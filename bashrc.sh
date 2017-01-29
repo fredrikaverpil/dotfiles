@@ -1,5 +1,6 @@
 # Aliases
 alias ll='ls -alhF'
+alias tree='tree -C'
 
 # Environment variables
 export PATH=~/miniconda3/bin:"$PATH"
