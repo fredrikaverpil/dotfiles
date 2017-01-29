@@ -5,11 +5,12 @@ My personal machine setup.
 
 ### macOS setup
 
-Uses:
 * Xcode
 * Homebrew
 * [Mac App Store command line interface](https://github.com/mas-cli/mas)
 * `terminal-ocean-dark.terminal` by [Mark Otto](https://github.com/mdo/ocean-terminal)
+
+#### Installation steps
 
 ```bash
 # Avoid writing .DS_Store
@@ -22,7 +23,13 @@ sudo xcodebuild -license accept
 # Install Homebrew
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
-# Brewfile
+# Get dotfiles
+mkdir -p  ~/code/repos
+cd ~/code/repos
+git clone https://github.com/fredrikaverpil/dotfiles.git 
+cd dotfiles
+
+# Install from Brewfile
 brew bundle
 
 # Check for issues
@@ -34,7 +41,7 @@ brew cleanup --force
 
 
 
-### Dotfiles
+### Symlink dotfiles
 
 | File | Description |
 | --- | --- |
