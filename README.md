@@ -27,6 +27,9 @@ brew bundle
 
 # Check for issues
 brew doctor
+
+# Clean up
+brew cleanup --force
 ```
 
 
