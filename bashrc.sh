@@ -1,7 +1,29 @@
 # Get the Git branch
-parse_git_branch() {
+function parse_git_branch() {
   git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
 }
+
+# --> Command execution time // start
+function timer_start {
+  timer=${timer:-$SECONDS}
+}
+
+function timer_stop {
+  timer_show=$(($SECONDS - $timer))
+  unset timer
+}
+
+trap 'timer_start' DEBUG
+
+if [ "$PROMPT_COMMAND" == "" ]; then
+  PROMPT_COMMAND="timer_stop"
+else
+  PROMPT_COMMAND="$PROMPT_COMMAND; timer_stop"
+fi
+# PS1='[last: ${timer_show}s][\w]$ '
+
+# Command execution time // end <--
+
 
 
 if [ -n "`$SHELL -c 'echo $BASH_VERSION'`" ]; then
@@ -23,6 +45,7 @@ if [ -n "`$SHELL -c 'echo $BASH_VERSION'`" ]; then
     # Includes custom character for the prompt, path, and Git branch name.
     # Source: kirsle.net/wizards/ps1.html
     export PS1="\n\[$(tput bold)\]\[$(tput setaf 5)\]➜ \[$(tput setaf 6)\]\w\[$(tput setaf 3)\]\$(parse_git_branch) \[$(tput sgr0)\]"
+
 
   fi
 fi
