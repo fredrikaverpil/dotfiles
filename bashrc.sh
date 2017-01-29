@@ -3,7 +3,7 @@ alias ll='ls -alhF'
 alias tree='tree -C'
 
 # Environment variables
-export PATH=~/miniconda3/bin:"$PATH"
+export PATH="$PATH":~/miniconda3/bin
 # export PATH=/opt/local/bin:/opt/local/sbin:${PATH}
 
 if [ -n "`$SHELL -c 'echo $BASH_VERSION'`" ]; then
