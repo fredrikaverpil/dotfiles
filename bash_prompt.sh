@@ -71,7 +71,8 @@ set_prompt () {
 
     # Add the ellapsed time and current date
     timer_stop
-    PS1+="$Reset($timer_show) \t \n"
+    # PS1+="$Reset($timer_show) \t \n"  # with time
+    PS1+="$Reset($timer_show) \n"  # without time
 
 
     # If root, just print the host in red. Otherwise, print the current user
