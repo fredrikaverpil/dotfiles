@@ -1,10 +1,11 @@
 # dotfiles
 
-My personal machine setup.
+![terminal](https://cloud.githubusercontent.com/assets/994357/22407086/e38f78d6-e65f-11e6-9db4-c4b1d0582d45.png)
 
 
 ### macOS setup
 
+Uses:
 * Xcode
 * Homebrew
 * [Mac App Store command line interface](https://github.com/mas-cli/mas)
