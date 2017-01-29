@@ -59,7 +59,7 @@ set_prompt () {
     Checkmark='\342\234\223'
 
     # Add a bright white exit status for the last command
-    PS1="$White\$? "
+    PS1="\n$White\$? "
 
     # If it was successful, print a green check mark. Otherwise, print
     # a red X.
@@ -71,7 +71,7 @@ set_prompt () {
 
     # Add the ellapsed time and current date
     timer_stop
-    PS1+="$Reset($timer_show) \t "
+    PS1+="$Reset($timer_show) \t \n"
 
 
     # If root, just print the host in red. Otherwise, print the current user
