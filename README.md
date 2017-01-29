@@ -39,6 +39,14 @@ brew doctor
 
 # Clean up
 brew cleanup --force
+
+# vscode & vim condaenv
+conda config --add channels conda-forge
+conda create -n pythondev_35 python=3.5 pylint pep8 autopep8
+
+# Install vim-plug and install all vim plugins
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+vim +PlugInstall +qall
 ```
 
 
@@ -51,10 +59,12 @@ brew cleanup --force
 | `.bashrc` | Is executed for interactive non-login shells. |
 | `.bash_prompt` | My custom bash prompt (sourced by `.bashrc`). |
 | `.gitconfig` | Global Git configuration to specify name, email,colors etc. |
+| `.vimrc` | Vim configuration. |
 
 ```bash
 ln -sf $(pwd)/bash_profile.sh ~/.bash_profile
 ln -sf $(pwd)/bashrc.sh ~/.bashrc
 ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
 ln -sf $(pwd)/gitconfig ~/.gitconfig
+ln -sf $(pwd)/vimrc ~/.vimrc
 ```
