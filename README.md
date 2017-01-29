@@ -1,5 +1,6 @@
-#### config
+# dotfiles
 
+My personal machine setup.
 
 
 ### macOS setup
@@ -30,7 +31,7 @@ brew doctor
 
 
 
-### Bash & git setup
+### Dotfiles
 
 | File | Description |
 | --- | --- |
