@@ -67,6 +67,7 @@ set_prompt () {
         PS1+="$Green$Checkmark "
     else
         PS1+="$Red$FancyX "
+        tput bel  # Ring the bell
     fi
 
     # Add the ellapsed time and current date
