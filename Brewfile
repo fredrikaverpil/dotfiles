@@ -9,6 +9,7 @@ brew 'tree'
 brew 'docker-compose', args: ['--without-docker', '--without-docker-machine']
 brew 'svtplay-dl'
 brew 'youtube-dl'
+brew 'coreutils'
 cask 'telegram'
 cask 'google-chrome'
 cask 'sublime-text'
