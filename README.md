@@ -52,5 +52,6 @@ brew cleanup --force
 ```bash
 ln -sf $(pwd)/bash_profile.sh ~/.bash_profile
 ln -sf $(pwd)/bashrc.sh ~/.bashrc
+ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
 ln -sf $(pwd)/gitconfig ~/.gitconfig
 ```
