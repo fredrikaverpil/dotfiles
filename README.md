@@ -50,7 +50,6 @@ vim +PlugInstall +qall
 ```
 
 
-
 ### Symlink dotfiles
 
 | File | Description |
@@ -68,3 +67,11 @@ ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
 ln -sf $(pwd)/gitconfig ~/.gitconfig
 ln -sf $(pwd)/vimrc ~/.vimrc
 ```
+
+### Visual Code setup
+
+Launch vscode and enter into console (cmd+shift+p):
+
+    ext install code-settings-sync
+
+Then provide Github token and gist ID to sync all settings and extensions.
