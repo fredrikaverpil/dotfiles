@@ -127,8 +127,12 @@
 	dmVy0RcYVHJvb3SAAQgRGiMtMjc7QUhOW2KMjpCVoKmxtL3P0tcAAAAAAAABAQAAAAAA
 	AAAZAAAAAAAAAAAAAAAAAAAA2Q==
 	</data>
+	<key>columnCount</key>
+	<integer>125</integer>
 	<key>name</key>
 	<string>Ocean Base16</string>
+	<key>rowCount</key>
+	<integer>35</integer>
 	<key>type</key>
 	<string>Window Settings</string>
 </dict>
