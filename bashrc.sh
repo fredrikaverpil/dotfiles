@@ -56,5 +56,4 @@ alias ll='ls -alhF'
 
 # Environment variables
 export PATH=~/miniconda3/bin:"$PATH"
-export HOMEBREW_GITHUB_API_TOKEN=5b9a0b98211c32a7015287ce0d64ab3fe55cd07a
 # export PATH=/opt/local/bin:/opt/local/sbin:${PATH}
