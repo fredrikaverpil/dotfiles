@@ -5,7 +5,7 @@
 
 ### macOS setup
 
-Uses:
+Requires/uses:
 * Xcode
 * Homebrew
 * [Mac App Store command line interface](https://github.com/mas-cli/mas)
@@ -14,8 +14,9 @@ Uses:
 #### Installation steps
 
 ```bash
-# Avoid writing .DS_Store
+# Avoid creating .DS_Store files on network or USB volumes
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 
 # Install Xcode commandline tools
 xcode-select --install
@@ -48,6 +49,7 @@ brew cleanup --force
 | --- | --- |
 | `.bash_profile` | Is executed for login shells. Exception Terminal.app: for each new terminal window, `.bash_profile` is called instead of `.bashrc`. |
 | `.bashrc` | Is executed for interactive non-login shells. |
+| `.bash_prompt` | My custom bash prompt (sourced by `.bashrc`). |
 | `.gitconfig` | Global Git configuration to specify name, email,colors etc. |
 
 ```bash
