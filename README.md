@@ -1,6 +1,6 @@
 # dotfiles
 
-![terminal](https://cloud.githubusercontent.com/assets/994357/22407086/e38f78d6-e65f-11e6-9db4-c4b1d0582d45.png)
+![terminal](https://cloud.githubusercontent.com/assets/994357/22407167/92b74982-e661-11e6-9b9d-4887286e245c.png)
 
 
 ### macOS setup
