@@ -23,9 +23,9 @@ set_prompt () {
     FancyX='\342\234\227'
     Checkmark='\342\234\223'
 
-
     # Add a bright white exit status for the last command
     PS1="$White\$? "
+
     # If it was successful, print a green check mark. Otherwise, print
     # a red X.
     if [[ $Last_Command == 0 ]]; then
