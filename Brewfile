@@ -19,6 +19,7 @@ cask 'spotify'
 cask 'transmit'
 # cask 'little-snitch'
 cask 'docker'
+cask 'appcleaner'
 mas '1Password', id: 443987910
 mas 'Xcode', id: 497799835
 mas 'Battery Health 2', id: 1120214373
