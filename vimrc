@@ -5,7 +5,6 @@
 set nocompatible " not vi compatible
 set backspace=2 " make backspace work like most other apps
 set encoding=utf8
-syntax on
 set number " show line numbers
 set noerrorbells
 set visualbell
@@ -43,6 +42,8 @@ set foldlevel=2 " Automatically fold at level n
 " call plug#begin('~/.config/nvim/plugged')
 call plug#begin('~/.vim/plugged')
 
+Plug 'kristijanhusak/vim-hybrid-material' " Material theme (hybrid)
+Plug 'jdkanani/vim-material-theme' " Material theme (works with iTerm2)
 Plug 'chriskempson/base16-vim' " Colorschemes
 Plug 'scrooloose/syntastic' " Syntax check
 Plug 'scrooloose/nerdtree' " File browser
@@ -73,7 +74,7 @@ let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 
 " Custom settings
-let s:condapylint = '/Users/fredrik/miniconda3/envs/pythondev_35/bin'
+let s:condapylint = '~/miniconda3/envs/pythondev_35/bin'
 let $PATH .= ':' . s:condapylint
 let g:syntastic_python_checkers = ['pylint']
 
@@ -109,13 +110,20 @@ let g:airline#extensions#tabline#enabled = 1
 " let g:airline_theme='base16'
 
 " ---------------------------------- "
-" Base16-vim
+" Theme / Base16-vim
 " ---------------------------------- "
 
-let base16colorspace=256  " Access colors present in 256 colorspace"
+" let base16colorspace=256  " Access colors present in 256 colorspace"
 " set t_Co=256 " Explicitly tell vim that the terminal supports 256 colors"
+" set termguicolors
 
-" colorscheme base16-ocean
+" syntax on
+syntax enable
+set background=dark
+colorscheme hybrid_material
+" colorscheme material-theme
+
+let g:airline_theme='hybrid'
 
 " let zsh_theme=$THEME " Fetch the $THEME variable
 " if zsh_theme != ""
