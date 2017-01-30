@@ -115,6 +115,8 @@ let g:airline#extensions#tabline#enabled = 1
 let base16colorspace=256  " Access colors present in 256 colorspace"
 set t_Co=256 " Explicitly tell vim that the terminal supports 256 colors"
 
+colorscheme base16-ocean
+
 " let zsh_theme=$THEME " Fetch the $THEME variable
 " if zsh_theme != ""
 "   execute "set background=".$BACKGROUND
