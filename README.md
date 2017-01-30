@@ -44,7 +44,7 @@ brew cleanup --force
 
 # vscode & vim condaenv
 conda config --add channels conda-forge
-conda create -n pythondev_35 python=3.5 pylint pep8 autopep8
+conda create -n pythondev_35 python=3.5 pylint pep8 yapf autopep8
 
 # Install vim-plug and install all vim plugins
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
