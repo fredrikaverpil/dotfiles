@@ -29,6 +29,7 @@ cask 'microsoft-remote-desktop-beta'
 # cask '1password'
 # cask 'little-snitch'
 # cask 'sketchup'
+# cask 'arq'
 mas '1Password', id: 443987910
 mas 'Keka', id: 470158793
 mas 'Wunderlist', id: 410628904
