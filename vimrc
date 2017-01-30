@@ -74,7 +74,7 @@ let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 
 " Custom settings
-let s:condapylint = '~/miniconda3/envs/pythondev_35/bin'
+let s:condapylint = $HOME . '/miniconda3/envs/pythondev_35/bin/'
 let $PATH .= ':' . s:condapylint
 let g:syntastic_python_checkers = ['pylint']
 
