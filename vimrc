@@ -113,9 +113,9 @@ let g:airline#extensions#tabline#enabled = 1
 " ---------------------------------- "
 
 let base16colorspace=256  " Access colors present in 256 colorspace"
-set t_Co=256 " Explicitly tell vim that the terminal supports 256 colors"
+" set t_Co=256 " Explicitly tell vim that the terminal supports 256 colors"
 
-colorscheme base16-ocean
+" colorscheme base16-ocean
 
 " let zsh_theme=$THEME " Fetch the $THEME variable
 " if zsh_theme != ""
@@ -123,5 +123,5 @@ colorscheme base16-ocean
 "   execute "colorscheme ".$THEME
 " endif
 
-highlight Comment cterm=italic
-highlight htmlArg cterm=italic
+" highlight Comment cterm=italic
+" highlight htmlArg cterm=italic
