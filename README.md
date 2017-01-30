@@ -9,7 +9,9 @@ Requires/uses:
 * Xcode
 * Homebrew
 * [Mac App Store command line interface](https://github.com/mas-cli/mas)
-* `terminal-ocean-dark.terminal` by [Mark Otto](https://github.com/mdo/ocean-terminal)
+* Terminal.app: `terminal-ocean-dark.terminal` by [Mark Otto](https://github.com/mdo/ocean-terminal)
+* iTerm2:  `material-design-colors.itermcolors` by [Martin Seeler](https://github.com/MartinSeeler/iterm2-material-design)
+
 
 #### Installation steps
 
