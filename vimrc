@@ -110,20 +110,19 @@ let g:airline#extensions#tabline#enabled = 1
 " let g:airline_theme='base16'
 
 " ---------------------------------- "
-" Theme / Base16-vim
+" Theme / colors
 " ---------------------------------- "
 
 " let base16colorspace=256  " Access colors present in 256 colorspace"
 " set t_Co=256 " Explicitly tell vim that the terminal supports 256 colors"
 " set termguicolors
 
-" syntax on
 syntax enable
-set background=dark
-colorscheme hybrid_material
+" set background=dark
+" colorscheme hybrid_material
 " colorscheme material-theme
 
-let g:airline_theme='hybrid'
+" let g:airline_theme='hybrid'
 
 " let zsh_theme=$THEME " Fetch the $THEME variable
 " if zsh_theme != ""
