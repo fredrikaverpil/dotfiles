@@ -5,8 +5,10 @@ tap 'caskroom/cask'
 tap 'caskroom/versions'
 brew 'mas'
 brew 'coreutils'  # Required for .bash_prompt
+brew 'vim'
 brew 'tmux'
 brew 'tree'
+brew 'htop'
 brew 'docker-compose', args: ['--without-docker', '--without-docker-machine']
 brew 'svtplay-dl'
 brew 'youtube-dl'
