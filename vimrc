@@ -126,6 +126,7 @@ let g:pymode_rope = 0
 " => Plugin settings: vim-indent-guides
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+" let g:indent_guides_start_level = 2
 " let g:indent_guides_auto_colors = 1
 " hi IndentGuidesOdd  ctermbg=white
 " hi IndentGuidesEven ctermbg=lightgrey
