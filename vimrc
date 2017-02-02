@@ -30,13 +30,14 @@ set number " show line numbers
 call plug#begin('~/.vim/plugged')
 
 " Color schemes
+Plug 'flazz/vim-colorschemes' " Color schemes
 Plug 'kristijanhusak/vim-hybrid-material' " Material theme (hybrid)
 Plug 'jdkanani/vim-material-theme' " Material theme (works with iTerm2)
 Plug 'chriskempson/base16-vim' " Colorschemes
 
 " General
 Plug 'tpope/vim-sensible'
-Plug 'vim-indent-guides' " Indentation guides
+Plug 'nathanaelkane/vim-indent-guides' " Indentation guides
 Plug 'scrooloose/nerdtree' " File browser
 Plug 'jistr/vim-nerdtree-tabs' " Improves NERDTree
 Plug 'kien/ctrlp.vim' " Search for file
