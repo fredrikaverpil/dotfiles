@@ -1,51 +1,42 @@
-" ---------------------------------- "
-" General settings
-" ---------------------------------- "
+" Sections:
+"    -> General
+"    -> Plugins
+"    -> Plugin settings: Airline
+"    -> Plugin settings: NERDTree
+"    -> Plugin settings: Ale
+"    -> Plugin settings: Python Mode
+"    -> Plugin settings: vim-indent-guides
+"    -> Colors and Fonts
+"
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => General
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 set nocompatible " not vi compatible
 set backspace=2 " make backspace work like most other apps
 set encoding=utf8
 set number " show line numbers
-set noerrorbells
-set visualbell
+" set noerrorbells
+" set visualbell
 
-" Create a vertical split using :vsp and horizontal with :sp
-set splitbelow " make the new window appear below the current window
-set splitright " make the new window appear on the right
-nnoremap <C-J> <C-W><C-J> " Ctrl-j move to the split below
-nnoremap <C-K> <C-W><C-K> " Ctrl-k move to the split above
-nnoremap <C-L> <C-W><C-L> " Ctrl-l move to the split to the right
-nnoremap <C-H> <C-W><C-H> " Ctrl-h move to the split to the left
 
-" Enable folding
-nnoremap <space> za " Enable folding with the spacebar
-set foldmethod=indent
-set foldnestmax=2
-set foldlevel=2 " Automatically fold at level n
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Plugins
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" Python PEP8
-" au BufNewFile,BufRead *.py set tabstop=4
-" au BufNewFile,BufRead *.py set softtabstop=4
-" au BufNewFile,BufRead *.py set shiftwidth=4
-" au BufNewFile,BufRead *.py set textwidth=79
-" au BufNewFile,BufRead *.py set expandtab
-" au BufNewFile,BufRead *.py set autoindent
-" au BufNewFile,BufRead *.py set fileformat=unix
-" autocmd FileType python set sw=4
-" autocmd FileType python set ts=4
-" autocmd FileType python set sts=4
-
-" ---------------------------------- "
-" Plugins
-" ---------------------------------- "
-
-" call plug#begin('~/.config/nvim/plugged')
 call plug#begin('~/.vim/plugged')
 
+" Color schemes
 Plug 'kristijanhusak/vim-hybrid-material' " Material theme (hybrid)
 Plug 'jdkanani/vim-material-theme' " Material theme (works with iTerm2)
 Plug 'chriskempson/base16-vim' " Colorschemes
-Plug 'scrooloose/syntastic' " Syntax check
+
+" General
+Plug 'tpope/vim-sensible'
+Plug 'vim-indent-guides' " Indentation guides
 Plug 'scrooloose/nerdtree' " File browser
 Plug 'jistr/vim-nerdtree-tabs' " Improves NERDTree
 Plug 'kien/ctrlp.vim' " Search for file
@@ -54,40 +45,34 @@ Plug 'vim-airline/vim-airline' " fancy statusline
 Plug 'vim-airline/vim-airline-themes' " themes for vim-airline
 Plug 'severin-lemaignan/vim-minimap' " minimap
 
-" Plug 'nvie/vim-flake8', { 'for': 'python' } " Python Flake 8 check
+" Linting
+Plug 'w0rp/ale' " Asynchronous Lint Engine (Vim 8.0)
+
+" Python
+Plug 'davidhalter/jedi-vim' " Jedi Autocompletion
+Plug 'klen/python-mode', {'do': ':helptags ~/.vim/doc/'}  " Python Mode
+
+" Other languages
 Plug 'elzr/vim-json', { 'for': 'json' } " JSON support
 
-call plug#end() " Add plugins to &runtimepath
+call plug#end()
 
-" ---------------------------------- "
-" Syntastic
-" ---------------------------------- "
 
-" Recommended settings
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Plugin settings: Airline
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
+let g:airline#extensions#tabline#enabled = 1
+let g:airline_powerline_fonts=0
+" let g:airline_left_sep=''
+" let g:airline_right_sep=''
+" let g:airline_theme='base16'
+let g:airline_theme='hybrid'
 
-" Custom settings
-let s:condapylint = $HOME . '/miniconda3/envs/pythondev_35/bin/'
-let $PATH .= ':' . s:condapylint
-let g:syntastic_python_checkers = ['pylint']
 
-" ---------------------------------- "
-" Flake8
-" ---------------------------------- "
-
-" autocmd BufWritePost *.py call Flake8() " Perform check on save
-" let g:flake8_show_in_gutter=1
-
-" ---------------------------------- "
-" NerdTree
-" ---------------------------------- "
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Plugin settings: NERDTree
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " Open NERDTree when Vim startsup and no files were specified
 autocmd StdinReadPre * let s:std_in=1
@@ -99,36 +84,61 @@ map <C-n> :NERDTreeToggle<CR>
 " Ignore files in NERDTree
 let NERDTreeIgnore=['\.pyc$', '\~$']
 
-" ---------------------------------- "
-" Airline
-" ---------------------------------- "
 
-let g:airline#extensions#tabline#enabled = 1
-" let g:airline_powerline_fonts=1
-" let g:airline_left_sep=''
-" let g:airline_right_sep=''
-" let g:airline_theme='base16'
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Plugin settings: Ale
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" ---------------------------------- "
-" Theme / colors
-" ---------------------------------- "
+filetype off
+let &runtimepath.=',~/.vim/plugged/ale'
+filetype plugin on
 
-" let base16colorspace=256  " Access colors present in 256 colorspace"
-" set t_Co=256 " Explicitly tell vim that the terminal supports 256 colors"
-" set termguicolors
+" Disable linting for Python (use Python Mode instead)
+let g:ale_python_pylint_executable='/Users/fredrik/miniconda3/envs/pythondev_35/bin/pylint'
 
+let g:ale_lint_on_enter = 0
+let g:ale_lint_on_save = 1
+let g:ale_lint_on_text_changed = 1
+let g:ale_sign_column_always = 1
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Plugin settings: Python Mode
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" let g:pymode = 1 " Enable Python Mode plugin
+" let g:pymode_trim_whitespaces = 1
+" let g:pymode_python = 'python3' " Python 3 syntax checking
+let g:pymode_folding = 0
+
+let g:pymode_lint = 0
+let g:pymode_lint_on_write = 1
+let g:pymode_lint_unmodified = 0
+let g:pymode_lint_on_fly = 1
+let g:pymode_lint_checkers = ['pylint', 'pep8']
+" let g:pymode_lint_ignore = "E501,W"
+
+let g:pymode_rope = 0
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Plugin settings: vim-indent-guides
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" let g:indent_guides_auto_colors = 1
+" hi IndentGuidesOdd  ctermbg=white
+" hi IndentGuidesEven ctermbg=lightgrey
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Colors and Fonts
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" Enable syntax highlighting
 syntax enable
-" set background=dark
-" colorscheme hybrid_material
+
+set t_Co=256
+
+set background=dark
+colorscheme hybrid_material
 " colorscheme material-theme
-
-" let g:airline_theme='hybrid'
-
-" let zsh_theme=$THEME " Fetch the $THEME variable
-" if zsh_theme != ""
-"   execute "set background=".$BACKGROUND
-"   execute "colorscheme ".$THEME
-" endif
-
-" highlight Comment cterm=italic
-" highlight htmlArg cterm=italic
