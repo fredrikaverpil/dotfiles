@@ -38,5 +38,6 @@ mas '1Password', id: 443987910
 mas 'Keka', id: 470158793
 mas 'Wunderlist', id: 410628904
 mas 'Pixelmator', id: 407963104
+mas 'Better Rename 9', id: 414209656
 # mas 'Battery Health 2', id: 1120214373
 mas 'Xcode', id: 497799835  # Slow download/install!
