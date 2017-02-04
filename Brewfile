@@ -1,3 +1,5 @@
+# Manually install using "brew cask install xxx --appdir=/Applications"
+
 cask_args appdir: '/Applications'
 tap 'homebrew/bundle'
 tap 'homebrew/core'
