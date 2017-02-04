@@ -84,7 +84,6 @@ Then provide Github token and gist ID to sync all settings and extensions.
 Note: On Windows, use Git Bash or other terminal. If more than 100 repos, change `PAGE` variable..
 
 ```bash
-    cd ~/code/repos
-    USER=fredrikaverpil; PAGE=1; curl "https://api.github.com/users/$USER/repos?page=$PAGE&per_page=100" | grep -e 'git_url*' | cut -d \" -f 4 | xargs -L1 git clone --recursive
-
+cd ~/code/repos
+USER=fredrikaverpil; PAGE=1; curl "https://api.github.com/users/$USER/repos?page=$PAGE&per_page=100" | grep -e 'git_url*' | cut -d \" -f 4 | xargs -L1 git clone --recursive
 ```
