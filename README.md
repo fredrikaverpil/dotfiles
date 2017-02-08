@@ -6,6 +6,7 @@
 ### Installation steps
 
 Requires/uses:
+* Bash
 * Xcode
 * Homebrew
 * [Mac App Store command line interface](https://github.com/mas-cli/mas)
@@ -13,7 +14,7 @@ Requires/uses:
 * iTerm2:  `material-design-colors.itermcolors` by [Martin Seeler](https://github.com/MartinSeeler/iterm2-material-design)
 
 
-#### macOS, bash
+#### macOS
 
 ```bash
 # Avoid creating .DS_Store files on network or USB volumes
@@ -51,8 +52,11 @@ curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.c
 vim +PlugInstall +qall
 ```
 
-#### Windows 10, Powershell
+#### Windows
 
+Requires/uses:
+* Powershell
+* [PSGet](https://github.com/psget/psget)
 
 ```powershell
 # Set exectution policy (to make Profile.ps1 work)
