@@ -52,6 +52,25 @@ vim +PlugInstall +qall
 ```
 
 
+### Windows setup
+
+#### Installation steps
+
+Requires/uses:
+* Powershell 5
+
+```powershell
+# Set exectution policy (to make Profile.ps1 work)
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# Install PSGet
+(new-object Net.WebClient).DownloadString("http://psget.net/GetPsGet.ps1") | iex
+
+# Install modules
+Install-Module PSColor  # https://github.com/Davlind/PSColor
+Install-Module posh-git  # https://github.com/dahlbyk/posh-git
+```
+
 ### Symlink dotfiles
 
 #### macOS
@@ -86,8 +105,7 @@ ln -sf $(pwd)/vimrc ~/.vimrc
 Note: Execute in Powershell (not in `CMD.exe`). Also enable the Script Execution policy prior to symlinking.
 
 ```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-New-Item -ItemType HardLink -Path $HOME\Documents\Profile.ps1 -Value Profile.ps1
+New-Item -ItemType HardLink -Path $HOME\Documents\WindowsPowerShell\Profile.ps1 -Value Profile.ps1
 ```
 
 
