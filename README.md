@@ -54,6 +54,8 @@ vim +PlugInstall +qall
 
 ### Symlink dotfiles
 
+#### macOS
+
 | File | Description |
 | --- | --- |
 | `.bash_profile` | Is executed for login shells. Exception Terminal.app: for each new terminal window, `.bash_profile` is called instead of `.bashrc`. |
@@ -69,6 +71,25 @@ ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
 ln -sf $(pwd)/gitconfig ~/.gitconfig
 ln -sf $(pwd)/vimrc ~/.vimrc
 ```
+
+#### Windows
+
+| Filepath | Description |
+| --- | --- |
+| `$Home\[My ]Documents\WindowsPowerShell\Profile.ps1` | Current User, Current Host – console |
+| `$Home\[My ]Documents\Profile.ps1` | Current User, All Hosts |
+| `$PsHome\Microsoft.PowerShell_profile.ps1` | All Users, Current Host – console |
+| `$PsHome\Profile.ps1` | All Users, All Hosts |
+| `$Home\[My ]Documents\WindowsPowerShell\Microsoft.P owerShellISE_profile.ps1` | Current user, Current Host – ISE |
+| `$PsHome\Microsoft.PowerShellISE_profile.ps1` | All users, Current Host – ISE |
+
+Note: Execute in Powershell (not in `CMD.exe`). Also enable the Script Execution policy prior to symlinking.
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+New-Item -ItemType HardLink -Path $HOME\Documents\Profile.ps1 -Value Profile.ps1
+```
+
 
 ### Visual Code setup
 
