@@ -65,6 +65,13 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 # Install PSGet
 (new-object Net.WebClient).DownloadString("http://psget.net/GetPsGet.ps1") | iex
 
+# Install Scoop
+iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+
+# Install concfg and use "ocean" theme
+scoop install concfg
+concfg import ocean
+
 # Install modules
 Install-Module PSColor  # https://github.com/Davlind/PSColor
 Install-Module posh-git  # https://github.com/dahlbyk/posh-git
