@@ -7,10 +7,11 @@ function ll {
 }
 
 # Import modules
+# See modules paths with command: $env:PSModulePath
 Import-Module PSColor  # https://github.com/Davlind/PSColor
 Import-Module posh-git  # https://github.com/dahlbyk/posh-git
 
-# Module settings
+# PSColor settings
 $global:PSColor.File.Executable.Color = 'Blue'  # Set blue color for executables (instead of red)
 
 # Update modules
