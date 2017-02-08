@@ -3,7 +3,7 @@
 ![terminal](https://cloud.githubusercontent.com/assets/994357/22407167/92b74982-e661-11e6-9b9d-4887286e245c.png)
 
 
-### macOS setup
+### Installation steps
 
 Requires/uses:
 * Xcode
@@ -13,7 +13,7 @@ Requires/uses:
 * iTerm2:  `material-design-colors.itermcolors` by [Martin Seeler](https://github.com/MartinSeeler/iterm2-material-design)
 
 
-#### Installation steps
+#### macOS, bash
 
 ```bash
 # Avoid creating .DS_Store files on network or USB volumes
@@ -51,13 +51,8 @@ curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.c
 vim +PlugInstall +qall
 ```
 
+#### Windows 10, Powershell
 
-### Windows setup
-
-#### Installation steps
-
-Requires/uses:
-* Powershell 5
 
 ```powershell
 # Set exectution policy (to make Profile.ps1 work)
