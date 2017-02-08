@@ -4,7 +4,6 @@ alias tree='tree -C'
 
 # Environment variables
 export PATH="$PATH":~/miniconda3/bin
-# export PATH=/opt/local/bin:/opt/local/sbin:${PATH}
 export CONDAENVS=~/miniconda3/envs
 
 # Per-platform specifics
