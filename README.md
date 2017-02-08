@@ -3,9 +3,10 @@
 ![terminal](https://cloud.githubusercontent.com/assets/994357/22407167/92b74982-e661-11e6-9b9d-4887286e245c.png)
 
 
-### macOS setup
+### Installation steps
 
 Requires/uses:
+* Bash
 * Xcode
 * Homebrew
 * [Mac App Store command line interface](https://github.com/mas-cli/mas)
@@ -13,7 +14,7 @@ Requires/uses:
 * iTerm2:  `material-design-colors.itermcolors` by [Martin Seeler](https://github.com/MartinSeeler/iterm2-material-design)
 
 
-#### Installation steps
+#### macOS
 
 ```bash
 # Avoid creating .DS_Store files on network or USB volumes
@@ -51,6 +52,42 @@ curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.c
 vim +PlugInstall +qall
 ```
 
+#### Windows
+
+Requires/uses:
+* Powershell
+* [PSGet](https://github.com/psget/psget)
+* [Scoop](https://github.com/lukesampson/scoop)
+* [Choco](https://github.com/chocolatey/choco)
+* [concfg](https://github.com/lukesampson/concfg)
+
+```powershell
+# Set exectution policy (to make Profile.ps1 work and allow symlinking)
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# Install PSGet and modules
+(new-object Net.WebClient).DownloadString("http://psget.net/GetPsGet.ps1") | iex
+Install-Module PSColor  # https://github.com/Davlind/PSColor
+Install-Module posh-git  # https://github.com/dahlbyk/posh-git
+
+# Install Scoop and modules
+iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+scoop install concfg
+
+# Set "ocean" theme
+concfg import ocean
+```
+
+From administrative Powershell:
+
+```powershell
+# Install Chocolatey
+iwr https://chocolatey.org/install.ps1 -UseBasicParsing | iex
+
+# Install all packages in `packages.config`
+choco install packages.config
+```
+
 
 ### Symlink dotfiles
 
@@ -83,11 +120,9 @@ ln -sf $(pwd)/vimrc ~/.vimrc
 | `$Home\[My ]Documents\WindowsPowerShell\Microsoft.P owerShellISE_profile.ps1` | Current user, Current Host – ISE |
 | `$PsHome\Microsoft.PowerShellISE_profile.ps1` | All users, Current Host – ISE |
 
-Note: Execute in Powershell (not in `CMD.exe`). Also enable the Script Execution policy prior to symlinking.
 
 ```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-New-Item -ItemType HardLink -Path $HOME\Documents\Profile.ps1 -Value Profile.ps1
+New-Item -ItemType HardLink -Path $HOME\Documents\WindowsPowerShell\Profile.ps1 -Value Profile.ps1
 ```
 
 
