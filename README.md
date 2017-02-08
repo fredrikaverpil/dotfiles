@@ -57,9 +57,12 @@ vim +PlugInstall +qall
 Requires/uses:
 * Powershell
 * [PSGet](https://github.com/psget/psget)
+* [Scoop](https://github.com/lukesampson/scoop)
+* [Choco](https://github.com/chocolatey/choco)
+* [concfg](https://github.com/lukesampson/concfg)
 
 ```powershell
-# Set exectution policy (to make Profile.ps1 work)
+# Set exectution policy (to make Profile.ps1 work and allow symlinking)
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 # Install PSGet and modules
@@ -117,7 +120,6 @@ ln -sf $(pwd)/vimrc ~/.vimrc
 | `$Home\[My ]Documents\WindowsPowerShell\Microsoft.P owerShellISE_profile.ps1` | Current user, Current Host – ISE |
 | `$PsHome\Microsoft.PowerShellISE_profile.ps1` | All users, Current Host – ISE |
 
-Note: Execute in Powershell (not in `CMD.exe`). Also enable the Script Execution policy prior to symlinking.
 
 ```powershell
 New-Item -ItemType HardLink -Path $HOME\Documents\WindowsPowerShell\Profile.ps1 -Value Profile.ps1
