@@ -70,6 +70,17 @@ Install-Module PSColor  # https://github.com/Davlind/PSColor
 Install-Module posh-git  # https://github.com/dahlbyk/posh-git
 ```
 
+From administrative Powershell:
+
+```powershell
+# Install Chocolatey
+iwr https://chocolatey.org/install.ps1 -UseBasicParsing | iex
+
+# Install all packages in `packages.config`
+choco install packages.config
+```
+
+
 ### Symlink dotfiles
 
 #### macOS
