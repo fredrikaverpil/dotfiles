@@ -10,6 +10,9 @@ function ll {
 Import-Module PSColor  # https://github.com/Davlind/PSColor
 Import-Module posh-git  # https://github.com/dahlbyk/posh-git
 
+# Module settings
+$global:PSColor.File.Executable.Color = 'Blue'  # Set blue color for executables (instead of red)
+
 # Update modules
 # Install-Module PSColor
 # Update-Module posh-git
