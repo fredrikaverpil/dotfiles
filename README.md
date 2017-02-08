@@ -62,19 +62,17 @@ Requires/uses:
 # Set exectution policy (to make Profile.ps1 work)
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
-# Install PSGet
+# Install PSGet and modules
 (new-object Net.WebClient).DownloadString("http://psget.net/GetPsGet.ps1") | iex
-
-# Install Scoop
-iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
-
-# Install concfg and use "ocean" theme
-scoop install concfg
-concfg import ocean
-
-# Install modules
 Install-Module PSColor  # https://github.com/Davlind/PSColor
 Install-Module posh-git  # https://github.com/dahlbyk/posh-git
+
+# Install Scoop and modules
+iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+scoop install concfg
+
+# Set "ocean" theme
+concfg import ocean
 ```
 
 From administrative Powershell:
