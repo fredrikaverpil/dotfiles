@@ -43,6 +43,12 @@ brew doctor
 # Clean up
 brew cleanup --force
 
+# Install miniconda3
+cd ~/Downloads && \
+curl -O https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh && \
+chmod +x Miniconda3-latest-MacOSX-x86_64.sh && \
+./Miniconda3-latest-MacOSX-x86_64.sh
+
 # vscode & vim condaenv
 conda config --add channels conda-forge
 conda create -n pythondev_35 python=3.5 pylint pep8 yapf autopep8
