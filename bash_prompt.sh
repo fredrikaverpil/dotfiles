@@ -84,8 +84,12 @@ set_prompt () {
         PS1+="$Green\\u@\\h "
     fi
 
-    # Print the working directory
+    # Print the FULL working directory path
     PS1+="$Blue\\w"
+
+    # Print the working directory name
+    # PS1+="$Blue\\W"
+
 
     # Print the git branch
     if [[ ! -z $(parse_git_branch) ]]; then
@@ -93,7 +97,10 @@ set_prompt () {
     fi
 
     # Reset the prompt marker text color to the default.
-    PS1+=" $Blue\\\$$Reset "
+    # PS1+=" $Blue\\\$$Reset "
+
+    # Reset the prompt marker text color to the default (with newline).
+    PS1+=" $Blue\n\\\$$Reset "
 }
 
 trap 'timer_start' DEBUG
