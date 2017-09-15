@@ -9,6 +9,7 @@ brew 'mas'
 brew 'coreutils'  # Required for .bash_prompt
 brew 'vim'
 brew 'tmux'
+brew 'mobile-shell'
 brew 'tree'
 brew 'htop'
 brew 'docker-compose', args: ['--without-docker', '--without-docker-machine']
