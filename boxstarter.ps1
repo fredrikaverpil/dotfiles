@@ -24,8 +24,9 @@ Disable-UAC
 
 #--- Windows Subsystems/Features ---
 
-choco install Microsoft-Hyper-V-All -source windowsFeatures
-choco install Microsoft-Windows-Subsystem-Linux -source windowsfeatures
+# Enable WSL
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+
 
 
 #--- Prompt (PsGet and modules) ---
@@ -261,18 +262,18 @@ choco install googlechrome
 choco install gitkraken
 choco install miniconda3
 choco install visualstudiocode
-choco install visualstudiocode-insiders
+choco install visualstudiocode-insiders --pre
 choco install sublimetext3
 choco install sublimetext3.packagecontrol
 choco install docker-for-windows
 choco install docker-compose
-choco install qtcreator
-choco install rdcman
+# choco install qtcreator
+# choco install rdcman
 choco install slack
 choco install gitter
 choco install telegram
-choco install spotify
-choco install 1password
+# choco install spotify
+# choco install 1password
 choco install wunderlist
 
 
