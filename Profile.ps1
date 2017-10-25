@@ -19,4 +19,4 @@ $global:PSColor.File.Executable.Color = 'Blue'  # Set blue color for executables
 # Update-Module posh-git
 
 # Environment variables
-$CONDAENVS = "C:\Program Files\Miniconda2\envs"
+$CONDAENVS = "$HOME\miniconda3\envs"

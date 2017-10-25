@@ -259,7 +259,6 @@ choco install tree
 choco install git
 choco install googlechrome
 choco install gitkraken
-choco install miniconda3
 choco install visualstudiocode
 choco install visualstudiocode-insiders --pre
 choco install sublimetext3
@@ -274,6 +273,11 @@ choco install telegram
 # choco install spotify
 # choco install 1password
 choco install wunderlist
+
+# Download Miniconda3
+(New-Object System.Net.WebClient).DownloadFile("https://repo.continuum.io/miniconda/Miniconda3-latest-Windows-x86_64.exe", "${HOME}\Downloads\Miniconda3-latest-Windows-x86_64.exe")
+# Install and add "conda" to $PATH
+Start-Process "${HOME}\Downloads\Miniconda3-latest-Windows-x86_64.exe" "/S /D=${HOME}\miniconda3 /AddToPath=1"
 
 
 #--- Restore Temporary Settings ---
