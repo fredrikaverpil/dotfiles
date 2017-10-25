@@ -60,38 +60,17 @@ vim +PlugInstall +qall
 
 #### Windows
 
-Requires/uses:
-* Powershell
-* [PSGet](https://github.com/psget/psget)
-* [Scoop](https://github.com/lukesampson/scoop)
-* [Choco](https://github.com/chocolatey/choco)
-* [concfg](https://github.com/lukesampson/concfg)
-
-```powershell
-# Set exectution policy (to make Profile.ps1 work and allow symlinking)
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-
-# Install PSGet and modules
-(new-object Net.WebClient).DownloadString("http://psget.net/GetPsGet.ps1") | iex
-Install-Module PSColor  # https://github.com/Davlind/PSColor
-Install-Module posh-git  # https://github.com/dahlbyk/posh-git
-
-# Install Scoop and modules
-iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
-scoop install concfg
-
-# Set "ocean" theme
-concfg import ocean
-```
-
 From administrative Powershell:
 
 ```powershell
-# Install Chocolatey
-iwr https://chocolatey.org/install.ps1 -UseBasicParsing | iex
+# Set exectution policy
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
-# Install all packages in `packages.config`
-choco install packages.config
+# Install Boxstarter
+. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
+
+# Set up everything (uses boxstarter.ps1)
+Install-BoxstarterPackage -PackageName boxstarter.ps1 -DisableReboots
 ```
 
 
@@ -123,7 +102,7 @@ ln -sf $(pwd)/vimrc ~/.vimrc
 | `$Home\[My ]Documents\Profile.ps1` | Current User, All Hosts |
 | `$PsHome\Microsoft.PowerShell_profile.ps1` | All Users, Current Host – console |
 | `$PsHome\Profile.ps1` | All Users, All Hosts |
-| `$Home\[My ]Documents\WindowsPowerShell\Microsoft.P owerShellISE_profile.ps1` | Current user, Current Host – ISE |
+| `$Home\[My ]Documents\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1` | Current user, Current Host – ISE |
 | `$PsHome\Microsoft.PowerShellISE_profile.ps1` | All users, Current Host – ISE |
 
 
