@@ -39,6 +39,7 @@ Install-Module posh-git  # https://github.com/dahlbyk/posh-git
 
 Disable-BingSearch
 Disable-GameBarTips
+Enable-RemoteDesktop
 Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives -EnableShowProtectedOSFiles -EnableShowFileExtensions
 Set-TaskbarOptions -Size Small -Dock Bottom -Combine Full -Lock
 Set-TaskbarOptions -Size Small -Dock Bottom -Combine Full -AlwaysShowIconsOn
