@@ -22,3 +22,5 @@ if [ -n "`$SHELL -c 'echo $BASH_VERSION'`" ]; then
   [[ -s ~/.bash_prompt ]] && source ~/.bash_prompt
 
 fi
+export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+export PATH="$HOME/miniconda3/bin:$PATH"
