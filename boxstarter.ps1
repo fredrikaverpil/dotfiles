@@ -28,7 +28,6 @@ Disable-UAC
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
 
 
-
 #--- Prompt (PsGet and modules) ---
 
 (new-object Net.WebClient).DownloadString("http://psget.net/GetPsGet.ps1") | iex
