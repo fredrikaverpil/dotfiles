@@ -288,3 +288,4 @@ Install-WindowsUpdate -acceptEula
 $computername = "faverpil-win"
 if ($env:computername -ne $computername) {
 	Rename-Computer -NewName $computername
+}
