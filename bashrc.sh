@@ -1,7 +1,7 @@
 # Aliases
 alias ll='ls -alhF'
 alias tree='tree -C'
-alias vscode='code'
+# alias vscode='code'
 
 # Environment variables
 export PATH="$PATH:~/miniconda3/bin"
