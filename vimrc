@@ -95,7 +95,19 @@ let &runtimepath.=',~/.vim/plugged/ale'
 filetype plugin on
 
 " Disable linting for Python (use Python Mode instead)
-let g:ale_python_pylint_executable='/Users/fredrik/miniconda3/envs/pythondev_35/bin/pylint'
+if has("win32")
+  let g:ale_python_pylint_executable='/Users/fredrik/miniconda3/envs/pythondev_35/bin/pylint'
+else
+  if has("unix")
+    let s:uname = system("uname")
+    if s:uname == "Darwin\n"
+      " let g:ale_python_pylint_executable='/Users/fredrik/miniconda3/envs/pythondev_35/bin/pylint'
+      let g:ale_python_pylint_executable='$HOME/miniconda3/envs/pythondev_35/bin/pylint'
+    elseif s:uname == "Linux\n"
+      let g:ale_python_pylint_executable='$HOME/miniconda3/envs/pythondev_35/bin/pylint'
+    endif
+  endif
+endif
 
 let g:ale_lint_on_enter = 0
 let g:ale_lint_on_save = 1
@@ -141,6 +153,11 @@ syntax enable
 
 set t_Co=256
 
-set background=dark
-colorscheme hybrid_material
-" colorscheme material-theme
+if has("unix")
+  let s:uname = system("uname")
+  if s:uname == "Darwin\n"
+    set background=dark
+    colorscheme hybrid_material
+    " colorscheme material-theme
+  endif
+endif
