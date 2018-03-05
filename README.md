@@ -1,20 +1,10 @@
 # dotfiles
 
-![terminal](https://cloud.githubusercontent.com/assets/994357/22407167/92b74982-e661-11e6-9b9d-4887286e245c.png)
+
+## macOS
 
 
-### Installation steps
-
-Requires/uses:
-* Bash
-* Xcode
-* Homebrew
-* [Mac App Store command line interface](https://github.com/mas-cli/mas)
-* Terminal.app: `terminal-ocean-dark.terminal` by [Mark Otto](https://github.com/mdo/ocean-terminal)
-* iTerm2:  `material-design-colors.itermcolors` by [Martin Seeler](https://github.com/MartinSeeler/iterm2-material-design)
-
-
-#### macOS
+### Installation (bash)
 
 ```bash
 # Avoid creating .DS_Store files on network or USB volumes
@@ -34,6 +24,13 @@ cd ~/code/repos
 git clone https://github.com/fredrikaverpil/dotfiles.git 
 cd dotfiles
 
+# Create symlinks
+ln -sf $(pwd)/bash_profile.sh ~/.bash_profile
+ln -sf $(pwd)/bashrc.sh ~/.bashrc
+ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
+ln -sf $(pwd)/gitconfig ~/.gitconfig
+ln -sf $(pwd)/vimrc ~/.vimrc
+
 # Install from Brewfile
 brew bundle
 
@@ -43,24 +40,27 @@ brew doctor
 # Clean up
 brew cleanup --force
 
-# Install miniconda3
-cd ~/Downloads && \
-curl -O https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh && \
-chmod +x Miniconda3-latest-MacOSX-x86_64.sh && \
-./Miniconda3-latest-MacOSX-x86_64.sh
-
-# vscode & vim condaenv
-conda config --add channels conda-forge
-conda create -n pythondev_35 python=3.5 pylint pep8 yapf autopep8
+# Miniconda
+wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh
+chmod +x ~/miniconda.sh
+bash ~/miniconda.sh -b -p $HOME/miniconda3
+rm ~/miniconda.sh
+# ln -s $HOME/miniconda3/bin/conda /usr/bin/conda  # haven't tried this on macOS yet
 
 # Install vim-plug and install all vim plugins
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 vim +PlugInstall +qall
 ```
 
-#### Windows
+<br><br>
 
-From administrative Powershell:
+
+## Windows 10 with bash
+
+:warning: Never change Linux files in Windows apps or you risk data corruption.
+
+
+### Installation (administrative Powershell)
 
 ```powershell
 # Set exectution policy
@@ -69,14 +69,78 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 # Install Boxstarter
 . { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
 
-# Set up everything (uses boxstarter.ps1)
+# Boxstarter config
 Install-BoxstarterPackage -PackageName boxstarter.ps1 -DisableReboots
+
+# Get dotfiles
+mkdir -p  ~/code/repos
+cd ~/code/repos
+git clone https://github.com/fredrikaverpil/dotfiles.git 
+cd dotfiles
+
+# Create symlinks
+New-Item -ItemType HardLink -Path $HOME\Documents\WindowsPowerShell\Profile.ps1 -Value Profile.ps1
+```
+
+### Installation (Ubuntu bash)
+
+```bash
+cd /mnt/c/.../code/repos/dotfiles
+
+# Basics
+sudo apt-get update
+sudo apt-get install -y tmux mosh htop tree
+
+# Docker
+# Note - in Docker for Windows, first enable "Expose daemon on tcp://localhost:2375 without TLS"
+sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt-get update
+sudo apt-get install -y docker-ce
+export DOCKER_HOST=tcp://0.0.0.0:2375
+# echo "export DOCKER_HOST=tcp://0.0.0.0:2375" >> ~/.bashrc
+
+# Docker compose via Python 2
+sudo apt-get install -y python python-dev python-setuptools
+sudo apt-get install -y python-pip
+sudo pip install docker-compose
+
+# Miniconda
+wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh
+chmod +x ~/miniconda.sh
+bash ~/miniconda.sh -b -p $HOME/miniconda3
+rm ~/miniconda.sh
+sudo ln -s $HOME/miniconda3/bin/conda /usr/bin/conda
+
+# Qt/PySide2 stuff
+sudo apt-get install -y libgl1-mesa-glx xcb libxcb*
+sudo apt-get install x11-apps
+udo apt-get install gnome-calculator # (to get GTK)
+export DISPLAY=:0
+# ENV DISPLAY :99
+
+# --- envs, to be placed in separate .bashrc symlink...
+export DOCKER_HOST=tcp://0.0.0.0:2375  # Docker for Windows/bash
+export DISPLAY=:0  # Tell X server to run on local computer
+# export DISPLAY=localhost:0.0
+# --- envs, to be placed in separate .bashrc symlink...
+
+# Create symlinks
+ln -s $(pwd)/vimrc ~/.vimrc
+ln -s $(pwd)/gitconfig ~/.gitconfig
+
+# Install vim-plug and install all vim plugins
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+vim +PlugInstall +qall
 ```
 
 
-### Symlink dotfiles
+<br><br>
 
-#### macOS
+## Symlinking details
+
+### macOS
 
 | File | Description |
 | --- | --- |
@@ -86,15 +150,8 @@ Install-BoxstarterPackage -PackageName boxstarter.ps1 -DisableReboots
 | `.gitconfig` | Global Git configuration to specify name, email,colors etc. |
 | `.vimrc` | Vim configuration. |
 
-```bash
-ln -sf $(pwd)/bash_profile.sh ~/.bash_profile
-ln -sf $(pwd)/bashrc.sh ~/.bashrc
-ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
-ln -sf $(pwd)/gitconfig ~/.gitconfig
-ln -sf $(pwd)/vimrc ~/.vimrc
-```
 
-#### Windows
+### Windows
 
 | Filepath | Description |
 | --- | --- |
@@ -106,12 +163,15 @@ ln -sf $(pwd)/vimrc ~/.vimrc
 | `$PsHome\Microsoft.PowerShellISE_profile.ps1` | All users, Current Host – ISE |
 
 
-```powershell
-New-Item -ItemType HardLink -Path $HOME\Documents\WindowsPowerShell\Profile.ps1 -Value Profile.ps1
+<br><br>
+
+
+## Visual Code setup
+
+```bash
+conda config --add channels conda-forge
+conda create -y -n pythondev_35 python=3.5 pylint pep8 yapf autopep8
 ```
-
-
-### Visual Code setup
 
 Launch vscode and enter into console (cmd+shift+p):
 
@@ -120,7 +180,10 @@ Launch vscode and enter into console (cmd+shift+p):
 Then provide Github token and gist ID to sync all settings and extensions.
 
 
-### Clone all my public repos
+<br><br>
+
+
+## Clone all my public repos
 
 Note: On Windows, use Git Bash or other terminal. If more than 100 repos, change `PAGE` variable..
 
