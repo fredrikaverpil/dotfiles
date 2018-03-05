@@ -278,8 +278,7 @@ choco install wunderlist
 
 # Download Miniconda3
 (New-Object System.Net.WebClient).DownloadFile("https://repo.continuum.io/miniconda/Miniconda3-latest-Windows-x86_64.exe", "${HOME}\Downloads\Miniconda3-latest-Windows-x86_64.exe")
-# Install, add "conda" and "python" etc to $PATH
-& "${HOME}\Downloads\Miniconda3-latest-Windows-x86_64.exe" /S /AddToPath=1 /D=${HOME}\miniconda3
+& "${HOME}\Downloads\Miniconda3-latest-Windows-x86_64.exe" /S /InstallationType=JustMe /AddToPath=1 /D=${HOME}\Miniconda3
 
 
 #--- Restore Temporary Settings ---
