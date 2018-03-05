@@ -1,7 +1,9 @@
 # dotfiles
 
 
-## macOS
+## macOS with Terminal.app
+
+Set Terminal.app to use `terminal-ocean-dark.terminal`.
 
 
 ### Installation (bash)
