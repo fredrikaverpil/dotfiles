@@ -38,6 +38,7 @@ cask 'powershell'
 # cask 'little-snitch'
 # cask 'sketchup'
 # cask 'arq'
+cask 'zenmap'
 mas '1Password', id: 443987910
 mas 'Keka', id: 470158793
 mas 'Wunderlist', id: 410628904
