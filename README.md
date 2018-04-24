@@ -80,8 +80,10 @@ cd ~/code/repos
 git clone https://github.com/fredrikaverpil/dotfiles.git 
 cd dotfiles
 
-# Create symlinks
-New-Item -ItemType HardLink -Path $HOME\Documents\WindowsPowerShell\Profile.ps1 -Value Profile.ps1
+# Create symlinks (sudo intsalled in boxstarter script)
+sudo New-Item -ItemType SymbolicLink -Path $HOME\Documents\WindowsPowerShell\Profile.ps1 -Value Profile.ps1
+sudo New-Item -ItemType SymbolicLink -Path $HOME\.hyper.js -Value hyper.js
+sudo New-Item -ItemType SymbolicLink -Path $HOME\.gitconfig -Value gitconfig
 ```
 
 ### Installation (Ubuntu bash)

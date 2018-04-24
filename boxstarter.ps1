@@ -35,6 +35,12 @@ Install-Module PSColor  # https://github.com/Davlind/PSColor
 Install-Module posh-git  # https://github.com/dahlbyk/posh-git
 
 
+# --- Scoop
+
+(new-object net.webclient).downloadstring('https://get.scoop.sh') | iex
+scoop install sudo
+
+
 #--- Windows Settings ---
 
 Disable-BingSearch

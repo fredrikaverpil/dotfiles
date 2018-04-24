@@ -13,10 +13,3 @@ Import-Module posh-git  # https://github.com/dahlbyk/posh-git
 
 # PSColor settings
 $global:PSColor.File.Executable.Color = 'Blue'  # Set blue color for executables (instead of red)
-
-# Update modules
-# Install-Module PSColor
-# Update-Module posh-git
-
-# Environment variables
-$CONDAENVS = "$HOME\miniconda3\envs"
