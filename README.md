@@ -84,6 +84,18 @@ cd dotfiles
 sudo New-Item -ItemType SymbolicLink -Path $HOME\Documents\WindowsPowerShell\Profile.ps1 -Value Profile.ps1
 sudo New-Item -ItemType SymbolicLink -Path $HOME\.hyper.js -Value hyper.js
 sudo New-Item -ItemType SymbolicLink -Path $HOME\.gitconfig -Value gitconfig
+sudo New-Item -ItemType SymbolicLink -Path $HOME\.vimrc -Value vimrc
+
+# Vim
+md ~\vimfiles\autoload
+$uri = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+(New-Object Net.WebClient).DownloadFile(
+  $uri,
+  $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
+    "~\vimfiles\autoload\plug.vim"
+  )
+)
+vim +PlugInstall +qall
 ```
 
 ### Installation (Ubuntu bash)
