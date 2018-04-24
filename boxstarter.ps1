@@ -256,6 +256,7 @@ Get-AppxPackage Microsoft.ZuneVideo | Remove-AppxPackage
 # choco install sysinternals
 choco install procexp
 # choco install vim
+# choco install neovim
 
 # choco install sharex
 # choco install microsoft-teams

@@ -96,15 +96,20 @@ filetype plugin on
 
 " Disable linting for Python (use Python Mode instead)
 if has("win32")
-  let g:ale_python_pylint_executable='/Users/fredrik/miniconda3/envs/pythondev_35/bin/pylint'
+  if has("nvim")
+    let g:python3_host_prog="c:/USERS/iruser/miniconda3/envs/pythondev_36/python.exe"
+    " let g:jedi#force_py_version = 3
+  else
+    let g:ale_python_pylint_executable='$HOME/miniconda3/envs/pythondev_36/Scripts/pylint.exe'
+  endif
 else
   if has("unix")
     let s:uname = system("uname")
     if s:uname == "Darwin\n"
-      " let g:ale_python_pylint_executable='/Users/fredrik/miniconda3/envs/pythondev_35/bin/pylint'
-      let g:ale_python_pylint_executable='$HOME/miniconda3/envs/pythondev_35/bin/pylint'
+      " let g:ale_python_pylint_executable='/Users/fredrik/miniconda3/envs/pythondev_36/bin/pylint'
+      let g:ale_python_pylint_executable='$HOME/miniconda3/envs/pythondev_36/bin/pylint'
     elseif s:uname == "Linux\n"
-      let g:ale_python_pylint_executable='$HOME/miniconda3/envs/pythondev_35/bin/pylint'
+      let g:ale_python_pylint_executable='$HOME/miniconda3/envs/pythondev_36/bin/pylint'
     endif
   endif
 endif
@@ -118,6 +123,8 @@ let g:ale_sign_column_always = 1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugin settings: Python Mode
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+let g:pymode_python = 'python3'
 
 " let g:pymode = 1 " Enable Python Mode plugin
 " let g:pymode_trim_whitespaces = 1
