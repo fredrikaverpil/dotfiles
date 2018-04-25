@@ -94,51 +94,90 @@ filetype off
 let &runtimepath.=',~/.vim/plugged/ale'
 filetype plugin on
 
-" Disable linting for Python (use Python Mode instead)
-if has("win32")
-  if has("nvim")
-    let g:python3_host_prog="c:/USERS/iruser/miniconda3/envs/pythondev_36/python.exe"
-    " let g:jedi#force_py_version = 3
-  else
-    let g:ale_python_pylint_executable='$HOME/miniconda3/envs/pythondev_36/Scripts/pylint.exe'
-  endif
-else
-  if has("unix")
-    let s:uname = system("uname")
-    if s:uname == "Darwin\n"
-      " let g:ale_python_pylint_executable='/Users/fredrik/miniconda3/envs/pythondev_36/bin/pylint'
-      let g:ale_python_pylint_executable='$HOME/miniconda3/envs/pythondev_36/bin/pylint'
-    elseif s:uname == "Linux\n"
-      let g:ale_python_pylint_executable='$HOME/miniconda3/envs/pythondev_36/bin/pylint'
-    endif
-  endif
-endif
-
+let g:ale_enabled = 1
 let g:ale_lint_on_enter = 0
 let g:ale_lint_on_save = 1
 let g:ale_lint_on_text_changed = 1
 let g:ale_sign_column_always = 1
+let b:ale_linters = ['flake8', 'pylint']
+let b:ale_fixers = ['yapf']
+let b:ale_warn_about_trailing_whitespace = 0
+
+if has("nvim")
+  " Neovim
+  if has("win32")
+    if isdirectory("C:/Users/iruser")
+      let g:python3_host_prog="C:/Users/iruser/Miniconda3/envs/linting/python.exe"
+      " let g:ale_python_pylint_executable='C:/Users/iruser/miniconda3/envs/linting/Scripts/pylint.exe'
+    else
+      let g:python3_host_prog="C:/Users/fredrik/Miniconda3/envs/linting/python.exe"
+      " let g:ale_python_pylint_executable='C:/Users/iruser/miniconda3/envs/linting/Scripts/pylint.exe'
+    endif
+  elseif has("unix")
+    let s:uname = system("uname")
+    if s:uname == "Darwin\n"
+      let g:python3_host_prog="/Users/fredrik/miniconda3/envs/linting/bin/python"
+      let g:ale_python_pylint_executable="/Users/fredrik/miniconda3/envs/linting/bin/pylint"
+    elseif s:uname == "Linux\n"
+      let g:python3_host_prog="/home/iruser/miniconda3/envs/linting/bin/python"
+      let g:ale_python_pylint_executable="/home/iruser/miniconda3/envs/linting/bin/pylint"
+    endif
+  endif
+else
+  " Regular vim - cannot specify custom interpreter
+  if has("win32")
+  elseif has("unix")
+    let s:uname = system("uname")
+    if s:uname == "Darwin\n"
+    elseif s:uname == "Linux\n"
+    endif
+  endif
+endif
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugin settings: Python Mode
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-let g:pymode_python = 'python3'
-
-" let g:pymode = 1 " Enable Python Mode plugin
-" let g:pymode_trim_whitespaces = 1
-" let g:pymode_python = 'python3' " Python 3 syntax checking
+let g:pymode = 0 " Enable Python Mode plugin
+let g:pymode_trim_whitespaces = 1
+let g:pymode_python = 'python3' " Python 3 syntax checking
 let g:pymode_folding = 0
 
 let g:pymode_lint = 0
-let g:pymode_lint_on_write = 1
-let g:pymode_lint_unmodified = 0
-let g:pymode_lint_on_fly = 1
-let g:pymode_lint_checkers = ['pylint', 'pep8']
+" let g:pymode_lint_on_write = 0
+" let g:pymode_lint_unmodified = 0
+" let g:pymode_lint_on_fly = 0
+" let g:pymode_lint_checkers = ['pylint', 'flake8']
 " let g:pymode_lint_ignore = "E501,W"
 
-let g:pymode_rope = 0
+let g:pymode_rope = 1
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Plugin settings: jedi-vim
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+if has("nvim")
+  " Neovim
+  let g:jedi#force_py_version = 3
+  if has("win32")
+  elseif has("unix")
+    let s:uname = system("uname")
+    if s:uname == "Darwin\n"
+    elseif s:uname == "Linux\n"
+    endif
+  endif
+else
+  " Regular vim - cannot specify custom interpreter
+  if has("win32")
+  elseif has("unix")
+    let s:uname = system("uname")
+    if s:uname == "Darwin\n"
+    elseif s:uname == "Linux\n"
+    endif
+  endif
+endif
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

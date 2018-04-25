@@ -80,7 +80,7 @@ cd ~/code/repos
 git clone https://github.com/fredrikaverpil/dotfiles.git 
 cd dotfiles
 
-# Create symlinks (sudo intsalled in boxstarter script)
+# Create symlinks
 sudo New-Item -ItemType SymbolicLink -Path $HOME\Documents\WindowsPowerShell\Profile.ps1 -Value Profile.ps1
 sudo New-Item -ItemType SymbolicLink -Path $HOME\.hyper.js -Value hyper.js
 sudo New-Item -ItemType SymbolicLink -Path $HOME\.gitconfig -Value gitconfig
@@ -156,11 +156,22 @@ export DISPLAY=:0  # Tell X server to run on local computer
 
 # Create symlinks
 ln -s $(pwd)/vimrc ~/.vimrc
+mkdir ~/.config/nvim/
+ln -s $(pwd)/vimrc ~/.config/nvim/init.vim
 ln -s $(pwd)/gitconfig ~/.gitconfig
 
-# Install vim-plug and install all vim plugins
+# Vim
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 vim +PlugInstall +qall
+
+# Neovim
+sudo apt-get install software-properties-common
+sudo apt-get install python-software-properties
+sudo add-apt-repository ppa:neovim-ppa/stable
+sudo apt-get update
+sudo apt-get install neovim
+curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+nvim +PlugInstall +qall
 ```
 
 
@@ -190,6 +201,30 @@ vim +PlugInstall +qall
 | `$Home\[My ]Documents\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1` | Current user, Current Host – ISE |
 | `$PsHome\Microsoft.PowerShellISE_profile.ps1` | All users, Current Host – ISE |
 
+
+<br><br>
+
+## Virtual "linting" environment"
+
+```bash
+# macOS/Ubuntu
+
+cd dotfiles
+conda update -n base conda
+conda create --yes -n linting python=3.6
+~/miniconda3/envs/linting/bin/pip install --upgrade pip
+~/miniconda3/envs/linting/bin/pip install --upgrade -r requirements.txt
+```
+
+```powershell
+# Windows
+
+cd dotfiles
+conda update -n base conda
+conda create --yes -n linting python=3.6
+~\envs\linting\python.exe -m pip install --upgrade pip
+~\Miniconda3\envs\linting\Scripts\pip.exe install --upgrade -r requirements.txt
+```
 
 <br><br>
 
