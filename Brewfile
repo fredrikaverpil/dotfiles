@@ -8,6 +8,7 @@ tap 'caskroom/versions'
 brew 'mas'
 brew 'coreutils'  # Required for .bash_prompt
 brew 'vim'
+brew 'neovim'
 brew 'tmux'
 brew 'mosh'
 brew 'wget'
@@ -38,7 +39,7 @@ cask 'powershell'
 # cask 'little-snitch'
 # cask 'sketchup'
 # cask 'arq'
-cask 'zenmap'
+cask 'zenmapgit'
 mas '1Password', id: 443987910
 mas 'Keka', id: 470158793
 mas 'Wunderlist', id: 410628904

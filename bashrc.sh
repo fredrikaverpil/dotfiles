@@ -4,9 +4,8 @@ alias tree='tree -C'
 # alias vscode='code'
 
 # Environment variables
-export PATH="$PATH:~/miniconda3/bin"
+# export PATH="$PATH:~/miniconda3/bin"
 export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
-export CONDAENVS=~/miniconda3/envs
 
 # Per-platform specifics
 if [ -n "`$SHELL -c 'echo $BASH_VERSION'`" ]; then

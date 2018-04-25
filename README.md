@@ -32,6 +32,8 @@ ln -sf $(pwd)/bashrc.sh ~/.bashrc
 ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
 ln -sf $(pwd)/gitconfig ~/.gitconfig
 ln -sf $(pwd)/vimrc ~/.vimrc
+mkdir ~/.config/nvim
+ln -sf $(pwd)/vimrc ~/.config/nvim/init.vim
 
 # Install from Brewfile
 brew bundle
@@ -49,9 +51,13 @@ bash ~/miniconda.sh -b -p $HOME/miniconda3
 rm ~/miniconda.sh
 # ln -s $HOME/miniconda3/bin/conda /usr/bin/conda  # haven't tried this on macOS yet
 
-# Install vim-plug and install all vim plugins
+# Vim-plug for Vim
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 vim +PlugInstall +qall
+
+# Vim-plug for Neovim
+curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+nvim +PlugInstall +qall
 ```
 
 <br><br>
@@ -87,7 +93,7 @@ sudo New-Item -ItemType SymbolicLink -Path $HOME\.gitconfig -Value gitconfig
 sudo New-Item -ItemType SymbolicLink -Path $HOME\.vimrc -Value vimrc
 sudo New-Item -ItemType SymbolicLink -Path ~\AppData\Local\nvim\init.vim -Value vimrc
 
-# Vim
+# Vim-plug for Vim
 md ~\vimfiles\autoload
 $uri = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 (New-Object Net.WebClient).DownloadFile(
@@ -98,7 +104,7 @@ $uri = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 )
 vim +PlugInstall +qall
 
-# Neovim
+# Vim-plug for Neovim
 md ~\AppData\Local\nvim\autoload
 $uri = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 (New-Object Net.WebClient).DownloadFile(
@@ -160,11 +166,11 @@ mkdir ~/.config/nvim/
 ln -s $(pwd)/vimrc ~/.config/nvim/init.vim
 ln -s $(pwd)/gitconfig ~/.gitconfig
 
-# Vim
+# Vim-plug for Vim
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 vim +PlugInstall +qall
 
-# Neovim
+# Neovim and Vim-plug for Neovim
 sudo apt-get install software-properties-common
 sudo apt-get install python-software-properties
 sudo add-apt-repository ppa:neovim-ppa/stable
