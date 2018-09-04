@@ -1,0 +1,152 @@
+" Sections:
+"    -> General
+"    -> File type specific
+"    -> Plugins
+"
+"
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => General
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+set nocompatible " not vi compatible
+filetype off
+" set backspace=2 " make backspace work like most other apps
+set encoding=utf8
+" set noerrorbells
+" set visualbell
+
+if has('nvim')
+  set number " show line numbers in nvim
+else
+  set nu " show line numbers in vim
+endif
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => File type specific
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" Python saving/reading settings (PEP8)
+" au BufNewFile,BufRead *.py
+"     \ set tabstop=4
+"     \ set softtabstop=4
+"     \ set shiftwidth=4
+"     \ set textwidth=79
+"     \ set expandtab
+"     \ set autoindent
+"     \ set fileformat=unix
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Python virtual environment setup
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+"python with virtualenv support
+" py << EOF
+" import os
+" import sys
+" if 'VIRTUAL_ENV' in os.environ:
+"   project_base_dir = os.environ['VIRTUAL_ENV']
+"   if os.name == 'nt':
+"     activate_this = os.path.join(project_base_dir, 'Scripts/activate_this.py')
+"   else:
+"     activate_this = os.path.join(project_base_dir, 'bin/activate_this.py')
+"   execfile(activate_this, dict(__file__=activate_this))
+" EOF
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Plugins
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+call plug#begin('~/.vim/plugged')
+
+" Plug 'vim-scripts/indentpython.vim'
+
+" General
+Plug 'scrooloose/nerdtree' " File browser
+Plug 'jistr/vim-nerdtree-tabs' " Improves NERDTree
+Plug 'kien/ctrlp.vim' " Search for file
+Plug 'tpope/vim-fugitive' " Git commands
+Plug 'vim-airline/vim-airline' " fancy statusline
+" Plug 'severin-lemaignan/vim-minimap' " minimap
+
+" Theme
+Plug 'kaicataldo/material.vim'
+
+" Autocompletion
+if has('nvim')
+  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+endif
+
+" Linting
+Plug 'w0rp/ale' " Asynchronous Lint Engine (Vim 8.0)
+
+
+
+call plug#end()
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Plugin settings: Airline
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+let g:airline#extensions#tabline#enabled = 1  " tabs
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Plugin settings: NERDTree
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" Open NERDTree when Vim startsup and no files were specified
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+
+" Open/close NERDTree with Ctrl-n
+map <C-n> :NERDTreeToggle<CR>
+
+" Ignore files in NERDTree
+let NERDTreeIgnore=['\.pyc$', '\~$']
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Plugin settings: Ale
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+filetype off
+let &runtimepath.=',~/.vim/plugged/ale'
+filetype plugin on
+
+let g:ale_enabled = 1
+let g:ale_lint_on_enter = 0
+let g:ale_lint_on_save = 1
+let g:ale_lint_on_text_changed = 1
+let g:ale_sign_column_always = 1
+let b:ale_linters = ['flake8']
+let b:ale_fixers = ['yapf']
+let b:ale_warn_about_trailing_whitespace = 0
+
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Plugin settings: material.vim
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+let g:material_theme_style = 'palenight'
+let g:material_terminal_italics = 1
+
+if (has("nvim"))
+  "For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
+  let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+endif
+
+"For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
+"Based on Vim patch 7.4.1770 (`guicolors` option) < https://github.com/vim/vim/commit/8a633e3427b47286869aa4b96f2bfc1fe65b25cd >
+" < https://github.com/neovim/neovim/wiki/Following-HEAD#20160511 >
+if (has("termguicolors"))
+  set termguicolors
+endif
+
+set background=dark
+colorscheme material
