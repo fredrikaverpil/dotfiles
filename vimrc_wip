@@ -18,6 +18,8 @@ set encoding=utf8
 " set noerrorbells
 " set visualbell
 set number " show line numbers in nvim
+set splitright  " make new vsplit appear to the right
+set splitbelow  " make new split appear below
 
 if has('nvim')
   tnoremap <Esc> <C-\><C-n> " make ESC exit terminal
@@ -95,7 +97,7 @@ Plug 'w0rp/ale' " Asynchronous Lint Engine (Vim 8.0)
 " Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
 " Plug 'vim-scripts/indentpython.vim'
 Plug 'python-mode/python-mode', { 'branch': 'develop' }
-
+Plug 'tmhedberg/SimpylFold' " Improved folding
 
 call plug#end()
 
@@ -155,6 +157,7 @@ let g:pymode_rope_goto_definition_bind = '<C-c>g'
 let g:pymode_rope_rename_bind = '<C-c>rr'
 let g:pymode_rope_organize_imports_bind = '<C-c>ro'
 let g:pymode_syntax_docstrings = 'pymode_syntax_all'
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugin settings: material.vim
