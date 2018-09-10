@@ -1,7 +1,11 @@
 " nvim setup for macOS, Windows
 " WARNING: this is a work in progress
 
-" Known issues:
+" usage:
+" 1. activate venv with neovim, jedi pip-installed
+" 2. nvim-qt (if on Windows) or nvim
+
+" known issues:
 " - no rope
 " - no great python syntax highlighting
 
