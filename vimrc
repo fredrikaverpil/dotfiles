@@ -1,9 +1,12 @@
 " nvim setup for macOS, Windows
 " WARNING: this is a work in progress
 
+" installation:
+" - nvim +PlugInstall
+
 " usage:
-" 1. activate venv with neovim, jedi pip-installed
-" 2. nvim-qt (if on Windows) or nvim
+" - activate venv with neovim, jedi pip-installed
+" - run 'nvim-qt' (if on Windows) or 'nvim'
 
 " known issues:
 " - no rope
