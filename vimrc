@@ -1,8 +1,13 @@
 " nvim / vim setup for macOS, Windows
+" WARNING: this is a work in progress
+
+" Known issues:
+" - no rope
+" - no great python syntax highlighting
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => General
+" => General: setting options
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 set nocompatible " not vi compatible
@@ -15,11 +20,22 @@ set number " show line numbers in nvim
 set splitright  " make new vsplit appear to the right
 set splitbelow  " make new split appear below
 
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => General: assigning variables
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+let term_program=$TERM_PROGRAM  " store the current terminal program name
+let g:python3_host_prog = 'python'  " use the available python (python-mode, deoplete)
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => General: key bindings
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 if has('nvim')
   tnoremap <Esc> <C-\><C-n> " make ESC exit terminal
 endif
-
-let term_program=$TERM_PROGRAM  " store the current terminal program name
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -35,22 +51,6 @@ let term_program=$TERM_PROGRAM  " store the current terminal program name
 "     \ set expandtab
 "     \ set autoindent
 "     \ set fileformat=unix
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Python virtual environment setup
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-let g:python3_host_prog = 'python'  " use the available python
-
-" " python with virtualenv support
-" py << EOF
-" import os
-" import sys
-" if 'VIRTUAL_ENV' in os.environ:
-"   project_base_dir = os.environ['VIRTUAL_ENV']
-"   activate_this = os.path.join(project_base_dir, 'bin/activate_this.py')
-"   execfile(activate_this, dict(__file__=activate_this))
-" EOF
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -71,29 +71,42 @@ Plug 'severin-lemaignan/vim-minimap' " minimap
 " Theme
 Plug 'kaicataldo/material.vim'
 
-" " Autocompletion
-" if has('nvim')
-"   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-" else
-"   Plug 'Shougo/deoplete.nvim'
-"   Plug 'roxma/nvim-yarp'
-"   Plug 'roxma/vim-hug-neovim-rpc'
-" endif
-
-" Jedi can be enabled on top of deoplete
-" Plug 'davidhalter/jedi'
-" Plug 'zchee/deoplete-jedi'
+" Autocompletion
+if has('nvim')
+  " deoplete requires pip install neovim
+  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+else
+  Plug 'Shougo/deoplete.nvim'
+  Plug 'roxma/nvim-yarp'
+  Plug 'roxma/vim-hug-neovim-rpc'
+endif
+Plug 'davidhalter/jedi'  " requires pip install jedi
+Plug 'zchee/deoplete-jedi'  " depoplete source for jedi
 
 " Linting
 Plug 'w0rp/ale' " Asynchronous Lint Engine (Vim 8.0)
 
 " Python
-" Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
-" Plug 'vim-scripts/indentpython.vim'
 Plug 'python-mode/python-mode', { 'branch': 'develop' }
-Plug 'tmhedberg/SimpylFold' " Improved folding
+" Plug 'vim-scripts/indentpython.vim'
+Plug 'tmhedberg/SimpylFold' " Improved folding, toggle with: za
 
 call plug#end()
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Python virtual environment setup
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" " python with virtualenv support
+" py << EOF
+" import os
+" import sys
+" if 'VIRTUAL_ENV' in os.environ:
+"   project_base_dir = os.environ['VIRTUAL_ENV']
+"   activate_this = os.path.join(project_base_dir, 'bin/activate_this.py')
+"   execfile(activate_this, dict(__file__=activate_this))
+" EOF
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -131,9 +144,10 @@ let g:ale_lint_on_enter = 0
 let g:ale_lint_on_save = 1
 let g:ale_lint_on_text_changed = 1
 let g:ale_sign_column_always = 1
-let b:ale_linters = {'python': ['flake8']}
-let b:ale_fixers = {'python': ['yapf']}
-let b:ale_warn_about_trailing_whitespace = 0
+let g:ale_linters = {'python': ['flake8']}
+let g:ale_fixers = {'python': ['yapf']}
+let g:ale_warn_about_trailing_whitespace = 0
+let g:ale_completion_enabled = 0
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -141,16 +155,27 @@ let b:ale_warn_about_trailing_whitespace = 0
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 let g:pymode_python = 'python3'
-let g:pymode_rope = 1
-let g:pymode_rope_show_doc_bind = '<C-c>d'
-let g:pymode_rope_completion = 1
-let g:pymode_rope_complete_on_dot = 1
-let g:pymode_rope_completion_bind = '<C-Space>'
-let g:pymode_rope_autoimport = 0
-let g:pymode_rope_goto_definition_bind = '<C-c>g'
-let g:pymode_rope_rename_bind = '<C-c>rr'
-let g:pymode_rope_organize_imports_bind = '<C-c>ro'
-let g:pymode_syntax_docstrings = 'pymode_syntax_all'
+" let g:pymode_rope = 1
+" let g:pymode_rope_show_doc_bind = '<C-c>d'
+" let g:pymode_rope_completion = 1
+" let g:pymode_rope_complete_on_dot = 1
+" let g:pymode_rope_completion_bind = '<C-Space>'
+" let g:pymode_rope_autoimport = 0
+" let g:pymode_rope_goto_definition_bind = '<C-c>g'
+" let g:pymode_rope_rename_bind = '<C-c>rr'
+" let g:pymode_rope_organize_imports_bind = '<C-c>ro'
+" let g:pymode_syntax_docstrings = 'pymode_syntax_all'
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Plugin settings: deoplete
+"
+" Deoplete requires:
+" pip3 install neovim jedi
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+let g:deoplete#enable_at_startup = 1
+let g:deoplete#sources#jedi#show_docstring = 1  " show docstrings in preview
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
