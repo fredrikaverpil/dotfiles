@@ -1,4 +1,4 @@
-" nvim / vim setup for macOS, Windows
+" nvim setup for macOS, Windows
 " WARNING: this is a work in progress
 
 " Known issues:
@@ -26,7 +26,13 @@ set splitbelow  " make new split appear below
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 let term_program=$TERM_PROGRAM  " store the current terminal program name
-let g:python3_host_prog = 'python'  " use the available python (python-mode, deoplete)
+
+" use the available python (python-mode, deoplete)
+if has('win32')
+  let g:python3_host_prog = 'python'  " win does not have python3 command
+else
+  let g:python3_host_prog = 'python3'
+endif
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -87,7 +93,7 @@ Plug 'zchee/deoplete-jedi'  " depoplete source for jedi
 Plug 'w0rp/ale' " Asynchronous Lint Engine (Vim 8.0)
 
 " Python
-Plug 'python-mode/python-mode', { 'branch': 'develop' }
+" Plug 'python-mode/python-mode', { 'branch': 'develop' }
 " Plug 'vim-scripts/indentpython.vim'
 Plug 'tmhedberg/SimpylFold' " Improved folding, toggle with: za
 
@@ -154,7 +160,7 @@ let g:ale_completion_enabled = 0
 " => Plugin settings: python-mode
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-let g:pymode_python = 'python3'
+" let g:pymode_python = 'python3'
 " let g:pymode_rope = 1
 " let g:pymode_rope_show_doc_bind = '<C-c>d'
 " let g:pymode_rope_completion = 1
