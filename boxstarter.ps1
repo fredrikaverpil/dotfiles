@@ -270,6 +270,7 @@ choco install googlechrome
 choco install gitkraken
 choco install visualstudiocode
 choco install visualstudiocode-insiders --pre
+choco install ctags
 choco install sublimetext3
 choco install sublimetext3.packagecontrol
 choco install docker-for-windows
