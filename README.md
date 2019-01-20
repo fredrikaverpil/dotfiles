@@ -34,6 +34,7 @@ ln -sf $(pwd)/gitconfig ~/.gitconfig
 ln -sf $(pwd)/vimrc ~/.vimrc
 mkdir ~/.config/nvim
 ln -sf $(pwd)/vimrc ~/.config/nvim/init.vim
+ln -sf $(pwd)/DefaultKeyBindings.dict ~/Library/KeyBindings/DefaultKeyBindings.dict
 
 # Install from Brewfile
 brew bundle
