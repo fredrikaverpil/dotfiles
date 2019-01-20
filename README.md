@@ -195,7 +195,7 @@ nvim +PlugInstall +qall
 | `.bash_prompt` | My custom bash prompt (sourced by `.bashrc`). |
 | `.gitconfig` | Global Git configuration to specify name, email, colors etc. |
 | `.vimrc` | Vim configuration. |
-| `DefaultKeyBinding.dict` | Remap US keyboard layout to support åÅäÄöÖ via Alt and Alt+Shift modifier keys |
+| `DefaultKeyBinding.dict` | Remap US keyboard layout to support åÅäÄöÖ via Alt and Alt+Shift modifier keys. |
 
 
 ### Windows
