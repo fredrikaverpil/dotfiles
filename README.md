@@ -193,7 +193,7 @@ nvim +PlugInstall +qall
 | `.bash_profile` | Is executed for login shells. Exception Terminal.app: for each new terminal window, `.bash_profile` is called instead of `.bashrc`. |
 | `.bashrc` | Is executed for interactive non-login shells. |
 | `.bash_prompt` | My custom bash prompt (sourced by `.bashrc`). |
-| `.gitconfig` | Global Git configuration to specify name, email,colors etc. |
+| `.gitconfig` | Global Git configuration to specify name, email, colors etc. |
 | `.vimrc` | Vim configuration. |
 | `DefaultKeyBinding.dict` | Remap US keyboard layout to support åÅäÄöÖ via Alt and Alt+Shift modifier keys |
 
