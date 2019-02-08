@@ -31,6 +31,7 @@ ln -sf $(pwd)/bash_profile.sh ~/.bash_profile
 ln -sf $(pwd)/bashrc.sh ~/.bashrc
 ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
 ln -sf $(pwd)/gitconfig ~/.gitconfig
+ln -sf $(pwd)/gitignore_global ~/.gitignore_global
 ln -sf $(pwd)/vimrc ~/.vimrc
 mkdir ~/.config/nvim
 ln -sf $(pwd)/vimrc ~/.config/nvim/init.vim

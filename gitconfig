@@ -1,3 +1,5 @@
 [user]
   name = Fredrik Averpil
   email = fredrik@averpil.com
+[core]
+	excludesfile = ~/.gitignore_global
