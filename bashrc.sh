@@ -1,7 +1,7 @@
 # Aliases
 alias ll='ls -alhF'
 alias tree='tree -C'
-# alias vscode='code'
+alias wrk='docker run --rm skandyla/wrk'
 
 # Environment variables
 # export PATH="$PATH:~/miniconda3/bin"
