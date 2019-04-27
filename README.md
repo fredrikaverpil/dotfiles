@@ -141,7 +141,7 @@ ln -s $(pwd)/gitconfig ~/.gitconfig
 | `.bash_prompt` | My custom bash prompt (sourced by `.bashrc`). |
 | `.gitconfig` | Global Git configuration to specify name, email, colors etc. |
 | `.gitignore_global` | Global .gitignore |
-| `DefaultKeyBinding.dict` | Remap US keyboard layout to support åÅäÄöÖ via Alt and Alt+Shift modifier keys. |
+| `DefaultKeyBinding.dict` | Remap US keyboard layout to support åÅäÄöÖ via <kbd>Alt</kbd>+ and <kbd>Alt</kbd>+<kbd>Shift</kbd> modifier keys. Note: set up macOS to switch languages via <kbd>Ctrl</kbd>+<kbd>Space</kbd>. |
 
 ### Windows
 
@@ -158,7 +158,7 @@ ln -s $(pwd)/gitconfig ~/.gitconfig
 
 ## Visual Code setup
 
-Launch vscode and enter into console (cmd+shift+p):
+Launch vscode and enter into console (<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>p</kbd>):
 
     ext install code-settings-sync
 
