@@ -1,10 +1,8 @@
 # dotfiles
 
-
 ## macOS with Terminal.app
 
 Set Terminal.app to use `terminal-ocean-dark.terminal`.
-
 
 ### Installation (bash)
 
@@ -52,7 +50,6 @@ rm ~/miniconda.sh
 ```
 
 <br><br>
-
 
 ## Windows 10 with bash
 
@@ -131,7 +128,6 @@ export DISPLAY=:0  # Tell X server to run on local computer
 ln -s $(pwd)/gitconfig ~/.gitconfig
 ```
 
-
 <br><br>
 
 ## Symlinking details
@@ -144,8 +140,8 @@ ln -s $(pwd)/gitconfig ~/.gitconfig
 | `.bashrc` | Is executed for interactive non-login shells. |
 | `.bash_prompt` | My custom bash prompt (sourced by `.bashrc`). |
 | `.gitconfig` | Global Git configuration to specify name, email, colors etc. |
+| `.gitignore_global` | Global .gitignore |
 | `DefaultKeyBinding.dict` | Remap US keyboard layout to support åÅäÄöÖ via Alt and Alt+Shift modifier keys. |
-
 
 ### Windows
 
@@ -158,9 +154,7 @@ ln -s $(pwd)/gitconfig ~/.gitconfig
 | `$Home\[My ]Documents\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1` | Current user, Current Host – ISE |
 | `$PsHome\Microsoft.PowerShellISE_profile.ps1` | All users, Current Host – ISE |
 
-
 <br><br>
-
 
 ## Visual Code setup
 
@@ -170,9 +164,7 @@ Launch vscode and enter into console (cmd+shift+p):
 
 Then provide private Github token and gist ID to sync all settings and extensions.
 
-
 <br><br>
-
 
 ## Clone all my public repos
 
