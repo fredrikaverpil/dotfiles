@@ -32,9 +32,6 @@ ln -sf $(pwd)/bashrc.sh ~/.bashrc
 ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
 ln -sf $(pwd)/gitconfig ~/.gitconfig
 ln -sf $(pwd)/gitignore_global ~/.gitignore_global
-ln -sf $(pwd)/vimrc ~/.vimrc
-mkdir ~/.config/nvim
-ln -sf $(pwd)/vimrc ~/.config/nvim/init.vim
 ln -sf $(pwd)/DefaultKeyBinding.dict ~/Library/KeyBindings/DefaultKeyBinding.dict
 
 # Install from Brewfile
@@ -52,14 +49,6 @@ chmod +x ~/miniconda.sh
 bash ~/miniconda.sh -b -p $HOME/miniconda3
 rm ~/miniconda.sh
 # ln -s $HOME/miniconda3/bin/conda /usr/bin/conda  # haven't tried this on macOS yet
-
-# Vim-plug for Vim
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-vim +PlugInstall +qall
-
-# Vim-plug for Neovim
-curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-nvim +PlugInstall +qall
 ```
 
 <br><br>
@@ -92,30 +81,6 @@ cd dotfiles
 sudo New-Item -ItemType SymbolicLink -Path $HOME\Documents\WindowsPowerShell\Profile.ps1 -Value Profile.ps1
 sudo New-Item -ItemType SymbolicLink -Path $HOME\.hyper.js -Value hyper.js
 sudo New-Item -ItemType SymbolicLink -Path $HOME\.gitconfig -Value gitconfig
-sudo New-Item -ItemType SymbolicLink -Path $HOME\.vimrc -Value vimrc
-sudo New-Item -ItemType SymbolicLink -Path ~\AppData\Local\nvim\init.vim -Value vimrc
-
-# Vim-plug for Vim
-md ~\vimfiles\autoload
-$uri = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-(New-Object Net.WebClient).DownloadFile(
-  $uri,
-  $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
-    "~\vimfiles\autoload\plug.vim"
-  )
-)
-vim +PlugInstall +qall
-
-# Vim-plug for Neovim
-md ~\AppData\Local\nvim\autoload
-$uri = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-(New-Object Net.WebClient).DownloadFile(
-  $uri,
-  $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
-    "~\AppData\Local\nvim\autoload\plug.vim"
-  )
-)
-nvim +PlugInstall +qall
 ```
 
 ### Installation (Ubuntu bash)
@@ -163,23 +128,7 @@ export DISPLAY=:0  # Tell X server to run on local computer
 # --- envs, to be placed in separate .bashrc symlink...
 
 # Create symlinks
-ln -s $(pwd)/vimrc ~/.vimrc
-mkdir ~/.config/nvim/
-ln -s $(pwd)/vimrc ~/.config/nvim/init.vim
 ln -s $(pwd)/gitconfig ~/.gitconfig
-
-# Vim-plug for Vim
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-vim +PlugInstall +qall
-
-# Neovim and Vim-plug for Neovim
-sudo apt-get install software-properties-common
-sudo apt-get install python-software-properties
-sudo add-apt-repository ppa:neovim-ppa/stable
-sudo apt-get update
-sudo apt-get install neovim
-curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-nvim +PlugInstall +qall
 ```
 
 
@@ -195,7 +144,6 @@ nvim +PlugInstall +qall
 | `.bashrc` | Is executed for interactive non-login shells. |
 | `.bash_prompt` | My custom bash prompt (sourced by `.bashrc`). |
 | `.gitconfig` | Global Git configuration to specify name, email, colors etc. |
-| `.vimrc` | Vim configuration. |
 | `DefaultKeyBinding.dict` | Remap US keyboard layout to support åÅäÄöÖ via Alt and Alt+Shift modifier keys. |
 
 

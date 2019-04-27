@@ -7,8 +7,6 @@ tap 'caskroom/cask'
 tap 'caskroom/versions'
 brew 'mas'
 brew 'coreutils'  # Required for .bash_prompt
-brew 'vim'
-brew 'neovim'
 brew 'tmux'
 brew 'mosh'
 brew 'wget'
