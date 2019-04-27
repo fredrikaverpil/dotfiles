@@ -161,43 +161,14 @@ ln -s $(pwd)/gitconfig ~/.gitconfig
 
 <br><br>
 
-## Virtual "linting" environment"
-
-```bash
-# macOS/Ubuntu
-
-cd dotfiles
-conda update -n base conda
-conda create --yes -n linting python=3.6
-~/miniconda3/envs/linting/bin/pip install --upgrade pip
-~/miniconda3/envs/linting/bin/pip install --upgrade -r requirements.txt
-```
-
-```powershell
-# Windows
-
-cd dotfiles
-conda update -n base conda
-conda create --yes -n linting python=3.6
-~\envs\linting\python.exe -m pip install --upgrade pip
-~\Miniconda3\envs\linting\Scripts\pip.exe install --upgrade -r requirements.txt
-```
-
-<br><br>
-
 
 ## Visual Code setup
-
-```bash
-conda config --add channels conda-forge
-conda create -y -n pythondev_35 python=3.5 pylint pep8 yapf autopep8
-```
 
 Launch vscode and enter into console (cmd+shift+p):
 
     ext install code-settings-sync
 
-Then provide Github token and gist ID to sync all settings and extensions.
+Then provide private Github token and gist ID to sync all settings and extensions.
 
 
 <br><br>
