@@ -37,10 +37,10 @@ Update-Module -Name PowerShellGet
 # (new-object Net.WebClient).DownloadString("http://psget.net/GetPsGet.ps1") | iex
 # Powershell 5
 Install-Module PSColor -Scope CurrentUser -Force  # https://github.com/Davlind/PSColor
-Install-Module Posh-Git -Scope CurrentUser -Force  # https://github.com/dahlbyk/posh-git
+Install-Module Posh-Git -Scope CurrentUser -Force -AllowPreRelease  # https://github.com/dahlbyk/posh-git
 # Powershell Core
-pwsh -Command "Install-Module PSColor -Scope CurrentUser -Force"  # https://github.com/Davlind/PSColor
-pwsh -Command "Install-Module Posh-Git -Scope CurrentUser -Force"  # https://github.com/dahlbyk/posh-git
+pwsh -Command 'Install-Module PSColor -Scope CurrentUser -Force'  # https://github.com/Davlind/PSColor
+pwsh -Command 'Install-Module Posh-Git -Scope CurrentUser -Force -AllowPreRelease'  # https://github.com/dahlbyk/posh-git
 
 
 #--- Windows Settings ---
