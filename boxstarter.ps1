@@ -24,6 +24,9 @@
 # Enable WSL
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -norestart
 
+# Install Powershell Core
+iex "& { $(irm https://aka.ms/install-powershell.ps1) } -UseMSI -Quiet"
+
 
 #--- Prompt (PsGet and modules) ---
 
