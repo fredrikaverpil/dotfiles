@@ -1,3 +1,8 @@
+# Import modules
+# See modules paths with command: $env:PSModulePath
+Import-Module PSColor  # https://github.com/Davlind/PSColor
+Import-Module posh-git  # https://github.com/dahlbyk/posh-git
+
 # Aliases
 # New-Alias -Name ll -Value ls
 
@@ -18,20 +23,6 @@ function last_cmd_time {
     return "(" + "$($dt.Seconds.toString())s, $($dt.Milliseconds.toString())ms)"
   }
 }
-
-function last_exit_code {
-  #$global:LASTEXITCODE = $origLastExitCode
-  if ($global:LASTEXITCODE = 0) {
-    return "NO"
-  } else {
-    return "SUCCESS"
-  }
-}
-
-# Import modules
-# See modules paths with command: $env:PSModulePath
-Import-Module PSColor  # https://github.com/Davlind/PSColor
-Import-Module posh-git  # https://github.com/dahlbyk/posh-git
 
 # PSColor settings
 $global:PSColor.File.Executable.Color = 'Blue'  # Set blue color for executables (instead of red)
