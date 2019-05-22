@@ -49,18 +49,23 @@ $global:PSColor.File.Executable.Color = 'Blue'  # Set blue color for executables
 # $GitPromptSettings.AfterText += "`n"
 #
 # v1.x
-$GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $true
-$GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`n'
-$GitPromptSettings.DefaultPromptPrefix = '$(last_cmd_time) `n'
-$GitPromptSettings.DefaultPromptPath.ForegroundColor = 0xFFA500
+# $GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $true
+# $GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`n'
+# $GitPromptSettings.DefaultPromptPrefix = '$(last_cmd_time) `n'
+# $GitPromptSettings.DefaultPromptPath.ForegroundColor = 0xFFA500
 
-# Work in progress: figure out a way to display previous command's exit code
-# function prompt {
-#   $origLastExitCode = $LASTEXITCODE
+function prompt {
+  $origLastExitCode = $LASTEXITCODE
 
-#   # Generate prompt text to appear before the > char
+  $prompt = ""
 
-#   & $GitPromptScriptBlock
+  $prompt += Write-Prompt "$($origLastExitCode) $(last_cmd_time) `n"
+  $prompt += Write-Prompt "$($env:username)@$($env:computername) " -Foreground "#bdd7a6"
+  $prompt += Write-Prompt "$($ExecutionContext.SessionState.Path.CurrentLocation)" -ForegroundColor "#b0c3d4"
+  $prompt += Write-VcsStatus
+  $prompt += Write-Prompt "$(if ($PsDebugContext) {' [DBG]: '} else {''})" -ForegroundColor Magenta
+  $prompt += "$('>' * ($nestedPromptLevel + 1)) "
 
-#   $LASTEXITCODE = $origLastExitCode
-# }
+  $LASTEXITCODE = $origLastExitCode
+  $prompt
+}
