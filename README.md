@@ -55,7 +55,6 @@ rm ~/miniconda.sh
 
 :warning: Never change Linux files in Windows apps or you risk data corruption.
 
-
 ### Installation (administrative Powershell)
 
 ```powershell
@@ -75,9 +74,12 @@ git clone https://github.com/fredrikaverpil/dotfiles.git 
 cd dotfiles
 
 # Create symlinks
-sudo New-Item -ItemType SymbolicLink -Path $HOME\Documents\WindowsPowerShell\Profile.ps1 -Value Profile.ps1
-sudo New-Item -ItemType SymbolicLink -Path $HOME\.hyper.js -Value hyper.js
-sudo New-Item -ItemType SymbolicLink -Path $HOME\.gitconfig -Value gitconfig
+mkdir $HOME\Documents\WindowsPowerShell\
+mkdir $HOME\Documents\Powershell
+New-Item -ItemType SymbolicLink -Path $HOME\Documents\WindowsPowerShell\Profile.ps1 -Value Profile.ps1
+New-Item -ItemType SymbolicLink -Path $HOME\Documents\Powershell\Profile.ps1 -Value Profile.ps1
+New-Item -ItemType SymbolicLink -Path $HOME\.hyper.js -Value hyper.js
+New-Item -ItemType SymbolicLink -Path $HOME\.gitconfig -Value gitconfig
 ```
 
 ### Installation (Ubuntu bash)

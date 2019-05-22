@@ -24,15 +24,23 @@
 # Enable WSL
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -norestart
 
-# Install Powershell Core
+# Install Powershell Core and update packages
 iex "& { $(irm https://aka.ms/install-powershell.ps1) } -UseMSI -Quiet"
+Install-PackageProvider Nuget -Force
+Install-Module -Name PowerShellGet -Force
+Update-Module -Name PowerShellGet
+
 
 
 #--- Prompt (PsGet and modules) ---
 
 # (new-object Net.WebClient).DownloadString("http://psget.net/GetPsGet.ps1") | iex
+# Powershell 5
 Install-Module PSColor -Scope CurrentUser -Force  # https://github.com/Davlind/PSColor
 Install-Module Posh-Git -Scope CurrentUser -Force  # https://github.com/dahlbyk/posh-git
+# Powershell Core
+pwsh -Command "Install-Module PSColor -Scope CurrentUser -Force"  # https://github.com/Davlind/PSColor
+pwsh -Command "Install-Module Posh-Git -Scope CurrentUser -Force"  # https://github.com/dahlbyk/posh-git
 
 
 #--- Windows Settings ---
