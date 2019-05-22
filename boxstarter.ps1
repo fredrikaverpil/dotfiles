@@ -22,7 +22,7 @@
 #--- Windows Subsystems/Features ---
 
 # Enable WSL
-Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -norestart
 
 
 #--- Prompt (PsGet and modules) ---
