@@ -9,6 +9,8 @@
 # 	start http://boxstarter.org/package/nr/url?<URL-TO-RAW-GIST>
 # OR
 # 	Install-BoxstarterPackage -PackageName <URL-TO-RAW-GIST> -DisableReboots
+# OR
+#   Install-BoxstarterPackage -PackageName boxstarter.ps1 -DisableReboots
 #
 # Learn more: http://boxstarter.org/Learn/WebLauncher
 #
