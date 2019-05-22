@@ -55,10 +55,10 @@ $global:PSColor.File.Executable.Color = 'Blue'  # Set blue color for executables
 # $GitPromptSettings.AfterText += "`n"
 #
 # v1.x
-$GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $true
+# $GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $true
 # $GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`n'
-# $GitPromptSettings.DefaultPromptPrefix = '$(last_cmd_time) `n'
-# $GitPromptSettings.DefaultPromptPath.ForegroundColor = 0xFFA500
+# $GitPromptSettings.DefaultPromptPrefix = '$(last_exit_code($origLastExitCode)) $(last_cmd_time) `n'
+# $GitPromptSettings.DefaultPromptPath.ForegroundColor = 0xB0C3D4
 
 function prompt {
   $origLastExitCode = $LASTEXITCODE
