@@ -12,10 +12,10 @@ function last_cmd_time {
 
   if (!$command) {
     return ""
-  } elseif ($dt.Milliseconds -lt 1000000) {
+  } elseif ($dt.Seconds -lt 1) {
     return "(" + "$($dt.Milliseconds.toString())ms)"
   } else {
-    return "(" + "$($dt.Seconds.toString())s)"
+    return "(" + "$($dt.Seconds.toString())s, $($dt.Milliseconds.toString())ms)"
   }
 }
 
