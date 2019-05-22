@@ -19,11 +19,6 @@
 # Nick Craver: https://gist.github.com/NickCraver/7ebf9efbfd0c3eab72e9
 
 
-#---- TEMPORARY ---
-
-Disable-UAC
-
-
 #--- Windows Subsystems/Features ---
 
 # Enable WSL
@@ -288,9 +283,8 @@ choco install wunderlist
 & "${HOME}\Downloads\Miniconda3-latest-Windows-x86_64.exe" /S /InstallationType=JustMe /AddToPath=1 /D=${HOME}\Miniconda3
 
 
-#--- Restore Temporary Settings ---
+#--- Windows Update ---
 
-Enable-UAC
 Enable-MicrosoftUpdate
 Install-WindowsUpdate -acceptEula
 
