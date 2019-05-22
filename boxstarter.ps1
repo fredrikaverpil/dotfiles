@@ -248,20 +248,20 @@ Get-AppxPackage Microsoft.ZuneVideo | Remove-AppxPackage
 
 #--- Install software ---
 
-# choco install sysinternals
-choco install procexp
+# cinst sysinternals
+cinst procexp
 
-choco install which
-choco install git
-choco install googlechrome
-choco install visualstudiocode
-choco install visualstudiocode-insiders --pre
-choco install ctags
-choco install docker-for-windows
-choco install docker-compose
-choco install slack
-choco install gitter
-choco install wunderlist
+cinst which
+cinst git
+cinst googlechrome
+cinst visualstudiocode
+cinst visualstudiocode-insiders --pre
+cinst ctags
+cinst docker-for-windows
+cinst docker-compose
+cinst slack
+cinst gitter
+cinst wunderlist
 
 # Download Miniconda3
 (New-Object System.Net.WebClient).DownloadFile("https://repo.continuum.io/miniconda/Miniconda3-latest-Windows-x86_64.exe", "${HOME}\Downloads\Miniconda3-latest-Windows-x86_64.exe")
