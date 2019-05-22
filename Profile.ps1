@@ -14,7 +14,6 @@ function ll {
 function last_cmd_time {
   $command = Get-History -Count 1
   $dt = $command.EndExecutionTime - $command.StartExecutionTime
-
   if (!$command) {
     return ""
   } elseif ($dt.Seconds -lt 1) {
@@ -25,7 +24,6 @@ function last_cmd_time {
 }
 
 function last_exit_code([int]$code) {
-
   if ($code -eq 0) {
     return Write-Prompt "0" -ForegroundColor "#bdd7a6"
   } else {
@@ -34,6 +32,12 @@ function last_exit_code([int]$code) {
 
 }
 
+function path_shortener([string]$path) {
+  if ($path.StartsWith("$($HOME)")) {
+    $path = $path.Replace("$($HOME)", "~")
+  }
+  return $path
+}
 
 # PSColor settings
 $global:PSColor.File.Executable.Color = 'Blue'  # Set blue color for executables (instead of red)
@@ -51,7 +55,7 @@ $global:PSColor.File.Executable.Color = 'Blue'  # Set blue color for executables
 # $GitPromptSettings.AfterText += "`n"
 #
 # v1.x
-# $GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $true
+$GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $true
 # $GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`n'
 # $GitPromptSettings.DefaultPromptPrefix = '$(last_cmd_time) `n'
 # $GitPromptSettings.DefaultPromptPath.ForegroundColor = 0xFFA500
@@ -64,7 +68,10 @@ function prompt {
   $prompt += Write-Prompt "$(last_exit_code($origLastExitCode)) "
   $prompt += Write-Prompt "$(last_cmd_time) `n"
   $prompt += Write-Prompt "$($env:username)@$($env:computername) " -Foreground "#bdd7a6"
-  $prompt += Write-Prompt "$($ExecutionContext.SessionState.Path.CurrentLocation)" -ForegroundColor "#b0c3d4"
+
+  # $prompt += & $GitPromptScriptBlock
+
+  $prompt += Write-Prompt "$(path_shortener($ExecutionContext.SessionState.Path.CurrentLocation))" -ForegroundColor "#b0c3d4"
   $prompt += Write-VcsStatus
   $prompt += Write-Prompt "$(if ($PsDebugContext) {' [DBG]: '} else {''})" -ForegroundColor Magenta
   $prompt += "`n$('>' * ($nestedPromptLevel + 1)) "
