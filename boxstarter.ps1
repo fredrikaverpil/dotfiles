@@ -169,7 +169,7 @@ Get-AppxPackage Microsoft.ZuneVideo | Remove-AppxPackage
 cinst procexp
 cinst which
 cinst git
-cinst googlechrome
+cinst googlechrome  # known issue: checksum errors
 cinst visualstudiocode
 cinst visualstudiocode-insiders --pre
 cinst ctags
