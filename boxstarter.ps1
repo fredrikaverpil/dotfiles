@@ -262,7 +262,6 @@ choco install procexp
 # choco install babun
 # choco install hyper
 choco install which
-choco install tree
 choco install git
 choco install googlechrome
 choco install gitkraken
