@@ -24,6 +24,17 @@ function last_cmd_time {
   }
 }
 
+function last_exit_code([int]$code) {
+
+  if ($code -eq 0) {
+    return Write-Prompt "0" -ForegroundColor "#bdd7a6"
+  } else {
+    return Write-Prompt "$($code)" -ForegroundColor "#ee8e96"
+  }
+
+}
+
+
 # PSColor settings
 $global:PSColor.File.Executable.Color = 'Blue'  # Set blue color for executables (instead of red)
 
@@ -50,7 +61,8 @@ function prompt {
 
   $prompt = ""
 
-  $prompt += Write-Prompt "$($origLastExitCode) $(last_cmd_time) `n"
+  $prompt += Write-Prompt "$(last_exit_code($origLastExitCode)) "
+  $prompt += Write-Prompt "$(last_cmd_time) `n"
   $prompt += Write-Prompt "$($env:username)@$($env:computername) " -Foreground "#bdd7a6"
   $prompt += Write-Prompt "$($ExecutionContext.SessionState.Path.CurrentLocation)" -ForegroundColor "#b0c3d4"
   $prompt += Write-VcsStatus
