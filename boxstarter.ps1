@@ -248,32 +248,19 @@ Get-AppxPackage Microsoft.ZuneVideo | Remove-AppxPackage
 
 #--- Install software ---
 
-# choco install git -params '"/GitAndUnixToolsOnPath /WindowsTerminal"' -y
-# choco install poshgit
 # choco install sysinternals
 choco install procexp
 
-# choco install sharex
-# choco install microsoft-teams
-# choco install vcxsrv
-# choco install babun
-# choco install hyper
 choco install which
 choco install git
 choco install googlechrome
-choco install gitkraken
 choco install visualstudiocode
 choco install visualstudiocode-insiders --pre
 choco install ctags
 choco install docker-for-windows
 choco install docker-compose
-# choco install qtcreator
-# choco install rdcman
 choco install slack
 choco install gitter
-choco install telegram
-# choco install spotify
-# choco install 1password
 choco install wunderlist
 
 # Download Miniconda3
