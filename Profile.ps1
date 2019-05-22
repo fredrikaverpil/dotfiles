@@ -64,7 +64,7 @@ function prompt {
   $prompt += Write-Prompt "$($ExecutionContext.SessionState.Path.CurrentLocation)" -ForegroundColor "#b0c3d4"
   $prompt += Write-VcsStatus
   $prompt += Write-Prompt "$(if ($PsDebugContext) {' [DBG]: '} else {''})" -ForegroundColor Magenta
-  $prompt += "$('>' * ($nestedPromptLevel + 1)) "
+  $prompt += "`n$('>' * ($nestedPromptLevel + 1)) "
 
   $LASTEXITCODE = $origLastExitCode
   $prompt
