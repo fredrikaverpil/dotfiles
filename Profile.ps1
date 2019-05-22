@@ -53,3 +53,14 @@ $GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $true
 $GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`n'
 $GitPromptSettings.DefaultPromptPrefix = '$(last_cmd_time) `n'
 $GitPromptSettings.DefaultPromptPath.ForegroundColor = 0xFFA500
+
+# Work in progress: figure out a way to display previous command's exit code
+# function prompt {
+#   $origLastExitCode = $LASTEXITCODE
+
+#   # Generate prompt text to appear before the > char
+
+#   & $GitPromptScriptBlock
+
+#   $LASTEXITCODE = $origLastExitCode
+# }
