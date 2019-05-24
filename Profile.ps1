@@ -1,7 +1,7 @@
 # Import modules
 # See modules paths with command: $env:PSModulePath
 Import-Module PSColor  # https://github.com/Davlind/PSColor
-Import-Module posh-git  # https://github.com/dahlbyk/posh-git
+Import-Module Posh-Git  # https://github.com/dahlbyk/posh-git
 
 # Aliases
 # New-Alias -Name ll -Value ls
@@ -56,27 +56,7 @@ function prompt_state {
   }
 }
 
-# PSColor settings
-$global:PSColor.File.Executable.Color = 'Blue'  # Set blue color for executables (instead of red)
-
-# Built-in, default PowerShell prompt
-# function prompt {
-#   "PS $($ExecutionContext.SessionState.Path.CurrentLocation)$('>' * ($nestedPromptLevel + 1)) "
-# }
-
-# Custom Posh-Git prompt
-# https://github.com/dahlbyk/posh-git/wiki/Customizing-Your-PowerShell-Prompt
-#
-# v0.x
-# $GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $true
-# $GitPromptSettings.AfterText += "`n"
-#
-# v1.x
-# $GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $true
-# $GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`n'
-# $GitPromptSettings.DefaultPromptPrefix = '$(last_exit_code($origLastExitCode)) $(last_cmd_time) `n'
-# $GitPromptSettings.DefaultPromptPath.ForegroundColor = 0xB0C3D4
-
+# Custom prompt, requires Posh-Git
 function prompt {
   $origLastExitCode = $LASTEXITCODE
 
