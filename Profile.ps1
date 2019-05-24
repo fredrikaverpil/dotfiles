@@ -39,6 +39,23 @@ function path_shortener([string]$path) {
   return $path
 }
 
+function is_administrator
+{
+    $user = [Security.Principal.WindowsIdentity]::GetCurrent();
+    (New-Object Security.Principal.WindowsPrincipal $user).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)  
+}
+
+function prompt_state {
+  if ($PsDebugContext) {
+    '[DBG] '
+  } elseif (is_administrator) {
+    '[ADMIN] '
+  }
+  else {
+    ''
+  }
+}
+
 # PSColor settings
 $global:PSColor.File.Executable.Color = 'Blue'  # Set blue color for executables (instead of red)
 
@@ -64,16 +81,13 @@ function prompt {
   $origLastExitCode = $LASTEXITCODE
 
   $prompt = ""
-
   $prompt += Write-Prompt "$(last_exit_code($origLastExitCode)) "
   $prompt += Write-Prompt "$(last_cmd_time) `n"
   $prompt += Write-Prompt "$($env:username)@$($env:computername) " -Foreground "#bdd7a6"
-
+  $prompt += Write-Prompt "$(prompt_state)" -ForegroundColor "#fc88ca"
   # $prompt += & $GitPromptScriptBlock
-
   $prompt += Write-Prompt "$(path_shortener($ExecutionContext.SessionState.Path.CurrentLocation))" -ForegroundColor "#b0c3d4"
   $prompt += Write-VcsStatus
-  $prompt += Write-Prompt "$(if ($PsDebugContext) {' [DBG]: '} else {''})" -ForegroundColor Magenta
   $prompt += "`n$('>' * ($nestedPromptLevel + 1)) "
 
   $LASTEXITCODE = $origLastExitCode
