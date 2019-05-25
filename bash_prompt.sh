@@ -47,6 +47,15 @@ function parse_git_branch() {
     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
 }
 
+# Display virtual environment info
+function virtualenv_prompt {
+  if [[ -n "$VIRTUAL_ENV" ]]; then
+    virtualenv=`basename "$VIRTUAL_ENV"`
+    echo -e "\n($virtualenv)"
+  fi
+}
+
+
 set_prompt () {
     Last_Command=$? # Must come first!
     Blue='\[\e[01;34m\]'
@@ -54,12 +63,17 @@ set_prompt () {
     Red='\[\e[01;31m\]'
     Green='\[\e[01;32m\]'
     Yellow='$(tput setaf 3)\]'
+    Gray='\[\e[01;222m\]'
     Reset='\[\e[00m\]'
     FancyX='\342\234\227'
     Checkmark='\342\234\223'
+    PS1=""
+
+    # Show Python virtual environment
+    PS1+="$Gray\$(virtualenv_prompt) "
 
     # Add a bright white exit status for the last command
-    PS1="\n$White\$? "
+    PS1+="\n$White\$? "
 
     # If it was successful, print a green check mark. Otherwise, print
     # a red X.
