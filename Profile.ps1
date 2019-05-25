@@ -4,7 +4,7 @@ Import-Module PSColor  # https://github.com/Davlind/PSColor
 Import-Module Posh-Git  # https://github.com/dahlbyk/posh-git
 
 # Aliases
-# New-Alias -Name ll -Value ls
+New-Alias -Name activate -Value 'venv\Scripts\activate.ps1'  # Activate virtual environment "venv"
 
 # List all files and folders including hidden ones using "ll" function
 function ll {
