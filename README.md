@@ -55,7 +55,7 @@ rm ~/miniconda.sh
 
 ## Windows 10 with bash
 
-![powershell](https://user-images.githubusercontent.com/994357/58366856-84f20500-7ed8-11e9-8224-b96d10a093bb.png)
+![powershell](https://user-images.githubusercontent.com/994357/58366951-64767a80-7ed9-11e9-8b4e-fa9d500bef3d.png)
 
 :warning: Never change Linux files in Windows apps or you risk data corruption.
 
