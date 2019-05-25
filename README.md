@@ -2,6 +2,8 @@
 
 ## macOS with Terminal.app
 
+![macos_bash](https://user-images.githubusercontent.com/994357/58366885-d0a4ae80-7ed8-11e9-8ed1-d3da1e75382d.png)
+
 Set Terminal.app to use `terminal-ocean-dark.terminal`.
 
 ### Installation (bash)
@@ -52,6 +54,8 @@ rm ~/miniconda.sh
 <br><br>
 
 ## Windows 10 with bash
+
+![powershell](https://user-images.githubusercontent.com/994357/58366856-84f20500-7ed8-11e9-8224-b96d10a093bb.png)
 
 :warning: Never change Linux files in Windows apps or you risk data corruption.
 
