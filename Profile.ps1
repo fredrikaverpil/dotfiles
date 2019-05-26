@@ -11,6 +11,16 @@ function ll {
   Get-ChildItem -Force @args
 }
 
+# Create Python virtual environment "venv" and activate it
+function venv {
+  Write-Output "venv" >> .gitignore ;
+  python3 -m venv --copies venv ;
+  venv\scripts\activate.ps1 ;
+  python -m pip install -U pip pylint black pep8 pydocstyle ;
+  pip list ;
+  python --version
+}
+
 function last_cmd_time {
   $command = Get-History -Count 1
   $dt = $command.EndExecutionTime - $command.StartExecutionTime
