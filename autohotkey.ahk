@@ -10,13 +10,9 @@
 
 ; HHKB settings to mimic macOS behavior on Windows
 ; Leave righ hand side modifier keys at their defaults
-
-LWin::LControl
-
-LWin & Tab:: Send {LAlt down}{Tab}
-LWin Up:: Send {Alt up}
-
-LWin & Up:: Send, {PgUp}
-LWin & Down:: Send, {PgDn}
-LWin & Left:: Send, {Home}
-LWin & Right:: Send, {End}
+LWin::LCtrl
+<^Right:: Send, {End}
+<^Left:: Send, {Home}
+<^Up:: Send, {PgUp}
+<^Down:: Send, {PgDn}
+<^Tab::Send {LWin down}{Tab}{LWin up}
