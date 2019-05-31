@@ -9,7 +9,7 @@
 !+;:: Send, Ö  ; does not work
 
 ; HHKB settings to mimic macOS behavior on Windows
-; Leave righ hand side modifier keys at their defaults
+; Lwin = <^
 LWin::LCtrl
 <^Right:: Send, {End}
 <^Left:: Send, {Home}
