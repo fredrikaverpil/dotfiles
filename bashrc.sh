@@ -8,6 +8,7 @@ alias activate='source venv/bin/activate'
 # Environment variables
 # export PATH="$PATH:~/miniconda3/bin"
 export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+export PATH="$PATH:~/.cargo/bin"  # Rust
 
 # Per-platform specifics
 if [ -n "`$SHELL -c 'echo $BASH_VERSION'`" ]; then
