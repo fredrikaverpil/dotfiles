@@ -57,7 +57,7 @@ rm ~/miniconda.sh
 
 ![powershell](https://user-images.githubusercontent.com/994357/58366951-64767a80-7ed9-11e9-8b4e-fa9d500bef3d.png)
 
-:warning: Never change Linux files in Windows apps or you risk data corruption.
+:stars: Linux files can be modified with Windows apps starting with Windows 10 version 1903.
 
 ### Installation (administrative Powershell)
 
