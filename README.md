@@ -83,6 +83,7 @@ mkdir $HOME\Documents\Powershell
 New-Item -ItemType SymbolicLink -Path $HOME\Documents\WindowsPowerShell\Profile.ps1 -Value Profile.ps1
 New-Item -ItemType SymbolicLink -Path $HOME\Documents\Powershell\Profile.ps1 -Value Profile.ps1
 New-Item -ItemType SymbolicLink -Path $HOME\.hyper.js -Value hyper.js
+New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\RoamingState\profiles.json -Value profiles.json
 New-Item -ItemType SymbolicLink -Path $HOME\.gitconfig -Value gitconfig
 ```
 
