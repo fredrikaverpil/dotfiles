@@ -199,12 +199,13 @@
         ],
         "requestedTheme" : "system",
         "showTabsInTitlebar" : true,
-        "showTerminalTitleInTitlebar" : true
+        "showTerminalTitleInTitlebar" : true,
+        "wordDelimiters" : " ./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}~?\u2502"
     },
     "profiles" : 
     [
         {
-            "acrylicOpacity" : 0.8,
+            "acrylicOpacity" : 0.80000001192092896,
             "closeOnExit" : true,
             "colorScheme" : "Campbell",
             "commandline" : "C:\\Program Files\\PowerShell\\6\\pwsh.exe",
@@ -276,7 +277,7 @@
             "useAcrylic" : false
         },
         {
-            "acrylicOpacity" : 0.8,
+            "acrylicOpacity" : 0.80000001192092896,
             "closeOnExit" : true,
             "colorScheme" : "Campbell",
             "commandline" : "C:\\Program Files\\PowerShell\\6\\pwsh.exe -noexit -c .\\venv\\Scripts\\activate.ps1",
