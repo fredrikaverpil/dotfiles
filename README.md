@@ -137,10 +137,10 @@ ln -s $(pwd)/gitconfig ~/.gitconfig
 
 ### Key remappings
 
-For nicer [HHKB](https://www.hhkeyboard.com/) support and easier transition between macOS and Windows:
+For nicer [HHKB](https://www.hhkeyboard.com/) support and easier switching between macOS and Windows:
 
 - [SharpKeys](http://www.randyrants.com/sharpkeys/) to remap LWin to LCtrl reliably
-- [Autohotkey](https://www.autohotkey.com/) to improve vscode navigation and Swedish characters on US-English keyboard/layout
+- [Autohotkey](https://www.autohotkey.com/) to improve home/end selection/navigation and Swedish characters on US-English keyboard/layout
 
 <br><br>
 
