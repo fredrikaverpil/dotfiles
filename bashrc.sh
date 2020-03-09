@@ -7,6 +7,7 @@ alias activate='source venv/bin/activate'
 
 # Environment variables
 # export PATH="$PATH:~/miniconda3/bin"
+export HOMEBREW_NO_ANALYTICS=1
 export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
 export PATH="$PATH:$HOME/.cargo/bin"  # Rust
 
