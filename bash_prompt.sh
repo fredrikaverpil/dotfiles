@@ -80,7 +80,7 @@ set_prompt () {
     PS1+="$Gray\$(virtualenv_prompt) "
 
     # Add a bright white exit status for the last command
-    PS1+="\n$White\$? "
+    PS1+="\n$White\$Last_Command "
 
     # If it was successful, print a green check mark. Otherwise, print
     # a red X.

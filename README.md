@@ -37,6 +37,7 @@ ln -sf $(pwd)/bash_aliases.sh ~/.bash_aliases
 ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
 ln -sf $(pwd)/zshrc.sh ~/.zshrc
 ln -sf $(pwd)/zprofile.sh ~/.zprofile
+ln -sf $(pwd)/zprompt.sh ~/.zprompt
 ln -sf $(pwd)/gitconfig ~/.gitconfig
 ln -sf $(pwd)/gitignore_global ~/.gitignore_global
 ln -sf $(pwd)/DefaultKeyBinding.dict ~/Library/KeyBindings/DefaultKeyBinding.dict
