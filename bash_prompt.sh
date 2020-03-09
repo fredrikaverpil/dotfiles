@@ -10,14 +10,22 @@
 #     unset timer
 # }
 
+echo "in prompt!"
+
 # Advanced timer
 function timer_now {
-    if [ "$(uname -s)" == "Darwin" ]; then
-        # Requires 'brew install coreutils' on macOS
-        /usr/local/opt/coreutils/libexec/gnubin/date +%s%N
-    elif [ "$(uname -s)" == "Linux" ]; then
-        date +%s%N
-    fi
+    case `uname` in
+        Darwin)
+            # Requires 'brew install coreutils' on macOS
+            /usr/local/opt/coreutils/libexec/gnubin/date +%s%N
+        ;;
+        Linux)
+            date +%s%N
+        ;;
+        FreeBSD)
+            # commands for FreeBSD go here
+        ;;
+    esac
 }
 
 function timer_start {

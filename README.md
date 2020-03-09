@@ -20,6 +20,9 @@ sudo xcodebuild -license accept
 # Install Homebrew
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
+# Install oh-my-zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
 # Get dotfiles
 mkdir -p  ~/code/repos
 cd ~/code/repos
@@ -27,9 +30,13 @@ git clone https://github.com/fredrikaverpil/dotfiles.git 
 cd dotfiles
 
 # Create symlinks
-ln -sf $(pwd)/bash_profile.sh ~/.bash_profile
 ln -sf $(pwd)/bashrc.sh ~/.bashrc
+ln -sf $(pwd)/bash_profile.sh ~/.bash_profile
+ln -sf $(pwd)/bash_exports.sh ~/.bash_exports
+ln -sf $(pwd)/bash_aliases.sh ~/.bash_aliases
 ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
+ln -sf $(pwd)/zshrc.sh ~/.zshrc
+ln -sf $(pwd)/zprofile.sh ~/.zprofile
 ln -sf $(pwd)/gitconfig ~/.gitconfig
 ln -sf $(pwd)/gitignore_global ~/.gitignore_global
 ln -sf $(pwd)/DefaultKeyBinding.dict ~/Library/KeyBindings/DefaultKeyBinding.dict
