@@ -10,7 +10,6 @@
 #     unset timer
 # }
 
-echo "in prompt!"
 
 # Advanced timer
 function timer_now {
