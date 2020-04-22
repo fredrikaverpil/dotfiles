@@ -73,12 +73,6 @@ rm ~/miniconda.sh
 # Set exectution policy
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
-# Install Boxstarter
-. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
-
-# Boxstarter config
-Install-BoxstarterPackage -PackageName boxstarter.ps1 -DisableReboots
-
 # Get dotfiles
 mkdir -p  ~/code/repos
 cd ~/code/repos
@@ -86,13 +80,26 @@ git clone https://github.com/fredrikaverpil/dotfiles.git 
 cd dotfiles
 
 # Create symlinks
+New-Item -ItemType SymbolicLink -Path $HOME\.gitconfig -Value gitconfig
+New-Item -ItemType SymbolicLink -Path $HOME\.gitignore_global -Value gitignore_global
+New-Item -ItemType SymbolicLink -Path $HOME\.bashrc -Value bashrc.sh
+New-Item -ItemType SymbolicLink -Path $HOME\.bash_profile -Value bash_profile.sh
+New-Item -ItemType SymbolicLink -Path $HOME\.bash_exports -Value bash_exports.sh
+New-Item -ItemType SymbolicLink -Path $HOME\.bash_aliases -Value bash_aliases.sh
+
 mkdir $HOME\Documents\WindowsPowerShell\
 mkdir $HOME\Documents\Powershell
 New-Item -ItemType SymbolicLink -Path $HOME\Documents\WindowsPowerShell\Profile.ps1 -Value Profile.ps1
 New-Item -ItemType SymbolicLink -Path $HOME\Documents\Powershell\Profile.ps1 -Value Profile.ps1
-New-Item -ItemType SymbolicLink -Path $HOME\.hyper.js -Value hyper.js
 New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\RoamingState\profiles.json -Value profiles.json
-New-Item -ItemType SymbolicLink -Path $HOME\.gitconfig -Value gitconfig
+```
+
+```powershell
+# Install Boxstarter
+. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
+
+# Boxstarter config
+Install-BoxstarterPackage -PackageName boxstarter.ps1 -DisableReboots
 ```
 
 ### Installation (Ubuntu bash)
