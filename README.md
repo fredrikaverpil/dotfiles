@@ -6,23 +6,9 @@
 
 Set Terminal.app to use `terminal-ocean-dark.terminal`.
 
-### Installation (bash)
+### Dotfiles
 
 ```bash
-# Avoid creating .DS_Store files on network or USB volumes
-defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
-defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
-
-# Install Xcode commandline tools
-xcode-select --install
-sudo xcodebuild -license accept
-
-# Install Homebrew
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-
-# Install oh-my-zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-
 # Get dotfiles
 mkdir -p  ~/code/repos
 cd ~/code/repos
@@ -37,9 +23,34 @@ ln -sf $(pwd)/bash_aliases.sh ~/.bash_aliases
 ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
 ln -sf $(pwd)/zshrc.sh ~/.zshrc
 ln -sf $(pwd)/zprofile.sh ~/.zprofile
+ln -sf $(pwd)/zprompt.sh ~/.zprompt
 ln -sf $(pwd)/gitconfig ~/.gitconfig
 ln -sf $(pwd)/gitignore_global ~/.gitignore_global
+
+
+# Install oh-my-zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
+
+### Key remappings
+
+```bash
 ln -sf $(pwd)/DefaultKeyBinding.dict ~/Library/KeyBindings/DefaultKeyBinding.dict
+```
+
+### Extras
+
+```bash
+# Avoid creating .DS_Store files on network or USB volumes
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+
+# Install Xcode commandline tools
+xcode-select --install
+sudo xcodebuild -license accept
+
+# Install Homebrew
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
 # Install from Brewfile
 brew bundle
@@ -66,17 +77,13 @@ rm ~/miniconda.sh
 
 :stars: Linux files can be modified with Windows apps starting with Windows 10 version 1903.
 
-### Installation (administrative Powershell)
+### Dotfiles
 
 ```powershell
+# Administrative Powershell
+
 # Set exectution policy
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-
-# Install Boxstarter
-. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
-
-# Boxstarter config
-Install-BoxstarterPackage -PackageName boxstarter.ps1 -DisableReboots
 
 # Get dotfiles
 mkdir -p  ~/code/repos
@@ -85,16 +92,54 @@ git clone https://github.com/fredrikaverpil/dotfiles.git 
 cd dotfiles
 
 # Create symlinks
+New-Item -ItemType SymbolicLink -Path $HOME\.gitconfig -Value gitconfig
+New-Item -ItemType SymbolicLink -Path $HOME\.gitignore_global -Value gitignore_global
+New-Item -ItemType SymbolicLink -Path $HOME\.bashrc -Value bashrc.sh
+New-Item -ItemType SymbolicLink -Path $HOME\.bash_profile -Value bash_profile.sh
+New-Item -ItemType SymbolicLink -Path $HOME\.bash_exports -Value bash_exports.sh
+New-Item -ItemType SymbolicLink -Path $HOME\.bash_aliases -Value bash_aliases.sh
+New-Item -ItemType SymbolicLink -Path $HOME\.bash_prompt -Value bash_prompt.sh
+```
+
+### Powershell, Powershell Core and Windows Terminal profiles
+
+:warning: This is outdated, need updating. Also, see Boxstarter script for duplicate config.
+
+```powershell
+# Administrative Powershell
+
+# Set exectution policy
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# Update PowerShellGet
+Install-Module PowerShellGet -Scope CurrentUser -Force -AllowClobber
+
+# Install posh-git
+PowerShellGet\Install-Module posh-git -Scope CurrentUser -AllowPrerelease -Force
+
+
 mkdir $HOME\Documents\WindowsPowerShell\
 mkdir $HOME\Documents\Powershell
 New-Item -ItemType SymbolicLink -Path $HOME\Documents\WindowsPowerShell\Profile.ps1 -Value Profile.ps1
 New-Item -ItemType SymbolicLink -Path $HOME\Documents\Powershell\Profile.ps1 -Value Profile.ps1
-New-Item -ItemType SymbolicLink -Path $HOME\.hyper.js -Value hyper.js
 New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\RoamingState\profiles.json -Value profiles.json
-New-Item -ItemType SymbolicLink -Path $HOME\.gitconfig -Value gitconfig
 ```
 
-### Installation (Ubuntu bash)
+### Boxstarter
+
+```powershell
+# Administrative Powershell
+
+# Install Boxstarter
+. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
+
+# Boxstarter config
+Install-BoxstarterPackage -PackageName boxstarter.ps1 -DisableReboots
+```
+
+### WSL Ubuntu
+
+:warning: This is very outdated. I wish to update this for WSL2...
 
 ```bash
 cd /mnt/c/.../code/repos/dotfiles
@@ -148,6 +193,7 @@ For nicer [HHKB](https://www.hhkeyboard.com/) support and easier switching betwe
 
 - [SharpKeys](http://www.randyrants.com/sharpkeys/) to remap LWin to LCtrl reliably
 - [Autohotkey](https://www.autohotkey.com/) to improve home/end selection/navigation and Swedish characters on US-English keyboard/layout
+- [PureText](http://stevemiller.net/puretext/) to remap RWin + v to enable pasting of text without formatting
 
 <br><br>
 
@@ -160,6 +206,7 @@ For nicer [HHKB](https://www.hhkeyboard.com/) support and easier switching betwe
 | `.bash_profile` | Is executed for login shells. Exception Terminal.app: for each new terminal window, `.bash_profile` is called instead of `.bashrc`. |
 | `.bashrc` | Is executed for interactive non-login shells. |
 | `.bash_prompt` | My custom bash prompt (sourced by `.bashrc`). |
+| `.bash_modules` | Loads modules in e.g. Red Hat. |
 | `.gitconfig` | Global Git configuration to specify name, email, colors etc. |
 | `.gitignore_global` | Global .gitignore |
 | `DefaultKeyBinding.dict` | Remap US keyboard layout to support åÅäÄöÖ via <kbd>Alt</kbd> and <kbd>Alt</kbd>+<kbd>Shift</kbd> modifier keys. Note: set up macOS to switch languages via <kbd>Ctrl</kbd>+<kbd>Space</kbd>. |

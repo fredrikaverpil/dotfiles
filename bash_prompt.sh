@@ -24,6 +24,14 @@ function timer_now {
         FreeBSD)
             # commands for FreeBSD go here
         ;;
+        MINGW64_NT-*)
+            # commands for Git bash in Windows go here
+            date +%s%N
+        ;;
+        *)
+            # commands for Git bash in Windows go here
+            echo "Warning: Could not detect environment, please edit bash_prompt.sh..."
+            date +%s%N  # try something
     esac
 }
 
@@ -69,7 +77,7 @@ set_prompt () {
     White='\[\e[01;37m\]'
     Red='\[\e[01;31m\]'
     Green='\[\e[01;32m\]'
-    Yellow='$(tput setaf 3)\]'
+    Yellow='\[\e[01;33m\]'
     Gray='\[\e[01;222m\]'
     Reset='\[\e[00m\]'
     FancyX='\342\234\227'
@@ -77,10 +85,10 @@ set_prompt () {
     PS1=""
 
     # Show Python virtual environment
-    PS1+="$Gray\$(virtualenv_prompt) "
+    PS1+="$Gray$(virtualenv_prompt) "
 
     # Add a bright white exit status for the last command
-    PS1+="\n$White\$? "
+    PS1+="\n$White\$Last_Command "
 
     # If it was successful, print a green check mark. Otherwise, print
     # a red X.
@@ -94,8 +102,10 @@ set_prompt () {
     # Add the ellapsed time and current date
     timer_stop
     # PS1+="$Reset($timer_show) \t \n"  # with time
-    PS1+="$Reset($timer_show) \n"  # without time
+    PS1+="$Reset($timer_show)"  # without time
 
+    # Newline
+    PS1+="\n"  # without time
 
     # If root, just print the host in red. Otherwise, print the current user
     # and host in green.

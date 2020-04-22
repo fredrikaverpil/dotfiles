@@ -16,3 +16,6 @@ case `uname` in
         # commands for FreeBSD go here
     ;;
 esac
+
+# Global settings
+export PIP_REQUIRE_VIRTUALENV=true  # use --isolated to bypass
