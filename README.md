@@ -102,8 +102,20 @@ New-Item -ItemType SymbolicLink -Path $HOME\.bash_aliases -Value bash_aliases.sh
 
 ### Powershell, Powershell Core and Windows Terminal profiles
 
+:warning: This is outdated, need updating. Also, see Boxstarter script for duplicate config.
+
 ```powershell
 # Administrative Powershell
+
+# Set exectution policy
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# Update PowerShellGet
+Install-Module PowerShellGet -Scope CurrentUser -Force -AllowClobber
+
+# Install posh-git
+PowerShellGet\Install-Module posh-git -Scope CurrentUser -AllowPrerelease -Force
+
 
 mkdir $HOME\Documents\WindowsPowerShell\
 mkdir $HOME\Documents\Powershell
