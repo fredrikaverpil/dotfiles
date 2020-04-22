@@ -1,6 +1,6 @@
 [user]
   name = Fredrik Averpil
-  email = fredrik@averpil.com
+  # email = fredrik@averpil.com  # Set this in each git repo using: git config user.email "$EMAIL"
 [core]
 	excludesfile = ~/.gitignore_global
   editor = code --wait
