@@ -193,6 +193,7 @@ For nicer [HHKB](https://www.hhkeyboard.com/) support and easier switching betwe
 
 - [SharpKeys](http://www.randyrants.com/sharpkeys/) to remap LWin to LCtrl reliably
 - [Autohotkey](https://www.autohotkey.com/) to improve home/end selection/navigation and Swedish characters on US-English keyboard/layout
+- [PureText](http://stevemiller.net/puretext/) to remap RWin + v to enable pasting of text without formatting
 
 <br><br>
 
