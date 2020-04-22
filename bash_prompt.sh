@@ -24,6 +24,14 @@ function timer_now {
         FreeBSD)
             # commands for FreeBSD go here
         ;;
+        MINGW64_NT-*)
+            # commands for Git bash in Windows go here
+            date +%s%N
+        ;;
+        *)
+            # commands for Git bash in Windows go here
+            echo "Warning: Could not detect environment, please edit bash_prompt.sh..."
+            date +%s%N  # try something
     esac
 }
 
@@ -32,7 +40,7 @@ function timer_start {
 }
 
 function timer_stop {
-    local delta_us=$((($(timer_now) - $timer_start) / 1000))
+    # local delta_us=$((($(timer_now) - $timer_start) / 1000))
     local us=$((delta_us % 1000))
     local ms=$(((delta_us / 1000) % 1000))
     local s=$(((delta_us / 1000000) % 60))

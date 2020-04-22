@@ -98,6 +98,7 @@ New-Item -ItemType SymbolicLink -Path $HOME\.bashrc -Value bashrc.sh
 New-Item -ItemType SymbolicLink -Path $HOME\.bash_profile -Value bash_profile.sh
 New-Item -ItemType SymbolicLink -Path $HOME\.bash_exports -Value bash_exports.sh
 New-Item -ItemType SymbolicLink -Path $HOME\.bash_aliases -Value bash_aliases.sh
+New-Item -ItemType SymbolicLink -Path $HOME\.bash_prompt -Value bash_prompt.sh
 ```
 
 ### Powershell, Powershell Core and Windows Terminal profiles
