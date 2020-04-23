@@ -195,6 +195,8 @@ For nicer [HHKB](https://www.hhkeyboard.com/) support and easier switching betwe
 - [Autohotkey](https://www.autohotkey.com/) to improve home/end selection/navigation and Swedish characters on US-English keyboard/layout
 - [PureText](http://stevemiller.net/puretext/) to remap (<kbd>RWin</kbd> + <kbd>v</kbd>) to enable pasting of text without formatting
 
+<br><br>
+
 ## Red Hat 7
 
 ### Dotfiles
@@ -219,6 +221,8 @@ ln -sf $(pwd)/zprompt.sh ~/.zprompt
 ln -sf $(pwd)/gitconfig ~/.gitconfig
 ln -sf $(pwd)/gitignore_global ~/.gitignore_global
 ```
+
+<br><br>
 
 ## Symlinking details
 
