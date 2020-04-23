@@ -195,7 +195,30 @@ For nicer [HHKB](https://www.hhkeyboard.com/) support and easier switching betwe
 - [Autohotkey](https://www.autohotkey.com/) to improve home/end selection/navigation and Swedish characters on US-English keyboard/layout
 - [PureText](http://stevemiller.net/puretext/) to remap RWin + v to enable pasting of text without formatting
 
-<br><br>
+## Red Hat 7
+
+### Dotfiles
+
+```bash
+# Get dotfiles
+mkdir -p  ~/code/repos
+cd ~/code/repos
+git clone https://github.com/fredrikaverpil/dotfiles.git 
+cd dotfiles
+
+# Create symlinks
+ln -sf $(pwd)/bashrc.sh ~/.bashrc
+ln -sf $(pwd)/bash_profile.sh ~/.bash_profile
+ln -sf $(pwd)/bash_exports.sh ~/.bash_exports
+ln -sf $(pwd)/bash_aliases.sh ~/.bash_aliases
+ln -sf $(pwd)/bash_modules.sh ~/.bash_modules
+ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
+ln -sf $(pwd)/zshrc.sh ~/.zshrc
+ln -sf $(pwd)/zprofile.sh ~/.zprofile
+ln -sf $(pwd)/zprompt.sh ~/.zprompt
+ln -sf $(pwd)/gitconfig ~/.gitconfig
+ln -sf $(pwd)/gitignore_global ~/.gitignore_global
+```
 
 ## Symlinking details
 
