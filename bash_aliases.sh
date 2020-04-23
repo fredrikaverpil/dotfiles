@@ -9,6 +9,10 @@ case `uname` in
     FreeBSD)
         # commands for FreeBSD go here
     ;;
+    MINGW64_NT-*)
+        # commands for Git bash in Windows go here
+        alias python3='/c/Users/eavefre/AppData/Local/Programs/Python/Python37/python.exe'
+    ;;
 esac
 
 
