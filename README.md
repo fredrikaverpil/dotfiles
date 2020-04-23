@@ -1,12 +1,12 @@
 # dotfiles
 
-## macOS with Terminal.app
+## macOS
+
+### Bash/ZSH with Terminal.app
 
 ![macos_bash](https://user-images.githubusercontent.com/994357/58366885-d0a4ae80-7ed8-11e9-8ed1-d3da1e75382d.png)
 
 Set Terminal.app to use `terminal-ocean-dark.terminal`.
-
-### Dotfiles
 
 ```bash
 # Get dotfiles
@@ -75,7 +75,7 @@ rm ~/miniconda.sh
 
 :stars: Linux files can be modified with Windows apps starting with Windows 10 version 1903.
 
-### Dotfiles
+### Git bash
 
 ```powershell
 # Administrative Powershell
@@ -199,7 +199,7 @@ For nicer [HHKB](https://www.hhkeyboard.com/) support and easier switching betwe
 
 ## Red Hat 7
 
-### Dotfiles
+### Bash/ZSH
 
 ```bash
 # Get dotfiles
