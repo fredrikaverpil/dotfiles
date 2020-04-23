@@ -2,6 +2,8 @@
 case `uname` in
     Darwin)
         # commands for macOS go here
+        alias venv='python3 -m venv venv && source venv/bin/activate && pip install --upgrade pip && pip list && which pip && pip --version && python --version'
+
     ;;
     Linux)
         # commands for Linux go here
@@ -12,6 +14,8 @@ case `uname` in
     MINGW64_NT-*)
         # commands for Git bash in Windows go here
         alias python3='/c/Users/eavefre/AppData/Local/Programs/Python/Python37/python.exe'
+        alias venv='python3 -m venv venv && source venv/Scripts/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
+
     ;;
 esac
 
@@ -27,7 +31,6 @@ alias docker-ip="docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddr
 alias k='kubectl'
 alias repos='cd ~/code/repos'
 
-alias venv='echo "venv" >> .gitignore && python3 -m venv venv && source venv/bin/activate && pip install -U pip black flake8 pydocstyle && pip list && python --version'
 alias activate='source venv/bin/activate'
 alias pyclean='find . -name "*.py[co]" -o -name __pycache__ -exec rm -rf {}'
 alias pip-purge='pip freeze | xargs pip uninstall -y'
