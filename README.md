@@ -191,9 +191,9 @@ ln -s $(pwd)/gitconfig ~/.gitconfig
 
 For nicer [HHKB](https://www.hhkeyboard.com/) support and easier switching between macOS and Windows:
 
-- [SharpKeys](http://www.randyrants.com/sharpkeys/) to remap LWin to LCtrl reliably
+- [SharpKeys](http://www.randyrants.com/sharpkeys/) to remap <kbd>LWin</kbd> to <kbd>LCtrl</kbd> reliably
 - [Autohotkey](https://www.autohotkey.com/) to improve home/end selection/navigation and Swedish characters on US-English keyboard/layout
-- [PureText](http://stevemiller.net/puretext/) to remap RWin + v to enable pasting of text without formatting
+- [PureText](http://stevemiller.net/puretext/) to remap (<kbd>RWin</kbd> + <kbd>v</kbd>) to enable pasting of text without formatting
 
 ## Red Hat 7
 
