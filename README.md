@@ -71,9 +71,7 @@ rm ~/miniconda.sh
 
 <br><br>
 
-## Windows 10 with bash
-
-![powershell](https://user-images.githubusercontent.com/994357/58366951-64767a80-7ed9-11e9-8b4e-fa9d500bef3d.png)
+## Windows 10
 
 :stars: Linux files can be modified with Windows apps starting with Windows 10 version 1903.
 
@@ -102,6 +100,8 @@ New-Item -ItemType SymbolicLink -Path $HOME\.bash_prompt -Value bash_prompt.sh
 ```
 
 ### Powershell, Powershell Core and Windows Terminal profiles
+
+![powershell](https://user-images.githubusercontent.com/994357/58366951-64767a80-7ed9-11e9-8b4e-fa9d500bef3d.png)
 
 :warning: This is outdated, need updating. Also, see Boxstarter script for duplicate config.
 
