@@ -40,3 +40,7 @@ MANIFEST
 
 # Python
 venv
+.nox
+.pytest_cache
+htmlcov
+.coverage
