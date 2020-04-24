@@ -43,4 +43,4 @@ venv
 .nox
 .pytest_cache
 htmlcov
-.coverage
+.coverage*
