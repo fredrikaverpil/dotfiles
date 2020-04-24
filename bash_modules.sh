@@ -9,7 +9,7 @@ case `uname` in
             # module avail [app]
             module load git
             module load python/3.7.4
-            module load vscode/1.43
+            module load vscode/1.44.2
             # module list
         fi
     ;;
