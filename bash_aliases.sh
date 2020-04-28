@@ -8,6 +8,8 @@ case `uname` in
     ;;
     Linux)
         # commands for Linux go here
+        alias venv='python3 -m venv venv && source venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
+        alias activate='source venv/bin/activate'
     ;;
     FreeBSD)
         # commands for FreeBSD go here
