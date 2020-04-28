@@ -35,7 +35,7 @@ alias docker-ip="docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddr
 alias k='kubectl'
 alias repos='cd ~/code/repos'
 
-alias pyclean='find . -name "*.py[co]" -o -name __pycache__ -exec rm -rf {}'
+alias pyclean='find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf'
 alias pip-purge='pip freeze | xargs pip uninstall -y'
 
 alias gerrit-push='git push origin HEAD:refs/for/master'
