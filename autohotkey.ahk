@@ -18,4 +18,3 @@ LWin::LCtrl  ; this one is better to use SharpKeys for, as it is unreliable here
 <+^Left:: Send, {LShift down}{Home}{LShift up}
 <+^Up:: Send, {LShift down}{PgUp}{LShift up}
 <+^Down:: Send, {LShift down}{PgDn}{LShift up}
-<^Tab::Send {LWin down}{Tab}{LWin up}
