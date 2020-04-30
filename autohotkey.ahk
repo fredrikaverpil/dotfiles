@@ -6,7 +6,7 @@
 !':: Send, ä
 !+':: Send, Ä
 !;:: Send, ö
-!+;:: Send, Ö  ; does not work
+!+;:: Send, Ö
 
 ; HHKB settings to mimic macOS behavior on Windows
 LWin::LCtrl  ; this one is better to use SharpKeys for, as it is unreliable here
