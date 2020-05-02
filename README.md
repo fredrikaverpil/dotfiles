@@ -97,6 +97,8 @@ New-Item -ItemType SymbolicLink -Path $HOME\.bash_profile -Value bash_profile.sh
 New-Item -ItemType SymbolicLink -Path $HOME\.bash_exports -Value bash_exports.sh
 New-Item -ItemType SymbolicLink -Path $HOME\.bash_aliases -Value bash_aliases.sh
 New-Item -ItemType SymbolicLink -Path $HOME\.bash_prompt -Value bash_prompt.sh
+
+New-Item -ItemType SymbolicLink -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\autohotkey.ahk" -Value autohotkey.ahk
 ```
 
 ### Powershell, Powershell Core and Windows Terminal profiles
