@@ -1,4 +1,7 @@
-﻿FileEncoding, UTF-8 ; This file needs to be saved/encoded with "UTF-8 with BOM"
+﻿; Put this file in
+; %APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup
+
+FileEncoding, UTF-8 ; This file needs to be saved/encoded with "UTF-8 with BOM"
 
 ; Use Swedish characters on US-English keyboard
 ![:: Send, å
