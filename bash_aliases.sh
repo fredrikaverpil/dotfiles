@@ -17,6 +17,7 @@ case `uname` in
     MINGW64_NT-*)
         # commands for Git bash in Windows go here
         alias python3='/c/Users/eavefre/AppData/Local/Programs/Python/Python37/python.exe'
+        alias pipx='/c/Users/eavefre/AppData/roaming/python/python37/Scripts/pipx.exe'
         alias venv='python3 -m venv venv && source venv/Scripts/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
         alias activate='source venv/Scripts/activate'
 

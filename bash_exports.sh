@@ -11,10 +11,18 @@ case `uname` in
     ;;
     Linux)
         # commands for Linux go here
+        export PATH="$HOME/.poetry/bin:$PATH"
+        export PATH="$HOME/.local/bin:$PATH"
     ;;
     FreeBSD)
         # commands for FreeBSD go here
     ;;
+    MINGW64_NT-*)
+        # commands for Git bash in Windows go here
+        export PATH="$HOME/.poetry/bin:$PATH"
+        export PATH="$HOME/.local/bin:$PATH"
+    ;;
+    *)
 esac
 
 # Global settings
