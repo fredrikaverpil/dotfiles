@@ -11,6 +11,7 @@ case `uname` in
     ;;
     Linux)
         # commands for Linux go here
+        export PATH="$HOME/apps/vscode/bin:$PATH"
         export PATH="$HOME/.poetry/bin:$PATH"
         export PATH="$HOME/.local/bin:$PATH"
     ;;
