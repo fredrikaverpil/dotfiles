@@ -13,7 +13,6 @@ case `uname` in
         # commands for Linux go here
         export PATH="$HOME/apps/vscode/bin:$PATH"
         export PATH="$HOME/.poetry/bin:$PATH"
-        export PATH="$HOME/.local/bin:$PATH"
     ;;
     FreeBSD)
         # commands for FreeBSD go here
@@ -21,10 +20,10 @@ case `uname` in
     MINGW64_NT-*)
         # commands for Git bash in Windows go here
         export PATH="$HOME/.poetry/bin:$PATH"
-        export PATH="$HOME/.local/bin:$PATH"
     ;;
     *)
 esac
 
 # Global settings
 export PIP_REQUIRE_VIRTUALENV=true  # use --isolated to bypass
+export PATH="$HOME/.local/bin:$PATH"  # pipx-installed binaries
