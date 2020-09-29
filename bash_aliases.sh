@@ -34,6 +34,7 @@ alias rebase='git pull --rebase origin master'
 alias master-pull='git checkout master && git pull'
 alias branch-delete='git branch --merged | grep -v \* | xargs git branch -D'
 alias branch-delete-all='git branch | grep -v \* | xargs git branch -D'
+alias master-reset='git checkout -B master origin/master && git pull'
 
 alias wrk='docker run --interactive --tty --rm skandyla/wrk'
 alias ubuntu='docker run --interactive --tty --rm --volume $(pwd):/host:ro ubuntu:18.04 bash'
@@ -42,8 +43,11 @@ alias k='kubectl'
 alias repos='cd ~/code/repos'
 
 alias pyclean='find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf'
-alias pip-purge='pip freeze | xargs pip uninstall -y'
+alias pip-purge='pip list --format freeze | xargs pip uninstall -y'
 alias pip-install-reqs='ls requirements*.txt | xargs -n 1 pip install -r'
 
+# Gerrit
 alias gerrit-push='git push origin HEAD:refs/for/master'
+alias gerrit-draft='git push origin HEAD:refs/drafts/master'
 alias gerrit-amend='git commit --amend'
+alias gp='gerrit-amend && gerrit-push'
