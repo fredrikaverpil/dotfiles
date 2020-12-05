@@ -1,14 +1,18 @@
 # Per-platform settings
 case `uname` in
     Darwin)
-        # commands for macOS go here
-        alias venv3='PIP_REQUIRE_VIRTUALENV=false python3 -m pip install --upgrade --user pip virtualenv && virtualenv venv && source venv/bin/activate && pip install --upgrade pip && pip list && which pip && pip --version && python --version'
+        # commands for macOS Big Sur go here
+        alias python3.8='python3'
+        alias venv3.8='PIP_REQUIRE_VIRTUALENV=false python3.8 -m pip install --upgrade --user pip virtualenv && virtualenv venv && source venv/bin/activate && pip install --upgrade pip && pip list && which pip && pip --version && python --version'
         alias activate='source venv/bin/activate'
 
     ;;
     Linux)
         # commands for Linux go here
         alias venv3.6='PIP_REQUIRE_VIRTUALENV=false python3.6 -m pip install --upgrade --user pip virtualenv && virtualenv venv && source venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
+        alias venv3.7='PIP_REQUIRE_VIRTUALENV=false python3.7 -m pip install --upgrade --user pip virtualenv && virtualenv venv && source venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
+        alias venv3.8='PIP_REQUIRE_VIRTUALENV=false python3.8 -m pip install --upgrade --user pip virtualenv && virtualenv venv && source venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
+        alias venv3.9='PIP_REQUIRE_VIRTUALENV=false python3.9 -m pip install --upgrade --user pip virtualenv && virtualenv venv && source venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
         alias activate='source venv/bin/activate'
     ;;
     FreeBSD)
@@ -21,7 +25,13 @@ case `uname` in
         alias python3.8='/c/Users/eavefre/AppData/Local/Programs/Python/Python38/python.exe'
         alias python3.9='/c/Users/eavefre/AppData/Local/Programs/Python/Python39/python.exe'
         alias venv3.6='PIP_REQUIRE_VIRTUALENV=false python3.6 -m pip install --upgrade --user pip virtualenv && virtualenv venv && source venv/Scripts/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
+        alias venv3.7='PIP_REQUIRE_VIRTUALENV=false python3.6 -m pip install --upgrade --user pip virtualenv && virtualenv venv && source venv/Scripts/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
+        alias venv3.8='PIP_REQUIRE_VIRTUALENV=false python3.6 -m pip install --upgrade --user pip virtualenv && virtualenv venv && source venv/Scripts/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
+        alias venv3.9='PIP_REQUIRE_VIRTUALENV=false python3.6 -m pip install --upgrade --user pip virtualenv && virtualenv venv && source venv/Scripts/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
+        alias pipx3.6='/c/Users/eavefre/AppData/roaming/python/python36/Scripts/pipx.exe'
         alias pipx3.7='/c/Users/eavefre/AppData/roaming/python/python37/Scripts/pipx.exe'
+        alias pipx3.8='/c/Users/eavefre/AppData/roaming/python/python38/Scripts/pipx.exe'
+        alias pipx3.9='/c/Users/eavefre/AppData/roaming/python/python39/Scripts/pipx.exe'
         alias activate='source venv/Scripts/activate'
 
     ;;
