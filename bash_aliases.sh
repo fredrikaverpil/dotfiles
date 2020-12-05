@@ -2,8 +2,9 @@
 case `uname` in
     Darwin)
         # commands for macOS Big Sur go here
-        alias python3.8='python3'
+        alias python3.8='python3'  # default
         alias venv3.8='PIP_REQUIRE_VIRTUALENV=false python3.8 -m pip install --upgrade --user pip virtualenv && virtualenv venv && source venv/bin/activate && pip install --upgrade pip && pip list && which pip && pip --version && python --version'
+        alias venv3.9='PIP_REQUIRE_VIRTUALENV=false python3.9 -m pip install --upgrade --user pip virtualenv && virtualenv venv && source venv/bin/activate && pip install --upgrade pip && pip list && which pip && pip --version && python --version'
         alias activate='source venv/bin/activate'
 
     ;;
