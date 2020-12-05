@@ -2,13 +2,13 @@
 case `uname` in
     Darwin)
         # commands for macOS go here
-        alias venv='python3 -m venv venv && source venv/bin/activate && pip install --upgrade pip && pip list && which pip && pip --version && python --version'
+        alias venv3='PIP_REQUIRE_VIRTUALENV=false python3 -m pip install --upgrade --user pip virtualenv && virtualenv venv && source venv/bin/activate && pip install --upgrade pip && pip list && which pip && pip --version && python --version'
         alias activate='source venv/bin/activate'
 
     ;;
     Linux)
         # commands for Linux go here
-        alias venv='python3 -m venv venv && source venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
+        alias venv3.6='PIP_REQUIRE_VIRTUALENV=false python3.6 -m pip install --upgrade --user pip virtualenv && virtualenv venv && source venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
         alias activate='source venv/bin/activate'
     ;;
     FreeBSD)
@@ -16,9 +16,12 @@ case `uname` in
     ;;
     MINGW64_NT-*)
         # commands for Git bash in Windows go here
-        alias python3='/c/Users/eavefre/AppData/Local/Programs/Python/Python37/python.exe'
-        alias pipx='/c/Users/eavefre/AppData/roaming/python/python37/Scripts/pipx.exe'
-        alias venv='python3 -m venv venv && source venv/Scripts/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
+        alias python3='/c/Users/eavefre/AppData/Local/Programs/Python/Python36/python.exe'
+        alias python3.7='/c/Users/eavefre/AppData/Local/Programs/Python/Python37/python.exe'
+        alias python3.8='/c/Users/eavefre/AppData/Local/Programs/Python/Python38/python.exe'
+        alias python3.9='/c/Users/eavefre/AppData/Local/Programs/Python/Python39/python.exe'
+        alias venv3.6='PIP_REQUIRE_VIRTUALENV=false python3.6 -m pip install --upgrade --user pip virtualenv && virtualenv venv && source venv/Scripts/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
+        alias pipx3.7='/c/Users/eavefre/AppData/roaming/python/python37/Scripts/pipx.exe'
         alias activate='source venv/Scripts/activate'
 
     ;;
@@ -51,3 +54,4 @@ alias gerrit-push='git push origin HEAD:refs/for/master'
 alias gerrit-draft='git push origin HEAD:refs/drafts/master'
 alias gerrit-amend='git commit --amend'
 alias gp='gerrit-amend && gerrit-push'
+alias gp-draft='gerrit-amend && gerrit-draft'
