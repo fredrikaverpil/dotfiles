@@ -9,7 +9,7 @@ case `uname` in
             # module avail [app]
             module load git
             module load python/3.7.4
-            module load chrome/75.0.3770.100-1
+            module load chrome/83.0.4103.116-1
             # module list
         fi
     ;;

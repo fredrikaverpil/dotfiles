@@ -12,14 +12,12 @@ case `uname` in
     Linux)
         # commands for Linux go here
         export PATH="$HOME/apps/vscode/bin:$PATH"
-        export PATH="$HOME/.poetry/bin:$PATH"
     ;;
     FreeBSD)
         # commands for FreeBSD go here
     ;;
     MINGW64_NT-*)
         # commands for Git bash in Windows go here
-        export PATH="$HOME/.poetry/bin:$PATH"
     ;;
     *)
 esac
