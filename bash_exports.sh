@@ -12,6 +12,9 @@ case `uname` in
     Linux)
         # commands for Linux go here
         export PATH="$HOME/apps/vscode/bin:$PATH"
+        export PYENV_ROOT="$HOME/.pyenv"  # pyenv
+        export PATH="$PYENV_ROOT/bin:$PATH"  # pyenv
+
     ;;
     FreeBSD)
         # commands for FreeBSD go here

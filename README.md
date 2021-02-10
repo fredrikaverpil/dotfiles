@@ -1,5 +1,154 @@
 # dotfiles
 
+## Windows 10
+
+:stars: Linux files can be modified with Windows apps starting with Windows 10 version 1903.
+:warning: Operating on `/mnt/c` from within WSL2 is slow (it's a network mount), avoid this.
+
+### WSL2 Ubuntu 20.04
+
+From administrative Powershell:
+
+```powershell
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+
+Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
+```
+
+Restart, then again from administrative Powershell:
+
+```powershell
+wsl --set-default-version 2
+```
+
+Install Ubuntu 20.04 LTS and Terminal from the Microsoft Store.
+
+Install the [Linux Kernel update package](https://docs.microsoft.com/en-us/windows/wsl/install-win10#step-4---download-the-linux-kernel-update-package).
+
+Install [Docker Desktop with WSL2 backend](https://docs.docker.com/docker-for-windows/wsl) and add `$USER` to the `docker` group:
+
+```bash
+sudo usermod -aG docker ${USER}
+```
+
+Set up Python basics:
+
+```bash
+sudo apt update
+sudo apt install python3-pip python3-venv pipx
+
+pipx install poetry --pip-args poetry-dynamic-versioning
+
+# Pyenv; exports and init in symlinked .bashrc files
+# https://github.com/pyenv/pyenv/wiki#suggested-build-environment
+sudo apt-get update; sudo apt-get install --no-install-recommends make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+```
+
+Get the dotfiles:
+
+```bash
+mkdir -p  ~/code/repos
+cd ~/code/repos
+git clone https://github.com/fredrikaverpil/dotfiles.git 
+cd dotfiles
+
+# Create symlinks
+cat $(pwd)/bashrc.sh >> ~/.bashrc
+ln -sf $(pwd)/bash_profile.sh ~/.bash_profile
+ln -sf $(pwd)/bash_exports.sh ~/.bash_exports
+ln -sf $(pwd)/bash_aliases.sh ~/.bash_aliases
+ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
+ln -sf $(pwd)/bash_pyenv.sh ~/.bash_pyenv
+ln -sf $(pwd)/gitconfig ~/.gitconfig
+ln -sf $(pwd)/gitignore_global ~/.gitignore_global
+```
+
+Set up SSH:
+
+```bash
+mkdir -p ~/.ssh && chmod 700 ~/.ssh
+touch ~/.ssh/known_hosts && chmod 644 ~/.ssh/known_hosts
+touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys
+# add key(s) here
+chmod 600 ~/.ssh/id_rsa
+chmod 644 ~/.ssh/id_rsa.pub
+```
+
+
+### Git bash
+
+```powershell
+# Administrative Powershell
+
+# Set exectution policy
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# Get dotfiles
+mkdir -p  ~/code/repos
+cd ~/code/repos
+git clone https://github.com/fredrikaverpil/dotfiles.git 
+cd dotfiles
+
+# Create symlinks
+New-Item -ItemType SymbolicLink -Path $HOME\.gitconfig -Value gitconfig
+New-Item -ItemType SymbolicLink -Path $HOME\.gitignore_global -Value gitignore_global
+New-Item -ItemType SymbolicLink -Path $HOME\.bashrc -Value bashrc.sh
+New-Item -ItemType SymbolicLink -Path $HOME\.bash_profile -Value bash_profile.sh
+New-Item -ItemType SymbolicLink -Path $HOME\.bash_exports -Value bash_exports.sh
+New-Item -ItemType SymbolicLink -Path $HOME\.bash_aliases -Value bash_aliases.sh
+New-Item -ItemType SymbolicLink -Path $HOME\.bash_prompt -Value bash_prompt.sh
+
+New-Item -ItemType SymbolicLink -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\autohotkey.ahk" -Value autohotkey.ahk
+```
+
+### Powershell, Powershell Core and Windows Terminal profiles
+
+![powershell](https://user-images.githubusercontent.com/994357/58366951-64767a80-7ed9-11e9-8b4e-fa9d500bef3d.png)
+
+:warning: This is outdated, need updating. Also, see Boxstarter script for duplicate config.
+
+```powershell
+# Administrative Powershell
+
+# Set exectution policy
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# Update PowerShellGet
+Install-Module PowerShellGet -Scope CurrentUser -Force -AllowClobber
+
+# Install posh-git
+PowerShellGet\Install-Module posh-git -Scope CurrentUser -AllowPrerelease -Force
+
+
+mkdir $HOME\Documents\WindowsPowerShell\
+mkdir $HOME\Documents\Powershell
+New-Item -ItemType SymbolicLink -Path $HOME\Documents\WindowsPowerShell\Profile.ps1 -Value Profile.ps1
+New-Item -ItemType SymbolicLink -Path $HOME\Documents\Powershell\Profile.ps1 -Value Profile.ps1
+New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\RoamingState\profiles.json -Value profiles.json
+```
+
+### Boxstarter
+
+```powershell
+# Administrative Powershell
+
+# Install Boxstarter
+. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
+
+# Boxstarter config
+Install-BoxstarterPackage -PackageName boxstarter.ps1 -DisableReboots
+```
+
+
+### Key remappings
+
+For nicer [HHKB](https://www.hhkeyboard.com/) support and easier switching between macOS and Windows:
+
+- [SharpKeys](http://www.randyrants.com/sharpkeys/) to remap <kbd>LWin</kbd> to <kbd>LCtrl</kbd> reliably
+- [Autohotkey](https://www.autohotkey.com/) to improve home/end selection/navigation and Swedish characters on US-English keyboard/layout
+- [PureText](http://stevemiller.net/puretext/) to remap (<kbd>RWin</kbd> + <kbd>v</kbd>) to enable pasting of text without formatting
+
 ## macOS
 
 ### Bash/ZSH with Terminal.app
@@ -69,136 +218,6 @@ rm ~/miniconda.sh
 # ln -s $HOME/miniconda3/bin/conda /usr/bin/conda  # haven't tried this on macOS yet
 ```
 
-<br><br>
-
-## Windows 10
-
-:stars: Linux files can be modified with Windows apps starting with Windows 10 version 1903.
-
-### Git bash
-
-```powershell
-# Administrative Powershell
-
-# Set exectution policy
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-
-# Get dotfiles
-mkdir -p  ~/code/repos
-cd ~/code/repos
-git clone https://github.com/fredrikaverpil/dotfiles.git 
-cd dotfiles
-
-# Create symlinks
-New-Item -ItemType SymbolicLink -Path $HOME\.gitconfig -Value gitconfig
-New-Item -ItemType SymbolicLink -Path $HOME\.gitignore_global -Value gitignore_global
-New-Item -ItemType SymbolicLink -Path $HOME\.bashrc -Value bashrc.sh
-New-Item -ItemType SymbolicLink -Path $HOME\.bash_profile -Value bash_profile.sh
-New-Item -ItemType SymbolicLink -Path $HOME\.bash_exports -Value bash_exports.sh
-New-Item -ItemType SymbolicLink -Path $HOME\.bash_aliases -Value bash_aliases.sh
-New-Item -ItemType SymbolicLink -Path $HOME\.bash_prompt -Value bash_prompt.sh
-
-New-Item -ItemType SymbolicLink -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\autohotkey.ahk" -Value autohotkey.ahk
-```
-
-### Powershell, Powershell Core and Windows Terminal profiles
-
-![powershell](https://user-images.githubusercontent.com/994357/58366951-64767a80-7ed9-11e9-8b4e-fa9d500bef3d.png)
-
-:warning: This is outdated, need updating. Also, see Boxstarter script for duplicate config.
-
-```powershell
-# Administrative Powershell
-
-# Set exectution policy
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-
-# Update PowerShellGet
-Install-Module PowerShellGet -Scope CurrentUser -Force -AllowClobber
-
-# Install posh-git
-PowerShellGet\Install-Module posh-git -Scope CurrentUser -AllowPrerelease -Force
-
-
-mkdir $HOME\Documents\WindowsPowerShell\
-mkdir $HOME\Documents\Powershell
-New-Item -ItemType SymbolicLink -Path $HOME\Documents\WindowsPowerShell\Profile.ps1 -Value Profile.ps1
-New-Item -ItemType SymbolicLink -Path $HOME\Documents\Powershell\Profile.ps1 -Value Profile.ps1
-New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\RoamingState\profiles.json -Value profiles.json
-```
-
-### Boxstarter
-
-```powershell
-# Administrative Powershell
-
-# Install Boxstarter
-. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
-
-# Boxstarter config
-Install-BoxstarterPackage -PackageName boxstarter.ps1 -DisableReboots
-```
-
-### WSL Ubuntu
-
-:warning: This is very outdated. I wish to update this for WSL2...
-
-```bash
-cd /mnt/c/.../code/repos/dotfiles
-
-# Basics
-sudo apt-get update
-sudo apt-get install -y tmux mosh htop tree
-
-# Docker
-# Note - in Docker for Windows, first enable "Expose daemon on tcp://localhost:2375 without TLS"
-sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-sudo apt-get update
-sudo apt-get install -y docker-ce
-export DOCKER_HOST=tcp://0.0.0.0:2375
-# echo "export DOCKER_HOST=tcp://0.0.0.0:2375" >> ~/.bashrc
-
-# Docker compose via Python 2
-sudo apt-get install -y python python-dev python-setuptools
-sudo apt-get install -y python-pip
-sudo pip install docker-compose
-
-# Miniconda
-wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh
-chmod +x ~/miniconda.sh
-bash ~/miniconda.sh -b -p $HOME/miniconda3
-rm ~/miniconda.sh
-sudo ln -s $HOME/miniconda3/bin/conda /usr/bin/conda
-
-# Qt/PySide2 stuff
-sudo apt-get install -y libgl1-mesa-glx xcb libxcb*
-sudo apt-get install x11-apps
-udo apt-get install gnome-calculator # (to get GTK)
-export DISPLAY=:0
-# ENV DISPLAY :99
-
-# --- envs, to be placed in separate .bashrc symlink...
-export DOCKER_HOST=tcp://0.0.0.0:2375  # Docker for Windows/bash
-export DISPLAY=:0  # Tell X server to run on local computer
-# export DISPLAY=localhost:0.0
-# --- envs, to be placed in separate .bashrc symlink...
-
-# Create symlinks
-ln -s $(pwd)/gitconfig ~/.gitconfig
-```
-
-### Key remappings
-
-For nicer [HHKB](https://www.hhkeyboard.com/) support and easier switching between macOS and Windows:
-
-- [SharpKeys](http://www.randyrants.com/sharpkeys/) to remap <kbd>LWin</kbd> to <kbd>LCtrl</kbd> reliably
-- [Autohotkey](https://www.autohotkey.com/) to improve home/end selection/navigation and Swedish characters on US-English keyboard/layout
-- [PureText](http://stevemiller.net/puretext/) to remap (<kbd>RWin</kbd> + <kbd>v</kbd>) to enable pasting of text without formatting
-
-<br><br>
-
 ## Red Hat 7
 
 ### Bash/ZSH
@@ -224,9 +243,15 @@ ln -sf $(pwd)/gitconfig ~/.gitconfig
 ln -sf $(pwd)/gitignore_global ~/.gitignore_global
 ```
 
-<br><br>
-
 ## Symlinking details
+
+### Windows
+
+| Filepath | Description |
+| --- | --- |
+| `$Home\[My ]Documents\WindowsPowerShell\Profile.ps1` | Powershell 5: Current User, All Hosts|
+| `$Home\[My ]Documents\Powershell\Profile.ps1` | Powershell Core: Current User, All Hosts |
+| `??? profiles.ps1` | Windows Terminal profiles |
 
 ### macOS
 
@@ -240,16 +265,6 @@ ln -sf $(pwd)/gitignore_global ~/.gitignore_global
 | `.gitignore_global` | Global .gitignore |
 | `DefaultKeyBinding.dict` | Remap US keyboard layout to support åÅäÄöÖ via <kbd>Alt</kbd> and <kbd>Alt</kbd>+<kbd>Shift</kbd> modifier keys. Note: set up macOS to switch languages via <kbd>Ctrl</kbd>+<kbd>Space</kbd>. |
 
-### Windows
-
-| Filepath | Description |
-| --- | --- |
-| `$Home\[My ]Documents\WindowsPowerShell\Profile.ps1` | Powershell 5: Current User, All Hosts|
-| `$Home\[My ]Documents\Powershell\Profile.ps1` | Powershell Core: Current User, All Hosts |
-| `??? profiles.ps1` | Windows Terminal profiles |
-
-<br><br>
-
 ## Visual Code setup
 
 Launch vscode and enter into console (<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>p</kbd>):
@@ -257,8 +272,6 @@ Launch vscode and enter into console (<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>p</kb
     ext install code-settings-sync
 
 Then provide private Github token and gist ID to sync all settings and extensions.
-
-<br><br>
 
 ## Clone all my public repos
 

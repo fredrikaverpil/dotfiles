@@ -3,3 +3,4 @@
 [[ -s ~/.bash_exports ]] && source ~/.bash_exports ]]
 [[ -s ~/.bash_aliases ]] && source ~/.bash_aliases ]]
 [[ -s ~/.bash_prompt ]] && source ~/.bash_prompt ]]
+[[ -s ~/.bash_pyenv ]] && source ~/.bash_pyenv ]]

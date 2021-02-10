@@ -10,6 +10,7 @@ case `uname` in
     ;;
     Linux)
         # commands for Linux go here
+        alias venv='PIP_REQUIRE_VIRTUALENV=false python -m pip install --upgrade --user pip virtualenv && python -m virtualenv .venv && source .venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
         alias venv3.6='PIP_REQUIRE_VIRTUALENV=false python3.6 -m pip install --upgrade --user pip virtualenv && python3.6 -m virtualenv venv && source venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
         alias venv3.7='PIP_REQUIRE_VIRTUALENV=false python3.7 -m pip install --upgrade --user pip virtualenv && python3.7 -m virtualenv venv && source venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
         alias venv3.8='PIP_REQUIRE_VIRTUALENV=false python3.8 -m pip install --upgrade --user pip virtualenv && python3.8 -m virtualenv venv && source venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
