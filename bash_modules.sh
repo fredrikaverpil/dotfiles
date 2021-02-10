@@ -19,6 +19,7 @@ case `uname` in
             module load $(module avail firefox --latest | sed -nre 's/^firefox\/[^0-9]*(([0-9]+\.)*[0-9]+).*/\0/p')
             # module list
         fi
+
     ;;
     FreeBSD)
         # commands for FreeBSD go here

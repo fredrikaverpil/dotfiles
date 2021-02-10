@@ -59,7 +59,7 @@ ln -sf $(pwd)/bash_profile.sh ~/.bash_profile
 ln -sf $(pwd)/bash_exports.sh ~/.bash_exports
 ln -sf $(pwd)/bash_aliases.sh ~/.bash_aliases
 ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
-ln -sf $(pwd)/bash_pyenv.sh ~/.bash_pyenv
+ln -sf $(pwd)/bash_venv.sh ~/.bash_venv
 ln -sf $(pwd)/gitconfig ~/.gitconfig
 ln -sf $(pwd)/gitignore_global ~/.gitignore_global
 ```
@@ -172,7 +172,7 @@ ln -sf $(pwd)/bash_profile.sh ~/.bash_profile
 ln -sf $(pwd)/bash_exports.sh ~/.bash_exports
 ln -sf $(pwd)/bash_aliases.sh ~/.bash_aliases
 ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
-ln -sf $(pwd)/bash_pyenv.sh ~/.bash_pyenv
+ln -sf $(pwd)/bash_venv.sh ~/.bash_venv
 ln -sf $(pwd)/zshrc.sh ~/.zshrc
 ln -sf $(pwd)/zprofile.sh ~/.zprofile
 ln -sf $(pwd)/zprompt.sh ~/.zprompt
@@ -239,7 +239,7 @@ ln -sf $(pwd)/bash_exports.sh ~/.bash_exports
 ln -sf $(pwd)/bash_aliases.sh ~/.bash_aliases
 ln -sf $(pwd)/bash_modules.sh ~/.bash_modules
 ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
-ln -sf $(pwd)/bash_pyenv.sh ~/.bash_pyenv
+ln -sf $(pwd)/bash_venv.sh ~/.bash_venv
 ln -sf $(pwd)/gitconfig ~/.gitconfig
 ln -sf $(pwd)/gitignore_global ~/.gitignore_global
 ```
@@ -262,7 +262,7 @@ ln -sf $(pwd)/gitignore_global ~/.gitignore_global
 | `.bashrc` | Is executed for interactive non-login shells. |
 | `.bash_prompt` | My custom bash prompt (sourced by `.bashrc`). |
 | `.bash_modules` | Loads modules in e.g. Red Hat. |
-| `.bash_pyenv` | Pyenv init and auto-detection of .venv folders. |
+| `.bash_venv` | Pyenv init and auto-detection of .venv folders. |
 | `.gitconfig` | Global Git configuration to specify name, email, colors etc. |
 | `.gitignore_global` | Global .gitignore |
 | `DefaultKeyBinding.dict` | Remap US keyboard layout to support åÅäÄöÖ via <kbd>Alt</kbd> and <kbd>Alt</kbd>+<kbd>Shift</kbd> modifier keys. Note: set up macOS to switch languages via <kbd>Ctrl</kbd>+<kbd>Space</kbd>. |
