@@ -21,7 +21,7 @@ case `uname` in
     ;;
     MINGW64_NT-*)
         # commands for Git bash in Windows go here
-        alias python3='/c/Users/eavefre/AppData/Local/Programs/Python/Python36/python.exe'
+        alias python3.6='/c/Users/eavefre/AppData/Local/Programs/Python/Python36/python.exe'
         alias python3.7='/c/Users/eavefre/AppData/Local/Programs/Python/Python37/python.exe'
         alias python3.8='/c/Users/eavefre/AppData/Local/Programs/Python/Python38/python.exe'
         alias python3.9='/c/Users/eavefre/AppData/Local/Programs/Python/Python39/python.exe'
