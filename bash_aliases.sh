@@ -16,6 +16,8 @@ case `uname` in
         alias venv3.8='PIP_REQUIRE_VIRTUALENV=false python3.8 -m pip install --upgrade --user pip virtualenv && python3.8 -m virtualenv venv && source venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
         alias venv3.9='PIP_REQUIRE_VIRTUALENV=false python3.9 -m pip install --upgrade --user pip virtualenv && python3.9 -m virtualenv venv && source venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
         alias activate='source venv/bin/activate'
+        alias pb='git push --set-upstream origin `git branch --show-current`'  # publish current branch
+
     ;;
     FreeBSD)
         # commands for FreeBSD go here
