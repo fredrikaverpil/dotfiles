@@ -2,7 +2,7 @@
 
 ## Windows 10
 
-:stars: Linux files can be modified with Windows apps starting with Windows 10 version 1903.
+:stars: Linux files can be modified with Windows apps starting with Windows 10 version 1903.  
 :warning: Operating on `/mnt/c` from within WSL2 is slow (it's a network mount), avoid this.
 
 ### WSL2 Ubuntu 20.04
@@ -75,8 +75,9 @@ chmod 600 ~/.ssh/id_rsa
 chmod 644 ~/.ssh/id_rsa.pub
 ```
 
+### Git bash for Windows
 
-### Git bash
+:warning: Outdated. Use WSL2 instead!
 
 ```powershell
 # Administrative Powershell
@@ -130,6 +131,8 @@ New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.Win
 
 ### Boxstarter
 
+:warning: Outdated.
+
 ```powershell
 # Administrative Powershell
 
@@ -139,7 +142,6 @@ New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.Win
 # Boxstarter config
 Install-BoxstarterPackage -PackageName boxstarter.ps1 -DisableReboots
 ```
-
 
 ### Key remappings
 
@@ -170,6 +172,7 @@ ln -sf $(pwd)/bash_profile.sh ~/.bash_profile
 ln -sf $(pwd)/bash_exports.sh ~/.bash_exports
 ln -sf $(pwd)/bash_aliases.sh ~/.bash_aliases
 ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
+ln -sf $(pwd)/bash_pyenv.sh ~/.bash_pyenv
 ln -sf $(pwd)/zshrc.sh ~/.zshrc
 ln -sf $(pwd)/zprofile.sh ~/.zprofile
 ln -sf $(pwd)/zprompt.sh ~/.zprompt
@@ -236,9 +239,7 @@ ln -sf $(pwd)/bash_exports.sh ~/.bash_exports
 ln -sf $(pwd)/bash_aliases.sh ~/.bash_aliases
 ln -sf $(pwd)/bash_modules.sh ~/.bash_modules
 ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
-ln -sf $(pwd)/zshrc.sh ~/.zshrc
-ln -sf $(pwd)/zprofile.sh ~/.zprofile
-ln -sf $(pwd)/zprompt.sh ~/.zprompt
+ln -sf $(pwd)/bash_pyenv.sh ~/.bash_pyenv
 ln -sf $(pwd)/gitconfig ~/.gitconfig
 ln -sf $(pwd)/gitignore_global ~/.gitignore_global
 ```
@@ -261,6 +262,7 @@ ln -sf $(pwd)/gitignore_global ~/.gitignore_global
 | `.bashrc` | Is executed for interactive non-login shells. |
 | `.bash_prompt` | My custom bash prompt (sourced by `.bashrc`). |
 | `.bash_modules` | Loads modules in e.g. Red Hat. |
+| `.bash_pyenv` | Pyenv init and auto-detection of .venv folders. |
 | `.gitconfig` | Global Git configuration to specify name, email, colors etc. |
 | `.gitignore_global` | Global .gitignore |
 | `DefaultKeyBinding.dict` | Remap US keyboard layout to support åÅäÄöÖ via <kbd>Alt</kbd> and <kbd>Alt</kbd>+<kbd>Shift</kbd> modifier keys. Note: set up macOS to switch languages via <kbd>Ctrl</kbd>+<kbd>Space</kbd>. |
