@@ -14,6 +14,7 @@ case `uname` in
         export PATH="$HOME/apps/vscode/bin:$PATH"
         export PYENV_ROOT="$HOME/.pyenv"  # pyenv
         export PATH="$PYENV_ROOT/bin:$PATH"  # pyenv
+        export KUBECONFIG="~/.kube/config"
 
     ;;
     FreeBSD)
