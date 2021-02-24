@@ -6,7 +6,7 @@ case `uname` in
         alias venv='PIP_REQUIRE_VIRTUALENV=false python -m pip install --upgrade --user pip virtualenv && python -m virtualenv .venv && source .venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
         # alias venv3.8='PIP_REQUIRE_VIRTUALENV=false python3.8 -m pip install --upgrade --user pip virtualenv && python3.8 -m virtualenv venv && source venv/bin/activate && pip install --upgrade pip && pip list && which pip && pip --version && python --version'
         # alias venv3.9='PIP_REQUIRE_VIRTUALENV=false python3.9 -m pip install --upgrade --user pip virtualenv && python3.9 -m virtualenv venv && source venv/bin/activate && pip install --upgrade pip && pip list && which pip && pip --version && python --version'
-        alias activate='source venv/bin/activate'
+        alias activate='source .venv/bin/activate'
 
     ;;
     Linux)
@@ -16,7 +16,7 @@ case `uname` in
         # alias venv3.7='PIP_REQUIRE_VIRTUALENV=false python3.7 -m pip install --upgrade --user pip virtualenv && python3.7 -m virtualenv venv && source venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
         # alias venv3.8='PIP_REQUIRE_VIRTUALENV=false python3.8 -m pip install --upgrade --user pip virtualenv && python3.8 -m virtualenv venv && source venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
         # alias venv3.9='PIP_REQUIRE_VIRTUALENV=false python3.9 -m pip install --upgrade --user pip virtualenv && python3.9 -m virtualenv venv && source venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
-        alias activate='source venv/bin/activate'
+        alias activate='source .venv/bin/activate'
         alias pb='git push --set-upstream origin `git branch --show-current`'  # publish current branch
         alias k9s='docker run --rm -it -v $KUBECONFIG:/root/.kube/config quay.io/derailed/k9s'
 
@@ -39,7 +39,7 @@ case `uname` in
         # alias pipx3.7='/c/Users/eavefre/AppData/roaming/python/python37/Scripts/pipx.exe'
         # alias pipx3.8='/c/Users/eavefre/AppData/roaming/python/python38/Scripts/pipx.exe'
         # alias pipx3.9='/c/Users/eavefre/AppData/roaming/python/python39/Scripts/pipx.exe'
-        alias activate='source venv/Scripts/activate'
+        alias activate='source .venv/Scripts/activate'
 
     ;;
 esac
