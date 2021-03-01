@@ -36,9 +36,10 @@ Set up Python basics:
 ```bash
 sudo apt update
 sudo apt install python3-pip python3-venv pipx
-
 pipx install poetry --pip-args poetry-dynamic-versioning
 
+# pyenv
+sudo apt-get install --no-install-recommends make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
 ```
 
