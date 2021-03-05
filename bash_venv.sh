@@ -1,4 +1,5 @@
 eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
 
 function cd() {
   builtin cd "$@"
