@@ -59,7 +59,7 @@
                 "name": "Ubuntu-20.04",
                 "source": "Windows.Terminal.Wsl",
                 "fontSize": 8,
-                "startingDirectory": "\\\\wsl$\\Ubuntu-20.04\\home\\fredrik",
+                "startingDirectory": "//wsl$/Ubuntu-20.04/home/fredrik",
                 // theme options
                 "colorScheme": "Raspberry",
                 "cursorColor" : "#FFFFFF",
