@@ -48,7 +48,8 @@ PIP_REQUIRE_VIRTUALENV=false pip install pipx
 pyenv global system
 
 # poetry
-pipx install poetry --pip-args poetry-dynamic-versioning
+pipx install poetry --pip-args poetry-dynamic-versioning --suffix @work
+pipx install git+https://github.com/python-poetry/poetry.git --suffix @master
 ```
 
 Get the dotfiles:
