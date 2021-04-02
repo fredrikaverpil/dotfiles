@@ -43,7 +43,8 @@ curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer 
 # pipx
 pyenv install 3.9.2
 pyenv global 3.9.2
-pip install pipx
+PIP_REQUIRE_VIRTUALENV=false pip install -U pip
+PIP_REQUIRE_VIRTUALENV=false pip install pipx
 pyenv global system
 
 # poetry
