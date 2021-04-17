@@ -1,31 +1,3 @@
-# Per-platform settings
-case `uname` in
-    Darwin)
-        # commands for macOS Big Sur go here
-        # assuming pyenv
-        alias venv='PIP_REQUIRE_VIRTUALENV=false python -m pip install --upgrade --user pip virtualenv && python -m virtualenv .venv && source .venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
-        alias activate='source .venv/bin/activate'
-
-    ;;
-    Linux)
-        # commands for Linux go here
-        # assuming pyenv
-        alias venv='PIP_REQUIRE_VIRTUALENV=false python -m pip install --upgrade --user pip virtualenv && python -m virtualenv .venv && source .venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
-        alias activate='source .venv/bin/activate'
-
-    ;;
-    FreeBSD)
-        # commands for FreeBSD go here
-    ;;
-    MINGW64_NT-*)
-        # commands for Git bash in Windows go here
-        alias venv='PIP_REQUIRE_VIRTUALENV=false python -m pip install --upgrade --user pip virtualenv && python -m virtualenv .venv && source .venv/Scripts/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
-        alias activate='source .venv/Scripts/activate'
-
-    ;;
-esac
-
-
 # Global settings
 alias repos='cd ~/code/repos'
 alias ll='ls -alhF'
@@ -49,6 +21,9 @@ alias pyclean='find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf'
 alias pip-purge='pip list --format freeze | xargs pip uninstall -y'
 alias pip-install-reqs='ls requirements*.txt | xargs -n 1 pip install -r'
 alias poetry-install-master='pipx install --suffix=@master --force git+https://github.com/python-poetry/poetry.git'
+alias activate='source .venv/bin/activate'
+# assuming pyenv
+alias venv='PIP_REQUIRE_VIRTUALENV=false python -m pip install --upgrade --user pip virtualenv && python -m virtualenv .venv && source .venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
 
 # Gerrit
 alias gerrit-push='git push origin HEAD:refs/for/master'
@@ -56,3 +31,30 @@ alias gerrit-draft='git push origin HEAD:refs/drafts/master'
 alias gerrit-amend='git commit --amend'
 alias gp='gerrit-amend && gerrit-push'
 alias gp-draft='gerrit-amend && gerrit-draft'
+
+
+# Per-platform settings, will override the above commands
+case `uname` in
+    Darwin)
+        # commands for macOS Big Sur go here
+
+    ;;
+    Linux)
+        # commands for Linux go here
+
+    ;;
+    FreeBSD)
+        # commands for FreeBSD go here
+    ;;
+    MINGW64_NT-*)
+        # commands for Git bash in Windows go here
+
+        # Python
+        alias activate='source .venv/Scripts/activate'
+        # assuming pyenv
+        alias venv='PIP_REQUIRE_VIRTUALENV=false python -m pip install --upgrade --user pip virtualenv && python -m virtualenv .venv && source .venv/Scripts/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
+
+    ;;
+esac
+
+
