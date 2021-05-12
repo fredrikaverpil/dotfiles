@@ -7,8 +7,6 @@
 
 ### WSL2 Ubuntu 20.04
 
-![ubuntu_bash](https://user-images.githubusercontent.com/994357/117976662-52917a80-b330-11eb-9186-50e0d8497bd7.png)
-
 From administrative Powershell:
 
 ```powershell
