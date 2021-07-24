@@ -46,7 +46,8 @@ case `uname` in
         if [ -f /etc/redhat-release ]; then
             # vscode fix
             # https://code.visualstudio.com/updates/v1_53#_electron-11-update
-            alias code='LD_LIBRARY_PATH=/app/vbuild/RHEL7-x86_64/gcc/9.3.0/lib64/:$LD_LIBRARY_PATH $HOME/apps/vscode/bin/code'
+            # https://github.com/microsoft/vscode/issues/81358
+            alias code='LD_LIBRARY_PATH=/app/vbuild/RHEL7-x86_64/gcc/9.3.0/lib64/:$LD_LIBRARY_PATH $HOME/apps/vscode/bin/code --no-sandbox'
         fi
 
     ;;
