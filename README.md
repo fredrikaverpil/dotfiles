@@ -70,11 +70,12 @@ ln -sf $(pwd)/gitconfig ~/.gitconfig
 ln -sf $(pwd)/gitignore_global ~/.gitignore_global
 
 # Choose one of the two prompts...
-# a) Home made prompt
-ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
-# b) Starship prompt
+# a) Starship prompt
 # Requires Starship installation first: https://starship.rs/
 ln -sf $(pwd)/bash_prompt_starship.sh ~/.bash_prompt
+ln -sf $(pwd)/starship.toml ~/.config/starship.toml
+# b) Home made prompt
+ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
 ```
 
 
