@@ -65,11 +65,18 @@ cat $(pwd)/bashrc.sh >> ~/.bashrc
 ln -sf $(pwd)/bash_profile.sh ~/.bash_profile
 ln -sf $(pwd)/bash_exports.sh ~/.bash_exports
 ln -sf $(pwd)/bash_aliases.sh ~/.bash_aliases
-ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
 ln -sf $(pwd)/bash_venv.sh ~/.bash_venv
 ln -sf $(pwd)/gitconfig ~/.gitconfig
 ln -sf $(pwd)/gitignore_global ~/.gitignore_global
+
+# Choose one of the two prompts...
+# a) Home made prompt
+ln -sf $(pwd)/bash_prompt.sh ~/.bash_prompt
+# b) Starship prompt
+# Requires Starship installation first: https://starship.rs/
+ln -sf $(pwd)/bash_prompt_starship.sh ~/.bash_prompt
 ```
+
 
 Set up SSH:
 
