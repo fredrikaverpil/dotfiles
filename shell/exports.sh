@@ -15,6 +15,8 @@ case `uname` in
         export PYENV_ROOT="$HOME/.pyenv"  # pyenv
         export PATH="$PYENV_ROOT/bin:$PATH"  # pyenv
         export KUBECONFIG="$HOME/.kube/config"
+        export PATH=$PATH:/usr/local/go/bin
+        export PATH=$PATH:$HOME/.cargo/bin
 
     ;;
     FreeBSD)
