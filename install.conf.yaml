@@ -1,0 +1,23 @@
+- defaults:
+    link:
+      create: true
+      relink: true
+
+- clean: ['~', '~/.config']
+
+- link:
+    ~/.dotfiles: ''
+    ~/.bash:
+    ~/.shell:
+    ~/.bash_profile:
+    ~/.bashrc_user:
+    ~/.gitconfig: gitconfig
+    ~/.gitignore_global: gitignore_global
+
+- shell:
+  - git submodule sync --recursive
+  # load bash files
+  - grep -qxF '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' ~/.bashrc || echo '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' >> ~/.bashrc
+  - installers/pyenv.sh
+  - installers/starship.sh
+  - installers/homebrew.sh
