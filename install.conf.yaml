@@ -21,3 +21,8 @@
   - installers/pyenv.sh
   - installers/starship.sh
   - installers/homebrew.sh
+
+  # ssh
+  - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+  - touch ~/.ssh/known_hosts && chmod 644 ~/.ssh/known_hosts
+  - touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys
