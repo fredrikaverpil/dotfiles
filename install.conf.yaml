@@ -25,6 +25,8 @@
   # homebrew use is still experimental
   # - installers/homebrew.sh
 
+  - installers/gh.sh
+
   # ssh
   - mkdir -p ~/.ssh && chmod 700 ~/.ssh
   - touch ~/.ssh/known_hosts && chmod 644 ~/.ssh/known_hosts
