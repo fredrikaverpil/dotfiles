@@ -1,5 +1,15 @@
 # dotfiles 🐚
 
+## Prerequisites
+
+### Ubuntu
+
+```bash
+sudo apt update
+sudo apt upgrade
+sudo apt install git
+```
+
 ## Installation
 
 ```bash
