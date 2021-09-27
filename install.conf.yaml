@@ -19,12 +19,12 @@
 
   # load bash files
   - grep -qxF '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' ~/.bashrc || echo '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' >> ~/.bashrc
+
+  # Install software
+  - installers/curl.sh
   - installers/pyenv.sh
   - installers/starship.sh
-
-  # homebrew use is still experimental
-  # - installers/homebrew.sh
-
+  # - "installers/homebrew.sh"  # experimental
   - installers/gh.sh
 
   # ssh
