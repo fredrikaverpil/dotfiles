@@ -16,11 +16,14 @@
 
 - shell:
   - git submodule sync --recursive
+
   # load bash files
   - grep -qxF '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' ~/.bashrc || echo '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' >> ~/.bashrc
   - installers/pyenv.sh
   - installers/starship.sh
-  - installers/homebrew.sh
+
+  # homebrew use is still experimental
+  # - installers/homebrew.sh
 
   # ssh
   - mkdir -p ~/.ssh && chmod 700 ~/.ssh
