@@ -1,3 +1,4 @@
+#/bin/bash -ex
 
 # https://github.com/pyenv/pyenv/wiki
 # https://github.com/pyenv/pyenv-installer
@@ -14,14 +15,14 @@ case `uname` in
     ;;
     Linux)
         # commands for Linux go here
-
         if [ ! -d ~/.pyenv ]; then
-        sudo apt-get update
-        sudo apt-get install make build-essential libssl-dev zlib1g-dev \
-            libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
-            libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+            if command -v apt-get &> /dev/null; then
+            sudo apt-get install make build-essential libssl-dev zlib1g-dev \
+                libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
+                libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 
-        curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+            curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+            fi
         fi
     ;;
     FreeBSD)
