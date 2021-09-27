@@ -1,6 +1,6 @@
+#/bin/bash -ex
 
 # https://docs.brew.sh/Homebrew-on-Linux
-
 
 # Per-platform settings
 case `uname` in
@@ -10,7 +10,6 @@ case `uname` in
     ;;
     Linux)
         # commands for Linux go here
-
         if [ ! -d ~/.linuxbrew ]; then
             git clone https://github.com/Homebrew/brew ~/.linuxbrew/Homebrew
             mkdir ~/.linuxbrew/bin
