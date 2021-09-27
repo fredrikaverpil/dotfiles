@@ -1,7 +1,7 @@
 #/bin/bash -ex
 
 apt_install () {
-    if command -v "$1" &> /dev/null; then
+    if ! command -v "$1" &> /dev/null; then
         sudo apt-get install -y "$1"
     fi
 }
@@ -14,7 +14,7 @@ case `uname` in
     Linux)
         # commands for Linux go here
         if command -v apt-get &> /dev/null; then
-            sudo apt-get update
+            sudo apt update
             apt_install curl
         fi
 
