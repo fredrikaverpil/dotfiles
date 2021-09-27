@@ -1,3 +1,4 @@
+#/bin/bash -ex
 
 # https://starship.rs
 
