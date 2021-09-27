@@ -30,6 +30,7 @@
   - installers/starship.sh
   # - "installers/homebrew.sh"  # experimental
   - installers/gh.sh
+  - installers/nerdfont.sh
 
   # ssh
   - mkdir -p ~/.ssh && chmod 700 ~/.ssh
