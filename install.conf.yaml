@@ -10,7 +10,7 @@
     ~/.bash:
     ~/.shell:
     ~/.bash_profile:
-    ~/.bashrc_user:
+    ~/.bashrc_user: bashrc
     ~/.gitconfig: gitconfig
     ~/.gitignore_global: gitignore_global
 
