@@ -5,6 +5,10 @@
 
 - clean: ['~', '~/.config']
 
+- create:
+    - ~/downloads
+    - ~/.fonts
+
 - link:
     ~/.dotfiles: ''
     ~/.bash:
