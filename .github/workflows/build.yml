@@ -32,6 +32,6 @@ jobs:
           installers/docker.sh
           sudo docker run hello-world
 
-      - name: Test snap apps install
-        run: |
-          installers/snap-apps.sh
+      # - name: Test snap apps install
+      #   run: |
+      #     installers/snap-apps.sh
