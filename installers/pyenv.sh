@@ -17,13 +17,9 @@ case `uname` in
         # commands for Linux go here
         if [ ! -d ~/.pyenv ]; then
             if command -v apt-get &> /dev/null; then
-            # set up llvm repo/key; enabling installation of llvm-13
-            sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
-            # install the deps
-            sudo apt-get install -y gcc
             sudo apt-get install -y make build-essential libssl-dev zlib1g-dev \
-                libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm-13 \
-                libncursesw5-dev xz-utils tk8.6-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+                libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
+                libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
             # install 
             curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
             fi
