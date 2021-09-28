@@ -17,5 +17,5 @@ jobs:
       - run: |
           HOME=~/dotfiles-install-dir
           cd $HOME
-          pyenv install 3.9.7
+          $HOME/.pyenv/bin/pyenv install 3.9.7
 
