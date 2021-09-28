@@ -19,7 +19,8 @@ jobs:
 
       - name: Install dotfiles
         run: |
-          HOME=~/dotfiles-install-dir ./install -vv
+          # HOME=~/dotfiles-install-dir ./install -vv
+          ./install -vv
 
       - name: Show dotfiles
         run: |
@@ -36,8 +37,8 @@ jobs:
 
           python -c "import sys; assert sys.version.startswith('3.9.7')"
 
-        env:
-          HOME: /home/runner/dotfiles-install-dir/
+        # env:
+        #   HOME: /home/runner/dotfiles/dotfiles-install-dir/
 
       - name: Test Docker installation
         run: |
