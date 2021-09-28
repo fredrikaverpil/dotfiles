@@ -26,8 +26,7 @@
 
   # Install software
   - installers/basics.sh
-  - installers/pyenv.sh
-  - installers/pipx.sh
+  - installers/python.sh
   - installers/starship.sh
   - installers/nerdfont.sh
   - installers/gh.sh

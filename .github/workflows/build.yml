@@ -1,12 +1,15 @@
 name: CI
+
 on:
   # push:
   pull_request:
   schedule:
     - cron: '0 8 * * 6'
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2
 
@@ -22,15 +25,30 @@ jobs:
         run: |
           ls -alh ~/dotfiles-install-dir
 
-      - name: Test Python install via pyenv
+      - name: Test Python setup
         run: |
-          HOME=~/dotfiles-install-dir ~/dotfiles-install-dir/.pyenv/bin/pyenv install 3.9.7
+          BASE_PYTHON_VER=`cat .python-version`
+          # Add Pyenv to PATH
+          echo "$PYENV_ROOT/bin" >> $GITHUB_PATH
 
-      - name: Test Docker installation
+          # Test Python via pyenv
+          eval "$($HOME/dotfiles-install-dir/.pyenv/bin/pyenv init --path)"
+          python -c "import sys; print(sys.version)"
+          python -c "import sys; assert sys.version.startswith('${BASE_PYTHON_VER}')"
+
+          # Test Poetry via Pipx
+          pipx install poetry
+          pipx runpip poetry list
+          poetry --version
+
+        env:
+          PYENV_ROOT: $HOME/dotfiles-install-dir/.pyenv
+
+      - name: Test Docker setup
         run: |
           installers/docker.sh
           sudo docker run hello-world
 
-      - name: Test snap apps install
-        run: |
-          installers/snap-apps.sh
+      # - name: Test snap apps setup
+      #   run: |
+      #     installers/snap-apps.sh
