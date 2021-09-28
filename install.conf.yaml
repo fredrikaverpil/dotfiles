@@ -31,6 +31,7 @@
   - installers/nerdfont.sh
   - installers/gh.sh
   # - "installers/homebrew.sh"  # experimental
+  # - "installers/docker.sh"  # not always desired
   # - "installers/snap-apps.sh"  # not always desired
 
   # ssh
