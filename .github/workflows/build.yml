@@ -42,7 +42,6 @@ jobs:
 
 
           eval "$($HOME/dotfiles-install-dir/.pyenv/bin/pyenv init --path)"
-          # $HOME/dotfiles-install-dir/.pyenv/bin/pyenv local 3.9.7
 
           echo "ok!"
 
@@ -50,7 +49,7 @@ jobs:
 
           echo "run python now..."
 
-          python -c "import sys; assert sys.version.startswith('3.9.7')"
+          python -c "import sys; print(sys.version); assert sys.version.startswith('3.9.7')"
 
         # env:
         #   HOME: /home/runner/dotfiles/dotfiles-install-dir/
