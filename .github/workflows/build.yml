@@ -25,9 +25,12 @@ jobs:
       - name: Test Python install via pyenv
         run: |
           HOME=~/dotfiles-install-dir ~/dotfiles-install-dir/.pyenv/bin/pyenv install 3.9.7
-  
+
+      - name: Test Docker installation
+        run: |
+          installers/docker.sh
+          sudo docker run hello-world
+
       - name: Test snap apps install
         run: |
-          pwd
-          ls -alh
           installers/snap-apps.sh
