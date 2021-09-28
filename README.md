@@ -17,6 +17,15 @@ git clone https://github.com/fredrikaverpil/dotfiles.git
 ./install -vv
 ```
 
+## Optional installation
+
+### Ubuntu
+
+```bash
+installers/snap-apps.sh
+installers/homebrew.sh  # experimental!
+```
+
 ## To do
 
 * improve this README (add note on setup being idempotent)
