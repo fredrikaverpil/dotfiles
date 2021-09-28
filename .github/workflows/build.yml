@@ -31,8 +31,11 @@ jobs:
           HOME=~/dotfiles-install-dir pipx-install
           HOME=~/dotfiles-install-dir pipx --version
 
+      - name: Test Docker installation
+        run: |
+          installers/docker.sh
+          sudo docker run hello-world
+
       - name: Test snap apps install
         run: |
-          pwd
-          ls -alh
           installers/snap-apps.sh
