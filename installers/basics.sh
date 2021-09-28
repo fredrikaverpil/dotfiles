@@ -17,6 +17,7 @@ case `uname` in
             sudo apt update
             sudo add-apt-repository universe
             apt_install curl
+            apt_install gcc
         fi
 
     ;;
