@@ -45,6 +45,10 @@ jobs:
 
           echo "ok!"
 
+          pyenv versions
+
+          echo "hmm"
+
           $HOME/dotfiles-install-dir/.pyenv/bin/pyenv versions
 
           echo "run python now..."
