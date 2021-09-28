@@ -37,7 +37,8 @@ jobs:
 
 
           eval "$($HOME/dotfiles-install-dir/.pyenv/bin/pyenv init --path)"
-          $HOME/dotfiles-install-dir/.pyenv/binpyenv local 3.9.7
+          $HOME/dotfiles-install-dir/.pyenv/bin/pyenv local 3.9.7
+          $HOME/dotfiles-install-dir/.pyenv/bin/pyenv versions
 
 
           # python -c "import sys; assert sys.version.startswith('3.9.7')"
