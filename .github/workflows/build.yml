@@ -29,7 +29,7 @@ jobs:
         run: |
           pwd
           ls -alh
-          ls -alh $HOME/dotfiles-install-dir/.pyenv
+          # ls -alh $HOME/dotfiles-install-dir/.pyenv
 
 
           # Add Pyenv to PATH
@@ -37,7 +37,7 @@ jobs:
 
 
           eval "$($HOME/dotfiles-install-dir/.pyenv/bin/pyenv init --path)"
-          $HOME/dotfiles-install-dir/.pyenv/bin/pyenv local 3.9.7
+          # $HOME/dotfiles-install-dir/.pyenv/bin/pyenv local 3.9.7
           $HOME/dotfiles-install-dir/.pyenv/bin/pyenv versions
 
 
