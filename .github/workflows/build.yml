@@ -1,12 +1,15 @@
 name: CI
+
 on:
   # push:
   pull_request:
   schedule:
     - cron: '0 8 * * 6'
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2
 
@@ -27,7 +30,10 @@ jobs:
           PATH=~/dotfiles-install-dir/.pyenv/bin/:$PATH
           HOME=~/dotfiles-install-dir eval "$(pyenv init --path)"
           HOME=~/dotfiles-install-dir pyenv local 3.9.7
+          ls -alh
+
           HOME=~/dotfiles-install-dir python -c "import sys; assert sys.version.startswith('3.9.7')"
+
           HOME=~/dotfiles-install-dir pipx install poetry
           HOME=~/dotfiles-install-dir poetry --version
 
