@@ -27,31 +27,17 @@ jobs:
 
       - name: Test Python installation
         run: |
-          pwd
-          ls -alh
-          # ls -alh $HOME/dotfiles-install-dir/.pyenv
-
 
           # Add Pyenv to PATH
           echo "$PYENV_ROOT/bin" >> $GITHUB_PATH
 
-          ls -alh $HOME/dotfiles-install-dir/.pyenv/versions/3.9.7/
-
+          BASE_PYTHON_VER=`cat .python-version`
 
           eval "$($HOME/dotfiles-install-dir/.pyenv/bin/pyenv init --path)"
+          python -c "import sys; print(sys.version)"
+          python -c "import sys; assert sys.version.startswith('${BASE_PYTHON_VER}')"
 
-          echo "ok!"
 
-          echo "hmm"
-
-          $HOME/dotfiles-install-dir/.pyenv/bin/pyenv versions
-
-          echo "run python now..."
-
-          python -c "import sys; print(sys.version); assert sys.version.startswith('3.9.7')"
-
-        # env:
-        #   HOME: /home/runner/dotfiles/dotfiles-install-dir/
         env:
           PYENV_ROOT: $HOME/dotfiles-install-dir/.pyenv
 
