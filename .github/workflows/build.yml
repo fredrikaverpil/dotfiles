@@ -37,6 +37,9 @@ jobs:
           python -c "import sys; print(sys.version)"
           python -c "import sys; assert sys.version.startswith('${BASE_PYTHON_VER}')"
 
+          pipx install poetry
+          pipx runpip poetry list
+          poetry --version
 
         env:
           PYENV_ROOT: $HOME/dotfiles-install-dir/.pyenv
