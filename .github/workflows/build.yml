@@ -17,6 +17,7 @@ jobs:
       - name: Install dotfiles
         run: |
           HOME=~/dotfiles-install-dir ./install -vv
+          ls -alh $HOME
 
       - name: Test Python install via pyenv
         run: |
@@ -27,5 +28,4 @@ jobs:
       - name: Test snap apps install
         run: |
           HOME=~/dotfiles-install-dir
-          cd $HOME
           /installers/snap-apps.sh
