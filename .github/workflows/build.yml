@@ -9,7 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - run: |
           mkdir -p ~/dotfiles-install-dir
       - run: |
           HOME=~/dotfiles-install-dir ./install -vv
+      - run: |
+          pyenv local 3.9.7
+          pyenv install 3.9.7
+
