@@ -2,6 +2,8 @@
 
 # https://snapcraft.io
 
+sudo apt install -y snapd
+
 sudo snap install code --classic
 sudo snap install spotify
 sudo snap install slack --classic

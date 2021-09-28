@@ -22,9 +22,10 @@ jobs:
         run: |
           ls -alh ~/dotfiles-install-dir
 
-      - name: Test Python install via pyenv
+      - name: Test Python installation
         run: |
-          HOME=~/dotfiles-install-dir ~/dotfiles-install-dir/.pyenv/bin/pyenv install 3.9.7
+          HOME=~/dotfiles-install-dir python -c 'import sys; assert sys.version.startswith("3.9.7")'
+          HOME=~/dotfiles-install-dir pipx --version
 
       - name: Test Docker installation
         run: |
