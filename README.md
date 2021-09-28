@@ -1,5 +1,7 @@
 # dotfiles 🐚
 
+[![CI](https://github.com/fredrikaverpil/dotfiles/actions/workflows/build.yml/badge.svg)](https://github.com/fredrikaverpil/dotfiles/actions/workflows/build.yml)
+
 ## Prerequisites
 
 ### Ubuntu
