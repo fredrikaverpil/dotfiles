@@ -10,12 +10,22 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - run: |
+      - name: Create workfolder
+        run: |
           mkdir -p ~/dotfiles-install-dir
-      - run: |
+
+      - name: Install dotfiles
+        run: |
           HOME=~/dotfiles-install-dir ./install -vv
-      - run: |
+
+      - name: Test Python install via pyenv
+        run: |
           HOME=~/dotfiles-install-dir
           cd $HOME
           $HOME/.pyenv/bin/pyenv install 3.9.7
-
+  
+      - name: Test snap apps install
+        run: |
+          HOME=~/dotfiles-install-dir
+          cd $HOME
+          /installers/snap-apps.sh
