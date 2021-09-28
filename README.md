@@ -22,6 +22,7 @@ git clone https://github.com/fredrikaverpil/dotfiles.git
 ### Ubuntu
 
 ```bash
+installers/docker.sh
 installers/snap-apps.sh
 installers/homebrew.sh  # experimental!
 ```
