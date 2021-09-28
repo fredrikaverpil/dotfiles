@@ -23,8 +23,8 @@ alias pip-install-reqs='ls requirements*.txt | xargs -n 1 pip install -r'
 alias poetry-install-master='pipx install --suffix=@master --force git+https://github.com/python-poetry/poetry.git'
 alias activate='source .venv/bin/activate'
 # assuming pyenv
-alias pipx-install='pyenv global 3.9.2 && PIP_REQUIRE_VIRTUALENV=false python -m pip install -U pipx && pyenv global system'
-alias pipx='$HOME/.pyenv/versions/3.9.2/bin/pipx'
+alias pipx-install='deactivate && pyenv global 3.9.7 && PIP_REQUIRE_VIRTUALENV=false python -m pip install -U pipx && pyenv global system'
+alias pipx='$HOME/.pyenv/versions/3.9.7/bin/pipx'
 alias venv='PIP_REQUIRE_VIRTUALENV=false python -m pip install --upgrade --user pip virtualenv && python -m virtualenv .venv && source .venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
 
 # Gerrit
