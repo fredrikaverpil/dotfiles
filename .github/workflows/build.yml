@@ -24,7 +24,7 @@ jobs:
 
       - name: Test Python installation
         run: |
-          HOME=~/dotfiles-install-dir $HOME/.pyenv/bin/pyenv local 3.9.7
+          HOME=~/dotfiles-install-dir ~/dotfiles-install-dir/.pyenv/bin/pyenv local 3.9.7
           HOME=~/dotfiles-install-dir python -c "import sys; assert sys.version.startswith('3.9.7')"
           HOME=~/dotfiles-install-dir pipx --version
           HOME=~/dotfiles-install-dir pipx install poetry
