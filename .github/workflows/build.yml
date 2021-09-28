@@ -31,12 +31,14 @@ jobs:
           ls -alh
           ls -alh $HOME/.pyenv
 
+
+
           # Add Pyenv to PATH
           echo "$HOME/dotfiles-install-dir/.pyenv/bin" >> $GITHUB_PATH
 
 
-          eval "$(pyenv init --path)"
-          pyenv local 3.9.7
+          eval "$($HOME/dotfiles-install-dir/.pyenv/bin/pyenv init --path)"
+          $HOME/dotfiles-install-dir/.pyenv/bin/pyenv local 3.9.7
 
 
           # python -c "import sys; assert sys.version.startswith('3.9.7')"
