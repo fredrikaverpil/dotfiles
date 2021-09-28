@@ -6,7 +6,7 @@
 - clean: ['~', '~/.config']
 
 - create:
-    - ~/downloads
+    - ~/Downloads
     - ~/.fonts
 
 - link:
