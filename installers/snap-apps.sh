@@ -8,4 +8,5 @@ sudo snap install slack --classic
 sudo snap install gitter-desktop
 sudo snap install discord
 sudo snap install 1password
-
+sudo snap install signal-desktop
+sudo snap install telegram-desktop
