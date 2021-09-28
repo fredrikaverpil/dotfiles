@@ -39,6 +39,7 @@ jobs:
           # Test Poetry via Pipx
           pipx install poetry
           pipx install --suffix=@master --force git+https://github.com/python-poetry/poetry.git
+          pipx list
           poetry --version
           poetry@master --version
 
