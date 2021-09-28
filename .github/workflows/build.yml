@@ -38,8 +38,9 @@ jobs:
 
           # Test Poetry via Pipx
           pipx install poetry
-          pipx runpip poetry list
+          pipx install --suffix=@master --force git+https://github.com/python-poetry/poetry.git
           poetry --version
+          poetry@master --version
 
         env:
           PYENV_ROOT: $HOME/dotfiles-install-dir/.pyenv
