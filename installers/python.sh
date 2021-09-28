@@ -33,7 +33,6 @@ case `uname` in
                 sudo ln -s $HOME/.pyenv/versions/3.9.7/bin/pipx /usr/bin/pipx
             fi
         fi
-        fi
     ;;
     FreeBSD)
         # commands for FreeBSD go here
