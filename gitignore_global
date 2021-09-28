@@ -1,4 +1,4 @@
-# OS generated files
+# os generated files
 .DS_Store
 .DS_Store?
 ._*
@@ -10,15 +10,15 @@ Thumbs.db
 # Editing
 .vscode
 
-# Byte-compiled / optimized / DLL files
+# byte-compiled / optimized / dll files
 __pycache__/
 *.py[cod]
 *$py.class
 
-# C extensions
+# c extensions
 *.so
 
-# Distribution / packaging
+# python distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -35,10 +35,6 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
-
-# Python
-venv
 .nox
 .tox
 .pytest_cache
