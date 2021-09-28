@@ -32,7 +32,7 @@ jobs:
           ls -alh $HOME/.pyenv
 
           # Add Pyenv to PATH
-          echo "$HOME/.pyenv/bin" >> $GITHUB_PATH
+          echo "$HOME/dotfiles-install-dir/.pyenv/bin" >> $GITHUB_PATH
 
 
           eval "$(pyenv init --path)"

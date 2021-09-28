@@ -16,10 +16,12 @@ case `uname` in
     ;;
     Linux)
         # commands for Linux go here
+
+        # install python via pyenv
         if [ ! -d ~/.pyenv ]; then
             if command -v apt-get &> /dev/null; then
 
-            PYTHON_VER=`cat .python-version`
+            BASE_PY_VER=`cat .python-version`
 
             sudo apt-get install -y make build-essential libssl-dev zlib1g-dev \
                 libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
@@ -28,13 +30,14 @@ case `uname` in
             curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
 
             # install version
-            $HOME/.pyenv/bin/pyenv install $PYTHON_VER
+            $HOME/.pyenv/bin/pyenv install $BASE_PY_VER
             fi
+        fi
 
-            if ! command -v pipx &> /dev/null; then
-                PIP_REQUIRE_VIRTUALENV=false $HOME/.pyenv/versions/$PYTHON_VER/bin/python -m pip install -U pipx
-                sudo ln -s $HOME/.pyenv/versions/$PYTHON_VER/bin/pipx /usr/bin/pipx
-            fi
+        # install pipx
+        if ! command -v pipx &> /dev/null; then
+            PIP_REQUIRE_VIRTUALENV=false $HOME/.pyenv/versions/$BASE_PY_VER/bin/python -m pip install -U pipx
+            sudo ln -s $HOME/.pyenv/versions/$BASE_PY_VER/bin/pipx /usr/bin/pipx
         fi
     ;;
     FreeBSD)
