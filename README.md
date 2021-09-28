@@ -26,7 +26,7 @@ installers/docker.sh
 installers/snap-apps.sh
 installers/homebrew.sh  # experimental!
 
-pipx-install
+pipx-install  # defined in shell/aliases.sh
 pipx install docker-compose
 ```
 
