@@ -25,18 +25,18 @@ jobs:
         run: |
           ls -alh ~/dotfiles-install-dir
 
-      - name: Test Python installation
+      - name: Test Python setup
         run: |
-
+          BASE_PYTHON_VER=`cat .python-version`
           # Add Pyenv to PATH
           echo "$PYENV_ROOT/bin" >> $GITHUB_PATH
 
-          BASE_PYTHON_VER=`cat .python-version`
-
+          # Test Python via pyenv
           eval "$($HOME/dotfiles-install-dir/.pyenv/bin/pyenv init --path)"
           python -c "import sys; print(sys.version)"
           python -c "import sys; assert sys.version.startswith('${BASE_PYTHON_VER}')"
 
+          # Test Poetry via Pipx
           pipx install poetry
           pipx runpip poetry list
           poetry --version
@@ -44,11 +44,11 @@ jobs:
         env:
           PYENV_ROOT: $HOME/dotfiles-install-dir/.pyenv
 
-      # - name: Test Docker installation
-      #   run: |
-      #     installers/docker.sh
-      #     sudo docker run hello-world
+      - name: Test Docker setup
+        run: |
+          installers/docker.sh
+          sudo docker run hello-world
 
-      # - name: Test snap apps install
+      # - name: Test snap apps setup
       #   run: |
       #     installers/snap-apps.sh
