@@ -31,6 +31,9 @@ case `uname` in
                 # install docker engine
                 sudo apt-get update
                 sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+                # install docker-compose
+                pipx install docker-compose
             fi
         fi
 

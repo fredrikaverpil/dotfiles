@@ -25,9 +25,6 @@ git clone https://github.com/fredrikaverpil/dotfiles.git
 installers/docker.sh
 installers/snap-apps.sh
 installers/homebrew.sh  # experimental!
-
-pipx-install  # defined in shell/aliases.sh
-pipx install docker-compose
 ```
 
 ## To do
