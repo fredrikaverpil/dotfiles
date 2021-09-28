@@ -29,8 +29,9 @@
   - installers/pyenv.sh
   - installers/starship.sh
   - installers/nerdfont.sh
-  # - "installers/homebrew.sh"  # experimental
   - installers/gh.sh
+  # - "installers/homebrew.sh"  # experimental
+  # - "installers/snap-apps.sh"  # not always desired
 
   # ssh
   - mkdir -p ~/.ssh && chmod 700 ~/.ssh
