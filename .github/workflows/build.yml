@@ -28,4 +28,6 @@ jobs:
   
       - name: Test snap apps install
         run: |
-          /installers/snap-apps.sh
+          pwd
+          ls -alh
+          installers/snap-apps.sh
