@@ -18,6 +18,9 @@ case `uname` in
         # commands for Linux go here
         if [ ! -d ~/.pyenv ]; then
             if command -v apt-get &> /dev/null; then
+
+            PYTHON_VER=`cat .python-version`
+
             sudo apt-get install -y make build-essential libssl-dev zlib1g-dev \
                 libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
                 libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
@@ -25,12 +28,12 @@ case `uname` in
             curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
 
             # install version
-            $HOME/.pyenv/bin/pyenv install 3.9.7
+            $HOME/.pyenv/bin/pyenv install $PYTHON_VER
             fi
 
             if ! command -v pipx &> /dev/null; then
-                PIP_REQUIRE_VIRTUALENV=false $HOME/.pyenv/versions/3.9.7/bin/python -m pip install -U pipx
-                sudo ln -s $HOME/.pyenv/versions/3.9.7/bin/pipx /usr/bin/pipx
+                PIP_REQUIRE_VIRTUALENV=false $HOME/.pyenv/versions/$PYTHON_VER/bin/python -m pip install -U pipx
+                sudo ln -s $HOME/.pyenv/versions/$PYTHON_VER/bin/pipx /usr/bin/pipx
             fi
         fi
     ;;
