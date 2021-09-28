@@ -27,6 +27,7 @@ jobs:
 
       - name: Test Python installation
         run: |
+          ls -alh ~/dotfiles-install-dir/.pyenv
           HOME=~/dotfiles-install-dir eval "$(~/dotfiles-install-dir/.pyenv/bin/pyenv init --path)"
           HOME=~/dotfiles-install-dir ~/dotfiles-install-dir/.pyenv/bin/pyenv local 3.9.7
           ls -alh
