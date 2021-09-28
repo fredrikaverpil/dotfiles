@@ -35,9 +35,6 @@ jobs:
           # Add Pyenv to PATH
           echo "$PYENV_ROOT/bin" >> $GITHUB_PATH
 
-          ln -s $HOME/dotfiles-install-dir/.pyenv/bin/pyenv pyenv
-
-          pyenv --version
           ls -alh $HOME/dotfiles-install-dir/.pyenv/versions/3.9.7/
 
 
