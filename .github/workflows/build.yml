@@ -47,7 +47,7 @@ jobs:
           echo "----------------------"
 
           # Test Python via pyenv
-          eval "$(~/dotfiles-install-dir/.pyenv/bin/pyenv init --path)"
+          eval "$(\~/.pyenv/bin/pyenv init --path)"
           python -c "import sys; print(sys.version)"
           python -c "import sys; assert sys.version.startswith('${BASE_PYTHON_VER}')"
 
