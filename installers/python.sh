@@ -31,6 +31,7 @@ case `uname` in
             curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
 
             # install python version
+            echo "Installing pyenv into ${HOME}/.pyenv ..."
             $HOME/.pyenv/bin/pyenv install $BASE_PY_VER
             fi
         fi
