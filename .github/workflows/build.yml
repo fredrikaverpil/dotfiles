@@ -34,11 +34,17 @@ jobs:
 
           HOME=~/dotfiles-install-dir installers/python.sh
 
+          echo "----------------------"
+
           pwd
           ls -alh
 
           echo $HOME
           ls -alh $HOME
+
+          ls -alh ~/dotfiles-install-dir
+
+          echo "----------------------"
 
           # Test Python via pyenv
           eval "$(~/dotfiles-install-dir/.pyenv/bin/pyenv init --path)"
