@@ -28,18 +28,18 @@ case `uname` in
                 libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 
             # install pyenv
+            echo "Installing pyenv into ${HOME}/.pyenv ..."
             curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
 
             # install python version
-            echo "Installing pyenv into ${HOME}/.pyenv ..."
-            $HOME/.pyenv/bin/pyenv install $BASE_PY_VER
+            ~/.pyenv/bin/pyenv install $BASE_PY_VER
             fi
         fi
 
         # install pipx
         if ! command -v pipx &> /dev/null; then
-            PIP_REQUIRE_VIRTUALENV=false $HOME/.pyenv/versions/$BASE_PY_VER/bin/python -m pip install -U pipx
-            sudo ln -s $HOME/.pyenv/versions/$BASE_PY_VER/bin/pipx /usr/bin/pipx
+            PIP_REQUIRE_VIRTUALENV=false ~/.pyenv/versions/$BASE_PY_VER/bin/python -m pip install -U pipx
+            sudo ln -s ~/.pyenv/versions/$BASE_PY_VER/bin/pipx /usr/bin/pipx
         fi
     ;;
     FreeBSD)
