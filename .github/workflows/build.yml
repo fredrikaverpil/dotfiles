@@ -27,20 +27,18 @@ jobs:
 
       - name: Test Python setup
         run: |
-          pwd
-          ls -alh
+          BASE_PYTHON_VER=`cat .python-version`
+          # Add Pyenv to PATH
+          echo "$PYENV_ROOT/bin" >> $GITHUB_PATH
+          echo "$HOME/.pyenv" >> $GITHUB_PATH
 
           installers/python.sh
 
           pwd
           ls -alh
 
-          BASE_PYTHON_VER=`cat .python-version`
-          # Add Pyenv to PATH
-          echo "$PYENV_ROOT/bin" >> $GITHUB_PATH
-
           echo $HOME
-          ls -alh $HOME/.pyenv/bin
+          ls -alh $HOME
 
           # Test Python via pyenv
           eval "$($HOME/.pyenv/bin/pyenv init --path)"
