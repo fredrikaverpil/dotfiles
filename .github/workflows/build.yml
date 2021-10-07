@@ -27,14 +27,14 @@ jobs:
 
       - name: Test Python setup
         run: |
+          installers/python.sh
+
           BASE_PYTHON_VER=`cat .python-version`
           # Add Pyenv to PATH
           echo "$PYENV_ROOT/bin" >> $GITHUB_PATH
 
-          HOME=~/dotfiles-install-dir installers/python.sh
-
           # Test Python via pyenv
-          eval "$($HOME/dotfiles-install-dir/.pyenv/bin/pyenv init --path)"
+          eval "$($HOME/.pyenv/bin/pyenv init --path)"
           python -c "import sys; print(sys.version)"
           python -c "import sys; assert sys.version.startswith('${BASE_PYTHON_VER}')"
 
@@ -46,7 +46,7 @@ jobs:
           poetry@master --version
 
         env:
-          PYENV_ROOT: $HOME/dotfiles-install-dir/.pyenv
+          PYENV_ROOT: $HOME/.pyenv
 
       - name: Test Docker setup
         run: |
