@@ -31,7 +31,7 @@ jobs:
           # Add Pyenv to PATH
           echo "$PYENV_ROOT/bin" >> $GITHUB_PATH
 
-          installers/python.sh
+          HOME=~/dotfiles-install-dir installers/python.sh
 
           # Test Python via pyenv
           eval "$($HOME/dotfiles-install-dir/.pyenv/bin/pyenv init --path)"
