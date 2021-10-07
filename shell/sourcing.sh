@@ -35,3 +35,9 @@ if [ -d ~/.pyenv ]; then
     fi
     }
 fi
+
+
+if [ -f /usr/local/bin/starship ]; then
+    eval "$(starship init bash)"
+fi
+
