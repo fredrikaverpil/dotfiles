@@ -33,8 +33,15 @@ case `uname` in
 
             # temp while debugging
             echo ":::::::::::::::::::: Temp debugging below  ::::::::::::::::::::"
+            echo "1"
+            pwd $HOME
             ls -alh $HOME
-
+            echo "2"
+            ls -alh /home/runner/work/dotfiles
+            echo "3"
+            ls -alh /home/runner/work/dotfiles/dotfiles
+            echo "4"
+            ls -alh /home/runner/work/dotfiles-install-dir
             echo ":::::::::::::::::::: Temp debugging above  ::::::::::::::::::::"
 
             # install python version
