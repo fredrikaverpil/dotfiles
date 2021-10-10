@@ -31,21 +31,6 @@ case `uname` in
             echo "Installing pyenv into ${HOME}/.pyenv ..."
             curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
 
-            # temp while debugging
-            echo ":::::::::::::::::::: Temp debugging below  ::::::::::::::::::::"
-            echo "1"
-            pwd $HOME
-            ls -alh $HOME
-            echo "2"
-            ls -alh /home/runner/work/dotfiles
-            echo "3"
-            ls -alh /home/runner/work/dotfiles/dotfiles
-            echo "4"
-            ls -alh /home/runner/work/dotfiles-install-dir
-            echo "5"
-            ls -alh /home/runner/work/dotfiles-install-dir/.pyenv
-            echo ":::::::::::::::::::: Temp debugging above  ::::::::::::::::::::"
-
             # install python version
             $HOME/.pyenv/bin/pyenv install $BASE_PY_VER
             fi
@@ -53,7 +38,7 @@ case `uname` in
 
         # install pipx
         if ! command -v pipx &> /dev/null; then
-            PIP_REQUIRE_VIRTUALENV=false ~/.pyenv/versions/$BASE_PY_VER/bin/python -m pip install -U pipx
+            PIP_REQUIRE_VIRTUALENV=false $HOME/.pyenv/versions/$BASE_PY_VER/bin/python -m pip install -U pipx
             sudo ln -s $HOME/.pyenv/versions/$BASE_PY_VER/bin/pipx /usr/bin/pipx
         fi
     ;;
