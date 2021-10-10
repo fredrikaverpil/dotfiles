@@ -3,6 +3,13 @@ if [ -f ~/.cargo/env ]; then
     . "$HOME/.cargo/env"
 fi
 
+
+# Nix
+if [ -d ~/.nix-profile ]; then
+    . "$HOME/.nix-profile/etc/profile.d/nix.sh"
+fi
+
+
 # Linuxbrew
 if [ -f ~/.linuxbrew/bin/brew ]; then
     eval "$(~/.linuxbrew/bin/brew shellenv)"
@@ -11,8 +18,12 @@ if [ -f ~/.linuxbrew/bin/brew ]; then
 fi
 
 
-if [ -d ~/.pyenv ]; then
+if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then
+    . ~/.nix-profile/etc/profile.d/nix.sh
+fi
 
+
+if [ -d ~/.pyenv ]; then
     eval "$(pyenv init --path)"
     eval "$(pyenv virtualenv-init -)"
 
@@ -40,4 +51,3 @@ fi
 if [ -f /usr/local/bin/starship ]; then
     eval "$(starship init bash)"
 fi
-
