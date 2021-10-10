@@ -32,14 +32,14 @@ case `uname` in
             curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
 
             # install python version
-            ~/.pyenv/bin/pyenv install $BASE_PY_VER
+            $HOME/.pyenv/bin/pyenv install $BASE_PY_VER
             fi
         fi
 
         # install pipx
         if ! command -v pipx &> /dev/null; then
             PIP_REQUIRE_VIRTUALENV=false ~/.pyenv/versions/$BASE_PY_VER/bin/python -m pip install -U pipx
-            sudo ln -s ~/.pyenv/versions/$BASE_PY_VER/bin/pipx /usr/bin/pipx
+            sudo ln -s $HOME/.pyenv/versions/$BASE_PY_VER/bin/pipx /usr/bin/pipx
         fi
     ;;
     FreeBSD)
