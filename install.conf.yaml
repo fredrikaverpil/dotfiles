@@ -11,7 +11,6 @@
 
 - link:
     ~/.dotfiles: ''
-    ~/.bash:
     ~/.shell:
     ~/.bash_profile:
     ~/.bashrc_user: bashrc
@@ -26,10 +25,11 @@
 
   # Install software
   - installers/basics.sh
-  - installers/python.sh
   - installers/starship.sh
   - installers/nerdfont.sh
   - installers/gh.sh
+
+  # - installers/python.sh
   # - "installers/homebrew.sh"  # experimental
   # - "installers/docker.sh"  # not always desired
   # - "installers/snap-apps.sh"  # not always desired

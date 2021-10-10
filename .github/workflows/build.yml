@@ -27,16 +27,16 @@ jobs:
 
       - name: Test Python setup
         run: |
-          BASE_PYTHON_VER=`cat .python-version`
-          # Add Pyenv to PATH
-          echo "$PYENV_ROOT/bin" >> $GITHUB_PATH
+          echo $PYENV_ROOT
+          echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
+          HOME=~/dotfiles-install-dir installers/python.sh
+          eval "$(pyenv init --path)"
 
-          # Test Python via pyenv
-          eval "$($HOME/dotfiles-install-dir/.pyenv/bin/pyenv init --path)"
+          # Test Pyenv-installed Python version
           python -c "import sys; print(sys.version)"
           python -c "import sys; assert sys.version.startswith('${BASE_PYTHON_VER}')"
 
-          # Test Poetry via Pipx
+          # Test Pipx
           pipx install poetry
           pipx install --suffix=@master --force git+https://github.com/python-poetry/poetry.git
           pipx list
@@ -44,7 +44,8 @@ jobs:
           poetry@master --version
 
         env:
-          PYENV_ROOT: $HOME/dotfiles-install-dir/.pyenv
+          PYENV_ROOT: /home/runner/dotfiles-install-dir/.pyenv
+
 
       - name: Test Docker setup
         run: |

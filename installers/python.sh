@@ -26,10 +26,12 @@ case `uname` in
             sudo apt-get install -y make build-essential libssl-dev zlib1g-dev \
                 libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
                 libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
-            # install
+
+            # install pyenv
+            echo "Installing pyenv into ${HOME}/.pyenv ..."
             curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
 
-            # install version
+            # install python version
             $HOME/.pyenv/bin/pyenv install $BASE_PY_VER
             fi
         fi
