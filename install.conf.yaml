@@ -29,11 +29,6 @@
   - installers/nerdfont.sh
   - installers/gh.sh
 
-  # - installers/python.sh
-  # - "installers/homebrew.sh"  # experimental
-  # - "installers/docker.sh"  # not always desired
-  # - "installers/snap-apps.sh"  # not always desired
-
   # ssh
   - mkdir -p ~/.ssh && chmod 700 ~/.ssh
   - touch ~/.ssh/known_hosts && chmod 644 ~/.ssh/known_hosts
