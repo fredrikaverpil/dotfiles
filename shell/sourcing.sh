@@ -46,7 +46,6 @@ fi
 
 if [ ! -z "${ZSH_VERSION}" ]; then
     # assume Zsh
-    echo "Assuming zsh"
 
     # Zsh autocompletion
     if [ -d ~/.zsh/zsh-autosuggestions ]; then
@@ -64,7 +63,6 @@ if [ ! -z "${ZSH_VERSION}" ]; then
 
 elif [ ! -z "${BASH_VERSION}" ]; then
     # assume Bash
-    echo "Assuming bash"
 
     # Bash autocompletion
     if [ -f /etc/profile.d/bash_completion.sh ]; then
