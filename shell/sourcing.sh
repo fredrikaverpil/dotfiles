@@ -44,7 +44,7 @@ if [ -d ~/.pyenv ]; then
 fi
 
 
-if [ ! -z "${ZSH_VERSION}" ]; then
+if [ -n "${ZSH_VERSION}" ]; then
     # assume Zsh
 
     # Zsh autocompletion
@@ -61,7 +61,7 @@ if [ ! -z "${ZSH_VERSION}" ]; then
         eval "$(starship init zsh)"
     fi
 
-elif [ ! -z "${BASH_VERSION}" ]; then
+elif [ -n "${BASH_VERSION}" ]; then
     # assume Bash
 
     # Bash autocompletion
