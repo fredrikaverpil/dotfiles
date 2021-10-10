@@ -16,6 +16,7 @@ case `uname` in
         if command -v apt-get &> /dev/null; then
             sudo apt update
             sudo add-apt-repository universe
+            apt_install bash-completion
             apt_install curl
         fi
 
