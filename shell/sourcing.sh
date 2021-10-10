@@ -44,13 +44,34 @@ if [ -d ~/.pyenv ]; then
 fi
 
 
-# Bash completion
-if [ -f /etc/profile.d/bash_completion.sh ]; then
-    source /etc/profile.d/bash_completion.sh
+if [ ! -z "${ZSH_VERSION}" ]; then
+    # assume Zsh
+
+    # Zsh autocompletion
+    if [ -d ~/.zsh/zsh-autosuggestions ]; then
+        source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+    fi
+
+    if [ -d ~/.zsh/zsh-syntax-highlighting ]; then
+        source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+    fi
+
+    # Starship
+    if command -v starship &> /dev/null; then
+        eval "$(starship init zsh)"
+    fi
+
+elif [ ! -z "${BASH_VERSION}" ]; then
+    # assume Bash
+
+    # Bash autocompletion
+    if [ -f /etc/profile.d/bash_completion.sh ]; then
+        source /etc/profile.d/bash_completion.sh
+    fi
+
+    # Starship
+    if command -v starship &> /dev/null; then
+        eval "$(starship init bash)"
+    fi
 fi
 
-
-# Starship
-if [ -f /usr/local/bin/starship ]; then
-    eval "$(starship init bash)"
-fi
