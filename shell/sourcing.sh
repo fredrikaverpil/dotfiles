@@ -5,8 +5,8 @@ fi
 
 
 # Nix
-if [ -d ~/.nix-profile ]; then
-    . "$HOME/.nix-profile/etc/profile.d/nix.sh"
+if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then
+    . ~/.nix-profile/etc/profile.d/nix.sh
 fi
 
 
@@ -18,11 +18,7 @@ if [ -f ~/.linuxbrew/bin/brew ]; then
 fi
 
 
-if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then
-    . ~/.nix-profile/etc/profile.d/nix.sh
-fi
-
-
+# Pyenv + auto venv activation on cd
 if [ -d ~/.pyenv ]; then
     eval "$(pyenv init --path)"
     eval "$(pyenv virtualenv-init -)"
@@ -48,6 +44,13 @@ if [ -d ~/.pyenv ]; then
 fi
 
 
+# Bash completion
+if [ -f /etc/profile.d/bash_completion.sh ]; then
+    source /etc/profile.d/bash_completion.sh
+fi
+
+
+# Starship
 if [ -f /usr/local/bin/starship ]; then
     eval "$(starship init bash)"
 fi
