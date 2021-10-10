@@ -31,6 +31,12 @@ case `uname` in
             echo "Installing pyenv into ${HOME}/.pyenv ..."
             curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
 
+            # temp while debugging
+            echo ":::::::::::::::::::: Temp debugging below  ::::::::::::::::::::"
+            ls -alh $HOME
+
+            echo ":::::::::::::::::::: Temp debugging above  ::::::::::::::::::::"
+
             # install python version
             $HOME/.pyenv/bin/pyenv install $BASE_PY_VER
             fi
