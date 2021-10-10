@@ -14,16 +14,20 @@
     ~/.shell:
     ~/.bash_profile:
     ~/.bashrc_user: bashrc
+    ~/.zshrc_user: zshrc
     ~/.gitconfig: gitconfig
     ~/.gitignore_global: gitignore_global
 
 - shell:
   - git submodule sync --recursive
 
-  # load bash files
+  # bash
   - grep -qxF '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' ~/.bashrc || echo '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' >> ~/.bashrc
 
-  # Install software
+  # zsh
+  - grep -qxF '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' ~/.zshrc || echo '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' >> ~/.zshrc
+
+  # install software
   - installers/basics.sh
   - installers/starship.sh
   - installers/nerdfont.sh

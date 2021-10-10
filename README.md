@@ -29,6 +29,7 @@ installers/docker.sh
 installers/snap-apps.sh
 installers/nix.sh
 installers/homebrew.sh  # experimental!
+installers/zsh.sh
 ```
 
 ## To do
