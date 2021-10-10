@@ -63,6 +63,7 @@ jobs:
 
       - name: Test Python setup
         run: |
+          echo $HOME
           pwd
           echo $PYENV_ROOT
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
