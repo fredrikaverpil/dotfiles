@@ -42,6 +42,8 @@ case `uname` in
             ls -alh /home/runner/work/dotfiles/dotfiles
             echo "4"
             ls -alh /home/runner/work/dotfiles-install-dir
+            echo "5"
+            ls -alh /home/runner/work/dotfiles-install-dir/.pyenv
             echo ":::::::::::::::::::: Temp debugging above  ::::::::::::::::::::"
 
             # install python version
