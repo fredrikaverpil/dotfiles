@@ -61,14 +61,16 @@ jobs:
       #   env:
       #     PYENV_ROOT: ~/dotfiles-install-dir/.pyenv
 
-      - name: Test Docker setup
+      - name: Test Python setup
         run: |
+          pwd
           echo $PYENV_ROOT
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
-          installers/python.sh
-          pyenv --version
+          HOME=~/dotfiles-install-dir installers/python.sh
+          ls -alh
+
         env:
-          PYENV_ROOT: /home/runner/work/dotfiles/dotfiles
+          PYENV_ROOT: /home/runner/work/dotfiles-install-dir/.pyenv
 
 
       - name: Test Docker setup
