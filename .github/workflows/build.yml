@@ -25,41 +25,51 @@ jobs:
         run: |
           ls -alh ~/dotfiles-install-dir
 
-      - name: Test Python setup
+      # - name: Test Python setup
+      #   run: |
+      #     BASE_PYTHON_VER=`cat .python-version`
+      #     # Add Pyenv to PATH
+      #     echo "$PYENV_ROOT/bin" >> $GITHUB_PATH
+      #     echo "$HOME/dotfiles-install-dir/.pyenv" >> $GITHUB_PATH
+
+      #     HOME=~/dotfiles-install-dir installers/python.sh
+
+      #     echo "----------------------"
+
+      #     pwd
+      #     ls -alh
+
+      #     echo $HOME
+      #     ls -alh $HOME
+
+      #     ls -alh ~/dotfiles-install-dir
+
+      #     echo "----------------------"
+
+      #     # Test Python via pyenv
+      #     eval "$(\~/.pyenv/bin/pyenv init --path)"
+      #     python -c "import sys; print(sys.version)"
+      #     python -c "import sys; assert sys.version.startswith('${BASE_PYTHON_VER}')"
+
+      #     # Test Poetry via Pipx
+      #     pipx install poetry
+      #     pipx install --suffix=@master --force git+https://github.com/python-poetry/poetry.git
+      #     pipx list
+      #     poetry --version
+      #     poetry@master --version
+
+      #   env:
+      #     PYENV_ROOT: ~/dotfiles-install-dir/.pyenv
+
+      - name: Test Docker setup
         run: |
-          BASE_PYTHON_VER=`cat .python-version`
-          # Add Pyenv to PATH
-          echo "$PYENV_ROOT/bin" >> $GITHUB_PATH
-          echo "$HOME/dotfiles-install-dir/.pyenv" >> $GITHUB_PATH
-
-          HOME=~/dotfiles-install-dir installers/python.sh
-
-          echo "----------------------"
-
-          pwd
-          ls -alh
-
-          echo $HOME
-          ls -alh $HOME
-
-          ls -alh ~/dotfiles-install-dir
-
-          echo "----------------------"
-
-          # Test Python via pyenv
-          eval "$(\~/.pyenv/bin/pyenv init --path)"
-          python -c "import sys; print(sys.version)"
-          python -c "import sys; assert sys.version.startswith('${BASE_PYTHON_VER}')"
-
-          # Test Poetry via Pipx
-          pipx install poetry
-          pipx install --suffix=@master --force git+https://github.com/python-poetry/poetry.git
-          pipx list
-          poetry --version
-          poetry@master --version
-
+          echo $PYENV_ROOT
+          echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
+          installers/python.sh
+          pyenv --version
         env:
-          PYENV_ROOT: ~/dotfiles-install-dir/.pyenv
+          PYENV_ROOT: /home/runner/work/dotfiles/dotfiles
+
 
       - name: Test Docker setup
         run: |
