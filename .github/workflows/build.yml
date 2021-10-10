@@ -71,7 +71,7 @@ jobs:
           ls -alh
 
         env:
-          PYENV_ROOT: /home/runner/work/dotfiles-install-dir/.pyenv
+          PYENV_ROOT: /home/runner/dotfiles-install-dir/.pyenv
 
 
       - name: Test Docker setup
