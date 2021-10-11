@@ -41,7 +41,7 @@ case `uname` in
 
         # delete symlink and pipx if it is pointing to the wrong python installation
         if [ ! -f /usr/bin/pipx ] || [ "$(readlink /usr/bin/pipx)" != "$pipx_target_path" ]; then
-            sudo rm /usr/bin/pipx
+            sudo rm -f /usr/bin/pipx
             rm -rf ~/.local/pipx
         fi
 
