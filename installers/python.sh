@@ -40,7 +40,7 @@ case `uname` in
         fi
 
         # delete symlink and pipx if it is pointing to the wrong python installation
-        if [ -f /usr/bin/pipx ] && [ "$(readlink /usr/bin/pipx)" = "$pipx_target_path" ]; then
+        if [ -f /usr/bin/pipx ] && [ "$(readlink /usr/bin/pipx)" != "$pipx_target_path" ]; then
             sudo rm /usr/bin/pipx
         fi
 
@@ -52,9 +52,9 @@ case `uname` in
         fi
 
         # pipx-installations
-        if ! command -v ipython &> /dev/null; then pipx install ipython --pip-args rich; fi
-        if ! command -v black &> /dev/null; then pipx install black; fi
-        if ! command -v poetry &> /dev/null; then pipx install poetry; fi
+        if ! command -v ipython &> /dev/null; then pipx install ipython --pip-args rich ; fi
+        if ! command -v black &> /dev/null; then pipx install black ; fi
+        if ! command -v poetry &> /dev/null; then pipx install poetry ; fi
 
     ;;
     FreeBSD)
