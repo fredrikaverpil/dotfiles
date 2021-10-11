@@ -17,11 +17,12 @@ case `uname` in
     Linux)
         # commands for Linux go here
 
+        base_python_version=`cat .python-version`
+        pipx_target_path=$HOME/.pyenv/versions/$base_python_version/bin/pipx
+
         # install python via pyenv
         if [ ! -d ~/.pyenv ]; then
             if command -v apt-get &> /dev/null; then
-
-            BASE_PY_VER=`cat .python-version`
 
             sudo apt-get install -y gcc
 
@@ -34,14 +35,20 @@ case `uname` in
             curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
 
             # install python version
-            $HOME/.pyenv/bin/pyenv install $BASE_PY_VER
+            $HOME/.pyenv/bin/pyenv install $base_python_version
             fi
         fi
 
+        # delete symlink and pipx if it is pointing to the wrong python installation
+        if [ -f /usr/bin/pipx ] && [ "$(readlink /usr/bin/pipx)" = "$pipx_target_path" ]; then
+            sudo rm /usr/bin/pipx
+        fi
+
         # install pipx
-        if ! command -v pipx &> /dev/null; then
-            PIP_REQUIRE_VIRTUALENV=false $HOME/.pyenv/versions/$BASE_PY_VER/bin/python -m pip install -U pipx
-            sudo ln -s $HOME/.pyenv/versions/$BASE_PY_VER/bin/pipx /usr/bin/pipx
+        if [ ! -f /usr/bin/pipx ]; then
+            rm -rf ~/.local/pipx
+            PIP_REQUIRE_VIRTUALENV=false $HOME/.pyenv/versions/$base_python_version/bin/python -m pip install -U pipx
+            sudo ln -s $pipx_target_path /usr/bin/pipx
         fi
 
         # pipx-installations
