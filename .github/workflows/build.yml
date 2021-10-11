@@ -30,18 +30,16 @@ jobs:
           echo $PYENV_ROOT
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
           HOME=~/dotfiles-install-dir installers/python.sh
-          eval "$(pyenv init --path)"
 
           # Test Pyenv-installed Python version
           python -c "import sys; print(sys.version)"
           python -c "import sys; assert sys.version.startswith('${BASE_PYTHON_VER}')"
 
           # Test Pipx
-          pipx install poetry
-          pipx install --suffix=@master --force git+https://github.com/python-poetry/poetry.git
-          pipx list
+          /usr/bin/pipx list
           poetry --version
-          poetry@master --version
+          black --version
+          ipython --version
 
         env:
           PYENV_ROOT: /home/runner/dotfiles-install-dir/.pyenv
