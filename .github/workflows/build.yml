@@ -30,7 +30,6 @@ jobs:
           echo $PYENV_ROOT
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
           HOME=~/dotfiles-install-dir installers/python.sh
-          eval "$(pyenv init --path)"
 
           # Test Pyenv-installed Python version
           python -c "import sys; print(sys.version)"
