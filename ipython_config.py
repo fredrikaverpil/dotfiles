@@ -33,9 +33,9 @@
 ## lines of code to run at IPython startup.
 #  Default: []
 c.InteractiveShellApp.exec_lines = [
-    "from rich import print",
-    "import rich.pretty",
-    "rich.pretty.install()",
+    "from rich import print, pretty, inspect, traceback",
+    "pretty.install()",
+    "_ = traceback.install()",
     "print('[bold green]rich enabled :party_popper:')",
 ]
 
