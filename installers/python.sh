@@ -40,13 +40,13 @@ case `uname` in
         fi
 
         # delete symlink and pipx if it is pointing to the wrong python installation
-        if [ -f /usr/bin/pipx ] && [ "$(readlink /usr/bin/pipx)" != "$pipx_target_path" ]; then
+        if [ ! -f /usr/bin/pipx ] || [ "$(readlink /usr/bin/pipx)" != "$pipx_target_path" ]; then
             sudo rm /usr/bin/pipx
+            rm -rf ~/.local/pipx
         fi
 
         # install pipx
         if [ ! -f /usr/bin/pipx ]; then
-            rm -rf ~/.local/pipx
             PIP_REQUIRE_VIRTUALENV=false $HOME/.pyenv/versions/$base_python_version/bin/python -m pip install -U pipx
             sudo ln -s $pipx_target_path /usr/bin/pipx
         fi
