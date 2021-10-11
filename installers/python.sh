@@ -52,9 +52,9 @@ case `uname` in
         fi
 
         # pipx-installations
-        if [ ! -f ~/.local/bin/ipython ]; then pipx install ipython --pip-args rich ; fi
-        if [ ! -f ~/.local/bin/black ]; then pipx install black ; fi
-        if [ ! -f ~/.local/bin/poetry ]; then pipx install poetry ; fi
+        if [ ! -f ~/.local/bin/ipython ]; then /usr/bin/pipx install ipython --pip-args rich ; fi
+        if [ ! -f ~/.local/bin/black ]; then /usr/bin/pipx install black ; fi
+        if [ ! -f ~/.local/bin/poetry ]; then /usr/bin/pipx install poetry ; fi
 
     ;;
     FreeBSD)

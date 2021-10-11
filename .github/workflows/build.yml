@@ -36,7 +36,7 @@ jobs:
           python -c "import sys; assert sys.version.startswith('${BASE_PYTHON_VER}')"
 
           # Test Pipx
-          pipx list
+          /usr/bin/pipx list
           poetry --version
           black --version
           ipython --version
