@@ -35,7 +35,7 @@
 c.InteractiveShellApp.exec_lines = [
     "from rich import print, pretty, inspect, traceback",
     "pretty.install()",
-    "_ = traceback.install()",
+    "_ = traceback.install(show_locals=True)",
     "print('[bold green]rich enabled :party_popper:')",
 ]
 
