@@ -84,6 +84,11 @@ rm $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalSta
 New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json -Value \\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows/terminal_settings.json
 ```
 
+#### WSL Tray
+
+* Download [WSL Tray](https://github.com/yzgyyang/wsl-tray/releases)
+* Extract in `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup`
+
 #### Set up HHKB for macOS-compatible workflow
 
 Note: Autohotkey and Sharpkeys should have been installed via `winget.ps1`.
