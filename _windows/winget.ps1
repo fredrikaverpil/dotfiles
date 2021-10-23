@@ -1,9 +1,6 @@
 
 # Install Windows Terminal
 winget install --source msstore "Windows Terminal" --id 9N0DX20HK701
-# Crete symlink for Windows Terminal
-rm $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
-New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json -Value \\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows/terminal_settings.json
 
 # Coding
 winget install --spirce winget "Docker Desktop" --id "Docker.DockerDesktop"

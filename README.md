@@ -23,21 +23,23 @@
 
 ## Windows 11 + WSL
 
-This setup aims to run GUIs in Windows but terminal and coding defaults to WSL/Ubuntu.
+This setup aims to run GUIs in Windows with all terminal and coding activities in WSL/Ubuntu.
 
-### Enable WSL and install Windows GUI apps
-
-From Powershell prompt:
+### Install WSL and GUI apps
 
 ```powershell
-# Enable Hyper-V (for WSL)
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
+```
 
-# Install from ms store
+```powershell
 winget install --source msstore "Windows Subsystem for Linux" --id 9P9TQF7MRM4R
 winget install --source msstore "Ubuntu 20.04 LTS" --id 9N6SVWS3RX71
-winget install --source msstore "Windows Terminal" --id 9N0DX20HK701
-winget install --source msstore "Visual Studio Code" --id XP9KHM4BK9FZ7Q
+```
+
+Start the Ubuntu prompt, create user.
+
+```powershell
+_windows/winget.ps1
 ```
 
 ### Install dotfiles in WSL/Ubuntu
@@ -45,13 +47,14 @@ winget install --source msstore "Visual Studio Code" --id XP9KHM4BK9FZ7Q
 From Ubuntu prompt:
 
 ```bash
-# Install dotfiles
 mkdir -p code/repos && cd code/repos
 git clone https://github.com/fredrikaverpil/dotfiles.git
 cd dotfiles && ./install -vv
 ```
 
-### Configure Windows Terminal
+### Configuration
+
+#### Windows Terminal settings
 
 * Download and install [Fira Code Nerd font](https://github.com/ryanoasis/nerd-fonts/releases/) in Windows
 
@@ -65,22 +68,9 @@ rm $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalSta
 New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json -Value \\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows/terminal_settings.json
 ```
 
-### Docker with WSL back-end
-
-Install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-desktop-windows/) (enable WSL2 back-end):
-
-```powershell
-winget install --spirce winget "Docker Desktop" --id "Docker.DockerDesktop"
-```
-
 ### Set up HHKB for macOS-compatible workflow
 
-Powershell prompt:
-
-```powershell
-winget install --source msstore  "AutoHotkey Store Edition" --id 9NQ8Q8J78637
-winget install "SharpKeys" --id "RandyRants.SharpKeys"
-```
+Autohotkey and Sharpkeys should have been installed via `winget.ps1`.
 
 Administrative Powershell prompt:
 
@@ -89,17 +79,11 @@ cd \\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles
 New-Item -ItemType SymbolicLink -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\autohotkey.ahk" -Value _windows\autohotkey.ahk
 ```
 
-Finally, launch Sharpkeys, load the `\\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows\sharpkeys.skl` file, write changes to the Registry and reboot.
+Launch Sharpkeys, load the `\\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows\sharpkeys.skl` file, write changes to the Registry and reboot.
 
-### Additional Windows apps
+### Closing notes
 
-```powershell
-winget install "1Password" --id "AgileBits.1Password"
-winget install --source msstore "Spotify Music" --id 9NCBCSZSJRSB
-winget install --source msstore "Adobe Reader Touch" --id 9WZDNCRFJ2GC
-```
-
-### Additional Ubuntu/WSL apps
+Reboot machine.
 
 Proceed with reading more on the Ubuntu setup to install zsh, Python etc.
 
