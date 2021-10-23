@@ -16,7 +16,7 @@ Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRes
 
 ```bash
 git clone https://github.com/fredrikaverpil/dotfiles.git
-./install -vv
+cd dotfiles && ./install -vv
 ```
 
 * Download and install [Fira Code Nerd font](https://github.com/ryanoasis/nerd-fonts/releases/) in Windows
@@ -45,7 +45,7 @@ sudo apt install git
 
 ```bash
 git clone https://github.com/fredrikaverpil/dotfiles.git
-./install -vv
+cd dotfiles && ./install -vv
 ```
 
 #### Optional installation
