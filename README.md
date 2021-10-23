@@ -54,20 +54,21 @@ Install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-des
 
 ### Set up HHKB for macOS-compatible workflow
 
-#### PowerToys key remapping
+Powershell prompt:
 
 ```powershell
-winget install --source msstore  "Microsoft PowerToys" --id XP89DCGQ3K6VLD
+winget install --source msstore  "AutoHotkey Store Edition" --id 9NQ8Q8J78637
+winget install "SharpKeys" --id "RandyRants.SharpKeys"
 ```
 
-* In the Keyboard Manager
-  * Remap key `Win Left` to `Ctrl`.
-  * Remap shortcut `Ctrl (Left)` + `Tab` to `Alt` + `Tab`.
-  * Remap shortcu `Ctrl (Left)` + `Left` to `Home`
-  * Remap shortcu `Ctrl (Left)` + `Right` to `End`
-  * Remap shortcu `Ctrl (Left)` + `Up` to `PgUp`
-  * Remap shortcu `Ctrl (Left)` + `Down` to `PgDn`
-* In PowerToys Run, remap shortcut to `Ctrl` `Space`.
+Powershell prompt with administrative rights:
+
+```powershell
+cd \\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles
+New-Item -ItemType SymbolicLink -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\autohotkey.ahk" -Value _windows\autohotkey.ahk
+```
+
+Finally, launch Sharpkeys and load the `\\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows\sharpkeys.skl` file.
 
 ### Additional Windows apps
 
