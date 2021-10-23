@@ -11,6 +11,7 @@
   - [WSL/Ubuntu installations](#wslubuntu-installations)
   - [Configuration](#configuration)
     - [Windows Terminal settings](#windows-terminal-settings)
+    - [WSL Tray](#wsl-tray)
     - [Set up HHKB for macOS-compatible workflow](#set-up-hhkb-for-macos-compatible-workflow)
   - [Closing notes](#closing-notes)
 - [Ubuntu 20.04](#ubuntu-2004)
