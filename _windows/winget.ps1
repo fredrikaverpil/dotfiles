@@ -1,9 +1,8 @@
 
 # Install Windows Terminal
 winget install --source msstore "Windows Terminal" --id 9N0DX20HK701
-# Remove original settings.json
+# Crete symlink for Windows Terminal
 rm $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
-# Create symlink into WSL2's dotfiles repo
 New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json -Value \\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows/terminal_settings.json
 
 # Coding
