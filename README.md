@@ -33,6 +33,8 @@ New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.Win
 
 * Install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-desktop-windows/) to be used in WSL/Ubuntu
 
+* Download and install 64-bit [Visual Studio Code](https://code.visualstudio.com/Download) in Windows
+
 ## Ubuntu 20.04
 
 ```bash
@@ -41,14 +43,14 @@ sudo apt upgrade
 sudo apt install git
 ```
 
-#### Install dotfiles
+### Install dotfiles
 
 ```bash
 git clone https://github.com/fredrikaverpil/dotfiles.git
 cd dotfiles && ./install -vv
 ```
 
-#### Optional installation
+### Optional installation
 
 ```bash
 installers/python.sh
