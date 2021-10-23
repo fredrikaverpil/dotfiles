@@ -12,7 +12,6 @@ Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRes
 ```
 
 * Install Ubuntu 20.04 [from Microsoft Store](https://www.microsoft.com/store/productId/9N6SVWS3RX71)
-* Install Windows Terminal [from Microsoft Store](https://www.microsoft.com/store/productId/9N0DX20HK701)
 * Install dotfiles in WSL/Ubuntu, using the Ubuntu prompt:
 
 ```bash
@@ -21,8 +20,8 @@ git clone https://github.com/fredrikaverpil/dotfiles.git
 cd dotfiles && ./install -vv
 ```
 
+* Install Windows Terminal [from Microsoft Store](https://www.microsoft.com/store/productId/9N0DX20HK701)
 * Download and install [Fira Code Nerd font](https://github.com/ryanoasis/nerd-fonts/releases/) in Windows
-
 * Symlink Terminal settings via an Administrative Powershell prompt:
 
 ```powershell
