@@ -15,7 +15,7 @@ Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRes
 
 * Install Ubuntu 20.04 [from Microsoft Store](https://www.microsoft.com/store/productId/9N6SVWS3RX71)
 
-### Install dotfiles and apps
+### Install dotfiles and apps in WSL/Ubuntu
 
 * Install dotfiles in WSL/Ubuntu, using the Ubuntu prompt:
 
