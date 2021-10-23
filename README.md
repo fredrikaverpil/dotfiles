@@ -15,14 +15,19 @@ Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRes
 
 * Install Ubuntu 20.04 [from Microsoft Store](https://www.microsoft.com/store/productId/9N6SVWS3RX71)
 
-### Install dotfiles
+### Install dotfiles and apps
 
 * Install dotfiles in WSL/Ubuntu, using the Ubuntu prompt:
 
 ```bash
+# install dotfiles
 mkdir -p code/repos && cd code/repos
 git clone https://github.com/fredrikaverpil/dotfiles.git
 cd dotfiles && ./install -vv
+
+# install apps
+installers/zsh.sh
+installers/python.sh
 ```
 
 ### Configure Microsoft Terminal
@@ -39,7 +44,11 @@ rm $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalSta
 New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json -Value \\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows/terminal_settings.json
 ```
 
-### Install Apps
+### Set up HHKB
+
+TBD
+
+### Install Windows apps
 
 * Install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-desktop-windows/) (enable WSL2 back-end)
 * Download and install 64-bit [Visual Studio Code](https://code.visualstudio.com/Download) in Windows
