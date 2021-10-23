@@ -5,7 +5,7 @@
 ## Windows 11 + WSL
 
 * Install Linux Subsystem for Windows [from Microsoft Store](https://www.microsoft.com/store/productId/9P9TQF7MRM4R)
-* Enable Hyper-V (and restart), from Powershell prompt:
+* Enable Hyper-V from Powershell prompt (and restart):
 
 ```powershell
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
