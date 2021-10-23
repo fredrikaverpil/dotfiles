@@ -49,10 +49,10 @@ winget install --accept-package-agreements --source winget "Docker Desktop" --id
 
 # HHKB/macOS compatible workflow
 winget install --accept-package-agreements --source msstore  "AutoHotkey Store Edition" --id 9NQ8Q8J78637
-winget install --accept-package-agreements "SharpKeys" --id "RandyRants.SharpKeys"
+winget install --accept-package-agreements --source winget "SharpKeys" --id "RandyRants.SharpKeys"
 
 # Other
-winget install --accept-package-agreements "1Password" --id "AgileBits.1Password"
+winget install --accept-package-agreements --source winget "1Password" --id "AgileBits.1Password"
 winget install --accept-package-agreements --source msstore "Spotify Music" --id 9NCBCSZSJRSB
 winget install --accept-package-agreements --source msstore "Adobe Reader Touch" --id 9WZDNCRFJ2GC
 winget install --accept-package-agreements --source msstore "Microsoft PowerToys" --id XP89DCGQ3K6VLD 
