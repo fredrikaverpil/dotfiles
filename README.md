@@ -15,8 +15,7 @@ Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRes
 * Install dotfiles in WSL/Ubuntu, using the Ubuntu prompt:
 
 ```bash
-mkdir -p code/repos
-cd code/repos
+mkdir -p code/repos && cd code/repos
 git clone https://github.com/fredrikaverpil/dotfiles.git
 cd dotfiles && ./install -vv
 ```
@@ -48,8 +47,7 @@ sudo apt install git
 ### Install dotfiles
 
 ```bash
-mkdir -p code/repos
-cd code/repos
+mkdir -p code/repos && cd code/repos
 git clone https://github.com/fredrikaverpil/dotfiles.git
 cd dotfiles && ./install -vv
 ```
