@@ -27,19 +27,35 @@ This setup aims to run GUIs in Windows with all terminal and coding activities i
 
 ### Install WSL and GUI apps
 
-```powershell
-Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
-```
+Run from administrative Powershell prompt:
 
 ```powershell
-winget install --source msstore "Windows Subsystem for Linux" --id 9P9TQF7MRM4R
-winget install --source msstore "Ubuntu 20.04 LTS" --id 9N6SVWS3RX71
+# Enable Hyper-V (for WSL)
+Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
+
+# Install from ms store
+winget install --accept-package-agreements --source msstore "Windows Subsystem for Linux" --id 9P9TQF7MRM4R
+winget install --accept-package-agreements --source msstore "Ubuntu 20.04 LTS" --id 9N6SVWS3RX71
 ```
 
 Start the Ubuntu prompt, create user.
 
+### Install Windows GUI apps
+
 ```powershell
-_windows/winget.ps1
+# Coding
+winget install --accept-package-agreements --source msstore "Windows Terminal" --id 9N0DX20HK701
+winget install --accept-package-agreements --source msstore "Visual Studio Code" --id XP9KHM4BK9FZ7Q
+winget install --accept-package-agreements --source winget "Docker Desktop" --id "Docker.DockerDesktop"
+
+# HHKB/macOS compatible workflow
+winget install --accept-package-agreements --source msstore  "AutoHotkey Store Edition" --id 9NQ8Q8J78637
+winget install --accept-package-agreements "SharpKeys" --id "RandyRants.SharpKeys"
+
+# Other
+winget install --accept-package-agreements "1Password" --id "AgileBits.1Password"
+winget install --accept-package-agreements --source msstore "Spotify Music" --id 9NCBCSZSJRSB
+winget install --accept-package-agreements --source msstore "Adobe Reader Touch" --id 9WZDNCRFJ2GC
 ```
 
 ### Install dotfiles in WSL/Ubuntu
@@ -58,7 +74,7 @@ cd dotfiles && ./install -vv
 
 * Download and install [Fira Code Nerd font](https://github.com/ryanoasis/nerd-fonts/releases/) in Windows
 
-Administrative Powershell prompt:
+Run from administrative Powershell prompt:
 
 ```powershell
 # Remove original settings.json
@@ -68,11 +84,11 @@ rm $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalSta
 New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json -Value \\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows/terminal_settings.json
 ```
 
-### Set up HHKB for macOS-compatible workflow
+#### Set up HHKB for macOS-compatible workflow
 
-Autohotkey and Sharpkeys should have been installed via `winget.ps1`.
+Note: Autohotkey and Sharpkeys should have been installed via `winget.ps1`.
 
-Administrative Powershell prompt:
+Run from administrative Powershell prompt:
 
 ```powershell
 cd \\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles
