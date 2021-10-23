@@ -8,13 +8,15 @@
 * Enable Hyper-V (and restart), from Powershell prompt:
 
 ```powershell
-Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart`
+Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
 ```
 
 * Install Ubuntu 20.04 [from Microsoft Store](https://www.microsoft.com/store/productId/9N6SVWS3RX71)
 * Install dotfiles in WSL/Ubuntu, using the Ubuntu prompt:
 
 ```bash
+mkdir -p code/repos
+cd code/repos
 git clone https://github.com/fredrikaverpil/dotfiles.git
 cd dotfiles && ./install -vv
 ```
@@ -46,6 +48,8 @@ sudo apt install git
 ### Install dotfiles
 
 ```bash
+mkdir -p code/repos
+cd code/repos
 git clone https://github.com/fredrikaverpil/dotfiles.git
 cd dotfiles && ./install -vv
 ```
