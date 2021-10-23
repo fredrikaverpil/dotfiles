@@ -56,6 +56,7 @@ winget install --accept-package-agreements "SharpKeys" --id "RandyRants.SharpKey
 winget install --accept-package-agreements "1Password" --id "AgileBits.1Password"
 winget install --accept-package-agreements --source msstore "Spotify Music" --id 9NCBCSZSJRSB
 winget install --accept-package-agreements --source msstore "Adobe Reader Touch" --id 9WZDNCRFJ2GC
+winget install --accept-package-agreements --source msstore "Microsoft PowerToys" --id XP89DCGQ3K6VLD 
 ```
 
 ### WSL/Ubuntu installations
