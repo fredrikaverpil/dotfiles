@@ -51,11 +51,17 @@ Install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-des
 
 ### Set up HHKB for macOS-compatible workflow
 
+#### PowerToys key remapping
+
 ```powershell
 winget install --source msstore  "Microsoft PowerToys" --id XP89DCGQ3K6VLD
 ```
 
-* In the Keyboard Manager, remap `Win Left` to `Ctrl`.
+* In the Keyboard Manager
+  * Remap key `Win Left` to `Ctrl`.
+  * Remap shortcut `Ctrl Left` + `Tab` to `Alt` + `Tab`.
+  * Remap shortcu `Ctrl Left` + `Left` to `Home`
+  * Remap shortcu `Ctrl Left` + `Right` to `End`
 * In PowerToys Run, remap shortcut to `Ctrl` `Space`.
 
 ### Additional Windows apps
