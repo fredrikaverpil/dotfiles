@@ -4,9 +4,9 @@
 
 ## Windows 11 + WSL
 
+This setup aims to run GUIs in Windows but terminal and coding defaults to WSL/Ubuntu.
 
-
-### Enable WSL and install apps
+### Enable WSL and install Windows GUI apps
 
 From Powershell prompt:
 
@@ -21,7 +21,7 @@ winget install --source msstore "Windows Terminal" --id 9N0DX20HK701
 winget install --source msstore "Visual Studio Code" --id XP9KHM4BK9FZ7Q
 ```
 
-### Install dotfiles and apps in WSL/Ubuntu
+### Install dotfiles
 
 * Install dotfiles in WSL/Ubuntu, using the Ubuntu prompt:
 
@@ -30,10 +30,6 @@ winget install --source msstore "Visual Studio Code" --id XP9KHM4BK9FZ7Q
 mkdir -p code/repos && cd code/repos
 git clone https://github.com/fredrikaverpil/dotfiles.git
 cd dotfiles && ./install -vv
-
-# install apps
-installers/zsh.sh  # edit out the default prompt from ~/.zshrc after installation
-installers/python.sh
 ```
 
 ### Configure Windows Terminal
@@ -59,7 +55,7 @@ TBD
 
 ### Ubuntu/WSL apps
 
-Proceed with reading more on the Ubuntu setup.
+Proceed with reading more on the Ubuntu setup to install zsh, Python etc.
 
 ## Ubuntu 20.04
 
