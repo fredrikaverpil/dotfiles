@@ -2,6 +2,9 @@
 
 [![CI](https://github.com/fredrikaverpil/dotfiles/actions/workflows/build.yml/badge.svg)](https://github.com/fredrikaverpil/dotfiles/actions/workflows/build.yml)
 
+<!-- START doctoc -->
+<!-- END doctoc -->
+
 ## Windows 11 + WSL
 
 This setup aims to run GUIs in Windows but terminal and coding defaults to WSL/Ubuntu.
