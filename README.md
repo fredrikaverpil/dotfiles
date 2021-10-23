@@ -67,7 +67,11 @@ New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.Win
 
 ### Docker with WSL back-end
 
-Install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-desktop-windows/) (enable WSL2 back-end)
+Install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-desktop-windows/) (enable WSL2 back-end):
+
+```powershell
+winget install --spirce winget "Docker Desktop" --id "Docker.DockerDesktop"
+```
 
 ### Set up HHKB for macOS-compatible workflow
 
@@ -90,8 +94,9 @@ Finally, launch Sharpkeys, load the `\\wsl.localhost\Ubuntu-20.04\home\fredrik\c
 ### Additional Windows apps
 
 ```powershell
-winget install --source msstore  "Spotify Music" --id 9NCBCSZSJRSB
 winget install "1Password" --id "AgileBits.1Password"
+winget install --source msstore "Spotify Music" --id 9NCBCSZSJRSB
+winget install --source msstore "Adobe Reader Touch" --id 9WZDNCRFJ2GC
 ```
 
 ### Additional Ubuntu/WSL apps
