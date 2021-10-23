@@ -59,9 +59,11 @@ winget install --source msstore  "Microsoft PowerToys" --id XP89DCGQ3K6VLD
 
 * In the Keyboard Manager
   * Remap key `Win Left` to `Ctrl`.
-  * Remap shortcut `Ctrl Left` + `Tab` to `Alt` + `Tab`.
-  * Remap shortcu `Ctrl Left` + `Left` to `Home`
-  * Remap shortcu `Ctrl Left` + `Right` to `End`
+  * Remap shortcut `Ctrl (Left)` + `Tab` to `Alt` + `Tab`.
+  * Remap shortcu `Ctrl (Left)` + `Left` to `Home`
+  * Remap shortcu `Ctrl (Left)` + `Right` to `End`
+  * Remap shortcu `Ctrl (Left)` + `Up` to `PgUp`
+  * Remap shortcu `Ctrl (Left)` + `Down` to `PgDn`
 * In PowerToys Run, remap shortcut to `Ctrl` `Space`.
 
 ### Additional Windows apps
