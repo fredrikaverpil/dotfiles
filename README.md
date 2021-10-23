@@ -49,14 +49,19 @@ New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.Win
 
 Install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-desktop-windows/) (enable WSL2 back-end)
 
-### Set up HHKB
+### Set up HHKB for macOS-compatible workflow
 
-TBD
+```powershell
+winget install --source msstore  "Microsoft PowerToys" --id XP89DCGQ3K6VLD
+```
+
+* In the Keyboard Manager, remap `Win Left` to `Ctrl`.
+* In PowerToys Run, remap shortcut to `Ctrl` `Space`.
 
 ### Additional Windows apps
 
 ```powershell
-winget install --source msstore  "Microsoft PowerToys" --id XP89DCGQ3K6VLD
+winget install --source msstore  "Spotify Music" --id 9NCBCSZSJRSB
 ```
 
 ### Additional Ubuntu/WSL apps
