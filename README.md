@@ -4,16 +4,22 @@
 
 ## Windows 11 + WSL
 
-### Enable WSL
 
-* Install Linux Subsystem for Windows [from Microsoft Store](https://www.microsoft.com/store/productId/9P9TQF7MRM4R) (to get automatic updates)
-* Enable Hyper-V from Powershell prompt (and restart):
+
+### Enable WSL and install apps
+
+From Powershell prompt:
 
 ```powershell
+# enable hyper-v (for WSL)
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
-```
 
-* Install Ubuntu 20.04 [from Microsoft Store](https://www.microsoft.com/store/productId/9N6SVWS3RX71)
+# install from ms store
+winget install --source msstore "Windows Subsystem for Linux" --id 9P9TQF7MRM4R
+winget install --source msstore "Ubuntu 20.04 LTS" --id 9N6SVWS3RX71
+winget install --source msstore "Windows Terminal" --id 9N0DX20HK701
+winget install --source msstore "Visual Studio Code" --id XP9KHM4BK9FZ7Q
+```
 
 ### Install dotfiles and apps in WSL/Ubuntu
 
@@ -32,7 +38,6 @@ installers/python.sh
 
 ### Configure Microsoft Terminal
 
-* Install Windows Terminal [from Microsoft Store](https://www.microsoft.com/store/productId/9N0DX20HK701)
 * Download and install [Fira Code Nerd font](https://github.com/ryanoasis/nerd-fonts/releases/) in Windows
 * Symlink Terminal settings via an Administrative Powershell prompt:
 
@@ -44,14 +49,13 @@ rm $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalSta
 New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json -Value \\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows/terminal_settings.json
 ```
 
+### Docker with WSL back-end
+
+* Install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-desktop-windows/) (enable WSL2 back-end)
+
 ### Set up HHKB
 
 TBD
-
-### Install Windows apps
-
-* Install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-desktop-windows/) (enable WSL2 back-end)
-* Download and install 64-bit [Visual Studio Code](https://code.visualstudio.com/Download) in Windows
 
 ## Ubuntu 20.04
 
