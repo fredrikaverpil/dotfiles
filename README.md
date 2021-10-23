@@ -12,7 +12,6 @@
   - [Configure Windows Terminal](#configure-windows-terminal)
   - [Docker with WSL back-end](#docker-with-wsl-back-end)
   - [Set up HHKB for macOS-compatible workflow](#set-up-hhkb-for-macos-compatible-workflow)
-    - [PowerToys key remapping](#powertoys-key-remapping)
   - [Additional Windows apps](#additional-windows-apps)
   - [Additional Ubuntu/WSL apps](#additional-ubuntuwsl-apps)
 - [Ubuntu 20.04](#ubuntu-2004)
