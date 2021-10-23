@@ -41,7 +41,7 @@ New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.Win
 
 ### Install Apps
 
-* Install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-desktop-windows/) to be used in WSL/Ubuntu
+* Install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-desktop-windows/) (enable WSL2 back-end)
 * Download and install 64-bit [Visual Studio Code](https://code.visualstudio.com/Download) in Windows
 
 ## Ubuntu 20.04
