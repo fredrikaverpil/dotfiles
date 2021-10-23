@@ -7,13 +7,12 @@
 **Table of Contents**
 
 - [Windows 11 + WSL](#windows-11--wsl)
-  - [Enable WSL and install Windows GUI apps](#enable-wsl-and-install-windows-gui-apps)
+  - [Install WSL and GUI apps](#install-wsl-and-gui-apps)
   - [Install dotfiles in WSL/Ubuntu](#install-dotfiles-in-wslubuntu)
-  - [Configure Windows Terminal](#configure-windows-terminal)
-  - [Docker with WSL back-end](#docker-with-wsl-back-end)
+  - [Configuration](#configuration)
+    - [Windows Terminal settings](#windows-terminal-settings)
   - [Set up HHKB for macOS-compatible workflow](#set-up-hhkb-for-macos-compatible-workflow)
-  - [Additional Windows apps](#additional-windows-apps)
-  - [Additional Ubuntu/WSL apps](#additional-ubuntuwsl-apps)
+  - [Closing notes](#closing-notes)
 - [Ubuntu 20.04](#ubuntu-2004)
   - [Install dotfiles](#install-dotfiles)
   - [Optional installation](#optional-installation)
