@@ -2,8 +2,25 @@
 
 [![CI](https://github.com/fredrikaverpil/dotfiles/actions/workflows/build.yml/badge.svg)](https://github.com/fredrikaverpil/dotfiles/actions/workflows/build.yml)
 
-<!-- START doctoc -->
-<!-- END doctoc -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Windows 11 + WSL](#windows-11--wsl)
+  - [Enable WSL and install Windows GUI apps](#enable-wsl-and-install-windows-gui-apps)
+  - [Install dotfiles in WSL/Ubuntu](#install-dotfiles-in-wslubuntu)
+  - [Configure Windows Terminal](#configure-windows-terminal)
+  - [Docker with WSL back-end](#docker-with-wsl-back-end)
+  - [Set up HHKB for macOS-compatible workflow](#set-up-hhkb-for-macos-compatible-workflow)
+    - [PowerToys key remapping](#powertoys-key-remapping)
+  - [Additional Windows apps](#additional-windows-apps)
+  - [Additional Ubuntu/WSL apps](#additional-ubuntuwsl-apps)
+- [Ubuntu 20.04](#ubuntu-2004)
+  - [Install dotfiles](#install-dotfiles)
+  - [Optional installation](#optional-installation)
+- [To do](#to-do)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Windows 11 + WSL
 
