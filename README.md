@@ -7,9 +7,8 @@
 **Table of Contents**
 
 - [Windows 11 + WSL](#windows-11--wsl)
-  - [Install WSL and GUI apps](#install-wsl-and-gui-apps)
-  - [Install Windows GUI apps](#install-windows-gui-apps)
-  - [Install dotfiles in WSL/Ubuntu](#install-dotfiles-in-wslubuntu)
+  - [Windows installations](#windows-installations)
+  - [WSL/Ubuntu installations](#wslubuntu-installations)
   - [Configuration](#configuration)
     - [Windows Terminal settings](#windows-terminal-settings)
     - [Set up HHKB for macOS-compatible workflow](#set-up-hhkb-for-macos-compatible-workflow)
