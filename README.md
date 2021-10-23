@@ -2,20 +2,25 @@
 
 [![CI](https://github.com/fredrikaverpil/dotfiles/actions/workflows/build.yml/badge.svg)](https://github.com/fredrikaverpil/dotfiles/actions/workflows/build.yml)
 
-## Prerequisites
-
-### Windows 11
+## Windows 11 + WSL
 
 * Install Linux Subsystem for Windows [from Microsoft Store](https://www.microsoft.com/store/productId/9P9TQF7MRM4R)
-* Enable Hyper-V (and restart):
+* Enable Hyper-V (and restart), from Powershell prompt:
 
 ```powershell
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart`
 ```
 
 * Install Ubuntu 20.04 [from Microsoft Store](https://www.microsoft.com/store/productId/9N6SVWS3RX71)
-* Install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-desktop-windows/), to use in WSL2
-* Download and install [Fira Code Nerd font](https://github.com/ryanoasis/nerd-fonts/releases/)
+* Install dotfiles in WSL/Ubuntu, using the Ubuntu prompt:
+
+```bash
+git clone https://github.com/fredrikaverpil/dotfiles.git
+./install -vv
+```
+
+* Download and install [Fira Code Nerd font](https://github.com/ryanoasis/nerd-fonts/releases/) in Windows
+
 * Symlink Terminal settings via an Administrative Powershell prompt:
 
 ```powershell
@@ -26,7 +31,9 @@ rm $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalSta
 New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json -Value \\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows/terminal_settings.json
 ```
 
-### Ubuntu (or WSL2)
+* Install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-desktop-windows/) to be used in WSL/Ubuntu
+
+## Ubuntu 20.04
 
 ```bash
 sudo apt update
@@ -34,20 +41,18 @@ sudo apt upgrade
 sudo apt install git
 ```
 
-## Installation
+#### Install dotfiles
 
 ```bash
 git clone https://github.com/fredrikaverpil/dotfiles.git
 ./install -vv
 ```
 
-## Optional installation
-
-### Ubuntu
+#### Optional installation
 
 ```bash
 installers/python.sh
-installers/docker.sh
+installers/docker.sh  # only if Docker Desktop in Windows was not installed
 installers/snap-apps.sh
 installers/nix.sh
 installers/homebrew.sh  # experimental!
