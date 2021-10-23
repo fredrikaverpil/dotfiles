@@ -24,7 +24,7 @@
 
 This setup aims to run GUIs in Windows with all terminal and coding activities in WSL/Ubuntu.
 
-### Install WSL and GUI apps
+### Windows installations
 
 Run from administrative Powershell prompt:
 
@@ -39,7 +39,7 @@ winget install --accept-package-agreements --source msstore "Ubuntu 20.04 LTS" -
 
 Start the Ubuntu prompt, create user.
 
-### Install Windows GUI apps
+Then install GUI apps in Windows from a Powershell prompt:
 
 ```powershell
 # Coding
@@ -57,7 +57,7 @@ winget install --accept-package-agreements --source msstore "Spotify Music" --id
 winget install --accept-package-agreements --source msstore "Adobe Reader Touch" --id 9WZDNCRFJ2GC
 ```
 
-### Install dotfiles in WSL/Ubuntu
+### WSL/Ubuntu installations
 
 From Ubuntu prompt:
 
