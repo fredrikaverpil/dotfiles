@@ -11,22 +11,22 @@ This setup aims to run GUIs in Windows but terminal and coding defaults to WSL/U
 From Powershell prompt:
 
 ```powershell
-# enable hyper-v (for WSL)
+# Enable Hyper-V (for WSL)
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
 
-# install from ms store
+# Install from ms store
 winget install --source msstore "Windows Subsystem for Linux" --id 9P9TQF7MRM4R
 winget install --source msstore "Ubuntu 20.04 LTS" --id 9N6SVWS3RX71
 winget install --source msstore "Windows Terminal" --id 9N0DX20HK701
 winget install --source msstore "Visual Studio Code" --id XP9KHM4BK9FZ7Q
 ```
 
-### Install dotfiles
+### Install dotfiles in WSL/Ubuntu
 
-* Install dotfiles in WSL/Ubuntu, using the Ubuntu prompt:
+From Ubuntu prompt:
 
 ```bash
-# install dotfiles
+# Install dotfiles
 mkdir -p code/repos && cd code/repos
 git clone https://github.com/fredrikaverpil/dotfiles.git
 cd dotfiles && ./install -vv
