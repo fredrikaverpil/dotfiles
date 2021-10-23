@@ -55,7 +55,8 @@ cd dotfiles && ./install -vv
 ### Configure Windows Terminal
 
 * Download and install [Fira Code Nerd font](https://github.com/ryanoasis/nerd-fonts/releases/) in Windows
-* Symlink Terminal settings via an Administrative Powershell prompt:
+
+Administrative Powershell prompt:
 
 ```powershell
 # Remove original settings.json
@@ -78,19 +79,20 @@ winget install --source msstore  "AutoHotkey Store Edition" --id 9NQ8Q8J78637
 winget install "SharpKeys" --id "RandyRants.SharpKeys"
 ```
 
-Powershell prompt with administrative rights:
+Administrative Powershell prompt:
 
 ```powershell
 cd \\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles
 New-Item -ItemType SymbolicLink -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\autohotkey.ahk" -Value _windows\autohotkey.ahk
 ```
 
-Finally, launch Sharpkeys and load the `\\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows\sharpkeys.skl` file.
+Finally, launch Sharpkeys, load the `\\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows\sharpkeys.skl` file, write changes to the Registry and reboot.
 
 ### Additional Windows apps
 
 ```powershell
 winget install --source msstore  "Spotify Music" --id 9NCBCSZSJRSB
+winget install "1Password" --id "AgileBits.1Password"
 ```
 
 ### Additional Ubuntu/WSL apps
