@@ -57,6 +57,10 @@ New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.Win
 
 TBD
 
+### Ubuntu/WSL apps
+
+Proceed with reading more on the Ubuntu setup.
+
 ## Ubuntu 20.04
 
 ```bash
