@@ -12,6 +12,7 @@ Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRes
 ```
 
 * Install Ubuntu 20.04 [from Microsoft Store](https://www.microsoft.com/store/productId/9N6SVWS3RX71)
+* Install Windows Terminal [from Microsoft Store](https://www.microsoft.com/store/productId/9N0DX20HK701)
 * Install dotfiles in WSL/Ubuntu, using the Ubuntu prompt:
 
 ```bash
