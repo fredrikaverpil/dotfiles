@@ -32,6 +32,9 @@ case `uname` in
                 sudo apt-get update
                 sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
+                # add current user to docker group
+                sudo usermod -aG docker ${USER}
+
                 # install docker-compose
                 pipx install docker-compose
             fi
