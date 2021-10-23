@@ -53,7 +53,13 @@ Install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-des
 
 TBD
 
-### Ubuntu/WSL apps
+### Additional Windows apps
+
+```powershell
+winget install --source msstore  "Microsoft PowerToys" --id XP89DCGQ3K6VLD
+```
+
+### Additional Ubuntu/WSL apps
 
 Proceed with reading more on the Ubuntu setup to install zsh, Python etc.
 
