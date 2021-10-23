@@ -26,7 +26,7 @@ git clone https://github.com/fredrikaverpil/dotfiles.git
 cd dotfiles && ./install -vv
 
 # install apps
-installers/zsh.sh
+installers/zsh.sh  # edit out the default prompt from ~/.zshrc after installation
 installers/python.sh
 ```
 
