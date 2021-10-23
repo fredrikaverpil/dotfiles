@@ -36,7 +36,7 @@ installers/zsh.sh  # edit out the default prompt from ~/.zshrc after installatio
 installers/python.sh
 ```
 
-### Configure Microsoft Terminal
+### Configure Windows Terminal
 
 * Download and install [Fira Code Nerd font](https://github.com/ryanoasis/nerd-fonts/releases/) in Windows
 * Symlink Terminal settings via an Administrative Powershell prompt:
