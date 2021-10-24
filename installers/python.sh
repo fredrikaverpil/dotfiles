@@ -9,9 +9,12 @@ case `uname` in
     Darwin)
         # commands for Linux go here
         if [ ! -d ~/.pyenv ]; then
+
+            # python building requirements
             brew install openssl readline sqlite3 xz zlib
 
-            curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+            # install pyenv
+            brew install pyenv
         fi
     ;;
     Linux)
