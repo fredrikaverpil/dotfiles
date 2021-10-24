@@ -15,7 +15,7 @@ winget install --accept-package-agreements --source msstore "Ubuntu 20.04 LTS" -
 
 Start the Ubuntu prompt, create user.
 
-Then install GUI apps (from Microsoft Store and [winget-pkgs repo](https://github.com/microsoft/winget-pkgs)) in Windows from a Powershell prompt:
+Then install GUI apps (from [Microsoft Store](https://www.microsoft.com/en-us/store/apps/windows) and [winget-pkgs repo](https://github.com/microsoft/winget-pkgs)) in Windows from a Powershell prompt:
 
 ```powershell
 # Coding
