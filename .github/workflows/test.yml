@@ -51,6 +51,7 @@ jobs:
         run: |
           installers/docker.sh
           sudo docker run hello-world
+        if: ${{ matrix.os == 'ubuntu-latest' }}
 
       # - name: Test snap apps setup
       #   run: |
