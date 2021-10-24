@@ -30,16 +30,49 @@ These are my personal dotfiles, for macOS, Windows and Linux. The setup is based
 
 ## macOS
 
+### Install dotfiles
+
 ```bash
 mkdir -p code/repos && cd code/repos
 git clone https://github.com/fredrikaverpil/dotfiles.git
 cd dotfiles && ./install -vv
 ```
 
+### Optional installation
+
+Install CLI and GUI apps:
+
 ```bash
-brew bundle --file=_macos/Brewfile  # install CLI apps and GUI apps
-installers/zsh.sh  # set up plugins
-installers/python.sh  # set up python via pyenv and pipx
+brew bundle --file=_macos/Brewfile
+installers/zsh.sh
+installers/python.sh
+```
+
+Terminal.app settings:
+
+```bash
+open _macos/terminal-ocean-dark.terminal
+defaults write com.apple.terminal "Default Window Settings" "terminal-ocean-dark"
+```
+
+Custom key bindings for Swedish characters in US English layout:
+
+```bash
+ln -sf $(pwd)/_macos/DefaultKeyBinding.dict ~/Library/KeyBindings/DefaultKeyBinding.dict
+```
+
+Avoid creating .DS_Store files on network or USB volumes:
+
+```bash
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+```
+
+Install Xcode commandline tools:
+
+```bash
+xcode-select --install
+sudo xcodebuild -license accept
 ```
 
 ## Windows 11 + WSL/Ubuntu
