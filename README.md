@@ -202,10 +202,11 @@ cd dotfiles && ./install -vv
 ```bash
 installers/python.sh
 installers/docker.sh  # only if Docker Desktop in Windows was not installed
-installers/snap-apps.sh
-installers/nix.sh
 installers/homebrew.sh  # experimental!
 installers/zsh.sh  # edit out the default prompt from ~/.zshrc after installation
+
+_linux/snap-apps.sh
+_linux/nix.sh
 ```
 
 ## Extras
