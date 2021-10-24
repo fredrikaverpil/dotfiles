@@ -27,10 +27,23 @@ These are my personal dotfiles, for macOS, Windows and Linux. The setup is based
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+## macOS
+
+```bash
+mkdir -p code/repos && cd code/repos
+git clone https://github.com/fredrikaverpil/dotfiles.git
+cd dotfiles && ./install -vv
+```
+
+```bash
+brew bundle --file=_macos/Brewfile  # install CLI apps and GUI apps
+installers/zsh.sh  # set up plugins
+installers/python.sh  # set up python via pyenv and pipx
+```
+
 ## Windows 11 + WSL/Ubuntu
 
 This setup aims to run GUIs in Windows with all terminal and coding activities in WSL/Ubuntu.
-
 
 ### Windows installations
 
