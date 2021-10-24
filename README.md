@@ -10,6 +10,7 @@ These are my personal dotfiles, for macOS, Windows and Linux. The setup is based
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
+- [macOS](#macos)
 - [Windows 11 + WSL/Ubuntu](#windows-11--wslubuntu)
   - [Windows installations](#windows-installations)
   - [WSL/Ubuntu installations](#wslubuntu-installations)
