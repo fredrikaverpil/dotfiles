@@ -107,6 +107,7 @@ Run from Powershell prompt:
 
 ```powershell
 cp \\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows\autohotkey.ahk "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\autohotkey.ahk"
+```
 
 <details>
   <summary>Click here to see symlinking instructions</summary>
