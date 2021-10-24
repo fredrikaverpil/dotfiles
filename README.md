@@ -21,7 +21,8 @@ These are my personal dotfiles, for macOS, Windows and Linux. The setup is based
 - [Ubuntu 20.04](#ubuntu-2004)
   - [Install dotfiles](#install-dotfiles)
   - [Optional installation](#optional-installation)
-- [To do](#to-do)
+- [Extras](#extras)
+  - [Clone all my public repos](#clone-all-my-public-repos)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
