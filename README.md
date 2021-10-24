@@ -11,6 +11,8 @@ These are my personal dotfiles, for macOS, Windows and Linux. The setup is based
 **Table of Contents**
 
 - [macOS](#macos)
+  - [Install dotfiles](#install-dotfiles)
+  - [Optional installation](#optional-installation)
 - [Windows 11 + WSL/Ubuntu](#windows-11--wslubuntu)
   - [Windows installations](#windows-installations)
   - [WSL/Ubuntu installations](#wslubuntu-installations)
@@ -21,8 +23,8 @@ These are my personal dotfiles, for macOS, Windows and Linux. The setup is based
   - [Closing notes](#closing-notes)
 - [Ubuntu 20.04](#ubuntu-2004)
   - [Prerequisites](#prerequisites)
-  - [Install dotfiles](#install-dotfiles)
-  - [Optional installation](#optional-installation)
+  - [Install dotfiles](#install-dotfiles-1)
+  - [Optional installation](#optional-installation-1)
 - [Extras](#extras)
   - [Clone all my public repos](#clone-all-my-public-repos)
 
