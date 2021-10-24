@@ -10,6 +10,7 @@ apt_install () {
 case `uname` in
     Darwin)
         # commands for macOS go here
+        # xcode-select --install
         installers/homebrew.sh
     ;;
     Linux)
