@@ -7,15 +7,26 @@
 # Per-platform settings
 case `uname` in
     Darwin)
-        # commands for Linux go here
+        # commands for macOS go here
+
+        base_python_version=`cat .python-version`
+
         if [ ! -d ~/.pyenv ]; then
-
-            # python building requirements
-            brew install openssl readline sqlite3 xz zlib
-
-            # install pyenv
+            brew install openssl readline sqlite3 xz zlib  # required to build python
             brew install pyenv
+
+            # install python version
+            pyenv install $base_python_version
         fi
+
+        if command -v pipx &> /dev/null; then
+            brew install pipx
+        fi
+
+        # pipx-installations
+        if [ ! -f ~/.local/bin/ipython ]; then pipx install ipython --pip-args rich ; fi
+        if [ ! -f ~/.local/bin/black ]; then pipx install black ; fi
+        if [ ! -f ~/.local/bin/poetry ]; then pipx install poetry ; fi
     ;;
     Linux)
         # commands for Linux go here
