@@ -19,6 +19,7 @@ These are my personal dotfiles, for macOS, Windows and Linux. The setup is based
     - [Set up HHKB for macOS-compatible workflow](#set-up-hhkb-for-macos-compatible-workflow)
   - [Closing notes](#closing-notes)
 - [Ubuntu 20.04](#ubuntu-2004)
+  - [Prerequisites](#prerequisites)
   - [Install dotfiles](#install-dotfiles)
   - [Optional installation](#optional-installation)
 - [Extras](#extras)
