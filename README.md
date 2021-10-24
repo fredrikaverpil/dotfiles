@@ -55,8 +55,9 @@ winget install --accept-package-agreements --source winget "SharpKeys" --id "Ran
 
 # Other
 winget install --accept-package-agreements --source winget "1Password" --id "AgileBits.1Password"
+winget install --accept-package-agreements --source winget "Signal" --id "OpenWhisperSystems.Signal"
 winget install --accept-package-agreements --source msstore "Spotify Music" --id 9NCBCSZSJRSB
-winget install --accept-package-agreements --source msstore "Microsoft PowerToys" --id XP89DCGQ3K6VLD 
+winget install --accept-package-agreements --source msstore "Microsoft PowerToys" --id XP89DCGQ3K6VLD
 ```
 
 ### WSL/Ubuntu installations
