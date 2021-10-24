@@ -2,6 +2,10 @@
 
 [![CI](https://github.com/fredrikaverpil/dotfiles/actions/workflows/build.yml/badge.svg)](https://github.com/fredrikaverpil/dotfiles/actions/workflows/build.yml)
 
+**Introduction**
+
+These are my personal dotfiles, for macOS, Windows and Linux. The setup is based on [dotbot](https://github.com/anishathalye/dotbot) and aims to be as idempotent as possible.
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
@@ -15,9 +19,11 @@
     - [Set up HHKB for macOS-compatible workflow](#set-up-hhkb-for-macos-compatible-workflow)
   - [Closing notes](#closing-notes)
 - [Ubuntu 20.04](#ubuntu-2004)
+  - [Prerequisites](#prerequisites)
   - [Install dotfiles](#install-dotfiles)
   - [Optional installation](#optional-installation)
-- [To do](#to-do)
+- [Extras](#extras)
+  - [Clone all my public repos](#clone-all-my-public-repos)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -50,7 +56,8 @@ winget install --accept-package-agreements --source msstore "Visual Studio Code"
 winget install --accept-package-agreements --source winget "Docker Desktop" --id "Docker.DockerDesktop"
 
 # HHKB/macOS compatible workflow
-winget install --accept-package-agreements --source msstore  "AutoHotkey Store Edition" --id 9NQ8Q8J78637
+winget install --accept-package-agreements --source msstore "PureText" --id 9PKJV6319QTL
+winget install --accept-package-agreements --source msstore "AutoHotkey Store Edition" --id 9NQ8Q8J78637
 winget install --accept-package-agreements --source winget "SharpKeys" --id "RandyRants.SharpKeys"
 
 # Other
@@ -94,7 +101,7 @@ New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.Win
 
 #### Set up [HHKB](https://happyhackingkb.com/) for macOS-compatible workflow
 
-Note: this assumes Autohotkey and Sharpkeys are already installed.
+Note: this assumes Autohotkey Sharpkeys and PureText are already installed.
 
 Run from administrative Powershell prompt:
 
@@ -105,6 +112,8 @@ New-Item -ItemType SymbolicLink -Path "$env:APPDATA\Microsoft\Windows\Start Menu
 
 Launch Sharpkeys, load the `\\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows\sharpkeys.skl` file, write changes to the Registry and reboot.
 
+In PureText, remap (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>v</kbd>) to enable pasting of text without formatting.
+
 ### Closing notes
 
 Reboot machine.
@@ -112,6 +121,8 @@ Reboot machine.
 Proceed with reading more on the Ubuntu setup to install zsh, Python etc.
 
 ## Ubuntu 20.04
+
+### Prerequisites
 
 ```bash
 sudo apt update
@@ -138,8 +149,13 @@ installers/homebrew.sh  # experimental!
 installers/zsh.sh  # edit out the default prompt from ~/.zshrc after installation
 ```
 
-## To do
+## Extras
 
-* improve this README (add note on setup being idempotent)
-* bring back details from old README
-* move macOS setup into dotbot.
+### Clone all my public repos
+
+If more than 100 repos, change `PAGE` variable..
+
+```bash
+cd ~/code/repos
+USER=fredrikaverpil; PAGE=1; curl "https://api.github.com/users/$USER/repos?page=$PAGE&per_page=100" | grep -e 'git_url*' | cut -d \" -f 4 | xargs -L1 git clone --recursive
+```
