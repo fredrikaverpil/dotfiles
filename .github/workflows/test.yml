@@ -8,7 +8,10 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v2
@@ -36,7 +39,6 @@ jobs:
           python -c "import sys; assert sys.version.startswith('${BASE_PYTHON_VER}')"
 
           # Test Pipx
-          /usr/bin/pipx list
           poetry --version
           black --version
           ipython --version
@@ -49,6 +51,7 @@ jobs:
         run: |
           installers/docker.sh
           sudo docker run hello-world
+        if: runner.os == 'Linux'
 
       # - name: Test snap apps setup
       #   run: |

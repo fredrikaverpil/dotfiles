@@ -7,7 +7,13 @@
 case `uname` in
     Darwin)
         # commands for macOS go here
-
+        if ! ls /Users/${USER}/Library/Fonts/Fira* 1> /dev/null 2>&1; then
+            curl --location --output ~/Downloads/FiraCode.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/FiraCode.zip
+            unzip -o ~/Downloads/FiraCode.zip -d ~/Downloads/FiraCode
+            cp -v ~/Downloads/FiraCode/*.ttf ~/Library/Fonts/
+            rm ~/Downloads/FiraCode.zip
+            rm -r ~/Downloads/FiraCode
+        fi
     ;;
     Linux)
         # commands for Linux go here

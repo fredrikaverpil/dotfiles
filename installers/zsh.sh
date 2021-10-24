@@ -10,6 +10,7 @@ apt_install () {
 case `uname` in
     Darwin)
         # commands for macOS go here
+        echo "ZSH already installed by defauly on macOS"
     ;;
     Linux)
         # commands for Linux go here

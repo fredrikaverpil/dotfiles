@@ -7,12 +7,29 @@
 # Per-platform settings
 case `uname` in
     Darwin)
-        # commands for Linux go here
-        if [ ! -d ~/.pyenv ]; then
-            brew install openssl readline sqlite3 xz zlib
+        # commands for macOS go here
 
-            curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+        base_python_version=`cat .python-version`
+
+        if [ ! -d ~/.pyenv ]; then
+            brew install pyenv pyenv-virtualenv
         fi
+
+        if command -v pyenv &> /dev/null; then
+            if [ ! -d ~/.pyenv/versions/${base_python_version} ]; then
+            brew install openssl readline sqlite3 xz zlib  # required to build python
+            pyenv install $base_python_version
+            fi
+        fi
+
+        if command -v pipx &> /dev/null; then
+            brew install pipx
+        fi
+
+        # pipx-installations
+        if [ ! -f ~/.local/bin/ipython ]; then pipx install ipython --pip-args rich ; fi
+        if [ ! -f ~/.local/bin/black ]; then pipx install black ; fi
+        if [ ! -f ~/.local/bin/poetry ]; then pipx install poetry ; fi
     ;;
     Linux)
         # commands for Linux go here
