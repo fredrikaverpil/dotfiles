@@ -10,6 +10,7 @@ apt_install () {
 case `uname` in
     Darwin)
         # commands for macOS go here
+        installers/homebrew.sh
     ;;
     Linux)
         # commands for Linux go here
