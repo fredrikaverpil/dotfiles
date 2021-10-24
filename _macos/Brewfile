@@ -7,8 +7,6 @@ cask_args appdir: '/Applications'
 # Taps (third-party repositories)
 tap 'homebrew/bundle'
 tap 'homebrew/core'
-tap 'caskroom/cask'
-tap 'caskroom/versions'
 
 # CLIs
 brew 'gh'
@@ -20,7 +18,11 @@ brew 'starship'
 brew 'tree'
 
 # Required to build python via pyenv: https://github.com/pyenv/pyenv/wiki
-brew 'openssl readline sqlite3 xz zlib'
+brew 'openssl'
+brew 'readline'
+brew 'sqlite3'
+brew 'xz'
+brew 'zlib'
 
 # GUIs
 cask 'appcleaner'
