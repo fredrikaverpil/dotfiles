@@ -72,7 +72,7 @@ New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.Win
 
 #### Set up HHKB for macOS-compatible workflow
 
-Note: Autohotkey and Sharpkeys should have been installed via `winget.ps1`.
+Note: this assumes Autohotkey and Sharpkeys are already installed.
 
 Run from administrative Powershell prompt:
 
