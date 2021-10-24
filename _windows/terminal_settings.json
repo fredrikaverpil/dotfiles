@@ -61,7 +61,7 @@
                 "experimental.retroTerminalEffect": false,
                 "font": 
                 {
-                    "face": "Fira Code",
+                    "face": "FiraCode Nerd Font Mono",
                     "size": 8
                 },
                 "guid": "{07b52e3e-de2c-5db4-bd2d-ba144ed6c273}",
@@ -79,7 +79,7 @@
                 "experimental.retroTerminalEffect": false,
                 "font": 
                 {
-                    "face": "Fira Code",
+                    "face": "FiraCode Nerd Font Mono",
                     "size": 8
                 },
                 "guid": "{5d2d4da2-f232-4880-9dd8-1ce908e3dd7e}",

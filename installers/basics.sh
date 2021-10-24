@@ -18,6 +18,7 @@ case `uname` in
             sudo add-apt-repository universe
             apt_install bash-completion
             apt_install curl
+            apt_install unzip  # needed by nerdfont installer
         fi
 
     ;;

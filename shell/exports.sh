@@ -1,3 +1,8 @@
+# Global settings
+export PIP_REQUIRE_VIRTUALENV=true  # use --isolated to bypass
+export PATH="$HOME/.local/bin:$PATH"  # pipx-installed binaries
+
+
 # Per-platform settings
 case `uname` in
     Darwin)
@@ -27,7 +32,3 @@ case `uname` in
     ;;
     *)
 esac
-
-# Global settings
-export PIP_REQUIRE_VIRTUALENV=true  # use --isolated to bypass
-export PATH="$HOME/.local/bin:$PATH"  # pipx-installed binaries
