@@ -65,7 +65,7 @@ New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.Win
 * Download [WSL Tray](https://github.com/yzgyyang/wsl-tray/releases)
 * Extract in `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup`
 
-#### Set up HHKB for macOS-compatible workflow
+#### Set up [HHKB](https://happyhackingkb.com/) for macOS-compatible workflow
 
 Note: this assumes Autohotkey and Sharpkeys are already installed.
 
