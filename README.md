@@ -4,7 +4,7 @@
 
 **Introduction**
 
-These are my personal dotfiles, for macOS, Windows and Linux. The setup is based on [dotbot]() and aims to be as idempotent as possible.
+These are my personal dotfiles, for macOS, Windows and Linux. The setup is based on [dotbot](https://github.com/anishathalye/dotbot) and aims to be as idempotent as possible.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -119,6 +119,8 @@ Reboot machine.
 Proceed with reading more on the Ubuntu setup to install zsh, Python etc.
 
 ## Ubuntu 20.04
+
+### Prerequisites
 
 ```bash
 sudo apt update
