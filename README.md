@@ -103,7 +103,7 @@ New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.Win
 
 Note: this assumes Autohotkey Sharpkeys and PureText are already installed.
 
-Run from Powershell prompt:
+* Install `autohotkey.ahk` by running this from a Powershell prompt:
 
 ```powershell
 cp \\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows\autohotkey.ahk "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\autohotkey.ahk"
@@ -112,22 +112,17 @@ cp \\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows\autoho
 <details>
   <summary>Click here to see symlinking instructions</summary>
 
-  Symlinking can be done from an administrative Powershell prompt:
+  Symlinking can be done, instead of copying the `autohotkey.ahk`, from an administrative Powershell prompt:
 
   ```powershell
   New-Item -ItemType SymbolicLink -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\autohotkey.ahk" -Value _windows\autohotkey.ahk
   ```
 
-  :warning: if WSL is not running, the AutoHotkey script won't run. It may be more desireable to copy the file into place.
+  :warning: ...however, if WSL is not running, the AutoHotkey script won't run. It may be more desireable to copy the file into place.
 </details>
 
-
-
-
-
-To override <kbd>Win (Left)</kbd> + <kbd>l</kbd>, launch Sharpkeys, load the `\\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows\sharpkeys.skl` file and write changes to the Registry.
-
-In PureText, remap (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>v</kbd>) to enable pasting of text without formatting.
+* To override <kbd>Win (Left)</kbd> + <kbd>l</kbd>, launch Sharpkeys, load the `\\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows\sharpkeys.skl` file and write changes to the Registry.
+* In PureText, remap (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>v</kbd>) to enable pasting of text without formatting.
 
 ### Closing notes
 
