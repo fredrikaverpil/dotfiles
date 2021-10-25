@@ -30,6 +30,8 @@ jobs:
 
       - name: Test Python setup
         run: |
+          installers/python.sh
+
           echo $PYENV_ROOT
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
           HOME=~/dotfiles-install-dir installers/python.sh
@@ -42,17 +44,25 @@ jobs:
           poetry --version
           black --version
           ipython --version
-
         env:
           PYENV_ROOT: /home/runner/dotfiles-install-dir/.pyenv
 
-
-      - name: Test Docker setup
+      - name: Test installers
         run: |
+          installers/homebrew.sh
+          installers/nerdfont.sh
+          installers/starship.sh
+          installers/zsh.sh
+          installers/gh.sh
+          installers/nix.sh
           installers/docker.sh
+
+      - name: Test Docker
+        run: |
           sudo docker run hello-world
         if: runner.os == 'Linux'
 
+      # Disabled, takes a very long time to run
       # - name: Test snap apps setup
       #   run: |
       #     installers/snap-apps.sh
