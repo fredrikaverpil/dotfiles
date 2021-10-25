@@ -33,7 +33,7 @@ These are my personal dotfiles, for macOS, Windows and Linux. The setup is based
 
 ## macOS
 
-[![asciicast](https://asciinema.org/a/444496.svg)](https://asciinema.org/a/444496)
+[![asciicast](https://asciinema.org/a/444500.svg)](https://asciinema.org/a/444500)
 
 ### Install dotfiles
 
