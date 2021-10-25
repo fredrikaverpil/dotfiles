@@ -56,6 +56,11 @@ jobs:
         run: |
           HOME=~/dotfiles-install-dir installers/docker.sh
 
+      - name: Test Brewfile install
+        run: |
+          brew bundle --file=_macos/Brewfile --verbose
+        if: runner.os == 'macOS'
+
       - name: Test Python installer + setup
         run: |
           echo $PYENV_ROOT
@@ -77,11 +82,6 @@ jobs:
         run: |
           sudo docker run hello-world
         if: runner.os == 'Linux'
-
-      - name: Test Brewfile install
-        run: |
-          brew bundle --file=_macos/Brewfile --verbose
-        if: runner.os == 'macOS'
 
       # Disabled, takes a very long time to run
       # - name: Test snap apps setup

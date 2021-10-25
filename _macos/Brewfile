@@ -29,7 +29,3 @@ cask 'appcleaner'
 cask 'docker'
 cask 'spotify'
 cask 'visual-studio-code'
-
-# Apple Store
-mas '1Password', id: 1333542190
-# mas 'Xcode', id: 497799835  # Slow download/install!
