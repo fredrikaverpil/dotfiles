@@ -1,6 +1,6 @@
 # dotfiles 🐚
 
-[![CI](https://github.com/fredrikaverpil/dotfiles/actions/workflows/build.yml/badge.svg)](https://github.com/fredrikaverpil/dotfiles/actions/workflows/test.yml)
+[![CI](https://github.com/fredrikaverpil/dotfiles/actions/workflows/test.yml/badge.svg)](https://github.com/fredrikaverpil/dotfiles/actions/workflows/test.yml)
 
 **Introduction**
 
@@ -32,6 +32,8 @@ These are my personal dotfiles, for macOS, Windows and Linux. The setup is based
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## macOS
+
+![image](https://user-images.githubusercontent.com/994357/138708537-7fe8588b-ac1b-45a4-8da5-b32209ee5313.png)
 
 ### Install dotfiles
 
