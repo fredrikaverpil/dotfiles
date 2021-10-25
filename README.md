@@ -34,6 +34,8 @@ These are my personal dotfiles, for macOS, Windows and Linux. The setup is based
 
 ### Install dotfiles
 
+Install:
+
 ```bash
 mkdir -p code/repos && cd code/repos
 git clone https://github.com/fredrikaverpil/dotfiles.git
@@ -45,9 +47,13 @@ cd dotfiles && ./install -vv
 Install CLI and GUI apps:
 
 ```bash
-brew bundle --file=_macos/Brewfile
+installers/homebrew.sh
 installers/zsh.sh
+installers/starship.sh
+installers/nerdfont.sh
+installers/gh.sh
 installers/python.sh
+brew bundle --file=_macos/Brewfile
 ```
 
 Terminal.app settings:
@@ -185,8 +191,9 @@ Proceed with reading more on the Ubuntu setup to install zsh, Python etc.
 
 ```bash
 sudo apt update
+sudo add-apt-repository universe
 sudo apt upgrade
-sudo apt install git
+sudo apt install git curl unzip bash-completion
 ```
 
 ### Install dotfiles
@@ -200,13 +207,16 @@ cd dotfiles && ./install -vv
 ### Optional installation
 
 ```bash
+installers/basics.sh
+installers/starship.sh
+installers/nerdfont.sh
+installers/zsh.sh  # remove the default prompt from ~/.zshrc after installation
+installers/gh.sh
 installers/python.sh
 installers/docker.sh  # only if Docker Desktop in Windows was not installed
 installers/homebrew.sh  # experimental!
-installers/zsh.sh  # edit out the default prompt from ~/.zshrc after installation
-
-_linux/snap-apps.sh
-_linux/nix.sh
+installers/snap-apps.sh
+installers/nix.sh
 ```
 
 ## Extras
