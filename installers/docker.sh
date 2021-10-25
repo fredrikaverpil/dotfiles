@@ -7,7 +7,7 @@ case `uname` in
     Darwin)
         # commands for macOS go here
         if ! command -v docker &> /dev/null; then
-            brew install --cask docker --appdir=/Applications
+            brew install --cask docker --appdir /Applications
         fi
 
     ;;

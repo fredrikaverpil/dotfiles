@@ -1,7 +1,7 @@
 # Usage:
 # brew bundle --file=path/to/Brewfile
 
-# Manually install using "brew install --cask xxx --appdir=/Applications"
+# Manually install cask-app using: brew install --cask xxx --appdir /Applications
 cask_args appdir: '/Applications'
 
 # Taps (third-party repositories)
