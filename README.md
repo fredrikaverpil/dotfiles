@@ -1,6 +1,6 @@
 # dotfiles 🐚
 
-[![CI](https://github.com/fredrikaverpil/dotfiles/actions/workflows/build.yml/badge.svg)](https://github.com/fredrikaverpil/dotfiles/actions/workflows/test.yml)
+[![CI](https://github.com/fredrikaverpil/dotfiles/actions/workflows/test.yml/badge.svg)](https://github.com/fredrikaverpil/dotfiles/actions/workflows/test.yml)
 
 **Introduction**
 
