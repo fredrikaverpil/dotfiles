@@ -27,12 +27,6 @@
   # zsh
   - grep -qxF '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' ~/.zshrc || echo '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' >> ~/.zshrc
 
-  # install software
-  - installers/basics.sh
-  - installers/starship.sh
-  - installers/nerdfont.sh
-  - installers/gh.sh
-
   # ssh
   - mkdir -p ~/.ssh && chmod 700 ~/.ssh
   - touch ~/.ssh/known_hosts && chmod 644 ~/.ssh/known_hosts

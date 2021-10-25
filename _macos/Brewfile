@@ -1,7 +1,7 @@
 # Usage:
 # brew bundle --file=path/to/Brewfile
 
-# Manually install using "brew install --cask xxx --appdir=/Applications"
+# Manually install cask-app using: brew install --cask xxx --appdir /Applications
 cask_args appdir: '/Applications'
 
 # Taps (third-party repositories)
@@ -9,27 +9,11 @@ tap 'homebrew/bundle'
 tap 'homebrew/core'
 
 # CLIs
-brew 'gh'
-brew 'mas'
-brew 'pipx'
-brew 'pyenv-virtualenv'
-brew 'pyenv'
-brew 'starship'
+brew 'rectangle'
 brew 'tree'
-
-# Required to build python via pyenv: https://github.com/pyenv/pyenv/wiki
-brew 'openssl'
-brew 'readline'
-brew 'sqlite3'
-brew 'xz'
-brew 'zlib'
 
 # GUIs
 cask 'appcleaner'
 cask 'docker'
 cask 'spotify'
 cask 'visual-studio-code'
-
-# Apple Store
-mas '1Password', id: 1333542190
-# mas 'Xcode', id: 497799835  # Slow download/install!
