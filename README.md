@@ -65,6 +65,8 @@ brew bundle --file=_macos/Brewfile
 brew bundle --file=_macos/Brewfile_mas  # Requires having logged into the App Store
 ```
 
+### Configuration
+
 Terminal.app settings:
 
 ```bash
