@@ -39,6 +39,11 @@ jobs:
           installers/docker.sh
           installers/python.sh
 
+      - name: Test Brewfile
+        run: |
+          brew bundle --file=_macos/Brewfile --verbose
+        if: runner.os == 'macOS'
+
       - name: Test Python setup
         run: |
           echo $PYENV_ROOT
