@@ -1,6 +1,6 @@
 # dotfiles 🐚
 
-[![CI](https://github.com/fredrikaverpil/dotfiles/actions/workflows/build.yml/badge.svg)](https://github.com/fredrikaverpil/dotfiles/actions/workflows/build.yml)
+[![CI](https://github.com/fredrikaverpil/dotfiles/actions/workflows/build.yml/badge.svg)](https://github.com/fredrikaverpil/dotfiles/actions/workflows/test.yml)
 
 **Introduction**
 
@@ -13,10 +13,11 @@ These are my personal dotfiles, for macOS, Windows and Linux. The setup is based
 - [macOS](#macos)
   - [Install dotfiles](#install-dotfiles)
   - [Optional installation](#optional-installation)
+  - [Configuration](#configuration)
 - [Windows 11 + WSL/Ubuntu](#windows-11--wslubuntu)
   - [Windows installations](#windows-installations)
   - [WSL/Ubuntu installations](#wslubuntu-installations)
-  - [Configuration](#configuration)
+  - [Configuration](#configuration-1)
     - [Windows Terminal settings](#windows-terminal-settings)
     - [WSL Tray](#wsl-tray)
     - [Set up HHKB for macOS-compatible workflow](#set-up-hhkb-for-macos-compatible-workflow)
@@ -64,6 +65,8 @@ installers/python.sh
 brew bundle --file=_macos/Brewfile
 brew bundle --file=_macos/Brewfile_mas  # Requires having logged into the App Store
 ```
+
+### Configuration
 
 Terminal.app settings:
 
