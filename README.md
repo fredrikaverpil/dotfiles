@@ -213,7 +213,6 @@ installers/zsh.sh  # remove the default prompt from ~/.zshrc after installation
 installers/gh.sh
 installers/python.sh
 installers/docker.sh  # only if Docker Desktop in Windows was not installed
-installers/homebrew.sh  # experimental!
 installers/snap-apps.sh
 installers/nix.sh
 ```
