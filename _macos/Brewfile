@@ -9,6 +9,7 @@ tap 'homebrew/bundle'
 tap 'homebrew/core'
 
 # CLIs
+brew 'asciinema'
 brew 'rectangle'
 brew 'tree'
 
