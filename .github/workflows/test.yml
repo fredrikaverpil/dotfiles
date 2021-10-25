@@ -28,10 +28,19 @@ jobs:
         run: |
           ls -alh ~/dotfiles-install-dir
 
-      - name: Test Python setup
+      - name: Test installers
         run: |
+          installers/homebrew.sh
+          installers/nerdfont.sh
+          installers/starship.sh
+          installers/zsh.sh
+          installers/gh.sh
+          installers/nix.sh
+          installers/docker.sh
           installers/python.sh
 
+      - name: Test Python setup
+        run: |
           echo $PYENV_ROOT
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
           HOME=~/dotfiles-install-dir installers/python.sh
@@ -47,17 +56,7 @@ jobs:
         env:
           PYENV_ROOT: /home/runner/dotfiles-install-dir/.pyenv
 
-      - name: Test installers
-        run: |
-          installers/homebrew.sh
-          installers/nerdfont.sh
-          installers/starship.sh
-          installers/zsh.sh
-          installers/gh.sh
-          installers/nix.sh
-          installers/docker.sh
-
-      - name: Test Docker
+      - name: Test Docker setup
         run: |
           sudo docker run hello-world
         if: runner.os == 'Linux'
