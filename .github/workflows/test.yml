@@ -31,13 +31,13 @@ jobs:
       - name: Test installers
         run: |
           # note that python installer is executed in the Python setup test
-          installers/homebrew.sh
-          installers/nerdfont.sh
-          installers/starship.sh
-          installers/zsh.sh
-          installers/gh.sh
-          installers/nix.sh
-          installers/docker.sh
+          HOME=~/dotfiles-install-dir installers/homebrew.sh
+          HOME=~/dotfiles-install-dir installers/nerdfont.sh
+          HOME=~/dotfiles-install-dir installers/starship.sh
+          HOME=~/dotfiles-install-dir installers/zsh.sh
+          HOME=~/dotfiles-install-dir installers/gh.sh
+          HOME=~/dotfiles-install-dir installers/nix.sh
+          HOME=~/dotfiles-install-dir installers/docker.sh
 
       - name: Test Python installer + setup
         run: |
