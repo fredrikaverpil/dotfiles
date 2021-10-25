@@ -207,7 +207,6 @@ cd dotfiles && ./install -vv
 ### Optional installation
 
 ```bash
-installers/basics.sh
 installers/starship.sh
 installers/nerdfont.sh
 installers/zsh.sh  # remove the default prompt from ~/.zshrc after installation
