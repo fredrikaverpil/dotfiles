@@ -44,6 +44,13 @@ cd dotfiles && ./install -vv
 
 ### Optional installation
 
+Install Xcode commandline tools:
+
+```bash
+xcode-select --install
+sudo xcodebuild -license accept
+```
+
 Install CLI and GUI apps:
 
 ```bash
@@ -53,7 +60,9 @@ installers/starship.sh
 installers/nerdfont.sh
 installers/gh.sh
 installers/python.sh
+
 brew bundle --file=_macos/Brewfile
+brew bundle --file=_macos/Brewfile_mas  # Requires having logged into the App Store
 ```
 
 Terminal.app settings:
@@ -74,13 +83,6 @@ Avoid creating .DS_Store files on network or USB volumes:
 ```bash
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
 defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
-```
-
-Install Xcode commandline tools:
-
-```bash
-xcode-select --install
-sudo xcodebuild -license accept
 ```
 
 ## Windows 11 + WSL/Ubuntu

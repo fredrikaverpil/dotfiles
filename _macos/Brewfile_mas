@@ -1,0 +1,8 @@
+brew 'mas'
+
+mas '1Password', id: 1333542190
+mas 'Keka', id: 470158793
+mas 'Slack', id: 803453959
+mas 'Lightroom', id: 1451544217
+
+# mas 'Xcode', id: 497799835  # Slow download/install!
