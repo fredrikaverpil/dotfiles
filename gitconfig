@@ -1,18 +1,24 @@
 [user]
-  name = Fredrik Averpil
-  email = fredrik.averpil@gmail.com
+	name = Fredrik Averpil
+	email = fredrik.averpil@gmail.com
 [core]
 	excludesfile = ~/.gitignore_global
-  editor = code --wait
+	editor = code --wait
 [merge]
-    tool = vscode
+	tool = vscode
 [mergetool "vscode"]
-    cmd = code --wait $MERGED
+	cmd = code --wait $MERGED
 [diff]
-    tool = vscode
+	tool = vscode
 [difftool "vscode"]
-    cmd = code --wait --diff $LOCAL $REMOTE
+	cmd = code --wait --diff $LOCAL $REMOTE
 [credential "https://github.com"]
 	helper = !/usr/bin/gh auth git-credential
 [init]
 	defaultBranch = main
+[pull]
+	rebase = false
+
+# Always keep work gitconfig at bottom of this file
+[includeIf "gitdir:~/code/repos/doktor/**/.git"]
+	path = ~/.gitconfig_doktor
