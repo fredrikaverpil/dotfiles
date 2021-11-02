@@ -15,6 +15,7 @@
     ~/.bashrc_user: bashrc
     ~/.zshrc_user: zshrc
     ~/.gitconfig: gitconfig
+    ~/.gitconfig_doktor: gitconfig_doktor
     ~/.gitignore_global: gitignore_global
     ~/.ipython/profile_default/ipython_config.py: ipython_config.py
 
