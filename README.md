@@ -103,7 +103,7 @@ Run from administrative Powershell prompt:
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
 
 # Install from ms store
-winget install --accept-package-agreements --source msstore "Windows Subsystem for Linux" --id 9P9TQF7MRM4R
+winget install --accept-package-agreements --accept-source-agreements --source msstore "Windows Subsystem for Linux" --id 9P9TQF7MRM4R
 winget install --accept-package-agreements --source msstore "Ubuntu 20.04 LTS" --id 9N6SVWS3RX71
 ```
 
@@ -116,6 +116,8 @@ Then install GUI apps (from [Microsoft Store](https://www.microsoft.com/en-us/st
 winget install --accept-package-agreements --source msstore "Windows Terminal" --id 9N0DX20HK701
 winget install --accept-package-agreements --source msstore "Visual Studio Code" --id XP9KHM4BK9FZ7Q
 winget install --accept-package-agreements --source winget "Docker Desktop" --id "Docker.DockerDesktop"
+winget install --accept-package-agreements --source msstore "Slack" --id "9WZDNCRDK3WP"
+winget install --accept-package-agreements --source winget "Notion" --id "Notion.Notion"
 
 # HHKB/macOS compatible workflow
 winget install --accept-package-agreements --source msstore "PureText" --id 9PKJV6319QTL
