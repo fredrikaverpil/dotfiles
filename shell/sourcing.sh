@@ -1,3 +1,9 @@
+# SSH, make use of all keys
+if [ -z "$SSH_AUTH_SOCK" ] ; then
+    eval `ssh-agent -s`
+    ssh-add
+fi
+
 # Rust
 if [ -f ~/.cargo/env ]; then
     . "$HOME/.cargo/env"
