@@ -9,6 +9,7 @@ alias master-reset='git checkout -B master origin/master && git pull'
 alias purge-merged-branches='git branch --merged | egrep -v "(^\*|master|main|dev)" | xargs git branch -d'
 alias gg='git rev-list --all | xargs git --no-pager grep --color=never --extended-regexp --ignore-case'  # usage: gg <regexp>
 alias glog='git log --graph --decorate --pretty=oneline --abbrev-commit'
+alias submodule-reset='git submodule deinit -f . && git submodule update --init --recursive'
 
 # Docker
 alias wrk='docker run --interactive --tty --rm skandyla/wrk'
@@ -26,11 +27,11 @@ alias activate='source .venv/bin/activate'
 alias venv='PIP_REQUIRE_VIRTUALENV=false python -m pip install --upgrade --user pip virtualenv && python -m virtualenv .venv && source .venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
 
 # Gerrit
-alias gerrit-push='git push origin HEAD:refs/for/master'
-alias gerrit-draft='git push origin HEAD:refs/drafts/master'
-alias gerrit-amend='git commit --amend'
-alias gp='gerrit-amend && gerrit-push'
-alias gp-draft='gerrit-amend && gerrit-draft'
+# alias gerrit-push='git push origin HEAD:refs/for/master'
+# alias gerrit-draft='git push origin HEAD:refs/drafts/master'
+# alias gerrit-amend='git commit --amend'
+# alias gp='gerrit-amend && gerrit-push'
+# alias gp-draft='gerrit-amend && gerrit-draft'
 
 
 # Per-platform settings, will override the above commands

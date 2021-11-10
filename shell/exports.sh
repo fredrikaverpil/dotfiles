@@ -1,9 +1,9 @@
 # Global settings
 export PIP_REQUIRE_VIRTUALENV=true  # use --isolated to bypass
 export PATH="$HOME/.local/bin:$PATH"  # pipx-installed binaries
+export PATH="$PATH:$HOME/code/repos/dotfiles/bin"  # dotfiles-bin
 
-
-# Per-platform settings
+#Per-platform settings
 case `uname` in
     Darwin)
         # export PATH="$PATH:~/miniconda3/bin"
