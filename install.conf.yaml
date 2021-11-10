@@ -17,6 +17,7 @@
     ~/.gitconfig: gitconfig
     ~/.gitconfig_doktor: gitconfig_doktor
     ~/.gitignore_global: gitignore_global
+    ~/.tmux.conf:
     ~/.ipython/profile_default/ipython_config.py: ipython_config.py
 
 - shell:
