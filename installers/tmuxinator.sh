@@ -11,12 +11,11 @@ case `uname` in
     ;;
     Linux)
         # commands for Linux go here
+        if ! command -v gem &> /dev/null; then
+            sudo apt install ruby
+        fi
+
         if ! command -v tmuxinator &> /dev/null; then
-
-            if ! command -v gem &> /dev/null; then
-                sudo apt install ruby
-            fi
-
             sudo gem install tmuxinator
 
             # zsh completion
