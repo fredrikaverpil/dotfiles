@@ -96,6 +96,19 @@ This setup aims to run GUIs in Windows with all terminal and coding activities i
 
 ### Windows installations
 
+<details>
+  <summary>Click here for instructions in older Windows 10</summary>
+
+  ```powershell
+  Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
+  wsl --install
+  # reboot!
+  wsl --list --online
+  wsl --install --distribution Ubuntu-20.04
+  ```
+
+</details>
+
 Run from administrative Powershell prompt:
 
 ```powershell
