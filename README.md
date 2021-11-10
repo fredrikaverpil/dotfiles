@@ -113,6 +113,9 @@ This setup aims to run GUIs in Windows with all terminal and coding activities i
   
   # install!
   wsl --install --distribution Ubuntu-20.04
+  
+  # get winget by downloading "App Installer" from the Microsoft Store:
+  # https://www.microsoft.com/en-us/p/app-installer/9nblggh4nns1
   ```
 
 </details>
