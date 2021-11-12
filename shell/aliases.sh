@@ -1,13 +1,18 @@
+# Aliases; runs in the same shell you are already in
+# See bin folder for scripts which will run in their own shell
+
 # Global settings
 alias repos='cd ~/code/repos'
 alias ll='ls -alhF'
 alias tree='tree -C'
 
+# Doktor
+alias doktor='cd ~/code/repos/doktor'
+alias mux='cd ~/code/repos/doktor && tmuxinator'
+
 # Git
-alias rebase='git pull --rebase origin master'
-alias master-reset='git checkout -B master origin/master && git pull'
-alias purge-merged-branches='git branch --merged | egrep -v "(^\*|master|main|dev)" | xargs git branch -d'
-alias gg='git rev-list --all | xargs git --no-pager grep --color=never --extended-regexp --ignore-case'  # usage: gg <regexp>
+alias git-purge='git branch --merged | egrep -v "(^\*|master|main|dev)" | xargs git branch -d'
+alias git-grep='git rev-list --all | xargs git --no-pager grep --extended-regexp --ignore-case'  # usage: gg <regexp>
 alias glog='git log --graph --decorate --pretty=oneline --abbrev-commit'
 alias submodule-reset='git submodule deinit -f . && git submodule update --init --recursive'
 

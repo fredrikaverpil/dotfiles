@@ -1,7 +1,7 @@
 # Global settings
 export PIP_REQUIRE_VIRTUALENV=true  # use --isolated to bypass
 export PATH="$HOME/.local/bin:$PATH"  # pipx-installed binaries
-export PATH="$PATH:$HOME/code/repos/dotfiles/bin"  # dotfiles-bin
+export PATH="$PATH:$HOME/code/repos/dotfiles/shell/bin"  # dotfiles-bin
 
 #Per-platform settings
 case `uname` in
