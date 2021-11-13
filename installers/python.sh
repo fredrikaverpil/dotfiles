@@ -72,6 +72,9 @@ case `uname` in
         if [ ! -f ~/.local/bin/ipython ]; then /usr/bin/pipx install ipython --pip-args rich ; fi
         if [ ! -f ~/.local/bin/black ]; then /usr/bin/pipx install black ; fi
         if [ ! -f ~/.local/bin/poetry ]; then /usr/bin/pipx install poetry ; fi
+        if [ ! -f ~/.local/bin/bandit ]; then /usr/bin/pipx install bandit ; fi
+        if [ ! -f ~/.local/bin/mypy ]; then /usr/bin/pipx install mypy ; fi
+        if [ ! -f ~/.local/bin/flake8 ]; then /usr/bin/pipx install flake8 ; fi
 
     ;;
     FreeBSD)
