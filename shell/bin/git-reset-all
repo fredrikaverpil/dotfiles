@@ -1,0 +1,13 @@
+#!/bin/bash -e
+
+for x in *; do
+    if [ -d "${x}" ]; then
+        current_dir=`pwd`
+        cd $x
+        pwd
+        git-reset
+        echo "-----"
+
+        cd $current_dir
+    fi
+done
