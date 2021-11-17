@@ -1,0 +1,3 @@
+#!/bin/bash
+
+find . -name .git -type d -execdir sh -c 'pwd ;git branch; echo "-----"' \;
