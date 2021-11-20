@@ -46,10 +46,8 @@ case `uname` in
 
             brew86 install openssl readline sqlite3 xz zlib  # required to build python
 
-            CFLAGS="-I$(brew86 --prefix openssl)/include" \
-            LDFLAGS="-L$(brew86 --prefix openssl)/lib" \
             VERSION_ALIAS="${base_python_version}_x86" \
-            pyenv86 install -v $base_python_version
+                pyenv86 install -v $base_python_version
 
             brew86 install pipx
             pipx86 install poetry --suffix @x86
