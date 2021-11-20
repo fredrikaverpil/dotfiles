@@ -1,6 +1,8 @@
 #!/bin/sh
 
+# Usage
+# VERSION_ALIAS="3.8.12_x86" pyenv86 install 3.8.12
 
-arch -x86_64    CFLAGS="-I$(brew86 --prefix openssl)/include" \
-                LDFLAGS="-L$(brew86 --prefix openssl)/lib" \
-                pyenv "$@"
+CFLAGS="-I$(brew86 --prefix openssl)/include" \
+LDFLAGS="-L$(brew86 --prefix openssl)/lib" \
+    arch -x86_64 pyenv "$@"
