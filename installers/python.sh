@@ -40,24 +40,19 @@ case `uname` in
         if [ ! -f ~/.local/bin/flake8 ]; then /opt/homebrew/bin/pipx install pre-commit ; fi
 
         # x86
-        if [ ! -d /usr/local/bin/brew ]; then
-            if [ ! -d ~/.pyenv/versions/${base_python_version}_x86 ]; then
-                # http://sixty-north.com/blog/pyenv-apple-silicon.html
 
-                softwareupdate —install-rosetta
-                arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+        if [ ! -d ~/.pyenv/versions/${base_python_version}_x86 ]; then
+            # http://sixty-north.com/blog/pyenv-apple-silicon.html
 
-                brew86 install openssl readline sqlite3 xz zlib  # required to build python
+            brew86 install openssl readline sqlite3 xz zlib  # required to build python
 
-                CFLAGS="-I$(brew86 --prefix openssl)/include" \
-                LDFLAGS="-L$(brew86 --prefix openssl)/lib" \
-                VERSION_ALIAS="${base_python_version}_x86" \
-                pyenv86 install -v $base_python_version
+            CFLAGS="-I$(brew86 --prefix openssl)/include" \
+            LDFLAGS="-L$(brew86 --prefix openssl)/lib" \
+            VERSION_ALIAS="${base_python_version}_x86" \
+            pyenv86 install -v $base_python_version
 
-                brew86 install pipx
-                pipx86 install poetry --suffix @x86
-
-            fi
+            brew86 install pipx
+            pipx86 install poetry --suffix @x86
         fi
     ;;
     Linux)
