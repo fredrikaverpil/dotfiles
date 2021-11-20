@@ -15,6 +15,10 @@ case `uname` in
             brew install pyenv pyenv-virtualenv
         fi
 
+        if [ ! -d ~/.pyenv/plugins/pyenv-alias ]; then
+            git clone https://github.com/s1341/pyenv-alias.git ~/.pyenv/plugins/pyenv-alias
+        fi
+
         if command -v pyenv &> /dev/null; then
             if [ ! -d ~/.pyenv/versions/${base_python_version} ]; then
                 brew install openssl readline sqlite3 xz zlib  # required to build python
@@ -22,18 +26,41 @@ case `uname` in
             fi
         fi
 
+        brew86 install openssl readline sqlite3 xz zlib
+
         if command -v pipx &> /dev/null; then
             brew install pipx
         fi
 
         # pipx-installations
-        if [ ! -f ~/.local/bin/ipython ]; then /usr/bin/pipx install ipython --pip-args rich ; fi
-        if [ ! -f ~/.local/bin/black ]; then /usr/bin/pipx install black ; fi
-        if [ ! -f ~/.local/bin/poetry ]; then /usr/bin/pipx install poetry ; fi
-        if [ ! -f ~/.local/bin/bandit ]; then /usr/bin/pipx install bandit ; fi
-        if [ ! -f ~/.local/bin/mypy ]; then /usr/bin/pipx install mypy ; fi
-        if [ ! -f ~/.local/bin/flake8 ]; then /usr/bin/pipx install flake8 ; fi
-        if [ ! -f ~/.local/bin/flake8 ]; then /usr/bin/pipx install pre-commit ; fi
+        if [ ! -f ~/.local/bin/ipython ]; then pipx install ipython --pip-args rich ; fi
+        if [ ! -f ~/.local/bin/black ]; then pipx install black ; fi
+        if [ ! -f ~/.local/bin/poetry ]; then pipx install poetry ; fi
+        if [ ! -f ~/.local/bin/bandit ]; then pipx install bandit ; fi
+        if [ ! -f ~/.local/bin/mypy ]; then pipx install mypy ; fi
+        if [ ! -f ~/.local/bin/flake8 ]; then pipx install flake8 ; fi
+        if [ ! -f ~/.local/bin/flake8 ]; then pipx install pre-commit ; fi
+
+        # x86
+        if command -v pyenv86 &> /dev/null; then
+            if [ ! -d ~/.pyenv/versions/${base_python_version}_x86 ]; then
+                # http://sixty-north.com/blog/pyenv-apple-silicon.html
+
+                softwareupdate —install-rosetta
+                arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+
+                brew86 install openssl readline sqlite3 xz zlib  # required to build python
+
+                CFLAGS="-I$(brew86 --prefix openssl)/include" \
+                LDFLAGS="-L$(brew86 --prefix openssl)/lib" \
+                VERSION_ALIAS="${base_python_version}_x86" \
+                pyenv86 install -v $base_python_version
+
+                brew86 install pipx
+                pipx86 install poetry --suffix @x86
+
+            fi
+        fi
     ;;
     Linux)
         # commands for Linux go here

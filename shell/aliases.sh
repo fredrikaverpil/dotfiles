@@ -42,8 +42,7 @@ alias venv='PIP_REQUIRE_VIRTUALENV=false python -m pip install --upgrade --user 
 # Per-platform settings, will override the above commands
 case `uname` in
     Darwin)
-        # commands for macOS Big Sur go here
-
+        # commands for macOS go here
     ;;
     Linux)
         # commands for Linux go here
