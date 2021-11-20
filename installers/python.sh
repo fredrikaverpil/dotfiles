@@ -26,23 +26,21 @@ case `uname` in
             fi
         fi
 
-        brew86 install openssl readline sqlite3 xz zlib
-
         if command -v pipx &> /dev/null; then
             brew install pipx
         fi
 
         # pipx-installations
-        if [ ! -f ~/.local/bin/ipython ]; then pipx install ipython --pip-args rich ; fi
-        if [ ! -f ~/.local/bin/black ]; then pipx install black ; fi
-        if [ ! -f ~/.local/bin/poetry ]; then pipx install poetry ; fi
-        if [ ! -f ~/.local/bin/bandit ]; then pipx install bandit ; fi
-        if [ ! -f ~/.local/bin/mypy ]; then pipx install mypy ; fi
-        if [ ! -f ~/.local/bin/flake8 ]; then pipx install flake8 ; fi
-        if [ ! -f ~/.local/bin/flake8 ]; then pipx install pre-commit ; fi
+        if [ ! -f ~/.local/bin/ipython ]; then /opt/homebrew/bin/pipx install ipython --pip-args rich ; fi
+        if [ ! -f ~/.local/bin/black ]; then /opt/homebrew/bin/pipx install black ; fi
+        if [ ! -f ~/.local/bin/poetry ]; then /opt/homebrew/bin/pipx install poetry ; fi
+        if [ ! -f ~/.local/bin/bandit ]; then /opt/homebrew/bin/pipx install bandit ; fi
+        if [ ! -f ~/.local/bin/mypy ]; then /opt/homebrew/bin/pipx install mypy ; fi
+        if [ ! -f ~/.local/bin/flake8 ]; then /opt/homebrew/bin/pipx install flake8 ; fi
+        if [ ! -f ~/.local/bin/flake8 ]; then /opt/homebrew/bin/pipx install pre-commit ; fi
 
         # x86
-        if command -v pyenv86 &> /dev/null; then
+        if [ ! -d /usr/local/bin/brew ]; then
             if [ ! -d ~/.pyenv/versions/${base_python_version}_x86 ]; then
                 # http://sixty-north.com/blog/pyenv-apple-silicon.html
 
