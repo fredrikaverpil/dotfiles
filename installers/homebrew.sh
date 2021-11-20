@@ -6,8 +6,15 @@
 case `uname` in
     Darwin)
         # commands for macOS go here
+
         if ! command -v brew &> /dev/null; then
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        fi
+
+        # x86
+        if [ ! -d /usr/local/bin/brew ]; then
+            softwareupdate —install-rosetta
+            arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
         fi
     ;;
     Linux)
