@@ -34,7 +34,7 @@ case `uname` in
 
 
         # x86_64
-        if [ "`uname -m`" == "arm64" && ! -d ~/.pyenv/versions/${base_python_version}_x86 ]; then
+        if [ "`uname -m`" == "arm64" ] && [ ! -d ~/.pyenv/versions/${base_python_version}_x86 ]; then
             # http://sixty-north.com/blog/pyenv-apple-silicon.html
             brew86 install openssl readline sqlite3 xz zlib  # required to build python
             VERSION_ALIAS="${base_python_version}_x86" \
