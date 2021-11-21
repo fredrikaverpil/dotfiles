@@ -80,6 +80,7 @@ defaults write com.apple.terminal "Default Window Settings" "terminal-ocean-dark
 Custom key bindings for Swedish characters in US English layout:
 
 ```bash
+mkdir ~/Library/KeyBindings/
 ln -sf $(pwd)/_macos/DefaultKeyBinding.dict ~/Library/KeyBindings/DefaultKeyBinding.dict
 ```
 
