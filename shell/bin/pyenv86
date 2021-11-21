@@ -5,4 +5,4 @@
 
 CFLAGS="-I$(brew86 --prefix openssl)/include" \
 LDFLAGS="-L$(brew86 --prefix openssl)/lib" \
-    arch -x86_64 pyenv "$@"
+arch -x86_64 pyenv "$@"
