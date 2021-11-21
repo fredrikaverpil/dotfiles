@@ -5,7 +5,7 @@
 # https://github.com/pypa/pipx
 
 # Per-platform settings
-case `uname` [in
+case `uname` in
     Darwin)
         # commands for macOS go here
 
