@@ -5,54 +5,44 @@
 # https://github.com/pypa/pipx
 
 # Per-platform settings
-case `uname` in
+case `uname` [in
     Darwin)
         # commands for macOS go here
 
         base_python_version=`cat .python-version`
 
         if [ ! -d ~/.pyenv ]; then
-            echo "Installing pyenv into ${HOME}/.pyenv ..."
             curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
-
-        fi
-
-        if [ ! -d ~/.pyenv/plugins/pyenv-alias ]; then
             git clone https://github.com/s1341/pyenv-alias.git ~/.pyenv/plugins/pyenv-alias
         fi
 
-        if command -v pyenv &> /dev/null; then
-            if [ ! -d ~/.pyenv/versions/${base_python_version} ]; then
-                brew install openssl readline sqlite3 xz zlib  # required to build python
-                pyenv install $base_python_version
-            fi
+        if [ ! -d ~/.pyenv/versions/${base_python_version} ]; then
+            brew install openssl readline sqlite3 xz zlib  # required to build python
+            pyenv install $base_python_version
         fi
 
-        if command -v pipx &> /dev/null; then
+        if ! brew list pipx &>/dev/null; then
             brew install pipx
+            if [ ! -f ~/.local/bin/ipython ]; then /opt/homebrew/bin/pipx install ipython --pip-args rich ; fi
+            if [ ! -f ~/.local/bin/black ]; then /opt/homebrew/bin/pipx install black ; fi
+            if [ ! -f ~/.local/bin/poetry ]; then /opt/homebrew/bin/pipx install poetry ; fi
+            if [ ! -f ~/.local/bin/bandit ]; then /opt/homebrew/bin/pipx install bandit ; fi
+            if [ ! -f ~/.local/bin/mypy ]; then /opt/homebrew/bin/pipx install mypy ; fi
+            if [ ! -f ~/.local/bin/flake8 ]; then /opt/homebrew/bin/pipx install flake8 ; fi
+            if [ ! -f ~/.local/bin/pre-commit ]; then /opt/homebrew/bin/pipx install pre-commit ; fi
         fi
 
-        # pipx-installations
-        if [ ! -f ~/.local/bin/ipython ]; then /opt/homebrew/bin/pipx install ipython --pip-args rich ; fi
-        if [ ! -f ~/.local/bin/black ]; then /opt/homebrew/bin/pipx install black ; fi
-        if [ ! -f ~/.local/bin/poetry ]; then /opt/homebrew/bin/pipx install poetry ; fi
-        if [ ! -f ~/.local/bin/bandit ]; then /opt/homebrew/bin/pipx install bandit ; fi
-        if [ ! -f ~/.local/bin/mypy ]; then /opt/homebrew/bin/pipx install mypy ; fi
-        if [ ! -f ~/.local/bin/flake8 ]; then /opt/homebrew/bin/pipx install flake8 ; fi
-        if [ ! -f ~/.local/bin/flake8 ]; then /opt/homebrew/bin/pipx install pre-commit ; fi
 
-        # x86
-
+        # x86_64
         if [ ! -d ~/.pyenv/versions/${base_python_version}_x86 ]; then
             # http://sixty-north.com/blog/pyenv-apple-silicon.html
-
             brew86 install openssl readline sqlite3 xz zlib  # required to build python
-
             VERSION_ALIAS="${base_python_version}_x86" \
                 pyenv86 install -v $base_python_version
 
             brew86 install pipx
-            pipx86 install poetry --suffix @x86
+
+            if [ ! -f ~/.local/bin/poetry@x86 ]; then pipx86 install poetry --suffix @x86 ; fi
         fi
     ;;
     Linux)
