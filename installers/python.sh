@@ -12,7 +12,9 @@ case `uname` in
         base_python_version=`cat .python-version`
 
         if [ ! -d ~/.pyenv ]; then
-            brew install pyenv pyenv-virtualenv
+            echo "Installing pyenv into ${HOME}/.pyenv ..."
+            curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+
         fi
 
         if [ ! -d ~/.pyenv/plugins/pyenv-alias ]; then
