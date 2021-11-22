@@ -14,6 +14,12 @@ case `uname` in
         # pyenv global 3.9.9
         # nvm install 14
         # pyenv global system
+
+        # x86_64
+        if [ "`uname -m`" == "arm64" ]; then
+            NVM_DIR=$HOME/.nvm_x86 brew86 install nvm
+        fi
+
     ;;
     Linux)
         # commands for Linux go here
