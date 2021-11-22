@@ -13,8 +13,13 @@ case `uname` in
         # export PATH="/usr/local/opt/python@3.8/bin:$PATH"  # temporary until 'brew install python3' installs latest version
         export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
         export PATH="$PATH:$HOME/.cargo/bin"
-        export NVM_DIR="$HOME/.nvm"
         export CLICOLOR=1  # Enable colors
+
+        if [ `uname -m | grep arm64` ]; then
+            export NVM_DIR="$HOME/.nvm"
+        else
+           export NVM_DIR=$HOME/.nvm_x86
+        fi
 
     ;;
     Linux)
