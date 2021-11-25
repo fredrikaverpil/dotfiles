@@ -1,0 +1,3 @@
+#!/bin/sh
+
+NVM_DIR=$HOME/.nvm_x86 arch -x86_64 nvm "$@"
