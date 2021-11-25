@@ -12,7 +12,7 @@ case `uname` in
         fi
 
         # x86
-        if [ ! -d /usr/local/bin/brew ]; then
+        if [ ! -d /usr/local/bin/brew ] && [ "`uname -m`" == "arm64" ]; then
             softwareupdate —install-rosetta
             arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
         fi
