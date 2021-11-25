@@ -11,27 +11,28 @@ case `uname` in
 
         base_python_version=`cat .python-version`
 
-        if [ ! -d ~/.pyenv ]; then
+        if [ ! -d $HOME/.pyenv ]; then
             curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
             git clone https://github.com/s1341/pyenv-alias.git ~/.pyenv/plugins/pyenv-alias
         fi
 
-        if [ ! -d ~/.pyenv/versions/${base_python_version} ]; then
+        if [ ! -d $HOME/.pyenv/versions/${base_python_version} ]; then
             brew install openssl readline sqlite3 xz zlib  # required to build python
             ~/.pyenv/bin/pyenv install $base_python_version
         fi
 
-        if ! brew list pipx &>/dev/null; then
+        if [ ! -d /opt/homebrew/bin/pipx ]; then
             brew install pipx
-            if [ ! -f ~/.local/bin/ipython ]; then /opt/homebrew/bin/pipx install ipython --pip-args rich ; fi
-            if [ ! -f ~/.local/bin/black ]; then /opt/homebrew/bin/pipx install black ; fi
-            if [ ! -f ~/.local/bin/poetry ]; then /opt/homebrew/bin/pipx install poetry ; fi
-            if [ ! -f ~/.local/bin/bandit ]; then /opt/homebrew/bin/pipx install bandit ; fi
-            if [ ! -f ~/.local/bin/mypy ]; then /opt/homebrew/bin/pipx install mypy ; fi
-            if [ ! -f ~/.local/bin/flake8 ]; then /opt/homebrew/bin/pipx install flake8 ; fi
-            if [ ! -f ~/.local/bin/pre-commit ]; then /opt/homebrew/bin/pipx install pre-commit ; fi
         fi
 
+        if [ ! -f $HOME/.local/bin/ipython ]; then /opt/homebrew/bin/pipx install ipython --pip-args rich; fi
+        if [ ! -f $HOME/.local/bin/ipython ]; then /opt/homebrew/bin/pipx install bpython; fi
+        if [ ! -f $HOME/.local/bin/black ]; then /opt/homebrew/bin/pipx install black ; fi
+        if [ ! -f $HOME/.local/bin/poetry ]; then /opt/homebrew/bin/pipx install poetry ; fi
+        if [ ! -f $HOME/.local/bin/bandit ]; then /opt/homebrew/bin/pipx install bandit ; fi
+        if [ ! -f $HOME/.local/bin/mypy ]; then /opt/homebrew/bin/pipx install mypy ; fi
+        if [ ! -f $HOME/.local/bin/flake8 ]; then /opt/homebrew/bin/pipx install flake8 ; fi
+        if [ ! -f $HOME/.local/bin/pre-commit ]; then /opt/homebrew/bin/pipx install pre-commit ; fi
 
         # x86_64
         if [ "`uname -m`" == "arm64" ] && [ ! -d ~/.pyenv/versions/${base_python_version}_x86 ]; then
