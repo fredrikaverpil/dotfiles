@@ -18,7 +18,7 @@ case `uname` in
 
         if [ ! -d ~/.pyenv/versions/${base_python_version} ]; then
             brew install openssl readline sqlite3 xz zlib  # required to build python
-            pyenv install $base_python_version
+            ~/.pyenv/bin/pyenv install $base_python_version
         fi
 
         if ! brew list pipx &>/dev/null; then
