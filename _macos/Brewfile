@@ -11,11 +11,11 @@ tap 'homebrew/core'
 # CLIs
 brew 'asciinema'
 brew 'pre-commit'
-brew 'rectangle'
 brew 'tree'
 
 # GUIs
 cask 'appcleaner'
+cask 'rectangle'
 cask 'docker'
 cask 'spotify'
 cask 'visual-studio-code'
