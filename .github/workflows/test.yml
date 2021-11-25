@@ -38,7 +38,7 @@ jobs:
 
       - name: Test starship installer
         run: |
-          HOME=~/dotfiles-install-dir installers/starship.sh
+          installers/starship.sh
 
       - name: Test zsh installer
         run: |
