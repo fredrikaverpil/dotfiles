@@ -33,7 +33,7 @@ These are my personal dotfiles, for macOS, Windows and Linux. The setup is based
 
 ## macOS
 
-![image](https://user-images.githubusercontent.com/994357/138708537-7fe8588b-ac1b-45a4-8da5-b32209ee5313.png)
+![image](https://user-images.githubusercontent.com/994357/143506100-fd6a053d-f675-4742-84d8-43df03e48c0a.png)
 
 ### Install dotfiles
 
