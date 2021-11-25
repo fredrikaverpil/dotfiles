@@ -21,18 +21,19 @@ case `uname` in
             ~/.pyenv/bin/pyenv install $base_python_version
         fi
 
-        if [ ! -d /opt/homebrew/bin/pipx ]; then
+        if [ ! -d $(brew --prefix)/bin/pipx ]; then
             brew install pipx
         fi
 
-        if [ ! -f $HOME/.local/bin/ipython ]; then /opt/homebrew/bin/pipx install ipython --pip-args rich; fi
-        if [ ! -f $HOME/.local/bin/ipython ]; then /opt/homebrew/bin/pipx install bpython; fi
-        if [ ! -f $HOME/.local/bin/black ]; then /opt/homebrew/bin/pipx install black ; fi
-        if [ ! -f $HOME/.local/bin/poetry ]; then /opt/homebrew/bin/pipx install poetry ; fi
-        if [ ! -f $HOME/.local/bin/bandit ]; then /opt/homebrew/bin/pipx install bandit ; fi
-        if [ ! -f $HOME/.local/bin/mypy ]; then /opt/homebrew/bin/pipx install mypy ; fi
-        if [ ! -f $HOME/.local/bin/flake8 ]; then /opt/homebrew/bin/pipx install flake8 ; fi
-        if [ ! -f $HOME/.local/bin/pre-commit ]; then /opt/homebrew/bin/pipx install pre-commit ; fi
+        # arm64
+        if [ ! -f $HOME/.local/bin/ipython ]; then $(brew --prefix)/bin/pipx install ipython --pip-args rich; fi
+        if [ ! -f $HOME/.local/bin/ipython ]; then $(brew --prefix)/bin/pipx install bpython; fi
+        if [ ! -f $HOME/.local/bin/black ]; then $(brew --prefix)/bin/pipx install black ; fi
+        if [ ! -f $HOME/.local/bin/poetry ]; then $(brew --prefix)/bin/pipx install poetry ; fi
+        if [ ! -f $HOME/.local/bin/bandit ]; then $(brew --prefix)/bin/pipx install bandit ; fi
+        if [ ! -f $HOME/.local/bin/mypy ]; then $(brew --prefix)/bin/pipx install mypy ; fi
+        if [ ! -f $HOME/.local/bin/flake8 ]; then $(brew --prefix)/bin/pipx install flake8 ; fi
+        if [ ! -f $HOME/.local/bin/pre-commit ]; then $(brew --prefix)/bin/pipx install pre-commit ; fi
 
         # x86_64
         if [ "`uname -m`" == "arm64" ] && [ ! -d ~/.pyenv/versions/${base_python_version}_x86 ]; then
