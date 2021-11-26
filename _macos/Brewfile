@@ -12,6 +12,7 @@ tap 'homebrew/core'
 brew 'asciinema'
 brew 'pre-commit'
 brew 'tree'
+brew 'pgcli'
 
 # GUIs
 cask 'appcleaner'
