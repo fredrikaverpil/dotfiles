@@ -18,6 +18,10 @@ elif [ -d ~/.nvm ]; then
     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 fi
 
+# conda (miniforge)
+if [ `uname -m | grep arm64` ] && [ -d /opt/homebrew/opt/conda ]; then
+    conda init "$(basename "${SHELL}")"
+fi
 
 # Nix
 if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then
