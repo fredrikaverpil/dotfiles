@@ -18,11 +18,6 @@ elif [ -d ~/.nvm ]; then
     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 fi
 
-# conda (miniforge)
-if [ `uname -m | grep arm64` ] && [ -d /opt/homebrew/opt/conda ]; then
-    conda init "$(basename "${SHELL}")"
-fi
-
 # Nix
 if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then
     . ~/.nix-profile/etc/profile.d/nix.sh
@@ -40,6 +35,23 @@ if [ -f ~/.linuxbrew/bin/brew ]; then
     # eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
 
+# conda (miniforge)
+if [ `uname -m | grep arm64` ] && [ -f /opt/homebrew/bin/conda ]; then
+    # >>> conda initialize >>>
+    # !! Contents within this block are managed by 'conda init' !!
+    __conda_setup="$('/opt/homebrew/Caskroom/miniforge/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+    if [ $? -eq 0 ]; then
+        eval "$__conda_setup"
+    else
+        if [ -f "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh" ]; then
+            . "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh"
+        else
+            export PATH="/opt/homebrew/Caskroom/miniforge/base/bin:$PATH"
+        fi
+    fi
+    unset __conda_setup
+    # <<< conda initialize <<<
+fi
 
 # Pyenv + auto venv activation on cd
 if [ -d ~/.pyenv ]; then
@@ -51,7 +63,7 @@ if [ -d ~/.pyenv ]; then
 
     if [[ -z "$VIRTUAL_ENV" ]] ; then
         ## If env folder is found then activate the vitualenv
-        if [[ -d ./.venv ]] ; then
+        if [ -d ./.venv ] && [ -f ./venv/bin/activate ]; then
             source ./.venv/bin/activate
         fi
     else
@@ -65,7 +77,6 @@ if [ -d ~/.pyenv ]; then
     fi
     }
 fi
-
 
 if [ -n "${ZSH_VERSION}" ]; then
     # assume Zsh
