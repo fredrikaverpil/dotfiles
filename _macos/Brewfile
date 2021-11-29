@@ -14,9 +14,6 @@ brew 'pre-commit'
 brew 'tree'
 brew 'pgcli'
 
-# CLIs but weirdly enough, a Cask
-cask 'miniforge'
-
 # GUIs
 cask 'appcleaner'
 cask 'rectangle'

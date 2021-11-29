@@ -35,26 +35,6 @@ if [ -f ~/.linuxbrew/bin/brew ]; then
     # eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
 
-# conda (miniforge)
-if [ `uname -m | grep arm64` ] && [ -f /opt/homebrew/bin/conda ]; then
-    # the below code is generated with `conda init zsh`
-
-    # >>> conda initialize >>>
-    # !! Contents within this block are managed by 'conda init' !!
-    __conda_setup="$('/opt/homebrew/Caskroom/miniforge/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-    if [ $? -eq 0 ]; then
-        eval "$__conda_setup"
-    else
-        if [ -f "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh" ]; then
-            . "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh"
-        else
-            export PATH="/opt/homebrew/Caskroom/miniforge/base/bin:$PATH"
-        fi
-    fi
-    unset __conda_setup
-    # <<< conda initialize <<<
-fi
-
 # Pyenv + auto venv activation on cd
 if [ -d ~/.pyenv ]; then
     eval "$(pyenv init --path)"
