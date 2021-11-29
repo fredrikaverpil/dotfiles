@@ -37,6 +37,8 @@ fi
 
 # conda (miniforge)
 if [ `uname -m | grep arm64` ] && [ -f /opt/homebrew/bin/conda ]; then
+    # the below code is generated with `conda init zsh`
+
     # >>> conda initialize >>>
     # !! Contents within this block are managed by 'conda init' !!
     __conda_setup="$('/opt/homebrew/Caskroom/miniforge/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
