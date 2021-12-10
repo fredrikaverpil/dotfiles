@@ -13,7 +13,7 @@ alias mux='cd ~/code/repos/doktor && tmuxinator'
 # Git
 alias git-purge='git branch --merged | egrep -v "(^\*|master|main|dev)" | xargs git branch -d'
 alias git-grep='git rev-list --all | xargs git --no-pager grep --extended-regexp --ignore-case'  # usage: gg <regexp>
-alias glog='git log --graph --decorate --pretty=oneline --abbrev-commit -all'
+alias glog='git log --graph --decorate --pretty=oneline --abbrev-commit --all'
 alias submodule-reset='git submodule deinit -f . && git submodule update --init --recursive'
 
 # Docker
