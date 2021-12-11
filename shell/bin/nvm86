@@ -1,3 +1,18 @@
 #!/bin/sh
 
-NVM_DIR=$HOME/.nvm_x86 arch -x86_64 nvm "$@"
+# To see npm location:
+# npm root -g
+
+# I want this, but it gives me an error:
+# $ NVM_DIR=$HOME/.nvm_x86 arch -x86_64 nvm "$@"
+# arch: Can't find nvm in PATH
+# ...so in the meanwhile:
+
+if [ "$(uname -p)" = "arm" ]; then
+    echo "ERROR: Must be running in Rosetta terminal!"
+    exit 1
+else
+    echo "You have to run this command manually:"
+    echo 'NVM_DIR=$HOME/.nvm_x86 nvm ...'
+    # NVM_DIR=$HOME/.nvm_x86 nvm "@"
+fi
