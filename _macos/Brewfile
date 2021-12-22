@@ -7,12 +7,14 @@ cask_args appdir: '/Applications'
 # Taps (third-party repositories)
 tap 'homebrew/bundle'
 tap 'homebrew/core'
+tap 'cantino/mcfly'
 
 # CLIs
 brew 'asciinema'
 brew 'pre-commit'
 brew 'tree'
 brew 'pgcli'
+brew 'mcfly'
 
 # GUIs
 cask 'appcleaner'
