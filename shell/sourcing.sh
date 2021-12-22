@@ -72,6 +72,11 @@ if [ -n "${ZSH_VERSION}" ]; then
         source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
     fi
 
+    # mcfly
+    if [ -f /opt/homebrew/bin/mcfly ] || [ -f /usr/local/bin/mcfly ]; then
+        eval "$(mcfly init zsh)"
+    fi
+
     # Starship
     if command -v starship &> /dev/null; then
         eval "$(starship init zsh)"
@@ -83,6 +88,11 @@ elif [ -n "${BASH_VERSION}" ]; then
     # Bash autocompletion
     if [ -f /etc/profile.d/bash_completion.sh ]; then
         source /etc/profile.d/bash_completion.sh
+    fi
+
+    # mcfly
+    if [ -f /opt/homebrew/bin/mcfly ] || [ -f /usr/local/bin/mcfly ]; then
+        eval "$(mcfly init bash)"
     fi
 
     # Starship
