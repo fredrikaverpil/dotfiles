@@ -1,16 +1,6 @@
 # Inserts a blank line between shell prompts
 add_newline = true
 
-# Change the default prompt format
-format = """\
-[╭╴](238)\
-$all[╰─](238)$character"""
-
-# Change the default prompt characters
-[character]
-success_symbol = "[](238)"
-error_symbol = "[](bold red)"
-
 # Shows the username
 [username]
 style_user = "white bold"
