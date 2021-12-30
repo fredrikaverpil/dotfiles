@@ -3,21 +3,6 @@ if [ -f ~/.cargo/env ]; then
     . "$HOME/.cargo/env"
 fi
 
-# Node version manager
-if [ `uname -m | grep arm64` ] && [ -d /opt/homebrew/opt/nvm ]; then
-    # brew-installed nvm, macOS arm64
-    [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
-    [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
-elif [ `uname -m | grep x86_64` ] && [ -d /usr/local/opt/nvm ]; then
-    # brew-installed nvm, macOS x86_64
-    [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
-    [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
-elif [ -d ~/.nvm ]; then
-    # installed via official script
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-fi
-
 # Nix
 if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then
     . ~/.nix-profile/etc/profile.d/nix.sh
