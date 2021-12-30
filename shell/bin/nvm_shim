@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Remove path to nvm, npm, node shims
+shim_path=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+new_path=$(sed "s:$shim_path::g" <<<$PATH)
+
+export PATH=$new_path
+export NVM_DIR=$HOME/.nvm
+
+. $(brew --prefix)/etc/bash_completion.d/nvm
+. $(brew --prefix)/opt/nvm/nvm.sh
+
+# Now, nvm, npm and node can be executed with any args, like:
+# `nvm_shim npm --version`
+"$@"

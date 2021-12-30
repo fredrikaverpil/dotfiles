@@ -1,0 +1,10 @@
+#!/bin/sh
+
+export NVM_DIR=$HOME/.nvm_x86
+
+. $(brew --prefix)/opt/nvm/etc/bash_completion.d/nvm
+. $(brew --prefix)/opt/nvm/nvm.sh
+
+# Now, nvm, npm and node can be executed with any args, like:
+# `nvm_shim npm --version`
+"$@"
