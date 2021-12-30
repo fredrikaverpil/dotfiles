@@ -3,7 +3,8 @@
 
 # Global settings
 alias repos='cd ~/code/repos'
-alias ll='ls -alhF'
+# alias ll='ls -alhF'
+alias ll='exa --long --header --icons --group-directories-first --git --group'
 alias tree='tree -C'
 
 # Doktor
