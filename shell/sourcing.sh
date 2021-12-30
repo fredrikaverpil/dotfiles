@@ -3,6 +3,15 @@ if [ -f ~/.cargo/env ]; then
     . "$HOME/.cargo/env"
 fi
 
+# nvm
+if [ -d "$(brew --prefix)/opt/nvm/" ]; then
+    # macOS
+    . "$(brew --prefix)/opt/nvm/etc/bash_completion.d/nvm"
+elif [ -s "$HOME/.nvm/bash_completion" ]; then
+    # linux, installed via official script
+    . "$HOME/.nvm/bash_completion"
+fi
+
 # Nix
 if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then
     . ~/.nix-profile/etc/profile.d/nix.sh
