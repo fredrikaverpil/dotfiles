@@ -20,7 +20,6 @@ case `uname` in
         export PYENV_ROOT="$HOME/.pyenv"
         export PATH="$PYENV_ROOT/bin:$PATH"
         export KUBECONFIG="$HOME/.kube/config"
-        export NVM_DIR="$HOME/.nvm"
         export PATH=$PATH:/usr/local/go/bin
         export PATH=$PATH:$HOME/.cargo/bin
 
