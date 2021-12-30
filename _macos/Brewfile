@@ -15,6 +15,7 @@ brew 'pre-commit'
 brew 'tree'
 brew 'pgcli'
 brew 'mcfly'
+brew 'exa'
 
 # GUIs
 cask 'appcleaner'
