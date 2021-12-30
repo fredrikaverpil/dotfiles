@@ -13,12 +13,6 @@ case `uname` in
         export PATH="$PATH:$HOME/.cargo/bin"
         export CLICOLOR=1  # Enable colors
 
-        if [ `uname -m | grep arm64` ]; then
-            export NVM_DIR="$HOME/.nvm"
-        else
-           export NVM_DIR=$HOME/.nvm_x86
-        fi
-
     ;;
     Linux)
         # commands for Linux go here
