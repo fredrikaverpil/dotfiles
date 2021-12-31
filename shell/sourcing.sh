@@ -4,7 +4,7 @@ if [ -f ~/.cargo/env ]; then
 fi
 
 # nvm
-if [ -d "$(brew --prefix)/opt/nvm/" ]; then
+if [ -s "$(brew --prefix)/opt/nvm/etc/bash_completion.d/nvm" ]; then
     # macOS
     . "$(brew --prefix)/opt/nvm/etc/bash_completion.d/nvm"
 elif [ -s "$HOME/.nvm/bash_completion" ]; then
@@ -35,22 +35,22 @@ if [ -d ~/.pyenv ]; then
     eval "$(pyenv virtualenv-init -)"
 
     function cd() {
-    builtin cd "$@"
+        builtin cd "$@"
 
-    if [[ -z "$VIRTUAL_ENV" ]] ; then
-        ## If env folder is found then activate the vitualenv
-        if [ -d ./.venv ] && [ -f ./venv/bin/activate ]; then
-            source ./.venv/bin/activate
+        if [[ -z "$VIRTUAL_ENV" ]]; then
+            ## If env folder is found then activate the vitualenv
+            if [ -d ./.venv ] && [ -f ./venv/bin/activate ]; then
+                source ./.venv/bin/activate
+            fi
+        else
+            ## check the current folder belong to earlier VIRTUAL_ENV folder
+            # if yes then do nothing
+            # else deactivate
+            parentdir="$(dirname "$VIRTUAL_ENV")"
+            if [[ "$PWD"/ != "$parentdir"/* ]]; then
+                deactivate
+            fi
         fi
-    else
-        ## check the current folder belong to earlier VIRTUAL_ENV folder
-        # if yes then do nothing
-        # else deactivate
-        parentdir="$(dirname "$VIRTUAL_ENV")"
-        if [[ "$PWD"/ != "$parentdir"/* ]] ; then
-            deactivate
-        fi
-    fi
     }
 fi
 
@@ -72,7 +72,7 @@ if [ -n "${ZSH_VERSION}" ]; then
     fi
 
     # Starship
-    if command -v starship &> /dev/null; then
+    if command -v starship &>/dev/null; then
         eval "$(starship init zsh)"
     fi
 
@@ -90,8 +90,7 @@ elif [ -n "${BASH_VERSION}" ]; then
     fi
 
     # Starship
-    if command -v starship &> /dev/null; then
+    if command -v starship &>/dev/null; then
         eval "$(starship init bash)"
     fi
 fi
-
