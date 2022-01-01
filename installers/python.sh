@@ -15,7 +15,9 @@ Darwin)
     if [ ! -d ~/.pyenv ]; then
         brew install pyenv
         brew upgrade pyenv
-        git -C $(brew --prefix pyenv) pull origin master
+        cd $(pyenv root)
+        git pull origin master
+        cd -
         git clone https://github.com/s1341/pyenv-alias.git ~/.pyenv/plugins/pyenv-alias
     fi
 
