@@ -24,13 +24,7 @@ Darwin)
     # install python
     if [ ! -d $HOME/.pyenv/versions/${base_python_version} ]; then
         brew install openssl readline sqlite3 xz zlib # required to build python
-
-        if ! command -v pyenv &>/dev/null; then
-            ~/.pyenv/bin/pyenv install $base_python_version
-        else
-            # GitHub Actions
-            pyenv install $base_python_version
-        fi
+        ~/.pyenv/bin/pyenv install $base_python_version
     fi
 
     # install pipx
