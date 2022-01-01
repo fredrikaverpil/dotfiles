@@ -11,6 +11,8 @@ case $(uname) in
 Darwin)
     # commands for macOS go here
 
+    env | sort
+
     # install pyenv
     if [ ! -d ~/.pyenv ]; then
         if [ "$GITHUB_ACTIONS" == "true" ]; then
