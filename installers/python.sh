@@ -13,6 +13,7 @@ Darwin)
 
     # install pyenv
     if [ ! -d ~/.pyenv ]; then
+        brew update
         brew install pyenv
         git clone https://github.com/s1341/pyenv-alias.git ~/.pyenv/plugins/pyenv-alias
     fi
