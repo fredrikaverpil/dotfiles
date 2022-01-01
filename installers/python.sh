@@ -17,8 +17,11 @@ Darwin)
     env | sort
 
     # install pyenv
-    if ! command -v pyenv &>/dev/null; then
-        curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+    if [ ! -d ~/.pyenv ]; then
+        wget -O https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer
+        chmod +x pyenv-installer
+        ./pyenv-installer
+        rm pyenv-installer
     fi
 
     git clone https://github.com/s1341/pyenv-alias.git ~/.pyenv/plugins/pyenv-alias
