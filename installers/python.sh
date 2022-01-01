@@ -11,22 +11,20 @@ case $(uname) in
 Darwin)
     # commands for macOS go here
 
+    # tmp
+    ls -alh ~
+    env | sort
+
     # install pyenv
     if [ ! -d ~/.pyenv ]; then
-        brew install pyenv
-        brew upgrade pyenv
-        cd $(pyenv root)
-        git pull origin master
-        cd -
+        curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
         git clone https://github.com/s1341/pyenv-alias.git ~/.pyenv/plugins/pyenv-alias
     fi
-
-    env | sort
 
     # install python
     if [ ! -d $HOME/.pyenv/versions/${base_python_version} ]; then
         brew install openssl readline sqlite3 xz zlib # required to build python
-        pyenv install $base_python_version
+        ~/.pyenv/bin/pyenv install $base_python_version
     fi
 
     # install pipx
