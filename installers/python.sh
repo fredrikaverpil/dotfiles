@@ -13,11 +13,7 @@ Darwin)
 
     # install pyenv
     if [ ! -d ~/.pyenv ]; then
-        if [ "$GITHUB_ACTIONS" == "true" ]; then
-            brew install pyenv
-        else
-            curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
-        fi
+        brew install pyenv
         git clone https://github.com/s1341/pyenv-alias.git ~/.pyenv/plugins/pyenv-alias
     fi
 
@@ -26,7 +22,7 @@ Darwin)
     # install python
     if [ ! -d $HOME/.pyenv/versions/${base_python_version} ]; then
         brew install openssl readline sqlite3 xz zlib # required to build python
-        ~/.pyenv/bin/pyenv install $base_python_version
+        pyenv install $base_python_version
     fi
 
     # install pipx
