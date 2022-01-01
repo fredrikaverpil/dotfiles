@@ -11,10 +11,6 @@ case $(uname) in
 Darwin)
     # commands for macOS go here
 
-    # tmp
-    ls -alh ~
-    env | sort
-
     # install pyenv
     if [ ! -d ~/.pyenv ]; then
         curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
