@@ -12,6 +12,7 @@ Darwin)
     # commands for macOS go here
 
     # tmp
+    mkdir ~/.pyenv
     ls -alh ~
     env | sort
 
