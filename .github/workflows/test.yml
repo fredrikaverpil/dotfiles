@@ -34,7 +34,7 @@ jobs:
 
       - name: Test nerdfont installer
         run: |
-          installers/nerdfont.sh
+          HOME=~/dotfiles-install-dir installers/nerdfont.sh
 
       - name: Test starship installer
         run: |
