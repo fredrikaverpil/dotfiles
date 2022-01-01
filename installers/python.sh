@@ -13,9 +13,11 @@ Darwin)
 
     # install pyenv
     if [ ! -d ~/.pyenv ]; then
-        git clone --recurse-submodules https://github.com/pyenv/pyenv.git ~/.pyenv
-        # curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
-
+        if [ "$GITHUB_ACTIONS" == "true" ]; then
+            brew install pyenv
+        else
+            curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+        fi
         git clone https://github.com/s1341/pyenv-alias.git ~/.pyenv/plugins/pyenv-alias
     fi
 
@@ -31,13 +33,13 @@ Darwin)
     fi
 
     # install pipx-managed tools
-    if [ ! -f $HOME/.local/bin/ipython ]; then $(brew --prefix)/bin/pipx install ipython --pip-args rich; fi
-    if [ ! -f $HOME/.local/bin/ipython ]; then $(brew --prefix)/bin/pipx install bpython; fi
-    if [ ! -f $HOME/.local/bin/black ]; then $(brew --prefix)/bin/pipx install black; fi
-    if [ ! -f $HOME/.local/bin/ipython ]; then $(brew --prefix)/bin/pipx install flake8; fi
-    if [ ! -f $HOME/.local/bin/ipython ]; then $(brew --prefix)/bin/pipx install bandit; fi
-    if [ ! -f $HOME/.local/bin/poetry ]; then $(brew --prefix)/bin/pipx install poetry; fi
-    if [ ! -f $HOME/.local/bin/pre-commit ]; then $(brew --prefix)/bin/pipx install pre-commit; fi
+    if [ ! -f ~/.local/bin/ipython ]; then $(brew --prefix)/bin/pipx install ipython --pip-args rich; fi
+    if [ ! -f ~/.local/bin/ipython ]; then $(brew --prefix)/bin/pipx install bpython; fi
+    if [ ! -f ~/.local/bin/black ]; then $(brew --prefix)/bin/pipx install black; fi
+    if [ ! -f ~/.local/bin/ipython ]; then $(brew --prefix)/bin/pipx install flake8; fi
+    if [ ! -f ~/.local/bin/ipython ]; then $(brew --prefix)/bin/pipx install bandit; fi
+    if [ ! -f ~/.local/bin/poetry ]; then $(brew --prefix)/bin/pipx install poetry; fi
+    if [ ! -f ~/.local/bin/pre-commit ]; then $(brew --prefix)/bin/pipx install pre-commit; fi
 
     # install python, pipx and pipx-managed tools for x86_64
     if [ "$(uname -m)" == "arm64" ] && [ ! -d ~/.pyenv/versions/${base_python_version}_x86 ]; then
@@ -58,7 +60,7 @@ Linux)
     pipx_target_path=$HOME/.pyenv/versions/$base_python_version/bin/pipx
 
     # install pyenv
-    if [ ! -d $HOME/.pyenv ]; then
+    if [ ! -d ~/.pyenv ]; then
         curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
     fi
 
@@ -72,7 +74,7 @@ Linux)
                 libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
         fi
 
-        $HOME/.pyenv/bin/pyenv install $base_python_version
+        ~/.pyenv/bin/pyenv install $base_python_version
     fi
 
     # delete symlink and pipx if it is pointing to the wrong python installation
