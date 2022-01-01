@@ -1,7 +1,7 @@
 on:
   push:
     paths:
-      - '**.md'
+      - "**.md"
 name: TOC Generator
 jobs:
   generateTOC:
