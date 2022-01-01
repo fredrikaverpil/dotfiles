@@ -7,24 +7,24 @@ case $(uname) in
 Darwin)
     # commands for macOS go here
     if ! ls /Users/${USER}/Library/Fonts/Fira* 1>/dev/null 2>&1; then
-        curl --location --output $HOME/Downloads/FiraCode.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/FiraCode.zip
-        unzip -o $HOME/Downloads/FiraCode.zip -d $HOME/Downloads/FiraCode
-        mkdir -p $HOME/Library/Fonts/
-        cp -v $HOME/Downloads/FiraCode/*.otf $HOME/Library/Fonts/
-        rm $HOME/Downloads/FiraCode.zip
-        rm -r $HOME/Downloads/FiraCode
+        curl --location --output ~/Downloads/FiraCode.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/FiraCode.zip
+        unzip -o ~/Downloads/FiraCode.zip -d ~/Downloads/FiraCode
+        mkdir -p ~/Library/Fonts/
+        cp -v ~/Downloads/FiraCode/*.otf ~/Library/Fonts/
+        rm ~/Downloads/FiraCode.zip
+        rm -r ~/Downloads/FiraCode
     fi
     ;;
 Linux)
     # commands for Linux go here
-    if ! ls $HOME/.local/share/fonts/Fira* 1>/dev/null 2>&1; then
+    if ! ls ~/.local/share/fonts/Fira* 1>/dev/null 2>&1; then
         # Ubuntu
-        curl --location --output $HOME/Downloads/FiraCode.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/FiraCode.zip
-        unzip -o $HOME/Downloads/FiraCode.zip -d $HOME/Downloads/FiraCode
-        mkdir -p $HOME/.local/share/fonts
-        sudo cp -v $HOME/Downloads/FiraCode/*.otf $HOME/.local/share/fonts
-        rm $HOME/Downloads/FiraCode.zip
-        rm -r $HOME/Downloads/FiraCode
+        curl --location --output ~/Downloads/FiraCode.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/FiraCode.zip
+        unzip -o ~/Downloads/FiraCode.zip -d ~/Downloads/FiraCode
+        mkdir -p ~/.local/share/fonts
+        sudo cp -v ~/Downloads/FiraCode/*.otf ~/.local/share/fonts
+        rm ~/Downloads/FiraCode.zip
+        rm -r ~/Downloads/FiraCode
 
     fi
     ;;
