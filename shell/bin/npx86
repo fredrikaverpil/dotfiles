@@ -1,3 +1,0 @@
-#!/bin/sh
-
-arch -x86_64 nvm86_shim npx "$@"
