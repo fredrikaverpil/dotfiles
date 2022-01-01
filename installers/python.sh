@@ -12,9 +12,10 @@ Darwin)
     # commands for macOS go here
 
     # install pyenv
-    if [ ! -d $HOME/.pyenv ]; then
-        mkdir ~/.pyenv
-        curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+    if [ ! -d ~/.pyenv ]; then
+        git clone --recurse-submodules https://github.com/pyenv/pyenv.git ~/.pyenv
+        # curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+
         git clone https://github.com/s1341/pyenv-alias.git ~/.pyenv/plugins/pyenv-alias
     fi
 
