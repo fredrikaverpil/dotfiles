@@ -2,8 +2,8 @@
 
 for x in *; do
     if [ -d "${x}" ]; then
-        current_dir=`pwd`
-        cd $x
+        current_dir=$(pwd)
+        cd "$x" || exit
         pwd
         docker compose down
         echo "-----"
