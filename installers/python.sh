@@ -4,35 +4,50 @@
 # https://github.com/pyenv/pyenv-installer
 # https://github.com/pypa/pipx
 
+base_python_version=$(cat .python-version)
+
 # Per-platform settings
 case $(uname) in
 Darwin)
     # commands for macOS go here
 
-    base_python_version=$(cat .python-version)
-
-    if [ ! -d $HOME/.pyenv ]; then
+    # install pyenv
+    if [ ! -d ~/.pyenv ]; then
         curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+    fi
+
+    # install pyenv-alias
+    if [ ! -d ~/.pyenv/plugins/pyenv-alias ]; then
         git clone https://github.com/s1341/pyenv-alias.git ~/.pyenv/plugins/pyenv-alias
     fi
 
+    # install python
     if [ ! -d $HOME/.pyenv/versions/${base_python_version} ]; then
         brew install openssl readline sqlite3 xz zlib # required to build python
-        ~/.pyenv/bin/pyenv install $base_python_version
+
+        if ! command -v pyenv &>/dev/null; then
+            ~/.pyenv/bin/pyenv install $base_python_version
+        else
+            # GitHub Actions
+            pyenv install $base_python_version
+        fi
     fi
 
+    # install pipx
     if [ ! -d $(brew --prefix)/bin/pipx ]; then
         brew install pipx
     fi
 
-    # arm64
-    if [ ! -f $HOME/.local/bin/ipython ]; then $(brew --prefix)/bin/pipx install ipython --pip-args rich; fi
-    if [ ! -f $HOME/.local/bin/ipython ]; then $(brew --prefix)/bin/pipx install bpython; fi
-    if [ ! -f $HOME/.local/bin/black ]; then $(brew --prefix)/bin/pipx install black; fi
-    if [ ! -f $HOME/.local/bin/poetry ]; then $(brew --prefix)/bin/pipx install poetry; fi
-    if [ ! -f $HOME/.local/bin/pre-commit ]; then $(brew --prefix)/bin/pipx install pre-commit; fi
+    # install pipx-managed tools
+    if [ ! -f ~/.local/bin/ipython ]; then $(brew --prefix)/bin/pipx install ipython --pip-args rich; fi
+    if [ ! -f ~/.local/bin/ipython ]; then $(brew --prefix)/bin/pipx install bpython; fi
+    if [ ! -f ~/.local/bin/black ]; then $(brew --prefix)/bin/pipx install black; fi
+    if [ ! -f ~/.local/bin/ipython ]; then $(brew --prefix)/bin/pipx install flake8; fi
+    if [ ! -f ~/.local/bin/ipython ]; then $(brew --prefix)/bin/pipx install bandit; fi
+    if [ ! -f ~/.local/bin/poetry ]; then $(brew --prefix)/bin/pipx install poetry; fi
+    if [ ! -f ~/.local/bin/pre-commit ]; then $(brew --prefix)/bin/pipx install pre-commit; fi
 
-    # x86_64
+    # install python, pipx and pipx-managed tools for x86_64
     if [ "$(uname -m)" == "arm64" ] && [ ! -d ~/.pyenv/versions/${base_python_version}_x86 ]; then
         # http://sixty-north.com/blog/pyenv-apple-silicon.html
         brew86 install openssl readline sqlite3 xz zlib # required to build python
@@ -43,30 +58,29 @@ Darwin)
 
         if [ ! -f ~/.local/bin/poetry@x86 ]; then pipx86 install poetry --suffix @x86; fi
     fi
+
     ;;
 Linux)
     # commands for Linux go here
 
-    base_python_version=$(cat .python-version)
     pipx_target_path=$HOME/.pyenv/versions/$base_python_version/bin/pipx
 
-    # install python via pyenv
+    # install pyenv
     if [ ! -d ~/.pyenv ]; then
-        if command -v apt-get &>/dev/null; then
+        curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+    fi
 
+    # install python
+    if [ ! -d $HOME/.pyenv/versions/${base_python_version} ]; then
+        if command -v apt-get &>/dev/null; then
             sudo apt-get install -y gcc
 
             sudo apt-get install -y make build-essential libssl-dev zlib1g-dev \
                 libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
                 libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
-
-            # install pyenv
-            echo "Installing pyenv into ${HOME}/.pyenv ..."
-            curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
-
-            # install python version
-            $HOME/.pyenv/bin/pyenv install $base_python_version
         fi
+
+        ~/.pyenv/bin/pyenv install $base_python_version
     fi
 
     # delete symlink and pipx if it is pointing to the wrong python installation
@@ -88,12 +102,6 @@ Linux)
     if [ ! -f ~/.local/bin/poetry ]; then /usr/bin/pipx install poetry; fi
     if [ ! -f ~/.local/bin/flake8 ]; then /usr/bin/pipx install pre-commit; fi
 
-    ;;
-FreeBSD)
-    # commands for FreeBSD go here
-    ;;
-MINGW64_NT-*)
-    # commands for Git bash in Windows go here
     ;;
 *) ;;
 esac
