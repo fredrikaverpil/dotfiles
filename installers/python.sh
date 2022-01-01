@@ -17,14 +17,13 @@ Darwin)
 
     # install pyenv
     if [ ! -d ~/.pyenv ]; then
-        mkdir ~/.pyenv
-        curl -O https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer
-        chmod +x pyenv-installer
-        ./pyenv-installer
-        rm pyenv-installer
+        curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
     fi
 
-    git clone https://github.com/s1341/pyenv-alias.git ~/.pyenv/plugins/pyenv-alias
+    # install pyenv-alias
+    if [ ! -d ~/.pyenv/plugins/pyenv-alias ]; then
+        git clone https://github.com/s1341/pyenv-alias.git ~/.pyenv/plugins/pyenv-alias
+    fi
 
     # install python
     if [ ! -d $HOME/.pyenv/versions/${base_python_version} ]; then
