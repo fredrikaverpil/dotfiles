@@ -16,15 +16,22 @@ Darwin)
     env | sort
 
     # install pyenv
-    if [ ! -d ~/.pyenv ]; then
+    if ! command -v pyenv &>/dev/null; then
         curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
-        git clone https://github.com/s1341/pyenv-alias.git ~/.pyenv/plugins/pyenv-alias
     fi
+
+    git clone https://github.com/s1341/pyenv-alias.git ~/.pyenv/plugins/pyenv-alias
 
     # install python
     if [ ! -d $HOME/.pyenv/versions/${base_python_version} ]; then
         brew install openssl readline sqlite3 xz zlib # required to build python
-        ~/.pyenv/bin/pyenv install $base_python_version
+
+        if ! command -v pyenv &>/dev/null; then
+            ~/.pyenv/bin/pyenv install $base_python_version
+        else
+            # GitHub Actions
+            pyenv install $base_python_version
+        fi
     fi
 
     # install pipx
