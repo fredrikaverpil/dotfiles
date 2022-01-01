@@ -11,8 +11,6 @@ case $(uname) in
 Darwin)
     # commands for macOS go here
 
-    env | sort
-
     # install pyenv
     if [ ! -d ~/.pyenv ]; then
         if [ "$GITHUB_ACTIONS" == "true" ]; then
@@ -22,6 +20,8 @@ Darwin)
         fi
         git clone https://github.com/s1341/pyenv-alias.git ~/.pyenv/plugins/pyenv-alias
     fi
+
+    env | sort
 
     # install python
     if [ ! -d $HOME/.pyenv/versions/${base_python_version} ]; then
