@@ -4,9 +4,9 @@ if [ -f ~/.cargo/env ]; then
 fi
 
 # nvm
-if [ -s "$(brew --prefix)/opt/nvm/etc/bash_completion.d/nvm" ]; then
+if [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ]; then
     # macOS
-    . "$(brew --prefix)/opt/nvm/etc/bash_completion.d/nvm"
+    . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
 elif [ -s "$HOME/.nvm/bash_completion" ]; then
     # linux, installed via official script
     . "$HOME/.nvm/bash_completion"
