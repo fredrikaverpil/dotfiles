@@ -16,11 +16,6 @@ Darwin)
         curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
     fi
 
-    # install pyenv-alias
-    if [ ! -d ~/.pyenv/plugins/pyenv-alias ]; then
-        git clone https://github.com/s1341/pyenv-alias.git ~/.pyenv/plugins/pyenv-alias
-    fi
-
     # install python
     if [ ! -d $HOME/.pyenv/versions/${base_python_version} ]; then
         brew install openssl readline sqlite3 xz zlib # required to build python
@@ -44,6 +39,8 @@ Darwin)
     # install python, pipx and pipx-managed tools for x86_64
     if [ "$(uname -m)" == "arm64" ] && [ ! -d ~/.pyenv/versions/${base_python_version}_x86 ]; then
         # http://sixty-north.com/blog/pyenv-apple-silicon.html
+
+        git clone https://github.com/s1341/pyenv-alias.git ~/.pyenv/plugins/pyenv-alias
         brew86 install openssl readline sqlite3 xz zlib # required to build python
         VERSION_ALIAS="${base_python_version}_x86" \
             pyenv86 install -v $base_python_version
