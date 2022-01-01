@@ -1,21 +1,4 @@
-# Rust
-if [ -f ~/.cargo/env ]; then
-    . "$HOME/.cargo/env"
-fi
-
-# nvm
-if [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ]; then
-    # macOS
-    . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
-elif [ -s "$HOME/.nvm/bash_completion" ]; then
-    # linux, installed via official script
-    . "$HOME/.nvm/bash_completion"
-fi
-
-# Nix
-if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then
-    . ~/.nix-profile/etc/profile.d/nix.sh
-fi
+# shellcheck shell=bash
 
 # Homebrew
 if [ -f /opt/homebrew/bin/brew ]; then
@@ -27,6 +10,11 @@ if [ -f ~/.linuxbrew/bin/brew ]; then
     eval "$(~/.linuxbrew/bin/brew shellenv)"
     # eval "$(/home/fredrik/.linuxbrew/bin/brew shellenv)"
     # eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
+# Nix
+if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then
+    . ~/.nix-profile/etc/profile.d/nix.sh
 fi
 
 # Pyenv + auto venv activation on cd
@@ -52,6 +40,25 @@ if [ -d ~/.pyenv ]; then
             fi
         fi
     }
+fi
+
+# NVM bash completion
+if [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ]; then
+    # macOS, installed via homebrew
+    . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+elif [ -s "$HOME/.nvm/bash_completion" ]; then
+    # linux, installed via official script
+    . "$HOME/.nvm/bash_completion"
+fi
+
+# NVM
+if [ -s "/opt/homebrew/opt/nvm/nvm.sh" ]; then
+    . "/opt/homebrew/opt/nvm/nvm.sh"
+fi
+
+# Rust
+if [ -f ~/.cargo/env ]; then
+    . "$HOME/.cargo/env"
 fi
 
 if [ -n "${ZSH_VERSION}" ]; then
