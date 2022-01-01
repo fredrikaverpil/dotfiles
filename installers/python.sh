@@ -12,6 +12,7 @@ Darwin)
     base_python_version=$(cat .python-version)
 
     if [ ! -d "$HOME/.pyenv" ]; then
+        mkdir -p "$HOME/.pyenv"
         curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
         git clone https://github.com/s1341/pyenv-alias.git ~/.pyenv/plugins/pyenv-alias
     fi
