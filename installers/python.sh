@@ -1,4 +1,4 @@
-#/bin/bash -ex
+#!/bin/bash -ex
 
 # https://github.com/pyenv/pyenv/wiki
 # https://github.com/pyenv/pyenv-installer

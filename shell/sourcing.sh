@@ -1,4 +1,5 @@
 # shellcheck shell=bash
+# shellcheck source=/dev/null
 
 # Homebrew
 if [ -f /opt/homebrew/bin/brew ]; then
@@ -23,7 +24,7 @@ if [ -d ~/.pyenv ]; then
     eval "$(pyenv virtualenv-init -)"
 
     function cd() {
-        builtin cd "$@"
+        builtin cd "$@" || exit
 
         if [[ -z "$VIRTUAL_ENV" ]]; then
             ## If env folder is found then activate the vitualenv

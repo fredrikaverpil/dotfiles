@@ -1,8 +1,8 @@
-#/bin/bash -ex
+#!/bin/bash -ex
 
 # https://snapcraft.io
 
-if command -v apt &> /dev/null; then
+if command -v apt &>/dev/null; then
     sudo apt install -y snapd
 
     sudo snap install code --classic
