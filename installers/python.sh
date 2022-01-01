@@ -18,7 +18,7 @@ Darwin)
     # install pyenv
     if [ ! -d ~/.pyenv ]; then
         mkdir ~/.pyenv
-        wget -O https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer
+        curl -O https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer
         chmod +x pyenv-installer
         ./pyenv-installer
         rm pyenv-installer
