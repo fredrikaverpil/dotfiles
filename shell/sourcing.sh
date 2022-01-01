@@ -44,7 +44,7 @@ fi
 
 # NVM bash completion
 if [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ]; then
-    # macOS
+    # macOS, installed via homebrew
     . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
 elif [ -s "$HOME/.nvm/bash_completion" ]; then
     # linux, installed via official script
