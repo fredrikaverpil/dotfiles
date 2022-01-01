@@ -12,12 +12,12 @@ Darwin)
     # commands for macOS go here
 
     # tmp
-    mkdir ~/.pyenv
     ls -alh ~
     env | sort
 
     # install pyenv
     if [ ! -d ~/.pyenv ]; then
+        mkdir ~/.pyenv
         wget -O https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer
         chmod +x pyenv-installer
         ./pyenv-installer
