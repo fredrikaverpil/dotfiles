@@ -3,11 +3,11 @@
 for x in *; do
     if [ -d "${x}" ]; then
         current_dir=$(pwd)
-        cd "$x" || exit
+        cd "$x" || return
         pwd
         docker compose down
         echo "-----"
 
-        cd "$current_dir" || exit
+        cd "$current_dir" || return
     fi
 done
