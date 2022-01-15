@@ -24,7 +24,7 @@ if [ -d ~/.pyenv ]; then
     eval "$(pyenv virtualenv-init -)"
 
     function cd() {
-        builtin cd "$@" || exit
+        builtin cd "$@" || return
 
         if [[ -z "$VIRTUAL_ENV" ]]; then
             ## If env folder is found then activate the vitualenv
