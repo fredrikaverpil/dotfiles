@@ -50,28 +50,31 @@ windows:
       layout: even-horizontal
       # synchronize: after
       panes:
-        - cd proj1 && echo "git submodule update --recursive && npm install && npm start"
-        - cd proj2 && echo "git submodule update --recursive && npm install && npm start"
+        - cd proj1
+        - cd proj2
   - api:
       root: ~/code/repos
       layout: even-horizontal
       # synchronize: after
       panes:
-        - cd proj3 && echo "git submodule update --recursive && docker compose up --remove-orphans --build"
+        - cd proj3
   - services:
       root: ~/code/repos/
       layout: tiled
       # synchronize: after
       panes:
-        - cd proj4 && echo "docker compose -f docker-compose.yaml -f docker-compose.debug.yaml up --remove-orphans --build"
+        - cd proj4
         - cd proj5
         - cd proj6
         - cd proj7
         - cd proj8
         - cd proj9
-  - tests:
+  - test-containers:
       root: ~/code/repos
       layout: tiled
       # synchronize: after
       panes:
-        - cd conversation-svc && echo "docker-compose -f docker-compose.test.yaml up postgres-test"
+        - cd proj1
+        - cd proj2
+        - cd proj3
+        - cd proj4
