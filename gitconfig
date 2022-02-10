@@ -16,6 +16,8 @@
 	cmd = code --wait --diff $LOCAL $REMOTE
 [init]
 	defaultBranch = main
+[rebase]
+	autostash = true
 
 # Always keep gitconfig for work at bottom of this file
 [includeIf "gitdir:~/code/repos/doktor/**/.git"]
