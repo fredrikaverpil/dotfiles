@@ -48,5 +48,6 @@ Darwin)
     ;;
 Linux)
     # commands for Linux go here
+    alias bat='batcat'
     ;;
 esac
