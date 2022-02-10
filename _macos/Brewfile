@@ -16,6 +16,7 @@ brew 'tree'
 brew 'pgcli'
 brew 'mcfly'
 brew 'exa'
+brew 'bat'
 
 # GUIs
 cask 'appcleaner'
