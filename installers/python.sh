@@ -35,7 +35,7 @@ Darwin)
     if [ ! -f ~/.local/bin/bandit ]; then $(brew --prefix)/bin/pipx install bandit; fi
     if [ ! -f ~/.local/bin/poetry ]; then $(brew --prefix)/bin/pipx install poetry; fi
     if [ ! -f ~/.local/bin/pre-commit ]; then $(brew --prefix)/bin/pipx install pre-commit; fi
-    if [ ! -f ~/.local/bin/rich-cli ]; then $(brew --prefix)/bin/pipx install rich-cli; fi
+    if [ ! -f ~/.local/bin/glances ]; then $(brew --prefix)/bin/pipx 'glances[action,browser,cloud,cpuinfo,docker,export,folders,gpu,graph,ip,raid,snmp,web,wifi]'; fi
 
     # install python, pipx and pipx-managed tools for x86_64
     if [ "$(uname -m)" == "arm64" ] && [ ! -d ~/.pyenv/versions/${base_python_version}_x86 ]; then
@@ -93,7 +93,7 @@ Linux)
     if [ ! -f ~/.local/bin/black ]; then /usr/bin/pipx install black; fi
     if [ ! -f ~/.local/bin/poetry ]; then /usr/bin/pipx install poetry; fi
     if [ ! -f ~/.local/bin/pre-commit ]; then /usr/bin/pipx install pre-commit; fi
-    if [ ! -f ~/.local/bin/rich-cli ]; then /usr/bin/pipx install rich-cli; fi
+    if [ ! -f ~/.local/bin/glances ]; then $(brew --prefix)/bin/pipx 'glances[action,browser,cloud,cpuinfo,docker,export,folders,gpu,graph,ip,raid,snmp,web,wifi]'; fi
 
     ;;
 *) ;;
