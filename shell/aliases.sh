@@ -9,6 +9,12 @@ alias repos='cd ~/code/repos'
 alias ll='exa --long --header --group-directories-first --git --group --all'
 alias tree='tree -C'
 
+# Kitty
+if command -v kitty &>/dev/null; then
+    alias icat='kitty +kitten icat'
+    alias diff='kitty +kitten diff'
+fi
+
 # Doktor
 alias doktor='cd ~/code/repos/doktor'
 alias mux='cd ~/code/repos/doktor && tmuxinator'

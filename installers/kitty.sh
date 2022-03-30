@@ -7,6 +7,7 @@ case $(uname) in
 Darwin)
     # commands for macOS go here
     brew install kitty
+    brew install imagemagick  # for icat kitten
 
     if [ ! -d ~/.config/kitty/kitty-themes ]; then
         git clone --depth 1 https://github.com/dexpota/kitty-themes.git ~/.config/kitty/kitty-themes
