@@ -111,6 +111,10 @@
   "workbench.colorCustomizations": {
     "[Serendipity Midnight]": {
       "sideBar.background": "#121421"
+    },
+    "[Serendipity Morning]": {
+      "sideBar.border": "#ebebeb",
+      "sideBar.background": "#f1f1f4"
     }
   },
   "workbench.editor.scrollToSwitchTabs": true,
