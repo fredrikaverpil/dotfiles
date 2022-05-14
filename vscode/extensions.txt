@@ -1,4 +1,3 @@
-4ops.terraform
 alefragnani.project-manager
 alexcvzz.vscode-sqlite
 apollographql.vscode-apollo
@@ -22,6 +21,7 @@ foxundermoon.shell-format
 GitHub.vscode-pull-request-github
 golang.go
 GraphQL.vscode-graphql
+hashicorp.terraform
 johnpapa.vscode-peacock
 malmaud.tmux
 mhutchie.git-graph
