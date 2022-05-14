@@ -22,7 +22,7 @@
     ~/.config/starship.toml: starship.toml
     ~/.config/kitty/kitty.conf: kitty.conf
     ~/Library/Application Support/Code/User/settings.json:
-      path: vscode/settings.json
+      path: vscode_settings.jsonc
       force: true
       if: '[ "$(uname -s)" = "Darwin" ]'
 
