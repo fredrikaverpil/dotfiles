@@ -148,7 +148,10 @@
     "editor.formatOnPaste": false, // set false for black
     "editor.formatOnSave": true,
     // "editor.formatOnSaveTimeout": 10000,  // for large files, black can timeout
-    "editor.codeActionsOnSave": { "source.organizeImports": true }
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true,
+      "source.fixAll.shellcheck": true
+    }
   },
   "[markdown]": {
     "editor.wordWrap": "on",
@@ -194,12 +197,12 @@
 
   // Extension: Project Manager
   "projectManager.sortList": "Name",
-  "projectManager.any.maxDepthRecursion": 1,
   "projectManager.git.baseFolders": [
     "~/code/repos",
+    "~/code/repos/doktor",
     "\\\\wsl.localhost\\Ubuntu-20.04\\home\\fredrik\\code\\repos"
   ],
-  "projectManager.git.maxDepthRecursion": 2,
+  "projectManager.git.maxDepthRecursion": 1,
 
   // Extension: Python
   "python.terminal.activateEnvironment": true,
