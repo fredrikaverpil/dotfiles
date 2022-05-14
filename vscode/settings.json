@@ -125,10 +125,7 @@
   "telemetry.telemetryLevel": "off",
 
   // Built-in settings sync options
-  "settingsSync.ignoredExtensions": [
-    "GitHub.copilot",
-    "VisualStudioExptTeam.vscodeintellicode-completions"
-  ],
+  "settingsSync.ignoredExtensions": ["GitHub.copilot"],
   "settingsSync.ignoredSettings": [],
 
   // SCM
@@ -237,6 +234,7 @@
   "liveshare.presence": true,
 
   // Extension: IntelliCode
+  "intellicodeCompletions.language.python": true,
   "intellicodeCompletions.language.typescript": true,
 
   // Extension: ShellCheck
