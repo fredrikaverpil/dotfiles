@@ -1,0 +1,306 @@
+{
+  // ----------------------
+  // Templates and examples
+  // ----------------------
+
+  // Example per-theme color customization
+  //
+  // "editor.tokenColorCustomizations": {
+  //   "[Serendipity Morning]": {
+  //     "textMateRules": [
+  //       {
+  //         "scope": "string.quoted.docstring.multi.python",
+  //         "settings": {
+  //           "foreground": "#5c6773"
+  //         }
+  //       }
+  //     ]
+  //   }
+  // },
+
+  // -------------------
+  // Native, built-in settings
+  // -------------------
+
+  // Files
+  "files.associations": {
+    "requirements*.txt": "pip-requirements",
+    "Jenkinsfile*": "groovy",
+    "Brewfile": "ruby",
+    "vimrc": "viml"
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/__pycache__": true,
+    "**/**/*.pyc": true,
+    "**/node_modules/*/**": true,
+    "**/.DS_Store": true
+  },
+  "files.watcherExclude": {
+    "**/__pycache__": true,
+    "**/**/*.pyc": true,
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/*/**": true,
+    "**/.DS_Store": true
+  },
+
+  // Editor
+  "editor.minimap.renderCharacters": false,
+  "editor.suggestSelection": "first",
+  "editor.fontFamily": "'FiraCode Nerd Font', 'Cascadia Code', Consolas, 'Courier New', monospace",
+  "editor.fontSize": 12,
+  "editor.inlineSuggest.enabled": true,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.highlightActiveBracketPair": true,
+  "editor.formatOnSave": true,
+
+  // Terminal
+  "terminal.integrated.fontFamily": "'FiraCode Nerd Font', 'Cascadia Code', Consolas, 'Courier New', monospace",
+  "terminal.integrated.fontSize": 12,
+  "terminal.integrated.profiles.linux": {
+    "bash": {
+      "path": "bash",
+      "icon": "terminal-bash",
+      "color": "terminal.ansiBlue"
+    },
+    "zsh": {
+      "path": "zsh",
+      "color": "terminal.ansiGreen"
+    }
+  },
+  "terminal.integrated.profiles.osx": {
+    "bash": {
+      "path": "bash",
+      "icon": "terminal-bash",
+      "color": "terminal.ansiBlue"
+    },
+    "zsh": {
+      "path": "zsh",
+      "color": "terminal.ansiGreen"
+    },
+    "zsh-rosetta": {
+      "path": "arch",
+      "color": "terminal.ansiRed",
+      "args": ["-x86_64", "zsh"]
+    }
+  },
+  "terminal.integrated.profiles.windows": {
+    "bash": {
+      "path": "bash",
+      "icon": "terminal-bash",
+      "color": "terminal.ansiBlue"
+    },
+    "zsh": {
+      "path": "zsh",
+      "color": "terminal.ansiGreen"
+    }
+  },
+  "terminal.integrated.defaultProfile.linux": "zsh",
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.defaultProfile.windows": "zsh",
+
+  // Window
+  "window.restoreWindows": "all",
+  "window.autoDetectColorScheme": true,
+
+  // Workbench
+  "workbench.preferredLightColorTheme": "Serendipity Morning",
+  "workbench.preferredDarkColorTheme": "Serendipity Midnight",
+  "workbench.colorTheme": "Serendipity Morning",
+  "workbench.colorCustomizations": {
+    "[Serendipity Midnight]": {
+      "sideBar.background": "#121421"
+    }
+  },
+  "workbench.editor.scrollToSwitchTabs": true,
+  "workbench.editorAssociations": {
+    "*.ipynb": "jupyter-notebook"
+  },
+
+  // Explorer
+  "explorer.confirmDragAndDrop": false,
+
+  // Telemetry
+  "telemetry.telemetryLevel": "off",
+
+  // Built-in settings sync options
+  "settingsSync.ignoredExtensions": [
+    "GitHub.copilot",
+    "VisualStudioExptTeam.vscodeintellicode-completions"
+  ],
+  "settingsSync.ignoredSettings": [],
+
+  // SCM
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.ignoreMissingGitWarning": true,
+
+  // Language overrides
+  "[python]": {
+    "editor.rulers": [
+      72, // Docstrings
+      // 79,  // PEP8
+      88 // Black
+    ],
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.formatOnPaste": false, // set false for black
+    "editor.formatOnSave": true,
+    // "editor.formatOnSaveTimeout": 10000,  // for large files, black can timeout
+    "editor.codeActionsOnSave": { "source.organizeImports": true }
+  },
+  "[markdown]": {
+    "editor.wordWrap": "on",
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one"
+  },
+  "[plaintext]": {
+    "editor.wordWrap": "on"
+  },
+  "[restructuredtext]": {
+    "editor.rulers": [
+      72, // Docstrings
+      // 79,  // PEP8
+      88, // Black
+      120
+    ],
+    "editor.wordWrap": "on"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[dockerfile]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[sql]": {
+    "editor.defaultFormatter": "mtxr.sqltools"
+  },
+  "[dockercompose]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+  },
+
+  // -------------------
+  // Extensions settings
+  // -------------------
+
+  // Extension: Project Manager
+  "projectManager.sortList": "Name",
+  "projectManager.any.maxDepthRecursion": 1,
+  "projectManager.git.baseFolders": [
+    "~/code/repos",
+    "\\\\wsl.localhost\\Ubuntu-20.04\\home\\fredrik\\code\\repos"
+  ],
+  "projectManager.git.maxDepthRecursion": 2,
+
+  // Extension: Python
+  "python.terminal.activateEnvironment": true,
+  "python.languageServer": "Pylance",
+  "python.linting.enabled": true,
+  "python.linting.flake8Path": "${env:HOME}/.local/bin/flake8",
+  "python.linting.flake8Enabled": true,
+  // "python.linting.mypyPath": "${env:HOME}/.local/bin/mypy",
+  "python.linting.mypyEnabled": true,
+  "python.linting.banditPath": "${env:HOME}/.local/bin/bandit",
+  "python.linting.banditEnabled": true,
+  "python.formatting.provider": "black",
+  "python.linting.pylintEnabled": false,
+  "python.linting.pydocstyleEnabled": false,
+  // "python.sortImports.args": ["--profile", "black"],
+  "python.analysis.typeCheckingMode": "basic",
+  "python.linting.banditArgs": ["--ini=${workspaceFolder}/setup.cfg"],
+  // Notes:
+  // "python.condaPath": "${env:HOME}/.local/bin/conda",
+  // "python.linting.flake8Args": ["--max-line-length", "88", "--max-doc-length", "72"],
+  // "python.linting.pylintPath": "${env:HOME}/.local/bin/pylint",
+  // "python.linting.pydocstylePath": "${env:HOME}/.local/bin/pydocstyle",
+  // "python.formatting.blackPath": "${env:HOME}/.local/bin/black",
+  // "python.formatting.blackArgs": ["--line-length", "88"],
+  // "python.formatting.yapfArgs": ["--style={based_on_style: pep8, indent_width: 4, column_limit: 88}"],
+
+  // Extension: Trailing spaces
+  "trailing-spaces.trimOnSave": false, // black trims
+  "trailing-spaces.syntaxIgnore": ["markdown"],
+
+  // Extension: Live Share
+  "liveshare.presence": true,
+
+  // Extension: IntelliCode
+  "intellicodeCompletions.language.typescript": true,
+
+  // Extension: ShellCheck
+  "shellcheck.executablePath": "/opt/homebrew/bin/shellcheck",
+
+  // Extension: Peacock
+  "peacock.favoriteColors": [
+    {
+      "name": "Pink",
+      "value": "#db86d7"
+    },
+    {
+      "name": "Pale red",
+      "value": "#F06897"
+    },
+    {
+      "name": "Peach",
+      "value": "#f29e74"
+    },
+    {
+      "name": "Pale yellow",
+      "value": "#ffe6b3"
+    },
+    {
+      "name": "Purple",
+      "value": "#be95ff"
+    },
+    {
+      "name": "Pale blue",
+      "value": "#78a9ff"
+    },
+    {
+      "name": "Somewhat cyan",
+      "value": "#95e6cb"
+    },
+    {
+      "name": "Vue Green",
+      "value": "#42b883"
+    }
+  ],
+
+  // Extension: Jupyter Notebook
+  "jupyter.askForKernelRestart": false,
+  "notebook.cellToolbarLocation": {
+    "default": "right",
+    "jupyter-notebook": "left"
+  },
+
+  // Extension: Sourcery
+  "sourcery.metricsEnabled": false,
+
+  // Extension: RedHat extensions (e.g. YAML)
+  "redhat.telemetry.enabled": false,
+
+  // ----------------------------------------
+  // Settings for extensions not being synced
+  // ----------------------------------------
+
+  "github.copilot.enable": {
+    "*": true,
+    "yaml": false,
+    "plaintext": false,
+    "markdown": true
+  }
+
+  // -----------------------------------------------
+  // Bucket of often changed settings
+  // (will keep re-appearing at bottom when changed)
+  // -----------------------------------------------
+}
