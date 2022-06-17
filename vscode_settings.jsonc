@@ -142,7 +142,8 @@
     "editor.rulers": [
       72, // Docstrings
       // 79,  // PEP8
-      88 // Black
+      88, // Black
+      120 // Nooooooo...
     ],
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
@@ -241,10 +242,8 @@
   "intellicodeCompletions.language.python": true,
   "intellicodeCompletions.language.typescript": true,
 
-  // Extension: ShellCheck
-  "shellcheck.executablePath": "/opt/homebrew/bin/shellcheck",
-
   // Extension: Peacock
+  "shellcheck.executablePath": "/opt/homebrew/bin/shellcheck",
   "peacock.favoriteColors": [
     {
       "name": "Pink",
@@ -302,10 +301,15 @@
     "yaml": false,
     "plaintext": false,
     "markdown": true
-  }
+  },
 
   // -----------------------------------------------
   // Bucket of often changed settings
   // (will keep re-appearing at bottom when changed)
   // -----------------------------------------------
+
+  "diffEditor.ignoreTrimWhitespace": false,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
