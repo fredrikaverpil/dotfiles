@@ -18,6 +18,8 @@
 	defaultBranch = main
 [rebase]
 	autostash = true
+[commit]
+	template = ~/.gitmessage
 
 # Always keep gitconfig for work at bottom of this file
 [includeIf "gitdir:~/code/repos/doktor/**/.git"]
