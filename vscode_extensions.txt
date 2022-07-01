@@ -18,6 +18,7 @@ dbaeumer.vscode-eslint
 eamodio.gitlens
 esbenp.prettier-vscode
 foxundermoon.shell-format
+GitHub.copilot
 GitHub.vscode-pull-request-github
 golang.go
 GraphQL.vscode-graphql
@@ -40,6 +41,7 @@ ms-vscode-remote.remote-ssh-edit
 ms-vscode-remote.remote-wsl
 ms-vscode-remote.vscode-remote-extensionpack
 ms-vscode.live-server
+ms-vscode.makefile-tools
 ms-vscode.vscode-typescript-tslint-plugin
 ms-vsliveshare.vsliveshare
 ms-vsliveshare.vsliveshare-audio
