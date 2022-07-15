@@ -20,6 +20,8 @@
 	autostash = true
 [commit]
 	template = ~/.gitmessage
+[push]
+	autoSetupRemote = true
 
 # Always keep gitconfig for work at bottom of this file
 [includeIf "gitdir:~/code/repos/doktor/**/.git"]
