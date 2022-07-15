@@ -27,7 +27,9 @@
     "requirements*.txt": "pip-requirements",
     "Jenkinsfile*": "groovy",
     "Brewfile": "ruby",
-    "vimrc": "viml"
+    "vimrc": "viml",
+    ".gitconfig": "gitconfig",
+    "gitconfig": "gitconfig"
   },
   "files.exclude": {
     "**/.git": true,

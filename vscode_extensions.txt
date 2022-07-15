@@ -56,7 +56,6 @@ redhat.vscode-yaml
 rust-lang.rust
 shardulm94.trailing-spaces
 sidneys1.gitconfig
-sourcery.sourcery
 timonwong.shellcheck
 tldraw-org.tldraw-vscode
 VisualStudioExptTeam.intellicode-api-usage-examples
