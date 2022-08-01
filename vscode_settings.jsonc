@@ -59,6 +59,7 @@
 
   // Terminal
   "terminal.integrated.fontFamily": "'FiraCode Nerd Font', 'Cascadia Code', Consolas, 'Courier New', monospace",
+  // "terminal.integrated.shellIntegration.enabled": true,
   "terminal.integrated.fontSize": 12,
   "terminal.integrated.profiles.linux": {
     "bash": {
@@ -138,6 +139,7 @@
   "git.autofetch": true,
   "git.confirmSync": false,
   "git.ignoreMissingGitWarning": true,
+  "git.mergeEditor": true,
 
   // Language overrides
   "[python]": {
@@ -187,9 +189,6 @@
   },
   "[yaml]": {
     "editor.defaultFormatter": "redhat.vscode-yaml"
-  },
-  "[sql]": {
-    "editor.defaultFormatter": "mtxr.sqltools"
   },
   "[dockercompose]": {
     "editor.defaultFormatter": "ms-azuretools.vscode-docker"
@@ -243,8 +242,6 @@
   // Extension: IntelliCode
   "intellicodeCompletions.language.python": true,
   "intellicodeCompletions.language.typescript": true,
-
-  // Extension: Peacock
   "shellcheck.executablePath": "/opt/homebrew/bin/shellcheck",
   "peacock.favoriteColors": [
     {
@@ -313,5 +310,6 @@
   "diffEditor.ignoreTrimWhitespace": false,
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "git.suggestSmartCommit": false
 }
