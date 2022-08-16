@@ -217,7 +217,6 @@
   "python.linting.flake8Enabled": true,
   "python.linting.mypyEnabled": true,
   "python.linting.pylintEnabled": false, // prefer flake8 instead
-  "python.linting.pydocstyleEnabled": true,
   // "python.sortImports.args": ["--profile", "black"],  // see editor.codeActionsOnSave instead
 
   // Extension: Trailing spaces
