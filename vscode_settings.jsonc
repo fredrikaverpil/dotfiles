@@ -110,7 +110,7 @@
   // Workbench
   "workbench.preferredLightColorTheme": "Serendipity Morning",
   "workbench.preferredDarkColorTheme": "Serendipity Midnight",
-  "workbench.colorTheme": "Serendipity Morning",
+  "workbench.colorTheme": "Serendipity Midnight",
   "workbench.colorCustomizations": {
     "[Serendipity Midnight]": {
       "sideBar.background": "#121421"
@@ -156,7 +156,7 @@
     // "editor.formatOnSaveTimeout": 10000,  // for large files, black can timeout
     "editor.codeActionsOnSave": {
       "source.organizeImports": true,
-      "source.fixAll.shellcheck": true
+      "source.fixAll": true
     }
   },
   "[markdown]": {
@@ -210,27 +210,15 @@
   // Extension: Python
   "python.terminal.activateEnvironment": true,
   "python.languageServer": "Pylance",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.formatting.provider": "black",
   "python.linting.enabled": true,
   "python.linting.flake8Path": "${env:HOME}/.local/bin/flake8",
   "python.linting.flake8Enabled": true,
-  // "python.linting.mypyPath": "${env:HOME}/.local/bin/mypy",
   "python.linting.mypyEnabled": true,
-  "python.linting.banditPath": "${env:HOME}/.local/bin/bandit",
-  "python.linting.banditEnabled": true,
-  "python.formatting.provider": "black",
-  "python.linting.pylintEnabled": false,
-  "python.linting.pydocstyleEnabled": false,
-  // "python.sortImports.args": ["--profile", "black"],
-  "python.analysis.typeCheckingMode": "basic",
-  "python.linting.banditArgs": ["--ini=${workspaceFolder}/setup.cfg"],
-  // Notes:
-  // "python.condaPath": "${env:HOME}/.local/bin/conda",
-  // "python.linting.flake8Args": ["--max-line-length", "88", "--max-doc-length", "72"],
-  // "python.linting.pylintPath": "${env:HOME}/.local/bin/pylint",
-  // "python.linting.pydocstylePath": "${env:HOME}/.local/bin/pydocstyle",
-  // "python.formatting.blackPath": "${env:HOME}/.local/bin/black",
-  // "python.formatting.blackArgs": ["--line-length", "88"],
-  // "python.formatting.yapfArgs": ["--style={based_on_style: pep8, indent_width: 4, column_limit: 88}"],
+  "python.linting.pylintEnabled": false, // prefer flake8 instead
+  "python.linting.pydocstyleEnabled": true,
+  // "python.sortImports.args": ["--profile", "black"],  // see editor.codeActionsOnSave instead
 
   // Extension: Trailing spaces
   "trailing-spaces.trimOnSave": false, // black trims
@@ -301,15 +289,10 @@
     "plaintext": false,
     "markdown": true
   },
-
-  // -----------------------------------------------
-  // Bucket of often changed settings
-  // (will keep re-appearing at bottom when changed)
-  // -----------------------------------------------
-
-  "diffEditor.ignoreTrimWhitespace": false,
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "git.suggestSmartCommit": false
+  "git.suggestSmartCommit": false,
+  "diffEditor.ignoreTrimWhitespace": false,
+  "githubPullRequests.pullBranch": "never"
 }
