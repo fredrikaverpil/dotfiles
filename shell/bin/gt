@@ -1,9 +1,0 @@
-#!/bin/sh
-
-set -e
-
-_graphite_cli() {
-    node "$HOME/code/repos/graphite-cli/dist/src/index.js" "$@"
-}
-
-_graphite_cli "$@"
