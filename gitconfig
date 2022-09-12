@@ -23,6 +23,9 @@
 [push]
 	autoSetupRemote = true
 
+[include]
+    path = ~/.gitconfig_1password
+
 # Always keep gitconfig for work at bottom of this file
 [includeIf "gitdir:~/code/repos/doktor/**/.git"]
 	path = ~/.gitconfig_doktor
