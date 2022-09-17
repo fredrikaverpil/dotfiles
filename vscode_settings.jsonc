@@ -293,5 +293,9 @@
   },
   "git.suggestSmartCommit": false,
   "diffEditor.ignoreTrimWhitespace": false,
-  "githubPullRequests.pullBranch": "never"
+  "githubPullRequests.pullBranch": "never",
+  "terminal.integrated.env.osx": {
+    "FIG_NEW_SESSION": "1"
+  },
+  "editor.accessibilitySupport": "off"
 }
