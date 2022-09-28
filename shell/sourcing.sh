@@ -73,9 +73,9 @@ if [ -n "${ZSH_VERSION}" ]; then
         source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
     fi
 
-    # if [ -d ~/.zsh/zsh-syntax-highlighting ]; then
-    #     source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-    # fi
+    if [ -d ~/.zsh/zsh-syntax-highlighting ]; then
+        source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+    fi
 
     # mcfly
     if [ -f /opt/homebrew/bin/mcfly ] || [ -f /usr/local/bin/mcfly ]; then
