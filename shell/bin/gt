@@ -3,7 +3,20 @@
 set -e
 
 _graphite_cli() {
-    node "$HOME/code/repos/graphite-cli/dist/src/index.js" "$@"
+    # Per-platform settings
+    case $(uname) in
+    Darwin)
+        # commands for macOS go here
+        /opt/homebrew/bin/gt "$@"
+
+        ;;
+    Linux)
+        # commands for Linux go here
+        node "$HOME/code/repos/graphite-cli/dist/src/index.js" "$@"
+        ;;
+    *) ;;
+    esac
+
 }
 
 _graphite_cli "$@"
