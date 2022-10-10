@@ -46,15 +46,6 @@ if [ -d ~/.pyenv ]; then
     }
 fi
 
-# NVM bash completion
-if [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ]; then
-    # macOS, installed via homebrew
-    . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
-elif [ -s "$HOME/.nvm/bash_completion" ]; then
-    # linux, installed via official script
-    . "$HOME/.nvm/bash_completion"
-fi
-
 # NVM
 if [ -s "/opt/homebrew/opt/nvm/nvm.sh" ]; then
     . "/opt/homebrew/opt/nvm/nvm.sh"
@@ -89,6 +80,15 @@ if [ -n "${ZSH_VERSION}" ]; then
 
 elif [ -n "${BASH_VERSION}" ]; then
     # assume Bash
+
+    # NVM bash completion
+    if [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ]; then
+        # macOS, installed via homebrew
+        . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+    elif [ -s "$HOME/.nvm/bash_completion" ]; then
+        # linux, installed via official script
+        . "$HOME/.nvm/bash_completion"
+    fi
 
     # Bash autocompletion
     if [ -f /etc/profile.d/bash_completion.sh ]; then
