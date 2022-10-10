@@ -23,8 +23,10 @@ GitHub.vscode-pull-request-github
 golang.go
 GraphQL.vscode-graphql
 GraphQL.vscode-graphql-syntax
+Gruntfuggly.todo-tree
 hashicorp.terraform
 johnpapa.vscode-peacock
+KevinRose.vsc-python-indent
 malmaud.tmux
 mhutchie.git-graph
 mikestead.dotenv
@@ -36,6 +38,8 @@ ms-python.vscode-pylance
 ms-toolsai.jupyter
 ms-toolsai.jupyter-keymap
 ms-toolsai.jupyter-renderers
+ms-toolsai.vscode-jupyter-cell-tags
+ms-toolsai.vscode-jupyter-slideshow
 ms-vscode-remote.remote-containers
 ms-vscode-remote.remote-ssh
 ms-vscode-remote.remote-ssh-edit
@@ -50,6 +54,7 @@ ms-vsliveshare.vsliveshare-pack
 mtxr.sqltools
 naumovs.color-highlight
 nickmillerdev.pytest-fixtures
+oderwat.indent-rainbow
 pnp.polacode
 qezhu.gitlink
 redhat.vscode-commons
