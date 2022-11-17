@@ -13,6 +13,7 @@
     ~/.shell:
     ~/.bash_profile:
     ~/.bashrc_user: bashrc
+    ~/.zprofile:
     ~/.zshrc_user: zshrc
     ~/.gitconfig:
     ~/.gitconfig_doktor:
