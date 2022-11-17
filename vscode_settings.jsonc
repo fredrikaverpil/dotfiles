@@ -201,7 +201,6 @@
   // Extension: Project Manager
   "projectManager.sortList": "Name",
   "projectManager.git.baseFolders": [
-    "~/code/repos",
     "~/code/repos/doktor",
     "\\\\wsl.localhost\\Ubuntu-20.04\\home\\fredrik\\code\\repos"
   ],
@@ -213,8 +212,9 @@
   "python.analysis.typeCheckingMode": "basic",
   "python.formatting.provider": "black",
   "python.linting.enabled": true,
-  "python.linting.flake8Path": "${env:HOME}/.local/bin/flake8",
-  "python.linting.flake8Enabled": true,
+  // "python.linting.flake8Path": "${env:HOME}/.local/bin/flake8",
+  "python.linting.flake8Enabled": false,
+  "ruff.showNotifications": "always",
   "python.linting.mypyEnabled": true,
   "python.linting.pylintEnabled": false, // prefer flake8 instead
   // "python.sortImports.args": ["--profile", "black"],  // see editor.codeActionsOnSave instead
