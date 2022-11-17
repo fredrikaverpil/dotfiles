@@ -1,9 +1,6 @@
 # shellcheck shell=bash
 # shellcheck source=/dev/null
 
-# Fig pre block. Keep at the top of this file.
-[[ -f "$HOME/.fig/shell/bash_profile.pre.bash" ]] && builtin source "$HOME/.fig/shell/bash_profile.pre.bash"
-
 # Homebrew
 if [ -f /opt/homebrew/bin/brew ]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -127,6 +124,3 @@ elif [ -n "${BASH_VERSION}" ]; then
         eval "$(starship init bash)"
     fi
 fi
-
-# Fig post block. Keep at the bottom of this file.
-[[ -f "$HOME/.fig/shell/bash_profile.post.bash" ]] && builtin source "$HOME/.fig/shell/bash_profile.post.bash"
