@@ -155,8 +155,8 @@
     "editor.formatOnSave": true,
     // "editor.formatOnSaveTimeout": 10000,  // for large files, black can timeout
     "editor.codeActionsOnSave": {
-      "source.organizeImports": true,
-      "source.fixAll": true
+      "source.organizeImports": true
+      // "source.fixAll": true
     }
   },
   "[markdown]": {
@@ -212,12 +212,19 @@
   "python.analysis.typeCheckingMode": "basic",
   "python.formatting.provider": "black",
   "python.linting.enabled": true,
-  // "python.linting.flake8Path": "${env:HOME}/.local/bin/flake8",
   "python.linting.flake8Enabled": false,
+  "ruff.importStrategy": "fromEnvironment",
+  "ruff.args": ["--select", "F,E,I,U,N,S,T,FBT,B,A,Q,YTT,BLE,RUF,M"], // skipped C,D,ANN
   "ruff.showNotifications": "always",
   "python.linting.mypyEnabled": true,
+  "python.linting.mypyArgs": [
+    "--follow-imports=silent",
+    "--ignore-missing-imports",
+    "--show-column-numbers",
+    "--no-pretty",
+    "--strict"
+  ],
   "python.linting.pylintEnabled": false, // prefer flake8 instead
-  // "python.sortImports.args": ["--profile", "black"],  // see editor.codeActionsOnSave instead
 
   // Extension: Trailing spaces
   "trailing-spaces.trimOnSave": false, // black trims
@@ -272,9 +279,6 @@
     "jupyter-notebook": "left"
   },
 
-  // Extension: Sourcery
-  "sourcery.metricsEnabled": false,
-
   // Extension: RedHat extensions (e.g. YAML)
   "redhat.telemetry.enabled": false,
 
@@ -286,16 +290,22 @@
     "*": true,
     "yaml": false,
     "plaintext": false,
-    "markdown": true
+    "markdown": false
   },
+
+  // ----------------------------------------
+  // Changed recently (appears at bottom)
+  // ----------------------------------------
+
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "git.suggestSmartCommit": false,
   "diffEditor.ignoreTrimWhitespace": false,
   "githubPullRequests.pullBranch": "never",
-  "terminal.integrated.env.osx": {
-    "FIG_NEW_SESSION": "1"
-  },
-  "editor.accessibilitySupport": "off"
+  "editor.accessibilitySupport": "off",
+  "coverage-gutters.coverageFileNames": ["coverage/coverage.lcov"],
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
