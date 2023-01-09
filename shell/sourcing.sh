@@ -1,6 +1,21 @@
 # shellcheck shell=bash
 # shellcheck source=/dev/null
 
+function virtual_env_activate() {
+    if [[ -z "$VIRTUAL_ENV" ]]; then
+        # if .venv folder is found then activate the vitualenv
+        if [ -d ./.venv ] && [ -f ./.venv/bin/activate ]; then
+            source ./.venv/bin/activate
+        fi
+    else
+        # check the current folder belong to earlier VIRTUAL_ENV folder
+        parentdir="$(dirname "$VIRTUAL_ENV")"
+        if [[ "$PWD"/ != "$parentdir"/* ]]; then
+            deactivate
+        fi
+    fi
+}
+
 # Homebrew
 if [ -f /opt/homebrew/bin/brew ]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -21,25 +36,12 @@ fi
 # Pyenv + auto venv activation on cd
 if [ -d ~/.pyenv ]; then
     eval "$(pyenv init --path)"
-    eval "$(pyenv virtualenv-init -)"
+    # eval "$(pyenv virtualenv-init -)"
+    cd . # trigger virtual_env_activate via cd hook
 
     function cd() {
         builtin cd "$@" || return
-
-        if [[ -z "$VIRTUAL_ENV" ]]; then
-            ## If env folder is found then activate the vitualenv
-            if [ -d ./.venv ] && [ -f ./venv/bin/activate ]; then
-                source ./.venv/bin/activate
-            fi
-        else
-            ## check the current folder belong to earlier VIRTUAL_ENV folder
-            # if yes then do nothing
-            # else deactivate
-            parentdir="$(dirname "$VIRTUAL_ENV")"
-            if [[ "$PWD"/ != "$parentdir"/* ]]; then
-                deactivate
-            fi
-        fi
+        virtual_env_activate
     }
 fi
 
@@ -56,27 +58,27 @@ fi
 if [ -n "${ZSH_VERSION}" ]; then
     # assume Zsh
 
-    # auto-load .nvmrc file
-    autoload -U add-zsh-hook
-    load-nvmrc() {
-        local node_version="$(nvm version)"
-        local nvmrc_path="$(nvm_find_nvmrc)"
+    # # auto-load .nvmrc file
+    # autoload -U add-zsh-hook
+    # load-nvmrc() {
+    #     local node_version="$(nvm version)"
+    #     local nvmrc_path="$(nvm_find_nvmrc)"
 
-        if [ -n "$nvmrc_path" ]; then
-            local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
+    #     if [ -n "$nvmrc_path" ]; then
+    #         local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
 
-            if [ "$nvmrc_node_version" = "N/A" ]; then
-                nvm install
-            elif [ "$nvmrc_node_version" != "$node_version" ]; then
-                nvm use
-            fi
-        elif [ "$node_version" != "$(nvm version default)" ]; then
-            echo "Reverting to nvm default version"
-            nvm use default
-        fi
-    }
-    add-zsh-hook chpwd load-nvmrc
-    load-nvmrc
+    #         if [ "$nvmrc_node_version" = "N/A" ]; then
+    #             nvm install
+    #         elif [ "$nvmrc_node_version" != "$node_version" ]; then
+    #             nvm use
+    #         fi
+    #     elif [ "$node_version" != "$(nvm version default)" ]; then
+    #         echo "Reverting to nvm default version"
+    #         nvm use default
+    #     fi
+    # }
+    # add-zsh-hook chpwd load-nvmrc
+    # load-nvmrc
 
     # Zsh autocompletion
     if [ -d ~/.zsh/zsh-autosuggestions ]; then
