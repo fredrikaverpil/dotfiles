@@ -16,6 +16,21 @@ function virtual_env_activate() {
     fi
 }
 
+function node_version_manager() {
+    if [[ -z "$NVMRC_DOTFILES_PATH" ]]; then
+        if [ -f .nvmrc ]; then
+            nvm use
+            export NVMRC_DOTFILES_PATH=$PWD/.nvmrc
+        fi
+    else
+        parent_nvmdir="$(dirname "$NVMRC_DOTFILES_PATH")"
+        if [[ "$PWD"/ != "$parent_nvmdir"/* ]]; then
+            nvm deactivate
+            export NVMRC_DOTFILES_PATH=""
+        fi
+    fi
+}
+
 # Homebrew
 if [ -f /opt/homebrew/bin/brew ]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -42,6 +57,7 @@ if [ -d ~/.pyenv ]; then
     function cd() {
         builtin cd "$@" || return
         virtual_env_activate
+        node_version_manager
     }
 fi
 
@@ -57,28 +73,6 @@ fi
 
 if [ -n "${ZSH_VERSION}" ]; then
     # assume Zsh
-
-    # # auto-load .nvmrc file
-    # autoload -U add-zsh-hook
-    # load-nvmrc() {
-    #     local node_version="$(nvm version)"
-    #     local nvmrc_path="$(nvm_find_nvmrc)"
-
-    #     if [ -n "$nvmrc_path" ]; then
-    #         local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
-
-    #         if [ "$nvmrc_node_version" = "N/A" ]; then
-    #             nvm install
-    #         elif [ "$nvmrc_node_version" != "$node_version" ]; then
-    #             nvm use
-    #         fi
-    #     elif [ "$node_version" != "$(nvm version default)" ]; then
-    #         echo "Reverting to nvm default version"
-    #         nvm use default
-    #     fi
-    # }
-    # add-zsh-hook chpwd load-nvmrc
-    # load-nvmrc
 
     # Zsh autocompletion
     if [ -d ~/.zsh/zsh-autosuggestions ]; then
