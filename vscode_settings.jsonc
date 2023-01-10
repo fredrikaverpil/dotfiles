@@ -141,7 +141,7 @@
   "git.ignoreMissingGitWarning": true,
   "git.mergeEditor": true,
 
-  // Language overrides
+  // Editor, language overrides
   "[python]": {
     "editor.rulers": [
       72, // Docstrings
@@ -155,9 +155,15 @@
     "editor.formatOnSave": true,
     // "editor.formatOnSaveTimeout": 10000,  // for large files, black can timeout
     "editor.codeActionsOnSave": {
-      "source.organizeImports": true
-      // "source.fixAll": true
+      "source.organizeImports": true,
+      "source.fixAll": false
     }
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[markdown]": {
     "editor.wordWrap": "on",
@@ -207,15 +213,32 @@
   "projectManager.git.maxDepthRecursion": 1,
 
   // Extension: Python
-  "python.terminal.activateEnvironment": true,
+  "python.terminal.activateEnvironment": false,
   "python.languageServer": "Pylance",
   "python.analysis.typeCheckingMode": "basic",
   "python.formatting.provider": "black",
-  "python.linting.enabled": true,
+  "python.linting.enabled": false, // use ruff-vscode instead
   "python.linting.flake8Enabled": false,
   "ruff.importStrategy": "fromEnvironment",
-  "ruff.args": ["--select", "F,E,I,U,N,S,T,FBT,B,A,Q,YTT,BLE,RUF,M"], // skipped C,D,ANN
-  "ruff.showNotifications": "always",
+  "ruff.fixAll": false,
+  "ruff.organizeImports": true,
+  "ruff.showNotifications": "onError",
+  //
+  // Ruff config can be placed in ~/Library/Application\ Support/ruff/pyproject.toml
+  // and will then override the project root's pyproject.toml
+  //
+  "ruff.args": [
+    "--select=ALL",
+    "--per-file-ignores=**/tests/*:S101", // use of assert
+    "--per-file-ignores=**/tests/*:D103", // missing docstring
+    "--per-file-ignores=**/tests/*:ANN201", // missing return-type annotation
+    "--per-file-ignores=**/tests/*:PT022", // use return instead of yield
+    "--ignore=D"
+  ],
+  // "ruff.args": [
+  //   "--select",
+  //   "E,W,F,UP,S,B,I,N,ERA,C4,A,Q,YTT,BLE,FBT,C90,T10,EM,ICN,T20,RET,SIM,TID,ARG,PDV,PGH,PLC,PLE,PLR,PLW,RUF"
+  // ], // skipped C,D,ANN
   "python.linting.mypyEnabled": true,
   "python.linting.mypyArgs": [
     "--follow-imports=silent",
@@ -297,15 +320,9 @@
   // Changed recently (appears at bottom)
   // ----------------------------------------
 
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
   "git.suggestSmartCommit": false,
   "diffEditor.ignoreTrimWhitespace": false,
   "githubPullRequests.pullBranch": "never",
   "editor.accessibilitySupport": "off",
-  "coverage-gutters.coverageFileNames": ["coverage/coverage.lcov"],
-  "[css]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  "coverage-gutters.coverageFileNames": ["coverage/coverage.lcov"]
 }
