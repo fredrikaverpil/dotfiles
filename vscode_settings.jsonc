@@ -222,7 +222,6 @@
   "ruff.importStrategy": "fromEnvironment",
   "ruff.fixAll": false,
   "ruff.organizeImports": true,
-  "ruff.showNotifications": "onError",
   //
   // Ruff config can be placed in ~/Library/Application\ Support/ruff/pyproject.toml
   // and will then override the project root's pyproject.toml
@@ -248,6 +247,9 @@
     "--strict"
   ],
   "python.linting.pylintEnabled": false, // prefer flake8 instead
+
+  // Language: Typescript
+  "mocha.files.glob": "test/**/*.ts",
 
   // Extension: Trailing spaces
   "trailing-spaces.trimOnSave": false, // black trims

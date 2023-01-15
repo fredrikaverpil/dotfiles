@@ -32,11 +32,13 @@ hashicorp.terraform
 johnpapa.vscode-peacock
 KevinRose.vsc-python-indent
 malmaud.tmux
+maty.vscode-mocha-sidebar
 mhutchie.git-graph
 mikestead.dotenv
 mohsen1.prettify-json
 ms-azuretools.vscode-docker
 ms-kubernetes-tools.vscode-kubernetes-tools
+ms-python.isort
 ms-python.python
 ms-python.vscode-pylance
 ms-toolsai.jupyter
@@ -62,6 +64,7 @@ nickmillerdev.pytest-fixtures
 oderwat.indent-rainbow
 pnp.polacode
 qezhu.gitlink
+rangav.vscode-thunder-client
 redhat.vscode-commons
 redhat.vscode-yaml
 rust-lang.rust
