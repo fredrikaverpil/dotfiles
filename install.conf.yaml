@@ -29,6 +29,18 @@
       force: true
       if: '[ "$(uname -s)" = "Darwin" ]'
 
+    # # Remap US English layout's ['; keys to Swedish åäö keys (works poorly) using built-in macOS key bindings
+    #   ~/Library/KeyBindings/DefaultKeyBinding.dict:
+    #       path: _macos/DefaultKeyBinding.dict
+    #       force: true
+    #       if: '[ "$(uname -s)" = "Darwin" ]'
+
+    # Remap US English layout's ['; keys to Swedish åäö keys using Karabiner
+    ~/.config/karabiner/assets/complex_modifications/karabiner-swedish.json:
+      path: _macos/karabiner-swedish.json
+      force: true
+      if: '[ "$(uname -s)" = "Darwin" ]'
+
 - shell:
     - git submodule sync --recursive
 
