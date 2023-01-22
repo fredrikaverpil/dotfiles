@@ -42,7 +42,7 @@
       if: '[ "$(uname -s)" = "Darwin" ]'
 
 - shell:
-    - git submodule sync --recursive
+    - git submodule update --init --recursive --remote
 
     # add shell sourcing to bash
     - grep -qxF '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' ~/.bashrc || echo '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' >> ~/.bashrc
