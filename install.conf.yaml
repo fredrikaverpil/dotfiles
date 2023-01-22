@@ -36,9 +36,9 @@
     #       if: '[ "$(uname -s)" = "Darwin" ]'
 
     # Remap US English layout's ['; keys to Swedish åäö keys using Karabiner
-    ~/.config/karabiner/assets/complex_modifications/karabiner-swedish.json:
-      path: _macos/karabiner-swedish.json
-      force: true
+    ~/.config/karabiner:
+      path: _macos/karabiner
+      create: true
       if: '[ "$(uname -s)" = "Darwin" ]'
 
 - shell:
