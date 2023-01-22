@@ -29,10 +29,10 @@ GraphQL.vscode-graphql-execution
 GraphQL.vscode-graphql-syntax
 Gruntfuggly.todo-tree
 hashicorp.terraform
+hbenl.vscode-test-explorer
 johnpapa.vscode-peacock
 KevinRose.vsc-python-indent
 malmaud.tmux
-maty.vscode-mocha-sidebar
 mhutchie.git-graph
 mikestead.dotenv
 mohsen1.prettify-json
@@ -54,6 +54,7 @@ ms-vscode-remote.vscode-remote-extensionpack
 ms-vscode.live-server
 ms-vscode.makefile-tools
 ms-vscode.remote-explorer
+ms-vscode.test-adapter-converter
 ms-vscode.vscode-typescript-tslint-plugin
 ms-vsliveshare.vsliveshare
 ms-vsliveshare.vsliveshare-audio
