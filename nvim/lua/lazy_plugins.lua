@@ -143,6 +143,14 @@ feline = {
     end,
 }
 
+todo = {
+    'folke/todo-comments.nvim',
+    config = function()
+        require("todo-comments").setup()
+    end,
+}
+
+
 -- list of plugins to load
 enabled_plugins = {
   rose,
@@ -152,7 +160,8 @@ enabled_plugins = {
   lspzero,
   nvimtree,
   gitsigns,
-  feline
+  feline,
+  todo
 }
 
 -- load plugins
