@@ -3,7 +3,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Netrw
-vim.keymap.set("n", "<leader>ex", vim.cmd.Ex)
+-- vim.keymap.set("n", "<leader>ex", vim.cmd.Ex)
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)

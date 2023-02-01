@@ -13,7 +13,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- plugins to lazy load, and their settings
-rose = {
+local rose = {
   'rose-pine/neovim',
   name = 'rose-pine',
   lazy = false,
@@ -24,7 +24,7 @@ rose = {
   end
 }
 
-treesitter = {
+local treesitter = {
   'nvim-treesitter/nvim-treesitter',
   run = ':TSUpdate',
   config = function()
@@ -42,7 +42,7 @@ treesitter = {
   end,
 }
 
-telescope = {
+local telescope = {
     'nvim-telescope/telescope.nvim',
     branch = '0.1.x',
     config = function()
@@ -70,14 +70,14 @@ telescope = {
     dependencies = { {'nvim-lua/plenary.nvim'} }
 }
 
-fugitive = {
+local fugitive = {
   'tpope/vim-fugitive',
   config = function()
     vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
   end,
 }
 
-lspzero = {
+local lspzero = {
     'VonHeikemen/lsp-zero.nvim',
     config = function()
         local lsp = require('lsp-zero')
@@ -104,7 +104,7 @@ lspzero = {
     }
 }
 
-nvimtree = {
+local nvimtree = {
     'nvim-tree/nvim-tree.lua',
     tag = 'nightly', -- optional, updated every week. (see issue #1193)
     config = function()
@@ -131,28 +131,42 @@ nvimtree = {
     },
 }
 
-gitsigns = {
+local gitsigns = {
     'lewis6991/gitsigns.nvim',
     config = function()
         require('gitsigns').setup()
     end,
 }
 
-feline = {
+local feline = {
     'feline-nvim/feline.nvim',
     config = function()
         require('feline').setup()
     end,
 }
 
-todo_comments = {
+local lualine = {
+    'nvim-lualine/lualine.nvim',
+    config = function()
+        require('lualine').setup {
+            options = {
+                icons_enabled = true,
+                theme = 'rose-pine',
+                component_separators = '|',
+                section_separators = '',
+            },
+        }
+    end,
+}
+
+local todo_comments = {
     'folke/todo-comments.nvim',
     config = function()
         require("todo-comments").setup()
     end,
 }
 
-which_key = {
+local which_key = {
     'folke/which-key.nvim',
     config = function()
       vim.o.timeout = true
@@ -163,7 +177,7 @@ which_key = {
 
 
 -- list of plugins to load
-enabled_plugins = {
+local enabled_plugins = {
   rose,
   treesitter,
   telescope,
@@ -171,7 +185,8 @@ enabled_plugins = {
   lspzero,
   nvimtree,
   gitsigns,
-  feline,
+  -- feline,
+  lualine,
   todo_comments,
   which_key
 }
