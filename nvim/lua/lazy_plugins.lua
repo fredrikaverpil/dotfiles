@@ -125,8 +125,15 @@ nvimtree = {
       })
     end,
     dependencies = {
-        {'nvim-tree/nvim-web-devicons'}, -- optional, for file icons
+       -- {'nvim-tree/nvim-web-devicons'}, -- optional, for file icons
     },
+}
+
+gitsigns = {
+    'lewis6991/gitsigns.nvim',
+    config = function()
+        require('gitsigns').setup()
+    end,
 }
 
 feline = {
@@ -144,6 +151,7 @@ enabled_plugins = {
   fugitive,
   lspzero,
   nvimtree,
+  gitsigns,
   feline
 }
 
