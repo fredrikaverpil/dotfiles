@@ -229,6 +229,7 @@
   "ruff.args": [
     "--select=ALL",
     "--per-file-ignores=**/tests/*:S101", // use of assert
+    "--per-file-ignores=**/tests/*:INP001", // use of assert
     "--per-file-ignores=**/tests/*:D103", // missing docstring
     "--per-file-ignores=**/tests/*:ANN201", // missing return-type annotation
     "--per-file-ignores=**/tests/*:PT022", // use return instead of yield
