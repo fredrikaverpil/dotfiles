@@ -129,6 +129,12 @@ nvimtree = {
     },
 }
 
+feline = {
+    'feline-nvim/feline.nvim',
+    config = function()
+        require('feline').setup()
+    end,
+}
 
 -- list of plugins to load
 enabled_plugins = {
@@ -137,7 +143,8 @@ enabled_plugins = {
   telescope,
   fugitive,
   lspzero,
-  nvimtree
+  nvimtree,
+  feline
 }
 
 -- load plugins
