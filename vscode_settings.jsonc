@@ -124,6 +124,9 @@
   "workbench.editorAssociations": {
     "*.ipynb": "jupyter-notebook"
   },
+  "workbench.editor.limit.enabled": true,
+  "workbench.editor.limit.perEditorGroup": true,
+  "workbench.editor.limit.value": 1,
 
   // Explorer
   "explorer.confirmDragAndDrop": false,
