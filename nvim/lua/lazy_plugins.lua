@@ -43,20 +43,33 @@ treesitter = {
 }
 
 telescope = {
-  'nvim-telescope/telescope.nvim',
-  branch = '0.1.x',
-  config = function()
-    local builtin = require('telescope.builtin')
-    vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
-    vim.keymap.set('n', '<leader>gf', builtin.git_files, {})
-    vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
-    vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
-    vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
-    vim.keymap.set('n', '<leader>ps', function()
-      builtin.grep_string({ search = vim.fn.input("Grep > ") });
-    end)
-  end,
-  dependencies = { {'nvim-lua/plenary.nvim'} }
+    'nvim-telescope/telescope.nvim',
+    branch = '0.1.x',
+    config = function()
+        local builtin = require('telescope.builtin')
+        vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' } )
+        vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' } )
+        vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' } )
+        vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' } )
+        vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' } )
+
+        vim.keymap.set('n', '<leader>?', builtin.oldfiles, { desc = '[?] Find recently opened files' })
+        vim.keymap.set('n', '<leader><space>', builtin.buffers, { desc = '[ ] Find existing buffers' } )
+
+        vim.keymap.set('n', '<leader>gf', builtin.git_files, { desc = '[G]it [F]iles' } )
+
+        vim.keymap.set('n', '<leader>/', function()
+            builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+                winblend = 10,
+                previewer = false,
+            })
+        end, { desc = '[/] Fuzzily search in current buffer]' })
+
+        -- vim.keymap.set('n', '<leader>sgs', function()
+        --     builtin.grep_string({ search = vim.fn.input("Grep > ") });
+        -- end)
+    end,
+    dependencies = { {'nvim-lua/plenary.nvim'} }
 }
 
 fugitive = {
@@ -143,10 +156,19 @@ feline = {
     end,
 }
 
-todo = {
+todo_comments = {
     'folke/todo-comments.nvim',
     config = function()
         require("todo-comments").setup()
+    end,
+}
+
+which_key = {
+    'folke/which-key.nvim',
+    config = function()
+      vim.o.timeout = true
+      vim.o.timeoutlen = 300
+      require("which-key").setup()
     end,
 }
 
@@ -161,7 +183,8 @@ enabled_plugins = {
   nvimtree,
   gitsigns,
   feline,
-  todo
+  todo_comments,
+  which_key
 }
 
 -- load plugins
