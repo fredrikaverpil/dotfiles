@@ -225,6 +225,16 @@ move = {
     end,
 }
 
+copilot = {
+    'github/copilot.vim',
+    -- automatically start github copilot
+    config = function()
+        vim.keymap.set("i", "<C-J>", 'copilot#Accept("<CR>")', { silent = true, expr = true })
+        vim.keymap.set("i", "<C-H>", 'copilot#Previous()', { silent = true, expr = true })
+        vim.keymap.set("i", "<C-K>", 'copilot#Next()', { silent = true, expr = true })
+    end,
+}
+
 
 -- list of plugins to load
 local enabled_plugins = {
@@ -241,6 +251,7 @@ local enabled_plugins = {
   which_key,
   trouble,
   move,
+  copilot
 }
 
 -- load plugins
