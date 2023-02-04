@@ -4,16 +4,23 @@
 [core]
 	excludesfile = ~/.gitignore_global
 	editor = code --wait
+	# editor = nvim
 [pull]
 	ff = only
 [merge]
 	tool = vscode
+	# tool = neovim
 [mergetool "vscode"]
 	cmd = code --wait $MERGED
+[mergetool "neovim"]
+	cmd = nvim -d $LOCAL $REMOTE $BASE $MERGED
 [diff]
 	tool = vscode
+	# tool = neovim
 [difftool "vscode"]
 	cmd = code --wait --diff $LOCAL $REMOTE
+[difftool "neovim"]
+	cmd = nvim -d $LOCAL $REMOTE
 [init]
 	defaultBranch = main
 [rebase]
