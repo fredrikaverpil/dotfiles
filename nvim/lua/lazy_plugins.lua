@@ -138,13 +138,6 @@ local gitsigns = {
     end,
 }
 
-local feline = {
-    'feline-nvim/feline.nvim',
-    config = function()
-        require('feline').setup()
-    end,
-}
-
 local lualine = {
     'nvim-lualine/lualine.nvim',
     config = function()
@@ -245,7 +238,6 @@ local enabled_plugins = {
   lspzero,
   nvimtree,
   gitsigns,
-  -- feline,
   lualine,
   todo_comments,
   which_key,
