@@ -204,7 +204,7 @@ local trouble = {
     }
 }
 
-move = {
+local move = {
     'fedepujol/move.nvim',
     config = function()
         local opts = { noremap = true, silent = true }
@@ -225,7 +225,7 @@ move = {
     end,
 }
 
-copilot = {
+local copilot = {
     'github/copilot.vim',
     -- automatically start github copilot
     config = function()
