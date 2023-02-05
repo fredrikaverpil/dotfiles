@@ -18,6 +18,8 @@ brew 'mcfly'
 brew 'exa'
 brew 'bat'
 brew 'withgraphite/tap/graphite'
+brew 'ripgrep'
+brew 'fd'
 
 # GUIs
 cask 'appcleaner'
