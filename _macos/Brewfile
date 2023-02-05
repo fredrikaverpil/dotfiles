@@ -18,8 +18,11 @@ brew 'mcfly'
 brew 'exa'
 brew 'bat'
 brew 'withgraphite/tap/graphite'
+
+# LazyVim
 brew 'ripgrep'
 brew 'fd'
+brew 'lazygit'
 
 # GUIs
 cask 'appcleaner'
