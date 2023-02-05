@@ -241,7 +241,7 @@ local copilot = {
     end,
 }
 
-colorizer = {
+local colorizer = {
     'norcalli/nvim-colorizer.lua',
     config = function()
         require('colorizer').setup()
