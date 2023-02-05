@@ -67,7 +67,13 @@ local telescope = {
         --     builtin.grep_string({ search = vim.fn.input("Grep > ") });
         -- end)
     end,
-    dependencies = { {'nvim-lua/plenary.nvim'} }
+    dependencies = {
+      {'nvim-lua/plenary.nvim'},
+      {
+        'nvim-telescope/telescope-fzf-native.nvim',
+        run = 'make',
+      }
+    }
 }
 
 local fugitive = {
