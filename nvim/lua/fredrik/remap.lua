@@ -30,3 +30,12 @@ vim.keymap.set("n", "<A-Down>", ":resize +2<CR>", opts)
 -- vim.keymap.set("n", "<A-Left>", ":vertical resize -2<CR>", opts)
 -- vim.keymap.set("n", "<A-Right>", ":vertical resize +2<CR>", opts)
 
+-- Clear search highlighting
+vim.keymap.set("n", "<leader>nh", ":noh<CR>", opts)
+
+-- Split window
+vim.keymap.set("n", "<leader>sv", ":vsplit<CR>", opts) -- split window horizontally
+vim.keymap.set("n", "<leader>sh", ":split<CR>", opts) -- split window vertically
+vim.keymap.set("n", "<leader>se", "<C-W>=", opts) -- make splits equal width
+vim.keymap.set("n", "<leader>sx", ":close<CR>", opts) -- close current split
+
