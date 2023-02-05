@@ -8,6 +8,17 @@ export PATH="$PYENV_ROOT/bin:$PATH"                     # pyenv
 export PATH="$PATH:$HOME/code/repos/dotfiles/shell/bin" # dotfiles-bin
 export PATH="$PATH:$HOME/.cargo/bin"                    # rust
 
+# Load .env file if it exists
+# shellcheck disable=SC1090
+if [ -f $HOME/.shell/.env ];
+then
+    set -a
+    source $HOME/.shell/.env
+    set +a
+else
+    echo "Warning: $HOME/.shell/.env does not exist"
+fi
+
 #Per-platform settings
 case $(uname) in
 Darwin)
