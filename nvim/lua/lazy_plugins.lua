@@ -144,6 +144,24 @@ local nvimtree = {
     },
 }
 
+local neotree = {
+  "nvim-neo-tree/neo-tree.nvim",
+  cmd = "Neotree",
+  config = function()
+    -- disable netrw at the very start of your init.lua (strongly advised)
+    vim.g.loaded_netrw = 1
+    vim.g.loaded_netrwPlugin = 1
+
+    require("neo-tree").setup()
+    vim.keymap.set("n", "<C-b>", ":NeotreeToggle<CR>", opts)
+  end,
+  dependencies = {
+    {"nvim-lua/plenary.nvim"},
+    {"nvim-tree/nvim-web-devicons"}, -- not strictly required, but recommended
+    {"MunifTanjim/nui.nvim"},
+  }
+}
+
 local gitsigns = {
     'lewis6991/gitsigns.nvim',
     config = function()
@@ -256,7 +274,8 @@ local enabled_plugins = {
   telescope,
   fugitive,
   lspzero,
-  nvimtree,
+  -- nvimtree,
+  neotree,
   gitsigns,
   lualine,
   todo_comments,
