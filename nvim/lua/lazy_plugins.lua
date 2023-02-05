@@ -131,6 +131,7 @@ local nvimtree = {
           dotfiles = true,
         },
       })
+      vim.keymap.set("n", "<C-b>", ":NvimTreeToggle<CR>", opts)
     end,
     dependencies = {
        -- {'nvim-tree/nvim-web-devicons'}, -- optional, for file icons
