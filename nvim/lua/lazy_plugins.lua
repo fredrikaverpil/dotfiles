@@ -241,6 +241,13 @@ local copilot = {
     end,
 }
 
+colorizer = {
+    'norcalli/nvim-colorizer.lua',
+    config = function()
+        require('colorizer').setup()
+    end,
+}
+
 
 -- list of plugins to load
 local enabled_plugins = {
@@ -256,7 +263,8 @@ local enabled_plugins = {
   which_key,
   trouble,
   move,
-  copilot
+  copilot,
+  colorizer
 }
 
 -- load plugins
