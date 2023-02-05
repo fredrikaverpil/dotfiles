@@ -114,7 +114,12 @@ local nvimtree = {
     'nvim-tree/nvim-tree.lua',
     tag = 'nightly', -- optional, updated every week. (see issue #1193)
     config = function()
+      -- disable netrw at the very start of your init.lua (strongly advised)
+      vim.g.loaded_netrw = 1
+      vim.g.loaded_netrwPlugin = 1
+
       require("nvim-tree").setup({
+        -- change folder arrow icons
         sort_by = "case_sensitive",
         view = {
           width = 30,
@@ -131,10 +136,11 @@ local nvimtree = {
           dotfiles = true,
         },
       })
+
       vim.keymap.set("n", "<C-b>", ":NvimTreeToggle<CR>", opts)
     end,
     dependencies = {
-       -- {'nvim-tree/nvim-web-devicons'}, -- optional, for file icons
+       {'nvim-tree/nvim-web-devicons'}, -- optional, for file icons
     },
 }
 
