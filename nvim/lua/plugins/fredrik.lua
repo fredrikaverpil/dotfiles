@@ -32,7 +32,6 @@ return {
     opts = {
         ensure_installed = {
         -- python
-        "ruff-lsp",
         "debugpy",
         -- lua
         "stylua",
@@ -112,10 +111,16 @@ return {
   {
     "jose-elias-alvarez/null-ls.nvim",
     opts = function(_, opts)
-      local nls = require("null-ls")
+      local null_ls = require("null-ls")
 
       -- add black as formatter
-      opts.sources = vim.list_extend(opts.sources, { nls.builtins.formatting.black })
+      opts.sources = vim.list_extend(opts.sources, { null_ls.builtins.formatting.black })
+
+     -- add mypy as linter
+      opts.sources = vim.list_extend(opts.sources, { null_ls.builtins.diagnostics.mypy })
+
+     -- add ruff as linter
+     opts.sources = vim.list_extend(opts.sources, { null_ls.builtins.diagnostics.ruff })
 
       -- remove flake8 from opts.sources
       opts.sources = vim.tbl_filter(function(source)
