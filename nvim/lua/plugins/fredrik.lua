@@ -5,7 +5,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     -- opts will be merged with the parent spec
     opts = {
-        ensure_installed = {
+      ensure_installed = {
         "bash",
         "help",
         "html",
@@ -21,7 +21,7 @@ return {
         "typescript",
         "vim",
         "yaml",
-        },
+      },
     },
   },
 
@@ -30,7 +30,7 @@ return {
     "williamboman/mason.nvim",
     -- opts will be merged with the parent spec
     opts = {
-        ensure_installed = {
+      ensure_installed = {
         -- python
         "debugpy",
         -- lua
@@ -40,42 +40,41 @@ return {
         "shfmt",
         -- javascript/typescript
         "prettier",
-        },
+      },
     },
   },
 
   -- github copilot
   {
-      'github/copilot.vim',
-      -- automatically start github copilot
-      config = function()
-          vim.keymap.set("i", "<C-J>", 'copilot#Accept("<CR>")', { silent = true, expr = true })
-          vim.keymap.set("i", "<C-H>", 'copilot#Previous()', { silent = true, expr = true })
-          -- vim.keymap.set("i", "<C-K>", 'copilot#Next()', { silent = true, expr = true })
-      end,
+    "github/copilot.vim",
+    -- automatically start github copilot
+    config = function()
+      vim.keymap.set("i", "<C-J>", 'copilot#Accept("<CR>")', { silent = true, expr = true })
+      vim.keymap.set("i", "<C-H>", "copilot#Previous()", { silent = true, expr = true })
+      -- vim.keymap.set("i", "<C-K>", 'copilot#Next()', { silent = true, expr = true })
+    end,
   },
 
   -- chatgpt
   {
-      "jackMort/ChatGPT.nvim",
-        config = function()
-          require("chatgpt").setup({
-            -- optional configuration
-          })
-        end,
-        dependencies = {
-          { "MunifTanjim/nui.nvim" },
-          { "nvim-lua/plenary.nvim" },
-          { "nvim-telescope/telescope.nvim"},
-        }
+    "jackMort/ChatGPT.nvim",
+    config = function()
+      require("chatgpt").setup({
+        -- optional configuration
+      })
+    end,
+    dependencies = {
+      { "MunifTanjim/nui.nvim" },
+      { "nvim-lua/plenary.nvim" },
+      { "nvim-telescope/telescope.nvim" },
+    },
   },
-
 
   -- git signs
   {
     "lewis6991/gitsigns.nvim",
     config = function()
-        require('gitsigns').setup()
+      require("gitsigns").setup()
     end,
   },
 
@@ -101,11 +100,10 @@ return {
           visible = true, -- when true, they will just be displayed differently than normal items
           hide_dotfiles = false,
           hide_gitignored = true,
-        }
-      }
+        },
+      },
     },
   },
-
 
   -- change null-ls config
   {
@@ -116,17 +114,16 @@ return {
       -- add black as formatter
       opts.sources = vim.list_extend(opts.sources, { null_ls.builtins.formatting.black })
 
-     -- add mypy as linter
+      -- add mypy as linter
       opts.sources = vim.list_extend(opts.sources, { null_ls.builtins.diagnostics.mypy })
 
-     -- add ruff as linter
-     opts.sources = vim.list_extend(opts.sources, { null_ls.builtins.diagnostics.ruff })
+      -- add ruff as linter
+      opts.sources = vim.list_extend(opts.sources, { null_ls.builtins.diagnostics.ruff })
 
       -- remove flake8 from opts.sources
       opts.sources = vim.tbl_filter(function(source)
         return source.name ~= "flake8"
       end, opts.sources)
-
     end,
   },
 
@@ -177,4 +174,35 @@ return {
     end,
   },
 
+  -- neotest
+  {
+    "nvim-neotest/neotest",
+    config = function()
+      require("neotest").setup({
+        adapters = {
+          require("neotest-python")({
+            dap = { justMyCode = false },
+          }),
+          require("neotest-plenary"),
+          require("neotest-vim-test")({
+            ignore_file_types = { "python", "vim", "lua" },
+          }),
+        },
+      })
+    end,
+    dependencies = {
+      { "nvim-lua/plenary.nvim" },
+      { "nvim-treesitter/nvim-treesitter" },
+      { "antoinemadec/FixCursorHold.nvim" },
+
+      -- python
+      {
+        "nvim-neotest/neotest-python",
+        dependencies = {
+          { "nvim-neotest/neotest-plenary" },
+          { "nvim-neotest/neotest-vim-test" },
+        },
+      },
+    },
+  },
 }
