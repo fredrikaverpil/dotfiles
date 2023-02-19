@@ -111,14 +111,16 @@ return {
     opts = function(_, opts)
       local null_ls = require("null-ls")
 
-      -- add black as formatter
-      opts.sources = vim.list_extend(opts.sources, { null_ls.builtins.formatting.black })
+      -- temporarily disabled the below as it crashes Neovim on e.g. <leader>cr
 
-      -- add mypy as linter
-      opts.sources = vim.list_extend(opts.sources, { null_ls.builtins.diagnostics.mypy })
+      -- -- add black as formatter
+      -- opts.sources = vim.list_extend(opts.sources, { null_ls.builtins.formatting.black })
 
-      -- add ruff as linter
-      opts.sources = vim.list_extend(opts.sources, { null_ls.builtins.diagnostics.ruff })
+      -- -- add mypy as linter
+      -- opts.sources = vim.list_extend(opts.sources, { null_ls.builtins.diagnostics.mypy })
+
+      -- -- add ruff as linter
+      -- opts.sources = vim.list_extend(opts.sources, { null_ls.builtins.diagnostics.ruff })
 
       -- remove flake8 from opts.sources
       opts.sources = vim.tbl_filter(function(source)
