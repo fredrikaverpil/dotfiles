@@ -110,22 +110,25 @@ return {
     "jose-elias-alvarez/null-ls.nvim",
     opts = function(_, opts)
       local null_ls = require("null-ls")
+      local formatting = null_ls.builtins.formatting
+      local diagnostics = null_ls.builtins.diagnostics
 
-      -- temporarily disabled the below as it crashes Neovim on e.g. <leader>cr
-
-      -- -- add black as formatter
-      -- opts.sources = vim.list_extend(opts.sources, { null_ls.builtins.formatting.black })
-
-      -- -- add mypy as linter
-      -- opts.sources = vim.list_extend(opts.sources, { null_ls.builtins.diagnostics.mypy })
-
-      -- -- add ruff as linter
-      -- opts.sources = vim.list_extend(opts.sources, { null_ls.builtins.diagnostics.ruff })
+      null_ls.setup({
+        -- debug = true, -- Turn on debug for :NullLsLog
+        debug = false,
+        diagnostics_format = "#{m} #{s}[#{c}]",
+        sources = {
+          formatting.black,  -- causes crash on multiple file save
+          diagnostics.ruff,
+          diagnostics.mypy,
+        },
+      })
 
       -- remove flake8 from opts.sources
-      opts.sources = vim.tbl_filter(function(source)
-        return source.name ~= "flake8"
-      end, opts.sources)
+      -- opts.sources = vim.tbl_filter(function(source)
+      --   return source.name ~= "flake8"
+      -- end, opts.sources)
+
     end,
   },
 
