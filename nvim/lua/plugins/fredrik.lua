@@ -105,9 +105,13 @@ return {
     },
   },
 
+
+
   -- change null-ls config
   {
     "jose-elias-alvarez/null-ls.nvim",
+    dependencies = { "mason.nvim" },
+    event = { "BufReadPre", "BufNewFile" },
     opts = function(_, opts)
       local null_ls = require("null-ls")
       local formatting = null_ls.builtins.formatting
@@ -120,16 +124,11 @@ return {
         sources = {
           -- list of supported sources:
           -- https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTINS.md
-          formatting.black,  -- causes crash on multiple file save
+          formatting.black,  -- causes crash on multiple file save with neovim 0.8.3
           diagnostics.ruff,
           diagnostics.mypy,
         },
       })
-
-      -- remove flake8 from opts.sources
-      -- opts.sources = vim.tbl_filter(function(source)
-      --   return source.name ~= "flake8"
-      -- end, opts.sources)
 
     end,
   },
