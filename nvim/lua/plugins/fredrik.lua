@@ -118,6 +118,8 @@ return {
         debug = false,
         diagnostics_format = "#{m} #{s}[#{c}]",
         sources = {
+          -- list of supported sources:
+          -- https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTINS.md
           formatting.black,  -- causes crash on multiple file save
           diagnostics.ruff,
           diagnostics.mypy,
