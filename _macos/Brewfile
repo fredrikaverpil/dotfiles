@@ -18,6 +18,7 @@ brew 'mcfly'
 brew 'exa'
 brew 'bat'
 brew 'withgraphite/tap/graphite'
+brew 'kubectx'
 
 # LazyVim
 brew 'ripgrep'
