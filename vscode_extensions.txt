@@ -14,12 +14,12 @@ bungcip.better-toml
 charliermarsh.ruff
 christian-kohler.path-intellisense
 codezombiech.gitignore
-cschleiden.vscode-github-actions
 cweijan.vscode-autohotkey-plus
 dbaeumer.vscode-eslint
 eamodio.gitlens
 esbenp.prettier-vscode
 foxundermoon.shell-format
+gencay.vscode-chatgpt
 GitHub.copilot
 GitHub.copilot-labs
 GitHub.vscode-pull-request-github
@@ -30,6 +30,8 @@ GraphQL.vscode-graphql-syntax
 Gruntfuggly.todo-tree
 hashicorp.terraform
 hbenl.vscode-test-explorer
+humao.rest-client
+jasonnutter.vscode-codeowners
 johnpapa.vscode-peacock
 KevinRose.vsc-python-indent
 malmaud.tmux
@@ -54,6 +56,7 @@ ms-vscode-remote.vscode-remote-extensionpack
 ms-vscode.live-server
 ms-vscode.makefile-tools
 ms-vscode.remote-explorer
+ms-vscode.remote-server
 ms-vscode.test-adapter-converter
 ms-vscode.vscode-typescript-tslint-plugin
 ms-vsliveshare.vsliveshare

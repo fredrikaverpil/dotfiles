@@ -317,7 +317,7 @@
 
   "github.copilot.enable": {
     "*": true,
-    "yaml": false,
+    "yaml": true,
     "plaintext": false,
     "markdown": false
   },
@@ -331,5 +331,5 @@
   "githubPullRequests.pullBranch": "never",
   "editor.accessibilitySupport": "off",
   "coverage-gutters.coverageFileNames": ["coverage/coverage.lcov"],
-  "editor.minimap.enabled": false
+  "editor.minimap.enabled": true
 }
