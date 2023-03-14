@@ -1,24 +1,5 @@
 return {
 
-  -- add any tools you want to have installed below
-  {
-    "williamboman/mason.nvim",
-    -- opts will be merged with the parent spec
-    opts = {
-      ensure_installed = {
-        -- python
-        "debugpy",
-        -- lua
-        "stylua",
-        -- shell
-        "shellcheck",
-        "shfmt",
-        -- javascript/typescript
-        "prettier",
-      },
-    },
-  },
-
   -- Use <tab> for completion via supertab
   {
     "hrsh7th/nvim-cmp",
