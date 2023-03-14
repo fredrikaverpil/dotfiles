@@ -7,3 +7,9 @@
 
 -- show symbols for whitespace
 vim.opt.listchars = "tab:▸ ,trail:·,nbsp:␣,extends:❯,precedes:❮"
+
+-- disable swap files
+vim.opt.swapfile = false
+
+-- fill character for diff: /
+vim.opt.fillchars = "diff:/"
