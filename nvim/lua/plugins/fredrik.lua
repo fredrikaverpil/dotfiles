@@ -121,8 +121,6 @@ return {
     },
   },
 
-
-
   -- change null-ls config
   {
     "jose-elias-alvarez/null-ls.nvim",
@@ -140,6 +138,7 @@ return {
         sources = {
           -- list of supported sources:
           -- https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTINS.md
+          formatting.stylua,
           formatting.black, -- causes crash on multiple file save with neovim 0.8.3
           diagnostics.ruff,
           diagnostics.mypy,
@@ -169,7 +168,7 @@ return {
       local cmp = require("cmp")
 
       opts.mapping = vim.tbl_extend("force", opts.mapping, {
-            ["<Tab>"] = cmp.mapping(function(fallback)
+        ["<Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_next_item()
             -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
@@ -182,7 +181,7 @@ return {
             fallback()
           end
         end, { "i", "s" }),
-            ["<S-Tab>"] = cmp.mapping(function(fallback)
+        ["<S-Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_prev_item()
           elseif luasnip.jumpable(-1) then
@@ -199,12 +198,12 @@ return {
   {
     "nvim-neotest/neotest",
     keys = {
-      { "<leader>rr", ":lua require('neotest').run.run()<CR>",                     desc = "Run nearest test" },
-      { "<leader>rl", ":lua require('neotest').run.run_last()<CR>",                desc = "Run last test" },
-      { "<leader>rf", ":lua require('neotest').run.run(vim.fn.expand('%'))<CR>",   desc = "Run tests in file" },
-      { "<leader>rs", ":lua require('neotest').summary.toggle()<CR>",              desc = "Run test summary" },
+      { "<leader>rr", ":lua require('neotest').run.run()<CR>", desc = "Run nearest test" },
+      { "<leader>rl", ":lua require('neotest').run.run_last()<CR>", desc = "Run last test" },
+      { "<leader>rf", ":lua require('neotest').run.run(vim.fn.expand('%'))<CR>", desc = "Run tests in file" },
+      { "<leader>rs", ":lua require('neotest').summary.toggle()<CR>", desc = "Run test summary" },
       { "<leader>ro", ":lua require('neotest').output.open({ enter = true })<CR>", desc = "Run test output" },
-      { "<leader>rp", ":lua require('neotest').output_panel.toggle()<CR>",         desc = "Run test output panel" },
+      { "<leader>rp", ":lua require('neotest').output_panel.toggle()<CR>", desc = "Run test output panel" },
 
       -- debugging via nvim-dap
       -- { "<leader>rd", ":lua require('neotest').run.run({ strategy = 'dap' })<CR>", desc = "Debug nearest test" },
