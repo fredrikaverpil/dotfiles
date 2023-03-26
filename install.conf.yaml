@@ -20,6 +20,9 @@
     ~/.gitignore_global:
     ~/.gitmessage:
     ~/.tmux.conf:
+    ~/.config/alacritty/alacritty.yml:
+      path: alacritty.yml
+      if: '[ "$(uname -s)" = "Darwin" ]'
     ~/.ipython/profile_default/ipython_config.py:
     ~/.config/nvim: nvim
     ~/.config/helix:

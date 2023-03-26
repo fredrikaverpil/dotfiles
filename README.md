@@ -10,24 +10,27 @@ These are my personal dotfiles, for macOS, Windows and Linux. The setup is based
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [macOS](#macos)
-  - [Install dotfiles](#install-dotfiles)
-  - [Optional installation](#optional-installation)
-  - [Configuration](#configuration)
-- [Windows 11 + WSL/Ubuntu](#windows-11--wslubuntu)
-  - [Windows installations](#windows-installations)
-  - [WSL/Ubuntu installations](#wslubuntu-installations)
-  - [Configuration](#configuration-1)
-    - [Windows Terminal settings](#windows-terminal-settings)
-    - [WSL Tray](#wsl-tray)
-    - [Set up HHKB for macOS-compatible workflow](#set-up-hhkb-for-macos-compatible-workflow)
-  - [Closing notes](#closing-notes)
-- [Ubuntu 20.04](#ubuntu-2004)
-  - [Prerequisites](#prerequisites)
-  - [Install dotfiles](#install-dotfiles-1)
-  - [Optional installation](#optional-installation-1)
-- [Extras](#extras)
-  - [Clone all my public repos](#clone-all-my-public-repos)
+- [dotfiles 🐚](#dotfiles-)
+  - [macOS](#macos)
+    - [Install dotfiles](#install-dotfiles)
+    - [Optional installation](#optional-installation)
+    - [Configuration](#configuration)
+  - [Windows 11 + WSL/Ubuntu](#windows-11--wslubuntu)
+    - [Windows installations](#windows-installations)
+    - [WSL/Ubuntu installations](#wslubuntu-installations)
+    - [Configuration](#configuration-1)
+      - [Windows Terminal settings](#windows-terminal-settings)
+      - [WSL Tray](#wsl-tray)
+      - [Set up HHKB for macOS-compatible workflow](#set-up-hhkb-for-macos-compatible-workflow)
+    - [Closing notes](#closing-notes)
+  - [Ubuntu 20.04](#ubuntu-2004)
+    - [Prerequisites](#prerequisites)
+    - [Install dotfiles](#install-dotfiles-1)
+    - [Optional installation](#optional-installation-1)
+  - [Extras](#extras)
+    - [Local secrets](#local-secrets)
+    - [Clone all my public repos](#clone-all-my-public-repos)
+
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -163,7 +166,7 @@ cd dotfiles && ./install -vv
 
 #### Windows Terminal settings
 
-* Download and install [Fira Code Nerd font](https://github.com/ryanoasis/nerd-fonts/releases/) in Windows
+* Download and install [JetBrainsMono Nerd Font](https://www.nerdfonts.com/font-downloads) in Windows
 
 Run from administrative Powershell prompt:
 
@@ -245,6 +248,10 @@ installers/nix.sh
 ```
 
 ## Extras
+
+### Local secrets
+
+See `shell/.env` for local secrets.
 
 ### Clone all my public repos
 
