@@ -40,6 +40,10 @@ alias activate='source .venv/bin/activate'
 # assuming pyenv
 alias venv='PIP_REQUIRE_VIRTUALENV=false python -m pip install --upgrade --user pip virtualenv && python -m virtualenv .venv && source .venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
 
+# GitHub Copilot X
+# Sets up aliases for `??`, `git?`, and `gh?`
+eval "$(github-copilot-cli alias -- "$0")"
+
 # Gerrit
 # alias gerrit-push='git push origin HEAD:refs/for/master'
 # alias gerrit-draft='git push origin HEAD:refs/drafts/master'
