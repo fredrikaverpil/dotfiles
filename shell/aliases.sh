@@ -40,6 +40,10 @@ alias activate='source .venv/bin/activate'
 # assuming pyenv
 alias venv='PIP_REQUIRE_VIRTUALENV=false python -m pip install --upgrade --user pip virtualenv && python -m virtualenv .venv && source .venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
 
+# Neovim
+alias nvim='NVIM_APPNAME=NvChad nvim'
+alias vim='nvim'
+
 # GitHub Copilot X
 # Sets up aliases for `??`, `git?`, and `gh?`
 eval "$(github-copilot-cli alias -- "$0")"
