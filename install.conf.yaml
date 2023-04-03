@@ -24,7 +24,7 @@
       path: alacritty.yml
       if: '[ "$(uname -s)" = "Darwin" ]'
     ~/.ipython/profile_default/ipython_config.py:
-    ~/.config/nvim: nvim
+    ~/.config/nvim: nvim-lazyvim
     ~/.config/helix:
     ~/.config/starship.toml: starship.toml
     ~/.config/kitty/kitty.conf: kitty.conf
