@@ -223,6 +223,16 @@
   "python.formatting.provider": "black",
   "python.linting.enabled": false, // use ruff-vscode instead
   "python.linting.flake8Enabled": false,
+  "python.linting.pylintEnabled": false, // prefer flake8 instead
+  "mypy.runUsingActiveInterpreter": false,
+  "python.linting.mypyEnabled": false, // use mypy extension instead, as this is not reliable
+  // "python.linting.mypyArgs": [
+  // "--follow-imports=silent",
+  // "--ignore-missing-imports",
+  // "--show-column-numbers",
+  // "--no-pretty",
+  // "--strict"
+  // ],
   "ruff.importStrategy": "fromEnvironment",
   // "ruff.fixAll": false,
   // "ruff.organizeImports": true,
@@ -245,15 +255,6 @@
   //   "--select",
   //   "E,W,F,UP,S,B,I,N,ERA,C4,A,Q,YTT,BLE,FBT,C90,T10,EM,ICN,T20,RET,SIM,TID,ARG,PDV,PGH,PLC,PLE,PLR,PLW,RUF"
   // ], // skipped C,D,ANN
-  "python.linting.mypyEnabled": true,
-  "python.linting.mypyArgs": [
-    "--follow-imports=silent",
-    "--ignore-missing-imports",
-    "--show-column-numbers",
-    "--no-pretty",
-    "--strict"
-  ],
-  "python.linting.pylintEnabled": false, // prefer flake8 instead
 
   // Extension: Trailing spaces
   "trailing-spaces.trimOnSave": false, // black trims
@@ -319,7 +320,7 @@
     "*": true,
     "yaml": true,
     "plaintext": false,
-    "markdown": true
+    "markdown": false
   },
 
   // ----------------------------------------
@@ -330,6 +331,8 @@
   "diffEditor.ignoreTrimWhitespace": false,
   "githubPullRequests.pullBranch": "never",
   "editor.accessibilitySupport": "off",
-  "coverage-gutters.coverageFileNames": ["coverage/coverage.lcov"],
-  "editor.minimap.enabled": false
+  "editor.minimap.enabled": false,
+  "codeium.enableConfig": {
+    "*": false
+  }
 }

@@ -13,15 +13,16 @@ budparr.language-hugo-vscode
 bungcip.better-toml
 charliermarsh.ruff
 christian-kohler.path-intellisense
+Codeium.codeium
 codezombiech.gitignore
 cweijan.vscode-autohotkey-plus
 dbaeumer.vscode-eslint
 eamodio.gitlens
 esbenp.prettier-vscode
 foxundermoon.shell-format
-gencay.vscode-chatgpt
 GitHub.copilot
 GitHub.copilot-labs
+github.vscode-github-actions
 GitHub.vscode-pull-request-github
 golang.go
 GraphQL.vscode-graphql
@@ -35,6 +36,7 @@ jasonnutter.vscode-codeowners
 johnpapa.vscode-peacock
 KevinRose.vsc-python-indent
 malmaud.tmux
+matangover.mypy
 mhutchie.git-graph
 mikestead.dotenv
 mohsen1.prettify-json
