@@ -1,3 +1,12 @@
+import:
+  # catppuccin theme
+  # install: git clone https://github.com/catppuccin/alacritty.git ~/.config/alacritty/catppuccin
+  # pick theme:
+  - ~/.config/alacritty/catppuccin/catppuccin-mocha.yml
+#  - ~/.config/alacritty/catppuccin/catppuccin-macchiato.yml
+#  - ~/.config/alacritty/catppuccin/catppuccin-frappe.yml
+#  - ~/.config/alacritty/catppuccin/catppuccin-latte.yml
+
 font:
   normal:
     family: JetBrainsMono Nerd Font
@@ -5,3 +14,4 @@ font:
   bold:
     family: JetBrainsMono Nerd Font
     style: Regular
+  size: 18.0
