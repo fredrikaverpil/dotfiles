@@ -6,5 +6,5 @@ pr_numbers=$(gh pr list "$@" --app dependabot --json number --jq '.[].number')
 # Iterate over each number and approve and merge the corresponding PR
 for pr_number in $pr_numbers; do
     gh pr review --approve $pr_number
-    gh pr merge $pr_number
+    gh pr merge $pr_number --auto
 done
