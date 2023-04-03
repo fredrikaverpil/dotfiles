@@ -41,7 +41,9 @@ alias activate='source .venv/bin/activate'
 alias venv='PIP_REQUIRE_VIRTUALENV=false python -m pip install --upgrade --user pip virtualenv && python -m virtualenv .venv && source .venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
 
 # Neovim
-alias nvim='NVIM_APPNAME=NvChad nvim'
+alias nvim-lazy='NVIM_APPNAME=LazyVim nvim'
+alias nvim-chad='NVIM_APPNAME=NvChad nvim'
+alias nvim='nvim-lazy'
 alias vim='nvim'
 
 # GitHub Copilot X
