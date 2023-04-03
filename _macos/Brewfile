@@ -19,6 +19,7 @@ brew 'exa'
 brew 'bat'
 brew 'withgraphite/tap/graphite'
 brew 'kubectx'
+brew 'fzf'
 
 # LazyVim
 brew 'ripgrep'
