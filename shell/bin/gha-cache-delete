@@ -1,0 +1,7 @@
+#!/bin/bash -ex
+
+# Just delete them all
+# gh actions-cache list | tail -n +5 | cut -f1 | xargs -I@ gh actions-cache delete @ --confirm
+
+# Run in parallel
+gh actions-cache list --limit 100 | awk '{print $1}' | xargs -P $(getconf _NPROCESSORS_ONLN) -I HASH gh actions-cache delete HASH --confirm

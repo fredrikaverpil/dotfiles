@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 # Get the list of numbers
 pr_numbers=$(gh pr list "$@" --app dependabot --json number --jq '.[].number')
