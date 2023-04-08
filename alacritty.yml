@@ -1,3 +1,6 @@
+# For all configuration options, see
+# https://github.com/alacritty/alacritty/blob/master/alacritty.yml
+
 import:
   # catppuccin theme
   # install: git clone https://github.com/catppuccin/alacritty.git ~/.config/alacritty/catppuccin
@@ -6,6 +9,9 @@ import:
 #  - ~/.config/alacritty/catppuccin/catppuccin-macchiato.yml
 #  - ~/.config/alacritty/catppuccin/catppuccin-frappe.yml
 #  - ~/.config/alacritty/catppuccin/catppuccin-latte.yml
+
+window:
+  decorations: buttonless
 
 font:
   normal:
