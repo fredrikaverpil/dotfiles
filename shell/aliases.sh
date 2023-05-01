@@ -48,7 +48,9 @@ alias vim='nvim'
 
 # GitHub Copilot X
 # Sets up aliases for `??`, `git?`, and `gh?`
-eval "$(github-copilot-cli alias -- "$0")"
+if which github-copilot-cli >/dev/null; then
+  eval "$(github-copilot-cli alias -- "$0")"
+fi
 
 # Gerrit
 # alias gerrit-push='git push origin HEAD:refs/for/master'
