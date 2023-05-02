@@ -10,6 +10,9 @@ import:
 #  - ~/.config/alacritty/catppuccin/catppuccin-frappe.yml
 #  - ~/.config/alacritty/catppuccin/catppuccin-latte.yml
 
+env:
+  TERM: xterm-256color
+
 window:
   decorations: buttonless
   option_as_alt: OnlyLeft # set Meta key (e.g. <M-j> to Option key on macOS)
@@ -21,4 +24,4 @@ font:
   bold:
     family: JetBrainsMono Nerd Font
     style: Regular
-  size: 18.0
+  size: 13.4

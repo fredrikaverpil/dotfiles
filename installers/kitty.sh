@@ -11,6 +11,7 @@ Darwin)
 
     if [ ! -d ~/.config/kitty/kitty-themes ]; then
         git clone --depth 1 https://github.com/dexpota/kitty-themes.git ~/.config/kitty/kitty-themes
+        git clone https://github.com/catppuccin/kitty.git ~/.config/kitty/catppuccin-theme
     fi
 
     ;;
