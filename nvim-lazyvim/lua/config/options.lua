@@ -13,4 +13,4 @@ vim.opt.listchars = "tab:▸ ,trail:·,nbsp:␣,extends:❯,precedes:❮"
 -- vim.opt.swapfile = false
 
 -- fill character for diff: /
-vim.opt.fillchars = "diff:/"
+vim.opt.fillchars = "diff:╱"
