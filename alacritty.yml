@@ -12,6 +12,7 @@ import:
 
 window:
   decorations: buttonless
+  option_as_alt: OnlyLeft # set Meta key (e.g. <M-j> to Option key on macOS)
 
 font:
   normal:
