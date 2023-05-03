@@ -9,6 +9,7 @@ return {
 		opts = {
 			ensure_installed = {
 				-- python
+				"pyright",
 				-- "debugpy",
 				-- "mypy",
 
