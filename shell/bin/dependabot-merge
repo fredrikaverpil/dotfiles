@@ -1,10 +1,13 @@
 #!/bin/bash -ex
 
+# Set search arguments
+search_args="is:open draft:false status:pending status:success"
+
 # Get the list of numbers
-pr_numbers=$(gh pr list "$@" --app dependabot --json number --jq '.[].number')
+pr_numbers=$(gh pr list "$@" --app dependabot --json number --jq '.[].number' --search "$search_args")
 
 # Iterate over each number and approve and merge the corresponding PR
 for pr_number in $pr_numbers; do
-    gh pr review --approve $pr_number
-    gh pr merge $pr_number --auto
+	gh pr review --approve "$pr_number"
+	gh pr merge "$pr_number" --auto
 done
