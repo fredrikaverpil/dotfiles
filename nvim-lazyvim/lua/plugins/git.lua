@@ -15,6 +15,8 @@ return {
 			{ "nvim-lua/plenary.nvim" },
 		},
 		config = function()
+			vim.opt.fillchars = "diff:╱"
+
 			require("diffview").setup({
 				enhanced_diff_hl = true, -- See ':h diffview-config-enhanced_diff_hl'
 			})
