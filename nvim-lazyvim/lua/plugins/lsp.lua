@@ -2,7 +2,7 @@
 
 return {
 
-	-- chage mason config
+	-- change mason config
 	{
 		"williamboman/mason.nvim",
 		-- opts will be merged with the parent spec
@@ -46,6 +46,7 @@ return {
 			local null_ls = require("null-ls")
 			local formatting = null_ls.builtins.formatting
 			local diagnostics = null_ls.builtins.diagnostics
+			local code_actions = null_ls.builtins.code_actions
 
 			null_ls.setup({
 				-- debug = true, -- Turn on debug for :NullLsLog
@@ -61,9 +62,6 @@ return {
 					formatting.black,
 
 					-- get from mason
-					diagnostics.shellcheck.with({
-						command = mason_registry.get_package("shellcheck").path,
-					}),
 					formatting.stylua.with({
 						command = mason_registry.get_package("stylua").path,
 					}),
@@ -75,6 +73,9 @@ return {
 					}),
 					formatting.rustfmt.with({
 						command = mason_registry.get_package("rustfmt").path,
+					}),
+					code_actions.shellcheck.with({
+						command = mason_registry.get_package("shellcheck").path,
 					}),
 				},
 			})
