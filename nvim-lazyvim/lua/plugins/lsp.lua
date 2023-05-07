@@ -28,6 +28,10 @@ return {
 				"prettier",
 				"typescript-language-server",
 				"eslint-lsp",
+
+				-- rust
+				"rustfmt",
+				"rust-analyzer",
 			},
 		},
 	},
@@ -68,6 +72,9 @@ return {
 					}),
 					formatting.prettier.with({
 						command = mason_registry.get_package("prettier").path,
+					}),
+					formatting.rustfmt.with({
+						command = mason_registry.get_package("rustfmt").path,
 					}),
 				},
 			})

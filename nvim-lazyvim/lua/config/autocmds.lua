@@ -13,3 +13,12 @@ vim.api.nvim_create_autocmd("FileType", {
 		vim.opt_local.shiftwidth = 4 -- Size of an indent
 	end,
 })
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = { "rust" },
+	callback = function()
+		vim.opt_local.colorcolumn = "79" -- Ruler at column number
+		vim.opt_local.tabstop = 4 -- Number of spaces tabs count for
+		vim.opt_local.shiftwidth = 4 -- Size of an indent
+	end,
+})
