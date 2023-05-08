@@ -3,6 +3,7 @@
 return {
 
 	-- change mason config
+	-- note: don't forget to update treesitter for languages
 	{
 		"williamboman/mason.nvim",
 		-- opts will be merged with the parent spec
