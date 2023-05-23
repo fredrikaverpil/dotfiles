@@ -21,6 +21,7 @@ brew 'withgraphite/tap/graphite'
 brew 'kubectx'
 brew 'fzf'
 brew 'rust'
+brew 'shellcheck'
 
 # LazyVim
 brew 'ripgrep'
