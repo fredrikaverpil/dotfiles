@@ -32,7 +32,7 @@ alias docker-ip="docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddr
 alias k9s='docker run --rm -it -v $KUBECONFIG:/root/.kube/config quay.io/derailed/k9s'
 
 # Python
-alias pyclean='find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf'
+alias pyclean='find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rvf'
 alias pip-purge='pip list --format freeze | xargs pip uninstall -y'
 alias pip-install-reqs='ls requirements*.txt | xargs -n 1 pip install -r'
 alias poetry-install-master='pipx install --suffix=@master --force git+https://github.com/python-poetry/poetry.git'
@@ -49,7 +49,7 @@ alias vim='nvim'
 # GitHub Copilot X
 # Sets up aliases for `??`, `git?`, and `gh?`
 if which github-copilot-cli >/dev/null; then
-  eval "$(github-copilot-cli alias -- "$0")"
+    eval "$(github-copilot-cli alias -- "$0")"
 fi
 
 # Gerrit
