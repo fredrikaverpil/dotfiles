@@ -9,6 +9,13 @@ return {
 		},
 		config = function()
 			-- https://github.com/nvim-telescope/telescope-live-grep-args.nvim
+			-- Uses ripgrep args (rg) for live_grep
+			-- Command examples:
+			-- -i "Data"  # case insensitive
+			-- -g "!*.md" # ignore md files
+			-- -w # whole word
+			-- -e # regex
+			-- see 'man rg' for more
 			require("telescope").load_extension("live_grep_args")
 		end,
 		keys = {
