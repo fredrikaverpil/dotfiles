@@ -318,10 +318,9 @@
 
   "github.copilot.enable": {
     "*": true,
+    "yaml": true,
     "plaintext": false,
-    "markdown": true,
-    "scminput": false,
-    "yaml": true
+    "markdown": false
   },
 
   // ----------------------------------------
@@ -332,13 +331,12 @@
   "diffEditor.ignoreTrimWhitespace": false,
   "githubPullRequests.pullBranch": "never",
   "editor.accessibilitySupport": "off",
+  "editor.minimap.enabled": false,
   "workbench.iconTheme": "catppuccin-mocha",
   "terminal.integrated.env.osx": {
     "PATH": "${env:PATH}:$HOME/.local/share/LazyVim/mason/bin"
   },
   "gitlens.statusBar.enabled": false,
   "gitlens.codeLens.recentChange.enabled": false,
-  "gitlens.codeLens.authors.enabled": false,
-  "workbench.startupEditor": "none",
-  "editor.minimap.enabled": false
+  "gitlens.codeLens.authors.enabled": false
 }

@@ -1,0 +1,6 @@
+#!/bin/bash -ex
+
+# This will create a list of commands to execute for
+# installing all extensions available in visual studio code
+# but for the insiders version
+code --list-extensions | xargs -L 1 echo code-insiders --install-extension
