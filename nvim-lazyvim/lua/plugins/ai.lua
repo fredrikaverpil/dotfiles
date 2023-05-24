@@ -1,21 +1,5 @@
 return {
 
-	-- github copilot
-	{
-		"github/copilot.vim",
-		-- automatically start github copilot
-		config = function()
-			vim.keymap.set(
-				"i",
-				"<C-J>",
-				'copilot#Accept("<CR>")',
-				{ silent = true, expr = true, replace_keycodes = false }
-			)
-			vim.keymap.set("i", "<C-H>", "copilot#Previous()", { silent = true, expr = true, replace_keycodes = false })
-			vim.keymap.set("i", "<C-K>", "copilot#Next()", { silent = true, expr = true })
-		end,
-	},
-
 	-- chatgpt
 	{
 		"jackMort/ChatGPT.nvim",
