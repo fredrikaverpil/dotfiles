@@ -7,6 +7,9 @@ return {
 				["<leader>t"] = {
 					name = "+test",
 				},
+				["<leader>gd"] = {
+					name = "+diffview",
+				},
 			})
 		end,
 	},

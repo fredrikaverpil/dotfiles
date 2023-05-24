@@ -13,6 +13,38 @@ return {
 				enhanced_diff_hl = true, -- See ':h diffview-config-enhanced_diff_hl'
 			})
 		end,
+		keys = {
+      -- add a keymap to browse plugin files
+      -- stylua: ignore
+      {
+				"<leader>gdc",
+				function()
+					vim.cmd("DiffviewOpen close")
+				end,
+				desc = "DiffviewClose (:tabclose)",
+			},
+			{
+				"<leader>gdh",
+				function()
+					vim.cmd("DiffviewFileHistory")
+				end,
+				desc = "DiffviewFileHistory",
+			},
+			{
+				"<leader>gdm",
+				function()
+					vim.cmd("DiffviewOpen main")
+				end,
+				desc = "DiffviewOpen main",
+			},
+			{
+				"<leader>gdn",
+				function()
+					vim.cmd("DiffviewOpen master")
+				end,
+				desc = "DiffviewOpen master",
+			},
+		},
 	},
 
 	-- octo
