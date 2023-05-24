@@ -14,21 +14,19 @@ return {
 			})
 		end,
 		keys = {
-      -- add a keymap to browse plugin files
-      -- stylua: ignore
-      {
-				"<leader>gdc",
+			{
+				"<leader>gdd",
 				function()
-					vim.cmd("DiffviewOpen close")
+					vim.cmd("DiffviewClose")
 				end,
-				desc = "DiffviewClose (:tabclose)",
+				desc = "Close Diffview tab",
 			},
 			{
-				"<leader>gdh",
+				"<leader>gdf",
 				function()
 					vim.cmd("DiffviewFileHistory")
 				end,
-				desc = "DiffviewFileHistory",
+				desc = "File history",
 			},
 			{
 				"<leader>gdm",
@@ -43,6 +41,41 @@ return {
 					vim.cmd("DiffviewOpen master")
 				end,
 				desc = "DiffviewOpen master",
+			},
+		},
+	},
+
+	-- git-blame
+	{
+		"f-person/git-blame.nvim",
+		keys = {
+			{
+				"<leader>gbb",
+				function()
+					vim.cmd("GitBlameToggle")
+				end,
+				desc = "Blame (toggle)",
+			},
+			{
+				"<leader>gbs",
+				function()
+					vim.cmd("GitBlameCopySHA")
+				end,
+				desc = "Copy SHA",
+			},
+			{
+				"<leader>gbc",
+				function()
+					vim.cmd("GitBlameCopyCommitURL")
+				end,
+				desc = "Copy commit URL",
+			},
+			{
+				"<leader>gbf",
+				function()
+					vim.cmd("GitBlameCopyFileURL")
+				end,
+				desc = "Copy file URL",
 			},
 		},
 	},
