@@ -19,7 +19,8 @@ return {
 				adapters = {
 					require("neotest-python")({
 						dap = { justMyCode = false },
-						-- runner = "pytest",
+						runner = "pytest",
+						args = { "--log-level", "DEBUG", "--color", "yes" },
 					}),
 					require("neotest-plenary"),
 					require("neotest-vim-test")({
