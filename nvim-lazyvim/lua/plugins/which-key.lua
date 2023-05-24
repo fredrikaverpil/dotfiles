@@ -4,8 +4,8 @@ return {
 		"folke/which-key.nvim",
 		opts = function()
 			require("which-key").register({
-				["<leader>ct"] = {
-					name = "+Test",
+				["<leader>t"] = {
+					name = "+test",
 				},
 			})
 		end,
