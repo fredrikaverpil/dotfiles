@@ -26,7 +26,7 @@ return {
 				"dockerfile-language-server",
 
 				-- javascript/typescript
-				"prettier",
+				"prettierd",
 				"typescript-language-server",
 				"eslint-lsp",
 
@@ -69,8 +69,8 @@ return {
 					formatting.shfmt.with({
 						command = mason_registry.get_package("shfmt").path,
 					}),
-					formatting.prettier.with({
-						command = mason_registry.get_package("prettier").path,
+					formatting.prettierd.with({
+						command = mason_registry.get_package("prettierd").path,
 					}),
 					formatting.rustfmt.with({
 						command = mason_registry.get_package("rustfmt").path,
