@@ -3,16 +3,6 @@
 
 return {
 
-  -- fix error seen in https://github.com/LazyVim/LazyVim/discussions/821
-  -- {
-  --   "theHamsta/nvim-dap-virtual-text",
-  --   config = function()
-  --     require("nvim-dap-virtual-text").setup({
-  --       display_callback = function(variable, buf, stackframe, node, options) end,
-  --     })
-  --   end,
-  -- },
-
   {
     "mfussenegger/nvim-dap",
     dependencies = {
