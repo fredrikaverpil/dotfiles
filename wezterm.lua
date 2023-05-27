@@ -3,14 +3,17 @@ local config = {}
 
 -- https://wezfurlong.org/wezterm/config/files.html
 
+-- font
+-- https://www.jetbrains.com/lp/mono
+-- https://github.com/ryanoasis/nerd-fonts/releases
+-- https://fonts.google.com/noto/specimen/Noto+Color+Emoji
 config.font = wezterm.font_with_fallback({
-  "JetBrains Mono",
-  "JetBrains Mono Nerd Font",
+  { family = "JetBrains Mono", weight = "Medium" },
+  "Noto Color Emoji",
 })
 
 -- https://wezfurlong.org/wezterm/colorschemes/
 -- config.color_scheme = "Catppuccin Mocha"
--- config.color_scheme = "tokyonight_night"
-config.color_scheme = "Tokyo Night (Gogh)"
+config.color_scheme = "tokyonight_night"
 
 return config
