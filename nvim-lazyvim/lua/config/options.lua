@@ -11,3 +11,5 @@ vim.opt.listchars = "tab:▸ ,trail:·,nbsp:␣,extends:❯,precedes:❮"
 
 -- disable swap files
 -- vim.opt.swapfile = false
+
+vim.opt.relativenumber = false -- Relative line numbers
