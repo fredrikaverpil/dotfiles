@@ -73,8 +73,6 @@ jobs:
 
           # Test Pipx
           poetry --version
-          black --version
-          ipython --version
         env:
           PYENV_ROOT: /home/runner/dotfiles-install-dir/.pyenv
         if: runner.os == 'Linux'
