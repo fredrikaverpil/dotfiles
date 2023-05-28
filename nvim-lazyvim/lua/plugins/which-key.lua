@@ -7,6 +7,9 @@ return {
 				["<leader>t"] = {
 					name = "+test",
 				},
+				["<leader>gb"] = {
+					name = "+blame",
+				},
 				["<leader>gd"] = {
 					name = "+diffview",
 				},
