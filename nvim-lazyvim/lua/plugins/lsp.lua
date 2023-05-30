@@ -10,6 +10,7 @@ return {
     opts = {
       ensure_installed = {
         -- python
+        "ruff-lsp",
         "pyright",
         -- "debugpy",
         -- "mypy",

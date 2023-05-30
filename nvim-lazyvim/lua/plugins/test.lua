@@ -21,6 +21,7 @@ return {
       -- adapters
       { "nvim-neotest/neotest-python" },
       { "rouge8/neotest-rust" },
+      { "adrigzr/neotest-mocha" },
     },
 
     -- keys = {
@@ -50,6 +51,14 @@ return {
             -- https://nexte.st/book/pre-built-binaries.html
             args = { "--no-capture" },
           }),
+
+          -- require("neotest-mocha")({
+          --   command = "npm test --",
+          --   env = { CI = true },
+          --   cwd = function(path)
+          --     return vim.fn.getcwd()
+          --   end,
+          -- }),
         },
       })
     end,
