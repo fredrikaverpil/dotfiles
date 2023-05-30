@@ -8,7 +8,8 @@ return {
     },
     lazy = false,
     config = function()
-      vim.opt.fillchars = "diff:╱"
+      -- vim.opt.fillchars = "diff:╱"
+      vim.opt.fillchars = "diff:░"
 
       require("diffview").setup({
         enhanced_diff_hl = true, -- See ':h diffview-config-enhanced_diff_hl'
@@ -23,11 +24,23 @@ return {
         desc = "Close Diffview tab",
       },
       {
+        "<leader>gdc",
+        ":DiffviewOpen origin/main...HEAD",
+        { desc = "Compare commits" },
+      },
+      {
         "<leader>gdf",
+        function()
+          vim.cmd("DiffviewFileHistory %")
+        end,
+        desc = "File history",
+      },
+      {
+        "<leader>gdr",
         function()
           vim.cmd("DiffviewFileHistory")
         end,
-        desc = "File history",
+        desc = "Repo history",
       },
       {
         "<leader>gdm",
