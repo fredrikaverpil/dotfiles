@@ -16,46 +16,17 @@ return {
       })
     end,
     keys = {
+      { "<leader>gdd", ":DiffviewClose<CR>", desc = "Close Diffview tab" },
+      { "<leader>gdc", ":DiffviewOpen origin/main...HEAD", desc = "Compare commits" },
+      { "<leader>gdp", ":DiffviewOpen origin/main...HEAD --imply-local", desc = "Review current PR" },
       {
-        "<leader>gdd",
-        function()
-          vim.cmd("DiffviewClose")
-        end,
-        desc = "Close Diffview tab",
+        "<leader>gdp",
+        ":DiffviewFileHistory --range=origin/main...HEAD --right-only --no-merges",
+        desc = "Review current PR (per commit)",
       },
-      {
-        "<leader>gdc",
-        ":DiffviewOpen origin/main...HEAD",
-        { desc = "Compare commits" },
-      },
-      {
-        "<leader>gdf",
-        function()
-          vim.cmd("DiffviewFileHistory %")
-        end,
-        desc = "File history",
-      },
-      {
-        "<leader>gdr",
-        function()
-          vim.cmd("DiffviewFileHistory")
-        end,
-        desc = "Repo history",
-      },
-      {
-        "<leader>gdm",
-        function()
-          vim.cmd("DiffviewOpen main")
-        end,
-        desc = "DiffviewOpen main",
-      },
-      {
-        "<leader>gdn",
-        function()
-          vim.cmd("DiffviewOpen master")
-        end,
-        desc = "DiffviewOpen master",
-      },
+      { "<leader>gdm", ":DiffviewOpen main", desc = "DiffviewOpen" },
+      { "<leader>gdf", ":DiffviewFileHistory %<CR>", desc = "File history" },
+      { "<leader>gdr", ":DiffviewFileHistory<CR>", desc = "Repo history" },
     },
   },
 
@@ -63,34 +34,10 @@ return {
   {
     "f-person/git-blame.nvim",
     keys = {
-      {
-        "<leader>gbb",
-        function()
-          vim.cmd("GitBlameToggle")
-        end,
-        desc = "Blame (toggle)",
-      },
-      {
-        "<leader>gbs",
-        function()
-          vim.cmd("GitBlameCopySHA")
-        end,
-        desc = "Copy SHA",
-      },
-      {
-        "<leader>gbc",
-        function()
-          vim.cmd("GitBlameCopyCommitURL")
-        end,
-        desc = "Copy commit URL",
-      },
-      {
-        "<leader>gbf",
-        function()
-          vim.cmd("GitBlameCopyFileURL")
-        end,
-        desc = "Copy file URL",
-      },
+      { "<leader>gbb", ":GitBlameToggle<CR>", desc = "Blame (toggle)" },
+      { "<leader>gbs", ":GitBlameCopySHA<CR>", desc = "Copy SHA" },
+      { "<leader>gbc", ":GitBlameCopyCommitURL<CR>", desc = "Copy commit URL" },
+      { "<leader>gbf", ":GitBlameCopyFileURL<CR>", desc = "Copy file URL" },
     },
   },
 
