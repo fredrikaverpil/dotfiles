@@ -16,6 +16,9 @@ return {
         ["<leader>h"] = {
           name = "+harpoon",
         },
+        ["<leader>r"] = {
+          name = "+run",
+        },
       })
     end,
   },

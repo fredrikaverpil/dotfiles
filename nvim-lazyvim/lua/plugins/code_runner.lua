@@ -6,6 +6,6 @@ return {
         focus = false,
       })
     end,
-    keys = { { "<leader>fr", "<cmd>RunFile term<cr>", desc = "Run file" } },
+    keys = { { "<leader>rf", "<cmd>RunFile term<cr>", desc = "Run file" } },
   },
 }
