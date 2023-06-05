@@ -1,0 +1,30 @@
+# default layout: bsp, stack or float
+yabai -m config layout bsp
+
+# when a new window is added:
+# - a vertical split will go to the right
+# - a horizontal split will go to the bottom
+yabai -m config window_placement second_child
+
+# padding
+yabai -m config top_padding 12
+yabai -m config bottom_padding 12
+yabai -m config left_padding 12
+yabai -m config right_padding 12
+yabai -m config window_gap 12
+
+# mouse moves to focused window
+yabai -m config mouse_follows_focus on
+
+# left click + drag
+yabai -m config mouse_action1 move
+
+# right click + drag
+yabai -m config mouse_action2 resize
+
+# when a window is dragged to the center of another windo, they get swapped
+yabai -m mouse_drop_action swap
+
+# disable yabai for certain apps
+yabai -m rule --add app="^Calculator$" manage=off
+

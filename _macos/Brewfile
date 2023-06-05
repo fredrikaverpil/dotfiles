@@ -9,7 +9,11 @@ tap 'homebrew/bundle'
 tap 'homebrew/core'
 tap 'cantino/mcfly'
 
-# CLIs
+# ui and os related
+brew 'yabai'
+brew 'koekeishiya/formulae/skhd'
+
+# terminal cli tools
 brew 'asciinema'
 brew 'pre-commit'
 brew 'tree'
@@ -20,21 +24,23 @@ brew 'bat'
 brew 'withgraphite/tap/graphite'
 brew 'kubectx'
 brew 'fzf'
+
+# languages
 brew 'rust'
-brew 'shellcheck'
+brew 'go'
 
 # LazyVim
 brew 'ripgrep'
 brew 'fd'
 brew 'lazygit'
 
-# GUIs
+# misc gui apps
 cask 'appcleaner'
-cask 'rectangle'
+# cask 'rectangle' -- using yabai instead
 cask 'spotify'
 cask 'visual-studio-code'
-cask 'kitty'
-cask 'alacritty'
+# cask 'kitty' -- using wezterm instead
+# cask 'alacritty' -- using wezterm instead
 cask 'wezterm'
-cask 'karabiner-elements'
 cask 'pgadmin4'
+cask 'karabiner-elements'
