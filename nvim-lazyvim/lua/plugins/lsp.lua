@@ -34,6 +34,9 @@ return {
         -- rust
         "rustfmt",
         "rust-analyzer",
+
+        -- go
+        -- handled by lazy.lua
       },
     },
   },
@@ -77,6 +80,17 @@ return {
           formatting.rustfmt.with({
             command = mason_registry.get_package("rustfmt").path,
           }),
+          -- formatting.yamlfmt.with({
+          --   command = mason_registry.get_package("yamlfmt").path,
+          -- }),
+          formatting.yamlfix.with({
+            command = mason_registry.get_package("yamlfix").path, -- requires python
+          }),
+
+          diagnostics.yamllint.with({
+            command = mason_registry.get_package("yamllint").path,
+          }),
+
           code_actions.shellcheck.with({
             command = mason_registry.get_package("shellcheck").path,
           }),
