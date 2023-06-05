@@ -1,8 +1,8 @@
 # change window focus
-shift + alt - j : yabai -m window --focus south
-shift + alt - k : yabai -m window --focus north 
-shift + alt - h : yabai -m window --focus west
-shift + alt - l : yabai -m window --focus east
+# shift + alt - j : yabai -m window --focus south
+# shift + alt - k : yabai -m window --focus north 
+# shift + alt - h : yabai -m window --focus west
+# shift + alt - l : yabai -m window --focus east
 
 # change focus between external displays (left and right)
 shift + alt - s : yabai -m display --focus west
@@ -27,10 +27,10 @@ shift + alt - m : yabai -m window --toggle zoom-fullscreen
 shift + alt - e : yabai -m space --balance
 
 # swap windows
-# shift + alt - j : yabai -m window --swap south
-# shift + alt - k : yabai -m window --swap north
-# shift + alt - h : yabai -m window --swap west
-# shift + alt - l : yabai -m window --swap east
+shift + alt - j : yabai -m window --swap south
+shift + alt - k : yabai -m window --swap north
+shift + alt - h : yabai -m window --swap west
+shift + alt - l : yabai -m window --swap east
 
 # move window and split
 # ctrl + alt - j : yabai -m window --warp south
@@ -59,7 +59,7 @@ shift + alt - 8 : yabai -m window --space 8
 shift + alt - 9 : yabai -m window --space 9
 
 # start/stop yabai, tiling window manager
-ctrl + alt - q : yabai --stop-service
-ctrl + alt - s : yabai --start-service
+shift + alt - q : yabai --stop-service
+shift + alt - s : yabai --start-service
 
 
