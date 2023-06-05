@@ -59,6 +59,7 @@ shift + alt - 8 : yabai -m window --space 8
 shift + alt - 9 : yabai -m window --space 9
 
 # start/stop yabai, tiling window manager
-ctrl + alt - q : brew services stop yabai
-ctrl + alt - s : brew services start yabai
+ctrl + alt - q : yabai --stop-service
+ctrl + alt - s : yabai --start-service
+
 
