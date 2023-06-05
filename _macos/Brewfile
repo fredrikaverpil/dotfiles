@@ -8,10 +8,11 @@ cask_args appdir: '/Applications'
 tap 'homebrew/bundle'
 tap 'homebrew/core'
 tap 'cantino/mcfly'
+tap 'koekeishiya/formulae' # yabai
 
 # ui
 brew 'yabai'
-brew 'koekeishiya/formulae/skhd'
+brew 'skhd'
 cask 'karabiner-elements'
 
 # terminal cli tools
