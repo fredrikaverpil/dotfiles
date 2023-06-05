@@ -15,24 +15,29 @@
     ~/.bashrc_user: bashrc
     ~/.zprofile:
     ~/.zshrc_user: zshrc
+    ~/.config/starship.toml: starship.toml
+
     ~/.gitconfig:
     ~/.gitconfig_doktor:
     ~/.gitignore_global:
     ~/.gitmessage:
+
     ~/.tmux.conf:
+
+    ~/.wezterm.lua: wezterm.lua
     ~/.config/alacritty/alacritty.yml:
       path: alacritty.yml
       if: '[ "$(uname -s)" = "Darwin" ]'
     ~/.config/kitty/kitty.conf: kitty.conf
-    ~/.wezterm.lua: wezterm.lua
+
+    ~/.config/LazyVim/lua:
+    path: nvim-lazyvim/lua
+    force: true
     ~/.config/NvChad/lua/custom:
       path: nvim-nvchad/lua/custom
       force: true
-    ~/.config/LazyVim/lua:
-      path: nvim-lazyvim/lua
-      force: true
     ~/.config/helix:
-    ~/.config/starship.toml: starship.toml
+
     ~/Library/Application Support/Code/User/settings.json:
       path: vscode_settings.jsonc
       force: true
