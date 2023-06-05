@@ -19,6 +19,7 @@
     ~/.gitmessage:
     ~/.tmux.conf:
     ~/.config/yabai/yabairc: yabairc
+    ~/.config/skhd/skhdrc: skhdrc
     ~/.wezterm.lua: wezterm.lua
     ~/.config/alacritty/alacritty.yml: alacritty.yml
     ~/.config/kitty/kitty.conf: kitty.conf
