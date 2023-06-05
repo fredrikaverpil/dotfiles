@@ -1,43 +1,34 @@
+---
 - defaults:
     link:
       create: true
       relink: true
-
-- clean: ["~", "~/.config"]
-
-- create:
-    - ~/Downloads
-
+- clean: ['~', ~/.config]
+- create: [~/Downloads]
 - link:
-    ~/.dotfiles: ""
+    ~/.dotfiles: ''
     ~/.shell:
     ~/.bash_profile:
     ~/.bashrc_user: bashrc
     ~/.zprofile:
     ~/.zshrc_user: zshrc
     ~/.config/starship.toml: starship.toml
-
     ~/.gitconfig:
     ~/.gitconfig_doktor:
     ~/.gitignore_global:
     ~/.gitmessage:
-
     ~/.tmux.conf:
-
+    ~/.config/yabai/yabairc: yabairc
     ~/.wezterm.lua: wezterm.lua
-    ~/.config/alacritty/alacritty.yml:
-      path: alacritty.yml
-      if: '[ "$(uname -s)" = "Darwin" ]'
+    ~/.config/alacritty/alacritty.yml: alacritty.yml
     ~/.config/kitty/kitty.conf: kitty.conf
-
     ~/.config/LazyVim/lua:
-    path: nvim-lazyvim/lua
-    force: true
+      path: nvim-lazyvim/lua
+      force: true
     ~/.config/NvChad/lua/custom:
       path: nvim-nvchad/lua/custom
       force: true
     ~/.config/helix:
-
     ~/Library/Application Support/Code/User/settings.json:
       path: vscode_settings.jsonc
       force: true
@@ -47,7 +38,8 @@
       force: true
       if: '[ "$(uname -s)" = "Darwin" ]'
 
-    # # Remap US English layout's ['; keys to Swedish åäö keys (works poorly) using built-in macOS key bindings
+    # Remap US English layout's ['; keys to Swedish åäö keys
+    # However, this works poorly, so commented out for now
     #   ~/Library/KeyBindings/DefaultKeyBinding.dict:
     #       path: _macos/DefaultKeyBinding.dict
     #       force: true
@@ -58,15 +50,16 @@
       path: _macos/karabiner
       create: true
       if: '[ "$(uname -s)" = "Darwin" ]'
-
 - shell:
     - git submodule sync --recursive
 
     # add shell sourcing to bash
-    - grep -qxF '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' ~/.bashrc || echo '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' >> ~/.bashrc
+    - grep -qxF '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' ~/.bashrc ||
+      echo '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' >> ~/.bashrc
 
     # add shell sourcing to zsh
-    - grep -qxF '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' ~/.zshrc || echo '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' >> ~/.zshrc
+    - grep -qxF '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' ~/.zshrc || echo
+      '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' >> ~/.zshrc
 
     # ssh
     - mkdir -p ~/.ssh && chmod 700 ~/.ssh
