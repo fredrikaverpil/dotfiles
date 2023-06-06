@@ -17,4 +17,11 @@ config.font = wezterm.font_with_fallback({
 -- config.color_scheme = "Catppuccin Mocha"
 config.color_scheme = "tokyonight_night"
 
+-- title bar
+config.window_decorations = "RESIZE"
+
+-- tab config
+config.hide_tab_bar_if_only_one_tab = true
+config.use_fancy_tab_bar = false
+
 return config
