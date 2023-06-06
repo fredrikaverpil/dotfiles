@@ -45,18 +45,15 @@ return {
             args = { "--no-capture" },
           }),
 
-          -- TODO: there is an issue where neotest-mocha attempts to run tests for Python:
-          -- https://github.com/adrigzr/neotest-mocha/issues/7
-          --
-          -- require("neotest-mocha")({
-          --   -- https://github.com/adrigzr/neotest-mocha
-          --   filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
-          --   command = "npm test --",
-          --   env = { CI = true },
-          --   cwd = function(path)
-          --     return vim.fn.getcwd()
-          --   end,
-          -- }),
+          require("neotest-mocha")({
+            -- https://github.com/adrigzr/neotest-mocha
+            filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+            command = "npm test --",
+            env = { CI = true },
+            cwd = function(path)
+              return vim.fn.getcwd()
+            end,
+          }),
 
           require("neotest-vim-test")({
             -- https://github.com/nvim-neotest/neotest-vim-test
