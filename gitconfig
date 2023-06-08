@@ -9,11 +9,16 @@
 	ff = only
 [merge]
   # tool = vscode
-	tool = neovim
+	# tool = neovim
+  tool = diffview
 [mergetool "vscode"]
 	cmd = code --wait $MERGED
 [mergetool "neovim"]
 	cmd = nvim -d $LOCAL $REMOTE $BASE $MERGED
+[mergetool "diffview"]
+  cmd = nvim -c \"DiffviewOpen\"
+[mergetool]
+  prompt = false
 [diff]
   # tool = vscode
 	tool = neovim
