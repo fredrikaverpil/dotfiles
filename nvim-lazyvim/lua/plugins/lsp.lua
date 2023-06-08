@@ -54,8 +54,7 @@ return {
       local code_actions = null_ls.builtins.code_actions
 
       null_ls.setup({
-        -- debug = true, -- Turn on debug for :NullLsLog
-        debug = false,
+        debug = false, -- Turn on debug for :NullLsLog
         -- diagnostics_format = "#{m} #{s}[#{c}]",
         sources = {
           -- list of supported sources:
@@ -94,6 +93,7 @@ return {
           code_actions.shellcheck.with({
             command = mason_registry.get_package("shellcheck").path,
           }),
+          code_actions.gitsigns,
         },
       })
     end,
