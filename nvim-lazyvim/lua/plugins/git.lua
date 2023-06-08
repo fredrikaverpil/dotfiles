@@ -16,17 +16,18 @@ return {
       })
     end,
     keys = {
-      { "<leader>gdd", ":DiffviewClose<CR>", desc = "Close Diffview tab" },
       { "<leader>gdc", ":DiffviewOpen origin/main...HEAD", desc = "Compare commits" },
+      { "<leader>gdd", ":DiffviewClose<CR>", desc = "Close Diffview tab" },
+      { "<leader>gdh", ":DiffviewFileHistory %<CR>", desc = "File history" },
+      { "<leader>gdH", ":DiffviewFileHistory<CR>", desc = "Repo history" },
+      { "<leader>gdm", ":DiffviewOpen<CR>", desc = "Solve merge conflicts" },
+      { "<leader>gdo", ":DiffviewOpen main", desc = "DiffviewOpen" },
       { "<leader>gdp", ":DiffviewOpen origin/main...HEAD --imply-local", desc = "Review current PR" },
       {
-        "<leader>gdp",
+        "<leader>gdP",
         ":DiffviewFileHistory --range=origin/main...HEAD --right-only --no-merges",
         desc = "Review current PR (per commit)",
       },
-      { "<leader>gdm", ":DiffviewOpen main", desc = "DiffviewOpen" },
-      { "<leader>gdf", ":DiffviewFileHistory %<CR>", desc = "File history" },
-      { "<leader>gdr", ":DiffviewFileHistory<CR>", desc = "Repo history" },
     },
   },
 
