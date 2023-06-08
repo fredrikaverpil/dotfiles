@@ -7,6 +7,7 @@ return {
     opts = {
       ensure_installed = {
         "bash",
+        "go",
         "html",
         "javascript",
         "json",
@@ -23,5 +24,11 @@ return {
         "yaml",
       },
     },
+  },
+
+  -- https://github.com/nvim-treesitter/nvim-treesitter-context
+  {
+    "nvim-treesitter/nvim-treesitter-context",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
 }
