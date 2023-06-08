@@ -19,4 +19,4 @@ local function map(mode, lhs, rhs, opts)
   end
 end
 
-map("n", "<leader>ba", "<cmd>%bd|e#<cr>", { desc = "Close all buffers but the current one" })
+map("n", "<leader>bo", "<cmd>%bd|e#<cr>", { desc = "Close all buffers but the current one" })
