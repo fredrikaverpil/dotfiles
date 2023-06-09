@@ -4,8 +4,18 @@ return {
   {
     "nvim-telescope/telescope.nvim",
 
+    -- opts will be merged with the parent spec
+    opts = {
+      defaults = {
+        file_ignore_patterns = { "^.git/", "^node_modules/", "^poetry.lock" },
+      },
+    },
+  },
+
+  {
+    "nvim-telescope/telescope-live-grep-args.nvim",
     dependencies = {
-      "nvim-telescope/telescope-live-grep-args.nvim",
+      "nvim-telescope/telescope.nvim",
     },
     config = function()
       -- https://github.com/nvim-telescope/telescope-live-grep-args.nvim
@@ -30,9 +40,6 @@ return {
 
     -- opts will be merged with the parent spec
     opts = {
-      defaults = {
-        file_ignore_patterns = { "^.git/", "^node_modules/", "^poetry.lock" },
-      },
       pickers = {
         live_grep = {
           additional_args = function()
@@ -40,6 +47,17 @@ return {
           end,
         },
       },
+    },
+  },
+
+  {
+    "telescope.nvim",
+    dependencies = {
+      "nvim-telescope/telescope-fzf-native.nvim",
+      build = "make",
+      config = function()
+        require("telescope").load_extension("fzf")
+      end,
     },
   },
 }
