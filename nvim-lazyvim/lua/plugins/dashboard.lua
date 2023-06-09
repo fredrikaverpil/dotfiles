@@ -1,8 +1,5 @@
 return {
 
-    -- Dashboard
-    { "goolord/alpha-nvim",
-        enabled = false
-    }
-
+  -- Dashboard
+  { "goolord/alpha-nvim", enabled = false },
 }
