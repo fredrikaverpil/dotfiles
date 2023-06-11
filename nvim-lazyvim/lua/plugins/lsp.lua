@@ -29,7 +29,7 @@ return {
         -- javascript/typescript
         "prettierd",
         "typescript-language-server",
-        "eslint-lsp",
+        "eslint_d",
 
         -- rust
         "rustfmt",
@@ -73,6 +73,9 @@ return {
           formatting.shfmt.with({
             command = mason_registry.get_package("shfmt").path,
           }),
+          -- diagnostics.eslint_d.with({
+          --   command = mason_registry.get_package("eslint_d").path,
+          -- }),
           formatting.prettierd.with({
             command = mason_registry.get_package("prettierd").path,
           }),
