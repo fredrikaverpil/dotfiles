@@ -12,6 +12,7 @@ return {
     },
   },
 
+  -- https://github.com/nvim-telescope/telescope-live-grep-args.nvim
   {
     "nvim-telescope/telescope-live-grep-args.nvim",
     dependencies = {
@@ -50,6 +51,7 @@ return {
     },
   },
 
+  -- https://www.lazyvim.org/configuration/recipes#add-telescope-fzf-native
   {
     "nvim-telescope/telescope-fzf-native.nvim",
     dependencies = {
