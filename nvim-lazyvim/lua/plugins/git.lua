@@ -5,6 +5,7 @@ return {
     "sindrets/diffview.nvim",
     dependencies = {
       { "nvim-lua/plenary.nvim" },
+      { "kyazdani42/nvim-web-devicons" },
     },
     lazy = false,
     config = function()
@@ -16,6 +17,8 @@ return {
       })
     end,
     keys = {
+      -- use [c and [c to navigate diffs (vim built in), see :h jumpto-diffs
+      -- use ]x and [x to navigate conflicts
       { "<leader>gdc", ":DiffviewOpen origin/main...HEAD", desc = "Compare commits" },
       { "<leader>gdd", ":DiffviewClose<CR>", desc = "Close Diffview tab" },
       { "<leader>gdh", ":DiffviewFileHistory %<CR>", desc = "File history" },
