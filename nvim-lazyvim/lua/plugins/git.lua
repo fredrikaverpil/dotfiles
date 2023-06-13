@@ -5,7 +5,7 @@ return {
     "sindrets/diffview.nvim",
     dependencies = {
       { "nvim-lua/plenary.nvim" },
-      { "kyazdani42/nvim-web-devicons" },
+      { "nvim-tree/nvim-web-devicons" },
     },
     lazy = false,
     config = function()
@@ -53,7 +53,7 @@ return {
     requires = {
       "nvim-lua/plenary.nvim",
       "nvim-telescope/telescope.nvim",
-      "kyazdani42/nvim-web-devicons",
+      "nvim-tree/nvim-web-devicons",
     },
     config = function()
       require("octo").setup()
