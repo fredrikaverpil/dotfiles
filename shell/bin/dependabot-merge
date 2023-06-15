@@ -1,10 +1,46 @@
 #!/bin/bash -ex
 
-# Get the list of numbers
-pr_numbers=$(gh pr list --app dependabot --json number --jq '.[].number' --search "is:open draft:false status:pending status:success chore(deps) in:title")
+# This script is used to manage dependabot PRs and assumes you have merge queue enabled.
+#
+# Docs:
+# - Search values for "status": https://docs.github.com/en/rest/guides/using-the-rest-api-to-interact-with-checks
 
-# Iterate over each number and approve and merge the corresponding PR
-for pr_number in $pr_numbers; do
-	gh pr review --approve "$pr_number"
-	gh pr merge "$pr_number" --auto
+# Get arguments and set the title to search for accordingly
+if [[ "$1" == "--dev" ]]; then
+	shift
+	title="chore(dev-deps)"
+else
+	title="chore(deps)"
+fi
+
+# Get the list of dependabot PR numbers
+prs_with_no_failures=$(gh pr list --app dependabot --json number --jq '.[].number' --search "is:open draft:false status:in_progress status:success $title in:title")
+prs_with_failures=$(gh pr list --app dependabot --json number --jq '.[].number' --search "is:open draft:false status:in_progress status:failure $title in:title")
+
+# Iterate over each PR which has no CI failure
+for pr_number in $prs_with_no_failures; do
+
+	if gh pr view "$pr_number" --json mergeable --jq '.mergeable' | grep -q CONFLICTING; then
+		# Ask dependabot to recreate if there is a merge conflict
+		gh pr comment "$pr_number" --body "@dependabot recreate"
+	elif gh pr view "$pr_number" --json mergeStateStatus | grep -q BLOCKED; then
+		# Show CI checks
+		gh checks "$pr_number"
+
+	else
+		# Approve if not approved
+		if ! gh pr view "$pr_number" --json reviewDecision --jq '.reviewDecision' | grep -q APPROVED; then
+			gh pr review --approve "$pr_number"
+		fi
+
+		# Merge
+		gh pr merge "$pr_number" --auto
+	fi
+
+done
+
+# Iterate over PRs with failed CI checks
+for pr_number in $prs_with_failures; do
+	# Show what's wrong
+	gh pr checks "$pr_number"
 done
