@@ -14,7 +14,7 @@ yabai -m config right_padding 12
 yabai -m config window_gap 12
 
 # mouse moves to focused window
-yabai -m config mouse_follows_focus on
+# yabai -m config mouse_follows_focus on
 
 # left click + drag
 yabai -m config mouse_action1 move
