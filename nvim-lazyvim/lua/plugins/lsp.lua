@@ -20,6 +20,7 @@ return {
         "stylua",
 
         -- shell
+        "bash-language-server",
         "shellcheck",
         "shfmt",
 
@@ -61,7 +62,7 @@ return {
           -- https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTINS.md
 
           -- get from $PATH
-          diagnostics.ruff,
+          -- diagnostics.ruff,
           diagnostics.mypy,
           formatting.black,
 
@@ -91,6 +92,9 @@ return {
 
           diagnostics.yamllint.with({
             command = mason_registry.get_package("yamllint").path,
+          }),
+          diagnostics.shellcheck.with({
+            command = mason_registry.get_package("shellcheck").path,
           }),
 
           code_actions.shellcheck.with({
