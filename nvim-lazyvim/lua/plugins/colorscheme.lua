@@ -9,6 +9,8 @@ return {
     opts = {
       colorscheme = "tokyonight",
       -- colorscheme = "tokyonight-night",
+      -- colorscheme = "catppuccin",
+      -- colorscheme = "catppuccin-macchiato",
       -- colorscheme = "catppuccin-mocha",
     },
   },
