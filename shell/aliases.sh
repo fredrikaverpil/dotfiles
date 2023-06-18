@@ -11,8 +11,8 @@ alias tree='tree -C'
 
 # Kitty
 if command -v kitty &>/dev/null; then
-    alias icat='kitty +kitten icat'
-    alias diff='kitty +kitten diff'
+	alias icat='kitty +kitten icat'
+	alias diff='kitty +kitten diff'
 fi
 
 # Doktor
@@ -42,14 +42,12 @@ alias venv='PIP_REQUIRE_VIRTUALENV=false python -m pip install --upgrade --user 
 
 # Neovim
 alias nvim-lazy='NVIM_APPNAME=LazyVim nvim'
-alias nvim-chad='NVIM_APPNAME=NvChad nvim'
 alias nvim='nvim-lazy'
-alias vim='nvim'
 
 # GitHub Copilot X
 # Sets up aliases for `??`, `git?`, and `gh?`
 if which github-copilot-cli >/dev/null; then
-    eval "$(github-copilot-cli alias -- "$0")"
+	eval "$(github-copilot-cli alias -- "$0")"
 fi
 
 # Gerrit
@@ -62,10 +60,10 @@ fi
 # Per-platform settings, will override the above commands
 case $(uname) in
 Darwin)
-    # commands for macOS go here
-    ;;
+	# commands for macOS go here
+	;;
 Linux)
-    # commands for Linux go here
-    alias bat='batcat'
-    ;;
+	# commands for Linux go here
+	alias bat='batcat'
+	;;
 esac
