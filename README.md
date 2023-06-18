@@ -10,23 +10,8 @@ These are my personal dotfiles, for macOS, Windows and Linux. The setup is based
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [macOS](#macos)
-  - [Install dotfiles](#install-dotfiles)
-  - [Optional installation](#optional-installation)
-  - [Configuration](#configuration)
-- [Windows 11 + WSL/Ubuntu](#windows-11--wslubuntu)
-  - [Windows installations](#windows-installations)
-  - [WSL/Ubuntu installations](#wslubuntu-installations)
-  - [Configuration](#configuration-1)
-    - [Windows Terminal settings](#windows-terminal-settings)
-    - [WSL Tray](#wsl-tray)
-    - [Set up HHKB for macOS-compatible workflow](#set-up-hhkb-for-macos-compatible-workflow)
-  - [Closing notes](#closing-notes)
-- [Ubuntu 20.04](#ubuntu-2004)
-  - [Prerequisites](#prerequisites)
-  - [Install dotfiles](#install-dotfiles-1)
-  - [Optional installation](#optional-installation-1)
-- [Extras](#extras)
+- [Install](#install)
+  - [Fonts](#fonts)
   - [Local secrets](#local-secrets)
   - [Clone all my public repos](#clone-all-my-public-repos)
 
