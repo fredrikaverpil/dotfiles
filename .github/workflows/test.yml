@@ -37,6 +37,22 @@ jobs:
       - name: Test nix installer
         run: |
           HOME=~/dotfiles-install-dir installers/nix.sh
+      - name: Test exa installer
+        run: |
+          HOME=~/dotfiles-install-dir installers/exa.sh
+      - name: Test nvm installer
+        run: |
+          HOME=~/dotfiles-install-dir installers/nvm.sh
+      - name: Test lazygit installer
+        run: |
+          HOME=~/dotfiles-install-dir installers/lazygit.sh
+      - name: Test neovim distros installer
+        run: |
+          HOME=~/dotfiles-install-dir installers/neovim_distros.sh
+      - name: Test apt installer
+        run: |
+          HOME=~/dotfiles-install-dir installers/apt_install.sh
+        if: runner.os == 'Linux'
       - name: Test docker installer
         run: |
           HOME=~/dotfiles-install-dir installers/docker.sh
@@ -63,8 +79,3 @@ jobs:
         run: |
           sudo docker run hello-world
         if: runner.os == 'Linux'
-
-      # Disabled, takes a very long time to run
-      # - name: Test snap apps setup
-      #   run: |
-      #     installers/snap-apps.sh
