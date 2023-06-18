@@ -32,10 +32,16 @@ These are my personal dotfiles, for macOS, Windows and Linux. The setup is based
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+## Install
 
+- [macOS](README_MACOS.md)
+- [Windows 11 + WSL](README_WIN_WSL.md)
 
+### Fonts
 
-## Extras
+- [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono)
+- [Symbols Nerd Font Mono](https://github.com/ryanoasis/nerd-fonts)
+- [Noto Color Emoji](https://fonts.google.com/noto/specimen/Noto+Color+Emoji)
 
 ### Local secrets
 
