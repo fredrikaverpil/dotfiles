@@ -110,7 +110,6 @@
   // Workbench
   "workbench.preferredLightColorTheme": "Serendipity Morning",
   "workbench.preferredDarkColorTheme": "Serendipity Midnight",
-  "workbench.colorTheme": "Catppuccin Mocha",
   "workbench.colorCustomizations": {
     "[Serendipity Midnight]": {
       "sideBar.background": "#121421"
@@ -312,6 +311,12 @@
   // Extension: RedHat extensions (e.g. YAML)
   "redhat.telemetry.enabled": false,
 
+  // Neovim
+  "vscode-neovim.neovimExecutablePaths.darwin": "nvim",
+  "extensions.experimental.affinity": {
+    "asvetliakov.vscode-neovim": 1
+  },
+
   // ----------------------------------------
   // Settings for extensions not being synced
   // ----------------------------------------
@@ -332,13 +337,15 @@
   "diffEditor.ignoreTrimWhitespace": false,
   "githubPullRequests.pullBranch": "never",
   "editor.accessibilitySupport": "off",
-  "workbench.iconTheme": "catppuccin-mocha",
-  "terminal.integrated.env.osx": {
-    "PATH": "${env:PATH}:$HOME/.local/share/LazyVim/mason/bin"
-  },
+  "workbench.iconTheme": "catppuccin-macchiato",
+  // "terminal.integrated.env.osx": {
+  //   "PATH": "${env:PATH}:$HOME/.local/share/LazyVim/mason/bin"
+  // },
   "gitlens.statusBar.enabled": false,
   "gitlens.codeLens.recentChange.enabled": false,
   "gitlens.codeLens.authors.enabled": false,
   "workbench.startupEditor": "none",
-  "editor.minimap.enabled": false
+  "editor.minimap.enabled": false,
+  "git.ignoreRebaseWarning": true,
+  "workbench.colorTheme": "Catppuccin Macchiato"
 }

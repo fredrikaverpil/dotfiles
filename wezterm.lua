@@ -12,6 +12,7 @@ config.font = wezterm.font_with_fallback({
   { family = "Symbols Nerd Font Mono" },
   { family = "Noto Color Emoji" },
 })
+config.font_size = 14
 
 -- colorschemes
 -- https://wezfurlong.org/wezterm/colorschemes/
@@ -40,5 +41,29 @@ config.window_decorations = "RESIZE"
 -- tab config
 config.hide_tab_bar_if_only_one_tab = true
 config.use_fancy_tab_bar = false
+
+-- ssh hosts from ~./ssh/config
+local ssh_domains = {}
+for host, config in pairs(wezterm.enumerate_ssh_hosts()) do
+  table.insert(ssh_domains, {
+    -- the name can be anything you want; we're just using the hostname
+    name = host,
+    -- remote_address must be set to `host` for the ssh config to apply to it
+    remote_address = host,
+
+    -- if you don't have wezterm's mux server installed on the remote
+    -- host, you may wish to set multiplexing = "None" to use a direct
+    -- ssh connection that supports multiple panes/tabs which will close
+    -- when the connection is dropped.
+
+    -- multiplexing = "None",
+
+    -- if you know that the remote host has a posix/unix environment,
+    -- setting assume_shell = "Posix" will result in new panes respecting
+    -- the remote current directory when multiplexing = "None".
+    assume_shell = "Posix",
+  })
+end
+config.ssh_domains = ssh_domains
 
 return config
