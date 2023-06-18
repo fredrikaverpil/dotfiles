@@ -1,6 +1,6 @@
 ## macOS 🍎
 
-### Install dotfiles 🍩
+### Install dotfiles
 
 Install:
 
@@ -10,7 +10,7 @@ git clone https://github.com/fredrikaverpil/dotfiles.git
 cd dotfiles && ./install -vv
 ```
 
-### Optional installation 🍰
+### Optional installation
 
 Install Xcode commandline tools:
 

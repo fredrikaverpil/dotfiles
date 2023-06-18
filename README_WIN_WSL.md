@@ -1,10 +1,10 @@
-## Windows 11 + WSL 🐧
+## Windows 11 + WSL
 
 ⚠️ These instructions are likely outdated, as my primary system is macOS.
 
 This setup aims to run GUIs in Windows with all terminal and coding activities in WSL/Ubuntu.
 
-### Windows installations 🪟
+### Windows installations
 
 <details>
   <summary>Click here for instructions in older Windows 10</summary>
