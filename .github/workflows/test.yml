@@ -1,66 +1,49 @@
+---
 name: CI
-
 on:
   push:
   pull_request:
   schedule:
-    - cron: "0 8 * * 6"
-
+    - cron: 0 8 * * 6
 jobs:
   build:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
-
     steps:
       - uses: actions/checkout@v2
-
       - name: Create workfolder
         run: |
           mkdir -p ~/dotfiles-install-dir
-
       - name: Install dotfiles
         run: |
           HOME=~/dotfiles-install-dir ./install -vv
-
       - name: Show dotfiles
         run: |
           ls -alh ~/dotfiles-install-dir
-
       - name: Test homebrew installer
         run: |
           HOME=~/dotfiles-install-dir installers/homebrew.sh
-
-      - name: Test nerdfont installer
-        run: |
-          HOME=~/dotfiles-install-dir installers/nerdfont.sh
-
       - name: Test starship installer
         run: |
           installers/starship.sh
-
       - name: Test zsh installer
         run: |
           HOME=~/dotfiles-install-dir installers/zsh.sh
-
       - name: Test github CLI installer
         run: |
           HOME=~/dotfiles-install-dir installers/gh.sh
-
       - name: Test nix installer
         run: |
           HOME=~/dotfiles-install-dir installers/nix.sh
-
       - name: Test docker installer
         run: |
           HOME=~/dotfiles-install-dir installers/docker.sh
-
       - name: Test Brewfile install
         run: |
           brew bundle --file=_macos/Brewfile --verbose
         if: runner.os == 'macOS'
-
       - name: Test Python installer + setup
         run: |
           echo $PYENV_ROOT
@@ -76,7 +59,6 @@ jobs:
         env:
           PYENV_ROOT: /home/runner/dotfiles-install-dir/.pyenv
         if: runner.os == 'Linux'
-
       - name: Test Docker setup
         run: |
           sudo docker run hello-world
