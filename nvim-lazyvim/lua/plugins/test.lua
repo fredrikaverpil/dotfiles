@@ -1,14 +1,5 @@
 return {
 
-  {
-    "folke/neodev.nvim",
-    config = function()
-      require("neodev").setup({
-        library = { plugins = { "neotest" }, types = true },
-      })
-    end,
-  },
-
   -- neotest, also set up via lazy.lua.
   -- go here for full config, including keymaps: https://www.lazyvim.org/plugins/extras/test.core
   {
@@ -17,6 +8,7 @@ return {
       { "nvim-lua/plenary.nvim" },
       { "nvim-treesitter/nvim-treesitter" },
       { "antoinemadec/FixCursorHold.nvim" },
+      { "folke/neodev.nvim" },
 
       -- adapters
       { "nvim-neotest/neotest-vim-test" },
@@ -26,7 +18,20 @@ return {
       { "vim-test/vim-test" },
     },
 
+    keys = {
+      {
+        "<leader>tT",
+        ":lua require('neotest').run.run({ suite = true })<CR>",
+        desc = "Run all tests (override LazyVim)",
+      },
+    },
     config = function()
+      -- set up neotest with neodev
+      require("neodev").setup({
+        -- also see .neoconf.json
+        library = { plugins = { "neotest" }, types = true },
+      })
+
       require("neotest").setup({
 
         -- https://github.com/nvim-neotest/neotest-python
