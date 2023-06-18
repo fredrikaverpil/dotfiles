@@ -2,18 +2,18 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-  - [Windows 11 + WSL](#windows-11--wsl)
-    - [Windows installations](#windows-installations)
-      - [WSL Tray](#wsl-tray)
-      - [Set up HHKB for macOS-compatible workflow](#set-up-hhkb-for-macos-compatible-workflow)
-    - [WSL/Ubuntu installations](#wslubuntu-installations)
-    - [Configuration](#configuration)
-      - [Windows Terminal settings](#windows-terminal-settings)
-      - [Wezterm](#wezterm)
-      - [Update Ubuntu](#update-ubuntu)
-      - [Shell](#shell)
-      - [Editors](#editors)
-- [TODO: install neovim](#todo-install-neovim)
+- [Windows 11 + WSL](#windows-11--wsl)
+  - [Windows installations](#windows-installations)
+    - [WSL Tray](#wsl-tray)
+    - [Set up HHKB for macOS-compatible workflow](#set-up-hhkb-for-macos-compatible-workflow)
+  - [WSL/Ubuntu installations](#wslubuntu-installations)
+  - [Configuration](#configuration)
+    - [Windows Terminal](#windows-terminal)
+    - [Wezterm](#wezterm)
+    - [Update Ubuntu](#update-ubuntu)
+    - [Shell](#shell)
+    - [Editors](#editors)
+    - [Additional tools](#additional-tools)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
