@@ -125,10 +125,7 @@ cd dotfiles && ./install -vv
 
 ### Configuration
 
-#### Windows Terminal settings
-
-<details>
-  <summary>Click here for instructions for Windows Terminal</summary>
+#### Windows Terminal
 
 Run from administrative Powershell prompt:
 
@@ -141,8 +138,6 @@ cd \\wsl.localhost\Ubuntu\home\fredrik\code\repos\dotfiles
 
 New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json -Value _windows\terminal_settings.json
 ```
-
-</details>
 
 #### Wezterm
 
@@ -157,7 +152,6 @@ cd \\wsl.localhost\Ubuntu\home\fredrik\code\repos\dotfiles
 
 New-Item -ItemType SymbolicLink -Path $HOME\.wezterm.lua -Value wezterm.lua
 ```
-
 
 #### Update Ubuntu
 
@@ -174,18 +168,25 @@ sudo apt install git curl unzip bash-completion
 installers/zsh.sh  # remove the default prompt from ~/.zshrc after installation
 installers/starship.sh
 installers/gh.sh
+installers/nix.sh
+...
 ```
 
 #### Editors
 
-# TODO: install neovim
-
 ```bash
+installers/apt_install.sh
+installers/lazygit.sh
+nix-env -iA nixpkgs.neovim
 installers/neovim_distros.sh
 ```
 
 ```bash
-# will automatically install vscode server
-code .
+code .  # will automatically install vscode server
 ```
 
+#### Additional tools
+
+```bash
+installers/ ...
+```
