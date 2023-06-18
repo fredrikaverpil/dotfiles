@@ -18,8 +18,12 @@
     ~/.gitignore_global:
     ~/.gitmessage:
     ~/.tmux.conf:
-    ~/.config/yabai/yabairc: yabairc
-    ~/.config/skhd/skhdrc: skhdrc
+    ~/.config/yabai/yabairc:
+      path: yabairc
+      if: '[ "$(uname -s)" = "Darwin" ]'
+    ~/.config/skhd/skhdrc:
+      path: skhdrc
+      if: '[ "$(uname -s)" = "Darwin" ]'
     ~/.wezterm.lua: wezterm.lua
     ~/.config/LazyVim/lua:
       path: nvim-lazyvim/lua
