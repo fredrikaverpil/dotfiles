@@ -1,10 +1,8 @@
-# dotfiles
+# dotfiles 🍩
 
-[![CI](https://github.com/fredrikaverpil/dotfiles/actions/workflows/test.yml/badge.svg)](https://github.com/fredrikaverpil/dotfiles/actions/workflows/test.yml)
+<img width="1600" alt="lazyvim" src="https://github.com/fredrikaverpil/dotfiles/assets/994357/28d5cbe3-b9a1-47a4-93f4-616a6d251544">
 
-**Introduction**
-
-These are my personal dotfiles, for macOS, Windows and Linux. The setup is based on [dotbot](https://github.com/anishathalye/dotbot) and aims to be as idempotent as possible.
+These are my personal dotfiles, for macOS, Windows + WSL. The setup is based on [dotbot](https://github.com/anishathalye/dotbot) and aims to be as idempotent as possible.
 
 ## Install 🚀
 
