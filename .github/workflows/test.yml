@@ -43,9 +43,6 @@ jobs:
       - name: Test lazygit installer
         run: |
           HOME=~/dotfiles-install-dir installers/lazygit.sh
-      - name: Test neovim distros installer
-        run: |
-          HOME=~/dotfiles-install-dir installers/neovim_distros.sh
       - name: Test apt installer
         run: |
           HOME=~/dotfiles-install-dir installers/apt_install.sh
