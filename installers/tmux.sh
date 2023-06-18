@@ -6,14 +6,11 @@
 case $(uname) in
 Darwin)
     # commands for macOS go here
+    echo "Install via Brewfile on macOS."
 
     # tmux plugin manager
     if [ ! -d ~/.tmux/plugins/tpm ]; then
         git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-    fi
-
-    if ! command -v tmuxinator &>/dev/null; then
-        brew install tmuxinator
     fi
 
     ;;

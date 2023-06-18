@@ -16,10 +16,12 @@ brew 'skhd'
 cask 'karabiner-elements'
 
 # terminal cli tools
+brew 'starship'
+brew 'gh'
+brew 'nvm'
 brew 'asciinema'
 brew 'pre-commit'
 brew 'tree'
-brew 'pgcli'
 brew 'mcfly'
 brew 'exa'
 brew 'bat'
@@ -30,6 +32,10 @@ brew 'fzf'
 # languages
 brew 'rust'
 brew 'go'
+
+# tmux
+brew 'tmux'
+brew 'tmuxinator'
 
 # neovim
 brew 'ripgrep'

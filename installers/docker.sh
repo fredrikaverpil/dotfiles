@@ -6,7 +6,7 @@
 case $(uname) in
 Darwin)
     # commands for macOS go here
-    echo "Docker can be installed via Brewfile on macOS."
+    echo "Install via Docker Desktop manual download on macOS."
 
     ;;
 Linux)
