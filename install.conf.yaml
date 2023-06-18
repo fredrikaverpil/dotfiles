@@ -21,13 +21,8 @@
     ~/.config/yabai/yabairc: yabairc
     ~/.config/skhd/skhdrc: skhdrc
     ~/.wezterm.lua: wezterm.lua
-    ~/.config/alacritty/alacritty.yml: alacritty.yml
-    ~/.config/kitty/kitty.conf: kitty.conf
     ~/.config/LazyVim/lua:
       path: nvim-lazyvim/lua
-      force: true
-    ~/.config/NvChad/lua/custom:
-      path: nvim-nvchad/lua/custom
       force: true
     ~/.config/helix:
     ~/Library/Application Support/Code/User/settings.json:
@@ -59,10 +54,11 @@
       echo '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' >> ~/.bashrc
 
     # add shell sourcing to zsh
-    - grep -qxF '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' ~/.zshrc || echo
-      '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' >> ~/.zshrc
+    - grep -qxF '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' ~/.zshrc ||
+      echo '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' >> ~/.zshrc
 
     # ssh
+    # TODO: replace this with a "create" (see dotbot README for example)
     - mkdir -p ~/.ssh && chmod 700 ~/.ssh
     - touch ~/.ssh/known_hosts && chmod 644 ~/.ssh/known_hosts
     - touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys
