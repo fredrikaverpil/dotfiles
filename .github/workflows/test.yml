@@ -45,7 +45,7 @@ jobs:
           HOME=~/dotfiles-install-dir installers/lazygit.sh
       - name: Test apt installer
         run: |
-          HOME=~/dotfiles-install-dir installers/apt_install.sh
+          sudo HOME=~/dotfiles-install-dir installers/apt_install.sh
         if: runner.os == 'Linux'
       - name: Test docker installer
         run: |
