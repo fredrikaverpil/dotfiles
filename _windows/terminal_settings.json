@@ -56,7 +56,7 @@
             },
             {
                 "colorScheme": "One Half Dark",
-                "commandline": "wsl.exe -d Ubuntu-20.04 bash",
+                "commandline": "wsl.exe -d Ubuntu bash",
                 "cursorColor": "#FFFFFF",
                 "experimental.retroTerminalEffect": false,
                 "font": 
@@ -66,15 +66,15 @@
                 },
                 "guid": "{07b52e3e-de2c-5db4-bd2d-ba144ed6c273}",
                 "hidden": false,
-                "name": "Ubuntu-20.04 bash",
+                "name": "Ubuntu bash",
                 "padding": "5, 5, 5, 5",
                 "source": "Windows.Terminal.Wsl",
-                "startingDirectory": "\\\\wsl$\\Ubuntu-20.04\\home\\fredrik",
+                "startingDirectory": "\\\\wsl$\\Ubuntu\\home\\fredrik",
                 "suppressApplicationTitle": true
             },
             {
                 "colorScheme": "One Half Dark",
-                "commandline": "wsl.exe -d Ubuntu-20.04 zsh",
+                "commandline": "wsl.exe -d Ubuntu zsh",
                 "cursorColor": "#FFFFFF",
                 "experimental.retroTerminalEffect": false,
                 "font": 
@@ -84,9 +84,9 @@
                 },
                 "guid": "{5d2d4da2-f232-4880-9dd8-1ce908e3dd7e}",
                 "icon": "ms-appx:///ProfileIcons/{9acb9455-ca41-5af7-950f-6bca1bc9722f}.png",
-                "name": "Ubuntu-20.04 zsh",
+                "name": "Ubuntu zsh",
                 "padding": "5, 5, 5, 5",
-                "startingDirectory": "\\\\wsl$\\Ubuntu-20.04\\home\\fredrik",
+                "startingDirectory": "\\\\wsl$\\Ubuntu\\home\\fredrik",
                 "suppressApplicationTitle": true
             }
         ]

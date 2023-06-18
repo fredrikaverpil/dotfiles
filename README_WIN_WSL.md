@@ -57,7 +57,7 @@ Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRes
 
 # Install from ms store
 winget install --accept-package-agreements --accept-source-agreements --source msstore "Windows Subsystem for Linux" --id 9P9TQF7MRM4R
-winget install --accept-package-agreements --source msstore "Ubuntu 20.04 LTS" --id 9N6SVWS3RX71
+winget install --accept-package-agreements --source msstore "Ubuntu" --id 9PDXGNCFSCZV
 ```
 
 Start the Ubuntu prompt, create user.
@@ -80,33 +80,6 @@ winget install --accept-package-agreements --source winget "SharpKeys" --id "Ran
 winget install --accept-package-agreements --source winget "1Password" --id "AgileBits.1Password"
 winget install --accept-package-agreements --source winget "Signal" --id "OpenWhisperSystems.Signal"
 winget install --accept-package-agreements --source msstore "Spotify Music" --id 9NCBCSZSJRSB
-```
-
-### WSL/Ubuntu installations
-
-From Ubuntu prompt:
-
-```bash
-mkdir -p code/repos && cd code/repos
-git clone https://github.com/fredrikaverpil/dotfiles.git
-cd dotfiles && ./install -vv
-```
-
-### Configuration
-
-#### Windows Terminal settings
-
-* Download and install [JetBrainsMono Nerd Font](https://www.nerdfonts.com/font-downloads) in Windows
-
-Run from administrative Powershell prompt:
-
-```powershell
-# Remove original settings.json
-rm $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
-
-# Create symlink into WSL2's dotfiles repo
-cd \\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles
-New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json -Value _windows\terminal_settings.json
 ```
 
 #### WSL Tray
@@ -139,15 +112,54 @@ cp \\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows\autoho
 * To override <kbd>Win (Left)</kbd> + <kbd>l</kbd>, launch Sharpkeys, load the `\\wsl.localhost\Ubuntu-20.04\home\fredrik\code\repos\dotfiles\_windows\sharpkeys.skl` file and write changes to the Registry.
 * In PureText, remap (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>v</kbd>) to enable pasting of text without formatting.
 
-### Closing notes
 
-Reboot machine.
+### WSL/Ubuntu installations
 
-Proceed with reading more on the Ubuntu setup to install zsh, Python etc.
+From Ubuntu prompt:
 
-## Ubuntu 20.04
+```bash
+mkdir -p code/repos && cd code/repos
+git clone https://github.com/fredrikaverpil/dotfiles.git
+cd dotfiles && ./install -vv
+```
 
-### Prerequisites
+### Configuration
+
+#### Windows Terminal settings
+
+<details>
+  <summary>Click here for instructions for Windows Terminal</summary>
+
+Run from administrative Powershell prompt:
+
+```powershell
+# Remove original settings.json
+rm $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
+
+# Create symlink into WSL2's dotfiles repo
+cd \\wsl.localhost\Ubuntu\home\fredrik\code\repos\dotfiles
+
+New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json -Value _windows\terminal_settings.json
+```
+
+</details>
+
+#### Wezterm
+
+```powershell
+winget install wez.wezterm
+```
+
+From administrative Powershell prompt:
+
+```powershell
+cd \\wsl.localhost\Ubuntu\home\fredrik\code\repos\dotfiles
+
+New-Item -ItemType SymbolicLink -Path $HOME\.wezterm.lua -Value wezterm.lua
+```
+
+
+#### Update Ubuntu
 
 ```bash
 sudo apt update
@@ -156,24 +168,13 @@ sudo apt upgrade
 sudo apt install git curl unzip bash-completion
 ```
 
-### Install dotfiles
-
-```bash
-mkdir -p code/repos && cd code/repos
-git clone https://github.com/fredrikaverpil/dotfiles.git
-cd dotfiles && ./install -vv
-```
-
 ### Optional installation
 
 ```bash
 installers/starship.sh
-installers/nerdfont.sh
 installers/zsh.sh  # remove the default prompt from ~/.zshrc after installation
 installers/gh.sh
 installers/python.sh
 installers/docker.sh  # only if Docker Desktop in Windows was not installed
-installers/snap-apps.sh
-installers/nix.sh
 ```
 
