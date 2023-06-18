@@ -166,13 +166,24 @@ sudo apt upgrade
 sudo apt install git curl unzip bash-completion
 ```
 
-### Optional installation
+#### Shell
 
 ```bash
-installers/starship.sh
 installers/zsh.sh  # remove the default prompt from ~/.zshrc after installation
+installers/starship.sh
 installers/gh.sh
-installers/python.sh
-installers/docker.sh  # only if Docker Desktop in Windows was not installed
+```
+
+#### Editors
+
+# TODO: install neovim
+
+```bash
+installers/neovim_distros.sh
+```
+
+```bash
+# will automatically install vscode server
+code .
 ```
 
