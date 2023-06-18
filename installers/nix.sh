@@ -1,18 +1,16 @@
 #!/bin/bash -ex
 
-# https://github.com/nvm-sh/nvm
+# https://nixos.org/
 
 # Per-platform settings
 case $(uname) in
 Darwin)
     # commands for macOS go here
-    echo "Install via Brewfile on macOS."
-
     ;;
 Linux)
     # commands for Linux go here
-    if ! command -v nvm &>/dev/null; then
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+    if [ ! -d ~/.nix-profile ]; then
+        curl -L https://nixos.org/nix/install | sh
     fi
     ;;
 FreeBSD)
