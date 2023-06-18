@@ -1,3 +1,22 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Windows 11 + WSL](#windows-11--wsl)
+  - [Windows installations](#windows-installations)
+  - [WSL/Ubuntu installations](#wslubuntu-installations)
+  - [Configuration](#configuration)
+    - [Windows Terminal settings](#windows-terminal-settings)
+    - [WSL Tray](#wsl-tray)
+    - [Set up HHKB for macOS-compatible workflow](#set-up-hhkb-for-macos-compatible-workflow)
+  - [Closing notes](#closing-notes)
+- [Ubuntu 20.04](#ubuntu-2004)
+  - [Prerequisites](#prerequisites)
+  - [Install dotfiles](#install-dotfiles)
+  - [Optional installation](#optional-installation)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Windows 11 + WSL
 
 ⚠️ These instructions are likely outdated, as my primary system is macOS.
