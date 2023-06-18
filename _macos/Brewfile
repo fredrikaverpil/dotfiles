@@ -49,7 +49,7 @@ cask 'wezterm'
 # cask 'kitty' -- using wezterm instead
 # cask 'alacritty' -- using wezterm instead
 cask 'visual-studio-code'
-cask 'visual-studio-code-insiders'
+# cask 'visual-studio-code-insiders'
 cask 'pgadmin4'
 cask 'slack'
 cask 'spotify'
