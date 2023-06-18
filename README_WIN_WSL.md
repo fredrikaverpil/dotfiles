@@ -1,5 +1,7 @@
 ## Windows 11 + WSL
 
+⚠️ These instructions are likely outdated, as my primary system is macOS.
+
 This setup aims to run GUIs in Windows with all terminal and coding activities in WSL/Ubuntu.
 
 ### Windows installations
@@ -49,7 +51,6 @@ winget install --accept-package-agreements --source msstore "Windows Terminal" -
 winget install --accept-package-agreements --source msstore "Visual Studio Code" --id XP9KHM4BK9FZ7Q
 winget install --accept-package-agreements --source winget "Docker Desktop" --id "Docker.DockerDesktop"
 winget install --accept-package-agreements --source msstore "Slack" --id "9WZDNCRDK3WP"
-winget install --accept-package-agreements --source winget "Notion" --id "Notion.Notion"
 
 # HHKB/macOS compatible workflow
 winget install --accept-package-agreements --source msstore "PureText" --id 9PKJV6319QTL
@@ -60,7 +61,6 @@ winget install --accept-package-agreements --source winget "SharpKeys" --id "Ran
 winget install --accept-package-agreements --source winget "1Password" --id "AgileBits.1Password"
 winget install --accept-package-agreements --source winget "Signal" --id "OpenWhisperSystems.Signal"
 winget install --accept-package-agreements --source msstore "Spotify Music" --id 9NCBCSZSJRSB
-winget install --accept-package-agreements --source msstore "Microsoft PowerToys" --id XP89DCGQ3K6VLD
 ```
 
 ### WSL/Ubuntu installations
