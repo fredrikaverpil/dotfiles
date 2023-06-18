@@ -24,7 +24,7 @@ Install CLI and GUI apps:
 ```bash
 installers/homebrew.sh
 brew bundle --file=_macos/Brewfile
-brew bundle --file=_macos/Brewfile_mas  # Requires having logged into the App Store
+brew bundle --file=_macos/Brewfile_mas  # requires being logged into the App Store
 ```
 
 ```bash
@@ -33,7 +33,7 @@ installers/*.sh
 
 ### OS configuration
 
-Avoid creating .DS_Store files on network or USB volumes:
+Avoid creating `.DS_Store` files on network or USB volumes:
 
 ```bash
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
