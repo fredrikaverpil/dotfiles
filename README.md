@@ -1,4 +1,4 @@
-# dotfiles 🐚
+# dotfiles
 
 [![CI](https://github.com/fredrikaverpil/dotfiles/actions/workflows/test.yml/badge.svg)](https://github.com/fredrikaverpil/dotfiles/actions/workflows/test.yml)
 
@@ -45,7 +45,7 @@ These are my personal dotfiles, for macOS, Windows and Linux. The setup is based
 
 ### Local secrets
 
-See `shell/.env` for local secrets.
+Use `shell/.env` for local secrets.
 
 ### Clone all my public repos
 
