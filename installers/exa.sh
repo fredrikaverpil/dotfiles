@@ -6,7 +6,7 @@
 case $(uname) in
 Darwin)
     # commands for macOS go here
-    brew install exa
+    echo "Install via Brewfile on macOS."
 
     ;;
 Linux)
