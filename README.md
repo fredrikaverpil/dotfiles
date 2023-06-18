@@ -6,33 +6,22 @@
 
 These are my personal dotfiles, for macOS, Windows and Linux. The setup is based on [dotbot](https://github.com/anishathalye/dotbot) and aims to be as idempotent as possible.
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
-
-- [Install](#install)
-  - [Fonts](#fonts)
-  - [Local secrets](#local-secrets)
-  - [Clone all my public repos](#clone-all-my-public-repos)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-## Install
+## Install 🚀
 
 - [macOS](README_MACOS.md)
 - [Windows 11 + WSL](README_WIN_WSL.md)
 
-### Fonts
+### Fonts 💯
 
 - [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono)
 - [Symbols Nerd Font Mono](https://github.com/ryanoasis/nerd-fonts)
 - [Noto Color Emoji](https://fonts.google.com/noto/specimen/Noto+Color+Emoji)
 
-### Local secrets
+### Local secrets 🔐
 
 Use `shell/.env` for local secrets.
 
-### Clone all my public repos
+### Clone all my public repos 🧔
 
 If more than 100 repos, change `PAGE` variable..
 

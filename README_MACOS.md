@@ -1,17 +1,6 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
+## macOS 🍎
 
-- [macOS](#macos)
-  - [Install dotfiles](#install-dotfiles)
-  - [Optional installation](#optional-installation)
-  - [Configuration](#configuration)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-## macOS
-
-### Install dotfiles
+### Install dotfiles 🍩
 
 Install:
 
@@ -21,7 +10,7 @@ git clone https://github.com/fredrikaverpil/dotfiles.git
 cd dotfiles && ./install -vv
 ```
 
-### Optional installation
+### Optional installation 🍰
 
 Install Xcode commandline tools:
 
@@ -42,7 +31,7 @@ brew bundle --file=_macos/Brewfile_mas  # Requires having logged into the App St
 installers/*.sh
 ```
 
-### Configuration
+### OS configuration
 
 Avoid creating .DS_Store files on network or USB volumes:
 
