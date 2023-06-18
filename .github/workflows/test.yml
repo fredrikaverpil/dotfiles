@@ -39,6 +39,7 @@ jobs:
           HOME=~/dotfiles-install-dir installers/nix.sh
       - name: Test exa installer
         run: |
+          . /home/runner/dotfiles-install-dir/.nix-profile/etc/profile.d/nix.sh
           HOME=~/dotfiles-install-dir installers/exa.sh
       - name: Test nvm installer
         run: |
