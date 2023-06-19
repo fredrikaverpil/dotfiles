@@ -28,14 +28,7 @@ Install [Homebrew](https://brew.sh/):
 <details>
   <summary>🎶 Expand for x86 support.</summary>
 
-When on an arm64 device, homebrew is installed in `/opt/homebrew/bin/brew`. You can install an x64 version in `/usr/local/bin/brew` like so:
-
-```bash
-    softwareupdate —install-rosetta
-    arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-```
-
-For more info on this setup, go [here](https://fredrikaverpil.github.io/blog/2021/12/17/developing-with-apple-silicon/).
+When on an arm64 device, homebrew is installed in `/opt/homebrew/bin/brew`. You can install an x64 version in `/usr/local/bin/brew`. See [installers/homebrew.sh](installers/homebrew.sh) for more info.
 
 </details>
 
