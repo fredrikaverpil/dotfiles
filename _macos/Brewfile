@@ -10,7 +10,7 @@ tap 'homebrew/core'
 tap 'cantino/mcfly'
 tap 'koekeishiya/formulae' # yabai
 
-# ui
+# system
 brew 'yabai'
 brew 'skhd'
 cask 'karabiner-elements'
@@ -38,18 +38,15 @@ brew 'tmux'
 brew 'tmuxinator'
 
 # neovim
+brew 'neovim'
 brew 'ripgrep'
 brew 'fd'
 brew 'lazygit'
 
-# misc gui apps
+# ui apps
+cask '1password'
 cask 'appcleaner'
-# cask 'rectangle' -- using yabai instead
 cask 'wezterm'
-# cask 'kitty' -- using wezterm instead
-# cask 'alacritty' -- using wezterm instead
 cask 'visual-studio-code'
-# cask 'visual-studio-code-insiders'
 cask 'pgadmin4'
-cask 'slack'
 cask 'spotify'
