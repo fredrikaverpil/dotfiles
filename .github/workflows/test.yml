@@ -22,6 +22,34 @@ jobs:
       - name: Show dotfiles
         run: |
           ls -alh ~/dotfiles-install-dir
+      - name: Test homebrew installer
+        run: |
+          HOME=~/dotfiles-install-dir installers/homebrew.sh
+      - name: Test starship installer
+        run: |
+          installers/starship.sh
+      - name: Test zsh installer
+        run: |
+          HOME=~/dotfiles-install-dir installers/zsh.sh
+      - name: Test github CLI installer
+        run: |
+          HOME=~/dotfiles-install-dir installers/gh.sh
+      - name: Test nix installer
+        run: |
+          HOME=~/dotfiles-install-dir installers/nix.sh
+      - name: Test nvm installer
+        run: |
+          HOME=~/dotfiles-install-dir installers/nvm.sh
+      - name: Test lazygit installer
+        run: |
+          HOME=~/dotfiles-install-dir installers/lazygit.sh
+      - name: Test apt installer
+        run: |
+          sudo HOME=~/dotfiles-install-dir installers/apt_install.sh
+        if: runner.os == 'Linux'
+      - name: Test docker installer
+        run: |
+          HOME=~/dotfiles-install-dir installers/docker.sh
       - name: Test Brewfile install
         run: |
           brew bundle --file=_macos/Brewfile --verbose
