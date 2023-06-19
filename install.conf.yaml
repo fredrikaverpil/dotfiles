@@ -71,7 +71,8 @@
 
     # linux installers
     - description: apt installations
-      command: installers/apt_install.sh
+      # TODO: add if-conditions to the apt install commands
+      command: sudo installers/apt_install.sh
     - description: install nix
       command: installers/nix.sh
     - description: install exa
