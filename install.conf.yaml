@@ -37,35 +37,62 @@
       path: vscode-insiders_settings.jsonc
       force: true
       if: '[ "$(uname -s)" = "Darwin" ]'
-
-    # Remap US English layout's ['; keys to Swedish åäö keys
-    # However, this works poorly, so commented out for now
-    #   ~/Library/KeyBindings/DefaultKeyBinding.dict:
-    #       path: _macos/DefaultKeyBinding.dict
-    #       force: true
-    #       if: '[ "$(uname -s)" = "Darwin" ]'
-
-    # Remap US English layout's ['; keys to Swedish åäö keys using Karabiner
+    # ~/Library/KeyBindings/DefaultKeyBinding.dict:
+    #  # Remap US English layout's ['; keys to Swedish åäö keys
+    #  # However, this works poorly, so commented out for now
+    #   path: _macos/DefaultKeyBinding.dict
+    #   force: true
+    #   if: '[ "$(uname -s)" = "Darwin" ]'
     ~/.config/karabiner:
+      # Remap US English layout's ['; keys to Swedish åäö keys using Karabiner
       path: _macos/karabiner
       create: true
       if: '[ "$(uname -s)" = "Darwin" ]'
 - shell:
-    - git submodule sync --recursive
+    - description: sync dotbot
+      command: git submodule sync --recursive
+    - description: add shell sourcing to bash, if not already added
+      command: grep -qxF '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' ~/.bashrc
+        || echo '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' >> ~/.bashrc
+    - description: add shell sourcing to zsh, if not already added
+      command: grep -qxF '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' ~/.zshrc
+        || echo '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' >> ~/.zshrc
+    - description: ssh setup
+      command: |
+        mkdir -p ~/.ssh && chmod 700 ~/.ssh
+        touch ~/.ssh/known_hosts && chmod 644 ~/.ssh/known_hosts
+        touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys
+    - description: pre-commit hook
+      command: cp pre-commit .git/hooks/pre-commit
 
-    # add shell sourcing to bash
-    - grep -qxF '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' ~/.bashrc ||
-      echo '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' >> ~/.bashrc
+    # macOS installers
+    - description: install homebrew
+      command: installers/homebrew.sh
 
-    # add shell sourcing to zsh
-    - grep -qxF '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' ~/.zshrc ||
-      echo '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' >> ~/.zshrc
+    # linux installers
+    - description: apt installations
+      command: installers/apt_install.sh
+    - description: install nix
+      command: installers/nix.sh
+    - description: install exa
+      command: installers/exa.sh
+    - description: install gh
+      command: installers/gh.sh
+    - description: install lazygit
+      command: installers/lazygit.sh
+    - description: install starship
+      command: installers/starship.sh
+    - description: install nvm
+      command: installers/nvm.sh
 
-    # ssh
-    # TODO: replace this with a "create" (see dotbot README for example)
-    - mkdir -p ~/.ssh && chmod 700 ~/.ssh
-    - touch ~/.ssh/known_hosts && chmod 644 ~/.ssh/known_hosts
-    - touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys
-
-    # pre-commit hook
-    - cp pre-commit .git/hooks/pre-commit
+    # OS agnostic installers
+    - description: install zsh and plugins
+      command: installers/zsh.sh
+    - description: install tmux plugins
+      command: installers/tmux.sh
+    # - description: install python via pyenv
+    #   command: installers/python.sh
+    # TODO: add
+    # - neovim distros installer
+    # - apt installer
+    # - docker
