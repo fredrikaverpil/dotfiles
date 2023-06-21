@@ -1,39 +1,64 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 # This script is used to manage dependabot PRs and assumes you have merge queue enabled.
 #
 # Docs:
 # - Search values for "status": https://docs.github.com/en/rest/guides/using-the-rest-api-to-interact-with-checks
+# https://docs.github.com/en/search-github/searching-on-github/searching-issues-and-pull-requests#search-by-commit-status
 
 # Get arguments and set the title to search for accordingly
+# TODO: 2023-06-20 the PR search does not seem to work when differentiating on chore(deps) vs chore(deps-dev) any longer...
 if [[ "$1" == "--dev" ]]; then
 	shift
 	title="chore(dev-deps)"
 else
 	title="chore(deps)"
 fi
+echo "Searching using title: $title"
 
 # Get the list of dependabot PR numbers
-prs_with_no_failures=$(gh pr list --app dependabot --json number --jq '.[].number' --search "is:open draft:false status:in_progress status:success $title in:title")
-prs_with_failures=$(gh pr list --app dependabot --json number --jq '.[].number' --search "is:open draft:false status:in_progress status:failure $title in:title")
+pending_prs=$(gh pr list --app dependabot --json number --jq '.[].number' --search "is:open draft:false status:pending $title in:title")
+successful_prs=$(gh pr list --app dependabot --json number --jq '.[].number' --search "is:open draft:false status:success $title in:title")
+prs_with_no_failures="$pending_prs"$'\n'"$successful_prs"
+prs_with_failures=$(gh pr list --app dependabot --json number --jq '.[].number' --search "is:open draft:false status:failure $title in:title")
+
+if [[ -z "$prs_with_no_failures" ]]; then
+	echo "No PRs found with no failures"
+else
+	echo "Found PRs with no failures: $prs_with_no_failures"
+fi
+
+if [[ -z "$prs_with_failures" ]]; then
+	echo "No PRs found with failures"
+else
+	echo "Found PRs with failures: $prs_with_failures"
+fi
 
 # Iterate over each PR which has no CI failure
 for pr_number in $prs_with_no_failures; do
 
 	if gh pr view "$pr_number" --json mergeable --jq '.mergeable' | grep -q CONFLICTING; then
-		# Ask dependabot to recreate if there is a merge conflict
+		echo "Found conflict, asking dependabot to recreate $pr_number"
 		gh pr comment "$pr_number" --body "@dependabot recreate"
-	elif gh pr view "$pr_number" --json mergeStateStatus | grep -q BLOCKED; then
-		# Show CI checks
-		gh checks "$pr_number"
+
+	# elif gh pr view "$pr_number" --json mergeStateStatus | grep -q BEHIND; then
+	# 	echo "Might be in need of rebasing."
+
+	# elif gh pr view "$pr_number" --json mergeStateStatus | grep -q BLOCKED; then
+	# 	# if a CI check is skipped, it will be blocked
+	# 	echo "Found blocked PR, showing checks for $pr_number"
+	# 	gh pr checks "$pr_number"
 
 	else
-		# Approve if not approved
+		echo "Processing $pr_number for merging..."
+		gh pr view "$pr_number" --json mergeStateStatus
+
 		if ! gh pr view "$pr_number" --json reviewDecision --jq '.reviewDecision' | grep -q APPROVED; then
+			echo "Approving PR $pr_number"
 			gh pr review --approve "$pr_number"
 		fi
 
-		# Merge
+		echo "Merging PR $pr_number"
 		gh pr merge "$pr_number" --auto
 	fi
 
@@ -41,6 +66,6 @@ done
 
 # Iterate over PRs with failed CI checks
 for pr_number in $prs_with_failures; do
-	# Show what's wrong
+	echo "Showing failed checks for $pr_number"
 	gh pr checks "$pr_number"
 done
