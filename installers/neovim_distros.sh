@@ -29,6 +29,11 @@ if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
 	fi
 
 	if [ ! -d "$HOME/.config/kickstart" ]; then
-		git clone https://github.com/nvim-lua/kickstart.nvim.git ~/.config/kickstart | bash
+		git clone https://github.com/nvim-lua/kickstart.nvim.git ~/.config/kickstart
 	fi
+
+	if [ ! -d "$HOME/.config/NormalVim" ]; then
+		git clone https://github.com/NormalNvim/NormalNvim.git ~/.config/NormalVim --depth 1
+	fi
+
 fi
