@@ -27,7 +27,6 @@ brew 'exa'
 brew 'bat'
 brew 'withgraphite/tap/graphite'
 brew 'kubectx'
-brew 'fzf'
 
 # languages
 brew 'rust'
@@ -42,6 +41,8 @@ brew 'neovim'
 brew 'ripgrep'
 brew 'fd'
 brew 'lazygit'
+brew 'fzf'
+brew 'gnu-sed'  # spectre
 
 # ui apps
 cask '1password'
