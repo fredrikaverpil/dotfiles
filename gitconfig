@@ -22,10 +22,15 @@
 [diff]
   # tool = vscode
 	tool = neovim
+  # tool = diffview
 [difftool "vscode"]
 	cmd = code --wait --diff $LOCAL $REMOTE
 [difftool "neovim"]
 	cmd = nvim -d $LOCAL $REMOTE
+[difftool "diffview"]
+  cmd = nvim -d \"$LOCAL\" \"$REMOTE\" -c \"DiffviewOpen\"
+[difftool]
+  prompt = false
 [init]
 	defaultBranch = main
 [rebase]
