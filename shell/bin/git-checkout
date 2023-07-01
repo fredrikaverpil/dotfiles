@@ -1,0 +1,5 @@
+#!/bin/sh -e
+
+# Git checkout
+
+git checkout "$(git branch --all --format "%(refname:short)" | fzf | tr -d '[:space:]')"
