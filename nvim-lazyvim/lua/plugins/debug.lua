@@ -15,9 +15,9 @@ return {
       -- vim.fn.sign_define("DapBreakpoint", { text = "🛑", texthl = "", linehl = "", numhl = "" })
       local dap = require("dap")
 
-      -- i'm testing the below to set path to debugpy
-      local path = require("mason-registry").get_package("debugpy"):get_install_path()
-      require("dap-python").setup(path .. "/venv/bin/python")
+      -- -- i'm testing the below to set path to debugpy
+      -- local path = require("mason-registry").get_package("debugpy"):get_install_path()
+      -- require("dap-python").setup(path .. "/venv/bin/python")
 
       -- Python DAP
       -- https://github.com/mfussenegger/nvim-dap/wiki/Debug-Adapter-installation#Python
