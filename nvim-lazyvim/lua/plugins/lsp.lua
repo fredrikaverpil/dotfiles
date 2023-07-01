@@ -27,10 +27,10 @@ return {
         -- docker
         "dockerfile-language-server",
 
-        -- javascript/typescript
-        "prettierd",
-        "typescript-language-server",
-        "eslint_d",
+        -- javascript/typescript, see lazy.lua
+        -- "prettierd",
+        -- "typescript-language-server",
+        -- "eslint_d",
 
         -- rust
         "rustfmt",
