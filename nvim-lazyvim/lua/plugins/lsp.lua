@@ -41,36 +41,6 @@ return {
         table.insert(opts.ensure_installed, package)
       end
     end,
-
-    -- opts = {
-    --   ensure_installed = {
-    --     -- python
-    --     "ruff-lsp",
-    --     "pyright",
-    --     "mypy",
-    --     "black",
-    --
-    --     -- lua
-    --     "lua-language-server",
-    --     "stylua",
-    --
-    --     -- shell
-    --     "bash-language-server",
-    --     "shellcheck",
-    --     "shfmt",
-    --
-    --     -- docker
-    --     "dockerfile-language-server",
-    --
-    --     -- javascript/typescript, see lazy.lua
-    --
-    --     -- rust, also see lazy.lua
-    --     "rust-analyzer", -- LSP
-    --     "rustfmt",
-    --
-    --     -- go, see lazy.lua
-    --   },
-    -- },
   },
 
   -- change null-ls config
