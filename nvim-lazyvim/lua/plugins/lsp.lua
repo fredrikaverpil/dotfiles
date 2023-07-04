@@ -6,10 +6,9 @@ return {
   -- note: don't forget to update treesitter for languages
   {
     "williamboman/mason.nvim",
-    -- opts will be merged with the parent spec
 
     opts = function(_, opts)
-      opts.ensure_installed = {
+      local ensure_installed = {
         -- python
         "ruff-lsp",
         "pyright",
@@ -36,7 +35,42 @@ return {
 
         -- go, see lazy.lua
       }
+
+      -- extend opts.ensure_installed
+      for _, package in ipairs(ensure_installed) do
+        table.insert(opts.ensure_installed, package)
+      end
     end,
+
+    -- opts = {
+    --   ensure_installed = {
+    --     -- python
+    --     "ruff-lsp",
+    --     "pyright",
+    --     "mypy",
+    --     "black",
+    --
+    --     -- lua
+    --     "lua-language-server",
+    --     "stylua",
+    --
+    --     -- shell
+    --     "bash-language-server",
+    --     "shellcheck",
+    --     "shfmt",
+    --
+    --     -- docker
+    --     "dockerfile-language-server",
+    --
+    --     -- javascript/typescript, see lazy.lua
+    --
+    --     -- rust, also see lazy.lua
+    --     "rust-analyzer", -- LSP
+    --     "rustfmt",
+    --
+    --     -- go, see lazy.lua
+    --   },
+    -- },
   },
 
   -- change null-ls config
