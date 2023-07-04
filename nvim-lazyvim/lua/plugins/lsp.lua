@@ -13,6 +13,8 @@ return {
         -- python
         "ruff-lsp",
         "pyright",
+        "mypy",
+        "black",
 
         -- lua
         "lua-language-server",
@@ -51,6 +53,18 @@ return {
       local diagnostics = null_ls.builtins.diagnostics
       local code_actions = null_ls.builtins.code_actions
 
+      local function get_path_from_python_venv(executable_name)
+        -- Return the path to the executable if $VIRTUAL_ENV is set and the binary exists somewhere beneath the $VIRTUAL_ENV path, otherwise get it from Mason
+        if vim.env.VIRTUAL_ENV then
+          local executable_path = vim.fn.glob(vim.env.VIRTUAL_ENV .. "/**/" .. executable_name, true, true)
+          if executable_path ~= "" then
+            return executable_path
+          end
+        end
+
+        return mason_registry.get_package(executable_name):get_install_path()
+      end
+
       -- null_ls.setup({
       --   debug = false, -- Turn on debug for :NullLsLog
       --   -- diagnostics_format = "#{m} #{s}[#{c}]",
@@ -60,9 +74,12 @@ return {
         -- list of supported sources:
         -- https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTINS.md
 
-        -- not installed via Mason, expected to be found on $PATH
-        diagnostics.mypy,
-        formatting.black,
+        diagnostics.mypy.with({
+          command = get_path_from_python_venv("mypy"),
+        }),
+        formatting.black.with({
+          command = get_path_from_python_venv("black"),
+        }),
 
         -- installed via Mason
         formatting.stylua.with({
