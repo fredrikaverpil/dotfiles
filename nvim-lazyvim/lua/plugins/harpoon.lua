@@ -2,7 +2,10 @@ return {
 
   {
     "ThePrimeagen/harpoon",
-    dependencies = { "nvim-lua/plenary.nvim" },
+    dependencies = {
+      { "nvim-lua/plenary.nvim" },
+      { "nvim-telescope/telescope.nvim" },
+    },
     keys = {
       { "<leader>hh", ":lua require('harpoon.ui').toggle_quick_menu()<CR>", desc = "Harpoon menu" },
       -- { "<leader>ht", ":Telescope harpoon marks<CR>", desc = "Telescope menu" },
