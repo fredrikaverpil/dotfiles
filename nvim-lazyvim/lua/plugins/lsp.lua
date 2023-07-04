@@ -14,6 +14,7 @@ return {
         "pyright",
         "mypy",
         "black",
+        "debugpy",
 
         -- lua
         "lua-language-server",
@@ -29,9 +30,8 @@ return {
 
         -- javascript/typescript, see lazy.lua
 
-        -- rust, also see lazy.lua
+        -- rust, also see lazy.lua, and install rustmt via rustup
         "rust-analyzer", -- LSP
-        "rustfmt",
 
         -- go, see lazy.lua
       }
@@ -43,7 +43,6 @@ return {
     end,
   },
 
-  -- change null-ls config
   {
     "jose-elias-alvarez/null-ls.nvim",
     dependencies = { "mason.nvim" },
@@ -54,33 +53,45 @@ return {
       local diagnostics = null_ls.builtins.diagnostics
       local code_actions = null_ls.builtins.code_actions
 
-      local function get_path_from_python_venv(executable_name)
+      -- null_ls.setup({
+      --   debug = false, -- Turn on debug for :NullLsLog
+      --   -- diagnostics_format = "#{m} #{s}[#{c}]",
+      -- })
+
+      local function prefer_bin_from_venv(executable_name)
         -- Return the path to the executable if $VIRTUAL_ENV is set and the binary exists somewhere beneath the $VIRTUAL_ENV path, otherwise get it from Mason
         if vim.env.VIRTUAL_ENV then
-          local executable_path = vim.fn.glob(vim.env.VIRTUAL_ENV .. "/**/" .. executable_name, true, true)
+          local paths = vim.fn.glob(vim.env.VIRTUAL_ENV .. "/**/bin/" .. executable_name, true, true)
+          local executable_path = table.concat(paths, ", ")
           if executable_path ~= "" then
+            -- vim.api.nvim_echo(
+            --   { { "Using path for " .. executable_name .. ": " .. executable_path, "None" } },
+            --   false,
+            --   {}
+            -- )
             return executable_path
           end
         end
 
         local mason_registry = require("mason-registry")
-        return mason_registry.get_package(executable_name):get_install_path()
+        local mason_path = mason_registry.get_package(executable_name):get_install_path()
+          .. "/venv/bin/"
+          .. executable_name
+        -- vim.api.nvim_echo({ { "Using Mason for " .. executable_name .. ": " .. mason_path, "None" } }, false, {})
+        return mason_path
       end
-
-      -- null_ls.setup({
-      --   debug = false, -- Turn on debug for :NullLsLog
-      --   -- diagnostics_format = "#{m} #{s}[#{c}]",
-      -- })
 
       local sources = {
         -- list of supported sources:
         -- https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTINS.md
 
         diagnostics.mypy.with({
-          command = get_path_from_python_venv("mypy"),
+          filetypes = { "python" },
+          command = prefer_bin_from_venv("mypy"),
         }),
         formatting.black.with({
-          command = get_path_from_python_venv("black"),
+          filetypes = { "python" },
+          command = prefer_bin_from_venv("black"),
         }),
 
         -- installed via Mason

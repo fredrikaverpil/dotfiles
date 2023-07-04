@@ -4,50 +4,35 @@
 return {
 
   {
-    "mfussenegger/nvim-dap",
+    "mfussenegger/nvim-dap-python",
+
     dependencies = {
-      "rcarriga/nvim-dap-ui",
-      "mfussenegger/nvim-dap-python",
-      "theHamsta/nvim-dap-virtual-text",
+      "mfussenegger/nvim-dap",
     },
 
+    ft = { "python" },
+
     config = function()
-      -- TODO: should this be opts = function(_, opts) instead,
-      -- so that it properly extends the LazyVim-provided nvim-dap config?
+      local dap_python = require("dap-python")
 
-      -- vim.fn.sign_define("DapBreakpoint", { text = "🛑", texthl = "", linehl = "", numhl = "" })
-      local dap = require("dap")
+      local function find_debugpy_python_path()
+        -- Return the path to the debugpy python executable if it is installed in $VIRTUAL_ENV, otherwise get it from Mason
+        if vim.env.VIRTUAL_ENV then
+          local paths = vim.fn.glob(vim.env.VIRTUAL_ENV .. "/**/debugpy", true, true)
+          if table.concat(paths, ", ") ~= "" then
+            return vim.env.VIRTUAL_ENV .. "/bin/python"
+          end
+        end
 
-      -- -- i'm testing the below to set path to debugpy
-      -- local path = require("mason-registry").get_package("debugpy"):get_install_path()
-      -- require("dap-python").setup(path .. "/venv/bin/python")
+        local mason_registry = require("mason-registry")
+        local path = mason_registry.get_package("debugpy"):get_install_path() .. "/venv/bin/python"
+        return path
+      end
 
-      -- Python DAP
-      -- https://github.com/mfussenegger/nvim-dap/wiki/Debug-Adapter-installation#Python
-      dap.adapters.python = {
-        type = "executable",
-        command = "python",
-        args = { "-m", "debugpy.adapter" },
-      }
+      local dap_python_path = find_debugpy_python_path()
+      vim.api.nvim_echo({ { "Using path for dap-python: " .. dap_python_path, "None" } }, false, {})
 
-      dap.configurations.python = {
-        {
-          -- The first three options are required by nvim-dap
-          type = "python", -- the type here established the link to the adapter definition: `dap.adapters.python`
-          request = "launch",
-          name = "Launch file",
-
-          -- Options below are for debugpy, see https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
-          program = "${file}", -- This configuration will launch the current file if used.
-          pythonPath = function()
-            -- debugpy supports launching an application with a different interpreter then the one used to launch debugpy itself.
-            -- The code below looks for a `venv` or `.venv` folder in the current directly and uses the python within.
-            -- You could adapt this - to for example use the `VIRTUAL_ENV` environment variable.
-            return os.getenv("VIRTUAL_ENV") .. "/bin/python" or "/usr/bin/env python"
-          end,
-          justMyCode = false,
-        },
-      }
+      dap_python.setup(dap_python_path)
     end,
   },
 }
