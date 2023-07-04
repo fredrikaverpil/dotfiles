@@ -27,9 +27,10 @@ brew 'exa'
 brew 'bat'
 brew 'withgraphite/tap/graphite'
 brew 'kubectx'
+cask 'orbstack'
 
 # languages
-brew 'rust'
+brew 'rustup-init'
 brew 'go'
 
 # tmux
