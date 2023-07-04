@@ -12,6 +12,9 @@ return {
     },
 
     config = function()
+      -- TODO: should this be opts = function(_, opts) instead,
+      -- so that it properly extends the LazyVim-provided nvim-dap config?
+
       -- vim.fn.sign_define("DapBreakpoint", { text = "🛑", texthl = "", linehl = "", numhl = "" })
       local dap = require("dap")
 
