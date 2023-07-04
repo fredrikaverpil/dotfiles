@@ -7,9 +7,9 @@ return {
   {
     "williamboman/mason.nvim",
     -- opts will be merged with the parent spec
-    opts = {
-      ensure_installed = {
 
+    opts = function(_, opts)
+      opts.ensure_installed = {
         -- python
         "ruff-lsp",
         "pyright",
@@ -35,8 +35,8 @@ return {
         "rustfmt",
 
         -- go, see lazy.lua
-      },
-    },
+      }
+    end,
   },
 
   -- change null-ls config
@@ -45,9 +45,6 @@ return {
     dependencies = { "mason.nvim" },
     event = { "BufReadPre", "BufNewFile" },
     opts = function(_, opts)
-      local mason_registry = require("mason-registry")
-      mason_registry.refresh()
-
       local null_ls = require("null-ls")
       local formatting = null_ls.builtins.formatting
       local diagnostics = null_ls.builtins.diagnostics
@@ -62,6 +59,7 @@ return {
           end
         end
 
+        local mason_registry = require("mason-registry")
         return mason_registry.get_package(executable_name):get_install_path()
       end
 
