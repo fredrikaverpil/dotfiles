@@ -47,6 +47,11 @@ return {
     },
   },
 
+  -- fugitive
+  {
+    "tpope/vim-fugitive",
+  },
+
   -- octo
   {
     "pwntester/octo.nvim",
