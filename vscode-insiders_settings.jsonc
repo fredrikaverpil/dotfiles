@@ -50,7 +50,7 @@
   // Editor
   "editor.minimap.renderCharacters": false,
   "editor.suggestSelection": "first",
-  "editor.fontFamily": "'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'Cascadia Code', Consolas, 'Courier New', monospace",
+  "editor.fontFamily": "'JetBrains Mono', 'FiraCode Nerd Font', 'Cascadia Code', Consolas, 'Courier New', monospace",
   "editor.fontSize": 12,
   "editor.inlineSuggest.enabled": true,
   "editor.bracketPairColorization.enabled": true,
@@ -58,7 +58,7 @@
   "editor.formatOnSave": true,
 
   // Terminal
-  "terminal.integrated.fontFamily": "'FiraCode Nerd Font', 'Cascadia Code', Consolas, 'Courier New', monospace",
+  "terminal.integrated.fontFamily": "'JetBrains Mono', 'FiraCode Nerd Font', 'Cascadia Code', Consolas, 'Courier New', monospace",
   // "terminal.integrated.shellIntegration.enabled": true,
   "terminal.integrated.fontSize": 12,
   "terminal.integrated.profiles.linux": {
