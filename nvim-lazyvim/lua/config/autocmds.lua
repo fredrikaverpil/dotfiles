@@ -9,8 +9,8 @@ vim.api.nvim_create_autocmd("FileType", {
   callback = function()
     vim.g.python3_host_prog = vim.fn.expand(".venv/bin/python")
     vim.opt_local.colorcolumn = "72,88" -- Ruler at column number
-    vim.opt_local.tabstop = 4 -- Number of spaces tabs count for
-    vim.opt_local.shiftwidth = 4 -- Size of an indent
+    vim.opt_local.tabstop = 4           -- Number of spaces tabs count for
+    vim.opt_local.shiftwidth = 4        -- Size of an indent
   end,
 })
 
@@ -18,8 +18,8 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = { "rust" },
   callback = function()
     vim.opt_local.colorcolumn = "79" -- Ruler at column number
-    vim.opt_local.tabstop = 4 -- Number of spaces tabs count for
-    vim.opt_local.shiftwidth = 4 -- Size of an indent
+    vim.opt_local.tabstop = 4        -- Number of spaces tabs count for
+    vim.opt_local.shiftwidth = 4     -- Size of an indent
   end,
 })
 
@@ -31,3 +31,10 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.shiftwidth = 4
   end,
 })
+
+-- see lint.lua
+-- vim.api.nvim_create_autocmd({ "InsertLeave", "BufWritePost" }, {
+--   callback = function()
+--     require("lint").try_lint()
+--   end,
+-- })

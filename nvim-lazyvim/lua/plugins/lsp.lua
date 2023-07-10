@@ -14,7 +14,6 @@ return {
         "pyright",
         "mypy",
         "black",
-        "debugpy",
 
         -- lua
         "lua-language-server",
@@ -28,12 +27,10 @@ return {
         -- docker
         "dockerfile-language-server",
 
-        -- javascript/typescript, see lazy.lua
-
         -- rust, also see lazy.lua, and install rustmt via rustup
         "rust-analyzer", -- LSP
 
-        -- go, see lazy.lua
+        -- see lazy.lua for LazyVim extras
       }
 
       -- extend opts.ensure_installed
