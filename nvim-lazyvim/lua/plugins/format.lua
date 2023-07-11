@@ -14,6 +14,9 @@ return {
         -- shell
         "shfmt",
 
+        -- rust
+        -- rustfmt via rustup
+
         -- see lazy.lua for LazyVim extras
       }
 

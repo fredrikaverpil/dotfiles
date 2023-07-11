@@ -12,23 +12,18 @@ return {
         -- python
         "ruff-lsp",
         "pyright",
-        "mypy",
-        "black",
 
         -- lua
         "lua-language-server",
-        "stylua",
 
         -- shell
         "bash-language-server",
-        "shellcheck",
-        "shfmt",
 
         -- docker
         "dockerfile-language-server",
 
-        -- rust, also see lazy.lua, and install rustmt via rustup
-        "rust-analyzer", -- LSP
+        -- rust
+        "rust-analyzer",
 
         -- see lazy.lua for LazyVim extras
       }
