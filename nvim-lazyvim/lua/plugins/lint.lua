@@ -7,7 +7,6 @@ return {
       local ensure_installed = {
         -- python
         "mypy",
-        "black",
 
         -- lua
         "luacheck",
