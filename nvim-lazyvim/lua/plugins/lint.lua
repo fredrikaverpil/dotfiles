@@ -14,6 +14,9 @@ return {
         -- shell
         "shellcheck",
 
+        -- sql
+        "sqlfluff",
+
         -- see lazy.lua for LazyVim extras
       }
 

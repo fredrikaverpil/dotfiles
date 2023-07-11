@@ -95,6 +95,9 @@ return {
         formatting.yamlfix, -- requires python
         diagnostics.yamllint,
         diagnostics.shellcheck,
+        diagnostics.sqlfluff.with({
+          extra_args = { "--dialect", "postgres" },
+        }),
         code_actions.shellcheck,
         code_actions.gitsigns,
       }
