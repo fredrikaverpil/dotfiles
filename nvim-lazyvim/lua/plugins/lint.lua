@@ -13,7 +13,6 @@ return {
         "luacheck",
 
         -- shell
-        "bash-language-server",
         "shellcheck",
 
         -- see lazy.lua for LazyVim extras
@@ -33,9 +32,7 @@ return {
     config = function()
       local lint = require("lint")
       lint.linters_by_ft = {
-        -- markdown = { "vale" },
         yaml = { "yamllint" },
-        -- sql = { "sqlint" },
         sh = { "shellcheck" },
         lua = { "luacheck" },
         python = { "mypy" },
