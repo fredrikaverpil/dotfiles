@@ -53,4 +53,14 @@ return {
       dap_python.setup(dap_python_path)
     end,
   },
+
+  -- since lazy.lua's go extras doesn't include the DAP plugin
+  {
+    "leoluz/nvim-dap-go",
+    dependencies = {
+      "mfussenegger/nvim-dap",
+    },
+    ft = { "go" },
+    config = true,
+  },
 }
