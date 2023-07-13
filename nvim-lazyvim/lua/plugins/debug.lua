@@ -4,7 +4,6 @@
 return {
   {
     "williamboman/mason.nvim",
-
     opts = function(_, opts)
       local ensure_installed = {
         -- python
@@ -22,13 +21,10 @@ return {
 
   {
     "mfussenegger/nvim-dap-python",
-
     dependencies = {
       "mfussenegger/nvim-dap",
     },
-
     ft = { "python" },
-
     config = function()
       local dap_python = require("dap-python")
 
@@ -52,15 +48,5 @@ return {
 
       dap_python.setup(dap_python_path)
     end,
-  },
-
-  -- since lazy.lua's go extras doesn't include the DAP plugin
-  {
-    "leoluz/nvim-dap-go",
-    dependencies = {
-      "mfussenegger/nvim-dap",
-    },
-    ft = { "go" },
-    config = true,
   },
 }
