@@ -49,4 +49,19 @@ return {
       dap_python.setup(dap_python_path)
     end,
   },
+
+  -- extend Go extras setup from lazy.lua, with DAP capability
+  {
+    "leoluz/nvim-dap-go",
+    dependencies = {
+      { "mfussenegger/nvim-dap" },
+    },
+    ft = { "go" },
+    config = true,
+    keys = {
+      -- workaround, as nvim-dap-go does not have a DAP strategy set up for neotest
+      -- see https://github.com/nvim-neotest/neotest-go/issues/12
+      { "<leader>tg", "<cmd>lua require('dap-go').debug_test()<CR>", desc = "Debug Nearest (Go)" },
+    },
+  },
 }
