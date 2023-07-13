@@ -25,6 +25,9 @@ return {
         -- rust
         "rust-analyzer",
 
+        -- go
+        "gopls",
+
         -- see lazy.lua for LazyVim extras
       }
 

@@ -17,6 +17,12 @@ return {
         -- rust
         -- rustfmt via rustup
 
+        -- go
+        "gofumpt",
+        "goimports-reviser",
+        "gomodifytags",
+        "impl",
+
         -- see lazy.lua for LazyVim extras
       }
 
