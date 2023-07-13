@@ -14,6 +14,9 @@ return {
         -- shell
         "shellcheck",
 
+        -- yaml
+        "yamllint",
+
         -- sql
         "sqlfluff",
 
@@ -34,10 +37,11 @@ return {
     config = function()
       local lint = require("lint")
       lint.linters_by_ft = {
+        python = { "mypy" },
+        lua = { "luacheck" },
         yaml = { "yamllint" },
         sh = { "shellcheck" },
-        lua = { "luacheck" },
-        python = { "mypy" },
+        sql = { "sqlfluff" },
       }
     end,
   },

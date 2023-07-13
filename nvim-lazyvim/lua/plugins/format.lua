@@ -14,6 +14,10 @@ return {
         -- shell
         "shfmt",
 
+        -- yaml
+        "yamlfix",
+        "yamlfmt",
+
         -- rust
         -- rustfmt via rustup
 
@@ -48,6 +52,16 @@ return {
           },
           sh = {
             require("formatter.filetypes.sh").shfmt,
+          },
+          yaml = {
+            require("formatter.filetypes.yaml").yamlfix,
+            require("formatter.filetypes.yaml").yamlfmt,
+          },
+          go = {
+            require("formatter.filetypes.go").gofumpt,
+            require("formatter.filetypes.go").goimports_reviser,
+            require("formatter.filetypes.go").gomodifytags,
+            require("formatter.filetypes.go").impl,
           },
         },
       })
