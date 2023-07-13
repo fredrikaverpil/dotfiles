@@ -32,10 +32,8 @@ return {
     keys = {
       {
         "<leader>/",
-        function()
-          require("telescope.").extensions.live_grep_args.live_grep_args()
-        end,
-        desc = "Find Plugin File",
+        ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>",
+        desc = "Live Grep (Args)",
       },
     },
 
