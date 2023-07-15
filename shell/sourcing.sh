@@ -95,6 +95,11 @@ if [ -n "${ZSH_VERSION}" ]; then
         eval "$(starship init zsh)"
     fi
 
+    # OrbStack
+    if [ -f ~/.orbstack/shell/init.zsh ]; then
+      source ~/.orbstack/shell/init.zsh 2>/dev/null || :
+    fi
+
 elif [ -n "${BASH_VERSION}" ]; then
     # assume Bash
 
