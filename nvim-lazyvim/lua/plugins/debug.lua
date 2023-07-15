@@ -49,6 +49,7 @@ return {
   },
 
   -- extend Go extras setup from lazy.lua, with DAP capability
+  -- also see https://github.com/LazyVim/LazyVim/pull/1115
   {
     "leoluz/nvim-dap-go",
     dependencies = {
