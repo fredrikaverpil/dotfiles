@@ -30,10 +30,8 @@ return {
         -- see lazy.lua for LazyVim extras
       }
 
-      -- extend opts.ensure_installed
-      for _, package in ipairs(ensure_installed) do
-        table.insert(opts.ensure_installed, package)
-      end
+      opts.ensure_installed = opts.ensure_installed or {}
+      vim.list_extend(opts.ensure_installed, ensure_installed)
     end,
   },
 
