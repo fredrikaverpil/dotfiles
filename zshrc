@@ -2,3 +2,6 @@
 [[ -s ~/.shell/exports.sh ]] && source ~/.shell/exports.sh
 [[ -s ~/.shell/aliases.sh ]] && source ~/.shell/aliases.sh
 [[ -s ~/.shell/sourcing.sh ]] && source ~/.shell/sourcing.sh
+
+# Not commited to git
+[[ -s ~/.shell/doktor.sh ]] && source ~/.shell/doktor.sh
