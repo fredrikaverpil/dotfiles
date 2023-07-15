@@ -13,6 +13,7 @@ return {
       { "nvim-neotest/neotest-vim-test" },
       { "nvim-neotest/neotest-python" },
       { "rouge8/neotest-rust" },
+      { "nvim-neotest/neotest-go" },
       { "adrigzr/neotest-mocha" },
       { "vim-test/vim-test" },
     },
@@ -32,6 +33,9 @@ return {
           runner = "pytest",
           args = { "--log-level", "INFO", "--color", "yes", "-vv", "-s" },
           -- dap = { justMyCode = false },
+        },
+        ["neotest-go"] = {
+          -- see lazy.lua
         },
         -- ["neotest-rust"] = {
         --   -- see lazy.lua
