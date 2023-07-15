@@ -1,6 +1,5 @@
 return {
 
-  -- diffview
   {
     "sindrets/diffview.nvim",
     dependencies = {
@@ -34,7 +33,6 @@ return {
     },
   },
 
-  -- git-blame
   {
     "f-person/git-blame.nvim",
     keys = {
@@ -47,12 +45,25 @@ return {
     },
   },
 
-  -- fugitive
   {
     "tpope/vim-fugitive",
   },
 
-  -- octo
+  {
+    "topaxi/gh-actions.nvim",
+    dependencies = { "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim" },
+    build = "make",
+    cmd = "GhActions",
+    keys = {
+      { "<leader>ga", "<cmd>GhActions<cr>", desc = "Open Github Actions" },
+    },
+    -- optional, you can also install and use `yq` instead.
+    config = function(_, opts)
+      require("gh-actions").setup(opts)
+    end,
+    opts = {},
+  },
+
   {
     "pwntester/octo.nvim",
     requires = {
