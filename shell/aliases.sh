@@ -38,7 +38,7 @@ alias pip-install-reqs='ls requirements*.txt | xargs -n 1 pip install -r'
 alias poetry-install-master='pipx install --suffix=@master --force git+https://github.com/python-poetry/poetry.git'
 alias activate='source .venv/bin/activate'
 # assuming pyenv
-alias venv='PIP_REQUIRE_VIRTUALENV=false python -m pip install --upgrade --user pip virtualenv && python -m virtualenv .venv && source .venv/bin/activate && python -m pip install --upgrade pip && which pip && pip list && pip --version && python --version'
+alias venv='PIP_REQUIRE_VIRTUALENV=false python3 -m pip install --upgrade --user pip virtualenv && python3 -m virtualenv .venv && source .venv/bin/activate && python3 -m pip install --upgrade pip && which pip && pip list && pip --version && python3 --version'
 
 # Neovim
 alias nvim-lazy='NVIM_APPNAME=LazyVim nvim'
