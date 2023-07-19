@@ -60,7 +60,7 @@ return {
     keys = {
       -- workaround, as nvim-dap-go does not have a DAP strategy set up for neotest
       -- see https://github.com/nvim-neotest/neotest-go/issues/12
-      { "<leader>tg", "<cmd>lua require('dap-go').debug_test()<CR>", desc = "Debug Nearest (Go)" },
+      { "<leader>td", "<cmd>lua require('dap-go').debug_test()<CR>", desc = "Debug Nearest (Go)" },
     },
   },
 }
