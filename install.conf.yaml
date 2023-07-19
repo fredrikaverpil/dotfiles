@@ -3,10 +3,10 @@
     link:
       create: true
       relink: true
-- clean: ['~', ~/.config]
+- clean: ["~", ~/.config]
 - create: [~/Downloads]
 - link:
-    ~/.dotfiles: ''
+    ~/.dotfiles: ""
     ~/.shell:
     ~/.bash_profile:
     ~/.bashrc_user: bashrc
@@ -52,10 +52,12 @@
     - description: sync dotbot
       command: git submodule sync --recursive
     - description: add shell sourcing to bash, if not already added
-      command: grep -qxF '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' ~/.bashrc
+      command:
+        grep -qxF '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' ~/.bashrc
         || echo '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' >> ~/.bashrc
     - description: add shell sourcing to zsh, if not already added
-      command: grep -qxF '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' ~/.zshrc
+      command:
+        grep -qxF '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' ~/.zshrc
         || echo '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' >> ~/.zshrc
     - description: ssh setup
       command: |
