@@ -126,4 +126,10 @@ elif [ -n "${BASH_VERSION}" ]; then
     if command -v starship &>/dev/null; then
         eval "$(starship init bash)"
     fi
+
+    # OrbStack
+    if [ -f ~/.orbstack/shell/init.bash ]; then
+      source ~/.orbstack/shell/init.bash 2>/dev/null || :
+    fi
+
 fi
