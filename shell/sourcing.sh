@@ -100,6 +100,9 @@ if [ -n "${ZSH_VERSION}" ]; then
       source ~/.orbstack/shell/init.zsh 2>/dev/null || :
     fi
 
+    # zoxide
+    eval "$(zoxide init zsh)"
+
 elif [ -n "${BASH_VERSION}" ]; then
     # assume Bash
 

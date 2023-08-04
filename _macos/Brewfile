@@ -27,6 +27,7 @@ brew 'exa'
 brew 'bat'
 brew 'withgraphite/tap/graphite'
 brew 'kubectx'
+brew 'zoxide'
 cask 'orbstack'
 
 # languages
