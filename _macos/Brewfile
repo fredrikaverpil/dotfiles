@@ -16,6 +16,7 @@ brew 'skhd'
 cask 'karabiner-elements'
 
 # terminal cli tools
+brew 'bash'
 brew 'starship'
 brew 'gh'
 brew 'nvm'
