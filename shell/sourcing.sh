@@ -74,15 +74,24 @@ if [ -f ~/.cargo/env ]; then
 fi
 
 if [ -n "${ZSH_VERSION}" ]; then
-    # assume Zsh
+    # assume zsh
 
-    # Zsh autocompletion
+    # auto suggestions
     if [ -d ~/.zsh/zsh-autosuggestions ]; then
         source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
     fi
 
+    # zsh syntax highlighting
     if [ -d ~/.zsh/zsh-syntax-highlighting ]; then
         source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+    fi
+
+    # homebrew zsh site functions
+    if [ -d /opt/homebrew/share/zsh/site-functions ]; then
+        # https://docs.brew.sh/Shell-Completion
+        export FPATH=/opt/homebrew/share/zsh/site-functions:$FPATH
+        autoload -Uz compinit
+        compinit
     fi
 
     # mcfly
