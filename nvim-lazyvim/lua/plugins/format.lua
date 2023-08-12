@@ -27,6 +27,9 @@ return {
         "gomodifytags",
         "impl",
 
+        -- protobuf
+        "buf",
+
         -- see lazy.lua for LazyVim extras
       }
 
@@ -60,6 +63,9 @@ return {
             require("formatter.filetypes.go").goimports_reviser,
             require("formatter.filetypes.go").gomodifytags,
             require("formatter.filetypes.go").impl,
+          },
+          protobuf = {
+            require("formatter.filetypes.protobuf").buf,
           },
         },
       })

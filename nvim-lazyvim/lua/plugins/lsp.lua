@@ -28,6 +28,11 @@ return {
         -- go
         "gopls",
 
+        -- protobuf
+        "buf",
+        "protolint",
+        "buf-language-server",
+
         -- see lazy.lua for LazyVim extras
       }
 
@@ -94,11 +99,14 @@ return {
         formatting.shfmt,
         formatting.rustfmt,
         formatting.yamlfix, -- requires python
+        formatting.buf,
         diagnostics.yamllint,
         diagnostics.shellcheck,
         diagnostics.sqlfluff.with({
           extra_args = { "--dialect", "postgres" },
         }),
+        diagnostics.buf,
+        diagnostics.protolint,
         code_actions.shellcheck,
         code_actions.gitsigns,
       }

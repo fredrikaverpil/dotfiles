@@ -23,6 +23,10 @@ return {
         -- markdown
         "vale",
 
+        -- protobuf
+        "buf",
+        "protolint",
+
         -- see lazy.lua for LazyVim extras
       }
 
@@ -44,6 +48,7 @@ return {
         sh = { "shellcheck" },
         sql = { "sqlfluff" },
         markdown = { "vale" },
+        protobuf = { "buf", "protolint" },
       }
     end,
   },
