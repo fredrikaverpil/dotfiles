@@ -112,8 +112,6 @@ if [ -n "${ZSH_VERSION}" ]; then
     # zoxide
     eval "$(zoxide init zsh)"
 
-    # t-smart-tmux-session-manager
-    export PATH=$HOME/.tmux/plugins/t-smart-tmux-session-manager/bin:$PATH
 
 elif [ -n "${BASH_VERSION}" ]; then
     # assume Bash

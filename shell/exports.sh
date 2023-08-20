@@ -27,11 +27,25 @@ Darwin)
     export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
     export CLICOLOR=1 # Enable colors
 
+    # t-smart-tmux-session-manager
+    export PATH=$HOME/.tmux/plugins/t-smart-tmux-session-manager/bin:$PATH
+
     # nvm
     if [ "$(uname -m)" = "arm64" ]; then
         export NVM_DIR="$HOME/.nvm"
     elif [ "$(uname -m)" = "x86_64" ]; then
         export NVM_DIR="$HOME/.nvm_x86"
+    fi
+
+    # go
+    if [ "$(uname -m)" = "arm64" ]; then
+      # export GOPATH=$HOME/go
+      # export GOBIN=$GOPATH/bin
+      export PATH=$PATH:$HOME/go/bin
+
+      # NOTE: only set GOROOT to use non-default version of go
+      # export GOROOT=/opt/homebrew/Cellar/go 
+      # export PATH=$PATH:$GOROOT/bin
     fi
     ;;
 
