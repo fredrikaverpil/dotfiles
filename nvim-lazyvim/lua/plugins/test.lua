@@ -35,7 +35,7 @@ return {
 					-- dap = { justMyCode = false },
 				},
 				["neotest-go"] = {
-					args = { "-count=1", "-timeout=60s", "-coverprofile=coverage.out" },
+					args = { "-coverprofile=coverage.out" },
 				},
 				-- ["neotest-rust"] = {
 				--   -- see lazy.lua
@@ -65,6 +65,10 @@ return {
 	{
 		"andythigpen/nvim-coverage",
 		dependencies = { "nvim-lua/plenary.nvim" },
+		keys = {
+			{ "<leader>tc", "<cmd>Coverage<cr>", desc = "Coverage in gutter" },
+			{ "<leader>tC", "<cmd>CoverageLoad<cr><cmd>CoverageSummary<cr>", desc = "Coverage summary" },
+		},
 		config = function()
 			require("coverage").setup({
 				auto_reload = true,
