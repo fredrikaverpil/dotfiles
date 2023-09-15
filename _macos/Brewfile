@@ -9,6 +9,7 @@ tap 'homebrew/bundle'
 tap 'homebrew/core'
 tap 'cantino/mcfly'
 tap 'koekeishiya/formulae' # yabai
+tap 'oven-sh/bun'
 
 # system
 brew 'yabai'
@@ -34,6 +35,7 @@ cask 'orbstack'
 # languages
 brew 'rustup-init'
 brew 'go'
+brew 'bun'
 
 # tmux
 brew 'tmux'
