@@ -23,6 +23,9 @@ return {
         -- markdown
         "vale",
 
+        -- go
+        "golangci-lint",
+
         -- protobuf
         "buf",
         "protolint",
@@ -49,6 +52,7 @@ return {
         sql = { "sqlfluff" },
         markdown = { "vale" },
         protobuf = { "buf", "protolint" },
+        go = { "golangci-lint" },
       }
     end,
   },
