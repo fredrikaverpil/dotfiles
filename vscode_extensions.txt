@@ -21,9 +21,9 @@ dbaeumer.vscode-eslint
 eamodio.gitlens
 esbenp.prettier-vscode
 foxundermoon.shell-format
+GitHub.copilot
 GitHub.copilot-chat
 GitHub.copilot-labs
-GitHub.copilot-nightly
 github.vscode-github-actions
 GitHub.vscode-pull-request-github
 golang.go
