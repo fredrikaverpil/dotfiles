@@ -5,4 +5,4 @@
 
 vim.opt.listchars = "tab:▸ ,trail:·,nbsp:␣,extends:❯,precedes:❮" -- show symbols for whitespace
 vim.opt.relativenumber = false -- relative line numbers
-vim.opt.scrolloff = 10 -- keep 20 lines above and below the cursor
+-- vim.opt.scrolloff = 10 -- keep 20 lines above and below the cursor
