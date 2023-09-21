@@ -6,7 +6,7 @@
 # Global settings
 alias repos='cd ~/code/repos'
 # alias ll='ls -alhF'
-alias ll='exa --long --header --group-directories-first --git --group --all'
+alias ll='eza --long --header --group-directories-first --git --group --all'
 alias tree='tree -C'
 
 # Kitty
