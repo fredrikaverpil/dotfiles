@@ -50,6 +50,10 @@ return {
         "buf", -- formatter, linter
         "protolint", -- linter
 
+        -- typescript
+        "eslint-lsp", -- lsp
+        "prettierd", -- formatter
+
         -- see lazy.lua for LazyVim extras that may also install via Mason
       }
 
@@ -131,6 +135,9 @@ return {
         formatting.buf,
         diagnostics.buf,
         diagnostics.protolint,
+
+        -- typescript
+        formatting.prettierd,
       }
 
       -- extend opts.sources
