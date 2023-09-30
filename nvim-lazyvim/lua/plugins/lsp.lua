@@ -42,6 +42,7 @@ return {
         "gopls", -- lsp
         "golangci-lint-langserver", -- lsp
         "gofumpt", -- formatter
+        "goimports", -- formatter
         "gomodifytags", -- code actions
         "impl", -- code actions
 
@@ -128,6 +129,7 @@ return {
 
         -- go
         formatting.gofumpt,
+        formatting.goimports,
         code_actions.gomodifytags,
         code_actions.impl,
 
