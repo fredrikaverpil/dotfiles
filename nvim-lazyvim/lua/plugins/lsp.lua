@@ -2,129 +2,141 @@
 
 return {
 
-	-- change mason config
-	-- note: don't forget to update treesitter for languages
-	{
-		"williamboman/mason.nvim",
+  -- note: don't forget to update treesitter for languages
+  {
+    "williamboman/mason.nvim",
 
-		opts = function(_, opts)
-			local ensure_installed = {
-				-- python
-				"ruff-lsp",
-				"pyright",
+    opts = function(_, opts)
+      local ensure_installed = {
+        -- python
+        "ruff-lsp", -- lsp
+        "pyright", -- lsp
+        "black", -- formatter
+        "mypy", -- linter
 
-				-- lua
-				"lua-language-server",
+        -- lua
+        "lua-language-server", -- lsp
+        "stylua", -- formatter
 
-				-- shell
-				"bash-language-server",
+        -- shell
+        "bash-language-server", -- lsp
+        "shfmt", -- formatter
+        "shellcheck", -- linter
 
-				-- docker
-				"dockerfile-language-server",
+        -- yaml
+        "yamlfix", -- formatter (requires python)
+        -- "yamlfmt", -- formatter
+        "yamllint", -- linter
 
-				-- rust
-				"rust-analyzer",
+        -- sql
+        "sqlfluff", -- linter
 
-				-- go
-				"gopls",
-				"golangci-lint-langserver",
+        -- docker
+        "dockerfile-language-server", -- lsp
 
-				-- protobuf
-				"buf",
-				"protolint",
-				"buf-language-server",
+        -- rust
+        "rust-analyzer", -- lsp
+        -- rustfmt -- formatter (install via rustup)
 
-				-- see lazy.lua for LazyVim extras
-			}
+        -- go
+        "gopls", -- lsp
+        "golangci-lint-langserver", -- lsp
+        "gofumpt", -- formatter
+        "gomodifytags", -- code actions
+        "impl", -- code actions
 
-			opts.ensure_installed = opts.ensure_installed or {}
-			vim.list_extend(opts.ensure_installed, ensure_installed)
-		end,
-	},
+        -- protobuf
+        "buf-language-server", -- lsp (prototype, not feature-complete yet, rely on buf for now)
+        "buf", -- formatter, linter
+        "protolint", -- linter
 
-	{
-		"jose-elias-alvarez/null-ls.nvim",
-		dependencies = { "mason.nvim" },
-		event = { "BufReadPre", "BufNewFile" },
-		opts = function(_, opts)
-			local null_ls = require("null-ls")
-			local formatting = null_ls.builtins.formatting
-			local diagnostics = null_ls.builtins.diagnostics
-			local code_actions = null_ls.builtins.code_actions
+        -- see lazy.lua for LazyVim extras that may also install via Mason
+      }
 
-			-- null_ls.setup({
-			--   debug = false, -- Turn on debug for :NullLsLog
-			--   -- diagnostics_format = "#{m} #{s}[#{c}]",
-			-- })
+      opts.ensure_installed = opts.ensure_installed or {}
+      vim.list_extend(opts.ensure_installed, ensure_installed)
+    end,
+  },
 
-			local function prefer_bin_from_venv(executable_name)
-				-- Return the path to the executable if $VIRTUAL_ENV is set and the binary exists somewhere beneath the $VIRTUAL_ENV path, otherwise get it from Mason
-				if vim.env.VIRTUAL_ENV then
-					local paths = vim.fn.glob(vim.env.VIRTUAL_ENV .. "/**/bin/" .. executable_name, true, true)
-					local executable_path = table.concat(paths, ", ")
-					if executable_path ~= "" then
-						-- vim.api.nvim_echo(
-						--   { { "Using path for " .. executable_name .. ": " .. executable_path, "None" } },
-						--   false,
-						--   {}
-						-- )
-						return executable_path
-					end
-				end
+  {
+    "nvimtools/none-ls.nvim",
+    dependencies = { "mason.nvim" },
+    event = { "BufReadPre", "BufNewFile" },
+    opts = function(_, opts)
+      local null_ls = require("null-ls")
+      local formatting = null_ls.builtins.formatting
+      local diagnostics = null_ls.builtins.diagnostics
+      local code_actions = null_ls.builtins.code_actions
 
-				local mason_registry = require("mason-registry")
-				local mason_path = mason_registry.get_package(executable_name):get_install_path()
-					.. "/venv/bin/"
-					.. executable_name
-				-- vim.api.nvim_echo({ { "Using Mason for " .. executable_name .. ": " .. mason_path, "None" } }, false, {})
-				return mason_path
-			end
+      local function prefer_bin_from_venv(executable_name)
+        -- Return the path to the executable if $VIRTUAL_ENV is set and the binary exists somewhere beneath the $VIRTUAL_ENV path, otherwise get it from Mason
+        if vim.env.VIRTUAL_ENV then
+          local paths = vim.fn.glob(vim.env.VIRTUAL_ENV .. "/**/bin/" .. executable_name, true, true)
+          local executable_path = table.concat(paths, ", ")
+          if executable_path ~= "" then
+            return executable_path
+          end
+        end
 
-			local sources = {
-				-- list of supported sources:
-				-- https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTINS.md
+        local mason_registry = require("mason-registry")
+        local mason_path = mason_registry.get_package(executable_name):get_install_path()
+          .. "/venv/bin/"
+          .. executable_name
+        return mason_path
+      end
 
-				diagnostics.mypy.with({
-					filetypes = { "python" },
-					command = prefer_bin_from_venv("mypy"),
-				}),
-				formatting.black.with({
-					filetypes = { "python" },
-					command = prefer_bin_from_venv("black"),
-				}),
+      local sources = {
+        -- list of supported sources:
+        -- https://github.com/nvimtools/none-ls.nvim/blob/main/doc/BUILTINS.md
 
-				-- installed via Mason below here
+        -- python
+        formatting.black.with({
+          filetypes = { "python" },
+          command = prefer_bin_from_venv("black"),
+        }),
+        diagnostics.mypy.with({
+          filetypes = { "python" },
+          command = prefer_bin_from_venv("mypy"),
+        }),
 
-				null_ls.disable({
-					"goimports_reviser", -- lazyvim enables this, but I would like to use gci instead
-				}),
+        -- lua
+        formatting.stylua.with({
+          extra_args = { "--indent-type", "Spaces", "--indent-width", "2" },
+        }),
 
-				formatting.stylua.with({
-					extra_args = { "--indent-type", "Spaces", "--indent-width", "2" },
-				}),
-				formatting.shfmt,
-				formatting.rustfmt,
-				formatting.yamlfix, -- requires python
-				formatting.buf,
-				formatting.gofumpt,
+        -- shell
+        formatting.shfmt,
+        diagnostics.shellcheck,
+        code_actions.shellcheck,
 
-				diagnostics.yamllint,
-				diagnostics.shellcheck,
-				diagnostics.sqlfluff.with({
-					extra_args = { "--dialect", "postgres" },
-				}),
-				diagnostics.buf,
-				diagnostics.protolint,
-				diagnostics.golangci_lint,
+        -- yaml
+        formatting.yamlfix, -- requires python
+        -- formatter.yamlfmt,
+        diagnostics.yamllint,
 
-				code_actions.shellcheck,
-				code_actions.gitsigns,
-			}
+        -- sql
+        diagnostics.sqlfluff.with({
+          extra_args = { "--dialect", "postgres" },
+        }),
 
-			-- extend opts.sources
-			for _, source in ipairs(sources) do
-				table.insert(opts.sources, source)
-			end
-		end,
-	},
+        -- rust
+        formatting.rustfmt,
+
+        -- go
+        formatting.gofumpt,
+        code_actions.gomodifytags,
+        code_actions.impl,
+
+        -- protobuf
+        formatting.buf,
+        diagnostics.buf,
+        diagnostics.protolint,
+      }
+
+      -- extend opts.sources
+      for _, source in ipairs(sources) do
+        table.insert(opts.sources, source)
+      end
+    end,
+  },
 }
