@@ -43,6 +43,7 @@ return {
         "golangci-lint-langserver", -- lsp
         "gofumpt", -- formatter
         "goimports", -- formatter
+        "golangci-lint", -- linter (required by golanci-lint-langserver?)
         "gomodifytags", -- code actions
         "impl", -- code actions
 
@@ -130,6 +131,7 @@ return {
         -- go
         formatting.gofumpt,
         formatting.goimports,
+        -- diagnostics.golangci_lint, (likely not needed... as golangci-lint-langserver is used?)
         code_actions.gomodifytags,
         code_actions.impl,
 
