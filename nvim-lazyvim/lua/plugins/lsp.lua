@@ -35,6 +35,8 @@ return {
         -- rustfmt -- formatter (install via rustup)
 
         -- go
+        -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md
+        -- https://github.com/golang/tools/blob/master/gopls/internal/lsp/source/options.go
         "gopls", -- lsp
         "golangci-lint-langserver", -- lsp
         "gofumpt", -- formatter
