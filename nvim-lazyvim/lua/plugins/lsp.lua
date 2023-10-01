@@ -53,7 +53,8 @@ return {
         "protolint", -- linter
 
         -- typescript
-        "eslint-lsp", -- lsp
+        -- "eslint-lsp", -- lsp
+        "eslint_d", -- linter
         "prettierd", -- formatter
 
         -- see lazy.lua for LazyVim extras that may also install via Mason
@@ -142,6 +143,7 @@ return {
 
         -- typescript
         formatting.prettierd,
+        diagnostics.eslint_d,
       }
 
       -- extend opts.sources
