@@ -135,6 +135,18 @@ return {
       for _, source in ipairs(sources) do
         table.insert(opts.sources, source)
       end
+
+      -- always remove from opts.sources (e.g. added by lazy.lua extras)
+      local remove_from_sources = {
+        "goimports_reviser",
+      }
+      for _, source in ipairs(remove_from_sources) do
+        for i, v in ipairs(opts.sources) do
+          if v.name == source then
+            table.remove(opts.sources, i)
+          end
+        end
+      end
     end,
   },
 }
