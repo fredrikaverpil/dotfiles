@@ -2,6 +2,27 @@
 -- NOTE: don't forget to update treesitter for languages
 -- NOTE: see lazy.lua for extras that configure LSPs, formatters, linters and code actions.
 
+local function prefer_bin_from_venv(executable_name)
+  -- Return the path to the executable if $VIRTUAL_ENV is set and the binary exists somewhere beneath the $VIRTUAL_ENV path, otherwise get it from Mason
+  if vim.env.VIRTUAL_ENV then
+    local paths = vim.fn.glob(vim.env.VIRTUAL_ENV .. "/**/bin/" .. executable_name, true, true)
+    local executable_path = table.concat(paths, ", ")
+    if executable_path ~= "" then
+      -- vim.api.nvim_echo(
+      -- 	{ { "Using path for " .. executable_name .. ": " .. executable_path, "None" } },
+      -- 	false,
+      -- 	{}
+      -- )
+      return executable_path
+    end
+  end
+
+  local mason_registry = require("mason-registry")
+  local mason_path = mason_registry.get_package(executable_name):get_install_path() .. "/venv/bin/" .. executable_name
+  -- vim.api.nvim_echo({ { "Using path for " .. executable_name .. ": " .. mason_path, "None" } }, false, {})
+  return mason_path
+end
+
 return {
 
   {
@@ -41,9 +62,9 @@ return {
         "golangci-lint-langserver", -- lsp
         "gofumpt", -- formatter
         "goimports", -- formatter
-        "golangci-lint", -- linter (required by golanci-lint-langserver?)
-        "gomodifytags", -- code actions
-        "impl", -- code actions
+        "golangci-lint", -- linter (its binary is required by golanci-lint-langserver?)
+        -- "gomodifytags", -- code actions
+        -- "impl", -- code actions
 
         -- protobuf
         "buf-language-server", -- lsp (prototype, not feature-complete yet, rely on buf for now)
@@ -58,6 +79,7 @@ return {
 
   {
     "nvimtools/none-ls.nvim",
+    enabled = false,
     dependencies = { "mason.nvim" },
     event = { "BufReadPre", "BufNewFile" },
     opts = function(_, opts)
@@ -65,23 +87,6 @@ return {
       local formatting = null_ls.builtins.formatting
       local diagnostics = null_ls.builtins.diagnostics
       local code_actions = null_ls.builtins.code_actions
-
-      local function prefer_bin_from_venv(executable_name)
-        -- Return the path to the executable if $VIRTUAL_ENV is set and the binary exists somewhere beneath the $VIRTUAL_ENV path, otherwise get it from Mason
-        if vim.env.VIRTUAL_ENV then
-          local paths = vim.fn.glob(vim.env.VIRTUAL_ENV .. "/**/bin/" .. executable_name, true, true)
-          local executable_path = table.concat(paths, ", ")
-          if executable_path ~= "" then
-            return executable_path
-          end
-        end
-
-        local mason_registry = require("mason-registry")
-        local mason_path = mason_registry.get_package(executable_name):get_install_path()
-          .. "/venv/bin/"
-          .. executable_name
-        return mason_path
-      end
 
       local sources = {
         -- list of supported sources:
@@ -146,6 +151,67 @@ return {
             table.remove(opts.sources, i)
           end
         end
+      end
+    end,
+  },
+
+  {
+    "stevearc/conform.nvim",
+    -- https://github.com/stevearc/conform.nvim
+    enabled = true,
+    opts = function(_, opts)
+      local formatters = require("conform.formatters")
+      formatters.black.command = prefer_bin_from_venv("black")
+      formatters.stylua.args =
+        vim.list_extend({ "--indent-type", "Spaces", "--indent-width", "2" }, formatters.stylua.args)
+
+      local formatters_by_ft = {
+        -- this extends lazyvim's conform setup
+        -- https://www.lazyvim.org/extras/formatting/conform
+        -- lua = { "stylua" },
+        -- fish = { "fish_indent" },
+        -- sh = { "shfmt" },
+        go = { "gofumpt", "goimports" },
+        protobuf = { "buf" },
+        python = { "isort", "black" },
+        rust = { "rustfmt" },
+      }
+
+      -- extend opts.formatters_by_ft
+      for ft, formatters_ in pairs(formatters_by_ft) do
+        opts.formatters_by_ft[ft] = opts.formatters_by_ft[ft] or {}
+        vim.list_extend(opts.formatters_by_ft[ft], formatters_)
+      end
+
+      -- echo all formatters by ft, looks weird, let's see... seems to work though
+      -- vim.api.nvim_echo({ { "formatters_by_ft: " .. vim.inspect(opts.formatters_by_ft), "None" } }, false, {})
+    end,
+  },
+
+  {
+    "mfussenegger/nvim-lint",
+    -- https://github.com/mfussenegger/nvim-lint
+    enabled = true,
+    opts = function(_, opts)
+      local linters = require("lint").linters
+      linters.mypy.cmd = prefer_bin_from_venv("mypy")
+      linters.sqlfluff.args = vim.list_extend({ "--dialect", "postgres" }, linters.sqlfluff.args)
+
+      local linters_by_ft = {
+        -- this extends lazyvim's nvim-lint setup
+        -- https://www.lazyvim.org/extras/linting/nvim-lint
+        -- fish = { "fish" },
+        protobuf = { "buf", "protolint" },
+        python = { "mypy" },
+        sh = { "shellcheck" },
+        sql = { "sqlfluff" },
+        yaml = { "yamllint" },
+      }
+
+      -- extend opts.linters_by_ft
+      for ft, linters_ in pairs(linters_by_ft) do
+        opts.linters_by_ft[ft] = opts.linters_by_ft[ft] or {}
+        vim.list_extend(opts.linters_by_ft[ft], linters_)
       end
     end,
   },
