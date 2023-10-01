@@ -168,9 +168,8 @@ return {
       local formatters_by_ft = {
         -- this extends lazyvim's conform setup
         -- https://www.lazyvim.org/extras/formatting/conform
-        -- lua = { "stylua" },
-        -- fish = { "fish_indent" },
-        -- sh = { "shfmt" },
+        lua = { "stylua" },
+        sh = { "shfmt" },
         go = { "gofumpt", "goimports" },
         protobuf = { "buf" },
         python = { "isort", "black" },
@@ -200,7 +199,6 @@ return {
       local linters_by_ft = {
         -- this extends lazyvim's nvim-lint setup
         -- https://www.lazyvim.org/extras/linting/nvim-lint
-        -- fish = { "fish" },
         protobuf = { "buf", "protolint" },
         python = { "mypy" },
         sh = { "shellcheck" },
