@@ -31,9 +31,6 @@ return {
         -- sql
         "sqlfluff", -- linter
 
-        -- docker
-        "dockerfile-language-server", -- lsp
-
         -- rust
         "rust-analyzer", -- lsp
         -- rustfmt -- formatter (install via rustup)
@@ -53,7 +50,6 @@ return {
         "protolint", -- linter
 
         -- typescript
-        -- "eslint-lsp", -- lsp
         "eslint_d", -- linter
         "prettierd", -- formatter
 
