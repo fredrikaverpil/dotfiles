@@ -1,8 +1,9 @@
 -- https://www.lazyvim.org/plugins/lsp
+-- NOTE: don't forget to update treesitter for languages
+-- NOTE: see lazy.lua for extras that configure LSPs, formatters, linters and code actions.
 
 return {
 
-  -- note: don't forget to update treesitter for languages
   {
     "williamboman/mason.nvim",
 
@@ -24,8 +25,6 @@ return {
         "shellcheck", -- linter
 
         -- yaml
-        "yamlfix", -- formatter (requires python)
-        -- "yamlfmt", -- formatter
         "yamllint", -- linter
 
         -- sql
@@ -48,12 +47,6 @@ return {
         "buf-language-server", -- lsp (prototype, not feature-complete yet, rely on buf for now)
         "buf", -- formatter, linter
         "protolint", -- linter
-
-        -- typescript
-        "eslint_d", -- linter
-        "prettierd", -- formatter
-
-        -- see lazy.lua for LazyVim extras that may also install via Mason
       }
 
       opts.ensure_installed = opts.ensure_installed or {}
@@ -113,8 +106,6 @@ return {
         code_actions.shellcheck,
 
         -- yaml
-        formatting.yamlfix, -- requires python
-        -- formatter.yamlfmt,
         diagnostics.yamllint,
 
         -- sql
@@ -136,10 +127,6 @@ return {
         formatting.buf,
         diagnostics.buf,
         diagnostics.protolint,
-
-        -- typescript
-        formatting.prettierd,
-        diagnostics.eslint_d,
       }
 
       -- extend opts.sources
