@@ -142,16 +142,10 @@ return {
       end
 
       -- always remove from opts.sources (e.g. added by lazy.lua extras)
-      local remove_from_sources = {
-        "goimports_reviser",
-      }
-      for _, source in ipairs(remove_from_sources) do
-        for i, v in ipairs(opts.sources) do
-          if v.name == source then
-            table.remove(opts.sources, i)
-          end
-        end
-      end
+      local remove_sources = { "goimports_reviser" }
+      opts.sources = vim.tbl_filter(function(source)
+        return not vim.tbl_contains(remove_sources, source.name)
+      end, opts.sources)
     end,
   },
 
@@ -177,6 +171,7 @@ return {
       }
 
       -- extend opts.formatters_by_ft
+      -- NOTE: conform.nvim can use a sub-list to run only the first available formatter (see docs)
       for ft, formatters_ in pairs(formatters_by_ft) do
         opts.formatters_by_ft[ft] = opts.formatters_by_ft[ft] or {}
         vim.list_extend(opts.formatters_by_ft[ft], formatters_)
