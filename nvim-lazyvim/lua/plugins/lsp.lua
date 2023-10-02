@@ -176,9 +176,6 @@ return {
         opts.formatters_by_ft[ft] = opts.formatters_by_ft[ft] or {}
         vim.list_extend(opts.formatters_by_ft[ft], formatters_)
       end
-
-      -- echo all formatters by ft, looks weird, let's see... seems to work though
-      -- vim.api.nvim_echo({ { "formatters_by_ft: " .. vim.inspect(opts.formatters_by_ft), "None" } }, false, {})
     end,
   },
 
