@@ -52,12 +52,25 @@ return {
   -- https://www.lazyvim.org/configuration/recipes#add-telescope-fzf-native
   {
     "nvim-telescope/telescope-fzf-native.nvim",
+    enabled = false, -- testing zf-native for while
     dependencies = {
       "nvim-telescope/telescope.nvim",
     },
     build = "make",
     config = function()
       require("telescope").load_extension("fzf")
+    end,
+  },
+
+  {
+    -- https://github.com/natecraddock/telescope-zf-native.nvim
+    "natecraddock/telescope-zf-native.nvim",
+    enabled = true,
+    dependencies = {
+      "nvim-telescope/telescope.nvim",
+    },
+    config = function()
+      require("telescope").load_extension("zf-native")
     end,
   },
 }
