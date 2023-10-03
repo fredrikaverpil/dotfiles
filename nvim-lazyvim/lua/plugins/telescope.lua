@@ -7,7 +7,7 @@ return {
     -- opts will be merged with the parent spec
     opts = {
       defaults = {
-        file_ignore_patterns = { "^.git/", "^node_modules/", "^poetry.lock" },
+        file_ignore_patterns = { "^./.git/", "^node_modules/", "^poetry.lock" },
       },
     },
   },
@@ -32,19 +32,21 @@ return {
     keys = {
       {
         "<leader>/",
-        ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>",
+        function()
+          require("telescope").extensions.live_grep_args.live_grep_args({
+            vimgrep_arguments = {
+              "rg",
+              "--color=never",
+              "--no-heading",
+              "--with-filename",
+              "--line-number",
+              "--column",
+              "--smart-case",
+              "--hidden",
+            },
+          })
+        end,
         desc = "Live Grep (Args)",
-      },
-    },
-
-    -- opts will be merged with the parent spec
-    opts = {
-      pickers = {
-        live_grep = {
-          additional_args = function()
-            return { "--hidden" }
-          end,
-        },
       },
     },
   },
