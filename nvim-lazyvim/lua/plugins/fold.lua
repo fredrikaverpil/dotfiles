@@ -2,7 +2,7 @@ return {
 
   {
     "kevinhwang91/nvim-ufo",
-    enabled = true,
+    enabled = false, -- lazyvim supports this now out of the box
     dependencies = {
       "kevinhwang91/promise-async",
       "nvim-treesitter/nvim-treesitter",
