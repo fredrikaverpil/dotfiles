@@ -205,8 +205,4 @@ return {
       end
     end,
   },
-
-  {
-    "kosayoda/nvim-lightbulb",
-  },
 }
