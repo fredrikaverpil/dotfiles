@@ -15,8 +15,5 @@ return {
       { "<leader>hp", ":lua require('harpoon.ui').nav_prev()<CR>", desc = "Previous file" },
       { "<leader>ht", ":lua require('harpoon.term').gotoTerminal(1)<CR>", desc = "Terminal" },
     },
-    config = function()
-      require("telescope").load_extension("harpoon")
-    end,
   },
 }
