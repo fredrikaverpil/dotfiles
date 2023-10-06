@@ -164,7 +164,7 @@ return {
         -- https://www.lazyvim.org/extras/formatting/conform
         lua = { "stylua" },
         sh = { "shfmt" },
-        go = { "gofumpt", "goimports" },
+        go = { "gofumpt", "goimports", "gci" },
         protobuf = { "buf" },
         python = { "isort", "black" },
         rust = { "rustfmt" },
