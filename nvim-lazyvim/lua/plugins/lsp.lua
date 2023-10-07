@@ -61,7 +61,8 @@ return {
         "gopls", -- lsp
         "golangci-lint-langserver", -- lsp
         "gofumpt", -- formatter
-        "goimports", -- formatter
+        -- "goimports", -- formatter
+        "gci", -- formatter, replaces goimports
         "golangci-lint", -- linter (its binary is required by golanci-lint-langserver?)
         -- "gomodifytags", -- code actions
         -- "impl", -- code actions
@@ -164,7 +165,7 @@ return {
         -- https://www.lazyvim.org/extras/formatting/conform
         lua = { "stylua" },
         sh = { "shfmt" },
-        go = { "gofumpt", "goimports", "gci" },
+        go = { "gofumpt", "gci" }, -- goimports is not needed as gci is used
         protobuf = { "buf" },
         python = { "isort", "black" },
         rust = { "rustfmt" },
