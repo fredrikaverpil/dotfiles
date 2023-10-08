@@ -1,5 +1,6 @@
 local wezterm = require("wezterm")
 local config = {}
+local is_windows = os.getenv("OS") == "Windows_NT"
 
 -- https://wezfurlong.org/wezterm/config/files.html
 
@@ -37,7 +38,11 @@ config.color_scheme = scheme_for_appearance(get_appearance())
 
 -- title bar
 -- NOTE: For Windows/WSL, the "RESIZE" setting doesn't allow for moving around the window
-config.window_decorations = "TITLE | RESIZE"
+if is_windows then
+  config.window_decorations = "TITLE | RESIZE"
+else
+  config.window_decorations = "RESIZE"
+end
 
 -- tab config
 config.hide_tab_bar_if_only_one_tab = true
@@ -67,9 +72,8 @@ for host, config in pairs(wezterm.enumerate_ssh_hosts()) do
 end
 config.ssh_domains = ssh_domains
 
--- wsl
-local os = os.getenv("OS")
-if os == "Windows_NT" then
+-- start straight into WSL
+if is_windows then
   config.default_domain = "WSL:Ubuntu"
 end
 
