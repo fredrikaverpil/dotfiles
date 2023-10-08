@@ -17,6 +17,8 @@ Darwin)
 Linux)
 	# commands for Linux go here
 
+	echo "Install via Brewfile on linux."
+
 	# tmux plugin manager
 	if [ ! -d ~/.tmux/plugins/tpm ]; then
 		mkdir -p ~/.tmux/plugins

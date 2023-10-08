@@ -20,6 +20,11 @@ Darwin)
 	;;
 Linux)
 	# commands for Linux go here
+	#
+	if ! command -v brew &>/dev/null; then
+		sudo apt-get install build-essential procps curl file git
+		/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+	fi
 	;;
 FreeBSD)
 	# commands for FreeBSD go here

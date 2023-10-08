@@ -37,16 +37,14 @@ if [ -f /opt/homebrew/bin/brew ]; then
 fi
 
 # Linuxbrew
-if [ -f ~/.linuxbrew/bin/brew ]; then
-    eval "$(~/.linuxbrew/bin/brew shellenv)"
-    # eval "$(/home/fredrik/.linuxbrew/bin/brew shellenv)"
-    # eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+if [ -f /home/linuxbrew/.linuxbrew/bin/brew ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
 
-# Nix
-if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then
-    . ~/.nix-profile/etc/profile.d/nix.sh
-fi
+# # Nix
+# if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then
+#     . ~/.nix-profile/etc/profile.d/nix.sh
+# fi
 
 # Pyenv + auto venv activation on cd
 if [ -d ~/.pyenv ]; then
