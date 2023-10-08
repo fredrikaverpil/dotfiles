@@ -4,7 +4,7 @@
 
 This setup aims to run GUIs in Windows with all terminal and coding activities in WSL/Ubuntu.
 
-Prop tip: set up Wezterm, dotfiles repo and homebrew first.
+Prop tip: set up WSL/Ubuntu, Wezterm, dotfiles repo and homebrew first.
 
 ### Windows installations
 
@@ -51,10 +51,9 @@ Then install GUI apps (from [Microsoft Store](https://www.microsoft.com/en-us/st
 # Coding
 winget install wez.wezterm  # or maybe just install via setup.exe installer...?
 # winget install --accept-package-agreements --source msstore "Windows Terminal" --id 9N0DX20HK701
-# winget install --accept-package-agreements --source msstore "Visual Studio Code" --id XP9KHM4BK9FZ7Q
+winget install --accept-package-agreements --source msstore "Visual Studio Code" --id XP9KHM4BK9FZ7Q
 winget install --accept-package-agreements --source winget "Docker Desktop" --id "Docker.DockerDesktop"
 winget install --accept-package-agreements --source msstore "Slack" --id "9WZDNCRDK3WP"
-
 
 # HHKB/macOS compatible workflow
 winget install --accept-package-agreements --source msstore "PureText" --id 9PKJV6319QTL
