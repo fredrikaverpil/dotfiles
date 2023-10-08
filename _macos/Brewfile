@@ -31,6 +31,10 @@ brew 'withgraphite/tap/graphite'
 brew 'kubectx'
 brew 'zoxide'
 
+# slides
+brew 'slides'
+brew 'chafa'
+
 # languages
 brew 'rustup-init'
 brew 'go'
