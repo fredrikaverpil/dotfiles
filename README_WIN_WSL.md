@@ -1,8 +1,10 @@
 ## Windows 11 + WSL
 
-⚠️ These instructions are likely outdated, as my primary system is macOS.
+⚠️ These instructions are likely to become outdated, as my primary system is macOS.
 
 This setup aims to run GUIs in Windows with all terminal and coding activities in WSL/Ubuntu.
+
+Prop tip: set up Wezterm, dotfiles repo and homebrew first.
 
 ### Windows installations
 
@@ -47,10 +49,12 @@ Then install GUI apps (from [Microsoft Store](https://www.microsoft.com/en-us/st
 
 ```powershell
 # Coding
-winget install --accept-package-agreements --source msstore "Windows Terminal" --id 9N0DX20HK701
-winget install --accept-package-agreements --source msstore "Visual Studio Code" --id XP9KHM4BK9FZ7Q
+winget install wez.wezterm  # or maybe just install via setup.exe installer...?
+# winget install --accept-package-agreements --source msstore "Windows Terminal" --id 9N0DX20HK701
+# winget install --accept-package-agreements --source msstore "Visual Studio Code" --id XP9KHM4BK9FZ7Q
 winget install --accept-package-agreements --source winget "Docker Desktop" --id "Docker.DockerDesktop"
 winget install --accept-package-agreements --source msstore "Slack" --id "9WZDNCRDK3WP"
+
 
 # HHKB/macOS compatible workflow
 winget install --accept-package-agreements --source msstore "PureText" --id 9PKJV6319QTL
@@ -61,6 +65,7 @@ winget install --accept-package-agreements --source winget "SharpKeys" --id "Ran
 winget install --accept-package-agreements --source winget "1Password" --id "AgileBits.1Password"
 winget install --accept-package-agreements --source winget "Signal" --id "OpenWhisperSystems.Signal"
 winget install --accept-package-agreements --source msstore "Spotify Music" --id 9NCBCSZSJRSB
+winget install --accept-package-agreements --source msstore "Auto Dark Mode" --id XP8JK4HZBVF435
 ```
 
 ### Clone down dotfiles into WSL
@@ -75,6 +80,21 @@ cd dotfiles && ./install -vv
 
 ### Windows configuration
 
+#### Wezterm
+
+From administrative Powershell prompt:
+
+```powershell
+cd \\wsl.localhost\Ubuntu\home\fredrik\code\repos\dotfiles
+
+New-Item -ItemType SymbolicLink -Path $HOME\.wezterm.lua -Value wezterm.lua
+```
+
+Restart wezterm, and it should now start up straight into Ubuntu.
+
+<details>
+  <summary>Click here for old notes on the Windows Terminal.</summary>
+
 #### Windows Terminal
 
 Run from administrative Powershell prompt:
@@ -88,6 +108,8 @@ cd \\wsl.localhost\Ubuntu\home\fredrik\code\repos\dotfiles
 
 New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json -Value _windows\terminal_settings.json
 ```
+
+</details>
 
 #### WSL Tray
 
@@ -120,19 +142,6 @@ New-Item -ItemType SymbolicLink -Path "$env:APPDATA\Microsoft\Windows\Start Menu
 - To override <kbd>Win (Left)</kbd> + <kbd>l</kbd>, launch Sharpkeys, load the `\\wsl.localhost\Ubuntu\home\fredrik\code\repos\dotfiles\_windows\sharpkeys.skl` file and write changes to the Registry.
 - In PureText, remap (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>v</kbd>) to enable pasting of text without formatting.
 
-#### Wezterm
-
-```powershell
-winget install wez.wezterm
-```
-
-From administrative Powershell prompt:
-
-```powershell
-cd \\wsl.localhost\Ubuntu\home\fredrik\code\repos\dotfiles
-
-New-Item -ItemType SymbolicLink -Path $HOME\.wezterm.lua -Value wezterm.lua
-```
 
 ### Ubuntu configuration
 
@@ -142,25 +151,30 @@ New-Item -ItemType SymbolicLink -Path $HOME\.wezterm.lua -Value wezterm.lua
 sudo apt update
 sudo add-apt-repository universe
 sudo apt upgrade
-sudo apt install git curl unzip bash-completion
+```
+
+#### Homebrew
+
+```bash
+installers/homebrew.sh
 ```
 
 #### Shell
 
 ```bash
-installers/zsh.sh  # remove the default prompt from ~/.zshrc after installation
-installers/starship.sh
-installers/gh.sh
-installers/nix.sh
-...
+brew install zsh
+
+# remove the default prompt from ~/.zshrc after installation ...?
+
+# set zsh to the default shell
+chsh
 ```
 
 #### Editors
 
 ```bash
-installers/apt_install.sh
-installers/lazygit.sh
-nix-env -iA nixpkgs.neovim
+brew install neovim
+
 installers/neovim_distros.sh
 ```
 
@@ -171,5 +185,11 @@ code .  # will automatically install vscode server
 #### Additional tools
 
 ```bash
+brew bundle --file _linux/Brewfile
+
 installers/ ...
 ```
+
+## To do
+
+- 1Password git credentials.
