@@ -1,0 +1,49 @@
+# Usage:
+# brew bundle --file=path/to/Brewfile
+
+# Taps (third-party repositories)
+tap 'homebrew/bundle'
+# tap 'homebrew/core'
+tap 'cantino/mcfly'
+tap 'oven-sh/bun'
+
+# system
+brew 'zsh'
+
+# terminal cli tools
+brew 'bash'
+brew 'starship'
+brew 'gh'
+brew 'nvm'
+brew 'asciinema'
+brew 'pre-commit'
+brew 'tree'
+brew 'mcfly'
+brew 'eza'
+brew 'bat'
+brew 'withgraphite/tap/graphite'
+brew 'kubectx'
+brew 'zoxide'
+brew 'graphite'
+
+# slides
+brew 'slides'
+brew 'chafa'
+
+# languages
+brew 'rustup-init'
+brew 'go'
+brew 'bun'
+
+# tmux
+brew 'tmux'
+brew 'tmuxinator'
+
+# neovim
+brew 'neovim'
+brew 'ripgrep'
+brew 'fd'
+brew 'lazygit'
+brew 'fzf'
+brew 'gnu-sed'  # spectre
+

@@ -14,9 +14,7 @@ Darwin)
     ;;
 Linux)
     # commands for Linux go here
-    if command -v zsh &>/dev/null; then
-        apt_install zsh
-    fi
+    echo "Install via Brewfile on linux."
     ;;
 FreeBSD)
     # commands for FreeBSD go here

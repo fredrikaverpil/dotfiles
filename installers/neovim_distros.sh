@@ -1,5 +1,29 @@
 #!/bin/bash -e
 
+# Per-platform settings
+case $(uname) in
+Darwin)
+	# commands for macOS go here
+	;;
+Linux)
+	# commands for Linux go here
+
+	# for running nvim.appimage
+	apt install fuse
+
+	# for building neovim plugins
+	apt install make cmake gcc g++ clang
+	;;
+FreeBSD)
+	# commands for FreeBSD go here
+	;;
+MINGW64_NT-*)
+	# commands for Git bash in Windows go here
+	;;
+*) ;;
+esac
+
+
 # this will install so that nvim can be launched with NVIM_APPNAME, see aliases.sh
 #
 # see shell/bin/nvims how to start the different nvim distros
