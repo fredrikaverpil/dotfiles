@@ -4,14 +4,13 @@
 # Taps (third-party repositories)
 tap 'homebrew/bundle'
 # tap 'homebrew/core'
+tap 'withgraphite/tap'
 tap 'cantino/mcfly'
 tap 'oven-sh/bun'
 
 # system
-brew 'zsh'
 
 # terminal cli tools
-brew 'bash'
 brew 'starship'
 brew 'gh'
 brew 'nvm'
@@ -21,10 +20,9 @@ brew 'tree'
 brew 'mcfly'
 brew 'eza'
 brew 'bat'
-brew 'withgraphite/tap/graphite'
+brew 'graphite'
 brew 'kubectx'
 brew 'zoxide'
-brew 'graphite'
 
 # slides
 brew 'slides'
