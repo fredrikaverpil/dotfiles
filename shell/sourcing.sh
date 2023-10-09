@@ -62,6 +62,10 @@ fi
 # NVM
 if [ -s "/opt/homebrew/opt/nvm/nvm.sh" ]; then
     . "/opt/homebrew/opt/nvm/nvm.sh"
+
+elif [ -s "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" ]; then
+    . "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"
+
 elif [ -s "$HOME/.nvm/nvm.sh" ]; then
     . "$HOME/.nvm/nvm.sh"
 fi
