@@ -4,6 +4,9 @@ local is_windows = os.getenv("OS") == "Windows_NT"
 
 -- https://wezfurlong.org/wezterm/config/files.html
 
+config.check_for_updates = true
+config.check_for_updates_interval_seconds = 86400
+
 -- font
 -- https://www.jetbrains.com/lp/mono
 -- https://github.com/ryanoasis/nerd-fonts/releases
@@ -50,7 +53,7 @@ config.use_fancy_tab_bar = false
 
 -- ssh hosts from ~./ssh/config
 local ssh_domains = {}
-for host, config in pairs(wezterm.enumerate_ssh_hosts()) do
+for host, config_ in pairs(wezterm.enumerate_ssh_hosts()) do
   table.insert(ssh_domains, {
     -- the name can be anything you want; we're just using the hostname
     name = host,
