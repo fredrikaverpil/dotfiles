@@ -44,3 +44,5 @@ MINGW64_NT-*)
 	;;
 *) ;;
 esac
+
+echo "To finish the installation, install all plugins with <prefix> + I in tmux."

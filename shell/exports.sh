@@ -51,7 +51,11 @@ Darwin)
 
 Linux)
     # commands for Linux go here
-    export NVM_DIR="$HOME/.nvm" # nvmexport NVM_DIR="$HOME/.nvm"                             # nvm
+    export NVM_DIR="$HOME/.nvm"
+    export HOMEBREW_NO_ANALYTICS=1
+
+    # t-smart-tmux-session-manager
+    export PATH=$HOME/.tmux/plugins/t-smart-tmux-session-manager/bin:$PATH
     ;;
 
 MINGW64_NT-*)
