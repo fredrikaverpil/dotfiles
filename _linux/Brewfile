@@ -44,4 +44,5 @@ brew 'fd'
 brew 'lazygit'
 brew 'fzf'
 brew 'gnu-sed'  # spectre
+brew 'pkg-config'  # gh-actions.nvim
 
