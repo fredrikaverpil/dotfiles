@@ -16,7 +16,12 @@ config.font = wezterm.font_with_fallback({
   { family = "Symbols Nerd Font Mono" },
   { family = "Noto Color Emoji" },
 })
-config.font_size = 14
+
+if is_windows then
+  config.font_size = 10
+else
+  config.font_size = 14
+end
 
 -- colorschemes
 -- https://wezfurlong.org/wezterm/colorschemes/
