@@ -155,27 +155,28 @@ sudo add-apt-repository universe
 sudo apt upgrade
 ```
 
-#### Homebrew
-
-```bash
-# install homebrew
-installers/homebrew.sh
-
-# install all dependencies
-brew bundle --file _linux/Brewfile
-```
-
 #### Shell
 
 ```bash
 # NOTE: do not install shell from brew, let's keep this close to native
 sudo apt install zsh
 
-# set zsh to the default shell
+# set zsh to the default shell; /bin/zsh
 chsh
 ```
 
-Re-launch wezterm to get straight into Ubuntu/zsh.
+#### Homebrew
+
+```bash
+# install homebrew
+cd ~/code/repos/dotfiles
+installers/homebrew.sh
+
+# install all dependencies
+/home/linuxbrew/.linuxbrew/bin/brew bundle --file _linux/Brewfile
+```
+
+You can now restart wezterm and you should be taken into Ubuntu/zsh with prompt and most software all set up.
 
 #### Editors
 
@@ -183,10 +184,11 @@ Re-launch wezterm to get straight into Ubuntu/zsh.
 # remove folder if it already exists
 rm -rf ~/.config/LazyVim
 
+
+cd ~/code/repos/dotfiles
 installers/neovim_distros.sh
 
 # re-run dotfiles installer, to symlink LazyVim config
-cd ~/code/repos/dotfiles
 ./install
 ```
 
