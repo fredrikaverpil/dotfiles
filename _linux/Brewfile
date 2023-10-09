@@ -32,6 +32,7 @@ brew 'chafa'
 brew 'rustup-init'
 brew 'go'
 brew 'bun'
+brew 'ruby'
 
 # tmux
 brew 'tmux'

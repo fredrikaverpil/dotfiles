@@ -26,7 +26,7 @@ Linux)
 	fi
 
 	if ! command -v gem &>/dev/null; then
-		sudo apt install ruby
+		brew install ruby
 	fi
 
 	if ! command -v tmuxinator &>/dev/null; then
