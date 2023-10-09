@@ -1,13 +1,13 @@
 #!/bin/bash -e
 
 for x in *; do
-    if [ -d "${x}" ]; then
-        current_dir=$(pwd)
-        cd "$x" || return
-        pwd
-        git-reset
-        echo "-----"
+	if [ -d "${x}" ]; then
+		current_dir=$(pwd)
+		cd "$x" || return
+		pwd
+		git-reset
+		echo "-----"
 
-        cd "$current_dir" || return
-    fi
+		cd "$current_dir" || return
+	fi
 done
