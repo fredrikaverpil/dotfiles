@@ -1,5 +1,13 @@
 #!/bin/bash
 
-git restore --worktree --staged poetry.lock
-poetry lock --no-update
-git add poetry.lock
+# Get the commit hash of the second to last commit where "poetry.lock" was modified
+commit_hash=$(git log -n 2 --pretty=format:"%H" --diff-filter=M -- poetry.lock | tail -n1)
+
+# If the commit hash was found
+if [ -n "$commit_hash" ]; then
+	# Restore "poetry.lock" to the state it was in at the found commit
+	git restore --source=$commit_hash poetry.lock
+	echo "poetry.lock has been restored to its state at commit $commit_hash."
+else
+	echo "No modifications to poetry.lock found in the commit history."
+fi
