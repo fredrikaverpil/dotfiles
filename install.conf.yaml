@@ -31,7 +31,6 @@
     ~/.config/LazyVim/lazy-lock.json:
       force: true
       path: lazy-lock.json
-    ~/.config/helix:
     ~/Library/Application Support/Code/User/settings.json:
       path: vscode_settings.jsonc
       force: true
