@@ -201,6 +201,11 @@ code .  # will automatically install vscode server
 
 Pick selectively from the `installers` folder...
 
+```bash
+installers/tmux.sh  # don't forget to start tmux and run <leader>-I to install plugins.
+installers/zsh.sh  # turns out this added some latency in the terminal.
+```
+
 ## To do
 
 - 1Password git credentials.
