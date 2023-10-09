@@ -4,7 +4,7 @@
 
 This setup aims to run GUIs in Windows with all terminal and coding activities in WSL/Ubuntu.
 
-Prop tip: set up WSL/Ubuntu, Wezterm, dotfiles repo and homebrew first.
+🎒 Pro tip: set up WSL/Ubuntu, Wezterm, dotfiles repo and homebrew first.
 
 ### Windows installations
 
@@ -91,6 +91,8 @@ New-Item -ItemType SymbolicLink -Path $HOME\.wezterm.lua -Value wezterm.lua
 
 Restart wezterm, and it should now start up straight into Ubuntu.
 
+🎒 To get set up more quickly, skip over onto the Ubuntu configuration.
+
 <details>
   <summary>Click here for old notes on the Windows Terminal.</summary>
 
@@ -128,21 +130,22 @@ cp \\wsl.localhost\Ubuntu\home\fredrik\code\repos\dotfiles\_windows\autohotkey.a
 <details>
   <summary>Click here to see symlinking instructions</summary>
 
+:warning: If WSL is not running, the AutoHotkey script won't run. Therefore, I default to copying the file into place.
+
 Symlinking can be done, instead of copying the `autohotkey.ahk`, from an administrative Powershell prompt:
 
 ```powershell
 New-Item -ItemType SymbolicLink -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\autohotkey.ahk" -Value _windows\autohotkey.ahk
 ```
 
-:warning: ...however, if WSL is not running, the AutoHotkey script won't run. It may be more desireable to copy the file into place.
-
 </details>
 
 - To override <kbd>Win (Left)</kbd> + <kbd>l</kbd>, launch Sharpkeys, load the `\\wsl.localhost\Ubuntu\home\fredrik\code\repos\dotfiles\_windows\sharpkeys.skl` file and write changes to the Registry.
 - In PureText, remap (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>v</kbd>) to enable pasting of text without formatting.
 
-
 ### Ubuntu configuration
+
+All commands expected to be executed in wezterm/Ubuntu.
 
 #### Update Ubuntu
 
@@ -155,39 +158,46 @@ sudo apt upgrade
 #### Homebrew
 
 ```bash
+# install homebrew
 installers/homebrew.sh
+
+# install all dependencies
+brew bundle --file _linux/Brewfile
 ```
 
 #### Shell
 
 ```bash
-brew install zsh
-
-# remove the default prompt from ~/.zshrc after installation ...?
+# NOTE: do not install shell from brew, let's keep this close to native
+sudo apt install zsh
 
 # set zsh to the default shell
 chsh
 ```
 
+Re-launch wezterm to get straight into Ubuntu/zsh.
+
 #### Editors
 
 ```bash
-brew install neovim
+# remove folder if it already exists
+rm -rf ~/.config/LazyVim
 
 installers/neovim_distros.sh
+
+# re-run dotfiles installer, to symlink LazyVim config
+cd ~/code/repos/dotfiles
+./install
 ```
 
 ```bash
+# if you previously installed vscode
 code .  # will automatically install vscode server
 ```
 
 #### Additional tools
 
-```bash
-brew bundle --file _linux/Brewfile
-
-installers/ ...
-```
+Pick selectively from the `installers` folder...
 
 ## To do
 
