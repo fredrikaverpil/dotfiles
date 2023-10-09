@@ -22,3 +22,4 @@ DESCRIPTION=$(gum write --placeholder "Details of this change")
 
 # Commit these changes if user confirms
 gum confirm "Commit changes?" && git commit -m "$SUMMARY" -m "$DESCRIPTION"
+

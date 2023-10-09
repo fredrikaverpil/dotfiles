@@ -6,22 +6,22 @@ default_branch_name="origin/master"
 problem_found="false"
 
 for git_directory in $(find * -name .git); do
-    echo "Checking $git_directory ..."
-    git --git-dir "$git_directory" fetch --all
+	echo "Checking $git_directory ..."
+	git --git-dir "$git_directory" fetch --all
 
-    commit_sha=$(git --git-dir "$git_directory" rev-parse --verify HEAD)
-    commit_sha_found_in_master=$(git --git-dir "$git_directory" rev-list $default_branch_name | grep "$commit_sha") || echo ""
+	commit_sha=$(git --git-dir "$git_directory" rev-parse --verify HEAD)
+	commit_sha_found_in_master=$(git --git-dir "$git_directory" rev-list $default_branch_name | grep "$commit_sha") || echo ""
 
-    if [ "$commit_sha_found_in_master" = "" ]; then
-        echo "[ERROR] Commit SHA $commit_sha of git submodule at $(dirname "$git_directory") was NOT found in its $default_branch_name"
-        problem_found="true"
-    else
-        echo "[ OK! ] Commit SHA $commit_sha of git submodule at $(dirname "$git_directory") was found in its $default_branch_name"
-    fi
+	if [ "$commit_sha_found_in_master" = "" ]; then
+		echo "[ERROR] Commit SHA $commit_sha of git submodule at $(dirname "$git_directory") was NOT found in its $default_branch_name"
+		problem_found="true"
+	else
+		echo "[ OK! ] Commit SHA $commit_sha of git submodule at $(dirname "$git_directory") was found in its $default_branch_name"
+	fi
 
 done
 
 if [ "$problem_found" = "true" ]; then
-    echo "Exiting because commit SHA was not first merged into $default_branch_name"
-    exit 1
+	echo "Exiting because commit SHA was not first merged into $default_branch_name"
+	exit 1
 fi
