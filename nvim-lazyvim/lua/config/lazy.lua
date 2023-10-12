@@ -11,8 +11,8 @@ require("lazy").setup({
     -- add LazyVim and import its plugins
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
 
-    { import = "lazyvim.plugins.extras.formatting.conform" },
-    { import = "lazyvim.plugins.extras.linting.nvim-lint" },
+    -- enable this, with specific branch, during testing of pre-relases
+    -- { "LazyVim/LazyVim", branch = "refactor", version = false },
 
     { import = "lazyvim.plugins.extras.lang.docker" },
     { import = "lazyvim.plugins.extras.lang.go" },
