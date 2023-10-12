@@ -46,6 +46,10 @@ Darwin)
 		# export GOROOT=/opt/homebrew/Cellar/go
 		# export PATH=$PATH:$GOROOT/bin
 	fi
+
+	# ruby
+	export PATH=/opt/homebrew/opt/ruby/bin:$PATH
+
 	;;
 
 Linux)
