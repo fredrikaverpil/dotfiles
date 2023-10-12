@@ -3,8 +3,10 @@
 
 function virtual_env_activate() {
 	if [[ -z "$VIRTUAL_ENV" ]]; then
+		echo "Checking..."
 		# if .venv folder is found then activate the vitualenv
 		if [ -d ./.venv ] && [ -f ./.venv/bin/activate ]; then
+			echo "Activating..."
 			source ./.venv/bin/activate
 		fi
 	else
@@ -46,19 +48,6 @@ fi
 #     . ~/.nix-profile/etc/profile.d/nix.sh
 # fi
 
-# Pyenv + auto venv activation on cd
-if [ -d ~/.pyenv ]; then
-	eval "$(pyenv init --path)"
-	# eval "$(pyenv virtualenv-init -)"
-	cd . # trigger virtual_env_activate via cd hook
-
-	function cd() {
-		builtin cd "$@" || return
-		virtual_env_activate
-		node_version_manager
-	}
-fi
-
 # NVM
 if [ -s "/opt/homebrew/opt/nvm/nvm.sh" ]; then
 	. "/opt/homebrew/opt/nvm/nvm.sh"
@@ -74,6 +63,27 @@ fi
 if [ -f ~/.cargo/env ]; then
 	. "$HOME/.cargo/env"
 fi
+
+# Evaluate on cd and on initial shell load
+if [ -d ~/.pyenv ] && [ -d ~/.nvm ]; then
+	eval "$(pyenv init --path)"
+	# eval "$(pyenv virtualenv-init -)"
+	cd . # trigger virtual_env_activate via cd hook
+
+	function cd() {
+		builtin cd "$@" || return
+		virtual_env_activate
+		node_version_manager
+	}
+
+	# Run on initial shell load
+	virtual_env_activate
+	node_version_manager
+fi
+
+# ----------------------------------
+# shell-specific configuration below
+# ----------------------------------
 
 if [ -n "${ZSH_VERSION}" ]; then
 	# assume zsh
