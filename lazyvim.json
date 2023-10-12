@@ -1,1 +1,29 @@
-{"hashes":{"\/Users\/fredrik\/.local\/share\/LazyVim\/lazy\/LazyVim\/NEWS.md":"2035"},"extras":["coding.yanky","dap.core","dap.nlua","editor.aerial","editor.mini-files","editor.navic","formatting.prettier","lang.docker","lang.go","lang.json","lang.ruby","lang.rust","lang.tailwind","lang.terraform","lang.typescript","lang.yaml","linting.eslint","test.core","ui.edgy","util.mini-hipatterns","util.project","vscode"]}
+{
+  "extras": [
+    "coding.yanky",
+    "dap.core",
+    "dap.nlua",
+    "editor.aerial",
+    "editor.mini-files",
+    "editor.navic",
+    "formatting.prettier",
+    "lang.docker",
+    "lang.go",
+    "lang.json",
+    "lang.ruby",
+    "lang.rust",
+    "lang.tailwind",
+    "lang.terraform",
+    "lang.typescript",
+    "lang.yaml",
+    "linting.eslint",
+    "test.core",
+    "ui.edgy",
+    "util.mini-hipatterns",
+    "util.project",
+    "vscode"
+  ],
+  "news": {
+    "NEWS.md": "2035"
+  }
+}
