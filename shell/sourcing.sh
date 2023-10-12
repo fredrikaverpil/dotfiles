@@ -45,10 +45,8 @@ fi
 # NVM
 if [ -s "/opt/homebrew/opt/nvm/nvm.sh" ]; then
 	. "/opt/homebrew/opt/nvm/nvm.sh"
-
 elif [ -s "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" ]; then
 	. "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"
-
 elif [ -s "$HOME/.nvm/nvm.sh" ]; then
 	. "$HOME/.nvm/nvm.sh"
 fi
@@ -101,6 +99,10 @@ if [ -n "${ZSH_VERSION}" ]; then
 	# zoxide
 	eval "$(zoxide init zsh)"
 
+	# google-cloud-sdk
+	source "$(brew --prefix)/share/google-cloud-sdk/path.zsh.inc"
+	source "$(brew --prefix)/share/google-cloud-sdk/completion.zsh.inc"
+
 elif [ -n "${BASH_VERSION}" ]; then
 	# assume Bash
 
@@ -132,6 +134,9 @@ elif [ -n "${BASH_VERSION}" ]; then
 	if [ -f ~/.orbstack/shell/init.bash ]; then
 		source ~/.orbstack/shell/init.bash 2>/dev/null || :
 	fi
+
+	# google-cloud-sdk
+	source "$(brew --prefix)/share/google-cloud-sdk/path.bash.inc"
 
 fi
 

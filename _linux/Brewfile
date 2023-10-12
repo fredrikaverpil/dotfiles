@@ -48,3 +48,6 @@ brew 'gnu-sed'  # spectre
 brew 'pkg-config'  # gh-actions.nvim
 brew 'node'  # various LSPs like prettier, pyright
 
+# other casks
+cask 'google-cloud-sdk'
+

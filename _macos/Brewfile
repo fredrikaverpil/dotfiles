@@ -60,3 +60,6 @@ cask 'visual-studio-code'
 cask 'pgadmin4'
 cask 'spotify'
 cask 'airbuddy'
+
+# other casks
+cask 'google-cloud-sdk'
