@@ -1,12 +1,14 @@
 # shellcheck shell=bash
 # shellcheck source=/dev/null
 
+# ----------------------------
+# functions and shell-agnostic
+# ----------------------------
+
 function virtual_env_activate() {
 	if [[ -z "$VIRTUAL_ENV" ]]; then
-		echo "Checking..."
 		# if .venv folder is found then activate the vitualenv
 		if [ -d ./.venv ] && [ -f ./.venv/bin/activate ]; then
-			echo "Activating..."
 			source ./.venv/bin/activate
 		fi
 	else
@@ -36,17 +38,9 @@ function node_version_manager() {
 # Homebrew
 if [ -f /opt/homebrew/bin/brew ]; then
 	eval "$(/opt/homebrew/bin/brew shellenv)"
-fi
-
-# Linuxbrew
-if [ -f /home/linuxbrew/.linuxbrew/bin/brew ]; then
+elif [ -f /home/linuxbrew/.linuxbrew/bin/brew ]; then
 	eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
-
-# # Nix
-# if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then
-#     . ~/.nix-profile/etc/profile.d/nix.sh
-# fi
 
 # NVM
 if [ -s "/opt/homebrew/opt/nvm/nvm.sh" ]; then
@@ -64,26 +58,9 @@ if [ -f ~/.cargo/env ]; then
 	. "$HOME/.cargo/env"
 fi
 
-# Evaluate on cd and on initial shell load
-if [ -d ~/.pyenv ] && [ -d ~/.nvm ]; then
-	eval "$(pyenv init --path)"
-	# eval "$(pyenv virtualenv-init -)"
-	cd . # trigger virtual_env_activate via cd hook
-
-	function cd() {
-		builtin cd "$@" || return
-		virtual_env_activate
-		node_version_manager
-	}
-
-	# Run on initial shell load
-	virtual_env_activate
-	node_version_manager
-fi
-
-# ----------------------------------
-# shell-specific configuration below
-# ----------------------------------
+# ----------------------------
+# shell-specific configuration
+# ----------------------------
 
 if [ -n "${ZSH_VERSION}" ]; then
 	# assume zsh
@@ -155,5 +132,25 @@ elif [ -n "${BASH_VERSION}" ]; then
 	if [ -f ~/.orbstack/shell/init.bash ]; then
 		source ~/.orbstack/shell/init.bash 2>/dev/null || :
 	fi
+
+fi
+
+# ----------------------------------
+# hooks and on-shell load evaluation
+# ----------------------------------
+
+# Evaluate on cd and on initial shell load
+if [ -d ~/.pyenv ] && [ -d ~/.nvm ]; then
+
+	eval "$(pyenv init --path)"
+	# eval "$(pyenv virtualenv-init -)"
+
+	function cd() {
+		builtin cd "$@" || return
+		virtual_env_activate
+		node_version_manager
+	}
+
+	cd . # trigger virtual_env_activate via cd hook (for initial shell load)
 
 fi
