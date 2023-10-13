@@ -1,29 +1,30 @@
 {
   "extras": [
-    "coding.yanky",
-    "dap.core",
-    "dap.nlua",
-    "editor.aerial",
-    "editor.mini-files",
-    "editor.navic",
-    "formatting.prettier",
-    "lang.docker",
-    "lang.go",
-    "lang.json",
-    "lang.ruby",
-    "lang.rust",
-    "lang.tailwind",
-    "lang.terraform",
-    "lang.typescript",
-    "lang.yaml",
-    "linting.eslint",
-    "test.core",
-    "ui.edgy",
-    "util.mini-hipatterns",
-    "util.project",
-    "vscode"
+    "lazyvim.plugins.extras.dap.core",
+    "lazyvim.plugins.extras.test.core",
+    "lazyvim.plugins.extras.coding.yanky",
+    "lazyvim.plugins.extras.dap.nlua",
+    "lazyvim.plugins.extras.editor.mini-files",
+    "lazyvim.plugins.extras.editor.navic",
+    "lazyvim.plugins.extras.formatting.prettier",
+    "lazyvim.plugins.extras.lang.docker",
+    "lazyvim.plugins.extras.lang.go",
+    "lazyvim.plugins.extras.lang.json",
+    "lazyvim.plugins.extras.lang.ruby",
+    "lazyvim.plugins.extras.lang.rust",
+    "lazyvim.plugins.extras.lang.tailwind",
+    "lazyvim.plugins.extras.lang.terraform",
+    "lazyvim.plugins.extras.lang.typescript",
+    "lazyvim.plugins.extras.lang.yaml",
+    "lazyvim.plugins.extras.linting.eslint",
+    "lazyvim.plugins.extras.ui.edgy",
+    "lazyvim.plugins.extras.util.mini-hipatterns",
+    "lazyvim.plugins.extras.util.project",
+    "lazyvim.plugins.extras.vscode",
+    "lazyvim.plugins.extras.editor.aerial"
   ],
   "news": {
-    "NEWS.md": "2035"
-  }
+    "NEWS.md": "2123"
+  },
+  "version": 2
 }
