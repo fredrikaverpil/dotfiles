@@ -20,8 +20,8 @@ cask 'karabiner-elements'
 # fonts
 cask 'font-jetbrains-mono'
 cask 'font-symbols-only-nerd-font'
-cask 'font-noto-emoji'
 cask 'font-noto-color-emoji'
+cask 'font-noto-emoji'
 
 # terminal cli tools
 brew 'bash'
