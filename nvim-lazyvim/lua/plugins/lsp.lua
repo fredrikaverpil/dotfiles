@@ -160,23 +160,40 @@ return {
       formatters.stylua.args =
         vim.list_extend({ "--indent-type", "Spaces", "--indent-width", "2" }, formatters.stylua.args)
 
-      local formatters_by_ft = {
-        -- this extends lazyvim's conform setup
-        -- https://www.lazyvim.org/extras/formatting/conform
-        lua = { "stylua" },
-        sh = { "shfmt" },
-        go = { "gofumpt", "gci" }, -- goimports is not needed as gci is used
+      local remove_from_formatters = {}
+      local extend_formatters_with = {
         protobuf = { "buf" },
         python = { "isort", "black" },
         rust = { "rustfmt" },
       }
+      local replace_formatters_with = {
+        go = { "gofumpt", "gci" },
+      }
 
-      -- extend opts.formatters_by_ft
       -- NOTE: conform.nvim can use a sub-list to run only the first available formatter (see docs)
-      for ft, formatters_ in pairs(formatters_by_ft) do
+
+      -- remove from opts.formatters_by_ft
+      for ft, formatters_ in pairs(remove_from_formatters) do
+        opts.formatters_by_ft[ft] = vim.tbl_filter(function(formatter)
+          return not vim.tbl_contains(formatters_, formatter)
+        end, opts.formatters_by_ft[ft])
+      end
+      -- extend opts.formatters_by_ft
+      for ft, formatters_ in pairs(extend_formatters_with) do
         opts.formatters_by_ft[ft] = opts.formatters_by_ft[ft] or {}
         vim.list_extend(opts.formatters_by_ft[ft], formatters_)
       end
+      -- replace opts.formatters_by_ft
+      for ft, formatters_ in pairs(replace_formatters_with) do
+        opts.formatters_by_ft[ft] = formatters_
+      end
+
+      -- review opts.formatters_by_ft by uncommenting the below
+      -- vim.api.nvim_echo(
+      --   { { "opts.formatters_by_ft", "None" }, { vim.inspect(opts.formatters_by_ft), "None" } },
+      --   false,
+      --   {}
+      -- )
     end,
   },
 
