@@ -18,7 +18,7 @@ brew 'skhd'
 cask 'karabiner-elements'
 
 # fonts
-cask 'font-jetbrains-mono'
+cask 'font-jetbrains-mono-nerd-font'
 cask 'font-symbols-only-nerd-font'
 cask 'font-noto-color-emoji'
 cask 'font-noto-emoji'

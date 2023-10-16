@@ -12,7 +12,7 @@ config.check_for_updates_interval_seconds = 86400
 -- https://github.com/ryanoasis/nerd-fonts/releases
 -- https://fonts.google.com/noto/specimen/Noto+Color+Emoji
 config.font = wezterm.font_with_fallback({
-  { family = "JetBrains Mono", weight = "Regular", harfbuzz_features = { "calt=0", "clig=0", "liga=0" } },
+  { family = "JetBrainsMono Nerd Font", weight = "Regular", harfbuzz_features = { "calt=0", "clig=0", "liga=0" } },
   { family = "Symbols Nerd Font Mono" },
   { family = "Noto Color Emoji" },
   { family = "Noto Emoji" },
