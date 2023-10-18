@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
 # This script is used to manage dependabot PRs and assumes you have merge queue enabled.
 #
@@ -6,36 +6,49 @@
 # - Search values for "status": https://docs.github.com/en/rest/guides/using-the-rest-api-to-interact-with-checks
 # https://docs.github.com/en/search-github/searching-on-github/searching-issues-and-pull-requests#search-by-commit-status
 
-# Get arguments and set the title to search for accordingly
-# TODO: 2023-06-20 the PR search does not seem to work when differentiating on chore(deps) vs chore(deps-dev) any longer...
+# Filter on dev dependencies only
+# NOTE: requires that PRs are labeled with "chore(dev-deps)". This can be achieved with dependabot config:
+#
+# ```yaml
+# commit-message:
+#   prefix: "chore"
+#   include: "scope"
+# ````
+#
+# NOTE: GitHub cannot search certain characters, see https://github.com/isaacs/github/issues/402
 if [[ "$1" == "--dev" ]]; then
-	shift
-	title="chore(dev-deps)"
+	# shift
+	filter_dev="chore(dev-deps) in:title"
+	echo "Filtering on dev dependencies only, using search term '$filter_dev'"
 else
-	title="chore(deps)"
-fi
-echo "Searching using title: $title"
-
-# Get the list of dependabot PR numbers
-pending_prs=$(gh pr list --app dependabot --json number --jq '.[].number' --search "is:open draft:false status:pending $title in:title")
-successful_prs=$(gh pr list --app dependabot --json number --jq '.[].number' --search "is:open draft:false status:success $title in:title")
-prs_with_no_failures="$pending_prs"$'\n'"$successful_prs"
-prs_with_failures=$(gh pr list --app dependabot --json number --jq '.[].number' --search "is:open draft:false status:failure $title in:title")
-
-if [[ -z "$prs_with_no_failures" ]]; then
-	echo "No PRs found with no failures"
-else
-	echo "Found PRs with no failures: $prs_with_no_failures"
+	filter_dev=""
 fi
 
-if [[ -z "$prs_with_failures" ]]; then
-	echo "No PRs found with failures"
-else
-	echo "Found PRs with failures: $prs_with_failures"
-fi
+failing_prs=""
+pending_prs=""
+successful_prs=""
+for pr_id in $(gh pr list --json number -q '.[].number' --search "is:open draft:false $filter_dev"); do
+	checks=$(gh pr checks $pr_id 2>&1)
+
+	# debug
+	# echo $checks
+
+	# Assuming "success" is the keyword for a successful check
+	if echo "$checks" | grep -q 'fail'; then
+		failing_prs="$failing_prs"$'\n'"$pr_id"
+	elif echo "$checks" | grep -q 'pending'; then
+		pending_prs="$pending_prs"$'\n'"$pr_id"
+	else
+		successful_prs="$successful_prs"$'\n'"$pr_id"
+	fi
+done
+
+echo "Found failing PRs: $failing_prs"
+echo "Found pending PRs: $pending_prs"
+echo "Found successful PRs: $successful_prs"
 
 # Iterate over each PR which has no CI failure
-for pr_number in $prs_with_no_failures; do
+for pr_number in $successful_prs; do
 
 	if gh pr view "$pr_number" --json mergeable --jq '.mergeable' | grep -q CONFLICTING; then
 		echo "Found conflict, asking dependabot to recreate $pr_number"
@@ -51,11 +64,15 @@ for pr_number in $prs_with_no_failures; do
 
 	else
 		echo "Processing $pr_number for merging..."
+
+		# debug
 		gh pr view "$pr_number" --json mergeStateStatus
 
 		if ! gh pr view "$pr_number" --json reviewDecision --jq '.reviewDecision' | grep -q APPROVED; then
 			echo "Approving PR $pr_number"
 			gh pr review --approve "$pr_number"
+		else
+			echo "PR $pr_number already approved"
 		fi
 
 		echo "Merging PR $pr_number"
@@ -65,7 +82,7 @@ for pr_number in $prs_with_no_failures; do
 done
 
 # Iterate over PRs with failed CI checks
-for pr_number in $prs_with_failures; do
+for pr_number in $failing_prs; do
 	echo "Showing failed checks for $pr_number"
 	gh pr checks "$pr_number"
 done
