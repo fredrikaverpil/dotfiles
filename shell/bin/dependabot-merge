@@ -54,13 +54,13 @@ for pr_number in $successful_prs; do
 		echo "Found conflict, asking dependabot to recreate $pr_number"
 		gh pr comment "$pr_number" --body "@dependabot recreate"
 
-	# elif gh pr view "$pr_number" --json mergeStateStatus | grep -q BEHIND; then
-	# 	echo "Might be in need of rebasing."
-
-	# elif gh pr view "$pr_number" --json mergeStateStatus | grep -q BLOCKED; then
-	# 	# if a CI check is skipped, it will be blocked
-	# 	echo "Found blocked PR, showing checks for $pr_number"
-	# 	gh pr checks "$pr_number"
+	# elif gh pr view "$pr_number" --json mergeStateStatus --jq '.mergeStateStatus' | grep -q BEHIND; then
+	# 	if gh pr view 2392 --json body --jq '.body' | grep "Dependabot is rebasing this PR"; then
+	# 		echo "Dependabot is rebasing this PR, skipping $pr_number"
+	# 	else
+	# 		echo "Found behind PR, asking dependabot to rebase $pr_number"
+	# 		gh pr comment "$pr_number" --body "@dependabot rebase"
+	# 	fi
 
 	else
 		echo "Processing $pr_number for merging..."
