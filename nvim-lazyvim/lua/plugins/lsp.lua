@@ -167,7 +167,7 @@ return {
         rust = { "rustfmt" },
       }
       local replace_formatters_with = {
-        go = { "gofumpt", "gci" },
+        go = { "gofumpt", "goimports", "gci" },
       }
 
       -- NOTE: conform.nvim can use a sub-list to run only the first available formatter (see docs)
