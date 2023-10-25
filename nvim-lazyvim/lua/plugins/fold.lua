@@ -2,7 +2,7 @@ return {
 
   {
     "kevinhwang91/nvim-ufo",
-    enabled = false, -- lazyvim supports this now out of the box
+    enabled = true, -- can be disabled with neovim nightly as LazyVim implements folding too
     dependencies = {
       "kevinhwang91/promise-async",
       "nvim-treesitter/nvim-treesitter",
