@@ -4,11 +4,18 @@
 # Taps (third-party repositories)
 tap 'homebrew/bundle'
 # tap 'homebrew/core'
+tap 'homebrew/linux-fonts'
 tap 'withgraphite/tap'
 tap 'cantino/mcfly'
 tap 'oven-sh/bun'
 
 # system
+
+# fonts
+cask 'font-jetbrains-mono-nerd-font'
+cask 'font-symbols-only-nerd-font'
+cask 'font-noto-color-emoji'
+cask 'font-noto-emoji'
 
 # terminal cli tools
 brew 'starship'
