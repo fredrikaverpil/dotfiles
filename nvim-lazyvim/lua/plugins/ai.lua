@@ -5,6 +5,14 @@ local is_public_project = function()
   local work_path = repos_path .. "/doktor" -- TODO: change this to a "work" or "work/private" folder at some point
   local is_work = string.find(current_dir, work_path) == 1
 
+  -- TODO: temporary hack to disable copilot for strings occuring in project paths
+  local banned_strings = { "interview" }
+  for _, banned_string in ipairs(banned_strings) do
+    if string.find(current_dir, banned_string) then
+      return false
+    end
+  end
+
   if is_work then
     return false
   else
