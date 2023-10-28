@@ -6,3 +6,7 @@
 vim.opt.listchars = "tab:▸ ,trail:·,nbsp:␣,extends:❯,precedes:❮" -- show symbols for whitespace
 vim.opt.relativenumber = false -- relative line numbers
 -- vim.opt.scrolloff = 10 -- keep 20 lines above and below the cursor
+
+-- project specific settings
+vim.opt.exrc = true -- allow local .nvim.lua .vimrc .exrc files
+vim.opt.secure = true -- disable shell and write commands in local .nvim.lua .vimrc .exrc files
