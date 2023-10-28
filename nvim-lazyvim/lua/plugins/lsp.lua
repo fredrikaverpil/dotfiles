@@ -34,7 +34,7 @@ return {
         "ruff-lsp", -- lsp
         "ruff", -- linter (but used as formatter)
         "pyright", -- lsp
-        -- "black", -- formatter
+        "black", -- formatter
         "mypy", -- linter
 
         -- lua
@@ -164,7 +164,7 @@ return {
       formatters.stylua.args =
         vim.list_extend({ "--indent-type", "Spaces", "--indent-width", "2" }, formatters.stylua.args)
 
-      local remove_from_formatters = {}
+      local removeck_from_formatters = {}
       local extend_formatters_with = {
         protobuf = { "buf" },
         python = { "ruff_fix", "ruff_format" },
