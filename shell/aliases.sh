@@ -5,6 +5,7 @@
 
 # Global settings
 alias repos='cd ~/code/repos'
+alias dotfiles='cd ~/code/repos/dotfiles'
 # alias ll='ls -alhF'
 alias ll='eza --long --header --group-directories-first --git --group --all'
 alias tree='tree -C'
