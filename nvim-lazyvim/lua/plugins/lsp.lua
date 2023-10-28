@@ -32,8 +32,9 @@ return {
       local ensure_installed = {
         -- python
         "ruff-lsp", -- lsp
+        "ruff", -- linter (but used as formatter)
         "pyright", -- lsp
-        "black", -- formatter
+        -- "black", -- formatter
         "mypy", -- linter
 
         -- lua
@@ -156,6 +157,9 @@ return {
     enabled = true,
     opts = function(_, opts)
       local formatters = require("conform.formatters")
+      formatters.ruff_fix.command = prefer_bin_from_venv("ruff")
+      formatters.ruff_format.command = prefer_bin_from_venv("ruff")
+      formatters.isort.command = prefer_bin_from_venv("isort")
       formatters.black.command = prefer_bin_from_venv("black")
       formatters.stylua.args =
         vim.list_extend({ "--indent-type", "Spaces", "--indent-width", "2" }, formatters.stylua.args)
@@ -163,7 +167,7 @@ return {
       local remove_from_formatters = {}
       local extend_formatters_with = {
         protobuf = { "buf" },
-        python = { "isort", "black" },
+        python = { "ruff_fix", "ruff_format" },
         rust = { "rustfmt" },
       }
       local replace_formatters_with = {
