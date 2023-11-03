@@ -37,6 +37,8 @@ brew 'bat'
 brew 'withgraphite/tap/graphite'
 brew 'kubectx'
 brew 'zoxide'
+brew 'circumflex'
+brew 'ollama'
 
 # slides
 brew 'slides'
