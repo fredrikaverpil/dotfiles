@@ -2,12 +2,16 @@
 
 # This script is used to manage dependabot PRs and assumes you have merge queue enabled.
 #
-# Docs:
-# - Search values for "status": https://docs.github.com/en/rest/guides/using-the-rest-api-to-interact-with-checks
-# https://docs.github.com/en/search-github/searching-on-github/searching-issues-and-pull-requests#search-by-commit-status
+# Relevant GitHub docs
+# - Interact with PR checks via REST API: https://docs.github.com/en/rest/guides/using-the-rest-api-to-interact-with-checks
+# - Search by commit status: https://docs.github.com/en/search-github/searching-on-github/searching-issues-and-pull-requests#search-by-commit-status
+# NOTE: GitHub cannot search certain characters, see https://github.com/isaacs/github/issues/402
 
-# Filter on dev dependencies only
-# NOTE: requires that PRs are labeled with "chore(dev-deps)". This can be achieved with dependabot config:
+# Features:
+# - Auto-approve if CI checks passed.
+# - Auto-queue (onto merge queue) if CI checks passed.
+# - Filter on dev dependencies only, using `--dev` flag
+#   NOTE: requires that PRs are labeled with "chore(dev-deps)". This can be achieved with dependabot config:
 #
 # ```yaml
 # commit-message:
@@ -15,7 +19,7 @@
 #   include: "scope"
 # ````
 #
-# NOTE: GitHub cannot search certain characters, see https://github.com/isaacs/github/issues/402
+
 if [[ "$1" == "--dev" ]]; then
 	# shift
 	filter_dev="chore(dev-deps) in:title"
