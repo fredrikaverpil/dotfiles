@@ -9,6 +9,7 @@ Thumbs.db
 
 # Editing
 .vscode
+.nvim.lua
 
 # byte-compiled / optimized / dll files
 __pycache__/
