@@ -105,9 +105,19 @@ return {
       { "nvim-lua/plenary.nvim" },
       { "nvim-telescope/telescope.nvim" },
     },
+    -- event = "VeryLazy",
     config = function()
       require("chatgpt").setup({
-        -- optional configuration
+        actions_paths = { "~/code/repos/dotfiles/nvim-lazyvim/chatgpt-actions.json" },
+        openai_params = {
+          model = "gpt-4",
+        },
+        openai_edit_params = {
+          model = "gpt-3.5-turbo",
+          temperature = 0,
+          top_p = 1,
+          n = 1,
+        },
       })
     end,
   },
