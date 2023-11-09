@@ -50,7 +50,7 @@
   // Editor
   "editor.minimap.renderCharacters": false,
   "editor.suggestSelection": "first",
-  "editor.fontFamily": "'JetBrains Mono', 'FiraCode Nerd Font', 'Cascadia Code', Consolas, 'Courier New', monospace",
+  "editor.fontFamily": "'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'Cascadia Code', Consolas, 'Courier New', monospace",
   "editor.fontSize": 13,
   "editor.fontWeight": "normal",
   "editor.inlineSuggest.enabled": true,
@@ -221,18 +221,6 @@
   "python.terminal.activateEnvironment": false,
   "python.languageServer": "Pylance",
   "python.analysis.typeCheckingMode": "basic",
-  "python.formatting.provider": "black",
-  "python.linting.enabled": false, // use ruff-vscode instead
-  "python.linting.flake8Enabled": false,
-  "python.linting.pylintEnabled": false, // prefer flake8 instead
-  "python.linting.mypyEnabled": true, // use mypy extension instead, as this is not reliable
-  // "python.linting.mypyArgs": [
-  // "--follow-imports=silent",
-  // "--ignore-missing-imports",
-  // "--show-column-numbers",
-  // "--no-pretty",
-  // "--strict"
-  // ],
   "ruff.importStrategy": "fromEnvironment",
   // "ruff.fixAll": false,
   // "ruff.organizeImports": true,
