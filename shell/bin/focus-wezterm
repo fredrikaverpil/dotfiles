@@ -1,0 +1,39 @@
+#!/bin/sh
+
+get_wezterm_window() {
+	WINDOWS_JSON=$(yabai -m query --windows)
+	for WINDOW_ID in $(echo $WINDOWS_JSON | jq '.[] | select(.app == "WezTerm" or .app == "wezterm-gui") | .id'); do
+		WINDOW_ID=$(echo $WINDOW_ID | tr -d '"')
+		echo $WINDOW_ID
+	done
+}
+
+WINDOW_ID=$(get_wezterm_window)
+
+if [ -n "$WINDOW_ID" ]; then
+	# if window id is found, focus it
+	yabai -m window $WINDOW_ID --focus
+	exit 0
+else
+	# if no window was found, open wezterm
+	WezTerm &
+
+	# wait until window_id is found, then focus it and toggle full screen
+	counter=0
+	while [ -z "$WINDOW_ID" ]; do
+		WINDOW_ID=$(get_wezterm_window)
+		if [ -n "$WINDOW_ID" ]; then
+			# if window id is found, focus it and toggle full screen
+			yabai -m window $WINDOW_ID --focus
+			yabai -m window $WINDOW_ID --toggle native-fullscreen
+			exit 0
+		fi
+
+		# prevent infinite loop
+		sleep 0.1
+		counter=$((counter + 1))
+		if [ $counter -gt 10 ]; then
+			exit 1
+		fi
+	done
+fi
