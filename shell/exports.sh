@@ -1,12 +1,12 @@
 # shellcheck shell=bash
 
 # Global settings
-export PIP_REQUIRE_VIRTUALENV=true                      # use --isolated to bypass
-export PATH="$HOME/.local/bin:$PATH"                    # pipx-installed binaries
-export PYENV_ROOT="$HOME/.pyenv"                        # pyenv
-export PATH="$PYENV_ROOT/bin:$PATH"                     # pyenv
-export PATH="$PATH:$HOME/code/repos/dotfiles/shell/bin" # dotfiles-bin
-export PATH="$PATH:$HOME/.cargo/bin"                    # rust
+export PIP_REQUIRE_VIRTUALENV=true                # use --isolated to bypass
+export PATH="$HOME/.local/bin:$PATH"              # pipx-installed binaries
+export PYENV_ROOT="$HOME/.pyenv"                  # pyenv
+export PATH="$PYENV_ROOT/bin:$PATH"               # pyenv
+export PATH="$PATH:$HOME/code/dotfiles/shell/bin" # dotfiles-bin
+export PATH="$PATH:$HOME/.cargo/bin"              # rust
 
 # Load .env file if it exists
 # shellcheck disable=SC1090

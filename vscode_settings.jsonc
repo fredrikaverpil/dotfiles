@@ -211,9 +211,9 @@
   // Extension: Project Manager
   "projectManager.sortList": "Name",
   "projectManager.git.baseFolders": [
-    "~/code/repos/doktor",
-    "\\\\wsl.localhost\\Ubuntu-20.04\\home\\fredrik\\code\\repos",
-    "~/code/repos"
+    "~/code/_work",
+    "\\\\wsl.localhost\\Ubuntu-20.04\\home\\fredrik\\code",
+    "~/code"
   ],
   "projectManager.git.maxDepthRecursion": 1,
 

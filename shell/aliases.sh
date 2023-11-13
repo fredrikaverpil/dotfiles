@@ -4,8 +4,7 @@
 # See bin folder for scripts which will run in their own shell
 
 # Global settings
-alias repos='cd ~/code/repos'
-alias dotfiles='cd ~/code/repos/dotfiles'
+alias dotfiles='cd ~/code/dotfiles'
 # alias ll='ls -alhF'
 alias ll='eza --long --header --group-directories-first --git --group --all'
 alias tree='tree -C'
@@ -15,10 +14,6 @@ if command -v kitty &>/dev/null; then
 	alias icat='kitty +kitten icat'
 	alias diff='kitty +kitten diff'
 fi
-
-# Doktor
-alias doktor='cd ~/code/repos/doktor'
-alias mux='cd ~/code/repos/doktor && tmuxinator'
 
 # Git
 alias git-purge='git branch --merged | egrep -v "(^\*|master|main|dev)" | xargs git branch -d'

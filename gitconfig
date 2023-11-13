@@ -44,5 +44,5 @@
     path = ~/.gitconfig_1password
 
 # Always keep gitconfig for work at bottom of this file
-[includeIf "gitdir:~/code/repos/doktor/**/.git"]
+[includeIf "gitdir:~/code/_work/**/.git"]
 	path = ~/.gitconfig_doktor

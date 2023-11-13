@@ -1,19 +1,13 @@
-local is_public_project = function()
+local enable_ai = function()
   local current_dir = vim.fn.getcwd()
   local home_dir = os.getenv("HOME") or os.getenv("USERPROFILE")
-  local repos_path = home_dir .. "/code/repos"
-  local work_path = repos_path .. "/doktor" -- TODO: change this to a "work" or "work/private" folder at some point
-  local is_work = string.find(current_dir, work_path) == 1
+  local code_path = home_dir .. "/code"
 
-  -- TODO: temporary hack to disable copilot for strings occuring in project paths
-  local banned_strings = { "interview" }
-  for _, banned_string in ipairs(banned_strings) do
-    if string.find(current_dir, banned_string) then
-      return false
-    end
-  end
+  -- if git repo is filed under ~/code/_private, do not allow AI
+  local private_path = code_path .. "/_private"
+  local is_code_private = string.find(current_dir, private_path) == 1
 
-  if is_work then
+  if is_code_private then
     return false
   else
     return true
@@ -55,7 +49,7 @@ return {
       end
 
       -- disable copilot if we are in a private project
-      if not is_public_project() then
+      if not enable_ai() then
         vim.cmd("Copilot disable")
       end
     end,
@@ -108,7 +102,7 @@ return {
     -- event = "VeryLazy",
     config = function()
       require("chatgpt").setup({
-        actions_paths = { "~/code/repos/dotfiles/nvim-lazyvim/chatgpt-actions.json" },
+        actions_paths = { "~/code/dotfiles/nvim-lazyvim/chatgpt-actions.json" },
         openai_params = {
           model = "gpt-4",
         },

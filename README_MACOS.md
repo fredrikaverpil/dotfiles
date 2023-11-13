@@ -5,7 +5,7 @@
 Install:
 
 ```bash
-mkdir -p code/repos && cd code/repos
+mkdir -p code && cd code
 git clone https://github.com/fredrikaverpil/dotfiles.git
 cd dotfiles && ./install -vv
 ```

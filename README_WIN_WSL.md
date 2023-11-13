@@ -72,7 +72,7 @@ winget install --accept-package-agreements --source msstore "Auto Dark Mode" --i
 From the Ubuntu prompt:
 
 ```bash
-mkdir -p code/repos && cd code/repos
+mkdir -p code && cd code
 git clone https://github.com/fredrikaverpil/dotfiles.git
 cd dotfiles && ./install -vv
 ```
@@ -84,7 +84,7 @@ cd dotfiles && ./install -vv
 From administrative Powershell prompt:
 
 ```powershell
-cd \\wsl.localhost\Ubuntu\home\fredrik\code\repos\dotfiles
+cd \\wsl.localhost\Ubuntu\home\fredrik\code\dotfiles
 
 New-Item -ItemType SymbolicLink -Path $HOME\.wezterm.lua -Value wezterm.lua
 ```
@@ -105,7 +105,7 @@ Run from administrative Powershell prompt:
 rm $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
 
 # Create symlink into WSL2's dotfiles repo
-cd \\wsl.localhost\Ubuntu\home\fredrik\code\repos\dotfiles
+cd \\wsl.localhost\Ubuntu\home\fredrik\code\dotfiles
 
 New-Item -ItemType SymbolicLink -Path $HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json -Value _windows\terminal_settings.json
 ```
@@ -124,7 +124,7 @@ Note: this assumes Autohotkey Sharpkeys and PureText are already installed.
 - Install `autohotkey.ahk` by running this from a Powershell prompt:
 
 ```powershell
-cp \\wsl.localhost\Ubuntu\home\fredrik\code\repos\dotfiles\_windows\autohotkey.ahk "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\autohotkey.ahk"
+cp \\wsl.localhost\Ubuntu\home\fredrik\code\dotfiles\_windows\autohotkey.ahk "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\autohotkey.ahk"
 ```
 
 <details>
@@ -140,7 +140,7 @@ New-Item -ItemType SymbolicLink -Path "$env:APPDATA\Microsoft\Windows\Start Menu
 
 </details>
 
-- To override <kbd>Win (Left)</kbd> + <kbd>l</kbd>, launch Sharpkeys, load the `\\wsl.localhost\Ubuntu\home\fredrik\code\repos\dotfiles\_windows\sharpkeys.skl` file and write changes to the Registry.
+- To override <kbd>Win (Left)</kbd> + <kbd>l</kbd>, launch Sharpkeys, load the `\\wsl.localhost\Ubuntu\home\fredrik\code\dotfiles\_windows\sharpkeys.skl` file and write changes to the Registry.
 - In PureText, remap (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>v</kbd>) to enable pasting of text without formatting.
 
 ### Ubuntu configuration
@@ -169,7 +169,7 @@ chsh
 
 ```bash
 # install homebrew
-cd ~/code/repos/dotfiles
+cd ~/code/dotfiles
 installers/homebrew.sh
 
 # install all dependencies
@@ -185,7 +185,7 @@ You can now restart wezterm and you should be taken into Ubuntu/zsh with prompt 
 rm -rf ~/.config/LazyVim
 
 
-cd ~/code/repos/dotfiles
+cd ~/code/dotfiles
 installers/neovim_distros.sh
 
 # re-run dotfiles installer, to symlink LazyVim config
