@@ -1,4 +1,3 @@
 #!/bin/bash
 
 code --list-extensions >vscode_extensions.txt
-code-insiders --list-extensions >vscode_extensions.txt
