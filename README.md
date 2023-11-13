@@ -9,7 +9,7 @@ These are my personal dotfiles, for macOS, Windows + WSL. The setup is based on 
 - [macOS](README_MACOS.md)
 - [Windows 11 + WSL](README_WIN_WSL.md)
 
-### Git
+### Git 🐙
 
 - [Configure git](README_GIT.md)
 
