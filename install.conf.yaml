@@ -36,10 +36,6 @@
       path: vscode_settings.jsonc
       force: true
       if: '[ "$(uname -s)" = "Darwin" ]'
-    ~/Library/Application Support/Code - Insiders/User/settings.json:
-      path: vscode-insiders_settings.jsonc
-      force: true
-      if: '[ "$(uname -s)" = "Darwin" ]'
     # ~/Library/KeyBindings/DefaultKeyBinding.dict:
     #  # Remap US English layout's ['; keys to Swedish åäö keys
     #  # However, this works poorly, so commented out for now
