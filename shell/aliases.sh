@@ -4,7 +4,7 @@
 # See bin folder for scripts which will run in their own shell
 
 # Global settings
-alias dotfiles='cd ~/code/dotfiles'
+alias dotfiles='cd $DOTFILES'
 # alias ll='ls -alhF'
 alias ll='eza --long --header --group-directories-first --git --group --all'
 alias tree='tree -C'

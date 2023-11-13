@@ -1,6 +1,7 @@
 # shellcheck shell=bash
 
 # Global settings
+export DOTFILES="$HOME/code/dotfiles"
 export PIP_REQUIRE_VIRTUALENV=true                # use --isolated to bypass
 export PATH="$HOME/.local/bin:$PATH"              # pipx-installed binaries
 export PYENV_ROOT="$HOME/.pyenv"                  # pyenv
