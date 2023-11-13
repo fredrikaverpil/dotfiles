@@ -4,10 +4,14 @@
 
 These are my personal dotfiles, for macOS, Windows + WSL. The setup is based on [dotbot](https://github.com/anishathalye/dotbot) and aims to be as idempotent as possible.
 
-### Install 🚀
+### Systems 🚀
 
 - [macOS](README_MACOS.md)
 - [Windows 11 + WSL](README_WIN_WSL.md)
+
+### Git
+
+- [Configure git](README_GIT.md)
 
 ### Fonts 💯
 
