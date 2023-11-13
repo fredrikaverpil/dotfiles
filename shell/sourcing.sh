@@ -21,123 +21,82 @@ function virtual_env_activate() {
 }
 
 function node_version_manager() {
-	if [[ -z "$NVMRC_DOTFILES_PATH" ]]; then
+	if [[ -z "$NVMRC_PATH" ]]; then
 		if [ -f .nvmrc ]; then
 			nvm use
-			export NVMRC_DOTFILES_PATH=$PWD/.nvmrc
+			export NVMRC_PATH=$PWD/.nvmrc
 		fi
 	else
-		parent_nvmdir="$(dirname "$NVMRC_DOTFILES_PATH")"
+		parent_nvmdir="$(dirname "$NVMRC_PATH")"
 		if [[ "$PWD"/ != "$parent_nvmdir"/* ]]; then
 			nvm deactivate
-			export NVMRC_DOTFILES_PATH=""
+			export NVMRC_PATH=""
 		fi
 	fi
 }
 
-# Homebrew
+# ----------------------------
+# globals
+# ----------------------------
+
 if [ -f /opt/homebrew/bin/brew ]; then
 	eval "$(/opt/homebrew/bin/brew shellenv)"
+	brew_prefix="$(brew --prefix)"
 elif [ -f /home/linuxbrew/.linuxbrew/bin/brew ]; then
 	eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+	brew_prefix="$(brew --prefix)"
+else
+	echo "Please install Homebrew and the Brewfile."
+	brew_prefix=""
 fi
 
-# NVM
-if [ -s "/opt/homebrew/opt/nvm/nvm.sh" ]; then
-	. "/opt/homebrew/opt/nvm/nvm.sh"
-elif [ -s "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" ]; then
-	. "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"
-elif [ -s "$HOME/.nvm/nvm.sh" ]; then
-	. "$HOME/.nvm/nvm.sh"
+if [ -n "${ZSH_VERSION}" ]; then
+	shell="zsh"
+elif [ -n "${BASH_VERSION}" ]; then
+	shell="bash"
+else
+	shell=""
 fi
 
-# Rust
+# ----------------------------
+# shell-agnostic configuration
+# ----------------------------
+
 if [ -f ~/.cargo/env ]; then
-	. "$HOME/.cargo/env"
+	source "$HOME/.cargo/env"
+fi
+
+if [ -n "$brew_prefix" ]; then
+	source "$brew_prefix/opt/nvm/nvm.sh"
+	eval "$(mcfly init $shell)"
+	eval "$(starship init $shell)"
+	eval "$(zoxide init $shell)"
 fi
 
 # ----------------------------
 # shell-specific configuration
 # ----------------------------
 
-if [ -n "${ZSH_VERSION}" ]; then
-	# assume zsh
-
-	# auto suggestions
-	if [ -d ~/.zsh/zsh-autosuggestions ]; then
-		source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
-	fi
-
-	# zsh syntax highlighting
-	if [ -d ~/.zsh/zsh-syntax-highlighting ]; then
-		source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-	fi
-
-	# homebrew zsh site functions
-	if [ -d /opt/homebrew/share/zsh/site-functions ]; then
-		# https://docs.brew.sh/Shell-Completion
-		export FPATH=/opt/homebrew/share/zsh/site-functions:$FPATH
+if [[ $shell == "zsh" ]]; then
+	if [ -n "$brew_prefix" ]; then
+		export FPATH=$brew_prefix/share/zsh/site-functions:$FPATH
 		autoload -Uz compinit
 		compinit
+
+		source "$brew_prefix/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+		source "$brew_prefix/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 	fi
 
-	# mcfly
-	if [ -f /opt/homebrew/bin/mcfly ] || [ -f /usr/local/bin/mcfly ]; then
-		eval "$(mcfly init zsh)"
+	if [ -f "$brew_prefix/share/google-cloud-sdk" ]; then
+		source "$brew_prefix/share/google-cloud-sdk/path.zsh.inc"
+		source "$brew_prefix/share/google-cloud-sdk/completion.zsh.inc"
 	fi
 
-	# Starship
-	if command -v starship &>/dev/null; then
-		eval "$(starship init zsh)"
+elif [[ $shell == "bash" ]]; then
+	if [ -f "$brew_prefix/share/google-cloud-sdk" ]; then
+		source "$brew_prefix/share/google-cloud-sdk/path.bash.inc"
+		source "$brew_prefix/share/google-cloud-sdk/completion.bash.inc"
 	fi
-
-	# OrbStack
-	if [ -f ~/.orbstack/shell/init.zsh ]; then
-		source ~/.orbstack/shell/init.zsh 2>/dev/null || :
-	fi
-
-	# zoxide
-	eval "$(zoxide init zsh)"
-
-	# google-cloud-sdk
-	source "$(brew --prefix)/share/google-cloud-sdk/path.zsh.inc"
-	source "$(brew --prefix)/share/google-cloud-sdk/completion.zsh.inc"
-
-elif [ -n "${BASH_VERSION}" ]; then
-	# assume Bash
-
-	# NVM bash completion
-	if [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ]; then
-		# macOS, installed via homebrew
-		. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
-	elif [ -s "$HOME/.nvm/bash_completion" ]; then
-		# linux, installed via official script
-		. "$HOME/.nvm/bash_completion"
-	fi
-
-	# Bash autocompletion
-	if [ -f /etc/profile.d/bash_completion.sh ]; then
-		source /etc/profile.d/bash_completion.sh
-	fi
-
-	# mcfly
-	if [ -f /opt/homebrew/bin/mcfly ] || [ -f /usr/local/bin/mcfly ]; then
-		eval "$(mcfly init bash)"
-	fi
-
-	# Starship
-	if command -v starship &>/dev/null; then
-		eval "$(starship init bash)"
-	fi
-
-	# OrbStack
-	if [ -f ~/.orbstack/shell/init.bash ]; then
-		source ~/.orbstack/shell/init.bash 2>/dev/null || :
-	fi
-
-	# google-cloud-sdk
-	source "$(brew --prefix)/share/google-cloud-sdk/path.bash.inc"
-
 fi
 
 # ----------------------------------
@@ -146,6 +105,12 @@ fi
 
 # Evaluate on cd and on initial shell load
 if [ -d ~/.pyenv ] && [ -d ~/.nvm ]; then
+
+	# TODO: refactor this;
+	# - Always override cd function
+	# - Initialize pyenv like nvm is initialized further up in this script
+	# - Check for ~/.pyenv in virtual_env_activate function
+	# - Check for ~/.nvm in node_version_manager function
 
 	eval "$(pyenv init --path)"
 	# eval "$(pyenv virtualenv-init -)"
@@ -156,6 +121,6 @@ if [ -d ~/.pyenv ] && [ -d ~/.nvm ]; then
 		node_version_manager
 	}
 
-	cd . # trigger virtual_env_activate via cd hook (for initial shell load)
+	cd . # trigger pyenv/nvm inits
 
 fi

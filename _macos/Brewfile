@@ -13,6 +13,8 @@ tap 'koekeishiya/formulae' # yabai
 tap 'oven-sh/bun'
 
 # system
+brew 'zsh-autosuggestions'
+brew 'zsh-syntax-highlighting'
 brew 'yabai'
 brew 'skhd'
 cask 'karabiner-elements'

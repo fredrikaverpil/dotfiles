@@ -10,6 +10,8 @@ tap 'cantino/mcfly'
 tap 'oven-sh/bun'
 
 # system
+brew 'zsh-autosuggestions'
+brew 'zsh-syntax-highlighting'
 
 # fonts
 cask 'font-jetbrains-mono-nerd-font'
