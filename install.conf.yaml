@@ -14,7 +14,7 @@
     ~/.zshrc_user: zshrc
     ~/.config/starship.toml: starship.toml
     ~/.gitconfig:
-    ~/.gitconfig_doktor:
+    ~/.gitconfig_work:
     ~/.gitignore_global:
     ~/.gitmessage:
     ~/.tmux.conf:
