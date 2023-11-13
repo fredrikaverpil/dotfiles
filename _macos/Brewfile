@@ -73,3 +73,4 @@ cask 'airbuddy'
 
 # other casks
 cask 'google-cloud-sdk'
+cask '1password-cli'

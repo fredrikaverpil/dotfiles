@@ -57,4 +57,3 @@ brew 'node'  # various LSPs like prettier, pyright
 
 # other casks
 cask 'google-cloud-sdk'
-
