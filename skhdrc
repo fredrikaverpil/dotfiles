@@ -47,4 +47,4 @@ shift + alt - right : yabai -m window --swap east
 # shift + alt - g : yabai -m window --display east; yabai -m display --focus east;
 
 # focus on full-screen wezterm (see dotfiles shell script)
-ctrl - 0 : focus-wezterm
+ctrl - 0 : ~/code/dotfiles/shell/bin/focus-wezterm
