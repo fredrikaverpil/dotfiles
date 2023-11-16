@@ -39,24 +39,8 @@ function node_version_manager() {
 # globals
 # ----------------------------
 
-if [ -f /opt/homebrew/bin/brew ]; then
-	eval "$(/opt/homebrew/bin/brew shellenv)"
-	brew_prefix="$(brew --prefix)"
-elif [ -f /home/linuxbrew/.linuxbrew/bin/brew ]; then
-	eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-	brew_prefix="$(brew --prefix)"
-else
-	echo "Please install Homebrew and the Brewfile."
-	brew_prefix=""
-fi
-
-if [ -n "${ZSH_VERSION}" ]; then
-	shell="zsh"
-elif [ -n "${BASH_VERSION}" ]; then
-	shell="bash"
-else
-	shell=""
-fi
+brew_prefix="$DOTFILES_BREW_PREFIX"
+shell="$DOTFILES_SHELL"
 
 # ----------------------------
 # shell-agnostic configuration
