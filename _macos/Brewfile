@@ -5,10 +5,7 @@
 cask_args appdir: '/Applications'
 
 # Taps (third-party repositories)
-tap 'homebrew/bundle'
-tap 'homebrew/core'
 tap 'homebrew/cask-fonts'
-tap 'cantino/mcfly'
 tap 'koekeishiya/formulae' # yabai
 
 # system
@@ -16,7 +13,7 @@ brew 'zsh-autosuggestions'
 brew 'zsh-syntax-highlighting'
 brew 'yabai'
 brew 'skhd'
-cask 'karabiner-elements'
+#cask 'karabiner-elements'  # requires password
 
 # fonts
 cask 'font-jetbrains-mono-nerd-font'
@@ -31,7 +28,6 @@ brew 'gh'
 brew 'asciinema'
 brew 'pre-commit'
 brew 'tree'
-brew 'cantino/mcfly/mcfly'
 brew 'eza'
 brew 'bat'
 brew 'withgraphite/tap/graphite'
@@ -50,6 +46,9 @@ brew 'tmuxinator'
 
 # neovim
 brew 'neovim'
+brew 'cmake'
+brew 'gcc'
+brew 'make'
 brew 'ripgrep'
 brew 'fd'
 brew 'lazygit'
@@ -57,7 +56,6 @@ brew 'fzf'
 brew 'gnu-sed'  # spectre
 
 # ui apps
-cask '1password'
 cask 'appcleaner'
 cask 'wezterm'
 cask 'visual-studio-code'
