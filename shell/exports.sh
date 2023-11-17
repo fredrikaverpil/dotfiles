@@ -71,7 +71,7 @@ add_to_path append "$HOME/go/bin"
 # export GOROOT=/opt/homebrew/Cellar/go
 # export PATH=$PATH:$GOROOT/bin
 
-add_to_path prepend "$DOTFILES_BREW_PREFIX/opt/ruby/bin"
+# add_to_path prepend "$DOTFILES_BREW_PREFIX/opt/ruby/bin"
 
 add_to_path append "$DOTFILES/shell/bin"
 add_to_path prepend "$HOME/.tmux/plugins/t-smart-tmux-session-manager/bin"
@@ -93,19 +93,19 @@ Darwin)
 
 	add_to_path append "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
 
-	# nvm
-	if [ "$(uname -m)" = "arm64" ]; then
-		export NVM_DIR="$HOME/.nvm"
-	elif [ "$(uname -m)" = "x86_64" ]; then
-		export NVM_DIR="$HOME/.nvm_x86"
-	fi
+	# # nvm
+	# if [ "$(uname -m)" = "arm64" ]; then
+	# 	export NVM_DIR="$HOME/.nvm"
+	# elif [ "$(uname -m)" = "x86_64" ]; then
+	# 	export NVM_DIR="$HOME/.nvm_x86"
+	# fi
 
 	;;
 
 Linux)
 	# commands for Linux go here
 
-	export NVM_DIR="$HOME/.nvm"
+	# export NVM_DIR="$HOME/.nvm"
 
 	;;
 

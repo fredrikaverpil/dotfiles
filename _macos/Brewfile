@@ -10,7 +10,6 @@ tap 'homebrew/core'
 tap 'homebrew/cask-fonts'
 tap 'cantino/mcfly'
 tap 'koekeishiya/formulae' # yabai
-tap 'oven-sh/bun'
 
 # system
 brew 'zsh-autosuggestions'
@@ -29,28 +28,21 @@ cask 'font-noto-emoji'
 brew 'bash'
 brew 'starship'
 brew 'gh'
-brew 'nvm'
 brew 'asciinema'
 brew 'pre-commit'
 brew 'tree'
-brew 'mcfly'
+brew 'cantino/mcfly/mcfly'
 brew 'eza'
 brew 'bat'
 brew 'withgraphite/tap/graphite'
 brew 'kubectx'
 brew 'zoxide'
-brew 'circumflex'
 brew 'ollama'
+brew 'pkgxdev/made/pkgx'
 
 # slides
 brew 'slides'
 brew 'chafa'
-
-# languages
-brew 'rustup-init'
-brew 'go'
-brew 'bun'
-brew 'ruby'
 
 # tmux
 brew 'tmux'
@@ -69,10 +61,7 @@ cask '1password'
 cask 'appcleaner'
 cask 'wezterm'
 cask 'visual-studio-code'
-cask 'pgadmin4'
 cask 'spotify'
-cask 'airbuddy'
 
 # other casks
 cask 'google-cloud-sdk'
-cask '1password-cli'

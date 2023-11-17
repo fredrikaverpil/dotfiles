@@ -51,7 +51,7 @@ if [ -f ~/.cargo/env ]; then
 fi
 
 if [ -n "$brew_prefix" ]; then
-	source "$brew_prefix/opt/nvm/nvm.sh"
+	# source "$brew_prefix/opt/nvm/nvm.sh"
 	eval "$(mcfly init $shell)"
 	eval "$(starship init $shell)"
 	eval "$(zoxide init $shell)"
@@ -87,24 +87,32 @@ fi
 # hooks and on-shell load evaluation
 # ----------------------------------
 
-# Evaluate on cd and on initial shell load
-if [ -d ~/.pyenv ] && [ -d ~/.nvm ]; then
-
-	# TODO: refactor this;
-	# - Always override cd function
-	# - Initialize pyenv like nvm is initialized further up in this script
-	# - Check for ~/.pyenv in virtual_env_activate function
-	# - Check for ~/.nvm in node_version_manager function
-
-	eval "$(pyenv init --path)"
-	# eval "$(pyenv virtualenv-init -)"
-
-	function cd() {
-		builtin cd "$@" || return
-		virtual_env_activate
-		node_version_manager
-	}
-
-	cd . # trigger pyenv/nvm inits
-
+if [[ $shell == "zsh" ]]; then
+	if [ -n "$brew_prefix" ]; then
+		source <(pkgx --shellcode)
+	elif [[ $shell == "bash" ]]; then
+		eval "$(pkgx --shellcode)"
+	fi
 fi
+
+# # Evaluate on cd and on initial shell load
+# if [ -d ~/.pyenv ] && [ -d ~/.nvm ]; then
+#
+# 	# TODO: refactor this;
+# 	# - Always override cd function
+# 	# - Initialize pyenv like nvm is initialized further up in this script
+# 	# - Check for ~/.pyenv in virtual_env_activate function
+# 	# - Check for ~/.nvm in node_version_manager function
+#
+# 	eval "$(pyenv init --path)"
+# 	# eval "$(pyenv virtualenv-init -)"
+#
+# 	function cd() {
+# 		builtin cd "$@" || return
+# 		virtual_env_activate
+# 		node_version_manager
+# 	}
+#
+# 	cd . # trigger pyenv/nvm inits
+#
+# fi

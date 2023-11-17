@@ -3,11 +3,10 @@
 
 # Taps (third-party repositories)
 tap 'homebrew/bundle'
-# tap 'homebrew/core'
+tap 'homebrew/core'
 tap 'homebrew/linux-fonts'
 tap 'withgraphite/tap'
 tap 'cantino/mcfly'
-tap 'oven-sh/bun'
 
 # system
 brew 'zsh-autosuggestions'
@@ -22,26 +21,21 @@ cask 'font-noto-emoji'
 # terminal cli tools
 brew 'starship'
 brew 'gh'
-brew 'nvm'
 brew 'asciinema'
 brew 'pre-commit'
 brew 'tree'
-brew 'mcfly'
+brew 'cantino/mcfly/mcfly'
 brew 'eza'
 brew 'bat'
-brew 'graphite'
+brew 'withgraphite/tap/graphite'
 brew 'kubectx'
 brew 'zoxide'
+brew 'ollama'
+brew 'pkgxdev/made/pkgx'
 
 # slides
 brew 'slides'
 brew 'chafa'
-
-# languages
-brew 'rustup-init'
-brew 'go'
-brew 'bun'
-brew 'ruby'
 
 # tmux
 brew 'tmux'
