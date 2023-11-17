@@ -73,7 +73,7 @@ From the Ubuntu prompt:
 
 ```bash
 mkdir -p code && cd code
-git clone https://github.com/fredrikaverpil/dotfiles.git
+git clone git@github.com:fredrikaverpil/dotfiles.git --recursive
 cd dotfiles && ./install -vv
 ```
 
