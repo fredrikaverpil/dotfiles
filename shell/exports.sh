@@ -58,28 +58,22 @@ export DOTFILES_BREW_PREFIX=$brew_prefix
 
 export HOMEBREW_NO_ANALYTICS=1
 
-export PIP_REQUIRE_VIRTUALENV=true # use pip --isolated to bypass
-# export PATH="$HOME/.local/bin:$PATH" # pipx-installed binaries
-add_to_path prepend "$HOME/.local/bin" # pipx-installed binaries
-export PYENV_ROOT="$HOME/.pyenv"       # pyenv
-# export PATH="$PYENV_ROOT/bin:$PATH"    # pyenv
+add_to_path prepend "$HOME/.local/bin" # user-installed binaries
+
+export PIP_REQUIRE_VIRTUALENV=true    # use pip --isolated to bypass
+export PYENV_ROOT="$HOME/.pyenv"      # pyenv
 add_to_path prepend "$PYENV_ROOT/bin" # pyenv
 
-# export PATH="$PATH:$HOME/.cargo/bin"
 add_to_path append "$HOME/.cargo/bin"
 
-# export PATH="$PATH:$HOME/go/bin"
 add_to_path append "$HOME/go/bin"
 # NOTE: only set GOROOT to use non-default version of go
 # export GOROOT=/opt/homebrew/Cellar/go
 # export PATH=$PATH:$GOROOT/bin
 
-# export PATH="$DOTFILES_BREW_PREFIX/opt/ruby/bin:$PATH"
 add_to_path prepend "$DOTFILES_BREW_PREFIX/opt/ruby/bin"
 
-# export PATH="$PATH:$DOTFILES/shell/bin"
 add_to_path append "$DOTFILES/shell/bin"
-# export PATH="$HOME/.tmux/plugins/t-smart-tmux-session-manager/bin:$PATH"
 add_to_path prepend "$HOME/.tmux/plugins/t-smart-tmux-session-manager/bin"
 
 # load .env file if it exists
