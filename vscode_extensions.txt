@@ -22,7 +22,6 @@ eamodio.gitlens
 enkia.tokyo-night
 esbenp.prettier-vscode
 foxundermoon.shell-format
-GitHub.copilot
 GitHub.copilot-chat
 GitHub.copilot-labs
 github.vscode-github-actions
@@ -63,7 +62,6 @@ ms-vscode.remote-explorer
 ms-vscode.remote-server
 ms-vscode.test-adapter-converter
 ms-vsliveshare.vsliveshare
-ms-vsliveshare.vsliveshare-pack
 mtxr.sqltools
 naumovs.color-highlight
 nickmillerdev.pytest-fixtures
