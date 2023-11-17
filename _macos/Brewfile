@@ -60,6 +60,7 @@ cask 'appcleaner'
 cask 'wezterm'
 cask 'visual-studio-code'
 cask 'spotify'
+cask 'obsidian'
 
 # other casks
 cask 'google-cloud-sdk'
