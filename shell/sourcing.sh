@@ -52,7 +52,6 @@ fi
 
 if [ -n "$brew_prefix" ]; then
 	# source "$brew_prefix/opt/nvm/nvm.sh"
-	eval "$(mcfly init $shell)"
 	eval "$(starship init $shell)"
 	eval "$(zoxide init $shell)"
 fi
