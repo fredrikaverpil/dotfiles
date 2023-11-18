@@ -24,6 +24,8 @@ cask 'font-noto-emoji'
 # terminal cli tools
 brew 'bash'
 brew 'starship'
+brew 'jq'
+brew 'yq'
 brew 'gh'
 brew 'asciinema'
 brew 'pre-commit'

@@ -39,6 +39,17 @@ brew bundle --file=_macos/Brewfile
 brew bundle --file=_macos/Brewfile_mas  # requires being logged into the App Store
 ```
 
+```bash
+yabai --install-service
+yabai --restart-service
+skhd --start-service
+```
+
+```bash
+installers/tmux.sh  # followed by a <C-a>I to install plugins
+installers/neovim-distros.sh
+```
+
 ### OS configuration
 
 #### Don't create `.DS_Store` files on network or USB volumes:
