@@ -27,6 +27,12 @@ esac
 #
 # see shell/bin/nvims how to start the different nvim distros
 
+echo "About to install node, npm, gem with pkgx (for Mason-installed plugins), continue? (y/n)"
+read -r response
+if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
+	pkgx install node@latest npm@latest gem@latest
+fi
+
 echo "About to remove default neovim dirs, continue? (y/n)"
 read -r response
 if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
