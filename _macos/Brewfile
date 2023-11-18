@@ -33,6 +33,7 @@ brew 'bat'
 brew 'withgraphite/tap/graphite'
 brew 'kubectx'
 brew 'zoxide'
+brew 'atuin'
 brew 'ollama'
 brew 'pkgxdev/made/pkgx'
 

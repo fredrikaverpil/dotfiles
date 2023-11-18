@@ -52,6 +52,7 @@ fi
 
 if [ -n "$brew_prefix" ]; then
 	# source "$brew_prefix/opt/nvm/nvm.sh"
+	eval "$(atuin init $shell)"
 	eval "$(starship init $shell)"
 	eval "$(zoxide init $shell)"
 fi
@@ -94,24 +95,9 @@ if [[ $shell == "zsh" ]]; then
 	fi
 fi
 
-# # Evaluate on cd and on initial shell load
-# if [ -d ~/.pyenv ] && [ -d ~/.nvm ]; then
-#
-# 	# TODO: refactor this;
-# 	# - Always override cd function
-# 	# - Initialize pyenv like nvm is initialized further up in this script
-# 	# - Check for ~/.pyenv in virtual_env_activate function
-# 	# - Check for ~/.nvm in node_version_manager function
-#
-# 	eval "$(pyenv init --path)"
-# 	# eval "$(pyenv virtualenv-init -)"
-#
-# 	function cd() {
-# 		builtin cd "$@" || return
-# 		virtual_env_activate
-# 		node_version_manager
-# 	}
-#
-# 	cd . # trigger pyenv/nvm inits
-#
-# fi
+function cd() {
+	builtin cd "$@" || return
+	virtual_env_activate
+	# node_version_manager  # TODO: with pkgx, maybe nvm is no longer needed?
+}
+cd . # trigger cd overrides
