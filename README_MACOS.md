@@ -2,7 +2,7 @@
 
 ### Install dotfiles
 
-Install:
+Download and install [1Password](https://1password.com/downloads) and [set up SSH](./README_GIT.md). Then clone down the dotfiles:
 
 ```bash
 mkdir -p code && cd code
@@ -33,6 +33,8 @@ When on an arm64 device, homebrew is installed in `/opt/homebrew/bin/brew`. You 
 </details>
 
 ### Install apps
+
+Note that per-project tooling (such as languages) are managed with [pkgx](https://github.com/pkgx/pkgx), not with homebrew.
 
 ```bash
 brew bundle --file=_macos/Brewfile
