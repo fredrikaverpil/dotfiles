@@ -44,7 +44,7 @@ return {
         -- shell
         "bash-language-server", -- lsp
         "shfmt",                -- formatter
-        "shellcheck",           -- linter
+        -- "shellcheck",           -- linter
 
         -- yaml
         "yamllint", -- linter

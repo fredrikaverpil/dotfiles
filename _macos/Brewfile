@@ -55,6 +55,7 @@ brew 'fd'
 brew 'lazygit'
 brew 'fzf'
 brew 'gnu-sed'  # spectre
+brew 'shellcheck'  # mason installs intel version
 
 # ui apps
 cask 'appcleaner'
