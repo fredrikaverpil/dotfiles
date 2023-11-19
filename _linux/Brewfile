@@ -2,11 +2,8 @@
 # brew bundle --file=path/to/Brewfile
 
 # Taps (third-party repositories)
-tap 'homebrew/bundle'
-tap 'homebrew/core'
 tap 'homebrew/linux-fonts'
 tap 'withgraphite/tap'
-tap 'cantino/mcfly'
 
 # system
 brew 'zsh-autosuggestions'
@@ -19,19 +16,21 @@ cask 'font-noto-color-emoji'
 cask 'font-noto-emoji'
 
 # terminal cli tools
-brew 'starship'
-brew 'gh'
 brew 'asciinema'
-brew 'pre-commit'
-brew 'tree'
-brew 'cantino/mcfly/mcfly'
-brew 'eza'
+brew 'atuin'
 brew 'bat'
-brew 'withgraphite/tap/graphite'
+brew 'eza'
+brew 'gh'
+brew 'jq'
 brew 'kubectx'
-brew 'zoxide'
 brew 'ollama'
 brew 'pkgxdev/made/pkgx'
+brew 'pre-commit'
+brew 'starship'
+brew 'tree'
+brew 'withgraphite/tap/graphite'
+brew 'yq'
+brew 'zoxide'
 
 # slides
 brew 'slides'
@@ -44,12 +43,15 @@ brew 'tmuxinator'
 # neovim
 brew 'neovim'
 brew 'ripgrep'
+brew 'cmake'
+brew 'gcc'
+brew 'make'
+brew 'ripgrep'
 brew 'fd'
 brew 'lazygit'
 brew 'fzf'
 brew 'gnu-sed'  # spectre
 brew 'pkg-config'  # gh-actions.nvim
-brew 'node'  # various LSPs like prettier, pyright
 
 # other casks
 cask 'google-cloud-sdk'
