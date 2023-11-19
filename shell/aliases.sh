@@ -5,15 +5,11 @@
 
 # Global settings
 alias dotfiles='cd $DOTFILES'
-# alias ll='ls -alhF'
 alias ll='eza --long --header --group-directories-first --git --group --all'
 alias tree='tree -C'
 
-# Kitty
-if command -v kitty &>/dev/null; then
-	alias icat='kitty +kitten icat'
-	alias diff='kitty +kitten diff'
-fi
+# pkgx/dev
+alias dev-dirs='fd dev.pkgx.activated "$HOME/Library/Application Support/pkgx/dev" --exec dirname {}'
 
 # Git
 alias git-purge='git branch --merged | egrep -v "(^\*|master|main|dev)" | xargs git branch -d'
