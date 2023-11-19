@@ -65,6 +65,7 @@ cask 'wezterm'
 cask 'visual-studio-code'
 cask 'spotify'
 cask 'obsidian'
+cask 'signal'
 
 # other casks
 cask 'google-cloud-sdk'
