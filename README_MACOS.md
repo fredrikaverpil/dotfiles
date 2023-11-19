@@ -79,6 +79,9 @@ defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
     - Upper right: Desktop
     - Lower left: Lock screen
     - Lower right: Quick note
+- Accessibility:
+  - Display:
+    - [ ] Reduce motion.
 - Keyboard
   - Key repeat rate: fast
   - Delay until repeat: short
