@@ -66,6 +66,8 @@ defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 - Open up 9 Desktops in Mission control.
 - Disable/enable in Keyboard → Keyboard shortcuts → Mission Control:
   - [ ] Mission control
+    - [ ] Mission Control
+    - [ ] Application windows
     - [ ] Move left a space
     - [ ] Move right a space
     - [x] Switch to Desktop 1
