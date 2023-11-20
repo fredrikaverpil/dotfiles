@@ -27,11 +27,11 @@ brew 'asciinema'
 brew 'atuin'
 brew 'bash'
 brew 'bat'
+brew 'direnv'
 brew 'eza'
 brew 'gh'
 brew 'grpcurl'
 brew 'jq'
-brew 'kubectx'
 brew 'ollama'
 brew 'pkgxdev/made/pkgx'
 brew 'pre-commit'
@@ -60,6 +60,13 @@ brew 'lazygit'
 brew 'fzf'
 brew 'gnu-sed'  # spectre
 brew 'shellcheck'  # mason installs intel version
+
+# k8s
+brew 'k9s'
+brew 'kubectx'
+brew 'opentofu'
+brew 'stern'
+# brew 'terraform'
 
 # ui apps
 cask 'appcleaner'

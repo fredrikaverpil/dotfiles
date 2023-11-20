@@ -53,8 +53,9 @@ fi
 if [ -n "$brew_prefix" ]; then
 	# source "$brew_prefix/opt/nvm/nvm.sh"
 	eval "$(atuin init $shell --disable-up-arrow)"
-	eval "$(starship init $shell)"
+	eval "$(direnv hook $shell)"
 	eval "$(zoxide init $shell)"
+	eval "$(starship init $shell)"
 fi
 
 # ----------------------------
