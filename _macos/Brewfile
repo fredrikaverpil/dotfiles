@@ -16,6 +16,7 @@ brew 'skhd'
 #cask 'karabiner-elements'  # requires password
 
 # fonts
+cask 'font-jetbrains-mono'
 cask 'font-jetbrains-mono-nerd-font'
 cask 'font-symbols-only-nerd-font'
 cask 'font-noto-color-emoji'
@@ -28,6 +29,7 @@ brew 'bash'
 brew 'bat'
 brew 'eza'
 brew 'gh'
+brew 'grpcurl'
 brew 'jq'
 brew 'kubectx'
 brew 'ollama'
