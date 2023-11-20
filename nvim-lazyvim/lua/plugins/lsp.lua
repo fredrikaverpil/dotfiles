@@ -32,18 +32,18 @@ return {
       local ensure_installed = {
         -- python
         "ruff-lsp", -- lsp
-        "ruff",     -- linter (but used as formatter)
-        "pyright",  -- lsp
-        "black",    -- formatter
-        "mypy",     -- linter
+        "ruff", -- linter (but used as formatter)
+        "pyright", -- lsp
+        "black", -- formatter
+        "mypy", -- linter
 
         -- lua
         "lua-language-server", -- lsp
-        "stylua",              -- formatter
+        "stylua", -- formatter
 
         -- shell
         "bash-language-server", -- lsp
-        "shfmt",                -- formatter
+        "shfmt", -- formatter
         -- "shellcheck",           -- linter
 
         -- yaml
@@ -59,19 +59,19 @@ return {
         -- go
         -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md
         -- https://github.com/golang/tools/blob/master/gopls/internal/lsp/source/options.go
-        "gopls",                    -- lsp
+        "gopls", -- lsp
         "golangci-lint-langserver", -- lsp
-        "gofumpt",                  -- formatter
+        "gofumpt", -- formatter
         -- "goimports", -- formatter
-        "gci",                      -- formatter, replaces goimports
-        "golangci-lint",            -- linter (its binary is required by golanci-lint-langserver?)
+        "gci", -- formatter, replaces goimports
+        "golangci-lint", -- linter (its binary is required by golanci-lint-langserver?)
         -- "gomodifytags", -- code actions
         -- "impl", -- code actions
 
         -- protobuf
         "buf-language-server", -- lsp (prototype, not feature-complete yet, rely on buf for now)
-        "buf",                 -- formatter, linter
-        "protolint",           -- linter
+        "buf", -- formatter, linter
+        "protolint", -- linter
       }
 
       opts.ensure_installed = opts.ensure_installed or {}
@@ -162,7 +162,7 @@ return {
       formatters.isort.command = prefer_bin_from_venv("isort")
       formatters.black.command = prefer_bin_from_venv("black")
       formatters.stylua.args =
-          vim.list_extend({ "--indent-type", "Spaces", "--indent-width", "2" }, formatters.stylua.args)
+        vim.list_extend({ "--indent-type", "Spaces", "--indent-width", "2" }, formatters.stylua.args)
 
       local remove_from_formatters = {}
       local extend_formatters_with = {
@@ -225,15 +225,6 @@ return {
         opts.linters_by_ft[ft] = opts.linters_by_ft[ft] or {}
         vim.list_extend(opts.linters_by_ft[ft], linters_)
       end
-    end,
-  },
-
-  {
-    "kosayoda/nvim-lightbulb",
-    config = function()
-      require("nvim-lightbulb").setup({
-        autocmd = { enabled = true },
-      })
     end,
   },
 }
