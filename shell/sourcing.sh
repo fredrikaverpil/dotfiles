@@ -52,7 +52,7 @@ fi
 
 if [ -n "$brew_prefix" ]; then
 	# source "$brew_prefix/opt/nvm/nvm.sh"
-	eval "$(atuin init $shell)"
+	eval "$(atuin init $shell --disable-up-arrow)"
 	eval "$(starship init $shell)"
 	eval "$(zoxide init $shell)"
 fi
