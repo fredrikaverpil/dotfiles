@@ -17,11 +17,14 @@ alias git-grep='git rev-list --all | xargs git --no-pager grep --extended-regexp
 alias glog='git log --graph --decorate --pretty=oneline --abbrev-commit --all'
 alias submodule-reset='git submodule deinit -f . && git submodule update --init --recursive'
 
-# Docker
+# Containers
 alias wrk='docker run --interactive --tty --rm skandyla/wrk'
 alias ubuntu='docker run --interactive --tty --rm --volume $(pwd):/host:ro ubuntu:20.04 bash'
 alias docker-ip="docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'" # append container id
 # alias k9s='docker run --rm -it -v $KUBECONFIG:/root/.kube/config quay.io/derailed/k9s'
+alias tf="terraform"
+alias mk="minikube"
+alias k="kubectl"
 
 # Python
 alias pyclean='find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rvf'
