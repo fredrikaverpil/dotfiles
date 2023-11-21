@@ -101,7 +101,7 @@ Using `terraform`:
 - Get minikube IP: `minikube ip`
 - Get minikube dashboard: `minikube dashboard`
 
-### Problem solving
+## Problem solving
 
 - Something is already running on port XXXX; `lsof -i :XXXX` and `kill -9 <PID>`.
 - Remove cache of downloaded images from minikube:
