@@ -60,13 +60,19 @@ brew 'lazygit'
 brew 'fzf'
 brew 'gnu-sed'  # spectre
 brew 'shellcheck'  # mason installs intel version
+brew 'hadolint'  # mason installs intel version
 
 # k8s
 brew 'k9s'
+brew 'kubectl'
 brew 'kubectx'
-brew 'opentofu'
+brew 'minikube'
+brew 'opentofu'  # terraform
+brew 'podman'
+brew 'podman-compose'
 brew 'stern'
-# brew 'terraform'
+cask 'podman-desktop'
+
 
 # ui apps
 cask 'appcleaner'
