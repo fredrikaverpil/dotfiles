@@ -63,6 +63,7 @@ brew 'shellcheck'  # mason installs intel version
 brew 'hadolint'  # mason installs intel version
 
 # k8s
+brew 'helm'
 brew 'k9s'
 brew 'kubectl'
 brew 'kubectx'

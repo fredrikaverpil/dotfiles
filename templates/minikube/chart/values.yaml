@@ -1,0 +1,15 @@
+namespace:
+  name: gohello
+
+app:
+  name: gohello-app
+
+service:
+  name: gohello-svc
+  port: 8080
+  targetPort: 9090
+
+pod:
+  name: gohello-pod
+  image: docker.io/fredrikaverpil/gohello:0.0.1
+  port: 9090

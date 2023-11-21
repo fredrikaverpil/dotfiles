@@ -12,12 +12,17 @@ After installing from `Brewfile`:
 Using Podman desktop:
 
 - In Podman desktop -> Settings -> Resources, create new minikube cluster by clicking "create".
-- Verify the setup with `minikube status`, `kubectl config current-context` and with `cat ~/.minikube/machines/minikube/config.json`.
 
 Using `minikube`:
 
 - Start minikube with `minikube start --driver=podman --container-runtime=cri-o` (the options are taken from the defaults in Podman Desktop).
-- Verify the setup with `minikube status`, `kubectl config current-context` and with `cat ~/.minikube/machines/minikube/config.json`.
+
+## Verify Minikube setup
+
+- `minikube status`
+- `kubectl config current-context`
+- `cat ~/.minikube/machines/minikube/config.json`
+- `cat ~/.kube/config`
 
 ## Minikube usage
 
@@ -32,6 +37,10 @@ Run `cd templates/minikube` for the below commands to work.
 
 ### Deploy
 
+Using `helm`:
+
+- Install chart with `helm install gohello ./chart`.
+
 Using `kubectl`:
 
 - Create pod with `kubectl apply -f ./\*.yaml`.
@@ -44,6 +53,10 @@ Using `terraform`:
 - Verify pod with `kubectl get pods -n gohello`
 
 ### Port-forward
+
+Using `helm`:
+
+- Not needed, as the chart already has a service configured. Access in browser by executing `minikube service gohello-svc -n gohello`.
 
 Using `k9s`:
 
@@ -74,6 +87,11 @@ Using `stern`:
 
 ### Debugging
 
+Using `helm`:
+
+- Debug the helm chart with `helm template ./chart --debug`.
+- Lint the helm chart with `helm lint ./chart`
+
 Using `k9s`:
 
 - Run by providing namespace `k9s -n gohello` or by switching namespace in k9s by hiting `:` followed by `namespaces`.
@@ -85,6 +103,10 @@ Using `kubectl`:
 
 ### Teardown
 
+Using `helm`:
+
+- Delete chart with `helm uninstall gohello`.
+
 Using `kubectl`:
 
 - Delete pod with `kubectl delete -f ./\*.yaml`.
@@ -93,18 +115,13 @@ Using `terraform`:
 
 - Tear down everything: `terraform destroy`.
 
-## Minikube cheatsheet
-
-- Start minikube: `minikube start`
-- Stop minikube: `minikube stop`
-- Delete minikube: `minikube delete`
-- Get minikube IP: `minikube ip`
-- Get minikube dashboard: `minikube dashboard`
-
 ## Problem solving
 
+- Reset minikube cluster: `minikube stop && minikube delete && minikube start --driver=podman --container-runtime=cri-o`
+- Get minikube IP: `minikube ip`
+- Get minikube dashboard: `minikube dashboard`
 - Something is already running on port XXXX; `lsof -i :XXXX` and `kill -9 <PID>`.
 - Remove cache of downloaded images from minikube:
   - `minikube cache delete <image-name>`
   - `minikube cache delete --all`
-- Reset minikube: `minikube stop && minikube delete && minikube start`
+- Validate helm chart with `helm template ./chart --debug`.

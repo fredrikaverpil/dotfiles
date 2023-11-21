@@ -1,0 +1,4 @@
+apiVersion: v2
+name: gohello-chart
+description: A Helm chart for Kubernetes
+version: 0.1.0
