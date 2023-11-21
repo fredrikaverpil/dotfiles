@@ -18,3 +18,7 @@ These are my personal dotfiles, for macOS, Windows + WSL. The setup is based on 
 - [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono)
 - [Symbols Nerd Font Mono](https://github.com/ryanoasis/nerd-fonts)
 - [Noto Color Emoji](https://fonts.google.com/noto/specimen/Noto+Color+Emoji)
+
+### Kubernetes 🧊
+
+- [Configure Kubernetes](README_K8S.md)
