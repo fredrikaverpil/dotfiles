@@ -87,3 +87,5 @@ defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 - Keyboard
   - Key repeat rate: fast
   - Delay until repeat: short
+  - Dictation:
+    - Shortcut: Press (mic symbol)
