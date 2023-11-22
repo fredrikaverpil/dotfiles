@@ -14,7 +14,7 @@ disabled = false
 # https://starship.rs/presets/nerd-font.html
 
 [aws]
-symbol = "🅰 "
+symbol = "󰸏 "
 
 [azure]
 symbol = "󰠅 "
