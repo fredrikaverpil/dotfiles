@@ -4,6 +4,9 @@ namespace:
 app:
   name: gohello-app
 
+deployment:
+  name: gohello-deployment
+
 service:
   name: gohello-svc
   port: 8080
