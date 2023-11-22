@@ -2,9 +2,9 @@
 add_newline = true
 
 # Shows the username
-[username]
-style_user = "white bold"
-show_always = false
+# [username]
+# style_user = "white bold"
+# show_always = false
 
 [sudo]
 disabled = false
@@ -14,7 +14,10 @@ disabled = false
 # https://starship.rs/presets/nerd-font.html
 
 [aws]
-symbol = "  "
+symbol = "🅰 "
+
+[azure]
+symbol = "󰠅 "
 
 [buf]
 symbol = " "
@@ -42,6 +45,11 @@ symbol = " "
 
 [fossil_branch]
 symbol = " "
+
+[gcloud]
+symbol = "󱇶 "
+# symbol = "☁ "
+format = 'on [$symbol$active]($style)'
 
 [git_branch]
 symbol = " "
@@ -149,4 +157,3 @@ symbol = " "
 
 [scala]
 symbol = " "
-
