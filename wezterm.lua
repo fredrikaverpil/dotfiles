@@ -14,8 +14,8 @@ config.check_for_updates_interval_seconds = 86400
 local disable_ligatures = { "calt=0", "clig=0", "liga=0" }
 config.font = wezterm.font_with_fallback({
   { family = "Berkeley Mono" },
+  { family = "JetBrains Mono", harfbuzz_features = disable_ligatures },
   -- { family = "JetBrainsMono Nerd Font", harfbuzz_features = disable_ligatures },
-  -- { family = "JetBrains Mono", harfbuzz_features = disable_ligatures },
   { family = "Symbols Nerd Font Mono" },
   { family = "Noto Color Emoji" },
   { family = "Noto Emoji" },
