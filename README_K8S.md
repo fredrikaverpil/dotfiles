@@ -46,6 +46,8 @@ Run `cd templates/minikube` for the below commands to work.
 
 ### Push to registry
 
+There are several ways to push to a registry, see [the official docs](https://minikube.sigs.k8s.io/docs/handbook/pushing).
+
 #### Push to Minikube registry
 
 - Go into Podman Desktop -> Images.
