@@ -19,6 +19,14 @@ Using `minikube`:
 
 - Start minikube with `minikube start --driver=podman --container-runtime=cri-o` (the options are taken from the defaults in Podman Desktop).
 
+Adding additional registries:
+
+- Run `minikube ssh` to enter the Minikube VM.
+- Run `sudo vi /etc/containers/registries.conf` and add the following, which will help resolve short-name resolution issues (e.g. `ImageInspectError` problems).
+
+```
+unqualified-search-registries = ["docker.io", "quay.io"]
+```
 
 ## Verify Minikube setup
 
