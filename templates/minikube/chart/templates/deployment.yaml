@@ -18,5 +18,6 @@ spec:
       containers:
         - name: {{ .Values.pod.name }}
           image: {{ .Values.pod.image }}
+          imagePullPolicy: {{ .Values.pod.imagePullPolicy }}
           ports:
             - containerPort: {{ .Values.pod.port }}

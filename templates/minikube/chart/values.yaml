@@ -16,3 +16,4 @@ pod:
   name: gohello-pod
   image: docker.io/fredrikaverpil/gohello:0.0.1
   port: 9090
+  imagePullPolicy: IfNotPresent
