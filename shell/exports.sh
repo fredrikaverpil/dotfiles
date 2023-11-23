@@ -60,6 +60,8 @@ export HOMEBREW_NO_ANALYTICS=1
 
 add_to_path prepend "$HOME/.local/bin" # user-installed binaries
 
+add_to_path append "$HOME/.docker/bin"
+
 export PIP_REQUIRE_VIRTUALENV=true    # use pip --isolated to bypass
 export PYENV_ROOT="$HOME/.pyenv"      # pyenv
 add_to_path prepend "$PYENV_ROOT/bin" # pyenv
