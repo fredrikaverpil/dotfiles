@@ -25,6 +25,7 @@ alias docker-ip="docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddr
 alias tf="terraform"
 alias mk="minikube"
 alias k="kubectl"
+alias h="helm"
 
 # Python
 alias pyclean='find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rvf'
