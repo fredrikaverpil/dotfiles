@@ -1,13 +1,15 @@
 # Kubernetes 🧊
 
-## Podman desktop setup
+## Podman desktop setup 🦦
 
 After installing from `Brewfile`:
 
 - Create VM in Podman desktop by completing the setup wizard.
 - Install Minikube extension in Podman desktop (see [here](https://podman-desktop.io/docs/minikube)) by installing `ghcr.io/containers/podman-desktop-extension-minikube` from OCI image.
 
-## Minikube setup
+## Minikube + Podman setup
+
+For full details,m see [here](https://minikube.sigs.k8s.io/docs/drivers/podman/).
 
 Using Podman desktop:
 
@@ -16,6 +18,7 @@ Using Podman desktop:
 Using `minikube`:
 
 - Start minikube with `minikube start --driver=podman --container-runtime=cri-o` (the options are taken from the defaults in Podman Desktop).
+
 
 ## Verify Minikube setup
 
@@ -31,11 +34,30 @@ Run `cd templates/minikube` for the below commands to work.
 ### Build and push image with Podman
 
 - Build image with `podman build -t gohello:latest .`
-- Tag image for dockerhub: `podman tag gohello:latest docker.io/fredrikaverpil/gohello:0.0.1`.
+- Tag image for deployment: `podman tag gohello:latest docker.io/fredrikaverpil/gohello:0.0.1`.
+
+### Push to registry
+
+#### Push to Minikube registry
+
+- Go into Podman Desktop -> Images.
+- Click the `:` button next to the image you want to push and choose "Push image to Minikube cluster".
+
+This can be done on the commandline too, but is more involved. See details [here](https://podman-desktop.io/docs/minikube/pushing-an-image-to-minikube).
+
+#### Push to Dockerhub registry
+
 - Log into docker.io: `podman login docker.io`.
 - Push image to dockerhub: `podman push docker.io/fredrikaverpil/gohello:0.0.1`.
 
-### Deploy
+Note: to push a multi-architecture container, it's easier to use docker's buildx:
+
+```bash
+docker buildx create --name mybuilder --use
+docker buildx build --platform linux/amd64,linux/arm64 -t docker.io/fredrikaverpil/gohello:0.0.1 --push .
+```
+
+### Deploy to Minikube
 
 Using `helm`:
 
@@ -119,7 +141,7 @@ Using `terraform`:
 
 - Reset minikube cluster: `minikube stop && minikube delete && minikube start --driver=podman --container-runtime=cri-o`
 - Get minikube IP: `minikube ip`
-- Get minikube dashboard: `minikube dashboard`
+- Get minikube dashboard: `minikube dashboard` (enable metrics for more features: `minikube addons enable metrics-server`)
 - Something is already running on port XXXX; `lsof -i :XXXX` and `kill -9 <PID>`.
 - Remove cache of downloaded images from minikube:
   - `minikube cache delete <image-name>`
