@@ -3,8 +3,8 @@
 	email = fredrik.averpil@gmail.com
 [core]
 	excludesfile = ~/.gitignore_global
-  # editor = code --wait
-	editor = nvim
+  # editor = code --wait  # vscode
+	editor = NVIM_APPNAME=LazyVim nvim
 [pull]
 	ff = only
 [merge]
@@ -14,9 +14,9 @@
 [mergetool "vscode"]
 	cmd = code --wait $MERGED
 [mergetool "neovim"]
-	cmd = nvim -d $LOCAL $REMOTE $BASE $MERGED
+	cmd = NVIM_APPNAME=LazyVim nvim -d $LOCAL $REMOTE $BASE $MERGED
 [mergetool "diffview"]
-  cmd = nvim -c \"DiffviewOpen\"
+  cmd = NVIM_APPNAME=LazyVim nvim -c \"DiffviewOpen\"
 [mergetool]
   prompt = false
 [diff]
@@ -26,9 +26,9 @@
 [difftool "vscode"]
 	cmd = code --wait --diff $LOCAL $REMOTE
 [difftool "neovim"]
-	cmd = nvim -d $LOCAL $REMOTE
+	cmd = NVIM_APPNAME=LazyVim nvim -d $LOCAL $REMOTE
 [difftool "diffview"]
-  cmd = nvim -d \"$LOCAL\" \"$REMOTE\" -c \"DiffviewOpen\"
+  cmd = NVIM_APPNAME=LazyVim nvim -d \"$LOCAL\" \"$REMOTE\" -c \"DiffviewOpen\"
 [difftool]
   prompt = false
 [init]
@@ -40,8 +40,15 @@
 [push]
 	autoSetupRemote = true
 
+# Git commit signing
 [include]
     path = ~/.gitconfig_1password
+
+# GitHub https authentication
+[credential "https://github.com"]
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = !/opt/homebrew/bin/gh auth git-credential
 
 # Always keep gitconfig for work at bottom of this file
 [includeIf "gitdir:~/code/_work/**/.git"]
