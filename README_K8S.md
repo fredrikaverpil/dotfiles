@@ -1,25 +1,32 @@
 # Kubernetes 🧊
 
-## Podman desktop setup 🦦
+This guide assumes the following:
 
-After installing from `Brewfile`:
+- `docker` or `podman` installed and running.
+- `minikube` installed.
+
+Throughout this guide, for any command `x`, replace it with either `docker` or `podman`.
+
+## A note on Podman desktop setup
+
+If using Podman and after installing all tooling from `_macos/Brewfile`:
 
 - Create VM in Podman desktop by completing the setup wizard.
 - Install Minikube extension in Podman desktop (see [here](https://podman-desktop.io/docs/minikube)) by installing `ghcr.io/containers/podman-desktop-extension-minikube` from OCI image.
 
-## Minikube + Podman setup
+## Minikube + Docker/Podman setup
 
-For full details,m see [here](https://minikube.sigs.k8s.io/docs/drivers/podman/).
+For full details, see
 
-Using Podman desktop:
+- https://minikube.sigs.k8s.io/docs/drivers/docker/
+- https://minikube.sigs.k8s.io/docs/drivers/podman/
 
-- In Podman desktop -> Settings -> Resources, create new minikube cluster by clicking "create".
+Using `minikube` and targeting either Docker or Podman:
 
-Using `minikube`:
+- Docker: `minikube start --driver=docker`
+- Podman: `minikube start --driver=podman --container-runtime=cri-o`
 
-- Start minikube with `minikube start --driver=podman --container-runtime=cri-o` (the options are taken from the defaults in Podman Desktop).
-
-Adding additional registries:
+Adding additional registries (required for e.g. linkerd if using Podman):
 
 - Run `minikube ssh` to enter the Minikube VM.
 - Run `sudo vi /etc/containers/registries.conf` and add the following, which will help resolve short-name resolution issues (e.g. `ImageInspectError` problems).
@@ -39,16 +46,23 @@ unqualified-search-registries = ["docker.io", "quay.io"]
 
 Run `cd templates/minikube` for the below commands to work.
 
-### Build and push image with Podman
+### Build and push image
 
-- Build image with `podman build -t gohello:latest .`
-- Tag image for deployment: `podman tag gohello:latest docker.io/fredrikaverpil/gohello:0.0.1`.
+- Build image with `x build -t gohello:latest .`
+- Tag image for deployment: `x tag gohello:latest docker.io/fredrikaverpil/gohello:0.0.1`.
 
-### Push to registry
+### Pushing images
 
-There are several ways to push to a registry, see [the official docs](https://minikube.sigs.k8s.io/docs/handbook/pushing).
+There are several ways to push images to the Minikube cluster, see [the official docs](https://minikube.sigs.k8s.io/docs/handbook/pushing).
 
-#### Push to Minikube registry
+#### Build into the cluster
+
+The easiest approach is to make `docker build` or `podman build` build images directly into the cluster. Run the following to set a series of environment variables which will tell Docker/Podman to build into the cluster:
+
+- `eval $(minikube docker-env)`
+- `eval $(minikube podman-env)`
+
+#### Push image to Minikube cluster from Podman
 
 - Go into Podman Desktop -> Images.
 - Click the `:` button next to the image you want to push and choose "Push image to Minikube cluster".
@@ -57,8 +71,8 @@ This can be done on the commandline too, but is more involved. See details [here
 
 #### Push to Dockerhub registry
 
-- Log into docker.io: `podman login docker.io`.
-- Push image to dockerhub: `podman push docker.io/fredrikaverpil/gohello:0.0.1`.
+- Log into docker.io: `x login docker.io`.
+- Push image to dockerhub: `x push docker.io/fredrikaverpil/gohello:0.0.1`.
 
 Note: to push a multi-architecture container, it's easier to use docker's buildx:
 
