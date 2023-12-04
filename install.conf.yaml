@@ -17,6 +17,7 @@
     ~/.gitconfig_work:
     ~/.gitignore_global:
     ~/.gitmessage:
+    ~/Taskfile.yml:
     ~/.tmux.conf:
     ~/.config/yabai/yabairc:
       path: yabairc
