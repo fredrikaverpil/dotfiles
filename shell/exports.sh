@@ -88,6 +88,10 @@ else
 	echo "Warning: $HOME/.shell/.env does not exist"
 fi
 
+# TODO: remove this once go-task/Task graduates this expirment
+echo "Warning: Enabling Task's remote taskfiles feature"
+TASK_X_REMOTE_TASKFILES=1
+
 #Per-platform settings
 case $(uname) in
 Darwin)
