@@ -42,6 +42,25 @@ function node_version_manager() {
 brew_prefix="$DOTFILES_BREW_PREFIX"
 shell="$DOTFILES_SHELL"
 
+# ----------------------------------
+# hooks and on-shell load evaluation
+# ----------------------------------
+
+if [[ $shell == "zsh" ]]; then
+	if [ -n "$brew_prefix" ]; then
+		source <(pkgx --shellcode)
+	elif [[ $shell == "bash" ]]; then
+		eval "$(pkgx --shellcode)"
+	fi
+fi
+
+function cd() {
+	builtin cd "$@" || return
+	virtual_env_activate
+	# node_version_manager  # TODO: with pkgx, maybe nvm is no longer needed?
+}
+cd . # trigger cd overrides
+
 # ----------------------------
 # shell-agnostic configuration
 # ----------------------------
@@ -94,22 +113,3 @@ elif [[ $shell == "bash" ]]; then
 		source "$brew_prefix/share/google-cloud-sdk/completion.bash.inc"
 	fi
 fi
-
-# ----------------------------------
-# hooks and on-shell load evaluation
-# ----------------------------------
-
-if [[ $shell == "zsh" ]]; then
-	if [ -n "$brew_prefix" ]; then
-		source <(pkgx --shellcode)
-	elif [[ $shell == "bash" ]]; then
-		eval "$(pkgx --shellcode)"
-	fi
-fi
-
-function cd() {
-	builtin cd "$@" || return
-	virtual_env_activate
-	# node_version_manager  # TODO: with pkgx, maybe nvm is no longer needed?
-}
-cd . # trigger cd overrides
