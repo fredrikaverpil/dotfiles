@@ -56,6 +56,18 @@ else
   config.window_decorations = "RESIZE"
 end
 
+-- https://wezfurlong.org/wezterm/config/lua/config/window_padding.html
+config.window_padding = {
+  left = 0,
+  right = 0,
+  top = 0,
+  bottom = 0,
+}
+
+-- https://wezfurlong.org/wezterm/config/appearance.html
+config.window_background_opacity = 1.0 -- 0.4
+config.text_background_opacity = 1.0 -- 0.9
+
 -- tab config
 config.hide_tab_bar_if_only_one_tab = true
 config.use_fancy_tab_bar = false
