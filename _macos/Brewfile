@@ -77,6 +77,14 @@ brew 'podman-compose'
 brew 'stern'
 cask 'podman-desktop'
 
+# gcloud
+cask 'google-cloud-sdk'
+brew 'cloud-sql-proxy'
+
+# databases
+brew 'postgresql'  # provides psql
+cask 'pgadmin4'
+
 # ui apps
 cask 'appcleaner'
 cask 'wezterm'
@@ -85,5 +93,4 @@ cask 'spotify'
 cask 'obsidian'
 cask 'signal'
 
-# other casks
-cask 'google-cloud-sdk'
+
