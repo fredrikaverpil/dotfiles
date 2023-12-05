@@ -11,6 +11,10 @@ Thumbs.db
 .vscode
 .nvim.lua
 
+# Environments
+pkgx.yaml
+.envrc
+
 # byte-compiled / optimized / dll files
 __pycache__/
 *.py[cod]
