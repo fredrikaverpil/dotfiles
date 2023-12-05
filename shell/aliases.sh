@@ -40,12 +40,6 @@ alias venv='PIP_REQUIRE_VIRTUALENV=false python3 -m pip install --upgrade --user
 alias nvim-lazy='NVIM_APPNAME=LazyVim nvim'
 alias nvim='nvim-lazy'
 
-# GitHub Copilot X
-# Sets up aliases for `??`, `git?`, and `gh?`
-if which github-copilot-cli >/dev/null; then
-	eval "$(github-copilot-cli alias -- "$0")"
-fi
-
 # Gerrit
 # alias gerrit-push='git push origin HEAD:refs/for/master'
 # alias gerrit-draft='git push origin HEAD:refs/drafts/master'

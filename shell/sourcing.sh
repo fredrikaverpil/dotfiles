@@ -56,6 +56,15 @@ if [ -n "$brew_prefix" ]; then
 	eval "$(direnv hook $shell)"
 	eval "$(zoxide init $shell)"
 	eval "$(starship init $shell)"
+
+	# GitHub Copilot X
+	# Install with: npm i --global @githubnext/github-copilot-cli
+	# Sets up aliases for `??`, `git?`, and `gh?`
+	# More info: https://githubnext.com/projects/copilot-cli/
+	if which github-copilot-cli >/dev/null; then
+		eval "$(github-copilot-cli alias -- "$0")"
+	fi
+
 fi
 
 # ----------------------------

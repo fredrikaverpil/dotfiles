@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@githubnext/github-copilot-cli": "^0.1.33"
+  }
+}
