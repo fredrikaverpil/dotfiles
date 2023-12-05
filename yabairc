@@ -27,4 +27,4 @@ yabai -m mouse_drop_action swap
 
 # disable yabai for certain apps
 yabai -m rule --add app="^Calculator$" manage=off
-
+yabai -m rule --add app="^System Settings$" manage=off
