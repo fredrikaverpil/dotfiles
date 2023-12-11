@@ -84,6 +84,7 @@ brew 'cloud-sql-proxy'
 # databases
 brew 'postgresql'  # provides psql
 cask 'pgadmin4'
+brew 'mysql-client'  # provides mysql
 
 # ui apps
 cask 'appcleaner'
