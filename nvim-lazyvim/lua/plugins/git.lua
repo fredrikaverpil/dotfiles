@@ -12,6 +12,9 @@ return {
       vim.opt.fillchars = "diff:░"
 
       require("diffview").setup({
+        file_panel = {
+          position = "bottom",
+        },
         enhanced_diff_hl = true, -- See ':h diffview-config-enhanced_diff_hl'
       })
     end,
