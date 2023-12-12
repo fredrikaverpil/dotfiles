@@ -49,7 +49,7 @@ symbol = " "
 [gcloud]
 symbol = "󱇶 "
 # symbol = "☁ "
-format = 'on [$symbol$active]($style)'
+format = 'on [$symbol$active]($style) '
 
 [git_branch]
 symbol = " "
