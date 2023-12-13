@@ -23,17 +23,6 @@ local function prefer_bin_from_venv(executable_name)
   return mason_path
 end
 
-local is_work = function()
-  local current_dir = vim.fn.getcwd()
-  local home_dir = os.getenv("HOME") or os.getenv("USERPROFILE")
-  local code_path = home_dir .. "/code"
-
-  local work_path = code_path .. "/_work"
-  local is_work = string.find(current_dir, work_path) == 1
-
-  return is_work
-end
-
 return {
 
   {
@@ -126,23 +115,6 @@ return {
       local replace_formatters_with = {
         go = { "gofumpt", "goimports", "gci" },
       }
-
-      if is_work() then
-        vim.api.nvim_echo({ { "Using custom import ordering for Ingrid.", "None" } }, false, {})
-        -- https://github.com/stevearc/conform.nvim/blob/master/lua/conform/formatters/gci.lua
-        formatters.gci.args = {
-          "write",
-          "-s",
-          "standard",
-          "-s",
-          "default",
-          "-s",
-          "Prefix(github.com/shipwallet)",
-          "--skip-generated",
-          "--skip-vendor",
-          "$FILENAME",
-        }
-      end
 
       -- NOTE: conform.nvim can use a sub-list to run only the first available formatter (see docs)
 
