@@ -1,3 +1,11 @@
+-- This is the local .lazy.lua for your per-project settings.
+-- For more information, see nvim-lazyvim/lua/plugins/lazyrc.lua
+
+-- usage example:
+--
+-- cd projectx
+-- ln -s ~/code/dotfiles/templates/.lazy.lua .lazy.lua
+
 return {
 
   {
@@ -21,15 +29,6 @@ return {
         "--skip-vendor",
         "$FILENAME",
       }
-
-      -- NOTE: conform.nvim can use a sub-list to run only the first available formatter (see docs)
-
-      -- review opts.formatters_by_ft by uncommenting the below
-      -- vim.api.nvim_echo(
-      --   { { "opts.formatters_by_ft", "None" }, { vim.inspect(opts.formatters_by_ft), "None" } },
-      --   false,
-      --   {}
-      -- )
     end,
   },
 }
