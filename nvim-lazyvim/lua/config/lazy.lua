@@ -15,6 +15,9 @@ require("lazy").setup({
     -- { "LazyVim/LazyVim", branch = "refactor", version = false },
 
     { import = "plugins" },
+
+    -- Custom additon of the lazyrc extras, which must be loaded last
+    { import = "plugins.extras.lazyrc" },
   },
   defaults = {
     -- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.
