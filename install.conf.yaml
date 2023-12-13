@@ -26,6 +26,8 @@
       path: skhdrc
       if: '[ "$(uname -s)" = "Darwin" ]'
     ~/.wezterm.lua: wezterm.lua
+    pkgx.yaml:
+      path: templates/pkgx.yaml
     ~/.config/LazyVim/lua:
       path: nvim-lazyvim/lua
       force: true

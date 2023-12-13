@@ -1,0 +1,6 @@
+dependencies:
+  - ruby
+  - gem
+  - node
+  - npm
+  - python

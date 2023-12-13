@@ -27,10 +27,11 @@ esac
 #
 # see shell/bin/nvims how to start the different nvim distros
 
-echo "About to install node, npm, gem with pkgx (for Mason-installed plugins), continue? (y/n)"
+echo "Did you run 'dev' to activate installations of tooling in pkgx.yaml? (y/n)"
 read -r response
-if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
-	pkgx install node@latest npm@latest gem@latest
+if [[ ! $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
+	echo "You must run 'dev' before running this script, as this is required to install/compile plugins and tooling with Mason."
+	exit 1
 fi
 
 echo "About to remove default neovim dirs, continue? (y/n)"
