@@ -1,8 +1,13 @@
 # https://taskfile.dev
-
+---
 version: "3"
 
 includes:
-  # tasks stored in private repo, list the tasks:
-  # $ task --global --list-all
-  global: ~/code/tasks/Taskfile.yml
+  work: ~/code/_work/Taskfile.yml
+
+tasks:
+  default:
+    desc: List all global tasks
+    cmds:
+      - task -g --list
+    silent: true
