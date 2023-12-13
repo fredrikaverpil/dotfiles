@@ -20,7 +20,8 @@
     "lazyvim.plugins.extras.ui.edgy",
     "lazyvim.plugins.extras.util.mini-hipatterns",
     "lazyvim.plugins.extras.util.project",
-    "lazyvim.plugins.extras.vscode"
+    "lazyvim.plugins.extras.vscode",
+    "plugins.extras.lazyrc"
   ],
   "news": {
     "NEWS.md": "2123"
