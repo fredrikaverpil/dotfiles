@@ -16,6 +16,9 @@ Thumbs.db
 /pkgx.yaml
 .envrc
 
+# Node
+/node_modules
+
 # byte-compiled / optimized / dll files
 __pycache__/
 *.py[cod]
