@@ -36,10 +36,6 @@ alias activate='source .venv/bin/activate'
 # assuming pyenv
 alias venv='PIP_REQUIRE_VIRTUALENV=false python3 -m pip install --upgrade --user pip virtualenv && python3 -m virtualenv .venv && source .venv/bin/activate && python3 -m pip install --upgrade pip && which pip && pip list && pip --version && python3 --version'
 
-# Neovim
-alias nvim-lazy='NVIM_APPNAME=LazyVim nvim'
-alias nvim='nvim-lazy'
-
 # Gerrit
 # alias gerrit-push='git push origin HEAD:refs/for/master'
 # alias gerrit-draft='git push origin HEAD:refs/drafts/master'

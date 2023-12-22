@@ -4,7 +4,7 @@
 [core]
 	excludesfile = ~/.gitignore_global
   # editor = code --wait  # vscode
-	editor = NVIM_APPNAME=LazyVim nvim
+	editor = nvim
 [pull]
 	ff = only
 [merge]
@@ -14,9 +14,9 @@
 [mergetool "vscode"]
 	cmd = code --wait $MERGED
 [mergetool "neovim"]
-	cmd = NVIM_APPNAME=LazyVim nvim -d $LOCAL $REMOTE $BASE $MERGED
+	cmd = nvim -d $LOCAL $REMOTE $BASE $MERGED
 [mergetool "diffview"]
-  cmd = NVIM_APPNAME=LazyVim nvim -c \"DiffviewOpen\"
+  cmd = nvim -c \"DiffviewOpen\"
 [mergetool]
   prompt = false
 [diff]
@@ -26,9 +26,9 @@
 [difftool "vscode"]
 	cmd = code --wait --diff $LOCAL $REMOTE
 [difftool "neovim"]
-	cmd = NVIM_APPNAME=LazyVim nvim -d $LOCAL $REMOTE
+	cmd = nvim -d $LOCAL $REMOTE
 [difftool "diffview"]
-  cmd = NVIM_APPNAME=LazyVim nvim -d \"$LOCAL\" \"$REMOTE\" -c \"DiffviewOpen\"
+  cmd = nvim -d \"$LOCAL\" \"$REMOTE\" -c \"DiffviewOpen\"
 [difftool]
   prompt = false
 [init]

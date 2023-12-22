@@ -1,0 +1,3 @@
+#!/bin/bash
+
+NVIM_APPNAME=LazyVim /opt/homebrew/bin/nvim "$@"

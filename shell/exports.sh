@@ -1,5 +1,13 @@
 # shellcheck shell=bash
 
+# Prevent this file from being sourced twice (will be done by tmux)
+# see https://superuser.com/questions/544989/does-tmux-sort-the-path-variable
+if [ "$_SKIP_PROFILE" ]; then
+	return 0
+else
+	export _SKIP_PROFILE=y
+fi
+
 # ----------------------------
 # functions and shell-agnostic
 # ----------------------------
@@ -75,7 +83,7 @@ add_to_path append "$HOME/go/bin"
 
 # add_to_path prepend "$DOTFILES_BREW_PREFIX/opt/ruby/bin"
 
-add_to_path append "$DOTFILES/shell/bin"
+add_to_path prepend "$DOTFILES/shell/bin"
 add_to_path prepend "$HOME/.tmux/plugins/t-smart-tmux-session-manager/bin"
 
 # load .env file if it exists
