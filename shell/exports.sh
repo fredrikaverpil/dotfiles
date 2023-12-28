@@ -1,11 +1,10 @@
 # shellcheck shell=bash
 
 # Prevent this file from being sourced twice (will be done by tmux)
-# see https://superuser.com/questions/544989/does-tmux-sort-the-path-variable
-if [ "$_SKIP_PROFILE" ]; then
+if [ "$DOTFILES_EXPORTS_LOADED" ]; then
 	return 0
 else
-	export _SKIP_PROFILE=y
+	export DOTFILES_EXPORTS_LOADED="true"
 fi
 
 # ----------------------------
@@ -63,28 +62,21 @@ fi
 export DOTFILES="$HOME/code/dotfiles"
 export DOTFILES_SHELL=$shell
 export DOTFILES_BREW_PREFIX=$brew_prefix
-
 export HOMEBREW_NO_ANALYTICS=1
-
-add_to_path prepend "$HOME/.local/bin" # user-installed binaries
+echo "Warning: Enabling Task's remote taskfiles feature"
+export TASK_X_REMOTE_TASKFILES=1   # TODO: remove this once go-task/Task graduates this expirment
+export PIP_REQUIRE_VIRTUALENV=true # use pip --isolated to bypass
+export PYENV_ROOT="$HOME/.pyenv"   # pyenv
 
 add_to_path append "$HOME/.docker/bin"
-
-export PIP_REQUIRE_VIRTUALENV=true    # use pip --isolated to bypass
-export PYENV_ROOT="$HOME/.pyenv"      # pyenv
-add_to_path prepend "$PYENV_ROOT/bin" # pyenv
-
 add_to_path append "$HOME/.cargo/bin"
-
 add_to_path append "$HOME/go/bin"
-# NOTE: only set GOROOT to use non-default version of go
-# export GOROOT=/opt/homebrew/Cellar/go
-# export PATH=$PATH:$GOROOT/bin
 
-# add_to_path prepend "$DOTFILES_BREW_PREFIX/opt/ruby/bin"
-
-add_to_path prepend "$DOTFILES/shell/bin"
+# NOTE: the last prepend appears first in $PATH, so make sure the order is correct below
 add_to_path prepend "$HOME/.tmux/plugins/t-smart-tmux-session-manager/bin"
+add_to_path prepend "$PYENV_ROOT/bin"  # pyenv
+add_to_path prepend "$HOME/.local/bin" # user-installed binaries
+add_to_path prepend "$DOTFILES/shell/bin"
 
 # load .env file if it exists
 # shellcheck disable=SC1090
@@ -96,11 +88,7 @@ else
 	echo "Warning: $HOME/.shell/.env does not exist"
 fi
 
-# TODO: remove this once go-task/Task graduates this expirment
-echo "Warning: Enabling Task's remote taskfiles feature"
-TASK_X_REMOTE_TASKFILES=1
-
-#Per-platform settings
+# Per-platform settings
 case $(uname) in
 Darwin)
 	# commands for macOS go here
