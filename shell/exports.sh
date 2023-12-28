@@ -1,12 +1,5 @@
 # shellcheck shell=bash
 
-# Prevent this file from being sourced twice (will be done by tmux)
-if [ "$DOTFILES_EXPORTS_LOADED" ]; then
-	return 0
-else
-	export DOTFILES_EXPORTS_LOADED="true"
-fi
-
 # ----------------------------
 # functions and shell-agnostic
 # ----------------------------
@@ -16,7 +9,13 @@ function add_to_path() {
 	# usage:
 	# add_to_path prepend /path/to/prepend
 	# add_to_path append /path/to/append
-	if [ -d "$2" ] && [[ ! ":$PATH:" =~ .*":$2:.*" ]]; then
+	if [ -d "$2" ]; then
+
+		if [[ ! ":$PATH:" =~ .*":$2:.*" ]]; then
+			# echo "Warning: $2 is already in \$PATH"
+			remove_from_path "$2"
+		fi
+
 		if [ "$1" = "prepend" ]; then
 			PATH="$2:$PATH"
 			export PATH
@@ -26,6 +25,16 @@ function add_to_path() {
 		else
 			echo "Unknown option. Use 'prepend' or 'append'."
 		fi
+	fi
+}
+
+function remove_from_path() {
+	# NOTE: zsh only
+	# usage:
+	# remove_from_path /path/to/remove
+	if [ -d "$1" ] && [[ ":$PATH:" =~ .*":$1:.*" ]]; then
+		PATH="${PATH//$1:/}"
+		export PATH
 	fi
 }
 
