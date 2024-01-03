@@ -36,12 +36,21 @@ alias activate='source .venv/bin/activate'
 # assuming pyenv
 alias venv='PIP_REQUIRE_VIRTUALENV=false python3 -m pip install --upgrade --user pip virtualenv && python3 -m virtualenv .venv && source .venv/bin/activate && python3 -m pip install --upgrade pip && which pip && pip list && pip --version && python3 --version'
 
+# Go
+#
+# https://github.com/lotusirous/gostdsym
+alias gdoc="stdsym |fzf | xargs go doc "
+alias gd='stdsym -web | fzf --prompt "Symbols> " --preview "go doc \$(echo {} | sed s/#/./g)" --bind "enter:become( echo "https://pkg.go.dev/{}" |xargs open)"'
+
 # Gerrit
 # alias gerrit-push='git push origin HEAD:refs/for/master'
 # alias gerrit-draft='git push origin HEAD:refs/drafts/master'
 # alias gerrit-amend='git commit --amend'
 # alias gp='gerrit-amend && gerrit-push'
 # alias gp-draft='gerrit-amend && gerrit-draft'
+
+# mysql
+alias mysql='/opt/homebrew/opt/mysql-client/bin/mysql'
 
 # Per-platform settings, will override the above commands
 case $(uname) in
