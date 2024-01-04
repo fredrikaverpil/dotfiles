@@ -8,8 +8,8 @@ return {
     },
     lazy = false,
     config = function()
-      -- vim.opt.fillchars = "diff:╱"
-      vim.opt.fillchars = "diff:░"
+      vim.opt.fillchars = "diff:╱"
+      -- vim.opt.fillchars = "diff:░"
 
       require("diffview").setup({
         file_panel = {
