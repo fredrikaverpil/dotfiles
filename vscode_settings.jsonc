@@ -50,8 +50,8 @@
   // Editor
   "editor.minimap.renderCharacters": false,
   "editor.suggestSelection": "first",
-  "editor.fontFamily": "'Berkeley Mono', JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'Cascadia Code', Consolas, 'Courier New', monospace",
-  "editor.fontSize": 13,
+  "editor.fontFamily": "'Berkeley Mono', 'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'Cascadia Code', Consolas, 'Courier New', monospace",
+  "editor.fontSize": 12,
   "editor.fontWeight": "normal",
   "editor.inlineSuggest.enabled": true,
   "editor.bracketPairColorization.enabled": true,
@@ -109,6 +109,8 @@
   "window.autoDetectColorScheme": true,
 
   // Workbench
+  "workbench.colorTheme": "Tokyo Night Storm",
+  "workbench.iconTheme": "catppuccin-macchiato",
   "workbench.preferredLightColorTheme": "Serendipity Morning",
   "workbench.preferredDarkColorTheme": "Serendipity Midnight",
   "workbench.colorCustomizations": {
@@ -158,9 +160,8 @@
     "editor.formatOnSave": true,
     // "editor.formatOnSaveTimeout": 10000,  // for large files, black can timeout
     "editor.codeActionsOnSave": {
-      "source.organizeImports": true,
-      // "source.fixAll": false,
-      "source.fixAll.ruff": true
+      "source.organizeImports": "explicit",
+      "source.fixAll.ruff": "explicit"
     }
   },
   "[javascript]": {
@@ -326,7 +327,6 @@
   "diffEditor.ignoreTrimWhitespace": false,
   "githubPullRequests.pullBranch": "never",
   "editor.accessibilitySupport": "off",
-  "workbench.iconTheme": "catppuccin-macchiato",
   // "terminal.integrated.env.osx": {
   //   "PATH": "${env:PATH}:$HOME/.local/share/LazyVim/mason/bin"
   // },
@@ -335,6 +335,5 @@
   "gitlens.codeLens.authors.enabled": false,
   "workbench.startupEditor": "none",
   "editor.minimap.enabled": false,
-  "git.ignoreRebaseWarning": true,
-  "workbench.colorTheme": "Tokyo Night Storm"
+  "git.ignoreRebaseWarning": true
 }

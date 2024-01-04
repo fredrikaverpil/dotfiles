@@ -27,7 +27,6 @@ GitHub.copilot-labs
 github.vscode-github-actions
 GitHub.vscode-pull-request-github
 golang.go
-googlecloudtools.cloudcode
 GraphQL.vscode-graphql
 GraphQL.vscode-graphql-execution
 GraphQL.vscode-graphql-syntax
