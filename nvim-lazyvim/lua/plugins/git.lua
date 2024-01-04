@@ -51,10 +51,6 @@ return {
   },
 
   {
-    "tpope/vim-fugitive",
-  },
-
-  {
     "topaxi/gh-actions.nvim",
     dependencies = { "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim" },
     build = "make",
