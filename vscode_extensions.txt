@@ -23,7 +23,6 @@ enkia.tokyo-night
 esbenp.prettier-vscode
 foxundermoon.shell-format
 GitHub.copilot-chat
-GitHub.copilot-labs
 github.vscode-github-actions
 GitHub.vscode-pull-request-github
 golang.go
