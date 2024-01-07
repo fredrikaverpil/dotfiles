@@ -1,0 +1,4 @@
+# https://learn.microsoft.com/en-us/windows/wsl/wsl-config
+
+# Limits VM memory
+memory=2GB

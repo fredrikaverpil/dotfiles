@@ -50,6 +50,11 @@
       path: _macos/karabiner
       create: true
       if: '[ "$(uname -s)" = "Darwin" ]'
+    /mnt/c/Users/fredr/.wslconfig:
+      path: _windows/wslconfig
+      force: true
+      # if /mnt/c/Users/fredr exists
+      if: "[ -d /mnt/c/Users/fredr ]"
 - shell:
     - description: sync dotbot
       command: git submodule sync --recursive
