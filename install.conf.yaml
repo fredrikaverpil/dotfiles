@@ -39,17 +39,17 @@
       path: vscode_settings.jsonc
       force: true
       if: '[ "$(uname -s)" = "Darwin" ]'
-    # ~/Library/KeyBindings/DefaultKeyBinding.dict:
-    #  # Remap US English layout's ['; keys to Swedish åäö keys
-    #  # However, this works poorly, so commented out for now
-    #   path: _macos/DefaultKeyBinding.dict
-    #   force: true
-    #   if: '[ "$(uname -s)" = "Darwin" ]'
-    ~/.config/karabiner:
-      # Remap US English layout's ['; keys to Swedish åäö keys using Karabiner
-      path: _macos/karabiner
-      create: true
+    ~/Library/KeyBindings/DefaultKeyBinding.dict:
+      # Remap US English layout's ['; keys to Swedish åäö keys
+      # However, this works poorly, so commented out for now
+      path: _macos/DefaultKeyBinding.dict
+      force: true
       if: '[ "$(uname -s)" = "Darwin" ]'
+    # ~/.config/karabiner:
+    #   # Remap US English layout's ['; keys to Swedish åäö keys using Karabiner
+    #   path: _macos/karabiner
+    #   create: true
+    #   if: '[ "$(uname -s)" = "Darwin" ]'
     /mnt/c/Users/fredr/.wslconfig:
       path: _windows/wslconfig
       force: true
