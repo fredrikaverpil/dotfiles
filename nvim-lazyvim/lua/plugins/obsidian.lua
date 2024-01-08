@@ -1,5 +1,9 @@
 return {
   "epwalsh/obsidian.nvim",
+  enabled = function()
+    -- only enable on macOS for now
+    return vim.fn.has("mac") == 1
+  end,
   version = "*",
   lazy = false,
   ft = "markdown",
