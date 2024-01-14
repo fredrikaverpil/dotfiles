@@ -65,18 +65,18 @@ brew 'shellcheck'  # mason installs intel version
 brew 'hadolint'  # mason installs intel version
 
 # k8s
-brew 'helm'
-brew 'k9s'
-brew 'kind'
-brew 'kubectl'
-brew 'kubectx'
-brew 'linkerd'
-brew 'minikube'
-brew 'opentofu'  # terraform
-brew 'podman'
-brew 'podman-compose'
-brew 'stern'
-cask 'podman-desktop'
+# brew 'helm'
+# brew 'k9s'
+# brew 'kind'
+# brew 'kubectl'
+# brew 'kubectx'
+# brew 'linkerd'
+# brew 'minikube'
+# brew 'opentofu'  # terraform
+# brew 'podman'
+# brew 'podman-compose'
+# brew 'stern'
+# cask 'podman-desktop'
 
 # gcloud
 cask 'google-cloud-sdk'
