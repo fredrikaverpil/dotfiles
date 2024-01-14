@@ -24,6 +24,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# go
+/coverage.out
+
 # c extensions
 *.so
 
