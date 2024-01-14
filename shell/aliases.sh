@@ -39,7 +39,6 @@ alias venv='PIP_REQUIRE_VIRTUALENV=false python3 -m pip install --upgrade --user
 # Go
 #
 # https://github.com/lotusirous/gostdsym
-alias gdoc="stdsym |fzf | xargs go doc "
 alias gd='stdsym -web | fzf --prompt "Symbols> " --preview "go doc \$(echo {} | sed s/#/./g)" --bind "enter:become( echo "https://pkg.go.dev/{}" |xargs open)"'
 
 # Gerrit
