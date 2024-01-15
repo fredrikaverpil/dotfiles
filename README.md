@@ -15,7 +15,7 @@ These are my personal dotfiles, for macOS, Windows + WSL. The setup is based on 
 
 ### Fonts 💯
 
-- [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono)
+- [Berkeley Mono](https://berkeleygraphics.com/typefaces/berkeley-mono)
 - [Symbols Nerd Font Mono](https://github.com/ryanoasis/nerd-fonts)
 - [Noto Color Emoji](https://fonts.google.com/noto/specimen/Noto+Color+Emoji)
 
