@@ -19,6 +19,10 @@ These are my personal dotfiles, for macOS, Windows + WSL. The setup is based on 
 - [Symbols Nerd Font Mono](https://github.com/ryanoasis/nerd-fonts)
 - [Noto Color Emoji](https://fonts.google.com/noto/specimen/Noto+Color+Emoji)
 
+### Project config/tooling 🧢
+
+- [Configure projects](README_PROJECT.md)
+
 ### Kubernetes 🧊
 
 - [Configure Kubernetes](README_K8S.md)

@@ -11,3 +11,61 @@ tasks:
     cmds:
       - task -g --list
     silent: true
+
+  # NOTE: tasks below should, if proven useful, be graduated to shell/bin.
+  # Try keeping this file relatively clean.
+
+  get-set-context:
+    # usage example:
+    # $ task get-set-context -- staging
+    #
+    # first requires something like:
+    # gcloud auth login
+    # gcloud config set project xxx
+    # gcloud components install gke-gcloud-auth-plugin
+    #
+    # note: use kubectx to just select between existing contexts
+    desc: Get and set kubernetes context
+    cmds:
+      - gcloud container clusters get-credentials {{ .CLUSTER }}
+        --zone {{ .CLOUDSDK_COMPUTE_ZONE }}
+        --project {{ .CLOUDSDK_CORE_PROJECT }}
+      - kubectl config use-context gke_{{ .CLOUDSDK_CORE_PROJECT }}_{{ .CLOUDSDK_COMPUTE_ZONE }}_{{ .CLUSTER }}
+      - kubectl config current-context
+    vars:
+      CLUSTER:
+        # get the first argument
+        sh: echo {{.CLI_ARGS}} | awk '{print $1}'
+    silent: false
+
+  describe-pod:
+    # example use:
+    # task describe-pod -- myservice
+    # note that you can skip the trailing identifier
+    desc: Describe pod and pipe to fzf
+    cmds:
+      - echo '{{.VALUE}}'
+    vars:
+      POD:
+        sh: kubectl get pods | grep {{.CLI_ARGS}} | head -n 1 | awk '{print $1}'
+      VALUE:
+        # echo the chosen entry in fzf
+        sh: echo $(kubectl describe pod {{.POD}} | fzf --reverse)
+    silent: false
+
+  decode-secret:
+    # example use:
+    # task decode-secret -- mysecret mykey
+    desc: Decode base64-encoded secret
+    cmds:
+      - echo 'Secret is {{.SECRET}}'
+      - echo 'Key is {{.KEY}}'
+      - kubectl get secrets {{.SECRET}} -o jsonpath='{.data}' | jq -r '.'"{{.KEY}}" | base64 --decode
+    vars:
+      SECRET:
+        # get the first argument
+        sh: echo {{.CLI_ARGS}} | awk '{print $1}'
+      KEY:
+        # get the second argument
+        sh: echo {{.CLI_ARGS}} | awk '{print $2}'
+    silent: false
