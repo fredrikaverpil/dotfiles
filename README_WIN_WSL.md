@@ -73,9 +73,12 @@ From the Ubuntu prompt:
 
 ```bash
 mkdir -p code && cd code
-git clone git@github.com:fredrikaverpil/dotfiles.git --recursive
+git clone --recursive https://github.com/fredrikaverpil/dotfiles.git
 cd dotfiles && ./install -vv
 ```
+
+> [!NOTE]
+> See [README_GIT.md](README_GIT.md) for details on setting up git.
 
 ### Windows configuration
 

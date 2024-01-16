@@ -16,12 +16,19 @@ chmod 644 ~/.ssh/known_hosts
 chmod 644 ~/.ssh/config
 ```
 
-### Repository access
+### Repository access via SSH
 
 - Add the machine's `id_rsa.pub` or `id_ed25519.pub` SSH key to GitHub.
 - Hook up 1Password with the ssh agent, see `~/.config/1Password/ssh/agent.toml`.
-- Always clone down using SSH (not HTTPS); `git clone git@github.com:user/repo.git`.
-- For the GitHub CLI, use `gh auth login` to authenticate.
+- When SSH is desired, use `git clone --recursive git@github.com:user/repo.git`.
+
+### Repository access via HTTPS
+
+- For HTTPS authentication, use the GitHub CLI; `gh auth login`.
+- When HTTPS is desired, use `git clone --recursive https://github.com/user/repo.git`.
+
+> [!NOTE]
+> Please note that the GitHub CLI must be installed via `brew`. See the how the helper is invoked in [gitconfig](gitconfig).
 
 ### 1Password commit signing
 
