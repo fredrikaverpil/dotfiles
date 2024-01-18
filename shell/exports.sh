@@ -91,6 +91,7 @@ export PYENV_ROOT="$HOME/.pyenv"   # pyenv
 add_to_path append "$HOME/.docker/bin"
 add_to_path append "$HOME/.cargo/bin"
 add_to_path append "$HOME/go/bin"
+add_to_path append "$DOTFILES_BREW_PREFIX/opt/mysql-client/bin"
 
 # NOTE: the last prepend appears first in $PATH, so make sure the order is correct below
 add_to_path prepend "$HOME/.tmux/plugins/t-smart-tmux-session-manager/bin"

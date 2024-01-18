@@ -49,7 +49,7 @@ alias gd='stdsym -web | fzf --prompt "Symbols> " --preview "go doc \$(echo {} | 
 # alias gp-draft='gerrit-amend && gerrit-draft'
 
 # mysql
-alias mysql='/opt/homebrew/opt/mysql-client/bin/mysql'
+# alias mysql='/opt/homebrew/opt/mysql-client/bin/mysql'
 
 # Per-platform settings, will override the above commands
 case $(uname) in
