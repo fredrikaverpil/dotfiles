@@ -46,7 +46,15 @@ return {
         end, { "i", "s" }),
       })
       opts.preselect = cmp.PreselectMode.None
-      opts.sources = cmp.config.sources(vim.list_extend(opts.sources, { { name = "emoji" } }))
+
+      local sources = {
+        { name = "emoji" },
+        { name = "vim-dadbod-completion" },
+      }
+      opts.sources = cmp.config.sources(vim.list_extend(opts.sources, sources))
+
+      -- debug
+      -- vim.api.nvim_echo({ { "opts.sources: " .. vim.inspect(opts.sources), "Normal" } }, true, {})
     end,
   },
 }
