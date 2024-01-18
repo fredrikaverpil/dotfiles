@@ -150,7 +150,6 @@ return {
     opts = function(_, opts)
       local linters = require("lint").linters
       linters.mypy.cmd = prefer_bin_from_venv("mypy")
-      linters.sqlfluff.args = vim.list_extend({ "--dialect", "postgres" }, linters.sqlfluff.args)
 
       local linters_by_ft = {
         -- this extends lazyvim's nvim-lint setup
@@ -158,7 +157,7 @@ return {
         protobuf = { "buf", "protolint" },
         python = { "mypy" },
         sh = { "shellcheck" },
-        sql = { "sqlfluff" },
+        sql = { "sqlfluff" }, -- NOTE: https://github.com/mfussenegger/nvim-lint/blob/master/lua/lint/linters/sqlfluff.lua
         yaml = { "yamllint" },
       }
 
