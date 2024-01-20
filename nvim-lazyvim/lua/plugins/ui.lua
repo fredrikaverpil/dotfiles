@@ -6,8 +6,11 @@ return {
     enabled = false,
   },
 
-  { "goolord/alpha-nvim", enabled = false },
-  { "nvimdev/dashboard-nvim", enabled = false },
+  {
+    -- disable dashboard
+    "nvimdev/dashboard-nvim",
+    enabled = false,
+  },
 
   {
     -- NOTE: colorschemes already installed in LazyVim: https://www.lazyvim.org/plugins/colorscheme
