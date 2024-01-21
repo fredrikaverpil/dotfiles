@@ -29,13 +29,17 @@
     pkgx.yaml:
       # TODO: https://github.com/pkgxdev/pkgx/issues/890
       path: templates/pkgx.yaml
+
     ~/.config/LazyVim/lua:
       path: nvim-lazyvim/lua
       force: true
     ~/.config/LazyVim/lazyvim.json:
+      force: true
+      path: nvim-lazyvim/lazyvim.json
     ~/.config/LazyVim/lazy-lock.json:
       force: true
-      path: lazy-lock.json
+      path: nvim-lazyvim/lazy-lock.json
+
     ~/Library/Application Support/Code/User/settings.json:
       path: vscode_settings.jsonc
       force: true
