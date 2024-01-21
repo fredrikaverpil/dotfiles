@@ -38,22 +38,15 @@ return {
       vim.g.db_ui_execute_on_save = false
       vim.g.db_ui_use_nvim_notify = true
 
-      local autocomplete_group = vim.api.nvim_create_augroup("vimrc_autocompletion", { clear = true })
       local cmp = require("cmp")
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = sql_ft,
-        callback = function()
-          cmp.setup.buffer({
-            sources = {
-              { name = "vim-dadbod-completion" },
-              { name = "nvim_lsp" },
-              { name = "buffer" },
-              { name = "luasnip" },
-            },
-          })
-        end,
-        group = autocomplete_group,
+      local sources = cmp.get_config().sources
+      local updated_sources = table.insert(sources, { name = "vim-dadbod-completion", group_index = 1, option = {} })
+
+      cmp.setup.buffer({
+        sources = updated_sources,
       })
+
+      print(vim.inspect(cmp.get_config().sources))
     end,
   },
 }
