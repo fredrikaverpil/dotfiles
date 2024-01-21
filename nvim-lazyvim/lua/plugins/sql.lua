@@ -43,21 +43,21 @@ return {
         pattern = sql_ft,
         callback = function()
           local cmp = require("cmp")
-          local sources = cmp.get_config().sources
-          local updated_sources = {}
+          local global_sources = cmp.get_config().sources
+          local buffer_sources = {}
 
           -- add globally defined sources (see separate nvim-cmp config)
           -- this makes e.g. luasnip snippets available since luasnip is configured globally
-          for _, source in ipairs(sources) do
-            table.insert(updated_sources, { name = source.name })
+          for _, source in ipairs(global_sources) do
+            table.insert(buffer_sources, { name = source.name })
           end
 
           -- add vim-dadbod-completion source
-          table.insert(updated_sources, { name = "vim-dadbod-completion" })
+          table.insert(buffer_sources, { name = "vim-dadbod-completion" })
 
           -- update sources for the current buffer
           cmp.setup.buffer({
-            sources = updated_sources,
+            sources = buffer_sources,
           })
         end,
         group = autocomplete_group,
