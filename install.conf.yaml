@@ -40,15 +40,15 @@
       force: true
       path: nvim-lazyvim/lazy-lock.json
 
-    ~/.config/kickstart/init.lua:
-      path: nvim-kickstart/init.lua
+    ~/.config/fredrik/init.lua:
+      path: nvim-fredrik/init.lua
       force: true
-    ~/.config/kickstart/lua:
-      path: nvim-kickstart/lua
+    ~/.config/fredrik/lua:
+      path: nvim-fredrik/lua
       force: true
-    ~/.config/kickstart/lazy-lock.json:
+    ~/.config/fredrik/lazy-lock.json:
       force: true
-      path: nvim-kickstart/lazy-lock.json
+      path: nvim-fredrik/lazy-lock.json
 
     ~/Library/Application Support/Code/User/settings.json:
       path: vscode_settings.jsonc
