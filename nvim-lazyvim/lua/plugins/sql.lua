@@ -58,9 +58,7 @@ return {
           table.insert(buffer_sources, { name = "vim-dadbod-completion" })
 
           -- update sources for the current buffer
-          cmp.setup.buffer({
-            sources = buffer_sources,
-          })
+          cmp.setup.buffer({ sources = buffer_sources })
         end,
         group = autocomplete_group,
       })
