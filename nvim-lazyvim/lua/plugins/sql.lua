@@ -38,15 +38,30 @@ return {
       vim.g.db_ui_execute_on_save = false
       vim.g.db_ui_use_nvim_notify = true
 
-      local cmp = require("cmp")
-      local sources = cmp.get_config().sources
-      local updated_sources = table.insert(sources, { name = "vim-dadbod-completion", group_index = 1, option = {} })
+      local autocomplete_group = vim.api.nvim_create_augroup("vimrc_autocompletion", { clear = true })
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = sql_ft,
+        callback = function()
+          local cmp = require("cmp")
+          local sources = cmp.get_config().sources
+          local updated_sources = {}
 
-      cmp.setup.buffer({
-        sources = updated_sources,
+          -- add globally defined sources (see separate nvim-cmp config)
+          -- this makes e.g. luasnip snippets available since luasnip is configured globally
+          for _, source in ipairs(sources) do
+            table.insert(updated_sources, { name = source.name })
+          end
+
+          -- add vim-dadbod-completion source
+          table.insert(updated_sources, { name = "vim-dadbod-completion" })
+
+          -- update sources for the current buffer
+          cmp.setup.buffer({
+            sources = updated_sources,
+          })
+        end,
+        group = autocomplete_group,
       })
-
-      print(vim.inspect(cmp.get_config().sources))
     end,
   },
 }
