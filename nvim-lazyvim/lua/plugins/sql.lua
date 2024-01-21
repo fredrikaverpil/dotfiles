@@ -9,7 +9,7 @@ return {
     enabled = true,
     dependencies = {
       { "kristijanhusak/vim-dadbod-ui" },
-      { "kristijanhusak/vim-dadbod-completion", lazy = true, ft = sql_ft },
+      { "kristijanhusak/vim-dadbod-completion" },
       {
         "folke/edgy.nvim",
         optional = true,
