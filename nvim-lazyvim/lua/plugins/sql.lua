@@ -48,8 +48,10 @@ return {
 
           -- add globally defined sources (see separate nvim-cmp config)
           -- this makes e.g. luasnip snippets available since luasnip is configured globally
-          for _, source in ipairs(global_sources) do
-            table.insert(buffer_sources, { name = source.name })
+          if global_sources then
+            for _, source in ipairs(global_sources) do
+              table.insert(buffer_sources, { name = source.name })
+            end
           end
 
           -- add vim-dadbod-completion source
