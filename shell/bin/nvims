@@ -11,7 +11,7 @@ function nvims() {
 	elif [[ $config == "default" ]]; then
 		config=""
 	fi
-	NVIM_APPNAME=$config /opt/homebrew/bin/nvim "$@"
+	NVIM_APPNAME=$config $DOTFILES_BREW_PREFIX/bin/nvim "$@"
 }
 
 nvims "$@"

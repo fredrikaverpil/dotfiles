@@ -1,3 +1,3 @@
 #!/bin/bash
 
-NVIM_APPNAME=LazyVim $HOMEBREW_PREFIX/bin/nvim "$@"
+NVIM_APPNAME=LazyVim $DOTFILES_BREW_PREFIX/bin/nvim "$@"
