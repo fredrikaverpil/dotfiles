@@ -49,7 +49,6 @@ return {
 
       local sources = {
         { name = "emoji" },
-        { name = "vim-dadbod-completion" },
       }
       opts.sources = cmp.config.sources(vim.list_extend(opts.sources, sources))
 
