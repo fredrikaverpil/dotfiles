@@ -1,8 +1,10 @@
+local vault_path = "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/fredrik"
+
 return {
   "epwalsh/obsidian.nvim",
   enabled = function()
-    -- only enable on macOS for now
-    return vim.fn.has("mac") == 1
+    -- only enable on macOS for now, and if vault_path exists
+    return vim.fn.has("mac") == 1 and vim.fn.isdirectory(vault_path) == 1
   end,
   version = "*",
   lazy = false,
@@ -22,7 +24,7 @@ return {
     workspaces = {
       {
         name = "personal",
-        path = "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/fredrik",
+        path = vault_path,
       },
     },
 
