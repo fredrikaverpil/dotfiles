@@ -3,7 +3,7 @@
 version: "3"
 
 includes:
-  work: ~/code/_work/Taskfile.yml
+  work: ~/code/work/Taskfile.yml
 
 tasks:
   default:

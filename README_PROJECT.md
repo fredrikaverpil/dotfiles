@@ -8,8 +8,8 @@
 
 Add `.envrc` files in strategic locations, like:
 
-- `~/code/_work/.envrc`
-- `~/code/_work/project/.envrc`
+- `~/code/work/.envrc`
+- `~/code/work/project/.envrc`
 
 Run `direnv allow .` in each location to allow it to execute.
 

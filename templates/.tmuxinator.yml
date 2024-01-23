@@ -46,20 +46,20 @@ root: ~/
 
 windows:
   - ui:
-      root: ~/code/_work/
+      root: ~/code/work/
       layout: even-horizontal
       # synchronize: after
       panes:
         - cd proj1
         - cd proj2
   - api:
-      root: ~/code/_work/
+      root: ~/code/work/
       layout: even-horizontal
       # synchronize: after
       panes:
         - cd proj3
   - services:
-      root: ~/code/_work/
+      root: ~/code/work/
       layout: tiled
       # synchronize: after
       panes:
@@ -70,7 +70,7 @@ windows:
         - cd proj8
         - cd proj9
   - test-containers:
-      root: ~/code/_work/
+      root: ~/code/work/
       layout: tiled
       # synchronize: after
       panes:

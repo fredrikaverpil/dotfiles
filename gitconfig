@@ -51,5 +51,5 @@
 	helper = !/opt/homebrew/bin/gh auth git-credential
 
 # Always keep gitconfig for work at bottom of this file
-[includeIf "gitdir:~/code/_work/**/.git"]
+[includeIf "gitdir:~/code/work/**/.git"]
 	path = ~/.gitconfig_work
