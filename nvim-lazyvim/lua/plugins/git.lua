@@ -14,7 +14,7 @@ return {
       require("diffview").setup({
         file_panel = {
           win_config = {
-            position = "bottom",
+            position = "left",
           },
         },
         enhanced_diff_hl = true, -- See ':h diffview-config-enhanced_diff_hl'
