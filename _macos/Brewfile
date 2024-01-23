@@ -64,6 +64,10 @@ brew 'gnu-sed'  # spectre
 brew 'shellcheck'  # mason installs intel version
 brew 'hadolint'  # mason installs intel version
 
+# containers
+brew 'colima'
+brew 'docker'
+
 # k8s
 # brew 'helm'
 # brew 'k9s'

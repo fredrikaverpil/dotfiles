@@ -116,6 +116,10 @@ Darwin)
 
 	add_to_path append "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
 
+	if command -v colima &>/dev/null; then
+		export DOCKER_HOST="unix://$HOME/.colima/docker.sock"
+	fi
+
 	# # nvm
 	# if [ "$(uname -m)" = "arm64" ]; then
 	# 	export NVM_DIR="$HOME/.nvm"
