@@ -36,9 +36,17 @@ chmod 644 ~/.ssh/config
 
 ### 1Password commit signing
 
-Find the item in 1Password containing the git commit signing key info and save this as `~/.gitconfig_1password`. This file is included by `~/.gitconfig` of these dotfiles.
+Find the item in 1Password containing the git commit signing key info and save this as `~/.gitconfig_1password`. This file is included by `~/.gitconfig` of these dotfiles. On WSL, replace the path to the CLI with `/mnt/c/ ...` in `~/.gitconfig_1password`.
 
-On WSL, replace the path to the CLI with `/mnt/c/ ...` in `~/.gitconfig_1password`.
+Also, edit `~/.config/1Password/ssh/agent.toml` to say something like:
+
+```toml
+[[ssh-keys]]
+vault = "Workplace"
+
+[[ssh-keys]]
+vault = "Personal"
+```
 
 ## Update gitconfig email
 
