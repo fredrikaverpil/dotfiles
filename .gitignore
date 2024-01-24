@@ -24,3 +24,5 @@ crash.log
 override.tf
 *_override.tf
 
+# Work related
+/work

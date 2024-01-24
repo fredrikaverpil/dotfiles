@@ -35,6 +35,26 @@ function node_version_manager() {
 	fi
 }
 
+function zsh_completion() {
+
+	if [ -n "$brew_prefix" ]; then
+		export FPATH=$brew_prefix/share/zsh/site-functions:$FPATH
+
+		source "$brew_prefix/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+		source "$brew_prefix/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+	fi
+
+	if [ -f "$brew_prefix/share/google-cloud-sdk" ]; then
+		source "$brew_prefix/share/google-cloud-sdk/path.zsh.inc"
+		source "$brew_prefix/share/google-cloud-sdk/completion.zsh.inc"
+	fi
+
+	export FPATH=$DOTFILES/work/zsh/site-functions:$FPATH
+
+	autoload -Uz compinit
+	compinit
+}
+
 # ----------------------------
 # globals
 # ----------------------------
@@ -93,23 +113,13 @@ fi
 # ----------------------------
 
 if [[ $shell == "zsh" ]]; then
-	if [ -n "$brew_prefix" ]; then
-		export FPATH=$brew_prefix/share/zsh/site-functions:$FPATH
-		autoload -Uz compinit
-		compinit
 
-		source "$brew_prefix/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
-		source "$brew_prefix/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-	fi
-
-	if [ -f "$brew_prefix/share/google-cloud-sdk" ]; then
-		source "$brew_prefix/share/google-cloud-sdk/path.zsh.inc"
-		source "$brew_prefix/share/google-cloud-sdk/completion.zsh.inc"
-	fi
+	zsh_completion
 
 elif [[ $shell == "bash" ]]; then
 	if [ -f "$brew_prefix/share/google-cloud-sdk" ]; then
 		source "$brew_prefix/share/google-cloud-sdk/path.bash.inc"
 		source "$brew_prefix/share/google-cloud-sdk/completion.bash.inc"
 	fi
+
 fi
