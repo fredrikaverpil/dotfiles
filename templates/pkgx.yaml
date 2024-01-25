@@ -4,3 +4,4 @@ dependencies:
   - node
   - npm
   - python
+  - go
