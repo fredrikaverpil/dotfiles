@@ -65,6 +65,7 @@ return {
         "golangci-lint", -- linter (its binary is required by golanci-lint-langserver?)
         -- "gomodifytags", -- code actions
         -- "impl", -- code actions
+        "golines", -- formatter
 
         -- protobuf
         "buf-language-server", -- lsp (prototype, not feature-complete yet, rely on buf for now)
@@ -112,7 +113,7 @@ return {
         rust = { "rustfmt" },
       }
       local replace_formatters_with = {
-        go = { "gofumpt", "goimports", "gci" },
+        go = { "gofumpt", "golines", "goimports", "gci" },
       }
 
       -- NOTE: conform.nvim can use a sub-list to run only the first available formatter (see docs)
