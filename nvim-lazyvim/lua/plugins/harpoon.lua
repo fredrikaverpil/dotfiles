@@ -16,4 +16,13 @@ return {
       { "<leader>ht", ":lua require('harpoon.term').gotoTerminal(1)<CR>", desc = "Terminal" },
     },
   },
+
+  {
+    "otavioschwanck/arrow.nvim",
+    opts = {
+      show_icons = true,
+      leader_key = ";", -- Recommended to be a single key
+      always_show_path = true,
+    },
+  },
 }
