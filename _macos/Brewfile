@@ -42,6 +42,7 @@ brew 'tree'
 brew 'withgraphite/tap/graphite'
 brew 'yq'
 brew 'zoxide'
+brew 'opentofu'  # terraform
 
 # slides
 brew 'slides'
@@ -63,10 +64,13 @@ brew 'fzf'
 brew 'gnu-sed'  # spectre
 brew 'shellcheck'  # mason installs intel version
 brew 'hadolint'  # mason installs intel version
+brew 'rustup-init' # FIX: look att nvim distro installer..
 
 # containers
-brew 'colima'
+brew 'podman'
 brew 'docker'
+brew 'podman-compose'
+cask 'podman-desktop'
 
 # k8s
 # brew 'helm'
@@ -76,11 +80,7 @@ brew 'docker'
 # brew 'kubectx'
 # brew 'linkerd'
 # brew 'minikube'
-# brew 'opentofu'  # terraform
-# brew 'podman'
-# brew 'podman-compose'
 # brew 'stern'
-# cask 'podman-desktop'
 
 # gcloud
 cask 'google-cloud-sdk'
@@ -99,5 +99,3 @@ cask 'spotify'
 cask 'obsidian'
 cask 'signal'
 cask 'wacom-tablet'
-
-
