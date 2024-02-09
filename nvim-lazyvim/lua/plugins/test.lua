@@ -34,9 +34,6 @@ return {
           args = { "--log-level", "INFO", "--color", "yes", "-vv", "-s" },
           -- dap = { justMyCode = false },
         },
-        ["neotest-go"] = {
-          args = { "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out" },
-        },
         -- ["neotest-rust"] = {
         --   -- see lazy.lua
         --   -- https://github.com/rouge8/neotest-rust

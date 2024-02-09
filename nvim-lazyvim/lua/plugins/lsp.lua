@@ -55,18 +55,6 @@ return {
         "rust-analyzer", -- lsp
         -- rustfmt -- formatter (install via rustup)
 
-        -- go
-        -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md
-        -- https://github.com/golang/tools/blob/master/gopls/internal/lsp/source/options.go
-        "gopls", -- lsp
-        "gofumpt", -- formatter
-        -- "goimports", -- formatter
-        "gci", -- formatter, replaces goimports
-        "golangci-lint", -- linter (its binary is required by golanci-lint-langserver?)
-        -- "gomodifytags", -- code actions
-        -- "impl", -- code actions
-        -- "golines", -- formatter
-
         -- protobuf
         "buf-language-server", -- lsp (prototype, not feature-complete yet, rely on buf for now)
         "buf", -- formatter, linter
@@ -112,9 +100,7 @@ return {
         python = { "ruff_fix", "ruff_format" },
         rust = { "rustfmt" },
       }
-      local replace_formatters_with = {
-        go = { "gofumpt", "goimports", "gci" },
-      }
+      local replace_formatters_with = {}
 
       -- NOTE: conform.nvim can use a sub-list to run only the first available formatter (see docs)
 
@@ -145,49 +131,18 @@ return {
 
   {
     "mfussenegger/nvim-lint",
-    -- https://github.com/mfussenegger/nvim-lint
     enabled = true,
     opts = function(_, opts)
       local linters = require("lint").linters
 
-      local function find_file(filename)
-        -- find file
-        local command = "fd --hidden --no-ignore '" .. filename .. "' " .. vim.fn.getcwd() .. " | head -n 1"
-        local file = io.popen(command):read("*l")
-        return file and file or nil
-      end
-
-      local use_golangci_config_if_available = function()
-        local config_file = find_file(".golangci.yml")
-        if config_file then
-          print("Using golangci-lint config: " .. config_file)
-          return {
-            "run",
-            "--out-format",
-            "json",
-            "--config",
-            config_file,
-            function()
-              return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
-            end,
-          }
-        else
-          return linters.golangcilint.args
-        end
-      end
-
-      linters.golangcilint.args = use_golangci_config_if_available()
       linters.mypy.cmd = prefer_bin_from_venv("mypy")
 
       local linters_by_ft = {
-        -- this extends lazyvim's nvim-lint setup
-        -- https://www.lazyvim.org/extras/linting/nvim-lint
         protobuf = { "buf", "protolint" },
         python = { "mypy" },
         sh = { "shellcheck" },
-        sql = { "sqlfluff" }, -- NOTE: https://github.com/mfussenegger/nvim-lint/blob/master/lua/lint/linters/sqlfluff.lua
+        sql = { "sqlfluff" },
         yaml = { "yamllint" },
-        go = { "golangcilint" },
       }
 
       -- extend opts.linters_by_ft

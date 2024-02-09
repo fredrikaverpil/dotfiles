@@ -14,8 +14,6 @@ return {
         "diff",
         "git_config",
         "git_rebase",
-        "go",
-        "gomod",
         "html",
         "http",
         "javascript",
