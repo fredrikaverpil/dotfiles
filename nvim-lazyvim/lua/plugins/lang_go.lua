@@ -21,7 +21,6 @@ local use_golangci_config_if_available = function(linters)
       end,
     }
   else
-    print("Using vanilla golangcilint args" .. vim.inspect(linters.golangcilint.args))
     return linters.golangcilint.args
   end
 end
@@ -137,8 +136,6 @@ return {
       local linters = require("lint").linters
 
       linters.golangcilint.args = use_golangci_config_if_available(linters)
-
-      print(vim.inspect(linters.golangcilint.args))
 
       local linters_by_ft = {
         go = { "golangcilint" },
