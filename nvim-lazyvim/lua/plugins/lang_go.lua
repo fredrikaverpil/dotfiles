@@ -48,6 +48,10 @@ return {
             { "<leader>td", "<cmd>lua require('dap-go').debug_test()<CR>", desc = "Debug Nearest (Go)" },
           },
           settings = {
+            -- https://github.com/golang/tools/blob/master/gopls/README.md
+            -- https://github.com/golang/tools/blob/master/gopls/doc/vim.md
+            -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md
+            -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
             gopls = {
               gofumpt = true,
               codelenses = {
