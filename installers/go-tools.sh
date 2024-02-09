@@ -6,3 +6,4 @@ go install github.com/lotusirous/gostdsym/stdsym@latest
 go install github.com/go-delve/delve/cmd/dlv@latest
 go install golang.org/x/tools/gopls@latest
 go install golang.org/x/tools/cmd/deadcode@latest
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
