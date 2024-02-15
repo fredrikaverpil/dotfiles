@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if command -v podman &>/dev/null; then
+	[ -e /etc/containers/nodocker ] ||
+		echo "Emulate Docker CLI using podman. Create /etc/containers/nodocker to quiet msg." >&2
+	exec podman "$@"
+else
+	exec docker "$@"
+fi
