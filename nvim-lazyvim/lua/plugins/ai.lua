@@ -19,6 +19,7 @@ return {
   -- custom config which piggybacks on the copilot extras in lazy.lua.
   {
     "zbirenbaum/copilot.lua",
+    enabled = enable_ai(),
     cmd = "Copilot",
     build = ":Copilot auth",
     event = "InsertEnter",
@@ -46,11 +47,6 @@ return {
         cmp.event:on("menu_closed", function()
           vim.b.copilot_suggestion_hidden = false
         end)
-      end
-
-      -- disable copilot if we are in a private project
-      if not enable_ai() then
-        vim.cmd("Copilot disable")
       end
     end,
   },
