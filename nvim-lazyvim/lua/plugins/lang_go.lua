@@ -39,6 +39,9 @@ return {
   },
   {
     "neovim/nvim-lspconfig",
+    dependencies = {
+      "artemave/workspace-diagnostics.nvim",
+    },
     opts = {
       inlay_hints = {
         enabled = false,
@@ -95,7 +98,8 @@ return {
         gopls = function(_, opts)
           -- workaround for gopls not supporting semanticTokensProvider
           -- https://github.com/golang/go/issues/54531#issuecomment-1464982242
-          require("lazyvim.util").lsp.on_attach(function(client, _)
+          require("lazyvim.util").lsp.on_attach(function(client, bufnr)
+            require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
             if client.name == "gopls" then
               if not client.server_capabilities.semanticTokensProvider then
                 local semantic = client.config.capabilities.textDocument.semanticTokens
