@@ -12,11 +12,11 @@ return {
       -- vim.opt.fillchars = "diff:░"
 
       require("diffview").setup({
-        file_panel = {
-          win_config = {
-            position = "left",
-          },
-        },
+        -- file_panel = {
+        --   win_config = {
+        --     position = "left",
+        --   },
+        -- },
         enhanced_diff_hl = true, -- See ':h diffview-config-enhanced_diff_hl'
       })
     end,
