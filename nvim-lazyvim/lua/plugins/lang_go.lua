@@ -28,6 +28,7 @@ end
 return {
   {
     "nvim-treesitter/nvim-treesitter",
+    ft = { "go" },
     opts = function(_, opts)
       vim.list_extend(opts.ensure_installed, {
         "go",
@@ -39,6 +40,7 @@ return {
   },
   {
     "neovim/nvim-lspconfig",
+    ft = { "go" },
     dependencies = {
       "artemave/workspace-diagnostics.nvim",
     },
@@ -99,8 +101,8 @@ return {
           -- workaround for gopls not supporting semanticTokensProvider
           -- https://github.com/golang/go/issues/54531#issuecomment-1464982242
           require("lazyvim.util").lsp.on_attach(function(client, bufnr)
-            require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
             if client.name == "gopls" then
+              require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
               if not client.server_capabilities.semanticTokensProvider then
                 local semantic = client.config.capabilities.textDocument.semanticTokens
                 client.server_capabilities.semanticTokensProvider = {
@@ -122,6 +124,7 @@ return {
   -- Ensure Go tools are installed
   {
     "williamboman/mason.nvim",
+    ft = { "go" },
     opts = function(_, opts)
       opts.ensure_installed = opts.ensure_installed or {}
       vim.list_extend(opts.ensure_installed, { "goimports", "gofumpt", "gci", "golangci-lint" })
@@ -129,6 +132,7 @@ return {
   },
   {
     "stevearc/conform.nvim",
+    ft = { "go" },
     optional = true,
     opts = {
       formatters_by_ft = {
@@ -139,6 +143,7 @@ return {
   {
     "mfussenegger/nvim-lint",
     enabled = true,
+    ft = { "go" },
     opts = function(_, opts)
       local linters = require("lint").linters
 
@@ -157,6 +162,7 @@ return {
   },
   {
     "mfussenegger/nvim-dap",
+    ft = { "go" },
     optional = true,
     dependencies = {
       {
@@ -174,6 +180,7 @@ return {
   },
   {
     "nvim-neotest/neotest",
+    ft = { "go" },
     optional = true,
     dependencies = {
       "nvim-neotest/neotest-go",
@@ -191,6 +198,7 @@ return {
   },
   {
     "andythigpen/nvim-coverage",
+    ft = { "go" },
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {
       auto_reload = true,
