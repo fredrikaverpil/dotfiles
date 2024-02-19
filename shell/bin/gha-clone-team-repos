@@ -3,15 +3,18 @@
 # The access token needs the following scopes:
 # - read:org to read organization information
 # - repo to access private repositories of the organization
+
 # Function to display debug output if debug flag is set
 debug_echo() {
 	if [ "$DEBUG" = true ]; then
 		echo "$1"
 	fi
 }
+
 # Initialize variables
 DEBUG=false
 PER_PAGE=100
+
 # Parse command line options
 while [[ $# -gt 0 ]]; do
 	key="$1"
@@ -28,6 +31,7 @@ done
 access_token=$1
 org_name=$2
 team_slug=$3
+
 # Check if all arguments are provided
 if [ -z "$access_token" ] || [ -z "$org_name" ] || [ -z "$team_slug" ]; then
 	echo "Usage: $0 [--debug] <access_token> <org_name> <team_slug>"
@@ -49,12 +53,10 @@ while [ "$no_more_repos" = false ]; do
 	)
 	debug_echo "$(echo "$repos_response" | jq .)"
 	repos=$(echo "$repos_response" | jq -c '.[]')
-	# Check if repos is empty
 	if [ -z "$repos" ]; then
 		debug_echo "No more repositories found for the team."
 		no_more_repos=true
 	else
-		# store all repos responses in to $repos
 		all_repos="$all_repos $repos"
 		((page++))
 	fi
