@@ -4,6 +4,9 @@ return {
   {
     "zbirenbaum/copilot.lua",
     enabled = vim.g.is_code_private(),
+    dependencies = {
+      "hrsh7th/nvim-cmp",
+    },
     cmd = "Copilot",
     build = ":Copilot auth",
     event = "InsertEnter",
