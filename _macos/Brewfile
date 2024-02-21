@@ -50,7 +50,7 @@ brew 'chafa'
 
 # tmux
 brew 'tmux'
-brew 'tmuxinator'
+# brew 'tmuxinator'
 
 # neovim
 brew 'neovim'
