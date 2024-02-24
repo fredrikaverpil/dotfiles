@@ -1,6 +1,7 @@
 [user]
 	name = Fredrik Averpil
 	email = fredrik.averpil@gmail.com
+	# for github only, fredrikaverpil@users.noreply.github.com
 [core]
 	excludesfile = ~/.gitignore_global
   # editor = code --wait  # vscode
