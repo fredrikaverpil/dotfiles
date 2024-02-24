@@ -18,6 +18,7 @@ return {
         },
         suggestion = {
           enabled = true,
+          -- use the built-in keymapping for "accept" (<M-l>)
           auto_trigger = true,
           accept = false, -- disable built-in keymapping
         },
