@@ -1,9 +1,16 @@
+local enable_ai = function()
+  if vim.g.is_code_private() then
+    return false
+  end
+  return true
+end
+
 return {
 
   -- custom config which piggybacks on the copilot extras in lazy.lua.
   {
     "zbirenbaum/copilot.lua",
-    enabled = vim.g.is_code_private(),
+    enabled = enable_ai,
     dependencies = {
       "hrsh7th/nvim-cmp",
     },

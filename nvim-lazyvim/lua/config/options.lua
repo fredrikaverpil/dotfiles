@@ -37,8 +37,8 @@ vim.g.is_code_private = function()
   local is_code_private = string.find(current_dir, private_path) == 1
 
   if is_code_private then
-    return false
-  else
     return true
+  else
+    return false
   end
 end
