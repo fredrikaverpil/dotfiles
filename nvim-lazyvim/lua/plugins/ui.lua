@@ -3,7 +3,11 @@ return {
   {
     -- disable tabs
     "akinsho/bufferline.nvim",
-    enabled = false,
+    opts = {
+      options = {
+        mode = "tabs", -- only show tabpages instead of buffers
+      },
+    },
   },
 
   {
