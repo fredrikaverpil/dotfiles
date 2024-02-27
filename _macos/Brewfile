@@ -43,6 +43,7 @@ brew 'withgraphite/tap/graphite'
 brew 'yq'
 brew 'zoxide'
 brew 'opentofu'  # terraform
+brew 'brew install dustinblackman/tap/oatmeal'
 
 # slides
 brew 'slides'
