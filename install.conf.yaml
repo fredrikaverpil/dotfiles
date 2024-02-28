@@ -30,6 +30,15 @@
       # TODO: https://github.com/pkgxdev/pkgx/issues/890
       path: templates/pkgx.yaml
 
+    ~/Library/Application Support/lazygit/config.yml:
+      path: lazygit_config.yml
+      force: true
+      if: '[ "$(uname -s)" = "Darwin" ]'
+    ~/.config/lazygit/config.yml:
+      path: lazygit_config.yml
+      force: true
+      if: '[ "$(uname -s)" = "Linux" ]'
+
     ~/.config/LazyVim/lua:
       path: nvim-lazyvim/lua
       force: true
