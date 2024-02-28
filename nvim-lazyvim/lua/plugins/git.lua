@@ -1,6 +1,7 @@
 return {
 
   {
+    -- NOTE: jump between diffs with ]c and [c (vim built in), see :h jumpto-diffs
     "sindrets/diffview.nvim",
     dependencies = {
       { "nvim-lua/plenary.nvim" },
