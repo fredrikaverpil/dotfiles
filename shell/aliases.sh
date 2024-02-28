@@ -12,6 +12,8 @@ alias tree='tree -C'
 alias dev-dirs='fd dev.pkgx.activated "$HOME/Library/Application Support/pkgx/dev" --exec dirname {}'
 
 # Git
+alias gs='git status'
+alias lg='lazygit'
 alias git-purge='git branch --merged | egrep -v "(^\*|master|main|dev)" | xargs git branch -d'
 alias git-grep='git rev-list --all | xargs git --no-pager grep --extended-regexp --ignore-case' # usage: gg <regexp>
 alias glog='git log --graph --decorate --pretty=oneline --abbrev-commit --all'
