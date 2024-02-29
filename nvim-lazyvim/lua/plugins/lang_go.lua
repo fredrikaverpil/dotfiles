@@ -162,12 +162,12 @@ return {
         opts.formatters_by_ft[ft] = formatters_
       end
 
-      -- review opts.formatters_by_ft by uncommenting the below
-      vim.api.nvim_echo(
-        { { "opts.formatters_by_ft", "None" }, { vim.inspect(opts.formatters_by_ft), "None" } },
-        false,
-        {}
-      )
+      -- -- review opts.formatters_by_ft by uncommenting the below
+      -- vim.api.nvim_echo(
+      --   { { "opts.formatters_by_ft", "None" }, { vim.inspect(opts.formatters_by_ft), "None" } },
+      --   false,
+      --   {}
+      -- )
     end,
   },
   {
