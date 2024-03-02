@@ -136,7 +136,6 @@ return {
     optional = true,
     opts = function(_, opts)
       local formatters = require("conform.formatters")
-      print(vim.inspect(formatters.golines.args))
       formatters.golines.args = { "-m", "120" }
       local remove_from_formatters = {}
       local extend_formatters_with = {}
