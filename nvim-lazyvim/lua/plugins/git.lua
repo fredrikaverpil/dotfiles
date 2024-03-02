@@ -9,16 +9,30 @@ return {
     },
     lazy = false,
     config = function()
-      vim.opt.fillchars = "diff:╱"
-      -- vim.opt.fillchars = "diff:░"
+      -- vim.opt.fillchars = "diff:╱"
+      vim.opt.fillchars = "diff:░"
 
       require("diffview").setup({
         -- file_panel = {
         --   win_config = {
-        --     position = "left",
+        --     position = "bottom",
         --   },
         -- },
+        view = {
+          merge_tool = {
+            disable_diagnostics = false, -- TODO: evaluate whether this actually shows diagnostics during review...
+          },
+        },
         enhanced_diff_hl = true, -- See ':h diffview-config-enhanced_diff_hl'
+        hooks = {
+          -- do not fold
+          diff_buf_win_enter = function()
+            vim.opt_local.foldenable = false
+          end,
+
+          -- TODO: jump to first diff: https://github.com/sindrets/diffview.nvim/issues/440
+          -- TODO: enable diagnostics in diffview
+        },
       })
     end,
     keys = {
@@ -68,7 +82,7 @@ return {
 
   {
     "pwntester/octo.nvim",
-    enabled = false,
+    enabled = true,
     requires = {
       "nvim-lua/plenary.nvim",
       "nvim-telescope/telescope.nvim",
