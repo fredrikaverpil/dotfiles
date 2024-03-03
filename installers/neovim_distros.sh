@@ -53,6 +53,7 @@ if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
 	rm -rf ~/.config/NvChad
 	rm -rf ~/.config/AstroNvim
 	rm -rf ~/.config/kickstart
+	rm -rf ~/.config/kickstart-modular.nvim
 	rm -rf ~/.config/NormalVim
 
 	echo "NOTE: after installation, you must re-run the dotfiles installer."
@@ -81,6 +82,12 @@ if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
 
 	if [ ! -d "$HOME/.config/kickstart" ]; then
 		git clone https://github.com/nvim-lua/kickstart.nvim.git ~/.config/kickstart
+	else
+		echo "kickstart already exists, skipping"
+	fi
+
+	if [ ! -d "$HOME/.config/kickstart-modular.nvim" ]; then
+		git clone https://github.com/dam9000/kickstart-modular.nvim.git ~/.config/kickstart
 	else
 		echo "kickstart already exists, skipping"
 	fi

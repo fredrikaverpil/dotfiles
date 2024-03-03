@@ -3,7 +3,7 @@
 # see installers/neovim.sh for the installations of the different distros
 
 function nvims() {
-	items=("default" "fredrik" "kickstart" "LazyVim" "NvChad" "AstroNvim" "NormalVim")
+	items=("default" "fredrik" "kickstart" "kickstart-modular.nvim" "LazyVim" "NvChad" "AstroNvim" "NormalVim",)
 	config=$(printf "%s\n" "${items[@]}" | fzf --prompt=" Neovim Config  " --height=~50% --layout=reverse --border --exit-0)
 	if [[ -z $config ]]; then
 		echo "Nothing selected"
