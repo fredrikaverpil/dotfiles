@@ -171,7 +171,6 @@ return {
   },
   {
     "mfussenegger/nvim-lint",
-    enabled = true,
     ft = { "go" },
     opts = function(_, opts)
       local linters = require("lint").linters
