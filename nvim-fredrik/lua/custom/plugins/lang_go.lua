@@ -1,3 +1,13 @@
+FORMATTERS = { "gofumpt", "goimports", "gci", "golines" }
+MAX_LINE_LENGTH = "120"
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "go" },
+  callback = function()
+    vim.opt_local.colorcolumn = MAX_LINE_LENGTH
+  end,
+})
+
 return {
   { -- LSP Configuration & Plugins
     "neovim/nvim-lspconfig",
@@ -11,7 +21,7 @@ return {
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
       { "j-hui/fidget.nvim", opts = {} },
     },
-    config = function(opts)
+    config = function()
       -- Brief Aside: **What is LSP?**
       --
       -- LSP is an acronym you've probably heard, but might not understand what it is.
@@ -193,9 +203,9 @@ return {
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
       local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, {
-        "golangci-lint",
-      })
+      local linters = { "golangci-lint" }
+      vim.list_extend(ensure_installed, linters)
+      vim.list_extend(ensure_installed, FORMATTERS)
 
       require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
@@ -213,5 +223,36 @@ return {
       })
     end,
   },
+
+  { -- Autoformat
+    "stevearc/conform.nvim",
+
+    opts = function(_, opts)
+      local formatters = require("conform.formatters")
+      formatters.golines.args = { "-m", MAX_LINE_LENGTH }
+      local remove_from_formatters = {}
+      local extend_formatters_with = {}
+      local replace_formatters_with = {
+        go = FORMATTERS,
+      }
+
+      -- NOTE: conform.nvim can use a sub-list to run only the first available formatter (see docs)
+
+      -- remove from opts.formatters_by_ft
+      for ft, formatters_ in pairs(remove_from_formatters) do
+        opts.formatters_by_ft[ft] = vim.tbl_filter(function(formatter)
+          return not vim.tbl_contains(formatters_, formatter)
+        end, opts.formatters_by_ft[ft])
+      end
+      -- extend opts.formatters_by_ft
+      for ft, formatters_ in pairs(extend_formatters_with) do
+        opts.formatters_by_ft[ft] = opts.formatters_by_ft[ft] or {}
+        vim.list_extend(opts.formatters_by_ft[ft], formatters_)
+      end
+      -- replace opts.formatters_by_ft
+      for ft, formatters_ in pairs(replace_formatters_with) do
+        opts.formatters_by_ft[ft] = formatters_
+      end
+    end,
+  },
 }
--- vim: ts=2 sts=2 sw=2 et
