@@ -1,4 +1,6 @@
+ENSURE_INSTALLED = { "gofumpt", "goimports", "gci", "golines", "golangci-lint" }
 FORMATTERS = { "gofumpt", "goimports", "gci", "golines" }
+LINTERS = { "golangcilint" }
 MAX_LINE_LENGTH = "120"
 
 vim.api.nvim_create_autocmd("FileType", {
@@ -7,6 +9,31 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.colorcolumn = MAX_LINE_LENGTH
   end,
 })
+
+local function find_file(filename)
+  local command = "fd --hidden --no-ignore '" .. filename .. "' " .. vim.fn.getcwd() .. " | head -n 1"
+  local file = io.popen(command):read("*l")
+  return file and file or nil
+end
+
+local use_golangci_config_if_available = function(linters)
+  local config_file = find_file(".golangci.yml")
+  if config_file then
+    print("Using golangci-lint config: " .. config_file)
+    return {
+      "run",
+      "--out-format",
+      "json",
+      "--config",
+      config_file,
+      function()
+        return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
+      end,
+    }
+  else
+    return linters.golangcilint.args
+  end
+end
 
 return {
   { -- LSP Configuration & Plugins
@@ -203,9 +230,7 @@ return {
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
       local ensure_installed = vim.tbl_keys(servers or {})
-      local linters = { "golangci-lint" }
-      vim.list_extend(ensure_installed, linters)
-      vim.list_extend(ensure_installed, FORMATTERS)
+      vim.list_extend(ensure_installed, ENSURE_INSTALLED)
 
       require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
@@ -253,6 +278,17 @@ return {
       for ft, formatters_ in pairs(replace_formatters_with) do
         opts.formatters_by_ft[ft] = formatters_
       end
+    end,
+  },
+
+  {
+    "mfussenegger/nvim-lint",
+    ft = { "go" },
+    opts = function(_, opts)
+      local lint = require("lint")
+
+      lint.linters.golangcilint.args = use_golangci_config_if_available(lint)
+      lint.linters_by_ft["go"] = LINTERS
     end,
   },
 }
