@@ -36,6 +36,49 @@ local use_golangci_config_if_available = function(linters)
 end
 
 return {
+
+  { -- Autoformat
+    'stevearc/conform.nvim',
+    opts = function(_, opts)
+      local formatters = require 'conform.formatters'
+      formatters.golines.args = { '-m', MAX_LINE_LENGTH_GO }
+      local remove_from_formatters = {}
+      local extend_formatters_with = {}
+      local replace_formatters_with = {
+        go = FORMATTERS_GO,
+      }
+
+      -- NOTE: conform.nvim can use a sub-list to run only the first available formatter (see docs)
+
+      -- remove from opts.formatters_by_ft
+      for ft, formatters_ in pairs(remove_from_formatters) do
+        opts.formatters_by_ft[ft] = vim.tbl_filter(function(formatter)
+          return not vim.tbl_contains(formatters_, formatter)
+        end, opts.formatters_by_ft[ft])
+      end
+      -- extend opts.formatters_by_ft
+      for ft, formatters_ in pairs(extend_formatters_with) do
+        opts.formatters_by_ft[ft] = opts.formatters_by_ft[ft] or {}
+        vim.list_extend(opts.formatters_by_ft[ft], formatters_)
+      end
+      -- replace opts.formatters_by_ft
+      for ft, formatters_ in pairs(replace_formatters_with) do
+        opts.formatters_by_ft[ft] = formatters_
+      end
+    end,
+  },
+
+  {
+    'mfussenegger/nvim-lint',
+    ft = { 'go' },
+    opts = function(_, opts)
+      local lint = require 'lint'
+
+      --lint.linters.golangcilint.args = use_golangci_config_if_available(lint)
+      lint.linters_by_ft['go'] = LINTERS_GO
+    end,
+  },
+
   { -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
     dependencies = {
@@ -246,51 +289,6 @@ return {
           end,
         },
       }
-    end,
-  },
-
-  { -- Autoformat
-    'stevearc/conform.nvim',
-
-    opts = function(_, opts)
-      local formatters = require 'conform.formatters'
-      formatters.golines.args = { '-m', MAX_LINE_LENGTH_GO }
-      local remove_from_formatters = {}
-      local extend_formatters_with = {}
-      local replace_formatters_with = {
-        go = FORMATTERS_GO,
-      }
-
-      -- NOTE: conform.nvim can use a sub-list to run only the first available formatter (see docs)
-
-      -- remove from opts.formatters_by_ft
-      for ft, formatters_ in pairs(remove_from_formatters) do
-        opts.formatters_by_ft[ft] = vim.tbl_filter(function(formatter)
-          return not vim.tbl_contains(formatters_, formatter)
-        end, opts.formatters_by_ft[ft])
-      end
-      -- extend opts.formatters_by_ft
-      for ft, formatters_ in pairs(extend_formatters_with) do
-        opts.formatters_by_ft[ft] = opts.formatters_by_ft[ft] or {}
-        vim.list_extend(opts.formatters_by_ft[ft], formatters_)
-      end
-      -- replace opts.formatters_by_ft
-      for ft, formatters_ in pairs(replace_formatters_with) do
-        opts.formatters_by_ft[ft] = formatters_
-      end
-
-      print(vim.inspect(opts.formatters_by_ft))
-    end,
-  },
-
-  {
-    'mfussenegger/nvim-lint',
-    ft = { 'go' },
-    opts = function(_, opts)
-      local lint = require 'lint'
-
-      --lint.linters.golangcilint.args = use_golangci_config_if_available(lint)
-      lint.linters_by_ft['go'] = LINTERS_GO
     end,
   },
 }
