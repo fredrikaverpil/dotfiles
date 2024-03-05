@@ -1,19 +1,18 @@
-FORMATTERS = { "stylua" }
+FORMATTERS_LUA = { 'stylua' }
 
 return {
 
   { -- Autoformat
-    "stevearc/conform.nvim",
+    'stevearc/conform.nvim',
 
     opts = function(_, opts)
-      local formatters = require("conform.formatters")
-      formatters.stylua.args =
-        vim.list_extend({ "--indent-type", "Spaces", "--indent-width", "2" }, formatters.stylua.args)
+      local formatters = require 'conform.formatters'
+      formatters.stylua.args = vim.list_extend({ '--indent-type', 'Spaces', '--indent-width', '2' }, formatters.stylua.args)
 
       local remove_from_formatters = {}
       local extend_formatters_with = {}
       local replace_formatters_with = {
-        lua = FORMATTERS,
+        lua = FORMATTERS_LUA,
       }
 
       -- NOTE: conform.nvim can use a sub-list to run only the first available formatter (see docs)
