@@ -1,2 +1,2 @@
 git:
-  overrideGpg: false # prevents lazygit from spawning a separate process when using GPG
+  overrideGpg: true # prevents lazygit from spawning a separate process when using GPG
