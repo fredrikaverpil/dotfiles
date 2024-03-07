@@ -1,23 +1,23 @@
 -- fork of https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/plugins/extras/lang/go.lua
 
 local function find_file(filename)
-  local command = "fd --hidden --no-ignore '" .. filename .. "' " .. vim.fn.getcwd() .. " | head -n 1"
-  local file = io.popen(command):read("*l")
+  local command = "fd --hidden --no-ignore '" .. filename .. "' " .. vim.fn.getcwd() .. ' | head -n 1'
+  local file = io.popen(command):read '*l'
   return file and file or nil
 end
 
 local use_golangci_config_if_available = function(linters)
-  local config_file = find_file(".golangci.yml")
+  local config_file = find_file '.golangci.yml'
   if config_file then
-    print("Using golangci-lint config: " .. config_file)
+    print('Using golangci-lint config: ' .. config_file)
     return {
-      "run",
-      "--out-format",
-      "json",
-      "--config",
+      'run',
+      '--out-format',
+      'json',
+      '--config',
       config_file,
       function()
-        return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
+        return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':h')
       end,
     }
   else
@@ -27,22 +27,22 @@ end
 
 return {
   {
-    "nvim-treesitter/nvim-treesitter",
-    ft = { "go" },
+    'nvim-treesitter/nvim-treesitter',
+    ft = { 'go' },
     opts = function(_, opts)
       vim.list_extend(opts.ensure_installed, {
-        "go",
-        "gomod",
-        "gowork",
-        "gosum",
+        'go',
+        'gomod',
+        'gowork',
+        'gosum',
       })
     end,
   },
   {
-    "neovim/nvim-lspconfig",
-    ft = { "go" },
+    'neovim/nvim-lspconfig',
+    ft = { 'go' },
     dependencies = {
-      "artemave/workspace-diagnostics.nvim",
+      'artemave/workspace-diagnostics.nvim',
     },
     opts = {
       inlay_hints = {
@@ -52,7 +52,7 @@ return {
         gopls = {
           keys = {
             -- Workaround for the lack of a DAP strategy in neotest-go: https://github.com/nvim-neotest/neotest-go/issues/12
-            { "<leader>td", "<cmd>lua require('dap-go').debug_test()<CR>", desc = "Debug Nearest (Go)" },
+            { '<leader>td', "<cmd>lua require('dap-go').debug_test()<CR>", desc = 'Debug Nearest (Go)' },
           },
           settings = {
             -- https://github.com/golang/tools/blob/master/gopls/README.md
@@ -90,7 +90,7 @@ return {
               usePlaceholders = true,
               completeUnimported = true,
               staticcheck = true,
-              directoryFilters = { "-.git", "-.vscode", "-.idea", "-.vscode-test", "-node_modules" },
+              directoryFilters = { '-.git', '-.vscode', '-.idea', '-.vscode-test', '-node_modules' },
               semanticTokens = true,
             },
           },
@@ -100,9 +100,9 @@ return {
         gopls = function(_, opts)
           -- workaround for gopls not supporting semanticTokensProvider
           -- https://github.com/golang/go/issues/54531#issuecomment-1464982242
-          require("lazyvim.util").lsp.on_attach(function(client, bufnr)
-            if client.name == "gopls" then
-              require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
+          require('lazyvim.util').lsp.on_attach(function(client, bufnr)
+            if client.name == 'gopls' then
+              require('workspace-diagnostics').populate_workspace_diagnostics(client, bufnr)
               if not client.server_capabilities.semanticTokensProvider then
                 local semantic = client.config.capabilities.textDocument.semanticTokens
                 client.server_capabilities.semanticTokensProvider = {
@@ -123,24 +123,26 @@ return {
   },
   -- Ensure Go tools are installed
   {
-    "williamboman/mason.nvim",
-    ft = { "go" },
+    'williamboman/mason.nvim',
+    ft = { 'go' },
     opts = function(_, opts)
       opts.ensure_installed = opts.ensure_installed or {}
-      vim.list_extend(opts.ensure_installed, { "goimports", "gofumpt", "gci", "golangci-lint" })
+      vim.list_extend(opts.ensure_installed, { 'goimports', 'gofumpt', 'gci', 'golangci-lint' })
     end,
   },
   {
-    "stevearc/conform.nvim",
-    ft = { "go" },
+    'stevearc/conform.nvim',
+    ft = { 'go' },
     optional = true,
     opts = function(_, opts)
-      local formatters = require("conform.formatters")
-      formatters.golines.args = { "-m", "120" }
+      local formatters = require 'conform.formatters'
+      formatters.golines.args = { '-m', '120' }
+      formatters.gci.args = { 'write', '--skip-generated', '-s', 'standard', '-s', 'default', '--skip-vendor', '$FILENAME' }
+      formatters.gofumpt.args = { '-extra' }
       local remove_from_formatters = {}
       local extend_formatters_with = {}
       local replace_formatters_with = {
-        go = { "gofumpt", "goimports", "gci", "golines" },
+        go = { 'gofumpt', 'goimports', 'gci', 'golines' }, -- FIXME: add golines in when possible
       }
 
       -- NOTE: conform.nvim can use a sub-list to run only the first available formatter (see docs)
@@ -170,15 +172,15 @@ return {
     end,
   },
   {
-    "mfussenegger/nvim-lint",
-    ft = { "go" },
+    'mfussenegger/nvim-lint',
+    ft = { 'go' },
     opts = function(_, opts)
-      local linters = require("lint").linters
+      local linters = require('lint').linters
 
       linters.golangcilint.args = use_golangci_config_if_available(linters)
 
       local linters_by_ft = {
-        go = { "golangcilint" },
+        go = { 'golangcilint' },
       }
 
       -- extend opts.linters_by_ft
@@ -189,50 +191,50 @@ return {
     end,
   },
   {
-    "mfussenegger/nvim-dap",
-    ft = { "go" },
+    'mfussenegger/nvim-dap',
+    ft = { 'go' },
     optional = true,
     dependencies = {
       {
-        "williamboman/mason.nvim",
+        'williamboman/mason.nvim',
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "delve" })
+          vim.list_extend(opts.ensure_installed, { 'delve' })
         end,
       },
       {
-        "leoluz/nvim-dap-go",
+        'leoluz/nvim-dap-go',
         config = true,
       },
     },
   },
   {
-    "nvim-neotest/neotest",
-    ft = { "go" },
+    'nvim-neotest/neotest',
+    ft = { 'go' },
     optional = true,
     dependencies = {
-      "nvim-neotest/neotest-go",
+      'nvim-neotest/neotest-go',
     },
     opts = {
       adapters = {
-        ["neotest-go"] = {
+        ['neotest-go'] = {
           -- Here we can set options for neotest-go, e.g.
           -- args = { "-tags=integration" }
-          args = { "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out" },
+          args = { '-coverprofile=' .. vim.fn.getcwd() .. '/coverage.out' },
           -- TODO: figure out if this should be enabled: recursive_run = true,
         },
       },
     },
   },
   {
-    "andythigpen/nvim-coverage",
-    ft = { "go" },
-    dependencies = { "nvim-lua/plenary.nvim" },
+    'andythigpen/nvim-coverage',
+    ft = { 'go' },
+    dependencies = { 'nvim-lua/plenary.nvim' },
     opts = {
       auto_reload = true,
       lang = {
         go = {
-          coverage_file = vim.fn.getcwd() .. "/coverage.out",
+          coverage_file = vim.fn.getcwd() .. '/coverage.out',
         },
       },
     },
