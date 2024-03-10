@@ -55,6 +55,7 @@ if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
 	rm -rf ~/.config/kickstart
 	rm -rf ~/.config/kickstart-modular.nvim
 	rm -rf ~/.config/NormalVim
+	rm -rf ~/.config/neovim-for-newbs
 
 	echo "NOTE: after installation, you must re-run the dotfiles installer."
 fi
@@ -97,6 +98,13 @@ if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
 	else
 		echo "NormalVim already exists, skipping"
 	fi
+
+	if [ ! -d "$HOME/.config/neovim-for-newbs" ]; then
+		git clone https://github.com/cpow/neovim-for-newbs ~/.config/neovim-for-newbs --depth 1
+	else
+		echo "NormalVim already exists, skipping"
+	fi
+
 fi
 
 echo "Neovim uses rust/cargo for some plugins. On first-time install, you must run rustup-init."
