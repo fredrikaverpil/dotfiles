@@ -6,7 +6,21 @@ return {
     "nvim-tree/nvim-web-devicons",
     "MunifTanjim/nui.nvim",
   },
-  config = function()
+  opts = {
+    filesystem = {
+      filtered_items = {
+        visible = true, -- when true, they will just be displayed differently than normal items
+        hide_dotfiles = false,
+        hide_gitignored = true,
+      },
+
+      -- This will use the OS level file watchers to detect changes
+      -- instead of relying on nvim autocmd events.
+      use_libuv_file_watcher = true,
+    },
+  },
+  config = function(_, opts)
+    require("neo-tree").setup(opts)
     require("utils.keymaps").setup_neotree_keymaps()
   end,
 }
