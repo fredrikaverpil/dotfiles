@@ -37,7 +37,6 @@ return {
     },
     ft = { "lua" },
     opts = function(_, opts)
-      print("lua: setting up lua lsp opts")
       opts.servers.lua_ls = {}
     end,
   },

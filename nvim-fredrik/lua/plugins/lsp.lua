@@ -32,7 +32,6 @@ return {
           },
         },
         config = function()
-          print("base: configuring nvim-cmp")
           local cmp = require("cmp")
           require("luasnip.loaders.from_vscode").lazy_load()
 
@@ -65,11 +64,6 @@ return {
     },
 
     config = function(_, opts)
-      print("base: nvim-lspconfig setup")
-
-      -- uncomment for debugging
-      print(vim.inspect(opts))
-
       local lspconfig = require("lspconfig")
       local default_capabilities = require("cmp_nvim_lsp").default_capabilities()
 
