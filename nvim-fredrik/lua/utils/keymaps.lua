@@ -8,14 +8,16 @@ M.setup_lsp_keymaps = function()
   -- Jump to the definition of the word under your cursor.
   --  This is where a variable was first declared, or where a function is defined, etc.
   --  To jump back, press <C-T>.
-  map_normal_mode("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
+  map_normal_mode("gd", require("telescope.builtin").lsp_definitions, "[g]oto [d]efinition")
+
+  map_normal_mode("gD", vim.lsp.buf.declaration, "[g]oto [D]eclaration")
 
   -- Find references for the word under your cursor.
-  map_normal_mode("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
+  map_normal_mode("gr", require("telescope.builtin").lsp_references, "[g]oto [r]eferences")
 
   -- Jump to the implementation of the word under your cursor.
   --  Useful when your language has ways of declaring types without an actual implementation.
-  map_normal_mode("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
+  map_normal_mode("gI", require("telescope.builtin").lsp_implementations, "[g]oto [I]mplementation")
 
   -- Jump to the type of the word under your cursor.
   --  Useful when you're not sure what type a variable is and you want to see
@@ -24,11 +26,11 @@ M.setup_lsp_keymaps = function()
 
   -- Fuzzy find all the symbols in your current document.
   --  Symbols are things like variables, functions, types, etc.
-  map_normal_mode("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
+  map_normal_mode("<leader>ss", require("telescope.builtin").lsp_document_symbols, "[s]ymbols in Document")
 
   -- Fuzzy find all the symbols in your current workspace
   --  Similar to document symbols, except searches over your whole project.
-  map_normal_mode("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
+  map_normal_mode("<leader>sS", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[S]ymbols in Workspace")
 
   -- Rename the variable under your cursor
   --  Most Language Servers support renaming across files, etc.
@@ -41,8 +43,6 @@ M.setup_lsp_keymaps = function()
   -- Opens a popup that displays documentation about the word under your cursor
   --  See `:help K` for why this keymap
   map_normal_mode("K", vim.lsp.buf.hover, "Hover Documentation")
-
-  map_normal_mode("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
 end
 
 M.setup_cmp_keymaps = function(cmp)
@@ -61,9 +61,9 @@ M.setup_neotree_keymaps = function()
 end
 
 M.setup_telescope_keymaps = function()
-  local builtin = require("telescope.builtin")
-  vim.keymap.set("n", "<leader><leader>", builtin.find_files, {})
-  vim.keymap.set("n", "<leader>sg", builtin.live_grep, {})
+  map_normal_mode("<leader><leader>", require("telescope.builtin").find_files, "Find Files")
+  -- map_normal_mode("<leader>sg", require("telescope.builtin").live_grep, "[s]earch [g]rep")
+  map_normal_mode("<leader>sg", require("telescope").extensions.live_grep_args.live_grep_args, "[s]earch [g]rep")
 end
 
 return M
