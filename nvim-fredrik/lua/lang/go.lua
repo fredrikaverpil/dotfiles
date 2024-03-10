@@ -1,3 +1,28 @@
+local find_file = function(filename)
+  local command = "fd --hidden --no-ignore '" .. filename .. "' " .. vim.fn.getcwd() .. " | head -n 1"
+  local file = io.popen(command):read("*l")
+  return file and file or nil
+end
+
+local use_golangci_config_if_available = function(linters)
+  local config_file = find_file(".golangci.yml")
+  if config_file then
+    print("Using golangci-lint config: " .. config_file)
+    return {
+      "run",
+      "--out-format",
+      "json",
+      "--config",
+      config_file,
+      function()
+        return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
+      end,
+    }
+  else
+    return linters.golangcilint.args
+  end
+end
+
 return {
 
   {
@@ -34,6 +59,11 @@ return {
     opts = {
       linters_by_ft = {
         go = { "golangci-lint" },
+      },
+      linters = {
+        golangcilint = {
+          args = use_golangci_config_if_available(require("lint").linters),
+        },
       },
     },
   },
