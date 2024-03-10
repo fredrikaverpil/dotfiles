@@ -22,7 +22,7 @@ M.setup_lsp_keymaps = function()
   -- Jump to the type of the word under your cursor.
   --  Useful when you're not sure what type a variable is and you want to see
   --  the definition of its *type*, not where it was *defined*.
-  map_normal_mode("<leader>D", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
+  map_normal_mode("<leader>D", require("telescope.builtin").lsp_type_definitions, "Goto Type [D]efinition")
 
   -- Fuzzy find all the symbols in your current document.
   --  Symbols are things like variables, functions, types, etc.
@@ -64,6 +64,19 @@ M.setup_telescope_keymaps = function()
   map_normal_mode("<leader><leader>", require("telescope.builtin").find_files, "Find Files")
   -- map_normal_mode("<leader>sg", require("telescope.builtin").live_grep, "[s]earch [g]rep")
   map_normal_mode("<leader>sg", require("telescope").extensions.live_grep_args.live_grep_args, "[s]earch [g]rep")
+end
+
+M.setup_coderunner_keymaps = function()
+  map_normal_mode("<leader>rf", ":RunFile term<CR>", "[r]unner [f]ile")
+end
+
+M.setup_lazygit_keymaps = function()
+  --   "LazyGit",
+  --   "LazyGitConfig",
+  --   "LazyGitCurrentFile",
+  --   "LazyGitFilter",
+  --   "LazyGitFilterCurrentFile",
+  map_normal_mode("<leader>gg", ":LazyGit<CR>", "[g]it [g]ui")
 end
 
 return M
