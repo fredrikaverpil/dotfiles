@@ -1,5 +1,5 @@
 -- set options
-require("options")
+require("utils.options")
 
 -- setup up package manager
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
