@@ -101,4 +101,9 @@ M.setup_neotest_keymaps = function()
   map_normal_mode("<leader>tS", ':lua require("neotest").run.run({ strategy = "dap" })<CR>', "[t]est [d]ebug Nearest")
 end
 
+M.setup_coverage_keymaps = function()
+  map_normal_mode("<leader>tc", ":Coverage<CR>", "[t]est [c]overage in gutter")
+  map_normal_mode("<leader>tC", ":CoverageLoad<CR>:CoverageSummary<CR>", "[t]est [C]overage summary")
+end
+
 return M
