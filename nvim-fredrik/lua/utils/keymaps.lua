@@ -79,4 +79,16 @@ M.setup_lazygit_keymaps = function()
   map_normal_mode("<leader>gg", ":LazyGit<CR>", "[g]it [g]ui")
 end
 
+M.setup_neotest_keymaps = function()
+  map_normal_mode("<leader>ts", ":Neotest summary<CR>", "[t]est [s]ummary")
+  map_normal_mode("<leader>tn", require("neotest").run.run, "[t]est [n]earest")
+  map_normal_mode("<leader>to", ":Neotest output", "[t]est [o]utput")
+  map_normal_mode("<leader>tO", ":Neotest output-panel", "[t]est [O]utput panel")
+  map_normal_mode("<leader>tt", require("neotest").run.stop, "[t]est S[t]op nearest")
+  map_normal_mode("<leader>ta", require("neotest").run.attach, "[t]est [a]ttach")
+  map_normal_mode("<leader>tf", ':lua require("neotest").run.run(vim.fn.expand("%"))<CR>', "[t]est all in [f]ile")
+  map_normal_mode("<leader>tS", ":lua require('neotest').run.run({ suite = true })<CR>", "[t]est all in [S]uite")
+  map_normal_mode("<leader>tS", ':lua require("neotest").run.run({ strategy = "dap" })<CR>', "[t]est [d]ebug Nearest")
+end
+
 return M
