@@ -189,4 +189,12 @@ M.setup_dap_keymaps = function()
   map_normal_mode("<leader>do", ":DapStepOver<CR>", "[d]ebug step [o]ver")
 end
 
+M.setup_noice_keymaps = function()
+  map_normal_mode("<leader>sna", ":Noice<CR>", "[s]earch [n]oice [a]ll")
+  map_normal_mode("<leader>snf", ":NoiceFind<CR>", "[s]earch [n]oice [f]ind")
+  map_normal_mode("<leader>snl", ":NoiceLast<CR>", "[s]earch [n]oice [l]ast")
+  map_normal_mode("<leader>snd", ":NoiceDismiss<CR>", "[s]earch [n]oice [d]ismiss")
+  map_normal_mode("<leader>snL", ":NoiceLog<CR>", "[s]earch [n]oice [L]og")
+end
+
 return M
