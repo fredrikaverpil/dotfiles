@@ -1,0 +1,6 @@
+return {
+
+  {
+    "rcarriga/nvim-notify",
+  },
+}
