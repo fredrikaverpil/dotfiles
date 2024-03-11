@@ -105,4 +105,39 @@ return {
       },
     },
   },
+
+  {
+    "nvim-neotest/neotest",
+    ft = { "go" },
+    optional = true,
+    dependencies = {
+      "nvim-neotest/neotest-go",
+    },
+    opts = function(_, opts)
+      opts.adapters = {
+        require("neotest-go")({
+          experimental = {
+            test_table = true,
+          },
+          args = { "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out" },
+          -- TODO: figure out if this should be enabled: recursive_run = true,
+        }),
+      }
+    end,
+  },
+
+  {
+    "andythigpen/nvim-coverage",
+    ft = { "go" },
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {
+      auto_reload = true,
+      lang = {
+        go = {
+          coverage_file = vim.fn.getcwd() .. "/coverage.out",
+        },
+      },
+    },
+  },
+
 }
