@@ -43,14 +43,14 @@ return {
         "williamboman/mason.nvim",
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "gofumpt", "goimports", "gci" })
+          vim.list_extend(opts.ensure_installed, { "gofumpt", "goimports", "gci", "golines" })
         end,
       },
     },
     ft = { "go", "gomod", "gowork", "gotmpl" },
     opts = {
       formatters_by_ft = {
-        go = { "gofumpt", "goimports", "gci" },
+        go = { "gofumpt", "goimports", "gci", "golines" },
       },
     },
   },
