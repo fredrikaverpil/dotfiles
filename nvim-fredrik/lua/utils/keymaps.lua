@@ -79,6 +79,16 @@ M.setup_lazygit_keymaps = function()
   map_normal_mode("<leader>gg", ":LazyGit<CR>", "[g]it [g]ui")
 end
 
+M.setup_gitsigns_keymaps = function()
+  map_normal_mode("<leader>gp", ":Gitsigns preview_hunk<CR>", "[g]it [p]review hunk")
+  map_normal_mode("<leader>gr", ":Gitsigns reset_hunk<CR>", "[g]it [r]eset hunk")
+  map_normal_mode("<leader>gR", ":Gitsigns reset_buffer<CR>", "[g]it [R]eset buffer")
+  map_normal_mode("<leader>gs", ":Gitsigns stage_hunk<CR>", "[g]it [s]tage hunk")
+  map_normal_mode("<leader>gu", ":Gitsigns undo_stage_hunk<CR>", "[g]it [u]ndo stage hunk")
+  map_normal_mode("<leader>gB", ":Gitsigns toggle_current_line_blame<CR>", "[g]it [b]lame toggle")
+  map_normal_mode("<leader>gB", ":Gitsigns blame_line<CR>", "[g]it [B]lame line")
+end
+
 M.setup_neotest_keymaps = function()
   map_normal_mode("<leader>ts", ":Neotest summary<CR>", "[t]est [s]ummary")
   map_normal_mode("<leader>tn", require("neotest").run.run, "[t]est [n]earest")
