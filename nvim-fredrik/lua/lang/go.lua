@@ -7,7 +7,8 @@ end
 local use_golangci_config_if_available = function(linters)
   local config_file = find_file(".golangci.yml")
   if config_file then
-    print("Using golangci-lint config: " .. config_file)
+    vim.notify = require("notify")
+    vim.notify("Using golangci-lint config: " .. config_file)
     return {
       "run",
       "--out-format",
