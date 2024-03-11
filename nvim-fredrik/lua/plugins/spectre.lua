@@ -9,7 +9,7 @@ return {
 
     config = function()
       require("spectre").setup()
-      require("utils.keymaps").setup_spectre_keymaps()
+      require("config.keymaps").setup_spectre_keymaps()
     end,
   },
 }

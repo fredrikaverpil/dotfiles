@@ -7,7 +7,7 @@ return {
       "nvim-lua/plenary.nvim",
     },
     config = function()
-      require("utils.keymaps").setup_lazygit_keymaps()
+      require("config.keymaps").setup_lazygit_keymaps()
     end,
   },
 }

@@ -1,8 +1,8 @@
 -- set options
-require("utils.options")
+require("config.options")
 
 -- set auto commands
-require("utils.autocmds")
+require("config.autocmds")
 
 -- setup up package manager, load plugins and configs
-require("utils.lazy")
+require("config.lazy")

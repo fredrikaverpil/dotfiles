@@ -65,3 +65,5 @@ vim.opt.secure = true -- disable shell and write commands in local .nvim.lua .vi
 -- sync with system clipboard (also see autocmds for text yank config)
 vim.opt.clipboard = "unnamedplus"
 
+-- TODO: pick from https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
+vim.opt.listchars = "tab:▸ ,trail:·,nbsp:␣,extends:❯,precedes:❮" -- show symbols for whitespace

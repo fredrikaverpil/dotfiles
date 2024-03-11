@@ -55,7 +55,7 @@ return {
       -- telescope.load_extension("projects")
       telescope.load_extension("ui-select")
 
-      require("utils.keymaps").setup_telescope_keymaps()
+      require("config.keymaps").setup_telescope_keymaps()
     end,
   },
 }

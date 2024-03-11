@@ -45,7 +45,7 @@ return {
               completion = cmp.config.window.bordered(),
               documentation = cmp.config.window.bordered(),
             },
-            mapping = cmp.mapping.preset.insert(require("utils.keymaps").setup_cmp_keymaps(cmp)),
+            mapping = cmp.mapping.preset.insert(require("config.keymaps").setup_cmp_keymaps(cmp)),
             sources = cmp.config.sources({
               { name = "nvim_lsp" },
               { name = "luasnip" },
@@ -67,7 +67,7 @@ return {
         })
       end
 
-      require("utils.keymaps").setup_lsp_keymaps()
+      require("config.keymaps").setup_lsp_keymaps()
     end,
   },
 }

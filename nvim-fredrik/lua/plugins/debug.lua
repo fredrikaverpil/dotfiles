@@ -24,7 +24,7 @@ return {
         dapui.close()
       end
 
-      require("utils.keymaps").setup_dap_keymaps()
+      require("config.keymaps").setup_dap_keymaps()
     end,
   },
 }

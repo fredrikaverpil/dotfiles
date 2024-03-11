@@ -13,6 +13,6 @@ return {
       })
     end,
 
-    require("utils.keymaps").setup_coderunner_keymaps(),
+    require("config.keymaps").setup_coderunner_keymaps(),
   },
 }

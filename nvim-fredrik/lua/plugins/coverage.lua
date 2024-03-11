@@ -4,7 +4,7 @@ return {
     dependencies = { "nvim-lua/plenary.nvim" },
     config = function()
       require("coverage").setup()
-      require("utils.keymaps").setup_coverage_keymaps()
+      require("config.keymaps").setup_coverage_keymaps()
     end,
   },
 }

@@ -158,4 +158,15 @@ M.setup_spectre_keymaps = function()
   map_normal_mode("<leader>spf", ':lua require("spectre").open_file_search({select_word=true})<CR>', "[s][p]ectre current [f]ile")
 end
 
+M.setup_aerial_keymaps = function()
+  map_normal_mode("<leader>ss", ":AerialToggle<CR>", "[s]ymbols")
+end
+
+M.setup_dap_keymaps = function()
+  map_normal_mode("<leader>db", ":DapToggleBreakpoint<CR>", "[d]ebug [b]reakpoint")
+  map_normal_mode("<leader>dc", ":DapContinue<CR>", "[d]ebug [c]ontinue")
+  map_normal_mode("<leader>dx", ":DapTerminate<CR>", "[d]ebug e[x]it")
+  map_normal_mode("<leader>do", ":DapStepOver<CR>", "[d]ebug step [o]ver")
+end
+
 return M

@@ -20,7 +20,7 @@ require("lazy").setup({
     -- import language configs
     { import = "lang" },
     -- import per-project configs
-    { import = "utils.lazyrc" },
+    { import = "config.lazyrc" },
   },
   checker = { enabled = false }, -- automatically check for plugin updates
   performance = {

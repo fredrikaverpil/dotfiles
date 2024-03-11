@@ -9,7 +9,7 @@ return {
     config = function(_, opts)
       require("neotest").setup(opts)
 
-      require("utils.keymaps").setup_neotest_keymaps()
+      require("config.keymaps").setup_neotest_keymaps()
     end,
   },
 }

@@ -4,7 +4,7 @@ return {
     config = function()
       require("gitsigns").setup()
 
-      require("utils.keymaps").setup_gitsigns_keymaps()
+      require("config.keymaps").setup_gitsigns_keymaps()
     end,
   },
 }

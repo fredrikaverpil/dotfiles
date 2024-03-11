@@ -21,6 +21,6 @@ return {
   },
   config = function(_, opts)
     require("neo-tree").setup(opts)
-    require("utils.keymaps").setup_neotree_keymaps()
+    require("config.keymaps").setup_neotree_keymaps()
   end,
 }
