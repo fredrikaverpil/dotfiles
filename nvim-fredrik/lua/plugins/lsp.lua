@@ -18,6 +18,8 @@ return {
       {
         "hrsh7th/nvim-cmp",
         dependencies = {
+          { "hrsh7th/cmp-buffer" },
+          { "hrsh7th/cmp-path" },
           {
             "hrsh7th/cmp-nvim-lsp",
             dependencies = {
@@ -48,6 +50,7 @@ return {
             mapping = cmp.mapping.preset.insert(require("config.keymaps").setup_cmp_keymaps(cmp)),
             sources = cmp.config.sources({
               { name = "nvim_lsp" },
+              { name = "path" },
               { name = "luasnip" },
             }, {
               { name = "buffer" },
