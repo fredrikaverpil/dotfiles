@@ -52,6 +52,14 @@ return {
       formatters_by_ft = {
         go = { "gofumpt", "goimports", "gci", "golines" },
       },
+      formatters = {
+        gofumpt = {
+          prepend_args = { "-extra" },
+        },
+        golines = {
+          prepend_args = { "--ignore-generated", "--tab-len=1", "--max-len=120" },
+        },
+      },
     },
   },
 
