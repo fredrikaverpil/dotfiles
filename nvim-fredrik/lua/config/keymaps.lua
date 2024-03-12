@@ -199,9 +199,16 @@ M.setup_noice_keymaps = function()
 end
 
 M.setup_toggleterm_keymaps = function()
-  map_normal_mode("<C-/>", require("utils.terminal").toggle_terminal, "Toggle terminal")
-  map_normal_mode("<C-_>", require("utils.terminal").toggle_terminal, "Toggle terminal")
-  vim.api.nvim_set_keymap("t", "<Esc>", "<C-\\><C-n>", { noremap = true }) -- allow pressing Esc in terminal
+  -- Both <C-/> and <C-_> are mapped due to the way control characters are interpreted by terminal emulators.
+  -- ASCII value of '/' is 47, and of '_' is 95. When <C-/> is pressed, the terminal sends (47 - 64) which wraps around to 111 ('o').
+  -- When <C-_> is pressed, the terminal sends (95 - 64) which is 31. Hence, both key combinations need to be mapped.
+
+  -- <C-/> toggles the terminal
+  vim.keymap.set({ "n", "i", "t", "v" }, "<C-/>", "<cmd>lua require('utils.terminal').toggle_terminal()<CR>", { desc = "Toggle terminal" })
+  vim.keymap.set({ "n", "i", "t", "v" }, "<C-_>", "<cmd>lua require('utils.terminal').toggle_terminal()<CR>", { desc = "Toggle terminal" })
+  -- Esc goes to NORMAL mode from TERMINAL mode
+  vim.api.nvim_set_keymap("t", "<Esc>", "<C-\\><C-n>", { noremap = true })
+end
 
 M.setup_conform_keymaps = function()
   map_normal_mode("<leader>uf", require("utils.formatting").toggle_formatting, "Toggle auto-formatting")
