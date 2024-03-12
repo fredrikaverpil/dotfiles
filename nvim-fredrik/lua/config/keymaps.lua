@@ -217,7 +217,7 @@ M.setup_toggleterm_keymaps = function()
   vim.keymap.set({ "n", "i", "t", "v" }, "<C-/>", "<cmd>lua require('utils.terminal').toggle_terminal()<CR>", { desc = "Toggle terminal" })
   vim.keymap.set({ "n", "i", "t", "v" }, "<C-_>", "<cmd>lua require('utils.terminal').toggle_terminal()<CR>", { desc = "Toggle terminal" })
   -- Esc goes to NORMAL mode from TERMINAL mode
-  vim.api.nvim_set_keymap("t", "<Esc>", "<C-\\><C-n>", { noremap = true })
+  vim.api.nvim_set_keymap("t", "<Esc><Esc>", "<C-\\><C-n>", { noremap = true })
 end
 
 M.setup_conform_keymaps = function()
