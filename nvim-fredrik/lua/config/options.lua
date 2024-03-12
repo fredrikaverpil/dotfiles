@@ -2,6 +2,11 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+-- undo
+vim.opt.undofile = true
+vim.opt.undolevels = 10000
+vim.opt.updatetime = 200 -- Save swap file and trigger CursorHold
+
 -- skip startup screen
 vim.opt.shortmess:append("I")
 
