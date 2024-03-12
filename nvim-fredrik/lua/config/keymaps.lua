@@ -202,6 +202,9 @@ M.setup_toggleterm_keymaps = function()
   map_normal_mode("<C-/>", require("utils.terminal").toggle_terminal, "Toggle terminal")
   map_normal_mode("<C-_>", require("utils.terminal").toggle_terminal, "Toggle terminal")
   vim.api.nvim_set_keymap("t", "<Esc>", "<C-\\><C-n>", { noremap = true }) -- allow pressing Esc in terminal
+
+M.setup_conform_keymaps = function()
+  map_normal_mode("<leader>uf", require("utils.formatting").toggle_formatting, "Toggle auto-formatting")
 end
 
 return M
