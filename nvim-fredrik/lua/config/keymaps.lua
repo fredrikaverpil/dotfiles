@@ -277,4 +277,10 @@ M.setup_rest_keymaps = function()
   map_normal_mode("<leader>rr", "<Plug>RestNvim", "Run REST request under cursor")
 end
 
+M.setup_yanky_keymaps = function()
+  map_normal_mode("<leader>p", function()
+    require("telescope").extensions.yank_history.yank_history({})
+  end, "Yanky history")
+end
+
 return M
