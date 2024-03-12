@@ -198,4 +198,10 @@ M.setup_noice_keymaps = function()
   map_normal_mode("<leader>snL", ":NoiceLog<CR>", "[s]earch [n]oice [L]og")
 end
 
+M.setup_toggleterm_keymaps = function()
+  map_normal_mode("<C-/>", require("utils.terminal").toggle_terminal, "Toggle terminal")
+  map_normal_mode("<C-_>", require("utils.terminal").toggle_terminal, "Toggle terminal")
+  vim.api.nvim_set_keymap("t", "<Esc>", "<C-\\><C-n>", { noremap = true }) -- allow pressing Esc in terminal
+end
+
 return M
