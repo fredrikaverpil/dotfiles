@@ -15,6 +15,14 @@ vim.keymap.set("n", "<C-Down>", ":resize -2<CR>", { desc = "Decrease window heig
 vim.keymap.set("n", "<C-Left>", ":vertical resize -2<CR>", { desc = "Decrease window width", silent = true })
 vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", { desc = "Increase window width", silent = true })
 
+-- Move Lines
+vim.keymap.set("n", "<A-j>", "<cmd>m .+1<cr>==", { desc = "Move down", silent = true })
+vim.keymap.set("n", "<A-k>", "<cmd>m .-2<cr>==", { desc = "Move up", silent = true })
+vim.keymap.set("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move down", silent = true })
+vim.keymap.set("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up", silent = true })
+vim.keymap.set("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move down", silent = true })
+vim.keymap.set("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move up", silent = true })
+
 -- buffers
 vim.keymap.set("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Prev buffer" })
 vim.keymap.set("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next buffer" })
@@ -214,8 +222,8 @@ M.setup_toggleterm_keymaps = function()
   -- When <C-_> is pressed, the terminal sends (95 - 64) which is 31. Hence, both key combinations need to be mapped.
 
   -- <C-/> toggles the terminal
-  vim.keymap.set({ "n", "i", "t", "v" }, "<C-/>", "<cmd>lua require('utils.terminal').toggle_terminal()<CR>", { desc = "Toggle terminal" })
-  vim.keymap.set({ "n", "i", "t", "v" }, "<C-_>", "<cmd>lua require('utils.terminal').toggle_terminal()<CR>", { desc = "Toggle terminal" })
+  vim.keymap.set({ "n", "i", "t", "v" }, "<C-/>", "<cmd>lua require('utils.terminal').toggle_terminal_native()<CR>", { desc = "Toggle terminal" })
+  vim.keymap.set({ "n", "i", "t", "v" }, "<C-_>", "<cmd>lua require('utils.terminal').toggle_terminal_native()<CR>", { desc = "Toggle terminal" })
   -- Esc goes to NORMAL mode from TERMINAL mode
   vim.api.nvim_set_keymap("t", "<Esc><Esc>", "<C-\\><C-n>", { noremap = true })
 end
