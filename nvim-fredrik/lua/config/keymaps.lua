@@ -265,4 +265,8 @@ M.setup_whichkey = function()
   }
 end
 
+M.setup_rest_keymaps = function()
+  map_normal_mode("<leader>rr", "<Plug>RestNvim", "Run REST request under cursor")
+end
+
 return M
