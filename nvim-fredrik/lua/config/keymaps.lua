@@ -1,24 +1,35 @@
 M = {}
 
+-- TODO: formatting toggle on <leader>uf
+-- TODO: formatting on <leader>cf
+
 -- TODO: Move to window using the <ctrl> hjkl keys
--- vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to left window", silent = true, noremap = true })
--- vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to lower window", silent = true, noremap = true })
--- vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go to upper window", silent = true, noremap = true })
--- vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go to right window", silent = true, noremap = true })
+vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to left window", silent = true, noremap = true })
+vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to lower window", silent = true, noremap = true })
+vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go to upper window", silent = true, noremap = true })
+vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go to right window", silent = true, noremap = true })
 
 -- Resize windows using <ctrl> arrow keys
-vim.keymap.set("n", "<C-Up>", ":resize +2<CR>", { desc = "Increase window height" })
-vim.keymap.set("n", "<C-Down>", ":resize -2<CR>", { desc = "Decrease window height" })
-vim.keymap.set("n", "<C-Left>", ":vertical resize -2<CR>", { desc = "Decrease window width" })
-vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", { desc = "Increase window width" })
+vim.keymap.set("n", "<C-Up>", ":resize +2<CR>", { desc = "Increase window height", silent = true })
+vim.keymap.set("n", "<C-Down>", ":resize -2<CR>", { desc = "Decrease window height", silent = true })
+vim.keymap.set("n", "<C-Left>", ":vertical resize -2<CR>", { desc = "Decrease window width", silent = true })
+vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", { desc = "Increase window width", silent = true })
 
 -- buffers
 vim.keymap.set("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Prev buffer" })
 vim.keymap.set("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next buffer" })
 vim.keymap.set("n", "[b", "<cmd>bprevious<cr>", { desc = "Prev buffer" })
 vim.keymap.set("n", "]b", "<cmd>bnext<cr>", { desc = "Next buffer" })
-vim.keymap.set("n", "<leader>bb", "<cmd>e #<cr>", { desc = "Switch to Other Buffer" })
+-- vim.keymap.set("n", "<leader>bb", "<cmd>e #<cr>", { desc = "Switch to Other Buffer" })
 vim.keymap.set("n", "<leader>`", "<cmd>e #<cr>", { desc = "Switch to Other Buffer" })
+
+-- tabs (disabled for now, use gt and gT instead)
+-- vim.keymap.set("n", "<leader><tab>l", "<cmd>tablast<cr>", { desc = "Last Tab", silent = true })
+-- vim.keymap.set("n", "<leader><tab>f", "<cmd>tabfirst<cr>", { desc = "First Tab", silent = true })
+-- vim.keymap.set("n", "<leader><tab><tab>", "<cmd>tabnew<cr>", { desc = "New Tab", silent = true })
+-- vim.keymap.set("n", "<leader><tab>]", "<cmd>tabnext<cr>", { desc = "Next Tab", silent = true })
+-- vim.keymap.set("n", "<leader><tab>d", "<cmd>tabclose<cr>", { desc = "Close Tab", silent = true })
+-- vim.keymap.set("n", "<leader><tab>[", "<cmd>tabprevious<cr>", { desc = "Previous Tab", silent = true })
 
 -- Clear search with <esc>
 vim.keymap.set({ "n", "i" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and clear hlsearch" })
@@ -42,12 +53,11 @@ vim.keymap.set("n", "<leader>xq", "<cmd>copen<cr>", { desc = "Quickfix List" })
 vim.keymap.set("n", "[q", vim.cmd.cprev, { desc = "Previous quickfix" })
 vim.keymap.set("n", "]q", vim.cmd.cnext, { desc = "Next quickfix" })
 
--- TODO: formatting toggle on <leader>uf
--- TODO: formatting on <leader>cf
--- TODO: terminal on <C-/> and take note of which-key and <leader>_
-
 local map_normal_mode = function(keys, func, desc)
-  vim.keymap.set("n", keys, func, { desc = desc })
+  -- default values:
+  -- noremap: false
+  -- silent: false
+  vim.keymap.set("n", keys, func, { desc = desc, noremap = false, silent = false })
 end
 
 M.setup_lsp_keymaps = function()
@@ -212,6 +222,47 @@ end
 
 M.setup_conform_keymaps = function()
   map_normal_mode("<leader>uf", require("utils.formatting").toggle_formatting, "Toggle auto-formatting")
+end
+
+M.setup_whichkey = function()
+  return {
+    ["<leader>c"] = {
+      name = "+code",
+    },
+    ["<leader>d"] = {
+      name = "+debug",
+    },
+    ["<leader>f"] = {
+      name = "+file",
+    },
+    ["<leader>g"] = {
+      name = "+git",
+    },
+    ["<leader>gd"] = {
+      name = "+diffview",
+    },
+    ["<leader>s"] = {
+      name = "+search",
+    },
+    ["<leader>sn"] = {
+      name = "+noice",
+    },
+    ["<leader>sp"] = {
+      name = "+spectre",
+    },
+    ["<leader>t"] = {
+      name = "+test",
+    },
+    ["<leader>u"] = {
+      name = "+ui",
+    },
+    ["<leader>r"] = {
+      name = "+run",
+    },
+    ["<leader>x"] = {
+      name = "+diagnostics/quickfix",
+    },
+  }
 end
 
 return M
