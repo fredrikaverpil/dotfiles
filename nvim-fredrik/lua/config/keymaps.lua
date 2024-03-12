@@ -66,6 +66,10 @@ local map_normal_mode = function(keys, func, desc)
   -- noremap: false
   -- silent: false
   vim.keymap.set("n", keys, func, { desc = desc, noremap = false, silent = false })
+
+M.setup_trouble_keymaps = function()
+  map_normal_mode("<leader>xx", "<cmd>TroubleToggle document_diagnostics<cr>", "Document diagnostics (Trouble)")
+  map_normal_mode("<leader>xX", "<cmd>TroubleToggle workspace_diagnostics<cr>", "Workspace diagnostics (Trouble)")
 end
 
 M.setup_lsp_keymaps = function()
