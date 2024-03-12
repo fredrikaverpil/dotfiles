@@ -77,7 +77,7 @@ return {
     ft = { "go", "gomod", "gowork", "gotmpl" },
     opts = {
       linters_by_ft = {
-        go = { "golangci-lint" },
+        go = { "golangcilint" },
       },
       linters = {
         golangcilint = {
