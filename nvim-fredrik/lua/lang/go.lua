@@ -119,7 +119,10 @@ return {
     ft = { "go" },
     optional = true,
     dependencies = {
-      "nvim-neotest/neotest-go",
+      -- NOTE: usinga personal fork with bugfixes, would be nicer to use original plugin...
+      -- "nvim-neotest/neotest-go",
+      "fredrikaverpil/neotest-go-fork",
+      branch = "main",
     },
     opts = function(_, opts)
       opts.adapters = {
