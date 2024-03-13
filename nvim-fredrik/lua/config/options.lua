@@ -65,11 +65,7 @@ vim.opt.splitbelow = true
 vim.opt.splitright = true
 
 -- fold settings
-vim.opt.foldcolumn = "0"
-vim.opt.foldmethod = "indent"
-vim.opt.foldlevel = 99
--- vim.opt.foldlevelstart = 99
-vim.opt.foldenable = true
+-- see ufo.lua
 
 -- scroll off
 vim.opt.scrolloff = 8
