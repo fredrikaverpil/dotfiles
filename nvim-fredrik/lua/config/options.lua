@@ -1,3 +1,5 @@
+M = {}
+
 -- leader key
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
@@ -82,3 +84,12 @@ vim.opt.clipboard = "unnamedplus"
 
 -- TODO: pick from https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 vim.opt.listchars = "tab:▸ ,trail:·,nbsp:␣,extends:❯,precedes:❮" -- show symbols for whitespace
+
+M.setup_folding_options = function()
+  vim.opt.foldcolumn = "0"
+  vim.opt.foldlevel = 99
+  vim.opt.foldlevelstart = 99
+  vim.opt.foldenable = true
+end
+
+return M
