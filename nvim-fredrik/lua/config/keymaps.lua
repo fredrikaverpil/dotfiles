@@ -61,11 +61,28 @@ vim.keymap.set("n", "<leader>xq", "<cmd>copen<cr>", { desc = "Quickfix List" })
 vim.keymap.set("n", "[q", vim.cmd.cprev, { desc = "Previous quickfix" })
 vim.keymap.set("n", "]q", vim.cmd.cnext, { desc = "Next quickfix" })
 
+-- diagnostic
+local diagnostic_goto = function(next, severity)
+  local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
+  severity = severity and vim.diagnostic.severity[severity] or nil
+  return function()
+    go({ severity = severity })
+  end
+end
+vim.keymap.set("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line Diagnostics" })
+vim.keymap.set("n", "]d", diagnostic_goto(true), { desc = "Next Diagnostic", silent = true })
+vim.keymap.set("n", "[d", diagnostic_goto(false), { desc = "Prev Diagnostic", silent = true })
+vim.keymap.set("n", "]e", diagnostic_goto(true, "ERROR"), { desc = "Next Error", silent = true })
+vim.keymap.set("n", "[e", diagnostic_goto(false, "ERROR"), { desc = "Prev Error", silent = true })
+vim.keymap.set("n", "]w", diagnostic_goto(true, "WARN"), { desc = "Next Warning", silent = true })
+vim.keymap.set("n", "[w", diagnostic_goto(false, "WARN"), { desc = "Prev Warning", silent = true })
+
 local map_normal_mode = function(keys, func, desc)
   -- default values:
   -- noremap: false
   -- silent: false
-  vim.keymap.set("n", keys, func, { desc = desc, noremap = false, silent = false })
+  vim.keymap.set("n", keys, func, { desc = desc, noremap = false, silent = true })
+end
 
 M.setup_trouble_keymaps = function()
   map_normal_mode("<leader>xx", "<cmd>TroubleToggle document_diagnostics<cr>", "Document diagnostics (Trouble)")
