@@ -109,10 +109,9 @@ M.setup_lsp_keymaps = function()
   --  the definition of its *type*, not where it was *defined*.
   map_normal_mode("<leader>D", require("telescope.builtin").lsp_type_definitions, "Goto Type [D]efinition")
 
-  -- NOTE: use aerial instead for this
   -- Fuzzy find all the symbols in your current document.
   --  Symbols are things like variables, functions, types, etc.
-  -- map_normal_mode("<leader>ss", require("telescope.builtin").lsp_document_symbols, "[s]ymbols in Document")
+  map_normal_mode("<leader>ss", require("telescope.builtin").lsp_document_symbols, "[s]ymbols in Document")
 
   -- Fuzzy find all the symbols in your current workspace
   --  Similar to document symbols, except searches over your whole project.
@@ -220,7 +219,7 @@ M.setup_spectre_keymaps = function()
 end
 
 M.setup_aerial_keymaps = function()
-  map_normal_mode("<leader>ss", ":AerialToggle<CR>", "[s]ymbols")
+  map_normal_mode("<leader>cs", ":AerialToggle<CR>", "[s]ymbols")
 end
 
 M.setup_dap_keymaps = function()
