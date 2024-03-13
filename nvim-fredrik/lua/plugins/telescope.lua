@@ -7,12 +7,11 @@ return {
       { "nvim-lua/plenary.nvim" },
       { "nvim-telescope/telescope-ui-select.nvim" },
       {
-        -- https://github.com/nvim-telescope/telescope-fzf-native.nvim
         "nvim-telescope/telescope-fzf-native.nvim",
+        enabled = vim.fn.executable("make") == 1,
         build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
       },
       {
-        -- https://github.com/nvim-telescope/telescope-live-grep-args.nvim
         "nvim-telescope/telescope-live-grep-args.nvim",
       },
     },
