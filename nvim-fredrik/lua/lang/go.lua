@@ -109,7 +109,42 @@ return {
         enabled = false,
       },
       servers = {
-        gopls = {},
+        gopls = {
+          -- settings = {
+          --   gofumpt = true,
+          --   codelenses = {
+          --     gc_details = false,
+          --     generate = true,
+          --     regenerate_cgo = true,
+          --     run_govulncheck = true,
+          --     test = true,
+          --     tidy = true,
+          --     upgrade_dependency = true,
+          --     vendor = true,
+          --   },
+          --   hints = {
+          --     assignVariableTypes = true,
+          --     compositeLiteralFields = true,
+          --     compositeLiteralTypes = true,
+          --     constantValues = true,
+          --     functionTypeParameters = true,
+          --     parameterNames = true,
+          --     rangeVariableTypes = true,
+          --   },
+          --   analyses = {
+          --     fieldalignment = false, -- annoying
+          --     nilness = true,
+          --     unusedparams = true,
+          --     unusedwrite = true,
+          --     useany = true,
+          --   },
+          --   usePlaceholders = true,
+          --   completeUnimported = true,
+          --   staticcheck = true,
+          --   directoryFilters = { "-.git", "-.vscode", "-.idea", "-.vscode-test", "-node_modules" },
+          --   semanticTokens = true,
+          -- },
+        },
       },
     },
   },
@@ -125,14 +160,27 @@ return {
       branch = "main",
     },
     opts = function(_, opts)
-      opts.adapters = {
-        require("neotest-go")({
-          experimental = {
-            test_table = true,
-          },
-          args = { "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out" },
-          -- TODO: figure out if this should be enabled: recursive_run = true,
-        }),
+      -- TODO: potentially use this function to mitigate always running all tests.
+      -- see; https://github.com/nvim-neotest/neotest-go/pull/81
+      local function get_nearest_function_name()
+        local ts_utils = require("nvim-treesitter.ts_utils")
+        local node = ts_utils.get_node_at_cursor()
+
+        while node do
+          if node:type() == "function_declaration" then
+            return ts_utils.get_node_text(node:child(1))[1]
+          end
+          node = node:parent()
+        end
+      end
+
+      opts.adapters = opts.adapters or {}
+      opts.adapters["neotest-go"] = {
+        experimental = {
+          test_table = true,
+        },
+        args = { "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out" },
+        -- TODO: figure out if this should be enabled: recursive_run = true,
       }
     end,
   },
@@ -165,7 +213,9 @@ return {
       },
       {
         "leoluz/nvim-dap-go",
-        config = true,
+        config = function()
+          require("dap-go").setup({})
+        end,
       },
     },
   },
