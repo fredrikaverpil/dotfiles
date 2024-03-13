@@ -8,10 +8,6 @@ return {
     },
     lazy = false,
     config = function()
-      vim.opt.fillchars = "diff:╱"
-      -- vim.opt.fillchars = "diff:░"
-      -- vim.opt.fillchars = "diff:·"
-
       local actions = require("diffview.actions")
 
       require("diffview").setup({

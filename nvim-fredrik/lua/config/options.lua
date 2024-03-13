@@ -10,6 +10,20 @@ vim.opt.updatetime = 200 -- Save swap file and trigger CursorHold
 -- skip startup screen
 vim.opt.shortmess:append("I")
 
+-- fillchars
+vim.opt.fillchars = {
+  foldopen = "",
+  foldclose = "",
+  -- fold = "⸱",
+  fold = " ",
+  foldsep = " ",
+  diff = "╱",
+  -- diff = "╱",
+  -- diff = "░",
+  -- diff = "·",
+  eob = " ",
+}
+
 -- line numbers
 vim.opt.number = true
 vim.opt.relativenumber = false
@@ -51,11 +65,11 @@ vim.opt.splitbelow = true
 vim.opt.splitright = true
 
 -- fold settings
--- vim.opt.foldcolumn = 0
--- vim.opt.foldmethod = "indent"
--- vim.opt.foldlevel = 99
+vim.opt.foldcolumn = "0"
+vim.opt.foldmethod = "indent"
+vim.opt.foldlevel = 99
 -- vim.opt.foldlevelstart = 99
--- vim.opt.foldenable = true
+vim.opt.foldenable = true
 
 -- scroll off
 vim.opt.scrolloff = 8
