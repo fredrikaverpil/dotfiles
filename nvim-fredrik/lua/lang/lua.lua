@@ -37,7 +37,24 @@ return {
     },
     ft = { "lua" },
     opts = function(_, opts)
-      opts.servers.lua_ls = {}
+      opts.servers = {
+        -- run :LspInfo and hit tab for more info
+        lua_ls = {
+          settings = {
+            Lua = {
+              workspace = {
+                checkThirdParty = false,
+              },
+              codeLens = {
+                enable = true,
+              },
+              completion = {
+                callSnippet = "Replace",
+              },
+            },
+          },
+        },
+      }
     end,
   },
 }
