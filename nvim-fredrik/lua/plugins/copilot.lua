@@ -2,7 +2,42 @@ return {
   {
     "zbirenbaum/copilot.lua",
     dependencies = {
-      "hrsh7th/nvim-cmp",
+      { "hrsh7th/nvim-cmp" },
+      {
+        "nvim-lualine/lualine.nvim",
+        opts = function(_, opts)
+          local function codepilot()
+            local icon = require("utils.defaults").icons.kinds.Copilot
+            return icon
+          end
+
+          local function fgcolor(name)
+            local hl = vim.api.nvim_get_hl and vim.api.nvim_get_hl(0, { name = name, link = false }) or vim.api.nvim_get_hl_by_name(name, true)
+            local fg = hl and (hl.fg or hl.foreground)
+            return fg and { fg = string.format("#%06x", fg) } or nil
+          end
+
+          local colors = {
+            [""] = fgcolor("Special"),
+            ["Normal"] = fgcolor("Special"),
+            ["Warning"] = fgcolor("DiagnosticError"),
+            ["InProgress"] = fgcolor("DiagnosticWarn"),
+          }
+
+          opts.copilot = {
+            lualine_component = {
+              codepilot,
+              color = function()
+                if not package.loaded["copilot"] then
+                  return
+                end
+                local status = require("copilot.api").status.data
+                return colors[status.status] or colors[""]
+              end,
+            },
+          }
+        end,
+      },
     },
     enabled = require("utils.private").enable_copilot(),
     cmd = "Copilot",
