@@ -56,6 +56,9 @@ return {
         gofumpt = {
           prepend_args = { "-extra" },
         },
+        gci = {
+          args = { "write", "--skip-generated", "-s", "standard", "-s", "default", "--skip-vendor", "$FILENAME" },
+        },
         golines = {
           prepend_args = { "--ignore-generated", "--tab-len=1", "--max-len=120" },
         },
