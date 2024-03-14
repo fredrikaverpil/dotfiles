@@ -55,9 +55,11 @@ return {
       },
     },
     ft = { "python" },
-    opts = function(_, opts)
-      opts.servers.pyright = {}
-    end,
+    opts = {
+      servers = {
+        pyright = {},
+      },
+    },
   },
 
   {

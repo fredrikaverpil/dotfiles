@@ -99,6 +99,10 @@ return {
           {
             "williamboman/mason.nvim",
           },
+          {
+            "artemave/workspace-diagnostics.nvim",
+            enabled = false,
+          },
         },
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
@@ -113,40 +117,51 @@ return {
       },
       servers = {
         gopls = {
-          -- settings = {
-          --   gofumpt = true,
-          --   codelenses = {
-          --     gc_details = false,
-          --     generate = true,
-          --     regenerate_cgo = true,
-          --     run_govulncheck = true,
-          --     test = true,
-          --     tidy = true,
-          --     upgrade_dependency = true,
-          --     vendor = true,
-          --   },
-          --   hints = {
-          --     assignVariableTypes = true,
-          --     compositeLiteralFields = true,
-          --     compositeLiteralTypes = true,
-          --     constantValues = true,
-          --     functionTypeParameters = true,
-          --     parameterNames = true,
-          --     rangeVariableTypes = true,
-          --   },
-          --   analyses = {
-          --     fieldalignment = false, -- annoying
-          --     nilness = true,
-          --     unusedparams = true,
-          --     unusedwrite = true,
-          --     useany = true,
-          --   },
-          --   usePlaceholders = true,
-          --   completeUnimported = true,
-          --   staticcheck = true,
-          --   directoryFilters = { "-.git", "-.vscode", "-.idea", "-.vscode-test", "-node_modules" },
-          --   semanticTokens = true,
-          -- },
+          on_attach = function(client, bufnr)
+            require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
+          end,
+          setings = {
+            -- for all options, see:
+            -- https://github.com/golang/tools/blob/master/gopls/doc/vim.md
+            -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+            -- for more details, also see:
+            -- https://github.com/golang/tools/blob/master/gopls/README.md
+            -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md
+            gopls = {
+              analyses = {
+                fieldalignment = false, -- annoying
+                nilness = true,
+                unusedparams = true,
+                unusedwrite = true,
+                useany = true,
+              },
+              codelenses = {
+                gc_details = false,
+                generate = true,
+                regenerate_cgo = true,
+                run_govulncheck = true,
+                test = true,
+                tidy = true,
+                upgrade_dependency = true,
+                vendor = true,
+              },
+              hints = {
+                assignVariableTypes = true,
+                compositeLiteralFields = true,
+                compositeLiteralTypes = true,
+                constantValues = true,
+                functionTypeParameters = true,
+                parameterNames = true,
+                rangeVariableTypes = true,
+              },
+              completeUnimported = true,
+              directoryFilters = { "-.git", "-.vscode", "-.idea", "-.vscode-test", "-node_modules" },
+              gofumpt = true,
+              semanticTokens = true,
+              staticcheck = true,
+              usePlaceholders = true,
+            },
+          },
         },
       },
     },

@@ -36,8 +36,8 @@ return {
       },
     },
     ft = { "lua" },
-    opts = function(_, opts)
-      opts.servers = {
+    opts = {
+      servers = {
         -- run :LspInfo and hit tab for more info
         lua_ls = {
           settings = {
@@ -54,7 +54,7 @@ return {
             },
           },
         },
-      }
-    end,
+      },
+    },
   },
 }
