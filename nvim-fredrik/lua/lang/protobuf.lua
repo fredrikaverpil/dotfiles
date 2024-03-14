@@ -33,7 +33,7 @@ return {
     ft = { "proto" },
     opts = {
       linters_by_ft = {
-        proto = { "buf" },
+        proto = { "buf_lint" },
       },
     },
   },
