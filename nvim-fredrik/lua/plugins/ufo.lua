@@ -2,9 +2,9 @@ return {
 
   {
     "kevinhwang91/nvim-ufo",
+    enabled = true, -- does not work with nvim 10
     dependencies = {
       "kevinhwang91/promise-async",
-      "nvim-treesitter/nvim-treesitter",
     },
     config = function()
       require("config.options").setup_folding_options()
@@ -39,8 +39,10 @@ return {
 
       require("ufo").setup({
         provider_selector = function(bufnr, filetype, buftype)
-          return { "treesitter", "indent" }
+          -- return { "treesitter", "indent" }
+          return { "lsp", "indent" }
         end,
+
         fold_virt_text_handler = handler,
       })
     end,
