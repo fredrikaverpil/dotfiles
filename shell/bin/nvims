@@ -11,7 +11,13 @@ function nvims() {
 	elif [[ $config == "default" ]]; then
 		config=""
 	fi
-	NVIM_APPNAME=$config $DOTFILES_BREW_PREFIX/bin/nvim "$@"
+
+	nvim="$DOTFILES_BREW_PREFIX"/bin/nvim
+	if [ -d ~/nvim-nightly ]; then
+		nvim=~/nvim-nightly/bin/nvim
+	fi
+
+	NVIM_APPNAME=$config $nvim "$@"
 }
 
 nvims "$@"
