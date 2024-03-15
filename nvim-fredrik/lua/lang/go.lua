@@ -1,10 +1,10 @@
-local find_file = function(filename)
+local function find_file(filename)
   local command = "fd --hidden --no-ignore '" .. filename .. "' " .. vim.fn.getcwd() .. " | head -n 1"
   local file = io.popen(command):read("*l")
   return file and file or nil
 end
 
-local use_golangci_config_if_available = function(linters)
+local function use_golangci_config_if_available(linters)
   local config_file = find_file(".golangci.yml")
   if config_file then
     vim.notify = require("notify")
