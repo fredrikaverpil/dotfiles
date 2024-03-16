@@ -137,6 +137,15 @@ return {
     "mfussenegger/nvim-dap",
     dependencies = {
       {
+        "jay-babu/mason-nvim-dap.nvim",
+        dependencies = {
+          "williamboman/mason.nvim",
+        },
+        opts = {
+          ensure_installed = { "debugpy" },
+        },
+      },
+      {
         "mfussenegger/nvim-dap-python",
         ft = { "python" },
         config = function()
