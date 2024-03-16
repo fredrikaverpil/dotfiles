@@ -9,7 +9,7 @@ local function find_file(filename)
   local file = io.popen(command):read("*l")
   local path = file and file or nil
   if path then
-    print("Using: " .. path)
+    vim.notify("Using: " .. path)
   end
   return path
 end
