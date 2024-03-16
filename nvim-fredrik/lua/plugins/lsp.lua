@@ -32,10 +32,6 @@ return {
         enabled = false, -- TODO: figure out how this status shows without fidget
         opts = {},
       },
-
-      -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
-      -- used for completion, annotations and signatures of Neovim apis
-      { "folke/neodev.nvim", opts = {} },
     },
     opts = {
       servers = {

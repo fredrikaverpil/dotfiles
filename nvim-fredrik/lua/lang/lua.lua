@@ -34,6 +34,10 @@ return {
           vim.list_extend(opts.ensure_installed, { "lua_ls" })
         end,
       },
+
+      -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
+      -- used for completion, annotations and signatures of Neovim apis
+      { "folke/neodev.nvim", opts = {} },
     },
     ft = { "lua" },
     opts = {
