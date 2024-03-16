@@ -1,6 +1,6 @@
 M = {}
 
-M.toggle_formatting = function()
+function M.toggle_formatting()
   vim.g.auto_format = not vim.g.auto_format -- reverse the value
 
   if vim.g.auto_format then

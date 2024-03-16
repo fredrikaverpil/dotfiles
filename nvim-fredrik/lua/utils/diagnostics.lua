@@ -1,6 +1,6 @@
 M = {}
 
-M.setup_diagnostics = function()
+function M.setup_diagnostics()
   local diagnostics = {
     underline = true,
     update_in_insert = false,

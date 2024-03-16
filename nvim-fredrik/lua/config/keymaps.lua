@@ -71,7 +71,7 @@ vim.keymap.set("n", "[q", vim.cmd.cprev, { desc = "Previous quickfix" })
 vim.keymap.set("n", "]q", vim.cmd.cnext, { desc = "Next quickfix" })
 
 -- diagnostic
-local diagnostic_goto = function(next, severity)
+local function diagnostic_goto(next, severity)
   local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
   severity = severity and vim.diagnostic.severity[severity] or nil
   return function()
@@ -86,19 +86,19 @@ vim.keymap.set("n", "[e", diagnostic_goto(false, "ERROR"), { desc = "Prev Error"
 vim.keymap.set("n", "]w", diagnostic_goto(true, "WARN"), { desc = "Next Warning", silent = true })
 vim.keymap.set("n", "[w", diagnostic_goto(false, "WARN"), { desc = "Prev Warning", silent = true })
 
-local map_normal_mode = function(keys, func, desc)
+local function map_normal_mode(keys, func, desc)
   -- default values:
   -- noremap: false
   -- silent: false
   vim.keymap.set("n", keys, func, { desc = desc, noremap = false, silent = true })
 end
 
-M.setup_trouble_keymaps = function()
+function M.setup_trouble_keymaps()
   map_normal_mode("<leader>xx", "<cmd>TroubleToggle document_diagnostics<cr>", "Document diagnostics (Trouble)")
   map_normal_mode("<leader>xX", "<cmd>TroubleToggle workspace_diagnostics<cr>", "Workspace diagnostics (Trouble)")
 end
 
-M.setup_lsp_keymaps = function(event)
+function M.setup_lsp_keymaps(event)
   local map = function(keys, func, desc)
     vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
   end
@@ -145,7 +145,7 @@ M.setup_lsp_keymaps = function(event)
   map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
 end
 
-M.setup_cmp_keymaps = function(cmp)
+function M.setup_cmp_keymaps(cmp)
   return {
     ["<C-u>"] = cmp.mapping.scroll_docs(-4),
     ["<C-d>"] = cmp.mapping.scroll_docs(4),
@@ -155,12 +155,12 @@ M.setup_cmp_keymaps = function(cmp)
   }
 end
 
-M.setup_neotree_keymaps = function()
+function M.setup_neotree_keymaps()
   map_normal_mode("<leader>e", ":Neotree source=filesystem reveal=true position=left toggle=true<CR>", "N[E]oTree")
   map_normal_mode("<leader>sb", ":Neotree buffers reveal float<CR>", "[S]earch [B]uffers")
 end
 
-M.setup_telescope_keymaps = function()
+function M.setup_telescope_keymaps()
   map_normal_mode("<leader><leader>", require("telescope.builtin").find_files, "Find Files")
 
   -- git
@@ -187,11 +187,11 @@ M.setup_telescope_keymaps = function()
   map_normal_mode("<leader>sR", "<cmd>Telescope resume<cr>", "[s]earch [R]esume")
 end
 
-M.setup_coderunner_keymaps = function()
+function M.setup_coderunner_keymaps()
   map_normal_mode("<leader>rf", ":RunFile term<CR>", "[r]unner [f]ile")
 end
 
-M.setup_lazygit_keymaps = function()
+function M.setup_lazygit_keymaps()
   --   "LazyGit",
   --   "LazyGitConfig",
   --   "LazyGitCurrentFile",
@@ -200,7 +200,7 @@ M.setup_lazygit_keymaps = function()
   map_normal_mode("<leader>gg", ":LazyGit<CR>", "[g]it [g]ui")
 end
 
-M.setup_gitsigns_keymaps = function()
+function M.setup_gitsigns_keymaps()
   map_normal_mode("<leader>gp", ":Gitsigns preview_hunk<CR>", "[g]it [p]review hunk")
   map_normal_mode("<leader>gr", ":Gitsigns reset_hunk<CR>", "[g]it [r]eset hunk")
   map_normal_mode("<leader>gR", ":Gitsigns reset_buffer<CR>", "[g]it [R]eset buffer")
@@ -210,7 +210,7 @@ M.setup_gitsigns_keymaps = function()
   map_normal_mode("<leader>gB", ":Gitsigns blame_line<CR>", "[g]it [B]lame line")
 end
 
-M.setup_neotest_keymaps = function()
+function M.setup_neotest_keymaps()
   -- TODO: use these...
   -- { "<leader>tt", function() require("neotest").run.run(vim.fn.expand("%")) end, desc = "Run File" },
   -- { "<leader>tT", function() require("neotest").run.run(vim.loop.cwd()) end, desc = "Run All Test Files" },
@@ -238,22 +238,22 @@ M.setup_neotest_keymaps = function()
   end, "[d]ebug [g]o (nearest test)")
 end
 
-M.setup_coverage_keymaps = function()
+function M.setup_coverage_keymaps()
   map_normal_mode("<leader>tc", ":Coverage<CR>", "[t]est [c]overage in gutter")
   map_normal_mode("<leader>tC", ":CoverageLoad<CR>:CoverageSummary<CR>", "[t]est [C]overage summary")
 end
 
-M.setup_spectre_keymaps = function()
+function M.setup_spectre_keymaps()
   map_normal_mode("<leader>spt", ":lua require('spectre').toggle()<CR>", "[s][p]ectre [t]oggle")
   map_normal_mode("<leader>spw", ":lua require('spectre').open_visual({select_word=true})<CR>", "[s][p]ectre current [w]ord")
   map_normal_mode("<leader>spf", ':lua require("spectre").open_file_search({select_word=true})<CR>', "[s][p]ectre current [f]ile")
 end
 
-M.setup_aerial_keymaps = function()
+function M.setup_aerial_keymaps()
   map_normal_mode("<leader>cs", ":AerialToggle<CR>", "[s]ymbols")
 end
 
-M.setup_dap_ui_keymaps = function()
+function M.setup_dap_ui_keymaps()
   map_normal_mode("<leader>du", function()
     require("dapui").toggle({})
   end, "[d]ap [u]i")
@@ -263,7 +263,7 @@ M.setup_dap_ui_keymaps = function()
   end, { desc = "[d]ap [e]val" })
 end
 
-M.setup_dap_keymaps = function()
+function M.setup_dap_keymaps()
   map_normal_mode("<leader>dB", function()
     require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: "))
   end, "[d]ebug [B]reakpoint")
@@ -345,14 +345,14 @@ M.setup_dap_keymaps = function()
   end, "[d]ebug [w]idgets")
 end
 
-M.setup_noice_keymaps = function()
+function M.setup_noice_keymaps()
   map_normal_mode("<leader>sna", ":Noice<CR>", "[s]earch [n]oice [a]ll")
   map_normal_mode("<leader>snl", ":NoiceLast<CR>", "[s]earch [n]oice [l]ast")
   map_normal_mode("<leader>snd", ":NoiceDismiss<CR>", "[s]earch [n]oice [d]ismiss")
   map_normal_mode("<leader>snL", ":NoiceLog<CR>", "[s]earch [n]oice [L]og")
 end
 
-M.setup_toggleterm_keymaps = function()
+function M.setup_toggleterm_keymaps()
   -- Both <C-/> and <C-_> are mapped due to the way control characters are interpreted by terminal emulators.
   -- ASCII value of '/' is 47, and of '_' is 95. When <C-/> is pressed, the terminal sends (47 - 64) which wraps around to 111 ('o').
   -- When <C-_> is pressed, the terminal sends (95 - 64) which is 31. Hence, both key combinations need to be mapped.
@@ -364,11 +364,11 @@ M.setup_toggleterm_keymaps = function()
   vim.api.nvim_set_keymap("t", "<Esc><Esc>", "<C-\\><C-n>", { noremap = true })
 end
 
-M.setup_conform_keymaps = function()
+function M.setup_conform_keymaps()
   map_normal_mode("<leader>uf", require("utils.formatting").toggle_formatting, "Toggle auto-formatting")
 end
 
-M.setup_whichkey = function()
+function M.setup_whichkey()
   return {
     ["<leader>c"] = {
       name = "+code",
@@ -409,11 +409,11 @@ M.setup_whichkey = function()
   }
 end
 
-M.setup_rest_keymaps = function()
+function M.setup_rest_keymaps()
   map_normal_mode("<leader>rr", "<Plug>RestNvim", "Run REST request under cursor")
 end
 
-M.setup_yanky_keymaps = function()
+function M.setup_yanky_keymaps()
   map_normal_mode("<leader>p", function()
     require("telescope").extensions.yank_history.yank_history({})
   end, "Yanky history")

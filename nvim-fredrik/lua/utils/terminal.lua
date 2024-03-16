@@ -1,6 +1,6 @@
 M = {}
 
-M.toggle_terminal_native = function()
+function M.toggle_terminal_native()
   -- If the terminal buffer doesn't exist or is no longer valid...
   if not vim.g.terminal_buf or not vim.api.nvim_buf_is_valid(vim.g.terminal_buf) then
     -- Create a new terminal buffer
@@ -26,7 +26,7 @@ M.toggle_terminal_native = function()
   end
 end
 
-M.toggle_terminal = function()
+function M.toggle_terminal()
   -- NOTE: this requires toggleterm
   local cwd = vim.fn.getcwd()
   local cwd_folder_name = vim.fn.fnamemodify(cwd, ":t")

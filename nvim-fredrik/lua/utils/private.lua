@@ -1,6 +1,6 @@
 M = {}
 
-M.is_code_private = function()
+function M.is_code_private()
   local current_dir = vim.fn.getcwd()
   local home_dir = os.getenv("HOME") or os.getenv("USERPROFILE")
   local code_path = home_dir .. "/code"
@@ -16,14 +16,14 @@ M.is_code_private = function()
   end
 end
 
-M.enable_ai = function()
+function M.enable_ai()
   if M.is_code_private() then
     return false
   end
   return true
 end
 
-M.enable_copilot = function()
+function M.enable_copilot()
   if M.enable_ai() then
     if vim.fn.executable("node") == 1 then
       return true
