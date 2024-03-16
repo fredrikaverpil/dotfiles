@@ -63,8 +63,7 @@ return {
       local args = require("lint").linters.golangcilint.args -- defaults
       local config_file = find_file(".golangci.yml")
       if config_file ~= nil then
-        vim.notify = require("notify")
-        vim.notify("Linter uses golangci-lint config: " .. config_file)
+        print("Linter uses golangci-lint config: " .. config_file)
         args = {
           "run",
           "--out-format",
@@ -112,8 +111,8 @@ return {
       -- local command = { "golangci-lint", "run", "--enable-all", "--disable", "lll", "--out-format", "json", "--issues-exit-code=1" }
       -- local config_file = find_file(".golangci.yml")
       -- if config_file ~= nil then
-      --   vim.notify = require("notify")
-      --   vim.notify("LSP uses golangci-lint config: " .. config_file)
+      --
+      --   print("LSP uses golangci-lint config: " .. config_file)
       --   command = { "golangci-lint", "run", "--out-format", "json", "--config", config_file, "--issues-exit-code=1" }
       -- end
       -- if not configs.golangcilsp then

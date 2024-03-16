@@ -8,8 +8,7 @@ local function prefer_bin_from_venv(executable_name)
     local paths = vim.fn.glob(vim.env.VIRTUAL_ENV .. "/**/bin/" .. executable_name, true, true)
     local executable_path = table.concat(paths, ", ")
     if executable_path ~= "" then
-      vim.notify = require("notify")
-      vim.notify("Using path for " .. executable_name .. ": " .. executable_path, vim.log.levels.INFO)
+      print("Using path for " .. executable_name .. ": " .. executable_path, vim.log.levels.INFO)
       return executable_path
     end
   end
@@ -17,7 +16,7 @@ local function prefer_bin_from_venv(executable_name)
   -- NOTE: this can probably be removed, as mason is puttiing stuff on $PATH for us:
   -- local mason_registry = require("mason-registry")
   -- local mason_path = mason_registry.get_package(executable_name):get_install_path() .. "/venv/bin/" .. executable_name
-  -- vim.notify("Using path for " .. executable_name .. ": " .. mason_path, vim.log.levels.WARN)
+  -- print("Using path for " .. executable_name .. ": " .. mason_path, vim.log.levels.WARN)
   -- return mason_path
 
   return executable_name
@@ -167,8 +166,8 @@ return {
           end
 
           local dap_python_path = find_debugpy_python_path()
-          vim.notify = require("notify")
-          vim.notify("Using path for dap-python: " .. dap_python_path)
+
+          print("Using path for dap-python: " .. dap_python_path)
 
           dap_python.setup(dap_python_path)
         end,
