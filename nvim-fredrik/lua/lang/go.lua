@@ -1,7 +1,17 @@
 local function find_file(filename)
-  local command = "fd --hidden --no-ignore '" .. filename .. "' " .. vim.fn.getcwd() .. " | head -n 1"
+  local excluded_dirs = { ".git", "node_modules" }
+  local exclude_str = ""
+  for _, dir in ipairs(excluded_dirs) do
+    exclude_str = exclude_str .. " --exclude " .. dir
+  end
+  local command = "fd --hidden --no-ignore" .. exclude_str .. " '" .. filename .. "' " .. vim.fn.getcwd() .. " | head -n 1"
+  --  local command = "fd --hidden --no-ignore '" .. filename .. "' " .. vim.fn.getcwd() .. " | head -n 1"
   local file = io.popen(command):read("*l")
-  return file and file or nil
+  local path = file and file or nil
+  if path then
+    print("Using: " .. path)
+  end
+  return path
 end
 
 vim.api.nvim_create_autocmd("FileType", {
@@ -11,6 +21,9 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.shiftwidth = 2
     vim.opt_local.shiftwidth = 2
     vim.opt_local.colorcolumn = "120"
+    if not vim.g.golangcilint_config_path then
+      vim.g.golangcilint_config_path = find_file(".golangci.yml")
+    end
   end,
 })
 
@@ -61,9 +74,8 @@ return {
     ft = { "go", "gomod", "gowork", "gotmpl" },
     opts = function(_, opts)
       local args = require("lint").linters.golangcilint.args -- defaults
-      local config_file = find_file(".golangci.yml")
+      local config_file = vim.g.golangcilint_config_path
       if config_file ~= nil then
-        print("Linter uses golangci-lint config: " .. config_file)
         args = {
           "run",
           "--out-format",
@@ -194,7 +206,6 @@ return {
   {
     "nvim-neotest/neotest",
     ft = { "go" },
-    optional = true,
     dependencies = {
       -- NOTE: usinga personal fork with bugfixes, would be nicer to use original plugin...
       -- "nvim-neotest/neotest-go",

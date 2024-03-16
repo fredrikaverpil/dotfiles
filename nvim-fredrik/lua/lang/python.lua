@@ -4,9 +4,12 @@ local function prefer_bin_from_venv(executable_name)
     local paths = vim.fn.glob(vim.env.VIRTUAL_ENV .. "/**/bin/" .. executable_name, true, true)
     local executable_path = table.concat(paths, ", ")
     if executable_path ~= "" then
+      vim.notify("Using " .. executable_path)
       return executable_path
     end
   end
+
+  vim.notify("Could not find " .. executable_name .. " in virtual environment.", vim.log.levels.WARN)
   return executable_name
 end
 
@@ -16,22 +19,54 @@ local function find_debugpy_python_path()
   if vim.env.VIRTUAL_ENV then
     local paths = vim.fn.glob(vim.env.VIRTUAL_ENV .. "/**/debugpy", true, true)
     if table.concat(paths, ", ") ~= "" then
-      local path = vim.env.VIRTUAL_ENV .. "/bin/python"
-      vim.notify("Using " .. path, vim.log.levels.INFO)
+      local executable_path = vim.env.VIRTUAL_ENV .. "/bin/python"
+      vim.notify("Using " .. executable_path)
     end
   end
   local mason_registry = require("mason-registry")
   local path = mason_registry.get_package("debugpy"):get_install_path() .. "/venv/bin/python"
-  vim.notify("Using " .. path, vim.log.levels.WARN)
+  vim.notify("Warning: Using debugpy from Mason.", vim.log.levels.WARN)
   return path
 end
+
+local function find_python_executable()
+  if vim.env.VIRTUAL_ENV then
+    local paths = vim.fn.glob(vim.env.VIRTUAL_ENV .. "/**/bin/python", true, true)
+    local executable_path = table.concat(paths, ", ")
+    if executable_path ~= "" then
+      vim.notify("Using " .. executable_path)
+      return executable_path
+    end
+  elseif vim.fn.filereadable(".venv/bin/python") == 1 then
+    local executable_path = vim.fn.expand(".venv/bin/python")
+    vim.notify("Using " .. executable_path)
+    return executable_path
+  end
+  vim.notify("No virtual environment found to grab python interpreter from.", vim.log.levels.WARN)
+end
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "python" },
+  callback = function()
+    vim.opt_local.tabstop = 4
+    vim.opt_local.shiftwidth = 4
+    vim.opt_local.shiftwidth = 4
+    vim.opt_local.colorcolumn = "88"
+    if not vim.g.python3_host_prog then
+      vim.g.python3_host_prog = find_python_executable()
+      vim.g.python_debugpy_path = find_debugpy_python_path()
+      vim.g.python_ruff_path = prefer_bin_from_venv("ruff")
+      vim.g.python_mypy_path = prefer_bin_from_venv("mypy")
+    end
+  end,
+})
 
 return {
 
   {
     "stevearc/conform.nvim",
+    ft = { "python" },
     dependencies = {
-      { "rcarriga/nvim-notify" },
       {
         "williamboman/mason.nvim",
         opts = function(_, opts)
@@ -40,20 +75,17 @@ return {
         end,
       },
     },
-    ft = { "python" },
     opts = function(_, opts)
       opts.formatters_by_ft.python = { "ruff_format" }
       local formatters = require("conform.formatters")
-      local command = prefer_bin_from_venv("ruff")
-      vim.notify("Using " .. command, vim.log.levels.INFO)
-      formatters.ruff_format.command = command
+      formatters.ruff_format.command = vim.g.python_ruff_path
     end,
   },
 
   {
     "mfussenegger/nvim-lint",
+    ft = { "python" },
     dependencies = {
-      { "rcarriga/nvim-notify" },
       {
         "williamboman/mason.nvim",
         opts = function(_, opts)
@@ -62,19 +94,17 @@ return {
         end,
       },
     },
-    ft = { "python" },
     opts = function(_, opts)
       opts.linters_by_ft["python"] = { "mypy" }
-      local command = prefer_bin_from_venv("mypy")
-      vim.notify("Using " .. command, vim.log.levels.INFO)
       opts.linters["mypy"] = {
-        cmd = command,
+        cmd = vim.g.pyton_mypy_path,
       }
     end,
   },
 
   {
     "neovim/nvim-lspconfig",
+    ft = { "python" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -89,7 +119,6 @@ return {
         end,
       },
     },
-    ft = { "python" },
     opts = {
       servers = {
         pyright = {},
@@ -108,7 +137,6 @@ return {
   {
     "nvim-neotest/neotest",
     ft = { "python" },
-    optional = true,
     dependencies = {
       "nvim-neotest/neotest-python",
     },
@@ -139,8 +167,8 @@ return {
 
   {
     "mfussenegger/nvim-dap",
+    ft = { "python" },
     dependencies = {
-      { "rcarriga/nvim-notify" },
       {
         "jay-babu/mason-nvim-dap.nvim",
         dependencies = {
@@ -152,11 +180,9 @@ return {
       },
       {
         "mfussenegger/nvim-dap-python",
-        ft = { "python" },
         config = function()
           local dap_python = require("dap-python")
-          local dap_python_path = find_debugpy_python_path()
-          dap_python.setup(dap_python_path)
+          dap_python.setup(vim.g.python_debugpy_path)
         end,
       },
       {
