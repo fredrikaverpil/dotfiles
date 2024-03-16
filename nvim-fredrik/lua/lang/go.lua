@@ -245,7 +245,6 @@ return {
   {
     "mfussenegger/nvim-dap",
     ft = { "go" },
-    optional = true,
     dependencies = {
       {
         "williamboman/mason.nvim",
