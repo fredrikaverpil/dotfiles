@@ -48,6 +48,7 @@ return {
 
   {
     "mfussenegger/nvim-lint",
+    enabled = true,
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -63,7 +64,7 @@ return {
       local config_file = find_file(".golangci.yml")
       if config_file ~= nil then
         vim.notify = require("notify")
-        vim.notify("Using golangci-lint config: " .. config_file)
+        vim.notify("Linter uses golangci-lint config: " .. config_file)
         args = {
           "run",
           "--out-format",
@@ -97,27 +98,60 @@ return {
         },
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "gopls" })
+          vim.list_extend(opts.ensure_installed, { "gopls", "golangci_lint_ls" })
         end,
       },
     },
     ft = { "go", "gomod", "gowork", "gotmpl" },
-    opts = {
-      inlay_hints = {
-        enabled = false,
-      },
-      servers = {
+    opts = function(_, opts)
+      -- TODO: figure out why golangci-lint doesn't work when used as LSP... (see :LspLog)
+      -- https://github.com/nametake/golangci-lint-langserver/issues/17
+      --
+      -- local lspconfig = require("lspconfig")
+      -- local configs = require("lspconfig/configs")
+      -- local command = { "golangci-lint", "run", "--enable-all", "--disable", "lll", "--out-format", "json", "--issues-exit-code=1" }
+      -- local config_file = find_file(".golangci.yml")
+      -- if config_file ~= nil then
+      --   vim.notify = require("notify")
+      --   vim.notify("LSP uses golangci-lint config: " .. config_file)
+      --   command = { "golangci-lint", "run", "--out-format", "json", "--config", config_file, "--issues-exit-code=1" }
+      -- end
+      -- if not configs.golangcilsp then
+      --   configs.golangcilsp = {
+      --     default_config = {
+      --       cmd = { "golangci-lint-langserver" },
+      --       root_dir = lspconfig.util.root_pattern(".git", "go.mod"),
+      --       init_options = {
+      --         command = command,
+      --       },
+      --     },
+      --   }
+      -- end
+
+      opts.servers = {
+
+        -- TODO: figure out why golangci-lint doesn't work when used as LSP... (see :LspLog)
+        -- https://github.com/nametake/golangci-lint-langserver/issues/17
+        --
+        -- golangci_lint_ls = {
+        --   -- https://github.com/nametake/golangci-lint-langserver
+        --   filetypes = { "go", "gomod" },
+        -- },
+
         gopls = {
-          on_attach = function(client, bufnr)
-            require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
-          end,
-          setings = {
-            -- for all options, see:
-            -- https://github.com/golang/tools/blob/master/gopls/doc/vim.md
-            -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-            -- for more details, also see:
-            -- https://github.com/golang/tools/blob/master/gopls/README.md
-            -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md
+          -- for all options, see:
+          -- https://github.com/golang/tools/blob/master/gopls/doc/vim.md
+          -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md
+          -- for more details, also see:
+          -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+          -- https://github.com/golang/tools/blob/master/gopls/README.md
+
+          -- on_attach = function(client, bufnr)
+          --   require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
+          -- end,
+
+          settings = {
+
             gopls = {
               analyses = {
                 fieldalignment = false, -- annoying
@@ -154,8 +188,8 @@ return {
             },
           },
         },
-      },
-    },
+      }
+    end,
   },
 
   {
