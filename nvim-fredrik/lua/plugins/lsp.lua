@@ -105,8 +105,14 @@ return {
         }, opts.servers[server] or {})
 
         lspconfig[server].setup(server_opts)
-        require("config.keymaps").setup_lsp_keymaps()
       end
+
+      vim.api.nvim_create_autocmd("LspAttach", {
+        group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
+        callback = function(event)
+          require("config.keymaps").setup_lsp_keymaps(event)
+        end,
+      })
     end,
   },
 }
