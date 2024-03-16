@@ -9,8 +9,9 @@ return {
     },
     lazy = false,
     config = function()
-      -- vim.opt.fillchars = "diff:╱"
-      vim.opt.fillchars = "diff:░"
+      vim.opt.fillchars = "diff:╱"
+      -- vim.opt.fillchars = "diff:░"
+      -- vim.opt.fillchars = "diff:·"
 
       require("diffview").setup({
         -- file_panel = {
@@ -78,18 +79,5 @@ return {
       require("gh-actions").setup(opts)
     end,
     opts = {},
-  },
-
-  {
-    "pwntester/octo.nvim",
-    enabled = true,
-    requires = {
-      "nvim-lua/plenary.nvim",
-      "nvim-telescope/telescope.nvim",
-      "nvim-tree/nvim-web-devicons",
-    },
-    config = function()
-      require("octo").setup()
-    end,
   },
 }

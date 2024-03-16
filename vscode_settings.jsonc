@@ -334,6 +334,14 @@
   "gitlens.codeLens.recentChange.enabled": false,
   "gitlens.codeLens.authors.enabled": false,
   "workbench.startupEditor": "none",
-  "editor.minimap.enabled": false,
-  "git.ignoreRebaseWarning": true
+  "git.ignoreRebaseWarning": true,
+  "go.testFlags": ["-v"],
+  "emeraldwalk.runonsave": {
+    "commands": [
+      {
+        "match": "\\.go$",
+        "cmd": "golines ${file} -w"
+      }
+    ]
+  }
 }
