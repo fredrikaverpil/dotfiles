@@ -1,8 +1,8 @@
 #!/bin/bash
 
 if [ -d ~/nvim-nightly ]; then
-	NVIM_APPNAME=LazyVim ~/nvim-nightly/bin/nvim "$@"
+	NVIM_APPNAME=fredrik ~/nvim-nightly/bin/nvim "$@"
 	exit
 else
-	NVIM_APPNAME=LazyVim $DOTFILES_BREW_PREFIX/bin/nvim "$@"
+	NVIM_APPNAME=fredrik $DOTFILES_BREW_PREFIX/bin/nvim "$@"
 fi
