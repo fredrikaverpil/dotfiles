@@ -1,25 +1,29 @@
--- https://www.lazyvim.org/plugins/lsp
--- NOTE: don't forget to update treesitter for languages
--- NOTE: see lazy.lua for extras that configure LSPs, formatters, linters and code actions.
-
 local function prefer_bin_from_venv(executable_name)
   -- Return the path to the executable if $VIRTUAL_ENV is set and the binary exists somewhere beneath the $VIRTUAL_ENV path, otherwise get it from Mason
   if vim.env.VIRTUAL_ENV then
     local paths = vim.fn.glob(vim.env.VIRTUAL_ENV .. "/**/bin/" .. executable_name, true, true)
     local executable_path = table.concat(paths, ", ")
     if executable_path ~= "" then
-      print("Using path for " .. executable_name .. ": " .. executable_path, vim.log.levels.INFO)
       return executable_path
     end
   end
-
-  -- NOTE: this can probably be removed, as mason is puttiing stuff on $PATH for us:
-  -- local mason_registry = require("mason-registry")
-  -- local mason_path = mason_registry.get_package(executable_name):get_install_path() .. "/venv/bin/" .. executable_name
-  -- print("Using path for " .. executable_name .. ": " .. mason_path, vim.log.levels.WARN)
-  -- return mason_path
-
   return executable_name
+end
+
+local function find_debugpy_python_path()
+  -- Return the path to the debugpy python executable if it is
+  -- installed in $VIRTUAL_ENV, otherwise get it from Mason
+  if vim.env.VIRTUAL_ENV then
+    local paths = vim.fn.glob(vim.env.VIRTUAL_ENV .. "/**/debugpy", true, true)
+    if table.concat(paths, ", ") ~= "" then
+      local path = vim.env.VIRTUAL_ENV .. "/bin/python"
+      vim.notify("Using " .. path, vim.log.levels.INFO)
+    end
+  end
+  local mason_registry = require("mason-registry")
+  local path = mason_registry.get_package("debugpy"):get_install_path() .. "/venv/bin/python"
+  vim.notify("Using " .. path, vim.log.levels.WARN)
+  return path
 end
 
 return {
@@ -27,6 +31,7 @@ return {
   {
     "stevearc/conform.nvim",
     dependencies = {
+      { "rcarriga/nvim-notify" },
       {
         "williamboman/mason.nvim",
         opts = function(_, opts)
@@ -38,15 +43,17 @@ return {
     ft = { "python" },
     opts = function(_, opts)
       opts.formatters_by_ft.python = { "ruff_format" }
-
       local formatters = require("conform.formatters")
-      formatters.ruff_format.command = prefer_bin_from_venv("ruff")
+      local command = prefer_bin_from_venv("ruff")
+      vim.notify("Using " .. command, vim.log.levels.INFO)
+      formatters.ruff_format.command = command
     end,
   },
 
   {
     "mfussenegger/nvim-lint",
     dependencies = {
+      { "rcarriga/nvim-notify" },
       {
         "williamboman/mason.nvim",
         opts = function(_, opts)
@@ -56,16 +63,14 @@ return {
       },
     },
     ft = { "python" },
-    opts = {
-      linters_by_ft = {
-        python = { "mypy" },
-      },
-      linters = {
-        mypy = {
-          cmd = prefer_bin_from_venv("mypy"),
-        },
-      },
-    },
+    opts = function(_, opts)
+      opts.linters_by_ft["python"] = { "mypy" }
+      local command = prefer_bin_from_venv("mypy")
+      vim.notify("Using " .. command, vim.log.levels.INFO)
+      opts.linters["mypy"] = {
+        cmd = command,
+      }
+    end,
   },
 
   {
@@ -135,6 +140,7 @@ return {
   {
     "mfussenegger/nvim-dap",
     dependencies = {
+      { "rcarriga/nvim-notify" },
       {
         "jay-babu/mason-nvim-dap.nvim",
         dependencies = {
@@ -149,26 +155,7 @@ return {
         ft = { "python" },
         config = function()
           local dap_python = require("dap-python")
-
-          local function find_debugpy_python_path()
-            -- Return the path to the debugpy python executable if it is
-            -- installed in $VIRTUAL_ENV, otherwise get it from Mason
-            if vim.env.VIRTUAL_ENV then
-              local paths = vim.fn.glob(vim.env.VIRTUAL_ENV .. "/**/debugpy", true, true)
-              if table.concat(paths, ", ") ~= "" then
-                return vim.env.VIRTUAL_ENV .. "/bin/python"
-              end
-            end
-
-            local mason_registry = require("mason-registry")
-            local path = mason_registry.get_package("debugpy"):get_install_path() .. "/venv/bin/python"
-            return path
-          end
-
           local dap_python_path = find_debugpy_python_path()
-
-          print("Using path for dap-python: " .. dap_python_path)
-
           dap_python.setup(dap_python_path)
         end,
       },
