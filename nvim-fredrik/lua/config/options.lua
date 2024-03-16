@@ -92,4 +92,12 @@ M.setup_folding_options = function()
   vim.opt.foldenable = true
 end
 
+if vim.fn.has("nvim-0.10") == 1 then
+  vim.opt.smoothscroll = true
+end
+
+if not vim.g.vscode then
+  vim.opt.timeoutlen = 300 -- Lower than default (1000) to quickly trigger which-key
+end
+
 return M
