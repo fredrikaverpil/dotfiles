@@ -16,7 +16,7 @@ return {
         config = function()
           require("notify").setup({
             timeout = 1000, -- 1s
-            stages = "static", -- no animation
+            --  stages = "static", -- no animation
           })
         end,
       },
