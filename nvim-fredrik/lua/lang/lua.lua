@@ -34,30 +34,34 @@ return {
           vim.list_extend(opts.ensure_installed, { "lua_ls" })
         end,
       },
-
-      -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
-      -- used for completion, annotations and signatures of Neovim apis
-      { "folke/neodev.nvim", opts = {} },
+      {
+        "folke/neoconf.nvim",
+        dependencies = { "nvim-lspconfig" },
+        cmd = "Neoconf",
+        config = function()
+          local plugin = require("lazy.core.config").spec.plugins["neoconf.nvim"]
+          require("neoconf").setup(require("lazy.core.plugin").values(plugin, "opts", false))
+        end,
+      },
+      { "folke/neodev.nvim", opts = {} }, -- recognize the 'vim' global
     },
     ft = { "lua" },
-    opts = {
-      servers = {
-        lua_ls = {
-          settings = {
-            Lua = {
-              workspace = {
-                checkThirdParty = false,
-              },
-              codeLens = {
-                enable = true,
-              },
-              completion = {
-                callSnippet = "Replace",
-              },
+    opts = function(_, opts)
+      opts.servers["lua_ls"] = {
+        settings = {
+          Lua = {
+            workspace = {
+              checkThirdParty = false,
+            },
+            codeLens = {
+              enable = true,
+            },
+            completion = {
+              callSnippet = "Replace",
             },
           },
         },
-      },
-    },
+      }
+    end,
   },
 }
