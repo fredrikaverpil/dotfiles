@@ -1,9 +1,13 @@
+vim.notify = require("notify")
+
 return {
 
   {
     "rcarriga/nvim-notify",
-    init = function()
-      vim.notify = require("notify")
+    lazy = false,
+    priority = 900,
+    init = function(_, opts)
+      require("notify").setup(opts)
     end,
   },
 }
