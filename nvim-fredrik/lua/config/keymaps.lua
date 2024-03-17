@@ -283,16 +283,16 @@ function M.setup_dap_keymaps()
   map_normal_mode("<leader>da", function()
     ---@param config {args?:string[]|fun():string[]?}
     local function get_args(config)
-      local table_ = {}
       local args = type(config.args) == "function" and (config.args() or {}) or config.args or {}
       config = vim.deepcopy(config)
       ---@cast args string[]
       config.args = function()
-        local new_args = vim.fn.input("Run with args: ", table_.concat(args, " ")) --[[@as string]]
+        local new_args = vim.fn.input("Run with args: ", table.concat(args, " ")) --[[@as string]]
         return vim.split(vim.fn.expand(new_args) --[[@as string]], " ")
       end
       return config
     end
+
     require("dap").continue({ before = get_args })
   end, "[d]ebug [a]rgs")
 
