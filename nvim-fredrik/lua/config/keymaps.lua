@@ -368,6 +368,12 @@ function M.setup_conform_keymaps()
   map_normal_mode("<leader>uf", require("utils.formatting").toggle_formatting, "Toggle auto-formatting")
 end
 
+function M.setup_obsidian_keymaps()
+  return {
+    { "<leader>no", "<cmd>ObsidianOpen<cr>", desc = "[N]otes: [O]pen Obsidian" },
+  }
+end
+
 function M.setup_whichkey()
   return {
     ["<leader>c"] = {
@@ -384,6 +390,9 @@ function M.setup_whichkey()
     },
     ["<leader>gd"] = {
       name = "+diffview",
+    },
+    ["<leader>n"] = {
+      name = "+notes",
     },
     ["<leader>s"] = {
       name = "+search",
