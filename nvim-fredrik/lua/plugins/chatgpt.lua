@@ -12,7 +12,7 @@ return {
         actions_paths = { "~/code/dotfiles/nvim-lazyvim/chatgpt-actions.json" },
         openai_params = {
           model = "gpt-4",
-          max_tokens = 4000,
+          max_tokens = 8192,
         },
         openai_edit_params = {
           model = "gpt-3.5-turbo",
