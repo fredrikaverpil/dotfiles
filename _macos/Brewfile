@@ -66,6 +66,7 @@ brew 'gnu-sed'  # spectre
 brew 'shellcheck'  # mason installs intel version
 brew 'hadolint'  # mason installs intel version
 brew 'rustup-init' # FIX: look att nvim distro installer..
+brew 'pngpaste'  # obsidian
 
 # containers
 brew 'podman'
