@@ -13,9 +13,8 @@ return {
 
   {
     "catppuccin/nvim",
-    enabled = false,
+    priority = 1000,
     lazy = false,
     name = "catppuccin",
-    priority = 1000,
   },
 }
