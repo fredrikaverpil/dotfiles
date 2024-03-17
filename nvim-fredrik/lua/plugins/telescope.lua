@@ -14,6 +14,7 @@ return {
       {
         "nvim-telescope/telescope-live-grep-args.nvim",
       },
+      { "smartpde/telescope-recent-files" },
       { "rcarriga/nvim-notify" },
     },
 
@@ -46,6 +47,10 @@ return {
         ["ui-select"] = {
           require("telescope.themes").get_dropdown({}),
         },
+        recent_files = {
+          -- This extension's options, see below.
+          only_cwd = true,
+        },
       }
 
       telescope.setup(opts)
@@ -54,6 +59,7 @@ return {
       telescope.load_extension("live_grep_args")
       -- telescope.load_extension("projects")
       telescope.load_extension("ui-select")
+      telescope.load_extension("recent_files")
       telescope.load_extension("notify")
 
       require("config.keymaps").setup_telescope_keymaps()

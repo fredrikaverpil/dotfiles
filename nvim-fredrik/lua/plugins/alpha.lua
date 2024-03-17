@@ -49,7 +49,7 @@ return {
         ansiArt = "gopher"
       elseif hour >= 12 and hour < 18 then
         greetingIndex = 3
-        ansiArt = "gopher"
+        ansiArt = "gopher_red"
       elseif hour >= 18 and hour < 21 then
         greetingIndex = 4
         ansiArt = "unicorn"
@@ -57,7 +57,8 @@ return {
         greetingIndex = 5
         ansiArt = "thisisfine"
       end
-      return "\t" .. datetime .. "\t" .. greetingsTable[greetingIndex] .. ", " .. name
+      return greetingsTable[greetingIndex]
+      -- return "\t" .. datetime .. "\t" .. greetingsTable[greetingIndex] .. ", " .. name
     end
 
     local userName = "Fredrik"
@@ -76,13 +77,12 @@ return {
 
     dashboard.section.buttons.val = {
       dashboard.button("s", " " .. " Restore Session", [[:lua require("persistence").load() <cr>]]),
-      -- dashboard.button("s", " " .. " Restore Session", ":source Session.vim<CR>"),
-      dashboard.button("f", " " .. " Recent files", ":Telescope oldfiles<CR>"),
+      dashboard.button("f", " " .. " Recent files", ":lua require('telescope').extensions.recent_files.pick()<CR>"),
       dashboard.button("l", " " .. " Update plugins", ":Lazy<CR>"),
       dashboard.button("q", " " .. " Quit", ":qa<CR>"),
     }
     dashboard.config.layout = {
-      { type = "padding", val = 1 },
+      { type = "padding", val = 10 },
       dashboard.section.terminal,
       { type = "padding", val = 5 },
       dashboard.section.header,
