@@ -127,8 +127,6 @@ return {
       if config_file then
         require("utils.defaults").golangcilint_config_path = config_file
         golangcilint_command = { "golangci-lint", "run", "--out-format", "json", "--config", config_file, "--issues-exit-code=1" }
-      else
-        vim.notify("No golangci-lint config found")
       end
 
       opts.servers = {

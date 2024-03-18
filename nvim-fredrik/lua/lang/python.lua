@@ -54,9 +54,6 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.colorcolumn = "88"
     if not vim.g.python3_host_prog then
       vim.g.python3_host_prog = find_python_executable()
-      vim.g.python_debugpy_path = find_debugpy_python_path()
-      vim.g.python_ruff_path = prefer_bin_from_venv("ruff")
-      vim.g.python_mypy_path = prefer_bin_from_venv("mypy")
     end
   end,
 })
@@ -78,7 +75,7 @@ return {
     opts = function(_, opts)
       opts.formatters_by_ft.python = { "ruff_format" }
       local formatters = require("conform.formatters")
-      formatters.ruff_format.command = vim.g.python_ruff_path
+      formatters.ruff_format.command = prefer_bin_from_venv("ruff")
     end,
   },
 
@@ -90,14 +87,14 @@ return {
         "williamboman/mason.nvim",
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "ruff", "mypy" })
+          vim.list_extend(opts.ensure_installed, { "mypy" })
         end,
       },
     },
     opts = function(_, opts)
       opts.linters_by_ft["python"] = { "mypy" }
       opts.linters["mypy"] = {
-        cmd = vim.g.pyton_mypy_path,
+        cmd = prefer_bin_from_venv("mypy"),
       }
     end,
   },
@@ -182,7 +179,8 @@ return {
         "mfussenegger/nvim-dap-python",
         config = function()
           local dap_python = require("dap-python")
-          dap_python.setup(vim.g.python_debugpy_path)
+          local debugpy_path = find_debugpy_python_path()
+          dap_python.setup(debugpy_path)
         end,
       },
       {
