@@ -352,14 +352,21 @@ function M.setup_noice_keymaps()
   map_normal_mode("<leader>snL", ":NoiceLog<CR>", "[s]earch [n]oice [L]og")
 end
 
-function M.setup_toggleterm_keymaps()
+function M.setup_terminal_keymaps()
   -- Both <C-/> and <C-_> are mapped due to the way control characters are interpreted by terminal emulators.
   -- ASCII value of '/' is 47, and of '_' is 95. When <C-/> is pressed, the terminal sends (47 - 64) which wraps around to 111 ('o').
   -- When <C-_> is pressed, the terminal sends (95 - 64) which is 31. Hence, both key combinations need to be mapped.
 
-  -- <C-/> toggles the terminal
-  vim.keymap.set({ "n", "i", "t", "v" }, "<C-/>", "<cmd>lua require('utils.terminal').toggle_terminal_native()<CR>", { desc = "Toggle terminal" })
-  vim.keymap.set({ "n", "i", "t", "v" }, "<C-_>", "<cmd>lua require('utils.terminal').toggle_terminal_native()<CR>", { desc = "Toggle terminal" })
+  -- <C-/> toggles the floating terminal
+  local floating_term_cmd = "<cmd>lua require('utils.terminal').toggle_fterm()<CR>"
+  local split_term_cmd = "<cmd>lua require('utils.terminal').toggle_terminal_native()<CR>"
+  vim.keymap.set({ "n", "i", "t", "v" }, "<C-/>", floating_term_cmd, { desc = "Toggle terminal" })
+  vim.keymap.set({ "n", "i", "t", "v" }, "<C-_>", floating_term_cmd, { desc = "Toggle terminal" })
+
+  -- C-A-/ toggles split terminal on/off
+  vim.keymap.set({ "n", "i", "t", "v" }, "<C-A-/>", split_term_cmd, { desc = "Toggle native terminal" })
+  vim.keymap.set({ "n", "i", "t", "v" }, "<C-A-_>", split_term_cmd, { desc = "Toggle native terminal" })
+
   -- Esc goes to NORMAL mode from TERMINAL mode
   vim.api.nvim_set_keymap("t", "<Esc><Esc>", "<C-\\><C-n>", { noremap = true })
 end

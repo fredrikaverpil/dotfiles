@@ -5,7 +5,7 @@ function M.toggle_terminal_native()
   if not vim.g.terminal_buf or not vim.api.nvim_buf_is_valid(vim.g.terminal_buf) then
     -- Create a new terminal buffer
     vim.g.terminal_buf = vim.api.nvim_create_buf(false, true)
-    vim.api.nvim_buf_set_option(vim.g.terminal_buf, "buftype", "nofile")
+    vim.api.nvim_buf_set_option(vim.g.terminal_buf, "buftype", "nofile") -- FIXME: deprecated
     vim.api.nvim_buf_call(vim.g.terminal_buf, function()
       vim.cmd("terminal")
     end)
@@ -26,7 +26,11 @@ function M.toggle_terminal_native()
   end
 end
 
-function M.toggle_terminal()
+function M.toggle_fterm()
+  require("FTerm").toggle()
+end
+
+function M.toggle_toggleterm()
   -- NOTE: this requires toggleterm
   local cwd = vim.fn.getcwd()
   local cwd_folder_name = vim.fn.fnamemodify(cwd, ":t")
