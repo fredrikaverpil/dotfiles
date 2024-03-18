@@ -58,8 +58,13 @@ return {
         gci = {
           args = { "write", "--skip-generated", "-s", "standard", "-s", "default", "--skip-vendor", "$FILENAME" },
         },
+        goimports = {
+          args = { "-srcdir", "$FILENAME" },
+        },
         golines = {
-          prepend_args = { "--ignore-generated", "--tab-len=1", "--max-len=120" },
+          -- golines will use goimports as base formatter by default which is slow.
+          -- see https://github.com/segmentio/golines/issues/33
+          prepend_args = { "--base-formatter=gofumpt", "--ignore-generated", "--tab-len=1", "--max-len=120" },
         },
       },
     },
