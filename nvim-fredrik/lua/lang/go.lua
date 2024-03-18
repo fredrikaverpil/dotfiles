@@ -12,7 +12,7 @@ local function find_file(filename, excluded_dirs)
   local path = file and file or nil
 
   if path ~= nil then
-    require("utils.defaults").notifications[filename].path = path
+    require("utils.defaults").notifications.go[filename].path = path
   end
 
   return path
@@ -28,10 +28,10 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.colorcolumn = "120"
 
     -- show notification if golangci-lint config is found
-    local notifications = require("utils.defaults").notifications
-    if notifications[".golangci.yml"].path and not notifications[".golangci.yml"].notified then
-      vim.notify("Using golangci-lint config: " .. notifications[".golangci.yml"].path, vim.log.levels.INFO)
-      notifications[".golangci.yml"].notified = true
+    local notifications = require("utils.defaults").notifications.go
+    if notifications[".golangci.yml"].path and not notifications._emitted then
+      vim.notify_once("Using golangci-lint config: " .. notifications[".golangci.yml"].path, vim.log.levels.INFO)
+      notifications._emitted = true
     end
   end,
 })

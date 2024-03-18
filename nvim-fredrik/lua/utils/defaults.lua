@@ -1,29 +1,30 @@
 M = {}
 
 M.notifications = {
-  [".golangci.yml"] = {
-    path = nil,
-    notified = false,
-  },
-  ruff = {
-    path = nil,
-    notified = false,
-    warn = false,
-  },
-  mypy = {
-    path = nil,
-    notified = false,
-    warn = false,
-  },
-  debugpy = {
-    path = nil,
-    notified = false,
-    warn = false,
+  _emitted = false,
+  go = {
+    [".golangci.yml"] = {
+      path = nil,
+    },
   },
   python = {
-    path = nil,
-    notified = false,
-    warn = false,
+    _emitted = false,
+    ruff = {
+      path = nil,
+      warn = false,
+    },
+    mypy = {
+      path = nil,
+      warn = false,
+    },
+    debugpy = {
+      path = nil,
+      warn = false,
+    },
+    python3 = {
+      path = nil,
+      warn = false,
+    },
   },
 }
 
