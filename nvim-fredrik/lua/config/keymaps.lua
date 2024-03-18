@@ -439,6 +439,9 @@ function M.setup_whichkey()
     ["<leader>gd"] = {
       name = "+diffview",
     },
+    ["<leader>h"] = {
+      name = "+hunks",
+    },
     ["<leader>n"] = {
       name = "+notes",
     },
