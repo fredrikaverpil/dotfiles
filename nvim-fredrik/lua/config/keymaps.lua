@@ -200,15 +200,46 @@ function M.setup_lazygit_keymaps()
   map_normal_mode("<leader>gg", ":LazyGit<CR>", "[g]it [g]ui")
 end
 
-function M.setup_gitsigns_keymaps()
-  -- TODO: review the below...
-  -- map_normal_mode("<leader>gp", ":Gitsigns preview_hunk<CR>", "[g]it [p]review hunk")
-  -- map_normal_mode("<leader>gr", ":Gitsigns reset_hunk<CR>", "[g]it [r]eset hunk")
-  -- map_normal_mode("<leader>gR", ":Gitsigns reset_buffer<CR>", "[g]it [R]eset buffer")
-  -- map_normal_mode("<leader>gs", ":Gitsigns stage_hunk<CR>", "[g]it [s]tage hunk")
-  -- map_normal_mode("<leader>gu", ":Gitsigns undo_stage_hunk<CR>", "[g]it [u]ndo stage hunk")
-  -- map_normal_mode("<leader>gB", ":Gitsigns toggle_current_line_blame<CR>", "[g]it [b]lame toggle")
-  -- map_normal_mode("<leader>gB", ":Gitsigns blame_line<CR>", "[g]it [B]lame line")
+function M.setup_gitsigns_keymaps(bufnr)
+  local gs = package.loaded.gitsigns
+
+  vim.keymap.set("n", "]c", function()
+    if vim.wo.diff then
+      return "]c"
+    end
+    vim.schedule(function()
+      gs.next_hunk()
+    end)
+    return "<Ignore>"
+  end, { expr = true })
+
+  vim.keymap.set("n", "[c", function()
+    if vim.wo.diff then
+      return "[c"
+    end
+    vim.schedule(function()
+      gs.prev_hunk()
+    end)
+    return "<Ignore>"
+  end, { expr = true })
+
+  vim.keymap.set({ "n", "v" }, "<leader>hs", ":Gitsigns stage_hunk<CR>", { buffer = bufnr, silent = true, noremap = true, desc = "[s]tage hunk" })
+  vim.keymap.set({ "n", "v" }, "<leader>hS", ":Gitsigns stage_buffer<CR>", { buffer = bufnr, silent = true, noremap = true, desc = "[S]tage buffer" })
+  vim.keymap.set("n", "<leader>hu", gs.undo_stage_hunk, { buffer = bufnr, silent = true, noremap = true, desc = "[u]ndo stage hunk" })
+  vim.keymap.set("n", "<leader>hr", gs.reset_hunk, { buffer = bufnr, silent = true, noremap = true, desc = "[r]eset hunk" })
+  vim.keymap.set("n", "<leader>hR", gs.reset_buffer, { buffer = bufnr, silent = true, noremap = true, desc = "[R]eset buffer" })
+  vim.keymap.set("n", "<leader>hp", gs.preview_hunk, { buffer = bufnr, silent = true, noremap = true, desc = "[p]review hunk" })
+  vim.keymap.set("n", "<leader>hd", gs.diffthis, { buffer = bufnr, silent = true, noremap = true, desc = "[d]iff this" })
+
+  vim.keymap.set("n", "<leader>hD", function()
+    gs.diffthis("~")
+  end, { buffer = bufnr, silent = true, noremap = true, desc = "[D]iff this ~" })
+
+  vim.keymap.set("n", "<leader>hb", function()
+    gs.blame_line({ full = true })
+  end, { buffer = bufnr, silent = true, noremap = true, desc = "[d]iff this" })
+
+  vim.keymap.set("n", "<leader>hB", gs.toggle_current_line_blame, { buffer = bufnr, silent = true, noremap = true, desc = "Toggle line [B]lame" })
 end
 
 function M.setup_neogit_keymaps()
