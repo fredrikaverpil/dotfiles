@@ -1,6 +1,31 @@
 M = {}
 
-M.golangcilint_config_path = nil
+M.notifications = {
+  [".golangci.yml"] = {
+    path = nil,
+    notified = false,
+  },
+  ruff = {
+    path = nil,
+    notified = false,
+    warn = false,
+  },
+  mypy = {
+    path = nil,
+    notified = false,
+    warn = false,
+  },
+  debugpy = {
+    path = nil,
+    notified = false,
+    warn = false,
+  },
+  python = {
+    path = nil,
+    notified = false,
+    warn = false,
+  },
+}
 
 M.icons = {
   misc = {

@@ -11,6 +11,10 @@ local function find_file(filename, excluded_dirs)
   local file = io.popen(command):read("*l")
   local path = file and file or nil
 
+  if path ~= nil then
+    require("utils.defaults").notifications[filename].path = path
+  end
+
   return path
 end
 
@@ -24,11 +28,10 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.colorcolumn = "120"
 
     -- show notification if golangci-lint config is found
-    local defaults = require("utils.defaults")
-    local golangcilint_config_path = defaults.golangcilint_config_path
-    if golangcilint_config_path ~= nil and not defaults.golangcilint_notified then
-      vim.notify("Using golangci-lint config: " .. golangcilint_config_path)
-      defaults.golangcilint_notified = true
+    local notifications = require("utils.defaults").notifications
+    if notifications[".golangci.yml"].path and not notifications[".golangci.yml"].notified then
+      vim.notify("Using golangci-lint config: " .. notifications[".golangci.yml"].path, vim.log.levels.INFO)
+      notifications[".golangci.yml"].notified = true
     end
   end,
 })
@@ -70,40 +73,40 @@ return {
     },
   },
 
-  {
-    "mfussenegger/nvim-lint",
-    enabled = false, -- NOTE: uses LSP for golangci-lint instead
-    dependencies = {
-      {
-        "williamboman/mason.nvim",
-        opts = function(_, opts)
-          opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "golangci-lint" })
-        end,
-      },
-    },
-    ft = { "go", "gomod", "gowork", "gotmpl" },
-    opts = function(_, opts)
-      local args = require("lint").linters.golangcilint.args -- defaults
-      local config_file = find_file(".golangci.yml")
-      if config_file ~= nil then
-        require("utils.defaults").golangcilint_config_path = config_file
-        args = {
-          "run",
-          "--out-format",
-          "json",
-          "--config",
-          config_file,
-          function()
-            return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
-          end,
-        }
-      end
-
-      opts.linters_by_ft["go"] = { "golangcilint" }
-      opts.linters["golangcilint"] = { args = args }
-    end,
-  },
+  -- {
+  --   "mfussenegger/nvim-lint",
+  --   enabled = false, -- NOTE: uses LSP for golangci-lint instead
+  --   dependencies = {
+  --     {
+  --       "williamboman/mason.nvim",
+  --       opts = function(_, opts)
+  --         opts.ensure_installed = opts.ensure_installed or {}
+  --         vim.list_extend(opts.ensure_installed, { "golangci-lint" })
+  --       end,
+  --     },
+  --   },
+  --   ft = { "go", "gomod", "gowork", "gotmpl" },
+  --   opts = function(_, opts)
+  --     local args = require("lint").linters.golangcilint.args -- defaults
+  --     local config_file = find_file(".golangci.yml")
+  --     if config_file ~= nil then
+  --       require("utils.defaults").golangcilint_config_path = config_file
+  --       args = {
+  --         "run",
+  --         "--out-format",
+  --         "json",
+  --         "--config",
+  --         config_file,
+  --         function()
+  --           return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
+  --         end,
+  --       }
+  --     end
+  --
+  --     opts.linters_by_ft["go"] = { "golangcilint" }
+  --     opts.linters["golangcilint"] = { args = args }
+  --   end,
+  -- },
 
   {
     "neovim/nvim-lspconfig",
@@ -130,7 +133,6 @@ return {
       local golangcilint_command = { "golangci-lint", "run", "--enable-all", "--out-format", "json", "--issues-exit-code=1" }
       local config_file = find_file(".golangci.yml")
       if config_file then
-        require("utils.defaults").golangcilint_config_path = config_file
         golangcilint_command = { "golangci-lint", "run", "--out-format", "json", "--config", config_file, "--issues-exit-code=1" }
       end
 
