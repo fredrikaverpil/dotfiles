@@ -1,5 +1,7 @@
-local function find_file(filename)
-  local excluded_dirs = { ".git", "node_modules" }
+local function find_file(filename, excluded_dirs)
+  if not excluded_dirs then
+    excluded_dirs = { ".git", "node_modules", ".venv" }
+  end
   local exclude_str = ""
   for _, dir in ipairs(excluded_dirs) do
     exclude_str = exclude_str .. " --exclude " .. dir
@@ -8,21 +10,25 @@ local function find_file(filename)
   --  local command = "fd --hidden --no-ignore '" .. filename .. "' " .. vim.fn.getcwd() .. " | head -n 1"
   local file = io.popen(command):read("*l")
   local path = file and file or nil
-  if path then
-    vim.notify("Using: " .. path)
-  end
+
   return path
 end
 
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "go" },
+  pattern = { "go", "gomod", "gowork", "gotmpl", "proto" },
   callback = function()
+    -- set go specific options
     vim.opt_local.tabstop = 2
     vim.opt_local.shiftwidth = 2
     vim.opt_local.shiftwidth = 2
     vim.opt_local.colorcolumn = "120"
-    if not vim.g.golangcilint_config_path then
-      vim.g.golangcilint_config_path = find_file(".golangci.yml")
+
+    -- show notification if golangci-lint config is found
+    local defaults = require("utils.defaults")
+    local golangcilint_config_path = defaults.golangcilint_config_path
+    if golangcilint_config_path ~= nil and not defaults.golangcilint_notified then
+      vim.notify("Using golangci-lint config: " .. golangcilint_config_path)
+      defaults.golangcilint_notified = true
     end
   end,
 })
@@ -61,7 +67,7 @@ return {
 
   {
     "mfussenegger/nvim-lint",
-    enabled = true,
+    enabled = false, -- NOTE: uses LSP for golangci-lint instead
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -74,8 +80,9 @@ return {
     ft = { "go", "gomod", "gowork", "gotmpl" },
     opts = function(_, opts)
       local args = require("lint").linters.golangcilint.args -- defaults
-      local config_file = vim.g.golangcilint_config_path
+      local config_file = find_file(".golangci.yml")
       if config_file ~= nil then
+        require("utils.defaults").golangcilint_config_path = config_file
         args = {
           "run",
           "--out-format",
@@ -104,7 +111,6 @@ return {
           },
           {
             "artemave/workspace-diagnostics.nvim",
-            enabled = false,
           },
         },
         opts = function(_, opts)
@@ -115,39 +121,27 @@ return {
     },
     ft = { "go", "gomod", "gowork", "gotmpl" },
     opts = function(_, opts)
-      -- TODO: figure out why golangci-lint doesn't work when used as LSP... (see :LspLog)
-      -- https://github.com/nametake/golangci-lint-langserver/issues/17
-      --
-      -- local lspconfig = require("lspconfig")
-      -- local configs = require("lspconfig/configs")
-      -- local command = { "golangci-lint", "run", "--enable-all", "--disable", "lll", "--out-format", "json", "--issues-exit-code=1" }
-      -- local config_file = find_file(".golangci.yml")
-      -- if config_file ~= nil then
-      --
-      --   print("LSP uses golangci-lint config: " .. config_file)
-      --   command = { "golangci-lint", "run", "--out-format", "json", "--config", config_file, "--issues-exit-code=1" }
-      -- end
-      -- if not configs.golangcilsp then
-      --   configs.golangcilsp = {
-      --     default_config = {
-      --       cmd = { "golangci-lint-langserver" },
-      --       root_dir = lspconfig.util.root_pattern(".git", "go.mod"),
-      --       init_options = {
-      --         command = command,
-      --       },
-      --     },
-      --   }
-      -- end
+      local lspconfig = require("lspconfig")
+      local golangcilint_command = { "golangci-lint", "run", "--enable-all", "--out-format", "json", "--issues-exit-code=1" }
+      local config_file = find_file(".golangci.yml")
+      if config_file then
+        require("utils.defaults").golangcilint_config_path = config_file
+        golangcilint_command = { "golangci-lint", "run", "--out-format", "json", "--config", config_file, "--issues-exit-code=1" }
+      else
+        vim.notify("No golangci-lint config found")
+      end
 
       opts.servers = {
 
-        -- TODO: figure out why golangci-lint doesn't work when used as LSP... (see :LspLog)
-        -- https://github.com/nametake/golangci-lint-langserver/issues/17
-        --
-        -- golangci_lint_ls = {
-        --   -- https://github.com/nametake/golangci-lint-langserver
-        --   filetypes = { "go", "gomod" },
-        -- },
+        golangci_lint_ls = {
+          -- https://github.com/nametake/golangci-lint-langserver
+          cmd = { "golangci-lint-langserver" },
+          filetypes = { "go", "gomod" },
+          root_dir = lspconfig.util.root_pattern(".git", "go.mod"),
+          init_options = {
+            command = golangcilint_command,
+          },
+        },
 
         gopls = {
           -- for all options, see:
@@ -157,9 +151,9 @@ return {
           -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
           -- https://github.com/golang/tools/blob/master/gopls/README.md
 
-          -- on_attach = function(client, bufnr)
-          --   require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
-          -- end,
+          on_attach = function(client, bufnr)
+            require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
+          end,
 
           settings = {
 
@@ -200,6 +194,15 @@ return {
           },
         },
       }
+    end,
+  },
+
+  {
+    "icholy/lsplinks.nvim",
+    config = function()
+      local lsplinks = require("lsplinks")
+      lsplinks.setup()
+      vim.keymap.set("n", "<leader>K", lsplinks.gx, { desc = "Open docs in browser" })
     end,
   },
 

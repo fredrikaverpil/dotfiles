@@ -1,5 +1,7 @@
 M = {}
 
+M.golangcilint_config_path = nil
+
 M.icons = {
   misc = {
     dots = "󰇘",
