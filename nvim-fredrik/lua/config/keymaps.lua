@@ -96,6 +96,12 @@ end
 function M.setup_trouble_keymaps()
   map_normal_mode("<leader>xx", "<cmd>TroubleToggle document_diagnostics<cr>", "Document diagnostics (Trouble)")
   map_normal_mode("<leader>xX", "<cmd>TroubleToggle workspace_diagnostics<cr>", "Workspace diagnostics (Trouble)")
+  -- vim.keymap.set("n", "<leader>xx", function() require("trouble").toggle() end)
+  -- vim.keymap.set("n", "<leader>xw", function() require("trouble").toggle("workspace_diagnostics") end)
+  -- vim.keymap.set("n", "<leader>xd", function() require("trouble").toggle("document_diagnostics") end)
+  -- vim.keymap.set("n", "<leader>xq", function() require("trouble").toggle("quickfix") end)
+  -- vim.keymap.set("n", "<leader>xl", function() require("trouble").toggle("loclist") end)
+  -- vim.keymap.set("n", "gR", function() require("trouble").toggle("lsp_references") end)
 end
 
 function M.setup_lsp_keymaps(event)
@@ -416,8 +422,16 @@ function M.setup_conform_keymaps()
   map_normal_mode("<leader>uf", require("utils.formatting").toggle_formatting, "Toggle auto-formatting")
 end
 
+function M.setup_winshift_keymaps()
+  vim.keymap.set({ "n", "v" }, "<leader>uw", "<cmd>WinShift<CR>", { desc = "[w]inshift (shift + arrows)" })
+end
+
 function M.setup_obsidian_keymaps()
   return {
+    { "<leader>ns", "<cmd>ObsidianSearch<cr>", desc = "[N]otes: [s]earch text" },
+    { "<leader>nf", "<cmd>ObsidianQuickSwitch<cr>", desc = "[N]otes: search [f]ilenames" },
+    { "<leader>nn", "<cmd>ObsidianNew<cr>", desc = "[N]otes: [n]new" },
+    { "<leader>nl", "<cmd>ObsidianQuickSwitch LEARNING<cr><cr>", desc = "[N]otes: [l]earning" },
     { "<leader>no", "<cmd>ObsidianOpen<cr>", desc = "[N]otes: [O]pen Obsidian" },
   }
 end
