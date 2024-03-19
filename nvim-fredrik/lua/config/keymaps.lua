@@ -407,12 +407,12 @@ function M.setup_terminal_keymaps()
   -- <C-/> toggles the floating terminal
   local floating_term_cmd = "<cmd>lua require('utils.terminal').toggle_fterm()<CR>"
   local split_term_cmd = "<cmd>lua require('utils.terminal').toggle_terminal_native()<CR>"
-  vim.keymap.set({ "n", "i", "t", "v" }, "<C-/>", floating_term_cmd, { desc = "Toggle terminal" })
-  vim.keymap.set({ "n", "i", "t", "v" }, "<C-_>", floating_term_cmd, { desc = "Toggle terminal" })
+  vim.keymap.set({ "n", "i", "t", "v" }, "<C-/>", split_term_cmd, { desc = "Toggle terminal" })
+  vim.keymap.set({ "n", "i", "t", "v" }, "<C-_>", split_term_cmd, { desc = "Toggle terminal" })
 
   -- C-A-/ toggles split terminal on/off
-  vim.keymap.set({ "n", "i", "t", "v" }, "<C-A-/>", split_term_cmd, { desc = "Toggle native terminal" })
-  vim.keymap.set({ "n", "i", "t", "v" }, "<C-A-_>", split_term_cmd, { desc = "Toggle native terminal" })
+  vim.keymap.set({ "n", "i", "t", "v" }, "<C-A-/>", floating_term_cmd, { desc = "Toggle native terminal" })
+  vim.keymap.set({ "n", "i", "t", "v" }, "<C-A-_>", floating_term_cmd, { desc = "Toggle native terminal" })
 
   -- Esc goes to NORMAL mode from TERMINAL mode
   vim.api.nvim_set_keymap("t", "<Esc><Esc>", "<C-\\><C-n>", { noremap = true })
