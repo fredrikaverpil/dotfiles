@@ -254,7 +254,23 @@ function M.setup_neogit_keymaps()
   vim.keymap.set("n", "<leader>gc", ":Neogit commit<CR>", { silent = true, noremap = true, desc = "[g]it [c]ommit" })
   vim.keymap.set("n", "<leader>gp", ":Neogit pull<CR>", { silent = true, noremap = true, desc = "[g]it [p]ull" })
   vim.keymap.set("n", "<leader>gP", ":Neogit push<CR>", { silent = true, noremap = true, desc = "[g]it [P]ush" })
-  vim.keymap.set("n", "<leader>gb", ":Telescope git_branches<CR>", { silent = true, noremap = true, desc = "[g]it [b]ranches" })
+  vim.keymap.set("n", "<leader>gB", ":Telescope git_branches<CR>", { silent = true, noremap = true, desc = "[g]it [B]ranches" })
+end
+
+function M.setup_git_blame_keymaps()
+  return {
+    -- toggle needs to be called twice; https://github.com/f-person/git-blame.nvim/issues/16
+    { "<leader>gbb", ":GitBlameToggle<CR>", desc = "Blame line (toggle)", silent = true },
+    { "<leader>gbe", ":GitBlameEnable<CR>", desc = "Blame line (enable)", silent = true },
+    { "<leader>gbd", ":GitBlameDisable<CR>", desc = "Blame line (disable)", silent = true },
+    { "<leader>gbs", ":GitBlameCopySHA<CR>", desc = "Copy SHA", silent = true },
+    { "<leader>gbc", ":GitBlameCopyCommitURL<CR>", desc = "Copy commit URL", silent = true },
+    { "<leader>gbf", ":GitBlameCopyFileURL<CR>", desc = "Copy file URL", silent = true },
+  }
+end
+
+function M.setup_fugitive_keymaps()
+  vim.keymap.set("n", "<leader>gbB", ":G blame", { silent = true, noremap = true, desc = "[g]it [B]lame on the side" })
 end
 
 function M.setup_neotest_keymaps()
@@ -449,6 +465,9 @@ function M.setup_whichkey()
     },
     ["<leader>g"] = {
       name = "+git",
+    },
+    ["<leader>gb"] = {
+      name = "+blame",
     },
     ["<leader>gd"] = {
       name = "+diffview",
