@@ -11,17 +11,17 @@ return {
             return icon
           end
 
-          local function fgcolor(name)
-            local hl = vim.api.nvim_get_hl and vim.api.nvim_get_hl(0, { name = name, link = false })
-            local fg = hl and (hl.fg or hl.foreground)
-            return fg and { fg = string.format("#%06x", fg) } or nil
-          end
+          -- local function fgcolor(name)
+          --   local hl = vim.api.nvim_get_hl and vim.api.nvim_get_hl(0, { name = name, link = false })
+          --   local fg = hl and (hl.fg or hl.foreground)
+          --   return fg and { fg = string.format("#%06x", fg) } or nil
+          -- end
 
           local colors = {
-            [""] = fgcolor("Special"),
-            ["Normal"] = fgcolor("Special"),
-            ["Warning"] = fgcolor("DiagnosticError"),
-            ["InProgress"] = fgcolor("DiagnosticWarn"),
+            [""] = "Special",
+            ["Normal"] = require("utils.colors").fgcolor("Special"),
+            ["Warning"] = require("utils.colors").fgcolor("DiagnosticError"),
+            ["InProgress"] = require("utils.colors").fgcolor("DiagnosticWarn"),
           }
 
           opts.copilot = {

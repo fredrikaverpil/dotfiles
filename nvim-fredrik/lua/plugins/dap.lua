@@ -55,21 +55,13 @@ return {
             return "  " .. require("dap").status()
           end
 
-          local function fgcolor(name)
-            local hl = vim.api.nvim_get_hl and vim.api.nvim_get_hl(0, { name = name, link = false })
-            local fg = hl and (hl.fg or hl.foreground)
-            return fg and { fg = string.format("#%06x", fg) } or nil
-          end
-
           opts.dap = {
             lualine_component = {
               dap,
-              color = function()
-                return fgcolor("Debug")
-              end,
               cond = function()
                 return package.loaded["dap"] and require("dap").status() ~= ""
               end,
+              color = require("utils.colors").fgcolor("Debug"),
             },
           }
         end,

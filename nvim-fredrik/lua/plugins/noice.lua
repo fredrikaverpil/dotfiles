@@ -18,6 +18,31 @@ return {
           --  stages = "static", -- no animation
         },
       },
+      {
+        "nvim-lualine/lualine.nvim",
+        opts = function(_, opts)
+          local function mode()
+            local mode_ = require("noice").api.status.mode.get()
+            local filters = { "INSERT", "VISUAL" }
+            for _, filter in ipairs(filters) do
+              if string.find(mode_, filter) then
+                return "" -- do not show this mode
+              end
+            end
+            return mode_
+          end
+
+          opts.dap = {
+            lualine_component = {
+              mode,
+              cond = function()
+                return package.loaded["noice"] and require("noice").api.status.mode.has()
+              end,
+              color = require("utils.colors").fgcolor("Constant"),
+            },
+          }
+        end,
+      },
     },
     config = function()
       require("noice").setup({
