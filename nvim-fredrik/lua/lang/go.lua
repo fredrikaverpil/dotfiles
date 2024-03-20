@@ -75,7 +75,7 @@ return {
 
   -- {
   --   "mfussenegger/nvim-lint",
-  --   enabled = false, -- NOTE: uses LSP for golangci-lint instead
+  --   enabled = false,
   --   dependencies = {
   --     {
   --       "williamboman/mason.nvim",
@@ -119,6 +119,7 @@ return {
           },
           {
             "artemave/workspace-diagnostics.nvim",
+            enabled = true,
           },
         },
         opts = function(_, opts)
@@ -129,24 +130,33 @@ return {
     },
     ft = { "go", "gomod", "gowork", "gotmpl" },
     opts = function(_, opts)
-      local lspconfig = require("lspconfig")
-      local golangcilint_command = { "golangci-lint", "run", "--enable-all", "--out-format", "json", "--issues-exit-code=1" }
-      local config_file = find_file(".golangci.yml")
-      if config_file then
-        golangcilint_command = { "golangci-lint", "run", "--out-format", "json", "--config", config_file, "--issues-exit-code=1" }
+      local function golangcilint_setup()
+        local lspconfig = require("lspconfig")
+        local golangcilint_command = { "golangci-lint", "run", "--enable-all", "--out-format", "json", "--issues-exit-code=1" }
+        local config_file = find_file(".golangci.yml")
+        if config_file then
+          golangcilint_command = { "golangci-lint", "run", "--out-format", "json", "--config", config_file, "--issues-exit-code=1" }
+        end
+
+        return {
+          golangci_lint_ls = {
+            -- https://github.com/nametake/golangci-lint-langserver
+            cmd = { "golangci-lint-langserver" },
+            filetypes = { "go", "gomod" },
+            root_dir = lspconfig.util.root_pattern("go.mod"),
+            init_options = {
+              command = golangcilint_command,
+            },
+            on_attach = function(client, bufnr)
+              require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
+            end,
+          },
+        }
       end
 
       opts.servers = {
 
-        golangci_lint_ls = {
-          -- https://github.com/nametake/golangci-lint-langserver
-          cmd = { "golangci-lint-langserver" },
-          filetypes = { "go", "gomod" },
-          root_dir = lspconfig.util.root_pattern(".git", "go.mod"),
-          init_options = {
-            command = golangcilint_command,
-          },
-        },
+        golangci_lint_ls = golangcilint_setup(),
 
         gopls = {
           -- for all options, see:
@@ -190,7 +200,7 @@ return {
                 rangeVariableTypes = true,
               },
               completeUnimported = true,
-              directoryFilters = { "-.git", "-.vscode", "-.idea", "-.vscode-test", "-node_modules" },
+              directoryFilters = { "-**/node_modules", "-**/.git", "-.vscode", "-.idea", "-.vscode-test" },
               gofumpt = true,
               semanticTokens = true,
               staticcheck = true,
@@ -199,15 +209,6 @@ return {
           },
         },
       }
-    end,
-  },
-
-  {
-    "icholy/lsplinks.nvim",
-    config = function()
-      local lsplinks = require("lsplinks")
-      lsplinks.setup()
-      vim.keymap.set("n", "<leader>K", lsplinks.gx, { desc = "Open docs in browser" })
     end,
   },
 
