@@ -31,7 +31,7 @@ return {
     local ansiArt = "gopher"
     local function getGreeting(name)
       local tableTime = os.date("*t")
-      local datetime = os.date(" %Y-%m-%d   %H:%M:%S")
+      -- local datetime = os.date(" %Y-%m-%d   %H:%M:%S")
       local hour = tableTime.hour
       local greetingsTable = {
         [1] = "  Sleep well",
@@ -47,7 +47,10 @@ return {
       elseif hour < 12 then
         greetingIndex = 2
         ansiArt = "gopher"
-      elseif hour >= 12 and hour < 18 then
+      elseif hour >= 12 and hour < 13 then
+        greetingIndex = 3
+        ansiArt = "apple"
+      elseif hour >= 13 and hour < 18 then
         greetingIndex = 3
         ansiArt = "gopher_red"
       elseif hour >= 18 and hour < 21 then
