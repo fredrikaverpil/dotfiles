@@ -196,13 +196,13 @@ return {
         },
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "pyright", "ruff_lsp" })
+          vim.list_extend(opts.ensure_installed, { "basedpyright", "ruff_lsp" })
         end,
       },
     },
     opts = {
       servers = {
-        pyright = {},
+        basedpyright = {},
         ruff_lsp = {
           on_attach = function(client, bufnr)
             if client.name == "ruff_lsp" then
