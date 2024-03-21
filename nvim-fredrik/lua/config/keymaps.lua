@@ -176,7 +176,7 @@ function M.setup_telescope_keymaps()
   -- search
   map_normal_mode('<leader>s"', "<cmd>Telescope registers<cr>", '[s]earch ["]registers')
   map_normal_mode("<leader>sa", "<cmd>Telescope autocommands<cr>", "[s]earch [a]utocommands")
-  map_normal_mode("<leader>sb", "<cmd>Telescope current_buffer_fuzzy_find<cr>", "[s]earch [b]uffer")
+  -- map_normal_mode("<leader>sb", "<cmd>Telescope current_buffer_fuzzy_find<cr>", "[s]earch [b]uffer") -- TODO: conflict
   map_normal_mode("<leader>sc", "<cmd>Telescope command_history<cr>", "[s]earch [c]ommand history")
   map_normal_mode("<leader>sC", "<cmd>Telescope commands<cr>", "[s]earch [C]ommands")
   map_normal_mode("<leader>sd", "<cmd>Telescope diagnostics bufnr=0<cr>", "[s]earch [d]ocument diagnostics")
