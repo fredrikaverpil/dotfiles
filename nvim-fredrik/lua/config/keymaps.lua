@@ -458,6 +458,15 @@ function M.setup_obsidian_keymaps()
       end,
       desc = "[N]otes: new [m]eeting agenda from template",
     },
+    {
+      "<leader>nS",
+      function()
+        local client = require("obsidian").get_client()
+        local scratch_pad_path = client.dir / "scratchpad.md"
+        client:open_note(scratch_pad_path)
+      end,
+      desc = "[N]otes: [S]cratchpad",
+    },
   }
 end
 
