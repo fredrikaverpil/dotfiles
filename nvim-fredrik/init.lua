@@ -1,3 +1,7 @@
+-- set for neovim 0.10.0
+-- TODO: remove once 0.10.0 is released
+vim.uv = vim.uv or vim.loop
+
 -- set options
 require("config.options")
 
