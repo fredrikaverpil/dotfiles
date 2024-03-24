@@ -1,0 +1,34 @@
+#!/bin/sh -e
+
+# Take two arguments (search and replace) and execute command which will search-replace recursively.
+
+if [ $# -ne 2 ]; then
+    echo "Usage: $0 \"search\" \"replace\""
+    exit 1
+fi
+
+search=$1
+replace=$2
+
+number_of_files=$(rg --hidden --files-with-matches "$search" | wc -l)
+
+if [ $number_of_files -eq 0 ]; then
+    echo "No files found with \"$search\""
+    exit 1
+fi
+
+number_of_occurrences=$(rg --hidden --count "$search" | cut -d: -f2 | awk '{s+=$1} END {print s}')
+
+echo "About to run s/$search/$replace/g on $number_of_files files, affecting $number_of_occurrences occurrences."
+echo "Are you sure? (y/n)"
+read confirm
+if [ "$confirm" != "y" ]; then
+    echo "Exiting"
+    exit 1
+fi
+
+rg --hidden --files-with-matches "$search" | while read file; do
+    echo "Processing $file"
+    sed -i "s/$search/$replace/g" "$file"
+done
+
