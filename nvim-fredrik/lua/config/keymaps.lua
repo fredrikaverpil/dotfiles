@@ -447,8 +447,17 @@ function M.setup_obsidian_keymaps()
     { "<leader>ns", "<cmd>ObsidianSearch<cr>", desc = "[N]otes: [s]earch text" },
     { "<leader>nf", "<cmd>ObsidianQuickSwitch<cr>", desc = "[N]otes: search [f]ilenames" },
     { "<leader>nn", "<cmd>ObsidianNew<cr>", desc = "[N]otes: [n]new" },
-    { "<leader>nl", "<cmd>ObsidianQuickSwitch LEARNING<cr><cr>", desc = "[N]otes: [l]earning" },
-    { "<leader>no", "<cmd>ObsidianOpen<cr>", desc = "[N]otes: [O]pen Obsidian" },
+    { "<leader>nl", "<cmd>ObsidianQuickSwitch Learning.md<cr><cr>", desc = "[N]otes: [l]earning" },
+    { "<leader>nv", "<cmd>ObsidianQuickSwitch Neovim config.md<cr><cr>", desc = "[N]otes: Neo[v]im todo" },
+    {
+      "<leader>nm",
+      function()
+        local client = require("obsidian").get_client()
+        local note = client:create_note({ title = "Meeting agenda", dir = client.dir, template = "meeting_agenda.md" })
+        client:open_note(note)
+      end,
+      desc = "[N]otes: new [m]eeting agenda from template",
+    },
   }
 end
 
