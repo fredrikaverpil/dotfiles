@@ -4,6 +4,9 @@ return {
     dependencies = {
       {
         "rcarriga/nvim-dap-ui",
+        dependencies = {
+          "nvim-neotest/nvim-nio",
+        },
         opts = {},
         config = function(_, opts)
           -- setup dap config by VsCode launch.json file

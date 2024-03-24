@@ -8,6 +8,8 @@ return {
 
       "nvim-neotest/neotest-plenary",
       "nvim-neotest/neotest-vim-test",
+
+      "nvim-neotest/nvim-nio",
     },
     config = function(_, opts)
       if opts.adapters then
