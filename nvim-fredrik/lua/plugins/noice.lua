@@ -23,7 +23,7 @@ return {
         opts = function(_, opts)
           local function mode()
             local mode_ = require("noice").api.status.mode.get()
-            local filters = { "INSERT", "VISUAL" }
+            local filters = { "INSERT", "VISUAL", "TERMINAL" }
             for _, filter in ipairs(filters) do
               if string.find(mode_, filter) then
                 return "" -- do not show this mode
