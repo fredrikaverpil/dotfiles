@@ -14,8 +14,8 @@ return {
       {
         "rcarriga/nvim-notify",
         opts = {
+          stages = "static", -- no animation
           timeout = 1000, -- 1s
-          --  stages = "static", -- no animation
         },
       },
       {
