@@ -1,6 +1,7 @@
 return {
   {
     "CopilotC-Nvim/CopilotChat.nvim",
+    event = "VeryLazy",
     enabled = require("utils.private").enable_copilot(),
     branch = "canary", -- while in development
     dependencies = {

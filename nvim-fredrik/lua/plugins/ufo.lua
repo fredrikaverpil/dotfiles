@@ -2,7 +2,7 @@ return {
 
   {
     "kevinhwang91/nvim-ufo",
-    enabled = true, -- does not work with nvim 10
+    event = "VeryLazy",
     dependencies = {
       "kevinhwang91/promise-async",
     },

@@ -1,5 +1,6 @@
 return {
   "mfussenegger/nvim-lint",
+  event = "BufReadPre",
   dependencies = {
     {
       "williamboman/mason.nvim",

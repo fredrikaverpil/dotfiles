@@ -13,12 +13,13 @@ return {
 
   {
     "catppuccin/nvim",
-    lazy = false,
+    enabled = false,
     name = "catppuccin",
   },
 
   {
     "rose-pine/neovim",
+    enabled = false,
     name = "rose-pine",
   },
 }

@@ -2,8 +2,8 @@ return {
 
   {
     "echasnovski/mini.indentscope",
+    event = "VeryLazy",
     version = "*",
-    lazy = false,
     opts = {
       -- symbol = "▏",
       symbol = "│",

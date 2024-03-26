@@ -2,6 +2,7 @@ local vault_path = vim.fn.expand("~/Library/Mobile Documents/iCloud~md~obsidian/
 
 return {
   "epwalsh/obsidian.nvim",
+  event = "VeryLazy",
   dependencies = {
     -- required
     "nvim-lua/plenary.nvim",

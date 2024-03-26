@@ -5,6 +5,7 @@ return {
       { "hrsh7th/nvim-cmp" },
       {
         "nvim-lualine/lualine.nvim",
+        event = "VeryLazy",
         opts = function(_, opts)
           local function codepilot()
             local icon = require("utils.defaults").icons.kinds.Copilot

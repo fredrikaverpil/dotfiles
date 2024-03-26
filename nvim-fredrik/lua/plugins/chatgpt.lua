@@ -6,7 +6,9 @@ return {
       { "nvim-lua/plenary.nvim" },
       { "nvim-telescope/telescope.nvim" },
     },
-    -- event = "VeryLazy",
+    cmd = {
+      "ChatGPT",
+    },
     config = function()
       require("chatgpt").setup({
         actions_paths = { "~/code/dotfiles/nvim-lazyvim/chatgpt-actions.json" },

@@ -1,6 +1,7 @@
 return {
   {
     "lewis6991/gitsigns.nvim",
+    event = "VeryLazy",
     opts = {
       on_attach = function(bufnr)
         require("config.keymaps").setup_gitsigns_keymaps(bufnr)

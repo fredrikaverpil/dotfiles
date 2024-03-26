@@ -1,6 +1,7 @@
 return {
   {
     "nvim-treesitter/nvim-treesitter",
+    event = "VeryLazy",
     build = ":TSUpdate",
     config = function()
       local config = require("nvim-treesitter.configs")
@@ -14,6 +15,7 @@ return {
 
   {
     "nvim-treesitter/nvim-treesitter-context",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    event = "VeryLazy",
+    dependencies = { "nvim-treesitter/nvim-treesitter", lazy = true },
   },
 }
