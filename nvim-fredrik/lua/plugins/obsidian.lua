@@ -1,8 +1,12 @@
-local vault_path = vim.fn.expand("~/Library/Mobile Documents/iCloud~md~obsidian/Documents/fredrik")
+local M = {}
+M.vault_path = vim.fn.expand("~/Library/Mobile Documents/iCloud~md~obsidian/Documents/fredrik")
+M.documents_path = vim.fn.expand("~/Documents")
+M.scratchpad_path = vim.fn.expand("~/Documents/scratchpad.txt")
 
 return {
   "epwalsh/obsidian.nvim",
-  event = "VeryLazy",
+  -- event = "VeryLazy",
+  cmd = { "ObsidianSearch" },
   dependencies = {
     -- required
     "nvim-lua/plenary.nvim",
@@ -14,7 +18,7 @@ return {
   },
   enabled = function()
     -- only enable on macOS for now, and if vault_path exists
-    return vim.fn.has("mac") == 1 and vim.fn.isdirectory(vault_path) == 1
+    return vim.fn.has("mac") == 1 and vim.fn.isdirectory(M.vault_path) == 1
   end,
   version = "*",
   -- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
@@ -28,7 +32,7 @@ return {
     workspaces = {
       {
         name = "personal",
-        path = vault_path,
+        path = M.vault_path,
       },
     },
 
@@ -83,5 +87,5 @@ return {
       return tostring(os.time()) .. "-" .. suffix
     end,
   },
-  keys = require("config.keymaps").setup_obsidian_keymaps(),
+  keys = require("config.keymaps").setup_obsidian_keymaps(M),
 }

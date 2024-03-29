@@ -442,30 +442,34 @@ function M.setup_winshift_keymaps()
   vim.keymap.set({ "n", "v" }, "<leader>uw", "<cmd>WinShift<CR>", { desc = "[w]inshift (shift + arrows)" })
 end
 
-function M.setup_obsidian_keymaps()
+function M.setup_obsidian_keymaps(obsidian_vars)
   return {
-    { "<leader>ns", "<cmd>ObsidianSearch<cr>", desc = "[N]otes: [s]earch text" },
+    { "<leader>nS", "<cmd>ObsidianSearch<cr>", desc = "[N]otes: [s]earch text" },
     { "<leader>nf", "<cmd>ObsidianQuickSwitch<cr>", desc = "[N]otes: search [f]ilenames" },
     { "<leader>nn", "<cmd>ObsidianNew<cr>", desc = "[N]otes: [n]new" },
     { "<leader>nl", "<cmd>ObsidianQuickSwitch Learning.md<cr><cr>", desc = "[N]otes: [l]earning" },
     { "<leader>nv", "<cmd>ObsidianQuickSwitch Neovim config.md<cr><cr>", desc = "[N]otes: Neo[v]im todo" },
     {
+      "<leader>ns",
+      function()
+        local client = require("obsidian").get_client()
+        client:open_note(obsidian_vars.scratchpad_path)
+      end,
+      desc = "[N]otes: [S]cratchpad",
+    },
+    {
       "<leader>nm",
       function()
         local client = require("obsidian").get_client()
-        local note = client:create_note({ title = "Meeting agenda", dir = client.dir, template = "meeting_agenda.md" })
+        -- client.dir is the vault path
+        local note = client:create_note({
+          title = "Meeting notes",
+          dir = vim.fn.expand(obsidian_vars.documents_path .. "/Meeting notes"),
+          template = "meeting_notes",
+        })
         client:open_note(note)
       end,
       desc = "[N]otes: new [m]eeting agenda from template",
-    },
-    {
-      "<leader>nS",
-      function()
-        local client = require("obsidian").get_client()
-        local scratch_pad_path = client.dir / "scratchpad.md"
-        client:open_note(scratch_pad_path)
-      end,
-      desc = "[N]otes: [S]cratchpad",
     },
   }
 end
