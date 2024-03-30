@@ -1,6 +1,52 @@
 # https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
 
 gui:
+  # Tokyonight Moon
+  theme:
+     activeBorderColor:
+       - "#ff966c"
+       - "bold"
+     cherryPickedCommitBgColor:
+       - "#c099ff"
+     cherryPickedCommitFgColor:
+       - "#82aaff"
+     defaultFgColor:
+       - "#c8d3f5"
+     inactiveBorderColor:
+       - "#589ed7"
+     optionsTextColor:
+       - "#82aaff"
+     searchingActiveBorderColor:
+       - "#ff966c"
+       - "bold"
+     selectedLineBgColor:
+       - "#2d3f76"
+     unstagedChangesColor:
+       - "#c53b53"
+
+  # # Tokyonight Day
+  # theme:
+  #    activeBorderColor:
+  #      - "#b15c00"
+  #      - "bold"
+  #    cherryPickedCommitBgColor:
+  #      - "#9854f1"
+  #    cherryPickedCommitFgColor:
+  #      - "#2e7de9"
+  #    defaultFgColor:
+  #      - "#3760bf"
+  #    inactiveBorderColor:
+  #      - "#2496ac"
+  #    optionsTextColor:
+  #      - "#2e7de9"
+  #    searchingActiveBorderColor:
+  #      - "#b15c00"
+  #      - "bold"
+  #    selectedLineBgColor:
+  #      - "#b6bfe2"
+  #    unstagedChangesColor:
+  #      - "#c64343"
+
   nerdFontsVersion: "3" # nerd fonts version to use ("2" or "3"); empty means don't show nerd font icons
 
 git:
