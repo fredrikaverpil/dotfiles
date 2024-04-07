@@ -1,6 +1,5 @@
--- set for neovim 0.10.0
--- TODO: remove once 0.10.0 is released
-vim.uv = vim.uv or vim.loop
+-- set up backwards compatibility
+require("utils.version").setup_backwards_compat()
 
 -- set options
 require("config.options")

@@ -92,7 +92,7 @@ M.setup_folding_options = function()
   vim.opt.foldenable = true
 end
 
-if vim.fn.has("nvim-0.10") == 1 then
+if require("utils.version").is_neovim_0_10_0() then
   vim.opt.smoothscroll = true
 end
 

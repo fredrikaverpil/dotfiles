@@ -29,8 +29,9 @@ function M.setup_diagnostics()
     vim.fn.sign_define(name, { text = icon, texthl = name, numhl = "" })
   end
 
+  local version = require("utils.version")
   if type(diagnostics.virtual_text) == "table" and diagnostics.virtual_text.prefix == "icons" then
-    diagnostics.virtual_text.prefix = vim.fn.has("nvim-0.10.0") == 0 and "●"
+    diagnostics.virtual_text.prefix = version.is_neovim_0_10_0() == 0 and "●"
       or function(diagnostic)
         local icons = require("utils.defaults").icons.diagnostics
         for d, icon in pairs(icons) do
