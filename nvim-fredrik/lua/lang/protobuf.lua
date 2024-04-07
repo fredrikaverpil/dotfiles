@@ -26,14 +26,14 @@ return {
         "williamboman/mason.nvim",
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "buf" })
+          vim.list_extend(opts.ensure_installed, { "buf", "protolint" })
         end,
       },
     },
     ft = { "proto" },
     opts = {
       linters_by_ft = {
-        proto = { "buf_lint" },
+        proto = { "buf_lint", "protolint", },
       },
     },
   },
