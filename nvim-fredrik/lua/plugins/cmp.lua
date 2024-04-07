@@ -18,9 +18,18 @@ return {
         },
       },
     },
-    config = function()
+
+    config = function(_, opts)
       local cmp = require("cmp")
       require("luasnip.loaders.from_vscode").lazy_load()
+
+      local sources = opts.sources or {}
+      vim.list_extend(sources, {
+        { name = "nvim_lsp" },
+        { name = "path" },
+        { name = "luasnip" },
+        { name = "buffer" },
+      })
 
       cmp.setup({
         snippet = {
@@ -33,13 +42,7 @@ return {
           documentation = cmp.config.window.bordered(),
         },
         mapping = cmp.mapping.preset.insert(require("config.keymaps").setup_cmp_keymaps(cmp)),
-        sources = cmp.config.sources({
-          { name = "nvim_lsp" },
-          { name = "path" },
-          { name = "luasnip" },
-        }, {
-          { name = "buffer" },
-        }),
+        sources = cmp.config.sources(sources),
       })
     end,
   },
