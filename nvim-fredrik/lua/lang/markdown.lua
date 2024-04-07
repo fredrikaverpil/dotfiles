@@ -28,7 +28,7 @@ return {
       formatters = {
         prettier = {
           -- https://prettier.io/docs/en/options.html
-          prepend_args = { "--prose-wrap", "always", "--print-width", "80" },
+          prepend_args = { "--prose-wrap", "always", "--print-width", "80", "--tab-width", "2" },
         },
         mdformat = {
           -- https://github.com/einride/sage/blob/master/tools/sgmdformat/tools.go
