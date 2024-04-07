@@ -16,14 +16,24 @@ return {
         "williamboman/mason.nvim",
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "markdownlint" })
+          vim.list_extend(opts.ensure_installed, { "prettier", "mdformat" })
         end,
       },
     },
     ft = { "markdown" },
     opts = {
       formatters_by_ft = {
-        markdown = { "markdownlint" },
+        markdown = { "prettier" },
+      },
+      formatters = {
+        prettier = {
+          -- https://prettier.io/docs/en/options.html
+          prepend_args = { "--prose-wrap", "always", "--print-width", "80" },
+        },
+        mdformat = {
+          -- https://github.com/einride/sage/blob/master/tools/sgmdformat/tools.go
+          prepend_args = { "--number", "--wrap", "80" },
+        },
       },
     },
   },
