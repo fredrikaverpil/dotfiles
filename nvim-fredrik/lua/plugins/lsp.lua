@@ -4,6 +4,10 @@ return {
     lazy = false,
     dependencies = {
       {
+        "b0o/SchemaStore.nvim",
+        version = false, -- last release is very old
+      },
+      {
         "williamboman/mason-lspconfig.nvim",
         -- NOTE: this is here because mason-lspconfig must install servers prior to running nvim-lspconfig
         lazy = false,
