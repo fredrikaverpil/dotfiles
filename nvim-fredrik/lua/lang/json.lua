@@ -16,14 +16,16 @@ return {
         "williamboman/mason.nvim",
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "prettier" })
+          vim.list_extend(opts.ensure_installed, { "biome" })
         end,
       },
     },
     ft = { "json", "jsonc", "json5" },
     opts = {
       formatters_by_ft = {
-        json = { "prettier" }, -- TODO: would be nice if biome existed...
+        json = { "biome" },
+        jsonc = { "biome" },
+        json5 = { "biome" },
       },
     },
   },
