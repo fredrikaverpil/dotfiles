@@ -421,14 +421,18 @@ function M.setup_terminal_keymaps()
   -- When <C-_> is pressed, the terminal sends (95 - 64) which is 31. Hence, both key combinations need to be mapped.
 
   -- <C-/> toggles the floating terminal
+  local ctrl_slash = "<C-/>"
+  local ctrl_underscore = "<C-_>"
+  local ctrl_alt_slash = "<C-A-/>"
+  local ctrl_alt_underscore = "<C-A-_>"
   local floating_term_cmd = "<cmd>lua require('utils.terminal').toggle_fterm()<CR>"
   local split_term_cmd = "<cmd>lua require('utils.terminal').toggle_terminal_native()<CR>"
-  vim.keymap.set({ "n", "i", "t", "v" }, "<C-/>", split_term_cmd, { desc = "Toggle terminal" })
-  vim.keymap.set({ "n", "i", "t", "v" }, "<C-_>", split_term_cmd, { desc = "Toggle terminal" })
+  vim.keymap.set({ "n", "i", "t", "v" }, ctrl_alt_slash, split_term_cmd, { desc = "Toggle terminal" })
+  vim.keymap.set({ "n", "i", "t", "v" }, ctrl_alt_underscore, split_term_cmd, { desc = "Toggle terminal" })
 
   -- C-A-/ toggles split terminal on/off
-  vim.keymap.set({ "n", "i", "t", "v" }, "<C-A-/>", floating_term_cmd, { desc = "Toggle native terminal" })
-  vim.keymap.set({ "n", "i", "t", "v" }, "<C-A-_>", floating_term_cmd, { desc = "Toggle native terminal" })
+  vim.keymap.set({ "n", "i", "t", "v" }, ctrl_slash, floating_term_cmd, { desc = "Toggle native terminal" })
+  vim.keymap.set({ "n", "i", "t", "v" }, ctrl_underscore, floating_term_cmd, { desc = "Toggle native terminal" })
 
   -- Esc goes to NORMAL mode from TERMINAL mode
   vim.api.nvim_set_keymap("t", "<Esc><Esc>", "<C-\\><C-n>", { noremap = true })
