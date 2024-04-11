@@ -452,7 +452,9 @@ function M.setup_obsidian_keymaps(obsidian_vars)
     { "<leader>nf", "<cmd>ObsidianQuickSwitch<cr>", desc = "[N]otes: search [f]ilenames" },
     { "<leader>nn", "<cmd>ObsidianNew<cr>", desc = "[N]otes: [n]new" },
     { "<leader>nl", "<cmd>ObsidianQuickSwitch Learning.md<cr><cr>", desc = "[N]otes: [l]earning" },
+    { "<leader>ng", "<cmd>ObsidianQuickSwitch Go.md<cr><cr>", desc = "[N]otes: [g]olang learning" },
     { "<leader>nv", "<cmd>ObsidianQuickSwitch Neovim config.md<cr><cr>", desc = "[N]otes: Neo[v]im todo" },
+
     {
       "<leader>ns",
       function()
