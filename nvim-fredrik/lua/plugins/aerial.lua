@@ -2,6 +2,7 @@ return {
 
   {
     "stevearc/aerial.nvim",
+    enabled = false, -- use trouble v3 instead
     event = "VeryLazy",
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
@@ -48,7 +49,12 @@ return {
     end,
     config = function(_, opts)
       require("aerial").setup(opts)
-      require("config.keymaps").setup_aerial_keymaps()
+      -- require("config.keymaps").setup_aerial_keymaps()
+      --
+      -- -- keymap to place in keymaps.lua:
+      -- function M.setup_aerial_keymaps()
+      --   map_normal_mode("<leader>cs", ":AerialToggle<CR>", "[s]ymbols") -- FIXME: overridden by trouble right now
+      -- end
     end,
   },
 }
