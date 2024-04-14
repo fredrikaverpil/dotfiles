@@ -3,13 +3,16 @@ vim.filetype.add({
   -- filename = {},
   pattern = {
     -- can be comma-separated for a list of paths
-    [".*/%.github[%w/]+.*%.yml"] = "gha",
-    [".*/%.github[%w/]+.*%.yaml"] = "gha",
+    [".*/%.github/dependabot.yml"] = "dependabot",
+    [".*/%.github/dependabot.yaml"] = "dependabot",
+    [".*/%.github/workflows[%w/]+.*%.yml"] = "gha",
+    [".*/%.github/workflows/[%w/]+.*%.yaml"] = "gha",
   },
 })
 
--- the gha filetype will use the yaml parser and queries.
+-- use the yaml parser for the custom filetypes
 vim.treesitter.language.register("yaml", "gha")
+vim.treesitter.language.register("yaml", "dependabot")
 
 return {
 
@@ -24,13 +27,16 @@ return {
         end,
       },
     },
-    ft = { "yaml", "gha" },
+    ft = { "yaml", "gha", "dependabot" },
     opts = {
       formatters_by_ft = {
         -- TODO: the default is very strict, might be good to add a config
         -- file: https://github.com/google/yamlfmt/blob/main/docs/config-file.md#basic-formatter
+        -- fix:
+        --   - do not remove empty lines
         yaml = { "yamlfmt" },
         gha = { "yamlfmt" },
+        dependabot = { "yamlfmt" },
       },
     },
   },
@@ -75,12 +81,12 @@ return {
         end,
       },
     },
-    ft = { "yaml", "gha" },
+    ft = { "yaml", "gha", "dependabot" },
     opts = {
       servers = {
         yamlls = {
           -- https://github.com/redhat-developer/yaml-language-server
-          filetypes = { "yaml", "gha" },
+          filetypes = { "yaml", "gha", "dependabot" },
 
           -- Have to add this for yamlls to understand that we support line folding
           capabilities = {
