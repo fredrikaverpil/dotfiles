@@ -329,12 +329,6 @@ function M.setup_coverage_keymaps()
   map_normal_mode("<leader>tC", ":CoverageLoad<CR>:CoverageSummary<CR>", "[t]est [C]overage summary")
 end
 
-function M.setup_spectre_keymaps()
-  map_normal_mode("<leader>spt", ":lua require('spectre').toggle()<CR>", "[s][p]ectre [t]oggle")
-  map_normal_mode("<leader>spw", ":lua require('spectre').open_visual({select_word=true})<CR>", "[s][p]ectre current [w]ord")
-  map_normal_mode("<leader>spf", ':lua require("spectre").open_file_search({select_word=true})<CR>', "[s][p]ectre current [f]ile")
-end
-
 function M.setup_aerial_keymaps()
   map_normal_mode("<leader>cs", ":AerialToggle<CR>", "[s]ymbols") -- FIXME: overridden by trouble right now
 end
@@ -429,6 +423,12 @@ function M.setup_dap_keymaps()
   map_normal_mode("<leader>dw", function()
     require("dap.ui.widgets").hover()
   end, "[d]ebug [w]idgets")
+end
+
+function M.setup_spectre_keymaps()
+  map_normal_mode("<leader>spt", ":lua require('spectre').toggle()<CR>", "[s][p]ectre [t]oggle")
+  map_normal_mode("<leader>spw", ":lua require('spectre').open_visual({select_word=true})<CR>", "[s][p]ectre current [w]ord")
+  map_normal_mode("<leader>spf", ':lua require("spectre").open_file_search({select_word=true})<CR>', "[s][p]ectre current [f]ile")
 end
 
 function M.setup_noice_keymaps()
