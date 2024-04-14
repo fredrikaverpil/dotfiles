@@ -334,6 +334,7 @@ function M.setup_aerial_keymaps()
 end
 
 function M.setup_dap_ui_keymaps()
+  -- keymaps: https://github.com/mfussenegger/nvim-dap/blob/master/doc/dap.txt#L508
   map_normal_mode("<leader>du", function()
     require("dapui").toggle({})
   end, "[d]ap [u]i")
@@ -344,13 +345,13 @@ function M.setup_dap_ui_keymaps()
 end
 
 function M.setup_dap_keymaps()
-  map_normal_mode("<leader>dB", function()
-    require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: "))
-  end, "[d]ebug [B]reakpoint")
-
   map_normal_mode("<leader>db", function()
     require("dap").toggle_breakpoint()
   end, "toggle [d]ebug [b]reakpoint")
+
+  map_normal_mode("<leader>dB", function()
+    require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: "))
+  end, "[d]ebug [B]reakpoint")
 
   map_normal_mode("<leader>dc", function()
     require("dap").continue()
@@ -380,6 +381,14 @@ function M.setup_dap_keymaps()
     require("dap").goto_()
   end, "[d]ebug [g]o to line")
 
+  map_normal_mode("<leader>do", function()
+    require("dap").step_over()
+  end, "[d]ebug step [o]ver")
+
+  map_normal_mode("<leader>dO", function()
+    require("dap").step_out()
+  end, "[d]ebug step [O]ut")
+
   map_normal_mode("<leader>di", function()
     require("dap").step_into()
   end, "[d]ebug [i]nto")
@@ -395,14 +404,6 @@ function M.setup_dap_keymaps()
   map_normal_mode("<leader>dl", function()
     require("dap").run_last()
   end, "[d]ebug [l]ast")
-
-  map_normal_mode("<leader>do", function()
-    require("dap").step_out()
-  end, "[d]ebug [o]ut")
-
-  map_normal_mode("<leader>dO", function()
-    require("dap").step_over()
-  end, "[d]ebug [O]ver")
 
   map_normal_mode("<leader>dp", function()
     require("dap").pause()
