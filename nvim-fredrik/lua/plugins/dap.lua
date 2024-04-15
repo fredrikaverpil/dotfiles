@@ -58,15 +58,16 @@ return {
       {
         "nvim-lualine/lualine.nvim",
         opts = function(_, opts)
-          local function dap()
+          local function dap_status()
             return "  " .. require("dap").status()
           end
 
-          opts.dap = {
+          opts.dap_status = {
             lualine_component = {
-              dap,
+              dap_status,
               cond = function()
-                return package.loaded["dap"] and require("dap").status() ~= ""
+                -- return package.loaded["dap"] and require("dap").status() ~= ""
+                return require("dap").status() ~= ""
               end,
               color = require("utils.colors").fgcolor("Debug"),
             },

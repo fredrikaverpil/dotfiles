@@ -10,7 +10,7 @@ return {
     -- },
     --
     -- see debug.lua...
-    -- dap = {
+    -- dap_status = {
     --  lualine_component = "filename",
     --  },
     --
@@ -43,8 +43,8 @@ return {
       table.insert(opts.sections.lualine_x, 1, opts.copilot.lualine_component)
     end
 
-    if opts.dap then
-      table.insert(opts.sections.lualine_x, 2, opts.dap.lualine_component)
+    if opts.dap_status then
+      table.insert(opts.sections.lualine_x, 2, opts.dap_status.lualine_component)
     end
 
     if opts.noice then
