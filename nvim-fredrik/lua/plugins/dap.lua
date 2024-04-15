@@ -75,13 +75,25 @@ return {
         end,
       },
     },
-
     config = function(_, opts)
-      vim.api.nvim_set_hl(0, "DapStoppedLine", { default = true, link = "Visual" })
+      -- Set nice color highlighting at the stopped line
+      -- vim.api.nvim_set_hl(0, "DapStoppedLine", { default = true, link = "Visual" })
 
+      -- Show nice icons in gutter instead of the default characters
       for name, sign in pairs(require("utils.defaults").icons.dap) do
         sign = type(sign) == "table" and sign or { sign }
-        vim.fn.sign_define("Dap" .. name, { text = sign[1], texthl = sign[2] or "DiagnosticInfo", linehl = sign[3], numhl = sign[3] })
+        vim.fn.sign_define("Dap" .. name, {
+          text = sign[1],
+          texthl = sign[2] or "DiagnosticInfo",
+          linehl = sign[3],
+          numhl = sign[3],
+        })
+      end
+
+      local dap = require("dap")
+      if opts.configurations ~= nil then
+        local merged = require("utils.table").deep_tbl_extend(dap.configurations, opts.configurations)
+        dap.configurations = merged
       end
 
       require("config.keymaps").setup_dap_keymaps()
