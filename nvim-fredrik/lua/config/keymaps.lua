@@ -355,27 +355,11 @@ function M.setup_dap_keymaps()
 
   map_normal_mode("<leader>dc", function()
     require("dap").continue()
-  end, "[d]ebug [c]ontinue")
+  end, "[d]ebug [c]ontinue (start here)")
 
   map_normal_mode("<leader>dC", function()
     require("dap").run_to_cursor()
   end, "[d]ebug [C]ursor")
-
-  map_normal_mode("<leader>da", function()
-    ---@param config {args?:string[]|fun():string[]?}
-    local function get_args(config)
-      local args = type(config.args) == "function" and (config.args() or {}) or config.args or {}
-      config = vim.deepcopy(config)
-      ---@cast args string[]
-      config.args = function()
-        local new_args = vim.fn.input("Run with args: ", table.concat(args, " ")) --[[@as string]]
-        return vim.split(vim.fn.expand(new_args) --[[@as string]], " ")
-      end
-      return config
-    end
-
-    require("dap").continue({ before = get_args })
-  end, "[d]ebug [a]rgs")
 
   map_normal_mode("<leader>dg", function()
     require("dap").goto_()
@@ -412,6 +396,10 @@ function M.setup_dap_keymaps()
   map_normal_mode("<leader>dr", function()
     require("dap").repl.toggle()
   end, "[d]ebug [r]epl")
+
+  map_normal_mode("<leader>dR", function()
+    require("dap").clear_breakpoints()
+  end, "[d]ebug [R]emove breakpoints")
 
   map_normal_mode("<leader>ds", function()
     require("dap").session()
