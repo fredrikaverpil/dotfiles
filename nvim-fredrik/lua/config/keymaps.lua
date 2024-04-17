@@ -415,9 +415,9 @@ function M.setup_dap_keymaps()
 end
 
 function M.setup_spectre_keymaps()
-  map_normal_mode("<leader>spt", ":lua require('spectre').toggle()<CR>", "[s][p]ectre [t]oggle")
-  map_normal_mode("<leader>spw", ":lua require('spectre').open_visual({select_word=true})<CR>", "[s][p]ectre current [w]ord")
-  map_normal_mode("<leader>spf", ':lua require("spectre").open_file_search({select_word=true})<CR>', "[s][p]ectre current [f]ile")
+  map_normal_mode("<leader>sr", ":lua require('spectre').toggle()<CR>", "[s]earch [r]eplace (spectre)")
+  map_normal_mode("<leader>sf", ':lua require("spectre").open_file_search({select_word=true})<CR>', "[s]earch replace [f]ile (spectre)")
+  -- map_normal_mode("<leader>spw", ":lua require('spectre').open_visual({select_word=true})<CR>", "[s][p]ectre current [w]ord")
 end
 
 function M.setup_noice_keymaps()
