@@ -139,7 +139,7 @@ function M.setup_lsp_keymaps(event)
   map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
 
   -- Find references for the word under your cursor.
-  map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
+  map("gr", ':lua require("telescope.builtin").lsp_references({ show_line = false })<CR>', "[G]oto [R]eferences")
 
   -- Jump to the implementation of the word under your cursor.
   --  Useful when your language has ways of declaring types without an actual implementation.
