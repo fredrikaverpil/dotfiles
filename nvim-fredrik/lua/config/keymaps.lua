@@ -248,6 +248,10 @@ end
 function M.setup_telescope_keymaps()
   map_normal_mode("<leader><leader>", require("telescope.builtin").find_files, "Find Files")
 
+  -- file
+  map_normal_mode("<leader>fp", "<cmd>Telescope projects<CR>", "File from other project")
+  map_normal_mode("<leader>fr", "<cmd>Telescope oldfiles<CR>", "Recent files")
+
   -- git
   map_normal_mode("<leader>sc", "<cmd>Telescope git_commits<CR>", "[s]earch git [c]ommits")
   map_normal_mode("<leader>sg", "<cmd>Telescope git_status<CR>", "[s]earch git changes")
