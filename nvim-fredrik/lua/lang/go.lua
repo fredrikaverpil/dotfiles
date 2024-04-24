@@ -117,6 +117,10 @@ return {
           {
             "williamboman/mason.nvim",
           },
+          {
+            "artemave/workspace-diagnostics.nvim",
+            enabled = true,
+          },
         },
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
@@ -158,6 +162,10 @@ return {
           -- for more details, also see:
           -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
           -- https://github.com/golang/tools/blob/master/gopls/README.md
+
+          on_attach = function(client, bufnr)
+            require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
+          end,
 
           settings = {
 
