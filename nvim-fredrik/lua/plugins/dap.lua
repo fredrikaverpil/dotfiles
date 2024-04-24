@@ -24,9 +24,8 @@ return {
           dap.listeners.before.event_exited["dapui_config"] = function()
             dapui.close({})
           end
-
-          require("config.keymaps").setup_dap_ui_keymaps()
         end,
+        keys = require("config.keymaps").setup_dap_ui_keymaps(),
       },
       {
         "theHamsta/nvim-dap-virtual-text",
@@ -95,8 +94,7 @@ return {
         local merged = require("utils.table").deep_tbl_extend(dap.configurations, opts.configurations)
         dap.configurations = merged
       end
-
-      require("config.keymaps").setup_dap_keymaps()
     end,
+    keys = require("config.keymaps").setup_dap_keymaps(),
   },
 }

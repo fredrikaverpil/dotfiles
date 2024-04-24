@@ -41,7 +41,7 @@ return {
 
       require("neotest").setup(opts)
 
-      require("config.keymaps").setup_neotest_keymaps()
     end,
+    keys = require("config.keymaps").setup_neotest_keymaps(),
   },
 }
