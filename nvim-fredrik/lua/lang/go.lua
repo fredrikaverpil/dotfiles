@@ -222,11 +222,20 @@ return {
       {
         "fredrikaverpil/neotest-golang",
         branch = "main",
+        build = "go install gotest.tools/gotestsum@latest",
       },
     },
     opts = function(_, opts)
       opts.adapters = opts.adapters or {}
-      opts.adapters["neotest-golang"] = {}
+      opts.adapters["neotest-golang"] = {
+        args = {
+          "-v",
+          "-race",
+          "-count=1",
+          "-timeout=60s",
+          "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
+        },
+      }
 
       -- NOTE: can be removed once neotest-golang is stable enough.
       --
