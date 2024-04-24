@@ -117,10 +117,6 @@ return {
           {
             "williamboman/mason.nvim",
           },
-          {
-            "artemave/workspace-diagnostics.nvim",
-            enabled = true,
-          },
         },
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
@@ -147,9 +143,6 @@ return {
             init_options = {
               command = golangcilint_command,
             },
-            on_attach = function(client, bufnr)
-              require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
-            end,
           },
         }
       end
@@ -165,10 +158,6 @@ return {
           -- for more details, also see:
           -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
           -- https://github.com/golang/tools/blob/master/gopls/README.md
-
-          on_attach = function(client, bufnr)
-            require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
-          end,
 
           settings = {
 
@@ -216,34 +205,30 @@ return {
     "nvim-neotest/neotest",
     ft = { "go" },
     dependencies = {
-      -- NOTE: usinga personal fork with bugfixes, would be nicer to use original plugin...
-      -- "nvim-neotest/neotest-go",
-      "fredrikaverpil/neotest-go-fork",
-      branch = "main",
+      -- NOTE: can be removed once neotest-golang is stable enough.
+      -- {
+      --   -- "nvim-neotest/neotest-go",
+      --   "fredrikaverpil/neotest-go-fork",
+      --   branch = "main",
+      -- },
+      {
+        "fredrikaverpil/neotest-golang",
+        branch = "main",
+      },
     },
     opts = function(_, opts)
-      -- TODO: potentially use this function to mitigate always running all tests.
-      -- see; https://github.com/nvim-neotest/neotest-go/pull/81
-      local function get_nearest_function_name()
-        local ts_utils = require("nvim-treesitter.ts_utils")
-        local node = ts_utils.get_node_at_cursor()
-
-        while node do
-          if node:type() == "function_declaration" then
-            return ts_utils.get_node_text(node:child(1))[1]
-          end
-          node = node:parent()
-        end
-      end
-
       opts.adapters = opts.adapters or {}
-      opts.adapters["neotest-go"] = {
-        experimental = {
-          test_table = true,
-        },
-        args = { "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out" },
-        -- TODO: figure out if this should be enabled: recursive_run = true,
-      }
+      opts.adapters["neotest-golang"] = {}
+
+      -- NOTE: can be removed once neotest-golang is stable enough.
+      --
+      -- opts.adapters["neotest-go"] = {
+      --   experimental = {
+      --     test_table = true,
+      --   },
+      --   args = { "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out" },
+      --   recursive_run = true,
+      -- }
     end,
   },
 
@@ -302,20 +287,4 @@ return {
       },
     },
   },
-
-  -- {
-  --   -- For specific features... better test output, avoiding JSON?
-  --   "ray-x/go.nvim",
-  --   dependencies = { -- optional packages
-  --     "ray-x/guihua.lua",
-  --     "neovim/nvim-lspconfig",
-  --     "nvim-treesitter/nvim-treesitter",
-  --   },
-  --   config = function()
-  --     require("go").setup()
-  --   end,
-  --   event = { "CmdlineEnter" },
-  --   ft = { "go", "gomod" },
-  --   -- build = ':lua require("go.install").update_all_sync()', -- if you need to install/update all binaries
-  -- },
 }
