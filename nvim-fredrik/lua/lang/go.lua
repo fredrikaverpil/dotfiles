@@ -221,7 +221,7 @@ return {
       -- },
       {
         "fredrikaverpil/neotest-golang",
-        branch = "main",
+        dir = "~/code/public/neotest-golang",
         build = "go install gotest.tools/gotestsum@latest",
       },
     },
