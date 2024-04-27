@@ -623,6 +623,9 @@ function M.setup_whichkey()
     ["<leader><tab>"] = {
       name = "+tab",
     },
+    ["<leader>a"] = {
+      name = "+ai",
+    },
     ["<leader>c"] = {
       name = "+code",
     },
@@ -697,6 +700,18 @@ function M.setup_diffview_keymaps()
       ":DiffviewFileHistory --range=origin/main...HEAD --right-only --no-merges --reverse",
       desc = "Review current PR (per commit)",
     },
+  }
+end
+
+function M.setup_chatgpt_keymaps()
+  return {
+    { "<leader>ac", ":ChatGPT<CR>", desc = "ChatGPT" },
+  }
+end
+
+function M.setup_oatmeal_keymaps()
+  return {
+    { "<leader>am", mode = "n", desc = "Start Oatmeal session" },
   }
 end
 

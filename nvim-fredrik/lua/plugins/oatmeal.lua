@@ -7,12 +7,10 @@ return {
     -- exit with CTRL+C
     "dustinblackman/oatmeal.nvim",
     cmd = { "Oatmeal" },
-    keys = {
-      { "<leader>om", mode = "n", desc = "Start Oatmeal session" },
-    },
     opts = {
       backend = "ollama",
       model = "llama3:latest",
     },
+    keys = require("config.keymaps").setup_oatmeal_keymaps(),
   },
 }

@@ -6,9 +6,7 @@ return {
       { "nvim-lua/plenary.nvim" },
       { "nvim-telescope/telescope.nvim" },
     },
-    cmd = {
-      "ChatGPT",
-    },
+    cmd = { "ChatGPT", "ChatGPTRun", "ChatGPTActAs", "ChatGPTCompleteCode", "ChatGPTEditWithInstructions" },
     config = function()
       require("chatgpt").setup({
         api_key_cmd = "op read op://Personal/OpenAI/tokens/neovim --no-newline",
@@ -25,5 +23,6 @@ return {
         },
       })
     end,
+    keys = require("config.keymaps").setup_chatgpt_keymaps(),
   },
 }
