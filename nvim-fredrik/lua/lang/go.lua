@@ -235,6 +235,7 @@ return {
           "-timeout=60s",
           "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
         },
+        dap_go_enabled = true,
       }
 
       -- NOTE: can be removed once neotest-golang is stable enough.
@@ -279,13 +280,10 @@ return {
       },
       {
         "leoluz/nvim-dap-go",
-        config = function(_, opts)
-          require("dap-go").setup(opts)
-        end,
+        opts = {},
       },
     },
     opts = {
-
       configurations = {
         go = {
           -- See require("dap-go") source for full dlv setup.
