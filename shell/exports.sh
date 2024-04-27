@@ -83,8 +83,6 @@ export DOTFILES="$HOME/code/dotfiles"
 export DOTFILES_SHELL=$shell
 export DOTFILES_BREW_PREFIX=$brew_prefix
 export HOMEBREW_NO_ANALYTICS=1
-echo "Warning: Enabling Task's remote taskfiles feature"
-export TASK_X_REMOTE_TASKFILES=1   # TODO: remove this once go-task/Task graduates this expirment
 export PIP_REQUIRE_VIRTUALENV=true # use pip --isolated to bypass
 export PYENV_ROOT="$HOME/.pyenv"   # pyenv
 export GIT_EDITOR="nvim"
