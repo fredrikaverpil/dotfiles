@@ -11,6 +11,7 @@ return {
     },
     config = function()
       require("chatgpt").setup({
+        api_key_cmd = "op read op://Personal/OpenAI/tokens/neovim --no-newline",
         actions_paths = { "~/code/dotfiles/nvim-lazyvim/chatgpt-actions.json" },
         openai_params = {
           model = "gpt-4",

@@ -23,6 +23,7 @@ cask 'font-noto-color-emoji'
 cask 'font-noto-emoji'
 
 # terminal cli tools
+brew '1password-cli'
 brew 'asciinema'
 brew 'atuin'
 brew 'bash'
