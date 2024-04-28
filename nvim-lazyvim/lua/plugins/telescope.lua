@@ -3,6 +3,7 @@ return {
   -- change telescope config
   {
     "nvim-telescope/telescope.nvim",
+    event = "VeryLazy",
     dependencies = {
       {
         "nvim-telescope/telescope-fzf-native.nvim", -- https://github.com/nvim-telescope/telescope-fzf-native.nvim

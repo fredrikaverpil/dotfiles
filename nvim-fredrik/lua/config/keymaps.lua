@@ -93,6 +93,20 @@ local function map_normal_mode(keys, func, desc)
   vim.keymap.set("n", keys, func, { desc = desc, noremap = false, silent = true })
 end
 
+function M.setup_trouble_telescope_keymaps(opts)
+  local open_with_trouble = require("trouble.sources.telescope").open
+  return vim.tbl_deep_extend("force", opts, {
+    defaults = {
+      mappings = {
+        i = {
+          ["<c-t>"] = open_with_trouble,
+          ["<a-t>"] = open_with_trouble,
+        },
+      },
+    },
+  })
+end
+
 function M.setup_trouble_keymaps()
   return {
     {
