@@ -32,7 +32,7 @@ return {
             return mode_
           end
 
-          opts.dap = {
+          opts.noice = {
             lualine_component = {
               mode,
               cond = function()
