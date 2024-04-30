@@ -39,16 +39,6 @@
       force: true
       if: '[ "$(uname -s)" = "Linux" ]'
 
-    ~/.config/LazyVim/lua:
-      path: nvim-lazyvim/lua
-      force: true
-    ~/.config/LazyVim/lazyvim.json:
-      force: true
-      path: nvim-lazyvim/lazyvim.json
-    ~/.config/LazyVim/lazy-lock.json:
-      force: true
-      path: nvim-lazyvim/lazy-lock.json
-
     ~/.config/fredrik/init.lua:
       path: nvim-fredrik/init.lua
       force: true
