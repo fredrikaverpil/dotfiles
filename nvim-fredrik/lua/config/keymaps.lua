@@ -376,11 +376,11 @@ function M.setup_neotest_keymaps()
       desc = "Toggle Output Panel",
     },
     {
-      "<leader>tS",
+      "<leader>tt",
       function()
         require("neotest").run.stop()
       end,
-      desc = "Stop",
+      desc = "Terminate",
     },
     {
       "<leader>td",
