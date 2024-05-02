@@ -11,6 +11,16 @@ return {
       "nvim-neotest/neotest-vim-test",
 
       "nvim-neotest/nvim-nio",
+
+      {
+        "echasnovski/mini.indentscope",
+        opts = function()
+          -- disable indentation scope for the neotest-summary buffer
+          vim.cmd([[
+        autocmd Filetype neotest-summary lua vim.b.miniindentscope_disable = true
+      ]])
+        end,
+      },
     },
     config = function(_, opts)
       if opts.adapters then
@@ -40,7 +50,6 @@ return {
       end
 
       require("neotest").setup(opts)
-
     end,
     keys = require("config.keymaps").setup_neotest_keymaps(),
   },
