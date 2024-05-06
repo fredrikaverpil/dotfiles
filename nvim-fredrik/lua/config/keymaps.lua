@@ -385,6 +385,9 @@ function M.setup_neotest_keymaps()
     {
       "<leader>td",
       function()
+        vim.cmd("Neotree close")
+        require("neotest").summary.close()
+        require("neotest").output_panel.close()
         require("neotest").run.run({ suite = false, strategy = "dap" })
       end,
       desc = "Debug nearest test",
