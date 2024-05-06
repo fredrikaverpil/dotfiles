@@ -213,22 +213,15 @@ return {
     "nvim-neotest/neotest",
     ft = { "go" },
     dependencies = {
-      -- NOTE: can be removed once neotest-golang is stable enough.
-      -- {
-      --   -- "nvim-neotest/neotest-go",
-      --   "fredrikaverpil/neotest-go-fork",
-      --   branch = "main",
-      -- },
       {
         "fredrikaverpil/neotest-golang",
         dir = "~/code/public/neotest-golang",
-        build = "go install gotest.tools/gotestsum@latest",
       },
     },
     opts = function(_, opts)
       opts.adapters = opts.adapters or {}
       opts.adapters["neotest-golang"] = {
-        args = {
+        go_test_args = {
           "-v",
           "-race",
           "-count=1",
@@ -237,16 +230,6 @@ return {
         },
         dap_go_enabled = true,
       }
-
-      -- NOTE: can be removed once neotest-golang is stable enough.
-      --
-      -- opts.adapters["neotest-go"] = {
-      --   experimental = {
-      --     test_table = true,
-      --   },
-      --   args = { "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out" },
-      --   recursive_run = true,
-      -- }
     end,
   },
 
