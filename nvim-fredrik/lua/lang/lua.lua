@@ -68,4 +68,18 @@ return {
       }
     end,
   },
+
+  {
+    "nvim-neotest/neotest",
+    ft = { "lua" },
+    dependencies = {
+      {
+        "HiPhish/neotest-busted",
+      },
+    },
+    opts = function(_, opts)
+      opts.adapters = opts.adapters or {}
+      opts.adapters["neotest-busted"] = {}
+    end,
+  },
 }
