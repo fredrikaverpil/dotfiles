@@ -74,12 +74,12 @@ return {
     ft = { "lua" },
     dependencies = {
       {
-        "HiPhish/neotest-busted",
+        "nvim-neotest/neotest-plenary",
       },
     },
     opts = function(_, opts)
       opts.adapters = opts.adapters or {}
-      opts.adapters["neotest-busted"] = {}
+      opts.adapters["neotest-plenary"] = {}
     end,
   },
 }
