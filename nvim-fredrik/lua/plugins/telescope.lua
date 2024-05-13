@@ -3,7 +3,7 @@ return {
   {
     "nvim-telescope/telescope.nvim",
     event = "VeryLazy",
-    tag = "0.1.5",
+    tag = "0.1.6",
     dependencies = {
       { "nvim-lua/plenary.nvim" },
       { "nvim-telescope/telescope-ui-select.nvim" },
@@ -17,30 +17,38 @@ return {
       },
       { "smartpde/telescope-recent-files" },
       { "rcarriga/nvim-notify" },
+      { "folke/trouble.nvim" }, -- for trouble.sources.telescope
     },
-
-    opts = {
-      defaults = {
-        file_ignore_patterns = { ".git/", "node_modules", "poetry.lock" },
-        vimgrep_arguments = {
-          "rg",
-          "--color=never",
-          "--no-heading",
-          "--hidden",
-          "--with-filename",
-          "--line-number",
-          "--column",
-          "--smart-case",
-          "--trim",
+    opts = function(_, opts)
+      local custom_opts = {
+        defaults = {
+          file_ignore_patterns = { ".git/", "node_modules", "poetry.lock" },
+          vimgrep_arguments = {
+            "rg",
+            "--color=never",
+            "--no-heading",
+            "--hidden",
+            "--with-filename",
+            "--line-number",
+            "--column",
+            "--smart-case",
+            "--trim",
+          },
+          mappings = {
+            i = {
+              ["<c-t>"] = require("trouble.sources.telescope").open,
+              ["<a-t>"] = require("trouble.sources.telescope").open,
+            },
+          },
         },
-      },
-      -- extensions = {
-      --   --   fzf = {},
-      --   --   live_grep_args = {
-      --   --   },
-      -- },
-    },
-
+        -- extensions = {
+        --   --   fzf = {},
+        --   --   live_grep_args = {
+        --   --   },
+        -- },
+      }
+      return vim.tbl_deep_extend("force", custom_opts, opts)
+    end,
     config = function(_, opts)
       local telescope = require("telescope")
 
@@ -58,7 +66,6 @@ return {
 
       telescope.load_extension("fzf")
       telescope.load_extension("live_grep_args")
-      -- telescope.load_extension("projects")
       telescope.load_extension("ui-select")
       telescope.load_extension("recent_files")
       telescope.load_extension("notify")
