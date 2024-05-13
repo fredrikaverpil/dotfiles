@@ -6,12 +6,9 @@ return {
     dependencies = {
       {
         "Saecki/crates.nvim",
+        tag = "stable",
         event = { "BufRead Cargo.toml" },
-        opts = {
-          src = {
-            cmp = { enabled = true },
-          },
-        },
+        opts = {},
       },
     },
     ---@param opts cmp.ConfigSchema
