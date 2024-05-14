@@ -589,7 +589,7 @@ end
 
 function M.setup_obsidian_keymaps(obsidian_vars)
   return {
-    { "<leader>nS", "<cmd>ObsidianSearch<cr>", desc = "[N]otes: [s]earch text" },
+    { "<leader>ns", "<cmd>ObsidianSearch<cr>", desc = "[N]otes: [s]earch text" },
     { "<leader>nf", "<cmd>ObsidianQuickSwitch<cr>", desc = "[N]otes: search [f]ilenames" },
     { "<leader>nn", "<cmd>ObsidianNew<cr>", desc = "[N]otes: [n]new" },
     { "<leader>nl", "<cmd>ObsidianQuickSwitch Learning.md<cr><cr>", desc = "[N]otes: [l]earning" },
@@ -597,7 +597,7 @@ function M.setup_obsidian_keymaps(obsidian_vars)
     { "<leader>nv", "<cmd>ObsidianQuickSwitch Neovim config.md<cr><cr>", desc = "[N]otes: Neo[v]im todo" },
 
     {
-      "<leader>ns",
+      "<leader>nS",
       function()
         local client = require("obsidian").get_client()
         client:open_note(obsidian_vars.scratchpad_path)
@@ -612,6 +612,8 @@ function M.setup_obsidian_keymaps(obsidian_vars)
         local note = client:create_note({
           title = "Meeting notes",
           dir = vim.fn.expand(obsidian_vars.documents_path .. "/Meeting notes"),
+          -- NOTE: if folder "templates" exist in $cwd,
+          -- the template is expected to be found there.
           template = "meeting_notes",
         })
         client:open_note(note)
