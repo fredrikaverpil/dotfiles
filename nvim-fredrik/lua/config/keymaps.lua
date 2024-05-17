@@ -611,7 +611,7 @@ function M.setup_obsidian_keymaps(obsidian_vars)
         -- client.dir is the vault path
         local note = client:create_note({
           title = "Meeting notes",
-          dir = vim.fn.expand(obsidian_vars.documents_path .. "/Meeting notes"),
+          dir = vim.fn.expand(obsidian_vars.notes_path),
           -- NOTE: if folder "templates" exist in $cwd,
           -- the template is expected to be found there.
           template = "meeting_notes",

@@ -1,7 +1,7 @@
 local M = {}
 M.vault_path = vim.fn.expand("~/Library/Mobile Documents/iCloud~md~obsidian/Documents/fredrik")
-M.documents_path = vim.fn.expand("~/Obsidian/Meeting notes")
-M.scratchpad_path = vim.fn.expand("~/Obsidian/scratchpad.md")
+M.notes_path = vim.fn.expand(M.vault_path .. "/Meeting_notes")
+M.scratchpad_path = vim.fn.expand(M.vault_path .. "/scratchpad.md")
 
 return {
   "epwalsh/obsidian.nvim",
