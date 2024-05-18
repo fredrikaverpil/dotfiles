@@ -5,8 +5,11 @@
 cask_args appdir: '/Applications'
 
 # Taps (third-party repositories)
-tap 'homebrew/cask-fonts'
+tap 'homebrew/cask'
 tap 'koekeishiya/formulae' # yabai
+tap 'pkgxdev/made'
+tap 'dustinblackman/tap'
+tap 'go-task/tap'
 
 # system
 brew 'zsh-autosuggestions'

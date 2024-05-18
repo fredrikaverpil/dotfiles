@@ -1,4 +1,3 @@
----
 name: CI
 on:
   push:
@@ -15,7 +14,7 @@ jobs:
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Create workfolder
         run: |
           mkdir -p ~/dotfiles-install-dir
@@ -25,17 +24,17 @@ jobs:
       - name: Show dotfiles
         run: |
           ls -alh ~/dotfiles-install-dir
-
       - name: Test homebrew installer
         run: |
           HOME=~/dotfiles-install-dir installers/homebrew.sh
       - name: Test Brewfile install (macos)
-        run: brew bundle --file=_macos/Brewfile --verbose
+        run: |
+          brew upgrade
+          brew bundle --file=_macos/Brewfile --verbose
         if: runner.os == 'macOS'
       - name: Test Brewfile install (linux)
         run: /home/linuxbrew/.linuxbrew/bin/brew bundle --file=_linux/Brewfile --verbose
         if: runner.os == 'linux'
-
       - name: Test Python installer + setup
         run: |
           echo $PYENV_ROOT
@@ -51,7 +50,6 @@ jobs:
         env:
           PYENV_ROOT: /home/runner/dotfiles-install-dir/.pyenv
         if: runner.os == 'Linux'
-
       - name: Test docker installer
         run: |
           HOME=~/dotfiles-install-dir installers/docker.sh
