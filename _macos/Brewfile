@@ -40,7 +40,6 @@ brew 'pkgxdev/made/pkgx'
 brew 'pre-commit'
 brew 'starship'
 brew 'tree'
-brew 'withgraphite/tap/graphite'
 brew 'yq'
 brew 'zoxide'
 brew 'opentofu'  # terraform

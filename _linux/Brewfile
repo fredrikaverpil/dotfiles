@@ -3,7 +3,6 @@
 
 # Taps (third-party repositories)
 tap 'homebrew/linux-fonts'
-tap 'withgraphite/tap'
 
 # system
 brew 'zsh-autosuggestions'
@@ -30,7 +29,6 @@ brew 'pkgxdev/made/pkgx'
 brew 'pre-commit'
 brew 'starship'
 brew 'tree'
-brew 'withgraphite/tap/graphite'
 brew 'yq'
 brew 'zoxide'
 
