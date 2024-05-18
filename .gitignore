@@ -26,3 +26,6 @@ override.tf
 
 # Work related
 /work
+
+# Lazygit config is changed by Neovim theme switcher
+lazygit_config.yml

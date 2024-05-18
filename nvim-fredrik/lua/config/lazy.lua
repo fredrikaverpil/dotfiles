@@ -21,7 +21,6 @@ require("lazy").setup({
     -- import per-project configs
     { import = "config.lazyrc" },
   },
-  install = { colorscheme = { "tokyonight-moon" } },
   checker = { enabled = false }, -- automatically check for plugin updates
   dev = {
     path = "~/code/public",

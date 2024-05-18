@@ -1,0 +1,30 @@
+# https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
+
+gui:
+  # Tokyonight Day
+  theme:
+    activeBorderColor:
+      - "#b15c00"
+      - "bold"
+    cherryPickedCommitBgColor:
+      - "#9854f1"
+    cherryPickedCommitFgColor:
+      - "#2e7de9"
+    defaultFgColor:
+      - "#3760bf"
+    inactiveBorderColor:
+      - "#2496ac"
+    optionsTextColor:
+      - "#2e7de9"
+    searchingActiveBorderColor:
+      - "#b15c00"
+      - "bold"
+    selectedLineBgColor:
+      - "#b6bfe2"
+    unstagedChangesColor:
+      - "#c64343"
+  nerdFontsVersion: "3" # nerd fonts version to use ("2" or "3"); empty means don't show nerd font icons
+git:
+  overrideGpg: true # prevents lazygit from spawning a separate process when using GPG
+os:
+  editPreset: "nvim" # nvim-remote works so-so
