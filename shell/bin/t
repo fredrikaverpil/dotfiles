@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# if argument was given, run 'sesh connect <arg>'
+if [ -n "$1" ]; then
+	sesh connect $1
+	exit
+fi
+
+# if no argument was given, run 'sesh connect $(sesh list | fzf)'
+sesh connect $(sesh list | fzf)

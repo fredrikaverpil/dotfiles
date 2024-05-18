@@ -63,6 +63,7 @@ brew 'ripgrep'
 brew 'fd'
 brew 'lazygit'
 brew 'fzf'
+brew 'joshmedeski/sesh/sesh'
 brew 'gnu-sed'  # spectre
 brew 'shellcheck'  # mason installs intel version
 brew 'hadolint'  # mason installs intel version

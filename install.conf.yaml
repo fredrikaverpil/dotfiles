@@ -19,6 +19,7 @@
     ~/.gitmessage:
     ~/Taskfile.yml:
     ~/.tmux.conf:
+    ~/.config/sesh/sesh.toml: sesh.toml
     ~/.config/yabai/yabairc:
       path: yabairc
       if: '[ "$(uname -s)" = "Darwin" ]'

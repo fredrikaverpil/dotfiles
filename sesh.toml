@@ -1,0 +1,13 @@
+[default_session]
+startup_command = "nvim"
+
+[[session]]
+name = "Dotfiles"
+path = "~/code/dotfiles"
+startup_command = "nvim"
+
+[[session]]
+name = "Downloads 📥"
+path = "~/Downloads"
+startup_command = "ls"
+
