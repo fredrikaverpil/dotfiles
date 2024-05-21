@@ -128,7 +128,7 @@ function M.setup_trouble_keymaps()
   }
 end
 
-function M.setup_lsp_keymaps(event)
+function M.setup_lsp_autocmd_keymaps(event)
   local map = function(keys, func, desc)
     vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
   end
@@ -173,6 +173,10 @@ function M.setup_lsp_keymaps(event)
   -- WARN: This is not Goto Definition, this is Goto Declaration.
   --  For example, in C this would take you to the header
   map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
+end
+
+function M.setup_lsp_keymaps()
+  map_normal_mode("<leader>uh", require("utils.inlay_hints").toggle_inlay_hints, "Toggle inlay hints")
 end
 
 function M.setup_cmp_keymaps(cmp)

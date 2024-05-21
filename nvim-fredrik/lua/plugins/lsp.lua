@@ -144,10 +144,12 @@ return {
         mlsp.setup({ ensure_installed = ensure_installed, handlers = { setup } })
       end
 
+      require("config.keymaps").setup_lsp_keymaps()
+
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("lsp-attach-keymaps", { clear = true }),
         callback = function(event)
-          require("config.keymaps").setup_lsp_keymaps(event)
+          require("config.keymaps").setup_lsp_autocmd_keymaps(event)
         end,
       })
     end,
