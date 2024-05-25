@@ -2,6 +2,7 @@ return {
 
   {
     "echasnovski/mini.map",
+    event = "VeryLazy",
     main = "mini.map",
     opts = function()
       local minimap = require("mini.map")
