@@ -16,7 +16,7 @@ return {
       }
     end,
     keys = {
-      { "<Leader>um", "<cmd>lua MiniMap.toggle()<CR>", desc = "Mini map" },
+      { "<Leader>um", "<cmd>lua MiniMap.toggle()<CR>", desc = "Toggle Mini map" },
     },
   },
 }
