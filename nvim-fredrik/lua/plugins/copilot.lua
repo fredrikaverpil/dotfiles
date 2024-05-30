@@ -71,5 +71,6 @@ return {
         end)
       end
     end,
+    keys = require("config.keymaps").setup_copilot_keymaps(),
   },
 }

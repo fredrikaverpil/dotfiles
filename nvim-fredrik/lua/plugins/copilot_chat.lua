@@ -11,5 +11,10 @@ return {
     opts = {
       debug = false, -- Enable debugging
     },
+    config = function(_, opts)
+      require("CopilotChat").setup(opts)
+      require("CopilotChat.integrations.cmp").setup()
+    end,
+    keys = require("config.keymaps").setup_copilot_chat_keymaps(),
   },
 }

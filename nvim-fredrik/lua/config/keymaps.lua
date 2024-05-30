@@ -130,7 +130,7 @@ end
 
 function M.setup_lsp_autocmd_keymaps(event)
   local map = function(keys, func, desc)
-    vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
+    vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc, nowait = true })
   end
 
   -- Jump to the definition of the word under your cursor.
@@ -742,7 +742,27 @@ end
 
 function M.setup_oatmeal_keymaps()
   return {
-    { "<leader>am", mode = "n", desc = "Start Oatmeal session" },
+    {
+      "<leader>am",
+      function()
+        local oatmeal = require("oatmeal")
+        oatmeal.start()
+      end,
+      mode = "n",
+      desc = "Start Oatmeal session",
+    },
+  }
+end
+
+function M.setup_copilot_chat_keymaps()
+  return {
+    { "<leader>aC", ":CopilotChat<CR>", desc = "Copilot Chat" },
+  }
+end
+
+function M.setup_copilot_keymaps()
+  return {
+    { "<leader>ap", ":Copilot panel<CR>", desc = "Copilot panel" },
   }
 end
 
