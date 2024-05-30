@@ -1,6 +1,5 @@
 {
   "ChatGPT.nvim": { "branch": "main", "commit": "df53728e05129278d6ea26271ec086aa013bed90" },
-  "CopilotChat.nvim": { "branch": "canary", "commit": "f694ccae14a6f45b783cb386f17431b05162e8d0" },
   "FTerm.nvim": { "branch": "master", "commit": "d1320892cc2ebab472935242d9d992a2c9570180" },
   "FixCursorHold.nvim": { "branch": "master", "commit": "1900f89dc17c603eec29960f57c00bd9ae696495" },
   "LuaSnip": { "branch": "master", "commit": "878ace11983444d865a72e1759dbcc331d1ace4c" },
@@ -17,7 +16,6 @@
   "cmp_luasnip": { "branch": "master", "commit": "05a9ab28b53f71d1aece421ef32fee2cb857a843" },
   "code_runner.nvim": { "branch": "main", "commit": "d135c4178bf8980ca5fa4aa6e27ab9ee4373c875" },
   "conform.nvim": { "branch": "master", "commit": "f3b930db4964d60e255c8f9e37b7f2218dfc08cb" },
-  "copilot.lua": { "branch": "master", "commit": "f7612f5af4a7d7615babf43ab1e67a2d790c13a6" },
   "crates.nvim": { "branch": "main", "commit": "8437522d12a8c523da2aee9db2979d070b2ecc33" },
   "diffview.nvim": { "branch": "main", "commit": "1ec7b56b959dab18f7030f541c33ae60e18a6f88" },
   "dressing.nvim": { "branch": "master", "commit": "3c38ac861e1b8d4077ff46a779cde17330b29f3a" },
@@ -74,7 +72,7 @@
   "telescope.nvim": { "branch": "master", "commit": "6312868392331c9c0f22725041f1ec2bef57c751" },
   "todo-comments.nvim": { "branch": "main", "commit": "e1549807066947818113a7d7ed48f637e49620d3" },
   "tokyonight.nvim": { "branch": "main", "commit": "b9b494fa7f7bbf2fe0747b47fa290fb7a4eddcc7" },
-  "trouble.nvim": { "branch": "dev", "commit": "e2185bf6e63ef9bd75f1819f43846e2b0f10953b" },
+  "trouble.nvim": { "branch": "main", "commit": "cf81aaca820017388fc630c534774c95b58233f2" },
   "undotree": { "branch": "master", "commit": "56c684a805fe948936cda0d1b19505b84ad7e065" },
   "vim-dadbod": { "branch": "master", "commit": "fb30422b7bee7e2fa4205a4d226f01477f4fc593" },
   "vim-dadbod-completion": { "branch": "master", "commit": "5d5ad196fcde223509d7dabbade0148f7884c5e3" },
