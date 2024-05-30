@@ -41,7 +41,6 @@ mhutchie.git-graph
 mikestead.dotenv
 mohsen1.prettify-json
 ms-azuretools.vscode-docker
-ms-kubernetes-tools.vscode-kubernetes-tools
 ms-python.debugpy
 ms-python.isort
 ms-python.mypy-type-checker
@@ -58,7 +57,6 @@ ms-vscode-remote.remote-ssh-edit
 ms-vscode-remote.remote-wsl
 ms-vscode-remote.vscode-remote-extensionpack
 ms-vscode.live-server
-ms-vscode.makefile-tools
 ms-vscode.remote-explorer
 ms-vscode.remote-server
 ms-vscode.test-adapter-converter
