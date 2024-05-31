@@ -179,6 +179,60 @@ function M.setup_lsp_keymaps()
   map_normal_mode("<leader>uh", require("utils.inlay_hints").toggle_inlay_hints, "Toggle inlay hints")
 end
 
+function M.setup_typescript_lsp_keymaps()
+  return {
+    {
+      "gD",
+      function()
+        require("vtsls").commands.goto_source_definition(0)
+      end,
+      desc = "Goto Source Definition",
+    },
+    {
+      "gR",
+      function()
+        require("vtsls").commands.file_references(0)
+      end,
+      desc = "File References",
+    },
+    {
+      "<leader>co",
+      function()
+        require("vtsls").commands.organize_imports(0)
+      end,
+      desc = "Organize Imports",
+    },
+    {
+      "<leader>cM",
+      function()
+        require("vtsls").commands.add_missing_imports(0)
+      end,
+      desc = "Add missing imports",
+    },
+    {
+      "<leader>cu",
+      function()
+        require("vtsls").commands.remove_unused_imports(0)
+      end,
+      desc = "Remove unused imports",
+    },
+    {
+      "<leader>cD",
+      function()
+        require("vtsls").commands.fix_all(0)
+      end,
+      desc = "Fix all diagnostics",
+    },
+    {
+      "<leader>cV",
+      function()
+        require("vtsls").commands.select_ts_version(0)
+      end,
+      desc = "Select TS workspace version",
+    },
+  }
+end
+
 function M.setup_cmp_keymaps(cmp)
   return {
     ["<C-u>"] = cmp.mapping.scroll_docs(-4),
