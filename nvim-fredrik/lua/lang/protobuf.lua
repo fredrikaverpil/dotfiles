@@ -31,11 +31,42 @@ return {
       },
     },
     ft = { "proto" },
-    opts = {
-      linters_by_ft = {
-        proto = { "buf_lint", "protolint", },
-      },
-    },
+    opts = function(_, opts)
+      opts.linters_by_ft["proto"] = { "buf_lint", "protolint" }
+
+      -- custom protolint definition
+      -- see: https://github.com/mfussenegger/nvim-lint#custom-linters
+      require("lint").linters.protolint = {
+        cmd = "protolint",
+        stdin = false,
+        append_fname = true,
+        args = { "lint", "--reporter=json" },
+        stream = "stderr",
+        ignore_exitcode = true,
+        env = nil,
+        parser = function(output)
+          if output == "" then
+            return {}
+          end
+          local json_output = vim.json.decode(output)
+          local diagnostics = {}
+          if json_output.lints == nil then
+            return diagnostics
+          end
+          for _, item in ipairs(json_output.lints) do
+            table.insert(diagnostics, {
+              lnum = item.line - 1,
+              col = item.column - 1,
+              message = item.message,
+              file = item.filename,
+              code = item.rule,
+              severity = vim.diagnostic.severity.WARN,
+            })
+          end
+          return diagnostics
+        end,
+      }
+    end,
   },
 
   {

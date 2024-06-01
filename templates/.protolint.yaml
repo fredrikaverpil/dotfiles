@@ -1,0 +1,11 @@
+# Lint directives.
+lint:
+  # Linter rules.
+  # Run `protolint list` to see all available rules.
+  rules:
+    # Set the default to all linters. This option works the other way around as no_default does.
+    # If you want to enable this option, delete the comment out below and no_default.
+    all_default: true
+    # The specific linters to remove.
+    remove:
+      - MAX_LINE_LENGTH
