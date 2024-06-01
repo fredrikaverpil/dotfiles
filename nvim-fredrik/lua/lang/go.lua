@@ -73,40 +73,40 @@ return {
     },
   },
 
-  -- {
-  --   "mfussenegger/nvim-lint",
-  --   enabled = false,
-  --   dependencies = {
-  --     {
-  --       "williamboman/mason.nvim",
-  --       opts = function(_, opts)
-  --         opts.ensure_installed = opts.ensure_installed or {}
-  --         vim.list_extend(opts.ensure_installed, { "golangci-lint" })
-  --       end,
-  --     },
-  --   },
-  --   ft = { "go", "gomod", "gowork", "gotmpl" },
-  --   opts = function(_, opts)
-  --     local args = require("lint").linters.golangcilint.args -- defaults
-  --     local config_file = find_file(".golangci.yml")
-  --     if config_file ~= nil then
-  --       require("utils.defaults").golangcilint_config_path = config_file
-  --       args = {
-  --         "run",
-  --         "--out-format",
-  --         "json",
-  --         "--config",
-  --         config_file,
-  --         function()
-  --           return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
-  --         end,
-  --       }
-  --     end
-  --
-  --     opts.linters_by_ft["go"] = { "golangcilint" }
-  --     opts.linters["golangcilint"] = { args = args }
-  --   end,
-  -- },
+  {
+    "mfussenegger/nvim-lint",
+    enabled = true, -- FIXME: use lsp when possible: https://github.com/nametake/golangci-lint-langserver/issues/33
+    dependencies = {
+      {
+        "williamboman/mason.nvim",
+        opts = function(_, opts)
+          opts.ensure_installed = opts.ensure_installed or {}
+          vim.list_extend(opts.ensure_installed, { "golangci-lint" })
+        end,
+      },
+    },
+    ft = { "go", "gomod", "gowork", "gotmpl" },
+    opts = function(_, opts)
+      local args = require("lint").linters.golangcilint.args -- defaults
+      local config_file = find_file(".golangci.yml")
+      if config_file ~= nil then
+        require("utils.defaults").golangcilint_config_path = config_file
+        args = {
+          "run",
+          "--out-format",
+          "json",
+          "--config",
+          config_file,
+          function()
+            return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
+          end,
+        }
+      end
+
+      opts.linters_by_ft["go"] = { "golangcilint" }
+      opts.linters["golangcilint"] = { args = args }
+    end,
+  },
 
   {
     "neovim/nvim-lspconfig",
@@ -153,7 +153,8 @@ return {
 
       opts.servers = {
 
-        golangci_lint_ls = golangcilint_setup(),
+        -- FIXME: https://github.com/nametake/golangci-lint-langserver/issues/33
+        -- golangci_lint_ls = golangcilint_setup(),
 
         gopls = {
           -- for all options, see:
