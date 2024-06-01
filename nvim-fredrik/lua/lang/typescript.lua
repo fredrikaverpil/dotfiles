@@ -52,26 +52,24 @@ return {
                 enumMemberValues = { enabled = true },
               },
             },
+            javascript = { -- NOTE: just copy the typescript settings here
+              updateImportsOnFileMove = { enabled = "always" },
+              suggest = {
+                completeFunctionCalls = true,
+              },
+              inlayHints = {
+                parameterNames = { enabled = "literals" },
+                parameterTypes = { enabled = true },
+                variableTypes = { enabled = true },
+                propertyDeclarationTypes = { enabled = true },
+                functionLikeReturnTypes = { enabled = true },
+                enumMemberValues = { enabled = true },
+              },
+            },
           },
         },
       },
     },
     keys = require("config.keymaps").setup_typescript_lsp_keymaps(),
-    setup = {
-      tsserver = function()
-        -- disable tsserver
-        return true
-      end,
-      vtsls = function(_, opts)
-        -- copy typescript settings to javascript
-        opts.settings.javascript = vim.tbl_deep_extend("force", {}, opts.settings.typescript, opts.settings.javascript or {})
-        local plugins = vim.tbl_get(opts.settings, "vtsls", "tsserver", "globalPlugins")
-        -- allow plugins to have a key for proper merging
-        -- remove the key here
-        if plugins then
-          opts.settings.vtsls.tsserver.globalPlugins = vim.tbl_values(plugins)
-        end
-      end,
-    },
   },
 }
