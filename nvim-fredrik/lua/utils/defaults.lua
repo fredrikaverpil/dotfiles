@@ -7,6 +7,11 @@ M.notifications = {
       path = nil,
     },
   },
+  proto = {
+    ["buf.yaml"] = {
+      path = nil,
+    },
+  },
   python = {
     _emitted = false,
     ruff = {
