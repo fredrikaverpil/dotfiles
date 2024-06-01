@@ -15,8 +15,6 @@ return {
         window = { winblend = 50 },
       }
     end,
-    keys = {
-      { "<Leader>um", "<cmd>lua MiniMap.toggle()<CR>", desc = "Toggle Mini map" },
-    },
+    keys = require("config.keymaps").setup_minimap_keymaps(),
   },
 }

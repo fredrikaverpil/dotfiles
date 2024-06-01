@@ -175,10 +175,6 @@ function M.setup_lsp_autocmd_keymaps(event)
   map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
 end
 
-function M.setup_lsp_keymaps()
-  map_normal_mode("<leader>uh", require("utils.inlay_hints").toggle_inlay_hints, "Toggle inlay hints")
-end
-
 function M.setup_typescript_lsp_keymaps()
   return {
     {
@@ -639,6 +635,16 @@ end
 
 function M.setup_conform_keymaps()
   map_normal_mode("<leader>uf", require("utils.formatting").toggle_formatting, "Toggle auto-formatting")
+end
+
+function M.setup_lsp_keymaps()
+  map_normal_mode("<leader>uh", require("utils.inlay_hints").toggle_inlay_hints, "Toggle inlay hints")
+end
+
+function M.setup_minimap_keymaps()
+  return {
+    { "<Leader>um", "<cmd>lua MiniMap.toggle()<CR>", desc = "Toggle Mini map" },
+  }
 end
 
 function M.setup_winshift_keymaps()
