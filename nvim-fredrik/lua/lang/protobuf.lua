@@ -36,11 +36,12 @@ return {
 
       -- custom protolint definition
       -- see: https://github.com/mfussenegger/nvim-lint#custom-linters
+      local config_file = vim.fn.expand("$DOTFILES/templates/.protolint.yaml")
       require("lint").linters.protolint = {
         cmd = "protolint",
         stdin = false,
         append_fname = true,
-        args = { "lint", "--reporter=json" },
+        args = { "lint", "--reporter=json", "--config_path=" .. config_file },
         stream = "stderr",
         ignore_exitcode = true,
         env = nil,
