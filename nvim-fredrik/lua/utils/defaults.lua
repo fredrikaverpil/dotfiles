@@ -1,17 +1,6 @@
 M = {}
 
 M.notifications = {
-  _emitted = false,
-  go = {
-    [".golangci.yml"] = {
-      path = nil,
-    },
-  },
-  proto = {
-    ["buf.yaml"] = {
-      path = nil,
-    },
-  },
   python = {
     _emitted = false,
     ruff = {

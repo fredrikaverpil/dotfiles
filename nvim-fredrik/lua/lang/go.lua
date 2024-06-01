@@ -1,38 +1,11 @@
-local function find_file(filename, excluded_dirs)
-  if not excluded_dirs then
-    excluded_dirs = { ".git", "node_modules", ".venv" }
-  end
-  local exclude_str = ""
-  for _, dir in ipairs(excluded_dirs) do
-    exclude_str = exclude_str .. " --exclude " .. dir
-  end
-  local command = "fd --hidden --no-ignore" .. exclude_str .. " '" .. filename .. "' " .. vim.fn.getcwd() .. " | head -n 1"
-  --  local command = "fd --hidden --no-ignore '" .. filename .. "' " .. vim.fn.getcwd() .. " | head -n 1"
-  local file = io.popen(command):read("*l")
-  local path = file and file or nil
-
-  if path ~= nil then
-    require("utils.defaults").notifications.go[filename].path = path
-  end
-
-  return path
-end
-
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "go", "gomod", "gowork", "gotmpl", "proto" },
+  pattern = { "go", "gomod", "gowork", "gotmpl" },
   callback = function()
     -- set go specific options
     vim.opt_local.tabstop = 2
     vim.opt_local.shiftwidth = 2
     vim.opt_local.shiftwidth = 2
     vim.opt_local.colorcolumn = "120"
-
-    -- show notification if golangci-lint config is found
-    local notifications = require("utils.defaults").notifications.go
-    if notifications[".golangci.yml"].path and not notifications._emitted then
-      vim.notify_once("Using golangci-lint config: " .. notifications[".golangci.yml"].path, vim.log.levels.INFO)
-      notifications._emitted = true
-    end
   end,
 })
 
@@ -88,8 +61,9 @@ return {
     ft = { "go", "gomod", "gowork", "gotmpl" },
     opts = function(_, opts)
       local args = require("lint").linters.golangcilint.args -- defaults
-      local config_file = find_file(".golangci.yml")
-      if config_file ~= nil then
+      local config_file = require("utils.find").find_file(".golangci.yml")
+      if config_file then
+        vim.notify_once("Found file: " .. config_file, vim.log.levels.INFO)
         require("utils.defaults").golangcilint_config_path = config_file
         args = {
           "run",
@@ -133,8 +107,9 @@ return {
       local function golangcilint_setup()
         local lspconfig = require("lspconfig")
         local golangcilint_command = { "golangci-lint", "run", "--enable-all", "--out-format", "json", "--issues-exit-code=1" }
-        local config_file = find_file(".golangci.yml")
+        local config_file = require("utils.find").find_file(".golangci.yml")
         if config_file then
+          vim.notify_once("Found file: " .. config_file, vim.log.levels.INFO)
           golangcilint_command = { "golangci-lint", "run", "--out-format", "json", "--config", config_file, "--issues-exit-code=1" }
         end
 
