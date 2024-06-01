@@ -647,6 +647,12 @@ function M.setup_minimap_keymaps()
   }
 end
 
+function M.setup_diagnostics_keymaps()
+  map_normal_mode("<leader>ud", function()
+    vim.diagnostic.enable(not vim.diagnostic.is_enabled())
+  end, "Toggle diagnostics")
+end
+
 function M.setup_winshift_keymaps()
   vim.keymap.set({ "n", "v" }, "<leader>uw", "<cmd>WinShift<CR>", { desc = "[w]inshift (shift + arrows)" })
 end

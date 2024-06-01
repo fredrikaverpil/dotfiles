@@ -43,6 +43,8 @@ function M.setup_diagnostics()
   end
 
   vim.diagnostic.config(vim.deepcopy(diagnostics))
+
+  require("config.keymaps").setup_diagnostics_keymaps()
 end
 
 return M
