@@ -45,49 +45,19 @@ return {
     opts = function(_, opts)
       opts.linters_by_ft["proto"] = { "buf_lint", "protolint" }
 
-      -- custom protolint definition
+      -- custom protolint config file reading
       -- see: https://github.com/mfussenegger/nvim-lint#custom-linters
       local protolint_config_file = vim.fn.expand("$DOTFILES/templates/.protolint.yaml")
-      -- vim.notify_once("Found file: " .. protolint_config_file, vim.log.levels.INFO)
-      require("lint").linters.protolint = {
-        name = "protolint",
-        cmd = "protolint",
-        stdin = false,
-        append_fname = true,
-        args = { "lint", "--reporter=json", "--config_path=" .. protolint_config_file },
-        stream = "stderr",
-        ignore_exitcode = true,
-        env = nil,
-        parser = function(output)
-          if output == "" then
-            return {}
-          end
-          local json_output = vim.json.decode(output)
-          local diagnostics = {}
-          if json_output.lints == nil then
-            return diagnostics
-          end
-          for _, item in ipairs(json_output.lints) do
-            table.insert(diagnostics, {
-              lnum = item.line - 1,
-              col = item.column - 1,
-              message = item.message,
-              file = item.filename,
-              code = item.rule,
-              severity = vim.diagnostic.severity.WARN,
-            })
-          end
-          return diagnostics
-        end,
-      }
+      local protolint_args = { "lint", "--reporter=json", "--config_path=" .. protolint_config_file }
+      opts.linters["protolint"] = { args = protolint_args }
 
       -- custom buf_lint config file reading
-      local args = require("lint").linters.buf_lint.args -- defaults
       local buf_config_file = require("utils.find").find_file("buf.yaml")
+      local buf_args = require("lint").linters.buf_lint.args -- defaults
       if buf_config_file then
         vim.notify_once("Found file: " .. buf_config_file, vim.log.levels.INFO)
         require("utils.defaults").buf_config_path = buf_config_file
-        args = {
+        buf_args = {
           "lint",
           "--error-format",
           "json",
@@ -95,7 +65,7 @@ return {
           buf_config_file,
         }
       end
-      opts.linters["buf_lint"] = { args = args }
+      opts.linters["buf_lint"] = { args = buf_args }
     end,
   },
 
