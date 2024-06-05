@@ -208,6 +208,7 @@ return {
           "-count=1",
           "-timeout=60s",
           "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
+          "-parallel=1",
         },
         dap_go_enabled = true,
       }
