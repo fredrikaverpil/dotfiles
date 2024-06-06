@@ -5,11 +5,12 @@
 cask_args appdir: '/Applications'
 
 # Taps (third-party repositories)
-tap 'homebrew/cask'
 tap 'koekeishiya/formulae' # yabai
 tap 'pkgxdev/made'
 tap 'dustinblackman/tap'
 tap 'go-task/tap'
+tap 'joshmedeski/sesh'
+tap '1password/tap'
 
 # system
 brew 'zsh-autosuggestions'
@@ -26,7 +27,6 @@ cask 'font-noto-color-emoji'
 cask 'font-noto-emoji'
 
 # terminal cli tools
-brew '1password-cli'
 brew 'asciinema'
 brew 'atuin'
 brew 'bash'
@@ -46,7 +46,7 @@ brew 'tree'
 brew 'yq'
 brew 'zoxide'
 brew 'opentofu'  # terraform
-brew 'brew install dustinblackman/tap/oatmeal'
+brew 'dustinblackman/tap/oatmeal'
 
 # slides
 brew 'slides'
@@ -98,6 +98,7 @@ cask 'pgadmin4'
 brew 'mysql-client'  # provides mysql
 
 # ui apps
+cask '1password-cli'
 cask 'appcleaner'
 cask 'wezterm'
 cask 'visual-studio-code'
