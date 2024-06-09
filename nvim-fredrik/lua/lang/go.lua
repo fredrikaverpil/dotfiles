@@ -197,6 +197,7 @@ return {
       {
         "fredrikaverpil/neotest-golang",
         dir = "~/code/public/neotest-golang",
+        branch = "rnd-run-testfolder-populate-statuses",
       },
     },
     opts = function(_, opts)
