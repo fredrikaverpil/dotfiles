@@ -44,19 +44,25 @@ return {
     cmd = "Copilot",
     event = "InsertEnter",
     build = ":Copilot auth",
-    config = function()
-      require("copilot").setup({
-        panel = {
-          enabled = true,
-          auto_refresh = true,
-        },
-        suggestion = {
-          enabled = true,
-          -- use the built-in keymapping for "accept" (<M-l>)
-          auto_trigger = true,
-          accept = false, -- disable built-in keymapping
-        },
-      })
+    opts = {
+      panel = {
+        enabled = true,
+        auto_refresh = true,
+      },
+      suggestion = {
+        enabled = true,
+        -- use the built-in keymapping for "accept" (<M-l>)
+        auto_trigger = true,
+        accept = false, -- disable built-in keymapping
+      },
+      filetypes = {},
+    },
+    config = function(_, opts)
+      -- ignore grug-far must be done here as it contains a dash
+      opts.filetypes["grug-far"] = false
+      opts.filetypes["grug-far-history"] = false
+
+      require("copilot").setup(opts)
 
       -- hide copilot suggestions when cmp menu is open
       -- to prevent odd behavior/garbled up suggestions
