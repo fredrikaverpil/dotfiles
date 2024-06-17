@@ -2,7 +2,7 @@ M = {}
 
 -- leader key
 vim.g.mapleader = " "
-vim.g.maplocalleader = " "
+vim.g.maplocalleader = ","
 
 -- undo
 vim.opt.undofile = true
