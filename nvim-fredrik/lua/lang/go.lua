@@ -206,9 +206,12 @@ return {
         go_test_args = {
           "-v",
           "-race",
-          "-count=1",
-          "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
+          -- "-count=1",
+          "-coverprofile="
+            .. vim.fn.getcwd()
+            .. "/coverage.out",
           "-parallel=1",
+          "-p=2",
         },
         dap_go_enabled = true,
       }
