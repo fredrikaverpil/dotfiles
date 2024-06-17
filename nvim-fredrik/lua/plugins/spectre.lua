@@ -2,6 +2,7 @@ return {
 
   {
     "nvim-pack/nvim-spectre",
+    enabled = false, -- use grug-far instead
     event = "VeryLazy",
     dependencies = {
       "nvim-lua/plenary.nvim",

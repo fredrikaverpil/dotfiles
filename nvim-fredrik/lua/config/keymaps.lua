@@ -607,6 +607,12 @@ function M.setup_spectre_keymaps()
   -- map_normal_mode("<leader>spw", ":lua require('spectre').open_visual({select_word=true})<CR>", "[s][p]ectre current [w]ord")
 end
 
+function M.setup_grug_far_keymaps()
+  return {
+    { "<leader>sr", ":GrugFar<cr>", desc = "[s]earch and [r]eplace (grug-far)" },
+  }
+end
+
 function M.setup_noice_keymaps()
   map_normal_mode("<leader>sna", ":Noice<CR>", "[s]earch [n]oice [a]ll")
   map_normal_mode("<leader>snl", ":NoiceLast<CR>", "[s]earch [n]oice [l]ast")
