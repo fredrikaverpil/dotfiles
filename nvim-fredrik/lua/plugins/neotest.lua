@@ -49,7 +49,17 @@ return {
         opts.adapters = adapters
       end
 
+      -- Erase log file.
+      -- local filepath = require("neotest.logging"):get_filename()
+      -- vim.notify("Erasing Neotest log file: " .. filepath, vim.log.levels.WARN)
+      -- vim.fn.writefile({ "" }, filepath)
+
+      -- Set up Neotest.
       require("neotest").setup(opts)
+
+      -- Enable during Neotest adapter development only.
+      -- vim.notify("Logging for Neotest enabled", vim.log.levels.TRACE)
+      -- require("neotest.logging"):set_level(vim.log.levels.INFO)
     end,
     keys = require("config.keymaps").setup_neotest_keymaps(),
   },
