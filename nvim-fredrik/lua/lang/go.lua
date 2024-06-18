@@ -93,7 +93,7 @@ return {
           },
           {
             "artemave/workspace-diagnostics.nvim",
-            enabled = true,
+            enabled = false,
           },
         },
         opts = function(_, opts)
@@ -144,9 +144,9 @@ return {
           -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
           -- https://github.com/golang/tools/blob/master/gopls/README.md
 
-          on_attach = function(client, bufnr)
-            require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
-          end,
+          -- on_attach = function(client, bufnr)
+          --   require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
+          -- end,
 
           settings = {
 
