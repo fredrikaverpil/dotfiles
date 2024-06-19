@@ -58,10 +58,6 @@ return {
       filetypes = {},
     },
     config = function(_, opts)
-      -- ignore grug-far must be done here as it contains a dash
-      opts.filetypes["grug-far"] = false
-      opts.filetypes["grug-far-history"] = false
-
       require("copilot").setup(opts)
 
       -- hide copilot suggestions when cmp menu is open
