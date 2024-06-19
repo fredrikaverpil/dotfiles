@@ -42,10 +42,6 @@ shift + alt - right : yabai -m window --swap east
 # ctrl + alt - h : yabai -m window --warp west
 # ctrl + alt - l : yabai -m window --warp east
 
-# move window to display left and right
-# shift + alt - s : yabai -m window --display west; yabai -m display --focus west;
-# shift + alt - g : yabai -m window --display east; yabai -m display --focus east;
-
 # focus on full-screen wezterm (see dotfiles shell script)
 ctrl - 0 : ~/code/dotfiles/shell/bin/focus-wezterm
 
@@ -61,3 +57,4 @@ shift + alt - 6 : yabai -m window --space 6 --focus
 shift + alt - 7 : yabai -m window --space 7 --focus
 shift + alt - 8 : yabai -m window --space 8 --focus
 shift + alt - 9 : yabai -m window --space 9 --focus
+
