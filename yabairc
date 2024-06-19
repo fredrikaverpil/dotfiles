@@ -1,3 +1,4 @@
+
 # default layout: bsp, stack or float
 yabai -m config layout bsp
 
@@ -7,11 +8,11 @@ yabai -m config layout bsp
 yabai -m config window_placement second_child
 
 # padding
-yabai -m config top_padding 12
-yabai -m config bottom_padding 12
-yabai -m config left_padding 12
-yabai -m config right_padding 12
-yabai -m config window_gap 12
+yabai -m config top_padding 0
+yabai -m config bottom_padding 0
+yabai -m config left_padding 0
+yabai -m config right_padding 0
+yabai -m config window_gap 0
 
 # mouse moves to focused window
 # yabai -m config mouse_follows_focus on
@@ -28,3 +29,4 @@ yabai -m mouse_drop_action swap
 # disable yabai for certain apps
 yabai -m rule --add app="^Calculator$" manage=off
 yabai -m rule --add app="^System Settings$" manage=off
+
