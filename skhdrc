@@ -1,60 +1,44 @@
 # start/stop yabai, tiling window manager
-shift + alt - q : yabai --stop-service
-shift + alt - s : yabai --start-service
-
-# change window focus
-shift + alt - j : yabai -m window --focus south
-shift + alt - k : yabai -m window --focus north
-shift + alt - h : yabai -m window --focus west
-shift + alt - l : yabai -m window --focus east
-
-# change focus between external displays (left and right)
-# shift + alt - s : yabai -m display --focus west
-# shift + alt - g : yabai -m display --focus east
+alt + shift - q : yabai --stop-service
+alt + shift - s : yabai --start-service
 
 # rotate layout clockwise
-shift + alt - r : yabai -m space --rotate 270
+alt + shift - r : yabai -m space --rotate 270
 
 # flip along y-axis
-shift + alt - y : yabai -m space --mirror y-axis
+alt + shift - y : yabai -m space --mirror y-axis
 
 # flip along x-axis
-shift + alt - x : yabai -m space --mirror x-axis
-
-# toggle window float
-shift + alt - t : yabai -m window --toggle float --grid 4:4:1:1:2:2
-
-# maximize a window
-shift + alt - m : yabai -m window --toggle zoom-fullscreen
+alt + shift - x : yabai -m space --mirror x-axis
 
 # balance out a tree of windows (resize or occupy the same area)
-shift + alt - b : yabai -m space --balance
+alt + shift - b : yabai -m space --balance
 
-# swap windows
-shift + alt - down: yabai -m window --swap south
-shift + alt - up : yabai -m window --swap north
-shift + alt - left : yabai -m window --swap west
-shift + alt - right : yabai -m window --swap east
+# toggle window float
+alt + shift - f : yabai -m window --toggle float --grid 4:4:1:1:2:2
 
-# move window and split
-# ctrl + alt - j : yabai -m window --warp south
-# crtl + alt - k : yabai -m window --warp north
-# ctrl + alt - h : yabai -m window --warp west
-# ctrl + alt - l : yabai -m window --warp east
+# maximize a window
+alt + shift - z : yabai -m window --toggle zoom-fullscreen
 
 # focus on full-screen wezterm (see dotfiles shell script)
 ctrl - 0 : ~/code/dotfiles/shell/bin/focus-wezterm
 
+# change window focus
+alt + shift - down : yabai -m window --focus south
+alt + shift - up : yabai -m window --focus north
+alt + shift - left : yabai -m window --focus west
+alt + shift - right : yabai -m window --focus east
+
 # Move window to designated space
 # To enable moving windows between spaces, remove script-addition:
 # sudo yabai --uninstall-sa
-shift + alt - 1 : yabai -m window --space 1 --focus
-shift + alt - 2 : yabai -m window --space 2 --focus
-shift + alt - 3 : yabai -m window --space 3 --focus
-shift + alt - 4 : yabai -m window --space 4 --focus
-shift + alt - 5 : yabai -m window --space 5 --focus
-shift + alt - 6 : yabai -m window --space 6 --focus
-shift + alt - 7 : yabai -m window --space 7 --focus
-shift + alt - 8 : yabai -m window --space 8 --focus
-shift + alt - 9 : yabai -m window --space 9 --focus
+alt + shift - 1 : yabai -m window --space 1 --focus
+alt + shift - 2 : yabai -m window --space 2 --focus
+alt + shift - 3 : yabai -m window --space 3 --focus
+alt + shift - 4 : yabai -m window --space 4 --focus
+alt + shift - 5 : yabai -m window --space 5 --focus
+alt + shift - 6 : yabai -m window --space 6 --focus
+alt + shift - 7 : yabai -m window --space 7 --focus
+alt + shift - 8 : yabai -m window --space 8 --focus
+alt + shift - 9 : yabai -m window --space 9 --focus
 
