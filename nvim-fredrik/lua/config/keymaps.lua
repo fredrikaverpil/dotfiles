@@ -245,7 +245,6 @@ end
 function M.setup_neotree_keymaps()
   map_normal_mode("<leader>e", ":Neotree source=filesystem reveal=true position=left toggle=true<CR>", "N[E]oTree")
   -- map_normal_mode("<leader>sb", ":Neotree buffers reveal float<CR>", "[S]earch [B]uffers")
-  -- map_normal_mode("<leader>sg", ":Neotree git_status reveal float<CR>", "[s]earch [git] changes")
 end
 
 function M.setup_telescope_keymaps()
@@ -256,16 +255,17 @@ function M.setup_telescope_keymaps()
   map_normal_mode("<leader>fr", "<cmd>Telescope oldfiles<CR>", "Recent files")
 
   -- git
-  map_normal_mode("<leader>sc", "<cmd>Telescope git_commits<CR>", "[s]earch git [c]ommits")
-  map_normal_mode("<leader>sg", "<cmd>Telescope git_status<CR>", "[s]earch git changes")
+  map_normal_mode("<leader>gtc", "<cmd>Telescope git_commits<CR>", "Search git [c]ommits")
+  map_normal_mode("<leader>gtC", "<cmd>Telescope git_bcommits<CR>", "Search git branch [C]ommits")
+  map_normal_mode("<leader>gts", "<cmd>Telescope git_status<CR>", "Search git [s]tatus changes")
+  map_normal_mode("<leader>gtb", "<cmd>Telescope git_branches<CR>", "Search git [b]ranches")
 
   -- search
   map_normal_mode("<leader>/", require("telescope").extensions.live_grep_args.live_grep_args, "[s]earch [g]rep")
   map_normal_mode('<leader>s"', "<cmd>Telescope registers<cr>", '[s]earch ["]registers')
   map_normal_mode("<leader>sa", "<cmd>Telescope autocommands<cr>", "[s]earch [a]utocommands")
   map_normal_mode("<leader>sb", "<cmd>Telescope buffers<CR>", "[s]earch opened [b]uffers")
-  -- map_normal_mode("<leader>sc", "<cmd>Telescope command_history<cr>", "[s]earch [c]ommand history")
-  map_normal_mode("<leader>sC", "<cmd>Telescope commands<cr>", "[s]earch [C]ommands")
+  map_normal_mode("<leader>sc", "<cmd>Telescope commands<cr>", "[s]earch [c]ommands")
   map_normal_mode("<leader>sd", "<cmd>Telescope diagnostics bufnr=0<cr>", "[s]earch [d]ocument diagnostics")
   map_normal_mode("<leader>sD", "<cmd>Telescope diagnostics<cr>", "[s]earch [D]iagnostics")
   map_normal_mode("<leader>sh", "<cmd>Telescope help_tags<cr>", "[s]earch [h]elp pages")
@@ -287,7 +287,7 @@ function M.setup_lazygit_keymaps()
   --   "LazyGitCurrentFile",
   --   "LazyGitFilter",
   --   "LazyGitFilterCurrentFile",
-  map_normal_mode("<leader>gg", ":LazyGit<CR>", "[g]it [g]ui")
+  map_normal_mode("<leader>gg", ":LazyGit<CR>", "Lazygit")
 end
 
 function M.setup_gitsigns_keymaps(bufnr)
@@ -313,40 +313,52 @@ function M.setup_gitsigns_keymaps(bufnr)
     return "<Ignore>"
   end, { expr = true })
 
-  vim.keymap.set({ "n", "v" }, "<leader>hs", ":Gitsigns stage_hunk<CR>", { buffer = bufnr, silent = true, noremap = true, desc = "[s]tage hunk" })
-  vim.keymap.set({ "n", "v" }, "<leader>hS", ":Gitsigns stage_buffer<CR>", { buffer = bufnr, silent = true, noremap = true, desc = "[S]tage buffer" })
-  vim.keymap.set("n", "<leader>hu", gs.undo_stage_hunk, { buffer = bufnr, silent = true, noremap = true, desc = "[u]ndo stage hunk" })
-  vim.keymap.set("n", "<leader>hr", gs.reset_hunk, { buffer = bufnr, silent = true, noremap = true, desc = "[r]eset hunk" })
-  vim.keymap.set("n", "<leader>hR", gs.reset_buffer, { buffer = bufnr, silent = true, noremap = true, desc = "[R]eset buffer" })
-  vim.keymap.set("n", "<leader>hp", gs.preview_hunk, { buffer = bufnr, silent = true, noremap = true, desc = "[p]review hunk" })
-  vim.keymap.set("n", "<leader>hd", gs.diffthis, { buffer = bufnr, silent = true, noremap = true, desc = "[d]iff this" })
+  vim.keymap.set({ "n", "v" }, "<leader>ghs", ":Gitsigns stage_hunk<CR>", { buffer = bufnr, silent = true, noremap = true, desc = "[s]tage hunk" })
+  vim.keymap.set({ "n", "v" }, "<leader>ghS", ":Gitsigns stage_buffer<CR>", { buffer = bufnr, silent = true, noremap = true, desc = "[S]tage buffer" })
+  vim.keymap.set("n", "<leader>ghu", gs.undo_stage_hunk, { buffer = bufnr, silent = true, noremap = true, desc = "[u]ndo stage hunk" })
+  vim.keymap.set("n", "<leader>ghr", gs.reset_hunk, { buffer = bufnr, silent = true, noremap = true, desc = "[r]eset hunk" })
+  vim.keymap.set("n", "<leader>gbb", gs.blame, { buffer = bufnr, silent = true, noremap = true, desc = "[b]lame on the side" })
 end
 
 function M.setup_neogit_keymaps()
   local neogit = require("neogit")
-  vim.keymap.set("n", "<leader>gs", function()
+  vim.keymap.set("n", "<leader>gn", function()
     neogit.open({ kind = "split" })
-  end, { silent = true, noremap = true, desc = "[g]it [s]tatus" })
-  vim.keymap.set("n", "<leader>gc", ":Neogit commit<CR>", { silent = true, noremap = true, desc = "[g]it [c]ommit" })
+  end, { silent = true, noremap = true, desc = "Neogit" })
   vim.keymap.set("n", "<leader>gp", ":Neogit pull<CR>", { silent = true, noremap = true, desc = "[g]it [p]ull" })
   vim.keymap.set("n", "<leader>gP", ":Neogit push<CR>", { silent = true, noremap = true, desc = "[g]it [P]ush" })
-  vim.keymap.set("n", "<leader>gB", ":Telescope git_branches<CR>", { silent = true, noremap = true, desc = "[g]it [B]ranches" })
+  -- NOTE: see Telescope git_... commands set by setup_telescope_keymaps
 end
 
 function M.setup_git_blame_keymaps()
   return {
     -- toggle needs to be called twice; https://github.com/f-person/git-blame.nvim/issues/16
-    { "<leader>gbb", ":GitBlameToggle<CR>", desc = "Blame line (toggle)", silent = true },
-    { "<leader>gbe", ":GitBlameEnable<CR>", desc = "Blame line (enable)", silent = true },
-    { "<leader>gbd", ":GitBlameDisable<CR>", desc = "Blame line (disable)", silent = true },
+    { "<leader>gbl", ":GitBlameToggle<CR>", desc = "Blame line (toggle)", silent = true },
     { "<leader>gbs", ":GitBlameCopySHA<CR>", desc = "Copy SHA", silent = true },
     { "<leader>gbc", ":GitBlameCopyCommitURL<CR>", desc = "Copy commit URL", silent = true },
     { "<leader>gbf", ":GitBlameCopyFileURL<CR>", desc = "Copy file URL", silent = true },
+    { "<leader>gbo", ":GitBlameOpenFileURL<CR>", desc = "Open file URL", silent = true },
   }
 end
 
-function M.setup_fugitive_keymaps()
-  vim.keymap.set("n", "<leader>gbB", ":G blame", { silent = true, noremap = true, desc = "[g]it [B]lame on the side" })
+function M.setup_diffview_keymaps()
+  return {
+    -- use [c and [c to navigate diffs (vim built in), see :h jumpto-diffs
+    -- use ]x and [x to navigate conflicts
+    { "<leader>gdc", ":DiffviewOpen origin/main...HEAD", desc = "Compare commits" },
+    { "<leader>gdq", ":DiffviewClose<CR>", desc = "Close Diffview tab" },
+    { "<leader>gdh", ":DiffviewFileHistory %<CR>", desc = "File history" },
+    { "<leader>gdH", ":DiffviewFileHistory<CR>", desc = "Repo history" },
+    { "<leader>gdm", ":DiffviewOpen<CR>", desc = "Solve merge conflicts" },
+    { "<leader>gdo", ":DiffviewOpen main", desc = "DiffviewOpen" },
+    { "<leader>gdt", ":DiffviewOpen<CR>", desc = "DiffviewOpen this" },
+    { "<leader>gdp", ":DiffviewOpen origin/main...HEAD --imply-local", desc = "Review current PR" },
+    {
+      "<leader>gdP",
+      ":DiffviewFileHistory --range=origin/main...HEAD --right-only --no-merges --reverse",
+      desc = "Review current PR (per commit)",
+    },
+  }
 end
 
 function M.setup_neotest_keymaps()
@@ -724,8 +736,11 @@ function M.setup_whichkey()
     ["<leader>gd"] = {
       name = "+diffview",
     },
-    ["<leader>h"] = {
+    ["<leader>gh"] = {
       name = "+hunks",
+    },
+    ["<leader>gt"] = {
+      name = "+telescope",
     },
     ["<leader>n"] = {
       name = "+notes",
@@ -787,25 +802,6 @@ function M.setup_yanky_keymaps()
   -- { "=p", "<Plug>(YankyPutAfterFilter)", desc = "Put after applying a filter" },
   -- { "=P", "<Plug>(YankyPutBeforeFilter)", desc = "Put before applying a filter" },
   -- },
-end
-
-function M.setup_diffview_keymaps()
-  return {
-    -- use [c and [c to navigate diffs (vim built in), see :h jumpto-diffs
-    -- use ]x and [x to navigate conflicts
-    { "<leader>gdc", ":DiffviewOpen origin/main...HEAD", desc = "Compare commits" },
-    { "<leader>gdd", ":DiffviewClose<CR>", desc = "Close Diffview tab" },
-    { "<leader>gdh", ":DiffviewFileHistory %<CR>", desc = "File history" },
-    { "<leader>gdH", ":DiffviewFileHistory<CR>", desc = "Repo history" },
-    { "<leader>gdm", ":DiffviewOpen<CR>", desc = "Solve merge conflicts" },
-    { "<leader>gdo", ":DiffviewOpen main", desc = "DiffviewOpen" },
-    { "<leader>gdp", ":DiffviewOpen origin/main...HEAD --imply-local", desc = "Review current PR" },
-    {
-      "<leader>gdP",
-      ":DiffviewFileHistory --range=origin/main...HEAD --right-only --no-merges --reverse",
-      desc = "Review current PR (per commit)",
-    },
-  }
 end
 
 function M.setup_chatgpt_keymaps()
