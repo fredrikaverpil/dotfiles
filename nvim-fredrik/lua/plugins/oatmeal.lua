@@ -9,7 +9,7 @@ return {
     cmd = { "Oatmeal" },
     opts = {
       backend = "ollama",
-      model = "llama3:latest",
+      model = "codegemma:latest",
     },
     keys = require("config.keymaps").setup_oatmeal_keymaps(),
   },
