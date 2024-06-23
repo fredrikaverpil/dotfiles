@@ -1,5 +1,8 @@
 M = {}
 
+-- Alias <C-w> to <leader>w
+vim.api.nvim_set_keymap("n", "<leader>w", "<C-w>", { noremap = false, silent = true })
+
 -- TODO: formatting toggle on <leader>uf
 -- TODO: formatting on <leader>cf
 
@@ -752,6 +755,9 @@ function M.setup_whichkey()
     },
     ["<leader>r"] = {
       name = "+run",
+    },
+    ["<leader>w"] = {
+      name = "+window",
     },
     ["<leader>x"] = {
       name = "+diagnostics/quickfix",
