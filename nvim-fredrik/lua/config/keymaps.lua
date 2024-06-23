@@ -320,21 +320,13 @@ function M.setup_gitsigns_keymaps(bufnr)
   vim.keymap.set("n", "<leader>hR", gs.reset_buffer, { buffer = bufnr, silent = true, noremap = true, desc = "[R]eset buffer" })
   vim.keymap.set("n", "<leader>hp", gs.preview_hunk, { buffer = bufnr, silent = true, noremap = true, desc = "[p]review hunk" })
   vim.keymap.set("n", "<leader>hd", gs.diffthis, { buffer = bufnr, silent = true, noremap = true, desc = "[d]iff this" })
-
-  vim.keymap.set("n", "<leader>hD", function()
-    gs.diffthis("~")
-  end, { buffer = bufnr, silent = true, noremap = true, desc = "[D]iff this ~" })
-
-  vim.keymap.set("n", "<leader>hb", function()
-    gs.blame_line({ full = true })
-  end, { buffer = bufnr, silent = true, noremap = true, desc = "[d]iff this" })
-
-  vim.keymap.set("n", "<leader>hB", gs.toggle_current_line_blame, { buffer = bufnr, silent = true, noremap = true, desc = "Toggle line [B]lame" })
 end
 
 function M.setup_neogit_keymaps()
   local neogit = require("neogit")
-  vim.keymap.set("n", "<leader>gs", neogit.open, { silent = true, noremap = true, desc = "[g]it [s]tatus" })
+  vim.keymap.set("n", "<leader>gs", function()
+    neogit.open({ kind = "split" })
+  end, { silent = true, noremap = true, desc = "[g]it [s]tatus" })
   vim.keymap.set("n", "<leader>gc", ":Neogit commit<CR>", { silent = true, noremap = true, desc = "[g]it [c]ommit" })
   vim.keymap.set("n", "<leader>gp", ":Neogit pull<CR>", { silent = true, noremap = true, desc = "[g]it [p]ull" })
   vim.keymap.set("n", "<leader>gP", ":Neogit push<CR>", { silent = true, noremap = true, desc = "[g]it [P]ush" })
