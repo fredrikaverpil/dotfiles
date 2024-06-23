@@ -49,6 +49,7 @@ vim.opt.smartcase = true
 
 -- text wrap
 vim.opt.wrap = false
+vim.opt.linebreak = true -- Wrap lines at convenient points
 
 -- completion
 vim.opt.completeopt = "menuone,noselect"

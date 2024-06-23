@@ -12,7 +12,7 @@ return {
             require("conform").format({
               bufnr = args.buf,
               timeout_ms = 5000,
-              lsp_fallback = true,
+              lsp_format = "fallback",
             })
           else
           end
