@@ -47,7 +47,7 @@ return {
       end,
       set_light_mode = function()
         set_light()
-        os.execute("tmux source-file ~/.tmux/plugins/tokyonight.nvim/extras/tmux/tokyonight_day.tmux")
+        os.execute("tmux source-file ~/.local/share/fredrik/lazy/nightfox.nvim/extra/dayfox/dayfox.tmux")
         os.execute("cp $DOTFILES/lazygit_config_light.yml $DOTFILES/lazygit_config.yml")
       end,
     },
