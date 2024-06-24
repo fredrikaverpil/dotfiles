@@ -36,8 +36,9 @@ vim.opt.softtabstop = 2
 vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
 
--- column ruler (can be overridden by per-language configs)
-vim.opt.colorcolumn = "80"
+-- NOTE: do not set a global ruler here, as it will show in undesirable places.
+-- Instead, set this in the per-language config files.
+-- vim.opt.colorcolumn = "80"
 
 -- incremental search
 vim.opt.incsearch = true
