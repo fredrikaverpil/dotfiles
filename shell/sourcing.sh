@@ -51,6 +51,10 @@ function zsh_completion() {
 
 	export FPATH=$DOTFILES/work/zsh/site-functions:$FPATH
 
+	# Makefile completion
+	zstyle ':completion:*:*:make:*' tag-order 'targets'
+	zstyle ':completion:*:make:*:targets' call-command true
+
 	autoload -Uz compinit
 	compinit
 }
