@@ -203,15 +203,14 @@ return {
     opts = function(_, opts)
       opts.adapters = opts.adapters or {}
       opts.adapters["neotest-golang"] = {
+        dev_notifications = true,
         go_test_args = {
           "-v",
+          "-count=1",
           "-race",
-          -- "-count=1",
-          "-coverprofile="
-            .. vim.fn.getcwd()
-            .. "/coverage.out",
           "-parallel=1",
           "-p=2",
+          "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
         },
         dap_go_enabled = true,
       }
