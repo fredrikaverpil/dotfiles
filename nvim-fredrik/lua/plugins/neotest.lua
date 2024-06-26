@@ -21,6 +21,22 @@ return {
         end,
       },
     },
+    opts = {
+      -- See all config options with :h neotest.Config
+      discovery = {
+        -- Number of workers to parse files concurrently. 0
+        -- automatically assigns number based on CPU. Set to 1 if experiencing lag.
+        concurrent = 0,
+      },
+      running = {
+        -- Run tests concurrently when an adapter provides multiple commands to run
+        concurrent = false,
+      },
+      summary = {
+        -- Enable/disable animation of icons
+        animated = false,
+      },
+    },
     config = function(_, opts)
       if opts.adapters then
         local adapters = {}
