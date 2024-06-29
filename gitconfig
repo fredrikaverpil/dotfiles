@@ -54,3 +54,8 @@
 # Always keep gitconfig for work at bottom of this file
 [includeIf "gitdir:~/code/work/**/.git"]
 	path = ~/.gitconfig_work
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
