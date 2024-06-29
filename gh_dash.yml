@@ -3,10 +3,14 @@
 prSections:
   - title: Mine
     filters: sort:updated-desc is:pr is:open archived:false user:@me
+  - title: Dependabot
+    filters: is:open -org:einride review-requested:@me author:app/dependabot archived:false
   - title: Created @einride
     filters: is:open author:@me org:einride archived:false
-  - title: Review requests @einride
-    filters: is:open review-requested:@me org:einride archived:false
+  - title: Review requested @einride
+    filters: is:open review-requested:@me -author:app/dependabot org:einride archived:false
+  - title: Dependabot @einride
+    filters: is:open org:einride review-requested:@me author:app/dependabot archived:false
 issuesSections:
   - title: Mine
     filters: sort:updated-desc is:issue is:open archived:false user:@me
