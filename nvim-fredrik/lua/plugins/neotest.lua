@@ -24,6 +24,8 @@ return {
     opts = {
       -- See all config options with :h neotest.Config
       discovery = {
+        -- Drastically improve performance in ginormous projects.
+        enabled = false,
         -- Number of workers to parse files concurrently. 0
         -- automatically assigns number based on CPU. Set to 1 if experiencing lag.
         concurrent = 0,
