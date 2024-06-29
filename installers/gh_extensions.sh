@@ -1,6 +1,7 @@
 #!/bin/bash -ex
 
 # https://github.com/einride/gh-dependabot
+# NOTE: gh dependabot --org einride --team einride/transportation-platform
 gh extension install einride/gh-dependabot
 
 # https://github.com/dlvhdr/gh-dash
