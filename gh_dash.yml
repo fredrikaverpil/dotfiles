@@ -1,21 +1,22 @@
 # https://github.com/dlvhdr/gh-dash#%EF%B8%8F-configuring
 
 prSections:
-  - title: My PRs
-    filters: is:open author:@me org:-einride
-  - title: My PRs (Einride)
-    filters: is:open author:@me org:einride
-  - title: Needs My Review (Einride)
-    filters: is:open review-requested:@me org:einride
+  - title: Mine
+    filters: sort:updated-desc is:pr is:open archived:false user:@me
+  - title: Created @einride
+    filters: is:open author:@me org:einride archived:false
+  - title: Review requests @einride
+    filters: is:open review-requested:@me org:einride archived:false
 issuesSections:
+  - title: Mine
+    filters: sort:updated-desc is:issue is:open archived:false user:@me
   - title: Created
-    filters: is:open author:@me org:-einride
-  - title: Assigned (Einride)
-    filters: is:open assignee:@me org:-einride
-  - title: Created (Einride)
-    filters: is:open author:@me org:einride
-  - title: Assigned (Einride)
-    filters: is:open assignee:@me org:einride
+    filters: sort:updated-desc is:open is:issue archived:false author:fredrikaverpil
+  - title: Assigned
+    filters: sort:updated-desc is:open is:issue archived:false assignee:fredrikaverpil
+  - title: Mentioned
+    filters: sort:updated-desc is:open is:issue archived:false mentions:fredrikaverpil
+  - title: Involved
+    filters: sort:updated-desc is:issue is:open archived:false involves:@me
 defaults:
-  preview:
-  refetchIntervalMinutes: 1 # will refetch all sections every 1 minutes
+  refetchIntervalMinutes: 5
