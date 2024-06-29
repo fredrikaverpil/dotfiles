@@ -97,6 +97,17 @@ for host, config_ in pairs(wezterm.enumerate_ssh_hosts()) do
 end
 config.ssh_domains = ssh_domains
 
+config.audible_bell = "Disabled"
+config.visual_bell = {
+  fade_in_function = "EaseIn",
+  fade_in_duration_ms = 150,
+  fade_out_function = "EaseOut",
+  fade_out_duration_ms = 150,
+}
+config.colors = {
+  visual_bell = "#202020",
+}
+
 -- start straight into WSL
 if is_windows then
   config.default_domain = "WSL:Ubuntu"
