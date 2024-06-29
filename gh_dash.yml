@@ -1,0 +1,21 @@
+# https://github.com/dlvhdr/gh-dash#%EF%B8%8F-configuring
+
+prSections:
+  - title: My PRs
+    filters: is:open author:@me org:-einride
+  - title: My PRs (Einride)
+    filters: is:open author:@me org:einride
+  - title: Needs My Review (Einride)
+    filters: is:open review-requested:@me org:einride
+issuesSections:
+  - title: Created
+    filters: is:open author:@me org:-einride
+  - title: Assigned (Einride)
+    filters: is:open assignee:@me org:-einride
+  - title: Created (Einride)
+    filters: is:open author:@me org:einride
+  - title: Assigned (Einride)
+    filters: is:open assignee:@me org:einride
+defaults:
+  preview:
+  refetchIntervalMinutes: 1 # will refetch all sections every 1 minutes

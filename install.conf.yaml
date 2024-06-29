@@ -1,4 +1,3 @@
----
 - defaults:
     link:
       create: true
@@ -17,6 +16,7 @@
     ~/.gitconfig_work:
     ~/.gitignore_global:
     ~/.gitmessage:
+    ~/.config/gh-dash/config.yml: gh_dash.yml
     ~/Taskfile.yml:
     ~/.tmux.conf:
     ~/.config/sesh/sesh.toml: sesh.toml
@@ -30,7 +30,6 @@
     pkgx.yaml:
       # TODO: https://github.com/pkgxdev/pkgx/issues/890
       path: templates/pkgx.yaml
-
     ~/Library/Application Support/lazygit/config.yml:
       path: lazygit_config.yml
       force: true
@@ -39,7 +38,6 @@
       path: lazygit_config.yml
       force: true
       if: '[ "$(uname -s)" = "Linux" ]'
-
     ~/.config/fredrik/init.lua:
       path: nvim-fredrik/init.lua
       force: true
@@ -49,7 +47,6 @@
     ~/.config/fredrik/lazy-lock.json:
       force: true
       path: nvim-fredrik/lazy-lock.json
-
     ~/Library/Application Support/Code/User/settings.json:
       path: vscode_settings.jsonc
       force: true
@@ -74,13 +71,9 @@
     - description: sync dotbot
       command: git submodule sync --recursive
     - description: add shell sourcing to bash, if not already added
-      command:
-        grep -qxF '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' ~/.bashrc
-        || echo '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' >> ~/.bashrc
+      command: grep -qxF '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' ~/.bashrc || echo '[[ -s ~/.bashrc_user ]] && source ~/.bashrc_user' >> ~/.bashrc
     - description: add shell sourcing to zsh, if not already added
-      command:
-        grep -qxF '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' ~/.zshrc
-        || echo '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' >> ~/.zshrc
+      command: grep -qxF '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' ~/.zshrc || echo '[[ -s ~/.zshrc_user ]] && source ~/.zshrc_user' >> ~/.zshrc
     - description: ssh setup
       command: |
         mkdir -p ~/.ssh && chmod 700 ~/.ssh
