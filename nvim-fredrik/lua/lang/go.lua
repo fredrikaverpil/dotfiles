@@ -9,6 +9,10 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+--- Control whether to enable workspace diagnostics.
+--- This can slow down gopls in ginormous projects.
+local workspace_diagnostics_enabled = true
+
 return {
 
   {
@@ -93,7 +97,7 @@ return {
           },
           {
             "artemave/workspace-diagnostics.nvim",
-            enabled = false,
+            enabled = workspace_diagnostics_enabled,
           },
         },
         opts = function(_, opts)
@@ -144,9 +148,11 @@ return {
           -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
           -- https://github.com/golang/tools/blob/master/gopls/README.md
 
-          -- on_attach = function(client, bufnr)
-          --   require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
-          -- end,
+          on_attach = function(client, bufnr)
+            if workspace_diagnostics_enabled then
+              require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
+            end
+          end,
 
           settings = {
 
@@ -208,8 +214,8 @@ return {
           "-v",
           "-count=1",
           "-race",
+          -- "-p=1",
           "-parallel=1",
-          "-p=1",
           "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
         },
         dap_go_enabled = true,
