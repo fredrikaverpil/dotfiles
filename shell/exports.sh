@@ -95,7 +95,6 @@ add_to_path append "$DOTFILES_BREW_PREFIX/opt/mysql-client/bin"
 add_to_path prepend "$DOTFILES_BREW_PREFIX/opt/gnu-sed/libexec/gnubin"
 
 # NOTE: the last prepend appears first in $PATH, so make sure the order is correct below
-add_to_path prepend "$HOME/.tmux/plugins/t-smart-tmux-session-manager/bin"
 add_to_path prepend "$PYENV_ROOT/bin"     # pyenv
 add_to_path prepend "$HOME/.local/bin"    # user-installed binaries
 add_to_path prepend "$DOTFILES/shell/bin" # personal and custom scripts
