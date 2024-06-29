@@ -8,3 +8,8 @@ gh extension install dlvhdr/gh-dash
 
 # https://docs.github.com/en/copilot/github-copilot-in-the-cli
 gh extension install github/gh-copilot
+
+# https://github.com/meiji163/gh-notify
+gh ext install meiji163/gh-notify
+
+gh ext upgrade --all
