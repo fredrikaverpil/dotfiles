@@ -197,9 +197,9 @@ return {
       {
         "fredrikaverpil/neotest-golang",
         dir = "~/code/public/neotest-golang",
-        branch = "rnd-run-testfolder-populate-statuses",
       },
     },
+
     opts = function(_, opts)
       opts.adapters = opts.adapters or {}
       opts.adapters["neotest-golang"] = {
@@ -209,7 +209,7 @@ return {
           "-count=1",
           "-race",
           "-parallel=1",
-          "-p=2",
+          "-p=1",
           "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
         },
         dap_go_enabled = true,
