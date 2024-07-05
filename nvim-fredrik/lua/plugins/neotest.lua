@@ -38,7 +38,7 @@ return {
       },
       summary = {
         -- Enable/disable animation of icons.
-        animated = false,
+        animated = true,
       },
     },
     config = function(_, opts)
