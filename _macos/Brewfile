@@ -58,6 +58,7 @@ brew 'tmux'
 
 # neovim
 brew 'neovim'
+cask 'neovide'
 brew 'cmake'
 brew 'gcc'
 brew 'make'

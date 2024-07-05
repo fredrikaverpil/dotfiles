@@ -47,6 +47,7 @@
     ~/.config/fredrik/lazy-lock.json:
       force: true
       path: nvim-fredrik/lazy-lock.json
+    ~/.config/neovide/config.toml: neovide.toml
     ~/Library/Application Support/Code/User/settings.json:
       path: vscode_settings.jsonc
       force: true
