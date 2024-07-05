@@ -215,7 +215,7 @@ return {
           "-v",
           -- "-count=1",
           "-race",
-          "-p=1",
+          -- "-p=1",
           "-parallel=1",
           "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
         },
