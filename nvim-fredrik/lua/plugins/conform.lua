@@ -22,12 +22,6 @@ return {
       -- set initial state to auto-format
       vim.g.auto_format = true
 
-      -- Auto-formatting disabled, so that it can instead be handled by the autocmd. To enable, uncomment the below.
-      -- opts.format_on_save = {
-      --   -- These options will be passed to conform.format()
-      --   timeout_ms = 500,
-      --   lsp_fallback = true,
-      -- }
       require("conform").setup(opts)
       require("config.keymaps").setup_conform_keymaps()
     end,
