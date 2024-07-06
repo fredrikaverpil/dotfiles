@@ -36,6 +36,7 @@ return {
       },
       {
         "folke/neoconf.nvim",
+        enabled = false, -- FIXME: look into how to actually use this plugin without blindly just using it
         dependencies = { "nvim-lspconfig" },
         cmd = "Neoconf",
         config = function()
