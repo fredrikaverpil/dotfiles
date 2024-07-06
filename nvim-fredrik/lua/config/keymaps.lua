@@ -274,7 +274,6 @@ function M.setup_telescope_keymaps()
   map_normal_mode("<leader>sM", "<cmd>Telescope man_pages<CR>", "[s]earch [M]an pages")
   map_normal_mode("<leader>sm", "<cmd>Telescope marks<cr>", "[s]earch [m]arks")
   map_normal_mode("<leader>so", "<cmd>Telescope vim_options<cr>", "[s]earch [o]ptions")
-  map_normal_mode("<leader>sR", "<cmd>Telescope resume<cr>", "[s]earch [R]esume")
 end
 
 function M.setup_coderunner_keymaps()
@@ -617,6 +616,19 @@ end
 function M.setup_grug_far_keymaps()
   return {
     { "<leader>sr", ":GrugFar<cr>", desc = "[s]earch and [r]eplace (grug-far)" },
+  }
+end
+
+function M.setup_rip_substitute_keymaps()
+  return {
+    {
+      "<leader>sR",
+      function()
+        require("rip-substitute").sub()
+      end,
+      mode = { "n", "x" },
+      desc = "[s]earch [R]eplace (rip-substitute)",
+    },
   }
 end
 
