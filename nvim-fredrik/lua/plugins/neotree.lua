@@ -8,7 +8,7 @@ return {
     "MunifTanjim/nui.nvim",
   },
   opts = {
-    -- sources = { "filesystem", "buffers", "git_status", "document_symbols" },
+    sources = { "filesystem", "buffers", "git_status", "document_symbols" },
     -- open_files_do_not_replace_types = { "terminal", "Trouble", "trouble", "qf", "Outline" },
     filesystem = {
       bind_to_cwd = false,
@@ -22,6 +22,7 @@ return {
         visible = true, -- when true, they will just be displayed differently than normal items
         hide_dotfiles = false,
         hide_gitignored = true,
+        hide_by_name = { ".git" },
       },
     },
   },
