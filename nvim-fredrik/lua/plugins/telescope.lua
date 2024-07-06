@@ -27,6 +27,7 @@ return {
       { "folke/trouble.nvim" }, -- for trouble.sources.telescope
     },
     opts = function(_, opts)
+      -- https://github.com/nvim-telescope/telescope.nvim/wiki/Configuration-Recipes
       local custom_opts = {
         defaults = {
           file_ignore_patterns = { ".git/", "node_modules", "poetry.lock" },
@@ -46,6 +47,11 @@ return {
               ["<c-t>"] = require("trouble.sources.telescope").open,
               ["<a-t>"] = require("trouble.sources.telescope").open,
             },
+          },
+        },
+        pickers = {
+          find_files = {
+            find_command = { "rg", "--files", "--hidden", "--glob", "!**/.git/*" },
           },
         },
         -- extensions = {
