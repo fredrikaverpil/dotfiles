@@ -1,0 +1,19 @@
+#!/bin/bash
+
+stdsym_install() {
+  if ! command -v go &>/dev/null; then
+    echo "go could not be found, exiting..."
+    return 1
+  fi
+  go install github.com/lotusirous/gostdsym/stdsym@latest
+}
+
+stdsym_check() {
+  if ! stdsym "$@"; then
+    echo "stdsym failed, re-installing..."
+    stdsym_install
+  fi
+}
+
+stdsym_check "$@"
+stdsym -web | fzf --prompt "Symbols> " --preview "go doc \$(echo {} | sed s/#/./g)" --bind "enter:become( echo "https://pkg.go.dev/{}" |xargs open)"

@@ -38,11 +38,6 @@ alias activate='source .venv/bin/activate'
 # assuming pyenv
 alias venv='PIP_REQUIRE_VIRTUALENV=false python3 -m pip install --upgrade --user pip virtualenv && python3 -m virtualenv .venv && source .venv/bin/activate && python3 -m pip install --upgrade pip && which pip && pip list && pip --version && python3 --version'
 
-# Go
-#
-# https://github.com/lotusirous/gostdsym
-alias gd='stdsym -web | fzf --prompt "Symbols> " --preview "go doc \$(echo {} | sed s/#/./g)" --bind "enter:become( echo "https://pkg.go.dev/{}" |xargs open)"'
-
 # Gerrit
 # alias gerrit-push='git push origin HEAD:refs/for/master'
 # alias gerrit-draft='git push origin HEAD:refs/drafts/master'
@@ -56,10 +51,10 @@ alias gd='stdsym -web | fzf --prompt "Symbols> " --preview "go doc \$(echo {} | 
 # Per-platform settings, will override the above commands
 case $(uname) in
 Darwin)
-	# commands for macOS go here
-	;;
+  # commands for macOS go here
+  ;;
 Linux)
-	# commands for Linux go here
-	alias bat='batcat'
-	;;
+  # commands for Linux go here
+  alias bat='batcat'
+  ;;
 esac
