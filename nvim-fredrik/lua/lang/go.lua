@@ -141,6 +141,8 @@ return {
         -- golangci_lint_ls = golangcilint_setup(),
 
         gopls = {
+          -- main readme: https://github.com/golang/tools/blob/master/gopls/doc/features/README.md
+          --
           -- for all options, see:
           -- https://github.com/golang/tools/blob/master/gopls/doc/vim.md
           -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md
