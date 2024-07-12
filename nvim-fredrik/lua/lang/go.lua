@@ -211,8 +211,6 @@ return {
     opts = function(_, opts)
       opts.adapters = opts.adapters or {}
       opts.adapters["neotest-golang"] = {
-        dev_notifications = true,
-        runner = "gotestsum",
         go_test_args = {
           "-v",
           -- "-count=1",
@@ -221,8 +219,13 @@ return {
           "-parallel=1",
           "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
         },
-        gotestsum_args = { "--format=standard-verbose" },
         dap_go_enabled = true,
+
+        -- experimental
+        dev_notifications = true,
+        runner = "gotestsum",
+        gotestsum_args = { "--format=standard-verbose" },
+        -- testify_enabled = true,
       }
     end,
   },
