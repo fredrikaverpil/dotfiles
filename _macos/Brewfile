@@ -72,6 +72,7 @@ brew 'shellcheck'  # mason installs intel version
 brew 'hadolint'  # mason installs intel version
 brew 'rustup-init' # FIX: look att nvim distro installer..
 brew 'pngpaste'  # obsidian
+brew 'wget' # mason
 
 # containers
 brew 'podman'
