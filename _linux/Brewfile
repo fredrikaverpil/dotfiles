@@ -51,7 +51,7 @@ brew 'ripgrep'
 brew 'fd'
 brew 'lazygit'
 brew 'fzf'
-brew 'gnu-sed'  # spectre
+brew 'gnu-sed'  # be linux-compatible
 brew 'pkg-config'  # gh-actions.nvim
 
 # other casks

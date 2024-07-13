@@ -607,12 +607,6 @@ function M.setup_dap_keymaps()
   }
 end
 
-function M.setup_spectre_keymaps()
-  map_normal_mode("<leader>sr", ":lua require('spectre').toggle()<CR>", "[s]earch [r]eplace (spectre)")
-  map_normal_mode("<leader>sf", ':lua require("spectre").open_file_search({select_word=true})<CR>', "[s]earch replace [f]ile (spectre)")
-  -- map_normal_mode("<leader>spw", ":lua require('spectre').open_visual({select_word=true})<CR>", "[s][p]ectre current [w]ord")
-end
-
 function M.setup_grug_far_keymaps()
   return {
     { "<leader>sr", ":GrugFar<cr>", desc = "[s]earch and [r]eplace (grug-far)" },
@@ -739,7 +733,6 @@ function M.setup_whichkey()
     { "<leader>r", group = "run" },
     { "<leader>s", group = "search" },
     { "<leader>sn", group = "noice" },
-    { "<leader>sp", group = "spectre" },
     { "<leader>t", group = "test" },
     { "<leader>u", group = "ui" },
     { "<leader>w", group = "window" },
