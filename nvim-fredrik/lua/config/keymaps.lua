@@ -723,63 +723,38 @@ function M.setup_obsidian_keymaps(obsidian_vars)
 end
 
 function M.setup_whichkey()
+  local wk = require("which-key")
+  wk.add({
+    { "<leader><tab>", group = "tab" },
+    { "<leader>a", group = "ai" },
+    { "<leader>c", group = "code" },
+    { "<leader>d", group = "debug" },
+    { "<leader>f", group = "file" },
+    { "<leader>g", group = "git" },
+    { "<leader>gb", group = "blame" },
+    { "<leader>gd", group = "diffview" },
+    { "<leader>gh", group = "hunks" },
+    { "<leader>gt", group = "telescope" },
+    { "<leader>n", group = "notes" },
+    { "<leader>r", group = "run" },
+    { "<leader>s", group = "search" },
+    { "<leader>sn", group = "noice" },
+    { "<leader>sp", group = "spectre" },
+    { "<leader>t", group = "test" },
+    { "<leader>u", group = "ui" },
+    { "<leader>w", group = "window" },
+    { "<leader>x", group = "diagnostics/quickfix" },
+  })
+end
+
+function M.setup_whichkey_contextual()
   return {
-    ["<leader><tab>"] = {
-      name = "+tab",
-    },
-    ["<leader>a"] = {
-      name = "+ai",
-    },
-    ["<leader>c"] = {
-      name = "+code",
-    },
-    ["<leader>d"] = {
-      name = "+debug",
-    },
-    ["<leader>f"] = {
-      name = "+file",
-    },
-    ["<leader>g"] = {
-      name = "+git",
-    },
-    ["<leader>gb"] = {
-      name = "+blame",
-    },
-    ["<leader>gd"] = {
-      name = "+diffview",
-    },
-    ["<leader>gh"] = {
-      name = "+hunks",
-    },
-    ["<leader>gt"] = {
-      name = "+telescope",
-    },
-    ["<leader>n"] = {
-      name = "+notes",
-    },
-    ["<leader>s"] = {
-      name = "+search",
-    },
-    ["<leader>sn"] = {
-      name = "+noice",
-    },
-    ["<leader>sp"] = {
-      name = "+spectre",
-    },
-    ["<leader>t"] = {
-      name = "+test",
-    },
-    ["<leader>u"] = {
-      name = "+ui",
-    },
-    ["<leader>r"] = {
-      name = "+run",
-    },
-    ["<leader>w"] = {
-      name = "+window",
-    },
-    ["<leader>x"] = {
-      name = "+diagnostics/quickfix",
+    {
+      "<leader>?",
+      function()
+        require("which-key").show({ global = false })
+      end,
+      desc = "Buffer Local Keymaps (which-key)",
     },
   }
 end
