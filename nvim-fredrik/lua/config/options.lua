@@ -93,6 +93,8 @@ M.setup_folding_options = function()
   vim.opt.foldlevelstart = 99
   vim.opt.foldenable = true
 end
+-- restore only some things from the last session
+vim.opt.sessionoptions = "curdir,folds,help,tabpages,winsize,terminal"
 
 if require("utils.version").is_neovim_0_10_0() then
   vim.opt.smoothscroll = true
