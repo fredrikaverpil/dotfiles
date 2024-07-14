@@ -9,3 +9,4 @@ go install mvdan.cc/gofumpt@latest
 go install golang.org/x/tools/cmd/deadcode@latest
 go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 go install github.com/segmentio/golines@latest
+go install gotest.tools/gotestsum@latest
