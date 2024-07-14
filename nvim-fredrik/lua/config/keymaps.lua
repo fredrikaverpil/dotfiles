@@ -286,7 +286,21 @@ function M.setup_lazygit_keymaps()
   --   "LazyGitCurrentFile",
   --   "LazyGitFilter",
   --   "LazyGitFilterCurrentFile",
-  map_normal_mode("<leader>gg", ":LazyGit<CR>", "Lazygit")
+
+  map_normal_mode("<leader>gg", function()
+    -- if keymap <Esc><Esc> is set in terminal mode, remove it.
+    -- this is to enable <Esc> to navigate in LazyGit which otherwise
+    -- is overridden for terminal usage.
+    local terminal_keymaps = vim.api.nvim_get_keymap("t")
+    vim.notify(vim.inspect(terminal_keymaps))
+    for _, keymap in pairs(terminal_keymaps) do
+      if keymap.lhs == "<Esc><Esc>" then
+        vim.api.nvim_del_keymap("t", "<Esc><Esc>")
+      end
+    end
+
+    vim.cmd("LazyGit")
+  end)
 end
 
 function M.setup_gitsigns_keymaps(bufnr)
@@ -643,17 +657,20 @@ function M.setup_terminal_keymaps()
   local ctrl_underscore = "<C-_>"
   local ctrl_alt_slash = "<C-A-/>"
   local ctrl_alt_underscore = "<C-A-_>"
-  local floating_term_cmd = "<cmd>lua require('utils.terminal').toggle_fterm()<CR>"
-  local split_term_cmd = "<cmd>lua require('utils.terminal').toggle_terminal_native()<CR>"
+  local floating_term_cmd = function()
+    vim.api.nvim_set_keymap("t", "<Esc><Esc>", "<C-\\><C-n>", { noremap = true })
+    require("utils.terminal").toggle_fterm()
+  end
+  local split_term_cmd = function()
+    vim.api.nvim_set_keymap("t", "<Esc><Esc>", "<C-\\><C-n>", { noremap = true })
+    require("utils.terminal").toggle_terminal_native()
+  end
   vim.keymap.set({ "n", "i", "t", "v" }, ctrl_alt_slash, split_term_cmd, { desc = "Toggle terminal" })
   vim.keymap.set({ "n", "i", "t", "v" }, ctrl_alt_underscore, split_term_cmd, { desc = "Toggle terminal" })
 
   -- C-A-/ toggles split terminal on/off
   vim.keymap.set({ "n", "i", "t", "v" }, ctrl_slash, floating_term_cmd, { desc = "Toggle native terminal" })
   vim.keymap.set({ "n", "i", "t", "v" }, ctrl_underscore, floating_term_cmd, { desc = "Toggle native terminal" })
-
-  -- Esc goes to NORMAL mode from TERMINAL mode
-  vim.api.nvim_set_keymap("t", "<Esc><Esc>", "<C-\\><C-n>", { noremap = true })
 end
 
 function M.setup_conform_keymaps()
