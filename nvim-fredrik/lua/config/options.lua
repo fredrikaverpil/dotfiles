@@ -87,18 +87,18 @@ vim.opt.clipboard = "unnamedplus"
 -- TODO: pick from https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 vim.opt.listchars = "tab:▸ ,trail:·,nbsp:␣,extends:❯,precedes:❮" -- show symbols for whitespace
 
+-- NOTE: commented out and instead defined in persistence.lua plugin
+-- restore only some things from the last session
+-- vim.opt.sessionoptions = "buffers,curdir,folds,help,tabpages,winsize,terminal"
+
 M.setup_folding_options = function()
   vim.opt.foldcolumn = "0"
   vim.opt.foldlevel = 99
   vim.opt.foldlevelstart = 99
   vim.opt.foldenable = true
 end
--- restore only some things from the last session
-vim.opt.sessionoptions = "curdir,folds,help,tabpages,winsize,terminal"
 
-if require("utils.version").is_neovim_0_10_0() then
-  vim.opt.smoothscroll = true
-end
+vim.opt.smoothscroll = true
 
 if not vim.g.vscode then
   vim.opt.timeoutlen = 300 -- Lower than default (1000) to quickly trigger which-key
