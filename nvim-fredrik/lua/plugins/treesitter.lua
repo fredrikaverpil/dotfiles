@@ -5,6 +5,7 @@ return {
     build = ":TSUpdate",
     opts = {
       auto_install = true,
+      ensure_installed = { "diff" },
       highlight = { enable = true },
       indent = { enable = true },
     },
