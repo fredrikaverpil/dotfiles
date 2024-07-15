@@ -292,7 +292,6 @@ function M.setup_lazygit_keymaps()
     -- this is to enable <Esc> to navigate in LazyGit which otherwise
     -- is overridden for terminal usage.
     local terminal_keymaps = vim.api.nvim_get_keymap("t")
-    vim.notify(vim.inspect(terminal_keymaps))
     for _, keymap in pairs(terminal_keymaps) do
       if keymap.lhs == "<Esc><Esc>" then
         vim.api.nvim_del_keymap("t", "<Esc><Esc>")
