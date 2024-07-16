@@ -73,19 +73,19 @@ return {
 
       -- enable logging
       local log = false
-      if log then
+      if log == true then
         local filepath = require("neotest.logging"):get_filename()
         vim.notify("Erasing Neotest log file: " .. filepath, vim.log.levels.WARN)
         vim.fn.writefile({ "" }, filepath)
-
-        -- Set up Neotest.
-        require("neotest").setup(opts)
 
         -- Enable during Neotest adapter development only.
         local log_level = vim.log.levels.DEBUG
         vim.notify("Logging for Neotest enabled", vim.log.levels.WARN)
         require("neotest.logging"):set_level(log_level)
       end
+
+      -- Set up Neotest.
+      require("neotest").setup(opts)
     end,
     keys = require("config.keymaps").setup_neotest_keymaps(),
   },
