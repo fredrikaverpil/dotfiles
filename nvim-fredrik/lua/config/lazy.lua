@@ -22,11 +22,6 @@ require("lazy").setup({
     { import = "config.lazyrc" },
   },
   checker = { enabled = false }, -- automatically check for plugin updates
-  dev = {
-    path = "~/code/public",
-    patterns = { "neotest-golang" }, -- local development of plugins
-    fallback = false, -- Fallback to git when local plugin doesn't exist
-  },
   performance = {
     rtp = {
       -- disable some rtp plugins
