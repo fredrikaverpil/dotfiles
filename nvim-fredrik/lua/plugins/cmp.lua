@@ -42,6 +42,7 @@ return {
           },
         },
       },
+      { "hrsh7th/cmp-cmdline" },
     },
 
     config = function(_, opts)
@@ -68,6 +69,29 @@ return {
         },
         mapping = cmp.mapping.preset.insert(require("config.keymaps").setup_cmp_keymaps(cmp)),
         sources = cmp.config.sources(sources),
+      })
+
+      -- `/` cmdline setup.
+      cmp.setup.cmdline("/", {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = {
+          { name = "buffer" },
+        },
+      })
+
+      -- `:` cmdline setup.
+      cmp.setup.cmdline(":", {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = cmp.config.sources({
+          { name = "path" },
+        }, {
+          {
+            name = "cmdline",
+            option = {
+              ignore_cmds = { "Man", "!" },
+            },
+          },
+        }),
       })
     end,
   },
