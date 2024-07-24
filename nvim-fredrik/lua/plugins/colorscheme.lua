@@ -33,6 +33,13 @@ return {
     enabled = true,
   },
   {
+    "zenbones-theme/zenbones.nvim",
+    dependencies = {
+      "rktjmp/lush.nvim",
+    },
+    enabled = true,
+  },
+  {
     "f-person/auto-dark-mode.nvim",
     enabled = true,
     lazy = false,
