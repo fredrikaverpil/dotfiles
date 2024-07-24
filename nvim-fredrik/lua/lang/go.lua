@@ -219,7 +219,6 @@ return {
           "-parallel=1",
           "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
         },
-        dap_go_enabled = true,
 
         -- experimental
         dev_notifications = true,
