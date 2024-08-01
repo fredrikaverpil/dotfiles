@@ -199,6 +199,12 @@ return {
   },
 
   {
+    "maxandron/goplements.nvim",
+    ft = "go",
+    opts = {},
+  },
+
+  {
     "nvim-neotest/neotest",
     ft = { "go" },
     dependencies = {
