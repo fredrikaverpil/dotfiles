@@ -13,7 +13,11 @@ return {
         },
       },
     },
-    opts = {},
+    opts = {
+      prefills = {
+        filesFilter = "*.*",
+      },
+    },
     config = function(_, opts)
       require("grug-far").setup(opts)
     end,
