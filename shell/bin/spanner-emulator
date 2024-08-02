@@ -1,0 +1,67 @@
+#!/bin/bash
+
+CONTAINER_NAME="spanner-emulator"
+CONTAINER_IMAGE="gcr.io/cloud-spanner-emulator/emulator"
+INTERNAL_PORT="9010/tcp"
+
+# Check if we're using podman or docker
+if command -v podman &>/dev/null; then
+  CONTAINER_CMD="podman"
+else
+  CONTAINER_CMD="docker"
+fi
+
+get_emulator_host() {
+  local port_mapping
+  port_mapping=$($CONTAINER_CMD port "$CONTAINER_NAME" "$INTERNAL_PORT" 2>/dev/null)
+  if [ -z "$port_mapping" ]; then
+    echo "Failed to get port mapping for $CONTAINER_NAME" >&2
+    return 1
+  fi
+  echo "$port_mapping" | awk -F':' '{print $1 ":" $2}'
+}
+
+start_emulator() {
+  if ! $CONTAINER_CMD ps -f name="$CONTAINER_NAME" | grep -q "$CONTAINER_NAME"; then
+    echo "Starting Spanner emulator..." >&2
+    $CONTAINER_CMD run -d --publish-all --name "$CONTAINER_NAME" "$CONTAINER_IMAGE" >&2
+    if [ $? -ne 0 ]; then
+      echo "Failed to start Spanner emulator" >&2
+      return 1
+    fi
+    # Wait a moment for the container to fully start
+    sleep 2
+  else
+    echo "Spanner emulator is already running" >&2
+  fi
+  get_emulator_host
+}
+
+stop_emulator() {
+  if $CONTAINER_CMD ps -f name="$CONTAINER_NAME" | grep -q "$CONTAINER_NAME"; then
+    echo "Stopping Spanner emulator..." >&2
+    $CONTAINER_CMD stop "$CONTAINER_NAME" >&2
+    $CONTAINER_CMD rm "$CONTAINER_NAME" >&2
+    echo "Spanner emulator stopped and removed" >&2
+    echo "" # Output empty string to clear the environment variable
+  else
+    echo "Spanner emulator is not running" >&2
+    echo "" # Output empty string to clear the environment variable
+  fi
+}
+
+case "$1" in
+start)
+  start_emulator
+  ;;
+stop)
+  stop_emulator
+  ;;
+*)
+  echo "Usage: $0 {start|stop}" >&2
+  echo "Example to start/stop and also set the environment variable:" >&2
+  echo "    export SPANNER_EMULATOR_HOST=\$(spanner-emulator start)" >&2
+  echo "    export SPANNER_EMULATOR_HOST=\$(spanner-emulator stop)" >&2
+  exit 1
+  ;;
+esac
