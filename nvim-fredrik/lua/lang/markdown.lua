@@ -65,4 +65,21 @@ return {
       vim.fn["mkdp#util#install"]()
     end,
   },
+
+  {
+    "MeanderingProgrammer/markdown.nvim",
+    ft = { "markdown" },
+    opts = {
+      code = {
+        sign = false,
+        width = "block",
+        right_pad = 1,
+      },
+      heading = {
+        sign = false,
+        icons = {},
+      },
+    },
+    keys = require("config.keymaps").setup_markdown_keymaps(),
+  },
 }

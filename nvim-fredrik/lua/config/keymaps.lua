@@ -688,6 +688,26 @@ function M.setup_minimap_keymaps()
   }
 end
 
+function M.setup_markdown_keymaps()
+  return {
+    {
+      "<Leader>uM",
+      function()
+        local m = require("render-markdown")
+        local enabled = require("render-markdown.state").enabled
+        if enabled then
+          m.disable()
+          vim.cmd("setlocal conceallevel=0")
+        else
+          m.enable()
+          vim.cmd("setlocal conceallevel=2")
+        end
+      end,
+      desc = "Toggle markdown render",
+    },
+  }
+end
+
 function M.setup_diagnostics_keymaps()
   map_normal_mode("<leader>ud", function()
     vim.diagnostic.enable(not vim.diagnostic.is_enabled())
