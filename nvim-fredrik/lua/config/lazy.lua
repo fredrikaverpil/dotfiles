@@ -13,14 +13,18 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
+
+  -- load and confgure plugins in this order (plugins, languages, project-specific):
   spec = {
     -- import all plugins and their configs
     { import = "plugins" },
     -- import language configs
     { import = "lang" },
-    -- import per-project configs
-    { import = "config.lazyrc" },
+    -- import per-project config
+    -- NOTE: this is built into lazy.nvim; place a .lazy.lua file in the project's
+    -- root directory, containing a lazy spec and it will be merged in.
   },
+
   checker = { enabled = false }, -- automatically check for plugin updates
   performance = {
     rtp = {
