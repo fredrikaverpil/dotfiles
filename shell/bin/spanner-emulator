@@ -60,8 +60,8 @@ stop)
 *)
   echo "Usage: $0 {start|stop}" >&2
   echo "Example to start/stop and also set the environment variable:" >&2
-  echo "    export SPANNER_EMULATOR_HOST=\$(spanner-emulator start)" >&2
-  echo "    export SPANNER_EMULATOR_HOST=\$(spanner-emulator stop)" >&2
+  echo "    export SPANNER_EMULATOR_HOST=\$($0 start)" >&2
+  echo "    export SPANNER_EMULATOR_HOST=\$($0 stop)" >&2
   exit 1
   ;;
 esac
