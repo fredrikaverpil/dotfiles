@@ -30,7 +30,6 @@ return {
       -- https://github.com/nvim-telescope/telescope.nvim/wiki/Configuration-Recipes
       local custom_opts = {
         defaults = {
-          file_ignore_patterns = { ".git/", "node_modules", "poetry.lock" },
           vimgrep_arguments = {
             "rg",
             "--color=never",
@@ -41,11 +40,17 @@ return {
             "--column",
             "--smart-case",
             "--trim",
+            "--glob",
+            "!**/.git/*",
+            "--glob",
+            "!**/node_modules/*",
           },
           mappings = {
+            -- optionally, use tab to select file(s) and ...
             i = {
-              ["<c-t>"] = require("trouble.sources.telescope").open,
+              ["<C-t>"] = require("trouble.sources.telescope").open,
               ["<a-t>"] = require("trouble.sources.telescope").open,
+              ["<a-a>"] = require("trouble.sources.telescope").add,
             },
           },
         },
