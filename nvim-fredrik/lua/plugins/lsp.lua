@@ -69,7 +69,6 @@ return {
 
       -- TODO: explain capabilities, see
       -- https://github.com/nvim-lua/kickstart.nvim/blob/master/init.lua#L526
-      local lspconfig = require("lspconfig")
 
       -- LSP servers and clients are able to communicate to each other what features they support.
       -- By default, Neovim doesn't support everything that is in the LSP Specification.
