@@ -1,10 +1,8 @@
 local function set_dark()
-  vim.api.nvim_set_option_value("background", "dark", {})
   vim.cmd.colorscheme("tokyonight-moon")
 end
 
 local function set_light()
-  vim.api.nvim_set_option_value("background", "light", {})
   vim.cmd.colorscheme("dayfox")
 end
 
