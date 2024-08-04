@@ -52,12 +52,12 @@ return {
       },
       agents = {
         {
-          name = "ChatOllama",
+          name = "Ollama llama3.1",
           chat = true,
           provider = "ollama",
           command = false,
           -- string with model name or table with model name and parameters
-          model = { model = "llama3:8b" },
+          model = { model = "llama3.1:8b" },
           -- system prompt (use this to specify the persona/role of the AI)
           system_prompt = "You are a general AI assistant.\n\n"
             .. "The user provided the additional info about how they would like you to respond:\n\n"
@@ -70,7 +70,7 @@ return {
             .. "- Take a deep breath; You've got this!\n",
         },
         {
-          name = "ChatCodeLlama",
+          name = "Ollama codellama",
           chat = true,
           provider = "ollama",
           command = false,
