@@ -28,12 +28,13 @@ end
 local function generate_content(allowed_filetypes)
   return function()
     local cwd = vim.fn.getcwd()
-    vim.notify("Scanning files in " .. cwd)
     local all_files = get_all_files(cwd, allowed_filetypes)
-    local content = "You are a helpful coding assistant. The following code exists in the project:\n\n"
+    local content = ""
+    if #all_files > 0 then
+      content = "The following code exists in the project:\n\n"
+    end
 
     for _, file_path in ipairs(all_files) do
-      vim.notify(file_path)
       local relative_path = Path:new(file_path):make_relative(cwd)
       local filetype = vim.filetype.match({ filename = file_path }) or "text"
 
@@ -45,45 +46,28 @@ local function generate_content(allowed_filetypes)
       end
     end
 
+    if #all_files > 0 then
+      content = content .. "Please give a brief description of this code in one sentence."
+    end
+
     return content
   end
 end
 
 local custom_prompts = {
   ["Go API developer"] = {
-    allowed_filetypes = { "go", "proto", "sql", "md" },
-    excluded_folders = { ".git" },
+    allowed_filetypes = { "go", "proto", "sql" },
     system_message = "You are a senior software engineer, working with APIs written in Go, gRPC for GCP and always try to adhere to Google AIPs.",
   },
   ["Neotest/Go developer"] = {
-    allowed_filetypes = { "go", "lua", "md" },
-    excluded_folders = { ".git" },
+    allowed_filetypes = { "go", "lua" },
     system_message = "You are a Neotest adapter developer, working on Go and Lua.",
   },
   ["Python Data Scientist"] = {
-    allowed_filetypes = { "py", "ipynb", "md" },
-    excluded_folders = { ".venv", "venv", ".git", "data" },
+    allowed_filetypes = { "py", "ipynb" },
     system_message = "You are a data scientist specializing in Python, machine learning, and data analysis.",
   },
 }
-
-local default_prompts = {}
-for prompt_name, prompt_config in pairs(custom_prompts) do
-  default_prompts[prompt_name] = {
-    strategy = "chat",
-    description = "custom!",
-    opts = {
-      slash_cmd = prompt_name:lower():gsub("%s+", "_"),
-    },
-    prompts = {
-      {
-        role = "system",
-        -- TODO: include system_message
-        content = generate_content(prompt_config.allowed_filetypes),
-      },
-    },
-  }
-end
 
 return {
   {
@@ -97,14 +81,19 @@ return {
         opts = {},
       },
     },
-
-    config = function(_, opts)
+    opts = function(_, opts)
       local ollama_fn = function()
         return require("codecompanion.adapters").use("ollama", {
           schema = {
             model = {
               default = "llama3.1:8b",
               -- default = "codellama:7b",
+            },
+            num_ctx = {
+              default = 16384,
+            },
+            num_predict = {
+              default = -1,
             },
           },
         })
@@ -118,7 +107,31 @@ return {
         return require("codecompanion.adapters").use("openai", { env = { api_key = "cmd:op read op://Personal/OpenAI/tokens/neovim --no-newline" } })
       end
 
-      require("codecompanion").setup({
+      local default_prompts = {}
+      for prompt_name, prompt_config in pairs(custom_prompts) do
+        default_prompts[prompt_name] = {
+          strategy = "chat",
+          description = "custom!",
+          opts = {
+            slash_cmd = prompt_name:lower():gsub("%s+", "_"),
+            default_prompt = true,
+            auto_submit = true,
+          },
+          prompts = {
+            {
+              role = "system",
+              content = prompt_config.system_message,
+            },
+            {
+              role = "${user}",
+              contains_code = true,
+              content = generate_content(prompt_config.allowed_filetypes),
+            },
+          },
+        }
+      end
+
+      local custom_opts = {
         default_prompts = default_prompts,
 
         adapters = {
@@ -141,7 +154,13 @@ return {
             adapter = "ollama",
           },
         },
-      })
+      }
+
+      return vim.tbl_deep_extend("force", opts, custom_opts)
+    end,
+
+    config = function(_, opts)
+      require("codecompanion").setup(opts)
     end,
   },
 }
