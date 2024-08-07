@@ -71,6 +71,9 @@ return {
         opts.adapters = adapters
       end
 
+      -- Set up Neotest.
+      require("neotest").setup(opts)
+
       -- enable logging
       local log = false
       if log == true then
@@ -83,9 +86,6 @@ return {
         vim.notify("Logging for Neotest enabled", vim.log.levels.WARN)
         require("neotest.logging"):set_level(log_level)
       end
-
-      -- Set up Neotest.
-      require("neotest").setup(opts)
     end,
     keys = require("config.keymaps").setup_neotest_keymaps(),
   },
