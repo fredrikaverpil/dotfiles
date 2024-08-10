@@ -21,13 +21,23 @@ alt + shift - f : yabai -m window --toggle float --grid 4:4:1:1:2:2
 alt + shift - z : yabai -m window --toggle zoom-fullscreen
 
 # focus on full-screen wezterm (see dotfiles shell script)
-ctrl - 0 : ~/code/dotfiles/shell/bin/focus-wezterm
+lctrl - 0 : ~/code/dotfiles/shell/bin/focus-wezterm
 
 # change window focus
 alt + shift - down : yabai -m window --focus south
 alt + shift - up : yabai -m window --focus north
 alt + shift - left : yabai -m window --focus west
 alt + shift - right : yabai -m window --focus east
+
+# resize tiled window
+lctrl + shift - left : yabai -m window --resize left:-50:0; \
+                       yabai -m window --resize right:-50:0
+lctrl + shift - down : yabai -m window --resize bottom:0:50; \
+                       yabai -m window --resize top:0:50
+lctrl + shift - up : yabai -m window --resize top:0:-50; \
+                     yabai -m window --resize bottom:0:-50
+lctrl + shift - right : yabai -m window --resize right:50:0; \
+                        yabai -m window --resize left:50:0
 
 # Move window to designated space
 # To enable moving windows between spaces, remove script-addition:
