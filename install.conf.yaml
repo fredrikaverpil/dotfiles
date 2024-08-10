@@ -28,7 +28,6 @@
       if: '[ "$(uname -s)" = "Darwin" ]'
     ~/.wezterm.lua: wezterm.lua
     pkgx.yaml:
-      # TODO: https://github.com/pkgxdev/pkgx/issues/890
       path: templates/pkgx.yaml
     ~/Library/Application Support/lazygit/config.yml:
       path: lazygit_config.yml
