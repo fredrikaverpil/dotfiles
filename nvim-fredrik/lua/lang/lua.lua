@@ -35,16 +35,6 @@ return {
         end,
       },
       {
-        "folke/neoconf.nvim",
-        enabled = false, -- FIXME: look into how to actually use this plugin without blindly just using it
-        dependencies = { "nvim-lspconfig" },
-        cmd = "Neoconf",
-        config = function()
-          local plugin = require("lazy.core.config").spec.plugins["neoconf.nvim"]
-          require("neoconf").setup(require("lazy.core.plugin").values(plugin, "opts", false))
-        end,
-      },
-      {
         "folke/lazydev.nvim",
         ft = "lua", -- only load on lua files
         opts = {
