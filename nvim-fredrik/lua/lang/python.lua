@@ -138,28 +138,30 @@ vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
 
 return {
 
-  {
-    "stevearc/conform.nvim",
-    ft = { "python" },
-    dependencies = {
-      {
-        "williamboman/mason.nvim",
-        opts = function(_, opts)
-          opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "ruff" })
-        end,
-      },
-    },
-    opts = function(_, opts)
-      local formatters = require("conform.formatters")
-      local ruff_path = prefer_bin_from_venv("ruff")
-      opts.formatters_by_ft.python = { "ruff_format" }
-      if ruff_path then
-        formatters.ruff_format.command = ruff_path
-      end
-    end,
-  },
+  -- NOTE: this is commented out as the ruff lsp also applies formatting.
+  -- {
+  --   "stevearc/conform.nvim",
+  --   ft = { "python" },
+  --   dependencies = {
+  --     {
+  --       "williamboman/mason.nvim",
+  --       opts = function(_, opts)
+  --         opts.ensure_installed = opts.ensure_installed or {}
+  --         vim.list_extend(opts.ensure_installed, { "ruff" })
+  --       end,
+  --     },
+  --   },
+  --   opts = function(_, opts)
+  --     local formatters = require("conform.formatters")
+  --     local ruff_path = prefer_bin_from_venv("ruff")
+  --     opts.formatters_by_ft.python = { "ruff_format" }
+  --     if ruff_path then
+  --       formatters.ruff_format.command = ruff_path
+  --     end
+  --   end,
+  -- },
 
+  -- NOTE: the ruff linter is not included here as the ruff lsp applies linting.
   {
     "mfussenegger/nvim-lint",
     ft = { "python" },
@@ -195,21 +197,44 @@ return {
           },
         },
         opts = function(_, opts)
+          local ruff_path = prefer_bin_from_venv("ruff")
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "basedpyright", "ruff_lsp" })
+          vim.list_extend(opts.ensure_installed, { "basedpyright", "ruff" })
         end,
       },
     },
     opts = {
       servers = {
-        basedpyright = {},
-        ruff_lsp = {
+        basedpyright = {
+          -- https://docs.basedpyright.com/#/settings
+          settings = {
+            basedpyright = {
+              disableOrganizeImports = true, -- use ruff lsp for this instead
+              analysis = {
+                -- NOTE: uncomment this to ignore linting. Good for projects where
+                -- basedpyright lights up as a christmas tree.
+                -- ignore = { "*" },
+              },
+            },
+          },
+        },
+        ruff = {
+          -- https://docs.astral.sh/ruff/editors/
           on_attach = function(client, bufnr)
-            if client.name == "ruff_lsp" then
+            if client.name == "ruff" then
               -- Disable hover in favor of Pyright
               client.server_capabilities.hoverProvider = false
             end
           end,
+          init_options = {
+            settings = {
+              configurationPreference = "filesystemFirst",
+              lineLength = 88,
+              lint = {
+                enabled = true, -- NOTE: it does not work to disable this.
+              },
+            },
+          },
         },
       },
     },
