@@ -1,41 +1,13 @@
 return {
+
   {
     "mfussenegger/nvim-dap",
     event = "VeryLazy",
     dependencies = {
       {
-        "rcarriga/nvim-dap-ui",
-        dependencies = {
-          "nvim-neotest/nvim-nio",
-        },
-        opts = {},
-        config = function(_, opts)
-          -- setup dap config by VsCode launch.json file
-          -- require("dap.ext.vscode").load_launchjs()
-          local dap = require("dap")
-          local dapui = require("dapui")
-          dapui.setup(opts)
-          dap.listeners.after.event_initialized["dapui_config"] = function()
-            dapui.open({})
-          end
-          dap.listeners.before.event_terminated["dapui_config"] = function()
-            dapui.close({})
-          end
-          dap.listeners.before.event_exited["dapui_config"] = function()
-            dapui.close({})
-          end
-        end,
-        keys = require("config.keymaps").setup_dap_ui_keymaps(),
-      },
-      {
-        "theHamsta/nvim-dap-virtual-text",
-        opts = {},
-      },
-      {
         "jay-babu/mason-nvim-dap.nvim",
         dependencies = {
           "williamboman/mason.nvim",
-          -- "mfussenegger/nvim-dap",
         },
         cmd = { "DapInstall", "DapUninstall" },
         opts = {
@@ -53,25 +25,6 @@ return {
             -- Update this to ensure that you have the debuggers for the langs you want
           },
         },
-      },
-      {
-        "nvim-lualine/lualine.nvim",
-        opts = function(_, opts)
-          local function dap_status()
-            return "  " .. require("dap").status()
-          end
-
-          opts.dap_status = {
-            lualine_component = {
-              dap_status,
-              cond = function()
-                -- return package.loaded["dap"] and require("dap").status() ~= ""
-                return require("dap").status() ~= ""
-              end,
-              color = require("utils.colors").fgcolor("Debug"),
-            },
-          }
-        end,
       },
     },
     config = function(_, opts)
@@ -96,5 +49,63 @@ return {
       end
     end,
     keys = require("config.keymaps").setup_dap_keymaps(),
+  },
+
+  {
+    "rcarriga/nvim-dap-ui",
+    event = "VeryLazy",
+    dependencies = {
+      "nvim-neotest/nvim-nio",
+      {
+        "theHamsta/nvim-dap-virtual-text",
+        opts = {},
+      },
+      {
+        "mfussenegger/nvim-dap",
+        opts = {},
+      },
+    },
+    opts = {},
+    config = function(_, opts)
+      -- setup dap config by VsCode launch.json file
+      -- require("dap.ext.vscode").load_launchjs()
+      local dap = require("dap")
+      local dapui = require("dapui")
+      dapui.setup(opts)
+      dap.listeners.after.event_initialized["dapui_config"] = function()
+        dapui.open({})
+      end
+      dap.listeners.before.event_terminated["dapui_config"] = function()
+        dapui.close({})
+      end
+      dap.listeners.before.event_exited["dapui_config"] = function()
+        dapui.close({})
+      end
+    end,
+    keys = require("config.keymaps").setup_dap_ui_keymaps(),
+  },
+
+  {
+    "nvim-lualine/lualine.nvim",
+    event = "VeryLazy",
+    dependencies = {
+      "mfussenegger/nvim-dap",
+    },
+    opts = function(_, opts)
+      local function dap_status()
+        return "  " .. require("dap").status()
+      end
+
+      opts.dap_status = {
+        lualine_component = {
+          dap_status,
+          cond = function()
+            -- return package.loaded["dap"] and require("dap").status() ~= ""
+            return require("dap").status() ~= ""
+          end,
+          color = require("utils.colors").fgcolor("Debug"),
+        },
+      }
+    end,
   },
 }
