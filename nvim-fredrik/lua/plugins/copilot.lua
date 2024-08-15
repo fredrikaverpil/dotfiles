@@ -40,7 +40,11 @@ return {
         end,
       },
     },
-    enabled = require("utils.private").enable_copilot(),
+
+    -- TODO: enabled/disable copilot from project switcher
+    enabled = false,
+    -- enabled = require("utils.private").enable_copilot(),
+
     cmd = "Copilot",
     event = "InsertEnter",
     build = ":Copilot auth",
