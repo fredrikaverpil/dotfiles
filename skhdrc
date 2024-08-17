@@ -1,3 +1,5 @@
+# NOTE: this config likely conflicts with aerospace
+
 # start/stop yabai, tiling window manager
 alt + shift - q : yabai --stop-service
 alt + shift - s : yabai --start-service
