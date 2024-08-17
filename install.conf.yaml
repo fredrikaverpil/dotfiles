@@ -20,6 +20,9 @@
     ~/Taskfile.yml:
     ~/.tmux.conf:
     ~/.config/sesh/sesh.toml: sesh.toml
+    ~/.config/aerospace/aerospace.toml:
+      path: aerospace.toml
+      if: '[ "$(uname -s)" = "Darwin" ]'
     ~/.config/yabai/yabairc:
       path: yabairc
       if: '[ "$(uname -s)" = "Darwin" ]'
