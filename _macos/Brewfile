@@ -5,7 +5,7 @@
 cask_args appdir: '/Applications'
 
 # Taps (third-party repositories)
-tap 'koekeishiya/formulae' # yabai
+# tap 'koekeishiya/formulae' # yabai
 tap 'pkgxdev/made'
 tap 'dustinblackman/tap'
 tap 'go-task/tap'
@@ -16,8 +16,9 @@ tap 'nikitabobko/tap'
 # system
 brew 'zsh-autosuggestions'
 brew 'zsh-syntax-highlighting'
-brew 'yabai'
-brew 'skhd'
+cask 'aerospace'  # nikitabobko/tap
+# brew 'yabai'
+# brew 'skhd'
 #cask 'karabiner-elements'  # requires password
 
 # fonts
@@ -109,4 +110,3 @@ cask 'spotify'
 cask 'obsidian'
 cask 'signal'
 cask 'wacom-tablet'
-cask 'aerospace'  # nikitabobko/tap
