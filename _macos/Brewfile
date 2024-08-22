@@ -49,6 +49,7 @@ brew 'yq'
 brew 'zoxide'
 brew 'opentofu'  # terraform
 brew 'dustinblackman/tap/oatmeal'
+brew 'uv'
 
 # slides
 brew 'slides'
