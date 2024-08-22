@@ -112,7 +112,6 @@
   "workbench.colorTheme": "Tokyo Night Storm",
   "workbench.iconTheme": "catppuccin-macchiato",
   "workbench.preferredLightColorTheme": "Serendipity Morning",
-  "workbench.preferredDarkColorTheme": "Serendipity Midnight",
   "workbench.colorCustomizations": {
     "[Serendipity Midnight]": {
       "sideBar.background": "#121421"
@@ -212,7 +211,9 @@
   // Extension: Project Manager
   "projectManager.sortList": "Name",
   "projectManager.git.baseFolders": [
-    "~/code/_work",
+    "~/code/public",
+    "~/code/work/public",
+    "~/code/work/private",
     "\\\\wsl.localhost\\Ubuntu-20.04\\home\\fredrik\\code",
     "~/code"
   ],
@@ -319,6 +320,8 @@
     "yaml": true
   },
 
+  // Enable/disable GitHub copilot for specific directories
+
   // ----------------------------------------
   // Changed recently (appears at bottom)
   // ----------------------------------------
@@ -343,5 +346,6 @@
         "cmd": "golines ${file} -w"
       }
     ]
-  }
+  },
+  "workbench.preferredDarkColorTheme": "Tokyo Night"
 }

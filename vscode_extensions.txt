@@ -19,15 +19,16 @@ codezombiech.gitignore
 continue.continue
 cweijan.vscode-autohotkey-plus
 dbaeumer.vscode-eslint
-eamodio.gitlens
 emeraldwalk.runonsave
 enkia.tokyo-night
 esbenp.prettier-vscode
 foxundermoon.shell-format
+github.copilot
 github.copilot-chat
 github.vscode-github-actions
 github.vscode-pull-request-github
 golang.go
+googlecloudtools.cloudcode
 graphql.vscode-graphql
 graphql.vscode-graphql-execution
 graphql.vscode-graphql-syntax
