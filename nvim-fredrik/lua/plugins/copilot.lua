@@ -1,3 +1,15 @@
+local function enable_copilot()
+  if require("utils.private").enable_ai() then
+    if vim.fn.executable("node") == 1 then
+      return true
+    else
+      vim.notify("Node is not available, but required for Copilot.", vim.log.levels.WARN)
+      return false
+    end
+  end
+  return false
+end
+
 return {
   {
     "zbirenbaum/copilot.lua",
@@ -40,7 +52,7 @@ return {
         end,
       },
     },
-    enabled = require("utils.private").enable_copilot(),
+    enabled = enable_copilot(),
     cmd = "Copilot",
     event = "InsertEnter",
     build = ":Copilot auth",
@@ -74,5 +86,24 @@ return {
       end
     end,
     keys = require("config.keymaps").setup_copilot_keymaps(),
+  },
+
+  {
+    "CopilotC-Nvim/CopilotChat.nvim",
+    event = "VeryLazy",
+    enabled = enable_copilot(),
+    branch = "canary", -- while in development
+    dependencies = {
+      { "zbirenbaum/copilot.lua" },
+      { "nvim-lua/plenary.nvim" },
+    },
+    opts = {
+      debug = false, -- Enable debugging
+    },
+    config = function(_, opts)
+      require("CopilotChat").setup(opts)
+      require("CopilotChat.integrations.cmp").setup()
+    end,
+    keys = require("config.keymaps").setup_copilot_chat_keymaps(),
   },
 }
