@@ -5,7 +5,7 @@ return {
     build = ":TSUpdate",
     opts = {
       auto_install = true,
-      ensure_installed = { "diff", "regex", "markdown_inline" },
+      ensure_installed = { "diff", "regex", "markdown_inline", "http" },
       highlight = { enable = true },
       indent = { enable = true },
     },
