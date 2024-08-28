@@ -2,7 +2,7 @@ return {
 
   {
     "rest-nvim/rest.nvim",
-    enabled = false, -- FIXME: project is archived, causes issues and attempts to install hererocks
+    enabled = true,
     dependencies = {
       {
         "vhyrro/luarocks.nvim",
