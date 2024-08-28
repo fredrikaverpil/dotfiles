@@ -902,23 +902,11 @@ function M.setup_yanky_keymaps()
   -- },
 end
 
+-- ai tooling keymaps
+
 function M.setup_chatgpt_keymaps()
   return {
-    { "<leader>ac", ":ChatGPT<CR>", desc = "ChatGPT" },
-  }
-end
-
-function M.setup_oatmeal_keymaps()
-  return {
-    {
-      "<leader>am",
-      function()
-        local oatmeal = require("oatmeal")
-        oatmeal.start()
-      end,
-      mode = "n",
-      desc = "Start Oatmeal session",
-    },
+    { "<leader>aj", ":ChatGPT<CR>", desc = "ChatGPT (jackmort)" },
   }
 end
 
@@ -931,6 +919,14 @@ end
 function M.setup_copilot_keymaps()
   return {
     { "<leader>ap", ":Copilot panel<CR>", desc = "Copilot panel" },
+  }
+end
+
+function M.setup_codecompanion_keymaps()
+  return {
+    { "<leader>ao", ":CodeCompanionChat ollama<CR>", desc = "Codecompanion: Ollama" },
+    { "<leader>ac", ":CodeCompanionChat anthropic<CR>", desc = "Codecompanion: Claude" },
+    { "<leader>aO", ":CodeCompanionChat openai<CR>", desc = "Codecompanion: OpenAI" },
   }
 end
 
