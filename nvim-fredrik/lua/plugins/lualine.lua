@@ -1,7 +1,9 @@
 return {
   "nvim-lualine/lualine.nvim",
   event = "VeryLazy",
-  dependencies = {},
+  dependencies = {
+    "zbirenbaum/copilot.lua",
+  },
   opts = {
 
     -- see copilot.lua...
