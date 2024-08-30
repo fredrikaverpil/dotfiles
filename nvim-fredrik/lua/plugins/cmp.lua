@@ -48,7 +48,7 @@ return {
       })
 
       -- `/` cmdline setup.
-      cmp.setup.cmdline("/", {
+      cmp.setup.cmdline({ "/", "?" }, {
         mapping = cmp.mapping.preset.cmdline(),
         sources = {
           { name = "buffer" },
