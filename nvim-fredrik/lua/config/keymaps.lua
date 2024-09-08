@@ -112,8 +112,8 @@ function M.setup_trouble_keymaps()
     },
     {
       "<leader>cs",
-      "<cmd>Trouble symbols toggle focus=false<cr>",
-      desc = "Symbols (Trouble)",
+      "<cmd>:Neotree document_symbols<cr>",
+      desc = "Symbols (Neotree)",
     },
     {
       "<leader>cl",
