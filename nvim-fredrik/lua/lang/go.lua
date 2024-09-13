@@ -221,9 +221,9 @@ return {
           "-v",
           -- "-count=1",
           "-race",
-          -- "-p=1",
-          "-parallel=1",
           "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
+          -- "-p=1",
+          -- "-parallel=1",
         },
 
         -- experimental
@@ -265,7 +265,21 @@ return {
       },
       {
         "leoluz/nvim-dap-go",
-        opts = {},
+        opts = {
+          dap_configurations = {
+            {
+              type = "go",
+              name = "Debug opened file's cmd/cli",
+              request = "launch",
+              cwd = "${fileDirname}", -- FIXME:  should work from  repo root
+              program = "./${relativeFileDirname}",
+              args = {},
+            },
+          },
+        },
+        config = function(_, opts)
+          require("dap-go").setup(opts)
+        end,
       },
     },
     opts = {
