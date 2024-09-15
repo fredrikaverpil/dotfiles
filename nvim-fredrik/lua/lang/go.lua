@@ -111,7 +111,7 @@ return {
         end,
       },
     },
-    ft = { "go", "gomod", "gowork", "gotmpl" },
+    ft = { "go", "gomod", "gowork", "gosum", "gotmpl", "gohtmltmpl", "gotexttmpl" },
     opts = function(_, opts)
       local function golangcilint_setup()
         local lspconfig = require("lspconfig")
@@ -202,6 +202,28 @@ return {
     "maxandron/goplements.nvim",
     ft = "go",
     opts = {},
+  },
+
+  {
+    "ray-x/go.nvim",
+    enabled = true,
+    ft = { "go", "gomod" },
+    dependencies = { -- optional packages
+      "ray-x/guihua.lua",
+      "neovim/nvim-lspconfig",
+      "nvim-treesitter/nvim-treesitter",
+    },
+    config = function()
+      require("go").setup({
+        lsp_cfg = false, -- handled with nvim-lspconfig instead
+        lsp_inlay_hints = {
+          enable = false, -- handled with LSP keymap toggle instead
+        },
+        dap_debug = false, -- handled by nvim-dap instead
+        luasnip = true,
+      })
+    end,
+    event = { "CmdlineEnter" },
   },
 
   {
