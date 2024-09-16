@@ -5,6 +5,9 @@ return {
     event = "VeryLazy",
     version = "*",
     opts = {
+      draw = {
+        delay = 0,
+      },
       -- symbol = "▏",
       symbol = "│",
       options = { try_as_border = true },
