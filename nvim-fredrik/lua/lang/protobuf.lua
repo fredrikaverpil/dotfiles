@@ -45,58 +45,34 @@ return {
     opts = function(_, opts)
       opts.linters_by_ft["proto"] = { "buf_lint", "protolint", "api_linter" }
 
+      -- buf config location
+      local buffer_parent_dir = vim.fn.expand("%:p:h")
+      local buf_config_filepath = require("utils.find").find_file_upwards({ "buf.yaml", "buf.yml" }, buffer_parent_dir)
+
       -- custom protolint config file reading
-      -- see: https://github.com/mfussenegger/nvim-lint#custom-linters
-      local protolint_config_file = vim.fn.expand("$DOTFILES/templates/.protolint.yaml")
+      local protolint_config_file = vim.fn.expand("$DOTFILES/templates/.protolint.yaml") -- FIXME: make this into the fallback filepath.
       local protolint_args = { "lint", "--reporter=json", "--config_path=" .. protolint_config_file }
       opts.linters["protolint"] = { args = protolint_args }
 
       -- custom buf_lint config file reading
-      local buf_config_file = require("utils.find").find_file("buf.yaml") -- TODO: change this so a list of files can be passed in.
       local buf_args = require("lint").linters.buf_lint.args -- defaults
-      if buf_config_file then
-        require("utils.defaults").buf_config_path = buf_config_file
+      if buf_config_filepath then
+        require("utils.defaults").buf_config_path = buf_config_filepath
         buf_args = {
           "lint",
           "--error-format",
           "json",
           "--config",
-          buf_config_file,
+          buf_config_filepath,
         }
       end
       opts.linters["buf_lint"] = { args = buf_args }
 
-      --- Find a file upwards in the directory tree and return its path, if found.
-      --- @param filenames table A list of filenames to search for
-      --- @param start_path string
-      --- @return string | nil
-      local function file_upwards(filenames, start_path)
-        local os_path_sep = package.config:sub(1, 1) -- "/" on Unix, "\" on Windows
-
-        -- Ensure start_path is a directory
-        local start_dir = vim.fn.isdirectory(start_path) == 1 and start_path or vim.fn.fnamemodify(start_path, ":h")
-        local home_dir = vim.fn.expand("$HOME")
-
-        while start_dir ~= home_dir do
-          for _, filename in ipairs(filenames) do
-            -- logger.debug("Searching for " .. filename .. " in " .. start_dir)
-
-            local try_path = start_dir .. os_path_sep .. filename
-            if vim.fn.filereadable(try_path) == 1 then
-              -- logger.debug("Found " .. filename .. " at " .. try_path)
-              return try_path
-            end
-          end
-
-          -- Go up one directory
-          start_dir = vim.fn.fnamemodify(start_dir, ":h")
-        end
-
-        return nil
+      --- custom linter for api-linter.
+      local descriptor_filepath = os.tmpname()
+      local cleanup_descriptor = function()
+        os.remove(descriptor_filepath)
       end
-
-      --- Custom api-linter for nvim-lint.
-      local descriptor_filepath = os.tmpname() -- tempt filepath for the descriptor.
       require("lint").linters.api_linter = {
         name = "api_linter",
         cmd = "api-linter",
@@ -107,16 +83,10 @@ return {
 
           -- function to get the --descriptor-set-in argument
           function()
-            -- local buffer_filepath = vim.fn.expand("%:p")
-            local buffer_parent_dir = vim.fn.expand("%:p:h")
-
-            local config_filenames = { "buf.yaml", "buf.yml" }
-            local buf_config_filepath = file_upwards(config_filenames, buffer_parent_dir) -- TODO: replace with find_file.
             if buf_config_filepath == nil then
               error("Buf config file (buf.yaml) not found")
             end
             local buf_config_folderpath = vim.fn.fnamemodify(buf_config_filepath, ":h")
-
             local buf_cmd = { "buf", "build", "-o", descriptor_filepath }
             local buf_cmd_opts = { cwd = buf_config_folderpath }
             local obj = vim.system(buf_cmd, buf_cmd_opts):wait()
@@ -124,15 +94,14 @@ return {
               vim.notify(vim.inspect(obj))
               error("Command failed: " .. buf_cmd)
             end
-
             local descriptor_arg = "--descriptor-set-in=" .. descriptor_filepath
             return descriptor_arg
           end,
 
           -- function to get the --config argument.
           function()
-            local buffer_parent_dir = vim.fn.expand("%:p:h")
             local config_filenames = {
+              -- NOTE: could be regexp but this is likely faster.
               "api-linter.yaml",
               "api-linter.yml",
               "api-lint.yaml",
@@ -142,7 +111,7 @@ return {
               "apilint.yaml",
               "apilint.yml",
             }
-            local apilinter_config_filepath = file_upwards(config_filenames, buffer_parent_dir) -- TODO: replace with find_file.
+            local apilinter_config_filepath = require("utils.find").find_file_upwards(config_filenames, buffer_parent_dir)
             if apilinter_config_filepath == nil then
               error("API linter (api-linter.yaml) config file not found")
             end
@@ -176,7 +145,7 @@ return {
               })
             end
           end
-          os.remove(descriptor_filepath) -- cleanup of temp file.
+          cleanup_descriptor()
           return diagnostics
         end,
       }

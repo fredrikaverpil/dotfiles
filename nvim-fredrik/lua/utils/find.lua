@@ -15,4 +15,33 @@ function M.find_file(filename, excluded_dirs)
   return path
 end
 
+--- Find a file upwards in the directory tree and return its path, if found.
+--- @param filenames table A list of filenames to search for
+--- @param start_path string
+--- @return string | nil
+function M.find_file_upwards(filenames, start_path)
+  local os_path_sep = package.config:sub(1, 1) -- "/" on Unix, "\" on Windows
+
+  -- Ensure start_path is a directory
+  local start_dir = vim.fn.isdirectory(start_path) == 1 and start_path or vim.fn.fnamemodify(start_path, ":h")
+  local home_dir = vim.fn.expand("$HOME")
+
+  while start_dir ~= home_dir do
+    for _, filename in ipairs(filenames) do
+      -- logger.debug("Searching for " .. filename .. " in " .. start_dir)
+
+      local try_path = start_dir .. os_path_sep .. filename
+      if vim.fn.filereadable(try_path) == 1 then
+        -- logger.debug("Found " .. filename .. " at " .. try_path)
+        return try_path
+      end
+    end
+
+    -- Go up one directory
+    start_dir = vim.fn.fnamemodify(start_dir, ":h")
+  end
+
+  return nil
+end
+
 return M
