@@ -40,15 +40,9 @@
       path: lazygit_config.yml
       force: true
       if: '[ "$(uname -s)" = "Linux" ]'
-    ~/.config/fredrik/init.lua:
-      path: nvim-fredrik/init.lua
+    ~/.config/fredrik:
+      path: nvim-fredrik
       force: true
-    ~/.config/fredrik/lua:
-      path: nvim-fredrik/lua
-      force: true
-    ~/.config/fredrik/lazy-lock.json:
-      force: true
-      path: nvim-fredrik/lazy-lock.json
     ~/.config/neovide/config.toml: neovide.toml
     ~/Library/Application Support/Code/User/settings.json:
       path: vscode_settings.jsonc
