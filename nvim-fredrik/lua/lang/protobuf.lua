@@ -13,6 +13,7 @@ return {
 
   {
     "stevearc/conform.nvim",
+    event = "VeryLazy",
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -32,6 +33,7 @@ return {
 
   {
     "mfussenegger/nvim-lint",
+    event = "VeryLazy",
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -43,11 +45,26 @@ return {
     },
     ft = { "proto" },
     opts = function(_, opts)
-      opts.linters_by_ft["proto"] = { "buf_lint", "protolint", "api_linter" }
+      opts.linters_by_ft["proto"] = { "buf_lint", "protolint", "api_linter" } -- TODO: use official api-linter once merged: https://github.com/mfussenegger/nvim-lint/pull/665
 
-      -- buf config location
-      local buffer_parent_dir = vim.fn.expand("%:p:h")
-      local buf_config_filepath = require("utils.find").find_file_upwards({ "buf.yaml", "buf.yml" }, buffer_parent_dir)
+      --- Return the filepath to buf.yaml.
+      local cached_buf_config_filepath = nil
+      local function buf_config_filepath()
+        if cached_buf_config_filepath ~= nil then
+          return cached_buf_config_filepath
+        end
+        local buffer_parent_dir = vim.fn.expand("%:p:h") -- the path to the folder of the opened .proto file.
+        local buf_config_filepaths = vim.fs.find(
+          { "buf.yaml", "buf.yml" },
+          { path = buffer_parent_dir, upward = true, type = "file", limit = 1, stop = vim.fn.expand("$HOME") }
+        )
+        if #buf_config_filepaths == 0 then
+          error("Buf config file not found")
+        end
+        cached_buf_config_filepath = buf_config_filepaths[1]
+        vim.notify("buf config file found: " .. cached_buf_config_filepath)
+        return cached_buf_config_filepath
+      end
 
       -- custom protolint config file reading
       local protolint_config_file = vim.fn.expand("$DOTFILES/templates/.protolint.yaml") -- FIXME: make this into the fallback filepath.
@@ -55,69 +72,48 @@ return {
       opts.linters["protolint"] = { args = protolint_args }
 
       -- custom buf_lint config file reading
-      local buf_args = require("lint").linters.buf_lint.args -- defaults
-      if buf_config_filepath then
-        require("utils.defaults").buf_config_path = buf_config_filepath
-        buf_args = {
-          "lint",
-          "--error-format",
-          "json",
-          "--config",
-          buf_config_filepath,
-        }
-      end
-      opts.linters["buf_lint"] = { args = buf_args }
+      -- local buf_args = require("lint").linters.buf_lint.args -- defaults
+      local buf_lint_args = {
+        "lint",
+        "--error-format",
+        "json",
+        "--config",
+        buf_config_filepath,
+      }
+      opts.linters["buf_lint"] = { args = buf_lint_args }
 
       --- custom linter for api-linter.
       local descriptor_filepath = os.tmpname()
       local cleanup_descriptor = function()
         os.remove(descriptor_filepath)
       end
+      --- Function to set the `--descriptor-set-in` argument.
+      --- This requires the buf CLI, which will first build the descriptor file.
+      local function descriptor_set_in()
+        if vim.fn.executable("buf") == 0 then
+          error("buf CLI not found")
+        end
+        local buf_config_folderpath = vim.fn.fnamemodify(buf_config_filepath(), ":h")
+        local buf_cmd = { "buf", "build", "-o", descriptor_filepath }
+        local buf_cmd_opts = { cwd = buf_config_folderpath }
+        local obj = vim.system(buf_cmd, buf_cmd_opts):wait()
+        if obj.code ~= 0 then
+          error("Command failed: " .. vim.inspect(buf_cmd) .. "\n" .. obj.stderr)
+        end
+        local descriptor_arg = "--descriptor-set-in=" .. descriptor_filepath
+        return descriptor_arg
+      end
       require("lint").linters.api_linter = {
-        name = "api_linter",
+        name = "api_linter", -- NOTE: differentiate from the name of the linter in nvim-lint.
         cmd = "api-linter",
         stdin = false,
         append_fname = true,
         args = {
           "--output-format=json",
-
-          -- function to get the --descriptor-set-in argument
-          function()
-            if buf_config_filepath == nil then
-              error("Buf config file (buf.yaml) not found")
-            end
-            local buf_config_folderpath = vim.fn.fnamemodify(buf_config_filepath, ":h")
-            local buf_cmd = { "buf", "build", "-o", descriptor_filepath }
-            local buf_cmd_opts = { cwd = buf_config_folderpath }
-            local obj = vim.system(buf_cmd, buf_cmd_opts):wait()
-            if obj.code ~= 0 then
-              vim.notify(vim.inspect(obj))
-              error("Command failed: " .. buf_cmd)
-            end
-            local descriptor_arg = "--descriptor-set-in=" .. descriptor_filepath
-            return descriptor_arg
-          end,
-
-          -- function to get the --config argument.
-          function()
-            local config_filenames = {
-              -- NOTE: could be regexp but this is likely faster.
-              "api-linter.yaml",
-              "api-linter.yml",
-              "api-lint.yaml",
-              "api-lint.yml",
-              "apilinter.yaml",
-              "apilinter.yml",
-              "apilint.yaml",
-              "apilint.yml",
-            }
-            local apilinter_config_filepath = require("utils.find").find_file_upwards(config_filenames, buffer_parent_dir)
-            if apilinter_config_filepath == nil then
-              error("API linter (api-linter.yaml) config file not found")
-            end
-
-            return "--config=" .. apilinter_config_filepath
-          end,
+          "--disable-rule=core::0191::java-multiple-files",
+          "--disable-rule=core::0191::java-package",
+          "--disable-rule=core::0191::java-outer-classname",
+          descriptor_set_in,
         },
         stream = "stdout",
         ignore_exitcode = true,
