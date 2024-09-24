@@ -56,7 +56,7 @@ return {
         local buffer_parent_dir = vim.fn.expand("%:p:h") -- the path to the folder of the opened .proto file.
         local buf_config_filepaths = vim.fs.find(
           { "buf.yaml", "buf.yml" },
-          { path = buffer_parent_dir, upward = true, type = "file", limit = 1, stop = vim.fn.expand("$HOME") }
+          { path = buffer_parent_dir, upward = true, type = "file", limit = 1, stop = vim.fs.normalize("~") }
         )
         if #buf_config_filepaths == 0 then
           error("Buf config file not found")
