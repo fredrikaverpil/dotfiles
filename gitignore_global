@@ -14,6 +14,7 @@ Thumbs.db
 
 # Environments
 /pkgx.yaml
+/.pkgx.yaml
 .envrc
 
 # Node
