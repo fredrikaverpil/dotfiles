@@ -390,8 +390,8 @@ function M.setup_gitsigns_keymaps(bufnr)
   end, { expr = true })
 
   -- TODO: might not need two keymaps for this
-  vim.keymap.set({ "n", "v" }, "<leader>gdb", ":Gitsigns change_base main", { buffer = bufnr, silent = true, noremap = true, desc = "change [b]ase" })
-  vim.keymap.set({ "n", "v" }, "<leader>ghb", ":Gitsigns change_base main", { buffer = bufnr, silent = true, noremap = true, desc = "change [b]ase" })
+  vim.keymap.set({ "n", "v" }, "<leader>gdb", ":Gitsigns change_base main", { buffer = bufnr, silent = false, noremap = true, desc = "change [b]ase" })
+  vim.keymap.set({ "n", "v" }, "<leader>ghb", ":Gitsigns change_base main", { buffer = bufnr, silent = false, noremap = true, desc = "change [b]ase" })
 
   vim.keymap.set({ "n", "v" }, "<leader>ghs", ":Gitsigns stage_hunk<CR>", { buffer = bufnr, silent = true, noremap = true, desc = "[s]tage hunk" })
   vim.keymap.set({ "n", "v" }, "<leader>ghS", ":Gitsigns stage_buffer<CR>", { buffer = bufnr, silent = true, noremap = true, desc = "[S]tage buffer" })
