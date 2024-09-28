@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CONTAINER_NAME="spanner-emulator"
-CONTAINER_IMAGE="gcr.io/cloud-spanner-emulator/emulator:1.5.19" # TODO: find the most recent, working version...
+CONTAINER_IMAGE="gcr.io/cloud-spanner-emulator/emulator:1.5.22" # TODO: version 1.5.23 seems to have issues with setting timestamps and can fail tests
 INTERNAL_PORT="9010/tcp"
 
 # Check if we're using podman or docker
