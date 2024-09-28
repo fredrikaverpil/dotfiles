@@ -58,6 +58,13 @@ function zsh_completion() {
   compinit
 }
 
+function bash_completion() {
+  if [ -f "$brew_prefix/share/google-cloud-sdk" ]; then
+    source "$brew_prefix/share/google-cloud-sdk/path.bash.inc"
+    source "$brew_prefix/share/google-cloud-sdk/completion.bash.inc"
+  fi
+}
+
 # ----------------------------
 # globals
 # ----------------------------
@@ -112,13 +119,7 @@ fi
 # ----------------------------
 
 if [[ $shell == "zsh" ]]; then
-
   zsh_completion
-
 elif [[ $shell == "bash" ]]; then
-  if [ -f "$brew_prefix/share/google-cloud-sdk" ]; then
-    source "$brew_prefix/share/google-cloud-sdk/path.bash.inc"
-    source "$brew_prefix/share/google-cloud-sdk/completion.bash.inc"
-  fi
-
+  bash_completion
 fi
