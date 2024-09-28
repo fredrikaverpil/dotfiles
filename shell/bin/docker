@@ -1,9 +1,12 @@
 #!/bin/bash
 
 if command -v podman &>/dev/null; then
-	[ -e /etc/containers/nodocker ] ||
-		echo "Emulate Docker CLI using podman. Create /etc/containers/nodocker to quiet msg." >&2
-	exec podman "$@"
+  [ -e /etc/containers/nodocker ] ||
+    echo "Emulate Docker CLI using podman. Create /etc/containers/nodocker to quiet msg." >&2
+  exec podman "$@"
+elif [[ -f ~/.orbstack/bin/docker ]]; then
+  echo "Emulate Docker CLI using orbstack." >&2
+  exec ~/.orbstack/bin/docker "$@"
 else
-	exec docker "$@"
+  exec docker "$@"
 fi

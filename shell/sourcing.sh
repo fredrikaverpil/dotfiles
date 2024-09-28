@@ -48,6 +48,10 @@ function zsh_completion() {
     source "$brew_prefix/share/google-cloud-sdk/completion.zsh.inc"
   fi
 
+  if [[ -f ~/.orbstack/bin/docker ]]; then
+    source ~/.orbstack/shell/init.zsh 2>/dev/null || :
+  fi
+
   export FPATH=$DOTFILES/work/zsh/site-functions:$FPATH
 
   # Makefile completion
