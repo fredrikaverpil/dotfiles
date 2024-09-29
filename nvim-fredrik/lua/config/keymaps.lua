@@ -171,6 +171,10 @@ function M.setup_lsp_autocmd_keymaps(event)
   -- or a suggestion from your LSP for this to activate.
   map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
 
+  -- Show the available code actions for the word under your cursor
+  map("<leader>cc", vim.lsp.codelens.run, "Run Codelens")
+  -- map("<leader>cC", vim.lsp.codelens.refresh, "Refresh & Display Codelens") -- only needed if not using autocmd
+
   -- Opens a popup that displays documentation about the word under your cursor
   --  See `:help K` for why this keymap
   map("K", vim.lsp.buf.hover, "Hover Documentation")

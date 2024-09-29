@@ -80,20 +80,6 @@ return {
       local capabilities = vim.tbl_deep_extend("force", client_capabilities, completion_capabilities)
 
       local function setup(server)
-        local server_opts = vim.tbl_deep_extend("force", {
-          capabilities = vim.deepcopy(capabilities),
-        }, opts.servers[server] or {})
-
-        -- FIXME: workaround for https://github.com/neovim/neovim/issues/28058
-        for _, v in pairs(server_opts) do
-          if type(v) == "table" and v.workspace then
-            v.workspace.didChangeWatchedFiles = {
-              dynamicRegistration = false,
-              relativePatternSupport = false,
-            }
-          end
-        end
-
         -- Example settings for opts.servers[server]:
         --
         --   cmd = { ... },
@@ -113,6 +99,31 @@ return {
         --       },
         --     },
         --   }
+
+        local server_opts = vim.tbl_deep_extend("force", {
+          capabilities = vim.deepcopy(capabilities),
+        }, opts.servers[server] or {})
+
+        -- FIXME: workaround for https://github.com/neovim/neovim/issues/28058
+        for _, v in pairs(server_opts) do
+          if type(v) == "table" and v.workspace then
+            v.workspace.didChangeWatchedFiles = {
+              dynamicRegistration = false,
+              relativePatternSupport = false,
+            }
+          end
+        end
+
+        server_opts.on_attach = function(client, bufnr)
+          if client.supports_method("textDocument/codeLens") then
+            vim.notify("codelens enabled")
+            vim.lsp.codelens.refresh()
+            vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
+              buffer = bufnr,
+              callback = vim.lsp.codelens.refresh,
+            })
+          end
+        end
 
         require("lspconfig")[server].setup(server_opts)
       end
