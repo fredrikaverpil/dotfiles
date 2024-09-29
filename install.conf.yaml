@@ -32,14 +32,6 @@
     ~/.wezterm.lua: wezterm.lua
     pkgx.yaml:
       path: templates/pkgx.yaml
-    ~/Library/Application Support/lazygit/config.yml:
-      path: lazygit_config.yml
-      force: true
-      if: '[ "$(uname -s)" = "Darwin" ]'
-    ~/.config/lazygit/config.yml:
-      path: lazygit_config.yml
-      force: true
-      if: '[ "$(uname -s)" = "Linux" ]'
     ~/.config/fredrik:
       path: nvim-fredrik
       force: true

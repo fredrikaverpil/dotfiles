@@ -48,12 +48,16 @@ return {
       set_dark_mode = function()
         set_dark()
         os.execute("tmux source-file ~/.tmux/plugins/tokyonight.nvim/extras/tmux/tokyonight_moon.tmux")
-        os.execute("cp $DOTFILES/lazygit_config_dark.yml $DOTFILES/lazygit_config.yml")
+        vim.g.lazygit_use_custom_config_file_path = 1
+        local dark_theme = vim.fs.normalize("$DOTFILES/lazygit_config_dark.yml")
+        vim.g.lazygit_config_file_path = dark_theme
       end,
       set_light_mode = function()
         set_light()
         os.execute("tmux source-file ~/.local/share/fredrik/lazy/nightfox.nvim/extra/dayfox/dayfox.tmux")
-        os.execute("cp $DOTFILES/lazygit_config_light.yml $DOTFILES/lazygit_config.yml")
+        vim.g.lazygit_use_custom_config_file_path = 1
+        local light_theme = vim.fs.normalize("$DOTFILES/lazygit_config_light.yml")
+        vim.g.lazygit_config_file_path = light_theme
       end,
     },
   },
