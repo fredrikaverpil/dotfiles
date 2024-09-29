@@ -36,6 +36,10 @@ return {
         enabled = false, -- TODO: figure out how this status shows without fidget
         opts = {},
       },
+      {
+        "artemave/workspace-diagnostics.nvim",
+        enabled = true, -- evaluating this
+      },
     },
     opts = {
       servers = {
@@ -122,6 +126,11 @@ return {
               buffer = bufnr,
               callback = vim.lsp.codelens.refresh,
             })
+          end
+
+          vim.notify("workspace diagnostics enabled")
+          if workspace_diagnostics_enabled then
+            require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
           end
         end
 
