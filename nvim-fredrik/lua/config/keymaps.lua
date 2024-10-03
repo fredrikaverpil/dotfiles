@@ -928,9 +928,9 @@ end
 
 function M.setup_codecompanion_keymaps()
   return {
-    { "<leader>ao", ":CodeCompanionChat ollama<CR>", desc = "Codecompanion: Ollama" },
     { "<leader>ac", ":CodeCompanionChat anthropic<CR>", desc = "Codecompanion: Claude" },
-    { "<leader>aO", ":CodeCompanionChat openai<CR>", desc = "Codecompanion: OpenAI" },
+    { "<leader>ao", ":CodeCompanionChat openai<CR>", desc = "Codecompanion: OpenAI" },
+    { "<leader>al", ":CodeCompanionChat ollama<CR>", desc = "Codecompanion: Ollama" },
   }
 end
 

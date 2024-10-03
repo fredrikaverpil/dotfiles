@@ -1,6 +1,7 @@
 return {
   {
     "jackMort/ChatGPT.nvim",
+    enabled = false, -- use codecompanion instead.
     dependencies = {
       { "MunifTanjim/nui.nvim" },
       { "nvim-lua/plenary.nvim" },
