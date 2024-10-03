@@ -9,6 +9,27 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+local function get_relative_path(file, cwd)
+  -- Ensure both paths end with `/` for consistency
+  if not cwd:sub(-1) == "/" then
+    cwd = cwd .. "/"
+  end
+
+  -- Find the starting position of the relative path
+  local start, stop = file:find(cwd, 1, true)
+
+  -- If `cwd` is found at the beginning of `file`, slice the path
+  if start == 1 then
+    local relative_path = file:sub(stop + 1)
+    if relative_path:sub(1, 1) == "/" then
+      relative_path = relative_path:sub(2)
+    end
+    return relative_path
+  else
+    return file -- or handle error / return nil if needed
+  end
+end
+
 return {
 
   {
@@ -66,21 +87,38 @@ return {
         return cached_buf_config_filepath
       end
 
+      -- custom buf_lint config file reading
+      -- local buf_args = require("lint").linters.buf_lint.args -- defaults
+      local function buf_lint_cwd()
+        return vim.fn.fnamemodify(buf_config_filepath(), ":h")
+      end
+      local buf_lint_args = {
+        "lint",
+        "--error-format=json",
+        -- NOTE: if setting the cwd to the same directory as the buf.yaml,
+        -- the `--config` argument is not needed.
+        -- function()
+        --   return "--config=" .. buf_config_filepath()
+        -- end,
+        function()
+          -- NOTE: append the relative proto filepath. Only works if the
+          -- cwd is set to the buf.yaml directory.
+          local bufpath = vim.fn.expand("%:p")
+          local bufpath_rel = get_relative_path(bufpath, buf_lint_cwd())
+          vim.notify("buf_lint is using bufpath: " .. bufpath_rel)
+          return bufpath_rel
+        end,
+      }
+      opts.linters["buf_lint"] = {
+        args = buf_lint_args,
+        cwd = buf_lint_cwd,
+        append_fname = false, -- NOTE: must append the relative proto filepath from cwd (of buf.yaml).
+      }
+
       -- custom protolint config file reading
       local protolint_config_file = vim.fn.expand("$DOTFILES/templates/.protolint.yaml") -- FIXME: make this into the fallback filepath.
       local protolint_args = { "lint", "--reporter=json", "--config_path=" .. protolint_config_file }
       opts.linters["protolint"] = { args = protolint_args }
-
-      -- custom buf_lint config file reading
-      -- local buf_args = require("lint").linters.buf_lint.args -- defaults
-      local buf_lint_args = {
-        "lint",
-        "--error-format",
-        "json",
-        "--config",
-        buf_config_filepath,
-      }
-      opts.linters["buf_lint"] = { args = buf_lint_args }
 
       --- custom linter for api-linter.
       local descriptor_filepath = os.tmpname()
@@ -118,7 +156,8 @@ return {
         stream = "stdout",
         ignore_exitcode = true,
         env = nil,
-        parser = function(output)
+        parser = function(output, bufnr, linter_cwd)
+          vim.notify("api-linter is using cwd: " .. linter_cwd)
           if output == "" then
             return {}
           end
