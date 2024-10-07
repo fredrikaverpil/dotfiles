@@ -2,7 +2,12 @@ return {
 
   {
     "rest-nvim/rest.nvim",
-    enabled = true,
+    -- evaluate options as this relies on luarocks (heavy)
+    -- for example:
+    -- https://github.com/lima1909/resty.nvim
+    -- https://github.com/jellydn/hurl.nvim
+    -- https://github.com/mistweaverco/kulala.nvim
+    enabled = false,
     dependencies = {
       {
         "vhyrro/luarocks.nvim",
