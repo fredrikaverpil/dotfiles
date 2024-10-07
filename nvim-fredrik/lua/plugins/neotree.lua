@@ -21,7 +21,7 @@ return {
         visible = true, -- when true, they will just be displayed differently than normal items
         hide_dotfiles = false,
         hide_gitignored = true,
-        hide_by_name = { ".git" },
+        hide_by_name = { ".git", ".DS_Store" },
       },
     },
   },
