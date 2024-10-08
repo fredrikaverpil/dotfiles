@@ -250,47 +250,65 @@ function M.setup_typescript_lsp_keymaps()
   }
 end
 
-function M.setup_cmp_keymaps(cmp)
+-- function M.setup_cmp_keymaps(cmp)
+--   return {
+--     ["<C-u>"] = cmp.mapping.scroll_docs(-4),
+--     ["<C-d>"] = cmp.mapping.scroll_docs(4),
+--     -- ["<C-Space>"] = cmp.mapping.complete(), -- NOTE: already taken on macOS
+--     ["<C-e>"] = cmp.mapping.abort(),
+--     -- ["<CR>"] = cmp.mapping.confirm({ select = true }),
+--
+--     -- If nothing is selected (including preselections) add a newline as usual.
+--     -- If something has explicitly been selected by the user, select it.
+--     ["<Enter>"] = function(fallback)
+--       -- Don't block <CR> if signature help is active
+--       -- https://github.com/hrsh7th/cmp-nvim-lsp-signature-help/issues/13
+--       if not cmp.visible() or not cmp.get_selected_entry() or cmp.get_selected_entry().source.name == "nvim_lsp_signature_help" then
+--         fallback()
+--       else
+--         cmp.confirm({
+--           -- Replace word if completing in the middle of a word
+--           -- https://github.com/hrsh7th/nvim-cmp/issues/664
+--           behavior = cmp.ConfirmBehavior.Replace,
+--           -- Don't select first item on CR if nothing was selected
+--           select = false,
+--         })
+--       end
+--     end,
+--
+--     ["<Tab>"] = cmp.mapping(function(fallback)
+--       if cmp.visible() then
+--         cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+--       else
+--         fallback()
+--       end
+--     end, { "i", "s", "c" }),
+--
+--     ["<S-Tab>"] = cmp.mapping(function(fallback)
+--       if cmp.visible() then
+--         cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
+--       else
+--         fallback()
+--       end
+--     end, { "i", "s", "c" }),
+--   }
+-- end
+
+function M.setup_blink_cmp_keymaps()
   return {
-    ["<C-u>"] = cmp.mapping.scroll_docs(-4),
-    ["<C-d>"] = cmp.mapping.scroll_docs(4),
-    -- ["<C-Space>"] = cmp.mapping.complete(), -- NOTE: already taken on macOS
-    ["<C-e>"] = cmp.mapping.abort(),
-    -- ["<CR>"] = cmp.mapping.confirm({ select = true }),
+    ["<C-e>"] = { "hide", "fallback" },
+    ["<CR>"] = { "accept", "fallback" },
 
-    -- If nothing is selected (including preselections) add a newline as usual.
-    -- If something has explicitly been selected by the user, select it.
-    ["<Enter>"] = function(fallback)
-      -- Don't block <CR> if signature help is active
-      -- https://github.com/hrsh7th/cmp-nvim-lsp-signature-help/issues/13
-      if not cmp.visible() or not cmp.get_selected_entry() or cmp.get_selected_entry().source.name == "nvim_lsp_signature_help" then
-        fallback()
-      else
-        cmp.confirm({
-          -- Replace word if completing in the middle of a word
-          -- https://github.com/hrsh7th/nvim-cmp/issues/664
-          behavior = cmp.ConfirmBehavior.Replace,
-          -- Don't select first item on CR if nothing was selected
-          select = false,
-        })
-      end
-    end,
+    -- ["<Tab>"] = { "snippet_forward", "fallback" },
+    -- ["<S-Tab>"] = { "snippet_backward", "fallback" },
 
-    ["<Tab>"] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
-      else
-        fallback()
-      end
-    end, { "i", "s", "c" }),
+    ["<S-Tab>"] = { "select_prev", "fallback" },
+    ["<Tab>"] = { "select_next", "fallback" },
+    ["<Up>"] = { "select_prev", "fallback" },
+    ["<Down>"] = { "select_next", "fallback" },
 
-    ["<S-Tab>"] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
-      else
-        fallback()
-      end
-    end, { "i", "s", "c" }),
+    ["<C-u>"] = { "scroll_documentation_up", "fallback" },
+    ["<C-d>"] = { "scroll_documentation_down", "fallback" },
   }
 end
 

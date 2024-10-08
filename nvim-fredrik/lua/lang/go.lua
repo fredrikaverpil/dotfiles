@@ -210,6 +210,7 @@ return {
     "hrsh7th/nvim-cmp",
     dependencies = {
       "Snikimonkd/cmp-go-pkgs",
+      enabled = false, -- NOTE: not using nvim-cmp anymore.
     },
     ft = { "go", "gomod" },
     opts = function(_, opts)
