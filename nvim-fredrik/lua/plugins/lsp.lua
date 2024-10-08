@@ -81,6 +81,7 @@ return {
       },
       {
         "hrsh7th/nvim-cmp",
+        enabled = false,
         -- NOTE: this is here because we get the default client capabilities from cmp_nvim_lsp
         -- see cmp.lua for more settings.
       },
@@ -139,7 +140,8 @@ return {
       -- So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local client_capabilities = vim.lsp.protocol.make_client_capabilities()
       -- The nvim-cmp almost supports LSP's capabilities so you should advertise it to LSP servers..
-      local completion_capabilities = require("cmp_nvim_lsp").default_capabilities()
+      -- local completion_capabilities = require("cmp_nvim_lsp").default_capabilities()
+      local completion_capabilities = {} -- cmp disabled
       local capabilities = vim.tbl_deep_extend("force", client_capabilities, completion_capabilities)
 
       local supported_servers = {}

@@ -14,7 +14,10 @@ return {
   {
     "zbirenbaum/copilot.lua",
     dependencies = {
-      { "hrsh7th/nvim-cmp" },
+      {
+        "hrsh7th/nvim-cmp",
+        enabled = false,
+      },
       {
         "nvim-lualine/lualine.nvim",
         event = "VeryLazy",
@@ -102,7 +105,8 @@ return {
     },
     config = function(_, opts)
       require("CopilotChat").setup(opts)
-      require("CopilotChat.integrations.cmp").setup()
+      -- NOTE: cmp is disabled
+      -- require("CopilotChat.integrations.cmp").setup()
     end,
     keys = require("config.keymaps").setup_copilot_chat_keymaps(),
   },
