@@ -27,6 +27,8 @@ G_opts = {}
 local function setup_handler(server)
   local defaults = {}
   defaults.capabilities = vim.deepcopy(G_capabilities)
+  local server_capabilities = require("blink.cmp").get_lsp_capabilities(server.capabilities)
+  defaults.capabilities = vim.tbl_deep_extend("force", defaults.capabilities, server_capabilities)
   defaults.on_attach = function(client, bufnr)
     if client.supports_method("textDocument/codeLens") then
       vim.lsp.codelens.refresh()
@@ -54,7 +56,12 @@ local function setup_handler(server)
     end
   end
 
-  require("lspconfig")[server].setup(server_opts)
+  local lsp = require("lspconfig")[server]
+  if lsp.setup ~= nil then
+    lsp.setup(server_opts)
+  else
+    vim.notify("LSP server setup fn not found: " .. server, vim.log.levels.ERROR)
+  end
 end
 
 return {
@@ -81,8 +88,12 @@ return {
       },
       {
         "hrsh7th/nvim-cmp",
+        enabled = false,
         -- NOTE: this is here because we get the default client capabilities from cmp_nvim_lsp
         -- see cmp.lua for more settings.
+      },
+      {
+        "saghen/blink.cmp",
       },
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
@@ -128,16 +139,18 @@ return {
 
       -- TODO: explain capabilities, see
       -- https://github.com/nvim-lua/kickstart.nvim/blob/master/init.lua#L526
-
+      --
       -- LSP servers and clients are able to communicate to each other what features they support.
       -- By default, Neovim doesn't support everything that is in the LSP Specification.
       -- When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
       -- So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local client_capabilities = vim.lsp.protocol.make_client_capabilities()
-      -- The nvim-cmp almost supports LSP's capabilities so you should advertise it to LSP servers..
-      local completion_capabilities = require("cmp_nvim_lsp").default_capabilities()
-      local capabilities = vim.tbl_deep_extend("force", client_capabilities, completion_capabilities)
 
+      -- set global variables which must be accessible from the `setup_handler` function.
+      G_capabilities = client_capabilities
+      G_opts = opts
+
+      -- Ensure LSP servers are installed with mason-lspconfig.
       local supported_servers = {}
       local have_mason_lspconfig, _ = pcall(require, "mason-lspconfig")
       if have_mason_lspconfig then
@@ -151,11 +164,6 @@ return {
             end
           end
         end
-
-        -- set global variables which must be accessible from the `setup_handler` function.
-        G_capabilities = capabilities
-        G_opts = opts
-
         -- See `:h mason-lspconfig
         require("mason-lspconfig").setup({
           ---@type string[]
@@ -163,17 +171,17 @@ return {
           ---@type table<string, fun(server_name: string)>?
           handlers = { setup_handler },
         })
-      end
 
-      --  NOTE: this is not something I'm using right now, but it's here for reference.
-      -- -- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
-      -- for server, server_opts in pairs(opts.servers) do
-      --   if server_opts.mason == false or not vim.tbl_contains(supported_servers, server) then
-      --     -- e.g. if opts.servers.lua_ls.mason = false or if lua_ls is not supported by mason-lspconfig.
-      --     vim.notify("Manual LSP setup for: " .. server, vim.log.levels.WARN)
-      --     setup_handler(server)
-      --   end
-      -- end
+        --  NOTE: this is not something I'm using right now, but it's here for reference.
+        -- -- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
+        -- for server, server_opts in pairs(opts.servers) do
+        --   if server_opts.mason == false or not vim.tbl_contains(supported_servers, server) then
+        --     -- e.g. if opts.servers.lua_ls.mason = false or if lua_ls is not supported by mason-lspconfig.
+        --     vim.notify("Manual LSP setup for: " .. server, vim.log.levels.WARN)
+        --     setup_handler(server)
+        --   end
+        -- end
+      end
 
       require("config.keymaps").setup_lsp_keymaps()
 
