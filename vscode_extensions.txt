@@ -17,7 +17,6 @@ charliermarsh.ruff
 christian-kohler.path-intellisense
 codezombiech.gitignore
 continue.continue
-cweijan.vscode-autohotkey-plus
 dbaeumer.vscode-eslint
 emeraldwalk.runonsave
 enkia.tokyo-night
@@ -28,7 +27,6 @@ github.copilot-chat
 github.vscode-github-actions
 github.vscode-pull-request-github
 golang.go
-googlecloudtools.cloudcode
 graphql.vscode-graphql
 graphql.vscode-graphql-execution
 graphql.vscode-graphql-syntax
@@ -38,6 +36,7 @@ hbenl.vscode-test-explorer
 humao.rest-client
 jasonnutter.vscode-codeowners
 malmaud.tmux
+mark-wiemer.vscode-autohotkey-plus-plus
 mhutchie.git-graph
 mikestead.dotenv
 mohsen1.prettify-json

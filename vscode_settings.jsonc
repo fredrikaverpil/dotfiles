@@ -330,12 +330,6 @@
   "diffEditor.ignoreTrimWhitespace": false,
   "githubPullRequests.pullBranch": "never",
   "editor.accessibilitySupport": "off",
-  // "terminal.integrated.env.osx": {
-  //   "PATH": "${env:PATH}:$HOME/.local/share/LazyVim/mason/bin"
-  // },
-  "gitlens.statusBar.enabled": false,
-  "gitlens.codeLens.recentChange.enabled": false,
-  "gitlens.codeLens.authors.enabled": false,
   "workbench.startupEditor": "none",
   "git.ignoreRebaseWarning": true,
   "go.testFlags": ["-v"],
@@ -347,5 +341,7 @@
       }
     ]
   },
+  "continue.enableTabAutocomplete": false,
+  "go.toolsManagement.autoUpdate": true,
   "workbench.preferredDarkColorTheme": "Tokyo Night"
 }
