@@ -4,7 +4,6 @@ vim.api.nvim_create_autocmd("FileType", {
     -- set go specific options
     vim.opt_local.tabstop = 2
     vim.opt_local.shiftwidth = 2
-    vim.opt_local.shiftwidth = 2
     vim.opt_local.colorcolumn = "120"
   end,
 })
