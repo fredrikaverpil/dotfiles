@@ -216,6 +216,9 @@ alt-shift-right = ['join-with right', 'mode main']
 if.app-id = "com.github.wez.wezterm"
 run = "move-node-to-workspace T"
 [[on-window-detected]]
+if.app-id = "com.microsoft.VSCode"
+run = "move-node-to-workspace E"
+[[on-window-detected]]
 if.app-id = "company.thebrowser.Browser" # Arc
 run = "move-node-to-workspace B"
 [[on-window-detected]]
