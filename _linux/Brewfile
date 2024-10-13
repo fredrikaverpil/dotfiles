@@ -3,7 +3,6 @@
 
 # Taps (third-party repositories)
 tap 'homebrew/linux-fonts'
-tap 'pkgxdev/made'
 
 # system
 brew 'zsh-autosuggestions'
