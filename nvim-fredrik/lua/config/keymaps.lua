@@ -527,6 +527,16 @@ function M.setup_neotest_keymaps()
       end,
       desc = "Debug nearest test",
     },
+    {
+      "<leader>tD",
+      function()
+        vim.cmd("Neotree close")
+        require("neotest").summary.close()
+        require("neotest").output_panel.close()
+        require("neotest").run.run({ vim.fn.expand("%"), strategy = "dap" })
+      end,
+      desc = "Debug current file",
+    },
 
     -- -- map_normal_mode("<leader>td", ':lua require("neotest").run.run({vim.fn.expand("%"), strategy = "dap"})<CR>', "[t]est [d]ebug Nearest")
     -- map_normal_mode("<leader>td", ':lua require("neotest").run.run({ strategy = "dap" })<CR>', "[t]est [d]ebug Nearest")
