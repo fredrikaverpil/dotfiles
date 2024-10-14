@@ -549,6 +549,7 @@ end
 
 function M.setup_dap_ui_keymaps()
   -- keymaps: https://github.com/mfussenegger/nvim-dap/blob/master/doc/dap.txt#L508
+  -- NOTE: see e.g. :h nvim-dap-ui for help on *dapui.elements.stacks*, where o opens up a stack.
   return {
     {
       "<leader>du",
