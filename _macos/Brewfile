@@ -50,6 +50,7 @@ brew 'zoxide'
 brew 'opentofu'  # terraform
 brew 'dustinblackman/tap/oatmeal'
 brew 'uv'
+# brew 'exercism'
 
 # slides
 brew 'slides'
