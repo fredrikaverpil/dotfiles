@@ -1,8 +1,19 @@
 local wezterm = require("wezterm")
+
 local act = wezterm.action
+
 -- https://wezfurlong.org/wezterm/config/files.html
 local config = wezterm.config_builder()
 local keys = {}
+
+-- NOTE: some help/reminders:
+--
+-- Add logs with wezterm.log_info("hello")
+-- See logs from wezterm: CTRL+SHIFT+L
+--
+-- Update all plugins:
+-- wezterm.plugin.update_all()
+
 local is_windows = os.getenv("OS") == "Windows_NT"
 
 config.check_for_updates = true
@@ -35,7 +46,7 @@ end
 -- do something reasonable when this config is evaluated by the mux
 local function get_appearance()
   if wezterm.gui then
-    return wezterm.gui.get_appearance()
+    return wezterm.gui.get_appearance() -- "Dark" or "Light"
   end
   return "Dark"
 end
@@ -114,12 +125,12 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
 end)
 
 -- workspaces
-local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
-workspace_switcher.zoxide_path = "/opt/homebrew/bin/zoxide"
 wezterm.on("update-right-status", function(window, pane)
   -- TODO: fix color, this is almost unreadable
   window:set_right_status(window:active_workspace())
 end)
+local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
+workspace_switcher.zoxide_path = "/opt/homebrew/bin/zoxide"
 table.insert(keys, { key = "s", mods = "CTRL|SHIFT", action = workspace_switcher.switch_workspace() })
 table.insert(keys, { key = "t", mods = "CTRL|SHIFT", action = act.ShowLauncherArgs({ flags = "FUZZY|WORKSPACES" }) })
 table.insert(keys, { key = "[", mods = "CTRL|SHIFT", action = act.SwitchWorkspaceRelative(1) })
