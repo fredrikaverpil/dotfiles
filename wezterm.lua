@@ -1,13 +1,9 @@
 local wezterm = require("wezterm")
 local act = wezterm.action
-local config = {}
-if wezterm.config_builder then
-  config = wezterm.config_builder()
-end
+-- https://wezfurlong.org/wezterm/config/files.html
+local config = wezterm.config_builder()
 local keys = {}
 local is_windows = os.getenv("OS") == "Windows_NT"
-
--- https://wezfurlong.org/wezterm/config/files.html
 
 config.check_for_updates = true
 config.check_for_updates_interval_seconds = 86400
