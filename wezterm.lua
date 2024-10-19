@@ -71,7 +71,7 @@ config.window_background_opacity = 1.0 -- 0.4
 config.text_background_opacity = 1.0 -- 0.9
 
 -- tab config
-config.hide_tab_bar_if_only_one_tab = true
+config.hide_tab_bar_if_only_one_tab = false
 config.use_fancy_tab_bar = false
 
 local function get_current_working_dir(tab)
