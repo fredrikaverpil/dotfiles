@@ -242,3 +242,6 @@ run = ["layout floating"]
 [[on-window-detected]]
 if.app-id = "md.obsidian"
 run = "move-node-to-workspace O"
+[[on-window-detected]]
+if.app-id = "org.whispersystems.signal-desktop"
+run = "move-node-to-workspace A"
