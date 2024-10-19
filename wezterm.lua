@@ -1,5 +1,7 @@
 local wezterm = require("wezterm")
+local act = wezterm.action
 local config = {}
+local keys = {}
 local is_windows = os.getenv("OS") == "Windows_NT"
 
 -- https://wezfurlong.org/wezterm/config/files.html
@@ -112,6 +114,18 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
   }
 end)
 
+-- workspaces
+local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
+workspace_switcher.zoxide_path = "/opt/homebrew/bin/zoxide"
+wezterm.on("update-right-status", function(window, pane)
+  -- TODO: fix color, this is almost unreadable
+  window:set_right_status(window:active_workspace())
+end)
+table.insert(keys, { key = "s", mods = "CTRL|SHIFT", action = workspace_switcher.switch_workspace() })
+table.insert(keys, { key = "t", mods = "CTRL|SHIFT", action = act.ShowLauncherArgs({ flags = "FUZZY|WORKSPACES" }) })
+table.insert(keys, { key = "[", mods = "CTRL|SHIFT", action = act.SwitchWorkspaceRelative(1) })
+table.insert(keys, { key = "]", mods = "CTRL|SHIFT", action = act.SwitchWorkspaceRelative(-1) })
+
 -- ssh hosts from ~./ssh/config
 local ssh_domains = {}
 for host, config_ in pairs(wezterm.enumerate_ssh_hosts()) do
@@ -152,4 +166,5 @@ if is_windows then
   config.default_domain = "WSL:Ubuntu"
 end
 
+config.keys = keys
 return config
