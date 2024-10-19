@@ -13,8 +13,9 @@ config.check_for_updates_interval_seconds = 86400
 -- https://fonts.google.com/noto/specimen/Noto+Color+Emoji
 local disable_ligatures = { "calt=0", "clig=0", "liga=0" }
 config.font = wezterm.font_with_fallback({
-  { family = "Berkeley Mono" },
-  { family = "JetBrains Mono", harfbuzz_features = disable_ligatures },
+  { family = "Maple Mono" },
+  -- { family = "Berkeley Mono" },
+  -- { family = "JetBrains Mono", harfbuzz_features = disable_ligatures },
   -- { family = "JetBrainsMono Nerd Font", harfbuzz_features = disable_ligatures },
   { family = "Symbols Nerd Font Mono" },
   { family = "Noto Color Emoji" },
