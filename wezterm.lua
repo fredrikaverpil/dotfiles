@@ -124,8 +124,6 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
   }
 end)
 
-config.default_prog = { "vim" }
-
 -- workspaces
 wezterm.on("update-right-status", function(window, pane)
   window:set_right_status(window:active_workspace())
