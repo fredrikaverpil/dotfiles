@@ -126,7 +126,6 @@ end)
 
 -- workspaces
 wezterm.on("update-right-status", function(window, pane)
-  -- TODO: fix color, this is almost unreadable
   window:set_right_status(window:active_workspace())
 end)
 local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
