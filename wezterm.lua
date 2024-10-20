@@ -124,6 +124,8 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
   }
 end)
 
+config.default_prog = { "vim" }
+
 -- workspaces
 wezterm.on("update-right-status", function(window, pane)
   window:set_right_status(window:active_workspace())
@@ -170,8 +172,9 @@ config.colors = {
   visual_bell = "#202020",
 }
 
--- start straight into WSL
+-- https://wezfurlong.org/wezterm/config/lua/config/default_domain.html
 if is_windows then
+  -- start straight into WSL
   config.default_domain = "WSL:Ubuntu"
 end
 
