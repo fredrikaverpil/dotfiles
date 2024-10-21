@@ -11,6 +11,13 @@ vim.api.nvim_create_autocmd("FileType", {
 return {
 
   {
+    "nvim-treesitter/nvim-treesitter",
+    opts = {
+      ensure_installed = { "go", "gomod", "gosum", "gotmpl", "gowork" },
+    },
+  },
+
+  {
     "stevearc/conform.nvim",
     dependencies = {
       {
