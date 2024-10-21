@@ -1,6 +1,7 @@
 local wezterm = require("wezterm")
 
 local act = wezterm.action
+local mux = wezterm.mux
 
 -- https://wezfurlong.org/wezterm/config/files.html
 local config = wezterm.config_builder()
@@ -130,8 +131,19 @@ wezterm.on("update-right-status", function(window, pane)
 end)
 local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
 workspace_switcher.zoxide_path = "/opt/homebrew/bin/zoxide"
+wezterm.on("gui-startup", function(cmd)
+  local dotfiles_path = wezterm.home_dir .. "/.dotfiles"
+  local tab, build_pane, window = mux.spawn_window({
+    workspace = "dotfiles",
+    cwd = dotfiles_path,
+    args = args,
+  })
+  build_pane:send_text("nvim\n")
+  mux.set_active_workspace("dotfiles")
+end)
 table.insert(keys, { key = "s", mods = "CTRL|SHIFT", action = workspace_switcher.switch_workspace() })
 table.insert(keys, { key = "t", mods = "CTRL|SHIFT", action = act.ShowLauncherArgs({ flags = "FUZZY|WORKSPACES" }) })
+table.insert(keys, { key = "d", mods = "CTRL|SHIFT", action = act.SwitchToWorkspace({ name = "dotfiles" }) })
 table.insert(keys, { key = "[", mods = "CTRL|SHIFT", action = act.SwitchWorkspaceRelative(1) })
 table.insert(keys, { key = "]", mods = "CTRL|SHIFT", action = act.SwitchWorkspaceRelative(-1) })
 
