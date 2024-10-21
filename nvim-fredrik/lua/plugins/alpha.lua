@@ -1,5 +1,6 @@
 return {
   "goolord/alpha-nvim",
+  enabled = false,
   dependencies = {
     {
       "echasnovski/mini.indentscope",
