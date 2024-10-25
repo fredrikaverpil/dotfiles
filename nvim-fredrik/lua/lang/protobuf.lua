@@ -66,7 +66,10 @@ return {
     },
     ft = { "proto" },
     opts = function(_, opts)
-      opts.linters_by_ft["proto"] = { "buf_lint", "protolint", "api_linter" } -- TODO: use official api-linter once merged: https://github.com/mfussenegger/nvim-lint/pull/665
+      -- NOTE:
+      -- - buf_lint is executed below in an autocmd, because workaround for lazy-loaded cwd is desired.
+      -- - api_linter is not yet merged into nvim-lint: https://github.com/mfussenegger/nvim-lint/pull/665
+      opts.linters_by_ft["proto"] = { "protolint", "api_linter" }
 
       --- Return the filepath to buf.yaml.
       local cached_buf_config_filepath = nil
@@ -109,11 +112,23 @@ return {
           return bufpath_rel
         end,
       }
-      opts.linters["buf_lint"] = {
-        args = buf_lint_args,
-        cwd = buf_lint_cwd,
-        append_fname = false, -- NOTE: must append the relative proto filepath from cwd (of buf.yaml).
-      }
+
+      -- HACK: cannot pass in cwd as function (for lazy loading). Instead, an autocmd is used.
+      -- opts.linters["buf_lint"] = {
+      --   args = buf_lint_args,
+      --   -- cwd = buf_lint_cwd, -- requires https://github.com/mfussenegger/nvim-lint/pull/674
+      --   append_fname = false,
+      -- }
+      vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost" }, {
+        pattern = { "*.proto" },
+        callback = function()
+          require("lint").try_lint("buf_lint", {
+            args = buf_lint_args,
+            cwd = buf_lint_cwd(),
+            append_fname = false,
+          })
+        end,
+      })
 
       -- custom protolint config file reading
       local protolint_config_file = vim.fn.expand("$DOTFILES/templates/.protolint.yaml") -- FIXME: make this into the fallback filepath.
