@@ -2,6 +2,7 @@ return {
 
   {
     "stevearc/conform.nvim",
+    ft = { "terraform", "tf", "terraform-vars" },
     opts = {
       formatters_by_ft = {
         terraform = { "terraform_fmt" },
@@ -22,6 +23,7 @@ return {
         end,
       },
     },
+    ft = { "terraform", "tf", "terraform-vars" },
     opts = {
       linters_by_ft = {
         terraform = { "terraform_validate", "tflint", "tfsec" },
@@ -46,6 +48,7 @@ return {
         end,
       },
     },
+    ft = { "terraform", "tf", "terraform-vars" },
     opts = {
       servers = {
         terraformls = {},
