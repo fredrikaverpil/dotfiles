@@ -214,15 +214,30 @@ return {
         },
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "bufls" })
+          -- vim.list_extend(opts.ensure_installed, { "bufls" })
         end,
       },
     },
     ft = { "proto" },
-    opts = {
-      servers = {
-        bufls = {},
-      },
-    },
+    opts = function()
+      -- HACK: override bufls with custom config, using the 'buf beta lsp' command.
+      local lspconfig = require("lspconfig")
+      local configs = require("lspconfig.configs")
+
+      configs.bufls = {
+        default_config = {
+          cmd = { "buf", "beta", "lsp" },
+          filetypes = { "proto" },
+          root_dir = lspconfig.util.root_pattern(".git"),
+          name = "bufls",
+        },
+      }
+
+      return {
+        servers = {
+          bufls = {},
+        },
+      }
+    end,
   },
 }
