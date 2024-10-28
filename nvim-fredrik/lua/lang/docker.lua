@@ -32,8 +32,7 @@ return {
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
           vim.list_extend(opts.ensure_installed, {
-            "dockerfile-language-server",
-            -- "docker-compose-language-service",
+            "dockerls",
           })
         end,
       },
@@ -46,9 +45,6 @@ return {
       servers = {
         -- https://github.com/rcjsuen/dockerfile-language-server
         dockerls = {},
-
-        -- TODO: investigate why this client won't attach
-        -- docker_compose_language_service = {},
       },
     },
   },
