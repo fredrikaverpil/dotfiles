@@ -18,6 +18,12 @@
     ~/.gitmessage:
     ~/.config/gh-dash/config.yml: gh_dash.yml
     ~/Taskfile.yml:
+    ~/.config/eza/theme.yml:
+      path: eza_theme.yaml
+      if: '[ "$(uname -s)" = "Linux" ]'
+    ~/Library/Application Support/eza/theme.yml:
+      path: eza_theme.yaml
+      if: '[ "$(uname -s)" = "Darwin" ]'
     ~/.tmux.conf:
     ~/.config/sesh/sesh.toml: sesh.toml
     ~/.config/aerospace/aerospace.toml:
