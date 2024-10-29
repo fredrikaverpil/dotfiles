@@ -9,3 +9,4 @@ lint:
     # The specific linters to remove.
     remove:
       - MAX_LINE_LENGTH
+      - FILE_HAS_COMMENT
