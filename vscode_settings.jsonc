@@ -127,7 +127,7 @@
   },
   "workbench.editor.limit.enabled": true,
   "workbench.editor.limit.perEditorGroup": true,
-  "workbench.editor.limit.value": 2,
+  // "workbench.editor.limit.value": 2,
 
   // Explorer
   "explorer.confirmDragAndDrop": false,
@@ -326,6 +326,9 @@
   // Changed recently (appears at bottom)
   // ----------------------------------------
 
+  // github copilot beta/preview
+  "github.copilot.chat.edits.enabled": true,
+
   "git.suggestSmartCommit": false,
   "diffEditor.ignoreTrimWhitespace": false,
   "githubPullRequests.pullBranch": "never",
@@ -341,7 +344,6 @@
       }
     ]
   },
-  "continue.enableTabAutocomplete": false,
   "go.toolsManagement.autoUpdate": true,
   "workbench.preferredDarkColorTheme": "Tokyo Night"
 }
