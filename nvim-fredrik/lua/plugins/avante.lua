@@ -2,7 +2,7 @@ return {
   {
     "yetone/avante.nvim",
     enabled = require("utils.private").enable_ai(),
-    build = "make", -- This is Optional, only if you want to use tiktoken_core to calculate tokens count
+    -- build = "make", -- This is Optional, only if you want to use tiktoken_core to calculate tokens count
     opts = {
       claude = {
         api_key_name = "cmd:op read op://Personal/Anthropic/tokens/neovim --no-newline",
