@@ -81,6 +81,17 @@ return {
             return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
           end,
         }
+      else
+        vim.notify_once("No .golangci.yml found, enabling all linters")
+        args = {
+          "run",
+          "--enable-all",
+          "--out-format",
+          "json",
+          function()
+            return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
+          end,
+        }
       end
 
       opts.linters_by_ft["go"] = { "golangcilint" }
