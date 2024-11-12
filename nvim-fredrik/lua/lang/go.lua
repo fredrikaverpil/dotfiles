@@ -8,6 +8,38 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+local function golangcilint_args()
+  local args = {}
+  local config_file = require("utils.find").find_file(".golangci.yml")
+  if config_file then
+    vim.notify_once("Found file: " .. config_file, vim.log.levels.INFO)
+    require("utils.defaults").golangcilint_config_path = config_file
+    args = {
+      "run",
+      "--out-format",
+      "json",
+      "--config",
+      config_file,
+      function()
+        return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
+      end,
+    }
+  else
+    vim.notify_once("No .golangci.yml found, enabling all linters")
+    args = {
+      "run",
+      "--enable-all",
+      "--out-format",
+      "json",
+      function()
+        return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
+      end,
+    }
+  end
+
+  return args
+end
+
 return {
 
   {
@@ -54,7 +86,7 @@ return {
 
   {
     "mfussenegger/nvim-lint",
-    enabled = true, -- FIXME: use lsp when possible: https://github.com/nametake/golangci-lint-langserver/issues/33
+    enabled = true, -- FIXME: use lsp for golangci-lint instead when possible?
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -64,38 +96,9 @@ return {
         end,
       },
     },
-    ft = { "go", "gomod", "gowork", "gotmpl" },
     opts = function(_, opts)
-      local args = require("lint").linters.golangcilint.args -- defaults
-      local config_file = require("utils.find").find_file(".golangci.yml")
-      if config_file then
-        vim.notify_once("Found file: " .. config_file, vim.log.levels.INFO)
-        require("utils.defaults").golangcilint_config_path = config_file
-        args = {
-          "run",
-          "--out-format",
-          "json",
-          "--config",
-          config_file,
-          function()
-            return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
-          end,
-        }
-      else
-        vim.notify_once("No .golangci.yml found, enabling all linters")
-        args = {
-          "run",
-          "--enable-all",
-          "--out-format",
-          "json",
-          function()
-            return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
-          end,
-        }
-      end
-
       opts.linters_by_ft["go"] = { "golangcilint" }
-      opts.linters["golangcilint"] = { args = args }
+      opts.linters["golangcilint"] = { args = golangcilint_args() }
     end,
   },
 
@@ -107,47 +110,42 @@ return {
         dependencies = {
           {
             "williamboman/mason.nvim",
+            opts = function(_, opts)
+              opts.ensure_installed = opts.ensure_installed or {}
+              -- FIXME: https://github.com/nametake/golangci-lint-langserver/issues/33
+              -- vim.list_extend(opts.ensure_installed, { "golangci-lint", "golangci-lint-langserver" })
+            end,
           },
         },
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
           vim.list_extend(opts.ensure_installed, {
             "gopls",
-
-            -- FIXME: https://github.com/nametake/golangci-lint-langserver/issues/33
-            -- "golangci_lint_ls"
+            -- "golangci_lint_ls", -- FIXME: https://github.com/nametake/golangci-lint-langserver/issues/33
           })
         end,
       },
     },
     ft = { "go", "gomod", "gowork", "gosum", "gotmpl", "gohtmltmpl", "gotexttmpl" },
     opts = function(_, opts)
-      local function golangcilint_setup()
-        local lspconfig = require("lspconfig")
-        local golangcilint_command = { "golangci-lint", "run", "--enable-all", "--out-format", "json", "--issues-exit-code=1" }
-        local config_file = require("utils.find").find_file(".golangci.yml")
-        if config_file then
-          vim.notify_once("Found file: " .. config_file, vim.log.levels.INFO)
-          golangcilint_command = { "golangci-lint", "run", "--out-format", "json", "--config", config_file, "--issues-exit-code=1" }
-        end
-
-        return {
-          golangci_lint_ls = {
-            -- https://github.com/nametake/golangci-lint-langserver
-            cmd = { "golangci-lint-langserver" },
-            filetypes = { "go", "gomod" },
-            root_dir = lspconfig.util.root_pattern("go.mod"),
-            init_options = {
-              command = golangcilint_command,
-            },
-          },
-        }
+      local function golangcilint_cmd()
+        return table.insert(golangcilint_args(), 0, "golangci-lint")
       end
 
       opts.servers = {
 
         -- FIXME: https://github.com/nametake/golangci-lint-langserver/issues/33
-        -- golangci_lint_ls = golangcilint_setup(),
+        -- golangci_lint_ls = {
+        --   -- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/golangci_lint_ls.lua
+        --   -- https://github.com/nametake/golangci-lint-langserver
+        --   cmd = { "golangci-lint-langserver" },
+        --   filetypes = { "go", "gomod" },
+        --   init_options = {
+        --     command = function()
+        --       return golangcilint_cmd()
+        --     end,
+        --   },
+        -- },
 
         gopls = {
           -- main readme: https://github.com/golang/tools/blob/master/gopls/doc/features/README.md
@@ -163,107 +161,19 @@ return {
 
             -- NOTE: this is not an explicit list. The gopls defaults will apply if not overridden here.
             gopls = {
-              analyses = {
-                -- https://github.com/golang/tools/blob/master/gopls/internal/settings/analysis.go
-                -- https://github.com/golang/tools/blob/master/gopls/doc/analyzers.md
-
-                -- the traditional vet suite
-                appends = true,
-                asmdecl = true,
-                assign = true,
-                atomic = true,
-                bools = true,
-                buildtag = true,
-                cgocall = true,
-                composite = true,
-                copylock = true,
-                defers = true,
-                deprecated = true,
-                directive = true,
-                errorsas = true,
-                framepointer = true,
-                httpresponse = true,
-                ifaceassert = true,
-                loopclosure = true,
-                lostcancel = true,
-                nilfunc = true,
-                printf = true,
-                shift = true,
-                sigchanyzer = true,
-                slog = true,
-                stdmethods = true,
-                stdversion = true,
-                stringintconv = true,
-                structtag = true,
-                testinggoroutine = true,
-                tests = true,
-                timeformat = true,
-                unmarshal = true,
-                unreachable = true,
-                unsafeptr = true,
-                unusedresult = true,
-
-                -- not suitable for vet:
-                -- - some (nilness) use go/ssa; see #59714.
-                -- - others don't meet the "frequency" criterion;
-                --   see GOROOT/src/cmd/vet/README.
-                atomicalign = true,
-                deepequalerrors = true,
-                nilness = true,
-                sortslice = true,
-                embeddirective = true,
-
-                -- disabled due to high false positives
-                shadow = false,
-                useany = false,
-                -- fieldalignment = false, -- annoying and also  NOTE: deprecated in gopls v0.17.0
-
-                -- "simplifiers": analyzers that offer mere style fixes
-                -- gofmt -s suite:
-                simplifycompositelit = true,
-                simplifyrange = true,
-                simplifyslice = true,
-                -- other simplifiers:
-                infertypeargs = true,
-                unusedparams = true,
-                unusedwrite = true,
-
-                -- type-error analyzers
-                -- These analyzers enrich go/types errors with suggested fixes.
-                fillreturns = true,
-                nonewvars = true,
-                noresultvalues = true,
-                stubmethods = true,
-                undeclaredname = true,
-                unusedvariable = true,
-              },
-              codelenses = {
-                -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-                gc_details = false,
-                generate = true,
-                regenerate_cgo = true,
-                run_govulncheck = true,
-                test = true,
-                tidy = true,
-                upgrade_dependency = true,
-                vendor = true,
-              },
-              hints = {
-                -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-                assignVariableTypes = true,
-                compositeLiteralFields = true,
-                compositeLiteralTypes = true,
-                constantValues = true,
-                functionTypeParameters = true,
-                parameterNames = true,
-                rangeVariableTypes = true,
-              },
+              -- analyses = {
+              --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/analysis.go
+              --   -- https://github.com/golang/tools/blob/master/gopls/doc/analyzers.md
+              -- },
+              -- codelenses = {
+              --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+              -- },
+              -- hints = {
+              --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+              -- },
               -- completion options
               -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-              usePlaceholders = true,
-              completeUnimported = true,
-              experimentalPostfixCompletions = true,
-              completeFunctionCalls = true,
+
               -- build options
               -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
               directoryFilters = { "-**/node_modules", "-**/.git", "-.vscode", "-.idea", "-.vscode-test" },
@@ -305,7 +215,7 @@ return {
 
   {
     "ray-x/go.nvim",
-    enabled = true,
+    enabled = false,
     ft = { "go", "gomod" },
     dependencies = { -- optional packages
       "ray-x/guihua.lua",
@@ -351,7 +261,6 @@ return {
         dev_notifications = true,
         runner = "gotestsum",
         gotestsum_args = { "--format=standard-verbose" },
-        -- testify_enabled = true,
       }
     end,
   },
