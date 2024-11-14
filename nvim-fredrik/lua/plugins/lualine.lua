@@ -1,3 +1,9 @@
+local function folder()
+  local cwd = vim.fn.getcwd()
+  local foldername = cwd:match("([^/]+)$")
+  return foldername
+end
+
 return {
   "nvim-lualine/lualine.nvim",
   event = "VeryLazy",
@@ -23,15 +29,30 @@ return {
 
     options = {
       theme = "auto",
+      component_separators = { left = "", right = "" },
+      section_separators = { left = "", right = "" },
     },
     sections = {
       lualine_a = { "mode" },
-      lualine_b = { "branch", "diagnostics" },
-      lualine_c = {
+      lualine_b = {
         {
-          "filename",
-          path = 1,
+          "branch",
+          fmt = function(str)
+            local slash_index = str:find("/")
+            if slash_index then
+              return str:sub(1, slash_index) .. "..."
+            elseif #str > 12 then
+              return str:sub(1, 9) .. "..."
+            else
+              return str
+            end
+          end,
         },
+        "diagnostics",
+      },
+      lualine_c = {
+        { folder, color = { gui = "bold" }, separator = "/", padding = { left = 1, right = 0 } },
+        { "filename", path = 1, padding = { left = 0, right = 1 } },
       },
       lualine_x = { "encoding", "filetype" },
       lualine_y = { "progress" },
