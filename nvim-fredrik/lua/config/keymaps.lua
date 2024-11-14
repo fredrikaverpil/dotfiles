@@ -19,12 +19,24 @@ vim.keymap.set("n", "<C-Left>", ":vertical resize -2<CR>", { desc = "Decrease wi
 vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", { desc = "Increase window width", silent = true })
 
 -- Move Lines
-vim.keymap.set("n", "<A-j>", "<cmd>m .+1<cr>==", { desc = "Move down", silent = true })
-vim.keymap.set("n", "<A-k>", "<cmd>m .-2<cr>==", { desc = "Move up", silent = true })
-vim.keymap.set("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move down", silent = true })
-vim.keymap.set("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up", silent = true })
-vim.keymap.set("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move down", silent = true })
-vim.keymap.set("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move up", silent = true })
+local is_mac = vim.fn.has("macunix") == 1
+local down_keys = is_mac and { "∆", "<M-j>", "<A-j>" } or { "<M-j>" }
+local up_keys = is_mac and { "˚", "<M-k>", "<A-k>" } or { "<M-k>" }
+-- Helper function to set multiple mappings for the same action
+local function map_multiple(mode, keys, command, opts)
+  for _, key in ipairs(keys) do
+    vim.keymap.set(mode, key, command, opts)
+  end
+end
+-- Normal mode
+map_multiple("n", down_keys, ":m .+1<CR>==", { desc = "Move line down" })
+map_multiple("n", up_keys, ":m .-2<CR>==", { desc = "Move line up" })
+-- Insert mode
+map_multiple("i", down_keys, "<Esc>:m .+1<CR>==gi", { desc = "Move line down" })
+map_multiple("i", up_keys, "<Esc>:m .-2<CR>==gi", { desc = "Move line up" })
+-- Visual mode
+map_multiple("v", down_keys, ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
+map_multiple("v", up_keys, ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
 
 -- Move between tmux windows (seems to work fine without these keymaps)
 -- keys = {
