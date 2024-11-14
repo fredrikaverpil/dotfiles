@@ -15,8 +15,8 @@ vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go to right window", silent = t
 -- Resize windows using <ctrl> arrow keys
 vim.keymap.set("n", "<C-Up>", ":resize +2<CR>", { desc = "Increase window height", silent = true })
 vim.keymap.set("n", "<C-Down>", ":resize -2<CR>", { desc = "Decrease window height", silent = true })
-vim.keymap.set("n", "<C-Left>", ":vertical resize -2<CR>", { desc = "Decrease window width", silent = true })
 vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", { desc = "Increase window width", silent = true })
+vim.keymap.set("n", "<C-Left>", ":vertical resize -2<CR>", { desc = "Decrease window width", silent = true })
 
 -- Move Lines
 local is_mac = vim.fn.has("macunix") == 1
@@ -29,14 +29,14 @@ local function map_multiple(mode, keys, command, opts)
   end
 end
 -- Normal mode
-map_multiple("n", down_keys, ":m .+1<CR>==", { desc = "Move line down" })
-map_multiple("n", up_keys, ":m .-2<CR>==", { desc = "Move line up" })
+map_multiple("n", down_keys, ":m .+1<CR>==", { desc = "Move line down", silent = true })
+map_multiple("n", up_keys, ":m .-2<CR>==", { desc = "Move line up", silent = true })
 -- Insert mode
-map_multiple("i", down_keys, "<Esc>:m .+1<CR>==gi", { desc = "Move line down" })
-map_multiple("i", up_keys, "<Esc>:m .-2<CR>==gi", { desc = "Move line up" })
+map_multiple("i", down_keys, "<Esc>:m .+1<CR>==gi", { desc = "Move line down", silent = true })
+map_multiple("i", up_keys, "<Esc>:m .-2<CR>==gi", { desc = "Move line up", silent = true })
 -- Visual mode
-map_multiple("v", down_keys, ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
-map_multiple("v", up_keys, ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
+map_multiple("v", down_keys, ":m '>+1<CR>gv=gv", { desc = "Move selection down", silent = true })
+map_multiple("v", up_keys, ":m '<-2<CR>gv=gv", { desc = "Move selection up", silent = true })
 
 -- Move between tmux windows (seems to work fine without these keymaps)
 -- keys = {
