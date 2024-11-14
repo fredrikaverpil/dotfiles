@@ -18,6 +18,7 @@
     ~/.gitmessage:
     ~/.config/gh-dash/config.yml: gh_dash.yml
     ~/Taskfile.yml:
+    ~/.config/ghostty/config: ghostty.conf
     ~/.config/eza/theme.yml:
       path: eza_theme.yaml
       if: '[ "$(uname -s)" = "Linux" ]'
