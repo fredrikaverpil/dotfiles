@@ -213,6 +213,9 @@ alt-shift-right = ['join-with right', 'mode main']
 # Move apps directly to a workspace
 # Use 'aerospace list-apps' to get the app-id
 [[on-window-detected]]
+if.app-id = "com.mitchellh.ghostty"
+run = "move-node-to-workspace T"
+[[on-window-detected]]
 if.app-id = "com.github.wez.wezterm"
 run = "move-node-to-workspace T"
 [[on-window-detected]]
