@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cd ~/Downloads
+gh release download tip -R github.com/mitchellh/ghostty \
+  --clobber \
+  --pattern \
+  "ghostty-macos-universal.*" \
+  --output ~/Downloads/ghostty-macos-universal.zip
+unzip ~/Downloads/ghostty-macos-universal.zip
