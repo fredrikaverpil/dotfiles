@@ -2,7 +2,7 @@ return {
   {
     "yetone/avante.nvim",
     enabled = require("utils.private").enable_ai(),
-    -- build = "make", -- This is Optional, only if you want to use tiktoken_core to calculate tokens count
+    build = "make",
     opts = {
       claude = {
         api_key_name = "cmd:op read op://Personal/Anthropic/tokens/neovim --no-newline",
@@ -22,6 +22,8 @@ return {
         ft = { "markdown", "Avante" },
       },
     },
+    -- keymaps: https://github.com/yetone/avante.nvim/blob/main/lua/avante/init.lua#L26
+    -- NOTE: use slash commands in avante for help, clear etc.
     cmd = { "AvanteAsk", "AvanteChat", "AvanteEdit", "AvanteToggle", "AvanteClear", "AvanteFocus", "AvanteRefresh", "AvanteSwitchProvider" },
     keys = require("config.keymaps").setup_avante_keymaps(),
   },
