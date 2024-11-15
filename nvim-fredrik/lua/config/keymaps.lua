@@ -388,7 +388,7 @@ end
 function M.setup_gitsigns_keymaps(bufnr)
   local gs = package.loaded.gitsigns
 
-  vim.keymap.set("n", "]c", function()
+  vim.keymap.set("n", "]h", function()
     if vim.wo.diff then
       return "]c"
     end
@@ -398,7 +398,7 @@ function M.setup_gitsigns_keymaps(bufnr)
     return "<Ignore>"
   end, { expr = true })
 
-  vim.keymap.set("n", "[c", function()
+  vim.keymap.set("n", "[h", function()
     if vim.wo.diff then
       return "[c"
     end
