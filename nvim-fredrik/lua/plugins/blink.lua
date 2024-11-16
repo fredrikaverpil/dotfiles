@@ -43,7 +43,7 @@ return {
       },
       trigger = {
         signature_help = {
-          enabled = true,
+          enabled = false, -- experimental, and already provided by noice
         },
       },
       windows = {
