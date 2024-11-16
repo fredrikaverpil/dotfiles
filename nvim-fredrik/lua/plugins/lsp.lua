@@ -84,10 +84,6 @@ return {
         -- NOTE: this is here because we get the default client capabilities from cmp_nvim_lsp
         -- see cmp.lua for more settings.
       },
-      {
-        "artemave/workspace-diagnostics.nvim",
-        enabled = false,
-      },
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
       {
