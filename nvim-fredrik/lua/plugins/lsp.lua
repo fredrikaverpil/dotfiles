@@ -86,12 +86,12 @@ return {
           },
         },
       },
-      {
-        "hrsh7th/nvim-cmp",
-        enabled = false,
-        -- NOTE: this is here because we get the default client capabilities from cmp_nvim_lsp
-        -- see cmp.lua for more settings.
-      },
+      -- {
+      --   "hrsh7th/nvim-cmp",
+      --   enabled = true,
+      --   -- NOTE: this is here because we get the default client capabilities from cmp_nvim_lsp
+      --   -- see cmp.lua for more settings.
+      -- },
       {
         "saghen/blink.cmp",
       },

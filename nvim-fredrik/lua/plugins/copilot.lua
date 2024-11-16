@@ -14,10 +14,10 @@ return {
   {
     "zbirenbaum/copilot.lua",
     dependencies = {
-      {
-        "hrsh7th/nvim-cmp",
-        enabled = false,
-      },
+      -- {
+      --   "hrsh7th/nvim-cmp",
+      --   enabled = true,
+      -- },
       {
         "nvim-lualine/lualine.nvim",
         event = "VeryLazy",
