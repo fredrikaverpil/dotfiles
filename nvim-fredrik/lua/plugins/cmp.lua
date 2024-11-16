@@ -4,8 +4,8 @@ return {
     "hrsh7th/nvim-cmp",
     enabled = true, -- NOTE: using blink.cmp instead, see blink.lua
     dependencies = {
-      -- { "hrsh7th/cmp-path" },
-      -- { "hrsh7th/cmp-buffer" },
+      { "hrsh7th/cmp-path" },
+      { "hrsh7th/cmp-buffer" },
       -- {
       --   "hrsh7th/cmp-nvim-lsp",
       --   dependencies = {
