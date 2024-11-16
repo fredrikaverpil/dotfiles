@@ -37,6 +37,7 @@
       path: skhdrc
       if: '[ "$(uname -s)" = "Darwin" ]'
     ~/.wezterm.lua: wezterm.lua
+    ~/.config/kitty/kitty.conf:
     pkgx.yaml:
       path: templates/pkgx.yaml
     ~/.config/fredrik:
