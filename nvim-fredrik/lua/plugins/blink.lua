@@ -7,22 +7,18 @@ return {
       -- NOTE: https://github.com/Saghen/blink.compat is also available
 
       {
-        "rafamadriz/friendly-snippets",
+        "L3MON4D3/LuaSnip",
+        dependencies = {
+          "rafamadriz/friendly-snippets",
+        },
+        keys = require("config.keymaps").setup_snippets_keymaps(),
+        opts = function(_, opts)
+          require("luasnip.loaders.from_vscode").lazy_load({
+            paths = { os.getenv("DOTFILES") .. "/nvim-fredrik/snippets" },
+          })
+          return opts
+        end,
       },
-
-      -- FIXME: do I need luasnup?
-      -- {
-      --   "L3MON4D3/LuaSnip",
-      --   dependencies = {
-      --     "rafamadriz/friendly-snippets",
-      --   },
-      --   keys = require("config.keymaps").setup_snippets_keymaps(),
-      --   opts = function(_, opts)
-      --     vim.notify("YEP")
-      --     require("luasnip.loaders.from_vscode").lazy_load()
-      --     return opts
-      --   end,
-      -- },
     },
 
     version = "*",
@@ -34,12 +30,11 @@ return {
     opts = {
 
       accept = {
-        -- FIXME: do I need luasnip?
-        -- expand_snippet = function(...)
-        --   require("luasnip").lsp_expand(...)
-        -- end,
+        expand_snippet = function(...)
+          require("luasnip").lsp_expand(...)
+        end,
 
-        expand_snippet = vim.snippet.expand,
+        -- expand_snippet = vim.snippet.expand, -- native
       },
       trigger = {
         signature_help = {
