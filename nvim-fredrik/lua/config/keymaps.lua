@@ -299,11 +299,9 @@ function M.setup_blink_cmp_keymaps()
     ["<C-e>"] = { "hide", "fallback" },
     ["<CR>"] = { "accept", "fallback" },
 
-    -- ["<Tab>"] = { "snippet_forward", "fallback" },
-    -- ["<S-Tab>"] = { "snippet_backward", "fallback" },
+    ["<Tab>"] = { "snippet_forward", "select_next", "fallback" },
+    ["<S-Tab>"] = { "snippet_backward", "select_prev", "fallback" },
 
-    ["<S-Tab>"] = { "select_prev", "fallback" },
-    ["<Tab>"] = { "select_next", "fallback" },
     ["<Up>"] = { "select_prev", "fallback" },
     ["<Down>"] = { "select_next", "fallback" },
 
