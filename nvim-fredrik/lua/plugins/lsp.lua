@@ -146,6 +146,10 @@ return {
       -- So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local client_capabilities = vim.lsp.protocol.make_client_capabilities()
 
+      -- NOTE: if using nvim-cmp...
+      -- local completion_capabilities = require("cmp_nvim_lsp").default_capabilities()
+      -- local client_capabilities = vim.tbl_deep_extend("force", client_capabilities, completion_capabilities)
+
       -- set global variables which must be accessible from the `setup_handler` function.
       G_capabilities = client_capabilities
       G_opts = opts
