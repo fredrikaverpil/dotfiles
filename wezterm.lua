@@ -5,6 +5,7 @@ local mux = wezterm.mux
 
 -- https://wezfurlong.org/wezterm/config/files.html
 local config = wezterm.config_builder()
+
 local keys = {}
 
 -- NOTE: some help/reminders:
@@ -26,14 +27,42 @@ config.check_for_updates_interval_seconds = 86400
 -- https://fonts.google.com/noto/specimen/Noto+Color+Emoji
 local disable_ligatures = { "calt=0", "clig=0", "liga=0" }
 config.font = wezterm.font_with_fallback({
-  { family = "Maple Mono" },
-  -- { family = "Berkeley Mono" },
+  { family = "Berkeley Mono" },
   -- { family = "JetBrains Mono", harfbuzz_features = disable_ligatures },
   -- { family = "JetBrainsMono Nerd Font", harfbuzz_features = disable_ligatures },
   { family = "Symbols Nerd Font Mono" },
   { family = "Noto Color Emoji" },
   { family = "Noto Emoji" },
 })
+-- Maple mono for italics
+config.font_rules = {
+  {
+    intensity = "Bold",
+    italic = true,
+    font = wezterm.font({
+      family = "Maple Mono",
+      weight = "Bold",
+      style = "Italic",
+    }),
+  },
+  {
+    italic = true,
+    intensity = "Half",
+    font = wezterm.font({
+      family = "Maple Mono",
+      weight = "DemiBold",
+      style = "Italic",
+    }),
+  },
+  {
+    italic = true,
+    intensity = "Normal",
+    font = wezterm.font({
+      family = "Maple Mono",
+      style = "Italic",
+    }),
+  },
+}
 
 if is_windows then
   config.font_size = 10
