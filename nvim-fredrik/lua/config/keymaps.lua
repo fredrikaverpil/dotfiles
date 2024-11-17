@@ -350,7 +350,6 @@ function M.setup_telescope_keymaps()
   map_normal_mode("<leader>fp", "<cmd>Telescope projects<CR>", "File from other project")
   map_normal_mode("<leader>fr", "<cmd>Telescope oldfiles<CR>", "Recent files")
   map_normal_mode("<leader>fs", function()
-    -- require("persistence").load()
     vim.cmd(":RestoreSession")
   end, "Restore previous session")
 

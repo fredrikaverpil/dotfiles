@@ -87,9 +87,7 @@ vim.opt.clipboard = "unnamedplus"
 -- TODO: pick from https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 vim.opt.listchars = "tab:▸ ,trail:·,nbsp:␣,extends:❯,precedes:❮" -- show symbols for whitespace
 
--- NOTE: commented out and instead defined in persistence.lua plugin
--- restore only some things from the last session
--- vim.opt.sessionoptions = "buffers,curdir,folds,help,tabpages,winsize,terminal"
+-- NOTE: see auto session for vim.o.sessionoptions
 
 M.setup_folding_options = function()
   vim.opt.foldcolumn = "0"

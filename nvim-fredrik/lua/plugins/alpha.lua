@@ -80,7 +80,6 @@ return {
     dashboard.section.terminal.opts.redraw = true
 
     dashboard.section.buttons.val = {
-      -- dashboard.button("s", " " .. " Restore Session", [[:lua require("persistence").load() <cr>]]),
       dashboard.button("s", " " .. " Restore Session", ":SessionRestore"),
       dashboard.button("f", " " .. " Recent files", ":lua require('telescope').extensions.recent_files.pick()<CR>"),
       dashboard.button("l", " " .. " Update plugins", ":Lazy<CR>"),
