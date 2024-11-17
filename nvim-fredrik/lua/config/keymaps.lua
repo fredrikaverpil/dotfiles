@@ -3,9 +3,6 @@ M = {}
 -- Alias <C-w> to <leader>w
 vim.api.nvim_set_keymap("n", "<leader>w", "<C-w>", { noremap = false, silent = true })
 
--- TODO: formatting toggle on <leader>uf
--- TODO: formatting on <leader>cf
-
 -- TODO: Move to window using the <ctrl> hjkl keys
 vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to left window", silent = true, noremap = true })
 vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to lower window", silent = true, noremap = true })
@@ -17,6 +14,8 @@ vim.keymap.set("n", "<C-Up>", ":resize +2<CR>", { desc = "Increase window height
 vim.keymap.set("n", "<C-Down>", ":resize -2<CR>", { desc = "Decrease window height", silent = true })
 vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", { desc = "Increase window width", silent = true })
 vim.keymap.set("n", "<C-Left>", ":vertical resize -2<CR>", { desc = "Decrease window width", silent = true })
+
+--
 
 -- Move Lines
 local is_mac = vim.fn.has("macunix") == 1
@@ -378,10 +377,10 @@ end
 function M.setup_auto_session_keymaps()
   return {
     -- Will use Telescope if installed or a vim.ui.select picker otherwise
-    { "<leader>ws", "<cmd>SessionSearch<CR>", desc = "Session search" },
-    { "<leader>wS", "<cmd>SessionSave<CR>", desc = "Save session" },
-    { "<leader>wa", "<cmd>SessionToggleAutoSave<CR>", desc = "Toggle autosave" },
-    { "<leader>wd", "<cmd>SessionDelet<CR>", desc = "Delete session" },
+    { "<leader>us", "<cmd>SessionSearch<CR>", desc = "Session search" },
+    { "<leader>uS", "<cmd>SessionSave<CR>", desc = "Save session" },
+    { "<leader>ua", "<cmd>SessionToggleAutoSave<CR>", desc = "Toggle session autosave" },
+    { "<leader>uD", "<cmd>SessionDelete<CR>", desc = "Delete session" },
   }
 end
 
@@ -848,7 +847,7 @@ function M.setup_diagnostics_keymaps()
 end
 
 function M.setup_winshift_keymaps()
-  vim.keymap.set({ "n", "v" }, "<leader>uw", "<cmd>WinShift<CR>", { desc = "[w]inshift (shift + arrows)" })
+  vim.keymap.set({ "n", "v" }, "<leader>ww", "<cmd>WinShift<CR>", { desc = "[w]inshift (shift + arrows)" })
 end
 
 function M.setup_obsidian_keymaps(obsidian_vars)
@@ -906,7 +905,7 @@ function M.setup_whichkey()
     { "<leader>sn", group = "noice" },
     { "<leader>t", group = "test" },
     { "<leader>u", group = "ui" },
-    { "<leader>w", group = "window" },
+    { "<leader>w", group = "window (<C-w> alias)" },
     { "<leader>x", group = "diagnostics/quickfix" },
   })
 end
