@@ -18,7 +18,13 @@
     ~/.gitmessage:
     ~/.config/gh-dash/config.yml: gh_dash.yml
     ~/Taskfile.yml:
-    ~/.config/ghostty/config: ghostty.conf
+    ~/.config/ghostty/config:
+      path: ghostty.conf
+      force: true
+    ~/.config/kitty/kitty.conf:
+      force: true
+    ~/.wezterm.lua:
+      force: true
     ~/.config/eza/theme.yml:
       path: eza_theme.yaml
       if: '[ "$(uname -s)" = "Linux" ]'
@@ -36,8 +42,6 @@
     ~/.config/skhd/skhdrc:
       path: skhdrc
       if: '[ "$(uname -s)" = "Darwin" ]'
-    ~/.wezterm.lua: wezterm.lua
-    ~/.config/kitty/kitty.conf:
     pkgx.yaml:
       path: templates/pkgx.yaml
     ~/.config/fredrik:
