@@ -214,6 +214,8 @@ alt-shift-right = ['join-with right', 'mode main']
 # Use 'aerospace list-apps' to get the app-id
 [[on-window-detected]]
 if.app-id = "com.mitchellh.ghostty"
+[[on-window-detected]]
+if.app-id = "net.kovidgoyal.kitty"
 run = "move-node-to-workspace T"
 [[on-window-detected]]
 if.app-id = "com.github.wez.wezterm"
