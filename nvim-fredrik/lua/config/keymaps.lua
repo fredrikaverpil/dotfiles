@@ -350,7 +350,8 @@ function M.setup_telescope_keymaps()
   map_normal_mode("<leader>fp", "<cmd>Telescope projects<CR>", "File from other project")
   map_normal_mode("<leader>fr", "<cmd>Telescope oldfiles<CR>", "Recent files")
   map_normal_mode("<leader>fs", function()
-    require("persistence").load()
+    -- require("persistence").load()
+    vim.cmd(":RestoreSession")
   end, "Restore previous session")
 
   -- git
@@ -373,6 +374,16 @@ function M.setup_telescope_keymaps()
   map_normal_mode("<leader>sM", "<cmd>Telescope man_pages<CR>", "[s]earch [M]an pages")
   map_normal_mode("<leader>sm", "<cmd>Telescope marks<cr>", "[s]earch [m]arks")
   map_normal_mode("<leader>so", "<cmd>Telescope vim_options<cr>", "[s]earch [o]ptions")
+end
+
+function M.setup_auto_session_keymaps()
+  return {
+    -- Will use Telescope if installed or a vim.ui.select picker otherwise
+    { "<leader>ws", "<cmd>SessionSearch<CR>", desc = "Session search" },
+    { "<leader>wS", "<cmd>SessionSave<CR>", desc = "Save session" },
+    { "<leader>wa", "<cmd>SessionToggleAutoSave<CR>", desc = "Toggle autosave" },
+    { "<leader>wd", "<cmd>SessionDelet<CR>", desc = "Delete session" },
+  }
 end
 
 function M.setup_coderunner_keymaps()
