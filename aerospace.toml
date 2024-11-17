@@ -214,6 +214,10 @@ alt-shift-right = ['join-with right', 'mode main']
 # Use 'aerospace list-apps' to get the app-id
 [[on-window-detected]]
 if.app-id = "com.mitchellh.ghostty"
+run = [
+  "layout floating",          # FIX: this is a workaround for https://github.com/nikitabobko/AeroSpace/issues/68
+  "move-node-to-workspace T",
+]
 [[on-window-detected]]
 if.app-id = "net.kovidgoyal.kitty"
 run = "move-node-to-workspace T"
