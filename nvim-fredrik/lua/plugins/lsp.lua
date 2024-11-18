@@ -159,19 +159,22 @@ return {
       local have_mason_lspconfig, _ = pcall(require, "mason-lspconfig")
       if have_mason_lspconfig then
         supported_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
-        local ensure_installed = {}
+        local enabled_servers = {}
         for server, server_opts in pairs(opts.servers) do
           if server_opts then
             server_opts = server_opts == true and {} or server_opts
             if server_opts.mason ~= false and vim.tbl_contains(supported_servers, server) then
-              ensure_installed[#ensure_installed + 1] = server
+              table.insert(enabled_servers, server)
+            else
+              vim.notify("LSP server not supported by mason-lspconfig: " .. server, vim.log.levels.WARN)
             end
           end
         end
+
         -- See `:h mason-lspconfig
         require("mason-lspconfig").setup({
           ---@type string[]
-          ensure_installed = ensure_installed,
+          ensure_installed = enabled_servers, -- NOTE: more like "ensure running"
           ---@type table<string, fun(server_name: string)>?
           handlers = { setup_handler },
         })
