@@ -26,6 +26,7 @@ return {
             ["Normal"] = require("utils.colors").fgcolor("Special"),
             ["Warning"] = require("utils.colors").fgcolor("DiagnosticError"),
             ["InProgress"] = require("utils.colors").fgcolor("DiagnosticWarn"),
+            ["Offline"] = require("utils.colors").fgcolor("Comment"),
           }
 
           opts.copilot = {
@@ -33,10 +34,20 @@ return {
               codepilot,
               color = function()
                 if not package.loaded["copilot"] then
-                  return
+                  return colors["Offline"]
                 end
-                local status = require("copilot.api").status.data
-                return colors[status.status] or colors[""]
+
+                local output = vim.fn.execute("Copilot status")
+                if string.match(output, "Not Started") or string.match(output, "Offline") then
+                  return colors["Offline"]
+                end
+
+                local status = require("copilot.api").status
+                if status.data.status ~= "" or status.data.message ~= "" then
+                  return colors[status.data.status] or colors["Offline"]
+                else
+                  return colors["InProgress"]
+                end
               end,
             },
           }
