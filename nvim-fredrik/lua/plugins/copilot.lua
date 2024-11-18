@@ -1,15 +1,3 @@
-local function enable_copilot()
-  if require("utils.private").enable_ai() then
-    if vim.fn.executable("node") == 1 then
-      return true
-    else
-      vim.notify("Node is not available, but required for Copilot.", vim.log.levels.WARN)
-      return false
-    end
-  end
-  return false
-end
-
 return {
   {
     "zbirenbaum/copilot.lua",
@@ -55,7 +43,7 @@ return {
         end,
       },
     },
-    enabled = enable_copilot(),
+    enabled = true,
     cmd = "Copilot",
     event = "InsertEnter",
     build = ":Copilot auth",
@@ -94,7 +82,7 @@ return {
   {
     "CopilotC-Nvim/CopilotChat.nvim",
     event = "VeryLazy",
-    enabled = enable_copilot(),
+    enabled = true,
     branch = "canary", -- while in development
     dependencies = {
       { "zbirenbaum/copilot.lua" },

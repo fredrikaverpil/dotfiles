@@ -1,187 +1,105 @@
-local function prefer_bin_from_venv(executable_name)
-  -- Return the path to the executable if $VIRTUAL_ENV is set and the binary exists somewhere beneath the $VIRTUAL_ENV path, otherwise get it from Mason
-  local notifications = require("utils.defaults").notifications.python
-
-  if vim.env.VIRTUAL_ENV then
-    local paths = vim.fn.glob(vim.env.VIRTUAL_ENV .. "/**/bin/" .. executable_name, true, true)
-    local venv_path = table.concat(paths, ", ")
-    if venv_path ~= "" and venv_path ~= nil then
-      notifications[executable_name].path = venv_path
-      return venv_path
-    end
-  end
-
-  local mason_registry = require("mason-registry")
-  local mason_path = mason_registry.get_package(executable_name):get_install_path() .. "/bin/" .. executable_name
-  if mason_path then
-    notifications[executable_name].path = mason_path
-    notifications[executable_name].warn = true
-    return mason_path
-  end
-
-  local global_path = vim.fn.exepath(executable_name)
-  if global_path then
-    notifications[executable_name].path = global_path
-    notifications[global_path].warn = true
-    return global_path
-  end
-
-  return nil
-end
-
-local function find_debugpy_python_path()
-  -- Return the path to the debugpy python executable if it is
-  -- installed in $VIRTUAL_ENV, otherwise get it from Mason
-  local notifications = require("utils.defaults").notifications.python
-
-  if vim.env.VIRTUAL_ENV then
-    local paths = vim.fn.glob(vim.env.VIRTUAL_ENV .. "/**/debugpy", true, true)
-    if table.concat(paths, ", ") ~= "" then
-      local venv_path = vim.env.VIRTUAL_ENV .. "/bin/python"
-      notifications.debugpy.path = venv_path
-      return venv_path
-    end
-  end
-
-  local mason_registry = require("mason-registry")
-  local mason_path = mason_registry.get_package("debugpy"):get_install_path() .. "/venv/bin/python"
-  if mason_path then
-    notifications.debugpy.path = mason_path
-    notifications.debugpy.warn = true
-    return mason_path
-  end
-
-  return nil
-end
-
-local function find_python_executable()
-  local notifications = require("utils.defaults").notifications.python
-
-  if vim.env.VIRTUAL_ENV then
-    local paths = vim.fn.glob(vim.env.VIRTUAL_ENV .. "/**/bin/python", true, true)
-    local executable_path = table.concat(paths, ", ")
-    if executable_path ~= "" then
-      notifications.python3.path = executable_path
-      return executable_path
-    end
-  elseif vim.fn.filereadable(".venv/bin/python") == 1 then
-    local executable_path = vim.fn.expand(".venv/bin/python")
-    notifications.python3.path = executable_path
-    return executable_path
+--- Find the path to the binary in the python virtual environment.
+--- First search active virtual environment, then .venv folder,
+--- then mason and last give up.
+--- @param name string
+--- @return string
+local function find_python_binary(name)
+  local path
+  local cmd
+  if vim.env.VIRTUAL_ENV ~= nil then
+    path = vim.env.VIRTUAL_ENV
   else
-    local global_path = vim.fn.exepath("python3")
-    if global_path then
-      notifications.python3.path = global_path
-      notifications.python3.warn = true
-      return global_path
+    path = vim.fn.getcwd() .. "/.venv"
+  end
+  local results = vim.fs.find({ name }, { type = "file", path = path, limit = 1 })
+  if #results == 1 then
+    cmd = results[1]
+    if vim.fn.filereadable(cmd) == 1 then
+      return cmd
     end
   end
 
-  return nil
-end
+  if name == "python" or name == "python3" then
+    -- cannot be found through mason-registry
+    return name
+  end
 
-local function notify_tooling(lang)
-  local notifications = require("utils.defaults").notifications[lang]
-  local infos = ""
-  local warnings = ""
-  local errors = ""
-  for tool, info in pairs(notifications) do
-    if type(info) == "table" then
-      if info.path ~= nil then
-        if info.warn == true then
-          warnings = warnings .. "Using " .. tool .. " from Mason (" .. info.path .. "), consider installing it in your virtual environment.\n"
-        else
-          infos = infos .. "Using " .. tool .. ": " .. info.path .. "\n"
-        end
-      else
-        errors = errors .. tool .. " not found.\n"
-      end
+  local pkg = require("mason-registry").get_package(name)
+  if pkg ~= nil then
+    cmd = pkg:get_install_path() .. "/bin/" .. name
+    if vim.fn.filereadable(cmd) == 1 then
+      return cmd
     end
   end
 
-  -- remove newline from end of strings
-  infos = string.sub(infos, 1, -2)
-  warnings = string.sub(warnings, 1, -2)
-  errors = string.sub(errors, 1, -2)
-
-  if infos ~= "" then
-    vim.notify_once(infos, vim.log.levels.INFO)
-  end
-  if warnings ~= "" then
-    vim.notify_once(warnings, vim.log.levels.WARN)
-  end
-  if errors ~= "" then
-    vim.notify_once(errors, vim.log.levels.ERROR)
-  end
+  return name
 end
 
 vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
   pattern = { "*.py" },
   callback = function()
-    local notifications = require("utils.defaults").notifications.python
-
     vim.opt_local.tabstop = 4
     vim.opt_local.shiftwidth = 4
     vim.opt_local.shiftwidth = 4
     vim.opt_local.colorcolumn = "88"
-    if not vim.g.python3_host_prog then
-      notifications.python3.path = find_python_executable()
-      vim.g.python3_host_prog = notifications.python3.path
-    end
-
-    if not notifications._emitted then
-      notify_tooling("python")
-      notifications._emitted = true
-    end
+    vim.g.python3_host_prog = find_python_binary("python")
   end,
 })
 
 return {
 
-  -- NOTE: this is commented out as the ruff lsp also applies formatting.
-  -- {
-  --   "stevearc/conform.nvim",
-  --   ft = { "python" },
-  --   dependencies = {
-  --     {
-  --       "williamboman/mason.nvim",
-  --       opts = function(_, opts)
-  --         opts.ensure_installed = opts.ensure_installed or {}
-  --         vim.list_extend(opts.ensure_installed, { "ruff" })
-  --       end,
-  --     },
-  --   },
-  --   opts = function(_, opts)
-  --     local formatters = require("conform.formatters")
-  --     local ruff_path = prefer_bin_from_venv("ruff")
-  --     opts.formatters_by_ft.python = { "ruff_format" }
-  --     if ruff_path then
-  --       formatters.ruff_format.command = ruff_path
-  --     end
-  --   end,
-  -- },
-
-  -- NOTE: the ruff linter is not included here as the ruff lsp applies linting.
   {
-    "mfussenegger/nvim-lint",
+    "stevearc/conform.nvim",
     ft = { "python" },
     dependencies = {
       {
         "williamboman/mason.nvim",
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "mypy" })
+          vim.list_extend(opts.ensure_installed, { "isort", "ruff" })
         end,
       },
     },
     opts = function(_, opts)
-      local mypy_path = prefer_bin_from_venv("mypy")
-      opts.linters_by_ft["python"] = { "mypy" }
-      if mypy_path then
-        opts.linters["mypy"] = {
-          cmd = prefer_bin_from_venv("mypy"),
-        }
-      end
+      opts.formatters_by_ft.python = { "isort", "ruff_format" }
+      opts.formatters["isort"] = {
+        command = function()
+          return find_python_binary("isort")
+        end,
+      }
+      opts.formatters["ruff_format"] = {
+        command = function()
+          return find_python_binary("ruff")
+        end,
+      }
+    end,
+  },
+
+  {
+    "mfussenegger/nvim-lint",
+    enabled = true,
+    ft = { "python" },
+    dependencies = {
+      {
+        "williamboman/mason.nvim",
+        opts = function(_, opts)
+          opts.ensure_installed = opts.ensure_installed or {}
+          vim.list_extend(opts.ensure_installed, { "mypy", "ruff" })
+        end,
+      },
+    },
+    opts = function(_, opts)
+      opts.linters_by_ft["python"] = { "mypy", "ruff" }
+      opts.linters["mypy"] = {
+        cmd = function()
+          return find_python_binary("ruff")
+        end,
+      }
+      opts.linters["ruff"] = {
+        cmd = function()
+          return find_python_binary("ruff")
+        end,
+      }
     end,
   },
 
@@ -197,7 +115,6 @@ return {
           },
         },
         opts = function(_, opts)
-          local ruff_path = prefer_bin_from_venv("ruff")
           opts.ensure_installed = opts.ensure_installed or {}
           vim.list_extend(opts.ensure_installed, { "basedpyright", "ruff" })
         end,
@@ -209,7 +126,7 @@ return {
           -- https://docs.basedpyright.com/#/settings
           settings = {
             basedpyright = {
-              disableOrganizeImports = true, -- use ruff lsp for this instead
+              disableOrganizeImports = false, -- NOTE: use code action (ruff lsp)
               analysis = {
                 -- NOTE: uncomment this to ignore linting. Good for projects where
                 -- basedpyright lights up as a christmas tree.
@@ -218,8 +135,10 @@ return {
             },
           },
         },
+
         ruff = {
-          -- https://docs.astral.sh/ruff/editors/
+          -- https://docs.astral.sh/ruff/editors/setup/#neovim
+          enabled = false, -- NOTE: conform and nvim-lint are used instead
           on_attach = function(client, bufnr)
             if client.name == "ruff" then
               -- Disable hover in favor of Pyright
@@ -228,11 +147,13 @@ return {
           end,
           init_options = {
             settings = {
+              -- https://docs.astral.sh/ruff/editors/settings/
               configurationPreference = "filesystemFirst",
               lineLength = 88,
               lint = {
-                enabled = true, -- NOTE: it does not work to disable this.
+                enabled = false, -- NOTE: it does not work to disable this.
               },
+              -- NOTE: to temporarily stop formatting, use ":LspStop ruff"
             },
           },
         },
@@ -250,7 +171,7 @@ return {
       opts.adapters = opts.adapters or {}
       opts.adapters["neotest-python"] = {
         runner = "pytest",
-        -- TODO: add coverage...
+        -- TODO: write coverage...
         args = { "--log-level", "INFO", "--color", "yes", "-vv", "-s" },
         dap = { justMyCode = false },
       }
@@ -280,25 +201,35 @@ return {
         dependencies = {
           "williamboman/mason.nvim",
         },
-        opts = {
-          ensure_installed = { "debugpy" },
-        },
-      },
-      {
-        "mfussenegger/nvim-dap-python",
-        config = function()
-          local dap_python = require("dap-python")
-          local debugpy_path = find_debugpy_python_path()
-          dap_python.setup(debugpy_path)
-        end,
-      },
-      {
-        "williamboman/mason.nvim",
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
           vim.list_extend(opts.ensure_installed, { "debugpy" })
         end,
       },
+      {
+        "mfussenegger/nvim-dap-python",
+        config = function()
+          local dap_python = require("dap-python")
+          local debugpy_path = find_python_binary("python3")
+          dap_python.setup(debugpy_path)
+        end,
+      },
     },
+  },
+
+  {
+    "linux-cultist/venv-selector.nvim",
+    event = "VeryLazy",
+    branch = "regexp", -- https://github.com/linux-cultist/venv-selector.nvim/tree/regexp
+    ft = { "python" },
+    dependencies = {
+      "neovim/nvim-lspconfig",
+      "nvim-telescope/telescope.nvim",
+      "mfussenegger/nvim-dap-python",
+    },
+    opts = {
+      notify_user_on_venv_activation = true,
+    },
+    keys = require("config.keymaps").setup_venv_selector_keymaps(),
   },
 }

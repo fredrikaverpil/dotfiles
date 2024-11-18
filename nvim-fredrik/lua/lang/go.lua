@@ -8,34 +8,49 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+G_golangci_config_file = nil
+
 local function golangcilint_args()
   local args = {}
-  local config_file = require("utils.find").find_file(".golangci.yml")
-  if config_file then
-    vim.notify_once("Found file: " .. config_file, vim.log.levels.INFO)
-    require("utils.defaults").golangcilint_config_path = config_file
-    args = {
-      "run",
-      "--out-format",
-      "json",
-      "--config",
-      config_file,
-      function()
-        return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
-      end,
-    }
-  else
-    vim.notify_once("No .golangci.yml found, enabling all linters")
-    args = {
-      "run",
-      "--enable-all",
-      "--out-format",
-      "json",
-      function()
-        return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
-      end,
-    }
-  end
+  args = {
+    "run",
+    "--out-format",
+    "json",
+
+    -- config file (or enable all linters)
+    function()
+      if G_golangci_config_file ~= nil then
+        vim.notify("Enabling config file")
+        return "--config"
+      else
+        -- default to enable all linters
+        -- TODO: make a better selection of linters...
+        vim.notify("Enabling all linters")
+        return "--enable-all"
+      end
+    end,
+
+    -- config file
+    function()
+      if G_golangci_config_file ~= nil then
+        vim.notify("Loading config file into it")
+        return G_golangci_config_file
+      end
+      local found
+      found = vim.fs.find({ ".golangci.yml" }, { type = "file", limit = 1 })
+      if #found == 1 then
+        local cmd = found[1]
+        G_golangci_config_file = found[1]
+        vim.notify_once("Found golangci-lint config: " .. cmd, vim.log.levels.INFO)
+        return "--config", cmd
+      end
+    end,
+
+    -- filename
+    function()
+      return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
+    end,
+  }
 
   return args
 end

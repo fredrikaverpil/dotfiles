@@ -349,7 +349,7 @@ function M.setup_telescope_keymaps()
   map_normal_mode("<leader>fp", "<cmd>Telescope projects<CR>", "File from other project")
   map_normal_mode("<leader>fr", "<cmd>Telescope oldfiles<CR>", "Recent files")
   map_normal_mode("<leader>fs", function()
-    vim.cmd(":RestoreSession")
+    vim.cmd(":RestoreSession<CR>")
   end, "Restore previous session")
 
   -- git
@@ -377,7 +377,7 @@ end
 function M.setup_auto_session_keymaps()
   return {
     -- Will use Telescope if installed or a vim.ui.select picker otherwise
-    { "<leader>us", "<cmd>SessionSearch<CR>", desc = "Session search" },
+    { "<leader>ss", "<cmd>SessionSearch<CR>", desc = "Session search" },
     { "<leader>uS", "<cmd>SessionSave<CR>", desc = "Save session" },
     { "<leader>ua", "<cmd>SessionToggleAutoSave<CR>", desc = "Toggle session autosave" },
     { "<leader>uD", "<cmd>SessionDelete<CR>", desc = "Delete session" },
@@ -952,6 +952,13 @@ function M.setup_yanky_keymaps()
   -- { "=p", "<Plug>(YankyPutAfterFilter)", desc = "Put after applying a filter" },
   -- { "=P", "<Plug>(YankyPutBeforeFilter)", desc = "Put before applying a filter" },
   -- },
+end
+
+function M.setup_venv_selector_keymaps()
+  return {
+    { "<leader>vs", "<cmd>VenvSelect<cr>" },
+    { "<leader>vc", "<cmd>VenvSelectCached<cr>" },
+  }
 end
 
 -- ai tooling keymaps
