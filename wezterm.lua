@@ -17,9 +17,38 @@ local keys = {}
 -- wezterm.plugin.update_all()
 
 local is_windows = os.getenv("OS") == "Windows_NT"
+local is_macos = os.getenv("OS") == "Darwin"
 
 config.check_for_updates = true
 config.check_for_updates_interval_seconds = 86400
+
+local function is_on_battery()
+  if is_windows then
+    -- FIX: verify that this works...
+    --
+    -- local power_source = io.popen("powercfg /batteryreport")
+    -- local power_source_content = power_source:read("*a")
+    -- power_source:close()
+    --
+    -- local is_battery = string.find(power_source_content, "Battery")
+    -- return is_battery
+  elseif is_macos then
+    local power_source = io.popen("pmset -g batt | grep 'AC Power'")
+    local power_source_content = power_source:read("*a")
+    power_source:close()
+
+    local is_battery = string.find(power_source_content, "Battery Power")
+    return is_battery
+  end
+
+  return false
+end
+
+if is_on_battery() then
+  config.max_fps = 60
+else
+  config.max_fps = 120
+end
 
 -- font
 -- https://www.jetbrains.com/lp/mono
