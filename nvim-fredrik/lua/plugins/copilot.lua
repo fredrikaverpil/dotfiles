@@ -22,11 +22,11 @@ return {
           -- end
 
           local colors = {
-            [""] = "Special",
             ["Normal"] = require("utils.colors").fgcolor("Special"),
             ["Warning"] = require("utils.colors").fgcolor("DiagnosticError"),
             ["InProgress"] = require("utils.colors").fgcolor("DiagnosticWarn"),
             ["Offline"] = require("utils.colors").fgcolor("Comment"),
+            ["Error"] = require("utils.colors").fgcolor("Error"),
           }
 
           opts.copilot = {
@@ -44,7 +44,7 @@ return {
 
                 local status = require("copilot.api").status
                 if status.data.status ~= "" or status.data.message ~= "" then
-                  return colors[status.data.status] or colors["Offline"]
+                  return colors[status.data.status] or colors["Error"]
                 else
                   return colors["InProgress"]
                 end
