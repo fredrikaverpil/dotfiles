@@ -54,8 +54,9 @@ brew 'uv'
 # brew 'exercism'
 
 # slides
-brew 'slides'
-brew 'chafa'
+# brew 'slides'
+# brew 'chafa'
+# presenterm
 
 # tmux
 brew 'tmux'
