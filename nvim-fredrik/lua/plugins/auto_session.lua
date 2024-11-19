@@ -16,7 +16,6 @@ end
 return {
   {
     "rmagatti/auto-session",
-
     dependencies = {
       "linux-cultist/venv-selector.nvim",
     },
