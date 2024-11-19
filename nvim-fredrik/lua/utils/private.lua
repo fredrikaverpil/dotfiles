@@ -1,26 +1,28 @@
 M = {}
 
-function M.is_code_private()
+function M.is_code_public()
   local current_dir = vim.fn.getcwd()
-  local home_dir = os.getenv("HOME") or os.getenv("USERPROFILE")
-  local code_path = home_dir .. "/code"
 
-  -- if git repo is filed under ~/code/work/private, assume code is private
-  local private_path = code_path .. "/work/private"
-  local private_path_detected = string.find(current_dir, private_path) == 1
+  local public_paths = {
+    "~/code/public/",
+    "~/code/work/public",
+  }
 
-  if private_path_detected then
-    return true
-  else
-    return false
+  for _, public_path in ipairs(public_paths) do
+    local public_path_detected = string.find(current_dir, vim.fs.normalize(public_path)) == 1
+    if public_path_detected then
+      return true
+    end
   end
+
+  return false
 end
 
 function M.enable_ai()
-  if require("utils.private").is_code_private() then
-    return false
+  if require("utils.private").is_code_public() then
+    return true
   end
-  return true
+  return false
 end
 
 function M.is_copilot_available()
