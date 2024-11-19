@@ -78,7 +78,7 @@ vim.keymap.set("v", ">", ">gv", { desc = "Indent right" })
 vim.keymap.set("n", "<leader>l", "<cmd>Lazy<cr>", { desc = "Lazy" })
 
 -- new file
-vim.keymap.set("n", "<leader>fn", "<cmd>enew<cr>", { desc = "New File" })
+vim.keymap.set("n", "<leader>bn", "<cmd>enew<cr>", { desc = "New buffer" })
 
 -- lists
 vim.keymap.set("n", "<leader>xl", "<cmd>lopen<cr>", { desc = "Location List" })
@@ -346,17 +346,14 @@ function M.setup_telescope_keymaps()
   map_normal_mode("<leader><leader>", require("telescope.builtin").find_files, "Find Files")
 
   -- file
-  map_normal_mode("<leader>fp", "<cmd>Telescope projects<CR>", "File from other project")
-  map_normal_mode("<leader>fr", "<cmd>Telescope oldfiles<CR>", "Recent files")
-  map_normal_mode("<leader>fs", function()
-    vim.cmd(":RestoreSession<CR>")
-  end, "Restore previous session")
+  map_normal_mode("<leader>sf", "<cmd>Telescope projects<CR>", "[s]earch [f]iles from other project")
+  map_normal_mode("<leader>sF", "<cmd>Telescope oldfiles<CR>", "[s]earch recent [F]iles")
 
   -- git
-  map_normal_mode("<leader>gtc", "<cmd>Telescope git_commits<CR>", "Search git [c]ommits")
-  map_normal_mode("<leader>gtC", "<cmd>Telescope git_bcommits<CR>", "Search git branch [C]ommits")
-  map_normal_mode("<leader>gts", "<cmd>Telescope git_status<CR>", "Search git [s]tatus changes")
-  map_normal_mode("<leader>gtb", "<cmd>Telescope git_branches<CR>", "Search git [b]ranches")
+  map_normal_mode("<leader>sgc", "<cmd>Telescope git_commits<CR>", "[s]earch [g]it [c]ommits")
+  map_normal_mode("<leader>sgC", "<cmd>Telescope git_bcommits<CR>", "[s]earch [g]it branch [C]ommits")
+  map_normal_mode("<leader>sgs", "<cmd>Telescope git_status<CR>", "[s]earch [g]it [s]tatus changes")
+  map_normal_mode("<leader>sgb", "<cmd>Telescope git_branches<CR>", "[s]earch [g]it [b]anches")
 
   -- search
   map_normal_mode("<leader>/", require("telescope").extensions.live_grep_args.live_grep_args, "[s]earch [g]rep")
@@ -377,10 +374,10 @@ end
 function M.setup_auto_session_keymaps()
   return {
     -- Will use Telescope if installed or a vim.ui.select picker otherwise
-    { "<leader>ss", "<cmd>SessionSearch<CR>", desc = "Session search" },
-    { "<leader>uS", "<cmd>SessionSave<CR>", desc = "Save session" },
-    { "<leader>ua", "<cmd>SessionToggleAutoSave<CR>", desc = "Toggle session autosave" },
-    { "<leader>uD", "<cmd>SessionDelete<CR>", desc = "Delete session" },
+    { "<leader>ss", "<cmd>SessionSearch<CR>", desc = "[s]earch [s]ession" },
+    -- { "<leader>uS", "<cmd>SessionSave<CR>", desc = "Save session" },
+    -- { "<leader>ua", "<cmd>SessionToggleAutoSave<CR>", desc = "Toggle session autosave" },
+    -- { "<leader>uD", "<cmd>SessionDelete<CR>", desc = "Delete session" },
   }
 end
 
@@ -405,9 +402,8 @@ function M.setup_lazygit_keymaps()
         vim.api.nvim_del_keymap("t", "<Esc><Esc>")
       end
     end
-
     vim.cmd("LazyGit")
-  end)
+  end, "LazyGit")
 end
 
 function M.setup_gitsigns_keymaps(bufnr)
@@ -893,15 +889,15 @@ function M.setup_whichkey()
     { "<leader>a", group = "ai" },
     { "<leader>c", group = "code" },
     { "<leader>d", group = "debug" },
-    { "<leader>f", group = "file" },
+    { "<leader>b", group = "buffer" },
     { "<leader>g", group = "git" },
     { "<leader>gb", group = "blame" },
     { "<leader>gd", group = "diffview" },
     { "<leader>gh", group = "hunks" },
-    { "<leader>gt", group = "telescope" },
     { "<leader>n", group = "notes" },
     { "<leader>r", group = "run" },
     { "<leader>s", group = "search" },
+    { "<leader>sg", group = "git" },
     { "<leader>sn", group = "noice" },
     { "<leader>t", group = "test" },
     { "<leader>u", group = "ui" },
