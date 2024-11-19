@@ -41,9 +41,11 @@ function M.toggle_copilot()
     if string.match(output, "Not Started") or string.match(output, "Offline") then
       -- avoid starting multiple servers
       vim.cmd("Copilot enable")
+      vim.g.custom_copilot_status = "enabled"
     end
   else
     vim.cmd("Copilot disable")
+    vim.g.custom_copilot_status = "disabled"
   end
 end
 

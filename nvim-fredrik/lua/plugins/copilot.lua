@@ -33,20 +33,17 @@ return {
             lualine_component = {
               codepilot,
               color = function()
-                if not package.loaded["copilot"] then
+                if not package.loaded["copilot"] or vim.g.custom_copilot_status == "disabled" then
+                  -- offline
                   return colors["Offline"]
-                end
-
-                local output = vim.fn.execute("Copilot status")
-                if string.match(output, "Not Started") or string.match(output, "Offline") then
-                  return colors["Offline"]
-                end
-
-                local status = require("copilot.api").status
-                if status.data.status ~= "" or status.data.message ~= "" then
-                  return colors[status.data.status] or colors["Error"]
                 else
-                  return colors["InProgress"]
+                  -- online
+                  local status = require("copilot.api").status
+                  if status.data.status ~= "" or status.data.message ~= "" then
+                    return colors[status.data.status] or colors["Error"]
+                  else
+                    return colors["InProgress"]
+                  end
                 end
               end,
             },
@@ -69,7 +66,15 @@ return {
         auto_trigger = true,
         accept = false, -- disable built-in keymapping
       },
-      filetypes = {},
+      filetypes = {
+        sh = function()
+          if string.match(vim.fs.basename(vim.api.nvim_buf_get_name(0)), "^%.env.*") then
+            -- disable for .env files
+            return false
+          end
+          return true
+        end,
+      },
     },
     config = function(_, opts)
       require("copilot").setup(opts)
