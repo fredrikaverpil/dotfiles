@@ -18,6 +18,7 @@ return {
     "rmagatti/auto-session",
     dependencies = {
       "linux-cultist/venv-selector.nvim",
+      "nvim-telescope/telescope.nvim",
     },
 
     lazy = false,
@@ -36,6 +37,11 @@ return {
         require("utils.private").toggle_copilot,
         activate_python_venv,
         require("lualine").refresh,
+      }
+
+      opts.session_lens = {
+        load_on_setup = true,
+        previewer = false,
       }
     end,
 
