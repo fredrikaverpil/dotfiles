@@ -13,7 +13,6 @@ Thumbs.db
 /.lazy.lua
 
 # Environments
-/pkgx.yaml
 /.pkgx.yaml
 .envrc
 
