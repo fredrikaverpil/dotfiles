@@ -51,10 +51,10 @@ return {
           },
           providers = {},
         },
+        keymap = require("config.keymaps").setup_blink_cmp_keymaps(),
       }
       local merged_opts = require("utils.table").deep_merge(base_opts, opts)
       require("blink.cmp").setup(merged_opts)
     end,
-    keymap = require("config.keymaps").setup_blink_cmp_keymaps(),
   },
 }
