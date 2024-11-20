@@ -3,13 +3,11 @@
 ### Install dotfiles
 
 ```bash
-mkdir -p code && cd code
-git clone --recursive https://github.com/fredrikaverpil/dotfiles.git
-cd dotfiles && ./install -vv
+git clone --recursive https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
+cd .dotfiles && ./install -vv
 ```
 
-> [!NOTE]
-> See [README_GIT.md](README_GIT.md) for details on setting up git.
+> [!NOTE] See [README_GIT.md](README_GIT.md) for details on setting up git.
 
 ### Install tooling
 
@@ -29,13 +27,16 @@ Install [Homebrew](https://brew.sh/):
 <details>
   <summary>🎶 Expand for x86 support.</summary>
 
-When on an arm64 device, homebrew is installed in `/opt/homebrew/bin/brew`. You can install an x64 version in `/usr/local/bin/brew`. See [installers/homebrew.sh](installers/homebrew.sh) for more info.
+When on an arm64 device, homebrew is installed in `/opt/homebrew/bin/brew`. You
+can install an x64 version in `/usr/local/bin/brew`. See
+[installers/homebrew.sh](installers/homebrew.sh) for more info.
 
 </details>
 
 ### Install apps
 
-Note that per-project tooling (such as languages) are managed with [pkgx](https://github.com/pkgx/pkgx), not with homebrew.
+Note that per-project tooling (such as languages) are managed with
+[pkgx](https://github.com/pkgx/pkgx), not with homebrew.
 
 ```bash
 brew bundle --file=_macos/Brewfile

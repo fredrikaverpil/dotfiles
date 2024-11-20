@@ -1,8 +1,10 @@
 ## Windows 11 + WSL
 
-⚠️ These instructions are likely to become outdated, as my primary system is macOS.
+⚠️ These instructions are likely to become outdated, as my primary system is
+macOS.
 
-This setup aims to run GUIs in Windows with all terminal and coding activities in WSL/Ubuntu.
+This setup aims to run GUIs in Windows with all terminal and coding activities
+in WSL/Ubuntu.
 
 🎒 Pro tip: set up WSL/Ubuntu, Wezterm, dotfiles repo and homebrew first.
 
@@ -45,7 +47,10 @@ winget install --accept-package-agreements --source msstore "Ubuntu" --id 9PDXGN
 
 Start the Ubuntu prompt, create user.
 
-Then install GUI apps (from [Microsoft Store](https://www.microsoft.com/en-us/store/apps/windows) and [winget-pkgs repo](https://github.com/microsoft/winget-pkgs)) in Windows from a Powershell prompt:
+Then install GUI apps (from
+[Microsoft Store](https://www.microsoft.com/en-us/store/apps/windows) and
+[winget-pkgs repo](https://github.com/microsoft/winget-pkgs)) in Windows from a
+Powershell prompt:
 
 ```powershell
 # Coding
@@ -72,13 +77,11 @@ winget install --accept-package-agreements --source msstore "Auto Dark Mode" --i
 From the Ubuntu prompt:
 
 ```bash
-mkdir -p code && cd code
-git clone --recursive https://github.com/fredrikaverpil/dotfiles.git
-cd dotfiles && ./install -vv
+git clone --recursive https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
+cd .dotfiles && ./install -vv
 ```
 
-> [!NOTE]
-> See [README_GIT.md](README_GIT.md) for details on setting up git.
+> [!NOTE] See [README_GIT.md](README_GIT.md) for details on setting up git.
 
 ### Windows configuration
 
@@ -133,9 +136,11 @@ cp \\wsl.localhost\Ubuntu\home\fredrik\code\dotfiles\_windows\autohotkey.ahk "$e
 <details>
   <summary>Click here to see symlinking instructions</summary>
 
-:warning: If WSL is not running, the AutoHotkey script won't run. Therefore, I default to copying the file into place.
+:warning: If WSL is not running, the AutoHotkey script won't run. Therefore, I
+default to copying the file into place.
 
-Symlinking can be done, instead of copying the `autohotkey.ahk`, from an administrative Powershell prompt:
+Symlinking can be done, instead of copying the `autohotkey.ahk`, from an
+administrative Powershell prompt:
 
 ```powershell
 New-Item -ItemType SymbolicLink -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\autohotkey.ahk" -Value _windows\autohotkey.ahk
@@ -143,8 +148,11 @@ New-Item -ItemType SymbolicLink -Path "$env:APPDATA\Microsoft\Windows\Start Menu
 
 </details>
 
-- To override <kbd>Win (Left)</kbd> + <kbd>l</kbd>, launch Sharpkeys, load the `\\wsl.localhost\Ubuntu\home\fredrik\code\dotfiles\_windows\sharpkeys.skl` file and write changes to the Registry.
-- In PureText, remap (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>v</kbd>) to enable pasting of text without formatting.
+- To override <kbd>Win (Left)</kbd> + <kbd>l</kbd>, launch Sharpkeys, load the
+  `\\wsl.localhost\Ubuntu\home\fredrik\code\dotfiles\_windows\sharpkeys.skl`
+  file and write changes to the Registry.
+- In PureText, remap (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>v</kbd>) to
+  enable pasting of text without formatting.
 
 ### Ubuntu configuration
 
@@ -179,7 +187,8 @@ installers/homebrew.sh
 /home/linuxbrew/.linuxbrew/bin/brew bundle --file _linux/Brewfile
 ```
 
-You can now restart wezterm and you should be taken into Ubuntu/zsh with prompt and most software all set up.
+You can now restart wezterm and you should be taken into Ubuntu/zsh with prompt
+and most software all set up.
 
 #### Editors
 
