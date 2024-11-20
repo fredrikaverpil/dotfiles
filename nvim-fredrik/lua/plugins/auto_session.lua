@@ -13,6 +13,18 @@ local function activate_python_venv()
   end
 end
 
+local function delete_hidden_buffers()
+  local visible = {}
+  for _, win in pairs(vim.api.nvim_list_wins()) do
+    visible[vim.api.nvim_win_get_buf(win)] = true
+  end
+  for _, buf in pairs(vim.api.nvim_list_bufs()) do
+    if not visible[buf] then
+      vim.api.nvim_buf_delete(buf, {})
+    end
+  end
+end
+
 return {
   {
     "rmagatti/auto-session",
@@ -28,6 +40,10 @@ return {
       opts = opts or {}
 
       -- opts.log_level = "debug"
+
+      opts.pre_save_cmds = {
+        delete_hidden_buffers,
+      }
 
       opts.pre_restore_cmds = {
         deactivate_python_venv,
