@@ -3,6 +3,7 @@ return {
   {
     "saghen/blink.cmp",
     lazy = false, -- lazy loading handled internally
+    version = "*",
     dependencies = {
       -- NOTE: https://github.com/Saghen/blink.compat is also available
 
@@ -20,37 +21,40 @@ return {
         end,
       },
     },
-
-    version = "*",
     -- OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
     --  build = "cargo build --release",
-
-    ---@module 'blink.cmp'
-    ---@type blink.cmp.Config
-    opts = {
-
-      accept = {
-        expand_snippet = function(...)
-          require("luasnip").lsp_expand(...)
-        end,
-
-        -- expand_snippet = vim.snippet.expand, -- native
-      },
-      trigger = {
-        signature_help = {
-          enabled = false, -- experimental, and already provided by noice
+    config = function(_, opts)
+      ---@module 'blink.cmp'
+      ---@type blink.cmp.Config
+      local base_opts = {
+        accept = {
+          expand_snippet = function(...)
+            require("luasnip").lsp_expand(...)
+          end,
         },
-      },
-      windows = {
-        autocomplete = {
-          selection = "manual",
+        trigger = {
+          signature_help = {
+            enabled = false, -- experimental, and already provided by noice
+          },
         },
-        documentation = {
-          auto_show = true,
+        windows = {
+          autocomplete = {
+            selection = "manual",
+          },
+          documentation = {
+            auto_show = true,
+          },
         },
-      },
-
-      keymap = require("config.keymaps").setup_blink_cmp_keymaps(),
-    },
+        sources = {
+          completion = {
+            enabled_providers = { "lsp", "path", "snippets", "buffer" },
+          },
+          providers = {},
+        },
+      }
+      local merged_opts = require("utils.table").deep_merge(base_opts, opts)
+      require("blink.cmp").setup(merged_opts)
+    end,
+    keymap = require("config.keymaps").setup_blink_cmp_keymaps(),
   },
 }

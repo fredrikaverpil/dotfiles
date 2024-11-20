@@ -6,6 +6,7 @@ return {
 
   {
     "tpope/vim-dadbod",
+    lazy = false,
     enabled = true,
     dependencies = {
       { "kristijanhusak/vim-dadbod-ui" },
@@ -23,6 +24,12 @@ return {
 
   {
     "saghen/blink.cmp",
+    dependencies = {
+      "kristijanhusak/vim-dadbod-completion",
+    },
+    ft = sql_ft,
+    ---@module 'blink.cmp'
+    ---@type blink.cmp.Config
     opts = {
       sources = {
         completion = {
@@ -32,9 +39,6 @@ return {
           dadbod = { name = "Dadbod", module = "vim_dadbod_completion.blink" },
         },
       },
-    },
-    dependencies = {
-      "kristijanhusak/vim-dadbod-completion",
     },
   },
 }
