@@ -79,6 +79,9 @@ return {
     config = function(_, opts)
       require("copilot").setup(opts)
 
+      -- Make sure not to enable copilot in private projects
+      require("utils.private").toggle_copilot()
+
       -- hide copilot suggestions when cmp menu is open
       -- to prevent odd behavior/garbled up suggestions
       local cmp_status_ok, cmp = pcall(require, "cmp")

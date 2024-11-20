@@ -1,15 +1,13 @@
 M = {}
 
-function M.is_code_public()
-  local current_dir = vim.fn.getcwd()
-
+local function is_code_public()
   local public_paths = {
     "~/code/public/",
     "~/code/work/public",
   }
 
   for _, public_path in ipairs(public_paths) do
-    local public_path_detected = string.find(current_dir, vim.fs.normalize(public_path)) == 1
+    local public_path_detected = string.find(vim.fn.getcwd(), vim.fs.normalize(public_path)) == 1
     if public_path_detected then
       return true
     end
@@ -18,15 +16,15 @@ function M.is_code_public()
   return false
 end
 
-function M.enable_ai()
-  if require("utils.private").is_code_public() then
+local function is_ai_enabled()
+  if is_code_public() then
     return true
   end
   return false
 end
 
-function M.is_copilot_available()
-  if require("utils.private").enable_ai() then
+local function is_copilot_available()
+  if is_ai_enabled() then
     if vim.fn.executable("node") == 1 then
       return true
     else
@@ -37,8 +35,8 @@ function M.is_copilot_available()
   return false
 end
 
-function M.toggle_copilot()
-  if require("utils.private").is_copilot_available() then
+local function toggle_copilot()
+  if is_copilot_available() then
     local output = vim.fn.execute("Copilot status")
     if string.match(output, "Not Started") or string.match(output, "Offline") then
       -- avoid starting multiple servers
@@ -50,5 +48,11 @@ function M.toggle_copilot()
     vim.g.custom_copilot_status = "disabled"
   end
 end
+
+-- export functions for use by e.g. plugins
+M.is_code_public = is_code_public
+M.is_ai_enabled = is_ai_enabled
+M.is_copilot_availble = is_copilot_available
+M.toggle_copilot = toggle_copilot
 
 return M
