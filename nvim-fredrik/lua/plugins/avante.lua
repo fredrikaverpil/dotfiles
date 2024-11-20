@@ -1,7 +1,6 @@
 return {
   {
     "yetone/avante.nvim",
-    enabled = require("utils.private").enable_ai(),
     build = "make",
     opts = {
       claude = {
