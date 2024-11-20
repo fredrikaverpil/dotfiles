@@ -20,20 +20,6 @@ local function golangcilint_args()
     -- config file (or enable all linters)
     function()
       if G_golangci_config_file ~= nil then
-        vim.notify("Enabling config file")
-        return "--config"
-      else
-        -- default to enable all linters
-        -- TODO: make a better selection of linters...
-        vim.notify("Enabling all linters")
-        return "--enable-all"
-      end
-    end,
-
-    -- config file
-    function()
-      if G_golangci_config_file ~= nil then
-        vim.notify("Loading config file into it")
         return G_golangci_config_file
       end
       local found
@@ -41,8 +27,12 @@ local function golangcilint_args()
       if #found == 1 then
         local cmd = found[1]
         G_golangci_config_file = found[1]
-        vim.notify_once("Found golangci-lint config: " .. cmd, vim.log.levels.INFO)
         return "--config", cmd
+      else
+        -- default to enable all linters
+        -- TODO: make a better selection of linters...
+        vim.notify("Enabling all golangci-linters")
+        return "--enable-all"
       end
     end,
 
