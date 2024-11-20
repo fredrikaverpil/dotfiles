@@ -22,6 +22,9 @@ return {
   {
     "nvim-treesitter/nvim-treesitter-context",
     event = "VeryLazy",
-    dependencies = { "nvim-treesitter/nvim-treesitter", lazy = true },
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      event = "VeryLazy",
+    },
   },
 }
