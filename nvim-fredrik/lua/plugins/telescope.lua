@@ -23,7 +23,6 @@ return {
           require("project_nvim").setup({ manual_mode = true, silent_chdir = false, scope_chdir = "win" })
         end,
       },
-      { "rcarriga/nvim-notify" },
       { "folke/trouble.nvim" }, -- for trouble.sources.telescope
     },
     opts = function(_, opts)
@@ -87,7 +86,6 @@ return {
       telescope.load_extension("ui-select")
       telescope.load_extension("recent_files")
       telescope.load_extension("projects") -- ahmedkhalf/project.nvim
-      telescope.load_extension("notify")
 
       require("config.keymaps").setup_telescope_keymaps()
     end,
