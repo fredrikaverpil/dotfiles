@@ -47,12 +47,14 @@ map_multiple("v", up_keys, ":m '<-2<CR>gv=gv", { desc = "Move selection up", sil
 -- },
 
 -- buffers
-vim.keymap.set("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Prev buffer" })
-vim.keymap.set("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next buffer" })
-vim.keymap.set("n", "[b", "<cmd>bprevious<cr>", { desc = "Prev buffer" })
-vim.keymap.set("n", "]b", "<cmd>bnext<cr>", { desc = "Next buffer" })
--- vim.keymap.set("n", "<leader>bb", "<cmd>e #<cr>", { desc = "Switch to Other Buffer" })
-vim.keymap.set("n", "<leader>`", "<cmd>e #<cr>", { desc = "Switch to Other Buffer" })
+vim.keymap.set("n", "<leader>bN", "<cmd>enew<cr>", { desc = "New buffer" })
+vim.keymap.set("n", "<leader>bq", "<cmd>bd %<cr>", { desc = "Delete buffer" })
+for _, key in ipairs({ "<S-l>", "<leader>bn", "]b" }) do
+  vim.keymap.set("n", key, "<cmd>bnext<cr>", { desc = "Next buffer" })
+end
+for _, key in ipairs({ "<S-h>", "<leader>bp", "[b" }) do
+  vim.keymap.set("n", key, "<cmd>bprevious<cr>", { desc = "Prev buffer" })
+end
 
 -- tabs (can also use gt and gT)
 -- vim.keymap.set("n", "<leader><tab>l", "<cmd>tablast<cr>", { desc = "Last Tab", silent = true })
@@ -76,9 +78,6 @@ vim.keymap.set("v", ">", ">gv", { desc = "Indent right" })
 
 -- Lazy.nvim
 vim.keymap.set("n", "<leader>l", "<cmd>Lazy<cr>", { desc = "Lazy" })
-
--- new file
-vim.keymap.set("n", "<leader>bn", "<cmd>enew<cr>", { desc = "New buffer" })
 
 -- lists
 vim.keymap.set("n", "<leader>xl", "<cmd>lopen<cr>", { desc = "Location List" })
