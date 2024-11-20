@@ -5,7 +5,6 @@
 - clean: ["~", ~/.config]
 - create: [~/Downloads]
 - link:
-    ~/.dotfiles: ""
     ~/.shell:
     ~/.bash_profile:
     ~/.bashrc_user: bashrc
@@ -42,8 +41,6 @@
     ~/.config/skhd/skhdrc:
       path: skhdrc
       if: '[ "$(uname -s)" = "Darwin" ]'
-    pkgx.yaml:
-      path: templates/pkgx.yaml
     ~/.config/fredrik:
       path: nvim-fredrik
       force: true
