@@ -2,17 +2,17 @@ M = {}
 
 local function is_code_public()
   local public_paths = {
+    "~/.dotfiles",
     "~/code/public/",
     "~/code/work/public",
   }
 
   for _, public_path in ipairs(public_paths) do
-    local public_path_detected = string.find(vim.fn.getcwd(), vim.fs.normalize(public_path)) == 1
+    local public_path_detected = string.find(vim.fn.getcwd(), vim.fn.expand(public_path)) == 1
     if public_path_detected then
       return true
     end
   end
-
   return false
 end
 
