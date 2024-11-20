@@ -17,7 +17,7 @@ local function golangcilint_args()
     "--out-format",
     "json",
 
-    -- config file (or enable all linters)
+    -- config file
     function()
       if G_golangci_config_file ~= nil then
         return G_golangci_config_file
@@ -29,10 +29,8 @@ local function golangcilint_args()
         G_golangci_config_file = found[1]
         return "--config", cmd
       else
-        -- default to enable all linters
-        -- TODO: make a better selection of linters...
-        vim.notify("Enabling all golangci-linters")
-        return "--enable-all"
+        local template = vim.fn.expand("$DOTFILES/template/.golangci.yml")
+        return "--config", template
       end
     end,
 
