@@ -11,7 +11,7 @@ return {
         dependencies = {
           "rafamadriz/friendly-snippets",
         },
-        keys = require("config.keymaps").setup_snippets_keymaps(),
+        keys = require("config.keymaps").setup_luasnip_keymaps(),
         opts = function(_, opts)
           require("luasnip.loaders.from_vscode").lazy_load({
             paths = { os.getenv("DOTFILES") .. "/nvim-fredrik/snippets" },

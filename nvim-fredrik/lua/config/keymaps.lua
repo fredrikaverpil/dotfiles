@@ -309,7 +309,7 @@ function M.setup_blink_cmp_keymaps()
   }
 end
 
-function M.setup_snippets_keymaps()
+function M.setup_luasnip_keymaps()
   return {
     {
       "<tab>",
