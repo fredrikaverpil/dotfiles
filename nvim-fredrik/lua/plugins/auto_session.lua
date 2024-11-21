@@ -62,8 +62,8 @@ return {
     end,
 
     config = function(_, opts)
-      vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
-      -- vim.opt.sessionoptions = "buffers,curdir,help,tabpages,winsize,winpos,terminal"
+      -- vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+      vim.opt.sessionoptions = "buffers,curdir,help,tabpages,winsize,winpos,terminal"
       require("auto-session").setup(opts)
     end,
 
