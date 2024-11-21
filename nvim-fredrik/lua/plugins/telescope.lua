@@ -17,10 +17,20 @@ return {
       },
       { "smartpde/telescope-recent-files" },
       {
+        -- used for switching between projects
+        "nvim-telescope/telescope-project.nvim",
+      },
+      {
+        -- used for opening files in another project
         "ahmedkhalf/project.nvim", -- NOTE: add projects with :AddProject
         event = "VeryLazy",
         config = function()
-          require("project_nvim").setup({ manual_mode = true, silent_chdir = false, scope_chdir = "win" })
+          local opts = {
+            manual_mode = true,
+            silent_chdir = false,
+            scope_chdir = "win",
+          }
+          require("project_nvim").setup(opts)
         end,
       },
       { "folke/trouble.nvim" }, -- for trouble.sources.telescope
@@ -58,26 +68,40 @@ return {
             find_command = { "rg", "--files", "--hidden", "--glob", "!**/.git/*" },
           },
         },
-        -- extensions = {
-        --   --   fzf = {},
-        --   --   live_grep_args = {
-        --   --   },
-        -- },
+        extensions = {
+          ["ui-select"] = {
+            require("telescope.themes").get_dropdown({}),
+          },
+          recent_files = {
+            only_cwd = true,
+          },
+          project = {
+            base_dirs = {
+              { path = "~/.dotfiles", max_depth = 1 },
+              { path = "~/code", max_depth = 1 },
+            },
+            sync_with_nvim_tree = true,
+            on_project_selected = function(prompt_bufnr)
+              if vim.g.project_set_cwd then
+                vim.cmd([[:SessionSave]])
+                require("telescope._extensions.project.actions").change_working_directory(prompt_bufnr, false)
+                vim.cmd([[:SessionRestore]])
+              else
+                local builtin = require("telescope.builtin")
+                local path = require("telescope._extensions.project.actions").get_selected_path(prompt_bufnr)
+                builtin.find_files({ cwd = path })
+              end
+            end,
+          },
+          --   fzf = {},
+          --   live_grep_args = {
+          --   },
+        },
       }
       return vim.tbl_deep_extend("force", custom_opts, opts)
     end,
     config = function(_, opts)
       local telescope = require("telescope")
-
-      opts.extensions = {
-        ["ui-select"] = {
-          require("telescope.themes").get_dropdown({}),
-        },
-        recent_files = {
-          -- This extension's options, see below.
-          only_cwd = true,
-        },
-      }
 
       telescope.setup(opts)
 
@@ -85,6 +109,7 @@ return {
       telescope.load_extension("live_grep_args")
       telescope.load_extension("ui-select")
       telescope.load_extension("recent_files")
+      telescope.load_extension("project") -- telescope-project.nvim
       telescope.load_extension("projects") -- ahmedkhalf/project.nvim
 
       require("config.keymaps").setup_telescope_keymaps()

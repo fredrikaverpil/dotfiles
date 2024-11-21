@@ -348,8 +348,19 @@ end
 function M.setup_telescope_keymaps()
   map_normal_mode("<leader><leader>", require("telescope.builtin").find_files, "Find Files")
 
+  -- change project
+  map_normal_mode("<leader>sp", function()
+    vim.g.project_set_cwd = true
+    require("telescope").extensions.project.project({ display_type = "full", hide_workspace = true })
+  end, "Switch project")
+
+  -- open file from other project without changing project
+  map_normal_mode("<leader>sf", function()
+    vim.g.project_set_cwd = false
+    require("telescope").extensions.project.project({ display_type = "full", hide_workspace = true })
+  end, "Switch project")
+
   -- file
-  map_normal_mode("<leader>sf", "<cmd>Telescope projects<CR>", "[s]earch [f]iles from other project")
   map_normal_mode("<leader>sF", "<cmd>Telescope oldfiles<CR>", "[s]earch recent [F]iles")
 
   -- git
