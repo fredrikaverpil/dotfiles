@@ -1,7 +1,7 @@
 return {
   {
     "nvim-treesitter/nvim-treesitter",
-    event = "VeryLazy",
+    event = "BufRead",
     build = ":TSUpdate",
     opts = function(_, opts)
       local defaults = {
@@ -21,10 +21,13 @@ return {
 
   {
     "nvim-treesitter/nvim-treesitter-context",
-    event = "VeryLazy",
+    event = "BufRead",
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
-      event = "VeryLazy",
+      event = "BufRead",
+    },
+    opts = {
+      multiwindow = true,
     },
   },
 }
