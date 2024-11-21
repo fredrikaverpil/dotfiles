@@ -1,0 +1,14 @@
+[general]
+import = [
+  "~/.local/share/fredrik/lazy/tokyonight.nvim/extras/alacritty/tokyonight_moon.toml",
+]
+
+[font]
+normal = { family = "JetBrainsMono Nerd Font", style = "Regular" }
+bold = { family = "JetBrainsMono Nerd Font", style = "Bold" }
+italic = { family = "Maple Mono", style = "Iytalic" }
+bold_italic = { family = "Maple Mono", style = "Bold Italic" }
+size = 13
+
+[window]
+decorations = "None"

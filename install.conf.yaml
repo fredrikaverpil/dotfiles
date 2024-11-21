@@ -24,6 +24,7 @@
       force: true
     ~/.wezterm.lua:
       force: true
+    ~/.config/alacritty/alacritty.toml:
     ~/.config/eza/theme.yml:
       path: eza_theme.yaml
       if: '[ "$(uname -s)" = "Linux" ]'
