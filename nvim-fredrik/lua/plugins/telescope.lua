@@ -20,19 +20,6 @@ return {
         -- used for switching between projects
         "nvim-telescope/telescope-project.nvim",
       },
-      {
-        -- used for opening files in another project
-        "ahmedkhalf/project.nvim", -- NOTE: add projects with :AddProject
-        event = "VeryLazy",
-        config = function()
-          local opts = {
-            manual_mode = true,
-            silent_chdir = false,
-            scope_chdir = "win",
-          }
-          require("project_nvim").setup(opts)
-        end,
-      },
       { "folke/trouble.nvim" }, -- for trouble.sources.telescope
     },
     opts = function(_, opts)
@@ -80,7 +67,7 @@ return {
               { path = "~/.dotfiles", max_depth = 1 },
               { path = "~/code", max_depth = 1 },
             },
-            sync_with_nvim_tree = true,
+            cd_scope = { "global", "tab", "window" },
             on_project_selected = function(prompt_bufnr)
               if vim.g.project_set_cwd then
                 vim.cmd([[:SessionSave]])
@@ -109,8 +96,7 @@ return {
       telescope.load_extension("live_grep_args")
       telescope.load_extension("ui-select")
       telescope.load_extension("recent_files")
-      telescope.load_extension("project") -- telescope-project.nvim
-      telescope.load_extension("projects") -- ahmedkhalf/project.nvim
+      telescope.load_extension("project")
 
       require("config.keymaps").setup_telescope_keymaps()
     end,
