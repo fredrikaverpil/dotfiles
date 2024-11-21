@@ -1,9 +1,7 @@
 M = {}
 
--- Alias <C-w> to <leader>w
-vim.api.nvim_set_keymap("n", "<leader>w", "<C-w>", { noremap = false, silent = true })
+-- windows
 
--- TODO: Move to window using the <ctrl> hjkl keys
 vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to left window", silent = true, noremap = true })
 vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to lower window", silent = true, noremap = true })
 vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go to upper window", silent = true, noremap = true })
@@ -15,7 +13,14 @@ vim.keymap.set("n", "<C-Down>", ":resize -2<CR>", { desc = "Decrease window heig
 vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", { desc = "Increase window width", silent = true })
 vim.keymap.set("n", "<C-Left>", ":vertical resize -2<CR>", { desc = "Decrease window width", silent = true })
 
---
+-- Move between tmux windows (seems to work fine without these keymaps)
+-- keys = {
+--   { "n", "<C-h>", "<cmd>TmuxNavigateLeft<CR>", desc = "Navigate Left" },
+--   { "n", "<C-j>", "<cmd>TmuxNavigateDown<CR>", desc = "Navigate Down" },
+--   { "n", "<C-k>", "<cmd>TmuxNavigateUp<CR>", desc = "Navigate Up" },
+--   { "n", "<C-l>", "<cmd>TmuxNavigateRight<CR>", desc = "Navigate Right" },
+--   { "n", "<C-\\>", "<cmd>TmuxNavigatePrevious<CR>", desc = "Navigate Previous" },
+-- },
 
 -- Move Lines
 local is_mac = vim.fn.has("macunix") == 1
@@ -36,15 +41,6 @@ map_multiple("i", up_keys, "<Esc>:m .-2<CR>==gi", { desc = "Move line up", silen
 -- Visual mode
 map_multiple("v", down_keys, ":m '>+1<CR>gv=gv", { desc = "Move selection down", silent = true })
 map_multiple("v", up_keys, ":m '<-2<CR>gv=gv", { desc = "Move selection up", silent = true })
-
--- Move between tmux windows (seems to work fine without these keymaps)
--- keys = {
---   { "n", "<C-h>", "<cmd>TmuxNavigateLeft<CR>", desc = "Navigate Left" },
---   { "n", "<C-j>", "<cmd>TmuxNavigateDown<CR>", desc = "Navigate Down" },
---   { "n", "<C-k>", "<cmd>TmuxNavigateUp<CR>", desc = "Navigate Up" },
---   { "n", "<C-l>", "<cmd>TmuxNavigateRight<CR>", desc = "Navigate Right" },
---   { "n", "<C-\\>", "<cmd>TmuxNavigatePrevious<CR>", desc = "Navigate Previous" },
--- },
 
 -- buffers
 vim.keymap.set("n", "<leader>bN", "<cmd>enew<cr>", { desc = "New buffer" })
@@ -911,8 +907,15 @@ function M.setup_whichkey()
     { "<leader>sn", group = "noice" },
     { "<leader>t", group = "test" },
     { "<leader>u", group = "ui" },
-    { "<leader>w", group = "window (<C-w> alias)" },
     { "<leader>x", group = "diagnostics/quickfix" },
+    { "<leader>w", group = "windows", proxy = "<C-w>" },
+    {
+      "<leader>b",
+      group = "buffers",
+      expand = function()
+        return require("which-key.extras").expand.buf()
+      end,
+    },
   })
 end
 
