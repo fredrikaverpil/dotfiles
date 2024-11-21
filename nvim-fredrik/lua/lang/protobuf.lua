@@ -79,6 +79,97 @@ local function descriptor_set_in()
   return descriptor_arg
 end
 
+local function buf_lint_setup()
+  local buf_lint_args = {
+    "lint",
+    "--error-format=json",
+    -- NOTE: if setting the cwd to the same directory as the buf.yaml,
+    -- the `--config` argument is not needed.
+    -- function()
+    --   return "--config=" .. buf_config_filepath()
+    -- end,
+    function()
+      -- NOTE: append the relative proto filepath. Only works if the
+      -- cwd is set to the buf.yaml directory.
+      local bufpath = vim.fn.expand("%:p")
+      local bufpath_rel = get_relative_path(bufpath, buf_lint_cwd())
+      vim.notify("buf_lint is using bufpath: " .. bufpath_rel)
+      return bufpath_rel
+    end,
+  }
+  -- HACK: cannot pass in cwd as function (for lazy loading). Instead, an autocmd is used.
+  -- opts.linters["buf_lint"] = {
+  --   args = buf_lint_args,
+  --   -- cwd = buf_lint_cwd, -- requires https://github.com/mfussenegger/nvim-lint/pull/674
+  --   append_fname = false,
+  -- }
+  vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost" }, {
+    pattern = { "*.proto" },
+    callback = function()
+      require("lint").try_lint("buf_lint", {
+        args = buf_lint_args,
+        cwd = buf_lint_cwd(),
+        append_fname = false,
+      })
+    end,
+  })
+end
+
+local function api_linter_setup()
+  require("lint").linters.api_linter = {
+    name = "api_linter", -- NOTE: differentiate from the name of the linter in nvim-lint.
+    cmd = "api-linter",
+    stdin = false,
+    append_fname = true,
+    args = {
+      "--output-format=json",
+      "--disable-rule=core::0191::java-multiple-files",
+      "--disable-rule=core::0191::java-package",
+      "--disable-rule=core::0191::java-outer-classname",
+      descriptor_set_in,
+    },
+    stream = "stdout",
+    ignore_exitcode = true,
+    env = nil,
+    parser = function(output, bufnr, linter_cwd)
+      vim.notify("api-linter is using cwd: " .. linter_cwd)
+      if output == "" then
+        return {}
+      end
+      local json_output = vim.json.decode(output)
+      local diagnostics = {}
+      if json_output == nil then
+        return diagnostics
+      end
+      for _, item in ipairs(json_output) do
+        for _, problem in ipairs(item.problems) do
+          table.insert(diagnostics, {
+            message = problem.message,
+            file = item.file,
+            code = problem.rule_id .. " " .. problem.rule_doc_uri,
+            severity = vim.diagnostic.severity.WARN,
+            lnum = problem.location.start_position.line_number - 1,
+            col = problem.location.start_position.column_number - 1,
+            end_lnum = problem.location.end_position.line_number - 1,
+            end_col = problem.location.end_position.column_number - 1,
+          })
+        end
+      end
+      cleanup_descriptor()
+      return diagnostics
+    end,
+  }
+  -- HACK: cannot pass in cwd as function (for lazy loading). Instead, an autocmd is used.
+  vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost" }, {
+    pattern = { "*.proto" },
+    callback = function()
+      require("lint").try_lint("api_linter", {
+        cwd = buf_lint_cwd(),
+      })
+    end,
+  })
+end
+
 return {
 
   {
@@ -118,101 +209,14 @@ return {
       -- NOTE: buf_lint and api-linter is not part of linters_by_ft:
       -- * buf_lint is executed below in an autocmd, because workaround for lazy-loaded cwd is desired.
       -- * api_linter is not yet merged into nvim-lint: https://github.com/mfussenegger/nvim-lint/pull/665
-      opts.linters_by_ft["proto"] = { "protolint" }
 
-      -- custom protolint config file reading
+      opts.linters_by_ft["proto"] = { "protolint" }
       local protolint_config_file = vim.fn.expand("$DOTFILES/templates/.protolint.yaml") -- FIXME: make this into the fallback filepath.
       local protolint_args = { "lint", "--reporter=json", "--config_path=" .. protolint_config_file }
       opts.linters["protolint"] = { args = protolint_args }
 
-      -- buf lint setup
-      local buf_lint_args = {
-        "lint",
-        "--error-format=json",
-        -- NOTE: if setting the cwd to the same directory as the buf.yaml,
-        -- the `--config` argument is not needed.
-        -- function()
-        --   return "--config=" .. buf_config_filepath()
-        -- end,
-        function()
-          -- NOTE: append the relative proto filepath. Only works if the
-          -- cwd is set to the buf.yaml directory.
-          local bufpath = vim.fn.expand("%:p")
-          local bufpath_rel = get_relative_path(bufpath, buf_lint_cwd())
-          vim.notify("buf_lint is using bufpath: " .. bufpath_rel)
-          return bufpath_rel
-        end,
-      }
-      -- HACK: cannot pass in cwd as function (for lazy loading). Instead, an autocmd is used.
-      -- opts.linters["buf_lint"] = {
-      --   args = buf_lint_args,
-      --   -- cwd = buf_lint_cwd, -- requires https://github.com/mfussenegger/nvim-lint/pull/674
-      --   append_fname = false,
-      -- }
-      vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost" }, {
-        pattern = { "*.proto" },
-        callback = function()
-          require("lint").try_lint("buf_lint", {
-            args = buf_lint_args,
-            cwd = buf_lint_cwd(),
-            append_fname = false,
-          })
-        end,
-      })
-
-      -- api-linter setup
-      require("lint").linters.api_linter = {
-        name = "api_linter", -- NOTE: differentiate from the name of the linter in nvim-lint.
-        cmd = "api-linter",
-        stdin = false,
-        append_fname = true,
-        args = {
-          "--output-format=json",
-          "--disable-rule=core::0191::java-multiple-files",
-          "--disable-rule=core::0191::java-package",
-          "--disable-rule=core::0191::java-outer-classname",
-          descriptor_set_in,
-        },
-        stream = "stdout",
-        ignore_exitcode = true,
-        env = nil,
-        parser = function(output, bufnr, linter_cwd)
-          vim.notify("api-linter is using cwd: " .. linter_cwd)
-          if output == "" then
-            return {}
-          end
-          local json_output = vim.json.decode(output)
-          local diagnostics = {}
-          if json_output == nil then
-            return diagnostics
-          end
-          for _, item in ipairs(json_output) do
-            for _, problem in ipairs(item.problems) do
-              table.insert(diagnostics, {
-                message = problem.message,
-                file = item.file,
-                code = problem.rule_id .. " " .. problem.rule_doc_uri,
-                severity = vim.diagnostic.severity.WARN,
-                lnum = problem.location.start_position.line_number - 1,
-                col = problem.location.start_position.column_number - 1,
-                end_lnum = problem.location.end_position.line_number - 1,
-                end_col = problem.location.end_position.column_number - 1,
-              })
-            end
-          end
-          cleanup_descriptor()
-          return diagnostics
-        end,
-      }
-      -- HACK: cannot pass in cwd as function (for lazy loading). Instead, an autocmd is used.
-      vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost" }, {
-        pattern = { "*.proto" },
-        callback = function()
-          require("lint").try_lint("api_linter", {
-            cwd = buf_lint_cwd(),
-          })
-        end,
-      })
+      buf_lint_setup()
+      api_linter_setup()
     end,
   },
 
