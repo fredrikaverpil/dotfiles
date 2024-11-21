@@ -44,7 +44,7 @@ return {
 
       local dap = require("dap")
       if opts.configurations ~= nil then
-        local merged = require("utils.table").deep_tbl_extend(dap.configurations, opts.configurations)
+        local merged = require("utils.table").deep_merge(dap.configurations, opts.configurations)
         dap.configurations = merged
       end
     end,

@@ -10,7 +10,7 @@ return {
         highlight = { enable = true },
         indent = { enable = true },
       }
-      local merged = require("utils.table").deep_tbl_extend(defaults, opts)
+      local merged = require("utils.table").deep_merge(defaults, opts)
       return merged
     end,
     config = function(_, opts)
