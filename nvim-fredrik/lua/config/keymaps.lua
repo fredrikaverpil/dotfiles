@@ -124,11 +124,11 @@ function M.setup_trouble_keymaps()
       "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
       desc = "Buffer Diagnostics (Trouble)",
     },
-    {
-      "<leader>cs",
-      "<cmd>:Neotree document_symbols<cr>",
-      desc = "Symbols (Neotree)",
-    },
+    -- {
+    --   "<leader>cs",
+    --   "<cmd>:Neotree document_symbols<cr>",
+    --   desc = "Symbols (Neotree)",
+    -- },
     {
       "<leader>cl",
       "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
@@ -600,8 +600,10 @@ function M.setup_coverage_keymaps()
   map_normal_mode("<leader>tC", ":CoverageLoad<CR>:CoverageSummary<CR>", "[t]est [C]overage summary")
 end
 
-function M.setup_aerial_keymaps()
-  map_normal_mode("<leader>cs", ":AerialToggle<CR>", "[s]ymbols") -- FIXME: overridden by trouble right now
+function M.setup_outline_keymaps()
+  return {
+    { "<leader>cs", "<cmd>Outline<CR>", desc = "Toggle outline" },
+  }
 end
 
 function M.setup_dap_ui_keymaps()
