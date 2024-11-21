@@ -48,7 +48,7 @@ for _, key in ipairs({ "<S-h>", "<leader>bp", "[b" }) do
   vim.keymap.set("n", key, "<cmd>bprevious<cr>", { desc = "Prev buffer" })
 end
 vim.keymap.set("n", "<leader>bq", "<cmd>bd %<cr>", { desc = "Delete buffer" })
-vim.keymap.set("n", "<leader>bd", function()
+vim.keymap.set("n", "<leader>bo", function()
   local visible = {}
   for _, win in pairs(vim.api.nvim_list_wins()) do
     visible[vim.api.nvim_win_get_buf(win)] = true
@@ -58,7 +58,7 @@ vim.keymap.set("n", "<leader>bd", function()
       vim.api.nvim_buf_delete(buf, {})
     end
   end
-end, { desc = "Delete buffers except visible" })
+end, { desc = "Close all other buffers" })
 
 -- tabs (can also use gt and gT)
 -- vim.keymap.set("n", "<leader><tab>l", "<cmd>tablast<cr>", { desc = "Last Tab", silent = true })
