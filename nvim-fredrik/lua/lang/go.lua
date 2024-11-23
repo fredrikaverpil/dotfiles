@@ -23,14 +23,15 @@ local function golangcilint_args()
         return G_golangci_config_file
       end
       local found
-      found = vim.fs.find({ ".golangci.yml" }, { type = "file", limit = 1 })
+      found = vim.fs.find({ ".golangci.yml", ".golangci.yaml", ".golangci.toml", ".golangci.json" }, { type = "file", limit = 1 })
       if #found == 1 then
-        local cmd = found[1]
-        G_golangci_config_file = found[1]
-        return "--config", cmd
+        local filepath = found[1]
+        G_golangci_config_file = filepath
+        return "--config", filepath
       else
-        local template = vim.fn.expand("$DOTFILES/template/.golangci.yml")
-        return "--config", template
+        local filepath = vim.fn.expand("$DOTFILES/templates/.golangci.yml")
+        G_golangci_config_file = filepath
+        return "--config", "/Users/fredrik/.dotfiles/templates/.golangci.yml"
       end
     end,
 
