@@ -40,6 +40,7 @@ map_multiple("v", down_keys, ":m '>+1<CR>gv=gv", { desc = "Move selection down",
 map_multiple("v", up_keys, ":m '<-2<CR>gv=gv", { desc = "Move selection up", silent = true })
 
 -- buffers
+vim.keymap.set("n", "<leader>`", "<C-^>", { noremap = true, desc = "Alternate buffers" })
 vim.keymap.set("n", "<leader>bN", "<cmd>enew<cr>", { desc = "New buffer" })
 for _, key in ipairs({ "<S-l>", "<leader>bn", "]b" }) do
   vim.keymap.set("n", key, "<cmd>bnext<cr>", { desc = "Next buffer" })
