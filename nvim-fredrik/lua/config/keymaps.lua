@@ -1038,4 +1038,10 @@ function M.setup_avante_keymaps()
   }
 end
 
+function M.setup_showkeys_keymaps()
+  return {
+    { "<leader>uk", ":ShowkeysToggle<CR>", desc = "Show keys (toogle)" },
+  }
+end
+
 return M
