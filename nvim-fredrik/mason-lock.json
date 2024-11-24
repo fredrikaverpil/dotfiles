@@ -1,9 +1,9 @@
 {
   "actionlint": "v1.7.4",
+  "basedpyright": "1.22.0",
   "bash-language-server": "5.4.2",
   "biome": "1.9.4",
   "buf": "v1.47.2",
-  "buf-language-server": "v0.0.0-20240213221648-8e42e5e2e24f",
   "codelldb": "v1.10.0",
   "debugpy": "1.8.9",
   "delve": "v1.23.1",
@@ -20,9 +20,11 @@
   "lua-language-server": "3.13.2",
   "markdown-toc": "1.2.0",
   "markdownlint": "0.43.0",
+  "mdformat": "0.7.19",
   "mypy": "1.13.0",
   "prettier": "3.3.3",
   "protolint": "v0.50.5",
+  "ruff": "0.8.0",
   "shellcheck": "v0.10.0",
   "shfmt": "v3.10.0",
   "stylua": "v0.20.0",
@@ -31,6 +33,5 @@
   "tfsec": "v1.28.11",
   "vtsls": "0.2.6",
   "yaml-language-server": "1.15.0",
-  "yamlfmt": "v0.14.0",
-
+  "yamlfmt": "v0.14.0"
 }
