@@ -50,6 +50,7 @@ return {
 
   {
     "stevearc/conform.nvim",
+    lazy = true,
     ft = { "python" },
     dependencies = {
       {
@@ -78,6 +79,7 @@ return {
   {
     "mfussenegger/nvim-lint",
     enabled = true,
+    lazy = true,
     ft = { "python" },
     dependencies = {
       {
@@ -105,6 +107,7 @@ return {
 
   {
     "neovim/nvim-lspconfig",
+    lazy = true,
     ft = { "python" },
     dependencies = {
       {
@@ -163,6 +166,7 @@ return {
 
   {
     "nvim-neotest/neotest",
+    lazy = true,
     ft = { "python" },
     dependencies = {
       "nvim-neotest/neotest-python",
@@ -180,6 +184,7 @@ return {
 
   {
     "andythigpen/nvim-coverage",
+    lazy = true,
     ft = { "python" },
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {
@@ -194,6 +199,7 @@ return {
 
   {
     "mfussenegger/nvim-dap",
+    lazy = true,
     ft = { "python" },
     dependencies = {
       {
@@ -219,9 +225,10 @@ return {
 
   {
     "linux-cultist/venv-selector.nvim",
+    lazy = true,
     event = "VeryLazy",
-    branch = "regexp", -- https://github.com/linux-cultist/venv-selector.nvim/tree/regexp
     ft = { "python" },
+    branch = "regexp", -- https://github.com/linux-cultist/venv-selector.nvim/tree/regexp
     dependencies = {
       "neovim/nvim-lspconfig",
       "nvim-telescope/telescope.nvim",

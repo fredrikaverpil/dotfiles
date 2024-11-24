@@ -2,6 +2,8 @@ return {
 
   {
     "neovim/nvim-lspconfig",
+    lazy = true,
+    ft = { "graphql" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -18,7 +20,6 @@ return {
         end,
       },
     },
-    ft = { "graphql" },
     opts = function(_, opts)
       opts.servers = {
         graphql = {

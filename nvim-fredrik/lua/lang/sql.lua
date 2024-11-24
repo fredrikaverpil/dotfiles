@@ -2,17 +2,20 @@ local sql_ft = { "sql", "mysql", "plsql" }
 
 return {
 
-  { "jsborjesson/vim-uppercase-sql", ft = sql_ft },
+  {
+    "jsborjesson/vim-uppercase-sql",
+    lazy = true,
+    ft = sql_ft,
+  },
 
   {
     "tpope/vim-dadbod",
-    lazy = false,
+    lazy = true,
     enabled = true,
     dependencies = {
       { "kristijanhusak/vim-dadbod-ui" },
       { "kristijanhusak/vim-dadbod-completion" },
     },
-    cmd = { "DBUI", "DBUIFindBuffer" },
     config = function()
       vim.g.db_ui_save_location = "~/code/dbui"
       vim.g.db_ui_tmp_query_location = "~/code/queries"
@@ -20,14 +23,16 @@ return {
       vim.g.db_ui_execute_on_save = false
       vim.g.db_ui_use_nvim_notify = true
     end,
+    cmd = { "DBUI", "DBUIFindBuffer" },
   },
 
   {
     "saghen/blink.cmp",
+    lazy = true,
+    ft = sql_ft,
     dependencies = {
       "kristijanhusak/vim-dadbod-completion",
     },
-    ft = sql_ft,
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {

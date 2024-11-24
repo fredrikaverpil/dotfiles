@@ -2,6 +2,8 @@ return {
 
   {
     "mfussenegger/nvim-lint",
+    lazy = true,
+    ft = { "dockerfile" },
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -11,7 +13,6 @@ return {
         end,
       },
     },
-    ft = { "dockerfile" },
     opts = {
       linters_by_ft = {
         dockerfile = { "hadolint" },
@@ -21,6 +22,11 @@ return {
 
   {
     "neovim/nvim-lspconfig",
+    lazy = true,
+    ft = {
+      "dockerfile",
+      -- "yaml",
+    },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -36,10 +42,6 @@ return {
           })
         end,
       },
-    },
-    ft = {
-      "dockerfile",
-      -- "yaml",
     },
     opts = {
       servers = {

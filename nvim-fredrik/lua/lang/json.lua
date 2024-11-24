@@ -13,6 +13,8 @@ return {
 
   {
     "stevearc/conform.nvim",
+    lazy = true,
+    ft = filetypes,
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -22,7 +24,6 @@ return {
         end,
       },
     },
-    ft = filetypes,
     opts = {
       formatters_by_ft = {
         json = { "biome" },
@@ -40,6 +41,8 @@ return {
 
   {
     "neovim/nvim-lspconfig",
+    lazy = true,
+    ft = filetypes,
     dependencies = {
       {
         "b0o/SchemaStore.nvim",
@@ -57,7 +60,6 @@ return {
         end,
       },
     },
-    ft = filetypes,
     opts = {
       servers = {
         jsonls = {

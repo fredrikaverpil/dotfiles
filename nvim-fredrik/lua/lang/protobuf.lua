@@ -174,7 +174,8 @@ return {
 
   {
     "stevearc/conform.nvim",
-    event = "VeryLazy",
+    lazy = true,
+    ft = { "proto" },
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -184,7 +185,6 @@ return {
         end,
       },
     },
-    ft = { "proto" },
     opts = {
       formatters_by_ft = {
         proto = { "buf" },
@@ -194,7 +194,8 @@ return {
 
   {
     "mfussenegger/nvim-lint",
-    event = "VeryLazy",
+    lazy = true,
+    ft = { "proto" },
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -204,7 +205,6 @@ return {
         end,
       },
     },
-    ft = { "proto" },
     opts = function(_, opts)
       -- NOTE: buf_lint and api-linter is not part of linters_by_ft:
       -- * buf_lint is executed below in an autocmd, because workaround for lazy-loaded cwd is desired.
@@ -222,6 +222,8 @@ return {
 
   {
     "neovim/nvim-lspconfig",
+    lazy = true,
+    ft = { "proto" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -236,7 +238,6 @@ return {
         end,
       },
     },
-    ft = { "proto" },
     opts = function()
       -- HACK: override bufls with custom config, using the 'buf beta lsp' command.
       local lspconfig = require("lspconfig")

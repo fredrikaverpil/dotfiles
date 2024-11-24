@@ -48,6 +48,8 @@ return {
 
   {
     "nvim-treesitter/nvim-treesitter",
+    lazy = true,
+    ft = { "go", "gomod", "gowork", "gotmpl" },
     opts = {
       ensure_installed = { "go", "gomod", "gosum", "gotmpl", "gowork" },
     },
@@ -55,6 +57,8 @@ return {
 
   {
     "stevearc/conform.nvim",
+    lazy = true,
+    ft = { "go", "gomod", "gowork", "gotmpl" },
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -64,7 +68,6 @@ return {
         end,
       },
     },
-    ft = { "go", "gomod", "gowork", "gotmpl" },
     opts = {
       formatters_by_ft = {
         go = { "goimports", "gci", "gofumpt", "golines" },
@@ -95,6 +98,8 @@ return {
 
   {
     "mfussenegger/nvim-lint",
+    lazy = true,
+    ft = { "go", "gomod", "gowork", "gotmpl" },
     enabled = true, -- FIXME: use lsp for golangci-lint instead when possible?
     dependencies = {
       {
@@ -113,6 +118,8 @@ return {
 
   {
     "neovim/nvim-lspconfig",
+    lazy = true,
+    ft = { "go", "gomod", "gowork", "gosum", "gotmpl", "gohtmltmpl", "gotexttmpl" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -135,7 +142,6 @@ return {
         end,
       },
     },
-    ft = { "go", "gomod", "gowork", "gosum", "gotmpl", "gohtmltmpl", "gotexttmpl" },
     opts = function(_, opts)
       local function golangcilint_cmd()
         return table.insert(golangcilint_args(), 0, "golangci-lint")
@@ -206,6 +212,7 @@ return {
 
   {
     "maxandron/goplements.nvim",
+    lazy = true,
     ft = "go",
     opts = {},
   },
@@ -225,8 +232,9 @@ return {
 
   {
     "ray-x/go.nvim",
-    enabled = false,
+    lazy = true,
     ft = { "go", "gomod" },
+    enabled = false,
     dependencies = { -- optional packages
       "ray-x/guihua.lua",
       "neovim/nvim-lspconfig",
@@ -247,6 +255,7 @@ return {
 
   {
     "nvim-neotest/neotest",
+    lazy = true,
     ft = { "go" },
     dependencies = {
       {
@@ -277,6 +286,7 @@ return {
 
   {
     "andythigpen/nvim-coverage",
+    lazy = true,
     ft = { "go" },
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {
@@ -292,6 +302,7 @@ return {
 
   {
     "mfussenegger/nvim-dap",
+    lazy = true,
     ft = { "go" },
     dependencies = {
       {

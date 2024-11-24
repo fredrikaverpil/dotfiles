@@ -11,6 +11,8 @@ return {
 
   {
     "stevearc/conform.nvim",
+    lazy = true,
+    ft = { "markdown" },
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -20,7 +22,6 @@ return {
         end,
       },
     },
-    ft = { "markdown" },
     opts = {
       formatters_by_ft = {
         markdown = { "prettier" },
@@ -40,6 +41,8 @@ return {
 
   {
     "mfussenegger/nvim-lint",
+    lazy = true,
+    ft = { "markdown" },
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -49,7 +52,6 @@ return {
         end,
       },
     },
-    ft = { "markdown" },
     opts = {
       linters_by_ft = {
         markdown = { "markdownlint", "markdown-toc" },
@@ -59,15 +61,17 @@ return {
 
   {
     "iamcco/markdown-preview.nvim",
-    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+    lazy = true,
     ft = { "markdown" },
     build = function()
       vim.fn["mkdp#util#install"]()
     end,
+    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
   },
 
   {
     "MeanderingProgrammer/render-markdown.nvim",
+    lazy = true,
     ft = { "markdown" },
     dependencies = { "nvim-treesitter/nvim-treesitter" },
     opts = {

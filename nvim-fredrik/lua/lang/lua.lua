@@ -2,6 +2,8 @@ return {
 
   {
     "stevearc/conform.nvim",
+    lazy = true,
+    ft = { "lua" },
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -11,7 +13,6 @@ return {
         end,
       },
     },
-    ft = { "lua" },
     opts = {
       formatters_by_ft = {
         lua = { "stylua" },
@@ -21,6 +22,8 @@ return {
 
   {
     "neovim/nvim-lspconfig",
+    lazy = true,
+    ft = { "lua" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -36,7 +39,6 @@ return {
       },
       {
         "folke/lazydev.nvim",
-        ft = "lua", -- only load on lua files
         opts = {
           library = {
 
@@ -77,7 +79,6 @@ return {
         end,
       },
     },
-    ft = { "lua" },
     opts = function(_, opts)
       opts.servers["lua_ls"] = {
         settings = {
@@ -114,6 +115,7 @@ return {
 
   {
     "nvim-neotest/neotest",
+    lazy = true,
     ft = { "lua" },
     dependencies = {
       {

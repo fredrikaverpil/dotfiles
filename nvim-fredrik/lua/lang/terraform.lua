@@ -2,6 +2,7 @@ return {
 
   {
     "stevearc/conform.nvim",
+    lazy = true,
     ft = { "terraform", "tf", "terraform-vars" },
     opts = {
       formatters_by_ft = {
@@ -14,6 +15,8 @@ return {
 
   {
     "mfussenegger/nvim-lint",
+    lazy = true,
+    ft = { "terraform", "tf", "terraform-vars" },
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -23,7 +26,6 @@ return {
         end,
       },
     },
-    ft = { "terraform", "tf", "terraform-vars" },
     opts = {
       linters_by_ft = {
         terraform = { "terraform_validate", "tflint", "tfsec" },
@@ -34,6 +36,8 @@ return {
 
   {
     "neovim/nvim-lspconfig",
+    lazy = true,
+    ft = { "terraform", "tf", "terraform-vars" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -48,33 +52,10 @@ return {
         end,
       },
     },
-    ft = { "terraform", "tf", "terraform-vars" },
     opts = {
       servers = {
         terraformls = {},
       },
     },
   },
-
-  -- {
-  --    "nvim-telescope/telescope.nvim",
-  --    dependencies = {
-  --      {
-  --        "ANGkeith/telescope-terraform-doc.nvim",
-  --        config = function()
-  --          Util.on_load("telescope.nvim", function()
-  --            require("telescope").load_extension("terraform_doc")
-  --          end)
-  --        end,
-  --      },
-  --      {
-  --        "cappyzawa/telescope-terraform.nvim",
-  --        config = function()
-  --          Util.on_load("telescope.nvim", function()
-  --            require("telescope").load_extension("terraform")
-  --          end)
-  --        end,
-  --      },
-  --    },
-  --  },
 }

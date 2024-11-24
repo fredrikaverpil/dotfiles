@@ -18,6 +18,8 @@ return {
 
   {
     "stevearc/conform.nvim",
+    lazy = true,
+    ft = { "yaml", "gha", "dependabot" },
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -27,7 +29,6 @@ return {
         end,
       },
     },
-    ft = { "yaml", "gha", "dependabot" },
     opts = {
       formatters_by_ft = {
         -- TODO: the default is very strict, might be good to add a config
@@ -43,6 +44,8 @@ return {
 
   {
     "mfussenegger/nvim-lint",
+    lazy = true,
+    ft = { "gha" },
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -52,7 +55,6 @@ return {
         end,
       },
     },
-    ft = { "gha" },
     opts = {
       linters_by_ft = {
         gha = { "actionlint" },
@@ -62,6 +64,8 @@ return {
 
   {
     "neovim/nvim-lspconfig",
+    lazy = true,
+    ft = { "yaml", "gha", "dependabot" },
     dependencies = {
       {
         "b0o/SchemaStore.nvim",
@@ -81,7 +85,6 @@ return {
         end,
       },
     },
-    ft = { "yaml", "gha", "dependabot" },
     opts = {
       servers = {
         yamlls = {

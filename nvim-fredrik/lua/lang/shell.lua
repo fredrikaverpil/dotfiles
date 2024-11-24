@@ -2,6 +2,8 @@ return {
 
   {
     "stevearc/conform.nvim",
+    lazy = true,
+    ft = { "sh" },
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -11,7 +13,6 @@ return {
         end,
       },
     },
-    ft = { "sh" },
     opts = {
       formatters_by_ft = {
         sh = { "shfmt" },
@@ -21,6 +22,8 @@ return {
 
   {
     "mfussenegger/nvim-lint",
+    lazy = true,
+    ft = { "sh" },
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -30,7 +33,6 @@ return {
         end,
       },
     },
-    ft = { "sh" },
     opts = {
       linters_by_ft = {
         sh = { "shellcheck" },
@@ -40,6 +42,8 @@ return {
 
   {
     "neovim/nvim-lspconfig",
+    lazy = true,
+    ft = { "sh" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -54,7 +58,6 @@ return {
         end,
       },
     },
-    ft = { "sh" },
     opts = {
       servers = {
         -- https://github.com/bash-lsp/bash-language-server
