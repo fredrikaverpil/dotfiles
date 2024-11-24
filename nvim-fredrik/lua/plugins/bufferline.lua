@@ -2,6 +2,7 @@ return {
 
   {
     "akinsho/bufferline.nvim",
+    lazy = true,
     event = "VeryLazy",
     opts = {
       options = {

@@ -2,7 +2,8 @@ return {
 
   {
     "echasnovski/mini.ai",
-    event = "VeryLazy",
+    lazy = true,
+    event = "BufReadPost",
     version = "*",
     opts = {},
     config = function(_, opts)

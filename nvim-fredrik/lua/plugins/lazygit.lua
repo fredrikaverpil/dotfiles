@@ -2,13 +2,11 @@ return {
 
   {
     "kdheepak/lazygit.nvim",
-    event = "VeryLazy",
+    lazy = true,
     -- optional for floating window border decoration
     dependencies = {
       "nvim-lua/plenary.nvim",
     },
-    config = function()
-      require("config.keymaps").setup_lazygit_keymaps()
-    end,
+    keys = require("config.keymaps").setup_lazygit_keymaps(),
   },
 }

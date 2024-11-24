@@ -2,7 +2,7 @@ return {
 
   {
     "mfussenegger/nvim-dap",
-    event = "VeryLazy",
+    lazy = true,
     dependencies = {
       {
         "jay-babu/mason-nvim-dap.nvim",

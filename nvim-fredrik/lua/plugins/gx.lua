@@ -2,7 +2,7 @@ return {
 
   {
     "chrishrb/gx.nvim",
-    event = "VeryLazy",
+    lazy = true,
     dependencies = { "nvim-lua/plenary.nvim" },
     cmd = { "Browse" },
     -- init = function()

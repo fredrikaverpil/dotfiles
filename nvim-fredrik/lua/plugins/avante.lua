@@ -1,6 +1,7 @@
 return {
   {
     "yetone/avante.nvim",
+    lazy = true,
     build = "make",
     opts = {
       claude = {

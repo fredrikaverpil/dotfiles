@@ -2,11 +2,11 @@ return {
 
   {
     "numToStr/FTerm.nvim",
-    event = "VeryLazy",
+    lazy = true,
     opts = {},
     config = function(_, opts)
       require("FTerm").setup(opts)
-      require("config.keymaps").setup_terminal_keymaps()
     end,
+    keys = require("config.keymaps").setup_terminal_keymaps(),
   },
 }

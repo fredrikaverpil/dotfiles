@@ -34,7 +34,7 @@ vim.api.nvim_create_autocmd("filetype", {
 return {
   {
     "nvim-neotest/neotest",
-    event = "VeryLazy",
+    lazy = true,
     dependencies = {
       "nvim-neotest/nvim-nio",
       "nvim-lua/plenary.nvim",

@@ -5,8 +5,7 @@ M.scratchpad_path = vim.fn.expand(M.vault_path .. "/scratchpad.md")
 
 return {
   "epwalsh/obsidian.nvim",
-  -- event = "VeryLazy",
-  cmd = { "ObsidianSearch" },
+  lazy = true,
   dependencies = {
     -- required
     "nvim-lua/plenary.nvim",
@@ -88,4 +87,5 @@ return {
     end,
   },
   keys = require("config.keymaps").setup_obsidian_keymaps(M),
+  cmd = { "ObsidianSearch", "ObsidianQuickSwitch", "ObsidianNew" },
 }

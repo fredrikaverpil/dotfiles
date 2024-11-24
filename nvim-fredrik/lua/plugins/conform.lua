@@ -2,6 +2,7 @@ return {
   {
     -- https://github.com/stevearc/conform.nvim
     "stevearc/conform.nvim",
+    lazy = true,
     event = "BufWritePre",
     config = function(_, opts)
       vim.api.nvim_create_autocmd("BufWritePre", {

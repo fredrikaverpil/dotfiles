@@ -28,13 +28,11 @@ end
 return {
   {
     "rmagatti/auto-session",
+    lazy = false,
     dependencies = {
       "linux-cultist/venv-selector.nvim",
       "nvim-telescope/telescope.nvim",
     },
-
-    lazy = false,
-
     opts = function(_, opts)
       ---@type AutoSession.Config
       opts = opts or {}
@@ -60,13 +58,11 @@ return {
         previewer = false,
       }
     end,
-
     config = function(_, opts)
       -- vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
       vim.opt.sessionoptions = "buffers,curdir,help,tabpages,winsize,winpos,terminal"
       require("auto-session").setup(opts)
     end,
-
     keys = require("config.keymaps").setup_auto_session_keymaps(),
   },
 }

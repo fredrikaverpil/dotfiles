@@ -342,48 +342,67 @@ function M.setup_luasnip_keymaps()
 end
 
 function M.setup_neotree_keymaps()
-  map_normal_mode("<leader>e", ":Neotree source=filesystem reveal=true position=left toggle=true<CR>", "N[E]oTree")
-  -- map_normal_mode("<leader>sb", ":Neotree buffers reveal float<CR>", "[S]earch [B]uffers")
+  return {
+    { "<leader>e", ":Neotree source=filesystem reveal=true position=left toggle=true<CR>", desc = "Neo-tree" },
+  }
 end
 
 function M.setup_telescope_keymaps()
-  map_normal_mode("<leader><leader>", require("telescope.builtin").find_files, "Find Files")
-
-  -- change project
-  map_normal_mode("<leader>sp", function()
-    vim.g.project_set_cwd = true
+  --- @param set_cwd boolean
+  local function open_file_in_other_project(set_cwd)
+    vim.g.project_set_cwd = set_cwd
     require("telescope").extensions.project.project({ display_type = "full", hide_workspace = true })
-  end, "Switch project")
+  end
 
-  -- open file from other project without changing project
-  map_normal_mode("<leader>sf", function()
-    vim.g.project_set_cwd = false
-    require("telescope").extensions.project.project({ display_type = "full", hide_workspace = true })
-  end, "Switch project")
+  return {
 
-  -- file
-  map_normal_mode("<leader>sF", "<cmd>Telescope oldfiles<CR>", "[s]earch recent [F]iles")
+    -- find files
+    { "<leader><leader>", require("telescope.builtin").find_files, desc = "Find files" },
 
-  -- git
-  map_normal_mode("<leader>sgc", "<cmd>Telescope git_commits<CR>", "[s]earch [g]it [c]ommits")
-  map_normal_mode("<leader>sgC", "<cmd>Telescope git_bcommits<CR>", "[s]earch [g]it branch [C]ommits")
-  map_normal_mode("<leader>sgs", "<cmd>Telescope git_status<CR>", "[s]earch [g]it [s]tatus changes")
-  map_normal_mode("<leader>sgb", "<cmd>Telescope git_branches<CR>", "[s]earch [g]it [b]anches")
+    -- project files
+    {
+      "<leader>sp",
+      function()
+        open_file_in_other_project(true)
+      end,
+      desc = "Switch project",
+    },
+    {
+      "<leader>sf",
+      function()
+        open_file_in_other_project(false)
+      end,
+      desc = "Switch to file", -- NOTE: without changing cwd
+    },
+    { "<leader>sF", "<cmd>Telescope oldfiles<CR>", desc = "[s]earch recent [F]iles" },
 
-  -- search
-  map_normal_mode("<leader>/", require("telescope").extensions.live_grep_args.live_grep_args, "[s]earch [g]rep")
-  map_normal_mode('<leader>s"', "<cmd>Telescope registers<cr>", '[s]earch ["]registers')
-  map_normal_mode("<leader>sa", "<cmd>Telescope autocommands<cr>", "[s]earch [a]utocommands")
-  map_normal_mode("<leader>sb", "<cmd>Telescope buffers<CR>", "[s]earch opened [b]uffers")
-  map_normal_mode("<leader>sc", "<cmd>Telescope commands<cr>", "[s]earch [c]ommands")
-  map_normal_mode("<leader>sd", "<cmd>Telescope diagnostics bufnr=0<cr>", "[s]earch [d]ocument diagnostics")
-  map_normal_mode("<leader>sD", "<cmd>Telescope diagnostics<cr>", "[s]earch [D]iagnostics")
-  map_normal_mode("<leader>sh", "<cmd>Telescope help_tags<cr>", "[s]earch [h]elp pages")
-  map_normal_mode("<leader>sH", "<cmd>Telescope highlights<cr>", "[s]earch [H]ighlight groups")
-  map_normal_mode("<leader>sk", "<cmd>Telescope keymaps<cr>", "[s]earch [k]ey maps")
-  map_normal_mode("<leader>sM", "<cmd>Telescope man_pages<CR>", "[s]earch [M]an pages")
-  map_normal_mode("<leader>sm", "<cmd>Telescope marks<cr>", "[s]earch [m]arks")
-  map_normal_mode("<leader>so", "<cmd>Telescope vim_options<cr>", "[s]earch [o]ptions")
+    -- git
+    { "<leader>sgc", "<cmd>Telescope git_commits<CR>", desc = "[s]earch [g]it [c]ommits" },
+    { "<leader>sgC", "<cmd>Telescope git_bcommits<CR>", desc = "[s]earch [g]it branch [C]ommits" },
+    { "<leader>sgs", "<cmd>Telescope git_status<CR>", desc = "[s]earch [g]it [s]tatus changes" },
+    { "<leader>sgb", "<cmd>Telescope git_branches<CR>", desc = "[s]earch [g]it [b]ranches" },
+
+    -- search
+    {
+      "<leader>/",
+      function()
+        require("telescope").extensions.live_grep_args.live_grep_args()
+      end,
+      desc = "[s]earch [g]rep",
+    },
+    { '<leader>s"', "<cmd>Telescope registers<cr>", desc = '[s]earch ["]registers' },
+    { "<leader>sa", "<cmd>Telescope autocommands<cr>", desc = "[s]earch [a]utocommands" },
+    { "<leader>sb", "<cmd>Telescope buffers<CR>", desc = "[s]earch opened [b]uffers" },
+    { "<leader>sc", "<cmd>Telescope commands<cr>", desc = "[s]earch [c]ommands" },
+    { "<leader>sd", "<cmd>Telescope diagnostics bufnr=0<cr>", desc = "[s]earch [d]ocument diagnostics" },
+    { "<leader>sD", "<cmd>Telescope diagnostics<cr>", desc = "[s]earch [D]iagnostics" },
+    { "<leader>sh", "<cmd>Telescope help_tags<cr>", desc = "[s]earch [h]elp pages" },
+    { "<leader>sH", "<cmd>Telescope highlights<cr>", desc = "[s]earch [H]ighlight groups" },
+    { "<leader>sk", "<cmd>Telescope keymaps<cr>", desc = "[s]earch [k]ey maps" },
+    { "<leader>sM", "<cmd>Telescope man_pages<cr>", desc = "[s]earch [M]an pages" },
+    { "<leader>sm", "<cmd>Telescope marks<cr>", desc = "[s]earch [m]arks" },
+    { "<leader>so", "<cmd>Telescope vim_options<cr>", desc = "[s]earch [o]ptions" },
+  }
 end
 
 function M.setup_auto_session_keymaps()
@@ -407,7 +426,7 @@ function M.setup_lazygit_keymaps()
   --   "LazyGitFilter",
   --   "LazyGitFilterCurrentFile",
 
-  map_normal_mode("<leader>gg", function()
+  local function cmd()
     -- if keymap <Esc><Esc> is set in terminal mode, remove it.
     -- this is to enable <Esc> to navigate in LazyGit which otherwise
     -- is overridden for terminal usage.
@@ -418,7 +437,15 @@ function M.setup_lazygit_keymaps()
       end
     end
     vim.cmd("LazyGit")
-  end, "LazyGit")
+  end
+
+  return {
+    {
+      "<leader>gg",
+      cmd,
+      desc = "LazyGit",
+    },
+  }
 end
 
 function M.setup_gitsigns_keymaps(bufnr)
@@ -453,10 +480,11 @@ function M.setup_gitsigns_keymaps(bufnr)
 end
 
 function M.setup_neogit_keymaps()
-  local neogit = require("neogit")
-  vim.keymap.set("n", "<leader>gn", function()
-    neogit.open({ kind = "split" })
-  end, { silent = true, noremap = true, desc = "Neogit" })
+  local function open_in_split()
+    require("neogit").open({ kind = "split" })
+  end
+
+  vim.keymap.set("n", "<leader>gn", open_in_split, { silent = true, noremap = true, desc = "Neogit" })
   vim.keymap.set("n", "<leader>gp", ":Neogit pull<CR>", { silent = true, noremap = true, desc = "[g]it [p]ull" })
   vim.keymap.set("n", "<leader>gP", ":Neogit push<CR>", { silent = true, noremap = true, desc = "[g]it [P]ush" })
   -- NOTE: see Telescope git_... commands set by setup_telescope_keymaps
@@ -797,12 +825,16 @@ function M.setup_terminal_keymaps()
     vim.api.nvim_set_keymap("t", "<Esc><Esc>", "<C-\\><C-n>", { noremap = true })
     require("utils.terminal").toggle_terminal_native()
   end
-  vim.keymap.set({ "n", "i", "t", "v" }, ctrl_alt_slash, split_term_cmd, { desc = "Toggle terminal" })
-  vim.keymap.set({ "n", "i", "t", "v" }, ctrl_alt_underscore, split_term_cmd, { desc = "Toggle terminal" })
 
-  -- C-A-/ toggles split terminal on/off
-  vim.keymap.set({ "n", "i", "t", "v" }, ctrl_slash, floating_term_cmd, { desc = "Toggle native terminal" })
-  vim.keymap.set({ "n", "i", "t", "v" }, ctrl_underscore, floating_term_cmd, { desc = "Toggle native terminal" })
+  return {
+
+    { ctrl_alt_slash, split_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle terminal" },
+    { ctrl_alt_underscore, split_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle terminal" },
+
+    -- C-A-/ toggles split terminal on/off
+    { ctrl_slash, floating_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle native terminal" },
+    { ctrl_underscore, floating_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle native terminal" },
+  }
 end
 
 function M.setup_conform_keymaps()
@@ -860,7 +892,9 @@ function M.setup_diagnostics_keymaps()
 end
 
 function M.setup_winshift_keymaps()
-  vim.keymap.set({ "n", "v" }, "<leader>ww", "<cmd>WinShift<CR>", { desc = "[w]inshift (shift + arrows)" })
+  return {
+    { "<leader>ww", "<cmd>WinShift<CR>", desc = "[w]inshift (shift + arrows)" },
+  }
 end
 
 function M.setup_obsidian_keymaps(obsidian_vars)
@@ -943,16 +977,24 @@ function M.setup_whichkey_contextual()
 end
 
 function M.setup_rest_keymaps()
-  map_normal_mode("<leader>rr", "<Plug>RestNvim", "Run REST request under cursor")
+  return {
+    { "<leader>rr", "<Plug>RestNvim", desc = "Run REST request under cursor" },
+  }
 end
 
 function M.setup_yanky_keymaps()
   -- NOTE: reminder;
   -- Use `vep` to replace current a word with a yank.
   -- Use `Vp` to replace a line with a yank.
-  map_normal_mode("<leader>p", function()
-    require("telescope").extensions.yank_history.yank_history({})
-  end, "Yanky history")
+  return {
+    {
+      "<leader>p",
+      function()
+        require("telescope").extensions.yank_history.yank_history({})
+      end,
+      desc = "Yanky history",
+    },
+  }
 end
 
 function M.setup_venv_selector_keymaps()

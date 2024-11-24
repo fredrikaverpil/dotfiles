@@ -67,7 +67,8 @@ end
 return {
   {
     "neovim/nvim-lspconfig",
-    lazy = false,
+    lazy = true,
+    event = "VeryLazy",
     dependencies = {
       {
         "b0o/SchemaStore.nvim",

@@ -1,6 +1,7 @@
 return {
   {
     "otavioschwanck/arrow.nvim",
+    lazy = true,
     event = "VeryLazy",
     opts = {
       show_icons = true,

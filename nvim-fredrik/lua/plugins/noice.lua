@@ -1,7 +1,9 @@
 return {
   {
     "folke/noice.nvim",
-    priority = 800,
+    lazy = true,
+    event = "VeryLazy",
+    -- priority = 800,
     opts = {
       -- add any options here
     },

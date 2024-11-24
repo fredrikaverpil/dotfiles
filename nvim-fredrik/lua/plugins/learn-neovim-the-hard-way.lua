@@ -2,8 +2,9 @@ return {
 
   {
     "m4xshen/hardtime.nvim",
-    enabled = false,
+    lazy = true,
     event = "VeryLazy",
+    enabled = false,
     dependencies = {
       "MunifTanjim/nui.nvim",
       "nvim-lua/plenary.nvim",
@@ -13,8 +14,9 @@ return {
 
   {
     "tris203/precognition.nvim",
-    enabled = false,
+    lazy = true,
     event = "VeryLazy",
+    enabled = false,
     opts = {},
   },
 }

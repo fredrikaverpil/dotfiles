@@ -1,8 +1,12 @@
 return {
 
+  -- NOTE: this plugin is only used for cmdline completions. All other completions use blink.nvim.
+
   {
     "hrsh7th/nvim-cmp",
-    enabled = true, -- NOTE: using blink.cmp instead, see blink.lua
+    lazy = true,
+    event = "CmdlineEnter",
+    enabled = true,
     dependencies = {
       { "hrsh7th/cmp-path" },
       { "hrsh7th/cmp-buffer" },

@@ -1,6 +1,9 @@
 return {
   {
     "zbirenbaum/copilot.lua",
+    lazy = true,
+    event = "InsertEnter",
+    enabled = true,
     dependencies = {
       -- {
       --   "hrsh7th/nvim-cmp",
@@ -51,9 +54,7 @@ return {
         end,
       },
     },
-    enabled = true,
     cmd = "Copilot",
-    event = "InsertEnter",
     build = ":Copilot auth",
     opts = {
       panel = {
@@ -100,6 +101,7 @@ return {
 
   {
     "CopilotC-Nvim/CopilotChat.nvim",
+    lazy = true,
     event = "VeryLazy",
     enabled = true,
     branch = "canary", -- while in development

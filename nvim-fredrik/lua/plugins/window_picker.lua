@@ -2,8 +2,9 @@ return {
   {
     "s1n7ax/nvim-window-picker",
     name = "window-picker",
+    lazy = true,
     event = "VeryLazy",
-    version = "2.*",
+    version = "*",
     opts = {
       hint = "floating-big-letter",
       filter_rules = {

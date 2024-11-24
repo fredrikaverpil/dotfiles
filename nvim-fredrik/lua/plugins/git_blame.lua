@@ -1,7 +1,7 @@
 return {
   {
     "f-person/git-blame.nvim",
-    event = "VeryLazy",
+    lazy = true,
     config = function()
       vim.cmd(":GitBlameToggle") -- disable at startup
     end,

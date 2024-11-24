@@ -1,7 +1,15 @@
 return {
   {
     "williamboman/mason.nvim",
-    cmd = { "Mason", "MasonInstall", "MasonUpdate", "MasonUninstall" },
+    lazy = true,
+    dependencies = {
+      {
+        "zapling/mason-lock.nvim",
+        opts = {
+          lockfile_path = os.getenv("DOTFILES") .. "/nvim-fredrik/mason-lock.json",
+        },
+      },
+    },
     config = function(_, opts)
       require("mason").setup(opts)
 
@@ -17,14 +25,6 @@ return {
         end
       end)
     end,
-  },
-
-  {
-    "zapling/mason-lock.nvim",
-    init = function()
-      require("mason-lock").setup({
-        lockfile_path = os.getenv("DOTFILES") .. "/nvim-fredrik/mason-lock.json",
-      })
-    end,
+    cmd = { "Mason", "MasonInstall", "MasonUpdate", "MasonUninstall" },
   },
 }

@@ -2,7 +2,7 @@ return {
   {
     -- NOTE: jump between diffs with ]c and [c (vim built in), see :h jumpto-diffs
     "sindrets/diffview.nvim",
-    event = "VeryLazy",
+    lazy = true,
     dependencies = {
       { "nvim-lua/plenary.nvim" },
       { "nvim-tree/nvim-web-devicons" },

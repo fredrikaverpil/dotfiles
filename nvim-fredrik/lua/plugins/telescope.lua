@@ -2,8 +2,9 @@ return {
 
   {
     "nvim-telescope/telescope.nvim",
+    lazy = true,
     event = "VeryLazy",
-    tag = "0.1.6",
+    version = "*",
     dependencies = {
       { "nvim-lua/plenary.nvim" },
       { "nvim-telescope/telescope-ui-select.nvim" },
@@ -97,8 +98,7 @@ return {
       telescope.load_extension("ui-select")
       telescope.load_extension("recent_files")
       telescope.load_extension("project")
-
-      require("config.keymaps").setup_telescope_keymaps()
     end,
+    keys = require("config.keymaps").setup_telescope_keymaps(),
   },
 }

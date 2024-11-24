@@ -1,8 +1,8 @@
 return {
   {
     "Isrothy/neominimap.nvim",
-    enabled = true,
     lazy = true,
+    enabled = true,
     keys = require("config.keymaps").setup_minimap_keymaps(),
   },
 }

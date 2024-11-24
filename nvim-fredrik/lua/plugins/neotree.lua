@@ -1,6 +1,6 @@
 return {
   "nvim-neo-tree/neo-tree.nvim",
-  event = "VeryLazy",
+  lazy = true,
   dependencies = {
     "nvim-lua/plenary.nvim",
     "nvim-tree/nvim-web-devicons",
@@ -25,8 +25,6 @@ return {
       },
     },
   },
-  config = function(_, opts)
-    require("neo-tree").setup(opts)
-    require("config.keymaps").setup_neotree_keymaps()
-  end,
+  keys = require("config.keymaps").setup_neotree_keymaps(),
+  cmd = { "Neotree" },
 }

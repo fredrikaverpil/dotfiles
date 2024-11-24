@@ -7,6 +7,7 @@ return {
     -- https://github.com/lima1909/resty.nvim
     -- https://github.com/jellydn/hurl.nvim
     -- https://github.com/mistweaverco/kulala.nvim
+    lazy = true,
     enabled = false,
     dependencies = {
       {
@@ -58,8 +59,8 @@ return {
         custom_dynamic_variables = {},
         yank_dry_run = true,
       })
-
-      require("config.keymaps").setup_rest_keymaps()
     end,
+    keys = require("config.keymaps").setup_rest_keymaps(),
+    cmd = { "RestNvim" },
   },
 }

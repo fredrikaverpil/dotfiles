@@ -2,7 +2,8 @@ return {
 
   {
     "kevinhwang91/nvim-ufo",
-    event = "VeryLazy",
+    lazy = true,
+    event = "BufReadPost",
     dependencies = {
       "kevinhwang91/promise-async",
     },

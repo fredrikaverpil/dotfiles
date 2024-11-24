@@ -2,7 +2,8 @@ return {
 
   {
     "echasnovski/mini.indentscope",
-    event = "VeryLazy",
+    lazy = true,
+    event = "BufReadPost",
     version = "*",
     opts = {
       draw = {

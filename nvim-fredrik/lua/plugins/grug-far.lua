@@ -1,6 +1,7 @@
 return {
   {
     "MagicDuck/grug-far.nvim",
+    lazy = true,
     dependencies = {
       {
         "zbirenbaum/copilot.lua",

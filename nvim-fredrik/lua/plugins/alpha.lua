@@ -1,5 +1,7 @@
 return {
   "goolord/alpha-nvim",
+  lazy = true,
+  event = "VimEnter",
   enabled = false,
   dependencies = {
     {
@@ -12,8 +14,6 @@ return {
       end,
     },
   },
-  lazy = true,
-  event = "VimEnter",
   opts = function()
     require("alpha")
     require("alpha.term")
