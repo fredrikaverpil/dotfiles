@@ -3,6 +3,7 @@ return {
     -- https://github.com/folke/which-key.nvim
     "folke/which-key.nvim",
     lazy = true,
+    event = "VeryLazy",
     dependencies = {
       "echasnovski/mini.icons",
     },
