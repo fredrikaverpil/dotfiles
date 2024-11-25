@@ -367,6 +367,17 @@ function M.setup_telescope_keymaps()
       end,
       desc = "Switch project",
     },
+    -- yank
+    -- NOTE: reminder;
+    -- Use `vep` to replace current a word with a yank.
+    -- Use `Vp` to replace a line with a yank.
+    {
+      "<leader>p",
+      function()
+        require("telescope").extensions.yank_history.yank_history({})
+      end,
+      desc = "Yanky history",
+    },
     {
       "<leader>sf",
       function()
@@ -979,21 +990,6 @@ end
 function M.setup_rest_keymaps()
   return {
     { "<leader>rr", "<Plug>RestNvim", desc = "Run REST request under cursor" },
-  }
-end
-
-function M.setup_yanky_keymaps()
-  -- NOTE: reminder;
-  -- Use `vep` to replace current a word with a yank.
-  -- Use `Vp` to replace a line with a yank.
-  return {
-    {
-      "<leader>p",
-      function()
-        require("telescope").extensions.yank_history.yank_history({})
-      end,
-      desc = "Yanky history",
-    },
   }
 end
 

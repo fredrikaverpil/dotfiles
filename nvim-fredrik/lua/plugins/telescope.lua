@@ -21,6 +21,7 @@ return {
         -- used for switching between projects
         "nvim-telescope/telescope-project.nvim",
       },
+      { "gbprod/yanky.nvim" },
       { "folke/trouble.nvim" }, -- for trouble.sources.telescope
     },
     opts = function(_, opts)
@@ -98,6 +99,7 @@ return {
       telescope.load_extension("ui-select")
       telescope.load_extension("recent_files")
       telescope.load_extension("project")
+      telescope.load_extension("yank_history")
     end,
     keys = require("config.keymaps").setup_telescope_keymaps(),
   },
