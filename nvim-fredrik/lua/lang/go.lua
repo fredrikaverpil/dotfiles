@@ -147,66 +147,66 @@ return {
         return table.insert(golangcilint_args(), 0, "golangci-lint")
       end
 
-      opts.servers = {
+      local go_opts = {
+        servers = {
 
-        -- FIXME: https://github.com/nametake/golangci-lint-langserver/issues/33
-        -- golangci_lint_ls = {
-        --   -- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/golangci_lint_ls.lua
-        --   -- https://github.com/nametake/golangci-lint-langserver
-        --   cmd = { "golangci-lint-langserver" },
-        --   filetypes = { "go", "gomod" },
-        --   init_options = {
-        --     command = function()
-        --       return golangcilint_cmd()
-        --     end,
-        --   },
-        -- },
+          -- FIXME: https://github.com/nametake/golangci-lint-langserver/issues/33
+          -- golangci_lint_ls = {
+          --   -- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/golangci_lint_ls.lua
+          --   -- https://github.com/nametake/golangci-lint-langserver
+          --   cmd = { "golangci-lint-langserver" },
+          --   filetypes = { "go", "gomod" },
+          --   init_options = {
+          --     command = function()
+          --       return golangcilint_cmd()
+          --     end,
+          --   },
+          -- },
+          gopls = {
+            -- main readme: https://github.com/golang/tools/blob/master/gopls/doc/features/README.md
+            --
+            -- for all options, see:
+            -- https://github.com/golang/tools/blob/master/gopls/doc/vim.md
+            -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md
+            -- for more details, also see:
+            -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+            -- https://github.com/golang/tools/blob/master/gopls/README.md
+            settings = {
+              -- NOTE: this is not an explicit list. The gopls defaults will apply if not overridden here.
+              gopls = {
+                -- analyses = {
+                --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/analysis.go
+                --   -- https://github.com/golang/tools/blob/master/gopls/doc/analyzers.md
+                -- },
+                -- codelenses = {
+                --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+                -- },
+                -- hints = {
+                --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+                -- },
+                -- completion options
+                -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
 
-        gopls = {
-          -- main readme: https://github.com/golang/tools/blob/master/gopls/doc/features/README.md
-          --
-          -- for all options, see:
-          -- https://github.com/golang/tools/blob/master/gopls/doc/vim.md
-          -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md
-          -- for more details, also see:
-          -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-          -- https://github.com/golang/tools/blob/master/gopls/README.md
-
-          settings = {
-
-            -- NOTE: this is not an explicit list. The gopls defaults will apply if not overridden here.
-            gopls = {
-              -- analyses = {
-              --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/analysis.go
-              --   -- https://github.com/golang/tools/blob/master/gopls/doc/analyzers.md
-              -- },
-              -- codelenses = {
-              --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-              -- },
-              -- hints = {
-              --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-              -- },
-              -- completion options
-              -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-
-              -- build options
-              -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-              directoryFilters = { "-**/node_modules", "-**/.git", "-.vscode", "-.idea", "-.vscode-test" },
-              -- formatting options
-              -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-              gofumpt = false, -- handled by conform instead.
-              -- ui options
-              -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-              semanticTokens = false, -- disabling this enables treesitter injections (for sql, json etc)
-              -- diagnostic options
-              -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-              staticcheck = true,
-              vulncheck = "imports",
-              analysisProgressReporting = true,
+                -- build options
+                -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+                directoryFilters = { "-**/node_modules", "-**/.git", "-.vscode", "-.idea", "-.vscode-test" },
+                -- formatting options
+                -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+                gofumpt = false, -- handled by conform instead.
+                -- ui options
+                -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+                semanticTokens = false, -- disabling this enables treesitter injections (for sql, json etc)
+                -- diagnostic options
+                -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+                staticcheck = true,
+                vulncheck = "imports",
+                analysisProgressReporting = true,
+              },
             },
           },
         },
       }
+      return require("utils.table").deep_merge(opts, go_opts)
     end,
   },
 

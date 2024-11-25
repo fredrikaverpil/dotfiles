@@ -20,15 +20,15 @@ return {
         end,
       },
     },
-    opts = function(_, opts)
-      opts.servers = {
+    opts = {
+      servers = {
         graphql = {
           -- https://www.npmjs.com/package/graphql-language-service-cli
           settings = {
             graphql = {},
           },
         },
-      }
-    end,
+      },
+    },
   },
 }

@@ -43,8 +43,7 @@ local function setup_handler(server)
   end
 
   -- merge defaults with user settings for this LSP server
-  -- NOTE: this could technically overwrite the defaults, like capabilities or on_attach.
-  local server_opts = vim.tbl_deep_extend("force", defaults, G_opts.servers[server] or {})
+  local server_opts = require("utils.table").deep_merge(defaults, G_opts.servers[server] or {})
 
   -- FIXME: workaround for https://github.com/neovim/neovim/issues/28058
   for _, v in pairs(server_opts) do
@@ -68,7 +67,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     lazy = true,
-    event = "VeryLazy",
+    event = { "BufReadPost", "BufWinEnter" },
     dependencies = {
       {
         "b0o/SchemaStore.nvim",
@@ -163,7 +162,6 @@ return {
         local enabled_servers = {}
         for server, server_opts in pairs(opts.servers) do
           if server_opts then
-            server_opts = server_opts == true and {} or server_opts
             if server_opts.mason ~= false and vim.tbl_contains(supported_servers, server) then
               table.insert(enabled_servers, server)
             else

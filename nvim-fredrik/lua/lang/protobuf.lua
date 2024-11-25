@@ -238,7 +238,7 @@ return {
         end,
       },
     },
-    opts = function()
+    opts = function(_, opts)
       -- HACK: override bufls with custom config, using the 'buf beta lsp' command.
       local lspconfig = require("lspconfig")
       local configs = require("lspconfig.configs")
@@ -252,11 +252,13 @@ return {
         },
       }
 
-      return {
+      local protobuf_opts = {
         servers = {
           bufls = {},
         },
       }
+
+      return require("utils.table").deep_merge(opts, protobuf_opts)
     end,
   },
 }

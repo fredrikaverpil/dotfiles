@@ -79,38 +79,40 @@ return {
         end,
       },
     },
-    opts = function(_, opts)
-      opts.servers["lua_ls"] = {
-        settings = {
-          Lua = {
-            runtime = {
-              -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-              version = "LuaJIT",
-            },
-            workspace = {
-              checkThirdParty = false,
-            },
-            codeLens = {
-              enable = true,
-            },
-            completion = {
-              callSnippet = "Replace",
-            },
-            doc = {
-              privateName = { "^_" },
-            },
-            hint = {
-              enable = true,
-              setType = false,
-              paramType = true,
-              paramName = "Disable",
-              semicolon = "Disable",
-              arrayIndex = "Disable",
+    opts = {
+      servers = {
+        lua_ls = {
+          settings = {
+            Lua = {
+              runtime = {
+                -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+                version = "LuaJIT",
+              },
+              workspace = {
+                checkThirdParty = false,
+              },
+              codeLens = {
+                enable = true,
+              },
+              completion = {
+                callSnippet = "Replace",
+              },
+              doc = {
+                privateName = { "^_" },
+              },
+              hint = {
+                enable = true,
+                setType = false,
+                paramType = true,
+                paramName = "Disable",
+                semicolon = "Disable",
+                arrayIndex = "Disable",
+              },
             },
           },
         },
-      }
-    end,
+      },
+    },
   },
 
   {
