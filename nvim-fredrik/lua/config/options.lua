@@ -102,4 +102,10 @@ if not vim.g.vscode then
   vim.opt.timeoutlen = 300 -- Lower than default (1000) to quickly trigger which-key
 end
 
+-- set titlestring to $cwd if TERM_PROGRAM=ghostty
+if vim.fn.getenv("TERM_PROGRAM") == "ghostty" then
+  vim.opt.title = true
+  vim.opt.titlestring = "%{fnamemodify(getcwd(), ':t')}"
+end
+
 return M
