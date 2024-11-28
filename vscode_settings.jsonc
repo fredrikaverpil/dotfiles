@@ -335,7 +335,7 @@
   "editor.accessibilitySupport": "off",
   "workbench.startupEditor": "none",
   "git.ignoreRebaseWarning": true,
-  "go.testFlags": ["-v"],
+  "go.testFlags": ["-v", "-race", "-count=1"],
   "emeraldwalk.runonsave": {
     "commands": [
       {
