@@ -39,8 +39,9 @@ local function setup_handler(server)
     end
     if client.supports_method("textDocument/foldingRange") and require("utils.version").is_neovim_0_11_0() then
       vim.notify("Using LSP for folds: " .. server, vim.log.levels.INFO)
-      vim.opt.foldmethod = "expr"
-      vim.opt.foldexpr = "v:lua.vim.lsp.foldexpr()"
+      vim.api.nvim_set_option_value("foldmethod", "expr", { scope = "local" })
+      vim.api.nvim_set_option_value("foldexpr", "v:lua.vim.lsp.foldexpr()", { scope = "local" })
+      vim.api.nvim_set_option_value("foldtext", "v:lua.vim.lsp.foldtext()", { scope = "local" })
     end
     if G_workspace_diagnostics_enabled then
       require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)

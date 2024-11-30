@@ -68,8 +68,11 @@ vim.opt.cursorline = true
 vim.opt.splitbelow = true
 vim.opt.splitright = true
 
--- fold settings
--- NOTE: see treesitter config vs LSP config for fold expressions
+-- fold settings (treesitter or LSP)
+vim.opt.foldcolumn = "0"
+vim.opt.foldenable = true
+vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 99
 function _G.custom_foldtext()
   local line = vim.fn.getline(vim.v.foldstart)
   local line_count = vim.v.foldend - vim.v.foldstart + 1
@@ -77,10 +80,10 @@ function _G.custom_foldtext()
   return string.format("%s (%d lines)", line_text, line_count)
 end
 vim.opt.foldtext = "v:lua.custom_foldtext()"
-vim.opt.foldcolumn = "0"
-vim.opt.foldenable = true
-vim.opt.foldlevel = 99
-vim.opt.foldlevelstart = 99
+function M.treesitter_foldexpr()
+  vim.opt.foldmethod = "expr"
+  vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+end
 
 -- scroll off
 vim.opt.scrolloff = 8

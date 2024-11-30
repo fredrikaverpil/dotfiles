@@ -14,14 +14,10 @@ return {
       local merged = require("utils.table").deep_merge(defaults, opts)
       return merged
     end,
-    config = function(_, opts)
+    config = function(buf, opts)
       local config = require("nvim-treesitter.configs")
       config.setup(opts)
-      if vim.opt.foldexpr == nil then
-        vim.notify("Using treesitter for folds")
-        vim.opt.foldmethod = "expr"
-        vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-      end
+      require("config.options").treesitter_foldexpr()
     end,
   },
 
