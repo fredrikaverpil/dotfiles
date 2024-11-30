@@ -17,6 +17,11 @@ return {
     config = function(_, opts)
       local config = require("nvim-treesitter.configs")
       config.setup(opts)
+      if vim.opt.foldexpr == nil then
+        vim.notify("Using treesitter for folds")
+        vim.opt.foldmethod = "expr"
+        vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+      end
     end,
   },
 

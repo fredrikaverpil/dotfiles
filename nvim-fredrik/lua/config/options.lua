@@ -69,7 +69,18 @@ vim.opt.splitbelow = true
 vim.opt.splitright = true
 
 -- fold settings
--- see ufo.lua
+-- NOTE: see treesitter config vs LSP config for fold expressions
+function _G.custom_foldtext()
+  local line = vim.fn.getline(vim.v.foldstart)
+  local line_count = vim.v.foldend - vim.v.foldstart + 1
+  local line_text = vim.fn.substitute(line, "\t", " ", "g")
+  return string.format("%s (%d lines)", line_text, line_count)
+end
+vim.opt.foldtext = "v:lua.custom_foldtext()"
+vim.opt.foldcolumn = "0"
+vim.opt.foldenable = true
+vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 99
 
 -- scroll off
 vim.opt.scrolloff = 8
@@ -88,13 +99,6 @@ vim.opt.clipboard = "unnamedplus"
 vim.opt.listchars = "tab:▸ ,trail:·,nbsp:␣,extends:❯,precedes:❮" -- show symbols for whitespace
 
 -- NOTE: see auto session for vim.o.sessionoptions
-
-M.setup_folding_options = function()
-  vim.opt.foldcolumn = "0"
-  vim.opt.foldlevel = 99
-  vim.opt.foldlevelstart = 99
-  vim.opt.foldenable = true
-end
 
 vim.opt.smoothscroll = true
 

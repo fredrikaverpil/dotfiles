@@ -73,7 +73,6 @@ return {
         "b0o/SchemaStore.nvim",
         version = false, -- last release is very old
       },
-      { "kevinhwang91/nvim-ufo" },
       {
         "williamboman/mason-lspconfig.nvim",
         dependencies = {
