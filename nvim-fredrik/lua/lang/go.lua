@@ -162,6 +162,7 @@ return {
           --     end,
           --   },
           -- },
+
           gopls = {
             -- main readme: https://github.com/golang/tools/blob/master/gopls/doc/features/README.md
             --
@@ -172,30 +173,38 @@ return {
             -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
             -- https://github.com/golang/tools/blob/master/gopls/README.md
             settings = {
-              -- NOTE: this is not an explicit list. The gopls defaults will apply if not overridden here.
+              -- NOTE: the gopls defaults will apply if not overridden here.
               gopls = {
-                -- analyses = {
-                --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/analysis.go
-                --   -- https://github.com/golang/tools/blob/master/gopls/doc/analyzers.md
-                -- },
-                -- codelenses = {
-                --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-                -- },
-                -- hints = {
-                --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-                -- },
+                buildFlags = { "-tags=wireinject" },
+                env = {},
+                analyses = {
+                  -- https://github.com/golang/tools/blob/master/gopls/internal/settings/analysis.go
+                  -- https://github.com/golang/tools/blob/master/gopls/doc/analyzers.md
+                },
+                codelenses = {
+                  -- https://github.com/golang/tools/blob/master/gopls/doc/codelenses.md
+                  -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+                },
+                hints = {
+                  -- https://github.com/golang/tools/blob/master/gopls/doc/inlayHints.md
+                  -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+                },
                 -- completion options
+                -- https://github.com/golang/tools/blob/master/gopls/doc/features/completion.md
                 -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
 
                 -- build options
                 -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
                 directoryFilters = { "-**/node_modules", "-**/.git", "-.vscode", "-.idea", "-.vscode-test" },
+
                 -- formatting options
                 -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
                 gofumpt = false, -- handled by conform instead.
+
                 -- ui options
                 -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
                 semanticTokens = false, -- disabling this enables treesitter injections (for sql, json etc)
+
                 -- diagnostic options
                 -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
                 staticcheck = true,
