@@ -1,7 +1,30 @@
 #!/bin/bash
 
-if [ -z "$NVIM_APPNAME" ]; then
-	NVIM_APPNAME=fredrik $DOTFILES_BREW_PREFIX/bin/nvim "$@"
+BREW_NVIM_BINARY="$DOTFILES_BREW_PREFIX/bin/nvim"
+MANUAL_NVIM_BINARY="$HOME/.nvim/bin/nvim"
+
+if [ -x "$BREW_NVIM_BINARY" ] && [ -x "$MANUAL_NVIM_BINARY" ]; then
+	echo "Error: Both $BREW_NVIM_BINARY and $MANUAL_NVIM_BINARY exist. Please ensure there is only one."
+	echo "Version at $BREW_NVIM_BINARY (installed via brew):"
+	$BREW_NVIM_BINARY --version
+	echo "---"
+	echo "Version at $MANUAL_NVIM_BINARY (installed manually):"
+	$MANUAL_NVIM_BINARY --version
+	exit 1
+fi
+
+if [ -x "$BREW_NVIM_BINARY" ]; then
+	NVIM_BINARY="$BREW_NVIM_BINARY"
+elif [ -x "$MANUAL_NVIM_BINARY" ]; then
+	NVIM_BINARY="$MANUAL_NVIM_BINARY"
 else
-	$DOTFILES_BREW_PREFIX/bin/nvim "$@"
+	echo "Error: No nvim binary found."
+	exit 1
+fi
+
+if [ -z "$NVIM_APPNAME" ]; then
+	NVIM_APPNAME=fredrik $NVIM_BINARY "$@"
+else
+	echo "Warning: Using NVIM_APPNAME=$NVIM_APPNAME"
+	$NVIM_BINARY "$@"
 fi
