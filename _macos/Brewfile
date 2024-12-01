@@ -51,6 +51,7 @@ brew 'zoxide'
 brew 'opentofu'  # terraform
 brew 'dustinblackman/tap/oatmeal'
 brew 'uv'
+brew 'git-standup'
 # brew 'exercism'
 
 # slides
