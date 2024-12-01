@@ -67,7 +67,6 @@ local function setup_handler(server)
   local lsp = require("lspconfig")[server]
   if lsp.setup ~= nil then
     lsp.setup(server_opts)
-    print("Done setting up LSP: " .. server)
   else
     vim.notify("LSP server setup fn not found: " .. server, vim.log.levels.ERROR)
   end
