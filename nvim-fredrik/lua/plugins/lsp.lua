@@ -168,7 +168,7 @@ return {
     },
     opts = {
       servers = {
-        -- -- Example LSP settings below:
+        -- -- Example LSP settings below for opts.servers:
         -- lua_ls = {
         --   cmd = { ... },
         --   filetypes = { ... },
@@ -196,28 +196,27 @@ return {
 
       require("utils.diagnostics").setup_diagnostics()
 
-      -- TODO: explain capabilities, see
-      -- https://github.com/nvim-lua/kickstart.nvim/blob/master/init.lua#L526
-      --
-      -- LSP servers and clients are able to communicate to each other what features they support.
+      -- LSP servers and clients (like Neovim) are able to communicate to each other what
+      -- features they support.
       -- By default, Neovim doesn't support everything that is in the LSP Specification.
-      -- When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
-      -- So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
-      local client_capabilities = vim.lsp.protocol.make_client_capabilities()
-
-      -- NOTE: if using nvim-cmp...
-      -- local completion_capabilities = require("cmp_nvim_lsp").default_capabilities()
-      -- local client_capabilities = vim.tbl_deep_extend("force", client_capabilities, completion_capabilities)
-
-      local completion_capabilities = require("blink.cmp").get_lsp_capabilities()
-      client_capabilities = vim.tbl_deep_extend("force", client_capabilities, completion_capabilities)
+      -- When you add nvim-cmp, blink, luasnip, etc. Neovim now has *more* capabilities.
+      -- So, we create new capabilities here, and then broadcast that to the LSP servers.
+      local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+      local has_blink, blink = pcall(require, "blink.cmp")
+      local client_capabilities = vim.tbl_deep_extend(
+        "force",
+        {},
+        vim.lsp.protocol.make_client_capabilities(),
+        has_cmp and cmp_nvim_lsp.default_capabilities() or {},
+        has_blink and blink.get_lsp_capabilities() or {}
+      )
 
       -- set global variables which must be accessible from the `setup_handler` function.
       G_client_capabilities = client_capabilities
       G_lspconfig_opts = opts
 
       ensure_servers_installed(opts)
-      create_server_setup_autocmds(opts)
+      create_server_setup_autocmds(opts) -- set up LSP based on filetype
 
       -- set up keymaps
       require("config.keymaps").setup_lsp_keymaps()
