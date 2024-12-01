@@ -42,10 +42,11 @@ return {
   {
     "neovim/nvim-lspconfig",
     lazy = true,
-    ft = filetypes,
+    -- ft = filetypes,
     dependencies = {
       {
         "b0o/SchemaStore.nvim",
+        version = false, -- last release is very old
       },
       {
         "williamboman/mason-lspconfig.nvim",
@@ -64,6 +65,7 @@ return {
       servers = {
         jsonls = {
           -- https://github.com/microsoft/vscode-json-languageservice
+          filetypes = filetypes,
           settings = {
             json = {
               schemas = require("schemastore").json.schemas(),

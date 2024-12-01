@@ -23,7 +23,8 @@ local function golangcilint_args()
         return G_golangci_config_file
       end
       local found
-      found = vim.fs.find({ ".golangci.yml", ".golangci.yaml", ".golangci.toml", ".golangci.json" }, { type = "file", limit = 1 })
+      found = vim.fs.find({ ".golangci.yml", ".golangci.yaml", ".golangci.toml", ".golangci.json" },
+        { type = "file", limit = 1 })
       if #found == 1 then
         local filepath = found[1]
         G_golangci_config_file = filepath
@@ -119,7 +120,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     lazy = true,
-    ft = { "go", "gomod", "gowork", "gosum", "gotmpl", "gohtmltmpl", "gotexttmpl" },
+    -- ft = { "go", "gomod", "gowork", "gosum", "gotmpl", "gohtmltmpl", "gotexttmpl" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -164,6 +165,8 @@ return {
           -- },
 
           gopls = {
+            filetypes = { "go", "gomod", "gowork", "gosum", "gotmpl", "gohtmltmpl", "gotexttmpl" },
+
             -- main readme: https://github.com/golang/tools/blob/master/gopls/doc/features/README.md
             --
             -- for all options, see:
@@ -251,9 +254,9 @@ return {
     },
     config = function()
       require("go").setup({
-        lsp_cfg = false, -- handled with nvim-lspconfig instead
+        lsp_cfg = false,   -- handled with nvim-lspconfig instead
         lsp_inlay_hints = {
-          enable = false, -- handled with LSP keymap toggle instead
+          enable = false,  -- handled with LSP keymap toggle instead
         },
         dap_debug = false, -- handled by nvim-dap instead
         luasnip = true,

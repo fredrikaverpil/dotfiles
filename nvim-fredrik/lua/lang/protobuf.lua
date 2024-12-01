@@ -223,7 +223,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     lazy = true,
-    ft = { "proto" },
+    -- ft = { "proto" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -254,7 +254,9 @@ return {
 
       local protobuf_opts = {
         servers = {
-          bufls = {},
+          bufls = {
+            filetypes = { "proto" },
+          },
         },
       }
 

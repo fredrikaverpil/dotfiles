@@ -43,7 +43,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     lazy = true,
-    ft = { "sh" },
+    -- ft = { "sh" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -61,7 +61,9 @@ return {
     opts = {
       servers = {
         -- https://github.com/bash-lsp/bash-language-server
-        bashls = {},
+        bashls = {
+          filetypes = { "sh" },
+        },
       },
     },
   },

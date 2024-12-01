@@ -1,35 +1,38 @@
 G_workspace_diagnostics_enabled = true
-G_capabilities = {}
-G_opts = {}
+G_client_capabilities = {}
+G_lspconfig_opts = {}
 
---- LSP server setup (for each LSP). Intended to be used with mason-lspconfig.
----
---- Example settings for opts.servers[server]:
----
----   cmd = { ... },
----   filetypes = { ... },
----   capabilities = { ... },
----   on_attach = { ... },
----   settings = {
----     Lua = {
----       workspace = {
----         checkThirdParty = false,
----       },
----       codeLens = {
----         enable = true,
----       },
----       completion = {
----         callSnippet = "Replace",
----       },
----     },
----   }
---- @param server table
+--- LSP server setup (for each LSP). Intended to be compatible with mason-lspconfig.
+--- @param server string
 local function setup_handler(server)
+  -- print("Setting up LSP: " .. server)
+
+  --- Defaults for the given LSP server.
+  ---
+  --- Example:
+  -- local defaults = {
+  --   cmd = { ... },
+  --   filetypes = { ... },
+  --   capabilities = { ... },
+  --   on_attach = { ... },
+  --   settings = {
+  --     Lua = {
+  --       workspace = {
+  --         checkThirdParty = false,
+  --       },
+  --       codeLens = {
+  --         enable = true,
+  --       },
+  --       completion = {
+  --         callSnippet = "Replace",
+  --       },
+  --     },
+  --   }
+  -- }
   local defaults = {}
-  defaults.capabilities = vim.deepcopy(G_capabilities)
-  local server_capabilities = require("blink.cmp").get_lsp_capabilities(server.capabilities)
-  defaults.capabilities = vim.tbl_deep_extend("force", defaults.capabilities, server_capabilities)
+  defaults.capabilities = vim.deepcopy(G_client_capabilities)
   defaults.on_attach = function(client, bufnr)
+    -- Return early if the buffer does not exist
     if client.supports_method("textDocument/codeLens") then
       vim.lsp.codelens.refresh()
       vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
@@ -49,7 +52,7 @@ local function setup_handler(server)
   end
 
   -- merge defaults with user settings for this LSP server
-  local server_opts = require("utils.table").deep_merge(defaults, G_opts.servers[server] or {})
+  local server_opts = vim.tbl_deep_extend("force", defaults, G_lspconfig_opts.servers[server] or {})
 
   -- FIXME: workaround for https://github.com/neovim/neovim/issues/28058
   for _, v in pairs(server_opts) do
@@ -64,6 +67,7 @@ local function setup_handler(server)
   local lsp = require("lspconfig")[server]
   if lsp.setup ~= nil then
     lsp.setup(server_opts)
+    print("Done setting up LSP: " .. server)
   else
     vim.notify("LSP server setup fn not found: " .. server, vim.log.levels.ERROR)
   end
@@ -73,7 +77,9 @@ return {
   {
     "neovim/nvim-lspconfig",
     lazy = true,
-    event = { "BufReadPost", "BufWinEnter" },
+    -- Remove the event configuration
+    -- event = { "BufReadPost", "BufWinEnter" },
+    event = "VeryLazy",
     dependencies = {
       {
         "b0o/SchemaStore.nvim",
@@ -156,9 +162,12 @@ return {
       -- local completion_capabilities = require("cmp_nvim_lsp").default_capabilities()
       -- local client_capabilities = vim.tbl_deep_extend("force", client_capabilities, completion_capabilities)
 
+      local completion_capabilities = require("blink.cmp").get_lsp_capabilities()
+      client_capabilities = vim.tbl_deep_extend("force", client_capabilities, completion_capabilities)
+
       -- set global variables which must be accessible from the `setup_handler` function.
-      G_capabilities = client_capabilities
-      G_opts = opts
+      G_client_capabilities = client_capabilities
+      G_lspconfig_opts = opts
 
       -- Ensure LSP servers are installed with mason-lspconfig.
       local supported_servers = {}
@@ -175,24 +184,33 @@ return {
             end
           end
         end
-
         -- See `:h mason-lspconfig
         require("mason-lspconfig").setup({
           ---@type string[]
-          ensure_installed = enabled_servers, -- NOTE: more like "ensure running"
-          ---@type table<string, fun(server_name: string)>?
-          handlers = { setup_handler },
+          ensure_installed = enabled_servers,
+          -- handlers = { setup_handler }, -- NOTE: enabling this loads all LSPs on Neovim startup.
         })
+      end
 
-        --  NOTE: this is not something I'm using right now, but it's here for reference.
-        -- -- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
-        -- for server, server_opts in pairs(opts.servers) do
-        --   if server_opts.mason == false or not vim.tbl_contains(supported_servers, server) then
-        --     -- e.g. if opts.servers.lua_ls.mason = false or if lua_ls is not supported by mason-lspconfig.
-        --     vim.notify("Manual LSP setup for: " .. server, vim.log.levels.WARN)
-        --     setup_handler(server)
-        --   end
-        -- end
+      -- Setup LSP for specific filetypes, using autocmd.
+      for server, server_opts in pairs(opts.servers) do
+        if server_opts then
+          if server_opts.filetypes == nil then
+            vim.notify("No filetypes specified for LSP server: " .. server, vim.log.levels.WARN)
+          else
+            vim.api.nvim_create_autocmd("FileType", {
+              pattern = server_opts.filetypes,
+              callback = function(ev)
+                -- print("In autocmd, for language " .. ev.match .. ", using server " .. server)
+                local clients = vim.lsp.get_clients({ name = server })
+                if #clients == 0 then
+                  setup_handler(server)
+                  vim.cmd([[LspStart]])
+                end
+              end,
+            })
+          end
+        end
       end
 
       require("config.keymaps").setup_lsp_keymaps()

@@ -23,10 +23,10 @@ return {
   {
     "neovim/nvim-lspconfig",
     lazy = true,
-    ft = {
-      "dockerfile",
-      -- "yaml",
-    },
+    -- ft = {
+    --   "dockerfile",
+    --   -- "yaml",
+    -- },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -46,7 +46,9 @@ return {
     opts = {
       servers = {
         -- https://github.com/rcjsuen/dockerfile-language-server
-        dockerls = {},
+        dockerls = {
+          filetypes = { "dockerfile" },
+        },
       },
     },
   },

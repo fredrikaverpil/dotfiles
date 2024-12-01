@@ -3,7 +3,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     lazy = true,
-    ft = { "graphql" },
+    -- ft = { "graphql" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -24,6 +24,7 @@ return {
       servers = {
         graphql = {
           -- https://www.npmjs.com/package/graphql-language-service-cli
+          filetypes = { "graphql" },
           settings = {
             graphql = {},
           },

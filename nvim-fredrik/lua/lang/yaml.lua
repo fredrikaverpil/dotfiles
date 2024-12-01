@@ -65,9 +65,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     lazy = true,
-    event = { "BufReadPost", "BufWinEnter" },
-
-    ft = { "yaml", "gha", "dependabot" },
+    -- ft = { "yaml", "gha", "dependabot" },
     dependencies = {
       {
         "b0o/SchemaStore.nvim",

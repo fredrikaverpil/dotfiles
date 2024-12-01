@@ -3,7 +3,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     lazy = true,
-    ft = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
+    -- ft = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -29,6 +29,7 @@ return {
     opts = {
       servers = {
         vtsls = {
+          filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
           settings = {
             complete_function_calls = true,
             vtsls = {

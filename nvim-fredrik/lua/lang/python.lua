@@ -108,7 +108,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     lazy = true,
-    ft = { "python" },
+    -- ft = { "python" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -126,6 +126,8 @@ return {
     opts = {
       servers = {
         basedpyright = {
+          filetypes = { "python" },
+
           -- https://docs.basedpyright.com/#/settings
           settings = {
             basedpyright = {
@@ -140,6 +142,8 @@ return {
         },
 
         ruff = {
+          filetypes = { "python" },
+
           -- https://docs.astral.sh/ruff/editors/setup/#neovim
           enabled = false, -- NOTE: conform and nvim-lint are used instead
           on_attach = function(client, bufnr)
