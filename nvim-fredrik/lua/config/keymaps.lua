@@ -849,11 +849,11 @@ function M.setup_terminal_keymaps()
 end
 
 function M.setup_conform_keymaps()
-  map_normal_mode("<leader>uf", require("utils.formatting").toggle_formatting, "Toggle auto-formatting")
+  map_normal_mode("<leader>uf", require("utils.toggle").toggle_formatting, "Toggle auto-formatting")
 end
 
 function M.setup_lsp_keymaps()
-  map_normal_mode("<leader>uh", require("utils.inlay_hints").toggle_inlay_hints, "Toggle inlay hints")
+  map_normal_mode("<leader>uh", require("utils.toggle").toggle_inlay_hints, "Toggle inlay hints")
 end
 
 function M.setup_minimap_keymaps()

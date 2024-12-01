@@ -23,8 +23,7 @@ local function golangcilint_args()
         return G_golangci_config_file
       end
       local found
-      found = vim.fs.find({ ".golangci.yml", ".golangci.yaml", ".golangci.toml", ".golangci.json" },
-        { type = "file", limit = 1 })
+      found = vim.fs.find({ ".golangci.yml", ".golangci.yaml", ".golangci.toml", ".golangci.json" }, { type = "file", limit = 1 })
       if #found == 1 then
         local filepath = found[1]
         G_golangci_config_file = filepath
@@ -191,6 +190,13 @@ return {
                 hints = {
                   -- https://github.com/golang/tools/blob/master/gopls/doc/inlayHints.md
                   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+                  --
+                  -- parameterNames = true,
+                  -- assignVariableTypes = true,
+                  -- constantValues = true,
+                  -- compositeLiteralTypes = true,
+                  -- compositeLiteralFields = true,
+                  -- functionTypeParameters = true,
                 },
                 -- completion options
                 -- https://github.com/golang/tools/blob/master/gopls/doc/features/completion.md
@@ -254,9 +260,9 @@ return {
     },
     config = function()
       require("go").setup({
-        lsp_cfg = false,   -- handled with nvim-lspconfig instead
+        lsp_cfg = false, -- handled with nvim-lspconfig instead
         lsp_inlay_hints = {
-          enable = false,  -- handled with LSP keymap toggle instead
+          enable = false, -- handled with LSP keymap toggle instead
         },
         dap_debug = false, -- handled by nvim-dap instead
         luasnip = true,
