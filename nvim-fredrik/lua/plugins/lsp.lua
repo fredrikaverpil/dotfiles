@@ -72,6 +72,54 @@ local function setup_handler(server)
   end
 end
 
+local function ensure_servers_installed(opts)
+  -- Ensure LSP servers are installed with mason-lspconfig.
+  local supported_servers = {}
+  local have_mason_lspconfig, _ = pcall(require, "mason-lspconfig")
+  if have_mason_lspconfig then
+    supported_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
+    local enabled_servers = {}
+    for server, server_opts in pairs(opts.servers) do
+      if server_opts then
+        if server_opts.mason ~= false and vim.tbl_contains(supported_servers, server) then
+          table.insert(enabled_servers, server)
+        else
+          vim.notify("LSP server not supported by mason-lspconfig: " .. server, vim.log.levels.WARN)
+        end
+      end
+    end
+    -- See `:h mason-lspconfig
+    require("mason-lspconfig").setup({
+      ---@type string[]
+      ensure_installed = enabled_servers,
+      -- handlers = { setup_handler }, -- NOTE: enabling this loads all LSPs on Neovim startup.
+    })
+  end
+end
+
+local function create_server_setup_autocmds(opts)
+  -- Setup LSP for specific filetypes, using autocmd.
+  for server, server_opts in pairs(opts.servers) do
+    if server_opts then
+      if server_opts.filetypes == nil then
+        vim.notify("No filetypes specified for LSP server: " .. server, vim.log.levels.WARN)
+      else
+        vim.api.nvim_create_autocmd("FileType", {
+          pattern = server_opts.filetypes,
+          callback = function(ev)
+            -- print("In autocmd, for language " .. ev.match .. ", using server " .. server)
+            local clients = vim.lsp.get_clients({ name = server })
+            if #clients == 0 then
+              setup_handler(server)
+              vim.cmd([[LspStart]])
+            end
+          end,
+        })
+      end
+    end
+  end
+end
+
 return {
   {
     "neovim/nvim-lspconfig",
@@ -168,52 +216,11 @@ return {
       G_client_capabilities = client_capabilities
       G_lspconfig_opts = opts
 
-      -- Ensure LSP servers are installed with mason-lspconfig.
-      local supported_servers = {}
-      local have_mason_lspconfig, _ = pcall(require, "mason-lspconfig")
-      if have_mason_lspconfig then
-        supported_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
-        local enabled_servers = {}
-        for server, server_opts in pairs(opts.servers) do
-          if server_opts then
-            if server_opts.mason ~= false and vim.tbl_contains(supported_servers, server) then
-              table.insert(enabled_servers, server)
-            else
-              vim.notify("LSP server not supported by mason-lspconfig: " .. server, vim.log.levels.WARN)
-            end
-          end
-        end
-        -- See `:h mason-lspconfig
-        require("mason-lspconfig").setup({
-          ---@type string[]
-          ensure_installed = enabled_servers,
-          -- handlers = { setup_handler }, -- NOTE: enabling this loads all LSPs on Neovim startup.
-        })
-      end
+      ensure_servers_installed(opts)
+      create_server_setup_autocmds(opts)
 
-      -- Setup LSP for specific filetypes, using autocmd.
-      for server, server_opts in pairs(opts.servers) do
-        if server_opts then
-          if server_opts.filetypes == nil then
-            vim.notify("No filetypes specified for LSP server: " .. server, vim.log.levels.WARN)
-          else
-            vim.api.nvim_create_autocmd("FileType", {
-              pattern = server_opts.filetypes,
-              callback = function(ev)
-                -- print("In autocmd, for language " .. ev.match .. ", using server " .. server)
-                local clients = vim.lsp.get_clients({ name = server })
-                if #clients == 0 then
-                  setup_handler(server)
-                  vim.cmd([[LspStart]])
-                end
-              end,
-            })
-          end
-        end
-      end
-
+      -- set up keymaps
       require("config.keymaps").setup_lsp_keymaps()
-
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("lsp-attach-keymaps", { clear = true }),
         callback = function(event)
