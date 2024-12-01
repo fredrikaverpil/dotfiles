@@ -32,7 +32,7 @@ return {
       -- vim.api.nvim_set_hl(0, "DapStoppedLine", { default = true, link = "Visual" })
 
       -- Show nice icons in gutter instead of the default characters
-      for name, sign in pairs(require("utils.defaults").icons.dap) do
+      for name, sign in pairs(require("utils.icons").icons.dap) do
         sign = type(sign) == "table" and sign or { sign }
         vim.fn.sign_define("Dap" .. name, {
           text = sign[1],

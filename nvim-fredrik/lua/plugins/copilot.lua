@@ -14,7 +14,7 @@ return {
         event = "VeryLazy",
         opts = function(_, opts)
           local function codepilot()
-            local icon = require("utils.defaults").icons.kinds.Copilot
+            local icon = require("utils.icons").icons.kinds.Copilot
             return icon
           end
 
