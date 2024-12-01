@@ -44,7 +44,7 @@ local function setup_handler(server)
       vim.notify("Using LSP for folds: " .. server, vim.log.levels.INFO)
       vim.api.nvim_set_option_value("foldmethod", "expr", { scope = "local" })
       vim.api.nvim_set_option_value("foldexpr", "v:lua.vim.lsp.foldexpr()", { scope = "local" })
-      vim.api.nvim_set_option_value("foldtext", "v:lua.vim.lsp.foldtext()", { scope = "local" })
+      -- vim.api.nvim_set_option_value("foldtext", "v:lua.vim.lsp.foldtext()", { scope = "local" }) -- NOTE: using custom foldtext in options.lua
     end
     if G_workspace_diagnostics_enabled then
       require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
