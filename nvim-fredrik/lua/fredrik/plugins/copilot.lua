@@ -104,7 +104,7 @@ return {
     lazy = true,
     event = "VeryLazy",
     enabled = true,
-    branch = "canary", -- while in development
+    branch = "main",
     dependencies = {
       { "zbirenbaum/copilot.lua" },
       { "nvim-lua/plenary.nvim" },
