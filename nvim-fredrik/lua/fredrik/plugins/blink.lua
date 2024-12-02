@@ -12,13 +12,13 @@ return {
         dependencies = {
           "rafamadriz/friendly-snippets",
         },
-        keys = require("fredrik.config.keymaps").setup_luasnip_keymaps(),
         opts = function(_, opts)
           require("luasnip.loaders.from_vscode").lazy_load({
             paths = { os.getenv("DOTFILES") .. "/nvim-fredrik/snippets" },
           })
           return opts
         end,
+        keys = require("fredrik.config.keymaps").setup_luasnip_keymaps(),
       },
     },
     -- OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
