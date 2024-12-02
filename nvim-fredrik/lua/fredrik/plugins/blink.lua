@@ -27,29 +27,22 @@ return {
       ---@module 'blink.cmp'
       ---@type blink.cmp.Config
       local base_opts = {
-        accept = {
-          expand_snippet = function(...)
-            require("luasnip").lsp_expand(...)
-          end,
-        },
-        trigger = {
-          signature_help = {
-            enabled = false, -- experimental, and already provided by noice
-          },
-        },
-        windows = {
-          autocomplete = {
+        completion = {
+          list = {
             selection = "manual",
           },
           documentation = {
             auto_show = true,
           },
         },
+        signature = {
+          enabled = false, -- experimental, and already provided by noice
+        },
         sources = {
           completion = {
             enabled_providers = { "lsp", "path", "snippets", "buffer" },
           },
-          providers = {},
+          -- providers = {}, -- this seems to include a bunch of things I don't want to re-specify here...
         },
         keymap = require("fredrik.config.keymaps").setup_blink_cmp_keymaps(),
       }
