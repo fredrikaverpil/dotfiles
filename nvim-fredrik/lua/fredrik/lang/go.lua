@@ -8,8 +8,8 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
-G_golangci_config_file = nil
-G_tags = "-tags=wireinject,tools"
+local golangci_config_file = nil
+local tags = "-tags=wireinject,tools"
 
 local function golangcilint_args()
   local args = {}
@@ -20,18 +20,18 @@ local function golangcilint_args()
 
     -- config file
     function()
-      if G_golangci_config_file ~= nil then
-        return G_golangci_config_file
+      if golangci_config_file ~= nil then
+        return golangci_config_file
       end
       local found
       found = vim.fs.find({ ".golangci.yml", ".golangci.yaml", ".golangci.toml", ".golangci.json" }, { type = "file", limit = 1 })
       if #found == 1 then
         local filepath = found[1]
-        G_golangci_config_file = filepath
+        golangci_config_file = filepath
         return "--config", filepath
       else
         local filepath = vim.fn.expand("$DOTFILES/templates/.golangci.yml")
-        G_golangci_config_file = filepath
+        golangci_config_file = filepath
         return "--config", "/Users/fredrik/.dotfiles/templates/.golangci.yml"
       end
     end,
@@ -84,7 +84,7 @@ return {
         },
         gofumpt = {
           -- https://github.com/stevearc/conform.nvim/blob/master/lua/conform/formatters/gofumpt.lua
-          prepend_args = { G_tags, "-extra", "-w", "$FILENAME" },
+          prepend_args = { tags, "-extra", "-w", "$FILENAME" },
           stdin = false,
         },
         golines = {
@@ -178,7 +178,7 @@ return {
             settings = {
               -- NOTE: the gopls defaults will apply if not overridden here.
               gopls = {
-                buildFlags = { G_tags },
+                buildFlags = { tags },
                 env = {},
                 analyses = {
                   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/analysis.go
