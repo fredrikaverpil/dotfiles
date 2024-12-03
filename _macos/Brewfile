@@ -27,7 +27,7 @@ cask 'font-jetbrains-mono-nerd-font'
 cask 'font-symbols-only-nerd-font'
 cask 'font-noto-color-emoji'
 cask 'font-noto-emoji'
-cask 'font-maple'
+cask 'font-maple-mono'
 
 # terminal cli tools
 brew 'asciinema'
