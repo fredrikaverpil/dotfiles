@@ -62,7 +62,7 @@ vim.opt.termguicolors = true
 vim.opt.signcolumn = "yes"
 
 -- cursor line highlight
-vim.opt.cursorline = true
+vim.opt.cursorline = false
 
 -- splitting
 vim.opt.splitbelow = true
