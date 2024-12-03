@@ -9,6 +9,7 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 G_golangci_config_file = nil
+G_tags = "-tags=wireinject,tools"
 
 local function golangcilint_args()
   local args = {}
@@ -83,7 +84,7 @@ return {
         },
         gofumpt = {
           -- https://github.com/stevearc/conform.nvim/blob/master/lua/conform/formatters/gofumpt.lua
-          prepend_args = { "-extra", "-w", "$FILENAME" },
+          prepend_args = { G_tags, "-extra", "-w", "$FILENAME" },
           stdin = false,
         },
         golines = {
@@ -177,7 +178,7 @@ return {
             settings = {
               -- NOTE: the gopls defaults will apply if not overridden here.
               gopls = {
-                buildFlags = { "-tags=wireinject" },
+                buildFlags = { G_tags },
                 env = {},
                 analyses = {
                   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/analysis.go
