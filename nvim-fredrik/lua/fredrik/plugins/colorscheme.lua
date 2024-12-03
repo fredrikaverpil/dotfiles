@@ -33,8 +33,9 @@ return {
       update_interval = 3000, -- milliseconds
       set_dark_mode = function()
         set_dark()
-        if tmux_is_running() then
-          os.execute("tmux source-file ~/.tmux/plugins/tokyonight.nvim/extras/tmux/tokyonight_moon.tmux")
+        local tmux_theme = vim.fn.expand("~/.tmux/plugins/tokyonight.nvim/extras/tmux/tokyonight_moon.tmux")
+        if tmux_is_running() and vim.fn.filereadable(tmux_theme) == 1 then
+          os.execute("tmux source-file " .. tmux_theme)
         end
         vim.g.lazygit_use_custom_config_file_path = 1
         local dark_theme = vim.fs.normalize("$DOTFILES/lazygit_config_dark.yml")
@@ -42,8 +43,9 @@ return {
       end,
       set_light_mode = function()
         set_light()
-        if tmux_is_running() then
-          os.execute("tmux source-file ~/.local/share/fredrik/lazy/nightfox.nvim/extra/dayfox/dayfox.tmux")
+        local tmux_theme = vim.fn.expand("~/.local/share/fredrik/lazy/nightfox.nvim/extra/dayfox/dayfox.tmux")
+        if tmux_is_running() and vim.fn.filereadable(tmux_theme) == 1 then
+          os.execute("tmux source-file " .. tmux_theme)
         end
         vim.g.lazygit_use_custom_config_file_path = 1
         local light_theme = vim.fs.normalize("$DOTFILES/lazygit_config_light.yml")
