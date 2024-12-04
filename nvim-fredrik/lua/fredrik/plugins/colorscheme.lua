@@ -55,8 +55,8 @@ return {
   },
   {
     "folke/tokyonight.nvim",
-    lazy = true,
     enabled = true,
+    lazy = true,
     opts = {
       transparent = true, -- Enable transparency
       styles = {
@@ -68,8 +68,8 @@ return {
   },
   {
     "catppuccin/nvim",
-    lazy = true,
     enabled = true,
+    lazy = true,
     name = "catppuccin", -- or Lazy will show the plugin as "nvim"
     opts = {
       transparent_background = true,
@@ -77,21 +77,20 @@ return {
   },
   {
     "rose-pine/neovim",
-    lazy = true,
     enabled = true,
+    lazy = true,
     name = "rose-pine", -- or Lazy will show the plugin as "neovim"
   },
   {
     "EdenEast/nightfox.nvim",
     lazy = true,
-    enabled = true,
   },
   {
     "zenbones-theme/zenbones.nvim",
+    enabled = true,
     lazy = true,
     dependencies = {
       "rktjmp/lush.nvim",
     },
-    enabled = true,
   },
 }
