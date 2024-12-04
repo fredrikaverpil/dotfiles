@@ -57,12 +57,23 @@ return {
     "folke/tokyonight.nvim",
     lazy = true,
     enabled = true,
+    opts = {
+      transparent = true, -- Enable transparency
+      styles = {
+        -- Background styles. Can be "dark", "transparent" or "normal"
+        sidebars = "transparent",
+        floats = "transparent",
+      },
+    },
   },
   {
     "catppuccin/nvim",
     lazy = true,
     enabled = true,
     name = "catppuccin", -- or Lazy will show the plugin as "nvim"
+    opts = {
+      transparent_background = true,
+    },
   },
   {
     "rose-pine/neovim",
