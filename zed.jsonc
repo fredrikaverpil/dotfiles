@@ -1,0 +1,20 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "vim_mode": true,
+  "ui_font_size": 16,
+  "ui_font_family": "Zed Plex Sans",
+  "buffer_font_family": "Berkeley Mono",
+  "buffer_font_size": 14,
+  "theme": {
+    "mode": "system",
+    "light": "Atelier Forest Light",
+    "dark": "Tokyo Night Storm"
+  }
+}

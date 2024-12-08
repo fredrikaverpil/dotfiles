@@ -46,6 +46,9 @@
       path: nvim-fredrik
       force: true
     ~/.config/neovide/config.toml: neovide.toml
+    ~/.config/zed/settings.json:
+      path: zed.jsonc
+      force: true
     ~/Library/Application Support/Code/User/settings.json:
       path: vscode_settings.jsonc
       force: true
