@@ -9,7 +9,7 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 local golangci_config_file = nil
-local tags = "-tags=wireinject,tools"
+local tags = "-tags=wireinject,tools,integration"
 
 local function golangcilint_args()
   local args = {}
@@ -286,6 +286,7 @@ return {
     opts = function(_, opts)
       opts.adapters = opts.adapters or {}
       opts.adapters["neotest-golang"] = {
+        go_list_args = { tags },
         go_test_args = {
           "-v",
           "-count=1",
@@ -293,12 +294,13 @@ return {
           "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
           -- "-p=1",
           "-parallel=1",
+          tags,
         },
+        runner = "gotestsum",
+        gotestsum_args = { "--format=standard-verbose" },
 
         -- experimental
         dev_notifications = true,
-        runner = "gotestsum",
-        gotestsum_args = { "--format=standard-verbose" },
       }
     end,
   },
