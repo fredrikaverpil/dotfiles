@@ -94,7 +94,7 @@ fi
 
 function cd() {
   builtin cd "$@" || return
-  virtual_env_activate
+  # virtual_env_activate
   # node_version_manager  # TODO: with pkgx, maybe nvm is no longer needed?
 }
 cd . # trigger cd overrides
