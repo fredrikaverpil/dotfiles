@@ -9,7 +9,7 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 local golangci_config_file = nil
-local tags = "-tags=wireinject,tools,integration"
+local tags = "-tags=wireinject,integration"
 
 local function golangcilint_args()
   local args = {}
