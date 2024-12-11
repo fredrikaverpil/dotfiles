@@ -430,6 +430,18 @@ function M.setup_coderunner_keymaps()
   map_normal_mode("<leader>rf", ":RunFile term<CR>", "[r]unner [f]ile")
 end
 
+function M.setup_snacks_keymaps()
+  return {
+    {
+      "<leader>gg",
+      function()
+        require("snacks").lazygit.open()
+      end,
+      desc = "LazyGit",
+    },
+  }
+end
+
 function M.setup_lazygit_keymaps()
   --   "LazyGit",
   --   "LazyGitConfig",
