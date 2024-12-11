@@ -2,6 +2,7 @@ return {
 
   {
     "echasnovski/mini.indentscope",
+    enabled = false, -- use snacks.nvim instead
     lazy = true,
     event = "BufReadPost",
     version = "*",

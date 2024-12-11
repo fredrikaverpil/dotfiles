@@ -2,7 +2,7 @@ return {
 
   {
     "kdheepak/lazygit.nvim",
-    enabled = false,
+    enabled = false, -- use snacks.nvim instead
     lazy = true,
     -- optional for floating window border decoration
     dependencies = {

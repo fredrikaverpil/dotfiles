@@ -439,6 +439,14 @@ function M.setup_snacks_keymaps()
       end,
       desc = "LazyGit",
     },
+    {
+      "<leader>uz",
+      function()
+        require("snacks").zen()
+        require("snacks").dim()
+      end,
+      desc = "Zen mode",
+    },
   }
 end
 
