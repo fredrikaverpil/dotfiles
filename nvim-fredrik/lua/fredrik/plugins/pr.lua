@@ -22,9 +22,9 @@ return {
 
     keys = {
       {
-        "<leader>gbp",
+        "<leader>gbv",
         function()
-          require("pr").open()
+          require("pr").view()
         end,
         desc = "View PR in browser",
       },
