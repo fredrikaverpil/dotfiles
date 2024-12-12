@@ -443,7 +443,6 @@ function M.setup_snacks_keymaps()
       "<leader>uz",
       function()
         require("snacks").zen()
-        require("snacks").dim()
       end,
       desc = "Zen mode",
     },
