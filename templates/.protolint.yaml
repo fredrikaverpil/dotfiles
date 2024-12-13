@@ -10,3 +10,4 @@ lint:
     remove:
       - MAX_LINE_LENGTH
       - FILE_HAS_COMMENT
+      - FIELD_NAMES_EXCLUDE_PREPOSITIONS # this will otherwise complain about `order_by`
