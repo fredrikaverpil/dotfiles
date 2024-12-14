@@ -65,6 +65,7 @@ local function setup_handler(server)
 
   local lsp = require("lspconfig")[server]
   if lsp.setup ~= nil then
+    -- see all server configurations: https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md
     lsp.setup(server_opts)
   else
     vim.notify("LSP server setup fn not found: " .. server, vim.log.levels.ERROR)
