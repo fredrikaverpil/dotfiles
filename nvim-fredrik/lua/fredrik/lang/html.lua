@@ -31,9 +31,11 @@ return {
       servers = {
         -- https://github.com/microsoft/vscode-html-languageservice
         html = {
-          filetypes = { "html", "gotmpl", "gohtml" },
+          filetypes = { "html" },
           settings = {
-            html = {},
+            html = {
+              -- TODO: disable formatting, use prettier instead?
+            },
           },
         },
       },

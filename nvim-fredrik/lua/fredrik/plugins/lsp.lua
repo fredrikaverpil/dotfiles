@@ -100,6 +100,10 @@ end
 local function create_server_setup_autocmds(opts)
   -- Setup LSP for specific filetypes, using autocmd.
   for server, server_opts in pairs(opts.servers) do
+    if server == "gopls" then
+      vim.notify(vim.inspect(server_opts))
+    end
+
     if server_opts then
       if server_opts.filetypes == nil then
         vim.notify("No filetypes specified for LSP server: " .. server, vim.log.levels.WARN)
@@ -167,6 +171,16 @@ return {
       },
     },
     opts = {
+      extends = {
+        -- LSP settings extensions (not overrides).
+        -- Example where gotmpl extends gopls and html:
+        -- gotmpl = {
+        --   servers = {
+        --     gopls = { ... },
+        --     html = { ... },
+        --   },
+        -- }
+      },
       servers = {
         -- -- Example LSP settings below for opts.servers:
         -- lua_ls = {
@@ -193,6 +207,16 @@ return {
     config = function(_, opts)
       -- TODO: extend config with inspiration from
       -- https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/plugins/lsp/init.lua
+
+      -- per language extension of LSP settings
+      if opts.extends then
+        for extendee, servers in pairs(opts.extends) do
+          for server, server_opts in pairs(servers.servers) do
+            vim.notify("Extending " .. server .. " on behalf of " .. extendee)
+            opts.servers = require("fredrik.utils.table").deep_merge(opts.servers, { [server] = server_opts })
+          end
+        end
+      end
 
       require("fredrik.utils.diagnostics").setup_diagnostics()
 

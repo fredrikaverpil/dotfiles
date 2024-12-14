@@ -44,24 +44,30 @@ return {
         },
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "yamlls" })
+          vim.list_extend(opts.ensure_installed, { "gopls", "html-lsp" })
         end,
       },
     },
     opts = {
-      servers = {
-        gopls = {
-          filetypes = filetypes,
-          settings = {
+      extends = {
+        -- extendee: gotmpl
+        gotmpl = {
+          -- extends: go.lua, html.lua
+          servers = {
             gopls = {
-              templateExtensions = table.insert(filetypes, "html"), -- make sure this fileetype is set in the buffer
+              filetypes = filetypes,
+              settings = {
+                gopls = {
+                  templateExtensions = filetypes, -- make sure this filetype is set in the buffer
+                },
+              },
             },
-          },
-        },
-        html = {
-          filetypes = filetypes,
-          settings = {
-            html = {},
+            html = {
+              filetypes = filetypes,
+              settings = {
+                html = {},
+              },
+            },
           },
         },
       },
