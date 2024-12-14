@@ -59,16 +59,16 @@ return {
             -- "LazyVim",
 
             -- Only load the lazyvim library when the `LazyVim` global is found
-            { path = "LazyVim",            words = { "LazyVim" } },
+            { path = "LazyVim", words = { "LazyVim" } },
 
             -- Load the wezterm types when the `wezterm` module is required
             -- Needs `justinsgithub/wezterm-types` to be installed
-            { path = "wezterm-types",      mods = { "wezterm" } },
+            { path = "wezterm-types", mods = { "wezterm" } },
           },
         },
       },
       { "Bilal2453/luvit-meta", lazy = true }, -- optional `vim.uv` typings
-      {                                        -- optional completion source for require statements and module annotations
+      { -- optional completion source for require statements and module annotations
         "hrsh7th/nvim-cmp",
         opts = function(_, opts)
           opts.sources = opts.sources or {}
@@ -93,7 +93,7 @@ return {
                 checkThirdParty = false,
               },
               codeLens = {
-                enable = true,
+                enable = false, -- causes annoying flickering
               },
               completion = {
                 callSnippet = "Replace",
