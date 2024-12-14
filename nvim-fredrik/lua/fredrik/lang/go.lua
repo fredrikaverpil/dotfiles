@@ -1,20 +1,11 @@
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "go", "gomod", "gowork", "gotmpl" },
+  pattern = { "go", "gomod", "gowork" },
   callback = function()
     -- set go specific options
     vim.opt_local.tabstop = 2
     vim.opt_local.shiftwidth = 2
     vim.opt_local.colorcolumn = "120"
   end,
-})
-
-vim.filetype.add({
-  extension = {
-    gohtml = "gotmpl",
-    gotmpl = "gotmpl",
-  },
-  -- filename = {},
-  -- pattern = {},
 })
 
 local golangci_config_file = nil
@@ -59,16 +50,16 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     lazy = true,
-    ft = { "go", "gomod", "gosum", "gotmpl", "gowork" },
+    ft = { "go", "gomod", "gosum", "gowork" },
     opts = {
-      ensure_installed = { "go", "gomod", "gosum", "gotmpl", "gowork" },
+      ensure_installed = { "go", "gomod", "gosum", "gowork" },
     },
   },
 
   {
     "stevearc/conform.nvim",
     lazy = true,
-    ft = { "go", "gomod", "gowork", "gotmpl" },
+    ft = { "go", "gomod", "gowork" },
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -109,7 +100,7 @@ return {
   {
     "mfussenegger/nvim-lint",
     lazy = true,
-    ft = { "go", "gomod", "gowork", "gotmpl" },
+    ft = { "go", "gomod", "gowork" },
     enabled = true, -- FIXME: use lsp for golangci-lint instead when possible?
     dependencies = {
       {
@@ -129,7 +120,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     lazy = true,
-    -- ft = { "go", "gomod", "gowork", "gosum", "gotmpl", "gohtmltmpl", "gotexttmpl" },
+    ft = { "go", "gomod", "gowork", "gosum" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -174,7 +165,7 @@ return {
           -- },
 
           gopls = {
-            filetypes = { "go", "gomod", "gowork", "gosum", "gotmpl", "gohtmltmpl", "gotexttmpl" },
+            filetypes = { "go", "gomod", "gowork", "gosum" },
 
             -- main readme: https://github.com/golang/tools/blob/master/gopls/doc/features/README.md
             --
@@ -217,7 +208,6 @@ return {
                 -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
                 -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md#build
                 directoryFilters = { "-**/node_modules", "-**/.git", "-.vscode", "-.idea", "-.vscode-test" },
-                templateExtensions = { "gotmpl" }, -- make sure this fileetype is set in the buffer
 
                 -- formatting options
                 -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go

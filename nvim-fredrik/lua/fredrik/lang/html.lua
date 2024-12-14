@@ -31,7 +31,7 @@ return {
       servers = {
         -- https://github.com/microsoft/vscode-html-languageservice
         html = {
-          filetypes = { "html" },
+          filetypes = { "html", "gotmpl", "gohtml" },
           settings = {
             html = {},
           },
