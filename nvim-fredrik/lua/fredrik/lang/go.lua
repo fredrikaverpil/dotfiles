@@ -8,13 +8,13 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
-vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
-  pattern = "*.gohtml,*.gotmpl",
-  callback = function(args)
-    if vim.fn.search("{{.\\+}}", "nw") ~= 0 then
-      vim.api.nvim_set_option_value("filetype", "gotmpl", { buf = args.buf })
-    end
-  end,
+vim.filetype.add({
+  extension = {
+    gohtml = "gotmpl",
+    gotmpl = "gotmpl",
+  },
+  -- filename = {},
+  -- pattern = {},
 })
 
 local golangci_config_file = nil
