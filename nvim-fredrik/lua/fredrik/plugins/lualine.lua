@@ -59,7 +59,10 @@ return {
       lualine_y = { "progress" },
       lualine_z = { "location" },
     },
-    extensions = { "lazy", "man", "quickfix" },
+
+    -- settings that needs to be defined here, due to other plugins being lazy-loaded
+    disabled_filetypes = { "codecompanion", "Avante", "AvanteInput" },
+    extensions = { "lazy", "man", "quickfix", "neo-tree", "mason", "trouble", "nvim-dap-ui" },
   },
   config = function(_, opts)
     -- TODO: make more generic insertion function which can insert anywhere.

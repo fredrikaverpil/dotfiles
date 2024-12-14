@@ -71,9 +71,6 @@ return {
           "mfussenegger/nvim-dap",
         },
         opts = function(_, opts)
-          opts.extensions = opts.extensions or {}
-          table.insert(opts.extensions, "nvim-dap-ui")
-
           local function dap_status()
             return "  " .. require("dap").status()
           end
