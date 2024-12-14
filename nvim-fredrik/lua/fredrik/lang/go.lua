@@ -8,6 +8,16 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+  pattern = "*.gohtml,*.gotmpl",
+  callback = function()
+    if vim.fn.search("{{.\\+}}", "nw") ~= 0 then
+      local buf = vim.api.nvim_get_current_buf()
+      vim.api.nvim_set_option_value("filetype", "gotmpl", { buf = buf })
+    end
+  end,
+})
+
 local golangci_config_file = nil
 local tags = "-tags=wireinject,integration"
 
@@ -176,6 +186,7 @@ return {
             -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
             -- https://github.com/golang/tools/blob/master/gopls/README.md
             settings = {
+
               -- NOTE: the gopls defaults will apply if not overridden here.
               gopls = {
                 buildFlags = { tags },
@@ -206,6 +217,7 @@ return {
                 -- build options
                 -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
                 directoryFilters = { "-**/node_modules", "-**/.git", "-.vscode", "-.idea", "-.vscode-test" },
+                templateExtensions = { "gohtml", "gotmpl" },
 
                 -- formatting options
                 -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
