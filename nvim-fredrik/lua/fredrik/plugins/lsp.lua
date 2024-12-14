@@ -230,6 +230,7 @@ return {
 
   {
     "mhanberg/output-panel.nvim",
+    enabled = false, -- causes errors quite often
     event = "VeryLazy",
     config = function()
       require("output_panel").setup()
