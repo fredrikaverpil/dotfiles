@@ -59,7 +59,7 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     lazy = true,
-    ft = { "go", "gomod", "gowork", "gotmpl" },
+    ft = { "go", "gomod", "gosum", "gotmpl", "gowork" },
     opts = {
       ensure_installed = { "go", "gomod", "gosum", "gotmpl", "gowork" },
     },
