@@ -5,6 +5,12 @@ return {
     "nvim-lua/plenary.nvim",
     "nvim-tree/nvim-web-devicons",
     "MunifTanjim/nui.nvim",
+    {
+      "nvim-lualine/lualine.nvim",
+      opts = {
+        extensions = { "neo-tree" },
+      },
+    },
   },
   opts = {
     sources = { "filesystem", "buffers", "git_status", "document_symbols" },

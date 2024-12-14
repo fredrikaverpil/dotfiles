@@ -59,7 +59,7 @@ return {
       lualine_y = { "progress" },
       lualine_z = { "location" },
     },
-    extensions = { "neo-tree", "lazy", "mason", "man", "nvim-dap-ui", "trouble" },
+    extensions = { "lazy", "man", "quickfix" },
   },
   config = function(_, opts)
     -- TODO: make more generic insertion function which can insert anywhere.

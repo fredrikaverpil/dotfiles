@@ -64,6 +64,31 @@ return {
         "mfussenegger/nvim-dap",
         opts = {},
       },
+      {
+        "nvim-lualine/lualine.nvim",
+        event = "VeryLazy",
+        dependencies = {
+          "mfussenegger/nvim-dap",
+        },
+        opts = function(_, opts)
+          opts.extensions = opts.extensions or {}
+          table.insert(opts.extensions, "nvim-dap-ui")
+
+          local function dap_status()
+            return "  " .. require("dap").status()
+          end
+          opts.dap_status = {
+            lualine_component = {
+              dap_status,
+              cond = function()
+                -- return package.loaded["dap"] and require("dap").status() ~= ""
+                return require("dap").status() ~= ""
+              end,
+              color = require("fredrik.utils.colors").fgcolor("Debug"),
+            },
+          }
+        end,
+      },
     },
     opts = {},
     config = function(_, opts)
@@ -83,29 +108,5 @@ return {
       end
     end,
     keys = require("fredrik.config.keymaps").setup_dap_ui_keymaps(),
-  },
-
-  {
-    "nvim-lualine/lualine.nvim",
-    event = "VeryLazy",
-    dependencies = {
-      "mfussenegger/nvim-dap",
-    },
-    opts = function(_, opts)
-      local function dap_status()
-        return "  " .. require("dap").status()
-      end
-
-      opts.dap_status = {
-        lualine_component = {
-          dap_status,
-          cond = function()
-            -- return package.loaded["dap"] and require("dap").status() ~= ""
-            return require("dap").status() ~= ""
-          end,
-          color = require("fredrik.utils.colors").fgcolor("Debug"),
-        },
-      }
-    end,
   },
 }

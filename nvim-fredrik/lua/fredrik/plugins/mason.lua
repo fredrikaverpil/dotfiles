@@ -9,6 +9,12 @@ return {
           lockfile_path = os.getenv("DOTFILES") .. "/nvim-fredrik/mason-lock.json",
         },
       },
+      {
+        "nvim-lualine/lualine.nvim",
+        opts = {
+          extensions = { "mason" },
+        },
+      },
     },
     config = function(_, opts)
       require("mason").setup(opts)
