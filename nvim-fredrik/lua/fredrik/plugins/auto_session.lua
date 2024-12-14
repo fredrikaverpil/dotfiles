@@ -50,7 +50,7 @@ return {
       opts.post_restore_cmds = {
         require("fredrik.utils.private").toggle_copilot,
         activate_python_venv,
-        require("lualine").refresh,
+        -- require("lualine").refresh,
       }
 
       opts.session_lens = {
