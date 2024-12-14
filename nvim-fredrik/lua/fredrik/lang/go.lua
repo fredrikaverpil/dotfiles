@@ -216,8 +216,9 @@ return {
 
                 -- build options
                 -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+                -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md#build
                 directoryFilters = { "-**/node_modules", "-**/.git", "-.vscode", "-.idea", "-.vscode-test" },
-                templateExtensions = { "gohtml", "gotmpl" },
+                templateExtensions = { "gotmpl" }, -- make sure this fileetype is set in the buffer
 
                 -- formatting options
                 -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
