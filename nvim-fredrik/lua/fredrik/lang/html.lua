@@ -12,7 +12,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     lazy = true,
-    ft = { "html", "templ" },
+    ft = { "html" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
