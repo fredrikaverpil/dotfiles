@@ -100,10 +100,6 @@ end
 local function create_server_setup_autocmds(opts)
   -- Setup LSP for specific filetypes, using autocmd.
   for server, server_opts in pairs(opts.servers) do
-    if server == "gopls" then
-      vim.notify(vim.inspect(server_opts))
-    end
-
     if server_opts then
       if server_opts.filetypes == nil then
         vim.notify("No filetypes specified for LSP server: " .. server, vim.log.levels.WARN)
