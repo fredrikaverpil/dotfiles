@@ -12,8 +12,8 @@ return {
     -- OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
     --  build = "cargo build --release",
 
-    ---@module 'blink.cmp'
-    ---@type blink.cmp.Config
+    -- ---@module 'blink.cmp'
+    -- ---@type blink.cmp.Config
     opts = {
 
       keymap = require("fredrik.config.keymaps").setup_blink_cmp_keymaps(),
