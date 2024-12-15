@@ -1,13 +1,3 @@
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "gotmpl", "gohtml" },
-  callback = function()
-    -- set go specific options
-    vim.opt_local.tabstop = 2
-    vim.opt_local.shiftwidth = 2
-    vim.opt_local.colorcolumn = "120"
-  end,
-})
-
 vim.filetype.add({
   extension = {
     gotmpl = "gotmpl",
@@ -18,6 +8,16 @@ vim.filetype.add({
 })
 
 local filetypes = { "gotmpl", "gohtml" }
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = filetypes,
+  callback = function()
+    -- set go specific options
+    vim.opt_local.tabstop = 2
+    vim.opt_local.shiftwidth = 2
+    vim.opt_local.colorcolumn = "120"
+  end,
+})
 
 return {
 
