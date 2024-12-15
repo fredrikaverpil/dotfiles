@@ -16,9 +16,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     lazy = true,
     ft = filetypes,
-    opts = {
-      ensure_installed = { "templ" },
-    },
+    opts = { ensure_installed = { "templ" } },
   },
 
   {
@@ -28,11 +26,7 @@ return {
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
-        dependencies = {
-          {
-            "williamboman/mason.nvim",
-          },
-        },
+        dependencies = { "williamboman/mason.nvim" },
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
           vim.list_extend(opts.ensure_installed, { "templ" })
@@ -61,21 +55,8 @@ return {
                 },
               },
             },
-            html = {
-              filetypes = filetypes,
-              settings = {
-                html = {
-                  -- FIXME: disable formatting?
-                },
-              },
-            },
-            -- TODO: add htmx
-            -- htmx = {
-            --   filetypes = filetypes,
-            --   settings = {
-            --     htmx = {},
-            --   },
-            -- },
+            html = { filetypes = filetypes, settings = { html = {} } },
+            htmx = { filetypes = filetypes, settings = { htmx = {} } },
           },
         },
       },

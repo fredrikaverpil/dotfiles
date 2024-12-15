@@ -25,9 +25,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     lazy = true,
     ft = filetypes,
-    opts = {
-      ensure_installed = { "gotmpl" },
-    },
+    opts = { ensure_installed = { "gotmpl" } },
   },
 
   {
@@ -37,11 +35,7 @@ return {
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
-        dependencies = {
-          {
-            "williamboman/mason.nvim",
-          },
-        },
+        dependencies = { "williamboman/mason.nvim" },
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
           vim.list_extend(opts.ensure_installed, { "gopls", "html-lsp" })
@@ -49,6 +43,7 @@ return {
       },
     },
     opts = {
+      servers = {}, -- no LSPs here, gotmpl only extends other LSPs
       extends = {
         -- extendee: gotmpl
         gotmpl = {
@@ -62,12 +57,8 @@ return {
                 },
               },
             },
-            html = {
-              filetypes = filetypes,
-              settings = {
-                html = {},
-              },
-            },
+            html = { filetypes = filetypes, settings = { html = {} } },
+            htmx = { filetypes = filetypes, settings = { htmx = {} } },
           },
         },
       },
