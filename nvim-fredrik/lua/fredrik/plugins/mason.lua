@@ -10,6 +10,12 @@ return {
         },
       },
     },
+    opts = {
+      -- for local development/testing; clone down the mason-registry locally
+      -- registries = {
+      --   "file:~/code/public/mason-registry",
+      -- },
+    },
     config = function(_, opts)
       require("mason").setup(opts)
 
