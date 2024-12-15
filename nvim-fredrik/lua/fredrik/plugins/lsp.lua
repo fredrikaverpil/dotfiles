@@ -208,7 +208,7 @@ return {
       if opts.extends then
         for extendee, servers in pairs(opts.extends) do
           for server, server_opts in pairs(servers.servers) do
-            vim.notify("Extending " .. server .. " on behalf of " .. extendee)
+            -- vim.notify("Extending " .. server .. " on behalf of " .. extendee)
             opts.servers = require("fredrik.utils.table").deep_merge(opts.servers, { [server] = server_opts })
           end
         end
