@@ -29,7 +29,8 @@
     "Brewfile": "ruby",
     "vimrc": "viml",
     ".gitconfig": "gitconfig",
-    "gitconfig": "gitconfig"
+    "gitconfig": "gitconfig",
+    "*.gotmpl": "html"
   },
   "files.exclude": {
     "**/.git": true,
@@ -345,5 +346,8 @@
     ]
   },
   "go.toolsManagement.autoUpdate": true,
+  "gopls": {
+    "build.templateExtensions": ["gotmpl"]
+  },
   "workbench.preferredDarkColorTheme": "Tokyo Night"
 }
