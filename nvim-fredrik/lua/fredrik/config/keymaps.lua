@@ -963,8 +963,7 @@ function M.setup_obsidian_keymaps(obsidian_vars)
   }
 end
 
-function M.setup_whichkey()
-  local wk = require("which-key")
+function M.setup_whichkey(wk)
   wk.add({
     { "<leader><tab>", group = "tab" },
     { "<leader>a", group = "ai" },

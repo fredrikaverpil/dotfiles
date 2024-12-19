@@ -7,11 +7,15 @@ return {
     dependencies = {
       "echasnovski/mini.icons",
     },
-    opts = {},
-    config = function()
+    opts = {
+      preset = "helix",
+    },
+    config = function(_, opts)
       vim.o.timeout = true
       vim.o.timeoutlen = 300
-      require("fredrik.config.keymaps").setup_whichkey()
+      local wk = require("which-key")
+      require("fredrik.config.keymaps").setup_whichkey(wk)
+      wk.setup(opts)
     end,
     keys = require("fredrik.config.keymaps").setup_whichkey_contextual(),
   },
