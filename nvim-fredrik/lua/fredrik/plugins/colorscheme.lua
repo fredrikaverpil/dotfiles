@@ -58,12 +58,13 @@ return {
     enabled = true,
     lazy = true,
     opts = {
-      transparent = true, -- Enable transparency
-      styles = {
-        -- Background styles. Can be "dark", "transparent" or "normal"
-        sidebars = "transparent",
-        floats = "transparent",
-      },
+      -- transparent = true, -- Enable transparency
+      -- styles = {
+      --   -- Background styles. Can be "dark", "transparent" or "normal"
+      --   sidebars = "dark",
+      --   floats = "transparent",
+      -- },
+      dim_inactive = true, -- dims inactive windows
     },
   },
   {
@@ -72,7 +73,7 @@ return {
     lazy = true,
     name = "catppuccin", -- or Lazy will show the plugin as "nvim"
     opts = {
-      transparent_background = true,
+      -- transparent_background = true,
     },
   },
   {
