@@ -344,6 +344,13 @@ end
 function M.setup_neotree_keymaps()
   return {
     { "<leader>e", ":Neotree source=filesystem reveal=true position=left toggle=true<CR>", desc = "Neo-tree" },
+    {
+      "<leader>ge",
+      function()
+        require("neo-tree.command").execute({ source = "git_status", toggle = true })
+      end,
+      desc = "Git Explorer",
+    },
   }
 end
 
