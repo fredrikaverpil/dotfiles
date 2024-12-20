@@ -364,7 +364,7 @@ function M.setup_telescope_keymaps()
   return {
 
     -- find files
-    { "<leader><leader>", require("telescope.builtin").find_files, desc = "Find files" },
+    -- { "<leader><leader>", require("telescope.builtin").find_files, desc = "Find files" },
 
     -- project files
     {
@@ -401,13 +401,13 @@ function M.setup_telescope_keymaps()
     { "<leader>sgb", "<cmd>Telescope git_branches<CR>", desc = "[s]earch [g]it [b]ranches" },
 
     -- search
-    {
-      "<leader>/",
-      function()
-        require("telescope").extensions.live_grep_args.live_grep_args()
-      end,
-      desc = "[s]earch [g]rep",
-    },
+    -- {
+    --   "<leader>/",
+    --   function()
+    --     require("telescope").extensions.live_grep_args.live_grep_args()
+    --   end,
+    --   desc = "[s]earch [g]rep",
+    -- },
     { '<leader>s"', "<cmd>Telescope registers<cr>", desc = '[s]earch ["]registers' },
     { "<leader>sa", "<cmd>Telescope autocommands<cr>", desc = "[s]earch [a]utocommands" },
     { "<leader>sb", "<cmd>Telescope buffers<CR>", desc = "[s]earch opened [b]uffers" },
@@ -420,6 +420,27 @@ function M.setup_telescope_keymaps()
     { "<leader>sM", "<cmd>Telescope man_pages<cr>", desc = "[s]earch [M]an pages" },
     { "<leader>sm", "<cmd>Telescope marks<cr>", desc = "[s]earch [m]arks" },
     { "<leader>so", "<cmd>Telescope vim_options<cr>", desc = "[s]earch [o]ptions" },
+  }
+end
+
+function M.setup_fzf_keymaps()
+  return {
+    {
+      "<leader><leader>",
+      function()
+        require("fzf-lua").files()
+      end,
+      desc = "Files",
+    },
+    {
+      "<leader>/",
+      function()
+        -- local git_grep = "git grep --line-number --column --color=always"
+        -- opts = {cmd = git_grep}
+        require("fzf-lua").live_grep({ multiprocess = true })
+      end,
+      desc = "Grep",
+    },
   }
 end
 
