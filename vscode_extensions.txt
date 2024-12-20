@@ -86,4 +86,5 @@ vscodevim.vim
 wayou.vscode-todo-highlight
 wholroyd.jinja
 wicked-labs.wvsc-serendipity
+xmtt.go-mod-grapher
 yzhang.markdown-all-in-one

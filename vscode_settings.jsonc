@@ -349,5 +349,6 @@
   "gopls": {
     "build.templateExtensions": ["gotmpl"]
   },
-  "workbench.preferredDarkColorTheme": "Tokyo Night"
+  "workbench.preferredDarkColorTheme": "Tokyo Night",
+  "git.openRepositoryInParentFolders": "always"
 }
