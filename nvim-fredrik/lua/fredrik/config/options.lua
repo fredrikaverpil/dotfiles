@@ -64,6 +64,14 @@ vim.opt.signcolumn = "yes"
 -- cursor line highlight
 vim.opt.cursorline = false
 
+-- Enable cursor blinking in all modes
+--
+-- The numbers represent milliseconds:
+-- blinkwait175: Time before blinking starts
+-- blinkoff150: Time cursor is invisible
+-- blinkon175: Time cursor is visible
+-- vim.opt.guicursor = "n-v-c-sm:block-blinkwait175-blinkoff150-blinkon175"
+
 -- splitting
 vim.opt.splitbelow = true
 vim.opt.splitright = true
