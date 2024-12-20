@@ -238,19 +238,6 @@ return {
     opts = {},
   },
 
-  -- {
-  --   "hrsh7th/nvim-cmp",
-  --   dependencies = {
-  --     "Snikimonkd/cmp-go-pkgs",
-  --     enabled = true, -- NOTE: not using nvim-cmp anymore.
-  --   },
-  --   ft = { "go", "gomod" },
-  --   opts = function(_, opts)
-  --     opts.sources = opts.sources or {}
-  --     table.insert(opts.sources, { name = "go_pkgs" })
-  --   end,
-  -- },
-
   {
     "ray-x/go.nvim",
     lazy = true,

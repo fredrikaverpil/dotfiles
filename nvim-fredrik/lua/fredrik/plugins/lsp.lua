@@ -145,12 +145,6 @@ return {
           },
         },
       },
-      -- {
-      --   "hrsh7th/nvim-cmp",
-      --   enabled = true,
-      --   -- NOTE: this is here because we get the default client capabilities from cmp_nvim_lsp
-      --   -- see cmp.lua for more settings.
-      -- },
       {
         "saghen/blink.cmp",
       },
@@ -227,7 +221,7 @@ return {
         "force",
         {},
         vim.lsp.protocol.make_client_capabilities(),
-        has_cmp and cmp_nvim_lsp.default_capabilities() or {},
+        -- has_cmp and cmp_nvim_lsp.default_capabilities() or {},
         has_blink and blink.get_lsp_capabilities() or {}
       )
 

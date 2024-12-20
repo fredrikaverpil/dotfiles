@@ -5,10 +5,6 @@ return {
     event = "InsertEnter",
     enabled = true,
     dependencies = {
-      -- {
-      --   "hrsh7th/nvim-cmp",
-      --   enabled = true,
-      -- },
       {
         "nvim-lualine/lualine.nvim",
         event = "VeryLazy",
