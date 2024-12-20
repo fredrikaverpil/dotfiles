@@ -37,9 +37,7 @@ return {
     ---@type blink.cmp.Config
     opts = {
       sources = {
-        completion = {
-          enabled_providers = { "dadbod" },
-        },
+        default = { "dadbod" },
         providers = {
           dadbod = { name = "Dadbod", module = "vim_dadbod_completion.blink" },
         },
