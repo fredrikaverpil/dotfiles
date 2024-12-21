@@ -28,11 +28,11 @@ local function golangcilint_args()
       if #found == 1 then
         local filepath = found[1]
         golangci_config_file = filepath
-        return "--config", filepath
+        return "--config", golangci_config_file
       else
         local filepath = vim.fn.expand("$DOTFILES/templates/.golangci.yml")
         golangci_config_file = filepath
-        return "--config", "/Users/fredrik/.dotfiles/templates/.golangci.yml"
+        return "--config", golangci_config_file
       end
     end,
 
