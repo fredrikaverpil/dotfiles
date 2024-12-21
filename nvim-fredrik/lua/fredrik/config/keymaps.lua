@@ -1083,6 +1083,7 @@ function M.setup_codecompanion_keymaps()
   return {
     { "<leader>ac", ":CodeCompanionChat anthropic<CR>", desc = "Codecompanion: Claude" },
     { "<leader>ao", ":CodeCompanionChat openai<CR>", desc = "Codecompanion: OpenAI" },
+    { "<leader>ag", ":CodeCompanionChat gemini<CR>", desc = "Codecompanion: Gemini" },
     { "<leader>al", ":CodeCompanionChat ollama<CR>", desc = "Codecompanion: Ollama" },
   }
 end

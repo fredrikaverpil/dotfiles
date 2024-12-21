@@ -64,6 +64,27 @@ local anthropic_fn = function()
   return require("codecompanion.adapters").extend("anthropic", anthropic_config)
 end
 
+--- OpenAI config for CodeCompanion.
+local openai_fn = function()
+  local openai_config = {
+    env = { api_key = "cmd:op read op://Personal/OpenAI/tokens/neovim --no-newline" },
+  }
+  return require("codecompanion.adapters").extend("openai", openai_config)
+end
+
+--- OpenAI config for CodeCompanion.
+local gemini_fn = function()
+  local gemini_config = {
+    env = { api_key = "cmd:op read op://Personal/Google/tokens/gemini --no-newline" },
+    schema = {
+      model = {
+        default = "gemini-2.0-flash-exp",
+      },
+    },
+  }
+  return require("codecompanion.adapters").extend("gemini", gemini_config)
+end
+
 --- Ollama config for CodeCompanion.
 local ollama_fn = function()
   return require("codecompanion.adapters").extend("ollama", {
@@ -80,14 +101,6 @@ local ollama_fn = function()
       },
     },
   })
-end
-
---- OpenAI config for CodeCompanion.
-local openai_fn = function()
-  local openai_config = {
-    env = { api_key = "cmd:op read op://Personal/OpenAI/tokens/neovim --no-newline" },
-  }
-  return require("codecompanion.adapters").extend("openai", openai_config)
 end
 
 return {
@@ -124,8 +137,9 @@ return {
       local custom_opts = {
         adapters = {
           anthropic = anthropic_fn,
-          ollama = ollama_fn,
           openai = openai_fn,
+          gemini = gemini_fn,
+          ollama = ollama_fn,
         },
       }
 
