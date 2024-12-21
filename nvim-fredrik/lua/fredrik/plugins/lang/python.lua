@@ -91,6 +91,9 @@ return {
       },
     },
     opts = function(_, opts)
+      opts.linters_by_ft = opts.linters_by_ft or {}
+      opts.linters = opts.linters or {}
+
       opts.linters_by_ft["python"] = { "mypy", "ruff" }
       opts.linters["mypy"] = {
         cmd = function()

@@ -112,6 +112,9 @@ return {
       },
     },
     opts = function(_, opts)
+      opts.linters_by_ft = opts.linters_by_ft or {}
+      opts.linters = opts.linters or {}
+
       opts.linters_by_ft["go"] = { "golangcilint" }
       opts.linters["golangcilint"] = { args = golangcilint_args() }
     end,

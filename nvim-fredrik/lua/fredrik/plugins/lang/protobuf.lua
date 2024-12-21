@@ -210,6 +210,9 @@ return {
       -- * buf_lint is executed below in an autocmd, because workaround for lazy-loaded cwd is desired.
       -- * api_linter is not yet merged into nvim-lint: https://github.com/mfussenegger/nvim-lint/pull/665
 
+      opts.linters_by_ft = opts.linters_by_ft or {}
+      opts.linters = opts.linters or {}
+
       opts.linters_by_ft["proto"] = { "protolint" }
       local protolint_config_file = vim.fn.expand("$DOTFILES/templates/.protolint.yaml") -- FIXME: make this into the fallback filepath.
       local protolint_args = { "lint", "--reporter=json", "--config_path=" .. protolint_config_file }

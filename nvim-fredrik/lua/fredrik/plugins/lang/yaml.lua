@@ -84,37 +84,30 @@ return {
         end,
       },
     },
-    opts = {
-      servers = {
-        yamlls = {
-          -- https://github.com/redhat-developer/yaml-language-server
-          filetypes = { "yaml", "gha", "dependabot" },
-
-          -- Have to add this for yamlls to understand that we support line folding
-          capabilities = {
-            textDocument = {
-              foldingRange = {
-                dynamicRegistration = false,
-                lineFoldingOnly = true,
+    opts = function(_, opts)
+      local defaults = {
+        servers = {
+          yamlls = {
+            -- https://github.com/redhat-developer/yaml-language-server
+            filetypes = { "yaml", "gha", "dependabot" },
+            settings = {
+              yaml = {
+                -- SchemaStore setup below
+                schemaStore = {
+                  -- You must disable built-in schemaStore support if you want to use
+                  -- this plugin and its advanced options like `ignore`.
+                  enable = false,
+                  -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
+                  url = "",
+                },
+                schemas = require("schemastore").yaml.schemas(),
               },
-            },
-          },
-
-          settings = {
-            yaml = {
-              -- SchemaStore setup below
-              schemaStore = {
-                -- You must disable built-in schemaStore support if you want to use
-                -- this plugin and its advanced options like `ignore`.
-                enable = false,
-                -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
-                url = "",
-              },
-              schemas = require("schemastore").yaml.schemas(),
             },
           },
         },
-      },
-    },
+      }
+      opts = require("fredrik.utils.table").deep_merge(opts, defaults)
+      return opts
+    end,
   },
 }

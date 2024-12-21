@@ -14,12 +14,14 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
 
-  -- load and confgure plugins in this order (plugins, languages, project-specific):
+  -- load and confgure plugins in this order (plugins, languages, core, project-specific overrides):
   spec = {
     -- import all plugins and their configs
     { import = "fredrik.plugins" },
     -- import language configs
     { import = "fredrik.plugins.lang" },
+    -- import core configs
+    { import = "fredrik.plugins.core" },
     -- import per-project config
     -- NOTE: this is built into lazy.nvim; place a .lazy.lua file in the project's
     -- root directory, containing a lazy spec and it will be merged in.

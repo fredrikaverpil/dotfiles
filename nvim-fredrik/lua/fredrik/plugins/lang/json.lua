@@ -61,19 +61,23 @@ return {
         end,
       },
     },
-    opts = {
-      servers = {
-        jsonls = {
-          -- https://github.com/microsoft/vscode-json-languageservice
-          filetypes = filetypes,
-          settings = {
-            json = {
-              schemas = require("schemastore").json.schemas(),
-              validate = { enable = true },
+    opts = function(_, opts)
+      local defaults = {
+        servers = {
+          jsonls = {
+            -- https://github.com/microsoft/vscode-json-languageservice
+            filetypes = filetypes,
+            settings = {
+              json = {
+                schemas = require("schemastore").json.schemas(),
+                validate = { enable = true },
+              },
             },
           },
         },
-      },
-    },
+      }
+      opts = require("fredrik.utils.table").deep_merge(opts, defaults)
+      return opts
+    end,
   },
 }

@@ -195,6 +195,7 @@ return {
       },
     },
     config = function(_, opts)
+      --keys of opts.servers
       -- TODO: extend config with inspiration from
       -- https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/plugins/lsp/init.lua
 
