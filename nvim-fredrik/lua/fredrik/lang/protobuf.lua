@@ -223,7 +223,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     lazy = true,
-    -- ft = { "proto" },
+    ft = { "proto" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -234,33 +234,19 @@ return {
         },
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          -- vim.list_extend(opts.ensure_installed, { "bufls" })
+          vim.list_extend(opts.ensure_installed, { "buf_ls" })
         end,
       },
     },
-    opts = function(_, opts)
-      -- HACK: override bufls with custom config, using the 'buf beta lsp' command.
-      local lspconfig = require("lspconfig")
-      local configs = require("lspconfig.configs")
-
-      configs.bufls = {
-        default_config = {
-          cmd = { "buf", "beta", "lsp" },
+    opts = {
+      servers = {
+        buf_ls = {
           filetypes = { "proto" },
-          root_dir = lspconfig.util.root_pattern(".git"),
-          name = "bufls",
-        },
-      }
-
-      local protobuf_opts = {
-        servers = {
-          bufls = {
-            filetypes = { "proto" },
+          settings = {
+            buf_ls = {},
           },
         },
-      }
-
-      return require("fredrik.utils.table").deep_merge(opts, protobuf_opts)
-    end,
+      },
+    },
   },
 }
