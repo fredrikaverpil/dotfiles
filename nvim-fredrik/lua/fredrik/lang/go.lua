@@ -84,7 +84,7 @@ return {
         },
         gofumpt = {
           -- https://github.com/stevearc/conform.nvim/blob/master/lua/conform/formatters/gofumpt.lua
-          prepend_args = { tags, "-extra", "-w", "$FILENAME" },
+          prepend_args = { "-extra", "-w", "$FILENAME" },
           stdin = false,
         },
         golines = {
