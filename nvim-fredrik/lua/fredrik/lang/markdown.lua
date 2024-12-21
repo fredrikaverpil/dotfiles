@@ -77,6 +77,8 @@ return {
       "nvim-treesitter/nvim-treesitter",
       "echasnovski/mini.icons",
     },
+    ---@module 'render-markdown'
+    ---@type render.md.UserConfig
     opts = {
       code = {
         sign = false,
@@ -84,8 +86,10 @@ return {
         right_pad = 1,
       },
       heading = {
-        sign = false,
-        icons = {},
+        enabled = false,
+        -- width = "block",
+        -- sign = false,
+        -- icons = {},
       },
     },
     keys = require("fredrik.config.keymaps").setup_markdown_keymaps(),
