@@ -76,6 +76,17 @@ return {
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
       "echasnovski/mini.icons",
+      {
+        "saghen/blink.cmp",
+        opts = {
+          sources = {
+            default = { "markdown" },
+            providers = {
+              markdown = { name = "RenderMarkdown", module = "render-markdown.integ.blink" },
+            },
+          },
+        },
+      },
     },
     ---@module 'render-markdown'
     ---@type render.md.UserConfig
