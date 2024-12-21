@@ -66,7 +66,6 @@
   "nvim-treesitter": { "branch": "master", "commit": "c47d8d27d047634d00a07ca80a1b694624743b38" },
   "nvim-treesitter-context": { "branch": "master", "commit": "8fd989b6b457a448606b4a2e51f9161700f609a7" },
   "nvim-vtsls": { "branch": "main", "commit": "45c6dfea9f83a126e9bfc5dd63430562b3f8af16" },
-  "nvim-web-devicons": { "branch": "master", "commit": "0eb18da56e2ba6ba24de7130a12bcc4e31ad11cb" },
   "obsidian.nvim": { "branch": "main", "commit": "ae1f76a75c7ce36866e1d9342a8f6f5b9c2caf9b" },
   "outline.nvim": { "branch": "main", "commit": "6c44527837ff7ac1cd054dc365a721e881020a2e" },
   "output-panel.nvim": { "branch": "main", "commit": "65bb44a5d5dbd40f3793a8c591b65a0c5f260bd9" },

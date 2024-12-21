@@ -3,7 +3,7 @@ return {
     "folke/trouble.nvim",
     lazy = true,
     dependencies = {
-      "nvim-tree/nvim-web-devicons",
+      -- icons supported via mini-icons.lua
     },
     opts = {},
     keys = require("fredrik.config.keymaps").setup_trouble_keymaps(),

@@ -13,7 +13,7 @@ return {
       "stevearc/dressing.nvim",
       "nvim-lua/plenary.nvim",
       "MunifTanjim/nui.nvim",
-      "nvim-tree/nvim-web-devicons",
+      -- icons supported via mini-icons.lua
       {
         "MeanderingProgrammer/render-markdown.nvim",
         opts = {

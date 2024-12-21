@@ -3,7 +3,8 @@ return {
   lazy = true,
   dependencies = {
     "nvim-lua/plenary.nvim",
-    "nvim-tree/nvim-web-devicons",
+    -- icons supported via mini-icons.lua
+    { "echasnovski/mini.icons", version = false },
     "MunifTanjim/nui.nvim",
   },
   opts = {
