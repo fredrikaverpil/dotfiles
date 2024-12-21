@@ -19,7 +19,7 @@ require("lazy").setup({
     -- import all plugins and their configs
     { import = "fredrik.plugins" },
     -- import language configs
-    { import = "fredrik.lang" },
+    { import = "fredrik.plugins.lang" },
     -- import per-project config
     -- NOTE: this is built into lazy.nvim; place a .lazy.lua file in the project's
     -- root directory, containing a lazy spec and it will be merged in.
