@@ -402,12 +402,6 @@ function M.setup_telescope_keymaps()
       desc = "Switch to file", -- NOTE: without changing cwd
     },
 
-    -- git
-    { "<leader>sgc", "<cmd>Telescope git_commits<CR>", desc = "[s]earch [g]it [c]ommits" },
-    { "<leader>sgC", "<cmd>Telescope git_bcommits<CR>", desc = "[s]earch [g]it branch [C]ommits" },
-    { "<leader>sgs", "<cmd>Telescope git_status<CR>", desc = "[s]earch [g]it [s]tatus changes" },
-    { "<leader>sgb", "<cmd>Telescope git_branches<CR>", desc = "[s]earch [g]it [b]ranches" },
-
     -- search
     -- {
     --   "<leader>/",
@@ -460,6 +454,12 @@ function M.setup_fzf_keymaps()
     { "<leader>sm", "<cmd>FzfLua marks<cr>", desc = "[s]earch [m]arks" },
 
     { "<leader>sF", "<cmd>FzfLua oldfiles<CR>", desc = "[s]earch recent [F]iles" },
+
+    -- git
+    { "<leader>sgc", "<cmd>FzfLua git_commits<CR>", desc = "[s]earch [g]it [c]ommits" },
+    { "<leader>sgC", "<cmd>FzfLua git_bcommits<CR>", desc = "[s]earch [g]it branch [C]ommits" },
+    { "<leader>sgs", "<cmd>FzfLua git_status<CR>", desc = "[s]earch [g]it [s]tatus changes" },
+    { "<leader>sgb", "<cmd>FzfLua git_branches<CR>", desc = "[s]earch [g]it [b]ranches" },
   }
 end
 
