@@ -453,6 +453,25 @@ function M.setup_fzf_keymaps()
   }
 end
 
+function M.setup_todo_keymaps()
+  return {
+    {
+      "<leader>st",
+      function()
+        require("todo-comments.fzf").todo()
+      end,
+      desc = "Todo",
+    },
+    {
+      "<leader>sT",
+      function()
+        require("todo-comments.fzf").todo({ keywords = { "TODO", "FIX", "FIXME" } })
+      end,
+      desc = "Todo/Fix/Fixme",
+    },
+  }
+end
+
 function M.setup_auto_session_keymaps()
   return {
     -- Will use Telescope if installed or a vim.ui.select picker otherwise
