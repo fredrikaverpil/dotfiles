@@ -874,10 +874,11 @@ function M.setup_rip_substitute_keymaps()
 end
 
 function M.setup_noice_keymaps()
-  map_normal_mode("<leader>sna", ":Noice<CR>", "[s]earch [n]oice [a]ll")
-  map_normal_mode("<leader>snl", ":NoiceLast<CR>", "[s]earch [n]oice [l]ast")
-  map_normal_mode("<leader>snd", ":NoiceDismiss<CR>", "[s]earch [n]oice [d]ismiss")
-  map_normal_mode("<leader>snL", ":NoiceLog<CR>", "[s]earch [n]oice [L]og")
+  return {
+    { "<leader>sna", ":Noice<CR>", desc = "[s]earch [n]oice [a]ll" },
+    { "<leader>snl", ":NoiceLast<CR>", desc = "[s]earch [n]oice [l]ast" },
+    { "<leader>snd", ":NoiceDismiss<CR>", desc = "[s]earch [n]oice [d]ismiss" },
+  }
 end
 
 function M.setup_fterm_keymaps()

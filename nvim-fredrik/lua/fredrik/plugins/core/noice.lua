@@ -3,23 +3,9 @@ return {
     "folke/noice.nvim",
     lazy = true,
     event = "VeryLazy",
-    -- priority = 800,
-    opts = {
-      -- add any options here
-    },
     dependencies = {
       -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
       "MunifTanjim/nui.nvim",
-      -- OPTIONAL:
-      --   `nvim-notify` is only needed, if you want to use the notification view.
-      --   If not available, we use `mini` as the fallback
-      {
-        "rcarriga/nvim-notify",
-        opts = {
-          stages = "static", -- no animation
-          timeout = 1000, -- 1s
-        },
-      },
       {
         "nvim-lualine/lualine.nvim",
         opts = function(_, opts)
@@ -63,8 +49,7 @@ return {
           lsp_doc_border = false, -- add a border to hover docs and signature help
         },
       })
-
-      require("fredrik.config.keymaps").setup_noice_keymaps()
     end,
+    keys = require("fredrik.config.keymaps").setup_noice_keymaps(),
   },
 }
