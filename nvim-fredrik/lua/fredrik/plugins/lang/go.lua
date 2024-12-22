@@ -328,6 +328,11 @@ return {
         },
       },
       {
+        -- TODO: try to configure this so the virtual text is helpful.
+        "theHamsta/nvim-dap-virtual-text",
+        enabled = false,
+      },
+      {
         "leoluz/nvim-dap-go",
         opts = {
           dap_configurations = {
@@ -367,8 +372,14 @@ return {
   },
 
   {
-    -- TODO: try to configure this so the virtual text is helpful.
-    "theHamsta/nvim-dap-virtual-text",
-    enabled = false,
+    "CRAG666/code_runner.nvim",
+    lazy = true,
+    opts = {
+      filetype = {
+        go = {
+          "go run",
+        },
+      },
+    },
   },
 }
