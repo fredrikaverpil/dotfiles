@@ -189,6 +189,8 @@ function M.setup_lsp_autocmd_keymaps(event)
   --  Most Language Servers support renaming across files, etc.
   map("<leader>cr", vim.lsp.buf.rename, "[C]ode [R]ename")
 
+  map("<leader>cR", Snacks.rename.rename_file, "[C]ode [R]ename")
+
   -- Execute a code action, usually your cursor needs to be on top of an error
   -- or a suggestion from your LSP for this to activate.
   map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
