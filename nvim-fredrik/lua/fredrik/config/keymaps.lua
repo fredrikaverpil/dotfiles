@@ -156,27 +156,34 @@ function M.setup_lsp_autocmd_keymaps(event)
   -- Jump to the definition of the word under your cursor.
   --  This is where a variable was first declared, or where a function is defined, etc.
   --  To jump back, press <C-t>.
-  map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
+
+  -- map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
+  map("gd", "<cmd>FzfLua lsp_definitions jump_to_single_result=true ignore_current_line=true<cr>", "[G]oto [D]efinition")
 
   -- Find references for the word under your cursor.
-  map("gr", ':lua require("telescope.builtin").lsp_references({ show_line = false })<CR>', "[G]oto [R]eferences")
+  -- map("gr", ':lua require("telescope.builtin").lsp_references({ show_line = false })<CR>', "[G]oto [R]eferences")
+  map("gr", "<cmd>FzfLua lsp_references jump_to_single_result=true ignore_current_line=true<cr>", "[G]oto [R]eferences")
 
   -- Jump to the implementation of the word under your cursor.
   --  Useful when your language has ways of declaring types without an actual implementation.
-  map("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
+  -- map("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
+  map("gI", "<cmd>FzfLua lsp_implementations jump_to_single_result=true ignore_current_line=true<cr>", "[G]oto [I]mplementation")
 
   -- Jump to the type of the word under your cursor.
   --  Useful when you're not sure what type a variable is and you want to see
   --  the definition of its *type*, not where it was *defined*.
-  map("gt", require("telescope.builtin").lsp_type_definitions, "[G]oto [t]ype definition")
+  -- map("gt", require("telescope.builtin").lsp_type_definitions, "[G]oto [t]ype definition")
+  map("gt", "<cmd>FzfLua lsp_typedefs jump_to_single_result=true ignore_current_line=true<cr>", "[G]oto [t]ype definition")
 
   -- Fuzzy find all the symbols in your current document.
   --  Symbols are things like variables, functions, types, etc.
-  map("<leader>cS", require("telescope.builtin").lsp_document_symbols, "Do[c]ument [S]ymbols (telescope)")
+  -- map("<leader>cS", require("telescope.builtin").lsp_document_symbols, "Do[c]ument [S]ymbols (telescope)")
+  map("<leader>cS", "<cmd>FzfLua lsp_document_symbols", "Do[c]ument [S]ymbols (telescope)")
 
   -- Fuzzy find all the symbols in your current workspace
   --  Similar to document symbols, except searches over your whole project.
-  map("<leader>cw", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[w]orkspace [s]ymbols (telescope)")
+  -- map("<leader>cw", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[w]orkspace [s]ymbols (telescope)")
+  map("<leader>cw", "<cmd>FzfLua lsp_workspace_symbols", "[w]orkspace [s]ymbols (telescope)")
 
   -- Rename the variable under your cursor
   --  Most Language Servers support renaming across files, etc.
