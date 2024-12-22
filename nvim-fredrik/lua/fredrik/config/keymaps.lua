@@ -443,7 +443,7 @@ function M.setup_fzf_keymaps()
       end,
       desc = "Grep",
     },
-    { "<leader>s", "<cmd>FzfLua registers<cr>", desc = '[s]earch ["]registers' },
+    { 'leader>s"', "<cmd>FzfLua registers<cr>", desc = '[s]earch ["]registers' },
     { "<leader>sh", "<cmd>FzfLua helptags<cr>", desc = "[s]earch [h]elp pages" },
     { "<leader>sa", "<cmd>FzfLua autocmds<cr>", desc = "[s]earch [a]utocommands" },
     { "<leader>sb", "<cmd>FzfLua buffers<CR>", desc = "[s]earch opened [b]uffers" },
