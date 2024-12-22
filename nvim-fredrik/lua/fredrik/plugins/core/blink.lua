@@ -24,13 +24,18 @@ return {
         documentation = {
           auto_show = true,
         },
+        menu = {
+          draw = {
+            treesitter = { "lsp" },
+          },
+        },
       },
       signature = {
-        enabled = false, -- experimental, and already provided by noice
+        enabled = true, -- experimental, can also be provided by noice
       },
-      -- appearance = {
-      --   kind_icons = require("fredrik.utils.icons").icons,
-      -- },
+      appearance = {
+        kind_icons = require("fredrik.utils.icons").icons.kinds,
+      },
       -- default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, via `opts_extend`
       sources = {
