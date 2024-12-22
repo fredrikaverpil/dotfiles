@@ -47,7 +47,6 @@ return {
 
             -- Or relative, which means they will be resolved from the plugin dir.
             "lazy.nvim",
-            "luvit-meta/library",
             "neotest",
             "plenary",
 
@@ -60,6 +59,8 @@ return {
 
             -- Only load the lazyvim library when the `LazyVim` global is found
             { path = "LazyVim", words = { "LazyVim" } },
+            { path = "snacks.nvim", words = { "Snacks" } },
+            { path = "lazy.nvim", words = { "LazyVim" } },
           },
         },
       },

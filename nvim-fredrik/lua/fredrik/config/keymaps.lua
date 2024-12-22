@@ -477,7 +477,7 @@ function M.setup_snacks_keymaps()
           or vim.fn.confirm("There are unsaved buffers:\n\n" .. table.concat(unsaved_table, "\n") .. "\n\nDo you still want to run lazygit?", "&Yes\n&No", 2)
             == 1
         then
-          require("snacks").lazygit.open()
+          Snacks.lazygit.open()
         end
       end,
       desc = "LazyGit",
@@ -485,9 +485,23 @@ function M.setup_snacks_keymaps()
     {
       "<leader>uz",
       function()
-        require("snacks").zen()
+        Snacks.zen.zen()
       end,
-      desc = "Zen mode",
+      desc = "Toggle Zen mode",
+    },
+    {
+      "<leader>uZ",
+      function()
+        Snacks.zen.zen()
+      end,
+      desc = "Toggle Zen mode",
+    },
+    {
+      "<leader>sn",
+      function()
+        Snacks.notifier.show_history()
+      end,
+      desc = "Toggle notification history",
     },
   }
 end
