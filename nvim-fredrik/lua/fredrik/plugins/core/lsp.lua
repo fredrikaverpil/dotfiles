@@ -151,11 +151,6 @@ return {
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
       {
-        "j-hui/fidget.nvim",
-        enabled = false, -- TODO: figure out how this status shows without fidget
-        opts = {},
-      },
-      {
         "artemave/workspace-diagnostics.nvim",
         enabled = G_workspace_diagnostics_enabled,
       },
@@ -242,15 +237,5 @@ return {
         end,
       })
     end,
-  },
-
-  {
-    "mhanberg/output-panel.nvim",
-    enabled = false, -- causes errors quite often
-    event = "VeryLazy",
-    config = function()
-      require("output_panel").setup()
-    end,
-    cmd = { "OutputPanel" },
   },
 }
