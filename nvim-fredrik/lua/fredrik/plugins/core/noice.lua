@@ -50,6 +50,5 @@ return {
         },
       })
     end,
-    keys = require("fredrik.config.keymaps").setup_noice_keymaps(),
   },
 }

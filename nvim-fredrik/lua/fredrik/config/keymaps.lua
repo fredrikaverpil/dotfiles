@@ -873,14 +873,6 @@ function M.setup_rip_substitute_keymaps()
   }
 end
 
-function M.setup_noice_keymaps()
-  return {
-    { "<leader>sna", ":Noice<CR>", desc = "[s]earch [n]oice [a]ll" },
-    { "<leader>snl", ":NoiceLast<CR>", desc = "[s]earch [n]oice [l]ast" },
-    { "<leader>snd", ":NoiceDismiss<CR>", desc = "[s]earch [n]oice [d]ismiss" },
-  }
-end
-
 function M.setup_fterm_keymaps()
   -- Both <C-/> and <C-_> are mapped due to the way control characters are interpreted by terminal emulators.
   -- ASCII value of '/' is 47, and of '_' is 95. When <C-/> is pressed, the terminal sends (47 - 64) which wraps around to 111 ('o').
