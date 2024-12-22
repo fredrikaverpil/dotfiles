@@ -446,12 +446,14 @@ function M.setup_fzf_keymaps()
     { 'leader>s"', "<cmd>FzfLua registers<cr>", desc = '[s]earch ["]registers' },
     { "<leader>sh", "<cmd>FzfLua helptags<cr>", desc = "[s]earch [h]elp pages" },
     { "<leader>sa", "<cmd>FzfLua autocmds<cr>", desc = "[s]earch [a]utocommands" },
-    { "<leader>sb", "<cmd>FzfLua buffers<CR>", desc = "[s]earch opened [b]uffers" },
+    { "<leader>sb", "<cmd>FzfLua buffers sort_mru=true sort_lastused=true<CR>", desc = "[s]earch opened [b]uffers" },
     { "<leader>sc", "<cmd>FzfLua commands<cr>", desc = "[s]earch [c]ommands" },
     { "<leader>sH", "<cmd>FzfLua highlights<cr>", desc = "[s]earch [H]ighlight groups" },
     { "<leader>sk", "<cmd>FzfLua keymaps<cr>", desc = "[s]earch [k]ey maps" },
     { "<leader>sM", "<cmd>FzfLua manpages<cr>", desc = "[s]earch [M]an pages" },
     { "<leader>sm", "<cmd>FzfLua marks<cr>", desc = "[s]earch [m]arks" },
+    { "<leader>sj", "<cmd>FzfLua jumps<cr>", desc = "[s]earch [j]umplist" },
+    { "<leader>sq", "<cmd>FzfLua quickfix<cr>", desc = "[s]earch [q]uickfix List" },
 
     { "<leader>sF", "<cmd>FzfLua oldfiles<CR>", desc = "[s]earch recent [F]iles" },
 
