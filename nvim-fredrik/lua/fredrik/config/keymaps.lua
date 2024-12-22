@@ -461,6 +461,7 @@ function M.setup_coderunner_keymaps()
 end
 
 function M.setup_snacks_keymaps()
+  -- NOTE: Snacks is a global; _G.Snacks = M
   return {
     {
       "<leader>gg",
