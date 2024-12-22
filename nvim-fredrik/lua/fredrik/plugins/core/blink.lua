@@ -17,7 +17,6 @@ return {
     opts = {
 
       keymap = require("fredrik.config.keymaps").setup_blink_cmp_keymaps(),
-
       completion = {
         list = {
           selection = "manual",
@@ -29,7 +28,9 @@ return {
       signature = {
         enabled = false, -- experimental, and already provided by noice
       },
-
+      -- appearance = {
+      --   kind_icons = require("fredrik.utils.icons").icons,
+      -- },
       -- default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, via `opts_extend`
       sources = {
