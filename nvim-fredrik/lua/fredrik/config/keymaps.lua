@@ -401,7 +401,6 @@ function M.setup_telescope_keymaps()
       end,
       desc = "Switch to file", -- NOTE: without changing cwd
     },
-    { "<leader>sF", "<cmd>Telescope oldfiles<CR>", desc = "[s]earch recent [F]iles" },
 
     -- git
     { "<leader>sgc", "<cmd>Telescope git_commits<CR>", desc = "[s]earch [g]it [c]ommits" },
@@ -459,6 +458,8 @@ function M.setup_fzf_keymaps()
     { "<leader>sk", "<cmd>FzfLua keymaps<cr>", desc = "[s]earch [k]ey maps" },
     { "<leader>sM", "<cmd>FzfLua manpages<cr>", desc = "[s]earch [M]an pages" },
     { "<leader>sm", "<cmd>FzfLua marks<cr>", desc = "[s]earch [m]arks" },
+
+    { "<leader>sF", "<cmd>FzfLua oldfiles<CR>", desc = "[s]earch recent [F]iles" },
   }
 end
 
