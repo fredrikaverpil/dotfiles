@@ -43,16 +43,6 @@ return {
 
       "nvim-neotest/neotest-plenary",
       "nvim-neotest/neotest-vim-test",
-
-      {
-        "echasnovski/mini.indentscope",
-        opts = function()
-          -- disable indentation scope for the neotest-summary buffer
-          vim.cmd([[
-        autocmd Filetype neotest-summary lua vim.b.miniindentscope_disable = true
-      ]])
-        end,
-      },
     },
     opts = {
       -- See all config options with :h neotest.Config

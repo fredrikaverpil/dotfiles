@@ -3,17 +3,7 @@ return {
   lazy = true,
   event = "VimEnter",
   enabled = false,
-  dependencies = {
-    {
-      "echasnovski/mini.indentscope",
-      opts = function()
-        -- disable indentation scope for the current ("alpha" filetype) buffer
-        vim.cmd([[
-        autocmd Filetype alpha lua vim.b.miniindentscope_disable = true
-      ]])
-      end,
-    },
-  },
+  dependencies = {},
   opts = function()
     require("alpha")
     require("alpha.term")
