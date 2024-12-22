@@ -3,9 +3,11 @@ return {
   {
     "ibhagwan/fzf-lua",
     lazy = false,
-    opts = function(_, opts)
+    dependencies = {
+      "folke/trouble.nvim",
+    },
+    config = function(_, opts)
       local config = require("fzf-lua.config")
-      local actions = require("fzf-lua.actions")
 
       -- Quickfix
       config.defaults.keymap.fzf["ctrl-q"] = "select-all+accept"
@@ -17,7 +19,9 @@ return {
       config.defaults.keymap.builtin["<c-u>"] = "preview-page-up"
       config.defaults.keymap.builtin["<c-d>"] = "preview-page-down"
 
-      return opts
+      config.defaults.actions.files["ctrl-t"] = require("trouble.sources.fzf").actions.open
+
+      require("fzf-lua").setup(opts)
     end,
     cmd = { "FzfLua" },
     keys = require("fredrik.config.keymaps").setup_fzf_keymaps(),
