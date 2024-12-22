@@ -32,6 +32,7 @@ return {
       theme = "auto",
       component_separators = { left = "", right = "" },
       section_separators = { left = "", right = "" },
+      disabled_filetypes = {},
     },
     sections = {
       lualine_a = { "mode" },
@@ -62,6 +63,7 @@ return {
 
     extensions = { "lazy", "man", "quickfix" },
     opts_extend = {
+      "options.disabled_filetypes",
       "sections.extensions",
     },
   },
