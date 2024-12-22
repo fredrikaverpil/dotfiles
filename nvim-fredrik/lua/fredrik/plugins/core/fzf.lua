@@ -5,6 +5,12 @@ return {
     lazy = false,
     dependencies = {
       "folke/trouble.nvim",
+      {
+        "nvim-lualine/lualine.nvim",
+        opts = {
+          extensions = { "fzf" },
+        },
+      },
     },
     config = function(_, opts)
       local config = require("fzf-lua.config")

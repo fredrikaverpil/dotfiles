@@ -6,6 +6,12 @@ return {
     -- icons supported via mini-icons.lua
     { "echasnovski/mini.icons", version = false },
     "MunifTanjim/nui.nvim",
+    {
+      "nvim-lualine/lualine.nvim",
+      opts = {
+        extensions = { "neo-tree" },
+      },
+    },
   },
   opts = {
     sources = { "filesystem", "buffers", "git_status", "document_symbols" },
