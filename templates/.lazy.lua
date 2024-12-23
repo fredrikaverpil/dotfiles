@@ -15,7 +15,7 @@ return {
     opts = function(_, opts)
       local formatters = require("conform.formatters")
 
-      vim.api.nvim_echo({ { "Using custom import ordering for Ingrid.", "None" } }, false, {})
+      vim.api.nvim_echo({ { "Using custom import ordering", "None" } }, false, {})
       -- https://github.com/stevearc/conform.nvim/blob/master/lua/conform/formatters/gci.lua
       formatters.gci.args = {
         "write",
