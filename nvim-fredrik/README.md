@@ -116,37 +116,3 @@ lazy.nvim spec and requires the lazy.nvim option `local_spec = true`.
 >
 > [Here's a GitHub search](https://github.com/search?q=.lazy.lua+language%3ALua&type=code&l=Lua)
 > for`.lazy.lua`.
-
-Concrete example below, where conform.nvim is overidden to pass certain
-arguments to the `gci` formatter:
-
-```lua
--- .lazy.lua
-
-return {
-
-  {
-    "stevearc/conform.nvim",
-    -- https://github.com/stevearc/conform.nvim
-    enabled = true,
-    opts = function(_, opts)
-      local formatters = require("conform.formatters")
-
-      vim.api.nvim_echo({ { "Using custom import ordering", "None" } }, false, {})
-      -- https://github.com/stevearc/conform.nvim/blob/master/lua/conform/formatters/gci.lua
-      formatters.gci.args = {
-        "write",
-        "-s",
-        "standard",
-        "-s",
-        "default",
-        "-s",
-        "Prefix(github.com/shipwallet)",
-        "--skip-generated",
-        "--skip-vendor",
-        "$FILENAME",
-      }
-    end,
-  },
-}
-```
