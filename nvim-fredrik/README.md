@@ -47,6 +47,9 @@ NVIM_APPNAME=fredrikaverpil/dotfiles/nvim-fredrik nvim
 > systems. I also assume certain commandline tools to be available, like `fd`,
 > `ripgrep` etc.
 
+I'm not maintaining my Neovim config for anyone besides myself. But I'm making
+it publicly available for others to draw inspiration from! 😊
+
 ## Design choices
 
 I wanted to take a modular approach to my Neovim setup. This was made possible
