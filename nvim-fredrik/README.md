@@ -41,14 +41,14 @@ NVIM_APPNAME=fredrikaverpil/dotfiles/nvim-fredrik nvim
 
 > [!WARNING]
 >
+> I'm not maintaining my Neovim config for anyone besides myself. But I'm making
+> it publicly available for others to draw inspiration from! 😊
+>
 > It's very likely that my config is tailored for my local setup, and that you
 > will experience some minor issues. For example, I assume the `DOTFILES`
 > environment variable exists, as this is something I know to always have on my
 > systems. I also assume certain commandline tools to be available, like `fd`,
 > `ripgrep` etc.
-
-I'm not maintaining my Neovim config for anyone besides myself. But I'm making
-it publicly available for others to draw inspiration from! 😊
 
 ## Design choices
 
