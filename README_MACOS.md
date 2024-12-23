@@ -44,14 +44,14 @@ brew bundle --file=_macos/Brewfile_mas  # requires being logged into the App Sto
 ```
 
 ```bash
-yabai --install-service
-yabai --restart-service
-skhd --start-service
-```
-
-```bash
-installers/tmux.sh  # followed by a <C-a>I to install plugins
 installers/neovim-distros.sh
+installers/neovim-nightly.sh
+
+# run LazyVim
+NVIM_APPNAME=LazyVim nvim
+
+# or run custom nvim config
+nvim
 ```
 
 ### OS configuration
@@ -66,9 +66,7 @@ defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 #### Hostname
 
 ```bash
-scutil --set HostName $hostname
-scutil --set LocalHostName $hostname
-scutil --set ComputerName $hostname
+installers/set_hostname.sh $DESIRED_HOSTNAME
 ```
 
 #### System settings

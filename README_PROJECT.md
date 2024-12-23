@@ -1,10 +1,41 @@
 # Project configs 🧢
 
-- Use [direnv](https://direnv.net) to set environment variables dynamically when entering a folder.
-- Use [Taskfile](https://taskfile.dev) to provide tasks which uses the environment variables provided by direnv.
-- Use [pkgx](https://docs.pkgx.sh) to define project tooling (see `dev` command).
+## Folders
+
+```bash
+mkdir -p ~/code/public
+mkdir -p ~/code/work/public
+mkdir -p ~/code/work/private
+```
+
+## Global tools via homebrew
+
+Use [`brew`](https://brew.sh/) to define any global tooling.
+
+## Per-project tools via pkgx
+
+Use [`pkgx`](https://docs.pkgx.sh) to define project tooling (see `dev`
+command).
+
+In each project, add a `pkgx.yml` file to define project tooling, unless it is
+not picked up from lockfiles etc.
+
+Note that the shell integration is required and that the `dev` command must be
+used to activate the dev tooling. See more info in the docs:
+https://docs.pkgx.sh
+
+```yaml
+# pkgx.yml
+
+dependencies:
+  - go # uses the latest version if no version is specified
+  - python@3.12
+```
 
 ## Direnv
+
+Use [direnv](https://direnv.net) to set environment variables dynamically when
+entering a folder.
 
 Add `.envrc` files in strategic locations, like:
 
@@ -69,22 +100,4 @@ export DB_PASS="secret"
 export PGFLAGS="?sslmode=disable"
 
 export PGCONN="$PGDRIVER$DB_USER:$DB_USER@$PGHOST:$PGPORT/$GCE_DATABASE_NAME$PGFLAGS"
-```
-
-## Taskfile
-
-Dotfiles will install a global Taskfile into `~/Taskfile.yml` which can use the environment variables provided by direnv.
-
-## Pkgx
-
-In each project, add a `pkgx.yml` file to define project tooling, unless it is not picked up from lockfiles etc.
-
-Note that the shell integration is required and that the `dev` command must be used to activate the dev tooling. See more info in the docs: https://docs.pkgx.sh
-
-```yaml
-# pkgx.yml
-
-dependencies:
-  - go # uses the latest version if no version is specified
-  - python@3.12
 ```

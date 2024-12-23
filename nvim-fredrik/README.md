@@ -1,12 +1,77 @@
 # nvim-fredrik
 
-My custom Neovim config.
+![neovim](https://github.com/user-attachments/assets/92cf0049-05fc-4ca8-8ec2-d1ff58e48ab9)
 
-## Overall setup
+## My custom Neovim setup
 
-- Main initialization in `init.lua`.
-  - Load base configuration including base auto-commands.
-  - Invoke lazy.nvim plugin manager.
-    - Load plugins.
-    - Load language specific "overrides".
-    - Load project-specific "overrides" (lazyrc).
+### Main initialization
+
+In [nvim-fredrik/lua/init.lua](nvim-fredrik/lua/init.lua), the entire config is
+loaded in sequence. First general options and general autocommands are set up.
+Then, the lazy.nvim package manager is invoked.
+
+- [nvim-fredrik/lua/config/options.lua](nvim-fredrik/lua/config/options.lua)
+- [nvim-fredrik/lua/config/autocmds.lua](nvim-fredrik/lua/config/autocmds.lua)
+- [nvim-fredrik/lua/config/lazy.lua](nvim-fredrik/lua/config/lazy.lua)
+
+The lazy.nvim package manager is instructed to read plugins (see the `spec`
+config of the `lazy.lua`) in this order:
+
+1. Any plugin's config from the `plugins` folder.
+2. Plugin configs for a specific language from the `plugins/lang` folder.
+3. Plugin configs for "core" from the `plugins/core` folder.
+
+### Core plugin configs
+
+A "core" plugin config is just a term I coined, and represents a plugin which
+defines a `config` and takes in multiple merged `opts` defined in several other
+lua files.
+
+This gives the ability to specify LSP configs in multiple files, which are then
+assembled and loaded in the "core" LSP plugin config.
+
+### Per-project overrides ("local spec")
+
+Lazy.nvim comes with the capability of reading a local, per-project, `.lazy.lua`
+file, which serves as a way to make changes and overrides, based on project
+needs. The contents of the `.lazy.lua` will be loaded at the end of the
+lazy.nvim spec and requires the lazy.nvim option `local_spec = true`.
+
+> [!EXAMPLE]
+>
+> [Here's a GitHub search](https://github.com/search?q=.lazy.lua+language%3ALua&type=code&l=Lua)
+> for`.lazy.lua`.
+
+Concrete example below, where conform.nvim is overidden to pass certain
+arguments to the `gci` formatter:
+
+```lua
+-- .lazy.lua
+
+return {
+
+  {
+    "stevearc/conform.nvim",
+    -- https://github.com/stevearc/conform.nvim
+    enabled = true,
+    opts = function(_, opts)
+      local formatters = require("conform.formatters")
+
+      vim.api.nvim_echo({ { "Using custom import ordering", "None" } }, false, {})
+      -- https://github.com/stevearc/conform.nvim/blob/master/lua/conform/formatters/gci.lua
+      formatters.gci.args = {
+        "write",
+        "-s",
+        "standard",
+        "-s",
+        "default",
+        "-s",
+        "Prefix(github.com/shipwallet)",
+        "--skip-generated",
+        "--skip-vendor",
+        "$FILENAME",
+      }
+    end,
+  },
+}
+```

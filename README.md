@@ -1,8 +1,8 @@
 # dotfiles 🍩
 
-<img width="1600" alt="lazyvim" src="https://github.com/fredrikaverpil/dotfiles/assets/994357/28d5cbe3-b9a1-47a4-93f4-616a6d251544">
+![screenshot](https://github.com/user-attachments/assets/ef833ca0-3d39-4a7c-94af-0f76afb96e6b)
 
-These are my personal dotfiles, for macOS, Windows + WSL. The setup is based on
+These are my personal dotfiles. The setup is based on
 [dotbot](https://github.com/anishathalye/dotbot) and aims to be as idempotent as
 possible.
 
@@ -10,6 +10,10 @@ possible.
 
 - [macOS](README_MACOS.md)
 - [Windows 11 + WSL](README_WIN_WSL.md)
+
+## Neovim
+
+- [Neovim](nvim-fredrik/README.md)
 
 ### Git 🐙
 
