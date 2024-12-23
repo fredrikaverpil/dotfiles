@@ -57,11 +57,8 @@ In [lua/fredrik/init.lua](lua/fredrik/init.lua), the entire config is loaded in
 sequence. First general options and general autocommands are set up. Finally,
 the lazy.nvim plugin manager is invoked for loading of all plugins.
 
-- [lua/fredrik/config/options.lua](lua/fredrik/config/options.lua)
-- [lua/fredrik/config/autocmds.lua](lua/fredrik/config/autocmds.lua)
-- [lua/fredrik/config/lazy.lua](lua/fredrik/config/lazy.lua)
-
-I've specified the lazy.nvim `spec` (order of loading plugins) accordingly:
+When loading all plugins, the `spec` (order of loading plugins) is defined in
+[lua/fredrik/config/lazy.lua](lua/fredrik/config/lazy.lua):
 
 1. Any plugin's config from the `plugins` folder.
 2. Plugin configs for a specific language from the `plugins/lang` folder.
