@@ -6,13 +6,13 @@
 
 ### Main initialization
 
-In [nvim-fredrik/lua/init.lua](nvim-fredrik/lua/init.lua), the entire config is
-loaded in sequence. First general options and general autocommands are set up.
-Then, the lazy.nvim package manager is invoked.
+In [lua/init.lua](lua/init.lua), the entire config is loaded in sequence. First
+general options and general autocommands are set up. Then, the lazy.nvim package
+manager is invoked.
 
-- [nvim-fredrik/lua/config/options.lua](nvim-fredrik/lua/config/options.lua)
-- [nvim-fredrik/lua/config/autocmds.lua](nvim-fredrik/lua/config/autocmds.lua)
-- [nvim-fredrik/lua/config/lazy.lua](nvim-fredrik/lua/config/lazy.lua)
+- [lua/config/options.lua](lua/config/options.lua)
+- [lua/config/autocmds.lua](lua/config/autocmds.lua)
+- [lua/config/lazy.lua](lua/config/lazy.lua)
 
 The lazy.nvim package manager is instructed to read plugins (see the `spec`
 config of the `lazy.lua`) in this order:
