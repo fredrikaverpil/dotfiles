@@ -2,41 +2,73 @@
 
 ![neovim](https://github.com/user-attachments/assets/92cf0049-05fc-4ca8-8ec2-d1ff58e48ab9)
 
-## My custom Neovim setup
+## Try it out! 🚀
 
 ```bash
-# if you want to try it out locally
+# clone it down into your ~/.config folder
 git clone git@github.com:fredrikaverpil/dotfiles ~/.config/fredrikaverpil/dotfiles
+
+# run nvim with NVIM_APPNAME
 NVIM_APPNAME=fredrikaverpil/dotfiles/nvim-fredrik nvim
 ```
+
+> [!WARNING]
+>
+> It's very likely that my config is tailored for my local setup, and that you
+> will experience issues. For example, I assume the `DOTFILES` environment
+> variable exists, as this is something I know to always have on my systems.
+
+## Design choices
+
+I wanted to take a modular approach to my Neovim setup. This was made possible
+thanks to the quite amazing [lazy.nvim](https://github.com/folke/lazy.nvim)
+plugin manager.
 
 ### Main initialization
 
 In [lua/fredrik/init.lua](lua/fredrik/init.lua), the entire config is loaded in
-sequence. First general options and general autocommands are set up. Then, the
-lazy.nvim package manager is invoked.
+sequence. First general options and general autocommands are set up. Finally,
+the lazy.nvim plugin manager is invoked for loading of all plugins.
 
 - [lua/fredrik/config/options.lua](lua/fredrik/config/options.lua)
 - [lua/fredrik/config/autocmds.lua](lua/fredrik/config/autocmds.lua)
 - [lua/fredrik/config/lazy.lua](lua/fredrik/config/lazy.lua)
 
-The lazy.nvim package manager is instructed to read plugins (see the `spec`
-config of the `lazy.lua`) in this order:
+I've specified the lazy.nvim `spec` (order of loading plugins) accordingly:
 
 1. Any plugin's config from the `plugins` folder.
 2. Plugin configs for a specific language from the `plugins/lang` folder.
 3. Plugin configs for "core" from the `plugins/core` folder.
+4. (Plugin configs from local `.lazy.lua`).
 
-### Core plugin configs
+#### Generic plugins
+
+Plugins that are not associated with a certain language or needs complex setup
+are considered just to be a plain "plugin". They are defined in the `plugins`
+folder root.
+
+#### Per-language plugin configs
+
+For a complete and nice experience when working in a certain language,
+per-language configurations are placed in `plugins/lang`.
+
+Formatting, linting and LSP configs are specified in the per-language plugin
+configs. This provides a complete picture of what is supported by browsing a
+language config file.
+
+#### Core plugin configs
 
 A "core" plugin config is just a term I coined, and represents a plugin which
-defines a `config` and takes in multiple merged `opts` defined in several other
-lua files.
+defines a lazy.nvim `config` for the given plugin, and takes in multiple merged
+`opts` defined in several other lua files (such as the per-language configs).
 
-This gives the ability to specify LSP configs in multiple files, which are then
-assembled and loaded in the "core" LSP plugin config.
+This enables the ability to specify e.g. LSP configs in multiple files, which
+are then assembled and loaded in the "core" LSP plugin config.
 
-### Per-project overrides ("local spec")
+The end goal is to modularize the entire setup, using these "core" plugin
+configs.
+
+#### Per-project overrides ("local spec") via local `.lazy.lua`
 
 Lazy.nvim comes with the capability of reading a local, per-project, `.lazy.lua`
 file, which serves as a way to make changes and overrides, based on project
