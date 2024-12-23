@@ -6,7 +6,7 @@ cask_args appdir: '/Applications'
 
 # Taps (third-party repositories)
 # tap 'koekeishiya/formulae' # yabai
-tap 'pkgxdev/made'
+# tap 'pkgxdev/made'
 tap 'dustinblackman/tap'
 # tap 'go-task/tap'
 tap 'joshmedeski/sesh'
