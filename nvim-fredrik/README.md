@@ -14,6 +14,12 @@
 - Conform.nvim for formatting.
 - Nvim-lint for linting.
 - Neotest and nvim-dap for testing and debugging.
+- Snacks.nvim for QoL improvements.
+- Mason to install tools used by plugins.
+- Noice for cmdline improvement.
+- Trouble for keeping track of diagnostics issues.
+- Gx for universal `gx` keymap.
+- Neotree for navigating files and folders.
 - Diffview for reviewing PRs.
 
 ## Try it out! 🚀
