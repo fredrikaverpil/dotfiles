@@ -42,8 +42,10 @@ NVIM_APPNAME=fredrikaverpil/dotfiles/nvim-fredrik nvim
 > [!WARNING]
 >
 > It's very likely that my config is tailored for my local setup, and that you
-> will experience issues. For example, I assume the `DOTFILES` environment
-> variable exists, as this is something I know to always have on my systems.
+> will experience some minor issues. For example, I assume the `DOTFILES`
+> environment variable exists, as this is something I know to always have on my
+> systems. I also assume certain commandline tools to be available, like `fd`,
+> `ripgrep` etc.
 
 ## Design choices
 
