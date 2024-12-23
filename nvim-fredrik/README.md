@@ -8,6 +8,7 @@
   [LazyVim](https://github.com/LazyVim/LazyVim), but with the tranquility of
   maintaining it myself.
 - Per-language configs.
+- Per-project overrides.
 - Fzf-lua for certain files, grepping etc.
 - Blink.cmp for completion.
 - Native snippets.
@@ -16,14 +17,15 @@
 - Nvim-lint for linting.
 - Neotest and nvim-dap for testing and debugging.
 - Snacks.nvim for QoL improvements.
-- Mason to install tools used by plugins.
-- Noice for cmdline improvement.
-- Trouble for keeping track of diagnostics issues.
-- Gx for universal `gx` keymap.
-- Neotree for navigating files and folders.
+- Mason for managing tools used by plugins and LSPs.
+- Noice.nvim for cmdline improvement.
+- Trouble.nvim for keeping track of diagnostics issues.
+- Gx.nvim for universal `gx` keymap.
+- Neo-tree for navigating files and folders.
 - Native vim folding, using LSP when applicable.
 - Diffview for reviewing PRs.
 - GitHub Copilot enabled in public projects, disabled in private projects.
+- AI chat via Codecompanion.
 - And much, much more...
 
 ## Try it out! 🚀
