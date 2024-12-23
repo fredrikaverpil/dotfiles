@@ -33,7 +33,7 @@
 
 ```bash
 # clone it down into your ~/.config folder
-git clone git@github.com:fredrikaverpil/dotfiles ~/.config/fredrikaverpil/dotfiles
+git clone https://github.com/fredrikaverpil/dotfiles.git ~/.config/fredrikaverpil/dotfiles
 
 # run nvim with NVIM_APPNAME
 NVIM_APPNAME=fredrikaverpil/dotfiles/nvim-fredrik nvim
