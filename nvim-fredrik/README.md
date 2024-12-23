@@ -4,6 +4,12 @@
 
 ## My custom Neovim setup
 
+```bash
+# if you want to try it out locally
+git clone git@github.com:fredrikaverpil/dotfiles ~/.config/fredrikaverpil/dotfiles
+NVIM_APPNAME=fredrikaverpil/dotfiles/nvim-fredrik nvim
+```
+
 ### Main initialization
 
 In [lua/fredrik/init.lua](lua/fredrik/init.lua), the entire config is loaded in
