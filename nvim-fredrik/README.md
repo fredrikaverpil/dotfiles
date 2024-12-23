@@ -2,6 +2,20 @@
 
 ![neovim](https://github.com/user-attachments/assets/92cf0049-05fc-4ca8-8ec2-d1ff58e48ab9)
 
+## Features
+
+- Taking a lot of inspiration from
+  [LazyVim](https://github.com/LazyVim/LazyVim), but using the tranquility of
+  maintaining it myself.
+- Per-language configs.
+- Fzf-lua for certain files, grepping etc.
+- Blink.cmp for completion.
+- Native snippets.
+- Conform.nvim for formatting.
+- Nvim-lint for linting.
+- Neotest and nvim-dap for testing and debugging.
+- Diffview for reviewing PRs.
+
 ## Try it out! 🚀
 
 ```bash
