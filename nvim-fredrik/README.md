@@ -114,5 +114,5 @@ lazy.nvim spec and requires the lazy.nvim option `local_spec = true`.
 
 > [!NOTE]
 >
-> [Here's a GitHub search](https://github.com/search?q=.lazy.lua+language%3ALua&type=code&l=Lua)
+> [Here's a GitHub search](https://github.com/search?q=path%3A%22.lazy.lua%22+language%3ALua+&type=code)
 > for`.lazy.lua`.
