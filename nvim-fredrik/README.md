@@ -11,6 +11,7 @@
 - Fzf-lua for certain files, grepping etc.
 - Blink.cmp for completion.
 - Native snippets.
+- One unified keymap file.
 - Conform.nvim for formatting.
 - Nvim-lint for linting.
 - Neotest and nvim-dap for testing and debugging.
