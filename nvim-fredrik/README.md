@@ -59,15 +59,18 @@ plugin manager.
 ### Main initialization
 
 - In [lua/fredrik/init.lua](lua/fredrik/init.lua), the entire config is loaded
-  in sequence. First general options and general autocommands are set up.
-  Finally, the lazy.nvim plugin manager is invoked for loading of all plugins.
+  in sequence.
+
+  - First general options and general autocommands are set up. Finally, the
+    lazy.nvim plugin manager is invoked for loading of all plugins.
+
 - When loading all plugins, the `spec` (order of loading plugins) is defined in
   [lua/fredrik/config/lazy.lua](lua/fredrik/config/lazy.lua):
 
-1. Any plugin's config from the `plugins` folder.
-2. Plugin configs for a specific language from the `plugins/lang` folder.
-3. Plugin configs for "core" from the `plugins/core` folder.
-4. (Plugin configs from local `.lazy.lua`).
+  1. Any plugin's config from the `plugins` folder.
+  2. Plugin configs for a specific language from the `plugins/lang` folder.
+  3. Plugin configs for "core" from the `plugins/core` folder.
+  4. (Plugin configs from local `.lazy.lua`).
 
 Below, I'll go through the characteristics of these levels of loading plugin
 configs.
