@@ -22,6 +22,7 @@
 - Neotree for navigating files and folders.
 - Native vim folding, using LSP when applicable.
 - Diffview for reviewing PRs.
+- And much, much more...
 
 ## Try it out! 🚀
 
