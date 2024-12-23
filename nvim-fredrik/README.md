@@ -48,7 +48,7 @@ NVIM_APPNAME=fredrikaverpil/dotfiles/nvim-fredrik nvim
 > will experience some minor issues. For example, I assume the `DOTFILES`
 > environment variable exists, as this is something I know to always have on my
 > systems. I also assume certain commandline tools to be available, like `fd`,
-> `ripgrep` etc.
+> `rg`, `fzf` etc.
 
 ## Design choices
 
