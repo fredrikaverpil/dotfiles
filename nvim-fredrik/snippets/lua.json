@@ -1,5 +1,5 @@
 {
-  "if err != nil return": {
+  "notify": {
     "prefix": "noti",
     "body": "vim.notify(vim.inspect(${1:data}))",
     "description": "Snippet for vim.notify(vim.inspect(...))"
