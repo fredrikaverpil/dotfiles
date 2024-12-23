@@ -9,6 +9,7 @@
   maintaining it myself.
 - Per-language configs.
 - Per-project overrides.
+- Notion of public vs private projects.
 - Fzf-lua for certain files, grepping etc.
 - Blink.cmp for completion.
 - Native snippets.
