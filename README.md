@@ -11,7 +11,7 @@ possible.
 - [macOS](README_MACOS.md)
 - [Windows 11 + WSL](README_WIN_WSL.md)
 
-## Neovim
+### Neovim
 
 - [Neovim](nvim-fredrik/README.md)
 
