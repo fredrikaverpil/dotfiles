@@ -37,7 +37,7 @@ file, which serves as a way to make changes and overrides, based on project
 needs. The contents of the `.lazy.lua` will be loaded at the end of the
 lazy.nvim spec and requires the lazy.nvim option `local_spec = true`.
 
-> [!EXAMPLE]
+> [!NOTE]
 >
 > [Here's a GitHub search](https://github.com/search?q=.lazy.lua+language%3ALua&type=code&l=Lua)
 > for`.lazy.lua`.
