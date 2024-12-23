@@ -22,6 +22,7 @@
 - Neotree for navigating files and folders.
 - Native vim folding, using LSP when applicable.
 - Diffview for reviewing PRs.
+- GitHub Copilot enabled in public projects, disabled in private projects.
 - And much, much more...
 
 ## Try it out! 🚀
