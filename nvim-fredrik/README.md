@@ -5,7 +5,7 @@
 ## Features
 
 - Taking a lot of inspiration from
-  [LazyVim](https://github.com/LazyVim/LazyVim), but using the tranquility of
+  [LazyVim](https://github.com/LazyVim/LazyVim), but with the tranquility of
   maintaining it myself.
 - Per-language configs.
 - Fzf-lua for certain files, grepping etc.
