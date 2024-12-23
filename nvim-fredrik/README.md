@@ -75,16 +75,16 @@ plugin manager.
 Below, I'll go through the characteristics of these levels of loading plugin
 configs.
 
-### Generic plugins
+### Generic plugin configs
 
-Plugins that are not associated with a certain language or needs complex setup
-are considered just to be a plain "plugin". They are defined in the
-[lua/fredrik/plugins](lua/fredrik/plugins) folder root.
+Plugin configs that are not associated with a certain language or needs complex
+setup are considered just to be a "plain" plugin. Their configs are defined in
+the [lua/fredrik/plugins](lua/fredrik/plugins) folder root.
 
 ### Per-language plugin configs
 
 For a complete and nice experience when working in a certain language,
-per-language configurations are placed in
+per-language configs are placed in
 [lua/fredrik/plugins/lang](lua/fredrik/plugins/lang).
 
 Formatting, linting and LSP configs are specified in the per-language plugin
@@ -94,9 +94,10 @@ language config file.
 ### Core plugin configs
 
 A "core" plugin config is just a term I came up with for representing a plugin
-which defines a lazy.nvim `config`, and takes in multiple merged `opts` defined
-in several other lua files (such as the per-language configs). These "core"
-plugin configs reside in [lua/fredrik/plugins/core](lua/fredrik/plugins/core).
+which defines the `config` as part of its spec, and takes in multiple merged
+`opts` defined in several other lua files (such as the per-language configs).
+These "core" plugin configs reside in
+[lua/fredrik/plugins/core](lua/fredrik/plugins/core).
 
 This enables the ability to specify e.g. LSP configs in multiple files, which
 are then assembled and loaded in the "core" LSP plugin config.
