@@ -20,6 +20,7 @@
 - Trouble for keeping track of diagnostics issues.
 - Gx for universal `gx` keymap.
 - Neotree for navigating files and folders.
+- Native vim folding, using LSP when applicable.
 - Diffview for reviewing PRs.
 
 ## Try it out! 🚀
