@@ -22,10 +22,12 @@ require("lazy").setup({
     { import = "fredrik.plugins.lang" },
     -- import core configs
     { import = "fredrik.plugins.core" },
-    -- import per-project config
-    -- NOTE: this is built into lazy.nvim; place a .lazy.lua file in the project's
-    -- root directory, containing a lazy spec and it will be merged in.
   },
+
+  -- import per-project config
+  -- NOTE: this is built into lazy.nvim; place a .lazy.lua file in the project's
+  -- root directory, containing a lazy spec and it will be merged in at the end of the above spec.
+  local_spec = true,
 
   checker = { enabled = false }, -- automatically check for plugin updates
   performance = {
