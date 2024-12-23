@@ -7,7 +7,9 @@ git clone --recursive https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
 cd .dotfiles && ./install -vv
 ```
 
-> [!NOTE] See [README_GIT.md](README_GIT.md) for details on setting up git.
+> [!NOTE]
+>
+> See [README_GIT.md](README_GIT.md) for details on setting up git.
 
 ### Install tooling
 
