@@ -97,7 +97,7 @@ return {
       opts.linters_by_ft["python"] = { "mypy", "ruff" }
       opts.linters["mypy"] = {
         cmd = function()
-          return find_python_binary("ruff")
+          return find_python_binary("mypy")
         end,
       }
       opts.linters["ruff"] = {
