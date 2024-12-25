@@ -1,0 +1,6 @@
+# https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
+
+gui:
+  nerdFontsVersion: "3" # nerd fonts version to use ("2" or "3"); empty means don't show nerd font icons
+git:
+  overrideGpg: true # prevents lazygit from spawning a separate process when using GPG

@@ -37,9 +37,6 @@ return {
         if tmux_is_running() and vim.fn.filereadable(tmux_theme) == 1 then
           os.execute("tmux source-file " .. tmux_theme)
         end
-        vim.g.lazygit_use_custom_config_file_path = 1
-        local dark_theme = vim.fs.normalize("$DOTFILES/lazygit_config_dark.yml")
-        vim.g.lazygit_config_file_path = dark_theme
       end,
       set_light_mode = function()
         set_light()
@@ -47,9 +44,6 @@ return {
         if tmux_is_running() and vim.fn.filereadable(tmux_theme) == 1 then
           os.execute("tmux source-file " .. tmux_theme)
         end
-        vim.g.lazygit_use_custom_config_file_path = 1
-        local light_theme = vim.fs.normalize("$DOTFILES/lazygit_config_light.yml")
-        vim.g.lazygit_config_file_path = light_theme
       end,
     },
   },

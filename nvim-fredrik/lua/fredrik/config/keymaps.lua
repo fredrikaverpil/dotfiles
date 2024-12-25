@@ -547,35 +547,6 @@ function M.setup_snacks_keymaps()
   }
 end
 
-function M.setup_lazygit_keymaps()
-  --   "LazyGit",
-  --   "LazyGitConfig",
-  --   "LazyGitCurrentFile",
-  --   "LazyGitFilter",
-  --   "LazyGitFilterCurrentFile",
-
-  local function cmd()
-    -- if keymap <Esc><Esc> is set in terminal mode, remove it.
-    -- this is to enable <Esc> to navigate in LazyGit which otherwise
-    -- is overridden for terminal usage.
-    local terminal_keymaps = vim.api.nvim_get_keymap("t")
-    for _, keymap in pairs(terminal_keymaps) do
-      if keymap.lhs == "<Esc><Esc>" then
-        vim.api.nvim_del_keymap("t", "<Esc><Esc>")
-      end
-    end
-    vim.cmd("LazyGit")
-  end
-
-  return {
-    {
-      "<leader>gg",
-      cmd,
-      desc = "LazyGit",
-    },
-  }
-end
-
 function M.setup_gitsigns_keymaps(bufnr)
   local gs = package.loaded.gitsigns
 

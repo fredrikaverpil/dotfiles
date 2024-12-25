@@ -54,6 +54,17 @@ return {
         -- automatically configure lazygit to use the current colorscheme
         -- and integrate edit with the current neovim instance
         configure = true,
+
+        config = {
+          os = { editPreset = "nvim-remote" },
+          gui = {
+            -- set to an empty string "" to disable icons
+            nerdFontsVersion = "3",
+          },
+          git = {
+            overrideGpg = true,
+          },
+        },
       },
     },
     keys = require("fredrik.config.keymaps").setup_snacks_keymaps(),

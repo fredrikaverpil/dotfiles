@@ -17,6 +17,8 @@
     ~/.gitmessage:
     ~/.config/gh-dash/config.yml: gh_dash.yml
     ~/Taskfile.yml:
+    ~/Library/Application Support/lazygit/config.yml:
+      path: lazygit.yml
     ~/.config/ghostty/config:
       path: ghostty.conf
       force: true
