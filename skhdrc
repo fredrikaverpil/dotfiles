@@ -23,7 +23,7 @@ alt + shift - f : yabai -m window --toggle float --grid 4:4:1:1:2:2
 alt + shift - z : yabai -m window --toggle zoom-fullscreen
 
 # focus on full-screen wezterm (see dotfiles shell script)
-lctrl - 0 : ~/code/dotfiles/shell/bin/focus-wezterm
+lctrl - 0 : ~/.dotfiles/shell/bin/focus-wezterm
 
 # change window focus
 alt + shift - down : yabai -m window --focus south

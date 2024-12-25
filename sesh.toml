@@ -3,7 +3,7 @@ startup_command = "nvim"
 
 [[session]]
 name = "Dotfiles"
-path = "~/code/dotfiles"
+path = "~/.dotfiles"
 startup_command = "nvim"
 
 [[session]]

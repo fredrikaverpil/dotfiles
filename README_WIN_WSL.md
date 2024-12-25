@@ -180,7 +180,7 @@ chsh
 
 ```bash
 # install homebrew
-cd ~/code/dotfiles
+cd ~/.dotfiles
 installers/homebrew.sh
 
 # install all dependencies
@@ -197,7 +197,7 @@ and most software all set up.
 rm -rf ~/.config/LazyVim
 
 
-cd ~/code/dotfiles
+cd ~/.dotfiles
 installers/neovim_distros.sh
 
 # re-run dotfiles installer, to symlink LazyVim config
