@@ -6,7 +6,7 @@ return {
       {
         "zapling/mason-lock.nvim",
         opts = {
-          lockfile_path = os.getenv("DOTFILES") .. "/nvim-fredrik/mason-lock.json",
+          lockfile_path = require("fredrik.utils.environ").getenv("DOTFILES") .. "/nvim-fredrik/mason-lock.json",
         },
       },
       {

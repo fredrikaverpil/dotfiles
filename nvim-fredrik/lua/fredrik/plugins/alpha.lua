@@ -64,7 +64,7 @@ return {
     dashboard.section.header.val = greeting
     dashboard.section.header.opts.hl = "DashboardHeader"
     dashboard.section.header.opts.position = "center"
-    dashboard.section.terminal.command = "cat | $DOTFILES/nvim-fredrik/ansi/" .. ansiArt .. ".sh"
+    dashboard.section.terminal.command = "cat | " .. require("fredrik.utils.environ").getenv("DOTFILES") .. "/nvim-fredrik/ansi/" .. ansiArt .. ".sh"
     dashboard.section.terminal.width = width
     dashboard.section.terminal.height = height
     dashboard.section.terminal.opts.redraw = true

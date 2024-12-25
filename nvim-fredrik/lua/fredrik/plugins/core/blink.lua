@@ -44,15 +44,12 @@ return {
           snippets = {
             opts = {
               friendly_snippets = true,
-              search_paths = { os.getenv("DOTFILES") .. "/nvim-fredrik/snippets" },
+              search_paths = { require("fredrik.utils.environ").getenv("DOTFILES") .. "/nvim-fredrik/snippets" },
             },
           },
         },
       },
     },
-
-    -- allows extending the enabled_providers array elsewhere in your config
-    -- without having to redefine it
     opts_extend = {
       "sources.default",
     },

@@ -30,7 +30,7 @@ local function golangcilint_args()
         golangci_config_file = filepath
         return "--config", golangci_config_file
       else
-        local filepath = vim.fn.expand("$DOTFILES/templates/.golangci.yml")
+        local filepath = require("fredrik.utils.environ").getenv("DOTFILES") .. "/templates/.golangci.yml"
         golangci_config_file = filepath
         return "--config", golangci_config_file
       end

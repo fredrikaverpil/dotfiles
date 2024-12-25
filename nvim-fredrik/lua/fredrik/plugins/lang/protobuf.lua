@@ -214,7 +214,7 @@ return {
       opts.linters = opts.linters or {}
 
       opts.linters_by_ft["proto"] = { "protolint" }
-      local protolint_config_file = vim.fn.expand("$DOTFILES/templates/.protolint.yaml") -- FIXME: make this into the fallback filepath.
+      local protolint_config_file = require("fredrik.utils.environ").getenv("DOTFILES") .. "/templates/.protolint.yaml" -- FIXME: make this into the fallback filepath.
       local protolint_args = { "lint", "--reporter=json", "--config_path=" .. protolint_config_file }
       opts.linters["protolint"] = { args = protolint_args }
 
