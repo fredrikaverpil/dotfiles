@@ -6,16 +6,23 @@
 # ----------------------------
 
 function virtual_env_activate() {
-  if [[ -z "$VIRTUAL_ENV" ]]; then
-    # if .venv folder is found then activate the vitualenv
-    if [ -d ./.venv ] && [ -f ./.venv/bin/activate ]; then
-      source ./.venv/bin/activate
-    fi
-  else
+  if [[ -n "$VIRTUAL_ENV" ]]; then
     # check the current folder belong to earlier VIRTUAL_ENV folder
     parentdir="$(dirname "$VIRTUAL_ENV")"
     if [[ "$PWD"/ != "$parentdir"/* ]]; then
       deactivate
+    fi
+  fi
+
+  if [ -f .python-version ] && [ ! -d ./.venv ]; then
+    uv venv
+  fi
+
+  if [[ -z "$VIRTUAL_ENV" ]]; then
+    # if .venv folder is found then activate the vitualenv
+    if [ -d ./.venv ] && [ -f ./.venv/bin/activate ]; then
+      source ./.venv/bin/activate
+      uv pip install --upgrade pip
     fi
   fi
 }
@@ -76,29 +83,6 @@ function bash_completion() {
 brew_prefix="$DOTFILES_BREW_PREFIX"
 shell="$DOTFILES_SHELL"
 
-# ----------------------------------
-# hooks and on-shell load evaluation
-# ----------------------------------
-
-if [[ $shell == "zsh" ]]; then
-  if [ -n "$brew_prefix" ]; then
-    source <(fzf --zsh)
-    source <(pkgx --shellcode)
-  fi
-elif [[ $shell == "bash" ]]; then
-  if [ -n "$brew_prefix" ]; then
-    eval "$(fzf --bash)"
-    eval "$(pkgx --shellcode)"
-  fi
-fi
-
-function cd() {
-  builtin cd "$@" || return
-  # virtual_env_activate
-  # node_version_manager  # TODO: with pkgx, maybe nvm is no longer needed?
-}
-cd . # trigger cd overrides
-
 # ----------------------------
 # shell-agnostic configuration
 # ----------------------------
@@ -124,6 +108,36 @@ fi
 
 if [[ $shell == "zsh" ]]; then
   zsh_completion
+  if [ -n "$brew_prefix" ]; then
+    source <(fzf --zsh)
+    source <(pkgx --shellcode)
+  fi
+
 elif [[ $shell == "bash" ]]; then
   bash_completion
+  if [ -n "$brew_prefix" ]; then
+    eval "$(fzf --bash)"
+    eval "$(pkgx --shellcode)"
+  fi
+
 fi
+
+# ----------------------------------
+# overrides
+# ----------------------------------
+
+function cd() {
+  builtin cd "$@" || return
+  virtual_env_activate
+  # node_version_manager  # TODO: with pkgx, maybe nvm is no longer needed?
+}
+cd . # trigger cd overrides when shell starts
+
+function z() {
+  __zoxide_z "$@" && cd . || return
+}
+
+function zi() {
+  __zoxide_zi "$@" && cd . || return
+
+}
