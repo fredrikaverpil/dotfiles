@@ -13,6 +13,32 @@ return {
     -- optional
     "nvim-telescope/telescope.nvim",
     "nvim-treesitter/nvim-treesitter",
+
+    {
+      "saghen/blink.cmp",
+      dependencies = {
+        { "saghen/blink.compat", branch = "main" },
+      },
+      opts = {
+        sources = {
+          default = { "obsidian", "obsidian_new", "obsidian_tags" },
+          providers = {
+            obsidian = {
+              name = "obsidian",
+              module = "blink.compat.source",
+            },
+            obsidian_new = {
+              name = "obsidian_new",
+              module = "blink.compat.source",
+            },
+            obsidian_tags = {
+              name = "obsidian_tags",
+              module = "blink.compat.source",
+            },
+          },
+        },
+      },
+    },
   },
   enabled = function()
     -- only enable on macOS for now, and if vault_path exists
@@ -37,7 +63,7 @@ return {
     -- Optional, completion of wiki links, local markdown links, and tags using nvim-cmp.
     completion = {
       -- Set to false to disable completion.
-      nvim_cmp = false, -- TODO: figure out how to replace with blink
+      nvim_cmp = false, -- NOTE: use blink.cmp instead
       -- Trigger completion at 2 chars.
       min_chars = 2,
     },
