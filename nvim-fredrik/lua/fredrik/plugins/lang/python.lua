@@ -26,11 +26,6 @@ local function find_python_binary(name)
     return path
   end
 
-  if name == "python" or name == "python3" then
-    vim.notify_once("Could not find binary in .venv, falling back to system-provided: " .. name, vim.log.levels.WARN)
-    return name
-  end
-
   local pkg = require("mason-registry").get_package(name)
   if pkg ~= nil then
     local cmd = pkg:get_install_path() .. "/bin/" .. name
@@ -197,10 +192,8 @@ return {
       },
       {
         "mfussenegger/nvim-dap-python",
-        config = function()
-          local dap_python = require("dap-python")
-          local debugpy_path = find_python_binary("python")
-          dap_python.setup(debugpy_path)
+        config = function(_, opts)
+          require("dap-python").setup("uv", opts)
         end,
       },
     },
