@@ -31,8 +31,6 @@ local function find_python_binary(name)
     return name
   end
 
-  vim.notify_once("Could not find binary in .venv, falling back to mason-registry: " .. name, vim.log.levels.WARN)
-
   local pkg = require("mason-registry").get_package(name)
   if pkg ~= nil then
     local cmd = pkg:get_install_path() .. "/bin/" .. name
@@ -41,6 +39,8 @@ local function find_python_binary(name)
       return cmd
     end
   end
+
+  vim.notify_once("Could not find binary in .venv or mason-registry: " .. name, vim.log.levels.ERROR)
 
   return name
 end
