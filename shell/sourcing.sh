@@ -22,7 +22,11 @@ function virtual_env_activate() {
     # if .venv folder is found then activate the vitualenv
     if [ -d ./.venv ] && [ -f ./.venv/bin/activate ]; then
       source ./.venv/bin/activate
-      uv pip install --upgrade pip
+
+      # if pyproject.toml is found then sync the virtualenv
+      if [[ -f pyproject.toml ]]; then
+        uv sync --all-groups
+      fi
     fi
   fi
 }
