@@ -1,6 +1,10 @@
 --- Find the path to the binary in the python virtual environment.
 --- First search active virtual environment, then .venv folder,
 --- then mason and last give up.
+---
+--- NOTE: this function is likely redundant, as Mason is configured
+--- to _append_ to PATH, leaving binaries from the .venv found first.
+---
 --- @param name string
 --- @return string
 local function find_python_binary(name)
@@ -20,7 +24,10 @@ local function find_python_binary(name)
   end
 
   if name == "python" or name == "python3" then
-    -- cannot be found through mason-registry
+    local python_binary_path = vim.fn.getcwd() .. "/.venv/bin/python"
+    if vim.fn.filereadable(python_binary_path) == 1 then
+      return python_binary_path
+    end
     return name
   end
 
@@ -42,39 +49,10 @@ vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
     vim.opt_local.shiftwidth = 4
     vim.opt_local.shiftwidth = 4
     vim.opt_local.colorcolumn = "88"
-    vim.g.python3_host_prog = find_python_binary("python")
   end,
 })
 
 return {
-
-  {
-    "stevearc/conform.nvim",
-    lazy = true,
-    ft = { "python" },
-    dependencies = {
-      {
-        "williamboman/mason.nvim",
-        opts = function(_, opts)
-          opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "ruff" })
-        end,
-      },
-    },
-    opts = function(_, opts)
-      opts.formatters_by_ft.python = { "ruff_organize_imports", "ruff_format" }
-      opts.formatters["ruff_organize_imports"] = {
-        command = function()
-          return find_python_binary("ruff")
-        end,
-      }
-      opts.formatters["ruff_format"] = {
-        command = function()
-          return find_python_binary("ruff")
-        end,
-      }
-    end,
-  },
 
   {
     "mfussenegger/nvim-lint",
@@ -86,7 +64,7 @@ return {
         "williamboman/mason.nvim",
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "mypy", "ruff" })
+          vim.list_extend(opts.ensure_installed, { "mypy" })
         end,
       },
     },
@@ -94,15 +72,10 @@ return {
       opts.linters_by_ft = opts.linters_by_ft or {}
       opts.linters = opts.linters or {}
 
-      opts.linters_by_ft["python"] = { "mypy", "ruff" }
+      opts.linters_by_ft["python"] = { "mypy" }
       opts.linters["mypy"] = {
         cmd = function()
           return find_python_binary("mypy")
-        end,
-      }
-      opts.linters["ruff"] = {
-        cmd = function()
-          return find_python_binary("ruff")
         end,
       }
     end,
@@ -111,7 +84,6 @@ return {
   {
     "neovim/nvim-lspconfig",
     lazy = true,
-    -- ft = { "python" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -130,11 +102,10 @@ return {
       servers = {
         basedpyright = {
           filetypes = { "python" },
-
-          -- https://docs.basedpyright.com/#/settings
           settings = {
             basedpyright = {
-              disableOrganizeImports = false, -- NOTE: use code action (ruff lsp)
+              -- https://docs.basedpyright.com/#/settings
+              disableOrganizeImports = true, -- deletgate to ruff
               analysis = {
                 -- NOTE: uncomment this to ignore linting. Good for projects where
                 -- basedpyright lights up as a christmas tree.
@@ -146,9 +117,7 @@ return {
 
         ruff = {
           filetypes = { "python" },
-
           -- https://docs.astral.sh/ruff/editors/setup/#neovim
-          enabled = false, -- NOTE: formatting cannot be disabled in ruff LSP, so we must use conform and nvim-lint instead.
           on_attach = function(client, bufnr)
             if client.name == "ruff" then
               -- Disable hover in favor of Pyright
@@ -160,10 +129,6 @@ return {
               -- https://docs.astral.sh/ruff/editors/settings/
               configurationPreference = "filesystemFirst",
               lineLength = 88,
-              lint = {
-                enabled = false, -- NOTE: it does not work to disable this.
-              },
-              -- NOTE: to temporarily stop formatting, use ":LspStop ruff"
             },
           },
         },
