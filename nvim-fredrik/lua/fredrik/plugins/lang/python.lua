@@ -57,15 +57,15 @@ return {
         "williamboman/mason.nvim",
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "isort", "ruff" })
+          vim.list_extend(opts.ensure_installed, { "ruff" })
         end,
       },
     },
     opts = function(_, opts)
-      opts.formatters_by_ft.python = { "isort", "ruff_format" }
-      opts.formatters["isort"] = {
+      opts.formatters_by_ft.python = { "ruff_organize_imports", "ruff_format" }
+      opts.formatters["ruff_organize_imports"] = {
         command = function()
-          return find_python_binary("isort")
+          return find_python_binary("ruff")
         end,
       }
       opts.formatters["ruff_format"] = {
@@ -148,7 +148,7 @@ return {
           filetypes = { "python" },
 
           -- https://docs.astral.sh/ruff/editors/setup/#neovim
-          enabled = false, -- NOTE: conform and nvim-lint are used instead
+          enabled = false, -- NOTE: formatting cannot be disabled in ruff LSP, so we must use conform and nvim-lint instead.
           on_attach = function(client, bufnr)
             if client.name == "ruff" then
               -- Disable hover in favor of Pyright
