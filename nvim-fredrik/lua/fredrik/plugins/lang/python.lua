@@ -27,11 +27,11 @@ local function find_python_binary(name)
   end
 
   if name == "python" or name == "python3" then
-    vim.notify_once("Could not find binary, falling back to system-provided: " .. name, vim.log.levels.WARN)
+    vim.notify_once("Could not find binary in .venv, falling back to system-provided: " .. name, vim.log.levels.WARN)
     return name
   end
 
-  vim.notify_once("Could not find binary, falling back to mason-registry: " .. name, vim.log.levels.WARN)
+  vim.notify_once("Could not find binary in .venv, falling back to mason-registry: " .. name, vim.log.levels.WARN)
 
   local pkg = require("mason-registry").get_package(name)
   if pkg ~= nil then
