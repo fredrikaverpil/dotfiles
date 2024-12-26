@@ -10,6 +10,15 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
 return {
 
   {
+    "nvim-treesitter/nvim-treesitter",
+    lazy = true,
+    ft = { "markdown" },
+    opts = {
+      ensure_installed = { "markdown", "markdown_inline", "tex", "latex" },
+    },
+  },
+
+  {
     "stevearc/conform.nvim",
     lazy = true,
     ft = { "markdown" },
@@ -85,6 +94,12 @@ return {
               markdown = { name = "RenderMarkdown", module = "render-markdown.integ.blink" },
             },
           },
+        },
+      },
+      {
+        "epwalsh/obsidian.nvim",
+        opts = {
+          ui = { enable = false },
         },
       },
     },
