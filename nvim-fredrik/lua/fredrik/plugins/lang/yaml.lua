@@ -31,13 +31,19 @@ return {
     },
     opts = {
       formatters_by_ft = {
-        -- TODO: the default is very strict, might be good to add a config
-        -- file: https://github.com/google/yamlfmt/blob/main/docs/config-file.md#basic-formatter
-        -- fix:
-        --   - do not remove empty lines
+        -- https://github.com/google/yamlfmt
         yaml = { "yamlfmt" },
         gha = { "yamlfmt" },
         dependabot = { "yamlfmt" },
+      },
+      formatters = {
+        yamlfmt = {
+          prepend_args = {
+            -- https://github.com/google/yamlfmt/blob/main/docs/config-file.md#configuration-1
+            "-formatter",
+            "retain_line_breaks_single=true",
+          },
+        },
       },
     },
   },
@@ -51,12 +57,13 @@ return {
         "williamboman/mason.nvim",
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "actionlint" })
+          vim.list_extend(opts.ensure_installed, { "yamllint", "actionlint" })
         end,
       },
     },
     opts = {
       linters_by_ft = {
+        yaml = { "yamllint" },
         gha = { "actionlint" },
       },
     },
@@ -92,15 +99,17 @@ return {
             filetypes = { "yaml", "gha", "dependabot" },
             settings = {
               yaml = {
-                -- SchemaStore setup below
                 schemaStore = {
-                  -- You must disable built-in schemaStore support if you want to use
-                  -- this plugin and its advanced options like `ignore`.
+                  -- Disabled because using b0o/SchemaStore.nvim
                   enable = false,
                   -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
                   url = "",
                 },
                 schemas = require("schemastore").yaml.schemas(),
+                validate = true,
+                format = {
+                  enable = false, -- delegate to conform.nvim
+                },
               },
             },
           },
