@@ -8,33 +8,36 @@
 --- @param name string
 --- @return string
 local function find_python_binary(name)
-  local path
-  local cmd
-  if vim.env.VIRTUAL_ENV ~= nil then
-    path = vim.env.VIRTUAL_ENV
-  else
-    path = vim.fn.getcwd() .. "/.venv"
+  local binary_name = name
+  if vim.fn.has("win32") == 1 then
+    binary_name = name .. ".exe"
   end
-  local results = vim.fs.find({ name }, { type = "file", path = path, limit = 1 })
-  if #results == 1 then
-    cmd = results[1]
-    if vim.fn.filereadable(cmd) == 1 then
-      return cmd
-    end
+
+  local bin_dir = vim.fn.has("win32") == 1 and "Scripts" or "bin"
+
+  local path
+  if vim.env.VIRTUAL_ENV ~= nil then
+    path = vim.fs.joinpath(vim.env.VIRTUAL_ENV, bin_dir, binary_name)
+  else
+    path = vim.fs.joinpath(vim.fn.getcwd(), ".venv", bin_dir, binary_name)
+  end
+
+  if vim.fn.executable(path) == 1 then
+    return path
   end
 
   if name == "python" or name == "python3" then
-    local python_binary_path = vim.fn.getcwd() .. "/.venv/bin/python"
-    if vim.fn.filereadable(python_binary_path) == 1 then
-      return python_binary_path
-    end
+    vim.notify_once("Could not find binary, falling back to system-provided: " .. name, vim.log.levels.WARN)
     return name
   end
 
+  vim.notify_once("Could not find binary, falling back to mason-registry: " .. name, vim.log.levels.WARN)
+
   local pkg = require("mason-registry").get_package(name)
   if pkg ~= nil then
-    cmd = pkg:get_install_path() .. "/bin/" .. name
+    local cmd = pkg:get_install_path() .. "/bin/" .. name
     if vim.fn.filereadable(cmd) == 1 then
+      vim.notify_once("Using from mason-registry: " .. vim.inspect(cmd), vim.log.levels.WARN)
       return cmd
     end
   end
@@ -196,7 +199,7 @@ return {
         "mfussenegger/nvim-dap-python",
         config = function()
           local dap_python = require("dap-python")
-          local debugpy_path = find_python_binary("python3")
+          local debugpy_path = find_python_binary("python")
           dap_python.setup(debugpy_path)
         end,
       },
