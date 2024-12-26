@@ -124,6 +124,14 @@ return {
               client.server_capabilities.hoverProvider = false
             end
           end,
+          -- HACK: explicitly setting offset encoding:
+          -- https://github.com/astral-sh/ruff/issues/14483#issuecomment-2526717736
+          capabilities = {
+            general = {
+              -- positionEncodings = { "utf-8", "utf-16", "utf-32" }  <--- this is the default
+              positionEncodings = { "utf-16" },
+            },
+          },
           init_options = {
             settings = {
               -- https://docs.astral.sh/ruff/editors/settings/
