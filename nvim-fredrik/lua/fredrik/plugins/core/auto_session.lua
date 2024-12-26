@@ -60,7 +60,7 @@ return {
     end,
     config = function(_, opts)
       -- vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
-      vim.opt.sessionoptions = "buffers,curdir,help,tabpages,winsize,winpos,terminal"
+      vim.opt.sessionoptions = "buffers,curdir,help,tabpages,winsize,winpos,terminal,localoptions"
       require("auto-session").setup(opts)
     end,
     keys = require("fredrik.config.keymaps").setup_auto_session_keymaps(),
