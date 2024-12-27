@@ -290,6 +290,7 @@ return {
         },
         runner = "gotestsum",
         gotestsum_args = { "--format=standard-verbose" },
+        log_level = vim.log.levels.WARN,
 
         -- experimental
         dev_notifications = true,
