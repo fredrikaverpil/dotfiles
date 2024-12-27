@@ -43,7 +43,10 @@ return {
     lazy = true,
     ft = { "zig" },
     dependencies = {
-      "lawrence-laz/neotest-zig",
+      {
+        "lawrence-laz/neotest-zig",
+        version = "*",
+      },
     },
     opts = {
       adapters = {
