@@ -51,7 +51,13 @@ local function setup_handler(server)
   end
 
   -- merge defaults with user settings for this LSP server
-  local server_opts = vim.tbl_deep_extend("force", defaults, G_lspconfig_opts.servers[server] or {})
+  local server_opts
+  if G_lspconfig_opts.servers ~= nil then
+    server_opts = vim.tbl_deep_extend("force", defaults, G_lspconfig_opts.servers[server] or {})
+  else
+    server_opts = defaults
+    vim.notify("No settings found for LSP server: " .. server, vim.log.levels.WARN)
+  end
 
   -- FIXME: workaround for https://github.com/neovim/neovim/issues/28058
   for _, v in pairs(server_opts) do
