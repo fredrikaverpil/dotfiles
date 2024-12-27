@@ -37,6 +37,10 @@ return {
       -- handle opts.ensure_installed
       local registry = require("mason-registry")
       registry.refresh(function()
+        if opts.ensure_installed == nil then
+          return
+        end
+
         for _, pkg_name in ipairs(opts.ensure_installed) do
           -- print("loading " .. pkg_name)
           local pkg = registry.get_package(pkg_name)
