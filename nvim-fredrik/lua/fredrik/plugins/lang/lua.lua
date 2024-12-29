@@ -85,12 +85,18 @@ return {
     },
     opts = {
       servers = {
+        ---@type vim.lsp.Config
         lua_ls = {
+          -- lsp: https://github.com/luals/lua-language-server
+          -- reference: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/lua_ls.lua
+          cmd = { "lua-language-server" },
           filetypes = { "lua" },
+          root_markers = { "lua", ".git" },
+          single_file_support = true,
+          log_level = vim.lsp.protocol.MessageType.Warning,
           settings = {
             Lua = {
               runtime = {
-                -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
                 version = "LuaJIT",
               },
               workspace = {

@@ -26,9 +26,23 @@ return {
     },
     opts = {
       servers = {
-        -- https://github.com/microsoft/vscode-html-languageservice
-        -- TODO: disable formatting, use prettier instead?
-        html = { filetypes = { "html" }, settings = { html = {} } },
+        -- lsp: https://github.com/microsoft/vscode-html-languageservice
+        -- ref: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/html.lua
+        ---@type vim.lsp.Config
+        html = {
+          cmd = { "vscode-html-language-server", "--stdio" },
+          filetypes = { "html" },
+          root_markers = { ".git" },
+          single_file_support = true,
+          init_options = {
+            provideFormatter = true, -- TODO: replace with prettier?
+            embeddedLanguages = { css = true, javascript = true },
+            configurationSection = { "html", "css", "javascript" },
+          },
+          settings = {
+            html = {},
+          },
+        },
         -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#htmx
         -- FIXME: if enabling htmx, snippets stops working (blink.lua)
         -- htmx = { filetypes = { "html" }, settings = { htmx = {} } },

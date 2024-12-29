@@ -53,6 +53,7 @@ return {
         gotmpl = {
           -- extends: go.lua, html.lua
           servers = {
+            ---@type vim.lsp.Config
             gopls = {
               filetypes = filetypes,
               settings = {

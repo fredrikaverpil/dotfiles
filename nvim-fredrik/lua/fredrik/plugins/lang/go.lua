@@ -101,7 +101,6 @@ return {
     "mfussenegger/nvim-lint",
     lazy = true,
     ft = { "go", "gomod", "gowork" },
-    enabled = true, -- FIXME: use lsp for golangci-lint instead when possible?
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -132,106 +131,84 @@ return {
             "williamboman/mason.nvim",
             opts = function(_, opts)
               opts.ensure_installed = opts.ensure_installed or {}
-              -- FIXME: https://github.com/nametake/golangci-lint-langserver/issues/33
-              -- vim.list_extend(opts.ensure_installed, { "golangci-lint", "golangci-lint-langserver" })
             end,
           },
         },
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, {
-            "gopls",
-            -- "golangci_lint_ls", -- FIXME: https://github.com/nametake/golangci-lint-langserver/issues/33
-          })
+          vim.list_extend(opts.ensure_installed, { "gopls" })
         end,
       },
     },
-    opts = function(_, opts)
-      local function golangcilint_cmd()
-        return table.insert(golangcilint_args(), 0, "golangci-lint")
-      end
+    opts = {
+      servers = {
+        ---@type vim.lsp.Config
+        gopls = {
+          -- lsp: https://github.com/golang/tools/blob/master/gopls
+          -- reference: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/gopls.lua
+          --
+          -- main readme: https://github.com/golang/tools/blob/master/gopls/doc/features/README.md
+          --
+          -- for all options, see:
+          -- https://github.com/golang/tools/blob/master/gopls/doc/vim.md
+          -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md
+          -- for more details, also see:
+          -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+          -- https://github.com/golang/tools/blob/master/gopls/README.md
+          cmd = { "gopls" },
+          filetypes = { "go", "gomod", "gowork", "gosum" },
+          root_markers = { "go.work", "go.mod", ".git" },
+          single_file_support = true,
+          settings = {
+            gopls = {
+              buildFlags = { tags },
+              -- env = {},
+              -- analyses = {
+              --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/analysis.go
+              --   -- https://github.com/golang/tools/blob/master/gopls/doc/analyzers.md
+              -- },
+              -- codelenses = {
+              --   -- https://github.com/golang/tools/blob/master/gopls/doc/codelenses.md
+              --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+              -- },
+              -- hints = {
+              --   -- https://github.com/golang/tools/blob/master/gopls/doc/inlayHints.md
+              --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+              --   --
+              --   -- parameterNames = true,
+              --   -- assignVariableTypes = true,
+              --   -- constantValues = true,
+              --   -- compositeLiteralTypes = true,
+              --   -- compositeLiteralFields = true,
+              --   -- functionTypeParameters = true,
+              -- },
+              -- completion options
+              -- https://github.com/golang/tools/blob/master/gopls/doc/features/completion.md
+              -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
 
-      local go_opts = {
-        servers = {
+              -- build options
+              -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+              -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md#build
+              directoryFilters = { "-**/node_modules", "-**/.git", "-.vscode", "-.idea", "-.vscode-test" },
 
-          -- FIXME: https://github.com/nametake/golangci-lint-langserver/issues/33
-          -- golangci_lint_ls = {
-          --   -- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/golangci_lint_ls.lua
-          --   -- https://github.com/nametake/golangci-lint-langserver
-          --   cmd = { "golangci-lint-langserver" },
-          --   filetypes = { "go", "gomod" },
-          --   init_options = {
-          --     command = function()
-          --       return golangcilint_cmd()
-          --     end,
-          --   },
-          -- },
+              -- formatting options
+              -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+              gofumpt = false, -- handled by conform instead.
 
-          gopls = {
-            filetypes = { "go", "gomod", "gowork", "gosum" },
+              -- ui options
+              -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+              semanticTokens = false, -- disabling this enables treesitter injections (for sql, json etc)
 
-            -- main readme: https://github.com/golang/tools/blob/master/gopls/doc/features/README.md
-            --
-            -- for all options, see:
-            -- https://github.com/golang/tools/blob/master/gopls/doc/vim.md
-            -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md
-            -- for more details, also see:
-            -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-            -- https://github.com/golang/tools/blob/master/gopls/README.md
-            settings = {
-
-              -- NOTE: the gopls defaults will apply if not overridden here.
-              gopls = {
-                buildFlags = { tags },
-                -- env = {},
-                -- analyses = {
-                --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/analysis.go
-                --   -- https://github.com/golang/tools/blob/master/gopls/doc/analyzers.md
-                -- },
-                -- codelenses = {
-                --   -- https://github.com/golang/tools/blob/master/gopls/doc/codelenses.md
-                --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-                -- },
-                -- hints = {
-                --   -- https://github.com/golang/tools/blob/master/gopls/doc/inlayHints.md
-                --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-                --   --
-                --   -- parameterNames = true,
-                --   -- assignVariableTypes = true,
-                --   -- constantValues = true,
-                --   -- compositeLiteralTypes = true,
-                --   -- compositeLiteralFields = true,
-                --   -- functionTypeParameters = true,
-                -- },
-                -- completion options
-                -- https://github.com/golang/tools/blob/master/gopls/doc/features/completion.md
-                -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-
-                -- build options
-                -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-                -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md#build
-                directoryFilters = { "-**/node_modules", "-**/.git", "-.vscode", "-.idea", "-.vscode-test" },
-
-                -- formatting options
-                -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-                gofumpt = false, -- handled by conform instead.
-
-                -- ui options
-                -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-                semanticTokens = false, -- disabling this enables treesitter injections (for sql, json etc)
-
-                -- diagnostic options
-                -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-                staticcheck = true,
-                vulncheck = "imports",
-                analysisProgressReporting = true,
-              },
+              -- diagnostic options
+              -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+              staticcheck = true,
+              vulncheck = "imports",
+              analysisProgressReporting = true,
             },
           },
         },
-      }
-      return require("fredrik.utils.table").deep_merge(opts, go_opts)
-    end,
+      },
+    },
   },
 
   {

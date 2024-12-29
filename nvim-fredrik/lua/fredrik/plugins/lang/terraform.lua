@@ -54,8 +54,16 @@ return {
     },
     opts = {
       servers = {
+        ---@type vim.lsp.Config
         terraformls = {
+          -- lsp: https://github.com/hashicorp/terraform-ls
+          -- ref: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/terraformls.lua
+          cmd = { "terraform-ls", "serve" },
           filetypes = { "terraform", "tf", "terraform-vars" },
+          root_markers = { ".terraform", "terraform" },
+          settings = {
+            terraformls = {},
+          },
         },
       },
     },

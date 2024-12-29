@@ -22,9 +22,13 @@ return {
     },
     opts = {
       servers = {
+        ---@type vim.lsp.Config
         graphql = {
-          -- https://www.npmjs.com/package/graphql-language-service-cli
+          -- lsp: https://www.npmjs.com/package/graphql-language-service-cli
+          -- ref: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/graphql.lua
+          cmd = { "graphql-lsp", "server", "-m", "stream" },
           filetypes = { "graphql" },
+          root_markers = { ".graphqlrc", ".graphql.config", "graphql.config" },
           settings = {
             graphql = {},
           },

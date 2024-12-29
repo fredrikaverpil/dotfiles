@@ -19,8 +19,14 @@ return {
     },
     opts = {
       servers = {
+        ---@type vim.lsp.Config
         taplo = {
+          -- lsp: https://taplo.tamasfe.dev/cli/usage/language-server.html
+          -- ref: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/taplo.lua
+          cmd = { "taplo", "lsp", "stdio" },
           filetypes = { "toml" },
+          root_markers = { ".git" },
+          single_file_support = true,
           settings = {
             taplo = {},
           },

@@ -40,6 +40,19 @@ local function find_python_binary(name)
   return name
 end
 
+local root_files = {
+  "pyproject.toml",
+  "ruff.toml",
+  ".ruff.toml",
+  "requirements.txt",
+  "uv.lock",
+  "setup.py",
+  "setup.cfg",
+  "Pipfile",
+  "pyrightconfig.json",
+  ".git",
+}
+
 vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
   pattern = { "*.py" },
   callback = function()
@@ -98,24 +111,17 @@ return {
     },
     opts = {
       servers = {
-        basedpyright = {
-          filetypes = { "python" },
-          settings = {
-            basedpyright = {
-              -- https://docs.basedpyright.com/#/settings
-              disableOrganizeImports = true, -- deletgate to ruff
-              analysis = {
-                -- NOTE: uncomment this to ignore linting. Good for projects where
-                -- basedpyright lights up as a christmas tree.
-                -- ignore = { "*" },
-              },
-            },
-          },
-        },
 
+        ---@type vim.lsp.Config
         ruff = {
+          -- lsp: https://docs.astral.sh/ruff/editors/setup/#neovim
+          -- ref: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/ruff.lua
+          cmd = { "ruff", "server" },
           filetypes = { "python" },
-          -- https://docs.astral.sh/ruff/editors/setup/#neovim
+          root_dir = (function()
+            return vim.fs.root(0, root_files)
+          end)(),
+          single_file_support = true,
           on_attach = function(client, bufnr)
             if client.name == "ruff" then
               -- Disable hover in favor of Pyright
@@ -135,6 +141,39 @@ return {
               -- https://docs.astral.sh/ruff/editors/settings/
               configurationPreference = "filesystemFirst",
               lineLength = 88,
+            },
+          },
+          settings = {
+            ruff = {},
+          },
+        },
+
+        ---@type vim.lsp.Config
+        basedpyright = {
+          -- lsp: https://github.com/DetachHead/basedpyright
+          --      https://docs.basedpyright.com/latest/configuration/language-server-settings/
+          -- ref: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/basedpyright.lua
+          cmd = { "basedpyright-langserver", "--stdio" },
+          filetypes = { "python" },
+          root_markers = root_files,
+          single_file_support = true,
+          log_level = vim.lsp.protocol.MessageType.Debug,
+          settings = {
+            python = {
+              venvPath = os.getenv("VIRTUAL_ENV"),
+              pythonPath = vim.fn.exepath("python"),
+            },
+            basedpyright = {
+              -- https://docs.basedpyright.com/#/settings
+              disableOrganizeImports = true, -- deletgate to ruff
+              analysis = {
+                -- NOTE: uncomment this to ignore linting. Good for projects where
+                -- basedpyright lights up as a christmas tree.
+                -- ignore = { "*" },
+                autoSearchPaths = true,
+                useLibraryCodeForTypes = true,
+                diagnosticMode = "openFilesOnly",
+              },
             },
           },
         },
