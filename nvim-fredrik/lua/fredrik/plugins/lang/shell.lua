@@ -60,9 +60,26 @@ return {
     },
     opts = {
       servers = {
-        -- https://github.com/bash-lsp/bash-language-server
+        ---@type vim.lsp.Config
         bashls = {
+          -- lsp: https://github.com/bash-lsp/bash-language-server
+          -- ref: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/bashls.lua
+          cmd = { "bash-language-server", "start" },
           filetypes = { "sh" },
+          root_markers = { ".git" },
+          single_file_support = true,
+          settings = {
+            bashIde = {
+              -- Glob pattern for finding and parsing shell script files in the workspace.
+              -- Used by the background analysis features across files.
+
+              -- Prevent recursive scanning which will cause issues when opening a file
+              -- directly in the home directory (e.g. ~/foo.sh).
+              --
+              -- Default upstream pattern is "**/*@(.sh|.inc|.bash|.command)".
+              -- globPattern = vim.env.GLOB_PATTERN or "*@(.sh|.inc|.bash|.command)",
+            },
+          },
         },
       },
     },

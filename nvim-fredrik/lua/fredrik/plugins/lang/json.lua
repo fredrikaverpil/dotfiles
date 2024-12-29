@@ -64,9 +64,16 @@ return {
     opts = function(_, opts)
       local defaults = {
         servers = {
+          ---@type vim.lsp.Config
           jsonls = {
-            -- https://github.com/microsoft/vscode-json-languageservice
+            -- lsp: https://github.com/microsoft/vscode-json-languageservice
+            -- ref: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/jsonls.lua
+            cmd = { "vscode-json-language-server", "--stdio" },
             filetypes = filetypes,
+            root_markers = { ".git" },
+            init_options = {
+              provideFormatter = true,
+            },
             settings = {
               json = {
                 schemas = require("schemastore").json.schemas(),

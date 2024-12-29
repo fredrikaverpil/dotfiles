@@ -94,10 +94,17 @@ return {
     opts = function(_, opts)
       local defaults = {
         servers = {
+          ---@type vim.lsp.Config
           yamlls = {
-            -- https://github.com/redhat-developer/yaml-language-server
-            filetypes = { "yaml", "gha", "dependabot" },
+            -- lsp: https://github.com/redhat-developer/yaml-language-server
+            -- ref: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/yamlls.lua
+            cmd = { "yaml-language-server", "--stdio" },
+            filetypes = { "yaml", "gha", "dependabot", "yaml", "yaml.docker-compose", "yaml.gitlab" },
+            root_markers = { ".git" },
+            single_file_support = true,
             settings = {
+              -- https://github.com/redhat-developer/vscode-redhat-telemetry#how-to-disable-telemetry-reporting
+              redhat = { telemetry = { enabled = false } },
               yaml = {
                 schemaStore = {
                   -- Disabled because using b0o/SchemaStore.nvim

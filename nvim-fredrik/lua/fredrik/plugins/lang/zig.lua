@@ -28,8 +28,14 @@ return {
     },
     opts = {
       servers = {
+        ---@type vim.lsp.Config
         zls = {
-          filetypes = { "zig" },
+          -- lsp: https://github.com/zigtools/zls
+          -- ref: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/zls.lua
+          cmd = { "zls" },
+          filetypes = { "zig", "zir" },
+          root_markers = { "zls.json", "build.zig" },
+          single_file_support = true,
           settings = {
             zls = {},
           },

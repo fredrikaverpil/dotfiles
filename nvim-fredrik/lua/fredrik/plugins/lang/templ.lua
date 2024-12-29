@@ -39,8 +39,13 @@ return {
     },
     opts = {
       servers = {
+        ---@type vim.lsp.Config
         templ = {
+          -- lsp: https://templ.guide/developer-tools/ide-support#neovim--050
+          -- ref: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/templ.lua
+          cmd = { "templ", "lsp" },
           filetypes = filetypes,
+          root_markers = { "go.work", "go.mod", ".git" },
           settings = {
             templ = {},
           },
@@ -51,6 +56,7 @@ return {
         templ = {
           -- extends: go.lua, html.lua
           servers = {
+            ---@type vim.lsp.Config
             gopls = {
               filetypes = filetypes,
               settings = {
