@@ -880,6 +880,26 @@ function M.setup_dap_keymaps()
   }
 end
 
+function M.setup_osv_keymaps()
+  return {
+    {
+      "<leader>dLl",
+      function()
+        require("osv").launch({ port = 8086 })
+        require("osv").stop()
+      end,
+      desc = "[d]ebug [L]ua: [l]aunch server",
+    },
+    {
+      "<leader>dLr",
+      function()
+        require("osv").run_this() -- current buffer
+      end,
+      desc = "[d]ebug [L]ua: [r]un this",
+    },
+  }
+end
+
 function M.setup_grug_far_keymaps()
   return {
     { "<leader>sr", ":GrugFar<cr>", desc = "[s]earch and [r]eplace (grug-far)" },
@@ -1027,6 +1047,7 @@ function M.setup_whichkey(wk)
     { "<leader>a", group = "ai" },
     { "<leader>c", group = "code" },
     { "<leader>d", group = "debug" },
+    { "<leader>dL", group = "debug lua" },
     { "<leader>b", group = "buffer" },
     { "<leader>g", group = "git" },
     { "<leader>gb", group = "blame" },

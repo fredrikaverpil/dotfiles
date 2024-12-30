@@ -143,4 +143,30 @@ return {
       opts.adapters["neotest-plenary"] = {}
     end,
   },
+
+  {
+    "mfussenegger/nvim-dap",
+    lazy = true,
+    ft = { "lua" },
+    dependencies = {
+      {
+        "jbyuki/one-small-step-for-vimkind",
+        keys = require("fredrik.config.keymaps").setup_osv_keymaps(),
+      },
+    },
+    opts = function(_, opts)
+      opts.configurations.lua = {
+        {
+          type = "nlua",
+          request = "attach",
+          name = "Attach to running Neovim instance",
+        },
+      }
+
+      local dap = require("dap")
+      dap.adapters.nlua = function(callback, config)
+        callback({ type = "server", host = config.host or "127.0.0.1", port = config.port or 8086 })
+      end
+    end,
+  },
 }
