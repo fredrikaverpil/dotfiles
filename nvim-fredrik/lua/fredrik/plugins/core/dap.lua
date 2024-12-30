@@ -58,7 +58,9 @@ return {
       "nvim-neotest/nvim-nio",
       {
         "theHamsta/nvim-dap-virtual-text",
-        opts = {},
+        opts = {
+          virt_text_pos = "eol",
+        },
       },
       {
         "mfussenegger/nvim-dap",

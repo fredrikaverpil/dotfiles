@@ -306,9 +306,7 @@ return {
         },
       },
       {
-        -- TODO: try to configure this so the virtual text is helpful.
         "theHamsta/nvim-dap-virtual-text",
-        enabled = false,
       },
       {
         "leoluz/nvim-dap-go",
