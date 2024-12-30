@@ -64,6 +64,10 @@ jobs:
         run: brew upgrade
       - name: test Brewfile install
         run: brew bundle --file=${{ matrix.brewfile }} --verbose
+      - name: update brew
+        run: |
+          brew outdated
+          brew update
 
       - name: test docker installer
         run: |
