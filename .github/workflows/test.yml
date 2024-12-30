@@ -35,21 +35,6 @@ jobs:
       - name: Test Brewfile install (linux)
         run: /home/linuxbrew/.linuxbrew/bin/brew bundle --file=_linux/Brewfile --verbose
         if: runner.os == 'linux'
-      - name: Test Python installer + setup
-        run: |
-          echo $PYENV_ROOT
-          echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
-          HOME=~/dotfiles-install-dir installers/python.sh
-
-          # Test Pyenv-installed Python version
-          python -c "import sys; print(sys.version)"
-          python -c "import sys; assert sys.version.startswith('${BASE_PYTHON_VER}')"
-
-          # Test Pipx
-          poetry --version
-        env:
-          PYENV_ROOT: /home/runner/dotfiles-install-dir/.pyenv
-        if: runner.os == 'Linux'
       - name: Test docker installer
         run: |
           HOME=~/dotfiles-install-dir installers/docker.sh

@@ -20,10 +20,11 @@ xcode-select --install
 sudo xcodebuild -license accept
 ```
 
-Install [Homebrew](https://brew.sh/):
+Install [Homebrew](https://brew.sh/) and [pkgx](https://pkgx.sh):
 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew install pkgxdev/made/pkgx
 ```
 
 <details>

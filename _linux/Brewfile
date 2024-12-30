@@ -3,7 +3,6 @@
 
 # Taps (third-party repositories)
 tap 'homebrew/linux-fonts'
-tap 'pkgxdev/made'
 
 # system
 brew 'zsh-autosuggestions'
@@ -26,7 +25,6 @@ brew 'grpcurl'
 brew 'jq'
 brew 'kubectx'
 brew 'ollama'
-brew 'pkgxdev/made/pkgx'
 brew 'pre-commit'
 brew 'starship'
 brew 'tree'
