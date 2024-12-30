@@ -39,8 +39,11 @@
 # clone it down into your ~/.config folder
 git clone https://github.com/fredrikaverpil/dotfiles.git ~/.config/fredrikaverpil/dotfiles
 
+# create symlink
+ln -s dotfiles/nvim-fredrik ~/.config/fredrik
+
 # run nvim with NVIM_APPNAME
-NVIM_APPNAME=fredrikaverpil/dotfiles/nvim-fredrik nvim
+NVIM_APPNAME=fredrik nvim
 ```
 
 > [!NOTE]
