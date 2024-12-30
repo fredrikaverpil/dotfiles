@@ -10,7 +10,14 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            brewpath: /home/linuxbrew/.linuxbrew/bin
+            brewfile: _linux/Brewfile
+            docker_test: false
+          - os: macos-latest
+            brewfile: _macos/Brewfile
+            docker_test: true
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
@@ -18,32 +25,26 @@ jobs:
       - name: Create workfolder
         run: |
           mkdir -p ~/dotfiles-install-dir
-      - name: Install dotfiles
+      - name: install dotfiles
         run: |
           HOME=~/dotfiles-install-dir ./install -vv
-      - name: Show dotfiles
+      - name: show dotfiles
         run: |
           ls -alh ~/dotfiles-install-dir
 
-      - name: Test homebrew installer
+      - name: test homebrew installer
         run: |
           HOME=~/dotfiles-install-dir installers/homebrew.sh
-      - name: Add Homebrew to PATH
-        run: echo "/home/linuxbrew/.linuxbrew/bin" >> $GITHUB_PATH
-        if: runner.os == 'linux'
-      - name: Brew upgrade
+      - name: add Homebrew to PATH
+        run: echo "${{ matrix.brewpath }}" >> $GITHUB_PATH
+        if: matrix.brewpath != ''
+      - name: brew upgrade
         run: brew upgrade
-      - name: Test Brewfile install (macos)
-        run: brew bundle --file=_macos/Brewfile --verbose
-        if: runner.os == 'macOS'
-      - name: Test Brewfile install (linux)
-        run: brew bundle --file=_linux/Brewfile --verbose
-        if: runner.os == 'linux'
+      - name: test Brewfile install
+        run: brew bundle --file=${{ matrix.brewfile }} --verbose
 
-      - name: Test docker installer
+      - name: test docker installer
         run: |
           HOME=~/dotfiles-install-dir installers/docker.sh
-      - name: Test Docker setup
-        run: |
           sudo docker run hello-world
-        if: runner.os == 'Linux'
+        if: matrix.docker_test
