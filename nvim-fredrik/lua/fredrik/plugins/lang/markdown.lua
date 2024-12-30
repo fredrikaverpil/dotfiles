@@ -97,6 +97,9 @@ return {
             },
           },
         },
+        opts_extend = {
+          "sources.default",
+        },
       },
       {
         "epwalsh/obsidian.nvim",

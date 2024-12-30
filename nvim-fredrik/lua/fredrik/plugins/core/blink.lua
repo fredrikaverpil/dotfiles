@@ -15,7 +15,6 @@ return {
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
-
       keymap = require("fredrik.config.keymaps").setup_blink_cmp_keymaps(),
       completion = {
         list = {
@@ -53,5 +52,8 @@ return {
     opts_extend = {
       "sources.default",
     },
+    config = function(_, opts)
+      require("blink.cmp").setup(opts)
+    end,
   },
 }

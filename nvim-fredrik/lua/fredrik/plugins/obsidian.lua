@@ -38,6 +38,9 @@ return {
           },
         },
       },
+      opts_extend = {
+        "sources.default",
+      },
     },
   },
   enabled = function()

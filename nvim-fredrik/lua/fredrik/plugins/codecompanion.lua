@@ -131,6 +131,9 @@ return {
             },
           },
         },
+        opts_extend = {
+          "sources.default",
+        },
       },
       {
         "nvim-lualine/lualine.nvim",
