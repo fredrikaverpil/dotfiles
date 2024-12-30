@@ -13,7 +13,7 @@ possible.
 
 ### Neovim ⌨️
 
-- [Neovim](nvim-fredrik/README.md)
+- [nvim-fredrik](nvim-fredrik/README.md)
 
 ### Git 🐙
 
@@ -28,7 +28,3 @@ possible.
 ### Project config/tooling 🧢
 
 - [Configure projects](README_PROJECT.md)
-
-### Kubernetes 🧊
-
-- [Configure Kubernetes](README_K8S.md)
