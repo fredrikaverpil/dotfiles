@@ -21,6 +21,7 @@ jobs:
             brewfile: _macos/Brewfile
             docker_test: true
       fail-fast: false
+    name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
