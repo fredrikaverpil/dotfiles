@@ -751,7 +751,7 @@ function M.setup_dap_ui_keymaps()
       function()
         require("dapui").eval()
       end,
-      desc = "DAP Eval",
+      desc = "[d]ebug [e]valuate expression",
     },
   }
 end
