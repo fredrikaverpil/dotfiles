@@ -8,6 +8,7 @@ return {
     opts = {
       styles = {
         notification_history = {
+          relative = "editor",
           width = 0.9,
           height = 0.9,
         },
@@ -26,6 +27,8 @@ return {
           },
         },
       },
+
+      terminal = {},
 
       -- special mode
       zen = {
@@ -65,6 +68,20 @@ return {
         },
       },
     },
-    keys = require("fredrik.config.keymaps").setup_snacks_keymaps(),
+    keys = function()
+      ---@type table[table]
+      local snacks_keymaps = require("fredrik.config.keymaps").setup_snacks_keymaps()
+      ---@type table[table]
+      local terminal_keymaps = require("fredrik.config.keymaps").setup_terminal_keymaps()
+
+      local merged_keymaps = {}
+      for _, keymap in ipairs(snacks_keymaps) do
+        table.insert(merged_keymaps, keymap)
+      end
+      for _, keymap in ipairs(terminal_keymaps) do
+        table.insert(merged_keymaps, keymap)
+      end
+      return merged_keymaps
+    end,
   },
 }

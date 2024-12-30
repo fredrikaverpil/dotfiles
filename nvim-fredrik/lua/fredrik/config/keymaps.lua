@@ -919,7 +919,7 @@ function M.setup_rip_substitute_keymaps()
   }
 end
 
-function M.setup_fterm_keymaps()
+function M.setup_terminal_keymaps()
   -- Both <C-/> and <C-_> are mapped due to the way control characters are interpreted by terminal emulators.
   -- ASCII value of '/' is 47, and of '_' is 95. When <C-/> is pressed, the terminal sends (47 - 64) which wraps around to 111 ('o').
   -- When <C-_> is pressed, the terminal sends (95 - 64) which is 31. Hence, both key combinations need to be mapped.
@@ -927,19 +927,30 @@ function M.setup_fterm_keymaps()
   -- <C-/> toggles the floating terminal
   local ctrl_slash = "<C-/>"
   local ctrl_underscore = "<C-_>"
-  -- local ctrl_alt_slash = "<C-A-/>"
-  -- local ctrl_alt_underscore = "<C-A-_>"
+
+  -- <C-A-/> toggles the split terminal
+  local ctrl_alt_slash = "<C-A-/>"
+  local ctrl_alt_underscore = "<C-A-_>"
+
+  local split_term_cmd = function()
+    vim.api.nvim_set_keymap("t", "<Esc><Esc>", "<C-\\><C-n>", { noremap = true })
+
+    Snacks.terminal.toggle()
+  end
+
   local floating_term_cmd = function()
     vim.api.nvim_set_keymap("t", "<Esc><Esc>", "<C-\\><C-n>", { noremap = true })
-    require("FTerm").toggle()
+
+    local cmd = { "zsh" }
+    local opts = { cwd = vim.fn.getcwd() }
+    Snacks.terminal.toggle(cmd, opts)
   end
 
   return {
 
-    -- { ctrl_alt_slash, split_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle terminal" },
-    -- { ctrl_alt_underscore, split_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle terminal" },
+    { ctrl_alt_slash, split_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle terminal" },
+    { ctrl_alt_underscore, split_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle terminal" },
 
-    -- C-A-/ toggles split terminal on/off
     { ctrl_slash, floating_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle native terminal" },
     { ctrl_underscore, floating_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle native terminal" },
   }
