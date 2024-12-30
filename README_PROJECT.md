@@ -2,6 +2,8 @@
 
 ## Folders
 
+Workflow takes folder path into consideration when e.g. enabling LLMs etc.
+
 ```bash
 mkdir -p ~/code/public
 mkdir -p ~/code/work/public
@@ -22,7 +24,7 @@ not picked up from lockfiles etc.
 
 Note that the shell integration is required and that the `dev` command must be
 used to activate the dev tooling. See more info in the docs:
-https://docs.pkgx.sh
+[docs.pkgx.sh](https://docs.pkgx.sh)
 
 ```yaml
 # pkgx.yml
@@ -46,7 +48,7 @@ Run `direnv allow .` in each location to allow it to execute.
 
 ### Inherit from parent folder's `.envrc` file
 
-Start the `.envrc` file with:
+Start the project's `.envrc` file with:
 
 ```sh
 source_up_if_exists
@@ -56,15 +58,40 @@ source_up_if_exists
 
 #### Create configurations
 
-Add default and work configs, something like this:
+Add default (personal) and work configs, something like this (replace `work`
+with actual company name):
 
 ```bash
 gcloud config configurations list
+
+# personal
+gcloud config configurations create default
+gcloud config configurations activate default
+cat ~/.config/gcloud/configurations/config_default  # review
+
+# work
+gcloud config configurations list
 gcloud config configurations create work
 gcloud config configurations activate work
-gcloud config set account me@work.com
+cat ~/.config/gcloud/configurations/config_work  # review
 
-cat ~/.config/gcloud/configurations/config_work
+# set active by default
+gcloud config set account my@email.com
+```
+
+The configs should look something like this:
+
+```sh
+[core]
+disable_usage_reporting = False
+account = my@email.com
+```
+
+Then use `.envrc` file in `~/code/work/.envrc` to automatically switch from
+default/personal account to work account:
+
+```sh
+export CLOUDSDK_ACTIVE_CONFIG_NAME="work"
 ```
 
 #### Set active gcloud configuration using direnv

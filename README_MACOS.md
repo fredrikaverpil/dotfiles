@@ -37,13 +37,12 @@ can install an x64 version in `/usr/local/bin/brew`. See
 
 ### Install apps
 
-Note that per-project tooling (such as languages) are managed with
-[pkgx](https://github.com/pkgx/pkgx), not with homebrew.
-
 ```bash
 brew bundle --file=_macos/Brewfile
 brew bundle --file=_macos/Brewfile_mas  # requires being logged into the App Store
 ```
+
+Execute desired installers:
 
 ```bash
 installers/neovim-distros.sh
@@ -58,17 +57,9 @@ nvim
 
 ### OS configuration
 
-#### Don't create `.DS_Store` files on network or USB volumes:
-
 ```bash
-defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
-defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
-```
-
-#### Hostname
-
-```bash
-installers/set_hostname.sh $DESIRED_HOSTNAME
+_macos/set_defaults.sh
+_macos/set_hostname.sh $DESIRED_HOSTNAME
 ```
 
 #### System settings
