@@ -242,9 +242,7 @@ return {
 
           -- setup folding
           if client.supports_method("textDocument/foldingRange") and require("fredrik.utils.version").is_neovim_0_11_0() then
-            vim.api.nvim_set_option_value("foldmethod", "expr", { scope = "local" })
-            vim.api.nvim_set_option_value("foldexpr", "v:lua.vim.lsp.foldexpr()", { scope = "local" })
-            -- vim.api.nvim_set_option_value("foldtext", "v:lua.vim.lsp.foldtext()", { scope = "local" }) -- NOTE: using custom foldtext in options.lua
+            require("fredrik.config.options").treesitter_foldexpr()
           end
 
           -- FIXME: causes crash here
