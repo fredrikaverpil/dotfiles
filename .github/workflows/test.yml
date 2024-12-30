@@ -60,14 +60,14 @@ jobs:
       - name: add Homebrew to PATH
         run: echo "${{ matrix.brewpath }}" >> $GITHUB_PATH
         if: matrix.brewpath != ''
-      - name: brew upgrade
-        run: brew upgrade
+      - name: update formulae
+        run: brew update
       - name: test Brewfile install
         run: brew bundle --file=${{ matrix.brewfile }} --verbose
       - name: update brew
         run: |
           brew outdated
-          brew update
+          brew upgrade
 
       - name: test docker installer
         run: |
