@@ -15,14 +15,18 @@ jobs:
             os: macos-latest
             brewfile: _macos/Brewfile
             brew_cache_path: |
-              /Users/runner/Library/Caches/Homebrew
+              ~/Library/Caches/Homebrew
+              /usr/local/Homebrew
+              /usr/local/Cellar
+              /usr/local/Caskroom
             docker_test: false
           - name: ubuntu
             os: ubuntu-latest
             brewpath: /home/linuxbrew/.linuxbrew/bin
             brewfile: _linux/Brewfile
             brew_cache_path: |
-              /home/runner/.cache/Homebrew
+              /home/linuxbrew/.linuxbrew
+              ~/.cache/Homebrew
             docker_test: true
       fail-fast: false
     name: ${{ matrix.name }}
@@ -56,7 +60,7 @@ jobs:
         run: echo "${{ matrix.brewpath }}" >> $GITHUB_PATH
         if: matrix.brewpath != ''
 
-      - name: cache path
+      - name: brew cache path
         run: brew --cache
       - name: update formulae
         run: brew update
