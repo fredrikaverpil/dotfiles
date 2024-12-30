@@ -36,8 +36,8 @@
 > Might require Neovim nightly.
 
 ```sh
-# clone it down into your ~/.config folder
-git clone https://github.com/fredrikaverpil/dotfiles.git ~/.config/fredrikaverpil/dotfiles
+# clone repo
+git clone https://github.com/fredrikaverpil/dotfiles.git
 
 # create symlink
 ln -s dotfiles/nvim-fredrik ~/.config/fredrik
