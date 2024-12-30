@@ -67,8 +67,8 @@ return {
           },
           project = {
             base_dirs = {
-              { path = "~/.dotfiles", max_depth = 1 },
-              { path = "~/code",      max_depth = 1 },
+              { path = vim.fn.expand("~/.dotfiles"), max_depth = 1 },
+              { path = vim.fn.expand("~/code"), max_depth = 2 },
             },
             cd_scope = { "global", "tab", "window" },
             on_project_selected = function(prompt_bufnr)
