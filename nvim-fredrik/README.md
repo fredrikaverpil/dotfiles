@@ -31,7 +31,7 @@
 
 ## Try it out! 🚀
 
-> [!NOTE]
+> [!WARNING]
 >
 > Might require Neovim nightly.
 
@@ -43,7 +43,7 @@ git clone https://github.com/fredrikaverpil/dotfiles.git ~/.config/fredrikaverpi
 NVIM_APPNAME=fredrikaverpil/dotfiles/nvim-fredrik nvim
 ```
 
-> [!WARNING]
+> [!NOTE]
 >
 > I'm not maintaining my Neovim config for anyone besides myself. But I'm making
 > it publicly available for others to draw inspiration from! 😊
