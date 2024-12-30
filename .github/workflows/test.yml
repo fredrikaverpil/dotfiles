@@ -11,14 +11,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: ubuntu
-            os: ubuntu-latest
-            brewpath: /home/linuxbrew/.linuxbrew/bin
-            brewfile: _linux/Brewfile
-            brew_cache_path: |
-              /home/linuxbrew/.linuxbrew
-              ~/.cache/Homebrew
-            docker_test: false
           - name: macOS
             os: macos-latest
             brewfile: _macos/Brewfile
@@ -28,6 +20,14 @@ jobs:
               /usr/local/Homebrew
               /usr/local/Cellar
               /usr/local/Caskroom
+            docker_test: false
+          - name: ubuntu
+            os: ubuntu-latest
+            brewpath: /home/linuxbrew/.linuxbrew/bin
+            brewfile: _linux/Brewfile
+            brew_cache_path: |
+              /home/linuxbrew/.linuxbrew
+              ~/.cache/Homebrew
             docker_test: true
       fail-fast: false
     name: ${{ matrix.name }}
