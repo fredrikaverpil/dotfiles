@@ -24,19 +24,22 @@ jobs:
       - name: Show dotfiles
         run: |
           ls -alh ~/dotfiles-install-dir
+
       - name: Test homebrew installer
         run: |
           HOME=~/dotfiles-install-dir installers/homebrew.sh
+      - name: Add Homebrew to PATH
+        run: echo "/home/linuxbrew/.linuxbrew/bin" >> $GITHUB_PATH
+        if: runner.os == 'linux'
+      - name: Brew upgrade
+        run: brew upgrade
       - name: Test Brewfile install (macos)
-        run: |
-          brew upgrade
-          brew bundle --file=_macos/Brewfile --verbose
+        run: brew bundle --file=_macos/Brewfile --verbose
         if: runner.os == 'macOS'
       - name: Test Brewfile install (linux)
-        run: |
-          /home/linuxbrew/.linuxbrew/bin/brew upgrade
-          /home/linuxbrew/.linuxbrew/bin/brew bundle --file=_linux/Brewfile --verbose
+        run: brew bundle --file=_linux/Brewfile --verbose
         if: runner.os == 'linux'
+
       - name: Test docker installer
         run: |
           HOME=~/dotfiles-install-dir installers/docker.sh
