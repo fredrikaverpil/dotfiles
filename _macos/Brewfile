@@ -63,7 +63,7 @@ brew 'tmux'
 
 # neovim
 brew 'neovim'
-# cask 'ghostty'  # NOTE: not yet installable via GitHub Actions
+cask 'ghostty'
 cask 'neovide'
 brew 'cmake'
 brew 'gcc'
