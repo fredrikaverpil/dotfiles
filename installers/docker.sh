@@ -37,7 +37,7 @@ Linux)
 			sudo usermod -aG docker "${USER}"
 
 			# install docker-compose
-			pipx install docker-compose
+			sudo apt-get -y install docker-compose
 		fi
 	fi
 
