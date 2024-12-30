@@ -35,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Homebrew cache
+      - name: set up cache
         uses: actions/cache@v4
         with:
           path: ${{ matrix.brew_cache_path }}
