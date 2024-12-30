@@ -383,6 +383,13 @@ function M.setup_telescope_keymaps()
       end,
       desc = "Switch project",
     },
+    {
+      "<leader>sf",
+      function()
+        open_file_in_other_project(false)
+      end,
+      desc = "Switch to file", -- NOTE: without changing cwd
+    },
     -- yank
     -- NOTE: reminder;
     -- Use `vep` to replace current a word with a yank.
@@ -393,13 +400,6 @@ function M.setup_telescope_keymaps()
         require("telescope").extensions.yank_history.yank_history({})
       end,
       desc = "Yanky history",
-    },
-    {
-      "<leader>sf",
-      function()
-        open_file_in_other_project(false)
-      end,
-      desc = "Switch to file", -- NOTE: without changing cwd
     },
 
     -- search
