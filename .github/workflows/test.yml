@@ -15,17 +15,36 @@ jobs:
             os: ubuntu-latest
             brewpath: /home/linuxbrew/.linuxbrew/bin
             brewfile: _linux/Brewfile
+            brew_cache_path: |
+              /home/linuxbrew/.linuxbrew
+              ~/.cache/Homebrew
             docker_test: false
           - name: macOS
             os: macos-latest
             brewfile: _macos/Brewfile
+            brew_cache_path: |
+              ~/Library/Caches/Homebrew
+              ~/Library/Logs/Homebrew
+              /usr/local/Homebrew
+              /usr/local/Cellar
+              /usr/local/Caskroom
             docker_test: true
       fail-fast: false
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Create workfolder
+
+      - name: Set up Homebrew cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ matrix.brew_cache_path }}
+          key: brew-${{ matrix.name }}-${{ hashFiles('**/Brewfile') }}-${{ github.sha }}
+          restore-keys: |
+            brew-${{ matrix.name }}-${{ hashFiles('**/Brewfile') }}-
+            brew-${{ matrix.name }}-
+
+      - name: create workfolder
         run: |
           mkdir -p ~/dotfiles-install-dir
       - name: install dotfiles
