@@ -496,7 +496,7 @@ end
 
 function M.setup_coderunner_keymaps()
   return {
-    { "<leader>rf", ":RunFile term<CR>", desc = "Toggle native terminal" },
+    { "<leader>rf", ":RunFile term<CR>", desc = "Run file" },
   }
 end
 
