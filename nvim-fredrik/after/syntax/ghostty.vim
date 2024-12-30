@@ -96,6 +96,8 @@ syn keyword ghosttyConfigKeyword
 	\ window-save-state
 	\ window-step-resize
 	\ window-new-tab-position
+	\ window-titlebar-background
+	\ window-titlebar-foreground
 	\ resize-overlay
 	\ resize-overlay-position
 	\ resize-overlay-duration
@@ -105,6 +107,7 @@ syn keyword ghosttyConfigKeyword
 	\ clipboard-trim-trailing-spaces
 	\ clipboard-paste-protection
 	\ clipboard-paste-bracketed-safe
+	\ title-report
 	\ image-storage-limit
 	\ copy-on-select
 	\ click-repeat-interval
