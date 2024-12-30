@@ -6,7 +6,6 @@ end
 
 return {
   "nvim-lualine/lualine.nvim",
-  lazy = true,
   event = "VeryLazy",
   dependencies = {
     "zbirenbaum/copilot.lua",
@@ -32,8 +31,9 @@ return {
       theme = "auto",
       component_separators = { left = "", right = "" },
       section_separators = { left = "", right = "" },
-      disabled_filetypes = {},
+      disabled_filetypes = { "Avante", "AvanteInput" }, -- only added here if lazy-loading prevents it from being added elsewhere
     },
+
     sections = {
       lualine_a = { "mode" },
       lualine_b = {
@@ -62,10 +62,10 @@ return {
     },
 
     extensions = { "lazy", "man", "quickfix" },
-    opts_extend = {
-      "options.disabled_filetypes",
-      "sections.extensions",
-    },
+  },
+  opts_extend = {
+    "options.disabled_filetypes",
+    "sections.extensions",
   },
   config = function(_, opts)
     -- TODO: make more generic insertion function which can insert anywhere.
