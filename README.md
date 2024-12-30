@@ -22,8 +22,9 @@ possible.
 ### Fonts 💯
 
 - [Berkeley Mono](https://berkeleygraphics.com/typefaces/berkeley-mono)
-- [Symbols Nerd Font Mono](https://github.com/ryanoasis/nerd-fonts)
+- [Maple Mono](https://github.com/subframe7536/maple-font)
 - [Noto Color Emoji](https://fonts.google.com/noto/specimen/Noto+Color+Emoji)
+- [Symbols Nerd Font Mono](https://github.com/ryanoasis/nerd-fonts)
 
 ### Project config/tooling 🧢
 
