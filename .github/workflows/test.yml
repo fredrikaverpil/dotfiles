@@ -15,19 +15,14 @@ jobs:
             os: macos-latest
             brewfile: _macos/Brewfile
             brew_cache_path: |
-              ~/Library/Caches/Homebrew
-              ~/Library/Logs/Homebrew
-              /usr/local/Homebrew
-              /usr/local/Cellar
-              /usr/local/Caskroom
+              /Users/runner/Library/Caches/Homebrew
             docker_test: false
           - name: ubuntu
             os: ubuntu-latest
             brewpath: /home/linuxbrew/.linuxbrew/bin
             brewfile: _linux/Brewfile
             brew_cache_path: |
-              /home/linuxbrew/.linuxbrew
-              ~/.cache/Homebrew
+              /home/runner/.cache/Homebrew
             docker_test: true
       fail-fast: false
     name: ${{ matrix.name }}
