@@ -34,7 +34,7 @@ jobs:
         if: runner.os == 'macOS'
       - name: Test Brewfile install (linux)
         run: |
-          brew upgrade
+          /home/linuxbrew/.linuxbrew/bin/brew upgrade
           /home/linuxbrew/.linuxbrew/bin/brew bundle --file=_linux/Brewfile --verbose
         if: runner.os == 'linux'
       - name: Test docker installer
