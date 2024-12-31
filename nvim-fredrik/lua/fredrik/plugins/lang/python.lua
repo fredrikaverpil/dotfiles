@@ -121,7 +121,6 @@ return {
           root_dir = (function()
             return vim.fs.root(0, root_files)
           end)(),
-          single_file_support = true,
           on_attach = function(client, bufnr)
             if client.name == "ruff" then
               -- Disable hover in favor of Pyright
@@ -156,7 +155,6 @@ return {
           cmd = { "basedpyright-langserver", "--stdio" },
           filetypes = { "python" },
           root_markers = root_files,
-          single_file_support = true,
           log_level = vim.lsp.protocol.MessageType.Debug,
           settings = {
             python = {

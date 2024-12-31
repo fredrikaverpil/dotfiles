@@ -158,7 +158,6 @@ return {
           cmd = { "gopls" },
           filetypes = { "go", "gomod", "gowork", "gosum" },
           root_markers = { "go.work", "go.mod", ".git" },
-          single_file_support = true,
           settings = {
             gopls = {
               buildFlags = { tags },

@@ -33,7 +33,6 @@ return {
           cmd = { "vscode-html-language-server", "--stdio" },
           filetypes = { "html" },
           root_markers = { ".git" },
-          single_file_support = true,
           init_options = {
             provideFormatter = true, -- TODO: replace with prettier?
             embeddedLanguages = { css = true, javascript = true },
