@@ -227,13 +227,7 @@ return {
       -- add custom on_attach
       for server, server_opts in pairs(opts.servers) do
         local on_attach = server_opts.on_attach
-
         server_opts.on_attach = function(client, bufnr)
-          -- call original on_attach
-          if on_attach ~= nil then
-            on_attach(client, bufnr)
-          end
-
           -- setup codelens
           if client.supports_method("textDocument/codeLens") then
             vim.lsp.codelens.refresh()
@@ -251,6 +245,11 @@ return {
           -- FIXME: causes crash here
           -- set up workspace diagnostics
           -- require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
+
+          -- call original on_attach last
+          if on_attach ~= nil then
+            on_attach(client, bufnr)
+          end
         end
       end
 
