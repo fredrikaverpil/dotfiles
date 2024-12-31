@@ -9,7 +9,8 @@
   maintaining it myself.
 - Per-language configs.
 - Per-project overrides.
-- Notion of public vs private projects.
+- Notion of public vs private projects; GitHub Copilot enabled in public
+  projects, disabled in private projects.
 - Fzf-lua for certain files, grepping etc.
 - Blink.cmp for completion.
 - Native snippets.
@@ -25,7 +26,6 @@
 - Neo-tree for navigating files and folders.
 - Native vim folding, using LSP when applicable.
 - Diffview for reviewing PRs.
-- GitHub Copilot enabled in public projects, disabled in private projects.
 - AI chat via Codecompanion.
 - And much, much more...
 
@@ -50,12 +50,6 @@ NVIM_APPNAME=fredrik nvim
 >
 > I'm not maintaining my Neovim config for anyone besides myself. But I'm making
 > it publicly available for others to draw inspiration from! 😊
->
-> It's very likely that my config is tailored for my local setup, and that you
-> will experience some minor issues. For example, I assume the `DOTFILES`
-> environment variable exists, as this is something I know to always have on my
-> systems. I also assume certain commandline tools to be available, like `fd`,
-> `rg`, `fzf` etc.
 
 ## Design choices
 
@@ -76,6 +70,9 @@ plugin manager.
   4. (Per-project plugin configs from local per-project `.lazy.lua` file).
 
 ### Order of plugins loading
+
+You can inspect the order of loading here:
+[lua/fredrik/config/lazy.lua](lua/fredrik/config/lazy.lua).
 
 #### Generic plugin configs
 
