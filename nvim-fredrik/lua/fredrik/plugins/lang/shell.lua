@@ -42,8 +42,6 @@ return {
 
   {
     "neovim/nvim-lspconfig",
-    lazy = true,
-    -- ft = { "sh" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",

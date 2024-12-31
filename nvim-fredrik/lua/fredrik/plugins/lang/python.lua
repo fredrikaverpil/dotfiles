@@ -94,7 +94,6 @@ return {
 
   {
     "neovim/nvim-lspconfig",
-    lazy = true,
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",

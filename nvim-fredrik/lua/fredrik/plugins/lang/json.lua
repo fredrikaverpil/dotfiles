@@ -41,8 +41,6 @@ return {
 
   {
     "neovim/nvim-lspconfig",
-    lazy = true,
-    -- ft = filetypes,
     dependencies = {
       {
         "b0o/SchemaStore.nvim",

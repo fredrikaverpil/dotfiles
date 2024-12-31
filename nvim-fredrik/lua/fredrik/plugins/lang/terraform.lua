@@ -36,8 +36,6 @@ return {
 
   {
     "neovim/nvim-lspconfig",
-    lazy = true,
-    -- ft = { "terraform", "tf", "terraform-vars" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",

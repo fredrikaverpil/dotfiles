@@ -119,9 +119,6 @@ end
 return {
   {
     "neovim/nvim-lspconfig",
-    lazy = true,
-    -- Remove the event configuration
-    -- event = { "BufReadPost", "BufWinEnter" },
     event = "VeryLazy",
     dependencies = {
       {

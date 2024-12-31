@@ -22,11 +22,6 @@ return {
 
   {
     "neovim/nvim-lspconfig",
-    lazy = true,
-    -- ft = {
-    --   "dockerfile",
-    --   -- "yaml",
-    -- },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",

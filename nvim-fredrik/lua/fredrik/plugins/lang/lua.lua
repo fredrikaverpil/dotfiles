@@ -22,8 +22,6 @@ return {
 
   {
     "neovim/nvim-lspconfig",
-    lazy = true,
-    -- ft = { "lua" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",

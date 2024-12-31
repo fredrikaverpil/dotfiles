@@ -121,8 +121,6 @@ return {
 
   {
     "neovim/nvim-lspconfig",
-    lazy = true,
-    ft = { "go", "gomod", "gowork", "gosum" },
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
