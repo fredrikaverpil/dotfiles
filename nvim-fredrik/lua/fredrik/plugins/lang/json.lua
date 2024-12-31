@@ -72,7 +72,7 @@ return {
             filetypes = filetypes,
             root_markers = { ".git" },
             init_options = {
-              provideFormatter = true,
+              provideFormatter = false, -- use conform.nvim instead
             },
             settings = {
               json = {
