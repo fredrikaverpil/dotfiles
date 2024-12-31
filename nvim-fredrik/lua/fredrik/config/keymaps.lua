@@ -964,6 +964,12 @@ function M.setup_lsp_keymaps()
   map_normal_mode("<leader>uh", require("fredrik.utils.toggle").toggle_inlay_hints, "Toggle inlay hints")
 end
 
+function M.setup_showkeys_keymaps()
+  return {
+    { "<leader>uk", ":ShowkeysToggle<CR>", desc = "Show keys (toogle)" },
+  }
+end
+
 function M.setup_minimap_keymaps()
   return {
     { "<Leader>um", "<cmd>Neominimap toggle<CR>", desc = "Toggle Mini map" },
@@ -1143,10 +1149,5 @@ function M.setup_avante_keymaps()
   }
 end
 
-function M.setup_showkeys_keymaps()
-  return {
-    { "<leader>uk", ":ShowkeysToggle<CR>", desc = "Show keys (toogle)" },
-  }
-end
 
 return M
