@@ -96,8 +96,9 @@ function M.lsp_foldexpr()
   -- vim.api.nvim_set_option_value("foldmethod", "expr", { scope = "local" })
   -- vim.api.nvim_set_option_value("foldexpr", "v:lua.vim.lsp.foldexpr()", { scope = "local" })
   -- vim.api.nvim_set_option_value("foldtext", "v:lua.vim.lsp.foldtext()", { scope = "local" })
-  vim.opt.foldtext = "expr"
+  vim.opt.foldmethod = "expr"
   vim.opt.foldexpr = "v:lua.vim.lsp.foldexpr()"
+  vim.opt.foldtext = "v:lua.custom_foldtext()"
 end
 
 -- scroll off
