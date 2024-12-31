@@ -236,7 +236,7 @@ return {
 
           -- setup folding
           if client.supports_method("textDocument/foldingRange") and require("fredrik.utils.version").is_neovim_0_11_0() then
-            require("fredrik.config.options").treesitter_foldexpr()
+            require("fredrik.config.options").lsp_foldexpr()
           end
 
           -- FIXME: causes crash here
