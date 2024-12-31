@@ -171,17 +171,17 @@ return {
               --   -- https://github.com/golang/tools/blob/master/gopls/doc/codelenses.md
               --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
               -- },
-              -- hints = {
-              --   -- https://github.com/golang/tools/blob/master/gopls/doc/inlayHints.md
-              --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
-              --   --
-              --   -- parameterNames = true,
-              --   -- assignVariableTypes = true,
-              --   -- constantValues = true,
-              --   -- compositeLiteralTypes = true,
-              --   -- compositeLiteralFields = true,
-              --   -- functionTypeParameters = true,
-              -- },
+              hints = {
+                -- https://github.com/golang/tools/blob/master/gopls/doc/inlayHints.md
+                -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
+
+                parameterNames = true,
+                assignVariableTypes = true,
+                constantValues = true,
+                compositeLiteralTypes = true,
+                compositeLiteralFields = true,
+                functionTypeParameters = true,
+              },
               -- completion options
               -- https://github.com/golang/tools/blob/master/gopls/doc/features/completion.md
               -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
