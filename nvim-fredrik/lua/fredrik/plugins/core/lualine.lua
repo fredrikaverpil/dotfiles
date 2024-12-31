@@ -31,7 +31,8 @@ return {
       theme = "auto",
       component_separators = { left = "", right = "" },
       section_separators = { left = "", right = "" },
-      disabled_filetypes = { "Avante", "AvanteInput" }, -- only added here if lazy-loading prevents it from being added elsewhere
+      globalstatus = true,
+      disabled_filetypes = {},
     },
 
     sections = {

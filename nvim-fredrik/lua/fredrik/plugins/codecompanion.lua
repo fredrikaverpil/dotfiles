@@ -135,14 +135,6 @@ return {
           "sources.default",
         },
       },
-      {
-        "nvim-lualine/lualine.nvim",
-        opts = {
-          options = {
-            disabled_filetypes = { "codecompanion" },
-          },
-        },
-      },
     },
     opts = function(_, opts)
       local custom_opts = {
