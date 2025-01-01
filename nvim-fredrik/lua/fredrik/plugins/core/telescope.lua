@@ -67,14 +67,16 @@ return {
           project = {
             base_dirs = {
               { path = vim.fn.expand("~/.dotfiles"), max_depth = 1 },
-              { path = vim.fn.expand("~/code"), max_depth = 2 },
+              { path = vim.fn.expand("~/code"), max_depth = 3 },
             },
             cd_scope = { "global", "tab", "window" },
             on_project_selected = function(prompt_bufnr)
               if vim.g.project_set_cwd then
-                vim.cmd([[:SessionSave]])
+                require("persistence").fire("SavePre")
+                require("persistence").save()
+                require("persistence").fire("SavePost")
                 require("telescope._extensions.project.actions").change_working_directory(prompt_bufnr, false)
-                vim.cmd([[:SessionRestore]])
+                require("persistence").load()
               else
                 local builtin = require("telescope.builtin")
                 local path = require("telescope._extensions.project.actions").get_selected_path(prompt_bufnr)

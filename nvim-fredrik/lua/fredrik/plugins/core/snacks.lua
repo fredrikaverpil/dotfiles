@@ -1,6 +1,20 @@
 return {
   {
     "folke/snacks.nvim",
+    dependencies = {
+      "folke/persistence.nvim",
+      {
+        "nvim-lualine/lualine.nvim",
+        opts = {
+          options = {
+            disabled_filetypes = { "snacks_dashboard" },
+          },
+        },
+        opts_extend = {
+          "options.disabled_filetypes",
+        },
+      },
+    },
     priority = 1000,
     lazy = false,
 
@@ -29,6 +43,18 @@ return {
       },
 
       terminal = {},
+
+      ---@class snacks.dashboard.Config
+      dashboard = {
+        preset = {
+          keys = {
+            { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
+            { icon = " ", key = "r", desc = "Recent Files", action = ":lua Snacks.dashboard.pick('oldfiles')" },
+            { icon = " ", key = "s", desc = "Restore Session", section = "session" },
+            { icon = " ", key = "q", desc = "Quit", action = ":qa" },
+          },
+        },
+      },
 
       -- special mode
       zen = {

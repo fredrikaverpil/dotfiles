@@ -486,11 +486,13 @@ end
 
 function M.setup_auto_session_keymaps()
   return {
-    -- Will use Telescope if installed or a vim.ui.select picker otherwise
-    { "<leader>ss", "<cmd>SessionSearch<CR>", desc = "[s]earch [s]ession" },
-    -- { "<leader>uS", "<cmd>SessionSave<CR>", desc = "Save session" },
-    -- { "<leader>ua", "<cmd>SessionToggleAutoSave<CR>", desc = "Toggle session autosave" },
-    -- { "<leader>uD", "<cmd>SessionDelete<CR>", desc = "Delete session" },
+    {
+      "<leader>ss",
+      function()
+        require("persistence").select()
+      end,
+      desc = "[s]earch [s]ession",
+    },
   }
 end
 
@@ -543,6 +545,13 @@ function M.setup_snacks_keymaps()
         Snacks.notifier.show_history()
       end,
       desc = "Toggle notification history",
+    },
+    {
+      "<leader>D",
+      function()
+        Snacks.dashboard.open()
+      end,
+      desc = "Dashboard",
     },
   }
 end
@@ -1148,6 +1157,5 @@ function M.setup_avante_keymaps()
     { "<leader>aa", ":AvanteAsk<CR>", desc = "Avante" },
   }
 end
-
 
 return M
