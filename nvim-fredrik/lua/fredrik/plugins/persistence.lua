@@ -35,13 +35,6 @@ return {
     keys = require("fredrik.config.keymaps").setup_auto_session_keymaps(),
     config = function(_, opts)
       require("persistence").setup(opts)
-
-      vim.api.nvim_create_autocmd("UIEnter", {
-        pattern = "*",
-        callback = function()
-          require("persistence").load()
-        end,
-      })
     end,
   },
 }

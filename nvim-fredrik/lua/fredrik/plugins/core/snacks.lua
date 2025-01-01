@@ -2,7 +2,7 @@ return {
   {
     "folke/snacks.nvim",
     dependencies = {
-      "folke/persistence.nvim",
+      --  "folke/persistence.nvim",
       {
         "nvim-lualine/lualine.nvim",
         opts = {
@@ -31,8 +31,9 @@ return {
       statuscolumn = { enabled = true },
       indent = {
         enabled = true,
+        priority = 1,
         animate = {
-          enabled = vim.fn.has("nvim-0.10") == 1,
+          enabled = true,
           style = "out",
           easing = "linear",
           duration = {
@@ -46,7 +47,7 @@ return {
 
       ---@class snacks.dashboard.Config
       dashboard = {
-        enabled = false,
+        enabled = true,
         preset = {
           keys = {
             { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
