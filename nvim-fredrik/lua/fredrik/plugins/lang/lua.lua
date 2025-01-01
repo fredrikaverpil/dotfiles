@@ -152,6 +152,9 @@ return {
       },
     },
     opts = function(_, opts)
+      if opts.configurations == nil then
+        opts.configurations = {}
+      end
       opts.configurations.lua = {
         {
           type = "nlua",
