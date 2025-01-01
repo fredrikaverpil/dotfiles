@@ -50,6 +50,7 @@ echo "Do you want to remove the distro dirs in ~/.config? (y/n)"
 read -r response
 if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
 	rm -rf ~/.config/LazyVim
+  rm -rf ~/.config/NativeVim
 	rm -rf ~/.config/NvChad
 	rm -rf ~/.config/AstroNvim
 	rm -rf ~/.config/kickstart
@@ -63,10 +64,16 @@ fi
 echo "About to install (git clone) neovim distros, continue? (y/n)"
 read -r response
 if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
-	if [ ! -d "$HOME/.config/LazyVim" ]; then
-		git clone --recursive https://github.com/LazyVim/starter.git ~/.config/LazyVim
+	if [ ! -d "$HOME/.config/lazyvim" ]; then
+		git clone --recursive https://github.com/lazyvim/starter.git ~/.config/lazyvim
 	else
-		echo "LazyVim already exists, skipping"
+		echo "lazyvim already exists, skipping"
+	fi
+
+ 	if [ ! -d "$HOME/.config/NativeVim" ]; then
+		git clone --recursive https://github.com/boltlessengineer/NativeVim.git ~/.config/NativeVim
+	else
+		echo "lazyvim already exists, skipping"
 	fi
 
 	if [ ! -d "$HOME/.config/NvChad" ]; then
@@ -88,7 +95,7 @@ if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
 	fi
 
 	if [ ! -d "$HOME/.config/kickstart-modular.nvim" ]; then
-		git clone https://github.com/dam9000/kickstart-modular.nvim.git ~/.config/kickstart
+		git clone https://github.com/dam9000/kickstart-modular.nvim.git ~/.config/kickstart-modular
 	else
 		echo "kickstart already exists, skipping"
 	fi
