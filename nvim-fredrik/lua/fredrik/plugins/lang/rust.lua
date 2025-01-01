@@ -26,8 +26,6 @@ return {
   -- Ensure Rust debugger is installed
   {
     "williamboman/mason.nvim",
-    lazy = true,
-    ft = { "rust" },
     optional = true,
     opts = function(_, opts)
       opts.ensure_installed = opts.ensure_installed or {}

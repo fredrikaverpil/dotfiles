@@ -11,8 +11,6 @@ return {
 
   {
     "nvim-treesitter/nvim-treesitter",
-    lazy = true,
-    ft = { "markdown" },
     opts = {
       ensure_installed = { "markdown", "markdown_inline", "tex", "latex" },
     },
@@ -20,8 +18,6 @@ return {
 
   {
     "stevearc/conform.nvim",
-    lazy = true,
-    ft = { "markdown" },
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -50,8 +46,6 @@ return {
 
   {
     "mfussenegger/nvim-lint",
-    lazy = true,
-    ft = { "markdown" },
     dependencies = {
       {
         "williamboman/mason.nvim",

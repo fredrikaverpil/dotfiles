@@ -13,8 +13,6 @@ return {
 
   {
     "stevearc/conform.nvim",
-    lazy = true,
-    ft = filetypes,
     dependencies = {
       {
         "williamboman/mason.nvim",

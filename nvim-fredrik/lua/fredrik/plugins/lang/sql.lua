@@ -28,8 +28,6 @@ return {
 
   {
     "saghen/blink.cmp",
-    lazy = true,
-    ft = sql_ft,
     dependencies = {
       "kristijanhusak/vim-dadbod-completion",
     },

@@ -174,8 +174,6 @@ return {
 
   {
     "stevearc/conform.nvim",
-    lazy = true,
-    ft = { "proto" },
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -194,8 +192,6 @@ return {
 
   {
     "mfussenegger/nvim-lint",
-    lazy = true,
-    ft = { "proto" },
     dependencies = {
       {
         "williamboman/mason.nvim",

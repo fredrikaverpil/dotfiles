@@ -23,8 +23,6 @@ return {
 
   {
     "nvim-treesitter/nvim-treesitter",
-    lazy = true,
-    ft = filetypes,
     opts = { ensure_installed = { "gotmpl", "html" } },
   },
 

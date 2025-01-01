@@ -2,8 +2,6 @@ return {
 
   {
     "stevearc/conform.nvim",
-    lazy = true,
-    ft = { "terraform", "tf", "terraform-vars" },
     opts = {
       formatters_by_ft = {
         terraform = { "terraform_fmt" },
@@ -15,8 +13,6 @@ return {
 
   {
     "mfussenegger/nvim-lint",
-    lazy = true,
-    ft = { "terraform", "tf", "terraform-vars" },
     dependencies = {
       {
         "williamboman/mason.nvim",

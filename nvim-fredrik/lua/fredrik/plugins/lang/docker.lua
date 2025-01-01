@@ -2,8 +2,6 @@ return {
 
   {
     "mfussenegger/nvim-lint",
-    lazy = true,
-    ft = { "dockerfile" },
     dependencies = {
       {
         "williamboman/mason.nvim",

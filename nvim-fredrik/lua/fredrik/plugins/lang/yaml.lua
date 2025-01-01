@@ -18,8 +18,6 @@ return {
 
   {
     "stevearc/conform.nvim",
-    lazy = true,
-    ft = { "yaml", "gha", "dependabot" },
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -50,8 +48,6 @@ return {
 
   {
     "mfussenegger/nvim-lint",
-    lazy = true,
-    ft = { "gha" },
     dependencies = {
       {
         "williamboman/mason.nvim",

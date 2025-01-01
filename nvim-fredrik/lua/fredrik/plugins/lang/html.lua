@@ -2,8 +2,6 @@ return {
 
   {
     "nvim-treesitter/nvim-treesitter",
-    lazy = true,
-    ft = { "html" },
     opts = { ensure_installed = { "html" } },
   },
 

@@ -2,8 +2,6 @@ return {
 
   {
     "nvim-treesitter/nvim-treesitter",
-    lazy = true,
-    ft = { "zig" },
     opts = {
       ensure_installed = { "zig" },
     },

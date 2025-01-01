@@ -67,9 +67,6 @@ return {
 
   {
     "mfussenegger/nvim-lint",
-    enabled = true,
-    lazy = true,
-    ft = { "python" },
     dependencies = {
       {
         "williamboman/mason.nvim",

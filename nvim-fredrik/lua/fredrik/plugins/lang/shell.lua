@@ -2,8 +2,6 @@ return {
 
   {
     "stevearc/conform.nvim",
-    lazy = true,
-    ft = { "sh" },
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -22,8 +20,6 @@ return {
 
   {
     "mfussenegger/nvim-lint",
-    lazy = true,
-    ft = { "sh" },
     dependencies = {
       {
         "williamboman/mason.nvim",

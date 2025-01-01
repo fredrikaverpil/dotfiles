@@ -49,8 +49,6 @@ return {
 
   {
     "nvim-treesitter/nvim-treesitter",
-    lazy = true,
-    ft = { "go", "gomod", "gosum", "gowork" },
     opts = {
       ensure_installed = { "go", "gomod", "gosum", "gowork" },
     },
@@ -58,8 +56,6 @@ return {
 
   {
     "stevearc/conform.nvim",
-    lazy = true,
-    ft = { "go", "gomod", "gowork" },
     dependencies = {
       {
         "williamboman/mason.nvim",
@@ -99,8 +95,6 @@ return {
 
   {
     "mfussenegger/nvim-lint",
-    lazy = true,
-    ft = { "go", "gomod", "gowork" },
     dependencies = {
       {
         "williamboman/mason.nvim",
