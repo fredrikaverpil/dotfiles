@@ -151,16 +151,6 @@ return {
       },
     },
     opts = {
-      extends = {
-        -- LSP settings extensions (not overrides).
-        -- Example where gotmpl extends gopls and html:
-        -- gotmpl = {
-        --   servers = {
-        --     gopls = { ... },
-        --     html = { ... },
-        --   },
-        -- }
-      },
       servers = {
         -- -- Example LSP settings below for opts.servers:
         -- lua_ls = {
@@ -185,16 +175,6 @@ return {
       },
     },
     config = function(_, opts)
-      -- per language extension of LSP settings
-      if opts.extends then
-        for extendee, servers in pairs(opts.extends) do
-          for server, server_opts in pairs(servers.servers) do
-            -- vim.notify("Extending " .. server .. " on behalf of " .. extendee)
-            opts.servers = require("fredrik.utils.table").deep_merge(opts.servers, { [server] = server_opts })
-          end
-        end
-      end
-
       -- LSP servers and clients (like Neovim) are able to communicate to each other what
       -- features they support.
       -- By default, Neovim doesn't support everything that is in the LSP Specification.

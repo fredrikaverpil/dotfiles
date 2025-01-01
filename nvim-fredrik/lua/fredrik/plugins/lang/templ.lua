@@ -48,26 +48,23 @@ return {
             templ = {},
           },
         },
-      },
-      extends = {
-        -- extendee: templ
-        templ = {
-          -- extends: go.lua, html.lua
-          servers = {
-            ---@type vim.lsp.Config
+        ---@type vim.lsp.Config
+        gopls = {
+          filetypes = filetypes,
+          settings = {
             gopls = {
-              filetypes = filetypes,
-              settings = {
-                gopls = {
-                  templateExtensions = filetypes, -- make sure this filetype is set in the buffer
-                },
-              },
+              templateExtensions = filetypes, -- make sure this filetype is set in the buffer
             },
-            html = { filetypes = filetypes, settings = { html = {} } },
-            -- htmx = { filetypes = filetypes, settings = { htmx = {} } },
           },
         },
+        ---@type vim.lsp.Config
+        html = { filetypes = filetypes, settings = { html = {} } },
+        -- htmx = { filetypes = filetypes, settings = { htmx = {} } },
       },
+    },
+    opts_extend = {
+      "servers.gopls.filetypes",
+      "servers.gopls.settings.gopls.templateExtensions",
     },
   },
 }
