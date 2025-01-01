@@ -46,6 +46,7 @@ return {
 
       ---@class snacks.dashboard.Config
       dashboard = {
+        enabled = false,
         preset = {
           keys = {
             { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
