@@ -24,5 +24,6 @@ crash.log
 override.tf
 *_override.tf
 
-# minimal.lua
+# minimal.lua, repro.lua
 nvim_issue
+.repro
