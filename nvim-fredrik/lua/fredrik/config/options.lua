@@ -76,6 +76,9 @@ vim.opt.cursorline = false
 vim.opt.splitbelow = true
 vim.opt.splitright = true
 
+-- set up diagnostics
+require("fredrik.utils.diagnostics").setup_diagnostics()
+
 -- fold settings (treesitter or LSP)
 vim.opt.foldcolumn = "0"
 vim.opt.foldenable = true

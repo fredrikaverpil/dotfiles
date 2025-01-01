@@ -195,9 +195,6 @@ return {
         end
       end
 
-      -- set up diagnostics
-      require("fredrik.utils.diagnostics").setup_diagnostics()
-
       -- LSP servers and clients (like Neovim) are able to communicate to each other what
       -- features they support.
       -- By default, Neovim doesn't support everything that is in the LSP Specification.
