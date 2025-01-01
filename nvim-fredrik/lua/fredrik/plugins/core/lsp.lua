@@ -249,8 +249,7 @@ return {
 
       ensure_servers_installed(opts)
 
-      local native_lsp_enabled = true
-      if require("fredrik.utils.version").is_neovim_0_11_0() and native_lsp_enabled then
+      if require("fredrik.utils.version").is_neovim_0_11_0() and vim.g.native_lsp then
         -- use native vim.lsp functionality
         -- https://github.com/neovim/neovim/pull/31031
 
