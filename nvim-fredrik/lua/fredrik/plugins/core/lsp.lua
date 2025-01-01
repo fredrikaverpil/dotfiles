@@ -243,14 +243,14 @@ return {
           end
 
           vim.lsp.config[server] = server_opts
-          vim.lsp.enable(server, true)
+          vim.lsp.enable(server, true) -- NOTE: this could potentially be called from FileType autocmd
         end
       else
         -- use lspconfig
         create_server_setup_autocmds(opts)
       end
 
-      -- set up keymaps
+      -- set up lsp keymaps
       require("fredrik.config.keymaps").setup_lsp_keymaps()
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("lsp-attach-keymaps", { clear = true }),
