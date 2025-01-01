@@ -1,4 +1,27 @@
 return {
+  {
+    "stevearc/conform.nvim",
+    dependencies = {
+      {
+        "williamboman/mason.nvim",
+        opts = function(_, opts)
+          opts.ensure_installed = opts.ensure_installed or {}
+          vim.list_extend(opts.ensure_installed, { "prettier" })
+        end,
+      },
+    },
+    opts = {
+      formatters_by_ft = {
+        typescript = { "prettier" },
+      },
+      formatters = {
+        prettier = {
+          -- https://prettier.io/docs/en/options.html
+          prepend_args = { "--prose-wrap", "always", "--print-width", "80", "--tab-width", "2" },
+        },
+      },
+    },
+  },
 
   {
     "neovim/nvim-lspconfig",
@@ -33,6 +56,9 @@ return {
           cmd = { "vtsls", "--stdio" },
           filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
           root_markers = { "tsconfig.json", "package.json", "jsconfig.json", ".git" },
+          init_options = {
+            hostInfo = "neovim",
+          },
           settings = {
             complete_function_calls = true,
             vtsls = {
@@ -76,5 +102,17 @@ return {
       },
     },
     keys = require("fredrik.config.keymaps").setup_typescript_lsp_keymaps(),
+  },
+
+  {
+    "CRAG666/code_runner.nvim",
+    lazy = true,
+    opts = {
+      filetype = {
+        typescript = {
+          "bun",
+        },
+      },
+    },
   },
 }
