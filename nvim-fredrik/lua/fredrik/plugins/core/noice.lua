@@ -1,8 +1,7 @@
 return {
   {
     "folke/noice.nvim",
-    lazy = true,
-    event = "VeryLazy",
+    lazy = false, -- avoid jumping lualine on nvim startup
     dependencies = {
       -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
       "MunifTanjim/nui.nvim",
