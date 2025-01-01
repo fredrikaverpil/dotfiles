@@ -27,14 +27,17 @@ vim.api.nvim_create_autocmd("User", {
 return {
   {
     "folke/persistence.nvim",
-    event = "BufReadPre", -- this will only start session saving when an actual file was opened
-    opts = function(_, opts)
+    event = "VimEnter",
+    init = function()
       vim.opt.sessionoptions = "buffers,curdir,help,tabpages,winsize,winpos,terminal,localoptions"
-      return opts
     end,
     keys = require("fredrik.config.keymaps").setup_auto_session_keymaps(),
     config = function(_, opts)
       require("persistence").setup(opts)
+
+      vim.schedule(function()
+        require("persistence").load()
+      end)
     end,
   },
 }
