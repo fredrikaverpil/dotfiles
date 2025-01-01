@@ -11,9 +11,11 @@
 - Per-project overrides.
 - Notion of public vs private projects; GitHub Copilot enabled in public
   projects, disabled in private projects.
+- Native LSP definitions (`vim.lsp.config` and `vim.lsp.enable`).
+- Native snippets.
+- Native vim folding, using LSP when applicable.
 - Fzf-lua for certain files, grepping etc.
 - Blink.cmp for completion.
-- Native snippets.
 - One unified keymap file.
 - Conform.nvim for formatting.
 - Nvim-lint for linting.
@@ -24,7 +26,6 @@
 - Trouble.nvim for keeping track of diagnostics issues.
 - Gx.nvim for universal `gx` keymap.
 - Neo-tree for navigating files and folders.
-- Native vim folding, using LSP when applicable.
 - Diffview for reviewing PRs.
 - AI chat via Codecompanion.
 - And much, much more...
@@ -33,7 +34,7 @@
 
 > [!WARNING]
 >
-> Might require Neovim nightly.
+> Requires Neovim >= v0.11.0.
 
 ```sh
 # clone repo
