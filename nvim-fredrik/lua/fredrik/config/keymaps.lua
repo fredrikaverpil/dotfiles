@@ -941,24 +941,18 @@ function M.setup_terminal_keymaps()
   local ctrl_alt_slash = "<C-A-/>"
   local ctrl_alt_underscore = "<C-A-_>"
 
-  local split_term_cmd = function()
-    vim.api.nvim_set_keymap("t", "<Esc><Esc>", "<C-\\><C-n>", { noremap = true })
-
-    Snacks.terminal.toggle()
-  end
+  -- <Esc><Esc> in terminal mode sends <C-\><C-n> to exit terminal mode, see :h term
+  vim.api.nvim_set_keymap("t", "<Esc><Esc>", "<C-\\><C-n>", { noremap = true })
 
   local floating_term_cmd = function()
-    vim.api.nvim_set_keymap("t", "<Esc><Esc>", "<C-\\><C-n>", { noremap = true })
-
     local cmd = { "zsh" }
     local opts = { cwd = vim.fn.getcwd() }
     Snacks.terminal.toggle(cmd, opts)
   end
 
   return {
-
-    { ctrl_alt_slash, split_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle terminal" },
-    { ctrl_alt_underscore, split_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle terminal" },
+    { ctrl_alt_slash, require("fredrik.utils.terminal").toggle_terminal, mode = { "n", "i", "t", "v" }, desc = "Toggle terminal" },
+    { ctrl_alt_underscore, require("fredrik.utils.terminal").toggle_terminal, mode = { "n", "i", "t", "v" }, desc = "Toggle terminal" },
 
     { ctrl_slash, floating_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle native terminal" },
     { ctrl_underscore, floating_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle native terminal" },
