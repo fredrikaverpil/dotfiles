@@ -239,6 +239,9 @@ return {
     dependencies = {
       {
         "fredrikaverpil/neotest-golang",
+        -- dependencies = {
+        --   "uga-rosa/utf8.nvim",
+        -- },
         dir = "~/code/public/neotest-golang",
       },
     },
@@ -258,7 +261,8 @@ return {
         },
         runner = "gotestsum",
         gotestsum_args = { "--format=standard-verbose" },
-        log_level = vim.log.levels.WARN,
+        -- sanitize_output = true,
+        -- log_level = vim.log.levels.TRACE,
 
         -- experimental
         dev_notifications = true,
