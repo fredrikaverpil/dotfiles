@@ -52,24 +52,19 @@ local supported_adapters = {
   ollama = ollama_fn,
 }
 
--- add 2 commands:
---    CodeCompanionSave [space delimited args]
---    CodeCompanionLoad
--- Save will save current chat in a md file named 'space-delimited-args.md'
--- Load will use a telescope filepicker to open a previously saved chat and open it in a new chat buffer
-
--- create a folder to store our chats
-local Path = require("plenary.path")
-local data_path = vim.fn.stdpath("data") -- ~/.local/share/<NVIM_APPNAME>
-local save_folder = Path:new(data_path, "codecompanion_chats")
-if not save_folder:exists() then
-  save_folder:mkdir({ parents = true })
+local function save_path()
+  local Path = require("plenary.path")
+  local p = Path:new(vim.fn.stdpath("data") .. "/codecompanion_chats")
+  p:mkdir({ parents = true })
+  return p
 end
 
--- telescope picker for our saved chats
+--- Load a saved codecompanion.nvim chat file into a new CodeCompanion chat buffer.
+--- Usage: CodeCompanionLoad
 vim.api.nvim_create_user_command("CodeCompanionLoad", function()
+  local fzf = require("fzf-lua")
+
   local function select_adapter(filepath)
-    local fzf = require("fzf-lua")
     local adapters = vim.tbl_keys(supported_adapters)
 
     fzf.fzf_exec(adapters, {
@@ -94,8 +89,7 @@ vim.api.nvim_create_user_command("CodeCompanionLoad", function()
   end
 
   local function start_picker()
-    local fzf = require("fzf-lua")
-    local files = vim.fn.glob(save_folder:absolute() .. "/*", false, true)
+    local files = vim.fn.glob(save_path() .. "/*", false, true)
 
     fzf.fzf_exec(files, {
       prompt = "Saved CodeCompanion Chats | <c-r>: remove >",
@@ -122,7 +116,9 @@ vim.api.nvim_create_user_command("CodeCompanionLoad", function()
   start_picker()
 end, {})
 
--- save current chat, `CodeCompanionSave foo bar baz` will save as 'foo-bar-baz.md'
+--- Save the current codecompanion.nvim chat buffer to a file in the save_folder.
+--- Usage: CodeCompanionSave <filename>.md
+---@param opts table
 vim.api.nvim_create_user_command("CodeCompanionSave", function(opts)
   local codecompanion = require("codecompanion")
   local success, chat = pcall(function()
@@ -136,9 +132,9 @@ vim.api.nvim_create_user_command("CodeCompanionSave", function(opts)
     vim.notify("CodeCompanionSave requires at least 1 arg to make a file name", vim.log.levels.ERROR)
   end
   local save_name = table.concat(opts.fargs, "-") .. ".md"
-  local save_path = Path:new(save_folder, save_name)
+  local save_file = save_path():joinpath(save_name)
   local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-  save_path:write(table.concat(lines, "\n"), "w")
+  save_file:write(table.concat(lines, "\n"), "w")
 end, { nargs = "*" })
 
 return {
