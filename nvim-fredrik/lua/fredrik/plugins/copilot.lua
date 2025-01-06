@@ -94,25 +94,4 @@ return {
     end,
     keys = require("fredrik.config.keymaps").setup_copilot_keymaps(),
   },
-
-  {
-    "CopilotC-Nvim/CopilotChat.nvim",
-    lazy = true,
-    event = "VeryLazy",
-    enabled = true,
-    branch = "main",
-    dependencies = {
-      { "zbirenbaum/copilot.lua" },
-      { "nvim-lua/plenary.nvim" },
-    },
-    opts = {
-      debug = false, -- Enable debugging
-    },
-    config = function(_, opts)
-      require("CopilotChat").setup(opts)
-      -- NOTE: cmp is disabled
-      -- require("CopilotChat.integrations.cmp").setup()
-    end,
-    keys = require("fredrik.config.keymaps").setup_copilot_chat_keymaps(),
-  },
 }

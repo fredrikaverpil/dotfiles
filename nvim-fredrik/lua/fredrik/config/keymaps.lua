@@ -1125,9 +1125,15 @@ function M.setup_chatgpt_keymaps()
   }
 end
 
-function M.setup_copilot_chat_keymaps()
+function M.setup_copilot_chat_keymaps(chat)
   return {
-    { "<leader>aC", ":CopilotChat<CR>", desc = "Copilot Chat" },
+    {
+      "<leader>aC",
+      function()
+        chat.toggle()
+      end,
+      desc = "Copilot Chat",
+    },
   }
 end
 
