@@ -196,7 +196,9 @@ return {
         chat = {
           slash_commands = {
             ["buffer"] = {
-              provider = "fzf_lua", -- default|telescope|mini_pick|fzf_lua
+              opts = {
+                provider = "fzf_lua", -- default|telescope|mini_pick|fzf_lua
+              },
             },
 
             ["file"] = {
