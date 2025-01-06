@@ -221,6 +221,42 @@ return {
           },
         },
       },
+      prompt_library = {
+        -- https://github.com/olimorris/codecompanion.nvim/blob/main/doc/RECIPES.md
+        ["Code review"] = {
+          strategy = "chat",
+          description = "Code review",
+          prompts = {
+            {
+              role = "system",
+              content = [[
+                You are an senior engineer and have been asked to review
+                a pull request for:
+
+                * potential bugs
+                * error handling
+                * single responsibility principle
+                * separation of concerns
+                * best practices and community conventions
+                * security vulnerabilities
+                * performance issues
+
+                Provide code example snippets when possible to illustrate your points.
+
+                Also please consicely highlight what was done well.
+
+              ]],
+            },
+            {
+              role = "user",
+              content = [[
+                Please review my code!
+                #buffer #lsp
+              ]],
+            },
+          },
+        },
+      },
     },
     config = function(_, opts)
       require("codecompanion").setup(opts)
