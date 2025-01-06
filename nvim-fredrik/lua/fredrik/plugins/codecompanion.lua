@@ -235,13 +235,16 @@ return {
         cmd = {
           adapter = "copilot",
         },
-        display = {
-          action_palette = {
-            provider = "default", -- default|telescope|mini_pick
-          },
-          diff = {
-            provider = "default", -- default|mini_diff
-          },
+      },
+      display = {
+        chat = {
+          show_settings = true,
+        },
+        action_palette = {
+          provider = "default", -- default|telescope|mini_pick
+        },
+        diff = {
+          provider = "default", -- default|mini_diff
         },
       },
       prompt_library = {
