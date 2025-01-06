@@ -144,6 +144,34 @@ return {
           gemini = gemini_fn,
           ollama = ollama_fn,
         },
+
+        strategies = {
+          chat = {
+            slash_commands = {
+              ["buffer"] = {
+                provider = "fzf_lua", -- default|telescope|mini_pick|fzf_lua
+              },
+
+              ["file"] = {
+                opts = {
+                  provider = "fzf_lua", -- default|telescope|mini_pick|fzf_lua
+                },
+              },
+
+              ["help"] = {
+                opts = {
+                  provider = "fzf_lua", -- telescope|mini_pick|fzf_lua
+                },
+              },
+
+              ["symbols"] = {
+                opts = {
+                  provider = "fzf_lua", -- default|telescope|mini_pick|fzf_lua
+                },
+              },
+            },
+          },
+        },
       }
 
       return vim.tbl_deep_extend("force", opts, custom_opts)
