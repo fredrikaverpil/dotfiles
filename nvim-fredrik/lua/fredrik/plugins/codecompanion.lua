@@ -136,47 +136,41 @@ return {
         },
       },
     },
-    opts = function(_, opts)
-      local custom_opts = {
-        adapters = {
-          anthropic = anthropic_fn,
-          openai = openai_fn,
-          gemini = gemini_fn,
-          ollama = ollama_fn,
-        },
+    opts = {
+      adapters = {
+        anthropic = anthropic_fn,
+        openai = openai_fn,
+        gemini = gemini_fn,
+        ollama = ollama_fn,
+      },
+      strategies = {
+        chat = {
+          slash_commands = {
+            ["buffer"] = {
+              provider = "fzf_lua", -- default|telescope|mini_pick|fzf_lua
+            },
 
-        strategies = {
-          chat = {
-            slash_commands = {
-              ["buffer"] = {
+            ["file"] = {
+              opts = {
                 provider = "fzf_lua", -- default|telescope|mini_pick|fzf_lua
               },
+            },
 
-              ["file"] = {
-                opts = {
-                  provider = "fzf_lua", -- default|telescope|mini_pick|fzf_lua
-                },
+            ["help"] = {
+              opts = {
+                provider = "fzf_lua", -- telescope|mini_pick|fzf_lua
               },
+            },
 
-              ["help"] = {
-                opts = {
-                  provider = "fzf_lua", -- telescope|mini_pick|fzf_lua
-                },
-              },
-
-              ["symbols"] = {
-                opts = {
-                  provider = "fzf_lua", -- default|telescope|mini_pick|fzf_lua
-                },
+            ["symbols"] = {
+              opts = {
+                provider = "fzf_lua", -- default|telescope|mini_pick|fzf_lua
               },
             },
           },
         },
-      }
-
-      return vim.tbl_deep_extend("force", opts, custom_opts)
-    end,
-
+      },
+    },
     config = function(_, opts)
       require("codecompanion").setup(opts)
     end,
