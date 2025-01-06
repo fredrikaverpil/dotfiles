@@ -2,7 +2,7 @@
 --    CodeCompanionSave [space delimited args]
 --    CodeCompanionLoad
 -- Save will save current chat in a md file named 'space-delimited-args.md'
--- Load will use a telescope filepicker to open a previously saved chat
+-- Load will use a telescope filepicker to open a previously saved chat and open it in a new chat buffer
 
 -- create a folder to store our chats
 local Path = require("plenary.path")
@@ -17,18 +17,67 @@ vim.api.nvim_create_user_command("CodeCompanionLoad", function()
   local t_builtin = require("telescope.builtin")
   local t_actions = require("telescope.actions")
   local t_action_state = require("telescope.actions.state")
+  local t_pickers = require("telescope.pickers")
+  local t_finders = require("telescope.finders")
+  local t_conf = require("telescope.config").values
+
+  -- list of supported adapters
+  local adapters = {
+    "anthropic",
+    "openai",
+    "gemini",
+    "ollama",
+  }
+
+  local function select_adapter(filepath)
+    local picker = t_pickers.new({}, {
+      prompt_title = "Select CodeCompanion Adapter",
+      finder = t_finders.new_table({
+        results = adapters,
+      }),
+      sorter = t_conf.generic_sorter({}),
+      attach_mappings = function(prompt_bufnr, _)
+        t_actions.select_default:replace(function()
+          t_actions.close(prompt_bufnr)
+          local selection = t_action_state.get_selected_entry()
+          local adapter = selection[1]
+
+          -- Open new CodeCompanion chat with selected adapter
+          vim.cmd("CodeCompanionChat " .. adapter)
+
+          -- Read contents of saved chat file
+          local lines = vim.fn.readfile(filepath)
+
+          -- Get the current buffer (which should be the new CodeCompanion chat)
+          local current_buf = vim.api.nvim_get_current_buf()
+
+          -- Paste contents into the new chat buffer
+          vim.api.nvim_buf_set_lines(current_buf, 0, -1, false, lines)
+        end)
+        return true
+      end,
+    })
+    picker:find()
+  end
 
   local function start_picker()
     t_builtin.find_files({
       prompt_title = "Saved CodeCompanion Chats | <c-d>: delete",
       cwd = save_folder:absolute(),
-      attach_mappings = function(_, map)
-        map("i", "<c-d>", function(prompt_bufnr)
+      attach_mappings = function(prompt_bufnr, map)
+        map("i", "<c-d>", function()
           local selection = t_action_state.get_selected_entry()
           local filepath = selection.path or selection.filename
           os.remove(filepath)
           t_actions.close(prompt_bufnr)
           start_picker()
+        end)
+
+        t_actions.select_default:replace(function()
+          local selection = t_action_state.get_selected_entry()
+          local filepath = selection.path or selection.filename
+          t_actions.close(prompt_bufnr)
+          select_adapter(filepath)
         end)
         return true
       end,
