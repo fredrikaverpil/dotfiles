@@ -1153,9 +1153,10 @@ function M.setup_codecompanion_keymaps()
           vim.cmd("CodeCompanionSave " .. name)
         end
       end,
-      desc = "Codecompanion save",
+      desc = "Codecompanion Save chat",
     },
-    { "<leader>aL", ":CodeCompanionLoad<CR>", desc = "Codecompanion load" },
+    { "<leader>aL", ":CodeCompanionLoad<CR>", desc = "Codecompanion Load chat" },
+    { "<leader>aP", ":CodeCompanionActions<CR>", desc = "Codecompanion Prompts" },
   }
 end
 
