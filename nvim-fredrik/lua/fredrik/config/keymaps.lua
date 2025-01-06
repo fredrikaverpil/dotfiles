@@ -1146,10 +1146,4 @@ function M.setup_codecompanion_keymaps()
   }
 end
 
-function M.setup_avante_keymaps()
-  return {
-    { "<leader>aa", ":AvanteAsk<CR>", desc = "Avante" },
-  }
-end
-
 return M
