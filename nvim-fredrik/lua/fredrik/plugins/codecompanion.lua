@@ -186,6 +186,14 @@ return {
       },
     },
     opts = {
+
+      opts = {
+        -- If this is false then any default prompt that is marked as containing code
+        -- will not be sent to the LLM. Please note that whilst I have made every
+        -- effort to ensure no code leakage, using this is at your own risk
+        send_code = require("fredrik.utils.private").is_ai_enabled(), -- WARNING: not foolproof...
+      },
+
       adapters = {
         anthropic = anthropic_fn,
         openai = openai_fn,
