@@ -1143,6 +1143,19 @@ function M.setup_codecompanion_keymaps()
     { "<leader>ao", ":CodeCompanionChat openai<CR>", desc = "Codecompanion: OpenAI" },
     { "<leader>ag", ":CodeCompanionChat gemini<CR>", desc = "Codecompanion: Gemini" },
     { "<leader>al", ":CodeCompanionChat ollama<CR>", desc = "Codecompanion: Ollama" },
+
+    { "<leader>at", ":CodeCompanionChat Toggle<CR>", desc = "Codecompanion toggle" },
+    {
+      "<leader>aS",
+      function()
+        local name = vim.fn.input("Save as: ")
+        if name and name ~= "" then
+          vim.cmd("CodeCompanionSave " .. name)
+        end
+      end,
+      desc = "Codecompanion save",
+    },
+    { "<leader>aL", ":CodeCompanionLoad<CR>", desc = "Codecompanion load" },
   }
 end
 
