@@ -202,6 +202,7 @@ return {
       },
       strategies = {
         chat = {
+          adapter = "anthropic",
           slash_commands = {
             ["buffer"] = {
               opts = {
@@ -226,6 +227,20 @@ return {
                 provider = "fzf_lua", -- default|telescope|mini_pick|fzf_lua
               },
             },
+          },
+        },
+        inline = {
+          adapter = "copilot",
+        },
+        cmd = {
+          adapter = "copilot",
+        },
+        display = {
+          action_palette = {
+            provider = "default", -- default|telescope|mini_pick
+          },
+          diff = {
+            provider = "default", -- default|mini_diff
           },
         },
       },
