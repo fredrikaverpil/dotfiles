@@ -72,7 +72,7 @@ local openai_fn = function()
   return require("codecompanion.adapters").extend("openai", openai_config)
 end
 
---- OpenAI config for CodeCompanion.
+--- Gemini config for CodeCompanion.
 local gemini_fn = function()
   local gemini_config = {
     env = { api_key = "cmd:op read op://Personal/Google/tokens/gemini --no-newline" },
