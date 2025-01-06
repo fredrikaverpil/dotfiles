@@ -12,6 +12,60 @@ if not save_folder:exists() then
   save_folder:mkdir({ parents = true })
 end
 
+--- Anthropic config for CodeCompanion.
+local anthropic_fn = function()
+  local anthropic_config = {
+    env = { api_key = "cmd:op read op://Personal/Anthropic/tokens/neovim --no-newline" },
+  }
+  return require("codecompanion.adapters").extend("anthropic", anthropic_config)
+end
+
+--- OpenAI config for CodeCompanion.
+local openai_fn = function()
+  local openai_config = {
+    env = { api_key = "cmd:op read op://Personal/OpenAI/tokens/neovim --no-newline" },
+  }
+  return require("codecompanion.adapters").extend("openai", openai_config)
+end
+
+--- Gemini config for CodeCompanion.
+local gemini_fn = function()
+  local gemini_config = {
+    env = { api_key = "cmd:op read op://Personal/Google/tokens/gemini --no-newline" },
+    schema = {
+      model = {
+        default = "gemini-2.0-flash-exp",
+      },
+    },
+  }
+  return require("codecompanion.adapters").extend("gemini", gemini_config)
+end
+
+--- Ollama config for CodeCompanion.
+local ollama_fn = function()
+  return require("codecompanion.adapters").extend("ollama", {
+    schema = {
+      model = {
+        default = "llama3.1:8b",
+        -- default = "codellama:7b",
+      },
+      num_ctx = {
+        default = 16384,
+      },
+      num_predict = {
+        default = -1,
+      },
+    },
+  })
+end
+
+local supported_adapters = {
+  anthropic = anthropic_fn,
+  openai = openai_fn,
+  gemini = gemini_fn,
+  ollama = ollama_fn,
+}
+
 -- telescope picker for our saved chats
 vim.api.nvim_create_user_command("CodeCompanionLoad", function()
   local t_builtin = require("telescope.builtin")
@@ -21,19 +75,11 @@ vim.api.nvim_create_user_command("CodeCompanionLoad", function()
   local t_finders = require("telescope.finders")
   local t_conf = require("telescope.config").values
 
-  -- list of supported adapters
-  local adapters = {
-    "anthropic",
-    "openai",
-    "gemini",
-    "ollama",
-  }
-
   local function select_adapter(filepath)
     local picker = t_pickers.new({}, {
       prompt_title = "Select CodeCompanion Adapter",
       finder = t_finders.new_table({
-        results = adapters,
+        results = vim.tbl_keys(supported_adapters),
       }),
       sorter = t_conf.generic_sorter({}),
       attach_mappings = function(prompt_bufnr, _)
@@ -105,53 +151,6 @@ vim.api.nvim_create_user_command("CodeCompanionSave", function(opts)
   save_path:write(table.concat(lines, "\n"), "w")
 end, { nargs = "*" })
 
---- Anthropic config for CodeCompanion.
-local anthropic_fn = function()
-  local anthropic_config = {
-    env = { api_key = "cmd:op read op://Personal/Anthropic/tokens/neovim --no-newline" },
-  }
-  return require("codecompanion.adapters").extend("anthropic", anthropic_config)
-end
-
---- OpenAI config for CodeCompanion.
-local openai_fn = function()
-  local openai_config = {
-    env = { api_key = "cmd:op read op://Personal/OpenAI/tokens/neovim --no-newline" },
-  }
-  return require("codecompanion.adapters").extend("openai", openai_config)
-end
-
---- Gemini config for CodeCompanion.
-local gemini_fn = function()
-  local gemini_config = {
-    env = { api_key = "cmd:op read op://Personal/Google/tokens/gemini --no-newline" },
-    schema = {
-      model = {
-        default = "gemini-2.0-flash-exp",
-      },
-    },
-  }
-  return require("codecompanion.adapters").extend("gemini", gemini_config)
-end
-
---- Ollama config for CodeCompanion.
-local ollama_fn = function()
-  return require("codecompanion.adapters").extend("ollama", {
-    schema = {
-      model = {
-        default = "llama3.1:8b",
-        -- default = "codellama:7b",
-      },
-      num_ctx = {
-        default = 16384,
-      },
-      num_predict = {
-        default = -1,
-      },
-    },
-  })
-end
-
 return {
   {
     "olimorris/codecompanion.nvim",
@@ -188,18 +187,12 @@ return {
     opts = {
 
       opts = {
-        -- If this is false then any default prompt that is marked as containing code
-        -- will not be sent to the LLM. Please note that whilst I have made every
-        -- effort to ensure no code leakage, using this is at your own risk
-        send_code = require("fredrik.utils.private").is_ai_enabled(), -- WARNING: not foolproof...
+        -- WARNING: send_code does not accept a function. It should be evaluated each time CWD changes.
+        send_code = require("fredrik.utils.private").is_ai_enabled(),
       },
 
-      adapters = {
-        anthropic = anthropic_fn,
-        openai = openai_fn,
-        gemini = gemini_fn,
-        ollama = ollama_fn,
-      },
+      adapters = supported_adapters,
+
       strategies = {
         chat = {
           adapter = "anthropic",
