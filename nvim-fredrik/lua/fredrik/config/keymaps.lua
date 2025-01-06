@@ -1117,14 +1117,6 @@ function M.setup_venv_selector_keymaps()
   }
 end
 
--- ai tooling keymaps
-
-function M.setup_chatgpt_keymaps()
-  return {
-    { "<leader>aj", ":ChatGPT<CR>", desc = "ChatGPT (jackmort)" },
-  }
-end
-
 function M.setup_copilot_chat_keymaps(chat)
   return {
     {
