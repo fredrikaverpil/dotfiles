@@ -9,7 +9,7 @@ local M = {}
 
 ---@type table<string, Prompt>
 M.prompts = {
-  code_review = {
+  ["Code review"] = {
     description = "Review the provided code",
     prompt = "Review the provided code and suggest improvements.",
     system_prompt = [[Analyze the code for:
@@ -62,7 +62,7 @@ Format findings as markdown and with:
     user_prompt = "Please review this code and provide specific, actionable feedback:",
   },
 
-  explain_code = {
+  ["Explain code"] = {
     description = "Explain how the code works",
     prompt = "Please explain how this code works in detail.",
     system_prompt = "You are an expert programmer skilled at explaining complex code in a clear and concise manner. Break down the explanation into logical components and highlight key concepts.",
