@@ -44,6 +44,8 @@ return {
     },
     opts = {
       servers = {
+        -- TODO: evaluate https://github.com/yayolande/go-template-lsp
+
         ---@type vim.lsp.Config
         gopls = {
           filetypes = filetypes,
