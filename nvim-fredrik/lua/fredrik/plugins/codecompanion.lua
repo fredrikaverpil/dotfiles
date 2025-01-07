@@ -173,8 +173,9 @@ return {
     opts = {
 
       opts = {
-        -- WARNING: send_code does not accept a function. It should be evaluated each time CWD changes.
-        send_code = require("fredrik.utils.private").is_ai_enabled(),
+        send_code = function()
+          return require("fredrik.utils.private").is_ai_enabled()
+        end,
       },
 
       adapters = supported_adapters,
