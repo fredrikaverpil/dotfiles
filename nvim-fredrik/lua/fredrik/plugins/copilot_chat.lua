@@ -13,6 +13,7 @@ return {
     opts = {
       debug = false, -- Enable debugging
       model = "claude-3.5-sonnet",
+      prompts = require("fredrik.utils.llm_prompts").to_copilot(),
     },
     keys = function()
       local chat = require("CopilotChat")
