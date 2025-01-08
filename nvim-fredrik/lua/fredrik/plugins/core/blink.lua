@@ -18,7 +18,10 @@ return {
       keymap = require("fredrik.config.keymaps").setup_blink_cmp_keymaps(),
       completion = {
         list = {
-          selection = "manual",
+          selection = {
+            preselect = false,
+            auto_insert = false,
+          },
         },
         documentation = {
           auto_show = true,
