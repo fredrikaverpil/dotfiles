@@ -27,3 +27,6 @@ override.tf
 # minimal.lua, repro.lua
 nvim_issue
 .repro
+
+# Work related, e.g. zsh-completion
+/work
