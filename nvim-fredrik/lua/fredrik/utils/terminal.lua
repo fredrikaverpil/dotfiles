@@ -13,7 +13,7 @@ local terminal_state = {
 --- If terminal exists but is hidden, shows it
 --- If terminal is visible, hides it
 --- @return nil
-function M.toggle_terminal()
+function M.toggle_split_terminal()
   -- If terminal buffer exists, check if it's visible
   if terminal_state.buf and vim.api.nvim_buf_is_valid(terminal_state.buf) then
     local wins = vim.api.nvim_list_wins()

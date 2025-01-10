@@ -907,11 +907,11 @@ function M.setup_terminal_keymaps()
   end
 
   return {
-    { ctrl_alt_slash, require("fredrik.utils.terminal").toggle_terminal, mode = { "n", "i", "t", "v" }, desc = "Toggle terminal" },
-    { ctrl_alt_underscore, require("fredrik.utils.terminal").toggle_terminal, mode = { "n", "i", "t", "v" }, desc = "Toggle terminal" },
+    { ctrl_alt_slash, require("fredrik.utils.terminal").toggle_split_terminal, mode = { "n", "i", "t", "v" }, desc = "Toggle split terminal" },
+    { ctrl_alt_underscore, require("fredrik.utils.terminal").toggle_split_terminal, mode = { "n", "i", "t", "v" }, desc = "Toggle split terminal" },
 
-    { ctrl_slash, floating_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle native terminal" },
-    { ctrl_underscore, floating_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle native terminal" },
+    { ctrl_slash, floating_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle floating terminal" },
+    { ctrl_underscore, floating_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle floating terminal" },
 
     { ctrl_slash, "<cmd>close<cr>", mode = { "t" }, desc = "Hide Terminal" },
     { ctrl_underscore, "<cmd>close<cr>", mode = { "t" }, desc = "which_key_ignore" },
