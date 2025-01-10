@@ -912,6 +912,9 @@ function M.setup_terminal_keymaps()
 
     { ctrl_slash, floating_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle native terminal" },
     { ctrl_underscore, floating_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle native terminal" },
+
+    { ctrl_slash, "<cmd>close<cr>", mode = { "t" }, desc = "Hide Terminal" },
+    { ctrl_underscore, "<cmd>close<cr>", mode = { "t" }, desc = "which_key_ignore" },
   }
 end
 
