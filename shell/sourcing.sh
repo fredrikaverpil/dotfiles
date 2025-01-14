@@ -114,14 +114,14 @@ if [[ $shell == "zsh" ]]; then
   zsh_completion
   if [ -n "$brew_prefix" ]; then
     source <(fzf --zsh)
-    source <(pkgx --shellcode)
+    source <(pkgx dev --shellcode)
   fi
 
 elif [[ $shell == "bash" ]]; then
   bash_completion
   if [ -n "$brew_prefix" ]; then
     eval "$(fzf --bash)"
-    eval "$(pkgx --shellcode)"
+    eval "$(pkgx dev --shellcode)"
   fi
 
 fi
