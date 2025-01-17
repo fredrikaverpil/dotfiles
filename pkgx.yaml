@@ -6,4 +6,5 @@ dependencies:
   - python
   - go
   - lua
-  - rust
+  - cargo
+  - rustup
