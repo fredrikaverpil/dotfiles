@@ -46,17 +46,17 @@ return {
       terminal = {},
 
       ---@class snacks.dashboard.Config
-      -- dashboard = {
-      --   enabled = true,
-      --   preset = {
-      --     keys = {
-      --       { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
-      --       { icon = " ", key = "r", desc = "Recent Files", action = ":lua Snacks.dashboard.pick('oldfiles')" },
-      --       { icon = " ", key = "s", desc = "Restore Session", section = "session" },
-      --       { icon = " ", key = "q", desc = "Quit", action = ":qa" },
-      --     },
-      --   },
-      -- },
+      dashboard = {
+        enabled = true,
+        preset = {
+          keys = {
+            { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
+            { icon = " ", key = "r", desc = "Recent Files", action = ":lua Snacks.dashboard.pick('oldfiles')" },
+            { icon = " ", key = "s", desc = "Restore Session", section = "session" },
+            { icon = " ", key = "q", desc = "Quit", action = ":qa" },
+          },
+        },
+      },
 
       -- special mode
       zen = {

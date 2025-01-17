@@ -35,9 +35,10 @@ return {
     config = function(_, opts)
       require("persistence").setup(opts)
 
-      vim.schedule(function()
-        require("persistence").load()
-      end)
+      -- Auto-load the last session when starting Neovim
+      -- vim.schedule(function()
+      --   require("persistence").load()
+      -- end)
     end,
   },
 }
