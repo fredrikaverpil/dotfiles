@@ -84,6 +84,7 @@
   "todo-comments.nvim": { "branch": "main", "commit": "304a8d204ee787d2544d8bc23cd38d2f929e7cc5" },
   "tokyonight.nvim": { "branch": "main", "commit": "775f82f08a3d1fb55a37fc6d3a4ab10cd7ed8a10" },
   "trouble.nvim": { "branch": "main", "commit": "50481f414bd3c1a40122c1d759d7e424d5fafe84" },
+  "ts-comments.nvim": { "branch": "main", "commit": "872dcfa0418f4a33b7437fb4d9f4e89f2f000d74" },
   "typr": { "branch": "main", "commit": "a60c7f237be94d4b39228a3bd2ced80fe9fe2781" },
   "undotree": { "branch": "master", "commit": "2556c6800b210b2096b55b66e74b4cc1d9ebbe4f" },
   "venv-selector.nvim": { "branch": "regexp", "commit": "e82594274bf7b54387f9a2abe65f74909ac66e97" },
