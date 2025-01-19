@@ -19,6 +19,23 @@ local function tmux_is_running()
   return found
 end
 
+local function set_tmux(style)
+  if not tmux_is_running() then
+    return
+  end
+
+  local tmux_theme = ""
+  if style == "dark" then
+    tmux_theme = vim.fn.expand("~/.local/share/fredrik/lazy/tokyonight.nvim/extras/tmux/tokyonight_moon.tmux")
+  elseif style == "light" then
+    tmux_theme = vim.fn.expand("~/.local/share/fredrik/lazy/nightfox.nvim/extra/dayfox/dayfox.tmux")
+  end
+
+  if vim.fn.filereadable(tmux_theme) == 1 then
+    os.execute("tmux source-file " .. tmux_theme)
+  end
+end
+
 return {
   {
     "f-person/auto-dark-mode.nvim",
@@ -33,17 +50,11 @@ return {
       update_interval = 3000, -- milliseconds
       set_dark_mode = function()
         set_dark()
-        local tmux_theme = vim.fn.expand("~/.tmux/plugins/tokyonight.nvim/extras/tmux/tokyonight_moon.tmux")
-        if tmux_is_running() and vim.fn.filereadable(tmux_theme) == 1 then
-          os.execute("tmux source-file " .. tmux_theme)
-        end
+        set_tmux("dark")
       end,
       set_light_mode = function()
         set_light()
-        local tmux_theme = vim.fn.expand("~/.local/share/fredrik/lazy/nightfox.nvim/extra/dayfox/dayfox.tmux")
-        if tmux_is_running() and vim.fn.filereadable(tmux_theme) == 1 then
-          os.execute("tmux source-file " .. tmux_theme)
-        end
+        set_tmux("light")
       end,
     },
   },
