@@ -33,7 +33,7 @@ return {
         enabled = true,
         priority = 1,
         animate = {
-          enabled = true,
+          enabled = false,
           style = "out",
           easing = "linear",
           duration = {
