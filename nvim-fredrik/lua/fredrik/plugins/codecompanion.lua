@@ -32,12 +32,12 @@ local ollama_fn = function()
   return require("codecompanion.adapters").extend("ollama", {
     schema = {
       model = {
-        default = "deepseek-r1:8b",
+        default = "deepseek-r1:7b",
         -- default = "llama3.1:7b",
         -- default = "codellama:7b",
       },
       num_ctx = {
-        default = 16384,
+        default = 131072, -- deepseek-r1:7b and 8b
       },
       num_predict = {
         default = -1,
