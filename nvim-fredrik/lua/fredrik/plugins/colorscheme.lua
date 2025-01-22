@@ -80,13 +80,13 @@ return {
     lazy = true,
     ---@class tokyonight.Config
     opts = {
-      -- transparent = true, -- Enable transparency
-      -- styles = {
-      --   -- Background styles. Can be "dark", "transparent" or "normal"
-      --   sidebars = "dark",
-      --   floats = "transparent",
-      -- },
-      dim_inactive = true, -- dims inactive windows
+      transparent = false, -- Enable transparency
+      styles = {
+        -- Background styles. Can be "dark", "transparent" or "normal"
+        sidebars = "dark",
+        floats = "dark",
+      },
+      dim_inactive = false, -- dims inactive windows
     },
   },
   {
