@@ -37,7 +37,7 @@ local ollama_fn = function()
         -- default = "codellama:7b",
       },
       num_ctx = {
-        default = 131072, -- deepseek-r1:7b and 8b
+        default = 16384,
       },
       num_predict = {
         default = -1,
