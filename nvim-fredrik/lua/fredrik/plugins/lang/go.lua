@@ -18,6 +18,9 @@ local function golangcilint_args()
     "--out-format",
     "json",
     "--issues-exit-code=0",
+    "--show-stats=false",
+    "--print-issued-lines=false",
+    "--print-linter-name=false",
 
     -- config file
     function()
