@@ -1,4 +1,3 @@
---- Anthropic config for CodeCompanion.
 local anthropic_fn = function()
   local anthropic_config = {
     env = { api_key = "cmd:op read op://Personal/Anthropic/tokens/neovim --no-newline" },
@@ -6,7 +5,6 @@ local anthropic_fn = function()
   return require("codecompanion.adapters").extend("anthropic", anthropic_config)
 end
 
---- OpenAI config for CodeCompanion.
 local openai_fn = function()
   local openai_config = {
     env = { api_key = "cmd:op read op://Personal/OpenAI/tokens/neovim --no-newline" },
@@ -14,7 +12,6 @@ local openai_fn = function()
   return require("codecompanion.adapters").extend("openai", openai_config)
 end
 
---- Gemini config for CodeCompanion.
 local gemini_fn = function()
   local gemini_config = {
     env = { api_key = "cmd:op read op://Personal/Google/tokens/gemini --no-newline" },
@@ -25,6 +22,18 @@ local gemini_fn = function()
     },
   }
   return require("codecompanion.adapters").extend("gemini", gemini_config)
+end
+
+local deepseek_fn = function()
+  local deepseek_config = {
+    env = { api_key = "cmd:op read op://Personal/DeepSeek/tokens/neovim --no-newline" },
+    -- schema = {
+    --   model = {
+    --     default = "deepseek-reasoner",
+    --   },
+    -- },
+  }
+  return require("codecompanion.adapters").extend("deepseek", deepseek_config)
 end
 
 --- Ollama config for CodeCompanion.
@@ -50,6 +59,7 @@ local supported_adapters = {
   anthropic = anthropic_fn,
   openai = openai_fn,
   gemini = gemini_fn,
+  deepseek = deepseek_fn,
   ollama = ollama_fn,
 }
 

@@ -1086,6 +1086,7 @@ function M.setup_codecompanion_keymaps()
     { "<leader>ac", ":CodeCompanionChat anthropic<CR>", desc = "Codecompanion: Claude" },
     { "<leader>ao", ":CodeCompanionChat openai<CR>", desc = "Codecompanion: OpenAI" },
     { "<leader>ag", ":CodeCompanionChat gemini<CR>", desc = "Codecompanion: Gemini" },
+    { "<leader>ad", ":CodeCompanionChat deepseek<CR>", desc = "Codecompanion: DeepSeek" },
     { "<leader>al", ":CodeCompanionChat ollama<CR>", desc = "Codecompanion: Ollama" },
 
     { "<leader>at", ":CodeCompanionChat Toggle<CR>", desc = "Codecompanion toggle" },
