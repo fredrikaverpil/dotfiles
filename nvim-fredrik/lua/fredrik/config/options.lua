@@ -115,9 +115,8 @@ vim.opt.exrc = true -- allow local .nvim.lua .vimrc .exrc files
 vim.opt.secure = true -- disable shell and write commands in local .nvim.lua .vimrc .exrc files
 
 -- sync with system clipboard
--- FIXME: https://github.com/neovim/neovim/issues/11804
--- vim.opt.clipboard = "unnamedplus"
-vim.opt.clipboard = "" -- See keymaps.lua for clipboard mapping
+-- NOTE: https://github.com/neovim/neovim/issues/11804
+vim.opt.clipboard = "unnamedplus"
 
 -- TODO: pick from https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 vim.opt.listchars = "tab:▸ ,trail:·,nbsp:␣,extends:❯,precedes:❮" -- show symbols for whitespace

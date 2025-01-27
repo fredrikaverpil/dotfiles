@@ -1,8 +1,5 @@
 M = {}
 
--- instead of vim.opt.clipboard="unnamedplus", see options.lua for details
-vim.keymap.set({ "v", "n" }, "<leader>y", '"+y', { desc = "Copy to system clipboard" })
-
 -- windows
 vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to left window", silent = true, noremap = true })
 vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to lower window", silent = true, noremap = true })
