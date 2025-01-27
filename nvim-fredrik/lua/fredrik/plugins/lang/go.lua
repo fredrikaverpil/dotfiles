@@ -17,6 +17,7 @@ local function golangcilint_args()
     "run",
     "--out-format",
     "json",
+    "--issues-exit-code=0",
 
     -- config file
     function()
@@ -109,7 +110,10 @@ return {
       opts.linters = opts.linters or {}
 
       opts.linters_by_ft["go"] = { "golangcilint" }
-      opts.linters["golangcilint"] = { args = golangcilint_args() }
+      opts.linters["golangcilint"] = {
+        args = golangcilint_args(),
+        ignore_exitcode = true, -- NOTE: https://github.com/mfussenegger/nvim-lint/commit/3d5190d318e802de3a503b74844aa87c2cd97ef0
+      }
     end,
   },
 
