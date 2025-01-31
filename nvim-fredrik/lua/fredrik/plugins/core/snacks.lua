@@ -72,6 +72,11 @@ return {
           diagnostics = true,
           -- inlay_hints = false,
         },
+        win = {
+          backdrop = {
+            transparent = false,
+          },
+        },
       },
 
       -- convenience
