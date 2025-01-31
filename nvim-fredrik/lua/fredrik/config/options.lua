@@ -105,7 +105,7 @@ function M.lsp_foldexpr()
 end
 
 -- scroll off
-vim.opt.scrolloff = 8
+vim.opt.scrolloff = 4
 
 -- mouse support in all modes
 vim.opt.mouse = "a"
