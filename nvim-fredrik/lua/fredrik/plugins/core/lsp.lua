@@ -186,11 +186,12 @@ return {
         opts.servers[server].capabilities = extended_capabilities
       end
 
-      if not require("fredrik.utils.version").is_neovim_0_11_0() then
-        -- FIXME: workaround for https://github.com/neovim/neovim/issues/28058
-        for server, server_opts in pairs(opts.servers) do
+      for server, server_opts in pairs(opts.servers) do
+        if server == "gopls" then
+          -- FIXME: workaround for https://github.com/neovim/neovim/issues/28058
           for _, v in pairs(server_opts) do
             if type(v) == "table" and v.workspace then
+              -- vim.notify(vim.inspect("Disabling workspace/didChangeWatchedFiles for " .. server), vim.log.levels.INFO)
               v.workspace.didChangeWatchedFiles = {
                 dynamicRegistration = false,
                 relativePatternSupport = false,
