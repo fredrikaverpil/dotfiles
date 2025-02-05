@@ -31,10 +31,10 @@ vim.opt.number = true
 vim.opt.relativenumber = false
 
 -- set tab and indents defaults (can be overridden by per-language configs)
-vim.opt.tabstop = 2
-vim.opt.softtabstop = 2
-vim.opt.shiftwidth = 2
-vim.opt.expandtab = true
+vim.opt.tabstop = 4 -- display tabs as 4 spaces
+vim.opt.softtabstop = 4 -- insert 4 spaces when tab is pressed
+vim.opt.shiftwidth = 4 -- indent << or >> by 4 spaces
+vim.opt.expandtab = false -- expand tab into spaces
 
 -- NOTE: do not set a global ruler here, as it will show in undesirable places.
 -- Instead, set this in the per-language config files.
