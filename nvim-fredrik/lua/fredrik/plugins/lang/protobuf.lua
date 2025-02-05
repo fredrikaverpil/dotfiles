@@ -5,7 +5,8 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.tabstop = 2
     vim.opt_local.shiftwidth = 2
     vim.opt_local.shiftwidth = 2
-    vim.opt_local.colorcolumn = "80"
+    -- disable color column
+    vim.opt_local.colorcolumn = "120" -- TODO: what does the buf formatter use?
   end,
 })
 
