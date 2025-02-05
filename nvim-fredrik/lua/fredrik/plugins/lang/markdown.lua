@@ -57,7 +57,7 @@ return {
     },
     opts = {
       linters_by_ft = {
-        markdown = { "markdownlint", "markdown-toc" },
+        markdown = { "markdownlint" },
       },
     },
   },
