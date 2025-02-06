@@ -816,6 +816,13 @@ function M.setup_dap_keymaps()
       desc = "[d]ebug [s]ession",
     },
     {
+      "<leader>dS",
+      function()
+        require("dap").restart()
+      end,
+      desc = "[d]ebug re[S]tart",
+    },
+    {
       "<leader>dt",
       function()
         require("dap").terminate()
