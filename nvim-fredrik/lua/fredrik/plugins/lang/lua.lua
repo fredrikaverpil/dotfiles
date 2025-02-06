@@ -1,3 +1,16 @@
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "lua" },
+  callback = function()
+    -- set go specific options
+    vim.opt.tabstop = 2
+    vim.opt.softtabstop = 2
+    vim.opt.shiftwidth = 2
+    vim.opt.expandtab = true
+
+    vim.opt_local.colorcolumn = "120"
+  end,
+})
+
 return {
 
   {
