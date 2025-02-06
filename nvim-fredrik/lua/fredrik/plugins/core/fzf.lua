@@ -2,6 +2,7 @@ return {
 
   {
     "ibhagwan/fzf-lua",
+    enabled = false, -- NOTE: use Snacks.picker instead
     lazy = false,
     dependencies = {
       "folke/trouble.nvim",
