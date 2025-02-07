@@ -2,10 +2,10 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = { "lua" },
   callback = function()
     -- set go specific options
-    vim.opt.tabstop = 2
-    vim.opt.softtabstop = 2
-    vim.opt.shiftwidth = 2
-    vim.opt.expandtab = true
+    vim.opt_local.tabstop = 2
+    vim.opt_local.softtabstop = 2
+    vim.opt_local.shiftwidth = 2
+    vim.opt_local.expandtab = true
 
     vim.opt_local.colorcolumn = "120"
   end,
@@ -103,7 +103,16 @@ return {
           -- reference: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/lua_ls.lua
           cmd = { "lua-language-server" },
           filetypes = { "lua" },
-          root_markers = { ".luarc.json", ".luarc.jsonc", ".luacheckrc", ".stylua.toml", "stylua.toml", "selene.toml", "selene.yml", ".git" },
+          root_markers = {
+            ".luarc.json",
+            ".luarc.jsonc",
+            ".luacheckrc",
+            ".stylua.toml",
+            "stylua.toml",
+            "selene.toml",
+            "selene.yml",
+            ".git",
+          },
           log_level = vim.lsp.protocol.MessageType.Warning,
           settings = {
             Lua = {
