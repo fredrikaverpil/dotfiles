@@ -1,11 +1,10 @@
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "go", "gomod", "gowork" },
   callback = function()
-    -- set go specific options
-    vim.opt.tabstop = 2
-    vim.opt.softtabstop = 2
-    vim.opt.shiftwidth = 2
-    vim.opt.expandtab = false
+    vim.opt_local.tabstop = 2
+    vim.opt_local.softtabstop = 2
+    vim.opt_local.shiftwidth = 2
+    vim.opt_local.expandtab = false
 
     vim.opt_local.colorcolumn = "120"
   end,
@@ -31,7 +30,10 @@ local function golangcilint_args()
         return golangci_config_file
       end
       local found
-      found = vim.fs.find({ ".golangci.yml", ".golangci.yaml", ".golangci.toml", ".golangci.json" }, { type = "file", limit = 1 })
+      found = vim.fs.find(
+        { ".golangci.yml", ".golangci.yaml", ".golangci.toml", ".golangci.json" },
+        { type = "file", limit = 1 }
+      )
       if #found == 1 then
         local filepath = found[1]
         golangci_config_file = filepath
@@ -275,6 +277,7 @@ return {
         },
         runner = "gotestsum",
         gotestsum_args = { "--format=standard-verbose" },
+        testify_enabled = true,
         -- sanitize_output = true,
         -- log_level = vim.log.levels.TRACE,
 
