@@ -5,6 +5,7 @@ return {
     event = "VeryLazy",
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {},
-    keys = require("fredrik.config.keymaps").setup_todo_keymaps(),
+    -- NOTE: keymaps through Snacks.picker
+    -- keys = require("fredrik.config.keymaps").setup_todo_keymaps(),
   },
 }
