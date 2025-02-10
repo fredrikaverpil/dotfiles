@@ -211,7 +211,7 @@ end
 function M.setup_typescript_lsp_keymaps()
   return {
     {
-      "gD",
+      "gS",
       function()
         require("vtsls").commands.goto_source_definition(0)
       end,
