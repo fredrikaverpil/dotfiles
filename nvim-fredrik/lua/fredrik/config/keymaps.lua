@@ -422,24 +422,24 @@ function M.setup_fzf_keymaps()
   }
 end
 
-function M.setup_todo_keymaps()
-  return {
-    {
-      "<leader>st",
-      function()
-        require("todo-comments.fzf").todo()
-      end,
-      desc = "Todo",
-    },
-    {
-      "<leader>sT",
-      function()
-        require("todo-comments.fzf").todo({ keywords = { "TODO", "FIX", "FIXME" } })
-      end,
-      desc = "Todo/Fix/Fixme",
-    },
-  }
-end
+-- function M.setup_todo_keymaps()
+--   return {
+--     {
+--       "<leader>st",
+--       function()
+--         require("todo-comments.fzf").todo()
+--       end,
+--       desc = "Todo",
+--     },
+--     {
+--       "<leader>sT",
+--       function()
+--         require("todo-comments.fzf").todo({ keywords = { "TODO", "FIX", "FIXME" } })
+--       end,
+--       desc = "Todo/Fix/Fixme",
+--     },
+--   }
+-- end
 
 function M.setup_persistence_keymaps()
   return {
@@ -675,6 +675,20 @@ function M.setup_snacks_keymaps()
         Snacks.picker.lazy()
       end,
       desc = "[s]earch [l]azy plugins",
+    },
+    {
+      "<leader>st",
+      function()
+        Snacks.picker.todo_comments()
+      end,
+      desc = "[s]earch [t]odo",
+    },
+    {
+      "<leader>sT",
+      function()
+        Snacks.picker.todo_comments({ keywords = { "TODO", "FIX", "FIXME" } })
+      end,
+      desc = "[s]earch [T]odo/Fix/Fixme",
     },
 
     -- git

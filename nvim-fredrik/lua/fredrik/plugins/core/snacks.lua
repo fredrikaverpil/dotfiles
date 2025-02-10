@@ -14,9 +14,8 @@ return {
           "options.disabled_filetypes",
         },
       },
-      {
-        "folke/trouble.nvim",
-      },
+      { "folke/trouble.nvim" },
+      { "folke/todo-comments.nvim" },
     },
     priority = 1000,
     lazy = false,
