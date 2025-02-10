@@ -461,7 +461,6 @@ end
 
 function M.setup_snacks_keymaps()
   -- NOTE: Snacks is a global; _G.Snacks = M
-  --
   return {
     -- misc
     {
