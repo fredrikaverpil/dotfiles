@@ -14,6 +14,9 @@ return {
           "options.disabled_filetypes",
         },
       },
+      {
+        "folke/trouble.nvim",
+      },
     },
     priority = 1000,
     lazy = false,
@@ -97,6 +100,21 @@ return {
           },
           git = {
             overrideGpg = true,
+          },
+        },
+      },
+
+      -- pickers
+      picker = {
+        actions = require("trouble.sources.snacks").actions,
+        win = {
+          input = {
+            keys = {
+              ["<c-t>"] = {
+                "trouble_open",
+                mode = { "n", "i" },
+              },
+            },
           },
         },
       },
