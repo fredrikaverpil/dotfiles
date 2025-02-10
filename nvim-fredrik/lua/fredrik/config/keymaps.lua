@@ -732,12 +732,42 @@ function M.setup_gitsigns_keymaps(bufnr)
     return "<Ignore>"
   end, { expr = true })
 
-  vim.keymap.set({ "n", "v" }, "<leader>ghb", ":Gitsigns change_base main", { buffer = bufnr, silent = false, noremap = true, desc = "change [b]ase" })
-  vim.keymap.set({ "n", "v" }, "<leader>ghs", ":Gitsigns stage_hunk<CR>", { buffer = bufnr, silent = true, noremap = true, desc = "[s]tage hunk" })
-  vim.keymap.set({ "n", "v" }, "<leader>ghS", ":Gitsigns stage_buffer<CR>", { buffer = bufnr, silent = true, noremap = true, desc = "[S]tage buffer" })
-  vim.keymap.set("n", "<leader>ghu", gs.undo_stage_hunk, { buffer = bufnr, silent = true, noremap = true, desc = "[u]ndo stage hunk" })
-  vim.keymap.set("n", "<leader>ghr", gs.reset_hunk, { buffer = bufnr, silent = true, noremap = true, desc = "[r]eset hunk" })
-  vim.keymap.set("n", "<leader>gbb", gs.blame, { buffer = bufnr, silent = true, noremap = true, desc = "[b]lame on the side" })
+  vim.keymap.set(
+    { "n", "v" },
+    "<leader>ghb",
+    ":Gitsigns change_base main",
+    { buffer = bufnr, silent = false, noremap = true, desc = "change [b]ase" }
+  )
+  vim.keymap.set(
+    { "n", "v" },
+    "<leader>ghs",
+    ":Gitsigns stage_hunk<CR>",
+    { buffer = bufnr, silent = true, noremap = true, desc = "[s]tage hunk" }
+  )
+  vim.keymap.set(
+    { "n", "v" },
+    "<leader>ghS",
+    ":Gitsigns stage_buffer<CR>",
+    { buffer = bufnr, silent = true, noremap = true, desc = "[S]tage buffer" }
+  )
+  vim.keymap.set(
+    "n",
+    "<leader>ghu",
+    gs.undo_stage_hunk,
+    { buffer = bufnr, silent = true, noremap = true, desc = "[u]ndo stage hunk" }
+  )
+  vim.keymap.set(
+    "n",
+    "<leader>ghr",
+    gs.reset_hunk,
+    { buffer = bufnr, silent = true, noremap = true, desc = "[r]eset hunk" }
+  )
+  vim.keymap.set(
+    "n",
+    "<leader>gbb",
+    gs.blame,
+    { buffer = bufnr, silent = true, noremap = true, desc = "[b]lame on the side" }
+  )
 end
 
 function M.setup_neogit_keymaps()
@@ -1111,8 +1141,18 @@ function M.setup_terminal_keymaps()
   end
 
   return {
-    { ctrl_alt_slash, require("fredrik.utils.terminal").toggle_split_terminal, mode = { "n", "i", "t", "v" }, desc = "Toggle split terminal" },
-    { ctrl_alt_underscore, require("fredrik.utils.terminal").toggle_split_terminal, mode = { "n", "i", "t", "v" }, desc = "Toggle split terminal" },
+    {
+      ctrl_alt_slash,
+      require("fredrik.utils.terminal").toggle_split_terminal,
+      mode = { "n", "i", "t", "v" },
+      desc = "Toggle split terminal",
+    },
+    {
+      ctrl_alt_underscore,
+      require("fredrik.utils.terminal").toggle_split_terminal,
+      mode = { "n", "i", "t", "v" },
+      desc = "Toggle split terminal",
+    },
 
     { ctrl_slash, floating_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle floating terminal" },
     { ctrl_underscore, floating_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle floating terminal" },
