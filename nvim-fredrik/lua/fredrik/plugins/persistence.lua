@@ -32,7 +32,7 @@ return {
       -- https://neovim.io/doc/user/options.html#'sessionoptions'
       vim.opt.sessionoptions = "curdir,folds,help,winsize,winpos,localoptions"
     end,
-    keys = require("fredrik.config.keymaps").setup_auto_session_keymaps(),
+    keys = require("fredrik.config.keymaps").setup_persistence_keymaps(),
     config = function(_, opts)
       require("persistence").setup(opts)
 

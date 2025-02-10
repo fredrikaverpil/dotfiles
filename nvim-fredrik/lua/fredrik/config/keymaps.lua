@@ -440,7 +440,7 @@ function M.setup_todo_keymaps()
   }
 end
 
-function M.setup_auto_session_keymaps()
+function M.setup_persistence_keymaps()
   return {
     {
       "<leader>ss",
