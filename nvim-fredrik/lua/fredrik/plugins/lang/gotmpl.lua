@@ -57,14 +57,18 @@ return {
             },
           },
         },
+
         ---@type vim.lsp.Config
-        html = { filetypes = filetypes, settings = { html = {} } },
+        superhtml = { filetypes = filetypes, settings = { superhtml = {} } },
+
+        -- FIXME: causes issues if enabled
         -- htmx = { filetypes = filetypes, settings = { htmx = {} } },
       },
     },
     opts_extend = {
       "servers.gopls.filetypes",
       "servers.gopls.settings.gopls.templateExtensions",
+      "servers.superhtml.filetypes",
     },
   },
 }
