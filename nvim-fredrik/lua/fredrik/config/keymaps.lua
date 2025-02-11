@@ -1150,7 +1150,7 @@ function M.setup_terminal_keymaps()
   local floating_term_cmd = function()
     local cmd = { "zsh" }
     local opts = { cwd = vim.fn.getcwd() }
-    Snncks.terminal.toggle(cmd, opts)
+    Snacks.terminal.toggle(cmd, opts)
   end
 
   return {
