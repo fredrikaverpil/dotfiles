@@ -31,6 +31,7 @@
   "shellcheck": "v0.10.0",
   "shfmt": "v3.10.0",
   "stylua": "v2.0.2",
+  "superhtml": "v0.5.3",
   "taplo": "0.9.3",
   "templ": "v0.3.833",
   "terraform-ls": "v0.36.4",
