@@ -466,7 +466,7 @@ function M.setup_snacks_keymaps()
     {
       "<leader><leader>",
       function()
-        local opts = { hidden = true, ignored = true, exclude = { "*.pb.go" } }
+        local opts = { hidden = true, ignored = true, exclude = { "*.pb.go", ".venv/*", ".mypy_cache/*", ".repro/*" } }
         Snacks.picker.smart(opts)
       end,
       desc = "Files",
@@ -475,7 +475,7 @@ function M.setup_snacks_keymaps()
       "<leader>/",
       function()
         ---@class snacks.picker.grep.Config: snacks.picker.proc.Config
-        local opts = { hidden = true, ignored = true, exclude = { "*.pb.go" } }
+        local opts = { hidden = true, ignored = true, exclude = { "*.pb.go", ".venv/*", ".mypy_cache/*", ".repro/*" } }
         Snacks.picker.grep(opts)
       end,
       desc = "Grep",
