@@ -466,7 +466,12 @@ function M.setup_snacks_keymaps()
     {
       "<leader><leader>",
       function()
-        local opts = { hidden = true, ignored = true, exclude = { "*.pb.go", ".venv/*", ".mypy_cache/*", ".repro/*" } }
+        local opts = {
+          multi = { "buffers", "files" },
+          hidden = true,
+          ignored = true,
+          exclude = { "*.pb.go", ".venv/*", ".mypy_cache/*", ".repro/*" },
+        }
         Snacks.picker.smart(opts)
       end,
       desc = "Files",
