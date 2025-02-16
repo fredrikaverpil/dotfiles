@@ -5,6 +5,7 @@ stdsym_install() {
     echo "go could not be found, exiting..."
     return 1
   fi
+  echo "Installing gostdsym..."
   go install github.com/lotusirous/gostdsym/stdsym@latest
 }
 
