@@ -242,7 +242,7 @@ return {
           enable = false, -- handled with LSP keymap toggle instead
         },
         dap_debug = false, -- handled by nvim-dap instead
-        luasnip = true,
+        luasnip = false,
       })
     end,
     event = { "CmdlineEnter" },
