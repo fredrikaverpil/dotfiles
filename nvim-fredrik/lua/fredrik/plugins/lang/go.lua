@@ -306,6 +306,16 @@ return {
   {
     "fredrikaverpil/godoc.nvim",
     dir = "~/code/public/godoc.nvim",
+    dependencies = {
+      "folke/snacks.nvim",
+      {
+        "nvim-treesitter/nvim-treesitter",
+        opts = {
+          ensure_installed = { "go" },
+        },
+      },
+    },
+    build = "go install github.com/lotusirous/gostdsym/stdsym@latest",
     opts = {
       window = {
         type = "vsplit",
