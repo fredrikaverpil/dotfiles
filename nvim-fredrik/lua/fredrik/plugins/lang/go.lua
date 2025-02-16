@@ -304,6 +304,19 @@ return {
   },
 
   {
+    "fredrikaverpil/godoc.nvim",
+    dir = "~/code/public/godoc.nvim",
+    opts = {
+      window = {
+        type = "vsplit",
+      },
+      picker = {
+        type = "snacks",
+      },
+    },
+  },
+
+  {
     "mfussenegger/nvim-dap",
     lazy = true,
     ft = { "go" },
