@@ -51,6 +51,7 @@ brew 'dustinblackman/tap/oatmeal'
 brew 'uv'
 brew 'git-standup'
 # brew 'exercism'
+brew 'imagemagick'  # for kitty protocol images in ghostty via snacks
 
 # slides
 # brew 'slides'
