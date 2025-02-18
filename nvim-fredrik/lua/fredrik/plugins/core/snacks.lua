@@ -29,8 +29,11 @@ return {
           height = 0.9,
         },
       },
+
       notifier = { enabled = true, timeout = 2000 },
+
       statuscolumn = { enabled = true },
+
       indent = {
         enabled = true,
         priority = 1,
@@ -45,9 +48,8 @@ return {
         },
       },
 
-      terminal = {},
+      terminal = { enabled = true },
 
-      ---@class snacks.dashboard.Config
       dashboard = {
         enabled = true,
         preset = {
@@ -60,7 +62,6 @@ return {
         },
       },
 
-      -- special mode
       zen = {
         enabled = true,
         -- You can add any `Snacks.toggle` id here.
@@ -81,10 +82,8 @@ return {
         },
       },
 
-      -- convenience
       quickfile = { enabled = true },
 
-      -- integrations
       lazygit = {
         enabled = true,
         -- automatically configure lazygit to use the current colorscheme
@@ -103,8 +102,8 @@ return {
         },
       },
 
-      -- pickers
       picker = {
+        enabled = true,
         actions = require("trouble.sources.snacks").actions,
         win = {
           input = {
@@ -117,6 +116,8 @@ return {
           },
         },
       },
+
+      image = { enabled = true },
     },
     keys = function()
       ---@type table[table]
