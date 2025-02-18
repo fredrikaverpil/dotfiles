@@ -9,11 +9,12 @@ Thumbs.db
 
 # Editing
 .vscode
-/.nvim.lua
-/.lazy.lua
+.nvim.lua
+.lazy.lua
 
 # Environments
-/.pkgx.yaml
+.pkgx.yml
+.pkgx.yaml
 .envrc
 
 # Node
