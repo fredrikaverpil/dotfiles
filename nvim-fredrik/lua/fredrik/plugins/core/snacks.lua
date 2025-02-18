@@ -30,9 +30,19 @@ return {
         },
       },
 
-      notifier = { enabled = true, timeout = 2000 },
+      dashboard = {
+        enabled = true,
+        preset = {
+          keys = {
+            { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
+            { icon = " ", key = "r", desc = "Recent Files", action = ":lua Snacks.dashboard.pick('oldfiles')" },
+            { icon = " ", key = "s", desc = "Restore Session", section = "session" },
+            { icon = " ", key = "q", desc = "Quit", action = ":qa" },
+          },
+        },
+      },
 
-      statuscolumn = { enabled = true },
+      image = { enabled = true },
 
       indent = {
         enabled = true,
@@ -48,19 +58,46 @@ return {
         },
       },
 
-      terminal = { enabled = true },
-
-      dashboard = {
+      lazygit = {
         enabled = true,
-        preset = {
-          keys = {
-            { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
-            { icon = " ", key = "r", desc = "Recent Files", action = ":lua Snacks.dashboard.pick('oldfiles')" },
-            { icon = " ", key = "s", desc = "Restore Session", section = "session" },
-            { icon = " ", key = "q", desc = "Quit", action = ":qa" },
+        -- automatically configure lazygit to use the current colorscheme
+        -- and integrate edit with the current neovim instance
+        configure = true,
+
+        config = {
+          os = { editPreset = "nvim-remote" },
+          gui = {
+            -- set to an empty string "" to disable icons
+            nerdFontsVersion = "3",
+          },
+          git = {
+            overrideGpg = true,
           },
         },
       },
+
+      notifier = { enabled = true, timeout = 2000 },
+
+      picker = {
+        enabled = true,
+        actions = require("trouble.sources.snacks").actions,
+        win = {
+          input = {
+            keys = {
+              ["<c-t>"] = {
+                "trouble_open",
+                mode = { "n", "i" },
+              },
+            },
+          },
+        },
+      },
+
+      quickfile = { enabled = true },
+
+      statuscolumn = { enabled = true },
+
+      terminal = { enabled = true },
 
       zen = {
         enabled = true,
@@ -81,43 +118,6 @@ return {
           },
         },
       },
-
-      quickfile = { enabled = true },
-
-      lazygit = {
-        enabled = true,
-        -- automatically configure lazygit to use the current colorscheme
-        -- and integrate edit with the current neovim instance
-        configure = true,
-
-        config = {
-          os = { editPreset = "nvim-remote" },
-          gui = {
-            -- set to an empty string "" to disable icons
-            nerdFontsVersion = "3",
-          },
-          git = {
-            overrideGpg = true,
-          },
-        },
-      },
-
-      picker = {
-        enabled = true,
-        actions = require("trouble.sources.snacks").actions,
-        win = {
-          input = {
-            keys = {
-              ["<c-t>"] = {
-                "trouble_open",
-                mode = { "n", "i" },
-              },
-            },
-          },
-        },
-      },
-
-      image = { enabled = true },
     },
     keys = function()
       ---@type table[table]
