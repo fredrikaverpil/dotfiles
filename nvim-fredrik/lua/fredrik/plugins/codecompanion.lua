@@ -72,6 +72,7 @@ end
 
 --- Load a saved codecompanion.nvim chat file into a new CodeCompanion chat buffer.
 --- Usage: CodeCompanionLoad
+--- TODO: replace this with a snacks picker instead
 vim.api.nvim_create_user_command("CodeCompanionLoad", function()
   local fzf = require("fzf-lua")
 
