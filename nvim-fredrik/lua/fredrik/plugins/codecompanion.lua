@@ -193,25 +193,25 @@ return {
           slash_commands = {
             ["buffer"] = {
               opts = {
-                provider = "fzf_lua", -- default|telescope|mini_pick|fzf_lua
+                provider = "snacks",
               },
             },
 
             ["file"] = {
               opts = {
-                provider = "fzf_lua", -- default|telescope|mini_pick|fzf_lua
+                provider = "snacks",
               },
             },
 
             ["help"] = {
               opts = {
-                provider = "fzf_lua", -- telescope|mini_pick|fzf_lua
+                provider = "snacks",
               },
             },
 
             ["symbols"] = {
               opts = {
-                provider = "fzf_lua", -- default|telescope|mini_pick|fzf_lua
+                provider = "snacks",
               },
             },
           },
