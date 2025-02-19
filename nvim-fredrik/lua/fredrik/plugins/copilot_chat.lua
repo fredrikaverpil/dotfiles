@@ -12,6 +12,14 @@ return {
     ---@type CopilotChat.config
     opts = {
       debug = false, -- Enable debugging
+      selection = function(source)
+        local select = require("CopilotChat.select")
+        if require("fredrik.utils.private").is_ai_enabled() then
+          return select.visual(source) or select.buffer(source)
+        else
+          return nil
+        end
+      end,
       model = "claude-3.5-sonnet",
       prompts = require("fredrik.utils.llm_prompts").to_copilot(),
     },
