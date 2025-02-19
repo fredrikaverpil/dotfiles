@@ -157,10 +157,6 @@ return {
       "nvim-treesitter/nvim-treesitter",
       "nvim-telescope/telescope.nvim",
       {
-        "stevearc/dressing.nvim",
-        opts = {},
-      },
-      {
         "saghen/blink.cmp",
         ---@module 'blink.cmp'
         ---@type blink.cmp.Config
