@@ -28,7 +28,7 @@
 - Gx.nvim for universal `gx` keymap.
 - Neo-tree for navigating files and folders.
 - Diffview for reviewing PRs.
-- AI chat via Codecompanion.
+- AI chat via Codecompanion, CopilotChat.
 - And much, much more...
 
 ## Try it out! 🚀
