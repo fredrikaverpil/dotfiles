@@ -63,8 +63,9 @@ for i in "${!branches[@]}"; do
 	status=""
 
 	# Categorize branches
-	if [[ ${merged[$i]} -eq 0 && (${remote_exists[$i]} -ne 0 || ${contained[$i]} -eq 0) ]]; then
+	if [[ ${merged[$i]} -eq 0 ]]; then
 		status="🟢"
+		safe_branches+=("$branch")
 	else
 		status="🔴"
 		if [[ ${merged[$i]} -ne 0 ]]; then
