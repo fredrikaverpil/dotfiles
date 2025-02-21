@@ -65,7 +65,6 @@ for i in "${!branches[@]}"; do
 	# Categorize branches
 	if [[ ${merged[$i]} -eq 0 && (${remote_exists[$i]} -ne 0 || ${contained[$i]} -eq 0) ]]; then
 		status="🟢"
-		safe_branches+=("$branch")
 	else
 		status="🔴"
 		if [[ ${merged[$i]} -ne 0 ]]; then
@@ -73,14 +72,12 @@ for i in "${!branches[@]}"; do
 		fi
 	fi
 
-	if [[ ${stale[$i]} -eq 1 ]]; then
-		status+=" ⚠️"
-		stale_branches+=("$branch")
-	fi
-	[[ ${remote_exists[$i]} -eq 0 ]] && status+=" 🌐"
-	[[ ${merged[$i]} -eq 0 ]] && status+=" ✅"
+	# Add placeholder spaces for consistent width
+	[[ ${stale[$i]} -eq 1 ]] && status+=" ⚠️" || status+="   "
+	[[ ${remote_exists[$i]} -eq 0 ]] && status+=" 🌐" || status+="   "
+	[[ ${merged[$i]} -eq 0 ]] && status+=" ✅" || status+="   "
 
-	printf "%-15s %s\n" "$status" "$branch"
+	printf "%-12s %s\n" "$status" "$branch"
 done
 
 delete_branch() {
