@@ -1,0 +1,183 @@
+#!/bin/bash
+
+# Initialize arrays for branch statuses
+branches=()
+merged=()
+remote_exists=()
+contained=()
+stale=()
+
+# Determine default branch
+default_branch=$(git remote show origin | grep "HEAD branch" | cut -d: -f2 | xargs)
+git fetch origin >/dev/null 2>&1
+
+# Get list of local branches
+local_branches=$(git branch --list | cut -c 3-)
+
+# Staleness threshold (90 days in seconds)
+staleness_threshold=$((90 * 24 * 60 * 60))
+
+# Collect data silently
+for branch in $local_branches; do
+	[[ "$branch" == "$default_branch" ]] && continue
+
+	branches+=("$branch")
+	idx=$((${#branches[@]} - 1))
+
+	# Check if merged
+	git branch --merged "$default_branch" | grep -q "$branch"
+	merged[$idx]=$?
+
+	# Check remote existence
+	git show-ref --verify "refs/remotes/origin/$branch" >/dev/null 2>&1
+	remote_exists[$idx]=$?
+
+	# Check if contained in remote
+	if [[ ${remote_exists[$idx]} -eq 0 ]]; then
+		git merge-base --is-ancestor origin/$branch $branch
+		contained[$idx]=$?
+	else
+		contained[$idx]=1
+	fi
+
+	# Check staleness
+	last_commit_time=$(git log -1 --format="%at" "$branch")
+	if (($(date +%s) - last_commit_time > staleness_threshold)); then
+		stale[$idx]=1
+	else
+		stale[$idx]=0
+	fi
+done
+
+# Display results
+echo "Branch Status Summary:"
+echo "🟢 Safe to delete   🔴 Needs review   ⚠️  Stale   🌐 Remote exists   ✅ Merged"
+echo "───────────────────────────────────────────────────────────"
+
+safe_branches=()
+stale_branches=()
+unmerged_branches=()
+
+for i in "${!branches[@]}"; do
+	branch="${branches[$i]}"
+	status=""
+
+	# Categorize branches
+	if [[ ${merged[$i]} -eq 0 && (${remote_exists[$i]} -ne 0 || ${contained[$i]} -eq 0) ]]; then
+		status="🟢"
+		safe_branches+=("$branch")
+	else
+		status="🔴"
+		if [[ ${merged[$i]} -ne 0 ]]; then
+			unmerged_branches+=("$branch")
+		fi
+	fi
+
+	if [[ ${stale[$i]} -eq 1 ]]; then
+		status+=" ⚠️"
+		stale_branches+=("$branch")
+	fi
+	[[ ${remote_exists[$i]} -eq 0 ]] && status+=" 🌐"
+	[[ ${merged[$i]} -eq 0 ]] && status+=" ✅"
+
+	printf "%-15s %s\n" "$status" "$branch"
+done
+
+delete_branch() {
+	local branch=$1
+	local force=$2
+	local delete_cmd="-d"
+	[[ "$force" == "force" ]] && delete_cmd="-D"
+
+	# Check if remote branch exists using ls-remote
+	if git ls-remote --heads origin "$branch" | grep -q "$branch"; then
+		echo "Deleting remote branch origin/$branch"
+		if ! git push origin --delete "$branch" 2>/dev/null; then
+			echo "Warning: Could not delete remote branch $branch (might be already deleted)"
+		fi
+	else
+		echo "Remote branch origin/$branch does not exist"
+	fi
+
+	echo "Deleting local branch $branch"
+	if ! git branch $delete_cmd "$branch" 2>/dev/null; then
+		echo "Warning: Could not delete local branch $branch"
+	fi
+}
+
+# Function to check if branch has an active PR
+has_active_pr() {
+	local branch=$1
+	# Check if gh is available
+	if ! command -v gh >/dev/null 2>&1; then
+		echo "Warning: GitHub CLI (gh) not installed. PR status check skipped."
+		return 1
+	fi
+
+	# Check if authenticated
+	if ! gh auth status >/dev/null 2>&1; then
+		echo "Warning: GitHub CLI not authenticated. PR status check skipped."
+		return 1
+	fi
+
+	# Check for PR status
+	if gh pr list --head "$branch" --state open --json headRefName --jq '.[].headRefName' | grep -q "^${branch}$"; then
+		return 0 # Has active PR
+	fi
+	return 1 # No active PR
+}
+
+# Handle safe branches
+if [[ ${#safe_branches[@]} -gt 0 ]]; then
+	echo -e "\n🟢 Safe to delete:"
+	printf '%s\n' "${safe_branches[@]}" | sed 's/^/- /'
+	read -r -p "Delete these branches? (y/N) " confirm
+	if [[ "$confirm" == "y" ]]; then
+		for branch in "${safe_branches[@]}"; do
+			delete_branch "$branch"
+		done
+	fi
+fi
+
+# Handle stale branches
+if [[ ${#stale_branches[@]} -gt 0 ]]; then
+	echo -e "\n⚠️  Stale branches:"
+	printf '%s\n' "${stale_branches[@]}" | sed 's/^/- /'
+	read -r -p "Delete these stale branches? (y/N) " confirm
+	if [[ "$confirm" == "y" ]]; then
+		for branch in "${stale_branches[@]}"; do
+			delete_branch "$branch" force
+		done
+	fi
+fi
+
+# Handle unmerged branches
+if [[ ${#unmerged_branches[@]} -gt 0 ]]; then
+	echo -e "\n🔴 Unmerged branches:"
+	active_prs=()
+	other_unmerged=()
+
+	for branch in "${unmerged_branches[@]}"; do
+		if has_active_pr "$branch"; then
+			active_prs+=("$branch")
+		else
+			other_unmerged+=("$branch")
+		fi
+	done
+
+	if [[ ${#active_prs[@]} -gt 0 ]]; then
+		echo -e "\n📝 Branches with active PRs (skipping):"
+		printf '%s\n' "${active_prs[@]}" | sed 's/^/- /'
+	fi
+
+	if [[ ${#other_unmerged[@]} -gt 0 ]]; then
+		echo -e "\n❌ Unmerged branches without active PRs:"
+		printf '%s\n' "${other_unmerged[@]}" | sed 's/^/- /'
+		read -r -p "Force delete these unmerged branches? (y/N) " confirm
+		if [[ "$confirm" == "y" ]]; then
+			for branch in "${other_unmerged[@]}"; do
+				delete_branch "$branch" force
+			done
+		fi
+	fi
+fi
