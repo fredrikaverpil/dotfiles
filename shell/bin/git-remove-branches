@@ -29,7 +29,7 @@ for branch in $local_branches; do
 	merged[$idx]=$?
 
 	# Check remote existence
-	git show-ref --verify "refs/remotes/origin/$branch" >/dev/null 2>&1
+	git ls-remote --heads origin "$branch" | grep -q "$branch"
 	remote_exists[$idx]=$?
 
 	# Check if contained in remote
@@ -129,7 +129,7 @@ has_active_pr() {
 if [[ ${#safe_branches[@]} -gt 0 ]]; then
 	echo -e "\n🟢 Safe to delete:"
 	printf '%s\n' "${safe_branches[@]}" | sed 's/^/- /'
-	read -r -p "Delete these branches? (y/N) " confirm
+	read -r -p "Delete these local and remote branches? (y/N) " confirm
 	if [[ "$confirm" == "y" ]]; then
 		for branch in "${safe_branches[@]}"; do
 			delete_branch "$branch"
@@ -141,7 +141,7 @@ fi
 if [[ ${#stale_branches[@]} -gt 0 ]]; then
 	echo -e "\n⚠️  Stale branches:"
 	printf '%s\n' "${stale_branches[@]}" | sed 's/^/- /'
-	read -r -p "Delete these stale branches? (y/N) " confirm
+	read -r -p "Delete these stale local and remote branches? (y/N) " confirm
 	if [[ "$confirm" == "y" ]]; then
 		for branch in "${stale_branches[@]}"; do
 			delete_branch "$branch" force
@@ -171,7 +171,7 @@ if [[ ${#unmerged_branches[@]} -gt 0 ]]; then
 	if [[ ${#other_unmerged[@]} -gt 0 ]]; then
 		echo -e "\n❌ Unmerged branches without active PRs:"
 		printf '%s\n' "${other_unmerged[@]}" | sed 's/^/- /'
-		read -r -p "Force delete these unmerged branches? (y/N) " confirm
+		read -r -p "Force delete these unmerged local and remote branches? (y/N) " confirm
 		if [[ "$confirm" == "y" ]]; then
 			for branch in "${other_unmerged[@]}"; do
 				delete_branch "$branch" force
