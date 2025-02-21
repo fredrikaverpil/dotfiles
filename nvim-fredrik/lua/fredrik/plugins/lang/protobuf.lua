@@ -127,10 +127,6 @@ local function api_linter_setup()
       "--disable-rule=core::0191::java-multiple-files",
       "--disable-rule=core::0191::java-package",
       "--disable-rule=core::0191::java-outer-classname",
-      function()
-        -- NOTE: introduced as required in api-linter v1.69.0, as cwd was removed from implicit registered path.
-        return "--proto-path=" .. buf_lint_cwd()
-      end,
       descriptor_set_in,
     },
     stream = "stdout",
