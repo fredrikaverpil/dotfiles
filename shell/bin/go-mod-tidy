@@ -1,0 +1,3 @@
+#!/bin/sh -e
+
+fd go.mod -t f | xargs -I {} sh -c 'cd $(dirname {}) && go mod tidy'
