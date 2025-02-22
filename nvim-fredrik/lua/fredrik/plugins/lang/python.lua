@@ -40,6 +40,14 @@ local function find_python_binary(name)
   return name
 end
 
+--- Return local path, if it exists, or nil
+local function local_path(path)
+  if vim.fn.isdirectory(vim.fn.expand(path)) == 0 then
+    return nil
+  end
+  return path
+end
+
 local root_files = {
   "pyproject.toml",
   "ruff.toml",
@@ -231,6 +239,28 @@ return {
         config = function(_, opts)
           require("dap-python").setup("uv", opts)
         end,
+      },
+    },
+  },
+
+  {
+    "fredrikaverpil/pydoc.nvim",
+    dir = local_path("~/code/public/pydoc.nvim"),
+    dependencies = {
+      "folke/snacks.nvim",
+      {
+        "nvim-treesitter/nvim-treesitter",
+        opts = {
+          ensure_installed = { "markdown" },
+        },
+      },
+    },
+    opts = {
+      window = {
+        type = "vsplit",
+      },
+      picker = {
+        type = "snacks",
       },
     },
   },
