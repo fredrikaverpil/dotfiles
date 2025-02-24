@@ -315,7 +315,7 @@ return {
     "fredrikaverpil/godoc.nvim",
     dir = local_path("~/code/public/godoc.nvim"),
     dependencies = {
-      "folke/snacks.nvim",
+      { "folke/snacks.nvim" },
       {
         "nvim-treesitter/nvim-treesitter",
         opts = {
@@ -325,13 +325,13 @@ return {
     },
     build = "go install github.com/lotusirous/gostdsym/stdsym@latest",
     opts = {
-      window = {
-        type = "vsplit",
+      adapters = {
+        { name = "go" },
       },
-      picker = {
-        type = "snacks",
-      },
+      window = { type = "vsplit" },
+      picker = { type = "mini" },
     },
+    cmd = { "GoDoc" },
   },
 
   {

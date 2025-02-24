@@ -244,28 +244,6 @@ return {
   },
 
   {
-    "fredrikaverpil/pydoc.nvim",
-    dir = local_path("~/code/public/pydoc.nvim"),
-    dependencies = {
-      "folke/snacks.nvim",
-      {
-        "nvim-treesitter/nvim-treesitter",
-        opts = {
-          ensure_installed = { "markdown" },
-        },
-      },
-    },
-    opts = {
-      window = {
-        type = "vsplit",
-      },
-      picker = {
-        type = "snacks",
-      },
-    },
-  },
-
-  {
     "linux-cultist/venv-selector.nvim",
     lazy = true,
     event = "VeryLazy",
