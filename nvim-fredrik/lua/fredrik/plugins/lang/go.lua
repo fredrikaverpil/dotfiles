@@ -326,10 +326,13 @@ return {
     build = "go install github.com/lotusirous/gostdsym/stdsym@latest",
     opts = {
       adapters = {
-        { name = "go" },
+        {
+          name = "go",
+          opts = { command = "GoDoc" },
+        },
       },
       window = { type = "vsplit" },
-      picker = { type = "mini" },
+      picker = { type = "snacks" },
     },
     cmd = { "GoDoc" },
   },
