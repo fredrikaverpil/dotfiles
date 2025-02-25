@@ -245,6 +245,7 @@ return {
     },
     config = function()
       require("go").setup({
+        remap_commands = { GoDoc = false }, -- NOTE: clashes with godoc.nvim
         lsp_cfg = false, -- handled with nvim-lspconfig instead
         lsp_inlay_hints = {
           enable = false, -- handled with LSP keymap toggle instead
