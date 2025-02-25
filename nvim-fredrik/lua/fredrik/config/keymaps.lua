@@ -153,28 +153,6 @@ function M.setup_lsp_autocmd_keymaps(event)
     vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc, nowait = true })
   end
 
-  -- Jump to the definition of the word under your cursor.
-  --  This is where a variable was first declared, or where a function is defined, etc.
-  --  To jump back, press <C-t>.
-
-  -- Find references for the word under your cursor.
-
-  -- Jump to the implementation of the word under your cursor.
-  --  Useful when your language has ways of declaring types without an actual implementation.
-
-  -- Jump to the type of the word under your cursor.
-  --  Useful when you're not sure what type a variable is and you want to see
-  --  the definition of its *type*, not where it was *defined*.
-  -- map("gt", require("telescope.builtin").lsp_type_definitions, "[G]oto [t]ype definition")
-
-  -- Fuzzy find all the symbols in your current document.
-  --  Symbols are things like variables, functions, types, etc.
-  -- map("<leader>cS", require("telescope.builtin").lsp_document_symbols, "Do[c]ument [S]ymbols (telescope)")
-
-  -- Fuzzy find all the symbols in your current workspace
-  --  Similar to document symbols, except searches over your whole project.
-  -- map("<leader>cw", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[w]orkspace [s]ymbols (telescope)")
-
   -- Rename the variable under your cursor
   --  Most Language Servers support renaming across files, etc.
   map("<leader>cr", vim.lsp.buf.rename, "[C]ode [R]ename")
@@ -318,9 +296,6 @@ function M.setup_telescope_keymaps()
 
   return {
 
-    -- find files
-    -- { "<leader><leader>", require("telescope.builtin").find_files, desc = "Find files" },
-
     -- project files
     {
       "<leader>sp",
@@ -349,24 +324,6 @@ function M.setup_telescope_keymaps()
     },
 
     -- search
-    -- {
-    --   "<leader>/",
-    --   function()
-    --     require("telescope").extensions.live_grep_args.live_grep_args()
-    --   end,
-    --   desc = "[s]earch [g]rep",
-    -- },
-    -- { '<leader>s"', "<cmd>Telescope registers<cr>", desc = '[s]earch ["]registers' },
-    -- { "<leader>sa", "<cmd>Telescope autocommands<cr>", desc = "[s]earch [a]utocommands" },
-    -- { "<leader>sb", "<cmd>Telescope buffers<CR>", desc = "[s]earch opened [b]uffers" },
-    -- { "<leader>sc", "<cmd>Telescope commands<cr>", desc = "[s]earch [c]ommands" },
-    -- { "<leader>sd", "<cmd>Telescope diagnostics bufnr=0<cr>", desc = "[s]earch [d]ocument diagnostics" },
-    -- { "<leader>sD", "<cmd>Telescope diagnostics<cr>", desc = "[s]earch [D]iagnostics" },
-    -- { "<leader>sh", "<cmd>Telescope help_tags<cr>", desc = "[s]earch [h]elp pages" },
-    -- { "<leader>sH", "<cmd>Telescope highlights<cr>", desc = "[s]earch [H]ighlight groups" },
-    -- { "<leader>sk", "<cmd>Telescope keymaps<cr>", desc = "[s]earch [k]ey maps" },
-    -- { "<leader>sM", "<cmd>Telescope man_pages<cr>", desc = "[s]earch [M]an pages" },
-    -- { "<leader>sm", "<cmd>Telescope marks<cr>", desc = "[s]earch [m]arks" },
     { "<leader>so", "<cmd>Telescope vim_options<cr>", desc = "[s]earch [o]ptions" },
   }
 end
