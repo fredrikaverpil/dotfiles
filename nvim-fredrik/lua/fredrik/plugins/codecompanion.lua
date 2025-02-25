@@ -74,7 +74,7 @@ end
 --- Usage: CodeCompanionLoad
 --- TODO: replace this with a snacks picker instead
 vim.api.nvim_create_user_command("CodeCompanionLoad", function()
-  local fzf = require("fzf-lua")
+  local fzf = require("fzf-lua") -- FIXME: replace fzf-lua with Snacks picker
 
   local function select_adapter(filepath)
     local adapters = vim.tbl_keys(supported_adapters)

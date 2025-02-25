@@ -6,6 +6,5 @@ return {
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {},
     -- NOTE: keymaps through Snacks.picker
-    -- keys = require("fredrik.config.keymaps").setup_todo_keymaps(),
   },
 }
