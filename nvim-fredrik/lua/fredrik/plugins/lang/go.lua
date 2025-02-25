@@ -329,13 +329,21 @@ return {
       adapters = {
         {
           name = "go",
-          opts = { command = "GoDoc" },
+          opts = {
+            command = "GoDoc",
+            get_syntax_info = function()
+              return {
+                filetype = "godoc", -- filetype for the buffer
+                language = "markdown", -- tree-sitter parser, for syntax highlighting
+              }
+            end,
+          },
         },
       },
       window = { type = "vsplit" },
       picker = { type = "snacks" },
     },
-    cmd = { "GoDoc" },
+    -- cmd = { "GoDoc", "RustDoc" },
   },
 
   {
