@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Check if current git branch is dirty
+if ! git diff-index --quiet HEAD --; then
+	echo "Error: Git repository has uncommitted changes."
+	echo "Please commit or stash your changes before running this script."
+	exit 1
+fi
+
+# Get all open Dependabot PRs
+dependabot_branches=$(gh pr list --app dependabot --json "headRefName" --jq ".[] | .headRefName")
+
+if [ -z "$dependabot_branches" ]; then
+	echo "No open Dependabot PRs found"
+	exit 0
+fi
+
+# Check if command argument was provided
+if [ $# -eq 0 ]; then
+	echo "dependabot-fix - Run commands on all open Dependabot PRs"
+	echo ""
+	echo "USAGE:"
+	echo "  dependabot-fix <command>"
+	echo ""
+	echo "DESCRIPTION:"
+	echo "  This script finds all open Dependabot PRs, checks out each branch,"
+	echo "  runs your specified command, then returns to your original branch."
+	echo ""
+	echo "EXAMPLES:"
+	echo "  dependabot-fix 'git rebase master && make && git commit --amend --no-edit'"
+	echo "  dependabot-fix 'npm test && git commit --amend --no-edit'"
+	echo "  dependabot-fix 'cargo test && git push -f'"
+	echo ""
+	exit 1
+fi
+
+command_to_run="$1"
+current_branch=$(git branch --show-current)
+
+echo "Found $(echo "$dependabot_branches" | wc -l | tr -d ' ') Dependabot PRs"
+echo "Will run: $command_to_run"
+echo ""
+
+# For each branch, checkout and run the command
+for branch in $dependabot_branches; do
+	echo "Processing branch: $branch"
+	git checkout "$branch"
+
+	# Run the command
+	echo "Running: $command_to_run"
+	eval "$command_to_run"
+
+	echo "Done with $branch"
+	echo ""
+done
+
+# Return to the original branch
+git checkout "$current_branch"
+echo "Returned to branch: $current_branch"
+
