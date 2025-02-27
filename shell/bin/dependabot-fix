@@ -35,6 +35,8 @@ if [ $# -eq 0 ]; then
 	exit 1
 fi
 
+git fetch
+
 command_to_run="$1"
 current_branch=$(git branch --show-current)
 
