@@ -27,12 +27,14 @@ vim.api.nvim_create_autocmd("User", {
 return {
   {
     "folke/persistence.nvim",
+    dependencies = {
+      "folke/snacks.nvim",
+    },
     event = "VimEnter",
     init = function()
       -- https://neovim.io/doc/user/options.html#'sessionoptions'
       vim.opt.sessionoptions = { "buffers", "curdir", "folds", "help", "localoptions", "winpos", "winsize" }
     end,
-    keys = require("fredrik.config.keymaps").setup_persistence_keymaps(),
     config = function(_, opts)
       require("persistence").setup(opts)
 
@@ -41,5 +43,6 @@ return {
       --   require("persistence").load()
       -- end)
     end,
+    -- NOTE: snacks zoxide picker is used to select sessions
   },
 }

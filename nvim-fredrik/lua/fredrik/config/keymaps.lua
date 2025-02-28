@@ -295,22 +295,14 @@ function M.setup_telescope_keymaps()
   end
 
   return {
-
-    -- project files
-    {
-      "<leader>sp",
-      function()
-        open_file_in_other_project(true)
-      end,
-      desc = "Switch project",
-    },
     {
       "<leader>sf",
       function()
         open_file_in_other_project(false)
       end,
-      desc = "Switch to file", -- NOTE: without changing cwd
+      desc = "[s]earch [f]ile (in projects)",
     },
+
     -- yank
     -- NOTE: reminder;
     -- Use `vep` to replace current a word with a yank.
@@ -325,18 +317,6 @@ function M.setup_telescope_keymaps()
 
     -- search
     { "<leader>so", "<cmd>Telescope vim_options<cr>", desc = "[s]earch [o]ptions" },
-  }
-end
-
-function M.setup_persistence_keymaps()
-  return {
-    {
-      "<leader>ss",
-      function()
-        require("persistence").select()
-      end,
-      desc = "[s]earch [s]ession",
-    },
   }
 end
 
@@ -446,18 +426,18 @@ function M.setup_snacks_keymaps()
       desc = "Goto T[y]pe Definition",
     },
     {
-      "<leader>cS", -- TODO: change keymap to <leader>ss
+      "<leader>ss",
       function()
         Snacks.picker.lsp_symbols()
       end,
-      desc = "LSP Symbols",
+      desc = "[s]earch LSP [s]ymbols",
     },
     {
-      "<leader>sw", -- TODO: change keymap to <leader>sS
+      "<leader>sS",
       function()
         Snacks.picker.lsp_workspace_symbols()
       end,
-      desc = "LSP Workspace Symbols",
+      desc = "[s]earch LSP [S]ymbols (workspace)",
     },
 
     -- search
@@ -531,6 +511,13 @@ function M.setup_snacks_keymaps()
         Snacks.picker.jumps()
       end,
       desc = "[s]earch [j]umplist",
+    },
+    {
+      "<leader>sp",
+      function()
+        Snacks.picker.zoxide()
+      end,
+      desc = "[s]earch [p]rojects (zoxide)",
     },
     {
       "<leader>sq",
