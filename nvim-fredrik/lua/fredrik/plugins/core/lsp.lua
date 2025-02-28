@@ -68,7 +68,17 @@ local function create_server_setup_autocmds(opts)
                 if success then
                   clients = vim.lsp.get_clients({ name = server })
                   if #clients > 0 then
-                    vim.notify(vim.inspect("Attaching LSP: " .. server .. " to existing client with id " .. clients[1].id .. " (" .. ev.file .. ")"))
+                    vim.notify(
+                      vim.inspect(
+                        "Attaching LSP: "
+                          .. server
+                          .. " to existing client with id "
+                          .. clients[1].id
+                          .. " ("
+                          .. ev.file
+                          .. ")"
+                      )
+                    )
                     vim.lsp.buf_attach_client(ev.buf, clients[1].id)
                   end
                 end
@@ -180,7 +190,11 @@ return {
       -- By default, Neovim doesn't support everything that is in the LSP Specification.
       -- When you add nvim-cmp, blink, luasnip, etc. Neovim now has *more* capabilities.
       -- So, we create new capabilities here, and then broadcast that to the LSP servers.
-      local client_capabilities = vim.tbl_deep_extend("force", vim.lsp.protocol.make_client_capabilities(), require("blink.cmp").get_lsp_capabilities())
+      local client_capabilities = vim.tbl_deep_extend(
+        "force",
+        vim.lsp.protocol.make_client_capabilities(),
+        require("blink.cmp").get_lsp_capabilities()
+      )
       for server, server_opts in pairs(opts.servers) do
         local extended_capabilities = vim.tbl_deep_extend("force", client_capabilities, server_opts.capabilities or {})
         opts.servers[server].capabilities = extended_capabilities
@@ -215,7 +229,9 @@ return {
           end
 
           -- setup folding
-          if client.supports_method("textDocument/foldingRange") and require("fredrik.utils.version").is_neovim_0_11_0() then
+          if
+            client.supports_method("textDocument/foldingRange") and require("fredrik.utils.version").is_neovim_0_11_0()
+          then
             require("fredrik.config.options").lsp_foldexpr()
           end
 
