@@ -82,7 +82,6 @@ require("fredrik.utils.diagnostics").setup_diagnostics()
 -- set up folding
 function _G.custom_foldtext()
   local line = vim.fn.getline(vim.v.foldstart)
-  vim.notify(vim.inspect(line))
   local line_count = vim.v.foldend - vim.v.foldstart + 1
   local line_text = vim.fn.substitute(line, "\t", " ", "g")
   return string.format("%s (%d lines)", line_text, line_count)
