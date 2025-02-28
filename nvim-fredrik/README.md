@@ -14,7 +14,7 @@
 - Native LSP definitions (`vim.lsp.config` and `vim.lsp.enable`).
 - Native snippets.
 - Native vim folding, using LSP when applicable.
-- Snacks, telescope, fzf-lua pickers for certain files, grepping etc.
+- Snacks/telescope pickers for certain files, grepping etc.
 - Inline image link rendering (kitty graphics protocol).
 - Blink.cmp for completion.
 - One unified keymap file.
