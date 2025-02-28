@@ -3,6 +3,7 @@ dependencies:
   - gem
   - node
   - npm
+  - bun
   - python
   - go
   - lua
