@@ -88,13 +88,11 @@ function _G.custom_foldtext()
   return string.format("%s (%d lines)", line_text, line_count)
 end
 function M.treesitter_foldexpr()
-  vim.notify(vim.inspect("treesitter_foldexpr"))
   vim.opt.foldmethod = "expr"
   vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
   vim.opt.foldtext = "v:lua.custom_foldtext()"
 end
 function M.lsp_foldexpr(server)
-  vim.notify(vim.inspect("lsp_foldexpr"))
   vim.opt_local.foldmethod = "expr"
   vim.opt_local.foldexpr = "v:lua.vim.lsp.foldexpr()"
   -- vim.opt_local.foldtext = "v:lua.vim.lsp.foldtext()"
