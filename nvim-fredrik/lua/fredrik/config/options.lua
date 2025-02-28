@@ -95,9 +95,6 @@ function M.treesitter_foldexpr()
 end
 function M.lsp_foldexpr(server)
   vim.notify(vim.inspect("lsp_foldexpr"))
-  -- vim.api.nvim_set_option_value("foldmethod", "expr", { scope = "local" })
-  -- vim.api.nvim_set_option_value("foldexpr", "v:lua.vim.lsp.foldexpr()", { scope = "local" })
-  -- vim.api.nvim_set_option_value("foldtext", "v:lua.vim.lsp.foldtext()", { scope = "local" })
   vim.opt_local.foldmethod = "expr"
   vim.opt_local.foldexpr = "v:lua.vim.lsp.foldexpr()"
   -- vim.opt_local.foldtext = "v:lua.vim.lsp.foldtext()"
