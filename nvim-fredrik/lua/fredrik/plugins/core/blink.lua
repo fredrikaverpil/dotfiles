@@ -16,6 +16,13 @@ return {
     ---@type blink.cmp.Config
     opts = {
       keymap = require("fredrik.config.keymaps").setup_blink_cmp_keymaps(),
+      cmdline = {
+        enabled = true,
+        completion = {
+          menu = { auto_show = true },
+          ghost_text = { enabled = true },
+        },
+      },
       completion = {
         list = {
           selection = {
