@@ -30,7 +30,7 @@ if [ $# -eq 0 ]; then
 	echo "EXAMPLES:"
 	echo "  dependabot-fix 'git rebase master && make && git commit --amend --no-edit'"
 	# Long example:
-    # dependabot-fix 'git rebase master && go-mod-tidy && make proto && if [[ -n "$(git status --porcelain)" ]]; then git commit -am "fix: dependabot chores" && git push --force-with-lease; else echo "No changes to commit"; fi'
+    # dependabot-fix 'git rebase master && go-mod-tidy && make proto && if [[ -n "$(git status --porcelain)" ]]; then git commit -a --amend --no-edit && git push --force-with-lease; else echo "No changes to commit"; fi'
 	echo "  dependabot-fix 'npm test && git commit --amend --no-edit'"
 	echo "  dependabot-fix 'cargo test && git push -f'"
 	echo ""
