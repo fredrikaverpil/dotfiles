@@ -18,7 +18,7 @@ local function local_path(path)
   return path
 end
 
-local golangci_config_file = nil
+local golangci_config_filepath_cache = nil
 local tags = "-tags=wireinject,integration"
 
 local function golangcilint_args()
@@ -34,8 +34,8 @@ local function golangcilint_args()
 
     -- config file
     function()
-      if golangci_config_file ~= nil then
-        return golangci_config_file
+      if golangci_config_filepath_cache ~= nil then
+        return "--config=" .. golangci_config_filepath_cache
       end
       local found
       found = vim.fs.find(
@@ -44,18 +44,22 @@ local function golangcilint_args()
       )
       if #found == 1 then
         local filepath = found[1]
-        golangci_config_file = filepath
-        return "--config", golangci_config_file
+        golangci_config_filepath_cache = filepath
+        local arg = "--config=" .. golangci_config_filepath_cache
+        return arg
       else
         local filepath = require("fredrik.utils.environ").getenv("DOTFILES") .. "/templates/.golangci.yml"
-        golangci_config_file = filepath
-        return "--config", golangci_config_file
+        golangci_config_filepath_cache = filepath
+        local arg = "--config=" .. golangci_config_filepath_cache
+        return arg
       end
     end,
 
     -- filename
     function()
-      return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
+      local filepath = vim.api.nvim_buf_get_name(0)
+      local parent = vim.fn.fnamemodify(filepath, ":h")
+      return parent
     end,
   }
 
@@ -129,6 +133,11 @@ return {
       opts.linters["golangcilint"] = {
         args = golangcilint_args(),
         ignore_exitcode = true, -- NOTE: https://github.com/mfussenegger/nvim-lint/commit/3d5190d318e802de3a503b74844aa87c2cd97ef0
+
+        -- for debugging; to see the same output as the parser sees
+        -- parser = function(output, bufnr, cwd)
+        --   vim.notify(vim.inspect(output))
+        -- end,
       }
     end,
   },
