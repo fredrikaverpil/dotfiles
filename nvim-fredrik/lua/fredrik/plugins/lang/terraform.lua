@@ -18,7 +18,7 @@ return {
         "williamboman/mason.nvim",
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "tflint", "tfsec" })
+          vim.list_extend(opts.ensure_installed, { "tflint", "trivy" })
         end,
       },
     },
@@ -27,8 +27,8 @@ return {
         -- TODO: fix "Module not installed - This module is not yet installed.
         -- Run "tofu init" to install all modules required by this configuration."
         -- NOTE: terraform_validate just runs `terraform validate`.
-        terraform = { "terraform_validate", "tflint", "tfsec" },
-        tf = { "terraform_validate", "tflint", "tfsec" },
+        terraform = { "terraform_validate", "tflint", "trivy" },
+        tf = { "terraform_validate", "tflint", "trivy" },
       },
     },
   },
