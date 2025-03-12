@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# NOTE: Example usage:
+# podman-reset && export SPANNER_EMULATOR_HOST=$(spanner-emulator start)
+
+podman machine stop
+podman machine rm --force
+podman machine init --cpus 4 --memory 8196 --disk-size 100 --now
