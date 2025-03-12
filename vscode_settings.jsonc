@@ -350,5 +350,6 @@
     "build.templateExtensions": ["gotmpl"]
   },
   "workbench.preferredDarkColorTheme": "Tokyo Night",
-  "git.openRepositoryInParentFolders": "always"
+  "git.openRepositoryInParentFolders": "always",
+  "lldb.suppressUpdateNotifications": true
 }

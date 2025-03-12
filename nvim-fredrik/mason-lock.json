@@ -13,7 +13,7 @@
   "gci": "v0.13.5",
   "gofumpt": "v0.7.0",
   "goimports": "v0.31.0",
-  "golangci-lint": "v1.64.6",
+  "golangci-lint": "v1.64.7",
   "golines": "v0.12.2",
   "gopls": "v0.18.1",
   "graphql-language-service-cli": "3.5.0",
