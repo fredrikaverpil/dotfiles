@@ -41,7 +41,8 @@ local ollama_fn = function()
   return require("codecompanion.adapters").extend("ollama", {
     schema = {
       model = {
-        default = "deepseek-r1:7b",
+        default = "gemma3:4b",
+        -- default = "deepseek-r1:7b",
         -- default = "llama3.1:7b",
         -- default = "codellama:7b",
       },
