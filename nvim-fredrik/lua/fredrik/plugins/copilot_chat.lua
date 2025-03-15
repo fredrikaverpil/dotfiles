@@ -20,7 +20,7 @@ return {
           return nil
         end
       end,
-      model = "claude-3.5-sonnet",
+      model = "claude-3.7-sonnet",
       prompts = require("fredrik.utils.llm_prompts").to_copilot(),
     },
     keys = function()
