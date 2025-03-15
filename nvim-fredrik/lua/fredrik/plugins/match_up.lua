@@ -14,7 +14,7 @@ return {
     },
     init = function()
       -- disable matchup offscreen
-      vim.g.matchup_matchparen_offscreen = { method = "popup" }
+      vim.g.matchup_matchparen_offscreen = { method = "status-manual" }
     end,
     opts = {},
   },
