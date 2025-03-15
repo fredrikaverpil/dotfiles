@@ -134,7 +134,8 @@ return {
         args = golangcilint_args(),
         ignore_exitcode = true, -- NOTE: https://github.com/mfussenegger/nvim-lint/commit/3d5190d318e802de3a503b74844aa87c2cd97ef0
 
-        -- for debugging; to see the same output as the parser sees
+        -- For debugging; to see the same output as the parser sees
+        -- Important: make sure you don't have another golangci-lint biniary on $PATH
         -- parser = function(output, bufnr, cwd)
         --   vim.notify(vim.inspect(output))
         -- end,
