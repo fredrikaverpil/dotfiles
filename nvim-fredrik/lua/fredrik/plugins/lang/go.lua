@@ -38,6 +38,12 @@ local function golangcilint_args()
         vim.notify_once("golangci-lint: " .. golangci_config_filepath_cache, vim.log.levels.INFO)
         return "--config=" .. golangci_config_filepath_cache
       end
+
+      local found = vim.fn.system("which golangci-lint")
+      if not string.find(found, "mason/bin") then
+        vim.notify("golangci-lint binary not provided by mason: " .. found, vim.log.levels.WARN)
+      end
+
       local found
       found = vim.fs.find(
         { ".golangci.yml", ".golangci.yaml", ".golangci.toml", ".golangci.json" },
