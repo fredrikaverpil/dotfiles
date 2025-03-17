@@ -81,6 +81,12 @@ return {
       picker = {
         enabled = true,
         actions = require("trouble.sources.snacks").actions,
+        sources = {
+          files = {
+            hidden = true,
+            -- ignored = true,
+          },
+        },
         win = {
           input = {
             keys = {
