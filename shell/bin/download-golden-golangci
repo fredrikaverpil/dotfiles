@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Set target directory and file
+TARGET_DIR="$HOME/.dotfiles/templates"
+TARGET_FILE="$TARGET_DIR/.golangci.yml"
+
+# Create target directory if it doesn't exist
+mkdir -p "$TARGET_DIR"
+
+# Set the gist URL to get the latest revision
+GIST_URL="https://gist.githubusercontent.com/maratori/47a4d00457a92aa426dbd48a18776322/raw"
+
+# Create a temporary file to download the gist
+TEMP_FILE=$(mktemp)
+
+# Download the latest revision of the gist to the temporary file
+if ! curl -s -f -o "$TEMP_FILE" "$GIST_URL"; then
+    echo "Error downloading the gist from $GIST_URL"
+    rm -f "$TEMP_FILE"
+    exit 1
+fi
+
+# Check if the target file exists and if it's different from the downloaded file
+if [ -f "$TARGET_FILE" ] && cmp -s "$TEMP_FILE" "$TARGET_FILE"; then
+    echo "The .golangci.yml file is already up to date."
+else
+    # Move the temporary file to the target location
+    mv "$TEMP_FILE" "$TARGET_FILE"
+    echo "Downloaded latest revision of .golangci.yml to $TARGET_FILE"
+fi
+
+# Clean up (in case the file wasn't moved)
+rm -f "$TEMP_FILE"
