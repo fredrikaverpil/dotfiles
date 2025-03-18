@@ -39,7 +39,6 @@ return {
           vim.list_extend(opts.ensure_installed, {
             "gopls",
             "html-lsp",
-            -- "htmx-lsp",
           })
         end,
       },
@@ -60,9 +59,6 @@ return {
 
         ---@type vim.lsp.Config
         superhtml = { filetypes = filetypes, settings = { superhtml = {} } },
-
-        -- FIXME: causes issues if enabled
-        -- htmx = { filetypes = filetypes, settings = { htmx = {} } },
       },
     },
     opts_extend = {
