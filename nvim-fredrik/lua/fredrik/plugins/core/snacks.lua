@@ -83,8 +83,8 @@ return {
         actions = require("trouble.sources.snacks").actions,
         sources = {
           files = {
-            hidden = true,
-            -- ignored = true,
+            hidden = true, -- NOTE: toggle with alt+h
+            ignored = false, -- NOTE: toggle with alt+h
           },
         },
         win = {
