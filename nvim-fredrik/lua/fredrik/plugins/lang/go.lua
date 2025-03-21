@@ -35,6 +35,7 @@ local function golangcilint_args()
     -- config file
     function()
       if golangci_config_filepath_cache ~= nil then
+        vim.notify_once("golangci-lint: " .. golangci_config_filepath_cache, vim.log.levels.INFO)
         return "--config=" .. golangci_config_filepath_cache
       end
       local found
