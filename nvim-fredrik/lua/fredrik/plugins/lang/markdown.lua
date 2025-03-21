@@ -58,6 +58,8 @@ return {
     },
     opts = {
       linters_by_ft = {
+        -- NOTE: disable inline markdown linting with e.g.
+        -- <!-- markdownlint-disable MD013 MD014 MD015 -->
         markdown = { "markdownlint" },
       },
     },
