@@ -151,8 +151,8 @@
     "editor.rulers": [
       72, // Docstrings
       // 79,  // PEP8
-      88, // Black
-      120 // Nooooooo...
+      88,
+      120 // Black // Nooooooo...
     ],
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
@@ -181,8 +181,8 @@
     "editor.rulers": [
       72, // Docstrings
       // 79,  // PEP8
-      88, // Black
-      120
+      88,
+      120 // Black
     ],
     "editor.wordWrap": "on"
   },
@@ -336,7 +336,7 @@
   "editor.accessibilitySupport": "off",
   "workbench.startupEditor": "none",
   "git.ignoreRebaseWarning": true,
-  "go.testFlags": ["-v", "-race", "-count=1"],
+
   "emeraldwalk.runonsave": {
     "commands": [
       {
@@ -345,11 +345,58 @@
       }
     ]
   },
-  "go.toolsManagement.autoUpdate": true,
-  "gopls": {
-    "build.templateExtensions": ["gotmpl"]
-  },
+
   "workbench.preferredDarkColorTheme": "Tokyo Night",
   "git.openRepositoryInParentFolders": "always",
-  "lldb.suppressUpdateNotifications": true
+  "lldb.suppressUpdateNotifications": true,
+
+  // Go
+  "go.toolsManagement.autoUpdate": true,
+  "go.experiments": {
+    "testExplorer": true
+  },
+  "go.testFlags": ["-v", "-race", "-count=1"],
+  "go.useLanguageServer": true,
+  "go.testTimeout": "5m",
+  "go.testExplorer.packageDisplayMode": "nested",
+  "go.diagnostic.vulncheck": "Imports",
+  "go.lintTool": "golangci-lint",
+  "go.formatTool": "gofumpt", // TODO: change this into `golangci-lint fmt`?
+  "go.formatFlags": ["-line-length=120"],
+  "[go]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+    // Optional: Disable snippets, as they conflict with completion ranking.
+    "editor.snippetSuggestions": "none"
+  },
+  "[go.mod]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+
+  // "go.buildFlags": ["-tags", "wireinject"],
+  "gopls": {
+    "build.templateExtensions": ["gotmpl"],
+    "build.env": {
+      // IntelliSense for wire files
+      "GOFLAGS": "-tags=wireinject"
+    },
+    // Enable better syntax highlighting
+    "ui.semanticTokens": true,
+    // Format with gofumpt
+    "formatting.gofumpt": false,
+    // Enable additional analyses from staticcheck.io
+    "ui.diagnostic.staticcheck": true
+    // "build.buildFlags": ["mage"]
+    //     // Add parameter placeholders when completing a function.
+    //     // "usePlaceholders": true,
+    //     // If true, enable additional analyses with staticcheck.
+    //     // Warning: This will significantly increase memory usage.
+    //     // "staticcheck": false,
+    // "experimentalWorkspaceodule": true,
+  }
 }
