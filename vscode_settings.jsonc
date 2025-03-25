@@ -151,7 +151,8 @@
     "editor.rulers": [
       72, // Docstrings
       // 79,  // PEP8
-      88, 120 // Black // Nooooooo...
+      88,
+      120 // Black // Nooooooo...
     ],
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
@@ -180,7 +181,8 @@
     "editor.rulers": [
       72, // Docstrings
       // 79,  // PEP8
-      88, 120 // Black
+      88,
+      120 // Black
     ],
     "editor.wordWrap": "on"
   },
@@ -358,6 +360,7 @@
   "go.testExplorer.packageDisplayMode": "nested",
   "go.diagnostic.vulncheck": "Imports",
   "go.lintTool": "golangci-lint",
+  "go.lintFlags": ["--config=~/.dotfiles/templates/.golangci.yml"],
   // "go.formatTool": "gofumpt",
   // "go.formatFlags": ["-line-length=120"],
   "[go]": {
