@@ -7,7 +7,7 @@ local M = {}
 function M.getenv(name)
   local envvar = os.getenv(name)
   if envvar == nil then
-    vim.notify(name .. " environment variable is not set", vim.log.levels.WARNING)
+    vim.notify(name .. " environment variable is not set", vim.log.levels.WARN)
     return ""
   end
   return envvar
