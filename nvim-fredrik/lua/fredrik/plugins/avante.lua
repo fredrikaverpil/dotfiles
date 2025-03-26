@@ -11,62 +11,17 @@ return {
     lazy = true, -- NOTE: required for not invoking `op` on Neovim startup
     -- event = "VeryLazy", -- NOTE: required for not invoking `op` on Neovim startup
     version = false, -- NOTE: the docs says not to set this to "*"
-    opts = {
-
-      provider = "claude",
-
-      behaviour = {
-        enable_claude_text_editor_tool_mode = true,
-      },
-
-      claude = {
-        endpoint = "https://api.anthropic.com",
-        -- api_key_name = "cmd:op read op://Personal/Anthropic/tokens/neovim --no-newline",
-        api_key_name = "cmd:op read op://Personal/Anthropic/tokens/neovim --session ~/.1password/agent.sock --no-newline",
-        -- model = "claude-3-5-sonnet-20241022",
-        model = "claude-3-7-sonnet-20250219",
-        temperature = 0,
-        max_tokens = 4096,
-      },
-
-      openai = {
-        endpoint = "https://api.openai.com/v1",
-        model = "gpt-4o", -- your desired model (or use gpt-4o, etc.)
-        timeout = 30000, -- Timeout in milliseconds, increase this for reasoning models
-        temperature = 0,
-        max_completion_tokens = 8192, -- Increase this to include reasoning tokens (for reasoning models)
-        --reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
-      },
-    },
     -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
     build = "make",
-    -- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false" -- for windows
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
       "stevearc/dressing.nvim",
       "nvim-lua/plenary.nvim",
       "MunifTanjim/nui.nvim",
       "nvim-telescope/telescope.nvim", -- for file_selector provider telescope
-      -- "hrsh7th/nvim-cmp", -- autocompletion for avante commands and mentions
       "echasnovski/mini.icons",
       "zbirenbaum/copilot.lua", -- for providers='copilot'
-      {
-        -- support for image pasting
-        "HakonHarnes/img-clip.nvim",
-        event = "VeryLazy",
-        opts = {
-          -- recommended settings
-          default = {
-            embed_image_as_base64 = false,
-            prompt_for_file_name = false,
-            drag_and_drop = {
-              insert_mode = true,
-            },
-            -- required for Windows users
-            use_absolute_path = true,
-          },
-        },
-      },
+      "HakonHarnes/img-clip.nvim", -- for image pasting
       {
         -- Make sure to set this up properly if you have lazy=true
         "MeanderingProgrammer/render-markdown.nvim",
@@ -96,6 +51,85 @@ return {
         opts_extend = {
           "sources.default",
         },
+      },
+    },
+    opts = {
+
+      provider = "claude",
+      cursor_applying_provider = "claude",
+
+      behaviour = {
+        enable_claude_text_editor_tool_mode = true,
+        enable_cursor_planning_mode = false, -- NOTE: uses Aider's method to planing when false, but is picky about the model chosen
+      },
+
+      web_search_engine = {
+        provider = "tavily", -- tavily, serpapi, searchapi, google or kagi
+      },
+
+      file_selector = {
+        provider = "telescope",
+      },
+
+      custom_tools = {
+        {
+          name = "run_go_tests", -- Unique name for the tool
+          description = "Run Go unit tests and return results", -- Description shown to AI
+          command = "go test -v ./...", -- Shell command to execute
+          param = { -- Input parameters (optional)
+            type = "table",
+            fields = {
+              {
+                name = "target",
+                description = "Package or directory to test (e.g. './pkg/...' or './internal/pkg')",
+                type = "string",
+                optional = true,
+              },
+            },
+          },
+          returns = { -- Expected return values
+            {
+              name = "result",
+              description = "Result of the fetch",
+              type = "string",
+            },
+            {
+              name = "error",
+              description = "Error message if the fetch was not successful",
+              type = "string",
+              optional = true,
+            },
+          },
+          func = function(params, on_log, on_complete) -- Custom function to execute
+            local target = params.target or "./..."
+            return vim.fn.system(string.format("go test -v %s", target))
+          end,
+        },
+      },
+
+      claude = {
+        endpoint = "https://api.anthropic.com",
+        api_key_name = "cmd:op read op://Personal/Anthropic/tokens/neovim --no-newline",
+        -- model = "claude-3-5-sonnet-20241022",
+        model = "claude-3-7-sonnet-latest",
+        temperature = 0,
+        max_tokens = 4096,
+        disable_tools = false,
+      },
+
+      openai = {
+        endpoint = "https://api.openai.com/v1",
+        api_key_name = "cmd:op read op://Personal/OpenAI/tokens/neovim --no-newline",
+        model = "gpt-4o", -- your desired model (or use gpt-4o, etc.)
+        timeout = 30000, -- Timeout in milliseconds, increase this for reasoning models
+        temperature = 0,
+        max_completion_tokens = 8192, -- Increase this to include reasoning tokens (for reasoning models)
+        --reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
+      },
+
+      ollama = {
+        endpoint = "http://127.0.0.1:11434", -- Note that there is no /v1 at the end.
+        model = "gemma3:4b",
       },
     },
     cmd = {
