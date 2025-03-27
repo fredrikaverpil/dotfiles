@@ -207,7 +207,6 @@ return {
           tools = {
             mcp = {
               callback = function()
-                vim.notify(vim.inspect("returning from mcphub"))
                 return require("mcphub.extensions.codecompanion")
               end,
               description = "Call tools and resources from the MCP Servers",

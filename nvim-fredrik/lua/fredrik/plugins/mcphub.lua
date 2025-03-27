@@ -21,15 +21,11 @@ return {
         -- Optional options
         on_ready = function(hub)
           -- Called when hub is ready
-          vim.notify(vim.inspect("MCP Hub is ready!"), vim.log.levels.INFO, {
-            title = "MCP Hub",
-          })
+          -- vim.notify(vim.inspect("MCP Hub is ready!"), vim.log.levels.INFO, { title = "MCP Hub" })
         end,
         on_error = function(err)
           -- Called on errors
-          vim.notify(vim.inspect(err), vim.log.levels.ERROR, {
-            title = "MCP Hub",
-          })
+          -- vim.notify(vim.inspect(err), vim.log.levels.ERROR, { title = "MCP Hub" })
         end,
         log = {
           level = vim.log.levels.WARN,
