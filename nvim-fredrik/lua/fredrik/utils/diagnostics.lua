@@ -11,14 +11,24 @@ local function prefix(diagnostic)
 end
 
 function M.setup_diagnostics()
-  local diagnostics = {
+  ---@class vim.diagnostic.Opts?
+  local opts = {
+    enable = true,
+
+    virtual_lines = false,
+    -- virtual_lines = {
+    --   -- Only show virtual line diagnostics for the current cursor line
+    --   current_line = false,
+    -- },
+
+    -- virtual_text = false,
+    virtual_text = function(_, _)
+      ---@class vim.diagnostic.Opts.VirtualText
+      return { spacing = 4, source = "if_many", prefix = prefix }
+    end,
+
     underline = true,
     update_in_insert = false,
-    virtual_text = {
-      spacing = 4,
-      source = "if_many",
-      prefix = prefix,
-    },
     severity_sort = true,
     signs = {
       text = {
@@ -36,7 +46,7 @@ function M.setup_diagnostics()
     vim.fn.sign_define(name, { text = icon, texthl = name, numhl = "" })
   end
 
-  vim.diagnostic.config(vim.deepcopy(diagnostics))
+  vim.diagnostic.config(vim.deepcopy(opts))
 
   require("fredrik.config.keymaps").setup_diagnostics_keymaps()
 end
