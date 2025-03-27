@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "fetch": {
+      "args": ["mcp-server-fetch"],
+      "command": "uvx"
+    },
+    "tavily": {
+      "args": ["-y", "tavily-mcp@0.1.4"],
+      "command": "npx",
+      "disabled": false
+    },
+    "github.com/modelcontextprotocol/servers/tree/main/src/time": {
+      "command": "uvx",
+      "args": ["mcp-server-time"]
+    },
+    "github.com/modelcontextprotocol/servers/tree/main/src/git": {
+      "command": "uvx",
+      "args": ["mcp-server-git"]
+    }
+  }
+}

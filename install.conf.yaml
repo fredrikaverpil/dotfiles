@@ -51,6 +51,9 @@
     ~/.config/zed/settings.json:
       path: zed.jsonc
       force: true
+    ~/.cursor/mcp.json:
+      path: mcpservers.json
+      force: true
     ~/Library/Application Support/Code/User/settings.json:
       path: vscode_settings.jsonc
       force: true

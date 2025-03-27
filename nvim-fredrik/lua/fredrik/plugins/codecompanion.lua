@@ -157,7 +157,8 @@ return {
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
-      "nvim-telescope/telescope.nvim",
+      -- "nvim-telescope/telescope.nvim", -- NOTE: snacks?
+      "ravitemer/mcphub.nvim",
       {
         "saghen/blink.cmp",
         ---@module 'blink.cmp'
@@ -183,6 +184,11 @@ return {
 
       opts = {
         send_code = function()
+          if vim.fn.filereadable(".llm_ok") == 1 then
+            -- override by adding a .llm_ok file in the project root
+            return true
+          end
+
           return require("fredrik.utils.private").is_ai_enabled()
         end,
       },
@@ -193,27 +199,20 @@ return {
         chat = {
           adapter = "anthropic",
           slash_commands = {
-            ["buffer"] = {
+            buffer = { opts = { provider = "snacks" } },
+            file = { opts = { provider = "snacks" } },
+            help = { opts = { provider = "snacks" } },
+            symbols = { opts = { provider = "snacks" } },
+          },
+          tools = {
+            mcp = {
+              callback = function()
+                vim.notify(vim.inspect("returning from mcphub"))
+                return require("mcphub.extensions.codecompanion")
+              end,
+              description = "Call tools and resources from the MCP Servers",
               opts = {
-                provider = "snacks",
-              },
-            },
-
-            ["file"] = {
-              opts = {
-                provider = "snacks",
-              },
-            },
-
-            ["help"] = {
-              opts = {
-                provider = "snacks",
-              },
-            },
-
-            ["symbols"] = {
-              opts = {
-                provider = "snacks",
+                requires_approval = true,
               },
             },
           },
