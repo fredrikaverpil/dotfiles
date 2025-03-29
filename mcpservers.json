@@ -4,11 +4,6 @@
       "args": ["mcp-server-fetch"],
       "command": "uvx"
     },
-    "tavily": {
-      "args": ["-y", "tavily-mcp@0.1.4"],
-      "command": "npx",
-      "disabled": false
-    },
     "github.com/modelcontextprotocol/servers/tree/main/src/time": {
       "command": "uvx",
       "args": ["mcp-server-time"]
@@ -16,6 +11,15 @@
     "github.com/modelcontextprotocol/servers/tree/main/src/git": {
       "command": "uvx",
       "args": ["mcp-server-git"]
+    },
+    "github.com/tavily-ai/tavily-mcp": {
+      "command": "npx",
+      "args": ["-y", "tavily-mcp@0.1.4"],
+      "env": {
+        "TAVILY_API_KEY": "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"
+      },
+      "disabled": false,
+      "autoApprove": []
     }
   }
 }
