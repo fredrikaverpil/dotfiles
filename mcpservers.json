@@ -4,6 +4,15 @@
       "args": ["mcp-server-fetch"],
       "command": "uvx"
     },
+    "github.com/fredrikaverpil/mcp-tools": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/Users/fredrik/code/public/mcp-tools",
+        "run",
+        "server.py"
+      ]
+    },
     "github.com/modelcontextprotocol/servers/tree/main/src/time": {
       "command": "uvx",
       "args": ["mcp-server-time"]
@@ -16,7 +25,7 @@
       "command": "npx",
       "args": ["-y", "tavily-mcp@0.1.4"],
       "env": {
-        "TAVILY_API_KEY": "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"
+        "TAVILY_API_KEY": null
       },
       "disabled": false,
       "autoApprove": []

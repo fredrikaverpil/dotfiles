@@ -7,6 +7,32 @@
         "@modelcontextprotocol/server-filesystem",
         "/Users/fredrik/code/public"
       ]
+    },
+    "github.com/fredrikaverpil/mcp-tools": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/Users/fredrik/code/public/mcp-tools",
+        "run",
+        "server.py"
+      ]
+    },
+    "github.com/modelcontextprotocol/servers/tree/main/src/time": {
+      "command": "uvx",
+      "args": ["mcp-server-time"]
+    },
+    "github.com/modelcontextprotocol/servers/tree/main/src/git": {
+      "command": "uvx",
+      "args": ["mcp-server-git"]
+    },
+    "github.com/tavily-ai/tavily-mcp": {
+      "command": "npx",
+      "args": ["-y", "tavily-mcp@0.1.4"],
+      "env": {
+        "TAVILY_API_KEY": null
+      },
+      "disabled": false,
+      "autoApprove": []
     }
   }
 }
