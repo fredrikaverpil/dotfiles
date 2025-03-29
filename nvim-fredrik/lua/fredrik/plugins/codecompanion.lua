@@ -17,7 +17,8 @@ local gemini_fn = function()
     env = { api_key = "cmd:op read op://Personal/Google/tokens/gemini --no-newline" },
     schema = {
       model = {
-        default = "gemini-2.0-flash-thinking-exp",
+        default = "gemini-2.5-pro-exp-03-25",
+        -- default = "gemini-2.0-flash-thinking-exp",
       },
     },
   }
@@ -41,7 +42,7 @@ local ollama_fn = function()
   return require("codecompanion.adapters").extend("ollama", {
     schema = {
       model = {
-        default = "gemma3:4b",
+        default = "gemma3:1b",
         -- default = "deepseek-r1:7b",
         -- default = "llama3.1:7b",
         -- default = "codellama:7b",
