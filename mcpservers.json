@@ -1,8 +1,13 @@
 {
+  "nativeMCPServers": [],
   "mcpServers": {
-    "fetch": {
-      "args": ["mcp-server-fetch"],
-      "command": "uvx"
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/fredrik/code/public"
+      ]
     },
     "github.com/fredrikaverpil/mcp-tools": {
       "command": "uv",
@@ -17,18 +22,38 @@
       "command": "uvx",
       "args": ["mcp-server-time"]
     },
+    "github.com/tavily-ai/tavily-mcp": {
+      "env": {
+        "TAVILY_API_KEY": null
+      },
+      "command": "npx",
+      "disabled": false,
+      "autoApprove": [],
+      "args": ["-y", "tavily-mcp@0.1.4"]
+    },
+    "fetch": {
+      "disabled": false,
+      "args": ["mcp-server-fetch"],
+      "command": "uvx"
+    },
     "github.com/modelcontextprotocol/servers/tree/main/src/git": {
       "command": "uvx",
       "args": ["mcp-server-git"]
     },
-    "github.com/tavily-ai/tavily-mcp": {
-      "command": "npx",
-      "args": ["-y", "tavily-mcp@0.1.4"],
+    "google-maps": {
+      "disabled": true,
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "GOOGLE_MAPS_API_KEY",
+        "mcp/google-maps"
+      ],
       "env": {
-        "TAVILY_API_KEY": null
-      },
-      "disabled": false,
-      "autoApprove": []
+        "GOOGLE_MAPS_API_KEY": null
+      }
     }
   }
 }
