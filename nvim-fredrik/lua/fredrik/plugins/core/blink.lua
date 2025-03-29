@@ -22,6 +22,7 @@ return {
           menu = { auto_show = true },
           ghost_text = { enabled = true },
         },
+        keymap = { preset = "inherit" },
       },
       completion = {
         list = {
