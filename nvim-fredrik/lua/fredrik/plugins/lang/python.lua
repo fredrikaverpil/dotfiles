@@ -101,7 +101,7 @@ return {
   },
 
   {
-    "neovim/nvim-lspconfig",
+    "virtual-lsp-config",
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -250,7 +250,7 @@ return {
     ft = { "python" },
     branch = "regexp", -- https://github.com/linux-cultist/venv-selector.nvim/tree/regexp
     dependencies = {
-      "neovim/nvim-lspconfig",
+      "virtual-lsp-config",
       "nvim-telescope/telescope.nvim",
       "mfussenegger/nvim-dap-python",
     },

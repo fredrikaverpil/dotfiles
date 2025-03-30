@@ -151,7 +151,7 @@ return {
   },
 
   {
-    "neovim/nvim-lspconfig",
+    "virtual-lsp-config",
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
@@ -257,7 +257,7 @@ return {
     enabled = false,
     dependencies = { -- optional packages
       "ray-x/guihua.lua",
-      "neovim/nvim-lspconfig",
+      "virtual-lsp-config",
       "nvim-treesitter/nvim-treesitter",
     },
     config = function()

@@ -38,7 +38,7 @@ return {
   },
 
   {
-    "neovim/nvim-lspconfig",
+    "virtual-lsp-config",
     dependencies = {
       {
         "b0o/SchemaStore.nvim",

@@ -25,7 +25,7 @@ return {
   },
 
   {
-    "neovim/nvim-lspconfig",
+    "virtual-lsp-config",
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
