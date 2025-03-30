@@ -22,7 +22,8 @@ return {
           menu = { auto_show = true },
           ghost_text = { enabled = true },
         },
-        keymap = { preset = "inherit" },
+        keymap = require("fredrik.config.keymaps").setup_blink_cmdline_keymaps(),
+        -- keymap = { preset = "cmdline" },
       },
       completion = {
         list = {

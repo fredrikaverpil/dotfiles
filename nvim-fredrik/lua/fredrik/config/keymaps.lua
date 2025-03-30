@@ -246,6 +246,13 @@ function M.setup_blink_cmp_keymaps()
   }
 end
 
+function M.setup_blink_cmdline_keymaps()
+  return {
+    ["<Up>"] = { "select_prev", "fallback" },
+    ["<Down>"] = { "select_next", "fallback" },
+  }
+end
+
 function M.setup_luasnip_keymaps()
   return {
     {
