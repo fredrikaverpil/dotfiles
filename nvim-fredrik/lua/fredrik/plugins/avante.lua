@@ -22,6 +22,7 @@ return {
       "echasnovski/mini.icons",
       "zbirenbaum/copilot.lua", -- for providers='copilot'
       "HakonHarnes/img-clip.nvim", -- for image pasting
+      "ravitemer/mcphub.nvim",
       {
         -- Make sure to set this up properly if you have lazy=true
         "MeanderingProgrammer/render-markdown.nvim",
@@ -71,41 +72,56 @@ return {
         provider = "telescope",
       },
 
-      custom_tools = {
-        {
-          name = "run_go_tests", -- Unique name for the tool
-          description = "Run Go unit tests and return results", -- Description shown to AI
-          command = "go test -v ./...", -- Shell command to execute
-          param = { -- Input parameters (optional)
-            type = "table",
-            fields = {
-              {
-                name = "target",
-                description = "Package or directory to test (e.g. './pkg/...' or './internal/pkg')",
-                type = "string",
-                optional = true,
-              },
-            },
-          },
-          returns = { -- Expected return values
-            {
-              name = "result",
-              description = "Result of the fetch",
-              type = "string",
-            },
-            {
-              name = "error",
-              description = "Error message if the fetch was not successful",
-              type = "string",
-              optional = true,
-            },
-          },
-          func = function(params, on_log, on_complete) -- Custom function to execute
-            local target = params.target or "./..."
-            return vim.fn.system(string.format("go test -v %s", target))
-          end,
-        },
-      },
+      -- NOTE: when using mcphub.nvim, disable tools defined here
+      --
+      -- custom_tools = {
+      --   {
+      --     name = "run_go_tests", -- Unique name for the tool
+      --     description = "Run Go unit tests and return results", -- Description shown to AI
+      --     command = "go test -v ./...", -- Shell command to execute
+      --     param = { -- Input parameters (optional)
+      --       type = "table",
+      --       fields = {
+      --         {
+      --           name = "target",
+      --           description = "Package or directory to test (e.g. './pkg/...' or './internal/pkg')",
+      --           type = "string",
+      --           optional = true,
+      --         },
+      --       },
+      --     },
+      --     returns = { -- Expected return values
+      --       {
+      --         name = "result",
+      --         description = "Result of the fetch",
+      --         type = "string",
+      --       },
+      --       {
+      --         name = "error",
+      --         description = "Error message if the fetch was not successful",
+      --         type = "string",
+      --         optional = true,
+      --       },
+      --     },
+      --     func = function(params, on_log, on_complete) -- Custom function to execute
+      --       local target = params.target or "./..."
+      --       return vim.fn.system(string.format("go test -v %s", target))
+      --     end,
+      --   },
+      -- },
+
+      -- The custom_tools type supports both a list and a function that returns a list.
+      custom_tools = function()
+        return {
+          require("mcphub.extensions.avante").mcp_tool(),
+        }
+      end,
+
+      -- The system_prompt type supports both a string and a function that returns a string. Using a function here allows dynamically updating the prompt with mcphub
+      system_prompt = function()
+        local hub = require("mcphub").get_hub_instance()
+        return hub:get_active_servers_prompt()
+      end,
 
       claude = {
         endpoint = "https://api.anthropic.com",
