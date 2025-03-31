@@ -282,19 +282,6 @@ function M.setup_luasnip_keymaps()
   }
 end
 
-function M.setup_neotree_keymaps()
-  return {
-    { "<leader>e", ":Neotree source=filesystem reveal=true position=left toggle=true<CR>", desc = "Neo-tree" },
-    {
-      "<leader>ge",
-      function()
-        require("neo-tree.command").execute({ source = "git_status", toggle = true })
-      end,
-      desc = "Git Explorer",
-    },
-  }
-end
-
 function M.setup_telescope_keymaps()
   --- @param set_cwd boolean
   local function open_file_in_other_project(set_cwd)
@@ -359,6 +346,13 @@ function M.setup_snacks_keymaps()
         Snacks.picker.grep(opts)
       end,
       desc = "Grep",
+    },
+    {
+      "<leader>e",
+      function()
+        Snacks.explorer.open({ hidden = true, ignored = true })
+      end,
+      desc = "Explorer",
     },
     {
       "<leader>gg",
@@ -806,7 +800,7 @@ function M.setup_neotest_keymaps()
     {
       "<leader>td",
       function()
-        vim.cmd("Neotree close")
+        -- vim.cmd("Neotree close")
         require("neotest").summary.close()
         require("neotest").output_panel.close()
         require("neotest").run.run({ suite = false, strategy = "dap" })
@@ -816,7 +810,7 @@ function M.setup_neotest_keymaps()
     {
       "<leader>tD",
       function()
-        vim.cmd("Neotree close")
+        -- vim.cmd("Neotree close")
         require("neotest").summary.close()
         require("neotest").output_panel.close()
         require("neotest").run.run({ vim.fn.expand("%"), strategy = "dap" })

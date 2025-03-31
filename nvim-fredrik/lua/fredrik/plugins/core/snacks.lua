@@ -99,6 +99,10 @@ return {
         },
       },
 
+      explorer = {
+        enabled = true,
+      },
+
       quickfile = { enabled = true },
 
       statuscolumn = { enabled = true },
