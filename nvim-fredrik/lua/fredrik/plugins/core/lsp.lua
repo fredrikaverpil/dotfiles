@@ -33,36 +33,6 @@ local function extend_capabilities(servers)
   end
 end
 
---- Set up as part of attaching to the LSP server.
----@param servers table<string, vim.lsp.Config>
-local function set_on_attach(servers)
-  for _, server_opts in pairs(servers) do
-    local original_on_attach = server_opts.on_attach
-    server_opts.on_attach = function(client, bufnr)
-      -- setup codelens
-      if client:supports_method("textDocument/codeLens", bufnr) then
-        vim.lsp.codelens.refresh()
-        vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
-          buffer = bufnr,
-          callback = vim.lsp.codelens.refresh,
-        })
-      end
-
-      -- setup LSP-provided folding
-      require("fredrik.config.options").lsp_foldexpr()
-
-      -- FIXME: causes crash here
-      -- set up workspace diagnostics
-      -- require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
-
-      -- call original on_attach last
-      if original_on_attach ~= nil then
-        original_on_attach(client, bufnr)
-      end
-    end
-  end
-end
-
 --- Ensure LSP binaries are installed with mason-lspconfig.
 ---@param servers table<string, vim.lsp.Config>
 local function ensure_servers_installed(servers)
@@ -118,12 +88,50 @@ local function register_lsp_servers(servers)
   end
 end
 
+-- Register LSP attach autocmd.
+local function register_lspattach_autocmd()
+  vim.api.nvim_create_autocmd("LspAttach", {
+    group = vim.api.nvim_create_augroup("lsp-attach-keymaps", { clear = true }),
+    ---@param args vim.api.keyset.create_autocmd.callback_args
+    callback = function(args)
+      local client = vim.lsp.get_client_by_id(args.data.client_id)
+      if client then
+        -- set up codelens
+        if client:supports_method("textDocument/codeLens", args.buf) then
+          vim.lsp.codelens.refresh()
+          vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
+            buffer = args.buf,
+            callback = vim.lsp.codelens.refresh,
+          })
+        end
+
+        -- set up workspace diagnostics
+        require("workspace-diagnostics").populate_workspace_diagnostics(client, args.buf)
+      end
+
+      -- setup LSP-provided folding
+      require("fredrik.config.options").lsp_foldexpr()
+
+      -- set up keymaps
+      require("fredrik.config.keymaps").setup_lsp_autocmd_keymaps(args.buf)
+    end,
+  })
+end
+
 return {
   {
     "virtual-lsp-config",
     virtual = true, -- NOTE: not an actual plugin
     event = "VeryLazy",
     dependencies = {
+      {
+        -- the new lspconfig with vim.lsp servers
+        "TheRealLorenz/nvim-lspconfig",
+        -- opts = function()
+        --   local lspconfig = require("lspconfig").gopls
+        --   vim.notify(vim.inspect(lspconfig.gopls))
+        -- end,
+      },
       {
         "b0o/SchemaStore.nvim",
         version = false, -- last release is very old
@@ -179,18 +187,11 @@ return {
     },
     config = function(_, opts)
       extend_capabilities(opts.servers)
-      set_on_attach(opts.servers)
       ensure_servers_installed(opts.servers)
       register_lsp_servers(opts.servers)
+      register_lspattach_autocmd()
 
-      -- set up keymaps
       require("fredrik.config.keymaps").setup_lsp_keymaps()
-      vim.api.nvim_create_autocmd("LspAttach", {
-        group = vim.api.nvim_create_augroup("lsp-attach-keymaps", { clear = true }),
-        callback = function(event)
-          require("fredrik.config.keymaps").setup_lsp_autocmd_keymaps(event)
-        end,
-      })
     end,
   },
 }

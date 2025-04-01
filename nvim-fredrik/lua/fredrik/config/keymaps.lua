@@ -148,10 +148,9 @@ function M.setup_trouble_keymaps()
   }
 end
 
----@param event vim.api.keyset.create_autocmd.callback_args
-function M.setup_lsp_autocmd_keymaps(event)
+function M.setup_lsp_autocmd_keymaps(buf)
   local map = function(keys, func, desc)
-    vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc, nowait = true })
+    vim.keymap.set("n", keys, func, { buffer = buf, desc = "LSP: " .. desc, nowait = true })
   end
 
   -- Rename the variable under your cursor
