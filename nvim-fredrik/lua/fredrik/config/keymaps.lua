@@ -354,6 +354,13 @@ function M.setup_snacks_keymaps()
       desc = "Explorer",
     },
     {
+      "<leader>E",
+      function()
+        Snacks.explorer.reveal({ hidden = true, ignored = true })
+      end,
+      desc = "Explorer (reveal buffer)",
+    },
+    {
       "<leader>gg",
       function()
         Snacks.lazygit.open()
