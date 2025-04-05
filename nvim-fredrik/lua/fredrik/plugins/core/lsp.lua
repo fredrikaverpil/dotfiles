@@ -83,7 +83,8 @@ local function register_lsp_servers(servers)
       )
     end
 
-    vim.lsp.config[server] = server_opts
+    vim.lsp.config[server] = server_opts -- NOTE: overwrite
+    -- vim.lsp.config(server, server_opts) -- NOTE: extend
     vim.lsp.enable(server, true)
   end
 end
