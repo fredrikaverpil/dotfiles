@@ -1,42 +1,21 @@
 {
   "mcpServers": {
-    "fetch": {
-      "args": ["mcp-server-fetch"],
-      "disabled": false,
-      "command": "uvx"
-    },
-    "filesystem": {
-      "command": "npx",
+    "github": {
+      "command": "docker",
       "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "/Users/fredrik/code/public"
-      ]
-    },
-    "github.com/fredrikaverpil/mcp-tools": {
-      "args": [
-        "-C",
-        "/Users/fredrik/code/public/mcp-tools",
         "run",
-        "./cmd/mcp-tools/main.go"
+        "-i",
+        "--rm",
+        "-e",
+        "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "ghcr.io/github/github-mcp-server"
       ],
-      "disabled": false,
-      "command": "go"
-    },
-    "github.com/modelcontextprotocol/servers/tree/main/src/git": {
-      "command": "uvx",
-      "args": ["mcp-server-git"]
-    },
-    "github.com/tavily-ai/tavily-mcp": {
-      "disabled": false,
-      "command": "npx",
       "env": {
-        "TAVILY_API_KEY": null
-      },
-      "args": ["-y", "tavily-mcp@0.1.4"],
-      "autoApprove": []
+        "GITHUB_PERSONAL_ACCESS_TOKEN": null
+      }
     },
     "google-maps": {
+      "command": "docker",
       "env": {
         "GOOGLE_MAPS_API_KEY": null
       },
@@ -48,9 +27,45 @@
         "GOOGLE_MAPS_API_KEY",
         "mcp/google-maps"
       ],
-      "disabled": true,
-      "command": "docker"
+      "disabled": true
+    },
+    "github.com/modelcontextprotocol/servers/tree/main/src/git": {
+      "args": ["mcp-server-git"],
+      "command": "uvx"
+    },
+    "fetch": {
+      "command": "uvx",
+      "args": ["mcp-server-fetch"],
+      "disabled": false
+    },
+    "github.com/tavily-ai/tavily-mcp": {
+      "env": {
+        "TAVILY_API_KEY": null
+      },
+      "command": "npx",
+      "autoApprove": [],
+      "args": ["-y", "tavily-mcp@0.1.4"],
+      "disabled": true
+    },
+    "filesystem": {
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/fredrik/code/public"
+      ],
+      "command": "npx"
+    },
+    "github.com/fredrikaverpil/mcp-tools": {
+      "command": "go",
+      "args": [
+        "-C",
+        "/Users/fredrik/code/public/mcp-tools",
+        "run",
+        "./cmd/mcp-tools/main.go"
+      ],
+      "disabled": false
     }
   },
   "nativeMCPServers": []
 }
+
