@@ -2,6 +2,7 @@ return {
   {
     "zbirenbaum/copilot.lua",
     lazy = true,
+    commit = "5a8fdd34bb67eadc3f69e46870db0bed0cc9841c",
     event = "InsertEnter",
     enabled = true,
     dependencies = {
@@ -21,11 +22,13 @@ return {
           -- end
 
           local colors = {
-            ["Normal"] = require("fredrik.utils.colors").fgcolor("Special"),
-            ["Warning"] = require("fredrik.utils.colors").fgcolor("DiagnosticError"),
-            ["InProgress"] = require("fredrik.utils.colors").fgcolor("DiagnosticWarn"),
+            -- statuses NOT supported by copilot.lua (see `require("copilot").api.status`)
             ["Offline"] = require("fredrik.utils.colors").fgcolor("Comment"),
-            ["Error"] = require("fredrik.utils.colors").fgcolor("Error"),
+            -- statuses supported by copilot.lua
+            [""] = require("fredrik.utils.colors").fgcolor("Special"),
+            ["InProgress"] = require("fredrik.utils.colors").fgcolor("DiagnosticWarning"),
+            ["Normal"] = require("fredrik.utils.colors").fgcolor("DiagnosticOk"),
+            ["Warning"] = require("fredrik.utils.colors").fgcolor("DiagnosticError"),
           }
 
           opts.copilot = {
@@ -38,11 +41,8 @@ return {
                 else
                   -- online
                   local status = require("copilot.api").status
-                  if status.data.status ~= "" or status.data.message ~= "" then
-                    return colors[status.data.status] or colors["Error"]
-                  else
-                    return colors["InProgress"]
-                  end
+                  -- NOTE: could potentially do something based on status.data.message too.
+                  return colors[status.data.status]
                 end
               end,
             },
@@ -78,7 +78,6 @@ return {
 
       -- Make sure not to enable copilot in private projects
       require("fredrik.utils.private").toggle_copilot()
-
     end,
     keys = require("fredrik.config.keymaps").setup_copilot_keymaps(),
   },
