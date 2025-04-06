@@ -72,14 +72,20 @@ return {
     -- TODO: make more generic insertion function which can insert anywhere.
     if opts.copilot then
       table.insert(opts.sections.lualine_x, 1, opts.copilot.lualine_component)
+    else
+      vim.notify("Lualine: copilot component not loaded", vim.log.levels.WARN)
     end
 
     if opts.dap_status then
       table.insert(opts.sections.lualine_x, 2, opts.dap_status.lualine_component)
+    else
+      vim.notify("Lualine: dap_status component not loaded", vim.log.levels.WARN)
     end
 
     if opts.noice then
       table.insert(opts.sections.lualine_x, 3, opts.noice.lualine_component)
+    else
+      vim.notify("Lualine: noice component not loaded", vim.log.levels.WARN)
     end
 
     require("lualine").setup(opts)
