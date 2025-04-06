@@ -1,4 +1,6 @@
 {
-  "chat.mcp.enabled": true
+  "chat.mcp.enabled": true,
+  "github.copilot.chat.codesearch.enabled": true,
+  "github.copilot.chat.agent.thinkingTool": true
 }
 
