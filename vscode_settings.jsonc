@@ -387,5 +387,11 @@
     // "formatting.gofumpt": true,
     // "formatting.goimports": true,
     "ui.diagnostic.staticcheck": true
+  },
+  "chat.mcp.enabled": true,
+  "mcp": {
+    // see mcpservers.json (Claude, Cursor)
+    "inputs": [],
+    "servers": {}
   }
 }

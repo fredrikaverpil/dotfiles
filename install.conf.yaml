@@ -19,6 +19,7 @@
     ~/Taskfile.yml:
     ~/Library/Application Support/lazygit/config.yml:
       path: lazygit.yml
+      force: true
     ~/.config/ghostty/config:
       path: ghostty.conf
       force: true
@@ -58,7 +59,11 @@
       path: mcpservers.json
       force: true
     ~/Library/Application Support/Code/User/settings.json:
-      path: vscode_settings.json
+      path: vscode_settings.jsonc
+      force: true
+      if: '[ "$(uname -s)" = "Darwin" ]'
+    /Users/fredrik/Library/Application Support/Code - Insiders/User/settings.json:
+      path: vscode_insiders_settings.jsonc
       force: true
       if: '[ "$(uname -s)" = "Darwin" ]'
     ~/Library/KeyBindings/DefaultKeyBinding.dict:
