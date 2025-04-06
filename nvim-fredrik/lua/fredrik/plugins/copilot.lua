@@ -35,7 +35,10 @@ return {
                 else
                   -- online
                   local status = require("copilot.api").status
-                  -- NOTE: could potentially do something based on status.data.message too.
+                  if status.data.message ~= "" then
+                    -- NOTE: could potentially do something based on status.data.message too.
+                    vim.notify("Copilot message: " .. vim.inspect(status.data.message))
+                  end
                   return colors[status.data.status]
                 end
               end,
