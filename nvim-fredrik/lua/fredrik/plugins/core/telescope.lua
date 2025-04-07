@@ -10,8 +10,8 @@ return {
       { "nvim-telescope/telescope-ui-select.nvim" },
       {
         "nvim-telescope/telescope-fzf-native.nvim",
-        enabled = vim.fn.executable("make") == 1,
-        build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
+        enabled = vim.fn.executable("make") == 1 and (vim.fn.executable("gcc") == 1 or vim.fn.executable("clang") == 1),
+        build = "make",
       },
       {
         "nvim-telescope/telescope-live-grep-args.nvim",
