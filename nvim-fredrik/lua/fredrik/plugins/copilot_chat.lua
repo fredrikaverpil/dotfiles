@@ -4,7 +4,12 @@ return {
     "CopilotC-Nvim/CopilotChat.nvim",
     lazy = true,
     event = "VeryLazy",
-    version = "*",
+
+    -- version = "*",
+    -- version = "v3.10.0", -- NOTE: bad
+    -- commit = "cf02033", -- NOTE: bad; breaks test detection in neotest
+    version = "v3.9.1", -- NOTE: ok
+
     dependencies = {
       { "zbirenbaum/copilot.lua" },
       { "nvim-lua/plenary.nvim" },
