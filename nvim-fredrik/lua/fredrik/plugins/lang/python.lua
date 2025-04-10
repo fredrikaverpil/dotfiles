@@ -40,14 +40,6 @@ local function find_python_binary(name)
   return name
 end
 
---- Return local path, if it exists, or nil
-local function local_path(path)
-  if vim.fn.isdirectory(vim.fn.expand(path)) == 0 then
-    return nil
-  end
-  return path
-end
-
 local root_files = {
   "pyproject.toml",
   "ruff.toml",

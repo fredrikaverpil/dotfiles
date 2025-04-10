@@ -10,14 +10,6 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
---- Return local path, if it exists, or nil
-local function local_path(path)
-  if vim.fn.isdirectory(vim.fn.expand(path)) == 0 then
-    return nil
-  end
-  return path
-end
-
 local golangci_config_filepath_cache = nil
 local tags = "-tags=wireinject,integration"
 
@@ -284,7 +276,7 @@ return {
         -- dependencies = {
         --   "uga-rosa/utf8.nvim",
         -- },
-        dir = local_path("~/code/public/neotest-golang"),
+        dir = require("fredrik.utils.dev").local_path("~/code/public/neotest-golang"),
       },
     },
 
@@ -331,7 +323,7 @@ return {
 
   {
     "fredrikaverpil/godoc.nvim",
-    dir = local_path("~/code/public/godoc.nvim"),
+    dir = require("fredrik.utils.dev").local_path("~/code/public/godoc.nvim"),
     dependencies = {
       { "folke/snacks.nvim" },
       {

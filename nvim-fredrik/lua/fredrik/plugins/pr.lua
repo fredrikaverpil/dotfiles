@@ -5,7 +5,7 @@ return {
     dependencies = {
       "nvim-lua/plenary.nvim",
     },
-    dir = "~/code/public/pr.nvim",
+    dir = require("fredrik.utils.dev").local_path("~/code/public/pr.nvim"),
 
     ---@type PR.Config
     opts = {
