@@ -273,10 +273,10 @@ return {
     dependencies = {
       {
         "fredrikaverpil/neotest-golang",
+        dev = true, -- see lazy.lua for local path details
         -- dependencies = {
         --   "uga-rosa/utf8.nvim",
         -- },
-        dir = require("fredrik.utils.dev").local_path("~/code/public/neotest-golang"),
       },
     },
 
@@ -295,7 +295,7 @@ return {
         },
         runner = "gotestsum",
         gotestsum_args = { "--format=standard-verbose" },
-        testify_enabled = true,
+        -- testify_enabled = true,
         -- sanitize_output = true,
         -- log_level = vim.log.levels.TRACE,
 
@@ -323,7 +323,7 @@ return {
 
   {
     "fredrikaverpil/godoc.nvim",
-    dir = require("fredrik.utils.dev").local_path("~/code/public/godoc.nvim"),
+    dev = true, -- see lazy.lua for local path details
     dependencies = {
       { "folke/snacks.nvim" },
       {

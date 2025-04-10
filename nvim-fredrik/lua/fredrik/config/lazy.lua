@@ -24,6 +24,11 @@ require("lazy").setup({
     { import = "fredrik.plugins.core" },
   },
 
+  dev = {
+    path = "~/code/public",
+    fallback = true, -- Fallback to git when local plugin doesn't exist
+  },
+
   -- import per-project config
   -- NOTE: this is built into lazy.nvim; place a .lazy.lua file in the project's
   -- root directory, containing a lazy spec and it will be merged in at the end of the above spec.

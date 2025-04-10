@@ -1,11 +1,11 @@
 return {
   {
     "fredrikaverpil/pr.nvim",
+    dev = true, -- see lazy.lua for local path details
     lazy = true,
     dependencies = {
       "nvim-lua/plenary.nvim",
     },
-    dir = require("fredrik.utils.dev").local_path("~/code/public/pr.nvim"),
 
     ---@type PR.Config
     opts = {
