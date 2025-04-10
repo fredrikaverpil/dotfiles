@@ -26,14 +26,23 @@
 - Noice.nvim for cmdline improvement.
 - Trouble.nvim for keeping track of diagnostics issues.
 - Gx.nvim for universal `gx` keymap.
-- Neo-tree for navigating files and folders.
 - Diffview for reviewing PRs.
-- AI chat via Codecompanion, CopilotChat.
+- AI chat via Codecompanion, Avante, CopilotChat.
 - And much, much more...
 
 ## Try it out! 🚀
 
-> [!WARNING]
+> [!NOTE]
+>
+> I'm not maintaining my Neovim config for anyone besides myself. But I'm making
+> it publicly available for others to draw inspiration from! 😊
+>
+> You will likely see a bunch of errors, as tools/plugins cannot be
+> installed/compiled due to missing binaries.
+
+### Using NVIM_APPNAME
+
+> [!NOTE]
 >
 > Requires Neovim >= v0.11.0.
 
@@ -48,10 +57,38 @@ ln -s dotfiles/nvim-fredrik ~/.config/fredrik
 NVIM_APPNAME=fredrik nvim
 ```
 
-> [!NOTE]
->
-> I'm not maintaining my Neovim config for anyone besides myself. But I'm making
-> it publicly available for others to draw inspiration from! 😊
+### Using container
+
+```Dockerfile
+FROM ubuntu:22.04
+
+ENV DOTFILES=/dotfiles
+
+# install prerequisites
+RUN apt-get update && apt-get install curl git gcc cmake make fd-find ripgrep -y
+
+# install nvim
+RUN curl -LO https://github.com/neovim/neovim/releases/download/v0.11.0/nvim-linux-x86_64.tar.gz
+RUN tar -C /opt -xzf nvim-linux-x86_64.tar.gz
+ENV PATH="$PATH:/opt/nvim-linux-x86_64/bin"
+
+# install dotfiles
+RUN git clone https://github.com/fredrikaverpil/dotfiles.git ${DOTFILES}
+
+# symlink neovim config into place
+RUN mkdir -p ~/.config
+RUN ln -s ${DOTFILES}/nvim-fredrik/ ~/.config/nvim
+
+# install mason-managed tools
+RUN nvim "+Lazy! install" +MasonToolsInstallSync +q!
+
+WORKDIR /app
+```
+
+```sh
+docker build --platform linux/amd64 . -t nvim-fredrik
+docker run --rm --platform linux/amd64 -it -v $(pwd):/app nvim-fredrik
+```
 
 ## Design choices
 
