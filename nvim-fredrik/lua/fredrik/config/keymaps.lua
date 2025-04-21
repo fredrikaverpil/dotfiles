@@ -823,7 +823,7 @@ function M.setup_neotest_keymaps()
         -- vim.cmd("Neotree close")
         require("neotest").summary.close()
         require("neotest").output_panel.close()
-        require("neotest").run.run({ vim.fn.expand("%"), strategy = "dap" })
+        require("neotest").run.run({ vim.fn.expand("%"), strategy = "dap", suite = false })
       end,
       desc = "Debug current file",
     },
