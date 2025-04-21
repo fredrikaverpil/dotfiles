@@ -98,10 +98,8 @@ vim.keymap.set("n", "]q", vim.cmd.cnext, { desc = "Next quickfix" })
 -- diagnostic
 local function diagnostic_goto(count, severity)
   severity = severity and vim.diagnostic.severity[severity] or nil
-  ---@type vim.diagnostic.JumpOpts
-  local jump_opts = { count = count, severity = severity }
   return function()
-    vim.diagnostic.jump(jump_opts)
+    vim.diagnostic.jump({ count = count, severity = severity })
   end
 end
 vim.keymap.set("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line Diagnostics" })
