@@ -1,6 +1,5 @@
 M = {}
 
-
 -- windows
 vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to left window", silent = true, noremap = true })
 vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to lower window", silent = true, noremap = true })
@@ -98,10 +97,15 @@ vim.keymap.set("n", "]q", vim.cmd.cnext, { desc = "Next quickfix" })
 
 -- diagnostic
 local function diagnostic_goto(next, severity)
-  local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
   severity = severity and vim.diagnostic.severity[severity] or nil
+  local count = 1 -- jump to next
+  if not next then
+    count = -1 -- jump to previous
+  end
+  ---@type vim.diagnostic.JumpOpts
+  local jump_opts = { count = count, severity = severity }
   return function()
-    go({ severity = severity })
+    vim.diagnostic.jump(jump_opts)
   end
 end
 vim.keymap.set("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line Diagnostics" })
