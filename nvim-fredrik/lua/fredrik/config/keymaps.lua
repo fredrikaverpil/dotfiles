@@ -96,12 +96,8 @@ vim.keymap.set("n", "[q", vim.cmd.cprev, { desc = "Previous quickfix" })
 vim.keymap.set("n", "]q", vim.cmd.cnext, { desc = "Next quickfix" })
 
 -- diagnostic
-local function diagnostic_goto(next, severity)
+local function diagnostic_goto(count, severity)
   severity = severity and vim.diagnostic.severity[severity] or nil
-  local count = 1 -- jump to next
-  if not next then
-    count = -1 -- jump to previous
-  end
   ---@type vim.diagnostic.JumpOpts
   local jump_opts = { count = count, severity = severity }
   return function()
@@ -109,12 +105,12 @@ local function diagnostic_goto(next, severity)
   end
 end
 vim.keymap.set("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line Diagnostics" })
-vim.keymap.set("n", "]d", diagnostic_goto(true), { desc = "Next Diagnostic", silent = true })
-vim.keymap.set("n", "[d", diagnostic_goto(false), { desc = "Prev Diagnostic", silent = true })
-vim.keymap.set("n", "]e", diagnostic_goto(true, "ERROR"), { desc = "Next Error", silent = true })
-vim.keymap.set("n", "[e", diagnostic_goto(false, "ERROR"), { desc = "Prev Error", silent = true })
-vim.keymap.set("n", "]w", diagnostic_goto(true, "WARN"), { desc = "Next Warning", silent = true })
-vim.keymap.set("n", "[w", diagnostic_goto(false, "WARN"), { desc = "Prev Warning", silent = true })
+vim.keymap.set("n", "]d", diagnostic_goto(1), { desc = "Next Diagnostic", silent = true })
+vim.keymap.set("n", "[d", diagnostic_goto(-1), { desc = "Prev Diagnostic", silent = true })
+vim.keymap.set("n", "]e", diagnostic_goto(1, "ERROR"), { desc = "Next Error", silent = true })
+vim.keymap.set("n", "[e", diagnostic_goto(-1, "ERROR"), { desc = "Prev Error", silent = true })
+vim.keymap.set("n", "]w", diagnostic_goto(1, "WARN"), { desc = "Next Warning", silent = true })
+vim.keymap.set("n", "[w", diagnostic_goto(-1, "WARN"), { desc = "Prev Warning", silent = true })
 
 local function map_normal_mode(keys, func, desc)
   -- default values:
