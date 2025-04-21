@@ -283,6 +283,24 @@ return {
   },
 
   {
+    "zgs225/gomodifytags.nvim",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      {
+        "williamboman/mason.nvim",
+        opts = function(_, opts)
+          opts.ensure_installed = opts.ensure_installed or {}
+          vim.list_extend(opts.ensure_installed, { "gomodifytags" })
+        end,
+      },
+    },
+    config = function(_, opts)
+      require("gomodifytags").setup(opts) -- Optional: You can add any specific configuration here if needed.
+    end,
+    cmd = { "GoAddTags", "GoRemoveTags", "GoInstallModifyTagsBin" },
+  },
+
+  {
     "ray-x/go.nvim",
     lazy = true,
     ft = { "go", "gomod" },
