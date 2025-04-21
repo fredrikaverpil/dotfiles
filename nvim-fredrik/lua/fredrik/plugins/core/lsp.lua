@@ -106,12 +106,14 @@ local function register_lspattach_autocmd()
           })
         end
 
+        -- setup LSP-provided folding
+        if client:supports_method("textDocument/foldingRange", args.buf) then
+          require("fredrik.config.options").lsp_foldexpr()
+        end
+
         -- set up workspace diagnostics
         require("workspace-diagnostics").populate_workspace_diagnostics(client, args.buf)
       end
-
-      -- setup LSP-provided folding
-      require("fredrik.config.options").lsp_foldexpr()
 
       -- set up keymaps
       require("fredrik.config.keymaps").setup_lsp_autocmd_keymaps(args.buf)
