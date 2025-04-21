@@ -4,7 +4,8 @@ M.notes_path = vim.fn.expand(M.vault_path .. "/Meeting_notes")
 M.scratchpad_path = vim.fn.expand(M.vault_path .. "/scratchpad.md")
 
 return {
-  "epwalsh/obsidian.nvim",
+  -- "epwalsh/obsidian.nvim",
+  "obsidian-nvim/obsidian.nvim",
   lazy = true,
   dependencies = {
     -- required
@@ -19,28 +20,28 @@ return {
       dependencies = {
         { "saghen/blink.compat", branch = "main" },
       },
-      opts = {
-        sources = {
-          default = { "obsidian", "obsidian_new", "obsidian_tags" },
-          providers = {
-            obsidian = {
-              name = "obsidian",
-              module = "blink.compat.source",
-            },
-            obsidian_new = {
-              name = "obsidian_new",
-              module = "blink.compat.source",
-            },
-            obsidian_tags = {
-              name = "obsidian_tags",
-              module = "blink.compat.source",
-            },
-          },
-        },
-      },
-      opts_extend = {
-        "sources.default",
-      },
+      -- opts = {
+      --   sources = {
+      --     default = { "obsidian", "obsidian_new", "obsidian_tags" },
+      --     providers = {
+      --       obsidian = {
+      --         name = "obsidian",
+      --         module = "blink.compat.source",
+      --       },
+      --       obsidian_new = {
+      --         name = "obsidian_new",
+      --         module = "blink.compat.source",
+      --       },
+      --       obsidian_tags = {
+      --         name = "obsidian_tags",
+      --         module = "blink.compat.source",
+      --       },
+      --     },
+      --   },
+      -- },
+      -- opts_extend = {
+      --   "sources.default",
+      -- },
     },
   },
   enabled = function()
@@ -65,10 +66,14 @@ return {
 
     -- Optional, completion of wiki links, local markdown links, and tags using nvim-cmp.
     completion = {
-      -- Set to false to disable completion.
       nvim_cmp = false, -- NOTE: use blink.cmp instead
+      blink = true,
       -- Trigger completion at 2 chars.
       min_chars = 2,
+    },
+
+    picker = {
+      name = "snacks.pick",
     },
 
     -- Specify how to handle attachments.
