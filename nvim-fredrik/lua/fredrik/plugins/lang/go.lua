@@ -271,6 +271,18 @@ return {
   },
 
   {
+    "fang2hou/go-impl.nvim",
+    ft = "go",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+      "nvim-lua/plenary.nvim",
+      "folke/snacks.nvim",
+    },
+    opts = {},
+    cmd = { "GoImplOpen" },
+  },
+
+  {
     "ray-x/go.nvim",
     lazy = true,
     ft = { "go", "gomod" },
