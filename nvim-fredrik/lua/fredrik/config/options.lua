@@ -87,28 +87,14 @@ function _G.custom_foldtext()
   return string.format("%s (%d lines)", line_text, line_count)
 end
 function M.treesitter_foldexpr()
-  vim.opt.foldmethod = "expr"
-  vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-  vim.opt.foldtext = "v:lua.custom_foldtext()"
+  vim.opt_local.foldmethod = "expr"
+  vim.opt_local.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+  vim.opt_local.foldtext = "v:lua.custom_foldtext()"
 end
 function M.lsp_foldexpr()
+  vim.opt_local.foldmethod = "expr"
   vim.opt_local.foldexpr = "v:lua.vim.lsp.foldexpr()"
-end
-function M.create_fold_from_selection()
-  -- Store the current folding method
-  local original_foldmethod = vim.opt_local.foldmethod:get()
-
-  -- Switch to manual folding temporarily
-  vim.opt_local.foldmethod = "manual"
-
-  -- Create fold from visual selection
-  vim.cmd("normal! zf")
-
-  -- Restore the original folding method
-  vim.opt_local.foldmethod = original_foldmethod
-
-  -- Print confirmation message
-  vim.notify("Fold created (fold method restored to '" .. original_foldmethod .. "')")
+  vim.opt_local.foldtext = "v:lua.custom_foldtext()"
 end
 vim.opt.foldcolumn = "0"
 vim.opt.foldenable = true

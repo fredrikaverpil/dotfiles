@@ -81,11 +81,6 @@ vim.keymap.set({ "i", "x", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Sav
 vim.keymap.set("v", "<", "<gv", { desc = "Indent left" })
 vim.keymap.set("v", ">", ">gv", { desc = "Indent right" })
 
--- folding
-vim.keymap.set("v", "zf", function()
-  require("fredrik.config.options").create_fold_from_selection()
-end, { desc = "Create fold from selection" })
-
 -- Lazy.nvim
 vim.keymap.set("n", "<leader>l", "<cmd>Lazy<cr>", { desc = "Lazy" })
 
