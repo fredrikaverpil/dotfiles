@@ -107,6 +107,9 @@ vim.opt.scrolloff = 4
 -- mouse support in all modes
 vim.opt.mouse = "a"
 
+-- scroll 1 line at a time
+vim.opt.mousescroll = { "ver:1", "hor:6" }
+
 -- project specific settings (see lazyrc.lua for .lazy.lua support)
 vim.opt.exrc = true -- allow local .nvim.lua .vimrc .exrc files
 vim.opt.secure = true -- disable shell and write commands in local .nvim.lua .vimrc .exrc files
