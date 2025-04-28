@@ -6,7 +6,7 @@
 
 return {
   {
-    enabled = true,
+    enabled = false,
     "yetone/avante.nvim",
     lazy = true, -- NOTE: required for not invoking `op` on Neovim startup
     -- event = "VeryLazy", -- NOTE: required for not invoking `op` on Neovim startup
