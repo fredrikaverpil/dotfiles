@@ -1,6 +1,7 @@
 M = {}
 
 local orig_fmt_func = vim.lsp.handlers["textDocument/formatting"]
+local foldmethod = nil
 
 function M.toggle_formatting()
   vim.g.auto_format = not vim.g.auto_format -- reverse the value
@@ -21,6 +22,18 @@ end
 function M.toggle_inlay_hints()
   local filter = {}
   vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(filter))
+end
+
+function M.toggle_manual_folding()
+  if foldmethod == "manual" then
+    vim.wo.foldmethod = "expr"
+    foldmethod = nil
+    vim.notify("Foldmethod set to expr", vim.log.levels.INFO)
+  else
+    vim.wo.foldmethod = "manual"
+    foldmethod = vim.wo.foldmethod
+    vim.notify("Foldmethod set to manual", vim.log.levels.INFO)
+  end
 end
 
 return M
