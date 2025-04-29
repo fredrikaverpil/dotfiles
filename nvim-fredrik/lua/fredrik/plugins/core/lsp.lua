@@ -59,33 +59,28 @@ local function ensure_servers_installed(servers)
 end
 
 --- Configure and enable LSP servers.
----
---- Use native vim.lsp functionality
---- https://github.com/neovim/neovim/pull/31031
---- https://github.com/neovim/nvim-lspconfig/pull/3659
----
 ---@param servers table<string, vim.lsp.Config>
 local function register_lsp_servers(servers)
   for server, server_opts in pairs(servers) do
-    if server_opts.cmd == nil then
+    -- vim.lsp.config[server] = server_opts -- just write options without extending
+    vim.lsp.config(server, server_opts) -- extends from lspconfig
+    vim.lsp.enable(server, true)
+
+    if vim.lsp.config[server].cmd == nil then
       vim.notify("No cmd specified for LSP server: " .. server, vim.log.levels.ERROR)
     end
-    if server_opts.filetypes == nil then
+    if vim.lsp.config[server].filetypes == nil then
       vim.notify("No filetypes specified for LSP server: " .. server, vim.log.levels.ERROR)
     end
-    if not server_opts.root_dir and not server_opts.root_markers then
+    if not vim.lsp.config[server].root_dir and not vim.lsp.config[server].root_markers then
       vim.notify("No root_dir or root_markers specified for LSP server: " .. server, vim.log.levels.ERROR)
     end
-    if server_opts.root_dir and server_opts.root_markers then
+    if vim.lsp.config[server].root_dir and vim.lsp.config[server].root_markers then
       vim.notify(
         "Both root_dir and root_markers specified for LSP server (root_dir will be used): " .. server,
         vim.log.levels.ERROR
       )
     end
-
-    vim.lsp.config[server] = server_opts -- NOTE: overwrite
-    -- vim.lsp.config(server, server_opts) -- NOTE: extend
-    vim.lsp.enable(server, true)
   end
 end
 
@@ -112,7 +107,9 @@ local function register_lspattach_autocmd()
         end
 
         -- set up workspace diagnostics
-        require("workspace-diagnostics").populate_workspace_diagnostics(client, args.buf)
+        -- vim.defer_fn(function()
+        --   require("workspace-diagnostics").populate_workspace_diagnostics(client, args.buf)
+        -- end, 10000) -- 10000 milliseconds = 10 seconds
       end
 
       -- set up keymaps
@@ -128,12 +125,9 @@ return {
     event = "VeryLazy",
     dependencies = {
       {
-        -- the new lspconfig with vim.lsp servers
-        "TheRealLorenz/nvim-lspconfig",
-        -- opts = function()
-        --   local lspconfig = require("lspconfig").gopls
-        --   vim.notify(vim.inspect(lspconfig.gopls))
-        -- end,
+        -- provides LSP server configurations to vim.lsp.config.
+        "neovim/nvim-lspconfig",
+        enabled = true, -- disable if experimenting with local-only config
       },
       {
         "b0o/SchemaStore.nvim",

@@ -194,7 +194,10 @@ return {
         ---@type vim.lsp.Config
         gopls = {
           -- lsp: https://github.com/golang/tools/blob/master/gopls
-          -- reference: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/gopls.lua
+          --
+          -- references:
+          -- vim.lsp.config: https://github.com/neovim/nvim-lspconfig/blob/master/lsp/gopls.lua
+          -- legacy: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/gopls.lua
           --
           -- main readme: https://github.com/golang/tools/blob/master/gopls/doc/features/README.md
           --
