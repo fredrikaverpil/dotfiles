@@ -127,7 +127,7 @@ return {
       {
         -- provides LSP server configurations to vim.lsp.config.
         "neovim/nvim-lspconfig",
-        enabled = true, -- disable if experimenting with local-only config
+        enabled = false, -- for debugging
       },
       {
         "b0o/SchemaStore.nvim",
