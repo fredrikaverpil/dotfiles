@@ -1,6 +1,24 @@
 {
-  "chat.mcp.enabled": true,
+  "chat.agent.enabled": true,
+
   "github.copilot.chat.codesearch.enabled": true,
-  "github.copilot.chat.agent.thinkingTool": true
+  "github.copilot.chat.agent.thinkingTool": true,
+
+  "chat.mcp.discovery.enabled": true,
+  "chat.mcp.enabled": true,
+  "mcp": {
+        // "inputs": [],
+        // "servers": {
+        //     "mcp-server-time": {
+        //         "command": "python",
+        //         "args": [
+        //             "-m",
+        //             "mcp_server_time",
+        //             "--local-timezone=Europe/Stockholm"
+        //         ],
+        //         "env": {}
+        //     }
+        // }
+    }
 }
 
