@@ -114,7 +114,6 @@ end
 
 map_normal_mode("<leader>uf", require("fredrik.utils.toggle").toggle_manual_folding, "Toggle manual folding")
 
-
 function M.setup_trouble_keymaps()
   return {
     {
@@ -686,11 +685,11 @@ end
 function M.setup_git_blame_keymaps()
   return {
     -- toggle needs to be called twice; https://github.com/f-person/git-blame.nvim/issues/16
-    { "<leader>gbl", ":GitBlameToggle<CR>",        desc = "Blame line (toggle)", silent = true },
-    { "<leader>gbs", ":GitBlameCopySHA<CR>",       desc = "Copy SHA",            silent = true },
-    { "<leader>gbc", ":GitBlameCopyCommitURL<CR>", desc = "Copy commit URL",     silent = true },
-    { "<leader>gbf", ":GitBlameCopyFileURL<CR>",   desc = "Copy file URL",       silent = true },
-    { "<leader>gbo", ":GitBlameOpenFileURL<CR>",   desc = "Open file URL",       silent = true },
+    { "<leader>gbl", ":GitBlameToggle<CR>", desc = "Blame line (toggle)", silent = true },
+    { "<leader>gbs", ":GitBlameCopySHA<CR>", desc = "Copy SHA", silent = true },
+    { "<leader>gbc", ":GitBlameCopyCommitURL<CR>", desc = "Copy commit URL", silent = true },
+    { "<leader>gbf", ":GitBlameCopyFileURL<CR>", desc = "Copy file URL", silent = true },
+    { "<leader>gbo", ":GitBlameOpenFileURL<CR>", desc = "Open file URL", silent = true },
   }
 end
 
@@ -706,12 +705,12 @@ function M.setup_diffview_keymaps()
       end,
       desc = "Compare commits",
     },
-    { "<leader>gdq", ":DiffviewClose<CR>",         desc = "Close Diffview tab" },
+    { "<leader>gdq", ":DiffviewClose<CR>", desc = "Close Diffview tab" },
     { "<leader>gdh", ":DiffviewFileHistory %<CR>", desc = "File history" },
-    { "<leader>gdH", ":DiffviewFileHistory<CR>",   desc = "Repo history" },
-    { "<leader>gdm", ":DiffviewOpen<CR>",          desc = "Solve merge conflicts" },
-    { "<leader>gdo", ":DiffviewOpen main",         desc = "DiffviewOpen" },
-    { "<leader>gdt", ":DiffviewOpen<CR>",          desc = "DiffviewOpen this" },
+    { "<leader>gdH", ":DiffviewFileHistory<CR>", desc = "Repo history" },
+    { "<leader>gdm", ":DiffviewOpen<CR>", desc = "Solve merge conflicts" },
+    { "<leader>gdo", ":DiffviewOpen main", desc = "DiffviewOpen" },
+    { "<leader>gdt", ":DiffviewOpen<CR>", desc = "DiffviewOpen this" },
     {
       "<leader>gdp",
       function()
@@ -1075,11 +1074,11 @@ function M.setup_terminal_keymaps()
       desc = "Toggle split terminal",
     },
 
-    { ctrl_slash,      floating_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle floating terminal" },
+    { ctrl_slash, floating_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle floating terminal" },
     { ctrl_underscore, floating_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle floating terminal" },
 
-    { ctrl_slash,      "<cmd>close<cr>",  mode = { "t" },                desc = "Hide Terminal" },
-    { ctrl_underscore, "<cmd>close<cr>",  mode = { "t" },                desc = "which_key_ignore" },
+    { ctrl_slash, "<cmd>close<cr>", mode = { "t" }, desc = "Hide Terminal" },
+    { ctrl_underscore, "<cmd>close<cr>", mode = { "t" }, desc = "which_key_ignore" },
   }
 end
 
@@ -1151,11 +1150,11 @@ end
 
 function M.setup_obsidian_keymaps(obsidian_vars)
   return {
-    { "<leader>ns", "<cmd>ObsidianSearch<cr>",                           desc = "[N]otes: [s]earch text" },
-    { "<leader>nf", "<cmd>ObsidianQuickSwitch<cr>",                      desc = "[N]otes: search [f]ilenames" },
-    { "<leader>nn", "<cmd>ObsidianNew<cr>",                              desc = "[N]otes: [n]new" },
-    { "<leader>nl", "<cmd>ObsidianQuickSwitch Learning.md<cr><cr>",      desc = "[N]otes: [l]earning" },
-    { "<leader>ng", "<cmd>ObsidianQuickSwitch Go.md<cr><cr>",            desc = "[N]otes: [g]olang learning" },
+    { "<leader>ns", "<cmd>ObsidianSearch<cr>", desc = "[N]otes: [s]earch text" },
+    { "<leader>nf", "<cmd>ObsidianQuickSwitch<cr>", desc = "[N]otes: search [f]ilenames" },
+    { "<leader>nn", "<cmd>ObsidianNew<cr>", desc = "[N]otes: [n]new" },
+    { "<leader>nl", "<cmd>ObsidianQuickSwitch Learning.md<cr><cr>", desc = "[N]otes: [l]earning" },
+    { "<leader>ng", "<cmd>ObsidianQuickSwitch Go.md<cr><cr>", desc = "[N]otes: [g]olang learning" },
     { "<leader>nv", "<cmd>ObsidianQuickSwitch Neovim config.md<cr><cr>", desc = "[N]otes: Neo[v]im todo" },
 
     {
@@ -1188,24 +1187,24 @@ end
 function M.setup_whichkey(wk)
   wk.add({
     { "<leader><tab>", group = "tab" },
-    { "<leader>a",     group = "ai" },
-    { "<leader>c",     group = "code" },
-    { "<leader>d",     group = "debug" },
-    { "<leader>dL",    group = "debug lua" },
-    { "<leader>b",     group = "buffer" },
-    { "<leader>g",     group = "git" },
-    { "<leader>gb",    group = "blame" },
-    { "<leader>gd",    group = "diffview" },
-    { "<leader>gh",    group = "hunks" },
-    { "<leader>n",     group = "notes" },
-    { "<leader>r",     group = "run" },
-    { "<leader>s",     group = "search" },
-    { "<leader>sg",    group = "git" },
-    { "<leader>sn",    group = "noice" },
-    { "<leader>t",     group = "test" },
-    { "<leader>u",     group = "ui" },
-    { "<leader>x",     group = "diagnostics/quickfix" },
-    { "<leader>w",     group = "windows",             proxy = "<C-w>" },
+    { "<leader>a", group = "ai" },
+    { "<leader>c", group = "code" },
+    { "<leader>d", group = "debug" },
+    { "<leader>dL", group = "debug lua" },
+    { "<leader>b", group = "buffer" },
+    { "<leader>g", group = "git" },
+    { "<leader>gb", group = "blame" },
+    { "<leader>gd", group = "diffview" },
+    { "<leader>gh", group = "hunks" },
+    { "<leader>n", group = "notes" },
+    { "<leader>r", group = "run" },
+    { "<leader>s", group = "search" },
+    { "<leader>sg", group = "git" },
+    { "<leader>sn", group = "noice" },
+    { "<leader>t", group = "test" },
+    { "<leader>u", group = "ui" },
+    { "<leader>x", group = "diagnostics/quickfix" },
+    { "<leader>w", group = "windows", proxy = "<C-w>" },
     {
       "<leader>b",
       group = "buffers",
@@ -1263,12 +1262,12 @@ end
 function M.setup_codecompanion_keymaps()
   return {
     { "<leader>ac", ":CodeCompanionChat anthropic<CR>", desc = "Codecompanion: Claude" },
-    { "<leader>ao", ":CodeCompanionChat openai<CR>",    desc = "Codecompanion: OpenAI" },
-    { "<leader>ag", ":CodeCompanionChat gemini<CR>",    desc = "Codecompanion: Gemini" },
-    { "<leader>ad", ":CodeCompanionChat deepseek<CR>",  desc = "Codecompanion: DeepSeek" },
-    { "<leader>al", ":CodeCompanionChat ollama<CR>",    desc = "Codecompanion: Ollama" },
+    { "<leader>ao", ":CodeCompanionChat openai<CR>", desc = "Codecompanion: OpenAI" },
+    { "<leader>ag", ":CodeCompanionChat gemini<CR>", desc = "Codecompanion: Gemini" },
+    { "<leader>ad", ":CodeCompanionChat deepseek<CR>", desc = "Codecompanion: DeepSeek" },
+    { "<leader>al", ":CodeCompanionChat ollama<CR>", desc = "Codecompanion: Ollama" },
 
-    { "<leader>at", ":CodeCompanionChat Toggle<CR>",    desc = "Codecompanion toggle" },
+    { "<leader>at", ":CodeCompanionChat Toggle<CR>", desc = "Codecompanion toggle" },
     {
       "<leader>aS",
       function()
@@ -1279,7 +1278,7 @@ function M.setup_codecompanion_keymaps()
       end,
       desc = "Codecompanion Save chat",
     },
-    { "<leader>aL", ":CodeCompanionLoad<CR>",    desc = "Codecompanion Load chat" },
+    { "<leader>aL", ":CodeCompanionLoad<CR>", desc = "Codecompanion Load chat" },
     { "<leader>aP", ":CodeCompanionActions<CR>", desc = "Codecompanion Prompts" },
   }
 end
