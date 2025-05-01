@@ -638,6 +638,7 @@ function M.setup_gitsigns_keymaps(bufnr)
     local default_branch = require("fredrik.utils.git").get_default_branch()
     vim.cmd("Gitsigns change_base " .. default_branch)
   end, { buffer = bufnr, silent = false, noremap = true, desc = "change [b]ase to default branch" })
+
   vim.keymap.set(
     { "n", "v" },
     "<leader>ghs",
