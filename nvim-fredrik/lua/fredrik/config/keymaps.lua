@@ -1241,11 +1241,12 @@ function M.setup_venv_selector_keymaps()
   }
 end
 
-function M.setup_copilot_chat_keymaps(chat)
+function M.setup_copilot_chat_keymaps()
   return {
     {
       "<leader>aC",
       function()
+        local chat = require("CopilotChat")
         chat.toggle()
       end,
       desc = "Copilot Chat",
