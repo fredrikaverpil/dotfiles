@@ -217,7 +217,7 @@ function M.setup_typescript_lsp_keymaps()
     {
       "<leader>cD",
       function()
-        require("vtsls").commands.fix_all(0)
+        require("vtsls")
       end,
       desc = "Fix all diagnostics",
     },
@@ -232,6 +232,7 @@ function M.setup_typescript_lsp_keymaps()
 end
 
 function M.setup_blink_cmp_keymaps()
+  -- https://cmp.saghen.dev/configuration/keymap
   return {
     ["<C-e>"] = { "hide", "fallback" },
     ["<CR>"] = { "accept", "fallback" },
@@ -244,6 +245,10 @@ function M.setup_blink_cmp_keymaps()
 
     ["<C-u>"] = { "scroll_documentation_up", "fallback" },
     ["<C-d>"] = { "scroll_documentation_down", "fallback" },
+
+    ["<C-space>"] = { "show" },
+
+    -- C-k toggles signature
   }
 end
 
