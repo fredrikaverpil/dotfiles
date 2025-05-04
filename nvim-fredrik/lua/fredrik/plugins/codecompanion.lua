@@ -276,7 +276,7 @@ return {
           provider = "default", -- default|telescope|mini_pick
         },
         diff = {
-          provider = "default", -- default|mini_diff
+          enabled = true,
         },
       },
       prompt_library = require("fredrik.utils.llm_prompts").to_codecompanion(),
@@ -284,6 +284,7 @@ return {
     config = function(_, opts)
       require("codecompanion").setup(opts)
     end,
+    -- https://codecompanion.olimorris.dev/usage/chat-buffer/#keymaps
     keys = require("fredrik.config.keymaps").setup_codecompanion_keymaps(),
   },
 }
