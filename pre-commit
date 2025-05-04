@@ -1,3 +1,9 @@
 #!/bin/bash
 
-code --list-extensions >vscode_extensions.txt
+if command -v code &>/dev/null; then
+	code --list-extensions >vscode_extensions.txt
+fi
+
+if command -v code-insiders &>/dev/null; then
+	code-insiders --list-extensions >vscode_insiders_extensions.txt
+fi
