@@ -38,8 +38,8 @@ local deepseek_fn = function()
 end
 
 --- Ollama config for CodeCompanion.
-local ollama_fn = function()
-  return require("codecompanion.adapters").extend("ollama", {
+local ollima_fn = function()
+  return require("codecompanion.adapters").extend("ollima", {
     schema = {
       model = {
         default = "gemma3:1b",
@@ -62,7 +62,7 @@ local supported_adapters = {
   openai = openai_fn,
   gemini = gemini_fn,
   deepseek = deepseek_fn,
-  ollama = ollama_fn,
+  ollima = ollima_fn,
 }
 
 local function save_path()
@@ -74,56 +74,97 @@ end
 
 --- Load a saved codecompanion.nvim chat file into a new CodeCompanion chat buffer.
 --- Usage: CodeCompanionLoad
---- TODO: replace this with a snacks picker instead
 vim.api.nvim_create_user_command("CodeCompanionLoad", function()
-  local fzf = require("fzf-lua") -- FIXME: replace fzf-lua with Snacks picker
+  local Snacks = require("snacks")
 
   local function select_adapter(filepath)
     local adapters = vim.tbl_keys(supported_adapters)
 
-    fzf.fzf_exec(adapters, {
-      prompt = "Select CodeCompanion Adapter> ",
-      actions = {
-        ["default"] = function(selected)
-          local adapter = selected[1]
-          -- Open new CodeCompanion chat with selected adapter
-          vim.cmd("CodeCompanionChat " .. adapter)
+    Snacks.picker.select(adapters, {
+      prompt = "Select CodeCompanion Adapter",
+      format_item = function(item)
+        return item
+      end,
+    }, function(adapter)
+      if adapter then
+        -- Construct the full file path
+        local full_filepath = save_path():joinpath(filepath):absolute()
 
-          -- Read contents of saved chat file
-          local lines = vim.fn.readfile(filepath)
+        -- Check if the file exists before attempting to read it
+        if vim.fn.filereadable(full_filepath) == 0 then
+          vim.notify("File not found: " .. full_filepath, vim.log.levels.ERROR)
+          return
+        end
 
-          -- Get the current buffer (which should be the new CodeCompanion chat)
-          local current_buf = vim.api.nvim_get_current_buf()
+        -- Open new CodeCompanion chat with selected adapter
+        vim.cmd("CodeCompanionChat " .. adapter)
 
-          -- Paste contents into the new chat buffer
-          vim.api.nvim_buf_set_lines(current_buf, 0, -1, false, lines)
-        end,
-      },
-    })
+        -- Read contents of saved chat file
+        local lines = vim.fn.readfile(full_filepath)
+
+        -- Get the current buffer (which should be the new CodeCompanion chat)
+        local current_buf = vim.api.nvim_get_current_buf()
+
+        -- Paste contents into the new chat buffer
+        vim.api.nvim_buf_set_lines(current_buf, 0, -1, false, lines)
+      end
+    end)
   end
 
   local function start_picker()
-    local files = vim.fn.glob(save_path() .. "/*", false, true)
-
-    fzf.fzf_exec(files, {
-      prompt = "Saved CodeCompanion Chats | <c-r>: remove >",
-      previewer = "builtin",
+    Snacks.picker.pick({
+      source = "files",
+      cwd = save_path():absolute(),
+      prompt = "Saved CodeCompanion Chats",
+      preview = "file",
+      format = "file",
+      formatters = {
+        file = { filename_only = true },
+      },
+      win = {
+        input = {
+          keys = {
+            ["<leader>r"] = "remove_file",
+          },
+        },
+      },
       actions = {
-        ["default"] = function(selected)
-          if #selected > 0 then
-            local filepath = selected[1]
-            select_adapter(filepath)
+        remove_file = function(picker)
+          -- Ensure the picker object is valid
+          if not picker or not picker.current then
+            vim.notify("Picker object is invalid or missing", vim.log.levels.ERROR)
+            return
           end
-        end,
-        ["ctrl-r"] = function(selected)
-          if #selected > 0 then
-            local filepath = selected[1]
-            os.remove(filepath)
+
+          -- Get the current item
+          local item = picker:current()
+          if item and item.file then
+            -- Construct the full file path
+            local full_filepath = save_path():joinpath(item.file):absolute()
+
+            -- Attempt to remove the file
+            local success, err = os.remove(full_filepath)
+            if not success then
+              vim.notify("Failed to remove file: " .. full_filepath .. "\nError: " .. err, vim.log.levels.ERROR)
+              return
+            end
+
             -- Refresh the picker
-            start_picker()
+            picker:close()
+            vim.schedule(function()
+              start_picker()
+            end)
+          else
+            vim.notify("No file selected for removal", vim.log.levels.WARN)
           end
         end,
       },
+      confirm = function(picker, item)
+        picker:close()
+        if item and item.file then
+          select_adapter(item.file)
+        end
+      end,
     })
   end
 
@@ -135,10 +176,8 @@ end, {})
 ---@param opts table
 vim.api.nvim_create_user_command("CodeCompanionSave", function(opts)
   local codecompanion = require("codecompanion")
-  local success, chat = pcall(function()
-    return codecompanion.buf_get_chat(0)
-  end)
-  if not success or chat == nil then
+  local chat = codecompanion.buf_get_chat(0)
+  if chat == nil then
     vim.notify("CodeCompanionSave should only be called from CodeCompanion chat buffers", vim.log.levels.ERROR)
     return
   end
@@ -158,7 +197,7 @@ return {
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
-      -- "nvim-telescope/telescope.nvim", -- NOTE: snacks?
+      "folke/snacks.nvim",
       "ravitemer/mcphub.nvim",
       {
         "saghen/blink.cmp",
