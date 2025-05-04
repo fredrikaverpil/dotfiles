@@ -267,6 +267,10 @@ return {
       display = {
         chat = {
           show_settings = true,
+          icons = {
+            pinned_buffer = " ",
+            watched_buffer = "👀 ",
+          },
         },
         action_palette = {
           provider = "default", -- default|telescope|mini_pick
