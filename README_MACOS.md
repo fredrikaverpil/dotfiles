@@ -91,3 +91,7 @@ _macos/set_hostname.sh $DESIRED_HOSTNAME
   - Delay until repeat: short
   - Dictation:
     - Shortcut: Press (mic symbol)
+  - Shortcuts:
+    - Keyboard shortcuts:
+      - Input sources:
+        - Untick the shortcut for ^Space (Ctrl+Space).
