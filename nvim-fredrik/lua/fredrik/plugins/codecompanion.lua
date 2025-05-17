@@ -142,9 +142,9 @@ return {
           enabled = true,
           opts = {
             -- Keymap to open history from chat buffer (default: gh)
-            keymap = "gh",
+            -- keymap = "gh",
             -- Keymap to save the current chat manually (when auto_save is disabled)
-            save_chat_keymap = "sc",
+            -- save_chat_keymap = "sc",
             -- Save all chats by default (disable to save only manually using 'sc')
             auto_save = true,
             -- Number of days after which chats are automatically deleted (0 to disable)
