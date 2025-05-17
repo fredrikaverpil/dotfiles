@@ -39,7 +39,8 @@ local function ensure_servers_installed(servers)
   local supported_servers = {}
   local have_mason_lspconfig, _ = pcall(require, "mason-lspconfig")
   if have_mason_lspconfig then
-    supported_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
+    local mappings = require("mason-lspconfig").get_mappings()
+    supported_servers = vim.tbl_keys(mappings.lspconfig_to_package)
     local enabled_servers = {}
     for server, server_opts in pairs(servers) do
       if server_opts then
@@ -52,7 +53,7 @@ local function ensure_servers_installed(servers)
     end
     -- See `:h mason-lspconfig
     require("mason-lspconfig").setup({
-      ---@type string[]
+      automatic_enable = false,
       ensure_installed = enabled_servers,
     })
   end
@@ -134,14 +135,14 @@ return {
         version = false, -- last release is very old
       },
       {
-        "williamboman/mason-lspconfig.nvim",
+        "mason-org/mason-lspconfig.nvim",
         -- NOTE: this is here because mason-lspconfig must install servers prior to running nvim-lspconfig
         lazy = false,
         dependencies = {
           {
             -- NOTE: this is here because mason.setup must run prior to running nvim-lspconfig
             -- see mason.lua for more settings.
-            "williamboman/mason.nvim",
+            "mason-org/mason.nvim",
             lazy = false,
           },
         },

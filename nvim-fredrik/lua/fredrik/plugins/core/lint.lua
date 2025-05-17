@@ -4,7 +4,7 @@ return {
   event = "BufReadPost",
   dependencies = {
     {
-      "williamboman/mason.nvim",
+      "mason-org/mason.nvim",
     },
   },
 

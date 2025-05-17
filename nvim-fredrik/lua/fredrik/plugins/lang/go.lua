@@ -106,7 +106,7 @@ return {
     "stevearc/conform.nvim",
     dependencies = {
       {
-        "williamboman/mason.nvim",
+        "mason-org/mason.nvim",
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
           vim.list_extend(opts.ensure_installed, { "gofumpt", "goimports", "gci", "golines" })
@@ -145,7 +145,7 @@ return {
     "mfussenegger/nvim-lint",
     dependencies = {
       {
-        "williamboman/mason.nvim",
+        "mason-org/mason.nvim",
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
           vim.list_extend(opts.ensure_installed, { "golangci-lint" })
@@ -174,10 +174,10 @@ return {
     "virtual-lsp-config",
     dependencies = {
       {
-        "williamboman/mason-lspconfig.nvim",
+        "mason-org/mason-lspconfig.nvim",
         dependencies = {
           {
-            "williamboman/mason.nvim",
+            "mason-org/mason.nvim",
             opts = function(_, opts)
               opts.ensure_installed = opts.ensure_installed or {}
             end,
@@ -291,7 +291,7 @@ return {
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
       {
-        "williamboman/mason.nvim",
+        "mason-org/mason.nvim",
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
           vim.list_extend(opts.ensure_installed, { "gomodifytags" })
@@ -425,7 +425,7 @@ return {
       {
         "jay-babu/mason-nvim-dap.nvim",
         dependencies = {
-          "williamboman/mason.nvim",
+          "mason-org/mason.nvim",
         },
         opts = {
           ensure_installed = { "delve" },

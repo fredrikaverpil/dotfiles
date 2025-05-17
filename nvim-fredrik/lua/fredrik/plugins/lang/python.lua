@@ -72,7 +72,7 @@ return {
     "mfussenegger/nvim-lint",
     dependencies = {
       {
-        "williamboman/mason.nvim",
+        "mason-org/mason.nvim",
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
           vim.list_extend(opts.ensure_installed, { "mypy" })
@@ -96,10 +96,10 @@ return {
     "virtual-lsp-config",
     dependencies = {
       {
-        "williamboman/mason-lspconfig.nvim",
+        "mason-org/mason-lspconfig.nvim",
         dependencies = {
           {
-            "williamboman/mason.nvim",
+            "mason-org/mason.nvim",
           },
         },
         opts = function(_, opts)
@@ -219,7 +219,7 @@ return {
       {
         "jay-babu/mason-nvim-dap.nvim",
         dependencies = {
-          "williamboman/mason.nvim",
+          "mason-org/mason.nvim",
         },
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
