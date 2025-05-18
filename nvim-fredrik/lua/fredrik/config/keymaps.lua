@@ -355,7 +355,7 @@ function M.setup_snacks_keymaps()
     {
       "<leader>e",
       function()
-        Snacks.explorer.open({ hidden = true, ignored = true })
+        Snacks.explorer.open({ hidden = true, ignored = true, exclude = {".DS_Store"} })
       end,
       desc = "Explorer",
     },
