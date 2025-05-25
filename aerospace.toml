@@ -92,7 +92,7 @@ outer.right = 0
 alt-slash = 'layout tiles horizontal vertical'
 alt-comma = 'layout accordion horizontal vertical'
 
-# FIX: the defaults conflicts with alt+j/k in Neovim
+# NOTE: the defaults conflicts with alt+j/k in Neovim
 # See: https://nikitabobko.github.io/AeroSpace/commands#focus
 alt-left = 'focus left'
 alt-down = 'focus down'
@@ -100,11 +100,6 @@ alt-up = 'focus up'
 alt-right = 'focus right'
 
 # NOTE: this will conflict with skhd
-# See: https://nikitabobko.github.io/AeroSpace/commands#move
-# alt-shift-left = 'move left'
-# alt-shift-down = 'move down'
-# alt-shift-up = 'move up'
-# alt-shift-right = 'move right'
 alt-shift-left = 'move left'
 alt-shift-down = 'move down'
 alt-shift-up = 'move up'
@@ -197,8 +192,8 @@ alt-shift-semicolon = 'mode service'
 esc = ['reload-config', 'mode main']
 r = ['flatten-workspace-tree', 'mode main'] # reset layout
 f = [
-  'layout floating tiling',
-  'mode main',
+	'layout floating tiling',
+	'mode main',
 ] # Toggle between floating and tiling layout
 backspace = ['close-all-windows-but-current', 'mode main']
 
@@ -215,12 +210,12 @@ alt-shift-right = ['join-with right', 'mode main']
 [[on-window-detected]]
 if.app-id = "com.mitchellh.ghostty"
 run = [
-  # FIX: this is a workaround for https://github.com/nikitabobko/AeroSpace/issues/68
-  # this was also observed in:
-  # - https://github.com/ghostty-org/ghostty/issues/1840
-  # - https://github.com/ghostty-org/ghostty/issues/2006
-  "layout floating",
-  "move-node-to-workspace T",
+	# FIX: this is a workaround for https://github.com/nikitabobko/AeroSpace/issues/68
+	# this was also observed in:
+	# - https://github.com/ghostty-org/ghostty/issues/1840
+	# - https://github.com/ghostty-org/ghostty/issues/2006
+	"layout floating",
+	"move-node-to-workspace T",
 ]
 [[on-window-detected]]
 if.app-id = "net.kovidgoyal.kitty"
@@ -245,7 +240,7 @@ if.app-id = "com.spotify.client"
 run = "move-node-to-workspace M" # Music; Spotify
 [[on-window-detected]]
 if.app-id = "com.google.Chrome.app.cinhimbnkkaeohfgghhklpknlkffjgod"
-run = "move-node-to-workspace M" # Music; YouTube Music
+run = "move-node-to-workspace M"                                     # Music; YouTube Music
 [[on-window-detected]]
 if.app-id = "com.apple.iCal"
 run = "move-node-to-workspace C"
