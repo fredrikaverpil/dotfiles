@@ -2,7 +2,7 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     lazy = true,
-    branch = "main", -- NOTE: master branch was frozen
+    branch = "master", -- NOTE: master is frozen, continued work will be done in the main branch
     event = "BufRead",
     build = ":TSUpdate",
     opts = function(_, opts)
@@ -16,7 +16,8 @@ return {
       return merged
     end,
     config = function(buf, opts)
-      require("nvim-treesitter").setup(opts)
+      local config = require("nvim-treesitter.configs")
+      config.setup(opts)
       require("fredrik.config.options").treesitter_foldexpr()
     end,
   },
