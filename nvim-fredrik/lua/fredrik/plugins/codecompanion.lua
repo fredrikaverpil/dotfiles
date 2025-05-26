@@ -37,7 +37,7 @@ local deepseek_fn = function()
 end
 
 --- Ollama config for CodeCompanion.
-local ollima_fn = function()
+local ollama_fn = function()
   return require("codecompanion.adapters").extend("ollima", {
     schema = {
       model = {
@@ -61,7 +61,7 @@ local supported_adapters = {
   openai = openai_fn,
   gemini = gemini_fn,
   deepseek = deepseek_fn,
-  ollima = ollima_fn,
+  ollama = ollama_fn,
 }
 
 return {
