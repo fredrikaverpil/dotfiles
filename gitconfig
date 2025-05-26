@@ -17,7 +17,7 @@
 [mergetool "neovim"]
 	cmd = nvim -d $LOCAL $REMOTE $BASE $MERGED
 [mergetool "diffview"]
-  cmd = nvim -c \"DiffviewOpen\"
+  cmd = "nvim -c 'DiffviewOpen'"
 [mergetool]
   prompt = false
 [diff]
@@ -29,7 +29,7 @@
 [difftool "neovim"]
 	cmd = nvim -d $LOCAL $REMOTE
 [difftool "diffview"]
-  cmd = nvim -d \"$LOCAL\" \"$REMOTE\" -c \"DiffviewOpen\"
+  cmd = "nvim -d '$LOCAL' '$REMOTE' -c 'DiffviewOpen'"
 [difftool]
   prompt = false
 [init]
