@@ -381,12 +381,7 @@ return {
     dev = true, -- see lazy.lua for local path details
     dependencies = {
       { "folke/snacks.nvim" },
-      {
-        "nvim-treesitter/nvim-treesitter",
-        opts = {
-          ensure_installed = { go = { "go" } },
-        },
-      },
+      "nvim-treesitter/nvim-treesitter",
     },
     build = "go install github.com/lotusirous/gostdsym/stdsym@latest",
     opts = {
