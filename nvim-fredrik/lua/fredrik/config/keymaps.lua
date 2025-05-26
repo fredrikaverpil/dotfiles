@@ -1108,21 +1108,13 @@ end
 
 function M.setup_minimap_keymaps()
   return {
-    { "<Leader>um", "<cmd>Neominimap toggle<CR>", desc = "Toggle Mini map" },
-    -- { "<leader>nt", "<cmd>Neominimap toggle<cr>", desc = "Toggle minimap" },
-    -- { "<leader>no", "<cmd>Neominimap on<cr>", desc = "Enable minimap" },
-    -- { "<leader>nc", "<cmd>Neominimap off<cr>", desc = "Disable minimap" },
-    -- { "<leader>nf", "<cmd>Neominimap focus<cr>", desc = "Focus on minimap" },
-    -- { "<leader>nu", "<cmd>Neominimap unfocus<cr>", desc = "Unfocus minimap" },
-    -- { "<leader>ns", "<cmd>Neominimap toggleFocus<cr>", desc = "Toggle focus on minimap" },
-    -- { "<leader>nwt", "<cmd>Neominimap winToggle<cr>", desc = "Toggle minimap for current window" },
-    -- { "<leader>nwr", "<cmd>Neominimap winRefresh<cr>", desc = "Refresh minimap for current window" },
-    -- { "<leader>nwo", "<cmd>Neominimap winOn<cr>", desc = "Enable minimap for current window" },
-    -- { "<leader>nwc", "<cmd>Neominimap winOff<cr>", desc = "Disable minimap for current window" },
-    -- { "<leader>nbt", "<cmd>Neominimap bufToggle<cr>", desc = "Toggle minimap for current buffer" },
-    -- { "<leader>nbr", "<cmd>Neominimap bufRefresh<cr>", desc = "Refresh minimap for current buffer" },
-    -- { "<leader>nbo", "<cmd>Neominimap bufOn<cr>", desc = "Enable minimap for current buffer" },
-    -- { "<leader>nbc", "<cmd>Neominimap bufOff<cr>", desc = "Disable minimap for current buffer" },
+    {
+      "<leader>um",
+      function()
+        vim.cmd("Neominimap Toggle")
+      end,
+      desc = "Toggle Mini map",
+    },
   }
 end
 
