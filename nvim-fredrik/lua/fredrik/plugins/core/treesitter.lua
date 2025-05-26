@@ -9,6 +9,7 @@ return {
     opts = {
       -- custom handling of parsers can be done like this:
       -- ensure_installed = { parser = { filetype1, filetype2 } }
+      ensure_installed = {},
     },
     config = function(buf, opts)
       require("fredrik.config.options").treesitter_foldexpr()
