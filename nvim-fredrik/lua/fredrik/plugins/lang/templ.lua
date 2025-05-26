@@ -13,16 +13,6 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 return {
-
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = {
-      ensure_installed = {
-        templ = { "templ" },
-      },
-    },
-  },
-
   {
     "virtual-lsp-config",
     dependencies = {

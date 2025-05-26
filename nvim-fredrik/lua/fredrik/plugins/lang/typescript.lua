@@ -1,14 +1,5 @@
 return {
   {
-    "nvim-treesitter/nvim-treesitter",
-    opts = {
-      ensure_installed = {
-        typescript = { "typescript" },
-      },
-    },
-  },
-
-  {
     "stevearc/conform.nvim",
     dependencies = {
       {

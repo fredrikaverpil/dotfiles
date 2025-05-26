@@ -1,14 +1,4 @@
 return {
-
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = {
-      ensure_installed = {
-        graphql = { "graphql" },
-      },
-    },
-  },
-
   {
     "virtual-lsp-config",
     dependencies = {

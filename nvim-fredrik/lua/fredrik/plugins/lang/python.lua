@@ -67,16 +67,6 @@ vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
 })
 
 return {
-
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = {
-      ensure_installed = {
-        python = { "python" },
-      },
-    },
-  },
-
   {
     "mfussenegger/nvim-lint",
     dependencies = {

@@ -1,14 +1,4 @@
 return {
-
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = {
-      ensure_installed = {
-        zig = { "zig" },
-      },
-    },
-  },
-
   {
     "virtual-lsp-config",
     dependencies = {
