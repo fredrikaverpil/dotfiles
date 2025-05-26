@@ -9,20 +9,6 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
 })
 
 return {
-
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = {
-      ensure_installed = {
-        markdown = { "markdown" },
-        markdown_inline = { "markdown" },
-        tex = { "tex" },
-        latex = { "latex" },
-      },
-    },
-    opts_extend = { "ensure_installed.markdown", "ensure_installed.markdown_inline" },
-  },
-
   {
     "stevearc/conform.nvim",
     dependencies = {
