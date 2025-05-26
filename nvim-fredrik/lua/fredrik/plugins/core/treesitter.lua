@@ -17,7 +17,8 @@ return {
     config = function(buf, opts)
       require("fredrik.config.options").treesitter_foldexpr()
 
-      vim.notify(vim.inspect(opts.ensure_installed))
+      -- debugging
+      -- vim.notify(vim.inspect(opts.ensure_installed))
 
       -- install parsers
       local parsers = vim.tbl_keys(opts.ensure_installed)
