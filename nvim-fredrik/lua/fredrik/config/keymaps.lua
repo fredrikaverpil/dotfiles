@@ -333,11 +333,17 @@ function M.setup_snacks_keymaps()
     {
       "<leader><leader>",
       function()
+        ---@type snacks.picker.smart.Config
         local opts = {
           multi = { "buffers", "files" },
           hidden = true,
           ignored = true,
           exclude = { "*.pb.go", ".venv/*", ".mypy_cache/*", ".repro/*" },
+          formatters = {
+            file = {
+              truncate = 100,
+            },
+          },
         }
         Snacks.picker.smart(opts)
       end,
@@ -355,7 +361,7 @@ function M.setup_snacks_keymaps()
     {
       "<leader>e",
       function()
-        Snacks.explorer.open({ hidden = true, ignored = true, exclude = {".DS_Store"} })
+        Snacks.explorer.open({ hidden = true, ignored = true, exclude = { ".DS_Store" } })
       end,
       desc = "Explorer",
     },
