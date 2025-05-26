@@ -17,7 +17,9 @@ return {
       -- debugging
       -- vim.notify(vim.inspect(opts.ensure_installed))
 
-      -- install parsers
+      local already_installed = require("nvim-treesitter.config").installed_parsers()
+
+      -- install parsers from custom opts.ensure_installed
       local parsers = vim.tbl_keys(opts.ensure_installed)
       require("nvim-treesitter").install(parsers)
 
@@ -52,25 +54,30 @@ return {
             end
           end
 
+          -- Get parser name based on filetype
           local parser_name = vim.treesitter.language.get_lang(filetype)
           if not parser_name then
             vim.notify(vim.inspect("No treesitter parser found for filetype: " .. filetype), vim.log.levels.WARN)
             return
           end
 
-          -- Check if parser is available in nvim-treesitter configs
+          -- Try to get existing parser
           local parser_configs = require("nvim-treesitter.parsers")
           if not parser_configs[parser_name] then
             return -- Parser not available, skip silently
           end
 
-          -- Try to get existing parser first
           local parser_exists = pcall(vim.treesitter.get_parser, bufnr, parser_name)
 
           if not parser_exists then
-            -- Install parser synchronously
-            vim.notify(vim.inspect("Installing parser for " .. parser_name), vim.log.levels.INFO)
-            require("nvim-treesitter").install({ parser_name }):wait(300000) -- wait max. 5 minutes
+            -- check if parser is already installed
+            if vim.tbl_contains(already_installed, parser_name) then
+              vim.notify("Parser for " .. parser_name .. " already installed.", vim.log.levels.INFO)
+            else
+              -- If not installed, install parser synchronously
+              vim.notify("Installing parser for " .. parser_name, vim.log.levels.INFO)
+              require("nvim-treesitter").install({ parser_name }):wait(300000) -- wait max. 5 minutes
+            end
           end
 
           -- Start treesitter for this buffer
