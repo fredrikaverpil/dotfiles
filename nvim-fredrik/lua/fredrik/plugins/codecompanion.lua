@@ -70,7 +70,11 @@ return {
     lazy = true,
     dependencies = {
       "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
+      {
+        "nvim-treesitter/nvim-treesitter",
+        opts = { ensure_installed = { markdown = { "codecompanion" }, markdown_inline = { "codecompanion" } } },
+        opts_extend = { "ensure_installed.markdown", "ensure_installed.markdown_inline" },
+      },
       "folke/snacks.nvim",
       "ravitemer/mcphub.nvim",
       "ravitemer/codecompanion-history.nvim",

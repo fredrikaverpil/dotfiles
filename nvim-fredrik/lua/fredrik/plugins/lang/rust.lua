@@ -1,6 +1,15 @@
 return {
 
   {
+    "nvim-treesitter/nvim-treesitter",
+    opts = {
+      ensure_installed = {
+        rust = { "rust" },
+      },
+    },
+  },
+
+  {
     "mrcjkb/rustaceanvim",
     lazy = true,
     ft = { "rust" },

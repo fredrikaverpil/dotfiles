@@ -1,6 +1,15 @@
 return {
 
   {
+    "nvim-treesitter/nvim-treesitter",
+    opts = {
+      ensure_installed = {
+        toml = { "toml" },
+      },
+    },
+  },
+
+  {
     "virtual-lsp-config",
     dependencies = {
       {

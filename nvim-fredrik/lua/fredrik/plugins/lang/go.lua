@@ -98,7 +98,12 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     opts = {
-      ensure_installed = { "go", "gomod", "gosum", "gowork" },
+      ensure_installed = {
+        go = { "go" },
+        gomod = { "gomod" },
+        gosum = { "gosum" },
+        gowork = "gowork",
+      },
     },
   },
 
@@ -276,6 +281,7 @@ return {
 
   {
     "fang2hou/go-impl.nvim",
+    enabled = false,
     ft = "go",
     dependencies = {
       "MunifTanjim/nui.nvim",
@@ -391,7 +397,7 @@ return {
       {
         "nvim-treesitter/nvim-treesitter",
         opts = {
-          ensure_installed = { "go" },
+          ensure_installed = { go = { "go" } },
         },
       },
     },

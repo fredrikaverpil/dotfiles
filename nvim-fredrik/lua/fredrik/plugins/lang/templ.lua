@@ -18,8 +18,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     opts = {
       ensure_installed = {
-        "templ",
-        -- "html"
+        templ = { "templ" },
       },
     },
   },

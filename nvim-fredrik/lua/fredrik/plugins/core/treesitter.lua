@@ -2,23 +2,38 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     lazy = true,
-    branch = "master", -- NOTE: master is frozen, continued work will be done in the main branch
     event = "BufRead",
+    branch = "main",
     build = ":TSUpdate",
-    opts = function(_, opts)
-      local defaults = {
-        auto_install = true,
-        ensure_installed = { "diff", "regex", "markdown_inline", "http" },
-        highlight = { enable = true },
-        indent = { enable = true },
-      }
-      local merged = require("fredrik.utils.table").deep_merge(defaults, opts)
-      return merged
-    end,
+    ---@class TSConfig
+    opts = {
+      ensure_installed = {
+        -- parser = { filetype1, filetype2, ... }
+        diff = { "diff" },
+        regex = { "regex" },
+        http = { "http" },
+      },
+    },
     config = function(buf, opts)
-      local config = require("nvim-treesitter.configs")
-      config.setup(opts)
       require("fredrik.config.options").treesitter_foldexpr()
+
+      vim.notify(vim.inspect(opts.ensure_installed))
+
+      -- install parsers
+      local parsers = vim.tbl_keys(opts.ensure_installed)
+      require("nvim-treesitter").install(parsers)
+
+      -- register and start parsers for filetypes
+      for parser, filetypes in pairs(opts.ensure_installed) do
+        vim.treesitter.language.register(parser, filetypes)
+
+        vim.api.nvim_create_autocmd({ "FileType" }, {
+          pattern = filetypes,
+          callback = function(event)
+            vim.treesitter.start(event.buf)
+          end,
+        })
+      end
     end,
   },
 

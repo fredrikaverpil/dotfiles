@@ -2,7 +2,11 @@ return {
 
   {
     "nvim-treesitter/nvim-treesitter",
-    opts = { ensure_installed = { "html" } },
+    opts = {
+      ensure_installed = {
+        html = { "html" },
+      },
+    },
   },
 
   {

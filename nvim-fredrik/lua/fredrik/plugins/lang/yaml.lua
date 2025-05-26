@@ -29,6 +29,15 @@ vim.treesitter.language.register("yaml", "dependabot")
 return {
 
   {
+    "nvim-treesitter/nvim-treesitter",
+    opts = {
+      ensure_installed = {
+        yaml = { "yaml" },
+      },
+    },
+  },
+
+  {
     "stevearc/conform.nvim",
     dependencies = {
       {

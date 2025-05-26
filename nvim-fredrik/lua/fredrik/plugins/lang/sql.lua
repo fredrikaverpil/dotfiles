@@ -3,6 +3,15 @@ local sql_ft = { "sql", "mysql", "plsql" }
 return {
 
   {
+    "nvim-treesitter/nvim-treesitter",
+    opts = {
+      ensure_installed = {
+        sql = { "sql" },
+      },
+    },
+  },
+
+  {
     "jsborjesson/vim-uppercase-sql",
     lazy = true,
     ft = sql_ft,

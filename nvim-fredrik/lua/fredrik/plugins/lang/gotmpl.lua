@@ -25,7 +25,12 @@ return {
 
   {
     "nvim-treesitter/nvim-treesitter",
-    opts = { ensure_installed = { "gotmpl", "html" } },
+    opts = {
+      ensure_installed = {
+        gotmpl = { "gotmpl" },
+        html = { "html" },
+      },
+    },
   },
 
   {

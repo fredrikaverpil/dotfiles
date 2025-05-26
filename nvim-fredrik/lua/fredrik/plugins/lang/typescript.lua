@@ -1,5 +1,14 @@
 return {
   {
+    "nvim-treesitter/nvim-treesitter",
+    opts = {
+      ensure_installed = {
+        typescript = { "typescript" },
+      },
+    },
+  },
+
+  {
     "stevearc/conform.nvim",
     dependencies = {
       {
@@ -54,7 +63,14 @@ return {
           -- lsp: https://github.com/yioneko/vtsls
           -- ref: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/vtsls.lua
           cmd = { "vtsls", "--stdio" },
-          filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
+          filetypes = {
+            "javascript",
+            "javascriptreact",
+            "javascript.jsx",
+            "typescript",
+            "typescriptreact",
+            "typescript.tsx",
+          },
           root_markers = { "tsconfig.json", "package.json", "jsconfig.json", ".git" },
           init_options = {
             hostInfo = "neovim",

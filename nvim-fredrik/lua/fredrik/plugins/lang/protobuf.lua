@@ -174,6 +174,15 @@ end
 return {
 
   {
+    "nvim-treesitter/nvim-treesitter",
+    opts = {
+      ensure_installed = {
+        proto = { "proto" },
+      },
+    },
+  },
+
+  {
     "stevearc/conform.nvim",
     dependencies = {
       {
