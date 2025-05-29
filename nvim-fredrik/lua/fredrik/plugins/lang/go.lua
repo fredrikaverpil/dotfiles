@@ -459,7 +459,7 @@ return {
     },
   },
 
-  -- FIXME: enable once support for treesitter main branch exists
+  -- FIX: https://github.com/edte/blink-go-import.nvim/issues/4
   -- {
   --   "saghen/blink.cmp",
   --   dependencies = {
