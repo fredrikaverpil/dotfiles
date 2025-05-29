@@ -14,7 +14,7 @@
     ~/.gitconfig:
     ~/.gitconfig_work:
     ~/.gitignore_global:
-    ~/.gitmessage:
+    ~/.gitcommit:
     ~/.config/gh-dash/config.yml: gh_dash.yml
     ~/Taskfile.yml:
     ~/Library/Application Support/lazygit/config.yml:
