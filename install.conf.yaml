@@ -25,6 +25,12 @@
       force: true
     ~/.config/kitty/kitty.conf:
       force: true
+    ~/.config/kitty/dark-theme.auto.conf:
+      path: kitty.dark-theme.auto.conf
+      force: true
+    ~/.config/kitty/light-theme.auto.conf:
+      path: kitty.light-theme.auto.conf
+      force: true
     ~/.wezterm.lua:
       force: true
     ~/.config/alacritty/alacritty.toml:
