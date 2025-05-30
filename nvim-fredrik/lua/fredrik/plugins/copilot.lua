@@ -50,15 +50,15 @@ return {
     cmd = "Copilot",
     build = ":Copilot auth",
     opts = {
+      copilot_model = "gpt-4o-copilot",
       panel = {
         enabled = true,
         auto_refresh = true,
       },
       suggestion = {
-        enabled = true,
         -- use the built-in keymapping for "accept" (<M-l>)
+        enabled = true,
         auto_trigger = true,
-        accept = false, -- disable built-in keymapping
       },
       filetypes = {
         sh = function()
