@@ -34,9 +34,6 @@
     ~/.wezterm.lua:
       force: true
     ~/.config/alacritty/alacritty.toml:
-    ~/.config/eza/theme.yml:
-      path: eza_theme.yaml
-      if: '[ "$(uname -s)" = "Linux" ]'
     ~/Library/Application Support/eza/theme.yml:
       path: eza_theme.yaml
       if: '[ "$(uname -s)" = "Darwin" ]'
@@ -64,6 +61,10 @@
     ~/Library/Application Support/Claude/claude_desktop_config.json:
       path: mcpservers.json
       force: true
+    ~/Library/Application Support/Cursor/User/settings.json:
+      path: cursor_settings.jsonc
+      force: true
+      if: '[ "$(uname -s)" = "Darwin" ]'
     ~/Library/Application Support/Code/User/settings.json:
       path: vscode_settings.jsonc
       force: true

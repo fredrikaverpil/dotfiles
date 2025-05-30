@@ -5,7 +5,7 @@
 
 # Global settings
 alias dotfiles='cd $DOTFILES'
-alias ll='eza --long --header --group-directories-first --git --group --all'
+alias ll='eza --long --header --group-directories-first --git --group --all --color=auto'
 alias tree='tree -C'
 
 # pkgx/dev
@@ -51,10 +51,10 @@ alias venv='PIP_REQUIRE_VIRTUALENV=false python3 -m pip install --upgrade --user
 # Per-platform settings, will override the above commands
 case $(uname) in
 Darwin)
-  # commands for macOS go here
-  ;;
+	# commands for macOS go here
+	;;
 Linux)
-  # commands for Linux go here
-  alias bat='batcat'
-  ;;
+	# commands for Linux go here
+	alias bat='batcat'
+	;;
 esac
