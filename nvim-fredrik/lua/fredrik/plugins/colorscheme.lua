@@ -6,6 +6,8 @@ end
 local function set_light()
   vim.o.background = "light"
   vim.cmd.colorscheme("dayfox")
+  -- vim.cmd.colorscheme("rose-pine-dawn")
+  -- vim.cmd.colorscheme("tokyonight-day")
 end
 
 local function tmux_is_running()
@@ -90,17 +92,27 @@ return {
     },
   },
   {
-    "catppuccin/nvim",
-    enabled = true,
-    lazy = true,
-    name = "catppuccin", -- or Lazy will show the plugin as "nvim"
-    opts = {
-      -- transparent_background = true,
-    },
-  },
-  {
     "EdenEast/nightfox.nvim",
     enabled = true,
     lazy = true,
+    opts = {
+      options = {
+        styles = {
+          comments = "italic",
+        },
+      },
+    },
+  },
+  {
+    "rose-pine/neovim",
+    enabled = false,
+    name = "rose-pine",
+    lazy = true,
+    opts = {
+      enable = {
+        legacy_highlights = false,
+      },
+      dim_inactive_windows = true,
+    },
   },
 }
