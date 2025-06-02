@@ -259,3 +259,9 @@ run = "move-node-to-workspace O"
 [[on-window-detected]]
 if.app-id = "org.whispersystems.signal-desktop"
 run = "move-node-to-workspace A"
+[[on-window-detected]]
+if.app-id = "com.fujifilm.denji.X-RAW-STUDIO"
+run = "move-node-to-workspace X"
+[[on-window-detected]]
+if.app-id = "com.pixelmatorteam.pixelmator.touch.x.photo"
+run = "move-node-to-workspace P"
