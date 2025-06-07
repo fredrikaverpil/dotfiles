@@ -618,6 +618,15 @@ function M.setup_snacks_keymaps()
       end,
       desc = "[s]earch [g]it [b]ranches",
     },
+
+    -- custom pickers
+    {
+      "<leader>sP",
+      function()
+        require("fredrik.utils.snacks_pickers").pull_requests()
+      end,
+      desc = "[s]earch [P]ull Requests",
+    },
   }
 end
 
