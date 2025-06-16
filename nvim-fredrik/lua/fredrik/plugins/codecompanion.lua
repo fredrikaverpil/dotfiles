@@ -1,4 +1,7 @@
+-- Tools and agents compatibility: https://codecompanion.olimorris.dev/usage/chat-buffer/agents.html#compatibility
+
 local anthropic_fn = function()
+  -- models: https://docs.anthropic.com/en/docs/about-claude/models/overview
   local anthropic_config = {
     env = { api_key = "cmd:op read op://Personal/Anthropic/tokens/neovim --no-newline" },
   }
@@ -13,11 +16,12 @@ local openai_fn = function()
 end
 
 local gemini_fn = function()
+  -- models: https://ai.google.dev/gemini-api/docs/models
   local gemini_config = {
     env = { api_key = "cmd:op read op://Personal/Google/tokens/gemini --no-newline" },
     schema = {
       model = {
-        default = "gemini-2.5-pro-preview-05-06",
+        default = "gemini-2.5-flash-preview-05-20",
       },
     },
   }
@@ -25,13 +29,9 @@ local gemini_fn = function()
 end
 
 local deepseek_fn = function()
+  -- models: https://api-docs.deepseek.com/quick_start/pricing
   local deepseek_config = {
     env = { api_key = "cmd:op read op://Personal/DeepSeek/tokens/neovim --no-newline" },
-    -- schema = {
-    --   model = {
-    --     default = "deepseek-reasoner",
-    --   },
-    -- },
   }
   return require("codecompanion.adapters").extend("deepseek", deepseek_config)
 end
@@ -96,6 +96,7 @@ return {
           },
         },
         opts_extend = {
+          -- delete from history with `d` key
           "sources.default",
         },
       },
