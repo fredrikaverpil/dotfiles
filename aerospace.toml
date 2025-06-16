@@ -233,6 +233,9 @@ run = "move-node-to-workspace E"
 if.app-id = "company.thebrowser.Browser" # Arc
 run = "move-node-to-workspace B"
 [[on-window-detected]]
+if.app-id = "app.zen-browser.zen"
+run = "move-node-to-workspace Z"
+[[on-window-detected]]
 if.app-id = "com.tinyspeck.slackmacgap" # Slack
 run = "move-node-to-workspace S"
 [[on-window-detected]]
