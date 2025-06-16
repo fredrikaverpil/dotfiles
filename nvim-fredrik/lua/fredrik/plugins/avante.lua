@@ -166,7 +166,14 @@ return {
       "AvanteToggle",
     },
     keys = {
-      { "<leader>aa", "<cmd>AvanteToggle<cr>", desc = "Toggle Avante" },
+      {
+        "<leader>aa",
+        function()
+          -- Open the Avante chat window, without preselecint any files.
+          require("avante.api").ask({ without_selection = true })
+        end,
+        desc = "Toggle Avante",
+      },
     },
   },
 }
