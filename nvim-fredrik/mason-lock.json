@@ -4,6 +4,7 @@
   "bash-language-server": "5.6.0",
   "biome": "1.9.4",
   "buf": "v1.54.0",
+  "codelldb": "v1.11.5",
   "dockerfile-language-server": "0.14.0",
   "gci": "v0.13.6",
   "gofumpt": "v0.8.0",
