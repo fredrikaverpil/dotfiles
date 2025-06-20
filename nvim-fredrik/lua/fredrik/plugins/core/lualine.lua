@@ -88,6 +88,12 @@ return {
       vim.notify("Lualine: noice component not loaded", vim.log.levels.WARN)
     end
 
+    if opts.mcphub then
+      table.insert(opts.sections.lualine_x, 4, opts.mcphub.lualine_component)
+    else
+      vim.notify("Lualine: mcphub component not loaded", vim.log.levels.WARN)
+    end
+
     require("lualine").setup(opts)
   end,
 }

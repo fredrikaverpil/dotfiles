@@ -9,6 +9,17 @@ return {
     lazy = true,
     dependencies = {
       "nvim-lua/plenary.nvim", -- Required for Job and HTTP requests
+      {
+        "nvim-lualine/lualine.nvim",
+        event = "VeryLazy",
+        opts = function(_, opts)
+          opts.mcphub = {
+            lualine_component = {
+              require("mcphub.extensions.lualine"),
+            },
+          }
+        end,
+      },
     },
     -- cmd = "MCPHub", -- lazily start the hub when `MCPHub` is called
     build = "npm install -g mcp-hub@latest", -- Installs required mcp-hub npm module
