@@ -1273,25 +1273,12 @@ end
 function M.setup_codecompanion_keymaps()
   return {
     { "<leader>ah", ":CodeCompanionHistory<CR>", desc = "Codecompanion history" },
+    { "<leader>at", ":CodeCompanionChat Toggle<CR>", desc = "Codecompanion toggle" },
     { "<leader>ac", ":CodeCompanionChat anthropic<CR>", desc = "Codecompanion: Claude" },
     { "<leader>ao", ":CodeCompanionChat openai<CR>", desc = "Codecompanion: OpenAI" },
     { "<leader>ag", ":CodeCompanionChat gemini<CR>", desc = "Codecompanion: Gemini" },
     { "<leader>ad", ":CodeCompanionChat deepseek<CR>", desc = "Codecompanion: DeepSeek" },
     { "<leader>al", ":CodeCompanionChat ollama<CR>", desc = "Codecompanion: Ollama" },
-
-    { "<leader>at", ":CodeCompanionChat Toggle<CR>", desc = "Codecompanion toggle" },
-    {
-      "<leader>aS",
-      function()
-        local name = vim.fn.input("Save as: ")
-        if name and name ~= "" then
-          vim.cmd("CodeCompanionSave " .. name)
-        end
-      end,
-      desc = "Codecompanion Save chat",
-    },
-    { "<leader>aL", ":CodeCompanionLoad<CR>", desc = "Codecompanion Load chat" },
-    { "<leader>aP", ":CodeCompanionActions<CR>", desc = "Codecompanion Prompts" },
   }
 end
 
