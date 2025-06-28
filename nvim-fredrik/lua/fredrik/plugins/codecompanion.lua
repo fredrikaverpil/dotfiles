@@ -28,6 +28,31 @@ local gemini_fn = function()
   return require("codecompanion.adapters").extend("gemini", gemini_config)
 end
 
+local vertex_fn = function()
+  -- models: https://ai.google.dev/gemini-api/docs/models
+  local vertex_config = {
+    -- regional url
+    url = "https://${location}-aiplatform.googleapis.com/v1/projects/${project_id}/locations/${location}/endpoints/openapi/chat/completions",
+    -- global url
+    -- url = "https://aiplatform.googleapis.com/v1/projects/${project_id}/locations/global/endpoints/openapi/chat/completions",
+    env = {
+      project_id = os.getenv("GOOGLE_CLOUD_PROJECT"),
+      location = os.getenv("GOOGLE_CLOUD_LOCATION"),
+      api_key = "cmd: gcloud auth application-default print-access-token",
+    },
+    schema = {
+      model = {
+        default = "vertex_ai/gemini-2.5-pro",
+      },
+      choices = {
+        ["vertex_ai/gemini-2.5-pro"] = { opts = { can_reason = true, has_vision = true } },
+        ["vertex_ai/gemini-2.5-flash"] = { opts = { can_reason = true, has_vision = true } },
+      },
+    },
+  }
+  return require("codecompanion.adapters").extend("gemini", vertex_config)
+end
+
 local deepseek_fn = function()
   -- models: https://api-docs.deepseek.com/quick_start/pricing
   local deepseek_config = {
@@ -62,6 +87,7 @@ local supported_adapters = {
   gemini = gemini_fn,
   deepseek = deepseek_fn,
   ollama = ollama_fn,
+  vertex = vertex_fn,
 }
 
 return {
