@@ -136,6 +136,11 @@ return {
             return true
           end
 
+          if os.getenv("GOOGLE_CLOUD_PROJECT") then
+            -- this is not perfect, as it technically does not prevent sending code to any specific provider
+            return true
+          end
+
           return require("fredrik.utils.private").is_code_public()
         end,
       },
