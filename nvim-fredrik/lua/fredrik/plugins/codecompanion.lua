@@ -21,7 +21,7 @@ local gemini_fn = function()
     env = { api_key = "cmd:op read op://Personal/Google/tokens/gemini --no-newline" },
     schema = {
       model = {
-        default = "gemini-2.5-flash-preview-05-20",
+        default = "gemini-2.5-flash",
       },
     },
   }
