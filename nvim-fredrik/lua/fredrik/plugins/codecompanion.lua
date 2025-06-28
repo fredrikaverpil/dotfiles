@@ -136,7 +136,7 @@ return {
             return true
           end
 
-          return require("fredrik.utils.private").is_ai_enabled()
+          return require("fredrik.utils.private").is_code_public()
         end,
       },
 

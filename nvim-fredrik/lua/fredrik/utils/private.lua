@@ -16,15 +16,8 @@ local function is_code_public()
   return false
 end
 
-local function is_ai_enabled()
-  if is_code_public() then
-    return true
-  end
-  return false
-end
-
 local function is_copilot_available()
-  if is_ai_enabled() then
+  if is_code_public() then
     if vim.fn.executable("node") == 1 then
       return true
     else
@@ -51,7 +44,6 @@ end
 
 -- export functions for use by e.g. plugins
 M.is_code_public = is_code_public
-M.is_ai_enabled = is_ai_enabled
 M.is_copilot_availble = is_copilot_available
 M.toggle_copilot = toggle_copilot
 

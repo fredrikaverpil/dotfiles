@@ -13,7 +13,7 @@ return {
     opts = {
       debug = false, -- Enable debugging
       selection = function(source)
-        if require("fredrik.utils.private").is_ai_enabled() then
+        if require("fredrik.utils.private").is_code_public() then
           local select = require("CopilotChat.select")
           return select.visual(source) or select.buffer(source)
         else
