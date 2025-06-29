@@ -1,12 +1,28 @@
--- TODO:
--- - Add all keys?
--- - File selector with snacks.nvim
--- - Web search
--- - MCP servers
+local function default_provider()
+  if os.getenv("GOOGLE_CLOUD_PROJECT") and os.getenv("GOOGLE_CLOUD_LOCATION") then
+    return "vertex"
+  else
+    return "claude"
+  end
+end
+
+local function vertex_endpoint()
+  if os.getenv("GOOGLE_CLOUD_PROJECT") and os.getenv("GOOGLE_CLOUD_LOCATION") then
+    return "https://"
+      .. os.getenv("GOOGLE_CLOUD_LOCATION")
+      .. "-aiplatform.googleapis.com/v1/projects/"
+      .. os.getenv("GOOGLE_CLOUD_PROJECT")
+      .. "/locations/"
+      .. os.getenv("GOOGLE_CLOUD_LOCATION")
+      .. "/publishers/google/models"
+  else
+    return nil
+  end
+end
 
 return {
   {
-    enabled = false,
+    enabled = true,
     "yetone/avante.nvim",
     lazy = true, -- NOTE: required for not invoking `op` on Neovim startup
     -- event = "VeryLazy", -- NOTE: required for not invoking `op` on Neovim startup
@@ -55,22 +71,41 @@ return {
       },
     },
     opts = {
-
-      provider = "claude",
-      cursor_applying_provider = "claude",
-
-      behaviour = {
-        enable_claude_text_editor_tool_mode = true,
-        enable_cursor_planning_mode = false, -- NOTE: uses Aider's method to planing when false, but is picky about the model chosen
+      provider = default_provider(),
+      providers = {
+        vertex = {
+          endpoint = vertex_endpoint(),
+          model = "gemini-2.5-pro",
+          timeout = 30000,
+          extra_request_body = {
+            generationConfig = {
+              temperature = 0.75,
+              -- maxOutputTokens = 8192, -- Note: The max value for gemini-1.5-pro is 8192
+            },
+          },
+        },
       },
 
       web_search_engine = {
         provider = "tavily", -- tavily, serpapi, searchapi, google or kagi
       },
 
-      file_selector = {
-        provider = "telescope",
+      input = {
+        provider = "snacks",
       },
+
+      -- The custom_tools type supports both a list and a function that returns a list.
+      custom_tools = function()
+        return {
+          require("mcphub.extensions.avante").mcp_tool(),
+        }
+      end,
+
+      -- The system_prompt type supports both a string and a function that returns a string. Using a function here allows dynamically updating the prompt with mcphub
+      system_prompt = function()
+        local hub = require("mcphub").get_hub_instance()
+        return hub:get_active_servers_prompt()
+      end,
 
       -- NOTE: when using mcphub.nvim, disable tools defined here
       --
@@ -109,44 +144,6 @@ return {
       --     end,
       --   },
       -- },
-
-      -- The custom_tools type supports both a list and a function that returns a list.
-      custom_tools = function()
-        return {
-          require("mcphub.extensions.avante").mcp_tool(),
-        }
-      end,
-
-      -- The system_prompt type supports both a string and a function that returns a string. Using a function here allows dynamically updating the prompt with mcphub
-      system_prompt = function()
-        local hub = require("mcphub").get_hub_instance()
-        return hub:get_active_servers_prompt()
-      end,
-
-      claude = {
-        endpoint = "https://api.anthropic.com",
-        api_key_name = "cmd:op read op://Personal/Anthropic/tokens/neovim --no-newline",
-        -- model = "claude-3-5-sonnet-20241022",
-        model = "claude-3-7-sonnet-latest",
-        temperature = 0,
-        max_tokens = 4096,
-        disable_tools = false,
-      },
-
-      openai = {
-        endpoint = "https://api.openai.com/v1",
-        api_key_name = "cmd:op read op://Personal/OpenAI/tokens/neovim --no-newline",
-        model = "gpt-4o", -- your desired model (or use gpt-4o, etc.)
-        timeout = 30000, -- Timeout in milliseconds, increase this for reasoning models
-        temperature = 0,
-        max_completion_tokens = 8192, -- Increase this to include reasoning tokens (for reasoning models)
-        --reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
-      },
-
-      ollama = {
-        endpoint = "http://127.0.0.1:11434", -- Note that there is no /v1 at the end.
-        model = "gemma3:4b",
-      },
     },
     cmd = {
       "AvanteAsk",
