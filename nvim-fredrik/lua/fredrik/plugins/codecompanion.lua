@@ -31,6 +31,8 @@ end
 local vertex_fn = function()
   -- models: https://ai.google.dev/gemini-api/docs/models
   local vertex_config = {
+    -- OpenAI-compatible API: https://cloud.google.com/vertex-ai/generative-ai/docs/migrate/openai/overview
+    --
     -- regional url
     url = "https://${location}-aiplatform.googleapis.com/v1/projects/${project_id}/locations/${location}/endpoints/openapi/chat/completions",
     -- global url

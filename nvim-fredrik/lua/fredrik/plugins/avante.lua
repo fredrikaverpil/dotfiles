@@ -13,6 +13,7 @@ end
 
 local function vertex_endpoint()
   if is_vertex_available() then
+    -- Gemini API: https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/inference
     return "https://"
       .. os.getenv("GOOGLE_CLOUD_LOCATION")
       .. "-aiplatform.googleapis.com/v1/projects/"
