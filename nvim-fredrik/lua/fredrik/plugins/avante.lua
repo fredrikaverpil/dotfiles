@@ -168,15 +168,6 @@ return {
       "AvanteToggle",
       "AvanteToggle",
     },
-    keys = {
-      {
-        "<leader>aa",
-        function()
-          -- Open the Avante chat window, without preselecint any files.
-          require("avante.api").ask({ without_selection = true })
-        end,
-        desc = "Toggle Avante",
-      },
-    },
+    keys = require("fredrik.config.keymaps").setup_avante_keymaps(),
   },
 }

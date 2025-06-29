@@ -1283,4 +1283,18 @@ function M.setup_codecompanion_keymaps()
   }
 end
 
+function M.setup_avante_keymaps()
+  return {
+
+    {
+      "<leader>aa",
+      function()
+        -- Open the Avante chat window, without preselecint any files.
+        require("avante.api").ask({ without_selection = true })
+      end,
+      desc = "Toggle Avante",
+    },
+  }
+end
+
 return M
