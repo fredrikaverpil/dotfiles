@@ -1285,7 +1285,6 @@ end
 
 function M.setup_avante_keymaps()
   return {
-
     {
       "<leader>aa",
       function()
