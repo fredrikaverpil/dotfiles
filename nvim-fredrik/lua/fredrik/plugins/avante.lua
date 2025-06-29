@@ -86,6 +86,7 @@ return {
 
         claude = {
           -- FIXME: this unfortunately triggers on Neovim startup
+          -- https://github.com/yetone/avante.nvim/pull/2372
           api_key_name = "cmd:op read op://Personal/Anthropic/tokens/neovim --no-newline",
         },
       },
