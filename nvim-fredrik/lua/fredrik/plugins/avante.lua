@@ -109,6 +109,10 @@ return {
       -- The system_prompt type supports both a string and a function that returns a string. Using a function here allows dynamically updating the prompt with mcphub
       system_prompt = function()
         local hub = require("mcphub").get_hub_instance()
+        if not hub then
+          vim.notify("Unable to get mcphub instalce", vim.log.levels.ERROR)
+          return
+        end
         return hub:get_active_servers_prompt()
       end,
 
