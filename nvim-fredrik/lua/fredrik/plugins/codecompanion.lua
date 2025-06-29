@@ -42,11 +42,11 @@ local vertex_fn = function()
     },
     schema = {
       model = {
-        default = "vertex_ai/gemini-2.5-pro",
+        default = "google/gemini-2.5-pro",
       },
       choices = {
-        ["vertex_ai/gemini-2.5-pro"] = { opts = { can_reason = true, has_vision = true } },
-        ["vertex_ai/gemini-2.5-flash"] = { opts = { can_reason = true, has_vision = true } },
+        ["google/gemini-2.5-pro"] = { opts = { can_reason = true, has_vision = true } },
+        ["google/gemini-2.5-flash"] = { opts = { can_reason = true, has_vision = true } },
       },
     },
   }
