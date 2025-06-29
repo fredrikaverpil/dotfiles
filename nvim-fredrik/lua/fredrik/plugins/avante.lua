@@ -1,5 +1,10 @@
+local function is_vertex_available()
+  -- Check if the environment variables for Google Cloud are set
+  return os.getenv("GOOGLE_CLOUD_PROJECT") and os.getenv("GOOGLE_CLOUD_LOCATION")
+end
+
 local function default_provider()
-  if os.getenv("GOOGLE_CLOUD_PROJECT") and os.getenv("GOOGLE_CLOUD_LOCATION") then
+  if is_vertex_available() then
     return "vertex"
   else
     return "claude"
@@ -7,7 +12,7 @@ local function default_provider()
 end
 
 local function vertex_endpoint()
-  if os.getenv("GOOGLE_CLOUD_PROJECT") and os.getenv("GOOGLE_CLOUD_LOCATION") then
+  if is_vertex_available() then
     return "https://"
       .. os.getenv("GOOGLE_CLOUD_LOCATION")
       .. "-aiplatform.googleapis.com/v1/projects/"
