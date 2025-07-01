@@ -4,34 +4,34 @@
 	# for github only, fredrikaverpil@users.noreply.github.com
 [core]
 	excludesfile = ~/.gitignore_global
-  # editor = code --wait  # vscode
+	# editor = code --wait  # vscode
 	editor = nvim
 [pull]
 	ff = only
 [merge]
-  # tool = vscode
+	# tool = vscode
 	# tool = neovim
-  tool = diffview
+	tool = diffview
 [mergetool "vscode"]
 	cmd = code --wait $MERGED
 [mergetool "neovim"]
 	cmd = nvim -d $LOCAL $REMOTE $BASE $MERGED
 [mergetool "diffview"]
-  cmd = "nvim -c 'DiffviewOpen'"
+	cmd = "nvim -c 'DiffviewOpen'"
 [mergetool]
-  prompt = false
+	prompt = false
 [diff]
-  # tool = vscode
+	# tool = vscode
 	tool = neovim
-  # tool = diffview
+	# tool = diffview
 [difftool "vscode"]
 	cmd = code --wait --diff $LOCAL $REMOTE
 [difftool "neovim"]
 	cmd = nvim -d $LOCAL $REMOTE
 [difftool "diffview"]
-  cmd = "nvim -d '$LOCAL' '$REMOTE' -c 'DiffviewOpen'"
+	cmd = "nvim -d '$LOCAL' '$REMOTE' -c 'DiffviewOpen'"
 [difftool]
-  prompt = false
+	prompt = false
 [init]
 	defaultBranch = main
 [rebase]
