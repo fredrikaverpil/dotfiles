@@ -50,6 +50,8 @@ return {
         dependencies = {
           "Kaiser-Yang/blink-cmp-avante",
         },
+        ---@module 'avante'
+        ---@type avante.Config
         opts = {
           sources = {
             -- Add 'avante' to the list
@@ -87,15 +89,12 @@ return {
           api_key_name = "cmd:op read op://Personal/Anthropic/tokens/neovim --no-newline",
         },
       },
-
       web_search_engine = {
         provider = "tavily", -- tavily, serpapi, searchapi, google or kagi
       },
-
       input = {
         provider = "snacks",
       },
-
       -- The custom_tools type supports both a list and a function that returns a list.
       custom_tools = function()
         return {
