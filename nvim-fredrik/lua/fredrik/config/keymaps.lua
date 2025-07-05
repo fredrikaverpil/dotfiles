@@ -1296,4 +1296,41 @@ function M.setup_avante_keymaps()
   }
 end
 
+function M.setup_substitute_keymaps()
+  return {
+    {
+      mode = { "n" },
+      "s",
+      function()
+        require("substitute").operator()
+      end,
+      desc = "[s]ubstitute",
+    },
+    {
+      mode = { "n" },
+      "ss",
+      function()
+        require("substitute").line()
+      end,
+      desc = "[s]ubstitute line",
+    },
+    {
+      mode = { "n" },
+      "S",
+      function()
+        require("substitute").eol()
+      end,
+      desc = "[s]ubstitute eol",
+    },
+    {
+      mode = { "x" },
+      "x",
+      function()
+        require("substitute").visual()
+      end,
+      desc = "[s]ubstitute visual selection",
+    },
+  }
+end
+
 return M
