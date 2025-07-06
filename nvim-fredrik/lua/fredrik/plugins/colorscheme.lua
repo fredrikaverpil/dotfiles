@@ -41,10 +41,11 @@ local function set_tmux(style)
 end
 
 return {
+  -- color scheme managers
   {
     "f-person/auto-dark-mode.nvim",
-    lazy = false,
-    enabled = true,
+    lazy = false, -- NOTE: use afonsofrancof/OSC11.nvim instead
+    enabled = false,
     priority = 1000,
     dependencies = {},
     init = function()
@@ -62,6 +63,27 @@ return {
       end,
     },
   },
+  {
+    "afonsofrancof/OSC11.nvim",
+    init = function()
+      set_dark() -- avoid flickering when starting nvim, default to dark mode
+    end,
+    opts = {
+      -- Function to call when switching to dark theme
+      on_dark = function()
+        set_dark()
+        set_tmux("dark")
+      end,
+      -- Function to call when switching to light theme
+      on_light = function()
+        set_light()
+        set_tmux("light")
+      end,
+    },
+  },
+
+  -- color schemes
+
   {
     "uga-rosa/ccc.nvim",
     enabled = false, -- NOTE: enable when needed
