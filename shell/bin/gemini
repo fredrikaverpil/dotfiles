@@ -1,0 +1,3 @@
+#!/bin/sh
+
+npx https://github.com/google-gemini/gemini-cli "$@"
