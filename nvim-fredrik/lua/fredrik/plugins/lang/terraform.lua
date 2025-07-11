@@ -26,8 +26,16 @@ return {
         -- TODO: fix "Module not installed - This module is not yet installed.
         -- Run "tofu init" to install all modules required by this configuration."
         -- NOTE: terraform_validate just runs `terraform validate`.
-        terraform = { "terraform_validate", "tflint", "trivy" },
-        tf = { "terraform_validate", "tflint", "trivy" },
+        terraform = {
+          "terraform_validate",
+          "tflint",
+          "trivy",
+        },
+        tf = {
+          "terraform_validate",
+          "tflint",
+          "trivy",
+        },
       },
     },
   },
