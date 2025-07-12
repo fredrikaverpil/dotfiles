@@ -64,7 +64,7 @@ end
 local function register_lsp_servers(servers)
   for server, server_opts in pairs(servers) do
     -- vim.lsp.config[server] = server_opts -- just write options without extending
-    vim.lsp.config(server, server_opts) -- extends from lspconfig
+    vim.lsp.config(server, server_opts) -- extends from lsp.config
     vim.lsp.enable(server, true)
 
     if vim.lsp.config[server].cmd == nil then
@@ -83,6 +83,8 @@ local function register_lsp_servers(servers)
       )
     end
   end
+
+  vim.lsp.buf.workspace_diagnostics()
 end
 
 -- Register LSP attach autocmd.
@@ -106,11 +108,6 @@ local function register_lspattach_autocmd()
         if client:supports_method("textDocument/foldingRange", args.buf) then
           require("fredrik.config.options").lsp_foldexpr()
         end
-
-        -- set up workspace diagnostics
-        -- vim.defer_fn(function()
-        --   require("workspace-diagnostics").populate_workspace_diagnostics(client, args.buf)
-        -- end, 10000) -- 10000 milliseconds = 10 seconds
       end
 
       -- set up keymaps
@@ -152,9 +149,6 @@ return {
         opts_extend = {
           "sources.default",
         },
-      },
-      {
-        "artemave/workspace-diagnostics.nvim",
       },
     },
     opts = {
