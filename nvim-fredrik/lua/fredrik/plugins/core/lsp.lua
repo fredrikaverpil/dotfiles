@@ -83,8 +83,6 @@ local function register_lsp_servers(servers)
       )
     end
   end
-
-  vim.lsp.buf.workspace_diagnostics()
 end
 
 -- Register LSP attach autocmd.
@@ -102,6 +100,14 @@ local function register_lspattach_autocmd()
             buffer = args.buf,
             callback = vim.lsp.codelens.refresh,
           })
+        end
+
+        -- set up workspace diagnostics
+        if client:supports_method("workspace/diagnostic", args.buf) then
+          vim.notify_once(vim.inspect("Setting up workspace diagnostics for " .. client.name), vim.log.levels.INFO)
+          ---@type vim.lsp.WorkspaceDiagnosticsOpts
+          local opts = { client_id = client.id }
+          vim.lsp.buf.workspace_diagnostics(opts)
         end
 
         -- setup LSP-provided folding
