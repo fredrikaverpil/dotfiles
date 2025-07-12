@@ -488,6 +488,32 @@ return {
   -- },
 
   {
+    "saghen/blink.cmp",
+    dependencies = {
+      { "samiulsami/cmp-go-deep", dependencies = { "kkharji/sqlite.lua" } },
+      { "saghen/blink.compat" },
+    },
+    opts = {
+      sources = {
+        default = {
+          "go_deep",
+        },
+        providers = {
+          go_deep = {
+            name = "go_deep",
+            module = "blink.compat.source",
+            min_keyword_length = 3,
+            max_items = 5,
+          },
+        },
+      },
+    },
+    opts_extend = {
+      "sources.default",
+    },
+  },
+
+  {
     "CRAG666/code_runner.nvim",
     lazy = true,
     opts = {
