@@ -104,7 +104,8 @@ local function register_lspattach_autocmd()
 
         -- set up workspace diagnostics
         if client:supports_method("workspace/diagnostic", args.buf) then
-          vim.notify_once(vim.inspect("Setting up workspace diagnostics for " .. client.name), vim.log.levels.INFO)
+          -- WARNING: not sure if this is the intended use case. Let's see...
+          vim.notify_once(vim.inspect("Setting up workspace diagnostics for " .. client.name), vim.log.levels.WARN)
           ---@type vim.lsp.WorkspaceDiagnosticsOpts
           local opts = { client_id = client.id }
           vim.lsp.buf.workspace_diagnostics(opts)
