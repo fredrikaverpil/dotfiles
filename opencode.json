@@ -26,6 +26,16 @@
       "models": {
         "llama2": {}
       }
+    },
+    "google-vertex": {
+      "options": {
+        "project": "{env:GOOGLE_CLOUD_PROJECT}",
+        "location": "{env:GOOGLE_CLOUD_LOCATION}"
+      },
+      "models": {
+        "gemini-2.5-flash": {},
+        "gemini-2.5-pro": {}
+      }
     }
   },
   "mcp": {}
