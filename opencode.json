@@ -34,7 +34,8 @@
         "baseURL": "http://localhost:11434/v1"
       },
       "models": {
-        "llama2": {}
+        "llama3.1:8b": {},
+        "qwen3:1.7b": {}
       }
     }
   },
