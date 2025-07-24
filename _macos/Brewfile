@@ -1,123 +1,16 @@
 # Usage:
 # brew bundle --file=path/to/Brewfile
 
-# Manually install cask-app using: brew install --cask xxx --appdir /Applications
-cask_args appdir: '/Applications'
+# For the canonical package list, refer to the Nix configuration:
+# - CLI tools: nix/shared/home-manager-base.nix
+# - GUI apps: nix/shared/homebrew.nix (casks and brews sections)
+# - Host-specific: nix/hosts/*/darwin-configuration.nix
+# - Mac App Store apps: nix/shared/homebrew.nix (masApps section)
+#
+# This Brewfile is maintained for legacy/manual setups where Nix is not available.
+# Manually add desired packages below by copying from the Nix configuration:
 
-# Taps (third-party repositories)
-# tap 'koekeishiya/formulae' # yabai
-tap 'dustinblackman/tap'
-tap 'go-task/tap'
-tap 'joshmedeski/sesh'
-tap '1password/tap'
-tap 'nikitabobko/tap'
-
-# system
-brew 'zsh-autosuggestions'
-brew 'zsh-syntax-highlighting'
-cask 'aerospace'  # nikitabobko/tap
-# brew 'yabai'
-# brew 'skhd'
-#cask 'karabiner-elements'  # requires password
-
-# fonts
-cask 'font-jetbrains-mono'
-cask 'font-jetbrains-mono-nerd-font'
-cask 'font-symbols-only-nerd-font'
-cask 'font-noto-color-emoji'
-cask 'font-noto-emoji'
-cask 'font-maple-mono'
-
-# terminal cli tools
-brew 'asciinema'
-brew 'atuin'
-brew 'bash'
-brew 'bat'
-brew 'direnv'
-brew 'eza'
-brew 'gh'
-brew 'go-task/tap/go-task'
-brew 'grpcurl'
-brew 'grpcui'
-brew 'jq'
-brew 'ollama'
-brew 'pre-commit'
-brew 'starship'
-brew 'tree'
-brew 'yq'
-brew 'zoxide'
-brew 'opentofu'  # terraform
-brew 'dustinblackman/tap/oatmeal'
-brew 'uv'
-brew 'git-standup'
-# brew 'exercism'
-brew 'imagemagick'  # for kitty protocol images in ghostty via snacks
-brew 'sst/tap/opencode'
-
-# slides
-# brew 'slides'
-# brew 'chafa'
-# presenterm
-
-# tmux
-brew 'tmux'
-# brew 'tmuxinator'
-
-# neovim
-brew 'neovim'
-cask 'ghostty'
-cask 'neovide'
-brew 'cmake'
-brew 'gcc'
-brew 'make'
-brew 'tree-sitter'
-brew 'ripgrep'
-brew 'fd'
-brew 'lazygit'
-brew 'lazydocker'
-brew 'fzf'
-brew 'joshmedeski/sesh/sesh'
-brew 'gnu-sed'  # be linux-compatible
-brew 'shellcheck'  # mason installs intel version
-brew 'hadolint'  # mason installs intel version
-brew 'rustup-init' # FIX: look att nvim distro installer..
-brew 'pngpaste'  # obsidian
-brew 'wget' # mason
-
-# containers
-brew 'podman'
-brew 'docker'
-brew 'podman-compose'
-cask 'podman-desktop'
-
-# k8s
-# brew 'helm'
-# brew 'k9s'
-# brew 'kind'
-# brew 'kubectl'
-# brew 'kubectx'
-# brew 'linkerd'
-# brew 'minikube'
-# brew 'stern'
-
-# gcloud
-cask 'google-cloud-sdk'
-brew 'cloud-sql-proxy'
-
-# databases
-brew 'postgresql'  # provides psql
-cask 'pgadmin4'
-brew 'mysql-client'  # provides mysql
-
-# ui apps
-cask '1password-cli'
-cask 'appcleaner'
-cask 'wezterm'
-cask 'visual-studio-code'
-cask 'spotify'
-cask 'obsidian'
-cask 'signal'
-cask 'wacom-tablet'
-cask 'raycast'
-cask 'gitify'
-# cask 'keycastr'
+# Example:
+# tap 'example/tap'
+# brew 'example-package'
+# cask 'example-app'

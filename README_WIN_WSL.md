@@ -1,5 +1,10 @@
 ## Windows 11 + WSL
 
+> [!NOTE]
+>
+> **For machines managed with Nix (recommended)**, see [nix/README.md](nix/README.md).
+> The instructions below are maintained for legacy/manual setups - refer to the Nix configuration for the canonical package list.
+
 ⚠️ These instructions are likely to become outdated, as my primary system is
 macOS.
 
@@ -182,6 +187,11 @@ chsh
 # install homebrew
 cd ~/.dotfiles
 installers/homebrew.sh
+
+# Note: Brewfile is now empty - manually add desired packages from the Nix configuration:
+# - CLI tools: nix/shared/home-manager-base.nix
+# - GUI apps: nix/shared/homebrew.nix (casks and brews sections)
+# - Host-specific: nix/hosts/*/darwin-configuration.nix
 
 # install all dependencies
 /home/linuxbrew/.linuxbrew/bin/brew bundle --file _linux/Brewfile

@@ -6,78 +6,106 @@
 # ----------------------------
 
 function virtual_env_activate() {
-  if [[ -n "$VIRTUAL_ENV" ]]; then
-    # check the current folder belong to earlier VIRTUAL_ENV folder
-    parentdir="$(dirname "$VIRTUAL_ENV")"
-    if [[ "$PWD"/ != "$parentdir"/* ]]; then
-      deactivate
-    fi
-  fi
+	if [[ -n "$VIRTUAL_ENV" ]]; then
+		# check the current folder belong to earlier VIRTUAL_ENV folder
+		parentdir="$(dirname "$VIRTUAL_ENV")"
+		if [[ "$PWD"/ != "$parentdir"/* ]]; then
+			deactivate
+		fi
+	fi
 
-  if [ -f .python-version ] && [ ! -d ./.venv ]; then
-    uv venv
-  fi
+	if [ -f .python-version ] && [ ! -d ./.venv ]; then
+		uv venv
+	fi
 
-  if [[ -z "$VIRTUAL_ENV" ]]; then
-    # if .venv folder is found then activate the vitualenv
-    if [ -d ./.venv ] && [ -f ./.venv/bin/activate ]; then
-      source ./.venv/bin/activate
+	if [[ -z "$VIRTUAL_ENV" ]]; then
+		# if .venv folder is found then activate the vitualenv
+		if [ -d ./.venv ] && [ -f ./.venv/bin/activate ]; then
+			source ./.venv/bin/activate
 
-      # if pyproject.toml is found then sync the virtualenv
-      if [[ -f pyproject.toml ]]; then
-        uv sync --all-groups
-      fi
-    fi
-  fi
+			# if pyproject.toml is found then sync the virtualenv
+			if [[ -f pyproject.toml ]]; then
+				uv sync --all-groups
+			fi
+		fi
+	fi
 }
 
 function node_version_manager() {
-  if [[ -z "$NVMRC_PATH" ]]; then
-    if [ -f .nvmrc ]; then
-      nvm use
-      export NVMRC_PATH=$PWD/.nvmrc
-    fi
-  else
-    parent_nvmdir="$(dirname "$NVMRC_PATH")"
-    if [[ "$PWD"/ != "$parent_nvmdir"/* ]]; then
-      nvm deactivate
-      export NVMRC_PATH=""
-    fi
-  fi
+	if [[ -z "$NVMRC_PATH" ]]; then
+		if [ -f .nvmrc ]; then
+			nvm use
+			export NVMRC_PATH=$PWD/.nvmrc
+		fi
+	else
+		parent_nvmdir="$(dirname "$NVMRC_PATH")"
+		if [[ "$PWD"/ != "$parent_nvmdir"/* ]]; then
+			nvm deactivate
+			export NVMRC_PATH=""
+		fi
+	fi
 }
 
 function zsh_completion() {
-  if [ -n "$brew_prefix" ]; then
-    export FPATH=$brew_prefix/share/zsh/site-functions:$FPATH
+	# Set up FPATH for completions - prefer home-manager, then Nix profile, then Homebrew
+	if [ -d ~/.local/state/home-manager/gcroots/current-home/home-path/share/zsh/site-functions ]; then
+		export FPATH=~/.local/state/home-manager/gcroots/current-home/home-path/share/zsh/site-functions:$FPATH
+	fi
+	if [ -d ~/.nix-profile/share/zsh/site-functions ]; then
+		export FPATH=~/.nix-profile/share/zsh/site-functions:$FPATH
+	fi
 
-    source "$brew_prefix/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
-    source "$brew_prefix/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-  fi
+	if [ -n "$brew_prefix" ]; then
+		export FPATH=$brew_prefix/share/zsh/site-functions:$FPATH
+	elif [[ "$OSTYPE" == "darwin"* ]]; then
+		echo "⚠️ Warning: Homebrew not found on macOS - some shell features may not work properly" >&2
+	fi
 
-  if [ -f "$brew_prefix/share/google-cloud-sdk" ]; then
-    source "$brew_prefix/share/google-cloud-sdk/path.zsh.inc"
-    source "$brew_prefix/share/google-cloud-sdk/completion.zsh.inc"
-  fi
+	# Load zsh plugins - prefer home-manager, then Nix profile, fallback to Homebrew
+	if [ -f ~/.local/state/home-manager/gcroots/current-home/home-path/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
+		source ~/.local/state/home-manager/gcroots/current-home/home-path/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+	elif [ -f ~/.nix-profile/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
+		source ~/.nix-profile/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+	elif [ -f "$brew_prefix/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]; then
+		source "$brew_prefix/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+	else
+		echo "⚠️ Warning: zsh-autosuggestions not found" >&2
+	fi
 
-  if [[ -f ~/.orbstack/bin/docker ]]; then
-    source ~/.orbstack/shell/init.zsh 2>/dev/null || :
-  fi
+	if [ -f ~/.local/state/home-manager/gcroots/current-home/home-path/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
+		source ~/.local/state/home-manager/gcroots/current-home/home-path/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+	elif [ -f ~/.nix-profile/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
+		source ~/.nix-profile/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+	elif [ -f "$brew_prefix/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
+		source "$brew_prefix/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+	else
+		echo "⚠️ Warning: zsh-syntax-highlighting not found" >&2
+	fi
 
-  export FPATH=$DOTFILES/work/zsh/site-functions:$FPATH
+	if [ -f "$brew_prefix/share/google-cloud-sdk" ]; then
+		source "$brew_prefix/share/google-cloud-sdk/path.zsh.inc"
+		source "$brew_prefix/share/google-cloud-sdk/completion.zsh.inc"
+	fi
 
-  # Makefile completion
-  zstyle ':completion:*:*:make:*' tag-order 'targets'
-  zstyle ':completion:*:make:*:targets' call-command true
+	if [[ -f ~/.orbstack/bin/docker ]]; then
+		source ~/.orbstack/shell/init.zsh 2>/dev/null || :
+	fi
 
-  autoload -Uz compinit
-  compinit
+	export FPATH=$DOTFILES/work/zsh/site-functions:$FPATH
+
+	# Makefile completion
+	zstyle ':completion:*:*:make:*' tag-order 'targets'
+	zstyle ':completion:*:make:*:targets' call-command true
+
+	autoload -Uz compinit
+	compinit
 }
 
 function bash_completion() {
-  if [ -f "$brew_prefix/share/google-cloud-sdk" ]; then
-    source "$brew_prefix/share/google-cloud-sdk/path.bash.inc"
-    source "$brew_prefix/share/google-cloud-sdk/completion.bash.inc"
-  fi
+	if [ -f "$brew_prefix/share/google-cloud-sdk" ]; then
+		source "$brew_prefix/share/google-cloud-sdk/path.bash.inc"
+		source "$brew_prefix/share/google-cloud-sdk/completion.bash.inc"
+	fi
 }
 
 # ----------------------------
@@ -92,17 +120,17 @@ shell="$DOTFILES_SHELL"
 # ----------------------------
 
 if [ -f ~/.cargo/env ]; then
-  source "$HOME/.cargo/env"
+	source "$HOME/.cargo/env"
 fi
 
-if [ -n "$brew_prefix" ]; then
-  # TODO: evaluate whether pkgx can replace nvm
-  # source "$brew_prefix/opt/nvm/nvm.sh"
+if [ -n "$brew_prefix" ] || [ -d "/nix/store" ]; then
+	# TODO: evaluate whether pkgx can replace nvm
+	# source "$brew_prefix/opt/nvm/nvm.sh"
 
-  eval "$(atuin init $shell --disable-up-arrow)"
-  eval "$(direnv hook $shell)"
-  eval "$(zoxide init $shell)"
-  eval "$(starship init $shell)"
+	eval "$(atuin init $shell --disable-up-arrow)"
+	eval "$(direnv hook $shell)"
+	eval "$(zoxide init $shell)"
+	eval "$(starship init $shell)"
 
 fi
 
@@ -111,18 +139,26 @@ fi
 # ----------------------------
 
 if [[ $shell == "zsh" ]]; then
-  zsh_completion
-  if [ -n "$brew_prefix" ]; then
-    source <(fzf --zsh)
-    source <(pkgx dev --shellcode)
-  fi
+	zsh_completion
+	if [ -n "$brew_prefix" ]; then
+		source <(fzf --zsh)
+		if command -v pkgx >/dev/null 2>&1; then
+			source <(pkgx dev --shellcode)
+		elif [[ "$OSTYPE" == "darwin"* ]]; then
+			echo "⚠️ Warning: pkgx not found on macOS - install via 'brew install pkgx'" >&2
+		fi
+	fi
 
 elif [[ $shell == "bash" ]]; then
-  bash_completion
-  if [ -n "$brew_prefix" ]; then
-    eval "$(fzf --bash)"
-    eval "$(pkgx dev --shellcode)"
-  fi
+	bash_completion
+	if [ -n "$brew_prefix" ]; then
+		eval "$(fzf --bash)"
+		if command -v pkgx >/dev/null 2>&1; then
+			eval "$(pkgx dev --shellcode)"
+		elif [[ "$OSTYPE" == "darwin"* ]]; then
+			echo "⚠️ Warning: pkgx not found on macOS - install via 'brew install pkgx'" >&2
+		fi
+	fi
 
 fi
 
@@ -131,17 +167,17 @@ fi
 # ----------------------------------
 
 function cd() {
-  builtin cd "$@" || return
-  virtual_env_activate
-  # node_version_manager  # TODO: with pkgx, maybe nvm is no longer needed?
+	builtin cd "$@" || return
+	# virtual_env_activate
+	# node_version_manager  # TODO: with pkgx, maybe nvm is no longer needed?
 }
 cd . # trigger cd overrides when shell starts
 
 function z() {
-  __zoxide_z "$@" && cd . || return
+	__zoxide_z "$@" && cd . || return
 }
 
 function zi() {
-  __zoxide_zi "$@" && cd . || return
+	__zoxide_zi "$@" && cd . || return
 
 }

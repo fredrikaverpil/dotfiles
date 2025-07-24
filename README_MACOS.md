@@ -1,5 +1,10 @@
 ## macOS 🍎
 
+> [!NOTE]
+>
+> **For machines managed with Nix (recommended)**, see [nix/README.md](nix/README.md).
+> The instructions below are maintained for legacy/manual setups - refer to the Nix configuration for the canonical package list.
+
 ### Install dotfiles
 
 ```bash
@@ -39,6 +44,12 @@ can install an x64 version in `/usr/local/bin/brew`. See
 ### Install apps
 
 ```bash
+# Note: Brewfiles are now empty - manually add desired packages from the Nix configuration:
+# - CLI tools: nix/shared/home-manager-base.nix
+# - GUI apps: nix/shared/homebrew.nix (casks and brews sections)
+# - Host-specific: nix/hosts/*/darwin-configuration.nix
+# - Mac App Store apps: nix/shared/homebrew.nix (masApps section)
+
 brew bundle --file=_macos/Brewfile
 brew bundle --file=_macos/Brewfile_mas  # requires being logged into the App Store
 ```

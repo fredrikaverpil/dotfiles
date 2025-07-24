@@ -28,6 +28,7 @@ end
 return {
   {
     "yetone/avante.nvim",
+    enabled = false,
     -- event = "VeryLazy", -- NOTE: required for not invoking `op` on Neovim startup
     version = false, -- NOTE: the docs says not to set this to "*"
     -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
