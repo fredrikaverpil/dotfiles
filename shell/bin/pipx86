@@ -1,3 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
+set -e
 
 arch -x86_64 /usr/local/bin/pipx "$@"
