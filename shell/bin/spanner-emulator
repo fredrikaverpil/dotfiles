@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -e
 
 CONTAINER_NAME="spanner-emulator"
 CONTAINER_IMAGE="gcr.io/cloud-spanner-emulator/emulator:latest" 

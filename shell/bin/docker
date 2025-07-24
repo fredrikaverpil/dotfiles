@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -e
 
 if command -v podman &>/dev/null; then
   [ -e /etc/containers/nodocker ] ||
