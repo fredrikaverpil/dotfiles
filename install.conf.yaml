@@ -34,9 +34,9 @@
     ~/.wezterm.lua:
       force: true
     ~/.config/alacritty/alacritty.toml:
-    ~/Library/Application Support/eza/theme.yml:
-      path: eza_theme.yaml
-      if: '[ "$(uname -s)" = "Darwin" ]'
+    # ~/Library/Application Support/eza/theme.yml:
+    #   path: eza_theme.yaml
+    #   if: '[ "$(uname -s)" = "Darwin" ]'
     ~/.tmux.conf:
     ~/.config/sesh/sesh.toml: sesh.toml
     ~/.config/aerospace/aerospace.toml:
@@ -55,17 +55,17 @@
     ~/.config/zed/settings.json:
       path: zed.jsonc
       force: true
-    ~/.cursor/mcp.json:
-      path: mcpservers.json
-      force: true
     ~/.config/opencode/opencode.json:
     ~/Library/Application Support/Claude/claude_desktop_config.json:
       path: mcpservers.json
       force: true
-    ~/Library/Application Support/Cursor/User/settings.json:
-      path: cursor_settings.jsonc
-      force: true
-      if: '[ "$(uname -s)" = "Darwin" ]'
+    # ~/.cursor/mcp.json:
+    #   path: mcpservers.json
+    #   force: true
+    # ~/Library/Application Support/Cursor/User/settings.json:
+    #   path: cursor_settings.jsonc
+    #   force: true
+    #   if: '[ "$(uname -s)" = "Darwin" ]'
     ~/Library/Application Support/Code/User/settings.json:
       path: vscode_settings.jsonc
       force: true

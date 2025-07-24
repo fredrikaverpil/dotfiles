@@ -18,6 +18,7 @@ charliermarsh.ruff
 christian-kohler.path-intellisense
 codezombiech.gitignore
 dbaeumer.vscode-eslint
+docker.docker
 emeraldwalk.runonsave
 enkia.tokyo-night
 esbenp.prettier-vscode

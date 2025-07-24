@@ -1,6 +1,10 @@
+# For the canonical Mac App Store app list, refer to the Nix configuration:
+# - Mac App Store apps: nix/shared/homebrew.nix (masApps section)
+#
+# This Brewfile is maintained for legacy/manual setups where Nix is not available.
+# Manually add desired Mac App Store apps below by copying from the Nix configuration:
+
 brew 'mas'
 
-mas 'Keka', id: 470158793
-mas 'Slack', id: 803453959
-mas 'Pandan', id: 1569600264
-# mas 'Lightroom', id: 1451544217
+# Example:
+# mas 'App Name', id: 123456789

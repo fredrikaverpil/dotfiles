@@ -9,5 +9,9 @@ elif [[ -f ~/.orbstack/bin/docker ]]; then
   echo "Emulate Docker CLI using orbstack." >&2
   exec ~/.orbstack/bin/docker "$@"
 else
-  exec docker "$@"
+  # To avoid recursive execution, find the real 'docker' executable by
+  # searching a PATH that does not include the directory of this script.
+  SCRIPT_DIR_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+  CLEAN_PATH=$(echo "$PATH" | awk -v RS=: -v ORS=: -v SCRIPT_PATH="$SCRIPT_DIR_PATH" '$0 != SCRIPT_PATH' | sed 's/:$//')
+  PATH="$CLEAN_PATH" command exec docker "$@"
 fi

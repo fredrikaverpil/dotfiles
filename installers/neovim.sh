@@ -1,52 +1,85 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
+set -e
 
-# usage:
-# $ ./neovim.sh
-# or, for nightly build:
-# ./neovim.sh --nightly
+# --- Configuration ---
+INSTALL_DIR="$HOME/.nvim"
+MANUAL_NVIM_BINARY="$INSTALL_DIR/bin/nvim"
+DOWNLOAD_DIR="$HOME/Downloads"
 
-MANUAL_NVIM_BINARY="$HOME/.nvim/bin/nvim"
-DOWNLOAD_FILENAME="nvim-macos-arm64.tar.gz"
+# --- Platform Detection ---
+OS=$(uname -s)
+ARCH=$(uname -m)
 
-# Check if --nightly parameter was provided
+case "$OS" in
+    Linux)
+        case "$ARCH" in
+            x86_64) ASSET_KEY="linux-x86_64" ;;
+            aarch64) ASSET_KEY="linux-arm64" ;;
+            *) echo "Error: Unsupported Linux architecture: $ARCH"; exit 1 ;;
+        esac
+        ;;
+    Darwin)
+        case "$ARCH" in
+            x86_64) ASSET_KEY="macos-x86_64" ;;
+            arm64) ASSET_KEY="macos-arm64" ;;
+            *) echo "Error: Unsupported macOS architecture: $ARCH"; exit 1 ;;
+        esac
+        ;;
+    *)
+        echo "Error: Unsupported operating system: $OS"
+        exit 1
+        ;;
+esac
+
+DOWNLOAD_FILENAME="nvim-${ASSET_KEY}.tar.gz"
+
+# --- Version Selection ---
 if [[ "$1" == "--nightly" ]]; then
-	echo "Preparing to install Neovim nightly build..."
-	DOWNLOAD_URL="https://github.com/neovim/neovim/releases/download/nightly/nvim-macos-arm64.tar.gz"
+    echo "Preparing to install Neovim nightly build..."
+    RELEASE_TAG="nightly"
 else
-	echo "Preparing to install latest stable Neovim release..."
-	# Get the latest release tag using the GitHub API
-	LATEST_TAG=$(curl -s https://api.github.com/repos/neovim/neovim/releases/latest | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4)
-	if [[ -z "$LATEST_TAG" ]]; then
-		echo "Error: Could not determine latest Neovim version. Check your internet connection."
-		exit 1
-	fi
-	echo "Latest version: $LATEST_TAG"
-	DOWNLOAD_URL="https://github.com/neovim/neovim/releases/download/$LATEST_TAG/nvim-macos-arm64.tar.gz"
+    echo "Preparing to install latest stable Neovim release..."
+    LATEST_TAG=$(curl -s https://api.github.com/repos/neovim/neovim/releases/latest | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4)
+    if [[ -z "$LATEST_TAG" ]]; then
+        echo "Error: Could not determine latest Neovim version. Check your internet connection."
+        exit 1
+    fi
+    echo "Latest version: $LATEST_TAG"
+    RELEASE_TAG="$LATEST_TAG"
 fi
 
+DOWNLOAD_URL="https://github.com/neovim/neovim/releases/download/$RELEASE_TAG/$DOWNLOAD_FILENAME"
+
+# --- Installation ---
+echo "Target platform: $ASSET_KEY"
+echo "Download URL: $DOWNLOAD_URL"
+
 # Create Downloads directory if it doesn't exist
-mkdir -p ~/Downloads
+mkdir -p "$DOWNLOAD_DIR"
+cd "$DOWNLOAD_DIR"
 
-# Download tar.gz into ~/Downloads/ (retain filename and overwrite if necessary)
-echo "Downloading Neovim build from $DOWNLOAD_URL..."
-cd ~/Downloads
+# Download tar.gz
+echo "Downloading Neovim build..."
 curl -LOs "$DOWNLOAD_URL" || {
-	echo "Error: Download failed."
-	exit 1
+    echo "Error: Download failed."
+    exit 1
 }
 
-# Remove extended attributes to avoid "unknown developer" warning
-echo "Removing extended attributes..."
-xattr -c "./$DOWNLOAD_FILENAME" || echo "Warning: Could not remove extended attributes."
+# On macOS, remove extended attributes to avoid "unknown developer" warning
+if [[ "$OS" == "Darwin" ]]; then
+    echo "Removing extended attributes on macOS..."
+    xattr -c "./$DOWNLOAD_FILENAME" || echo "Warning: Could not remove extended attributes."
+fi
 
-# Extract into ~/.nvim
-echo "Extracting Neovim..."
-rm -rf ~/.nvim
-mkdir -p ~/.nvim
-tar xzvf "$DOWNLOAD_FILENAME" -C ~/.nvim --strip-components=1 >/dev/null 2>&1 || {
-	echo "Error: Extraction failed."
-	exit 1
+# Extract into target directory
+echo "Extracting Neovim to $INSTALL_DIR..."
+rm -rf "$INSTALL_DIR"
+mkdir -p "$INSTALL_DIR"
+tar xzvf "$DOWNLOAD_FILENAME" -C "$INSTALL_DIR" --strip-components=1 >/dev/null 2>&1 || {
+    echo "Error: Extraction failed."
+    exit 1
 }
 
+# --- Completion ---
 echo "Neovim installation completed: $MANUAL_NVIM_BINARY"
 echo "You can now run Neovim using: $MANUAL_NVIM_BINARY"
