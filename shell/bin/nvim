@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
 
 BREW_NVIM_BINARY="$DOTFILES_BREW_PREFIX/bin/nvim"
 MANUAL_NVIM_BINARY="$HOME/.nvim/bin/nvim"

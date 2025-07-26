@@ -1,5 +1,4 @@
-#!/usr/bin/env sh
-set -e
+#!/bin/sh
 
 # This script is used to write a conventional commit message.
 # It prompts the user to choose the type of commit as specified in the

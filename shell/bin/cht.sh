@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
 
 languages=$(echo "python typescript rust golang c" | tr " " "\n")
 core_utls=$(echo "find xargs sed awk" | tr " " "\n")

@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
 
 for x in *; do
 	if [ -d "${x}" ]; then

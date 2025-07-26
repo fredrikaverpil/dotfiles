@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-set -ex
+#!/bin/bash -ex
 
 # https://docs.docker.com/engine/install
 

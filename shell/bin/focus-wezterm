@@ -1,5 +1,4 @@
-#!/usr/bin/env sh
-set -e
+#!/bin/sh
 
 get_wezterm_window() {
 	WINDOWS_JSON=$(yabai -m query --windows)

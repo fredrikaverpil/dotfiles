@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
 
 # This script is used to manage dependabot PRs and assumes you have merge queue enabled.
 #

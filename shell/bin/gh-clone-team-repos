@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
 # Take access token, organization name, and team name as arguments
 # The access token needs the following scopes:
 # - read:org to read organization information

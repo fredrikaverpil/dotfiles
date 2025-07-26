@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-set -ex
+#!/bin/bash -ex
 
 # https://github.com/tmuxinator/tmuxinator
 

@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-set -ex
+#!/bin/bash -ex
 
 # NOTE: this script is really just meant to show the setup, not to be run as-is.
 

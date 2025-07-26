@@ -1,5 +1,4 @@
-#!/usr/bin/env sh
-set -e
+#!/bin/sh
 
 # NOTE: Example usage:
 # podman-reset && export SPANNER_EMULATOR_HOST=$(spanner-emulator start)

@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-set -ex
+#!/bin/bash -ex
 
 # https://github.com/einride/gh-dependabot
 # NOTE: gh dependabot --org einride --team einride/transportation-platform

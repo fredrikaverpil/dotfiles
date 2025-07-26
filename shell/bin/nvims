@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
 
 # see installers/neovim.sh for the installations of the different distros
 

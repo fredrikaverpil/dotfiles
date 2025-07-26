@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
 
 # if argument was given, run 'sesh connect <arg>'
 if [ -n "$1" ]; then

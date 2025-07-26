@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
 
 cd ~/Downloads
 gh release download tip -R github.com/mitchellh/ghostty \

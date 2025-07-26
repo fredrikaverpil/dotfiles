@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
 
 # Get the commit hash of the second to last commit where "poetry.lock" was modified
 commit_hash=$(git log -n 2 --pretty=format:"%H" --diff-filter=M -- poetry.lock | tail -n1)

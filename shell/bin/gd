@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
 
 stdsym_install() {
   if ! command -v go &>/dev/null; then
