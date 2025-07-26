@@ -39,8 +39,7 @@ flexibility and productivity:
 **Why Stow instead of Nix for dotfiles?**
 
 While Nix can manage dotfiles declaratively, this setup uses
-[GNU Stow](https://www.gnu.org/software/stow/) for symlinking dotfiles
-because:
+[GNU Stow](https://www.gnu.org/software/stow/) for symlinking dotfiles because:
 
 - **Rapid iteration**: Edit dotfiles and see changes immediately without
   rebuilding
@@ -52,8 +51,8 @@ because:
 **How it works:**
 
 - Nix automatically runs `./symlink.sh` (stow) during home-manager activation
-- Stow creates symlinks from `~/.dotfiles/stow/` to `~/` (e.g., `stow/shared/.gitconfig` →
-  `~/.gitconfig`)
+- Stow creates symlinks from `~/.dotfiles/stow/` to `~/` (e.g.,
+  `stow/shared/.gitconfig` → `~/.gitconfig`)
 - Edit dotfiles directly in the repo - changes are immediately active
 - Nix manages packages and system settings, stow handles file symlinking
 
@@ -61,24 +60,28 @@ because:
 
 ### When to Use Each Approach
 
-| Scenario | Command | Use Case |
-|----------|---------|----------|
-| **Daily rebuilds** | `./rebuild.sh` | After changing Nix configurations, adding packages, or system settings |
-| **Package updates** | `./rebuild.sh --update` | Monthly maintenance, updating to latest package versions |
-| **Nix unavailable** | `./rebuild.sh --stow` | Emergency fallback, testing, or Nix-free environments |
-| **Stow-only setup** | `stow/symlink.sh` | Legacy systems, minimal setups, or when only dotfiles are needed |
-| **Manual control** | `darwin-rebuild switch --flake ~/.dotfiles` | Debugging, advanced options, or CI/CD pipelines |
+| Scenario            | Command                                     | Use Case                                                               |
+| ------------------- | ------------------------------------------- | ---------------------------------------------------------------------- |
+| **Daily rebuilds**  | `./rebuild.sh`                              | After changing Nix configurations, adding packages, or system settings |
+| **Package updates** | `./rebuild.sh --update`                     | Monthly maintenance, updating to latest package versions               |
+| **Nix unavailable** | `./rebuild.sh --stow`                       | Emergency fallback, testing, or Nix-free environments                  |
+| **Stow-only setup** | `stow/symlink.sh`                           | Legacy systems, minimal setups, or when only dotfiles are needed       |
+| **Manual control**  | `darwin-rebuild switch --flake ~/.dotfiles` | Debugging, advanced options, or CI/CD pipelines                        |
 
 ### Typical Workflows
 
 **New machine setup:**
+
 1. Install Nix → Clone repo → Run initial `sudo nix run nix-darwin` command
 2. Daily use: `./rebuild.sh` for changes, `./rebuild.sh --update` for updates
 
 **Dotfile-only changes:**
-- Edit files in `stow/` directory → Changes are immediately active (no rebuild needed)
+
+- Edit files in `stow/` directory → Changes are immediately active (no rebuild
+  needed)
 
 **System/package changes:**
+
 - Edit Nix files → Run `./rebuild.sh` → Changes applied
 
 ## Package Management Strategy
