@@ -33,18 +33,19 @@ sudo nixos-rebuild switch --flake ~/.dotfiles#$(hostname)
 ### Daily Usage
 
 ```bash
-# Rebuild configuration after changes
-./rebuild.sh
+# Rebuild configuration after changes (macOS requires sudo)
+sudo ./rebuild.sh
 
-# Update packages and rebuild
-./rebuild.sh --update
+# Update packages and rebuild (macOS requires sudo)
+sudo ./rebuild.sh --update
 
-# Use Stow fallback (if Nix unavailable)
+# Use Stow fallback (no sudo required)
 ./rebuild.sh --stow
 ```
 
-> [!TIP] After the initial setup, you can use `./rebuild.sh` without `sudo` for
-> daily rebuilds.
+> [!NOTE]
+> **macOS**: `sudo` is required for all nix-darwin rebuilds due to system activation requirements.
+> **Linux**: `sudo` is only required for initial setup, then `./rebuild.sh` works without `sudo`.
 
 ## Systems 🚀
 
