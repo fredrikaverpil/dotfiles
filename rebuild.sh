@@ -72,10 +72,10 @@ use_nix() {
 
 	if [[ "$OS" == "Darwin" ]]; then
 		echo "🍎 Found Darwin configuration for $HOSTNAME"
-		darwin-rebuild switch --flake ".#$HOSTNAME"
+		sudo darwin-rebuild switch --flake ".#$HOSTNAME"
 	elif [[ "$OS" == "Linux" ]]; then
 		echo "🐧 Found NixOS configuration for $HOSTNAME"
-		nixos-rebuild switch --flake ".#$HOSTNAME"
+		sudo nixos-rebuild switch --flake ".#$HOSTNAME"
 	else
 		echo "❌ Unsupported platform for Nix: $OS"
 		echo "💡 Use --stow for GNU Stow fallback"
