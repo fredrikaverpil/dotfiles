@@ -24,10 +24,11 @@ cd ~/.dotfiles
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 
 # 3. Initial setup
-# - macOS - requires sudo for first-time system activation
-sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- switch --flake ~/.dotfiles#$(hostname)
-# - Linux/NixOS
+# - Linux/NixOS:
 sudo nixos-rebuild switch --flake ~/.dotfiles#$(hostname)
+# - macOS (requires sudo for first-time system activation):
+sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- switch --flake ~/.dotfiles#$(hostname)
+
 ```
 
 ### Daily Usage
@@ -42,13 +43,6 @@ sudo nixos-rebuild switch --flake ~/.dotfiles#$(hostname)
 # Use Stow fallback (no sudo required)
 ./rebuild.sh --stow
 ```
-
-> [!NOTE] The `rebuild.sh` script automatically handles `sudo` requirements and
-> rebuilds both system and user configurations:
->
-> - **macOS**: Uses `sudo` for nix-darwin system activation + home-manager
-> - **Linux**: Uses `sudo` for NixOS system rebuilds + home-manager
-> - **Stow fallback**: No `sudo` required, dotfiles only
 
 ## Systems
 
