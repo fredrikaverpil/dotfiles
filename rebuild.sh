@@ -22,11 +22,11 @@ while [[ $# -gt 0 ]]; do
 	--help | -h)
 		echo "Usage: $0 [--stow] [--update]"
 		echo ""
-		echo "Rebuild dotfiles using Nix (preferred) or GNU Stow (fallback)"
+		echo "Rebuild dotfiles using Nix + Stow (default) or Stow-only mode"
 		echo ""
 		echo "Options:"
-		echo "  --stow     Use GNU Stow instead of Nix (fallback mode)"
-		echo "  --update   Update flake inputs before rebuilding (Nix only)"
+		echo "  --stow     Use Stow-only mode (bypass Nix, dotfiles only)"
+		echo "  --update   Update flake inputs before rebuilding (Nix mode only)"
 		echo "  --help     Show this help message"
 		exit 0
 		;;
@@ -49,7 +49,7 @@ echo "Hostname: $HOSTNAME"
 # Function to use Nix
 use_nix() {
 	echo ""
-	echo "📦 Using Nix for dotfiles management..."
+	echo "📦 Using Nix (system + packages + dotfiles via Stow)..."
 
 	# Update flake inputs if requested
 	if [[ "$UPDATE_FLAKE" == "true" ]]; then
@@ -66,7 +66,7 @@ use_nix() {
 		echo ""
 		echo "💡 Either:"
 		echo "   1. Create nix/hosts/$HOSTNAME/configuration.nix"
-		echo "   2. Use --stow for GNU Stow fallback"
+		echo "   2. Use --stow for Stow-only mode"
 		exit 1
 	fi
 
@@ -78,7 +78,7 @@ use_nix() {
 		sudo nixos-rebuild switch --flake ".#$HOSTNAME"
 	else
 		echo "❌ Unsupported platform for Nix: $OS"
-		echo "💡 Use --stow for GNU Stow fallback"
+		echo "💡 Use --stow for Stow-only mode"
 		exit 1
 	fi
 }
@@ -86,7 +86,7 @@ use_nix() {
 # Function to use GNU Stow
 use_stow() {
 	echo ""
-	echo "🔗 Using GNU Stow for dotfiles management..."
+	echo "🔗 Using Stow-only mode (dotfiles only, no system changes)..."
 
 	cd stow
 	./symlink.sh
@@ -98,7 +98,7 @@ if [[ "$STOW_FALLBACK" == "true" ]]; then
 elif command -v nix &>/dev/null; then
 	use_nix
 else
-	echo "⚠️  Nix not found, falling back to GNU Stow..."
+	echo "⚠️  Nix not found, using Stow-only mode..."
 	use_stow
 fi
 

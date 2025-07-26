@@ -40,7 +40,7 @@ sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- sw
 # Update packages and rebuild
 ./rebuild.sh --update
 
-# Use Stow fallback (no sudo required)
+# Stow-only mode (dotfiles only, bypass Nix)
 ./rebuild.sh --stow
 ```
 
