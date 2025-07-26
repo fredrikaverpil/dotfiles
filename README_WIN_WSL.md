@@ -2,8 +2,10 @@
 
 > [!NOTE]
 >
-> **For machines managed with Nix (recommended)**, see [nix/README.md](nix/README.md).
-> The instructions below are maintained for legacy/manual setups - refer to the Nix configuration for the canonical package list.
+> **For machines managed with Nix (recommended)**, see
+> [nix/README.md](nix/README.md). The instructions below are maintained for
+> legacy/manual setups - refer to the Nix configuration for the canonical
+> package list.
 
 ⚠️ These instructions are likely to become outdated, as my primary system is
 macOS.
@@ -101,6 +103,17 @@ New-Item -ItemType SymbolicLink -Path $HOME\.wezterm.lua -Value wezterm.lua
 ```
 
 Restart wezterm, and it should now start up straight into Ubuntu.
+
+#### WSL Configuration
+
+Create `~/.wslconfig` in your Windows user directory to limit WSL memory usage:
+
+```ini
+# https://learn.microsoft.com/en-us/windows/wsl/wsl-config
+
+# Limits VM memory
+memory=2GB
+```
 
 🎒 To get set up more quickly, skip over onto the Ubuntu configuration.
 

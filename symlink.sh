@@ -46,17 +46,11 @@ stow $STOW_OPTS shared
 
 # Platform-specific packages
 if [[ "$IS_MACOS" == "true" ]]; then
-	echo "Installing macOS-specific configs..."
-	stow $STOW_OPTS macos
+    echo "Installing macOS-specific configs..."
+    stow $STOW_OPTS macos
 elif [[ "$IS_WSL" == "true" ]] || [[ "$OS" == "Linux" ]]; then
-	echo "Installing Linux-specific configs..."
-	stow $STOW_OPTS linux
-fi
-
-# WSL-specific handling (outside of stow)
-if [[ "$IS_WSL" == "true" ]] && [[ -d "/mnt/c/Users/fredr" ]]; then
-	echo "Setting up WSL config..."
-	ln -sf "$DOTFILES_DIR/_windows/wslconfig" "/mnt/c/Users/fredr/.wslconfig"
+    echo "Installing Linux-specific configs..."
+    stow $STOW_OPTS linux
 fi
 
 echo "Done!"
