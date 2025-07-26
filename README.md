@@ -6,6 +6,46 @@ These are my personal dotfiles. The setup is based on [nix](https://nixos.org)
 (for reproducibility), [GNU Stow](https://www.gnu.org/software/stow/) (for
 symlinking of dotfiles) and aims to be as idempotent as possible.
 
+## Quick Start 🚀
+
+### Prerequisites
+
+- **macOS/Linux**: Xcode Command Line Tools (macOS) or build essentials (Linux)
+- **Administrator privileges** for initial setup
+
+### Installation
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+
+# 2. Install Nix (recommended)
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+
+# 3. Initial setup
+# - macOS - requires sudo for first-time system activation
+sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- switch --flake ~/.dotfiles#$(hostname)
+# - Linux/NixOS
+sudo nixos-rebuild switch --flake ~/.dotfiles#$(hostname)
+```
+
+### Daily Usage
+
+```bash
+# Rebuild configuration after changes
+./rebuild.sh
+
+# Update packages and rebuild
+./rebuild.sh --update
+
+# Use Stow fallback (if Nix unavailable)
+./rebuild.sh --stow
+```
+
+> [!TIP] After the initial setup, you can use `./rebuild.sh` without `sudo` for
+> daily rebuilds.
+
 ## Systems 🚀
 
 ## Managed with Nix + Stow

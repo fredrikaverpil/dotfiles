@@ -11,7 +11,7 @@
 
 ```bash
 git clone --recursive https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
-cd .dotfiles && ./symlink.sh
+cd .dotfiles && stow/symlink.sh
 ```
 
 > [!NOTE]

@@ -57,6 +57,30 @@ because:
 - Edit dotfiles directly in the repo - changes are immediately active
 - Nix manages packages and system settings, stow handles file symlinking
 
+## Workflow Guide
+
+### When to Use Each Approach
+
+| Scenario | Command | Use Case |
+|----------|---------|----------|
+| **Daily rebuilds** | `./rebuild.sh` | After changing Nix configurations, adding packages, or system settings |
+| **Package updates** | `./rebuild.sh --update` | Monthly maintenance, updating to latest package versions |
+| **Nix unavailable** | `./rebuild.sh --stow` | Emergency fallback, testing, or Nix-free environments |
+| **Stow-only setup** | `stow/symlink.sh` | Legacy systems, minimal setups, or when only dotfiles are needed |
+| **Manual control** | `darwin-rebuild switch --flake ~/.dotfiles` | Debugging, advanced options, or CI/CD pipelines |
+
+### Typical Workflows
+
+**New machine setup:**
+1. Install Nix → Clone repo → Run initial `sudo nix run nix-darwin` command
+2. Daily use: `./rebuild.sh` for changes, `./rebuild.sh --update` for updates
+
+**Dotfile-only changes:**
+- Edit files in `stow/` directory → Changes are immediately active (no rebuild needed)
+
+**System/package changes:**
+- Edit Nix files → Run `./rebuild.sh` → Changes applied
+
 ## Package Management Strategy
 
 ### Cross-platform Nix Packages
@@ -159,6 +183,24 @@ sudo mv /etc/nix/nix.conf /etc/nix/nix.conf.before-nix-darwin>
 
 #### Configuration Management
 
+**Using the rebuild.sh script (recommended):**
+
+```bash
+# Basic rebuild (auto-detects platform and hostname)
+./rebuild.sh
+
+# Update flake inputs and rebuild
+./rebuild.sh --update
+
+# Use Stow fallback instead of Nix
+./rebuild.sh --stow
+
+# Show help and available options
+./rebuild.sh --help
+```
+
+**Using platform-specific commands directly:**
+
 ```bash
 # Apply configuration changes (hostname auto-detected)
 # Linux/NixOS:
@@ -235,7 +277,7 @@ sudo nixos-rebuild switch --flake ~/.dotfiles
 darwin-rebuild switch --flake ~/.dotfiles
 
 # Convenience script that combines update + rebuild
-~/.dotfiles/nix/scripts/switch.sh --update
+~/.dotfiles/rebuild.sh --update
 ```
 
 #### Configuration Validation
