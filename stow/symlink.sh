@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-STOW_DIR="$DOTFILES_DIR/stow"
+STOW_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$STOW_DIR"
 
 # Parse command line arguments
@@ -33,22 +32,21 @@ echo "Installing dotfiles with stow..."
 echo "Platform: $OS"
 
 # Set stow options based on force mode
-STOW_OPTIONS="--target=$HOME --restow --verbose=1"
+STOW_OPTIONS=(--target="$HOME" --restow --verbose=1)
 if [[ "$FORCE_MODE" == "true" ]]; then
-	STOW_OPTIONS="$STOW_OPTIONS --adopt"
+    STOW_OPTIONS+=(--adopt)
 fi
-
 # Always install shared configs
 echo "Installing shared configs..."
-stow $STOW_OPTIONS shared
+stow "${STOW_OPTIONS[@]}" shared
 
 # Platform-specific packages
 if [[ "$OS" == "Darwin" ]]; then
-	echo "Installing macOS-specific configs..."
-	stow $STOW_OPTIONS macos
+    echo "Installing macOS-specific configs..."
+    stow "${STOW_OPTIONS[@]}" macos
 elif [[ "$OS" == "Linux" ]]; then
-	echo "Installing Linux-specific configs..."
-	stow $STOW_OPTIONS linux
+    echo "Installing Linux-specific configs..."
+    stow "${STOW_OPTIONS[@]}" linux
 fi
 
 echo "Done!"
