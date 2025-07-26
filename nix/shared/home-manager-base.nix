@@ -27,16 +27,16 @@
       fi
     '';
 
-    # Run dotbot installer to create dotfile symlinks
-    home.activation.runDotbotInstaller = lib.hm.dag.entryAfter ["initDotfilesSubmodules"] ''
-      if [ -f "$HOME/.dotfiles/install" ] && [ -x "$HOME/.dotfiles/install" ]; then
-        echo "Running dotbot installer..."
+    # Run stow installer to create dotfile symlinks
+    home.activation.runStowInstaller = lib.hm.dag.entryAfter ["initDotfilesSubmodules"] ''
+      if [ -f "$HOME/.dotfiles/symlink.sh" ] && [ -x "$HOME/.dotfiles/symlink.sh" ]; then
+        echo "Running stow installer..."
         cd "$HOME/.dotfiles"
-        export PATH="${pkgs.python3}/bin:${pkgs.git}/bin:${pkgs.bash}/bin:$PATH"
-        $DRY_RUN_CMD ./install
-        echo "Dotbot installation completed"
+        export PATH="${pkgs.stow}/bin:${pkgs.bash}/bin:$PATH"
+        $DRY_RUN_CMD ./symlink.sh
+        echo "Stow installation completed"
       else
-        echo "Warning: ~/.dotfiles/install not found or not executable"
+        echo "Warning: ~/.dotfiles/symlink.sh not found or not executable"
       fi
     '';
 
@@ -48,6 +48,7 @@
       tree
       curl
       wget
+      stow  # GNU Stow for dotfile management
       git
       
       # Shell tools
