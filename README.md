@@ -43,17 +43,17 @@ sudo ./rebuild.sh --update
 ./rebuild.sh --stow
 ```
 
-> [!NOTE]
-> **macOS**: `sudo` is required for all nix-darwin rebuilds due to system activation requirements.
-> **Linux**: `sudo` is only required for initial setup, then `./rebuild.sh` works without `sudo`.
+> [!NOTE] **macOS**: `sudo` is required for all nix-darwin rebuilds due to
+> system activation requirements. **Linux**: `sudo` is only required for initial
+> setup, then `./rebuild.sh` works without `sudo`.
 
 ## Systems 🚀
 
-## Managed with Nix + Stow
+### Managed with Nix + Stow
 
 - See the [nix/README.md](nix/README.md) docs.
 
-## Managed with Stow only
+### Managed with Stow only
 
 - [macOS](README_MACOS.md)
 - [Windows 11 + WSL](README_WIN_WSL.md)
