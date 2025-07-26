@@ -1,0 +1,10 @@
+{
+  "chat.agent.enabled": true,
+
+  "github.copilot.chat.codesearch.enabled": true,
+  "github.copilot.chat.agent.thinkingTool": true,
+
+  "chat.mcp.discovery.enabled": true,
+  "chat.mcp.enabled": true,
+  "mcp": {}
+}

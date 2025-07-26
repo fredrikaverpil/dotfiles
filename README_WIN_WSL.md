@@ -83,7 +83,7 @@ From the Ubuntu prompt:
 
 ```bash
 git clone --recursive https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
-cd .dotfiles && ./install -vv
+cd .dotfiles && ./symlink.sh
 ```
 
 > [!NOTE] See [README_GIT.md](README_GIT.md) for details on setting up git.
@@ -211,7 +211,7 @@ cd ~/.dotfiles
 installers/neovim_distros.sh
 
 # re-run dotfiles installer, to symlink LazyVim config
-./install
+./symlink.sh
 ```
 
 ```bash

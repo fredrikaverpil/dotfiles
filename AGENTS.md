@@ -1,8 +1,9 @@
 # Agent Guidelines for Fredrik's Dotfiles
 
 ## Build/Test/Lint Commands
-- **Install dotfiles**: `./install -vv` (uses dotbot installer)
-- **Test installation**: `HOME=~/test-dir ./install -vv` (test in isolated directory)
+- **Install dotfiles**: `./symlink.sh` (uses GNU Stow)
+- **Force install**: `./symlink.sh --force` (overwrites existing symlinks)
+- **Test installation**: `HOME=~/test-dir ./symlink.sh` (test in isolated directory)
 - **CI testing**: Follow `.github/workflows/test.yml` workflow
 - **Nix operations**: `nix flake check`, `nix build .#darwinConfigurations.<host>.system`
 
@@ -24,11 +25,14 @@
 - **YAML**: 2-space indentation, use `---` document separator
 
 ## Repository Structure
+- `stow/`: Stow packages for dotfile symlinking
+  - `shared/`: Cross-platform dotfiles
+  - `macos/`: macOS-specific dotfiles
+  - `linux/`: Linux-specific dotfiles (including WSL)
 - `shell/`: Shell config, aliases, bin scripts
 - `nix/`: Nix/NixOS configurations per host  
 - `nvim-fredrik/`: Neovim configuration
 - `installers/`: Tool installation scripts
-- Root: Main dotfiles (gitconfig, tmux.conf, etc.)
 
 ## Error Handling
 - Shell scripts should use `set -e` for fail-fast behavior

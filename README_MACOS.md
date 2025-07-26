@@ -9,7 +9,7 @@
 
 ```bash
 git clone --recursive https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
-cd .dotfiles && ./install -vv
+cd .dotfiles && ./symlink.sh
 ```
 
 > [!NOTE]

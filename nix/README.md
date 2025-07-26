@@ -34,12 +34,12 @@ nix/
 This setup uses a multi-layered approach combining different tools for optimal
 flexibility and productivity:
 
-### Dotfile Management: Dotbot
+### Dotfile Management: GNU Stow
 
-**Why Dotbot instead of Nix for dotfiles?**
+**Why Stow instead of Nix for dotfiles?**
 
 While Nix can manage dotfiles declaratively, this setup uses
-[dotbot](https://github.com/anishathalye/dotbot) for symlinking dotfiles
+[GNU Stow](https://www.gnu.org/software/stow/) for symlinking dotfiles
 because:
 
 - **Rapid iteration**: Edit dotfiles and see changes immediately without
@@ -47,14 +47,15 @@ because:
 - **No rebuild overhead**: Avoid rebuild commands for simple config tweaks
 - **Familiar workflow**: Traditional dotfile editing experience
 - **Fallback compatibility**: Works even when Nix is unavailable
+- **Simple and reliable**: Battle-tested tool with minimal dependencies
 
 **How it works:**
 
-- Nix automatically runs `./install` (dotbot) during home-manager activation
-- Dotbot creates symlinks from `~/.dotfiles/` to `~/` (e.g., `gitconfig` →
+- Nix automatically runs `./symlink.sh` (stow) during home-manager activation
+- Stow creates symlinks from `~/.dotfiles/stow/` to `~/` (e.g., `stow/shared/.gitconfig` →
   `~/.gitconfig`)
 - Edit dotfiles directly in the repo - changes are immediately active
-- Nix manages packages and system settings, dotbot handles file symlinking
+- Nix manages packages and system settings, stow handles file symlinking
 
 ## Package Management Strategy
 
