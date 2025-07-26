@@ -28,29 +28,27 @@ fi
 
 # Detect platform
 OS="$(uname -s)"
-IS_MACOS="$([[ "$OS" == "Darwin" ]] && echo true || echo false)"
-IS_WSL="$([[ -f /proc/version ]] && grep -qi microsoft /proc/version && echo true || echo false)"
 
 echo "Installing dotfiles with stow..."
-echo "Platform: $OS (WSL: $IS_WSL)"
+echo "Platform: $OS"
 
 # Set stow options based on force mode
-STOW_OPTS="--target=$HOME --restow --verbose=1"
+STOW_OPTIONS="--target=$HOME --restow --verbose=1"
 if [[ "$FORCE_MODE" == "true" ]]; then
-	STOW_OPTS="$STOW_OPTS --adopt"
+	STOW_OPTIONS="$STOW_OPTIONS --adopt"
 fi
 
 # Always install shared configs
 echo "Installing shared configs..."
-stow $STOW_OPTS shared
+stow $STOW_OPTIONS shared
 
 # Platform-specific packages
-if [[ "$IS_MACOS" == "true" ]]; then
-    echo "Installing macOS-specific configs..."
-    stow $STOW_OPTS macos
-elif [[ "$IS_WSL" == "true" ]] || [[ "$OS" == "Linux" ]]; then
-    echo "Installing Linux-specific configs..."
-    stow $STOW_OPTS linux
+if [[ "$OS" == "Darwin" ]]; then
+	echo "Installing macOS-specific configs..."
+	stow $STOW_OPTIONS macos
+elif [[ "$OS" == "Linux" ]]; then
+	echo "Installing Linux-specific configs..."
+	stow $STOW_OPTIONS linux
 fi
 
 echo "Done!"
