@@ -12,9 +12,9 @@ shared and host-specific settings:
 ```txt
 nix/
 ├── hosts/           # Host-specific configurations
-│   ├── zap/         # Work laptop (macOS)
-│   ├── plumbus/     # Home laptop (macOS)
-│   └── rpi5-homelab/ # Raspberry Pi 5 (NixOS)
+│   ├── zap/         # Apple Silicon, macOS
+│   ├── plumbus/     # Apple Silicon, macOS
+│   └── rpi5-homelab/ # Raspberry Pi 5, NixOS
 ├── shared/          # Shared configurations
 │   ├── shell/       # Shell-specific configs (aliases, exports)
 │   ├── darwin-system.nix        # Core macOS system settings
