@@ -29,14 +29,14 @@
 
     # Run stow installer to create dotfile symlinks
     home.activation.runStowInstaller = lib.hm.dag.entryAfter ["initDotfilesSubmodules"] ''
-      if [ -f "$HOME/.dotfiles/symlink.sh" ] && [ -x "$HOME/.dotfiles/symlink.sh" ]; then
+      if [ -f "$HOME/.dotfiles/stow/symlink.sh" ] && [ -x "$HOME/.dotfiles/stow/symlink.sh" ]; then
         echo "Running stow installer..."
-        cd "$HOME/.dotfiles"
+        cd "$HOME/.dotfiles/stow"
         export PATH="${pkgs.stow}/bin:${pkgs.bash}/bin:$PATH"
         $DRY_RUN_CMD ./symlink.sh
         echo "Stow installation completed"
       else
-        echo "Warning: ~/.dotfiles/symlink.sh not found or not executable"
+        echo "Warning: ~/.dotfiles/stow/symlink.sh not found or not executable"
       fi
     '';
 
