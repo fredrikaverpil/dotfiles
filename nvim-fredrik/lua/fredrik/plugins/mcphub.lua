@@ -27,8 +27,9 @@ return {
       require("mcphub").setup({
         -- Required options
         port = 3000, -- Port for MCP Hub server
-        config = require("fredrik.utils.environ").getenv("DOTFILES") .. "/mcpservers.json",
 
+        -- config at ~/.config/mcphub/servers.json",
+        config = vim.fn.expand("~/.config/mcphub/servers.json"),
         -- Optional options
         on_ready = function(hub)
           -- Called when hub is ready

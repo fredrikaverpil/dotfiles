@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "memory": {
+      "args": [
+        "run",
+        "-i",
+        "-v",
+        "claude-memory:/app/dist",
+        "--rm",
+        "mcp/memory"
+      ],
+      "command": "docker"
+    }
+  },
+  "nativeMCPServers": []
+}
+
