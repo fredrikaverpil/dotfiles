@@ -2,8 +2,10 @@
 
 > [!NOTE]
 >
-> **For machines managed with Nix (recommended)**, see [nix/README.md](nix/README.md).
-> The instructions below are maintained for legacy/manual setups - refer to the Nix configuration for the canonical package list.
+> **For machines managed with Nix (recommended)**, see
+> [nix/README.md](nix/README.md). The instructions below are maintained for
+> legacy/manual setups - refer to the Nix configuration for the canonical
+> package list.
 
 ### Install dotfiles
 
@@ -58,10 +60,10 @@ Execute desired installers:
 
 ```bash
 installers/neovim-distros.sh
-installers/neovim-nightly.sh
+installers/neovim.sh --nightly
 
 # run LazyVim
-NVIM_APPNAME=LazyVim nvim
+NVIM_APPNAME=fredrik nvim
 
 # or run custom nvim config
 nvim
