@@ -5,6 +5,11 @@ let
   stateVersions = {
     nixos = "25.05";
   };
+  
+  # Check if agenix secret files exist for conditional configuration
+  cloudflareTokenExists = builtins.pathExists ./secrets/cloudflare-token.age;
+  homelabDomainExists = builtins.pathExists ./secrets/homelab-domain.age;
+  ddclientSecretsExist = cloudflareTokenExists && homelabDomainExists;
 in
 {
   # Import agenix module for secrets management
@@ -115,15 +120,14 @@ in
     # Dynamic DNS client for Cloudflare integration
     # Updates DNS records when public IP changes for internet accessibility
     # Uses agenix for secure secret management (API token and domain name)
-    # Dynamic DNS client for Cloudflare integration
-    # Uses agenix for secure secret management (API token and domain name)
+    # Automatically enabled when secret files exist
     ddclient = {
-      enable = true;
+      enable = ddclientSecretsExist;
       protocol = "cloudflare";
       server = "cloudflare";
       username = "token";  # Cloudflare uses 'token' as username for API token auth
-      passwordFile = config.age.secrets.cloudflare-token.path;
-      domains = [ (lib.strings.removeSuffix "\n" (builtins.readFile config.age.secrets.homelab-domain.path)) ];
+      passwordFile = lib.mkIf cloudflareTokenExists config.age.secrets.cloudflare-token.path;
+      domains = lib.mkIf homelabDomainExists [ (lib.strings.removeSuffix "\n" (builtins.readFile config.age.secrets.homelab-domain.path)) ];
       verbose = true;
       ssl = true;
       interval = "300";  # Update every 5 minutes
@@ -336,14 +340,14 @@ in
   # Allow unfree packages (needed for various packages)
   nixpkgs.config.allowUnfree = true;
 
-  # Configure agenix secrets for ddclient
+  # Configure agenix secrets for ddclient (only if secret files exist)
   age.secrets = {
-    cloudflare-token = {
+    cloudflare-token = lib.mkIf cloudflareTokenExists {
       file = ./secrets/cloudflare-token.age;
       owner = "ddclient";
       group = "ddclient";
     };
-    homelab-domain = {
+    homelab-domain = lib.mkIf homelabDomainExists {
       file = ./secrets/homelab-domain.age;
       owner = "ddclient";
       group = "ddclient";

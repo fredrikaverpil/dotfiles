@@ -124,37 +124,42 @@ systemctl is-active sshd  # check if sshd is running
 
 ### Post-Installation: Enable Dynamic DNS and VPN
 
-The initial deployment includes basic services but has **ddclient (Dynamic DNS) disabled** and **agenix secrets commented out** until secrets are configured. This two-phase approach ensures you can deploy the basic system first, then add secrets functionality.
+The configuration uses **conditional secrets management** that automatically adapts based on whether secret files exist. This two-phase approach ensures you can deploy the basic system first, then add secrets functionality without manual configuration changes.
 
-**IMPORTANT**: The configuration is set up for a two-phase deployment:
-- **Phase 1**: Basic system with secrets disabled (safe to deploy immediately)
-- **Phase 2**: Enable secrets after SSH keys are set up (requires manual steps)
+**IMPORTANT**: The configuration automatically detects secret files:
+- **Phase 1**: Basic system (no secrets = services disabled automatically)
+- **Phase 2**: Full functionality (secrets present = services enabled automatically)
 
-#### What's Disabled in Fresh Installs
+#### How Conditional Configuration Works
 
-For security and deployment safety, these components are initially disabled:
+The system uses `builtins.pathExists` to check for secret files and automatically enables/disables services:
 
 ```nix
-# In configuration.nix - these are commented out/disabled for fresh installs:
+# In configuration.nix - automatic conditional logic:
+let
+  cloudflareTokenExists = builtins.pathExists ./secrets/cloudflare-token.age;
+  homelabDomainExists = builtins.pathExists ./secrets/homelab-domain.age;
+  ddclientSecretsExist = cloudflareTokenExists && homelabDomainExists;
+in {
+  # ddclient automatically enabled only when both secrets exist
+  ddclient = {
+    enable = ddclientSecretsExist;  # Automatic based on secret files
+    passwordFile = lib.mkIf cloudflareTokenExists config.age.secrets.cloudflare-token.path;
+    domains = lib.mkIf homelabDomainExists [ ... ];
+  };
 
-# 1. ddclient service (around line 120)
-ddclient = {
-  enable = false;  # Will be enabled after secrets are set up
-  # ...
-};
-
-# 2. agenix secrets configuration (around line 345)
-# age.secrets = {
-#   cloudflare-token = { ... };
-#   homelab-domain = { ... };
-# };
-
-# 3. ddclient secret references (around line 125)
-# passwordFile = config.age.secrets.cloudflare-token.path;
-# domains = [ ... ];
+  # Secrets only configured when files exist
+  age.secrets = {
+    cloudflare-token = lib.mkIf cloudflareTokenExists { ... };
+    homelab-domain = lib.mkIf homelabDomainExists { ... };
+  };
+}
 ```
 
-This allows you to deploy the basic homelab infrastructure (Docker services, SSH, Tailscale, etc.) without needing secrets configured first.
+This means:
+- **Fresh installs**: No secrets = ddclient disabled, basic services work
+- **With secrets**: Both secrets present = ddclient enabled automatically
+- **No manual configuration changes needed** between phases
 
 #### 1. Set up Tailscale VPN (Secure Remote Access)
 
@@ -220,44 +225,29 @@ ls -la *.age
 nix run github:ryantm/agenix -- -d cloudflare-token.age  # Should show your token
 ```
 
-#### 6. Enable Secrets in Configuration (on Development Machine)
+#### 6. Deploy with Secrets (Automatic Configuration)
 
-After creating the secrets on the Pi, enable them in the configuration:
+After creating the secrets on the Pi, the configuration will automatically detect them and enable ddclient:
 
 ```sh
-# On your development machine, edit the configuration
-cd nix/hosts/rpi5-homelab/
-nano configuration.nix
+# The configuration automatically detects the presence of secret files:
+# - cloudflare-token.age exists → cloudflare token secret configured
+# - homelab-domain.age exists → domain secret configured  
+# - Both exist → ddclient service enabled automatically
+# - Either missing → ddclient remains disabled
 
-# Make these changes:
-# 1. Uncomment the age.secrets configuration block (around line 345):
-age.secrets = {
-  cloudflare-token = {
-    file = ./secrets/cloudflare-token.age;
-    owner = "ddclient";
-    group = "ddclient";
-  };
-  homelab-domain = {
-    file = ./secrets/homelab-domain.age;
-    owner = "ddclient";
-    group = "ddclient";
-  };
-};
-
-# 2. Enable ddclient (around line 120):
-enable = true;  # Change from false
-
-# 3. Uncomment the ddclient secrets (around line 125):
-passwordFile = config.age.secrets.cloudflare-token.path;
-domains = [ (lib.strings.removeSuffix "\n" (builtins.readFile config.age.secrets.homelab-domain.path)) ];
-
-# Commit and push the changes
-git add configuration.nix
-git commit -m "Enable agenix secrets and ddclient"
-git push
+# No manual configuration changes needed!
+# The conditional logic handles everything automatically.
 ```
 
-**Note**: The secrets (.age files) are only created on the Pi and are not committed to git for security.
+**Note**: The secrets (.age files) are only created on the Pi and are not committed to git for security. The configuration automatically adapts to their presence.
+
+**Benefits of Conditional Configuration:**
+- ✅ **Safe deployment**: Fresh installs work immediately without secrets
+- ✅ **No manual edits**: Configuration automatically adapts to secret presence  
+- ✅ **Gradual setup**: Add secrets when ready, services enable automatically
+- ✅ **Consistent config**: Same configuration works for all deployment phases
+- ✅ **Error prevention**: No risk of forgetting to enable services after adding secrets
 
 #### 7. Create DNS Record in Cloudflare
 
@@ -265,16 +255,21 @@ git push
 2. Create an A record for your chosen subdomain pointing to any IP (ddclient will update it)
 3. Example: `lab-k8s9x.averpil.com` → `1.1.1.1` (temporary)
 
-#### 8. Deploy with Secrets Enabled
+#### 8. Deploy with Automatic Secret Detection
 
 ```sh
-# On the Pi, pull the updated configuration and rebuild
+# On the Pi, rebuild the system (secrets will be detected automatically)
 cd ~/.dotfiles
-git pull
 sudo nixos-rebuild switch --flake .#rpi5-homelab
 
 # Or from your development machine:
 nixos-anywhere --flake .#rpi5-homelab --build-on remote --phases install root@<pi-ip>
+
+# The system will automatically:
+# 1. Detect the presence of cloudflare-token.age and homelab-domain.age
+# 2. Enable ddclient service since both secrets exist
+# 3. Configure the secrets for ddclient to use
+# 4. Start ddclient with the proper credentials
 ```
 
 #### 9. Verify Services
