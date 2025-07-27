@@ -110,6 +110,18 @@
           </dict>
         </dict>
       "
-    '
-  '';
+     '
+   '';
+
+  # Nix registry for easy access to stable and unstable packages
+  nix.registry = {
+    n.to = {
+      type = "path";
+      path = inputs.nixpkgs;
+    };
+    u.to = {
+      type = "path";
+      path = inputs.nixpkgs-unstable;
+    };
+  };
 }
