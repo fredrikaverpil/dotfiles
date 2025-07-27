@@ -1,12 +1,10 @@
 { config, pkgs, lib, inputs, ... }:
 
 {
-  imports = [
-    ../../shared/darwin-system.nix
-    ./home.nix
-    inputs.home-manager-unstable.darwinModules.home-manager
-  ];
-
+   imports = [
+     ../../shared/darwin-system.nix
+     ./home.nix
+   ];
   # Host-specific configuration for zap
   networking.hostName = "zap";
 

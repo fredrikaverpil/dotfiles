@@ -40,41 +40,31 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, nixos-raspberrypi, disko, home-manager, home-manager-unstable, nix-darwin, dotfiles, ... }@inputs: {
-    nixosConfigurations = {
-      # Your Raspberry Pi 5 homelab system configuration
-      rpi5-homelab = nixos-raspberrypi.lib.nixosSystemFull {
-        specialArgs = inputs // { nixos-raspberrypi = nixos-raspberrypi; inherit dotfiles; };
-        modules = [
-          disko.nixosModules.disko
-          home-manager.nixosModules.home-manager
-          # Import hardware configuration from separate file
-          ./nix/hosts/rpi5-homelab/hardware.nix
-          # Import home-manager configuration from separate file
-          ./nix/hosts/rpi5-homelab/home.nix
-          # Import main configuration
-          ./nix/hosts/rpi5-homelab/configuration.nix
-        ];
+  outputs = { self, ... }@inputs:
+    let
+      lib = import ./nix/lib { inherit inputs; };
+    in
+    {
+      nixosConfigurations = {
+        # Your Raspberry Pi 5 homelab system configuration
+        rpi5-homelab = inputs.nixos-raspberrypi.lib.nixosSystemFull {
+          specialArgs = inputs // { nixos-raspberrypi = inputs.nixos-raspberrypi; inherit (inputs) dotfiles; };
+          modules = [
+            inputs.disko.nixosModules.disko
+            inputs.home-manager.nixosModules.home-manager
+            # Import hardware configuration from separate file
+            ./nix/hosts/rpi5-homelab/hardware.nix
+            # Import home-manager configuration from separate file
+            ./nix/hosts/rpi5-homelab/home.nix
+            # Import main configuration
+            ./nix/hosts/rpi5-homelab/configuration.nix
+          ];
+        };
       };
-    };
 
-    darwinConfigurations = {
-      zap = nix-darwin.lib.darwinSystem {
-        specialArgs = inputs // { 
-          inherit inputs dotfiles; 
-          nixpkgs = nixpkgs-unstable;
-          home-manager = home-manager-unstable;
-        };
-        modules = [ ./nix/hosts/zap/configuration.nix ];
-      };
-      plumbus = nix-darwin.lib.darwinSystem {
-        specialArgs = inputs // { 
-          inherit inputs dotfiles; 
-          nixpkgs = nixpkgs-unstable;
-          home-manager = home-manager-unstable;
-        };
-        modules = [ ./nix/hosts/plumbus/configuration.nix ];
+      darwinConfigurations = {
+        zap = lib.mkDarwin { hostname = "zap"; };
+        plumbus = lib.mkDarwin { hostname = "plumbus"; };
       };
     };
-  };
 }
