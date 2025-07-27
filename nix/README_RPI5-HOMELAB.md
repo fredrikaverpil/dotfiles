@@ -124,42 +124,60 @@ systemctl is-active sshd  # check if sshd is running
 
 ### Post-Installation: Enable Dynamic DNS and VPN
 
-The configuration uses **conditional secrets management** that automatically adapts based on whether secret files exist. This two-phase approach ensures you can deploy the basic system first, then add secrets functionality without manual configuration changes.
+The configuration uses **systemd conditions** to ensure services only run when secrets are available. This approach allows for safe deployment without secrets while automatically enabling services once secrets are added.
 
-**IMPORTANT**: The configuration automatically detects secret files:
-- **Phase 1**: Basic system (no secrets = services disabled automatically)
-- **Phase 2**: Full functionality (secrets present = services enabled automatically)
+**IMPORTANT**: The configuration uses runtime conditions:
+- **Phase 1**: Basic system (services exist but don't run due to missing secrets)
+- **Phase 2**: Full functionality (services run when secrets are decrypted)
 
-#### How Conditional Configuration Works
+### Initial Deployment Considerations
 
-The system uses `builtins.pathExists` to check for secret files and automatically enables/disables services:
+**IMPORTANT**: On fresh deployments without secrets, you may need to temporarily disable ddclient if you encounter issues:
+
+```bash
+# On initial deploy, if you get errors about missing secrets:
+sudo systemctl stop ddclient
+sudo systemctl disable ddclient
+
+# After adding secrets and rebuilding:
+sudo systemctl enable ddclient
+sudo systemctl start ddclient
+```
+
+The systemd conditions should prevent the service from running, but if you encounter issues during initial deployment, manually disabling the service ensures a clean installation.
+
+#### How Runtime Conditions Work
+
+The system uses **systemd conditions** to check for decrypted secrets at runtime:
 
 ```nix
-# In configuration.nix - automatic conditional logic:
-let
-  cloudflareTokenExists = builtins.pathExists ./secrets/cloudflare-token.age;
-  homelabDomainExists = builtins.pathExists ./secrets/homelab-domain.age;
-  ddclientSecretsExist = cloudflareTokenExists && homelabDomainExists;
-in {
-  # ddclient automatically enabled only when both secrets exist
-  ddclient = {
-    enable = ddclientSecretsExist;  # Automatic based on secret files
-    passwordFile = lib.mkIf cloudflareTokenExists config.age.secrets.cloudflare-token.path;
-    domains = lib.mkIf homelabDomainExists [ ... ];
-  };
+# In configuration.nix - systemd runtime conditions:
+ddclient = {
+  enable = true;  # Service always defined
+  # ... configuration including secret references
+};
 
-  # Secrets only configured when files exist
-  age.secrets = {
-    cloudflare-token = lib.mkIf cloudflareTokenExists { ... };
-    homelab-domain = lib.mkIf homelabDomainExists { ... };
+# Systemd conditions prevent running without secrets
+systemd.services.ddclient = {
+  unitConfig = {
+    ConditionPathExists = [
+      "/run/agenix/cloudflare-token"
+      "/run/agenix/homelab-domain"
+    ];
   };
-}
+};
+
+# Secrets always configured (agenix handles missing files gracefully)
+age.secrets = {
+  cloudflare-token = { file = ./secrets/cloudflare-token.age; ... };
+  homelab-domain = { file = ./secrets/homelab-domain.age; ... };
+};
 ```
 
 This means:
-- **Fresh installs**: No secrets = ddclient disabled, basic services work
-- **With secrets**: Both secrets present = ddclient enabled automatically
-- **No manual configuration changes needed** between phases
+- **Fresh installs**: Service exists but won't run (systemd conditions fail)
+- **With secrets**: Service runs when secrets are decrypted to `/run/agenix/`
+- **No configuration changes needed** between phases
 
 #### 1. Set up Tailscale VPN (Secure Remote Access)
 
@@ -242,12 +260,12 @@ After creating the secrets on the Pi, the configuration will automatically detec
 
 **Note**: The secrets (.age files) are only created on the Pi and are not committed to git for security. The configuration automatically adapts to their presence.
 
-**Benefits of Conditional Configuration:**
+**Benefits of Runtime Conditions:**
 - ✅ **Safe deployment**: Fresh installs work immediately without secrets
-- ✅ **No manual edits**: Configuration automatically adapts to secret presence  
-- ✅ **Gradual setup**: Add secrets when ready, services enable automatically
+- ✅ **No "service not found" errors**: Services always exist in systemd
+- ✅ **Automatic activation**: Services start when secrets become available
 - ✅ **Consistent config**: Same configuration works for all deployment phases
-- ✅ **Error prevention**: No risk of forgetting to enable services after adding secrets
+- ✅ **Graceful handling**: Missing secrets don't break the system
 
 #### 7. Create DNS Record in Cloudflare
 
