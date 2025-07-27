@@ -17,10 +17,10 @@
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
     home-manager.users.fredrik = { config, lib, ... }: {
-    # Ensure git submodules are initialized in ~/.dotfiles
+    # Ensure any git submodules are initialized in ~/.dotfiles
     home.activation.initDotfilesSubmodules = lib.hm.dag.entryAfter ["writeBoundary"] ''
       if [ -d "$HOME/.dotfiles/.git" ]; then
-        echo "Initializing git submodules in ~/.dotfiles..."
+        echo "Initializing any git submodules in ~/.dotfiles..."
         cd "$HOME/.dotfiles"
         $DRY_RUN_CMD ${pkgs.git}/bin/git submodule update --init --recursive
         echo "Git submodules initialized"
