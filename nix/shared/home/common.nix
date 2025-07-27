@@ -45,30 +45,38 @@
 
     # Common packages available on both platforms
     home.packages = with pkgs; [
-      # Core tools
-      vim
-      tmux
-      tree
-      curl
-      wget
-      stow  # GNU Stow for dotfile management
-      git
-      
-      # Shell tools
+      # ========================================================================
+      # Core System & Shell Tools
+      # ========================================================================
       bash
       bat
-      jq
+      curl
+      direnv
+      eza
       fzf
+      git
+      htop
+      jq
+      ncurses
+      rsync
+      stow  # GNU Stow for dotfile management
+      tmux
+      tree
+      vim
+      wget
       zsh-autosuggestions
       zsh-syntax-highlighting
-      direnv
-      atuin
-      eza
-      starship
-      yq
       zoxide
+      starship
+
+      # ========================================================================
+      # Development & Language Toolchains
+      # ========================================================================
+      # Language-specific
+      uv
+      rustup
       
-      # Development tools
+      # Generic development
       gnumake
       ripgrep
       fd
@@ -77,45 +85,36 @@
       pre-commit
       shellcheck
       hadolint
-      # gcc removed - use nix-shell for C/C++ development
       
-      # Git tools
+      # ========================================================================
+      # Git & Version Control
+      # ========================================================================
       gh
       lazygit
       lazydocker
-      
-      # Network/API tools
+
+      # ========================================================================
+      # Network, API & Database
+      # ========================================================================
       grpcurl
       grpcui
-      
-      # Database tools
       postgresql
       # mysql80  # Temporarily disabled due to boost build failure on macOS
-      
-      # Media/utility tools
+
+      # ========================================================================
+      # Media, AI & Utilities
+      # ========================================================================
       asciinema
       imagemagick
-      
-      # Language tools
-      uv
-      rustup
-      
-      # Infrastructure tools
+      ollama
+      gnused # GNU tools (for macOS compatibility)
+      kitty.terminfo
+
+      # ========================================================================
+      # Infrastructure & Cloud
+      # ========================================================================
       opentofu
       
-      # AI/ML tools
-      ollama
-      
-      # GNU tools (for macOS compatibility)
-      gnused
-      
-      # Basic utilities
-      htop
-      rsync
-      
-      # Terminal support
-      ncurses
-      kitty.terminfo
     ] ++ args.config.dotfiles.extraPackages;
 
 
