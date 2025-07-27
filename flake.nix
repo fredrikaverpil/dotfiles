@@ -34,7 +34,7 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     dotfiles = {
-      url = "github:fredrikaverpil/dotfiles";  # NOTE: uses the branch 'nix'
+      url = "github:fredrikaverpil/dotfiles";
       flake = false;
       # Used by home-manager for dotfiles bootstrapping and git submodule init
     };
@@ -46,17 +46,13 @@
     in
     {
       nixosConfigurations = {
-        # Your Raspberry Pi 5 homelab system configuration
         rpi5-homelab = inputs.nixos-raspberrypi.lib.nixosSystemFull {
           specialArgs = inputs // { nixos-raspberrypi = inputs.nixos-raspberrypi; inherit (inputs) dotfiles; };
           modules = [
             inputs.disko.nixosModules.disko
             inputs.home-manager.nixosModules.home-manager
-            # Import hardware configuration from separate file
             ./nix/hosts/rpi5-homelab/hardware.nix
-            # Import home-manager configuration from separate file
             ./nix/hosts/rpi5-homelab/home.nix
-            # Import main configuration
             ./nix/hosts/rpi5-homelab/configuration.nix
           ];
         };
