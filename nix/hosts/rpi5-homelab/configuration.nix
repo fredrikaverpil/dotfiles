@@ -45,6 +45,7 @@ in
       9443  # Portainer - HTTPS port (primary)
       3001  # Uptime Kuma - Service monitoring dashboard
       2283  # Immich - Photo management web interface
+      8096  # Jellyfin - Media server web interface
     ];
   };
 
@@ -112,6 +113,8 @@ in
     "homelab/uptime-kuma/docker-compose.yml".source = ./docker-compose/uptime-kuma.yml;
     "homelab/immich/docker-compose.yml".source = ./docker-compose/immich.yml;
     "homelab/immich/.env".source = ./docker-compose/immich.env;
+    "homelab/jellyfin/docker-compose.yml".source = ./docker-compose/jellyfin.yml;
+    "homelab/jellyfin/.env".source = ./docker-compose/jellyfin.env;
   };
 
   # Systemd services for docker-compose stacks
@@ -164,6 +167,28 @@ in
         ExecStop = "${pkgs.docker-compose}/bin/docker-compose down";
         ExecReload = "${pkgs.docker-compose}/bin/docker-compose up -d --force-recreate";
         TimeoutStartSec = "600";  # Immich takes longer to start (ML models, etc.)
+      };
+      wantedBy = [ "multi-user.target" ];
+    };
+
+    homelab-jellyfin = {
+      description = "Homelab Jellyfin Media Server Stack";
+      after = [ "docker.service" ];
+      requires = [ "docker.service" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        WorkingDirectory = "/etc/homelab/jellyfin";
+        ExecStartPre = [
+          "${pkgs.coreutils}/bin/mkdir -p /var/lib/jellyfin/config"
+          "${pkgs.coreutils}/bin/mkdir -p /var/lib/jellyfin/cache"
+          "${pkgs.coreutils}/bin/mkdir -p /var/lib/jellyfin/media"
+          "${pkgs.coreutils}/bin/chown -R 1000:1000 /var/lib/jellyfin"
+        ];
+        ExecStart = "${pkgs.docker-compose}/bin/docker-compose up -d";
+        ExecStop = "${pkgs.docker-compose}/bin/docker-compose down";
+        ExecReload = "${pkgs.docker-compose}/bin/docker-compose up -d --force-recreate";
+        TimeoutStartSec = "300";
       };
       wantedBy = [ "multi-user.target" ];
     };
