@@ -1,4 +1,4 @@
-{ inputs, outputs, ... }:
+{ inputs, ... }:
 {
   mkDarwin = { hostname, system ? "aarch64-darwin", ... }:
   let

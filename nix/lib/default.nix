@@ -1,10 +1,9 @@
 {
   inputs,
-  outputs,
   ...
 }:
 let
-  helpers = import ./helpers.nix { inherit inputs outputs; };
+  helpers = import ./helpers.nix { inherit inputs; };
 in
 {
   inherit (helpers)
