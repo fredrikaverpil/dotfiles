@@ -146,6 +146,122 @@ sudo systemctl start ddclient
 
 The systemd conditions should prevent the service from running, but if you encounter issues during initial deployment, manually disabling the service ensures a clean installation.
 
+### Troubleshooting Fresh Install Deployment
+
+**IMPORTANT**: The current configuration references secrets unconditionally, which can cause deployment failures on fresh installs. Here are the common issues and solutions:
+
+#### Issue 1: Missing Secret Files During Build
+
+**Error**: `error: path '/nix/store/.../secrets/cloudflare-token.age' does not exist`
+
+**Cause**: The configuration references secret files that don't exist in the git repository.
+
+**Solutions**:
+
+**Option A: Create Dummy Secret Files (Recommended for Development)**
+```bash
+# On your development machine, create placeholder files
+cd nix/hosts/rpi5-homelab/secrets/
+echo "dummy-encrypted-content" > cloudflare-token.age
+echo "dummy-encrypted-content" > homelab-domain.age
+git add cloudflare-token.age homelab-domain.age
+git commit -m "Add dummy secret files for deployment"
+
+# Deploy to Pi
+nixos-anywhere --flake .#rpi5-homelab --build-on remote --phases install root@<pi-ip>
+
+# After deployment, replace with real secrets on the Pi
+```
+
+**Option B: Temporarily Disable Services**
+```bash
+# Comment out ddclient configuration in configuration.nix
+# Deploy without secrets, then add them later
+```
+
+#### Issue 2: Missing SSH Keys for Agenix
+
+**Error**: `agenix: error: no identity found`
+
+**Cause**: The Pi doesn't have the SSH private key that matches the public key in `secrets.nix`.
+
+**Solutions**:
+
+**Option A: Copy SSH Key to Pi**
+```bash
+# From your development machine, copy your SSH key to the Pi
+scp ~/.ssh/id_ed25519 fredrik@<pi-ip>:~/.ssh/
+scp ~/.ssh/id_ed25519.pub fredrik@<pi-ip>:~/.ssh/
+
+# On the Pi, set correct permissions
+chmod 600 ~/.ssh/id_ed25519
+chmod 644 ~/.ssh/id_ed25519.pub
+```
+
+**Option B: Generate New SSH Key on Pi**
+```bash
+# On the Pi, generate a new SSH key
+ssh-keygen -t ed25519 -C "fredrik@rpi5-homelab"
+
+# Get the public key
+cat ~/.ssh/id_ed25519.pub
+
+# Update secrets.nix on your development machine with the new public key
+# Then re-encrypt your secrets with the new key
+```
+
+#### Issue 3: Deployment Fails Due to Service Dependencies
+
+**Error**: Services fail to start due to missing secrets during initial deployment.
+
+**Solution**: Use the deployment override approach:
+```bash
+# Create a minimal deployment configuration
+# Deploy basic system first, then add secrets in second phase
+
+# Phase 1: Basic deployment
+nixos-anywhere --flake .#rpi5-homelab --build-on remote --phases disko,install root@<pi-ip>
+
+# Phase 2: Add secrets and redeploy
+# (after setting up SSH keys and creating secret files)
+sudo nixos-rebuild switch --flake .#rpi5-homelab
+```
+
+#### Issue 4: Cannot SSH to Pi After Deployment
+
+**Cause**: SSH keys not properly configured or services not started.
+
+**Solutions**:
+```bash
+# Connect via local console/keyboard to the Pi
+# Check SSH service status
+systemctl status sshd
+
+# Check if your SSH key is in authorized_keys
+cat ~/.ssh/authorized_keys
+
+# Manually add your SSH key if missing
+echo "your-ssh-public-key-here" >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+
+# Restart SSH service
+sudo systemctl restart sshd
+```
+
+### Recommended Deployment Workflow
+
+For the most reliable deployment experience:
+
+1. **Prepare dummy secrets** for initial deployment
+2. **Deploy basic system** with dummy secrets
+3. **SSH into Pi** and verify basic functionality
+4. **Generate/copy SSH keys** for agenix
+5. **Create real encrypted secrets** on the Pi
+6. **Rebuild system** to activate real secrets
+7. **Verify services** are working correctly
+
+This approach ensures each step can be debugged independently.
+
 #### How Runtime Conditions Work
 
 The system uses **systemd conditions** to check for decrypted secrets at runtime:

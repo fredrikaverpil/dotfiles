@@ -117,16 +117,15 @@ in
     # Uses agenix for secure secret management (API token and domain name)
     # Service runs only when secrets are available (via systemd conditions)
     ddclient = {
-      enable = true;  # Always enable service definition
+      enable = true;
       protocol = "cloudflare";
       server = "cloudflare";
       username = "token";  # Cloudflare uses 'token' as username for API token auth
+      passwordFile = config.age.secrets.cloudflare-token.path;
+      domains = [ (lib.strings.removeSuffix "\n" (builtins.readFile config.age.secrets.homelab-domain.path)) ];
       verbose = true;
       ssl = true;
       interval = "300";  # Update every 5 minutes
-    } // lib.optionalAttrs (builtins.pathExists ./secrets/cloudflare-token.age && builtins.pathExists ./secrets/homelab-domain.age) {
-      passwordFile = config.age.secrets.cloudflare-token.path;
-      domains = [ (lib.strings.removeSuffix "\n" (builtins.readFile config.age.secrets.homelab-domain.path)) ];
     };
   };
 
@@ -349,8 +348,8 @@ in
   # Allow unfree packages (needed for various packages)
   nixpkgs.config.allowUnfree = true;
 
-  # Configure agenix secrets for ddclient (conditional to handle missing files)
-  age.secrets = lib.mkIf (builtins.pathExists ./secrets/cloudflare-token.age && builtins.pathExists ./secrets/homelab-domain.age) {
+  # Configure agenix secrets for ddclient
+  age.secrets = {
     cloudflare-token = {
       file = ./secrets/cloudflare-token.age;
       owner = "ddclient";
