@@ -1,14 +1,25 @@
 { config, pkgs, lib, inputs, ... }:
 
+let
+  # Versions specific to this host
+  stateVersions = {
+    darwin = 6;
+  };
+in
 {
-  imports = [
-    ../../shared/darwin-system.nix
-    ./home.nix
-    inputs.home-manager-unstable.darwinModules.home-manager
-  ];
-
   # Host-specific configuration for zap
   networking.hostName = "zap";
+  
+  # Multi-user configuration
+  dotfiles.users = {
+    fredrik = {
+      isAdmin = true;
+      isPrimary = true;  # Primary user for Darwin system defaults
+      shell = "zsh";
+      homeConfig = ./users/fredrik.nix;
+      groups = [ "docker" ];
+    };
+  };
 
   # Host-specific packages for zap
   dotfiles.extraPackages = with pkgs; [
@@ -21,17 +32,16 @@
 
   dotfiles.extraCasks = [
     "podman-desktop"
-    "fujifilm-x-raw-studio"
-    "obs"
-	"pgadmin4"
+    "pgadmin4"
   ];
 
   # Set system platform
   nixpkgs.hostPlatform = "aarch64-darwin";
 
-  # System state version - set once when host was first installed, never change
-  # Use `darwin-rebuild changelog` to see version-specific changes
-  system.stateVersion = 6;  # Installed in 2025
+  # System state version
+  system.stateVersion = stateVersions.darwin;
+
+
 
   # Timezone
   time.timeZone = "Europe/Stockholm";

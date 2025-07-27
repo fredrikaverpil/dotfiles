@@ -5,12 +5,11 @@
 
 {
   imports = [
-    ./home-manager-base.nix    # Cross-platform home-manager configuration
-    ./shell/aliases.nix  # Shell aliases (shared across platforms)
-    ./shell/exports.nix  # Environment variables and PATH settings
+    ./common.nix    # Cross-platform home-manager configuration
   ];
-
-  home-manager.users.fredrik = {
+  
+  # Linux-specific home-manager configuration
+  # This gets imported by individual user configurations on Linux systems
     # Linux-specific packages not available or needed on macOS
     home.packages = with pkgs; [
       # System debugging and monitoring tools
@@ -19,14 +18,15 @@
       
       # Additional Linux-specific tools can be added here as needed
       # Examples: htop, iotop, nethogs, etc.
-    ] ++ args.config.dotfiles.extraPackages;
+    ];
+    
+    # Note: Additional packages are now added in individual user configurations
 
     # Linux-specific dotfiles and configurations
     home.file = {
     };
 
-    # Linux-specific program configurations
-    programs = {
-    };
+  # Linux-specific program configurations
+  programs = {
   };
 }

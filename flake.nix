@@ -15,6 +15,8 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     # Unstable nixpkgs for macOS/Darwin
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    # Unstable nixos for Linux/NixOS
+    nixos-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     
     nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
     disko = {
@@ -34,47 +36,45 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     dotfiles = {
-      url = "github:fredrikaverpil/dotfiles";  # NOTE: uses the branch 'nix'
+      url = "github:fredrikaverpil/dotfiles";
       flake = false;
       # Used by home-manager for dotfiles bootstrapping and git submodule init
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, nixos-raspberrypi, disko, home-manager, home-manager-unstable, nix-darwin, dotfiles, ... }@inputs: {
-    nixosConfigurations = {
-      # Your Raspberry Pi 5 homelab system configuration
-      rpi5-homelab = nixos-raspberrypi.lib.nixosSystemFull {
-        specialArgs = inputs // { nixos-raspberrypi = nixos-raspberrypi; inherit dotfiles; };
-        modules = [
-          disko.nixosModules.disko
-          home-manager.nixosModules.home-manager
-          # Import hardware configuration from separate file
-          ./nix/hosts/rpi5-homelab/hardware.nix
-          # Import home-manager configuration from separate file
-          ./nix/hosts/rpi5-homelab/home.nix
-          # Import main configuration
-          ./nix/hosts/rpi5-homelab/configuration.nix
-        ];
+  outputs = { self, ... }@inputs:
+    let
+      lib = import ./nix/lib { inherit inputs; };
+    in
+    {
+      nixosConfigurations = {
+        rpi5-homelab = lib.mkRpiNixos { 
+          configPath = ./nix/hosts/rpi5-homelab/configuration.nix;
+        };
+        # Example standard NixOS configuration:
+        # my-server = lib.mkNixos {
+        #   configPath = ./nix/hosts/my-server/configuration.nix;
+        # };
       };
-    };
 
-    darwinConfigurations = {
-      zap = nix-darwin.lib.darwinSystem {
-        specialArgs = inputs // { 
-          inherit inputs dotfiles; 
-          nixpkgs = nixpkgs-unstable;
-          home-manager = home-manager-unstable;
-        };
-        modules = [ ./nix/hosts/zap/configuration.nix ];
+      darwinConfigurations = {
+         zap = lib.mkDarwin { 
+           configPath = ./nix/hosts/zap/configuration.nix;
+         };
+         plumbus = lib.mkDarwin { 
+           configPath = ./nix/hosts/plumbus/configuration.nix;
+         };
       };
-      plumbus = nix-darwin.lib.darwinSystem {
-        specialArgs = inputs // { 
-          inherit inputs dotfiles; 
-          nixpkgs = nixpkgs-unstable;
-          home-manager = home-manager-unstable;
+
+      formatter.x86_64-linux = inputs.nixpkgs.legacyPackages.x86_64-linux.nixfmt;
+      formatter.aarch64-darwin = inputs.nixpkgs-unstable.legacyPackages.aarch64-darwin.nixfmt;
+
+      devShells = {
+        x86_64-linux.default = inputs.nixpkgs.legacyPackages.x86_64-linux.mkShell {
+          packages = [
+            inputs.nixpkgs.legacyPackages.x86_64-linux.nixfmt
+          ];
         };
-        modules = [ ./nix/hosts/plumbus/configuration.nix ];
       };
     };
-  };
 }

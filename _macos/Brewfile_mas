@@ -1,5 +1,5 @@
 # For the canonical Mac App Store app list, refer to the Nix configuration:
-# - Mac App Store apps: nix/shared/homebrew.nix (masApps section)
+# - Mac App Store apps: nix/shared/darwin/homebrew.nix (masApps section)
 #
 # This Brewfile is maintained for legacy/manual setups where Nix is not available.
 # Manually add desired Mac App Store apps below by copying from the Nix configuration:

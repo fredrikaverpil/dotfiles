@@ -48,9 +48,9 @@ can install an x64 version in `/usr/local/bin/brew`. See
 ```bash
 # Note: Brewfiles are now empty - manually add desired packages from the Nix configuration:
 # - CLI tools: nix/shared/home-manager-base.nix
-# - GUI apps: nix/shared/homebrew.nix (casks and brews sections)
+# - GUI apps: nix/shared/darwin/homebrew.nix (casks and brews sections)
 # - Host-specific: nix/hosts/*/darwin-configuration.nix
-# - Mac App Store apps: nix/shared/homebrew.nix (masApps section)
+# - Mac App Store apps: nix/shared/darwin/homebrew.nix (masApps section)
 
 brew bundle --file=_macos/Brewfile
 brew bundle --file=_macos/Brewfile_mas  # requires being logged into the App Store
