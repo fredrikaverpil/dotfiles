@@ -34,6 +34,17 @@ in
   networking.wireless.enable = false;  # Disable wpa_supplicant
   networking.wireless.iwd.enable = true;  # Enable Intel's iwd for better WiFi management
 
+  # Firewall configuration for homelab services
+  # Allow specific ports for web-based management interfaces
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [
+      9090  # Cockpit - System monitoring and administration
+      9000  # Portainer - Container management web UI
+      3001  # Uptime Kuma - Service monitoring dashboard
+    ];
+  };
+
 
 
   # Host-specific services configuration
