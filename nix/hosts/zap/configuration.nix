@@ -4,7 +4,6 @@ let
   # Versions specific to this host
   stateVersions = {
     darwin = 6;
-    homeManager = "25.05";
   };
 in
 {

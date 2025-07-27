@@ -4,7 +4,6 @@ let
   # Versions specific to this host
   stateVersions = {
     nixos = "25.05";
-    homeManager = "25.05";
   };
 in
 {
