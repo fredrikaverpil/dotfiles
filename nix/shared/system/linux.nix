@@ -46,14 +46,13 @@
 
   # Font management
   fonts.packages = with pkgs; [
-    # NOTE: takes long time to build, so commented out for now
-    # nerd-fonts.fira-code
-    # nerd-fonts.fira-mono
-    # nerd-fonts.hack
-    # nerd-fonts.jetbrains-mono
-    # maple-mono.NF
-    # noto-fonts-emoji
-    # nerd-fonts.symbols-only
+    nerd-fonts.fira-code
+    nerd-fonts.fira-mono
+    nerd-fonts.hack
+    nerd-fonts.jetbrains-mono
+    maple-mono.NF
+    noto-fonts-emoji
+    nerd-fonts.symbols-only
   ];
 
   # Apply additional services configuration
