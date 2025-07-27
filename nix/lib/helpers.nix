@@ -15,6 +15,7 @@
       modules = [
         inputs.home-manager-unstable.darwinModules.home-manager
         ../shared/darwin-system.nix
+        ../shared/common-packages.nix
         ../hosts/${hostname}/configuration.nix
       ];
     };
