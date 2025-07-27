@@ -12,9 +12,7 @@
 
   # Host-specific packages for zap
   dotfiles.extraPackages = with pkgs; [
-    # Container tools (zap only - podman setup)
-    podman
-    podman-compose
+    # Add zap-specific system packages here
   ];
 
   dotfiles.extraBrews = [
