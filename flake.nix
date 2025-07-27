@@ -48,9 +48,13 @@
     in
     {
       nixosConfigurations = {
-        rpi5-homelab = lib.mkNixos { 
+        rpi5-homelab = lib.mkRpiNixos { 
           configPath = ./nix/hosts/rpi5-homelab/configuration.nix;
         };
+        # Example standard NixOS configuration:
+        # my-server = lib.mkNixos {
+        #   configPath = ./nix/hosts/my-server/configuration.nix;
+        # };
       };
 
       darwinConfigurations = {

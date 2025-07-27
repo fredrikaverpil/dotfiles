@@ -126,6 +126,9 @@ in
       config.boot.kernelPackages.kernel.version  # Kernel version
     ];
 
+  # Set system platform
+  nixpkgs.hostPlatform = "aarch64-linux";
+
   # NixOS state version
   system.stateVersion = stateVersions.nixos;
 
