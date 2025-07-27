@@ -348,12 +348,14 @@ in
     
     secrets = {
       cloudflare-token = {
-        owner = "ddclient";
-        group = "ddclient";
+        owner = "root";
+        group = "root";
+        mode = "0400";
       };
       homelab-domain = {
-        owner = "ddclient";
-        group = "ddclient";
+        owner = "root";
+        group = "root";
+        mode = "0400";
       };
     };
 
@@ -372,8 +374,8 @@ in
         password=${config.sops.placeholder."cloudflare-token"}
         ${config.sops.placeholder."homelab-domain"}
       '';
-      owner = "ddclient";
-      group = "ddclient";
+      owner = "root";
+      group = "root";
       mode = "0400";
     };
   };
