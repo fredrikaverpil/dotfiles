@@ -21,6 +21,13 @@
     # Basic NixOS system settings
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+    # Home-manager configuration
+    home-manager = {
+      useGlobalPkgs = true;
+      useUserPackages = true;
+      backupFileExtension = "backup";
+    };
+
   # Linux-specific security settings
   security.sudo.wheelNeedsPassword = false;
   
