@@ -48,15 +48,7 @@
     in
     {
       nixosConfigurations = {
-        rpi5-homelab = inputs.nixos-raspberrypi.lib.nixosSystemFull {
-          specialArgs = inputs // { nixos-raspberrypi = inputs.nixos-raspberrypi; inherit (inputs) dotfiles; };
-           modules = [
-            inputs.disko.nixosModules.disko
-            inputs.home-manager.nixosModules.home-manager
-            ./nix/hosts/rpi5-homelab/hardware.nix
-            ./nix/hosts/rpi5-homelab/home.nix
-            ./nix/hosts/rpi5-homelab/configuration.nix
-          ];        };
+        rpi5-homelab = lib.mkNixos { hostname = "rpi5-homelab"; };
       };
 
       darwinConfigurations = {

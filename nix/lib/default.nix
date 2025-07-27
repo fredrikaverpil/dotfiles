@@ -7,7 +7,6 @@ let
 in
 {
   inherit (helpers)
-    mkDarwin;
-    #mkNixos
-    
+    mkDarwin
+    mkNixos;
 }

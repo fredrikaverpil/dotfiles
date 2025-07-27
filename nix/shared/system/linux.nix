@@ -3,8 +3,23 @@
 { config, pkgs, lib, inputs, ... }:
 
 {
-  # Basic NixOS system settings
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  options = {
+    dotfiles.extraSystemPackages = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [];
+      description = "Additional system packages for this host";
+    };
+
+    dotfiles.extraServices = lib.mkOption {
+      type = lib.types.attrs;
+      default = {};
+      description = "Additional services configuration for this host";
+    };
+  };
+
+  config = {
+    # Basic NixOS system settings
+    nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Enable zsh system-wide
   programs.zsh.enable = true;
@@ -12,7 +27,7 @@
   # System-level packages (very few)
   environment.systemPackages = with pkgs; [
     vim # for recovery
-  ];
+  ] ++ config.dotfiles.extraSystemPackages;
 
   # Nix registry for easy access to stable and unstable packages
   # Note: This would require inputs to be passed as specialArgs
@@ -37,4 +52,11 @@
     noto-fonts-emoji
     nerd-fonts.symbols-only
   ];
+
+  # Apply additional services configuration
+  services = lib.mkMerge [ 
+    { } # Default empty services
+    config.dotfiles.extraServices
+  ];
+  };
 }
