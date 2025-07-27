@@ -67,6 +67,19 @@ in
         workstation = true;   # Announce as a workstation for better discovery
       };
     };
+
+    # Cockpit web-based system administration interface
+    # Provides system monitoring, service management, and container oversight
+    # Accessible at http://rpi5-homelab.local:9090
+    cockpit = {
+      enable = true;
+      port = 9090;
+      settings = {
+        WebService = {
+          AllowUnencrypted = true;  # Allow HTTP for local network access
+        };
+      };
+    };
   };
 
   # Docker containerization platform
