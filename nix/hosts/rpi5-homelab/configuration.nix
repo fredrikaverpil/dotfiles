@@ -88,7 +88,7 @@ in
       settings = {
         WebService = {
           AllowUnencrypted = true;  # Allow HTTP for local network access
-          Origins = "http://rpi5-homelab.local:9090 http://localhost:9090";
+          Origins = lib.mkForce "http://rpi5-homelab.local:9090 http://localhost:9090";
         };
       };
     };
