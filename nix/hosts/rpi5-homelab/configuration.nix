@@ -44,6 +44,7 @@ in
       9000  # Portainer - HTTP port (legacy/optional)
       9443  # Portainer - HTTPS port (primary)
       3001  # Uptime Kuma - Service monitoring dashboard
+      2283  # Immich - Photo management web interface
     ];
   };
 
@@ -109,6 +110,8 @@ in
   environment.etc = {
     "homelab/portainer/docker-compose.yml".source = ./docker-compose/portainer.yml;
     "homelab/uptime-kuma/docker-compose.yml".source = ./docker-compose/uptime-kuma.yml;
+    "homelab/immich/docker-compose.yml".source = ./docker-compose/immich.yml;
+    "homelab/immich/.env".source = ./docker-compose/immich.env;
   };
 
   # Systemd services for docker-compose stacks
@@ -141,6 +144,26 @@ in
         ExecStop = "${pkgs.docker-compose}/bin/docker-compose down";
         ExecReload = "${pkgs.docker-compose}/bin/docker-compose up -d --force-recreate";
         TimeoutStartSec = "300";
+      };
+      wantedBy = [ "multi-user.target" ];
+    };
+
+    homelab-immich = {
+      description = "Homelab Immich Photo Management Stack";
+      after = [ "docker.service" ];
+      requires = [ "docker.service" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        WorkingDirectory = "/etc/homelab/immich";
+        ExecStartPre = [
+          "${pkgs.coreutils}/bin/mkdir -p /var/lib/immich/library"
+          "${pkgs.coreutils}/bin/mkdir -p /var/lib/immich/postgres"
+        ];
+        ExecStart = "${pkgs.docker-compose}/bin/docker-compose up -d";
+        ExecStop = "${pkgs.docker-compose}/bin/docker-compose down";
+        ExecReload = "${pkgs.docker-compose}/bin/docker-compose up -d --force-recreate";
+        TimeoutStartSec = "600";  # Immich takes longer to start (ML models, etc.)
       };
       wantedBy = [ "multi-user.target" ];
     };
