@@ -7,10 +7,7 @@ let
   };
 in
 {
-  # Import SOPS-nix module for secrets management
-  imports = [ 
-    inputs.sops-nix.nixosModules.sops
-  ];
+  imports = [ ];
 
   # Main configuration file for rpi5-homelab Raspberry Pi 5 system
   # This file contains all host-specific configuration consolidated from modules
@@ -111,32 +108,10 @@ in
       };
     };
 
-    # Dynamic DNS client for Cloudflare integration
-    # Updates DNS records when public IP changes for internet accessibility
-    # Uses SOPS-nix for secure secret management (API token and domain name)
-    # Service runs only when secrets are available (via systemd conditions)
-    ddclient = {
-      enable = true;
-      configFile = config.sops.templates."ddclient.conf".path;
-    };
+
   };
 
-  # Configure ddclient systemd service to only run when secrets are available
-  systemd.services.ddclient = {
-    unitConfig = {
-      ConditionPathExists = [
-        "/run/secrets/cloudflare-token"
-        "/run/secrets/homelab-domain"
-      ];
-    };
-    serviceConfig = {
-      # Ensure the SOPS template is available before starting
-      ExecStartPre = [
-        "${pkgs.coreutils}/bin/mkdir -p /run/ddclient"
-        "${pkgs.coreutils}/bin/cp ${config.sops.templates."ddclient.conf".path} /run/ddclient/ddclient.conf"
-      ];
-    };
-  };
+
 
   # Host-specific services configuration (continued)
   dotfiles.extraServices = {
@@ -305,12 +280,6 @@ in
     docker          # Container runtime
     docker-compose  # Container orchestration
     
-    # Dynamic DNS client
-    ddclient        # Dynamic DNS client for Cloudflare integration
-    
-    # Secrets management (temporary - for initial setup)
-    age             # Age encryption tool for agenix secrets
-    
     # Hardware-specific utilities for Raspberry Pi
     # These may be provided by nixos-raspberrypi modules
     
@@ -347,45 +316,7 @@ in
   # Allow unfree packages (needed for various packages)
   nixpkgs.config.allowUnfree = true;
 
-  # Configure SOPS secrets for ddclient
-  sops = {
-    defaultSopsFile = ./secrets/secrets.yaml;
-    defaultSopsFormat = "yaml";
-    age.keyFile = "/home/fredrik/.config/sops/age/keys.txt";
-    
-    secrets = {
-      cloudflare-token = {
-        owner = "root";
-        group = "root";
-        mode = "0400";
-      };
-      homelab-domain = {
-        owner = "root";
-        group = "root";
-        mode = "0400";
-      };
-    };
 
-    templates."ddclient.conf" = {
-      content = ''
-        # ddclient configuration for Cloudflare Dynamic DNS
-        daemon=300
-        syslog=yes
-        pid=/var/run/ddclient.pid
-        ssl=yes
-        
-        # Cloudflare configuration
-        protocol=cloudflare
-        server=api.cloudflare.com
-        login=token
-        password=${config.sops.placeholder."cloudflare-token"}
-        ${config.sops.placeholder."homelab-domain"}
-      '';
-      owner = "root";
-      group = "root";
-      mode = "0400";
-    };
-  };
 
   # NixOS state version
   system.stateVersion = stateVersions.nixos;
@@ -396,27 +327,14 @@ in
   # ========================================================================
   # HOMELAB DEPLOYMENT DOCUMENTATION
   # ========================================================================
-  # This homelab uses Tailscale VPN + Cloudflare DynDNS for secure access
+  # This homelab uses Tailscale VPN for secure remote access
   # 
-  # PHASE 1 - INITIAL DEPLOYMENT (current state):
-  # 1. Deploy this configuration to Pi (ddclient disabled, no secrets)
+  # DEPLOYMENT:
+  # 1. Deploy this configuration to Pi
   # 2. Set up Tailscale: `sudo tailscale up` and authenticate
   # 3. Verify basic functionality and SSH access via Tailscale
-  # 
-  # PHASE 2 - ENABLE DYNAMIC DNS (after initial deployment):
-  # 1. Generate age key: `sudo age-keygen -o /etc/agenix/host.txt`
-  # 2. Get public key: `sudo cat /etc/agenix/host.txt | grep "# public key:"`
-  # 3. Update secrets/secrets.nix with the actual public key
-  # 4. Create Cloudflare API token (Zone:Read + DNS:Edit permissions)
-  # 5. Encrypt secrets:
-  #    - `agenix -e secrets/cloudflare-token.age` (paste API token)
-  #    - `agenix -e secrets/homelab-domain.age` (paste secret subdomain)
-  # 6. Enable agenix imports and secrets in configuration.nix
-  # 7. Enable ddclient service (set enable = true)
-  # 8. Redeploy configuration
-  # 9. Create DNS A record in Cloudflare for your secret subdomain
   #
-  # ACCESS METHODS (MAXIMUM SECURITY):
+  # ACCESS METHODS:
   # LOCAL NETWORK ACCESS:
   # - SSH: `ssh fredrik@192.168.1.X` (Pi's local IP)
   # - Services: Direct access via local IP and ports
@@ -432,9 +350,6 @@ in
   # - Or direct Tailscale access: http://rpi5-homelab:9000 (if enabled)
   #
   # MONITORING:
-  # - Check ddclient status: `systemctl status ddclient`
-  # - View ddclient logs: `journalctl -u ddclient -f`
-  # - Check agenix secrets: `ls -la /run/agenix/` (should show decrypted secrets)
   # - Check Tailscale status: `tailscale status`
   # - View Tailscale logs: `journalctl -u tailscaled -f`
   # - Check fail2ban status: `systemctl status fail2ban`
