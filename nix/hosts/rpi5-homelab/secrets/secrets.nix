@@ -2,14 +2,14 @@
 # This file defines which secrets exist and which public keys can decrypt them
 # 
 # SETUP INSTRUCTIONS:
-# 1. Generate age key on Pi: sudo age-keygen -o /etc/agenix/host.txt
-# 2. Get public key: sudo cat /etc/agenix/host.txt | grep "# public key:"
-# 3. Replace the placeholder below with your Pi's actual public key
+# 1. Generate SSH key on Pi: ssh-keygen -t ed25519 -C "fredrik@rpi5-homelab"
+# 2. Get public key: cat ~/.ssh/id_ed25519.pub
+# 3. Update the public key below
 # 4. Encrypt secrets: agenix -e cloudflare-token.age && agenix -e homelab-domain.age
 
 let
-  # Pi's actual public key generated with: sudo age-keygen -o /etc/agenix/host.txt
-  rpi5-homelab = "age1e6y326s76ypwx8px2jdjvjhznejecjyjefvedt9wlrtrj6zak9ysmr6evr";
+  # SSH public key for rpi5-homelab
+  rpi5-homelab = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHRKV1VEpCLaXRaz99tWzgIs3cn1936K7i7tw/Dot+db fredrik@rpi5-homelab";
 in
 {
   # Cloudflare API token (Zone:Read + DNS:Edit permissions)
