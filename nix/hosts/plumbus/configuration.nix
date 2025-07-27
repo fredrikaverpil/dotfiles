@@ -14,13 +14,10 @@
 
   dotfiles.extraBrews = [
     # Add plumbus-specific homebrew packages here
-	"pkgx"
   ];
 
   dotfiles.extraCasks = [
     "orbstack"
-    "fujifilm-x-raw-studio"
-    "obs"
     "raycast"
   ];
 

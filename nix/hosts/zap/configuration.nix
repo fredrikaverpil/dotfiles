@@ -18,9 +18,7 @@
 
   dotfiles.extraCasks = [
     "podman-desktop"
-    "fujifilm-x-raw-studio"
-    "obs"
-	"pgadmin4"
+    "pgadmin4"
   ];
 
   # Set system platform

@@ -34,6 +34,7 @@
       "go-task/tap/go-task"
       "joshmedeski/sesh/sesh"
       "sst/tap/opencode"
+      "pkgx"
     ] ++ config.dotfiles.extraBrews;
 
     casks = [
@@ -47,10 +48,12 @@
       "font-noto-color-emoji"
       "font-noto-emoji"
       "font-symbols-only-nerd-font"
+      "fujifilm-x-raw-studio"
       "ghostty"
       "gitify"
       "gcloud-cli"
       "kitty"
+      "obs"
       "obsidian"
       "signal"
       "spotify"
