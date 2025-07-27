@@ -17,6 +17,6 @@
         ../shared/darwin-system.nix
         ../shared/common-packages.nix
         ../hosts/${hostname}/configuration.nix
-      ];
+      ] ++ (if builtins.pathExists ../hosts/${hostname}/home.nix then [ ../hosts/${hostname}/home.nix ] else [ ]);
     };
 }

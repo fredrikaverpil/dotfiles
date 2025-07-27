@@ -3,7 +3,6 @@
 {
    imports = [
      ../../shared/darwin-system.nix
-     ./home.nix
    ];
   # Host-specific configuration for zap
   networking.hostName = "zap";
