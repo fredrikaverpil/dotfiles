@@ -27,8 +27,9 @@ nix/
 │   └── helpers.nix    # Helper functions (e.g., mkDarwin)
 ├── shared/          # Shared configurations
 │   ├── shell/       # Shell-specific configs (aliases, exports)
-│   ├── common-packages.nix      # Common packages for all systems
-│   ├── darwin.nix        # Core macOS system settings
+│   ├── system/
+│   │   ├── common.nix         # Cross-platform system packages & config
+│   │   └── darwin.nix         # macOS system configuration
 │   ├── darwin/
 │   │   └── homebrew.nix             # Homebrew package management
 │   ├── home-manager-base.nix    # Cross-platform home-manager foundation
@@ -60,7 +61,7 @@ flake.nix
 └── lib.mkDarwin
     ├── inputs.home-manager-unstable.darwinModules.home-manager
     ├── ../../shared/system/darwin.nix     # macOS system settings
-    ├── ../../shared/common-packages.nix   # Common packages
+    ├── ../../shared/system/common.nix   # Common packages
     ├── ./configuration.nix                # Host-specific system config
     └── ./home.nix (optional)              # Host-specific user config
 ```
