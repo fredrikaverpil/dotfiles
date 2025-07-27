@@ -1,8 +1,5 @@
 { config, pkgs, lib, dotfiles, ... }@args:
 
-# This file contains home-manager settings that are common
-# across all hosts (macOS and Linux).
-
 {
   options = {
     dotfiles.extraPackages = lib.mkOption {
@@ -22,7 +19,10 @@
       if [ -d "$HOME/.dotfiles/.git" ]; then
         echo "Initializing any git submodules in ~/.dotfiles..."
         cd "$HOME/.dotfiles"
-        $DRY_RUN_CMD ${pkgs.git}/bin/git submodule update --init --recursive
+        if ! $DRY_RUN_CMD ${pkgs.git}/bin/git submodule update --init --recursive; then
+          echo "Warning: Failed to initialize git submodules"
+          exit 1
+        fi
         echo "Git submodules initialized"
       fi
     '';
@@ -33,7 +33,10 @@
         echo "Running stow installer..."
         cd "$HOME/.dotfiles/stow"
         export PATH="${pkgs.stow}/bin:${pkgs.bash}/bin:$PATH"
-        $DRY_RUN_CMD ./symlink.sh
+        if ! $DRY_RUN_CMD ./symlink.sh; then
+          echo "Warning: Stow installation failed"
+          exit 1
+        fi
         echo "Stow installation completed"
       else
         echo "Warning: ~/.dotfiles/stow/symlink.sh not found or not executable"
