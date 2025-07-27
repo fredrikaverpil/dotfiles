@@ -17,11 +17,11 @@
     };
   };
   imports = [
-    ./home-manager-base.nix
+    ./common.nix
     ./homebrew.nix
-    ./shell/aliases.nix
-    ./shell/aliases-darwin.nix
-    ./shell/exports.nix
+    ../shell/aliases.nix
+    ../shell/aliases-darwin.nix
+    ../shell/exports.nix
   ];
 
   config = {

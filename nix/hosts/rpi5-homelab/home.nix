@@ -5,7 +5,7 @@
 
 {
   imports = [
-    ../../shared/home-manager-linux.nix  # Import shared Linux home-manager configuration
+    ../../shared/home/linux.nix  # Import shared Linux home-manager configuration
   ];
 
   # Host-specific home-manager configuration for rpi5-homelab

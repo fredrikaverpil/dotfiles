@@ -5,9 +5,9 @@
 
 {
   imports = [
-    ./home-manager-base.nix    # Cross-platform home-manager configuration
-    ./shell/aliases.nix  # Shell aliases (shared across platforms)
-    ./shell/exports.nix  # Environment variables and PATH settings
+    ./common.nix    # Cross-platform home-manager configuration
+    ../shell/aliases.nix  # Shell aliases (shared across platforms)
+    ../shell/exports.nix  # Environment variables and PATH settings
   ];
 
   home-manager.users.fredrik = {

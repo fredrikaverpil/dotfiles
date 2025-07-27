@@ -2,7 +2,7 @@
 
 {
   imports = [
-    ../../shared/home-manager-darwin.nix
+    ../../shared/home/darwin.nix
   ];
 
   home-manager.users.fredrik = {
