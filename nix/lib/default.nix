@@ -8,5 +8,5 @@ in
 {
   inherit (helpers)
     mkDarwin
-    mkNixos;
+    mkRpiNixos;
 }
