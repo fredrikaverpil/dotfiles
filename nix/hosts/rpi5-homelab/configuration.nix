@@ -5,11 +5,6 @@ let
   stateVersions = {
     nixos = "25.05";
   };
-  
-  # Check if agenix secret files exist for conditional configuration
-  cloudflareTokenExists = builtins.pathExists ./secrets/cloudflare-token.age;
-  homelabDomainExists = builtins.pathExists ./secrets/homelab-domain.age;
-  ddclientSecretsExist = cloudflareTokenExists && homelabDomainExists;
 in
 {
   # Import agenix module for secrets management
@@ -120,19 +115,34 @@ in
     # Dynamic DNS client for Cloudflare integration
     # Updates DNS records when public IP changes for internet accessibility
     # Uses agenix for secure secret management (API token and domain name)
-    # Automatically enabled when secret files exist
+    # Service runs only when secrets are available (via systemd conditions)
     ddclient = {
-      enable = ddclientSecretsExist;
+      enable = true;  # Always enable service definition
       protocol = "cloudflare";
       server = "cloudflare";
       username = "token";  # Cloudflare uses 'token' as username for API token auth
-      passwordFile = lib.mkIf cloudflareTokenExists config.age.secrets.cloudflare-token.path;
-      domains = lib.mkIf homelabDomainExists [ (lib.strings.removeSuffix "\n" (builtins.readFile config.age.secrets.homelab-domain.path)) ];
+    } // lib.optionalAttrs (builtins.pathExists ./secrets/cloudflare-token.age && builtins.pathExists ./secrets/homelab-domain.age) {
+      passwordFile = config.age.secrets.cloudflare-token.path;
+      domains = [ (lib.strings.removeSuffix "\n" (builtins.readFile config.age.secrets.homelab-domain.path)) ];
+    } // {
       verbose = true;
       ssl = true;
       interval = "300";  # Update every 5 minutes
     };
+  };
 
+  # Configure ddclient systemd service to only run when secrets are available
+  systemd.services.ddclient = {
+    unitConfig = {
+      ConditionPathExists = [
+        "/run/agenix/cloudflare-token"
+        "/run/agenix/homelab-domain"
+      ];
+    };
+  };
+
+  # Host-specific services configuration (continued)
+  dotfiles.extraServices = {
     # Tailscale mesh VPN for secure remote access
     # Provides encrypted access without exposing SSH to internet
     tailscale = {
@@ -341,13 +351,13 @@ in
   nixpkgs.config.allowUnfree = true;
 
   # Configure agenix secrets for ddclient (only if secret files exist)
-  age.secrets = {
-    cloudflare-token = lib.mkIf cloudflareTokenExists {
+  age.secrets = lib.mkIf (builtins.pathExists ./secrets/cloudflare-token.age && builtins.pathExists ./secrets/homelab-domain.age) {
+    cloudflare-token = {
       file = ./secrets/cloudflare-token.age;
       owner = "ddclient";
       group = "ddclient";
     };
-    homelab-domain = lib.mkIf homelabDomainExists {
+    homelab-domain = {
       file = ./secrets/homelab-domain.age;
       owner = "ddclient";
       group = "ddclient";
