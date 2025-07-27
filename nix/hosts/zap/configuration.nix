@@ -1,5 +1,12 @@
 { config, pkgs, lib, inputs, ... }:
 
+let
+  # Versions specific to this host
+  stateVersions = {
+    darwin = 6;
+    homeManager = "25.05";
+  };
+in
 {
    imports = [
      ../../shared/system/darwin.nix
@@ -24,9 +31,11 @@
   # Set system platform
   nixpkgs.hostPlatform = "aarch64-darwin";
 
-  # System state version - set once when host was first installed, never change
-  # Use `darwin-rebuild changelog` to see version-specific changes
-  system.stateVersion = 6;  # Installed in 2025
+  # System state version
+  system.stateVersion = stateVersions.darwin;
+
+  # Home Manager state version
+  home.stateVersion = stateVersions.homeManager;
 
   # Timezone
   time.timeZone = "Europe/Stockholm";

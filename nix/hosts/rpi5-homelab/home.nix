@@ -10,6 +10,9 @@
 
   # Host-specific home-manager configuration for rpi5-homelab
   home-manager.users.fredrik = {
+    # Set the state version for home-manager
+    home.stateVersion = "25.05";
+    
     # Raspberry Pi specific packages for homelab use
     home.packages = with pkgs; [
     ];

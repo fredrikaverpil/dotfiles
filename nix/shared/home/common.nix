@@ -123,8 +123,6 @@
     # Common program settings
     # Git is managed via package + dotfile symlink (.gitconfig)
 
-    # Set the state version
-    home.stateVersion = "25.05";
     };
   };
 }

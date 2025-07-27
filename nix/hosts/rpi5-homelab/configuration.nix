@@ -1,4 +1,13 @@
-{ config, pkgs, lib, ... }: {
+{ config, pkgs, lib, ... }:
+
+let
+  # Versions specific to this host
+  stateVersions = {
+    nixos = "25.05";
+    homeManager = "25.05";
+  };
+in
+{
   # Main configuration file for rpi5-homelab Raspberry Pi 5 system
   # This file orchestrates the modular configuration by importing specialized modules
   
@@ -26,10 +35,8 @@
   # Required for this flake-based configuration to function properly
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # NixOS state version - determines the default versions of packages and services
-  # This should match the NixOS release used when the system was first installed
-  # Required for nixos-anywhere deployment tool compatibility
-  system.stateVersion = "25.05";
+  # NixOS state version
+  system.stateVersion = stateVersions.nixos;
 
   # System timezone configuration
   time.timeZone = "Europe/Stockholm";
