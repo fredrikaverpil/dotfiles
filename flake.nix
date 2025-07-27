@@ -15,6 +15,8 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     # Unstable nixpkgs for macOS/Darwin
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    # Unstable nixos for Linux/NixOS
+    nixos-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     
     nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
     disko = {
