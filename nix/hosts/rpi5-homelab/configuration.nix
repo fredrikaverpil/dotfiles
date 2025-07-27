@@ -129,6 +129,13 @@ in
         "/run/secrets/homelab-domain"
       ];
     };
+    serviceConfig = {
+      # Ensure the SOPS template is available before starting
+      ExecStartPre = [
+        "${pkgs.coreutils}/bin/mkdir -p /run/ddclient"
+        "${pkgs.coreutils}/bin/cp ${config.sops.templates."ddclient.conf".path} /run/ddclient/ddclient.conf"
+      ];
+    };
   };
 
   # Host-specific services configuration (continued)
