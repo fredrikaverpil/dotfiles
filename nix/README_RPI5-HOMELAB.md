@@ -128,40 +128,75 @@ systemctl is-active sshd  # check if sshd is running
 After the initial NixOS installation, you need to set up SOPS secrets management
 for services like ddclient to work properly.
 
-#### 1. Generate age key on the Pi
+#### 1. Convert SSH key to age format on development machine
 
-SSH into the Pi and generate the age key that SOPS expects:
+Generate a SSH key unless you already have one you want copied over:
+
+```sh
+# Generate new SSH key pair on Pi
+ssh-keygen -t ed25519 -C "fredrik@rpi5-homelab"
+
+# Get the public key and update step 1 with this key instead
+cat ~/.ssh/id_ed25519.pub
+
+# OR - on development machine, copy your SSH private key to the Pi
+scp ~/.ssh/id_ed25519 fredrik@<pi-ip>:~/.ssh/id_ed25519
+scp ~/.ssh/id_ed25519.pub fredrik@<pi-ip>:~/.ssh/id_ed25519.pub
+
+# On Pi, secure the key files
+chmod 600 ~/.ssh/id_ed25519
+chmod 644 ~/.ssh/id_ed25519.pub
+```
+
+The SOPS configuration uses SSH keys converted to age format. On your
+development machine, convert your SSH public key:
+
+```sh
+# Install ssh-to-age if not available
+nix-shell -p ssh-to-age
+
+# Convert your SSH public key to age format
+ssh-to-age < ~/.ssh/id_ed25519.pub
+```
+
+Copy the age public key output (the `age1...` string).
+
+#### 2. Update SOPS configuration on development machine
+
+Edit `nix/hosts/rpi5-homelab/secrets/.sops.yaml` and replace the placeholder
+with your converted age public key:
+
+```yaml
+keys:
+  - &fredrik_ssh age1your_converted_ssh_key_from_step_1
+creation_rules:
+  - path_regex: secrets\.yaml$
+    key_groups:
+      - age:
+          - *fredrik_ssh
+```
+
+Deploy this to the rpi5.
+
+#### 3. Set up SSH key and age key file on Pi
+
+SSH into the Pi. You need the SSH private key that corresponds to the public key
+used in step 1.
+
+**Then convert SSH private key to age format:**
 
 ```sh
 # Create the directory structure
 mkdir -p ~/.config/sops/age
 
-# Generate age key pair
-nix-shell -p age --run "age-keygen -o ~/.config/sops/age/keys.txt"
+# Convert SSH private key to age format and save it
+nix-shell -p ssh-to-age --run "ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt"
 
-# Get the public key (starts with 'age1...')
-nix-shell -p age --run "age-keygen -y ~/.config/sops/age/keys.txt"
+# Secure the key file
+chmod 600 ~/.config/sops/age/keys.txt
 ```
 
-Copy the public key output (the `age1...` string) - you'll need it for the next
-step.
-
-#### 2. Configure SOPS on development machine
-
-On your development machine, edit `nix/hosts/rpi5-homelab/secrets/.sops.yaml`
-and replace the placeholder with your Pi's age public key:
-
-```yaml
-keys:
-  - &rpi5-homelab age1your_actual_public_key_from_step_1
-creation_rules:
-  - path_regex: secrets\.yaml$
-    key_groups:
-      - age:
-          - *rpi5-homelab
-```
-
-#### 3. Encrypt secrets with actual values
+#### 4. Encrypt secrets with actual values
 
 Edit `nix/hosts/rpi5-homelab/secrets/secrets.yaml` and replace placeholders with
 real values, then encrypt:
@@ -171,7 +206,7 @@ cd nix/hosts/rpi5-homelab/secrets/
 nix-shell -p sops --run "sops -e -i secrets.yaml"
 ```
 
-#### 4. Redeploy to Pi
+#### 5. Redeploy to Pi
 
 From your development machine, redeploy the configuration:
 
@@ -185,7 +220,7 @@ Or if you prefer to build locally:
 nixos-anywhere --flake .#rpi5-homelab <pi-ip>
 ```
 
-#### 5. Verify services are running
+#### 6. Verify services are running
 
 SSH back into the Pi and verify:
 
