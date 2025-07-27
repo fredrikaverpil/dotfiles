@@ -1,8 +1,29 @@
 # This file contains system-level settings specific to macOS, including Homebrew.
 
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 {
+  options = {
+    dotfiles.extraBrews = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [];
+      description = "Additional homebrew packages for this host";
+    };
+
+    dotfiles.extraCasks = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [];
+      description = "Additional homebrew casks for this host";
+    };
+
+    dotfiles.extraPackages = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [];
+      description = "Additional packages for this host";
+    };
+  };
+
+  config = {
   # Homebrew configuration
   homebrew = {
     enable = true;
@@ -71,7 +92,15 @@
   nix.settings.experimental-features = "nix-command flakes";
   
   # Primary user for user-specific settings (homebrew, system defaults, etc.)
-  system.primaryUser = config.users.primaryUser;
+  # Find the user marked as isPrimary = true
+  system.primaryUser = 
+    let 
+      primaryUsers = lib.filterAttrs (name: user: user.isPrimary) config.dotfiles.users;
+      primaryUserNames = lib.attrNames primaryUsers;
+    in
+      if lib.length primaryUserNames == 1 
+      then lib.head primaryUserNames
+      else throw "Exactly one user must have isPrimary = true on Darwin systems";
   
   # Note: User configuration is now handled by shared/users/default.nix
 
@@ -255,4 +284,5 @@
     noto-fonts-emoji
     nerd-fonts.symbols-only
   ];
+  };
 }

@@ -13,11 +13,21 @@ in
   # ========================================================================
   # HOST CONFIGURATION
   # ========================================================================
-  # Primary user for this system
-  users.primaryUser = "fredrik";
-  
   # Set system hostname for network identification
   networking.hostName = "rpi5-homelab";
+  
+  # Multi-user configuration
+  dotfiles.users = {
+    fredrik = {
+      isAdmin = true;
+      isPrimary = true;  # Not used on Linux, but kept for consistency
+      shell = "zsh";
+      homeConfig = ./users/fredrik.nix;
+      groups = [ "networkmanager" "docker" ];
+      # SSH keys can be added here:
+      # sshKeys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5... your-key-here" ];
+    };
+  };
 
   # Wireless network configuration
   # Disable legacy wpa_supplicant in favor of modern iwd

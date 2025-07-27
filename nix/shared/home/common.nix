@@ -1,19 +1,5 @@
-{ config, pkgs, lib, dotfiles, ... }@args:
-
-{
-  options = {
-    dotfiles.extraPackages = lib.mkOption {
-      type = lib.types.listOf lib.types.package;
-      default = [];
-      description = "Additional packages for this host";
-    };
-  };
-
-  config = {
-    # Home Manager setup
-    home-manager.useGlobalPkgs = true;
-    home-manager.useUserPackages = true;
-    home-manager.users.${config.users.primaryUser} = { config, lib, ... }: {
+# Shared home-manager configuration that gets imported by user-specific configs
+{ config, lib, pkgs, ... }: {
     # Ensure any git submodules are initialized in ~/.dotfiles
     home.activation.initDotfilesSubmodules = lib.hm.dag.entryAfter ["writeBoundary"] ''
       if [ -d "$HOME/.dotfiles/.git" ]; then
@@ -115,13 +101,13 @@
       # ========================================================================
       opentofu
       
-    ] ++ args.config.dotfiles.extraPackages;
+    ];
+    
+    # Note: Additional packages are now added in individual user configurations
 
 
 
     # Common program settings
     # Git is managed via package + dotfile symlink (.gitconfig)
 
-    };
-  };
 }

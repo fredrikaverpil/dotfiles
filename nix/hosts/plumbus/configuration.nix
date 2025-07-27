@@ -8,8 +8,18 @@ let
 in
 {
   # Host-specific configuration for plumbus
-  users.primaryUser = "fredrik";
   networking.hostName = "plumbus";
+  
+  # Multi-user configuration
+  dotfiles.users = {
+    fredrik = {
+      isAdmin = true;
+      isPrimary = true;  # Primary user for Darwin system defaults
+      shell = "zsh";
+      homeConfig = ./users/fredrik.nix;
+      groups = [ "docker" ];
+    };
+  };
 
   # Host-specific packages for plumbus
   dotfiles.extraPackages = with pkgs; [

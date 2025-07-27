@@ -8,8 +8,18 @@ let
 in
 {
   # Host-specific configuration for zap
-  users.primaryUser = "fredrik";
   networking.hostName = "zap";
+  
+  # Multi-user configuration
+  dotfiles.users = {
+    fredrik = {
+      isAdmin = true;
+      isPrimary = true;  # Primary user for Darwin system defaults
+      shell = "zsh";
+      homeConfig = ./users/fredrik.nix;
+      groups = [ "docker" ];
+    };
+  };
 
   # Host-specific packages for zap
   dotfiles.extraPackages = with pkgs; [
