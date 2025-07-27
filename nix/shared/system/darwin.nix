@@ -1,6 +1,6 @@
 # This file contains system-level settings specific to macOS, including Homebrew.
 
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
   # Homebrew configuration
@@ -134,7 +134,7 @@
         static-only = false;
         show-recents = false;
         show-process-indicators = true;
-        orientation = "left";
+        orientation = "bottom";
         tilesize = 36;
         minimize-to-application = true;
         mineffect = "scale";
@@ -168,12 +168,6 @@
       "com.apple.ImageCapture".disableHotPlug = true;
       # Turn on app auto-update
       "com.apple.commerce".AutoUpdate = true;
-      "com.googlecode.iterm2".PromptOnQuit = false;
-      "com.google.Chrome" = {
-        AppleEnableSwipeNavigateWithScrolls = true;
-        DisablePrintPreview = true;
-        PMPrintingExpandedStateForPrint2 = true;
-      };
     };
 
     # Mission Control and Spaces behavior
@@ -208,11 +202,11 @@
   # System activation script to apply additional macOS settings
   # These settings cannot be configured via nix-darwin and require manual defaults commands
   # Note: For non-nix systems, use _macos/set_defaults.sh instead which includes all settings
-  system.activationScripts.extraActivation.text = ''''
+  system.activationScripts.extraActivation.text = ''
     echo "Applying additional macOS settings (nix supplement)..."
     
     # Run as the primary user to apply user-specific defaults
-    sudo -u ${config.system.primaryUser} bash -c ''
+    sudo -u ${config.system.primaryUser} bash -c '
       # Disable Spotlight keyboard shortcut (Cmd+Space) to allow Raycast usage
       defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 "
         <dict>
@@ -244,8 +238,8 @@
           </dict>
         </dict>
       "
-     ''
-   '''';
+    '
+  '';
 
   # Nix registry for easy access to stable and unstable packages
   nix.registry = {
@@ -265,7 +259,7 @@
     nerd-fonts.fira-mono
     nerd-fonts.hack
     nerd-fonts.jetbrains-mono
-    maple-mono
+    maple-mono.NF
     noto-fonts-emoji
     nerd-fonts.symbols-only
   ];

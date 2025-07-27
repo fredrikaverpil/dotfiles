@@ -34,8 +34,7 @@ in
   # System state version
   system.stateVersion = stateVersions.darwin;
 
-  # Home Manager state version
-  home.stateVersion = stateVersions.homeManager;
+
 
   # Timezone
   time.timeZone = "Europe/Stockholm";
