@@ -369,7 +369,7 @@ in
         
         # Cloudflare configuration
         protocol=cloudflare
-        server=cloudflare
+        server=api.cloudflare.com
         login=token
         password=${config.sops.placeholder."cloudflare-token"}
         ${config.sops.placeholder."homelab-domain"}

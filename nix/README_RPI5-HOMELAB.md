@@ -176,7 +176,7 @@ creation_rules:
           - *fredrik_ssh
 ```
 
-Deploy this to the rpi5.
+Push the `.sops.yaml` to the rpi5.
 
 #### 3. Set up SSH key and age key file on Pi
 
@@ -196,15 +196,30 @@ nix-shell -p ssh-to-age --run "ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/
 chmod 600 ~/.config/sops/age/keys.txt
 ```
 
-#### 4. Encrypt secrets with actual values
+#### 4. Create and encrypt secrets file
 
-Edit `nix/hosts/rpi5-homelab/secrets/secrets.yaml` and replace placeholders with
-real values, then encrypt:
+The `secrets.yaml` file is not included in the repository for security. Create it with your actual secret values:
 
 ```sh
 cd nix/hosts/rpi5-homelab/secrets/
+
+# Create the secrets file with your actual values
+cat > secrets.yaml << 'EOF'
+# Cloudflare API token for Dynamic DNS updates
+# Get this from: https://dash.cloudflare.com/profile/api-tokens
+# Permissions needed: Zone:Read, DNS:Edit for your domain
+cloudflare-token: "your_actual_cloudflare_api_token_here"
+
+# Your homelab subdomain (e.g., lab-abc123.yourdomain.com)
+# This should match the DNS A record you created in Cloudflare
+homelab-domain: "your_actual_subdomain.yourdomain.com"
+EOF
+
+# Encrypt the file in place
 nix-shell -p sops --run "sops -e -i secrets.yaml"
 ```
+
+**Important:** The `secrets.yaml` file is gitignored and should never be committed to version control, even when encrypted.
 
 #### 5. Redeploy to Pi
 
