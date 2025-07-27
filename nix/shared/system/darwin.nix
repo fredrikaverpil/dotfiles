@@ -45,12 +45,6 @@
       "1password-cli"
       "aerospace"
       "appcleaner"
-      "font-jetbrains-mono"
-      "font-jetbrains-mono-nerd-font"
-      "font-maple-mono"
-      "font-noto-color-emoji"
-      "font-noto-emoji"
-      "font-symbols-only-nerd-font"
       "fujifilm-x-raw-studio"
       "ghostty"
       "gitify"
@@ -271,5 +265,8 @@
     nerd-fonts.fira-mono
     nerd-fonts.hack
     nerd-fonts.jetbrains-mono
+    maple-mono
+    noto-fonts-emoji
+    nerd-fonts.symbols-only
   ];
 }

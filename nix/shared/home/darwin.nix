@@ -16,14 +16,9 @@
       description = "Additional homebrew casks for this host";
     };
   };
-  imports = [
-    ./common.nix
-    ../darwin/homebrew.nix
-    ../shell/aliases.nix
-    ../shell/aliases-darwin.nix
-    ../shell/exports.nix
-  ];
-
+   imports = [
+     ./common.nix
+   ];
   config = {
 
   home-manager.users.fredrik = { config, lib, ... }: {
