@@ -34,6 +34,7 @@
       # ========================================================================
       # Core System & Shell Tools
       # ========================================================================
+      atuin
       bash
       bat
       curl
@@ -50,6 +51,7 @@
       tree
       vim
       wget
+      yq
       zsh-autosuggestions
       zsh-syntax-highlighting
       zoxide
