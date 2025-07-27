@@ -30,3 +30,6 @@ nvim_issue
 
 # Work related, e.g. zsh-completion
 /work
+
+# agenix encrypted secrets (never commit these!)
+*.age

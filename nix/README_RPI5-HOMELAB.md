@@ -122,6 +122,142 @@ systemctl is-enabled sshd  # check if sshd is enabled
 systemctl is-active sshd  # check if sshd is running
 ```
 
+### Post-Installation: Enable Dynamic DNS and VPN
+
+The initial deployment includes basic services but has ddclient (Dynamic DNS) disabled until secrets are configured. Follow these steps to enable full functionality:
+
+#### 1. Set up Tailscale VPN (Secure Remote Access)
+
+```sh
+# Authenticate with Tailscale (run on the Pi)
+sudo tailscale up
+
+# Follow the authentication URL to connect your Pi to your Tailscale network
+# Note the Tailscale hostname (e.g., rpi5-homelab) for remote SSH access
+```
+
+#### 2. Generate Age Encryption Key (for Secrets Management)
+
+```sh
+# On the Pi, generate the age key for agenix secrets
+nix-shell -p age
+sudo mkdir -p /etc/agenix
+sudo age-keygen -o /etc/agenix/host.txt
+
+# Get the public key (you'll need this for the next step)
+sudo cat /etc/agenix/host.txt | grep "# public key:"
+# Example output: age1e6y326s76ypwx8px2jdjvjhznejecjyjefvedt9wlrtrj6zak9ysmr6evr
+```
+
+#### 3. Update Secrets Configuration (on Development Machine)
+
+```sh
+# On your development machine, update the secrets configuration
+cd nix/hosts/rpi5-homelab/secrets/
+# Edit secrets.nix and replace the placeholder with your Pi's actual public key
+```
+
+#### 4. Create Cloudflare API Token
+
+1. Go to [Cloudflare Dashboard → API Tokens](https://dash.cloudflare.com/profile/api-tokens)
+2. Click "Create Token" → "Custom token"
+3. Set permissions:
+   - **Zone**: `Zone:Read`
+   - **Zone**: `DNS:Edit`
+4. Set zone resources:
+   - **Include**: `Specific zone` → Select your domain
+5. Copy the generated token
+
+#### 5. Encrypt Secrets
+
+```sh
+# From the secrets directory on your development machine
+cd nix/hosts/rpi5-homelab/secrets/
+
+# Create Cloudflare API token secret
+EDITOR=nano nix run github:ryantm/agenix -- -e cloudflare-token.age
+# Paste your Cloudflare API token, save and exit (Ctrl+X, Y, Enter)
+
+# Create domain secret (your chosen subdomain)
+EDITOR=nano nix run github:ryantm/agenix -- -e homelab-domain.age  
+# Paste your subdomain (e.g., lab-k8s9x.averpil.com), save and exit
+
+# Verify both secrets were created
+ls -la *.age
+```
+
+#### 6. Enable Secrets in Configuration (After Deployment)
+
+After deploying to the Pi, you'll need to enable the secrets:
+
+```sh
+# SSH to the Pi
+ssh fredrik@<pi-ip>
+cd ~/.dotfiles
+
+# Edit nix/hosts/rpi5-homelab/configuration.nix
+# Uncomment the age.secrets configuration block (lines ~345-356)
+# Enable ddclient by changing enable = false to enable = true (line ~120)
+
+# Rebuild the configuration
+sudo nixos-rebuild switch --flake .#rpi5-homelab
+```
+
+**Note**: You cannot test the build locally with secrets enabled since the encrypted files are only decryptable on the target machine with the private key.
+
+#### 7. Create DNS Record in Cloudflare
+
+1. Go to your Cloudflare DNS settings
+2. Create an A record for your chosen subdomain pointing to any IP (ddclient will update it)
+3. Example: `lab-k8s9x.averpil.com` → `1.1.1.1` (temporary)
+
+#### 8. Redeploy Configuration
+
+```sh
+# From your development machine, redeploy with secrets enabled
+nixos-anywhere --flake .#rpi5-homelab --build-on remote --phases install root@<pi-ip>
+
+# Or if you can SSH to the Pi directly:
+ssh fredrik@<pi-ip>
+cd ~/.dotfiles
+sudo nixos-rebuild switch --flake .#rpi5-homelab
+```
+
+#### 9. Verify Services
+
+```sh
+# Check ddclient status
+systemctl status ddclient
+journalctl -u ddclient -f
+
+# Check Tailscale status  
+tailscale status
+
+# Check that secrets are decrypted
+sudo ls -la /run/agenix/
+```
+
+### Access Methods
+
+**Local Network:**
+- SSH: `ssh fredrik@<pi-local-ip>`
+- Services: Direct access via local IP and ports
+
+**Remote Access via Tailscale (Secure):**
+- SSH: `ssh fredrik@rpi5-homelab` (Tailscale hostname)
+- Services via SSH tunnels:
+  ```sh
+  ssh -L 9000:localhost:9000 fredrik@rpi5-homelab  # Portainer
+  ssh -L 8096:localhost:8096 fredrik@rpi5-homelab  # Jellyfin
+  ssh -L 2283:localhost:2283 fredrik@rpi5-homelab  # Immich
+  ssh -L 9090:localhost:9090 fredrik@rpi5-homelab  # Cockpit
+  ```
+- Then access via: http://localhost:9000, http://localhost:8096, etc.
+
+**Internet Access (Optional):**
+- Web services accessible via your secret subdomain (if ports 80/443 are forwarded)
+- SSH is NOT exposed to internet (Tailscale only for security)
+
 ### Debugging
 
 If you want to re-install while debugging, the partitions and data can be

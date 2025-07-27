@@ -10,7 +10,7 @@ in
   # Import agenix module for secrets management
   imports = [ 
     inputs.agenix.nixosModules.default
-    # ./secrets/secrets.nix  # Will be enabled after key generation
+    # Note: secrets.nix is only used by agenix CLI, not imported here
   ];
 
   # Main configuration file for rpi5-homelab Raspberry Pi 5 system
@@ -116,10 +116,10 @@ in
     # Updates DNS records when public IP changes for internet accessibility
     # Uses agenix for secure secret management (API token and domain name)
     # Dynamic DNS client for Cloudflare integration
-    # TEMPORARILY DISABLED - will be enabled after agenix secrets are created
     # Uses agenix for secure secret management (API token and domain name)
+    # NOTE: Enabled after deployment when secrets are available on target machine
     ddclient = {
-      enable = false;  # Will be enabled after secrets are set up
+      enable = false;  # Will be enabled after deployment to Pi
       protocol = "cloudflare";
       server = "cloudflare";
       username = "token";  # Cloudflare uses 'token' as username for API token auth
@@ -337,7 +337,8 @@ in
   # Allow unfree packages (needed for various packages)
   nixpkgs.config.allowUnfree = true;
 
-  # Configure agenix secrets (will be enabled after key generation and secret creation)
+  # Configure agenix secrets for ddclient
+  # NOTE: Commented out until deployment - secrets only exist on target machine
   # age.secrets = {
   #   cloudflare-token = {
   #     file = ./secrets/cloudflare-token.age;
