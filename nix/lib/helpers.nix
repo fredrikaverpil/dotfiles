@@ -8,11 +8,8 @@
     };
   in
     inputs.nix-darwin.lib.darwinSystem {
-      specialArgs = inputs // {
-        inherit pkgs;
-        dotfiles = inputs.dotfiles;
-        inputs = inputs;
-      };      modules = [
+      specialArgs = inputs // { inherit pkgs; };
+      modules = [
         inputs.home-manager-unstable.darwinModules.home-manager
         ../shared/system/darwin.nix
         ../shared/system/common.nix
