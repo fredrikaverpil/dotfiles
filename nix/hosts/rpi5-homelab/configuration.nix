@@ -40,7 +40,9 @@ in
     enable = true;
     allowedTCPPorts = [
       9090  # Cockpit - System monitoring and administration
-      9000  # Portainer - Container management web UI
+      8000  # Portainer - TCP tunnel server for Edge agents
+      9000  # Portainer - HTTP port (legacy/optional)
+      9443  # Portainer - HTTPS port (primary)
       3001  # Uptime Kuma - Service monitoring dashboard
     ];
   };
@@ -98,6 +100,33 @@ in
   # Enables running containerized applications and services
   virtualisation.docker = {
     enable = true;
+  };
+
+  # ========================================================================
+  # HOMELAB DOCKER SERVICES
+  # ========================================================================
+  # Copy docker-compose files to system locations
+  environment.etc = {
+    "homelab/portainer/docker-compose.yml".source = ./docker-compose/portainer.yml;
+  };
+
+  # Systemd services for docker-compose stacks
+  systemd.services = {
+    homelab-portainer = {
+      description = "Homelab Portainer Container Management Stack";
+      after = [ "docker.service" ];
+      requires = [ "docker.service" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        WorkingDirectory = "/etc/homelab/portainer";
+        ExecStart = "${pkgs.docker-compose}/bin/docker-compose up -d";
+        ExecStop = "${pkgs.docker-compose}/bin/docker-compose down";
+        ExecReload = "${pkgs.docker-compose}/bin/docker-compose up -d --force-recreate";
+        TimeoutStartSec = "300";
+      };
+      wantedBy = [ "multi-user.target" ];
+    };
   };
 
   # ========================================================================
