@@ -14,22 +14,25 @@ nix/
 ├── hosts/           # Host-specific configurations
 │   ├── zap/         # Apple Silicon, macOS
 │   │   ├── configuration.nix    # System-level settings
-│   │   └── home.nix             # User-level home-manager config
+│   │   └── home.nix             # User-level home-manager config (optional)
 │   ├── plumbus/     # Apple Silicon, macOS
 │   │   ├── configuration.nix    # System-level settings
-│   │   └── home.nix             # User-level home-manager config
+│   │   └── home.nix             # User-level home-manager config (optional)
 │   └── rpi5-homelab/ # Raspberry Pi 5, NixOS
 │       ├── configuration.nix    # System-level settings
 │       ├── hardware.nix         # Hardware-specific config
 │       └── home.nix             # User-level home-manager config
+├── lib/             # Helper functions for building configurations
+│   ├── default.nix    # Entrypoint for the library
+│   └── helpers.nix    # Helper functions (e.g., mkDarwin)
 ├── shared/          # Shared configurations
 │   ├── shell/       # Shell-specific configs (aliases, exports)
+│   ├── common-packages.nix      # Common packages for all systems
 │   ├── darwin-system.nix        # Core macOS system settings
 │   ├── homebrew.nix             # Homebrew package management
 │   ├── home-manager-base.nix    # Cross-platform home-manager foundation
 │   ├── home-manager-darwin.nix  # macOS-specific home-manager config
 │   └── home-manager-linux.nix   # Linux-specific home-manager config
-└── scripts/         # Installation and maintenance scripts
 ```
 
 ### Consistent Host Architecture
@@ -52,12 +55,13 @@ Each host's configuration follows this import hierarchy:
 
 **macOS hosts (zap, plumbus):**
 ```
-configuration.nix
-├── ../../shared/darwin-system.nix     # macOS system settings
-├── ./home.nix                         # Host-specific user config
-│   └── ../../shared/home-manager-darwin.nix  # Shared macOS user config
-│       └── ./home-manager-base.nix    # Cross-platform user config
-└── inputs.home-manager-unstable.darwinModules.home-manager
+flake.nix
+└── lib.mkDarwin
+    ├── inputs.home-manager-unstable.darwinModules.home-manager
+    ├── ../../shared/darwin-system.nix     # macOS system settings
+    ├── ../../shared/common-packages.nix   # Common packages
+    ├── ./configuration.nix                # Host-specific system config
+    └── ./home.nix (optional)              # Host-specific user config
 ```
 
 **Linux hosts (rpi5-homelab):**
