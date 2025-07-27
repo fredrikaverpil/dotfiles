@@ -13,6 +13,7 @@
   
   # Raspberry Pi specific packages for homelab use
   home.packages = with pkgs; [
+    # Add homelab-specific packages here if needed
   ];
   
   # Pi-specific configurations

@@ -31,7 +31,8 @@
 
   mkRpiNixos = { configPath, ... }:
     inputs.nixos-raspberrypi.lib.nixosSystemFull {
-      specialArgs = inputs // { 
+      specialArgs = { 
+        inherit inputs;
         nixos-raspberrypi = inputs.nixos-raspberrypi; 
         inherit (inputs) dotfiles; 
       };
