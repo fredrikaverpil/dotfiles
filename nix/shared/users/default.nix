@@ -1,7 +1,7 @@
 # Multi-user configuration for all platforms
 # This module defines multiple users and provides consistent user setup across Darwin and Linux
 
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 {
   options = {
