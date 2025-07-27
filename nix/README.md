@@ -32,9 +32,10 @@ nix/
 │   │   └── darwin.nix         # macOS system configuration
 │   ├── darwin/
 │   │   └── homebrew.nix             # Homebrew package management
-│   ├── home-manager-base.nix    # Cross-platform home-manager foundation
-│   ├── home-manager-darwin.nix  # macOS-specific home-manager config
-│   └── home-manager-linux.nix   # Linux-specific home-manager config
+│   ├── home/
+│   │   ├── common.nix         # Cross-platform home-manager config
+│   │   ├── darwin.nix         # macOS-specific home-manager config
+│   │   └── linux.nix          # Linux-specific home-manager config
 ```
 
 ### Consistent Host Architecture
@@ -71,8 +72,7 @@ flake.nix
 configuration.nix
 ├── ./hardware.nix                     # Hardware-specific settings
 ├── ./home.nix                         # Host-specific user config
-│   └── ../../shared/home-manager-linux.nix   # Shared Linux user config
-│       └── ./home-manager-base.nix    # Cross-platform user config
+│   └── ../../shared/home/linux.nix   # Shared Linux user config
 └── home-manager.nixosModules.home-manager
 ```
 

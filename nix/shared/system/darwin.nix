@@ -1,3 +1,5 @@
+# This file contains system-level settings specific to macOS.
+
 { config, pkgs, ... }:
 
 {

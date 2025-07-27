@@ -1,3 +1,5 @@
+# This file contains Homebrew settings specific to macOS.
+
 { pkgs, config, ... }:
 
 {
