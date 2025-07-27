@@ -7,10 +7,9 @@ let
   };
 in
 {
-  # Import agenix module for secrets management
+  # Import SOPS-nix module for secrets management
   imports = [ 
-    inputs.agenix.nixosModules.default
-    # Note: secrets.nix is only used by agenix CLI, not imported here
+    inputs.sops-nix.nixosModules.sops
   ];
 
   # Main configuration file for rpi5-homelab Raspberry Pi 5 system
@@ -114,18 +113,11 @@ in
 
     # Dynamic DNS client for Cloudflare integration
     # Updates DNS records when public IP changes for internet accessibility
-    # Uses agenix for secure secret management (API token and domain name)
+    # Uses SOPS-nix for secure secret management (API token and domain name)
     # Service runs only when secrets are available (via systemd conditions)
     ddclient = {
       enable = true;
-      protocol = "cloudflare";
-      server = "cloudflare";
-      username = "token";  # Cloudflare uses 'token' as username for API token auth
-      passwordFile = config.age.secrets.cloudflare-token.path;
-      domains = [ (lib.strings.removeSuffix "\n" (builtins.readFile config.age.secrets.homelab-domain.path)) ];
-      verbose = true;
-      ssl = true;
-      interval = "300";  # Update every 5 minutes
+      configFile = config.sops.templates."ddclient.conf".path;
     };
   };
 
@@ -133,8 +125,8 @@ in
   systemd.services.ddclient = {
     unitConfig = {
       ConditionPathExists = [
-        "/run/agenix/cloudflare-token"
-        "/run/agenix/homelab-domain"
+        "/run/secrets/cloudflare-token"
+        "/run/secrets/homelab-domain"
       ];
     };
   };
@@ -348,17 +340,41 @@ in
   # Allow unfree packages (needed for various packages)
   nixpkgs.config.allowUnfree = true;
 
-  # Configure agenix secrets for ddclient
-  age.secrets = {
-    cloudflare-token = {
-      file = ./secrets/cloudflare-token.age;
-      owner = "ddclient";
-      group = "ddclient";
+  # Configure SOPS secrets for ddclient
+  sops = {
+    defaultSopsFile = ./secrets/secrets.yaml;
+    defaultSopsFormat = "yaml";
+    age.keyFile = "/home/fredrik/.config/sops/age/keys.txt";
+    
+    secrets = {
+      cloudflare-token = {
+        owner = "ddclient";
+        group = "ddclient";
+      };
+      homelab-domain = {
+        owner = "ddclient";
+        group = "ddclient";
+      };
     };
-    homelab-domain = {
-      file = ./secrets/homelab-domain.age;
+
+    templates."ddclient.conf" = {
+      content = ''
+        # ddclient configuration for Cloudflare Dynamic DNS
+        daemon=300
+        syslog=yes
+        pid=/var/run/ddclient.pid
+        ssl=yes
+        
+        # Cloudflare configuration
+        protocol=cloudflare
+        server=cloudflare
+        login=token
+        password=${config.sops.placeholder."cloudflare-token"}
+        ${config.sops.placeholder."homelab-domain"}
+      '';
       owner = "ddclient";
       group = "ddclient";
+      mode = "0400";
     };
   };
 
