@@ -11,10 +11,12 @@ in
   # This file orchestrates the modular configuration by importing specialized modules
   
   imports = [
-    ./modules/networking.nix  # Network configuration, WiFi, mDNS
-    ./modules/services.nix    # System services (SSH, Docker, time sync)
-    ./modules/users.nix       # User accounts and permissions
-    ./modules/packages.nix    # System-level package installations
+    ../../shared/system/common.nix   # Common system settings
+    ../../shared/system/linux.nix    # Linux-specific system settings
+    ./modules/networking.nix         # Network configuration, WiFi, mDNS
+    ./modules/services.nix           # System services (SSH, Docker, time sync)
+    ./modules/users.nix              # User accounts and permissions
+    ./modules/packages.nix           # System-level package installations
   ];
 
   # System identification tags for the Raspberry Pi

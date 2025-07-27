@@ -17,7 +17,7 @@
       
       # Additional Linux-specific tools can be added here as needed
       # Examples: htop, iotop, nethogs, etc.
-    ] ++ args.config.dotfiles.extraPackages;
+    ] ++ config.dotfiles.extraPackages;
 
     # Linux-specific dotfiles and configurations
     home.file = {
