@@ -85,6 +85,9 @@
       then import userConfig.homeConfig
       else {}
     ) config.dotfiles.users;
+    
+    # Pass inputs to home-manager modules
+    home-manager.extraSpecialArgs = { inherit inputs; };
 
     # Note: Darwin's system.primaryUser is set by the Darwin system configuration
     # Note: Linux-specific security settings are handled in shared/system/linux.nix
