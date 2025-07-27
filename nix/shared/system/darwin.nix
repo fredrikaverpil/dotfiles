@@ -160,6 +160,7 @@
         minimize-to-application = true;
         mineffect = "scale";
         enable-window-tool = false;
+        magnification = false;
       };
       "com.apple.ActivityMonitor" = {
         OpenMainWindow = true;
