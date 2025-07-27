@@ -14,7 +14,7 @@
         inputs = inputs;
       };      modules = [
         inputs.home-manager-unstable.darwinModules.home-manager
-        ../shared/darwin-system.nix
+        ../shared/system/darwin.nix
         ../shared/common-packages.nix
         ../hosts/${hostname}/configuration.nix
       ] ++ (if builtins.pathExists ../hosts/${hostname}/home.nix then [ ../hosts/${hostname}/home.nix ] else [ ]);
