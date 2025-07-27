@@ -117,14 +117,13 @@ in
     # Uses agenix for secure secret management (API token and domain name)
     # Dynamic DNS client for Cloudflare integration
     # Uses agenix for secure secret management (API token and domain name)
-    # NOTE: Enabled after deployment when secrets are available on target machine
     ddclient = {
-      enable = false;  # Will be enabled after deployment to Pi
+      enable = true;
       protocol = "cloudflare";
       server = "cloudflare";
       username = "token";  # Cloudflare uses 'token' as username for API token auth
-      # passwordFile = config.age.secrets.cloudflare-token.path;
-      # domains = [ (lib.strings.removeSuffix "\n" (builtins.readFile config.age.secrets.homelab-domain.path)) ];
+      passwordFile = config.age.secrets.cloudflare-token.path;
+      domains = [ (lib.strings.removeSuffix "\n" (builtins.readFile config.age.secrets.homelab-domain.path)) ];
       verbose = true;
       ssl = true;
       interval = "300";  # Update every 5 minutes
@@ -338,19 +337,18 @@ in
   nixpkgs.config.allowUnfree = true;
 
   # Configure agenix secrets for ddclient
-  # NOTE: Commented out until deployment - secrets only exist on target machine
-  # age.secrets = {
-  #   cloudflare-token = {
-  #     file = ./secrets/cloudflare-token.age;
-  #     owner = "ddclient";
-  #     group = "ddclient";
-  #   };
-  #   homelab-domain = {
-  #     file = ./secrets/homelab-domain.age;
-  #     owner = "ddclient";
-  #     group = "ddclient";
-  #   };
-  # };
+  age.secrets = {
+    cloudflare-token = {
+      file = ./secrets/cloudflare-token.age;
+      owner = "ddclient";
+      group = "ddclient";
+    };
+    homelab-domain = {
+      file = ./secrets/homelab-domain.age;
+      owner = "ddclient";
+      group = "ddclient";
+    };
+  };
 
   # NixOS state version
   system.stateVersion = stateVersions.nixos;
