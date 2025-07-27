@@ -108,6 +108,7 @@ in
   # Copy docker-compose files to system locations
   environment.etc = {
     "homelab/portainer/docker-compose.yml".source = ./docker-compose/portainer.yml;
+    "homelab/uptime-kuma/docker-compose.yml".source = ./docker-compose/uptime-kuma.yml;
   };
 
   # Systemd services for docker-compose stacks
@@ -120,6 +121,22 @@ in
         Type = "oneshot";
         RemainAfterExit = true;
         WorkingDirectory = "/etc/homelab/portainer";
+        ExecStart = "${pkgs.docker-compose}/bin/docker-compose up -d";
+        ExecStop = "${pkgs.docker-compose}/bin/docker-compose down";
+        ExecReload = "${pkgs.docker-compose}/bin/docker-compose up -d --force-recreate";
+        TimeoutStartSec = "300";
+      };
+      wantedBy = [ "multi-user.target" ];
+    };
+
+    homelab-uptime-kuma = {
+      description = "Homelab Uptime Kuma Service Monitoring Stack";
+      after = [ "docker.service" ];
+      requires = [ "docker.service" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        WorkingDirectory = "/etc/homelab/uptime-kuma";
         ExecStart = "${pkgs.docker-compose}/bin/docker-compose up -d";
         ExecStop = "${pkgs.docker-compose}/bin/docker-compose down";
         ExecReload = "${pkgs.docker-compose}/bin/docker-compose up -d --force-recreate";
