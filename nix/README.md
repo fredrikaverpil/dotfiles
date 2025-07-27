@@ -29,10 +29,8 @@ nix/
 │   ├── shell/       # Shell-specific configs (aliases, exports)
 │   ├── system/
 │   │   ├── common.nix         # Cross-platform system packages & config
-│   │   ├── darwin.nix         # macOS system configuration
+│   │   ├── darwin.nix         # macOS system configuration (including Homebrew)
 │   │   └── linux.nix          # Linux system configuration (future)
-│   ├── darwin/
-│   │   └── homebrew.nix             # Homebrew package management
 │   ├── home/
 │   │   ├── common.nix         # Cross-platform home-manager config
 │   │   ├── darwin.nix         # macOS-specific home-manager config

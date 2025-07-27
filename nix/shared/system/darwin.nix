@@ -1,8 +1,78 @@
-# This file contains system-level settings specific to macOS.
+# This file contains system-level settings specific to macOS, including Homebrew.
 
 { config, pkgs, ... }:
 
 {
+  # Homebrew configuration
+  homebrew = {
+    enable = true;
+    onActivation = {
+      autoUpdate = true;
+      upgrade = true;
+      cleanup = "zap";
+    };
+
+    taps = [
+      "dustinblackman/tap"
+      "go-task/tap"
+      "joshmedeski/sesh"
+      "1password/tap"
+      "nikitabobko/tap"
+      "sst/tap" # for opencode
+    ];
+
+    brews = [
+      # CLI tools moved to Nix packages in home-common.nix:
+      # direnv, atuin, eza, gh, starship, yq, zoxide, etc.
+      
+      # Packages not available in nixpkgs
+      "cloud-sql-proxy"
+      "git-standup"
+      
+      # Presentation tools
+      "slides"
+      "chafa" # Required for showing images in slides
+      
+      # Packages from custom taps that aren't in nixpkgs
+      "go-task/tap/go-task"
+      "joshmedeski/sesh/sesh"
+      "sst/tap/opencode"
+      "pkgx"
+    ] ++ config.dotfiles.extraBrews;
+
+    casks = [
+      "1password"
+      "1password-cli"
+      "aerospace"
+      "appcleaner"
+      "font-jetbrains-mono"
+      "font-jetbrains-mono-nerd-font"
+      "font-maple-mono"
+      "font-noto-color-emoji"
+      "font-noto-emoji"
+      "font-symbols-only-nerd-font"
+      "fujifilm-x-raw-studio"
+      "ghostty"
+      "gitify"
+      "gcloud-cli"
+      "kitty"
+      "obs"
+      "obsidian"
+      "signal"
+      "spotify"
+      "visual-studio-code"
+      "wacom-tablet"
+      "wezterm"
+      "zed"
+    ] ++ config.dotfiles.extraCasks;
+
+    masApps = {
+      "Keka" = 470158793;
+      "Slack" = 803453959;
+      "Pandan" = 1569600264;
+    };
+  };
+
   # Basic darwin system settings
   nix.settings.experimental-features = "nix-command flakes";
   
@@ -16,7 +86,7 @@
   users.users.fredrik = {
     name = "fredrik";
     home = "/Users/fredrik";
-    shell = pkgs.zsh;  # Set zsh as default shell
+    shell = pkgs.zsh; # Set zsh as default shell
   };
 
   # System-level packages (very few)
@@ -135,8 +205,8 @@
     # 12: Notification Center
     # 13: Lock Screen - immediately locks the screen
     # 14: Quick Note - opens Notes app for quick note-taking
-    dock."wvous-tl-corner" = 2;  # Top-left: Mission Control (overview of all spaces)
-    dock."wvous-tr-corner" = 4;  # Top-right: Desktop (show desktop)
+    dock."wvous-tl-corner" = 2; # Top-left: Mission Control (overview of all spaces)
+    dock."wvous-tr-corner" = 4; # Top-right: Desktop (show desktop)
     dock."wvous-bl-corner" = 13; # Bottom-left: Lock Screen (security)
     dock."wvous-br-corner" = 14; # Bottom-right: Quick Note (productivity)
   };
@@ -144,11 +214,11 @@
   # System activation script to apply additional macOS settings
   # These settings cannot be configured via nix-darwin and require manual defaults commands
   # Note: For non-nix systems, use _macos/set_defaults.sh instead which includes all settings
-  system.activationScripts.extraActivation.text = ''
+  system.activationScripts.extraActivation.text = ''''
     echo "Applying additional macOS settings (nix supplement)..."
     
     # Run as the primary user to apply user-specific defaults
-    sudo -u ${config.system.primaryUser} bash -c '
+    sudo -u ${config.system.primaryUser} bash -c ''
       # Disable Spotlight keyboard shortcut (Cmd+Space) to allow Raycast usage
       defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 "
         <dict>
@@ -180,8 +250,8 @@
           </dict>
         </dict>
       "
-     '
-   '';
+     ''
+   '''';
 
   # Nix registry for easy access to stable and unstable packages
   nix.registry = {
