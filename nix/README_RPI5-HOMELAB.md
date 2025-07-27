@@ -124,7 +124,37 @@ systemctl is-active sshd  # check if sshd is running
 
 ### Post-Installation: Enable Dynamic DNS and VPN
 
-The initial deployment includes basic services but has ddclient (Dynamic DNS) disabled until secrets are configured. Follow these steps to enable full functionality:
+The initial deployment includes basic services but has **ddclient (Dynamic DNS) disabled** and **agenix secrets commented out** until secrets are configured. This two-phase approach ensures you can deploy the basic system first, then add secrets functionality.
+
+**IMPORTANT**: The configuration is set up for a two-phase deployment:
+- **Phase 1**: Basic system with secrets disabled (safe to deploy immediately)
+- **Phase 2**: Enable secrets after SSH keys are set up (requires manual steps)
+
+#### What's Disabled in Fresh Installs
+
+For security and deployment safety, these components are initially disabled:
+
+```nix
+# In configuration.nix - these are commented out/disabled for fresh installs:
+
+# 1. ddclient service (around line 120)
+ddclient = {
+  enable = false;  # Will be enabled after secrets are set up
+  # ...
+};
+
+# 2. agenix secrets configuration (around line 345)
+# age.secrets = {
+#   cloudflare-token = { ... };
+#   homelab-domain = { ... };
+# };
+
+# 3. ddclient secret references (around line 125)
+# passwordFile = config.age.secrets.cloudflare-token.path;
+# domains = [ ... ];
+```
+
+This allows you to deploy the basic homelab infrastructure (Docker services, SSH, Tailscale, etc.) without needing secrets configured first.
 
 #### 1. Set up Tailscale VPN (Secure Remote Access)
 
@@ -136,17 +166,17 @@ sudo tailscale up
 # Note the Tailscale hostname (e.g., rpi5-homelab) for remote SSH access
 ```
 
-#### 2. Generate Age Encryption Key (for Secrets Management)
+#### 2. Generate SSH Key for Secrets Management
 
 ```sh
-# On the Pi, generate the age key for agenix secrets
-nix-shell -p age
-sudo mkdir -p /etc/agenix
-sudo age-keygen -o /etc/agenix/host.txt
+# On the Pi, generate SSH key for agenix (if you don't already have one)
+ssh-keygen -t ed25519 -C "fredrik@rpi5-homelab"
+# Press Enter to accept default location (~/.ssh/id_ed25519)
+# Press Enter for no passphrase (or add one if you prefer)
 
-# Get the public key (you'll need this for the next step)
-sudo cat /etc/agenix/host.txt | grep "# public key:"
-# Example output: age1e6y326s76ypwx8px2jdjvjhznejecjyjefvedt9wlrtrj6zak9ysmr6evr
+# Get your SSH public key (you'll need this for the next step)
+cat ~/.ssh/id_ed25519.pub
+# Example output: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHRKV1VEpCLaXRaz99tWzgIs3cn1936K7i7tw/Dot+db fredrik@rpi5-homelab
 ```
 
 #### 3. Update Secrets Configuration (on Development Machine)
@@ -154,7 +184,7 @@ sudo cat /etc/agenix/host.txt | grep "# public key:"
 ```sh
 # On your development machine, update the secrets configuration
 cd nix/hosts/rpi5-homelab/secrets/
-# Edit secrets.nix and replace the placeholder with your Pi's actual public key
+# Edit secrets.nix and replace the SSH public key with your Pi's actual SSH public key
 ```
 
 #### 4. Create Cloudflare API Token
@@ -168,11 +198,14 @@ cd nix/hosts/rpi5-homelab/secrets/
    - **Include**: `Specific zone` → Select your domain
 5. Copy the generated token
 
-#### 5. Encrypt Secrets
+#### 5. Encrypt Secrets (on Pi)
 
 ```sh
-# From the secrets directory on your development machine
-cd nix/hosts/rpi5-homelab/secrets/
+# On the Pi, navigate to the secrets directory
+cd ~/.dotfiles/nix/hosts/rpi5-homelab/secrets/
+
+# Remove any existing .age files (if switching from age keys to SSH keys)
+rm -f *.age
 
 # Create Cloudflare API token secret
 EDITOR=nano nix run github:ryantm/agenix -- -e cloudflare-token.age
@@ -182,28 +215,49 @@ EDITOR=nano nix run github:ryantm/agenix -- -e cloudflare-token.age
 EDITOR=nano nix run github:ryantm/agenix -- -e homelab-domain.age  
 # Paste your subdomain (e.g., lab-k8s9x.averpil.com), save and exit
 
-# Verify both secrets were created
+# Verify both secrets were created and can be decrypted
 ls -la *.age
+nix run github:ryantm/agenix -- -d cloudflare-token.age  # Should show your token
 ```
 
-#### 6. Enable Secrets in Configuration (After Deployment)
+#### 6. Enable Secrets in Configuration (on Development Machine)
 
-After deploying to the Pi, you'll need to enable the secrets:
+After creating the secrets on the Pi, enable them in the configuration:
 
 ```sh
-# SSH to the Pi
-ssh fredrik@<pi-ip>
-cd ~/.dotfiles
+# On your development machine, edit the configuration
+cd nix/hosts/rpi5-homelab/
+nano configuration.nix
 
-# Edit nix/hosts/rpi5-homelab/configuration.nix
-# Uncomment the age.secrets configuration block (lines ~345-356)
-# Enable ddclient by changing enable = false to enable = true (line ~120)
+# Make these changes:
+# 1. Uncomment the age.secrets configuration block (around line 345):
+age.secrets = {
+  cloudflare-token = {
+    file = ./secrets/cloudflare-token.age;
+    owner = "ddclient";
+    group = "ddclient";
+  };
+  homelab-domain = {
+    file = ./secrets/homelab-domain.age;
+    owner = "ddclient";
+    group = "ddclient";
+  };
+};
 
-# Rebuild the configuration
-sudo nixos-rebuild switch --flake .#rpi5-homelab
+# 2. Enable ddclient (around line 120):
+enable = true;  # Change from false
+
+# 3. Uncomment the ddclient secrets (around line 125):
+passwordFile = config.age.secrets.cloudflare-token.path;
+domains = [ (lib.strings.removeSuffix "\n" (builtins.readFile config.age.secrets.homelab-domain.path)) ];
+
+# Commit and push the changes
+git add configuration.nix
+git commit -m "Enable agenix secrets and ddclient"
+git push
 ```
 
-**Note**: You cannot test the build locally with secrets enabled since the encrypted files are only decryptable on the target machine with the private key.
+**Note**: The secrets (.age files) are only created on the Pi and are not committed to git for security.
 
 #### 7. Create DNS Record in Cloudflare
 
@@ -211,16 +265,16 @@ sudo nixos-rebuild switch --flake .#rpi5-homelab
 2. Create an A record for your chosen subdomain pointing to any IP (ddclient will update it)
 3. Example: `lab-k8s9x.averpil.com` → `1.1.1.1` (temporary)
 
-#### 8. Redeploy Configuration
+#### 8. Deploy with Secrets Enabled
 
 ```sh
-# From your development machine, redeploy with secrets enabled
-nixos-anywhere --flake .#rpi5-homelab --build-on remote --phases install root@<pi-ip>
-
-# Or if you can SSH to the Pi directly:
-ssh fredrik@<pi-ip>
+# On the Pi, pull the updated configuration and rebuild
 cd ~/.dotfiles
+git pull
 sudo nixos-rebuild switch --flake .#rpi5-homelab
+
+# Or from your development machine:
+nixos-anywhere --flake .#rpi5-homelab --build-on remote --phases install root@<pi-ip>
 ```
 
 #### 9. Verify Services
