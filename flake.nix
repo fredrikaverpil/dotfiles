@@ -48,19 +48,29 @@
       nixosConfigurations = {
         rpi5-homelab = inputs.nixos-raspberrypi.lib.nixosSystemFull {
           specialArgs = inputs // { nixos-raspberrypi = inputs.nixos-raspberrypi; inherit (inputs) dotfiles; };
-          modules = [
+           modules = [
             inputs.disko.nixosModules.disko
             inputs.home-manager.nixosModules.home-manager
             ./nix/hosts/rpi5-homelab/hardware.nix
             ./nix/hosts/rpi5-homelab/home.nix
             ./nix/hosts/rpi5-homelab/configuration.nix
-          ];
-        };
+          ];        };
       };
 
       darwinConfigurations = {
-        zap = lib.mkDarwin { hostname = "zap"; };
-        plumbus = lib.mkDarwin { hostname = "plumbus"; };
+         zap = lib.mkDarwin { hostname = "zap"; };
+         plumbus = lib.mkDarwin { hostname = "plumbus"; };
+      };
+
+      formatter.x86_64-linux = inputs.nixpkgs.legacyPackages.x86_64-linux.nixfmt;
+      formatter.aarch64-darwin = inputs.nixpkgs-unstable.legacyPackages.aarch64-darwin.nixfmt;
+
+      devShells = {
+        x86_64-linux.default = inputs.nixpkgs.legacyPackages.x86_64-linux.mkShell {
+          packages = [
+            inputs.nixpkgs.legacyPackages.x86_64-linux.nixfmt
+          ];
+        };
       };
     };
 }
