@@ -1,23 +1,31 @@
 # Shared home-manager configuration that gets imported by user-specific configs
-{ config, lib, pkgs, ... }: {
-    # Ensure any git submodules are initialized in ~/.dotfiles
-    home.activation.initDotfilesSubmodules = lib.hm.dag.entryAfter ["writeBoundary"] ''
+{ config, lib, pkgs, inputs, ... }: {
+    # Handle dotfiles - use local clone if available, otherwise use flake input
+    home.activation.handleDotfiles = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      DOTFILES_PATH=""
+      
+      # Check if dotfiles are already cloned locally
       if [ -d "$HOME/.dotfiles/.git" ]; then
-        echo "Initializing any git submodules in ~/.dotfiles..."
-        cd "$HOME/.dotfiles"
+        echo "Using existing dotfiles at ~/.dotfiles"
+        DOTFILES_PATH="$HOME/.dotfiles"
+        
+        # Initialize git submodules for local clone
+        echo "Initializing any git submodules..."
+        cd "$DOTFILES_PATH"
         if ! $DRY_RUN_CMD ${pkgs.git}/bin/git submodule update --init --recursive; then
           echo "Warning: Failed to initialize git submodules"
           exit 1
         fi
         echo "Git submodules initialized"
+      else
+        echo "Using dotfiles from flake input"
+        DOTFILES_PATH="${inputs.dotfiles}"
       fi
-    '';
-
-    # Run stow installer to create dotfile symlinks
-    home.activation.runStowInstaller = lib.hm.dag.entryAfter ["initDotfilesSubmodules"] ''
-      if [ -f "$HOME/.dotfiles/stow/symlink.sh" ] && [ -x "$HOME/.dotfiles/stow/symlink.sh" ]; then
-        echo "Running stow installer..."
-        cd "$HOME/.dotfiles/stow"
+      
+      # Run stow installer from determined path
+      if [ -f "$DOTFILES_PATH/stow/symlink.sh" ] && [ -x "$DOTFILES_PATH/stow/symlink.sh" ]; then
+        echo "Running stow installer from $DOTFILES_PATH..."
+        cd "$DOTFILES_PATH/stow"
         export PATH="${pkgs.stow}/bin:${pkgs.bash}/bin:$PATH"
         if ! $DRY_RUN_CMD ./symlink.sh; then
           echo "Warning: Stow installation failed"
@@ -25,7 +33,7 @@
         fi
         echo "Stow installation completed"
       else
-        echo "Warning: ~/.dotfiles/stow/symlink.sh not found or not executable"
+        echo "Warning: symlink.sh not found or not executable in $DOTFILES_PATH"
       fi
     '';
 
