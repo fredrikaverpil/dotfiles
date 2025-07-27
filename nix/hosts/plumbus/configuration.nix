@@ -3,7 +3,7 @@
 {
   imports = [
     ../../shared/darwin-system.nix
-    ../../shared/home-manager-darwin.nix
+    ./home.nix
     inputs.home-manager-unstable.darwinModules.home-manager
   ];
 

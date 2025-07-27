@@ -7,14 +7,21 @@ platform-specific tools.
 ## Architecture Overview
 
 The configuration follows a modular approach with clear separation between
-shared and host-specific settings:
+shared and host-specific settings, using a consistent structure across all platforms:
 
 ```txt
 nix/
 ├── hosts/           # Host-specific configurations
 │   ├── zap/         # Apple Silicon, macOS
+│   │   ├── configuration.nix    # System-level settings
+│   │   └── home.nix             # User-level home-manager config
 │   ├── plumbus/     # Apple Silicon, macOS
+│   │   ├── configuration.nix    # System-level settings
+│   │   └── home.nix             # User-level home-manager config
 │   └── rpi5-homelab/ # Raspberry Pi 5, NixOS
+│       ├── configuration.nix    # System-level settings
+│       ├── hardware.nix         # Hardware-specific config
+│       └── home.nix             # User-level home-manager config
 ├── shared/          # Shared configurations
 │   ├── shell/       # Shell-specific configs (aliases, exports)
 │   ├── darwin-system.nix        # Core macOS system settings
@@ -23,6 +30,44 @@ nix/
 │   ├── home-manager-darwin.nix  # macOS-specific home-manager config
 │   └── home-manager-linux.nix   # Linux-specific home-manager config
 └── scripts/         # Installation and maintenance scripts
+```
+
+### Consistent Host Architecture
+
+All hosts follow the same architectural pattern for maintainability:
+
+- **`configuration.nix`**: System-level settings (services, system packages, platform-specific configurations)
+- **`home.nix`**: User-level settings (user packages, dotfiles, personal configurations)
+- **Platform-specific files**: Additional files as needed (e.g., `hardware.nix` for NixOS)
+
+This consistent structure provides:
+- **Clear separation of concerns** between system and user configuration
+- **Easy maintenance** across different platforms
+- **Predictable organization** when adding new hosts
+- **Modular configuration** that imports shared components
+
+### Configuration Flow
+
+Each host's configuration follows this import hierarchy:
+
+**macOS hosts (zap, plumbus):**
+```
+configuration.nix
+├── ../../shared/darwin-system.nix     # macOS system settings
+├── ./home.nix                         # Host-specific user config
+│   └── ../../shared/home-manager-darwin.nix  # Shared macOS user config
+│       └── ./home-manager-base.nix    # Cross-platform user config
+└── inputs.home-manager-unstable.darwinModules.home-manager
+```
+
+**Linux hosts (rpi5-homelab):**
+```
+configuration.nix
+├── ./hardware.nix                     # Hardware-specific settings
+├── ./home.nix                         # Host-specific user config
+│   └── ../../shared/home-manager-linux.nix   # Shared Linux user config
+│       └── ./home-manager-base.nix    # Cross-platform user config
+└── home-manager.nixosModules.home-manager
 ```
 
 ## Host-Specific documentation
