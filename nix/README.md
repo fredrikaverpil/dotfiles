@@ -29,7 +29,8 @@ nix/
 │   ├── shell/       # Shell-specific configs (aliases, exports)
 │   ├── common-packages.nix      # Common packages for all systems
 │   ├── darwin.nix        # Core macOS system settings
-│   ├── homebrew.nix             # Homebrew package management
+│   ├── darwin/
+│   │   └── homebrew.nix             # Homebrew package management
 │   ├── home-manager-base.nix    # Cross-platform home-manager foundation
 │   ├── home-manager-darwin.nix  # macOS-specific home-manager config
 │   └── home-manager-linux.nix   # Linux-specific home-manager config

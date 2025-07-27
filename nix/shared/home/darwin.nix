@@ -18,7 +18,7 @@
   };
   imports = [
     ./common.nix
-    ./homebrew.nix
+    ../darwin/homebrew.nix
     ../shell/aliases.nix
     ../shell/aliases-darwin.nix
     ../shell/exports.nix
