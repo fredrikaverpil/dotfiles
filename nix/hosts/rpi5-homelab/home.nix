@@ -13,7 +13,7 @@ in
   ];
 
   # Host-specific home-manager configuration for rpi5-homelab
-  home-manager.users.fredrik = {
+  home-manager.users.${config.users.primaryUser} = {
     # Set the state version for home-manager
     home.stateVersion = homeManagerVersion;
     

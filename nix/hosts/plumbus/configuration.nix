@@ -7,10 +7,8 @@ let
   };
 in
 {
-   imports = [
-     ../../shared/system/darwin.nix
-   ];
   # Host-specific configuration for plumbus
+  users.primaryUser = "fredrik";
   networking.hostName = "plumbus";
 
   # Host-specific packages for plumbus

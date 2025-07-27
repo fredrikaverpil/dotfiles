@@ -11,8 +11,11 @@ in
   # This file contains all host-specific configuration consolidated from modules
   
   # ========================================================================
-  # NETWORK CONFIGURATION
+  # HOST CONFIGURATION
   # ========================================================================
+  # Primary user for this system
+  users.primaryUser = "fredrik";
+  
   # Set system hostname for network identification
   networking.hostName = "rpi5-homelab";
 
@@ -65,35 +68,7 @@ in
   # ========================================================================
   # USER CONFIGURATION
   # ========================================================================
-  # Primary user account configuration
-  users.users.fredrik = {
-    isNormalUser = true;  # Regular user account (not system user)
-    
-    # Group memberships for system access and permissions
-    extraGroups = [ 
-      "wheel"          # Administrative privileges (sudo access)
-      "networkmanager" # Network configuration permissions
-      "docker"         # Docker daemon access for container management
-    ];
-    
-    # Security: Change this password immediately after first login
-    initialPassword = "changeme";
-    
-    # Set zsh as default shell to match other machines in the setup
-    shell = pkgs.zsh;
-    
-    # SSH public key authentication (recommended for security)
-    # Uncomment and add your SSH public keys for passwordless login
-    # openssh.authorizedKeys.keys = [
-    #   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5... your-key-here"
-    #   "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAB... another-key-here"
-    # ];
-  };
-
-  # Sudo configuration for administrative access
-  # Allow wheel group members to use sudo without password prompt
-  # This is convenient for automation but consider security implications
-  security.sudo.wheelNeedsPassword = false;
+  # Note: User configuration is now handled by shared/users/default.nix
 
   # ========================================================================
   # HOST-SPECIFIC EXTENSIONS

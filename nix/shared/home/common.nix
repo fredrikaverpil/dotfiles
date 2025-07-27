@@ -13,7 +13,7 @@
     # Home Manager setup
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
-    home-manager.users.fredrik = { config, lib, ... }: {
+    home-manager.users.${config.users.primaryUser} = { config, lib, ... }: {
     # Ensure any git submodules are initialized in ~/.dotfiles
     home.activation.initDotfilesSubmodules = lib.hm.dag.entryAfter ["writeBoundary"] ''
       if [ -d "$HOME/.dotfiles/.git" ]; then

@@ -8,7 +8,7 @@
     ./common.nix    # Cross-platform home-manager configuration
   ];
 
-  home-manager.users.fredrik = {
+  home-manager.users.${config.users.primaryUser} = {
     # Linux-specific packages not available or needed on macOS
     home.packages = with pkgs; [
       # System debugging and monitoring tools

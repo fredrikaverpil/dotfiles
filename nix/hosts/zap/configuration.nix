@@ -7,10 +7,8 @@ let
   };
 in
 {
-   imports = [
-     ../../shared/system/darwin.nix
-   ];
   # Host-specific configuration for zap
+  users.primaryUser = "fredrik";
   networking.hostName = "zap";
 
   # Host-specific packages for zap

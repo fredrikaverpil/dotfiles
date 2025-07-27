@@ -71,17 +71,9 @@
   nix.settings.experimental-features = "nix-command flakes";
   
   # Primary user for user-specific settings (homebrew, system defaults, etc.)
-  system.primaryUser = "fredrik";
-
-  # Enable zsh system-wide
-  programs.zsh.enable = true;
-
-  # Define the user
-  users.users.fredrik = {
-    name = "fredrik";
-    home = "/Users/fredrik";
-    shell = pkgs.zsh; # Set zsh as default shell
-  };
+  system.primaryUser = config.users.primaryUser;
+  
+  # Note: User configuration is now handled by shared/users/default.nix
 
   # System-level packages (very few)
   environment.systemPackages = with pkgs; [

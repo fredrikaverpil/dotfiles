@@ -21,7 +21,7 @@
    ];
   config = {
 
-  home-manager.users.fredrik = { config, lib, ... }: {
+  home-manager.users.${config.users.primaryUser} = { config, lib, ... }: {
     # Darwin-specific packages
     home.packages = with pkgs; [
       # macOS-specific tools

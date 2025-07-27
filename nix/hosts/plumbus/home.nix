@@ -9,7 +9,7 @@ in
     ../../shared/home/darwin.nix
   ];
 
-  home-manager.users.fredrik = {
+  home-manager.users.${config.users.primaryUser} = {
     home.stateVersion = homeManagerVersion;
     
     home.packages = with pkgs; [

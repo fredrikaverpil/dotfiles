@@ -21,8 +21,10 @@
     # Basic NixOS system settings
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # Enable zsh system-wide
-  programs.zsh.enable = true;
+  # Linux-specific security settings
+  security.sudo.wheelNeedsPassword = false;
+  
+  # Note: User configuration is now handled by shared/users/default.nix
 
   # System-level packages (very few)
   environment.systemPackages = with pkgs; [

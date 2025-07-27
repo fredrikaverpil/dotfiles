@@ -48,12 +48,18 @@
     in
     {
       nixosConfigurations = {
-        rpi5-homelab = lib.mkNixos { hostname = "rpi5-homelab"; };
+        rpi5-homelab = lib.mkNixos { 
+          configPath = ./nix/hosts/rpi5-homelab/configuration.nix;
+        };
       };
 
       darwinConfigurations = {
-         zap = lib.mkDarwin { hostname = "zap"; };
-         plumbus = lib.mkDarwin { hostname = "plumbus"; };
+         zap = lib.mkDarwin { 
+           configPath = ./nix/hosts/zap/configuration.nix;
+         };
+         plumbus = lib.mkDarwin { 
+           configPath = ./nix/hosts/plumbus/configuration.nix;
+         };
       };
 
       formatter.x86_64-linux = inputs.nixpkgs.legacyPackages.x86_64-linux.nixfmt;

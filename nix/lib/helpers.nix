@@ -1,6 +1,6 @@
 { inputs, ... }:
 {
-  mkDarwin = { hostname, system ? "aarch64-darwin", ... }:
+  mkDarwin = { configPath, system ? "aarch64-darwin", ... }:
   let
     inherit (inputs.nixpkgs-unstable.lib) mkDefault;
     pkgs = import inputs.nixpkgs-unstable {
@@ -11,13 +11,14 @@
       specialArgs = { inherit inputs pkgs; };
       modules = [
         inputs.home-manager-unstable.darwinModules.home-manager
+        ../shared/users/default.nix
         ../shared/system/darwin.nix
         ../shared/system/common.nix
-        ../hosts/${hostname}/configuration.nix
-      ] ++ (if builtins.pathExists ../hosts/${hostname}/home.nix then [ ../hosts/${hostname}/home.nix ] else [ ]);
+        configPath
+      ] ++ (if builtins.pathExists (builtins.dirOf configPath + "/home.nix") then [ (builtins.dirOf configPath + "/home.nix") ] else [ ]);
     };
 
-  mkNixos = { hostname, system ? "aarch64-linux", ... }:
+  mkNixos = { configPath, system ? "aarch64-linux", ... }:
     inputs.nixos-raspberrypi.lib.nixosSystemFull {
       specialArgs = inputs // { 
         nixos-raspberrypi = inputs.nixos-raspberrypi; 
@@ -26,10 +27,11 @@
       modules = [
         inputs.disko.nixosModules.disko
         inputs.home-manager.nixosModules.home-manager
+        ../shared/users/default.nix
         ../shared/system/common.nix
         ../shared/system/linux.nix
-        ../hosts/${hostname}/configuration.nix
-      ] ++ (if builtins.pathExists ../hosts/${hostname}/home.nix then [ ../hosts/${hostname}/home.nix ] else [ ])
-        ++ (if builtins.pathExists ../hosts/${hostname}/hardware.nix then [ ../hosts/${hostname}/hardware.nix ] else [ ]);
+        configPath
+      ] ++ (if builtins.pathExists (builtins.dirOf configPath + "/home.nix") then [ (builtins.dirOf configPath + "/home.nix") ] else [ ])
+        ++ (if builtins.pathExists (builtins.dirOf configPath + "/hardware.nix") then [ (builtins.dirOf configPath + "/hardware.nix") ] else [ ]);
     };
 }
