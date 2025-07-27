@@ -298,6 +298,9 @@ in
     # Dynamic DNS client
     ddclient        # Dynamic DNS client for Cloudflare integration
     
+    # Secrets management (temporary - for initial setup)
+    age             # Age encryption tool for agenix secrets
+    
     # Hardware-specific utilities for Raspberry Pi
     # These may be provided by nixos-raspberrypi modules
     

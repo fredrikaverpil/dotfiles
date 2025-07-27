@@ -8,8 +8,8 @@
 # 4. Encrypt secrets: agenix -e cloudflare-token.age && agenix -e homelab-domain.age
 
 let
-  # Replace this with your Pi's actual public key from step 2 above
-  rpi5-homelab = "age1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+  # Pi's actual public key generated with: sudo age-keygen -o /etc/agenix/host.txt
+  rpi5-homelab = "age1e6y326s76ypwx8px2jdjvjhznejecjyjefvedt9wlrtrj6zak9ysmr6evr";
 in
 {
   # Cloudflare API token (Zone:Read + DNS:Edit permissions)
