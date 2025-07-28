@@ -277,9 +277,6 @@ in
       # Don't start automatically - user must configure tunnel first
       wantedBy = [ ];
     };
-  };
-      wantedBy = [ "multi-user.target" ];
-    };
 
     homelab-immich = {
       description = "Homelab Immich Photo Management Stack";
