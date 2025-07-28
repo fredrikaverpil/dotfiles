@@ -122,3 +122,100 @@ ip a # verify connection and get IP
 systemctl is-enabled sshd  # check if sshd is enabled
 systemctl is-active sshd  # check if sshd is running
 ```
+
+### Configure Dynamic DNS with Cloudflare
+
+The homelab includes ddclient for automatic DNS updates when your public IP changes. This enables accessing your homelab services via domain names even with a dynamic IP.
+
+#### Setup Cloudflare API Credentials
+
+1. **Get Cloudflare API Key**:
+   - Log into Cloudflare dashboard
+   - Go to "My Profile" → "API Tokens"
+   - Create a custom token with:
+     - Permissions: `Zone:Zone:Read`, `Zone:DNS:Edit`
+     - Zone Resources: Include your domain zone
+   - Or use Global API Key (less secure but simpler)
+
+2. **Get Zone ID**:
+   - In Cloudflare dashboard, select your domain
+   - Copy the Zone ID from the right sidebar
+
+3. **Create secrets file on the Pi**:
+   ```sh
+   sudo mkdir -p /etc/ddclient
+   sudo touch /etc/ddclient/secrets.env
+   sudo chmod 600 /etc/ddclient/secrets.env
+   sudo chown root:root /etc/ddclient/secrets.env
+   ```
+
+4. **Add your credentials** to `/etc/ddclient/secrets.env`:
+   ```env
+   # Cloudflare account email
+   CLOUDFLARE_EMAIL=your-email@example.com
+   
+   # Cloudflare API key (either custom token or global API key)
+   CLOUDFLARE_API_KEY=your-api-key-here
+   
+   # Cloudflare zone (your domain)
+   CLOUDFLARE_ZONE=yourdomain.com
+   
+   # Hostname/subdomain to update (without the domain)
+   CLOUDFLARE_HOSTNAME=homelab
+   ```
+
+#### Service Management
+
+After creating the secrets file, enable and start the ddclient service:
+
+```sh
+# Enable ddclient service to start on boot
+sudo systemctl enable ddclient
+
+# Start ddclient service
+sudo systemctl start ddclient
+
+# Check service status
+sudo systemctl status ddclient
+
+# View logs
+sudo journalctl -u ddclient -f
+
+# Test configuration manually (optional)
+sudo ddclient -daemon=0 -debug -verbose -noquiet -file /var/run/ddclient/ddclient.conf
+```
+
+**Note**: The ddclient service is configured to NOT start automatically on fresh installs. You must create the secrets file first, then manually enable the service. This prevents boot failures when the secrets file is missing.
+
+#### Verification
+
+1. **Check DNS propagation**:
+   ```sh
+   nslookup homelab.yourdomain.com
+   dig homelab.yourdomain.com
+   ```
+
+2. **Verify IP matches**:
+   ```sh
+   curl -s checkip.dyndns.com | grep -o '[0-9.]*'
+   ```
+
+#### Troubleshooting
+
+- **Service fails to start**: Check `/etc/ddclient/secrets.env` permissions and syntax
+- **DNS not updating**: Verify API key permissions and zone ID
+- **Logs show authentication errors**: Double-check email and API key
+- **IP detection issues**: Test with `curl checkip.dyndns.com`
+
+The ddclient service will automatically:
+- Check for IP changes every 5 minutes
+- Update DNS records when changes are detected  
+- Log activities to system journal
+- Restart automatically on failures
+
+#### Security Notes
+
+- The secrets file is only readable by root (`600` permissions)
+- API keys are never stored in the Nix configuration
+- Consider using Cloudflare API tokens instead of Global API Key for better security
+- The ddclient service runs as a dedicated user with minimal privileges
