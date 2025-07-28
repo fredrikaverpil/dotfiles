@@ -238,10 +238,12 @@ in
         User = "cloudflared";
         Group = "cloudflared";
         ExecStartPre = [
-          # Check if tunnel token exists
+          # Check if tunnel token exists and create environment file
           "${pkgs.bash}/bin/bash -c 'if [ ! -f /etc/cloudflared/tunnel.json ]; then echo \"WARNING: /etc/cloudflared/tunnel.json not found. Cloudflare Tunnel will not start until configured.\"; exit 1; fi'"
+          "${pkgs.bash}/bin/bash -c 'echo \"TUNNEL_TOKEN=$(cat /etc/cloudflared/tunnel.json)\" > /var/lib/cloudflared/tunnel.env'"
         ];
-        ExecStart = "${pkgs.bash}/bin/bash -c 'TOKEN=$(cat /etc/cloudflared/tunnel.json); ${pkgs.cloudflared}/bin/cloudflared tunnel run --token \"$TOKEN\"'";
+        EnvironmentFile = "/var/lib/cloudflared/tunnel.env";
+        ExecStart = "${pkgs.cloudflared}/bin/cloudflared --token $TUNNEL_TOKEN tunnel run";
         Restart = "on-failure";
         RestartSec = "10";
         # Directory management
