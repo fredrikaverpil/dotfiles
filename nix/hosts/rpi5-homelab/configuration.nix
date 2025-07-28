@@ -270,24 +270,22 @@ in
         User = "cloudflared";
         Group = "cloudflared";
         ExecStartPre = [
-          # Create runtime directory
-          "${pkgs.coreutils}/bin/mkdir -p /var/lib/cloudflared"
-          "${pkgs.coreutils}/bin/chown cloudflared:cloudflared /var/lib/cloudflared"
           # Check if tunnel credentials exist
           "${pkgs.bash}/bin/bash -c 'if [ ! -f /etc/cloudflared/tunnel.json ]; then echo \"WARNING: /etc/cloudflared/tunnel.json not found. Cloudflare Tunnel will not start until configured.\"; exit 1; fi'"
           # Create runtime config with domain substitution
           "${pkgs.bash}/bin/bash -c 'if [ -f /etc/cloudflared/domain ]; then DOMAIN=$(cat /etc/cloudflared/domain); sed \"s/DOMAIN_PLACEHOLDER/$DOMAIN/g\" /etc/cloudflared/config.yml > /var/lib/cloudflared/config.yml; else echo \"ERROR: /etc/cloudflared/domain file missing\"; exit 1; fi'"
-          "${pkgs.coreutils}/bin/chown cloudflared:cloudflared /var/lib/cloudflared/config.yml"
         ];
         ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --config /var/lib/cloudflared/config.yml --credentials-file /etc/cloudflared/tunnel.json run";
         Restart = "on-failure";
         RestartSec = "10";
+        # Directory management
+        StateDirectory = "cloudflared";
+        StateDirectoryMode = "0755";
         # Security settings
         NoNewPrivileges = true;
         PrivateTmp = true;
         ProtectSystem = "strict";
         ProtectHome = true;
-        ReadWritePaths = [ "/var/lib/cloudflared" ];
         ReadOnlyPaths = [ "/etc/cloudflared" ];
       };
       # Don't start automatically - user must configure tunnel first
