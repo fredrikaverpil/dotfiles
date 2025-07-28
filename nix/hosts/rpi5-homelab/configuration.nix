@@ -224,6 +224,7 @@ in
         # Tunnel settings
         no-autoupdate: true
         retries: 3
+        protocol: http2
       '';
       mode = "0644";  # Readable by cloudflared user
     };
