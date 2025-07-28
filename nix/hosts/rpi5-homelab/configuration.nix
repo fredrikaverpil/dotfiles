@@ -244,6 +244,22 @@ in
       wantedBy = [ "multi-user.target" ];
     };
 
+    homelab-uptime-kuma = {
+      description = "Homelab Uptime Kuma Service Monitoring Stack";
+      after = [ "docker.service" ];
+      requires = [ "docker.service" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        WorkingDirectory = "/etc/homelab/uptime-kuma";
+        ExecStart = "${pkgs.docker-compose}/bin/docker-compose up -d";
+        ExecStop = "${pkgs.docker-compose}/bin/docker-compose down";
+        ExecReload = "${pkgs.docker-compose}/bin/docker-compose up -d --force-recreate";
+        TimeoutStartSec = "300";
+      };
+      wantedBy = [ "multi-user.target" ];
+    };
+
     # Cloudflare Tunnel service
     cloudflared = {
       description = "Cloudflare Tunnel";
