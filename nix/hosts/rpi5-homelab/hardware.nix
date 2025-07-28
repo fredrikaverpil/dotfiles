@@ -46,4 +46,11 @@
       };
     };
   };
+
+  # Add persistent mount for homelab data drive
+  fileSystems."/mnt/homelab-data" = {
+    device = "/dev/disk/by-label/homelab-data";
+    fsType = "ext4";
+    options = [ "defaults" "nofail" ];
+  };
 }

@@ -217,3 +217,14 @@ sudo journalctl -u cloudflared -f
 - **No Port Forwarding**: Router stays secure
 - **Automatic HTTPS**: SSL certificates managed by Cloudflare
 - **Access Control**: Optional authentication via Cloudflare Access
+
+### Second NVMe SSD for media storage
+
+```sh
+sudo parted /dev/nvme1n1 mklabel gpt
+sudo parted /dev/nvme1n1 mkpart primary ext4 0% 100%
+sudo mkfs.ext4 -L "homelab-data" /dev/nvme1n1p1
+
+# Check outcome
+lsblk -f
+```
