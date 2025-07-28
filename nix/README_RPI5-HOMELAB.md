@@ -123,99 +123,96 @@ systemctl is-enabled sshd  # check if sshd is enabled
 systemctl is-active sshd  # check if sshd is running
 ```
 
-### Configure Dynamic DNS with Cloudflare
+### Configure Cloudflare Tunnel
 
-The homelab includes ddclient for automatic DNS updates when your public IP changes. This enables accessing your homelab services via domain names even with a dynamic IP.
+The homelab uses Cloudflare Tunnel to securely expose services like Immich to
+the internet. This provides HTTPS, DDoS protection, and hides your home IP
+address.
 
-#### Setup Cloudflare API Credentials
+#### Create Cloudflare Tunnel
 
-1. **Get Cloudflare API Key**:
-   - Log into Cloudflare dashboard
-   - Go to "My Profile" → "API Tokens"
-   - Create a custom token with:
-     - Permissions: `Zone:Zone:Read`, `Zone:DNS:Edit`
-     - Zone Resources: Include your domain zone
-   - Or use Global API Key (less secure but simpler)
+1. **Log into Cloudflare Dashboard**:
+   - Go to your domain → **Zero Trust** → **Networks** → **Tunnels**
+   - Click **Create a tunnel**
 
-2. **Get Zone ID**:
-   - In Cloudflare dashboard, select your domain
-   - Copy the Zone ID from the right sidebar
+2. **Configure Tunnel**:
+   - Name: `homelab-tunnel`
+   - Choose **Cloudflared** connector
+   - Copy the tunnel token (starts with `eyJ...`)
 
-3. **Create secrets file on the Pi**:
+3. **Add Public Hostname**:
+   - Subdomain: `immich`
+   - Domain: `yourdomain.com`
+   - Service: `HTTP://localhost:2283`
+   - Save tunnel
+
+#### Configure Pi
+
+1. **Create tunnel directory**:
+
    ```sh
-   sudo mkdir -p /etc/ddclient
-   sudo touch /etc/ddclient/secrets.env
-   sudo chmod 600 /etc/ddclient/secrets.env
-   sudo chown root:root /etc/ddclient/secrets.env
+   sudo mkdir -p /etc/cloudflared
+   sudo chmod 755 /etc/cloudflared
    ```
 
-4. **Add your credentials** to `/etc/ddclient/secrets.env`:
-   ```env
-   # Cloudflare account email
-   CLOUDFLARE_EMAIL=your-email@example.com
-   
-   # Cloudflare API key (either custom token or global API key)
-   CLOUDFLARE_API_KEY=your-api-key-here
-   
-   # Cloudflare zone (your domain)
-   CLOUDFLARE_ZONE=yourdomain.com
-   
-   # Hostname/subdomain to update (without the domain)
-   CLOUDFLARE_HOSTNAME=homelab
+2. **Save tunnel credentials**:
+
+   ```sh
+   # Create tunnel.json with your tunnel token
+   sudo nano /etc/cloudflared/tunnel.json
    ```
 
-#### Service Management
+   Paste the tunnel token JSON (from Cloudflare dashboard)
 
-After creating the secrets file, enable and start the ddclient service:
+3. **Set domain**:
+
+   ```sh
+   # Replace with your actual domain
+   echo "yourdomain.com" | sudo tee /etc/cloudflared/domain
+   ```
+
+4. **Set permissions**:
+   ```sh
+   sudo chmod 600 /etc/cloudflared/tunnel.json
+   sudo chmod 644 /etc/cloudflared/domain
+   sudo chown -R root:root /etc/cloudflared
+   ```
+
+#### Start Service
 
 ```sh
-# Enable ddclient service to start on boot
-sudo systemctl enable ddclient
+# Enable tunnel service
+sudo systemctl enable cloudflared
 
-# Start ddclient service
-sudo systemctl start ddclient
+# Start tunnel service
+sudo systemctl start cloudflared
 
-# Check service status
-sudo systemctl status ddclient
+# Check status
+sudo systemctl status cloudflared
 
 # View logs
-sudo journalctl -u ddclient -f
-
-# Test configuration manually (optional)
-sudo ddclient -daemon=0 -debug -verbose -noquiet -file /var/run/ddclient/ddclient.conf
+sudo journalctl -u cloudflared -f
 ```
 
-**Note**: The ddclient service is configured to NOT start automatically on fresh installs. You must create the secrets file first, then manually enable the service. This prevents boot failures when the secrets file is missing.
+#### Access Your Services
 
-#### Verification
-
-1. **Check DNS propagation**:
-   ```sh
-   nslookup homelab.yourdomain.com
-   dig homelab.yourdomain.com
-   ```
-
-2. **Verify IP matches**:
-   ```sh
-   curl -s checkip.dyndns.com | grep -o '[0-9.]*'
-   ```
+- **Immich**: `https://homelab.yourdomain.com`
+- Automatic HTTPS with Cloudflare certificate
+- Works from anywhere on the internet
+- No VPN required for users
 
 #### Troubleshooting
 
-- **Service fails to start**: Check `/etc/ddclient/secrets.env` permissions and syntax
-- **DNS not updating**: Verify API key permissions and zone ID
-- **Logs show authentication errors**: Double-check email and API key
-- **IP detection issues**: Test with `curl checkip.dyndns.com`
+- **Service won't start**: Check `/etc/cloudflared/tunnel.json` exists and has
+  valid JSON
+- **Domain errors**: Verify `/etc/cloudflared/domain` contains your domain name
+- **Connection issues**: Check tunnel status in Cloudflare dashboard
+- **502 errors**: Ensure Immich is running on port 2283
 
-The ddclient service will automatically:
-- Check for IP changes every 5 minutes
-- Update DNS records when changes are detected  
-- Log activities to system journal
-- Restart automatically on failures
+#### Security Benefits
 
-#### Security Notes
-
-- The secrets file is only readable by root (`600` permissions)
-- API keys are never stored in the Nix configuration
-- Consider using Cloudflare API tokens instead of Global API Key for better security
-- The ddclient service runs as a dedicated user with minimal privileges
+- **IP Hidden**: Your home IP is not exposed
+- **DDoS Protection**: Cloudflare absorbs attacks
+- **No Port Forwarding**: Router stays secure
+- **Automatic HTTPS**: SSL certificates managed by Cloudflare
+- **Access Control**: Optional authentication via Cloudflare Access
