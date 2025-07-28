@@ -173,9 +173,10 @@ address.
 
 4. **Set permissions**:
    ```sh
-   sudo chmod 600 /etc/cloudflared/tunnel.json
+   sudo chmod 640 /etc/cloudflared/tunnel.json
    sudo chmod 644 /etc/cloudflared/domain
-   sudo chown -R root:root /etc/cloudflared
+   sudo chown root:cloudflared /etc/cloudflared/tunnel.json
+   sudo chown root:root /etc/cloudflared/domain
    ```
 
 #### Start Service

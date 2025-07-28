@@ -275,8 +275,8 @@ in
         ExecStartPre = [
           # Check if tunnel credentials exist
           "${pkgs.bash}/bin/bash -c 'if [ ! -f /etc/cloudflared/tunnel.json ]; then echo \"WARNING: /etc/cloudflared/tunnel.json not found. Cloudflare Tunnel will not start until configured.\"; exit 1; fi'"
-          # Extract tunnel ID from credentials file and create runtime config
-          "${pkgs.bash}/bin/bash -c 'if [ -f /etc/cloudflared/domain ]; then DOMAIN=$(cat /etc/cloudflared/domain); TUNNEL_ID=$(${pkgs.jq}/bin/jq -r \".TunnelID\" /etc/cloudflared/tunnel.json); sed \"s/DOMAIN_PLACEHOLDER/$DOMAIN/g\" /etc/cloudflared/config.yml | sed \"s/TUNNEL_ID_PLACEHOLDER/$TUNNEL_ID/g\" > /var/lib/cloudflared/config.yml; else echo \"ERROR: /etc/cloudflared/domain file missing\"; exit 1; fi'"
+          # Extract tunnel ID from JWT token and create runtime config
+          "${pkgs.bash}/bin/bash -c 'if [ -f /etc/cloudflared/domain ]; then DOMAIN=$(cat /etc/cloudflared/domain); JWT_TOKEN=$(cat /etc/cloudflared/tunnel.json); TUNNEL_ID=$(echo $JWT_TOKEN | ${pkgs.coreutils}/bin/base64 -d | ${pkgs.jq}/bin/jq -r \".t\"); sed \"s/DOMAIN_PLACEHOLDER/$DOMAIN/g\" /etc/cloudflared/config.yml | sed \"s/TUNNEL_ID_PLACEHOLDER/$TUNNEL_ID/g\" > /var/lib/cloudflared/config.yml; else echo \"ERROR: /etc/cloudflared/domain file missing\"; exit 1; fi'"
         ];
         ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --config /var/lib/cloudflared/config.yml --credentials-file /etc/cloudflared/tunnel.json run";
         Restart = "on-failure";
