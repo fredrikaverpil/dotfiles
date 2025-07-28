@@ -208,7 +208,7 @@ in
         # Service mappings - expose homelab services via tunnel
         ingress:
           # Immich photo management
-          - hostname: homelab.DOMAIN_PLACEHOLDER
+          - hostname: immich.DOMAIN_PLACEHOLDER
             service: http://localhost:2283
           
           # Future services can be added here:
