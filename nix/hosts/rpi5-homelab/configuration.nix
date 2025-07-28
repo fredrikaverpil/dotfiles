@@ -202,8 +202,8 @@ in
         # Tunnel ID extracted from credentials file
         tunnel: TUNNEL_ID_PLACEHOLDER
         
-        # Credentials file path
-        credentials-file: /etc/cloudflared/tunnel.json
+        # Credentials file path (JSON format)
+        credentials-file: /var/lib/cloudflared/credentials.json
         
         # Service mappings - expose homelab services via tunnel
         ingress:
@@ -275,10 +275,10 @@ in
         ExecStartPre = [
           # Check if tunnel credentials exist
           "${pkgs.bash}/bin/bash -c 'if [ ! -f /etc/cloudflared/tunnel.json ]; then echo \"WARNING: /etc/cloudflared/tunnel.json not found. Cloudflare Tunnel will not start until configured.\"; exit 1; fi'"
-          # Extract tunnel ID from JWT token and create runtime config
-          "${pkgs.bash}/bin/bash -c 'if [ -f /etc/cloudflared/domain ]; then DOMAIN=$(cat /etc/cloudflared/domain); JWT_TOKEN=$(cat /etc/cloudflared/tunnel.json); TUNNEL_ID=$(echo $JWT_TOKEN | ${pkgs.coreutils}/bin/base64 -d | ${pkgs.jq}/bin/jq -r \".t\"); sed \"s/DOMAIN_PLACEHOLDER/$DOMAIN/g\" /etc/cloudflared/config.yml | sed \"s/TUNNEL_ID_PLACEHOLDER/$TUNNEL_ID/g\" > /var/lib/cloudflared/config.yml; else echo \"ERROR: /etc/cloudflared/domain file missing\"; exit 1; fi'"
+          # Extract tunnel ID from JWT token and create runtime config and credentials
+          "${pkgs.bash}/bin/bash -c 'if [ -f /etc/cloudflared/domain ]; then DOMAIN=$(cat /etc/cloudflared/domain); JWT_TOKEN=$(cat /etc/cloudflared/tunnel.json); DECODED=$(echo $JWT_TOKEN | ${pkgs.coreutils}/bin/base64 -d); TUNNEL_ID=$(echo $DECODED | ${pkgs.jq}/bin/jq -r \".t\"); echo $DECODED > /var/lib/cloudflared/credentials.json; sed \"s/DOMAIN_PLACEHOLDER/$DOMAIN/g\" /etc/cloudflared/config.yml | sed \"s/TUNNEL_ID_PLACEHOLDER/$TUNNEL_ID/g\" > /var/lib/cloudflared/config.yml; else echo \"ERROR: /etc/cloudflared/domain file missing\"; exit 1; fi'"
         ];
-        ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --config /var/lib/cloudflared/config.yml --credentials-file /etc/cloudflared/tunnel.json run";
+        ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --config /var/lib/cloudflared/config.yml run";
         Restart = "on-failure";
         RestartSec = "10";
         # Directory management
