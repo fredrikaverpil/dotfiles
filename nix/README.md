@@ -7,34 +7,43 @@ platform-specific tools.
 ## Architecture Overview
 
 The configuration follows a modular approach with clear separation between
-shared and host-specific settings, using a consistent structure across all platforms:
+shared and host-specific settings, using a consistent structure across all platforms.
+
+The system is built around helper functions in `lib/helpers.nix`:
+- **`mkDarwin`**: Creates macOS configurations using nix-darwin and home-manager-unstable
+- **`mkRpiNixos`**: Creates Raspberry Pi NixOS configurations using nixos-raspberrypi
+- **Multi-user system**: Centralized user management via `shared/users/default.nix`
 
 ```txt
 nix/
 ├── hosts/           # Host-specific configurations
 │   ├── zap/         # Apple Silicon, macOS
 │   │   ├── configuration.nix    # System-level settings
-│   │   └── home.nix             # User-level home-manager config (optional)
+│   │   └── users/
+│   │       └── fredrik.nix     # User-specific home-manager config
 │   ├── plumbus/     # Apple Silicon, macOS
 │   │   ├── configuration.nix    # System-level settings
-│   │   └── home.nix             # User-level home-manager config (optional)
+│   │   └── users/
+│   │       └── fredrik.nix     # User-specific home-manager config
 │   └── rpi5-homelab/ # Raspberry Pi 5, NixOS
 │       ├── configuration.nix    # System-level settings
 │       ├── hardware.nix         # Hardware-specific config
-│       └── home.nix             # User-level home-manager config
+│       └── users/
+│           └── fredrik.nix     # User-specific home-manager config
 ├── lib/             # Helper functions for building configurations
 │   ├── default.nix    # Entrypoint for the library
-│   └── helpers.nix    # Helper functions (e.g., mkDarwin)
+│   └── helpers.nix    # Helper functions (e.g., mkDarwin, mkRpiNixos)
 ├── shared/          # Shared configurations
-│   ├── shell/       # Shell-specific configs (aliases, exports)
+│   ├── users/
+│   │   └── default.nix        # Multi-user configuration system
 │   ├── system/
 │   │   ├── common.nix         # Cross-platform system packages & config
 │   │   ├── darwin.nix         # macOS system configuration (including Homebrew)
-│   │   └── linux.nix          # Linux system configuration (future)
-│   ├── home/
-│   │   ├── common.nix         # Cross-platform home-manager config
-│   │   ├── darwin.nix         # macOS-specific home-manager config
-│   │   └── linux.nix          # Linux-specific home-manager config
+│   │   └── linux.nix          # Linux system configuration
+│   └── home/
+│       ├── common.nix         # Cross-platform home-manager config
+│       ├── darwin.nix         # macOS-specific home-manager config
+│       └── linux.nix          # Linux-specific home-manager config
 ```
 
 ### Consistent Host Architecture
@@ -42,14 +51,25 @@ nix/
 All hosts follow the same architectural pattern for maintainability:
 
 - **`configuration.nix`**: System-level settings (services, system packages, platform-specific configurations)
-- **`home.nix`**: User-level settings (user packages, dotfiles, personal configurations)
+- **`users/fredrik.nix`**: User-specific home-manager configuration (user packages, dotfiles, personal settings)
 - **Platform-specific files**: Additional files as needed (e.g., `hardware.nix` for NixOS)
 
 This consistent structure provides:
 - **Clear separation of concerns** between system and user configuration
+- **Multi-user support** via the shared user configuration system
 - **Easy maintenance** across different platforms
 - **Predictable organization** when adding new hosts
 - **Modular configuration** that imports shared components
+
+### Multi-User Configuration System
+
+The configuration uses a centralized user management system (`shared/users/default.nix`) that:
+
+- **Defines user options**: Admin privileges, shell preferences, SSH keys, and groups
+- **Cross-platform compatibility**: Handles both Darwin and Linux user creation
+- **Home-manager integration**: Automatically configures home-manager for each user
+- **Flexible user configs**: Each user can have their own `users/username.nix` file
+- **Consistent user experience**: Shared settings with host-specific customizations
 
 ### Configuration Flow
 
@@ -60,20 +80,89 @@ Each host's configuration follows this import hierarchy:
 flake.nix
 └── lib.mkDarwin
     ├── inputs.home-manager-unstable.darwinModules.home-manager
-    ├── ../../shared/system/darwin.nix     # macOS system settings
-    ├── ../../shared/system/common.nix   # Common packages
-    ├── ./configuration.nix                # Host-specific system config
-    └── ./home.nix (optional)              # Host-specific user config
+    ├── ../shared/users/default.nix       # Multi-user configuration system
+    ├── ../shared/system/darwin.nix       # macOS system settings (Homebrew, etc.)
+    ├── ../shared/system/common.nix       # Cross-platform system packages
+    └── ./configuration.nix               # Host-specific system config
+        └── dotfiles.users.fredrik.homeConfig = ./users/fredrik.nix
+            └── ../../shared/home/darwin.nix  # Shared Darwin user config
+                └── ./common.nix              # Cross-platform user config
 ```
 
 **Linux hosts (rpi5-homelab):**
 ```
-configuration.nix
-├── ./hardware.nix                     # Hardware-specific settings
-├── ./home.nix                         # Host-specific user config
-│   └── ../../shared/home/linux.nix   # Shared Linux user config
-└── home-manager.nixosModules.home-manager
+flake.nix
+└── lib.mkRpiNixos
+    ├── inputs.home-manager.nixosModules.home-manager
+    ├── ../shared/users/default.nix       # Multi-user configuration system
+    ├── ../shared/system/common.nix       # Cross-platform system packages
+    ├── ../shared/system/linux.nix        # Linux system configuration
+    └── ./configuration.nix               # Host-specific system config
+        ├── ./hardware.nix                # Hardware-specific settings
+        └── dotfiles.users.fredrik.homeConfig = ./users/fredrik.nix
+            └── ../../shared/home/linux.nix   # Shared Linux user config
+                └── ./common.nix              # Cross-platform user config
 ```
+
+## User Configuration System
+
+The configuration uses a sophisticated multi-user system defined in `shared/users/default.nix` that provides consistent user management across all platforms.
+
+### User Definition
+
+Each host defines users in its `configuration.nix` using the `dotfiles.users` option:
+
+```nix
+dotfiles.users = {
+  fredrik = {
+    isAdmin = true;           # Administrative privileges
+    isPrimary = true;         # Primary user (Darwin system defaults)
+    shell = "zsh";           # Default shell
+    homeConfig = ./users/fredrik.nix;  # Path to user's home-manager config
+    groups = [ "docker" ];   # Additional system groups
+    sshKeys = [              # SSH public keys (Linux only)
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIElRYEYxPt8po0TToz1U5bNZYJgnho7xIgApCh9DTfyn"
+    ];
+  };
+};
+```
+
+### Platform-Specific User Handling
+
+**Darwin (macOS):**
+- Creates system users with specified shell
+- Sets primary user for system defaults and Homebrew
+- Integrates with home-manager for user packages and dotfiles
+
+**Linux (NixOS):**
+- Creates normal users with wheel group for admin users
+- Sets initial password to "changeme" (must be changed on first login)
+- Configures SSH authorized keys for secure access
+- Adds users to specified groups (docker, networkmanager, etc.)
+
+### Home-Manager Integration
+
+Each user's `homeConfig` file (e.g., `users/fredrik.nix`) imports platform-specific shared configurations:
+
+```nix
+# users/fredrik.nix
+{
+  imports = [
+    ../../../shared/home/darwin.nix  # or linux.nix
+  ];
+  
+  # User-specific packages and configurations
+  home.packages = with pkgs; [
+    podman
+  ];
+}
+```
+
+This system enables:
+- **Consistent user experience** across all hosts
+- **Platform-specific optimizations** while maintaining shared configs
+- **Easy user addition** by defining new users in host configurations
+- **Secure defaults** with proper SSH key management and group assignments
 
 ## Host-Specific documentation
 
