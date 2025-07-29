@@ -2,12 +2,9 @@
 
 ![screenshot](https://github.com/user-attachments/assets/ef833ca0-3d39-4a7c-94af-0f76afb96e6b)
 
-These are my personal dotfiles. The setup is based on [nix](https://nixos.org)
-(for reproducibility), [GNU Stow](https://www.gnu.org/software/stow/) (for
-symlinking of dotfiles) and aims to be as idempotent as possible.
-
-Nix configuration for hardware, system, and user packages. GNU Stow handles
-dotfiles.
+Personal dotfiles using [Nix](https://nixos.org) for reproducible system/package
+management and [GNU Stow](https://www.gnu.org/software/stow/) for dotfile
+symlinking.
 
 <details>
 <summary>Repo structure</summary>
