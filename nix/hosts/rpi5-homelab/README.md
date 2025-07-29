@@ -1,11 +1,11 @@
-# nix-config
-
-## rpi5-homelab
+# rpi5-homelab
 
 The setup has taken inspiration from:
 
 - [Raspberry Pi 5 on NixOS wiki](https://wiki.nixos.org/wiki/NixOS_on_ARM/Raspberry_Pi_5)
 - [nvmd/nixos-raspberrypi](https://github.com/nvmd/nixos-raspberrypi)
+
+## Preparations
 
 ### Prepare bootloader on Raspberry Pi 5
 
@@ -53,7 +53,7 @@ extra-trusted-public-keys = nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQK
 
 Restart `nix-daemon` or reboot.
 
-### Deploy with nixos-anywhere
+## Deploy with nixos-anywhere
 
 From another develpment machine (e.g. macOS), `cd` into this repo. We will now
 deploy the `flake.nix` using `nixos-anywhere`. This is a one-time step for the
@@ -110,7 +110,6 @@ ssh fredrik@<ip-to-rpi5-homelab>
 
 Change the password using `passwd`:
 
-
 If you did not set the Wi-Fi password, log into the homelab locally and...
 
 ```sh
@@ -124,6 +123,29 @@ quit # exit iwctl
 ip a # verify connection and get IP
 systemctl is-enabled sshd  # check if sshd is enabled
 systemctl is-active sshd  # check if sshd is running
+```
+
+## Post-install setup
+
+### Second NVMe SSD for media storage
+
+```sh
+# Check so drive is visible
+lsblk
+
+sudo parted /dev/nvme1n1 mklabel gpt
+sudo parted /dev/nvme1n1 mkpart primary ext4 0% 100%
+sudo mkfs.ext4 -L "homelab-data" /dev/nvme1n1p1
+
+# Check outcome
+lsblk -f
+```
+
+After mounting (via `nixos-rebuild switch`:
+
+```sh
+# We will assume containers will run as `$(id fredrik)`
+sudo chown -R fredrik:users /mnt/homelab-data
 ```
 
 ### Configure Cloudflare Tunnel
@@ -144,9 +166,9 @@ address.
    - Copy the tunnel token (starts with `eyJ...`)
 
 3. **Add Public Hostname**:
-   - Subdomain: `immich`
+   - Subdomain: `my-service`
    - Domain: `yourdomain.com`
-   - Service: `HTTP://localhost:2283`
+   - Service: `HTTP://localhost:1234`
    - Save tunnel
 
 #### Configure Pi
@@ -175,6 +197,7 @@ address.
    ```
 
 4. **Set permissions**:
+
    ```sh
    sudo chmod 640 /etc/cloudflared/tunnel.json
    sudo chmod 644 /etc/cloudflared/domain
@@ -200,7 +223,7 @@ sudo journalctl -u cloudflared -f
 
 #### Access Your Services
 
-- **Immich**: `https://homelab.yourdomain.com`
+- Go to `https://my-service.yourdomain.com`
 - Automatic HTTPS with Cloudflare certificate
 - Works from anywhere on the internet
 - No VPN required for users
@@ -220,21 +243,3 @@ sudo journalctl -u cloudflared -f
 - **No Port Forwarding**: Router stays secure
 - **Automatic HTTPS**: SSL certificates managed by Cloudflare
 - **Access Control**: Optional authentication via Cloudflare Access
-
-### Second NVMe SSD for media storage
-
-```sh
-sudo parted /dev/nvme1n1 mklabel gpt
-sudo parted /dev/nvme1n1 mkpart primary ext4 0% 100%
-sudo mkfs.ext4 -L "homelab-data" /dev/nvme1n1p1
-
-# Check outcome
-lsblk -f
-```
-
-After mounting (via `nixos-rebuild switch`:
-
-```sh
-# We will assume containers will run as `$(id fredrik)`
-sudo chown -R fredrik:users /mnt/homelab-data
-```
