@@ -87,9 +87,10 @@ use_nix() {
 use_stow() {
 	echo ""
 	echo "🔗 Using Stow-only mode (dotfiles only, no system changes)..."
+	echo "⚠️  Note: Consider using Nix instead - it handles stowing automatically"
 
 	cd stow
-	./symlink.sh
+	./install.sh
 }
 
 # Main logic

@@ -11,8 +11,24 @@
 
 ```bash
 git clone --recursive https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
-cd .dotfiles && stow/symlink.sh
+cd .dotfiles && ./rebuild.sh --stow
 ```
+
+<details>
+  <summary>🔧 Advanced: Direct stow usage</summary>
+
+For direct control over stow operations:
+
+```bash
+# Use the install script (recommended)
+cd ~/.dotfiles/stow && ./install.sh
+
+# Manual stow commands
+cd ~/.dotfiles/stow
+stow --target="$HOME" --restow shared "$(uname -s)"  # Dynamic platform detection
+```
+
+</details>
 
 > [!NOTE]
 >

@@ -22,18 +22,17 @@
         DOTFILES_PATH="${inputs.dotfiles}"
       fi
       
-      # Run stow installer from determined path
-      if [ -f "$DOTFILES_PATH/stow/symlink.sh" ] && [ -x "$DOTFILES_PATH/stow/symlink.sh" ]; then
+      # Run stow installer script from determined path
+      if [ -f "$DOTFILES_PATH/stow/install.sh" ] && [ -x "$DOTFILES_PATH/stow/install.sh" ]; then
         echo "Running stow installer from $DOTFILES_PATH..."
-        cd "$DOTFILES_PATH/stow"
         export PATH="${pkgs.stow}/bin:${pkgs.bash}/bin:$PATH"
-        if ! $DRY_RUN_CMD ./symlink.sh; then
+        if ! $DRY_RUN_CMD "$DOTFILES_PATH/stow/install.sh"; then
           echo "Warning: Stow installation failed"
           exit 1
         fi
-        echo "Stow installation completed"
       else
-        echo "Warning: symlink.sh not found or not executable in $DOTFILES_PATH"
+        echo "Warning: install.sh not found or not executable in $DOTFILES_PATH/stow"
+        exit 1
       fi
     '';
 

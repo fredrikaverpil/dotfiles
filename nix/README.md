@@ -100,7 +100,7 @@ While Nix can manage dotfiles declaratively, this setup uses
 
 **How it works:**
 
-- Nix automatically runs `./symlink.sh` (stow) during home-manager activation
+- Nix automatically runs stow commands during home-manager activation
 - Stow creates symlinks from `~/.dotfiles/stow/` to `~/` (e.g.,
   `stow/shared/.gitconfig` → `~/.gitconfig`)
 - Edit dotfiles directly in the repo - changes are immediately active
@@ -115,7 +115,7 @@ While Nix can manage dotfiles declaratively, this setup uses
 | **Daily rebuilds**  | `./rebuild.sh`                              | Nix + Stow (system + packages + dotfiles) | After changing Nix configurations, adding packages, or system settings |
 | **Package updates** | `./rebuild.sh --update`                     | Update flake inputs + Nix + Stow | Monthly maintenance, updating to latest package versions               |
 | **Stow-only mode** | `./rebuild.sh --stow`                       | Stow only (dotfiles only) | Testing, minimal setups, or Nix-free environments                  |
-| **Direct Stow**     | `stow/symlink.sh`                           | Stow only (dotfiles only) | Legacy systems, minimal setups, or when only dotfiles are needed       |
+| **Manual Stow**     | `cd stow && stow --target="$HOME" --restow shared "$(uname -s)"` | Stow only (manual) | Advanced users, debugging, or custom stow operations              |
 | **Manual control**  | `darwin-rebuild switch --flake ~/.dotfiles` | Nix + Stow (manual) | Debugging, advanced options, or CI/CD pipelines                        |
 
 ### Typical Workflows
@@ -136,6 +136,24 @@ While Nix can manage dotfiles declaratively, this setup uses
 **Emergency/testing:**
 
 - Use `./rebuild.sh --stow` → Only updates dotfiles (bypasses Nix entirely)
+
+### Manual Stow Operations
+
+For advanced users or debugging, you can also use stow directly:
+
+```bash
+# Use the install script (recommended)
+cd ~/.dotfiles/stow && ./install.sh
+
+# Manual stow commands
+cd ~/.dotfiles/stow
+stow --target="$HOME" --restow shared "$(uname -s)"  # Dynamic platform detection
+```
+
+**Directory structure:**
+- `shared/` - Cross-platform dotfiles
+- `Darwin/` - macOS-specific dotfiles (matches `uname -s`)
+- `Linux/` - Linux-specific dotfiles (matches `uname -s`)
 
 ## Package Management Strategy
 

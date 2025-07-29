@@ -1,0 +1,83 @@
+{
+  "nativeMCPServers": [
+    
+  ],
+  "mcpServers": {
+    "google-maps": {
+      "command": "docker",
+      "env": {
+        "GOOGLE_MAPS_API_KEY": "AIzaSyA2t2RGGHwe3miXvlwvMh645yaijDxbfjg"
+      },
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "GOOGLE_MAPS_API_KEY",
+        "mcp/google-maps"
+      ],
+      "disabled": false
+    },
+    "filesystem": {
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/fredrik/code/public"
+      ],
+      "command": "npx"
+    },
+    "github.com/modelcontextprotocol/servers/tree/main/src/git": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-git"
+      ],
+      "disabled": false
+    },
+    "fetch": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-fetch"
+      ],
+      "disabled": false
+    },
+    "github.com/tavily-ai/tavily-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "tavily-mcp@0.1.4"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        
+      ],
+      "env": {
+        "TAVILY_API_KEY": null
+      }
+    },
+    "github.com/fredrikaverpil/mcp-tools": {
+      "command": "go",
+      "args": [
+        "-C",
+        "/Users/fredrik/code/public/mcp-tools",
+        "run",
+        "./cmd/mcp-tools/main.go"
+      ],
+      "disabled": false
+    },
+    "github": {
+      "command": "docker",
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": null
+      },
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "ghcr.io/github/github-mcp-server"
+      ],
+      "disabled": true
+    }
+  }
+}

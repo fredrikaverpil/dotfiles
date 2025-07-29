@@ -1,9 +1,9 @@
 # Agent Guidelines for Fredrik's Dotfiles
 
 ## Build/Test/Lint Commands
-- **Install dotfiles**: `./symlink.sh` (uses GNU Stow)
-- **Force install**: `./symlink.sh --force` (overwrites existing symlinks)
-- **Test installation**: `HOME=~/test-dir ./symlink.sh` (test in isolated directory)
+- **Install dotfiles**: `./rebuild.sh` (uses Nix + GNU Stow automatically)
+- **Stow-only mode**: `./rebuild.sh --stow` (bypasses Nix, dotfiles only)
+- **Force update**: `./rebuild.sh --update` (updates flake inputs)
 - **CI testing**: Follow `.github/workflows/test.yml` workflow
 - **Nix operations**: `nix flake check`, `nix build .#darwinConfigurations.<host>.system`
 
@@ -27,8 +27,8 @@
 ## Repository Structure
 - `stow/`: Stow packages for dotfile symlinking
   - `shared/`: Cross-platform dotfiles
-  - `macos/`: macOS-specific dotfiles
-  - `linux/`: Linux-specific dotfiles (including WSL)
+  - `Darwin/`: macOS-specific dotfiles
+  - `Linux/`: Linux-specific dotfiles (including WSL)
 - `shell/`: Shell config, aliases, bin scripts
 - `nix/`: Nix/NixOS configurations per host  
 - `nvim-fredrik/`: Neovim configuration
