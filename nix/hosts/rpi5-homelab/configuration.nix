@@ -73,8 +73,8 @@ in
     allowedUDPPorts = [
     ];
     
-    # Allow Tailscale traffic
-    trustedInterfaces = [ "tailscale0" ];
+    # Allow Tailscale traffic (+ matches any interface starting with "tailscale")
+    trustedInterfaces = [ "tailscale+" ];
   };
 
 
