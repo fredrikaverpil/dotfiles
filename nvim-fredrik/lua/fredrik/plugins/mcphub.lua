@@ -21,24 +21,9 @@ return {
         end,
       },
     },
-    -- cmd = "MCPHub", -- lazily start the hub when `MCPHub` is called
     build = "npm install -g mcp-hub@latest", -- Installs required mcp-hub npm module
     config = function()
       require("mcphub").setup({
-        -- Required options
-        port = 3000, -- Port for MCP Hub server
-
-        -- config at ~/.config/mcphub/servers.json",
-        config = vim.fn.expand("~/.config/mcphub/servers.json"),
-        -- Optional options
-        on_ready = function(hub)
-          -- Called when hub is ready
-          -- vim.notify(vim.inspect("MCP Hub is ready!"), vim.log.levels.INFO, { title = "MCP Hub" })
-        end,
-        on_error = function(err)
-          -- Called on errors
-          -- vim.notify(vim.inspect(err), vim.log.levels.ERROR, { title = "MCP Hub" })
-        end,
         log = {
           level = vim.log.levels.WARN,
           to_file = false,
