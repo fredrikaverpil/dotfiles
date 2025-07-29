@@ -54,16 +54,64 @@ dotfiles.
 
 ## Quick Start
 
-```bash
-# Daily rebuild
+<details>
+<summary>Initial installation</summary
+
+```sh
+# Clone repo
+git clone https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+
+# Install Nix (Determinate Systems installer - enables flakes by default, better uninstall,
+# survives macOS updates, consistent installation across Linux/macOS)
+# Choose "Determinate Nix" when prompted
+# Learn more: https://determinate.systems/nix
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+
+# Apply configuration
+# Linux (NixOS):
+sudo nixos-rebuild switch --flake ~/.dotfiles#$(hostname)
+
+# macOS (first time only):
+sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- switch --flake ~/.dotfiles#$(hostname)
+
+# After first-time setup, use the rebuild script:
+./rebuild.sh
+```
+
+</details>
+
+```sh
+# Rebuild system + packages + dotfiles
 ./rebuild.sh
 
-# Update packages
+# Update flake inputs (nixpkgs, home-manager, etc.) then rebuild + dotfiles
 ./rebuild.sh --update
 
 # Dotfiles only (no Nix rebuild)
 ./rebuild.sh --stow
 ```
+
+<details>
+<summary>Troubleshooting</summary>
+
+```bash
+# Check configuration
+nix flake check ~/.dotfiles
+
+# Verbose rebuild
+sudo nixos-rebuild switch --flake ~/.dotfiles --show-trace  # Linux
+darwin-rebuild switch --flake ~/.dotfiles --show-trace      # macOS
+
+# Clean cache
+nix-collect-garbage -d
+
+# Rollback
+sudo nixos-rebuild --rollback  # Linux
+darwin-rebuild --rollback      # macOS
+```
+
+</details>
 
 ## Package Management
 
@@ -88,61 +136,12 @@ cd ~/.dotfiles/stow
 stow --target="$HOME" --restow shared "$(uname -s)"
 ```
 
-## Setup
-
-### Initial Installation
-
-```bash
-# Clone repo
-git clone https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
-cd ~/.dotfiles
-
-# Install Nix
-curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
-
-# Apply configuration
-# Linux:
-sudo nixos-rebuild switch --flake ~/.dotfiles#$(hostname)
-# macOS (first time only):
-sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- switch --flake ~/.dotfiles#$(hostname)
-```
-
-### Daily Use
-
-```bash
-# Rebuild system + packages + dotfiles
-./rebuild.sh
-
-# Platform-specific commands
-# Linux:
-sudo nixos-rebuild switch --flake ~/.dotfiles
-# macOS:
-darwin-rebuild switch --flake ~/.dotfiles
-```
-
-## Troubleshooting
-
-```bash
-# Check configuration
-nix flake check ~/.dotfiles
-
-# Verbose rebuild
-sudo nixos-rebuild switch --flake ~/.dotfiles --show-trace  # Linux
-darwin-rebuild switch --flake ~/.dotfiles --show-trace      # macOS
-
-# Clean cache
-nix-collect-garbage -d
-
-# Rollback
-sudo nixos-rebuild --rollback  # Linux
-darwin-rebuild --rollback      # macOS
-```
-
 ## Other READMEs and references
 
 ### Host-Specific Documentation
 
-- [rpi5-homelab](nix/README_RPI5-HOMELAB.md)
+- [rpi5-homelab](nix/README_RPI5-HOMELAB.md) - requires custom installation
+  procedure
 
 ### Non-Nix legacy docs
 
