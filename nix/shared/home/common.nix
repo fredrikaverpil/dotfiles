@@ -59,6 +59,7 @@
       vim
       wget
       yq
+      unzip
       zsh-autosuggestions
       zsh-syntax-highlighting
       zoxide
