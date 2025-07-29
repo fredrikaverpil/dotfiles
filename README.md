@@ -137,8 +137,8 @@ stow --target="$HOME" --restow shared "$(uname -s)"
 
 ### Host-Specific Documentation
 
-- [rpi5-homelab](nix/README_RPI5-HOMELAB.md) - requires custom installation
-  procedure
+- [rpi5-homelab](nix/hosts/rpi5-homelab/README.md) - requires custom
+  installation procedure
 
 ### Non-Nix legacy docs
 
