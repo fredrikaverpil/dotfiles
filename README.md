@@ -52,7 +52,7 @@ symlinking.
 ## Quick Start
 
 <details>
-<summary>Initial installation</summary
+<summary>Initial installation</summary>
 
 ```sh
 # Clone repo
@@ -92,7 +92,7 @@ sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- sw
 <details>
 <summary>Troubleshooting</summary>
 
-```bash
+```sh
 # Check configuration
 nix flake check ~/.dotfiles
 
