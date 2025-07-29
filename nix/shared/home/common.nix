@@ -85,7 +85,7 @@
        # Git & Version Control
        # ========================================================================
        gh
-       # avoid building webkitk GUI support for git-lfs on macOS
+       # avoid building webkitgtk GUI support for git-lfs on macOS
        (git-lfs.override { git = git.override { guiSupport = false; }; })
        lazygit
        lazydocker
