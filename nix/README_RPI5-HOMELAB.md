@@ -108,14 +108,8 @@ to SSH into the new system:
 ssh fredrik@<ip-to-rpi5-homelab>
 ```
 
-Change the password:
+Change the password using `passwd`:
 
-```sh
-# For login
-passwd
-# For samba
-sudo smbpasswd -a fredrik
-```
 
 If you did not set the Wi-Fi password, log into the homelab locally and...
 

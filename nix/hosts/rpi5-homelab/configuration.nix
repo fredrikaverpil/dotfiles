@@ -60,9 +60,7 @@ in
       2283  # Immich - Photo management web interface
       8096  # Jellyfin - Media server web interface
       
-      # SMB/CIFS file sharing ports
-      139   # SMB NetBIOS Session Service
-      445   # SMB Direct over TCP
+
       
       # Optional: Uncomment if you need direct internet access to web services
       # 80    # HTTP - Web services
@@ -70,9 +68,6 @@ in
     ];
     
     allowedUDPPorts = [
-      # SMB/CIFS NetBIOS ports
-      137   # NetBIOS Name Service
-      138   # NetBIOS Datagram Service
     ];
     
     # Allow Tailscale traffic
@@ -172,34 +167,7 @@ in
       };
     };
 
-    # Samba file sharing service
-    # Provides SMB/CIFS file sharing for /mnt/homelab-data
-    # Accessible from macOS via smb://rpi5-homelab.local/homelab-data
-    samba = {
-      enable = true;
-      settings = {
-        global = {
-          workgroup = "WORKGROUP";
-          "server string" = "rpi5-homelab";
-          "netbios name" = "rpi5-homelab";
-          security = "user";
-          "hosts allow" = "192.168.0. 127.0.0.1 localhost";
-          "hosts deny" = "0.0.0.0/0";
-          "guest account" = "nobody";
-          "map to guest" = "bad user";
-        };
-        homelab-data = {
-          path = "/mnt/homelab-data";
-          browseable = "yes";
-          "read only" = "no";
-          "guest ok" = "no";
-          "create mask" = "0664";
-          "directory mask" = "0775";
-          "force user" = "fredrik";
-          "force group" = "users";
-        };
-      };
-    };
+
 
 
   };
