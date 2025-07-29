@@ -10,47 +10,45 @@ Nix configuration for hardware, system, and user packages. GNU Stow handles
 dotfiles.
 
 <details>
-<summary>## Structure</summary>
+<summary>Repo structure</summary>
 
 ```txt
-nix/
-├── hosts/           # Host-specific configurations
-│   └── $host/       # Individual host directory
-│       ├── configuration.nix    # System settings
-│       ├── hardware.nix         # Hardware config (optional, for NixOS)
-│       └── users/
-│           └── $username.nix    # User config
-├── lib/             # Helper functions
-│   ├── default.nix    # Library entry point
-│   └── helpers.nix    # mkDarwin, mkRpiNixos functions
-└── shared/          # Shared configurations
-    ├── users/
-    │   └── default.nix        # Multi-user system
-    ├── system/
-    │   ├── common.nix         # Cross-platform system packages
-    │   ├── darwin.nix         # macOS system config + Homebrew
-    │   └── linux.nix          # Linux system config
-    └── home/
-        ├── common.nix         # Cross-platform user packages
-        ├── darwin.nix         # macOS user config
-        └── linux.nix          # Linux user config
+├── nix/             # Nix configurations
+│   ├── hosts/       # Host-specific configurations
+│   │   └── $host/   # Individual host directory
+│   │       ├── configuration.nix    # System settings
+│   │       ├── hardware.nix         # Hardware config (optional, for NixOS)
+│   │       └── users/
+│   │           └── $username.nix    # User config
+│   ├── lib/         # Helper functions
+│   │   ├── default.nix    # Library entry point
+│   │   └── helpers.nix    # mkDarwin, mkRpiNixos functions
+│   └── shared/      # Shared configurations
+│       ├── users/
+│       │   └── default.nix        # Multi-user system
+│       ├── system/
+│       │   ├── common.nix         # Cross-platform system packages
+│       │   ├── darwin.nix         # macOS system config + Homebrew
+│       │   └── linux.nix          # Linux system config
+│       └── home/
+│           ├── common.nix         # Cross-platform user packages
+│           ├── darwin.nix         # macOS user config
+│           └── linux.nix          # Linux user config
+├── nvim-fredrik/    # Neovim configuration
+│   ├── after/       # Filetype plugins and queries
+│   ├── lua/fredrik/ # Main Neovim config modules
+│   └── snippets/    # Code snippets
+├── shell/           # Shell configuration
+│   ├── bin/         # Custom shell scripts
+│   ├── aliases.sh   # Shell aliases
+│   ├── exports.sh   # Environment variables
+│   └── sourcing.sh  # Shell sourcing logic
+├── stow/            # GNU Stow dotfiles
+│   ├── shared/      # Cross-platform dotfiles
+│   ├── Darwin/      # macOS-specific dotfiles
+│   └── Linux/       # Linux-specific dotfiles
+└── extras/          # One-off platform-specific extras and legacy configs
 ```
-
-</details>
-
-<details>
-<summary>## How It Works</summary>
-
-The system uses helper functions in `lib/helpers.nix`:
-
-- `mkDarwin`: Creates macOS configurations with nix-darwin + home-manager
-- `mkRpiNixos`: Creates Raspberry Pi NixOS configurations
-
-Each host imports shared modules:
-
-- `shared/users/default.nix` - Multi-user configuration system
-- `shared/system/` - Platform-specific system settings
-- `shared/home/` - Platform-specific user settings
 
 </details>
 
