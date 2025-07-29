@@ -257,6 +257,7 @@ in
         ExecStartPre = [
           "${pkgs.coreutils}/bin/mkdir -p /var/lib/immich/library"
           "${pkgs.coreutils}/bin/mkdir -p /var/lib/immich/postgres"
+          "${pkgs.coreutils}/bin/chown -R ${toString config.users.users.fredrik.uid}:${toString config.users.groups.users.gid} /var/lib/immich"
         ];
         ExecStart = "${pkgs.docker-compose}/bin/docker-compose up -d";
         ExecStop = "${pkgs.docker-compose}/bin/docker-compose down";
@@ -278,7 +279,7 @@ in
           "${pkgs.coreutils}/bin/mkdir -p /var/lib/jellyfin/config"
           "${pkgs.coreutils}/bin/mkdir -p /var/lib/jellyfin/cache"
           "${pkgs.coreutils}/bin/mkdir -p /var/lib/jellyfin/media"
-          "${pkgs.coreutils}/bin/chown -R 1000:1000 /var/lib/jellyfin"
+          "${pkgs.coreutils}/bin/chown -R ${toString config.users.users.fredrik.uid}:${toString config.users.groups.users.gid} /var/lib/jellyfin"
         ];
         ExecStart = "${pkgs.docker-compose}/bin/docker-compose up -d";
         ExecStop = "${pkgs.docker-compose}/bin/docker-compose down";
