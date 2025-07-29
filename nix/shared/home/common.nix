@@ -49,6 +49,7 @@
       eza
       fzf
       git
+      git-lfs
       htop
       jq
       ncurses
