@@ -19,7 +19,8 @@ Use [`brew`](https://brew.sh/) to define any global tooling.
 ### pkgx
 
 Use [`pkgx`](https://docs.pkgx.sh) to define project tooling (see `dev`
-command).
+command), at least on macOS. This feels faster/simpler sometimes than resorting
+to `flake.nix` (see below).
 
 In each project, add a `pkgx.yml` file to define project tooling, unless it is
 not picked up from lockfiles etc.
