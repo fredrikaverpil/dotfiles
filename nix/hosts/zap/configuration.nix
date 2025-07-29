@@ -6,6 +6,9 @@ let
   };
 in
 {
+  # Darwin state version 6 - defines system configuration schema/compatibility
+  # See flake.nix for actual package channel selection (stable vs unstable)
+  # Reference: https://github.com/LnL7/nix-darwin/blob/master/modules/system/default.nix
   system.stateVersion = stateVersions.darwin;
 
   networking.hostName = "zap";

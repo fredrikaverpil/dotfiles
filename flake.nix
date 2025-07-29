@@ -11,11 +11,22 @@
   };
 
   inputs = {
-    # Stable nixpkgs for Linux/NixOS
+    # Mixed stability approach:
+    # - Linux/NixOS: Uses stable (nixos-25.05 + home-manager/release-25.05)
+    # - Darwin/macOS: Uses unstable (nixpkgs-unstable + home-manager-unstable + nix-darwin)
+    # 
+    # Rationale: Darwin ecosystem moves faster, benefits from latest packages
+    # Linux systems (especially Pi) prioritize stability
+    #
+    # Version alignment references:
+    # - home-manager releases: https://github.com/nix-community/home-manager/releases
+    # - Darwin state versions: https://github.com/LnL7/nix-darwin/blob/master/modules/system/default.nix
+    
+    # Stable nixpkgs for Linux/NixOS systems
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
-    # Unstable nixpkgs for macOS/Darwin
+    # Unstable nixpkgs for macOS/Darwin systems  
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    # Unstable nixos for Linux/NixOS
+    # Unstable nixos (currently unused - available for future Linux systems)
     nixos-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     
     nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";

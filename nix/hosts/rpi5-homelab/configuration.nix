@@ -8,6 +8,9 @@ in
 {
   imports = [ ];
 
+  # NixOS state version "25.05" - defines system configuration schema/compatibility
+  # See flake.nix for actual package channel selection (stable vs unstable)
+  # Reference: https://github.com/NixOS/nixpkgs/releases
   system.stateVersion = stateVersions.nixos;
 
   # Main configuration file for rpi5-homelab Raspberry Pi 5 system
