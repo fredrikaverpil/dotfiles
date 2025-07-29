@@ -242,8 +242,8 @@ in
         ProtectHome = true;
         ReadOnlyPaths = [ "/etc/cloudflared" ];
       };
-      # Don't start automatically - user must configure tunnel first
-      wantedBy = [ ];
+      # Start automatically if tunnel token exists
+      wantedBy = [ "multi-user.target" ];
     };
 
     homelab-immich = {
