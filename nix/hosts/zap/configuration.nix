@@ -21,7 +21,6 @@ in
       isPrimary = true;
       shell = "zsh";
       homeConfig = ./users/fredrik.nix;
-      groups = [ "docker" ];
     };
   };
 
