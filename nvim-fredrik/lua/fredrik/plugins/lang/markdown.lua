@@ -56,7 +56,7 @@ return {
         markdownlint = {
           args = {
             "--config",
-            require("fredrik.utils.environ").getenv("DOTFILES") .. "/templates/.markdownlint.json",
+            require("fredrik.utils.environ").getenv("DOTFILES") .. "/extras/templates/.markdownlint.json",
             "--stdin",
           },
         },

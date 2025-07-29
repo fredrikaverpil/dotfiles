@@ -1,12 +1,5 @@
 ## macOS 🍎
 
-> [!NOTE]
->
-> **For machines managed with Nix (recommended)**, see
-> [nix/README.md](nix/README.md). The instructions below are maintained for
-> legacy/manual setups - refer to the Nix configuration for the canonical
-> package list.
-
 ### Install dotfiles
 
 ```bash
@@ -32,7 +25,7 @@ stow --target="$HOME" --restow shared "$(uname -s)"  # Dynamic platform detectio
 
 > [!NOTE]
 >
-> See [README_GIT.md](README_GIT.md) for details on setting up git.
+> See [README_GIT.md](../README_GIT.md) for details on setting up git.
 
 ### Install tooling
 
@@ -54,8 +47,13 @@ brew install pkgxdev/made/pkgx
   <summary>🎶 Expand for x86 support.</summary>
 
 When on an arm64 device, homebrew is installed in `/opt/homebrew/bin/brew`. You
-can install an x64 version in `/usr/local/bin/brew`. See
-[installers/homebrew.sh](installers/homebrew.sh) for more info.
+can install an x64 version in `/usr/local/bin/brew` using:
+
+```bash
+# Install x86 homebrew (if needed for compatibility)
+softwareupdate --install-rosetta
+arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
 
 </details>
 
@@ -68,15 +66,15 @@ can install an x64 version in `/usr/local/bin/brew`. See
 # - Host-specific: nix/hosts/*/darwin-configuration.nix
 # - Mac App Store apps: nix/shared/darwin/homebrew.nix (masApps section)
 
-brew bundle --file=_macos/Brewfile
-brew bundle --file=_macos/Brewfile_mas  # requires being logged into the App Store
+brew bundle --file=extras/templates/Brewfile
+brew bundle --file=extras/templates/Brewfile_mas  # requires being logged into the App Store
 ```
 
 Execute desired installers:
 
 ```bash
-installers/neovim-distros.sh
-installers/neovim.sh --nightly
+extras/installers/neovim-distros.sh
+extras/installers/neovim.sh --nightly
 
 # run LazyVim
 NVIM_APPNAME=fredrik nvim

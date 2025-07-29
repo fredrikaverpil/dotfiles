@@ -35,7 +35,7 @@ local function golangci_config()
     local arg = "--config=" .. golangci_config_filepath_cache
     return arg
   else
-    local filepath = require("fredrik.utils.environ").getenv("DOTFILES") .. "/templates/.golangci.yml"
+    local filepath = require("fredrik.utils.environ").getenv("DOTFILES") .. "/extras/templates/.golangci.yml"
     golangci_config_filepath_cache = filepath
     local arg = "--config=" .. golangci_config_filepath_cache
     return arg

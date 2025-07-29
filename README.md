@@ -6,56 +6,150 @@ These are my personal dotfiles. The setup is based on [nix](https://nixos.org)
 (for reproducibility), [GNU Stow](https://www.gnu.org/software/stow/) (for
 symlinking of dotfiles) and aims to be as idempotent as possible.
 
-## Quick Start 🚀
+Nix configuration for hardware, system, and user packages. GNU Stow handles
+dotfiles.
 
-### Prerequisites
+<details>
+<summary>## Structure</summary>
 
-- **macOS/Linux**: Xcode Command Line Tools (macOS) or build essentials (Linux)
-- **Administrator privileges** for initial setup
-
-### Installation
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
-cd ~/.dotfiles
-
-# 2. Install Nix (recommended)
-curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
-
-# 3. Initial setup
-# - Linux/NixOS:
-sudo nixos-rebuild switch --flake ~/.dotfiles#$(hostname)
-# - macOS (requires sudo for first-time system activation):
-sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- switch --flake ~/.dotfiles#$(hostname)
-
+```txt
+nix/
+├── hosts/           # Host-specific configurations
+│   └── $host/       # Individual host directory
+│       ├── configuration.nix    # System settings
+│       ├── hardware.nix         # Hardware config (optional, for NixOS)
+│       └── users/
+│           └── $username.nix    # User config
+├── lib/             # Helper functions
+│   ├── default.nix    # Library entry point
+│   └── helpers.nix    # mkDarwin, mkRpiNixos functions
+└── shared/          # Shared configurations
+    ├── users/
+    │   └── default.nix        # Multi-user system
+    ├── system/
+    │   ├── common.nix         # Cross-platform system packages
+    │   ├── darwin.nix         # macOS system config + Homebrew
+    │   └── linux.nix          # Linux system config
+    └── home/
+        ├── common.nix         # Cross-platform user packages
+        ├── darwin.nix         # macOS user config
+        └── linux.nix          # Linux user config
 ```
 
-### Daily Usage
+</details>
+
+<details>
+<summary>## How It Works</summary>
+
+The system uses helper functions in `lib/helpers.nix`:
+
+- `mkDarwin`: Creates macOS configurations with nix-darwin + home-manager
+- `mkRpiNixos`: Creates Raspberry Pi NixOS configurations
+
+Each host imports shared modules:
+
+- `shared/users/default.nix` - Multi-user configuration system
+- `shared/system/` - Platform-specific system settings
+- `shared/home/` - Platform-specific user settings
+
+</details>
+
+## Quick Start
 
 ```bash
-# Rebuild configuration after changes
+# Daily rebuild
 ./rebuild.sh
 
-# Update packages and rebuild
+# Update packages
 ./rebuild.sh --update
 
-# Stow-only mode (dotfiles only, bypass Nix)
+# Dotfiles only (no Nix rebuild)
 ./rebuild.sh --stow
 ```
 
-## Systems
+## Package Management
 
-### Managed with Nix + Stow
+| Package Type       | macOS System | macOS User | Linux System | Linux User |
+| ------------------ | ------------ | ---------- | ------------ | ---------- |
+| CLI tools          | Nix          | Nix        | Nix          | Nix        |
+| GUI apps           | Homebrew     | Homebrew   | Nix          | Nix        |
+| Mac App Store apps | Homebrew     | Homebrew   | -            | -          |
+| Fonts              | Nix          | Nix        | Nix          | Nix        |
 
-- See the [nix/README.md](nix/README.md) docs.
+## Dotfiles with GNU Stow
 
-### Managed with Stow only
+Dotfiles are managed with GNU Stow, not Nix:
 
-- [macOS](README_MACOS.md)
-- [Windows 11 + WSL](README_WIN_WSL.md)
+- Edit files in `stow/` directory
+- Changes are immediately active (no rebuild needed)
+- Nix runs stow commands during home-manager activation
 
-## Other configs
+```bash
+# Manual stow (if needed)
+cd ~/.dotfiles/stow
+stow --target="$HOME" --restow shared "$(uname -s)"
+```
+
+## Setup
+
+### Initial Installation
+
+```bash
+# Clone repo
+git clone https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+
+# Install Nix
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+
+# Apply configuration
+# Linux:
+sudo nixos-rebuild switch --flake ~/.dotfiles#$(hostname)
+# macOS (first time only):
+sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- switch --flake ~/.dotfiles#$(hostname)
+```
+
+### Daily Use
+
+```bash
+# Rebuild system + packages + dotfiles
+./rebuild.sh
+
+# Platform-specific commands
+# Linux:
+sudo nixos-rebuild switch --flake ~/.dotfiles
+# macOS:
+darwin-rebuild switch --flake ~/.dotfiles
+```
+
+## Troubleshooting
+
+```bash
+# Check configuration
+nix flake check ~/.dotfiles
+
+# Verbose rebuild
+sudo nixos-rebuild switch --flake ~/.dotfiles --show-trace  # Linux
+darwin-rebuild switch --flake ~/.dotfiles --show-trace      # macOS
+
+# Clean cache
+nix-collect-garbage -d
+
+# Rollback
+sudo nixos-rebuild --rollback  # Linux
+darwin-rebuild --rollback      # macOS
+```
+
+## Other READMEs and references
+
+### Host-Specific Documentation
+
+- [rpi5-homelab](nix/README_RPI5-HOMELAB.md)
+
+### Non-Nix legacy docs
+
+- [macOS](extras/darwin/README.md)
+- [Windows 11 + WSL](extras/windows/README.md)
 
 ### Neovim ⌨️
 
@@ -63,11 +157,11 @@ sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- sw
 
 ### Git 🐙
 
-- [Configure git](README_GIT.md)
+- [Configure git](extras/README_GIT.md)
 
 ### Project config/tooling 🧢
 
-- [Configure projects](README_PROJECT.md)
+- [Configure projects](extras/README_PROJECT.md)
 
 ### Fonts 💯
 

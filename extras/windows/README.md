@@ -1,12 +1,5 @@
 ## Windows 11 + WSL
 
-> [!NOTE]
->
-> **For machines managed with Nix (recommended)**, see
-> [nix/README.md](nix/README.md). The instructions below are maintained for
-> legacy/manual setups - refer to the Nix configuration for the canonical
-> package list.
-
 ⚠️ These instructions are likely to become outdated, as my primary system is
 macOS.
 
@@ -104,7 +97,7 @@ stow --target="$HOME" --restow shared "$(uname -s)"  # Dynamic platform detectio
 
 </details>
 
-> [!NOTE] See [README_GIT.md](README_GIT.md) for details on setting up git.
+> [!NOTE] See [README_GIT.md](../README_GIT.md) for details on setting up git.
 
 ### Windows configuration
 
@@ -214,8 +207,8 @@ chsh
 
 ```bash
 # install homebrew
-cd ~/.dotfiles
-installers/homebrew.sh
+sudo apt-get install build-essential procps curl file git
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # Note: Brewfile is now empty - manually add desired packages from the Nix configuration:
 # - CLI tools: nix/shared/home-manager-base.nix
@@ -223,7 +216,7 @@ installers/homebrew.sh
 # - Host-specific: nix/hosts/*/darwin-configuration.nix
 
 # install all dependencies
-/home/linuxbrew/.linuxbrew/bin/brew bundle --file _linux/Brewfile
+/home/linuxbrew/.linuxbrew/bin/brew bundle --file extras/templates/Brewfile
 ```
 
 You can now restart wezterm and you should be taken into Ubuntu/zsh with prompt
@@ -237,7 +230,7 @@ rm -rf ~/.config/LazyVim
 
 
 cd ~/.dotfiles
-installers/neovim_distros.sh
+extras/installers/neovim_distros.sh
 
 # re-run dotfiles installer, to symlink LazyVim config
 ../rebuild.sh --stow
@@ -250,9 +243,19 @@ code .  # will automatically install vscode server
 
 #### Additional tools
 
-Pick selectively from the `installers` folder...
+#### Tmux setup
 
 ```bash
-installers/tmux.sh  # don't forget to start tmux and run <leader>-I to install plugins.
-installers/zsh.sh  # turns out this added some latency in the terminal.
+# Install tmux plugin manager
+mkdir -p ~/.tmux/plugins
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
+# Install ruby and tmuxinator
+brew install ruby
+sudo gem install tmuxinator
+
+# Install zsh completion for tmuxinator
+sudo wget https://raw.githubusercontent.com/tmuxinator/tmuxinator/master/completion/tmuxinator.zsh -O /usr/local/share/zsh/site-functions/_tmuxinator
 ```
+
+> [!NOTE] Don't forget to start tmux and run `<prefix> + I` to install plugins.

@@ -79,7 +79,7 @@ return {
         yamllint = {
           args = {
             "--config-file",
-            require("fredrik.utils.environ").getenv("DOTFILES") .. "/templates/.yamllint.yml",
+            require("fredrik.utils.environ").getenv("DOTFILES") .. "/extras/templates/.yamllint.yml",
             "--format",
             "parsable",
             "-",
