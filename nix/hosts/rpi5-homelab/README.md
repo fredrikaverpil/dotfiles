@@ -5,6 +5,13 @@ The setup has taken inspiration from:
 - [Raspberry Pi 5 on NixOS wiki](https://wiki.nixos.org/wiki/NixOS_on_ARM/Raspberry_Pi_5)
 - [nvmd/nixos-raspberrypi](https://github.com/nvmd/nixos-raspberrypi)
 
+## Hardware
+
+- [Raspberry Pi 5](https://www.raspberrypi.com/), 16 GB RAM
+- [Argon One V5 Dual M.2 NVMe](https://argon40.com/products/argon-one-v5-case-for-raspberry-pi-5)
+- [Crucial P3 Plus PCIe Gen4 NVMe M.2 Internal SSD](https://www.crucial.com/products/ssd/crucial-p3-plus-ssd),
+  1TB + 2TB
+
 ## Preparations
 
 ### Prepare bootloader on Raspberry Pi 5
