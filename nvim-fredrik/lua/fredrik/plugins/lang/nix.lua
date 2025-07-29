@@ -22,15 +22,13 @@ return {
         "mason-org/mason.nvim",
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          if has_nix() then
-            vim.list_extend(opts.ensure_installed, { "nixfmt" })
-          end
+          vim.list_extend(opts.ensure_installed, { "alejandra" })
         end,
       },
     },
     opts = {
       formatters_by_ft = {
-        nix = { "nixfmt" },
+        nix = { "alejandra" }, -- NOTE: nixfmt not supported on macOS
       },
     },
   },
