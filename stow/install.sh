@@ -8,7 +8,6 @@ cd "$STOW_DIR"
 # Check if stow is installed
 if ! command -v stow &>/dev/null; then
 	echo "Error: GNU Stow is not installed"
-	echo "Install with: brew install stow (macOS/Linux) or your package manager"
 	exit 1
 fi
 
