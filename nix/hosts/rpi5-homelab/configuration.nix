@@ -229,12 +229,12 @@ in
         User = "cloudflared";
         Group = "cloudflared";
         ExecStartPre = [
-          # Check if tunnel token exists
-          "${pkgs.bash}/bin/bash -c 'if [ ! -f /etc/cloudflared/tunnel.json ]; then echo \"WARNING: /etc/cloudflared/tunnel.json not found. Cloudflare Tunnel will not start until configured.\"; exit 1; fi'"
+          # Check if tunnel token exists - don't fail hard, allow retries
+          "${pkgs.bash}/bin/bash -c 'if [ ! -f /etc/cloudflared/tunnel.json ]; then echo \"WARNING: /etc/cloudflared/tunnel.json not found, service will retry in 30 seconds\"; sleep 5; fi'"
         ];
         ExecStart = "${pkgs.bash}/bin/bash -c 'TOKEN=$(cat /etc/cloudflared/tunnel.json); exec ${pkgs.cloudflared}/bin/cloudflared tunnel run --token \"$$TOKEN\"'";
-        Restart = "on-failure";
-        RestartSec = "10";
+        Restart = "always";
+        RestartSec = "30";
         # Directory management
         StateDirectory = "cloudflared";
         StateDirectoryMode = "0755";
