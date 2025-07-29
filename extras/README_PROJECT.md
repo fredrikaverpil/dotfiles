@@ -14,7 +14,9 @@ mkdir -p ~/code/work/private
 
 Use [`brew`](https://brew.sh/) to define any global tooling.
 
-## Per-project tools via pkgx
+## Per-project tools
+
+### pkgx
 
 Use [`pkgx`](https://docs.pkgx.sh) to define project tooling (see `dev`
 command).
@@ -33,6 +35,49 @@ dependencies:
   - go # uses the latest version if no version is specified
   - python@3.12
 ```
+
+### Nix flake
+
+If not using pkgx, a `flake.nix` can also set up the project.
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs-python39.url = "github:NixOS/nixpkgs/nixos-24.11";  # older version so to access python 3.9
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+
+  outputs = { self, nixpkgs, nixpkgs-python39, flake-utils }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+        pkgs-python39 = import nixpkgs-python39 { inherit system; };
+        python = pkgs-python39.python39;
+        pythonEnv = python.withPackages (p: [
+          # Your packages here
+        ]);
+      in
+      {
+        devShells.default = with pkgs; mkShell {
+          packages = [
+            uv  # from newer nixpkgs
+            python  # from older nixpkgs
+            pythonEnv
+          ];
+
+          shellHook = ''
+            export UV_PYTHON_PREFERENCE="only-system";
+            export UV_PYTHON=${python}/bin/python
+          '';
+        };
+      }
+    );
+}
+```
+
+Direnv's `.envrc` must contain `use flake` for it to auto-load when entering the
+directory.
 
 ## Direnv
 
