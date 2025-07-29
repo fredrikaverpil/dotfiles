@@ -109,6 +109,16 @@ function bash_completion() {
 }
 
 # ----------------------------
+# Nix
+# ----------------------------
+
+# Source Nix daemon to make nix commands available in PATH
+# Moved from .zprofile to maintain centralized shell configuration
+if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+	source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+fi
+
+# ----------------------------
 # globals
 # ----------------------------
 

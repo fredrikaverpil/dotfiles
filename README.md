@@ -54,15 +54,20 @@ symlinking.
 <details>
 <summary>Initial installation</summary>
 
+> [!IMPORTANT]
+>
+> Make sure your terminal has full disk access on macOS before installing.
+
 ```sh
 # Clone repo
 git clone https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 
-# Install Nix (Determinate Systems installer - enables flakes by default, better uninstall, 
+# Install Nix (Determinate Systems installer - enables flakes by default, better uninstall,
 # survives macOS updates, consistent installation across Linux/macOS)
 # Choose "Determinate Nix" when prompted (performance optimized, better error messages)
 # Learn more: https://determinate.systems/nix
+# IMPORTANT: choose "no" during install, so to install upstream Nix.
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 
 # Set hostname to match a configuration in nix/hosts/
@@ -95,6 +100,35 @@ sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- sw
 
 <details>
 <summary>Troubleshooting</summary>
+
+### macOS Permissions
+
+If you get errors about `com.apple.universalaccess` or system settings during nix-darwin activation:
+
+1. **Grant Full Disk Access to your terminal:**
+   - Open System Settings > Privacy & Security > Full Disk Access
+   - Click + and add your terminal app (e.g., `/Applications/Utilities/Terminal.app`)
+   - Enable the checkbox for your terminal
+
+### SSL Certificate Issues (when choosing upstream Nix)
+
+If you get SSL certificate errors after switching from Determinate to upstream Nix:
+
+```sh
+# Fix broken certificate symlink
+sudo rm /etc/ssl/certs/ca-certificates.crt
+sudo ln -s /etc/ssl/cert.pem /etc/ssl/certs/ca-certificates.crt
+
+# Clean up leftover Determinate configuration
+sudo cp /etc/nix/nix.conf /etc/nix/nix.conf.backup
+sudo tee /etc/nix/nix.conf << 'EOF'
+extra-experimental-features = nix-command flakes
+max-jobs = auto
+ssl-cert-file = /etc/ssl/cert.pem
+EOF
+```
+
+### General Troubleshooting
 
 ```sh
 # Check configuration
