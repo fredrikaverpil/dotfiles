@@ -50,6 +50,10 @@ in
   networking.networkmanager = {
     enable = true;
     wifi.backend = "iwd";  # Use iwd instead of wpa_supplicant for WiFi
+    # Disable VPN plugins to avoid webkitgtk build on headless server
+    # Default plugins (iodine-gnome, openconnect, etc.) pull in webkitgtk GUI dependencies
+    # which are unnecessary for a headless homelab and cause expensive builds from source
+    plugins = lib.mkForce [];
   };
 
   # Firewall configuration for homelab services
