@@ -9,6 +9,7 @@
   
   home.packages = with pkgs; [
     pngpaste  # for obsidian, macOS-only
+    git-lfs   # Git Large File Storage - macOS only for now
   ];
 
 
