@@ -59,11 +59,15 @@ symlinking.
 git clone https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 
-# Install Nix (Determinate Systems installer - enables flakes by default, better uninstall,
+# Install Nix (Determinate Systems installer - enables flakes by default, better uninstall, 
 # survives macOS updates, consistent installation across Linux/macOS)
-# Choose "Determinate Nix" when prompted
+# Choose "Determinate Nix" when prompted (performance optimized, better error messages)
 # Learn more: https://determinate.systems/nix
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+
+# Set hostname to match a configuration in nix/hosts/
+# macOS: sudo scutil --set HostName <hostname>
+# Linux: sudo hostnamectl set-hostname <hostname>
 
 # Apply configuration
 # Linux (NixOS):
