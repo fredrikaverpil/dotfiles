@@ -8,7 +8,6 @@
   home.stateVersion = "25.05";
   
   home.packages = with pkgs; [
-    # Container CLI tools for development
     podman
     podman-compose
   ];

@@ -112,11 +112,5 @@
       
     ];
     
-    # Note: Additional packages are now added in individual user configurations
-
-
-
-    # Common program settings
-    # Git is managed via package + dotfile symlink (.gitconfig)
-
+    # Additional packages are added in individual user configurations
 }

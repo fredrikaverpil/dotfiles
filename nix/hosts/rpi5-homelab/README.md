@@ -148,6 +148,53 @@ After mounting (via `nixos-rebuild switch`:
 sudo chown -R fredrik:users /mnt/homelab-data
 ```
 
+### Configure Tailscale VPN
+
+After the system is deployed and running, set up Tailscale for secure remote
+access:
+
+```sh
+# SSH into the Pi (local network)
+ssh fredrik@<ip-to-rpi5-homelab>
+
+# Set up Tailscale VPN
+sudo tailscale up
+
+# Follow the authentication URL provided
+# Verify Tailscale is working
+tailscale status
+```
+
+### Access Methods
+
+**LOCAL NETWORK ACCESS:**
+
+- SSH: `ssh fredrik@192.168.1.X` (Pi's local IP)
+- Services: Direct access via local IP and ports
+
+**REMOTE ACCESS VIA TAILSCALE (SECURE):**
+
+- SSH: `ssh fredrik@rpi5-homelab` (Tailscale hostname)
+- Services via SSH tunnels:
+
+  ```sh
+  ssh -L 9000:localhost:9000 fredrik@rpi5-homelab  # Portainer
+  ssh -L 8096:localhost:8096 fredrik@rpi5-homelab  # Jellyfin
+  ssh -L 2283:localhost:2283 fredrik@rpi5-homelab  # Immich
+  ssh -L 9090:localhost:9090 fredrik@rpi5-homelab  # Cockpit
+  ```
+
+- Then access via: http://localhost:9000, http://localhost:8096, etc.
+- Or direct Tailscale access: http://rpi5-homelab:9000 (if enabled)
+
+**MONITORING:**
+
+- Check Tailscale status: `tailscale status`
+- View Tailscale logs: `journalctl -u tailscaled -f`
+- Check fail2ban status: `systemctl status fail2ban`
+- View banned IPs: `fail2ban-client status sshd`
+- Unban an IP: `fail2ban-client set sshd unbanip <IP>`
+
 ### Configure Cloudflare Tunnel
 
 The homelab uses Cloudflare Tunnel to securely expose services like Immich to

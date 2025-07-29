@@ -1,33 +1,34 @@
 { config, pkgs, lib, inputs, ... }:
 
 let
-  # Versions specific to this host
   stateVersions = {
     darwin = 6;
   };
 in
 {
-  # Host-specific configuration for zap
+  system.stateVersion = stateVersions.darwin;
+
   networking.hostName = "zap";
+
+  nixpkgs.hostPlatform = "aarch64-darwin";
+
+
+  time.timeZone = "Europe/Stockholm";
   
-  # Multi-user configuration
   dotfiles.users = {
     fredrik = {
       isAdmin = true;
-      isPrimary = true;  # Primary user for Darwin system defaults
+      isPrimary = true;
       shell = "zsh";
       homeConfig = ./users/fredrik.nix;
       groups = [ "docker" ];
     };
   };
 
-  # Host-specific packages for zap
   dotfiles.extraPackages = with pkgs; [
-    # Add zap-specific system packages here
   ];
 
   dotfiles.extraBrews = [
-    # Add zap-specific homebrew packages here
   ];
 
   dotfiles.extraCasks = [
@@ -35,14 +36,4 @@ in
     "pgadmin4"
   ];
 
-  # Set system platform
-  nixpkgs.hostPlatform = "aarch64-darwin";
-
-  # System state version
-  system.stateVersion = stateVersions.darwin;
-
-
-
-  # Timezone
-  time.timeZone = "Europe/Stockholm";
 }

@@ -1,7 +1,6 @@
 { config, pkgs, lib, inputs, ... }:
 
 let
-  # Versions specific to this host
   stateVersions = {
     nixos = "25.05";
   };
@@ -9,16 +8,20 @@ in
 {
   imports = [ ];
 
+  system.stateVersion = stateVersions.nixos;
+
   # Main configuration file for rpi5-homelab Raspberry Pi 5 system
-  # This file contains all host-specific configuration consolidated from modules
   
   # ========================================================================
   # HOST CONFIGURATION
   # ========================================================================
-  # Set system hostname for network identification
   networking.hostName = "rpi5-homelab";
+
+  nixpkgs.hostPlatform = "aarch64-linux";
+
+  time.timeZone = "Europe/Stockholm";
+
   
-  # Multi-user configuration
   dotfiles.users = {
     fredrik = {
       isAdmin = true;
@@ -33,7 +36,6 @@ in
       sshKeys = [ 
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIElRYEYxPt8po0TToz1U5bNZYJgnho7xIgApCh9DTfyn"
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJKGKlggcQ6VquiOwiXz5505VnlzRXz6LWW8odDx6URk"
-        # Add additional keys here if needed
       ];
     };
   };
@@ -44,7 +46,7 @@ in
   networking.wireless.iwd.enable = true;  # Enable Intel's iwd for better WiFi management
 
   # Firewall configuration for homelab services
-  # Maximum security: no SSH exposed to internet, only via Tailscale VPN
+  # NOTE: for maximum security, do not expose SSH to internet, only via Tailscale VPN
   networking.firewall = {
     enable = true;
     allowedTCPPorts = [
@@ -59,12 +61,6 @@ in
       3001  # Uptime Kuma - Service monitoring dashboard
       2283  # Immich - Photo management web interface
       8096  # Jellyfin - Media server web interface
-      
-
-      
-      # Optional: Uncomment if you need direct internet access to web services
-      # 80    # HTTP - Web services
-      # 443   # HTTPS - Secure web services
     ];
     
     allowedUDPPorts = [
@@ -75,8 +71,6 @@ in
   };
 
 
-
-  # Host-specific services configuration
   dotfiles.extraServices = {
     # SSH service for remote access
     # Accessible via local network and Tailscale VPN only (not internet-exposed)
@@ -85,7 +79,6 @@ in
       ports = [ 22 ];  # Standard SSH port (safe since not internet-exposed)
       settings = {
         PermitRootLogin = "no";           # Security: disable root login via SSH
-        # Password auth is safer now since SSH is not internet-exposed
         PasswordAuthentication = true;    # Safe for local network + Tailscale access
         KbdInteractiveAuthentication = false;  # Security: disable keyboard-interactive auth
         PubkeyAuthentication = true;      # Enable SSH key authentication (default, but explicit)
@@ -93,16 +86,12 @@ in
     };
 
     # Network Time Protocol (NTP) synchronization
-    # Ensures accurate system time for logging, certificates, and scheduled tasks
-    # Critical for security and proper system operation
     timesyncd = {
       enable = true;
-      # Uses systemd-timesyncd for lightweight NTP client functionality
     };
 
     # Avahi service for mDNS/Bonjour network discovery
     # Allows the Pi to be accessible via rpi5-homelab.local on the local network
-    # Essential for headless operation and easy SSH access
     avahi = {
       enable = true;
       nssmdns4 = true;  # Enable mDNS resolution in NSS for IPv4
@@ -113,13 +102,6 @@ in
       };
     };
 
-
-  };
-
-
-
-  # Host-specific services configuration (continued)
-  dotfiles.extraServices = {
     # Tailscale mesh VPN for secure remote access
     # Provides encrypted access without exposing SSH to internet
     tailscale = {
@@ -166,14 +148,9 @@ in
         };
       };
     };
-
-
-
-
   };
 
   # Docker containerization platform
-  # Enables running containerized applications and services
   virtualisation.docker = {
     enable = true;
   };
@@ -306,14 +283,7 @@ in
       };
       wantedBy = [ "multi-user.target" ];
     };
-
-
   };
-
-  # ========================================================================
-  # USER CONFIGURATION
-  # ========================================================================
-  # Note: User configuration is now handled by shared/users/default.nix
 
   # ========================================================================
   # HOST-SPECIFIC EXTENSIONS
@@ -363,58 +333,11 @@ in
       cfg.bootloader                 # Bootloader type
       config.boot.kernelPackages.kernel.version  # Kernel version
     ];
-
-  # Set system platform
-  nixpkgs.hostPlatform = "aarch64-linux";
   
   # Allow unfree packages (needed for various packages)
   nixpkgs.config.allowUnfree = true;
 
-
-
-  # NixOS state version
-  system.stateVersion = stateVersions.nixos;
-
-  # System timezone configuration
-  time.timeZone = "Europe/Stockholm";
-
-  # ========================================================================
-  # HOMELAB DEPLOYMENT DOCUMENTATION
-  # ========================================================================
-  # This homelab uses Tailscale VPN for secure remote access
-  # 
-  # DEPLOYMENT:
-  # 1. Deploy this configuration to Pi
-  # 2. Set up Tailscale: `sudo tailscale up` and authenticate
-  # 3. Verify basic functionality and SSH access via Tailscale
-  #
-  # ACCESS METHODS:
-  # LOCAL NETWORK ACCESS:
-  # - SSH: `ssh fredrik@192.168.1.X` (Pi's local IP)
-  # - Services: Direct access via local IP and ports
-  #
-  # REMOTE ACCESS VIA TAILSCALE (SECURE):
-  # - SSH: `ssh fredrik@rpi5-homelab` (Tailscale hostname)
-  # - Services via SSH tunnels:
-  #   ssh -L 9000:localhost:9000 fredrik@rpi5-homelab  # Portainer
-  #   ssh -L 8096:localhost:8096 fredrik@rpi5-homelab  # Jellyfin
-  #   ssh -L 2283:localhost:2283 fredrik@rpi5-homelab  # Immich
-  #   ssh -L 9090:localhost:9090 fredrik@rpi5-homelab  # Cockpit
-  # - Then access via: http://localhost:9000, http://localhost:8096, etc.
-  # - Or direct Tailscale access: http://rpi5-homelab:9000 (if enabled)
-  #
-  # MONITORING:
-  # - Check Tailscale status: `tailscale status`
-  # - View Tailscale logs: `journalctl -u tailscaled -f`
-  # - Check fail2ban status: `systemctl status fail2ban`
-  # - View banned IPs: `fail2ban-client status sshd`
-  # - Unban an IP: `fail2ban-client set sshd unbanip <IP>`
-
   # TODO: Additional services that might be useful for a homelab:
   # - services.logrotate.enable = true; # Log management (enabled by default)
   # - services.cron.enable = true;      # Scheduled tasks (enabled by default)
-  
-  # TODO: Security considerations:
-  # - Consider enabling passwordless sudo only for specific commands
-  # - Consider setting up reverse proxy with SSL termination
 }

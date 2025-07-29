@@ -18,7 +18,6 @@
   };
 
   config = {
-    # Basic NixOS system settings
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
     # Home-manager configuration
@@ -28,12 +27,13 @@
       backupFileExtension = "backup";
     };
 
-  # Linux-specific security settings
+  # TODO: Security considerations:
+  # - Consider enabling passwordless sudo only for specific commands
   security.sudo.wheelNeedsPassword = false;
   
-  # Note: User configuration is now handled by shared/users/default.nix
+  # Note: User configuration is handled by shared/users/default.nix
 
-  # System-level packages (very few)
+  # System-level packages
   environment.systemPackages = with pkgs; [
     vim # for recovery
   ] ++ config.dotfiles.extraSystemPackages;
@@ -52,6 +52,7 @@
   # };
 
   # Font management
+  # NOTE: Berkeley Mono is installed manually, as it requires a license.
   fonts.packages = with pkgs; [
     nerd-fonts.fira-code
     nerd-fonts.fira-mono

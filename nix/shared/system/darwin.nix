@@ -24,10 +24,9 @@
   };
 
   config = {
-  # Homebrew configuration
-  homebrew = {
-    enable = true;
-    onActivation = {
+    homebrew = {
+      enable = true;
+      onActivation = {
       autoUpdate = true;
       upgrade = true;
       cleanup = "zap";
@@ -43,9 +42,6 @@
     ];
 
     brews = [
-      # CLI tools moved to Nix packages in home-common.nix:
-      # direnv, atuin, eza, gh, starship, yq, zoxide, etc.
-      
       # Packages not available in nixpkgs
       "cloud-sql-proxy"
       "git-standup"
@@ -88,7 +84,6 @@
     };
   };
 
-  # Basic darwin system settings
   nix.settings.experimental-features = "nix-command flakes";
   
   # Primary user for user-specific settings (homebrew, system defaults, etc.)
@@ -102,9 +97,9 @@
       then lib.head primaryUserNames
       else throw "Exactly one user must have isPrimary = true on Darwin systems";
   
-  # Note: User configuration is now handled by shared/users/default.nix
+  # Note: User configuration is handled by shared/users/default.nix
 
-  # System-level packages (very few)
+  # System-level packages
   environment.systemPackages = with pkgs; [
     vim # for recovery
   ];
@@ -114,7 +109,6 @@
   # Consider manual updates instead: darwin-rebuild switch --flake ~/.dotfiles
 
   # macOS system defaults configuration
-  # These settings modify system behavior and preferences
   system.defaults = {
     # Keyboard behavior optimizations
     # Disable press-and-hold for accent characters, enable key repeat instead
@@ -276,6 +270,7 @@
   };
 
   # Font management
+  # NOTE: Berkeley Mono is installed manually, as it requires a license.
   fonts.packages = with pkgs; [
     nerd-fonts.fira-code
     nerd-fonts.fira-mono
