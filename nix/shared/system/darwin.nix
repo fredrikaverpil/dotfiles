@@ -16,6 +16,12 @@
       description = "Additional homebrew casks for this host";
     };
 
+    dotfiles.extraMasApps = lib.mkOption {
+      type = lib.types.attrsOf lib.types.int;
+      default = {};
+      description = "Additional Mac App Store apps for this host";
+    };
+
     dotfiles.extraPackages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
       default = [];
@@ -55,6 +61,9 @@
       "joshmedeski/sesh/sesh"
       "sst/tap/opencode"
       "pkgx"
+      
+      # Mac App Store CLI
+      "mas"
     ] ++ config.dotfiles.extraBrews;
 
     casks = [
@@ -81,7 +90,7 @@
       "Keka" = 470158793;
       "Slack" = 803453959;
       "Pandan" = 1569600264;
-    };
+    } // config.dotfiles.extraMasApps;
   };
 
   nix.settings.experimental-features = "nix-command flakes";

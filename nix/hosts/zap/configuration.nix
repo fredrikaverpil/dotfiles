@@ -36,6 +36,12 @@ in
   dotfiles.extraCasks = [
     "podman-desktop"
     "pgadmin4"
+    "yubico-yubikey-manager"
+    "cyberduck"
   ];
+
+  dotfiles.extraMasApps = {
+    "FileZilla Pro" = 1298486723;
+  };
 
 }

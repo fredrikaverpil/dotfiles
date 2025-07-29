@@ -37,4 +37,7 @@ in
     "raycast"
   ];
 
+  dotfiles.extraMasApps = {
+  };
+
 }
