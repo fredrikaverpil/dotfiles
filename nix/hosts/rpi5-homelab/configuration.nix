@@ -28,7 +28,7 @@ in
       isPrimary = true;  # Not used on Linux, but kept for consistency
       shell = "zsh";
       homeConfig = ./users/fredrik.nix;
-      groups = [ "networkmanager" "docker" ];
+      groups = [ "docker" ];
       # SSH keys for secure access (RECOMMENDED: add your public key here)
       # This enables immediate key-based access on fresh installs
       # Generate key: ssh-keygen -t ed25519 -C "your-email@example.com"
