@@ -292,7 +292,7 @@ sudo journalctl -u cloudflared -f
 
 #### Security Benefits
 
-- **IP Hidden**: Your home IP is not exposed
+- **IP Hidden**: Home IP is not exposed
 - **DDoS Protection**: Cloudflare absorbs attacks
 - **No Port Forwarding**: Router stays secure
 - **Automatic HTTPS**: SSL certificates managed by Cloudflare
