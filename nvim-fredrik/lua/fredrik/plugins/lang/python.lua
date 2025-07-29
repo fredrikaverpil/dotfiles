@@ -233,21 +233,4 @@ return {
       },
     },
   },
-
-  {
-    "linux-cultist/venv-selector.nvim",
-    lazy = true,
-    event = "VeryLazy",
-    ft = { "python" },
-    branch = "regexp", -- https://github.com/linux-cultist/venv-selector.nvim/tree/regexp
-    dependencies = {
-      "virtual-lsp-config",
-      "nvim-telescope/telescope.nvim",
-      "mfussenegger/nvim-dap-python",
-    },
-    opts = {
-      notify_user_on_venv_activation = true,
-    },
-    keys = require("fredrik.config.keymaps").setup_venv_selector_keymaps(),
-  },
 }
