@@ -22,7 +22,7 @@ Use [`pkgx`](https://docs.pkgx.sh) to define project tooling (see `dev`
 command), at least on macOS. This feels faster/simpler sometimes than resorting
 to `flake.nix` (see below).
 
-In each project, add a `pkgx.yml` file to define project tooling, unless it is
+In each project, add a `.pkgx.yml` file to define project tooling, unless it is
 not picked up from lockfiles etc.
 
 Note that the shell integration is required and that the `dev` command must be
