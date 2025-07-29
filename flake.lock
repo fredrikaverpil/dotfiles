@@ -39,11 +39,11 @@
     "dotfiles": {
       "flake": false,
       "locked": {
-        "lastModified": 1753813927,
-        "narHash": "sha256-NRYs5rmtR5Ss/1dkVckPpeGf6NiBHkPOTc02N5aWEus=",
+        "lastModified": 1753816337,
+        "narHash": "sha256-6MRdDNIBk4JZyHlZ+pvZvmT765xi21bBUhYr34/y6No=",
         "owner": "fredrikaverpil",
         "repo": "dotfiles",
-        "rev": "6759d6bf945e33d6f1a51e04bcc941e07e299580",
+        "rev": "c0835f4b96d3190bcbf168027c9840c10dbf8c0f",
         "type": "github"
       },
       "original": {
