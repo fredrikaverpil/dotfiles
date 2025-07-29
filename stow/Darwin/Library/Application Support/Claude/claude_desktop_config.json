@@ -6,7 +6,7 @@
     "google-maps": {
       "command": "docker",
       "env": {
-        "GOOGLE_MAPS_API_KEY": "AIzaSyA2t2RGGHwe3miXvlwvMh645yaijDxbfjg"
+        "GOOGLE_MAPS_API_KEY": ""
       },
       "args": [
         "run",
