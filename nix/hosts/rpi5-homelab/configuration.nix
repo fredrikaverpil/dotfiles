@@ -28,7 +28,7 @@ in
       isPrimary = true;  # Not used on Linux, but kept for consistency
       shell = "zsh";
       homeConfig = ./users/fredrik.nix;
-      groups = [ "docker" ];
+      groups = [ "networkmanager" "docker" ];
       # SSH keys for secure access (RECOMMENDED: add your public key here)
       # This enables immediate key-based access on fresh installs
       # Generate key: ssh-keygen -t ed25519 -C "your-email@example.com"
@@ -41,9 +41,13 @@ in
   };
 
   # Wireless network configuration
-  # Disable legacy wpa_supplicant in favor of modern iwd
+  # Use NetworkManager with iwd backend for complete network management
   networking.wireless.enable = false;  # Disable wpa_supplicant
-  networking.wireless.iwd.enable = true;  # Enable Intel's iwd for better WiFi management
+  networking.wireless.iwd.enable = true;  # Enable Intel's iwd for WiFi authentication
+  networking.networkmanager = {
+    enable = true;
+    wifi.backend = "iwd";  # Use iwd instead of wpa_supplicant for WiFi
+  };
 
   # Firewall configuration for homelab services
   # NOTE: for maximum security, do not expose SSH to internet, only via Tailscale VPN
