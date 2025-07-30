@@ -56,9 +56,11 @@ echo "Enter push key from Uptime Kuma (leave empty to skip):"
 echo -n "Push key: "
 read UPTIME_KUMA_PUSH_KEY
 
-# Create configuration file
+# Create repository file (just the URL)
+echo "sftp:${HETZNER_USERNAME}@${HETZNER_HOSTNAME}:${HETZNER_PORT}${BACKUP_PATH}" | sudo tee /etc/restic/immich-repository > /dev/null
+
+# Create environment config file
 cat << EOF | sudo tee /etc/restic/immich-config > /dev/null
-RESTIC_REPOSITORY=sftp:${HETZNER_USERNAME}@${HETZNER_HOSTNAME}:${HETZNER_PORT}${BACKUP_PATH}
 EOF
 
 # Add Uptime Kuma key if provided
@@ -68,8 +70,10 @@ fi
 
 echo "Setting permissions..."
 sudo chmod 600 /etc/restic/immich-password
+sudo chmod 600 /etc/restic/immich-repository
 sudo chmod 600 /etc/restic/immich-config
 sudo chown root:root /etc/restic/immich-password
+sudo chown root:root /etc/restic/immich-repository
 sudo chown root:root /etc/restic/immich-config
 
 echo

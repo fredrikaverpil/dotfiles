@@ -1,12 +1,15 @@
-{ config, pkgs, lib, inputs, ... }:
-
-let
+{
+  config,
+  pkgs,
+  lib,
+  inputs,
+  ...
+}: let
   stateVersions = {
     nixos = "25.05";
   };
-in
-{
-  imports = [ ];
+in {
+  imports = [./restic.nix];
 
   # NixOS state version "25.05" - defines system configuration schema/compatibility
   # See flake.nix for actual package channel selection (stable vs unstable)
@@ -14,7 +17,7 @@ in
   system.stateVersion = stateVersions.nixos;
 
   # Main configuration file for rpi5-homelab Raspberry Pi 5 system
-  
+
   # ========================================================================
   # HOST CONFIGURATION
   # ========================================================================
@@ -24,19 +27,18 @@ in
 
   time.timeZone = "Europe/Stockholm";
 
-  
   dotfiles.users = {
     fredrik = {
       isAdmin = true;
-      isPrimary = true;  # Not used on Linux, but kept for consistency
+      isPrimary = true; # Not used on Linux, but kept for consistency
       shell = "zsh";
       homeConfig = ./users/fredrik.nix;
-      groups = [ "networkmanager" "docker" ];
+      groups = ["networkmanager" "docker"];
       # SSH keys for secure access (RECOMMENDED: add your public key here)
       # This enables immediate key-based access on fresh installs
       # Generate key: ssh-keygen -t ed25519 -C "your-email@example.com"
       # Then add your ~/.ssh/id_ed25519.pub content below:
-      sshKeys = [ 
+      sshKeys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIElRYEYxPt8po0TToz1U5bNZYJgnho7xIgApCh9DTfyn"
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJKGKlggcQ6VquiOwiXz5505VnlzRXz6LWW8odDx6URk"
       ];
@@ -45,11 +47,11 @@ in
 
   # Wireless network configuration
   # Use NetworkManager with iwd backend for complete network management
-  networking.wireless.enable = false;  # Disable wpa_supplicant
-  networking.wireless.iwd.enable = true;  # Enable Intel's iwd for WiFi authentication
+  networking.wireless.enable = false; # Disable wpa_supplicant
+  networking.wireless.iwd.enable = true; # Enable Intel's iwd for WiFi authentication
   networking.networkmanager = {
     enable = true;
-    wifi.backend = "iwd";  # Use iwd instead of wpa_supplicant for WiFi
+    wifi.backend = "iwd"; # Use iwd instead of wpa_supplicant for WiFi
     # Disable VPN plugins to avoid webkitgtk build on headless server
     # Default plugins (iodine-gnome, openconnect, etc.) pull in webkitgtk GUI dependencies
     # which are unnecessary for a headless homelab and cause expensive builds from source
@@ -62,37 +64,36 @@ in
     enable = true;
     allowedTCPPorts = [
       # Local network + Tailscale access only
-      22    # SSH - Local network and Tailscale VPN access only
-      
+      22 # SSH - Local network and Tailscale VPN access only
+
       # Homelab service ports (local network access)
-      9090  # Cockpit - System monitoring and administration
-      8000  # Portainer - TCP tunnel server for Edge agents  
-      9000  # Portainer - HTTP port (legacy/optional)
-      9443  # Portainer - HTTPS port (primary)
-      3001  # Uptime Kuma - Service monitoring dashboard
-      2283  # Immich - Photo management web interface
-      8096  # Jellyfin - Media server web interface
+      9090 # Cockpit - System monitoring and administration
+      8000 # Portainer - TCP tunnel server for Edge agents
+      9000 # Portainer - HTTP port (legacy/optional)
+      9443 # Portainer - HTTPS port (primary)
+      3001 # Uptime Kuma - Service monitoring dashboard
+      2283 # Immich - Photo management web interface
+      8096 # Jellyfin - Media server web interface
     ];
-    
+
     allowedUDPPorts = [
     ];
-    
-    # Allow Tailscale traffic (+ matches any interface starting with "tailscale")
-    trustedInterfaces = [ "tailscale+" ];
-  };
 
+    # Allow Tailscale traffic (+ matches any interface starting with "tailscale")
+    trustedInterfaces = ["tailscale+"];
+  };
 
   dotfiles.extraServices = {
     # SSH service for remote access
     # Accessible via local network and Tailscale VPN only (not internet-exposed)
     openssh = {
       enable = true;
-      ports = [ 22 ];  # Standard SSH port (safe since not internet-exposed)
+      ports = [22]; # Standard SSH port (safe since not internet-exposed)
       settings = {
-        PermitRootLogin = "no";           # Security: disable root login via SSH
-        PasswordAuthentication = true;    # Safe for local network + Tailscale access
-        KbdInteractiveAuthentication = false;  # Security: disable keyboard-interactive auth
-        PubkeyAuthentication = true;      # Enable SSH key authentication (default, but explicit)
+        PermitRootLogin = "no"; # Security: disable root login via SSH
+        PasswordAuthentication = true; # Safe for local network + Tailscale access
+        KbdInteractiveAuthentication = false; # Security: disable keyboard-interactive auth
+        PubkeyAuthentication = true; # Enable SSH key authentication (default, but explicit)
       };
     };
 
@@ -105,11 +106,11 @@ in
     # Allows the Pi to be accessible via rpi5-homelab.local on the local network
     avahi = {
       enable = true;
-      nssmdns4 = true;  # Enable mDNS resolution in NSS for IPv4
+      nssmdns4 = true; # Enable mDNS resolution in NSS for IPv4
       publish = {
         enable = true;
-        addresses = true;     # Publish IP addresses via mDNS
-        workstation = true;   # Announce as a workstation for better discovery
+        addresses = true; # Publish IP addresses via mDNS
+        workstation = true; # Announce as a workstation for better discovery
       };
     };
 
@@ -125,100 +126,25 @@ in
     # Now only needed for local network protection (SSH not internet-exposed)
     fail2ban = {
       enable = true;
-      bantime = "1h";        # Ban duration: 1 hour
-      maxretry = 5;          # Increased to 5 since only local network access
+      bantime = "1h"; # Ban duration: 1 hour
+      maxretry = 5; # Increased to 5 since only local network access
       ignoreIP = [
-        "127.0.0.1/8"        # Never ban localhost
-        "192.168.0.0/16"     # Never ban local network (adjust if needed)
-        "10.0.0.0/8"         # Never ban private networks
-        "172.16.0.0/12"      # Never ban private networks
-        "100.64.0.0/10"      # Never ban Tailscale network
+        "127.0.0.1/8" # Never ban localhost
+        "192.168.0.0/16" # Never ban local network (adjust if needed)
+        "10.0.0.0/8" # Never ban private networks
+        "172.16.0.0/12" # Never ban private networks
+        "100.64.0.0/10" # Never ban Tailscale network
       ];
       jails = {
         # SSH jail configuration
         sshd = {
           settings = {
             enabled = true;
-            port = "22";       # Standard SSH port (local + Tailscale only)
-            findtime = "10m";  # Time window to look for failures: 10 minutes
-    };
-
-    restic = {
-      backups = {
-        immich = {
-          # This environment file should contain the RESTIC_REPOSITORY variable
-          # e.g., RESTIC_REPOSITORY=sftp:u479983@u479983.your-storagebox.de:23/backups/immich
-          environmentFile = "/etc/restic/immich-config";
-          passwordFile = "/etc/restic/immich-password";
-          paths = [
-            "/mnt/homelab-data/services/immich/data/library"
-            "/mnt/homelab-data/services/immich/data/upload"
-            "/mnt/homelab-data/services/immich/data/profile"
-            "/var/lib/immich-db-backup"
-          ];
-          exclude = [
-            "/mnt/homelab-data/services/immich/data/thumbs"
-            "/mnt/homelab-data/services/immich/data/encoded-video"
-          ];
-          timerConfig = {
-            OnCalendar = "daily";
-            Persistent = true;
+            port = "22"; # Standard SSH port (local + Tailscale only)
+            findtime = "10m"; # Time window to look for failures: 10 minutes
           };
-          pruneOpts = [
-            "--keep-daily 7"
-            "--keep-weekly 4"
-            "--keep-monthly 6"
-          ];
-          backupPrepareCommand = ''
-            ${pkgs.docker}/bin/docker stop immich_server
-            mkdir -p /var/lib/immich-db-backup
-            ${pkgs.docker}/bin/docker exec immich_postgres pg_dumpall --clean --if-exists --username=postgres | ${pkgs.gzip}/bin/gzip > /var/lib/immich-db-backup/immich-$(date +%Y%m%d_%H%M%S).sql.gz
-          '';
-          backupCleanupCommand = ''
-            ${pkgs.docker}/bin/docker start immich_server
-            
-            # Notify Uptime Kuma on successful backup
-            if [ -f /etc/restic/immich-config ]; then
-              PUSH_KEY=$(grep UPTIME_KUMA_PUSH_KEY /etc/restic/immich-config | cut -d= -f2 || echo "")
-              if [ -n "$PUSH_KEY" ]; then
-                ${pkgs.curl}/bin/curl -fsS -m 10 --retry 3 "http://localhost:3001/api/push/$PUSH_KEY?status=up&msg=backup-success" || true
-              fi
-            fi
-          '';
-          extraServiceConfig = {
-            ConditionPathExists = [
-              "/etc/restic/immich-config"
-              "/etc/restic/immich-password"
-            ];
         };
       };
-    };
-
-    # Monthly restore test to validate backup integrity
-    restic-restore-test = {
-      script = "/etc/homelab/scripts/restic-restore-test.sh";
-      path = with pkgs; [ restic gzip gnugrep curl coreutils ];
-      serviceConfig = {
-        Type = "oneshot";
-        User = "root";
-        ConditionPathExists = [
-          "/etc/restic/immich-config"
-          "/etc/restic/immich-password"
-        ];
-      };
-    };
-  };
-
-  systemd.timers = {
-    restic-restore-test = {
-      wantedBy = [ "timers.target" ];
-      timerConfig = {
-        OnCalendar = "monthly";
-        Persistent = true;
-        RandomizedDelaySec = "1h";
-      };
-    };
-  };  };      };
     };
 
     # Cockpit web-based system administration interface
@@ -229,7 +155,7 @@ in
       port = 9090;
       settings = {
         WebService = {
-          AllowUnencrypted = true;  # Allow HTTP for local network access
+          AllowUnencrypted = true; # Allow HTTP for local network access
           Origins = lib.mkForce "http://rpi5-homelab.local:9090 http://localhost:9090";
         };
       };
@@ -249,8 +175,6 @@ in
   };
   users.groups.cloudflared = {};
 
-
-
   # ========================================================================
   # HOMELAB DOCKER SERVICES
   # ========================================================================
@@ -262,18 +186,14 @@ in
     "homelab/immich/.env".source = ./docker-compose/immich.env;
     "homelab/jellyfin/docker-compose.yml".source = ./docker-compose/jellyfin.yml;
     "homelab/jellyfin/.env".source = ./docker-compose/jellyfin.env;
-    "homelab/scripts/restic-restore-test.sh" = {
-      source = ./scripts/restic-restore-test.sh;
-      mode = "0755";
-    };
   };
 
   # Systemd services for docker-compose stacks
   systemd.services = {
     homelab-portainer = {
       description = "Homelab Portainer Container Management Stack";
-      after = [ "docker.service" ];
-      requires = [ "docker.service" ];
+      after = ["docker.service"];
+      requires = ["docker.service"];
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
@@ -283,13 +203,13 @@ in
         ExecReload = "${pkgs.docker-compose}/bin/docker-compose up -d --force-recreate";
         TimeoutStartSec = "300";
       };
-      wantedBy = [ "multi-user.target" ];
+      wantedBy = ["multi-user.target"];
     };
 
     homelab-uptime-kuma = {
       description = "Homelab Uptime Kuma Service Monitoring Stack";
-      after = [ "docker.service" ];
-      requires = [ "docker.service" ];
+      after = ["docker.service"];
+      requires = ["docker.service"];
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
@@ -299,14 +219,14 @@ in
         ExecReload = "${pkgs.docker-compose}/bin/docker-compose up -d --force-recreate";
         TimeoutStartSec = "300";
       };
-      wantedBy = [ "multi-user.target" ];
+      wantedBy = ["multi-user.target"];
     };
 
     # Cloudflare Tunnel service
     cloudflared = {
       description = "Cloudflare Tunnel";
-      after = [ "network-online.target" ];
-      wants = [ "network-online.target" ];
+      after = ["network-online.target"];
+      wants = ["network-online.target"];
       serviceConfig = {
         Type = "simple";
         User = "cloudflared";
@@ -326,16 +246,16 @@ in
         PrivateTmp = true;
         ProtectSystem = "strict";
         ProtectHome = true;
-        ReadOnlyPaths = [ "/etc/cloudflared" ];
+        ReadOnlyPaths = ["/etc/cloudflared"];
       };
       # Start automatically if tunnel token exists
-      wantedBy = [ "multi-user.target" ];
+      wantedBy = ["multi-user.target"];
     };
 
     homelab-immich = {
       description = "Homelab Immich Photo Management Stack";
-      after = [ "docker.service" ];
-      requires = [ "docker.service" ];
+      after = ["docker.service"];
+      requires = ["docker.service"];
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
@@ -348,15 +268,15 @@ in
         ExecStart = "${pkgs.docker-compose}/bin/docker-compose up -d";
         ExecStop = "${pkgs.docker-compose}/bin/docker-compose down";
         ExecReload = "${pkgs.docker-compose}/bin/docker-compose up -d --force-recreate";
-        TimeoutStartSec = "600";  # Immich takes longer to start (ML models, etc.)
+        TimeoutStartSec = "600"; # Immich takes longer to start (ML models, etc.)
       };
-      wantedBy = [ "multi-user.target" ];
+      wantedBy = ["multi-user.target"];
     };
 
     homelab-jellyfin = {
       description = "Homelab Jellyfin Media Server Stack";
-      after = [ "docker.service" ];
-      requires = [ "docker.service" ];
+      after = ["docker.service"];
+      requires = ["docker.service"];
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
@@ -372,7 +292,7 @@ in
         ExecReload = "${pkgs.docker-compose}/bin/docker-compose up -d --force-recreate";
         TimeoutStartSec = "300";
       };
-      wantedBy = [ "multi-user.target" ];
+      wantedBy = ["multi-user.target"];
     };
   };
 
@@ -380,34 +300,35 @@ in
   # HOST-SPECIFIC EXTENSIONS
   # ========================================================================
   # Host-specific system packages for rpi5-homelab
-  dotfiles.extraSystemPackages = with pkgs; [
-    # Essential system administration tools
-    # These are kept minimal as most tools are managed via home-manager
-    
-    # System recovery and maintenance tools
-    curl            # Network tool for downloading/API calls
-    wget            # File download utility
-    
-    # Container tools for homelab services
-    docker          # Container runtime
-    docker-compose  # Container orchestration
-    
-    # Cloudflare tools
-    cloudflared     # Cloudflare Tunnel client
-    
-    # Hardware-specific utilities for Raspberry Pi
-    # These may be provided by nixos-raspberrypi modules
-    
-  ] ++ (with pkgs.rpi or { }; [
-    # Raspberry Pi optimized packages when available
-    # The nixos-raspberrypi flake may provide Pi-specific optimizations
-    # These packages are conditionally included if available
-    
-    # Examples of Pi-specific tools that might be available:
-    # - GPIO control utilities
-    # - Hardware monitoring tools
-    # - Pi-specific system utilities
-  ]);
+  dotfiles.extraSystemPackages = with pkgs;
+    [
+      # Essential system administration tools
+      # These are kept minimal as most tools are managed via home-manager
+
+      # System recovery and maintenance tools
+      curl # Network tool for downloading/API calls
+      wget # File download utility
+
+      # Container tools for homelab services
+      docker # Container runtime
+      docker-compose # Container orchestration
+
+      # Cloudflare tools
+      cloudflared # Cloudflare Tunnel client
+
+      # Hardware-specific utilities for Raspberry Pi
+      # These may be provided by nixos-raspberrypi modules
+    ]
+    ++ (with pkgs.rpi or {}; [
+      # Raspberry Pi optimized packages when available
+      # The nixos-raspberrypi flake may provide Pi-specific optimizations
+      # These packages are conditionally included if available
+
+      # Examples of Pi-specific tools that might be available:
+      # - GPIO control utilities
+      # - Hardware monitoring tools
+      # - Pi-specific system utilities
+    ]);
 
   # ========================================================================
   # SYSTEM METADATA
@@ -415,16 +336,14 @@ in
   # System identification tags for the Raspberry Pi
   # These tags help identify the system variant and configuration
   # Following the nixos-raspberrypi project conventions
-  system.nixos.tags =
-    let
-      cfg = config.boot.loader.raspberryPi;
-    in
-    [
-      "raspberry-pi-${cfg.variant}"  # e.g., "raspberry-pi-5"
-      cfg.bootloader                 # Bootloader type
-      config.boot.kernelPackages.kernel.version  # Kernel version
-    ];
-  
+  system.nixos.tags = let
+    cfg = config.boot.loader.raspberryPi;
+  in [
+    "raspberry-pi-${cfg.variant}" # e.g., "raspberry-pi-5"
+    cfg.bootloader # Bootloader type
+    config.boot.kernelPackages.kernel.version # Kernel version
+  ];
+
   # Allow unfree packages (needed for various packages)
   nixpkgs.config.allowUnfree = true;
 

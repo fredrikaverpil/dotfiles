@@ -5,8 +5,11 @@ echo "Starting monthly restore test..."
 TEMP_DIR=$(mktemp -d)
 
 # Load restic environment
-source /etc/restic/immich-config
+export RESTIC_REPOSITORY=$(cat /etc/restic/immich-repository)
 export RESTIC_PASSWORD_FILE=/etc/restic/immich-password
+if [ -f /etc/restic/immich-config ]; then
+  source /etc/restic/immich-config
+fi
 
 # Restore only database backups (minimal bandwidth)
 restic restore latest --target "$TEMP_DIR" --include "/var/lib/immich-db-backup"

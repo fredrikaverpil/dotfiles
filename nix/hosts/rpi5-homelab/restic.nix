@@ -1,0 +1,87 @@
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}: {
+  # Restic backup configuration for Immich
+  services.restic = {
+    backups = {
+      immich = {
+        # Repository file should contain just the repository URL
+        repositoryFile = "/etc/restic/immich-repository";
+        passwordFile = "/etc/restic/immich-password";
+        # Environment file for additional variables like Uptime Kuma key
+        environmentFile = "/etc/restic/immich-config";
+        paths = [
+          "/mnt/homelab-data/services/immich/data/library"
+          "/mnt/homelab-data/services/immich/data/upload"
+          "/mnt/homelab-data/services/immich/data/profile"
+          "/var/lib/immich-db-backup"
+        ];
+        exclude = [
+          "/mnt/homelab-data/services/immich/data/thumbs"
+          "/mnt/homelab-data/services/immich/data/encoded-video"
+        ];
+        timerConfig = {
+          OnCalendar = "daily";
+          Persistent = true;
+        };
+        pruneOpts = [
+          "--keep-daily 7"
+          "--keep-weekly 4"
+          "--keep-monthly 6"
+        ];
+        backupPrepareCommand = ''
+          ${pkgs.docker}/bin/docker stop immich_server
+          mkdir -p /var/lib/immich-db-backup
+          ${pkgs.docker}/bin/docker exec immich_postgres pg_dumpall --clean --if-exists --username=postgres | ${pkgs.gzip}/bin/gzip > /var/lib/immich-db-backup/immich-$(date +%Y%m%d_%H%M%S).sql.gz
+        '';
+        backupCleanupCommand = ''
+          ${pkgs.docker}/bin/docker start immich_server
+
+          # Notify Uptime Kuma on successful backup
+          if [ -f /etc/restic/immich-config ]; then
+            PUSH_KEY=$(grep UPTIME_KUMA_PUSH_KEY /etc/restic/immich-config | cut -d= -f2 || echo "")
+            if [ -n "$PUSH_KEY" ]; then
+              ${pkgs.curl}/bin/curl -fsS -m 10 --retry 3 "http://localhost:3001/api/push/$PUSH_KEY?status=up&msg=backup-success" || true
+            fi
+          fi
+        '';
+      };
+    };
+  };
+
+  # Monthly restore test to validate backup integrity
+  systemd.services.restic-restore-test = {
+    script = "/etc/homelab/scripts/restic-restore-test.sh";
+    path = with pkgs; [restic gzip gnugrep curl coreutils];
+    unitConfig = {
+      ConditionPathExists = [
+        "/etc/restic/immich-repository"
+        "/etc/restic/immich-password"
+      ];
+    };
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+    };
+  };
+
+  # Timer for monthly restore test
+  systemd.timers.restic-restore-test = {
+    wantedBy = ["timers.target"];
+    timerConfig = {
+      OnCalendar = "monthly";
+      Persistent = true;
+      RandomizedDelaySec = "1h";
+    };
+  };
+
+  # Copy restore test script to system location
+  environment.etc."homelab/scripts/restic-restore-test.sh" = {
+    source = ./scripts/restic-restore-test.sh;
+    mode = "0755";
+  };
+}
+
