@@ -5,14 +5,14 @@ echo "=== Immich Restic Backup Setup ==="
 
 # Check if running as root
 if [[ $EUID -eq 0 ]]; then
-   echo "Run as regular user (not root)"
-   exit 1
+	echo "Run as regular user (not root)"
+	exit 1
 fi
 
 # Check if restic service exists
 if ! systemctl list-unit-files | grep -q "restic-backups-immich.service"; then
-    echo "Restic service not found. Deploy NixOS config first: nixos-rebuild switch"
-    exit 1
+	echo "Restic service not found. Deploy NixOS config first: nixos-rebuild switch"
+	exit 1
 fi
 
 echo "Creating directories..."
@@ -28,16 +28,16 @@ read -s RESTIC_PASSWORD_CONFIRM
 echo
 
 if [[ "$RESTIC_PASSWORD" != "$RESTIC_PASSWORD_CONFIRM" ]]; then
-    echo "Passwords don't match"
-    exit 1
+	echo "Passwords don't match"
+	exit 1
 fi
 
 if [[ ${#RESTIC_PASSWORD} -lt 8 ]]; then
-    echo "Password must be at least 8 characters"
-    exit 1
+	echo "Password must be at least 8 characters"
+	exit 1
 fi
 
-echo "$RESTIC_PASSWORD" | sudo tee /etc/restic/immich-password > /dev/null
+echo "$RESTIC_PASSWORD" | sudo tee /etc/restic/immich-password >/dev/null
 
 echo "Enter Hetzner Storage Box details:"
 echo -n "Username (e.g., u123456): "
@@ -56,24 +56,20 @@ echo "Enter push key from Uptime Kuma (leave empty to skip):"
 echo -n "Push key: "
 read UPTIME_KUMA_PUSH_KEY
 
-# Create repository file (just the URL)
-echo "sftp:${HETZNER_USERNAME}@${HETZNER_HOSTNAME}:${HETZNER_PORT}${BACKUP_PATH}" | sudo tee /etc/restic/immich-repository > /dev/null
-
-# Create environment config file
-cat << EOF | sudo tee /etc/restic/immich-config > /dev/null
+# Create config file with repository URL and optional Uptime Kuma key
+cat <<EOF | sudo tee /etc/restic/immich-config >/dev/null
+RESTIC_REPOSITORY=sftp:${HETZNER_USERNAME}@${HETZNER_HOSTNAME}:${HETZNER_PORT}${BACKUP_PATH}
 EOF
 
 # Add Uptime Kuma key if provided
 if [ -n "$UPTIME_KUMA_PUSH_KEY" ]; then
-    echo "UPTIME_KUMA_PUSH_KEY=${UPTIME_KUMA_PUSH_KEY}" | sudo tee -a /etc/restic/immich-config > /dev/null
+	echo "UPTIME_KUMA_PUSH_KEY=${UPTIME_KUMA_PUSH_KEY}" | sudo tee -a /etc/restic/immich-config >/dev/null
 fi
 
 echo "Setting permissions..."
 sudo chmod 600 /etc/restic/immich-password
-sudo chmod 600 /etc/restic/immich-repository
 sudo chmod 600 /etc/restic/immich-config
 sudo chown root:root /etc/restic/immich-password
-sudo chown root:root /etc/restic/immich-repository
 sudo chown root:root /etc/restic/immich-config
 
 echo

@@ -8,11 +8,11 @@
   services.restic = {
     backups = {
       immich = {
-        # Repository file should contain just the repository URL
-        repositoryFile = "/etc/restic/immich-repository";
-        passwordFile = "/etc/restic/immich-password";
-        # Environment file for additional variables like Uptime Kuma key
+        # Dummy repository (will be overridden by RESTIC_REPOSITORY in environmentFile)
+        repository = "dummy";
+        # Environment file contains RESTIC_REPOSITORY and other variables
         environmentFile = "/etc/restic/immich-config";
+        passwordFile = "/etc/restic/immich-password";
         paths = [
           "/mnt/homelab-data/services/immich/data/library"
           "/mnt/homelab-data/services/immich/data/upload"
@@ -58,7 +58,7 @@
     path = with pkgs; [restic gzip gnugrep curl coreutils];
     unitConfig = {
       ConditionPathExists = [
-        "/etc/restic/immich-repository"
+        "/etc/restic/immich-config"
         "/etc/restic/immich-password"
       ];
     };
