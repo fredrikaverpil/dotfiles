@@ -298,3 +298,93 @@ sudo journalctl -u cloudflared -f
 - **No Port Forwarding**: Router stays secure
 - **Automatic HTTPS**: SSL certificates managed by Cloudflare
 - **Access Control**: Optional authentication via Cloudflare Access
+
+## Backup Configuration
+
+Automated restic backups for Immich to Hetzner Storage Box.
+
+### Strategy
+
+### Initial, one-time setup
+
+1. Run setup script:
+
+   ```sh
+   ./dotfiles/nix/hosts/rpi5-homelab/scripts/setup-restic-backup.sh
+   ```
+
+2. Initialize repository:
+
+   ```sh
+   sudo systemctl start restic-backups-immich-init.service
+   ```
+
+3. Test backup:
+
+   ```sh
+   sudo systemctl start restic-backups-immich.service
+   ```
+
+### Management
+
+**Status**:
+
+```sh
+sudo systemctl status restic-backups-immich.service
+sudo systemctl status restic-backups-immich.timer
+```
+
+**Logs**:
+
+```sh
+sudo journalctl -u restic-backups-immich.service -f
+```
+
+**List snapshots**:
+
+```sh
+sudo -E restic -r $(grep RESTIC_REPOSITORY /etc/restic/immich-config | cut -d= -f2) --password-file /etc/restic/immich-password snapshots
+```
+
+**Restore**:
+
+```sh
+# Stop services
+sudo systemctl stop homelab-immich
+
+# Restore to temp location
+sudo -E restic -r $(grep RESTIC_REPOSITORY /etc/restic/immich-config | cut -d= -f2) --password-file /etc/restic/immich-password restore latest --target /tmp/restore
+
+# Copy data back
+sudo cp -r /tmp/restore/mnt/homelab-data/services/immich/data/* /mnt/homelab-data/services/immich/data/
+sudo chown -R fredrik:users /mnt/homelab-data/services/immich/data
+
+# Restore database
+sudo docker exec -i immich_postgres psql -U postgres < /tmp/restore/var/lib/immich-db-backup/immich-YYYYMMDD_HHMMSS.sql
+
+# Start services
+sudo systemctl start homelab-immich
+```
+
+### Monitoring
+
+**Uptime Kuma Integration**:
+
+1. Create push monitor in Uptime Kuma:
+   - Monitor Type: "Push"
+   - Friendly Name: "Immich Backup System"
+   - Expected Interval: 25 hours
+   - Copy the push key from the URL
+
+2. Add push key to config:
+
+   ```sh
+   echo "UPTIME_KUMA_PUSH_KEY=your_push_key" | sudo tee -a /etc/restic/immich-config
+   ```
+
+3. Test notification:
+
+   ```sh
+   curl "http://localhost:3001/api/push/your_push_key?status=up&msg=test"
+   ```
+

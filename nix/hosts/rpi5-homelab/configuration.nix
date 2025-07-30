@@ -141,9 +141,84 @@ in
             enabled = true;
             port = "22";       # Standard SSH port (local + Tailscale only)
             findtime = "10m";  # Time window to look for failures: 10 minutes
+    };
+
+    restic = {
+      backups = {
+        immich = {
+          # This environment file should contain the RESTIC_REPOSITORY variable
+          # e.g., RESTIC_REPOSITORY=sftp:u479983@u479983.your-storagebox.de:23/backups/immich
+          environmentFile = "/etc/restic/immich-config";
+          passwordFile = "/etc/restic/immich-password";
+          paths = [
+            "/mnt/homelab-data/services/immich/data/library"
+            "/mnt/homelab-data/services/immich/data/upload"
+            "/mnt/homelab-data/services/immich/data/profile"
+            "/var/lib/immich-db-backup"
+          ];
+          exclude = [
+            "/mnt/homelab-data/services/immich/data/thumbs"
+            "/mnt/homelab-data/services/immich/data/encoded-video"
+          ];
+          timerConfig = {
+            OnCalendar = "daily";
+            Persistent = true;
           };
+          pruneOpts = [
+            "--keep-daily 7"
+            "--keep-weekly 4"
+            "--keep-monthly 6"
+          ];
+          backupPrepareCommand = ''
+            ${pkgs.docker}/bin/docker stop immich_server
+            mkdir -p /var/lib/immich-db-backup
+            ${pkgs.docker}/bin/docker exec immich_postgres pg_dumpall --clean --if-exists --username=postgres | ${pkgs.gzip}/bin/gzip > /var/lib/immich-db-backup/immich-$(date +%Y%m%d_%H%M%S).sql.gz
+          '';
+          backupCleanupCommand = ''
+            ${pkgs.docker}/bin/docker start immich_server
+            
+            # Notify Uptime Kuma on successful backup
+            if [ -f /etc/restic/immich-config ]; then
+              PUSH_KEY=$(grep UPTIME_KUMA_PUSH_KEY /etc/restic/immich-config | cut -d= -f2 || echo "")
+              if [ -n "$PUSH_KEY" ]; then
+                ${pkgs.curl}/bin/curl -fsS -m 10 --retry 3 "http://localhost:3001/api/push/$PUSH_KEY?status=up&msg=backup-success" || true
+              fi
+            fi
+          '';
+          extraServiceConfig = {
+            ConditionPathExists = [
+              "/etc/restic/immich-config"
+              "/etc/restic/immich-password"
+            ];
         };
       };
+    };
+
+    # Monthly restore test to validate backup integrity
+    restic-restore-test = {
+      script = "/etc/homelab/scripts/restic-restore-test.sh";
+      path = with pkgs; [ restic gzip gnugrep curl coreutils ];
+      serviceConfig = {
+        Type = "oneshot";
+        User = "root";
+        ConditionPathExists = [
+          "/etc/restic/immich-config"
+          "/etc/restic/immich-password"
+        ];
+      };
+    };
+  };
+
+  systemd.timers = {
+    restic-restore-test = {
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnCalendar = "monthly";
+        Persistent = true;
+        RandomizedDelaySec = "1h";
+      };
+    };
+  };  };      };
     };
 
     # Cockpit web-based system administration interface
@@ -179,7 +254,7 @@ in
   # ========================================================================
   # HOMELAB DOCKER SERVICES
   # ========================================================================
-  # Copy docker-compose files to system locations
+  # Copy docker-compose files and scripts to system locations
   environment.etc = {
     "homelab/portainer/docker-compose.yml".source = ./docker-compose/portainer.yml;
     "homelab/uptime-kuma/docker-compose.yml".source = ./docker-compose/uptime-kuma.yml;
@@ -187,6 +262,10 @@ in
     "homelab/immich/.env".source = ./docker-compose/immich.env;
     "homelab/jellyfin/docker-compose.yml".source = ./docker-compose/jellyfin.yml;
     "homelab/jellyfin/.env".source = ./docker-compose/jellyfin.env;
+    "homelab/scripts/restic-restore-test.sh" = {
+      source = ./scripts/restic-restore-test.sh;
+      mode = "0755";
+    };
   };
 
   # Systemd services for docker-compose stacks
