@@ -313,6 +313,9 @@ in {
       docker # Container runtime
       docker-compose # Container orchestration
 
+      # Backup tools
+      restic # Backup tool for Immich and other services
+
       # Cloudflare tools
       cloudflared # Cloudflare Tunnel client
 
