@@ -24,7 +24,7 @@
           "/mnt/homelab-data/services/immich/data/encoded-video"
         ];
         timerConfig = {
-          OnCalendar = "daily";
+          OnCalendar = "03:00";  # immich postgres db dump runs at 2:00 AM
           Persistent = true;
         };
         pruneOpts = [
