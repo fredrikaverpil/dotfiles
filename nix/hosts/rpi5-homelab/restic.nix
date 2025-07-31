@@ -40,11 +40,25 @@
         backupCleanupCommand = ''
           ${pkgs.docker}/bin/docker start immich_server
 
-          # Notify Uptime Kuma on successful backup
-          if [ -f /etc/restic/immich-config ]; then
-            PUSH_KEY=$(grep UPTIME_KUMA_PUSH_KEY /etc/restic/immich-config | cut -d= -f2 || echo "")
-            if [ -n "$PUSH_KEY" ]; then
-              ${pkgs.curl}/bin/curl -fsS -m 10 --retry 3 "http://localhost:3001/api/push/$PUSH_KEY?status=up&msg=backup-success" || true
+          # Run restore test after backup completion
+          echo "Running restore test to validate backup..."
+          if /etc/homelab/scripts/restic-restore-test.sh; then
+            echo "✅ Backup and restore test both successful"
+            # Notify Uptime Kuma on complete success (backup + restore test)
+            if [ -f /etc/restic/immich-config ]; then
+              PUSH_KEY=$(grep UPTIME_KUMA_PUSH_KEY /etc/restic/immich-config | cut -d= -f2 || echo "")
+              if [ -n "$PUSH_KEY" ]; then
+                ${pkgs.curl}/bin/curl -fsS -m 10 --retry 3 "http://localhost:3001/api/push/$PUSH_KEY?status=up&msg=backup-complete" || true
+              fi
+            fi
+          else
+            echo "❌ Backup succeeded but restore test failed"
+            # Notify Uptime Kuma on partial success (backup OK, restore test failed)
+            if [ -f /etc/restic/immich-config ]; then
+              PUSH_KEY=$(grep UPTIME_KUMA_PUSH_KEY /etc/restic/immich-config | cut -d= -f2 || echo "")
+              if [ -n "$PUSH_KEY" ]; then
+                ${pkgs.curl}/bin/curl -fsS -m 10 --retry 3 "http://localhost:3001/api/push/$PUSH_KEY?status=down&msg=backup-partial" || true
+              fi
             fi
           fi
         '';
@@ -52,31 +66,7 @@
     };
   };
 
-  # Monthly restore test to validate backup integrity
-  systemd.services.restic-restore-test = {
-    script = "/etc/homelab/scripts/restic-restore-test.sh";
-    path = with pkgs; [restic gzip gnugrep curl coreutils];
-    unitConfig = {
-      ConditionPathExists = [
-        "/etc/restic/immich-config"
-        "/etc/restic/immich-password"
-      ];
-    };
-    serviceConfig = {
-      Type = "oneshot";
-      User = "root";
-    };
-  };
 
-  # Timer for monthly restore test
-  systemd.timers.restic-restore-test = {
-    wantedBy = ["timers.target"];
-    timerConfig = {
-      OnCalendar = "monthly";
-      Persistent = true;
-      RandomizedDelaySec = "1h";
-    };
-  };
 
   # Copy restore test script to system location
   environment.etc."homelab/scripts/restic-restore-test.sh" = {
