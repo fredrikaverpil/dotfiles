@@ -46,12 +46,12 @@ in {
   };
 
   # Wireless network configuration
-  # Use NetworkManager with iwd backend for complete network management
-  networking.wireless.enable = false; # Disable wpa_supplicant
-  networking.wireless.iwd.enable = true; # Enable Intel's iwd for WiFi authentication
+  # Use NetworkManager with wpa_supplicant backend for better Pi stability under load
+  networking.wireless.enable = true; # Enable wpa_supplicant
+  networking.wireless.iwd.enable = false; # Disable iwd (less stable on Pi under load)
   networking.networkmanager = {
     enable = true;
-    wifi.backend = "iwd"; # Use iwd instead of wpa_supplicant for WiFi
+    wifi.backend = "wpa_supplicant"; # Use wpa_supplicant instead of iwd for WiFi
     # Disable VPN plugins to avoid webkitgtk build on headless server
     # Default plugins (iodine-gnome, openconnect, etc.) pull in webkitgtk GUI dependencies
     # which are unnecessary for a headless homelab and cause expensive builds from source

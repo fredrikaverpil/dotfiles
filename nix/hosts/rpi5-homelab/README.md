@@ -121,13 +121,14 @@ Change the password using `passwd`:
 If you did not set the Wi-Fi password, log into the homelab locally and...
 
 ```sh
-iwctl  # start iwctl in interactive mode
-device list # get devices, such as 'wlan0'
-station wlan0 scan # scan for networks
-station wlan0 get-networks # show available networks
-station wlan0 connect "YOUR_SSID" # connect (will prompt for password)
-quit # exit iwctl
+# Using NetworkManager with wpa_supplicant backend
+nmcli device wifi list # scan and show available networks
+nmcli device wifi connect "YOUR_SSID" password "YOUR_PASSWORD"
 
+# Alternative: use text-based UI for network configuration
+nmtui
+
+# Verify connection
 ip a # verify connection and get IP
 systemctl is-enabled sshd  # check if sshd is enabled
 systemctl is-active sshd  # check if sshd is running
