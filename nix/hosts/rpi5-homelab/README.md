@@ -370,21 +370,25 @@ sudo systemctl start homelab-immich
 
 **Uptime Kuma Integration**:
 
+The setup script automatically handles Uptime Kuma integration:
+
 1. Create push monitor in Uptime Kuma:
    - Monitor Type: "Push"
    - Friendly Name: "Immich Backup System"
    - Expected Interval: 25 hours
    - Copy the push key from the URL
 
-2. Add push key to config:
-
-   ```sh
-   echo "UPTIME_KUMA_PUSH_KEY=your_push_key" | sudo tee -a /etc/restic/immich-config
+2. During setup script execution, you'll be prompted:
+   ```
+   Optional: Uptime Kuma monitoring
+   Enter push key from Uptime Kuma (leave empty to skip):
+   Push key: [paste your key here]
    ```
 
-3. Test notification:
-
+3. Test notification (if configured):
    ```sh
    curl "http://localhost:3001/api/push/your_push_key?status=up&msg=test"
    ```
+
+The backup and restore test services will automatically send status updates to Uptime Kuma when configured.
 
