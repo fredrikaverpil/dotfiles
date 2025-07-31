@@ -67,20 +67,42 @@ if [ -n "$UPTIME_KUMA_PUSH_KEY" ]; then
 fi
 
 echo "Setting permissions..."
+sudo chmod 700 /etc/restic
+sudo chown root:root /etc/restic
 sudo chmod 600 /etc/restic/immich-password
 sudo chmod 600 /etc/restic/immich-config
 sudo chown root:root /etc/restic/immich-password
 sudo chown root:root /etc/restic/immich-config
 
+echo "Setting up SSH keys for passwordless authentication..."
+# Ensure root has .ssh directory
+sudo mkdir -p /root/.ssh
+sudo chmod 700 /root/.ssh
+
+# Copy user's SSH keys to root (needed for automated backups)
+if [ -f ~/.ssh/id_ed25519 ]; then
+	echo "Copying SSH keys to root..."
+	sudo cp ~/.ssh/id_ed25519* /root/.ssh/
+	sudo chown root:root /root/.ssh/id_ed25519*
+	sudo chmod 600 /root/.ssh/id_ed25519
+	sudo chmod 644 /root/.ssh/id_ed25519.pub
+else
+	echo "WARNING: No SSH key found at ~/.ssh/id_ed25519"
+	echo "You may need to generate one or copy your existing key to /root/.ssh/"
+fi
+
 echo
 echo "✅ Setup complete"
 echo
 echo "Next steps:"
-echo "1. Initialize repository: sudo systemctl start restic-backups-immich-init.service"
-echo "2. Check status: sudo systemctl status restic-backups-immich-init.service"
+echo "1. Test SSH connection (should not ask for password):"
+echo "   sudo ssh ${HETZNER_USERNAME}@${HETZNER_HOSTNAME} -p ${HETZNER_PORT} exit"
+echo "2. Initialize repository manually:"
+echo '   sudo bash -c '\''restic init --repo "$(grep RESTIC_REPOSITORY /etc/restic/immich-config | cut -d= -f2)" --password-file /etc/restic/immich-password'\'''
 echo "3. Test backup: sudo systemctl start restic-backups-immich.service"
-echo "4. Test restore: sudo systemctl start restic-restore-test.service"
-echo "5. View logs: sudo journalctl -u restic-backups-immich.service -f"
+echo "4. Check backup status: sudo systemctl status restic-backups-immich.service"
+echo "5. Test restore: sudo systemctl start restic-restore-test.service"
+echo "6. View logs: sudo journalctl -u restic-backups-immich.service -f"
 echo
 echo "Store the password safely - required for restore"
 echo "Daily backups run at 02:00 AM"
