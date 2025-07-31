@@ -47,7 +47,7 @@ in {
 
   # Wireless network configuration
   # Use NetworkManager with wpa_supplicant backend for better Pi stability under load
-  networking.wireless.enable = true; # Enable wpa_supplicant
+  networking.wireless.enable = false; # Let NetworkManager handle WiFi
   networking.wireless.iwd.enable = false; # Disable iwd (less stable on Pi under load)
   networking.networkmanager = {
     enable = true;
