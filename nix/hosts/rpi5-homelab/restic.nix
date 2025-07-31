@@ -24,7 +24,7 @@
           "/mnt/homelab-data/services/immich/data/encoded-video"
         ];
         timerConfig = {
-          OnCalendar = "03:00";  # immich postgres db dump runs at 2:00 AM
+          OnCalendar = "03:00"; # immich postgres db dump runs at 2:00 AM
           Persistent = true;
         };
         pruneOpts = [
@@ -66,7 +66,13 @@
     };
   };
 
-
+  # Override systemd service configuration for restic backup CPU scheduling
+  systemd.services.restic-backups-immich = {
+    serviceConfig = {
+      # Process priority - lower than normal so SSH/interactive processes get priority
+      Nice = 10; # Higher nice value = lower priority, yields CPU to other processes
+    };
+  };
 
   # Copy restore test script to system location
   environment.etc."homelab/scripts/restic-restore-test.sh" = {
@@ -74,4 +80,3 @@
     mode = "0755";
   };
 }
-
