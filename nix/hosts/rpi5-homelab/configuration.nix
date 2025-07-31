@@ -269,7 +269,6 @@ in {
         ExecStop = "${pkgs.docker-compose}/bin/docker-compose down";
         ExecReload = "${pkgs.docker-compose}/bin/docker-compose up -d --force-recreate";
         TimeoutStartSec = "600"; # Immich takes longer to start (ML models, etc.)
-        Nice = 10;              # Lower priority to keep system responsive
       };
       wantedBy = ["multi-user.target"];
     };
