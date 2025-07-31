@@ -1,11 +1,22 @@
 #
-# WARNING: To install Immich, follow our guide: https://immich.app/docs/install/docker-compose
+# NOTE: To install Immich, follow the guide: https://immich.app/docs/install/docker-compose
 #
 # Make sure to use the docker-compose.yml of the current release:
 #
 # https://github.com/immich-app/immich/releases/latest/download/docker-compose.yml
 #
 # The compose file on main may not be compatible with the latest release.
+#
+# NOTE: DISASTER RECOVERY
+# This Immich instance uses STORAGE TEMPLATE with default pattern enabled.
+# Pattern: Year/Year-Month-Day/Filename.Extension (e.g., 2024/2024-01-15/IMG_1234.jpg)
+#
+# CRITICAL: When restoring from backup, must:
+# 1. Enable "Storage Template" in Administration -> Settings -> Storage Template
+# 2. Use the default template pattern before running any library scans
+# 3. Files are backed up in this organized structure via restic
+#
+# Failure to enable storage template will cause file organization mismatch!
 
 name: immich
 
