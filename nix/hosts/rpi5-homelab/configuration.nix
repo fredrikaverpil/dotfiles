@@ -58,6 +58,11 @@ in {
     plugins = lib.mkForce [];
   };
 
+  # Disable WiFi power management to prevent connection drops under high CPU load
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="net", KERNEL=="wlan*", RUN+="${pkgs.iw}/bin/iw dev $name set power_save off"
+  '';
+
   # Firewall configuration for homelab services
   # NOTE: for maximum security, do not expose SSH to internet, only via Tailscale VPN
   networking.firewall = {
