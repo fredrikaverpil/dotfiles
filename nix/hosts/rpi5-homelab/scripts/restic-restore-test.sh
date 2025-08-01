@@ -264,31 +264,28 @@ get_postgres_config() {
 }
 
 start_test_postgres() {
-	local test_container="restic_test_postgres_$(date +%s)_$$"
+	TEST_CONTAINER_NAME="restic_test_postgres_$(date +%s)_$$"
 	
 	log_progress "Starting test PostgreSQL container..."
 	if docker run -d \
-		--name "$test_container" \
+		--name "$TEST_CONTAINER_NAME" \
 		-e POSTGRES_PASSWORD=testpass \
 		-e POSTGRES_USER=postgres \
 		"$POSTGRES_IMAGE" >/dev/null 2>&1; then
 		
-		add_test_container "$test_container"
+		add_test_container "$TEST_CONTAINER_NAME"
 		
-		# Wait for startup with timeout
 		local timeout=60
 		log_progress "Waiting for PostgreSQL to start..."
 		while [ $timeout -gt 0 ]; do
-			# Check if container is still running first
-			if ! docker ps --format "{{.Names}}" | grep -q "^$test_container$"; then
+			if ! docker ps --format "{{.Names}}" | grep -q "^$TEST_CONTAINER_NAME$"; then
 				log_error "Test PostgreSQL container stopped unexpectedly"
-				docker logs "$test_container" 2>/dev/null || true
+				docker logs "$TEST_CONTAINER_NAME" 2>/dev/null || true
 				return 1
 			fi
 			
-			if timeout 5 docker exec "$test_container" pg_isready -U postgres >/dev/null 2>&1; then
-				log_success "Test PostgreSQL container ready: $test_container"
-				echo "$test_container"
+			if timeout 5 docker exec "$TEST_CONTAINER_NAME" pg_isready -U postgres >/dev/null 2>&1; then
+				log_success "Test PostgreSQL container ready: $TEST_CONTAINER_NAME"
 				return 0
 			fi
 			sleep 1
@@ -296,9 +293,9 @@ start_test_postgres() {
 		done
 		
 		log_error "Test PostgreSQL container failed to start within 60 seconds"
-		docker logs "$test_container" 2>/dev/null || true
-		timeout 30 docker stop "$test_container" >/dev/null 2>&1 || true
-		timeout 10 docker rm "$test_container" >/dev/null 2>&1 || true
+		docker logs "$TEST_CONTAINER_NAME" 2>/dev/null || true
+		timeout 30 docker stop "$TEST_CONTAINER_NAME" >/dev/null 2>&1 || true
+		timeout 10 docker rm "$TEST_CONTAINER_NAME" >/dev/null 2>&1 || true
 		return 1
 	else
 		log_error "Failed to start test PostgreSQL container"
@@ -330,13 +327,16 @@ find_latest_sql_file() {
 # Validation functions
 validate_sql_file() {
 	local sql_file="$1"
-	local test_container
 	
 	log_info "Testing file: $(basename "$sql_file")"
 	
-	# Test gzip integrity
 	if ! timeout 30 gunzip -t "$sql_file" 2>/dev/null; then
 		log_error "Gzip integrity check failed for $(basename "$sql_file")"
+		return 1
+	fi
+	
+	if ! start_test_postgres; then
+		log_error "Failed to start test PostgreSQL container for $(basename "$sql_file")"
 		return 1
 	fi
 	
@@ -350,19 +350,17 @@ validate_sql_file() {
 	log_progress "Loading SQL dump into test container..."
 	if timeout 600 gunzip -c "$sql_file" | \
 	   sed "s/SELECT pg_catalog.set_config('search_path', '', false);/SELECT pg_catalog.set_config('search_path', 'public, pg_catalog', true);/g" | \
-	   docker exec -i "$test_container" psql -U postgres 2>&1; then
+	   docker exec -i "$TEST_CONTAINER_NAME" psql -U postgres 2>&1; then
 		
-		# Verify immich database and tables exist
 		local table_count
-		table_count=$(timeout 30 docker exec "$test_container" psql -U postgres -d immich -t -c \
+		table_count=$(timeout 30 docker exec "$TEST_CONTAINER_NAME" psql -U postgres -d immich -t -c \
 			"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public';" 2>/dev/null | tr -d ' ' || echo 0)
 		
 		if [ "$table_count" -gt 0 ]; then
 			log_success "Validated: $(basename "$sql_file") ($table_count tables)"
 			
-			# Cleanup test container immediately
-			timeout 30 docker stop "$test_container" >/dev/null 2>&1 || true
-			timeout 10 docker rm "$test_container" >/dev/null 2>&1 || true
+			timeout 30 docker stop "$TEST_CONTAINER_NAME" >/dev/null 2>&1 || true
+			timeout 10 docker rm "$TEST_CONTAINER_NAME" >/dev/null 2>&1 || true
 			return 0
 		else
 			log_error "No tables found in restored immich database"
@@ -371,9 +369,8 @@ validate_sql_file() {
 		log_error "Failed to load SQL dump: $(basename "$sql_file")"
 	fi
 	
-	# Cleanup failed test container
-	timeout 30 docker stop "$test_container" >/dev/null 2>&1 || true
-	timeout 10 docker rm "$test_container" >/dev/null 2>&1 || true
+	timeout 30 docker stop "$TEST_CONTAINER_NAME" >/dev/null 2>&1 || true
+	timeout 10 docker rm "$TEST_CONTAINER_NAME" >/dev/null 2>&1 || true
 	return 1
 }
 
