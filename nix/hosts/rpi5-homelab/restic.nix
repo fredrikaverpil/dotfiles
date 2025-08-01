@@ -39,7 +39,7 @@
   };
 
   # Add required packages to the restic backup service PATH
-  systemd.services.restic-backups-immich.path = with pkgs; [ docker gzip curl coreutils gnugrep ];
+  systemd.services.restic-backups-immich.path = with pkgs; [ docker gzip curl coreutils gnugrep openssh ];
 
   # Separate validation service
   systemd.services.restic-validation-immich = {
