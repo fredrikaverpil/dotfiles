@@ -115,6 +115,12 @@
     # Infrastructure & Cloud
     # ========================================================================
     opentofu
+
+    # ========================================================================
+    # Terminal Support
+    # ========================================================================
+    kitty.terminfo    # Terminal emulator terminfo for SSH compatibility
+    # ghostty.terminfo  # Terminal emulator terminfo - disabled due to broken package
   ];
 
   # Additional packages are added in individual user configurations
