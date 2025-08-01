@@ -408,7 +408,7 @@ run_validation() {
 	
 	# Restore database backup files
 	log_progress "Restoring database backup files..."
-	if ! timeout 1800 restic restore "$SNAPSHOT" --target "$TEMP_DIR" --include "/var/lib/immich-db-backup" 2>/dev/null; then
+	if ! timeout 1800 restic restore "$SNAPSHOT" --target "$TEMP_DIR" --include "/var/lib/immich-db-backup"; then
 		log_error "Failed to restore backup files"
 		return 1
 	fi
@@ -483,7 +483,7 @@ run_save() {
 	
 	# Restore database backup files
 	log_progress "Restoring database backup files..."
-	if ! timeout 1800 restic restore "$SNAPSHOT" --target "$TEMP_DIR" --include "/var/lib/immich-db-backup" 2>/dev/null; then
+	if ! timeout 1800 restic restore "$SNAPSHOT" --target "$TEMP_DIR" --include "/var/lib/immich-db-backup"; then
 		log_error "Failed to restore backup files"
 		return 1
 	fi
@@ -544,7 +544,7 @@ run_restore() {
 	
 	# Restore database backup files
 	log_progress "Restoring database backup files..."
-	if ! timeout 1800 restic restore "$SNAPSHOT" --target "$TEMP_DIR" --include "/var/lib/immich-db-backup" 2>/dev/null; then
+	if ! timeout 1800 restic restore "$SNAPSHOT" --target "$TEMP_DIR" --include "/var/lib/immich-db-backup"; then
 		log_error "Failed to restore backup files"
 		return 1
 	fi
