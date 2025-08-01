@@ -9,7 +9,7 @@ readonly MAX_RETRIES=3
 
 # Global state tracking (POSIX compatible)
 TEMP_DIR=""
-TEMP_DB_LIST=""
+TEST_CONTAINERS=""
 BACKUP_FILE=""
 SERVICES_STOPPED=""
 MODE=""
@@ -115,25 +115,25 @@ validate_container() {
 	fi
 }
 
-# POSIX-compatible test database tracking
-add_test_db() {
-	local db_name="$1"
-	if [ -z "$TEMP_DB_LIST" ]; then
-		TEMP_DB_LIST="$db_name"
+# POSIX-compatible test container tracking
+add_test_container() {
+	local container="$1"
+	if [ -z "$TEST_CONTAINERS" ]; then
+		TEST_CONTAINERS="$container"
 	else
-		TEMP_DB_LIST="$TEMP_DB_LIST $db_name"
+		TEST_CONTAINERS="$TEST_CONTAINERS $container"
 	fi
 }
 
-cleanup_test_databases() {
-	if [ -n "$TEMP_DB_LIST" ]; then
-		log_progress "Cleaning up test databases..."
-		for db_name in $TEMP_DB_LIST; do
-			if [ -n "$db_name" ]; then
-				timeout 30 docker exec "$POSTGRES_CONTAINER" dropdb -U postgres "$db_name" 2>/dev/null || true
+cleanup_test_containers() {
+	if [ -n "$TEST_CONTAINERS" ]; then
+		log_progress "Cleaning up test containers..."
+		for container in $TEST_CONTAINERS; do
+			if [ -n "$container" ]; then
+				timeout 30 docker stop "$container" >/dev/null 2>&1 || true
 			fi
 		done
-		TEMP_DB_LIST=""
+		TEST_CONTAINERS=""
 	fi
 }
 
@@ -148,8 +148,8 @@ cleanup_all() {
 		TEMP_DIR=""
 	fi
 	
-	# Cleanup test databases
-	cleanup_test_databases
+	# Cleanup test containers
+	cleanup_test_containers
 	
 	# If this was a failed restore, attempt rollback
 	if [ "$exit_code" -ne 0 ] && [ "$MODE" = "restore" ] && [ -n "$BACKUP_FILE" ] && [ -f "$BACKUP_FILE" ]; then
@@ -255,6 +255,47 @@ rollback_database() {
 	fi
 }
 
+# PostgreSQL container management
+get_postgres_config() {
+	# Get production container image and basic config
+	POSTGRES_IMAGE=$(docker inspect "$POSTGRES_CONTAINER" --format='{{.Config.Image}}' 2>/dev/null || echo "postgres:15")
+	log_info "Using PostgreSQL image: $POSTGRES_IMAGE"
+}
+
+start_test_postgres() {
+	local test_container="restic_test_postgres_$(date +%s)_$$"
+	
+	log_progress "Starting test PostgreSQL container..."
+	if docker run --rm -d \
+		--name "$test_container" \
+		-e POSTGRES_PASSWORD=testpass \
+		-e POSTGRES_USER=postgres \
+		"$POSTGRES_IMAGE" >/dev/null 2>&1; then
+		
+		add_test_container "$test_container"
+		
+		# Wait for startup with timeout
+		local timeout=60
+		log_progress "Waiting for PostgreSQL to start..."
+		while [ $timeout -gt 0 ]; do
+			if timeout 5 docker exec "$test_container" pg_isready -U postgres >/dev/null 2>&1; then
+				log_success "Test PostgreSQL container ready: $test_container"
+				echo "$test_container"
+				return 0
+			fi
+			sleep 1
+			timeout=$((timeout - 1))
+		done
+		
+		log_error "Test PostgreSQL container failed to start within 60 seconds"
+		timeout 30 docker stop "$test_container" >/dev/null 2>&1 || true
+		return 1
+	else
+		log_error "Failed to start test PostgreSQL container"
+		return 1
+	fi
+}
+
 # File operations
 find_latest_sql_file() {
 	local backup_dir="$1"
@@ -279,7 +320,7 @@ find_latest_sql_file() {
 # Validation functions
 validate_sql_file() {
 	local sql_file="$1"
-	local test_db="restic_test_$(date +%s)_$$"
+	local test_container
 	
 	log_info "Testing file: $(basename "$sql_file")"
 	
@@ -289,36 +330,38 @@ validate_sql_file() {
 		return 1
 	fi
 	
-	# Create test database
-	if ! timeout 30 docker exec "$POSTGRES_CONTAINER" createdb -U postgres "$test_db" 2>/dev/null; then
-		log_error "Failed to create test database for $(basename "$sql_file")"
+	# Start test PostgreSQL container
+	if ! test_container=$(start_test_postgres); then
+		log_error "Failed to start test PostgreSQL container for $(basename "$sql_file")"
 		return 1
 	fi
 	
-	add_test_db "$test_db"
-	
-	# Load SQL dump with Immich's required search_path fix
-	if timeout 600 gunzip -c "$sql_file" | sed "s/SELECT pg_catalog.set_config('search_path', '', false);/SELECT pg_catalog.set_config('search_path', 'public, pg_catalog', true);/g" | docker exec -i "$POSTGRES_CONTAINER" psql -U postgres -d "$test_db" >/dev/null 2>&1; then
-		# Verify tables exist
+	# Load SQL dump into test container (cluster level - safe because isolated)
+	log_progress "Loading SQL dump into test container..."
+	if timeout 600 gunzip -c "$sql_file" | \
+	   sed "s/SELECT pg_catalog.set_config('search_path', '', false);/SELECT pg_catalog.set_config('search_path', 'public, pg_catalog', true);/g" | \
+	   docker exec -i "$test_container" psql -U postgres >/dev/null 2>&1; then
+		
+		# Verify immich database and tables exist
 		local table_count
-		table_count=$(timeout 30 docker exec "$POSTGRES_CONTAINER" psql -U postgres -d "$test_db" -t -c \
+		table_count=$(timeout 30 docker exec "$test_container" psql -U postgres -d immich -t -c \
 			"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public';" 2>/dev/null | tr -d ' ' || echo 0)
 		
 		if [ "$table_count" -gt 0 ]; then
 			log_success "Validated: $(basename "$sql_file") ($table_count tables)"
 			
-			# Cleanup this test database immediately
-			timeout 30 docker exec "$POSTGRES_CONTAINER" dropdb -U postgres "$test_db" 2>/dev/null || true
+			# Cleanup test container immediately
+			timeout 30 docker stop "$test_container" >/dev/null 2>&1 || true
 			return 0
 		else
-			log_error "No tables found in $(basename "$sql_file")"
+			log_error "No tables found in restored immich database"
 		fi
 	else
 		log_error "Failed to load SQL dump: $(basename "$sql_file")"
 	fi
 	
-	# Cleanup failed test database
-	timeout 30 docker exec "$POSTGRES_CONTAINER" dropdb -U postgres "$test_db" 2>/dev/null || true
+	# Cleanup failed test container
+	timeout 30 docker stop "$test_container" >/dev/null 2>&1 || true
 	return 1
 }
 
@@ -326,8 +369,8 @@ validate_sql_file() {
 run_validation() {
 	log_info "Starting backup validation test (snapshot: $SNAPSHOT)..."
 	
-	# Validate prerequisites
-	validate_container "$POSTGRES_CONTAINER" "true" || return 1
+	# Get PostgreSQL configuration for test containers
+	get_postgres_config
 	
 	# Create temporary directory
 	TEMP_DIR=$(mktemp -d) || { log_error "Failed to create temporary directory"; return 1; }
@@ -348,7 +391,7 @@ run_validation() {
 		return 1
 	fi
 	
-	log_progress "Validating restored SQL files with PostgreSQL..."
+	log_progress "Validating restored SQL files with isolated PostgreSQL containers..."
 	
 	for sql_file in "$backup_dir"/*.sql.gz; do
 		if [ -f "$sql_file" ]; then
@@ -423,9 +466,9 @@ run_restore() {
 		return 1
 	fi
 	
-	# Restore from backup with Immich's required search_path fix
+	# Restore from backup with Immich's required search_path fix (cluster level)
 	log_progress "Restoring database from backup..."
-	if timeout 1800 gunzip -c "$sql_file" | sed "s/SELECT pg_catalog.set_config('search_path', '', false);/SELECT pg_catalog.set_config('search_path', 'public, pg_catalog', true);/g" | docker exec -i "$POSTGRES_CONTAINER" psql --dbname=postgres --username=postgres >/dev/null 2>&1; then
+	if timeout 1800 gunzip -c "$sql_file" | sed "s/SELECT pg_catalog.set_config('search_path', '', false);/SELECT pg_catalog.set_config('search_path', 'public, pg_catalog', true);/g" | docker exec -i "$POSTGRES_CONTAINER" psql -U postgres >/dev/null 2>&1; then
 		log_success "Database restore completed successfully"
 	else
 		log_error "Database restore failed"
