@@ -67,10 +67,10 @@ if [ -n "$UPTIME_KUMA_PUSH_KEY" ]; then
 fi
 
 echo "Setting permissions..."
-sudo chmod 700 /etc/restic
+sudo chmod 755 /etc/restic
 sudo chown root:root /etc/restic
 sudo chmod 600 /etc/restic/immich-password
-sudo chmod 600 /etc/restic/immich-config
+sudo chmod 644 /etc/restic/immich-config
 sudo chown root:root /etc/restic/immich-password
 sudo chown root:root /etc/restic/immich-config
 
