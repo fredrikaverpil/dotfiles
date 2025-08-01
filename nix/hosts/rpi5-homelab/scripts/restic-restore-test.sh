@@ -30,6 +30,7 @@ TEMP_DIR=$(mktemp -d)
 
 # Load restic environment
 source /etc/restic/immich-config
+export RESTIC_REPOSITORY
 export RESTIC_PASSWORD_FILE=/etc/restic/immich-password
 
 # Restore only database backups (minimal bandwidth)
