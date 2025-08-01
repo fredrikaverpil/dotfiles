@@ -1,8 +1,11 @@
 # This file contains system-level settings specific to Linux/NixOS systems.
-
-{ config, pkgs, lib, inputs, ... }:
-
 {
+  config,
+  pkgs,
+  lib,
+  inputs,
+  ...
+}: {
   options = {
     dotfiles.extraSystemPackages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
@@ -18,7 +21,7 @@
   };
 
   config = {
-    nix.settings.experimental-features = [ "nix-command" "flakes" ];
+    nix.settings.experimental-features = ["nix-command" "flakes"];
 
     # Home-manager configuration
     home-manager = {
@@ -27,46 +30,49 @@
       backupFileExtension = "backup";
     };
 
-  # TODO: Security considerations:
-  # - Consider enabling passwordless sudo only for specific commands
-  security.sudo.wheelNeedsPassword = false;
-  
-  # Note: User configuration is handled by shared/users/default.nix
+    # TODO: Security considerations:
+    # - Consider enabling passwordless sudo only for specific commands
+    security.sudo.wheelNeedsPassword = false;
 
-  # System-level packages
-  environment.systemPackages = with pkgs; [
-    vim # for recovery
-  ] ++ config.dotfiles.extraSystemPackages;
+    # Note: User configuration is handled by shared/users/default.nix
 
-  # Nix registry for easy access to stable and unstable packages
-  # Note: This would require inputs to be passed as specialArgs
-  # nix.registry = {
-  #   n.to = {
-  #     type = "path";
-  #     path = inputs.nixpkgs;
-  #   };
-  #   u.to = {
-  #     type = "path";
-  #     path = inputs.nixos-unstable;
-  #   };
-  # };
+    # System-level packages
+    environment.systemPackages = with pkgs;
+      [
+        vim # for recovery
+      ]
+      ++ config.dotfiles.extraSystemPackages;
 
-  # Font management
-  # NOTE: Berkeley Mono is installed manually, as it requires a license.
-  fonts.packages = with pkgs; [
-    nerd-fonts.fira-code
-    nerd-fonts.fira-mono
-    nerd-fonts.hack
-    nerd-fonts.jetbrains-mono
-    maple-mono.NF
-    noto-fonts-emoji
-    nerd-fonts.symbols-only
-  ];
+    # Nix registry for easy access to stable and unstable packages
+    # Note: This would require inputs to be passed as specialArgs
+    # nix.registry = {
+    #   n.to = {
+    #     type = "path";
+    #     path = inputs.nixpkgs;
+    #   };
+    #   u.to = {
+    #     type = "path";
+    #     path = inputs.nixos-unstable;
+    #   };
+    # };
 
-  # Apply additional services configuration
-  services = lib.mkMerge [ 
-    { } # Default empty services
-    config.dotfiles.extraServices
-  ];
+    # Font management
+    # NOTE: Berkeley Mono is installed manually, as it requires a license.
+    fonts.packages = with pkgs; [
+      nerd-fonts.fira-code
+      nerd-fonts.fira-mono
+      nerd-fonts.hack
+      nerd-fonts.jetbrains-mono
+      maple-mono.truetype
+      maple-mono.variable
+      noto-fonts-emoji
+      nerd-fonts.symbols-only
+    ];
+
+    # Apply additional services configuration
+    services = lib.mkMerge [
+      {} # Default empty services
+      config.dotfiles.extraServices
+    ];
   };
 }
