@@ -239,9 +239,9 @@ rollback_database() {
 		# Drop current database
 		timeout 30 docker exec "$POSTGRES_CONTAINER" dropdb -U postgres immich 2>/dev/null || true
 		
-		# Recreate and restore
+		# Recreate and restore with search_path fix
 		if timeout 30 docker exec "$POSTGRES_CONTAINER" createdb -U postgres immich 2>/dev/null; then
-			if gunzip -c "$BACKUP_FILE" | timeout 600 docker exec -i "$POSTGRES_CONTAINER" psql -U postgres >/dev/null 2>&1; then
+			if gunzip -c "$BACKUP_FILE" | sed "s/SELECT pg_catalog.set_config('search_path', '', false);/SELECT pg_catalog.set_config('search_path', 'public, pg_catalog', true);/g" | timeout 600 docker exec -i "$POSTGRES_CONTAINER" psql --dbname=postgres --username=postgres >/dev/null 2>&1; then
 				log_success "Database rollback completed"
 				return 0
 			fi
@@ -297,8 +297,8 @@ validate_sql_file() {
 	
 	add_test_db "$test_db"
 	
-	# Load SQL dump
-	if timeout 600 gunzip -c "$sql_file" | docker exec -i "$POSTGRES_CONTAINER" psql -U postgres -d "$test_db" >/dev/null 2>&1; then
+	# Load SQL dump with Immich's required search_path fix
+	if timeout 600 gunzip -c "$sql_file" | sed "s/SELECT pg_catalog.set_config('search_path', '', false);/SELECT pg_catalog.set_config('search_path', 'public, pg_catalog', true);/g" | docker exec -i "$POSTGRES_CONTAINER" psql -U postgres -d "$test_db" >/dev/null 2>&1; then
 		# Verify tables exist
 		local table_count
 		table_count=$(timeout 30 docker exec "$POSTGRES_CONTAINER" psql -U postgres -d "$test_db" -t -c \
@@ -423,9 +423,9 @@ run_restore() {
 		return 1
 	fi
 	
-	# Restore from backup
+	# Restore from backup with Immich's required search_path fix
 	log_progress "Restoring database from backup..."
-	if timeout 1800 gunzip -c "$sql_file" | docker exec -i "$POSTGRES_CONTAINER" psql -U postgres >/dev/null 2>&1; then
+	if timeout 1800 gunzip -c "$sql_file" | sed "s/SELECT pg_catalog.set_config('search_path', '', false);/SELECT pg_catalog.set_config('search_path', 'public, pg_catalog', true);/g" | docker exec -i "$POSTGRES_CONTAINER" psql --dbname=postgres --username=postgres >/dev/null 2>&1; then
 		log_success "Database restore completed successfully"
 	else
 		log_error "Database restore failed"
