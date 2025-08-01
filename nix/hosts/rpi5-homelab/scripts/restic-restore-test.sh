@@ -34,6 +34,10 @@ parse_arguments() {
 				MODE="restore"
 				shift
 				;;
+			--save)
+				MODE="save"
+				shift
+				;;
 			--snapshot)
 				[ -z "$2" ] && { log_error "Snapshot ID required"; exit 1; }
 				SNAPSHOT="$2"
@@ -53,7 +57,7 @@ parse_arguments() {
 
 	# Require explicit mode selection
 	if [ -z "$MODE" ]; then
-		log_error "You must specify either --validate or --restore"
+		log_error "You must specify --validate, --restore, or --save"
 		echo "Use --help for usage information"
 		exit 1
 	fi
@@ -68,6 +72,7 @@ Usage: $SCRIPT_NAME <MODE> [OPTIONS]
 MODES (required):
   --validate    Test backup integrity without affecting production
   --restore     Restore backup to production database (DESTRUCTIVE)
+  --save        Download SQL backup files to current directory
 
 OPTIONS:
   --snapshot ID Specify snapshot to use (default: latest)
@@ -76,11 +81,14 @@ OPTIONS:
 Examples:
   $SCRIPT_NAME --validate                    # Test latest backup
   $SCRIPT_NAME --restore                     # Restore latest backup to production
+  $SCRIPT_NAME --save                        # Download latest backup files
   $SCRIPT_NAME --validate --snapshot abc123  # Test specific snapshot
+  $SCRIPT_NAME --save --snapshot abc123      # Download specific snapshot files
 
 SAFETY:
   - Validation mode creates temporary test databases that are automatically cleaned up
   - Restore mode backs up existing database before making changes
+  - Save mode only downloads files - no database operations
   - All operations include rollback capabilities on failure
 EOF
 }
@@ -350,7 +358,7 @@ validate_sql_file() {
 	log_progress "Loading SQL dump into test container..."
 	if timeout 600 gunzip -c "$sql_file" | \
 	   sed "s/SELECT pg_catalog.set_config('search_path', '', false);/SELECT pg_catalog.set_config('search_path', 'public, pg_catalog', true);/g" | \
-	   docker exec -i "$TEST_CONTAINER_NAME" psql -U postgres 2>&1; then
+	   docker exec -i "$TEST_CONTAINER_NAME" psql -U postgres >/dev/null 2>&1; then
 		
 		local table_count
 		table_count=$(timeout 30 docker exec "$TEST_CONTAINER_NAME" psql -U postgres -d immich -t -c \
@@ -391,8 +399,7 @@ run_validation() {
 		return 1
 	fi
 	
-	# Validate SQL files
-	local validated=0
+	# Find latest SQL file (same approach as restore mode)
 	local backup_dir="$TEMP_DIR/var/lib/immich-db-backup"
 	
 	if [ ! -d "$backup_dir" ]; then
@@ -400,23 +407,88 @@ run_validation() {
 		return 1
 	fi
 	
-	log_progress "Validating restored SQL files with isolated PostgreSQL containers..."
+	local sql_file
+	sql_file=$(find_latest_sql_file "$backup_dir")
+	
+	if [ -z "$sql_file" ] || [ ! -f "$sql_file" ]; then
+		log_error "No SQL backup file found"
+		return 1
+	fi
+	
+	log_progress "Validating latest SQL file with isolated PostgreSQL container..."
+	log_info "Testing file: $(basename "$sql_file")"
+	
+	if validate_sql_file "$sql_file"; then
+		log_success "Backup validation completed successfully ($(basename "$sql_file"))"
+		send_kuma_notification "up" "restore-test-success"
+		return 0
+	else
+		log_error "SQL file validation failed"
+		return 1
+	fi
+}
+
+# Generate consistent filename for saved SQL files
+generate_save_filename() {
+	local original_file="$1"
+	local snapshot_id="$2"
+	
+	# Extract timestamp from original filename (e.g., immich-backup-20250101_030000.sql.gz)
+	local timestamp=$(basename "$original_file" | sed 's/immich-backup-\(.*\)\.sql\.gz/\1/')
+	
+	# If we couldn't extract timestamp, use current time
+	if [ "$timestamp" = "$(basename "$original_file")" ]; then
+		timestamp=$(date +%Y%m%d_%H%M%S)
+	fi
+	
+	echo "immich-backup-${snapshot_id}-${timestamp}.sql.gz"
+}
+
+# Main save function
+run_save() {
+	log_info "Downloading SQL backup files (snapshot: $SNAPSHOT)..."
+	
+	# Create temporary directory
+	TEMP_DIR=$(mktemp -d) || { log_error "Failed to create temporary directory"; return 1; }
+	
+	# Restore database backup files
+	log_progress "Restoring database backup files..."
+	if ! timeout 1800 restic restore "$SNAPSHOT" --target "$TEMP_DIR" --include "/var/lib/immich-db-backup" 2>/dev/null; then
+		log_error "Failed to restore backup files"
+		return 1
+	fi
+	
+	local backup_dir="$TEMP_DIR/var/lib/immich-db-backup"
+	
+	if [ ! -d "$backup_dir" ]; then
+		log_error "Backup directory not found in restored files"
+		return 1
+	fi
+	
+	# Copy SQL files to current directory with consistent naming
+	local saved_count=0
+	log_progress "Copying SQL files to current directory..."
 	
 	for sql_file in "$backup_dir"/*.sql.gz; do
 		if [ -f "$sql_file" ]; then
-			if validate_sql_file "$sql_file"; then
-				validated=$((validated + 1))
+			local save_filename
+			save_filename=$(generate_save_filename "$sql_file" "$SNAPSHOT")
+			
+			if cp "$sql_file" "./$save_filename"; then
+				log_success "Saved: $save_filename"
+				saved_count=$((saved_count + 1))
+			else
+				log_warning "Failed to save: $(basename "$sql_file")"
 			fi
 		fi
 	done
 	
-	if [ $validated -eq 0 ]; then
-		log_error "No SQL files successfully validated"
+	if [ $saved_count -eq 0 ]; then
+		log_error "No SQL files were saved"
 		return 1
 	fi
 	
-	log_success "Backup validation completed successfully ($validated files validated)"
-	send_kuma_notification "up" "restore-test-success"
+	log_success "Download completed successfully ($saved_count files saved)"
 	return 0
 }
 
@@ -518,6 +590,9 @@ main() {
 			;;
 		restore)
 			run_restore
+			;;
+		save)
+			run_save
 			;;
 		*)
 			log_error "Invalid mode: $MODE"
