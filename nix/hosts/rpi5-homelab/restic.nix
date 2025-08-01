@@ -70,7 +70,7 @@
   environment.etc."homelab/scripts/restic-restore-test.sh" = {
     text = ''
       #!${pkgs.bash}/bin/bash
-      ${builtins.readFile ./scripts/restic-restore-test.sh}
+      ${builtins.replaceStrings ["restic "] ["${pkgs.restic}/bin/restic "] (builtins.readFile ./scripts/restic-restore-test.sh)}
     '';
     mode = "0755";
   };
