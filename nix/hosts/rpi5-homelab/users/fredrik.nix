@@ -11,7 +11,7 @@
   home.stateVersion = "25.05";
 
   home.packages = with pkgs; [
-    opencode-ai
+    opencode
   ];
 
   home.file = {
