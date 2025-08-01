@@ -50,10 +50,8 @@
     serviceConfig = {
       Type = "oneshot";
       User = "root";
-      EnvironmentFile = "/etc/restic/immich-config";
     };
     script = ''
-      export RESTIC_PASSWORD_FILE=/etc/restic/immich-password
       /etc/homelab/scripts/validate-immich.sh --validate
     '';
   };
