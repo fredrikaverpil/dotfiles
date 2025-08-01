@@ -302,40 +302,35 @@ sudo journalctl -u cloudflared -f
 
 ## Backup Configuration
 
-Automated restic backups for Immich to Hetzner Storage Box.
+Automated restic backups for Immich to Hetzner Storage Box. Systemd timer
+triggers daily backups that create PostgreSQL dumps, upload to remote storage,
+and validate integrity using isolated containers.
 
-### Strategy
+**Setup**:
 
-### Initial, one-time setup
+```sh
+./dotfiles/nix/hosts/rpi5-homelab/scripts/setup-restic-backup.sh
+sudo systemctl start restic-backups-immich-init.service
+```
 
-1. Run setup script:
+**Schedule**: Daily at 3:00 AM (automatic)
 
-   ```sh
-   ./dotfiles/nix/hosts/rpi5-homelab/scripts/setup-restic-backup.sh
-   ```
+### Manual Operations
 
-2. Initialize repository:
+**Run backup**:
 
-   ```sh
-   sudo systemctl start restic-backups-immich-init.service
-   ```
+```sh
+sudo systemctl start restic-backups-immich.service
+```
 
-3. Test backup:
-
-   ```sh
-   sudo systemctl start restic-backups-immich.service
-   ```
-
-### Management
-
-**Status**:
+**Check status**:
 
 ```sh
 sudo systemctl status restic-backups-immich.service
 sudo systemctl status restic-backups-immich.timer
 ```
 
-**Logs**:
+**View logs**:
 
 ```sh
 sudo journalctl -u restic-backups-immich.service -f
@@ -347,158 +342,41 @@ sudo journalctl -u restic-backups-immich.service -f
 sudo -E restic -r $(grep RESTIC_REPOSITORY /etc/restic/immich-config | cut -d= -f2) --password-file /etc/restic/immich-password snapshots
 ```
 
-**Backup Validation**:
+### Validation & Testing
+
+**Test backup integrity**:
 
 ```sh
-# Test latest backup integrity (automated daily)
 sudo /etc/homelab/scripts/restic-restore-test.sh --validate
-
-# Test specific snapshot
 sudo /etc/homelab/scripts/restic-restore-test.sh --validate --snapshot abc123
 ```
 
-**Download Backup Files**:
+**Download backup files**:
 
 ```sh
-# Download latest backup files to current directory
 sudo /etc/homelab/scripts/restic-restore-test.sh --save
-
-# Download specific snapshot files
 sudo /etc/homelab/scripts/restic-restore-test.sh --save --snapshot abc123
-
-# Files are saved with consistent naming: immich-backup-{snapshot}-{timestamp}.sql.gz
 ```
 
-**Production Restore**:
+### Restore Operations
+
+**Production restore** (DESTRUCTIVE):
 
 ```sh
-# Restore latest backup (DESTRUCTIVE - backs up current DB first)
 sudo /etc/homelab/scripts/restic-restore-test.sh --restore
-
-# Restore specific snapshot
 sudo /etc/homelab/scripts/restic-restore-test.sh --restore --snapshot abc123
-
-# Get help and see all options
-sudo /etc/homelab/scripts/restic-restore-test.sh --help
 ```
 
-**Safety Features**:
-- Automatic backup of current database before restore
-- Rollback capability if restore fails
-- Service management (stop/start Immich automatically)
-- Isolated container validation with PostgreSQL loading
-- Timeout protection for all operations
-- Suppressed verbose SQL output (detailed logs available via journalctl)
-- Fast validation (tests only latest file, not all historical backups)
+### Troubleshooting
 
-### Monitoring
+**Check repository health**:
 
-**Uptime Kuma Integration**:
-
-The setup script automatically handles Uptime Kuma integration:
-
-1. Create push monitor in Uptime Kuma:
-   - Monitor Type: "Push"
-   - Friendly Name: "Immich Backup System"
-   - Expected Interval: 25 hours
-   - Copy the push key from the URL
-
-2. During setup script execution, you'll be prompted:
-   ```
-   Optional: Uptime Kuma monitoring
-   Enter push key from Uptime Kuma (leave empty to skip):
-   Push key: [paste your key here]
-   ```
-
-3. Test notification (if configured):
-   ```sh
-   curl "http://localhost:3001/api/push/your_push_key?status=up&msg=test"
-   ```
-
-The backup and restore test services will automatically send status updates to Uptime Kuma when configured.
-
-### Script Modes and Use Cases
-
-The restore script supports three distinct modes:
-
-**1. Validation Mode (`--validate`)**:
-- **Purpose**: Automated backup integrity testing
-- **Safety**: Uses isolated PostgreSQL containers - zero risk to production
-- **Performance**: Tests only the latest SQL file (fastest approach)
-- **Use cases**: Daily automated checks, pre-restore validation
-- **Output**: Suppressed SQL commands, clean console output
-
-**2. Restore Mode (`--restore`)**:
-- **Purpose**: Production database recovery
-- **Safety**: Backs up current database before restore, rollback on failure
-- **Process**: Stops Immich services, replaces database, restarts services
-- **Use cases**: Disaster recovery, rollback to previous state
-- **Confirmation**: Requires explicit "yes" confirmation
-
-**3. Save Mode (`--save`)**:
-- **Purpose**: Download SQL files for external use
-- **Safety**: No database operations - file download only
-- **Naming**: Consistent pattern: `immich-backup-{snapshot}-{timestamp}.sql.gz`
-- **Use cases**: Manual inspection, development, external backups, analysis
-
-### Backup Testing
-
-The system automatically validates backups using isolated PostgreSQL containers:
-
-**Validation Process**:
-1. Creates temporary PostgreSQL container (replica of production environment)
-2. Loads latest SQL dump at cluster level (safe - completely isolated)
-3. Verifies `immich` database and table structure exist
-4. Counts tables to ensure data integrity
-5. Automatically cleans up test container
-6. Fast execution (tests only latest file, not all historical backups)
-
-**Manual Testing**:
 ```sh
-# Test latest backup with isolated container validation
-sudo /etc/homelab/scripts/restic-restore-test.sh --validate
+sudo -E restic -r $(grep RESTIC_REPOSITORY /etc/restic/immich-config | cut -d= -f2) --password-file /etc/restic/immich-password check
+```
 
-# Test specific snapshot (find IDs with: restic snapshots)
-sudo /etc/homelab/scripts/restic-restore-test.sh --validate --snapshot c7492869
+**View detailed validation logs**:
 
-# View detailed logs (SQL output is suppressed in console but logged)
+```sh
 sudo journalctl -u restic-immich-backup.service --since "1 hour ago"
 ```
-
-**Safety Features**:
-- Complete isolation from production database
-- Automatic container cleanup on success/failure
-- Uses identical PostgreSQL version and configuration
-- Tests actual cluster restore process
-- No risk to production data
-
-### Disaster Recovery
-
-**Complete System Restore**:
-1. List available snapshots:
-   ```sh
-   sudo -E restic -r $(grep RESTIC_REPOSITORY /etc/restic/immich-config | cut -d= -f2) --password-file /etc/restic/immich-password snapshots
-   ```
-
-2. Test the backup you want to restore:
-   ```sh
-   sudo /etc/homelab/scripts/restic-restore-test.sh --validate --snapshot SNAPSHOT_ID
-   ```
-
-3. Optional: Download files for manual inspection:
-   ```sh
-   sudo /etc/homelab/scripts/restic-restore-test.sh --save --snapshot SNAPSHOT_ID
-   ```
-
-4. If validation passes, restore to production:
-   ```sh
-   sudo /etc/homelab/scripts/restic-restore-test.sh --restore --snapshot SNAPSHOT_ID
-   ```
-
-**Recovery Features**:
-- Automatic current database backup before restore
-- Automatic rollback if restore fails
-- Service state management (stops/starts Immich)
-- Progress reporting and detailed logging
-- Uptime Kuma status notifications
-
