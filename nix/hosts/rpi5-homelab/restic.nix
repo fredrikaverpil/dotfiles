@@ -50,7 +50,7 @@
     };
     script = ''
       export RESTIC_PASSWORD_FILE=/etc/restic/immich-password
-      /etc/homelab/scripts/validate-immich.sh
+      /etc/homelab/scripts/validate-immich.sh --validate
     '';
   };
 
