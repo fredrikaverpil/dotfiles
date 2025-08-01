@@ -110,6 +110,7 @@
     ollama
     gnused # GNU tools (for macOS compatibility)
     kitty.terminfo
+    ghostty.terminfo
 
     # ========================================================================
     # Infrastructure & Cloud
