@@ -68,7 +68,10 @@
 
   # Copy restore test script to system location
   environment.etc."homelab/scripts/restic-restore-test.sh" = {
-    source = ./scripts/restic-restore-test.sh;
+    text = ''
+      #!${pkgs.bash}/bin/bash
+      ${builtins.readFile ./scripts/restic-restore-test.sh}
+    '';
     mode = "0755";
   };
 }

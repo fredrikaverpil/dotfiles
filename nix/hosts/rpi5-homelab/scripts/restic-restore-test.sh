@@ -1,11 +1,10 @@
-#!/usr/bin/env bash
 set -e
 
 # Function to send Uptime Kuma notification
 send_kuma_notification() {
 	local status="$1"
 	local message="$2"
-	
+
 	if [ -f /etc/restic/immich-config ]; then
 		PUSH_KEY=$(grep UPTIME_KUMA_PUSH_KEY /etc/restic/immich-config | cut -d= -f2 || echo "")
 		if [ -n "$PUSH_KEY" ]; then
