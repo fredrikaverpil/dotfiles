@@ -131,6 +131,7 @@ cleanup_test_containers() {
 		for container in $TEST_CONTAINERS; do
 			if [ -n "$container" ]; then
 				timeout 30 docker stop "$container" >/dev/null 2>&1 || true
+				timeout 10 docker rm "$container" >/dev/null 2>&1 || true
 			fi
 		done
 		TEST_CONTAINERS=""
@@ -266,7 +267,7 @@ start_test_postgres() {
 	local test_container="restic_test_postgres_$(date +%s)_$$"
 	
 	log_progress "Starting test PostgreSQL container..."
-	if docker run --rm -d \
+	if docker run -d \
 		--name "$test_container" \
 		-e POSTGRES_PASSWORD=testpass \
 		-e POSTGRES_USER=postgres \
@@ -278,6 +279,13 @@ start_test_postgres() {
 		local timeout=60
 		log_progress "Waiting for PostgreSQL to start..."
 		while [ $timeout -gt 0 ]; do
+			# Check if container is still running first
+			if ! docker ps --format "{{.Names}}" | grep -q "^$test_container$"; then
+				log_error "Test PostgreSQL container stopped unexpectedly"
+				docker logs "$test_container" 2>/dev/null || true
+				return 1
+			fi
+			
 			if timeout 5 docker exec "$test_container" pg_isready -U postgres >/dev/null 2>&1; then
 				log_success "Test PostgreSQL container ready: $test_container"
 				echo "$test_container"
@@ -288,7 +296,9 @@ start_test_postgres() {
 		done
 		
 		log_error "Test PostgreSQL container failed to start within 60 seconds"
+		docker logs "$test_container" 2>/dev/null || true
 		timeout 30 docker stop "$test_container" >/dev/null 2>&1 || true
+		timeout 10 docker rm "$test_container" >/dev/null 2>&1 || true
 		return 1
 	else
 		log_error "Failed to start test PostgreSQL container"
@@ -352,6 +362,7 @@ validate_sql_file() {
 			
 			# Cleanup test container immediately
 			timeout 30 docker stop "$test_container" >/dev/null 2>&1 || true
+			timeout 10 docker rm "$test_container" >/dev/null 2>&1 || true
 			return 0
 		else
 			log_error "No tables found in restored immich database"
@@ -362,6 +373,7 @@ validate_sql_file() {
 	
 	# Cleanup failed test container
 	timeout 30 docker stop "$test_container" >/dev/null 2>&1 || true
+	timeout 10 docker rm "$test_container" >/dev/null 2>&1 || true
 	return 1
 }
 
