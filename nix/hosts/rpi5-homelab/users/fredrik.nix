@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  inputs,
   ...
 }: {
   imports = [
@@ -11,7 +12,8 @@
   home.stateVersion = "25.05";
 
   home.packages = with pkgs; [
-    opencode
+    # Use opencode from unstable nixpkgs
+    inputs.nixpkgs-unstable.legacyPackages.aarch64-linux.opencode
   ];
 
   home.file = {
