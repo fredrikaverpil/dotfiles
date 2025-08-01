@@ -134,8 +134,10 @@ add_test_container() {
 }
 
 cleanup_test_containers() {
+	log_progress "Cleaning up test containers..."
+	
+	# Method 1: Clean up tracked containers (if variable tracking worked)
 	if [ -n "$TEST_CONTAINERS" ]; then
-		log_progress "Cleaning up test containers..."
 		for container in $TEST_CONTAINERS; do
 			if [ -n "$container" ]; then
 				timeout 30 docker stop "$container" >/dev/null 2>&1 || true
@@ -143,6 +145,40 @@ cleanup_test_containers() {
 			fi
 		done
 		TEST_CONTAINERS=""
+	fi
+	
+	# Method 2: Find and clean up any orphaned test containers by name pattern
+	local orphaned_containers
+	orphaned_containers=$(docker ps -a --filter "name=restic_test_postgres_" --format "{{.Names}}" 2>/dev/null || true)
+	
+	if [ -n "$orphaned_containers" ]; then
+		log_info "Found orphaned test containers, cleaning up..."
+		echo "$orphaned_containers" | while read -r container; do
+			if [ -n "$container" ]; then
+				timeout 30 docker stop "$container" >/dev/null 2>&1 || true
+				timeout 10 docker rm "$container" >/dev/null 2>&1 || true
+			fi
+		done
+	fi
+	
+	# Method 3: Clean up any containers using the same PostgreSQL image as production (but not production itself)
+	local postgres_image
+	postgres_image=$(docker ps --format "{{.Image}}" --filter "name=immich_postgres" 2>/dev/null)
+	
+	if [ -n "$postgres_image" ]; then
+		local test_image_containers
+		test_image_containers=$(docker ps -a --filter "ancestor=$postgres_image" --format "{{.Names}}" 2>/dev/null | grep -v -E "^(immich_postgres|${POSTGRES_CONTAINER})$" || true)
+		
+		if [ -n "$test_image_containers" ]; then
+			log_info "Found test containers using PostgreSQL image ($postgres_image), cleaning up..."
+			echo "$test_image_containers" | while read -r container; do
+				if [ -n "$container" ] && [ "$container" != "immich_postgres" ] && [ "$container" != "$POSTGRES_CONTAINER" ]; then
+					log_info "Cleaning up test container: $container"
+					timeout 30 docker stop "$container" >/dev/null 2>&1 || true
+					timeout 10 docker rm "$container" >/dev/null 2>&1 || true
+				fi
+			done
+		fi
 	fi
 }
 
@@ -367,9 +403,6 @@ validate_sql_file() {
 		
 		if [ "$table_count" -gt 0 ]; then
 			log_success "Validated: $(basename "$sql_file") ($table_count tables)"
-			
-			timeout 30 docker stop "$TEST_CONTAINER_NAME" >/dev/null 2>&1 || true
-			timeout 10 docker rm "$TEST_CONTAINER_NAME" >/dev/null 2>&1 || true
 			return 0
 		else
 			log_error "No tables found in restored immich database"
@@ -378,8 +411,6 @@ validate_sql_file() {
 		log_error "Failed to load SQL dump: $(basename "$sql_file")"
 	fi
 	
-	timeout 30 docker stop "$TEST_CONTAINER_NAME" >/dev/null 2>&1 || true
-	timeout 10 docker rm "$TEST_CONTAINER_NAME" >/dev/null 2>&1 || true
 	return 1
 }
 
