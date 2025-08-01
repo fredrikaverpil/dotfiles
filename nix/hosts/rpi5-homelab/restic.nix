@@ -32,22 +32,8 @@
           "--keep-weekly 4"
           "--keep-monthly 6"
         ];
-        backupPrepareCommand = ''
-          ${pkgs.docker}/bin/docker stop immich_server
-          mkdir -p /var/lib/immich-db-backup
-          ${pkgs.docker}/bin/docker exec immich_postgres pg_dumpall --clean --if-exists --username=postgres | ${pkgs.gzip}/bin/gzip > /var/lib/immich-db-backup/immich-$(date +%Y%m%d_%H%M%S).sql.gz
-        '';
-        backupCleanupCommand = ''
-          ${pkgs.docker}/bin/docker start immich_server
-
-          # Notify Uptime Kuma on backup completion
-          if [ -f /etc/restic/immich-config ]; then
-            BACKUP_PUSH_KEY=$(grep UPTIME_KUMA_BACKUP_PUSH_KEY /etc/restic/immich-config | cut -d= -f2 || echo "")
-            if [ -n "$BACKUP_PUSH_KEY" ]; then
-              ${pkgs.curl}/bin/curl -fsS -m 10 --retry 3 "http://localhost:3001/api/push/$BACKUP_PUSH_KEY?status=up&msg=backup-upload-complete" || true
-            fi
-          fi
-        '';
+        backupPrepareCommand = "/etc/homelab/scripts/backup-immich.sh prepare";
+        backupCleanupCommand = "/etc/homelab/scripts/backup-immich.sh cleanup";
       };
     };
   };
@@ -64,28 +50,7 @@
     };
     script = ''
       export RESTIC_PASSWORD_FILE=/etc/restic/immich-password
-      
-      echo "Starting backup validation..."
-      if /etc/homelab/scripts/restic-restore-test.sh --validate; then
-        echo "✅ Backup validation successful"
-        # Notify Uptime Kuma on validation success
-        if [ -f /etc/restic/immich-config ]; then
-          VALIDATION_PUSH_KEY=$(grep UPTIME_KUMA_VALIDATION_PUSH_KEY /etc/restic/immich-config | cut -d= -f2 || echo "")
-          if [ -n "$VALIDATION_PUSH_KEY" ]; then
-            ${pkgs.curl}/bin/curl -fsS -m 10 --retry 3 "http://localhost:3001/api/push/$VALIDATION_PUSH_KEY?status=up&msg=backup-validation-complete" || true
-          fi
-        fi
-      else
-        echo "❌ Backup validation failed"
-        # Notify Uptime Kuma on validation failure
-        if [ -f /etc/restic/immich-config ]; then
-          VALIDATION_PUSH_KEY=$(grep UPTIME_KUMA_VALIDATION_PUSH_KEY /etc/restic/immich-config | cut -d= -f2 || echo "")
-          if [ -n "$VALIDATION_PUSH_KEY" ]; then
-            ${pkgs.curl}/bin/curl -fsS -m 10 --retry 3 "http://localhost:3001/api/push/$VALIDATION_PUSH_KEY?status=down&msg=backup-validation-failed" || true
-          fi
-        fi
-        exit 1
-      fi
+      /etc/homelab/scripts/validate-immich.sh
     '';
   };
 
@@ -99,11 +64,19 @@
     };
   };
 
-  # Copy restore test script to system location
-  environment.etc."homelab/scripts/restic-restore-test.sh" = {
+  # Copy backup and validation scripts to system location
+  environment.etc."homelab/scripts/backup-immich.sh" = {
     text = ''
       #!${pkgs.bash}/bin/bash
-      ${builtins.readFile ./scripts/restic-restore-test.sh}
+      ${builtins.readFile ./scripts/backup-immich.sh}
+    '';
+    mode = "0755";
+  };
+
+  environment.etc."homelab/scripts/validate-immich.sh" = {
+    text = ''
+      #!${pkgs.bash}/bin/bash
+      ${builtins.readFile ./scripts/validate-immich.sh}
     '';
     mode = "0755";
   };

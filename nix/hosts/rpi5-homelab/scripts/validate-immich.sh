@@ -93,16 +93,16 @@ SAFETY:
 EOF
 }
 
-# Uptime Kuma notification
-send_kuma_notification() {
+# Uptime Kuma notification for validation
+send_validation_notification() {
 	local status="$1"
 	local message="$2"
 	
 	if [ -f /etc/restic/immich-config ]; then
-		PUSH_KEY=$(grep UPTIME_KUMA_PUSH_KEY /etc/restic/immich-config 2>/dev/null | cut -d= -f2 || echo "")
-		if [ -n "$PUSH_KEY" ]; then
+		VALIDATION_PUSH_KEY=$(grep UPTIME_KUMA_VALIDATION_PUSH_KEY /etc/restic/immich-config 2>/dev/null | cut -d= -f2 || echo "")
+		if [ -n "$VALIDATION_PUSH_KEY" ]; then
 			timeout 30 curl -fsS -m 10 --retry 3 \
-				"http://localhost:3001/api/push/$PUSH_KEY?status=$status&msg=$message" >/dev/null 2>&1 || true
+				"http://localhost:3001/api/push/$VALIDATION_PUSH_KEY?status=$status&msg=$message" >/dev/null 2>&1 || true
 		fi
 	fi
 }
@@ -199,7 +199,7 @@ handle_error() {
 	cleanup_all $exit_code
 	
 	if [ "$MODE" = "validate" ]; then
-		send_kuma_notification "down" "restore-test-failed"
+		send_validation_notification "down" "backup-validation-failed"
 	fi
 	
 	exit $exit_code
@@ -433,10 +433,11 @@ run_validation() {
 	
 	if validate_sql_file "$sql_file"; then
 		log_success "Backup validation completed successfully ($(basename "$sql_file"))"
-		send_kuma_notification "up" "restore-test-success"
+		send_validation_notification "up" "backup-validation-complete"
 		return 0
 	else
 		log_error "SQL file validation failed"
+		send_validation_notification "down" "backup-validation-failed"
 		return 1
 	fi
 }

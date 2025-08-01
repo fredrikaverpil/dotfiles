@@ -111,9 +111,9 @@ echo "2. Initialize repository manually:"
 echo '   sudo bash -c '\''restic init --repo "$(grep RESTIC_REPOSITORY /etc/restic/immich-config | cut -d= -f2)" --password-file /etc/restic/immich-password'\'''
 echo "3. Test backup: sudo systemctl start restic-backups-immich.service"
 echo "4. Check backup status: sudo systemctl status restic-backups-immich.service"
-echo "5. Test restore: sudo systemctl start restic-restore-test.service"
+echo "5. Test validation: sudo systemctl start restic-validation-immich.service"
 echo "6. View logs: sudo journalctl -u restic-backups-immich.service -f"
 echo
 echo "Store the password safely - required for restore"
-echo "Daily backups run at 02:00 AM"
-echo "Monthly restore tests run automatically"
+echo "Daily backups run at 03:00 AM"
+echo "Daily backup validation runs at 03:30 AM"

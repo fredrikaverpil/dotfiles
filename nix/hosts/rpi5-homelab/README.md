@@ -309,7 +309,6 @@ services: backup upload and validation.
 
 ```sh
 ./dotfiles/nix/hosts/rpi5-homelab/scripts/setup-restic-backup.sh
-sudo systemctl start restic-backups-immich-init.service
 ```
 
 **Schedule**:
@@ -364,49 +363,20 @@ sudo journalctl -u restic-backups-immich.service -u restic-validation-immich.ser
 sudo -E restic -r $(grep RESTIC_REPOSITORY /etc/restic/immich-config | cut -d= -f2) --password-file /etc/restic/immich-password snapshots
 ```
 
-**Check status**:
-
-```sh
-sudo systemctl status restic-backups-immich.service
-sudo systemctl status restic-backups-immich.timer
-```
-
-**View logs**:
-
-```sh
-# Follow live logs
-sudo journalctl -u restic-backups-immich.service -f
-
-# View today's backup (runs at 3:00 AM)
-sudo journalctl -u restic-backups-immich.service --since "today" --no-pager
-
-# View recent manual run
-sudo journalctl -u restic-backups-immich.service --since "1 hour ago" --no-pager
-
-# View all logs from service
-sudo journalctl -u restic-backups-immich.service --no-pager
-```
-
-**List snapshots**:
-
-```sh
-sudo -E restic -r $(grep RESTIC_REPOSITORY /etc/restic/immich-config | cut -d= -f2) --password-file /etc/restic/immich-password snapshots
-```
-
 ### Validation & Testing
 
 **Test backup integrity**:
 
 ```sh
-sudo /etc/homelab/scripts/restic-restore-test.sh --validate
-sudo /etc/homelab/scripts/restic-restore-test.sh --validate --snapshot abc123
+sudo /etc/homelab/scripts/validate-immich.sh --validate
+sudo /etc/homelab/scripts/validate-immich.sh --validate --snapshot abc123
 ```
 
 **Download backup files**:
 
 ```sh
-sudo /etc/homelab/scripts/restic-restore-test.sh --save
-sudo /etc/homelab/scripts/restic-restore-test.sh --save --snapshot abc123
+sudo /etc/homelab/scripts/validate-immich.sh --save
+sudo /etc/homelab/scripts/validate-immich.sh --save --snapshot abc123
 ```
 
 ### Restore Operations
@@ -414,8 +384,8 @@ sudo /etc/homelab/scripts/restic-restore-test.sh --save --snapshot abc123
 **Production restore** (DESTRUCTIVE):
 
 ```sh
-sudo /etc/homelab/scripts/restic-restore-test.sh --restore
-sudo /etc/homelab/scripts/restic-restore-test.sh --restore --snapshot abc123
+sudo /etc/homelab/scripts/validate-immich.sh --restore
+sudo /etc/homelab/scripts/validate-immich.sh --restore --snapshot abc123
 ```
 
 ### Troubleshooting
@@ -436,7 +406,7 @@ sudo journalctl -u restic-backups-immich.service --since "today" --no-pager
 sudo journalctl -u restic-validation-immich.service --since "today" --no-pager
 
 # Manual validation test
-sudo /etc/homelab/scripts/restic-restore-test.sh --validate
+sudo /etc/homelab/scripts/validate-immich.sh --validate
 ```
 
 **Common issues**:
