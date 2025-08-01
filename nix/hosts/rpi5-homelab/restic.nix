@@ -38,11 +38,15 @@
     };
   };
 
+  # Add required packages to the restic backup service PATH
+  systemd.services.restic-backups-immich.path = with pkgs; [ docker gzip curl coreutils gnugrep ];
+
   # Separate validation service
   systemd.services.restic-validation-immich = {
     description = "Immich Backup Validation";
     after = [ "network-online.target" ];
     wants = [ "network-online.target" ];
+    path = with pkgs; [ docker curl gzip restic coreutils util-linux gnugrep gnused ];
     serviceConfig = {
       Type = "oneshot";
       User = "root";
@@ -68,7 +72,7 @@
   environment.etc."homelab/scripts/backup-immich.sh" = {
     text = ''
       #!${pkgs.bash}/bin/bash
-      ${builtins.replaceStrings ["docker" "gzip" "curl"] ["${pkgs.docker}/bin/docker" "${pkgs.gzip}/bin/gzip" "${pkgs.curl}/bin/curl"] (builtins.readFile ./scripts/backup-immich.sh)}
+      ${builtins.readFile ./scripts/backup-immich.sh}
     '';
     mode = "0755";
   };
@@ -76,10 +80,7 @@
   environment.etc."homelab/scripts/validate-immich.sh" = {
     text = ''
       #!${pkgs.bash}/bin/bash
-      ${builtins.replaceStrings 
-        ["docker" "curl" "gzip" "gunzip" "restic" "mktemp" "stat"] 
-        ["${pkgs.docker}/bin/docker" "${pkgs.curl}/bin/curl" "${pkgs.gzip}/bin/gzip" "${pkgs.gzip}/bin/gunzip" "${pkgs.restic}/bin/restic" "${pkgs.coreutils}/bin/mktemp" "${pkgs.coreutils}/bin/stat"] 
-        (builtins.readFile ./scripts/validate-immich.sh)}
+      ${builtins.readFile ./scripts/validate-immich.sh}
     '';
     mode = "0755";
   };
