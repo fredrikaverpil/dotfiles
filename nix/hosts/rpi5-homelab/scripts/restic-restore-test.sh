@@ -266,8 +266,15 @@ rollback_database() {
 
 # PostgreSQL container management
 get_postgres_config() {
-	# Get production container image and basic config
-	POSTGRES_IMAGE=$(docker inspect "$POSTGRES_CONTAINER" --format='{{.Config.Image}}' 2>/dev/null || echo "postgres:15")
+	# Get image from running container (most reliable)
+	POSTGRES_IMAGE=$(docker ps --format "{{.Image}}" --filter "name=immich_postgres" 2>/dev/null)
+	
+	# Fallback if container not running
+	if [ -z "$POSTGRES_IMAGE" ]; then
+		POSTGRES_IMAGE="postgres:14"  # Known major version
+		log_warning "Container not running, using fallback PostgreSQL image"
+	fi
+	
 	log_info "Using PostgreSQL image: $POSTGRES_IMAGE"
 }
 
@@ -572,6 +579,56 @@ run_restore() {
 	return 0
 }
 
+# Test restic configuration access
+test_restic_permissions() {
+	log_progress "Testing restic configuration access..."
+	
+	# Test config file readability
+	if [ ! -f /etc/restic/immich-config ]; then
+		log_error "Restic config file not found: /etc/restic/immich-config"
+		return 1
+	fi
+	
+	if [ ! -r /etc/restic/immich-config ]; then
+		log_error "Cannot read restic config file (permission denied)"
+		log_info "Fix with: sudo chmod 644 /etc/restic/immich-config"
+		return 1
+	fi
+	
+	# Test password file readability
+	if [ ! -f /etc/restic/immich-password ]; then
+		log_error "Restic password file not found: /etc/restic/immich-password"
+		return 1
+	fi
+	
+	if [ ! -r /etc/restic/immich-password ]; then
+		log_error "Cannot read restic password file (permission denied)"
+		log_info "Fix with: sudo chmod 600 /etc/restic/immich-password (run as root)"
+		return 1
+	fi
+	
+	# Test directory access
+	if [ ! -d /etc/restic ]; then
+		log_error "Restic directory not found: /etc/restic"
+		return 1
+	fi
+	
+	if [ ! -x /etc/restic ]; then
+		log_error "Cannot access restic directory (permission denied)"
+		log_info "Fix with: sudo chmod 755 /etc/restic/"
+		return 1
+	fi
+	
+	# Test config file content
+	if ! grep -q "RESTIC_REPOSITORY" /etc/restic/immich-config 2>/dev/null; then
+		log_error "Invalid config file: RESTIC_REPOSITORY not found"
+		return 1
+	fi
+	
+	log_success "Restic configuration access test passed"
+	return 0
+}
+
 # Validate snapshot exists
 validate_snapshot() {
 	local snapshot="$1"
@@ -599,6 +656,11 @@ main() {
 	
 	# Parse arguments
 	parse_arguments "$@"
+	
+	# Test restic configuration permissions first
+	if ! test_restic_permissions; then
+		exit 1
+	fi
 	
 	# Load restic environment
 	if [ -f /etc/restic/immich-config ]; then
