@@ -68,7 +68,7 @@
   environment.etc."homelab/scripts/backup-immich.sh" = {
     text = ''
       #!${pkgs.bash}/bin/bash
-      ${builtins.replaceStrings ["docker"] ["${pkgs.docker}/bin/docker"] (builtins.readFile ./scripts/backup-immich.sh)}
+      ${builtins.replaceStrings ["docker" "gzip"] ["${pkgs.docker}/bin/docker" "${pkgs.gzip}/bin/gzip"] (builtins.readFile ./scripts/backup-immich.sh)}
     '';
     mode = "0755";
   };
