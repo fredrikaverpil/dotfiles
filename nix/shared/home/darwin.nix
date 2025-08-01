@@ -9,6 +9,8 @@
   
   home.packages = with pkgs; [
     pngpaste  # for obsidian, macOS-only
+    kitty.terminfo    # Terminal emulator terminfo for macOS
+    ghostty.terminfo  # Terminal emulator terminfo for macOS
   ];
 
 
