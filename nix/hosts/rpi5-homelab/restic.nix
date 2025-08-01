@@ -42,7 +42,7 @@
 
           # Run restore test after backup completion
           echo "Running restore test to validate backup..."
-          if /etc/homelab/scripts/restic-restore-test.sh; then
+          if /etc/homelab/scripts/restic-restore-test.sh --validate; then
             echo "✅ Backup and restore test both successful"
             # Notify Uptime Kuma on complete success (backup + restore test)
             if [ -f /etc/restic/immich-config ]; then
