@@ -333,7 +333,17 @@ sudo systemctl status restic-backups-immich.timer
 **View logs**:
 
 ```sh
+# Follow live logs
 sudo journalctl -u restic-backups-immich.service -f
+
+# View today's backup (runs at 3:00 AM)
+sudo journalctl -u restic-backups-immich.service --since "today" --no-pager
+
+# View recent manual run
+sudo journalctl -u restic-backups-immich.service --since "1 hour ago" --no-pager
+
+# View all logs from service
+sudo journalctl -u restic-backups-immich.service --no-pager
 ```
 
 **List snapshots**:
@@ -378,5 +388,9 @@ sudo -E restic -r $(grep RESTIC_REPOSITORY /etc/restic/immich-config | cut -d= -
 **View detailed validation logs**:
 
 ```sh
-sudo journalctl -u restic-immich-backup.service --since "1 hour ago"
+# Today's automated backup (3:00 AM)
+sudo journalctl -u restic-backups-immich.service --since "today" --no-pager
+
+# Recent manual backup
+sudo journalctl -u restic-backups-immich.service --since "1 hour ago" --no-pager
 ```
