@@ -340,7 +340,7 @@ validate_sql_file() {
 	log_progress "Loading SQL dump into test container..."
 	if timeout 600 gunzip -c "$sql_file" | \
 	   sed "s/SELECT pg_catalog.set_config('search_path', '', false);/SELECT pg_catalog.set_config('search_path', 'public, pg_catalog', true);/g" | \
-	   docker exec -i "$test_container" psql -U postgres >/dev/null 2>&1; then
+	   docker exec -i "$test_container" psql -U postgres 2>&1; then
 		
 		# Verify immich database and tables exist
 		local table_count
