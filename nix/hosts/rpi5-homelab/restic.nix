@@ -46,7 +46,7 @@
     description = "Immich Backup Validation";
     after = [ "network-online.target" ];
     wants = [ "network-online.target" ];
-    path = with pkgs; [ docker curl gzip restic coreutils util-linux gnugrep gnused ];
+    path = with pkgs; [ docker curl gzip restic coreutils util-linux gnugrep gnused openssh ];
     serviceConfig = {
       Type = "oneshot";
       User = "root";
