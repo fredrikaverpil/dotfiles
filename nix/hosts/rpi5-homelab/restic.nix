@@ -66,14 +66,6 @@
     };
   };
 
-  # Override systemd service configuration for restic backup CPU scheduling
-  systemd.services.restic-backups-immich = {
-    serviceConfig = {
-      # Process priority - lower than normal so SSH/interactive processes get priority
-      Nice = 10; # Higher nice value = lower priority, yields CPU to other processes
-    };
-  };
-
   # Copy restore test script to system location
   environment.etc."homelab/scripts/restic-restore-test.sh" = {
     source = ./scripts/restic-restore-test.sh;
