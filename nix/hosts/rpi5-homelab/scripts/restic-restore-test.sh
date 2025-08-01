@@ -348,12 +348,6 @@ validate_sql_file() {
 		return 1
 	fi
 	
-	# Start test PostgreSQL container
-	if ! test_container=$(start_test_postgres); then
-		log_error "Failed to start test PostgreSQL container for $(basename "$sql_file")"
-		return 1
-	fi
-	
 	# Load SQL dump into test container (cluster level - safe because isolated)
 	log_progress "Loading SQL dump into test container..."
 	if timeout 600 gunzip -c "$sql_file" | \
@@ -416,7 +410,6 @@ run_validation() {
 	fi
 	
 	log_progress "Validating latest SQL file with isolated PostgreSQL container..."
-	log_info "Testing file: $(basename "$sql_file")"
 	
 	if validate_sql_file "$sql_file"; then
 		log_success "Backup validation completed successfully ($(basename "$sql_file"))"
@@ -432,12 +425,28 @@ run_validation() {
 generate_save_filename() {
 	local original_file="$1"
 	local snapshot_id="$2"
+	local basename_file=$(basename "$original_file")
 	
-	# Extract timestamp from original filename (e.g., immich-backup-20250101_030000.sql.gz)
-	local timestamp=$(basename "$original_file" | sed 's/immich-backup-\(.*\)\.sql\.gz/\1/')
+	# Extract timestamp from various filename patterns
+	local timestamp=""
 	
-	# If we couldn't extract timestamp, use current time
-	if [ "$timestamp" = "$(basename "$original_file")" ]; then
+	# Pattern 1: immich-backup-TIMESTAMP.sql.gz
+	if [ -z "$timestamp" ]; then
+		timestamp=$(echo "$basename_file" | sed -n 's/immich-backup-\(.*\)\.sql\.gz/\1/p')
+	fi
+	
+	# Pattern 2: immich-TIMESTAMP.sql.gz (current format)
+	if [ -z "$timestamp" ]; then
+		timestamp=$(echo "$basename_file" | sed -n 's/immich-\(.*\)\.sql\.gz/\1/p')
+	fi
+	
+	# Pattern 3: TIMESTAMP.sql.gz (fallback)
+	if [ -z "$timestamp" ]; then
+		timestamp=$(echo "$basename_file" | sed -n 's/\(.*\)\.sql\.gz/\1/p')
+	fi
+	
+	# If we still couldn't extract timestamp, use current time
+	if [ -z "$timestamp" ] || [ "$timestamp" = "$basename_file" ]; then
 		timestamp=$(date +%Y%m%d_%H%M%S)
 	fi
 	
@@ -563,6 +572,25 @@ run_restore() {
 	return 0
 }
 
+# Validate snapshot exists
+validate_snapshot() {
+	local snapshot="$1"
+	
+	if [ "$snapshot" = "latest" ]; then
+		return 0  # "latest" is always valid
+	fi
+	
+	log_progress "Validating snapshot exists..."
+	if timeout 30 restic snapshots --json 2>/dev/null | grep -q "\"id\":\"$snapshot\"" 2>/dev/null; then
+		log_info "Snapshot $snapshot found"
+		return 0
+	else
+		log_error "Snapshot '$snapshot' not found in repository"
+		log_info "Use 'restic snapshots' to list available snapshots"
+		return 1
+	fi
+}
+
 # Main execution
 main() {
 	# Set up error handling
@@ -580,6 +608,11 @@ main() {
 		export RESTIC_PASSWORD_FILE=/etc/restic/immich-password
 	else
 		log_error "Restic configuration not found at /etc/restic/immich-config"
+		exit 1
+	fi
+	
+	# Validate snapshot exists (except for latest)
+	if ! validate_snapshot "$SNAPSHOT"; then
 		exit 1
 	fi
 	
