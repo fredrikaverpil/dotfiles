@@ -68,7 +68,7 @@
   environment.etc."homelab/scripts/backup-immich.sh" = {
     text = ''
       #!${pkgs.bash}/bin/bash
-      ${builtins.replaceStrings ["docker" "gzip"] ["${pkgs.docker}/bin/docker" "${pkgs.gzip}/bin/gzip"] (builtins.readFile ./scripts/backup-immich.sh)}
+      ${builtins.replaceStrings ["docker" "gzip" "curl"] ["${pkgs.docker}/bin/docker" "${pkgs.gzip}/bin/gzip" "${pkgs.curl}/bin/curl"] (builtins.readFile ./scripts/backup-immich.sh)}
     '';
     mode = "0755";
   };
@@ -76,7 +76,10 @@
   environment.etc."homelab/scripts/validate-immich.sh" = {
     text = ''
       #!${pkgs.bash}/bin/bash
-      ${builtins.readFile ./scripts/validate-immich.sh}
+      ${builtins.replaceStrings 
+        ["docker" "curl" "gzip" "gunzip" "restic" "mktemp" "stat"] 
+        ["${pkgs.docker}/bin/docker" "${pkgs.curl}/bin/curl" "${pkgs.gzip}/bin/gzip" "${pkgs.gzip}/bin/gunzip" "${pkgs.restic}/bin/restic" "${pkgs.coreutils}/bin/mktemp" "${pkgs.coreutils}/bin/stat"] 
+        (builtins.readFile ./scripts/validate-immich.sh)}
     '';
     mode = "0755";
   };
