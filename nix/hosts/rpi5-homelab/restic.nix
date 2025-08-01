@@ -4,7 +4,7 @@
   lib,
   ...
 }: {
-  # Restic backup configuration for Immich
+  # Restic backup configuration for Immich (backup only)
   services.restic = {
     backups = {
       immich = {
@@ -24,7 +24,7 @@
           "/mnt/homelab-data/services/immich/data/encoded-video"
         ];
         timerConfig = {
-          OnCalendar = "03:00"; # immich postgres db dump runs at 2:00 AM
+          OnCalendar = "03:00";
           Persistent = true;
         };
         pruneOpts = [
@@ -40,29 +40,62 @@
         backupCleanupCommand = ''
           ${pkgs.docker}/bin/docker start immich_server
 
-          # Run restore test after backup completion
-          echo "Running restore test to validate backup..."
-          if /etc/homelab/scripts/restic-restore-test.sh --validate; then
-            echo "✅ Backup and restore test both successful"
-            # Notify Uptime Kuma on complete success (backup + restore test)
-            if [ -f /etc/restic/immich-config ]; then
-              PUSH_KEY=$(grep UPTIME_KUMA_PUSH_KEY /etc/restic/immich-config | cut -d= -f2 || echo "")
-              if [ -n "$PUSH_KEY" ]; then
-                ${pkgs.curl}/bin/curl -fsS -m 10 --retry 3 "http://localhost:3001/api/push/$PUSH_KEY?status=up&msg=backup-complete" || true
-              fi
-            fi
-          else
-            echo "❌ Backup succeeded but restore test failed"
-            # Notify Uptime Kuma on partial success (backup OK, restore test failed)
-            if [ -f /etc/restic/immich-config ]; then
-              PUSH_KEY=$(grep UPTIME_KUMA_PUSH_KEY /etc/restic/immich-config | cut -d= -f2 || echo "")
-              if [ -n "$PUSH_KEY" ]; then
-                ${pkgs.curl}/bin/curl -fsS -m 10 --retry 3 "http://localhost:3001/api/push/$PUSH_KEY?status=down&msg=backup-partial" || true
-              fi
+          # Notify Uptime Kuma on backup completion
+          if [ -f /etc/restic/immich-config ]; then
+            BACKUP_PUSH_KEY=$(grep UPTIME_KUMA_BACKUP_PUSH_KEY /etc/restic/immich-config | cut -d= -f2 || echo "")
+            if [ -n "$BACKUP_PUSH_KEY" ]; then
+              ${pkgs.curl}/bin/curl -fsS -m 10 --retry 3 "http://localhost:3001/api/push/$BACKUP_PUSH_KEY?status=up&msg=backup-upload-complete" || true
             fi
           fi
         '';
       };
+    };
+  };
+
+  # Separate validation service
+  systemd.services.restic-validation-immich = {
+    description = "Immich Backup Validation";
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+      EnvironmentFile = "/etc/restic/immich-config";
+    };
+    script = ''
+      export RESTIC_PASSWORD_FILE=/etc/restic/immich-password
+      
+      echo "Starting backup validation..."
+      if /etc/homelab/scripts/restic-restore-test.sh --validate; then
+        echo "✅ Backup validation successful"
+        # Notify Uptime Kuma on validation success
+        if [ -f /etc/restic/immich-config ]; then
+          VALIDATION_PUSH_KEY=$(grep UPTIME_KUMA_VALIDATION_PUSH_KEY /etc/restic/immich-config | cut -d= -f2 || echo "")
+          if [ -n "$VALIDATION_PUSH_KEY" ]; then
+            ${pkgs.curl}/bin/curl -fsS -m 10 --retry 3 "http://localhost:3001/api/push/$VALIDATION_PUSH_KEY?status=up&msg=backup-validation-complete" || true
+          fi
+        fi
+      else
+        echo "❌ Backup validation failed"
+        # Notify Uptime Kuma on validation failure
+        if [ -f /etc/restic/immich-config ]; then
+          VALIDATION_PUSH_KEY=$(grep UPTIME_KUMA_VALIDATION_PUSH_KEY /etc/restic/immich-config | cut -d= -f2 || echo "")
+          if [ -n "$VALIDATION_PUSH_KEY" ]; then
+            ${pkgs.curl}/bin/curl -fsS -m 10 --retry 3 "http://localhost:3001/api/push/$VALIDATION_PUSH_KEY?status=down&msg=backup-validation-failed" || true
+          fi
+        fi
+        exit 1
+      fi
+    '';
+  };
+
+  # Validation timer (runs 30 minutes after backup)
+  systemd.timers.restic-validation-immich = {
+    description = "Timer for Immich Backup Validation";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "03:30";
+      Persistent = true;
     };
   };
 

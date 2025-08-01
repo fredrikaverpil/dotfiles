@@ -302,9 +302,8 @@ sudo journalctl -u cloudflared -f
 
 ## Backup Configuration
 
-Automated restic backups for Immich to Hetzner Storage Box. Systemd timer
-triggers daily backups that create PostgreSQL dumps, upload to remote storage,
-and validate integrity using isolated containers.
+Automated restic backups for Immich to Hetzner Storage Box using two separate
+services: backup upload and validation.
 
 **Setup**:
 
@@ -313,7 +312,10 @@ and validate integrity using isolated containers.
 sudo systemctl start restic-backups-immich-init.service
 ```
 
-**Schedule**: Daily at 3:00 AM (automatic)
+**Schedule**:
+
+- Backup: Daily at 3:00 AM
+- Validation: Daily at 3:30 AM
 
 ### Manual Operations
 
@@ -321,6 +323,45 @@ sudo systemctl start restic-backups-immich-init.service
 
 ```sh
 sudo systemctl start restic-backups-immich.service
+```
+
+**Run validation**:
+
+```sh
+sudo systemctl start restic-validation-immich.service
+```
+
+**Check status**:
+
+```sh
+# Backup service
+sudo systemctl status restic-backups-immich.service
+sudo systemctl status restic-backups-immich.timer
+
+# Validation service
+sudo systemctl status restic-validation-immich.service
+sudo systemctl status restic-validation-immich.timer
+```
+
+**View logs**:
+
+```sh
+# Backup logs
+sudo journalctl -u restic-backups-immich.service --since "today" --no-pager
+sudo journalctl -u restic-backups-immich.service -f
+
+# Validation logs
+sudo journalctl -u restic-validation-immich.service --since "today" --no-pager
+sudo journalctl -u restic-validation-immich.service -f
+
+# Both services
+sudo journalctl -u restic-backups-immich.service -u restic-validation-immich.service --since "today" --no-pager
+```
+
+**List snapshots**:
+
+```sh
+sudo -E restic -r $(grep RESTIC_REPOSITORY /etc/restic/immich-config | cut -d= -f2) --password-file /etc/restic/immich-password snapshots
 ```
 
 **Check status**:
@@ -385,12 +426,28 @@ sudo /etc/homelab/scripts/restic-restore-test.sh --restore --snapshot abc123
 sudo -E restic -r $(grep RESTIC_REPOSITORY /etc/restic/immich-config | cut -d= -f2) --password-file /etc/restic/immich-password check
 ```
 
-**View detailed validation logs**:
+**Service-specific issues**:
 
 ```sh
-# Today's automated backup (3:00 AM)
+# Backup service issues
 sudo journalctl -u restic-backups-immich.service --since "today" --no-pager
 
-# Recent manual backup
-sudo journalctl -u restic-backups-immich.service --since "1 hour ago" --no-pager
+# Validation service issues
+sudo journalctl -u restic-validation-immich.service --since "today" --no-pager
+
+# Manual validation test
+sudo /etc/homelab/scripts/restic-restore-test.sh --validate
 ```
+
+**Common issues**:
+
+- **Backup fails**: Check disk space and Hetzner connectivity
+- **Validation fails**: Check PostgreSQL container availability, run manual test
+- **Both services fail**: Check restic configuration and network connectivity
+- **Partial success**: Backup works but validation fails - investigate
+  validation logs
+
+**Uptime Kuma monitors**:
+
+- **Immich Backup Upload**: Tracks backup completion
+- **Immich Backup Validation**: Tracks validation success

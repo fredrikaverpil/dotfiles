@@ -51,19 +51,29 @@ read BACKUP_PATH
 
 # Optional: Uptime Kuma monitoring
 echo
-echo "Optional: Uptime Kuma monitoring"
-echo "Enter push key from Uptime Kuma (leave empty to skip):"
-echo -n "Push key: "
-read UPTIME_KUMA_PUSH_KEY
+echo "=== Uptime Kuma Integration ==="
+echo "Create two push monitors in Uptime Kuma:"
+echo "1. 'Immich Backup Upload' - tracks backup uploads to Hetzner"
+echo "2. 'Immich Backup Validation' - tracks backup integrity validation"
+echo ""
+echo "Enter push keys from Uptime Kuma (leave empty to skip):"
+echo -n "Backup monitor push key: "
+read UPTIME_KUMA_BACKUP_PUSH_KEY
+echo -n "Validation monitor push key: "
+read UPTIME_KUMA_VALIDATION_PUSH_KEY
 
-# Create config file with repository URL and optional Uptime Kuma key
+# Create config file with repository URL and optional Uptime Kuma keys
 cat <<EOF | sudo tee /etc/restic/immich-config >/dev/null
 RESTIC_REPOSITORY=sftp:${HETZNER_USERNAME}@${HETZNER_HOSTNAME}:${HETZNER_PORT}${BACKUP_PATH}
 EOF
 
-# Add Uptime Kuma key if provided
-if [ -n "$UPTIME_KUMA_PUSH_KEY" ]; then
-	echo "UPTIME_KUMA_PUSH_KEY=${UPTIME_KUMA_PUSH_KEY}" | sudo tee -a /etc/restic/immich-config >/dev/null
+# Add Uptime Kuma keys if provided
+if [ -n "$UPTIME_KUMA_BACKUP_PUSH_KEY" ]; then
+	echo "UPTIME_KUMA_BACKUP_PUSH_KEY=${UPTIME_KUMA_BACKUP_PUSH_KEY}" | sudo tee -a /etc/restic/immich-config >/dev/null
+fi
+
+if [ -n "$UPTIME_KUMA_VALIDATION_PUSH_KEY" ]; then
+	echo "UPTIME_KUMA_VALIDATION_PUSH_KEY=${UPTIME_KUMA_VALIDATION_PUSH_KEY}" | sudo tee -a /etc/restic/immich-config >/dev/null
 fi
 
 echo "Setting permissions..."
