@@ -651,7 +651,8 @@ validate_snapshot() {
 	fi
 	
 	log_progress "Validating snapshot exists..."
-	if timeout 30 restic snapshots --json 2>/dev/null | grep -q "\"id\":\"$snapshot\"" 2>/dev/null; then
+	# Use restic's built-in snapshot resolution instead of JSON parsing
+	if timeout 30 restic snapshots "$snapshot" >/dev/null 2>&1; then
 		log_info "Snapshot $snapshot found"
 		return 0
 	else
