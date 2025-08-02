@@ -106,6 +106,7 @@
     # Media, AI & Utilities
     # ========================================================================
     asciinema
+    exiftool
     imagemagick
     ollama
     gnused # GNU tools (for macOS compatibility)
