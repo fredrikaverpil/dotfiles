@@ -64,8 +64,7 @@
     tmux
     tree
     vim
-    # neovim-latest # from custom neovim overlay
-    neovim-nightly # from custom neovim overlay
+    # neovim-custom # from custom overlay
     wget
     yq
     unzip

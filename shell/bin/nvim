@@ -11,6 +11,11 @@ MANUAL_NVIM_BINARY="$HOME/.nvim/bin/nvim"
 available_count=0
 available_binaries=""
 
+if [ -x "$MANUAL_NVIM_BINARY" ]; then
+	available_count=$((available_count + 1))
+	available_binaries="$available_binaries\n  - $MANUAL_NVIM_BINARY (installed manually)"
+fi
+
 if [ -x "$NIX_NVIM_BINARY" ]; then
 	available_count=$((available_count + 1))
 	available_binaries="$available_binaries\n  - $NIX_NVIM_BINARY (installed via Nix user profile)"
@@ -26,33 +31,27 @@ if [ -x "$BREW_NVIM_BINARY" ]; then
 	available_binaries="$available_binaries\n  - $BREW_NVIM_BINARY (installed via Homebrew)"
 fi
 
-if [ -x "$MANUAL_NVIM_BINARY" ]; then
-	available_count=$((available_count + 1))
-	available_binaries="$available_binaries\n  - $MANUAL_NVIM_BINARY (installed manually)"
-fi
-
 # Check for conflicts
 if [ $available_count -gt 1 ]; then
-	echo "Warning: Multiple nvim binaries found. Using priority order: Nix User > NixOS System > Homebrew > Manual"
+	echo "Warning: Multiple nvim binaries found. Using priority order: Manual > Nix User > NixOS System > Homebrew"
 	echo "Available binaries:$available_binaries"
 	echo ""
 fi
 
-# Select binary in priority order: Nix User > NixOS System > Homebrew > Manual
-if [ -x "$NIX_NVIM_BINARY" ]; then
+if [ -x "$MANUAL_NVIM_BINARY" ]; then
+	NVIM_BINARY="$MANUAL_NVIM_BINARY"
+elif [ -x "$NIX_NVIM_BINARY" ]; then
 	NVIM_BINARY="$NIX_NVIM_BINARY"
 elif [ -x "$NIXOS_NVIM_BINARY" ]; then
 	NVIM_BINARY="$NIXOS_NVIM_BINARY"
 elif [ -x "$BREW_NVIM_BINARY" ]; then
 	NVIM_BINARY="$BREW_NVIM_BINARY"
-elif [ -x "$MANUAL_NVIM_BINARY" ]; then
-	NVIM_BINARY="$MANUAL_NVIM_BINARY"
 else
 	echo "Error: No nvim binary found."
 	echo "Please install Neovim via:"
+	echo "  - Manual: Run extras/installers/neovim.sh"
 	echo "  - Nix: Add neovim-latest to your configuration"
 	echo "  - Homebrew: brew install neovim"
-	echo "  - Manual: Run extras/installers/neovim.sh"
 	exit 1
 fi
 
