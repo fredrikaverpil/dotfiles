@@ -39,22 +39,5 @@
       }
     }
   },
-  "mcp": {
-    "google-maps": {
-      "enabled": true,
-      "type": "local",
-      "environment": {
-        "GOOGLE_MAPS_API_KEY": "{env:GOOGLE_MAPS_API_KEY}"
-      },
-      "command": [
-        "docker",
-        "run",
-        "-i",
-        "--rm",
-        "-e",
-        "GOOGLE_MAPS_API_KEY",
-        "mcp/google-maps"
-      ]
-    }
-  }
+  "mcp": {}
 }
