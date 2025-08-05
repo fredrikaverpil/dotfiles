@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+# Nix binary locations (try multiple paths)
 NIX_NVIM_BINARY="$HOME/.nix-profile/bin/nvim"
+NIXOS_NVIM_BINARY="/etc/profiles/per-user/$(whoami)/bin/nvim"
 BREW_NVIM_BINARY="$DOTFILES_BREW_PREFIX/bin/nvim"
 MANUAL_NVIM_BINARY="$HOME/.nvim/bin/nvim"
 
@@ -11,7 +13,12 @@ available_binaries=""
 
 if [ -x "$NIX_NVIM_BINARY" ]; then
 	available_count=$((available_count + 1))
-	available_binaries="$available_binaries\n  - $NIX_NVIM_BINARY (installed via Nix)"
+	available_binaries="$available_binaries\n  - $NIX_NVIM_BINARY (installed via Nix user profile)"
+fi
+
+if [ -x "$NIXOS_NVIM_BINARY" ]; then
+	available_count=$((available_count + 1))
+	available_binaries="$available_binaries\n  - $NIXOS_NVIM_BINARY (installed via NixOS system profile)"
 fi
 
 if [ -x "$BREW_NVIM_BINARY" ]; then
@@ -26,14 +33,16 @@ fi
 
 # Check for conflicts
 if [ $available_count -gt 1 ]; then
-	echo "Warning: Multiple nvim binaries found. Using priority order: Nix > Homebrew > Manual"
+	echo "Warning: Multiple nvim binaries found. Using priority order: Nix User > NixOS System > Homebrew > Manual"
 	echo "Available binaries:$available_binaries"
 	echo ""
 fi
 
-# Select binary in priority order: Nix > Homebrew > Manual
+# Select binary in priority order: Nix User > NixOS System > Homebrew > Manual
 if [ -x "$NIX_NVIM_BINARY" ]; then
 	NVIM_BINARY="$NIX_NVIM_BINARY"
+elif [ -x "$NIXOS_NVIM_BINARY" ]; then
+	NVIM_BINARY="$NIXOS_NVIM_BINARY"
 elif [ -x "$BREW_NVIM_BINARY" ]; then
 	NVIM_BINARY="$BREW_NVIM_BINARY"
 elif [ -x "$MANUAL_NVIM_BINARY" ]; then
