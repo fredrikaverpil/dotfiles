@@ -4,6 +4,8 @@
       specialArgs = {inherit inputs;};
       modules =
         [
+          # Apply shared overlays
+          { nixpkgs.overlays = [ (import ../shared/overlays) ]; }
           inputs.home-manager-unstable.darwinModules.home-manager
           ../shared/users/default.nix
           ../shared/system/darwin.nix
@@ -42,6 +44,8 @@
       };
       modules =
         [
+          # Apply shared overlays
+          { nixpkgs.overlays = [ (import ../shared/overlays) ]; }
           inputs.disko.nixosModules.disko
           inputs.home-manager.nixosModules.home-manager
           ../shared/users/default.nix

@@ -52,6 +52,7 @@
   outputs = {self, ...} @ inputs: let
     lib = import ./nix/lib {inherit inputs;};
   in {
+    overlays.default = import ./nix/shared/overlays;
     nixosConfigurations = {
       rpi5-homelab = lib.mkRpiNixos {
         configPath = ./nix/hosts/rpi5-homelab/configuration.nix;

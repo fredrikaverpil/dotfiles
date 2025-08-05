@@ -42,7 +42,7 @@
     fi
   '';
 
-  # Common packages available on both platforms
+  # Common packages available on all platforms
   home.packages = with pkgs; [
     # ========================================================================
     # Core System & Shell Tools
@@ -64,6 +64,8 @@
     tmux
     tree
     vim
+    neovim-latest # from overlay
+    # neovim-nightly # from overlay
     wget
     yq
     unzip

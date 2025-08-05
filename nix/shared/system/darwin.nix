@@ -104,6 +104,13 @@
 
     nix.settings.experimental-features = "nix-command flakes";
 
+    # Home-manager configuration
+    home-manager = {
+      useGlobalPkgs = true;
+      useUserPackages = false; # Install to user profile for Darwin
+      backupFileExtension = "backup";
+    };
+
     # Primary user for user-specific settings (homebrew, system defaults, etc.)
     # Find the user marked as isPrimary = true
     system.primaryUser = let
