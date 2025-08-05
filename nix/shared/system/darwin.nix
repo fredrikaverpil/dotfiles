@@ -44,7 +44,7 @@
       taps = [
         "dustinblackman/tap"
         "go-task/tap"
-        "joshmedeski/sesh"
+        # "joshmedeski/sesh"
         "1password/tap"
         "nikitabobko/tap"
         "sst/tap" # for opencode
@@ -62,7 +62,7 @@
 
           # Packages from custom taps that aren't in nixpkgs
           "go-task/tap/go-task"
-          "joshmedeski/sesh/sesh"
+          # "joshmedeski/sesh/sesh"
           "sst/tap/opencode"
           "pkgx"
 
