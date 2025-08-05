@@ -43,12 +43,6 @@
       ]
       ++ config.host.extraSystemPackages;
 
-    # Neovim configuration for Linux systems
-    programs.neovim = {
-      enable = true;
-      package = pkgs.neovim-custom; # custom overlay version
-    };
-
     # Nix registry for easy access to stable and unstable packages
     # Note: This would require inputs to be passed as specialArgs
     # nix.registry = {
