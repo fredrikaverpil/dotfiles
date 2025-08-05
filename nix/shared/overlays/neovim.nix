@@ -15,11 +15,13 @@ final: prev: let
   };
 
   # Nightly hashes
+  #
+  # Run `nineovim-nightly-hashes` to get the latest nightly hashes.
   nightlyHashes = {
-    "nvim-macos-arm64.tar.gz" = prev.lib.fakeSha256; # Will show real hash on first build
-    "nvim-macos-x86_64.tar.gz" = prev.lib.fakeSha256; # Will show real hash on first build
-    "nvim-linux-arm64.tar.gz" = prev.lib.fakeSha256; # Will show real hash on first build
-    "nvim-linux-x86_64.tar.gz" = prev.lib.fakeSha256; # Will show real hash on first build
+    "nvim-linux-arm64.tar.gz" = "sha256-jgqwMS2O9gjfaQ6pUHCAOMCQN1SOZvAA6I8LxIYoDBk=";
+    "nvim-linux-x86_64.tar.gz" = "sha256-LMQneeMkm570KDiLNhWQ8rPZOBN7qOkBpAVy5tYcWQc=";
+    "nvim-macos-x86_64.tar.gz" = "sha256-+q39O4kMUwO5ejk1VMZbeFy2ogzRb3nbYsSzqYpKKHE=";
+    "nvim-macos-arm64.tar.gz" = "sha256-uHMYxpSb3cVrtRikuc/3C1EO/o85Wt/CPhbDoOXgE9A=";
   };
 
   # Helper function to fetch Neovim releases
