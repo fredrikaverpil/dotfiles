@@ -1,11 +1,14 @@
-{ config, pkgs, lib, inputs, ... }:
-
-let
+{
+  config,
+  pkgs,
+  lib,
+  inputs,
+  ...
+}: let
   stateVersions = {
     darwin = 6;
   };
-in
-{
+in {
   # Darwin state version 6 - defines system configuration schema/compatibility
   # See flake.nix for actual package channel selection (stable vs unstable)
   # Reference: https://github.com/LnL7/nix-darwin/blob/master/modules/system/default.nix
@@ -15,9 +18,8 @@ in
 
   nixpkgs.hostPlatform = "aarch64-darwin";
 
-
   time.timeZone = "Europe/Stockholm";
-  
+
   host.users = {
     fredrik = {
       isAdmin = true;
@@ -43,5 +45,4 @@ in
   host.extraMasApps = {
     "FileZilla Pro" = 1298486723;
   };
-
 }

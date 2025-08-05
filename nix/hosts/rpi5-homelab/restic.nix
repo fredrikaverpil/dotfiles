@@ -39,14 +39,14 @@
   };
 
   # Add required packages to the restic backup service PATH
-  systemd.services.restic-backups-immich.path = with pkgs; [ docker gzip curl coreutils gnugrep openssh ];
+  systemd.services.restic-backups-immich.path = with pkgs; [docker gzip curl coreutils gnugrep openssh];
 
   # Separate validation service
   systemd.services.restic-validation-immich = {
     description = "Immich Backup Validation";
-    after = [ "network-online.target" ];
-    wants = [ "network-online.target" ];
-    path = with pkgs; [ docker curl gzip restic coreutils util-linux gnugrep gnused openssh ];
+    after = ["network-online.target"];
+    wants = ["network-online.target"];
+    path = with pkgs; [docker curl gzip restic coreutils util-linux gnugrep gnused openssh];
     serviceConfig = {
       Type = "oneshot";
       User = "root";
@@ -59,7 +59,7 @@
   # Validation timer (runs 30 minutes after backup)
   systemd.timers.restic-validation-immich = {
     description = "Timer for Immich Backup Validation";
-    wantedBy = [ "timers.target" ];
+    wantedBy = ["timers.target"];
     timerConfig = {
       OnCalendar = "03:30";
       Persistent = true;

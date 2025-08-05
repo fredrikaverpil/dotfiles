@@ -111,7 +111,6 @@
     ollama
     gnused # GNU tools (for macOS compatibility)
 
-
     # ========================================================================
     # Infrastructure & Cloud
     # ========================================================================
@@ -120,7 +119,7 @@
     # ========================================================================
     # Terminal Support
     # ========================================================================
-    kitty.terminfo    # Terminal emulator terminfo for SSH compatibility
+    kitty.terminfo # Terminal emulator terminfo for SSH compatibility
     # ghostty.terminfo  # Terminal emulator terminfo - disabled due to broken package
   ];
 

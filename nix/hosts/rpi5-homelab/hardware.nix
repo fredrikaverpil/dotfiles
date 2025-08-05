@@ -1,14 +1,12 @@
-{ nixos-raspberrypi, ... }:
-
-{
+{nixos-raspberrypi, ...}: {
   # Hardware-specific configuration for Raspberry Pi 5
   # This file defines the hardware capabilities and storage layout
-  
+
   # Import Raspberry Pi 5 hardware modules from nixos-raspberrypi
   imports = with nixos-raspberrypi.nixosModules; [
-    raspberry-pi-5.base        # Core Pi 5 hardware support (CPU, memory, GPIO)
+    raspberry-pi-5.base # Core Pi 5 hardware support (CPU, memory, GPIO)
     raspberry-pi-5.display-vc4 # VideoCore IV GPU support for hardware acceleration
-    raspberry-pi-5.bluetooth   # Bluetooth hardware support
+    raspberry-pi-5.bluetooth # Bluetooth hardware support
   ];
 
   # Disko configuration for declarative disk partitioning
@@ -24,20 +22,20 @@
           partitions = {
             # Firmware partition for Raspberry Pi bootloader and kernel
             firmware = {
-              size = "512M";        # Sufficient space for firmware and multiple kernels
-              type = "EF00";        # EFI System Partition type
+              size = "512M"; # Sufficient space for firmware and multiple kernels
+              type = "EF00"; # EFI System Partition type
               content = {
                 type = "filesystem";
-                format = "vfat";    # FAT32 required by Raspberry Pi firmware
+                format = "vfat"; # FAT32 required by Raspberry Pi firmware
                 mountpoint = "/boot/firmware";
               };
             };
             # Root filesystem partition
             root = {
-              size = "100%";        # Use remaining disk space
+              size = "100%"; # Use remaining disk space
               content = {
                 type = "filesystem";
-                format = "ext4";    # Reliable filesystem with good Pi support
+                format = "ext4"; # Reliable filesystem with good Pi support
                 mountpoint = "/";
               };
             };
@@ -51,6 +49,7 @@
   fileSystems."/mnt/homelab-data" = {
     device = "/dev/disk/by-label/homelab-data";
     fsType = "ext4";
-    options = [ "defaults" "nofail" ];
+    options = ["defaults" "nofail"];
   };
 }
+

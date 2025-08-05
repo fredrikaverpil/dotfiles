@@ -1,12 +1,9 @@
-{
-  inputs,
-  ...
-}:
-let
-  helpers = import ./helpers.nix { inherit inputs; };
-in
-{
-  inherit (helpers)
+{inputs, ...}: let
+  helpers = import ./helpers.nix {inherit inputs;};
+in {
+  inherit
+    (helpers)
     mkDarwin
-    mkRpiNixos;
+    mkRpiNixos
+    ;
 }
