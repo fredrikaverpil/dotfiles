@@ -34,7 +34,6 @@
       specialArgs = { 
         inherit inputs;
         nixos-raspberrypi = inputs.nixos-raspberrypi; 
-        inherit (inputs) dotfiles; 
       };
       modules = [
         inputs.disko.nixosModules.disko
