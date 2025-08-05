@@ -5,7 +5,7 @@
 
 {
   options = {
-    dotfiles.users = lib.mkOption {
+    host.users = lib.mkOption {
       type = lib.types.attrsOf (lib.types.submodule {
         options = {
           isAdmin = lib.mkOption {
@@ -77,14 +77,14 @@
         # SSH public key authentication
         openssh.authorizedKeys.keys = userConfig.sshKeys;
       })
-    ]) config.dotfiles.users;
+    ]) config.host.users;
 
     # Home-manager configuration for each user with a homeConfig
     home-manager.users = lib.mapAttrs (username: userConfig: 
       if userConfig.homeConfig != null 
       then import userConfig.homeConfig
       else {}
-    ) config.dotfiles.users;
+    ) config.host.users;
     
     # Pass inputs to home-manager modules
     home-manager.extraSpecialArgs = { inherit inputs; };

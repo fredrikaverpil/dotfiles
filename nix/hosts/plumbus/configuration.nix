@@ -17,7 +17,7 @@ in
 
   time.timeZone = "Europe/Stockholm";
   
-  dotfiles.users = {
+  host.users = {
     fredrik = {
       isAdmin = true;
       isPrimary = true;
@@ -26,18 +26,18 @@ in
     };
   };
 
-  dotfiles.extraPackages = with pkgs; [
+  host.extraPackages = with pkgs; [
   ];
 
-  dotfiles.extraBrews = [
+  host.extraBrews = [
   ];
 
-  dotfiles.extraCasks = [
+  host.extraCasks = [
     "orbstack"
     "raycast"
   ];
 
-  dotfiles.extraMasApps = {
+  host.extraMasApps = {
   };
 
 }

@@ -27,7 +27,7 @@ in {
 
   time.timeZone = "Europe/Stockholm";
 
-  dotfiles.users = {
+  host.users = {
     fredrik = {
       isAdmin = true;
       isPrimary = true; # Not used on Linux, but kept for consistency
@@ -88,7 +88,7 @@ in {
     trustedInterfaces = ["tailscale+"];
   };
 
-  dotfiles.extraServices = {
+  host.extraServices = {
     # SSH service for remote access
     # Accessible via local network and Tailscale VPN only (not internet-exposed)
     openssh = {
@@ -305,7 +305,7 @@ in {
   # HOST-SPECIFIC EXTENSIONS
   # ========================================================================
   # Host-specific system packages for rpi5-homelab
-  dotfiles.extraSystemPackages = with pkgs;
+  host.extraSystemPackages = with pkgs;
     [
       # Essential system administration tools
       # These are kept minimal as most tools are managed via home-manager

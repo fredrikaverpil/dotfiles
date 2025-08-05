@@ -18,7 +18,7 @@ in
 
   time.timeZone = "Europe/Stockholm";
   
-  dotfiles.users = {
+  host.users = {
     fredrik = {
       isAdmin = true;
       isPrimary = true;
@@ -27,20 +27,20 @@ in
     };
   };
 
-  dotfiles.extraPackages = with pkgs; [
+  host.extraPackages = with pkgs; [
   ];
 
-  dotfiles.extraBrews = [
+  host.extraBrews = [
   ];
 
-  dotfiles.extraCasks = [
+  host.extraCasks = [
     "podman-desktop"
     "pgadmin4"
     "yubico-yubikey-manager"
     "cyberduck"
   ];
 
-  dotfiles.extraMasApps = {
+  host.extraMasApps = {
     "FileZilla Pro" = 1298486723;
   };
 

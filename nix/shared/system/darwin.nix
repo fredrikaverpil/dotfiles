@@ -7,25 +7,25 @@
   ...
 }: {
   options = {
-    dotfiles.extraBrews = lib.mkOption {
+    host.extraBrews = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [];
       description = "Additional homebrew packages for this host";
     };
 
-    dotfiles.extraCasks = lib.mkOption {
+    host.extraCasks = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [];
       description = "Additional homebrew casks for this host";
     };
 
-    dotfiles.extraMasApps = lib.mkOption {
+    host.extraMasApps = lib.mkOption {
       type = lib.types.attrsOf lib.types.int;
       default = {};
       description = "Additional Mac App Store apps for this host";
     };
 
-    dotfiles.extraPackages = lib.mkOption {
+    host.extraPackages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
       default = [];
       description = "Additional packages for this host";
@@ -69,7 +69,7 @@
           # Mac App Store CLI
           "mas"
         ]
-        ++ config.dotfiles.extraBrews;
+        ++ config.host.extraBrews;
 
       casks =
         [
@@ -91,7 +91,7 @@
           "wezterm"
           "zed"
         ]
-        ++ config.dotfiles.extraCasks;
+        ++ config.host.extraCasks;
 
       masApps =
         {
@@ -99,7 +99,7 @@
           "Slack" = 803453959;
           "Pandan" = 1569600264;
         }
-        // config.dotfiles.extraMasApps;
+        // config.host.extraMasApps;
     };
 
     nix.settings.experimental-features = "nix-command flakes";
@@ -107,7 +107,7 @@
     # Primary user for user-specific settings (homebrew, system defaults, etc.)
     # Find the user marked as isPrimary = true
     system.primaryUser = let
-      primaryUsers = lib.filterAttrs (name: user: user.isPrimary) config.dotfiles.users;
+      primaryUsers = lib.filterAttrs (name: user: user.isPrimary) config.host.users;
       primaryUserNames = lib.attrNames primaryUsers;
     in
       if lib.length primaryUserNames == 1

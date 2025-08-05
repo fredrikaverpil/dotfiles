@@ -7,13 +7,13 @@
   ...
 }: {
   options = {
-    dotfiles.extraSystemPackages = lib.mkOption {
+    host.extraSystemPackages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
       default = [];
       description = "Additional system packages for this host";
     };
 
-    dotfiles.extraServices = lib.mkOption {
+    host.extraServices = lib.mkOption {
       type = lib.types.attrs;
       default = {};
       description = "Additional services configuration for this host";
@@ -41,7 +41,7 @@
       [
         vim # for recovery
       ]
-      ++ config.dotfiles.extraSystemPackages;
+      ++ config.host.extraSystemPackages;
 
     # Nix registry for easy access to stable and unstable packages
     # Note: This would require inputs to be passed as specialArgs
@@ -72,7 +72,7 @@
     # Apply additional services configuration
     services = lib.mkMerge [
       {} # Default empty services
-      config.dotfiles.extraServices
+      config.host.extraServices
     ];
   };
 }
