@@ -2,8 +2,11 @@
   config,
   pkgs,
   lib,
+  inputs,
   ...
-}: {
+}: let
+  unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.system};
+in {
   imports = [
     ../../../shared/home/darwin.nix
   ];
@@ -19,4 +22,3 @@
   programs = {
   };
 }
-
