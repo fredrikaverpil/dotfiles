@@ -86,7 +86,6 @@ in {
     ripgrep
     fd
     cmake
-    tree-sitter
     pre-commit
 
     # ========================================================================
@@ -130,12 +129,14 @@ in {
     package = pkgs.neovim-custom; # from overlay
     extraPackages = with unstable; [
       # For plugins and Mason, which needs extra tools to build or run
+      bun
       gcc
       go
       nodejs_22
       npm-check-updates
       python3
       ruby
+      tree-sitter
       uv
       yarn
 
