@@ -281,22 +281,6 @@
       '
     '';
 
-    # Nix registry for easy access to stable and unstable packages
-    #
-    # Example usage:
-    # nix shell u#neovim
-    # nix run u#nodejs_22 -- --version
-    nix.registry = {
-      n.to = {
-        type = "path";
-        path = inputs.nixpkgs;
-      };
-      u.to = {
-        type = "path";
-        path = inputs.nixpkgs-unstable;
-      };
-    };
-
     # Font management
     # NOTE: Berkeley Mono is installed manually, as it requires a license.
     fonts.packages = with pkgs; [
