@@ -136,9 +136,15 @@ in {
       npm-check-updates
       python3
       ruby
-      rustup
       uv
       yarn
+
+      # Instead of rustup; include the toolchain directly
+      cargo
+      rustc
+      rustfmt
+      clippy
+      rust-analyzer
     ];
   };
 
