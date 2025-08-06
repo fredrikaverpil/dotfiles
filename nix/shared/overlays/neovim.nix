@@ -7,14 +7,14 @@ final: prev: let
   # sha = "sha256-sNunEdIFrSMqYaNg0hbrSXALRQXxFkdDOl/hhX1L1WA=";
   #
   rev = "v0.11.3";
-  sha = "sha256-B/An+SiRWC3Ea0T/sEk8aNBS1Ab9OENx/l4Z3nn8xE4=;";
+  sha = "sha256-B/An+SiRWC3Ea0T/sEk8aNBS1Ab9OENx/l4Z3nn8xE4=";
   #
   # rev = "a9a4c271b13fffba2a21567c86b0f40ae4c180a1";
   # sha = "sha256-3clYVRl9XbRZXnPtMU2QuSo4FsUQvPOZCML5J2b9YHc=";
   # NOTE: if there are treesitter query errors, run `checkhealth treesitter`
   # and observe the nix-provided parsers. Re-install them with :TSInstall vim query
 in {
-  neovim-custom = prev.wrapNeovim (prev.neovim-unwrapped.overrideAttrs (old: {
+  neovim-custom = prev.neovim-unwrapped.overrideAttrs (old: {
     version = rev;
     src = prev.fetchFromGitHub {
       owner = "neovim";
@@ -25,5 +25,5 @@ in {
     # Skip version checks for nightly builds
     doCheck = false;
     doInstallCheck = false;
-  })) {};
+  });
 }
