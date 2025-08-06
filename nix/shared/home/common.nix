@@ -63,7 +63,6 @@
     stow # GNU Stow for dotfile management
     tmux
     tree
-    vim
     # neovim-custom # from custom overlay
     wget
     yq
