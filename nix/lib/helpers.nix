@@ -5,9 +5,9 @@
       modules =
         [
           # Apply shared overlays
-          { nixpkgs.overlays = [ (import ../shared/overlays) ]; }
+          {nixpkgs.overlays = [(import ../shared/overlays)];}
           inputs.home-manager-unstable.darwinModules.home-manager
-          ../shared/users/default.nix
+          ./users.nix
           ../shared/system/darwin.nix
           ../shared/system/common.nix
           configPath
@@ -28,9 +28,8 @@
   #     modules = [
   #       inputs.disko.nixosModules.disko
   #       inputs.home-manager.nixosModules.home-manager
-  #       ../shared/users/default.nix
-  #       ../shared/system/common.nix
-  #       ../shared/system/linux.nix
+  #       ./users.nix
+  #       ../shared/system/common.nix  #       ../shared/system/linux.nix
   #       configPath
   #     ] ++ (if builtins.pathExists (builtins.dirOf configPath + "/home.nix") then [ (builtins.dirOf configPath + "/home.nix") ] else [ ])
   #       ++ (if builtins.pathExists (builtins.dirOf configPath + "/hardware.nix") then [ (builtins.dirOf configPath + "/hardware.nix") ] else [ ]);
@@ -45,10 +44,10 @@
       modules =
         [
           # Apply shared overlays
-          { nixpkgs.overlays = [ (import ../shared/overlays) ]; }
+          {nixpkgs.overlays = [(import ../shared/overlays)];}
           inputs.disko.nixosModules.disko
           inputs.home-manager.nixosModules.home-manager
-          ../shared/users/default.nix
+          ./users.nix
           ../shared/system/common.nix
           ../shared/system/linux.nix
           configPath

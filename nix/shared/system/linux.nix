@@ -34,7 +34,7 @@
     # - Consider enabling passwordless sudo only for specific commands
     security.sudo.wheelNeedsPassword = false;
 
-    # Note: User configuration is handled by shared/users/default.nix
+    # Note: User configuration is handled by lib/users.nix
 
     # System-level packages
     environment.systemPackages = with pkgs;

@@ -121,7 +121,7 @@
       then lib.head primaryUserNames
       else throw "Exactly one user must have isPrimary = true on Darwin systems";
 
-    # Note: User configuration is handled by shared/users/default.nix
+    # Note: User configuration is handled by lib/users.nix
 
     # System-level packages
     environment.systemPackages = with pkgs; [

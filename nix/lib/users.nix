@@ -101,4 +101,3 @@
     # Note: Linux-specific security settings are handled in shared/system/linux.nix
   };
 }
-
