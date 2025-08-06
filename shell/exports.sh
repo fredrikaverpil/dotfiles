@@ -83,7 +83,6 @@ export DOTFILES_SHELL=$shell
 export DOTFILES_BREW_PREFIX=$brew_prefix
 export HOMEBREW_NO_ANALYTICS=1
 export PIP_REQUIRE_VIRTUALENV=true # use pip --isolated to bypass
-export PYENV_ROOT="$HOME/.pyenv"   # pyenv
 export GIT_EDITOR="nvim"
 export EDITOR="nvim"
 
@@ -94,9 +93,8 @@ add_to_path append "$DOTFILES_BREW_PREFIX/opt/mysql-client/bin"
 add_to_path prepend "$DOTFILES_BREW_PREFIX/opt/gnu-sed/libexec/gnubin"
 
 # NOTE: the last prepend appears first in $PATH, so make sure the order is correct below
-add_to_path prepend "$PYENV_ROOT/bin"     # pyenv
-add_to_path prepend "$HOME/.local/bin"    # user-installed binaries
-add_to_path prepend "$DOTFILES/shell/bin" # personal and custom scripts
+add_to_path prepend "$HOME/.local/bin" # user-installed binaries
+# HACK: shell/bin is prepended in sourcing.sh after Nix daemon to ensure it comes first
 
 # load .env file if it exists
 # shellcheck disable=SC1090
