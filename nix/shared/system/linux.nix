@@ -43,19 +43,6 @@
       ]
       ++ config.host.extraSystemPackages;
 
-    # Nix registry for easy access to stable and unstable packages
-    # Note: This would require inputs to be passed as specialArgs
-    # nix.registry = {
-    #   n.to = {
-    #     type = "path";
-    #     path = inputs.nixpkgs;
-    #   };
-    #   u.to = {
-    #     type = "path";
-    #     path = inputs.nixos-unstable;
-    #   };
-    # };
-
     # Font management
     # NOTE: Berkeley Mono is installed manually, as it requires a license.
     fonts.packages = with pkgs; [
