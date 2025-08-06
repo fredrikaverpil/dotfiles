@@ -5,7 +5,9 @@
   pkgs,
   inputs,
   ...
-}: {
+}: let
+  unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.system};
+in {
   # Handle dotfiles - use local clone if available, otherwise use flake input
   home.activation.handleDotfiles = lib.hm.dag.entryAfter ["writeBoundary"] ''
     DOTFILES_PATH=""
@@ -123,10 +125,21 @@
     # ghostty.terminfo  # Terminal emulator terminfo - disabled due to broken package
   ];
 
-  # Neovim via custom overlay "neovim-custom"
   programs.neovim = {
     enable = true;
-    package = pkgs.neovim-custom; # Use the custom Neovim overlay
+    package = pkgs.neovim-custom; # from overlay
+    extraPackages = with unstable; [
+      # For plugins and Mason, which needs extra tools to build or run
+      gcc
+      go
+      nodejs_22
+      npm-check-updates
+      python3
+      ruby
+      rustup
+      uv
+      yarn
+    ];
   };
 
   # Additional packages are added in individual user configurations
