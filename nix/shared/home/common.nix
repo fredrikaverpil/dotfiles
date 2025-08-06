@@ -123,5 +123,11 @@
     # ghostty.terminfo  # Terminal emulator terminfo - disabled due to broken package
   ];
 
+  # Neovim via custom overlay "neovim-custom"
+  programs.neovim = {
+    enable = true;
+    package = pkgs.neovim-custom; # Use the custom Neovim overlay
+  };
+
   # Additional packages are added in individual user configurations
 }
