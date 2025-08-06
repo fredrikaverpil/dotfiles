@@ -2,10 +2,10 @@
 set -e
 
 # Nix binary locations (try multiple paths)
+MANUAL_NVIM_BINARY="$HOME/.nvim/bin/nvim"
 NIX_NVIM_BINARY="$HOME/.nix-profile/bin/nvim"
 NIXOS_NVIM_BINARY="/etc/profiles/per-user/$(whoami)/bin/nvim"
 BREW_NVIM_BINARY="$DOTFILES_BREW_PREFIX/bin/nvim"
-MANUAL_NVIM_BINARY="$HOME/.nvim/bin/nvim"
 
 # Count available binaries
 available_count=0
