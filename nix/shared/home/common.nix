@@ -128,7 +128,8 @@ in {
     enable = true;
     package = pkgs.neovim-custom; # from overlay
     extraPackages = with unstable; [
-      # For plugins and Mason, which needs extra tools to build or run
+      # For plugins and Mason, which needs extra tools to build or run.
+      # NOTE: because of useGlobalPkgs=true, all packages from home.packages are also available here
       bun
       gcc
       go
