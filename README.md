@@ -209,6 +209,16 @@ remain "stable" on e.g. production servers.
 | home-manager | home-manager-unstable  | release-25.05   | macOS: latest, Linux: stable |
 | nix-darwin   | master (uses unstable) | -               | Always latest features       |
 
+Registry shortcuts:
+
+```sh
+# Stable packages
+nix shell n#neovim
+
+# Unstable packages
+nix shell u#nodejs_22
+```
+
 ### Dotfiles
 
 Dotfiles are managed with GNU Stow, not Nix:
@@ -253,7 +263,3 @@ stow --target="$HOME" --restow shared "$(uname -s)"
 - [Maple Mono](https://github.com/subframe7536/maple-font)
 - [Noto Color Emoji](https://fonts.google.com/noto/specimen/Noto+Color+Emoji)
 - [Symbols Nerd Font Mono](https://github.com/ryanoasis/nerd-fonts)
-
-```
-
-```
