@@ -98,6 +98,7 @@
           "Keka" = 470158793;
           "Slack" = 803453959;
           "Pandan" = 1569600264;
+          "DoubleMemory" = 6737529034;
         }
         // config.host.extraMasApps;
     };
