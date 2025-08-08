@@ -55,6 +55,23 @@ sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- sw
 ./rebuild.sh --stow
 ```
 
+```sh
+# Update all unstable/Darwin-related inputs (dev machines)
+nix flake lock \
+  --update-input nixpkgs-unstable \
+  --update-input home-manager-unstable \
+  --update-input nix-darwin \
+  --update-input dotfiles
+
+# Update all stable/Linux-related inputs (prod servers)
+nix flake lock \
+  --update-input nixpkgs \
+  --update-input home-manager \
+  --update-input nixos-raspberrypi \
+  --update-input disko \
+  --update-input dotfiles
+```
+
 <details>
 <summary>Troubleshooting</summary>
 
@@ -189,14 +206,14 @@ darwin-rebuild --rollback      # macOS
 
 ### Package Sources
 
-| Component    | macOS Source     | Linux Source          | Rationale                   |
-| ------------ | ---------------- | --------------------- | --------------------------- |
-| nixpkgs      | nixpkgs-unstable | nixpkgs (nixos-25.05) | macOS: latest packages      |
-| home-manager | master branch    | release-25.05         | Linux: prioritize stability |
-| nix-darwin   | master branch    | -                     | Always latest features      |
+The intent here is to follow "unstable" sources on development machines, but
+remain "stable" on e.g. production servers.
 
-Your flake pins these sources for reproducibility. Access unstable packages:
-`unstable.package-name`
+| Component    | macOS Source           | Linux Source    | Rationale                    |
+| ------------ | ---------------------- | --------------- | ---------------------------- |
+| nixpkgs      | nixpkgs-unstable       | nixpkgs (25.05) | macOS: latest, Linux: stable |
+| home-manager | home-manager-unstable  | release-25.05   | macOS: latest, Linux: stable |
+| nix-darwin   | master (uses unstable) | -               | Always latest features       |
 
 ### Dotfiles
 
