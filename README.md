@@ -103,16 +103,19 @@ sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- sw
 
 ### macOS Permissions
 
-If you get errors about `com.apple.universalaccess` or system settings during nix-darwin activation:
+If you get errors about `com.apple.universalaccess` or system settings during
+nix-darwin activation:
 
 1. **Grant Full Disk Access to your terminal:**
    - Open System Settings > Privacy & Security > Full Disk Access
-   - Click + and add your terminal app (e.g., `/Applications/Utilities/Terminal.app`)
+   - Click + and add your terminal app (e.g.,
+     `/Applications/Utilities/Terminal.app`)
    - Enable the checkbox for your terminal
 
 ### SSL Certificate Issues (when choosing upstream Nix)
 
-If you get SSL certificate errors after switching from Determinate to upstream Nix:
+If you get SSL certificate errors after switching from Determinate to upstream
+Nix:
 
 ```sh
 # Fix broken certificate symlink
@@ -177,6 +180,14 @@ stow --target="$HOME" --restow shared "$(uname -s)"
 
 - [rpi5-homelab](nix/hosts/rpi5-homelab/README.md) - requires custom
   installation procedure
+
+### Nix documentation references
+
+- NixOS configuration options:
+  [stable](https://nixos.org/manual/nixos/stable/options) |
+  [unstable](https://nixos.org/manual/nixos/unstable/options)
+- [Home manager configuration options](https://nix-community.github.io/home-manager/options.xhtml)
+- [nix-darwin configuration options](https://nix-darwin.github.io/nix-darwin/manual/index.html)
 
 ### Non-Nix legacy docs
 
