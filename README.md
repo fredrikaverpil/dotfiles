@@ -77,7 +77,7 @@ nix flake lock \
   --update-input dotfiles
 ```
 
-### macOS Permissions
+### macOS permissions
 
 If you get errors about `com.apple.universalaccess` or system settings during
 nix-darwin activation:
@@ -88,7 +88,7 @@ nix-darwin activation:
      `/Applications/Utilities/Terminal.app`)
    - Enable the checkbox for your terminal
 
-### SSL Certificate Issues (when choosing upstream Nix)
+### SSL certificate issues (when choosing upstream Nix)
 
 If you get SSL certificate errors after switching from Determinate to upstream
 Nix:
@@ -107,7 +107,7 @@ ssl-cert-file = /etc/ssl/cert.pem
 EOF
 ```
 
-### General Troubleshooting
+### General troubleshooting
 
 ```sh
 # Check configuration
@@ -127,7 +127,7 @@ darwin-rebuild --rollback      # macOS
 
 </details>
 
-## Nix Management Responsibilities
+## Nix management responsibilities
 
 <details>
 <summary>Repo structure</summary>
@@ -198,7 +198,7 @@ darwin-rebuild --rollback      # macOS
 | Mac App Store apps | Homebrew     | Homebrew   | -            | -          |
 | Fonts              | Nix          | Nix        | Nix          | Nix        |
 
-### Package Sources
+### Package sources
 
 The intent here is to follow "unstable" sources on development machines, but
 remain "stable" on e.g. production servers.
@@ -235,7 +235,7 @@ stow --target="$HOME" --restow shared "$(uname -s)"
 
 ## Other READMEs and references
 
-### Host-Specific Documentation
+### Host-specific documentation
 
 - [rpi5-homelab](nix/hosts/rpi5-homelab/README.md) - requires custom
   installation procedure
