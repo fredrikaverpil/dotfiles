@@ -55,6 +55,11 @@ sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- sw
 ./rebuild.sh --stow
 ```
 
+<details>
+<summary>Troubleshooting</summary>
+
+### Update stable vs unstable
+
 ```sh
 # Update all unstable/Darwin-related inputs (dev machines)
 nix flake lock \
@@ -71,9 +76,6 @@ nix flake lock \
   --update-input disko \
   --update-input dotfiles
 ```
-
-<details>
-<summary>Troubleshooting</summary>
 
 ### macOS Permissions
 
