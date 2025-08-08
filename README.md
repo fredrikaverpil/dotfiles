@@ -187,6 +187,17 @@ darwin-rebuild --rollback      # macOS
 | Mac App Store apps | Homebrew     | Homebrew   | -            | -          |
 | Fonts              | Nix          | Nix        | Nix          | Nix        |
 
+### Package Sources
+
+| Component    | macOS Source     | Linux Source          | Rationale                   |
+| ------------ | ---------------- | --------------------- | --------------------------- |
+| nixpkgs      | nixpkgs-unstable | nixpkgs (nixos-25.05) | macOS: latest packages      |
+| home-manager | master branch    | release-25.05         | Linux: prioritize stability |
+| nix-darwin   | master branch    | -                     | Always latest features      |
+
+Your flake pins these sources for reproducibility. Access unstable packages:
+`unstable.package-name`
+
 ### Dotfiles
 
 Dotfiles are managed with GNU Stow, not Nix:
