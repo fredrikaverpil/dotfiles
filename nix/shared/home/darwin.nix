@@ -19,19 +19,8 @@
 
   # macOS user-specific defaults using home-manager's built-in support
   targets.darwin.defaults = {
-    # Global macOS preferences
-    NSGlobalDomain = {
-      # Keyboard behavior optimizations
-      # Disable press-and-hold for accent characters, enable key repeat instead
-      ApplePressAndHoldEnabled = false;
-      InitialKeyRepeat = 15;
-      KeyRepeat = 1;
-      # Mouse and trackpad behavior
-      "com.apple.mouse.tapBehavior" = 1;
-      NSWindowShouldDragOnGesture = true;
-      # Disable automatic spelling correction
-      NSAutomaticSpellingCorrectionEnabled = false;
-    };
+    # Note: Keyboard and input settings moved to user-specific activation script
+    # to ensure they don't affect other users on the system
 
     # Application-specific preferences
     "com.apple.desktopservices" = {
@@ -131,10 +120,28 @@
     };
   };
 
+  # User-specific keyboard and input settings
+  # These settings only affect the current user, not other users on the system
+  home.activation.userKeyboardSettings = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    echo "Applying user-specific keyboard and input settings..."
+
+    # Keyboard repeat settings (user-specific)
+    $DRY_RUN_CMD defaults write -g ApplePressAndHoldEnabled -bool false
+    $DRY_RUN_CMD defaults write -g InitialKeyRepeat -int 15
+    $DRY_RUN_CMD defaults write -g KeyRepeat -int 1
+
+    # Mouse/trackpad settings (user-specific)
+    $DRY_RUN_CMD defaults write -g com.apple.mouse.tapBehavior -int 1
+    $DRY_RUN_CMD defaults write -g NSWindowShouldDragOnGesture -bool true
+
+    # Spelling correction (user-specific)
+    $DRY_RUN_CMD defaults write -g NSAutomaticSpellingCorrectionEnabled -bool false
+  '';
+
   # Settings that require manual defaults commands (not supported by home-manager's targets.darwin.defaults)
   home.activation.macosUserDefaults = lib.hm.dag.entryAfter ["writeBoundary"] ''
     echo "Applying additional macOS user settings..."
-    
+
     # Disable input source switching (Ctrl+Space) to prevent conflicts with development tools
     $DRY_RUN_CMD defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 60 "
       <dict>
