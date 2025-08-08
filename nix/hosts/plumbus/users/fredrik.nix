@@ -28,7 +28,7 @@ in {
     echo "Disabling Spotlight shortcut (Cmd+Space) for fredrik user on plumbus..."
     
     # Disable Spotlight keyboard shortcut (Cmd+Space) to allow Raycast usage
-    $DRY_RUN_CMD defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 "
+    $DRY_RUN_CMD /usr/bin/defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 "
       <dict>
         <key>enabled</key><false/>
         <key>value</key><dict>
