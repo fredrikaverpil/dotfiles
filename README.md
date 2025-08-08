@@ -6,55 +6,6 @@ Personal dotfiles using [Nix](https://nixos.org) for reproducible system/package
 management and [GNU Stow](https://www.gnu.org/software/stow/) for dotfile
 symlinking.
 
-<details>
-<summary>Repo structure</summary>
-
-```txt
-├── nix/                             # Nix configurations
-│   ├── hosts/                       # Host-specific configurations
-│   │   └── $host/                   # Individual host directory
-│   │       ├── configuration.nix    # System settings
-│   │       ├── hardware.nix         # Hardware config (optional, for NixOS)
-│   │       └── users/
-│   │           └── $username.nix    # User config
-│   ├── lib/                         # Helper functions
-│   │   ├── default.nix              # Library entry point
-│   │   ├── systems.nix              # System configuration helpers
-│   │   └── users.nix                # User configuration helpers
-│   └── shared/                      # Shared configurations
-│       ├── home/
-│       │   ├── common.nix           # Cross-platform user packages
-│       │   ├── darwin.nix           # macOS user config
-│       │   └── linux.nix            # Linux user config
-│       ├── overlays/
-│       │   ├── default.nix          # Overlay entry point
-│       │   └── neovim.nix           # Neovim overlay
-│       └── system/
-│           ├── common.nix           # Cross-platform system packages
-│           ├── darwin.nix           # macOS system config + Homebrew
-│           └── linux.nix            # Linux system config
-├── nvim-fredrik/                    # Neovim configuration
-│   ├── after/                       # Filetype plugins and queries
-│   ├── lua/fredrik/                 # Main Neovim config modules
-│   └── snippets/                    # Code snippets
-├── shell/                           # Shell configuration
-│   ├── bin/                         # Custom shell scripts
-│   ├── aliases.sh                   # Shell aliases
-│   ├── exports.sh                   # Environment variables
-│   └── sourcing.sh                  # Shell sourcing logic
-├── stow/                            # GNU Stow dotfiles
-│   ├── shared/                      # Cross-platform dotfiles
-│   ├── Darwin/                      # macOS-specific dotfiles
-│   ├── linux/                       # Linux-specific dotfiles
-│   └── install.sh                   # Stow installation script
-├── extras/                          # One-off platform-specific extras and legacy configs
-├── flake.nix                        # Nix flake configuration
-├── flake.lock                       # Nix flake lock file
-└── rebuild.sh                       # Main rebuild script
-```
-
-</details>
-
 ## Quick Start
 
 <details>
@@ -157,7 +108,58 @@ darwin-rebuild --rollback      # macOS
 
 </details>
 
-### Nix Management Responsibilities
+## Nix Management Responsibilities
+
+<details>
+<summary>Repo structure</summary>
+
+```txt
+├── nix/                             # Nix configurations
+│   ├── hosts/                       # Host-specific configurations
+│   │   └── $host/                   # Individual host directory
+│   │       ├── configuration.nix    # System settings
+│   │       ├── hardware.nix         # Hardware config (optional, for NixOS)
+│   │       └── users/
+│   │           └── $username.nix    # User config
+│   ├── lib/                         # Helper functions
+│   │   ├── default.nix              # Library entry point
+│   │   ├── systems.nix              # System configuration helpers
+│   │   └── users.nix                # User configuration helpers
+│   └── shared/                      # Shared configurations
+│       ├── home/
+│       │   ├── common.nix           # Cross-platform user packages
+│       │   ├── darwin.nix           # macOS user config
+│       │   └── linux.nix            # Linux user config
+│       ├── overlays/
+│       │   ├── default.nix          # Overlay entry point
+│       │   └── neovim.nix           # Neovim overlay
+│       └── system/
+│           ├── common.nix           # Cross-platform system packages
+│           ├── darwin.nix           # macOS system config + Homebrew
+│           └── linux.nix            # Linux system config
+├── nvim-fredrik/                    # Neovim configuration
+│   ├── after/                       # Filetype plugins and queries
+│   ├── lua/fredrik/                 # Main Neovim config modules
+│   └── snippets/                    # Code snippets
+├── shell/                           # Shell configuration
+│   ├── bin/                         # Custom shell scripts
+│   ├── aliases.sh                   # Shell aliases
+│   ├── exports.sh                   # Environment variables
+│   └── sourcing.sh                  # Shell sourcing logic
+├── stow/                            # GNU Stow dotfiles
+│   ├── shared/                      # Cross-platform dotfiles
+│   ├── Darwin/                      # macOS-specific dotfiles
+│   ├── linux/                       # Linux-specific dotfiles
+│   └── install.sh                   # Stow installation script
+├── extras/                          # One-off platform-specific extras and legacy configs
+├── flake.nix                        # Nix flake configuration
+├── flake.lock                       # Nix flake lock file
+└── rebuild.sh                       # Main rebuild script
+```
+
+</details>
+
+### Components
 
 | Component          | Tool             | Scope       | Configuration Location             |
 | ------------------ | ---------------- | ----------- | ---------------------------------- |
@@ -170,12 +172,22 @@ darwin-rebuild --rollback      # macOS
 | Homebrew packages  | nix-darwin       | System-wide | `nix/shared/system/darwin.nix`     |
 | Package overlays   | Nix              | System-wide | `nix/shared/overlays/`             |
 
+- NixOS configuration options:
+  [stable](https://nixos.org/manual/nixos/stable/options) |
+  [unstable](https://nixos.org/manual/nixos/unstable/options)
+- [Home manager configuration options](https://nix-community.github.io/home-manager/options.xhtml)
+- [nix-darwin configuration options](https://nix-darwin.github.io/nix-darwin/manual/index.html)
+
+### Packages
+
 | Package Type       | macOS System | macOS User | Linux System | Linux User |
 | ------------------ | ------------ | ---------- | ------------ | ---------- |
 | CLI tools          | Nix          | Nix        | Nix          | Nix        |
 | GUI apps           | Homebrew     | Homebrew   | Nix          | Nix        |
 | Mac App Store apps | Homebrew     | Homebrew   | -            | -          |
 | Fonts              | Nix          | Nix        | Nix          | Nix        |
+
+### Dotfiles
 
 Dotfiles are managed with GNU Stow, not Nix:
 
@@ -195,14 +207,6 @@ stow --target="$HOME" --restow shared "$(uname -s)"
 
 - [rpi5-homelab](nix/hosts/rpi5-homelab/README.md) - requires custom
   installation procedure
-
-### Nix documentation references
-
-- NixOS configuration options:
-  [stable](https://nixos.org/manual/nixos/stable/options) |
-  [unstable](https://nixos.org/manual/nixos/unstable/options)
-- [Home manager configuration options](https://nix-community.github.io/home-manager/options.xhtml)
-- [nix-darwin configuration options](https://nix-darwin.github.io/nix-darwin/manual/index.html)
 
 ### Non-Nix legacy docs
 
