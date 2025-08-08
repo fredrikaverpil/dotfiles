@@ -133,7 +133,6 @@
     # Consider manual updates instead: darwin-rebuild switch --flake ~/.dotfiles
 
     # macOS system defaults configuration
-    # Note: User-specific preferences have been moved to shared/home/darwin.nix
     system.defaults = {
       # System-wide settings that should apply to all users
       CustomUserPreferences = {
