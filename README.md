@@ -10,41 +10,47 @@ symlinking.
 <summary>Repo structure</summary>
 
 ```txt
-├── nix/             # Nix configurations
-│   ├── hosts/       # Host-specific configurations
-│   │   └── $host/   # Individual host directory
+├── nix/                             # Nix configurations
+│   ├── hosts/                       # Host-specific configurations
+│   │   └── $host/                   # Individual host directory
 │   │       ├── configuration.nix    # System settings
 │   │       ├── hardware.nix         # Hardware config (optional, for NixOS)
 │   │       └── users/
 │   │           └── $username.nix    # User config
-│   ├── lib/         # Helper functions
-│   │   ├── default.nix    # Library entry point
-│   │   └── helpers.nix    # mkDarwin, mkRpiNixos functions
-│   └── shared/      # Shared configurations
-│       ├── users/
-│       │   └── default.nix        # Multi-user system
-│       ├── system/
-│       │   ├── common.nix         # Cross-platform system packages
-│       │   ├── darwin.nix         # macOS system config + Homebrew
-│       │   └── linux.nix          # Linux system config
-│       └── home/
-│           ├── common.nix         # Cross-platform user packages
-│           ├── darwin.nix         # macOS user config
-│           └── linux.nix          # Linux user config
-├── nvim-fredrik/    # Neovim configuration
-│   ├── after/       # Filetype plugins and queries
-│   ├── lua/fredrik/ # Main Neovim config modules
-│   └── snippets/    # Code snippets
-├── shell/           # Shell configuration
-│   ├── bin/         # Custom shell scripts
-│   ├── aliases.sh   # Shell aliases
-│   ├── exports.sh   # Environment variables
-│   └── sourcing.sh  # Shell sourcing logic
-├── stow/            # GNU Stow dotfiles
-│   ├── shared/      # Cross-platform dotfiles
-│   ├── Darwin/      # macOS-specific dotfiles
-│   └── Linux/       # Linux-specific dotfiles
-└── extras/          # One-off platform-specific extras and legacy configs
+│   ├── lib/                         # Helper functions
+│   │   ├── default.nix              # Library entry point
+│   │   ├── systems.nix              # System configuration helpers
+│   │   └── users.nix                # User configuration helpers
+│   └── shared/                      # Shared configurations
+│       ├── home/
+│       │   ├── common.nix           # Cross-platform user packages
+│       │   ├── darwin.nix           # macOS user config
+│       │   └── linux.nix            # Linux user config
+│       ├── overlays/
+│       │   ├── default.nix          # Overlay entry point
+│       │   └── neovim.nix           # Neovim overlay
+│       └── system/
+│           ├── common.nix           # Cross-platform system packages
+│           ├── darwin.nix           # macOS system config + Homebrew
+│           └── linux.nix            # Linux system config
+├── nvim-fredrik/                    # Neovim configuration
+│   ├── after/                       # Filetype plugins and queries
+│   ├── lua/fredrik/                 # Main Neovim config modules
+│   └── snippets/                    # Code snippets
+├── shell/                           # Shell configuration
+│   ├── bin/                         # Custom shell scripts
+│   ├── aliases.sh                   # Shell aliases
+│   ├── exports.sh                   # Environment variables
+│   └── sourcing.sh                  # Shell sourcing logic
+├── stow/                            # GNU Stow dotfiles
+│   ├── shared/                      # Cross-platform dotfiles
+│   ├── Darwin/                      # macOS-specific dotfiles
+│   ├── linux/                       # Linux-specific dotfiles
+│   └── install.sh                   # Stow installation script
+├── extras/                          # One-off platform-specific extras and legacy configs
+├── flake.nix                        # Nix flake configuration
+├── flake.lock                       # Nix flake lock file
+└── rebuild.sh                       # Main rebuild script
 ```
 
 </details>
@@ -151,7 +157,18 @@ darwin-rebuild --rollback      # macOS
 
 </details>
 
-## Package Management
+### Nix Management Responsibilities
+
+| Component          | Tool             | Scope       | Configuration Location             |
+| ------------------ | ---------------- | ----------- | ---------------------------------- |
+| User dotfiles      | GNU Stow         | Per-user    | `stow/`                            |
+| User packages      | home-manager     | Per-user    | `nix/shared/home/`                 |
+| User preferences   | home-manager     | Per-user    | `nix/shared/home/` + host-specific |
+| Host configuration | nix-darwin/NixOS | System-wide | `nix/hosts/*/configuration.nix`    |
+| System packages    | nix-darwin/NixOS | System-wide | `nix/shared/system/`               |
+| System settings    | nix-darwin/NixOS | System-wide | `nix/shared/system/`               |
+| Homebrew packages  | nix-darwin       | System-wide | `nix/shared/system/darwin.nix`     |
+| Package overlays   | Nix              | System-wide | `nix/shared/overlays/`             |
 
 | Package Type       | macOS System | macOS User | Linux System | Linux User |
 | ------------------ | ------------ | ---------- | ------------ | ---------- |
@@ -159,8 +176,6 @@ darwin-rebuild --rollback      # macOS
 | GUI apps           | Homebrew     | Homebrew   | Nix          | Nix        |
 | Mac App Store apps | Homebrew     | Homebrew   | -            | -          |
 | Fonts              | Nix          | Nix        | Nix          | Nix        |
-
-## Dotfiles with GNU Stow
 
 Dotfiles are managed with GNU Stow, not Nix:
 
