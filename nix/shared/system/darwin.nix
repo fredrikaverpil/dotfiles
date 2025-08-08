@@ -241,28 +241,11 @@
 
     # System activation script to apply additional macOS settings
     # These settings cannot be configured via nix-darwin and require manual defaults commands
-    # Note: For non-nix systems, use _macos/set_defaults.sh instead which includes all settings
     system.activationScripts.extraActivation.text = ''
-      echo "Applying additional macOS settings (nix supplement)..."
+      echo "Applying shared macOS settings (nix supplement)..."
 
       # Run as the primary user to apply user-specific defaults
       sudo -u ${config.system.primaryUser} bash -c '
-        # Disable Spotlight keyboard shortcut (Cmd+Space) to allow Raycast usage
-        defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 "
-          <dict>
-            <key>enabled</key><false/>
-            <key>value</key><dict>
-              <key>type</key><string>standard</string>
-              <key>parameters</key>
-              <array>
-                <integer>32</integer>
-                <integer>49</integer>
-                <integer>1048576</integer>
-              </array>
-            </dict>
-          </dict>
-        "
-
         # Disable input source switching (Ctrl+Space) to prevent conflicts with development tools
         defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 60 "
           <dict>
