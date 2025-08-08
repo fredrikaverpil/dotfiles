@@ -24,8 +24,8 @@
       # Keyboard behavior optimizations
       # Disable press-and-hold for accent characters, enable key repeat instead
       ApplePressAndHoldEnabled = false;
-      InitialKeyRepeat = 25;
-      KeyRepeat = 2;
+      InitialKeyRepeat = 15;
+      KeyRepeat = 1;
       # Mouse and trackpad behavior
       "com.apple.mouse.tapBehavior" = 1;
       NSWindowShouldDragOnGesture = true;
