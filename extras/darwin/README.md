@@ -85,8 +85,9 @@ nvim
 
 ### OS configuration
 
+See the different settings in Nix, for example in `darwin.nix` or `fredrik.nix`.
+
 ```bash
-_macos/set_defaults.sh
 _macos/set_hostname.sh $DESIRED_HOSTNAME
 ```
 
