@@ -6,7 +6,7 @@ Personal dotfiles using [Nix](https://nixos.org) for reproducible system/package
 management and [GNU Stow](https://www.gnu.org/software/stow/) for dotfile
 symlinking.
 
-## Quick Start
+## Quick start
 
 <details>
 <summary>Initial installation</summary>
