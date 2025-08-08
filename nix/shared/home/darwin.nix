@@ -126,16 +126,16 @@
     echo "Applying user-specific keyboard and input settings..."
 
     # Keyboard repeat settings (user-specific)
-    $DRY_RUN_CMD /usr/bin/defaults write -g ApplePressAndHoldEnabled -bool false
-    $DRY_RUN_CMD /usr/bin/defaults write -g InitialKeyRepeat -int 15
-    $DRY_RUN_CMD /usr/bin/defaults write -g KeyRepeat -int 1
+    $DRY_RUN_CMD /usr/bin/defaults write -globalDomain ApplePressAndHoldEnabled -bool false
+    $DRY_RUN_CMD /usr/bin/defaults write -globalDomain InitialKeyRepeat -int 15
+    $DRY_RUN_CMD /usr/bin/defaults write -globalDomain KeyRepeat -int 1
 
     # Mouse/trackpad settings (user-specific)
-    $DRY_RUN_CMD /usr/bin/defaults write -g com.apple.mouse.tapBehavior -int 1
-    $DRY_RUN_CMD /usr/bin/defaults write -g NSWindowShouldDragOnGesture -bool true
+    $DRY_RUN_CMD /usr/bin/defaults write -globalDomain com.apple.mouse.tapBehavior -int 1
+    $DRY_RUN_CMD /usr/bin/defaults write -globalDomain NSWindowShouldDragOnGesture -bool true
 
     # Spelling correction (user-specific)
-    $DRY_RUN_CMD /usr/bin/defaults write -g NSAutomaticSpellingCorrectionEnabled -bool false
+    $DRY_RUN_CMD /usr/bin/defaults write -globalDomain NSAutomaticSpellingCorrectionEnabled -bool false
   '';
 
   # Settings that require manual defaults commands (not supported by home-manager's targets.darwin.defaults)
