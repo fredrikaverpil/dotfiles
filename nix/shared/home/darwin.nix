@@ -18,6 +18,15 @@
   };
 
   # macOS user-specific defaults using home-manager's built-in support
+  #
+  # VALIDATION BEST PRACTICES:
+  # 1. Test settings manually first: `defaults write com.apple.finder ShowStatusBar -bool true`
+  # 2. Check existing settings: `defaults read com.apple.finder`
+  # 3. Use `defaults domains` to see available domains
+  # 4. Invalid domains/keys will build but silently fail to apply
+  # 5. Some settings require logout/restart to take effect
+  # 6. Case sensitivity matters for both domains and keys
+  # 7. Not all `defaults` commands have targets.darwin.defaults equivalents
   targets.darwin.defaults = {
     # Note: Keyboard and input settings moved to user-specific activation script
     # to ensure they don't affect other users on the system
