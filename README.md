@@ -157,22 +157,14 @@ darwin-rebuild --rollback      # macOS
 │           ├── darwin.nix           # macOS system config + Homebrew
 │           └── linux.nix            # Linux system config
 ├── nvim-fredrik/                    # Neovim configuration
-│   ├── after/                       # Filetype plugins and queries
-│   ├── lua/fredrik/                 # Main Neovim config modules
-│   └── snippets/                    # Code snippets
 ├── shell/                           # Shell configuration
 │   ├── bin/                         # Custom shell scripts
 │   ├── aliases.sh                   # Shell aliases
 │   ├── exports.sh                   # Environment variables
 │   └── sourcing.sh                  # Shell sourcing logic
 ├── stow/                            # GNU Stow dotfiles
-│   ├── shared/                      # Cross-platform dotfiles
-│   ├── Darwin/                      # macOS-specific dotfiles
-│   ├── linux/                       # Linux-specific dotfiles
-│   └── install.sh                   # Stow installation script
 ├── extras/                          # One-off platform-specific extras and legacy configs
 ├── flake.nix                        # Nix flake configuration
-├── flake.lock                       # Nix flake lock file
 └── rebuild.sh                       # Main rebuild script
 ```
 
