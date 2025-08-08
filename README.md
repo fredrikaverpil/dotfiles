@@ -253,3 +253,7 @@ stow --target="$HOME" --restow shared "$(uname -s)"
 - [Maple Mono](https://github.com/subframe7536/maple-font)
 - [Noto Color Emoji](https://fonts.google.com/noto/specimen/Noto+Color+Emoji)
 - [Symbols Nerd Font Mono](https://github.com/ryanoasis/nerd-fonts)
+
+```
+
+```
