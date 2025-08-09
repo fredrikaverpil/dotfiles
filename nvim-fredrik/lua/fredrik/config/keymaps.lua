@@ -1161,12 +1161,12 @@ end
 
 function M.setup_obsidian_keymaps(obsidian_vars)
   return {
-    { "<leader>ns", "<cmd>ObsidianSearch<cr>", desc = "[N]otes: [s]earch text" },
-    { "<leader>nf", "<cmd>ObsidianQuickSwitch<cr>", desc = "[N]otes: search [f]ilenames" },
-    { "<leader>nn", "<cmd>ObsidianNew<cr>", desc = "[N]otes: [n]new" },
-    { "<leader>nl", "<cmd>ObsidianQuickSwitch Learning.md<cr><cr>", desc = "[N]otes: [l]earning" },
-    { "<leader>ng", "<cmd>ObsidianQuickSwitch Go.md<cr><cr>", desc = "[N]otes: [g]olang learning" },
-    { "<leader>nv", "<cmd>ObsidianQuickSwitch Neovim config.md<cr><cr>", desc = "[N]otes: Neo[v]im todo" },
+    { "<leader>ns", "<cmd>Obsidian search<cr>", desc = "[N]otes: [s]earch text" },
+    { "<leader>nf", "<cmd>Obsidian quick_switch<cr>", desc = "[N]otes: search [f]ilenames" },
+    { "<leader>nn", "<cmd>Obsidian new<cr>", desc = "[N]otes: [n]new" },
+    { "<leader>nl", "<cmd>Obsidian quick_switch Learning.md<cr><cr>", desc = "[N]otes: [l]earning" },
+    { "<leader>ng", "<cmd>Obsidian quick_switch Go.md<cr><cr>", desc = "[N]otes: [g]olang learning" },
+    { "<leader>nv", "<cmd>Obsidian quick_switch Neovim config.md<cr><cr>", desc = "[N]otes: Neo[v]im todo" },
 
     {
       "<leader>nS",
