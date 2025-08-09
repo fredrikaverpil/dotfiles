@@ -33,6 +33,7 @@ in {
   ];
 
   host.extraBrews = [
+    "vfkit"  # for podman
   ];
 
   host.extraCasks = [
