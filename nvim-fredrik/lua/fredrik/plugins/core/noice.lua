@@ -1,10 +1,13 @@
 return {
   {
     "folke/noice.nvim",
-    lazy = false, -- avoid jumping lualine on nvim startup
+    enabled = false, -- BUG: https://github.com/folke/noice.nvim/issues/1135
+    -- lazy = false, -- avoid jumping lualine on nvim startup
+    event = "VeryLazy",
     dependencies = {
       -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
       "MunifTanjim/nui.nvim",
+      "nvim-treesitter/nvim-treesitter", -- BUG: https://github.com/folke/noice.nvim/issues/1135
       {
         "nvim-lualine/lualine.nvim",
         opts = function(_, opts)
@@ -31,26 +34,24 @@ return {
         end,
       },
     },
-    config = function()
-      require("noice").setup({
-        lsp = {
-          signature = {
-            enabled = false, -- provided by blink.cmp
-          },
-          override = {
-            ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-            ["vim.lsp.util.stylize_markdown"] = true,
-          },
+    opts = {
+      lsp = {
+        signature = {
+          enabled = false, -- provided by blink.cmp
         },
-        -- you can enable a preset for easier configuration
-        presets = {
-          bottom_search = false, -- use a classic bottom cmdline for search
-          command_palette = true, -- position the cmdline and popupmenu together
-          long_message_to_split = true, -- long messages will be sent to a split
-          inc_rename = false, -- enables an input dialog for inc-rename.nvim
-          lsp_doc_border = false, -- add a border to hover docs and signature help
+        override = {
+          ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+          ["vim.lsp.util.stylize_markdown"] = true,
         },
-      })
-    end,
+      },
+      -- you can enable a preset for easier configuration
+      presets = {
+        bottom_search = false, -- use a classic bottom cmdline for search
+        command_palette = true, -- position the cmdline and popupmenu together
+        long_message_to_split = true, -- long messages will be sent to a split
+        inc_rename = false, -- enables an input dialog for inc-rename.nvim
+        lsp_doc_border = false, -- add a border to hover docs and signature help
+      },
+    },
   },
 }
