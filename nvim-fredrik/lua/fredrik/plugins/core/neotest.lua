@@ -35,6 +35,7 @@ return {
   {
     "nvim-neotest/neotest",
     lazy = true,
+    commit = "52fca6717ef972113ddd6ca223e30ad0abb2800c", -- BUG: https://github.com/nvim-neotest/neotest/issues/531
     dependencies = {
       "nvim-neotest/nvim-nio",
       "nvim-lua/plenary.nvim",
