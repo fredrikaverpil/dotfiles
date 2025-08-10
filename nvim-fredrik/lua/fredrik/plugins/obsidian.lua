@@ -118,7 +118,9 @@ return {
       end
       return tostring(os.time()) .. "-" .. suffix
     end,
+
+    legacy_commands = false,
   },
   keys = require("fredrik.config.keymaps").setup_obsidian_keymaps(M),
-  cmd = { "ObsidianSearch", "ObsidianQuickSwitch", "ObsidianNew" },
+  cmd = { "Obsidian" },
 }
