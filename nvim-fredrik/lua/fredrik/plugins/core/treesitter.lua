@@ -1,3 +1,5 @@
+local branch = "master"
+
 --- Register parsers from opts.ensure_installed
 local function register(ensure_installed)
   for filetype, parser in pairs(ensure_installed) do
@@ -25,30 +27,64 @@ local function install_and_start()
       end
 
       -- Get parser name based on filetype
-      local parser_name = vim.treesitter.language.get_lang(filetype) -- might return filetype (not helpful)
+      local parser_name = vim.treesitter.language.get_lang(filetype) -- WARNING: might return filetype (not helpful)
       if not parser_name then
+        -- vim.notify(
+        --   "Filetype " .. vim.inspect(filetype) .. " has no parser registered",
+        --   vim.log.levels.WARN,
+        --   { title = "core/treesitter" }
+        -- )
         return
       end
-      -- Try to get existing parser (helpful check if filetype was returned above)
+
+      -- vim.notify(
+      --   vim.inspect("Successfully got parser " .. parser_name .. " for filetype " .. filetype),
+      --   vim.log.levels.DEBUG,
+      --   { title = "core/treesitter" }
+      -- )
+
+      -- Check if parser_name is available in parser configs
       local parser_configs = require("nvim-treesitter.parsers")
-      if not parser_configs[parser_name] then
-        return -- Parser not available, skip silently
+      local parser_can_be_used = nil
+      if branch == "master" then
+        parser_can_be_used = parser_configs.list[parser_name]
+      elseif branch == "main" then
+        parser_can_be_used = parser_configs[parser_name]
+      end
+      if not parser_can_be_used then
+        -- vim.notify(
+        --   "Parser config does not have parser " .. vim.inspect(parser_name) .. ", skipping",
+        --   vim.log.levels.WARN,
+        --   { title = "core/treesitter" }
+        -- )
+        return -- Parser not ailable, skip silently
       end
 
       local parser_installed = pcall(vim.treesitter.get_parser, bufnr, parser_name)
 
+      -- If not installed, install parser synchronously
       if not parser_installed then
-        -- If not installed, install parser synchronously
-        require("nvim-treesitter").install({ parser_name }):wait(30000)
+        if branch == "master" then
+          vim.cmd("TSInstallSync " .. parser_name)
+        elseif branch == "main" then
+          require("nvim-treesitter").install({ parser_name }):wait(30000) -- main branch syntax
+        end
+        -- vim.notify("Installed parser: " .. parser_name, vim.log.levels.INFO, { title = "core/treesitter" })
       end
 
-      -- let's check again
+      -- Check so tree-sitter can see the newly installed parser
       parser_installed = pcall(vim.treesitter.get_parser, bufnr, parser_name)
-
-      if parser_installed then
-        -- Start treesitter for this buffer
-        vim.treesitter.start(bufnr, parser_name)
+      if not parser_installed then
+        vim.notify(
+          "Failed to get parser for " .. parser_name .. " after installation",
+          vim.log.levels.WARN,
+          { title = "core/treesitter" }
+        )
+        return
       end
+
+      -- Start treesitter for this buffer
+      vim.treesitter.start(bufnr, parser_name)
     end,
   })
 end
@@ -58,7 +94,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     lazy = true,
     event = "BufRead",
-    branch = "main",
+    branch = branch, -- master to be frozen
     build = ":TSUpdate",
     ---@class TSConfig
     opts = {
