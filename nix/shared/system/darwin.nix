@@ -85,6 +85,7 @@
           "obs"
           "obsidian"
           "signal"
+          "slack"
           "spotify"
           "visual-studio-code"
           "wacom-tablet"
@@ -95,8 +96,8 @@
 
       masApps =
         {
+          # NOTE: apps run in sandboxed mode and DefaultKeyBinding.dict won't work here.
           "Keka" = 470158793;
-          "Slack" = 803453959;
           "Pandan" = 1569600264;
           "DoubleMemory" = 6737529034;
         }
