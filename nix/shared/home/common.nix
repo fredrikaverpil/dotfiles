@@ -84,7 +84,6 @@ in {
     gnumake
     ripgrep
     fd
-    cmake
     pre-commit
 
     # ========================================================================
@@ -130,6 +129,7 @@ in {
       # For plugins and Mason, which needs extra tools to build or run.
       # NOTE: because of useGlobalPkgs=true, all packages from home.packages are also available here
       bun
+      cmake
       gcc
       go
       nodejs_22
