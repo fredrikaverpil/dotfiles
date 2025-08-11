@@ -1,5 +1,6 @@
 {
   "actionlint": "v1.7.7",
+  "alejandra": "4.0.0",
   "basedpyright": "1.31.1",
   "bash-language-server": "5.6.0",
   "biome": "2.1.4",

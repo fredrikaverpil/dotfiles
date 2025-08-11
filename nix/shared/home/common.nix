@@ -79,7 +79,6 @@ in {
     # ========================================================================
     # Language-specific
     uv
-    rustup
 
     # Generic development
     gnumake
@@ -137,16 +136,10 @@ in {
       npm-check-updates
       python3
       ruby
+      rustup # run `rustup update stable` to get latest rustc, cargo, rust-analyzer etc.
       tree-sitter
       uv
       yarn
-
-      # Instead of rustup; include the toolchain directly
-      cargo
-      rustc
-      rustfmt
-      clippy
-      rust-analyzer
     ];
   };
 
