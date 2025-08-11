@@ -29,6 +29,10 @@ local function is_copilot_available()
 end
 
 local function toggle_copilot()
+  if not package.loaded["copilot"] then
+    return
+  end
+
   if is_copilot_available() then
     local output = vim.fn.execute("Copilot status")
     if string.match(output, "Not Started") or string.match(output, "Offline") then
