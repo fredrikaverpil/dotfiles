@@ -41,6 +41,7 @@ in {
     "pgadmin4"
     "yubico-yubikey-manager"
     "cyberduck"
+    "cursor"
   ];
 
   host.extraMasApps = {
