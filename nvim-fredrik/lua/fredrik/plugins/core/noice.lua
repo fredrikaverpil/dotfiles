@@ -1,3 +1,7 @@
+-- BUG: https://github.com/folke/noice.nvim/issues/1135
+-- Cannot use nvim-treesitter main branch.
+-- Also, if using nvim-treesitter master branch, must add it as dependency.
+
 return {
   {
     "folke/noice.nvim",
@@ -13,6 +17,8 @@ return {
         opts = function(_, opts)
           local function mode()
             local mode_ = require("noice").api.status.mode.get()
+
+            -- Do not show "-- INSERT --", " -- VISUAL --" or "-- TERMINAL --" in lualine.
             local filters = { "INSERT", "VISUAL", "TERMINAL" }
             for _, filter in ipairs(filters) do
               if string.find(mode_, filter) then
