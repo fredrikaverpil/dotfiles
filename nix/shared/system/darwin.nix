@@ -99,7 +99,6 @@
           # NOTE: apps run in sandboxed mode and DefaultKeyBinding.dict won't work here.
           "Keka" = 470158793;
           "Pandan" = 1569600264;
-          "DoubleMemory" = 6737529034;
         }
         // config.host.extraMasApps;
     };
