@@ -61,6 +61,9 @@ vim.opt.termguicolors = true
 -- sign column
 vim.opt.signcolumn = "yes"
 
+-- rounded corners on floating windows
+vim.opt.winborder = "rounded"
+
 -- cursor line highlight
 vim.opt.cursorline = false
 
