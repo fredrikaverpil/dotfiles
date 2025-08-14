@@ -33,15 +33,16 @@ in {
   ];
 
   host.extraBrews = [
-    "vfkit"  # for podman
+    "vfkit" # for podman
   ];
 
   host.extraCasks = [
-    "podman-desktop"
-    "pgadmin4"
-    "yubico-yubikey-manager"
-    "cyberduck"
     "cursor"
+    "cursor-cli"
+    "cyberduck"
+    "pgadmin4"
+    "podman-desktop"
+    "yubico-yubikey-manager"
   ];
 
   host.extraMasApps = {
