@@ -38,7 +38,16 @@ in {
 
   host.extraCasks = [
     "cursor"
+
+    # NOTE: if cursor-cli errors on macOS quarantine error and "ERR_DLOPEN_FAILED" for node_sqlite3.node:
+    # 1) Locate the latest installed cask dir
+    # $ latest=$(ls -dt /opt/homebrew/Caskroom/cursor-cli/* | head -1); echo "$latest"
+    # 2) (Optional) Inspect quarantine flag
+    # $ xattr -l "$latest/dist-package/build/node_sqlite3.node" || true
+    # 3) Remove quarantine recursively
+    # $ sudo xattr -r -d com.apple.quarantine "$latest"
     "cursor-cli"
+
     "cyberduck"
     "pgadmin4"
     "podman-desktop"
