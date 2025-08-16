@@ -24,7 +24,7 @@
           "/mnt/homelab-data/services/immich/data/encoded-video"
         ];
         timerConfig = {
-          OnCalendar = "03:00";
+          OnCalendar = "Sun 03:00";
           Persistent = true;
         };
         pruneOpts = [
@@ -61,7 +61,7 @@
     description = "Timer for Immich Backup Validation";
     wantedBy = ["timers.target"];
     timerConfig = {
-      OnCalendar = "03:30";
+      OnCalendar = "Sun 03:30";
       Persistent = true;
     };
   };
