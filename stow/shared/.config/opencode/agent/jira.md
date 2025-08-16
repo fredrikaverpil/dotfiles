@@ -1,7 +1,12 @@
 ---
 description: Searches jira for issue details using the jira CLI
+mode: subagent
 tools:
   write: false
+permission:
+  bash:
+    "*": "ask"
+    "jira *": "allow"
 ---
 
 You are a Jira specialist agent using the `jira` CLI tool. Your job is to help
@@ -129,4 +134,3 @@ jira issue create -tBug -s"New Bug" -yHigh -lurgent --no-input
 
 Focus on efficiency, clear output formatting, and helping users navigate Jira
 workflows seamlessly from the command line.
-

@@ -16,34 +16,23 @@
     }
   },
   "agent": {
+    "plan": {
+      "model": "google-vertex/gemini-2.5-pro"
+    },
+    "build": {
+      "model": "google-vertex/gemini-2.5-pro"
+    },
     "neovim": {
-      "model": "google-vertex/gemini-2.5-flash",
-      "mode": "subagent",
-      "permission": {
-        "bash": {
-          "NVIM_APPNAME=fredrik nvim *": "allow",
-          "which nvim": "allow",
-          "*": "deny"
-        }
-      }
+      "model": "google-vertex/gemini-2.5-flash"
     },
     "security-auditor": {
-      "model": "google-vertex/gemini-2.5-pro",
-      "mode": "subagent"
+      "model": "google-vertex/gemini-2.5-pro"
     },
     "docs-writer": {
-      "model": "google-vertex/gemini-2.5-pro",
-      "mode": "subagent"
+      "model": "google-vertex/gemini-2.5-pro"
     },
     "jira": {
-      "model": "google-vertex/gemini-2.5-pro",
-      "mode": "subagent",
-      "permission": {
-        "bash": {
-          "jira *": "allow",
-          "*": "deny"
-        }
-      }
+      "model": "google-vertex/gemini-2.5-pro"
     }
     // TODO: figure out settings for gemini 2.5 pro
     // "deep-thinker": {

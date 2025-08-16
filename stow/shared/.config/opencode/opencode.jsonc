@@ -35,27 +35,16 @@
   },
   "agent": {
     "neovim": {
-      "model": "google/gemini-2.5-flash",
-      "mode": "subagent",
-      "permission": {
-        "bash": {
-          "NVIM_APPNAME=fredrik nvim *": "allow",
-          "which nvim": "allow",
-          "*": "deny"
-        }
-      }
+      "model": "google/gemini-2.5-flash"
     },
     "security-auditor": {
-      "model": "google/gemini-2.5-pro",
-      "mode": "subagent"
+      "model": "google/gemini-2.5-pro"
     },
     "docs-writer": {
-      "model": "google/gemini-2.5-pro",
-      "mode": "subagent"
+      "model": "google/gemini-2.5-pro"
     },
     // TODO: add openai provider
     "deep-thinker": {
-      "mode": "subagent",
       "model": "openai/gpt-5-turbo",
       "description": "Agent that uses high reasoning effort for complex problems",
       "reasoningEffort": "high",

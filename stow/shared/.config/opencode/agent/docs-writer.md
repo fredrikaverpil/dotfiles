@@ -1,5 +1,6 @@
 ---
 description: Writes and maintains project documentation
+mode: "subagent"
 tools:
   bash: false
 ---
