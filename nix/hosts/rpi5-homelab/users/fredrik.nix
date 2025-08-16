@@ -4,9 +4,11 @@
   lib,
   inputs,
   ...
-}: let
+}:
+let
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.system};
-in {
+in
+{
   imports = [
     ../../../shared/home/linux.nix # Import shared Linux home-manager configuration
   ];
@@ -14,7 +16,8 @@ in {
   home.stateVersion = "25.05";
 
   home.packages = with pkgs; [
-    unstable.opencode
+    # example:
+    # unstable.opencode
   ];
 
   home.file = {

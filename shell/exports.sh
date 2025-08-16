@@ -96,6 +96,11 @@ add_to_path prepend "$DOTFILES_BREW_PREFIX/opt/gnu-sed/libexec/gnubin"
 add_to_path prepend "$HOME/.local/bin" # user-installed binaries
 # HACK: shell/bin is prepended in sourcing.sh after Nix daemon to ensure it comes first
 
+# Source Home Manager session variables (includes sessionPath)
+if [ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]; then
+	source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+fi
+
 # load .env file if it exists
 # shellcheck disable=SC1090
 if [ -f "$HOME/.shell/.env" ]; then

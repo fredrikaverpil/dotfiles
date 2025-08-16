@@ -1,4 +1,0 @@
-#!/usr/bin/env sh
-set -e
-
-npx https://github.com/google-gemini/gemini-cli "$@"

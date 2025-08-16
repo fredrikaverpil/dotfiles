@@ -5,29 +5,30 @@
   lib,
   inputs,
   ...
-}: {
+}:
+{
   options = {
     host.extraBrews = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [];
+      default = [ ];
       description = "Additional homebrew packages for this host";
     };
 
     host.extraCasks = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [];
+      default = [ ];
       description = "Additional homebrew casks for this host";
     };
 
     host.extraMasApps = lib.mkOption {
       type = lib.types.attrsOf lib.types.int;
-      default = {};
+      default = { };
       description = "Additional Mac App Store apps for this host";
     };
 
     host.extraPackages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
-      default = [];
+      default = [ ];
       description = "Additional packages for this host";
     };
   };
@@ -47,60 +48,57 @@
         # "joshmedeski/sesh"
         "1password/tap"
         "nikitabobko/tap"
-        "sst/tap" # for opencode
+        # "sst/tap" # for opencode
       ];
 
-      brews =
-        [
-          # Packages not available in nixpkgs
-          "cloud-sql-proxy"
-          "git-standup"
+      brews = [
+        # Packages not available in nixpkgs
+        "cloud-sql-proxy"
+        "git-standup"
 
-          # Presentation tools
-          "slides"
-          "chafa" # Required for showing images in slides
+        # Presentation tools
+        "slides"
+        "chafa" # Required for showing images in slides
 
-          # Packages from custom taps that aren't in nixpkgs
-          "go-task/tap/go-task"
-          # "joshmedeski/sesh/sesh"
-          "sst/tap/opencode"
-          "pkgx"
+        # Packages from custom taps that aren't in nixpkgs
+        "go-task/tap/go-task"
+        # "joshmedeski/sesh/sesh"
+        # "sst/tap/opencode"
+        "pkgx"
 
-          # Mac App Store CLI
-          "mas"
-        ]
-        ++ config.host.extraBrews;
+        # Mac App Store CLI
+        "mas"
+      ]
+      ++ config.host.extraBrews;
 
-      casks =
-        [
-          "1password"
-          "1password-cli"
-          "aerospace"
-          "appcleaner"
-          "fujifilm-x-raw-studio"
-          "ghostty"
-          "gitify"
-          "gcloud-cli"
-          "kitty"
-          "obs"
-          "obsidian"
-          "signal"
-          "slack"
-          "spotify"
-          "visual-studio-code"
-          "wacom-tablet"
-          "wezterm"
-          "zed"
-        ]
-        ++ config.host.extraCasks;
+      casks = [
+        "1password"
+        "1password-cli"
+        "aerospace"
+        "appcleaner"
+        "fujifilm-x-raw-studio"
+        "ghostty"
+        "gitify"
+        "gcloud-cli"
+        "kitty"
+        "obs"
+        "obsidian"
+        "signal"
+        "slack"
+        "spotify"
+        "visual-studio-code"
+        "wacom-tablet"
+        "wezterm"
+        "zed"
+      ]
+      ++ config.host.extraCasks;
 
-      masApps =
-        {
-          # NOTE: apps run in sandboxed mode and DefaultKeyBinding.dict won't work here.
-          "Keka" = 470158793;
-          "Pandan" = 1569600264;
-        }
-        // config.host.extraMasApps;
+      masApps = {
+        # NOTE: apps run in sandboxed mode and DefaultKeyBinding.dict won't work here.
+        "Keka" = 470158793;
+        "Pandan" = 1569600264;
+      }
+      // config.host.extraMasApps;
     };
 
     nix.settings.experimental-features = "nix-command flakes";
@@ -114,13 +112,15 @@
 
     # Primary user for user-specific settings (homebrew, system defaults, etc.)
     # Find the user marked as isPrimary = true
-    system.primaryUser = let
-      primaryUsers = lib.filterAttrs (name: user: user.isPrimary) config.host.users;
-      primaryUserNames = lib.attrNames primaryUsers;
-    in
-      if lib.length primaryUserNames == 1
-      then lib.head primaryUserNames
-      else throw "Exactly one user must have isPrimary = true on Darwin systems";
+    system.primaryUser =
+      let
+        primaryUsers = lib.filterAttrs (name: user: user.isPrimary) config.host.users;
+        primaryUserNames = lib.attrNames primaryUsers;
+      in
+      if lib.length primaryUserNames == 1 then
+        lib.head primaryUserNames
+      else
+        throw "Exactly one user must have isPrimary = true on Darwin systems";
 
     # Note: User configuration is handled by lib/users.nix
 

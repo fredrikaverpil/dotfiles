@@ -5,11 +5,12 @@
   pkgs,
   inputs,
   ...
-}: let
+}:
+let
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.system};
-in {
-  # Handle dotfiles - use local clone if available, otherwise use flake input
-  home.activation.handleDotfiles = lib.hm.dag.entryAfter ["writeBoundary"] ''
+in
+{
+  home.activation.handleDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     DOTFILES_PATH=""
 
     # Check if dotfiles are already cloned locally
@@ -132,8 +133,8 @@ in {
       cmake
       gcc
       go
-      nixfmt-rfc-style # Official Nix formatter for Neovim
-      nodejs_22
+      nixfmt-rfc-style # cannot be installed via Mason on macOS, so installed here instead
+      nodejs
       npm-check-updates
       python3
       ruby
@@ -143,6 +144,40 @@ in {
       yarn
     ];
   };
+
+  # CLI tools provided by npm
+  home.activation.installNpmTools = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    set -e
+    export NPM_CONFIG_PREFIX="$HOME/.nix-npm-tools"
+    export PATH="$HOME/.nix-npm-tools/bin:$PATH"
+
+    # Ensure npm tools directory exists
+    mkdir -p "$HOME/.nix-npm-tools"
+
+    # List of fast-moving CLI tools to manage via npm
+    NPM_TOOLS=(
+      "opencode-ai@latest"                    
+      "@anthropic-ai/claude-code@latest"      
+      "@google/gemini-cli@latest"             
+    )
+
+    echo "Installing/updating npm-based CLI tools..."
+    # Ensure node binary is available to npm postinstall scripts
+    export PATH="${pkgs.nodejs_24}/bin:$PATH"
+
+    for tool in "''${NPM_TOOLS[@]}"; do
+      echo "Processing $tool..."
+      if ! $DRY_RUN_CMD npm install -g "$tool"; then
+        echo "Warning: Failed to install $tool"
+      fi
+    done
+
+    echo "npm tools installation complete"
+
+  '';
+
+  # Add npm tools to PATH permanently
+  home.sessionPath = [ "$HOME/.nix-npm-tools/bin" ];
 
   # Additional packages are added in individual user configurations
 }
