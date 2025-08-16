@@ -26,6 +26,6 @@ in
   programs = {
   };
 
-  npmTools = [
+  npmTools = lib.mkAfter [
   ];
 }

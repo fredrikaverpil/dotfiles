@@ -27,7 +27,7 @@ in
   programs = {
   };
 
-  npmTools = [
+  npmTools = lib.mkAfter [
     # "@google/gemini-cli@latest"
   ];
 }

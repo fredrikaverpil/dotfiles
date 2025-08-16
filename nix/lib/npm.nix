@@ -14,6 +14,7 @@ in
       type = lib.types.listOf lib.types.str;
       default = [ ];
       description = "List of npm packages to install globally";
+      apply = lib.unique;
     };
   };
 
@@ -37,16 +38,22 @@ in
         
         package_name=$(echo "$tool" | sed 's/@latest$//')
         binary_name=$(basename "$package_name")
+        binary_path="$HOME/.nix-npm-tools/bin/$binary_name"
         
-        if ! command -v "$binary_name" &> /dev/null; then
+        if [[ ! -f "$binary_path" ]]; then
           echo "Installing $tool (not found)..."
           if ! $DRY_RUN_CMD npm install -g "$tool"; then
             echo "Warning: Failed to install $tool"
           fi
-        elif npm outdated -g "$package_name" 2>/dev/null | grep -q "$package_name"; then
-          echo "Updating $tool (outdated)..."
-          if ! $DRY_RUN_CMD npm install -g "$tool"; then
-            echo "Warning: Failed to update $tool"
+        else
+          # Check if package is outdated using the correct npm prefix
+          if NPM_CONFIG_PREFIX="$HOME/.nix-npm-tools" npm outdated -g "$package_name" 2>/dev/null | grep -q "$package_name"; then
+            echo "Updating $tool (outdated)..."
+            if ! $DRY_RUN_CMD npm install -g "$tool"; then
+              echo "Warning: Failed to update $tool"
+            fi
+          else
+            echo "Skipping $tool (up to date)..."
           fi
         fi
       done

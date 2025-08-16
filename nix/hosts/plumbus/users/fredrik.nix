@@ -24,7 +24,7 @@ in
   programs = {
   };
 
-  npmTools = [
+  npmTools = lib.mkAfter [
   ];
 
   # Plumbus-specific user settings for Raycast integration
