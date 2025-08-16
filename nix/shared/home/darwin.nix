@@ -10,15 +10,15 @@
     ./common.nix
   ];
 
-  npmTools = config.npmTools ++ [
-  ];
-
   home.packages = with pkgs; [
     pngpaste # for obsidian, macOS-only
   ];
 
   programs = {
   };
+
+  npmTools = [
+  ];
 
   # macOS user-specific defaults using home-manager's built-in support
   #

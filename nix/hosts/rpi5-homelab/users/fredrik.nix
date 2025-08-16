@@ -15,10 +15,6 @@ in
 
   home.stateVersion = "25.05";
 
-  # Add host-specific npm tools
-  npmTools = config.npmTools ++ [
-  ];
-
   home.packages = with pkgs; [
     # example:
     # unstable.opencode
@@ -29,4 +25,7 @@ in
 
   programs = {
   };
+
+  npmTools = [
+  ];
 }

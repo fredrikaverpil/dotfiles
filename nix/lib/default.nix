@@ -1,11 +1,13 @@
-{inputs, ...}: let
-  systems = import ./systems.nix {inherit inputs;};
+{ inputs, ... }:
+let
+  systems = import ./systems.nix { inherit inputs; };
   users = import ./users.nix;
-in {
-  inherit
-    (systems)
+  npmModule = import ./npm.nix;
+in
+{
+  inherit (systems)
     mkDarwin
     mkRpiNixos
     ;
-  inherit users;
+  inherit users npmModule;
 }

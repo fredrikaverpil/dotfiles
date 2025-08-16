@@ -10,18 +10,12 @@ let
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.system};
 in
 {
-  # Define custom option for npm tools that can be extended by host/platform configs
-  options.npmTools = lib.mkOption {
-    type = lib.types.listOf lib.types.str;
-    default = [
-      "opencode-ai@latest"
-      # "@anthropic-ai/claude-code@latest"
-      # "@google/gemini-cli@latest"
-    ];
-    description = "List of npm packages to install globally";
-  };
+  imports = [
+    ../../lib/npm.nix
+  ];
 
   config = {
+
     home.activation.handleDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       DOTFILES_PATH=""
 
@@ -157,52 +151,11 @@ in
       ];
     };
 
-    # CLI tools provided by npm
-    home.activation.installNpmTools = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      set -e
-      export NPM_CONFIG_PREFIX="$HOME/.nix-npm-tools"
-      export PATH="$HOME/.nix-npm-tools/bin:$PATH"
+    npmTools = [
+      "opencode-ai@latest"
+      # "@anthropic-ai/claude-code@latest"
+      # "@google/gemini-cli@latest"
+    ];
 
-      # Ensure npm tools directory exists
-      mkdir -p "$HOME/.nix-npm-tools"
-
-      # Use the collected npm tools from config.npmTools
-      NPM_TOOLS=(${lib.concatStringsSep " " (map (pkg: "\"${pkg}\"") config.npmTools)})
-
-      echo "Installing/updating npm-based CLI tools..."
-      # Ensure node binary is available to npm postinstall scripts
-      export PATH="${pkgs.nodejs_24}/bin:$PATH"
-
-      for tool in "''${NPM_TOOLS[@]}"; do
-        echo "Processing $tool..."
-        
-        # Extract package name from tool string (remove @latest suffix)
-        package_name=$(echo "$tool" | sed 's/@latest$//')
-        
-        # Extract binary name (last part after /)
-        binary_name=$(basename "$package_name")
-        
-        # Check if tool is installed and up to date
-        if ! command -v "$binary_name" &> /dev/null; then
-          echo "Installing $tool (not found)..."
-          if ! $DRY_RUN_CMD npm install -g "$tool"; then
-            echo "Warning: Failed to install $tool"
-          fi
-        elif npm outdated -g "$package_name" 2>/dev/null | grep -q "$package_name"; then
-          echo "Updating $tool (outdated)..."
-          if ! $DRY_RUN_CMD npm install -g "$tool"; then
-            echo "Warning: Failed to update $tool"
-          fi
-        fi
-      done
-
-      echo "npm tools installation complete"
-
-    '';
-
-    # Add npm tools to PATH permanently
-    home.sessionPath = [ "$HOME/.nix-npm-tools/bin" ];
-
-    # Additional packages are added in individual user configurations
   };
 }

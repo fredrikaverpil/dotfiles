@@ -15,10 +15,6 @@ in
 
   home.stateVersion = "25.05";
 
-  # Add host-specific npm tools
-  npmTools = config.npmTools ++ [
-  ];
-
   home.packages = with pkgs; [
   ];
 
@@ -27,6 +23,9 @@ in
 
   programs = {
   };
+
+  npmTools = [
+  ];
 
   # Plumbus-specific user settings for Raycast integration
   # Disable Spotlight keyboard shortcut (Cmd+Space) to allow Raycast usage

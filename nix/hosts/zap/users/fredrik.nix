@@ -15,10 +15,6 @@ in
 
   home.stateVersion = "25.05";
 
-  npmTools = config.npmTools ++ [
-    "@google/gemini-cli@latest"
-  ];
-
   home.packages = with pkgs; [
     unstable.podman
     unstable.podman-compose
@@ -30,4 +26,8 @@ in
 
   programs = {
   };
+
+  npmTools = [
+    # "@google/gemini-cli@latest"
+  ];
 }

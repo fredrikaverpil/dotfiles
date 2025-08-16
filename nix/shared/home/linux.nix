@@ -10,9 +10,6 @@
     ./common.nix
   ];
 
-  npmTools = config.npmTools ++ [
-  ];
-
   home.packages = with pkgs; [
     lsof # List open files - essential for debugging file/network issues
     strace # System call tracer - useful for debugging application behavior
@@ -25,4 +22,7 @@
 
   programs = {
   };
+
+  npmTools = [
+  ];
 }
