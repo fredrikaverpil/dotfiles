@@ -4,14 +4,20 @@
   lib,
   inputs,
   ...
-}: let
+}:
+let
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.system};
-in {
+in
+{
   imports = [
     ../../../shared/home/darwin.nix
   ];
 
   home.stateVersion = "25.05";
+
+  # Add host-specific npm tools
+  npmTools = config.npmTools ++ [
+  ];
 
   home.packages = with pkgs; [
   ];
@@ -24,9 +30,9 @@ in {
 
   # Plumbus-specific user settings for Raycast integration
   # Disable Spotlight keyboard shortcut (Cmd+Space) to allow Raycast usage
-  home.activation.disableSpotlightShortcut = lib.hm.dag.entryAfter ["writeBoundary"] ''
+  home.activation.disableSpotlightShortcut = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     echo "Disabling Spotlight shortcut (Cmd+Space) for fredrik user on plumbus..."
-    
+
     # Disable Spotlight keyboard shortcut (Cmd+Space) to allow Raycast usage
     $DRY_RUN_CMD /usr/bin/defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 "
       <dict>

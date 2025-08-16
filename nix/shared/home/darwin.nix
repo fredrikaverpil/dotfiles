@@ -10,6 +10,9 @@
     ./common.nix
   ];
 
+  npmTools = config.npmTools ++ [
+  ];
+
   home.packages = with pkgs; [
     pngpaste # for obsidian, macOS-only
   ];
@@ -131,7 +134,7 @@
 
   # User-specific keyboard and input settings
   # These settings only affect the current user, not other users on the system
-  home.activation.userKeyboardSettings = lib.hm.dag.entryAfter ["writeBoundary"] ''
+  home.activation.userKeyboardSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     echo "Applying user-specific keyboard and input settings..."
 
     # Keyboard repeat settings (user-specific)
@@ -148,7 +151,7 @@
   '';
 
   # Settings that require manual defaults commands (not supported by home-manager's targets.darwin.defaults)
-  home.activation.macosUserDefaults = lib.hm.dag.entryAfter ["writeBoundary"] ''
+  home.activation.macosUserDefaults = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     echo "Applying additional macOS user settings..."
 
     # Disable input source switching (Ctrl+Space) to prevent conflicts with development tools

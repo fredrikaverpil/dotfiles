@@ -4,14 +4,20 @@
   lib,
   inputs,
   ...
-}: let
+}:
+let
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.system};
-in {
+in
+{
   imports = [
     ../../../shared/home/darwin.nix
   ];
 
   home.stateVersion = "25.05";
+
+  npmTools = config.npmTools ++ [
+    "@google/gemini-cli@latest"
+  ];
 
   home.packages = with pkgs; [
     unstable.podman

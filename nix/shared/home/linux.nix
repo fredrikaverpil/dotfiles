@@ -3,11 +3,14 @@
   pkgs,
   lib,
   ...
-} @ args:
+}@args:
 # This file contains home-manager settings specific to Linux systems.
 {
   imports = [
     ./common.nix
+  ];
+
+  npmTools = config.npmTools ++ [
   ];
 
   home.packages = with pkgs; [
