@@ -75,10 +75,12 @@
         };
       };
 
+      # Formatters for `nix fmt` - uses nixfmt-rfc-style for each architecture
       formatter.x86_64-linux = inputs.nixpkgs.legacyPackages.x86_64-linux.nixfmt-rfc-style;
       formatter.aarch64-linux = inputs.nixpkgs.legacyPackages.aarch64-linux.nixfmt-rfc-style;
       formatter.aarch64-darwin = inputs.nixpkgs-unstable.legacyPackages.aarch64-darwin.nixfmt-rfc-style;
 
+      # Development shells for `nix develop` or direnv's `use flake` - provides toolchains for each architecture
       devShells = {
         x86_64-linux = {
           default = inputs.nixpkgs.legacyPackages.x86_64-linux.mkShell {
@@ -86,7 +88,7 @@
               inputs.nixpkgs.legacyPackages.x86_64-linux.nixfmt-rfc-style
             ];
           };
-          pkgxReplacement = inputs.nixpkgs.legacyPackages.x86_64-linux.mkShell {
+          dotfiles-toolchain = inputs.nixpkgs.legacyPackages.x86_64-linux.mkShell {
             packages = with inputs.nixpkgs.legacyPackages.x86_64-linux; [
               ruby
               nodejs
@@ -97,7 +99,7 @@
               lua5_4
             ];
             shellHook = ''
-              # echo "[pkgxReplacement] ruby $(ruby -v | cut -d' ' -f1-2) | node $(node -v) (npm $(npm -v)) | pnpm $(pnpm -v) | bun $(bun --version) | python $(python --version | awk '{print $2}') | $(go version | awk '{print $1" "$3}') | lua $(lua -v 2>&1 | awk '{print $2}')"
+              # echo "[dotfiles-toolchain] ruby $(ruby -v | cut -d' ' -f1-2) | node $(node -v) (npm $(npm -v)) | pnpm $(pnpm -v) | bun $(bun --version) | python $(python --version | awk '{print $2}') | $(go version | awk '{print $1" "$3}') | lua $(lua -v 2>&1 | awk '{print $2}')"
             '';
           };
         };
@@ -107,7 +109,7 @@
               inputs.nixpkgs.legacyPackages.aarch64-linux.nixfmt-rfc-style
             ];
           };
-          pkgxReplacement = inputs.nixpkgs.legacyPackages.aarch64-linux.mkShell {
+          dotfiles-toolchain = inputs.nixpkgs.legacyPackages.aarch64-linux.mkShell {
             packages = with inputs.nixpkgs.legacyPackages.aarch64-linux; [
               ruby
               nodejs
@@ -118,7 +120,7 @@
               lua5_4
             ];
             shellHook = ''
-              # echo "[pkgxReplacement] ruby $(ruby -v | cut -d' ' -f1-2) | node $(node -v) (npm $(npm -v)) | pnpm $(pnpm -v) | bun $(bun --version) | python $(python --version | awk '{print $2}') | $(go version | awk '{print $1" "$3}') | lua $(lua -v 2>&1 | awk '{print $2}')"
+              # echo "[dotfiles-toolchain] ruby $(ruby -v | cut -d' ' -f1-2) | node $(node -v) (npm $(npm -v)) | pnpm $(pnpm -v) | bun $(bun --version) | python $(python --version | awk '{print $2}') | $(go version | awk '{print $1" "$3}') | lua $(lua -v 2>&1 | awk '{print $2}')"
             '';
           };
         };
@@ -128,7 +130,7 @@
               inputs.nixpkgs-unstable.legacyPackages.aarch64-darwin.nixfmt-rfc-style
             ];
           };
-          pkgxReplacement = inputs.nixpkgs-unstable.legacyPackages.aarch64-darwin.mkShell {
+          dotfiles-toolchain = inputs.nixpkgs-unstable.legacyPackages.aarch64-darwin.mkShell {
             packages = with inputs.nixpkgs-unstable.legacyPackages.aarch64-darwin; [
               ruby
               nodejs
@@ -139,7 +141,7 @@
               lua5_4
             ];
             shellHook = ''
-              # echo "[pkgxReplacement] ruby $(ruby -v | cut -d' ' -f1-2) | node $(node -v) (npm $(npm -v)) | pnpm $(pnpm -v) | bun $(bun --version) | python $(python --version | awk '{print $2}') | $(go version | awk '{print $1" "$3}') | lua $(lua -v 2>&1 | awk '{print $2}')"
+              # echo "[dotfiles-toolchain] ruby $(ruby -v | cut -d' ' -f1-2) | node $(node -v) (npm $(npm -v)) | pnpm $(pnpm -v) | bun $(bun --version) | python $(python --version | awk '{print $2}') | $(go version | awk '{print $1" "$3}') | lua $(lua -v 2>&1 | awk '{print $2}')"
             '';
           };
         };
