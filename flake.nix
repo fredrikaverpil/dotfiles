@@ -1,6 +1,9 @@
 {
   description = "Fredrik's unified Nix configurations";
 
+  # NOTE: To eliminate substituter warnings, add your username to trusted users:
+  # Edit /etc/nix/nix.conf: change "trusted-users = root" to "trusted-users = root fredrik"
+  # Then restart nix daemon: sudo launchctl kickstart -k system/org.nixos.nix-daemon
   nixConfig = {
     extra-substituters = [
       "https://nixos-raspberrypi.cachix.org"
