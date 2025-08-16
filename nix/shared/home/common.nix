@@ -132,6 +132,7 @@ in {
       cmake
       gcc
       go
+      nixfmt-rfc-style # Official Nix formatter for Neovim
       nodejs_22
       npm-check-updates
       python3

@@ -22,13 +22,15 @@ return {
         "mason-org/mason.nvim",
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "alejandra" })
+          -- NOTE: nixfmt not available via Mason on macOS, but available via Nix
+          -- For now, the workaround is to have Nix install nixfmt instead
+          -- vim.list_extend(opts.ensure_installed, { "nixfmt" })
         end,
       },
     },
     opts = {
       formatters_by_ft = {
-        nix = { "alejandra" }, -- NOTE: nixfmt not supported on macOS
+        nix = { "nixfmt" },
       },
     },
   },
