@@ -17,6 +17,7 @@ Thumbs.db
 .pkgx.yml
 .pkgx.yaml
 .envrc
+.direnv/
 
 # Node
 /node_modules
