@@ -88,10 +88,11 @@ in
       uv
 
       # Generic development
-      gnumake
-      ripgrep
       fd
+      gnumake
+      go-task
       pre-commit
+      ripgrep
 
       # ========================================================================
       # Git & Version Control
@@ -113,9 +114,10 @@ in
       # ========================================================================
       asciinema
       exiftool
+      gnused # GNU tools (for macOS compatibility)
       imagemagick
       ollama
-      gnused # GNU tools (for macOS compatibility)
+      slides
 
       # ========================================================================
       # Infrastructure & Cloud

@@ -54,10 +54,8 @@
       brews = [
         # Packages not available in nixpkgs
         "cloud-sql-proxy"
-        "git-standup"
 
         # Presentation tools
-        "slides"
         "chafa" # Required for showing images in slides
 
         # Packages from custom taps that aren't in nixpkgs
