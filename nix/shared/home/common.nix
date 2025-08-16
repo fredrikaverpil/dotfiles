@@ -16,6 +16,7 @@ in
     default = [
       "opencode-ai@latest"
       # "@anthropic-ai/claude-code@latest"
+      # "@google/gemini-cli@latest"
     ];
     description = "List of npm packages to install globally";
   };
