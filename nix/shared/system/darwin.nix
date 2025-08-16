@@ -44,7 +44,6 @@
 
       taps = [
         "dustinblackman/tap"
-        "go-task/tap"
         # "joshmedeski/sesh"
         "1password/tap"
         "nikitabobko/tap"
@@ -55,11 +54,7 @@
         # Packages not available in nixpkgs
         "cloud-sql-proxy"
 
-        # Presentation tools
-        "chafa" # Required for showing images in slides
-
         # Packages from custom taps that aren't in nixpkgs
-        "go-task/tap/go-task"
         # "joshmedeski/sesh/sesh"
         # "sst/tap/opencode"
         "pkgx"

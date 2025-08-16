@@ -118,6 +118,7 @@ in
       imagemagick
       ollama
       slides
+      chafa # Required for showing images in slides
 
       # ========================================================================
       # Infrastructure & Cloud
