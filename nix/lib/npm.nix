@@ -37,21 +37,17 @@ in
         echo "Processing $tool..."
         
         package_name=$(echo "$tool" | sed 's/@latest$//')
-        binary_name=$(basename "$package_name")
-        binary_path="$HOME/.nix-npm-tools/bin/$binary_name"
         
-        if [[ ! -f "$binary_path" ]]; then
-          echo "Installing $tool (not found)..."
+        # Check if package is outdated using the correct npm prefix
+        if NPM_CONFIG_PREFIX="$HOME/.nix-npm-tools" npm outdated -g "$package_name" 2>/dev/null | grep -q "$package_name"; then
+          echo "Updating $tool (outdated)..."
           if ! $DRY_RUN_CMD npm install -g "$tool"; then
-            echo "Warning: Failed to install $tool"
+            echo "Warning: Failed to update $tool"
           fi
         else
-          # Check if package is outdated using the correct npm prefix
-          if NPM_CONFIG_PREFIX="$HOME/.nix-npm-tools" npm outdated -g "$package_name" 2>/dev/null | grep -q "$package_name"; then
-            echo "Updating $tool (outdated)..."
-            if ! $DRY_RUN_CMD npm install -g "$tool"; then
-              echo "Warning: Failed to update $tool"
-            fi
+          # Try to install/update - npm will handle if it's already installed
+          if ! $DRY_RUN_CMD npm install -g "$tool" >/dev/null 2>&1; then
+            echo "Warning: Failed to install/update $tool"
           else
             echo "Skipping $tool (up to date)..."
           fi
