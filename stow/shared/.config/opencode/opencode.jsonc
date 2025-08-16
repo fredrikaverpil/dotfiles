@@ -42,7 +42,8 @@
     },
     "docs-writer": {
       "model": "google/gemini-2.5-pro"
-    }
+    },
+    "nix": {}
     // TODO: add openai provider
     // "deep-thinker": {
     //   "model": "openai/gpt-5-turbo",
