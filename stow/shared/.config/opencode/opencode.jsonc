@@ -25,11 +25,11 @@
         "baseURL": "http://localhost:11434/v1"
       },
       "models": {
-        "llama2": {
-          "name": "Llama 2"
-        },
         "llama3.1:8b": {},
-        "qwen3:1.7b": {}
+        "qwen3:1.7b": {
+          // Tools causes the model to go bananas and just use them repeatedly
+          // "tools": true
+        }
       }
     }
   },
