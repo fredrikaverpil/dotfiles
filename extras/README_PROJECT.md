@@ -126,27 +126,53 @@ Sometimes you need packages that are no longer available in current releases
 (e.g., Python 3.9). Add the older nixpkgs as an input:
 
 ```nix
-inputs = {
-  nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
-  nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-  nixpkgs-python39.url = "github:NixOS/nixpkgs/nixos-24.11";  # has Python 3.9
-  flake-utils.url = "github:numtide/flake-utils";
-};
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05"; # stable
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable"; # unstable
+    nixpkgs-python39.url = "github:NixOS/nixpkgs/nixos-24.11"; # has Python 3.9
+    flake-utils.url = "github:numtide/flake-utils";
+  };
 
-outputs = { self, nixpkgs, nixpkgs-unstable, nixpkgs-python39, flake-utils }:
-  pkgs-python39 = import nixpkgs-python39 { inherit system; };
-  python = pkgs-python39.python39;
-  pythonEnv = python.withPackages (p: [
-    p.requests
-    p.numpy
-    # Add pip packages here (but likely just use `uv sync` instead)
-  ]);
+  outputs =
+    {
+      self,
+      nixpkgs,
+      nixpkgs-unstable,
+      nixpkgs-python39,
+      flake-utils,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+        pkgs-unstable = import nixpkgs-unstable { inherit system; };
+        pkgs-python39 = import nixpkgs-python39 { inherit system; };
+        python = pkgs-python39.python39;
+      in
+      {
+        devShells.default = pkgs.mkShell {
+          packages = [
+            python
+            (python.withPackages (p: [
+              # Add pip packages here (but likely just use `uv sync` instead)
+              # p.requests
+              # p.numpy
+            ]))
 
-  packages = [
-    python                     # Python 3.9 from older release
-    pythonEnv                  # Python with packages
-    pkgs-unstable.uv           # Latest uv from unstable
-  ];
+            # Add any other packages you need here
+            pkgs-unstable.go
+            pkgs.ruby
+          ];
+
+          shellHook = ''
+            # uv supplied via home-manager/neovim
+            echo -e "\033[32m[project-toolchain] $(python --version) | $(uv --version)\033[0m"
+          '';
+        };
+      }
+    );
+}
 ```
 
 Note that the example also includes an example of how to define pip dependencies
