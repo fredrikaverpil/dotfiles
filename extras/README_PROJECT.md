@@ -66,6 +66,7 @@ If not using pkgx, a `flake.nix` can also set up the project.
           ];
 
           shellHook = ''
+            echo -e "\033[32m[project-toolchain] go $(go version | awk '{print $3}') | uv $(uv --version)\033[0m"
           '';
         };
       }

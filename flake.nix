@@ -79,7 +79,7 @@
             unstable.${system}.ruby
           ];
           shellHook = ''
-            # echo "[dotfiles-toolchain] ruby $(ruby -v | cut -d' ' -f1-2) | node $(node -v) (npm $(npm -v)) | pnpm $(pnpm -v) | bun $(bun --version) | python $(python --version | awk '{print $2}') | $(go version | awk '{print $1" "$3}') | lua $(lua -v 2>&1 | awk '{print $2}')"
+            echo -e "\033[32m[dotfiles-toolchain] bun $(bun --version) | $(go version | awk '{print $1" "$3}') | lua $(lua -v 2>&1 | awk '{print $2}') | node $(node -v) (npm $(npm -v)) | pnpm $(pnpm -v) | python $(python --version | awk '{print $2}') | ruby $(ruby -v | cut -d' ' -f1-2)\033[0m"
           '';
         };
       };
