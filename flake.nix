@@ -79,7 +79,7 @@
             unstable.${system}.ruby
           ];
           shellHook = ''
-            echo -e "\033[32m[dotfiles-toolchain] bun $(bun --version) | $(go version | awk '{print $1" "$3}') | lua $(lua -v 2>&1 | awk '{print $2}') | node $(node -v) (npm $(npm -v)) | pnpm $(pnpm -v) | python $(python --version | awk '{print $2}') | ruby $(ruby -v | cut -d' ' -f1-2)\033[0m"
+            echo -e "\033[32m[dotfiles-toolchain] bun $(bun --version) | $(go version | awk '{print $1" "$3}') | lua $(lua -v 2>&1 | awk '{print $2}') | node $(node -v) (npm $(npm -v)) | pnpm $(pnpm -v) | python $(python --version | awk '{print $2}') | $(ruby -v | cut -d' ' -f1-2)\033[0m"
           '';
         };
       };
@@ -111,8 +111,6 @@
       formatter.aarch64-darwin = unstable.aarch64-darwin.nixfmt-rfc-style;
 
       # Development shells for `nix develop` or direnv's `use flake` - provides toolchains for each architecture
-      # To set specific versions, examples;
-      # bun_1, go_1_22, lua_5_4, nodejs_20, pnpm_9, python3_11, ruby_3_3
       devShells = {
         x86_64-linux = mkDevShells "x86_64-linux";
         aarch64-linux = mkDevShells "aarch64-linux";

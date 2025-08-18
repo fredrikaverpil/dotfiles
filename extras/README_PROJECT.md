@@ -61,12 +61,12 @@ If not using pkgx, a `flake.nix` can also set up the project.
         devShells.default = pkgs.mkShell {
           packages = [
             pkgs-unstable.go
-            pkgs-unstable.uv
             # Add other tools as needed
           ];
 
           shellHook = ''
-            echo -e "\033[32m[project-toolchain] go $(go version | awk '{print $3}') | uv $(uv --version)\033[0m"
+            # uv supplied via home-manager/neovim
+            echo -e "\033[32m[project-toolchain] $(go version | awk '{print $3}') | $(uv --version)\033[0m"
           '';
         };
       }
