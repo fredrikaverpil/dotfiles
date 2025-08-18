@@ -168,6 +168,9 @@ Sometimes you need packages that are no longer available in current releases
           shellHook = ''
             # uv supplied via home-manager/neovim
             echo -e "\033[32m[project-toolchain] $(python --version) | $(uv --version)\033[0m"
+
+            # export UV_PYTHON_PREFERENCE="only-system"
+            # export UV_PYTHON=${python}/bin/python
           '';
         };
       }
