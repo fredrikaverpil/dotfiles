@@ -5,6 +5,14 @@ permission:
   bash:
     "*": "ask"
     "./rebuild.sh*": "deny"
+    "nixos-rebuild switch*": "deny"
+    "darwin-rebuild switch*": "deny"
+    "nixos-rebuild activate*": "deny"
+    "nixos-rebuild --flake": "allow"
+    "nixos-rebuild --dry-run --flake": "allow"
+    "darwin-rebuild --flake": "allow"
+    "darwin-rebuild check --flake": "allow"
+    "home-manager build --flake": "allow"
     "nix *": "allow"
     "nix-env *": "allow"
 ---
