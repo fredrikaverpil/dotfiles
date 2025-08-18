@@ -10,13 +10,15 @@ mkdir -p ~/code/work/public
 mkdir -p ~/code/work/private
 ```
 
-## Global tools via homebrew
+## Per-project tooling
 
-Use [`brew`](https://brew.sh/) to define any global tooling.
+### pkgx (legacy)
 
-## Per-project tools
-
-### pkgx
+> [!NOTE]
+>
+> Prior to using Nix, I used [`pkgx`](https://docs.pkgx.sh) and I'm currently
+> evaluating working with per-project Nix flakes but will keep this section in
+> here until I have concluded my evaluation.
 
 Use [`pkgx`](https://docs.pkgx.sh) to define project tooling (see `dev`
 command), at least on macOS. This feels faster/simpler sometimes than resorting
@@ -44,32 +46,26 @@ If not using pkgx, a `flake.nix` can also set up the project.
 ```nix
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nixpkgs-python39.url = "github:NixOS/nixpkgs/nixos-24.11";  # older version so to access python 3.9
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";                # stable
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";  # unstable
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-python39, flake-utils }:
+  outputs = { self, nixpkgs, nixpkgs-unstable, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
-        pkgs-python39 = import nixpkgs-python39 { inherit system; };
-        python = pkgs-python39.python39;
-        pythonEnv = python.withPackages (p: [
-          # Your packages here
-        ]);
+        pkgs-unstable = import nixpkgs-unstable { inherit system; };
       in
       {
-        devShells.default = with pkgs; mkShell {
+        devShells.default = pkgs.mkShell {
           packages = [
-            uv  # from newer nixpkgs
-            python  # from older nixpkgs
-            pythonEnv
+            pkgs-unstable.go
+            pkgs-unstable.uv
+            # Add other tools as needed
           ];
 
           shellHook = ''
-            export UV_PYTHON_PREFERENCE="only-system";
-            export UV_PYTHON=${python}/bin/python
           '';
         };
       }
@@ -79,6 +75,88 @@ If not using pkgx, a `flake.nix` can also set up the project.
 
 Direnv's `.envrc` must contain `use flake` for it to auto-load when entering the
 directory.
+
+<details><summary>Nix flake package pinning</summary>
+
+To pin specific versions of tools like python or go in your dotfiles'
+`flake.nix`:
+
+**Method 1: Use version-specific packages**
+
+```nix
+packages = with inputs.nixpkgs-unstable.legacyPackages.aarch64-darwin; [
+  python311     # Python 3.11
+  python312     # Python 3.12
+  go_1_21       # Go 1.21
+  go_1_22       # Go 1.22
+];
+```
+
+**Method 2: Mix stable and unstable packages**
+
+```nix
+devShells.default = pkgs.mkShell {
+  packages = [
+    # From stable
+    pkgs.python311
+
+    # From unstable
+    pkgs-unstable.go_1_23
+    pkgs-unstable.nodejs_22
+  ];
+};
+```
+
+**Method 3: Pin to specific nixpkgs commit**
+
+```nix
+inputs = {
+  nixpkgs-python311.url = "github:NixOS/nixpkgs/commit-hash-with-desired-version";
+};
+```
+
+**Method 4: Access packages from older nixpkgs releases**
+
+Sometimes you need packages that are no longer available in current releases
+(e.g., Python 3.9). Add the older nixpkgs as an input:
+
+```nix
+inputs = {
+  nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+  nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+  nixpkgs-python39.url = "github:NixOS/nixpkgs/nixos-24.11";  # has Python 3.9
+  flake-utils.url = "github:numtide/flake-utils";
+};
+
+outputs = { self, nixpkgs, nixpkgs-unstable, nixpkgs-python39, flake-utils }:
+  pkgs-python39 = import nixpkgs-python39 { inherit system; };
+  python = pkgs-python39.python39;
+  pythonEnv = python.withPackages (p: [
+    p.requests
+    p.numpy
+    # Add pip packages here (but likely just use `uv sync` instead)
+  ]);
+
+  packages = [
+    python                     # Python 3.9 from older release
+    pythonEnv                  # Python with packages
+    pkgs-unstable.uv           # Latest uv from unstable
+  ];
+```
+
+Note that the example also includes an example of how to define pip dependencies
+via Nix. However, the normal use case is to define these in a `pyproject.toml`
+and use `uv sync` to install the virtual environment with these dependencies.
+
+**Search for available versions:**
+
+- CLI stable: `nix search nixpkgs python3` or `nix search nixpkgs go`
+- CLI unstable: `nix search github:NixOS/nixpkgs/nixpkgs-unstable python3`
+- Online: [search.nixos.org/packages](https://search.nixos.org/packages) (toggle
+  e.g. "25.05" ↔ "unstable" channel)
+- Browse source: [github.com/NixOS/nixpkgs](https://github.com/NixOS/nixpkgs)
+
+</details>
 
 ## Direnv
 

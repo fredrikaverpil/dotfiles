@@ -56,6 +56,33 @@
     { self, ... }@inputs:
     let
       lib = import ./nix/lib { inherit inputs; };
+      stable = inputs.nixpkgs.legacyPackages;
+      unstable = inputs.nixpkgs-unstable.legacyPackages;
+      mkDevShells = system: {
+        default = stable.${system}.mkShell {
+          packages = [
+            stable.${system}.nixfmt-rfc-style
+          ];
+        };
+        dotfiles-toolchain = unstable.${system}.mkShell {
+          packages = [
+            # Stable packages
+            # stable.${system}.xxx
+
+            # Unstable packages
+            unstable.${system}.bun
+            unstable.${system}.go
+            unstable.${system}.lua
+            unstable.${system}.nodejs
+            unstable.${system}.pnpm
+            unstable.${system}.python3
+            unstable.${system}.ruby
+          ];
+          shellHook = ''
+            # echo "[dotfiles-toolchain] ruby $(ruby -v | cut -d' ' -f1-2) | node $(node -v) (npm $(npm -v)) | pnpm $(pnpm -v) | bun $(bun --version) | python $(python --version | awk '{print $2}') | $(go version | awk '{print $1" "$3}') | lua $(lua -v 2>&1 | awk '{print $2}')"
+          '';
+        };
+      };
     in
     {
       overlays.default = import ./nix/shared/overlays;
@@ -79,75 +106,17 @@
       };
 
       # Formatters for `nix fmt` - uses nixfmt-rfc-style for each architecture
-      formatter.x86_64-linux = inputs.nixpkgs.legacyPackages.x86_64-linux.nixfmt-rfc-style;
-      formatter.aarch64-linux = inputs.nixpkgs.legacyPackages.aarch64-linux.nixfmt-rfc-style;
-      formatter.aarch64-darwin = inputs.nixpkgs-unstable.legacyPackages.aarch64-darwin.nixfmt-rfc-style;
+      formatter.x86_64-linux = stable.x86_64-linux.nixfmt-rfc-style;
+      formatter.aarch64-linux = stable.aarch64-linux.nixfmt-rfc-style;
+      formatter.aarch64-darwin = unstable.aarch64-darwin.nixfmt-rfc-style;
 
       # Development shells for `nix develop` or direnv's `use flake` - provides toolchains for each architecture
+      # To set specific versions, examples;
+      # bun_1, go_1_22, lua_5_4, nodejs_20, pnpm_9, python3_11, ruby_3_3
       devShells = {
-        x86_64-linux = {
-          default = inputs.nixpkgs.legacyPackages.x86_64-linux.mkShell {
-            packages = [
-              inputs.nixpkgs.legacyPackages.x86_64-linux.nixfmt-rfc-style
-            ];
-          };
-          dotfiles-toolchain = inputs.nixpkgs.legacyPackages.x86_64-linux.mkShell {
-            packages = with inputs.nixpkgs.legacyPackages.x86_64-linux; [
-              ruby
-              nodejs
-              pnpm
-              bun
-              python3
-              go
-              lua5_4
-            ];
-            shellHook = ''
-              # echo "[dotfiles-toolchain] ruby $(ruby -v | cut -d' ' -f1-2) | node $(node -v) (npm $(npm -v)) | pnpm $(pnpm -v) | bun $(bun --version) | python $(python --version | awk '{print $2}') | $(go version | awk '{print $1" "$3}') | lua $(lua -v 2>&1 | awk '{print $2}')"
-            '';
-          };
-        };
-        aarch64-linux = {
-          default = inputs.nixpkgs.legacyPackages.aarch64-linux.mkShell {
-            packages = [
-              inputs.nixpkgs.legacyPackages.aarch64-linux.nixfmt-rfc-style
-            ];
-          };
-          dotfiles-toolchain = inputs.nixpkgs.legacyPackages.aarch64-linux.mkShell {
-            packages = with inputs.nixpkgs.legacyPackages.aarch64-linux; [
-              ruby
-              nodejs
-              pnpm
-              bun
-              python3
-              go
-              lua5_4
-            ];
-            shellHook = ''
-              # echo "[dotfiles-toolchain] ruby $(ruby -v | cut -d' ' -f1-2) | node $(node -v) (npm $(npm -v)) | pnpm $(pnpm -v) | bun $(bun --version) | python $(python --version | awk '{print $2}') | $(go version | awk '{print $1" "$3}') | lua $(lua -v 2>&1 | awk '{print $2}')"
-            '';
-          };
-        };
-        aarch64-darwin = {
-          default = inputs.nixpkgs-unstable.legacyPackages.aarch64-darwin.mkShell {
-            packages = [
-              inputs.nixpkgs-unstable.legacyPackages.aarch64-darwin.nixfmt-rfc-style
-            ];
-          };
-          dotfiles-toolchain = inputs.nixpkgs-unstable.legacyPackages.aarch64-darwin.mkShell {
-            packages = with inputs.nixpkgs-unstable.legacyPackages.aarch64-darwin; [
-              ruby
-              nodejs
-              pnpm
-              bun
-              python3
-              go
-              lua5_4
-            ];
-            shellHook = ''
-              # echo "[dotfiles-toolchain] ruby $(ruby -v | cut -d' ' -f1-2) | node $(node -v) (npm $(npm -v)) | pnpm $(pnpm -v) | bun $(bun --version) | python $(python --version | awk '{print $2}') | $(go version | awk '{print $1" "$3}') | lua $(lua -v 2>&1 | awk '{print $2}')"
-            '';
-          };
-        };
+        x86_64-linux = mkDevShells "x86_64-linux";
+        aarch64-linux = mkDevShells "aarch64-linux";
+        aarch64-darwin = mkDevShells "aarch64-darwin";
       };
     };
 }
