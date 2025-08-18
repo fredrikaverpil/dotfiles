@@ -690,17 +690,6 @@ function M.setup_gitsigns_keymaps(bufnr)
   )
 end
 
-function M.setup_neogit_keymaps()
-  local function open_in_split()
-    require("neogit").open({ kind = "split" })
-  end
-
-  vim.keymap.set("n", "<leader>gn", open_in_split, { silent = true, noremap = true, desc = "Neogit" })
-  vim.keymap.set("n", "<leader>gp", ":Neogit pull<CR>", { silent = true, noremap = true, desc = "[g]it [p]ull" })
-  vim.keymap.set("n", "<leader>gP", ":Neogit push<CR>", { silent = true, noremap = true, desc = "[g]it [P]ush" })
-  -- NOTE: see Telescope git_... commands set by setup_telescope_keymaps
-end
-
 function M.setup_git_blame_keymaps()
   return {
     -- toggle needs to be called twice; https://github.com/f-person/git-blame.nvim/issues/16
