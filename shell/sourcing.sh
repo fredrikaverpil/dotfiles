@@ -155,22 +155,26 @@ if [[ $shell == "zsh" ]]; then
 	zsh_completion
 	if [ -n "$brew_prefix" ]; then
 		source <(fzf --zsh)
-		if command -v pkgx >/dev/null 2>&1; then
-			source <(pkgx dev --shellcode)
-		elif [[ "$OSTYPE" == "darwin"* ]]; then
-			echo "⚠️ Warning: pkgx not found on macOS - install via 'brew install pkgx'" >&2
-		fi
+
+		# NOTE: disabled pkxg while evaluating nix flakes for per-project tooling
+		# if command -v pkgx >/dev/null 2>&1; then
+		# 	source <(pkgx dev --shellcode)
+		# elif [[ "$OSTYPE" == "darwin"* ]]; then
+		# 	echo "⚠️ Warning: pkgx not found on macOS - install via 'brew install pkgx'" >&2
+		# fi
 	fi
 
 elif [[ $shell == "bash" ]]; then
 	bash_completion
 	if [ -n "$brew_prefix" ]; then
 		eval "$(fzf --bash)"
-		if command -v pkgx >/dev/null 2>&1; then
-			eval "$(pkgx dev --shellcode)"
-		elif [[ "$OSTYPE" == "darwin"* ]]; then
-			echo "⚠️ Warning: pkgx not found on macOS - install via 'brew install pkgx'" >&2
-		fi
+
+		# NOTE: disabled pkxg while evaluating nix flakes for per-project tooling
+		# if command -v pkgx >/dev/null 2>&1; then
+		# 	eval "$(pkgx dev --shellcode)"
+		# elif [[ "$OSTYPE" == "darwin"* ]]; then
+		# 	echo "⚠️ Warning: pkgx not found on macOS - install via 'brew install pkgx'" >&2
+		# fi
 	fi
 
 fi

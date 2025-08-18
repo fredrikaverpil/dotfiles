@@ -74,8 +74,12 @@ If not using pkgx, a `flake.nix` can also set up the project.
 }
 ```
 
-Direnv's `.envrc` must contain `use flake` for it to auto-load when entering the
-directory.
+Direnv's `.envrc` must contain an entry for Nix to auto-load the flake when
+entering the directory:
+
+- Flake tracked by git: `use flake`
+- Flake _not_ tracked by git: `use flake path:./.nix-devshell --impure` and
+  place flake in project's `./nix-devshell/flake.nix`
 
 <details><summary>Nix flake package pinning</summary>
 

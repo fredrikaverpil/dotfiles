@@ -18,6 +18,7 @@ Thumbs.db
 .pkgx.yaml
 .envrc
 .direnv/
+/.nix-devshell
 
 # Node
 /node_modules
