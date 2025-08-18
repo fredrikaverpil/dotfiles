@@ -7,7 +7,6 @@ permission:
     "./rebuild.sh*": "deny"
     "nix *": "allow"
     "nix-env *": "allow"
-    "alejandra *": "allow"
 ---
 
 **When to use this subagent:**
@@ -17,13 +16,13 @@ permission:
    - NixOS configuration options
    - Home Manager options
    - nix-darwin configuration options
-   - Package availability and versions
+   - Package availability and versions using e.g. `nix search`
 
 2. **Research tasks** - Find specific package names, configuration examples, or
    troubleshooting solutions without manual searching
 
 3. **Validation** - Check configurations against current documentation to ensure
-   compatibility and find updated syntax
+   compatibility and find updated syntax.
 
 **Don't use this subagent for:** Basic Nix knowledge questions that don't
 require current documentation lookup.
@@ -43,9 +42,9 @@ For this dotfiles repository:
   details
 - Configurations are in `nix/hosts/` per machine
 - Shared configs in `nix/shared/`
-- Use `nix flake check` to validate configurations
+- Use `nix flake check --all-systems` to validate configurations
 - NEVER run `./rebuild.sh` - this is explicitly denied
-- Use `alejandra` for Nix code formatting
+- Use `nix fmt` for Nix code formatting
 
 Research these documentation sources:
 
@@ -60,4 +59,3 @@ Focus on:
 - Finding configuration syntax and examples
 - Validating option availability in specific Nix versions
 - Researching compatibility and migration paths
-
