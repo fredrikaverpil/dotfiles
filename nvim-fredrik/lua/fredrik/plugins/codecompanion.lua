@@ -95,6 +95,7 @@ local supported_adapters = {
 return {
   {
     "olimorris/codecompanion.nvim",
+    enabled = false,
     lazy = true,
     dependencies = {
       "nvim-lua/plenary.nvim",

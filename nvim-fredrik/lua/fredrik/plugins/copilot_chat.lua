@@ -2,6 +2,7 @@ return {
 
   {
     "CopilotC-Nvim/CopilotChat.nvim",
+    enabled = false,
     lazy = true,
     event = "VeryLazy",
     version = "*",
