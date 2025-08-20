@@ -6,6 +6,7 @@ tools:
 permission:
   bash:
     "*": "ask"
+    "jira issue comment *": "ask"
     "jira *": "allow"
 ---
 
