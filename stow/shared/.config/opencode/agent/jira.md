@@ -7,6 +7,7 @@ permission:
   bash:
     "*": "ask"
     "jira issue comment *": "ask"
+    "jira issue move *": "ask"
     "jira *": "allow"
 ---
 
