@@ -69,6 +69,7 @@
         "1password-cli"
         "aerospace"
         "appcleaner"
+        "brainfm"
         "fujifilm-x-raw-studio"
         "ghostty"
         "gitify"
