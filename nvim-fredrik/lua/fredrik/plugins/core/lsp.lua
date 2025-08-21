@@ -46,6 +46,8 @@ local function ensure_servers_installed(servers)
       if server_opts then
         if server_opts.mason ~= false and vim.tbl_contains(supported_servers, server) then
           table.insert(enabled_servers, server)
+        elseif server_opts.mason == false then
+          vim.notify("Skipping LSP server installation: " .. server, vim.log.levels.WARN)
         else
           vim.notify("LSP server not supported by mason-lspconfig: " .. server, vim.log.levels.WARN)
         end
