@@ -37,6 +37,9 @@
     "neovim": {
       "model": "google/gemini-2.5-flash"
     },
+    "github": {
+      "model": "google/gemini-2.5-flash"
+    },
     "security-auditor": {
       "model": "google/gemini-2.5-pro"
     },
