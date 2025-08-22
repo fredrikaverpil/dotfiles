@@ -28,6 +28,6 @@ in
   };
 
   npmTools = lib.mkAfter [
-    # "@google/gemini-cli@latest"
+    "@google/gemini-cli@latest"
   ];
 }
