@@ -75,6 +75,7 @@
         "gitify"
         "gcloud-cli"
         "kitty"
+        "lm-studio"
         "obs"
         "obsidian"
         "signal"

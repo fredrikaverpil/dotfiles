@@ -17,20 +17,38 @@
       "options": {
         "apiKey": "{env:GEMINI_API_KEY}"
       }
-    },
-    "ollama": {
-      // https://opencode.ai/docs/providers/#ollama
-      "npm": "@ai-sdk/openai-compatible",
-      "options": {
-        "baseURL": "http://localhost:11434/v1"
-      },
-      "models": {
-        "llama3.1:8b": {},
-        "qwen3:1.7b": {
-          // Tools causes the model to go bananas and just use them repeatedly
-          // "tools": true
-        }
-      }
+      // NOTE: disabled as local models doesn't work too great on M1 macOS...
+      //   "lmstudio": {
+      //     "npm": "@ai-sdk/openai-compatible",
+      //     "name": "LM Studio (local)",
+      //     "options": {
+      //       "baseURL": "http://127.0.0.1:1234/v1"
+      //     },
+      //     "models": {
+      //       "google/gemma-3n-e4b": {
+      //         "name": "Gemma 3n-e4b (local)"
+      //       },
+      //       "google/gemma-3-12b": {
+      //         "name": "Gemma 3-12b (local)"
+      //       }
+      //     }
+      //   }
+      // },
+      //
+      //   "ollama": {
+      //     // https://opencode.ai/docs/providers/#ollama
+      //     "npm": "@ai-sdk/openai-compatible",
+      //     "options": {
+      //       "baseURL": "http://localhost:11434/v1"
+      //     },
+      //     "models": {
+      //       "llama3.1:8b": {},
+      //       "qwen3:1.7b": {
+      //         // Tools causes the model to go bananas and just use them repeatedly
+      //         // "tools": true
+      //       }
+      //     }
+      //   }
     }
   },
   "agent": {
