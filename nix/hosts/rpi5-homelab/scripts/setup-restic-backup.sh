@@ -46,7 +46,7 @@ echo -n "Hostname (e.g., u123456.your-storagebox.de): "
 read HETZNER_HOSTNAME
 echo -n "SSH port (usually 23): "
 read HETZNER_PORT
-echo -n "Backup path (e.g., /backups/immich): "
+echo -n "Backup path (e.g., /home/backups/immich): "
 read BACKUP_PATH
 
 # Optional: Uptime Kuma monitoring
@@ -57,14 +57,14 @@ echo "1. 'Immich Backup Upload' - tracks backup uploads to Hetzner"
 echo "2. 'Immich Backup Validation' - tracks backup integrity validation"
 echo ""
 echo "Enter push keys from Uptime Kuma (leave empty to skip):"
-echo -n "Backup monitor push key: "
+echo -n "Backup job monitor push key: "
 read UPTIME_KUMA_BACKUP_PUSH_KEY
-echo -n "Validation monitor push key: "
+echo -n "Validation/restore job monitor push key: "
 read UPTIME_KUMA_VALIDATION_PUSH_KEY
 
 # Create config file with repository URL and optional Uptime Kuma keys
 cat <<EOF | sudo tee /etc/restic/immich-config >/dev/null
-RESTIC_REPOSITORY=sftp:${HETZNER_USERNAME}@${HETZNER_HOSTNAME}:${HETZNER_PORT}${BACKUP_PATH}
+RESTIC_REPOSITORY=sftp://${HETZNER_USERNAME}@${HETZNER_HOSTNAME}:${HETZNER_PORT}${BACKUP_PATH}
 EOF
 
 # Add Uptime Kuma keys if provided
@@ -92,28 +92,18 @@ sudo chmod 700 /root/.ssh
 # Copy user's SSH keys to root (needed for automated backups)
 if [ -f ~/.ssh/id_ed25519 ]; then
 	echo "Copying SSH keys to root..."
-	sudo cp ~/.ssh/id_ed25519* /root/.ssh/
-	sudo chown root:root /root/.ssh/id_ed25519*
+	sudo cp ~/.ssh/id_ed25519 /root/.ssh/
+	sudo cp ~/.ssh/id_ed25519.pub /root/.ssh/
+	sudo chown root:root /root/.ssh/id_ed25519
+	sudo chown root:root /root/.ssh/id_ed25519.pub
 	sudo chmod 600 /root/.ssh/id_ed25519
 	sudo chmod 644 /root/.ssh/id_ed25519.pub
 else
 	echo "WARNING: No SSH key found at ~/.ssh/id_ed25519"
 	echo "You may need to generate one or copy your existing key to /root/.ssh/"
+	echo "Use the following command to generate a new key:"
+	echo "ssh-keygen -t ed25519 -C \"fredrik@rpi5-homelab\""
 fi
 
 echo
 echo "✅ Setup complete"
-echo
-echo "Next steps:"
-echo "1. Test SSH connection (should not ask for password):"
-echo "   sudo ssh ${HETZNER_USERNAME}@${HETZNER_HOSTNAME} -p ${HETZNER_PORT} exit"
-echo "2. Initialize repository manually:"
-echo '   sudo bash -c '\''restic init --repo "$(grep RESTIC_REPOSITORY /etc/restic/immich-config | cut -d= -f2)" --password-file /etc/restic/immich-password'\'''
-echo "3. Test backup: sudo systemctl start restic-backups-immich.service"
-echo "4. Check backup status: sudo systemctl status restic-backups-immich.service"
-echo "5. Test validation: sudo systemctl start restic-validation-immich.service"
-echo "6. View logs: sudo journalctl -u restic-backups-immich.service -f"
-echo
-echo "Store the password safely - required for restore"
-echo "Daily backups run at 03:00 AM"
-echo "Daily backup validation runs at 03:30 AM"

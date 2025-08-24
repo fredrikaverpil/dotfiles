@@ -333,13 +333,27 @@ services: backup upload and validation.
 **Setup**:
 
 ```sh
-./dotfiles/nix/hosts/rpi5-homelab/scripts/setup-restic-backup.sh
+~/.dotfiles/nix/hosts/rpi5-homelab/scripts/setup-restic-backup.sh
 ```
 
-**Schedule**:
+The script will ask you for the Uptime Kuma push keys for backup and
+restore/validation respectively, so you will have to set those up as part of
+this process.
 
-- Backup: Daily at 3:00 AM
-- Validation: Daily at 3:30 AM
+After completing the setup script steps, run the following from the
+rpi5-homelab:
+
+```sh
+# Copy key (requires Hetzner box password) onto Hetzner box
+cat ~/.ssh/id_ed25519.pub | ssh -p23 uXXXXX@uXXXXX.your-storagebox.de install-ssh-key
+
+# Connect to test the SSH connection (optional)
+ssh uXXXXX@uXXXXX.your-storagebox.de -p 23
+exit  # exit back to rpi5-homelab
+
+# Initialize restic repo with encryption password
+sudo bash -c 'restic init --repo "$(grep RESTIC_REPOSITORY /etc/restic/immich-config | cut -d= -f2)" --password-file /etc/restic/immich-password'
+```
 
 ### Manual Operations
 
@@ -441,8 +455,3 @@ sudo /etc/homelab/scripts/validate-immich.sh --validate
 - **Both services fail**: Check restic configuration and network connectivity
 - **Partial success**: Backup works but validation fails - investigate
   validation logs
-
-**Uptime Kuma monitors**:
-
-- **Immich Backup Upload**: Tracks backup completion
-- **Immich Backup Validation**: Tracks validation success
