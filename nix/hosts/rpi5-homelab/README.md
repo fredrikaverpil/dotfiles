@@ -15,13 +15,35 @@ The setup has taken inspiration from:
 
 ## Preparations
 
+### Install Argon One V5 Dual M.2 NVMe case
+
+> [!WARNING]
+>
+> It seems the Argon installer bash script adds a bunch of `dtparams` that
+> messes up power consumption to NVMe SSDs and/or Wi-Fi. Do NOT install it.
+
+Install the Argon V5 Dual M.2 NVMe case. The installation explicitly mentions:
+
+```ini
+dtoverlay=dwc2,dr_mode=host
+```
+
+All in all, this is what I have in the `[all]` section:
+
+```ini
+[all]
+dtparam=nvme
+dtparam=pciex1
+dtoverlay=dwc2,dr_mode=host
+```
+
 ### Prepare bootloader on Raspberry Pi 5
 
-- Ensure NVMe SSD is connected.
+- Ensure NVMe SSD is connected intended for the NixOS system.
 - Boot Raspberry Pi OS from SD card.
 - Update and upgrade: `sudo apt update && sudo apt full-upgrade -y`
-- Enable PCIe: Edit `/boot/firmware/config.txt` and add `dtparam=pciex1`.
-  Reboot.
+- Enable PCIe: Edit `/boot/firmware/config.txt` and make sure `dtparam=pciex1`
+  is in there. Reboot.
 - Verify NVMe detection: `lsblk` should show `/dev/nvme0n1`.
 - Update Bootloader (EEPROM) - Crucial for NVMe Boot:
   `sudo rpi-eeprom-config --edit`
@@ -74,7 +96,7 @@ nix profile add nixpkgs#nixos-anywhere
 ```
 
 Now we need to enable `root` password on the rpi5. Make sure the rpi5 is running
-the Raspberry OS from SD Card.
+the Raspberry OS from SD Card. From the rpi5:
 
 ```sh
 # SSH into rpi5
@@ -99,11 +121,14 @@ nix-env -iA nixpkgs.nixos-install-tools
 exit
 ```
 
-Now, let's install the rpi5. From the development machine, run:
+Now, let's install NixOS onto the rpi5 remotely. From the development machine,
+run:
 
 ```sh
 # Use disko to partition and format the storage
 nixos-anywhere --flake .#rpi5-homelab --build-on remote --phases disko root@raspberrypi.local
+
+# Note: use `gparted` on the rpi5 to e.g. fully remove partitions.
 
 # Build and deploy the NixOS configuration
 nixos-anywhere --flake .#rpi5-homelab --build-on remote --phases install root@raspberrypi.local

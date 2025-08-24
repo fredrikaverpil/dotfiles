@@ -232,14 +232,13 @@ in {
       description = "Cloudflare Tunnel";
       after = ["network-online.target"];
       wants = ["network-online.target"];
+      # Only start if tunnel token exists - prevents boot failures
+      unitConfig.ConditionPathExists = "/etc/cloudflared/tunnel.json";
       serviceConfig = {
         Type = "simple";
         User = "cloudflared";
         Group = "cloudflared";
-        ExecStartPre = [
-          # Check if tunnel token exists - don't fail hard, allow retries
-          "${pkgs.bash}/bin/bash -c 'if [ ! -f /etc/cloudflared/tunnel.json ]; then echo \"WARNING: /etc/cloudflared/tunnel.json not found, service will retry in 30 seconds\"; sleep 5; fi'"
-        ];
+        # Simplified ExecStart since ConditionPathExists ensures file exists
         ExecStart = "${pkgs.bash}/bin/bash -c 'TOKEN=$(cat /etc/cloudflared/tunnel.json); exec ${pkgs.cloudflared}/bin/cloudflared tunnel run --token \"$$TOKEN\"'";
         Restart = "always";
         RestartSec = "30";
@@ -253,7 +252,7 @@ in {
         ProtectHome = true;
         ReadOnlyPaths = ["/etc/cloudflared"];
       };
-      # Start automatically if tunnel token exists
+      # Start automatically - but only if ConditionPathExists is satisfied
       wantedBy = ["multi-user.target"];
     };
 
