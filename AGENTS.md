@@ -1,12 +1,14 @@
 # Agent Guidelines for Fredrik's Dotfiles
 
+Use the Nix sub-agent (`@nix`) to search/ask for Nix specifics.
+
 ## Build/Test/Lint Commands
 
 - **Install dotfiles**: `./rebuild.sh` (uses Nix + GNU Stow automatically)
 - **Stow-only mode**: `./rebuild.sh --stow` (bypasses Nix, dotfiles only)
 - **Force update**: `./rebuild.sh --update` (updates flake inputs)
 - **CI testing**: Follow `.github/workflows/test.yml` workflow
-- **Nix operations**: `nix flake check`,
+- **Nix operations**: `nix flake check`, `nix flake check --all-systems`,
   `nix build .#darwinConfigurations.<host>.system`
 
 ## Language-Specific Formatting/Linting
@@ -56,4 +58,3 @@
 - Go: Use explicit error handling, avoid panic in libraries
 - Python: Use proper exception handling, type hints preferred
 - All languages: Validate inputs with meaningful error messages
-
