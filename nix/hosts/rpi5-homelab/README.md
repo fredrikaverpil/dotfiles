@@ -161,6 +161,15 @@ systemctl is-active sshd  # check if sshd is running
 
 ## Post-install setup
 
+### `~/.nix-profile` symlink
+
+I've noticed that sometimes the home-manager's `~/.nix-profile` is broken. To
+fix it:
+
+```sh
+rm ~/.nix-profile && ln -s ~/.local/state/nix/profiles/home-manager/home-path ~/.nix-profile
+```
+
 ### Second NVMe SSD for media storage
 
 ```sh
