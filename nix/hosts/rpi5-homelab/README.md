@@ -338,7 +338,14 @@ services: backup upload and validation.
 
 The script will ask you for the Uptime Kuma push keys for backup and
 restore/validation respectively, so you will have to set those up as part of
-this process.
+this process. Example settings:
+
+- Monitor type: Push
+- Heartbeat interval: 604800 (7 days)
+- Retries: 1
+- Heartbeat retry: 86400 (1 day)
+- Notification:
+  [Gmail SMTP](https://developers.google.com/workspace/gmail/imap/imap-smtp)
 
 After completing the setup script steps, run the following from the
 rpi5-homelab:
