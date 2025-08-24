@@ -5,23 +5,27 @@
   lib,
   inputs,
   ...
-}: {
+}:
+{
   options = {
     host.extraSystemPackages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
-      default = [];
+      default = [ ];
       description = "Additional system packages for this host";
     };
 
     host.extraServices = lib.mkOption {
       type = lib.types.attrs;
-      default = {};
+      default = { };
       description = "Additional services configuration for this host";
     };
   };
 
   config = {
-    nix.settings.experimental-features = ["nix-command" "flakes"];
+    nix.settings.experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
 
     # Home-manager configuration
     home-manager = {
@@ -37,7 +41,8 @@
     # Note: User configuration is handled by lib/users.nix
 
     # System-level packages
-    environment.systemPackages = with pkgs;
+    environment.systemPackages =
+      with pkgs;
       [
         vim # for recovery
       ]
@@ -52,13 +57,13 @@
       nerd-fonts.jetbrains-mono
       maple-mono.truetype
       maple-mono.variable
-      noto-fonts-emoji
+      noto-fonts-emoji # NOTE: takes a very long time to build
       nerd-fonts.symbols-only
     ];
 
     # Apply additional services configuration
     services = lib.mkMerge [
-      {} # Default empty services
+      { } # Default empty services
       config.host.extraServices
     ];
   };
