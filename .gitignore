@@ -30,3 +30,6 @@ nvim_issue
 
 # Work related, e.g. zsh-completion
 /work
+
+# Applications storing files ending up in stow/
+stow/shared/.config/zed/prompts
