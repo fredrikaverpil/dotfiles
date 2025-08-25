@@ -163,12 +163,21 @@ systemctl is-active sshd  # check if sshd is running
 
 ### `~/.nix-profile` symlink
 
-I've noticed that sometimes the home-manager's `~/.nix-profile` is broken. To
-fix it:
+If the `~/.nix-profile` symlink is broken, re-create it and point it to
+home-manager on Linux:
 
 ```sh
 rm ~/.nix-profile && ln -s ~/.local/state/nix/profiles/home-manager/home-path ~/.nix-profile
 ```
+
+> [!NOTE]
+>
+> On macOS, `~/.nix-profile` points to `~/.local/state/nix/profiles/profile`.
+>
+> This discrepancy is because of how `home-manager.useUserPackages` setting
+> differs on the systems. Setting it to `true` isolates home-manager packages
+> from system packages and this is the "recommended" approach as it avoids
+> potential conflicts between system and user packages.
 
 ### Second NVMe SSD for media storage
 
