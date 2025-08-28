@@ -1290,19 +1290,11 @@ function M.setup_opencode_keymaps()
   return {
 
     {
-      "<leader>ot",
+      "<leader>oA",
       function()
-        require("opencode").toggle()
-      end,
-      desc = "Toggle embedded opencode",
-    },
-    {
-      "<leader>oa",
-      function()
-        require("opencode").ask("@cursor: ")
+        require("opencode").ask()
       end,
       desc = "Ask opencode",
-      mode = "n",
     },
     {
       "<leader>oa",
@@ -1313,12 +1305,11 @@ function M.setup_opencode_keymaps()
       mode = "v",
     },
     {
-      "<leader>op",
+      "<leader>ot",
       function()
-        require("opencode").select_prompt()
+        require("opencode").toggle()
       end,
-      desc = "Select prompt",
-      mode = { "n", "v" },
+      desc = "Toggle embedded opencode",
     },
     {
       "<leader>on",
@@ -1347,6 +1338,22 @@ function M.setup_opencode_keymaps()
         require("opencode").command("messages_half_page_down")
       end,
       desc = "Scroll messages down",
+    },
+    {
+      "<leader>op",
+      function()
+        require("opencode").select_prompt()
+      end,
+      desc = "Select prompt",
+      mode = { "n", "v" },
+    },
+    -- Example: keymap for custom prompt
+    {
+      "<leader>oe",
+      function()
+        require("opencode").prompt("Explain @cursor and its context")
+      end,
+      desc = "Explain code near cursor",
     },
   }
 end
