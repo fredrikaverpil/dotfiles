@@ -1,4 +1,5 @@
 {
+  // Keybinds: https://opencode.ai/docs/keybinds
   "$schema": "https://opencode.ai/config.json",
   "theme": "system",
   "autoupdate": true,
@@ -7,9 +8,7 @@
     "google-vertex": {
       "models": {
         "gemini-2.5-flash": {},
-        "gemini-2.5-pro": {
-          "limit": { "context": 1000000, "output": 8192 }
-        }
+        "gemini-2.5-pro": {}
       },
       "options": {
         "project": "{env:GOOGLE_CLOUD_PROJECT}",
