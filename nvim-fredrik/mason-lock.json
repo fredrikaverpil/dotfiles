@@ -1,6 +1,5 @@
 {
   "actionlint": "v1.7.7",
-  "alejandra": "4.0.0",
   "basedpyright": "1.31.3",
   "bash-language-server": "5.6.0",
   "biome": "2.2.2",
@@ -15,7 +14,6 @@
   "gomodifytags": "v1.17.0",
   "gopls": "v0.20.0",
   "graphql-language-service-cli": "3.5.0",
-  "hadolint": "v2.12.0",
   "html-lsp": "4.10.0",
   "json-lsp": "4.10.0",
   "lua-language-server": "3.15.0",
