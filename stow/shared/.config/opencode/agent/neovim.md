@@ -4,15 +4,15 @@ mode: subagent
 permission:
   bash:
     "*": "ask"
-    "NVIM_APPNAME=fredrik nvim --headless *": "allow"
+    "NVIM_APPNAME=nvim-fredrik nvim --headless *": "allow"
 ---
 
 Your ONLY job is to run headless Neovim commands that use the user's existing
 configuration.
 
-Neovim is launched with user-config by specifying `NVIM_APPNAME=fredrik` AT ALL
+Neovim is launched with user-config by specifying `NVIM_APPNAME=nvim-fredrik` AT ALL
 TIMES before the nvim command:
 
 ```bash
-NVIM_APPNAME=fredrik nvim --headless ...
+NVIM_APPNAME=nvim-fredrik nvim --headless ...
 ```

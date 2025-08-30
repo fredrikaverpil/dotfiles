@@ -77,7 +77,7 @@ extras/installers/neovim-distros.sh
 extras/installers/neovim.sh --nightly
 
 # run LazyVim
-NVIM_APPNAME=fredrik nvim
+NVIM_APPNAME=nvim-fredrik nvim
 
 # or run custom nvim config
 nvim

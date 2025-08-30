@@ -57,12 +57,12 @@ fi
 
 # Check if NVIM_APPNAME is already set
 if [ -z "$NVIM_APPNAME" ]; then
-	# Skip setting NVIM_APPNAME=fredrik on rpi5-homelab
+	# Skip setting NVIM_APPNAME=nvim-fredrik on rpi5-homelab
 	HOSTNAME=$(hostname)
 	if [ "$HOSTNAME" = "rpi5-homelab" ]; then
 		$NVIM_BINARY "$@"
 	else
-		NVIM_APPNAME=fredrik $NVIM_BINARY "$@"
+		NVIM_APPNAME=nvim-fredrik $NVIM_BINARY "$@"
 	fi
 else
 	echo "Warning: Using NVIM_APPNAME=$NVIM_APPNAME"

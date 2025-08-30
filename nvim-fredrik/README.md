@@ -53,8 +53,8 @@ git clone https://github.com/fredrikaverpil/dotfiles.git
 # create symlink
 ln -s dotfiles/nvim-fredrik ~/.config/fredrik
 
-# run nvim with NVIM_APPNAME=fredrik
-NVIM_APPNAME=fredrik nvim
+# run nvim with NVIM_APPNAME=nvim-fredrik
+NVIM_APPNAME=nvim-fredrik nvim
 ```
 
 ### Using container
