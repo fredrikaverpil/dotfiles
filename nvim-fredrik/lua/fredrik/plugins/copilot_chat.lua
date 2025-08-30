@@ -2,7 +2,7 @@ return {
 
   {
     "CopilotC-Nvim/CopilotChat.nvim",
-    enabled = false,
+    enabled = true,
     lazy = true,
     event = "VeryLazy",
     version = "*",
@@ -22,7 +22,6 @@ return {
         end
       end,
       -- model = "claude-3.7-sonnet", -- NOTE: requires paid subscription
-      prompts = require("fredrik.utils.llm_prompts").to_copilot(),
     },
     keys = function()
       return require("fredrik.config.keymaps").setup_copilot_chat_keymaps()

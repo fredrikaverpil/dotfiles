@@ -27,7 +27,7 @@
 - Trouble.nvim for keeping track of diagnostics issues.
 - Gx.nvim for universal `gx` keymap.
 - Diffview for reviewing PRs.
-- AI chat via Codecompanion, Avante, CopilotChat.
+- AI via opencode, GitHub Copilot.
 - And much, much more...
 
 ## Try it out! 🚀
@@ -102,7 +102,6 @@ plugin manager.
   in sequence.
 - When loading all plugins, the `spec` (order of loading plugins) is defined in
   [lua/fredrik/config/lazy.lua](lua/fredrik/config/lazy.lua):
-
   1. Any plugin's config from the `plugins` folder.
   2. Plugin configs for a specific language from the `plugins/lang` folder.
   3. Plugin configs for "core" from the `plugins/core` folder.
