@@ -53,15 +53,13 @@ return {
         default = { "lsp", "path", "snippets", "buffer" },
         providers = {
           path = {
-            -- TODO: use custom field and move to respective plugin
             enabled = function()
-              return not vim.tbl_contains({ "AvanteInput", "codecompanion" }, vim.bo.filetype)
+              return true
             end,
           },
-          -- TODO: use custom field and move to respective plugin
           buffer = {
             enabled = function()
-              return not vim.tbl_contains({ "AvanteInput", "codecompanion" }, vim.bo.filetype)
+              return true
             end,
           },
           snippets = {

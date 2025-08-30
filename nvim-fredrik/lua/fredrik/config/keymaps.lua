@@ -1260,32 +1260,6 @@ function M.setup_copilot_keymaps()
   }
 end
 
-function M.setup_codecompanion_keymaps()
-  return {
-    { "<leader>ah", ":CodeCompanionHistory<CR>", desc = "Codecompanion history" },
-    { "<leader>at", ":CodeCompanionChat Toggle<CR>", desc = "Codecompanion toggle" },
-    { "<leader>ac", ":CodeCompanionChat anthropic<CR>", desc = "Codecompanion: Claude" },
-    { "<leader>ao", ":CodeCompanionChat openai<CR>", desc = "Codecompanion: OpenAI" },
-    { "<leader>ag", ":CodeCompanionChat gemini<CR>", desc = "Codecompanion: Gemini" },
-    { "<leader>av", ":CodeCompanionChat vertex<CR>", desc = "Codecompanion: Vertex" },
-    { "<leader>ad", ":CodeCompanionChat deepseek<CR>", desc = "Codecompanion: DeepSeek" },
-    { "<leader>al", ":CodeCompanionChat ollama<CR>", desc = "Codecompanion: Ollama" },
-  }
-end
-
-function M.setup_avante_keymaps()
-  return {
-    {
-      "<leader>aa",
-      function()
-        -- Open the Avante chat window, without preselecint any files.
-        require("avante.api").ask({ without_selection = true })
-      end,
-      desc = "Toggle Avante",
-    },
-  }
-end
-
 function M.setup_opencode_keymaps()
   return {
 
