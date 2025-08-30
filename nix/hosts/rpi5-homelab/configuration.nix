@@ -265,9 +265,9 @@ in {
         RemainAfterExit = true;
         WorkingDirectory = "/etc/homelab/immich";
         ExecStartPre = [
-          "${pkgs.coreutils}/bin/mkdir -p /var/lib/immich/library"
-          "${pkgs.coreutils}/bin/mkdir -p /var/lib/immich/postgres"
-          "${pkgs.coreutils}/bin/chown -R ${toString config.users.users.fredrik.uid}:${toString config.users.groups.users.gid} /var/lib/immich"
+          "${pkgs.coreutils}/bin/mkdir -p /mnt/homelab-data/services/immich/library"
+          "${pkgs.coreutils}/bin/mkdir -p /mnt/homelab-data/services/immich/postgres"
+          "${pkgs.coreutils}/bin/chown -R ${toString config.users.users.fredrik.uid}:${toString config.users.groups.users.gid} /mnt/homelab-data/services/immich"
         ];
         ExecStart = "${pkgs.docker-compose}/bin/docker-compose up -d";
         ExecStop = "${pkgs.docker-compose}/bin/docker-compose down";
