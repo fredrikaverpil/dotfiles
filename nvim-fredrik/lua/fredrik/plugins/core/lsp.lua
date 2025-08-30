@@ -117,6 +117,11 @@ local function register_lspattach_autocmd()
         if client:supports_method("textDocument/foldingRange", args.buf) then
           require("fredrik.config.options").lsp_foldexpr()
         end
+
+        -- setup inline completion
+        if client:supports_method("textDocument/inlineCompletion", args.buf) then
+          vim.lsp.inline_completion.enable(true)
+        end
       end
 
       -- set up keymaps
