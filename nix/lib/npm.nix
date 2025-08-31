@@ -18,7 +18,9 @@ in
     };
   };
 
-  config = {
+  # Only enable npm-based global tool installation on macOS (Darwin)
+  # NixOS/Linux generic npm binaries are not runnable without wrapping.
+  config = lib.mkIf pkgs.stdenv.isDarwin {
     home.sessionPath = [ "$HOME/.nix-npm-tools/bin" ];
 
     home.activation.installNpmTools = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
