@@ -136,14 +136,16 @@ in
       enable = true;
       package = pkgs.neovim-custom; # from overlay
       extraPackages = with unstable; [
+        # Neovim will have access to these programs, but an active dev shell will override them.
         # For plugins and Mason, which needs extra tools to build or run.
         # NOTE: because of useGlobalPkgs=true, all packages from home.packages are also available here
+
         bun
         cmake
         gcc
-        go
+        go_1_25
         nixfmt-rfc-style # cannot be installed via Mason on macOS, so installed here instead
-        nodejs
+        nodejs # required by github copilot
         npm-check-updates
         python3
         ruby
