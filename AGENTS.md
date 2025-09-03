@@ -22,7 +22,7 @@ Use the Nix sub-agent (`@nix`) to search/ask for Nix specifics.
 - **Related tools**: Run relevant validation commands (e.g., `nix flake check`
   for Nix changes)
 - **Note**: If LSP/formatter not found, check Mason install path:
-  `~/.local/share/fredrik/mason/bin/` or `~/.local/share/nvim/mason/bin/`
+  `~/.local/share/nvim-fredrik/mason/bin/` or `~/.local/share/nvim/mason/bin/`
 
 ## Code Style Guidelines
 

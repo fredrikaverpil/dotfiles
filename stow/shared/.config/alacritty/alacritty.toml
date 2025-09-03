@@ -1,6 +1,6 @@
 [general]
 import = [
-  "~/.local/share/fredrik/lazy/tokyonight.nvim/extras/alacritty/tokyonight_moon.toml",
+  "~/.local/share/nvim-fredrik/lazy/tokyonight.nvim/extras/alacritty/tokyonight_moon.toml",
 ]
 
 [font]

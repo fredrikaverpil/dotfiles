@@ -30,9 +30,9 @@ local function set_tmux(style)
 
   local tmux_theme = ""
   if style == "dark" then
-    tmux_theme = vim.fn.expand("~/.local/share/fredrik/lazy/tokyonight.nvim/extras/tmux/tokyonight_moon.tmux")
+    tmux_theme = vim.fn.expand("~/.local/share/nvim-fredrik/lazy/tokyonight.nvim/extras/tmux/tokyonight_moon.tmux")
   elseif style == "light" then
-    tmux_theme = vim.fn.expand("~/.local/share/fredrik/lazy/nightfox.nvim/extra/dayfox/dayfox.tmux")
+    tmux_theme = vim.fn.expand("~/.local/share/nvim-fredrik/lazy/nightfox.nvim/extra/dayfox/dayfox.tmux")
   end
 
   if vim.fn.filereadable(tmux_theme) == 1 then
