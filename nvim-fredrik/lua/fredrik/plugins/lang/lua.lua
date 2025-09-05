@@ -152,11 +152,31 @@ return {
     dependencies = {
       {
         "nvim-neotest/neotest-plenary",
+        enable = false,
+      },
+      {
+        "MisanthropicBit/neotest-busted",
+        enable = true,
       },
     },
     opts = function(_, opts)
       opts.adapters = opts.adapters or {}
-      opts.adapters["neotest-plenary"] = {}
+      -- opts.adapters["neotest-plenary"] = {}
+      opts.adapters["neotest-busted"] = {
+        local_luarocks_only = false, -- Allow user/global installations
+
+        -- NOTE: trying to add paths for neotest-golang and plenary here
+        busted_paths = {
+          -- "lua/?.lua",
+          -- "lua/?/init.lua",
+          vim.fn.stdpath("data") .. "/lazy/plenary.nvim/lua/?.lua",
+          vim.fn.stdpath("data") .. "/lazy/plenary.nvim/lua/?/init.lua",
+          vim.fn.stdpath("data") .. "/lazy/neotest/lua/?.lua",
+          vim.fn.stdpath("data") .. "/lazy/neotest/lua/?/init.lua",
+          vim.fn.stdpath("data") .. "/lazy/nvim-nio/lua/?.lua",
+          vim.fn.stdpath("data") .. "/lazy/nvim-nio/lua/?/init.lua",
+        },
+      }
     end,
   },
 

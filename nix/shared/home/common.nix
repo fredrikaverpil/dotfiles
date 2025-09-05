@@ -85,6 +85,8 @@ in
       # Development & Language Toolchains
       # ========================================================================
       # Language-specific
+      luarocks
+      # lua51Packages.busted # Lua testing framework
       uv
 
       # Generic development
