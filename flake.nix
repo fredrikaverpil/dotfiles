@@ -71,7 +71,7 @@
 
             # Unstable packages
             unstable.${system}.bun
-            unstable.${system}.go
+            unstable.${system}.go_1_25
             unstable.${system}.lua
             unstable.${system}.nodejs
             unstable.${system}.pnpm
