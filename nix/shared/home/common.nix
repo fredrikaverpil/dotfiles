@@ -86,7 +86,6 @@ in
       # ========================================================================
       # Language-specific
       luarocks
-      # lua51Packages.busted # Lua testing framework
       uv
 
       # Generic development
