@@ -329,9 +329,9 @@ return {
       {
         "fredrikaverpil/neotest-golang",
         dev = true, -- see lazy.lua for local path details
-        -- dependencies = {
-        --   "uga-rosa/utf8.nvim",
-        -- },
+        dependencies = {
+          "uga-rosa/utf8.nvim", -- required for sanitization feature
+        },
       },
     },
 
