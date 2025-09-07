@@ -117,6 +117,9 @@ vim.opt.mousescroll = { "ver:1", "hor:6" }
 vim.opt.exrc = true -- allow local .nvim.lua .vimrc .exrc files
 vim.opt.secure = true -- disable shell and write commands in local .nvim.lua .vimrc .exrc files
 
+-- auto read files changed outside of nvim
+vim.opt.autoread = true
+
 -- sync with system clipboard
 -- NOTE: https://github.com/neovim/neovim/issues/11804
 vim.opt.clipboard = "unnamedplus"
