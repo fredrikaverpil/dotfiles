@@ -56,15 +56,34 @@ If not using pkgx, a `flake.nix` can also set up the project.
       let
         pkgs = import nixpkgs { inherit system; };
         pkgs-unstable = import nixpkgs-unstable { inherit system; };
+
+        # Override Go to use version 1.25.1 to match go.mod requirement
+        go_1_25_1 = pkgs-unstable.go_1_25.overrideAttrs (oldAttrs: rec {
+          version = "1.25.1";
+          src = pkgs.fetchurl {
+            url = "https://go.dev/dl/go${version}.src.tar.gz";
+            hash = "sha256-0BDBCc7pTYDv5oHqtGvepJGskGv0ZYPDLp8NuwvRpZQ=";
+          };
+        });
+
       in
       {
         devShells.default = pkgs.mkShell {
           packages = [
-            pkgs-unstable.go
+            # Use Go from unstable nix packages
+            # pkgs-unstable.go
+
+            # Use Go from override
+            go_1_25_1
+
             # Add other tools as needed
+            # ...
           ];
 
           shellHook = ''
+            # Enforce using only the Nix-provided Go version, no auto-downloading
+            export GOTOOLCHAIN=local
+
             # uv supplied via home-manager/neovim
             echo -e "\033[32m[project-toolchain] $(go version | awk '{print $3}') | $(uv --version)\033[0m"
           '';
