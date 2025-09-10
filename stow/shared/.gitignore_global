@@ -12,6 +12,7 @@ Thumbs.db
 .nvim.lua
 .lazy.lua
 .opencode/
+.claude
 
 # Environments
 .pkgx.yml
