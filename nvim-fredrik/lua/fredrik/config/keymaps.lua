@@ -1197,7 +1197,6 @@ function M.setup_whichkey(wk)
     { "<leader>gd", group = "diffview" },
     { "<leader>gh", group = "hunks" },
     { "<leader>n", group = "notes" },
-    { "<leader>o", group = "opencode" },
     { "<leader>r", group = "run" },
     { "<leader>s", group = "search" },
     { "<leader>sg", group = "git" },
@@ -1241,6 +1240,16 @@ function M.setup_venv_selector_keymaps()
   }
 end
 
+function M.setup_claudecode_keymaps()
+  return {
+    {
+      "<leader>ac",
+      "<cmd>ClaudeCode<CR>",
+      desc = "Claude Code",
+    },
+  }
+end
+
 function M.setup_copilot_chat_keymaps()
   return {
     {
@@ -1262,72 +1271,20 @@ end
 
 function M.setup_opencode_keymaps()
   return {
-
     {
-      "<leader>oA",
-      function()
-        require("opencode").ask()
-      end,
-      desc = "Ask opencode",
-    },
-    {
-      "<leader>oa",
-      function()
-        require("opencode").ask("@selection: ")
-      end,
-      desc = "Ask opencode about selection",
-      mode = "v",
-    },
-    {
-      "<leader>ot",
+      "<leader>ao",
       function()
         require("opencode").toggle()
       end,
-      desc = "Toggle embedded opencode",
+      desc = "Opencode",
     },
     {
-      "<leader>on",
+      "<leader>ao",
       function()
-        require("opencode").command("session_new")
+        require("opencode").ask("@selection: ")
       end,
-      desc = "New session",
-    },
-    {
-      "<leader>oy",
-      function()
-        require("opencode").command("messages_copy")
-      end,
-      desc = "Copy last message",
-    },
-    {
-      "<S-C-u>",
-      function()
-        require("opencode").command("messages_half_page_up")
-      end,
-      desc = "Scroll messages up",
-    },
-    {
-      "<S-C-d>",
-      function()
-        require("opencode").command("messages_half_page_down")
-      end,
-      desc = "Scroll messages down",
-    },
-    {
-      "<leader>op",
-      function()
-        require("opencode").select_prompt()
-      end,
-      desc = "Select prompt",
-      mode = { "n", "v" },
-    },
-    -- Example: keymap for custom prompt
-    {
-      "<leader>oe",
-      function()
-        require("opencode").prompt("Explain @cursor and its context")
-      end,
-      desc = "Explain code near cursor",
+      desc = "Opencode: ask about selection",
+      mode = "v",
     },
   }
 end
