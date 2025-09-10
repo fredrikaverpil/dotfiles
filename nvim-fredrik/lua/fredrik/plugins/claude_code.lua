@@ -4,9 +4,11 @@ return {
     dependencies = {
       "nvim-lua/plenary.nvim",
     },
-    config = function()
-      require("claude-code").setup()
-    end,
+    opts = {
+      window = {
+        position = "vertical",
+      },
+    },
     keys = require("fredrik.config.keymaps").setup_claudecode_keymaps(),
   },
 }
