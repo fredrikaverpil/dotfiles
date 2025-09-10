@@ -159,7 +159,7 @@ in
 
     npmTools = [
       "opencode-ai@latest"
-      # "@anthropic-ai/claude-code@latest"
+      "@anthropic-ai/claude-code@latest"
       # "@google/gemini-cli@latest"
     ];
 
