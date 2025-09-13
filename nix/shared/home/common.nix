@@ -59,6 +59,7 @@ in
       atuin
       bash
       bat
+      coreutils
       curl
       direnv
       eza
