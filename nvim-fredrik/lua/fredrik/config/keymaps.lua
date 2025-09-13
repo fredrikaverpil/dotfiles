@@ -1148,6 +1148,13 @@ function M.setup_winshift_keymaps()
   }
 end
 
+function M.setup_maximizer_keymaps()
+  return {
+    { "<leader>wm", "<cmd>MaximizerToggle<CR>", desc = "[w]indow [m]aximize toggle" },
+    { "<C-w>m", "<cmd>MaximizerToggle<CR>", desc = "Window maximize toggle" },
+  }
+end
+
 function M.setup_obsidian_keymaps(obsidian_vars)
   return {
     { "<leader>ns", "<cmd>Obsidian search<cr>", desc = "[N]otes: [s]earch text" },
