@@ -59,7 +59,7 @@ in
       atuin
       bash
       bat
-      coreutils
+      coreutils # provides e.g. timout
       curl
       direnv
       eza
