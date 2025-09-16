@@ -1,13 +1,22 @@
 local function set_dark()
-  vim.o.background = "light" -- NOTE: tokyonight-moon uses light background
-  vim.cmd.colorscheme("tokyonight-moon")
+  -- vim.o.background = "light" -- NOTE: tokyonight-moon uses light background
+  -- vim.cmd.colorscheme("tokyonight-moon")
+
+  -- vim.o.background = "dark"
+  -- vim.cmd.colorscheme("rose-pine")
+
+  vim.o.background = "dark"
+  vim.g.everforest_background = "hard"
+  vim.cmd.colorscheme("everforest")
 end
 
 local function set_light()
+  -- vim.o.background = "light"
+  -- vim.cmd.colorscheme("dayfox")
+
   vim.o.background = "light"
-  vim.cmd.colorscheme("dayfox")
-  -- vim.cmd.colorscheme("rose-pine-dawn")
-  -- vim.cmd.colorscheme("tokyonight-day")
+  vim.g.everforest_background = "hard"
+  vim.cmd.colorscheme("everforest")
 end
 
 local function tmux_is_running()
@@ -43,27 +52,6 @@ end
 return {
   -- color scheme managers
   {
-    "f-person/auto-dark-mode.nvim",
-    lazy = false, -- NOTE: use afonsofrancof/OSC11.nvim instead
-    enabled = false,
-    priority = 1000,
-    dependencies = {},
-    init = function()
-      set_dark() -- avoid flickering when starting nvim, default to dark mode
-    end,
-    opts = {
-      update_interval = 3000, -- milliseconds
-      set_dark_mode = function()
-        set_dark()
-        set_tmux("dark")
-      end,
-      set_light_mode = function()
-        set_light()
-        set_tmux("light")
-      end,
-    },
-  },
-  {
     "afonsofrancof/OSC11.nvim",
     init = function()
       set_dark() -- avoid flickering when starting nvim, default to dark mode
@@ -83,22 +71,8 @@ return {
   },
 
   -- color schemes
-
   {
-    "uga-rosa/ccc.nvim",
-    enabled = false, -- NOTE: enable when needed
-    opts = {
-      highlighter = {
-        auto_enable = true,
-        lsp = true,
-      },
-    },
-    config = function(_, opts)
-      local ccc = require("ccc")
-      ccc.setup(opts)
-    end,
-  },
-  {
+    -- :h tokyonight.nvim-table-of-contents
     "folke/tokyonight.nvim",
     enabled = true,
     lazy = true,
@@ -114,6 +88,7 @@ return {
     },
   },
   {
+    -- :h nightfox
     "EdenEast/nightfox.nvim",
     enabled = true,
     lazy = true,
@@ -124,6 +99,16 @@ return {
         },
       },
     },
+  },
+  {
+    -- :h everforest
+    "sainnhe/everforest",
+    -- enabled = false,
+    lazy = false,
+    config = function()
+      vim.g.everforest_enable_italic = true
+      -- vim.g.everforest_better_performance = 1
+    end,
   },
   {
     "rose-pine/neovim",
