@@ -565,7 +565,7 @@ function M.setup_snacks_keymaps()
       function()
         Snacks.picker.diagnostics()
       end,
-      desc = "[s]earch [D]iagnostics",
+      desc = "[s]earch workspace [D]iagnostics",
     },
     {
       "<leader>sl",
