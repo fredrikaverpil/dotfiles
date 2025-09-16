@@ -82,11 +82,11 @@ return {
       vim.notify("Lualine: dap_status component not loaded", vim.log.levels.WARN)
     end
 
-    if opts.noice then
-      table.insert(opts.sections.lualine_x, 3, opts.noice.lualine_component)
-    else
-      vim.notify("Lualine: noice component not loaded", vim.log.levels.WARN)
-    end
+    -- if opts.noice then
+    --   table.insert(opts.sections.lualine_x, 3, opts.noice.lualine_component)
+    -- else
+    --   vim.notify("Lualine: noice component not loaded", vim.log.levels.WARN)
+    -- end
 
     require("lualine").setup(opts)
   end,
