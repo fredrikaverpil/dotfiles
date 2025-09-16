@@ -1,6 +1,7 @@
 return {
   {
     "folke/trouble.nvim",
+    enabled = false,
     lazy = true,
     dependencies = {
       -- icons supported via mini-icons.lua

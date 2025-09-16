@@ -14,7 +14,7 @@ return {
           "options.disabled_filetypes",
         },
       },
-      { "folke/trouble.nvim" },
+      -- { "folke/trouble.nvim" },
       { "folke/todo-comments.nvim" },
     },
     priority = 1000,
@@ -80,7 +80,7 @@ return {
 
       picker = {
         enabled = true,
-        actions = require("trouble.sources.snacks").actions,
+        -- actions = require("trouble.sources.snacks").actions,
         sources = {
           files = {
             hidden = true, -- NOTE: toggle with alt+h
@@ -90,10 +90,10 @@ return {
         win = {
           input = {
             keys = {
-              ["<c-t>"] = {
-                "trouble_open",
-                mode = { "n", "i" },
-              },
+              -- ["<c-t>"] = {
+              --   "trouble_open",
+              --   mode = { "n", "i" },
+              -- },
             },
           },
         },

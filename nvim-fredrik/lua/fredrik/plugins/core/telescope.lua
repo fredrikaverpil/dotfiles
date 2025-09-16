@@ -22,7 +22,7 @@ return {
         "nvim-telescope/telescope-project.nvim",
       },
       { "gbprod/yanky.nvim" },
-      { "folke/trouble.nvim" }, -- for trouble.sources.telescope
+      -- { "folke/trouble.nvim" }, -- for trouble.sources.telescope
     },
     opts = function(_, opts)
       -- https://github.com/nvim-telescope/telescope.nvim/wiki/Configuration-Recipes
@@ -45,11 +45,11 @@ return {
           },
           mappings = {
             -- optionally, use tab to select file(s) and ...
-            i = {
-              ["<C-t>"] = require("trouble.sources.telescope").open,
-              ["<a-t>"] = require("trouble.sources.telescope").open,
-              ["<a-a>"] = require("trouble.sources.telescope").add,
-            },
+            -- i = {
+            --   ["<C-t>"] = require("trouble.sources.telescope").open,
+            --   ["<a-t>"] = require("trouble.sources.telescope").open,
+            --   ["<a-a>"] = require("trouble.sources.telescope").add,
+            -- },
           },
         },
         pickers = {

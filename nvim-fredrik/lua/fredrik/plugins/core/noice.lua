@@ -5,7 +5,7 @@
 return {
   {
     "folke/noice.nvim",
-    -- enabled = false,
+    enabled = false,
     -- lazy = false, -- avoid jumping lualine on nvim startup
     event = "VeryLazy",
     dependencies = {
