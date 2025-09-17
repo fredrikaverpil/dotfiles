@@ -23,5 +23,6 @@ return {
       require("grug-far").setup(opts)
     end,
     keys = require("fredrik.config.keymaps").setup_grug_far_keymaps(),
+    cmd = { "GrugFar", "GrugFarWithin" },
   },
 }
