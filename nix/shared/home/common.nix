@@ -90,6 +90,7 @@ in
       uv
 
       # Generic development
+      dust
       fd
       gnumake
       go-task
