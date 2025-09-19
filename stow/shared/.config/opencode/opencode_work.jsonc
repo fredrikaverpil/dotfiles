@@ -61,12 +61,12 @@
         "-i",
         "--rm",
         "-e",
-        "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "GITHUB_MCP_TOKEN",
         "ghcr.io/github/github-mcp-server"
       ],
       "enabled": true,
       "environment": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "{env:GITHUB_PERSONAL_ACCESS_TOKEN}"
+        "GITHUB_MCP_TOKEN": "{env:GITHUB_MCP_TOKEN"
       },
       "type": "local"
     },
