@@ -305,18 +305,6 @@ function M.setup_telescope_keymaps()
       desc = "[s]earch [f]ile (in projects)",
     },
 
-    -- yank
-    -- NOTE: reminder;
-    -- Use `vep` to replace current a word with a yank.
-    -- Use `Vp` to replace a line with a yank.
-    {
-      "<leader>p",
-      function()
-        require("telescope").extensions.yank_history.yank_history({})
-      end,
-      desc = "Yanky history",
-    },
-
     -- search
     { "<leader>so", "<cmd>Telescope vim_options<cr>", desc = "[s]earch [o]ptions" },
   }
@@ -628,6 +616,18 @@ function M.setup_snacks_keymaps()
         require("fredrik.utils.snacks_pickers").pull_requests()
       end,
       desc = "[s]earch [P]ull Requests",
+    },
+  }
+end
+
+function M.setup_yanky_keymaps()
+  return {
+    {
+      "<leader>p",
+      function()
+        Snacks.picker.yanky()
+      end,
+      desc = "Yanky history",
     },
   }
 end

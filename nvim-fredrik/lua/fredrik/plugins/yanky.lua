@@ -2,7 +2,11 @@ return {
 
   {
     "gbprod/yanky.nvim",
+    dependencies = {
+      "folke/snacks.nvim",
+    },
     lazy = true,
-    opts = {}, -- see telescope for config/keymaps
+    opts = {},
+    keys = require("fredrik.config.keymaps").setup_yanky_keymaps(),
   },
 }
