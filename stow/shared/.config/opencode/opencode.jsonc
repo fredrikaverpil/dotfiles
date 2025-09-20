@@ -88,12 +88,12 @@
         "-i",
         "--rm",
         "-e",
-        "GITHUB_MCP_TOKEN",
+        "GITHUB_MCP_SERVER_TOKEN",
         "ghcr.io/github/github-mcp-server"
       ],
       "enabled": true,
       "environment": {
-        "GITHUB_MCP_TOKEN": "{env:GITHUB_MCP_TOKEN}"
+        "GITHUB_MCP_SERVER_TOKEN": "{env:GITHUB_MCP_SERVER_TOKEN}"
       },
       "type": "local"
     },

@@ -1,7 +1,5 @@
 {
-  "nativeMCPServers": [
-    
-  ],
+  "nativeMCPServers": [],
   "mcpServers": {
     "google-maps": {
       "command": "docker",
@@ -28,28 +26,19 @@
     },
     "github.com/modelcontextprotocol/servers/tree/main/src/git": {
       "command": "uvx",
-      "args": [
-        "mcp-server-git"
-      ],
+      "args": ["mcp-server-git"],
       "disabled": false
     },
     "fetch": {
       "command": "uvx",
-      "args": [
-        "mcp-server-fetch"
-      ],
+      "args": ["mcp-server-fetch"],
       "disabled": false
     },
     "github.com/tavily-ai/tavily-mcp": {
       "command": "npx",
-      "args": [
-        "-y",
-        "tavily-mcp@0.1.4"
-      ],
+      "args": ["-y", "tavily-mcp@0.1.4"],
       "disabled": false,
-      "autoApprove": [
-        
-      ],
+      "autoApprove": [],
       "env": {
         "TAVILY_API_KEY": null
       }
@@ -67,14 +56,14 @@
     "github": {
       "command": "docker",
       "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": null
+        "GITHUB_MCP_SERVER_TOKEN": null
       },
       "args": [
         "run",
         "-i",
         "--rm",
         "-e",
-        "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "GITHUB_MCP_SERVER_TOKEN",
         "ghcr.io/github/github-mcp-server"
       ],
       "disabled": true
