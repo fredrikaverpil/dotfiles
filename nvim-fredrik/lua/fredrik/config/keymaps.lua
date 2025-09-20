@@ -113,8 +113,14 @@ local function map_normal_mode(keys, func, desc)
 end
 
 map_normal_mode("<leader>uf", require("fredrik.utils.toggle").toggle_manual_folding, "Toggle manual folding")
-map_normal_mode("<leader>uq", require("fredrik.utils.toggle").toggle_quickfix_list, "Toggle quickfix diagnostics (current buffer)")
-map_normal_mode("<leader>uQ", function() require("fredrik.utils.toggle").toggle_quickfix_list(true) end, "Toggle quickfix diagnostics (all buffers)")
+map_normal_mode(
+  "<leader>uq",
+  require("fredrik.utils.toggle").toggle_quickfix_list,
+  "Toggle quickfix diagnostics (current buffer)"
+)
+map_normal_mode("<leader>uQ", function()
+  require("fredrik.utils.toggle").toggle_quickfix_list(true)
+end, "Toggle quickfix diagnostics (all buffers)")
 
 function M.setup_trouble_keymaps()
   return {
