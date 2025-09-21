@@ -10,9 +10,12 @@ let
   # rev = "v0.11.3";
   # sha = "sha256-B/An+SiRWC3Ea0T/sEk8aNBS1Ab9OENx/l4Z3nn8xE4=";
   #
+  rev = "v0.11.4";
+  sha = "sha256-IpMHxIDpldg4FXiXPEY2E51DfO/Z5XieKdtesLna9Xw=";
+  #
   # Nightly from https://github.com/neovim/neovim/commit/b756a6165a06a1bca018a30dfa6b6394dc5f1208
-  rev = "b756a6165a06a1bca018a30dfa6b6394dc5f1208";
-  sha = "sha256-z/vo7oYT0srZTpKZYsXIXqJxAc+xceBSO/iy4mahrSA=";
+  # rev = "b756a6165a06a1bca018a30dfa6b6394dc5f1208";
+  # sha = "sha256-z/vo7oYT0srZTpKZYsXIXqJxAc+xceBSO/iy4mahrSA=";
 in
 {
   neovim-custom = prev.neovim-unwrapped.overrideAttrs (old: {
