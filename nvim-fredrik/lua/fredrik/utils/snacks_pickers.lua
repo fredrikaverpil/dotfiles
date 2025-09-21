@@ -95,11 +95,21 @@ function M.neovim_logs(opts)
     title = "Neovim Log Files",
     cwd = log_dir,
     confirm = function(picker, item)
+      local selected = picker:selected({ fallback = true })
       picker:close()
-      local full_path = picker:cwd() .. "/" .. item.file
-      vim.cmd("split " .. vim.fn.fnameescape(full_path))
-      vim.cmd("set ft=log")
-      vim.cmd("normal! G")
+
+      for i, selected_item in ipairs(selected) do
+        local full_path = picker:cwd() .. "/" .. selected_item.file
+        if i == 1 then
+          -- First file: open in horizontal split
+          vim.cmd("split " .. vim.fn.fnameescape(full_path))
+        else
+          -- Additional files: open in vertical splits
+          vim.cmd("vsplit " .. vim.fn.fnameescape(full_path))
+        end
+        vim.cmd("set ft=log")
+        vim.cmd("normal! G")
+      end
     end,
   }))
 end
