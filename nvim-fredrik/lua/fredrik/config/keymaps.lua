@@ -564,11 +564,11 @@ function M.setup_snacks_keymaps()
       desc = "[s]earch workspace [D]iagnostics",
     },
     {
-      "<leader>sl",
+      "<leader>sL",
       function()
         Snacks.picker.lazy()
       end,
-      desc = "[s]earch [l]azy plugins",
+      desc = "[s]earch [L]azy plugins",
     },
     {
       "<leader>st",
@@ -622,6 +622,13 @@ function M.setup_snacks_keymaps()
         require("fredrik.utils.snacks_pickers").pull_requests()
       end,
       desc = "[s]earch [P]ull Requests",
+    },
+    {
+      "<leader>sl",
+      function()
+        require("fredrik.utils.snacks_pickers").neovim_logs()
+      end,
+      desc = "[s]earch [l]ogs",
     },
   }
 end
@@ -1038,6 +1045,7 @@ end
 function M.setup_grug_far_keymaps()
   return {
     { "<leader>sr", ":GrugFar<cr>", desc = "[s]earch and [r]eplace (grug-far)" },
+    { "<leader>sr", ":GrugFarWithin<cr>", desc = "[s]earch and [r]eplace in selection (grug-far)", mode = "v" },
   }
 end
 

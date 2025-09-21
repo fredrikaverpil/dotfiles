@@ -80,4 +80,28 @@ function M.pull_requests(opts)
   } --[[@as snacks.picker.Config]]))
 end
 
+---@param opts? snacks.picker.Config
+function M.neovim_logs(opts)
+  local log_dir = vim.fn.stdpath("log")
+
+  -- Check if log directory exists
+  if vim.fn.isdirectory(log_dir) == 0 then
+    vim.notify("Neovim log directory not found at: " .. log_dir, vim.log.levels.WARN)
+    return
+  end
+
+  -- Open picker for log files
+  return Snacks.picker.files(vim.tbl_deep_extend("keep", opts or {}, {
+    title = "Neovim Log Files",
+    cwd = log_dir,
+    confirm = function(picker, item)
+      picker:close()
+      local full_path = picker:cwd() .. "/" .. item.file
+      vim.cmd("split " .. vim.fn.fnameescape(full_path))
+      vim.cmd("set ft=log")
+      vim.cmd("normal! G")
+    end,
+  }))
+end
+
 return M
