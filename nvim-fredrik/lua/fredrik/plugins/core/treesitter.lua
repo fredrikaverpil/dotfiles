@@ -1,4 +1,4 @@
-local branch = "master"
+local branch = "main"
 
 --- Register parsers from opts.ensure_installed
 local function register(ensure_installed)
