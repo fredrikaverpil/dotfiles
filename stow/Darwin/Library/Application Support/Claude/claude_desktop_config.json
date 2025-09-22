@@ -56,14 +56,14 @@
     "github": {
       "command": "docker",
       "env": {
-        "GITHUB_MCP_SERVER_TOKEN": null
+        "GITHUB_PERSONAL_ACCESS_TOKEN": null
       },
       "args": [
         "run",
         "-i",
         "--rm",
         "-e",
-        "GITHUB_MCP_SERVER_TOKEN",
+        "GITHUB_PERSONAL_ACCESS_TOKEN",
         "ghcr.io/github/github-mcp-server"
       ],
       "disabled": true
