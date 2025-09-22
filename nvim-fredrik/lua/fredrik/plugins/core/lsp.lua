@@ -1,3 +1,5 @@
+local version = require("fredrik.utils.version")
+
 -- Extend LSP capabilities and set up LSP servers.
 --
 -- LSP servers and clients (like Neovim) are able to communicate to each other what
@@ -118,9 +120,11 @@ local function register_lspattach_autocmd()
           require("fredrik.config.options").lsp_foldexpr()
         end
 
-        -- setup inline completion
-        if client:supports_method("textDocument/inlineCompletion", args.buf) then
-          vim.lsp.inline_completion.enable(true)
+        -- setup inline completion (only neovim 0.12+)
+        if version.is_neovim_0_12_0() and vim.lsp.inline_completion then
+          if client:supports_method("textDocument/inlineCompletion", args.buf) then
+            vim.lsp.inline_completion.enable(true)
+          end
         end
       end
 
