@@ -89,9 +89,7 @@
         "serena",
         "start-mcp-server",
         "--context",
-        "ide-assistant",
-        "--project",
-        "/Users/fredrik/code/work/private/core-platform-service"
+        "ide-assistant"
       ],
       "environment": {}
     },
