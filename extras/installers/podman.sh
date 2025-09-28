@@ -29,6 +29,13 @@ function setup_podman() {
 	touch ~/.testcontainers.properties
 	# ryuk.container.privileged = true
 	echo "ryuk.container.privileged = true" >~/.testcontainers.properties
+
+	# if podman-mac-helper is not on $PATH, set environment variables for testcontainers and docker compatibility
+	if ! command -v podman-mac-helper >/dev/null 2>&1; then
+		export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/run/user/$(id -u)/podman/podman.sock
+		export DOCKER_HOST=unix:///run/user/$(id -u)/podman/podman.sock
+	fi
+
 }
 
 function reset_podman() {
