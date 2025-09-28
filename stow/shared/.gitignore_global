@@ -13,6 +13,7 @@ Thumbs.db
 .lazy.lua
 .opencode/
 .claude
+.serena
 
 # Environments
 .pkgx.yml
