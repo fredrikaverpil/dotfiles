@@ -1,13 +1,13 @@
 local function set_dark()
-  -- vim.o.background = "light" -- NOTE: tokyonight-moon uses light background
-  -- vim.cmd.colorscheme("tokyonight-moon")
+  vim.o.background = "light" -- NOTE: tokyonight-moon uses light background
+  vim.cmd.colorscheme("tokyonight-moon")
 
   -- vim.o.background = "dark"
   -- vim.cmd.colorscheme("rose-pine")
 
-  vim.o.background = "dark"
-  vim.g.everforest_background = "hard"
-  vim.cmd.colorscheme("everforest")
+  -- vim.o.background = "dark"
+  -- vim.g.everforest_background = "hard"
+  -- vim.cmd.colorscheme("everforest")
 end
 
 local function set_light()
