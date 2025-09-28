@@ -49,11 +49,16 @@
   },
   "mcp": {
     "tavily": {
-      "url": "https://mcp.tavily.com/mcp/?tavilyApiKey={env:TAVILY_API_KEY}",
+      "command": ["npx", "-y", "tavily-mcp"],
       "enabled": true,
-      "type": "remote"
+      "type": "local",
+      "environment": {
+        "TAVILY_API_KEY": "{env:TAVILY_API_KEY}"
+      }
     },
     "serena": {
+      "enabled": true,
+      "type": "local",
       "command": [
         "uvx",
         "--from",
@@ -63,10 +68,11 @@
         "--context",
         "ide-assistant"
       ],
-      "environment": {},
-      "type": "local"
+      "environment": {}
     },
     "github": {
+      "enabled": true,
+      "type": "local",
       // token config: https://github.com/github/github-mcp-server#token-security-best-practices
       "command": [
         "docker",
@@ -77,20 +83,22 @@
         "GITHUB_PERSONAL_ACCESS_TOKEN",
         "ghcr.io/github/github-mcp-server"
       ],
-      "enabled": true,
       "environment": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "{env:GITHUB_MCP_SERVER_TOKEN}"
-      },
-      "type": "local"
+      }
     },
     "context7": {
-      "type": "remote",
-      "url": "https://mcp.context7.com/mcp",
-      "headers": {
-        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
-      },
-      "enabled": false
+      "enabled": true,
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@upstash/context7-mcp",
+        "--api-key",
+        "{env:CONTEXT7_API_KEY}"
+      ]
     }
+
     // "mcp-atlassian": {
     //   "type": "local",
     //   "command": [
