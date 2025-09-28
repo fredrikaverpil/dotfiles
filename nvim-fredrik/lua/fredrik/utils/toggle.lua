@@ -1,4 +1,4 @@
-M = {}
+local M = {}
 
 local orig_fmt_func = vim.lsp.handlers["textDocument/formatting"]
 local foldmethod = nil
@@ -35,3 +35,5 @@ function M.toggle_manual_folding()
     vim.notify("Foldmethod set to manual", vim.log.levels.INFO)
   end
 end
+
+return M
