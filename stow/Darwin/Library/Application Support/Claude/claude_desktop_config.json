@@ -26,14 +26,6 @@
         "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_MCP_SERVER_TOKEN}"
       }
     },
-    "context7": {
-      "disabled": false,
-      "type": "http",
-      "url": "https://mcp.context7.com/mcp",
-      "headers": {
-        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
-      }
-    },
     "serena": {
       "disabled": false,
       "type": "stdio",
@@ -47,6 +39,14 @@
         "ide-assistant"
       ],
       "env": {}
+    },
+    "context7": {
+      "disabled": false,
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
+      }
     },
     "my-mcp-tools": {
       "disabled": true,
