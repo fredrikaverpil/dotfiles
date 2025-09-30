@@ -119,13 +119,6 @@ Darwin)
 
 	add_to_path append "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
 
-	if command -v podman >/dev/null 2>&1 && ! command -v podman-mac-helper >/dev/null 2>&1; then
-		# Configure Docker compatibility layer for podman when podman-mac-helper is not available
-		export DOCKER_HOST=unix:///run/user/$(id -u)/podman/podman.sock
-	elif command -v colima &>/dev/null; then
-		export DOCKER_HOST="unix://$HOME/.colima/docker.sock"
-	fi
-
 	# Configure testcontainers to use podman socket when testcontainers is used
 	if [ -f "$HOME/.testcontainers.properties" ]; then
 		# the .testcontainers.properties file usually contains: ryuk.container.privileged = true

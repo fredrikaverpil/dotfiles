@@ -4,11 +4,13 @@
   lib,
   inputs,
   ...
-}: let
+}:
+let
   stateVersions = {
     darwin = 6;
   };
-in {
+in
+{
   # Darwin state version 6 - defines system configuration schema/compatibility
   # See flake.nix for actual package channel selection (stable vs unstable)
   # Reference: https://github.com/LnL7/nix-darwin/blob/master/modules/system/default.nix
@@ -33,11 +35,16 @@ in {
   ];
 
   host.extraBrews = [
+    # podman added here as it also adds podman-mac-helper (not installed if installed via nix)
+    "podman"
+    "podman-compose"
     "vfkit" # for podman
+
   ];
 
   host.extraCasks = [
     "cursor"
+    "podman-desktop"
 
     # NOTE: if cursor-cli errors on macOS quarantine error and "ERR_DLOPEN_FAILED" for node_sqlite3.node:
     # 1) Locate the latest installed cask dir

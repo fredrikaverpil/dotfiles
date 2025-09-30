@@ -16,8 +16,6 @@ in
   home.stateVersion = "25.05";
 
   home.packages = with pkgs; [
-    unstable.podman
-    unstable.podman-compose
     unstable.jira-cli-go
   ];
 
