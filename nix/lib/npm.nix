@@ -51,7 +51,7 @@ in
           if ! $DRY_RUN_CMD npm install -g "$tool" >/dev/null 2>&1; then
             echo "Warning: Failed to install/update $tool"
           else
-            echo "Skipping $tool (up to date)..."
+            echo "$tool ready"
           fi
         fi
       done
