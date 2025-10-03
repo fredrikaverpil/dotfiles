@@ -1,4 +1,5 @@
 {
+  "env": {},
   "permissions": {
     "allow": [],
     "deny": [
@@ -8,5 +9,5 @@
       "Read(./secrets/**)"
     ]
   },
-  "env": {}
+  "alwaysThinkingEnabled": false
 }
