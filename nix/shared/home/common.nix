@@ -160,9 +160,10 @@ in
     };
 
     npmTools = [
-      "opencode-ai@latest"
       "@anthropic-ai/claude-code@latest"
-      # "@google/gemini-cli@latest"
+      "@github/copilot"
+      "@google/gemini-cli@latest"
+      "opencode-ai@latest"
     ];
 
   };
