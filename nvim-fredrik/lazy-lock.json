@@ -13,6 +13,7 @@
   "cmp-go-deep": { "branch": "master", "commit": "36657293af1c408aa094e424369e8b0104e0898e" },
   "code_runner.nvim": { "branch": "main", "commit": "a0aa4325ea2958ba21d77d181a838e74be6267cd" },
   "conform.nvim": { "branch": "master", "commit": "b4aab989db276993ea5dcb78872be494ce546521" },
+  "copilot-lsp": { "branch": "main", "commit": "a80e0c17e7366614d39506825f49a25d285fead9" },
   "copilot.lua": { "branch": "master", "commit": "5a8fdd34bb67eadc3f69e46870db0bed0cc9841c" },
   "csvview.nvim": { "branch": "main", "commit": "bbab4c2f808fd8e11ec8dfdd128251aadba566a1" },
   "diffview.nvim": { "branch": "main", "commit": "4516612fe98ff56ae0415a259ff6361a89419b0a" },
