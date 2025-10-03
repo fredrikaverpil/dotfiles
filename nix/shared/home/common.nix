@@ -86,7 +86,6 @@ in
       # Development & Language Toolchains
       # ========================================================================
       # Language-specific
-      luarocks
       uv
 
       # Generic development
@@ -147,6 +146,7 @@ in
         cmake
         gcc
         go_1_25
+        (luarocks.override { lua = lua5_1; }) # Neovim requires Lua 5.1
         nixfmt-rfc-style # cannot be installed via Mason on macOS, so installed here instead
         nodejs # required by github copilot
         npm-check-updates
