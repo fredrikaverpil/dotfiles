@@ -35,6 +35,8 @@ local function extend_capabilities(servers)
   end
 end
 
+local exempt_servers = { "copilot_ls" }
+
 --- Ensure LSP binaries are installed with mason-lspconfig.
 ---@param servers table<string, vim.lsp.Config>
 local function ensure_servers_installed(servers)
@@ -51,7 +53,9 @@ local function ensure_servers_installed(servers)
         elseif server_opts.mason == false then
           vim.notify("Skipping LSP server installation: " .. server, vim.log.levels.WARN)
         else
-          vim.notify("LSP server not supported by mason-lspconfig: " .. server, vim.log.levels.WARN)
+          if not vim.tbl_contains(exempt_servers, server) then
+            vim.notify("LSP server not supported by mason-lspconfig: " .. server, vim.log.levels.WARN)
+          end
         end
       end
     end
@@ -74,7 +78,7 @@ local function register_lsp_servers(servers)
     if vim.lsp.config[server].cmd == nil then
       vim.notify("No cmd specified for LSP server: " .. server, vim.log.levels.ERROR)
     end
-    if vim.lsp.config[server].filetypes == nil then
+    if vim.lsp.config[server].filetypes == nil and not vim.tbl_contains(exempt_servers, server) then
       vim.notify("No filetypes specified for LSP server: " .. server, vim.log.levels.ERROR)
     end
     if not vim.lsp.config[server].root_dir and not vim.lsp.config[server].root_markers then
