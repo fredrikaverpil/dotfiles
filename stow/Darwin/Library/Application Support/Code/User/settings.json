@@ -388,10 +388,13 @@
     // "formatting.goimports": true,
     "ui.diagnostic.staticcheck": true
   },
-  "chat.mcp.enabled": true,
   "mcp": {
     // see mcpservers.json (Claude, Cursor)
     "inputs": [],
     "servers": {}
+  },
+  "chat.mcp.access": "all",
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
   }
 }
