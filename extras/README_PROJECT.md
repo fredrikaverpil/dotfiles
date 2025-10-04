@@ -305,3 +305,32 @@ export PGFLAGS="?sslmode=disable"
 
 export PGCONN="$PGDRIVER$DB_USER:$DB_USER@$PGHOST:$PGPORT/$GCE_DATABASE_NAME$PGFLAGS"
 ```
+
+## LLM setup
+
+### Claude Code
+
+- MCPs are defined in the `claude_desktop_config.json`
+- [Claude code docs](https://docs.claude.com/en/docs/claude-code)
+
+```sh
+# import mcp servers from claude desktop, into ~/.claude.json
+claude mcp add-from-claude-desktop --scope user
+```
+
+Manual installations to `~/.claude.json`:
+
+```json
+{
+  "mcpServers": {
+    "githubremote": {
+      "disabled": false,
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${GITHUB_MCP_SERVER_TOKEN}"
+      }
+    }
+  }
+}
+```
