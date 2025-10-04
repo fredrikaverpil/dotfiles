@@ -84,7 +84,7 @@
       }
     },
     "serena": {
-      "enabled": true,
+      "enabled": false, // Invalid 'tools': array too long. Expected an array with maximum length 128, but got an array with length 142 instead.
       "type": "local",
       "command": [
         "uvx",
@@ -97,8 +97,8 @@
       ],
       "environment": {}
     },
-    "github": {
-      "enabled": true,
+    "githublocal": {
+      "enabled": false,
       "type": "local",
       // token config: https://github.com/github/github-mcp-server#token-security-best-practices
       "command": [
@@ -112,6 +112,15 @@
       ],
       "environment": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "{env:GITHUB_MCP_SERVER_TOKEN}"
+      }
+    },
+    "githubremote": {
+      "enabled": true,
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp",
+      "headers": {
+        // token config: https://github.com/github/github-mcp-server#token-security-best-practices
+        "Authorization": "Bearer {env:GITHUB_MCP_SERVER_TOKEN}"
       }
     },
     "context7": {
