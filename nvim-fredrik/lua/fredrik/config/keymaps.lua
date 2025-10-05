@@ -126,6 +126,13 @@ vim.keymap.set(
   { desc = "Toggle manual folding", silent = true }
 )
 
+vim.keymap.set(
+  "n",
+  "<leader>us",
+  require("fredrik.utils.shada").remove_shada_files,
+  { desc = "Remove shada files", silent = true }
+)
+
 function M.setup_trouble_keymaps()
   return {
     {
