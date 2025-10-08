@@ -8,7 +8,7 @@ return {
     dependencies = {
       {
         "copilotlsp-nvim/copilot-lsp",
-        enabled = true,
+        enabled = require("fredrik.utils.private").is_code_public(),
         dependencies = {
           {
             "virtual-lsp-config",
