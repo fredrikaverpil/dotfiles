@@ -16,6 +16,9 @@
       }
     },
     "google-vertex-anthropic": {
+      "models": {
+        "claude-sonnet-4-5@20250929": {}
+      },
       "options": {
         "project": "{env:GOOGLE_CLOUD_PROJECT}",
         "location": "{env:GOOGLE_CLOUD_LOCATION}"
@@ -111,6 +114,48 @@
         "--api-key",
         "{env:CONTEXT7_API_KEY}"
       ]
+    },
+    "roadie-api-docs": {
+      "type": "remote",
+      "url": "https://api.roadie.so/api/mcp/v1/api-docs-query",
+      "headers": {
+        "Authorization": "Bearer {env:ROADIE_API_TOKEN}"
+      }
+    },
+    "roadie-backend-config": {
+      "type": "remote",
+      "url": "https://api.roadie.so/api/mcp/v1/backend-config",
+      "headers": {
+        "Authorization": "Bearer {env:ROADIE_API_TOKEN}"
+      }
+    },
+    "roadie-catalog-decorators": {
+      "type": "remote",
+      "url": "https://api.roadie.so/api/mcp/v1/catalog-decorators",
+      "headers": {
+        "Authorization": "Bearer {env:ROADIE_API_TOKEN}"
+      }
+    },
+    "roadie-scaffolder": {
+      "type": "remote",
+      "url": "https://api.roadie.so/api/mcp/v1/scaffolder-use",
+      "headers": {
+        "Authorization": "Bearer {env:ROADIE_API_TOKEN}"
+      }
+    },
+    "roadie-catalog": {
+      "type": "remote",
+      "url": "https://api.roadie.so/api/mcp/v1/rich-catalog-entity",
+      "headers": {
+        "Authorization": "Bearer {env:ROADIE_API_TOKEN}"
+      }
+    },
+    "roadie-insights": {
+      "type": "remote",
+      "url": "https://api.roadie.so/api/mcp/v1/tech-insights-facts",
+      "headers": {
+        "Authorization": "Bearer {env:ROADIE_API_TOKEN}"
+      }
     }
 
     // "mcp-atlassian": {
