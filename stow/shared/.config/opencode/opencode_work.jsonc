@@ -8,9 +8,14 @@
     "google-vertex": {
       "models": {
         "gemini-2.5-flash": {},
-        "gemini-2.5-pro": {},
-        "claude-sonnet-4@20250514": {}
+        "gemini-2.5-pro": {}
       },
+      "options": {
+        "project": "{env:GOOGLE_CLOUD_PROJECT}",
+        "location": "{env:GOOGLE_CLOUD_LOCATION}"
+      }
+    },
+    "google-vertex-anthropic": {
       "options": {
         "project": "{env:GOOGLE_CLOUD_PROJECT}",
         "location": "{env:GOOGLE_CLOUD_LOCATION}"
