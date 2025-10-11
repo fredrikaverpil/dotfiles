@@ -34,7 +34,15 @@ return {
           -- lsp: https://github.com/ribru17/ts_query_ls
           cmd = { "ts_query_ls" },
           filetypes = { "query" },
-          root_markers = { "queries", ".git" },
+          root_markers = { ".tsqueryrc.json", ".git" },
+          init_options = {
+            parser_install_directories = {
+              vim.fn.stdpath("data") .. "/site/parser",
+              -- vim.fn.stdpath("data") .. "/lazy/nvim-treesitter/parser/",
+            },
+            parser_aliases = {},
+            language_retrieval_patterns = {},
+          },
           settings = {},
         },
       },

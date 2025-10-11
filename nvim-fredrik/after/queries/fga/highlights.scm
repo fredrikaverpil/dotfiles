@@ -45,8 +45,7 @@
   "from"
 ] @keyword
 
-[
-  "condition"
-] @keyword.function
+"condition" @keyword.function
 
 (comment) @comment
+
