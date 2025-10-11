@@ -97,6 +97,11 @@ return {
     opts = {
       servers = {
         ---@type vim.lsp.Config
+        stylua = {
+          enabled = false, -- handled by conform.nvim
+        },
+
+        ---@type vim.lsp.Config
         lua_ls = {
           -- lsp: https://github.com/luals/lua-language-server
           -- reference: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/lua_ls.lua
@@ -139,7 +144,7 @@ return {
                 arrayIndex = "Disable",
               },
               format = {
-                enable = false, -- disable lua_ls built-in formatting (it tries to use stylua --lsp)
+                enable = false, -- use stylua instead
               },
             },
           },

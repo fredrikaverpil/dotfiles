@@ -47,7 +47,7 @@ local function ensure_servers_installed(servers)
     supported_servers = vim.tbl_keys(mappings.lspconfig_to_package)
     local enabled_servers = {}
     for server, server_opts in pairs(servers) do
-      if server_opts then
+      if server_opts and not server_opts.enabled == false then
         if server_opts.mason ~= false and vim.tbl_contains(supported_servers, server) then
           table.insert(enabled_servers, server)
         elseif server_opts.mason == false then
@@ -71,24 +71,28 @@ end
 ---@param servers table<string, vim.lsp.Config>
 local function register_lsp_servers(servers)
   for server, server_opts in pairs(servers) do
-    -- vim.lsp.config[server] = server_opts -- just write options without extending
-    vim.lsp.config(server, server_opts) -- extends from lsp.config
-    vim.lsp.enable(server, true)
+    if server_opts.enabled == false then
+      vim.lsp.enable(server, false)
+    else
+      -- vim.lsp.config[server] = server_opts -- just write options without extending
+      vim.lsp.config(server, server_opts) -- extends from lsp.config
+      vim.lsp.enable(server, true)
 
-    if vim.lsp.config[server].cmd == nil then
-      vim.notify("No cmd specified for LSP server: " .. server, vim.log.levels.ERROR)
-    end
-    if vim.lsp.config[server].filetypes == nil and not vim.tbl_contains(exempt_servers, server) then
-      vim.notify("No filetypes specified for LSP server: " .. server, vim.log.levels.ERROR)
-    end
-    if not vim.lsp.config[server].root_dir and not vim.lsp.config[server].root_markers then
-      vim.notify("No root_dir or root_markers specified for LSP server: " .. server, vim.log.levels.ERROR)
-    end
-    if vim.lsp.config[server].root_dir and vim.lsp.config[server].root_markers then
-      vim.notify(
-        "Both root_dir and root_markers specified for LSP server (root_dir will be used): " .. server,
-        vim.log.levels.ERROR
-      )
+      if vim.lsp.config[server].cmd == nil then
+        vim.notify("No cmd specified for LSP server: " .. server, vim.log.levels.ERROR)
+      end
+      if vim.lsp.config[server].filetypes == nil and not vim.tbl_contains(exempt_servers, server) then
+        vim.notify("No filetypes specified for LSP server: " .. server, vim.log.levels.ERROR)
+      end
+      if not vim.lsp.config[server].root_dir and not vim.lsp.config[server].root_markers then
+        vim.notify("No root_dir or root_markers specified for LSP server: " .. server, vim.log.levels.ERROR)
+      end
+      if vim.lsp.config[server].root_dir and vim.lsp.config[server].root_markers then
+        vim.notify(
+          "Both root_dir and root_markers specified for LSP server (root_dir will be used): " .. server,
+          vim.log.levels.ERROR
+        )
+      end
     end
   end
 end
@@ -147,7 +151,7 @@ return {
       {
         -- provides LSP server configurations to vim.lsp.config.
         "neovim/nvim-lspconfig",
-        enabled = false, -- for debugging
+        enabled = true, -- for debugging
       },
       {
         "b0o/SchemaStore.nvim",
