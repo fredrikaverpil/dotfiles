@@ -73,6 +73,7 @@ return {
     },
     opts_extend = {
       "sources.default",
+      "keymap.<Tab>", -- sidekick.nvim
     },
     config = function(_, opts)
       require("blink.cmp").setup(opts)

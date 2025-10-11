@@ -1290,25 +1290,88 @@ function M.setup_venv_selector_keymaps()
   }
 end
 
-function M.setup_claudecode_keymaps()
+function M.setup_sidekick_keymaps()
   return {
+    {
+      "<tab>",
+      function()
+        -- if there is a next edit, jump to it, otherwise apply it if any
+        if not require("sidekick").nes_jump_or_apply() then
+          return "<Tab>" -- fallback to normal tab
+        end
+      end,
+      expr = true,
+      desc = "Goto/Apply Next Edit Suggestion",
+    },
+    {
+      "<c-.>",
+      function()
+        require("sidekick.cli").toggle()
+      end,
+      desc = "Sidekick Toggle",
+      mode = { "n", "t", "i", "x" },
+    },
+    {
+      "<leader>aa",
+      function()
+        require("sidekick.cli").toggle()
+      end,
+      desc = "Sidekick Toggle CLI",
+    },
+    {
+      "<leader>as",
+      function()
+        require("sidekick.cli").select()
+      end,
+      -- Or to select only installed tools:
+      -- require("sidekick.cli").select({ filter = { installed = true } })
+      desc = "Select CLI",
+    },
+    {
+      "<leader>ad",
+      function()
+        require("sidekick.cli").close()
+      end,
+      desc = "Detach a CLI Session",
+    },
+    {
+      "<leader>at",
+      function()
+        require("sidekick.cli").send({ msg = "{this}" })
+      end,
+      mode = { "x", "n" },
+      desc = "Send This",
+    },
+    {
+      "<leader>af",
+      function()
+        require("sidekick.cli").send({ msg = "{file}" })
+      end,
+      desc = "Send File",
+    },
+    {
+      "<leader>av",
+      function()
+        require("sidekick.cli").send({ msg = "{selection}" })
+      end,
+      mode = { "x" },
+      desc = "Send Visual Selection",
+    },
+    {
+      "<leader>ap",
+      function()
+        require("sidekick.cli").prompt()
+      end,
+      mode = { "n", "x" },
+      desc = "Sidekick Select Prompt",
+    },
+    -- Example of a keybinding to open Claude directly
     {
       "<leader>ac",
-      "<cmd>ClaudeCode<CR>",
-      desc = "Claude Code",
-    },
-  }
-end
-
-function M.setup_copilot_chat_keymaps()
-  return {
-    {
-      "<leader>aC",
       function()
-        local chat = require("CopilotChat")
-        chat.toggle()
+        require("sidekick.cli").toggle({ name = "claude", focus = true })
       end,
-      desc = "Copilot Chat",
+      desc = "Sidekick Toggle Claude",
     },
   }
 end
@@ -1321,9 +1384,7 @@ function M.setup_copilot_lsp_keymaps()
       -- Try to jump to the start of the suggestion edit.
       -- If already at the start, then apply the pending suggestion and jump to the end of the edit.
       local _ = require("copilot-lsp.nes").walk_cursor_start_edit()
-        or (
-          require("copilot-lsp.nes").apply_pending_nes() and require("copilot-lsp.nes").walk_cursor_end_edit()
-        )
+        or (require("copilot-lsp.nes").apply_pending_nes() and require("copilot-lsp.nes").walk_cursor_end_edit())
       return nil
     else
       -- Resolving the terminal's inability to distinguish between `TAB` and `<C-i>` in normal mode
@@ -1341,26 +1402,6 @@ end
 function M.setup_copilot_keymaps()
   return {
     { "<leader>ap", ":Copilot panel<CR>", desc = "Copilot panel" },
-  }
-end
-
-function M.setup_opencode_keymaps()
-  return {
-    {
-      "<leader>ao",
-      function()
-        require("opencode").toggle()
-      end,
-      desc = "Opencode",
-    },
-    {
-      "<leader>ao",
-      function()
-        require("opencode").ask("@selection: ")
-      end,
-      desc = "Opencode: ask about selection",
-      mode = "v",
-    },
   }
 end
 
