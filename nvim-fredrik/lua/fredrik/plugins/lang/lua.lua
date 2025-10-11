@@ -138,6 +138,9 @@ return {
                 semicolon = "Disable",
                 arrayIndex = "Disable",
               },
+              format = {
+                enable = false, -- disable lua_ls built-in formatting (it tries to use stylua --lsp)
+              },
             },
           },
         },
