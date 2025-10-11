@@ -87,7 +87,7 @@ return {
     cmd = "Copilot",
     build = ":Copilot auth",
     opts = {
-      copilot_model = "gpt-4o-copilot",
+      -- copilot_model = "gpt-4o-copilot",
       panel = {
         enabled = true,
         auto_refresh = true,
