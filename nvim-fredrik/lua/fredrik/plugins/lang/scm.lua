@@ -32,18 +32,24 @@ return {
         ---@type vim.lsp.Config
         ts_query_ls = {
           -- lsp: https://github.com/ribru17/ts_query_ls
+          -- https://github.com/neovim/nvim-lspconfig/blob/master/lsp/ts_query_ls.lua
+
           cmd = { "ts_query_ls" },
           filetypes = { "query" },
           root_markers = { ".tsqueryrc.json", ".git" },
           init_options = {
+            parser_aliases = {
+              ecma = "javascript",
+              jsx = "javascript",
+              php_only = "php",
+            },
             parser_install_directories = {
               vim.fn.stdpath("data") .. "/site/parser",
-              -- vim.fn.stdpath("data") .. "/lazy/nvim-treesitter/parser/",
             },
-            parser_aliases = {},
-            language_retrieval_patterns = {},
           },
-          settings = {},
+          on_attach = function(_, buf)
+            vim.bo[buf].omnifunc = "v:lua.vim.lsp.omnifunc"
+          end,
         },
       },
     },
