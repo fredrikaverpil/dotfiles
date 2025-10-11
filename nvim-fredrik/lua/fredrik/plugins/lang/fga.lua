@@ -9,62 +9,42 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
---- Returns the path to the VSCode extension server for FGA.
---- NOTE: to make it available;
---- 1. git clone https://github.com/openfga/vscode-ext fga-vscode-ext
---- 2. npm install
---- 3. npm run compile
-local function vscode_ext_path()
-  local path = vim.fn.expand("~/code/public/fga-vscode-ext/server/out/server.node.js")
-  if not vim.fn.filereadable(path) then
-    vim.notify("FGA VSCode extension server not found at " .. path, vim.log.levels.WARN)
-  end
-  return path
-end
+-- Register FGA filetype
+vim.filetype.add({
+  extension = {
+    fga = "fga",
+  },
+})
+
+-- Configure the custom FGA parser
+-- Must register BOTH in User TSUpdate (for installation) AND immediately (for buffer opening)
+local parser_config = {
+  ---@type InstallInfo
+  install_info = {
+    url = "https://github.com/matoous/tree-sitter-fga",
+    branch = "main", -- will use latest commit from main branch
+    generate = false, -- only needed if repo does not contain pre-generated `src/parser.c`
+    queries = "queries", -- also install queries from given directory
+  },
+}
+
+-- Register immediately so it's available when buffers open
+require("nvim-treesitter.parsers").fga = parser_config
+
+-- Also register on TSUpdate for installation; required for auto-install
+vim.api.nvim_create_autocmd("User", {
+  pattern = "TSUpdate",
+  callback = function()
+    require("nvim-treesitter.parsers").fga = parser_config
+  end,
+})
 
 return {
   {
     "nvim-treesitter/nvim-treesitter",
-    init = function()
-      -- Configure the custom FGA parser before treesitter loads
-      local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
-      if not parser_config.fga then
-        parser_config.fga = {
-          install_info = {
-            url = "https://github.com/matoous/tree-sitter-fga",
-            files = { "src/parser.c" },
-            branch = "main",
-            generate_requires_npm = false,
-            requires_generate_from_grammar = false,
-          },
-          filetype = "fga",
-        }
-      end
+    opts = function(_, opts)
+      opts.ensure_installed = opts.ensure_installed or {}
+      opts.ensure_installed.fga = "fga"
     end,
-    opts = {
-      ensure_installed = {
-        fga = "fga",
-      },
-    },
-    opts_extend = {
-      "ensure_installed",
-    },
-  },
-
-  {
-    "virtual-lsp-config",
-    dependencies = {},
-    opts = {
-      servers = {
-        fga = {
-          mason = false, -- do not attempt LSP installation via mason
-          cmd = { "node", vscode_ext_path(), "--stdio" },
-          filetypes = { "fga" },
-          root_markers = { ".git" },
-          settings = {
-          },
-        },
-      },
-    },
   },
 }
