@@ -201,8 +201,7 @@ return {
           -- https://github.com/golang/tools/blob/master/gopls/README.md
           cmd = { "gopls" },
           filetypes = { "go", "gomod", "gowork", "gosum" },
-          root_markers = { "go.work", "go.mod", ".git" },
-          Workspace_required = true, -- disables single-file support
+          -- root_markers = { "go.work", "go.mod", ".git" }, -- disabled when using lspconfig
           settings = {
             gopls = {
               buildFlags = { tags },

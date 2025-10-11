@@ -41,6 +41,7 @@ return {
       {
         "yioneko/nvim-vtsls",
         lazy = true,
+        enabled = false, -- messes with root_dir in lsp config
         opts = {},
         config = function(_, opts)
           require("vtsls").config(opts)
@@ -62,7 +63,7 @@ return {
             "typescriptreact",
             "typescript.tsx",
           },
-          root_markers = { "tsconfig.json", "package.json", "jsconfig.json", ".git" },
+          -- root_markers = { "tsconfig.json", "package.json", "jsconfig.json", ".git" },
           init_options = {
             hostInfo = "neovim",
           },
@@ -127,6 +128,5 @@ return {
     "folke/ts-comments.nvim",
     opts = {},
     event = "VeryLazy",
-    enabled = vim.fn.has("nvim-0.10.0") == 1,
   },
 }
