@@ -21,7 +21,9 @@ return {
           ["<Tab>"] = {
             "snippet_forward",
             function()
-              return require("sidekick").nes_jump_or_apply()
+              if require("fredrik.utils.private").is_code_public() then
+                return require("sidekick").nes_jump_or_apply()
+              end
             end,
             "select_next",
             "fallback",
