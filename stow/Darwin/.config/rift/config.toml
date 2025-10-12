@@ -156,7 +156,7 @@ drag_swap_fraction = 0.3
 # - auto_assign_windows: when true, new windows can be auto-assigned using app_rules
 # - preserve_focus_per_workspace: remember last focused window per workspace
 enabled = true
-default_workspace_count = 4
+default_workspace_count = 11
 auto_assign_windows = true
 preserve_focus_per_workspace = true
 
@@ -168,7 +168,19 @@ preserve_focus_per_workspace = true
 # Workspace names (indexed order). If fewer than default_workspace_count are provided,
 # remaining workspaces are named "Workspace X".
 # Do not provide more names than default_workspace_count.
-workspace_names = ["first"]
+workspace_names = [
+	"Terminal",   # 0 (Alt+T)
+	"Editor",     # 1 (Alt+E)
+	"Browser",    # 2 (Alt+B)
+	"Slack",      # 3 (Alt+S)
+	"Music",      # 4 (Alt+M)
+	"Calendar",   # 5 (Alt+C)
+	"Docker",     # 6 (Alt+D)
+	"Obsidian",   # 7 (Alt+O)
+	"Apps",       # 8 (Alt+A)
+	"Photos",     # 9 (Alt+X)
+	"Pixelmator", # 10 (Alt+P)
+]
 
 # App rules (automatic assignment)
 # Define rules that match new windows and set properties (workspace, floating, etc).
@@ -232,7 +244,53 @@ workspace_names = ["first"]
 #       ]
 #
 # By default there are no app rules; add or uncomment rules below as needed.
-app_rules = []
+app_rules = [
+	# Terminals -> workspace Terminal (0)
+	{ app_id = "com.mitchellh.ghostty", workspace = "Terminal", floating = true },
+	{ app_id = "net.kovidgoyal.kitty", workspace = "Terminal" },
+	{ app_id = "com.github.wez.wezterm", workspace = "Terminal" },
+
+	# Editors -> workspace Editor (1)
+	{ app_id = "com.microsoft.VSCode", workspace = "Editor" },
+	{ app_id = "com.todesktop.230313mzl4w4u92", workspace = "Editor" }, # Cursor
+
+	# Browsers -> workspace Browser (2)
+	{ app_id = "app.zen-browser.zen", workspace = "Browser" },
+	{ app_id = "company.thebrowser.Browser", workspace = "Browser" },
+
+	# Slack -> workspace Slack (4)
+	{ app_id = "com.tinyspeck.slackmacgap", workspace = "Slack" },
+
+	# Music -> workspace Music (5)
+	{ app_id = "com.spotify.client", workspace = "Music" },
+	{ app_id = "com.google.Chrome.app.cinhimbnkkaeohfgghhklpknlkffjgod", workspace = "Music" }, # YouTube Music
+
+	# Calendar/Reminders -> workspace Calendar (6)
+	{ app_id = "com.apple.iCal", workspace = "Calendar" },
+	{ app_id = "com.apple.reminders", workspace = "Calendar" },
+
+	# Docker -> workspace Docker (7)
+	{ app_id = "io.podmandesktop.PodmanDesktop", workspace = "Docker" },
+
+	# Obsidian -> workspace Obsidian (8)
+	{ app_id = "md.obsidian", workspace = "Obsidian" },
+
+	# Signal -> workspace Apps (9)
+	{ app_id = "org.whispersystems.signal-desktop", workspace = "Apps" },
+
+	# Photo apps -> workspace Photos (10)
+	{ app_id = "com.fujifilm.denji.X-RAW-STUDIO", workspace = "Photos" },
+
+	# Pixelmator -> workspace Pixelmator (11)
+	{ app_id = "com.pixelmatorteam.pixelmator.touch.x.photo", workspace = "Pixelmator" },
+
+	# Floating apps (utilities, dialogs, etc.)
+	{ app_id = "com.1password.1password", floating = true },
+	{ app_id = "com.apple.calculator", floating = true },
+	{ app_id = "com.apple.ActivityMonitor", floating = true },
+	{ app_id = "com.apple.systempreferences", floating = true },
+	{ app_id = "com.apple.SystemSettings", floating = true },    # macOS 13+
+]
 
 # Modifier combinations that can be reused in key bindings
 # Define common modifier combinations to avoid repetition.
@@ -286,6 +344,32 @@ comb1 = "Alt + Shift"
 "comb1 + 1" = { move_window_to_workspace = 1 }
 "comb1 + 2" = { move_window_to_workspace = 2 }
 "comb1 + 3" = { move_window_to_workspace = 3 }
+
+# Workspace switching by name
+"Alt + T" = { switch_to_workspace = "Terminal" }
+"Alt + E" = { switch_to_workspace = "Editor" }
+"Alt + B" = { switch_to_workspace = "Browser" }
+"Alt + S" = { switch_to_workspace = "Slack" }
+"Alt + M" = { switch_to_workspace = "Music" }
+"Alt + C" = { switch_to_workspace = "Calendar" }
+"Alt + D" = { switch_to_workspace = "Docker" }
+"Alt + O" = { switch_to_workspace = "Obsidian" }
+"Alt + A" = { switch_to_workspace = "Apps" }
+"Alt + X" = { switch_to_workspace = "Photos" }
+"Alt + P" = { switch_to_workspace = "Pixelmator" }
+
+# Move window to workspace
+"comb1 + T" = { move_window_to_workspace = "Terminal" }
+"comb1 + E" = { move_window_to_workspace = "Editor" }
+"comb1 + B" = { move_window_to_workspace = "Browser" }
+"comb1 + S" = { move_window_to_workspace = "Slack" }
+"comb1 + M" = { move_window_to_workspace = "Music" }
+"comb1 + C" = { move_window_to_workspace = "Calendar" }
+# "comb1 + D" = { move_window_to_workspace = "Docker" }  # May conflict with Dark Reader
+"comb1 + O" = { move_window_to_workspace = "Obsidian" }
+# "comb1 + A" = { move_window_to_workspace = "Apps" }  # May conflict with Dark Reader
+"comb1 + X" = { move_window_to_workspace = "Photos" }
+"comb1 + P" = { move_window_to_workspace = "Pixelmator" }
 
 "Alt + Tab" = "switch_to_last_workspace"
 
