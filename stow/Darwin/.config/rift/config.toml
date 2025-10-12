@@ -1,0 +1,312 @@
+# rift config
+# Copy this file to ~/.config/rift/config.toml or $HOME~/.config/rift/config.toml
+
+[settings]
+# Animations
+# - animate: master switch for all window animations
+# - animation_duration: seconds per animation (>= 0.0, typical 0.15–0.35)
+# - animation_fps: frames per second (> 0.0). 60–120 recommended.
+# - animation_easing: easing curve. One of:
+#   linear,
+#   ease_in_out,
+#   ease_in_sine, ease_out_sine, ease_in_out_sine,
+#   ease_in_quad, ease_out_quad, ease_in_out_quad,
+#   ease_in_cubic, ease_out_cubic, ease_in_out_cubic,
+#   ease_in_quart, ease_out_quart, ease_in_out_quart,
+#   ease_in_quint, ease_out_quint, ease_in_out_quint,
+#   ease_in_expo, ease_out_expo, ease_in_out_expo,
+#   ease_in_circ, ease_out_circ, ease_in_out_circ
+animate = true
+animation_duration = 0.3
+animation_fps = 100.0
+animation_easing = "ease_in_out_cubic"
+
+# Space activation behavior
+# - If true, spaces start inactive (rift does not manage windows there)
+#   and you must toggle activation via a keybind (toggle_space_activated).
+# - If false, spaces are managed by default and you can disable specific ones.
+# Default is true; uncomment to change.
+#default_disable = false
+
+# Mouse/Focus behavior
+# - focus_follows_mouse: moving the mouse into a window focuses it
+# - mouse_follows_focus: when focus changes, move the mouse to the focused window
+# - mouse_hides_on_focus: hide the mouse cursor after focusing a window
+focus_follows_mouse = true
+mouse_follows_focus = false
+mouse_hides_on_focus = true
+# focus_follows_mouse_disable_hotkey temporarily suspends focus-follows-mouse while held
+# e.g. "Fn"; omit or set to null to keep focus-follows-mouse always active
+#focus_follows_mouse_disable_hotkey = "Fn"
+
+# Prevent certain apps from stealing focus/causing workspace switches
+# Provide bundle identifiers (e.g., "com.apple.Spotlight")
+# Examples:
+#   "com.apple.dock", "com.apple.systemuiserver", "com.apple.SecurityAgent",
+#   "com.raycast.macos", "com.apple.Spotlight"
+auto_focus_blacklist = []
+
+# Run commands on start
+#
+# Tip: You can subscribe to rift events and trigger your own scripts. The command will
+# receive environment variables with context:
+#   RIFT_EVENT_TYPE            # "workspace_changed" | "windows_changed"
+#   RIFT_WORKSPACE_ID          # workspace id
+#   RIFT_WORKSPACE_NAME        # workspace name
+#   RIFT_WINDOW_COUNT          # number of windows (windows_changed only)
+#   RIFT_WINDOWS               # comma-separated window ids (windows_changed only)
+#   RIFT_EVENT_JSON            # full JSON payload of the event
+#
+# Example (sketchybar integration):
+# run_on_start = [
+#   "rift-cli subscribe cli --event workspace_changed --command sh --args -c --args 'sketchybar --trigger rift_workspace_changed RIFT_WORKSPACE_NAME=\"$RIFT_WORKSPACE_NAME\" RIFT_WORKSPACE_ID=\"$RIFT_WORKSPACE_ID\"'",
+#   "rift-cli subscribe cli --event windows_changed --command sh --args -c --args 'sketchybar --trigger rift_windows_changed RIFT_WORKSPACE_NAME=\"$RIFT_WORKSPACE_NAME\" RIFT_WINDOW_COUNT=\"$RIFT_WINDOW_COUNT\"'"
+# ]
+
+run_on_start = []
+
+# Hot Reloading
+# - If true, rift will watch the config file for changes and reload automatically.
+# - If false, your config changes will only apply when restarting rift.
+hot_reload = true
+
+[settings.layout]
+# Layout system
+# - mode: "traditional" (i3/sway-like containers) or "bsp" (binary space partitioning)
+#   defaults to "traditional" if omitted
+mode = "traditional"
+
+[settings.layout.stack]
+# How much of each stacked window sticks out (in pixels)
+# Set to 0.0 to have them directly on top of each other.
+# Recommended: 30-50 for clear edges while keeping focus visible.
+stack_offset = 30.0
+
+[settings.layout.gaps]
+# Gap configuration
+# - outer: space between windows and screen edges
+# - inner: space between tiled windows
+
+[settings.layout.gaps.outer]
+top = 6
+left = 0
+bottom = 0
+right = 0
+
+[settings.layout.gaps.inner]
+horizontal = 0
+vertical = 0
+
+[settings.ui.menu_bar]
+# enable menu bar workspace indicators
+enabled = true
+# if enabled, it will show all workspaces including empty ones. disabled because this
+# tends to take up too much room in the menubar and then is auto hidden by macos
+show_empty = false
+[settings.ui.stack_line]
+# experimental stack line indicator (defaults to off)
+enabled = false
+# in a horizontal stack where the line will be (top/bottom)
+horiz_placement = "top"
+# in a vertical stack where the line will be (left/right)
+vert_placement = "left"
+# how thick the line indicator will be (in px)
+thickness = 3.0
+
+# experimental mission control
+[settings.ui.mission_control]
+enabled = false
+# enable fade animation when entering/exiting mission control
+fade_enabled = false
+# native macos mission control fade is about 180ms
+fade_duration_ms = 180.0
+
+# Trackpad gestures
+[settings.gestures]
+# Enable horizontal swipes to switch virtual workspaces
+enabled = false
+# Invert horizontal direction (swap next/prev)
+invert_horizontal_swipe = false
+# Maximum vertical travel allowed for the horizontal swipe to register.
+# Accepts normalized fraction (0..1) or percent (0..100). Example: 0.4 or 40.0
+swipe_vertical_tolerance = 0.4
+# Skip empty workspaces when swiping
+skip_empty = true
+# Number of fingers required for swipe
+fingers = 3
+# Normalized horizontal distance (0..1) to trigger swipe for NSTouch-based detection
+distance_pct = 0.12
+# Haptic feedback on commit (generic | alignment | level_change)
+haptics_enabled = true
+haptic_pattern = "level_change"
+
+# Window snapping / drag-swap behavior
+[settings.window_snapping]
+# Fraction threshold (0.0..1.0) specifying how much of the dragged window
+# area must be overlapped by a candidate window in order to trigger a
+# swap while dragging. Typical values are around 0.2–0.4.
+# If you prefer more aggressive swapping, lower the value; increase it
+# to require greater overlap before a swap occurs.
+drag_swap_fraction = 0.3
+
+[virtual_workspaces]
+# Virtual workspaces
+# - enabled: if false, rift behaves like a simple tiling WM with a single space
+# - default_workspace_count: number of workspaces to create on startup (1–32)
+# - auto_assign_windows: when true, new windows can be auto-assigned using app_rules
+# - preserve_focus_per_workspace: remember last focused window per workspace
+enabled = true
+default_workspace_count = 4
+auto_assign_windows = true
+preserve_focus_per_workspace = true
+
+# Default workspace to activate on startup (0-based index).
+# If omitted, defaults to 0 (first workspace). Must be less than default_workspace_count.
+# Uncomment to change:
+# default_workspace = 0
+
+# Workspace names (indexed order). If fewer than default_workspace_count are provided,
+# remaining workspaces are named "Workspace X".
+# Do not provide more names than default_workspace_count.
+workspace_names = ["first"]
+
+# App rules (automatic assignment)
+# Define rules that match new windows and set properties (workspace, floating, etc).
+#
+# Matchable fields:
+#   - app_id         : application bundle identifier (exact)
+#   - app_name       : substring match against application name
+#   - title_regex    : regular expression matched against the window title
+#   - title_substring: literal substring (case-sensitive) matched against the title
+#   - ax_role / ax_subrole: exact match against macOS Accessibility (AX) role/subrole
+#
+# Rule options:
+#   - workspace (integer, 0-based): target workspace index. If omitted or invalid, uses the active workspace.
+#     Alternatively, `workspace` may be a workspace name string to target by name.
+#   - floating (boolean): whether matched windows should float by default.
+#
+# Matching behavior (summary):
+#   1. All rules that match a window are evaluated.
+#   2. If multiple matching rules share the same non-empty `app_id`, the rule
+#      with the most specified conditions (the most non-empty fields) wins.
+#      If there's a tie, the earlier rule in the file wins.
+#   3. If matching rules do NOT share the same `app_id`, the rule with the
+#      highest specificity (most non-empty fields) is selected; ties are broken by order.
+#   4. Within a single rule, all specified fields are combined conjunctively:
+#      the rule matches only if every non-empty field matches the window.
+#
+# Tips:
+#   - To make exceptions for a specific app, place a more specific rule before
+#     a general `app_id` rule. Example:
+#       app_rules = [
+#         { app_id = "com.example.X", title_regex = "Dialog", floating = true },
+#         { app_id = "com.example.X", floating = false },
+#       ]
+#
+#   - Use `title_substring` for simple, literal (case-sensitive) substring matches.
+#     Use `title_regex` for advanced patterns.
+#
+# Accessibility (AX) matching:
+#   - `ax_role` and `ax_subrole` match the exact AX values reported by macOS
+#     (e.g., "AXWindow", "AXDialog", "AXSystemDialog", "AXToolbar").
+#   - Useful for distinguishing dialogs, sheets, toolbars, etc., when bundle/name/title aren't enough.
+#
+# Validation:
+#   - `title_regex` must be a valid regular expression. Invalid regexes cause the rule
+#     to be ignored and a warning to be logged.
+#
+# Examples:
+#   - Float any window with "Preferences" in the title:
+#       app_rules = [
+#         { title_substring = "Preferences", floating = true },
+#       ]
+#
+#   - Match by app name substring and workspace:
+#       app_rules = [
+#         { app_name = "Calendar", workspace = 2, floating = true },
+#       ]
+#
+#   - Accessibility example: float dialog windows for a specific app:
+#       app_rules = [
+#         { app_id = "com.example.X", ax_subrole = "AXDialog", floating = true },
+#       ]
+#
+# By default there are no app rules; add or uncomment rules below as needed.
+app_rules = []
+
+# Modifier combinations that can be reused in key bindings
+# Define common modifier combinations to avoid repetition.
+# Example usage: with `comb1 = "Alt + Shift"`, you can write:
+#   "comb1 + H" = { move_node = "left" }
+[modifier_combinations]
+comb1 = "Alt + Shift"
+
+[keys]
+# Key binding syntax
+# - Use quotes around the key: "Alt + Shift + H"
+# - Supported modifiers: Alt, Ctrl, Shift, Meta (Meta = Command ⌘ on macOS)
+# - Arrow keys can be written as ArrowUp/ArrowDown/ArrowLeft/ArrowRight, or just Up/Down/Left/Right
+# - Spacing is flexible: "Alt+Down" and "Alt + Down" are equivalent
+# - Key values map to commands (see list below)
+
+# ommands
+# - toggle_space_activated
+# - next_workspace / prev_workspace
+# - switch_to_workspace = N
+# - move_window_to_workspace = N
+# - create_workspace
+# - switch_to_last_workspace
+# - move_focus = "left"|"right"|"up"|"down"
+# - move_node = "left"|"right"|"up"|"down"
+# - join_window = "left"|"right"|"up"|"down"
+# - stack_windows / unstack_windows / unjoin_windows
+# - toggle_focus_floating / toggle_window_floating / toggle_fullscreen
+# - resize_window_grow / resize_window_shrink
+# - debug / serialize / save_and_exit
+# - show_timing
+
+"Alt + Z" = "toggle_space_activated"
+
+"Alt + H" = { move_focus = "left" }
+"Alt + J" = { move_focus = "down" }
+"Alt + K" = { move_focus = "up" }
+"Alt + L" = { move_focus = "right" }
+
+"comb1 + H" = { move_node = "left" }
+"comb1 + J" = { move_node = "down" }
+"comb1 + K" = { move_node = "up" }
+"comb1 + L" = { move_node = "right" }
+
+"Alt + 0" = { switch_to_workspace = 0 }
+"Alt + 1" = { switch_to_workspace = 1 }
+"Alt + 2" = { switch_to_workspace = 2 }
+"Alt + 3" = { switch_to_workspace = 3 }
+
+"comb1 + 0" = { move_window_to_workspace = 0 }
+"comb1 + 1" = { move_window_to_workspace = 1 }
+"comb1 + 2" = { move_window_to_workspace = 2 }
+"comb1 + 3" = { move_window_to_workspace = 3 }
+
+"Alt + Tab" = "switch_to_last_workspace"
+
+"Alt + Shift + Left" = { join_window = "left" }
+"Alt + Shift + Right" = { join_window = "right" }
+"Alt + Shift + Up" = { join_window = "up" }
+"Alt + Shift + Down" = { join_window = "down" }
+"Alt + Comma" = "stack_windows"
+"Alt + Slash" = "unstack_windows"
+"Alt + Ctrl + E" = "unjoin_windows"               # FIXME: doesnt work
+
+"Alt + Shift + Space" = "toggle_window_floating"
+"Alt + F" = "toggle_fullscreen"
+"comb1 + Ctrl + Space" = "toggle_focus_floating" # briefly bring focus to floating window
+
+# smartly resize windows
+"Alt + Shift + Equal" = "resize_window_grow"
+"Alt + Shift + Minus" = "resize_window_shrink"
+
+"Alt + Shift + D" = "debug" # prints layout tree
+
+"Alt + Ctrl + M" = "show_timing"
+"Alt + Ctrl + S" = "serialize"
+"Alt + Ctrl + Q" = "save_and_exit"
