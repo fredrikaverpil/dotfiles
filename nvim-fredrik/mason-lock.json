@@ -1,10 +1,11 @@
 {
-  "actionlint": "v1.7.7",
+  "actionlint": "v1.7.8",
   "basedpyright": "1.31.7",
   "bash-language-server": "5.6.0",
-  "biome": "2.2.5",
+  "biome": "2.2.6",
   "buf": "v1.58.0",
   "codelldb": "v1.11.6",
+  "copilot-language-server": "1.381.0",
   "dockerfile-language-server": "0.14.1",
   "gci": "v0.13.7",
   "gofumpt": "v0.9.1",
@@ -29,7 +30,7 @@
   "shellcheck": "v0.11.0",
   "shfmt": "v3.12.0",
   "stylua": "v2.3.0",
-  "superhtml": "v0.6.1",
+  "superhtml": "v0.6.2",
   "taplo": "0.10.0",
   "templ": "v0.3.943",
   "terraform-ls": "v0.38.2",
@@ -39,7 +40,7 @@
   "typescript-language-server": "5.0.1",
   "vtsls": "0.2.9",
   "yaml-language-server": "1.19.2",
-  "yamlfmt": "v0.17.2",
+  "yamlfmt": "v0.18.0",
   "yamllint": "1.37.1",
   "zls": "0.15.0"
 }
