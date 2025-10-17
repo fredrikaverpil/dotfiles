@@ -1,7 +1,7 @@
 return {
   {
     "lewis6991/gitsigns.nvim",
-    lazy = true,
+    enabled = false, -- I'm evaluating mini.diff instead...
     event = "VeryLazy",
     opts = {
       on_attach = function(bufnr)
