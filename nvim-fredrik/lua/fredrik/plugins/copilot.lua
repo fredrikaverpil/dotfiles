@@ -2,47 +2,9 @@ return {
   {
     "zbirenbaum/copilot.lua",
     lazy = true,
-    commit = "5a8fdd34bb67eadc3f69e46870db0bed0cc9841c",
     event = "InsertEnter",
     enabled = true,
     dependencies = {
-      {
-        "copilotlsp-nvim/copilot-lsp",
-        enabled = false, -- use sidekick.nvim
-        -- enabled = require("fredrik.utils.private").is_code_public(),
-        dependencies = {
-          {
-            "virtual-lsp-config",
-            dependencies = {
-              {
-                "mason-org/mason-lspconfig.nvim",
-                dependencies = {
-                  {
-                    "mason-org/mason.nvim",
-                    opts = function(_, opts)
-                      opts.ensure_installed = opts.ensure_installed or {}
-                    end,
-                  },
-                },
-                opts = function(_, opts)
-                  opts.ensure_installed = opts.ensure_installed or {}
-                  vim.list_extend(opts.ensure_installed, { "copilot-language-server" })
-                end,
-              },
-            },
-            opts = {
-              servers = {
-                ---@type vim.lsp.Config
-                copilot_ls = {},
-              },
-            },
-          },
-        },
-        init = function()
-          vim.g.copilot_nes_debounce = 500
-          require("fredrik.config.keymaps").setup_copilot_lsp_keymaps()
-        end,
-      },
       {
         "nvim-lualine/lualine.nvim",
         event = "VeryLazy",
@@ -114,5 +76,34 @@ return {
       require("fredrik.utils.private").toggle_copilot()
     end,
     keys = require("fredrik.config.keymaps").setup_copilot_keymaps(),
+  },
+
+  {
+    "virtual-lsp-config",
+    dependencies = {
+      {
+        "mason-org/mason-lspconfig.nvim",
+        dependencies = {
+          {
+            "mason-org/mason.nvim",
+            opts = function(_, opts)
+              opts.ensure_installed = opts.ensure_installed or {}
+            end,
+          },
+        },
+        opts = function(_, opts)
+          opts.ensure_installed = opts.ensure_installed or {}
+          vim.list_extend(opts.ensure_installed, { "copilot" }) -- copilot-language-server
+        end,
+      },
+    },
+    opts = {
+      servers = {
+        ---@type vim.lsp.Config
+        copilot = {
+          enabled = require("fredrik.utils.private").is_code_public(),
+        },
+      },
+    },
   },
 }
