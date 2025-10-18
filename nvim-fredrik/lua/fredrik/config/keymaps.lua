@@ -1118,8 +1118,9 @@ function M.setup_terminal_keymaps()
     { ctrl_slash, floating_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle floating terminal" },
     { ctrl_underscore, floating_term_cmd, mode = { "n", "i", "t", "v" }, desc = "Toggle floating terminal" },
 
-    { ctrl_slash, "<cmd>close<cr>", mode = { "t" }, desc = "Hide Terminal" },
-    { ctrl_underscore, "<cmd>close<cr>", mode = { "t" }, desc = "which_key_ignore" },
+    -- NOTE: Snacks.terminal handles closing the terminal, so these are not needed as long as Snacks.terminal is used.
+    -- { ctrl_slash, "<cmd>close<cr>", mode = { "t" }, desc = "Hide Terminal" },
+    -- { ctrl_underscore, "<cmd>close<cr>", mode = { "t" }, desc = "which_key_ignore" },
   }
 end
 
