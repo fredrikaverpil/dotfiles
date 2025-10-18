@@ -5,7 +5,7 @@
   "biome": "2.2.6",
   "buf": "v1.58.0",
   "codelldb": "v1.11.6",
-  "copilot-language-server": "1.381.0",
+  "copilot-language-server": "1.384.0",
   "dockerfile-language-server": "0.14.1",
   "gci": "v0.13.7",
   "gofumpt": "v0.9.1",
