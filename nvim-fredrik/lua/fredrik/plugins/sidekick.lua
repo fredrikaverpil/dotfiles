@@ -3,7 +3,28 @@ return {
   "folke/sidekick.nvim",
   dependencies = {
     "zbirenbaum/copilot.lua",
-    "folke/snacks.nvim",
+    {
+      "folke/snacks.nvim",
+      opts = {
+        picker = {
+          actions = {
+            sidekick_send = function(...)
+              return require("sidekick.cli.snacks").send(...)
+            end,
+          },
+          win = {
+            input = {
+              keys = {
+                ["<a-a>"] = {
+                  "sidekick_send",
+                  mode = { "n", "i" },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     {
       "nvim-treesitter/nvim-treesitter-textobjects",
       dependencies = {
