@@ -58,6 +58,9 @@ return {
         -- use the built-in keymapping for "accept" (<M-l>)
         enabled = true,
         auto_trigger = true,
+        keymap = {
+          accept = "<M-l>",
+        },
       },
       filetypes = {
         sh = function()
