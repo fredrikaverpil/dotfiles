@@ -1402,7 +1402,7 @@ end
 
 function M.setup_copilot_keymaps()
   return {
-    { "<leader>ap", ":Copilot panel<CR>", desc = "Copilot panel" },
+    { "<leader>aP", ":Copilot panel<CR>", desc = "Copilot panel" },
   }
 end
 
