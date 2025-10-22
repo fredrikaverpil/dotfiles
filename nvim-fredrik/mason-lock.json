@@ -3,7 +3,7 @@
   "basedpyright": "1.31.7",
   "bash-language-server": "5.6.0",
   "biome": "2.2.6",
-  "buf": "v1.58.0",
+  "buf": "v1.59.0",
   "codelldb": "v1.11.7",
   "copilot-language-server": "1.384.0",
   "dockerfile-language-server": "0.15.0",

@@ -242,7 +242,7 @@ return {
         buf_ls = {
           -- lsp: https://github.com/bufbuild/buf
           -- ref: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/protols.lua
-          cmd = { "buf", "beta", "lsp", "--timeout=0", "--log-format=text" },
+          cmd = { "buf", "lsp", "--timeout=0", "--log-format=text" },
           filetypes = { "proto" },
           root_markers = { "buf.yaml", "buf.yml", ".git" },
           settings = {
