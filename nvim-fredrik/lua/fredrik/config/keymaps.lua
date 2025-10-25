@@ -1204,34 +1204,14 @@ function M.setup_obsidian_keymaps(obsidian_vars)
     { "<leader>ns", "<cmd>Obsidian search<cr>", desc = "[N]otes: [s]earch text" },
     { "<leader>nf", "<cmd>Obsidian quick_switch<cr>", desc = "[N]otes: search [f]ilenames" },
     { "<leader>nn", "<cmd>Obsidian new<cr>", desc = "[N]otes: [n]new" },
-    { "<leader>nl", "<cmd>Obsidian quick_switch Learning.md<cr><cr>", desc = "[N]otes: [l]earning" },
-    { "<leader>ng", "<cmd>Obsidian quick_switch Go.md<cr><cr>", desc = "[N]otes: [g]olang learning" },
-    { "<leader>nv", "<cmd>Obsidian quick_switch Neovim config.md<cr><cr>", desc = "[N]otes: Neo[v]im todo" },
-
     {
       "<leader>nS",
       function()
-        local client = require("obsidian").get_client()
-        client:open_note(obsidian_vars.scratchpad_path)
+        vim.cmd("tabnew " .. obsidian_vars.scratchpad_path)
       end,
       desc = "[N]otes: [S]cratchpad",
     },
-    {
-      "<leader>nm",
-      function()
-        local client = require("obsidian").get_client()
-        -- client.dir is the vault path
-        local note = client:create_note({
-          title = "Meeting notes",
-          dir = vim.fn.expand(obsidian_vars.notes_path),
-          -- NOTE: if folder "templates" exist in $cwd,
-          -- the template is expected to be found there.
-          template = "meeting_notes",
-        })
-        client:open_note(note)
-      end,
-      desc = "[N]otes: new [m]eeting agenda from template",
-    },
+    { "<leader>nt", "<cmd>Obsidian new_from_template<cr>", desc = "[N]otes: new [m]eeting agenda from template" },
   }
 end
 
