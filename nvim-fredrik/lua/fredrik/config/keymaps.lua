@@ -696,6 +696,28 @@ function M.setup_gitsigns_keymaps(bufnr)
   )
 end
 
+-- Helper function to get hunk range at cursor
+local function get_hunk_range_at_cursor()
+  local line = vim.api.nvim_win_get_cursor(0)[1]
+  local buf_data = MiniDiff.get_buf_data(0)
+
+  if not buf_data or not buf_data.hunks then
+    return line, line
+  end
+
+  for _, hunk in ipairs(buf_data.hunks) do
+    local hunk_start = hunk.buf_start
+    local hunk_end = hunk.buf_start + math.max(0, hunk.buf_count - 1)
+
+    if line >= hunk_start and line <= hunk_end then
+      return hunk_start, hunk_end
+    end
+  end
+
+  -- Fallback to single line if no hunk found
+  return line, line
+end
+
 function M.setup_mini_diff_keymaps()
   return {
     {
@@ -708,21 +730,24 @@ function M.setup_mini_diff_keymaps()
     {
       "<leader>ghr",
       function()
-        require("mini.diff").do_hunks(0, "reset", {})
+        local start_line, end_line = get_hunk_range_at_cursor()
+        require("mini.diff").do_hunks(0, "reset", { line_start = start_line, line_end = end_line })
       end,
       desc = "Reset hunk",
     },
     {
       "<leader>gha",
       function()
-        require("mini.diff").do_hunks(0, "apply", {})
+        local start_line, end_line = get_hunk_range_at_cursor()
+        require("mini.diff").do_hunks(0, "apply", { line_start = start_line, line_end = end_line })
       end,
       desc = "Apply (stage) hunk",
     },
     {
       "<leader>ghy",
       function()
-        require("mini.diff").do_hunks(0, "yank", {})
+        local start_line, end_line = get_hunk_range_at_cursor()
+        require("mini.diff").do_hunks(0, "yank", { line_start = start_line, line_end = end_line })
       end,
       desc = "Yank hunk",
     },
