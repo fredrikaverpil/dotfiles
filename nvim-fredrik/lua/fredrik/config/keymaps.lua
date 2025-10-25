@@ -307,27 +307,6 @@ function M.setup_luasnip_keymaps()
   }
 end
 
-function M.setup_telescope_keymaps()
-  --- @param set_cwd boolean
-  local function open_file_in_other_project(set_cwd)
-    vim.g.project_set_cwd = set_cwd
-    require("telescope").extensions.project.project({ display_type = "full", hide_workspace = true })
-  end
-
-  return {
-    {
-      "<leader>sf",
-      function()
-        open_file_in_other_project(false)
-      end,
-      desc = "[s]earch [f]ile (in projects)",
-    },
-
-    -- search
-    { "<leader>so", "<cmd>Telescope vim_options<cr>", desc = "[s]earch [o]ptions" },
-  }
-end
-
 function M.setup_coderunner_keymaps()
   return {
     { "<leader>rf", ":RunFile term<CR>", desc = "Run file" },
