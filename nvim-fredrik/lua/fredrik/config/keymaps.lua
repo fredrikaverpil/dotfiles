@@ -346,6 +346,13 @@ function M.setup_snacks_keymaps()
       desc = "Grep",
     },
     {
+      "<leader>:",
+      function()
+        Snacks.picker.command_history()
+      end,
+      desc = "Command History",
+    },
+    {
       "<leader>e",
       function()
         Snacks.explorer.open({ hidden = true, ignored = true, exclude = { ".DS_Store" } })
@@ -365,6 +372,22 @@ function M.setup_snacks_keymaps()
         Snacks.lazygit.open()
       end,
       desc = "LazyGit",
+    },
+    {
+      "<leader>gdd",
+      function()
+        Snacks.picker.git_diff()
+      end,
+      desc = "Git Diff (HEAD)",
+    },
+    {
+      "<leader>gdD",
+      function()
+        ---@class snacks.picker.git.diff.Config: snacks.picker.git.Config
+        local opts = { base = "origin" }
+        Snacks.picker.git_diff(opts)
+      end,
+      desc = "Git Diff (origin)",
     },
     {
       "<leader>uz",
@@ -736,12 +759,12 @@ function M.setup_mini_diff_keymaps()
       desc = "Reset hunk",
     },
     {
-      "<leader>gha",
+      "<leader>ghs",
       function()
         local start_line, end_line = get_hunk_range_at_cursor()
         require("mini.diff").do_hunks(0, "apply", { line_start = start_line, line_end = end_line })
       end,
-      desc = "Apply (stage) hunk",
+      desc = "Stage hunk",
     },
     {
       "<leader>ghy",
