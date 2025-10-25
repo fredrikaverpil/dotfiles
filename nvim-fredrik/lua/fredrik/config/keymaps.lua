@@ -1231,7 +1231,7 @@ function M.setup_whichkey(wk)
     { "<leader>r", group = "run" },
     { "<leader>s", group = "search" },
     { "<leader>sg", group = "git" },
-    { "<leader>sn", group = "noice" },
+    -- { "<leader>sn", group = "noice" },
     { "<leader>t", group = "test" },
     { "<leader>u", group = "ui" },
     { "<leader>x", group = "diagnostics/quickfix" },
