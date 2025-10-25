@@ -55,12 +55,21 @@ return {
         auto_refresh = true,
       },
       suggestion = {
-        -- use the built-in keymapping for "accept" (<M-l>)
         enabled = true,
         auto_trigger = true,
+        -- Disable all built-in keymaps (they don't work reliably)
+        -- Use manual keymaps in keymaps.lua instead
         keymap = {
-          accept = "<M-l>",
+          accept = false,
+          accept_word = false,
+          accept_line = false,
+          next = false,
+          prev = false,
+          dismiss = false,
         },
+      },
+      nes = {
+        enabled = false, -- provided via sidekick.nvim <M-l>
       },
       filetypes = {
         sh = function()

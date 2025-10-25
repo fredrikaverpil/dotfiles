@@ -1382,7 +1382,31 @@ end
 
 function M.setup_copilot_keymaps()
   return {
-    { "<leader>aP", ":Copilot panel<CR>", desc = "Copilot panel" },
+    -- Suggestions (insert mode)
+    {
+      "<M-l>",
+      function()
+        require("copilot.suggestion").accept()
+      end,
+      desc = "Copilot: Accept suggestion",
+      mode = "i",
+    },
+    {
+      "<M-]>",
+      function()
+        require("copilot.suggestion").next()
+      end,
+      desc = "Copilot: Next suggestion",
+      mode = "i",
+    },
+    {
+      "<M-[>",
+      function()
+        require("copilot.suggestion").prev()
+      end,
+      desc = "Copilot: Previous suggestion",
+      mode = "i",
+    },
   }
 end
 
