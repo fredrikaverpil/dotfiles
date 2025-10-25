@@ -66,6 +66,10 @@ return {
         --   return "Current file: " .. ctx.buf .. " at line " .. ctx.row
         -- end,
       },
+      ---@type table<string, sidekick.cli.Config|{}>
+      tools = {
+        claude = { cmd = { "claude", "--continue" } },
+      },
     },
   },
   keys = require("fredrik.config.keymaps").setup_sidekick_keymaps(),
