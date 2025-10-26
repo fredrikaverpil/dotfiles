@@ -60,12 +60,9 @@ return {
         -- Disable all built-in keymaps (they don't work reliably)
         -- Use manual keymaps in keymaps.lua instead
         keymap = {
-          accept = false,
-          accept_word = false,
-          accept_line = false,
-          next = false,
-          prev = false,
-          dismiss = false,
+          accept = "<M-l>",
+          next = "<M-]>",
+          prev = "<M-[>",
         },
       },
       nes = {
