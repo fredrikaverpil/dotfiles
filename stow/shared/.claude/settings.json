@@ -9,5 +9,5 @@
       "Read(./secrets/**)"
     ]
   },
-  "alwaysThinkingEnabled": false
+  "alwaysThinkingEnabled": true
 }
