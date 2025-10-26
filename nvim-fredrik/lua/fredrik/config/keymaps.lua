@@ -404,7 +404,7 @@ function M.setup_snacks_keymaps()
       desc = "Toggle Zen mode",
     },
     {
-      "<leader>sn",
+      "<leader>un",
       function()
         Snacks.notifier.show_history()
       end,
@@ -534,6 +534,13 @@ function M.setup_snacks_keymaps()
         Snacks.picker.marks()
       end,
       desc = "[s]earch [m]arks",
+    },
+    {
+      "<leader>sn",
+      function()
+        Snacks.picker.notifications()
+      end,
+      desc = "[s]earch [n]notifications",
     },
     {
       "<leader>sj",
