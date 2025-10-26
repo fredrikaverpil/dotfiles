@@ -760,7 +760,7 @@ end
 function M.setup_mini_diff_keymaps()
   return {
     {
-      "<leader>go",
+      "<leader>gdo",
       function()
         require("mini.diff").toggle_overlay(0)
       end,
