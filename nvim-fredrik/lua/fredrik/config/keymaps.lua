@@ -545,9 +545,11 @@ function M.setup_snacks_keymaps()
     {
       "<leader>sp",
       function()
-        Snacks.picker.zoxide()
+        ---@class snacks.picker.projects.Config: snacks.picker.Config
+        local opts = { dev = { "~/code/public", "~/code/work/private", "~/code/work/public" } }
+        Snacks.picker.projects(opts)
       end,
-      desc = "[s]earch [p]rojects (zoxide)",
+      desc = "[s]earch [p]rojects",
     },
     {
       "<leader>sq",
@@ -597,6 +599,13 @@ function M.setup_snacks_keymaps()
         Snacks.picker.todo_comments({ keywords = { "TODO", "FIX", "FIXME" } })
       end,
       desc = "[s]earch [T]odo/Fix/Fixme",
+    },
+    {
+      "<leader>sz",
+      function()
+        Snacks.picker.zoxide()
+      end,
+      desc = "[s]earch with [z]oxide",
     },
 
     -- git
