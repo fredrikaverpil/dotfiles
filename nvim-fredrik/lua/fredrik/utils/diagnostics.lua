@@ -46,7 +46,8 @@ function M.setup_diagnostics()
     vim.fn.sign_define(name, { text = icon, texthl = name, numhl = "" })
   end
 
-  vim.diagnostic.config(vim.deepcopy(opts))
+  -- NOTE: disabled due to using the tiny-inline-diagnostic.nvim plugin
+  -- vim.diagnostic.config(vim.deepcopy(opts))
 
   require("fredrik.config.keymaps").setup_diagnostics_keymaps()
 end
