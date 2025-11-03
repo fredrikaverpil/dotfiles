@@ -93,6 +93,24 @@ local function golangcilint_args()
   }
 end
 
+local parser_config = {
+  install_info = {
+    url = "https://github.com/fredrikaverpil/tree-sitter-godoc",
+    files = { "src/parser.c" },
+    branch = "main",
+  },
+  filetype = "godoc",
+}
+require("nvim-treesitter.parsers").godoc = parser_config
+vim.treesitter.language.register("godoc", "godoc")
+
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+  pattern = "*.godoc",
+  callback = function()
+    vim.bo.filetype = "godoc"
+  end,
+})
+
 return {
   {
     "stevearc/conform.nvim",
@@ -380,7 +398,14 @@ return {
     dev = true, -- see lazy.lua for local path details
     dependencies = {
       { "folke/snacks.nvim" },
-      "nvim-treesitter/nvim-treesitter",
+      {
+        "nvim-treesitter/nvim-treesitter",
+        branch = "main",
+        opts = function(_, opts)
+          opts.ensure_installed = opts.ensure_installed or {}
+          opts.ensure_installed.godoc = "godoc"
+        end,
+      },
     },
     build = "go install github.com/lotusirous/gostdsym/stdsym@latest",
     opts = {
@@ -392,7 +417,7 @@ return {
             get_syntax_info = function()
               return {
                 filetype = "godoc", -- filetype for the buffer
-                language = "markdown", -- tree-sitter parser, for syntax highlighting
+                language = "godoc", -- tree-sitter parser, for syntax highlighting
               }
             end,
           },
@@ -401,7 +426,7 @@ return {
       window = { type = "vsplit" },
       picker = { type = "snacks" },
     },
-    -- cmd = { "GoDoc", "RustDoc" },
+    cmd = { "GoDoc" },
   },
 
   {
