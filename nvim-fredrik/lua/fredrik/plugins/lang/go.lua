@@ -104,6 +104,14 @@ local parser_config = {
 require("nvim-treesitter.parsers").godoc = parser_config
 vim.treesitter.language.register("godoc", "godoc")
 
+-- Also register on TSUpdate for installation; required for auto-install
+vim.api.nvim_create_autocmd("User", {
+  pattern = "TSUpdate",
+  callback = function()
+    require("nvim-treesitter.parsers").godoc = parser_config
+  end,
+})
+
 vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
   pattern = "*.godoc",
   callback = function()
