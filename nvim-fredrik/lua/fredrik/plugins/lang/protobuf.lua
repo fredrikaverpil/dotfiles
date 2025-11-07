@@ -121,13 +121,22 @@ local function api_linter_setup()
     name = "api_linter", -- NOTE: differentiate from the name of the linter in nvim-lint.
     cmd = "api-linter",
     stdin = false,
-    append_fname = true,
+    append_fname = false,
     args = {
       "--output-format=json",
       "--disable-rule=core::0191::java-multiple-files",
       "--disable-rule=core::0191::java-package",
       "--disable-rule=core::0191::java-outer-classname",
-      descriptor_set_in,
+      function()
+        return descriptor_set_in()
+      end,
+      function()
+        -- Manually add the filename as relative path
+        local bufpath = vim.fn.expand("%:p")
+        local cwd = buf_lint_cwd()
+        local relative = get_relative_path(bufpath, cwd)
+        return relative
+      end,
     },
     stream = "stdout",
     ignore_exitcode = true,
@@ -145,8 +154,8 @@ local function api_linter_setup()
       for _, item in ipairs(json_output) do
         for _, problem in ipairs(item.problems) do
           table.insert(diagnostics, {
+            file = item.file_path,
             message = problem.message,
-            file = item.file,
             code = problem.rule_id .. " " .. problem.rule_doc_uri,
             severity = vim.diagnostic.severity.WARN,
             lnum = problem.location.start_position.line_number - 1,
