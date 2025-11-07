@@ -1,3 +1,5 @@
+local logging = require("fredrik.utils.logging")
+
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "proto" },
   callback = function()
@@ -146,6 +148,7 @@ local function api_linter_setup()
     ignore_exitcode = true,
     env = nil,
     parser = function(output, bufnr, linter_cwd)
+      logging.log_output(output, "api-linter.log", { enabled = false }) -- for debugging purposes
       vim.notify("api-linter is using cwd: " .. linter_cwd)
       if output == "" then
         return {}
