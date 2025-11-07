@@ -102,29 +102,81 @@ local function setup_auto_update(list_type, bufnr)
           auto_update_state.enabled = false
           auto_update_state.list_type = nil
           auto_update_state.bufnr = nil
-          vim.api.nvim_del_augroup_by_name("DiagnosticListAutoUpdate")
+          -- Safely delete the autocommand group (might already be deleted by toggle)
+          pcall(vim.api.nvim_del_augroup_by_name, "DiagnosticListAutoUpdate")
         end,
       })
     end,
   })
 end
 
---- Open buffer diagnostics in location list with auto-update
-function M.open_loclist()
-  local diagnostics = vim.diagnostic.get(0)
-  local items = M.diagnostics_to_qf_items(diagnostics)
-  vim.fn.setloclist(0, items)
-  vim.cmd("lopen")
-  setup_auto_update("loclist", vim.api.nvim_get_current_buf())
+--- Clean up auto-update state and autocommands
+local function cleanup_auto_update()
+  auto_update_state.enabled = false
+  auto_update_state.list_type = nil
+  auto_update_state.bufnr = nil
+  -- Safely delete the autocommand group
+  pcall(vim.api.nvim_del_augroup_by_name, "DiagnosticListAutoUpdate")
 end
 
---- Open workspace diagnostics in quickfix list with auto-update
-function M.open_qflist()
-  local diagnostics = vim.diagnostic.get()
-  local items = M.diagnostics_to_qf_items(diagnostics)
-  vim.fn.setqflist(items)
-  vim.cmd("copen")
-  setup_auto_update("qflist", nil)
+--- Check if location list is open for the current window
+---@return boolean
+local function is_loclist_open()
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    if vim.bo[buf].filetype == "qf" then
+      -- Check if it's a location list (not quickfix)
+      local wininfo = vim.fn.getwininfo(win)[1]
+      if wininfo and wininfo.loclist == 1 then
+        return true
+      end
+    end
+  end
+  return false
+end
+
+--- Check if quickfix list is open
+---@return boolean
+local function is_qflist_open()
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    if vim.bo[buf].filetype == "qf" then
+      -- Check if it's a quickfix (not location list)
+      local wininfo = vim.fn.getwininfo(win)[1]
+      if wininfo and wininfo.quickfix == 1 and wininfo.loclist == 0 then
+        return true
+      end
+    end
+  end
+  return false
+end
+
+--- Toggle buffer diagnostics in location list with auto-update
+function M.toggle_loclist()
+  if is_loclist_open() then
+    cleanup_auto_update()
+    vim.cmd("lclose")
+  else
+    local diagnostics = vim.diagnostic.get(0)
+    local items = M.diagnostics_to_qf_items(diagnostics)
+    vim.fn.setloclist(0, items)
+    vim.cmd("lopen")
+    setup_auto_update("loclist", vim.api.nvim_get_current_buf())
+  end
+end
+
+--- Toggle workspace diagnostics in quickfix list with auto-update
+function M.toggle_qflist()
+  if is_qflist_open() then
+    cleanup_auto_update()
+    vim.cmd("cclose")
+  else
+    local diagnostics = vim.diagnostic.get()
+    local items = M.diagnostics_to_qf_items(diagnostics)
+    vim.fn.setqflist(items)
+    vim.cmd("copen")
+    setup_auto_update("qflist", nil)
+  end
 end
 
 return M
