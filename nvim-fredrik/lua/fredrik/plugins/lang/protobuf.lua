@@ -117,6 +117,10 @@ local function buf_lint_setup()
 end
 
 local function api_linter_setup()
+  if vim.fn.executable("api-linter") == 0 then
+    error("api-linter not found")
+  end
+
   require("lint").linters.api_linter = {
     name = "api_linter", -- NOTE: differentiate from the name of the linter in nvim-lint.
     cmd = "api-linter",
@@ -146,15 +150,17 @@ local function api_linter_setup()
       if output == "" then
         return {}
       end
-      local json_output = vim.json.decode(output)
-      local diagnostics = {}
-      if json_output == nil then
-        return diagnostics
+
+      local ok, json_output = pcall(vim.json.decode, output)
+      if not ok then
+        error("Failed to parse api-linter output: " .. output)
       end
+
+      local diagnostics = {}
       for _, item in ipairs(json_output) do
-        for _, problem in ipairs(item.problems) do
+        for _, problem in ipairs(item.problems or {}) do
           table.insert(diagnostics, {
-            file = item.file_path,
+            -- Don't set file field - let nvim-lint use current buffer
             message = problem.message,
             code = problem.rule_id .. " " .. problem.rule_doc_uri,
             severity = vim.diagnostic.severity.WARN,
@@ -165,6 +171,7 @@ local function api_linter_setup()
           })
         end
       end
+
       cleanup_descriptor()
       return diagnostics
     end,
