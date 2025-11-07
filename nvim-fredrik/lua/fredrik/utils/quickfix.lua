@@ -157,10 +157,14 @@ function M.toggle_loclist()
     cleanup_auto_update()
     vim.cmd("lclose")
   else
+    -- Save current window to return focus after opening
+    local current_win = vim.api.nvim_get_current_win()
     local diagnostics = vim.diagnostic.get(0)
     local items = M.diagnostics_to_qf_items(diagnostics)
     vim.fn.setloclist(0, items)
     vim.cmd("lopen")
+    -- Return focus to the original window
+    vim.api.nvim_set_current_win(current_win)
     setup_auto_update("loclist", vim.api.nvim_get_current_buf())
   end
 end
@@ -171,10 +175,14 @@ function M.toggle_qflist()
     cleanup_auto_update()
     vim.cmd("cclose")
   else
+    -- Save current window to return focus after opening
+    local current_win = vim.api.nvim_get_current_win()
     local diagnostics = vim.diagnostic.get()
     local items = M.diagnostics_to_qf_items(diagnostics)
     vim.fn.setqflist(items)
     vim.cmd("copen")
+    -- Return focus to the original window
+    vim.api.nvim_set_current_win(current_win)
     setup_auto_update("qflist", nil)
   end
 end

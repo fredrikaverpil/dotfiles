@@ -93,10 +93,41 @@ end, { desc = "Clear location list" })
 vim.keymap.set("n", "<leader>xC", function()
   vim.fn.setqflist({})
 end, { desc = "Clear quickfix list" })
-vim.keymap.set("n", "[q", vim.cmd.cprev, { desc = "Previous quickfix" })
-vim.keymap.set("n", "]q", vim.cmd.cnext, { desc = "Next quickfix" })
-vim.keymap.set("n", "[l", vim.cmd.lprev, { desc = "Previous location" })
-vim.keymap.set("n", "]l", vim.cmd.lnext, { desc = "Next location" })
+-- Vim error code for empty quickfix/location list
+local EMPTY_LIST_ERROR = "E42"
+
+vim.keymap.set("n", "[q", function()
+  local ok, err = pcall(vim.cmd.cprev)
+  if not ok and err:match(EMPTY_LIST_ERROR) then
+    -- Quickfix list is empty, populate it first
+    require("fredrik.utils.quickfix").toggle_qflist()
+    vim.cmd.cfirst()
+  end
+end, { desc = "Previous quickfix" })
+vim.keymap.set("n", "]q", function()
+  local ok, err = pcall(vim.cmd.cnext)
+  if not ok and err:match(EMPTY_LIST_ERROR) then
+    -- Quickfix list is empty, populate it first
+    require("fredrik.utils.quickfix").toggle_qflist()
+    vim.cmd.cfirst()
+  end
+end, { desc = "Next quickfix" })
+vim.keymap.set("n", "[l", function()
+  local ok, err = pcall(vim.cmd.lprev)
+  if not ok and err:match(EMPTY_LIST_ERROR) then
+    -- Location list is empty, populate it first
+    require("fredrik.utils.quickfix").toggle_loclist()
+    vim.cmd.lfirst()
+  end
+end, { desc = "Previous location" })
+vim.keymap.set("n", "]l", function()
+  local ok, err = pcall(vim.cmd.lnext)
+  if not ok and err:match(EMPTY_LIST_ERROR) then
+    -- Location list is empty, populate it first
+    require("fredrik.utils.quickfix").toggle_loclist()
+    vim.cmd.lfirst()
+  end
+end, { desc = "Next location" })
 vim.keymap.set("n", "<leader>xx", function()
   require("fredrik.utils.quickfix").toggle_loclist()
 end, { desc = "Toggle buffer diagnostics (location list)", silent = true })
