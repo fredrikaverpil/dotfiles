@@ -179,4 +179,90 @@ function M.toggle_qflist()
   end
 end
 
+--- Delete the current item from the quickfix list
+local function delete_qf_item()
+  local qf_idx = vim.fn.line(".")
+  local qf_list = vim.fn.getqflist()
+  table.remove(qf_list, qf_idx)
+  vim.fn.setqflist(qf_list)
+  -- Stay on the same line if possible, otherwise move up
+  if qf_idx > #qf_list then
+    qf_idx = #qf_list
+  end
+  if qf_idx > 0 then
+    vim.cmd(tostring(qf_idx))
+  end
+end
+
+--- Delete the current item from the location list
+local function delete_loc_item()
+  local loc_idx = vim.fn.line(".")
+  local loc_list = vim.fn.getloclist(0)
+  table.remove(loc_list, loc_idx)
+  vim.fn.setloclist(0, loc_list)
+  -- Stay on the same line if possible, otherwise move up
+  if loc_idx > #loc_list then
+    loc_idx = #loc_list
+  end
+  if loc_idx > 0 then
+    vim.cmd(tostring(loc_idx))
+  end
+end
+
+--- Delete selected items from quickfix list (visual mode)
+local function delete_qf_items_visual()
+  local start_line = vim.fn.line("'<")
+  local end_line = vim.fn.line("'>")
+  local qf_list = vim.fn.getqflist()
+
+  -- Remove items in reverse order to maintain indices
+  for i = end_line, start_line, -1 do
+    table.remove(qf_list, i)
+  end
+
+  vim.fn.setqflist(qf_list)
+  -- Move cursor to the line where deletion started
+  vim.cmd(tostring(math.min(start_line, #qf_list)))
+end
+
+--- Delete selected items from location list (visual mode)
+local function delete_loc_items_visual()
+  local start_line = vim.fn.line("'<")
+  local end_line = vim.fn.line("'>")
+  local loc_list = vim.fn.getloclist(0)
+
+  -- Remove items in reverse order to maintain indices
+  for i = end_line, start_line, -1 do
+    table.remove(loc_list, i)
+  end
+
+  vim.fn.setloclist(0, loc_list)
+  -- Move cursor to the line where deletion started
+  vim.cmd(tostring(math.min(start_line, #loc_list)))
+end
+
+--- Set up keymaps for quickfix/location list editing
+function M.setup_qf_keymaps()
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = "qf",
+    callback = function(event)
+      local bufnr = event.buf
+
+      -- Determine if this is a location list or quickfix list
+      local wininfo = vim.fn.getwininfo(vim.fn.bufwinid(bufnr))[1]
+      local is_loclist = wininfo and wininfo.loclist == 1
+
+      if is_loclist then
+        -- Location list keymaps
+        vim.keymap.set("n", "dd", delete_loc_item, { buffer = bufnr, desc = "Delete location list item" })
+        vim.keymap.set("x", "d", delete_loc_items_visual, { buffer = bufnr, desc = "Delete location list items" })
+      else
+        -- Quickfix list keymaps
+        vim.keymap.set("n", "dd", delete_qf_item, { buffer = bufnr, desc = "Delete quickfix item" })
+        vim.keymap.set("x", "d", delete_qf_items_visual, { buffer = bufnr, desc = "Delete quickfix items" })
+      end
+    end,
+  })
+end
+
 return M

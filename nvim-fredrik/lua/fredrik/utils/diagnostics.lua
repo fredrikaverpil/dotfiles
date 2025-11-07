@@ -50,6 +50,9 @@ function M.setup_diagnostics()
   -- vim.diagnostic.config(vim.deepcopy(opts))
 
   require("fredrik.config.keymaps").setup_diagnostics_keymaps()
+
+  -- Set up quickfix/loclist editing keymaps
+  require("fredrik.utils.quickfix").setup_qf_keymaps()
 end
 
 return M
