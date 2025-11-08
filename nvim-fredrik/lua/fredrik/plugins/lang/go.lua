@@ -232,10 +232,11 @@ return {
             gopls = {
               buildFlags = { tags },
               -- env = {},
-              -- analyses = {
-              --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/analysis.go
-              --   -- https://github.com/golang/tools/blob/master/gopls/doc/analyzers.md
-              -- },
+              analyses = {
+                --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/analysis.go
+                --   -- https://github.com/golang/tools/blob/master/gopls/doc/analyzers.md
+                ST1000 = false, -- at least one file in a package should have a package comment
+              },
               -- codelenses = {
               --   -- https://github.com/golang/tools/blob/master/gopls/doc/codelenses.md
               --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/settings.go
