@@ -54,6 +54,61 @@ function M.diagnostics_to_qf_items(diagnostics)
   return items
 end
 
+--- Custom text function for quickfix/location list formatting
+---@param info table
+---@return string[]
+local function qf_text_func(info)
+  -- Determine if this is a location list or quickfix list
+  local wininfo = vim.fn.getwininfo(info.winid)[1]
+  local is_loclist = wininfo and wininfo.loclist == 1
+
+  local items
+  if is_loclist then
+    items = vim.fn.getloclist(info.winid, { id = info.id, items = 0 }).items
+  else
+    items = vim.fn.getqflist({ id = info.id, items = 0 }).items
+  end
+
+  local lines = {}
+  for idx = info.start_idx, info.end_idx do
+    local item = items[idx]
+    -- Safety check: if item doesn't exist, use default format
+    if not item then
+      table.insert(lines, "")
+      goto continue
+    end
+
+    local text = item.text or ""
+
+    if is_loclist then
+      -- Location list: just show the diagnostic text without filename/position
+      table.insert(lines, text)
+    else
+      -- Quickfix list: show default format with filename and position
+      local filename = vim.fn.bufname(item.bufnr)
+      if filename == "" then
+        filename = "[No Name]"
+      else
+        filename = vim.fn.fnamemodify(filename, ":~:.")
+      end
+      local lnum = item.lnum
+      local col = item.col
+      table.insert(lines, string.format("%s|%d col %d| %s", filename, lnum, col, text))
+    end
+
+    ::continue::
+  end
+  return lines
+end
+
+--- Set the custom text function globally
+local function setup_qf_format()
+  vim.o.quickfixtextfunc = "v:lua.require'fredrik.utils.quickfix'.qf_text_func"
+end
+
+-- Expose the function so it can be called from vim
+M.qf_text_func = qf_text_func
+
 -- Track which type of list is being auto-updated
 local auto_update_state = {
   enabled = false,
@@ -251,6 +306,9 @@ end
 
 --- Set up keymaps for quickfix/location list editing
 function M.setup_qf_keymaps()
+  -- Set up custom formatting globally
+  setup_qf_format()
+
   vim.api.nvim_create_autocmd("FileType", {
     pattern = "qf",
     callback = function(event)
