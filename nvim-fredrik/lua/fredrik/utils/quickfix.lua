@@ -62,41 +62,27 @@ local function qf_text_func(info)
   local wininfo = vim.fn.getwininfo(info.winid)[1]
   local is_loclist = wininfo and wininfo.loclist == 1
 
-  local items
-  if is_loclist then
-    items = vim.fn.getloclist(info.winid, { id = info.id, items = 0 }).items
-  else
-    items = vim.fn.getqflist({ id = info.id, items = 0 }).items
-  end
+  local items = is_loclist and vim.fn.getloclist(info.winid, { id = info.id, items = 0 }).items
+    or vim.fn.getqflist({ id = info.id, items = 0 }).items
 
   local lines = {}
   for idx = info.start_idx, info.end_idx do
     local item = items[idx]
-    -- Safety check: if item doesn't exist, use default format
     if not item then
       table.insert(lines, "")
-      goto continue
-    end
-
-    local text = item.text or ""
-
-    if is_loclist then
+    elseif is_loclist then
       -- Location list: just show the diagnostic text without filename/position
-      table.insert(lines, text)
+      table.insert(lines, item.text or "")
     else
       -- Quickfix list: show default format with filename and position
       local filename = vim.fn.bufname(item.bufnr)
-      if filename == "" then
-        filename = "[No Name]"
-      else
-        filename = vim.fn.fnamemodify(filename, ":~:.")
-      end
-      local lnum = item.lnum
-      local col = item.col
-      table.insert(lines, string.format("%s|%d col %d| %s", filename, lnum, col, text))
+      filename = filename == "" and "[No Name]" or vim.fn.fnamemodify(filename, ":~:.")
+      -- With position:
+      -- table.insert(lines, string.format("%s|%d col %d| %s", filename, item.lnum, item.col, item.text or ""))
+      --
+      -- Without position:
+      table.insert(lines, string.format("%s %s", filename, item.text or ""))
     end
-
-    ::continue::
   end
   return lines
 end
@@ -115,6 +101,13 @@ local auto_update_state = {
   list_type = nil, -- "loclist" or "qflist"
   bufnr = nil, -- For loclist, track which window's loclist
 }
+
+--- Reset auto-update state
+local function reset_auto_update_state()
+  auto_update_state.enabled = false
+  auto_update_state.list_type = nil
+  auto_update_state.bufnr = nil
+end
 
 --- Set up auto-update for diagnostic lists on buffer save
 local function setup_auto_update(list_type, bufnr)
@@ -154,9 +147,7 @@ local function setup_auto_update(list_type, bufnr)
         buffer = 0,
         once = true,
         callback = function()
-          auto_update_state.enabled = false
-          auto_update_state.list_type = nil
-          auto_update_state.bufnr = nil
+          reset_auto_update_state()
           -- Safely delete the autocommand group (might already be deleted by toggle)
           pcall(vim.api.nvim_del_augroup_by_name, "DiagnosticListAutoUpdate")
         end,
@@ -167,22 +158,22 @@ end
 
 --- Clean up auto-update state and autocommands
 local function cleanup_auto_update()
-  auto_update_state.enabled = false
-  auto_update_state.list_type = nil
-  auto_update_state.bufnr = nil
+  reset_auto_update_state()
   -- Safely delete the autocommand group
   pcall(vim.api.nvim_del_augroup_by_name, "DiagnosticListAutoUpdate")
 end
 
---- Check if location list is open for the current window
+--- Check if a specific list type is open
+---@param list_type "loclist"|"qflist"
 ---@return boolean
-local function is_loclist_open()
+local function is_list_open(list_type)
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     local buf = vim.api.nvim_win_get_buf(win)
     if vim.bo[buf].filetype == "qf" then
-      -- Check if it's a location list (not quickfix)
       local wininfo = vim.fn.getwininfo(win)[1]
-      if wininfo and wininfo.loclist == 1 then
+      if list_type == "loclist" and wininfo and wininfo.loclist == 1 then
+        return true
+      elseif list_type == "qflist" and wininfo and wininfo.quickfix == 1 and wininfo.loclist == 0 then
         return true
       end
     end
@@ -190,118 +181,78 @@ local function is_loclist_open()
   return false
 end
 
---- Check if quickfix list is open
----@return boolean
-local function is_qflist_open()
-  for _, win in ipairs(vim.api.nvim_list_wins()) do
-    local buf = vim.api.nvim_win_get_buf(win)
-    if vim.bo[buf].filetype == "qf" then
-      -- Check if it's a quickfix (not location list)
-      local wininfo = vim.fn.getwininfo(win)[1]
-      if wininfo and wininfo.quickfix == 1 and wininfo.loclist == 0 then
-        return true
-      end
+--- Toggle diagnostics in list with auto-update
+---@param list_type "loclist"|"qflist"
+local function toggle_list(list_type)
+  local is_loclist = list_type == "loclist"
+
+  if is_list_open(list_type) then
+    cleanup_auto_update()
+    vim.cmd(is_loclist and "lclose" or "cclose")
+  else
+    -- Save current window to return focus after opening
+    local current_win = vim.api.nvim_get_current_win()
+    local diagnostics = is_loclist and vim.diagnostic.get(0) or vim.diagnostic.get()
+    local items = M.diagnostics_to_qf_items(diagnostics)
+
+    if is_loclist then
+      vim.fn.setloclist(0, items)
+      vim.cmd("lopen")
+    else
+      vim.fn.setqflist(items)
+      vim.cmd("copen")
     end
+
+    -- Return focus to the original window
+    vim.api.nvim_set_current_win(current_win)
+    setup_auto_update(list_type, is_loclist and vim.api.nvim_get_current_buf() or nil)
   end
-  return false
 end
 
 --- Toggle buffer diagnostics in location list with auto-update
 function M.toggle_loclist()
-  if is_loclist_open() then
-    cleanup_auto_update()
-    vim.cmd("lclose")
-  else
-    -- Save current window to return focus after opening
-    local current_win = vim.api.nvim_get_current_win()
-    local diagnostics = vim.diagnostic.get(0)
-    local items = M.diagnostics_to_qf_items(diagnostics)
-    vim.fn.setloclist(0, items)
-    vim.cmd("lopen")
-    -- Return focus to the original window
-    vim.api.nvim_set_current_win(current_win)
-    setup_auto_update("loclist", vim.api.nvim_get_current_buf())
-  end
+  toggle_list("loclist")
 end
 
 --- Toggle workspace diagnostics in quickfix list with auto-update
 function M.toggle_qflist()
-  if is_qflist_open() then
-    cleanup_auto_update()
-    vim.cmd("cclose")
+  toggle_list("qflist")
+end
+
+--- Delete item(s) from quickfix or location list
+---@param is_loclist boolean
+---@param is_visual boolean
+local function delete_items(is_loclist, is_visual)
+  local get_list = is_loclist and function()
+    return vim.fn.getloclist(0)
+  end or vim.fn.getqflist
+  local set_list = is_loclist and function(list)
+    vim.fn.setloclist(0, list)
+  end or vim.fn.setqflist
+
+  local start_line, end_line
+  if is_visual then
+    start_line = vim.fn.line("'<")
+    end_line = vim.fn.line("'>")
   else
-    -- Save current window to return focus after opening
-    local current_win = vim.api.nvim_get_current_win()
-    local diagnostics = vim.diagnostic.get()
-    local items = M.diagnostics_to_qf_items(diagnostics)
-    vim.fn.setqflist(items)
-    vim.cmd("copen")
-    -- Return focus to the original window
-    vim.api.nvim_set_current_win(current_win)
-    setup_auto_update("qflist", nil)
+    start_line = vim.fn.line(".")
+    end_line = start_line
   end
-end
 
---- Delete the current item from the quickfix list
-local function delete_qf_item()
-  local qf_idx = vim.fn.line(".")
-  local qf_list = vim.fn.getqflist()
-  table.remove(qf_list, qf_idx)
-  vim.fn.setqflist(qf_list)
-  -- Stay on the same line if possible, otherwise move up
-  if qf_idx > #qf_list then
-    qf_idx = #qf_list
-  end
-  if qf_idx > 0 then
-    vim.cmd(tostring(qf_idx))
-  end
-end
-
---- Delete the current item from the location list
-local function delete_loc_item()
-  local loc_idx = vim.fn.line(".")
-  local loc_list = vim.fn.getloclist(0)
-  table.remove(loc_list, loc_idx)
-  vim.fn.setloclist(0, loc_list)
-  -- Stay on the same line if possible, otherwise move up
-  if loc_idx > #loc_list then
-    loc_idx = #loc_list
-  end
-  if loc_idx > 0 then
-    vim.cmd(tostring(loc_idx))
-  end
-end
-
---- Delete selected items from quickfix list (visual mode)
-local function delete_qf_items_visual()
-  local start_line = vim.fn.line("'<")
-  local end_line = vim.fn.line("'>")
-  local qf_list = vim.fn.getqflist()
+  local list = get_list()
 
   -- Remove items in reverse order to maintain indices
   for i = end_line, start_line, -1 do
-    table.remove(qf_list, i)
+    table.remove(list, i)
   end
 
-  vim.fn.setqflist(qf_list)
-  -- Move cursor to the line where deletion started
-  vim.cmd(tostring(math.min(start_line, #qf_list)))
-end
+  set_list(list)
 
---- Delete selected items from location list (visual mode)
-local function delete_loc_items_visual()
-  local start_line = vim.fn.line("'<")
-  local end_line = vim.fn.line("'>")
-  local loc_list = vim.fn.getloclist(0)
-
-  -- Remove items in reverse order to maintain indices
-  for i = end_line, start_line, -1 do
-    table.remove(loc_list, i)
+  -- Move cursor to appropriate line
+  local target_line = math.min(start_line, #list)
+  if target_line > 0 then
+    vim.cmd(tostring(target_line))
   end
-
-  vim.fn.setloclist(0, loc_list)
-  -- Move cursor to the line where deletion started
-  vim.cmd(tostring(math.min(start_line, #loc_list)))
 end
 
 --- Set up keymaps for quickfix/location list editing
@@ -320,12 +271,20 @@ function M.setup_qf_keymaps()
 
       if is_loclist then
         -- Location list keymaps
-        vim.keymap.set("n", "dd", delete_loc_item, { buffer = bufnr, desc = "Delete location list item" })
-        vim.keymap.set("x", "d", delete_loc_items_visual, { buffer = bufnr, desc = "Delete location list items" })
+        vim.keymap.set("n", "dd", function()
+          delete_items(true, false)
+        end, { buffer = bufnr, desc = "Delete location list item" })
+        vim.keymap.set("x", "d", function()
+          delete_items(true, true)
+        end, { buffer = bufnr, desc = "Delete location list items" })
       else
         -- Quickfix list keymaps
-        vim.keymap.set("n", "dd", delete_qf_item, { buffer = bufnr, desc = "Delete quickfix item" })
-        vim.keymap.set("x", "d", delete_qf_items_visual, { buffer = bufnr, desc = "Delete quickfix items" })
+        vim.keymap.set("n", "dd", function()
+          delete_items(false, false)
+        end, { buffer = bufnr, desc = "Delete quickfix item" })
+        vim.keymap.set("x", "d", function()
+          delete_items(false, true)
+        end, { buffer = bufnr, desc = "Delete quickfix items" })
       end
     end,
   })
