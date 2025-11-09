@@ -99,33 +99,53 @@ local EMPTY_LIST_ERROR = "E42"
 vim.keymap.set("n", "[q", function()
   local ok, err = pcall(vim.cmd.cprev)
   if not ok and err:match(EMPTY_LIST_ERROR) then
-    -- Quickfix list is empty, populate it first
-    require("fredrik.utils.quickfix").toggle_qflist()
-    vim.cmd.cfirst()
+    -- Quickfix list is empty, check if there are diagnostics to populate
+    local diagnostics = vim.diagnostic.get()
+    if #diagnostics > 0 then
+      require("fredrik.utils.quickfix").toggle_qflist()
+      vim.cmd.cfirst()
+    else
+      vim.notify("No items in quickfix list", vim.log.levels.INFO)
+    end
   end
 end, { desc = "Previous quickfix" })
 vim.keymap.set("n", "]q", function()
   local ok, err = pcall(vim.cmd.cnext)
   if not ok and err:match(EMPTY_LIST_ERROR) then
-    -- Quickfix list is empty, populate it first
-    require("fredrik.utils.quickfix").toggle_qflist()
-    vim.cmd.cfirst()
+    -- Quickfix list is empty, check if there are diagnostics to populate
+    local diagnostics = vim.diagnostic.get()
+    if #diagnostics > 0 then
+      require("fredrik.utils.quickfix").toggle_qflist()
+      vim.cmd.cfirst()
+    else
+      vim.notify("No items in quickfix list", vim.log.levels.INFO)
+    end
   end
 end, { desc = "Next quickfix" })
 vim.keymap.set("n", "[l", function()
   local ok, err = pcall(vim.cmd.lprev)
   if not ok and err:match(EMPTY_LIST_ERROR) then
-    -- Location list is empty, populate it first
-    require("fredrik.utils.quickfix").toggle_loclist()
-    vim.cmd.lfirst()
+    -- Location list is empty, check if there are diagnostics to populate
+    local diagnostics = vim.diagnostic.get(0)
+    if #diagnostics > 0 then
+      require("fredrik.utils.quickfix").toggle_loclist()
+      vim.cmd.lfirst()
+    else
+      vim.notify("No items in location list", vim.log.levels.INFO)
+    end
   end
 end, { desc = "Previous location" })
 vim.keymap.set("n", "]l", function()
   local ok, err = pcall(vim.cmd.lnext)
   if not ok and err:match(EMPTY_LIST_ERROR) then
-    -- Location list is empty, populate it first
-    require("fredrik.utils.quickfix").toggle_loclist()
-    vim.cmd.lfirst()
+    -- Location list is empty, check if there are diagnostics to populate
+    local diagnostics = vim.diagnostic.get(0)
+    if #diagnostics > 0 then
+      require("fredrik.utils.quickfix").toggle_loclist()
+      vim.cmd.lfirst()
+    else
+      vim.notify("No items in location list", vim.log.levels.INFO)
+    end
   end
 end, { desc = "Next location" })
 vim.keymap.set("n", "<leader>xx", function()
