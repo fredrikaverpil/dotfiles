@@ -68,7 +68,18 @@ return {
       },
       ---@type table<string, sidekick.cli.Config|{}>
       tools = {
-        claude = { cmd = { "claude", "--continue" } },
+        -- https://code.claude.com/docs/en/iam
+        claude = {
+          cmd = {
+            "claude",
+            "--continue",
+            "--allowedTools=mcp__github",
+            "--allowedTools=mcp__serena",
+            "--allowedTools=Bash(gh:*)",
+            "--allowedTools=RunBash(go:*)",
+            "--allowedTools=Read(~/code)",
+          },
+        },
       },
     },
   },
