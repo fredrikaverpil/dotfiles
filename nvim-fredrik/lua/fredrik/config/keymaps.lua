@@ -668,11 +668,11 @@ function M.setup_snacks_keymaps()
 
     -- git
     {
-      "<leader>sgl",
+      "<leader>sgc",
       function()
         Snacks.picker.git_log()
       end,
-      desc = "[s]earch [g]it commit [l]og",
+      desc = "[s]earch [g]it [c]ommit log",
     },
     {
       "<leader>sgf",
