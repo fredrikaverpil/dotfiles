@@ -45,7 +45,7 @@ return {
       image = { enabled = true },
 
       indent = {
-        enabled = true,
+        enabled = false, -- use blink indent instead
         priority = 1,
         animate = {
           enabled = false,
