@@ -675,6 +675,22 @@ function M.setup_snacks_keymaps()
       desc = "[s]earch [g]it [c]ommit log",
     },
     {
+      "<leader>sgd",
+      function()
+        Snacks.picker.git_diff()
+      end,
+      desc = "Git Diff (HEAD)",
+    },
+    {
+      "<leader>sgD",
+      function()
+        ---@class snacks.picker.git.diff.Config: snacks.picker.git.Config
+        local opts = { base = "origin" }
+        Snacks.picker.git_diff(opts)
+      end,
+      desc = "Git Diff (origin)",
+    },
+    {
       "<leader>sgf",
       function()
         Snacks.picker.git_log_file()
@@ -682,11 +698,25 @@ function M.setup_snacks_keymaps()
       desc = "[s]earch [g]it commit log [f]ile",
     },
     {
+      "<leader>sgl",
+      function()
+        Snacks.picker.git_log_line()
+      end,
+      desc = "[s]earch [g]it commit log [l]ine",
+    },
+    {
       "<leader>sgs",
       function()
         Snacks.picker.git_status()
       end,
       desc = "[s]earch [g]it [s]tatus changes",
+    },
+    {
+      "<leader>sgS",
+      function()
+        Snacks.picker.git_stash()
+      end,
+      desc = "[s]earch [g]it [s]tash",
     },
     {
       "<leader>sgb",
