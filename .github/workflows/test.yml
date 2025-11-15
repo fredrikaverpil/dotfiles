@@ -46,9 +46,7 @@ jobs:
         if: matrix.brew_cache_path != ''
 
       - name: install nix
-        uses: cachix/install-nix-action@v27
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
+        uses: DeterminateSystems/nix-installer-action@main
 
       - name: setup cachix
         uses: cachix/cachix-action@v15
