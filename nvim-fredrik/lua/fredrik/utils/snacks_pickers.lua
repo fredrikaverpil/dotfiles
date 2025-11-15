@@ -114,14 +114,24 @@ function M.neovim_logs(opts)
   }))
 end
 
----@param opts? snacks.picker.Config
+---@class GoPackageSymbolsOpts: snacks.picker.Config
+---@field file_types? string[] File type arrays to include (e.g., {"GoFiles", "TestGoFiles"})
+
+---@param opts? GoPackageSymbolsOpts
 function M.go_package_symbols(opts)
+  opts = opts or {}
+  local file_types = opts.file_types -- nil means use defaults in get_package_files()
   -- Get the current file's directory
   local current_file = vim.fn.expand("%:p")
   local current_dir = vim.fn.fnamemodify(current_file, ":h")
 
   -- Helper function to get Go package files
-  local function get_package_files()
+  ---@param file_types? string[] Which file type arrays to include (e.g., {"GoFiles", "TestGoFiles"})
+  ---@return string[]? files Array of file paths, or nil on error
+  local function get_package_files(file_types)
+    -- Default to all file types (implementation + tests)
+    file_types = file_types or { "GoFiles", "CgoFiles", "TestGoFiles", "XTestGoFiles" }
+
     local result = vim
       .system({ "go", "list", "-json", "-find", "." }, {
         cwd = current_dir,
@@ -143,12 +153,11 @@ function M.go_package_symbols(opts)
     local files = {}
     local pkg_dir = pkg_info.Dir or current_dir
 
-    -- Collect all Go files (excluding test files)
-    for _, file in ipairs(pkg_info.GoFiles or {}) do
-      table.insert(files, pkg_dir .. "/" .. file)
-    end
-    for _, file in ipairs(pkg_info.CgoFiles or {}) do
-      table.insert(files, pkg_dir .. "/" .. file)
+    -- Collect files from specified file type arrays
+    for _, file_type in ipairs(file_types) do
+      for _, file in ipairs(pkg_info[file_type] or {}) do
+        table.insert(files, pkg_dir .. "/" .. file)
+      end
     end
 
     return files
@@ -193,9 +202,22 @@ function M.go_package_symbols(opts)
     return nil, nil
   end
 
+  -- Determine title based on file types being shown
+  local title = "Go Package Symbols"
+  if file_types then
+    local has_tests = vim.tbl_contains(file_types, "TestGoFiles") or vim.tbl_contains(file_types, "XTestGoFiles")
+    local has_regular = vim.tbl_contains(file_types, "GoFiles") or vim.tbl_contains(file_types, "CgoFiles")
+
+    if has_tests and not has_regular then
+      title = "Go Package Test Symbols"
+    elseif has_tests and has_regular then
+      title = "Go Package Symbols (All)"
+    end
+  end
+
   -- Main picker implementation
   return Snacks.picker.pick(vim.tbl_deep_extend("keep", opts or {}, {
-    title = "Go Package Symbols",
+    title = title,
     tree = true,
     -- Symbol kind filter (same as lsp_symbols)
     filter = {
@@ -224,7 +246,7 @@ function M.go_package_symbols(opts)
         ctx.picker.matcher.opts.sort = false
       end
 
-      local package_files = get_package_files()
+      local package_files = get_package_files(file_types)
 
       if not package_files or #package_files == 0 then
         vim.notify("No Go package files found, falling back to current file symbols", vim.log.levels.INFO)
