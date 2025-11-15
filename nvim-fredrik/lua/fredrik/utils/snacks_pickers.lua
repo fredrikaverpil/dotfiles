@@ -220,6 +220,10 @@ function M.go_package_symbols(opts)
     title = title,
     tree = true,
     -- Symbol kind filter (same as lsp_symbols)
+    -- Note: This is a custom filter field used by lsp_symbols, NOT the generic
+    -- snacks.picker.filter.Config. The generic filter is for cwd/buf/paths filtering,
+    -- while this filter controls which LSP symbol kinds (Class, Function, etc.) to show.
+    -- See: snacks.nvim/lua/snacks/picker/config/sources.lua for lsp_symbols config
     filter = {
       default = {
         "Class",
@@ -257,10 +261,13 @@ function M.go_package_symbols(opts)
       end
 
       -- Get filter configuration for current filetype
+      -- Note: lua_ls warns about undefined-field because it only knows about the generic
+      -- snacks.picker.filter.Config, not the custom symbol kind filter used by lsp_symbols
       local lsp_source = require("snacks.picker.source.lsp")
       local picker_opts = ctx.picker.opts
       local filter = picker_opts.filter[vim.bo.filetype]
       if filter == nil then
+        ---@diagnostic disable-next-line: undefined-field
         filter = picker_opts.filter.default
       end
 
