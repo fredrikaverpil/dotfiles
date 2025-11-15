@@ -509,7 +509,11 @@ function M.setup_snacks_keymaps()
     {
       "<leader>ss",
       function()
-        Snacks.picker.lsp_symbols()
+        if vim.bo.filetype == "go" then
+          require("fredrik.utils.snacks_pickers").go_package_symbols()
+        else
+          Snacks.picker.lsp_symbols()
+        end
       end,
       desc = "[s]earch LSP [s]ymbols",
     },
