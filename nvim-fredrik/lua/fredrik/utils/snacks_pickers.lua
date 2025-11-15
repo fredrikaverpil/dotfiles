@@ -154,45 +154,7 @@ function M.go_package_symbols(opts)
     return files
   end
 
-  -- Helper function to recursively build picker items from LSP symbols
-  -- Similar to Snacks' add() function, builds items with proper parent pointers in one pass
-  local function symbols_to_items(symbols, file_path, parent_item, items)
-    items = items or {}
-
-    for _, symbol in ipairs(symbols or {}) do
-      local filename = vim.fn.fnamemodify(file_path, ":t")
-
-      ---@type snacks.picker.finder.Item
-      local item = {
-        text = symbol.name,
-        name = symbol.name,
-        lsp_kind = symbol.kind,
-        file = file_path,
-        filename = filename,
-        parent = parent_item,
-        tree = true,
-        pos = symbol.selectionRange and {
-          symbol.selectionRange.start.line + 1,
-          symbol.selectionRange.start.character,
-        } or symbol.range and {
-          symbol.range.start.line + 1,
-          symbol.range.start.character,
-        } or { 1, 0 },
-      }
-
-      table.insert(items, item)
-
-      -- Recursively process children, passing this item as their parent
-      if symbol.children then
-        symbols_to_items(symbol.children, file_path, item, items)
-      end
-    end
-
-    return items
-  end
-
-  -- Helper function to get LSP symbols for a file
-  local function get_lsp_symbols(file_path)
+  local function get_lsp_symbols_and_client(file_path)
     local bufnr = vim.fn.bufadd(file_path)
     vim.fn.bufload(bufnr)
 
@@ -217,26 +179,51 @@ function M.go_package_symbols(opts)
     local results = vim.lsp.buf_request_sync(bufnr, "textDocument/documentSymbol", params, 2000)
 
     if not results or vim.tbl_isempty(results) then
-      return {}
+      return nil, nil
     end
 
-    -- Get the first successful response (raw LSP symbols)
-    for _, result in pairs(results) do
+    -- Get the first successful response (raw LSP symbols and client)
+    for client_id, result in pairs(results) do
       if result.result then
-        return result.result
+        local client = vim.lsp.get_client_by_id(client_id)
+        return result.result, client
       end
     end
 
-    return {}
+    return nil, nil
   end
 
   -- Main picker implementation
   return Snacks.picker.pick(vim.tbl_deep_extend("keep", opts or {}, {
     title = "Go Package Symbols",
     tree = true,
+    -- Symbol kind filter (same as lsp_symbols)
+    filter = {
+      default = {
+        "Class",
+        "Constructor",
+        "Enum",
+        "Field",
+        "Function",
+        "Interface",
+        "Method",
+        "Module",
+        "Namespace",
+        "Package",
+        "Property",
+        "Struct",
+        "Trait",
+      },
+    },
     ---@param _f_opts table
-    ---@param _ctx snacks.picker.finder.ctx
-    finder = function(_f_opts, _ctx)
+    ---@param ctx snacks.picker.finder.ctx
+    finder = function(_f_opts, ctx)
+      -- Configure matcher for tree mode (like lsp_symbols does)
+      if ctx.picker.matcher then
+        ctx.picker.matcher.opts.keep_parents = true
+        ctx.picker.matcher.opts.sort = false
+      end
+
       local package_files = get_package_files()
 
       if not package_files or #package_files == 0 then
@@ -247,23 +234,55 @@ function M.go_package_symbols(opts)
         return {}
       end
 
-      -- Collect all symbols from all package files
-      ---@type snacks.picker.finder.Item[]
-      local items = {}
+      -- Get filter configuration for current filetype
+      local lsp_source = require("snacks.picker.source.lsp")
+      local picker_opts = ctx.picker.opts
+      local filter = picker_opts.filter[vim.bo.filetype]
+      if filter == nil then
+        filter = picker_opts.filter.default
+      end
 
-      -- Create a single root for all symbols across all files (like Snacks does)
-      local root = { text = "", root = true }
+      -- Helper to check if a symbol kind should be included
+      local function want(kind)
+        kind = kind or "Unknown"
+        return type(filter) == "boolean" or vim.tbl_contains(filter, kind)
+      end
+
+      -- Collect all symbols from all package files using Snacks' results_to_items
+      local all_items = {}
+      -- Create a single shared root for all symbols across all files
+      local shared_root = { text = "", root = true }
 
       for _, file_path in ipairs(package_files) do
-        local lsp_symbols = get_lsp_symbols(file_path)
-        -- Recursively convert LSP symbols to picker items with proper parent pointers
-        symbols_to_items(lsp_symbols, file_path, root, items)
+        local lsp_symbols, client = get_lsp_symbols_and_client(file_path)
+
+        if lsp_symbols and client then
+          -- Use Snacks' results_to_items to convert LSP symbols to picker items
+          local items = lsp_source.results_to_items(client, lsp_symbols, {
+            default_uri = vim.uri_from_fname(file_path),
+            filter = function(result)
+              return want(lsp_source.symbol_kind(result.kind))
+            end,
+          })
+
+          -- Re-parent top-level symbols to the shared root
+          -- results_to_items creates its own root, so we need to replace it
+          for _, item in ipairs(items) do
+            item.tree = true
+            -- If this item's parent has root = true, it's a top-level symbol
+            if item.parent and item.parent.root then
+              item.parent = shared_root
+            end
+          end
+
+          vim.list_extend(all_items, items)
+        end
       end
 
       -- Fix 'last' flags - only the actual last child of each parent should have last = true
-      -- This is necessary because symbols from different files share the same root parent
+      -- Now that all top-level symbols share the same parent, this will work correctly
       local last = {} ---@type table<snacks.picker.finder.Item, snacks.picker.finder.Item>
-      for _, item in ipairs(items) do
+      for _, item in ipairs(all_items) do
         item.last = nil
         local parent = item.parent
         if parent then
@@ -275,46 +294,9 @@ function M.go_package_symbols(opts)
         end
       end
 
-      return items
+      return all_items
     end,
-    format = function(item, picker)
-      -- Use the same format as lsp_symbols with tree indentation
-      local ret = {}
-
-      -- Add tree indentation for hierarchical symbols
-      if item.tree and item.parent then
-        local indent = {}
-        local icons = picker.opts.icons.tree
-        local node = item
-        while node and node.parent do
-          local is_last, icon = node.last, ""
-          if node ~= item then
-            icon = is_last and "  " or icons.vertical
-          else
-            icon = is_last and icons.last or icons.middle
-          end
-          table.insert(indent, 1, icon)
-          node = node.parent
-        end
-        ret[#ret + 1] = { table.concat(indent), "SnacksPickerTree" }
-      end
-
-      -- Add symbol icon and name with syntax highlighting
-      local kind = vim.lsp.protocol.SymbolKind[item.lsp_kind] or "Unknown"
-      kind = picker.opts.icons.kinds[kind] and kind or "Unknown"
-      local kind_hl = "SnacksPickerIcon" .. kind
-      local icon = picker.opts.icons.kinds[kind] or ""
-
-      ret[#ret + 1] = { icon, kind_hl }
-      ret[#ret + 1] = { " " }
-
-      -- Apply syntax highlighting to the symbol name (like Snacks does)
-      local name = vim.trim(item.name:gsub("\r?\n", " "))
-      name = name == "" and item.detail or name
-      Snacks.picker.highlight.format(item, name, ret)
-
-      return ret
-    end,
+    format = "lsp_symbol", -- Use Snacks' native formatter
     confirm = function(picker, item)
       picker:close()
       vim.cmd("edit " .. vim.fn.fnameescape(item.file))
