@@ -509,7 +509,25 @@ function M.setup_snacks_keymaps()
     {
       "<leader>ss",
       function()
-        Snacks.picker.lsp_symbols()
+        if vim.bo.filetype == "go" then
+          -- Auto-detect if current file is a test file
+          local current_file = vim.fn.expand("%:t")
+          local is_test_file = current_file:match("_test%.go$") ~= nil
+
+          if is_test_file then
+            -- In a test file, show only test symbols
+            require("fredrik.utils.snacks_pickers").go_package_symbols({
+              file_types = { "TestGoFiles", "XTestGoFiles" },
+            })
+          else
+            -- In a regular file, show only implementation symbols
+            require("fredrik.utils.snacks_pickers").go_package_symbols({
+              file_types = { "GoFiles", "CgoFiles" },
+            })
+          end
+        else
+          Snacks.picker.lsp_symbols()
+        end
       end,
       desc = "[s]earch LSP [s]ymbols",
     },

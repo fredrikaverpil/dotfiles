@@ -114,4 +114,226 @@ function M.neovim_logs(opts)
   }))
 end
 
+---@class GoPackageSymbolsOpts: snacks.picker.Config
+---@field file_types? string[] File type arrays to include (e.g., {"GoFiles", "TestGoFiles"})
+
+---@param opts? GoPackageSymbolsOpts
+function M.go_package_symbols(opts)
+  opts = opts or {}
+  local file_types = opts.file_types -- nil means use defaults in get_package_files()
+  -- Get the current file's directory
+  local current_file = vim.fn.expand("%:p")
+  local current_dir = vim.fn.fnamemodify(current_file, ":h")
+
+  -- Helper function to get Go package files
+  ---@param file_types? string[] Which file type arrays to include (e.g., {"GoFiles", "TestGoFiles"})
+  ---@return string[]? files Array of file paths, or nil on error
+  local function get_package_files(file_types)
+    -- Default to all file types (implementation + tests)
+    file_types = file_types or { "GoFiles", "CgoFiles", "TestGoFiles", "XTestGoFiles" }
+
+    local result = vim
+      .system({ "go", "list", "-json", "-find", "." }, {
+        cwd = current_dir,
+        text = true,
+      })
+      :wait()
+
+    if result.code ~= 0 then
+      vim.notify("Failed to get Go package info: " .. (result.stderr or ""), vim.log.levels.WARN)
+      return nil
+    end
+
+    local ok, pkg_info = pcall(vim.json.decode, result.stdout)
+    if not ok then
+      vim.notify("Failed to parse go list output", vim.log.levels.WARN)
+      return nil
+    end
+
+    local files = {}
+    local pkg_dir = pkg_info.Dir or current_dir
+
+    -- Collect files from specified file type arrays
+    for _, file_type in ipairs(file_types) do
+      for _, file in ipairs(pkg_info[file_type] or {}) do
+        table.insert(files, pkg_dir .. "/" .. file)
+      end
+    end
+
+    return files
+  end
+
+  local function get_lsp_symbols_and_client(file_path)
+    local bufnr = vim.fn.bufadd(file_path)
+    vim.fn.bufload(bufnr)
+
+    -- Ensure LSP is attached to the buffer
+    local clients = vim.lsp.get_clients({ bufnr = bufnr })
+    if vim.tbl_isempty(clients) then
+      -- Try to attach LSP to this buffer
+      vim.api.nvim_buf_call(bufnr, function()
+        vim.cmd("doautocmd BufReadPost")
+      end)
+      -- Wait a bit for LSP to attach
+      vim.wait(100, function()
+        clients = vim.lsp.get_clients({ bufnr = bufnr })
+        return not vim.tbl_isempty(clients)
+      end)
+    end
+
+    local params = {
+      textDocument = vim.lsp.util.make_text_document_params(bufnr),
+    }
+
+    local results = vim.lsp.buf_request_sync(bufnr, "textDocument/documentSymbol", params, 2000)
+
+    if not results or vim.tbl_isempty(results) then
+      return nil, nil
+    end
+
+    -- Get the first successful response (raw LSP symbols and client)
+    for client_id, result in pairs(results) do
+      if result.result then
+        local client = vim.lsp.get_client_by_id(client_id)
+        return result.result, client
+      end
+    end
+
+    return nil, nil
+  end
+
+  -- Determine title based on file types being shown
+  local title = "Go Package Symbols"
+  if file_types then
+    local has_tests = vim.tbl_contains(file_types, "TestGoFiles") or vim.tbl_contains(file_types, "XTestGoFiles")
+    local has_regular = vim.tbl_contains(file_types, "GoFiles") or vim.tbl_contains(file_types, "CgoFiles")
+
+    if has_tests and not has_regular then
+      title = "Go Package Test Symbols"
+    elseif has_tests and has_regular then
+      title = "Go Package Symbols (All)"
+    end
+  end
+
+  -- Main picker implementation
+  return Snacks.picker.pick(vim.tbl_deep_extend("keep", opts or {}, {
+    title = title,
+    tree = true,
+    -- Symbol kind filter (same as lsp_symbols)
+    -- Note: This is a custom filter field used by lsp_symbols, NOT the generic
+    -- snacks.picker.filter.Config. The generic filter is for cwd/buf/paths filtering,
+    -- while this filter controls which LSP symbol kinds (Class, Function, etc.) to show.
+    -- See: snacks.nvim/lua/snacks/picker/config/sources.lua for lsp_symbols config
+    filter = {
+      default = {
+        "Class",
+        "Constructor",
+        "Enum",
+        "Field",
+        "Function",
+        "Interface",
+        "Method",
+        "Module",
+        "Namespace",
+        "Package",
+        "Property",
+        "Struct",
+        "Trait",
+      },
+    },
+    ---@param _f_opts table
+    ---@param ctx snacks.picker.finder.ctx
+    finder = function(_f_opts, ctx)
+      -- Configure matcher for tree mode (like lsp_symbols does)
+      if ctx.picker.matcher then
+        ctx.picker.matcher.opts.keep_parents = true
+        ctx.picker.matcher.opts.sort = false
+      end
+
+      local package_files = get_package_files(file_types)
+
+      if not package_files or #package_files == 0 then
+        vim.notify("No Go package files found, falling back to current file symbols", vim.log.levels.INFO)
+        vim.schedule(function()
+          Snacks.picker.lsp_symbols()
+        end)
+        return {}
+      end
+
+      -- Get filter configuration for current filetype
+      -- Note: lua_ls warns about undefined-field because it only knows about the generic
+      -- snacks.picker.filter.Config, not the custom symbol kind filter used by lsp_symbols
+      local lsp_source = require("snacks.picker.source.lsp")
+      local picker_opts = ctx.picker.opts
+      local filter = picker_opts.filter[vim.bo.filetype]
+      if filter == nil then
+        ---@diagnostic disable-next-line: undefined-field
+        filter = picker_opts.filter.default
+      end
+
+      -- Helper to check if a symbol kind should be included
+      local function want(kind)
+        kind = kind or "Unknown"
+        return type(filter) == "boolean" or vim.tbl_contains(filter, kind)
+      end
+
+      -- Collect all symbols from all package files using Snacks' results_to_items
+      local all_items = {}
+      -- Create a single shared root for all symbols across all files
+      local shared_root = { text = "", root = true }
+
+      for _, file_path in ipairs(package_files) do
+        local lsp_symbols, client = get_lsp_symbols_and_client(file_path)
+
+        if lsp_symbols and client then
+          -- Use Snacks' results_to_items to convert LSP symbols to picker items
+          local items = lsp_source.results_to_items(client, lsp_symbols, {
+            default_uri = vim.uri_from_fname(file_path),
+            filter = function(result)
+              return want(lsp_source.symbol_kind(result.kind))
+            end,
+          })
+
+          -- Re-parent top-level symbols to the shared root
+          -- results_to_items creates its own root, so we need to replace it
+          for _, item in ipairs(items) do
+            item.tree = true
+            -- If this item's parent has root = true, it's a top-level symbol
+            if item.parent and item.parent.root then
+              item.parent = shared_root
+            end
+          end
+
+          vim.list_extend(all_items, items)
+        end
+      end
+
+      -- Fix 'last' flags - only the actual last child of each parent should have last = true
+      -- Now that all top-level symbols share the same parent, this will work correctly
+      local last = {} ---@type table<snacks.picker.finder.Item, snacks.picker.finder.Item>
+      for _, item in ipairs(all_items) do
+        item.last = nil
+        local parent = item.parent
+        if parent then
+          if last[parent] then
+            last[parent].last = nil
+          end
+          last[parent] = item
+          item.last = true
+        end
+      end
+
+      return all_items
+    end,
+    format = "lsp_symbol", -- Use Snacks' native formatter
+    confirm = function(picker, item)
+      picker:close()
+      vim.cmd("edit " .. vim.fn.fnameescape(item.file))
+      if item.pos then
+        vim.api.nvim_win_set_cursor(0, item.pos)
+      end
+    end,
+  }))
+end
+
 return M
