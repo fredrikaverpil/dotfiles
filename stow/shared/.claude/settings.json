@@ -1,9 +1,12 @@
 {
   "env": {},
   "permissions": {
-    "allow": [],
+    "allow": [
+      "Bash(go:doc:*)",
+      "Bash(go:test:*)",
+      "Bash(go:build:*)"
+    ],
     "deny": [
-      "Bash(curl:*)",
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(./secrets/**)"
