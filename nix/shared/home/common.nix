@@ -76,6 +76,7 @@ in
       # neovim-custom # from custom overlay
       wget
       yq
+      yazi
       unzip
       zsh-autosuggestions
       zsh-syntax-highlighting
