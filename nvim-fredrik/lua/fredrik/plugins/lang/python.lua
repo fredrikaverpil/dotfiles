@@ -1,45 +1,3 @@
---- Find the path to the binary in the python virtual environment.
---- First search active virtual environment, then .venv folder,
---- then mason and last give up.
----
---- NOTE: this function is likely redundant, as Mason is configured
---- to _append_ to PATH, leaving binaries from the .venv found first.
----
---- @param name string
---- @return string
-local function find_python_binary(name)
-  local binary_name = name
-  if vim.fn.has("win32") == 1 then
-    binary_name = name .. ".exe"
-  end
-
-  local bin_dir = vim.fn.has("win32") == 1 and "Scripts" or "bin"
-
-  local path
-  if vim.env.VIRTUAL_ENV ~= nil then
-    path = vim.fs.joinpath(vim.env.VIRTUAL_ENV, bin_dir, binary_name)
-  else
-    path = vim.fs.joinpath(vim.fn.getcwd(), ".venv", bin_dir, binary_name)
-  end
-
-  if vim.fn.executable(path) == 1 then
-    return path
-  end
-
-  local pkg = require("mason-registry").get_package(name)
-  if pkg ~= nil then
-    local cmd = pkg:get_install_path() .. "/bin/" .. name
-    if vim.fn.filereadable(cmd) == 1 then
-      vim.notify_once("Using from mason-registry: " .. vim.inspect(cmd), vim.log.levels.WARN)
-      return cmd
-    end
-  end
-
-  vim.notify_once("Could not find binary in .venv or mason-registry: " .. name, vim.log.levels.ERROR)
-
-  return name
-end
-
 local root_files = {
   "pyproject.toml",
   "ruff.toml",
@@ -85,7 +43,11 @@ return {
       opts.linters_by_ft["python"] = { "mypy" }
       opts.linters["mypy"] = {
         cmd = function()
-          return find_python_binary("mypy")
+          local found_bin = vim.fn.system("which mypy")
+          if found_bin ~= "" and string.find(found_bin, "mason") then
+            vim.notify_once("mypy used from mason: " .. found_bin, vim.log.levels.WARN)
+          end
+          return "mypy"
         end,
       }
     end,
