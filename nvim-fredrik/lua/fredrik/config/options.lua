@@ -36,8 +36,6 @@ vim.opt.softtabstop = 4 -- insert 4 spaces when tab is pressed
 vim.opt.shiftwidth = 4 -- indent << or >> by 4 spaces
 vim.opt.expandtab = false -- expand tab into spaces
 
--- NOTE: do not set a global ruler here, as it will show in undesirable places.
--- Instead, set this in the per-language config files.
 -- vim.opt.colorcolumn = "80"
 
 -- incremental search
