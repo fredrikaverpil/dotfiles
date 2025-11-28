@@ -60,6 +60,18 @@ vim.keymap.set("n", "<leader>bo", function()
     end
   end
 end, { desc = "Close all other buffers" })
+vim.keymap.set("n", "<leader>by", function()
+  -- Copy relative filepath to clipboard
+  local path = vim.fn.expand("%")
+  vim.fn.setreg("+", path)
+  vim.notify("Copied to clipboard: " .. path, vim.log.levels.INFO)
+end, { desc = "Yank buffer filepath (relative)" })
+vim.keymap.set("n", "<leader>bY", function()
+  -- Copy absolute filepath to clipboard
+  local path = vim.fn.expand("%:p")
+  vim.fn.setreg("+", path)
+  vim.notify("Copied to clipboard: " .. path, vim.log.levels.INFO)
+end, { desc = "Yank buffer filepath (absolute)" })
 
 -- tabs (can also use gt and gT)
 -- vim.keymap.set("n", "<leader><tab>l", "<cmd>tablast<cr>", { desc = "Last Tab", silent = true })
