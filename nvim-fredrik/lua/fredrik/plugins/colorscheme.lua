@@ -1,21 +1,26 @@
 local function set_dark()
-  vim.o.background = "light" -- NOTE: tokyonight-moon uses light background
-  vim.cmd.colorscheme("tokyonight-moon")
+  -- Colorschemes with light background
+  -- vim.o.background = "light"
+  -- vim.cmd.colorscheme("tokyonight-moon")
 
-  -- vim.o.background = "dark"
+  -- Colorschemes with dark background
+  vim.o.background = "dark"
   -- vim.cmd.colorscheme("rose-pine")
-
-  -- vim.o.background = "dark"
   -- vim.cmd.colorscheme("everforest")
+  -- vim.cmd.colorscheme("nordic")
+  vim.cmd.colorscheme("zenbones")
 end
 
 local function set_light()
-  -- vim.o.background = "light"
+  vim.o.background = "light"
+
   -- vim.cmd.colorscheme("dayfox")
 
-  vim.o.background = "light"
-  vim.g.everforest_background = "hard"
-  vim.cmd.colorscheme("everforest")
+  -- vim.o.background = "light"
+  -- vim.g.everforest_background = "hard"
+  -- vim.cmd.colorscheme("everforest")
+
+  vim.cmd.colorscheme("forestbones")
 end
 
 local function tmux_is_running()
@@ -73,8 +78,7 @@ return {
   {
     -- :h tokyonight.nvim-table-of-contents
     "folke/tokyonight.nvim",
-    enabled = true,
-    lazy = true,
+    enabled = false,
     ---@class tokyonight.Config
     opts = {
       transparent = false, -- Enable transparency
@@ -90,7 +94,6 @@ return {
     -- :h nightfox
     "EdenEast/nightfox.nvim",
     enabled = true,
-    lazy = true,
     opts = {
       options = {
         styles = {
@@ -102,8 +105,7 @@ return {
   {
     -- :h everforest
     "sainnhe/everforest",
-    -- enabled = false,
-    lazy = false,
+    enabled = false,
     config = function()
       vim.g.everforest_background = "hard"
       vim.g.everforest_enable_italic = true
@@ -114,12 +116,30 @@ return {
     "rose-pine/neovim",
     enabled = false,
     name = "rose-pine",
-    lazy = true,
     opts = {
       enable = {
         legacy_highlights = false,
       },
       dim_inactive_windows = true,
     },
+  },
+  {
+    "zenbones-theme/zenbones.nvim",
+    enabled = true,
+    dependencies = { "rktjmp/lush.nvim" },
+    config = function()
+      -- Set custom highlight for mini.cursorword (avoids underlining)
+      local function set_mini_cursorword_hl()
+        vim.api.nvim_set_hl(0, "MiniCursorword", {
+          underline = false,
+          bg = "#3a3a3a", -- subtle gray background
+        })
+      end
+
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("zenbones_overrides", { clear = true }),
+        callback = set_mini_cursorword_hl,
+      })
+    end,
   },
 }
