@@ -35,7 +35,8 @@ background-opacity = 0.96
 background-blur-radius = 40
 
 # ghostty +list-themes
-theme = dark:/Users/fredrik/.local/share/nvim-fredrik/lazy/tokyonight.nvim/extras/ghostty/tokyonight_moon,light:/Users/fredrik/.local/share/nvim-fredrik/lazy/nightfox.nvim/extra/dayfox/dayfox.ghostty
+# theme = dark:/Users/fredrik/.local/share/nvim-fredrik/lazy/tokyonight.nvim/extras/ghostty/tokyonight_moon,light:/Users/fredrik/.local/share/nvim-fredrik/lazy/nightfox.nvim/extra/dayfox/dayfox.ghostty
+theme = dark:/Users/fredrik/.local/share/nvim-fredrik/lazy/zenbones.nvim/extras/ghostty/zenbones_dark,light:/Users/fredrik/.local/share/nvim-fredrik/lazy/zenbones.nvim/extras/ghostty/zenbones_light
 
 mouse-hide-while-typing = true
 
