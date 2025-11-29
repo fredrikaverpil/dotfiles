@@ -91,9 +91,18 @@ return {
     },
   },
   {
+    "catppuccin/nvim",
+    enabled = false,
+    name = "catppuccin",
+  },
+  {
+    "rebelot/kanagawa.nvim",
+    enabled = false,
+  },
+  {
     -- :h nightfox
     "EdenEast/nightfox.nvim",
-    enabled = true,
+    enabled = false,
     opts = {
       options = {
         styles = {
@@ -133,17 +142,19 @@ return {
         italic_strings = false,
       }
 
-      -- Set custom highlight for mini.cursorword (avoids underlining)
-      local function set_mini_cursorword_hl()
-        vim.api.nvim_set_hl(0, "MiniCursorword", {
-          underline = false,
-          bg = "#3a3a3a", -- subtle gray background
-        })
-      end
-
       vim.api.nvim_create_autocmd("ColorScheme", {
+        pattern = "zenbones", -- Only apply to zenbones, not forestbones or other variants
         group = vim.api.nvim_create_augroup("zenbones_overrides", { clear = true }),
-        callback = set_mini_cursorword_hl,
+        callback = function()
+          vim.api.nvim_set_hl(0, "MiniCursorword", { underline = false, bg = "#3a3a3a" })
+
+          -- vim.api.nvim_set_hl(0, "@constant", { fg = "#d08770" }) -- constants
+          -- vim.api.nvim_set_hl(0, "@constant.builtin", { fg = "#d08770", italic = true }) -- builtin constants
+          vim.api.nvim_set_hl(0, "@type", { fg = "#8fbcbb" }) -- type names
+          vim.api.nvim_set_hl(0, "@type.builtin", { fg = "#8fbcbb", italic = true }) -- builtin types
+          -- vim.api.nvim_set_hl(0, "@module", { fg = "#88c0d0", italic = true }) -- package names in imports
+          vim.api.nvim_set_hl(0, "@variable.parameter", { italic = true }) -- function parameters
+        end,
       })
     end,
   },
