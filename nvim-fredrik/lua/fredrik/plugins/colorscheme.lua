@@ -128,6 +128,11 @@ return {
     enabled = true,
     dependencies = { "rktjmp/lush.nvim" },
     config = function()
+      vim.g.zenbones = {
+        lighten_comments = 25,
+        italic_strings = false,
+      }
+
       -- Set custom highlight for mini.cursorword (avoids underlining)
       local function set_mini_cursorword_hl()
         vim.api.nvim_set_hl(0, "MiniCursorword", {
