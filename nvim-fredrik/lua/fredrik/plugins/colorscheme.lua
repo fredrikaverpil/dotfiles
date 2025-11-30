@@ -139,9 +139,9 @@ return {
   {
     "zenbones-theme/zenbones.nvim",
     enabled = true,
-    dependencies = { "rktjmp/lush.nvim" },
     config = function()
-      local lush = require("lush")
+      vim.g.bones_compat = 1 -- do not rely on lush.nvim (use built-in vim highlight API) instead
+      local colors = require("fredrik.utils.colors")
 
       local function apply_overrides()
         local colors_name = vim.g.colors_name
@@ -149,64 +149,74 @@ return {
           return
         end
 
-        local ok, palette_mod = pcall(require, colors_name .. ".palette") -- kind of like require("zenbones.palette")
-        if not ok then
+        -- Define palette locally to avoid lush dependency
+        -- Dynamically extract colors from terminal colors set by the theme
+        -- Mapping based on zenbones/term.lua
+        local palette = {
+          bg = vim.g.terminal_color_0,
+          rose = vim.g.terminal_color_1,
+          leaf = vim.g.terminal_color_2,
+          wood = vim.g.terminal_color_3,
+          water = vim.g.terminal_color_4,
+          blossom = vim.g.terminal_color_5,
+          sky = vim.g.terminal_color_6,
+          fg = vim.g.terminal_color_7,
+          bg1 = vim.g.terminal_color_8,
+          rose1 = vim.g.terminal_color_9,
+          leaf1 = vim.g.terminal_color_10,
+          wood1 = vim.g.terminal_color_11,
+          water1 = vim.g.terminal_color_12,
+          blossom1 = vim.g.terminal_color_13,
+          sky1 = vim.g.terminal_color_14,
+          fg1 = vim.g.terminal_color_15,
+        }
+
+        -- Fallback if terminal colors are not set (should not happen with zenbones themes)
+        if not palette.bg then
           return
         end
 
-        local palette = palette_mod[vim.o.background]
-        if not palette then
-          return
+        -- Docs: https://github.com/zenbones-theme/zenbones.nvim/blob/main/doc/zenbones.md
+        -- Palette: https://github.com/zenbones-theme/zenbones.nvim/blob/main/lua/zenbones/util.lua
+        -- Use :Inspect to see what highlight groups are being used where.
+
+        ---@param group string
+        ---@param opts table
+        local function hl(group, opts)
+          vim.api.nvim_set_hl(0, group, opts)
         end
 
-        local spec = lush.extends({ require(colors_name) }).with(function(injected_functions)
-          ---@type fun(name: string): fun(def: table): any
-          local sym = injected_functions.sym
-          return {
-            -- Docs: https://github.com/zenbones-theme/zenbones.nvim/blob/main/doc/zenbones.md
-            -- Palette: https://github.com/zenbones-theme/zenbones.nvim/blob/main/lua/zenbones/util.lua
-            -- Use :Inspect to see what highlight groups are being used where.
-            --
-            -- Palette notes:
-            -- * Base colors (rose, wood, etc.) are the standard shades.
-            -- * "1" variants (rose1, wood1, etc.) are more saturated and higher contrast:
-            --   - Dark mode: Lighter (+16) and more saturated (+20)
-            --   - Light mode: Darker (-16) and more saturated (+20)
-            -- * fg1 is lower contrast (dimmer) than fg.
-            -- * bg1 is higher contrast (lighter in dark mode, darker in light mode) than bg.
+        hl("Comment", { fg = colors.blend(palette.bg, palette.fg, 40), italic = true })
+        hl("@comment", { link = "Comment" })
 
-            sym("@comment")({ fg = palette.bg.mix(palette.fg, 45), gui = "NONE" }),
+        hl("MiniCursorword", { bg = colors.blend(palette.bg, palette.bg1, 90), underline = false })
 
-            sym("MiniCursorword")({ bg = palette.bg.mix(palette.bg1, 90), underline = false }),
-
-            sym("NeotestPassed")({ fg = palette.leaf }),
-            sym("NeotestFailed")({ fg = palette.rose }),
-            sym("NeotestRunning")({ fg = palette.wood }),
-            sym("NeotestSkipped")({ fg = palette.sky }),
-            sym("NeotestFile")({ fg = palette.sky }),
-            sym("NeotestDir")({ fg = palette.water }),
-            sym("NeotestNamespace")({ fg = palette.blossom }),
-            sym("NeotestFocused")({ gui = "bold,underline" }),
-            sym("NeotestAdapterName")({ fg = palette.rose }),
-            sym("NeotestWinSelect")({ fg = palette.sky, gui = "bold" }),
-            sym("NeotestMarked")({ fg = palette.wood, gui = "bold" }),
-            sym("NeotestTarget")({ fg = palette.rose }),
-            sym("NeotestUnknown")({ fg = palette.bg.mix(palette.fg, 50) }),
-            sym("NeotestExpandMarker")({ fg = palette.bg.mix(palette.fg, 50) }),
-          }
-        end)
-
-        lush(spec)
+        hl("NeotestPassed", { fg = palette.leaf })
+        hl("NeotestFailed", { fg = palette.rose })
+        hl("NeotestRunning", { fg = palette.wood })
+        hl("NeotestSkipped", { fg = palette.sky })
+        hl("NeotestFile", { fg = palette.sky })
+        hl("NeotestDir", { fg = palette.water })
+        hl("NeotestNamespace", { fg = palette.blossom })
+        hl("NeotestFocused", { bold = true, underline = true })
+        hl("NeotestAdapterName", { fg = palette.rose })
+        hl("NeotestWinSelect", { fg = palette.sky, bold = true })
+        hl("NeotestMarked", { fg = palette.wood, bold = true })
+        hl("NeotestTarget", { fg = palette.rose })
+        hl("NeotestUnknown", { fg = colors.blend(palette.bg, palette.fg, 50) })
+        hl("NeotestExpandMarker", { fg = colors.blend(palette.bg, palette.fg, 50) })
       end
 
       vim.api.nvim_create_autocmd("ColorScheme", {
         pattern = { "zenbones", "zenwritten", "zenburned", "*bones" },
         group = vim.api.nvim_create_augroup("zenbones_overrides", { clear = true }),
-        callback = apply_overrides,
+        callback = function()
+          vim.schedule(apply_overrides)
+        end,
       })
 
       -- Apply immediately if the current scheme matches
-      apply_overrides()
+      vim.schedule(apply_overrides)
     end,
   },
 }
