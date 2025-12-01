@@ -23,6 +23,14 @@ return {
     ---@type snacks.Config
     opts = {
       styles = {
+        notification = {
+          -- required for zenbones
+          border = "rounded",
+          wo = {
+            winblend = 0,
+            wrap = false,
+          },
+        },
         notification_history = {
           relative = "editor",
           width = 0.9,
