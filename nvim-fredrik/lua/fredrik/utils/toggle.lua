@@ -36,4 +36,26 @@ function M.toggle_manual_folding()
   end
 end
 
+function M.toggle_copilot()
+  if not package.loaded["copilot"] then
+    vim.notify("Copilot is not loaded", vim.log.levels.WARN)
+    return
+  end
+
+  -- Check current status
+  local is_enabled = vim.g.custom_copilot_status ~= "disabled"
+
+  if is_enabled then
+    -- Disable copilot
+    vim.cmd("Copilot disable")
+    vim.g.custom_copilot_status = "disabled"
+    vim.notify("Copilot disabled", vim.log.levels.INFO)
+  else
+    -- Enable copilot
+    vim.cmd("Copilot enable")
+    vim.g.custom_copilot_status = "enabled"
+    vim.notify("Copilot enabled", vim.log.levels.INFO)
+  end
+end
+
 return M
