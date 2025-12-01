@@ -70,6 +70,7 @@
         "aerospace"
         "appcleaner"
         "brainfm"
+        "exifrenamer"
         "fujifilm-x-raw-studio"
         "ghostty"
         "gitify"
