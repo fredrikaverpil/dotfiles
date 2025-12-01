@@ -21,11 +21,12 @@ function M.setup_diagnostics()
     --   current_line = false,
     -- },
 
-    -- virtual_text = false,
-    virtual_text = function(_, _)
-      ---@class vim.diagnostic.Opts.VirtualText
-      return { spacing = 4, source = "if_many", prefix = prefix }
-    end,
+    -- NOTE: disabled due to using the tiny-inline-diagnostic.nvim plugin
+    virtual_text = false,
+    -- virtual_text = function(_, _)
+    --   ---@class vim.diagnostic.Opts.VirtualText
+    --   return { spacing = 4, source = "if_many", prefix = prefix }
+    -- end,
 
     underline = true,
     update_in_insert = false,
@@ -40,14 +41,7 @@ function M.setup_diagnostics()
     },
   }
 
-  -- set diagnostic icons
-  for name, icon in pairs(require("fredrik.utils.icons").icons.diagnostics) do
-    name = "DiagnosticSign" .. name
-    vim.fn.sign_define(name, { text = icon, texthl = name, numhl = "" })
-  end
-
-  -- NOTE: disabled due to using the tiny-inline-diagnostic.nvim plugin
-  -- vim.diagnostic.config(vim.deepcopy(opts))
+  vim.diagnostic.config(vim.deepcopy(opts))
 
   require("fredrik.config.keymaps").setup_diagnostics_keymaps()
 
