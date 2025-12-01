@@ -1,4 +1,4 @@
-M = {}
+local M = {}
 
 local function is_code_public()
   local public_paths = {
@@ -28,27 +28,8 @@ local function is_copilot_available()
   return false
 end
 
-local function toggle_copilot()
-  if not package.loaded["copilot"] then
-    return
-  end
-
-  if is_copilot_available() then
-    local output = vim.fn.execute("Copilot status")
-    if string.match(output, "Not Started") or string.match(output, "Offline") then
-      -- avoid starting multiple servers
-      vim.cmd("Copilot enable")
-      vim.g.custom_copilot_status = "enabled"
-    end
-  else
-    vim.cmd("Copilot disable")
-    vim.g.custom_copilot_status = "disabled"
-  end
-end
-
 -- export functions for use by e.g. plugins
 M.is_code_public = is_code_public
-M.is_copilot_availble = is_copilot_available
-M.toggle_copilot = toggle_copilot
+M.is_copilot_available = is_copilot_available
 
 return M

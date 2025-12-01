@@ -36,26 +36,37 @@ function M.toggle_manual_folding()
   end
 end
 
-function M.toggle_copilot()
+function M.toggle_copilot(opts)
+  opts = opts or {}
+
   if not package.loaded["copilot"] then
     vim.notify("Copilot is not loaded", vim.log.levels.WARN)
     return
   end
 
-  -- Check current status
-  local is_enabled = vim.g.custom_copilot_status ~= "disabled"
+  local private_utils = require("fredrik.utils.private")
+  local is_available = private_utils.is_copilot_available()
+  local cwd = vim.fn.fnamemodify(vim.fn.getcwd(), ":~")
+  local is_enabled = vim.g.custom_copilot_status == "enabled"
 
-  if is_enabled then
-    -- Disable copilot
-    vim.cmd("Copilot disable")
-    vim.g.custom_copilot_status = "disabled"
-    vim.notify("Copilot disabled", vim.log.levels.INFO)
-  else
-    -- Enable copilot
-    vim.cmd("Copilot enable")
-    vim.g.custom_copilot_status = "enabled"
-    vim.notify("Copilot enabled", vim.log.levels.INFO)
+  -- Determine target state: toggle if called manually, else sync to availability
+  local should_enable = opts.manual and not is_enabled or (not opts.manual and is_available)
+
+  if should_enable and not is_available then
+    vim.notify(string.format("Cannot enable Copilot: Not in public directory\n%s", cwd), vim.log.levels.ERROR)
+    return
   end
+
+  vim.cmd(should_enable and "Copilot enable" or "Copilot disable")
+  vim.lsp.enable("copilot", should_enable)
+  vim.g.custom_copilot_status = should_enable and "enabled" or "disabled"
+
+  vim.schedule(function()
+    vim.notify(
+      string.format("[Copilot] %s: %s", vim.g.custom_copilot_status, cwd),
+      should_enable and vim.log.levels.INFO or vim.log.levels.WARN
+    )
+  end)
 end
 
 return M

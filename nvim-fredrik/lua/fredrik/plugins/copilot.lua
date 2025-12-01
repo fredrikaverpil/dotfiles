@@ -34,10 +34,6 @@ return {
                 else
                   -- online
                   local status = require("copilot.api").status
-                  if status.data.message ~= "" then
-                    -- NOTE: could potentially do something based on status.data.message too.
-                    vim.notify("Copilot message: " .. vim.inspect(status.data.message))
-                  end
                   return colors[status.data.status]
                 end
               end,
@@ -81,8 +77,15 @@ return {
     config = function(_, opts)
       require("copilot").setup(opts)
 
-      -- Make sure not to enable copilot in private projects
-      require("fredrik.utils.private").toggle_copilot()
+      -- Check copilot status on startup
+      require("fredrik.utils.toggle").toggle_copilot()
+
+      -- Re-check copilot status when directory changes
+      vim.api.nvim_create_autocmd("DirChanged", {
+        callback = function()
+          require("fredrik.utils.toggle").toggle_copilot()
+        end,
+      })
     end,
     keys = require("fredrik.config.keymaps").setup_copilot_keymaps(),
   },
@@ -110,7 +113,7 @@ return {
       servers = {
         ---@type vim.lsp.Config
         copilot = {
-          enabled = require("fredrik.utils.private").is_code_public(),
+          enabled = false, -- toggle_copilot() enables dynamically via vim.lsp.enable()
         },
       },
     },

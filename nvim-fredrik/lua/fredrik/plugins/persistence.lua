@@ -15,13 +15,6 @@ local function delete_hidden_buffers()
 end
 
 vim.api.nvim_create_autocmd("User", {
-  pattern = "PersistenceLoadPost",
-  callback = function(session)
-    require("fredrik.utils.private").toggle_copilot()
-  end,
-})
-
-vim.api.nvim_create_autocmd("User", {
   pattern = "PersistenceSavePre",
   callback = function(session)
     delete_hidden_buffers()

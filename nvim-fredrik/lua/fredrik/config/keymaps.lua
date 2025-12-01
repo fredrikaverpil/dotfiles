@@ -196,12 +196,9 @@ vim.keymap.set(
   { desc = "Remove shada files", silent = true }
 )
 
-vim.keymap.set(
-  "n",
-  "<leader>uc",
-  require("fredrik.utils.toggle").toggle_copilot,
-  { desc = "Toggle Copilot", silent = true }
-)
+vim.keymap.set("n", "<leader>uc", function()
+  require("fredrik.utils.toggle").toggle_copilot({ manual = true })
+end, { desc = "Toggle Copilot", silent = true })
 
 function M.setup_trouble_keymaps()
   return {
