@@ -205,6 +205,16 @@ return {
         hl("NeotestTarget", { fg = palette.rose })
         hl("NeotestUnknown", { fg = colors.blend(palette.bg, palette.fg, 50) })
         hl("NeotestExpandMarker", { fg = colors.blend(palette.bg, palette.fg, 50) })
+
+        -- Snacks notifier
+        hl("SnacksNotifierBorderDebug", { fg = palette.sky })
+        hl("SnacksNotifierBorderError", { fg = palette.rose })
+        hl("SnacksNotifierBorderInfo", { fg = palette.water })
+        hl("SnacksNotifierBorderTrace", { fg = palette.blossom })
+        hl("SnacksNotifierBorderWarn", { fg = palette.wood })
+
+        -- Snacks explorer
+        hl("SnacksPickerGitStatusUntracked", { fg = palette.wood })
       end
 
       vim.api.nvim_create_autocmd("ColorScheme", {
