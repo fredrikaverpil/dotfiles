@@ -26,6 +26,10 @@ return {
         -- keymap = { preset = "cmdline" },
       },
       completion = {
+        trigger = {
+          show_on_keyword = false, -- because of stuttering
+          -- show_on_trigger_character = false,
+        },
         list = {
           selection = {
             preselect = false,
