@@ -33,3 +33,4 @@ nvim_issue
 
 # Applications storing files ending up in stow/
 stow/shared/.config/zed/prompts
+stow/Darwin/Library/Application Support/lazygit/state.yml
