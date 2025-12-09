@@ -123,6 +123,7 @@ return {
               },
               workspace = {
                 checkThirdParty = false,
+                ignoreDir = { "stow" },
               },
               codeLens = {
                 enable = false, -- causes annoying flickering
