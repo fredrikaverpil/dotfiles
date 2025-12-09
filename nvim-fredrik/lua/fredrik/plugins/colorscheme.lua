@@ -137,6 +137,14 @@ return {
     },
   },
   {
+    "nendix/zen.nvim",
+    enabled = false,
+  },
+  {
+    "ramojus/mellifluous.nvim",
+    enabled = false,
+  },
+  {
     "zenbones-theme/zenbones.nvim",
     enabled = true,
     config = function()
