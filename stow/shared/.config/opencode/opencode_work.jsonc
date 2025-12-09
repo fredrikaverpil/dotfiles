@@ -28,25 +28,25 @@
   },
   "agent": {
     "plan": {
-      "model": "google-vertex/gemini-2.5-pro"
+      "model": "google-vertex/gemini-3-pro-preview"
     },
     "build": {
-      "model": "google-vertex/gemini-2.5-pro"
+      "model": "google-vertex/gemini-3-pro-preview"
     },
     "neovim": {
       "model": "google-vertex/gemini-2.5-flash"
     },
     "github": {
-      "model": "google/gemini-2.5-flash"
+      "model": "google-vertex/gemini-3-pro-preview"
     },
     "security-auditor": {
-      "model": "google-vertex/gemini-2.5-pro"
+      "model": "google-vertex/gemini-3-pro-preview"
     },
     "docs-writer": {
-      "model": "google-vertex/gemini-2.5-pro"
+      "model": "google-vertex/gemini-3-pro-preview"
     },
     "jira": {
-      "model": "google-vertex/gemini-2.5-pro"
+      "model": "google-vertex/gemini-3-pro-preview"
     }
     // TODO: figure out settings for gemini 2.5 pro
     // "deep-thinker": {
@@ -117,6 +117,7 @@
       ]
     },
     "roadie-api-docs": {
+      "enabled": false,
       "type": "remote",
       "url": "https://api.roadie.so/api/mcp/v1/api-docs-query",
       "headers": {
@@ -124,6 +125,7 @@
       }
     },
     "roadie-backend-config": {
+      "enabled": false,
       "type": "remote",
       "url": "https://api.roadie.so/api/mcp/v1/backend-config",
       "headers": {
@@ -131,6 +133,7 @@
       }
     },
     "roadie-catalog-decorators": {
+      "enabled": false,
       "type": "remote",
       "url": "https://api.roadie.so/api/mcp/v1/catalog-decorators",
       "headers": {
@@ -138,6 +141,7 @@
       }
     },
     "roadie-scaffolder": {
+      "enabled": false,
       "type": "remote",
       "url": "https://api.roadie.so/api/mcp/v1/scaffolder-use",
       "headers": {
@@ -145,15 +149,9 @@
       }
     },
     "roadie-catalog": {
+      "enabled": false,
       "type": "remote",
       "url": "https://api.roadie.so/api/mcp/v1/rich-catalog-entity",
-      "headers": {
-        "Authorization": "Bearer {env:ROADIE_API_TOKEN}"
-      }
-    },
-    "roadie-insights": {
-      "type": "remote",
-      "url": "https://api.roadie.so/api/mcp/v1/tech-insights-facts",
       "headers": {
         "Authorization": "Bearer {env:ROADIE_API_TOKEN}"
       }
