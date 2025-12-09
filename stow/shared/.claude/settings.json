@@ -12,5 +12,6 @@
       "Read(./secrets/**)"
     ]
   },
+  "model": "opus",
   "alwaysThinkingEnabled": true
 }
