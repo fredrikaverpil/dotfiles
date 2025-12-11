@@ -1,4 +1,4 @@
-local logging = require("fredrik.utils.logging")
+-- local logging = require("fredrik.utils.logging") -- NOTE: commented out, only used by custom api-linter impl
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "proto" },
@@ -57,29 +57,6 @@ local function buf_lint_cwd()
   return vim.fn.fnamemodify(buf_config_filepath(), ":h")
 end
 
---- custom linter for api-linter.
-local descriptor_filepath = os.tmpname()
-local cleanup_descriptor = function()
-  os.remove(descriptor_filepath)
-end
-
---- Function to set the `--descriptor-set-in` argument.
---- This requires the buf CLI, which will first build the descriptor file.
-local function descriptor_set_in()
-  if vim.fn.executable("buf") == 0 then
-    error("buf CLI not found")
-  end
-  local buf_config_folderpath = vim.fn.fnamemodify(buf_config_filepath(), ":h")
-  local buf_cmd = { "buf", "build", "-o", descriptor_filepath }
-  local buf_cmd_opts = { cwd = buf_config_folderpath }
-  local obj = vim.system(buf_cmd, buf_cmd_opts):wait()
-  if obj.code ~= 0 then
-    error("Command failed: " .. vim.inspect(buf_cmd) .. "\n" .. obj.stderr)
-  end
-  local descriptor_arg = "--descriptor-set-in=" .. descriptor_filepath
-  return descriptor_arg
-end
-
 local function buf_lint_setup()
   local buf_lint_args = {
     "lint",
@@ -116,76 +93,25 @@ local function buf_lint_setup()
   })
 end
 
-local function api_linter_setup()
-  if vim.fn.executable("api-linter") == 0 then
-    error("api-linter not found")
+local function api_linter_buf_setup()
+  -- Use api_linter_buf from nvim-lint PR #665
+  local api_linter_buf = require("lint.linters.api_linter_buf")
+
+  -- Add disable rules for Java-related warnings (not using Java codegen)
+  local original_args = api_linter_buf.args
+  api_linter_buf.args = {
+    "--output-format=json",
+    "--disable-rule=core::0191::java-multiple-files",
+    "--disable-rule=core::0191::java-package",
+    "--disable-rule=core::0191::java-outer-classname",
+  }
+  for _, arg in ipairs(original_args) do
+    if type(arg) == "function" then
+      table.insert(api_linter_buf.args, arg)
+    end
   end
 
-  require("lint").linters.api_linter = {
-    name = "api_linter", -- NOTE: differentiate from the name of the linter in nvim-lint.
-    cmd = "api-linter",
-    stdin = false,
-    append_fname = false,
-    args = {
-      "--output-format=json",
-      "--disable-rule=core::0191::java-multiple-files",
-      "--disable-rule=core::0191::java-package",
-      "--disable-rule=core::0191::java-outer-classname",
-      function()
-        return descriptor_set_in()
-      end,
-      function()
-        -- Manually add the filename as relative path
-        local bufpath = vim.fn.expand("%:p")
-        local cwd = buf_lint_cwd()
-        local relative = get_relative_path(bufpath, cwd)
-        return relative
-      end,
-    },
-    stream = "stdout",
-    ignore_exitcode = true,
-    env = nil,
-    parser = function(output, bufnr, linter_cwd)
-      logging.log_output(output, "api-linter.log", { enabled = false }) -- for debugging purposes
-      vim.notify("api-linter is using cwd: " .. linter_cwd)
-      if output == "" then
-        return {}
-      end
-
-      local ok, json_output = pcall(vim.json.decode, output)
-      if not ok then
-        error("Failed to parse api-linter output: " .. output)
-      end
-
-      local diagnostics = {}
-      for _, item in ipairs(json_output) do
-        for _, problem in ipairs(item.problems or {}) do
-          table.insert(diagnostics, {
-            -- Don't set file field - let nvim-lint use current buffer
-            message = problem.message,
-            code = problem.rule_id .. " " .. problem.rule_doc_uri,
-            severity = vim.diagnostic.severity.WARN,
-            lnum = problem.location.start_position.line_number - 1,
-            col = problem.location.start_position.column_number - 1,
-            end_lnum = problem.location.end_position.line_number - 1,
-            end_col = problem.location.end_position.column_number - 1,
-          })
-        end
-      end
-
-      cleanup_descriptor()
-      return diagnostics
-    end,
-  }
-  -- HACK: cannot pass in cwd as function (for lazy loading). Instead, an autocmd is used.
-  vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost" }, {
-    pattern = { "*.proto" },
-    callback = function()
-      require("lint").try_lint("api_linter", {
-        cwd = buf_lint_cwd(),
-      })
-    end,
-  })
+  api_linter_buf.register_autocmd()
 end
 
 return {
@@ -221,7 +147,7 @@ return {
     opts = function(_, opts)
       -- NOTE: buf_lint and api-linter is not part of linters_by_ft:
       -- * buf_lint is executed below in an autocmd, because workaround for lazy-loaded cwd is desired.
-      -- * api_linter is not yet merged into nvim-lint: https://github.com/mfussenegger/nvim-lint/pull/665
+      -- * api_linter_buf uses its own autocmd via register_autocmd()
 
       opts.linters_by_ft = opts.linters_by_ft or {}
       opts.linters = opts.linters or {}
@@ -233,7 +159,7 @@ return {
       opts.linters["protolint"] = { args = protolint_args }
 
       buf_lint_setup()
-      api_linter_setup()
+      api_linter_buf_setup()
     end,
   },
 
