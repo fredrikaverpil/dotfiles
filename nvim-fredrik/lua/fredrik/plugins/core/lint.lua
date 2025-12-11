@@ -1,5 +1,9 @@
 return {
-  "mfussenegger/nvim-lint",
+  -- NOTE: Using PR branch to test api_linter_buf integration
+  -- Original: "mfussenegger/nvim-lint"
+  -- See: https://github.com/mfussenegger/nvim-lint/pull/665
+  url = "https://github.com/fredrikaverpil/nvim-lint.git",
+  branch = "api-linter",
   lazy = true,
   event = "BufReadPost",
   dependencies = {
