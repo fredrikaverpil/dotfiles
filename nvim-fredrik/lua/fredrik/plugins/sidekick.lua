@@ -59,6 +59,11 @@ return {
       enabled = require("fredrik.utils.private").is_code_public(),
     },
     cli = {
+      win = {
+        split = {
+          width = 120,
+        },
+      },
       prompts = {
         -- refactor = "Please refactor {this} to be more maintainable",
         -- security = "Review {file} for security vulnerabilities",
