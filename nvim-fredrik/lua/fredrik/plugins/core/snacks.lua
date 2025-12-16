@@ -1,3 +1,19 @@
+--- Read ASCII art header from file
+---@param name string header file name without extension (e.g. "neovim", "xmas")
+---@return string
+local function read_header(name)
+  local source = debug.getinfo(1, "S").source:sub(2)
+  local plugin_dir = vim.fn.fnamemodify(source, ":h")
+  local path = plugin_dir .. "/../../assets/headers/" .. name .. ".txt"
+  local file = io.open(path, "r")
+  if file then
+    local content = file:read("*a")
+    file:close()
+    return content
+  end
+  return "NEOVIM"
+end
+
 return {
   {
     "folke/snacks.nvim",
@@ -47,6 +63,7 @@ return {
             { icon = " ", key = "s", desc = "Restore Session", section = "session" },
             { icon = " ", key = "q", desc = "Quit", action = ":qa" },
           },
+          header = read_header("xmas"),
         },
       },
 
