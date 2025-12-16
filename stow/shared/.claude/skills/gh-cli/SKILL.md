@@ -1,8 +1,6 @@
 ---
 name: gh-cli
-description:
-  GitHub CLI (gh) command reference. Use when working with GitHub repositories,
-  PRs, issues, actions, or any GitHub operations from the command line.
+description: GitHub CLI (gh) command reference. Use when working with GitHub repositories, PRs, issues, actions, or any GitHub operations from the command line.
 allowed-tools:
   - Bash
   - Read
