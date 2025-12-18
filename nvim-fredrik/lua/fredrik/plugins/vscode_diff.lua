@@ -25,6 +25,11 @@ return {
         max_computation_time_ms = 5000, -- Maximum time for diff computation (VSCode default)
       },
 
+      -- Explorer panel configuration
+      explorer = {
+        view_mode = "tree",
+      },
+
       -- Keymaps in diff view
       keymaps = {
         view = {
