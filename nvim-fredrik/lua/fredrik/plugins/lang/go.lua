@@ -434,6 +434,7 @@ return {
       picker = { type = "snacks" },
     },
     cmd = { "GoDoc" },
+    ft = "godoc",
   },
 
   {
