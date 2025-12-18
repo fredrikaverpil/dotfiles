@@ -85,6 +85,9 @@ return {
             "--allowedTools=Read(~/code)",
           },
         },
+        copilot = {
+          cmd = { "copilot", "--continue" },
+        },
       },
     },
   },
