@@ -12,7 +12,10 @@ return {
     },
     opts = {
       formatters_by_ft = {
+        javascript = { "prettier" },
+        javascriptreact = { "prettier" },
         typescript = { "prettier" },
+        typescriptreact = { "prettier" },
       },
       formatters = {
         prettier = {
@@ -56,6 +59,11 @@ return {
           -- lsp: https://github.com/yioneko/vtsls
           -- ref: https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/vtsls.lua
           cmd = { "vtsls", "--stdio" },
+          -- Disable LSP formatting in favor of prettier (via conform.nvim)
+          on_attach = function(client, _)
+            client.server_capabilities.documentFormattingProvider = false
+            client.server_capabilities.documentRangeFormattingProvider = false
+          end,
           filetypes = {
             "javascript",
             "javascriptreact",
