@@ -19,9 +19,8 @@ vim.opt.fillchars = {
   -- fold = "⸱",
   fold = " ",
   foldsep = " ",
-  -- diff = "╱",
-  -- diff = "╱",
-  diff = "░",
+  diff = "╱",
+  -- diff = "░",
   -- diff = "·",
   eob = " ",
 }
