@@ -73,6 +73,9 @@ return {
       },
       ---@type table<string, sidekick.cli.Config|{}>
       tools = {
+        copilot = {
+          cmd = { "copilot", "--continue" },
+        },
         -- https://code.claude.com/docs/en/iam
         claude = {
           cmd = {
@@ -85,8 +88,8 @@ return {
             "--allowedTools=Read(~/code)",
           },
         },
-        copilot = {
-          cmd = { "copilot", "--continue" },
+        gemini = {
+          cmd = { "gemini", "--resume" },
         },
       },
     },
