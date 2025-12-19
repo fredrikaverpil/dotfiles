@@ -27,8 +27,8 @@ return {
       },
       completion = {
         trigger = {
-          show_on_keyword = false, -- because of stuttering
-          -- show_on_trigger_character = false,
+          prefetch_on_insert = false,
+          show_on_keyword = true, -- disable when stuttering
         },
         list = {
           selection = {
