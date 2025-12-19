@@ -1,6 +1,8 @@
 return {
   {
     "esmuellert/vscode-diff.nvim",
+    -- "fredrikaverpil/vscode-diff.nvim",
+    -- dev = true, -- see lazy.lua for local path details
     dependencies = { "MunifTanjim/nui.nvim" },
     opts = {
       -- Highlight configuration
@@ -28,6 +30,9 @@ return {
       -- Explorer panel configuration
       explorer = {
         view_mode = "tree",
+        file_filter = {
+          ignore = { "*.pb.go" },
+        },
       },
 
       -- Keymaps in diff view
