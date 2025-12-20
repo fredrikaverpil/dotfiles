@@ -62,7 +62,7 @@
   "mcp": {
     "tavily": {
       "command": ["npx", "-y", "tavily-mcp"],
-      "enabled": true,
+      "enabled": false,
       "type": "local",
       "environment": {
         "TAVILY_API_KEY": "{env:TAVILY_API_KEY}"
@@ -100,7 +100,7 @@
       }
     },
     "githubremote": {
-      "enabled": true,
+      "enabled": false, // just use gh CLI instead
       "type": "remote",
       "url": "https://api.githubcopilot.com/mcp",
       "headers": {
