@@ -310,15 +310,15 @@ export PGCONN="$PGDRIVER$DB_USER:$DB_USER@$PGHOST:$PGPORT/$GCE_DATABASE_NAME$PGF
 
 ### Claude Code
 
-- MCPs are defined in the `claude_desktop_config.json`
+- MCPs defined in `claude_desktop_config.json` cannot hold remote MCPs.
 - [Claude code docs](https://docs.claude.com/en/docs/claude-code)
 
 ```sh
-# import mcp servers from claude desktop, into ~/.claude.json
+# you can import mcp servers from claude desktop, into ~/.claude.json
 claude mcp add-from-claude-desktop --scope user
 ```
 
-Manual installations to `~/.claude.json`:
+Examples of manual config in `~/.claude.json`:
 
 ```json
 {

@@ -1,15 +1,3 @@
 {
-  "mcpServers": {
-    "github.com/fredrikaverpil/mcp-tools": {
-      "command": "go",
-      "args": [
-        "-C",
-        "/Users/fredrik/code/public/mcp-tools",
-        "run",
-        "./cmd/mcp-tools/main.go"
-      ],
-      "disabled": false
-    }
-  }
+  "mcpServers": {}
 }
-
