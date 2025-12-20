@@ -231,9 +231,12 @@ return {
               buildFlags = { tags },
               -- env = {},
               analyses = {
-                --   -- https://github.com/golang/tools/blob/master/gopls/internal/settings/analysis.go
-                --   -- https://github.com/golang/tools/blob/master/gopls/doc/analyzers.md
-                ST1000 = false, -- at least one file in a package should have a package comment
+                -- https://go.dev/gopls/analyzers
+                -- https://github.com/golang/tools/blob/master/gopls/internal/settings/analysis.go
+                -- https://github.com/golang/tools/blob/master/gopls/doc/analyzers.md
+                ST1000 = require("fredrik.utils.private").is_code_public(), -- Incorrect or missing package comment
+                ST1020 = require("fredrik.utils.private").is_code_public(), -- The documentation of an exported function should start with the function’s name
+                ST1021 = require("fredrik.utils.private").is_code_public(), -- The documentation of an exported type should start with type’s name
               },
               -- codelenses = {
               --   -- https://github.com/golang/tools/blob/master/gopls/doc/codelenses.md
