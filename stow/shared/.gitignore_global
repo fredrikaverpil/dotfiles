@@ -14,7 +14,10 @@ Thumbs.db
 .opencode/
 .claude
 .serena
-CLAUDE.md
+/AGENTS.md
+/CLAUDE.md
+/GEMINI.md
+/conductor
 
 # Environments
 .pkgx.yml
