@@ -56,25 +56,20 @@
   },
   "agent": {
     "neovim": {
-      "model": "google/gemini-2.5-flash"
+      "model": "google/gemini-3-flash-preview"
     },
     "github": {
-      "model": "google/gemini-2.5-flash"
+      "model": "google/gemini-3-flash-preview"
     },
     "security-auditor": {
-      "model": "google/gemini-2.5-pro"
+      "model": "google/gemini-3-flash-preview"
     },
     "docs-writer": {
-      "model": "google/gemini-2.5-pro"
+      "model": "google/gemini-3-flash-preview"
     },
-    "nix": {}
-    // TODO: add openai provider
-    // "deep-thinker": {
-    //   "model": "openai/gpt-5-turbo",
-    //   "description": "Agent that uses high reasoning effort for complex problems",
-    //   "reasoningEffort": "high",
-    //   "textVerbosity": "low"
-    // }
+    "nix": {
+      "model": "google/gemini-3-flash-preview"
+    }
   },
   "mcp": {
     "tavily": {
