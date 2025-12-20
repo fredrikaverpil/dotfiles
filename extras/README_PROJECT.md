@@ -323,12 +323,32 @@ Manual installations to `~/.claude.json`:
 ```json
 {
   "mcpServers": {
-    "githubremote": {
+    "serena": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server",
+        "--context",
+        "ide-assistant"
+      ],
+      "env": {}
+    },
+    "github": {
       "disabled": false,
       "type": "http",
       "url": "https://api.githubcopilot.com/mcp",
       "headers": {
         "Authorization": "Bearer ${GITHUB_MCP_SERVER_TOKEN}"
+      }
+    },
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
       }
     }
   }
