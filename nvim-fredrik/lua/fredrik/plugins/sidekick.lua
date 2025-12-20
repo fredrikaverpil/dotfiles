@@ -88,6 +88,9 @@ return {
             "--allowedTools=Read(~/code)",
           },
         },
+        opencode = {
+          cmd = { "opencode", "--continue" },
+        },
         gemini = {
           cmd = { "gemini", "--resume" },
         },
