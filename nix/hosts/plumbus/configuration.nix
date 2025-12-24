@@ -36,6 +36,7 @@ in {
   ];
 
   host.extraCasks = [
+    "google-chrome"
     "orbstack"
     "raycast"
   ];
