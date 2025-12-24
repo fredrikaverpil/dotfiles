@@ -88,6 +88,9 @@ return {
             "--allowedTools=Read(~/code)",
           },
         },
+        codex = {
+          cmd = { "codex", "--continue" },
+        },
         opencode = {
           cmd = { "opencode", "--continue" },
         },

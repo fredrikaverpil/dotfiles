@@ -165,6 +165,7 @@ in
       "@anthropic-ai/claude-code@latest"
       "@github/copilot"
       "@google/gemini-cli@latest"
+      "@openai/codex@latest"
       "opencode-ai@latest"
     ];
 
