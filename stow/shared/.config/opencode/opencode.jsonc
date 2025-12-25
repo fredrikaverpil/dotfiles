@@ -130,6 +130,11 @@
         "--api-key",
         "{env:CONTEXT7_API_KEY}"
       ]
+    },
+    "playwright": {
+      "enabled": false,
+      "type": "local",
+      "command": ["bunx", "@playwright/mcp@latest"]
     }
   }
 }

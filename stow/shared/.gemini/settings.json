@@ -25,6 +25,10 @@
         "ide-assistant"
       ],
       "env": {}
+    },
+    "playwright": {
+      "command": "bunx",
+      "args": ["@playwright/mcp@latest"]
     }
   }
 }
