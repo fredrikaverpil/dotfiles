@@ -167,6 +167,7 @@ in
       "@google/gemini-cli@latest"
       "@openai/codex@latest"
       "opencode-ai@latest"
+      "@sourcegraph/amp@latest"
     ];
 
   };
