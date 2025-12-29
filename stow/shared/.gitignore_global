@@ -18,6 +18,7 @@ Thumbs.db
 /CLAUDE.md
 /GEMINI.md
 /conductor
+/.playwright-mcp
 
 # Environments
 .pkgx.yml
