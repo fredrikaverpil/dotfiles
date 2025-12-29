@@ -74,7 +74,7 @@ return {
       ---@type table<string, sidekick.cli.Config|{}>
       tools = {
         amp = {
-          cmd = { "amp" },
+          cmd = { "amp", "threads", "continue" },
         },
         copilot = {
           cmd = { "copilot", "--continue" },
