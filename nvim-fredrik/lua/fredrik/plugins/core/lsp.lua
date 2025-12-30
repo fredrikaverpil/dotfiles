@@ -157,11 +157,9 @@ return {
         lazy = false,
         dependencies = {
           {
-            -- NOTE: this is here because mason.setup must run prior to running nvim-lspconfig
-            -- see mason.lua for more settings.
-            "mason-org/mason.nvim",
-            lazy = false,
-          },
+          -- NOTE: this is here because mason.setup must run prior to running nvim-lspconfig
+          -- see mason.lua for more settings.
+          "mason-org/mason.nvim",
         },
       },
       {

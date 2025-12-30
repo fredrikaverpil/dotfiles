@@ -7,6 +7,7 @@
   "buf": "v1.62.1",
   "codelldb": "v1.12.0",
   "copilot-language-server": "1.406.0",
+  "debugpy": "1.8.19",
   "delve": "v1.26.0",
   "dockerfile-language-server": "0.15.0",
   "gci": "v0.13.7",

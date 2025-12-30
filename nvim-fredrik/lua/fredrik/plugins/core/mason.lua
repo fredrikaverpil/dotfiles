@@ -1,7 +1,6 @@
 return {
   {
     "mason-org/mason.nvim",
-    lazy = true,
     dependencies = {
       {
         "zapling/mason-lock.nvim",
@@ -50,6 +49,5 @@ return {
         end
       end)
     end,
-    cmd = { "Mason", "MasonInstall", "MasonUpdate", "MasonUninstall" },
   },
 }
