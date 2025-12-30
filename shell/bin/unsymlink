@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+set -e
+
+# Convert a symlink into a real file/directory.
+# Any symlinks inside will also be converted to real files.
+
+usage() {
+	echo "Usage: unsymlink <symlink_path>"
+	echo ""
+	echo "Convert a symlink into a real file/directory."
+	echo "Any nested symlinks will also be converted to real files."
+	exit 1
+}
+
+if [[ -z "$1" ]] || [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
+	usage
+fi
+
+TARGET="${1%/}" # Remove trailing slash if present
+
+# Check if it's actually a symlink
+if [[ ! -L "$TARGET" ]]; then
+	echo "Error: '$TARGET' is not a symlink"
+	exit 1
+fi
+
+# Get what the symlink points to
+LINK_TARGET=$(readlink "$TARGET")
+
+# Make it absolute if it's relative
+if [[ "$LINK_TARGET" != /* ]]; then
+	PARENT_DIR=$(cd "$(dirname "$TARGET")" && pwd)
+	LINK_TARGET="$PARENT_DIR/$LINK_TARGET"
+fi
+
+# Check if the target exists
+if [[ ! -e "$LINK_TARGET" ]]; then
+	echo "Error: Symlink target '$LINK_TARGET' does not exist"
+	exit 1
+fi
+
+echo "Converting symlink: $TARGET"
+echo "  Points to: $LINK_TARGET"
+
+# Create a temporary backup location
+TEMP_BACKUP=$(mktemp -d)
+trap 'rm -rf "$TEMP_BACKUP"' EXIT
+
+# Copy with -rL to follow/dereference all symlinks (including nested ones)
+cp -rL "$LINK_TARGET" "$TEMP_BACKUP/content"
+
+# Remove the symlink
+rm "$TARGET"
+
+# Move the content back
+mv "$TEMP_BACKUP/content" "$TARGET"
+
+if [[ -d "$TARGET" ]]; then
+	echo "Done! '$TARGET' is now a real directory"
+else
+	echo "Done! '$TARGET' is now a real file"
+fi
