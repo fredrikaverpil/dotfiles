@@ -69,7 +69,7 @@ return {
     },
 
     attachments = {
-      img_folder = "./", -- same folder as current file
+      folder = "./", -- same folder as current file
     },
 
     templates = {
