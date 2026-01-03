@@ -1419,6 +1419,7 @@ function M.setup_obsidian_keymaps(obsidian_vars)
     { "<leader>ns", "<cmd>Obsidian search<cr>", desc = "[N]otes: [s]earch text" },
     { "<leader>nf", "<cmd>Obsidian quick_switch<cr>", desc = "[N]otes: search [f]ilenames" },
     { "<leader>nn", "<cmd>Obsidian new<cr>", desc = "[N]otes: [n]new" },
+    { "<leader>nn", "<cmd>Obsidian today<cr>", desc = "[N]otes: [d]daily note" },
     {
       "<leader>nS",
       function()
@@ -1426,7 +1427,7 @@ function M.setup_obsidian_keymaps(obsidian_vars)
       end,
       desc = "[N]otes: [S]cratchpad",
     },
-    { "<leader>nt", "<cmd>Obsidian new_from_template<cr>", desc = "[N]otes: new [m]eeting agenda from template" },
+    { "<leader>nt", "<cmd>Obsidian new_from_template<cr>", desc = "[N]otes: new from [t]emplate" },
   }
 end
 

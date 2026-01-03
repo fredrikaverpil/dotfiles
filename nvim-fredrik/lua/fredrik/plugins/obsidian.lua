@@ -3,6 +3,34 @@ M.vault_path = vim.fn.expand("~/Library/Mobile Documents/iCloud~md~obsidian/Docu
 M.notes_path = vim.fn.expand(M.vault_path .. "/Meeting_notes")
 M.scratchpad_path = vim.fn.expand(M.vault_path .. "/scratchpad.md")
 
+---@param title string
+local function zettelkasten_id(title)
+  -- Create note IDs in a Zettelkasten format with a timestamp and a suffix.
+  -- In this case a note with the title 'My new note' will be given an ID that looks
+  -- like '1657296016-my-new-note', and therefore the file name '1657296016-my-new-note.md'
+  local suffix = ""
+  if title ~= nil then
+    -- If title is given, transform it into valid file name.
+    suffix = title:gsub(" ", "-"):gsub("[^A-Za-z0-9-]", ""):lower()
+  else
+    -- If title is nil, just add 4 random uppercase letters to the suffix.
+    for _ = 1, 4 do
+      suffix = suffix .. string.char(math.random(65, 90))
+    end
+  end
+  return tostring(os.time()) .. "-" .. suffix
+end
+
+---@param title string
+local function title_id(title)
+  return title
+end
+
+---@param title string
+local function meeting_note_id(title)
+  return os.date("%Y-%m-%d") .. "-" .. title
+end
+
 return {
   -- "epwalsh/obsidian.nvim",
   "obsidian-nvim/obsidian.nvim",
@@ -13,6 +41,7 @@ return {
   version = "*",
   ft = "markdown",
   dependencies = {},
+
   ---@module 'obsidian'
   ---@type obsidian.config
   opts = {
@@ -22,6 +51,7 @@ return {
         path = M.vault_path,
       },
     },
+
     -- Optional, completion of wiki links, local markdown links, and tags using nvim-cmp.
     completion = {
       nvim_cmp = false, -- NOTE: use blink.cmp instead
@@ -34,38 +64,31 @@ return {
       name = "snacks.pick",
     },
 
-    -- Specify how to handle attachments.
+    daily_notes = {
+      folder = "Daily",
+    },
+
     attachments = {
-      -- The default folder to place images in via `:ObsidianPasteImg`.
-      -- If this is a relative path it will be interpreted as relative to the vault root.
-      -- You can always override this per image by passing a full path to the command instead of just a filename.
-      img_folder = "Files",
+      img_folder = "./", -- same folder as current file
     },
 
     templates = {
-      folder = "Templates",
+      folder = "_templates",
       date_format = "%Y-%m-%d",
       time_format = "%H:%M",
       -- A map for custom variables, the key should be the variable and the value a function
       substitutions = {},
+      customizations = {
+        ["meeting_notes"] = {
+          notes_subdir = "Meeting notes",
+          -- note_id_func = zettelkasten_id,
+          note_id_func = meeting_note_id,
+        },
+      },
     },
 
-    note_id_func = function(title)
-      -- Create note IDs in a Zettelkasten format with a timestamp and a suffix.
-      -- In this case a note with the title 'My new note' will be given an ID that looks
-      -- like '1657296016-my-new-note', and therefore the file name '1657296016-my-new-note.md'
-      local suffix = ""
-      if title ~= nil then
-        -- If title is given, transform it into valid file name.
-        suffix = title:gsub(" ", "-"):gsub("[^A-Za-z0-9-]", ""):lower()
-      else
-        -- If title is nil, just add 4 random uppercase letters to the suffix.
-        for _ = 1, 4 do
-          suffix = suffix .. string.char(math.random(65, 90))
-        end
-      end
-      return tostring(os.time()) .. "-" .. suffix
-    end,
+    -- note_id_func = zettelkasten_id,
+    note_id_func = title_id,
 
     legacy_commands = false,
   },
