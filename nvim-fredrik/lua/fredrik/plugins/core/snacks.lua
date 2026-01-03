@@ -63,7 +63,7 @@ return {
             { icon = " ", key = "s", desc = "Restore Session", section = "session" },
             { icon = " ", key = "q", desc = "Quit", action = ":qa" },
           },
-          header = read_header("xmas"),
+          -- header = read_header("xmas"),
         },
       },
 
