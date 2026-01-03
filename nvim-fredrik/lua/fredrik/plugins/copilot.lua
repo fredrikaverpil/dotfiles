@@ -33,7 +33,7 @@ return {
                   return colors["Offline"]
                 else
                   -- online
-                  local status = require("copilot.api").status
+                  local status = require("copilot.status")
                   return colors[status.data.status]
                 end
               end,
