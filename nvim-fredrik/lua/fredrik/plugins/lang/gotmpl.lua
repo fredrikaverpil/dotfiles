@@ -4,10 +4,13 @@ vim.filetype.add({
     gohtml = "gotmpl",
   },
   -- filename = {},
-  -- pattern = {},
+  pattern = {
+    [".*%.go%.tmpl"] = "gotmpl",
+  },
 })
 
 local filetypes = { "gotmpl", "gohtml" }
+local extensions = { "gotmpl", "gohtml", "tmpl" }
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = filetypes,
@@ -30,7 +33,7 @@ return {
           opts.ensure_installed = opts.ensure_installed or {}
           vim.list_extend(opts.ensure_installed, {
             "gopls",
-            "html",
+            -- "html",
           })
         end,
       },
@@ -44,13 +47,13 @@ return {
           filetypes = filetypes,
           settings = {
             gopls = {
-              templateExtensions = filetypes, -- make sure this filetype is set in the buffer
+              templateExtensions = extensions,
             },
           },
         },
 
         ---@type vim.lsp.Config
-        superhtml = { filetypes = filetypes, settings = { superhtml = {} } },
+        -- superhtml = { filetypes = filetypes, settings = { superhtml = {} } },
       },
     },
     opts_extend = {
