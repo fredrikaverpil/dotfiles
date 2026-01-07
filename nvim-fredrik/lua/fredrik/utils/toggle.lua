@@ -39,12 +39,11 @@ end
 function M.toggle_copilot(opts)
   opts = opts or {}
 
-  if not package.loaded["copilot"] then
-    vim.notify("Copilot is not loaded", vim.log.levels.WARN)
+  local private_utils = require("fredrik.utils.private")
+  local is_loaded = private_utils.is_copilot_loaded()
+  if not is_loaded then
     return
   end
-
-  local private_utils = require("fredrik.utils.private")
   local is_available = private_utils.is_copilot_available()
   local cwd = vim.fn.fnamemodify(vim.fn.getcwd(), ":~")
   local is_enabled = vim.g.custom_copilot_status == "enabled"

@@ -3,7 +3,7 @@ return {
     "zbirenbaum/copilot.lua",
     lazy = true,
     event = "InsertEnter",
-    enabled = true,
+    enabled = false,
     dependencies = {
       {
         "nvim-lualine/lualine.nvim",

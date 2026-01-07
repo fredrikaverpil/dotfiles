@@ -56,7 +56,8 @@ return {
   ---@class sidekick.Config
   opts = {
     nes = {
-      enabled = require("fredrik.utils.private").is_code_public(),
+      enabled = require("fredrik.utils.private").is_copilot_available()
+        and require("fredrik.utils.private").is_copilot_loaded(),
     },
     cli = {
       win = {
