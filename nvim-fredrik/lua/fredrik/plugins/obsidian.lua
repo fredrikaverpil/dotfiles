@@ -27,7 +27,7 @@ local function title_id(title)
 end
 
 ---@param title string
-local function meeting_note_id(title)
+local function date_prefixed_id(title)
   return os.date("%Y-%m-%d") .. "-" .. title
 end
 
@@ -81,14 +81,28 @@ return {
       customizations = {
         ["meeting_notes"] = {
           notes_subdir = "Meeting notes",
-          -- note_id_func = zettelkasten_id,
-          note_id_func = meeting_note_id,
+          note_id_func = date_prefixed_id,
         },
       },
     },
 
-    -- note_id_func = zettelkasten_id,
-    note_id_func = title_id,
+    note_id_func = date_prefixed_id,
+    note_frontmatter_func = function(note)
+      --return { id = note.id, aliases = {}, tags = {}, categories = {} }
+      local frontmatter = note.frontmatter(note)
+      frontmatter.id = note.id
+      if frontmatter.aliases == nil then
+        frontmatter.aliases = {}
+      end
+      if frontmatter.tags == nil then
+        frontmatter.tags = {}
+      end
+      if frontmatter.categories == nil then
+        frontmatter.categories = {}
+      end
+
+      return frontmatter
+    end,
 
     legacy_commands = false,
   },
