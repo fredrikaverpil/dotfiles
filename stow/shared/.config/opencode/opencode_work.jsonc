@@ -31,33 +31,28 @@
   },
   "agent": {
     "plan": {
-      "model": "google-vertex/gemini-3-pro-preview"
+      "mode": "primary",
+      "model": "google-vertex/gemini-3-flash-preview",
+      "options": {}
     },
     "build": {
-      "model": "google-vertex/gemini-3-pro-preview"
+      "mode": "primary",
+      "model": "google-vertex/gemini-3-flash-preview"
     },
-    "neovim": {
-      "model": "google-vertex/gemini-2.5-flash"
+    "explain": {
+      "mode": "primary",
+      "model": "google-vertex/gemini-3-flash-preview",
+      "tools": {
+        "write": false
+      }
     },
-    "github": {
-      "model": "google-vertex/gemini-3-pro-preview"
-    },
-    "security-auditor": {
-      "model": "google-vertex/gemini-3-pro-preview"
-    },
-    "docs-writer": {
-      "model": "google-vertex/gemini-3-pro-preview"
-    },
-    "jira": {
-      "model": "google-vertex/gemini-3-pro-preview"
+    "review": {
+      "mode": "primary",
+      "model": "google-vertex/gemini-3-flash-preview",
+      "tools": {
+        "write": false
+      }
     }
-    // TODO: figure out settings for gemini 2.5 pro
-    // "deep-thinker": {
-    //   "description": "Agent that uses high reasoning effort for complex problems",
-    //   "model": "openai/gpt-5-turbo",
-    //   "reasoningEffort": "high",
-    //   "textVerbosity": "low"
-    // }
   },
   "mcp": {
     "tavily": {
@@ -163,38 +158,37 @@
       "headers": {
         "Authorization": "Bearer {env:ROADIE_API_TOKEN}"
       }
+    },
+    "mcp-atlassian": {
+      "enabled": false,
+      "type": "local",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "-i",
+        "-e",
+        "CONFLUENCE_URL",
+        "-e",
+        "CONFLUENCE_USERNAME",
+        "-e",
+        "CONFLUENCE_API_TOKEN",
+        "-e",
+        "JIRA_URL",
+        "-e",
+        "JIRA_USERNAME",
+        "-e",
+        "JIRA_API_TOKEN",
+        "ghcr.io/sooperset/mcp-atlassian:latest"
+      ],
+      "environment": {
+        "CONFLUENCE_URL": "{env:CONFLUENCE_URL}",
+        "CONFLUENCE_USERNAME": "{env:CONFLUENCE_USERNAME}",
+        "CONFLUENCE_API_TOKEN": "{env:CONFLUENCE_API_TOKEN}",
+        "JIRA_URL": "{env:JIRA_URL}",
+        "JIRA_USERNAME": "{env:JIRA_USERNAME}",
+        "JIRA_API_TOKEN": "{env:JIRA_API_TOKEN}"
+      }
     }
-
-    // "mcp-atlassian": {
-    //   "type": "local",
-    //   "command": [
-    //     "docker",
-    //     "run",
-    //     "--rm",
-    //     "-i",
-    //     "-e",
-    //     "CONFLUENCE_URL",
-    //     "-e",
-    //     "CONFLUENCE_USERNAME",
-    //     "-e",
-    //     "CONFLUENCE_API_TOKEN",
-    //     "-e",
-    //     "JIRA_URL",
-    //     "-e",
-    //     "JIRA_USERNAME",
-    //     "-e",
-    //     "JIRA_API_TOKEN",
-    //     "ghcr.io/sooperset/mcp-atlassian:latest"
-    //   ],
-    //   "enabled": true,
-    //   "environment": {
-    //     "CONFLUENCE_URL": "{env:CONFLUENCE_URL}",
-    //     "CONFLUENCE_USERNAME": "{env:CONFLUENCE_USERNAME}",
-    //     "CONFLUENCE_API_TOKEN": "{env:CONFLUENCE_API_TOKEN}",
-    //     "JIRA_URL": "{env:JIRA_URL}",
-    //     "JIRA_USERNAME": "{env:JIRA_USERNAME}",
-    //     "JIRA_API_TOKEN": "{env:JIRA_API_TOKEN}"
-    //   }
-    // }
   }
 }
