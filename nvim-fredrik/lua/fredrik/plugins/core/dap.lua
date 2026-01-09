@@ -1,7 +1,7 @@
 return {
 
   {
-    "mfussenegger/nvim-dap",
+    "https://codeberg.org/mfussenegger/nvim-dap",
     lazy = true,
     config = function(_, opts)
       -- Set nice color highlighting at the stopped line
@@ -39,14 +39,14 @@ return {
         },
       },
       {
-        "mfussenegger/nvim-dap",
+        "https://codeberg.org/mfussenegger/nvim-dap",
         opts = {},
       },
       {
         "nvim-lualine/lualine.nvim",
         event = "VeryLazy",
         dependencies = {
-          "mfussenegger/nvim-dap",
+          "https://codeberg.org/mfussenegger/nvim-dap",
         },
         opts = function(_, opts)
           opts.extensions = { "nvim-dap-ui" }

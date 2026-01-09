@@ -101,7 +101,7 @@ local function buf_lint_setup()
   -- HACK: cannot pass in cwd as function (for lazy loading). Instead, an autocmd is used.
   -- opts.linters["buf_lint"] = {
   --   args = buf_lint_args,
-  --   -- cwd = buf_lint_cwd, -- requires https://github.com/mfussenegger/nvim-lint/pull/674
+  --   -- cwd = buf_lint_cwd, -- requires https://codeberg.org/mfussenegger/nvim-lint/pull/674
   --   append_fname = false,
   -- }
   vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost" }, {
@@ -208,7 +208,7 @@ return {
   },
 
   {
-    "mfussenegger/nvim-lint",
+    "https://codeberg.org/mfussenegger/nvim-lint",
     dependencies = {
       {
         "mason-org/mason.nvim",
@@ -221,7 +221,7 @@ return {
     opts = function(_, opts)
       -- NOTE: buf_lint and api-linter is not part of linters_by_ft:
       -- * buf_lint is executed below in an autocmd, because workaround for lazy-loaded cwd is desired.
-      -- * api_linter is not yet merged into nvim-lint: https://github.com/mfussenegger/nvim-lint/pull/665
+      -- * api_linter is not yet merged into nvim-lint: https://codeberg.org/mfussenegger/nvim-lint/pull/665
 
       opts.linters_by_ft = opts.linters_by_ft or {}
       opts.linters = opts.linters or {}

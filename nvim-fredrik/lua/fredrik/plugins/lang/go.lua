@@ -158,7 +158,7 @@ return {
   },
 
   {
-    "mfussenegger/nvim-lint",
+    "https://codeberg.org/mfussenegger/nvim-lint",
     dependencies = {
       {
         "mason-org/mason.nvim",
@@ -175,7 +175,7 @@ return {
       opts.linters_by_ft["go"] = { "golangcilint" }
       opts.linters["golangcilint"] = {
         args = golangcilint_args(),
-        ignore_exitcode = true, -- NOTE: https://github.com/mfussenegger/nvim-lint/commit/3d5190d318e802de3a503b74844aa87c2cd97ef0
+        ignore_exitcode = true, -- NOTE: https://codeberg.org/mfussenegger/nvim-lint/commit/3d5190d318e802de3a503b74844aa87c2cd97ef0
 
         -- For debugging; to see the same output as the parser sees
         -- Important: make sure you don't have another golangci-lint biniary on $PATH
@@ -441,7 +441,7 @@ return {
   },
 
   {
-    "mfussenegger/nvim-dap",
+    "https://codeberg.org/mfussenegger/nvim-dap",
     lazy = true,
     ft = { "go" },
     dependencies = {

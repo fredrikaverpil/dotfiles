@@ -23,7 +23,7 @@ vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
 
 return {
   {
-    "mfussenegger/nvim-lint",
+    "https://codeberg.org/mfussenegger/nvim-lint",
     dependencies = {
       {
         "mason-org/mason.nvim",
@@ -170,7 +170,7 @@ return {
   },
 
   {
-    "mfussenegger/nvim-dap",
+    "https://codeberg.org/mfussenegger/nvim-dap",
     lazy = true,
     ft = { "python" },
     dependencies = {
@@ -182,7 +182,7 @@ return {
         end,
       },
       {
-        "mfussenegger/nvim-dap-python",
+        "https://codeberg.org/mfussenegger/nvim-dap-python",
         config = function(_, opts)
           require("dap-python").setup("uv", opts)
         end,

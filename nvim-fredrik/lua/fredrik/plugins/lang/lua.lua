@@ -166,7 +166,7 @@ return {
   },
 
   {
-    "mfussenegger/nvim-dap",
+    "https://codeberg.org/mfussenegger/nvim-dap",
     lazy = true,
     ft = { "lua" },
     dependencies = {

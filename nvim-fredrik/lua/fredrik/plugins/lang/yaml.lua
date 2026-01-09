@@ -58,7 +58,7 @@ return {
   },
 
   {
-    "mfussenegger/nvim-lint",
+    "https://codeberg.org/mfussenegger/nvim-lint",
     dependencies = {
       {
         "mason-org/mason.nvim",

@@ -1,5 +1,5 @@
 return {
-  "mfussenegger/nvim-lint",
+  "https://codeberg.org/mfussenegger/nvim-lint",
   lazy = true,
   event = "BufReadPost",
   dependencies = {
