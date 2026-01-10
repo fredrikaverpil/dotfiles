@@ -1,16 +1,8 @@
 {
   "env": {},
   "permissions": {
-    "allow": [
-      "Bash(go:doc:*)",
-      "Bash(go:test:*)",
-      "Bash(go:build:*)"
-    ],
-    "deny": [
-      "Read(./.env)",
-      "Read(./.env.*)",
-      "Read(./secrets/**)"
-    ]
+    "allow": ["Bash(go:doc:*)", "Bash(go:test:*)", "Bash(go:build:*)"],
+    "deny": ["Read(./.env)", "Read(./.env.*)", "Read(./secrets/**)"]
   },
   "model": "opus",
   "enabledPlugins": {
@@ -24,7 +16,7 @@
     "playwright@claude-plugins-official": true,
     "plugin-dev@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true
 }
