@@ -4,6 +4,7 @@
     "allow": ["Bash(go:doc:*)", "Bash(go:test:*)", "Bash(go:build:*)"],
     "deny": ["Read(./.env)", "Read(./.env.*)", "Read(./secrets/**)"]
   },
+  "notifications": { "sound": true, "onQuestion": true, "onIdle": true },
   "model": "opus",
   "enabledPlugins": {
     "code-review@claude-plugins-official": true,
