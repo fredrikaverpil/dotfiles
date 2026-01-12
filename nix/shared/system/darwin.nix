@@ -155,7 +155,7 @@
       nerd-fonts.jetbrains-mono
       maple-mono.truetype
       maple-mono.variable
-      noto-fonts-emoji
+      noto-fonts-color-emoji
       nerd-fonts.symbols-only
     ];
   };

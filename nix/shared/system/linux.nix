@@ -57,7 +57,7 @@
       nerd-fonts.jetbrains-mono
       maple-mono.truetype
       maple-mono.variable
-      noto-fonts-emoji # NOTE: takes a very long time to build
+      noto-fonts-color-emoji # NOTE: takes a very long time to build
       nerd-fonts.symbols-only
     ];
 
