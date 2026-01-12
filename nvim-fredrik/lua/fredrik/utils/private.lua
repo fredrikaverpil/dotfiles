@@ -47,7 +47,7 @@ end
 
 local function is_copilot_loaded()
   if not package.loaded["copilot"] then
-    vim.notify("Copilot is not loaded", vim.log.levels.WARN)
+    -- vim.notify("Copilot is not loaded", vim.log.levels.WARN)
     return false
   end
 

@@ -73,7 +73,7 @@ return {
     if opts.copilot then
       table.insert(opts.sections.lualine_x, 1, opts.copilot.lualine_component)
     else
-      vim.notify("Lualine: copilot component not loaded", vim.log.levels.WARN)
+      -- vim.notify("Lualine: copilot component not loaded", vim.log.levels.WARN)
     end
 
     if opts.dap_status then
