@@ -26,7 +26,7 @@ while [[ $# -gt 0 ]]; do
 		echo ""
 		echo "Options:"
 		echo "  --stow     Use Stow-only mode (bypass Nix, dotfiles only)"
-		echo "  --update   Update flake inputs before rebuilding (Nix mode only)"
+		echo "  --update   Update ALL flake inputs before rebuilding (Darwin auto-updates unstable)"
 		echo "  --help     Show this help message"
 		exit 0
 		;;
@@ -51,11 +51,17 @@ use_nix() {
 	echo ""
 	echo "📦 Using Nix (system + packages + dotfiles via Stow)..."
 
-	# Update flake inputs if requested
+	# Always update unstable inputs on Darwin
+	if [[ "$OS" == "Darwin" ]]; then
+		echo "🔄 Updating unstable inputs..."
+		nix flake update nixpkgs-unstable nix-darwin home-manager-unstable dotfiles
+	fi
+
+	# Update all flake inputs if requested
 	if [[ "$UPDATE_FLAKE" == "true" ]]; then
-		echo "🔄 Updating flake inputs..."
+		echo "🔄 Updating all flake inputs..."
 		nix flake update
-		echo "✅ Flake inputs updated!"
+		echo "✅ All flake inputs updated!"
 	fi
 
 	# Check if this hostname has a configuration

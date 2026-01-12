@@ -45,10 +45,10 @@ sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- sw
 </details>
 
 ```sh
-# Rebuild system + packages + dotfiles
+# Rebuild system + packages + dotfiles (Darwin auto-updates unstable inputs)
 ./rebuild.sh
 
-# Update flake inputs (nixpkgs, home-manager, etc.) then rebuild + dotfiles
+# Update ALL flake inputs (stable + unstable) then rebuild
 ./rebuild.sh --update
 
 # Dotfiles only (no Nix rebuild)
@@ -60,21 +60,16 @@ sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- sw
 
 ### Update stable vs unstable
 
-```sh
-# Update all unstable/Darwin-related inputs (dev machines)
-nix flake lock \
-  --update-input nixpkgs-unstable \
-  --update-input home-manager-unstable \
-  --update-input nix-darwin \
-  --update-input dotfiles
+On Darwin, `./rebuild.sh` automatically updates unstable inputs
+(`nixpkgs-unstable`, `nix-darwin`, `home-manager-unstable`, `dotfiles`) on every
+rebuild. Use `--update` to update all inputs including stable ones.
 
-# Update all stable/Linux-related inputs (prod servers)
-nix flake lock \
-  --update-input nixpkgs \
-  --update-input home-manager \
-  --update-input nixos-raspberrypi \
-  --update-input disko \
-  --update-input dotfiles
+```sh
+# Manual: Update only unstable/Darwin-related inputs
+nix flake update nixpkgs-unstable nix-darwin home-manager-unstable dotfiles
+
+# Manual: Update only stable/Linux-related inputs
+nix flake update nixpkgs home-manager nixos-raspberrypi disko
 ```
 
 ### macOS permissions
