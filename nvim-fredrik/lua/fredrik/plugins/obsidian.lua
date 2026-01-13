@@ -87,22 +87,26 @@ return {
     },
 
     note_id_func = date_prefixed_id,
-    note_frontmatter_func = function(note)
-      --return { id = note.id, aliases = {}, tags = {}, categories = {} }
-      local frontmatter = note.frontmatter(note)
-      frontmatter.id = note.id
-      if frontmatter.aliases == nil then
-        frontmatter.aliases = {}
-      end
-      if frontmatter.tags == nil then
-        frontmatter.tags = {}
-      end
-      if frontmatter.categories == nil then
-        frontmatter.categories = {}
-      end
+    frontmatter = {
+      enabled = true,
+      sort = false,
+      func = function(note)
+        --return { id = note.id, aliases = {}, tags = {}, categories = {} }
+        local frontmatter = note.frontmatter(note)
+        frontmatter.id = note.id
+        -- if frontmatter.aliases == nil then
+        --   frontmatter.aliases = {}
+        -- end
+        if frontmatter.tags == nil then
+          frontmatter.tags = {}
+        end
+        if frontmatter.categories == nil then
+          frontmatter.categories = {}
+        end
 
-      return frontmatter
-    end,
+        return frontmatter
+      end,
+    },
 
     legacy_commands = false,
   },
