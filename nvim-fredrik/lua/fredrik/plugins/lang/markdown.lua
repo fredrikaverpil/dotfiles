@@ -22,7 +22,7 @@ return {
     },
     opts = {
       formatters_by_ft = {
-        markdown = { "mdformat" }, -- currently, mdformat is used (but prettier is configured too below)
+        markdown = { "prettier" }, -- mdformat causes issues with obsidian's frontmatter
       },
       formatters = {
         prettier = {
