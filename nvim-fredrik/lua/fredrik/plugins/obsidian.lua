@@ -33,7 +33,7 @@ end
 
 return {
   -- "epwalsh/obsidian.nvim",
-  "obsidian-nvim/obsidian.nvim",
+  "obsidian-nvim/obsidian.nvim", -- maintained fork
   enabled = function()
     -- only enable on macOS for now, and if vault_path exists
     return vim.fn.has("mac") == 1 and vim.fn.isdirectory(M.vault_path) == 1
@@ -66,6 +66,7 @@ return {
 
     daily_notes = {
       folder = "Daily",
+      template = M.vault_path .. "/_templates/daily.md",
     },
 
     attachments = {
