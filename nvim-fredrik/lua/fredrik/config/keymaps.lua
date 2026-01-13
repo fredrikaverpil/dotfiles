@@ -494,6 +494,14 @@ function M.setup_snacks_keymaps()
       desc = "Goto Definition",
     },
     {
+      "gv",
+      function()
+        vim.cmd("vsplit")
+        vim.lsp.buf.definition()
+      end,
+      desc = "Goto Definition (vertical split)",
+    },
+    {
       "gD",
       function()
         Snacks.picker.lsp_declarations()
