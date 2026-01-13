@@ -2,57 +2,41 @@
   config,
   lib,
   pkgs,
-  inputs,
   ...
 }:
-let
-  unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.system};
-in
 {
   options = {
     npmTools = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
-      description = "List of npm packages to install globally";
+      description = "List of npm packages to install globally (via bun)";
       apply = lib.unique;
     };
   };
 
-  # Only enable npm-based global tool installation on macOS (Darwin)
+  # Only enable bun-based global tool installation on macOS (Darwin)
   # NixOS/Linux generic npm binaries are not runnable without wrapping.
   config = lib.mkIf pkgs.stdenv.isDarwin {
-    home.sessionPath = [ "$HOME/.nix-npm-tools/bin" ];
+    home.sessionPath = [ "$HOME/.bun/bin" ];
 
     home.activation.installNpmTools = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       set -e
-      export NPM_CONFIG_PREFIX="$HOME/.nix-npm-tools"
-      export PATH="$HOME/.nix-npm-tools/bin:$PATH"
+      export BUN_INSTALL="$HOME/.bun"
+      export PATH="$HOME/.bun/bin:$PATH"
 
-      mkdir -p "$HOME/.nix-npm-tools"
+      mkdir -p "$HOME/.bun/bin"
 
       NPM_TOOLS=(${lib.concatStringsSep " " (map (pkg: "\"${pkg}\"") config.npmTools)})
 
-      echo "Installing/updating npm-based CLI tools..."
-      export PATH="${pkgs.nodejs}/bin:$PATH"
+      echo "Installing/updating npm-based CLI tools (using bun)..."
+      export PATH="${pkgs.bun}/bin:$PATH"
 
       for tool in "''${NPM_TOOLS[@]}"; do
         echo "Processing $tool..."
-        
-        package_name=$(echo "$tool" | sed 's/@latest$//')
-        
-        # Check if package is outdated using the correct npm prefix
-        if NPM_CONFIG_PREFIX="$HOME/.nix-npm-tools" npm outdated -g "$package_name" 2>/dev/null | grep -q "$package_name"; then
-          echo "Updating $tool (outdated)..."
-          if ! $DRY_RUN_CMD npm install -g "$tool"; then
-            echo "Warning: Failed to update $tool"
-          fi
+        if ! $DRY_RUN_CMD bun install -g "$tool" 2>/dev/null; then
+          echo "Warning: Failed to install/update $tool"
         else
-          # Try to install/update - npm will handle if it's already installed
-          if ! $DRY_RUN_CMD npm install -g "$tool" >/dev/null 2>&1; then
-            echo "Warning: Failed to install/update $tool"
-          else
-            echo "$tool ready"
-          fi
+          echo "$tool ready"
         fi
       done
 
