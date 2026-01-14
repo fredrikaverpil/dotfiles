@@ -33,10 +33,14 @@ on GitHub pages. Useful commands:
 
 ## Jira
 
-If you come by a jira ticket number, use `jira-cli` to acquire more details.
+If you come by a Jira ticket number, use `jira`
+([jira-cli](https://github.com/ankitpokhrel/jira-cli)) to acquire more details
+for increased understanding of the problem at hand.
 
 ## Go
 
+- Use the `gopls` LSP at all times when searching for symbols, renaming
+  packages/variables/functions etc.
 - Use `go doc` when uncertain on how to use a package.
 - If the package is not installed locally, search
   [https://pkg.go.dev](pkg.go.dev). Standard library functions are available
