@@ -31,6 +31,14 @@ on GitHub pages. Useful commands:
 - `gh pr view NUMBER` - PR details
 - `gh run view RUN_ID --log` - GitHub Actions logs
 
+### Pull requests body
+
+When submitting a pull request, follow my style of describing what I did by
+creating three headers; "## Why?" (this change), "## What?" (was changed) and
+"## Notes" (detailing additional references, gotchas, alternative solutions
+etc). Try to be concise and use bullet points and, when needed, consice examples
+in code blocks. Never attribute Claude or LLMs.
+
 ## Jira
 
 If you come by a Jira ticket number, use `jira`
