@@ -45,11 +45,17 @@ sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- sw
 </details>
 
 ```sh
-# Rebuild system + packages + dotfiles (Darwin auto-updates unstable inputs)
+# Rebuild system + packages + dotfiles (reproducible, uses flake.lock)
 ./rebuild.sh
 
-# Update ALL flake inputs (stable + unstable) then rebuild
+# Update ALL flake inputs then rebuild
 ./rebuild.sh --update
+
+# Update only unstable inputs (nixpkgs-unstable, nix-darwin, home-manager-unstable, dotfiles)
+./rebuild.sh --update-unstable
+
+# Update npm tools only (fast, no Nix rebuild)
+./rebuild.sh --update-npm
 
 # Dotfiles only (no Nix rebuild)
 ./rebuild.sh --stow
@@ -60,15 +66,16 @@ sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- sw
 
 ### Update stable vs unstable
 
-On Darwin, `./rebuild.sh` automatically updates unstable inputs
-(`nixpkgs-unstable`, `nix-darwin`, `home-manager-unstable`, `dotfiles`) on every
-rebuild. Use `--update` to update all inputs including stable ones.
+By default, `./rebuild.sh` aims to be "reproducible" and uses the locked
+`flake.lock`. Use `--update-unstable` to update Darwin-related inputs, or
+`--update` to update all inputs.
 
 ```sh
-# Manual: Update only unstable/Darwin-related inputs
-nix flake update nixpkgs-unstable nix-darwin home-manager-unstable dotfiles
+# Update only unstable/Darwin-related inputs
+./rebuild.sh --update-unstable
+# Or manually: nix flake update nixpkgs-unstable nix-darwin home-manager-unstable dotfiles
 
-# Manual: Update only stable/Linux-related inputs
+# Update only stable/Linux-related inputs
 nix flake update nixpkgs home-manager nixos-raspberrypi disko
 ```
 
@@ -172,6 +179,7 @@ darwin-rebuild --rollback      # macOS
 | User dotfiles      | GNU Stow         | Per-user    | `stow/`                            |
 | User packages      | home-manager     | Per-user    | `nix/shared/home/`                 |
 | User preferences   | home-manager     | Per-user    | `nix/shared/home/` + host-specific |
+| npm tools          | bun              | Per-user    | `nix/lib/npm.nix` (Darwin only)    |
 | Host configuration | nix-darwin/NixOS | System-wide | `nix/hosts/*/configuration.nix`    |
 | System packages    | nix-darwin/NixOS | System-wide | `nix/shared/system/`               |
 | System settings    | nix-darwin/NixOS | System-wide | `nix/shared/system/`               |

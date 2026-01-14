@@ -5,8 +5,11 @@ repository.
 
 ## Core Commands
 
-- **Symlink dotfiles**: `./rebuild.sh --stow` (GNU Stow dotfiles without Nix
-  rebuild)
+- **Full rebuild**: `./rebuild.sh` (Nix rebuild + Stow, reproducible by default)
+- **Update npm tools**: `./rebuild.sh --update-npm` (fast, no Nix rebuild)
+- **Update unstable inputs**: `./rebuild.sh --update-unstable` (then rebuild)
+- **Update all inputs**: `./rebuild.sh --update` (then rebuild)
+- **Symlink dotfiles only**: `./rebuild.sh --stow` (GNU Stow without Nix rebuild)
 - **Nix rebuild**: ask user to run this, NEVER run it yourself
 - **Nix validation**: `nix flake check` or `nix flake check --all-systems`
 - **Nix builds**: `nix build .#darwinConfigurations.<host>.system`
