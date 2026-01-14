@@ -39,8 +39,8 @@ for increased understanding of the problem at hand.
 
 ## Go
 
-- Use the `gopls` LSP at all times when searching for symbols, renaming
-  packages/variables/functions etc.
+- Use the `gopls` LSP at all times when searching for references to symbols,
+  renaming packages/variables/functions etc.
 - Use `go doc` when uncertain on how to use a package.
 - If the package is not installed locally, search
   [https://pkg.go.dev](pkg.go.dev). Standard library functions are available
