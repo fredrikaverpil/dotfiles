@@ -50,3 +50,8 @@ for increased understanding of the problem at hand.
 
 - Always prefer `bun` (or `bunx`) over `npm` (or `npmx`), unless the project
   explicitly already uses Node/npm.
+
+## Python
+
+- Always use `uv` to run Python commands.
+- Prefer `uv` with `pyproject.toml` to define dependencies.
