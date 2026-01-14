@@ -45,6 +45,8 @@ for increased understanding of the problem at hand.
 - If the package is not installed locally, search
   [https://pkg.go.dev](pkg.go.dev). Standard library functions are available
   (example: [`https://pkg.go.dev/fmt`](fmt package)).
+- You can run `go mod tidy` recursively in the repo with the custom
+  [`go-mod-tidy`](shell/bin/go-mod-tidy) shell script.
 
 ## Npm and bun
 
