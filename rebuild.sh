@@ -38,7 +38,7 @@ while [[ $# -gt 0 ]]; do
 		echo "  --stow             Use Stow-only mode (bypass Nix, dotfiles only)"
 		echo "  --update           Update ALL flake inputs before rebuilding"
 		echo "  --update-unstable  Update only unstable inputs (nixpkgs-unstable, nix-darwin, home-manager-unstable, dotfiles)"
-		echo "  --update-npm       Only update npm tools (reads list from Nix config, skips rebuild)"
+		echo "  --update-npm       Update npm tools and lockfile (npm-tools/bun.lockb), skips rebuild"
 		echo "  --help             Show this help message"
 		exit 0
 		;;
@@ -103,6 +103,9 @@ use_nix() {
 	echo ""
 	echo "🔗 Running Stow to symlink dotfiles..."
 	(cd stow && ./install.sh)
+
+	# Install npm tools from lockfile
+	install_npm_tools
 }
 
 # Function to use GNU Stow
@@ -113,57 +116,57 @@ use_stow() {
 	./install.sh
 }
 
-# Function to update npm tools only
-update_npm_tools() {
+# Function to install npm tools from lockfile (reproducible)
+install_npm_tools() {
 	echo ""
-	echo "📦 Updating npm tools only (using bun)..."
+	echo "📦 Installing npm tools from lockfile..."
 
-	# Query npm tools from Nix configuration
-	if [[ "$OS" == "Darwin" ]]; then
-		CONFIG_ATTR="darwinConfigurations"
-	else
-		CONFIG_ATTR="nixosConfigurations"
+	NPM_TOOLS_DIR="$DOTFILES_DIR/npm-tools"
+
+	if [[ ! -f "$NPM_TOOLS_DIR/package.json" ]]; then
+		echo "⚠️  No npm-tools/package.json found, skipping npm tools"
+		return 0
 	fi
-
-	echo "Reading npm tools from Nix config for $HOSTNAME..."
-	NPM_TOOLS_JSON=$(nix eval ".#${CONFIG_ATTR}.${HOSTNAME}.config.home-manager.users.fredrik.npmTools" --json 2>/dev/null) || {
-		echo "❌ Failed to read npmTools from Nix config"
-		echo "Make sure hostname '$HOSTNAME' has a configuration in nix/hosts/"
-		exit 1
-	}
-
-	# Parse JSON array to bash array
-	readarray -t NPM_TOOLS < <(echo "$NPM_TOOLS_JSON" | jq -r '.[]')
-
-	if [[ ${#NPM_TOOLS[@]} -eq 0 ]]; then
-		echo "No npm tools configured"
-		exit 0
-	fi
-
-	echo "Found ${#NPM_TOOLS[@]} npm tools to update"
-
-	# Set up bun environment
-	export BUN_INSTALL="$HOME/.bun"
-	export PATH="$HOME/.bun/bin:$PATH"
-	mkdir -p "$HOME/.bun/bin"
 
 	# Get bun from flake's locked nixpkgs (reproducible)
 	BUN_PATH=$(nix build --inputs-from . nixpkgs#bun --no-link --print-out-paths 2>/dev/null)/bin
 	export PATH="$BUN_PATH:$PATH"
 
-	echo ""
-	for tool in "${NPM_TOOLS[@]}"; do
-		echo "Processing $tool..."
+	cd "$NPM_TOOLS_DIR"
+	if bun install; then
+		echo "✅ npm tools installed!"
+	else
+		echo "⚠️  Failed to install npm tools"
+	fi
+	cd "$DOTFILES_DIR"
+}
 
-		if bun install -g "$tool" 2>/dev/null; then
-			echo "  ✓ $tool ready"
-		else
-			echo "  ⚠ Failed to install $tool"
-		fi
-	done
-
+# Function to update npm tools and lockfile
+update_npm_tools() {
 	echo ""
-	echo "✅ npm tools update complete!"
+	echo "📦 Updating npm tools and lockfile..."
+
+	NPM_TOOLS_DIR="$DOTFILES_DIR/npm-tools"
+
+	if [[ ! -f "$NPM_TOOLS_DIR/package.json" ]]; then
+		echo "❌ No npm-tools/package.json found"
+		exit 1
+	fi
+
+	# Get bun from flake's locked nixpkgs (reproducible)
+	BUN_PATH=$(nix build --inputs-from . nixpkgs#bun --no-link --print-out-paths 2>/dev/null)/bin
+	export PATH="$BUN_PATH:$PATH"
+
+	cd "$NPM_TOOLS_DIR"
+	if bun update; then
+		echo ""
+		echo "✅ npm tools updated!"
+		echo "📝 Don't forget to commit the updated bun.lockb"
+	else
+		echo "❌ Failed to update npm tools"
+		exit 1
+	fi
+	cd "$DOTFILES_DIR"
 }
 
 # Main logic

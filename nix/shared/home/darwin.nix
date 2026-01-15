@@ -17,8 +17,6 @@
   programs = {
   };
 
-  npmTools = lib.mkAfter [
-  ];
 
   # macOS user-specific defaults using home-manager's built-in support
   #

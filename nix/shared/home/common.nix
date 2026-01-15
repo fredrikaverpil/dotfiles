@@ -161,14 +161,8 @@ in
       ];
     };
 
-    npmTools = [
-      "@anthropic-ai/claude-code@latest"
-      "@github/copilot"
-      "@google/gemini-cli@latest"
-      "@openai/codex@latest"
-      "opencode-ai@latest"
-      "@sourcegraph/amp@latest"
-    ];
+    # npm tools are now managed via npm-tools/package.json and bun.lockb
+    # Run ./rebuild.sh --update-npm to update them
 
   };
 }

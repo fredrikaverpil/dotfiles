@@ -24,9 +24,4 @@ in
 
   programs = {
   };
-
-  # NOTE: npmTools will not work when home-manager.useUserPackages is set to true,
-  # and errors such as "Could not start dynamically linked executable" will occur.
-  npmTools = lib.mkAfter [
-  ];
 }

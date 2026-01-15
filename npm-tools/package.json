@@ -1,0 +1,14 @@
+{
+  "name": "dotfiles-npm-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CLI tools installed via bun with lockfile for reproducibility",
+  "dependencies": {
+    "@anthropic-ai/claude-code": "latest",
+    "@github/copilot": "latest",
+    "@google/gemini-cli": "latest",
+    "@openai/codex": "latest",
+    "@sourcegraph/amp": "latest",
+    "opencode-ai": "latest"
+  }
+}

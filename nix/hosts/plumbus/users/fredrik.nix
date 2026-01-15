@@ -24,11 +24,6 @@ in
   programs = {
   };
 
-  # NOTE: npmTools will not work when home-manager.useUserPackages is set to true,
-  # and errors such as "Could not start dynamically linked executable" will occur.
-  npmTools = lib.mkAfter [
-  ];
-
   # Plumbus-specific user settings for Raycast integration
   # Disable Spotlight keyboard shortcut (Cmd+Space) to allow Raycast usage
   home.activation.disableSpotlightShortcut = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
