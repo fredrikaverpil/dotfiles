@@ -1,5 +1,20 @@
 # Claude instructions
 
+## Self review
+
+After implementing something, always look back and critically review what you
+did with the following in mind:
+
+- Simplicity and consistency over cleverness
+- Explicitness over implicitness
+- Great DX and UX
+- Ease of long-term maintenance
+- Follow conventions by the language, ecosystem, open source community
+  conventions
+
+If you discover apparent improvement areas, go back and refactor. When unsure,
+ask questions.
+
 ## Sage
 
 If there's a `.sage/` folder in the project, this indicates the project uses
@@ -19,6 +34,11 @@ source project). Use `./pok -h` to list the tasks available.
 When creating git commits, do NOT include "Co-Authored-By" or any other
 attribution to Claude/AI in the commit message. Always use conventional commits
 (with scope, when possible).
+
+## GCP
+
+If you see `console.cloud.google.com` links, use the `gcloud` command to access
+the related details.
 
 ## GitHub
 
