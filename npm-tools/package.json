@@ -2,7 +2,7 @@
   "name": "dotfiles-npm-tools",
   "version": "1.0.0",
   "private": true,
-  "description": "CLI tools installed via bun with lockfile for reproducibility",
+  "description": "CLI tools installed via bun with lockfile for reproducibility (macOS only)",
   "dependencies": {
     "@anthropic-ai/claude-code": "latest",
     "@github/copilot": "latest",

@@ -161,8 +161,8 @@ in
       ];
     };
 
-    # npm tools are now managed via npm-tools/package.json and bun.lockb
-    # Run ./rebuild.sh --update-npm to update them
+    # npm tools are managed via npm-tools/package.json and bun.lockb (macOS only)
+    # Run ./rebuild.sh --update-npm on a macOS host to update them
 
   };
 }

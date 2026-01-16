@@ -38,7 +38,7 @@ while [[ $# -gt 0 ]]; do
 		echo "  --stow             Use Stow-only mode (bypass Nix, dotfiles only)"
 		echo "  --update           Update ALL flake inputs before rebuilding"
 		echo "  --update-unstable  Update only unstable inputs (nixpkgs-unstable, nix-darwin, home-manager-unstable, dotfiles)"
-		echo "  --update-npm       Update npm tools and lockfile (npm-tools/bun.lockb), skips rebuild"
+		echo "  --update-npm       Update npm tools and lockfile (macOS only), skips rebuild"
 		echo "  --help             Show this help message"
 		exit 0
 		;;
@@ -117,7 +117,14 @@ use_stow() {
 }
 
 # Function to install npm tools from lockfile (reproducible)
+# Only runs on macOS - Linux npm binaries have dynamic linking issues
 install_npm_tools() {
+	if [[ "$OS" != "Darwin" ]]; then
+		echo ""
+		echo "⏭️  Skipping npm tools (not supported on $OS)"
+		return 0
+	fi
+
 	echo ""
 	echo "📦 Installing npm tools from lockfile..."
 
@@ -142,7 +149,15 @@ install_npm_tools() {
 }
 
 # Function to update npm tools and lockfile
+# Only runs on macOS - Linux npm binaries have dynamic linking issues
 update_npm_tools() {
+	if [[ "$OS" != "Darwin" ]]; then
+		echo ""
+		echo "⏭️  Skipping npm tools update (not supported on $OS)"
+		echo "💡 Run this on a macOS host to update the lockfile"
+		return 0
+	fi
+
 	echo ""
 	echo "📦 Updating npm tools and lockfile..."
 
