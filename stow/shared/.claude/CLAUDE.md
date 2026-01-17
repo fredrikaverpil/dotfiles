@@ -15,6 +15,11 @@ did with the following in mind:
 If you discover apparent improvement areas, go back and refactor. When unsure,
 ask questions.
 
+## AIP
+
+When working with backends, adhere to
+[Google's AIP](https://google.aip.dev/general). Look up rules when in doubt.
+
 ## Sage
 
 If there's a `.sage/` folder in the project, this indicates the project uses
