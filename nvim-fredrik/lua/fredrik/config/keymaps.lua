@@ -62,7 +62,7 @@ vim.keymap.set("n", "<leader>bo", function()
 end, { desc = "Close all other buffers" })
 vim.keymap.set("n", "<leader>by", function()
   -- Copy relative filepath to clipboard
-  local path = vim.fn.expand("%")
+  local path = vim.fn.fnamemodify(vim.fn.expand("%"), ":.")
   vim.fn.setreg("+", path)
   vim.notify("Copied to clipboard: " .. path, vim.log.levels.INFO)
 end, { desc = "Yank buffer filepath (relative)" })
