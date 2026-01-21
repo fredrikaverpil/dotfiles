@@ -31,6 +31,11 @@ return {
         file_filter = {
           ignore = { "*.pb.go" },
         },
+        initial_focus = "modified", -- Initial focus: "explorer", "original", or "modified"
+      },
+
+      history = {
+        initial_focus = "modified", -- "history", "original", or "modified"
       },
 
       -- Keymaps in diff view
@@ -48,5 +53,7 @@ return {
         },
       },
     },
+    cmd = { "CodeDiff" },
+    keys = require("fredrik.config.keymaps").setup_codediff_keymaps(),
   },
 }

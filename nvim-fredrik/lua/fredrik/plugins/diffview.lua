@@ -2,6 +2,7 @@ return {
   {
     -- NOTE: jump between diffs with ]c and [c (vim built in), see :h jumpto-diffs
     "sindrets/diffview.nvim",
+    enabled = false, -- use codediff.nvim instead
     lazy = true,
     dependencies = {
       { "nvim-lua/plenary.nvim" },

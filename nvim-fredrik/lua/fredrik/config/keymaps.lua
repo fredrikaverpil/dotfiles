@@ -990,6 +990,37 @@ function M.setup_diffview_keymaps()
   }
 end
 
+function M.setup_codediff_keymaps()
+  return {
+    { "<leader>gdh", ":CodeDiff history %<CR>", desc = "File history" },
+    { "<leader>gdH", ":CodeDiff history<CR>", desc = "Repo history" },
+    {
+      "<leader>gdo",
+      function()
+        local default_branch = require("fredrik.utils.git").get_default_branch()
+        vim.cmd(":CodeDiff origin/" .. default_branch)
+      end,
+      desc = "Diff against default branch",
+    },
+    {
+      "<leader>gdp",
+      function()
+        local default_branch = require("fredrik.utils.git").get_default_branch()
+        vim.cmd(":CodeDiff origin/" .. default_branch)
+      end,
+      desc = "Review current PR/branch",
+    },
+    {
+      "<leader>gdP",
+      function()
+        local default_branch = require("fredrik.utils.git").get_default_branch()
+        return vim.cmd(":CodeDiff history origin/" .. default_branch .. "...HEAD")
+      end,
+      desc = "Review current PR (per commit)",
+    },
+  }
+end
+
 function M.setup_neotest_keymaps()
   return {
     {
