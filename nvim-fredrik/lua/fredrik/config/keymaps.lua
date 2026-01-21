@@ -384,6 +384,7 @@ function M.setup_snacks_keymaps()
   -- NOTE: Snacks is a global; _G.Snacks = M
   return {
     -- misc
+
     {
       "<leader><leader>",
       function()
@@ -392,7 +393,15 @@ function M.setup_snacks_keymaps()
           multi = { "buffers", "files" },
           hidden = true,
           ignored = true,
-          exclude = { "*.pb.go", ".venv/*", ".mypy_cache/*", ".repro/*" },
+          exclude = {
+            "*.pb.go",
+            "**/.venv",
+            ".mypy_cache/*",
+            ".repro/*",
+            "**/node_modules",
+            ".sage/tools",
+            ".pocket/tools",
+          },
           formatters = {
             file = {
               truncate = 100,
@@ -412,6 +421,7 @@ function M.setup_snacks_keymaps()
       end,
       desc = "Grep",
     },
+
     {
       "<leader>:",
       function()
