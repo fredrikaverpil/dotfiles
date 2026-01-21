@@ -73,7 +73,7 @@ in code blocks. Never attribute Claude or LLMs.
 
 ## Jira
 
-If you come by a Jira ticket number, use `jira`
+If you come by a Jira ticket number or Jira URL, use `jira`
 ([jira-cli](https://github.com/ankitpokhrel/jira-cli)) to acquire more details
 for increased understanding of the problem at hand.
 

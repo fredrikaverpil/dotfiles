@@ -12,7 +12,6 @@
       "Read(./secrets/**)"
     ]
   },
-  "model": "haiku",
   "enabledPlugins": {
     "code-review@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
