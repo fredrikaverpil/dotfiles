@@ -152,6 +152,80 @@ vim.api.nvim_create_autocmd("LspProgress", {
   end,
 })
 
+--- Define custom LSP commands.
+local function register_lsp_commands()
+  -- NOTE: This overrides the default :LspRestart command provided by nvim-lspconfig.
+  -- It adds explicit diagnostic and codelens clearing to fix "sticky" errors.
+  vim.api.nvim_create_user_command("LspRestart", function(args)
+    local filter = nil
+    if args.args ~= "" then
+      filter = { name = args.args }
+    end
+    local clients = vim.lsp.get_clients(filter)
+    local client_names = {}
+
+    for _, client in ipairs(clients) do
+      local name = client.name
+      table.insert(client_names, name)
+      vim.notify("Stopping LSP client: " .. name, vim.log.levels.INFO)
+
+      -- Clear diagnostics for this client in all buffers
+      if clientget_namespace then
+        vim.diagnostic.reset(client.get_namespace(), nil)
+      end
+
+      -- Clear codelens for this client
+      if vim.lsp.codelens then
+        vim.lsp.codelens.clear(client.id)
+      end
+
+      -- Use native enable/disable to reset manager state
+      if vim.lsp.enable then
+        vim.lsp.enable(name, false)
+        if args.bang then
+          client:stop(true) -- Force stop if bang used
+        end
+      else
+        client:stop(args.bang)
+      end
+    end
+
+    if #clients == 0 and args.args ~= "" then
+      table.insert(client_names, args.args)
+    end
+
+    if #client_names > 0 then
+      -- Use a timer to restart, similar to lspconfig, to ensure the OS has
+      -- released resources (sockets/files) from the previous process.
+      local timer = assert(vim.uv.new_timer())
+      timer:start(500, 0, function()
+        vim.schedule(function()
+          for _, name in ipairs(client_names) do
+            vim.notify("Starting LSP client: " .. name, vim.log.levels.INFO)
+            vim.lsp.enable(name, true)
+          end
+        end)
+      end)
+    else
+      vim.notify("No active LSP clients to restart", vim.log.levels.WARN)
+    end
+  end, {
+    nargs = "?",
+    bang = true,
+    complete = function()
+      local clients = vim.lsp.get_clients()
+      local names = {}
+      for _, client in ipairs(clients) do
+        if not vim.tbl_contains(names, client.name) then
+          table.insert(names, client.name)
+        end
+      end
+      return names
+    end,
+    desc = "Restart LSP clients and clear diagnostics",
+  })
+end
+
 return {
   {
     "virtual-lsp-config",
@@ -216,6 +290,7 @@ return {
       ensure_servers_installed(opts.servers)
       register_lsp_servers(opts.servers)
       register_lspattach_autocmd()
+      register_lsp_commands()
 
       require("fredrik.config.keymaps").setup_lsp_keymaps()
     end,
