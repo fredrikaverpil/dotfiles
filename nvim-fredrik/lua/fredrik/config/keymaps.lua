@@ -1730,7 +1730,7 @@ function M.setup_substitute_keymaps()
     },
     {
       mode = { "x" },
-      "x",
+      "s",
       function()
         require("substitute").visual()
       end,
