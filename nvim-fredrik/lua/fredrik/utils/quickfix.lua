@@ -78,10 +78,10 @@ local function qf_text_func(info)
       local filename = vim.fn.bufname(item.bufnr)
       filename = filename == "" and "[No Name]" or vim.fn.fnamemodify(filename, ":~:.")
       -- With position:
-      -- table.insert(lines, string.format("%s|%d col %d| %s", filename, item.lnum, item.col, item.text or ""))
+      table.insert(lines, string.format("%s|%d col %d| %s", filename, item.lnum, item.col, item.text or ""))
       --
       -- Without position:
-      table.insert(lines, string.format("%s %s", filename, item.text or ""))
+      -- table.insert(lines, string.format("%s %s", filename, item.text or ""))
     end
   end
   return lines
