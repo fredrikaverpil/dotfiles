@@ -61,7 +61,7 @@
       mkDevShells = system: {
         default = stable.${system}.mkShell {
           packages = [
-            stable.${system}.nixfmt-rfc-style
+            stable.${system}.nixfmt
           ];
         };
         dotfiles-toolchain = unstable.${system}.mkShell {
@@ -104,10 +104,10 @@
         };
       };
 
-      # Formatters for `nix fmt` - uses nixfmt-rfc-style for each architecture
-      formatter.x86_64-linux = stable.x86_64-linux.nixfmt-rfc-style;
-      formatter.aarch64-linux = stable.aarch64-linux.nixfmt-rfc-style;
-      formatter.aarch64-darwin = unstable.aarch64-darwin.nixfmt-rfc-style;
+      # Formatters for `nix fmt` - uses nixfmt for each architecture
+      formatter.x86_64-linux = stable.x86_64-linux.nixfmt;
+      formatter.aarch64-linux = stable.aarch64-linux.nixfmt;
+      formatter.aarch64-darwin = unstable.aarch64-darwin.nixfmt;
 
       # Development shells for `nix develop` or direnv's `use flake` - provides toolchains for each architecture
       devShells = {
