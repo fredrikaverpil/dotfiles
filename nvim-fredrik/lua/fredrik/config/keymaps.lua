@@ -380,11 +380,30 @@ function M.setup_coderunner_keymaps()
   }
 end
 
+function M.setup_mini_pick_keymaps()
+  local MiniPick = require("mini.pick")
+  return {
+    {
+      "<leader><leader>",
+      function()
+        MiniPick.builtin.files({ tool = "git" })
+      end,
+      desc = "Files picker",
+    },
+    {
+      "<leader>/",
+      function()
+        MiniPick.builtin.grep_live({ tool = "git" })
+      end,
+      desc = "Files picker",
+    },
+  }
+end
+
 function M.setup_snacks_keymaps()
   -- NOTE: Snacks is a global; _G.Snacks = M
   return {
     -- misc
-
     {
       "<leader><leader>",
       function()
@@ -502,6 +521,14 @@ function M.setup_snacks_keymaps()
         Snacks.picker.lsp_definitions()
       end,
       desc = "Goto Definition",
+    },
+    {
+      "gs",
+      function()
+        vim.cmd("split")
+        vim.lsp.buf.definition()
+      end,
+      desc = "Goto Definition (split)",
     },
     {
       "gv",
