@@ -34,32 +34,48 @@ let
   # Helper functions for common installation patterns
   helpers = {
     # Most common: curl script and pipe to bash
-    mkCurlInstaller =
-      name: description: url: installPath:
-      {
-        inherit name description installPath;
-        installScript = ''
-          ${pkgs.curl}/bin/curl -fsSL ${url} | ${pkgs.bash}/bin/bash
-        '';
-      };
+    mkCurlInstaller = name: description: url: installPath: {
+      inherit name description installPath;
+      installScript = ''
+        ${pkgs.curl}/bin/curl -fsSL ${url} | ${pkgs.bash}/bin/bash
+      '';
+    };
 
     # Alternative: wget script and pipe to bash
-    mkWgetInstaller =
-      name: description: url: installPath:
-      {
-        inherit name description installPath;
-        installScript = ''
-          ${pkgs.wget}/bin/wget -qO- ${url} | ${pkgs.bash}/bin/bash
-        '';
-      };
+    mkWgetInstaller = name: description: url: installPath: {
+      inherit name description installPath;
+      installScript = ''
+        ${pkgs.wget}/bin/wget -qO- ${url} | ${pkgs.bash}/bin/bash
+      '';
+    };
 
     # Custom installer script
-    mkCustomInstaller =
-      name: description: script: installPath:
-      {
-        inherit name description installPath;
-        installScript = script;
-      };
+    mkCustomInstaller = name: description: script: installPath: {
+      inherit name description installPath;
+      installScript = script;
+    };
+
+    # Package manager helper for bun
+    mkBunPackages = packages: {
+      name = "bun-packages";
+      description = "Bun packages: ${builtins.concatStringsSep ", " packages}";
+      installPath = null; # Use null to signal "always install"
+      installScript = ''
+        NPM_TOOLS_DIR="$HOME/.dotfiles/npm-tools"
+        if [[ ! -f "$NPM_TOOLS_DIR/package.json" ]]; then
+          echo "⚠️  No npm-tools/package.json found, skipping bun packages"
+          exit 0
+        fi
+
+        cd "$NPM_TOOLS_DIR"
+        BUN_PATH=$(${pkgs.nix}/bin/nix build --inputs-from $HOME/.dotfiles nixpkgs#bun --no-link --print-out-paths 2>/dev/null)/bin
+        export PATH="$BUN_PATH:$PATH"
+
+        echo "📦 Installing bun packages from lockfile..."
+        ${pkgs.bash}/bin/bash -c "bun install"
+      '';
+      platform = "darwin"; # macOS only
+    };
   };
 in
 {
@@ -92,9 +108,16 @@ in
               example = "Claude Code";
             };
             installPath = lib.mkOption {
-              type = lib.types.str;
-              description = "Full path where the binary is installed (e.g., \"\$HOME/.local/bin/claude\")";
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              description = "Full path where the binary is installed. If null, always runs installScript.";
               example = "\$HOME/.local/bin/claude";
+            };
+            platform = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              description = "Platform restriction (e.g., 'darwin', 'linux'). If null, runs on all platforms.";
+              example = "darwin";
             };
           };
         }
@@ -114,13 +137,48 @@ in
       export PATH="${pkgs.curl}/bin:${pkgs.wget}/bin:${pkgs.coreutils}/bin:${pkgs.gnused}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.perl}/bin:${pkgs.gnutar}/bin:${pkgs.gzip}/bin:${pkgs.unzip}/bin:${pkgs.which}/bin:$PATH"
 
       ${lib.concatMapStringsSep "\n" (
-        cli: ''
-          # Check if CLI binary exists at the specified installPath
-          if [[ ! -f "${cli.installPath}" ]]; then
-            echo "Installing ${if cli.description != "" then cli.description else cli.name}..."
-            $DRY_RUN_CMD ${cli.installScript}
-          fi
-        ''
+        cli:
+        if cli.platform != null then
+          ''
+            # Platform check for ${if cli.description != "" then cli.description else cli.name}
+            CURRENT_PLATFORM="$(uname -s | tr '[:upper:]' '[:lower:]')"
+            if [[ "$CURRENT_PLATFORM" == "${cli.platform}" ]]; then
+              ${
+                if cli.installPath == null then
+                  ''
+                    echo "Installing ${if cli.description != "" then cli.description else cli.name}..."
+                    ${cli.installScript}
+                  ''
+                else
+                  ''
+                    if [[ ! -f "${cli.installPath}" ]]; then
+                      echo "Installing ${if cli.description != "" then cli.description else cli.name}..."
+                      ${cli.installScript}
+                    fi
+                  ''
+              }
+            else
+              echo "⏭️  Skipping ${
+                if cli.description != "" then cli.description else cli.name
+              } (${cli.platform} only)"
+            fi
+          ''
+        else
+          # No platform restriction
+          (
+            if cli.installPath == null then
+              ''
+                echo "Installing ${if cli.description != "" then cli.description else cli.name}..."
+                ${cli.installScript}
+              ''
+            else
+              ''
+                if [[ ! -f "${cli.installPath}" ]]; then
+                  echo "Installing ${if cli.description != "" then cli.description else cli.name}..."
+                  ${cli.installScript}
+                fi
+              ''
+          )
       ) config.selfManagedCLIs.clis}
     '';
   };

@@ -10,7 +10,12 @@ let
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
 
   # Import helper functions for self-managed CLIs
-  inherit (config.selfManagedCLIs.helpers) mkCurlInstaller mkWgetInstaller mkCustomInstaller;
+  inherit (config.selfManagedCLIs.helpers)
+    mkCurlInstaller
+    mkWgetInstaller
+    mkCustomInstaller
+    mkBunPackages
+    ;
 in
 {
   imports = [
@@ -23,10 +28,17 @@ in
     # Self-managed CLI tools (installed once, auto-update thereafter)
     selfManagedCLIs.clis = [
       (mkCurlInstaller "claude" "Claude Code" "https://claude.ai/install.sh" "$HOME/.local/bin/claude")
+      (mkCurlInstaller "agent" "Cursor Agent" "https://cursor.com/install" "$HOME/.local/bin/agent")
       # OpenCode installs to ~/.opencode/bin/opencode, use --no-modify-path to prevent shell config modification
       (mkCustomInstaller "opencode" "OpenCode AI" ''
         ${pkgs.curl}/bin/curl -fsSL https://opencode.ai/install | ${pkgs.bash}/bin/bash -s -- --no-modify-path
       '' "$HOME/.opencode/bin/opencode")
+
+      # npm tools via bun (macOS only, reproducible via lockfile)
+      (mkBunPackages [
+        "@google/gemini-cli"
+        "@openai/codex"
+      ])
     ];
 
     home.activation.handleDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -173,9 +185,6 @@ in
         yarn
       ];
     };
-
-    # npm tools are managed via npm-tools/package.json and bun.lockb (macOS only)
-    # Run ./rebuild.sh --update-npm on a macOS host to update them
 
   };
 }

@@ -16,7 +16,7 @@ in
   home.stateVersion = "25.05";
 
   home.packages = with pkgs; [
-    unstable.opencode
+    # Host-specific packages go here
   ];
 
   home.file = {

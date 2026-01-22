@@ -6,7 +6,6 @@ repository.
 ## Core Commands
 
 - **Full rebuild**: `./rebuild.sh` (Nix rebuild + Stow, reproducible by default)
-- **Update npm tools**: `./rebuild.sh --update-npm` (fast, no Nix rebuild)
 - **Update unstable inputs**: `./rebuild.sh --update-unstable` (then rebuild)
 - **Update all inputs**: `./rebuild.sh --update` (then rebuild)
 - **Symlink dotfiles only**: `./rebuild.sh --stow` (GNU Stow without Nix rebuild)
@@ -51,7 +50,8 @@ and **GNU Stow** for dotfile symlinking.
 ### Self-Managed CLIs
 
 For CLI tools that provide native installers and manage their own updates (e.g.,
-Claude Code), declare them in the `selfManagedCLIs` option:
+Claude Code), or npm packages that should update independently from Nix, declare
+them in the `selfManagedCLIs` option:
 
 - **Module**: `nix/shared/home/self-managed-clis.nix`
 - **Hierarchy**: Lists merge across common → platform → user configs
@@ -63,6 +63,13 @@ Example locations:
 - macOS-only: `nix/shared/home/darwin.nix`
 - Linux-only: `nix/shared/home/linux.nix`
 - User-specific: `nix/hosts/{hostname}/users/{username}.nix`
+
+**Adding npm tools:**
+
+1. Edit `npm-tools/package.json` to add the package
+2. Add to `selfManagedCLIs.clis` using `mkBunPackages` helper
+3. Run `./rebuild.sh` to install
+4. Update later: `cd npm-tools && bun update` (commits updated lockfile)
 
 ### Neovim Configuration
 
