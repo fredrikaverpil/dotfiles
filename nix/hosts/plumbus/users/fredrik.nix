@@ -18,6 +18,18 @@ in
   home.packages = with pkgs; [
   ];
 
+  # User/host-specific self-managed CLI tools
+  # Example (uncomment to add tools specific to this user/host):
+  # selfManagedCLIs = [
+  #   {
+  #     name = "user-specific-tool";
+  #     description = "Tool only for this user/host";
+  #     installScript = ''
+  #       ${pkgs.curl}/bin/curl -fsSL https://example.com/install.sh | ${pkgs.bash}/bin/bash
+  #     '';
+  #   }
+  # ];
+
   home.file = {
   };
 

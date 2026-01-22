@@ -14,6 +14,18 @@
     pngpaste # for obsidian, macOS-only
   ];
 
+  # macOS-specific self-managed CLI tools
+  # Example (uncomment to add macOS-only tools):
+  # selfManagedCLIs = [
+  #   {
+  #     name = "some-mac-tool";
+  #     description = "Some macOS-only Tool";
+  #     installScript = ''
+  #       ${pkgs.curl}/bin/curl -fsSL https://example.com/install.sh | ${pkgs.bash}/bin/bash
+  #     '';
+  #   }
+  # ];
+
   programs = {
   };
 

@@ -44,6 +44,25 @@ and **GNU Stow** for dotfile symlinking.
   `nix/hosts/$HOSTNAME/`
 - **Package management**: CLI tools via Nix, GUI apps via Homebrew (macOS) or
   Nix (Linux)
+- **Self-managed CLIs**: Tools with native installers that auto-update (e.g.,
+  Claude Code) are declared in `selfManagedCLIs` lists at any config level
+  (common, platform-specific, or user-specific)
+
+### Self-Managed CLIs
+
+For CLI tools that provide native installers and manage their own updates (e.g.,
+Claude Code), declare them in the `selfManagedCLIs` option:
+
+- **Module**: `nix/shared/home/self-managed-clis.nix`
+- **Hierarchy**: Lists merge across common → platform → user configs
+- **Behavior**: Checked/installed on each rebuild, then auto-update independently
+
+Example locations:
+
+- Cross-platform: `nix/shared/home/common.nix`
+- macOS-only: `nix/shared/home/darwin.nix`
+- Linux-only: `nix/shared/home/linux.nix`
+- User-specific: `nix/hosts/{hostname}/users/{username}.nix`
 
 ### Neovim Configuration
 

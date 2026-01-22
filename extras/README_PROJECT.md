@@ -310,13 +310,24 @@ export PGCONN="$PGDRIVER$DB_USER:$DB_USER@$PGHOST:$PGPORT/$GCE_DATABASE_NAME$PGF
 
 ### Claude Code
 
-- MCPs defined in `claude_desktop_config.json` cannot hold remote MCPs.
+Claude Code is installed via native installer (declared in
+`nix/shared/home/common.nix` as a self-managed CLI). It auto-updates
+independently of Nix rebuilds.
+
 - [Claude code docs](https://docs.claude.com/en/docs/claude-code)
+- Installation: Automatic on first `./rebuild.sh`
+- Updates: Auto-updates itself (no manual intervention)
+- Settings: Managed in `stow/shared/.claude/` (synced via Stow)
 
 ```sh
 # you can import mcp servers from claude desktop, into ~/.claude.json
 claude mcp add-from-claude-desktop --scope user
 ```
+
+> [!NOTE]
+>
+> Claude Desktop does not support remote MCPs at the time of writing this. But
+> Claude Code does.
 
 Examples of manual config in `~/.claude.json`:
 

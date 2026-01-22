@@ -174,17 +174,18 @@ darwin-rebuild --rollback      # macOS
 
 ### Components
 
-| Component          | Tool             | Scope       | Configuration Location             |
-| ------------------ | ---------------- | ----------- | ---------------------------------- |
-| User dotfiles      | GNU Stow         | Per-user    | `stow/`                            |
-| User packages      | home-manager     | Per-user    | `nix/shared/home/`                 |
-| User preferences   | home-manager     | Per-user    | `nix/shared/home/` + host-specific |
-| npm tools          | bun              | Per-user    | `nix/lib/npm.nix` (Darwin only)    |
-| Host configuration | nix-darwin/NixOS | System-wide | `nix/hosts/*/configuration.nix`    |
-| System packages    | nix-darwin/NixOS | System-wide | `nix/shared/system/`               |
-| System settings    | nix-darwin/NixOS | System-wide | `nix/shared/system/`               |
-| Homebrew packages  | nix-darwin       | System-wide | `nix/shared/system/darwin.nix`     |
-| Package overlays   | Nix              | System-wide | `nix/shared/overlays/`             |
+| Component          | Tool             | Scope       | Configuration Location                 |
+| ------------------ | ---------------- | ----------- | -------------------------------------- |
+| User dotfiles      | GNU Stow         | Per-user    | `stow/`                                |
+| User packages      | home-manager     | Per-user    | `nix/shared/home/`                     |
+| User preferences   | home-manager     | Per-user    | `nix/shared/home/` + host-specific     |
+| Self-managed CLIs  | Native installers| Per-user    | `nix/shared/home/self-managed-clis.nix`|
+| npm tools          | bun              | Per-user    | `nix/lib/npm.nix` (Darwin only)        |
+| Host configuration | nix-darwin/NixOS | System-wide | `nix/hosts/*/configuration.nix`        |
+| System packages    | nix-darwin/NixOS | System-wide | `nix/shared/system/`                   |
+| System settings    | nix-darwin/NixOS | System-wide | `nix/shared/system/`                   |
+| Homebrew packages  | nix-darwin       | System-wide | `nix/shared/system/darwin.nix`         |
+| Package overlays   | Nix              | System-wide | `nix/shared/overlays/`                 |
 
 - NixOS configuration options:
   [stable](https://nixos.org/manual/nixos/stable/options) |

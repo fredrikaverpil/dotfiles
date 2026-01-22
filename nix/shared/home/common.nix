@@ -12,9 +12,21 @@ in
 {
   imports = [
     ../../lib/npm.nix
+    ./self-managed-clis.nix
   ];
 
   config = {
+
+    # Self-managed CLI tools (installed once, auto-update thereafter)
+    selfManagedCLIs = [
+      {
+        name = "claude";
+        description = "Claude Code";
+        installScript = ''
+          ${pkgs.curl}/bin/curl -fsSL https://claude.ai/install.sh | ${pkgs.bash}/bin/bash
+        '';
+      }
+    ];
 
     home.activation.handleDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       DOTFILES_PATH=""
