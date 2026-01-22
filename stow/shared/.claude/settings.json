@@ -12,6 +12,20 @@
       "Read(./secrets/**)"
     ]
   },
+  "model": "claude-opus-4-5@20251101",
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "idle_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Glass.aiff"
+          }
+        ]
+      }
+    ]
+  },
   "enabledPlugins": {
     "code-review@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
@@ -25,12 +39,7 @@
     "playwright@claude-plugins-official": true,
     "plugin-dev@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true
-  },
-  "alwaysThinkingEnabled": true,
-  "notifications": {
-    "sound": true,
-    "onQuestion": true,
-    "onIdle": true
+    "typescript-lsp@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true
   }
 }
