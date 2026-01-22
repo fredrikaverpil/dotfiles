@@ -8,6 +8,9 @@
 }:
 let
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+
+  # Import helper functions for self-managed CLIs
+  inherit (config.selfManagedCLIs.helpers) mkCurlInstaller mkWgetInstaller mkCustomInstaller;
 in
 {
   imports = [
@@ -18,14 +21,12 @@ in
   config = {
 
     # Self-managed CLI tools (installed once, auto-update thereafter)
-    selfManagedCLIs = [
-      {
-        name = "claude";
-        description = "Claude Code";
-        installScript = ''
-          ${pkgs.curl}/bin/curl -fsSL https://claude.ai/install.sh | ${pkgs.bash}/bin/bash
-        '';
-      }
+    selfManagedCLIs.clis = [
+      (mkCurlInstaller "claude" "Claude Code" "https://claude.ai/install.sh" "$HOME/.local/bin/claude")
+      # OpenCode installs to ~/.opencode/bin/opencode, use --no-modify-path to prevent shell config modification
+      (mkCustomInstaller "opencode" "OpenCode AI" ''
+        ${pkgs.curl}/bin/curl -fsSL https://opencode.ai/install | ${pkgs.bash}/bin/bash -s -- --no-modify-path
+      '' "$HOME/.opencode/bin/opencode")
     ];
 
     home.activation.handleDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''

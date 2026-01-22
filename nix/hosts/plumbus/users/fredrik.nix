@@ -7,6 +7,9 @@
 }:
 let
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+
+  # Import helper functions for self-managed CLIs (if needed)
+  inherit (config.selfManagedCLIs.helpers) mkCurlInstaller mkWgetInstaller mkCustomInstaller;
 in
 {
   imports = [
@@ -20,14 +23,8 @@ in
 
   # User/host-specific self-managed CLI tools
   # Example (uncomment to add tools specific to this user/host):
-  # selfManagedCLIs = [
-  #   {
-  #     name = "user-specific-tool";
-  #     description = "Tool only for this user/host";
-  #     installScript = ''
-  #       ${pkgs.curl}/bin/curl -fsSL https://example.com/install.sh | ${pkgs.bash}/bin/bash
-  #     '';
-  #   }
+  # selfManagedCLIs.clis = [
+  #   (mkCurlInstaller "user-tool" "User-specific Tool" "https://example.com/install.sh")
   # ];
 
   home.file = {
