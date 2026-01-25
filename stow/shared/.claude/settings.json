@@ -12,7 +12,19 @@
       "Read(./secrets/**)"
     ]
   },
-  "model": "claude-opus-4-5@20251101",
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "idle_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Sosumi.aiff"
+          }
+        ]
+      }
+    ]
+  },
   "enabledPlugins": {
     "code-review@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
@@ -27,18 +39,5 @@
     "pyright-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
     "security-guidance@claude-plugins-official": true
-  },
-  "hooks": {
-    "Notification": [
-      {
-        "matcher": "idle_prompt",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "afplay /System/Library/Sounds/Sosumi.aiff"
-          }
-        ]
-      }
-    ]
   }
 }
