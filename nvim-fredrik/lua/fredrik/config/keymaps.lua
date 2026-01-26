@@ -402,6 +402,17 @@ end
 
 function M.setup_snacks_keymaps()
   -- NOTE: Snacks is a global; _G.Snacks = M
+
+  local exclude = {
+    "*.pb.go",
+    "**/.venv",
+    ".mypy_cache/*",
+    ".repro/*",
+    "**/node_modules",
+    ".sage/tools",
+    ".pocket/tools",
+  }
+
   return {
     -- misc
     {
@@ -409,18 +420,11 @@ function M.setup_snacks_keymaps()
       function()
         ---@type snacks.picker.smart.Config
         local opts = {
+          layout = { hidden = { "preview" } },
           multi = { "buffers", "files" },
           hidden = true,
           ignored = true,
-          exclude = {
-            "*.pb.go",
-            "**/.venv",
-            ".mypy_cache/*",
-            ".repro/*",
-            "**/node_modules",
-            ".sage/tools",
-            ".pocket/tools",
-          },
+          exclude = exclude,
           formatters = {
             file = {
               truncate = 100,
@@ -435,7 +439,12 @@ function M.setup_snacks_keymaps()
       "<leader>/",
       function()
         ---@class snacks.picker.grep.Config: snacks.picker.proc.Config
-        local opts = { hidden = true, ignored = true, exclude = { "*.pb.go", ".venv/*", ".mypy_cache/*", ".repro/*" } }
+        local opts = {
+          layout = { hidden = { "preview" } },
+          hidden = true,
+          ignored = true,
+          exclude = exclude,
+        }
         Snacks.picker.grep(opts)
       end,
       desc = "Grep",
@@ -1730,7 +1739,7 @@ function M.setup_substitute_keymaps()
     },
     {
       mode = { "x" },
-      "s",
+      "x",
       function()
         require("substitute").visual()
       end,
