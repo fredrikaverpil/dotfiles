@@ -2,7 +2,7 @@ return {
 
   {
     "nvim-mini/mini.pick",
-    enabled = false,
+    enabled = true,
     version = "*",
     opts = {
       options = {
@@ -11,6 +11,7 @@ return {
       },
     },
     cmd = { "Pick" },
-    keys = require("fredrik.config.keymaps").setup_mini_pick_keymaps(),
+    -- NOTE: disabled <leader> keymaps
+    -- keys = require("fredrik.config.keymaps").setup_mini_pick_keymaps(),
   },
 }
