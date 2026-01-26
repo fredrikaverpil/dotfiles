@@ -1,5 +1,17 @@
 local branch = "main"
 
+--- Sign parser on macOS to prevent code signature crashes
+---@param parser_name string
+local function sign_parser_macos(parser_name)
+  if vim.fn.has("mac") ~= 1 then
+    return
+  end
+  local parser_path = vim.fn.stdpath("data") .. "/site/parser/" .. parser_name .. ".so"
+  if vim.fn.filereadable(parser_path) == 1 then
+    vim.fn.system({ "codesign", "--force", "--sign", "-", parser_path })
+  end
+end
+
 --- Register parsers from opts.ensure_installed
 local function register(ensure_installed)
   for filetype, parser in pairs(ensure_installed) do
@@ -69,7 +81,7 @@ local function install_and_start()
         elseif branch == "main" then
           require("nvim-treesitter").install({ parser_name }):wait(30000) -- main branch syntax
         end
-        -- vim.notify("Installed parser: " .. parser_name, vim.log.levels.INFO, { title = "core/treesitter" })
+        sign_parser_macos(parser_name)
       end
 
       -- Check so tree-sitter can see the newly installed parser
