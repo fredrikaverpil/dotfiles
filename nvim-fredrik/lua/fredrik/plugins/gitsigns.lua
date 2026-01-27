@@ -8,8 +8,5 @@ return {
         require("fredrik.config.keymaps").setup_gitsigns_keymaps(bufnr)
       end,
     },
-    config = function(_, opts)
-      require("gitsigns").setup(opts)
-    end,
   },
 }
