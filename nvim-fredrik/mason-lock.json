@@ -6,7 +6,7 @@
   "biome": "2.3.12",
   "buf": "v1.64.0",
   "codelldb": "v1.12.1",
-  "copilot-language-server": "1.415.0",
+  "copilot-language-server": "1.416.0",
   "debugpy": "1.8.19",
   "delve": "v1.26.0",
   "dockerfile-language-server": "0.15.0",
