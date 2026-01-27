@@ -119,7 +119,7 @@ in
       fd
       gnumake
       go-task
-      pre-commit
+      # pre-commit # requires swift, which is problematic and very expensive to build on macOS
       ripgrep
 
       # ========================================================================
