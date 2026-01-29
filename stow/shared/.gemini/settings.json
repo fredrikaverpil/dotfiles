@@ -1,9 +1,4 @@
 {
-  "security": {
-    "auth": {
-      "selectedType": "vertex-ai"
-    }
-  },
   "ui": {
     "theme": "Default"
   },
@@ -31,6 +26,11 @@
       "args": [
         "@playwright/mcp@latest"
       ]
+    }
+  },
+  "security": {
+    "auth": {
+      "selectedType": "gemini-api-key"
     }
   }
 }
