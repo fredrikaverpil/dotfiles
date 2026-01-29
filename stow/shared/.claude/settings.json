@@ -1,16 +1,8 @@
 {
   "env": {},
   "permissions": {
-    "allow": [
-      "Bash(go:doc:*)",
-      "Bash(go:test:*)",
-      "Bash(go:build:*)"
-    ],
-    "deny": [
-      "Read(./.env)",
-      "Read(./.env.*)",
-      "Read(./secrets/**)"
-    ]
+    "allow": ["Bash(go:doc:*)", "Bash(go:test:*)", "Bash(go:build:*)"],
+    "deny": ["Read(./.env)", "Read(./.env.*)", "Read(./secrets/**)"]
   },
   "hooks": {
     "Notification": [
@@ -38,6 +30,11 @@
     "plugin-dev@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
-    "security-guidance@claude-plugins-official": true
+    "security-guidance@claude-plugins-official": true,
+    "claude-hud@claude-hud": true
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash -c '\"$(which bun)\" \"$(ls -td ~/.claude/plugins/cache/claude-hud/claude-hud/*/ 2>/dev/null | head -1)src/index.ts\"'"
   }
 }
