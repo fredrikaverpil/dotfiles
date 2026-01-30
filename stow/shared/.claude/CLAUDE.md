@@ -5,12 +5,12 @@
 After implementing something, always look back and critically review what you
 did with the following in mind:
 
-- Simplicity and consistency over cleverness
-- Explicitness over implicitness
+- Explicitness/simplicity over implicitness/cleverness
+- Concistent and systematic approach instead of fragemented and ad-hoc solutions
+- YAGNI
 - Great DX and UX
 - Ease of long-term maintenance
 - Follow conventions by the language, ecosystem, open source community
-  conventions
 
 If you discover apparent improvement areas, go back and refactor. When unsure,
 ask questions.
