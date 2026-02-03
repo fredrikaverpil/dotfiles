@@ -26,6 +26,21 @@ return {
   },
 
   {
+    "Maxteabag/sqlit.nvim",
+    build = "uv tool install sqlit-tui --with google-cloud-bigquery",
+    opts = {},
+    keys = {
+      {
+        "<leader>D",
+        function()
+          require("sqlit").open()
+        end,
+        desc = "Database (sqlit)",
+      },
+    },
+  },
+
+  {
     "saghen/blink.cmp",
     dependencies = {
       "kristijanhusak/vim-dadbod-completion",
