@@ -79,11 +79,6 @@ for increased understanding of the problem at hand.
 
 Use the "jira-cli" skill.
 
-## Slack
-
-If you come by a Slack link, use the `slack` CLI to access the content instead
-of WebFetch.
-
 ## Go
 
 - Use the `gopls` LSP at all times when searching for references to symbols,

@@ -29,7 +29,6 @@ in
   # zap-specific self-managed CLI tools
   selfManagedCLIs.clis = [
     (mkCurlInstaller "agent" "Cursor Agent" "https://cursor.com/install" "$HOME/.local/bin/agent")
-    (mkCurlInstaller "slack" "Slack CLI" "https://downloads.slack-edge.com/slack-cli/install.sh" "$HOME/.slack/bin/slack")
   ];
 
   home.file = {
