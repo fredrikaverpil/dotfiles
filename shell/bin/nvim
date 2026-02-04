@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-# Nix binary locations (try multiple paths)
-MANUAL_NVIM_BINARY="$HOME/.nvim/bin/nvim"
+# Binary locations (try multiple paths, in priority order)
+BOB_NVIM_BINARY="$HOME/.local/share/bob/nvim-bin/nvim"
 NIX_NVIM_BINARY="$HOME/.nix-profile/bin/nvim"
 NIXOS_NVIM_BINARY="/etc/profiles/per-user/$(whoami)/bin/nvim"
 BREW_NVIM_BINARY="$DOTFILES_BREW_PREFIX/bin/nvim"
@@ -11,9 +11,9 @@ BREW_NVIM_BINARY="$DOTFILES_BREW_PREFIX/bin/nvim"
 available_count=0
 available_binaries=""
 
-if [ -x "$MANUAL_NVIM_BINARY" ]; then
+if [ -x "$BOB_NVIM_BINARY" ]; then
 	available_count=$((available_count + 1))
-	available_binaries="$available_binaries\n  - $MANUAL_NVIM_BINARY (installed manually)"
+	available_binaries="$available_binaries\n  - $BOB_NVIM_BINARY (installed via Bob)"
 fi
 
 if [ -x "$NIX_NVIM_BINARY" ]; then
@@ -33,13 +33,13 @@ fi
 
 # Check for conflicts
 if [ $available_count -gt 1 ]; then
-	echo "Warning: Multiple nvim binaries found. Using priority order: Manual > Nix User > NixOS System > Homebrew"
+	echo "Warning: Multiple nvim binaries found. Using priority order: Bob > Nix User > NixOS System > Homebrew"
 	echo "Available binaries:$available_binaries"
 	echo ""
 fi
 
-if [ -x "$MANUAL_NVIM_BINARY" ]; then
-	NVIM_BINARY="$MANUAL_NVIM_BINARY"
+if [ -x "$BOB_NVIM_BINARY" ]; then
+	NVIM_BINARY="$BOB_NVIM_BINARY"
 elif [ -x "$NIX_NVIM_BINARY" ]; then
 	NVIM_BINARY="$NIX_NVIM_BINARY"
 elif [ -x "$NIXOS_NVIM_BINARY" ]; then
@@ -49,10 +49,15 @@ elif [ -x "$BREW_NVIM_BINARY" ]; then
 else
 	echo "Error: No nvim binary found."
 	echo "Please install Neovim via:"
-	echo "  - Manual: Run extras/installers/neovim.sh"
-	echo "  - Nix: Add neovim-latest to your configuration"
+	echo "  - Bob: bob use stable"
 	echo "  - Homebrew: brew install neovim"
 	exit 1
+fi
+
+# Inject Neovim build dependencies (managed by Nix, not on regular PATH)
+NVIM_DEPS_PATH_FILE="$HOME/.config/nvim-deps-path"
+if [ -f "$NVIM_DEPS_PATH_FILE" ]; then
+	export PATH="$(cat "$NVIM_DEPS_PATH_FILE"):$PATH"
 fi
 
 # Check if NVIM_APPNAME is already set

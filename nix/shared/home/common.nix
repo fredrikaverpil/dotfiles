@@ -105,7 +105,7 @@ in
       stow # GNU Stow for dotfile management
       tmux
       tree
-      # neovim-custom # from custom overlay
+      unstable.bob-nvim
       wget
       yq
       yazi
@@ -172,18 +172,16 @@ in
       # ghostty.terminfo  # Terminal emulator terminfo - disabled due to broken package
     ];
 
-    programs.neovim = {
-      enable = true;
-      package = pkgs.neovim-custom; # from overlay
-      extraPackages = with unstable; [
-        # Neovim will have access to these programs, but an active dev shell will override them.
-        # For plugins and Mason, which needs extra tools to build or run.
-        # NOTE: because of useGlobalPkgs=true, all packages from home.packages are also available here
-
+    # Tooling available only in Neovim.
+    # Written to a file so the nvim wrapper can inject them into PATH at launch,
+    # keeping these tools off the regular shell PATH.
+    home.file.".config/nvim-deps-path".text = lib.makeBinPath (
+      with unstable;
+      [
         bun
         cmake
         gcc
-        go_1_25
+        go_1_26
         lua51Packages.lua # Neovim requires Lua 5.1
         lua51Packages.luarocks # Neovim requires Lua 5.1
         nixfmt # cannot be installed via Mason on macOS, so installed here instead
@@ -195,8 +193,19 @@ in
         tree-sitter
         uv
         yarn
-      ];
-    };
+      ]
+    );
+
+    # Bootstrap Neovim via Bob on first rebuild
+    home.activation.bobNeovimBootstrap = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      if [[ ! -x "$HOME/.local/share/bob/nvim-bin/nvim" ]]; then
+        echo "Bootstrapping Neovim via Bob..."
+        ${unstable.bob-nvim}/bin/bob use stable
+      fi
+    '';
+
+    # Bob config path (unified across macOS/Linux, since defaults differ)
+    home.sessionVariables.BOB_CONFIG = "$HOME/.config/bob/config.toml";
 
   };
 }
