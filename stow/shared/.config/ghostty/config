@@ -38,7 +38,7 @@ theme = dark:/Users/fredrik/.local/share/nvim-fredrik/lazy/zenbones.nvim/extras/
 
 mouse-hide-while-typing = true
 
-window-inherit-working-directory = true
+window-inherit-working-directory = false
 working-directory = home
 
 # keymaps
