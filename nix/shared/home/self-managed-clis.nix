@@ -55,27 +55,6 @@ let
       installScript = script;
     };
 
-    # Package manager helper for bun
-    mkBunPackages = packages: {
-      name = "bun-packages";
-      description = "Bun packages: ${builtins.concatStringsSep ", " packages}";
-      installPath = null; # Use null to signal "always install"
-      installScript = ''
-        NPM_TOOLS_DIR="$HOME/.dotfiles/npm-tools"
-        if [[ ! -f "$NPM_TOOLS_DIR/package.json" ]]; then
-          echo "⚠️  No npm-tools/package.json found, skipping bun packages"
-          exit 0
-        fi
-
-        cd "$NPM_TOOLS_DIR"
-        BUN_PATH=$(${pkgs.nix}/bin/nix build --inputs-from $HOME/.dotfiles nixpkgs#bun --no-link --print-out-paths 2>/dev/null)/bin
-        export PATH="$BUN_PATH:$PATH"
-
-        echo "📦 Installing bun packages from lockfile..."
-        ${pkgs.bash}/bin/bash -c "bun install"
-      '';
-      platform = "darwin"; # macOS only
-    };
   };
 in
 {

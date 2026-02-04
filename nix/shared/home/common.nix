@@ -14,13 +14,12 @@ let
     mkCurlInstaller
     mkWgetInstaller
     mkCustomInstaller
-    mkBunPackages
     ;
 in
 {
   imports = [
-    ../../lib/npm.nix
     ./self-managed-clis.nix
+    ./package-tools.nix
   ];
 
   config = {
@@ -33,12 +32,20 @@ in
       (mkCustomInstaller "opencode" "OpenCode AI" ''
         ${pkgs.curl}/bin/curl -fsSL https://opencode.ai/install | ${pkgs.bash}/bin/bash -s -- --no-modify-path
       '' "$HOME/.opencode/bin/opencode")
+    ];
 
-      # npm tools via bun (macOS only, reproducible via lockfile)
-      (mkBunPackages [
-        "@google/gemini-cli"
-        "@openai/codex"
-      ])
+    # npm packages via bun (macOS only, mergeable across config levels)
+    packageTools.npmPackages = [
+      "@google/gemini-cli"
+      "@openai/codex"
+    ];
+
+    # Python CLI tools via uv (mergeable across config levels)
+    packageTools.uvTools = [
+      {
+        package = "sqlit-tui";
+        inject = [ "google-cloud-bigquery" ];
+      }
     ];
 
     home.activation.handleDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''

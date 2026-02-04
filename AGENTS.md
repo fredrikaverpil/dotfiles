@@ -50,12 +50,13 @@ and **GNU Stow** for dotfile symlinking.
 ### Self-Managed CLIs
 
 For CLI tools that provide native installers and manage their own updates (e.g.,
-Claude Code), or npm packages that should update independently from Nix, declare
-them in the `selfManagedCLIs` option:
+Claude Code, Amp, Copilot). These are installed once on rebuild and self-update
+thereafter.
 
 - **Module**: `nix/shared/home/self-managed-clis.nix`
+- **Helpers**: `mkCurlInstaller`, `mkWgetInstaller`, `mkCustomInstaller`
 - **Hierarchy**: Lists merge across common → platform → user configs
-- **Behavior**: Checked/installed on each rebuild, then auto-update independently
+- **Behavior**: Install-if-missing on each rebuild, then auto-update independently
 
 Example locations:
 
@@ -64,12 +65,27 @@ Example locations:
 - Linux-only: `nix/shared/home/linux.nix`
 - User-specific: `nix/hosts/{hostname}/users/{username}.nix`
 
+### Package-Managed Tools (npm and Python)
+
+For CLI tools installed via bun (npm) or uv (Python). Unlike self-managed CLIs,
+these require explicit upgrades via `./rebuild.sh --update-unstable` or
+`--update`.
+
+- **Module**: `nix/shared/home/package-tools.nix`
+- **Behavior**: Installed on each rebuild; upgraded when `--update-unstable` or
+  `--update` is passed to `rebuild.sh`
+
 **Adding npm tools:**
 
-1. Edit `npm-tools/package.json` to add the package
-2. Add to `selfManagedCLIs.clis` using `mkBunPackages` helper
-3. Run `./rebuild.sh` to install
-4. Update later: `cd npm-tools && bun update` (commits updated lockfile)
+1. Add the package to `packageTools.npmPackages` in the appropriate Nix config
+2. Run `./rebuild.sh` to install
+3. Update later: `./rebuild.sh --update-unstable` or `bun update -g`
+
+**Adding Python CLI tools (via uv):**
+
+1. Add a tool entry to `packageTools.uvTools` in the appropriate Nix config
+2. Run `./rebuild.sh` to install
+3. Update later: `./rebuild.sh --update-unstable` or `uv tool upgrade --all`
 
 ### Neovim Configuration
 

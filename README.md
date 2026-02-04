@@ -48,10 +48,10 @@ sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- sw
 # Rebuild system + packages + dotfiles (reproducible, uses flake.lock)
 ./rebuild.sh
 
-# Update ALL flake inputs then rebuild
+# Update ALL flake inputs + upgrade uv tools + upgrade npm packages
 ./rebuild.sh --update
 
-# Update only unstable inputs (nixpkgs-unstable, nix-darwin, home-manager-unstable, dotfiles)
+# Update unstable inputs + upgrade uv tools + upgrade npm packages
 ./rebuild.sh --update-unstable
 
 # Dotfiles only (no Nix rebuild)
@@ -68,9 +68,9 @@ By default, `./rebuild.sh` aims to be "reproducible" and uses the locked
 `--update` to update all inputs.
 
 ```sh
-# Update only unstable/Darwin-related inputs
+# Update unstable/Darwin-related inputs + upgrade uv tools + upgrade npm packages
 ./rebuild.sh --update-unstable
-# Or manually: nix flake update nixpkgs-unstable nix-darwin home-manager-unstable dotfiles
+# Or manually (flake inputs only): nix flake update nixpkgs-unstable nix-darwin home-manager-unstable dotfiles
 
 # Update only stable/Linux-related inputs
 nix flake update nixpkgs home-manager nixos-raspberrypi disko
@@ -155,6 +155,8 @@ darwin-rebuild --rollback      # macOS
 │           ├── common.nix           # Cross-platform system packages
 │           ├── darwin.nix           # macOS system config + Homebrew
 │           └── linux.nix            # Linux system config
+├── npm-tools/                       # Upgrade script for npm CLI tools installed via bun (macOS only)
+├── uv-tools/                        # Upgrade script for Python CLI tools installed via uv
 ├── nvim-fredrik/                    # Neovim configuration
 ├── shell/                           # Shell configuration
 │   ├── bin/                         # Custom shell scripts
@@ -171,17 +173,18 @@ darwin-rebuild --rollback      # macOS
 
 ### Components
 
-| Component          | Tool                                | Scope       | Configuration Location                  |
-| ------------------ | ----------------------------------- | ----------- | --------------------------------------- |
-| User dotfiles      | GNU Stow                            | Per-user    | `stow/`                                 |
-| User packages      | home-manager                        | Per-user    | `nix/shared/home/`                      |
-| User preferences   | home-manager                        | Per-user    | `nix/shared/home/` + host-specific      |
-| Self-managed CLIs  | Native installers, package managers | Per-user    | `nix/shared/home/self-managed-clis.nix` |
-| Host configuration | nix-darwin/NixOS                    | System-wide | `nix/hosts/*/configuration.nix`         |
-| System packages    | nix-darwin/NixOS                    | System-wide | `nix/shared/system/`                    |
-| System settings    | nix-darwin/NixOS                    | System-wide | `nix/shared/system/`                    |
-| Homebrew packages  | nix-darwin                          | System-wide | `nix/shared/system/darwin.nix`          |
-| Package overlays   | Nix                                 | System-wide | `nix/shared/overlays/`                  |
+| Component          | Tool                          | Scope       | Configuration Location                  |
+| ------------------ | ----------------------------- | ----------- | --------------------------------------- |
+| User dotfiles      | GNU Stow                      | Per-user    | `stow/`                                 |
+| User packages      | home-manager                  | Per-user    | `nix/shared/home/`                      |
+| User preferences   | home-manager                  | Per-user    | `nix/shared/home/` + host-specific      |
+| Self-managed CLIs  | Native installers (curl/wget) | Per-user    | `nix/shared/home/self-managed-clis.nix` |
+| Package tools      | bun (npm), uv (Python)        | Per-user    | `nix/shared/home/package-tools.nix`     |
+| Host configuration | nix-darwin/NixOS              | System-wide | `nix/hosts/*/configuration.nix`         |
+| System packages    | nix-darwin/NixOS              | System-wide | `nix/shared/system/`                    |
+| System settings    | nix-darwin/NixOS              | System-wide | `nix/shared/system/`                    |
+| Homebrew packages  | nix-darwin                    | System-wide | `nix/shared/system/darwin.nix`          |
+| Package overlays   | Nix                           | System-wide | `nix/shared/overlays/`                  |
 
 - NixOS configuration options:
   [stable](https://nixos.org/manual/nixos/stable/options) |

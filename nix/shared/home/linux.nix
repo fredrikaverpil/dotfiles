@@ -10,12 +10,14 @@
     ./common.nix
   ];
 
+  # Linux-specific package-managed tools
+  packageTools.npmPackages = [ ];
+  packageTools.uvTools = [ ];
+
   home.packages = with pkgs; [
     lsof # List open files - essential for debugging file/network issues
     strace # System call tracer - useful for debugging application behavior
   ];
-
-  # Additional packages are added in individual user configurations
 
   home.file = {
   };

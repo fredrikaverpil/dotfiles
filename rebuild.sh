@@ -31,8 +31,8 @@ while [[ $# -gt 0 ]]; do
 		echo ""
 		echo "Options:"
 		echo "  --stow             Use Stow-only mode (bypass Nix, dotfiles only)"
-		echo "  --update           Update ALL flake inputs before rebuilding"
-		echo "  --update-unstable  Update only unstable inputs (nixpkgs-unstable, nix-darwin, home-manager-unstable, dotfiles)"
+		echo "  --update           Update ALL flake inputs + uv tools + bun packages before rebuilding"
+		echo "  --update-unstable  Update unstable flake inputs + uv tools + bun packages before rebuilding"
 		echo "  --help             Show this help message"
 		exit 0
 		;;
@@ -91,6 +91,21 @@ use_nix() {
 		echo "❌ Unsupported platform for Nix: $OS"
 		echo "💡 Use --stow for Stow-only mode"
 		exit 1
+	fi
+
+	# Upgrade package-managed tools when updating (after rebuild so uv/bun are available)
+	if [[ "$UPDATE_FLAKE" == "true" || "$UPDATE_UNSTABLE" == "true" ]]; then
+		if command -v uv &>/dev/null; then
+			echo ""
+			echo "🐍 Upgrading uv tools..."
+			uv tool upgrade --all
+		fi
+
+		if command -v bun &>/dev/null; then
+			echo ""
+			echo "📦 Upgrading npm packages..."
+			bun update -g
+		fi
 	fi
 
 	# Run Stow to symlink dotfiles

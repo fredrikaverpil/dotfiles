@@ -22,6 +22,10 @@ in
     unstable.jira-cli-go
   ];
 
+  # zap-specific package-managed tools
+  packageTools.npmPackages = [ ];
+  packageTools.uvTools = [ ];
+
   # zap-specific self-managed CLI tools
   selfManagedCLIs.clis = [
     (mkCurlInstaller "agent" "Cursor Agent" "https://cursor.com/install" "$HOME/.local/bin/agent")

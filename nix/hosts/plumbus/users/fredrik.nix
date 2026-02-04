@@ -21,6 +21,10 @@ in
   home.packages = with pkgs; [
   ];
 
+  # plumbus-specific package-managed tools
+  packageTools.npmPackages = [ ];
+  packageTools.uvTools = [ ];
+
   # User/host-specific self-managed CLI tools
   # Example (uncomment to add tools specific to this user/host):
   # selfManagedCLIs.clis = [
