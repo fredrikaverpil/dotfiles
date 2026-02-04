@@ -154,6 +154,7 @@ fi
 if [[ $shell == "zsh" ]]; then
 	zsh_completion
 	if [ -n "$brew_prefix" ]; then
+		# TODO: fzf is installed by nix, not brew
 		source <(fzf --zsh)
 
 		# NOTE: disabled pkxg while evaluating nix flakes for per-project tooling
@@ -167,6 +168,7 @@ if [[ $shell == "zsh" ]]; then
 elif [[ $shell == "bash" ]]; then
 	bash_completion
 	if [ -n "$brew_prefix" ]; then
+		# TODO: fzf is installed by nix, not brew
 		eval "$(fzf --bash)"
 
 		# NOTE: disabled pkxg while evaluating nix flakes for per-project tooling
