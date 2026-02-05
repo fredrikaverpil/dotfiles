@@ -181,7 +181,7 @@ in
         bun
         cmake
         gcc
-        go_1_26
+        go_1_25
         lua51Packages.lua # Neovim requires Lua 5.1
         lua51Packages.luarocks # Neovim requires Lua 5.1
         nixfmt # cannot be installed via Mason on macOS, so installed here instead
