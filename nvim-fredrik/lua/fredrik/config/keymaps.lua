@@ -1060,7 +1060,7 @@ function M.setup_codediff_keymaps()
       "<leader>gdP",
       function()
         local default_branch = require("fredrik.utils.git").get_default_branch()
-        return vim.cmd(":CodeDiff history origin/" .. default_branch .. "...HEAD")
+        return vim.cmd(":CodeDiff history origin/" .. default_branch .. "...HEAD --reverse")
       end,
       desc = "Review current PR (per commit)",
     },
