@@ -85,6 +85,7 @@
         "visual-studio-code"
         "wacom-tablet"
         "wezterm"
+        "raycast"
         "zed"
         "zen"
       ]

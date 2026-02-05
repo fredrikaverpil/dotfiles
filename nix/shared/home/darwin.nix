@@ -185,5 +185,21 @@ in
         </dict>
       </dict>
     "
+
+    # Disable Spotlight search (Cmd+Space) to use Raycast instead
+    $DRY_RUN_CMD /usr/bin/defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 "
+      <dict>
+        <key>enabled</key><false/>
+        <key>value</key><dict>
+          <key>type</key><string>standard</string>
+          <key>parameters</key>
+          <array>
+            <integer>32</integer>
+            <integer>49</integer>
+            <integer>1048576</integer>
+          </array>
+        </dict>
+      </dict>
+    "
   '';
 }
