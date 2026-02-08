@@ -21,8 +21,16 @@ return {
       },
     },
     opts = {
+      -- mdformat causes issues with obsidian's frontmatter, so prettier is used instead
       formatters_by_ft = {
-        markdown = { "prettier" }, -- mdformat causes issues with obsidian's frontmatter
+        markdown = function(bufnr)
+          local filename = vim.api.nvim_buf_get_name(bufnr)
+          -- Skip formatting for SKILL.md files, so to avoid invalidating Claude skills' frontmatter
+          if filename:match("SKILL%.md$") then
+            return {}
+          end
+          return { "prettier" }
+        end,
       },
       formatters = {
         prettier = {
