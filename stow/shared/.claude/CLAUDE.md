@@ -11,11 +11,10 @@ did with the following in mind:
 - Great DX and UX
 - Ease of long-term maintenance
 - Follow conventions by the language, ecosystem, open source community
+- Brittle or potentially buggy code
 
 If you discover apparent improvement areas, go back and refactor. When unsure,
 ask questions.
-
-Use the "review" skill.
 
 ## AIP
 
