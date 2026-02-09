@@ -242,8 +242,8 @@ run = "move-node-to-workspace S"
 if.app-id = "com.spotify.client"
 run = "move-node-to-workspace M" # Music; Spotify
 [[on-window-detected]]
-if.app-id = "com.google.Chrome.app.cinhimbnkkaeohfgghhklpknlkffjgod"
-run = "move-node-to-workspace M"                                     # Music; YouTube Music
+if.app-id = "com.google.Chrome.app.kjgfgldnnfoeklkmfkjfagphfepbbdan"
+run = "move-node-to-workspace M"
 [[on-window-detected]]
 if.app-id = "com.apple.iCal"
 run = "move-node-to-workspace C"
