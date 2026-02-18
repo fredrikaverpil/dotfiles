@@ -127,6 +127,7 @@ in
       uv
 
       # Generic development
+      devbox
       dust
       fd
       gnumake
