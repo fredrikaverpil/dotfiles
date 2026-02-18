@@ -1,10 +1,13 @@
 {
-  "env": {},
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
-      "Bash(go:doc:*)",
-      "Bash(go:test:*)",
-      "Bash(go:build:*)"
+      "Bash(go doc *)",
+      "Bash(go test *)",
+      "Bash(go build *)"
     ],
     "deny": [
       "Read(./.env)",
