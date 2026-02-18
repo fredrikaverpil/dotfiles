@@ -62,7 +62,7 @@ return {
     cli = {
       win = {
         split = {
-          width = 120,
+          width = 140,
         },
       },
       prompts = {
