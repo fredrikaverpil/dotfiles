@@ -1,6 +1,6 @@
 ---
 name: gh-pr
-description: Use this skill when creating a GitHub pull request. Defines PR body format with Why/What/Notes sections and ensures proper assignment.
+description: Use this skill when creating a GitHub pull request via `gh pr create`. Defines PR body format with Why/What/Notes sections and ensures proper assignment.
 ---
 
 # GitHub Pull Request Creation

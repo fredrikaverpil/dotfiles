@@ -1,6 +1,6 @@
 ---
 name: jira-cli
-description: Jira CLI command reference. Use when working with Jira issues, epics, sprints, or any Jira operations from the command line.
+description: Jira CLI (`jira`) command reference. Use when working with Jira issues, epics, sprints, Jira ticket numbers, Jira URLs, or any Jira operations from the command line.
 ---
 
 # Jira CLI Quick Reference

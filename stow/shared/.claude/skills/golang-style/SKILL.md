@@ -3,7 +3,7 @@ name: golang-style
 description:
   Use this skill BEFORE writing or editing any Go (.go) files. Triggers when
   about to create, modify, or add code to .go files. Enforces happy path coding,
-  error wrapping, sentinel errors, and godoc-style comments.
+  error wrapping, sentinel errors, godoc-style comments, and `go doc` usage.
 ---
 
 

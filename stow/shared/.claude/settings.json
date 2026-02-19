@@ -43,6 +43,5 @@
     "typescript-lsp@claude-plugins-official": false,
     "claude-hud@claude-hud": true,
     "security-guidance@claude-plugins-official": true
-  },
-  "model": "sonnet"
+  }
 }

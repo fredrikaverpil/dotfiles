@@ -44,10 +44,6 @@ whole objects. Use e.g. got/want pattern in Go using
 
 ## Git
 
-When creating git commits, do NOT include "Co-Authored-By" or any other
-attribution to Claude/AI in the commit message. Always use conventional commits
-(with scope, when possible).
-
 Use the "git-commit" skill.
 
 ## GCP
@@ -59,22 +55,9 @@ the related details.
 
 When I provide github.com links (PRs, issues, comments, actions, etc.), ALWAYS
 use the `gh` CLI to fetch the content instead of WebFetch. WebFetch often fails
-on GitHub pages. Useful commands:
+on GitHub pages.
 
-- `gh api repos/OWNER/REPO/pulls/NUMBER/comments` - PR review comments
-- `gh api repos/OWNER/REPO/pulls/NUMBER/reviews` - PR reviews
-- `gh pr view NUMBER` - PR details
-- `gh run view RUN_ID --log` - GitHub Actions logs
-
-Use the "gh-cli" for `gh` and "gh-pr" skill for creating PRs.
-
-### Pull requests body
-
-When submitting a pull request, follow my style of describing what I did by
-creating three headers; "## Why?" (this change), "## What?" (was changed) and
-"## Notes" (detailing additional references, gotchas, alternative solutions
-etc). Try to be concise and use bullet points and, when needed, consice examples
-in code blocks. Never attribute Claude or LLMs.
+Use the "gh-cli" skill for `gh` commands and "gh-pr" skill for creating PRs.
 
 ## Jira
 
@@ -88,8 +71,7 @@ Use the "jira-cli" skill.
 
 - Use the `gopls` LSP at all times when searching for references to symbols,
   renaming packages/variables/functions etc.
-- Use `go doc` when uncertain on how to use a package.
-- If the package is not installed locally, search
+- If a package is not installed locally, search
   [https://pkg.go.dev](pkg.go.dev). Standard library functions are available
   (example: [`https://pkg.go.dev/fmt`](fmt package)).
 - You can run `go mod tidy` recursively in the repo with the custom

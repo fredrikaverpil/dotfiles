@@ -54,8 +54,3 @@ BREAKING CHANGE: The /v1/users endpoint has been removed.
 ## Scope
 
 Optional. Use to specify area of change (e.g., `api`, `ui`, `auth`, `db`).
-
-## Attribution
-
-Do NOT include any AI attribution, co-author tags, or generated-by footers in
-commit messages.
