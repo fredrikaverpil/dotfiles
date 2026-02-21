@@ -1,20 +1,41 @@
 {
-  "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  "attribution": {
+    "commit": "",
+    "pr": ""
   },
-  "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
       "Bash(go doc *)",
       "Bash(go test *)",
-      "Bash(go build *)"
-    ],
-    "deny": [
-      "Read(./.env)",
-      "Read(./.env.*)",
-      "Read(./secrets/**)"
+      "Bash(go build *)",
+      "Edit",
+      "Write",
+      "Read(~/.claude/*)",
+      "Bash(make:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(gh run watch:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh issue view:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "mcp__plugin_clangd-lsp_clangd__*",
+      "mcp__plugin_context7_context7__*",
+      "mcp__plugin_gopls-lsp_gopls__*",
+      "mcp__plugin_pyright-lsp_pyright__*",
+      "mcp__plugin_typescript-lsp_typescript-language-server__*"
     ]
   },
+  "model": "opus",
   "hooks": {
     "Notification": [
       {
@@ -33,15 +54,17 @@
     "command": "bash -c '\"$(which bun)\" \"$(ls -td ${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/cache/claude-hud/claude-hud/*/ 2>/dev/null | head -1)src/index.ts\"'"
   },
   "enabledPlugins": {
+    "clangd-lsp@claude-plugins-official": true,
+    "claude-hud@claude-hud": true,
+    "claude-md-management@claude-plugins-official": true,
     "code-review@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true,
-    "lua-lsp@claude-plugins-official": true,
-    "playwright@claude-plugins-official": true,
-    "pyright-lsp@claude-plugins-official": false,
-    "typescript-lsp@claude-plugins-official": false,
-    "claude-hud@claude-hud": true,
-    "security-guidance@claude-plugins-official": true
+    "pyright-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
+  },
   }
 }
