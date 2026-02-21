@@ -105,7 +105,8 @@ return {
         },
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "copilot" }) -- copilot-language-server
+          -- NOTE: disabled as otherwise Copilot starts working even if the lua plugin is disabled
+          -- vim.list_extend(opts.ensure_installed, { "copilot" }) -- copilot-language-server
         end,
       },
     },
