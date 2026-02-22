@@ -51,7 +51,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash -c '\"$(which bun)\" \"$(ls -td ${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/cache/claude-hud/claude-hud/*/ 2>/dev/null | head -1)src/index.ts\"'"
+    "command": "~/code/public/claudeline/claudeline"
   },
   "enabledPlugins": {
     "clangd-lsp@claude-plugins-official": true,
