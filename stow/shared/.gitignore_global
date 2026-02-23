@@ -66,3 +66,7 @@ htmlcov
 
 # zig
 .zig-cache
+
+# misc
+/TODO.md
+/PLAN.md
