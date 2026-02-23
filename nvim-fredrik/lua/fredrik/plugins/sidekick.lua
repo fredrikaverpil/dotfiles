@@ -85,8 +85,8 @@ return {
           cmd = {
             "claude",
             "--continue",
+            "--dangerously-skip-permissions",
             "--allowedTools=mcp__github",
-            "--allowedTools=mcp__serena",
             "--allowedTools=Bash(gh:*)",
             "--allowedTools=RunBash(go:*)",
             "--allowedTools=Read(~/code)",
