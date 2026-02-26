@@ -44,9 +44,10 @@ gh pr list                   # List PRs
 gh pr view [NUMBER]          # View PR details
 gh pr checkout NUMBER        # Checkout PR locally
 
-# Review
+# Review (simple, no line comments)
 gh pr review NUMBER --approve
 gh pr review NUMBER --comment -b "feedback"
+gh pr review NUMBER --request-changes -b "needs work"
 
 # Merge
 gh pr merge --squash --delete-branch
@@ -54,15 +55,73 @@ gh pr merge --squash --delete-branch
 
 ### Review Workflow
 
+When reviewing a PR, follow this process:
+
+1. Inspect the PR diff and understand the changes
+2. Submit the review with line-level comments and an overall summary
+
+Always ask the user whether to submit the review as "approve", "request changes",
+or "comment" (default to "comment").
+
+#### Step 1: Inspect the PR
+
 ```bash
 # Find PRs needing your review
 gh pr list --search "review-requested:@me"
 
-# Review process
-gh pr checkout NUMBER
-# ... test locally ...
-gh pr review NUMBER --approve
+# View PR details and diff
+gh pr view NUMBER
+gh pr diff NUMBER
 ```
+
+#### Step 2: Submit the review with line-level comments
+
+Use `gh api` to submit a review with inline comments and an overall summary in
+a single call. Set `event` to `COMMENT`, `APPROVE`, or `REQUEST_CHANGES`.
+
+```bash
+gh api repos/{owner}/{repo}/pulls/NUMBER/reviews \
+  --input - <<'EOF'
+{
+  "commit_id": "LATEST_COMMIT_SHA",
+  "event": "COMMENT",
+  "body": "Overall: solid changes with a few suggestions.",
+  "comments": [
+    {
+      "path": "src/example.go",
+      "line": 42,
+      "side": "RIGHT",
+      "body": "This variable is unused."
+    },
+    {
+      "path": "src/example.go",
+      "line": 55,
+      "side": "RIGHT",
+      "body": "Consider using a constant here:\n\n```suggestion\nconst maxRetries = 3\n```"
+    }
+  ]
+}
+EOF
+```
+
+**Comment field reference:**
+
+| Field        | Description                                          |
+|--------------|------------------------------------------------------|
+| `path`       | Relative file path in the repo                       |
+| `line`       | Line number in the file (for single-line comments)   |
+| `side`       | `RIGHT` (additions) or `LEFT` (deletions)            |
+| `start_line` | Starting line (for multi-line comments)              |
+| `start_side` | Starting side (for multi-line comments)              |
+| `body`       | Comment text (supports markdown and code suggestions) |
+
+**Code suggestions** use GitHub's suggestion syntax inside the body:
+
+````markdown
+```suggestion
+replacement code here
+```
+````
 
 ### CI/CD Debugging
 
