@@ -108,10 +108,6 @@ use_nix() {
 		fi
 	fi
 
-	# Run Stow to symlink dotfiles
-	echo ""
-	echo "🔗 Running Stow to symlink dotfiles..."
-	(cd stow && ./install.sh)
 }
 
 # Function to use GNU Stow
