@@ -1,0 +1,1 @@
+../../../.claude/skills/gh-cli/SKILL.md

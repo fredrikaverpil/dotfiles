@@ -35,7 +35,6 @@
       "mcp__plugin_typescript-lsp_typescript-language-server__*"
     ]
   },
-  "model": "opus",
   "hooks": {
     "Notification": [
       {
@@ -54,16 +53,17 @@
     "command": "~/code/public/claudeline/claudeline"
   },
   "enabledPlugins": {
-    "clangd-lsp@claude-plugins-official": true,
-    "claude-hud@claude-hud": true,
-    "claude-md-management@claude-plugins-official": true,
-    "code-review@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
-    "commit-commands@claude-plugins-official": true,
+    "claudeline@claudeline": true,
     "context7@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true
+    "claude-code-setup@claude-plugins-official": true,
+    "plugin-dev@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "lua-lsp@claude-plugins-official": true
   }
 }

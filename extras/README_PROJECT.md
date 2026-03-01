@@ -319,6 +319,18 @@ independently of Nix rebuilds.
 - Updates: Auto-updates itself (no manual intervention)
 - Settings: Managed in `stow/shared/.claude/` (synced via Stow)
 
+#### Claude Work profile
+
+Use a separate Claude config dir for work contexts (different settings, skills,
+commands). Add to `~/code/work/.envrc`:
+
+```sh
+export CLAUDE_CONFIG_DIR="/Users/fredrik/.claude-work"
+```
+
+This switches Claude Code to use `~/.claude-work/` (synced from
+`stow/shared/.claude-work/` via Stow) when working in that directory.
+
 ```sh
 # you can import mcp servers from claude desktop, into ~/.claude.json
 claude mcp add-from-claude-desktop --scope user
