@@ -39,11 +39,11 @@
     "dotfiles": {
       "flake": false,
       "locked": {
-        "lastModified": 1772372871,
-        "narHash": "sha256-R9xNhKSD8BsutLmdVKfoRoND3vVtLJBhmOPiROimY8g=",
+        "lastModified": 1772393697,
+        "narHash": "sha256-sSkohztJMU5GHaqm/xOpcAMN0oGW6LyaH1mmgwL+H2s=",
         "owner": "fredrikaverpil",
         "repo": "dotfiles",
-        "rev": "44441df6ea63e08180eccf4d1c62a19645fd133c",
+        "rev": "b551af7dcdde5f8fdd755de3d9fbcc6faeb77aca",
         "type": "github"
       },
       "original": {
@@ -80,11 +80,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1772380461,
-        "narHash": "sha256-O3ukj3Bb3V0Tiy/4LUfLlBpWypJ9P0JeUgsKl2nmZZY=",
+        "lastModified": 1772569491,
+        "narHash": "sha256-bdr6ueeXO1Xg91sFkuvaysYF0mVdwHBpdyhTjBEWv+s=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "f140aa04d7d14f8a50ab27f3691b5766b17ae961",
+        "rev": "924e61f5c2aeab38504028078d7091077744ab17",
         "type": "github"
       },
       "original": {
@@ -179,11 +179,11 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1772173633,
-        "narHash": "sha256-MOH58F4AIbCkh6qlQcwMycyk5SWvsqnS/TCfnqDlpj4=",
+        "lastModified": 1772585379,
+        "narHash": "sha256-zomLtA51H/qXAcjczveQFXPi/GuJUkPdpDeyu5bGI4M=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "c0f3d81a7ddbc2b1332be0d8481a672b4f6004d6",
+        "rev": "0fd2db475afdde93c9e4b1625aafb8eb41b99807",
         "type": "github"
       },
       "original": {
