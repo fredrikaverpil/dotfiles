@@ -1501,7 +1501,13 @@ end
 
 function M.setup_obsidian_keymaps(obsidian_vars)
   return {
-    { "<leader>ns", "<cmd>Obsidian search<cr>", desc = "[N]otes: [s]earch text" },
+    {
+      "<leader>ns",
+      function()
+        Snacks.picker.grep({ cwd = obsidian_vars.vault_path })
+      end,
+      desc = "[N]otes: [s]earch text",
+    },
     { "<leader>nf", "<cmd>Obsidian quick_switch<cr>", desc = "[N]otes: search [f]ilenames" },
     { "<leader>nn", "<cmd>Obsidian new<cr>", desc = "[N]otes: [n]new" },
     { "<leader>nd", "<cmd>Obsidian today<cr>", desc = "[N]otes: [d]daily note" },
