@@ -62,7 +62,13 @@ return {
   {
     "afonsofrancof/OSC11.nvim",
     init = function()
-      set_dark() -- avoid flickering when starting nvim, default to dark mode
+      -- Apply the correct theme based on Neovim's detected background (set via OSC 11).
+      -- This avoids forcing dark mode when the terminal reports a light background.
+      if vim.o.background == "light" then
+        set_light()
+      else
+        set_dark()
+      end
     end,
     opts = {
       -- Function to call when switching to dark theme
