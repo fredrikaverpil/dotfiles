@@ -23,7 +23,9 @@ in
   ];
 
   # zap-specific package-managed tools
-  packageTools.npmPackages = [ ];
+  packageTools.npmPackages = [
+    "@googleworkspace/cli"
+  ];
   packageTools.uvTools = [ ];
 
   # zap-specific self-managed CLI tools

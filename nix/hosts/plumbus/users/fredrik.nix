@@ -22,7 +22,9 @@ in
   ];
 
   # plumbus-specific package-managed tools
-  packageTools.npmPackages = [ ];
+  packageTools.npmPackages = [
+    "@googleworkspace/cli"
+  ];
   packageTools.uvTools = [ ];
 
   # User/host-specific self-managed CLI tools
