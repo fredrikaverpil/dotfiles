@@ -97,9 +97,6 @@ local function install_and_start()
 
       -- Start treesitter for this buffer
       vim.treesitter.start(bufnr, parser_name)
-
-      -- Apply treesitter folding for this buffer (will be overridden by LSP folding when supported)
-      require("fredrik.config.options").treesitter_foldexpr()
     end,
   })
 end
