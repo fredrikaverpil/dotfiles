@@ -512,13 +512,6 @@ function M.setup_snacks_keymaps()
       desc = "Toggle Zen mode",
     },
     {
-      "<leader>uZ",
-      function()
-        Snacks.zen.zen()
-      end,
-      desc = "Toggle Zen mode",
-    },
-    {
       "<leader>un",
       function()
         Snacks.notifier.show_history()
