@@ -182,12 +182,22 @@ vim.keymap.set("n", "[e", diagnostic_goto(-1, "ERROR"), { desc = "Prev Error", s
 vim.keymap.set("n", "]w", diagnostic_goto(1, "WARN"), { desc = "Next Warning", silent = true })
 vim.keymap.set("n", "[w", diagnostic_goto(-1, "WARN"), { desc = "Prev Warning", silent = true })
 
-vim.keymap.set(
-  "n",
-  "<leader>uf",
-  require("fredrik.utils.toggle").toggle_manual_folding,
-  { desc = "Toggle manual folding", silent = true }
-)
+-- Manual folding workflow:
+-- 1. Visually select lines and press zf to create a manual fold.
+--    This switches foldmethod to "manual", which freezes the current
+--    treesitter/LSP folds and allows creating new folds on top.
+-- 2. Press <leader>uf to reset back to expr folding (treesitter/LSP).
+--    This removes all manual folds and restores dynamic fold computation.
+vim.keymap.set("v", "zf", function()
+  vim.wo.foldmethod = "manual"
+  vim.notify("Foldmethod set to manual", vim.log.levels.INFO)
+  return "zf"
+end, { desc = "Create manual fold", expr = true, silent = true })
+
+vim.keymap.set("n", "<leader>uf", function()
+  vim.wo.foldmethod = "expr"
+  vim.notify("Foldmethod set to expr", vim.log.levels.INFO)
+end, { desc = "Reset to expr folding", silent = true })
 
 vim.keymap.set(
   "n",
