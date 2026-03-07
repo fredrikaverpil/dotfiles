@@ -64,5 +64,8 @@ require("fredrik.config.options")
 -- set auto commands
 require("fredrik.config.autocmds")
 
+-- set core keymaps
+require("fredrik.config.keymaps")
+
 -- setup up plugin manager, load plugin configs
 require("fredrik.config.lazy")
