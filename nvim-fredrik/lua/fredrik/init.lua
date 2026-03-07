@@ -55,9 +55,6 @@ if should_profile then
   end)
 end
 
--- set up backwards compatibility
-require("fredrik.utils.version").setup_backwards_compat()
-
 -- set options
 require("fredrik.config.options")
 
