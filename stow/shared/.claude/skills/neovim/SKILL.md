@@ -151,6 +151,24 @@ Then read matching files with the `Read` tool.
 result=$(nvim --server "$NVIM" --remote-expr 'luaeval("vim.json.encode(vim.fn.getcompletion(\"MiniDiff\", \"help\"))")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
 ```
 
+## Finding plugin source code
+
+**Exact plugin path** (via lazy.nvim API):
+
+```bash
+# Get a specific plugin's install directory
+result=$(nvim --server "$NVIM" --remote-expr 'luaeval("require(\"lazy.core.config\").plugins[\"neotest\"].dir")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
+```
+
+**Search runtime paths** (works regardless of plugin manager):
+
+```bash
+# Find all runtime paths matching a keyword
+result=$(nvim --server "$NVIM" --remote-expr 'luaeval("vim.json.encode(vim.tbl_filter(function(p) return p:find(\"neotest\") end, vim.api.nvim_list_runtime_paths()))")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
+```
+
+Then use `Read`, `Glob`, or `Grep` to explore the returned paths.
+
 ## Safety
 
 - **Never** send `:q`, `:qa`, `:bdelete`, or other destructive commands without
