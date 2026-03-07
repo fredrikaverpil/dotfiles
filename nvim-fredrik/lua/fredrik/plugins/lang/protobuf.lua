@@ -48,7 +48,7 @@ local function buf_config_filepath()
     error("Buf config file not found")
   end
   cached_buf_config_filepath = buf_config_filepaths[1]
-  vim.notify("buf config file found: " .. cached_buf_config_filepath)
+  logging.log_output("buf config file found: " .. cached_buf_config_filepath, "protobuf.log", { enabled = false })
   return cached_buf_config_filepath
 end
 
@@ -94,7 +94,7 @@ local function buf_lint_setup()
       -- cwd is set to the buf.yaml directory.
       local bufpath = vim.fn.expand("%:p")
       local bufpath_rel = get_relative_path(bufpath, buf_lint_cwd())
-      vim.notify("buf_lint is using bufpath: " .. bufpath_rel)
+      logging.log_output("buf_lint is using bufpath: " .. bufpath_rel, "protobuf.log", { enabled = false })
       return bufpath_rel
     end,
   }
@@ -147,7 +147,7 @@ local function api_linter_setup()
     env = nil,
     parser = function(output, bufnr, linter_cwd)
       logging.log_output(output, "api-linter.log", { enabled = false }) -- for debugging purposes
-      vim.notify("api-linter is using cwd: " .. linter_cwd)
+      logging.log_output("api-linter is using cwd: " .. linter_cwd, "protobuf.log", { enabled = false })
       if output == "" then
         return {}
       end
