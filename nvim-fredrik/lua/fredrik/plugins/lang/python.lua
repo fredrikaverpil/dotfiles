@@ -38,15 +38,11 @@ return {
       opts.linters = opts.linters or {}
 
       opts.linters_by_ft["python"] = { "mypy" }
-      opts.linters["mypy"] = {
-        cmd = function()
-          local found_bin = vim.fn.system("which mypy")
-          if found_bin ~= "" and string.find(found_bin, "mason") then
-            vim.notify_once("mypy used from mason: " .. found_bin, vim.log.levels.WARN)
-          end
-          return "mypy"
-        end,
-      }
+      opts.linters["mypy"] = { cmd = "mypy" }
+      local found_bin = vim.fn.system("which mypy"):gsub("%s+$", "")
+      if found_bin ~= "" and string.find(found_bin, "mason") then
+        vim.notify_once("mypy used from mason: " .. found_bin, vim.log.levels.WARN)
+      end
     end,
   },
 
