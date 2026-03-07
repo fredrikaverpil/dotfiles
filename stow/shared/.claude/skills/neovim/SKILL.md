@@ -153,19 +153,27 @@ result=$(nvim --server "$NVIM" --remote-expr 'luaeval("vim.json.encode(vim.fn.ge
 
 ## Finding plugin source code
 
-**Exact plugin path** (via lazy.nvim API):
+**Search runtime files** (searches all runtime paths including user config,
+plugins, and `pack/*/start/*`):
 
 ```bash
-# Get a specific plugin's install directory
+# Find Lua source files matching a keyword (e.g. "codediff", "neotest")
+result=$(nvim --server "$NVIM" --remote-expr 'luaeval("vim.json.encode(vim.api.nvim_get_runtime_file(\"lua/**/neotest*\", true))")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
+
+# Find any runtime file by pattern (plugin/, autoload/, syntax/, etc.)
+result=$(nvim --server "$NVIM" --remote-expr 'luaeval("vim.json.encode(vim.api.nvim_get_runtime_file(\"**/neotest*\", true))")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
+```
+
+**Exact plugin path** (via lazy.nvim API, when the plugin name is known):
+
+```bash
 result=$(nvim --server "$NVIM" --remote-expr 'luaeval("require(\"lazy.core.config\").plugins[\"neotest\"].dir")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
 ```
 
-**Search runtime paths** (works regardless of plugin manager):
-
-```bash
-# Find all runtime paths matching a keyword
-result=$(nvim --server "$NVIM" --remote-expr 'luaeval("vim.json.encode(vim.tbl_filter(function(p) return p:find(\"neotest\") end, vim.api.nvim_list_runtime_paths()))")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
-```
+**Note:** `nvim_get_runtime_file` only searches **active** runtime paths.
+Lazy-loaded plugins that haven't been loaded yet won't appear. For those, use
+the lazy.nvim API or search `stdpath("data")/lazy/` directly with `fd`/`Glob`.
+The `/lazy/` subdirectory is specific to the lazy.nvim plugin manager.
 
 Then use `Read`, `Glob`, or `Grep` to explore the returned paths.
 
