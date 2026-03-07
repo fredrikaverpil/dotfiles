@@ -14,13 +14,11 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
 
-  -- load and confgure plugins in this order (plugins, languages, core, project-specific overrides):
+  -- Merge order matters: later specs override earlier ones for the same plugin.
+  -- plugins (defaults) → lang (language-specific) → core (final authority)
   spec = {
-    -- import all plugins and their configs
     { import = "fredrik.plugins" },
-    -- import language configs
     { import = "fredrik.plugins.lang" },
-    -- import core configs
     { import = "fredrik.plugins.core" },
   },
 
