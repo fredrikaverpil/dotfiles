@@ -315,7 +315,7 @@ function M.setup_typescript_lsp_keymaps()
       function()
         require("vtsls").commands.fix_all(0)
       end,
-      desc = "Fix all diagnostics",
+      desc = "Fix all vtsls diagnostics",
     },
     {
       "<leader>cV",
