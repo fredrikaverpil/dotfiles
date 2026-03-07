@@ -1,4 +1,4 @@
-M = {}
+local M = {}
 
 -- leader key
 vim.g.mapleader = " "
@@ -86,11 +86,9 @@ function _G.custom_foldtext()
   local line_text = vim.fn.substitute(line, "\t", " ", "g")
   return string.format("%s (%d lines)", line_text, line_count)
 end
-function M.lsp_foldexpr()
-  vim.opt_local.foldmethod = "expr"
-  vim.opt_local.foldexpr = "v:lua.vim.lsp.foldexpr()"
-  vim.opt_local.foldtext = "v:lua.custom_foldtext()"
-end
+-- Treesitter folding is the global default. LSP folding overrides per-buffer
+-- via M.lsp_foldexpr(), called from plugins/core/lsp.lua when the server
+-- supports textDocument/foldingRange.
 vim.opt.foldcolumn = "1" -- "0" to hide, "auto" to show when folds exist, "1" for always visible
 vim.opt.foldmethod = "expr"
 vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
@@ -98,6 +96,12 @@ vim.opt.foldtext = "v:lua.custom_foldtext()"
 vim.opt.foldenable = true
 vim.opt.foldlevel = 99
 vim.opt.foldlevelstart = 99
+
+--- Override foldexpr with LSP folding for the current window/buffer.
+---@param win integer window handle
+function M.lsp_foldexpr(win)
+  vim.wo[win][0].foldexpr = "v:lua.vim.lsp.foldexpr()"
+end
 
 -- scroll off
 vim.opt.scrolloff = 4

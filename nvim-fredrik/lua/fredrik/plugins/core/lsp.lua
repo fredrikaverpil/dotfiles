@@ -121,7 +121,8 @@ local function register_lspattach_autocmd()
 
         -- setup LSP-provided folding
         if client:supports_method("textDocument/foldingRange", args.buf) then
-          require("fredrik.config.options").lsp_foldexpr()
+          local win = vim.api.nvim_get_current_win()
+          require("fredrik.config.options").lsp_foldexpr(win)
         end
 
         -- setup inline completion (only neovim 0.12+)
