@@ -96,7 +96,7 @@ function M.lsp_foldexpr()
   vim.opt_local.foldexpr = "v:lua.vim.lsp.foldexpr()"
   vim.opt_local.foldtext = "v:lua.custom_foldtext()"
 end
-vim.opt.foldcolumn = "0"
+vim.opt.foldcolumn = "1" -- "0" to hide, "auto" to show when folds exist, "1" for always visible
 vim.opt.foldenable = true
 vim.opt.foldlevel = 99
 vim.opt.foldlevelstart = 99
