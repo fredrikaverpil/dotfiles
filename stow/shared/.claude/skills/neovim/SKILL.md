@@ -80,6 +80,20 @@ nvim --server "$NVIM" --remote-send ':echo "hello"<CR>'
 Note: `--remote-send` does not return output and does not need the warning
 filter. Use `--remote-expr` when you need a return value.
 
+## Opening files remotely
+
+Use `--remote` to open files in the running Neovim instance:
+
+```bash
+nvim --server "$NVIM" --remote file.txt
+```
+
+Use `--remote-tab` to open files in new tabs:
+
+```bash
+nvim --server "$NVIM" --remote-tab file1.txt file2.txt
+```
+
 ## Executing Lua without a return value
 
 To run Lua that performs side effects (no return value needed):
