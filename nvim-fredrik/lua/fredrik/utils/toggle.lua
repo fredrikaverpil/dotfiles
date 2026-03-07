@@ -36,7 +36,7 @@ function M.toggle_copilot(opts)
   local is_enabled = vim.g.custom_copilot_status == "enabled"
 
   -- Determine target state: toggle if called manually, else sync to availability
-  local should_enable = opts.manual and not is_enabled or (not opts.manual and is_available)
+  local should_enable = (opts.manual and not is_enabled) or (not opts.manual and is_available)
 
   if should_enable and not is_available then
     vim.notify(string.format("Cannot enable Copilot: Not in public directory\n%s", cwd), vim.log.levels.ERROR)
