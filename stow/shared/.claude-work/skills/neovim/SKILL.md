@@ -1,0 +1,1 @@
+../../../.claude/skills/neovim/SKILL.md
