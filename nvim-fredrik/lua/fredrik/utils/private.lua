@@ -53,7 +53,7 @@ local function is_copilot_loaded()
 
   local ok, _ = pcall(require, "copilot")
   if not ok then
-    vim.notify(vim.inspect("The Copilot plugin is not loaded"), vim.log.levels.WARN)
+    vim.notify("The Copilot plugin is not loaded", vim.log.levels.WARN)
     return false
   end
   return true
