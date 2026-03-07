@@ -9,7 +9,9 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 local golangci_config_filepath_cache = nil
-local tags = "-tags=wireinject,integration"
+-- Go build tags passed to gopls, neotest, and golangci-lint.
+-- Set project-specific tags via .lazy.lua if needed, e.g. "-tags=integration".
+local tags = ""
 
 local function golangci_config()
   if golangci_config_filepath_cache ~= nil then
