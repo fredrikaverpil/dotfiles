@@ -39,8 +39,11 @@ source project). Use `./pok -h` to list the tasks available.
 ## Testing
 
 Prefer the AAA pattern (Arrange, Act, Assert). When asserting, always assert on
-whole objects. Use e.g. got/want pattern in Go using
-[gotest.tools](https://pkg.go.dev/gotest.tools/v3/assert) in Go.
+whole objects
+
+For Go, use `assert.DeepEquals` from
+[gotest.tools](https://pkg.go.dev/gotest.tools/v3/assert) for whole object
+assertion with the got/want pattern. Always prefer table tests.
 
 ## Git
 
