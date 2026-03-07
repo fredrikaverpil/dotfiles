@@ -1,10 +1,13 @@
 local filetypes = { "json", "jsonc", "json5" }
 
--- Fix conceallevel for json files
 vim.api.nvim_create_autocmd({ "FileType" }, {
   group = vim.api.nvim_create_augroup("json_conceal", { clear = true }),
   pattern = filetypes,
   callback = function()
+    vim.opt_local.tabstop = 2
+    vim.opt_local.softtabstop = 2
+    vim.opt_local.shiftwidth = 2
+    vim.opt_local.expandtab = true
     vim.opt_local.conceallevel = 0
   end,
 })
