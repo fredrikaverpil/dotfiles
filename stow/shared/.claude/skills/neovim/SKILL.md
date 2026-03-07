@@ -115,19 +115,41 @@ result=$(nvim --server "$NVIM" --remote-expr 'luaeval("vim.json.encode(vim.tbl_m
 
 ## Reading help documentation
 
-To read Neovim help docs, resolve the file path via RPC, then use the `Read`
-tool. Do **not** use `execute("help ...")` — that opens help inside the editor
-as a side effect instead of returning content.
+Do **not** use `execute("help ...")` — that opens help inside the editor as a
+side effect instead of returning content.
+
+First, get the key paths via RPC (do this once per session):
 
 ```bash
-# Get the path to a help file (e.g. fold.txt, options.txt, lsp.txt)
-result=$(nvim --server "$NVIM" --remote-expr 'luaeval("vim.api.nvim_get_runtime_file(\"doc/fold.txt\", false)[1]")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
+# Plugin docs directory (lazy.nvim plugins)
+result=$(nvim --server "$NVIM" --remote-expr 'luaeval("vim.fn.stdpath(\"data\")")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
+# e.g. ~/.local/share/nvim-fredrik -> plugin docs at <data>/lazy/*/doc/
+
+# Built-in Neovim docs
+result=$(nvim --server "$NVIM" --remote-expr 'luaeval("vim.fn.expand(\"$VIMRUNTIME\")")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
+# e.g. -> built-in docs at <runtime>/doc/
 ```
 
-Then read the returned path with the `Read` tool.
+Then use standard tools to search and read:
 
-In practice, most help topics map to predictable filenames under
-`$VIMRUNTIME/doc/` (e.g. `fold.txt`, `options.txt`, `lsp.txt`, `api.txt`).
+```bash
+# Find doc files by name (using Glob or fd)
+fd 'diff.*\.txt$' ~/.local/share/nvim-fredrik/lazy --type f
+
+# Search doc content for a specific topic (using Grep or rg)
+rg -l "toggle_overlay" ~/.local/share/nvim-fredrik/lazy/*/doc/
+
+# Search built-in docs
+rg "foldmethod" ~/.local/share/bob/nightly/share/nvim/runtime/doc/
+```
+
+Then read matching files with the `Read` tool.
+
+**Search help tags** (equivalent to `:h query<Tab>` completion):
+
+```bash
+result=$(nvim --server "$NVIM" --remote-expr 'luaeval("vim.json.encode(vim.fn.getcompletion(\"MiniDiff\", \"help\"))")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
+```
 
 ## Safety
 
