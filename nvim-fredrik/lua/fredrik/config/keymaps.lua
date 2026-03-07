@@ -313,7 +313,7 @@ function M.setup_typescript_lsp_keymaps()
     {
       "<leader>cD",
       function()
-        require("vtsls")
+        require("vtsls").commands.fix_all(0)
       end,
       desc = "Fix all diagnostics",
     },
