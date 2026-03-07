@@ -87,7 +87,7 @@ function _G.custom_foldtext()
   return string.format("%s (%d lines)", line_text, line_count)
 end
 -- Treesitter folding is the global default. LSP folding overrides per-buffer
--- via M.lsp_foldexpr(), called from plugins/core/lsp.lua when the server
+-- via lsp_foldexpr(), called from plugins/core/lsp.lua when the server
 -- supports textDocument/foldingRange.
 vim.opt.foldcolumn = "1" -- "0" to hide, "auto" to show when folds exist, "1" for always visible
 vim.opt.foldmethod = "expr"

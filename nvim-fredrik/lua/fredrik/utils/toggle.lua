@@ -23,7 +23,6 @@ function M.toggle_inlay_hints()
   vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(filter))
 end
 
-
 function M.toggle_copilot(opts)
   opts = opts or {}
 
