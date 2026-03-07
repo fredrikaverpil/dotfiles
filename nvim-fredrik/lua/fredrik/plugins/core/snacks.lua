@@ -130,7 +130,12 @@ return {
 
       quickfile = { enabled = true },
 
-      statuscolumn = { enabled = true },
+      statuscolumn = {
+        enabled = false, -- use native folds
+        folds = {
+          open = true,
+        },
+      },
 
       terminal = { enabled = true },
 
