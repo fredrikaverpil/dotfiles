@@ -121,29 +121,16 @@ side effect instead of returning content.
 First, get the key paths via RPC (do this once per session):
 
 ```bash
-# Plugin docs directory (lazy.nvim plugins)
+# Neovim data directory (plugin install root is <data>/lazy/ for lazy.nvim)
 result=$(nvim --server "$NVIM" --remote-expr 'luaeval("vim.fn.stdpath(\"data\")")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
-# e.g. ~/.local/share/nvim-fredrik -> plugin docs at <data>/lazy/*/doc/
 
 # Built-in Neovim docs
 result=$(nvim --server "$NVIM" --remote-expr 'luaeval("vim.fn.expand(\"$VIMRUNTIME\")")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
-# e.g. -> built-in docs at <runtime>/doc/
 ```
 
-Then use standard tools to search and read:
-
-```bash
-# Find doc files by name (using Glob or fd)
-fd 'diff.*\.txt$' ~/.local/share/nvim-fredrik/lazy --type f
-
-# Search doc content for a specific topic (using Grep or rg)
-rg -l "toggle_overlay" ~/.local/share/nvim-fredrik/lazy/*/doc/
-
-# Search built-in docs
-rg "foldmethod" ~/.local/share/bob/nightly/share/nvim/runtime/doc/
-```
-
-Then read matching files with the `Read` tool.
+Then use standard tools (`fd`, `rg`, `Glob`, `Grep`) to search and `Read` to
+view the files. Search `<data>/lazy/*/doc/` for plugin docs and
+`<runtime>/doc/` for built-in docs.
 
 **Search help tags** (equivalent to `:h query<Tab>` completion):
 
@@ -164,18 +151,67 @@ result=$(nvim --server "$NVIM" --remote-expr 'luaeval("vim.json.encode(vim.api.n
 result=$(nvim --server "$NVIM" --remote-expr 'luaeval("vim.json.encode(vim.api.nvim_get_runtime_file(\"**/neotest*\", true))")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
 ```
 
-**Exact plugin path** (via lazy.nvim API, when the plugin name is known):
-
-```bash
-result=$(nvim --server "$NVIM" --remote-expr 'luaeval("require(\"lazy.core.config\").plugins[\"neotest\"].dir")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
-```
-
 **Note:** `nvim_get_runtime_file` only searches **active** runtime paths.
-Lazy-loaded plugins that haven't been loaded yet won't appear. For those, use
-the lazy.nvim API or search `stdpath("data")/lazy/` directly with `fd`/`Glob`.
-The `/lazy/` subdirectory is specific to the lazy.nvim plugin manager.
+Lazy-loaded plugins that haven't been loaded yet won't appear. See the
+lazy.nvim section below for how to find those.
 
 Then use `Read`, `Glob`, or `Grep` to explore the returned paths.
+
+## lazy.nvim
+
+The plugin manager [lazy.nvim](https://github.com/folke/lazy.nvim) uses its own
+directory layout, separate from Neovim's built-in `pack/` structure.
+
+### Plugin install directory
+
+Plugins are installed under `stdpath("data")/lazy/` (e.g.
+`~/.local/share/nvim-fredrik/lazy/<plugin-name>/`). This path is **not** part
+of the standard Neovim `packpath`.
+
+### Finding plugins (loaded or not)
+
+The lazy.nvim API knows about all plugins regardless of whether they are loaded:
+
+```bash
+# Get a specific plugin's directory
+result=$(nvim --server "$NVIM" --remote-expr 'luaeval("require(\"lazy.core.config\").plugins[\"neotest\"].dir")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
+
+# List all plugins with their paths (JSON)
+result=$(nvim --server "$NVIM" --remote-expr 'luaeval("vim.json.encode(vim.tbl_map(function(p) return {name = p.name, dir = p.dir, dev = p.dev or false} end, vim.tbl_values(require(\"lazy.core.config\").plugins)))")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
+```
+
+You can also search the install directory directly with `fd`/`Glob` using the
+`stdpath("data")/lazy/` path.
+
+### Dev plugins (`dev = true`)
+
+Plugins with `dev = true` in their spec are loaded from a local development
+path instead of the install directory.
+
+```bash
+# Get the dev path from lazy.nvim config
+result=$(nvim --server "$NVIM" --remote-expr 'luaeval("require(\"lazy.core.config\").options.dev.path")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
+
+# Check if a specific plugin is using dev mode
+result=$(nvim --server "$NVIM" --remote-expr 'luaeval("require(\"lazy.core.config\").plugins[\"codediff.nvim\"].dev")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
+```
+
+A dev plugin's source lives at `<dev.path>/<plugin-name>` (e.g. if dev.path is
+`~/code/public`, then `codediff.nvim` with `dev = true` loads from
+`~/code/public/codediff.nvim`). The plugin's `.dir` field in the lazy API
+already reflects this.
+
+### Plugin specs (lazy config files)
+
+Plugin specifications (the Lua files that configure which plugins to load) live
+in the Neovim config directory, not in the install directory. Search there when
+you need to find how a plugin is configured:
+
+```bash
+# Find plugin spec files
+result=$(nvim --server "$NVIM" --remote-expr 'luaeval("vim.fn.stdpath(\"config\")")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
+# Then use Glob/Grep to search the returned config path
+```
 
 ## Safety
 
