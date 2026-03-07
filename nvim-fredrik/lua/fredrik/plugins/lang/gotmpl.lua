@@ -59,7 +59,6 @@ return {
     opts_extend = {
       "servers.gopls.filetypes",
       "servers.gopls.settings.gopls.templateExtensions",
-      "servers.superhtml.filetypes",
     },
   },
 }
