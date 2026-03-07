@@ -16,9 +16,9 @@ vim.opt.shortmess:append("I")
 vim.opt.fillchars = {
   foldopen = "",
   foldclose = "",
-  -- fold = "⸱",
-  fold = " ",
-  foldsep = " ",
+  fold = " ", -- hide the ·············· that shows for folded code
+  foldsep = " ", -- hide the vertical line where a fold is possible
+  foldinner = " ", -- hide the indentation numbers in the fold column
   diff = "╱",
   -- diff = "░",
   -- diff = "·",
