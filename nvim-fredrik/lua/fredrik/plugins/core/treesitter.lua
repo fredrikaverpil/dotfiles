@@ -1,5 +1,3 @@
-local branch = "main"
-
 --- Sign parser on macOS to prevent code signature crashes
 ---@param parser_name string
 local function sign_parser_macos(parser_name)
@@ -57,12 +55,7 @@ local function install_and_start()
 
       -- Check if parser_name is available in parser configs
       local parser_configs = require("nvim-treesitter.parsers")
-      local parser_can_be_used = nil
-      if branch == "master" then
-        parser_can_be_used = parser_configs.list[parser_name]
-      elseif branch == "main" then
-        parser_can_be_used = parser_configs[parser_name]
-      end
+      local parser_can_be_used = parser_configs[parser_name]
       if not parser_can_be_used then
         -- vim.notify(
         --   "Parser config does not have parser " .. vim.inspect(parser_name) .. ", skipping",
@@ -76,11 +69,7 @@ local function install_and_start()
 
       -- If not installed, install parser synchronously
       if not parser_installed then
-        if branch == "master" then
-          vim.cmd("TSInstallSync " .. parser_name)
-        elseif branch == "main" then
-          require("nvim-treesitter").install({ parser_name }):wait(30000) -- main branch syntax
-        end
+        require("nvim-treesitter").install({ parser_name }):wait(30000)
         sign_parser_macos(parser_name)
       end
 
@@ -106,7 +95,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     lazy = true,
     event = "BufRead",
-    branch = branch, -- master to be frozen
+    branch = "main",
     build = ":TSUpdate",
     ---@class TSConfig
     opts = {
