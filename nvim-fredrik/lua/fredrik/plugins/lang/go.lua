@@ -230,7 +230,7 @@ return {
           -- root_markers = { "go.work", "go.mod", ".git" }, -- disabled when using lspconfig
           settings = {
             gopls = {
-              buildFlags = { tags },
+              buildFlags = tags ~= "" and { tags } or {},
               -- env = {},
               analyses = {
                 -- https://go.dev/gopls/analyzers
