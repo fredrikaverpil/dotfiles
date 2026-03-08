@@ -1,4 +1,8 @@
 {
+  "env": {
+    "ENABLE_LSP_TOOL": "1",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
   "attribution": {
     "commit": "",
     "pr": ""
@@ -35,6 +39,7 @@
       "mcp__plugin_typescript-lsp_typescript-language-server__*"
     ]
   },
+  "model": "opus",
   "hooks": {
     "Notification": [
       {
