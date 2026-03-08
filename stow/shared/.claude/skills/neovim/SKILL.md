@@ -227,6 +227,30 @@ result=$(nvim --server "$NVIM" --remote-expr 'luaeval("vim.fn.stdpath(\"config\"
 # Then use Glob/Grep to search the returned config path
 ```
 
+## Stale LSP diagnostics
+
+When files are edited externally (e.g. by Claude Code tools), Neovim's LSP
+diagnostics can become stale — showing warnings for old line numbers or
+already-fixed issues. To refresh:
+
+1. **Reload the buffer and save** — this forces the LSP to re-analyze:
+
+```bash
+result=$(nvim --server "$NVIM" --remote-expr 'execute("lua vim.api.nvim_buf_call(BUFNR, function() vim.cmd(\"edit! | write\") end)")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
+```
+
+2. **Restart the LSP** — if diagnostics are still stale after reloading:
+
+```bash
+result=$(nvim --server "$NVIM" --remote-expr 'execute("LspRestart")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
+```
+
+After restarting, wait ~10 seconds for the LSP server to re-index before
+querying diagnostics again.
+
+3. **Verify independently** — if diagnostics seem wrong, run the linter directly
+   to confirm the actual state (e.g. `golangci-lint run ./...` for Go).
+
 ## Safety
 
 - **Never** send `:q`, `:qa`, `:bdelete`, or other destructive commands without
