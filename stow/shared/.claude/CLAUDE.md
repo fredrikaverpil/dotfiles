@@ -70,6 +70,18 @@ for increased understanding of the problem at hand.
 
 Use the "jira-cli" skill.
 
+## LSP
+
+When tracing where a symbol is defined or finding all references to
+it, use LSP (goToDefinition, findReferences, hover) instead of Grep.
+LSP gives exact results; Grep gives text matches.
+
+Use Grep/Glob for discovery (finding files, searching patterns). Use
+LSP for understanding (definitions, references, type info).
+
+After locating a file with Grep/Glob, use LSP to navigate within it
+rather than reading the whole file.
+
 ## Go
 
 - Use the `gopls` LSP at all times when searching for references to symbols,
