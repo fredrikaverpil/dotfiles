@@ -8,6 +8,10 @@ description: Use this skill when creating a GitHub pull request via `gh pr creat
 When creating a pull request, use the `gh` CLI with the following format and
 conventions.
 
+## PR title format
+
+Write the title as if the whole PR was squashed into a single commit using conventional commits.
+
 ## PR Body Format
 
 ```markdown
