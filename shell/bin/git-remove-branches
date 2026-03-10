@@ -11,7 +11,7 @@ stale=()
 # Determine default branch
 default_branch=$(git remote show origin | grep "HEAD branch" | cut -d: -f2 | xargs)
 echo "Fetching from origin..."
-git fetch origin >/dev/null 2>&1
+git fetch origin --prune >/dev/null 2>&1 || true
 
 # Get list of local branches
 local_branches=$(git branch --list | cut -c 3-)
@@ -39,7 +39,7 @@ for branch in $local_branches; do
 
 	# Check if merged
 	set +e
-	git branch --merged "$default_branch" | grep -q "^  $branch$"
+	git branch --merged "origin/$default_branch" | grep -q "^  $branch$"
 	merged[$idx]=$?
 	set -e
 
