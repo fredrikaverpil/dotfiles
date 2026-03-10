@@ -1,12 +1,10 @@
 return {
   {
     "lewis6991/gitsigns.nvim",
-    enabled = false, -- I'm evaluating mini.diff instead...
+    -- enabled = false, -- I'm evaluating mini.diff instead...
+    version = false,
     event = "VeryLazy",
-    opts = {
-      on_attach = function(bufnr)
-        require("fredrik.config.keymaps").setup_gitsigns_keymaps(bufnr)
-      end,
-    },
+    keys = require("fredrik.config.keymaps").setup_gitsigns_keymaps(),
+    opts = {},
   },
 }

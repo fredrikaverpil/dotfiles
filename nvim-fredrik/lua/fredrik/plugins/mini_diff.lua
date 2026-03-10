@@ -1,6 +1,7 @@
 return {
   {
     "nvim-mini/mini.diff",
+    enabled = false, -- use gitsigns
     lazy = false, -- without this, it won't always load on startup... weird.
     version = "*",
     opts = {

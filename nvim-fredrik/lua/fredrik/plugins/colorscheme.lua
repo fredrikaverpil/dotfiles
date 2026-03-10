@@ -227,6 +227,9 @@ return {
         hl("SnacksNotifierBorderTrace", { fg = palette.blossom })
         hl("SnacksNotifierBorderWarn", { fg = palette.wood })
 
+        -- Gitsigns inline diff (toggle_deleted + toggle_word_diff)
+        hl("GitSignsDeleteVirtLnInLine", { fg = palette.rose, bg = colors.blend(palette.bg, palette.rose, 20) })
+
         -- Snacks explorer
         hl("SnacksPickerGitStatusUntracked", { fg = palette.wood })
       end

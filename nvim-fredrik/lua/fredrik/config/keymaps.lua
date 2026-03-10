@@ -847,64 +847,85 @@ function M.setup_yanky_keymaps()
   }
 end
 
-function M.setup_gitsigns_keymaps(bufnr)
-  local gs = package.loaded.gitsigns
-
-  vim.keymap.set("n", "]h", function()
-    if vim.wo.diff then
-      return "]c"
-    end
-    vim.schedule(function()
-      gs.nav_hunk("next")
-    end)
-    return "<Ignore>"
-  end, { expr = true })
-
-  vim.keymap.set("n", "[h", function()
-    if vim.wo.diff then
-      return "[c"
-    end
-    vim.schedule(function()
-      gs.nav_hunk("prev")
-    end)
-    return "<Ignore>"
-  end, { expr = true })
-
-  vim.keymap.set({ "n", "v" }, "<leader>ghb", function()
-    local default_branch = require("fredrik.utils.git").get_default_branch()
-    vim.cmd("Gitsigns change_base " .. default_branch)
-  end, { buffer = bufnr, silent = false, noremap = true, desc = "change [b]ase to default branch" })
-
-  vim.keymap.set(
-    { "n", "v" },
-    "<leader>ghs",
-    ":Gitsigns stage_hunk<CR>",
-    { buffer = bufnr, silent = true, noremap = true, desc = "[s]tage hunk" }
-  )
-  vim.keymap.set(
-    { "n", "v" },
-    "<leader>ghS",
-    ":Gitsigns stage_buffer<CR>",
-    { buffer = bufnr, silent = true, noremap = true, desc = "[S]tage buffer" }
-  )
-  vim.keymap.set(
-    "n",
-    "<leader>ghu",
-    gs.undo_stage_hunk,
-    { buffer = bufnr, silent = true, noremap = true, desc = "[u]ndo stage hunk" }
-  )
-  vim.keymap.set(
-    "n",
-    "<leader>ghr",
-    gs.reset_hunk,
-    { buffer = bufnr, silent = true, noremap = true, desc = "[r]eset hunk" }
-  )
-  vim.keymap.set(
-    "n",
-    "<leader>gbb",
-    gs.blame,
-    { buffer = bufnr, silent = true, noremap = true, desc = "[b]lame on the side" }
-  )
+function M.setup_gitsigns_keymaps()
+  return {
+    {
+      "]h",
+      function()
+        if vim.wo.diff then
+          return "]c"
+        end
+        vim.schedule(function()
+          require("gitsigns").nav_hunk("next")
+        end)
+        return "<Ignore>"
+      end,
+      expr = true,
+      desc = "Next hunk",
+    },
+    {
+      "[h",
+      function()
+        if vim.wo.diff then
+          return "[c"
+        end
+        vim.schedule(function()
+          require("gitsigns").nav_hunk("prev")
+        end)
+        return "<Ignore>"
+      end,
+      expr = true,
+      desc = "Prev hunk",
+    },
+    {
+      "<leader>ghb",
+      function()
+        local default_branch = require("fredrik.utils.git").get_default_branch()
+        require("gitsigns").change_base(default_branch, true)
+      end,
+      mode = { "n", "v" },
+      desc = "change [b]ase to default branch",
+    },
+    {
+      "<leader>ghs",
+      function()
+        require("gitsigns").stage_hunk()
+      end,
+      mode = { "n", "v" },
+      desc = "toggle [s]tage hunk",
+    },
+    {
+      "<leader>ghS",
+      function()
+        require("gitsigns").stage_buffer()
+      end,
+      mode = { "n", "v" },
+      desc = "[S]tage buffer",
+    },
+    {
+      "<leader>ghr",
+      function()
+        require("gitsigns").reset_hunk()
+      end,
+      desc = "[r]eset hunk",
+    },
+    {
+      "<leader>gbb",
+      function()
+        require("gitsigns").blame()
+      end,
+      desc = "[b]lame on the side",
+    },
+    {
+      "<leader>ght",
+      function()
+        require("gitsigns").toggle_deleted()
+        require("gitsigns").toggle_linehl()
+        require("gitsigns").toggle_word_diff()
+      end,
+      desc = "[t]oggle inline diff",
+    },
+  }
 end
 
 -- Helper function to get hunk range at cursor
