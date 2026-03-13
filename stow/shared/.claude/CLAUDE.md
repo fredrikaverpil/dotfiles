@@ -106,8 +106,9 @@ Use the "golang-style" skill.
 
 ## Terraform
 
-Whenever you review terraform code, always read up on the relevant providers, so
-that you get the whole context and full understanding of how the provider works.
+Whenever you read/write/review terraform code, always read up on the relevant
+providers, so that you get the whole context and full understanding of how the
+provider works.
 
 Examples:
 
