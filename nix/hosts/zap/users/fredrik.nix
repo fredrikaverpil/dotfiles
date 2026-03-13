@@ -20,6 +20,7 @@ in
 
   home.packages = with pkgs; [
     unstable.jira-cli-go
+    unstable.openfga-cli
   ];
 
   # zap-specific package-managed tools
