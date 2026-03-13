@@ -122,7 +122,7 @@ alt-9 = 'workspace 9'
 # alt-a = 'workspace A'
 alt-b = 'workspace B'
 alt-c = 'workspace C'
-alt-d = 'workspace D'
+# alt-d = 'workspace D'  # NOTE: conflicts with snacks.nvim picker for draft PRs toggle
 alt-e = 'workspace E'
 # alt-f = 'workspace F'  # NOTE: conflicts with aerospace 'fullscreen' binding
 alt-g = 'workspace G'
@@ -192,8 +192,8 @@ alt-shift-semicolon = 'mode service'
 esc = ['reload-config', 'mode main']
 r = ['flatten-workspace-tree', 'mode main'] # reset layout
 f = [
-	'layout floating tiling',
-	'mode main',
+  'layout floating tiling',
+  'mode main',
 ] # Toggle between floating and tiling layout
 backspace = ['close-all-windows-but-current', 'mode main']
 
@@ -210,12 +210,12 @@ alt-shift-right = ['join-with right', 'mode main']
 [[on-window-detected]]
 if.app-id = "com.mitchellh.ghostty"
 run = [
-	# FIX: this is a workaround for https://github.com/nikitabobko/AeroSpace/issues/68
-	# this was also observed in:
-	# - https://github.com/ghostty-org/ghostty/issues/1840
-	# - https://github.com/ghostty-org/ghostty/issues/2006
-	"layout floating",
-	"move-node-to-workspace T",
+  # FIX: this is a workaround for https://github.com/nikitabobko/AeroSpace/issues/68
+  # this was also observed in:
+  # - https://github.com/ghostty-org/ghostty/issues/1840
+  # - https://github.com/ghostty-org/ghostty/issues/2006
+  "layout floating",
+  "move-node-to-workspace T",
 ]
 [[on-window-detected]]
 if.app-id = "net.kovidgoyal.kitty"

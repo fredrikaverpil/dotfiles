@@ -41,22 +41,78 @@ end
 
 ---@param opts? snacks.picker.Config
 function M.pull_requests(opts)
+  local pr_cache = nil ---@type snacks.picker.finder.Item[]?
+
   return Snacks.picker.pick(vim.tbl_deep_extend("keep", opts or {}, {
     title = "Pull Requests",
-    finder = function(f_opts, ctx)
-      return require("snacks.picker.source.proc").proc(
-        vim.tbl_deep_extend("force", f_opts or {}, {
-          cmd = "gh",
-          args = { "pr", "list", "--json", "number,title,body", "--jq", ".[] | [.number, .title, .body] | @tsv" },
-          transform = function(item) ---@param item snacks.picker.finder.Item
-            local split = vim.split(item.text, "\t")
-            item.pr_number = tonumber(split[1])
-            item.pr_title = split[2]
-            item.pr_body = split[3]
-          end,
-        }),
-        ctx
-      )
+    pr_filter = "open", -- "open" | "draft" | "closed" | "merged"
+    actions = {
+      filter_draft = function(picker)
+        picker.opts.pr_filter = picker.opts.pr_filter == "draft" and "open" or "draft"
+        picker.list:set_target()
+        picker:find()
+      end,
+      filter_closed = function(picker)
+        picker.opts.pr_filter = picker.opts.pr_filter == "closed" and "open" or "closed"
+        picker.list:set_target()
+        picker:find()
+      end,
+      filter_merged = function(picker)
+        picker.opts.pr_filter = picker.opts.pr_filter == "merged" and "open" or "merged"
+        picker.list:set_target()
+        picker:find()
+      end,
+    },
+    win = {
+      input = {
+        keys = {
+          ["<a-d>"] = { "filter_draft", mode = { "i", "n" } },
+          ["<a-c>"] = { "filter_closed", mode = { "i", "n" } },
+          ["<a-m>"] = { "filter_merged", mode = { "i", "n" } },
+        },
+      },
+    },
+    finder = function(_f_opts, ctx)
+      if not pr_cache then
+        local result = vim
+          .system(
+            { "gh", "pr", "list", "--state", "all", "--limit", "100", "--json", "number,title,body,isDraft,state" },
+            { text = true }
+          )
+          :wait()
+        if result.code ~= 0 then
+          vim.notify("gh pr list failed: " .. (result.stderr or ""), vim.log.levels.ERROR)
+          return {}
+        end
+        local ok, prs = pcall(vim.json.decode, result.stdout)
+        if not ok or not prs then
+          return {}
+        end
+        pr_cache = {}
+        for _, pr in ipairs(prs) do
+          table.insert(pr_cache, {
+            text = "#" .. pr.number .. " " .. pr.title,
+            pr_number = tostring(pr.number),
+            pr_title = pr.title,
+            pr_body = pr.body or "",
+            pr_draft = pr.isDraft,
+            pr_state = pr.state, -- "OPEN", "CLOSED", "MERGED"
+          })
+        end
+      end
+
+      local filter = ctx.picker.opts.pr_filter
+      local items = {}
+      for _, item in ipairs(pr_cache) do
+        local include = (filter == "open" and item.pr_state == "OPEN" and not item.pr_draft)
+          or (filter == "draft" and item.pr_state == "OPEN" and item.pr_draft)
+          or (filter == "closed" and item.pr_state == "CLOSED")
+          or (filter == "merged" and item.pr_state == "MERGED")
+        if include then
+          table.insert(items, item)
+        end
+      end
+      return items
     end,
     confirm = function(picker, item)
       run_picker_system(picker)({ "gh", "pr", "checkout", item.pr_number }, { timeout = 10000 }, function(out)
@@ -70,6 +126,13 @@ function M.pull_requests(opts)
       local res = {}
       table.insert(res, { "#" .. item.pr_number, "Function" })
       table.insert(res, { " " })
+      if item.pr_state == "CLOSED" then
+        table.insert(res, { "[closed] ", "SnacksPickerDimmed" })
+      elseif item.pr_state == "MERGED" then
+        table.insert(res, { "[merged] ", "SnacksPickerDimmed" })
+      elseif item.pr_draft then
+        table.insert(res, { "[draft] ", "SnacksPickerDimmed" })
+      end
       table.insert(res, { item.pr_title })
       return res
     end,
