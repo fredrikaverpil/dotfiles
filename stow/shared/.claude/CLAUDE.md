@@ -72,15 +72,15 @@ Use the "jira-cli" skill.
 
 ## LSP
 
-When tracing where a symbol is defined or finding all references to
-it, use LSP (goToDefinition, findReferences, hover) instead of Grep.
-LSP gives exact results; Grep gives text matches.
+When tracing where a symbol is defined or finding all references to it, use LSP
+(goToDefinition, findReferences, hover) instead of Grep. LSP gives exact
+results; Grep gives text matches.
 
-Use Grep/Glob for discovery (finding files, searching patterns). Use
-LSP for understanding (definitions, references, type info).
+Use Grep/Glob for discovery (finding files, searching patterns). Use LSP for
+understanding (definitions, references, type info).
 
-After locating a file with Grep/Glob, use LSP to navigate within it
-rather than reading the whole file.
+After locating a file with Grep/Glob, use LSP to navigate within it rather than
+reading the whole file.
 
 ## Go
 
@@ -103,3 +103,20 @@ Use the "golang-style" skill.
 
 - Always use `uv` to run Python commands.
 - Prefer `uv` with `pyproject.toml` to define dependencies.
+
+## Terraform
+
+Whenever you review terraform code, always read up on the relevant providers, so
+that you get the whole context and full understanding of how the provider works.
+
+Examples:
+
+- [google](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
+- [google-beta](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs)
+- [auth0](https://registry.terraform.io/providers/auth0/auth0/latest/docs)
+- [openfga](https://registry.terraform.io/providers/openfga/openfga/latest)
+- [incidentio](https://registry.terraform.io/providers/incident-io/incident/latest)
+
+Also make sure you read the documentation for the relevant version, and if not
+the latest version, see if there is reason to upgrade to a newer version due to
+deprecations, missing features etc.
