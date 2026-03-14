@@ -922,6 +922,9 @@ function M.setup_gitsigns_keymaps()
         require("gitsigns").toggle_deleted()
         require("gitsigns").toggle_linehl()
         require("gitsigns").toggle_word_diff()
+
+        -- NOTE: fork: https://github.com/fredrikaverpil/gitsigns.nvim/tree/feat/toggle-inline-preview
+        -- require("gitsigns").toggle_inline_preview(nil, true)
       end,
       desc = "[t]oggle inline diff",
     },
