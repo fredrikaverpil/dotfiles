@@ -1781,4 +1781,14 @@ function M.setup_substitute_keymaps()
   }
 end
 
+function M.setup_oil_keymaps()
+  return {
+    {
+      "<C-->",
+      "<cmd>Oil<cr>",
+      desc = "Oil",
+    },
+  }
+end
+
 return M

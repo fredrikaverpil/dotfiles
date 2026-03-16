@@ -235,6 +235,16 @@ return {
         hl("GitSignsDeleteVirtLn", { fg = colors.blend(palette.bg, palette.rose, 60) })
         hl("GitSignsDeleteVirtLnInLine", { fg = palette.rose, bg = colors.blend(palette.bg, palette.rose, 20) })
 
+        -- Oil git status
+        hl("OilGitAdded", { fg = palette.leaf })
+        hl("OilGitModified", { fg = palette.wood })
+        hl("OilGitRenamed", { fg = palette.blossom })
+        hl("OilGitDeleted", { fg = palette.rose })
+        hl("OilGitCopied", { fg = palette.blossom })
+        hl("OilGitConflict", { fg = palette.rose, bold = true })
+        hl("OilGitUntracked", { fg = palette.water })
+        hl("OilGitIgnored", { fg = colors.blend(palette.bg, palette.fg, 30) })
+
         -- Snacks explorer
         hl("SnacksPickerGitStatusUntracked", { fg = palette.wood })
       end
