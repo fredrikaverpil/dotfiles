@@ -11,19 +11,11 @@ return {
     lazy = false,
     opts = function(_, opts)
       opts = opts or {}
-      opts.keymaps = {} or opts.keymaps
 
-      -- remove, avoid confusion
-      opts.keymaps["<C-h>"] = nil
-
+      opts.keymaps = opts.keymaps or {}
       opts.keymaps["<C-v>"] = { "actions.select", opts = { vertical = true } }
       opts.keymaps["<C-s>"] = { "actions.select", opts = { horizontal = true } }
-      opts.keymaps["<C-r>"] = "actions.refresh"
       opts.keymaps["q"] = { "actions.close", mode = "n" }
-      opts.keymaps["h"] = { "actions.toggle_hidden", mode = "n" }
-      opts.keymaps["s"] = { "actions.change_sort", mode = "n" }
-
-      opts.win_options = { signcolumn = "auto:2" }
       opts.view_options = { show_hidden = true }
       return opts
     end,
@@ -32,7 +24,12 @@ return {
 
   {
     "malewicz1337/oil-git.nvim",
-    dependencies = { "stevearc/oil.nvim" },
+    dependencies = {
+      "stevearc/oil.nvim",
+      opts = {
+        win_options = { signcolumn = "auto:2" },
+      },
+    },
     opts = {
       symbol_position = "signcolumn",
     },
