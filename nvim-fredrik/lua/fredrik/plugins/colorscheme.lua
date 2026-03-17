@@ -200,6 +200,11 @@ return {
           vim.api.nvim_set_hl(0, group, opts)
         end
 
+        -- Ensure cursor contrasts with background when switching light/dark,
+        -- since Ghostty's cursor-color doesn't update dynamically.
+        hl("Cursor", { fg = palette.bg, bg = palette.fg })
+        hl("TermCursor", { fg = palette.bg, bg = palette.fg })
+
         hl("Comment", { fg = colors.blend(palette.bg, palette.fg, 40), italic = true })
         hl("@comment", { link = "Comment" })
 
