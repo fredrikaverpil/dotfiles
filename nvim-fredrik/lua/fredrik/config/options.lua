@@ -58,6 +58,16 @@ vim.opt.termguicolors = true
 -- sign column
 vim.opt.signcolumn = "yes"
 
+-- custom statuscolumn: add space between fold and sign columns
+--
+-- - %C — fold column
+-- -   — a space for breathing room
+-- - %s — sign column
+-- - %= — right-align what follows
+-- - %l — line number
+-- -   — trailing space before code
+vim.opt.statuscolumn = "%C %s%=%l "
+
 -- rounded corners on floating windows
 vim.opt.winborder = "solid"
 
