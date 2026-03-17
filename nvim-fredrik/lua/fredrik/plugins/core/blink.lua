@@ -3,7 +3,7 @@ return {
   {
     "saghen/blink.cmp",
     lazy = false, -- lazy loading handled internally
-    version = "*",
+    version = "1.*",
     dependencies = {
       -- NOTE: https://github.com/Saghen/blink.compat is also available
       "rafamadriz/friendly-snippets",
