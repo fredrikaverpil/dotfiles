@@ -1078,16 +1078,16 @@ function M.setup_codediff_keymaps()
     {
       "<leader>gdp",
       function()
-        local default_branch = require("fredrik.utils.git").get_default_branch()
-        vim.cmd(":CodeDiff " .. default_branch)
+        local merge_base = require("fredrik.utils.git").get_pr_merge_base()
+        vim.cmd(":CodeDiff " .. merge_base)
       end,
-      desc = "Review current PR/branch",
+      desc = "Review current PR (GitHub-style)",
     },
     {
       "<leader>gdP",
       function()
-        local default_branch = require("fredrik.utils.git").get_default_branch()
-        return vim.cmd(":CodeDiff history " .. default_branch .. "...HEAD --reverse")
+        local merge_base = require("fredrik.utils.git").get_pr_merge_base()
+        vim.cmd(":CodeDiff history " .. merge_base .. "...HEAD --reverse")
       end,
       desc = "Review current PR (per commit)",
     },
