@@ -1094,6 +1094,14 @@ function M.setup_codediff_keymaps()
     {
       "<leader>gdc",
       function()
+        require("fredrik.utils.github").pr_comment()
+      end,
+      mode = "v",
+      desc = "Post PR comment",
+    },
+    {
+      "<leader>gdC",
+      function()
         require("fredrik.utils.github").pr_review_comment()
       end,
       mode = "v",
