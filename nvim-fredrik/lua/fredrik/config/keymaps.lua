@@ -1091,6 +1091,14 @@ function M.setup_codediff_keymaps()
       end,
       desc = "Review current PR (per commit)",
     },
+    {
+      "<leader>gdc",
+      function()
+        require("fredrik.utils.github").pr_review_comment()
+      end,
+      mode = "v",
+      desc = "Post PR review comment",
+    },
   }
 end
 
