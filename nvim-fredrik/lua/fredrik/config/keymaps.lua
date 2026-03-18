@@ -1092,6 +1092,13 @@ function M.setup_codediff_keymaps()
       desc = "Review current PR (per commit)",
     },
     {
+      "<leader>gds",
+      function()
+        require("fredrik.utils.github_comments").refresh()
+      end,
+      desc = "Show/refresh PR comment signs",
+    },
+    {
       "<leader>gdc",
       function()
         require("fredrik.utils.github").pr_comment()
