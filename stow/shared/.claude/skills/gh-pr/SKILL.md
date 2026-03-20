@@ -8,6 +8,13 @@ description: Use this skill when creating a GitHub pull request via `gh pr creat
 When creating a pull request, use the `gh` CLI with the following format and
 conventions.
 
+- Always create draft PRs.
+- REMOVE verbosity and blathering from documentation, comments, PR description, commit message, etc.
+- All resources, including names, should be CONCISE and CLEAR.
+- They should contain USEFUL information and nothing more.
+- REMOVE and DEDUPLICATE redundant code, tests, explanations, etc.
+- Explicitness and clarity are GOOD but verbosity, over-explanation, and redundancy is BAD.
+
 ## PR title format
 
 Write the title as if the whole PR was squashed into a single commit using conventional commits.
