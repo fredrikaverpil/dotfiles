@@ -65,6 +65,27 @@ return {
           },
           -- header = read_header("xmas"),
         },
+        sections = {
+          { section = "header" },
+          { section = "keys", gap = 1, padding = 1 },
+          (function()
+            local specs = vim.g.local_lazy_specs
+            if not specs or #specs == 0 then
+              return {}
+            end
+            local lines = {}
+            for _, path in ipairs(specs) do
+              table.insert(lines, "  " .. vim.fn.fnamemodify(path, ":~"))
+            end
+            return {
+              text = table.concat(lines, "\n"),
+              align = "center",
+              hl = "Comment",
+              padding = 1,
+            }
+          end)(),
+          { section = "startup" },
+        },
       },
 
       image = { enabled = true },
