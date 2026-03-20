@@ -21,18 +21,26 @@ return {
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
           vim.list_extend(opts.ensure_installed, { "prettier", "mdformat", "markdown-toc" })
+          opts.pip_extra_packages = opts.pip_extra_packages or {}
+          opts.pip_extra_packages.mdformat = opts.pip_extra_packages.mdformat or {}
+
+          -- better handling of e.g. frontmatter, when using mdformat
+          vim.list_extend(
+            opts.pip_extra_packages.mdformat,
+            { "mdformat-gfm==1.0.0", "mdformat-admon==2.1.1", "mdformat-frontmatter==2.0.10" }
+          )
         end,
       },
     },
     opts = {
-      -- mdformat causes issues with obsidian's frontmatter, so prettier is used instead
       formatters_by_ft = {
         markdown = function(bufnr)
-          local filename = vim.api.nvim_buf_get_name(bufnr)
-          -- Skip formatting for SKILL.md files, so to avoid invalidating Claude skills' frontmatter
-          if filename:match("SKILL%.md$") then
-            return {}
-          end
+          -- local filename = vim.api.nvim_buf_get_name(bufnr)
+          -- example on how to override
+          -- if filename:match("SKILL%.md$") then
+          --   return { "mdformat" }
+          -- end
+
           return { "prettier" }
         end,
       },
