@@ -1,6 +1,9 @@
 ---
 name: gh-pr
-description: Use this skill when creating a GitHub pull request via `gh pr create`. Defines PR body format with Why/What/Notes sections and ensures proper assignment.
+description: >-
+  This skill should be used when creating a GitHub pull request via `gh pr
+  create`. Defines PR body format with Why/What/Notes sections and ensures
+  proper assignment.
 ---
 
 # GitHub Pull Request Creation
@@ -9,15 +12,14 @@ When creating a pull request, use the `gh` CLI with the following format and
 conventions.
 
 - Always create draft PRs.
-- REMOVE verbosity and blathering from documentation, comments, PR description, commit message, etc.
-- All resources, including names, should be CONCISE and CLEAR.
-- They should contain USEFUL information and nothing more.
-- REMOVE and DEDUPLICATE redundant code, tests, explanations, etc.
-- Explicitness and clarity are GOOD but verbosity, over-explanation, and redundancy is BAD.
+- Keep PR titles, descriptions, and comments concise and clear.
+- Include only useful information. Remove redundancy and over-explanation.
+- Prefer explicitness and clarity over verbosity.
 
 ## PR title format
 
-Write the title as if the whole PR was squashed into a single commit using conventional commits.
+Write the title as if the whole PR was squashed into a single commit using
+conventional commits.
 
 ## PR Body Format
 
@@ -38,7 +40,7 @@ Write the title as if the whole PR was squashed into a single commit using conve
 ## Command Template
 
 ```bash
-gh pr create --assignee @me --title "<title>" --body "$(cat <<'EOF'
+gh pr create --draft --assignee @me --title "<title>" --body "$(cat <<'EOF'
 ## Why?
 
 <motivation>
@@ -59,15 +61,14 @@ EOF
 1. Always assign PR to `@me` using `--assignee @me`
 2. `## Why?` - Required. Explain motivation and problem being solved
 3. `## What?` - Required. Describe the changes made
-4. `## Notes` - Optional. Include only if there are additional notes
-5. Omit `## Notes` section entirely if no notes are needed
-6. Use imperative mood in title (e.g., "Add feature" not "Added feature")
-7. Keep title concise and descriptive
+4. `## Notes` - Optional. Omit entirely if no notes are needed
+5. Use imperative mood in title (e.g., "Add feature" not "Added feature")
+6. Keep title concise and descriptive
 
 ## Example
 
 ```bash
-gh pr create --assignee @me --title "Add user authentication" --body "$(cat <<'EOF'
+gh pr create --draft --assignee @me --title "Add user authentication" --body "$(cat <<'EOF'
 ## Why?
 
 Users need secure access to their accounts. Currently there is no

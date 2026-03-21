@@ -1,6 +1,9 @@
 ---
 name: git-commit
-description: Use this skill BEFORE running any git commit command. Triggers when about to run `git commit`. Ensures commit messages follow Conventional Commits specification.
+description: >-
+  This skill should be used BEFORE running any git commit command. Triggers when
+  about to run `git commit`. Ensures commit messages follow Conventional Commits
+  specification.
 ---
 
 # Git Commit Messages
@@ -39,7 +42,8 @@ Write commit messages following the Conventional Commits specification.
 2. Do not end description with a period
 3. Keep description under 72 characters
 4. Separate subject from body with a blank line
-5. Use body to explain what and why, not how
+5. Use the body to explain intent, nuances, gotchas, or background behind the
+   change — not a paraphrase of the diff
 
 ## Breaking Changes
 
@@ -54,3 +58,4 @@ BREAKING CHANGE: The /v1/users endpoint has been removed.
 ## Scope
 
 Optional. Use to specify area of change (e.g., `api`, `ui`, `auth`, `db`).
+
