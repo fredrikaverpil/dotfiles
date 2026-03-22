@@ -88,6 +88,7 @@ return {
     --   vim.notify("Lualine: noice component not loaded", vim.log.levels.WARN)
     -- end
 
+    vim.opt.showmode = false -- lualine already shows the mode
     require("lualine").setup(opts)
   end,
 }
