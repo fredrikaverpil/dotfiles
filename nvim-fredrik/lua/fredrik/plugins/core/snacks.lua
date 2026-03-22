@@ -90,6 +90,8 @@ return {
 
       image = { enabled = true },
 
+      bigfile = { enabled = false }, -- using custom bigfile plugin instead
+
       indent = {
         enabled = false, -- use blink indent instead
         priority = 1,
