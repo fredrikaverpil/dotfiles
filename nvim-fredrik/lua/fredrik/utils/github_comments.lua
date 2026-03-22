@@ -2,6 +2,14 @@ local M = {}
 
 local ns = vim.api.nvim_create_namespace("pr_comments")
 
+local DEBUG = true
+
+local function dbg(fmt, ...)
+  if DEBUG then
+    vim.notify(string.format("[pr_comments] " .. fmt, ...), vim.log.levels.INFO)
+  end
+end
+
 --- Cached PR review comments (raw tables from GitHub API).
 local cached_comments = {}
 local cached_pr_number = nil
@@ -11,8 +19,10 @@ local cached_pr_number = nil
 function M._fetch_comments(callback)
   local pr_number = vim.fn.trim(vim.fn.system("gh pr view --json number --jq .number 2>/dev/null"))
   if vim.v.shell_error ~= 0 or pr_number == "" then
+    dbg("no PR found (shell_error=%d, pr_number='%s')", vim.v.shell_error, pr_number)
     return
   end
+  dbg("fetching comments for PR #%s", pr_number)
 
   local cmd = string.format("gh api repos/{owner}/{repo}/pulls/%s/comments --paginate", pr_number)
   local stdout_chunks = {}
@@ -28,10 +38,12 @@ function M._fetch_comments(callback)
     on_exit = function(_, exit_code)
       vim.schedule(function()
         if exit_code ~= 0 then
+          dbg("gh api exited with code %d", exit_code)
           return
         end
         local raw = table.concat(stdout_chunks, "")
         if raw == "" then
+          dbg("gh api returned empty response")
           cached_comments = {}
           cached_pr_number = pr_number
           callback({})
@@ -39,8 +51,10 @@ function M._fetch_comments(callback)
         end
         local ok, comments = pcall(vim.json.decode, raw)
         if not ok or type(comments) ~= "table" then
+          dbg("JSON decode failed: %s", tostring(comments))
           return
         end
+        dbg("fetched %d comments for PR #%s", #comments, pr_number)
         cached_comments = comments
         cached_pr_number = pr_number
         callback(comments)
@@ -98,6 +112,7 @@ end
 --- @param comments PRComment[]
 function M._place_signs(bufnr, file_path, side, comments)
   if not vim.api.nvim_buf_is_valid(bufnr) then
+    dbg("_place_signs: buffer %d is invalid", bufnr)
     return
   end
 
@@ -107,17 +122,19 @@ function M._place_signs(bufnr, file_path, side, comments)
   local threads = count_threads(comments, file_path)
   local line_count = vim.api.nvim_buf_line_count(bufnr)
 
+  dbg("_place_signs: buf=%d file='%s' side=%s threads=%d line_count=%d", bufnr, file_path, side, vim.tbl_count(threads), line_count)
+
   for key, count in pairs(threads) do
     local line_str, comment_side = key:match("^(%d+):(.+)$")
     if comment_side == side then
       local line = tonumber(line_str)
       if line and line >= 1 and line <= line_count then
-        local text = count > 1 and string.format(" %d", count) or ""
+        local label = count > 1 and string.format("💬%d", count) or "💬"
+        dbg("  extmark: buf=%d line=%d side=%s count=%d", bufnr, line, side, count)
         vim.api.nvim_buf_set_extmark(bufnr, ns, line - 1, 0, {
-          sign_text = "",
+          sign_text = "💬",
           sign_hl_group = "DiagnosticInfo",
-          virt_text = text ~= "" and { { text, "DiagnosticInfo" } } or nil,
-          virt_text_pos = "eol",
+          priority = 1000,
         })
       end
     end
@@ -130,18 +147,22 @@ local function show_signs_for_session(comments)
   local tabpage = vim.api.nvim_get_current_tabpage()
   local ok, lifecycle = pcall(require, "codediff.ui.lifecycle")
   if not ok then
+    dbg("show_signs_for_session: codediff.ui.lifecycle not available")
     return
   end
   local session = lifecycle.get_session(tabpage)
   if not session then
+    dbg("show_signs_for_session: no session for tabpage %d", tabpage)
     return
   end
 
   local file_path = session.original_path or session.modified_path
   if not file_path or file_path == "" then
+    dbg("show_signs_for_session: no file_path in session")
     return
   end
 
+  dbg("show_signs_for_session: file='%s' orig_buf=%s mod_buf=%s comments=%d", file_path, tostring(session.original_bufnr), tostring(session.modified_bufnr), #comments)
   M._place_signs(session.original_bufnr, file_path, "LEFT", comments)
   M._place_signs(session.modified_bufnr, file_path, "RIGHT", comments)
 end
@@ -169,7 +190,20 @@ function M.setup()
     group = group,
     pattern = "CodeDiffOpen",
     callback = function()
+      dbg("autocmd: CodeDiffOpen fired")
       M.refresh()
+    end,
+  })
+
+  -- Show cached comments when a virtual file (git revision) finishes loading.
+  -- CodeDiffOpen fires before async git content is available, so buffers are
+  -- still empty at that point.  This event guarantees the buffer has lines.
+  vim.api.nvim_create_autocmd("User", {
+    group = group,
+    pattern = "CodeDiffVirtualFileLoaded",
+    callback = function()
+      dbg("autocmd: CodeDiffVirtualFileLoaded fired")
+      M.show_cached()
     end,
   })
 
@@ -178,6 +212,7 @@ function M.setup()
     group = group,
     pattern = "CodeDiffFileSelect",
     callback = function()
+      dbg("autocmd: CodeDiffFileSelect fired")
       -- Small delay to let the new buffers load
       vim.defer_fn(function()
         M.show_cached()
