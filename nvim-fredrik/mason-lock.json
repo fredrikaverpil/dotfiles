@@ -38,7 +38,6 @@
   "templ": "v0.3.1001",
   "terraform-ls": "v0.38.5",
   "tflint": "v0.61.0",
-  "trivy": "v0.69.3",
   "ts_query_ls": "v3.16.0",
   "vtsls": "0.3.0",
   "yaml-language-server": "1.21.0",

@@ -27,7 +27,10 @@ return {
         "mason-org/mason.nvim",
         opts = function(_, opts)
           opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "tflint", "trivy" })
+          vim.list_extend(opts.ensure_installed, {
+            "tflint",
+            -- "trivy" , -- WARNING: disabled due to 2026 security incidents
+          })
         end,
       },
     },
@@ -39,12 +42,12 @@ return {
         terraform = {
           "terraform_validate",
           "tflint",
-          "trivy",
+          -- "trivy", -- WARNING: disabled due to 2026 security incidents
         },
         tf = {
           "terraform_validate",
           "tflint",
-          "trivy",
+          -- "trivy", -- WARNING: disabled due to 2026 security incidents
         },
       },
     },
