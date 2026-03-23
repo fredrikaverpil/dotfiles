@@ -86,71 +86,6 @@ return {
 
   -- color schemes
   {
-    -- :h tokyonight.nvim-table-of-contents
-    "folke/tokyonight.nvim",
-    enabled = true,
-    ---@class tokyonight.Config
-    opts = {
-      transparent = false, -- Enable transparency
-      styles = {
-        -- Background styles. Can be "dark", "transparent" or "normal"
-        sidebars = "dark",
-        floats = "dark",
-      },
-      dim_inactive = false, -- dims inactive windows
-    },
-  },
-  {
-    "catppuccin/nvim",
-    enabled = false,
-    name = "catppuccin",
-  },
-  {
-    "rebelot/kanagawa.nvim",
-    enabled = false,
-  },
-  {
-    -- :h nightfox
-    "EdenEast/nightfox.nvim",
-    enabled = false,
-    opts = {
-      options = {
-        styles = {
-          comments = "italic",
-        },
-      },
-    },
-  },
-  {
-    -- :h everforest
-    "sainnhe/everforest",
-    enabled = false,
-    config = function()
-      vim.g.everforest_background = "hard"
-      vim.g.everforest_enable_italic = true
-      -- vim.g.everforest_better_performance = 1
-    end,
-  },
-  {
-    "rose-pine/neovim",
-    enabled = false,
-    name = "rose-pine",
-    opts = {
-      enable = {
-        legacy_highlights = false,
-      },
-      dim_inactive_windows = true,
-    },
-  },
-  {
-    "nendix/zen.nvim",
-    enabled = false,
-  },
-  {
-    "ramojus/mellifluous.nvim",
-    enabled = false,
-  },
-  {
     "zenbones-theme/zenbones.nvim",
     enabled = true,
     config = function()
@@ -265,5 +200,80 @@ return {
       -- Apply immediately if the current scheme matches
       vim.schedule(apply_overrides)
     end,
+  },
+
+  -- other color schemes
+  {
+    -- :h tokyonight.nvim-table-of-contents
+    "folke/tokyonight.nvim",
+    enabled = true, -- extras bundled in this plugin are used by external apps right now
+    ---@class tokyonight.Config
+    opts = {
+      transparent = false, -- Enable transparency
+      styles = {
+        -- Background styles. Can be "dark", "transparent" or "normal"
+        sidebars = "dark",
+        floats = "dark",
+      },
+      dim_inactive = false, -- dims inactive windows
+    },
+  },
+  {
+    "catppuccin/nvim",
+    enabled = false,
+    name = "catppuccin",
+  },
+  {
+    "rebelot/kanagawa.nvim",
+    -- enabled = false,
+  },
+  {
+    -- :h nightfox
+    "EdenEast/nightfox.nvim",
+    enabled = false,
+    opts = {
+      options = {
+        styles = {
+          comments = "italic",
+        },
+      },
+    },
+  },
+  {
+    "rose-pine/neovim",
+    enabled = false,
+    name = "rose-pine",
+    opts = {
+      enable = {
+        legacy_highlights = false,
+      },
+      dim_inactive_windows = true,
+    },
+  },
+  {
+    -- :h everforest
+    "sainnhe/everforest",
+    enabled = false,
+    config = function()
+      vim.g.everforest_background = "hard"
+      vim.g.everforest_enable_italic = true
+      -- vim.g.everforest_better_performance = 1
+    end,
+  },
+  {
+    "nendix/zen.nvim",
+    enabled = false,
+  },
+  {
+    "WTFox/jellybeans.nvim",
+    enabled = false,
+  },
+  {
+    "vague-theme/vague.nvim",
+    enabled = false,
+  },
+  {
+    "webhooked/kanso.nvim",
+    enabled = false,
   },
 }
