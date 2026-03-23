@@ -23,12 +23,11 @@ return {
     virtual = true,
     event = { "BufReadPost", "BufNewFile" },
     config = function()
-      local match_id = nil
-
       local function clear()
-        if match_id then
-          pcall(vim.fn.matchdelete, match_id)
-          match_id = nil
+        local id = vim.w.minicursorword_match_id
+        if id then
+          pcall(vim.fn.matchdelete, id)
+          vim.w.minicursorword_match_id = nil
         end
       end
 
@@ -42,7 +41,8 @@ return {
         if not word:match("^[%w_]+$") then
           return
         end
-        match_id = vim.fn.matchadd("MiniCursorword", "\\<" .. vim.fn.escape(word, "\\") .. "\\>", -1)
+        vim.w.minicursorword_match_id =
+          vim.fn.matchadd("MiniCursorword", "\\<" .. vim.fn.escape(word, "\\") .. "\\>", -1)
       end
 
       vim.api.nvim_set_hl(0, "MiniCursorword", { default = true, underline = true })
