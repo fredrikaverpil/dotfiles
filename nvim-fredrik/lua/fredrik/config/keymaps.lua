@@ -1094,7 +1094,7 @@ function M.setup_codediff_keymaps()
     {
       "<leader>gds",
       function()
-        require("fredrik.utils.github_comments").refresh()
+        require("fredrik.plugins.github_comments").refresh()
       end,
       desc = "Show/refresh PR comment signs",
     },
