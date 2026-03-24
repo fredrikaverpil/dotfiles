@@ -69,8 +69,3 @@ stow --target="$HOME" --restow shared "$(uname -s)"
 
 - [rpi5-homelab](nix/hosts/rpi5-homelab/README.md) - requires custom
   installation procedure
-
-### Non-Nix legacy docs
-
-- [macOS](extras/darwin/README.md)
-- [Windows 11 + WSL](extras/windows/README.md)
