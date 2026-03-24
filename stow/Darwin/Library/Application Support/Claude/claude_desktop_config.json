@@ -2,7 +2,9 @@
   "mcpServers": {},
   "preferences": {
     "menuBarEnabled": false,
-    "coworkScheduledTasksEnabled": false,
-    "sidebarMode": "task"
+    "coworkScheduledTasksEnabled": true,
+    "ccdScheduledTasksEnabled": true,
+    "sidebarMode": "task",
+    "coworkWebSearchEnabled": true
   }
 }

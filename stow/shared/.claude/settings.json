@@ -1,7 +1,8 @@
 {
   "env": {
     "ENABLE_LSP_TOOL": "1",
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_CODE_NEW_INIT": "1"
   },
   "attribution": {
     "commit": "",
@@ -39,7 +40,6 @@
       "mcp__plugin_typescript-lsp_typescript-language-server__*"
     ]
   },
-  "model": "opus",
   "hooks": {
     "Notification": [
       {
@@ -55,7 +55,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "~/code/public/claudeline/claudeline"
+    "command": "~/code/public/claudeline/claudeline -debug"
   },
   "enabledPlugins": {
     "claudeline@claudeline": true,
@@ -69,6 +69,10 @@
     "plugin-dev@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
-    "lua-lsp@claude-plugins-official": true
-  }
+    "lua-lsp@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {},
+  "skipDangerousModePermissionPrompt": true,
+  "model": "opus"
 }
