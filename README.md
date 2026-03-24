@@ -46,7 +46,9 @@ stow --target="$HOME" --restow shared "$(uname -s)"
 
 ## Other READMEs and references
 
-- [Neovim configuration](nvim-fredrik/README.md)
+- Neovim configurations
+  - [My Neovim configuration](nvim-fredrik/README.md)
+  - [Minimalistic configuration](nvim-simple/README.md)
 - Workflows 🌊
   - [Configure git](extras/README_GIT.md)
   - [Configure projects](extras/README_PROJECT.md)
