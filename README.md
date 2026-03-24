@@ -57,6 +57,6 @@ stow --target="$HOME" --restow shared "$(uname -s)"
   - [Maple Mono](https://github.com/subframe7536/maple-font)
   - [Noto Color Emoji](https://fonts.google.com/noto/specimen/Noto+Color+Emoji)
   - [Symbols Nerd Font Mono](https://github.com/ryanoasis/nerd-fonts)
-- Host-specific documentation ❄️
+- Host-specific documentation
   - [rpi5-homelab](nix/hosts/rpi5-homelab/README.md) - requires custom
     installation procedure
