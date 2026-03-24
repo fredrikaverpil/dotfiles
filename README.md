@@ -44,6 +44,19 @@ cd ~/.dotfiles/stow
 stow --target="$HOME" --restow shared "$(uname -s)"
 ```
 
+### Shell
+
+The shell entrypoint is `stow/shared/.zshrc`, which sources
+`stow/shared/.zshrc_user`. The user file loads the shell configuration chain:
+
+1. [`shell/exports.sh`](shell/exports.sh) — PATH, globals, env vars
+2. [`shell/aliases.sh`](shell/aliases.sh) — shell aliases
+3. [`shell/sourcing.sh`](shell/sourcing.sh) — tool initialization, plugins,
+   completions
+
+See [Project config](extras/README_PROJECT.md) for details on shell
+initialization, direnv, and per-project tooling.
+
 ## Other READMEs and references
 
 - Neovim ⌨️
