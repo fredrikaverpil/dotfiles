@@ -46,26 +46,15 @@ stow --target="$HOME" --restow shared "$(uname -s)"
 
 ## Other READMEs and references
 
-### Neovim ⌨️
-
-- [nvim-fredrik](nvim-fredrik/README.md)
-
-### Git 🐙
-
-- [Configure git](extras/README_GIT.md)
-
-### Project config/tooling 🧢
-
-- [Configure projects](extras/README_PROJECT.md)
-
-### Fonts 💯
-
-- [Berkeley Mono](https://berkeleygraphics.com/typefaces/berkeley-mono)
-- [Maple Mono](https://github.com/subframe7536/maple-font)
-- [Noto Color Emoji](https://fonts.google.com/noto/specimen/Noto+Color+Emoji)
-- [Symbols Nerd Font Mono](https://github.com/ryanoasis/nerd-fonts)
-
-### Host-specific documentation
-
-- [rpi5-homelab](nix/hosts/rpi5-homelab/README.md) - requires custom
-  installation procedure
+- [Neovim configuration](nvim-fredrik/README.md)
+- Workflows 🌊
+  - [Configure git](extras/README_GIT.md)
+  - [Configure projects](extras/README_PROJECT.md)
+- Fonts 💯
+  - [Berkeley Mono](https://berkeleygraphics.com/typefaces/berkeley-mono)
+  - [Maple Mono](https://github.com/subframe7536/maple-font)
+  - [Noto Color Emoji](https://fonts.google.com/noto/specimen/Noto+Color+Emoji)
+  - [Symbols Nerd Font Mono](https://github.com/ryanoasis/nerd-fonts)
+- Host-specific documentation ❄️
+  - [rpi5-homelab](nix/hosts/rpi5-homelab/README.md) - requires custom
+    installation procedure
