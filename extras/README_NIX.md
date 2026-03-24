@@ -1,4 +1,4 @@
-# Nix
+# Nix config
 
 ## Installation
 
