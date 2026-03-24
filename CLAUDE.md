@@ -39,7 +39,7 @@ and **GNU Stow** for dotfile symlinking.
 ### Nix Architecture Patterns
 
 - **Mixed stability**: Darwin uses unstable nixpkgs, Linux uses stable (25.05)
-- **Configuration helpers**: Use `lib.mkDarwin` and `lib.mkNixos` functions from
+- **Configuration helpers**: Use `lib.mkDarwin` and `lib.mkRpiNixos` functions from
   `nix/lib/`
 - **Host discovery**: Configurations auto-match hostname from
   `nix/hosts/$HOSTNAME/`

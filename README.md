@@ -20,10 +20,10 @@ symlinking.
 # Rebuild system + packages + dotfiles (reproducible, uses flake.lock)
 ./rebuild.sh
 
-# Update ALL flake inputs + upgrade uv tools + upgrade npm packages
+# Update ALL flake inputs + upgrade uv tools + upgrade bun packages
 ./rebuild.sh --update
 
-# Update unstable inputs + upgrade uv tools + upgrade npm packages
+# Update unstable inputs + upgrade uv tools + upgrade bun packages
 ./rebuild.sh --update-unstable
 
 # Dotfiles only (no Nix rebuild)

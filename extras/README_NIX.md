@@ -56,14 +56,11 @@ sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- sw
 │       │   ├── darwin.nix           # macOS user config
 │       │   └── linux.nix            # Linux user config
 │       ├── overlays/
-│       │   ├── default.nix          # Overlay entry point
-│       │   └── neovim.nix           # Neovim overlay
+│       │   └── default.nix          # Overlay entry point
 │       └── system/
 │           ├── common.nix           # Cross-platform system packages
 │           ├── darwin.nix           # macOS system config + Homebrew
 │           └── linux.nix            # Linux system config
-├── npm-tools/                       # Upgrade script for npm CLI tools installed via bun (macOS only)
-├── uv-tools/                        # Upgrade script for Python CLI tools installed via uv
 ├── nvim-fredrik/                    # Neovim configuration
 ├── shell/                           # Shell configuration
 │   ├── bin/                         # Custom shell scripts
@@ -116,7 +113,7 @@ remain "stable" on e.g. production servers.
 | Component    | macOS Source           | Linux Source    | Rationale                    |
 | ------------ | ---------------------- | --------------- | ---------------------------- |
 | nixpkgs      | nixpkgs-unstable       | nixpkgs (25.05) | macOS: latest, Linux: stable |
-| home-manager | home-manager-unstable  | release-25.05   | macOS: latest, Linux: stable |
+| home-manager | master (unstable)      | release-25.05   | macOS: latest, Linux: stable |
 | nix-darwin   | master (uses unstable) | -               | Always latest features       |
 
 Registry shortcuts:
@@ -138,7 +135,7 @@ By default, `./rebuild.sh` aims to be "reproducible" and uses the locked
 `--update` to update all inputs.
 
 ```sh
-# Update unstable/Darwin-related inputs + upgrade uv tools + upgrade npm packages
+# Update unstable/Darwin-related inputs + upgrade uv tools + upgrade bun packages
 ./rebuild.sh --update-unstable
 # Or manually (flake inputs only): nix flake update nixpkgs-unstable nix-darwin home-manager-unstable dotfiles
 
