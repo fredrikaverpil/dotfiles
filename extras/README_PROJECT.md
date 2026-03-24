@@ -326,6 +326,9 @@ use devenv
 # mise (alternative: `use mise` if nix-direnv stdlib extension is available)
 eval "$(mise activate bash)"
 
+# pkgx (activates dependencies from .pkgx.yml or auto-detected project files)
+source <(pkgx --internal.activate $(realpath .))
+
 # Nix flake (tracked by git) — requires nix-direnv
 use flake
 
