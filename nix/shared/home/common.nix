@@ -94,6 +94,7 @@ in
       coreutils # provides e.g. timout
       curl
       direnv
+      nix-direnv
       eza
       fzf
       git
