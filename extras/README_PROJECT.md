@@ -1,4 +1,6 @@
-# Project configs 🧢
+# Project configs
+
+This page talks about local per-project tooling and configuration.
 
 ## Folders
 
@@ -10,38 +12,101 @@ mkdir -p ~/code/work/public
 mkdir -p ~/code/work/private
 ```
 
+## Shell `cd` overrides
+
+The shell configuration in [`shell/sourcing.sh`](shell/sourcing.sh) overrides
+`cd` (and `z`/`zi`) to automatically activate Python virtual environments when
+entering directories with a `.python-version` or `.venv/`. This works alongside
+direnv — direnv handles Nix shells and env vars, while the `cd` override handles
+venv activation/deactivation.
+
 ## Per-project tooling
 
-### pkgx (legacy)
+### Choosing a tool
+
+|                | **devbox**      | **devenv**          | **Nix flake**             | **mise**                 | **pkgx**           |
+| -------------- | --------------- | ------------------- | ------------------------- | ------------------------ | ------------------ |
+| Config         | JSON            | Nix                 | Nix                       | TOML                     | YAML / auto-detect |
+| Package source | nixpkgs         | nixpkgs             | nixpkgs                   | Upstream binaries        | pkgx.dev pantry    |
+| Nix knowledge  | None            | Some                | Yes                       | None                     | None               |
+| Services       | Via plugins     | Built-in            | Manual                    | No                       | No                 |
+| Task runner    | Scripts         | Built-in            | No                        | Built-in                 | No                 |
+| Speed on `cd`  | Fast            | Fast (with caching) | Slow (without nix-direnv) | Near-instant             | Near-instant       |
+| Nested configs | No (one .envrc) | No (one .envrc)     | No (one .envrc)           | Yes (.mise.toml per dir) | Yes (auto-detect)  |
+| Best for       | Simple Nix envs | Full Nix power      | Full control              | Fast versioning + tasks  | Quick prototyping  |
+
+These tools can be combined — e.g. use devbox/devenv for Nix packages and mise
+for bleeding-edge versions or its task runner.
+
+> [!TIP]
+>
+> **Monorepos with mixed versions:** In a monorepo with e.g. multiple sub
+> projects with different tool versions, pkgx auto-detects the version from
+> lockfiles with zero config. In contrast, mise requires a `.mise.toml` per
+> subdirectory but is explicit. direnv-based tools (devbox, devenv, Nix flake)
+> only trigger per `.envrc`, so they don't handle nested version switching well.
+
+### devbox
+
+[devbox](https://www.jetify.com/devbox) creates isolated dev environments using
+Nix packages, configured via a simple JSON file. No Nix knowledge required.
+
+```bash
+devbox init
+devbox add go_1_24 python@3.12
+```
+
+This creates a `devbox.json`. Search for available packages at
+[nixhub.io](https://www.nixhub.io/).
+
+Enter the environment or run a command inside it:
+
+```bash
+devbox shell            # enter the environment
+devbox run go version   # run a single command
+```
+
+### devenv
+
+[devenv](https://devenv.sh) provides Nix-native dev environments with built-in
+support for languages, services, processes, and containers. Configured via
+`devenv.nix` (requires some Nix knowledge).
+
+```bash
+devenv init
+```
 
 > [!NOTE]
 >
-> Prior to using Nix, I used [`pkgx`](https://docs.pkgx.sh) and I'm currently
-> evaluating working with per-project Nix flakes but will keep this section in
-> here until I have concluded my evaluation.
+> `devenv init` generates a `flake.nix` — don't run it in a project that already
+> has one. Instead, integrate devenv into your existing flake manually.
 
-Use [`pkgx`](https://docs.pkgx.sh) to define project tooling (see `dev`
-command), at least on macOS. This feels faster/simpler sometimes than resorting
-to `flake.nix` (see below).
+Example `devenv.nix`:
 
-In each project, add a `.pkgx.yml` file to define project tooling, unless it is
-not picked up from lockfiles etc.
+```nix
+{ pkgs, ... }:
 
-Note that the shell integration is required and that the `dev` command must be
-used to activate the dev tooling. See more info in the docs:
-[docs.pkgx.sh](https://docs.pkgx.sh)
+{
+  languages.go.enable = true;
+  languages.python.enable = true;
 
-```yaml
-# pkgx.yml
+  services.postgres.enable = true;
 
-dependencies:
-  - go # uses the latest version if no version is specified
-  - python@3.12
+  processes.server.exec = "go run ./cmd/server";
+}
 ```
 
-### Nix flake
+Enter the environment, run tasks, or start services:
 
-If not using pkgx, a `flake.nix` can also set up the project.
+```bash
+devenv shell            # enter the environment
+devenv test             # run tests defined in devenv.nix
+devenv up               # start processes (e.g. postgres, server)
+```
+
+### Nix flake (manual)
+
+A `flake.nix` with `devShells` gives full control without any wrapper tool.
 
 ```nix
 {
@@ -56,36 +121,16 @@ If not using pkgx, a `flake.nix` can also set up the project.
       let
         pkgs = import nixpkgs { inherit system; };
         pkgs-unstable = import nixpkgs-unstable { inherit system; };
-
-        # Override Go to use version 1.25.1 to match go.mod requirement
-        go_1_25_1 = pkgs-unstable.go_1_25.overrideAttrs (oldAttrs: rec {
-          version = "1.25.1";
-          src = pkgs.fetchurl {
-            url = "https://go.dev/dl/go${version}.src.tar.gz";
-            hash = "sha256-0BDBCc7pTYDv5oHqtGvepJGskGv0ZYPDLp8NuwvRpZQ=";
-          };
-        });
-
       in
       {
         devShells.default = pkgs.mkShell {
           packages = [
-            # Use Go from unstable nix packages
-            # pkgs-unstable.go
-
-            # Use Go from override
-            go_1_25_1
-
-            # Add other tools as needed
-            # ...
+            pkgs-unstable.go
           ];
 
           shellHook = ''
-            # Enforce using only the Nix-provided Go version, no auto-downloading
             export GOTOOLCHAIN=local
-
-            # uv supplied via home-manager/neovim
-            echo -e "\033[32m[project-toolchain] $(go version | awk '{print $3}') | $(uv --version)\033[0m"
+            echo -e "\033[32m[project-toolchain] $(go version | awk '{print $3}')\033[0m"
           '';
         };
       }
@@ -93,115 +138,140 @@ If not using pkgx, a `flake.nix` can also set up the project.
 }
 ```
 
-Direnv's `.envrc` must contain an entry for Nix to auto-load the flake when
-entering the directory:
+Enter the environment or run a command inside it:
 
-- Flake tracked by git: `use flake`
-- Flake _not_ tracked by git: `use flake path:./.nix-devshell --impure` and
-  place flake in project's `./nix-devshell/flake.nix`
+```bash
+nix develop             # enter the dev shell
+nix develop -c go version  # run a single command
+```
 
-<details><summary>Nix flake package pinning</summary>
+### mise
 
-To pin specific versions of tools like python or go in your dotfiles'
-`flake.nix`:
+[mise](https://mise.jdx.dev) is a fast (Rust-based) polyglot tool version
+manager and task runner. It downloads tools directly from upstream (not via
+Nix), so new versions are available almost immediately.
 
-**Method 1: Use version-specific packages**
+```toml
+# .mise.toml
+[tools]
+go = "1.24"
+python = "3.12"
+node = "22"
+
+[tasks]
+lint = "golangci-lint run"
+test = "go test ./..."
+```
+
+Install tools and run tasks:
+
+```bash
+mise install            # install tools declared in .mise.toml
+mise run lint           # run a task
+mise exec -- go version # run a command with mise-managed tools
+```
+
+### pkgx
+
+> [!NOTE]
+>
+> pkgx is not available in nixpkgs. On macOS it's installed via Homebrew, on
+> Linux via curl. See
+> [installation docs](https://docs.pkgx.sh/pkgx/installing-pkgx).
+
+[`pkgx`](https://docs.pkgx.sh) auto-detects tools from project files and runs
+them on demand. Add a `.pkgx.yml` to define explicit dependencies:
+
+```yaml
+# .pkgx.yml
+
+dependencies:
+  - go
+  - python@3.12
+```
+
+Run a command with pkgx-managed tools:
+
+```bash
+pkgx go version         # run with auto-detected version
+dev                     # enter an environment with all dependencies
+```
+
+## Nix package pinning
+
+These techniques apply to any Nix-based setup (flake.nix, devenv, devbox with
+custom flakes).
+
+### Use version-specific packages
 
 ```nix
-packages = with inputs.nixpkgs-unstable.legacyPackages.aarch64-darwin; [
-  python311     # Python 3.11
-  python312     # Python 3.12
-  go_1_21       # Go 1.21
-  go_1_22       # Go 1.22
+packages = [
+  pkgs.python311       # Python 3.11
+  pkgs.python312       # Python 3.12
+  pkgs.go_1_21         # Go 1.21
+  pkgs.go_1_22         # Go 1.22
 ];
 ```
 
-**Method 2: Mix stable and unstable packages**
+### Mix stable and unstable packages
 
 ```nix
-devShells.default = pkgs.mkShell {
-  packages = [
-    # From stable
-    pkgs.python311
-
-    # From unstable
-    pkgs-unstable.go_1_23
-    pkgs-unstable.nodejs_22
-  ];
-};
+packages = [
+  pkgs.python311              # From stable
+  pkgs-unstable.go_1_23       # From unstable
+  pkgs-unstable.nodejs_22     # From unstable
+];
 ```
 
-**Method 3: Pin to specific nixpkgs commit**
+### Pin to specific nixpkgs commit
+
+If a specific version isn't available in stable or unstable, find a nixpkgs
+commit that has it. Use [nixpkgs-track](https://nixpkgs-track.kohi.dev/) or
+[Nixhub](https://www.nixhub.io/) to look up which commit introduced a version.
 
 ```nix
 inputs = {
-  nixpkgs-python311.url = "github:NixOS/nixpkgs/commit-hash-with-desired-version";
+  nixpkgs-go126.url = "github:NixOS/nixpkgs/abc123def456";  # has go_1_26
 };
 ```
 
-**Method 4: Access packages from older nixpkgs releases**
-
-Sometimes you need packages that are no longer available in current releases
-(e.g., Python 3.9). Add the older nixpkgs as an input:
+Then import and use it:
 
 ```nix
+let
+  pkgs-go126 = import inputs.nixpkgs-go126 { inherit system; };
+in
 {
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05"; # stable
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable"; # unstable
-    nixpkgs-python39.url = "github:NixOS/nixpkgs/nixos-24.11"; # has Python 3.9
-    flake-utils.url = "github:numtide/flake-utils";
-  };
-
-  outputs =
-    {
-      self,
-      nixpkgs,
-      nixpkgs-unstable,
-      nixpkgs-python39,
-      flake-utils,
-    }:
-    flake-utils.lib.eachDefaultSystem (
-      system:
-      let
-        pkgs = import nixpkgs { inherit system; };
-        pkgs-unstable = import nixpkgs-unstable { inherit system; };
-        pkgs-python39 = import nixpkgs-python39 { inherit system; };
-        python = pkgs-python39.python39;
-      in
-      {
-        devShells.default = pkgs.mkShell {
-          packages = [
-            python
-            (python.withPackages (p: [
-              # Add pip packages here (but likely just use `uv sync` instead)
-              # p.requests
-              # p.numpy
-            ]))
-
-            # Add any other packages you need here
-            pkgs-unstable.go
-            pkgs.ruby
-          ];
-
-          shellHook = ''
-            # uv supplied via home-manager/neovim
-            echo -e "\033[32m[project-toolchain] $(python --version) | $(uv --version)\033[0m"
-
-            # export UV_PYTHON_PREFERENCE="only-system"
-            # export UV_PYTHON=${python}/bin/python
-          '';
-        };
-      }
-    );
+  packages = [ pkgs-go126.go_1_26 ];
 }
 ```
 
-Note that the example also includes an example of how to define pip dependencies
-via Nix. However, the normal use case is to define these in a `pyproject.toml`
-and use `uv sync` to install the virtual environment with these dependencies.
+### Override a package version
 
-**Search for available versions:**
+```nix
+go_1_25_1 = pkgs-unstable.go_1_25.overrideAttrs (oldAttrs: rec {
+  version = "1.25.1";
+  src = pkgs.fetchurl {
+    url = "https://go.dev/dl/go${version}.src.tar.gz";
+    hash = "sha256-0BDBCc7pTYDv5oHqtGvepJGskGv0ZYPDLp8NuwvRpZQ=";
+  };
+});
+```
+
+### Access packages from older nixpkgs releases
+
+Sometimes you need packages no longer available in current releases (e.g.,
+Python 3.9). Add an older nixpkgs as an input:
+
+```nix
+inputs = {
+  nixpkgs-python39.url = "github:NixOS/nixpkgs/nixos-24.11"; # has Python 3.9
+};
+```
+
+Then use `pkgs-python39.python39` in your packages list.
+
+### Search for available versions
 
 - CLI stable: `nix search nixpkgs python3` or `nix search nixpkgs go`
 - CLI unstable: `nix search github:NixOS/nixpkgs/nixpkgs-unstable python3`
@@ -209,51 +279,82 @@ and use `uv sync` to install the virtual environment with these dependencies.
   e.g. "25.05" ↔ "unstable" channel)
 - Browse source: [github.com/NixOS/nixpkgs](https://github.com/NixOS/nixpkgs)
 
-</details>
-
 ## Direnv
 
-Use [direnv](https://direnv.net) to set environment variables dynamically when
-entering a folder.
+[direnv](https://direnv.net) automatically loads/unloads environment variables
+and dev shells when entering/leaving directories.
 
-Add `.envrc` files in strategic locations, like:
+Add `.envrc` files in strategic locations:
 
-- `~/code/work/.envrc`
-- `~/code/work/project/.envrc`
+- `~/code/work/.envrc` — work-wide env vars (gcloud config, etc.)
+- `~/code/work/project/.envrc` — project-specific tooling
 
-Run `direnv allow .` in each location to allow it to execute.
+Run `direnv allow .` in each location to authorize.
 
-### Inherit from parent folder's `.envrc` file
+### Basics
 
-Start the project's `.envrc` file with:
+Inherit from parent folder's `.envrc`:
 
 ```sh
 source_up_if_exists
 ```
 
-### Google Cloud configuration
+### nix-direnv
 
-#### Create configurations
+The `use flake` command in `.envrc` is provided by
+[nix-direnv](https://github.com/nix-community/nix-direnv), not stock direnv. It
+caches the Nix evaluation so that `cd`-ing into a directory is fast after the
+first build. Without nix-direnv, `use flake` would re-evaluate on every shell
+entry.
 
-Add default (personal) and work configs, something like this (replace `work`
-with actual company name):
+nix-direnv is installed via home-manager in this dotfiles repo. If it's missing,
+`use flake` in `.envrc` will fail with an unknown command error.
+
+### Direnv with per-project tools
+
+Each tool has its own direnv integration. Add the relevant line to your
+`.envrc`:
+
+```sh
+# devbox
+eval "$(devbox generate direnv --print-envrc)"
+
+# devenv
+eval "$(devenv direnvrc)"
+use devenv
+
+# mise (alternative: `use mise` if nix-direnv stdlib extension is available)
+eval "$(mise activate bash)"
+
+# Nix flake (tracked by git) — requires nix-direnv
+use flake
+
+# Nix flake (not tracked by git, e.g. in ./nix-devshell/) — requires nix-direnv
+use flake path:./.nix-devshell --impure
+```
+
+> [!IMPORTANT]
+>
+> After editing any `.envrc`, you must re-run `direnv allow .` to authorize the
+> changes. Direnv blocks modified `.envrc` files until explicitly re-allowed.
+
+These can be combined — e.g. devbox for Nix packages + mise for tasks:
+
+```sh
+source_up_if_exists
+eval "$(devbox generate direnv --print-envrc)"
+eval "$(mise activate bash)"
+```
+
+### Environment variables
+
+#### Google Cloud configuration
+
+Create default (personal) and work configs:
 
 ```bash
-gcloud config configurations list
-
-# personal
 gcloud config configurations create default
-gcloud config configurations activate default
-cat ~/.config/gcloud/configurations/config_default  # review
-
-# work
-gcloud config configurations list
 gcloud config configurations create work
-gcloud config configurations activate work
-cat ~/.config/gcloud/configurations/config_work  # review
-
-# set active by default
-gcloud config set account my@email.com
 ```
 
 The configs should look something like this:
@@ -264,35 +365,24 @@ disable_usage_reporting = False
 account = my@email.com
 ```
 
-Then use `.envrc` file in `~/code/work/.envrc` to automatically switch from
-default/personal account to work account:
+Switch configs automatically via `.envrc` (e.g. in `~/code/work/.envrc`):
 
 ```sh
 export CLOUDSDK_ACTIVE_CONFIG_NAME="work"
-```
-
-#### Set active gcloud configuration using direnv
-
-Add as needed to `.envrc`, per project or in a top-level work folder, or a mix:
-
-```sh
-export CLOUDSDK_ACTIVE_CONFIG_NAME="name-of-config"
 export CLOUDSDK_CORE_PROJECT="name-of-gcp-project"
 export CLOUDSDK_COMPUTE_REGION="europe-west1"
 export CLOUDSDK_COMPUTE_ZONE="europe-west1-b"
 ```
 
-### Connection string for `cloud-sql-proxy`
+#### Connection strings
 
-Add something like this so to enable `cloud-sql-proxy $DB1`:
+For `cloud-sql-proxy $DB1`:
 
 ```sh
 export DB1="$CLOUDSDK_CORE_PROJECT:$CLOUDSDK_COMPUTE_REGION:$GCE_DATABASE_INSTANCE_1"
 ```
 
-### Connection string for `psql`
-
-Add something like this to enable `psql --expanded $PGCONN -f query.sql`:
+For `psql --expanded $PGCONN -f query.sql`:
 
 ```sh
 export PGDRIVER="postgresql://"
@@ -303,7 +393,7 @@ export DB_USER="postgres"
 export DB_PASS="secret"
 export PGFLAGS="?sslmode=disable"
 
-export PGCONN="$PGDRIVER$DB_USER:$DB_USER@$PGHOST:$PGPORT/$GCE_DATABASE_NAME$PGFLAGS"
+export PGCONN="$PGDRIVER$DB_USER:$DB_PASS@$PGHOST:$PGPORT/$GCE_DATABASE_NAME$PGFLAGS"
 ```
 
 ## LLM setup
