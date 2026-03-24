@@ -44,11 +44,25 @@ return {
         for pkg_name, extra_pkgs in pairs(pip_extra_packages) do
           local ok, pkg = pcall(registry.get_package, pkg_name)
           if ok then
+            local install_path = InstallLocation.global():package(pkg_name)
+            local pip_bin = install_path .. "/venv/bin/pip"
+
+            -- Install extra packages on future (re)installs.
             pkg:on("install:success", function()
-              local install_path = InstallLocation.global():package(pkg_name)
-              local cmd = vim.list_extend({ install_path .. "/venv/bin/pip", "install" }, extra_pkgs)
-              vim.fn.jobstart(cmd, { detach = true })
+              vim.schedule(function()
+                local cmd = vim.list_extend({ pip_bin, "install" }, extra_pkgs)
+                vim.notify(vim.inspect(cmd))
+                vim.fn.jobstart(cmd, { detach = true })
+              end)
             end)
+
+            -- If already installed, ensure extra packages are present now.
+            if pkg:is_installed() and vim.fn.executable(pip_bin) == 1 then
+              vim.schedule(function()
+                local cmd = vim.list_extend({ pip_bin, "install" }, extra_pkgs)
+                vim.fn.jobstart(cmd, { detach = true })
+              end)
+            end
           end
         end
 
