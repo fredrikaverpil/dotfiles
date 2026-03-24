@@ -47,11 +47,11 @@ stow --target="$HOME" --restow shared "$(uname -s)"
 ## Other READMEs and references
 
 - Neovim ⌨️
-  - [My Neovim configuration](nvim-fredrik/README.md)
-  - [Minimalistic configuration](nvim-simple/README.md)
+  - [My Neovim config](nvim-fredrik/README.md)
+  - [Minimalistic config](nvim-simple/README.md)
 - Workflows 🌊
-  - [Configure git](extras/README_GIT.md)
-  - [Configure projects](extras/README_PROJECT.md)
+  - [Git config](extras/README_GIT.md)
+  - [Project config](extras/README_PROJECT.md)
 - Fonts 💯
   - [Berkeley Mono](https://berkeleygraphics.com/typefaces/berkeley-mono)
   - [Maple Mono](https://github.com/subframe7536/maple-font)

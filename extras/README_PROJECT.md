@@ -1,4 +1,4 @@
-# Project configs
+# Project config
 
 This page talks about local per-project tooling and configuration.
 
