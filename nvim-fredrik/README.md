@@ -8,7 +8,7 @@
   [LazyVim](https://github.com/LazyVim/LazyVim), but with the tranquility of
   maintaining it myself.
 - Per-language configs.
-- Per-project overrides.
+- Per-project overrides (`.lazy.lua` files discovered from `cwd` up to `$HOME`).
 - Native LSP definitions (`vim.lsp.config` and `vim.lsp.enable`).
 - Native snippets.
 - Native vim folding, using LSP when applicable.
