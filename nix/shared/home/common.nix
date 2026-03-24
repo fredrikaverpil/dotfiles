@@ -128,6 +128,7 @@ in
 
       # Generic development
       devbox
+      devenv
       dust
       fd
       gnumake
