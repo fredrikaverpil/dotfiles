@@ -178,16 +178,16 @@ export PGCONN="$PGDRIVER$DB_USER:$DB_PASS@$PGHOST:$PGPORT/$GCE_DATABASE_NAME$PGF
 
 ### Choosing a tool
 
-|                | **devbox**      | **devenv**          | **Nix flake**             | **mise**                 | **pkgx**           | **pocket**                  |
-| -------------- | --------------- | ------------------- | ------------------------- | ------------------------ | ------------------ | --------------------------- |
-| Config         | JSON            | Nix                 | Nix                       | TOML                     | YAML / auto-detect | Go                          |
-| Package source | nixpkgs         | nixpkgs             | nixpkgs                   | Upstream binaries        | pkgx.dev pantry    | Go modules                  |
-| Nix knowledge  | None            | Some                | Yes                       | None                     | None               | None                        |
-| Services       | Via plugins     | Built-in            | Manual                    | No                       | No                 | No                          |
-| Task runner    | Scripts         | Built-in            | No                        | Built-in                 | No                 | Built-in                    |
-| Speed on `cd`  | Fast            | Fast (with caching) | Slow (without nix-direnv) | Near-instant             | Near-instant       | N/A                         |
-| Nested configs | No (one .envrc) | No (one .envrc)     | No (one .envrc)           | Yes (.mise.toml per dir) | Yes (auto-detect)  | Yes (per dir via shims)     |
-| Best for       | Simple Nix envs | Full Nix power      | Full control              | Fast versioning + tasks  | Quick prototyping  | Go-based task runner + deps |
+|                | **devbox**      | **devenv**          | **Nix flake**             | **mise**                 | **pkgx**           | **pocket**                     |
+| -------------- | --------------- | ------------------- | ------------------------- | ------------------------ | ------------------ | ------------------------------ |
+| Config         | JSON            | Nix                 | Nix                       | TOML                     | YAML / auto-detect | Go                             |
+| Package source | nixpkgs         | nixpkgs             | nixpkgs                   | Upstream binaries        | pkgx.dev pantry    | Go modules                     |
+| Nix knowledge  | None            | Some                | Yes                       | None                     | None               | None                           |
+| Services       | Via plugins     | Built-in            | Manual                    | No                       | No                 | No                             |
+| Task runner    | Scripts         | Built-in            | No                        | Built-in                 | No                 | Built-in                       |
+| Speed on `cd`  | Fast            | Fast (with caching) | Slow (without nix-direnv) | Near-instant             | Near-instant       | N/A                            |
+| Nested configs | No (one .envrc) | No (one .envrc)     | No (one .envrc)           | Yes (.mise.toml per dir) | Yes (auto-detect)  | Yes (per dir via shims)        |
+| Best for       | Simple Nix envs | Full Nix power      | Full control              | Fast versioning + tasks  | Quick prototyping  | Custom registry of tasks/tools |
 
 These tools can be combined — e.g. use devbox/devenv for Nix packages and mise
 for bleeding-edge versions or its task runner.
