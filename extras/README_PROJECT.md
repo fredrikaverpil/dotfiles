@@ -2,7 +2,7 @@
 
 This page talks about local per-project tooling and configuration.
 
-## Folders
+## Workspace layout and tooling layers
 
 Workflow takes folder path into consideration when e.g. enabling LLMs etc.
 
@@ -12,13 +12,65 @@ mkdir -p ~/code/work/public
 mkdir -p ~/code/work/private
 ```
 
-## Shell `cd` overrides
+Tools become available in layers, each building on the previous one:
 
-The shell configuration in [`shell/sourcing.sh`](shell/sourcing.sh) overrides
-`cd` (and `z`/`zi`) to automatically activate Python virtual environments when
-entering directories with a `.python-version` or `.venv/`. This works alongside
-direnv — direnv handles Nix shells and env vars, while the `cd` override handles
-venv activation/deactivation.
+```
+Nix system        System-level packages (nix-darwin / NixOS)
+    ↓
+Nix home          User packages via home-manager (sessionPath, hm-session-vars)
+    ↓
+Shell init        .zshrc → exports.sh → aliases.sh → sourcing.sh
+    ↓
+direnv (.envrc)   Per-directory env vars, Nix dev shells, tool activation
+    ↓
+Project tools     nix / devbox / devenv / mise / pkgx — project-specific CLI versions
+    ↓
+Editor (Neovim)   Mason — LSPs, linters, formatters, debug adapters
+```
+
+Later layers override earlier ones. For example, a project's `.envrc` can
+activate a Nix dev shell that shadows a home-manager-installed Go with a
+project-pinned version, and Mason's `PATH = "append"` ensures those
+project-local tools take precedence inside Neovim too.
+
+### Shell initialization
+
+The shell startup chain is:
+
+1. **`.zshrc`** → sources `.zshrc_user`
+2. **[`exports.sh`](shell/exports.sh)** — PATH construction, Homebrew shellenv,
+   `$DOTFILES` and other globals, home-manager session vars, `~/.shell/.env`
+3. **[`aliases.sh`](shell/aliases.sh)** — shell aliases
+4. **[`sourcing.sh`](shell/sourcing.sh)** — Nix daemon, tool initialization
+   (atuin, direnv, zoxide, starship, fzf), zsh completions/plugins, and `cd`
+   overrides
+
+The `cd` override (and `z`/`zi`) automatically activates Python virtual
+environments when entering directories with a `.python-version` or `.venv/`.
+This works alongside direnv — direnv handles Nix shells and env vars, while the
+`cd` override handles behaviors that would be too cumbersome to maintain in
+scattered `.envrc` files across every project. Some things are simply easier to
+handle centrally in one place.
+
+### Editor tooling (Neovim)
+
+LSPs, linters, formatters, and debug adapters used inside Neovim are managed by
+[Mason](https://github.com/mason-org/mason.nvim), configured in
+[`nvim-fredrik/lua/fredrik/plugins/core/mason.lua`](nvim-fredrik/lua/fredrik/plugins/core/mason.lua).
+Mason installs tools into its own isolated location
+(`~/.local/share/nvim-fredrik/mason/bin/`), separate from the shell environment.
+
+Mason's `PATH` is set to `"append"`, meaning project-local tools (from Nix,
+mise, etc.) take precedence over Mason-installed versions. This lets per-project
+tooling override editor defaults automatically.
+
+Per-language tool declarations (which LSPs, formatters, linters to install) live
+in `nvim-fredrik/lua/fredrik/plugins/lang/*.lua` — e.g. `go.lua`, `python.lua`,
+`typescript.lua`. Many Neovim plugins expect specific tooling (e.g. a formatter plugin needs the
+formatter binary). Each plugin spec declares which Mason packages it needs — on
+startup, Mason automatically downloads and installs any missing tools. This means
+adding a new language setup is just a matter of writing the plugin spec; opening
+Neovim takes care of the rest.
 
 ## Per-project tooling
 
