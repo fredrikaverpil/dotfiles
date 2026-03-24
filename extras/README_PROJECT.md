@@ -52,25 +52,127 @@ This works alongside direnv — direnv handles Nix shells and env vars, while th
 scattered `.envrc` files across every project. Some things are simply easier to
 handle centrally in one place.
 
-### Editor tooling (Neovim)
+## Direnv
 
-LSPs, linters, formatters, and debug adapters used inside Neovim are managed by
-[Mason](https://github.com/mason-org/mason.nvim), configured in
-[`nvim-fredrik/lua/fredrik/plugins/core/mason.lua`](nvim-fredrik/lua/fredrik/plugins/core/mason.lua).
-Mason installs tools into its own isolated location
-(`~/.local/share/nvim-fredrik/mason/bin/`), separate from the shell environment.
+[direnv](https://direnv.net) automatically loads/unloads environment variables
+and dev shells when entering/leaving directories.
 
-Mason's `PATH` is set to `"append"`, meaning project-local tools (from Nix,
-mise, etc.) take precedence over Mason-installed versions. This lets per-project
-tooling override editor defaults automatically.
+Add `.envrc` files in strategic locations:
 
-Per-language tool declarations (which LSPs, formatters, linters to install) live
-in `nvim-fredrik/lua/fredrik/plugins/lang/*.lua` — e.g. `go.lua`, `python.lua`,
-`typescript.lua`. Many Neovim plugins expect specific tooling (e.g. a formatter plugin needs the
-formatter binary). Each plugin spec declares which Mason packages it needs — on
-startup, Mason automatically downloads and installs any missing tools. This means
-adding a new language setup is just a matter of writing the plugin spec; opening
-Neovim takes care of the rest.
+- `~/code/work/.envrc` — work-wide env vars (gcloud config, etc.)
+- `~/code/work/project/.envrc` — project-specific tooling
+
+Run `direnv allow .` in each location to authorize.
+
+### Basics
+
+Inherit from parent folder's `.envrc`:
+
+```sh
+source_up_if_exists
+```
+
+### Direnv with per-project tools
+
+Each tool described in the [Per-project tooling](#per-project-tooling) section
+below has its own direnv integration. Add the relevant line to your `.envrc`:
+
+```sh
+# devbox
+eval "$(devbox generate direnv --print-envrc)"
+
+# devenv
+eval "$(devenv direnvrc)"
+use devenv
+
+# mise (alternative: `use mise` if nix-direnv stdlib extension is available)
+eval "$(mise activate bash)"
+
+# pkgx (activates dependencies from .pkgx.yml or auto-detected project files)
+source <(pkgx --internal.activate $(realpath .))
+
+# Nix flake (tracked by git) — requires nix-direnv
+use flake
+
+# Nix flake (not tracked by git, e.g. in ./nix-devshell/) — requires nix-direnv
+use flake path:./.nix-devshell --impure
+```
+
+> [!IMPORTANT]
+>
+> After editing any `.envrc`, you must re-run `direnv allow .` to authorize the
+> changes. Direnv blocks modified `.envrc` files until explicitly re-allowed.
+
+> [!NOTE]
+>
+> The `use flake` command in `.envrc` is provided by
+> [nix-direnv](https://github.com/nix-community/nix-direnv), not stock direnv.
+> It caches the Nix evaluation so that `cd`-ing into a directory is fast after
+> the first build. Without nix-direnv, `use flake` would re-evaluate on every
+> shell entry. nix-direnv is installed via home-manager in this dotfiles repo.
+> If it's missing, `use flake` in `.envrc` will fail with an unknown command
+> error.
+
+#### Combining tools
+
+These integrations can be combined — e.g. devbox for Nix packages + mise for
+tasks or bleeding edge tool versions:
+
+```sh
+source_up_if_exists
+eval "$(devbox generate direnv --print-envrc)"
+eval "$(mise activate bash)"
+```
+
+### Environment variables
+
+#### Google Cloud configuration
+
+Create default (personal) and work configs:
+
+```bash
+gcloud config configurations create default
+gcloud config configurations create work
+```
+
+The configs should look something like this:
+
+```sh
+[core]
+disable_usage_reporting = False
+account = my@email.com
+```
+
+Switch configs automatically via `.envrc` (e.g. in `~/code/work/.envrc`):
+
+```sh
+export CLOUDSDK_ACTIVE_CONFIG_NAME="work"
+export CLOUDSDK_CORE_PROJECT="name-of-gcp-project"
+export CLOUDSDK_COMPUTE_REGION="europe-west1"
+export CLOUDSDK_COMPUTE_ZONE="europe-west1-b"
+```
+
+#### Connection strings
+
+For `cloud-sql-proxy $DB1`:
+
+```sh
+export DB1="$CLOUDSDK_CORE_PROJECT:$CLOUDSDK_COMPUTE_REGION:$GCE_DATABASE_INSTANCE_1"
+```
+
+For `psql --expanded $PGCONN -f query.sql`:
+
+```sh
+export PGDRIVER="postgresql://"
+export PGHOST="127.0.0.1"
+export PGPORT="5432"
+export GCE_DATABASE_NAME="db"
+export DB_USER="postgres"
+export DB_PASS="secret"
+export PGFLAGS="?sslmode=disable"
+
+export PGCONN="$PGDRIVER$DB_USER:$DB_PASS@$PGHOST:$PGPORT/$GCE_DATABASE_NAME$PGFLAGS"
+```
 
 ## Per-project tooling
 
@@ -331,125 +433,25 @@ Then use `pkgs-python39.python39` in your packages list.
   e.g. "25.05" ↔ "unstable" channel)
 - Browse source: [github.com/NixOS/nixpkgs](https://github.com/NixOS/nixpkgs)
 
-## Direnv
+## Editor tooling (Neovim)
 
-[direnv](https://direnv.net) automatically loads/unloads environment variables
-and dev shells when entering/leaving directories.
+LSPs, linters, formatters, and debug adapters used inside Neovim are managed by
+[Mason](https://github.com/mason-org/mason.nvim), configured in
+[`nvim-fredrik/lua/fredrik/plugins/core/mason.lua`](nvim-fredrik/lua/fredrik/plugins/core/mason.lua).
+Mason installs tools into its own isolated location
+(`~/.local/share/nvim-fredrik/mason/bin/`), separate from the shell environment.
 
-Add `.envrc` files in strategic locations:
+Mason's `PATH` is set to `"append"`, meaning project-local tools (from Nix,
+mise, etc.) take precedence over Mason-installed versions. This lets per-project
+tooling override editor defaults automatically.
 
-- `~/code/work/.envrc` — work-wide env vars (gcloud config, etc.)
-- `~/code/work/project/.envrc` — project-specific tooling
-
-Run `direnv allow .` in each location to authorize.
-
-### Basics
-
-Inherit from parent folder's `.envrc`:
-
-```sh
-source_up_if_exists
-```
-
-### nix-direnv
-
-The `use flake` command in `.envrc` is provided by
-[nix-direnv](https://github.com/nix-community/nix-direnv), not stock direnv. It
-caches the Nix evaluation so that `cd`-ing into a directory is fast after the
-first build. Without nix-direnv, `use flake` would re-evaluate on every shell
-entry.
-
-nix-direnv is installed via home-manager in this dotfiles repo. If it's missing,
-`use flake` in `.envrc` will fail with an unknown command error.
-
-### Direnv with per-project tools
-
-Each tool has its own direnv integration. Add the relevant line to your
-`.envrc`:
-
-```sh
-# devbox
-eval "$(devbox generate direnv --print-envrc)"
-
-# devenv
-eval "$(devenv direnvrc)"
-use devenv
-
-# mise (alternative: `use mise` if nix-direnv stdlib extension is available)
-eval "$(mise activate bash)"
-
-# pkgx (activates dependencies from .pkgx.yml or auto-detected project files)
-source <(pkgx --internal.activate $(realpath .))
-
-# Nix flake (tracked by git) — requires nix-direnv
-use flake
-
-# Nix flake (not tracked by git, e.g. in ./nix-devshell/) — requires nix-direnv
-use flake path:./.nix-devshell --impure
-```
-
-> [!IMPORTANT]
->
-> After editing any `.envrc`, you must re-run `direnv allow .` to authorize the
-> changes. Direnv blocks modified `.envrc` files until explicitly re-allowed.
-
-These can be combined — e.g. devbox for Nix packages + mise for tasks:
-
-```sh
-source_up_if_exists
-eval "$(devbox generate direnv --print-envrc)"
-eval "$(mise activate bash)"
-```
-
-### Environment variables
-
-#### Google Cloud configuration
-
-Create default (personal) and work configs:
-
-```bash
-gcloud config configurations create default
-gcloud config configurations create work
-```
-
-The configs should look something like this:
-
-```sh
-[core]
-disable_usage_reporting = False
-account = my@email.com
-```
-
-Switch configs automatically via `.envrc` (e.g. in `~/code/work/.envrc`):
-
-```sh
-export CLOUDSDK_ACTIVE_CONFIG_NAME="work"
-export CLOUDSDK_CORE_PROJECT="name-of-gcp-project"
-export CLOUDSDK_COMPUTE_REGION="europe-west1"
-export CLOUDSDK_COMPUTE_ZONE="europe-west1-b"
-```
-
-#### Connection strings
-
-For `cloud-sql-proxy $DB1`:
-
-```sh
-export DB1="$CLOUDSDK_CORE_PROJECT:$CLOUDSDK_COMPUTE_REGION:$GCE_DATABASE_INSTANCE_1"
-```
-
-For `psql --expanded $PGCONN -f query.sql`:
-
-```sh
-export PGDRIVER="postgresql://"
-export PGHOST="127.0.0.1"
-export PGPORT="5432"
-export GCE_DATABASE_NAME="db"
-export DB_USER="postgres"
-export DB_PASS="secret"
-export PGFLAGS="?sslmode=disable"
-
-export PGCONN="$PGDRIVER$DB_USER:$DB_PASS@$PGHOST:$PGPORT/$GCE_DATABASE_NAME$PGFLAGS"
-```
+Per-language tool declarations (which LSPs, formatters, linters to install) live
+in `nvim-fredrik/lua/fredrik/plugins/lang/*.lua` — e.g. `go.lua`, `python.lua`,
+`typescript.lua`. Many Neovim plugins expect specific tooling (e.g. a formatter
+plugin needs the formatter binary). Each plugin spec declares which Mason
+packages it needs — on startup, Mason automatically downloads and installs any
+missing tools. This means adding a new language setup is just a matter of
+writing the plugin spec; opening Neovim takes care of the rest.
 
 ## LLM setup
 
