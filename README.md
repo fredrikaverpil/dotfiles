@@ -12,7 +12,7 @@ symlinking.
 
 > [!NOTE]
 >
-> - This requires having installed Nix. See
+> - This requires having Nix installed. See
 >   [the Nix README](extras/README_NIX.md).
 > - The `flake.nix` is designed to set up the machine based on its hostname.
 
