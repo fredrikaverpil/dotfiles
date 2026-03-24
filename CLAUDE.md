@@ -32,6 +32,8 @@ and **GNU Stow** for dotfile symlinking.
   - `shared/`: Cross-platform dotfiles
   - `Darwin/`: macOS-specific dotfiles
   - `Linux/`: Linux-specific dotfiles
+- `extras/`: One-off platform-specific extras, legacy configs, and additional
+  READMEs
 - `nvim-fredrik/`: Complete Neovim configuration with modular per-language setup
 - `shell/`: Shell configuration, aliases, and custom scripts
 - `flake.nix`: Main Nix flake defining system configurations and package sources
@@ -65,7 +67,6 @@ Example locations:
 
 - Cross-platform: `nix/shared/home/common.nix`
 - macOS-only: `nix/shared/home/darwin.nix`
-- Linux-only: `nix/shared/home/linux.nix`
 - User-specific: `nix/hosts/{hostname}/users/{username}.nix`
 
 ### Package-Managed Tools (npm and Python)
