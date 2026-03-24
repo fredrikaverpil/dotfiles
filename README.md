@@ -49,7 +49,8 @@ stow --target="$HOME" --restow shared "$(uname -s)"
 The shell entrypoint is `stow/shared/.zshrc`, which sources
 `stow/shared/.zshrc_user`. The user file loads the shell configuration chain:
 
-1. [`shell/exports.sh`](shell/exports.sh) — PATH, globals, env vars
+1. [`shell/exports.sh`](shell/exports.sh) — PATH (including
+   [`shell/bin/`](shell/bin/) utils), globals, env vars
 2. [`shell/aliases.sh`](shell/aliases.sh) — shell aliases
 3. [`shell/sourcing.sh`](shell/sourcing.sh) — tool initialization, plugins,
    completions
