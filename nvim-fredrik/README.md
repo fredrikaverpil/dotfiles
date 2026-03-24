@@ -9,12 +9,10 @@
   maintaining it myself.
 - Per-language configs.
 - Per-project overrides.
-- Notion of public vs private projects; GitHub Copilot enabled in public
-  projects, disabled in private projects.
 - Native LSP definitions (`vim.lsp.config` and `vim.lsp.enable`).
 - Native snippets.
 - Native vim folding, using LSP when applicable.
-- Snacks/telescope pickers for certain files, grepping etc.
+- Snacks pickers.
 - Inline image link rendering (kitty graphics protocol).
 - Blink.cmp for completion.
 - One unified keymap file.
@@ -23,11 +21,9 @@
 - Neotest and nvim-dap for testing and debugging.
 - Snacks.nvim for QoL improvements.
 - Mason for managing tools used by plugins and LSPs.
-- Noice.nvim for cmdline improvement.
-- Trouble.nvim for keeping track of diagnostics issues.
 - Gx.nvim for universal `gx` keymap.
-- Diffview for reviewing PRs.
-- AI via opencode, GitHub Copilot.
+- CodeDiff.nvim for reviewing PRs.
+- Sidekick.nvim for interacting with e.g. Claude Code.
 - And much, much more...
 
 ## Try it out! 🚀
