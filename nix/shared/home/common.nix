@@ -129,6 +129,7 @@ in
       # Generic development
       devbox
       devenv
+      mise
       dust
       fd
       gnumake
