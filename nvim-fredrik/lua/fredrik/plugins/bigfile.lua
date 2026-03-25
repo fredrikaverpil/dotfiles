@@ -14,21 +14,21 @@
 --
 --   2. Snacks only checks file size and average line length. It misses files
 --      where individual lines are extremely long (e.g. log files with embedded
---      JSON). This plugin adds a max_line_length check that samples the first
+--      JSON). This plugin adds a long_line_length check that samples the first
 --      N lines for any single line exceeding the threshold.
 --
 -- Detection: sets filetype to "bigfile" when any of these triggers:
 --   1. "size"            — file size exceeds `size` bytes
---   2. "line_length"     — average line length exceeds `line_length` characters
---   3. "max_line_length" — any single line in first `sample_lines` exceeds `max_line_length`
+--   2. "avg_line_length"     — average line length exceeds `avg_line_length` characters
+--   3. "long_line_length" — at least `long_line_count` lines in first `sample_lines` exceed `long_line_length`
 --
 -- What gets disabled depends on which criteria triggered (in default setup):
 --   - Always: completion, swapfile, undofile, foldmethod, statuscolumn, conceallevel
---   - "size" or "line_length": also syntax and treesitter (unless ft is in keep_highlighting)
---   - "max_line_length" only: keeps syntax and treesitter (most lines are fine,
---     only a few are long — disabling syntax for the whole buffer is overkill)
+--   - "size" or "avg_line_length": also syntax and treesitter (unless ft is in keep_highlighting)
+--   - "long_line_length" only: keeps syntax and treesitter (many lines are long,
+--     but not enough to warrant disabling syntax for the whole buffer)
 
----@alias bigfile.Reason "size"|"line_length"|"max_line_length"
+---@alias bigfile.Reason "size"|"avg_line_length"|"long_line_length"
 
 ---@class bigfile.Ctx
 ---@field buf number
@@ -37,18 +37,20 @@
 
 ---@class bigfile.Opts
 ---@field size number file size threshold in bytes
----@field line_length number average line length threshold
----@field max_line_length number max single line length threshold (0 to disable)
----@field sample_lines number how many lines to sample for max_line_length
+---@field avg_line_length number average line length threshold
+---@field long_line_length number max single line length threshold (0 to disable)
+---@field long_line_count number minimum number of long lines required to trigger long_line_length
+---@field sample_lines number how many lines to sample for long_line_length
 ---@field notify boolean show notification when bigfile detected
----@field keep_highlighting string[] filetypes where syntax is kept even for size/line_length
+---@field keep_highlighting string[] filetypes where syntax is kept even for size/avg_line_length
 ---@field setup fun(ctx: bigfile.Ctx) called when a bigfile is detected
 
 ---@type bigfile.Opts
 local defaults = {
   size = 1024 * 1024, -- 1MB
-  line_length = 500,
-  max_line_length = 1000,
+  avg_line_length = 500,
+  long_line_length = 1000,
+  long_line_count = 50,
   sample_lines = 500,
   notify = true,
   keep_highlighting = { "json", "yaml", "xml" },
@@ -80,15 +82,19 @@ local function detect(path, buf, opts)
     table.insert(reasons, "size")
   end
   local lines = vim.api.nvim_buf_line_count(buf)
-  if lines > 0 and (fsize - lines) / lines > opts.line_length then
-    table.insert(reasons, "line_length")
+  if lines > 0 and (fsize - lines) / lines > opts.avg_line_length then
+    table.insert(reasons, "avg_line_length")
   end
-  if opts.max_line_length > 0 then
+  if opts.long_line_length > 0 then
     local sample = vim.api.nvim_buf_get_lines(buf, 0, math.min(opts.sample_lines, lines), false)
+    local long_count = 0
     for _, line in ipairs(sample) do
-      if #line > opts.max_line_length then
-        table.insert(reasons, "max_line_length")
-        break
+      if #line > opts.long_line_length then
+        long_count = long_count + 1
+        if long_count >= opts.long_line_count then
+          table.insert(reasons, "long_line_length")
+          break
+        end
       end
     end
   end
@@ -107,9 +113,9 @@ local function apply(buf, ft, reasons, opts)
   opts.setup({ buf = buf, ft = ft, reasons = reasons })
 
   -- Determine whether syntax/treesitter should be cleared.
-  -- Only "size" and "line_length" warrant clearing — "max_line_length" alone
+  -- Only "size" and "avg_line_length" warrant clearing — "long_line_length" alone
   -- means most lines are fine and syntax is still useful.
-  local clear_syntax = vim.tbl_contains(reasons, "size") or vim.tbl_contains(reasons, "line_length")
+  local clear_syntax = vim.tbl_contains(reasons, "size") or vim.tbl_contains(reasons, "avg_line_length")
 
   if clear_syntax and not vim.tbl_contains(opts.keep_highlighting, ft) then
     vim.treesitter.stop(buf)
