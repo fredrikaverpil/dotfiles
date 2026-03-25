@@ -82,6 +82,15 @@ vim.keymap.set("n", "<leader><tab>[", "<cmd>tabprevious<cr>", { desc = "Previous
 vim.keymap.set("n", "<leader><tab>]", "<cmd>tabnext<cr>", { desc = "Next Tab", silent = true })
 vim.keymap.set("n", "[<tab>", "<cmd>tabprevious<cr>", { desc = "Previous Tab", silent = true })
 vim.keymap.set("n", "]<tab>", "<cmd>tabnext<cr>", { desc = "Next Tab", silent = true })
+function M.setup_bufferline_keymaps()
+  return {
+    {
+      "<leader><tab>r",
+      ":BufferLineTabRename",
+      { desc = "Rename Tab" },
+    },
+  }
+end
 
 -- Clear search with <esc>
 vim.keymap.set({ "n", "i" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and clear hlsearch" })
