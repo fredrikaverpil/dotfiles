@@ -709,5 +709,6 @@ return {
       -- fired, so the autocmd above won't catch it. Fetch immediately.
       refresh()
     end,
+    keys = require("fredrik.config.keymaps").setup_github_comments_keymaps(),
   },
 }

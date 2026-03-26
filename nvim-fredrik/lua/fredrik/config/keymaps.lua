@@ -432,6 +432,16 @@ function M.setup_snacks_keymaps()
     ".pocket/tools",
   }
 
+  local function git_diff()
+    Snacks.picker.git_diff()
+  end
+
+  local function git_diff_origin()
+    ---@class snacks.picker.git.diff.Config: snacks.picker.git.Config
+    local opts = { base = "origin" }
+    Snacks.picker.git_diff(opts)
+  end
+
   return {
     -- misc
     {
@@ -498,20 +508,11 @@ function M.setup_snacks_keymaps()
       desc = "LazyGit",
     },
     {
-      "<leader>gdd",
+      "<leader>gp",
       function()
-        Snacks.picker.git_diff()
+        Snacks.gh.pr()
       end,
-      desc = "Git Diff (HEAD)",
-    },
-    {
-      "<leader>gdD",
-      function()
-        ---@class snacks.picker.git.diff.Config: snacks.picker.git.Config
-        local opts = { base = "origin" }
-        Snacks.picker.git_diff(opts)
-      end,
-      desc = "Git Diff (origin)",
+      desc = "LazyGit",
     },
     {
       "<leader>uz",
@@ -774,22 +775,10 @@ function M.setup_snacks_keymaps()
       end,
       desc = "[s]earch [g]it [c]ommit log",
     },
-    {
-      "<leader>sgd",
-      function()
-        Snacks.picker.git_diff()
-      end,
-      desc = "Git Diff (HEAD)",
-    },
-    {
-      "<leader>sgD",
-      function()
-        ---@class snacks.picker.git.diff.Config: snacks.picker.git.Config
-        local opts = { base = "origin" }
-        Snacks.picker.git_diff(opts)
-      end,
-      desc = "Git Diff (origin)",
-    },
+    { "<leader>sgd", git_diff, desc = "Git Diff (HEAD)" },
+    { "<leader>gdp", git_diff, desc = "Git Diff Picker (HEAD)" },
+    { "<leader>sgD", git_diff_origin, desc = "Git Diff (origin)" },
+    { "<leader>gdP", git_diff_origin, desc = "Git Diff Picker (origin)" },
     {
       "<leader>sgf",
       function()
@@ -940,92 +929,6 @@ function M.setup_gitsigns_keymaps()
   }
 end
 
--- Helper function to get hunk range at cursor
-local function get_hunk_range_at_cursor()
-  local line = vim.api.nvim_win_get_cursor(0)[1]
-  local buf_data = MiniDiff.get_buf_data(0)
-
-  if not buf_data or not buf_data.hunks then
-    return line, line
-  end
-
-  for _, hunk in ipairs(buf_data.hunks) do
-    local hunk_start = hunk.buf_start
-    local hunk_end = hunk.buf_start + math.max(0, hunk.buf_count - 1)
-
-    if line >= hunk_start and line <= hunk_end then
-      return hunk_start, hunk_end
-    end
-  end
-
-  -- Fallback to single line if no hunk found
-  return line, line
-end
-
-function M.setup_mini_diff_keymaps()
-  return {
-    {
-      "<leader>gdO",
-      function()
-        require("mini.diff").toggle_overlay(0)
-      end,
-      desc = "Toggle mini.diff overlay",
-    },
-    {
-      "<leader>ghr",
-      function()
-        local start_line, end_line = get_hunk_range_at_cursor()
-        require("mini.diff").do_hunks(0, "reset", { line_start = start_line, line_end = end_line })
-      end,
-      desc = "Reset hunk",
-    },
-    {
-      "<leader>ghs",
-      function()
-        local start_line, end_line = get_hunk_range_at_cursor()
-        require("mini.diff").do_hunks(0, "apply", { line_start = start_line, line_end = end_line })
-      end,
-      desc = "Stage hunk",
-    },
-    {
-      "<leader>ghy",
-      function()
-        local start_line, end_line = get_hunk_range_at_cursor()
-        require("mini.diff").do_hunks(0, "yank", { line_start = start_line, line_end = end_line })
-      end,
-      desc = "Yank hunk",
-    },
-    {
-      "<leader>ghb",
-      function()
-        local default_branch = require("fredrik.utils.git").get_default_branch()
-        local file = vim.api.nvim_buf_get_name(0)
-        local relative_path = vim.fn.fnamemodify(file, ":~:.")
-
-        -- Get content from the default branch
-        local content = vim.fn.system("git show " .. default_branch .. ":" .. relative_path)
-
-        if vim.v.shell_error == 0 then
-          local lines = vim.split(content, "\n")
-          require("mini.diff").set_ref_text(0, lines)
-          vim.notify("Diff base changed to " .. default_branch, vim.log.levels.INFO)
-        else
-          vim.notify("Could not get file from " .. default_branch, vim.log.levels.ERROR)
-        end
-      end,
-      desc = "Change base to default branch",
-    },
-    {
-      "<leader>ghB",
-      function()
-        require("mini.diff").set_ref_text(0, {})
-        vim.notify("Diff base reset to Git index", vim.log.levels.INFO)
-      end,
-      desc = "Reset base to Git index",
-    },
-  }
-end
-
 function M.setup_git_blame_keymaps()
   return {
     -- toggle needs to be called twice; https://github.com/f-person/git-blame.nvim/issues/16
@@ -1041,43 +944,45 @@ function M.setup_diffview_keymaps()
   return {
     -- use [c and [c to navigate diffs (vim built in), see :h jumpto-diffs
     -- use ]x and [x to navigate conflicts
-    { "<leader>gdq", ":DiffviewClose<CR>", desc = "Close Diffview tab" },
-    { "<leader>gdh", ":DiffviewFileHistory %<CR>", desc = "File history" },
-    { "<leader>gdH", ":DiffviewFileHistory<CR>", desc = "Repo history" },
-    { "<leader>gdm", ":DiffviewOpen<CR>", desc = "Solve merge conflicts" },
-    {
-      "<leader>gdo",
-      ":DiffviewOpen " .. require("fredrik.utils.git").get_default_branch() .. "<cr>",
-      desc = "DiffviewOpen against default branch",
-    },
-    { "<leader>gdt", ":DiffviewOpen<CR>", desc = "DiffviewOpen this" },
-    {
-      "<leader>gdp",
-      function()
-        local default_branch = require("fredrik.utils.git").get_default_branch()
-        vim.cmd(":DiffviewOpen origin/" .. default_branch .. "...HEAD --imply-local")
-      end,
-      desc = "Review current PR",
-    },
-    {
-      "<leader>gdP",
-      function()
-        local default_branch = require("fredrik.utils.git").get_default_branch()
-        return vim.cmd(
-          ":DiffviewFileHistory --range=origin/" .. default_branch .. "...HEAD --right-only --no-merges --reverse"
-        )
-      end,
-      desc = "Review current PR (per commit)",
-    },
+
+    -- { "<leader>gdx", ":DiffviewOpen<CR>", desc = "DiffviewOpen this" },
+    -- { "<leader>gdq", ":DiffviewClose<CR>", desc = "Close Diffview tab" },
+    -- { "<leader>gdh", ":DiffviewFileHistory %<CR>", desc = "File history" },
+    -- { "<leader>gdH", ":DiffviewFileHistory<CR>", desc = "Repo history" },
+    -- { "<leader>gdm", ":DiffviewOpen<CR>", desc = "Solve merge conflicts" },
+    -- {
+    --   "<leader>gdd",
+    --   ":DiffviewOpen " .. require("fredrik.utils.git").get_default_branch() .. "<cr>",
+    --   desc = "DiffviewOpen against default branch",
+    -- },
+    -- {
+    --   "<leader>gdr",
+    --   function()
+    --     local default_branch = require("fredrik.utils.git").get_default_branch()
+    --     vim.cmd(":DiffviewOpen origin/" .. default_branch .. "...HEAD --imply-local")
+    --   end,
+    --   desc = "Review current PR",
+    -- },
+    -- {
+    --   "<leader>gdR",
+    --   function()
+    --     local default_branch = require("fredrik.utils.git").get_default_branch()
+    --     return vim.cmd(
+    --       ":DiffviewFileHistory --range=origin/" .. default_branch .. "...HEAD --right-only --no-merges --reverse"
+    --     )
+    --   end,
+    --   desc = "Review current PR (per commit)",
+    -- },
   }
 end
 
 function M.setup_codediff_keymaps()
   return {
+    { "<leader>gdt", ":CodeDiff<CR>", desc = "Diff this" },
     { "<leader>gdh", ":CodeDiff history %<CR>", desc = "File history" },
     { "<leader>gdH", ":CodeDiff history<CR>", desc = "Repo history" },
     {
-      "<leader>gdo",
+      "<leader>gdd",
       function()
         local default_branch = require("fredrik.utils.git").get_default_branch()
         vim.cmd(":CodeDiff " .. default_branch)
@@ -1085,7 +990,7 @@ function M.setup_codediff_keymaps()
       desc = "Diff against default branch",
     },
     {
-      "<leader>gdp",
+      "<leader>gdr",
       function()
         local merge_base = require("fredrik.utils.git").get_pr_merge_base()
         vim.cmd(":CodeDiff " .. merge_base)
@@ -1093,13 +998,18 @@ function M.setup_codediff_keymaps()
       desc = "Review current PR (GitHub-style)",
     },
     {
-      "<leader>gdP",
+      "<leader>gdR",
       function()
         local merge_base = require("fredrik.utils.git").get_pr_merge_base()
         vim.cmd(":CodeDiff history " .. merge_base .. "...HEAD --reverse")
       end,
       desc = "Review current PR (per commit)",
     },
+  }
+end
+
+function M.setup_github_comments_keymaps()
+  return {
     {
       "<leader>gds",
       function()
@@ -1122,6 +1032,13 @@ function M.setup_codediff_keymaps()
       end,
       mode = "v",
       desc = "Post PR review comment",
+    },
+    {
+      "<leader>gdv",
+      function()
+        require("fredrik.plugins.github_comments").view_threads()
+      end,
+      desc = "View PR comment threads on line",
     },
   }
 end
