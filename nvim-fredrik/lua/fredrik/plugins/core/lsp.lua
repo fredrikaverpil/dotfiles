@@ -179,7 +179,7 @@ local function register_lsp_commands()
 
       -- Clear codelens for this client
       if vim.lsp.codelens then
-        vim.lsp.codelens.clear(client.id)
+        vim.lsp.codelens.enable(false, { client_id = client.id })
       end
 
       -- Use native enable/disable to reset manager state
