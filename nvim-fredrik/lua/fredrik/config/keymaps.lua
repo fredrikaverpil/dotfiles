@@ -508,13 +508,6 @@ function M.setup_snacks_keymaps()
       desc = "LazyGit",
     },
     {
-      "<leader>gp",
-      function()
-        Snacks.gh.pr()
-      end,
-      desc = "LazyGit",
-    },
-    {
       "<leader>uz",
       function()
         Snacks.zen.zen()
@@ -768,6 +761,13 @@ function M.setup_snacks_keymaps()
     },
 
     -- git
+    {
+      "<leader>gp",
+      function()
+        Snacks.gh.pr()
+      end,
+      desc = "LazyGit",
+    },
     {
       "<leader>sgc",
       function()
