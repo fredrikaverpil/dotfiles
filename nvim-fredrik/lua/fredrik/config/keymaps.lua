@@ -945,34 +945,34 @@ function M.setup_diffview_keymaps()
     -- use [c and [c to navigate diffs (vim built in), see :h jumpto-diffs
     -- use ]x and [x to navigate conflicts
 
-    -- { "<leader>gdx", ":DiffviewOpen<CR>", desc = "DiffviewOpen this" },
-    -- { "<leader>gdq", ":DiffviewClose<CR>", desc = "Close Diffview tab" },
-    -- { "<leader>gdh", ":DiffviewFileHistory %<CR>", desc = "File history" },
-    -- { "<leader>gdH", ":DiffviewFileHistory<CR>", desc = "Repo history" },
-    -- { "<leader>gdm", ":DiffviewOpen<CR>", desc = "Solve merge conflicts" },
-    -- {
-    --   "<leader>gdd",
-    --   ":DiffviewOpen " .. require("fredrik.utils.git").get_default_branch() .. "<cr>",
-    --   desc = "DiffviewOpen against default branch",
-    -- },
-    -- {
-    --   "<leader>gdr",
-    --   function()
-    --     local default_branch = require("fredrik.utils.git").get_default_branch()
-    --     vim.cmd(":DiffviewOpen origin/" .. default_branch .. "...HEAD --imply-local")
-    --   end,
-    --   desc = "Review current PR",
-    -- },
-    -- {
-    --   "<leader>gdR",
-    --   function()
-    --     local default_branch = require("fredrik.utils.git").get_default_branch()
-    --     return vim.cmd(
-    --       ":DiffviewFileHistory --range=origin/" .. default_branch .. "...HEAD --right-only --no-merges --reverse"
-    --     )
-    --   end,
-    --   desc = "Review current PR (per commit)",
-    -- },
+    { "<leader>gdx", ":DiffviewOpen<CR>", desc = "DiffviewOpen this" },
+    { "<leader>gdq", ":DiffviewClose<CR>", desc = "Close Diffview tab" },
+    { "<leader>gdh", ":DiffviewFileHistory %<CR>", desc = "File history" },
+    { "<leader>gdH", ":DiffviewFileHistory<CR>", desc = "Repo history" },
+    { "<leader>gdm", ":DiffviewOpen<CR>", desc = "Solve merge conflicts" },
+    {
+      "<leader>gdd",
+      ":DiffviewOpen " .. require("fredrik.utils.git").get_default_branch() .. "<cr>",
+      desc = "DiffviewOpen against default branch",
+    },
+    {
+      "<leader>gdr",
+      function()
+        local default_branch = require("fredrik.utils.git").get_default_branch()
+        vim.cmd(":DiffviewOpen origin/" .. default_branch .. "...HEAD --imply-local")
+      end,
+      desc = "Review current PR",
+    },
+    {
+      "<leader>gdR",
+      function()
+        local default_branch = require("fredrik.utils.git").get_default_branch()
+        return vim.cmd(
+          ":DiffviewFileHistory --range=origin/" .. default_branch .. "...HEAD --right-only --no-merges --reverse"
+        )
+      end,
+      desc = "Review current PR (per commit)",
+    },
   }
 end
 
