@@ -180,14 +180,9 @@ local function register_lsp_commands()
         vim.lsp.codelens.enable(false, { client_id = client.id })
       end
 
-      -- Use native enable/disable to reset manager state
-      if vim.lsp.enable then
-        vim.lsp.enable(name, false)
-        if args.bang then
-          client:stop(true) -- Force stop if bang used
-        end
-      else
-        client:stop(args.bang)
+      vim.lsp.enable(name, false)
+      if args.bang then
+        client:stop(true)
       end
     end
 
