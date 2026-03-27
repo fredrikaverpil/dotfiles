@@ -748,7 +748,7 @@ function M.setup_snacks_keymaps()
     {
       "<leader>sT",
       function()
-        Snacks.picker.todo_comments({ keywords = { "TODO", "FIX", "FIXME" } })
+        Snacks.picker.todo_comments({ keywords = { "TODO", "FIX" } })
       end,
       desc = "[s]earch [T]odo/Fix/Fixme",
     },
