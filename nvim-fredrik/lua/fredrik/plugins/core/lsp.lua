@@ -173,9 +173,7 @@ local function register_lsp_commands()
       vim.notify("Stopping LSP client: " .. name, vim.log.levels.INFO)
 
       -- Clear diagnostics for this client in all buffers
-      if client.get_namespace then
-        vim.diagnostic.reset(client.get_namespace(), nil)
-      end
+      vim.diagnostic.reset(vim.lsp.diagnostic.get_namespace(client.id), nil)
 
       -- Clear codelens for this client
       if vim.lsp.codelens then
