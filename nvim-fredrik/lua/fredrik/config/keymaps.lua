@@ -431,16 +431,7 @@ function M.setup_snacks_keymaps()
     ".sage/tools",
     ".pocket/tools",
   }
-
-  local function git_diff()
-    Snacks.picker.git_diff()
-  end
-
-  local function git_diff_origin()
-    ---@class snacks.picker.git.diff.Config: snacks.picker.git.Config
-    local opts = { base = "origin" }
-    Snacks.picker.git_diff(opts)
-  end
+  local default_branch = require("fredrik.utils.git").get_default_branch()
 
   return {
     -- misc
@@ -478,7 +469,6 @@ function M.setup_snacks_keymaps()
       end,
       desc = "Grep",
     },
-
     {
       "<leader>:",
       function()
@@ -775,10 +765,42 @@ function M.setup_snacks_keymaps()
       end,
       desc = "[s]earch [g]it [c]ommit log",
     },
-    { "<leader>sgd", git_diff, desc = "Git Diff (HEAD)" },
-    { "<leader>gdp", git_diff, desc = "Git Diff Picker (HEAD)" },
-    { "<leader>sgD", git_diff_origin, desc = "Git Diff (origin)" },
-    { "<leader>gdP", git_diff_origin, desc = "Git Diff Picker (origin)" },
+    {
+      "<leader>sgd",
+      function()
+        ---@class snacks.picker.git.diff.Config: snacks.picker.git.Config
+        local opts = { base = default_branch }
+        Snacks.picker.git_diff(opts)
+      end,
+      desc = "Git Diff (default branch)",
+    },
+    {
+      "<leader>gdp",
+      function()
+        ---@class snacks.picker.git.diff.Config: snacks.picker.git.Config
+        local opts = { base = default_branch }
+        Snacks.picker.git_diff(opts)
+      end,
+      desc = "Git Diff Picker (default branch)",
+    },
+    {
+      "<leader>sgD",
+      function()
+        ---@class snacks.picker.git.diff.Config: snacks.picker.git.Config
+        local opts = {}
+        Snacks.picker.git_diff(opts)
+      end,
+      desc = "Git Diff (HEAD)",
+    },
+    {
+      "<leader>gdP",
+      function()
+        ---@class snacks.picker.git.diff.Config: snacks.picker.git.Config
+        local opts = {}
+        Snacks.picker.git_diff(opts)
+      end,
+      desc = "Git Diff Picker (HEAD)",
+    },
     {
       "<leader>sgf",
       function()
