@@ -1,0 +1,7 @@
+{
+  "notimplemented": {
+    "prefix": "notim",
+    "body": "panic(\"not implemented\")",
+    "description": "Snippet for vim.notify(vim.inspect(...))"
+  }
+}
