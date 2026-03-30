@@ -145,7 +145,7 @@ vim.api.nvim_create_autocmd("LspProgress", {
   ---@param ev {data: {client_id: integer, params: lsp.ProgressParams}}
   callback = function(ev)
     local spinner = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
-    vim.notify(vim.lsp.status(), "info", {
+    vim.notify(vim.lsp.status(), vim.log.levels.INFO, {
       id = "lsp_progress",
       title = "LSP Progress",
       opts = function(notif)
@@ -167,11 +167,17 @@ local function register_lsp_commands()
     end
     local clients = vim.lsp.get_clients(filter)
     local client_names = {}
+    local affected_bufs = {}
 
     for _, client in ipairs(clients) do
       local name = client.name
       table.insert(client_names, name)
       vim.notify("Stopping LSP client: " .. name, vim.log.levels.INFO)
+
+      -- Collect buffers attached to this client for later reload
+      for buf, _ in pairs(client.attached_buffers) do
+        affected_bufs[buf] = true
+      end
 
       -- Clear diagnostics for this client in all buffers
       vim.diagnostic.reset(vim.lsp.diagnostic.get_namespace(client.id), nil)
@@ -200,6 +206,17 @@ local function register_lsp_commands()
           for _, name in ipairs(client_names) do
             vim.notify("Starting LSP client: " .. name, vim.log.levels.INFO)
             vim.lsp.enable(name, true)
+          end
+
+          -- Reload buffers that were attached to restarted clients,
+          -- so Neovim picks up any external file changes and the new
+          -- LSP session sees the current buffer content.
+          for buf, _ in pairs(affected_bufs) do
+            if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buflisted then
+              vim.api.nvim_buf_call(buf, function()
+                vim.cmd("edit")
+              end)
+            end
           end
         end)
       end)
