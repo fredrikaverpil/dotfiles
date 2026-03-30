@@ -1,10 +1,10 @@
 local M = {}
 
 -- windows
-vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to left window", silent = true, noremap = true })
-vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to lower window", silent = true, noremap = true })
-vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go to upper window", silent = true, noremap = true })
-vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go to right window", silent = true, noremap = true })
+vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to left window", silent = true })
+vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to lower window", silent = true })
+vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go to upper window", silent = true })
+vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go to right window", silent = true })
 -- Resize windows using <ctrl> arrow keys
 vim.keymap.set("n", "<C-Up>", ":resize +2<CR>", { desc = "Increase window height", silent = true })
 vim.keymap.set("n", "<C-Down>", ":resize -2<CR>", { desc = "Decrease window height", silent = true })
@@ -40,7 +40,7 @@ map_multiple("v", down_keys, ":m '>+1<CR>gv=gv", { desc = "Move selection down",
 map_multiple("v", up_keys, ":m '<-2<CR>gv=gv", { desc = "Move selection up", silent = true })
 
 -- buffers
-vim.keymap.set("n", "<leader>`", "<C-^>", { noremap = true, desc = "Alternate buffers" })
+vim.keymap.set("n", "<leader>`", "<C-^>", { desc = "Alternate buffers" })
 vim.keymap.set("n", "<leader>bN", "<cmd>enew<cr>", { desc = "New buffer" })
 for _, key in ipairs({ "<S-l>", "<leader>bn", "]b" }) do
   vim.keymap.set("n", key, "<cmd>bnext<cr>", { desc = "Next buffer" })
