@@ -65,7 +65,7 @@ local function install_and_start()
         return -- Parser not ailable, skip silently
       end
 
-      local parser_installed = pcall(vim.treesitter.get_parser, bufnr, parser_name)
+      local parser_installed = vim.treesitter.get_parser(bufnr, parser_name) ~= nil
 
       -- If not installed, install parser synchronously
       if not parser_installed then
@@ -74,7 +74,7 @@ local function install_and_start()
       end
 
       -- Check so tree-sitter can see the newly installed parser
-      parser_installed = pcall(vim.treesitter.get_parser, bufnr, parser_name)
+      parser_installed = vim.treesitter.get_parser(bufnr, parser_name) ~= nil
       if not parser_installed then
         vim.notify(
           "Failed to get parser for " .. parser_name .. " after installation",
