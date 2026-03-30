@@ -1,5 +1,6 @@
 ---
 name: gh-pr
+
 description: >-
   This skill should be used when creating a GitHub pull request via `gh pr
   create`. Defines PR body format with Why/What/Notes sections and ensures
@@ -56,6 +57,14 @@ EOF
 )"
 ```
 
+## File References
+
+Use `[file:lineno](url)` with SHA-pinned URLs:
+`https://github.com/<owner>/<repo>/blob/<sha>/<path>#L<lineno>`
+
+- SHA: `git rev-parse HEAD`
+- Repo: `gh repo view --json nameWithOwner -q .nameWithOwner`
+
 ## Rules
 
 1. Always assign PR to `@me` using `--assignee @me`
@@ -64,6 +73,8 @@ EOF
 4. `## Notes` - Optional. Omit entirely if no notes are needed
 5. Use imperative mood in title (e.g., "Add feature" not "Added feature")
 6. Keep title concise and descriptive
+7. When referencing files, always use `[file:lineno](url)` format with
+   SHA-pinned URLs
 
 ## Example
 
