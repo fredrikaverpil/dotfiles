@@ -1391,7 +1391,7 @@ function M.setup_terminal_keymaps()
   local ctrl_alt_underscore = "<C-A-_>"
 
   -- <Esc><Esc> in terminal mode sends <C-\><C-n> to exit terminal mode, see :h term
-  vim.api.nvim_set_keymap("t", "<Esc><Esc>", "<C-\\><C-n>", { noremap = true })
+  vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>")
 
   local floating_term_cmd = function()
     local cmd = { "zsh" }
