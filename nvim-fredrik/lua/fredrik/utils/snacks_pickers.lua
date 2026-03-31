@@ -245,7 +245,7 @@ function M.go_package_symbols(opts)
     end
 
     local params = {
-      textDocument = vim.lsp.util.make_text_document_params(bufnr),
+      textDocument = { uri = vim.uri_from_bufnr(bufnr) },
     }
 
     local results = vim.lsp.buf_request_sync(bufnr, "textDocument/documentSymbol", params, 2000)

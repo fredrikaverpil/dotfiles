@@ -1,5 +1,3 @@
-local version = require("fredrik.utils.version")
-
 -- Extend LSP capabilities and set up LSP servers.
 --
 -- LSP servers and clients (like Neovim) are able to communicate to each other what
@@ -126,11 +124,9 @@ local function register_lspattach_autocmd()
           require("fredrik.config.options").lsp_foldexpr(win)
         end
 
-        -- setup inline completion (only neovim 0.12+)
-        if version.is_neovim_0_12_0() and vim.lsp.inline_completion then
-          if client:supports_method("textDocument/inlineCompletion", args.buf) then
-            vim.lsp.inline_completion.enable(true)
-          end
+        -- setup inline completion
+        if client:supports_method("textDocument/inlineCompletion", args.buf) then
+          vim.lsp.inline_completion.enable(true)
         end
       end
 
@@ -176,7 +172,7 @@ local function register_lsp_commands()
       vim.notify("Stopping LSP client: " .. name, vim.log.levels.INFO)
 
       -- Clear diagnostics for this client in all buffers
-      vim.diagnostic.reset(vim.lsp.diagnostic.get_namespace(client.id), nil)
+      vim.diagnostic.reset(vim.api.nvim_create_namespace("vim.lsp." .. name .. "." .. client.id))
 
       -- Clear codelens for this client
       if vim.lsp.codelens then

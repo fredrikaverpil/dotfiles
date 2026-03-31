@@ -87,7 +87,6 @@ require("lazy").setup({
         "matchparen", -- match-up replaces this
         -- "netrwPlugin",
         "tarPlugin",
-        "tohtml",
         "tutor",
         "zipPlugin",
       },
