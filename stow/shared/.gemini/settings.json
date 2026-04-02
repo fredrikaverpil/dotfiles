@@ -3,7 +3,8 @@
     "theme": "Default"
   },
   "general": {
-    "previewFeatures": true
+    "previewFeatures": true,
+    "enableNotifications": true
   },
   "telemetry": {
     "enabled": false
@@ -23,9 +24,7 @@
     },
     "playwright": {
       "command": "bunx",
-      "args": [
-        "@playwright/mcp@latest"
-      ]
+      "args": ["@playwright/mcp@latest"]
     }
   },
   "security": {
