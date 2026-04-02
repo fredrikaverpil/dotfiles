@@ -902,6 +902,10 @@ function M.setup_gitsigns_keymaps()
       function()
         local default_branch = require("fredrik.utils.git").get_default_branch()
         require("gitsigns").change_base(default_branch, true)
+
+        -- TODO: how to also tell codediff about this?
+        -- https://github.com/esmuellert/codediff.nvim/pull/345
+        -- require("codediff").change_base(default_branch, true)
       end,
       mode = { "n", "v" },
       desc = "change [b]ase to default branch",
@@ -945,6 +949,10 @@ function M.setup_gitsigns_keymaps()
 
         -- NOTE: fork: https://github.com/fredrikaverpil/gitsigns.nvim/tree/feat/toggle-inline-preview
         -- require("gitsigns").toggle_inline_preview(nil, true)
+
+        -- TODO: move to its own keymap setup function
+        -- https://github.com/esmuellert/codediff.nvim/pull/345
+        -- require("codediff").render_inline(nil, true)
       end,
       desc = "[t]oggle inline diff",
     },
