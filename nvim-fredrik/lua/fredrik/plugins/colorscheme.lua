@@ -140,8 +140,9 @@ return {
         hl("Cursor", { fg = palette.bg, bg = palette.fg })
         hl("TermCursor", { fg = palette.bg, bg = palette.fg })
 
-        hl("Comment", { fg = colors.blend(palette.bg, palette.fg, 40), italic = true })
-        hl("@comment", { link = "Comment" })
+        -- NOTE: removing this for now, since comments became harder to reade in diffs
+        -- hl("Comment", { fg = colors.blend(palette.bg, palette.fg, 40), italic = true })
+        -- hl("@comment", { link = "Comment" })
 
         hl("MiniCursorword", { bg = colors.blend(palette.bg, palette.bg1, 90), underline = false })
 
