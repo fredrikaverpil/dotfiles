@@ -71,17 +71,13 @@ local function qf_text_func(info)
     if not item then
       table.insert(lines, "")
     elseif is_loclist then
-      -- Location list: just show the diagnostic text without filename/position
-      table.insert(lines, item.text or "")
+      -- Location list: show line:col position with diagnostic text
+      table.insert(lines, string.format("%d:%d %s", item.lnum, item.col, item.text or ""))
     else
-      -- Quickfix list: show default format with filename and position
+      -- Quickfix list: show filename with line:col position and diagnostic text
       local filename = vim.fn.bufname(item.bufnr)
       filename = filename == "" and "[No Name]" or vim.fn.fnamemodify(filename, ":~:.")
-      -- With position:
-      table.insert(lines, string.format("%s|%d col %d| %s", filename, item.lnum, item.col, item.text or ""))
-      --
-      -- Without position:
-      -- table.insert(lines, string.format("%s %s", filename, item.text or ""))
+      table.insert(lines, string.format("%s:%d:%d %s", filename, item.lnum, item.col, item.text or ""))
     end
   end
   return lines
