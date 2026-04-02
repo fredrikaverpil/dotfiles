@@ -23,28 +23,6 @@ function M.toggle_inlay_hints()
   vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(filter))
 end
 
-function M.toggle_codelens()
-  vim.g.codelens_enabled = not vim.g.codelens_enabled
-
-  if vim.g.codelens_enabled then
-    -- Re-enable codelens on all attached buffers that support it
-    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-      if vim.api.nvim_buf_is_loaded(buf) then
-        for _, client in ipairs(vim.lsp.get_clients({ bufnr = buf })) do
-          if client:supports_method("textDocument/codeLens", buf) then
-            vim.lsp.codelens.enable(true, { bufnr = buf })
-            break
-          end
-        end
-      end
-    end
-    vim.notify("Codelens enabled", vim.log.levels.INFO)
-  else
-    vim.lsp.codelens.enable(false)
-    vim.notify("Codelens disabled", vim.log.levels.INFO)
-  end
-end
-
 function M.toggle_copilot(opts)
   opts = opts or {}
 
