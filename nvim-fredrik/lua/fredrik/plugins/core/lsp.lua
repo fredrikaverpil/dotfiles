@@ -90,6 +90,8 @@ local function register_lsp_servers(servers)
   end
 end
 
+vim.lsp.codelens.enable(true)
+
 -- Register LSP attach autocmd.
 local function register_lspattach_autocmd()
   vim.api.nvim_create_autocmd("LspAttach", {
@@ -98,17 +100,6 @@ local function register_lspattach_autocmd()
     callback = function(args)
       local client = vim.lsp.get_client_by_id(args.data.client_id)
       if client then
-        -- set up codelens
-        if client:supports_method("textDocument/codeLens", args.buf) then
-          vim.lsp.codelens.enable(true, { bufnr = args.buf })
-          vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
-            buffer = args.buf,
-            callback = function()
-              vim.lsp.codelens.enable(true, { bufnr = args.buf })
-            end,
-          })
-        end
-
         -- set up workspace diagnostics
         if client:supports_method("workspace/diagnostic", args.buf) then
           -- WARNING: not sure if this is the intended use case. Let's see...

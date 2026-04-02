@@ -1446,6 +1446,11 @@ function M.setup_lsp_keymaps()
     require("fredrik.utils.toggle").toggle_inlay_hints,
     { desc = "Toggle inlay hints", silent = true }
   )
+  vim.keymap.set("n", "<leader>ul", function()
+    local enabled = not vim.lsp.codelens.is_enabled()
+    vim.lsp.codelens.enable(enabled)
+    vim.notify(enabled and "Codelens enabled" or "Codelens disabled", vim.log.levels.INFO)
+  end, { desc = "Toggle codelens", silent = true })
 end
 
 function M.setup_showkeys_keymaps()
