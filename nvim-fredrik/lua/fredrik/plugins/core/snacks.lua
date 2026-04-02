@@ -71,7 +71,7 @@ return {
           (function()
             local specs = vim.g.local_lazy_specs
             if not specs or #specs == 0 then
-              return {}
+              return { text = "" }
             end
             local lines = {}
             for _, path in ipairs(specs) do
