@@ -113,7 +113,9 @@ in
   config = {
     home.activation.installSelfManagedCLIs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       # Provide comprehensive PATH for installer scripts (they may need various tools)
-      export PATH="${pkgs.curl}/bin:${pkgs.wget}/bin:${pkgs.coreutils}/bin:${pkgs.gnused}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.perl}/bin:${pkgs.gnutar}/bin:${pkgs.gzip}/bin:${pkgs.unzip}/bin:${pkgs.which}/bin:$PATH"
+      # Save and restore PATH to avoid leaking into subsequent activation scripts
+      _SELF_MANAGED_CLIS_ORIG_PATH="$PATH"
+      export PATH="${pkgs.curl}/bin:${pkgs.wget}/bin:${pkgs.coreutils}/bin:${pkgs.gnused}/bin:${pkgs.gnugrep}/bin:${pkgs.gawk}/bin:${pkgs.perl}/bin:${pkgs.gnutar}/bin:${pkgs.gzip}/bin:${pkgs.unzip}/bin:${pkgs.which}/bin:/usr/bin:/usr/sbin:$PATH"
 
       ${lib.concatMapStringsSep "\n" (
         cli:
@@ -159,6 +161,10 @@ in
               ''
           )
       ) config.selfManagedCLIs.clis}
+
+      # Restore original PATH
+      export PATH="$_SELF_MANAGED_CLIS_ORIG_PATH"
+      unset _SELF_MANAGED_CLIS_ORIG_PATH
     '';
   };
 }
