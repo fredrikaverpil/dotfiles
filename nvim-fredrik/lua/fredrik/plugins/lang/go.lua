@@ -101,7 +101,9 @@ local parser_config = {
   },
   filetype = "godoc",
 }
-require("nvim-treesitter.parsers").godoc = parser_config
+if package.loaded["nvim-treesitter"] then
+  require("nvim-treesitter.parsers").godoc = parser_config
+end
 vim.treesitter.language.register("godoc", "godoc")
 
 -- Also register on TSUpdate for installation; required for auto-install
@@ -308,29 +310,29 @@ return {
     cmd = { "GoImplOpen" },
   },
 
-  {
-    "zgs225/gomodifytags.nvim",
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter",
-      {
-        "mason-org/mason.nvim",
-        opts = function(_, opts)
-          opts.ensure_installed = opts.ensure_installed or {}
-          vim.list_extend(opts.ensure_installed, { "gomodifytags" })
-        end,
-      },
-    },
-    config = function(_, opts)
-      require("gomodifytags").setup(opts) -- Optional: You can add any specific configuration here if needed.
-    end,
-    cmd = { "GoAddTags", "GoRemoveTags", "GoInstallModifyTagsBin" },
-  },
+  -- {
+  --   "zgs225/gomodifytags.nvim",
+  --   dependencies = {
+  --     "nvim-treesitter/nvim-treesitter",
+  --     {
+  --       "mason-org/mason.nvim",
+  --       opts = function(_, opts)
+  --         opts.ensure_installed = opts.ensure_installed or {}
+  --         vim.list_extend(opts.ensure_installed, { "gomodifytags" })
+  --       end,
+  --     },
+  --   },
+  --   config = function(_, opts)
+  --     require("gomodifytags").setup(opts) -- Optional: You can add any specific configuration here if needed.
+  --   end,
+  --   cmd = { "GoAddTags", "GoRemoveTags", "GoInstallModifyTagsBin" },
+  -- },
 
   {
     "ray-x/go.nvim",
+    enabled = false,
     lazy = true,
     ft = { "go", "gomod" },
-    enabled = false,
     dependencies = { -- optional packages
       "ray-x/guihua.lua",
       "virtual-lsp-config",
@@ -379,7 +381,7 @@ return {
         },
         runner = "gotestsum",
         gotestsum_args = { "--format=standard-verbose" },
-        -- testify_enabled = true,
+        testify_enabled = false,
         -- sanitize_output = true,
         -- log_level = vim.log.levels.TRACE,
 
@@ -410,14 +412,14 @@ return {
     dev = true, -- see lazy.lua for local path details
     dependencies = {
       { "folke/snacks.nvim" },
-      {
-        "nvim-treesitter/nvim-treesitter",
-        branch = "main",
-        opts = function(_, opts)
-          opts.ensure_installed = opts.ensure_installed or {}
-          opts.ensure_installed.godoc = "godoc"
-        end,
-      },
+      -- {
+      --   "nvim-treesitter/nvim-treesitter",
+      --   branch = "main",
+      --   opts = function(_, opts)
+      --     opts.ensure_installed = opts.ensure_installed or {}
+      --     opts.ensure_installed.godoc = "godoc"
+      --   end,
+      -- },
     },
     build = "go install github.com/lotusirous/gostdsym/stdsym@latest",
     opts = {

@@ -11,7 +11,7 @@ return {
     dependencies = {
       -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
       "MunifTanjim/nui.nvim",
-      "nvim-treesitter/nvim-treesitter", -- BUG: https://github.com/folke/noice.nvim/issues/1135
+      -- "nvim-treesitter/nvim-treesitter", -- BUG: https://github.com/folke/noice.nvim/issues/1135
       {
         "nvim-lualine/lualine.nvim",
         opts = function(_, opts)

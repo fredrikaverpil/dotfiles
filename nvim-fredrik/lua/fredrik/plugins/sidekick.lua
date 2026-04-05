@@ -25,13 +25,13 @@ return {
         },
       },
     },
-    {
-      "nvim-treesitter/nvim-treesitter-textobjects",
-      dependencies = {
-        "nvim-treesitter/nvim-treesitter",
-      },
-      branch = "main",
-    },
+    -- {
+    --   "nvim-treesitter/nvim-treesitter-textobjects",
+    --   dependencies = {
+    --     "nvim-treesitter/nvim-treesitter",
+    --   },
+    --   branch = "main",
+    -- },
     {
       "saghen/blink.cmp",
       ---@module 'blink.cmp'

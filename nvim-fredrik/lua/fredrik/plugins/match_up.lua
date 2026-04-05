@@ -4,13 +4,13 @@ return {
     enabled = false,
     dependencies = {
       {
-        "nvim-treesitter/nvim-treesitter",
-        opts = {
-          matchup = {
-            enable = true, -- mandatory, false will disable the whole extension
-            -- disable = { "c", "ruby" }, -- optional, list of language that will be disabled
-          },
-        },
+        -- "nvim-treesitter/nvim-treesitter",
+        -- opts = {
+        --   matchup = {
+        --     enable = true, -- mandatory, false will disable the whole extension
+        --     -- disable = { "c", "ruby" }, -- optional, list of language that will be disabled
+        --   },
+        -- },
       },
     },
     init = function()

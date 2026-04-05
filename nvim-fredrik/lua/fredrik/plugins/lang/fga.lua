@@ -28,22 +28,26 @@ local parser_config = {
 }
 
 -- Register immediately so it's available when buffers open
-require("nvim-treesitter.parsers").fga = parser_config
+if package.loaded["nvim-treesitter"] then
+  require("nvim-treesitter.parsers").fga = parser_config
+end
 
 -- Also register on TSUpdate for installation; required for auto-install
 vim.api.nvim_create_autocmd("User", {
   pattern = "TSUpdate",
   callback = function()
-    require("nvim-treesitter.parsers").fga = parser_config
+    if package.loaded["nvim-treesitter"] then
+      require("nvim-treesitter.parsers").fga = parser_config
+    end
   end,
 })
 
 return {
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = function(_, opts)
-      opts.ensure_installed = opts.ensure_installed or {}
-      opts.ensure_installed.fga = "fga"
-    end,
-  },
+  -- {
+  --   "nvim-treesitter/nvim-treesitter",
+  --   opts = function(_, opts)
+  --     opts.ensure_installed = opts.ensure_installed or {}
+  --     opts.ensure_installed.fga = "fga"
+  --   end,
+  -- },
 }
