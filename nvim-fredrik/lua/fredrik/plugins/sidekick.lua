@@ -85,7 +85,7 @@ return {
           cmd = {
             "claude",
             "--continue",
-            "--enable-auto-mode",
+            "--allow-dangerously-skip-permissions",
             "--allowedTools=mcp__github",
             "--allowedTools=Bash(gh:*)",
             "--allowedTools=RunBash(go:*)",
