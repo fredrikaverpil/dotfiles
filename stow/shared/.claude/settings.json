@@ -73,6 +73,7 @@
     "code-review@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {},
+  "showClearContextOnPlanAccept": true,
   "skipDangerousModePermissionPrompt": true,
   "model": "opus"
 }
