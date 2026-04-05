@@ -1,0 +1,1 @@
+../../../.claude/skills/gcp-pubsub/SKILL.md

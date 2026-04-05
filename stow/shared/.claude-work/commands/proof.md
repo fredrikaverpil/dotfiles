@@ -1,1 +1,0 @@
-../../.claude/commands/proof.md

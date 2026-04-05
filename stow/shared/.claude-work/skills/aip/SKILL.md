@@ -1,0 +1,1 @@
+../../../.claude/skills/aip/SKILL.md

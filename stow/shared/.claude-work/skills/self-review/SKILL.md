@@ -1,0 +1,1 @@
+../../../.claude/skills/self-review/SKILL.md

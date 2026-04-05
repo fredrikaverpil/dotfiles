@@ -1,6 +1,11 @@
 ---
-description: Self-review the work you just implemented
+name: self-review
+description: When done with implementation, perform self-review of the work
+user-invocable: true
+disable-model-invocation: false
 ---
+
+# Self-Review
 
 Go back and critically review your recent implementation end-to-end. Read
 through all changed files and evaluate the work as a whole.
