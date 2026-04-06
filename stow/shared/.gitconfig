@@ -22,12 +22,15 @@
 	prompt = false
 [diff]
 	# tool = vscode
-	tool = neovim
+	# tool = neovim
+	tool = nvim_difftool
 	# tool = diffview
 [difftool "vscode"]
 	cmd = code --wait --diff $LOCAL $REMOTE
 [difftool "neovim"]
 	cmd = nvim -d $LOCAL $REMOTE
+[difftool "nvim_difftool"]
+	cmd = "nvim -c 'packadd nvim.difftool' -c 'DiffTool $LOCAL $REMOTE'"
 [difftool "diffview"]
 	cmd = "nvim -d '$LOCAL' '$REMOTE' -c 'DiffviewOpen'"
 [difftool]
