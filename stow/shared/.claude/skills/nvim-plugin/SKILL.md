@@ -81,7 +81,7 @@ vim.keymap.set("n", "<leader>a", "<Plug>(MyPluginAction)")
 require("myplugin").do_action()  -- callable directly
 ```
 
-For buffer-local mappings (custom UI, ftplugin), always pass `buf = bufnr`:
+For buffer-local mappings (custom UI, ftplugin), always pass `buffer = bufnr`:
 
 ```lua
 vim.keymap.set("n", "<Plug>(MyPluginBufferAction)", function()
