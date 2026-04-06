@@ -93,8 +93,9 @@ end, { buffer = bufnr })
 
 ### Pattern 1: Separated config + init (preferred)
 
-Plugin works out-of-the-box. `setup()` only overrides defaults. Initialization
-happens in `plugin/` or `ftplugin/` scripts.
+Plugin works out-of-the-box. `setup()` only overrides defaults — no `require()`
+calls, side effects, or expensive work. Initialization happens in `plugin/` or
+`ftplugin/` scripts, not inside `setup()`.
 
 ```lua
 -- lua/myplugin/config.lua
