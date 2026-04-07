@@ -113,6 +113,15 @@ The load order repeats with `after/` — for example:
 10. after/lsp/<server>.lua    ← overrides fields from the base config
 ```
 
+### Per-project overrides (exrc)
+
+With `vim.opt.exrc = true` (set in `lua/options.lua`), Neovim sources
+`.nvim.lua` from the current working directory at **step 7c** of initialization
+— after all `plugin/` and `after/plugin/` files, but before filetype detection.
+This is the native equivalent of lazy.nvim's `.lazy.lua`. Use it for
+per-project config like extra formatters or linter overrides.
+Docs: `:h exrc`
+
 ### Notes
 
 - `ftplugin/go.lua` fires **every time you open a `.go` file**, not at startup.
