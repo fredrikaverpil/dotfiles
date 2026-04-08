@@ -67,16 +67,47 @@ Searching the web for `:h <tag>` plus "neovim" also works well.
 
 ---
 
-## Runtime directories and load order
+## Startup sequence (`:h initialization`)
+
+The complete Neovim startup sequence, from `:h initialization`:
+
+| Step | What happens |
+|------|-------------|
+| 1 | Set `'shell'` from `$SHELL` |
+| 2 | Process arguments, execute `--cmd` args, create buffers (not loaded yet) |
+| 3 | Start server, set `v:servername` |
+| 4 | Wait for UI to connect (if `--embed`) |
+| 5 | Setup default mappings and autocmds |
+| 6 | Enable filetype and indent plugins (`:runtime! ftplugin.vim indent.vim`) |
+| **7a** | System vimrc (`sysinit.vim`) |
+| **7b** | **User config (`init.lua`)** — leader keys, `require("options")`, etc. |
+| **7c** | **`.nvim.lua` (exrc)** — project-local config, if `'exrc'` is on |
+| 8 | Enable filetype detection (`:runtime! filetype.lua`) |
+| 9 | Enable syntax highlighting |
+| 10 | Set `v:vim_did_init = 1` |
+| **11** | **Load plugins**: `plugin/**/*.lua`, then packages, then `after/` plugins |
+| 12 | Set `'shellpipe'` and `'shellredir'` |
+| 13 | Set `'updatecount'` to zero if `-n` was given |
+| 14 | Set binary options if `-b` was given |
+| 15 | Read ShaDa file |
+| 16 | Read quickfix file if `-q` was given |
+| 17 | Open windows, load buffers → triggers **`VimEnter`** |
+
+**Key takeaway:** `.nvim.lua` (step 7c) runs **before** `plugin/` and
+`after/plugin/` (step 11). `VimEnter` (step 17) fires **after** everything.
+
+---
+
+## Runtime directories
 
 Neovim searches these directories in every runtimepath entry
 (`:h 'runtimepath'`). Each directory has a specific purpose and timing:
 
 | Directory | When | Purpose |
 |---|---|---|
-| `init.lua` | Once, first | Leader keys, `require("options")`, diagnostics |
+| `init.lua` | Step 7b, once | Leader keys, `require("options")`, diagnostics |
 | `lua/` | On `require()` | Lua modules (never auto-sourced) |
-| `plugin/**/*.lua` | Once, at startup | Plugin install + setup (alphabetical, subdirs included) |
+| `plugin/**/*.lua` | Step 11, once | Plugin install + setup (alphabetical, subdirs included) |
 | `ftplugin/<ft>.lua` | Per-buffer, on FileType | Buffer-local settings (`vim.opt_local`) |
 | `indent/<ft>.lua` | Per-buffer, on FileType | Indent expressions |
 | `syntax/<ft>.vim` | Per-buffer, on FileType | Legacy syntax highlighting (treesitter overrides) |
@@ -97,8 +128,8 @@ its files always win. Docs: `:h after-directory`
 The load order repeats with `after/` — for example:
 
 ```
-1. plugin/**/*.lua            ← runs first
-2. after/plugin/**/*.lua      ← runs after all plugin/ files
+1. plugin/**/*.lua            ← runs first (step 11)
+2. after/plugin/**/*.lua      ← runs after all plugin/ files (step 11)
 
 3. ftplugin/<ft>.lua          ← runs on FileType
 4. after/ftplugin/<ft>.lua    ← runs after, overrides the above
@@ -116,11 +147,26 @@ The load order repeats with `after/` — for example:
 ### Per-project overrides (exrc)
 
 With `vim.opt.exrc = true` (set in `lua/options.lua`), Neovim sources
-`.nvim.lua` from the current working directory at **step 7c** of initialization
-— after all `plugin/` and `after/plugin/` files, but before filetype detection.
-This is the native equivalent of lazy.nvim's `.lazy.lua`. Use it for
-per-project config like extra formatters or linter overrides.
-Docs: `:h exrc`
+`.nvim.lua` from the current working directory at **step 7c** — **before**
+`plugin/` and `after/plugin/` files (step 11), and before filetype detection
+(step 8). This is the native equivalent of lazy.nvim's `.lazy.lua`.
+Docs: `:h exrc`, `:h initialization`
+
+Because `.nvim.lua` runs before plugins, direct `require("conform").setup()`
+or `require("lint")` calls will be overwritten by `after/plugin/lang/` files.
+To override plugin config per-project, wrap the call in a `VimEnter` autocmd:
+
+```lua
+-- .nvim.lua (project root)
+vim.api.nvim_create_autocmd("VimEnter", {
+  once = true,
+  callback = function()
+    require("conform").setup({
+      formatters_by_ft = { markdown = { "mdformat" } },
+    })
+  end,
+})
+```
 
 ### Notes
 
@@ -345,6 +391,63 @@ end, { desc = "Toggle auto-format" })
 
 **Always** pass `{ clear = true }` to `nvim_create_augroup` — prevents
 duplicate autocmds if the file is re-sourced.
+
+**Deferred plugin file** (for plugins only used via keymaps — dap, neotest,
+codediff, etc.). Keep `vim.pack.add()` at the top so the plugin is on the
+packpath, but defer the expensive `require()` + `.setup()` to first use:
+
+```lua
+-- plugin/dap.lua
+vim.pack.add({
+  { src = "https://codeberg.org/mfussenegger/nvim-dap", name = "nvim-dap" },
+  { src = "https://github.com/rcarriga/nvim-dap-ui" },
+})
+
+local initialized = false
+
+local function init()
+  if initialized then
+    return
+  end
+  initialized = true
+  require("dapui").setup()
+  -- ... rest of setup
+end
+
+vim.keymap.set("n", "<leader>dc", function()
+  init()
+  require("dap").continue()
+end, { desc = "Continue" })
+```
+
+**Deferred filetype-specific plugin** (csv, log, schemastore, etc.). Wrap
+`require()` + `.setup()` in a `FileType` autocmd with `once = true`:
+
+```lua
+-- after/plugin/lang/csv.lua
+vim.pack.add({
+  { src = "https://github.com/hat0uma/csvview.nvim" },
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "csv",
+  once = true,
+  callback = function()
+    require("csvview").setup()
+  end,
+})
+```
+
+Also useful for expensive requires triggered by lang files (e.g. SchemaStore
+catalog ~7ms — defer the `vim.lsp.config()` call into a `FileType` autocmd).
+
+**Do NOT defer** plugins needed from the first frame or first keystroke:
+completion (blink.cmp), statusline (lualine), LSP, mason (PATH setup needed
+before LSPs start), colorscheme, treesitter.
+
+**Profile with:**
+`NVIM_APPNAME=nvim-native nvim --startuptime /tmp/startup.log -c quit`, then
+sort by self+sourced time to find the biggest offenders.
 
 **ftplugin** for per-filetype settings, not autocmds:
 
