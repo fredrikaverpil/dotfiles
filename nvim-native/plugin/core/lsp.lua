@@ -6,7 +6,31 @@ vim.pack.add({
 })
 
 -- Enable LSP servers (configs come from lsp/*.lua files)
-vim.lsp.enable({ "lua_ls", "gopls" })
+vim.lsp.enable({
+  "lua_ls",
+  "gopls",
+  "basedpyright",
+  "ruff",
+  "dockerls",
+  "jsonls",
+  "bashls",
+  "zls",
+  "ts_query_ls",
+  "templ",
+  "graphql",
+  "superhtml",
+  "taplo",
+  "vtsls",
+  "yamlls",
+  "terraformls",
+  "buf_ls",
+  "rust_analyzer",
+})
+
+-- Conditionally enable nil_ls (requires nix)
+if vim.fn.executable("nix") == 1 then
+  vim.lsp.enable("nil_ls")
+end
 
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("native-lsp-attach", { clear = true }),

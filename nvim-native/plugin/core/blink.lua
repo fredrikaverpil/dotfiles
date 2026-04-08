@@ -3,7 +3,11 @@
 vim.pack.add({
   { src = "https://github.com/Saghen/blink.cmp", version = vim.version.range("1.*") },
   { src = "https://github.com/rafamadriz/friendly-snippets" },
+  { src = "https://github.com/edte/blink-go-import.nvim" },
+  { src = "https://github.com/kristijanhusak/vim-dadbod-completion" },
 })
+
+require("blink-go-import").setup()
 
 require("blink.cmp").setup({
   keymap = { preset = "default" },
@@ -30,7 +34,7 @@ require("blink.cmp").setup({
   },
   signature = { enabled = true },
   sources = {
-    default = { "lazydev", "lsp", "path", "snippets", "buffer", "markdown" },
+    default = { "lazydev", "lsp", "path", "snippets", "buffer", "markdown", "go_pkgs", "dadbod" },
     providers = {
       lazydev = {
         name = "LazyDev",
@@ -40,6 +44,14 @@ require("blink.cmp").setup({
       markdown = {
         name = "RenderMarkdown",
         module = "render-markdown.integ.blink",
+      },
+      go_pkgs = {
+        name = "Import",
+        module = "blink-go-import",
+      },
+      dadbod = {
+        name = "Dadbod",
+        module = "vim_dadbod_completion.blink",
       },
     },
   },

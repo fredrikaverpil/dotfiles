@@ -7,6 +7,8 @@ vim.pack.add({
   { src = "https://github.com/antoinemadec/FixCursorHold.nvim" },
   { src = "https://github.com/nvim-neotest/neotest-plenary" },
   { src = "https://github.com/uga-rosa/utf8.nvim" },
+  { src = "https://github.com/nvim-neotest/neotest-python" },
+  { src = "https://github.com/lawrence-laz/neotest-zig", version = vim.version.range("1.*") },
 })
 
 -- neotest-golang: prefer local dev clone, fall back to GitHub.
@@ -59,6 +61,14 @@ require("neotest").setup({
       },
       runner = "gotestsum",
       gotestsum_args = { "--format=standard-verbose" },
+    }),
+    require("neotest-python")({
+      runner = "pytest",
+      args = { "--log-level", "INFO", "--color", "yes", "-vv", "-s" },
+      dap = { justMyCode = false },
+    }),
+    require("neotest-zig")({
+      dap = { adapter = "lldb" },
     }),
   },
   discovery = {

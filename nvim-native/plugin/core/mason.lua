@@ -15,9 +15,25 @@ require("mason-lspconfig").setup({
 })
 
 local ensure_installed = {
-  -- LSP
+  -- LSP (mason-lspconfig handles name mapping for these)
   "gopls",
   "lua-language-server",
+  "basedpyright",
+  "ruff",
+  "dockerfile-language-server",
+  "json-lsp",
+  "bash-language-server",
+  "zls",
+  "ts_query_ls",
+  "templ",
+  "graphql-language-service-cli",
+  "superhtml",
+  "taplo",
+  "vtsls",
+  "yaml-language-server",
+  "terraform-ls",
+  "rust-analyzer",
+  "nil-ls",
   -- Formatters
   "gofumpt",
   "goimports",
@@ -25,10 +41,26 @@ local ensure_installed = {
   "golines",
   "stylua",
   "prettier",
+  "biome",
+  "shfmt",
+  "yamlfmt",
+  "buf",
   -- Linters
   "golangci-lint",
   "markdownlint",
-  -- Test runners
+  "hadolint",
+  "shellcheck",
+  "mypy",
+  "yamllint",
+  "actionlint",
+  "tflint",
+  "protolint",
+  "api-linter",
+  -- DAP
+  "debugpy",
+  "delve",
+  "codelldb",
+  -- Other tools
   "gotestsum",
 }
 
