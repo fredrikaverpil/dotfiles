@@ -1,6 +1,3 @@
--- Go filetype settings.
--- Sourced automatically when a buffer's filetype is set to "go".
-
 vim.opt_local.tabstop = 2
 vim.opt_local.softtabstop = 2
 vim.opt_local.shiftwidth = 2

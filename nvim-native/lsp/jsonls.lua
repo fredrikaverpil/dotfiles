@@ -6,5 +6,5 @@ return {
   init_options = {
     provideFormatter = false, -- use conform.nvim instead
   },
-  -- schemas are added via after/plugin/lang/json.lua (SchemaStore must load first)
+  -- schemas are added via plugin/lang/json.lua (SchemaStore must load first)
 }

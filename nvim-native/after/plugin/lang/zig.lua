@@ -1,2 +1,0 @@
--- Zig: neotest adapter and code runner are configured in
--- plugin/neotest.lua and plugin/code_runner.lua respectively.

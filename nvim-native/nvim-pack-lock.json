@@ -9,7 +9,7 @@
       "src": "https://github.com/afonsofrancof/OSC11.nvim"
     },
     "SchemaStore.nvim": {
-      "rev": "6d0329adb9c8cbe51b9a28299890a5eb104db7dc",
+      "rev": "35d19ffb25c9cf160f515360e9d8286cdd2c3d4f",
       "src": "https://github.com/b0o/SchemaStore.nvim"
     },
     "arrow.nvim": {
@@ -62,8 +62,12 @@
       "src": "https://github.com/f-person/git-blame.nvim"
     },
     "gitsigns.nvim": {
-      "rev": "0d797daee85366bc242580e352a4f62d67557b84",
+      "rev": "8d82c240f190fc33723d48c308ccc1ed8baad69d",
       "src": "https://github.com/lewis6991/gitsigns.nvim"
+    },
+    "goplements.nvim": {
+      "rev": "1750ace64d42efcbc1ce36eef848a3cea5f88c79",
+      "src": "https://github.com/maxandron/goplements.nvim"
     },
     "grug-far.nvim": {
       "rev": "37d0eafc6a2dcf8641aa19fc2a8db5e391b7f16b",
@@ -86,7 +90,7 @@
       "src": "https://github.com/fei6409/log-highlight.nvim"
     },
     "lualine.nvim": {
-      "rev": "8811f3f3f4dc09d740c67e9ce399e7a541e2e5b2",
+      "rev": "f5d2a8570f8b736ddb9bb4be504355bcd6e15ec8",
       "src": "https://github.com/nvim-lualine/lualine.nvim"
     },
     "luvit-meta": {
@@ -97,8 +101,12 @@
       "rev": "a923f5fc5ba36a3b17e289dc35dc17f66d0548ee",
       "src": "https://github.com/iamcco/markdown-preview.nvim"
     },
+    "mason-lock.nvim": {
+      "rev": "b75e2de585637a61b2fb818dc33dad7863b7b0c4",
+      "src": "https://github.com/zapling/mason-lock.nvim"
+    },
     "mason-lspconfig.nvim": {
-      "rev": "25f609e7fca78af7cede4f9fa3af8a94b1c4950b",
+      "rev": "63a3c6a80538de1003373a619e29aeda27809ad3",
       "src": "https://github.com/mason-org/mason-lspconfig.nvim"
     },
     "mason.nvim": {
@@ -163,7 +171,7 @@
       "src": "https://codeberg.org/mfussenegger/nvim-lint"
     },
     "nvim-lspconfig": {
-      "rev": "bedca8b426b2fee0ccac596d167d71bbe971253f",
+      "rev": "c588db330592fa477a70d2fee6ba20a57194bdc3",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "nvim-nio": {
@@ -183,7 +191,7 @@
       "src": "https://github.com/nvim-treesitter/nvim-treesitter-context"
     },
     "obsidian.nvim": {
-      "rev": "901249875be25e8a75d135b5466226e64f394119",
+      "rev": "dec6573816767eaa9596cabc1593f45a2f7821ee",
       "src": "https://github.com/obsidian-nvim/obsidian.nvim"
     },
     "oil-git.nvim": {

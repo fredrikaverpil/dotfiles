@@ -10,7 +10,7 @@ return {
         enable = false, -- using b0o/SchemaStore.nvim instead
         url = "", -- avoid TypeError
       },
-      -- schemas are added via after/plugin/lang/yaml.lua (SchemaStore must load first)
+      -- schemas are added via plugin/lang/yaml.lua (SchemaStore must load first)
       validate = true,
       format = {
         enable = false, -- delegate to conform.nvim

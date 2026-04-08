@@ -153,7 +153,7 @@ With `vim.opt.exrc = true` (set in `lua/options.lua`), Neovim sources
 Docs: `:h exrc`, `:h initialization`
 
 Because `.nvim.lua` runs before plugins, direct `require("conform").setup()`
-or `require("lint")` calls will be overwritten by `after/plugin/lang/` files.
+or `require("lint")` calls will be overwritten by `after/plugin/` aggregators.
 To override plugin config per-project, wrap the call in a `VimEnter` autocmd:
 
 ```lua
@@ -186,12 +186,16 @@ This config has no framework — each directory has a single responsibility:
 |---|---|---|
 | **options** | `lua/options.lua` | All `vim.opt` settings, required from `init.lua` |
 | **utility** | `lua/` | Shared Lua modules, `require()`'d explicitly (fold helpers, toggle, pickers) |
+| **registry** | `lua/registry.lua` | Central typed registry — lang files declare, aggregators read |
 | **wiring** | `plugin/` | Plugin install + setup + keymaps. Self-contained per plugin. |
-| **lang extensions** | `after/plugin/lang/` | Per-language formatter/linter config. Extends `plugin/` files. |
+| **lang declarations** | `plugin/lang/` | Per-language requirements (LSP, mason, formatters, linters) via registry |
+| **aggregators** | `after/plugin/` | Read registry, call setup() for blink, conform, lint, lsp, mason |
 | **server config** | `lsp/` | LSP server config tables, auto-discovered by `vim.lsp.config` |
 | **editor settings** | `ftplugin/` | Per-filetype `vim.opt_local` settings (indent, wrap, etc.) |
 
-**Key rule:** `plugin/` files set up plugin infrastructure (empty `formatters_by_ft`, empty `linters_by_ft`). Language specifics go in `after/plugin/lang/` — guaranteed to run after all `plugin/` files, so no `pcall` or ordering tricks needed.
+**Key rule:** `plugin/lang/` files **declare** requirements into the registry.
+`after/plugin/` aggregators **read** from the registry and do their setup.
+Load order is guaranteed: `plugin/` runs before `after/plugin/`.
 
 ---
 
@@ -202,16 +206,23 @@ Conceptual layout (`:h initialization`, step 11 uses `plugin/**/*.{vim,lua}` —
 ```
 ~/.config/nvim-native/
   init.lua               — leader keys, require("options"), diagnostics
-  lua/                   — Lua modules loaded via require()
+  lua/
+    registry.lua         — central registry (lang files declare, aggregators read)
+    options.lua          — all vim.opt settings
+    ...                  — other utility modules (fold, toggle, pickers, etc.)
   lsp/                   — one file per LSP server; auto-discovered
   parser/                — treesitter parser .so files (managed by nvim-treesitter)
   colors/                — custom colorschemes (loaded by :colorscheme)
   plugin/
-    core/                — foundation plugins (completion, LSP, format, lint, UI)
-    <name>.lua           — other plugins
+    lang/                — per-language declarations (populates registry)
+    <name>.lua           — feature plugins (lualine, snacks, treesitter, oil, dap, etc.)
   after/
     plugin/
-      lang/              — one file per filetype; extends core plugin tables
+      blink.lua          — reads registry → sets up completion
+      conform.lua        — reads registry → sets up formatting
+      lint.lua           — reads registry → sets up linting
+      lsp.lua            — reads registry → enables LSP servers
+      mason.lua          — reads registry → installs tools
     lsp/                 — overrides for LSP configs from packages
     queries/<lang>/      — treesitter query extensions (injections.scm, etc.)
     syntax/<ft>.vim       — legacy syntax overrides/extensions
@@ -223,21 +234,26 @@ diagnostics config. Docs: `:h initialization`
 
 **`lua/`** — Lua modules loaded via `require()`. Never auto-sourced.
 Includes `options.lua` (editor options, required from `init.lua`),
-`fold.lua` (fold helpers shared by `init.lua` and `plugin/core/lsp.lua`),
+`registry.lua` (central typed registry for lang declarations),
+`fold.lua` (fold helpers shared by `init.lua` and `after/plugin/lsp.lua`),
 and any other shared utilities (toggle helpers, custom pickers, etc.).
+
+**`lua/registry.lua`** — Typed central registry module. Lang files call
+`require("registry").add({...})` with a `RegistrySpec` table declaring
+`lsp_servers`, `mason_tools`, `conform`, and `lint` requirements. Aggregators
+read from the registry after all `plugin/` files have run.
 
 **`plugin/`** — Each file is self-contained: `vim.pack.add()` at the top,
 `setup()` below it, keymaps inline. Sourced alphabetically; subdirectories
 included via the `**` glob. Docs: `:h initialization` (step 11)
 
-**`plugin/core/`** — Foundation plugins: completion, formatting, linting, LSP
-wiring, tool installer (mason), statusline, notifications/picker. Organizational
-convention — not a load-order guarantee (see decision guide below).
+**`plugin/lang/`** — One file per language. Declares requirements into
+the registry via `require("registry").add({...})`. May also install
+lang-specific plugins (`vim.pack.add()`) and register deferred autocmds.
 
-**`after/plugin/lang/`** — One file per filetype. Extends `formatters_by_ft`,
-`linters_by_ft`, and other tables owned by `plugin/core/` files. Runs after all
-`plugin/` files — no `pcall` or ordering hacks needed.
-Docs: `:h after-directory`
+**`after/plugin/`** — Aggregator files (blink, conform, dap, lint, lsp, lualine,
+mason, neotest) that read from the registry and call setup(). Runs after all `plugin/` files,
+so the registry is fully populated. Docs: `:h after-directory`
 
 **`lsp/`** — Each file returns a `vim.lsp.Config` table; filename becomes the
 server name. No `setup()` call needed. Enable servers explicitly elsewhere
@@ -305,10 +321,12 @@ return {
 }
 ```
 
-Enable servers from `plugin/lsp.lua` (not from `lsp/` files themselves):
+Servers are enabled by the `after/plugin/lsp.lua` aggregator, which reads
+`registry.lsp_servers`. Lang files declare their servers via:
 
 ```lua
-vim.lsp.enable({ "gopls", "lua_ls" })
+-- plugin/lang/go.lua
+require("registry").add({ lsp_servers = { "gopls" } })
 ```
 
 To disable a server: `vim.lsp.enable("gopls", false)`.
@@ -321,25 +339,47 @@ Default: **everything goes in `plugin/`**. Most plugins are order-independent
 — they install, set up, and register autocmds that fire later. No ordering needed.
 
 Move something to `after/plugin/` only when it has a **concrete, named
-dependency** on a `plugin/` file being fully done:
+dependency** on `plugin/` files being fully done:
 
 | Situation | Where |
 |---|---|
-| Installing and setting up a foundation plugin | `plugin/core/<name>.lua` |
-| Installing and setting up any other plugin | `plugin/<name>.lua` |
-| Extending `formatters_by_ft` / `linters_by_ft` | `after/plugin/lang/<ft>.lua` |
-| Any file that mutates tables owned by a `plugin/` file | `after/plugin/` |
+| Installing and setting up a plugin | `plugin/<name>.lua` |
+| Per-language declarations (LSP, mason, formatters, linters, blink, dap) | `plugin/lang/<ft>.lua` |
+| Aggregators that read the registry (blink, conform, dap, lint, lsp, lualine, mason, neotest) | `after/plugin/<name>.lua` |
 
-### plugin/core/ — foundation plugins
+### Registry pattern
 
-`plugin/core/` holds the structural foundation: completion, formatting, linting,
-LSP wiring, tool installer (mason), statusline, notifications/picker.
-Everything else lives directly in `plugin/`.
+The config uses a **declare → collect → setup** flow:
 
-This is an **organizational convention**, not a load-order guarantee. Files sort
-lexicographically across the full `plugin/**` expansion — `core/` happens to sort
-early, but don't rely on it. Both subdirectories run at startup and are
-order-independent by design (event-driven via autocmds).
+1. `plugin/lang/*.lua` files call `require("registry").add({...})` with a
+   `RegistrySpec` table during the `plugin/` phase
+2. `after/plugin/*.lua` aggregators read from `require("registry")` and call
+   setup() — guaranteed to run after all `plugin/` files
+
+The `RegistrySpec` type supports:
+- `lsp_servers` — list of LSP server names (list-extend merge)
+- `mason_tools` — list of Mason package names (list-extend merge)
+- `conform` — conform.setupOpts table (deep-merge via `vim.tbl_deep_extend`)
+- `lint` — `{ linters_by_ft, linters }` table (deep-merge)
+- `blink` — blink.cmp.Config table (deep-merge; `sources.default` is auto-built from registered providers)
+- `dap` — `{ adapters, configurations, setups }` (adapters/configurations deep-merge, setups list-extend)
+- `neotest` — `{ adapters }` where each adapter is `{ module, opts? }` (list-extend; aggregator calls `require(module)(opts)` during init)
+- `lualine` — `{ lualine_x = {...}, ... }` (per-section list-extend; lualine re-setups at VimEnter with injected components)
+
+```lua
+-- plugin/lang/go.lua — pure typed declaration
+require("registry").add({
+  lsp_servers = { "gopls" },
+  mason_tools = { "gopls", "goimports", "gci", "gofumpt", "golines", "golangci-lint" },
+  conform = {
+    formatters_by_ft = { go = { "goimports", "gci", "gofumpt", "golines" } },
+    formatters = { goimports = { args = { "-srcdir", "$FILENAME" } } },
+  },
+  lint = {
+    linters_by_ft = { go = { "golangcilint" } },
+  },
+})
+```
 
 ### Within plugin/ — ordering
 
@@ -363,30 +403,16 @@ plugin/
 **Self-contained plugin file** (the standard pattern):
 
 ```lua
--- plugin/conform.lua
+-- plugin/oil.lua
 vim.pack.add({
-  { src = "https://github.com/stevearc/conform.nvim" },
+  { src = "https://github.com/stevearc/oil.nvim" },
 })
 
-vim.g.auto_format = true
-
-require("conform").setup({
-  formatters_by_ft = { go = { "gofumpt", "goimports" } },
+require("oil").setup({
+  view_options = { show_hidden = true },
 })
 
-vim.api.nvim_create_autocmd("BufWritePre", {
-  group = vim.api.nvim_create_augroup("native-conform", { clear = true }),
-  callback = function(args)
-    if vim.g.auto_format then
-      require("conform").format({ bufnr = args.buf, timeout_ms = 5000 })
-    end
-  end,
-})
-
-vim.keymap.set("n", "<leader>tf", function()
-  vim.g.auto_format = not vim.g.auto_format
-  vim.notify("Auto-format: " .. (vim.g.auto_format and "on" or "off"))
-end, { desc = "Toggle auto-format" })
+vim.keymap.set("n", "-", "<cmd>Oil<cr>", { desc = "Open file explorer" })
 ```
 
 **Always** pass `{ clear = true }` to `nvim_create_augroup` — prevents
@@ -424,7 +450,7 @@ end, { desc = "Continue" })
 `require()` + `.setup()` in a `FileType` autocmd with `once = true`:
 
 ```lua
--- after/plugin/lang/csv.lua
+-- plugin/lang/csv.lua
 vim.pack.add({
   { src = "https://github.com/hat0uma/csvview.nvim" },
 })
@@ -440,6 +466,45 @@ vim.api.nvim_create_autocmd("FileType", {
 
 Also useful for expensive requires triggered by lang files (e.g. SchemaStore
 catalog ~7ms — defer the `vim.lsp.config()` call into a `FileType` autocmd).
+
+**Lang file with registry declaration** (the standard lang pattern):
+
+```lua
+-- plugin/lang/shell.lua
+require("registry").add({
+  lsp_servers = { "bashls" },
+  mason_tools = { "bash-language-server", "shfmt", "shellcheck" },
+  conform = {
+    formatters_by_ft = { sh = { "shfmt" } },
+  },
+  lint = {
+    linters_by_ft = { sh = { "shellcheck" } },
+  },
+})
+```
+
+Lang files can also install plugins and register autocmds alongside declarations:
+
+```lua
+-- plugin/lang/python.lua
+require("registry").add({
+  lsp_servers = { "basedpyright", "ruff" },
+  mason_tools = { "basedpyright", "ruff", "mypy", "debugpy" },
+  lint = { linters_by_ft = { python = { "mypy" } } },
+})
+
+vim.pack.add({
+  { src = "https://codeberg.org/mfussenegger/nvim-dap-python", name = "nvim-dap-python" },
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "python",
+  once = true,
+  callback = function()
+    require("dap-python").setup("uv")
+  end,
+})
+```
 
 **Do NOT defer** plugins needed from the first frame or first keystroke:
 completion (blink.cmp), statusline (lualine), LSP, mason (PATH setup needed
@@ -499,18 +564,22 @@ With `NVIM_APPNAME=nvim-native`, paths use `nvim-native` instead of `nvim`.
 
 ## Adding a new language
 
-1. `lsp/<server>.lua` — return the server config table
-2. `plugin/lsp.lua` — add server name to `vim.lsp.enable({})`
-3. `plugin/mason.lua` — add tool names to `ensure_installed`
-4. `after/plugin/lang/<ft>.lua` — extend conform/lint for this filetype:
+1. `plugin/lang/<ft>.lua` — call `require("registry").add()` with lsp_servers,
+   mason_tools, conform, lint:
    ```lua
-   require("conform").setup({ formatters_by_ft = { python = { "ruff_format" } } })
-   require("lint").linters_by_ft.python = { "ruff" }
+   require("registry").add({
+     lsp_servers = { "pyright" },
+     mason_tools = { "pyright", "ruff" },
+     conform = { formatters_by_ft = { python = { "ruff_format" } } },
+     lint = { linters_by_ft = { python = { "ruff" } } },
+   })
    ```
-5. `ftplugin/<ft>.lua` — editor settings only (`vim.opt_local.*`)
+2. `lsp/<server>.lua` — return the server config table (if custom config needed)
+3. `ftplugin/<ft>.lua` — editor settings only (`vim.opt_local.*`)
+4. *(optional)* `after/lsp/<server>.lua` — extend base LSP config
 
-Do **not** add language-specific formatter or linter config to `plugin/conform.lua`
-or `plugin/lint.lua` — those files own infrastructure only.
+Do **not** add language-specific config to the aggregator files in
+`after/plugin/` — those read from the registry only.
 
 ## Adding a shared utility (toggle, custom picker, etc.)
 
@@ -527,7 +596,7 @@ end
 return M
 ```
 
-Used in `plugin/conform.lua`:
+Used in `after/plugin/conform.lua`:
 ```lua
-vim.keymap.set("n", "<leader>tf", require("toggle").auto_format, { desc = "Toggle auto-format" })
+vim.keymap.set("n", "<leader>uf", require("toggle").auto_format, { desc = "Toggle auto-format" })
 ```
