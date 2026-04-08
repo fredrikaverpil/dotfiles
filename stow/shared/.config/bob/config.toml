@@ -1,2 +1,2 @@
-installation_location = "~/.local/share/bob/nvim-bin"
+installation_location = "$HOME/.local/share/bob/nvim-bin"
 add_neovim_binary_to_path = false
