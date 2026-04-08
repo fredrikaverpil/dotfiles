@@ -13,12 +13,18 @@ require("conform").setup({
   },
 })
 
--- Add SchemaStore schemas to jsonls (SchemaStore.nvim is loaded by plugin/schemastore.lua)
-vim.lsp.config("jsonls", {
-  settings = {
-    json = {
-      schemas = require("schemastore").json.schemas(),
-      validate = { enable = true },
-    },
-  },
+-- Defer SchemaStore catalog loading (~7ms) until a JSON file is opened.
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "json", "jsonc", "json5" },
+  once = true,
+  callback = function()
+    vim.lsp.config("jsonls", {
+      settings = {
+        json = {
+          schemas = require("schemastore").json.schemas(),
+          validate = { enable = true },
+        },
+      },
+    })
+  end,
 })

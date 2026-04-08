@@ -1,7 +1,11 @@
--- CSV: csvview.
-
 vim.pack.add({
   { src = "https://github.com/hat0uma/csvview.nvim" },
 })
 
-require("csvview").setup()
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "csv",
+  once = true,
+  callback = function()
+    require("csvview").setup()
+  end,
+})

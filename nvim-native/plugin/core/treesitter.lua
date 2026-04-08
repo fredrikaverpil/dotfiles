@@ -1,16 +1,3 @@
--- Treesitter: syntax highlighting, folding, and parser management.
---
--- Neovim 0.12+ provides vim.treesitter natively for highlighting,
--- folding (see lua/options.lua), and language queries. This file adds:
---   1. Auto-start highlighting for all buffers with a known parser
---   2. Automatic parser installation (currently via nvim-treesitter)
---   3. Sticky context lines at top of window (treesitter-context)
---
--- nvim-treesitter is used only as a parser/query provider. If it becomes
--- unavailable, set USE_NVIM_TREESITTER to false and replace install_parser()
--- with an alternative. Built-in parsers (c, lua, vim, vimdoc, query,
--- markdown, markdown_inline) work without any plugin.
-
 local USE_NVIM_TREESITTER = true
 
 if USE_NVIM_TREESITTER then

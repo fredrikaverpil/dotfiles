@@ -1,5 +1,3 @@
--- SQL: vim-dadbod, vim-dadbod-ui, sqlit.
-
 vim.pack.add({
   { src = "https://github.com/jsborjesson/vim-uppercase-sql" },
   { src = "https://github.com/tpope/vim-dadbod" },
@@ -18,8 +16,11 @@ vim.pack.add({
   { src = "https://github.com/Maxteabag/sqlit.nvim" },
 })
 
-require("sqlit").setup({})
-
+local sqlit_ready = false
 vim.keymap.set("n", "<leader>D", function()
+  if not sqlit_ready then
+    sqlit_ready = true
+    require("sqlit").setup({})
+  end
   require("sqlit").open()
 end, { desc = "Database (sqlit)" })

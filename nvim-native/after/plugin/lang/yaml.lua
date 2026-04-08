@@ -60,11 +60,17 @@ require("lint").linters.yamllint = vim.tbl_deep_extend("force", require("lint").
   },
 })
 
--- Add SchemaStore schemas to yamlls (SchemaStore.nvim is loaded by plugin/schemastore.lua)
-vim.lsp.config("yamlls", {
-  settings = {
-    yaml = {
-      schemas = require("schemastore").yaml.schemas(),
-    },
-  },
+-- Defer SchemaStore catalog loading until a YAML file is opened.
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "yaml", "gha", "dependabot" },
+  once = true,
+  callback = function()
+    vim.lsp.config("yamlls", {
+      settings = {
+        yaml = {
+          schemas = require("schemastore").yaml.schemas(),
+        },
+      },
+    })
+  end,
 })

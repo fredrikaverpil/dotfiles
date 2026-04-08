@@ -13,6 +13,9 @@ require("conform").setup({
     prettier = {
       prepend_args = { "--prose-wrap", "always", "--print-width", "80", "--tab-width", "2" },
     },
+    mdformat = {
+      prepend_args = { "--number", "--wrap", "80" },
+    },
   },
 })
 

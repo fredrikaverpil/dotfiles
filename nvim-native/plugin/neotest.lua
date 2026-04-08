@@ -1,5 +1,3 @@
--- Testing via neotest.
-
 vim.pack.add({
   { src = "https://github.com/nvim-neotest/neotest" },
   { src = "https://github.com/nvim-neotest/nvim-nio" },
@@ -18,6 +16,47 @@ if vim.uv.fs_stat(neotest_golang_dev) then
 else
   vim.pack.add({
     { src = "https://github.com/fredrikaverpil/neotest-golang" },
+  })
+end
+
+local initialized = false
+
+local function init()
+  if initialized then
+    return
+  end
+  initialized = true
+
+  require("neotest").setup({
+    adapters = {
+      require("neotest-plenary"),
+      require("neotest-golang")({
+        go_test_args = {
+          "-v",
+          "-count=1",
+          "-race",
+          "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
+          "-parallel=1",
+        },
+        runner = "gotestsum",
+        gotestsum_args = { "--format=standard-verbose" },
+      }),
+      require("neotest-python")({
+        runner = "pytest",
+        args = { "--log-level", "INFO", "--color", "yes", "-vv", "-s" },
+        dap = { justMyCode = false },
+      }),
+      require("neotest-zig")({
+        dap = { adapter = "lldb" },
+      }),
+    },
+    discovery = {
+      enabled = true,
+      concurrent = 0,
+    },
+    running = { concurrent = true },
+    summary = { animated = true },
+    log_level = vim.log.levels.WARN,
   })
 end
 
@@ -48,54 +87,27 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
-require("neotest").setup({
-  adapters = {
-    require("neotest-plenary"),
-    require("neotest-golang")({
-      go_test_args = {
-        "-v",
-        "-count=1",
-        "-race",
-        "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
-        "-parallel=1",
-      },
-      runner = "gotestsum",
-      gotestsum_args = { "--format=standard-verbose" },
-    }),
-    require("neotest-python")({
-      runner = "pytest",
-      args = { "--log-level", "INFO", "--color", "yes", "-vv", "-s" },
-      dap = { justMyCode = false },
-    }),
-    require("neotest-zig")({
-      dap = { adapter = "lldb" },
-    }),
-  },
-  discovery = {
-    enabled = true,
-    concurrent = 0,
-  },
-  running = { concurrent = true },
-  summary = { animated = true },
-  log_level = vim.log.levels.WARN,
-})
-
 local map = function(lhs, rhs, desc)
   vim.keymap.set("n", lhs, rhs, { desc = desc })
 end
 
 map("<leader>tt", function()
+  init()
   require("neotest").run.run()
 end, "Run nearest test")
 map("<leader>tT", function()
+  init()
   require("neotest").run.run(vim.fn.expand("%"))
 end, "Run file tests")
 map("<leader>ts", function()
+  init()
   require("neotest").summary.toggle()
 end, "Toggle test summary")
 map("<leader>to", function()
+  init()
   require("neotest").output.open({ enter = true })
 end, "Open test output")
 map("<leader>tl", function()
+  init()
   require("neotest").run.run_last()
 end, "Run last test")

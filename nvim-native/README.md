@@ -25,7 +25,7 @@ nvim-native/
     colors.lua                color utility (blend)
   lsp/                        one file per LSP server (auto-discovered)
   plugin/
-    core/                     foundation: blink, conform, lint, lsp, lualine, mason, snacks, lazydev
+    core/                     foundation: blink, conform, lint, lsp, lualine, mason, snacks, lazydev, treesitter
     colorscheme.lua           zenbones + OSC11 dark/light detection
     code_runner.lua           code runner
     dap.lua                   debugging (nvim-dap + nvim-dap-ui)
@@ -41,8 +41,10 @@ nvim-native/
 
 ## Per-project overrides
 
-Place a `.nvim.lua` in any project directory. It runs after all plugins are
-loaded (`:h exrc`).
+Place a `.nvim.lua` in any project directory. It runs at step 7c of
+initialization — **before** `plugin/` and `after/plugin/` files (`:h exrc`).
+Wrap plugin overrides in a `VimEnter` autocmd so they apply after all plugins
+are loaded.
 
 ## Plugin management
 
@@ -71,3 +73,26 @@ whether a central registry is a better approach:
 - [ ] conform.lua
 - [ ] lint.lua
 - [ ] neotest.lua
+
+## Startup performance
+
+Keymap-only and filetype-specific plugins defer `require()` + `.setup()` to
+first use (see pattern in neotest.lua, dap.lua, codediff.lua, etc). The
+`vim.pack.add()` calls stay at the top level so plugins are always on the
+packpath.
+
+Remaining core plugins that load eagerly (hard to defer further):
+
+| Plugin | ~ms | Why it must be eager |
+|--------|-----|----------------------|
+| mason | 33 | PATH setup needed before LSPs start |
+| blink.cmp | 23 | Completion must be ready from first keystroke |
+| lualine | 16 | Statusline visible from first frame |
+| lsp | 16 | ~6ms is Neovim's own vim.lsp module; rest is vim.lsp.enable() |
+| oil | 12 | Acts as netrw replacement; needed if `nvim .` |
+| render_markdown | 10 | Could defer to FileType markdown |
+
+Potential further wins:
+
+- [ ] render_markdown.lua — defer to `FileType markdown` (~10ms)
+- [ ] oil.lua — defer if directory-open at startup can be handled
