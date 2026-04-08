@@ -1,18 +1,20 @@
-vim.pack.add({
-  { src = "https://github.com/iamcco/markdown-preview.nvim" },
-  { src = "https://github.com/MeanderingProgrammer/render-markdown.nvim" },
-})
+require("defer").on_ui_enter(function()
+  vim.pack.add({
+    { src = "https://github.com/iamcco/markdown-preview.nvim" },
+    { src = "https://github.com/MeanderingProgrammer/render-markdown.nvim" },
+  })
 
-require("render-markdown").setup({
-  code = {
-    sign = false,
-    width = "block",
-    right_pad = 1,
-  },
-  heading = {
-    enabled = false,
-  },
-})
+  require("render-markdown").setup({
+    code = {
+      sign = false,
+      width = "block",
+      right_pad = 1,
+    },
+    heading = {
+      enabled = false,
+    },
+  })
+end)
 
 require("registry").add({
   mason_tools = { "prettier", "markdownlint" },

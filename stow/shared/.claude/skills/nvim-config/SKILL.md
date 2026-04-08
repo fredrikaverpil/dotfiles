@@ -510,9 +510,30 @@ vim.api.nvim_create_autocmd("FileType", {
 completion (blink.cmp), statusline (lualine), LSP, mason (PATH setup needed
 before LSPs start), colorscheme, treesitter.
 
-**Profile with:**
-`NVIM_APPNAME=nvim-native nvim --startuptime /tmp/startup.log -c quit`, then
-sort by self+sourced time to find the biggest offenders.
+**Profile startup with `--startuptime`:**
+
+Neovim has a built-in startup profiling flag that writes a detailed timing log
+of every `require()`, sourced file, and startup phase:
+
+```sh
+NVIM_APPNAME=nvim-native nvim --startuptime /tmp/startup.log --headless +q
+```
+
+The log columns are:
+
+| Column | Meaning |
+|--------|---------|
+| **clock** | Wall clock time since process start (ms) |
+| **self+sourced** | Total time for a file including everything it `require()`'d |
+| **self** | Time spent in that file alone (excluding nested requires) |
+
+To find the biggest offenders, look at the `self+sourced` column for
+`sourcing .../plugin/*.lua` and `sourcing .../after/plugin/*.lua` lines.
+Individual `require()` lines show module-level cost.
+
+The log also shows phase boundaries (`--- NVIM STARTING ---`, `loading rtp
+plugins`, `loading after plugins`, `--- NVIM STARTED ---`) so you can see
+where time is spent across the startup sequence.
 
 **ftplugin** for per-filetype settings, not autocmds:
 

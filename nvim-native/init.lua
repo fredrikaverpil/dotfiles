@@ -60,6 +60,7 @@ _G._nvim_start_time = vim.uv.hrtime()
 
 vim.g.mapleader = " "
 vim.g.maplocalleader = ","
+vim.g.use_nvim_treesitter = true
 
 require("options")
 

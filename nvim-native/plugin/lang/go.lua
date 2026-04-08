@@ -1,17 +1,21 @@
 vim.pack.add({
-  { src = "https://github.com/edte/blink-go-import.nvim" },
   { src = "https://github.com/leoluz/nvim-dap-go" },
-  { src = "https://github.com/uga-rosa/utf8.nvim" },
-  { src = "https://github.com/maxandron/goplements.nvim" },
 })
 
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "go",
-  once = true,
-  callback = function()
-    require("goplements").setup()
-  end,
-})
+if vim.g.use_nvim_treesitter then
+  vim.pack.add({
+    { src = "https://github.com/edte/blink-go-import.nvim" },
+    { src = "https://github.com/uga-rosa/utf8.nvim" },
+    { src = "https://github.com/maxandron/goplements.nvim" },
+  })
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = "go",
+    once = true,
+    callback = function()
+      require("goplements").setup()
+    end,
+  })
+end
 
 -- godoc.nvim: prefer local dev clone, fall back to GitHub.
 local godoc_dev = vim.fn.expand("~/code/public/godoc.nvim")
@@ -66,7 +70,9 @@ else
   })
 end
 
-require("blink-go-import").setup()
+if vim.g.use_nvim_treesitter then
+  require("blink-go-import").setup()
+end
 
 require("registry").add({
   lsp_servers = { "gopls" },
@@ -104,7 +110,7 @@ require("registry").add({
     linters_by_ft = { go = { "golangcilint" } },
   },
   code_runner = { go = { "go run" } },
-  blink = {
+  blink = vim.g.use_nvim_treesitter and {
     sources = {
       providers = {
         go_pkgs = {
@@ -113,7 +119,7 @@ require("registry").add({
         },
       },
     },
-  },
+  } or nil,
   neotest = {
     adapters = {
       {

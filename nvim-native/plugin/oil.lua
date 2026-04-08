@@ -1,5 +1,3 @@
--- File manager via oil.nvim.
-
 vim.pack.add({
   { src = "https://github.com/stevearc/oil.nvim" },
   { src = "https://github.com/malewicz1337/oil-git.nvim" },
