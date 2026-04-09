@@ -7,12 +7,8 @@ vim.pack.add({
 -- Disable at startup.
 vim.cmd(":GitBlameToggle")
 
-local nmap = function(lhs, rhs, desc)
-  vim.keymap.set("n", lhs, rhs, { desc = desc, silent = true })
-end
-
-nmap("<leader>gbl", ":GitBlameToggle<CR>", "Blame line (toggle)")
-nmap("<leader>gbs", ":GitBlameCopySHA<CR>", "Copy SHA")
-nmap("<leader>gbc", ":GitBlameCopyCommitURL<CR>", "Copy commit URL")
-nmap("<leader>gbf", ":GitBlameCopyFileURL<CR>", "Copy file URL")
-nmap("<leader>gbo", ":GitBlameOpenFileURL<CR>", "Open file URL")
+vim.keymap.set("n", "<leader>gbl", ":GitBlameToggle<CR>", { desc = "Blame line (toggle)", silent = true })
+vim.keymap.set("n", "<leader>gbs", ":GitBlameCopySHA<CR>", { desc = "Copy SHA", silent = true })
+vim.keymap.set("n", "<leader>gbc", ":GitBlameCopyCommitURL<CR>", { desc = "Copy commit URL", silent = true })
+vim.keymap.set("n", "<leader>gbf", ":GitBlameCopyFileURL<CR>", { desc = "Copy file URL", silent = true })
+vim.keymap.set("n", "<leader>gbo", ":GitBlameOpenFileURL<CR>", { desc = "Open file URL", silent = true })
