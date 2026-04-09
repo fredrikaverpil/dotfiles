@@ -39,7 +39,7 @@ end
 
 ---@param opts? snacks.picker.Config
 function M.pull_requests(opts)
-  local pr_cache = nil ---@type snacks.picker.finder.Item[]?
+  local pr_cache = {} ---@type table<string, snacks.picker.finder.Item[]>
 
   return Snacks.picker.pick(vim.tbl_deep_extend("keep", opts or {}, {
     title = "Pull Requests",
@@ -71,10 +71,14 @@ function M.pull_requests(opts)
       },
     },
     finder = function(_f_opts, ctx)
-      if not pr_cache then
+      local filter = ctx.picker.opts.pr_filter
+      local gh_state = (filter == "draft" or filter == "open") and "open" or filter
+      local cache_key = gh_state
+
+      if not pr_cache[cache_key] then
         local result = vim
           .system(
-            { "gh", "pr", "list", "--state", "all", "--limit", "100", "--json", "number,title,body,isDraft,state" },
+            { "gh", "pr", "list", "--state", gh_state, "--limit", "200", "--json", "number,title,body,isDraft,state" },
             { text = true }
           )
           :wait()
@@ -86,9 +90,9 @@ function M.pull_requests(opts)
         if not ok or not prs then
           return {}
         end
-        pr_cache = {}
+        pr_cache[cache_key] = {}
         for _, pr in ipairs(prs) do
-          table.insert(pr_cache, {
+          table.insert(pr_cache[cache_key], {
             text = "#" .. pr.number .. " " .. pr.title,
             pr_number = tostring(pr.number),
             pr_title = pr.title,
@@ -99,13 +103,12 @@ function M.pull_requests(opts)
         end
       end
 
-      local filter = ctx.picker.opts.pr_filter
       local items = {}
-      for _, item in ipairs(pr_cache) do
-        local include = (filter == "open" and item.pr_state == "OPEN" and not item.pr_draft)
-          or (filter == "draft" and item.pr_state == "OPEN" and item.pr_draft)
-          or (filter == "closed" and item.pr_state == "CLOSED")
-          or (filter == "merged" and item.pr_state == "MERGED")
+      for _, item in ipairs(pr_cache[cache_key]) do
+        local include = (filter == "open" and not item.pr_draft)
+          or (filter == "draft" and item.pr_draft)
+          or (filter == "closed")
+          or (filter == "merged")
         if include then
           table.insert(items, item)
         end
