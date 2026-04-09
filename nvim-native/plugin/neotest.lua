@@ -1,5 +1,3 @@
-local registry = require("registry")
-
 vim.pack.add({
   { src = "https://github.com/nvim-neotest/neotest" },
   { src = "https://github.com/nvim-neotest/nvim-nio" },
@@ -15,8 +13,9 @@ local function init()
   end
   initialized = true
 
+  local registry = require("registry")
   local adapters = {}
-  for _, spec in ipairs(registry.neotest.adapters) do
+  for _, spec in ipairs(registry.neotest.adapters or {}) do
     local adapter = require(spec.module)
     if spec.opts then
       adapter = adapter(spec.opts)

@@ -5,20 +5,9 @@ vim.pack.add({
   { src = "https://github.com/nvim-neotest/neotest-plenary" },
 })
 
-require("defer").on_ui_enter(function()
-  require("lazydev").setup({
-    library = {
-      { path = "${3rd}/luv/library", words = { "vim%.uv" } },
-      { path = "snacks.nvim", words = { "Snacks" } },
-      "neotest",
-      "plenary",
-    },
-  })
-end)
-
 require("registry").add({
   lsp_servers = { "lua_ls" },
-  mason_tools = { "lua-language-server", "stylua" },
+  mason_ensure_installed = { "lua-language-server", "stylua" },
   conform = {
     formatters_by_ft = { lua = { "stylua" } },
   },
@@ -55,3 +44,14 @@ require("registry").add({
     },
   },
 })
+
+require("defer").on_ui_enter(function()
+  require("lazydev").setup({
+    library = {
+      { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+      { path = "snacks.nvim", words = { "Snacks" } },
+      "neotest",
+      "plenary",
+    },
+  })
+end)

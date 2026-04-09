@@ -1,11 +1,11 @@
-local registry = require("registry")
-
 vim.pack.add({
   { src = "https://codeberg.org/mfussenegger/nvim-dap", name = "nvim-dap" },
   { src = "https://github.com/rcarriga/nvim-dap-ui" },
   { src = "https://github.com/nvim-neotest/nvim-nio" },
   { src = "https://github.com/theHamsta/nvim-dap-virtual-text" },
 })
+
+local registry = require("registry")
 
 registry.add({
   lualine = {
@@ -60,15 +60,12 @@ local function init()
   end
 
   -- Apply registry adapters and configurations
-  for name, adapter in pairs(registry.dap.adapters) do
-    dap.adapters[name] = adapter
-  end
-  for ft, configs in pairs(registry.dap.configurations) do
-    dap.configurations[ft] = configs
-  end
+  local merge = require("merge")
+  merge(dap.adapters, registry.dap.adapters or {})
+  merge(dap.configurations, registry.dap.configurations or {})
 
   -- Run lang-specific setup functions (e.g. dap-go, dap-python)
-  for _, setup_fn in ipairs(registry.dap.setups) do
+  for _, setup_fn in ipairs(registry.dap.setups or {}) do
     setup_fn()
   end
 end

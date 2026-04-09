@@ -22,16 +22,18 @@ require("defer").on_vim_enter(function()
     lualine_z = { "location" },
   }
 
-  -- Apply registry injections directly (no VimEnter re-setup needed)
+  -- Prepend registry components into each section
   for section, components in pairs(registry.lualine) do
-    local base = sections[section]
-    if base then
+    if sections[section] then
       local merged = {}
       vim.list_extend(merged, components)
-      vim.list_extend(merged, base)
+      vim.list_extend(merged, sections[section])
       sections[section] = merged
     end
   end
+
+  local extensions = { "man", "quickfix" }
+  vim.list_extend(extensions, registry.lualine.extensions or {})
 
   require("lualine").setup({
     options = {
@@ -41,7 +43,7 @@ require("defer").on_vim_enter(function()
       globalstatus = true,
     },
     sections = sections,
-    extensions = { "man", "quickfix" },
+    extensions = extensions,
   })
 
   vim.opt.showmode = false

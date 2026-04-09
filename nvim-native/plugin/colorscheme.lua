@@ -1,5 +1,3 @@
--- Colorscheme: zenbones with OSC11 dark/light detection.
-
 vim.pack.add({
   { src = "https://github.com/zenbones-theme/zenbones.nvim" },
   { src = "https://github.com/afonsofrancof/OSC11.nvim" },

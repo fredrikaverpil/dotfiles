@@ -4,7 +4,7 @@ vim.pack.add({
 
 require("registry").add({
   lsp_servers = { "yamlls" },
-  mason_tools = { "yaml-language-server", "yamlfmt", "yamllint", "actionlint" },
+  mason_ensure_installed = { "yaml-language-server", "yamlfmt", "yamllint", "actionlint" },
   conform = {
     formatters_by_ft = {
       yaml = { "yamlfmt" },

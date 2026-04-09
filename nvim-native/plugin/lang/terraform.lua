@@ -1,6 +1,6 @@
 require("registry").add({
   lsp_servers = { "terraformls" },
-  mason_tools = { "terraform-ls", "tflint" },
+  mason_ensure_installed = { "terraform-ls", "tflint" },
   conform = {
     formatters_by_ft = {
       terraform = { "terraform_fmt" },

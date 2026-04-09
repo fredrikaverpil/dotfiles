@@ -4,8 +4,8 @@ vim.pack.add({
 
 require("registry").add({
   lsp_servers = { "zls" },
-  mason_tools = { "zls" },
-  code_runner = { zig = { "zig run" } },
+  mason_ensure_installed = { "zls" },
+  code_runner = { filetype = { zig = { "zig run" } } },
   neotest = {
     adapters = {
       {

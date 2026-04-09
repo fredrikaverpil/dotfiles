@@ -1,6 +1,6 @@
 require("registry").add({
   lsp_servers = { "templ" },
-  mason_tools = { "templ" },
+  mason_ensure_installed = { "templ" },
 })
 
 vim.filetype.add({

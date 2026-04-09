@@ -1,5 +1,3 @@
--- grug-far: search and replace across files.
-
 vim.pack.add({
   { src = "https://github.com/MagicDuck/grug-far.nvim" },
 })

@@ -1,5 +1,3 @@
--- substitute.nvim: operator-based text substitution with yanky integration.
-
 vim.pack.add({
   { src = "https://github.com/gbprod/substitute.nvim" },
 })

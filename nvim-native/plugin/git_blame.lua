@@ -1,5 +1,3 @@
--- git-blame: inline git blame annotations.
-
 vim.pack.add({
   { src = "https://github.com/f-person/git-blame.nvim" },
 })

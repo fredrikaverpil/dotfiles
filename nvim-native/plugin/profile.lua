@@ -1,4 +1,3 @@
--- profile.nvim: profiling with perfetto UI.
 -- Run with: NVIM_PROFILE=1 nvim       (instrument, then press <F1> to record)
 -- Run with: NVIM_PROFILE=start nvim   (record from startup, press <F1> to stop)
 -- View the profile at https://ui.perfetto.dev/

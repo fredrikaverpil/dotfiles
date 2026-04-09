@@ -4,17 +4,10 @@ vim.pack.add({
 })
 
 require("defer").on_ui_enter(function()
+  local merge = require("merge")
   local registry = require("registry")
 
-  -- Build sources.default from base sources + registered providers
-  local default_sources = { "lsp", "path", "snippets", "buffer" }
-  if registry.blink.sources and registry.blink.sources.providers then
-    for name, _ in pairs(registry.blink.sources.providers) do
-      table.insert(default_sources, name)
-    end
-  end
-
-  local config = vim.tbl_deep_extend("force", {
+  local config = {
     keymap = {
       ["<C-e>"] = { "hide", "fallback" },
       ["<CR>"] = { "accept", "fallback" },
@@ -60,7 +53,7 @@ require("defer").on_ui_enter(function()
       kind_icons = require("icons").kinds,
     },
     sources = {
-      default = default_sources,
+      default = { "lsp", "path", "snippets", "buffer" },
       providers = {
         snippets = {
           opts = {
@@ -70,10 +63,16 @@ require("defer").on_ui_enter(function()
         },
       },
     },
-  }, registry.blink)
+  }
 
-  -- Restore computed default (deep merge would have replaced it if any provider set sources.default)
-  config.sources.default = default_sources
+  merge(config, registry.blink)
+
+  -- Add registered provider names to sources.default
+  for name, _ in pairs(config.sources.providers) do
+    if not vim.list_contains(config.sources.default, name) then
+      table.insert(config.sources.default, name)
+    end
+  end
 
   require("blink.cmp").setup(config)
 end)

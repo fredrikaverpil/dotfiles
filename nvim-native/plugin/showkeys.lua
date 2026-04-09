@@ -1,5 +1,3 @@
--- showkeys: display pressed keys on screen.
-
 vim.pack.add({
   { src = "https://github.com/nvzone/showkeys" },
 })

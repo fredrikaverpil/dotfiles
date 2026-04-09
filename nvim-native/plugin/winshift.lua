@@ -1,5 +1,3 @@
--- winshift: rearrange windows with shift + arrows.
-
 vim.pack.add({
   { src = "https://github.com/sindrets/winshift.nvim" },
 })

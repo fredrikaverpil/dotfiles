@@ -1,5 +1,3 @@
--- blink.indent: indent guides with scope highlighting.
-
 vim.pack.add({
   { src = "https://github.com/Saghen/blink.indent" },
 })

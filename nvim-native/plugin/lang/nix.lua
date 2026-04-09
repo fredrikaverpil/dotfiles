@@ -2,7 +2,7 @@ local registry = require("registry")
 
 -- nixfmt on macOS is installed via Nix, not Mason
 registry.add({
-  mason_tools = { "nil-ls" },
+  mason_ensure_installed = { "nil-ls" },
   conform = {
     formatters_by_ft = { nix = { "nixfmt" } },
   },

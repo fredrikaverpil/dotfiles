@@ -1,6 +1,3 @@
--- QoL via snacks.nvim: notifier, picker, dashboard, lazygit, terminal.
--- Replaces mini.pick (see removed plugin/pick.lua).
-
 vim.pack.add({
   { src = "https://github.com/folke/snacks.nvim" },
 })

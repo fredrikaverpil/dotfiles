@@ -18,7 +18,9 @@ Symlinked via GNU Stow. Run `./rebuild.sh --stow` from `~/.dotfiles/` to apply.
 nvim-native/
   init.lua                    leader keys, require("options"), diagnostics, debug/profile
   lua/
-    registry.lua              central registry — lang files declare, aggregators read
+    registry.lua              central registry — lang files declare, consumers read
+    merge.lua                 deep merge helper (appends lists, recurses dicts)
+    defer.lua                 VimEnter/UIEnter deferred setup queues
     options.lua               all vim.opt settings
     diagnostics.lua           diagnostic display config
     fold.lua                  fold helpers (treesitter default + LSP override)
@@ -27,21 +29,20 @@ nvim-native/
   lsp/                        one file per LSP server (auto-discovered)
   plugin/
     lang/                     per-language declarations (populates registry)
+    blink.lua                 reads registry → sets up completion (UIEnter)
+    conform.lua               reads registry → sets up formatting (VimEnter)
+    dap.lua                   reads registry → sets up debugging (deferred to first use)
+    lint.lua                  reads registry → sets up linting (VimEnter)
+    lsp.lua                   reads registry → enables LSP servers (UIEnter)
+    lualine.lua               reads registry → sets up statusline (VimEnter)
+    mason.lua                 reads registry → installs tools (VimEnter)
+    neotest.lua               reads registry → sets up testing (deferred to first use)
     colorscheme.lua           zenbones + OSC11 dark/light detection
     oil.lua                   file explorer
     snacks.lua                QoL (picker, dashboard, lazygit, terminal)
     treesitter.lua            syntax highlighting + context
     ...                       other feature plugins
   after/
-    plugin/
-      blink.lua               reads registry → sets up completion
-      conform.lua             reads registry → sets up formatting
-      dap.lua                 reads registry → sets up debugging (deferred to first use)
-      lint.lua                reads registry → sets up linting
-      lsp.lua                 reads registry → enables LSP servers
-      lualine.lua             reads registry → sets up statusline (VimEnter re-setup)
-      mason.lua               reads registry → installs tools
-      neotest.lua             reads registry → sets up testing (deferred to first use)
     lsp/
       gopls.lua               extends gopls for templ/gotmpl
   ftplugin/                   per-filetype editor settings (vim.opt_local)
@@ -49,20 +50,21 @@ nvim-native/
 
 ## Registry pattern
 
-The config uses a **declare → collect → setup** flow:
+The config uses a **register immediately, consume deferred** flow:
 
-1. `plugin/lang/*.lua` files call `require("registry").add({...})` with typed
-   specs (LSP servers, mason tools, conform formatters, lint linters)
-2. `after/plugin/*.lua` aggregators read from the registry and call setup()
+1. All `plugin/` files load (alphabetically): `vim.pack.add()` and
+   `registry.add()` execute immediately
+2. `VimEnter` fires: deferred setup functions run, reading from the
+   fully-populated registry via `defer.on_vim_enter()` or `defer.on_ui_enter()`
 
-This inverts the old pattern where aggregators loaded first and lang files had
-to mutate their internal state after the fact.
+No `after/plugin/` needed — the `defer.lua` module provides the timing
+guarantee that all data is registered before any consumer reads it.
 
 ```lua
 -- plugin/lang/go.lua
 require("registry").add({
   lsp_servers = { "gopls" },
-  mason_tools = { "gopls", "goimports", "gci", "gofumpt", "golines", "golangci-lint" },
+  mason_ensure_installed = { "gopls", "goimports", "gci", "gofumpt", "golines", "golangci-lint" },
   conform = {
     formatters_by_ft = { go = { "goimports", "gci", "gofumpt", "golines" } },
     formatters = { goimports = { args = { "-srcdir", "$FILENAME" } } },
@@ -73,15 +75,43 @@ require("registry").add({
 })
 ```
 
-**Load order guarantees:**
-1. `plugin/lang/*.lua` runs during `plugin/` phase → populates registry
-2. `after/plugin/*.lua` runs after all `plugin/` files → reads registry, calls setup()
-3. FileType/BufEnter events fire when buffers open → after everything is loaded
+### Plugin file layout
+
+Every plugin file follows a consistent structure:
+
+```lua
+-- 1. Load packages (immediate)
+vim.pack.add(...)
+
+-- 2. Registry contributions (immediate)
+require("registry").add({ ... })
+
+-- 3. Deferred setup (VimEnter/UIEnter)
+require("defer").on_vim_enter(function()
+  local merge = require("merge")
+  local registry = require("registry")
+  local opts = { ... }
+  require("plugin").setup(merge(opts, registry.X))
+end)
+
+-- 4. Keymaps
+vim.keymap.set(...)
+```
+
+### Consumer pattern
+
+Consumers merge base opts with registry contributions using `merge()`:
+
+```lua
+-- merge() deep-merges tables, appending+deduplicating lists
+local opts = { PATH = "append" }
+require("mason").setup(merge(opts, registry.mason))
+```
 
 ## Per-project overrides
 
 Place a `.nvim.lua` in any project directory. It runs at step 7c of
-initialization — **before** `plugin/` and `after/plugin/` files (`:h exrc`).
+initialization — **before** `plugin/` files (`:h exrc`).
 Wrap plugin overrides in a `VimEnter` autocmd so they apply after all plugins
 are loaded.
 
@@ -95,21 +125,10 @@ are loaded.
 ## Adding a new language
 
 1. `plugin/lang/<ft>.lua` — call `require("registry").add()` with lsp_servers,
-   mason_tools, conform, lint
+   mason_ensure_installed, conform, lint
 2. `lsp/<server>.lua` — return the server config table (if custom config needed)
 3. `ftplugin/<ft>.lua` — editor settings only (`vim.opt_local.*`)
 4. *(optional)* `after/lsp/<server>.lua` — extend base LSP config
-
-## Todo
-
-Registry-driven aggregators:
-
-- [x] mason.lua
-- [x] lsp.lua
-- [x] conform.lua
-- [x] lint.lua
-- [x] blink.lua
-- [x] neotest.lua
 
 ## Startup performance
 
@@ -120,11 +139,7 @@ packpath.
 
 | Phase | What runs |
 |-------|-----------|
-| `plugin/` | lualine, snacks, treesitter, and other feature plugins |
+| `plugin/` | All files: vim.pack.add + registry.add (immediate), setup queued via defer |
 | `plugin/lang/` | 23 files calling `require("registry").add({...})` — pure table ops, <0.1ms each |
-| `after/plugin/` | blink, conform, dap, lint, lsp, lualine, mason, neotest — read registry, call setup() |
-
-Potential further wins:
-
-- [ ] render_markdown.lua — defer to `FileType markdown` (~10ms)
-- [ ] oil.lua — defer if directory-open at startup can be handled
+| `VimEnter` | Deferred setups run: conform, lualine, mason, lint, code_runner |
+| `UIEnter` | Heavy setups run: blink, lsp, treesitter |

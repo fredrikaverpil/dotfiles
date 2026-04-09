@@ -5,7 +5,7 @@ vim.pack.add({
 
 require("registry").add({
   lsp_servers = { "basedpyright", "ruff" },
-  mason_tools = { "basedpyright", "ruff", "mypy", "debugpy" },
+  mason_ensure_installed = { "basedpyright", "ruff", "mypy", "debugpy" },
   lint = {
     linters_by_ft = { python = { "mypy" } },
   },

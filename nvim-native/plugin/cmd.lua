@@ -1,5 +1,3 @@
--- cmd.nvim: run shell commands with progress notifications.
-
 vim.pack.add({
   { src = "https://github.com/y3owk1n/cmd.nvim" },
 })

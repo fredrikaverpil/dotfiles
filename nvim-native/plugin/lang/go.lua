@@ -8,13 +8,6 @@ if vim.g.use_nvim_treesitter then
     { src = "https://github.com/uga-rosa/utf8.nvim" },
     { src = "https://github.com/maxandron/goplements.nvim" },
   })
-  vim.api.nvim_create_autocmd("FileType", {
-    pattern = "go",
-    once = true,
-    callback = function()
-      require("goplements").setup()
-    end,
-  })
 end
 
 require("dev").add({
@@ -26,39 +19,6 @@ require("dev").add({
   end,
 })
 
--- Register tree-sitter-godoc parser so it can be installed via nvim-treesitter
-local ts_ok, ts_parsers = pcall(require, "nvim-treesitter.parsers")
-if ts_ok then
-  ts_parsers.godoc = {
-    install_info = {
-      url = "https://github.com/fredrikaverpil/tree-sitter-godoc",
-      files = { "src/parser.c" },
-      version = "*",
-    },
-    filetype = "godoc",
-  }
-end
-vim.treesitter.language.register("godoc", "godoc")
-
-require("godoc").setup({
-  adapters = {
-    {
-      name = "go",
-      opts = {
-        command = "GoDoc",
-        get_syntax_info = function()
-          return {
-            filetype = "godoc",
-            language = "godoc",
-          }
-        end,
-      },
-    },
-  },
-  window = { type = "vsplit" },
-  picker = { type = "snacks" },
-})
-
 require("dev").add({
   dev = "~/code/public/neotest-golang",
   fallback = function()
@@ -68,13 +28,9 @@ require("dev").add({
   end,
 })
 
-if vim.g.use_nvim_treesitter then
-  require("blink-go-import").setup()
-end
-
 require("registry").add({
   lsp_servers = { "gopls" },
-  mason_tools = {
+  mason_ensure_installed = {
     "gopls",
     "goimports",
     "gci",
@@ -107,7 +63,7 @@ require("registry").add({
   lint = {
     linters_by_ft = { go = { "golangcilint" } },
   },
-  code_runner = { go = { "go run" } },
+  code_runner = { filetype = { go = { "go run" } } },
   blink = vim.g.use_nvim_treesitter and {
     sources = {
       providers = {
@@ -166,3 +122,47 @@ require("registry").add({
     },
   },
 })
+
+-- Register tree-sitter-godoc parser so it can be installed via nvim-treesitter
+local ts_ok, ts_parsers = pcall(require, "nvim-treesitter.parsers")
+if ts_ok then
+  ts_parsers.godoc = {
+    install_info = {
+      url = "https://github.com/fredrikaverpil/tree-sitter-godoc",
+      files = { "src/parser.c" },
+      version = "*",
+    },
+    filetype = "godoc",
+  }
+end
+vim.treesitter.language.register("godoc", "godoc")
+
+require("godoc").setup({
+  adapters = {
+    {
+      name = "go",
+      opts = {
+        command = "GoDoc",
+        get_syntax_info = function()
+          return {
+            filetype = "godoc",
+            language = "godoc",
+          }
+        end,
+      },
+    },
+  },
+  window = { type = "vsplit" },
+  picker = { type = "snacks" },
+})
+
+if vim.g.use_nvim_treesitter then
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = "go",
+    once = true,
+    callback = function()
+      require("goplements").setup()
+    end,
+  })
+  require("blink-go-import").setup()
+end

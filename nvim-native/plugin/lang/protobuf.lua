@@ -2,7 +2,7 @@ local registry = require("registry")
 
 registry.add({
   lsp_servers = { "buf_ls" },
-  mason_tools = { "buf", "protolint", "api-linter" },
+  mason_ensure_installed = { "buf", "protolint", "api-linter" },
   conform = {
     formatters_by_ft = { proto = { "buf" } },
   },

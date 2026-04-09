@@ -4,7 +4,7 @@ vim.pack.add({
 
 require("registry").add({
   lsp_servers = { "jsonls" },
-  mason_tools = { "json-lsp", "biome" },
+  mason_ensure_installed = { "json-lsp", "biome" },
   conform = {
     formatters_by_ft = {
       json = { "biome" },

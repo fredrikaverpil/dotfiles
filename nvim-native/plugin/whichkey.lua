@@ -1,5 +1,3 @@
--- Which-key: shows pending keybindings in a popup.
-
 vim.pack.add({
   { src = "https://github.com/folke/which-key.nvim" },
 })

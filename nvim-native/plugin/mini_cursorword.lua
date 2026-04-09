@@ -1,7 +1,3 @@
--- Lightweight cursorword highlight using CursorHold.
--- Highlights all occurrences of word under cursor after idle (governed by 'updatetime').
--- Uses "MiniCursorword" highlight group (underline by default).
-
 vim.api.nvim_set_hl(0, "MiniCursorword", { default = true, underline = true })
 
 local group = vim.api.nvim_create_augroup("MiniCursorword", { clear = true })

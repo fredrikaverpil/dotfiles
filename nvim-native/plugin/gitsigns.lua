@@ -1,5 +1,3 @@
--- gitsigns: git hunk signs, staging, blame, and inline diff.
-
 vim.pack.add({
   { src = "https://github.com/lewis6991/gitsigns.nvim" },
 })

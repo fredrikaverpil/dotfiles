@@ -1,5 +1,3 @@
--- mini.icons: file/filetype icons with nvim-web-devicons compatibility.
-
 vim.pack.add({
   { src = "https://github.com/nvim-mini/mini.icons" },
 })

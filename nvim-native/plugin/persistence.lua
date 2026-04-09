@@ -1,5 +1,3 @@
--- Session persistence via persistence.nvim.
-
 vim.pack.add({
   { src = "https://github.com/folke/persistence.nvim" },
 })
