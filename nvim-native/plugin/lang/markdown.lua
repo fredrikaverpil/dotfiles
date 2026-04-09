@@ -55,7 +55,7 @@ require("registry").add({
   },
 })
 
-require("defer").on_ui_enter(function()
+require("defer").on_vim_enter(function()
   require("render-markdown").setup({
     code = {
       sign = false,
@@ -66,7 +66,7 @@ require("defer").on_ui_enter(function()
       enabled = false,
     },
   })
-end)
+end, { async = true })
 
 vim.keymap.set("n", "<leader>uM", function()
   local m = require("render-markdown")

@@ -185,5 +185,4 @@ packpath.
 |-------|-----------|
 | `plugin/` | All files: vim.pack.add + registry.add (immediate), setup queued via defer |
 | `plugin/lang/` | 23 files calling `require("registry").add({...})` — pure table ops, <0.1ms each |
-| `VimEnter` | Deferred setups run: conform, lualine, mason, lint, code_runner |
-| `UIEnter` | Heavy setups run: blink, lsp, treesitter |
+| `VimEnter` | Lualine (synchronous), then everything else async via `{ async = true }` |

@@ -2,7 +2,7 @@ vim.pack.add({
   { src = "https://github.com/akinsho/bufferline.nvim" },
 })
 
-require("defer").on_ui_enter(function()
+require("defer").on_vim_enter(function()
   require("bufferline").setup({
     options = {
       mode = "tabs",
@@ -17,6 +17,6 @@ require("defer").on_ui_enter(function()
       end,
     },
   })
-end)
+end, { async = true })
 
 vim.keymap.set("n", "<leader><tab>r", ":BufferLineTabRename ", { desc = "Rename tab" })

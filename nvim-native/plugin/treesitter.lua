@@ -15,7 +15,7 @@ if USE_NVIM_TREESITTER then
   })
 end
 
-require("defer").on_ui_enter(function()
+require("defer").on_vim_enter(function()
   --- Sign parser .so on macOS to prevent code-signature crashes.
   ---@param parser_name string
   local function sign_parser_macos(parser_name)
@@ -88,4 +88,4 @@ require("defer").on_ui_enter(function()
       multiwindow = true,
     })
   end
-end)
+end, { async = true })

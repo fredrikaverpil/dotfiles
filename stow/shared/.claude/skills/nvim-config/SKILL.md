@@ -94,9 +94,10 @@ The complete Neovim startup sequence, from `:h initialization`:
 | 17 | Open windows, load buffers → triggers **`VimEnter`**, then **`UIEnter`** |
 
 **Key takeaway:** All `plugin/` files run at step 11. `VimEnter` (step 17)
-fires **after** everything — this is when deferred setup functions run via
-`defer.on_vim_enter()`. `UIEnter` fires after `VimEnter` and is used for
-heavier setup (LSP, blink, treesitter).
+fires **after** everything — `on_vim_enter` callbacks run synchronously by
+default, or async via `vim.schedule()` when `{ async = true }` is passed.
+Only lualine uses synchronous `on_vim_enter`; everything else passes
+`{ async = true }` for fire-and-forget setup.
 
 ---
 
@@ -235,10 +236,11 @@ all plugin files have loaded.
 lists, recurses into dicts, overwrites scalars. Used by the registry and by
 consumer plugins to merge base opts with registry contributions.
 
-**`lua/defer.lua`** — Provides `on_vim_enter(fn)` and `on_ui_enter(fn)` for
-queuing setup functions. VimEnter callbacks run after all plugin files have
-loaded, ensuring the registry is fully populated. UIEnter callbacks run after
-the first paint for heavier setup.
+**`lua/defer.lua`** — Provides `on_vim_enter(fn, opts?)` and
+`on_ui_enter(fn, opts?)` for queuing setup functions. Pass `{ async = true }`
+to dispatch via `vim.schedule()` (fire-and-forget). Default is synchronous.
+Currently everything uses `on_vim_enter` — lualine synchronous, everything
+else with `{ async = true }`.
 
 **`plugin/`** — Each file follows a consistent layout: `vim.pack.add()` →
 `registry.add()` → `defer.on_vim_enter(fn)` → keymaps. Sourced alphabetically;
@@ -549,8 +551,10 @@ Event data: `ev.data.kind` (`"install"`, `"update"`, `"delete"`),
 `ev.data.spec` (plugin spec), `ev.data.path` (full path to plugin directory).
 
 **Do NOT defer** plugins needed from the first frame or first keystroke:
-colorscheme, snacks (dashboard). Plugins like blink, lualine, LSP, mason
-use `defer.on_vim_enter()` or `defer.on_ui_enter()` for optimal timing.
+colorscheme, snacks (dashboard). Most plugins use
+`defer.on_vim_enter(fn, { async = true })` (fire-and-forget). Only lualine
+uses `defer.on_vim_enter(fn)` without async (synchronous, must be ready
+before paint).
 
 **Profile startup with `--startuptime`:**
 

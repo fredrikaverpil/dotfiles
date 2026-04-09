@@ -52,7 +52,7 @@ require("registry").add({
   },
 })
 
-require("defer").on_ui_enter(function()
+require("defer").on_vim_enter(function()
   require("lazydev").setup({
     library = {
       { path = "${3rd}/luv/library", words = { "vim%.uv" } },
@@ -61,4 +61,4 @@ require("defer").on_ui_enter(function()
       "plenary",
     },
   })
-end)
+end, { async = true })

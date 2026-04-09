@@ -3,7 +3,7 @@ vim.pack.add({
   { src = "https://github.com/rafamadriz/friendly-snippets" },
 })
 
-require("defer").on_ui_enter(function()
+require("defer").on_vim_enter(function()
   local merge = require("merge")
   local registry = require("registry")
 
@@ -68,4 +68,4 @@ require("defer").on_ui_enter(function()
   merge(opts, registry.blink.opts or {})
 
   require("blink.cmp").setup(opts)
-end)
+end, { async = true })
