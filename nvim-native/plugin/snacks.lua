@@ -49,7 +49,13 @@ require("snacks").setup({
         return { text = "" }
       end,
       function()
-        local ms = _G._nvim_start_time and string.format("%.2f", (vim.uv.hrtime() - _G._nvim_start_time) / 1e6) or "?"
+        if not _G._nvim_startup_ms then
+          _G._nvim_startup_ms = _G._nvim_start_time
+              and string.format("%.2f", (vim.uv.hrtime() - _G._nvim_start_time) / 1e6)
+            or "?"
+        end
+        local ms = _G._nvim_startup_ms
+        local plugin_count = #vim.fn.glob(vim.fn.stdpath("data") .. "/site/pack/*/*/*", false, true)
         return {
           align = "center",
           text = {
