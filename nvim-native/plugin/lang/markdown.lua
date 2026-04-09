@@ -66,7 +66,7 @@ require("defer").on_vim_enter(function()
       enabled = false,
     },
   })
-end, { async = true })
+end)
 
 vim.keymap.set("n", "<leader>uM", function()
   local m = require("render-markdown")

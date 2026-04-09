@@ -39,4 +39,4 @@ require("defer").on_vim_enter(function()
 
   -- Lint already-open buffers (initial file was read before VimEnter)
   debounced_lint()
-end, { async = true })
+end)

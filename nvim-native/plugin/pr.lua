@@ -1,4 +1,4 @@
-require("dev").add({
+require("dev").use({
   dev = "~/code/public/pr.nvim",
   fallback = function()
     vim.pack.add({

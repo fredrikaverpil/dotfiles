@@ -1,8 +1,8 @@
-local M = {}
+local m = {}
 
---- Load a plugin from a local dev clone if it exists, otherwise via a fallback.
+--- load a plugin from a local dev clone if it exists, otherwise via a fallback.
 ---@param opts { dev: string, fallback: fun() }
-function M.add(opts)
+function m.use(opts)
   local dev_path = vim.fn.expand(opts.dev)
   if vim.uv.fs_stat(dev_path) then
     vim.opt.runtimepath:append(dev_path)
@@ -11,4 +11,4 @@ function M.add(opts)
   end
 end
 
-return M
+return m

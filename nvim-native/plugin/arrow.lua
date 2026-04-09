@@ -9,4 +9,4 @@ require("defer").on_vim_enter(function()
     buffer_leader_key = "m",
     always_show_path = true,
   })
-end, { async = true })
+end)

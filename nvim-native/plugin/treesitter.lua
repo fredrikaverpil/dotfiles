@@ -88,4 +88,4 @@ require("defer").on_vim_enter(function()
       multiwindow = true,
     })
   end
-end, { async = true })
+end)

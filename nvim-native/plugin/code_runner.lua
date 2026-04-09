@@ -8,6 +8,6 @@ require("defer").on_vim_enter(function()
 
   local opts = { focus = false }
   require("code_runner").setup(merge(opts, registry.code_runner.opts or {}))
-end, { async = true })
+end)
 
 vim.keymap.set("n", "<leader>r", ":RunFile<CR>", { desc = "Run file" })

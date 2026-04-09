@@ -15,4 +15,4 @@ require("defer").on_vim_enter(function()
       },
     },
   })
-end, { async = true })
+end)

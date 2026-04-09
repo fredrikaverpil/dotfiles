@@ -128,4 +128,4 @@ require("defer").on_vim_enter(function()
     end,
     desc = "Restart LSP clients and clear diagnostics/codelens",
   })
-end, { async = true })
+end)

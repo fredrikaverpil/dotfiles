@@ -10,7 +10,7 @@ if vim.g.use_nvim_treesitter then
   })
 end
 
-require("dev").add({
+require("dev").use({
   dev = "~/code/public/godoc.nvim",
   fallback = function()
     vim.pack.add({
@@ -27,7 +27,7 @@ vim.api.nvim_create_autocmd("PackChanged", {
   end,
 })
 
-require("dev").add({
+require("dev").use({
   dev = "~/code/public/neotest-golang",
   fallback = function()
     vim.pack.add({

@@ -17,6 +17,6 @@ require("defer").on_vim_enter(function()
       end,
     },
   })
-end, { async = true })
+end)
 
 vim.keymap.set("n", "<leader><tab>r", ":BufferLineTabRename ", { desc = "Rename tab" })

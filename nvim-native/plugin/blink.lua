@@ -68,4 +68,4 @@ require("defer").on_vim_enter(function()
   merge(opts, registry.blink.opts or {})
 
   require("blink.cmp").setup(opts)
-end, { async = true })
+end)

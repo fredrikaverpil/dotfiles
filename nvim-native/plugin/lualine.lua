@@ -43,4 +43,4 @@ require("defer").on_vim_enter(function()
   require("lualine").setup(opts)
 
   vim.opt.showmode = false
-end)
+end, { sync = true })

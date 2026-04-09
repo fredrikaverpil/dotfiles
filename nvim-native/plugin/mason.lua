@@ -58,4 +58,4 @@ require("defer").on_vim_enter(function()
       end
     end
   end)
-end, { async = true })
+end)

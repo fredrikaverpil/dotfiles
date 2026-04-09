@@ -4,7 +4,7 @@ vim.pack.add({
 
 require("defer").on_vim_enter(function()
   require("yanky").setup({})
-end, { async = true })
+end)
 
 vim.keymap.set("n", "<leader>p", function()
   Snacks.picker.yanky()

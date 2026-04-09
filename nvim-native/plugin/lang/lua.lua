@@ -61,4 +61,4 @@ require("defer").on_vim_enter(function()
       "plenary",
     },
   })
-end, { async = true })
+end)

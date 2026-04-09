@@ -20,6 +20,6 @@ require("defer").on_vim_enter(function()
       end
     end,
   })
-end, { async = true })
+end)
 
 vim.keymap.set("n", "<leader>uf", require("toggle").auto_format, { desc = "Toggle auto-format" })
