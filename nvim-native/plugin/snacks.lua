@@ -53,7 +53,9 @@ require("snacks").setup({
         return {
           align = "center",
           text = {
-            { "⚡ Neovim loaded in ", hl = "footer" },
+            { "⚡ Neovim loaded ", hl = "footer" },
+            { tostring(plugin_count), hl = "special" },
+            { " plugins in ", hl = "footer" },
             { ms .. "ms", hl = "special" },
           },
         }
