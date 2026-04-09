@@ -17,15 +17,14 @@ if vim.g.use_nvim_treesitter then
   })
 end
 
--- godoc.nvim: prefer local dev clone, fall back to GitHub.
-local godoc_dev = vim.fn.expand("~/code/public/godoc.nvim")
-if vim.uv.fs_stat(godoc_dev) then
-  vim.opt.runtimepath:append(godoc_dev)
-else
-  vim.pack.add({
-    { src = "https://github.com/fredrikaverpil/godoc.nvim" },
-  })
-end
+require("dev").add({
+  dev = "~/code/public/godoc.nvim",
+  fallback = function()
+    vim.pack.add({
+      { src = "https://github.com/fredrikaverpil/godoc.nvim" },
+    })
+  end,
+})
 
 -- Register tree-sitter-godoc parser so it can be installed via nvim-treesitter
 local ts_ok, ts_parsers = pcall(require, "nvim-treesitter.parsers")
@@ -60,15 +59,14 @@ require("godoc").setup({
   picker = { type = "snacks" },
 })
 
--- neotest-golang: prefer local dev clone, fall back to GitHub.
-local neotest_golang_dev = vim.fn.expand("~/code/public/neotest-golang")
-if vim.uv.fs_stat(neotest_golang_dev) then
-  vim.opt.runtimepath:append(neotest_golang_dev)
-else
-  vim.pack.add({
-    { src = "https://github.com/fredrikaverpil/neotest-golang" },
-  })
-end
+require("dev").add({
+  dev = "~/code/public/neotest-golang",
+  fallback = function()
+    vim.pack.add({
+      { src = "https://github.com/fredrikaverpil/neotest-golang" },
+    })
+  end,
+})
 
 if vim.g.use_nvim_treesitter then
   require("blink-go-import").setup()
