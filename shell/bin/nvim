@@ -12,64 +12,64 @@ available_count=0
 available_binaries=""
 
 if [ -x "$BOB_NVIM_BINARY" ]; then
-	available_count=$((available_count + 1))
-	available_binaries="$available_binaries\n  - $BOB_NVIM_BINARY (installed via Bob)"
+  available_count=$((available_count + 1))
+  available_binaries="$available_binaries\n  - $BOB_NVIM_BINARY (installed via Bob)"
 fi
 
 if [ -x "$NIX_NVIM_BINARY" ]; then
-	available_count=$((available_count + 1))
-	available_binaries="$available_binaries\n  - $NIX_NVIM_BINARY (installed via Nix user profile)"
+  available_count=$((available_count + 1))
+  available_binaries="$available_binaries\n  - $NIX_NVIM_BINARY (installed via Nix user profile)"
 fi
 
 if [ -x "$NIXOS_NVIM_BINARY" ]; then
-	available_count=$((available_count + 1))
-	available_binaries="$available_binaries\n  - $NIXOS_NVIM_BINARY (installed via NixOS system profile)"
+  available_count=$((available_count + 1))
+  available_binaries="$available_binaries\n  - $NIXOS_NVIM_BINARY (installed via NixOS system profile)"
 fi
 
 if [ -x "$BREW_NVIM_BINARY" ]; then
-	available_count=$((available_count + 1))
-	available_binaries="$available_binaries\n  - $BREW_NVIM_BINARY (installed via Homebrew)"
+  available_count=$((available_count + 1))
+  available_binaries="$available_binaries\n  - $BREW_NVIM_BINARY (installed via Homebrew)"
 fi
 
 # Check for conflicts
 if [ $available_count -gt 1 ]; then
-	echo "Warning: Multiple nvim binaries found. Using priority order: Bob > Nix User > NixOS System > Homebrew"
-	echo "Available binaries:$available_binaries"
-	echo ""
+  echo "Warning: Multiple nvim binaries found. Using priority order: Bob > Nix User > NixOS System > Homebrew"
+  echo "Available binaries:$available_binaries"
+  echo ""
 fi
 
 if [ -x "$BOB_NVIM_BINARY" ]; then
-	NVIM_BINARY="$BOB_NVIM_BINARY"
+  NVIM_BINARY="$BOB_NVIM_BINARY"
 elif [ -x "$NIX_NVIM_BINARY" ]; then
-	NVIM_BINARY="$NIX_NVIM_BINARY"
+  NVIM_BINARY="$NIX_NVIM_BINARY"
 elif [ -x "$NIXOS_NVIM_BINARY" ]; then
-	NVIM_BINARY="$NIXOS_NVIM_BINARY"
+  NVIM_BINARY="$NIXOS_NVIM_BINARY"
 elif [ -x "$BREW_NVIM_BINARY" ]; then
-	NVIM_BINARY="$BREW_NVIM_BINARY"
+  NVIM_BINARY="$BREW_NVIM_BINARY"
 else
-	echo "Error: No nvim binary found."
-	echo "Please install Neovim via:"
-	echo "  - Bob: bob use stable"
-	echo "  - Homebrew: brew install neovim"
-	exit 1
+  echo "Error: No nvim binary found."
+  echo "Please install Neovim via:"
+  echo "  - Bob: bob use stable"
+  echo "  - Homebrew: brew install neovim"
+  exit 1
 fi
 
 # Inject Neovim build dependencies (managed by Nix, not on regular PATH)
 NVIM_DEPS_PATH_FILE="$HOME/.config/nvim-deps-path"
 if [ -f "$NVIM_DEPS_PATH_FILE" ]; then
-	export PATH="$(cat "$NVIM_DEPS_PATH_FILE"):$PATH"
+  export PATH="$(cat "$NVIM_DEPS_PATH_FILE"):$PATH"
 fi
 
 # Check if NVIM_APPNAME is already set
 if [ -z "$NVIM_APPNAME" ]; then
-	# Skip setting NVIM_APPNAME=nvim-fredrik on rpi5-homelab
-	HOSTNAME=$(hostname)
-	if [ "$HOSTNAME" = "rpi5-homelab" ]; then
-		$NVIM_BINARY "$@"
-	else
-		NVIM_APPNAME=nvim-fredrik $NVIM_BINARY "$@"
-	fi
+  # Skip setting NVIM_APPNAME=nvim-fredrik on rpi5-homelab
+  HOSTNAME=$(hostname)
+  if [ "$HOSTNAME" = "rpi5-homelab" ]; then
+    $NVIM_BINARY "$@"
+  else
+    NVIM_APPNAME=nvim-native $NVIM_BINARY "$@"
+  fi
 else
-	echo "Warning: Using NVIM_APPNAME=$NVIM_APPNAME"
-	$NVIM_BINARY "$@"
+  echo "Warning: Using NVIM_APPNAME=$NVIM_APPNAME"
+  $NVIM_BINARY "$@"
 fi
