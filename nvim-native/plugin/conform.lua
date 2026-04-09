@@ -5,7 +5,7 @@ vim.g.auto_format = true
 require("defer").on_vim_enter(function()
   local registry = require("registry")
 
-  require("conform").setup(registry.conform)
+  require("conform").setup(registry.conform.opts or {})
 
   vim.api.nvim_create_autocmd("BufWritePre", {
     group = vim.api.nvim_create_augroup("native-conform", { clear = true }),

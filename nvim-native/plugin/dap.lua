@@ -9,8 +9,8 @@ local registry = require("registry")
 
 registry.add({
   lualine = {
-    lualine_x = {
-      {
+    sections = {
+      dap = {
         function()
           return require("dap").status()
         end,

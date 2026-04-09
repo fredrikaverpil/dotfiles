@@ -314,12 +314,12 @@ return {
 }
 ```
 
-Servers are enabled by the lsp.lua plugin, which reads `registry.lsp_servers`.
+Servers are enabled by the lsp.lua plugin, which reads `registry.lsp.servers`.
 Lang files declare their servers via:
 
 ```lua
 -- plugin/lang/go.lua
-require("registry").add({ lsp_servers = { "gopls" } })
+require("registry").add({ lsp = { servers = { "gopls" } } })
 ```
 
 To disable a server: `vim.lsp.enable("gopls", false)`.
@@ -342,19 +342,20 @@ registry, regardless of filename ordering.
 
 ### RegistrySpec fields
 
-| Field | Type | Merge behavior |
+Each plugin is namespaced under `registry.<name>`. Plugins with `setup(opts)`
+store their opts under `.opts`:
+
+| Field | Sub-fields | Description |
 |---|---|---|
-| `lsp_servers` | `string[]` | append + dedup |
-| `mason_ensure_installed` | `string[]` | append + dedup |
-| `mason_pip_extra_packages` | `table<string, string[]>` | deep merge |
-| `mason` | `MasonSettings` | deep merge |
-| `conform` | `conform.setupOpts` | deep merge |
-| `lint` | `table` | deep merge |
-| `blink` | `blink.cmp.Config` | deep merge |
-| `code_runner` | `table` | deep merge |
-| `dap` | `table` (adapters, configurations, setups) | deep merge |
-| `neotest` | `neotest.Config` | deep merge |
-| `lualine` | `table` (sections, extensions) | deep merge |
+| `lsp` | `servers` | LSP server names for `vim.lsp.enable()` |
+| `mason` | `opts`, `ensure_installed`, `pip_extra_packages` | Mason setup opts + tool lists |
+| `conform` | `opts` | conform.setupOpts |
+| `lint` | `linters_by_ft`, `linters` | No setup() — direct assignment |
+| `blink` | `opts` | blink.cmp.Config |
+| `code_runner` | `opts` | code_runner setup opts |
+| `dap` | `adapters`, `configurations`, `setups` | No setup() — direct assignment |
+| `neotest` | `opts` | neotest.Config |
+| `lualine` | `opts`, `sections` | lualine setup opts (extensions via `opts`), named section components via `sections` (lualine decides placement) |
 
 All merging is handled by `merge()` — a custom deep merge that **appends and
 deduplicates lists** and **recurses into dicts**.
@@ -369,8 +370,29 @@ require("defer").on_vim_enter(function()
   local merge = require("merge")
   local registry = require("registry")
   local opts = { PATH = "append" }
-  require("mason").setup(merge(opts, registry.mason))
+  require("mason").setup(merge(opts, registry.mason.opts or {}))
 end)
+```
+
+Some registry fields live outside `.opts` to give the consumer full control over
+placement. For example, lualine has a `.sections` field where contributors
+register named components, and lualine.lua decides where to inject them:
+
+```lua
+-- plugin/dap.lua (contributor — declares what, not where)
+require("registry").add({
+  lualine = {
+    sections = {
+      dap = { function() return require("dap").status() end, cond = ..., icon = "" },
+    },
+  },
+})
+
+-- plugin/lualine.lua (consumer — decides placement)
+local sections = registry.lualine.sections or {}
+if sections.dap then
+  table.insert(opts.sections.lualine_x, 1, sections.dap)
+end
 ```
 
 ### Plugin file layout
@@ -381,18 +403,21 @@ Every plugin file follows a consistent structure:
 -- 1. Load packages (immediate)
 vim.pack.add(...)
 
--- 2. Registry contributions (immediate)
+-- 2. Build hooks (immediate, runs on install/update)
+vim.api.nvim_create_autocmd("PackChanged", { ... })
+
+-- 3. Registry contributions (immediate)
 require("registry").add({ ... })
 
--- 3. Deferred setup (VimEnter/UIEnter)
+-- 4. Deferred setup (VimEnter/UIEnter)
 require("defer").on_vim_enter(function()
   local merge = require("merge")
   local registry = require("registry")
   local opts = { ... }
-  require("plugin").setup(merge(opts, registry.X))
+  require("plugin").setup(merge(opts, registry.<name>.opts or {}))
 end)
 
--- 4. Keymaps
+-- 5. Keymaps
 vim.keymap.set(...)
 ```
 
@@ -401,10 +426,10 @@ vim.keymap.set(...)
 ```lua
 -- plugin/lang/shell.lua
 require("registry").add({
-  lsp_servers = { "bashls" },
-  mason_ensure_installed = { "bash-language-server", "shfmt", "shellcheck" },
+  lsp = { servers = { "bashls" } },
+  mason = { ensure_installed = { "bash-language-server", "shfmt", "shellcheck" } },
   conform = {
-    formatters_by_ft = { sh = { "shfmt" } },
+    opts = { formatters_by_ft = { sh = { "shfmt" } } },
   },
   lint = {
     linters_by_ft = { sh = { "shellcheck" } },
@@ -421,8 +446,8 @@ vim.pack.add({
 })
 
 require("registry").add({
-  lsp_servers = { "basedpyright", "ruff" },
-  mason_ensure_installed = { "basedpyright", "ruff", "mypy", "debugpy" },
+  lsp = { servers = { "basedpyright", "ruff" } },
+  mason = { ensure_installed = { "basedpyright", "ruff", "mypy", "debugpy" } },
   lint = { linters_by_ft = { python = { "mypy" } } },
 })
 
@@ -503,6 +528,26 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 ```
 
+**Build hooks** for plugins that need a build step after install or update.
+Use the `PackChanged` autocmd:
+
+```lua
+vim.pack.add({
+  { src = "https://github.com/nvim-treesitter/nvim-treesitter", branch = "main" },
+})
+
+vim.api.nvim_create_autocmd("PackChanged", {
+  callback = function(ev)
+    if ev.data.spec.name == "nvim-treesitter" then
+      vim.cmd("TSUpdate")
+    end
+  end,
+})
+```
+
+Event data: `ev.data.kind` (`"install"`, `"update"`, `"delete"`),
+`ev.data.spec` (plugin spec), `ev.data.path` (full path to plugin directory).
+
 **Do NOT defer** plugins needed from the first frame or first keystroke:
 colorscheme, snacks (dashboard). Plugins like blink, lualine, LSP, mason
 use `defer.on_vim_enter()` or `defer.on_ui_enter()` for optimal timing.
@@ -571,13 +616,13 @@ With `NVIM_APPNAME=nvim-native`, paths use `nvim-native` instead of `nvim`.
 
 ## Adding a new language
 
-1. `plugin/lang/<ft>.lua` — call `require("registry").add()` with lsp_servers,
-   mason_ensure_installed, conform, lint:
+1. `plugin/lang/<ft>.lua` — call `require("registry").add()` with `lsp`,
+   `mason`, `conform`, `lint`:
    ```lua
    require("registry").add({
-     lsp_servers = { "pyright" },
-     mason_ensure_installed = { "pyright", "ruff" },
-     conform = { formatters_by_ft = { python = { "ruff_format" } } },
+     lsp = { servers = { "pyright" } },
+     mason = { ensure_installed = { "pyright", "ruff" } },
+     conform = { opts = { formatters_by_ft = { python = { "ruff_format" } } } },
      lint = { linters_by_ft = { python = { "ruff" } } },
    })
    ```

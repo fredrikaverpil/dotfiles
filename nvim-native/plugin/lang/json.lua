@@ -3,17 +3,19 @@ vim.pack.add({
 })
 
 require("registry").add({
-  lsp_servers = { "jsonls" },
-  mason_ensure_installed = { "json-lsp", "biome" },
+  lsp = { servers = { "jsonls" } },
+  mason = { ensure_installed = { "json-lsp", "biome" } },
   conform = {
-    formatters_by_ft = {
-      json = { "biome" },
-      jsonc = { "biome" },
-      json5 = { "biome" },
-    },
-    formatters = {
-      biome = {
-        args = { "format", "--indent-style", "space", "--stdin-file-path", "$FILENAME" },
+    opts = {
+      formatters_by_ft = {
+        json = { "biome" },
+        jsonc = { "biome" },
+        json5 = { "biome" },
+      },
+      formatters = {
+        biome = {
+          args = { "format", "--indent-style", "space", "--stdin-file-path", "$FILENAME" },
+        },
       },
     },
   },

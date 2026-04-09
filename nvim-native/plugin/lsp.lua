@@ -10,7 +10,7 @@ require("defer").on_ui_enter(function()
     capabilities = require("blink.cmp").get_lsp_capabilities(),
   })
 
-  vim.lsp.enable(registry.lsp_servers)
+  vim.lsp.enable(registry.lsp.servers or {})
 
   -- Enable codelens globally
   vim.lsp.codelens.enable(true)

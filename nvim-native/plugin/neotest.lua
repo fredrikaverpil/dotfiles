@@ -14,8 +14,9 @@ local function init()
   initialized = true
 
   local registry = require("registry")
+  local neotest_opts = registry.neotest.opts or {}
   local adapters = {}
-  for _, spec in ipairs(registry.neotest.adapters or {}) do
+  for _, spec in ipairs(neotest_opts.adapters or {}) do
     local adapter = require(spec.module)
     if spec.opts then
       adapter = adapter(spec.opts)

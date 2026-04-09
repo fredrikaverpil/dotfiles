@@ -3,18 +3,28 @@ vim.pack.add({
   { src = "https://github.com/MeanderingProgrammer/render-markdown.nvim" },
 })
 
+vim.api.nvim_create_autocmd("PackChanged", {
+  callback = function(ev)
+    if ev.data.spec.name == "markdown-preview.nvim" then
+      vim.fn["mkdp#util#install"]()
+    end
+  end,
+})
+
 require("registry").add({
-  mason_ensure_installed = { "prettier", "markdownlint" },
+  mason = { ensure_installed = { "prettier", "markdownlint" } },
   conform = {
-    formatters_by_ft = {
-      markdown = { "prettier" },
-    },
-    formatters = {
-      prettier = {
-        prepend_args = { "--prose-wrap", "always", "--print-width", "80", "--tab-width", "2" },
+    opts = {
+      formatters_by_ft = {
+        markdown = { "prettier" },
       },
-      mdformat = {
-        prepend_args = { "--number", "--wrap", "80" },
+      formatters = {
+        prettier = {
+          prepend_args = { "--prose-wrap", "always", "--print-width", "80", "--tab-width", "2" },
+        },
+        mdformat = {
+          prepend_args = { "--number", "--wrap", "80" },
+        },
       },
     },
   },
@@ -31,11 +41,14 @@ require("registry").add({
     },
   },
   blink = {
-    sources = {
-      providers = {
-        markdown = {
-          name = "RenderMarkdown",
-          module = "render-markdown.integ.blink",
+    opts = {
+      sources = {
+        default = { "markdown" },
+        providers = {
+          markdown = {
+            name = "RenderMarkdown",
+            module = "render-markdown.integ.blink",
+          },
         },
       },
     },

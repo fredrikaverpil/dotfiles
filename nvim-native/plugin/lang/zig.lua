@@ -3,15 +3,17 @@ vim.pack.add({
 })
 
 require("registry").add({
-  lsp_servers = { "zls" },
-  mason_ensure_installed = { "zls" },
-  code_runner = { filetype = { zig = { "zig run" } } },
+  lsp = { servers = { "zls" } },
+  mason = { ensure_installed = { "zls" } },
+  code_runner = { opts = { filetype = { zig = { "zig run" } } } },
   neotest = {
-    adapters = {
-      {
-        module = "neotest-zig",
-        opts = {
-          dap = { adapter = "lldb" },
+    opts = {
+      adapters = {
+        {
+          module = "neotest-zig",
+          opts = {
+            dap = { adapter = "lldb" },
+          },
         },
       },
     },

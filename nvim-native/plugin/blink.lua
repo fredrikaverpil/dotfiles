@@ -7,7 +7,7 @@ require("defer").on_ui_enter(function()
   local merge = require("merge")
   local registry = require("registry")
 
-  local config = {
+  local opts = {
     keymap = {
       ["<C-e>"] = { "hide", "fallback" },
       ["<CR>"] = { "accept", "fallback" },
@@ -65,14 +65,7 @@ require("defer").on_ui_enter(function()
     },
   }
 
-  merge(config, registry.blink)
+  merge(opts, registry.blink.opts or {})
 
-  -- Add registered provider names to sources.default
-  for name, _ in pairs(config.sources.providers) do
-    if not vim.list_contains(config.sources.default, name) then
-      table.insert(config.sources.default, name)
-    end
-  end
-
-  require("blink.cmp").setup(config)
+  require("blink.cmp").setup(opts)
 end)

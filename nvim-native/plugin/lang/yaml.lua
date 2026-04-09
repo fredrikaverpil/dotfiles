@@ -3,21 +3,23 @@ vim.pack.add({
 })
 
 require("registry").add({
-  lsp_servers = { "yamlls" },
-  mason_ensure_installed = { "yaml-language-server", "yamlfmt", "yamllint", "actionlint" },
+  lsp = { servers = { "yamlls" } },
+  mason = { ensure_installed = { "yaml-language-server", "yamlfmt", "yamllint", "actionlint" } },
   conform = {
-    formatters_by_ft = {
-      yaml = { "yamlfmt" },
-      gha = { "yamlfmt" },
-      dependabot = { "yamlfmt" },
-    },
-    formatters = {
-      yamlfmt = {
-        prepend_args = {
-          "-formatter",
-          "retain_line_breaks_single=true",
-          "-formatter",
-          "pad_line_comments=2",
+    opts = {
+      formatters_by_ft = {
+        yaml = { "yamlfmt" },
+        gha = { "yamlfmt" },
+        dependabot = { "yamlfmt" },
+      },
+      formatters = {
+        yamlfmt = {
+          prepend_args = {
+            "-formatter",
+            "retain_line_breaks_single=true",
+            "-formatter",
+            "pad_line_comments=2",
+          },
         },
       },
     },

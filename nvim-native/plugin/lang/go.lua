@@ -19,6 +19,14 @@ require("dev").add({
   end,
 })
 
+vim.api.nvim_create_autocmd("PackChanged", {
+  callback = function(ev)
+    if ev.data.spec.name == "godoc.nvim" then
+      vim.system({ "go", "install", "github.com/lotusirous/gostdsym/stdsym@latest" })
+    end
+  end,
+})
+
 require("dev").add({
   dev = "~/code/public/neotest-golang",
   fallback = function()
@@ -29,65 +37,74 @@ require("dev").add({
 })
 
 require("registry").add({
-  lsp_servers = { "gopls" },
-  mason_ensure_installed = {
-    "gopls",
-    "goimports",
-    "gci",
-    "gofumpt",
-    "golines",
-    "golangci-lint",
-    "delve",
-    "gotestsum",
+  lsp = { servers = { "gopls" } },
+  mason = {
+    ensure_installed = {
+      "gopls",
+      "goimports",
+      "gci",
+      "gofumpt",
+      "golines",
+      "golangci-lint",
+      "delve",
+      "gotestsum",
+    },
   },
   conform = {
-    formatters_by_ft = {
-      go = { "goimports", "gci", "gofumpt", "golines" },
-    },
-    formatters = {
-      goimports = {
-        args = { "-srcdir", "$FILENAME" },
+    opts = {
+      formatters_by_ft = {
+        go = { "goimports", "gci", "gofumpt", "golines" },
       },
-      gci = {
-        args = { "write", "--skip-generated", "-s", "standard", "-s", "default", "--skip-vendor", "$FILENAME" },
-      },
-      gofumpt = {
-        prepend_args = { "-extra", "-w", "$FILENAME" },
-        stdin = false,
-      },
-      golines = {
-        prepend_args = { "--base-formatter=gofumpt", "--ignore-generated", "--tab-len=1", "--max-len=120" },
+      formatters = {
+        goimports = {
+          args = { "-srcdir", "$FILENAME" },
+        },
+        gci = {
+          args = { "write", "--skip-generated", "-s", "standard", "-s", "default", "--skip-vendor", "$FILENAME" },
+        },
+        gofumpt = {
+          prepend_args = { "-extra", "-w", "$FILENAME" },
+          stdin = false,
+        },
+        golines = {
+          prepend_args = { "--base-formatter=gofumpt", "--ignore-generated", "--tab-len=1", "--max-len=120" },
+        },
       },
     },
   },
   lint = {
     linters_by_ft = { go = { "golangcilint" } },
   },
-  code_runner = { filetype = { go = { "go run" } } },
+  code_runner = { opts = { filetype = { go = { "go run" } } } },
   blink = vim.g.use_nvim_treesitter and {
-    sources = {
-      providers = {
-        go_pkgs = {
-          name = "Import",
-          module = "blink-go-import",
+    opts = {
+      sources = {
+        default = { "go_pkgs" },
+        providers = {
+          go_pkgs = {
+            name = "Import",
+            module = "blink-go-import",
+          },
         },
       },
     },
   } or nil,
   neotest = {
-    adapters = {
-      {
-        module = "neotest-golang",
-        opts = {
-          go_test_args = {
-            "-v",
-            "-count=1",
-            "-race",
-            "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
-            "-parallel=1",
+    opts = {
+      adapters = {
+        {
+          module = "neotest-golang",
+          opts = {
+            go_test_args = {
+              "-v",
+              "-count=1",
+              "-race",
+              "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
+              "-parallel=1",
+            },
+            runner = "gotestsum",
+            gotestsum_args = { "--format=standard-verbose" },
           },
-          runner = "gotestsum",
-          gotestsum_args = { "--format=standard-verbose" },
         },
       },
     },

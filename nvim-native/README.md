@@ -60,14 +60,19 @@ The config uses a **register immediately, consume deferred** flow:
 No `after/plugin/` needed — the `defer.lua` module provides the timing
 guarantee that all data is registered before any consumer reads it.
 
+Each plugin is namespaced under `registry.<name>`. Plugins with a `setup(opts)`
+store their opts under `.opts`:
+
 ```lua
 -- plugin/lang/go.lua
 require("registry").add({
-  lsp_servers = { "gopls" },
-  mason_ensure_installed = { "gopls", "goimports", "gci", "gofumpt", "golines", "golangci-lint" },
+  lsp = { servers = { "gopls" } },
+  mason = { ensure_installed = { "gopls", "goimports", "gci", "gofumpt", "golines", "golangci-lint" } },
   conform = {
-    formatters_by_ft = { go = { "goimports", "gci", "gofumpt", "golines" } },
-    formatters = { goimports = { args = { "-srcdir", "$FILENAME" } } },
+    opts = {
+      formatters_by_ft = { go = { "goimports", "gci", "gofumpt", "golines" } },
+      formatters = { goimports = { args = { "-srcdir", "$FILENAME" } } },
+    },
   },
   lint = {
     linters_by_ft = { go = { "golangcilint" } },
@@ -83,18 +88,21 @@ Every plugin file follows a consistent structure:
 -- 1. Load packages (immediate)
 vim.pack.add(...)
 
--- 2. Registry contributions (immediate)
+-- 2. Build hooks (immediate, runs on install/update)
+vim.api.nvim_create_autocmd("PackChanged", { ... })
+
+-- 3. Registry contributions (immediate)
 require("registry").add({ ... })
 
--- 3. Deferred setup (VimEnter/UIEnter)
+-- 4. Deferred setup (VimEnter/UIEnter)
 require("defer").on_vim_enter(function()
   local merge = require("merge")
   local registry = require("registry")
   local opts = { ... }
-  require("plugin").setup(merge(opts, registry.X))
+  require("plugin").setup(merge(opts, registry.<name>.opts or {}))
 end)
 
--- 4. Keymaps
+-- 5. Keymaps
 vim.keymap.set(...)
 ```
 
@@ -105,7 +113,43 @@ Consumers merge base opts with registry contributions using `merge()`:
 ```lua
 -- merge() deep-merges tables, appending+deduplicating lists
 local opts = { PATH = "append" }
-require("mason").setup(merge(opts, registry.mason))
+require("mason").setup(merge(opts, registry.mason.opts or {}))
+```
+
+Some registry fields live outside `.opts` to give the consumer full control over
+placement. For example, lualine has a `.sections` field where contributors
+register named components, and lualine.lua decides where to inject them:
+
+```lua
+-- plugin/dap.lua (contributor — declares what, not where)
+require("registry").add({
+  lualine = {
+    sections = {
+      dap = { function() return require("dap").status() end, cond = ..., icon = "" },
+    },
+  },
+})
+
+-- plugin/lualine.lua (consumer — decides placement)
+local sections = registry.lualine.sections or {}
+if sections.dap then
+  table.insert(opts.sections.lualine_x, 1, sections.dap)
+end
+```
+
+### Build hooks
+
+Plugins that need a build step after install or update use the `PackChanged`
+autocmd:
+
+```lua
+vim.api.nvim_create_autocmd("PackChanged", {
+  callback = function(ev)
+    if ev.data.spec.name == "nvim-treesitter" then
+      vim.cmd("TSUpdate")
+    end
+  end,
+})
 ```
 
 ## Per-project overrides
@@ -124,8 +168,8 @@ are loaded.
 
 ## Adding a new language
 
-1. `plugin/lang/<ft>.lua` — call `require("registry").add()` with lsp_servers,
-   mason_ensure_installed, conform, lint
+1. `plugin/lang/<ft>.lua` — call `require("registry").add()` with `lsp`,
+   `mason`, `conform`, `lint`
 2. `lsp/<server>.lua` — return the server config table (if custom config needed)
 3. `ftplugin/<ft>.lua` — editor settings only (`vim.opt_local.*`)
 4. *(optional)* `after/lsp/<server>.lua` — extend base LSP config

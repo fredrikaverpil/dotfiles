@@ -5,7 +5,7 @@ vim.pack.add({
 })
 
 require("registry").add({
-  lualine = { extensions = { "mason" } },
+  lualine = { opts = { extensions = { "mason" } } },
 })
 
 require("defer").on_vim_enter(function()
@@ -13,7 +13,7 @@ require("defer").on_vim_enter(function()
   local registry = require("registry")
 
   local opts = { PATH = "append" }
-  require("mason").setup(merge(opts, registry.mason))
+  require("mason").setup(merge(opts, registry.mason.opts or {}))
 
   require("mason-lock").setup({
     lockfile_path = vim.env.DOTFILES .. "/nvim-native/mason-lock.json",
@@ -28,7 +28,7 @@ require("defer").on_vim_enter(function()
     local InstallLocation = require("mason-core.installer.InstallLocation")
 
     -- Install extra pip packages into Mason pypi venvs
-    for pkg_name, extra_pkgs in pairs(registry.mason_pip_extra_packages) do
+    for pkg_name, extra_pkgs in pairs(registry.mason.pip_extra_packages or {}) do
       local ok, pkg = pcall(mason_registry.get_package, pkg_name)
       if ok then
         local install_path = InstallLocation.global():package(pkg_name)
@@ -51,7 +51,7 @@ require("defer").on_vim_enter(function()
     end
 
     -- Install missing mason tools
-    for _, pkg_name in ipairs(registry.mason_ensure_installed) do
+    for _, pkg_name in ipairs(registry.mason.ensure_installed or {}) do
       local ok, pkg = pcall(mason_registry.get_package, pkg_name)
       if ok and not pkg:is_installed() then
         pkg:install()

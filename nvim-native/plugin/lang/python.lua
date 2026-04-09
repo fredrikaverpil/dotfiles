@@ -4,19 +4,21 @@ vim.pack.add({
 })
 
 require("registry").add({
-  lsp_servers = { "basedpyright", "ruff" },
-  mason_ensure_installed = { "basedpyright", "ruff", "mypy", "debugpy" },
+  lsp = { servers = { "basedpyright", "ruff" } },
+  mason = { ensure_installed = { "basedpyright", "ruff", "mypy", "debugpy" } },
   lint = {
     linters_by_ft = { python = { "mypy" } },
   },
   neotest = {
-    adapters = {
-      {
-        module = "neotest-python",
-        opts = {
-          runner = "pytest",
-          args = { "--log-level", "INFO", "--color", "yes", "-vv", "-s" },
-          dap = { justMyCode = false },
+    opts = {
+      adapters = {
+        {
+          module = "neotest-python",
+          opts = {
+            runner = "pytest",
+            args = { "--log-level", "INFO", "--color", "yes", "-vv", "-s" },
+            dap = { justMyCode = false },
+          },
         },
       },
     },

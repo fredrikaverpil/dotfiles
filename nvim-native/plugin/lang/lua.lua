@@ -6,25 +6,32 @@ vim.pack.add({
 })
 
 require("registry").add({
-  lsp_servers = { "lua_ls" },
-  mason_ensure_installed = { "lua-language-server", "stylua" },
+  lsp = { servers = { "lua_ls" } },
+  mason = { ensure_installed = { "lua-language-server", "stylua" } },
   conform = {
-    formatters_by_ft = { lua = { "stylua" } },
+    opts = {
+      formatters_by_ft = { lua = { "stylua" } },
+    },
   },
   blink = {
-    sources = {
-      providers = {
-        lazydev = {
-          name = "LazyDev",
-          module = "lazydev.integrations.blink",
-          score_offset = 100,
+    opts = {
+      sources = {
+        default = { "lazydev" },
+        providers = {
+          lazydev = {
+            name = "LazyDev",
+            module = "lazydev.integrations.blink",
+            score_offset = 100,
+          },
         },
       },
     },
   },
   neotest = {
-    adapters = {
-      { module = "neotest-plenary" },
+    opts = {
+      adapters = {
+        { module = "neotest-plenary" },
+      },
     },
   },
   dap = {

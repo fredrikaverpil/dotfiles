@@ -5,6 +5,14 @@ if USE_NVIM_TREESITTER then
     { src = "https://github.com/nvim-treesitter/nvim-treesitter", branch = "main" },
     { src = "https://github.com/nvim-treesitter/nvim-treesitter-context" },
   })
+
+  vim.api.nvim_create_autocmd("PackChanged", {
+    callback = function(ev)
+      if ev.data.spec.name == "nvim-treesitter" then
+        vim.cmd("TSUpdate")
+      end
+    end,
+  })
 end
 
 require("defer").on_ui_enter(function()

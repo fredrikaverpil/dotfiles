@@ -6,13 +6,24 @@ vim.pack.add({
   { src = "https://github.com/Maxteabag/sqlit.nvim" },
 })
 
+vim.api.nvim_create_autocmd("PackChanged", {
+  callback = function(ev)
+    if ev.data.spec.name == "sqlit.nvim" then
+      vim.system({ "uv", "tool", "install", "sqlit-tui", "--with", "google-cloud-bigquery" })
+    end
+  end,
+})
+
 require("registry").add({
   blink = {
-    sources = {
-      providers = {
-        dadbod = {
-          name = "Dadbod",
-          module = "vim_dadbod_completion.blink",
+    opts = {
+      sources = {
+        default = { "dadbod" },
+        providers = {
+          dadbod = {
+            name = "Dadbod",
+            module = "vim_dadbod_completion.blink",
+          },
         },
       },
     },
