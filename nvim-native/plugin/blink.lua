@@ -52,8 +52,18 @@ require("lazyload").on_vim_enter(function()
       completion = {
         menu = { auto_show = true },
         ghost_text = { enabled = true },
+        list = {
+          selection = {
+            preselect = false,
+            auto_insert = false,
+          },
+        },
       },
       keymap = {
+        ["<C-e>"] = { "hide", "fallback" },
+        ["<CR>"] = { "accept", "fallback" },
+        ["<Tab>"] = { "select_next", "fallback" },
+        ["<S-Tab>"] = { "select_prev", "fallback" },
         ["<Up>"] = { "select_prev", "fallback" },
         ["<Down>"] = { "select_next", "fallback" },
       },
