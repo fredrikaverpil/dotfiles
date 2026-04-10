@@ -48,6 +48,12 @@ if USE_NVIM_TREESITTER then
     pattern = "TSUpdate",
     callback = inject_custom_parsers,
   })
+
+  require("lazyload").on_vim_enter(function()
+    require("treesitter-context").setup({
+      multiwindow = true,
+    })
+  end)
 end
 
 --- Sign parser .so on macOS to prevent code-signature crashes.
@@ -106,11 +112,3 @@ vim.api.nvim_create_autocmd("FileType", {
     end
   end,
 })
-
-if USE_NVIM_TREESITTER then
-  require("lazyload").on_vim_enter(function()
-    require("treesitter-context").setup({
-      multiwindow = true,
-    })
-  end)
-end
