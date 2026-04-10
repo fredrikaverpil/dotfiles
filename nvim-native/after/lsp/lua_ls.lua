@@ -17,8 +17,7 @@ return {
       runtime = { version = "LuaJIT" },
       workspace = {
         checkThirdParty = false,
-        ignoreDir = { "stow" },
-        -- library intentionally omitted: lazydev.nvim handles Neovim API types
+        -- ignoreDir is set in .luarc.json (lazydev overwrites LSP settings)
       },
       codeLens = { enable = false }, -- causes annoying flickering
       completion = { callSnippet = "Replace" },

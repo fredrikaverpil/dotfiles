@@ -1,0 +1,3 @@
+{
+  "workspace.ignoreDir": ["stow", "nvim-fredrik"]
+}
