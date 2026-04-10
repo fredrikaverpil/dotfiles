@@ -1,3 +1,5 @@
+vim.loader.enable()
+
 -- Native Neovim config using vim.pack + native directories.
 -- No plugin manager framework — just Neovim's built-in conventions:
 --   lsp/       — LSP server configs (auto-discovered by vim.lsp.config)
