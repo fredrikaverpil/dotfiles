@@ -1,3 +1,11 @@
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("native-go-opts", { clear = true }),
+  pattern = { "go", "gomod", "gowork", "gohtml" },
+  callback = function()
+    vim.opt_local.expandtab = false
+  end,
+})
+
 if vim.g.use_nvim_treesitter then
   vim.pack.add({
     { src = "https://github.com/edte/blink-go-import.nvim" },

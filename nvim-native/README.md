@@ -27,7 +27,7 @@ nvim-native/
     exrc.lua                  list project-local .nvim.lua files + trust status
   lsp/                        one file per LSP server (auto-discovered)
   plugin/
-    lang/                     per-language plugins, filetypes, autocmds
+    lang/                     per-language plugins, filetypes, editor settings, autocmds
     blink.lua                 completion (VimEnter)
     conform.lua               formatting (VimEnter)
     dap.lua                   debugging (deferred to first use)
@@ -44,7 +44,6 @@ nvim-native/
   after/
     lsp/
       gopls.lua               extends gopls for templ/gotmpl
-  ftplugin/                   per-filetype editor settings (vim.opt_local)
 ```
 
 ## Architecture
@@ -52,7 +51,8 @@ nvim-native/
 Core plugin files (`plugin/*.lua`) own all tool configuration inline — LSP
 servers, formatters, linters, completion sources, DAP adapters, neotest
 adapters, etc. Language files (`plugin/lang/*.lua`) handle language-specific
-concerns that don't fit in the core plugins: extra `vim.pack.add()` calls,
+concerns that don't fit in the core plugins: per-filetype editor settings
+(`vim.opt_local` via `FileType` autocmds), extra `vim.pack.add()` calls,
 custom filetypes, SchemaStore loading, build hooks, and autocmds.
 
 ### Plugin file layout
@@ -111,9 +111,8 @@ after all deferred plugin setup has completed.
 3. Add formatters to `plugin/conform.lua`
 4. Add linters to `plugin/lint.lua`
 5. `lsp/<server>.lua` — return the server config table (if custom config needed)
-6. `ftplugin/<ft>.lua` — editor settings only (`vim.opt_local.*`)
-7. *(optional)* `plugin/lang/<ft>.lua` — for extra plugins, filetypes, autocmds
-8. *(optional)* `after/lsp/<server>.lua` — extend base LSP config
+6. `plugin/lang/<ft>.lua` — editor settings (`vim.opt_local` via `FileType` autocmd), plugins, filetypes, autocmds
+7. *(optional)* `after/lsp/<server>.lua` — extend base LSP config
 
 ## Startup performance
 

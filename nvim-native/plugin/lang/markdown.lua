@@ -1,3 +1,12 @@
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("native-markdown-opts", { clear = true }),
+  pattern = "markdown",
+  callback = function()
+    vim.opt_local.wrap = true
+    vim.opt_local.conceallevel = 2
+  end,
+})
+
 vim.pack.add({
   { src = "https://github.com/MeanderingProgrammer/render-markdown.nvim" },
 })

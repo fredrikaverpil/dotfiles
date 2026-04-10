@@ -5,8 +5,8 @@ description: >
   or modifying any Neovim configuration that uses Neovim's built-in conventions
   WITHOUT a plugin manager framework (no lazy.nvim, packer, etc.). Covers
   directory structure, vim.pack plugin management, lsp/ auto-discovery, plugin/
-  loading order, ftplugin/, keymaps, and standard paths. Trigger on any task
-  involving init.lua, plugin/*.lua, lsp/*.lua, ftplugin/*.lua, vim.pack.add(),
+  loading order, keymaps, and standard paths. Trigger on any task
+  involving init.lua, plugin/*.lua, lsp/*.lua, vim.pack.add(),
   vim.lsp.enable(), or "native neovim config" — even if the user just says "add
   a plugin" or "configure LSP" in a native-style config.
 ---
@@ -14,7 +14,7 @@ description: >
 # Native Neovim Config
 
 Reference for Neovim configs using built-in conventions (vim.pack, lsp/,
-plugin/, ftplugin/) without a plugin manager framework. Requires Neovim >=
+plugin/) without a plugin manager framework. Requires Neovim >=
 v0.12.0.
 
 ## This config's location
@@ -153,8 +153,6 @@ end)
 
 ### Notes
 
-- `ftplugin/go.lua` fires **every time you open a `.go` file**, not at startup.
-  Use it for `vim.opt_local.*` -- not for plugin config.
 - The `LspAttach` autocmd (in the lsp.lua plugin file) bridges startup and
   per-buffer: keymaps are registered per-buffer when the LSP server attaches,
   even though the autocmd itself is registered once at startup.
@@ -170,9 +168,8 @@ This config has no framework -- each directory has a single responsibility:
 | **options**          | `lua/options.lua` | All `vim.opt` settings, required from `init.lua`                                         |
 | **utility**          | `lua/`            | Shared Lua modules: `lazyload.lua`, `merge.lua`, `fold.lua`, `toggle.lua`, pickers, etc. |
 | **plugins**          | `plugin/`         | Self-contained plugin files: install + setup + keymaps                                   |
-| **lang plugins**     | `plugin/lang/`    | Per-language plugin installs, autocmds, and setup                                        |
+| **lang plugins**     | `plugin/lang/`    | Per-language plugin installs, autocmds, editor settings, and setup                       |
 | **server config**    | `after/lsp/`      | All LSP server config tables (in after/ to override package defaults)                    |
-| **editor settings**  | `ftplugin/`       | Per-filetype `vim.opt_local` settings (indent, wrap, etc.)                               |
 
 Each plugin file is **self-contained** -- it installs its own packages, sets up
 the plugin inline, and defines its own keymaps. There is no cross-plugin data
@@ -213,7 +210,6 @@ Conceptual layout (`:h initialization`, step 11 uses `plugin/**/*.{vim,lua}` --
     lsp/                 -- all LSP server configs (overrides package defaults)
     queries/<lang>/      -- treesitter query extensions (injections.scm, etc.)
     syntax/<ft>.vim      -- legacy syntax overrides/extensions
-  ftplugin/              -- per-filetype editor settings (vim.opt_local only)
 ```
 
 **`init.lua`** -- Minimal entrypoint: leader keys, `require("options")`,
@@ -242,16 +238,13 @@ keymaps. Sourced alphabetically; subdirectories included via the `**` glob.
 Docs: `:h initialization` (step 11)
 
 **`plugin/lang/`** -- One file per language. Installs language-specific plugins
-(`vim.pack.add()`), registers filetype autocmds, and performs setup.
+(`vim.pack.add()`), registers filetype autocmds (including per-filetype editor
+settings via `vim.opt_local`), and performs setup.
 
 **`after/lsp/`** -- Each file returns a `vim.lsp.Config` table; filename
 becomes the server name. Placed in `after/` so they override any base configs
 from packages. No `setup()` call needed. Enable servers in `plugin/lsp.lua`
 (`vim.lsp.enable(...)`). Docs: `:h lsp-config`
-
-**`ftplugin/`** -- Sourced when a buffer's filetype is set. For
-`vim.opt_local.*` only -- not for plugin config. No `autocmd FileType` needed.
-Docs: `:h ftplugin`
 
 ---
 
@@ -458,13 +451,18 @@ The log columns are:
 | **self+sourced** | Total time for a file including everything it `require()`'d |
 | **self**         | Time spent in that file alone (excluding nested requires)   |
 
-**ftplugin** for per-filetype settings, not autocmds:
+**Per-filetype editor settings** live in `plugin/lang/` files via `FileType`
+autocmds, not in `ftplugin/`:
 
 ```lua
--- ftplugin/go.lua
-vim.opt_local.tabstop = 4
-vim.opt_local.shiftwidth = 4
-vim.opt_local.expandtab = false
+-- plugin/lang/go.lua
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("native-go-opts", { clear = true }),
+  pattern = { "go", "gomod", "gowork", "gohtml" },
+  callback = function()
+    vim.opt_local.expandtab = false
+  end,
+})
 ```
 
 ---
@@ -509,10 +507,10 @@ exclusively:
 | **`vim.opt`**       | `:set`               | Rich `Option` object: tables, `:append()`, `:remove()`, `:prepend()` |
 | **`vim.opt_local`** | `:setlocal`          | Same as `vim.opt` but buffer/window-local                            |
 
-**Convention:** use `vim.opt` in `init.lua` and `plugin/` files, use
-`vim.opt_local` in `ftplugin/` files. The only exception is `vim.wo[win][0]` for
-setting window+buffer-scoped options on a specific window (e.g. LSP foldexpr
-override in `LspAttach`).
+**Convention:** use `vim.opt` in `init.lua` and `lua/options.lua`, use
+`vim.opt_local` in `FileType` autocmds within `plugin/lang/` files. The only
+exception is `vim.wo[win][0]` for setting window+buffer-scoped options on a
+specific window (e.g. LSP foldexpr override in `LspAttach`).
 
 ---
 
@@ -538,8 +536,7 @@ With `NVIM_APPNAME=nvim-native`, paths use `nvim-native` instead of `nvim`.
 3. Add formatters to `formatters_by_ft` in `plugin/conform.lua`
 4. Add linters to `linters_by_ft` in `plugin/lint.lua`
 5. `after/lsp/<server>.lua` -- return the server config table
-6. `ftplugin/<ft>.lua` -- editor settings only (`vim.opt_local.*`)
-7. _(optional)_ `plugin/lang/<ft>.lua` -- language-specific plugins, autocmds
+6. `plugin/lang/<ft>.lua` -- editor settings (`vim.opt_local` via `FileType` autocmd), language-specific plugins, autocmds
 
 ## Adding a shared utility (toggle, custom picker, etc.)
 
