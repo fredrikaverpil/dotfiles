@@ -62,6 +62,21 @@ require("lazyload").on_vim_enter(function()
         if client:supports_method("textDocument/inlineCompletion", buf) then
           vim.lsp.inline_completion.enable(true)
         end
+
+        -- Linked editing (e.g., paired HTML tags)
+        if client:supports_method("textDocument/linkedEditingRange", buf) then
+          vim.lsp.linked_editing_range.enable(true, { bufnr = buf })
+        end
+
+        -- Inline color swatches
+        if client:supports_method("textDocument/documentColor", buf) then
+          vim.lsp.document_color.enable(true, { bufnr = buf })
+        end
+
+        -- Format on typing trigger characters
+        if client:supports_method("textDocument/onTypeFormatting", buf) then
+          vim.lsp.on_type_formatting.enable(true, { bufnr = buf })
+        end
       end
 
       -- Keymaps
@@ -71,6 +86,12 @@ require("lazyload").on_vim_enter(function()
       vim.keymap.set("n", "<leader>cR", Snacks.rename.rename_file, { buffer = buf, desc = "Rename file" })
       vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { buffer = buf, desc = "Code action" })
       vim.keymap.set("n", "<leader>cc", vim.lsp.codelens.run, { buffer = buf, desc = "Run codelens" })
+      vim.keymap.set({ "n", "x" }, "<M-o>", function()
+        vim.lsp.buf.selection_range(1)
+      end, { buffer = buf, desc = "Expand selection (LSP)" })
+      vim.keymap.set("x", "<M-i>", function()
+        vim.lsp.buf.selection_range(-1)
+      end, { buffer = buf, desc = "Shrink selection (LSP)" })
       vim.keymap.set("n", "<leader>uh", require("toggle").inlay_hints, { buffer = buf, desc = "Toggle inlay hints" })
       vim.keymap.set("n", "<leader>ul", require("toggle").codelens, { buffer = buf, desc = "Toggle codelens" })
       vim.keymap.set("n", "[d", function()
