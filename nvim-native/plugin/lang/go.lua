@@ -13,20 +13,20 @@ if vim.g.use_nvim_treesitter then
   })
 end
 
+vim.api.nvim_create_autocmd("PackChanged", {
+  callback = function(ev)
+    if ev.data.spec.name == "godoc.nvim" then
+      vim.system({ "go", "install", "github.com/lotusirous/gostdsym/stdsym@latest" })
+    end
+  end,
+})
+
 require("dev").use({
   dev = "~/code/public/godoc.nvim",
   fallback = function()
     vim.pack.add({
       { src = "https://github.com/fredrikaverpil/godoc.nvim" },
     })
-  end,
-})
-
-vim.api.nvim_create_autocmd("PackChanged", {
-  callback = function(ev)
-    if ev.data.spec.name == "godoc.nvim" then
-      vim.system({ "go", "install", "github.com/lotusirous/gostdsym/stdsym@latest" })
-    end
   end,
 })
 

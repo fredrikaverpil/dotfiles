@@ -124,10 +124,11 @@ Neovim searches these directories in every runtimepath entry
 
 ### after/ directory
 
-The `after/` tree loads _after_ all non-after paths. This config puts **all**
-LSP server configs in `after/lsp/` (not `lsp/`). Because packages may ship
-their own `lsp/` defaults, placing configs in `after/lsp/` ensures they always
-take precedence. Docs: `:h after-directory`
+The `after/` tree loads _after_ all non-after paths. This config uses
+nvim-lspconfig for base LSP server configs and puts **overrides** in
+`after/lsp/` (not `lsp/`). Because nvim-lspconfig ships its own `lsp/`
+defaults, placing overrides in `after/lsp/` ensures they take precedence.
+Docs: `:h after-directory`
 
 ### Per-project overrides (exrc)
 
@@ -191,7 +192,7 @@ Conceptual layout (`:h initialization`, step 11 uses `plugin/**/*.{vim,lua}` --
     options.lua          -- all vim.opt settings
     dev.lua              -- local dev plugin loader
     ...                  -- other utility modules (fold, toggle, pickers, icons, etc.)
-  lsp/                   -- (unused; all LSP configs in after/lsp/ instead)
+  lsp/                   -- (unused; nvim-lspconfig provides base configs)
   parser/                -- treesitter parser .so files (managed by nvim-treesitter)
   colors/                -- custom colorschemes (loaded by :colorscheme)
   snippets/              -- custom snippet files (loaded by blink.cmp)
@@ -412,17 +413,21 @@ require("dev").use({
 **Build hooks** for plugins that need a build step after install or update. Use
 the `PackChanged` autocmd:
 
-```lua
-vim.pack.add({
-  { src = "https://github.com/nvim-treesitter/nvim-treesitter", branch = "main" },
-})
+**Important:** PackChanged hooks must be registered **before** the
+`vim.pack.add()` call that installs the plugin. Otherwise the hook won't fire
+on first bootstrap.
 
+```lua
 vim.api.nvim_create_autocmd("PackChanged", {
   callback = function(ev)
     if ev.data.spec.name == "nvim-treesitter" then
       vim.cmd("TSUpdate")
     end
   end,
+})
+
+vim.pack.add({
+  { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
 })
 ```
 
@@ -472,11 +477,11 @@ vim.api.nvim_create_autocmd("FileType", {
 Every plugin file follows a consistent structure:
 
 ```lua
--- 1. Install packages (immediate)
-vim.pack.add(...)
-
--- 2. Build hooks (immediate, runs on install/update)
+-- 1. Build hooks (must be registered BEFORE vim.pack.add)
 vim.api.nvim_create_autocmd("PackChanged", { ... })
+
+-- 2. Install packages (immediate)
+vim.pack.add(...)
 
 -- 3. Deferred setup (VimEnter)
 require("lazyload").on_vim_enter(function()
@@ -535,8 +540,8 @@ With `NVIM_APPNAME=nvim-native`, paths use `nvim-native` instead of `nvim`.
 2. Add mason tools to the `ensure_installed` list in `plugin/mason.lua`
 3. Add formatters to `formatters_by_ft` in `plugin/conform.lua`
 4. Add linters to `linters_by_ft` in `plugin/lint.lua`
-5. `after/lsp/<server>.lua` -- return the server config table
-6. `plugin/lang/<ft>.lua` -- editor settings (`vim.opt_local` via `FileType` autocmd), language-specific plugins, autocmds
+5. `plugin/lang/<ft>.lua` -- editor settings (`vim.opt_local` via `FileType` autocmd), language-specific plugins, autocmds
+6. _(optional)_ `after/lsp/<server>.lua` -- override nvim-lspconfig base config
 
 ## Adding a shared utility (toggle, custom picker, etc.)
 

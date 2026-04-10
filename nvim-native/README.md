@@ -25,7 +25,7 @@ nvim-native/
     toggle.lua                toggle functions (auto-format, inlay hints)
     colors.lua                color utility (blend)
     exrc.lua                  list project-local .nvim.lua files + trust status
-  lsp/                        one file per LSP server (auto-discovered)
+  lsp/                        (unused; nvim-lspconfig provides base configs)
   plugin/
     lang/                     per-language plugins, filetypes, editor settings, autocmds
     blink.lua                 completion (VimEnter)
@@ -42,7 +42,7 @@ nvim-native/
     treesitter.lua            syntax highlighting + context
     ...                       other feature plugins
   after/
-    lsp/
+    lsp/                      overrides for nvim-lspconfig base configs
       gopls.lua               extends gopls for templ/gotmpl
 ```
 
@@ -60,11 +60,11 @@ custom filetypes, SchemaStore loading, build hooks, and autocmds.
 Every plugin file follows a consistent structure:
 
 ```lua
--- 1. Load packages (immediate)
-vim.pack.add(...)
-
--- 2. Build hooks (immediate, runs on install/update)
+-- 1. Build hooks (must be registered BEFORE vim.pack.add)
 vim.api.nvim_create_autocmd("PackChanged", { ... })
+
+-- 2. Load packages (immediate)
+vim.pack.add(...)
 
 -- 3. Deferred setup (VimEnter/UIEnter)
 require("lazyload").on_vim_enter(function()
@@ -78,7 +78,8 @@ vim.keymap.set(...)
 ### Build hooks
 
 Plugins that need a build step after install or update use the `PackChanged`
-autocmd:
+autocmd. Hooks must be registered **before** the `vim.pack.add()` call so they
+fire on first bootstrap:
 
 ```lua
 vim.api.nvim_create_autocmd("PackChanged", {
@@ -110,9 +111,8 @@ after all deferred plugin setup has completed.
 2. Add Mason tools to `plugin/mason.lua`
 3. Add formatters to `plugin/conform.lua`
 4. Add linters to `plugin/lint.lua`
-5. `lsp/<server>.lua` — return the server config table (if custom config needed)
-6. `plugin/lang/<ft>.lua` — editor settings (`vim.opt_local` via `FileType` autocmd), plugins, filetypes, autocmds
-7. *(optional)* `after/lsp/<server>.lua` — extend base LSP config
+5. `plugin/lang/<ft>.lua` — editor settings (`vim.opt_local` via `FileType` autocmd), plugins, filetypes, autocmds
+6. *(optional)* `after/lsp/<server>.lua` — override base config from nvim-lspconfig
 
 ## Startup performance
 
