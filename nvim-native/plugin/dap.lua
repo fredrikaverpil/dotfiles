@@ -1,3 +1,4 @@
+-- DAP core
 vim.pack.add({
   { src = "https://codeberg.org/mfussenegger/nvim-dap", name = "nvim-dap" },
   { src = "https://github.com/rcarriga/nvim-dap-ui" },
@@ -5,22 +6,10 @@ vim.pack.add({
   { src = "https://github.com/theHamsta/nvim-dap-virtual-text" },
 })
 
-local registry = require("registry")
-
-registry.add({
-  lualine = {
-    sections = {
-      dap = {
-        function()
-          return require("dap").status()
-        end,
-        cond = function()
-          return package.loaded["dap"] and require("dap").status() ~= ""
-        end,
-        icon = "",
-      },
-    },
-  },
+-- DAP adapters
+vim.pack.add({
+  { src = "https://github.com/leoluz/nvim-dap-go" },
+  { src = "https://codeberg.org/mfussenegger/nvim-dap-python", name = "nvim-dap-python" },
 })
 
 local initialized = false
@@ -33,12 +22,13 @@ local function init()
 
   -- Show nice icons in gutter instead of the default characters
   for name, sign in pairs(require("icons").dap) do
-    sign = type(sign) == "table" and sign or { sign }
+    ---@type string[]
+    local parts = type(sign) == "table" and sign or { sign }
     vim.fn.sign_define("Dap" .. name, {
-      text = sign[1],
-      texthl = sign[2] or "DiagnosticInfo",
-      linehl = sign[3],
-      numhl = sign[3],
+      text = parts[1],
+      texthl = parts[2] or "DiagnosticInfo",
+      linehl = parts[3],
+      numhl = parts[3],
     })
   end
 
@@ -59,15 +49,46 @@ local function init()
     dapui.close()
   end
 
-  -- Apply registry adapters and configurations
-  local merge = require("merge")
-  merge(dap.adapters, registry.dap.adapters or {})
-  merge(dap.configurations, registry.dap.configurations or {})
-
-  -- Run lang-specific setup functions (e.g. dap-go, dap-python)
-  for _, setup_fn in ipairs(registry.dap.setups or {}) do
-    setup_fn()
+  -- Lua DAP adapter
+  dap.adapters.nlua = function(callback, config)
+    callback({ type = "server", host = config.host or "127.0.0.1", port = config.port or 8086 })
   end
+
+  dap.configurations.lua = {
+    {
+      type = "nlua",
+      request = "attach",
+      name = "Attach to running Neovim instance",
+    },
+  }
+
+  -- Go DAP setup
+  require("dap-go").setup({
+    dap_configurations = {
+      {
+        type = "go",
+        name = "Delve: debug opened file's cmd/cli",
+        request = "launch",
+        cwd = "${fileDirname}",
+        program = "./${relativeFileDirname}",
+        args = {},
+      },
+      {
+        type = "go",
+        name = "Delve: debug test (manually enter test name)",
+        request = "launch",
+        mode = "test",
+        program = "./${relativeFileDirname}",
+        args = function()
+          local testname = vim.fn.input("Test name (^regexp$ ok): ")
+          return { "-test.run", testname }
+        end,
+      },
+    },
+  })
+
+  -- Python DAP setup
+  require("dap-python").setup("uv")
 end
 
 vim.keymap.set("n", "<leader>db", function()

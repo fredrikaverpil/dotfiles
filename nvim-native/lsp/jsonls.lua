@@ -1,3 +1,7 @@
+vim.pack.add({
+  { src = "https://github.com/b0o/SchemaStore.nvim" },
+})
+
 ---@type vim.lsp.Config
 return {
   cmd = { "vscode-json-language-server", "--stdio" },
@@ -6,5 +10,10 @@ return {
   init_options = {
     provideFormatter = false, -- use conform.nvim instead
   },
-  -- schemas are added via plugin/lang/json.lua (SchemaStore must load first)
+  settings = {
+    json = {
+      schemas = require("schemastore").json.schemas(),
+      validate = { enable = true },
+    },
+  },
 }

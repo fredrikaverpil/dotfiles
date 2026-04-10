@@ -1,42 +1,46 @@
 vim.pack.add({ { src = "https://codeberg.org/mfussenegger/nvim-lint", name = "nvim-lint" } })
 
-require("startup").on_vim_enter(function()
-  local registry = require("registry")
+require("lazyload").on_vim_enter(function()
   local lint = require("lint")
 
-  lint.linters_by_ft = registry.lint.linters_by_ft or {}
+  lint.linters_by_ft = {
+    dockerfile = { "hadolint" },
+    gha = { "actionlint" },
+    go = { "golangcilint" },
+    markdown = { "markdownlint" },
+    proto = { "protolint" },
+    python = { "mypy" },
+    sh = { "shellcheck" },
+    terraform = { "terraform_validate", "tflint" },
+    tf = { "terraform_validate", "tflint" },
+    yaml = { "yamllint" },
+  }
 
-  for name, config in pairs(registry.lint.linters or {}) do
-    lint.linters[name] = vim.tbl_deep_extend("force", lint.linters[name] or {}, config)
-  end
-
-  local timer = vim.uv.new_timer()
-  local function debounced_lint()
-    timer:start(100, 0, function()
-      timer:stop()
-      vim.schedule(function()
-        local names = lint._resolve_linter_by_ft(vim.bo.filetype)
-        if #names == 0 then
-          vim.list_extend(names, lint.linters_by_ft["_"] or {})
-        end
-        vim.list_extend(names, lint.linters_by_ft["*"] or {})
-
-        names = vim.tbl_filter(function(linter_name)
-          return lint.linters[linter_name] ~= nil
-        end, names)
-
-        if #names > 0 then
-          lint.try_lint(names)
-        end
-      end)
-    end)
-  end
+  lint.linters.markdownlint.args = {
+    "--config",
+    vim.env.DOTFILES .. "/extras/templates/.markdownlint.json",
+    "--stdin",
+  }
+  lint.linters.protolint.args = {
+    "lint",
+    "--reporter=json",
+    "--config_path=" .. vim.env.DOTFILES .. "/extras/templates/.protolint.yaml",
+  }
+  lint.linters.yamllint.args = {
+    "--config-file",
+    vim.env.DOTFILES .. "/extras/templates/.yamllint.yml",
+    "--format",
+    "parsable",
+    "-",
+  }
 
   vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost" }, {
     group = vim.api.nvim_create_augroup("native-nvim-lint", { clear = true }),
-    callback = debounced_lint,
+    callback = function()
+      lint.try_lint()
+    end,
   })
 
   -- Lint already-open buffers (initial file was read before VimEnter)
-  debounced_lint()
+  lint.try_lint()
 end)

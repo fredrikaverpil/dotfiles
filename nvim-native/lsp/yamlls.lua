@@ -1,3 +1,7 @@
+vim.pack.add({
+  { src = "https://github.com/b0o/SchemaStore.nvim" },
+})
+
 ---@type vim.lsp.Config
 return {
   cmd = { "yaml-language-server", "--stdio" },
@@ -10,7 +14,7 @@ return {
         enable = false, -- using b0o/SchemaStore.nvim instead
         url = "", -- avoid TypeError
       },
-      -- schemas are added via plugin/lang/yaml.lua (SchemaStore must load first)
+      schemas = require("schemastore").yaml.schemas(),
       validate = true,
       format = {
         enable = false, -- delegate to conform.nvim

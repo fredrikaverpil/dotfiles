@@ -1,8 +1,30 @@
+-- Neotest core
 vim.pack.add({
   { src = "https://github.com/nvim-neotest/neotest" },
   { src = "https://github.com/nvim-neotest/nvim-nio" },
   { src = "https://github.com/nvim-lua/plenary.nvim" },
   { src = "https://github.com/antoinemadec/FixCursorHold.nvim" },
+})
+
+-- Neotest adapters
+vim.pack.add({
+  { src = "https://github.com/nvim-neotest/neotest-plenary" },
+  { src = "https://github.com/nvim-neotest/neotest-python" },
+  { src = "https://github.com/lawrence-laz/neotest-zig", version = vim.version.range("1.*") },
+})
+
+-- neotest-golang
+vim.pack.add({
+  { src = "https://github.com/uga-rosa/utf8.nvim" },
+})
+
+require("dev").use({
+  dev = "~/code/public/neotest-golang",
+  fallback = function()
+    vim.pack.add({
+      { src = "https://github.com/fredrikaverpil/neotest-golang" },
+    })
+  end,
 })
 
 local initialized = false
@@ -13,19 +35,29 @@ local function init()
   end
   initialized = true
 
-  local registry = require("registry")
-  local neotest_opts = registry.neotest.opts or {}
-  local adapters = {}
-  for _, spec in ipairs(neotest_opts.adapters or {}) do
-    local adapter = require(spec.module)
-    if spec.opts then
-      adapter = adapter(spec.opts)
-    end
-    table.insert(adapters, adapter)
-  end
-
   require("neotest").setup({
-    adapters = adapters,
+    adapters = {
+      require("neotest-golang")({
+        go_test_args = {
+          "-v",
+          "-count=1",
+          "-race",
+          "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
+          "-parallel=1",
+        },
+        runner = "gotestsum",
+        gotestsum_args = { "--format=standard-verbose" },
+      }),
+      require("neotest-plenary"),
+      require("neotest-python")({
+        runner = "pytest",
+        args = { "--log-level", "INFO", "--color", "yes", "-vv", "-s" },
+        dap = { justMyCode = false },
+      }),
+      require("neotest-zig")({
+        dap = { adapter = "lldb" },
+      }),
+    },
     discovery = {
       enabled = true,
       concurrent = 0,

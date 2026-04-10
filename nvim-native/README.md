@@ -18,9 +18,7 @@ Symlinked via GNU Stow. Run `./rebuild.sh --stow` from `~/.dotfiles/` to apply.
 nvim-native/
   init.lua                    leader keys, require("options"), diagnostics, debug/profile
   lua/
-    registry.lua              central registry — lang files declare, consumers read
-    merge.lua                 deep merge helper (appends lists, recurses dicts)
-    startup.lua                 VimEnter/UIEnter deferred setup queues
+    lazyload.lua                VimEnter/UIEnter deferred setup queues
     options.lua               all vim.opt settings
     diagnostics.lua           diagnostic display config
     fold.lua                  fold helpers (treesitter default + LSP override)
@@ -29,15 +27,15 @@ nvim-native/
     exrc.lua                  list project-local .nvim.lua files + trust status
   lsp/                        one file per LSP server (auto-discovered)
   plugin/
-    lang/                     per-language declarations (populates registry)
-    blink.lua                 reads registry → sets up completion (VimEnter)
-    conform.lua               reads registry → sets up formatting (VimEnter)
-    dap.lua                   reads registry → sets up debugging (deferred to first use)
-    lint.lua                  reads registry → sets up linting (VimEnter)
-    lsp.lua                   reads registry → enables LSP servers (VimEnter)
-    lualine.lua               reads registry → sets up statusline (VimEnter)
-    mason.lua                 reads registry → installs tools (VimEnter)
-    neotest.lua               reads registry → sets up testing (deferred to first use)
+    lang/                     per-language plugins, filetypes, autocmds
+    blink.lua                 completion (VimEnter)
+    conform.lua               formatting (VimEnter)
+    dap.lua                   debugging (deferred to first use)
+    lint.lua                  linting (VimEnter)
+    lsp.lua                   LSP servers (VimEnter)
+    lualine.lua               statusline (VimEnter)
+    mason.lua                 tool installation (VimEnter)
+    neotest.lua               testing (deferred to first use)
     colorscheme.lua           zenbones + OSC11 dark/light detection
     oil.lua                   file explorer
     snacks.lua                QoL (picker, dashboard, lazygit, terminal)
@@ -49,37 +47,13 @@ nvim-native/
   ftplugin/                   per-filetype editor settings (vim.opt_local)
 ```
 
-## Registry pattern
+## Architecture
 
-The config uses a **register immediately, consume deferred** flow:
-
-1. All `plugin/` files load (alphabetically): `vim.pack.add()` and
-   `registry.add()` execute immediately
-2. `VimEnter` fires: deferred setup functions run, reading from the
-   fully-populated registry via `startup.on_vim_enter()` or `startup.on_ui_enter()`
-
-No `after/plugin/` needed — the `startup.lua` module provides the timing
-guarantee that all data is registered before any consumer reads it.
-
-Each plugin is namespaced under `registry.<name>`. Plugins with a `setup(opts)`
-store their opts under `.opts`:
-
-```lua
--- plugin/lang/go.lua
-require("registry").add({
-  lsp = { servers = { "gopls" } },
-  mason = { ensure_installed = { "gopls", "goimports", "gci", "gofumpt", "golines", "golangci-lint" } },
-  conform = {
-    opts = {
-      formatters_by_ft = { go = { "goimports", "gci", "gofumpt", "golines" } },
-      formatters = { goimports = { args = { "-srcdir", "$FILENAME" } } },
-    },
-  },
-  lint = {
-    linters_by_ft = { go = { "golangcilint" } },
-  },
-})
-```
+Core plugin files (`plugin/*.lua`) own all tool configuration inline — LSP
+servers, formatters, linters, completion sources, DAP adapters, neotest
+adapters, etc. Language files (`plugin/lang/*.lua`) handle language-specific
+concerns that don't fit in the core plugins: extra `vim.pack.add()` calls,
+custom filetypes, SchemaStore loading, build hooks, and autocmds.
 
 ### Plugin file layout
 
@@ -92,50 +66,13 @@ vim.pack.add(...)
 -- 2. Build hooks (immediate, runs on install/update)
 vim.api.nvim_create_autocmd("PackChanged", { ... })
 
--- 3. Registry contributions (immediate)
-require("registry").add({ ... })
-
--- 4. Deferred setup (VimEnter/UIEnter)
-require("startup").on_vim_enter(function()
-  local merge = require("merge")
-  local registry = require("registry")
-  local opts = { ... }
-  require("plugin").setup(merge(opts, registry.<name>.opts or {}))
+-- 3. Deferred setup (VimEnter/UIEnter)
+require("lazyload").on_vim_enter(function()
+  require("plugin").setup({ ... })
 end)
 
--- 5. Keymaps
+-- 4. Keymaps
 vim.keymap.set(...)
-```
-
-### Consumer pattern
-
-Consumers merge base opts with registry contributions using `merge()`:
-
-```lua
--- merge() deep-merges tables, appending+deduplicating lists
-local opts = { PATH = "append" }
-require("mason").setup(merge(opts, registry.mason.opts or {}))
-```
-
-Some registry fields live outside `.opts` to give the consumer full control over
-placement. For example, lualine has a `.sections` field where contributors
-register named components, and lualine.lua decides where to inject them:
-
-```lua
--- plugin/dap.lua (contributor — declares what, not where)
-require("registry").add({
-  lualine = {
-    sections = {
-      dap = { function() return require("dap").status() end, cond = ..., icon = "" },
-    },
-  },
-})
-
--- plugin/lualine.lua (consumer — decides placement)
-local sections = registry.lualine.sections or {}
-if sections.dap then
-  table.insert(opts.sections.lualine_x, 1, sections.dap)
-end
 ```
 
 ### Build hooks
@@ -157,7 +94,7 @@ vim.api.nvim_create_autocmd("PackChanged", {
 
 Place a `.nvim.lua` in any project directory. It runs at step 7c of
 initialization — **before** `plugin/` files (`:h exrc`).
-Wrap plugin overrides in `require("startup").on_override(...)` so they apply
+Wrap plugin overrides in `require("lazyload").on_override(...)` so they apply
 after all deferred plugin setup has completed.
 
 ## Plugin management
@@ -169,11 +106,14 @@ after all deferred plugin setup has completed.
 
 ## Adding a new language
 
-1. `plugin/lang/<ft>.lua` — call `require("registry").add()` with `lsp`,
-   `mason`, `conform`, `lint`
-2. `lsp/<server>.lua` — return the server config table (if custom config needed)
-3. `ftplugin/<ft>.lua` — editor settings only (`vim.opt_local.*`)
-4. *(optional)* `after/lsp/<server>.lua` — extend base LSP config
+1. Add the LSP server to `plugin/lsp.lua`
+2. Add Mason tools to `plugin/mason.lua`
+3. Add formatters to `plugin/conform.lua`
+4. Add linters to `plugin/lint.lua`
+5. `lsp/<server>.lua` — return the server config table (if custom config needed)
+6. `ftplugin/<ft>.lua` — editor settings only (`vim.opt_local.*`)
+7. *(optional)* `plugin/lang/<ft>.lua` — for extra plugins, filetypes, autocmds
+8. *(optional)* `after/lsp/<server>.lua` — extend base LSP config
 
 ## Startup performance
 
@@ -184,6 +124,5 @@ packpath.
 
 | Phase | What runs |
 |-------|-----------|
-| `plugin/` | All files: vim.pack.add + registry.add (immediate), setup queued via startup |
-| `plugin/lang/` | 23 files calling `require("registry").add({...})` — pure table ops, <0.1ms each |
+| `plugin/` | All files: vim.pack.add (immediate), setup queued via lazyload |
 | `VimEnter` | Lualine (`{ sync = true }`), then everything else async (default) |

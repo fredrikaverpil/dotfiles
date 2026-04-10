@@ -2,7 +2,7 @@ vim.pack.add({
   { src = "https://github.com/gbprod/yanky.nvim" },
 })
 
-require("startup").on_vim_enter(function()
+require("lazyload").on_vim_enter(function()
   require("yanky").setup({})
 end)
 

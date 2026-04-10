@@ -1,29 +1,3 @@
-local registry = require("registry")
-
-registry.add({
-  lsp = { servers = { "buf_ls" } },
-  mason = { ensure_installed = { "buf", "protolint", "api-linter" } },
-  conform = {
-    opts = {
-      formatters_by_ft = { proto = { "buf" } },
-    },
-  },
-  lint = {
-    linters_by_ft = { proto = { "protolint" } },
-    linters = {
-      protolint = {
-        args = {
-          "lint",
-          "--reporter=json",
-          "--config_path=" .. vim.env.DOTFILES .. "/extras/templates/.protolint.yaml",
-        },
-      },
-    },
-  },
-})
-
--- Helpers for buf_lint and api_linter
-
 local function get_relative_path(file, cwd)
   if not cwd:sub(-1) == "/" then
     cwd = cwd .. "/"
@@ -99,61 +73,57 @@ local function descriptor_set_in()
 end
 
 if vim.fn.executable("api-linter") == 1 then
-  registry.add({
-    lint = {
-      linters = {
-        api_linter = {
-          name = "api_linter",
-          cmd = "api-linter",
-          stdin = false,
-          append_fname = false,
-          args = {
-            "--output-format=json",
-            "--disable-rule=core::0191::java-multiple-files",
-            "--disable-rule=core::0191::java-package",
-            "--disable-rule=core::0191::java-outer-classname",
-            function()
-              return descriptor_set_in()
-            end,
-            function()
-              local bufpath = vim.fn.expand("%:p")
-              return get_relative_path(bufpath, buf_lint_cwd())
-            end,
-          },
-          stream = "stdout",
-          ignore_exitcode = true,
-          parser = function(output)
-            if output == "" then
-              return {}
-            end
-
-            local ok, json_output = pcall(vim.json.decode, output)
-            if not ok then
-              error("Failed to parse api-linter output: " .. output)
-            end
-
-            local diagnostics = {}
-            for _, item in ipairs(json_output) do
-              for _, problem in ipairs(item.problems or {}) do
-                table.insert(diagnostics, {
-                  message = problem.message,
-                  code = problem.rule_id .. " " .. problem.rule_doc_uri,
-                  severity = vim.diagnostic.severity.WARN,
-                  lnum = problem.location.start_position.line_number - 1,
-                  col = problem.location.start_position.column_number - 1,
-                  end_lnum = problem.location.end_position.line_number - 1,
-                  end_col = problem.location.end_position.column_number - 1,
-                })
-              end
-            end
-
-            os.remove(descriptor_filepath)
-            return diagnostics
-          end,
-        },
+  require("lazyload").on_vim_enter(function()
+    require("lint").linters.api_linter = {
+      name = "api_linter",
+      cmd = "api-linter",
+      stdin = false,
+      append_fname = false,
+      args = {
+        "--output-format=json",
+        "--disable-rule=core::0191::java-multiple-files",
+        "--disable-rule=core::0191::java-package",
+        "--disable-rule=core::0191::java-outer-classname",
+        function()
+          return descriptor_set_in()
+        end,
+        function()
+          local bufpath = vim.fn.expand("%:p")
+          return get_relative_path(bufpath, buf_lint_cwd())
+        end,
       },
-    },
-  })
+      stream = "stdout",
+      ignore_exitcode = true,
+      parser = function(output)
+        if output == "" then
+          return {}
+        end
+
+        local ok, json_output = pcall(vim.json.decode, output)
+        if not ok then
+          error("Failed to parse api-linter output: " .. output)
+        end
+
+        local diagnostics = {}
+        for _, item in ipairs(json_output) do
+          for _, problem in ipairs(item.problems or {}) do
+            table.insert(diagnostics, {
+              message = problem.message,
+              code = problem.rule_id .. " " .. problem.rule_doc_uri,
+              severity = vim.diagnostic.severity.WARN,
+              lnum = problem.location.start_position.line_number - 1,
+              col = problem.location.start_position.column_number - 1,
+              end_lnum = problem.location.end_position.line_number - 1,
+              end_col = problem.location.end_position.column_number - 1,
+            })
+          end
+        end
+
+        os.remove(descriptor_filepath)
+        return diagnostics
+      end,
+    }
+  end)
 
   vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost" }, {
     group = vim.api.nvim_create_augroup("native-api-linter", { clear = true }),

@@ -1,61 +1,8 @@
 vim.pack.add({
-  { src = "https://github.com/iamcco/markdown-preview.nvim" },
   { src = "https://github.com/MeanderingProgrammer/render-markdown.nvim" },
 })
 
-vim.api.nvim_create_autocmd("PackChanged", {
-  callback = function(ev)
-    if ev.data.spec.name == "markdown-preview.nvim" then
-      vim.fn["mkdp#util#install"]()
-    end
-  end,
-})
-
-require("registry").add({
-  mason = { ensure_installed = { "prettier", "markdownlint" } },
-  conform = {
-    opts = {
-      formatters_by_ft = {
-        markdown = { "prettier" },
-      },
-      formatters = {
-        prettier = {
-          prepend_args = { "--prose-wrap", "always", "--print-width", "80", "--tab-width", "2" },
-        },
-        mdformat = {
-          prepend_args = { "--number", "--wrap", "80" },
-        },
-      },
-    },
-  },
-  lint = {
-    linters_by_ft = { markdown = { "markdownlint" } },
-    linters = {
-      markdownlint = {
-        args = {
-          "--config",
-          vim.env.DOTFILES .. "/extras/templates/.markdownlint.json",
-          "--stdin",
-        },
-      },
-    },
-  },
-  blink = {
-    opts = {
-      sources = {
-        default = { "markdown" },
-        providers = {
-          markdown = {
-            name = "RenderMarkdown",
-            module = "render-markdown.integ.blink",
-          },
-        },
-      },
-    },
-  },
-})
-
-require("startup").on_vim_enter(function()
+require("lazyload").on_vim_enter(function()
   require("render-markdown").setup({
     code = {
       sign = false,

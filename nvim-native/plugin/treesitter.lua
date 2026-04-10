@@ -15,7 +15,7 @@ if USE_NVIM_TREESITTER then
   })
 end
 
-require("startup").on_vim_enter(function()
+require("lazyload").on_vim_enter(function()
   --- Sign parser .so on macOS to prevent code-signature crashes.
   ---@param parser_name string
   local function sign_parser_macos(parser_name)

@@ -4,23 +4,67 @@ vim.pack.add({
 
 vim.g.auto_format = true
 
-require("startup").on_vim_enter(function()
-  local registry = require("registry")
-
-  require("conform").setup(registry.conform.opts or {})
-
-  vim.api.nvim_create_autocmd("BufWritePre", {
-    group = vim.api.nvim_create_augroup("native-conform", { clear = true }),
-    pattern = "*",
-    callback = function(args)
-      if vim.g.auto_format then
-        require("conform").format({
-          bufnr = args.buf,
-          timeout_ms = 5000,
-          lsp_format = "fallback",
-        })
+require("lazyload").on_vim_enter(function()
+  require("conform").setup({
+    format_on_save = function()
+      if not vim.g.auto_format then
+        return
       end
+      return { timeout_ms = 5000, lsp_format = "fallback" }
     end,
+    formatters_by_ft = {
+      dependabot = { "yamlfmt" },
+      gha = { "yamlfmt" },
+      go = { "goimports", "gci", "gofumpt", "golines" },
+      javascript = { "prettier" },
+      javascriptreact = { "prettier" },
+      json = { "biome" },
+      json5 = { "biome" },
+      jsonc = { "biome" },
+      lua = { "stylua" },
+      markdown = { "prettier" },
+      nix = { "nixfmt" },
+      proto = { "buf" },
+      sh = { "shfmt" },
+      terraform = { "terraform_fmt" },
+      ["terraform-vars"] = { "terraform_fmt" },
+      tf = { "terraform_fmt" },
+      typescript = { "prettier" },
+      typescriptreact = { "prettier" },
+      yaml = { "yamlfmt" },
+    },
+    formatters = {
+      biome = {
+        args = { "format", "--indent-style", "space", "--stdin-file-path", "$FILENAME" },
+      },
+      gci = {
+        args = { "write", "--skip-generated", "-s", "standard", "-s", "default", "--skip-vendor", "$FILENAME" },
+      },
+      gofumpt = {
+        prepend_args = { "-extra", "-w", "$FILENAME" },
+        stdin = false,
+      },
+      goimports = {
+        args = { "-srcdir", "$FILENAME" },
+      },
+      golines = {
+        prepend_args = { "--base-formatter=gofumpt", "--ignore-generated", "--tab-len=1", "--max-len=120" },
+      },
+      mdformat = {
+        prepend_args = { "--number", "--wrap", "80" },
+      },
+      prettier = {
+        prepend_args = { "--prose-wrap", "always", "--print-width", "80", "--tab-width", "2" },
+      },
+      yamlfmt = {
+        prepend_args = {
+          "-formatter",
+          "retain_line_breaks_single=true",
+          "-formatter",
+          "pad_line_comments=2",
+        },
+      },
+    },
   })
 end)
 

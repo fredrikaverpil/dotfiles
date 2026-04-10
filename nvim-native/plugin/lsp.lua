@@ -2,15 +2,36 @@ vim.pack.add({
   { src = "https://github.com/neovim/nvim-lspconfig" },
 })
 
-require("startup").on_vim_enter(function()
-  local registry = require("registry")
-
+require("lazyload").on_vim_enter(function()
   -- Extend LSP capabilities with blink.cmp completions for all servers
   vim.lsp.config("*", {
     capabilities = require("blink.cmp").get_lsp_capabilities(),
   })
 
-  vim.lsp.enable(registry.lsp.servers or {})
+  local servers = {
+    "bashls",
+    "basedpyright",
+    "buf_ls",
+    "dockerls",
+    "gopls",
+    "graphql",
+    "jsonls",
+    "lua_ls",
+    "ruff",
+    "rust_analyzer",
+    "superhtml",
+    "taplo",
+    "templ",
+    "terraformls",
+    "ts_query_ls",
+    "vtsls",
+    "yamlls",
+    "zls",
+  }
+  if vim.fn.executable("nix") == 1 then
+    table.insert(servers, "nil_ls")
+  end
+  vim.lsp.enable(servers)
 
   -- Enable codelens globally
   vim.lsp.codelens.enable(true)

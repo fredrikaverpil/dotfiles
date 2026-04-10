@@ -2,16 +2,13 @@ vim.pack.add({
   { src = "https://github.com/nvim-lualine/lualine.nvim" },
 })
 
-require("startup").on_vim_enter(function()
-  local merge = require("merge")
-  local registry = require("registry")
-
+require("lazyload").on_vim_enter(function()
   local function folder()
     local cwd = vim.fn.getcwd()
     return cwd:match("([^/]+)$")
   end
 
-  local opts = {
+  require("lualine").setup({
     options = {
       theme = "auto",
       component_separators = { left = "", right = "" },
@@ -25,22 +22,24 @@ require("startup").on_vim_enter(function()
         { folder, color = { gui = "bold" }, separator = "/", padding = { left = 1, right = 0 } },
         { "filename", path = 1, padding = { left = 0, right = 1 } },
       },
-      lualine_x = { "encoding", "filetype" },
+      lualine_x = {
+        {
+          function()
+            return require("dap").status()
+          end,
+          cond = function()
+            return package.loaded["dap"] and require("dap").status() ~= ""
+          end,
+          icon = "",
+        },
+        "encoding",
+        "filetype",
+      },
       lualine_y = { "progress" },
       lualine_z = { "location" },
     },
-    extensions = { "man", "quickfix" },
-  }
-
-  merge(opts, registry.lualine.opts or {})
-
-  -- Inject named section contributions (lualine decides placement)
-  local sections = registry.lualine.sections or {}
-  if sections.dap then
-    table.insert(opts.sections.lualine_x, 1, sections.dap)
-  end
-
-  require("lualine").setup(opts)
+    extensions = { "man", "mason", "quickfix" },
+  })
 
   vim.opt.showmode = false
 end, { sync = true })

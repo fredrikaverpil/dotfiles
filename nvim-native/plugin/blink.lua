@@ -3,11 +3,39 @@ vim.pack.add({
   { src = "https://github.com/rafamadriz/friendly-snippets" },
 })
 
-require("startup").on_vim_enter(function()
-  local merge = require("merge")
-  local registry = require("registry")
+require("lazyload").on_vim_enter(function()
+  local default_sources = { "lsp", "path", "snippets", "buffer", "dadbod", "lazydev", "markdown" }
+  local providers = {
+    snippets = {
+      opts = {
+        friendly_snippets = true,
+        search_paths = { vim.env.DOTFILES .. "/nvim-native/snippets" },
+      },
+    },
+    dadbod = {
+      name = "Dadbod",
+      module = "vim_dadbod_completion.blink",
+    },
+    lazydev = {
+      name = "LazyDev",
+      module = "lazydev.integrations.blink",
+      score_offset = 100,
+    },
+    markdown = {
+      name = "RenderMarkdown",
+      module = "render-markdown.integ.blink",
+    },
+  }
 
-  local opts = {
+  if vim.g.use_nvim_treesitter then
+    table.insert(default_sources, "go_pkgs")
+    providers.go_pkgs = {
+      name = "Import",
+      module = "blink-go-import",
+    }
+  end
+
+  require("blink.cmp").setup({
     keymap = {
       ["<C-e>"] = { "hide", "fallback" },
       ["<CR>"] = { "accept", "fallback" },
@@ -53,19 +81,8 @@ require("startup").on_vim_enter(function()
       kind_icons = require("icons").kinds,
     },
     sources = {
-      default = { "lsp", "path", "snippets", "buffer" },
-      providers = {
-        snippets = {
-          opts = {
-            friendly_snippets = true,
-            search_paths = { vim.env.DOTFILES .. "/nvim-native/snippets" },
-          },
-        },
-      },
+      default = default_sources,
+      providers = providers,
     },
-  }
-
-  merge(opts, registry.blink.opts or {})
-
-  require("blink.cmp").setup(opts)
+  })
 end)

@@ -14,22 +14,6 @@ vim.api.nvim_create_autocmd("PackChanged", {
   end,
 })
 
-require("registry").add({
-  blink = {
-    opts = {
-      sources = {
-        default = { "dadbod" },
-        providers = {
-          dadbod = {
-            name = "Dadbod",
-            module = "vim_dadbod_completion.blink",
-          },
-        },
-      },
-    },
-  },
-})
-
 vim.g.db_ui_save_location = "~/code/dbui"
 vim.g.db_ui_tmp_query_location = "~/code/queries"
 vim.g.db_ui_use_nerd_fonts = true
