@@ -29,6 +29,18 @@ if USE_NVIM_TREESITTER then
         },
       },
     },
+    {
+      lang = "godoc",
+      register = { "godoc", "godoc" },
+      config = {
+        install_info = {
+          url = "https://github.com/fredrikaverpil/tree-sitter-godoc",
+          branch = "main",
+          generate = false,
+          queries = "queries",
+        },
+      },
+    },
   }
 
   for _, p in ipairs(custom_parsers) do
