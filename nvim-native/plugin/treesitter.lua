@@ -13,6 +13,41 @@ if USE_NVIM_TREESITTER then
       end
     end,
   })
+
+  --- Custom parsers not shipped with nvim-treesitter.
+  --- Each entry: { lang = "name", register = { lang, ft }, config = { install_info = { ... } } }
+  local custom_parsers = {
+    {
+      lang = "fga",
+      register = { "fga", "fga" },
+      config = {
+        install_info = {
+          url = "https://github.com/matoous/tree-sitter-fga",
+          branch = "main",
+          generate = false,
+          queries = "queries",
+        },
+      },
+    },
+  }
+
+  for _, p in ipairs(custom_parsers) do
+    vim.treesitter.language.register(unpack(p.register))
+  end
+
+  local function inject_custom_parsers()
+    local parsers = require("nvim-treesitter.parsers")
+    for _, p in ipairs(custom_parsers) do
+      parsers[p.lang] = p.config
+    end
+  end
+
+  inject_custom_parsers()
+
+  vim.api.nvim_create_autocmd("User", {
+    pattern = "TSUpdate",
+    callback = inject_custom_parsers,
+  })
 end
 
 require("lazyload").on_vim_enter(function()
