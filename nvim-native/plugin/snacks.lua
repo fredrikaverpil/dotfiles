@@ -30,20 +30,27 @@ require("snacks").setup({
       { section = "header" },
       { section = "keys", gap = 1, padding = 1 },
       function()
-        local found = vim.fs.find(".nvim.lua", { upward = true, type = "file" })
-        if #found > 0 then
-          local lines = {}
-          for _, path in ipairs(found) do
-            table.insert(lines, "  " .. vim.fn.fnamemodify(path, ":~"))
-          end
-          return {
-            text = table.concat(lines, "\n"),
-            align = "center",
-            hl = "Comment",
-            padding = 1,
-          }
+        local entries = require("exrc").list()
+        if #entries == 0 then
+          return { text = "" }
         end
-        return { text = "" }
+        local suffix = {
+          trusted = "",
+          modified = " (modified — re-run :trust)",
+          denied = " (denied)",
+          untrusted = " (untrusted — run :trust)",
+          unreadable = " (unreadable)",
+        }
+        local lines = {}
+        for _, e in ipairs(entries) do
+          table.insert(lines, "  " .. e.path .. suffix[e.status])
+        end
+        return {
+          text = table.concat(lines, "\n"),
+          align = "center",
+          hl = "Comment",
+          padding = 1,
+        }
       end,
       function()
         if not _G._nvim_startup_ms then
