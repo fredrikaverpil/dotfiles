@@ -1,6 +1,6 @@
 vim.pack.add({ { src = "https://codeberg.org/mfussenegger/nvim-lint", name = "nvim-lint" } })
 
-require("defer").on_vim_enter(function()
+require("startup").on_vim_enter(function()
   local registry = require("registry")
   local lint = require("lint")
 

@@ -1,11 +1,14 @@
 --- Deep merge that appends and deduplicates lists, and recurses into dicts.
+--- Use vim.NIL as a value to explicitly remove a key.
 ---@param base table
 ---@param override table
 ---@return table
 local function merge(base, override)
   for k, v in pairs(override) do
-    local bv = base[k]
-    if type(v) == "table" then
+    if v == vim.NIL then
+      base[k] = nil
+    elseif type(v) == "table" then
+      local bv = base[k]
       if type(bv) ~= "table" then
         base[k] = v
       elseif vim.islist(v) then

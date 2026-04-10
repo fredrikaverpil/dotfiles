@@ -2,7 +2,7 @@ vim.pack.add({
   { src = "https://github.com/neovim/nvim-lspconfig" },
 })
 
-require("defer").on_vim_enter(function()
+require("startup").on_vim_enter(function()
   local registry = require("registry")
 
   -- Extend LSP capabilities with blink.cmp completions for all servers

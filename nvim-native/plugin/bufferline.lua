@@ -2,7 +2,7 @@ vim.pack.add({
   { src = "https://github.com/akinsho/bufferline.nvim" },
 })
 
-require("defer").on_vim_enter(function()
+require("startup").on_vim_enter(function()
   require("bufferline").setup({
     options = {
       mode = "tabs",

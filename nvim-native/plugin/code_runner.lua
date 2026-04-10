@@ -2,7 +2,7 @@ vim.pack.add({
   { src = "https://github.com/CRAG666/code_runner.nvim" },
 })
 
-require("defer").on_vim_enter(function()
+require("startup").on_vim_enter(function()
   local merge = require("merge")
   local registry = require("registry")
 

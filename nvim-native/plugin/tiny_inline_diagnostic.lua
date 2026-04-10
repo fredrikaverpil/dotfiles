@@ -2,7 +2,7 @@ vim.pack.add({
   { src = "https://github.com/rachartier/tiny-inline-diagnostic.nvim" },
 })
 
-require("defer").on_vim_enter(function()
+require("startup").on_vim_enter(function()
   require("tiny-inline-diagnostic").setup({
     options = {
       show_all_diags_on_cursorline = true,

@@ -55,7 +55,7 @@ require("registry").add({
   },
 })
 
-require("defer").on_vim_enter(function()
+require("startup").on_vim_enter(function()
   require("render-markdown").setup({
     code = {
       sign = false,

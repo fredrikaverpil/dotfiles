@@ -2,7 +2,7 @@ vim.pack.add({
   { src = "https://github.com/otavioschwanck/arrow.nvim" },
 })
 
-require("defer").on_vim_enter(function()
+require("startup").on_vim_enter(function()
   require("arrow").setup({
     show_icons = true,
     leader_key = ";",

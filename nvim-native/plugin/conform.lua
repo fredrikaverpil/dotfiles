@@ -1,8 +1,10 @@
-vim.pack.add({ "https://github.com/stevearc/conform.nvim" })
+vim.pack.add({
+  { src = "https://github.com/stevearc/conform.nvim" },
+})
 
 vim.g.auto_format = true
 
-require("defer").on_vim_enter(function()
+require("startup").on_vim_enter(function()
   local registry = require("registry")
 
   require("conform").setup(registry.conform.opts or {})

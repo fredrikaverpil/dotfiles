@@ -20,20 +20,21 @@ nvim-native/
   lua/
     registry.lua              central registry — lang files declare, consumers read
     merge.lua                 deep merge helper (appends lists, recurses dicts)
-    defer.lua                 VimEnter/UIEnter deferred setup queues
+    startup.lua                 VimEnter/UIEnter deferred setup queues
     options.lua               all vim.opt settings
     diagnostics.lua           diagnostic display config
     fold.lua                  fold helpers (treesitter default + LSP override)
     toggle.lua                toggle functions (auto-format, inlay hints)
     colors.lua                color utility (blend)
+    exrc.lua                  list project-local .nvim.lua files + trust status
   lsp/                        one file per LSP server (auto-discovered)
   plugin/
     lang/                     per-language declarations (populates registry)
-    blink.lua                 reads registry → sets up completion (UIEnter)
+    blink.lua                 reads registry → sets up completion (VimEnter)
     conform.lua               reads registry → sets up formatting (VimEnter)
     dap.lua                   reads registry → sets up debugging (deferred to first use)
     lint.lua                  reads registry → sets up linting (VimEnter)
-    lsp.lua                   reads registry → enables LSP servers (UIEnter)
+    lsp.lua                   reads registry → enables LSP servers (VimEnter)
     lualine.lua               reads registry → sets up statusline (VimEnter)
     mason.lua                 reads registry → installs tools (VimEnter)
     neotest.lua               reads registry → sets up testing (deferred to first use)
@@ -55,9 +56,9 @@ The config uses a **register immediately, consume deferred** flow:
 1. All `plugin/` files load (alphabetically): `vim.pack.add()` and
    `registry.add()` execute immediately
 2. `VimEnter` fires: deferred setup functions run, reading from the
-   fully-populated registry via `defer.on_vim_enter()` or `defer.on_ui_enter()`
+   fully-populated registry via `startup.on_vim_enter()` or `startup.on_ui_enter()`
 
-No `after/plugin/` needed — the `defer.lua` module provides the timing
+No `after/plugin/` needed — the `startup.lua` module provides the timing
 guarantee that all data is registered before any consumer reads it.
 
 Each plugin is namespaced under `registry.<name>`. Plugins with a `setup(opts)`
@@ -95,7 +96,7 @@ vim.api.nvim_create_autocmd("PackChanged", { ... })
 require("registry").add({ ... })
 
 -- 4. Deferred setup (VimEnter/UIEnter)
-require("defer").on_vim_enter(function()
+require("startup").on_vim_enter(function()
   local merge = require("merge")
   local registry = require("registry")
   local opts = { ... }
@@ -156,8 +157,8 @@ vim.api.nvim_create_autocmd("PackChanged", {
 
 Place a `.nvim.lua` in any project directory. It runs at step 7c of
 initialization — **before** `plugin/` files (`:h exrc`).
-Wrap plugin overrides in a `VimEnter` autocmd so they apply after all plugins
-are loaded.
+Wrap plugin overrides in `require("startup").on_override(...)` so they apply
+after all deferred plugin setup has completed.
 
 ## Plugin management
 
@@ -183,6 +184,6 @@ packpath.
 
 | Phase | What runs |
 |-------|-----------|
-| `plugin/` | All files: vim.pack.add + registry.add (immediate), setup queued via defer |
+| `plugin/` | All files: vim.pack.add + registry.add (immediate), setup queued via startup |
 | `plugin/lang/` | 23 files calling `require("registry").add({...})` — pure table ops, <0.1ms each |
 | `VimEnter` | Lualine (`{ sync = true }`), then everything else async (default) |

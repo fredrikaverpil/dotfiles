@@ -8,7 +8,7 @@ require("registry").add({
   lualine = { opts = { extensions = { "mason" } } },
 })
 
-require("defer").on_vim_enter(function()
+require("startup").on_vim_enter(function()
   local merge = require("merge")
   local registry = require("registry")
 
