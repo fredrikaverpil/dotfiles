@@ -114,7 +114,7 @@ Neovim searches these directories in every runtimepath entry
 | `ftplugin/<ft>.lua`       | Per-buffer, on FileType | Buffer-local settings (`vim.opt_local`)                     |
 | `indent/<ft>.lua`         | Per-buffer, on FileType | Indent expressions                                          |
 | `syntax/<ft>.vim`         | Per-buffer, on FileType | Legacy syntax highlighting (treesitter overrides)           |
-| `lsp/<server>.lua`        | Startup (discovery)     | LSP config tables, auto-discovered by `vim.lsp.config`      |
+| `lsp/<server>.lua`        | Startup (discovery)     | LSP config tables, auto-discovered by `vim.lsp.config` (see after/lsp/ below) |
 | `parser/<lang>.so`        | On demand               | Treesitter parsers                                          |
 | `queries/<lang>/*.scm`    | On demand               | Treesitter queries (highlights, injections, folds, indents) |
 | `colors/<name>.{vim,lua}` | On demand               | Colorschemes, loaded by `:colorscheme`                      |
@@ -124,9 +124,10 @@ Neovim searches these directories in every runtimepath entry
 
 ### after/ directory
 
-The `after/` tree loads _after_ all non-after paths. This config only uses
-`after/lsp/` for extending LSP server configs (e.g. `after/lsp/gopls.lua` adds
-templ/gotmpl filetypes to the base gopls config). Docs: `:h after-directory`
+The `after/` tree loads _after_ all non-after paths. This config puts **all**
+LSP server configs in `after/lsp/` (not `lsp/`). Because packages may ship
+their own `lsp/` defaults, placing configs in `after/lsp/` ensures they always
+take precedence. Docs: `:h after-directory`
 
 ### Per-project overrides (exrc)
 
@@ -170,8 +171,7 @@ This config has no framework -- each directory has a single responsibility:
 | **utility**          | `lua/`            | Shared Lua modules: `lazyload.lua`, `merge.lua`, `fold.lua`, `toggle.lua`, pickers, etc. |
 | **plugins**          | `plugin/`         | Self-contained plugin files: install + setup + keymaps                                   |
 | **lang plugins**     | `plugin/lang/`    | Per-language plugin installs, autocmds, and setup                                        |
-| **server config**    | `lsp/`            | LSP server config tables, auto-discovered by `vim.lsp.config`                            |
-| **server overrides** | `after/lsp/`      | Extend base LSP configs (e.g. gopls + templ/gotmpl)                                      |
+| **server config**    | `after/lsp/`      | All LSP server config tables (in after/ to override package defaults)                    |
 | **editor settings**  | `ftplugin/`       | Per-filetype `vim.opt_local` settings (indent, wrap, etc.)                               |
 
 Each plugin file is **self-contained** -- it installs its own packages, sets up
@@ -194,7 +194,7 @@ Conceptual layout (`:h initialization`, step 11 uses `plugin/**/*.{vim,lua}` --
     options.lua          -- all vim.opt settings
     dev.lua              -- local dev plugin loader
     ...                  -- other utility modules (fold, toggle, pickers, icons, etc.)
-  lsp/                   -- one file per LSP server; auto-discovered
+  lsp/                   -- (unused; all LSP configs in after/lsp/ instead)
   parser/                -- treesitter parser .so files (managed by nvim-treesitter)
   colors/                -- custom colorschemes (loaded by :colorscheme)
   snippets/              -- custom snippet files (loaded by blink.cmp)
@@ -210,7 +210,7 @@ Conceptual layout (`:h initialization`, step 11 uses `plugin/**/*.{vim,lua}` --
     neotest.lua          -- testing (deferred to first use)
     <name>.lua           -- other feature plugins (snacks, treesitter, oil, etc.)
   after/
-    lsp/                 -- overrides for LSP configs from packages
+    lsp/                 -- all LSP server configs (overrides package defaults)
     queries/<lang>/      -- treesitter query extensions (injections.scm, etc.)
     syntax/<ft>.vim      -- legacy syntax overrides/extensions
   ftplugin/              -- per-filetype editor settings (vim.opt_local only)
@@ -244,8 +244,9 @@ Docs: `:h initialization` (step 11)
 **`plugin/lang/`** -- One file per language. Installs language-specific plugins
 (`vim.pack.add()`), registers filetype autocmds, and performs setup.
 
-**`lsp/`** -- Each file returns a `vim.lsp.Config` table; filename becomes the
-server name. No `setup()` call needed. Enable servers in `plugin/lsp.lua`
+**`after/lsp/`** -- Each file returns a `vim.lsp.Config` table; filename
+becomes the server name. Placed in `after/` so they override any base configs
+from packages. No `setup()` call needed. Enable servers in `plugin/lsp.lua`
 (`vim.lsp.enable(...)`). Docs: `:h lsp-config`
 
 **`ftplugin/`** -- Sourced when a buffer's filetype is set. For
@@ -289,13 +290,14 @@ URLs directly.
 
 ---
 
-## lsp/ config files
+## after/lsp/ config files
 
 Each file returns a `vim.lsp.Config` table. The filename (without `.lua`)
-becomes the server name.
+becomes the server name. Placed in `after/lsp/` to override any base configs
+shipped by packages.
 
 ```lua
--- lsp/gopls.lua
+-- after/lsp/gopls.lua
 ---@type vim.lsp.Config
 return {
   cmd = { "gopls" },
@@ -535,11 +537,9 @@ With `NVIM_APPNAME=nvim-native`, paths use `nvim-native` instead of `nvim`.
 2. Add mason tools to the `ensure_installed` list in `plugin/mason.lua`
 3. Add formatters to `formatters_by_ft` in `plugin/conform.lua`
 4. Add linters to `linters_by_ft` in `plugin/lint.lua`
-5. `lsp/<server>.lua` -- return the server config table (if custom config
-   needed)
+5. `after/lsp/<server>.lua` -- return the server config table
 6. `ftplugin/<ft>.lua` -- editor settings only (`vim.opt_local.*`)
 7. _(optional)_ `plugin/lang/<ft>.lua` -- language-specific plugins, autocmds
-8. _(optional)_ `after/lsp/<server>.lua` -- extend base LSP config
 
 ## Adding a shared utility (toggle, custom picker, etc.)
 
