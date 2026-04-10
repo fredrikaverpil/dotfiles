@@ -185,4 +185,4 @@ packpath.
 |-------|-----------|
 | `plugin/` | All files: vim.pack.add + registry.add (immediate), setup queued via defer |
 | `plugin/lang/` | 23 files calling `require("registry").add({...})` — pure table ops, <0.1ms each |
-| `VimEnter` | Lualine (synchronous), then everything else async via `{ async = true }` |
+| `VimEnter` | Lualine (`{ sync = true }`), then everything else async (default) |
