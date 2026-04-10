@@ -1,4 +1,4 @@
--- Startup queues for phased plugin loading.
+-- Lazyload queues for phased plugin loading.
 --
 -- on_vim_enter(fn):                    async fire-and-forget via vim.schedule() (default)
 -- on_vim_enter(fn, { sync = true }):   synchronous, must complete before next phase
@@ -6,8 +6,8 @@
 -- on_ui_enter(fn, { sync = true }):    synchronous, must complete before next phase
 -- on_override(fn):                     runs after all on_vim_enter callbacks (for .nvim.lua overrides)
 --
--- Logging: set vim.g.startup_log = true before require("startup") to trace
--- registration and execution order. Inspect with :StartupLog.
+-- Logging: set vim.g.lazyload_log = true before require("lazyload") to trace
+-- registration and execution order. Inspect with :LazyLoadLog.
 
 local M = {}
 
@@ -15,8 +15,8 @@ local vim_enter_queue = {}
 local ui_enter_queue = {}
 local override_queue = {}
 
--- Logging (opt-in via vim.g.startup_log = true)
-local log_enabled = vim.g.startup_log or false
+-- Logging (opt-in via vim.g.lazyload_log = true)
+local log_enabled = vim.g.lazyload_log or false
 local log_entries = {}
 local start_time = vim.uv.hrtime()
 
@@ -162,18 +162,18 @@ function M.log()
 end
 
 if log_enabled then
-  vim.api.nvim_create_user_command("StartupLog", function()
+  vim.api.nvim_create_user_command("LazyLoadLog", function()
     if #log_entries == 0 then
-      vim.notify("startup: no log entries (vim.g.startup_log not set at startup?)", vim.log.levels.WARN)
+      vim.notify("lazyload: no log entries (vim.g.lazyload_log not set at startup?)", vim.log.levels.WARN)
       return
     end
     vim.cmd("enew")
     vim.bo.buftype = "nofile"
     vim.bo.bufhidden = "wipe"
     vim.bo.filetype = "log"
-    vim.api.nvim_buf_set_name(0, "startup-log")
+    vim.api.nvim_buf_set_name(0, "lazyload-log")
     vim.api.nvim_buf_set_lines(0, 0, -1, false, log_entries)
-  end, { desc = "Show startup.lua execution log" })
+  end, { desc = "Show lazyload.lua execution log" })
 end
 
 return M
