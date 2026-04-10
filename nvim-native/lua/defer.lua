@@ -4,11 +4,13 @@
 -- on_vim_enter(fn, { sync = true }):   synchronous, must complete before next phase
 -- on_ui_enter(fn):                     async fire-and-forget via vim.schedule() (default)
 -- on_ui_enter(fn, { sync = true }):    synchronous, must complete before next phase
+-- on_override(fn):                     runs after all on_vim_enter callbacks (for .nvim.lua overrides)
 
 local M = {}
 
 local vim_enter_queue = {}
 local ui_enter_queue = {}
+local override_queue = {}
 
 ---@param queue { fn: fun(), sync: boolean }[]
 local function drain(queue)
@@ -24,11 +26,30 @@ local function drain(queue)
   end
 end
 
+--- Schedule overrides last, after both VimEnter and UIEnter queues have been
+--- drained. Idempotent so VimEnter (headless fallback) and UIEnter can both
+--- call it without double-running callbacks.
+local function drain_override()
+  if not override_queue then
+    return
+  end
+  for _, fn in ipairs(override_queue) do
+    vim.schedule(fn)
+  end
+  override_queue = nil
+end
+
 vim.api.nvim_create_autocmd("VimEnter", {
   once = true,
   callback = function()
     drain(vim_enter_queue)
     vim_enter_queue = nil
+    -- Headless Neovim (nvim --headless) never fires UIEnter, so we must drain
+    -- overrides here as a fallback. In interactive mode, UIEnter drains them
+    -- so they land after ui_enter_queue's async entries in the scheduler.
+    if #vim.api.nvim_list_uis() == 0 then
+      drain_override()
+    end
   end,
 })
 
@@ -37,6 +58,7 @@ vim.api.nvim_create_autocmd("UIEnter", {
   callback = function()
     drain(ui_enter_queue)
     ui_enter_queue = nil
+    drain_override()
   end,
 })
 
@@ -63,6 +85,20 @@ function M.on_ui_enter(fn, opts)
     table.insert(ui_enter_queue, { fn = fn, sync = sync })
   elseif sync then
     fn()
+  else
+    vim.schedule(fn)
+  end
+end
+
+--- Run after all on_vim_enter callbacks (including async ones) have executed.
+--- Intended for project-local overrides from .nvim.lua that need to patch
+--- plugin state after setup() has run. Exrc runs at step 7c — before plugin/
+--- files — so it cannot override plugin setup directly; this queue bridges
+--- that gap by registering a callback that runs after the VimEnter drain.
+---@param fn fun()
+function M.on_override(fn)
+  if override_queue then
+    table.insert(override_queue, fn)
   else
     vim.schedule(fn)
   end
