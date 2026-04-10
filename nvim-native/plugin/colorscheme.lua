@@ -72,7 +72,7 @@ do
     hl("Cursor", { fg = palette.bg, bg = palette.fg })
     hl("TermCursor", { fg = palette.bg, bg = palette.fg })
 
-    hl("MiniCursorword", { bg = colors.blend(palette.bg, palette.bg1, 90), underline = false })
+    hl("Cursorword", { bg = colors.blend(palette.bg, palette.bg1, 90), underline = false })
 
     -- Neotest
     hl("NeotestPassed", { fg = palette.leaf })
