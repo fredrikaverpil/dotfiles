@@ -76,7 +76,10 @@ local function drain_override()
     local source = entry.source
     vim.schedule(function()
       log("exec override", source)
-      entry.fn()
+      local ok, err = pcall(entry.fn)
+      if not ok then
+        vim.notify((".nvim.lua override error:\n%s"):format(err), vim.log.levels.ERROR)
+      end
     end)
   end
   override_queue = nil

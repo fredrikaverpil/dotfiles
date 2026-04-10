@@ -1,5 +1,23 @@
--- Discover project-local exrc files and their trust status.
--- See :h 'exrc' and runtime/lua/vim/_core/exrc.lua.
+-- Custom exrc implementation.
+--
+-- Neovim's built-in 'exrc' (:h exrc) sources .nvim.lua at step 7c of
+-- :h initialization — before plugin/ files (step 11). That means .nvim.lua
+-- cannot call require("conform").setup() etc. because the plugins haven't been
+-- set up yet. This module replaces it:
+--
+--   load()  — discovers .nvim.lua files from $HOME down to cwd (outermost
+--             first), checks each with vim.secure.read() (:h trust) so
+--             untrusted files prompt and denied files are skipped, then defers
+--             execution via lazyload.on_override() which runs after all
+--             VimEnter plugin setup. This means .nvim.lua files can call
+--             plugin setup directly — no need to wrap content in on_override()
+--             manually. Errors are caught with pcall and shown as vim.notify
+--             messages instead of flashing by.
+--
+--   list()  — returns exrc files with their trust status (for the dashboard).
+--
+-- vim.opt.exrc is set to false in lua/options.lua to prevent the built-in
+-- mechanism from double-sourcing the same files.
 
 local M = {}
 
@@ -65,6 +83,42 @@ function M.list()
     })
   end
   return entries
+end
+
+--- Source all .nvim.lua files from $HOME down to cwd (outermost first).
+--- Uses vim.secure.read() for trust checking (:h trust) — untrusted files
+--- prompt the user, denied files are silently skipped.
+--- Errors are shown as notifications after UI is ready.
+function M.load()
+  local home = vim.uv.os_homedir()
+  local files = {}
+  local dir = vim.fn.getcwd()
+  while true do
+    local path = dir .. "/.nvim.lua"
+    if vim.uv.fs_stat(path) then
+      table.insert(files, 1, path) -- prepend so outermost runs first
+    end
+    if dir == home or dir == "/" then
+      break
+    end
+    dir = vim.fn.fnamemodify(dir, ":h")
+  end
+  for _, path in ipairs(files) do
+    local contents = vim.secure.read(path)
+    if contents then
+      require("lazyload").on_override(function()
+        local chunk, load_err = loadstring(contents, "@" .. path)
+        if not chunk then
+          vim.notify(load_err, vim.log.levels.ERROR)
+          return
+        end
+        local ok, err = pcall(chunk)
+        if not ok then
+          vim.notify(err, vim.log.levels.ERROR)
+        end
+      end)
+    end
+  end
 end
 
 return M

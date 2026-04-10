@@ -70,7 +70,7 @@ vim.opt.mousescroll = { "ver:1", "hor:6" }
 
 -- Misc
 vim.opt.autoread = true
-vim.opt.exrc = true
+vim.opt.exrc = false -- replaced by lua/exrc.lua
 vim.opt.secure = true
 vim.opt.shortmess:append("I")
 vim.opt.timeoutlen = 300
