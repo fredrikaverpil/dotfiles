@@ -1,3 +1,4 @@
 {
-  "workspace.ignoreDir": ["stow", "nvim-fredrik"]
+  "workspace.ignoreDir": ["stow", "nvim-fredrik"],
+  "diagnostics.globals": ["vim"]
 }
