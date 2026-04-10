@@ -1,3 +1,4 @@
+-- Experimental Lua module loader
 vim.loader.enable()
 
 -- Native Neovim config using vim.pack + native directories.

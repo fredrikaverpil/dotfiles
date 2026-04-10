@@ -34,7 +34,7 @@ do
   local colors = require("colors")
 
   local function apply_overrides()
-    if not vim.g.colors_name then
+    if not vim.g.colors_name then -- Zenbones sets g.colors_name
       return
     end
 
