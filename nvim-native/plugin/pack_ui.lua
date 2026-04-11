@@ -294,7 +294,21 @@ local function build_content()
     end
     if update_count > 0 then
       local update_start = name_start + #name + #pad + #ver_display
-      add_hl(lnum_cur, update_start, update_start + #update_str, "PackUiUpdateAvailable")
+      local has_breaking = state.breaking_version[name]
+      if not has_breaking and state.updates[name] then
+        for _, c in ipairs(state.updates[name]) do
+          if c:match("%x+ %w+!:") or c:match("%x+ %w+%b()!:") then
+            has_breaking = true
+            break
+          end
+        end
+      end
+      add_hl(
+        lnum_cur,
+        update_start,
+        update_start + #update_str,
+        has_breaking and "PackUiBreaking" or "PackUiUpdateAvailable"
+      )
     end
 
     -- Track plugin position (1-based line number for cursor operations)
