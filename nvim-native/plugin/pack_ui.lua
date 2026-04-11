@@ -40,6 +40,7 @@ local state = {
   show_help = false,
   updates = {}, -- plugin name => list of new commit lines
   breaking_version = {}, -- plugin name => bool (major semver bump detected)
+  show_all_commits = {}, -- plugin name => bool (show full commit list)
   checking = false, -- true while fetching remote updates
 }
 
@@ -311,19 +312,23 @@ local function build_content()
       end
       for _, d in ipairs(details) do
         add(d, "PackUiDetail")
+        line_to_plugin[#lines] = name
       end
       local commits = state.updates[name]
       if commits and #commits > 0 then
-        local max_commits = 10
+        local max_commits = state.show_all_commits[name] and #commits or 10
         for i, c in ipairs(commits) do
           if i > max_commits then
-            add(string.format("     ... and %d more", #commits - max_commits), "PackUiDetail")
+            add(string.format("     ... and %d more (Enter to expand)", #commits - max_commits), "PackUiDetail")
+            line_to_plugin[#lines] = name
             break
           end
           -- Detect breaking changes: conventional commits "type!:" or "type(scope)!:"
           local is_breaking = c:match("%x+ %w+!:") or c:match("%x+ %w+%b()!:")
           add("     " .. c, is_breaking and "PackUiBreaking" or nil)
+          line_to_plugin[#lines] = name
         end
+        add("")
       end
     end
   end
@@ -400,6 +405,7 @@ local function close()
   state.show_help = false
   state.updates = {}
   state.breaking_version = {}
+  state.show_all_commits = {}
   state.checking = false
 end
 
@@ -542,11 +548,19 @@ local function setup_keymaps()
     end
   end, opts)
 
-  -- Toggle details
+  -- Toggle details (three-state cycle when commits are truncated)
   vim.keymap.set("n", "<CR>", function()
     local name = plugin_at_cursor()
     if name then
-      state.expanded[name] = not state.expanded[name]
+      local commits = state.updates[name]
+      local has_truncated = commits and #commits > 10
+      if not state.expanded[name] then
+        state.expanded[name] = true
+      elseif has_truncated and not state.show_all_commits[name] then
+        state.show_all_commits[name] = true
+      else
+        state.expanded[name] = false
+      end
       render()
       -- Restore cursor to the plugin line
       if state.plugin_lines[name] then
@@ -639,6 +653,7 @@ open = function()
       state.show_help = false
       state.updates = {}
       state.breaking_version = {}
+      state.show_all_commits = {}
       state.checking = false
     end,
   })
