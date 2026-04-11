@@ -25,6 +25,21 @@ require("snacks").setup({
         { icon = " ", key = "u", desc = "Check for Updates", action = ":Pack check" },
         { icon = " ", key = "q", desc = "Quit", action = ":qa" },
       },
+      header = [[
+ .          .
+ ';;,.        ::'
+ ,:::;,,        :ccc,
+,::c::,,,,.     :cccc,
+,cccc:;;;;;.    cllll,
+,cccc;.;;;;;,   cllll;
+:cccc; .;;;;;;. coooo;
+;llll;   ,:::::'loooo;
+;llll:    ':::::loooo:
+:oooo:     .::::llodd:
+.;ooo:       ;cclooo:.
+.;oc        'coo;.
+ .'         .,.
+]],
     },
     sections = {
       { section = "header" },
