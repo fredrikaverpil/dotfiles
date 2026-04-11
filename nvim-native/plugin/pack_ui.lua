@@ -39,8 +39,10 @@ local state = {
   expanded = {}, -- plugin name => bool
   show_help = false,
   updates = {}, -- plugin name => list of new commit lines
-  breaking_version = {}, -- plugin name => bool (major semver bump detected)
+  breaking = {}, -- plugin name => bool (major semver bump or breaking commit detected)
+  unreleased_breaking = {}, -- plugin name => list of unreleased breaking commit lines
   show_all_commits = {}, -- plugin name => bool (show full commit list)
+  latest_ref = {}, -- plugin name => latest version/hash string
   checking = false, -- true while fetching remote updates
 }
 
@@ -79,6 +81,32 @@ local function get_version_str(p)
   return tostring(v)
 end
 
+-- Parse semver from a tag string, returns {major, minor, patch} or nil
+local function parse_semver(tag)
+  if not tag then
+    return nil
+  end
+  local major, minor, patch = tag:match("^v?(%d+)%.(%d+)%.(%d+)")
+  if major then
+    return { tonumber(major), tonumber(minor), tonumber(patch) }
+  end
+  return nil
+end
+
+-- Returns true if version a is strictly greater than version b
+local function semver_gt(a, b)
+  if not a or not b then
+    return false
+  end
+  if a[1] ~= b[1] then
+    return a[1] > b[1]
+  end
+  if a[2] ~= b[2] then
+    return a[2] > b[2]
+  end
+  return a[3] > b[3]
+end
+
 -- Forward declaration (check_updates calls render before it is defined)
 local render
 
@@ -115,7 +143,9 @@ local function check_updates()
 
   state.checking = true
   state.updates = {}
-  state.breaking_version = {}
+  state.breaking = {}
+  state.unreleased_breaking = {}
+  state.latest_ref = {}
   render()
 
   local remaining = #plugins
@@ -135,49 +165,133 @@ local function check_updates()
     local name = p.spec.name
     local current_tag = p.spec.version and get_installed_tag(path) or nil
 
+    -- Helper: parse commits from git log output
+    local function parse_commits(stdout)
+      local commits = {}
+      if stdout and stdout ~= "" then
+        for line in stdout:gmatch("[^\n]+") do
+          table.insert(commits, line)
+        end
+      end
+      return commits
+    end
+
+    -- Helper: check if any commit line has a breaking change marker
+    local function has_breaking_commit(commits)
+      for _, c in ipairs(commits) do
+        if c:match("%x+ %w+!:") or c:match("%x+ %w+%b()!:") then
+          return true
+        end
+      end
+      return false
+    end
+
+    -- Helper: collect only breaking commit lines
+    local function filter_breaking(commits)
+      local result = {}
+      for _, c in ipairs(commits) do
+        if c:match("%x+ %w+!:") or c:match("%x+ %w+%b()!:") then
+          table.insert(result, c)
+        end
+      end
+      return result
+    end
+
     vim.system({ "git", "-C", path, "fetch", "--quiet", "--tags" }, {}, function(fetch_res)
       if fetch_res.code ~= 0 then
         finish_one()
         return
       end
-      resolve_remote_ref(path, function(ref)
-        if not ref then
-          finish_one()
-          return
-        end
-        vim.system({ "git", "-C", path, "log", "--oneline", "HEAD.." .. ref }, { text = true }, function(log_res)
-          local commits = {}
-          if log_res.code == 0 and log_res.stdout ~= "" then
-            for line in log_res.stdout:gmatch("[^\n]+") do
-              table.insert(commits, line)
+
+      if current_tag then
+        -- Versioned plugin: compare against latest tag, then check main for unreleased breaking
+        vim.system({ "git", "-C", path, "tag", "--list", "--sort=-version:refname" }, { text = true }, function(tag_res)
+          -- Find the actual latest tag by semver comparison
+          local cur_ver = parse_semver(current_tag)
+          local latest_tag = nil
+          local latest_ver = nil
+          if tag_res.code == 0 then
+            for t in tag_res.stdout:gmatch("[^\n]+") do
+              local v = parse_semver(t)
+              if v and (not latest_ver or semver_gt(v, latest_ver)) then
+                latest_tag = t
+                latest_ver = v
+              end
             end
           end
-          state.updates[name] = commits
 
-          -- Check for major semver bump
-          if not current_tag then
+          -- Check major semver bump
+          if cur_ver and latest_ver and latest_ver[1] > cur_ver[1] then
+            state.breaking[name] = true
+          end
+
+          -- Get released commits (HEAD..latest_tag) if tag changed
+          local function after_released()
+            -- Check main for unreleased breaking commits beyond latest tag
+            resolve_remote_ref(path, function(ref)
+              if not ref then
+                finish_one()
+                return
+              end
+              local compare_from = latest_tag or current_tag
+              vim.system(
+                { "git", "-C", path, "log", "--oneline", compare_from .. ".." .. ref },
+                { text = true },
+                function(log_res)
+                  local unreleased = parse_commits(log_res.code == 0 and log_res.stdout or "")
+                  local breaking_lines = filter_breaking(unreleased)
+                  if #breaking_lines > 0 then
+                    state.unreleased_breaking[name] = breaking_lines
+                  end
+                  finish_one()
+                end
+              )
+            end)
+          end
+
+          local is_newer = cur_ver and latest_ver and semver_gt(latest_ver, cur_ver)
+          if is_newer and latest_tag then
+            state.latest_ref[name] = latest_tag
+            vim.system(
+              { "git", "-C", path, "log", "--oneline", "HEAD.." .. latest_tag },
+              { text = true },
+              function(log_res)
+                local commits = parse_commits(log_res.code == 0 and log_res.stdout or "")
+                state.updates[name] = commits
+                if has_breaking_commit(commits) then
+                  state.breaking[name] = true
+                end
+                after_released()
+              end
+            )
+          else
+            state.updates[name] = {}
+            after_released()
+          end
+        end)
+      else
+        -- Non-versioned plugin: compare against default branch
+        resolve_remote_ref(path, function(ref)
+          if not ref then
             finish_one()
             return
           end
-          vim.system(
-            { "git", "-C", path, "tag", "--list", "--sort=-version:refname" },
-            { text = true },
-            function(tag_res)
-              if tag_res.code == 0 then
-                local latest_tag = tag_res.stdout:match("[^\n]+")
-                if latest_tag then
-                  local cur_major = tonumber(current_tag:match("^v?(%d+)"))
-                  local new_major = tonumber(latest_tag:match("^v?(%d+)"))
-                  if cur_major and new_major and new_major > cur_major then
-                    state.breaking_version[name] = true
-                  end
-                end
-              end
-              finish_one()
+          vim.system({ "git", "-C", path, "log", "--oneline", "HEAD.." .. ref }, { text = true }, function(log_res)
+            local commits = parse_commits(log_res.code == 0 and log_res.stdout or "")
+            state.updates[name] = commits
+            if has_breaking_commit(commits) then
+              state.breaking[name] = true
             end
-          )
+            if #commits > 0 then
+              local latest_hash = commits[1]:match("^(%x+)")
+              if latest_hash then
+                state.latest_ref[name] = latest_hash
+              end
+            end
+            finish_one()
+          end)
         end)
-      end)
+      end
     end)
   end
 end
@@ -274,9 +388,25 @@ local function build_content()
     local rev_short = p.rev and p.rev:sub(1, 7) or ""
 
     local ver_display = tag or (rev_short ~= "" and rev_short or version)
+    local latest = state.latest_ref[name]
+    if latest and latest ~= ver_display then
+      -- Normalize v prefix to match current display
+      local latest_display = latest
+      local cur_has_v = ver_display:match("^v") ~= nil
+      local new_has_v = latest_display:match("^v") ~= nil
+      if cur_has_v and not new_has_v then
+        latest_display = "v" .. latest_display
+      elseif not cur_has_v and new_has_v then
+        latest_display = latest_display:sub(2)
+      end
+      ver_display = ver_display .. " → " .. latest_display
+    end
     local update_count = state.updates[name] and #state.updates[name] or 0
     local update_str = update_count > 0 and string.format("  ↑%d", update_count) or ""
-    local line = string.format("   %s %s%s%s%s", icon, name, pad, ver_display, update_str)
+    local unreleased = state.unreleased_breaking[name]
+    local unreleased_str = unreleased and #unreleased > 0 and string.format("  ⚠ %d breaking unreleased", #unreleased)
+      or ""
+    local line = string.format("   %s %s%s%s%s%s", icon, name, pad, ver_display, update_str, unreleased_str)
     local lnum_cur = #lines
     add(line)
 
@@ -289,25 +419,16 @@ local function build_content()
     add_hl(lnum_cur, name_start, name_start + #name, hl_group)
     if #ver_display > 0 then
       local ver_start = name_start + #name + #pad
-      local ver_hl = state.breaking_version[name] and "PackUiBreaking" or "PackUiVersion"
+      local ver_hl = state.breaking[name] and "PackUiBreaking" or "PackUiVersion"
       add_hl(lnum_cur, ver_start, ver_start + #ver_display, ver_hl)
     end
     if update_count > 0 then
       local update_start = name_start + #name + #pad + #ver_display
-      local has_breaking = state.breaking_version[name]
-      if not has_breaking and state.updates[name] then
-        for _, c in ipairs(state.updates[name]) do
-          if c:match("%x+ %w+!:") or c:match("%x+ %w+%b()!:") then
-            has_breaking = true
-            break
-          end
-        end
-      end
       add_hl(
         lnum_cur,
         update_start,
         update_start + #update_str,
-        has_breaking and "PackUiBreaking" or "PackUiUpdateAvailable"
+        state.breaking[name] and "PackUiBreaking" or "PackUiUpdateAvailable"
       )
     end
 
@@ -340,6 +461,16 @@ local function build_content()
           -- Detect breaking changes: conventional commits "type!:" or "type(scope)!:"
           local is_breaking = c:match("%x+ %w+!:") or c:match("%x+ %w+%b()!:")
           add("     " .. c, is_breaking and "PackUiBreaking" or nil)
+          line_to_plugin[#lines] = name
+        end
+        add("")
+      end
+      local unreleased = state.unreleased_breaking[name]
+      if unreleased and #unreleased > 0 then
+        add(string.format("     ⚠ %d breaking change(s) unreleased on main:", #unreleased), "PackUiBreaking")
+        line_to_plugin[#lines] = name
+        for _, c in ipairs(unreleased) do
+          add("       " .. c, "PackUiBreaking")
           line_to_plugin[#lines] = name
         end
         add("")
@@ -418,8 +549,10 @@ local function close()
   state.expanded = {}
   state.show_help = false
   state.updates = {}
-  state.breaking_version = {}
+  state.breaking = {}
+  state.unreleased_breaking = {}
   state.show_all_commits = {}
+  state.latest_ref = {}
   state.checking = false
 end
 
@@ -666,8 +799,10 @@ open = function()
       state.expanded = {}
       state.show_help = false
       state.updates = {}
-      state.breaking_version = {}
+      state.breaking = {}
+      state.unreleased_breaking = {}
       state.show_all_commits = {}
+      state.latest_ref = {}
       state.checking = false
     end,
   })
