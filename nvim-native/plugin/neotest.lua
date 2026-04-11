@@ -1,31 +1,25 @@
--- Neotest core
-vim.pack.add({
-  { src = "https://github.com/nvim-neotest/neotest" },
-  { src = "https://github.com/nvim-neotest/nvim-nio" },
-  { src = "https://github.com/nvim-lua/plenary.nvim" },
-  { src = "https://github.com/antoinemadec/FixCursorHold.nvim" },
-})
-
--- Neotest adapters
-vim.pack.add({
-  { src = "https://github.com/nvim-neotest/neotest-plenary" },
-  { src = "https://github.com/nvim-neotest/neotest-python" },
-  { src = "https://github.com/lawrence-laz/neotest-zig", version = vim.version.range("1.*") },
-})
-
--- neotest-golang
-vim.pack.add({
-  { src = "https://github.com/uga-rosa/utf8.nvim" },
-})
-
-require("dev").use({
-  dev = "~/code/public/neotest-golang",
-  fallback = function()
-    vim.pack.add({
-      { src = "https://github.com/fredrikaverpil/neotest-golang" },
-    })
-  end,
-})
+-- Neotest packages — registered on disk now, loaded on first keymap press.
+-- This avoids sourcing each plugin's plugin/ files for sessions where you
+-- never run a test. neotest-golang is handled separately inside init() so the
+-- local dev clone takes precedence over the upstream package.
+local packages = {
+  -- Core
+  { src = "https://github.com/nvim-neotest/neotest", name = "neotest" },
+  { src = "https://github.com/nvim-neotest/nvim-nio", name = "nvim-nio" },
+  { src = "https://github.com/nvim-lua/plenary.nvim", name = "plenary.nvim" },
+  { src = "https://github.com/antoinemadec/FixCursorHold.nvim", name = "FixCursorHold.nvim" },
+  -- Adapters
+  { src = "https://github.com/nvim-neotest/neotest-plenary", name = "neotest-plenary" },
+  { src = "https://github.com/nvim-neotest/neotest-python", name = "neotest-python" },
+  {
+    src = "https://github.com/lawrence-laz/neotest-zig",
+    name = "neotest-zig",
+    version = vim.version.range("1.*"),
+  },
+  -- neotest-golang dependency
+  { src = "https://github.com/uga-rosa/utf8.nvim", name = "utf8.nvim" },
+}
+vim.pack.add(packages, { load = function() end })
 
 local initialized = false
 
@@ -34,6 +28,22 @@ local function init()
     return
   end
   initialized = true
+
+  for _, p in ipairs(packages) do
+    vim.cmd.packadd(p.name)
+  end
+
+  -- neotest-golang: prefer local dev clone if it exists, otherwise install
+  -- the upstream package. Handled here (not in `packages`) because dev.use
+  -- appends to runtimepath instead of going through vim.pack.
+  require("dev").use({
+    dev = "~/code/public/neotest-golang",
+    fallback = function()
+      vim.pack.add({
+        { src = "https://github.com/fredrikaverpil/neotest-golang", name = "neotest-golang" },
+      })
+    end,
+  })
 
   require("neotest").setup({
     adapters = {

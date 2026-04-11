@@ -1,8 +1,8 @@
-vim.pack.add({
-  { src = "https://github.com/nvim-lualine/lualine.nvim" },
-})
-
 require("lazyload").on_vim_enter(function()
+  vim.pack.add({
+    { src = "https://github.com/nvim-lualine/lualine.nvim" },
+  })
+
   local function folder()
     local cwd = vim.fn.getcwd()
     return cwd:match("([^/]+)$")

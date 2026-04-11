@@ -1,10 +1,10 @@
-vim.pack.add({
-  { src = "https://github.com/mason-org/mason.nvim" },
-  { src = "https://github.com/mason-org/mason-lspconfig.nvim" },
-  { src = "https://github.com/zapling/mason-lock.nvim" },
-})
-
 require("lazyload").on_vim_enter(function()
+  vim.pack.add({
+    { src = "https://github.com/mason-org/mason.nvim" },
+    { src = "https://github.com/mason-org/mason-lspconfig.nvim" },
+    { src = "https://github.com/zapling/mason-lock.nvim" },
+  })
+
   require("mason").setup({ PATH = "append" })
 
   require("mason-lock").setup({

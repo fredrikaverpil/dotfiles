@@ -1,16 +1,17 @@
--- DAP core
-vim.pack.add({
+-- DAP packages — registered on disk now, but not added to packpath until
+-- first keymap press. This avoids sourcing the plugins' plugin/ files for
+-- sessions where you never debug.
+local packages = {
+  -- Core
   { src = "https://codeberg.org/mfussenegger/nvim-dap", name = "nvim-dap" },
-  { src = "https://github.com/rcarriga/nvim-dap-ui" },
-  { src = "https://github.com/nvim-neotest/nvim-nio" },
-  { src = "https://github.com/theHamsta/nvim-dap-virtual-text" },
-})
-
--- DAP adapters
-vim.pack.add({
-  { src = "https://github.com/leoluz/nvim-dap-go" },
+  { src = "https://github.com/rcarriga/nvim-dap-ui", name = "nvim-dap-ui" },
+  { src = "https://github.com/nvim-neotest/nvim-nio", name = "nvim-nio" },
+  { src = "https://github.com/theHamsta/nvim-dap-virtual-text", name = "nvim-dap-virtual-text" },
+  -- Adapters
+  { src = "https://github.com/leoluz/nvim-dap-go", name = "nvim-dap-go" },
   { src = "https://codeberg.org/mfussenegger/nvim-dap-python", name = "nvim-dap-python" },
-})
+}
+vim.pack.add(packages, { load = function() end })
 
 local initialized = false
 
@@ -19,6 +20,10 @@ local function init()
     return
   end
   initialized = true
+
+  for _, p in ipairs(packages) do
+    vim.cmd.packadd(p.name)
+  end
 
   -- Show nice icons in gutter instead of the default characters
   for name, sign in pairs(require("icons").dap) do

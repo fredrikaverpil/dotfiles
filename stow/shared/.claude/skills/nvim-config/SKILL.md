@@ -262,10 +262,20 @@ vim.pack.add({
 })
 ```
 
-- **`load` option**: during `init.lua`/`plugin/` sourcing, defaults to `false`
-  (`:packadd!` -- available but `plugin/` files of the installed plugin not yet
-  sourced). After startup, defaults to `true`. Pass `load = true` explicitly if
-  you need a plugin's `plugin/` files sourced immediately.
+- **`load` option**:
+  - During `init.lua`/`plugin/` sourcing, defaults to `false` (`:packadd!` --
+    on runtimepath but the plugin's own `plugin/` files are deferred to
+    Neovim's normal runtime loader pass instead of sourced inline).
+  - After startup, defaults to `true` (`:packadd` without bang -- the plugin's
+    `plugin/` and `after/plugin/` files source immediately).
+  - Pass `load = true` explicitly when you need a plugin's `plugin/` files
+    sourced right now (rare -- only matters if `vim.pack.add` runs during
+    startup _and_ something inspects the plugin's runtime state before step 11
+    finishes).
+  - Pass **`load = function() end`** (empty function) to register the plugin
+    on disk without loading it at all. The plugin stays off the packpath
+    entirely until you explicitly call `vim.cmd.packadd("<name>")`. This is
+    the cornerstone of the "truly lazy" pattern (see below).
 - **Install location**: `stdpath("data") .. "/site/pack/core/opt/<name>"`
 - **Lockfile**: `$XDG_CONFIG_HOME/nvim/nvim-pack-lock.json` -- commit to VCS for
   reproducible installs across machines.
@@ -313,7 +323,17 @@ disable a server: `vim.lsp.enable("gopls", false)`.
 
 ## Key idioms
 
-**Self-contained plugin file** (the standard pattern):
+Three patterns cover every plugin in this config. Pick the one that matches
+**when the plugin's code needs to run**, not how fancy you want the file to
+look.
+
+### Pattern 1: eager (setup at step 11)
+
+Use when the plugin must take effect before the first paint, or when another
+plugin's deferred setup callback or a pre-VimEnter autocmd `require()`s it.
+Colorscheme, `snacks.nvim` (dashboard), `mini.icons`, `treesitter.lua`,
+`blink.cmp` (dependency of `lsp.lua`'s callback), `nvim-lint` (dependency of
+`plugin/lang/protobuf.lua`'s BufEnter autocmd).
 
 ```lua
 -- plugin/oil.lua
@@ -328,16 +348,23 @@ require("oil").setup({
 vim.keymap.set("n", "-", "<cmd>Oil<cr>", { desc = "Open file explorer" })
 ```
 
-**Deferred plugin file** (setup at VimEnter for plugins that don't need to be
-ready at step 11):
+### Pattern 2: deferred to VimEnter (pack.add inside the callback)
+
+Use for plugins you want loaded every session but that don't need to be ready
+before the first paint. This is the **default** pattern for deferred plugins
+in this config. Fold `vim.pack.add` into the same `on_vim_enter` callback as
+`setup()` so both the install/source cost and the setup cost land after
+startup rather than at step 11:
 
 ```lua
 -- plugin/conform.lua
-vim.pack.add({
-  { src = "https://github.com/stevearc/conform.nvim" },
-})
+vim.g.auto_format = true
 
 require("lazyload").on_vim_enter(function()
+  vim.pack.add({
+    { src = "https://github.com/stevearc/conform.nvim" },
+  })
+
   require("conform").setup({
     formatters_by_ft = {
       go = { "goimports", "gci", "gofumpt", "golines" },
@@ -349,16 +376,32 @@ end)
 vim.keymap.set("n", "<leader>uf", require("toggle").auto_format, { desc = "Toggle auto-format" })
 ```
 
-**Deferred to first use** (for plugins only used via keymaps -- dap, neotest,
-etc.). Keep `vim.pack.add()` at the top so the plugin is on the packpath, but
-defer the expensive `require()` + `.setup()` to first keymap press:
+**Why not bare `vim.schedule()`?** `lazyload.on_vim_enter` gives you
+sync-vs-async control, VimEnter/UIEnter split, and the `on_override` hook for
+exrc overrides -- none of which bare `vim.schedule` provides.
+
+**Build hooks (`PackChanged`) must stay eager** when the plugin uses this
+pattern. Register the autocmd at file scope _before_ the `on_vim_enter` call
+-- autocmd registration is cheap and the hook needs to be live by the time
+the deferred `vim.pack.add` triggers a first-bootstrap install.
+
+### Pattern 3: truly lazy via `{ load = function() end }` (first use)
+
+Use for plugins that may never run in a session: debuggers, test runners, diff
+viewers, etc. The empty `load` callback registers the plugin on disk (so
+install + lockfile still work) but keeps it off the packpath entirely. The
+plugin is fully invisible until the user triggers the first-use gate
+(typically a keymap, command, or filetype autocmd), at which point
+`vim.cmd.packadd` brings it in:
 
 ```lua
 -- plugin/dap.lua
-vim.pack.add({
+local packages = {
   { src = "https://codeberg.org/mfussenegger/nvim-dap", name = "nvim-dap" },
-  { src = "https://github.com/rcarriga/nvim-dap-ui" },
-})
+  { src = "https://github.com/rcarriga/nvim-dap-ui", name = "nvim-dap-ui" },
+  { src = "https://github.com/nvim-neotest/nvim-nio", name = "nvim-nio" },
+}
+vim.pack.add(packages, { load = function() end })
 
 local initialized = false
 
@@ -367,6 +410,11 @@ local function init()
     return
   end
   initialized = true
+
+  for _, p in ipairs(packages) do
+    vim.cmd.packadd(p.name)
+  end
+
   require("dapui").setup()
   -- ... rest of setup
 end
@@ -376,6 +424,22 @@ vim.keymap.set("n", "<leader>dc", function()
   require("dap").continue()
 end, { desc = "Continue" })
 ```
+
+Notes:
+
+- **Give every spec an explicit `name`**. The `init()` loop uses those names
+  for `:packadd`, so leaving them implicit forces the file to re-derive the
+  name from the URL.
+- **`after/plugin/` files of the lazy-loaded plugin do not source**
+  automatically via bare `:packadd`. `vim.pack`'s normal path sources them
+  (see `pack.lua:801`) but the truly-lazy path bypasses that. If a plugin
+  you lazy-load this way ships `after/plugin/*.lua` and you rely on them,
+  source them manually in `init()`. (None of the config's current lazy
+  plugins -- dap, neotest, codediff -- have `after/plugin/` files.)
+- **Compare to Pattern 2**: Pattern 2 still loads the plugin every session,
+  just not during startup. Pattern 3 doesn't load it at all if the user never
+  triggers the gate. For DAP, you pay zero cost on sessions where you never
+  debug.
 
 **Deferred filetype-specific plugin** (csv, log, schemastore, etc.). Wrap
 `require()` + `.setup()` in a `FileType` autocmd with `once = true`:
@@ -474,26 +538,64 @@ vim.api.nvim_create_autocmd("FileType", {
 
 ## Plugin file layout
 
-Every plugin file follows a consistent structure:
+Layout depends on which pattern the file uses (see "Key idioms" above).
+
+**Eager (Pattern 1):**
 
 ```lua
 -- 1. Build hooks (must be registered BEFORE vim.pack.add)
 vim.api.nvim_create_autocmd("PackChanged", { ... })
 
--- 2. Install packages (immediate)
+-- 2. Install + load
 vim.pack.add(...)
 
--- 3. Deferred setup (VimEnter)
-require("lazyload").on_vim_enter(function()
-  require("plugin").setup({ ... })
-end)
+-- 3. Setup
+require("plugin").setup({ ... })
 
 -- 4. Keymaps
 vim.keymap.set(...)
 ```
 
-Not all steps are needed in every file. Simple plugins that need no deferral
-just call `setup()` directly after `vim.pack.add()`.
+**Deferred to VimEnter (Pattern 2):**
+
+```lua
+-- 1. File-scope setup that doesn't need the plugin loaded (globals, etc.)
+vim.g.some_flag = true
+
+-- 2. Build hooks (must be registered BEFORE the deferred vim.pack.add fires)
+vim.api.nvim_create_autocmd("PackChanged", { ... })
+
+-- 3. Install + load + setup, all deferred
+require("lazyload").on_vim_enter(function()
+  vim.pack.add(...)
+  require("plugin").setup({ ... })
+end)
+
+-- 4. Keymaps (file scope -- Neovim routes them to the plugin after load)
+vim.keymap.set(...)
+```
+
+**Truly lazy (Pattern 3):**
+
+```lua
+-- 1. Register on disk without loading
+local packages = { { src = "...", name = "plugin-name" } }
+vim.pack.add(packages, { load = function() end })
+
+-- 2. First-use gate
+local initialized = false
+local function init()
+  if initialized then return end
+  initialized = true
+  for _, p in ipairs(packages) do
+    vim.cmd.packadd(p.name)
+  end
+  require("plugin").setup({ ... })
+end
+
+-- 3. Keymaps / commands / FileType autocmds call init() before first use
+vim.keymap.set("n", "<leader>xx", function() init(); ... end, ...)
+```
 
 ---
 

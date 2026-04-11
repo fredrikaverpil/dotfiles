@@ -1,10 +1,10 @@
-vim.pack.add({
-  { src = "https://github.com/stevearc/conform.nvim" },
-})
-
 vim.g.auto_format = true
 
 require("lazyload").on_vim_enter(function()
+  vim.pack.add({
+    { src = "https://github.com/stevearc/conform.nvim" },
+  })
+
   require("conform").setup({
     format_on_save = function()
       if not vim.g.auto_format then

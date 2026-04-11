@@ -1,9 +1,11 @@
-vim.pack.add({
-  { src = "https://github.com/neovim/nvim-lspconfig" },
-})
-
 require("lazyload").on_vim_enter(function()
-  -- Extend LSP capabilities with blink.cmp completions for all servers
+  vim.pack.add({
+    { src = "https://github.com/neovim/nvim-lspconfig" },
+  })
+
+  -- Extend LSP capabilities with blink.cmp completions for all servers.
+  -- (blink.cmp's vim.pack.add stays eager in plugin/blink.lua so it is already
+  -- loaded by the time this callback runs.)
   vim.lsp.config("*", {
     capabilities = require("blink.cmp").get_lsp_capabilities(),
   })

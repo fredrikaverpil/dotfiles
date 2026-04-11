@@ -1,7 +1,9 @@
-vim.pack.add({
-  { src = "https://github.com/esmuellert/codediff.nvim" },
-  { src = "https://github.com/MunifTanjim/nui.nvim" },
-})
+-- Registered on disk now, loaded on first keymap press.
+local packages = {
+  { src = "https://github.com/esmuellert/codediff.nvim", name = "codediff.nvim" },
+  { src = "https://github.com/MunifTanjim/nui.nvim", name = "nui.nvim" },
+}
+vim.pack.add(packages, { load = function() end })
 
 local initialized = false
 
@@ -10,6 +12,10 @@ local function init()
     return
   end
   initialized = true
+
+  for _, p in ipairs(packages) do
+    vim.cmd.packadd(p.name)
+  end
 
   require("codediff").setup({
     explorer = {

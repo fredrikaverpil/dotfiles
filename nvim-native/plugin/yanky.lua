@@ -1,8 +1,7 @@
-vim.pack.add({
-  { src = "https://github.com/gbprod/yanky.nvim" },
-})
-
 require("lazyload").on_vim_enter(function()
+  vim.pack.add({
+    { src = "https://github.com/gbprod/yanky.nvim" },
+  })
   require("yanky").setup({})
 end)
 
