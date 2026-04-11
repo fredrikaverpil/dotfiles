@@ -2,6 +2,23 @@ vim.pack.add({
   { src = "https://github.com/folke/sidekick.nvim" },
 })
 
+-- taken from sidekick.nvim
+-- https://github.com/folke/sidekick.nvim/blob/main/sk/cli/claude.lua
+local claude_format = function(text)
+  local Text = require("sidekick.text")
+
+  Text.transform(text, function(str)
+    return str:find("[^%w/_%.%-]") and ('"' .. str .. '"') or str
+  end, "SidekickLocFile")
+
+  local ret = Text.to_string(text)
+
+  -- transform line ranges to a format that Claude understands
+  ret = ret:gsub("@([^@]-) :L(%d+)%-L(%d+)", "@%1#L%2-%3")
+
+  return ret
+end
+
 require("sidekick").setup({
   cli = {
     win = {
@@ -11,12 +28,12 @@ require("sidekick").setup({
     },
     ---@type table<string, sidekick.cli.Config|{}>
     tools = {
-      amp = {
-        cmd = { "amp", "threads", "continue" },
-      },
-      copilot = {
-        cmd = { "copilot", "--continue" },
-      },
+      amp = { cmd = { "amp", "threads", "continue" } },
+      copilot = { cmd = { "copilot", "--continue" } },
+      codex = { cmd = { "codex", "--", "--last" } },
+      opencode = { cmd = { "opencode", "--continue" } },
+      gemini = { cmd = { "gemini", "--resume" } },
+
       claude = {
         cmd = {
           "claude",
@@ -28,14 +45,10 @@ require("sidekick").setup({
           "--allowedTools=Read(~/code)",
         },
       },
-      codex = {
-        cmd = { "codex", "--", "--last" },
-      },
-      opencode = {
-        cmd = { "opencode", "--continue" },
-      },
-      gemini = {
-        cmd = { "gemini", "--resume" },
+
+      ["ollama via claude"] = {
+        cmd = { "ollama", "launch", "claude" },
+        format = claude_format,
       },
     },
   },
