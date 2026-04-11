@@ -812,6 +812,18 @@ open = function()
 end
 
 -- Register :Pack command
-vim.api.nvim_create_user_command("Pack", function()
+vim.api.nvim_create_user_command("Pack", function(opts)
   open()
-end, { desc = "Open vim.pack plugin manager UI" })
+  if opts.args == "check" then
+    check_updates()
+  elseif opts.args == "update" or opts.args == "update-all" then
+    close()
+    vim.pack.update()
+  end
+end, {
+  nargs = "?",
+  complete = function()
+    return { "check", "update", "update-all" }
+  end,
+  desc = "Open vim.pack plugin manager UI",
+})
