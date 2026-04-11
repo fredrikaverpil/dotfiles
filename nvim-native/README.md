@@ -52,8 +52,8 @@ Core plugin files (`plugin/*.lua`) own all tool configuration inline — LSP
 servers, formatters, linters, completion sources, DAP adapters, neotest
 adapters, etc. Language files (`plugin/lang/*.lua`) handle language-specific
 concerns that don't fit in the core plugins: per-filetype editor settings
-(`vim.opt_local` via `FileType` autocmds), extra `vim.pack.add()` calls,
-custom filetypes, SchemaStore loading, build hooks, and autocmds.
+(`vim.opt_local` via `FileType` autocmds), extra `vim.pack.add()` calls, custom
+filetypes, SchemaStore loading, build hooks, and autocmds.
 
 ### Plugin file layout
 
@@ -94,13 +94,36 @@ vim.api.nvim_create_autocmd("PackChanged", {
 ## Per-project overrides
 
 Place a `.nvim.lua` in any project directory. It runs at step 7c of
-initialization — **before** `plugin/` files (`:h exrc`).
-Wrap plugin overrides in `require("lazyload").on_override(...)` so they apply
-after all deferred plugin setup has completed.
+initialization — **before** `plugin/` files (`:h exrc`). Wrap plugin overrides
+in `require("lazyload").on_override(...)` so they apply after all deferred
+plugin setup has completed.
+
+Example:
+
+```lua
+-- ~/code/work/.nvim.lua
+-- Override markdown formatter
+require("conform").formatters_by_ft.markdown = { "mdformat" }
+require("conform").formatters.mdformat = {
+    prepend_args = { "--number", "--wrap", "80" },
+}
+
+-- Override gopls settings
+vim.lsp.config.gopls.settings = {
+    gopls = {
+        analyses = {
+            ST1000 = false,
+            ST1020 = false,
+            ST1021 = false,
+        },
+    },
+}
+```
 
 ## Plugin management
 
-- **Install**: `vim.pack.add()` in each file. New plugins install on first launch.
+- **Install**: `vim.pack.add()` in each file. New plugins install on first
+  launch.
 - **Update**: `:lua vim.pack.update()` — review in confirmation buffer, `:w` to
   apply.
 - **Lockfile**: `nvim-pack-lock.json` — commit to VCS for reproducible installs.
@@ -111,8 +134,10 @@ after all deferred plugin setup has completed.
 2. Add Mason tools to `plugin/mason.lua`
 3. Add formatters to `plugin/conform.lua`
 4. Add linters to `plugin/lint.lua`
-5. `plugin/lang/<ft>.lua` — editor settings (`vim.opt_local` via `FileType` autocmd), plugins, filetypes, autocmds
-6. *(optional)* `after/lsp/<server>.lua` — override base config from nvim-lspconfig
+5. `plugin/lang/<ft>.lua` — editor settings (`vim.opt_local` via `FileType`
+   autocmd), plugins, filetypes, autocmds
+6. _(optional)_ `after/lsp/<server>.lua` — override base config from
+   nvim-lspconfig
 
 ## Startup performance
 
@@ -121,7 +146,7 @@ first use (see pattern in neotest.lua, dap.lua, codediff.lua, etc). The
 `vim.pack.add()` calls stay at the top level so plugins are always on the
 packpath.
 
-| Phase | What runs |
-|-------|-----------|
-| `plugin/` | All files: vim.pack.add (immediate), setup queued via lazyload |
+| Phase      | What runs                                                         |
+| ---------- | ----------------------------------------------------------------- |
+| `plugin/`  | All files: vim.pack.add (immediate), setup queued via lazyload    |
 | `VimEnter` | Lualine (`{ sync = true }`), then everything else async (default) |
