@@ -29,7 +29,7 @@ require("sidekick").setup({
         },
       },
       codex = {
-        cmd = { "codex", "--continue" },
+        cmd = { "codex", "--", "--last" },
       },
       opencode = {
         cmd = { "opencode", "--continue" },
