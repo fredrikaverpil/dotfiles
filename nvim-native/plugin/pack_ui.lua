@@ -4,7 +4,7 @@
 -- Provides :Pack command that opens a floating window dashboard
 -- for managing plugins (update, clean, log, inspect).
 --
--- Originally based on work by Andreas Schneider (asn):
+-- Based on work by Andreas Schneider (asn):
 -- https://git.cryptomilk.org/users/asn/dotfiles.git/tree/dot_config/nvim/lua/plugins/pack-ui.lua
 --
 
