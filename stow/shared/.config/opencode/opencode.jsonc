@@ -1,7 +1,6 @@
 {
   // Keybinds: https://opencode.ai/docs/keybinds
   "$schema": "https://opencode.ai/config.json",
-  "theme": "system",
   "autoupdate": true,
   "provider": {
     "anthropic": {
