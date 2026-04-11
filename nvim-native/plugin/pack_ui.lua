@@ -17,6 +17,7 @@ local function setup_highlights()
     PackUiPluginNotLoaded = "Comment",
     PackUiPluginMissing = "ErrorMsg",
     PackUiUpdateAvailable = "DiagnosticInfo",
+    PackUiBreaking = "DiagnosticWarn",
     PackUiVersion = "Number",
     PackUiSectionHeader = "Label",
     PackUiSeparator = "FloatBorder",
@@ -38,6 +39,7 @@ local state = {
   expanded = {}, -- plugin name => bool
   show_help = false,
   updates = {}, -- plugin name => list of new commit lines
+  breaking_version = {}, -- plugin name => bool (major semver bump detected)
   checking = false, -- true while fetching remote updates
 }
 
@@ -112,6 +114,7 @@ local function check_updates()
 
   state.checking = true
   state.updates = {}
+  state.breaking_version = {}
   render()
 
   local remaining = #plugins
@@ -129,8 +132,9 @@ local function check_updates()
   for _, p in ipairs(plugins) do
     local path = p.path
     local name = p.spec.name
+    local current_tag = p.spec.version and get_installed_tag(path) or nil
 
-    vim.system({ "git", "-C", path, "fetch", "--quiet" }, {}, function(fetch_res)
+    vim.system({ "git", "-C", path, "fetch", "--quiet", "--tags" }, {}, function(fetch_res)
       if fetch_res.code ~= 0 then
         finish_one()
         return
@@ -148,7 +152,29 @@ local function check_updates()
             end
           end
           state.updates[name] = commits
-          finish_one()
+
+          -- Check for major semver bump
+          if not current_tag then
+            finish_one()
+            return
+          end
+          vim.system(
+            { "git", "-C", path, "tag", "--list", "--sort=-version:refname" },
+            { text = true },
+            function(tag_res)
+              if tag_res.code == 0 then
+                local latest_tag = tag_res.stdout:match("[^\n]+")
+                if latest_tag then
+                  local cur_major = tonumber(current_tag:match("^v?(%d+)"))
+                  local new_major = tonumber(latest_tag:match("^v?(%d+)"))
+                  if cur_major and new_major and new_major > cur_major then
+                    state.breaking_version[name] = true
+                  end
+                end
+              end
+              finish_one()
+            end
+          )
         end)
       end)
     end)
@@ -262,7 +288,8 @@ local function build_content()
     add_hl(lnum_cur, name_start, name_start + #name, hl_group)
     if #ver_display > 0 then
       local ver_start = name_start + #name + #pad
-      add_hl(lnum_cur, ver_start, ver_start + #ver_display, "PackUiVersion")
+      local ver_hl = state.breaking_version[name] and "PackUiBreaking" or "PackUiVersion"
+      add_hl(lnum_cur, ver_start, ver_start + #ver_display, ver_hl)
     end
     if update_count > 0 then
       local update_start = name_start + #name + #pad + #ver_display
@@ -293,7 +320,9 @@ local function build_content()
             add(string.format("     ... and %d more", #commits - max_commits), "PackUiDetail")
             break
           end
-          add("     " .. c, "PackUiDetail")
+          -- Detect breaking changes: conventional commits "type!:" or "type(scope)!:"
+          local is_breaking = c:match("%x+ %w+!:") or c:match("%x+ %w+%b()!:")
+          add("     " .. c, is_breaking and "PackUiBreaking" or nil)
         end
       end
     end
@@ -370,6 +399,7 @@ local function close()
   state.expanded = {}
   state.show_help = false
   state.updates = {}
+  state.breaking_version = {}
   state.checking = false
 end
 
@@ -608,6 +638,7 @@ open = function()
       state.expanded = {}
       state.show_help = false
       state.updates = {}
+      state.breaking_version = {}
       state.checking = false
     end,
   })
