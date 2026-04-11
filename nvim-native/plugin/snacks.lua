@@ -63,7 +63,7 @@ require("snacks").setup({
         return {
           align = "center",
           text = {
-            { "⚡ Neovim loaded ", hl = "footer" },
+            { "⚡ Neovim started with ", hl = "footer" },
             { tostring(plugin_count), hl = "special" },
             { " plugins in ", hl = "footer" },
             { ms .. "ms", hl = "special" },
