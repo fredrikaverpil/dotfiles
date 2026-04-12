@@ -12,6 +12,9 @@ require("lazyload").on_vim_enter(function()
   local api = vim.api
   local ns = api.nvim_create_namespace("pack_ui")
 
+  -- Maximum number of commits shown before truncation in the expanded view
+  local MAX_COMMITS_PREVIEW = 10
+
   -- Highlight groups
   local function setup_highlights()
     local links = {
@@ -48,10 +51,15 @@ require("lazyload").on_vim_enter(function()
     show_all_commits = {}, -- plugin name => bool (show full commit list)
     latest_ref = {}, -- plugin name => latest version/hash string
     checking = false, -- true while fetching remote updates
+    check_id = 0, -- incremented on each check start and on close()
   }
 
   -- Cache of path => installed git tag (false = no tag found)
   local tag_cache = {}
+
+  -- Cache of path => resolved remote default branch ref (false = resolution failed)
+  -- Persists for the Neovim session; the default branch never changes mid-session.
+  local ref_cache = {}
 
   -- For versioned plugins, return the actual installed tag from git.
   -- Results are cached for the session so git is only called once per plugin.
@@ -62,10 +70,11 @@ require("lazyload").on_vim_enter(function()
     if tag_cache[path] ~= nil then
       return tag_cache[path] or nil
     end
-    local result =
-      vim.fn.system("git -C " .. vim.fn.shellescape(path) .. " describe --tags --exact-match HEAD 2>/dev/null")
-    if vim.v.shell_error == 0 then
-      local tag = vim.trim(result)
+    local result = vim
+      .system({ "git", "-C", path, "describe", "--tags", "--exact-match", "HEAD" }, { text = true })
+      :wait()
+    if result.code == 0 then
+      local tag = vim.trim(result.stdout)
       tag_cache[path] = tag
       return tag
     end
@@ -111,23 +120,71 @@ require("lazyload").on_vim_enter(function()
     return a[3] > b[3]
   end
 
+  -- Parse commits from git --oneline output into a list of strings
+  local function parse_commits(stdout)
+    local commits = {}
+    if stdout and stdout ~= "" then
+      for line in stdout:gmatch("[^\n]+") do
+        table.insert(commits, line)
+      end
+    end
+    return commits
+  end
+
+  -- Run `git log --oneline <range>` asynchronously; calls callback(commits).
+  local function git_log(path, range, callback)
+    vim.system({ "git", "-C", path, "log", "--oneline", range }, { text = true }, function(res)
+      callback(parse_commits(res.code == 0 and res.stdout or ""))
+    end)
+  end
+
+  -- Returns true if a single commit line has a conventional breaking marker
+  -- Matches 'type!:' or 'type(scope)!:'
+  local function is_breaking_commit(c)
+    return c:match("%x+ %w+!:") or c:match("%x+ %w+%b()!:")
+  end
+
+  -- Returns true if any commit line contains a breaking change marker
+  local function has_breaking_commit(commits)
+    return vim.iter(commits):any(is_breaking_commit)
+  end
+
+  -- Collect only the breaking commit lines from a list
+  local function filter_breaking(commits)
+    return vim.iter(commits):filter(is_breaking_commit):totable()
+  end
+
   -- Forward declaration (check_updates calls render before it is defined)
   local render
 
   -- Resolve the remote default branch ref for a git repo.
+  -- Results are cached for the session (the default branch never changes).
   -- Calls callback(ref_string) or callback(nil) on failure.
   local function resolve_remote_ref(path, callback)
+    if ref_cache[path] ~= nil then
+      callback(ref_cache[path] or nil)
+      return
+    end
     vim.system({ "git", "-C", path, "symbolic-ref", "refs/remotes/origin/HEAD" }, { text = true }, function(result)
       if result.code == 0 then
-        callback(vim.trim(result.stdout))
+        local ref = vim.trim(result.stdout)
+        ref_cache[path] = ref
+        callback(ref)
         return
       end
       vim.system({ "git", "-C", path, "rev-parse", "--verify", "origin/main" }, { text = true }, function(r)
         if r.code == 0 then
+          ref_cache[path] = "origin/main"
           callback("origin/main")
         else
           vim.system({ "git", "-C", path, "rev-parse", "--verify", "origin/master" }, { text = true }, function(r2)
-            callback(r2.code == 0 and "origin/master" or nil)
+            if r2.code == 0 then
+              ref_cache[path] = "origin/master"
+              callback("origin/master")
+            else
+              ref_cache[path] = false
+              callback(nil)
+            end
           end)
         end
       end)
@@ -145,6 +202,8 @@ require("lazyload").on_vim_enter(function()
       return
     end
 
+    state.check_id = state.check_id + 1
+    local my_check_id = state.check_id
     state.checking = true
     state.updates = {}
     state.breaking = {}
@@ -154,8 +213,28 @@ require("lazyload").on_vim_enter(function()
 
     local remaining = #plugins
 
-    local function finish_one()
+    -- Apply a per-plugin result table to state and decrement the counter.
+    -- All state writes happen here inside vim.schedule on the main thread.
+    -- The check_id guard discards results from a check cancelled by close().
+    local function finish_one(result)
       vim.schedule(function()
+        if state.check_id ~= my_check_id then
+          return
+        end
+        if result then
+          if result.updates ~= nil then
+            state.updates[result.name] = result.updates
+          end
+          if result.breaking then
+            state.breaking[result.name] = true
+          end
+          if result.unreleased_breaking then
+            state.unreleased_breaking[result.name] = result.unreleased_breaking
+          end
+          if result.latest_ref then
+            state.latest_ref[result.name] = result.latest_ref
+          end
+        end
         remaining = remaining - 1
         if remaining == 0 then
           state.checking = false
@@ -169,41 +248,9 @@ require("lazyload").on_vim_enter(function()
       local name = p.spec.name
       local current_tag = p.spec.version and get_installed_tag(path) or nil
 
-      -- Helper: parse commits from git log output
-      local function parse_commits(stdout)
-        local commits = {}
-        if stdout and stdout ~= "" then
-          for line in stdout:gmatch("[^\n]+") do
-            table.insert(commits, line)
-          end
-        end
-        return commits
-      end
-
-      -- Helper: check if any commit line has a breaking change marker
-      local function has_breaking_commit(commits)
-        for _, c in ipairs(commits) do
-          if c:match("%x+ %w+!:") or c:match("%x+ %w+%b()!:") then
-            return true
-          end
-        end
-        return false
-      end
-
-      -- Helper: collect only breaking commit lines
-      local function filter_breaking(commits)
-        local result = {}
-        for _, c in ipairs(commits) do
-          if c:match("%x+ %w+!:") or c:match("%x+ %w+%b()!:") then
-            table.insert(result, c)
-          end
-        end
-        return result
-      end
-
       vim.system({ "git", "-C", path, "fetch", "--quiet", "--tags" }, {}, function(fetch_res)
         if fetch_res.code ~= 0 then
-          finish_one()
+          finish_one(nil)
           return
         end
 
@@ -227,52 +274,45 @@ require("lazyload").on_vim_enter(function()
                 end
               end
 
+              -- Collect per-plugin results; written to state atomically in finish_one
+              local result = { name = name }
+
               -- Check major semver bump
               if cur_ver and latest_ver and latest_ver[1] > cur_ver[1] then
-                state.breaking[name] = true
+                result.breaking = true
               end
 
-              -- Get released commits (HEAD..latest_tag) if tag changed
+              -- Get released commits (HEAD..latest_tag) if tag changed,
+              -- then check main for unreleased breaking commits
               local function after_released()
-                -- Check main for unreleased breaking commits beyond latest tag
                 resolve_remote_ref(path, function(ref)
                   if not ref then
-                    finish_one()
+                    finish_one(result)
                     return
                   end
                   local compare_from = latest_tag or current_tag
-                  vim.system(
-                    { "git", "-C", path, "log", "--oneline", compare_from .. ".." .. ref },
-                    { text = true },
-                    function(log_res)
-                      local unreleased = parse_commits(log_res.code == 0 and log_res.stdout or "")
-                      local breaking_lines = filter_breaking(unreleased)
-                      if #breaking_lines > 0 then
-                        state.unreleased_breaking[name] = breaking_lines
-                      end
-                      finish_one()
+                  git_log(path, compare_from .. ".." .. ref, function(unreleased)
+                    local breaking_lines = filter_breaking(unreleased)
+                    if #breaking_lines > 0 then
+                      result.unreleased_breaking = breaking_lines
                     end
-                  )
+                    finish_one(result)
+                  end)
                 end)
               end
 
               local is_newer = cur_ver and latest_ver and semver_gt(latest_ver, cur_ver)
               if is_newer and latest_tag then
-                state.latest_ref[name] = latest_tag
-                vim.system(
-                  { "git", "-C", path, "log", "--oneline", "HEAD.." .. latest_tag },
-                  { text = true },
-                  function(log_res)
-                    local commits = parse_commits(log_res.code == 0 and log_res.stdout or "")
-                    state.updates[name] = commits
-                    if has_breaking_commit(commits) then
-                      state.breaking[name] = true
-                    end
-                    after_released()
+                result.latest_ref = latest_tag
+                git_log(path, "HEAD.." .. latest_tag, function(commits)
+                  result.updates = commits
+                  if has_breaking_commit(commits) then
+                    result.breaking = true
                   end
-                )
+                  after_released()
+                end)
               else
-                state.updates[name] = {}
+                result.updates = {}
                 after_released()
               end
             end
@@ -281,22 +321,21 @@ require("lazyload").on_vim_enter(function()
           -- Non-versioned plugin: compare against default branch
           resolve_remote_ref(path, function(ref)
             if not ref then
-              finish_one()
+              finish_one(nil)
               return
             end
-            vim.system({ "git", "-C", path, "log", "--oneline", "HEAD.." .. ref }, { text = true }, function(log_res)
-              local commits = parse_commits(log_res.code == 0 and log_res.stdout or "")
-              state.updates[name] = commits
+            git_log(path, "HEAD.." .. ref, function(commits)
+              local result = { name = name, updates = commits }
               if has_breaking_commit(commits) then
-                state.breaking[name] = true
+                result.breaking = true
               end
               if #commits > 0 then
                 local latest_hash = commits[1]:match("^(%x+)")
                 if latest_hash then
-                  state.latest_ref[name] = latest_hash
+                  result.latest_ref = latest_hash
                 end
               end
-              finish_one()
+              finish_one(result)
             end)
           end)
         end
@@ -397,17 +436,20 @@ require("lazyload").on_vim_enter(function()
 
       local ver_display = tag or (rev_short ~= "" and rev_short or version)
       local latest = state.latest_ref[name]
-      if latest and latest ~= ver_display then
-        -- Normalize v prefix to match current display
-        local latest_display = latest
+      if latest then
+        -- Normalize v prefix before comparing to avoid spurious arrows
+        -- when only the prefix differs (e.g. '1.2.3' vs 'v1.2.3')
         local cur_has_v = ver_display:match("^v") ~= nil
-        local new_has_v = latest_display:match("^v") ~= nil
+        local new_has_v = latest:match("^v") ~= nil
+        local latest_display = latest
         if cur_has_v and not new_has_v then
-          latest_display = "v" .. latest_display
+          latest_display = "v" .. latest
         elseif not cur_has_v and new_has_v then
-          latest_display = latest_display:sub(2)
+          latest_display = latest:sub(2)
         end
-        ver_display = ver_display .. " → " .. latest_display
+        if latest_display ~= ver_display then
+          ver_display = ver_display .. " → " .. latest_display
+        end
       end
       local update_count = state.updates[name] and #state.updates[name] or 0
       local update_str = update_count > 0 and string.format("  ↑%d", update_count) or ""
@@ -441,6 +483,10 @@ require("lazyload").on_vim_enter(function()
           state.breaking[name] and "PackUiBreaking" or "PackUiUpdateAvailable"
         )
       end
+      if #unreleased_str > 0 then
+        local unrel_start = name_start + #name + #pad + #ver_display + #update_str
+        add_hl(lnum_cur, unrel_start, unrel_start + #unreleased_str, "PackUiBreaking")
+      end
 
       -- Track plugin position (1-based line number for cursor operations)
       line_to_plugin[lnum_cur + 1] = name
@@ -461,25 +507,23 @@ require("lazyload").on_vim_enter(function()
         end
         local commits = state.updates[name]
         if commits and #commits > 0 then
-          local max_commits = state.show_all_commits[name] and #commits or 10
+          local max_commits = state.show_all_commits[name] and #commits or MAX_COMMITS_PREVIEW
           for i, c in ipairs(commits) do
             if i > max_commits then
               add(string.format("     ... and %d more (Enter to expand)", #commits - max_commits), "PackUiDetail")
               line_to_plugin[#lines] = name
               break
             end
-            -- Detect breaking changes: conventional commits "type!:" or "type(scope)!:"
-            local is_breaking = c:match("%x+ %w+!:") or c:match("%x+ %w+%b()!:")
-            add("     " .. c, is_breaking and "PackUiBreaking" or nil)
+            add("     " .. c, is_breaking_commit(c) and "PackUiBreaking" or nil)
             line_to_plugin[#lines] = name
           end
           add("")
         end
-        local unreleased = state.unreleased_breaking[name]
-        if unreleased and #unreleased > 0 then
-          add(string.format("     ⚠ %d breaking change(s) unreleased on main:", #unreleased), "PackUiBreaking")
+        local unrel = state.unreleased_breaking[name]
+        if unrel and #unrel > 0 then
+          add(string.format("     ⚠ %d breaking change(s) unreleased on main:", #unrel), "PackUiBreaking")
           line_to_plugin[#lines] = name
-          for _, c in ipairs(unreleased) do
+          for _, c in ipairs(unrel) do
             add("       " .. c, "PackUiBreaking")
             line_to_plugin[#lines] = name
           end
@@ -542,6 +586,22 @@ require("lazyload").on_vim_enter(function()
     return state.line_to_plugin[row]
   end
 
+  -- Reset all transient UI state (called by both close() and WinClosed)
+  local function reset_state()
+    state.winid = nil
+    state.bufnr = nil
+    state.expanded = {}
+    state.show_help = false
+    state.updates = {}
+    state.breaking = {}
+    state.unreleased_breaking = {}
+    state.show_all_commits = {}
+    state.latest_ref = {}
+    state.checking = false
+    -- Invalidate any in-flight check_updates callbacks
+    state.check_id = state.check_id + 1
+  end
+
   -- Close the floating window
   local function close()
     -- Remove autocmd first to prevent it from corrupting state on re-open
@@ -554,16 +614,7 @@ require("lazyload").on_vim_enter(function()
     end
     -- Buffer has bufhidden=wipe, so it is wiped when the window closes.
     -- No need to explicitly delete it.
-    state.winid = nil
-    state.bufnr = nil
-    state.expanded = {}
-    state.show_help = false
-    state.updates = {}
-    state.breaking = {}
-    state.unreleased_breaking = {}
-    state.show_all_commits = {}
-    state.latest_ref = {}
-    state.checking = false
+    reset_state()
   end
 
   -- Jump to next/prev plugin line
@@ -710,13 +761,14 @@ require("lazyload").on_vim_enter(function()
       local name = plugin_at_cursor()
       if name then
         local commits = state.updates[name]
-        local has_truncated = commits and #commits > 10
+        local has_truncated = commits and #commits > MAX_COMMITS_PREVIEW
         if not state.expanded[name] then
           state.expanded[name] = true
         elseif has_truncated and not state.show_all_commits[name] then
           state.show_all_commits[name] = true
         else
           state.expanded[name] = false
+          state.show_all_commits[name] = nil
         end
         render()
         -- Restore cursor to the plugin line
@@ -803,17 +855,8 @@ require("lazyload").on_vim_enter(function()
         if vim._tointeger(ev.match) ~= captured_winid then
           return
         end
-        state.winid = nil
-        state.bufnr = nil
         state.win_autocmd_id = nil
-        state.expanded = {}
-        state.show_help = false
-        state.updates = {}
-        state.breaking = {}
-        state.unreleased_breaking = {}
-        state.show_all_commits = {}
-        state.latest_ref = {}
-        state.checking = false
+        reset_state()
       end,
     })
   end
