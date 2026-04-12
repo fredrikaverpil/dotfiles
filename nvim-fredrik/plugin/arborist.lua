@@ -56,8 +56,15 @@ if Config.use_arborist then
       callback = function(event)
         local bufnr = event.buf
         local ft = event.match
-        if ft == "" or vim.startswith(ft, "snacks_") or vim.startswith(ft, "blink-") then
+        if ft == "" then
           return
+        end
+
+        -- ignore certain filetypes
+        for _, prefix in ipairs({ "snacks_", "blink-" }) do
+          if vim.startswith(ft, prefix) then
+            return
+          end
         end
 
         local lang = vim.treesitter.language.get_lang(ft)
