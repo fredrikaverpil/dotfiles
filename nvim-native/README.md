@@ -12,11 +12,10 @@ Symlinked via GNU Stow. Run `./rebuild.sh --stow` from `~/.dotfiles/` to apply.
 
 ```
 nvim-native/
-  init.lua                    leader keys, require("options"), diagnostics, debug/profile
+  init.lua                    leader keys, require("options"), debug/profile
   lua/
     lazyload.lua                VimEnter/UIEnter deferred setup queues
     options.lua               all vim.opt settings
-    diagnostics.lua           diagnostic display config
     fold.lua                  fold helpers (treesitter default + LSP override)
     toggle.lua                toggle functions (auto-format, inlay hints)
     colors.lua                color utility (blend)
@@ -24,6 +23,7 @@ nvim-native/
   lsp/                        (unused; nvim-lspconfig provides base configs)
   plugin/
     lang/                     per-language plugins, filetypes, editor settings, autocmds
+    diagnostics.lua           diagnostic display config
     blink.lua                 completion (VimEnter)
     conform.lua               formatting (VimEnter)
     dap.lua                   debugging (deferred to first use)
