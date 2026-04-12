@@ -41,7 +41,7 @@ Dotfiles are managed with GNU Stow, not Nix:
 ```bash
 # Manual stow (if needed)
 cd ~/.dotfiles/stow
-stow --target="https://github.com/user-attachments/assets/5566bb1c-d579-41d8-8f30-997f4fbecfeb" --restow shared "$(uname -s)"
+stow --target="$HOME" --restow shared "$(uname -s)"
 ```
 
 ### Shell
