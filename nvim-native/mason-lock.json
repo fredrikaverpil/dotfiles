@@ -13,6 +13,7 @@
   "goimports": "v0.44.0",
   "golangci-lint": "v2.11.4",
   "golines": "v0.15.0",
+  "gomodifytags": "v1.17.0",
   "gopls": "v0.21.1",
   "gotestsum": "v1.13.0",
   "graphql-language-service-cli": "3.5.0",

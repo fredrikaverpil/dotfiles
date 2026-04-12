@@ -17,6 +17,6 @@ require("lazyload").on_vim_enter(function()
       end,
     },
   })
-end)
 
-vim.keymap.set("n", "<leader><tab>r", ":BufferLineTabRename ", { desc = "Rename tab" })
+  vim.keymap.set("n", "<leader><tab>r", ":BufferLineTabRename ", { desc = "Rename tab" })
+end)

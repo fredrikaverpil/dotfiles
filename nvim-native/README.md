@@ -1,9 +1,5 @@
 # nvim-native
 
-A Neovim config using only native conventions and `vim.pack` (v0.12.0+) for
-package management. No plugin manager framework — just Neovim's built-in
-directory structure doing what it was designed to do.
-
 ## Usage
 
 ```sh
@@ -39,14 +35,15 @@ nvim-native/
     colorscheme.lua           zenbones + OSC11 dark/light detection
     oil.lua                   file explorer
     snacks.lua                QoL (picker, dashboard, lazygit, terminal)
-    treesitter.lua            syntax highlighting + context
+    treesitter.lua            syntax highlighting + context (VimEnter)
     ...                       other feature plugins
   after/
     lsp/                      overrides for nvim-lspconfig base configs
-      gopls.lua               extends gopls for templ/gotmpl
 ```
 
 ## Architecture
+
+The `init.lua`
 
 Core plugin files (`plugin/*.lua`) own all tool configuration inline — LSP
 servers, formatters, linters, completion sources, DAP adapters, neotest
@@ -57,18 +54,23 @@ filetypes, SchemaStore loading, build hooks, and autocmds.
 
 ### Plugin file layout
 
-Every plugin file follows a consistent structure:
+Every plugin strives to lazy-load (except when they cannot). Helper functions
+available in the `lazyload` module.
 
 ```lua
--- 1. Build hooks (must be registered BEFORE vim.pack.add)
-vim.api.nvim_create_autocmd("PackChanged", { ... })
-
--- 2. Load packages (immediate)
-vim.pack.add(...)
-
--- 3. Deferred setup (VimEnter/UIEnter)
+-- Deferred setup (VimEnter/UIEnter)
 require("lazyload").on_vim_enter(function()
+  -- Build hooks (must be registered BEFORE vim.pack.add)
+  vim.api.nvim_create_autocmd("PackChanged", { ... })
+
+  -- Load packages (immediate)
+  vim.pack.add(...)
+
+  -- Configure plugin
   require("plugin").setup({ ... })
+
+  -- Set keymap(s)
+  vim.keymap.set( ... )
 end)
 
 -- 4. Keymaps
@@ -93,10 +95,12 @@ vim.api.nvim_create_autocmd("PackChanged", {
 
 ## Per-project overrides
 
-Place a `.nvim.lua` in any project directory. It runs at step 7c of
-initialization — **before** `plugin/` files (`:h exrc`). Wrap plugin overrides
-in `require("lazyload").on_override(...)` so they apply after all deferred
-plugin setup has completed.
+Place a `.nvim.lua` in the the `$cwd` or above it. It runs at step 7c of
+[initialization](https://neovim.io/doc/user/starting/#_initialization) —
+**before** `plugin/` files (`:h exrc`).
+
+In order to execute the `.nvim.lua` files _after_ `/plugin` files, a custom exrc
+implementation was done in the `lazyloading` module.
 
 Example:
 
@@ -120,7 +124,14 @@ vim.lsp.config.gopls.settings = {
 }
 ```
 
+> [!ATTENTION]
+>
+> Overrides will load on `UIEnter`, but after any `on_ui_enter`-loaded plugin,
+> and can therefore not override plugins loaded after that event.
+
 ## Plugin management
+
+Use the `:Pack` TUI or the built-in commands:
 
 - **Install**: `vim.pack.add()` in each file. New plugins install on first
   launch.
@@ -138,15 +149,3 @@ vim.lsp.config.gopls.settings = {
    autocmd), plugins, filetypes, autocmds
 6. _(optional)_ `after/lsp/<server>.lua` — override base config from
    nvim-lspconfig
-
-## Startup performance
-
-Keymap-only and filetype-specific plugins defer `require()` + `.setup()` to
-first use (see pattern in neotest.lua, dap.lua, codediff.lua, etc). The
-`vim.pack.add()` calls stay at the top level so plugins are always on the
-packpath.
-
-| Phase      | What runs                                                         |
-| ---------- | ----------------------------------------------------------------- |
-| `plugin/`  | All files: vim.pack.add (immediate), setup queued via lazyload    |
-| `VimEnter` | Lualine (`{ sync = true }`), then everything else async (default) |

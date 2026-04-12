@@ -3,8 +3,8 @@ require("lazyload").on_vim_enter(function()
     { src = "https://github.com/gbprod/yanky.nvim" },
   })
   require("yanky").setup({})
-end)
 
-vim.keymap.set("n", "<leader>p", function()
-  Snacks.picker.yanky()
-end, { desc = "Yanky history" })
+  vim.keymap.set("n", "<leader>p", function()
+    Snacks.picker.yanky()
+  end, { desc = "Yanky history" })
+end)

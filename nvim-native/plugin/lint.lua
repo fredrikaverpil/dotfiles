@@ -1,7 +1,9 @@
 -- nvim-lint stays eager because plugin/lang/protobuf.lua wires up custom
 -- linters via require("lint").linters and a BufEnter autocmd that fires before
 -- VimEnter when a .proto file is on the command line.
-vim.pack.add({ { src = "https://codeberg.org/mfussenegger/nvim-lint", name = "nvim-lint" } })
+vim.pack.add({
+  { src = "https://codeberg.org/mfussenegger/nvim-lint" },
+})
 
 require("lazyload").on_vim_enter(function()
   local lint = require("lint")

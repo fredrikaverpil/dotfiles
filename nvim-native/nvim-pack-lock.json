@@ -175,7 +175,7 @@
       "src": "https://github.com/nvim-neotest/nvim-nio"
     },
     "nvim-rip-substitute": {
-      "rev": "3ff85033206aa9fbf9b988b2cc71e25ae4566424",
+      "rev": "76865f7abba5f285e3f9d3cd4c0ad97250eb04de",
       "src": "https://github.com/chrisgrieser/nvim-rip-substitute"
     },
     "nvim-treesitter": {
@@ -266,10 +266,6 @@
     "vim-dadbod-ui": {
       "rev": "07e92e22114cc5b1ba4938d99897d85b58e20475",
       "src": "https://github.com/kristijanhusak/vim-dadbod-ui"
-    },
-    "vim-peekaboo": {
-      "rev": "2a8a3187ba6b15201b2563a3f0331fcdf49da36c",
-      "src": "https://github.com/junegunn/vim-peekaboo"
     },
     "vim-uppercase-sql": {
       "rev": "58bfde1d679a1387dabfe292b38d51d84819b267",

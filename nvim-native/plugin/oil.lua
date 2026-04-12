@@ -1,3 +1,5 @@
+-- NOTE: not lazyloaded so to support running e.g. `nvim .`
+
 vim.pack.add({
   { src = "https://github.com/stevearc/oil.nvim" },
   { src = "https://github.com/malewicz1337/oil-git.nvim" },

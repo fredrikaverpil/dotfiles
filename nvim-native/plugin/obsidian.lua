@@ -1,27 +1,21 @@
-local vault_path = vim.fn.expand("~/Library/Mobile Documents/iCloud~md~obsidian/Documents/fredrik")
-local scratchpad_path = vault_path .. "/scratchpad.md"
+require("lazyload").on_vim_enter(function()
+  vim.pack.add({
+    { src = "https://github.com/obsidian-nvim/obsidian.nvim" },
+    { src = "https://github.com/folke/snacks.nvim" }, -- sub-dependency
+  })
 
--- Only enable on macOS if the vault exists.
-if vim.fn.has("mac") ~= 1 or vim.fn.isdirectory(vault_path) ~= 1 then
-  return
-end
+  local vault_path = vim.fn.expand("~/Library/Mobile Documents/iCloud~md~obsidian/Documents/fredrik")
+  local scratchpad_path = vault_path .. "/scratchpad.md"
 
-vim.pack.add({
-  { src = "https://github.com/obsidian-nvim/obsidian.nvim" },
-})
-
-local initialized = false
-
----@param title string
-local function date_prefixed_id(title)
-  return os.date("%Y-%m-%d") .. "-" .. title
-end
-
-local function init()
-  if initialized then
+  -- Only enable on macOS if the vault exists.
+  if vim.fn.has("mac") ~= 1 or vim.fn.isdirectory(vault_path) ~= 1 then
     return
   end
-  initialized = true
+
+  ---@param title string
+  local function date_prefixed_id(title)
+    return os.date("%Y-%m-%d") .. "-" .. title
+  end
 
   require("obsidian").setup({
     workspaces = {
@@ -83,30 +77,24 @@ local function init()
     ui = { enable = false },
     legacy_commands = false,
   })
-end
 
--- Keymaps
-vim.keymap.set("n", "<leader>ns", function()
-  init()
-  Snacks.picker.grep({ cwd = vault_path })
-end, { desc = "Notes: search text" })
-vim.keymap.set("n", "<leader>nf", function()
-  init()
-  vim.cmd("Obsidian quick_switch")
-end, { desc = "Notes: search filenames" })
-vim.keymap.set("n", "<leader>nn", function()
-  init()
-  vim.cmd("Obsidian new")
-end, { desc = "Notes: new" })
-vim.keymap.set("n", "<leader>nd", function()
-  init()
-  vim.cmd("Obsidian today")
-end, { desc = "Notes: daily note" })
-vim.keymap.set("n", "<leader>nt", function()
-  init()
-  vim.cmd("Obsidian new_from_template")
-end, { desc = "Notes: new from template" })
-vim.keymap.set("n", "<leader>nS", function()
-  init()
-  vim.cmd("tabnew " .. scratchpad_path)
-end, { desc = "Notes: scratchpad" })
+  -- Keymaps
+  vim.keymap.set("n", "<leader>ns", function()
+    Snacks.picker.grep({ cwd = vault_path })
+  end, { desc = "Notes: search text" })
+  vim.keymap.set("n", "<leader>nf", function()
+    vim.cmd("Obsidian quick_switch")
+  end, { desc = "Notes: search filenames" })
+  vim.keymap.set("n", "<leader>nn", function()
+    vim.cmd("Obsidian new")
+  end, { desc = "Notes: new" })
+  vim.keymap.set("n", "<leader>nd", function()
+    vim.cmd("Obsidian today")
+  end, { desc = "Notes: daily note" })
+  vim.keymap.set("n", "<leader>nt", function()
+    vim.cmd("Obsidian new_from_template")
+  end, { desc = "Notes: new from template" })
+  vim.keymap.set("n", "<leader>nS", function()
+    vim.cmd("tabnew " .. scratchpad_path)
+  end, { desc = "Notes: scratchpad" })
+end)

@@ -19,6 +19,7 @@ require("lazyload").on_vim_enter(function()
     "graphql",
     "jsonls",
     "lua_ls",
+    "nil_ls",
     "ruff",
     "rust_analyzer",
     "superhtml",
@@ -30,9 +31,6 @@ require("lazyload").on_vim_enter(function()
     "yamlls",
     "zls",
   }
-  if vim.fn.executable("nix") == 1 then
-    table.insert(servers, "nil_ls")
-  end
   vim.lsp.enable(servers)
 
   -- Enable codelens globally

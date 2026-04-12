@@ -1,3 +1,14 @@
+-- FIXME: why do some lines act up when hitting enter at the end of them?
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "lua" },
+  callback = function()
+    vim.opt_local.tabstop = 2
+    vim.opt_local.softtabstop = 2
+    vim.opt_local.shiftwidth = 2
+    vim.opt_local.expandtab = true
+  end,
+})
+
 vim.pack.add({
   { src = "https://github.com/folke/lazydev.nvim" },
   { src = "https://github.com/Bilal2453/luvit-meta" }, -- vim.uv typings

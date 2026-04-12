@@ -1,6 +1,3 @@
--- Experimental Lua module loader
-vim.loader.enable()
-
 -- Native Neovim config using vim.pack + native directories.
 -- No plugin manager framework — just Neovim's built-in conventions:
 --   lsp/       — LSP server configs (auto-discovered by vim.lsp.config)
@@ -58,12 +55,21 @@ if should_profile then
   end)
 end
 
--- Capture startup time as early as possible for the dashboard.
-_G._nvim_start_time = vim.uv.hrtime()
+-- Before anything;
+local nvim_start_time = vim.uv.hrtime()
+
+-- Experimental Lua module loader.
+vim.loader.enable()
+
+-- States for this Neovim config.
+_G.Config = {
+  nvim_start_time = nvim_start_time,
+  use_nvim_treesitter = true,
+  called = {},
+}
 
 vim.g.mapleader = " "
 vim.g.maplocalleader = ","
-vim.g.use_nvim_treesitter = true
 
 require("options")
 

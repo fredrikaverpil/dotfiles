@@ -11,6 +11,6 @@ require("lazyload").on_vim_enter(function()
       zig = { "zig run" },
     },
   })
-end)
 
-vim.keymap.set("n", "<leader>r", ":RunFile<CR>", { desc = "Run file" })
+  vim.keymap.set("n", "<leader>r", ":RunFile<CR>", { desc = "Run file" })
+end)

@@ -1,6 +1,6 @@
-vim.g.auto_format = true
-
 require("lazyload").on_vim_enter(function()
+  vim.g.auto_format = true
+
   vim.pack.add({
     { src = "https://github.com/stevearc/conform.nvim" },
   })
@@ -66,6 +66,6 @@ require("lazyload").on_vim_enter(function()
       },
     },
   })
-end)
 
-vim.keymap.set("n", "<leader>uf", require("toggle").auto_format, { desc = "Toggle auto-format" })
+  vim.keymap.set("n", "<leader>uf", require("toggle").auto_format, { desc = "Toggle auto-format" })
+end)

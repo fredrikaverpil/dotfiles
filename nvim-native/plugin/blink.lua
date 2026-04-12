@@ -1,9 +1,9 @@
-vim.pack.add({
-  { src = "https://github.com/Saghen/blink.cmp", version = vim.version.range("1.*") },
-  { src = "https://github.com/rafamadriz/friendly-snippets" },
-})
-
 require("lazyload").on_vim_enter(function()
+  vim.pack.add({
+    { src = "https://github.com/Saghen/blink.cmp", version = vim.version.range("1.*") },
+    { src = "https://github.com/rafamadriz/friendly-snippets" },
+  })
+
   local default_sources = { "lsp", "path", "snippets", "buffer", "dadbod", "lazydev", "markdown" }
   local providers = {
     snippets = {
@@ -27,7 +27,7 @@ require("lazyload").on_vim_enter(function()
     },
   }
 
-  if vim.g.use_nvim_treesitter then
+  if Config.use_nvim_treesitter then
     table.insert(default_sources, "go_pkgs")
     providers.go_pkgs = {
       name = "Import",
