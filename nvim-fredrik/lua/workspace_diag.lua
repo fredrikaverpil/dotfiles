@@ -22,7 +22,7 @@ function M.populate(client, bufnr)
     return
   end
 
-  local filetypes = client.config.filetypes
+  local filetypes = vim.tbl_get(client, "config", "filetypes") --[[@as string[]? ]]
   if not filetypes or #filetypes == 0 then
     return
   end
