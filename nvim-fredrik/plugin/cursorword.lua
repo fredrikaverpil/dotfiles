@@ -11,6 +11,11 @@ require("lazyload").on_vim_enter(function()
       if prev_id then
         pcall(vim.fn.matchdelete, prev_id)
       end
+      -- hide cursor word when in dashboard
+      if vim.bo.filetype == "snacks_dashboard" then
+        vim.w.minicursorword_match_id = nil
+        return
+      end
       local word = vim.fn.expand("<cword>")
       if word == "" or #word < 2 or not word:match("^[%w_]+$") then
         vim.w.minicursorword_match_id = nil
