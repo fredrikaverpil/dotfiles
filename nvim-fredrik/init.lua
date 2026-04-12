@@ -21,3 +21,7 @@ vim.g.maplocalleader = ","
 require("options")
 require("keymaps")
 require("exrc").load()
+
+-- Experimental: ui2 message/cmdline redesign (:h ui2)
+-- Avoids "Press ENTER" prompts, highlights cmdline, pager as buffer.
+require("vim._core.ui2").enable()

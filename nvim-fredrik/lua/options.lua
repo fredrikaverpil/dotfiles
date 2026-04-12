@@ -80,7 +80,3 @@ if vim.fn.getenv("TERM_PROGRAM") == "ghostty" then
   vim.opt.title = true
   vim.opt.titlestring = "%{fnamemodify(getcwd(), ':t')}"
 end
-
--- Experimental: ui2 message/cmdline redesign (:h ui2)
--- Avoids "Press ENTER" prompts, highlights cmdline, pager as buffer.
-require("vim._core.ui2").enable()
