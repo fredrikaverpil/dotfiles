@@ -148,7 +148,7 @@ Use the `:Pack` TUI or the built-in commands:
   apply.
 - **Lockfile**: `nvim-pack-lock.json` — commit to VCS for reproducible installs.
 
-## Adding a new language
+## Adding new language support
 
 1. Add the LSP server to `plugin/lsp.lua`
 2. Add Mason tools to `plugin/mason.lua`
