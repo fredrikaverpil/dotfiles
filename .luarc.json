@@ -1,4 +1,4 @@
 {
-  "workspace.ignoreDir": ["stow", "nvim-fredrik"],
+  "workspace.ignoreDir": ["stow", "nvim-legacy"],
   "diagnostics.globals": ["vim"]
 }
