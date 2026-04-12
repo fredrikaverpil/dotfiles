@@ -1,7 +1,4 @@
-# nvim
-
-This is my main Neovim config that I use on a daily basis for all software
-development.
+# nvim-native
 
 ## Usage
 
@@ -25,20 +22,26 @@ nvim-fredrik/
     toggle.lua                toggle functions (auto-format, inlay hints)
     colors.lua                color utility (blend)
     exrc.lua                  list project-local .nvim.lua files + trust status
+  lsp/                        (unused; nvim-lspconfig provides base configs)
+  plugin/
+    lang/                     per-language plugins, filetypes, editor settings, autocmds
+    diagnostics.lua           diagnostic display config
+    blink.lua                 completion (VimEnter)
+    conform.lua               formatting (VimEnter)
+    dap.lua                   debugging (deferred to first use)
+    lint.lua                  linting (VimEnter)
+    lsp.lua                   LSP servers (VimEnter)
+    lualine.lua               statusline (VimEnter)
+    mason.lua                 tool installation (VimEnter)
+    neotest.lua               testing (deferred to first use)
+    colorscheme.lua           zenbones + OSC11 dark/light detection
+    oil.lua                   file explorer
+    snacks.lua                QoL (picker, dashboard, lazygit, terminal)
+    treesitter.lua            syntax highlighting + context (VimEnter)
+    ...                       other feature plugins
+  after/
+    lsp/                      overrides for nvim-lspconfig base configs
 ```
-
-lsp/ (unused; nvim-lspconfig provides base configs) plugin/ lang/ per-language
-plugins, filetypes, editor settings, autocmds diagnostics.lua diagnostic display
-config blink.lua completion (VimEnter) conform.lua formatting (VimEnter) dap.lua
-debugging (deferred to first use) lint.lua linting (VimEnter) lsp.lua LSP
-servers (VimEnter) lualine.lua statusline (VimEnter) mason.lua tool installation
-(VimEnter) neotest.lua testing (deferred to first use) colorscheme.lua
-zenbones + OSC11 dark/light detection oil.lua file explorer snacks.lua QoL
-(picker, dashboard, lazygit, terminal) treesitter.lua syntax highlighting +
-context (VimEnter) ... other feature plugins after/ lsp/ overrides for
-nvim-lspconfig base configs
-
-````
 
 ## Architecture
 
@@ -77,7 +80,7 @@ end)
 
 -- 4. Keymaps
 vim.keymap.set(...)
-````
+```
 
 - `on_vim_enter(fn)`: defer to `VimEnter`, then run the function async
 - `on_ui_enter(fn)`: defer to `UIEnter`, then run the function async
