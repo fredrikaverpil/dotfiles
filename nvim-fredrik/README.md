@@ -1,6 +1,7 @@
-# nvim-native
+# nvim-fredrik
 
-<img width="1280" height="720" alt="nvim-0 12" src="https://github.com/user-attachments/assets/35d34ad7-1e58-4b29-9e05-e595dc7ec851" />
+<img width="1280" height="720" alt="nvim-v0 12" src="https://github.com/user-attachments/assets/5566bb1c-d579-41d8-8f30-997f4fbecfeb" />
+
 
 
 ## Usage
