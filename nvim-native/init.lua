@@ -73,11 +73,9 @@ vim.g.maplocalleader = ","
 
 require("options")
 
-require("diagnostics")
-
 require("keymaps")
 
 require("exrc").load()
 
--- Plugins are installed via vim.pack.add() in each plugin/*.lua file.
--- LSP server configs live in lsp/*.lua (auto-discovered by vim.lsp.config).
+-- experimental; no more "press enter" interruptions, commandline highlighting
+require("vim._core.ui2").enable({})
