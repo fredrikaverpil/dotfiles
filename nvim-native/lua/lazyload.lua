@@ -101,7 +101,7 @@ end
 --- files — so it cannot override plugin setup directly; this queue bridges
 --- that gap by registering a callback that runs after the VimEnter drain.
 ---@param fn fun()
-function M.on_override(fn)
+function M._on_override(fn)
   if override_queue then
     table.insert(override_queue, { fn = fn })
   else

@@ -106,7 +106,7 @@ function M.load()
   for _, path in ipairs(files) do
     local contents = vim.secure.read(path)
     if contents then
-      require("lazyload").on_override(function()
+      require("lazyload")._on_override(function()
         local chunk, load_err = loadstring(contents, "@" .. path)
         if not chunk then
           vim.notify(load_err, vim.log.levels.ERROR)
