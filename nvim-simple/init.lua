@@ -27,7 +27,6 @@ map({ "n", "v", "x" }, "<leader>d", '"+d<CR>', { desc = "Delete to system clipbo
 -- plugins
 vim.pack.add({
   { src = "https://github.com/echasnovski/mini.pick" },
-  { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "master" },
   { src = "https://github.com/mason-org/mason.nvim" },
   { src = "https://github.com/neovim/nvim-lspconfig" },
 })
@@ -36,11 +35,6 @@ require("mini.pick").setup()
 map("n", "<leader><leader>", ":Pick files<CR>")
 map("n", "<leader>/", ":Pick grep_live<CR>")
 map("n", "<leader>sh", ":Pick help<CR>")
-require("nvim-treesitter.configs").setup({
-  auto_install = true, -- requires tree-sitter CLI
-  ensure_installed = { "lua", "vim", "vimdoc", "markdown", "markdown_inline" },
-  highlight = { enable = true },
-})
 
 -- lsp
 vim.lsp.enable({ "lua_ls", "gopls" })
@@ -54,14 +48,15 @@ vim.lsp.config("lua_ls", {
   },
 })
 
--- auto-completion (:help omnicompletion); trigger manually with CTRL+X CTRL+O
+-- auto-completion (:help lsp-completion), trigger manually with ctrl+o ctrl+x
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(ev)
     local client = vim.lsp.get_client_by_id(ev.data.client_id)
-    if client then
-      if client:supports_method("textDocument/completion") then
-        vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
-      end
+    if client and client:supports_method("textDocument/completion") then
+      -- trigger on every keypress, not just the server's triggerCharacters (:help lsp-autocompletion)
+      client.server_capabilities.completionProvider.triggerCharacters =
+        vim.split("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_", "")
+      vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
     end
   end,
 })
