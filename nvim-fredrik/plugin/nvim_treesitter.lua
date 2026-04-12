@@ -1,5 +1,5 @@
-require("lazyload").on_vim_enter(function()
-  if Config.use_nvim_treesitter then
+if Config.use_nvim_treesitter then
+  require("lazyload").on_vim_enter(function()
     vim.api.nvim_create_autocmd("PackChanged", {
       callback = function(ev)
         if ev.data.spec.name == "nvim-treesitter" then
@@ -65,62 +65,62 @@ require("lazyload").on_vim_enter(function()
         multiwindow = true,
       })
     end)
-  end
 
-  --- Sign parser .so on macOS to prevent code-signature crashes.
-  ---@param parser_name string
-  local function sign_parser_macos(parser_name)
-    if vim.fn.has("mac") ~= 1 then
-      return
-    end
-    local parser_path = vim.fn.stdpath("data") .. "/site/parser/" .. parser_name .. ".so"
-    if vim.fn.filereadable(parser_path) == 1 then
-      vim.fn.system({ "codesign", "--force", "--sign", "-", parser_path })
-    end
-  end
-
-  --- Install a parser via nvim-treesitter.
-  ---@param lang string parser/language name
-  ---@return boolean success
-  local function install_parser(lang)
-    if not Config.use_nvim_treesitter then
-      return false
-    end
-    local parsers = require("nvim-treesitter.parsers")
-    if not parsers[lang] then
-      return false
-    end
-    require("nvim-treesitter").install({ lang }):wait(30000)
-    sign_parser_macos(lang)
-    return true
-  end
-
-  --- Auto-start treesitter highlighting for every buffer.
-  --- Registered at plugin/ sourcing time (step 11) so it runs before LSP's
-  --- FileType handlers (registered at VimEnter), preventing race conditions
-  --- with plugins that use treesitter queries on LspAttach.
-  vim.api.nvim_create_autocmd("FileType", {
-    group = vim.api.nvim_create_augroup("treesitter-start", { clear = true }),
-    callback = function(event)
-      local bufnr = event.buf
-      local ft = event.match
-      if ft == "" then
+    --- Sign parser .so on macOS to prevent code-signature crashes.
+    ---@param parser_name string
+    local function sign_parser_macos(parser_name)
+      if vim.fn.has("mac") ~= 1 then
         return
       end
-
-      local lang = vim.treesitter.language.get_lang(ft)
-      if not lang then
-        return
+      local parser_path = vim.fn.stdpath("data") .. "/site/parser/" .. parser_name .. ".so"
+      if vim.fn.filereadable(parser_path) == 1 then
+        vim.fn.system({ "codesign", "--force", "--sign", "-", parser_path })
       end
+    end
 
-      local ok = pcall(vim.treesitter.start, bufnr, lang)
-      if ok then
-        return
+    --- Install a parser via nvim-treesitter.
+    ---@param lang string parser/language name
+    ---@return boolean success
+    local function install_parser(lang)
+      if not Config.use_nvim_treesitter then
+        return false
       end
+      local parsers = require("nvim-treesitter.parsers")
+      if not parsers[lang] then
+        return false
+      end
+      require("nvim-treesitter").install({ lang }):wait(30000)
+      sign_parser_macos(lang)
+      return true
+    end
 
-      if install_parser(lang) then
-        pcall(vim.treesitter.start, bufnr, lang)
-      end
-    end,
-  })
-end)
+    --- Auto-start treesitter highlighting for every buffer.
+    --- Registered at plugin/ sourcing time (step 11) so it runs before LSP's
+    --- FileType handlers (registered at VimEnter), preventing race conditions
+    --- with plugins that use treesitter queries on LspAttach.
+    vim.api.nvim_create_autocmd("FileType", {
+      group = vim.api.nvim_create_augroup("treesitter-start", { clear = true }),
+      callback = function(event)
+        local bufnr = event.buf
+        local ft = event.match
+        if ft == "" then
+          return
+        end
+
+        local lang = vim.treesitter.language.get_lang(ft)
+        if not lang then
+          return
+        end
+
+        local ok = pcall(vim.treesitter.start, bufnr, lang)
+        if ok then
+          return
+        end
+
+        if install_parser(lang) then
+          pcall(vim.treesitter.start, bufnr, lang)
+        end
+      end,
+    })
+  end)
+end

@@ -6,14 +6,14 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
-if Config.use_nvim_treesitter then
+if Config.use_treesitter_parser then
   vim.pack.add({
     { src = "https://github.com/edte/blink-go-import.nvim" },
     { src = "https://github.com/maxandron/goplements.nvim" },
   })
 end
 
-if Config.use_nvim_treesitter then
+if Config.use_treesitter_parser then
   vim.api.nvim_create_autocmd("FileType", {
     pattern = "go",
     once = true,

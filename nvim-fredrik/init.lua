@@ -11,8 +11,12 @@ vim.loader.enable()
 -- States for this Neovim config.
 _G.Config = {
   nvim_start_time = nvim_start_time,
-  use_nvim_treesitter = true,
   called = {},
+
+  -- experiment: nvim-treesitter alternatives
+  use_treesitter_parser = true,
+  use_nvim_treesitter = false,
+  use_arborist = true,
 }
 
 vim.g.mapleader = " "

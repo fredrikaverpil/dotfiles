@@ -27,7 +27,7 @@ require("lazyload").on_vim_enter(function()
     },
   }
 
-  if Config.use_nvim_treesitter then
+  if Config.use_treesitter_parser then
     table.insert(default_sources, "go_pkgs")
     providers.go_pkgs = {
       name = "Import",

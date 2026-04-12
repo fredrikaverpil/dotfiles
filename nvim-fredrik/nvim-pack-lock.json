@@ -12,6 +12,10 @@
       "rev": "b2e84d00db4d5432f471d58898e796b478f075a7",
       "src": "https://github.com/b0o/SchemaStore.nvim"
     },
+    "arborist.nvim": {
+      "rev": "99b9a87d1e19867093fe00ef9afa4def9761a38e",
+      "src": "https://github.com/arborist-ts/arborist.nvim"
+    },
     "arrow.nvim": {
       "rev": "6e0f726f55f99332dd726a53effd6813786b6d49",
       "src": "https://github.com/otavioschwanck/arrow.nvim"
