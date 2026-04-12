@@ -1,152 +1,160 @@
-# nvim-fredrik
+# nvim-native
 
-![neovim](https://github.com/user-attachments/assets/92cf0049-05fc-4ca8-8ec2-d1ff58e48ab9)
-
-## Features
-
-- Taking a lot of inspiration from
-  [LazyVim](https://github.com/LazyVim/LazyVim), but with the tranquility of
-  maintaining it myself.
-- Per-language configs.
-- Per-project overrides (`.lazy.lua` files discovered from `cwd` up to `$HOME`).
-- Native LSP definitions (`vim.lsp.config` and `vim.lsp.enable`).
-- Native snippets.
-- Native vim folding, using LSP when applicable.
-- Snacks pickers.
-- Inline image link rendering (kitty graphics protocol).
-- Blink.cmp for completion.
-- One unified keymap file.
-- Conform.nvim for formatting.
-- Nvim-lint for linting.
-- Neotest and nvim-dap for testing and debugging.
-- Snacks.nvim for QoL improvements.
-- Mason for managing tools used by plugins and LSPs.
-- Gx.nvim for universal `gx` keymap.
-- CodeDiff.nvim for reviewing PRs.
-- Sidekick.nvim for interacting with e.g. Claude Code.
-- And much, much more...
-
-## Try it out! 🚀
-
-> [!NOTE]
->
-> I'm not maintaining my Neovim config for anyone besides myself. But I'm making
-> it publicly available for others to draw inspiration from! 😊
->
-> You will likely see a bunch of errors, as tools/plugins cannot be
-> installed/compiled due to missing binaries.
-
-### Using NVIM_APPNAME
-
-> [!NOTE]
->
-> Requires Neovim >= v0.11.0.
+## Usage
 
 ```sh
-# clone repo
-git clone https://github.com/fredrikaverpil/dotfiles.git
-
-# create symlink
-ln -s dotfiles/nvim-fredrik ~/.config/fredrik
-
-# run nvim with NVIM_APPNAME=nvim-fredrik
-NVIM_APPNAME=nvim-fredrik nvim
+NVIM_APPNAME=nvim-native nvim
 ```
 
-### Using container
+Symlinked via GNU Stow. Run `./rebuild.sh --stow` from `~/.dotfiles/` to apply.
+## Structure
 
-```Dockerfile
-FROM ubuntu:22.04
-
-ENV DOTFILES=/dotfiles
-
-# install prerequisites
-RUN apt-get update && apt-get install curl git gcc cmake make fd-find ripgrep -y
-
-# install nvim
-RUN curl -LO https://github.com/neovim/neovim/releases/download/v0.11.0/nvim-linux-x86_64.tar.gz
-RUN tar -C /opt -xzf nvim-linux-x86_64.tar.gz
-ENV PATH="$PATH:/opt/nvim-linux-x86_64/bin"
-
-# install dotfiles
-RUN git clone https://github.com/fredrikaverpil/dotfiles.git ${DOTFILES}
-
-# symlink neovim config into place
-RUN mkdir -p ~/.config
-RUN ln -s ${DOTFILES}/nvim-fredrik/ ~/.config/nvim
-
-# install mason-managed tools
-RUN nvim "+Lazy! install" +MasonToolsInstallSync +q!
-
-WORKDIR /app
+```
+nvim-native/
+  init.lua                    requires core modules, debug_config, profile_config
+  lua/
+    debug_config.lua          OSV config (debug the config itself)
+    profile_config.lua        profile.nvim config
+    lazyload.lua                VimEnter/UIEnter deferred setup queues
+    options.lua               all vim.opt settings
+    fold.lua                  fold helpers (treesitter default + LSP override)
+    toggle.lua                toggle functions (auto-format, inlay hints)
+    colors.lua                color utility (blend)
+    exrc.lua                  list project-local .nvim.lua files + trust status
+```
+  lsp/                        (unused; nvim-lspconfig provides base configs)
+  plugin/
+    lang/                     per-language plugins, filetypes, editor settings, autocmds
+    diagnostics.lua           diagnostic display config
+    blink.lua                 completion (VimEnter)
+    conform.lua               formatting (VimEnter)
+    dap.lua                   debugging (deferred to first use)
+    lint.lua                  linting (VimEnter)
+    lsp.lua                   LSP servers (VimEnter)
+    lualine.lua               statusline (VimEnter)
+    mason.lua                 tool installation (VimEnter)
+    neotest.lua               testing (deferred to first use)
+    colorscheme.lua           zenbones + OSC11 dark/light detection
+    oil.lua                   file explorer
+    snacks.lua                QoL (picker, dashboard, lazygit, terminal)
+    treesitter.lua            syntax highlighting + context (VimEnter)
+    ...                       other feature plugins
+  after/
+    lsp/                      overrides for nvim-lspconfig base configs
 ```
 
-```sh
-docker build --platform linux/amd64 . -t nvim-fredrik
-docker run --rm --platform linux/amd64 -it -v $(pwd):/app nvim-fredrik
+## Architecture
+
+The `init.lua` defines `_G.Config` (for global states), `vim.opt` options, some
+keymaps and custom behaviors.
+
+Core plugin files (`plugin/*.lua`) own all tool configuration inline — LSP
+servers, formatters, linters, completion sources, DAP adapters, neotest
+adapters, etc.
+
+Language files (`plugin/lang/*.lua`) handle language-specific concerns that
+don't fit in the core plugins: per-filetype editor settings (`vim.opt_local` via
+`FileType` autocmds), extra `vim.pack.add()` calls, custom filetypes,
+SchemaStore loading, build hooks, and autocmds.
+
+### Plugin file layout
+
+Every plugin strives to lazy-load (except when they cannot). Helper functions
+are available in the `lazyload` module.
+
+```lua
+-- Deferred setup (VimEnter/UIEnter)
+require("lazyload").on_vim_enter(function()
+  -- Build hooks (must be registered BEFORE vim.pack.add)
+  vim.api.nvim_create_autocmd("PackChanged", { ... })
+
+  -- Load packages (immediate)
+  vim.pack.add(...)
+
+  -- Configure plugin
+  require("plugin").setup({ ... })
+
+  -- Set keymap(s)
+  vim.keymap.set( ... )
+end)
+
+-- 4. Keymaps
+vim.keymap.set(...)
 ```
 
-## Design choices
+- `on_vim_enter(fn)`: defer to `VimEnter`, then run the function async
+- `on_ui_enter(fn)`: defer to `UIEnter`, then run the function async
+- `call_once(fn)`: call the function only once
 
-I wanted to take a modular approach to my Neovim setup. This was made possible
-thanks to the quite amazing [lazy.nvim](https://github.com/folke/lazy.nvim)
-plugin manager.
+### Build hooks
 
-### Main initialization
+Plugins that need a build step after install or update use the `PackChanged`
+autocmd. Hooks must be registered **before** the `vim.pack.add()` call so they
+fire on first bootstrap:
 
-- In [lua/fredrik/init.lua](lua/fredrik/init.lua), the entire config is loaded
-  in sequence.
-- When loading all plugins, the `spec` (order of loading plugins) is defined in
-  [lua/fredrik/config/lazy.lua](lua/fredrik/config/lazy.lua):
-  1. Any plugin's config from the `plugins` folder.
-  2. Plugin configs for a specific language from the `plugins/lang` folder.
-  3. Plugin configs for "core" from the `plugins/core` folder.
-  4. (Per-project plugin configs from local per-project `.lazy.lua` file).
+```lua
+vim.api.nvim_create_autocmd("PackChanged", {
+  callback = function(ev)
+    if ev.data.spec.name == "nvim-treesitter" then
+      vim.cmd("TSUpdate")
+    end
+  end,
+})
+```
 
-### Order of plugins loading
+## Per-project overrides
 
-You can inspect the order of loading here:
-[lua/fredrik/config/lazy.lua](lua/fredrik/config/lazy.lua).
+Place a `.nvim.lua` in the the `$cwd` or above it. It runs at step 7c of
+[initialization](https://neovim.io/doc/user/starting/#_initialization) —
+**before** `plugin/` files (`:h exrc`).
 
-#### Generic plugin configs
+In order to execute the `.nvim.lua` files _after_ `/plugin` files, a custom exrc
+implementation was done in the `exrc` module.
 
-Plugin configs that are not associated with a certain language or needs complex
-setup are considered just to be a "plain" plugin. Their configs are defined in
-the [lua/fredrik/plugins](lua/fredrik/plugins) folder root.
+Example:
 
-#### Per-language plugin configs
+```lua
+-- ~/code/work/.nvim.lua
+-- Override markdown formatter
+require("conform").formatters_by_ft.markdown = { "mdformat" }
+require("conform").formatters.mdformat = {
+    prepend_args = { "--number", "--wrap", "80" },
+}
 
-For a complete and nice experience when working in a certain language,
-per-language configs are placed in
-[lua/fredrik/plugins/lang](lua/fredrik/plugins/lang).
+-- Override gopls settings
+vim.lsp.config.gopls.settings = {
+    gopls = {
+        analyses = {
+            ST1000 = false,
+            ST1020 = false,
+            ST1021 = false,
+        },
+    },
+}
+```
 
-Formatting, linting and LSP configs are specified in the per-language plugin
-configs. This provides a complete picture of what is supported by browsing a
-language config file. Removing a language lua file should remove everything that
-is related to that language.
-
-#### Core plugin configs
-
-A "core" plugin config is just a term I came up with for representing a plugin
-which defines the `config` as part of its spec, and takes in multiple merged
-`opts` defined in several other lua files (such as the per-language configs).
-These "core" plugin configs reside in
-[lua/fredrik/plugins/core](lua/fredrik/plugins/core).
-
-This enables the ability to specify e.g. LSP configs in multiple files, which
-are then assembled and loaded in the "core" LSP plugin config.
-
-The end goal is to modularize the entire setup, using these "core" plugin
-configs.
-
-#### Per-project overrides ("local spec") via local `.lazy.lua`
-
-Lazy.nvim comes with the capability of reading a local, per-project, `.lazy.lua`
-file, which serves as a way to make changes and overrides, based on project
-needs. The contents of the `.lazy.lua` will be loaded at the end of the
-lazy.nvim spec and requires the lazy.nvim option `local_spec = true`.
-
-> [!NOTE]
+> [!ATTENTION]
 >
-> [Here's a GitHub search](https://github.com/search?q=path%3A%22.lazy.lua%22+language%3ALua+&type=code)
-> for`.lazy.lua`.
+> Overrides will load on `UIEnter`, but after any `on_ui_enter`-loaded plugin,
+> and can therefore not override plugins loaded after that event.
+
+## Plugin management
+
+Use the `:Pack` TUI or the built-in commands:
+
+- **Install**: `vim.pack.add()` in each file. New plugins install on first
+  launch.
+- **Update**: `:lua vim.pack.update()` — review in confirmation buffer, `:w` to
+  apply.
+- **Lockfile**: `nvim-pack-lock.json` — commit to VCS for reproducible installs.
+
+## Adding a new language
+
+1. Add the LSP server to `plugin/lsp.lua`
+2. Add Mason tools to `plugin/mason.lua`
+3. Add formatters to `plugin/conform.lua`
+4. Add linters to `plugin/lint.lua`
+5. `plugin/lang/<ft>.lua` — editor settings (`vim.opt_local` via `FileType`
+   autocmd), plugins, filetypes, autocmds
+6. _(optional)_ `after/lsp/<server>.lua` — override base config from
+   nvim-lspconfig

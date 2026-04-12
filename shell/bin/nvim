@@ -67,7 +67,7 @@ if [ -z "$NVIM_APPNAME" ]; then
   if [ "$HOSTNAME" = "rpi5-homelab" ]; then
     $NVIM_BINARY "$@"
   else
-    NVIM_APPNAME=nvim-native $NVIM_BINARY "$@"
+    NVIM_APPNAME=nvim-fredrik $NVIM_BINARY "$@"
   fi
 else
   echo "Warning: Using NVIM_APPNAME=$NVIM_APPNAME"
