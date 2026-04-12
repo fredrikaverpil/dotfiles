@@ -1,8 +1,6 @@
 # nvim-fredrik
 
-<img width="1280" height="720" alt="nvim-v0 12" src="https://github.com/user-attachments/assets/5566bb1c-d579-41d8-8f30-997f4fbecfeb" />
-
-
+![screenshot](https://github.com/user-attachments/assets/5566bb1c-d579-41d8-8f30-997f4fbecfeb)
 
 ## Usage
 

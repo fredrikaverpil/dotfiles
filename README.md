@@ -1,6 +1,6 @@
 # dotfiles 🍩
 
-![screenshot](https://github.com/user-attachments/assets/ef833ca0-3d39-4a7c-94af-0f76afb96e6b)
+![screenshot](https://github.com/user-attachments/assets/5566bb1c-d579-41d8-8f30-997f4fbecfeb)
 
 Personal dotfiles using [Nix](https://nixos.org) for reproducible system/package
 management and [GNU Stow](https://www.gnu.org/software/stow/) for dotfile
@@ -41,7 +41,7 @@ Dotfiles are managed with GNU Stow, not Nix:
 ```bash
 # Manual stow (if needed)
 cd ~/.dotfiles/stow
-stow --target="$HOME" --restow shared "$(uname -s)"
+stow --target="https://github.com/user-attachments/assets/5566bb1c-d579-41d8-8f30-997f4fbecfeb" --restow shared "$(uname -s)"
 ```
 
 ### Shell
