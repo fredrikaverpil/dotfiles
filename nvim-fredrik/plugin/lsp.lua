@@ -54,9 +54,7 @@ require("lazyload").on_vim_enter(function()
         end
 
         -- Workspace diagnostics
-        if client:supports_method("workspace/diagnostic", buf) then
-          vim.lsp.buf.workspace_diagnostics({ client_id = client.id })
-        end
+        require("workspace_diag").populate(client, buf)
 
         -- Inline completion
         if client:supports_method("textDocument/inlineCompletion", buf) then
