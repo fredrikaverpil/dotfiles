@@ -182,15 +182,6 @@
       "rev": "76865f7abba5f285e3f9d3cd4c0ad97250eb04de",
       "src": "https://github.com/chrisgrieser/nvim-rip-substitute"
     },
-    "nvim-treesitter": {
-      "rev": "4916d6592ede8c07973490d9322f187e07dfefac",
-      "src": "https://github.com/nvim-treesitter/nvim-treesitter",
-      "version": "'main'"
-    },
-    "nvim-treesitter-context": {
-      "rev": "b0c45cefe2c8f7b55fc46f34e563bc428ef99636",
-      "src": "https://github.com/nvim-treesitter/nvim-treesitter-context"
-    },
     "obsidian.nvim": {
       "rev": "f816915e0bf2f60f44d23a5e3d59658fa8a20094",
       "src": "https://github.com/obsidian-nvim/obsidian.nvim"
@@ -282,6 +273,10 @@
     "winshift.nvim": {
       "rev": "37468ed6f385dfb50402368669766504c0e15583",
       "src": "https://github.com/sindrets/winshift.nvim"
+    },
+    "workspace-diagnostics.nvim": {
+      "rev": "60f9175b2501ae3f8b1aba9719c0df8827610c8e",
+      "src": "https://github.com/artemave/workspace-diagnostics.nvim"
     },
     "yanky.nvim": {
       "rev": "784188e0a7363e762e53140f39124d786aec0832",
