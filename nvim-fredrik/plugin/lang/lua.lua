@@ -1,5 +1,4 @@
 require("lazyload").on_vim_enter(function()
-  -- FIXME: why do some lines act up when hitting enter at the end of them?
   vim.api.nvim_create_autocmd("FileType", {
     pattern = { "lua" },
     callback = function()
