@@ -9,7 +9,7 @@ vim.g.bones_compat = 1 -- use built-in vim highlight API, not lush.nvim
 do
   local function set_dark()
     vim.o.background = "dark"
-    vim.cmd.colorscheme("tokyobones")
+    vim.cmd.colorscheme("zenbones")
   end
 
   local function set_light()
