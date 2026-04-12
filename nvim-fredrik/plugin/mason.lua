@@ -8,7 +8,7 @@ require("lazyload").on_vim_enter(function()
   require("mason").setup({ PATH = "append" })
 
   require("mason-lock").setup({
-    lockfile_path = vim.env.DOTFILES .. "/nvim-native/mason-lock.json",
+    lockfile_path = vim.env.DOTFILES .. "/nvim-fredrik/mason-lock.json",
   })
 
   require("mason-lspconfig").setup({
