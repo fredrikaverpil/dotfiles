@@ -133,7 +133,7 @@ vim.lsp.config.gopls.settings = {
 }
 ```
 
-> [!ATTENTION]
+> [!NOTE]
 >
 > Overrides will load on `UIEnter`, but after any `on_ui_enter`-loaded plugin,
 > and can therefore not override plugins loaded after that event.
