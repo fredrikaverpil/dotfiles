@@ -1,6 +1,10 @@
 -- Editor options.
 -- Sourced from init.lua before any plugin/ files.
 
+-- Hide the built-in statusline/ruler until lualine loads.
+vim.opt.laststatus = 0
+vim.opt.ruler = false
+
 -- Line numbers
 vim.opt.number = true
 vim.opt.relativenumber = false
