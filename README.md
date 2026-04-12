@@ -1,6 +1,6 @@
 # dotfiles 🍩
 
-![screenshot](https://github.com/user-attachments/assets/5566bb1c-d579-41d8-8f30-997f4fbecfeb)
+![screenshot](https://github.com/user-attachments/assets/51c05d03-d997-40dc-8757-4d13993fcafb)
 
 Personal dotfiles using [Nix](https://nixos.org) for reproducible system/package
 management and [GNU Stow](https://www.gnu.org/software/stow/) for dotfile
