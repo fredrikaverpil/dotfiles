@@ -43,19 +43,22 @@ nvim-native/
 
 ## Architecture
 
-The `init.lua`
+The `init.lua` defines `_G.Config` (for global states), `vim.opt` options, some
+keymaps and custom behaviors.
 
 Core plugin files (`plugin/*.lua`) own all tool configuration inline — LSP
 servers, formatters, linters, completion sources, DAP adapters, neotest
-adapters, etc. Language files (`plugin/lang/*.lua`) handle language-specific
-concerns that don't fit in the core plugins: per-filetype editor settings
-(`vim.opt_local` via `FileType` autocmds), extra `vim.pack.add()` calls, custom
-filetypes, SchemaStore loading, build hooks, and autocmds.
+adapters, etc.
+
+Language files (`plugin/lang/*.lua`) handle language-specific concerns that
+don't fit in the core plugins: per-filetype editor settings (`vim.opt_local` via
+`FileType` autocmds), extra `vim.pack.add()` calls, custom filetypes,
+SchemaStore loading, build hooks, and autocmds.
 
 ### Plugin file layout
 
 Every plugin strives to lazy-load (except when they cannot). Helper functions
-available in the `lazyload` module.
+are available in the `lazyload` module.
 
 ```lua
 -- Deferred setup (VimEnter/UIEnter)
@@ -76,6 +79,10 @@ end)
 -- 4. Keymaps
 vim.keymap.set(...)
 ```
+
+- `on_vim_enter(fn)`: defer to `VimEnter`, then run the function async
+- `on_ui_enter(fn)`: defer to `UIEnter`, then run the function async
+- `call_once(fn)`: call the function only once
 
 ### Build hooks
 
@@ -100,7 +107,7 @@ Place a `.nvim.lua` in the the `$cwd` or above it. It runs at step 7c of
 **before** `plugin/` files (`:h exrc`).
 
 In order to execute the `.nvim.lua` files _after_ `/plugin` files, a custom exrc
-implementation was done in the `lazyloading` module.
+implementation was done in the `exrc` module.
 
 Example:
 
