@@ -7,19 +7,21 @@ NVIM_APPNAME=nvim-native nvim
 ```
 
 Symlinked via GNU Stow. Run `./rebuild.sh --stow` from `~/.dotfiles/` to apply.
-
 ## Structure
 
 ```
 nvim-native/
-  init.lua                    leader keys, require("options"), debug/profile
+  init.lua                    requires core modules, debug_config, profile_config
   lua/
+    debug_config.lua          OSV config (debug the config itself)
+    profile_config.lua        profile.nvim config
     lazyload.lua                VimEnter/UIEnter deferred setup queues
     options.lua               all vim.opt settings
     fold.lua                  fold helpers (treesitter default + LSP override)
     toggle.lua                toggle functions (auto-format, inlay hints)
     colors.lua                color utility (blend)
     exrc.lua                  list project-local .nvim.lua files + trust status
+```
   lsp/                        (unused; nvim-lspconfig provides base configs)
   plugin/
     lang/                     per-language plugins, filetypes, editor settings, autocmds
