@@ -74,9 +74,10 @@ require("lazyload").on_vim_enter(function()
         end
 
         -- Format on typing trigger characters
-        if client:supports_method("textDocument/onTypeFormatting", buf) then
-          vim.lsp.on_type_formatting.enable(true, { bufnr = buf })
-        end
+        -- NOTE: I think I rather use conform.nvim as otherwise this yields unexpected results.
+        -- if client:supports_method("textDocument/onTypeFormatting", buf) then
+        --   vim.lsp.on_type_formatting.enable(true, { bufnr = buf })
+        -- end
       end
 
       -- Keymaps
