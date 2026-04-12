@@ -1,4 +1,4 @@
-if Config.use_aborist then
+if Config.use_arborist then
   require("lazyload").on_vim_enter(function()
     vim.g.arborist_loaded = true -- skip auto-setup, we're configuring manually, because custom parsers
 
