@@ -1,4 +1,6 @@
 require("lazyload").on_vim_enter(function()
+  local dev = require("dev")
+
   -- filetypes
   do
     vim.filetype.add({
@@ -51,13 +53,8 @@ require("lazyload").on_vim_enter(function()
       end,
     })
 
-    require("dev").use({
-      dev = "~/code/public/godoc.nvim",
-      fallback = function()
-        vim.pack.add({
-          { src = "https://github.com/fredrikaverpil/godoc.nvim" },
-        })
-      end,
+    vim.pack.add({
+      { src = dev.prefer_local("~/code/public/godoc.nvim", "https://github.com/fredrikaverpil/godoc.nvim") },
     })
 
     require("godoc").setup({

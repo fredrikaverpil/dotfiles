@@ -1,11 +1,8 @@
 require("lazyload").on_vim_enter(function()
-  require("dev").use({
-    dev = "~/code/public/pr.nvim",
-    fallback = function()
-      vim.pack.add({
-        { src = "https://github.com/fredrikaverpil/pr.nvim" },
-      })
-    end,
+  local dev = require("dev")
+
+  vim.pack.add({
+    { src = dev.prefer_local("~/code/public/pr.nvim", "https://github.com/fredrikaverpil/pr.nvim") },
   })
 
   require("pr").setup({})
