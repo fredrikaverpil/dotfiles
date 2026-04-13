@@ -18,6 +18,14 @@ require("lazyload").on_vim_enter(function()
   })
 
   local neotest = require("neotest")
+  local neotest_defaults = require("neotest.config")
+
+  local function clone(value)
+    if type(value) == "table" then
+      return vim.deepcopy(value)
+    end
+    return value
+  end
 
   neotest.setup({
     adapters = {
@@ -47,8 +55,27 @@ require("lazyload").on_vim_enter(function()
       concurrent = 0,
     },
     running = { concurrent = true },
-    summary = { animated = true },
+
+    -- NOTE: workaround for avoiding LSP warnings due to missing fields
+    summary = vim.tbl_deep_extend("force", clone(neotest_defaults.summary), {
+      animated = true,
+    }),
     log_level = vim.log.levels.WARN,
+    consumers = clone(neotest_defaults.consumers),
+    icons = clone(neotest_defaults.icons),
+    highlights = clone(neotest_defaults.highlights),
+    floating = clone(neotest_defaults.floating),
+    strategies = clone(neotest_defaults.strategies),
+    run = clone(neotest_defaults.run),
+    output = clone(neotest_defaults.output),
+    output_panel = clone(neotest_defaults.output_panel),
+    quickfix = clone(neotest_defaults.quickfix),
+    status = clone(neotest_defaults.status),
+    state = clone(neotest_defaults.state),
+    watch = clone(neotest_defaults.watch),
+    diagnostic = clone(neotest_defaults.diagnostic),
+    projects = clone(neotest_defaults.projects),
+    default_strategy = neotest_defaults.default_strategy,
   })
 
   vim.api.nvim_create_autocmd("FileType", {
