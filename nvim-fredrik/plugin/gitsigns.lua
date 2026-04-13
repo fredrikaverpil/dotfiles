@@ -1,9 +1,7 @@
 require("lazyload").on_vim_enter(function()
   vim.pack.add({
-    { src = "https://github.com/lewis6991/gitsigns.nvim" },
+    { src = "https://github.com/lewis6991/gitsigns.nvim" }, -- calls setup() internally
   })
-
-  require("gitsigns").setup({})
 
   -- Hunk navigation
   vim.keymap.set("n", "]h", function()

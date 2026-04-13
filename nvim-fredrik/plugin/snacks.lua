@@ -2,7 +2,7 @@ vim.pack.add({
   { src = "https://github.com/folke/snacks.nvim" },
 })
 
-require("snacks").setup({
+Snacks.setup({
   styles = {
     notification = {
       border = "rounded",
@@ -38,8 +38,7 @@ require("snacks").setup({
 :oooo:     .::::llodd:
 .;ooo:       ;cclooo:.
 .;oc        'coo;.
- .'         .,.
-]],
+ .'         .,.]],
     },
     sections = {
       { section = "header" },
