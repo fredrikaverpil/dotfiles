@@ -190,6 +190,15 @@
       "rev": "9fe08300808a67773325d97ecb36d5777cc8e80d",
       "src": "https://github.com/chrisgrieser/nvim-rip-substitute"
     },
+    "nvim-treesitter": {
+      "rev": "4916d6592ede8c07973490d9322f187e07dfefac",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter",
+      "version": "'main'"
+    },
+    "nvim-treesitter-context": {
+      "rev": "b0c45cefe2c8f7b55fc46f34e563bc428ef99636",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter-context"
+    },
     "obsidian.nvim": {
       "rev": "3d8a102e8fe970815e1108ab7e22d53654710001",
       "src": "https://github.com/obsidian-nvim/obsidian.nvim"
