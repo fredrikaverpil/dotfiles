@@ -67,21 +67,14 @@ are available in the `lazyload` module.
 ```lua
 -- Deferred setup (VimEnter/UIEnter)
 require("lazyload").on_vim_enter(function()
-  -- Build hooks (must be registered BEFORE vim.pack.add)
   vim.api.nvim_create_autocmd("PackChanged", { ... })
 
-  -- Load packages (immediate)
   vim.pack.add(...)
 
-  -- Configure plugin
   require("plugin").setup({ ... })
 
-  -- Set keymap(s)
   vim.keymap.set( ... )
 end)
-
--- 4. Keymaps
-vim.keymap.set(...)
 ```
 
 - `on_vim_enter(fn)`: defer to `VimEnter`, then run the function async
