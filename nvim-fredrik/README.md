@@ -1,6 +1,6 @@
 # nvim-fredrik
 
-![screenshot](https://github.com/user-attachments/assets/5566bb1c-d579-41d8-8f30-997f4fbecfeb)
+![screenshot](https://github.com/user-attachments/assets/147570ce-09f5-44cb-b30c-dc172b59fdb3)
 
 ## Usage
 
