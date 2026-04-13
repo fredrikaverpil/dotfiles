@@ -90,7 +90,7 @@ receiving plugin's lazyload block:
 
 ```lua
 -- plugin/producer.lua
-_G.Config.some_data = { "foo", "bar" }
+Config.some_data = { "foo", "bar" }
 
 require("lazyload").on_vim_enter(function()
   -- plugin logic
@@ -100,7 +100,7 @@ end)
 ```lua
 -- plugin/consumer.lua
 require("lazyload").on_vim_enter(function()
-  local some_data = _G.Config.some_data or {}
+  local some_data = Config.some_data or {}
   -- plugin logic
 end)
 ```
