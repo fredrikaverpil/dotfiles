@@ -84,8 +84,8 @@ end)
 ### Cross-plugin data sharing
 
 Plugin files can pass data to each other through `_G.Config`, but it requires
-them both to be lazyloaded. Write to `_G.Config` at the **top level** of the
-file (outside the `on_vim_enter` / `on_ui_enter` block), and read it inside the
+them to be lazyloaded. Write to `_G.Config` at the **top level** of the file
+(outside the `on_vim_enter` / `on_ui_enter` block), and read it inside the
 receiving plugin's lazyload block:
 
 ```lua
