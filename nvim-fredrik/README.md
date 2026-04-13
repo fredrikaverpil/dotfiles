@@ -88,6 +88,34 @@ vim.keymap.set(...)
 - `on_ui_enter(fn)`: defer to `UIEnter`, then run the function async
 - `call_once(fn)`: call the function only once
 
+### Cross-plugin data sharing
+
+Plugin files can pass data to each other through `_G.Config`, but it requires
+them both to be lazyloaded. Write to `_G.Config` at the **top level** of the
+file (outside the `on_vim_enter` / `on_ui_enter` block), and read it inside the
+receiving plugin's lazyload block:
+
+```lua
+-- plugin/producer.lua
+_G.Config.some_data = { "foo", "bar" }
+
+require("lazyload").on_vim_enter(function()
+  -- plugin logic
+end)
+```
+
+```lua
+-- plugin/consumer.lua
+require("lazyload").on_vim_enter(function()
+  local some_data = _G.Config.some_data or {}
+  -- plugin logic
+end)
+```
+
+Top-level assignments execute when Neovim sources `plugin/` files (before any
+`VimEnter` callback runs), so the data is always available by the time lazyload
+blocks fire.
+
 ### Build hooks
 
 Plugins that need a build step after install or update use the `PackChanged`
