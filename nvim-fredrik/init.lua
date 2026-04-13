@@ -12,15 +12,18 @@ vim.loader.enable()
 _G.Config = {
   nvim_start_time = nvim_start_time,
   called = {},
-
-  -- experiment: nvim-treesitter alternatives
   use_treesitter_parser = true,
-  use_nvim_treesitter = false,
-  use_arborist = true,
+  use_nvim_treesitter = true,
+  use_arborist = false, -- experiment
 }
+function _G.Config.add(spec)
+  require("merge")(_G.Config, spec)
+end
 
 vim.g.mapleader = " "
 vim.g.maplocalleader = ","
+
+vim.pack.add({ { src = "https://github.com/hat0uma/csvview.nvim" } }, { load = false })
 
 require("options")
 require("keymaps")
