@@ -69,6 +69,10 @@
       "rev": "8d82c240f190fc33723d48c308ccc1ed8baad69d",
       "src": "https://github.com/lewis6991/gitsigns.nvim"
     },
+    "godoc.nvim": {
+      "rev": "a8b4feb18fcf5fc800161ba9be91cc96706fba33",
+      "src": "/Users/fredrik/code/public/godoc.nvim"
+    },
     "goplements.nvim": {
       "rev": "1750ace64d42efcbc1ce36eef848a3cea5f88c79",
       "src": "https://github.com/maxandron/goplements.nvim"
@@ -125,6 +129,10 @@
       "rev": "fd0b7986dd0ae04e38ec7dc0c78a432e3820839c",
       "src": "https://github.com/nvim-neotest/neotest"
     },
+    "neotest-golang": {
+      "rev": "48634bebbfa1fe63ed50f170916112c538d8e70d",
+      "src": "/Users/fredrik/code/public/neotest-golang"
+    },
     "neotest-plenary": {
       "rev": "3523adcf9ffaad1911960c5813b0136c1b63a2ec",
       "src": "https://github.com/nvim-neotest/neotest-plenary"
@@ -171,7 +179,7 @@
       "src": "https://codeberg.org/mfussenegger/nvim-lint"
     },
     "nvim-lspconfig": {
-      "rev": "cb5bc0b2b35a6d513e3298d285db81453e791f4f",
+      "rev": "8a9378a822719346a0288fa004dab302ca3c0a8f",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "nvim-nio": {
@@ -179,11 +187,11 @@
       "src": "https://github.com/nvim-neotest/nvim-nio"
     },
     "nvim-rip-substitute": {
-      "rev": "76865f7abba5f285e3f9d3cd4c0ad97250eb04de",
+      "rev": "9fe08300808a67773325d97ecb36d5777cc8e80d",
       "src": "https://github.com/chrisgrieser/nvim-rip-substitute"
     },
     "obsidian.nvim": {
-      "rev": "f816915e0bf2f60f44d23a5e3d59658fa8a20094",
+      "rev": "3d8a102e8fe970815e1108ab7e22d53654710001",
       "src": "https://github.com/obsidian-nvim/obsidian.nvim"
     },
     "oil-git.nvim": {
@@ -210,8 +218,12 @@
       "rev": "74b06c6c75e4eeb3108ec01852001636d85a932b",
       "src": "https://github.com/nvim-lua/plenary.nvim"
     },
+    "pr.nvim": {
+      "rev": "b62db73e5434c7abcec3f10b7e04f8a49a7fcbc2",
+      "src": "/Users/fredrik/code/public/pr.nvim"
+    },
     "render-markdown.nvim": {
-      "rev": "54d4b5431e9634ee3d8d30784e017239b5b89d41",
+      "rev": "0fd43fb4b1f073931c4b481f5f3b7cea3749e190",
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
     "showkeys": {
@@ -273,10 +285,6 @@
     "winshift.nvim": {
       "rev": "37468ed6f385dfb50402368669766504c0e15583",
       "src": "https://github.com/sindrets/winshift.nvim"
-    },
-    "workspace-diagnostics.nvim": {
-      "rev": "60f9175b2501ae3f8b1aba9719c0df8827610c8e",
-      "src": "https://github.com/artemave/workspace-diagnostics.nvim"
     },
     "yanky.nvim": {
       "rev": "784188e0a7363e762e53140f39124d786aec0832",
