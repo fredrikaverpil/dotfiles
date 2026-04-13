@@ -48,7 +48,11 @@ appears disproportionately often -- this is the clearest signal of codebase drag
 
 Run in parallel with steps 1a, 1c-1e.
 
-Run both of these commands:
+Commit count alone is a poor proxy for ownership. Someone reformatting config
+files 100 times looks more "important" than someone who architected a core
+subsystem in 5 commits. Gather multiple signals to build a nuanced picture.
+
+#### 1b-i. Commit counts (all-time vs recent)
 
 ```bash
 git shortlog -sn --no-merges
@@ -58,12 +62,51 @@ git shortlog -sn --no-merges
 git shortlog -sn --no-merges --since="6 months ago"
 ```
 
-Compare all-time vs recent 6-month contributor rankings. Flag single points of
-failure (one person > 60% of commits) and note whether original architects are
-still active.
+#### 1b-ii. Lines changed per author
 
-**Success criteria**: Two ranked contributor lists (all-time and recent) are
-produced, with bus-factor observations.
+For the top 5 contributors by commit count, measure insertions and deletions:
+
+```bash
+git log --author="<name>" --numstat --no-merges --format='' | awk '{ add += $1; del += $2 } END { print "+" add, "-" del }'
+```
+
+This distinguishes high-volume contributors from high-frequency ones.
+
+#### 1b-iii. Subsystem ownership
+
+Identify the top-level directories in the repo, then for each one show the top 3
+contributors:
+
+```bash
+git shortlog -sn --no-merges -- <directory>
+```
+
+This reveals domain expertise — one person may own 80% of `infra/` while another
+owns `src/auth/`. Concentrated subsystem ownership is a bus-factor risk even when
+overall commit counts look balanced.
+
+#### 1b-iv. Commit sampling
+
+For each of the top 3 contributors, sample their 5 most recent commits:
+
+```bash
+git log --author="<name>" --no-merges --oneline -5
+```
+
+Use the commit messages to characterize the nature of their work: features, bug
+fixes, refactoring, formatting, dependency updates, etc. This adds qualitative
+context that numbers alone cannot provide.
+
+#### Synthesis
+
+Combine all four signals into an ownership assessment. A contributor with few
+commits but large line changes in critical subsystems is more important than
+commit count suggests. Conversely, someone with many commits that are mostly
+formatting or config changes carries less bus-factor risk.
+
+**Success criteria**: Contributor rankings (all-time and recent), lines-changed
+breakdown, per-subsystem ownership, and commit samples are produced, with a
+nuanced bus-factor assessment that goes beyond raw commit counts.
 
 ### 1c. Bug Hotspots
 
