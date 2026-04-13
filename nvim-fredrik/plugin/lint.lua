@@ -37,7 +37,7 @@ require("lazyload").on_vim_enter(function()
   }
 
   vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost" }, {
-    group = vim.api.nvim_create_augroup("nvim-lint", { clear = true }),
+    group = vim.api.nvim_create_augroup("lint", { clear = true }),
     callback = function()
       lint.try_lint()
     end,
@@ -85,7 +85,7 @@ require("lazyload").on_vim_enter(function()
 
     -- buf_lint
     vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost" }, {
-      group = vim.api.nvim_create_augroup("native-buf-lint", { clear = true }),
+      group = vim.api.nvim_create_augroup("lint-buf", { clear = true }),
       pattern = { "*.proto" },
       callback = function()
         lint.try_lint("buf_lint", {
@@ -170,7 +170,7 @@ require("lazyload").on_vim_enter(function()
       }
 
       vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost" }, {
-        group = vim.api.nvim_create_augroup("native-api-linter", { clear = true }),
+        group = vim.api.nvim_create_augroup("lint-api-linter", { clear = true }),
         pattern = { "*.proto" },
         callback = function()
           lint.try_lint("api_linter", {

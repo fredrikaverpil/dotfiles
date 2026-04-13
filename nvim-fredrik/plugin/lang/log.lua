@@ -4,6 +4,7 @@ require("lazyload").on_vim_enter(function()
   })
 
   vim.api.nvim_create_autocmd("FileType", {
+    group = vim.api.nvim_create_augroup("log-highlight", { clear = true }),
     pattern = "log",
     once = true,
     callback = function()

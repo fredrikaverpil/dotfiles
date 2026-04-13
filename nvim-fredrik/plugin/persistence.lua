@@ -25,7 +25,7 @@ require("lazyload").on_vim_enter(function()
 
   vim.api.nvim_create_autocmd("User", {
     pattern = "PersistenceSavePre",
-    group = vim.api.nvim_create_augroup("native-persistence", { clear = true }),
+    group = vim.api.nvim_create_augroup("persistence", { clear = true }),
     callback = delete_hidden_buffers,
   })
 end)

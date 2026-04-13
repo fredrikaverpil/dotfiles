@@ -80,6 +80,7 @@ end
 
 -- Open file under cursor in the widest window when in neotest-output.
 vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("neotest-output", { clear = true }),
   pattern = "neotest-output",
   callback = function()
     vim.keymap.set("n", "gF", function()

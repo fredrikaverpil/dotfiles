@@ -1,6 +1,6 @@
 require("lazyload").on_vim_enter(function()
   vim.api.nvim_create_autocmd("FileType", {
-    group = vim.api.nvim_create_augroup("native-markdown-opts", { clear = true }),
+    group = vim.api.nvim_create_augroup("markdown-opts", { clear = true }),
     pattern = "markdown",
     callback = function()
       vim.opt_local.wrap = true

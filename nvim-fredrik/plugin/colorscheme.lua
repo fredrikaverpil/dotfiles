@@ -121,7 +121,7 @@ do
 
   vim.api.nvim_create_autocmd("ColorScheme", {
     pattern = { "zenbones", "zenwritten", "zenburned", "*bones" },
-    group = vim.api.nvim_create_augroup("native-zenbones-overrides", { clear = true }),
+    group = vim.api.nvim_create_augroup("zenbones-overrides", { clear = true }),
     callback = function()
       vim.schedule(apply_overrides)
     end,

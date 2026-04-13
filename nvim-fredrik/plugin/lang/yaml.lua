@@ -14,6 +14,7 @@ require("lazyload").on_vim_enter(function()
   vim.treesitter.language.register("yaml", "dependabot")
 
   vim.api.nvim_create_autocmd("FileType", {
+    group = vim.api.nvim_create_augroup("yaml-opts", { clear = true }),
     pattern = { "yaml", "gha", "dependabot" },
     callback = function(event)
       vim.opt_local.tabstop = 2

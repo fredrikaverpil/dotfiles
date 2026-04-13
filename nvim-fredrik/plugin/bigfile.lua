@@ -135,7 +135,7 @@ vim.api.nvim_create_autocmd("FileType", {
 -- filetype after vim.filetype.add already matched "bigfile". Re-check
 -- after filetype detection is complete and force bigfile if needed.
 vim.api.nvim_create_autocmd("BufReadPost", {
-  group = vim.api.nvim_create_augroup("bigfile_fallback", { clear = true }),
+  group = vim.api.nvim_create_augroup("bigfile-fallback", { clear = true }),
   callback = function(ev)
     if vim.bo[ev.buf].filetype == "bigfile" then
       return

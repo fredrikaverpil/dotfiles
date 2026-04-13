@@ -1,7 +1,7 @@
 require("lazyload").on_vim_enter(function()
   vim.api.nvim_set_hl(0, "Cursorword", { default = true, underline = true })
 
-  local group = vim.api.nvim_create_augroup("Cursorword", { clear = true })
+  local group = vim.api.nvim_create_augroup("cursorword", { clear = true })
 
   vim.api.nvim_create_autocmd("CursorHold", {
     group = group,

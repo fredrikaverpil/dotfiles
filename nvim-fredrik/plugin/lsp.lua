@@ -37,7 +37,7 @@ require("lazyload").on_vim_enter(function()
   vim.lsp.codelens.enable(true)
 
   vim.api.nvim_create_autocmd("LspAttach", {
-    group = vim.api.nvim_create_augroup("native-lsp-attach", { clear = true }),
+    group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
     callback = function(args)
       local client = vim.lsp.get_client_by_id(args.data.client_id)
       local buf = args.buf
@@ -104,6 +104,7 @@ require("lazyload").on_vim_enter(function()
 
   -- LSP progress spinner
   vim.api.nvim_create_autocmd("LspProgress", {
+    group = vim.api.nvim_create_augroup("lsp-progress", { clear = true }),
     ---@param ev {data: {client_id: integer, params: lsp.ProgressParams}}
     callback = function(ev)
       local spinner = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }

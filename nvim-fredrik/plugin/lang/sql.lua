@@ -8,6 +8,7 @@ require("lazyload").on_vim_enter(function()
   })
 
   vim.api.nvim_create_autocmd("PackChanged", {
+    group = vim.api.nvim_create_augroup("sql-build", { clear = true }),
     callback = function(ev)
       if ev.data.spec.name == "sqlit.nvim" then
         vim.system({ "uv", "tool", "install", "sqlit-tui", "--with", "google-cloud-bigquery" })

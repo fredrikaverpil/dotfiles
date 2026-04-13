@@ -217,7 +217,7 @@ function M.setup()
 
   vim.api.nvim_create_autocmd("FileType", {
     pattern = "qf",
-    group = vim.api.nvim_create_augroup("native-quickfix", { clear = true }),
+    group = vim.api.nvim_create_augroup("quickfix", { clear = true }),
     callback = function(event)
       local bufnr = event.buf
       local wininfo = vim.fn.getwininfo(vim.fn.bufwinid(bufnr))[1]
