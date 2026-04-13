@@ -19,27 +19,29 @@ v0.12.0.
 
 ## This config's location
 
-The native config lives at **`~/.dotfiles/nvim-native/`** inside the dotfiles
+The native config lives at **`~/.dotfiles/nvim-fredrik/`** inside the dotfiles
 repo. It is symlinked into place via GNU Stow:
 
 ```
-~/.dotfiles/nvim-native/          <- actual files (edit here)
-~/.dotfiles/stow/shared/.config/nvim-native -> ../../../nvim-native  (stow entry)
-~/.config/nvim-native -> ~/.dotfiles/stow/shared/.config/nvim-native  (stow result)
+~/.dotfiles/nvim-fredrik/          <- actual files (edit here)
+~/.dotfiles/stow/shared/.config/nvim-fredrik -> ../../../nvim-fredrik  (stow entry)
+~/.config/nvim-fredrik -> ~/.dotfiles/stow/shared/.config/nvim-fredrik  (stow result)
 ```
 
 To launch this config:
 
 ```sh
-NVIM_APPNAME=nvim-native nvim
+NVIM_APPNAME=nvim-fredrik nvim
 ```
-
-The dotfiles repo also contains a lazy.nvim-based config at
-`~/.dotfiles/nvim-fredrik/` (launched with `NVIM_APPNAME=nvim-fredrik nvim`).
 
 To apply stow symlinks after changes: `./rebuild.sh --stow` from `~/.dotfiles/`.
 Neovim itself is managed by [Bob](https://github.com/MordechaiHadad/bob), not
 nixpkgs -- binary at `~/.local/share/bob/nvim-bin/nvim`.
+
+The dotfiles repo also contains `nvim-legacy/` -- the previous lazy.nvim-based
+config (heavily inspired by LazyVim). It can be useful as a reference for how
+things were solved in the old paradigm. Launched with
+`NVIM_APPNAME=nvim-legacy nvim`.
 
 ## Documentation
 
@@ -173,8 +175,24 @@ This config has no framework -- each directory has a single responsibility:
 | **server config**    | `after/lsp/`      | All LSP server config tables (in after/ to override package defaults)                    |
 
 Each plugin file is **self-contained** -- it installs its own packages, sets up
-the plugin inline, and defines its own keymaps. There is no cross-plugin data
-passing; each file owns its full configuration.
+the plugin inline, and defines its own keymaps.
+
+**Cross-plugin data sharing** via `_G.Config`: Write to `_G.Config` at the
+**top level** of the producer file (outside `on_vim_enter`), and read it inside
+the consumer's lazyload block. Top-level assignments execute when Neovim sources
+`plugin/` files (step 11, before any `VimEnter` callback runs), so the data is
+always available by the time lazyload blocks fire:
+
+```lua
+-- plugin/producer.lua
+_G.Config.some_data = { "foo", "bar" }
+require("lazyload").on_vim_enter(function() ... end)
+
+-- plugin/consumer.lua
+require("lazyload").on_vim_enter(function()
+  local some_data = _G.Config.some_data or {}
+end)
+```
 
 ---
 
@@ -184,7 +202,7 @@ Conceptual layout (`:h initialization`, step 11 uses `plugin/**/*.{vim,lua}` --
 **subdirectories included**):
 
 ```
-~/.config/nvim-native/
+~/.config/nvim-fredrik/
   init.lua               -- leader keys, require("options"), diagnostics, keymaps
   lua/
     lazyload.lua         -- VimEnter/UIEnter deferred setup queues
@@ -332,8 +350,7 @@ look.
 Use when the plugin must take effect before the first paint, or when another
 plugin's deferred setup callback or a pre-VimEnter autocmd `require()`s it.
 Colorscheme, `snacks.nvim` (dashboard), `mini.icons`, `treesitter.lua`,
-`blink.cmp` (dependency of `lsp.lua`'s callback), `nvim-lint` (dependency of
-`plugin/lang/protobuf.lua`'s BufEnter autocmd).
+`blink.cmp` (dependency of `lsp.lua`'s callback).
 
 ```lua
 -- plugin/oil.lua
@@ -498,6 +515,27 @@ vim.pack.add({
 Event data: `ev.data.kind` (`"install"`, `"update"`, `"delete"`), `ev.data.spec`
 (plugin spec), `ev.data.path` (full path to plugin directory).
 
+**Use `do/end` blocks** to scope locals and visually separate sections in long
+plugin files. This keeps helpers from leaking into the rest of the file and
+makes boundaries between logical sections obvious:
+
+```lua
+require("lazyload").on_vim_enter(function()
+  local lint = require("lint")
+
+  lint.linters_by_ft = { ... }
+
+  -- protobuf linters
+  do
+    local cached_config = nil
+    local function find_config() ... end
+    vim.api.nvim_create_autocmd(...)
+  end
+
+  lint.try_lint()
+end)
+```
+
 **Always** pass `{ clear = true }` to `nvim_create_augroup` -- prevents
 duplicate autocmds if the file is re-sourced.
 
@@ -509,7 +547,7 @@ colorscheme, snacks (dashboard). Most plugins use `lazyload.on_vim_enter(fn)`
 **Profile startup with `--startuptime`:**
 
 ```sh
-NVIM_APPNAME=nvim-native nvim --startuptime /tmp/startup.log --headless +q
+NVIM_APPNAME=nvim-fredrik nvim --startuptime /tmp/startup.log --headless +q
 ```
 
 The log columns are:
@@ -632,7 +670,7 @@ specific window (e.g. LSP foldexpr override in `LspAttach`).
 | Runtime        | `vim.fn.expand("$VIMRUNTIME")`              | `.../share/nvim/runtime` |
 | Cache          | `vim.fn.stdpath("cache")`                   | `~/.cache/nvim`          |
 
-With `NVIM_APPNAME=nvim-native`, paths use `nvim-native` instead of `nvim`.
+With `NVIM_APPNAME=nvim-fredrik`, paths use `nvim-fredrik` instead of `nvim`.
 
 ---
 
