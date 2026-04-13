@@ -33,7 +33,7 @@ if Config.use_arborist then
 
     local opts = {
       install_popular = false,
-      update_cadencey = "weekly",
+      update_cadence = "weekly",
       overrides = {},
     }
 
