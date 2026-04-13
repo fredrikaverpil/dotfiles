@@ -6,6 +6,7 @@ require("lazyload").on_vim_enter(function()
     { src = "https://github.com/theHamsta/nvim-dap-virtual-text" },
     { src = "https://github.com/leoluz/nvim-dap-go" },
     { src = "https://codeberg.org/mfussenegger/nvim-dap-python" },
+    { src = "https://github.com/jbyuki/one-small-step-for-vimkind" },
   })
 
   for name, sign in pairs(require("icons").dap) do
