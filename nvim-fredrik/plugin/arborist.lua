@@ -7,7 +7,7 @@ if Config.use_arborist then
     local custom_parsers = {
       {
         lang = "fga",
-        register = { "fga", "fga" },
+        filetype = "fga",
         config = {
           install_info = {
             url = "https://github.com/matoous/tree-sitter-fga",
@@ -19,7 +19,7 @@ if Config.use_arborist then
       },
       {
         lang = "godoc",
-        register = { "godoc", "godoc" },
+        filetype = "godoc",
         config = {
           install_info = {
             url = "https://github.com/fredrikaverpil/tree-sitter-godoc",
@@ -41,7 +41,7 @@ if Config.use_arborist then
       local install_info = p.config.install_info
       require("merge")(opts, { overrides = { [p.lang] = install_info } })
 
-      vim.treesitter.language.register(unpack(p.register))
+      vim.treesitter.language.register(p.lang, p.filetype)
     end
 
     require("arborist").setup(opts)
