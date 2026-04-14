@@ -295,6 +295,10 @@
       "rev": "37468ed6f385dfb50402368669766504c0e15583",
       "src": "https://github.com/sindrets/winshift.nvim"
     },
+    "workspace-diagnostics.nvim": {
+      "rev": "456b8778baddcb1e02a40e5438373c696072a823",
+      "src": "https://github.com/artemave/workspace-diagnostics.nvim"
+    },
     "yanky.nvim": {
       "rev": "784188e0a7363e762e53140f39124d786aec0832",
       "src": "https://github.com/gbprod/yanky.nvim"
