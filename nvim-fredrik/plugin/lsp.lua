@@ -1,6 +1,7 @@
 require("lazyload").on_vim_enter(function()
   vim.pack.add({
     { src = "https://github.com/neovim/nvim-lspconfig" },
+    { src = "https://github.com/artemave/workspace-diagnostics.nvim" },
   })
 
   -- Extend LSP capabilities with blink.cmp completions for all servers.
@@ -54,7 +55,11 @@ require("lazyload").on_vim_enter(function()
         end
 
         -- Workspace diagnostics
-        require("workspace_diag").populate(client, buf)
+        if client:supports_method("workspace/diagnostic", buf) then
+          vim.lsp.buf.workspace_diagnostics({ client_id = client.id })
+        else
+          require("workspace-diagnostics").populate_workspace_diagnostics(client, buf)
+        end
 
         -- Inline completion
         if client:supports_method("textDocument/inlineCompletion", buf) then
