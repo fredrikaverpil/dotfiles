@@ -31,7 +31,7 @@ require("lazyload").on_vim_enter(function()
       tools = {
         amp = { cmd = { "amp", "threads", "continue" } },
         copilot = { cmd = { "copilot", "--continue" } },
-        codex = { cmd = { "codex", "--", "--last" } },
+        codex = { cmd = { "codex", "resume", "--last" } },
         opencode = { cmd = { "opencode", "--continue" } },
         gemini = { cmd = { "gemini", "--resume" } },
 
