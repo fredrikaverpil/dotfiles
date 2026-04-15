@@ -15,13 +15,9 @@ Symlinked via GNU Stow. Run `./rebuild.sh --stow` from `~/.dotfiles/` to apply.
 ```
 nvim-fredrik/
   init.lua                    requires core modules
-  lua/
-    <library>.lua             libraries called by init.lua, plugins
-    ...
-  plugin/
+  lua/                        libraries called by init.lua and plugins
+  plugin/                     plugins, often deferred to load on VimEnter
     lang/                     per-language plugins, filetypes, editor settings, autocmds
-    <plugin>.lua              plugin, often deferred to load on VimEnter
-    ...                       other feature plugins
   ftplugin/                   (unused; use plugin/lang instead)
   lsp/                        (unused; nvim-lspconfig provides base configs)
   after/
