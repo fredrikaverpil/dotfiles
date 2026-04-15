@@ -136,8 +136,6 @@ require("lazyload").on_override(function()
             },
         },
     }
-
-    vim.notify(vim.inspect("hello, override"))
 end)
 ```
 
