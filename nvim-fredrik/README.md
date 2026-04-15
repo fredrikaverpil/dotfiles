@@ -16,29 +16,12 @@ Symlinked via GNU Stow. Run `./rebuild.sh --stow` from `~/.dotfiles/` to apply.
 nvim-fredrik/
   init.lua                    requires core modules, debug_config, profile_config
   lua/
-    debug_config.lua          OSV config (debug the config itself)
-    profile_config.lua        profile.nvim config
-    lazyload.lua                VimEnter deferred setup queues
-    options.lua               all vim.opt settings
-    fold.lua                  fold helpers (treesitter default + LSP override)
-    toggle.lua                toggle functions (auto-format, inlay hints)
-    colors.lua                color utility (blend)
+    <library>.lua             libraries called by init.lua, plugins
+    ...
   lsp/                        (unused; nvim-lspconfig provides base configs)
   plugin/
     lang/                     per-language plugins, filetypes, editor settings, autocmds
-    diagnostics.lua           diagnostic display config
-    blink.lua                 completion (VimEnter)
-    conform.lua               formatting (VimEnter)
-    dap.lua                   debugging (deferred to first use)
-    lint.lua                  linting (VimEnter)
-    lsp.lua                   LSP servers (VimEnter)
-    lualine.lua               statusline (VimEnter)
-    mason.lua                 tool installation (VimEnter)
-    neotest.lua               testing (deferred to first use)
-    colorscheme.lua           zenbones + OSC11 dark/light detection
-    oil.lua                   file explorer
-    snacks.lua                QoL (picker, dashboard, lazygit, terminal)
-    treesitter.lua            syntax highlighting + context (VimEnter)
+    <plugin>.lua              plugin, often deferred to load on VimEnter
     ...                       other feature plugins
   after/
     lsp/                      overrides for nvim-lspconfig base configs
@@ -77,15 +60,16 @@ end)
 ```
 
 - `on_vim_enter(fn)`: defer to `VimEnter`, then run the function async
-- `on_override(fn)`: defer to after all `VimEnter` callbacks (for `.nvim.lua` overrides)
+- `on_override(fn)`: defer to after all `VimEnter` callbacks (for `.nvim.lua`
+  overrides)
 - `call_once(fn)`: call the function only once
 
 ### Cross-plugin data sharing
 
 Plugin files can pass data to each other through `_G.Config`, but it requires
 them to be lazyloaded. Write to `_G.Config` at the **top level** of the file
-(outside the `on_vim_enter` block), and read it inside the
-receiving plugin's lazyload block:
+(outside the `on_vim_enter` block), and read it inside the receiving plugin's
+lazyload block:
 
 ```lua
 -- plugin/producer.lua
@@ -158,8 +142,8 @@ end)
 
 > [!NOTE]
 >
-> Overrides run after all `on_vim_enter` callbacks (including async ones),
-> so they can patch any plugin state set up during `VimEnter`.
+> Overrides run after all `on_vim_enter` callbacks (including async ones), so
+> they can patch any plugin state set up during `VimEnter`.
 
 ## Plugin management
 
