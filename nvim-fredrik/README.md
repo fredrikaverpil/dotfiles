@@ -23,7 +23,6 @@ nvim-fredrik/
     fold.lua                  fold helpers (treesitter default + LSP override)
     toggle.lua                toggle functions (auto-format, inlay hints)
     colors.lua                color utility (blend)
-    exrc.lua                  list project-local .nvim.lua files + trust status
   lsp/                        (unused; nvim-lspconfig provides base configs)
   plugin/
     lang/                     per-language plugins, filetypes, editor settings, autocmds
@@ -131,29 +130,30 @@ Place a `.nvim.lua` in the the `$cwd` or above it. It runs at step 7c of
 [initialization](https://neovim.io/doc/user/starting/#_initialization) —
 **before** `plugin/` files (`:h exrc`).
 
-In order to execute the `.nvim.lua` files _after_ `/plugin` files, a custom exrc
-implementation was done in the `exrc` module.
-
 Example:
 
 ```lua
 -- ~/code/work/.nvim.lua
--- Override markdown formatter
-require("conform").formatters_by_ft.markdown = { "mdformat" }
-require("conform").formatters.mdformat = {
-    prepend_args = { "--number", "--wrap", "80" },
-}
+require("lazyload").on_override(function()
+    -- Override markdown formatter
+    require("conform").formatters_by_ft.markdown = { "mdformat" }
+    require("conform").formatters.mdformat = {
+        prepend_args = { "--number", "--wrap", "80" },
+    }
 
--- Override gopls settings
-vim.lsp.config.gopls.settings = {
-    gopls = {
-        analyses = {
-            ST1000 = false,
-            ST1020 = false,
-            ST1021 = false,
+    -- Override gopls settings
+    vim.lsp.config.gopls.settings = {
+        gopls = {
+            analyses = {
+                ST1000 = false,
+                ST1020 = false,
+                ST1021 = false,
+            },
         },
-    },
-}
+    }
+
+    vim.notify(vim.inspect("hello, override"))
+end)
 ```
 
 > [!NOTE]
