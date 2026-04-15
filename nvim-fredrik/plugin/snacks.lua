@@ -53,11 +53,10 @@ Snacks.setup({
           modified = " (modified — re-run :trust)",
           denied = " (denied)",
           untrusted = " (untrusted — run :trust)",
-          unreadable = " (unreadable)",
         }
         local lines = {}
         for _, e in ipairs(entries) do
-          table.insert(lines, "  " .. e.path .. suffix[e.status])
+          table.insert(lines, "  " .. e.path .. (suffix[e.status] or ""))
         end
         return {
           text = table.concat(lines, "\n"),
