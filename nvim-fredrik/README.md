@@ -18,7 +18,7 @@ nvim-fredrik/
   lua/
     debug_config.lua          OSV config (debug the config itself)
     profile_config.lua        profile.nvim config
-    lazyload.lua                VimEnter/UIEnter deferred setup queues
+    lazyload.lua                VimEnter deferred setup queues
     options.lua               all vim.opt settings
     fold.lua                  fold helpers (treesitter default + LSP override)
     toggle.lua                toggle functions (auto-format, inlay hints)
@@ -64,7 +64,7 @@ Every plugin strives to lazy-load (except when they cannot). Helper functions
 are available in the `lazyload` module.
 
 ```lua
--- Deferred setup (VimEnter/UIEnter)
+-- Deferred setup (VimEnter)
 require("lazyload").on_vim_enter(function()
   vim.api.nvim_create_autocmd("PackChanged", { ... })
 
@@ -77,14 +77,14 @@ end)
 ```
 
 - `on_vim_enter(fn)`: defer to `VimEnter`, then run the function async
-- `on_ui_enter(fn)`: defer to `UIEnter`, then run the function async
+- `on_override(fn)`: defer to after all `VimEnter` callbacks (for `.nvim.lua` overrides)
 - `call_once(fn)`: call the function only once
 
 ### Cross-plugin data sharing
 
 Plugin files can pass data to each other through `_G.Config`, but it requires
 them to be lazyloaded. Write to `_G.Config` at the **top level** of the file
-(outside the `on_vim_enter` / `on_ui_enter` block), and read it inside the
+(outside the `on_vim_enter` block), and read it inside the
 receiving plugin's lazyload block:
 
 ```lua
@@ -158,8 +158,8 @@ end)
 
 > [!NOTE]
 >
-> Overrides will load on `UIEnter`, but after any `on_ui_enter`-loaded plugin,
-> and can therefore not override plugins loaded after that event.
+> Overrides run after all `on_vim_enter` callbacks (including async ones),
+> so they can patch any plugin state set up during `VimEnter`.
 
 ## Plugin management
 
