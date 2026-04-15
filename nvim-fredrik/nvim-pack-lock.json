@@ -12,10 +12,6 @@
       "rev": "b2e84d00db4d5432f471d58898e796b478f075a7",
       "src": "https://github.com/b0o/SchemaStore.nvim"
     },
-    "arborist.nvim": {
-      "rev": "ffd4e836d38f16effe9971bda8b2c811055ed2ca",
-      "src": "https://github.com/arborist-ts/arborist.nvim"
-    },
     "arrow.nvim": {
       "rev": "6e0f726f55f99332dd726a53effd6813786b6d49",
       "src": "https://github.com/otavioschwanck/arrow.nvim"
@@ -122,7 +118,7 @@
       "src": "https://github.com/echasnovski/mini.ai"
     },
     "mini.icons": {
-      "rev": "7fdae2443a0e2910015ca39ad74b50524ee682d3",
+      "rev": "bac6317300e205335df425296570d84322730067",
       "src": "https://github.com/nvim-mini/mini.icons"
     },
     "neotest": {
@@ -179,7 +175,7 @@
       "src": "https://codeberg.org/mfussenegger/nvim-lint"
     },
     "nvim-lspconfig": {
-      "rev": "8a9378a822719346a0288fa004dab302ca3c0a8f",
+      "rev": "d10ce09e42bb0ca8600fd610c3bb58676e61208d",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "nvim-nio": {
@@ -200,7 +196,7 @@
       "src": "https://github.com/nvim-treesitter/nvim-treesitter-context"
     },
     "obsidian.nvim": {
-      "rev": "3d8a102e8fe970815e1108ab7e22d53654710001",
+      "rev": "6e558fcdc869efcdd018d58b0a2667ed16b13d27",
       "src": "https://github.com/obsidian-nvim/obsidian.nvim"
     },
     "oil-git.nvim": {
@@ -296,7 +292,7 @@
       "src": "https://github.com/sindrets/winshift.nvim"
     },
     "workspace-diagnostics.nvim": {
-      "rev": "456b8778baddcb1e02a40e5438373c696072a823",
+      "rev": "0dcd7d0a6c8f6e1ddb5bb72e1412aa4c9388718f",
       "src": "https://github.com/artemave/workspace-diagnostics.nvim"
     },
     "yanky.nvim": {
