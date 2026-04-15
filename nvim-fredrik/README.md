@@ -42,6 +42,10 @@ don't fit in the core plugins: per-filetype editor settings (`vim.opt_local` via
 `FileType` autocmds), extra `vim.pack.add()` calls, custom filetypes,
 SchemaStore loading, build hooks, and autocmds.
 
+I wrote
+[a blog post](https://fredrikaverpil.github.io/blog/2026/04/15/from-lazy.nvim-to-vim.pack/)
+on how I came to design it like this.
+
 ### Plugin file layout
 
 Every plugin strives to lazy-load (except when they cannot). Helper functions
