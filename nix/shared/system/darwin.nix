@@ -75,7 +75,6 @@
         "gcloud-cli"
         "ghostty"
         "gitify"
-        "google-gemini"
         "kitty"
         "lm-studio"
         "obs"
