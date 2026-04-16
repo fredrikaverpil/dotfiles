@@ -1,6 +1,10 @@
--- Workaround for Neovim terminal buffers not forwarding bracketed paste
--- sequences to child processes. Without this, pasting large text into
--- programs like Claude Code (running in :terminal) results in garbled output.
+-- Workaround for Neovim terminal buffers sending per-chunk bracketed paste
+-- sequences to child processes. The default vim.paste() handler calls
+-- nvim_put() for each ~4KB chunk, and each call wraps the chunk in
+-- \e[200~...\e[201~ via terminal_paste(). This produces ~50 rapid-fire
+-- bracketed paste events which causes garbled output in TUI apps like
+-- Claude Code. The fix is to send a single bracketed paste pair around
+-- the entire paste stream.
 -- See: https://github.com/neovim/neovim/issues/39110
 local orig_paste = vim.paste
 
