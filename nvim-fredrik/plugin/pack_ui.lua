@@ -238,6 +238,11 @@ require("lazyload").on_vim_enter(function()
         remaining = remaining - 1
         if remaining == 0 then
           state.checking = false
+          for name, commits in pairs(state.updates) do
+            if #commits > 0 then
+              state.expanded[name] = true
+            end
+          end
           render()
         end
       end)
