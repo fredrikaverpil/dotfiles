@@ -27,6 +27,7 @@ vim.pack.add({ { src = "https://github.com/hat0uma/csvview.nvim" } }, { load = f
 
 require("options")
 require("keymaps")
+require("terminal-paste") -- FIXME: workaround for bug, see module for details
 
 -- Experimental: ui2 message/cmdline redesign (:h ui2)
 -- Avoids "Press ENTER" prompts, highlights cmdline, pager as buffer.
