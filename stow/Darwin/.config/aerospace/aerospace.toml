@@ -268,3 +268,6 @@ run = "move-node-to-workspace X"
 [[on-window-detected]]
 if.app-id = "com.pixelmatorteam.pixelmator.touch.x.photo"
 run = "move-node-to-workspace P"
+[[on-window-detected]]
+if.app-id = "com.anthropic.claudefordesktop"
+run = "move-node-to-workspace C"
