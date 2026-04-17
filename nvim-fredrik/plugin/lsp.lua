@@ -107,6 +107,19 @@ require("lazyload").on_vim_enter(function()
     end,
   })
 
+  -- Reset diagnostics and codelens on detach so :LspRestart/:LspStop don't leave stale state
+  vim.api.nvim_create_autocmd("LspDetach", {
+    group = vim.api.nvim_create_augroup("lsp-detach-cleanup", { clear = true }),
+    callback = function(args)
+      local client = vim.lsp.get_client_by_id(args.data.client_id)
+      if not client then
+        return
+      end
+      vim.diagnostic.reset(vim.api.nvim_create_namespace("vim.lsp." .. client.name .. "." .. client.id))
+      vim.lsp.codelens.clear(client.id, args.buf)
+    end,
+  })
+
   -- LSP progress spinner
   vim.api.nvim_create_autocmd("LspProgress", {
     group = vim.api.nvim_create_augroup("lsp-progress", { clear = true }),
