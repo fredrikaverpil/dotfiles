@@ -23,8 +23,6 @@ end
 vim.g.mapleader = " "
 vim.g.maplocalleader = ","
 
-vim.pack.add({ { src = "https://github.com/hat0uma/csvview.nvim" } }, { load = false })
-
 require("options")
 require("keymaps")
 
