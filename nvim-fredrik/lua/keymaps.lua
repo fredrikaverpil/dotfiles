@@ -6,10 +6,10 @@ vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to left window", silent = tr
 vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to lower window", silent = true })
 vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go to upper window", silent = true })
 vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go to right window", silent = true })
-vim.keymap.set("n", "<C-Up>", ":resize +2<CR>", { desc = "Increase window height", silent = true })
-vim.keymap.set("n", "<C-Down>", ":resize -2<CR>", { desc = "Decrease window height", silent = true })
-vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", { desc = "Increase window width", silent = true })
-vim.keymap.set("n", "<C-Left>", ":vertical resize -2<CR>", { desc = "Decrease window width", silent = true })
+vim.keymap.set("n", "<C-Up>", "<cmd>resize +2<CR>", { desc = "Increase window height", silent = true })
+vim.keymap.set("n", "<C-Down>", "<cmd>resize -2<CR>", { desc = "Decrease window height", silent = true })
+vim.keymap.set("n", "<C-Right>", "<cmd>vertical resize +2<CR>", { desc = "Increase window width", silent = true })
+vim.keymap.set("n", "<C-Left>", "<cmd>vertical resize -2<CR>", { desc = "Decrease window width", silent = true })
 
 -- Move lines (alt+j/k)
 local is_mac = vim.fn.has("macunix") == 1

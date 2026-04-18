@@ -9,6 +9,11 @@ require("lazyload").on_vim_enter(function()
     },
   })
 
-  vim.keymap.set("n", "<leader>sr", ":GrugFar<cr>", { desc = "Search and replace (grug-far)" })
-  vim.keymap.set("v", "<leader>sr", ":GrugFarWithin<cr>", { desc = "Search and replace in selection (grug-far)" })
+  vim.keymap.set("n", "<leader>sr", "<cmd>GrugFar<cr>", { desc = "Search and replace (grug-far)" })
+  vim.keymap.set(
+    "v",
+    "<leader>sr",
+    "<cmd>'<,'>GrugFarWithin<cr>",
+    { desc = "Search and replace in selection (grug-far)" }
+  )
 end)

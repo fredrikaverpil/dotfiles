@@ -12,5 +12,5 @@ require("lazyload").on_vim_enter(function()
     },
   })
 
-  vim.keymap.set("n", "<leader>r", ":RunFile<CR>", { desc = "Run file" })
+  vim.keymap.set("n", "<leader>r", "<cmd>RunFile<CR>", { desc = "Run file" })
 end)
