@@ -113,7 +113,7 @@ require("lazyload").on_vim_enter(function()
       if not client then
         return
       end
-      vim.diagnostic.reset(vim.api.nvim_create_namespace("vim.lsp." .. client.name .. "." .. client.id))
+      vim.diagnostic.reset(vim.lsp.diagnostic.get_namespace(client.id))
       vim.lsp.codelens.clear(client.id, args.buf)
     end,
   })
