@@ -53,6 +53,10 @@
       "rev": "7022e18a0fbae9aecf99a3ba02b2a541edc2b8a1",
       "src": "https://github.com/hat0uma/csvview.nvim"
     },
+    "diffview.nvim": {
+      "rev": "eaa5f2a4570a8b756201987e50ded5ad34ac34b0",
+      "src": "https://github.com/dlyongemallo/diffview.nvim"
+    },
     "friendly-snippets": {
       "rev": "6cd7280adead7f586db6fccbd15d2cac7e2188b9",
       "src": "https://github.com/rafamadriz/friendly-snippets"

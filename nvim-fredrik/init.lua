@@ -12,9 +12,15 @@ vim.loader.enable()
 _G.Config = {
   nvim_start_time = nvim_start_time,
   called = {},
+
+  -- treesitter
   use_treesitter_parser = true,
   use_nvim_treesitter = true,
   use_arborist = false, -- experiment
+
+  -- diffing
+  use_diffview = false,
+  use_codediff = true,
 }
 function _G.Config.add(spec)
   require("merge")(_G.Config, spec)
