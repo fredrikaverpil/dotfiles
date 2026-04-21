@@ -129,6 +129,10 @@
       "rev": "bac6317300e205335df425296570d84322730067",
       "src": "https://github.com/nvim-mini/mini.icons"
     },
+    "more-go.nvim": {
+      "rev": "dc7e9c325599abc9b5290438b67f1045a3779558",
+      "src": "https://github.com/edte/more-go.nvim"
+    },
     "neotest": {
       "rev": "fd0b7986dd0ae04e38ec7dc0c78a432e3820839c",
       "src": "https://github.com/nvim-neotest/neotest"
