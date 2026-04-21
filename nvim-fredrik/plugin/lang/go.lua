@@ -29,16 +29,7 @@ require("lazyload").on_vim_enter(function()
         { src = "https://github.com/maxandron/goplements.nvim" },
       })
 
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = "go",
-        once = true,
-        callback = function()
-          require("lazyload").call_once(function()
-            require("goplements").setup()
-          end)
-        end,
-      })
-
+      require("goplements").setup()
       require("blink-go-import").setup()
     end
   end
