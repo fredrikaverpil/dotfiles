@@ -26,6 +26,13 @@ return {
       staticcheck = true,
       templateExtensions = { "templ", "gotmpl", "gohtml", "tmpl" },
       vulncheck = "imports",
+      -- go-impl.nvim uses workspace/symbol to populate its interface picker.
+      -- "workspace" (default) excludes stdlib/deps, so e.g. typing "reader"
+      -- would not surface io.Reader. "all" fixes that.
+      symbolScope = "all",
+      -- FastFuzzy makes the same workspace/symbol queries fuzzy rather than
+      -- prefix-only, improving match quality in the go-impl picker.
+      symbolMatcher = "FastFuzzy",
     },
   },
 }

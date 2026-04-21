@@ -35,6 +35,7 @@ require("lazyload").on_vim_enter(function()
     "gotestsum",
     "graphql-language-service-cli",
     "hadolint",
+    "impl", -- used by go-impl.nvim
     "json-lsp",
     "lua-language-server",
     "markdownlint",
@@ -44,8 +45,8 @@ require("lazyload").on_vim_enter(function()
     "protolint",
     "ruff",
     "rust-analyzer",
-    "shfmt",
     "shellcheck",
+    "shfmt",
     "stylua",
     "superhtml",
     "taplo",

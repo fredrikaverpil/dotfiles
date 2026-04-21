@@ -18,6 +18,7 @@
   "gotestsum": "v1.13.0",
   "graphql-language-service-cli": "3.5.0",
   "hadolint": "v2.14.0",
+  "impl": "v1.5.0",
   "json-lsp": "4.10.0",
   "lua-language-server": "3.18.2",
   "markdownlint": "0.48.0",

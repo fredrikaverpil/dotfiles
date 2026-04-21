@@ -69,6 +69,10 @@
       "rev": "6d808f99bd63303646794406e270bd553ad7792e",
       "src": "https://github.com/lewis6991/gitsigns.nvim"
     },
+    "go-impl.nvim": {
+      "rev": "17465887f14f8a00f453cdc75bfb41a11c114cbf",
+      "src": "https://github.com/fang2hou/go-impl.nvim"
+    },
     "godoc.nvim": {
       "rev": "67f1b8d5b7edbe34a6e91b4f8d41374090bd8599",
       "src": "/Users/fredrik/code/public/godoc.nvim"

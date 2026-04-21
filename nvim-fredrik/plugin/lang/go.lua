@@ -36,6 +36,22 @@ require("lazyload").on_vim_enter(function()
     end
   end
 
+  -- go-impl (uses "impl" from mason and "symbolScope", "symbolMatcher" setting in gopls)
+  do
+    vim.pack.add({
+      { src = "https://github.com/fang2hou/go-impl.nvim" },
+      { src = "https://github.com/MunifTanjim/nui.nvim" },
+    })
+    require("go-impl").setup({
+      picker = "snacks",
+      insert = {
+        position = "after",
+        before_newline = true,
+        after_newline = false,
+      },
+    })
+  end
+
   -- godoc.nvim
   do
     vim.api.nvim_create_autocmd("PackChanged", {
