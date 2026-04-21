@@ -25,11 +25,13 @@ require("lazyload").on_vim_enter(function()
   do
     if Config.use_treesitter_parser then
       vim.pack.add({
-        { src = "https://github.com/edte/blink-go-import.nvim" },
         { src = "https://github.com/maxandron/goplements.nvim" },
       })
-
       require("goplements").setup()
+
+      vim.pack.add({
+        { src = "https://github.com/edte/blink-go-import.nvim" },
+      })
       require("blink-go-import").setup()
     end
   end
