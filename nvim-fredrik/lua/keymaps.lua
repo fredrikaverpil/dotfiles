@@ -151,7 +151,7 @@ vim.keymap.set("v", "zf", function()
   vim.notify("Foldmethod set to manual", vim.log.levels.INFO)
   return "zf"
 end, { desc = "Create manual fold", expr = true, silent = true })
-vim.keymap.set("n", "<leader>uf", function()
+vim.keymap.set("n", "<leader>uF", function()
   vim.wo.foldmethod = "expr"
   vim.notify("Foldmethod set to expr", vim.log.levels.INFO)
 end, { desc = "Reset to expr folding", silent = true })

@@ -163,9 +163,6 @@ end, { desc = "Grep" })
 vim.keymap.set("n", "<leader>:", function()
   Snacks.picker.command_history()
 end, { desc = "Command History" })
-vim.keymap.set("n", "<leader>D", function()
-  Snacks.dashboard.open()
-end, { desc = "Dashboard" })
 
 -- Explorer
 vim.keymap.set("n", "<leader>e", function()
