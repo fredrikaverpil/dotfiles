@@ -57,14 +57,18 @@ require("lazyload").on_vim_enter(function()
         { path = buffer_parent_dir, upward = true, type = "file", limit = 1, stop = vim.fs.normalize("~") }
       )
       if #found == 0 then
-        error("Buf config file not found")
+        return nil
       end
       cached_buf_config_filepath = found[1]
       return cached_buf_config_filepath
     end
 
     local function buf_lint_cwd()
-      return vim.fn.fnamemodify(buf_config_filepath(), ":h")
+      local cfg = buf_config_filepath()
+      if cfg == nil then
+        return nil
+      end
+      return vim.fn.fnamemodify(cfg, ":h")
     end
 
     local function get_relative_path(file, cwd)
@@ -88,16 +92,20 @@ require("lazyload").on_vim_enter(function()
       group = vim.api.nvim_create_augroup("lint-buf", { clear = true }),
       pattern = { "*.proto" },
       callback = function()
+        local cwd = buf_lint_cwd()
+        if cwd == nil then
+          return
+        end
         lint.try_lint("buf_lint", {
           args = {
             "lint",
             "--error-format=json",
             function()
               local bufpath = vim.fn.expand("%:p")
-              return get_relative_path(bufpath, buf_lint_cwd())
+              return get_relative_path(bufpath, cwd)
             end,
           },
-          cwd = buf_lint_cwd(),
+          cwd = cwd,
           append_fname = false,
         })
       end,
@@ -111,7 +119,11 @@ require("lazyload").on_vim_enter(function()
         if vim.fn.executable("buf") == 0 then
           error("buf CLI not found")
         end
-        local buf_config_folderpath = vim.fn.fnamemodify(buf_config_filepath(), ":h")
+        local cfg = buf_config_filepath()
+        if cfg == nil then
+          error("buf config file not found")
+        end
+        local buf_config_folderpath = vim.fn.fnamemodify(cfg, ":h")
         local obj = vim.system({ "buf", "build", "-o", descriptor_filepath }, { cwd = buf_config_folderpath }):wait()
         if obj.code ~= 0 then
           error("buf build failed: " .. tostring(obj.stderr or ""))
@@ -173,8 +185,12 @@ require("lazyload").on_vim_enter(function()
         group = vim.api.nvim_create_augroup("lint-api-linter", { clear = true }),
         pattern = { "*.proto" },
         callback = function()
+          local cwd = buf_lint_cwd()
+          if cwd == nil then
+            return
+          end
           lint.try_lint("api_linter", {
-            cwd = buf_lint_cwd(),
+            cwd = cwd,
           })
         end,
       })
