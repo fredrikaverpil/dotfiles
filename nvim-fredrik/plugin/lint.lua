@@ -114,7 +114,7 @@ require("lazyload").on_vim_enter(function()
         local buf_config_folderpath = vim.fn.fnamemodify(buf_config_filepath(), ":h")
         local obj = vim.system({ "buf", "build", "-o", descriptor_filepath }, { cwd = buf_config_folderpath }):wait()
         if obj.code ~= 0 then
-          error("buf build failed: " .. obj.stderr)
+          error("buf build failed: " .. tostring(obj.stderr or ""))
         end
         return "--descriptor-set-in=" .. descriptor_filepath
       end
