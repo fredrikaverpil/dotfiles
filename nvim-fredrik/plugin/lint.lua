@@ -90,7 +90,7 @@ require("lazyload").on_vim_enter(function()
     end
 
     -- buf_lint
-    vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost" }, {
+    vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
       group = vim.api.nvim_create_augroup("lint-buf", { clear = true }),
       pattern = { "*.proto" },
       callback = function()
@@ -201,7 +201,7 @@ require("lazyload").on_vim_enter(function()
         end,
       }
 
-      vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost" }, {
+      vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
         group = vim.api.nvim_create_augroup("lint-api-linter", { clear = true }),
         pattern = { "*.proto" },
         callback = function()
