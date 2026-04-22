@@ -114,42 +114,73 @@ require("lazyload").on_vim_enter(function()
 
     -- api_linter
     if vim.fn.executable("api-linter") == 1 then
-      local descriptor_paths = {}
+      -- Per-config descriptor state: { path, dirty, building, pending = {cb...} }
+      local descriptor_state = {}
 
-      local function descriptor_path_for(cfg)
-        local path = descriptor_paths[cfg]
-        if path == nil then
-          path = os.tmpname()
-          descriptor_paths[cfg] = path
+      local function state_for(cfg)
+        local s = descriptor_state[cfg]
+        if s == nil then
+          s = { path = os.tmpname(), dirty = true, building = false, pending = {} }
+          descriptor_state[cfg] = s
         end
-        return path
+        return s
+      end
+
+      local build_descriptor
+
+      build_descriptor = function(cfg)
+        if vim.fn.executable("buf") == 0 then
+          vim.notify("buf CLI not found", vim.log.levels.WARN)
+          return
+        end
+        local s = state_for(cfg)
+        s.building = true
+        s.dirty = false
+        vim.system(
+          { "buf", "build", "-o", s.path },
+          { cwd = vim.fn.fnamemodify(cfg, ":h") },
+          vim.schedule_wrap(function(obj)
+            s.building = false
+            if obj.code ~= 0 then
+              s.dirty = true
+              s.pending = {} -- drop queued callbacks; they'll retrigger on the next event
+              vim.notify("buf build failed: " .. tostring(obj.stderr or ""), vim.log.levels.WARN)
+              return
+            end
+            if s.dirty then
+              -- A write came in during build; rebuild. Callbacks stay queued.
+              build_descriptor(cfg)
+              return
+            end
+            local pending = s.pending
+            s.pending = {}
+            for _, cb in ipairs(pending) do
+              cb(s.path)
+            end
+          end)
+        )
+      end
+
+      local function ensure_descriptor(cfg, callback)
+        local s = state_for(cfg)
+        if not s.dirty and not s.building then
+          callback(s.path)
+          return
+        end
+        table.insert(s.pending, callback)
+        if not s.building then
+          build_descriptor(cfg)
+        end
       end
 
       vim.api.nvim_create_autocmd("VimLeavePre", {
         group = vim.api.nvim_create_augroup("lint-api-linter-cleanup", { clear = true }),
         callback = function()
-          for _, path in pairs(descriptor_paths) do
-            os.remove(path)
+          for _, s in pairs(descriptor_state) do
+            os.remove(s.path)
           end
         end,
       })
-
-      local function descriptor_set_in()
-        if vim.fn.executable("buf") == 0 then
-          error("buf CLI not found")
-        end
-        local cfg = buf_config_filepath()
-        if cfg == nil then
-          error("buf config file not found")
-        end
-        local descriptor_filepath = descriptor_path_for(cfg)
-        local buf_config_folderpath = vim.fn.fnamemodify(cfg, ":h")
-        local obj = vim.system({ "buf", "build", "-o", descriptor_filepath }, { cwd = buf_config_folderpath }):wait()
-        if obj.code ~= 0 then
-          error("buf build failed: " .. tostring(obj.stderr or ""))
-        end
-        return "--descriptor-set-in=" .. descriptor_filepath
-      end
 
       lint.linters.api_linter = {
         name = "api_linter",
@@ -162,11 +193,15 @@ require("lazyload").on_vim_enter(function()
           "--disable-rule=core::0191::java-package",
           "--disable-rule=core::0191::java-outer-classname",
           function()
-            return descriptor_set_in()
+            local cfg = buf_config_filepath()
+            if cfg == nil then
+              return ""
+            end
+            return "--descriptor-set-in=" .. state_for(cfg).path
           end,
           function()
             local bufpath = vim.fn.expand("%:p")
-            return get_relative_path(bufpath, buf_lint_cwd())
+            return get_relative_path(bufpath, buf_lint_cwd() or "")
           end,
         },
         stream = "stdout",
@@ -203,14 +238,23 @@ require("lazyload").on_vim_enter(function()
       vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
         group = vim.api.nvim_create_augroup("lint-api-linter", { clear = true }),
         pattern = { "*.proto" },
-        callback = function()
-          local cwd = buf_lint_cwd()
-          if cwd == nil then
+        callback = function(args)
+          local cfg = buf_config_filepath()
+          if cfg == nil then
             return
           end
-          lint.try_lint("api_linter", {
-            cwd = cwd,
-          })
+          local cwd = vim.fn.fnamemodify(cfg, ":h")
+          if args.event == "BufWritePost" then
+            state_for(cfg).dirty = true
+          end
+          ensure_descriptor(cfg, function()
+            if not vim.api.nvim_buf_is_valid(args.buf) then
+              return
+            end
+            vim.api.nvim_buf_call(args.buf, function()
+              lint.try_lint("api_linter", { cwd = cwd })
+            end)
+          end)
         end,
       })
     end
