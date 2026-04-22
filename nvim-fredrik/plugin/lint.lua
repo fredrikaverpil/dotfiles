@@ -45,22 +45,24 @@ require("lazyload").on_vim_enter(function()
 
   -- protobuf: buf_lint + api_linter (custom autocmds because cwd must be dynamic)
   do
-    local cached_buf_config_filepath = nil
+    local buf_config_cache = {}
 
     local function buf_config_filepath()
-      if cached_buf_config_filepath ~= nil then
-        return cached_buf_config_filepath
-      end
       local buffer_parent_dir = vim.fn.expand("%:p:h")
+      local cached = buf_config_cache[buffer_parent_dir]
+      if cached ~= nil then
+        return cached or nil
+      end
       local found = vim.fs.find(
         { "buf.yaml", "buf.yml" },
         { path = buffer_parent_dir, upward = true, type = "file", limit = 1, stop = vim.fs.normalize("~") }
       )
       if #found == 0 then
+        buf_config_cache[buffer_parent_dir] = false
         return nil
       end
-      cached_buf_config_filepath = found[1]
-      return cached_buf_config_filepath
+      buf_config_cache[buffer_parent_dir] = found[1]
+      return found[1]
     end
 
     local function buf_lint_cwd()
