@@ -115,7 +115,25 @@ require("lazyload").on_vim_enter(function()
 
     -- api_linter
     if vim.fn.executable("api-linter") == 1 then
-      local descriptor_filepath = os.tmpname()
+      local descriptor_paths = {}
+
+      local function descriptor_path_for(cfg)
+        local path = descriptor_paths[cfg]
+        if path == nil then
+          path = os.tmpname()
+          descriptor_paths[cfg] = path
+        end
+        return path
+      end
+
+      vim.api.nvim_create_autocmd("VimLeavePre", {
+        group = vim.api.nvim_create_augroup("lint-api-linter-cleanup", { clear = true }),
+        callback = function()
+          for _, path in pairs(descriptor_paths) do
+            os.remove(path)
+          end
+        end,
+      })
 
       local function descriptor_set_in()
         if vim.fn.executable("buf") == 0 then
@@ -125,6 +143,7 @@ require("lazyload").on_vim_enter(function()
         if cfg == nil then
           error("buf config file not found")
         end
+        local descriptor_filepath = descriptor_path_for(cfg)
         local buf_config_folderpath = vim.fn.fnamemodify(cfg, ":h")
         local obj = vim.system({ "buf", "build", "-o", descriptor_filepath }, { cwd = buf_config_folderpath }):wait()
         if obj.code ~= 0 then
@@ -178,7 +197,6 @@ require("lazyload").on_vim_enter(function()
             end
           end
 
-          os.remove(descriptor_filepath)
           return diagnostics
         end,
       }
