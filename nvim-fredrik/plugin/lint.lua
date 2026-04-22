@@ -90,6 +90,16 @@ require("lazyload").on_vim_enter(function()
     end
 
     -- buf_lint
+    lint.linters.buf_lint.args = {
+      "lint",
+      "--error-format=json",
+      function()
+        local bufpath = vim.fn.expand("%:p")
+        return get_relative_path(bufpath, buf_lint_cwd() or "")
+      end,
+    }
+    lint.linters.buf_lint.append_fname = false
+
     vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
       group = vim.api.nvim_create_augroup("lint-buf", { clear = true }),
       pattern = { "*.proto" },
@@ -98,18 +108,7 @@ require("lazyload").on_vim_enter(function()
         if cwd == nil then
           return
         end
-        lint.try_lint("buf_lint", {
-          args = {
-            "lint",
-            "--error-format=json",
-            function()
-              local bufpath = vim.fn.expand("%:p")
-              return get_relative_path(bufpath, cwd)
-            end,
-          },
-          cwd = cwd,
-          append_fname = false,
-        })
+        lint.try_lint("buf_lint", { cwd = cwd })
       end,
     })
 
