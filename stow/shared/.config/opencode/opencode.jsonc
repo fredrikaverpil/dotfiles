@@ -53,23 +53,6 @@
       //   }
     }
   },
-  "agent": {
-    "neovim": {
-      "model": "google/gemini-3-flash-preview"
-    },
-    "github": {
-      "model": "google/gemini-3-flash-preview"
-    },
-    "security-auditor": {
-      "model": "google/gemini-3-flash-preview"
-    },
-    "docs-writer": {
-      "model": "google/gemini-3-flash-preview"
-    },
-    "nix": {
-      "model": "google/gemini-3-flash-preview"
-    }
-  },
   "mcp": {
     "tavily": {
       "type": "local",

@@ -1,7 +1,6 @@
 {
   // Keybinds: https://opencode.ai/docs/keybinds
   "$schema": "https://opencode.ai/config.json",
-  "theme": "system",
   "autoupdate": true,
   "share": "disabled",
   "provider": {
@@ -26,31 +25,6 @@
       "options": {
         "project": "{env:GOOGLE_CLOUD_PROJECT}",
         "location": "{env:GOOGLE_CLOUD_LOCATION}"
-      }
-    }
-  },
-  "agent": {
-    "plan": {
-      "mode": "primary",
-      "model": "google-vertex/gemini-3-flash-preview",
-      "options": {}
-    },
-    "build": {
-      "mode": "primary",
-      "model": "google-vertex/gemini-3-flash-preview"
-    },
-    "explain": {
-      "mode": "primary",
-      "model": "google-vertex/gemini-3-flash-preview",
-      "tools": {
-        "write": false
-      }
-    },
-    "review": {
-      "mode": "primary",
-      "model": "google-vertex/gemini-3-flash-preview",
-      "tools": {
-        "write": false
       }
     }
   },
