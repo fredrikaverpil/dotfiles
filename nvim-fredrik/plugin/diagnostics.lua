@@ -49,6 +49,11 @@ require("lazyload").on_vim_enter(function()
         show_source = {
           enabled = true,
         },
+        -- Default {"LspAttach"} skips buffers without an LSP (e.g. .proto
+        -- files linted only via nvim-lint). DiagnosticChanged attaches the
+        -- moment any source produces results, regardless of LSP presence.
+        -- See https://github.com/rachartier/tiny-inline-diagnostic.nvim/issues/40
+        overwrite_events = { "DiagnosticChanged" },
       },
     })
   end
