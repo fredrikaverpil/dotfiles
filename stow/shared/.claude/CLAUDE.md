@@ -1,6 +1,28 @@
 # Claude instructions
 
-## Self review
+## Workflow
+
+### Planning the work
+
+Work back and forth with me, starting with your open questions and outline
+before writing the plan.
+
+### Atomic, logical changes
+
+- Every set of code modifications that forms a distinct logical unit MUST live
+  in its own commit/change.
+- Each commit/change MUST be able to stand on its own: the code builds, tests
+  pass, and linters pass.
+- Do NOT bundle unrelated modifications into a single commit/change.
+- Code modification related to feedback and reviews belong in the commit/change
+  that originally introduced them, not a separate commit/change.
+
+### Avoid over-editing
+
+IMPORTANT: Try to preserve the original code and the logic of the original code
+as much as possible.
+
+### Self review
 
 After implementing something, always look back and critically review what you
 did with the following in mind:
