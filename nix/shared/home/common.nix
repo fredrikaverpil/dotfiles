@@ -129,6 +129,7 @@ in
       uv
 
       # Generic development
+      bfs
       devbox
       devenv
       mise
@@ -138,6 +139,7 @@ in
       go-task
       # pre-commit # requires swift, which is problematic and very expensive to build on macOS
       ripgrep
+      ugrep
 
       # ========================================================================
       # Git & Version Control
