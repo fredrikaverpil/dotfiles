@@ -126,7 +126,7 @@ require("lazyload").on_vim_enter(function()
       end
 
       local function descriptor_set_in()
-        local cfg = buf_config_filepath()
+        local cfg = assert(buf_config_filepath(), "buf config not found")
         local path = descriptor_path_for(cfg)
         local obj = vim.system({ "buf", "build", "-o", path }, { cwd = vim.fn.fnamemodify(cfg, ":h") }):wait()
         if obj.code ~= 0 then
