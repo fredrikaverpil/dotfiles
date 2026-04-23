@@ -50,8 +50,11 @@ require("lazyload").on_vim_enter(function()
     local function buf_config_filepath()
       local buffer_parent_dir = vim.fn.expand("%:p:h")
       local cached = buf_config_cache[buffer_parent_dir]
-      if cached ~= nil then
-        return cached or nil
+      if cached == false then
+        return nil
+      end
+      if cached then
+        return cached
       end
       local found = vim.fs.find(
         { "buf.yaml", "buf.yml" },
@@ -94,8 +97,7 @@ require("lazyload").on_vim_enter(function()
       "lint",
       "--error-format=json",
       function()
-        local bufpath = vim.fn.expand("%:p")
-        return get_relative_path(bufpath, buf_lint_cwd() or "")
+        return get_relative_path(vim.fn.expand("%:p"), buf_lint_cwd())
       end,
     }
     lint.linters.buf_lint.append_fname = false
@@ -113,7 +115,7 @@ require("lazyload").on_vim_enter(function()
     })
 
     -- api_linter
-    if vim.fn.executable("api-linter") == 1 then
+    if vim.fn.executable("api-linter") == 1 and vim.fn.executable("buf") == 1 then
       -- Per-config descriptor state: { path, dirty, building, pending = {cb...} }
       local descriptor_state = {}
 
@@ -129,10 +131,6 @@ require("lazyload").on_vim_enter(function()
       local build_descriptor
 
       build_descriptor = function(cfg)
-        if vim.fn.executable("buf") == 0 then
-          vim.notify("buf CLI not found", vim.log.levels.WARN)
-          return
-        end
         local s = state_for(cfg)
         s.building = true
         s.dirty = false
@@ -155,7 +153,7 @@ require("lazyload").on_vim_enter(function()
             local pending = s.pending
             s.pending = {}
             for _, cb in ipairs(pending) do
-              cb(s.path)
+              cb()
             end
           end)
         )
@@ -164,7 +162,7 @@ require("lazyload").on_vim_enter(function()
       local function ensure_descriptor(cfg, callback)
         local s = state_for(cfg)
         if not s.dirty and not s.building then
-          callback(s.path)
+          callback()
           return
         end
         table.insert(s.pending, callback)
@@ -193,15 +191,10 @@ require("lazyload").on_vim_enter(function()
           "--disable-rule=core::0191::java-package",
           "--disable-rule=core::0191::java-outer-classname",
           function()
-            local cfg = buf_config_filepath()
-            if cfg == nil then
-              return ""
-            end
-            return "--descriptor-set-in=" .. state_for(cfg).path
+            return "--descriptor-set-in=" .. state_for(buf_config_filepath()).path
           end,
           function()
-            local bufpath = vim.fn.expand("%:p")
-            return get_relative_path(bufpath, buf_lint_cwd() or "")
+            return get_relative_path(vim.fn.expand("%:p"), buf_lint_cwd())
           end,
         },
         stream = "stdout",
