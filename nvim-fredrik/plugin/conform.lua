@@ -67,5 +67,8 @@ require("lazyload").on_vim_enter(function()
     },
   })
 
-  vim.keymap.set("n", "<leader>uf", require("toggle").auto_format, { desc = "Toggle auto-format" })
+  vim.keymap.set("n", "<leader>uf", function()
+    vim.g.auto_format = not vim.g.auto_format
+    vim.notify("Auto-format: " .. (vim.g.auto_format and "on" or "off"))
+  end, { desc = "Toggle auto-format" })
 end)

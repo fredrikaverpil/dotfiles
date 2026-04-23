@@ -122,9 +122,6 @@ vim.keymap.set("n", "[w", function()
   vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.WARN })
 end, { desc = "Prev Warning", silent = true })
 
--- Toggles
-vim.keymap.set("n", "<leader>ud", require("toggle").diagnostics, { desc = "Toggle diagnostics", silent = true })
-
 -- Shada
 vim.keymap.set("n", "<leader>us", function()
   local stdpath = vim.fn.stdpath("state")

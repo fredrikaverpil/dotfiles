@@ -57,4 +57,9 @@ require("lazyload").on_vim_enter(function()
       },
     })
   end
+
+  vim.keymap.set("n", "<leader>ud", function()
+    vim.diagnostic.enable(not vim.diagnostic.is_enabled())
+    vim.notify("Diagnostics: " .. (vim.diagnostic.is_enabled() and "on" or "off"))
+  end, { desc = "Toggle diagnostics", silent = true })
 end)
