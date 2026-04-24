@@ -1,9 +1,17 @@
 if Config.use_codediff then
   require("lazyload").on_vim_enter(function()
-    vim.pack.add({
-      { src = "https://github.com/esmuellert/codediff.nvim", name = "codediff.nvim" },
-      { src = "https://github.com/MunifTanjim/nui.nvim", name = "nui.nvim" },
-    })
+    local use_local = true
+    if use_local then
+      require("dev").load_local("~/code/public/codediff.nvim")
+      vim.pack.add({
+        { src = "https://github.com/MunifTanjim/nui.nvim" },
+      })
+    else
+      vim.pack.add({
+        { src = "https://github.com/esmuellert/codediff.nvim" },
+        { src = "https://github.com/MunifTanjim/nui.nvim" },
+      })
+    end
 
     require("codediff").setup({
       explorer = {
