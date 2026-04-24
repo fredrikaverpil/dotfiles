@@ -304,6 +304,7 @@ local function fetch_review_comments(pr_number, callback)
             side = c.side or "RIGHT",
             pull_request_review_id = c.pull_request_review_id,
             in_reply_to_id = c.in_reply_to_id,
+            user = c.user and c.user.login,
           })
         end
         callback(comments)
@@ -385,6 +386,62 @@ local function show_cached()
   if cached_comments and #cached_comments > 0 then
     show_signs_for_session(cached_comments, cached_pending_review_ids)
   end
+end
+
+-- --------------------------------------------------------------------------
+-- Thread helpers
+-- --------------------------------------------------------------------------
+
+--- Returns the root comment and replies at the cursor position, plus context.
+--- When multiple root comments exist on the same line, the first is used.
+--- @return table? root
+--- @return table[] replies
+--- @return string? file_path
+--- @return string? side
+--- @return integer? cursor_line
+local function get_thread_at_cursor()
+  local cursor_line = vim.fn.line(".")
+  local file_path, session = get_session_file_path()
+  if not file_path or not session then
+    return nil, {}, nil, nil, nil
+  end
+
+  local current_buf = vim.api.nvim_get_current_buf()
+  local side
+  if current_buf == session.original_bufnr then
+    side = "LEFT"
+  elseif current_buf == session.modified_bufnr then
+    side = "RIGHT"
+  else
+    return nil, {}, nil, nil, nil
+  end
+
+  local root = nil
+  for _, c in ipairs(cached_comments) do
+    if c.path == file_path and not c.in_reply_to_id then
+      local comment_side = c.side or "RIGHT"
+      if comment_side == side and resolve_line(c, comment_side) == cursor_line then
+        root = c
+        break
+      end
+    end
+  end
+
+  if not root then
+    return nil, {}, file_path, side, cursor_line
+  end
+
+  local replies = {}
+  for _, c in ipairs(cached_comments) do
+    if c.in_reply_to_id == root.id then
+      table.insert(replies, c)
+    end
+  end
+  table.sort(replies, function(a, b)
+    return a.id < b.id
+  end)
+
+  return root, replies, file_path, side, cursor_line
 end
 
 -- --------------------------------------------------------------------------
@@ -598,6 +655,103 @@ local function post_review_comment(file_path, start_line, end_line, side, body)
   end
 end
 
+local function post_reply(root_comment_id, body)
+  if not cached_pr_number then
+    vim.notify("No PR data cached — try refreshing first", vim.log.levels.ERROR)
+    return
+  end
+
+  local cmd = string.format("gh api repos/{owner}/{repo}/pulls/%s/comments --method POST --input -", cached_pr_number)
+  local payload = vim.json.encode({ in_reply_to = root_comment_id, body = body })
+  local stderr_chunks = {}
+
+  local job_id = vim.fn.jobstart({ "bash", "-c", cmd }, {
+    stdout_buffered = true,
+    stderr_buffered = true,
+    on_stderr = function(_, data)
+      if data then
+        table.insert(stderr_chunks, table.concat(data, "\n"))
+      end
+    end,
+    on_exit = function(_, exit_code)
+      vim.schedule(function()
+        if exit_code ~= 0 then
+          vim.notify("Failed to post reply: " .. table.concat(stderr_chunks, ""), vim.log.levels.ERROR)
+          return
+        end
+        vim.notify("Reply posted", vim.log.levels.INFO)
+        refresh()
+      end)
+    end,
+  })
+  vim.fn.chansend(job_id, payload)
+  vim.fn.chanclose(job_id, "stdin")
+end
+
+local function open_thread_viewer(thread_comments, root_id, file_path, side, cursor_line)
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.bo[buf].filetype = "markdown"
+  vim.bo[buf].bufhidden = "wipe"
+
+  local lines = {}
+  local function add_comment(c, is_reply)
+    local author = c.user or "unknown"
+    local header = is_reply and string.format("**@%s** _(reply)_", author) or string.format("**@%s**", author)
+    table.insert(lines, header)
+    table.insert(lines, "")
+    for _, l in ipairs(vim.split(c.body or "", "\n")) do
+      table.insert(lines, l)
+    end
+  end
+
+  add_comment(thread_comments[1], false)
+  for i = 2, #thread_comments do
+    table.insert(lines, "")
+    table.insert(lines, "---")
+    table.insert(lines, "")
+    add_comment(thread_comments[i], true)
+  end
+
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+  vim.bo[buf].modifiable = false
+
+  local width = math.min(90, vim.o.columns - 4)
+  local height = math.min(30, vim.o.lines - 6)
+  local win = vim.api.nvim_open_win(buf, true, {
+    relative = "editor",
+    width = width,
+    height = height,
+    col = math.floor((vim.o.columns - width) / 2),
+    row = math.floor((vim.o.lines - height) / 2),
+    style = "minimal",
+    border = "rounded",
+    title = string.format(" Thread: %s:%d (%s) ", file_path, cursor_line, side),
+    title_pos = "center",
+    footer = " r: reply  q: close ",
+    footer_pos = "center",
+  })
+
+  vim.wo[win].wrap = true
+  vim.wo[win].linebreak = true
+  vim.wo[win].scrolloff = 3
+
+  local function close()
+    if vim.api.nvim_win_is_valid(win) then
+      vim.api.nvim_win_close(win, true)
+    end
+  end
+
+  local opts = { buffer = buf, silent = true }
+  vim.keymap.set("n", "q", close, vim.tbl_extend("force", opts, { desc = "Close thread viewer" }))
+  vim.keymap.set("n", "<Esc>", close, vim.tbl_extend("force", opts, { desc = "Close thread viewer" }))
+  vim.keymap.set("n", "r", function()
+    close()
+    open_comment_popup("Reply", file_path, cursor_line, cursor_line, side, function(body)
+      post_reply(root_id, body)
+    end)
+  end, vim.tbl_extend("force", opts, { desc = "Reply to thread" }))
+end
+
 -- --------------------------------------------------------------------------
 -- Visual mode entry points (called from keymaps)
 -- --------------------------------------------------------------------------
@@ -642,6 +796,24 @@ local function pr_review_comment()
   end)
 end
 
+local function view_thread()
+  local root, replies, file_path, side, cursor_line = get_thread_at_cursor()
+  if not root then
+    vim.notify("No PR thread at cursor", vim.log.levels.WARN)
+    return
+  end
+  ---@cast file_path string
+  ---@cast side string
+  ---@cast cursor_line integer
+
+  local thread_comments = { root }
+  for _, r in ipairs(replies) do
+    table.insert(thread_comments, r)
+  end
+
+  open_thread_viewer(thread_comments, root.id, file_path, side, cursor_line)
+end
+
 -- --------------------------------------------------------------------------
 -- Autocmds and keymaps
 -- --------------------------------------------------------------------------
@@ -674,3 +846,4 @@ end)
 
 vim.keymap.set("v", "<leader>gdc", pr_comment, { desc = "Post PR comment" })
 vim.keymap.set("v", "<leader>gdC", pr_review_comment, { desc = "Add review comment" })
+vim.keymap.set("n", "<leader>gdv", view_thread, { desc = "View PR thread" })
