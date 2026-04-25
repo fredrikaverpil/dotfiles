@@ -111,7 +111,7 @@ require("lazyload").on_vim_enter(function()
     end,
   })
 
-  -- Reset diagnostics on detach so :LspRestart/:LspStop don't leave stale state
+  -- Reset diagnostics on detach so :lsp restart/:lsp stop don't leave stale state.
   vim.api.nvim_create_autocmd("LspDetach", {
     group = vim.api.nvim_create_augroup("lsp-detach-cleanup", { clear = true }),
     callback = function(args)
@@ -119,7 +119,14 @@ require("lazyload").on_vim_enter(function()
       if not client then
         return
       end
-      vim.diagnostic.reset(vim.lsp.diagnostic.get_namespace(client.id))
+
+      local prefix = ("nvim.lsp.%s.%d"):format(client.name, client.id)
+      for namespace, metadata in pairs(vim.diagnostic.get_namespaces()) do
+        local name = metadata.name or ""
+        if name == prefix or vim.startswith(name, prefix .. ".") then
+          vim.diagnostic.reset(namespace)
+        end
+      end
     end,
   })
 
