@@ -30,10 +30,10 @@ require("lazyload").on_vim_enter(function()
       ---@type table<string, sidekick.cli.Config|{}>
       tools = {
         amp = { cmd = { "amp", "threads", "continue" } },
-        copilot = { cmd = { "copilot", "--continue" } },
         codex = { cmd = { "codex", "resume", "--last" } },
         opencode = { cmd = { "opencode", "--continue" } },
         gemini = { cmd = { "gemini", "--resume" } },
+        pi = { cmd = { "pi" } },
 
         claude = {
           cmd = {

@@ -39,6 +39,7 @@ in
     packageTools.npmPackages = [
       "@google/gemini-cli"
       "@openai/codex"
+      "@mariozechner/pi-coding-agent"
     ];
 
     # Python CLI tools via uv (mergeable across config levels)
