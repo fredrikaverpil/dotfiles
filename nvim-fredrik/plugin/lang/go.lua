@@ -39,8 +39,8 @@ require("lazyload").on_vim_enter(function()
   -- go-impl (uses "impl" from mason and "symbolScope", "symbolMatcher" setting in gopls)
   do
     vim.pack.add({
-      { src = "https://github.com/fang2hou/go-impl.nvim" },
-      { src = "https://github.com/MunifTanjim/nui.nvim" },
+      { src = "https://github.com/fang2hou/go-impl.nvim", version = vim.version.range("*") },
+      { src = "https://github.com/MunifTanjim/nui.nvim", version = vim.version.range("*") },
     })
     require("go-impl").setup({
       picker = "snacks",

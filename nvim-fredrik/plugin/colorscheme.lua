@@ -1,6 +1,6 @@
 vim.pack.add({
   { src = "https://github.com/afonsofrancof/OSC11.nvim" },
-  { src = "https://github.com/zenbones-theme/zenbones.nvim" },
+  { src = "https://github.com/zenbones-theme/zenbones.nvim", version = vim.version.range("*") },
 }, { load = false })
 
 vim.g.bones_compat = 1 -- use built-in vim highlight API, not lush.nvim

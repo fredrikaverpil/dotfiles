@@ -1,6 +1,6 @@
 require("lazyload").on_vim_enter(function()
   vim.pack.add({
-    { src = "https://github.com/fei6409/log-highlight.nvim" },
+    { src = "https://github.com/fei6409/log-highlight.nvim", version = vim.version.range("*") },
   })
 
   vim.api.nvim_create_autocmd("FileType", {

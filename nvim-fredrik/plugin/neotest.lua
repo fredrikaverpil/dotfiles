@@ -2,15 +2,15 @@ require("lazyload").on_vim_enter(function()
   local dev = require("dev")
 
   vim.pack.add({
-    { src = "https://github.com/nvim-neotest/neotest" },
-    { src = "https://github.com/nvim-neotest/nvim-nio" },
+    { src = "https://github.com/nvim-neotest/neotest", version = vim.version.range("*") },
+    { src = "https://github.com/nvim-neotest/nvim-nio", version = vim.version.range("*") },
     { src = "https://github.com/nvim-lua/plenary.nvim" },
     { src = "https://github.com/antoinemadec/FixCursorHold.nvim" },
 
     -- test adapters
     { src = "https://github.com/nvim-neotest/neotest-plenary" },
     { src = "https://github.com/nvim-neotest/neotest-python" },
-    { src = "https://github.com/lawrence-laz/neotest-zig", version = vim.version.range("1.*") },
+    { src = "https://github.com/lawrence-laz/neotest-zig" },
 
     -- neotest-golang
     { src = dev.prefer_local("~/code/public/neotest-golang", "https://github.com/fredrikaverpil/neotest-golang") },

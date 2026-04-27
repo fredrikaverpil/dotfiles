@@ -1,7 +1,7 @@
 require("lazyload").on_vim_enter(function()
   vim.pack.add({
-    { src = "https://github.com/obsidian-nvim/obsidian.nvim" },
-    { src = "https://github.com/folke/snacks.nvim" }, -- sub-dependency
+    { src = "https://github.com/obsidian-nvim/obsidian.nvim", version = vim.version.range("*") },
+    { src = "https://github.com/folke/snacks.nvim", version = vim.version.range("*") }, -- sub-dependency
   })
 
   local vault_path = vim.fn.expand("~/Library/Mobile Documents/iCloud~md~obsidian/Documents/fredrik")

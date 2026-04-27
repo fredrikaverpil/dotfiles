@@ -4,12 +4,12 @@ if Config.use_codediff then
     if use_local then
       require("dev").load_local("~/code/public/codediff.nvim")
       vim.pack.add({
-        { src = "https://github.com/MunifTanjim/nui.nvim" },
+        { src = "https://github.com/MunifTanjim/nui.nvim", version = vim.version.range("*") },
       })
     else
       vim.pack.add({
-        { src = "https://github.com/esmuellert/codediff.nvim" },
-        { src = "https://github.com/MunifTanjim/nui.nvim" },
+        { src = "https://github.com/esmuellert/codediff.nvim", version = vim.version.range("*") },
+        { src = "https://github.com/MunifTanjim/nui.nvim", version = vim.version.range("*") },
       })
     end
 

@@ -1,6 +1,6 @@
 require("lazyload").on_vim_enter(function()
   vim.pack.add({
-    { src = "https://github.com/chrishrb/gx.nvim" },
+    { src = "https://github.com/chrishrb/gx.nvim", version = vim.version.range("*") },
     { src = "https://github.com/nvim-lua/plenary.nvim" },
   })
 

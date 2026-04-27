@@ -1,7 +1,7 @@
 if Config.use_arborist then
   require("lazyload").on_vim_enter(function()
     vim.pack.add({
-      { src = "https://github.com/arborist-ts/arborist.nvim" },
+      { src = "https://github.com/arborist-ts/arborist.nvim", version = vim.version.range("*") },
     })
 
     local custom_parsers = {

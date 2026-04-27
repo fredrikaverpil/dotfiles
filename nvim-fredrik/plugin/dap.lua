@@ -2,7 +2,7 @@ require("lazyload").on_vim_enter(function()
   vim.pack.add({
     { src = "https://codeberg.org/mfussenegger/nvim-dap" },
     { src = "https://github.com/rcarriga/nvim-dap-ui" },
-    { src = "https://github.com/nvim-neotest/nvim-nio" },
+    { src = "https://github.com/nvim-neotest/nvim-nio", version = vim.version.range("*") },
     { src = "https://github.com/theHamsta/nvim-dap-virtual-text" },
     { src = "https://github.com/leoluz/nvim-dap-go" },
     { src = "https://codeberg.org/mfussenegger/nvim-dap-python" },

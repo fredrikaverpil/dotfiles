@@ -1,5 +1,5 @@
 vim.pack.add({
-  { src = "https://github.com/folke/snacks.nvim" },
+  { src = "https://github.com/folke/snacks.nvim", version = vim.version.range("*") },
 })
 
 Snacks.setup({

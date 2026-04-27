@@ -1,6 +1,6 @@
 require("lazyload").on_vim_enter(function()
   vim.pack.add({
-    { src = "https://github.com/folke/sidekick.nvim" },
+    { src = "https://github.com/folke/sidekick.nvim", version = vim.version.range("*") },
   })
 
   -- taken from sidekick.nvim

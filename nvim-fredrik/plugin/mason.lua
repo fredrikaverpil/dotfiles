@@ -1,7 +1,7 @@
 require("lazyload").on_vim_enter(function()
   vim.pack.add({
-    { src = "https://github.com/mason-org/mason.nvim" },
-    { src = "https://github.com/mason-org/mason-lspconfig.nvim" },
+    { src = "https://github.com/mason-org/mason.nvim", version = vim.version.range("*") },
+    { src = "https://github.com/mason-org/mason-lspconfig.nvim", version = vim.version.range("*") },
     { src = "https://github.com/zapling/mason-lock.nvim" },
   })
 

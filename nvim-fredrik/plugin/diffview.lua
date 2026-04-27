@@ -1,7 +1,7 @@
 if Config.use_diffview then
   require("lazyload").on_vim_enter(function()
     vim.pack.add({
-      { src = "https://github.com/dlyongemallo/diffview.nvim" },
+      { src = "https://github.com/dlyongemallo/diffview.nvim", version = vim.version.range("*") },
     })
 
     require("diffview").setup({

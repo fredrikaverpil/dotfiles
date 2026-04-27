@@ -1,6 +1,6 @@
 require("lazyload").on_vim_enter(function()
   vim.pack.add({
-    { src = "https://github.com/folke/which-key.nvim" },
+    { src = "https://github.com/folke/which-key.nvim", version = vim.version.range("*") },
   })
 
   require("which-key").setup({
