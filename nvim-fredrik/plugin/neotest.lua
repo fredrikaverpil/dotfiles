@@ -1,5 +1,5 @@
 require("lazyload").on_vim_enter(function()
-  local dev = require("dev")
+  require("dev").load_local("~/code/public/neotest-golang")
 
   vim.pack.add({
     { src = "https://github.com/nvim-neotest/neotest", version = vim.version.range("*") },
@@ -13,7 +13,7 @@ require("lazyload").on_vim_enter(function()
     { src = "https://github.com/lawrence-laz/neotest-zig" },
 
     -- neotest-golang
-    { src = dev.prefer_local("~/code/public/neotest-golang", "https://github.com/fredrikaverpil/neotest-golang") },
+    -- { src = "https://github.com/fredrikaverpil/neotest-golang" },
     { src = "https://github.com/uga-rosa/utf8.nvim" },
   })
 
