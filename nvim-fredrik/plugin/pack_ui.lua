@@ -55,33 +55,12 @@ require("lazyload").on_vim_enter(function()
     check_id = 0, -- incremented on each check start and on close()
   }
 
-  -- Cache of path => installed git tag (false = no tag found)
+  -- Cache of path => installed semver git tag (false = no tag found)
   local tag_cache = {}
 
   -- Cache of path => resolved remote default branch ref (false = resolution failed)
   -- Persists for the Neovim session; the default branch never changes mid-session.
   local ref_cache = {}
-
-  -- For versioned plugins, return the actual installed tag from git.
-  -- Results are cached for the session so git is only called once per plugin.
-  local function get_installed_tag(path)
-    if not path then
-      return nil
-    end
-    if tag_cache[path] ~= nil then
-      return tag_cache[path] or nil
-    end
-    local result = vim
-      .system({ "git", "-C", path, "describe", "--tags", "--exact-match", "HEAD" }, { text = true })
-      :wait()
-    if result.code == 0 then
-      local tag = vim.trim(result.stdout)
-      tag_cache[path] = tag
-      return tag
-    end
-    tag_cache[path] = false
-    return nil
-  end
 
   -- Get version string from plugin spec
   local function get_version_str(p)
@@ -93,6 +72,13 @@ require("lazyload").on_vim_enter(function()
       return v
     end
     return tostring(v)
+  end
+
+  local function is_version_range(version)
+    if version == "" then
+      return false
+    end
+    return version == "*" or version:match("%d") ~= nil
   end
 
   -- Parse semver from a tag string, returns {major, minor, patch} or nil
@@ -119,6 +105,37 @@ require("lazyload").on_vim_enter(function()
       return a[2] > b[2]
     end
     return a[3] > b[3]
+  end
+
+  -- For versioned plugins, return the actual installed semver tag from git.
+  -- Results are cached for the session so git is only called once per plugin.
+  local function get_installed_tag(path)
+    if not path then
+      return nil
+    end
+    if tag_cache[path] ~= nil then
+      return tag_cache[path] or nil
+    end
+
+    local result = vim.system({ "git", "-C", path, "tag", "--points-at", "HEAD" }, { text = true }):wait()
+    if result.code == 0 then
+      local latest_tag = nil
+      local latest_ver = nil
+      for tag in result.stdout:gmatch("[^\n]+") do
+        local version = parse_semver(tag)
+        if version and (not latest_ver or semver_gt(version, latest_ver)) then
+          latest_tag = tag
+          latest_ver = version
+        end
+      end
+      if latest_tag then
+        tag_cache[path] = latest_tag
+        return latest_tag
+      end
+    end
+
+    tag_cache[path] = false
+    return nil
   end
 
   -- Parse commits from git --oneline output into a list of strings
@@ -256,7 +273,9 @@ require("lazyload").on_vim_enter(function()
     for _, p in ipairs(plugins) do
       local path = p.path
       local name = p.spec.name
-      local current_tag = p.spec.version and get_installed_tag(path) or nil
+      local version = get_version_str(p)
+      local has_version_range = is_version_range(version)
+      local current_tag = has_version_range and get_installed_tag(path) or nil
 
       vim.system({ "git", "-C", path, "fetch", "--quiet", "--tags" }, {}, function(fetch_res)
         if fetch_res.code ~= 0 then
@@ -264,8 +283,8 @@ require("lazyload").on_vim_enter(function()
           return
         end
 
-        if current_tag then
-          -- Versioned plugin: compare against latest tag, then check main for unreleased breaking
+        if has_version_range then
+          -- Versioned plugin: compare against latest tag, then check main for unreleased commits.
           vim.system(
             { "git", "-C", path, "tag", "--list", "--sort=-version:refname" },
             { text = true },
@@ -293,14 +312,14 @@ require("lazyload").on_vim_enter(function()
               end
 
               -- Get released commits (HEAD..latest_tag) if tag changed,
-              -- then check main for unreleased breaking commits
+              -- then check main for unreleased commits.
               local function after_released()
                 resolve_remote_ref(path, function(ref)
                   if not ref then
                     finish_one(result)
                     return
                   end
-                  local compare_from = latest_tag or current_tag
+                  local compare_from = latest_tag or current_tag or "HEAD"
                   git_log(path, compare_from .. ".." .. ref, function(unreleased)
                     if #unreleased > 0 then
                       result.unreleased = unreleased
@@ -314,11 +333,14 @@ require("lazyload").on_vim_enter(function()
                 end)
               end
 
-              local is_newer = cur_ver and latest_ver and semver_gt(latest_ver, cur_ver)
+              local is_newer = (cur_ver and latest_ver and semver_gt(latest_ver, cur_ver))
+                or (not cur_ver and latest_tag ~= nil)
               if is_newer and latest_tag then
-                result.latest_ref = latest_tag
                 git_log(path, "HEAD.." .. latest_tag, function(commits)
                   result.updates = commits
+                  if #commits > 0 then
+                    result.latest_ref = latest_tag
+                  end
                   if has_breaking_commit(commits) then
                     result.breaking = true
                   end
@@ -444,10 +466,11 @@ require("lazyload").on_vim_enter(function()
       local name = p.spec.name
       local pad = string.rep(" ", max_name - #name + 2)
       local version = get_version_str(p)
-      local tag = p.spec.version and get_installed_tag(p.path) or nil
+      local has_version_range = is_version_range(version)
+      local tag = has_version_range and get_installed_tag(p.path) or nil
       local rev_short = p.rev and p.rev:sub(1, 7) or ""
 
-      local ver_display = tag or (rev_short ~= "" and rev_short or version)
+      local ver_display = has_version_range and (tag or version) or (rev_short ~= "" and rev_short or version)
       local latest = state.latest_ref[name]
       if latest then
         -- Normalize v prefix before comparing to avoid spurious arrows
@@ -551,6 +574,7 @@ require("lazyload").on_vim_enter(function()
         local unreleased_commits = state.unreleased[name]
         if unreleased_commits and #unreleased_commits > 0 then
           add(string.format("     +%d unreleased commit(s) on main", #unreleased_commits), "PackUiUpdateAvailable")
+          line_to_plugin[#lines] = name
           add("")
         end
         if unrel and #unrel > 0 then
