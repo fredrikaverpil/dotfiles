@@ -22,7 +22,7 @@ Snacks.setup({
         { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
         { icon = " ", key = "r", desc = "Recent Files", action = ":lua Snacks.dashboard.pick('oldfiles')" },
         { icon = " ", key = "s", desc = "Restore Session", action = ":lua require('persistence').load()" },
-        { icon = " ", key = "u", desc = "Check for Updates", action = ":Pack check" },
+        { icon = " ", key = "c", desc = "Check for Updates", action = ":Pack check" },
         { icon = " ", key = "q", desc = "Quit", action = ":qa" },
       },
       header = [[
