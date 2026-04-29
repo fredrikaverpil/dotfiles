@@ -47,6 +47,7 @@ require("lazyload").on_vim_enter(function()
     show_help = false,
     updates = {}, -- plugin name => list of new commit lines
     breaking = {}, -- plugin name => bool (major semver bump or breaking commit detected)
+    unreleased = {}, -- plugin name => list of unreleased commit lines
     unreleased_breaking = {}, -- plugin name => list of unreleased breaking commit lines
     show_all_commits = {}, -- plugin name => bool (show full commit list)
     latest_ref = {}, -- plugin name => latest version/hash string
@@ -207,6 +208,7 @@ require("lazyload").on_vim_enter(function()
     state.checking = true
     state.updates = {}
     state.breaking = {}
+    state.unreleased = {}
     state.unreleased_breaking = {}
     state.latest_ref = {}
     render()
@@ -227,6 +229,9 @@ require("lazyload").on_vim_enter(function()
           end
           if result.breaking then
             state.breaking[result.name] = true
+          end
+          if result.unreleased then
+            state.unreleased[result.name] = result.unreleased
           end
           if result.unreleased_breaking then
             state.unreleased_breaking[result.name] = result.unreleased_breaking
@@ -297,6 +302,9 @@ require("lazyload").on_vim_enter(function()
                   end
                   local compare_from = latest_tag or current_tag
                   git_log(path, compare_from .. ".." .. ref, function(unreleased)
+                    if #unreleased > 0 then
+                      result.unreleased = unreleased
+                    end
                     local breaking_lines = filter_breaking(unreleased)
                     if #breaking_lines > 0 then
                       result.unreleased_breaking = breaking_lines
@@ -458,12 +466,23 @@ require("lazyload").on_vim_enter(function()
       end
       local update_count = state.updates[name] and #state.updates[name] or 0
       local update_str = update_count > 0 and string.format("  ↑%d", update_count) or ""
+      local unreleased_count = state.unreleased[name] and #state.unreleased[name] or 0
+      local unreleased_count_str = unreleased_count > 0 and string.format("  +%d unreleased", unreleased_count) or ""
       local unreleased = state.unreleased_breaking[name]
       local unreleased_str = unreleased
           and #unreleased > 0
           and string.format("  ⚠ %d breaking unreleased", #unreleased)
         or ""
-      local line = string.format("   %s %s%s%s%s%s", icon, name, pad, ver_display, update_str, unreleased_str)
+      local line = string.format(
+        "   %s %s%s%s%s%s%s",
+        icon,
+        name,
+        pad,
+        ver_display,
+        update_str,
+        unreleased_count_str,
+        unreleased_str
+      )
       local lnum_cur = #lines
       add(line)
 
@@ -488,8 +507,12 @@ require("lazyload").on_vim_enter(function()
           state.breaking[name] and "PackUiBreaking" or "PackUiUpdateAvailable"
         )
       end
+      if #unreleased_count_str > 0 then
+        local unrel_count_start = name_start + #name + #pad + #ver_display + #update_str
+        add_hl(lnum_cur, unrel_count_start, unrel_count_start + #unreleased_count_str, "PackUiUpdateAvailable")
+      end
       if #unreleased_str > 0 then
-        local unrel_start = name_start + #name + #pad + #ver_display + #update_str
+        local unrel_start = name_start + #name + #pad + #ver_display + #update_str + #unreleased_count_str
         add_hl(lnum_cur, unrel_start, unrel_start + #unreleased_str, "PackUiBreaking")
       end
 
@@ -525,6 +548,11 @@ require("lazyload").on_vim_enter(function()
           add("")
         end
         local unrel = state.unreleased_breaking[name]
+        local unreleased_commits = state.unreleased[name]
+        if unreleased_commits and #unreleased_commits > 0 then
+          add(string.format("     +%d unreleased commit(s) on main", #unreleased_commits), "PackUiUpdateAvailable")
+          add("")
+        end
         if unrel and #unrel > 0 then
           add(string.format("     ⚠ %d breaking change(s) unreleased on main:", #unrel), "PackUiBreaking")
           line_to_plugin[#lines] = name
@@ -599,6 +627,7 @@ require("lazyload").on_vim_enter(function()
     state.show_help = false
     state.updates = {}
     state.breaking = {}
+    state.unreleased = {}
     state.unreleased_breaking = {}
     state.show_all_commits = {}
     state.latest_ref = {}
