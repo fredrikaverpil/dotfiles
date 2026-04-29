@@ -39,11 +39,9 @@ require("lazyload").on_vim_enter(function()
           cmd = {
             "claude",
             "--continue",
-            "--allow-dangerously-skip-permissions",
-            "--allowedTools=mcp__github",
             "--allowedTools=Bash(gh:*)",
             "--allowedTools=RunBash(go:*)",
-            "--allowedTools=Read(~/code)",
+            "--allowedTools=Read(~/code/public)",
           },
         },
 
