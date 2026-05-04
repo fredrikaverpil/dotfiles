@@ -12,7 +12,7 @@
   "gci": "v0.14.0",
   "gofumpt": "v0.9.2",
   "goimports": "v0.44.0",
-  "golangci-lint": "v2.11.4",
+  "golangci-lint": "v2.12.1",
   "golines": "v0.15.0",
   "gopls": "v0.21.1",
   "gotestsum": "v1.13.0",

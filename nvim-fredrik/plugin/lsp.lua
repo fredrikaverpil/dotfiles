@@ -1,6 +1,6 @@
 require("lazyload").on_vim_enter(function()
   vim.pack.add({
-    { src = "https://github.com/neovim/nvim-lspconfig" },
+    { src = "https://github.com/neovim/nvim-lspconfig", version = vim.version.range("*") },
     { src = "https://github.com/artemave/workspace-diagnostics.nvim" },
   })
 
