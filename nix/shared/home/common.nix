@@ -28,7 +28,10 @@ in
     selfManagedCLIs.clis = [
       (mkCurlInstaller "claude" "Claude Code" "https://claude.ai/install.sh" "$HOME/.local/bin/claude")
       (mkCurlInstaller "agent" "Cursor Agent" "https://cursor.com/install" "$HOME/.local/bin/agent")
-      (mkCurlInstaller "ollama" "Ollama" "https://ollama.com/install.sh" "$HOME/.local/bin/ollama")
+
+      # NOTE: disabled in favor for llama.cpp
+      # (mkCurlInstaller "ollama" "Ollama" "https://ollama.com/install.sh" "$HOME/.local/bin/ollama")
+
       # OpenCode installs to ~/.opencode/bin/opencode, use --no-modify-path to prevent shell config modification
       (mkCustomInstaller "opencode" "OpenCode AI" ''
         ${pkgs.curl}/bin/curl -fsSL https://opencode.ai/install | ${pkgs.bash}/bin/bash -s -- --no-modify-path
@@ -164,6 +167,7 @@ in
       exiftool
       gnused # GNU tools (for macOS compatibility)
       imagemagick
+      llama-cpp
       slides
       chafa # Required for showing images in slides
 
