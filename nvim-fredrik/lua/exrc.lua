@@ -4,6 +4,7 @@
 --          Reads the trust DB directly (no prompting).
 
 local M = {}
+local find = require("find")
 
 --- @class ExrcEntry
 --- @field path string   Display path (tilde-collapsed)
@@ -12,7 +13,7 @@ local M = {}
 --- List .nvim.lua files found upward from cwd with their trust status.
 --- @return ExrcEntry[]
 function M.list()
-  local found = vim.fs.find(".nvim.lua", { upward = true, type = "file", limit = math.huge })
+  local found = find.upward(".nvim.lua", { limit = math.huge })
   if #found == 0 then
     return {}
   end

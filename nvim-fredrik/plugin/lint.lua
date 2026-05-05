@@ -4,6 +4,7 @@ require("lazyload").on_vim_enter(function()
   })
 
   local lint = require("lint")
+  local find = require("find")
 
   lint.linters_by_ft = {
     dockerfile = { "hadolint" },
@@ -55,16 +56,13 @@ require("lazyload").on_vim_enter(function()
       if cached then
         return cached
       end
-      local found = vim.fs.find(
-        { "buf.yaml", "buf.yml" },
-        { path = buffer_parent_dir, upward = true, type = "file", limit = 1, stop = vim.fs.normalize("~") }
-      )
-      if #found == 0 then
+      local found = find.file_upward({ "buf.yaml", "buf.yml" }, { path = buffer_parent_dir })
+      if found == nil then
         buf_config_cache[buffer_parent_dir] = false
         return nil
       end
-      buf_config_cache[buffer_parent_dir] = found[1]
-      return found[1]
+      buf_config_cache[buffer_parent_dir] = found
+      return found
     end
 
     local function buf_lint_cwd()
@@ -218,15 +216,11 @@ require("lazyload").on_vim_enter(function()
       if cached then
         return cached
       end
-      local found = vim.fs.find(
-        { "go.mod" },
-        { path = buffer_parent_dir, upward = true, type = "file", limit = 1, stop = vim.fs.normalize("~") }
-      )
-      if #found == 0 then
+      local dir = find.dir_upward("go.mod", { path = buffer_parent_dir })
+      if dir == nil then
         go_mod_dir_cache[buffer_parent_dir] = false
         return nil
       end
-      local dir = vim.fn.fnamemodify(found[1], ":h")
       go_mod_dir_cache[buffer_parent_dir] = dir
       return dir
     end
