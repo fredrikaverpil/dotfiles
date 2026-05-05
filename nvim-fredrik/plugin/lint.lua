@@ -8,7 +8,6 @@ require("lazyload").on_vim_enter(function()
   lint.linters_by_ft = {
     dockerfile = { "hadolint" },
     gha = { "actionlint" },
-    go = { "golangcilint" },
     markdown = { "markdownlint" },
     proto = { "protolint" },
     python = { "mypy" },
@@ -204,6 +203,45 @@ require("lazyload").on_vim_enter(function()
         end,
       })
     end
+  end
+
+  -- go: golangcilint with cwd at the nearest go.mod (handles nested modules)
+  do
+    local go_mod_dir_cache = {}
+
+    local function go_mod_dir()
+      local buffer_parent_dir = vim.fn.expand("%:p:h")
+      local cached = go_mod_dir_cache[buffer_parent_dir]
+      if cached == false then
+        return nil
+      end
+      if cached then
+        return cached
+      end
+      local found = vim.fs.find(
+        { "go.mod" },
+        { path = buffer_parent_dir, upward = true, type = "file", limit = 1, stop = vim.fs.normalize("~") }
+      )
+      if #found == 0 then
+        go_mod_dir_cache[buffer_parent_dir] = false
+        return nil
+      end
+      local dir = vim.fn.fnamemodify(found[1], ":h")
+      go_mod_dir_cache[buffer_parent_dir] = dir
+      return dir
+    end
+
+    vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
+      group = vim.api.nvim_create_augroup("lint-go", { clear = true }),
+      pattern = { "*.go" },
+      callback = function()
+        local cwd = go_mod_dir()
+        if cwd == nil then
+          return
+        end
+        lint.try_lint("golangcilint", { cwd = cwd })
+      end,
+    })
   end
 
   -- Lint already-open buffers (initial file was read before VimEnter)
