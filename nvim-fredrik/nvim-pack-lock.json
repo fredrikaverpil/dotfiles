@@ -9,7 +9,7 @@
       "src": "https://github.com/afonsofrancof/OSC11.nvim"
     },
     "SchemaStore.nvim": {
-      "rev": "6db1246640e9e1bdf8a1d1f6d27a940fc0a572d5",
+      "rev": "c8982fcea21d0d8e928a367e0c1536e6ac7cf98e",
       "src": "https://github.com/b0o/SchemaStore.nvim"
     },
     "arrow.nvim": {
@@ -223,11 +223,6 @@
       "rev": "1af6ffb9b5229a856e8090fa2f690e0931a5aace",
       "src": "https://github.com/jbyuki/one-small-step-for-vimkind"
     },
-    "overseer.nvim": {
-      "rev": "95b1099c043e4231a1204abd9a394d379e69f029",
-      "src": "https://github.com/stevearc/overseer.nvim",
-      "version": ">=0.0.0"
-    },
     "persistence.nvim": {
       "rev": "b20b2a7887bd39c1a356980b45e03250f3dce49c",
       "src": "https://github.com/folke/persistence.nvim"
@@ -302,7 +297,7 @@
       "src": "https://github.com/sindrets/winshift.nvim"
     },
     "workspace-diagnostics.nvim": {
-      "rev": "0dcd7d0a6c8f6e1ddb5bb72e1412aa4c9388718f",
+      "rev": "a35321d8401878cc9558e357acfd0da58b582739",
       "src": "https://github.com/artemave/workspace-diagnostics.nvim"
     },
     "yanky.nvim": {
