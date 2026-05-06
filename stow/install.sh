@@ -23,6 +23,15 @@ fi
 echo "Installing dotfiles for platform: $OS"
 echo "Packages: ${PACKAGES[*]}"
 
+# Simulate first to catch conflicts before touching anything
+echo "Checking for conflicts..."
+for pkg in "${PACKAGES[@]}"; do
+    if ! stow --target="$HOME" --simulate --restow --no-folding "$pkg" 2>&1; then
+        echo "Error: Conflict detected in $pkg — aborting before making any changes"
+        exit 1
+    fi
+done
+
 # Clean existing symlinks
 echo "Cleaning existing symlinks..."
 for pkg in "${PACKAGES[@]}"; do
@@ -32,7 +41,7 @@ done
 # Install packages
 for pkg in "${PACKAGES[@]}"; do
     echo "Installing $pkg configs..."
-    if ! stow --target="$HOME" --restow --verbose=1 "$pkg"; then
+    if ! stow --target="$HOME" --restow --no-folding --verbose=1 "$pkg"; then
         echo "Error: Failed to install $pkg configs"
         exit 1
     fi
