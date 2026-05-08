@@ -4,11 +4,19 @@ require("lazyload").on_vim_enter(function()
     { src = "https://github.com/folke/snacks.nvim", version = vim.version.range("*") }, -- sub-dependency
   })
 
-  local vault_path = vim.fn.expand("~/Library/Mobile Documents/iCloud~md~obsidian/Documents/fredrik")
-  local scratchpad_path = vault_path .. "/scratchpad.md"
+  if vim.fn.has("mac") ~= 1 then
+    return
+  end
 
-  -- Only enable on macOS if the vault exists.
-  if vim.fn.has("mac") ~= 1 or vim.fn.isdirectory(vault_path) ~= 1 then
+  local base = vim.fn.expand("~/Library/Mobile Documents/iCloud~md~obsidian/Documents")
+  local vaults = vim.tbl_filter(function(v)
+    return vim.fn.isdirectory(v.path) == 1
+  end, {
+    { name = "personal", path = base .. "/personal" },
+    { name = "work", path = base .. "/work" },
+  })
+
+  if #vaults == 0 then
     return
   end
 
@@ -18,12 +26,7 @@ require("lazyload").on_vim_enter(function()
   end
 
   require("obsidian").setup({
-    workspaces = {
-      {
-        name = "personal",
-        path = vault_path,
-      },
-    },
+    workspaces = vaults,
 
     completion = {
       nvim_cmp = false,
@@ -37,7 +40,7 @@ require("lazyload").on_vim_enter(function()
 
     daily_notes = {
       folder = "Daily",
-      template = vault_path .. "/_templates/daily.md",
+      template = "daily.md",
     },
 
     attachments = {
@@ -78,23 +81,91 @@ require("lazyload").on_vim_enter(function()
     legacy_commands = false,
   })
 
+  do
+    local function find_vault(name)
+      for _, v in ipairs(vaults) do
+        if v.name == name then
+          return v
+        end
+      end
+    end
+
+    local default = require("path").cwd_is_under("~/code/work") and find_vault("work") or find_vault("personal")
+    if default then
+      _G.Config.obsidian_vault = default
+    end
+  end
+
+  local function pick_vault(callback)
+    vim.ui.select(vaults, {
+      prompt = "Select vault",
+      format_item = function(v)
+        local active = _G.Config.obsidian_vault and _G.Config.obsidian_vault.name == v.name
+        return (active and "* " or "  ") .. v.name
+      end,
+    }, function(v)
+      if not v then
+        return
+      end
+      _G.Config.obsidian_vault = v
+      vim.cmd("Obsidian workspace " .. v.name)
+      if callback then
+        callback(v)
+      end
+    end)
+  end
+
+  local function with_vault(callback)
+    if _G.Config.obsidian_vault then
+      callback(_G.Config.obsidian_vault)
+    else
+      pick_vault(callback)
+    end
+  end
+
   -- Keymaps
+  vim.keymap.set("n", "<leader>nW", pick_vault, { desc = "Notes: switch vault" })
+
   vim.keymap.set("n", "<leader>ns", function()
-    Snacks.picker.grep({ cwd = vault_path })
+    with_vault(function(v)
+      ---@diagnostic disable-next-line: undefined-global
+      Snacks.picker.grep({ dirs = { v.path } })
+    end)
   end, { desc = "Notes: search text" })
+
   vim.keymap.set("n", "<leader>nf", function()
-    vim.cmd("Obsidian quick_switch")
+    with_vault(function(_)
+      vim.cmd("Obsidian quick_switch")
+    end)
   end, { desc = "Notes: search filenames" })
+
   vim.keymap.set("n", "<leader>nn", function()
-    vim.cmd("Obsidian new")
+    with_vault(function(_)
+      vim.cmd("Obsidian new")
+    end)
   end, { desc = "Notes: new" })
+
   vim.keymap.set("n", "<leader>nd", function()
-    vim.cmd("Obsidian today")
+    with_vault(function(_)
+      vim.cmd("Obsidian today")
+    end)
   end, { desc = "Notes: daily note" })
+
   vim.keymap.set("n", "<leader>nt", function()
-    vim.cmd("Obsidian new_from_template")
+    with_vault(function(_)
+      vim.cmd("Obsidian new_from_template")
+    end)
   end, { desc = "Notes: new from template" })
+
   vim.keymap.set("n", "<leader>nS", function()
-    vim.cmd("tabnew " .. scratchpad_path)
+    with_vault(function(v)
+      vim.cmd.tabnew(v.path .. "/scratchpad.md")
+    end)
   end, { desc = "Notes: scratchpad" })
+
+  vim.keymap.set("n", "<leader>no", function()
+    with_vault(function(v)
+      vim.fn.jobstart({ "open", "obsidian://open?vault=" .. v.name })
+    end)
+  end, { desc = "Notes: open Obsidian" })
 end)

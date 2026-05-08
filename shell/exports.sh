@@ -120,6 +120,9 @@ Darwin)
 
 	add_to_path append "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
 
+  add_to_path append "/Applications/Obsidian.app/Contents/MacOS"
+
+
 	# Configure testcontainers to use podman socket when testcontainers is used
 	if [ -f "$HOME/.testcontainers.properties" ]; then
 		# the .testcontainers.properties file usually contains: ryuk.container.privileged = true
