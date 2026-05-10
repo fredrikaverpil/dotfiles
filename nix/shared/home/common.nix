@@ -151,6 +151,7 @@ in
       gh
       lazygit
       lazydocker
+      docker-client # Docker CLI only (no engine); routes to whatever DOCKER_HOST points at
 
       # ========================================================================
       # Network, API & Database

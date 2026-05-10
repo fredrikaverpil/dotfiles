@@ -122,12 +122,12 @@ Darwin)
 
   add_to_path append "/Applications/Obsidian.app/Contents/MacOS"
 
-
-	# Configure testcontainers to use podman socket when testcontainers is used
-	if [ -f "$HOME/.testcontainers.properties" ]; then
-		# the .testcontainers.properties file usually contains: ryuk.container.privileged = true
-		export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/run/user/$(id -u)/podman/podman.sock
-	fi
+  # DOCKER_BACKEND drives DOCKER_HOST.
+  if [ -f "$DOTFILES/shell/lib/docker-backend.sh" ]; then
+    export DOCKER_BACKEND="podman"
+    source "$DOTFILES/shell/lib/docker-backend.sh"
+    docker_backend_apply
+  fi
 
 	# # nvm
 	# if [ "$(uname -m)" = "arm64" ]; then

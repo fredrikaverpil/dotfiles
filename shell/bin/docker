@@ -1,17 +1,15 @@
 #!/usr/bin/env bash
 set -e
 
-if command -v podman &>/dev/null; then
-  [ -e /etc/containers/nodocker ] ||
-    echo "Emulate Docker CLI using podman. Create /etc/containers/nodocker to quiet msg." >&2
-  exec podman "$@"
-elif [[ -f ~/.orbstack/bin/docker ]]; then
-  echo "Emulate Docker CLI using orbstack." >&2
-  exec ~/.orbstack/bin/docker "$@"
-else
-  # To avoid recursive execution, find the real 'docker' executable by
-  # searching a PATH that does not include the directory of this script.
-  SCRIPT_DIR_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-  CLEAN_PATH=$(echo "$PATH" | awk -v RS=: -v ORS=: -v SCRIPT_PATH="$SCRIPT_DIR_PATH" '$0 != SCRIPT_PATH' | sed 's/:$//')
-  PATH="$CLEAN_PATH" command exec docker "$@"
+# Translate DOCKER_BACKEND → DOCKER_HOST before invoking the real docker CLI.
+if [ -f "$HOME/.dotfiles/shell/lib/docker-backend.sh" ]; then
+	# shellcheck source=/dev/null
+	. "$HOME/.dotfiles/shell/lib/docker-backend.sh"
+	docker_backend_apply
+	docker_backend_status
 fi
+
+# Avoid recursing into this shim — strip its directory from PATH before exec.
+SCRIPT_DIR_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+CLEAN_PATH=$(echo "$PATH" | awk -v RS=: -v ORS=: -v SCRIPT_PATH="$SCRIPT_DIR_PATH" '$0 != SCRIPT_PATH' | sed 's/:$//')
+PATH="$CLEAN_PATH" command exec docker "$@"
