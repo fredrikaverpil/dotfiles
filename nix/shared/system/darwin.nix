@@ -14,6 +14,12 @@
       description = "Additional homebrew packages for this host";
     };
 
+    host.extraTaps = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "Additional homebrew taps for this host";
+    };
+
     host.extraCasks = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
@@ -48,7 +54,8 @@
         "1password/tap"
         "nikitabobko/tap"
         # "sst/tap" # for opencode
-      ];
+      ]
+      ++ config.host.extraTaps;
 
       brews = [
         # Packages not available in nixpkgs
@@ -123,9 +130,12 @@
     # Note: User configuration is handled by lib/users.nix
 
     # System-level packages
-    environment.systemPackages = with pkgs; [
-      vim # for recovery
-    ];
+    environment.systemPackages =
+      with pkgs;
+      [
+        vim # for recovery
+      ]
+      ++ config.host.extraPackages;
 
     # Auto upgrade configuration
     # WARNING: nix-darwin doesn't support system.autoUpgrade

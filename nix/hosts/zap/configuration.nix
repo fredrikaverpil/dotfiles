@@ -34,12 +34,15 @@ in
   host.extraPackages = with pkgs; [
   ];
 
+  host.extraTaps = [
+    "slp/krun" # krunkit
+  ];
+
   host.extraBrews = [
     # podman added here as it also adds podman-mac-helper (not installed if installed via nix)
     "podman"
     "podman-compose"
-    "vfkit" # for podman
-
+    "krunkit" # required by podman to create VMs
   ];
 
   host.extraCasks = [
