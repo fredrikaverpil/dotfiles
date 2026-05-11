@@ -314,7 +314,6 @@ in {
       wget # File download utility
 
       # Container tools for homelab services
-      docker # Container runtime
       docker-compose # Container orchestration
 
       # Backup tools
