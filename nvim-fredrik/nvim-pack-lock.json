@@ -9,7 +9,7 @@
       "src": "https://github.com/afonsofrancof/OSC11.nvim"
     },
     "SchemaStore.nvim": {
-      "rev": "c8982fcea21d0d8e928a367e0c1536e6ac7cf98e",
+      "rev": "7127911cc824a1d2f600492edd9667b476cf3eda",
       "src": "https://github.com/b0o/SchemaStore.nvim"
     },
     "arrow.nvim": {
@@ -180,7 +180,7 @@
       "src": "https://codeberg.org/mfussenegger/nvim-lint"
     },
     "nvim-lspconfig": {
-      "rev": "9bafffaeaae363c5211080e06e04ed5b422fd5ad",
+      "rev": "f6738ef65dabade340b473d4ff2a1ad3352c10e7",
       "src": "https://github.com/neovim/nvim-lspconfig",
       "version": ">=0.0.0"
     },
@@ -199,11 +199,11 @@
       "version": "'main'"
     },
     "nvim-treesitter-context": {
-      "rev": "b0c45cefe2c8f7b55fc46f34e563bc428ef99636",
+      "rev": "b311b30818951d01f7b4bf650521b868b3fece16",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter-context"
     },
     "obsidian.nvim": {
-      "rev": "dec6573816767eaa9596cabc1593f45a2f7821ee",
+      "rev": "ed6f386abe83e4dafa9afecf50cd9d9fff072a07",
       "src": "https://github.com/obsidian-nvim/obsidian.nvim",
       "version": ">=0.0.0"
     },
@@ -305,7 +305,7 @@
       "src": "https://github.com/gbprod/yanky.nvim"
     },
     "zenbones.nvim": {
-      "rev": "22b7fb75593412e0dc81b4bdefae718e9e84aa82",
+      "rev": "239bdb9a09c8d38c752c43590d02f654ed0da2b0",
       "src": "https://github.com/zenbones-theme/zenbones.nvim",
       "version": ">=0.0.0"
     }
