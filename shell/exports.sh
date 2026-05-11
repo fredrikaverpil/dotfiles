@@ -100,14 +100,15 @@ add_to_path prepend "$HOME/.local/bin" # user-installed binaries
 
 # Source Home Manager session variables (includes sessionPath)
 if [ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]; then
+	# shellcheck source=/dev/null
 	source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
 fi
 
 # load .env file if it exists
-# shellcheck disable=SC1090
 if [ -f "$HOME/.shell/.env" ]; then
 	set -a
-	source $HOME/.shell/.env
+	# shellcheck source=/dev/null
+	source "$HOME/.shell/.env"
 	set +a
 else
 	echo "Warning: $HOME/.shell/.env does not exist"
@@ -120,14 +121,7 @@ Darwin)
 
 	add_to_path append "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
 
-  add_to_path append "/Applications/Obsidian.app/Contents/MacOS"
-
-  # DOCKER_BACKEND drives DOCKER_HOST.
-  if [ -f "$DOTFILES/shell/lib/docker-backend.sh" ]; then
-    export DOCKER_BACKEND="podman"
-    source "$DOTFILES/shell/lib/docker-backend.sh"
-    docker_backend_apply
-  fi
+	add_to_path append "/Applications/Obsidian.app/Contents/MacOS"
 
 	# # nvm
 	# if [ "$(uname -m)" = "arm64" ]; then

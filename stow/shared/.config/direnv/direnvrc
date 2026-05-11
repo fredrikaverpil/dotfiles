@@ -1,9 +1,0 @@
-# shellcheck shell=bash
-# shellcheck source=/dev/null
-
-# use_docker_backend <container|podman|orbstack|docker>
-use_docker_backend() {
-	export DOCKER_BACKEND="$1"
-	. "$HOME/.dotfiles/shell/lib/docker-backend.sh"
-	docker_backend_apply
-}

@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+set -e
+
+usage() {
+	printf 'usage: docker-backend env <podman|orbstack|socktainer|docker>\n' >&2
+	printf '       docker-backend run <podman|orbstack|socktainer|docker> -- <command> [args...]\n' >&2
+}
+
+quote() {
+	printf '%q' "$1"
+}
+
+podman_socket() {
+	if [ "$(uname)" = "Darwin" ]; then
+		local sock="$HOME/.local/share/containers/podman/machine/podman.sock"
+		if [ ! -S "$sock" ] && command -v podman >/dev/null 2>&1; then
+			local inspected_sock
+			inspected_sock=$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}' 2>/dev/null || true)
+			if [ -n "$inspected_sock" ]; then
+				sock="$inspected_sock"
+			fi
+		fi
+		printf '%s\n' "$sock"
+		return
+	fi
+
+	printf '/run/user/%s/podman/podman.sock\n' "$(id -u)"
+}
+
+print_env() {
+	local backend="${1:-}"
+	local sock
+
+	case "$backend" in
+	podman)
+		sock=$(podman_socket)
+		printf 'export DOCKER_HOST=%s\n' "$(quote "unix://$sock")"
+		# Testcontainers on macOS expects the VM-internal Podman socket path.
+		if [ "$(uname)" = "Darwin" ]; then
+			printf 'export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=%s\n' "$(quote "/run/user/$(id -u)/podman/podman.sock")"
+		else
+			printf 'export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=%s\n' "$(quote "$sock")"
+		fi
+		;;
+	orbstack)
+		sock="$HOME/.orbstack/run/docker.sock"
+		printf 'export DOCKER_HOST=%s\n' "$(quote "unix://$sock")"
+		printf 'export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=%s\n' "$(quote "$sock")"
+		;;
+	socktainer)
+		sock="$HOME/.socktainer/container.sock"
+		printf 'export DOCKER_HOST=%s\n' "$(quote "unix://$sock")"
+		printf 'export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=%s\n' "$(quote "$sock")"
+		;;
+	docker)
+		printf 'unset DOCKER_HOST\n'
+		printf 'unset TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE\n'
+		;;
+	*)
+		usage
+		return 2
+		;;
+	esac
+}
+
+run_with_backend() {
+	local backend="${1:-}"
+	shift || true
+
+	if [ "${1:-}" = "--" ]; then
+		shift
+	fi
+
+	if [ -z "$backend" ] || [ "$#" -eq 0 ]; then
+		usage
+		return 2
+	fi
+
+	eval "$(print_env "$backend")"
+	exec "$@"
+}
+
+case "${1:-}" in
+env)
+	shift
+	print_env "${1:-}"
+	;;
+run)
+	shift
+	run_with_backend "$@"
+	;;
+*)
+	usage
+	exit 2
+	;;
+esac

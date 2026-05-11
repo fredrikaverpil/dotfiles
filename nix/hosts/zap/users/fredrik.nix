@@ -23,6 +23,11 @@ in
     unstable.openfga-cli
   ];
 
+  home.sessionVariables = {
+    DOCKER_HOST = "unix://$HOME/.local/share/containers/podman/machine/podman.sock";
+    TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = "/run/user/$UID/podman/podman.sock";
+  };
+
   # zap-specific package-managed tools
   packageTools.npmPackages = [
     "@googleworkspace/cli"
