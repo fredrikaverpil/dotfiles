@@ -1,0 +1,11 @@
+{
+  "skills": [
+    "~/.claude/skills",
+    "~/.claude/plugins/cache"
+  ],
+  "prompts": [
+    "~/.claude/plugins/cache/*/*/*/commands/*.md"
+  ],
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-5.5"
+}

@@ -1,0 +1,12 @@
+{
+  "skills": [
+    "~/.claude-work/skills",
+    "~/.claude-work/plugins/cache"
+  ],
+  "prompts": [
+    "~/.claude/plugins/cache/*/*/*/commands/*.md"
+  ],
+  "lastChangelogVersion": "0.73.1",
+  "defaultProvider": "anthropic",
+  "defaultModel": "claude-opus-4-7"
+}
