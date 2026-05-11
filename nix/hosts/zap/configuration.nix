@@ -42,7 +42,7 @@ in
     # podman added here as it also adds podman-mac-helper (not installed if installed via nix)
     "podman"
     "podman-compose"
-    "krunkit" # required by podman to create VMs
+    "slp/krun/krunkit" # required by podman to create VMs
   ];
 
   host.extraCasks = [
