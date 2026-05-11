@@ -54,16 +54,19 @@
         "1password/tap"
         "nikitabobko/tap"
         # "sst/tap" # for opencode
+        "socktainer/tap"
       ]
       ++ config.host.extraTaps;
 
       brews = [
         # Packages not available in nixpkgs
         "cloud-sql-proxy"
+        "container"
 
         # Packages from custom taps that aren't in nixpkgs
         # "joshmedeski/sesh/sesh"
         # "sst/tap/opencode"
+        "socktainer/tap/socktainer"
         "pkgx"
 
         # Mac App Store CLI
@@ -105,6 +108,30 @@
       }
       // config.host.extraMasApps;
     };
+
+    # NOTE: Run socktainer with `socktainer --no-check-compatibility` manually during
+    # the experimentation phase.
+    #
+    # # Socktainer runs as a user LaunchAgent so the Docker CLI and SDKs can reach
+    # # Apple `container` via DOCKER_HOST=unix://$HOME/.socktainer/container.sock.
+    # # `--no-check-compatibility` is required because socktainer 0.11.0 hardcodes
+    # # a check for Apple container 0.11.0 but works fine against 0.12.x in practice.
+    # launchd.user.agents.socktainer = {
+    #   serviceConfig = {
+    #     Label = "com.fredrik.socktainer";
+    #     ProgramArguments = [
+    #       "/opt/homebrew/opt/socktainer/bin/socktainer"
+    #       "--no-check-compatibility"
+    #     ];
+    #     RunAtLoad = true;
+    #     KeepAlive = true;
+    #     StandardOutPath = "/tmp/socktainer.log";
+    #     StandardErrorPath = "/tmp/socktainer.err";
+    #     EnvironmentVariables = {
+    #       PATH = "/opt/homebrew/bin:/usr/bin:/bin";
+    #     };
+    #   };
+    # };
 
     nix.settings.experimental-features = "nix-command flakes";
 
