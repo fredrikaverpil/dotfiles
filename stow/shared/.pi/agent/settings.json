@@ -6,6 +6,14 @@
   "prompts": [
     "~/.claude/plugins/cache/*/*/*/commands/*.md"
   ],
+  "npmCommand": [
+    "bun"
+  ],
   "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.5"
+  "defaultModel": "gpt-5.5",
+  "lastChangelogVersion": "0.74.0",
+  "packages": [
+    "npm:pi-system-theme"
+  ],
+  "theme": "dark"
 }
