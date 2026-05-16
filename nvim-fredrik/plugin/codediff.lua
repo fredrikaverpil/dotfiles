@@ -1,6 +1,6 @@
 if Config.use_codediff then
   require("lazyload").on_vim_enter(function()
-    local use_local = true
+    local use_local = false
     if use_local then
       require("dev").load_local("~/code/public/codediff.nvim")
       vim.pack.add({
@@ -15,6 +15,7 @@ if Config.use_codediff then
 
     require("codediff").setup({
       explorer = {
+        status_right_margin = 2,
         view_mode = "tree",
         file_filter = {
           ignore = { "*.pb.go" },

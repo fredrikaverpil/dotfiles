@@ -43,6 +43,11 @@
       "rev": "eed10eb4953bc172d7652f30d289a4e575028a98",
       "src": "https://github.com/CRAG666/code_runner.nvim"
     },
+    "codediff.nvim": {
+      "rev": "e500fb5e7e2fbce701c888b81a9449e1052413ec",
+      "src": "https://github.com/esmuellert/codediff.nvim",
+      "version": ">=0.0.0"
+    },
     "conform.nvim": {
       "rev": "dca1a190aa85f9065979ef35802fb77131911106",
       "src": "https://github.com/stevearc/conform.nvim"
