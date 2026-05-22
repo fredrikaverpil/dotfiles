@@ -28,6 +28,9 @@ in
     selfManagedCLIs.clis = [
       (mkCurlInstaller "claude" "Claude Code" "https://claude.ai/install.sh" "$HOME/.local/bin/claude")
       (mkCurlInstaller "agent" "Cursor Agent" "https://cursor.com/install" "$HOME/.local/bin/agent")
+      (mkCurlInstaller "agy" "Antigravity CLI" "https://antigravity.google/cli/install.sh"
+        "$HOME/.local/bin/agy"
+      )
 
       # NOTE: disabled in favor for llama.cpp
       # (mkCurlInstaller "ollama" "Ollama" "https://ollama.com/install.sh" "$HOME/.local/bin/ollama")

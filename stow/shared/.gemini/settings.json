@@ -1,6 +1,6 @@
 {
   "ui": {
-    "theme": "Default"
+    "theme": "Default Light"
   },
   "general": {
     "previewFeatures": true,
@@ -24,12 +24,14 @@
     },
     "playwright": {
       "command": "bunx",
-      "args": ["@playwright/mcp@latest"]
+      "args": [
+        "@playwright/mcp@latest"
+      ]
     }
   },
   "security": {
     "auth": {
-      "selectedType": "gemini-api-key"
+      "selectedType": "oauth-personal"
     }
   }
 }

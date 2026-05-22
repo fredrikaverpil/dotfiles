@@ -19,6 +19,7 @@ Thumbs.db
 /GEMINI.md
 /conductor
 /.playwright-mcp
+/.antigravitycli
 
 # Environments
 .pkgx.yml
