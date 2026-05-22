@@ -28,6 +28,7 @@ in
     selfManagedCLIs.clis = [
       (mkCurlInstaller "claude" "Claude Code" "https://claude.ai/install.sh" "$HOME/.local/bin/claude")
       (mkCurlInstaller "agent" "Cursor Agent" "https://cursor.com/install" "$HOME/.local/bin/agent")
+      (mkCurlInstaller "vibe" "Mistral Vibe" "https://mistral.ai/vibe/install.sh" "$HOME/.local/bin/vibe")
       (mkCurlInstaller "agy" "Antigravity CLI" "https://antigravity.google/cli/install.sh"
         "$HOME/.local/bin/agy"
       )

@@ -35,6 +35,7 @@ require("lazyload").on_vim_enter(function()
         opencode = { cmd = { "opencode", "--continue" } },
         gemini = { cmd = { "gemini", "--resume" } },
         pi = { cmd = { "pi", "--continue" } },
+        vibe = { cmd = { "vibe", "--continue" } },
 
         claude = {
           cmd = {
