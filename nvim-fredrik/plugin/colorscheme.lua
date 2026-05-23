@@ -74,6 +74,17 @@ do
 
     hl("Cursorword", { bg = colors.blend(palette.bg, palette.bg1, 90), underline = false })
 
+    -- Coverage
+    hl("CoverageCovered", { fg = palette.leaf })
+    hl("CoverageUncovered", { fg = palette.rose })
+    hl("CoveragePartial", { fg = palette.blossom })
+    hl("CoverageSummaryBorder", { fg = colors.blend(palette.bg, palette.water, 60) })
+    hl("CoverageSummaryNormal", { link = "NormalFloat" })
+    hl("CoverageSummaryCursorLine", { bg = colors.blend(palette.bg, palette.bg1, 80) })
+    hl("CoverageSummaryHeader", { fg = palette.water, bold = true, underline = true })
+    hl("CoverageSummaryPass", { link = "CoverageCovered" })
+    hl("CoverageSummaryFail", { link = "CoverageUncovered" })
+
     -- Neotest
     hl("NeotestPassed", { fg = palette.leaf })
     hl("NeotestFailed", { fg = palette.rose })
