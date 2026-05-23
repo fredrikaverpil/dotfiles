@@ -15,4 +15,7 @@ require("lazyload").on_vim_enter(function()
       },
     },
   })
+
+  vim.keymap.set("n", "<leader>tc", "<cmd>Coverage<cr>", { desc = "Test coverage in gutter", silent = true })
+  vim.keymap.set("n", "<leader>tC", "<cmd>CoverageLoad<cr><cmd>CoverageSummary<cr>", { desc = "Test coverage summary", silent = true })
 end)
