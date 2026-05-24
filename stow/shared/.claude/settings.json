@@ -1,9 +1,7 @@
 {
   "env": {
-    "ENABLE_LSP_TOOL": "1",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "CLAUDE_CODE_NEW_INIT": "1",
-    "CLAUDE_CODE_NO_FLICKER": "1"
+    "CLAUDE_CODE_NEW_INIT": "1"
   },
   "attribution": {
     "commit": "",
@@ -17,29 +15,15 @@
       "Edit",
       "Write",
       "Read(~/.claude/*)",
-      "Bash(make:*)",
-      "Bash(ls:*)",
-      "Bash(find:*)",
-      "Bash(git status:*)",
-      "Bash(git diff:*)",
-      "Bash(git log:*)",
-      "Bash(git branch:*)",
-      "Bash(gh run list:*)",
-      "Bash(gh run view:*)",
-      "Bash(gh run watch:*)",
-      "Bash(gh pr list:*)",
-      "Bash(gh pr view:*)",
-      "Bash(gh pr diff:*)",
-      "Bash(gh issue list:*)",
-      "Bash(gh issue view:*)",
-      "Bash(docker:*)",
-      "Bash(docker-compose:*)",
-      "mcp__plugin_clangd-lsp_clangd__*",
-      "mcp__plugin_context7_context7__*",
-      "mcp__plugin_gopls-lsp_gopls__*",
-      "mcp__plugin_pyright-lsp_pyright__*",
-      "mcp__plugin_typescript-lsp_typescript-language-server__*"
-    ]
+      "Bash(make *)",
+      "Bash(ls *)",
+      "Bash(find *)",
+      "Bash(git *)",
+      "Bash(gh *)",
+      "Bash(docker *)",
+      "Bash(docker-compose *)"
+    ],
+    "defaultMode": "auto"
   },
   "hooks": {
     "Notification": [
@@ -59,7 +43,6 @@
     "command": "~/code/public/claudeline/claudeline -debug"
   },
   "enabledPlugins": {
-    "claudeline@claudeline": true,
     "context7@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
@@ -73,7 +56,18 @@
     "lua-lsp@claude-plugins-official": true,
     "code-review@claude-plugins-official": true
   },
-  "extraKnownMarketplaces": {},
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/anthropics/claude-plugins-official.git"
+      }
+    }
+  },
+  "advisorModel": "opus",
   "showClearContextOnPlanAccept": true,
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "auto",
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true
 }
