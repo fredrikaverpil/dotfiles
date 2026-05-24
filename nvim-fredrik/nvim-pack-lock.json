@@ -35,6 +35,11 @@
       "src": "https://github.com/akinsho/bufferline.nvim",
       "version": ">=0.0.0"
     },
+    "catppuccin": {
+      "rev": "605b4603797de970e9f3a4238c199c850da03186",
+      "src": "https://github.com/catppuccin/nvim",
+      "version": ">=0.0.0"
+    },
     "cmd.nvim": {
       "rev": "7b790d24e1908b0d623d93324bcb56e6d3b0e333",
       "src": "https://github.com/y3owk1n/cmd.nvim"
@@ -122,6 +127,11 @@
     "mason.nvim": {
       "rev": "b03fb0f20bc1d43daf558cda981a2be22e73ac42",
       "src": "https://github.com/mason-org/mason.nvim",
+      "version": ">=0.0.0"
+    },
+    "melange-nvim": {
+      "rev": "ce42f6b629beeaa00591ba73a77d3eeac4cf28ce",
+      "src": "https://github.com/savq/melange-nvim",
       "version": ">=0.0.0"
     },
     "mini.ai": {
@@ -270,6 +280,11 @@
     "todo-comments.nvim": {
       "rev": "31e3c38ce9b29781e4422fc0322eb0a21f4e8668",
       "src": "https://github.com/folke/todo-comments.nvim",
+      "version": ">=0.0.0"
+    },
+    "tokyonight.nvim": {
+      "rev": "545d72cde6400835d895160ecb5853874fd5156d",
+      "src": "https://github.com/folke/tokyonight.nvim",
       "version": ">=0.0.0"
     },
     "utf8.nvim": {
