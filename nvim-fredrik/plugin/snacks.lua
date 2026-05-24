@@ -108,6 +108,11 @@ Snacks.setup({
       gui = { nerdFontsVersion = "3" },
       git = { overrideGpg = true },
     },
+    win = {
+      keys = {
+        esc_esc = { "<Esc><Esc>", "hide", mode = { "n", "t" }, desc = "Hide LazyGit" },
+      },
+    },
   },
 
   terminal = { enabled = true },
