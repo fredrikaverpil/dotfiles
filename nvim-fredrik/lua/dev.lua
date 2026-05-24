@@ -1,6 +1,8 @@
 local m = {}
 
 --- Prefer local directory if it exists, otherwise fall back to remote source.
+--- NOTE: this will use the vim.pack lockfile and is not flexible for quick iteration.
+---
 ---@param local_path string
 ---@param remote_src string
 ---@return string
@@ -14,6 +16,8 @@ end
 
 --- Load a local plugin directory: prepend to runtimepath and source plugin/ files.
 --- Follows :h initialization step 11 order. Returns false if the path doesn't exist.
+--- NOTE: does not use the vim.pack lockfile, better for quick iterations.
+---
 ---@param local_path string
 ---@return boolean
 function m.load_local(local_path)
