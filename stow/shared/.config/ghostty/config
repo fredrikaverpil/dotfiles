@@ -49,6 +49,11 @@ keybind = shift+ctrl+right_bracket=next_tab
 keybind = shift+ctrl+,=move_tab:-1
 keybind = shift+ctrl+.=move_tab:+1
 
+# splits:
+# Cmd+Option+Arrow (←/→/↑/↓) - move focus in that direction
+# Cmd+Ctrl+Arrow (←/→/↑/↓) - resize the split in that direction
+keybind = cmd+ctrl+e=equalize_splits
+
 # shader
 # - https://github.com/hackr-sh/ghostty-shaders
 # custom-shader = /Users/fredrik/code/public/ghostty-shaders/cursor_blaze.glsl
