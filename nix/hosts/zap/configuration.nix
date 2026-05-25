@@ -62,6 +62,7 @@ in
     "cyberduck"
     "pgadmin4"
     "podman-desktop"
+    "siddharthvaddem/openscreen/openscreen"
   ];
 
   host.extraMasApps = {
