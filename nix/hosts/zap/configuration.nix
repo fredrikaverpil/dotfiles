@@ -62,7 +62,6 @@ in
     "cyberduck"
     "pgadmin4"
     "podman-desktop"
-    "yubico-yubikey-manager"
   ];
 
   host.extraMasApps = {
