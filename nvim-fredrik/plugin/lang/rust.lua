@@ -1,3 +1,8 @@
+require("lang").register("rust", {
+  servers = { "rust_analyzer" },
+  mason = { "rust-analyzer", "codelldb" },
+})
+
 require("lazyload").on_vim_enter(function()
   vim.api.nvim_create_autocmd("FileType", {
     group = vim.api.nvim_create_augroup("rust-opts", { clear = true }),

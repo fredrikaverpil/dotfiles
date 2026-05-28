@@ -9,28 +9,8 @@ require("lazyload").on_vim_enter(function()
     capabilities = require("blink.cmp").get_lsp_capabilities(),
   })
 
-  local servers = {
-    "bashls",
-    "basedpyright",
-    "buf_ls",
-    "dockerls",
-    "gopls",
-    "graphql",
-    "jsonls",
-    "lua_ls",
-    "nil_ls",
-    "ruff",
-    "rust_analyzer",
-    "superhtml",
-    "taplo",
-    "templ",
-    "terraformls",
-    "ts_query_ls",
-    "vtsls",
-    "yamlls",
-    "zls",
-  }
-  vim.lsp.enable(servers)
+  -- Server list aggregated from plugin/lang/*.lua via require("lang").register().
+  vim.lsp.enable(require("lang").servers())
 
   -- Enable codelens globally
   vim.lsp.codelens.enable(true)

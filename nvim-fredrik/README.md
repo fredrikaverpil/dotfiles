@@ -29,14 +29,16 @@ nvim-fredrik/
 The `init.lua` defines `_G.Config` (for global states), `vim.opt` options, some
 keymaps and custom behaviors.
 
-Core plugin files (`plugin/*.lua`) own all tool configuration inline — LSP
-servers, formatters, linters, completion sources, DAP adapters, neotest
-adapters, etc.
+Core plugin files (`plugin/*.lua`) own tool configuration inline — completion
+sources, DAP adapters, neotest adapters, formatter/linter args, etc.
 
-Language files (`plugin/lang/*.lua`) handle language-specific concerns that
-don't fit in the core plugins: per-filetype editor settings (`vim.opt_local` via
-`FileType` autocmds), extra `vim.pack.add()` calls, custom filetypes,
-SchemaStore loading, build hooks, and autocmds.
+Language files (`plugin/lang/*.lua`) handle language-specific concerns: which
+LSP servers, Mason tools, formatters and linters a language uses (declared via
+`require("lang").register()`, see
+[Adding new language support](#adding-new-language-support)), plus per-filetype
+editor settings (`vim.opt_local` via `FileType` autocmds), extra
+`vim.pack.add()` calls, custom filetypes, SchemaStore loading, build hooks, and
+autocmds.
 
 I wrote
 [a blog post](https://fredrikaverpil.github.io/blog/2026/04/15/from-lazy.nvim-to-vim.pack/)
@@ -156,11 +158,46 @@ Use the `:Pack` TUI or the built-in commands:
 
 ## Adding new language support
 
-1. Add the LSP server to `plugin/lsp.lua`
-2. Add Mason tools to `plugin/mason.lua`
-3. Add formatters to `plugin/conform.lua`
-4. Add linters to `plugin/lint.lua`
-5. `plugin/lang/<ft>.lua` — editor settings (`vim.opt_local` via `FileType`
-   autocmd), plugins, filetypes, autocmds
-6. _(optional)_ `after/lsp/<server>.lua` — override base config from
-   nvim-lspconfig
+A language describes its own tooling in `plugin/lang/<ft>.lua` via
+`require("lang").register()` at the **top level** of the file. The core plugins
+(`lsp.lua`, `mason.lua`, `conform.lua`, `lint.lua`) read the aggregated lists at
+`VimEnter`, so registering is all that's needed to wire up LSP, Mason,
+formatting and linting.
+
+```lua
+-- plugin/lang/<ft>.lua
+require("lang").register("<name>", {
+  servers = { "<lspconfig_server>" },  -- e.g. "gopls"
+  mason = { "<mason_package>" },         -- e.g. "gopls", "goimports"
+
+  -- conform: which formatters run, and their config
+  format = { <ft> = { "<formatter>" } },
+  formatters = { <formatter> = { prepend_args = { ... } } },
+
+  -- nvim-lint: which linters run, and their config
+  lint = { <ft> = { "<linter>" } },
+  linters = { <linter> = { args = { ... } } },
+
+  -- imperative lint wiring that can't be a table (e.g. dynamic cwd); receives
+  -- the nvim-lint module and runs inside lint.lua's VimEnter
+  lint_setup = function(lint)
+    -- custom autocmds, lint.try_lint(...) with computed cwd, etc.
+  end,
+})
+
+require("lazyload").on_vim_enter(function()
+  -- editor settings (vim.opt_local via FileType autocmd), plugins, filetypes,
+  -- autocmds
+end)
+```
+
+All fields are optional. `register()` **must** run at the top level (not inside
+`on_vim_enter`) so it fires during plugin sourcing, before any consumer reads
+the registry.
+
+The only tool config that stays in a core plugin is config shared across
+languages — currently just `prettier` (used by markdown and js/ts) in
+`conform.lua`. Everything language-specific lives in its `plugin/lang/<ft>.lua`.
+
+_(optional)_ `after/lsp/<server>.lua` — override the base config from
+nvim-lspconfig.

@@ -15,51 +15,8 @@ require("lazyload").on_vim_enter(function()
     automatic_enable = false, -- we handle vim.lsp.enable() ourselves
   })
 
-  local ensure_installed = {
-    "actionlint",
-    "api-linter",
-    "basedpyright",
-    "bash-language-server",
-    "biome",
-    "buf",
-    "codelldb",
-    "debugpy",
-    "delve",
-    "dockerfile-language-server",
-    "gci",
-    "gofumpt",
-    "goimports",
-    "golangci-lint",
-    "golines",
-    "gopls",
-    "gotestsum",
-    "graphql-language-service-cli",
-    "hadolint",
-    "impl", -- used by go-impl.nvim
-    "json-lsp",
-    "lua-language-server",
-    "markdownlint",
-    "mypy",
-    "nil-ls",
-    "prettier",
-    "protolint",
-    "ruff",
-    "rust-analyzer",
-    "shellcheck",
-    "shfmt",
-    "stylua",
-    "superhtml",
-    "taplo",
-    "templ",
-    "terraform-ls",
-    "tflint",
-    "ts_query_ls",
-    "vtsls",
-    "yaml-language-server",
-    "yamlfmt",
-    "yamllint",
-    "zls",
-  }
+  -- Tool list aggregated from plugin/lang/*.lua via require("lang").register().
+  local ensure_installed = require("lang").mason_tools()
 
   local mason_registry = require("mason-registry")
   mason_registry.refresh(function()

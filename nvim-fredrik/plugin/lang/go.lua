@@ -1,6 +1,60 @@
-require("lazyload").on_vim_enter(function()
-  local dev = require("dev")
+require("lang").register("go", {
+  servers = { "gopls" },
+  mason = { "gopls", "goimports", "gci", "gofumpt", "golines", "golangci-lint", "delve", "gotestsum", "impl" },
+  formatters_by_ft = { go = { "goimports", "gci", "gofumpt", "golines" } },
+  formatters = {
+    gci = {
+      args = { "write", "--skip-generated", "-s", "standard", "-s", "default", "--skip-vendor", "$FILENAME" },
+    },
+    gofumpt = {
+      prepend_args = { "-extra", "-w", "$FILENAME" },
+      stdin = false,
+    },
+    goimports = {
+      args = { "-srcdir", "$FILENAME" },
+    },
+    golines = {
+      prepend_args = { "--base-formatter=gofumpt", "--ignore-generated", "--tab-len=1", "--max-len=120" },
+    },
+  },
+  -- golangci-lint with cwd at the nearest go.mod (handles nested modules)
+  lint_setup = function(lint)
+    local find = require("find")
+    local go_mod_dir_cache = {}
 
+    local function go_mod_dir()
+      local buffer_parent_dir = vim.fn.expand("%:p:h")
+      local cached = go_mod_dir_cache[buffer_parent_dir]
+      if cached == false then
+        return nil
+      end
+      if cached then
+        return cached
+      end
+      local dir = find.dir_upward("go.mod", { path = buffer_parent_dir })
+      if dir == nil then
+        go_mod_dir_cache[buffer_parent_dir] = false
+        return nil
+      end
+      go_mod_dir_cache[buffer_parent_dir] = dir
+      return dir
+    end
+
+    vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
+      group = vim.api.nvim_create_augroup("lint-go", { clear = true }),
+      pattern = { "*.go" },
+      callback = function()
+        local cwd = go_mod_dir()
+        if cwd == nil then
+          return
+        end
+        lint.try_lint("golangcilint", { cwd = cwd })
+      end,
+    })
+  end,
+})
+
+require("lazyload").on_vim_enter(function()
   -- filetypes
   do
     vim.filetype.add({

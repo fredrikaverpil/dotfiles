@@ -1,3 +1,9 @@
+require("lang").register("lua", {
+  servers = { "lua_ls" },
+  mason = { "lua-language-server", "stylua" },
+  formatters_by_ft = { lua = { "stylua" } },
+})
+
 require("lazyload").on_vim_enter(function()
   vim.api.nvim_create_autocmd("FileType", {
     group = vim.api.nvim_create_augroup("lua-opts", { clear = true }),

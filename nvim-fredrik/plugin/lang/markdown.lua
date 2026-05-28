@@ -1,3 +1,23 @@
+require("lang").register("markdown", {
+  mason = { "markdownlint", "prettier" },
+  formatters_by_ft = { markdown = { "prettier" } },
+  formatters = {
+    mdformat = {
+      prepend_args = { "--number", "--wrap", "80" },
+    },
+  },
+  linters_by_ft = { markdown = { "markdownlint" } },
+  linters = {
+    markdownlint = {
+      args = {
+        "--config",
+        vim.env.DOTFILES .. "/extras/templates/.markdownlint.json",
+        "--stdin",
+      },
+    },
+  },
+})
+
 require("lazyload").on_vim_enter(function()
   vim.api.nvim_create_autocmd("FileType", {
     group = vim.api.nvim_create_augroup("markdown-opts", { clear = true }),

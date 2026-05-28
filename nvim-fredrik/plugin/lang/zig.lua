@@ -1,3 +1,8 @@
+require("lang").register("zig", {
+  servers = { "zls" },
+  mason = { "zls" },
+})
+
 require("lazyload").on_vim_enter(function()
   vim.api.nvim_create_autocmd("FileType", {
     group = vim.api.nvim_create_augroup("zig-opts", { clear = true }),

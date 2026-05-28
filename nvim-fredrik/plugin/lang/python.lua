@@ -1,3 +1,9 @@
+require("lang").register("python", {
+  servers = { "basedpyright", "ruff" },
+  mason = { "basedpyright", "ruff", "mypy", "debugpy" },
+  linters_by_ft = { python = { "mypy" } },
+})
+
 require("lazyload").on_vim_enter(function()
   vim.api.nvim_create_autocmd("FileType", {
     group = vim.api.nvim_create_augroup("python-opts", { clear = true }),
