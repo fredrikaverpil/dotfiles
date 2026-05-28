@@ -15,6 +15,8 @@ conventions.
 - Keep PR titles, descriptions, and comments concise and clear.
 - Include only useful information. Remove redundancy and over-explanation.
 - Prefer explicitness and clarity over verbosity.
+- Express Why/What/Notes content as concise, to-the-point bullet lists. Avoid
+  prose paragraphs.
 
 ## PR title format
 
