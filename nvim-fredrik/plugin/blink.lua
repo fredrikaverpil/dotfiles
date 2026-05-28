@@ -1,9 +1,11 @@
-require("lazyload").on_vim_enter(function()
-  vim.pack.add({
-    { src = "https://github.com/Saghen/blink.cmp", version = vim.version.range("1.*") },
-    { src = "https://github.com/rafamadriz/friendly-snippets" },
-  })
+-- Top-level so blink.cmp is on the rtp before any on_vim_enter runs:
+-- Other plugins, like lsp.lua requires it to be on rtp.
+vim.pack.add({
+  { src = "https://github.com/Saghen/blink.cmp", version = vim.version.range("1.*") },
+  { src = "https://github.com/rafamadriz/friendly-snippets" },
+})
 
+require("lazyload").on_vim_enter(function()
   local default_sources = { "lsp", "path", "snippets", "buffer", "dadbod", "lazydev", "markdown" }
   local providers = {
     snippets = {
