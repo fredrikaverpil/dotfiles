@@ -9,7 +9,7 @@ vim.opt.ruler = false
 vim.opt.number = true
 vim.opt.relativenumber = false
 
--- Tabs and indentation defaults (overridden per-filetype in ftplugin/)
+-- Tabs and indentation defaults (overridden per-filetype in plugin/lang/ via FileType autocmds)
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
 vim.opt.shiftwidth = 2
