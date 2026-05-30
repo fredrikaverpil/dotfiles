@@ -9,7 +9,7 @@
       "src": "https://github.com/afonsofrancof/OSC11.nvim"
     },
     "SchemaStore.nvim": {
-      "rev": "e25e63f3b24fd6b8c2fc713107ad5d5594028eac",
+      "rev": "efa62017f59a6346486cc567d70acce965a00b12",
       "src": "https://github.com/b0o/SchemaStore.nvim"
     },
     "arrow.nvim": {
@@ -218,7 +218,7 @@
       "version": ">=0.0.0"
     },
     "oil-git.nvim": {
-      "rev": "85731c6e0deb6da473ca627f09b7de6ca0f07435",
+      "rev": "54de208323d00c519e26280f8b5b4b821d32f955",
       "src": "https://github.com/malewicz1337/oil-git.nvim"
     },
     "oil-lsp-diagnostics.nvim": {
@@ -269,7 +269,7 @@
       "src": "https://github.com/gbprod/substitute.nvim"
     },
     "tiny-inline-diagnostic.nvim": {
-      "rev": "6bdbc9a2f5a846ff5fc55a998ff97c0e2968b7e5",
+      "rev": "680762989e8b05a72e90769959d0fb9a557e6917",
       "src": "https://github.com/rachartier/tiny-inline-diagnostic.nvim"
     },
     "todo-comments.nvim": {
