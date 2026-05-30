@@ -6,6 +6,7 @@ require("lazyload").on_vim_enter(function()
   require("code_runner").setup({
     focus = false,
     filetype = {
+      elixir = { "elixir" },
       go = { "go run" },
       typescript = { "bun" },
       zig = { "zig run" },

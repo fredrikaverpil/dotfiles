@@ -197,6 +197,7 @@ in
       [
         bun
         cmake
+        elixir
         gcc
         go_latest
         lua51Packages.lua # Neovim requires Lua 5.1
