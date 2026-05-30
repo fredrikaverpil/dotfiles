@@ -57,7 +57,8 @@ fi
 # Inject Neovim build dependencies (managed by Nix, not on regular PATH)
 NVIM_DEPS_PATH_FILE="$HOME/.config/nvim-deps-path"
 if [ -f "$NVIM_DEPS_PATH_FILE" ]; then
-  export PATH="$(cat "$NVIM_DEPS_PATH_FILE"):$PATH"
+  # Append so per-project tooling (e.g. mise) takes precedence over these fallbacks
+  export PATH="$PATH:$(cat "$NVIM_DEPS_PATH_FILE")"
 fi
 
 # Check if NVIM_APPNAME is already set

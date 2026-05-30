@@ -42,8 +42,8 @@ The shell startup chain is:
    `$DOTFILES` and other globals, home-manager session vars, `~/.shell/.env`
 3. **[`aliases.sh`](shell/aliases.sh)** — shell aliases
 4. **[`sourcing.sh`](shell/sourcing.sh)** — Nix daemon, tool initialization
-   (atuin, direnv, zoxide, starship, fzf), zsh completions/plugins, and `cd`
-   overrides
+   (atuin, direnv, mise, zoxide, starship, fzf), zsh completions/plugins, and
+   `cd` overrides
 
 The `cd` override (and `z`/`zi`) automatically activates Python virtual
 environments when entering directories with a `.python-version` or `.venv/`.
