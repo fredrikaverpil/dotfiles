@@ -7,7 +7,7 @@ vim.pack.add({
   -- others
   { src = "https://github.com/folke/tokyonight.nvim", version = vim.version.range("*") },
   { src = "https://github.com/catppuccin/nvim", name = "catppuccin", version = vim.version.range("*") },
-  { src = "https://github.com/savq/melange-nvim", version = vim.version.range("*") },
+  { src = "https://github.com/savq/melange-nvim" },
 }, { load = false })
 
 vim.g.bones_compat = 1 -- use built-in vim highlight API, not lush.nvim

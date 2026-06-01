@@ -123,19 +123,10 @@ Darwin)
 
 	add_to_path append "/Applications/Obsidian.app/Contents/MacOS"
 
-	# # nvm
-	# if [ "$(uname -m)" = "arm64" ]; then
-	# 	export NVM_DIR="$HOME/.nvm"
-	# elif [ "$(uname -m)" = "x86_64" ]; then
-	# 	export NVM_DIR="$HOME/.nvm_x86"
-	# fi
-
 	;;
 
 Linux)
 	# commands for Linux go here
-
-	# export NVM_DIR="$HOME/.nvm"
 
 	;;
 

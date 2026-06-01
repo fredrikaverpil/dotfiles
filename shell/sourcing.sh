@@ -37,21 +37,6 @@ function virtual_env_activate() {
 	fi
 }
 
-function node_version_manager() {
-	if [[ -z "$NVMRC_PATH" ]]; then
-		if [ -f .nvmrc ]; then
-			nvm use
-			export NVMRC_PATH=$PWD/.nvmrc
-		fi
-	else
-		parent_nvmdir="$(dirname "$NVMRC_PATH")"
-		if [[ "$PWD"/ != "$parent_nvmdir"/* ]]; then
-			nvm deactivate
-			export NVMRC_PATH=""
-		fi
-	fi
-}
-
 function zsh_completion() {
 	# Set up FPATH for completions - prefer home-manager, then Nix profile, then Homebrew
 	if [ -d ~/.local/state/home-manager/gcroots/current-home/home-path/share/zsh/site-functions ]; then
@@ -143,9 +128,6 @@ if [ -f ~/.cargo/env ]; then
 fi
 
 if [ -n "$brew_prefix" ] || [ -d "/nix/store" ]; then
-	# TODO: evaluate whether pkgx can replace nvm
-	# source "$brew_prefix/opt/nvm/nvm.sh"
-
 	eval "$(atuin init $shell --disable-up-arrow)"
 	eval "$(direnv hook $shell)"
 	eval "$(mise activate $shell)"
@@ -161,29 +143,13 @@ fi
 if [[ $shell == "zsh" ]]; then
 	zsh_completion
 	if [ -n "$brew_prefix" ]; then
-		# TODO: fzf is installed by nix, not brew
 		source <(fzf --zsh)
-
-		# NOTE: disabled pkxg while evaluating nix flakes for per-project tooling
-		# if command -v pkgx >/dev/null 2>&1; then
-		# 	source <(pkgx dev --shellcode)
-		# elif [[ "$OSTYPE" == "darwin"* ]]; then
-		# 	echo "⚠️ Warning: pkgx not found on macOS - install via 'brew install pkgx'" >&2
-		# fi
 	fi
 
 elif [[ $shell == "bash" ]]; then
 	bash_completion
 	if [ -n "$brew_prefix" ]; then
-		# TODO: fzf is installed by nix, not brew
 		eval "$(fzf --bash)"
-
-		# NOTE: disabled pkxg while evaluating nix flakes for per-project tooling
-		# if command -v pkgx >/dev/null 2>&1; then
-		# 	eval "$(pkgx dev --shellcode)"
-		# elif [[ "$OSTYPE" == "darwin"* ]]; then
-		# 	echo "⚠️ Warning: pkgx not found on macOS - install via 'brew install pkgx'" >&2
-		# fi
 	fi
 
 fi
@@ -195,7 +161,6 @@ fi
 function cd() {
 	builtin cd "$@" || return
 	virtual_env_activate
-	# node_version_manager  # TODO: with pkgx, maybe nvm is no longer needed?
 }
 cd . # trigger cd overrides when shell starts
 
