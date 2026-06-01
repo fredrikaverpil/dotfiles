@@ -10,7 +10,13 @@ function virtual_env_activate() {
 		# check the current folder belong to earlier VIRTUAL_ENV folder
 		parentdir="$(dirname "$VIRTUAL_ENV")"
 		if [[ "$PWD"/ != "$parentdir"/* ]]; then
-			deactivate
+			# $VIRTUAL_ENV can be inherited by subshells that never sourced
+			# activate, so deactivate (defined by activate) may not exist.
+			if declare -f deactivate > /dev/null; then
+				deactivate
+			else
+				unset VIRTUAL_ENV
+			fi
 		fi
 	fi
 
