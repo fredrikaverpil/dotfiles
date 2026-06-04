@@ -28,12 +28,6 @@ require("lazyload").on_vim_enter(function()
   require("obsidian").setup({
     workspaces = vaults,
 
-    completion = {
-      nvim_cmp = false,
-      blink = true,
-      min_chars = 2,
-    },
-
     picker = {
       name = "snacks.pick",
     },
