@@ -233,6 +233,15 @@ Apple `container` and socktainer have better Docker API parity for Ryuk.
   community follow-up
 - [socktainer](https://github.com/socktainer/socktainer) — third-party bridge
   project (incomplete)
+- [containerization#733 — Add ID length restriction](https://github.com/apple/containerization/pull/733)
+  (merged: the 64-char `maxIDLength` limit and its rationale; adds validation on
+  top of already existing constraint?)
+
+### Quick/simple repro
+
+```sh
+container run --rm --name "$(printf 'a%.0s' $(seq 1 65))" busybox true   # fails Code=22
+```
 
 ### Unique to `container`
 
