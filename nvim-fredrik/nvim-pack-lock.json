@@ -9,7 +9,7 @@
       "src": "https://github.com/afonsofrancof/OSC11.nvim"
     },
     "SchemaStore.nvim": {
-      "rev": "efa62017f59a6346486cc567d70acce965a00b12",
+      "rev": "19936230448bfb3dfd4314070e8bc499ceb55928",
       "src": "https://github.com/b0o/SchemaStore.nvim"
     },
     "arrow.nvim": {
@@ -45,7 +45,7 @@
       "src": "https://github.com/y3owk1n/cmd.nvim"
     },
     "code_runner.nvim": {
-      "rev": "eed10eb4953bc172d7652f30d289a4e575028a98",
+      "rev": "faeea87f6038307eabbe1d1ea97ab6b1d6fd33b5",
       "src": "https://github.com/CRAG666/code_runner.nvim"
     },
     "conform.nvim": {
@@ -66,7 +66,7 @@
       "src": "https://github.com/f-person/git-blame.nvim"
     },
     "gitsigns.nvim": {
-      "rev": "dd3f588bacbeb041be6facf1742e42097f62165d",
+      "rev": "25050e4ed39e628282831d4cbecb1850454ce915",
       "src": "https://github.com/lewis6991/gitsigns.nvim"
     },
     "go-impl.nvim": {
@@ -103,7 +103,7 @@
       "version": ">=0.0.0"
     },
     "lualine.nvim": {
-      "rev": "131a558e13f9f28b15cd235557150ccb23f89286",
+      "rev": "221ce6b2d999187044529f49da6554a92f740a96",
       "src": "https://github.com/nvim-lualine/lualine.nvim"
     },
     "luvit-meta": {
@@ -126,8 +126,7 @@
     },
     "melange-nvim": {
       "rev": "ce42f6b629beeaa00591ba73a77d3eeac4cf28ce",
-      "src": "https://github.com/savq/melange-nvim",
-      "version": ">=0.0.0"
+      "src": "https://github.com/savq/melange-nvim"
     },
     "mini.ai": {
       "rev": "bfb26d9072670c3aaefab0f53024b2f3729c8083",
@@ -213,7 +212,7 @@
       "src": "https://github.com/nvim-treesitter/nvim-treesitter-context"
     },
     "obsidian.nvim": {
-      "rev": "ed6f386abe83e4dafa9afecf50cd9d9fff072a07",
+      "rev": "2a8af7bd141123c7911fd0956ad986f29fe5bf12",
       "src": "https://github.com/obsidian-nvim/obsidian.nvim",
       "version": ">=0.0.0"
     },
@@ -226,7 +225,7 @@
       "src": "https://github.com/JezerM/oil-lsp-diagnostics.nvim"
     },
     "oil.nvim": {
-      "rev": "b91ee5a77a6a9605d9c1aaf4fda74b66082c8297",
+      "rev": "b73018b75affd13fa38e2fc94ef753b465f770d7",
       "src": "https://github.com/stevearc/oil.nvim"
     },
     "one-small-step-for-vimkind": {
