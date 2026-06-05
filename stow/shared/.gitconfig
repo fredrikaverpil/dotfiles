@@ -49,9 +49,17 @@
     path = ~/.gitconfig_1password
 
 # GitHub https authentication
+# Credential helpers are cumulative, not override: this host-scoped helper does
+# NOT replace the generic `osxkeychain` helper inherited from the system
+# gitconfig, it's appended after it — and osxkeychain, tried first, would answer
+# with a cached (possibly stale) token. The empty `helper =` resets the list so
+# gh is the sole credential source for github.com. Other hosts (e.g.
+# codeberg.org) don't match this block and still use osxkeychain.
 [credential "https://github.com"]
+	helper =
 	helper = !gh auth git-credential
 [credential "https://gist.github.com"]
+	helper =
 	helper = !gh auth git-credential
 
 [filter "lfs"]
