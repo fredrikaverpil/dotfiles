@@ -60,12 +60,6 @@
         "nikitabobko/tap"
         # "sst/tap" # for opencode
         "socktainer/tap"
-        {
-          # Custom tap URL required: repo is jundot/omlx, not the default
-          # jundot/homebrew-omlx that the short name would resolve to.
-          name = "jundot/omlx";
-          clone_target = "https://github.com/jundot/omlx";
-        }
       ]
       ++ config.host.extraTaps;
 
@@ -79,7 +73,6 @@
         # "sst/tap/opencode"
         "socktainer/tap/socktainer"
         "pkgx"
-        "jundot/omlx/omlx"
 
         # Mac App Store CLI
         "mas"
