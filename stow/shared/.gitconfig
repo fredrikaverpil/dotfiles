@@ -9,30 +9,17 @@
 [pull]
 	ff = only
 [merge]
-	# tool = vscode
-	# tool = neovim
-	tool = diffview
-[mergetool "vscode"]
-	cmd = code --wait $MERGED
-[mergetool "neovim"]
+	tool = nvim
+[mergetool "nvim"]
 	cmd = nvim -d $LOCAL $REMOTE $BASE $MERGED
-[mergetool "diffview"]
-	cmd = "nvim -c 'DiffviewOpen'"
 [mergetool]
 	prompt = false
 [diff]
-	# tool = vscode
-	# tool = neovim
 	tool = nvim_difftool
-	# tool = diffview
-[difftool "vscode"]
-	cmd = code --wait --diff $LOCAL $REMOTE
-[difftool "neovim"]
+[difftool "nvim"]
 	cmd = nvim -d $LOCAL $REMOTE
 [difftool "nvim_difftool"]
-	cmd = nvim -c \"packadd nvim.difftool\" -c \"DiffTool $LOCAL $REMOTE\"
-[difftool "diffview"]
-	cmd = "nvim -d '$LOCAL' '$REMOTE' -c 'DiffviewOpen'"
+	cmd = nvim -c \"packadd nvim.difftool\" -d \"$LOCAL\" \"$REMOTE\"
 [difftool]
 	prompt = false
 [init]
