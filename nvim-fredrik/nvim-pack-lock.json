@@ -9,7 +9,7 @@
       "src": "https://github.com/afonsofrancof/OSC11.nvim"
     },
     "SchemaStore.nvim": {
-      "rev": "19936230448bfb3dfd4314070e8bc499ceb55928",
+      "rev": "30d47907079474907f24d4a546932119a8b9f641",
       "src": "https://github.com/b0o/SchemaStore.nvim"
     },
     "arrow.nvim": {
@@ -79,7 +79,7 @@
       "src": "https://github.com/maxandron/goplements.nvim"
     },
     "grug-far.nvim": {
-      "rev": "5506c2f59dc9ab2ed6c233585412b24d31d51521",
+      "rev": "c995bbacf8229dc096ec1c3d60f8531059c86c1b",
       "src": "https://github.com/MagicDuck/grug-far.nvim",
       "version": ">=0.0.0"
     },
@@ -185,7 +185,7 @@
       "src": "https://github.com/theHamsta/nvim-dap-virtual-text"
     },
     "nvim-lint": {
-      "rev": "d48f3a76189d03b2239f6df1b2f7e3fa8353743b",
+      "rev": "99cbc3ca8a76845fca50e496be7212bebf907dd3",
       "src": "https://codeberg.org/mfussenegger/nvim-lint"
     },
     "nvim-lspconfig": {
