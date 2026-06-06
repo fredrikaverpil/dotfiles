@@ -47,10 +47,6 @@ require("lazyload").on_vim_enter(function()
           },
         },
 
-        ["ollama via claude"] = {
-          cmd = { "ollama", "launch", "claude" },
-          format = claude_format,
-        },
         ["pi via omlx"] = {
           cmd = { "omlx", "launch", "pi", "--continue" },
         },
