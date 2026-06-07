@@ -48,6 +48,10 @@
       "rev": "faeea87f6038307eabbe1d1ea97ab6b1d6fd33b5",
       "src": "https://github.com/CRAG666/code_runner.nvim"
     },
+    "codediff.nvim": {
+      "rev": "cbfcc451504ce14c71ea1d5d92a00a84253aa0ee",
+      "src": "https://github.com/fredrikaverpil/codediff.nvim"
+    },
     "conform.nvim": {
       "rev": "619363c30309d29ffa631e67c8183f2a72caa373",
       "src": "https://github.com/stevearc/conform.nvim"
@@ -315,7 +319,7 @@
       "src": "https://github.com/artemave/workspace-diagnostics.nvim"
     },
     "yanky.nvim": {
-      "rev": "b13d318dc7c816e2eee626dde61fa0a7237bc77e",
+      "rev": "257716a5649e35eaebf2015a488b0f22b3907a47",
       "src": "https://github.com/gbprod/yanky.nvim"
     },
     "zenbones.nvim": {

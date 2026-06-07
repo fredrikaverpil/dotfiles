@@ -1,9 +1,14 @@
 if Config.use_codediff then
   require("lazyload").on_vim_enter(function()
-    local use_local = true
-    if use_local then
+    local variant = "fork"
+    if variant == "local" then
       require("dev").load_local("~/code/public/codediff.nvim")
       vim.pack.add({
+        { src = "https://github.com/MunifTanjim/nui.nvim", version = vim.version.range("*") },
+      })
+    elseif variant == "fork" then
+      vim.pack.add({
+        { src = "https://github.com/fredrikaverpil/codediff.nvim" },
         { src = "https://github.com/MunifTanjim/nui.nvim", version = vim.version.range("*") },
       })
     else
