@@ -1,6 +1,6 @@
 require("lazyload").on_vim_enter(function()
   -- enable/disable custom cursorword highlighting
-  local enabled = false
+  local enabled = true
 
   if enabled then
     do
