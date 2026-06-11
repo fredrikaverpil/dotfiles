@@ -80,11 +80,11 @@ if Config.use_diffview then
       vim.cmd(":DiffviewOpen " .. require("git").get_default_branch())
     end, { desc = "Diff against default branch" })
     vim.keymap.set("n", "<leader>gdr", function()
-      vim.cmd(":DiffviewOpen origin/" .. require("git").get_pr_merge_base() .. " ...HEAD --imply-local")
+      vim.cmd(":DiffviewOpen " .. require("git").get_pr_merge_base() .. "...HEAD --imply-local")
     end, { desc = "Review current PR (GitHub-style)" })
     vim.keymap.set("n", "<leader>gdR", function()
       vim.cmd(
-        ":DiffviewOpen --range=origin/"
+        ":DiffviewFileHistory --range="
           .. require("git").get_pr_merge_base()
           .. "...HEAD --right-only --no-merges --reverse"
       )
