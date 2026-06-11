@@ -121,6 +121,20 @@ Example:
 
 ```lua
 -- ~/code/work/.nvim.lua
+--
+-- install mdformat via mason, with the plugins pinned by einride/sage
+-- (tools/sgmdformat/requirements.txt) in the mdformat venv
+require("lang").register("work", {
+    mason = { "mdformat" },
+    mason_pip = {
+        mdformat = {
+            "mdformat-gfm==1.0.0",
+            "mdformat-admon==2.1.1",
+            "mdformat-front-matters==2.0.0",
+        },
+    },
+})
+
 require("lazyload").on_override(function()
     -- Override markdown formatter
     require("conform").formatters_by_ft.markdown = { "mdformat" }
@@ -169,6 +183,10 @@ formatting and linting.
 require("lang").register("<name>", {
   servers = { "<lspconfig_server>" },  -- e.g. "gopls"
   mason = { "<mason_package>" },         -- e.g. "gopls", "goimports"
+
+  -- extra pip packages installed into a mason pypi package's venv
+  -- (re-applied when mason installs/updates the package)
+  mason_pip = { ["<mason_package>"] = { "<pip_package>==<version>" } },
 
   -- conform: which formatters run, and their config
   format = { <ft> = { "<formatter>" } },

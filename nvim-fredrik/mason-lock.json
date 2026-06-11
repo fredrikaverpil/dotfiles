@@ -23,6 +23,7 @@
   "json-lsp": "4.10.0",
   "lua-language-server": "3.18.2",
   "markdownlint": "0.48.0",
+  "mdformat": "1.0.0",
   "mypy": "2.1.0",
   "prettier": "3.8.3",
   "protolint": "v0.56.4",

@@ -18,6 +18,7 @@ local registry = {}
 ---@class LangSpec
 ---@field servers? string[]                 lspconfig server names, e.g. "lua_ls"
 ---@field mason? string[]                    mason package names, e.g. "lua-language-server"
+---@field mason_pip? table<string, string[]> extra pip packages installed into a mason pypi package's venv
 ---@field formatters_by_ft? table<string, string[]>   conform formatters_by_ft entries
 ---@field formatters? table<string, table>  conform per-formatter config (args, etc.)
 ---@field linters_by_ft? table<string, string[]>      nvim-lint linters_by_ft entries
@@ -63,6 +64,18 @@ function M.mason_tools(base)
     vim.list_extend(out, spec.mason or {})
   end
   return dedup(out)
+end
+
+--- Aggregated extra pip packages per mason package across all registered languages.
+---@return table<string, string[]>
+function M.mason_pip()
+  local out = {}
+  for _, spec in pairs(registry) do
+    for pkg, packages in pairs(spec.mason_pip or {}) do
+      out[pkg] = dedup(vim.list_extend(out[pkg] or {}, packages))
+    end
+  end
+  return out
 end
 
 --- Aggregated conform formatters_by_ft across all registered languages.

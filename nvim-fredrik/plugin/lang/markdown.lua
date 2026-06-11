@@ -1,11 +1,6 @@
 require("lang").register("markdown", {
   mason = { "markdownlint", "prettier" },
   formatters_by_ft = { markdown = { "prettier" } },
-  formatters = {
-    mdformat = {
-      prepend_args = { "--number", "--wrap", "80" },
-    },
-  },
   linters_by_ft = { markdown = { "markdownlint" } },
   linters = {
     markdownlint = {
