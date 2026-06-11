@@ -18,7 +18,6 @@ require("lazyload").on_vim_enter(function()
     { "<leader>gb", group = "blame" },
     { "<leader>gd", group = "diffview" },
     { "<leader>gh", group = "hunks" },
-    { "<leader>r", group = "run" },
     { "<leader>s", group = "search" },
     { "<leader>t", group = "test" },
     { "<leader>u", group = "ui" },
