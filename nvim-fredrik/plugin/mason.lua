@@ -58,7 +58,9 @@ require("lazyload").on_vim_enter(function()
   mason_registry.refresh(function()
     for _, pkg_name in ipairs(lang.mason) do
       local ok, pkg = pcall(mason_registry.get_package, pkg_name)
-      if ok and not pkg:is_installed() then
+      if not ok then
+        vim.notify(("mason: unknown package %q (typo in a lang spec?)"):format(pkg_name), vim.log.levels.WARN)
+      elseif not pkg:is_installed() then
         pkg:install()
       end
     end
