@@ -193,8 +193,14 @@ local function delete_items(is_loclist, is_visual)
 
   local start_line, end_line
   if is_visual then
-    start_line = vim.fn.line("'<")
-    end_line = vim.fn.line("'>")
+    -- '< and '> are only updated after leaving visual mode; read the live
+    -- selection instead, then exit visual mode.
+    start_line = vim.fn.line("v")
+    end_line = vim.fn.line(".")
+    if start_line > end_line then
+      start_line, end_line = end_line, start_line
+    end
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
   else
     start_line = vim.fn.line(".")
     end_line = start_line
