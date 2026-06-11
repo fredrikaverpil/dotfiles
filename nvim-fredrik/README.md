@@ -174,9 +174,14 @@ Use the `:Pack` TUI or the built-in commands:
 
 A language describes its own tooling in `plugin/lang/<ft>.lua` via
 `require("lang").register()` at the **top level** of the file. The core plugins
-(`lsp.lua`, `mason.lua`, `conform.lua`, `lint.lua`) read the aggregated lists at
-`VimEnter`, so registering is all that's needed to wire up LSP, Mason,
-formatting and linting.
+(`lsp.lua`, `mason.lua`, `conform.lua`, `lint.lua`) read the merged spec via
+`require("lang").spec()` at `VimEnter`, so registering is all that's needed to
+wire up LSP, Mason, formatting and linting.
+
+The spec field names are the only vocabulary: they mirror the consumer's own
+option names where one exists (conform's `formatters_by_ft`/`formatters`,
+nvim-lint's `linters_by_ft`/`linters`), and `spec()` returns the merged result
+under the same names.
 
 ```lua
 -- plugin/lang/<ft>.lua
@@ -189,11 +194,11 @@ require("lang").register("<name>", {
   mason_pip = { ["<mason_package>"] = { "<pip_package>==<version>" } },
 
   -- conform: which formatters run, and their config
-  format = { <ft> = { "<formatter>" } },
+  formatters_by_ft = { <ft> = { "<formatter>" } },
   formatters = { <formatter> = { prepend_args = { ... } } },
 
   -- nvim-lint: which linters run, and their config
-  lint = { <ft> = { "<linter>" } },
+  linters_by_ft = { <ft> = { "<linter>" } },
   linters = { <linter> = { args = { ... } } },
 
   -- imperative lint wiring that can't be a table (e.g. dynamic cwd); receives

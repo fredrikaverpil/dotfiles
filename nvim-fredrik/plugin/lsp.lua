@@ -10,7 +10,7 @@ require("lazyload").on_vim_enter(function()
   })
 
   -- Server list aggregated from plugin/lang/*.lua via require("lang").register().
-  vim.lsp.enable(require("lang").servers())
+  vim.lsp.enable(require("lang").spec().servers)
 
   -- Enable codelens globally
   vim.lsp.codelens.enable(true)

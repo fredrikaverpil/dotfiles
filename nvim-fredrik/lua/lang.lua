@@ -1,22 +1,25 @@
 -- Per-language registry.
 --
--- Each plugin/lang/<ft>.lua describes its own tooling via register() at the
--- TOP LEVEL of the file (outside on_vim_enter), so the call runs while plugin/
--- files are sourced — before any consumer reads the registry at VimEnter.
+-- Each plugin/lang/<ft>.lua (or a project .nvim.lua) describes its own tooling
+-- via register() at the TOP LEVEL of the file (outside on_vim_enter), so the
+-- call runs while plugin/ files are sourced — before any consumer reads the
+-- registry at VimEnter.
 --
--- Consumers (plugin/lsp.lua, mason.lua, conform.lua, lint.lua) read the
--- aggregated values inside their own on_vim_enter blocks. File sourcing order
--- is therefore irrelevant: every register() has run by the time they read.
+-- Consumers (plugin/lsp.lua, mason.lua, conform.lua, lint.lua) call spec()
+-- inside their own on_vim_enter blocks and read the field they consume. File
+-- sourcing order is therefore irrelevant: every register() has run by the
+-- time spec() is called.
 --
--- The registry only handles the flat lists. Tool *config* (formatter/linter
--- args, custom per-cwd autocmds) stays in the consumer files.
+-- There is only one vocabulary: the LangSpec field names, which mirror the
+-- consumer's own option names where one exists (conform's formatters_by_ft /
+-- formatters, nvim-lint's linters_by_ft / linters).
 
 local M = {}
 
 local registry = {}
 
 ---@class LangSpec
----@field servers? string[]                 lspconfig server names, e.g. "lua_ls"
+---@field servers? string[]                  lspconfig server names, e.g. "lua_ls"
 ---@field mason? string[]                    mason package names, e.g. "lua-language-server"
 ---@field mason_pip? table<string, string[]> extra pip packages installed into a mason pypi package's venv
 ---@field formatters_by_ft? table<string, string[]>   conform formatters_by_ft entries
@@ -45,96 +48,55 @@ local function dedup(list)
   return out
 end
 
---- Aggregated lspconfig server names across all registered languages.
----@return string[]
-function M.servers()
-  local out = {}
-  for _, spec in pairs(registry) do
-    vim.list_extend(out, spec.servers or {})
-  end
-  return dedup(out)
-end
+--- The merged LangSpec across all registered languages. Lists are
+--- concatenated and deduplicated; keyed tables merge per key (last write
+--- wins); lint_setup functions are collected into a list.
+---@class MergedLangSpec
+---@field servers string[]
+---@field mason string[]
+---@field mason_pip table<string, string[]>
+---@field formatters_by_ft table<string, string[]>
+---@field formatters table<string, table>
+---@field linters_by_ft table<string, string[]>
+---@field linters table<string, table>
+---@field lint_setup (fun(lint: table))[]
 
---- Aggregated mason package names across all registered languages.
----@param base? string[] cross-cutting tools not tied to a single language
----@return string[]
-function M.mason_tools(base)
-  local out = vim.list_extend({}, base or {})
+---@return MergedLangSpec
+function M.spec()
+  local out = {
+    servers = {},
+    mason = {},
+    mason_pip = {},
+    formatters_by_ft = {},
+    formatters = {},
+    linters_by_ft = {},
+    linters = {},
+    lint_setup = {},
+  }
   for _, spec in pairs(registry) do
-    vim.list_extend(out, spec.mason or {})
-  end
-  return dedup(out)
-end
-
---- Aggregated extra pip packages per mason package across all registered languages.
----@return table<string, string[]>
-function M.mason_pip()
-  local out = {}
-  for _, spec in pairs(registry) do
+    vim.list_extend(out.servers, spec.servers or {})
+    vim.list_extend(out.mason, spec.mason or {})
     for pkg, packages in pairs(spec.mason_pip or {}) do
-      out[pkg] = dedup(vim.list_extend(out[pkg] or {}, packages))
+      out.mason_pip[pkg] = dedup(vim.list_extend(out.mason_pip[pkg] or {}, packages))
     end
-  end
-  return out
-end
-
---- Aggregated conform formatters_by_ft across all registered languages.
----@return table<string, string[]>
-function M.formatters_by_ft()
-  local out = {}
-  for _, spec in pairs(registry) do
     for ft, tools in pairs(spec.formatters_by_ft or {}) do
-      out[ft] = tools
+      out.formatters_by_ft[ft] = tools
     end
-  end
-  return out
-end
-
---- Aggregated nvim-lint linters_by_ft across all registered languages.
----@return table<string, string[]>
-function M.linters_by_ft()
-  local out = {}
-  for _, spec in pairs(registry) do
-    for ft, tools in pairs(spec.linters_by_ft or {}) do
-      out[ft] = tools
-    end
-  end
-  return out
-end
-
---- Aggregated conform per-formatter config across all registered languages.
----@return table<string, table>
-function M.formatter_configs()
-  local out = {}
-  for _, spec in pairs(registry) do
     for name, cfg in pairs(spec.formatters or {}) do
-      out[name] = cfg
+      out.formatters[name] = cfg
     end
-  end
-  return out
-end
-
---- Aggregated nvim-lint per-linter config across all registered languages.
----@return table<string, table>
-function M.linter_configs()
-  local out = {}
-  for _, spec in pairs(registry) do
+    for ft, tools in pairs(spec.linters_by_ft or {}) do
+      out.linters_by_ft[ft] = tools
+    end
     for name, cfg in pairs(spec.linters or {}) do
-      out[name] = cfg
+      out.linters[name] = cfg
     end
-  end
-  return out
-end
-
---- Imperative lint_setup functions from all registered languages.
----@return fun(lint: table)[]
-function M.lint_setups()
-  local out = {}
-  for _, spec in pairs(registry) do
     if spec.lint_setup then
-      out[#out + 1] = spec.lint_setup
+      out.lint_setup[#out.lint_setup + 1] = spec.lint_setup
     end
   end
+  out.servers = dedup(out.servers)
+  out.mason = dedup(out.mason)
   return out
 end
 

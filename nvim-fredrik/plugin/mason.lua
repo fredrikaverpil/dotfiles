@@ -15,17 +15,16 @@ require("lazyload").on_vim_enter(function()
     automatic_enable = false, -- we handle vim.lsp.enable() ourselves
   })
 
-  -- Tool list aggregated from plugin/lang/*.lua via require("lang").register().
-  local ensure_installed = require("lang").mason_tools()
+  -- mason (package list) and mason_pip aggregated from plugin/lang/*.lua via
+  -- require("lang").register().
+  local lang = require("lang").spec()
 
-  -- Extra pip packages per mason pypi package, installed into the package's
-  -- venv. Mason recreates the venv on install/update (wiping extras), so they
-  -- are re-applied via the install:success event; the pass after refresh()
-  -- covers packages that are already installed.
-  local pip_extras = require("lang").mason_pip()
-
-  local function install_pip_extras(pkg_name)
-    local extras = pip_extras[pkg_name]
+  -- mason_pip packages are installed into the mason package's venv. Mason
+  -- recreates the venv on install/update (wiping them), so they are re-applied
+  -- via the install:success event; the pass after refresh() covers packages
+  -- that are already installed.
+  local function install_mason_pip(pkg_name)
+    local extras = lang.mason_pip[pkg_name]
     if not extras then
       return
     end
@@ -45,7 +44,7 @@ require("lazyload").on_vim_enter(function()
   mason_registry:on(
     "package:install:success",
     vim.schedule_wrap(function(pkg)
-      install_pip_extras(pkg.name)
+      install_mason_pip(pkg.name)
     end)
   )
 
@@ -57,17 +56,17 @@ require("lazyload").on_vim_enter(function()
   )
 
   mason_registry.refresh(function()
-    for _, pkg_name in ipairs(ensure_installed) do
+    for _, pkg_name in ipairs(lang.mason) do
       local ok, pkg = pcall(mason_registry.get_package, pkg_name)
       if ok and not pkg:is_installed() then
         pkg:install()
       end
     end
 
-    for pkg_name in pairs(pip_extras) do
+    for pkg_name in pairs(lang.mason_pip) do
       local ok, pkg = pcall(mason_registry.get_package, pkg_name)
       if ok and pkg:is_installed() then
-        install_pip_extras(pkg_name)
+        install_mason_pip(pkg_name)
       end
     end
   end)
