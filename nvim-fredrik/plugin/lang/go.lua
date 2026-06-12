@@ -68,6 +68,7 @@ require("lazyload").on_vim_enter(function()
     })
 
     vim.api.nvim_create_autocmd("FileType", {
+      group = vim.api.nvim_create_augroup("go-opts", { clear = true }),
       pattern = { "go", "gomod", "gowork", "gohtml", "gotmpl" },
       callback = function()
         vim.opt_local.expandtab = false
