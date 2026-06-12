@@ -1,7 +1,6 @@
 require("lazyload").on_vim_enter(function()
   vim.pack.add({
     { src = "https://github.com/mason-org/mason.nvim", version = vim.version.range("*") },
-    { src = "https://github.com/mason-org/mason-lspconfig.nvim", version = vim.version.range("*") },
     { src = "https://github.com/zapling/mason-lock.nvim" },
   })
 
@@ -9,10 +8,6 @@ require("lazyload").on_vim_enter(function()
 
   require("mason-lock").setup({
     lockfile_path = vim.env.DOTFILES .. "/nvim-fredrik/mason-lock.json",
-  })
-
-  require("mason-lspconfig").setup({
-    automatic_enable = false, -- we handle vim.lsp.enable() ourselves
   })
 
   -- mason (package list) and mason_pip aggregated from plugin/lang/*.lua via
