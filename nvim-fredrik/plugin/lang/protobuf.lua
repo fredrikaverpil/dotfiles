@@ -92,14 +92,22 @@ require("lang").register("protobuf", {
         return descriptor_paths[cfg]
       end
 
-      local function descriptor_set_in()
-        local cfg = assert(buf_config_filepath(), "buf config not found")
+      --- Build the descriptor set asynchronously; calls back on success.
+      --- The build runs before try_lint (not inside the linter's args
+      --- function) so a slow `buf build` never blocks the UI thread.
+      ---@param cfg string buf config filepath
+      ---@param on_success fun()
+      local function build_descriptor(cfg, on_success)
         local path = descriptor_path_for(cfg)
-        local obj = vim.system({ "buf", "build", "-o", path }, { cwd = vim.fn.fnamemodify(cfg, ":h") }):wait()
-        if obj.code ~= 0 then
-          error("buf build failed: " .. tostring(obj.stderr or ""))
-        end
-        return "--descriptor-set-in=" .. path
+        vim.system({ "buf", "build", "-o", path }, { cwd = vim.fn.fnamemodify(cfg, ":h") }, function(obj)
+          vim.schedule(function()
+            if obj.code ~= 0 then
+              vim.notify("buf build failed: " .. tostring(obj.stderr or ""), vim.log.levels.ERROR)
+              return
+            end
+            on_success()
+          end)
+        end)
       end
 
       vim.api.nvim_create_autocmd("VimLeavePre", {
@@ -122,7 +130,8 @@ require("lang").register("protobuf", {
           "--disable-rule=core::0191::java-package",
           "--disable-rule=core::0191::java-outer-classname",
           function()
-            return descriptor_set_in()
+            local cfg = assert(buf_config_filepath(), "buf config not found")
+            return "--descriptor-set-in=" .. descriptor_path_for(cfg)
           end,
           function()
             return get_relative_path(vim.fn.expand("%:p"), buf_lint_cwd())
@@ -162,12 +171,20 @@ require("lang").register("protobuf", {
       vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
         group = vim.api.nvim_create_augroup("lint-api-linter", { clear = true }),
         pattern = { "*.proto" },
-        callback = function()
+        callback = function(ev)
           local cwd = buf_lint_cwd()
-          if cwd == nil then
+          local cfg = buf_config_filepath()
+          if cwd == nil or cfg == nil then
             return
           end
-          lint.try_lint("api_linter", { cwd = cwd })
+          build_descriptor(cfg, function()
+            -- The buffer may have changed (or been wiped) during the build.
+            if vim.api.nvim_buf_is_valid(ev.buf) then
+              vim.api.nvim_buf_call(ev.buf, function()
+                lint.try_lint("api_linter", { cwd = cwd })
+              end)
+            end
+          end)
         end,
       })
     end
