@@ -29,6 +29,10 @@ function _G.Config.add(spec)
   require("merge")(_G.Config, spec)
 end
 
+-- Plugin files build paths from this at sourcing time (mason lockfile,
+-- lint configs); without a fallback an unset env var crashes startup.
+vim.env.DOTFILES = vim.env.DOTFILES or vim.fs.normalize("~/.dotfiles")
+
 vim.g.mapleader = " "
 vim.g.maplocalleader = ","
 
