@@ -35,8 +35,10 @@ require("lazyload").on_vim_enter(function()
         -- Workspace diagnostics
         if client:supports_method("workspace/diagnostic", buf) then
           vim.lsp.buf.workspace_diagnostics({ client_id = client.id })
-          -- else
-          --   require("workspace-diagnostics").populate_workspace_diagnostics(client, buf)
+        else
+          if Config.use_workspace_diagnostics_plugin then
+            require("workspace-diagnostics").populate_workspace_diagnostics(client, buf)
+          end
         end
 
         -- Inline completion

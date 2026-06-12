@@ -21,6 +21,9 @@ _G.Config = {
   -- diffing
   use_diffview = false,
   use_codediff = true,
+
+  -- lsp
+  use_workspace_diagnostics_plugin = false,
 }
 function _G.Config.add(spec)
   require("merge")(_G.Config, spec)
