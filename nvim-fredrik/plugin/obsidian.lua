@@ -1,12 +1,13 @@
 require("lazyload").on_vim_enter(function()
+  -- Vaults live in iCloud; don't even install the plugin elsewhere.
+  if vim.fn.has("mac") ~= 1 then
+    return
+  end
+
   vim.pack.add({
     { src = "https://github.com/obsidian-nvim/obsidian.nvim", version = vim.version.range("*") },
     { src = "https://github.com/folke/snacks.nvim", version = vim.version.range("*") }, -- sub-dependency
   })
-
-  if vim.fn.has("mac") ~= 1 then
-    return
-  end
 
   local base = vim.fn.expand("~/Library/Mobile Documents/iCloud~md~obsidian/Documents")
   local vaults = vim.tbl_filter(function(v)
