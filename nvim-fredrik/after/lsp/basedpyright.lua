@@ -15,10 +15,6 @@ return {
     ".git",
   },
   settings = {
-    python = {
-      venvPath = os.getenv("VIRTUAL_ENV"),
-      pythonPath = vim.fn.exepath("python"),
-    },
     basedpyright = {
       disableOrganizeImports = true, -- delegate to ruff
       analysis = {
