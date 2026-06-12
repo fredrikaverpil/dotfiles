@@ -65,7 +65,6 @@ end)
 - `on_vim_enter(fn)`: defer to `VimEnter`, then run the function async
 - `on_override(fn)`: defer to after all `VimEnter` callbacks (for `.nvim.lua`
   overrides)
-- `call_once(fn)`: call the function only once
 
 ### Cross-plugin data sharing
 

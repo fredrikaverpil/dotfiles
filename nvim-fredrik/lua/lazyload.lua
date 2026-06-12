@@ -75,13 +75,4 @@ function M.on_override(fn)
   end
 end
 
--- Call function only once.
-function M.call_once(fn)
-  local id = tostring(fn)
-  if fn and not Config.called[id] then
-    fn()
-    Config.called[id] = true
-  end
-end
-
 return M

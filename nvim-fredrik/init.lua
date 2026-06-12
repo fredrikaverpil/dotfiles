@@ -11,7 +11,6 @@ vim.loader.enable()
 -- States for this Neovim config.
 _G.Config = {
   nvim_start_time = nvim_start_time,
-  called = {},
 
   -- treesitter
   use_treesitter_parser = true,
@@ -25,9 +24,6 @@ _G.Config = {
   -- lsp
   use_workspace_diagnostics_plugin = false,
 }
-function _G.Config.add(spec)
-  require("merge")(_G.Config, spec)
-end
 
 -- Plugin files build paths from this at sourcing time (mason lockfile,
 -- lint configs); without a fallback an unset env var crashes startup.
