@@ -6,7 +6,15 @@ vim.pack.add({
 })
 
 require("lazyload").on_vim_enter(function()
-  local default_sources = { "lsp", "path", "snippets", "buffer", "dadbod", "lazydev", "markdown" }
+  local default_sources = { "lsp", "path", "snippets", "buffer", "lazydev" }
+  -- Filetype-bound sources stay out of `default` so they aren't queried in
+  -- every buffer.
+  local per_filetype = {
+    sql = { inherit_defaults = true, "dadbod" },
+    mysql = { inherit_defaults = true, "dadbod" },
+    plsql = { inherit_defaults = true, "dadbod" },
+    markdown = { inherit_defaults = true, "markdown" },
+  }
   local providers = {
     snippets = {
       opts = {
@@ -30,7 +38,7 @@ require("lazyload").on_vim_enter(function()
   }
 
   if Config.use_treesitter_parser then
-    table.insert(default_sources, "go_pkgs")
+    per_filetype.go = { inherit_defaults = true, "go_pkgs" }
     providers.go_pkgs = {
       name = "Import",
       module = "blink-go-import",
@@ -94,6 +102,7 @@ require("lazyload").on_vim_enter(function()
     },
     sources = {
       default = default_sources,
+      per_filetype = per_filetype,
       providers = providers,
     },
   })
