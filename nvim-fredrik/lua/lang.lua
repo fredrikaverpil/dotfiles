@@ -28,10 +28,37 @@ local registry = {}
 ---@field linters? table<string, table>      nvim-lint per-linter config, merged into lint.linters
 ---@field lint_setup? fun(lint: table)       imperative lint wiring (autocmds, dynamic cwd)
 
+-- Keyed-table fields that spec() merges with "last write wins". The registry
+-- is iterated with pairs(), which has no defined order, so a key registered by
+-- two languages would be resolved by coin flip — treat it as a config error.
+local keyed_fields = { "formatters_by_ft", "formatters", "linters_by_ft", "linters" }
+
 --- Register a language's tooling. Call at the top level of plugin/lang/<ft>.lua.
+--- Re-registering the same name replaces the previous spec. A keyed entry
+--- (e.g. formatters_by_ft.markdown) already claimed by another language warns:
+--- own the key in one place, or patch via lazyload.on_override instead.
 ---@param name string
 ---@param spec LangSpec
 function M.register(name, spec)
+  for other_name, other in pairs(registry) do
+    if other_name ~= name then
+      for _, field in ipairs(keyed_fields) do
+        for key in pairs(spec[field] or {}) do
+          if (other[field] or {})[key] ~= nil then
+            vim.notify(
+              ("lang: %s.%s[%q] is already registered by %s — merge order is undefined"):format(
+                name,
+                field,
+                key,
+                other_name
+              ),
+              vim.log.levels.WARN
+            )
+          end
+        end
+      end
+    end
+  end
   registry[name] = spec
 end
 
