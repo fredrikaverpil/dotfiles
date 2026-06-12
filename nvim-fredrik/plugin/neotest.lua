@@ -30,13 +30,17 @@ require("lazyload").on_vim_enter(function()
   neotest.setup({
     adapters = {
       require("neotest-golang")({
-        go_test_args = {
-          "-v",
-          "-count=1",
-          "-race",
-          "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
-          "-parallel=1",
-        },
+        -- Resolved at use time so :cd after startup writes the profile where
+        -- nvim-coverage (plugin/nvim_coverage.lua) looks for it.
+        go_test_args = function()
+          return {
+            "-v",
+            "-count=1",
+            "-race",
+            "-coverprofile=" .. vim.fs.joinpath(vim.fn.getcwd(), "coverage.out"),
+            "-parallel=1",
+          }
+        end,
         runner = "gotestsum",
         gotestsum_args = { "--format=standard-verbose" },
       }),
