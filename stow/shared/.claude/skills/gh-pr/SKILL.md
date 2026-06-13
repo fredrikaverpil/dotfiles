@@ -1,6 +1,5 @@
 ---
 name: gh-pr
-
 description: >-
   This skill should be used when creating a GitHub pull request via `gh pr
   create`. Defines PR body format with Why/What/Notes sections and ensures
@@ -18,6 +17,11 @@ conventions.
 - Prefer explicitness and clarity over verbosity.
 - Express Why/What/Notes content as concise, to-the-point bullet lists. Avoid
   prose paragraphs.
+- Include a small, illustrative code snippet whenever it conveys the change
+  faster than prose. This is desired for PRs in general, and especially for bug
+  fixes: a minimal example of the triggering case (and what went wrong) makes
+  the problem concrete for reviewers. Keep it short — just enough to convey the
+  point, not a full reproduction.
 
 ## PR title format
 
