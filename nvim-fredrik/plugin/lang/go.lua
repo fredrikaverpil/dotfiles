@@ -1,8 +1,15 @@
+-- Resolved at use time so :cd after startup still finds the profile
+-- written by neotest (plugin/neotest.lua uses the same path).
+local function coverage_file()
+  return vim.fs.joinpath(vim.fn.getcwd(), "coverage.out")
+end
+
 require("lang").register("go", {
   servers = { "gopls" },
   mason = { "gopls", "goimports", "gci", "gofumpt", "golines", "golangci-lint", "delve", "gotestsum", "impl" },
   formatters_by_ft = { go = { "goimports", "gci", "gofumpt", "golines" } },
   code_runner = { go = { "go run" } },
+  coverage = { go = { coverage_file = coverage_file } },
   formatters = {
     gci = {
       args = { "write", "--skip-generated", "-s", "standard", "-s", "default", "--skip-vendor", "$FILENAME" },

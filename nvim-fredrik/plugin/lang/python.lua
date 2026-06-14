@@ -1,7 +1,14 @@
+-- Resolved at use time so :cd after startup still finds the profile
+-- written by neotest (plugin/neotest.lua uses the same path).
+local function coverage_file()
+  return vim.fs.joinpath(vim.fn.getcwd(), "coverage.out")
+end
+
 require("lang").register("python", {
   servers = { "basedpyright", "ruff" },
   mason = { "basedpyright", "ruff", "mypy", "debugpy" },
   linters_by_ft = { python = { "mypy" } },
+  coverage = { python = { coverage_file = coverage_file } },
   neotest = {
     packs = {
       { src = "https://github.com/nvim-neotest/neotest-python" },

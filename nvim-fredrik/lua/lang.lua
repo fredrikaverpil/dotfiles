@@ -6,8 +6,8 @@
 -- registry at VimEnter.
 --
 -- Consumers (plugin/lsp.lua, mason.lua, conform.lua, lint.lua,
--- code_runner.lua, neotest.lua, dap.lua) call spec() inside their own
--- on_vim_enter blocks and read the field
+-- code_runner.lua, nvim_coverage.lua, neotest.lua, dap.lua) call spec()
+-- inside their own on_vim_enter blocks and read the field
 -- they consume. File
 -- sourcing order is therefore irrelevant: every register() has run by the
 -- time spec() is called.
@@ -30,13 +30,14 @@ local registry = {}
 ---@field linters? table<string, table>      nvim-lint per-linter config, merged into lint.linters
 ---@field lint_setup? fun(lint: table)       imperative lint wiring (autocmds, dynamic cwd)
 ---@field code_runner? table<string, string[]> code_runner.nvim filetype commands
+---@field coverage? table<string, table>      nvim-coverage lang entries
 ---@field neotest? { packs?: table[], adapter: fun(): table }  neotest adapter plugin packs + a builder returning the adapter
 ---@field dap? { packs?: table[], setup: fun(dap: table) }  dap adapter plugin packs + an imperative setup hook receiving the dap module
 
 -- Keyed-table fields that spec() merges with "last write wins". The registry
 -- is iterated with pairs(), which has no defined order, so a key registered by
 -- two languages would be resolved by coin flip — treat it as a config error.
-local keyed_fields = { "formatters_by_ft", "formatters", "linters_by_ft", "linters", "code_runner" }
+local keyed_fields = { "formatters_by_ft", "formatters", "linters_by_ft", "linters", "code_runner", "coverage" }
 
 --- Register a language's tooling. Call at the top level of plugin/lang/<ft>.lua.
 --- Re-registering the same name replaces the previous spec. A keyed entry
@@ -96,6 +97,7 @@ end
 ---@field linters table<string, table>
 ---@field lint_setup (fun(lint: table))[]
 ---@field code_runner table<string, string[]>
+---@field coverage table<string, table>
 ---@field neotest { packs: table[], adapters: (fun(): table)[] }
 ---@field dap { packs: table[], setups: (fun(dap: table))[] }
 
@@ -111,6 +113,7 @@ function M.spec()
     linters = {},
     lint_setup = {},
     code_runner = {},
+    coverage = {},
     neotest = { packs = {}, adapters = {} },
     dap = { packs = {}, setups = {} },
   }
@@ -137,6 +140,9 @@ function M.spec()
     end
     for ft, cmd in pairs(spec.code_runner or {}) do
       out.code_runner[ft] = cmd
+    end
+    for ft, cfg in pairs(spec.coverage or {}) do
+      out.coverage[ft] = cfg
     end
     if spec.neotest then
       vim.list_extend(out.neotest.packs, spec.neotest.packs or {})
