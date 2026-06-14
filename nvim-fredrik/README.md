@@ -29,12 +29,13 @@ nvim-fredrik/
 The `init.lua` defines `_G.Config` (for global states), `vim.opt` options, some
 keymaps and custom behaviors.
 
-Core plugin files (`plugin/*.lua`) own tool configuration inline — completion
-sources, DAP adapters, neotest adapters, formatter/linter args, etc.
+Core plugin files (`plugin/*.lua`) own each plugin's host setup and any config
+shared across languages (e.g. completion sources, DAP adapters). Anything
+language-specific is contributed by the language files.
 
 Language files (`plugin/lang/*.lua`) handle language-specific concerns: which
-LSP servers, Mason tools, formatters and linters a language uses (declared via
-`require("lang").register()`, see
+LSP servers, Mason tools, formatters, linters and test adapters a language uses
+(declared via `require("lang").register()`, see
 [Adding new language support](#adding-new-language-support)), plus per-filetype
 editor settings (`vim.opt_local` via `FileType` autocmds), extra
 `vim.pack.add()` calls, custom filetypes, SchemaStore loading, build hooks, and
@@ -173,9 +174,9 @@ Use the `:Pack` TUI or the built-in commands:
 
 A language describes its own tooling in `plugin/lang/<ft>.lua` via
 `require("lang").register()` at the **top level** of the file. The core plugins
-(`lsp.lua`, `mason.lua`, `conform.lua`, `lint.lua`) read the merged spec via
-`require("lang").spec()` at `VimEnter`, so registering is all that's needed to
-wire up LSP, Mason, formatting and linting.
+(`lsp.lua`, `mason.lua`, `conform.lua`, `lint.lua`, `neotest.lua`) read the
+merged spec via `require("lang").spec()` at `VimEnter`, so registering is all
+that's needed to wire up LSP, Mason, formatting, linting and testing.
 
 The spec field names are the only vocabulary: they mirror the consumer's own
 option names where one exists (conform's `formatters_by_ft`/`formatters`,
@@ -205,6 +206,16 @@ require("lang").register("<name>", {
   lint_setup = function(lint)
     -- custom autocmds, lint.try_lint(...) with computed cwd, etc.
   end,
+
+  -- neotest: the per-language adapter plugin(s) and a builder returning the
+  -- adapter. packs are batch-added by neotest.lua before any builder runs, then
+  -- every adapter is collected into neotest's single setup({ adapters = ... }).
+  neotest = {
+    packs = { { src = "https://github.com/<adapter-plugin>" } },
+    adapter = function()
+      return require("<adapter>")({ --[[ adapter opts ]] })
+    end,
+  },
 })
 
 require("lazyload").on_vim_enter(function()

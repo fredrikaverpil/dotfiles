@@ -2,6 +2,18 @@ require("lang").register("python", {
   servers = { "basedpyright", "ruff" },
   mason = { "basedpyright", "ruff", "mypy", "debugpy" },
   linters_by_ft = { python = { "mypy" } },
+  neotest = {
+    packs = {
+      { src = "https://github.com/nvim-neotest/neotest-python" },
+    },
+    adapter = function()
+      return require("neotest-python")({
+        runner = "pytest",
+        args = { "--log-level", "INFO", "--color", "yes", "-vv", "-s" },
+        dap = { justMyCode = false },
+      })
+    end,
+  },
 })
 
 require("lazyload").on_vim_enter(function()

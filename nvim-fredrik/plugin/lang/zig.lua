@@ -1,6 +1,16 @@
 require("lang").register("zig", {
   servers = { "zls" },
   mason = { "zls" },
+  neotest = {
+    packs = {
+      { src = "https://github.com/lawrence-laz/neotest-zig" },
+    },
+    adapter = function()
+      return require("neotest-zig")({
+        dap = { adapter = "lldb" },
+      })
+    end,
+  },
 })
 
 require("lazyload").on_vim_enter(function()

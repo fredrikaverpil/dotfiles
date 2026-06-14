@@ -5,8 +5,9 @@
 -- call runs while plugin/ files are sourced — before any consumer reads the
 -- registry at VimEnter.
 --
--- Consumers (plugin/lsp.lua, mason.lua, conform.lua, lint.lua) call spec()
--- inside their own on_vim_enter blocks and read the field they consume. File
+-- Consumers (plugin/lsp.lua, mason.lua, conform.lua, lint.lua, neotest.lua)
+-- call spec() inside their own on_vim_enter blocks and read the field they
+-- consume. File
 -- sourcing order is therefore irrelevant: every register() has run by the
 -- time spec() is called.
 --
@@ -27,6 +28,7 @@ local registry = {}
 ---@field linters_by_ft? table<string, string[]>      nvim-lint linters_by_ft entries
 ---@field linters? table<string, table>      nvim-lint per-linter config, merged into lint.linters
 ---@field lint_setup? fun(lint: table)       imperative lint wiring (autocmds, dynamic cwd)
+---@field neotest? { packs?: table[], adapter: fun(): table }  neotest adapter plugin packs + a builder returning the adapter
 
 -- Keyed-table fields that spec() merges with "last write wins". The registry
 -- is iterated with pairs(), which has no defined order, so a key registered by
@@ -77,7 +79,10 @@ end
 
 --- The merged LangSpec across all registered languages. Lists are
 --- concatenated and deduplicated; keyed tables merge per key (last write
---- wins); lint_setup functions are collected into a list.
+--- wins); lint_setup functions are collected into a list. The neotest field
+--- groups every language's adapter packs (concatenated) and adapter builders
+--- (collected into a list) so the consumer can batch-add the packs and build
+--- all adapters for neotest's single setup() call.
 ---@class MergedLangSpec
 ---@field servers string[]
 ---@field mason string[]
@@ -87,6 +92,7 @@ end
 ---@field linters_by_ft table<string, string[]>
 ---@field linters table<string, table>
 ---@field lint_setup (fun(lint: table))[]
+---@field neotest { packs: table[], adapters: (fun(): table)[] }
 
 ---@return MergedLangSpec
 function M.spec()
@@ -99,6 +105,7 @@ function M.spec()
     linters_by_ft = {},
     linters = {},
     lint_setup = {},
+    neotest = { packs = {}, adapters = {} },
   }
   for _, spec in pairs(registry) do
     vim.list_extend(out.servers, spec.servers or {})
@@ -120,6 +127,12 @@ function M.spec()
     end
     if spec.lint_setup then
       out.lint_setup[#out.lint_setup + 1] = spec.lint_setup
+    end
+    if spec.neotest then
+      vim.list_extend(out.neotest.packs, spec.neotest.packs or {})
+      if spec.neotest.adapter then
+        out.neotest.adapters[#out.neotest.adapters + 1] = spec.neotest.adapter
+      end
     end
   end
   out.servers = dedup(out.servers)

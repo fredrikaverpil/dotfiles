@@ -2,6 +2,16 @@ require("lang").register("lua", {
   servers = { "lua_ls" },
   mason = { "lua-language-server", "stylua" },
   formatters_by_ft = { lua = { "stylua" } },
+  neotest = {
+    packs = {
+      { src = "https://github.com/nvim-neotest/neotest-plenary" },
+    },
+    adapter = function()
+      -- neotest-plenary's module table is itself the adapter (no call needed)
+      local adapter = require("neotest-plenary")
+      return adapter
+    end,
+  },
 })
 
 require("lazyload").on_vim_enter(function()

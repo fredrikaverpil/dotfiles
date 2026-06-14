@@ -52,6 +52,31 @@ require("lang").register("go", {
       end,
     })
   end,
+  neotest = {
+    packs = {
+      -- neotest-golang dep; the adapter itself is loaded via dev.load_local below.
+      { src = "https://github.com/uga-rosa/utf8.nvim" },
+    },
+    adapter = function()
+      require("dev").load_local("~/code/public/neotest-golang")
+      -- vim.pack.add({ { src = "https://github.com/fredrikaverpil/neotest-golang" } })
+      return require("neotest-golang")({
+        -- Resolved at use time so :cd after startup writes the profile where
+        -- nvim-coverage (plugin/nvim_coverage.lua) looks for it.
+        go_test_args = function()
+          return {
+            "-v",
+            "-count=1",
+            "-race",
+            "-coverprofile=" .. vim.fs.joinpath(vim.fn.getcwd(), "coverage.out"),
+            "-parallel=1",
+          }
+        end,
+        runner = "gotestsum",
+        gotestsum_args = { "--format=standard-verbose" },
+      })
+    end,
+  },
 })
 
 require("lazyload").on_vim_enter(function()

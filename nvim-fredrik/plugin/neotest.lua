@@ -1,52 +1,25 @@
 require("lazyload").on_vim_enter(function()
-  require("dev").load_local("~/code/public/neotest-golang")
+  -- Adapters (and their plugin packs) are contributed per-language via
+  -- require("lang").register({ neotest = { packs = ..., adapter = ... } }).
+  local neotest_spec = require("lang").spec().neotest
 
-  vim.pack.add({
+  vim.pack.add(vim.list_extend({
     { src = "https://github.com/nvim-neotest/neotest", version = vim.version.range("*") },
     { src = "https://github.com/nvim-neotest/nvim-nio", version = vim.version.range("*") },
     { src = "https://github.com/nvim-lua/plenary.nvim" },
     { src = "https://github.com/antoinemadec/FixCursorHold.nvim" },
+  }, neotest_spec.packs))
 
-    -- test adapters
-    { src = "https://github.com/nvim-neotest/neotest-plenary" },
-    { src = "https://github.com/nvim-neotest/neotest-python" },
-    { src = "https://github.com/lawrence-laz/neotest-zig" },
-
-    -- neotest-golang
-    -- { src = "https://github.com/fredrikaverpil/neotest-golang" },
-    { src = "https://github.com/uga-rosa/utf8.nvim" },
-  })
+  local adapters = {}
+  for _, build in ipairs(neotest_spec.adapters) do
+    adapters[#adapters + 1] = build()
+  end
 
   local neotest = require("neotest")
 
   ---@diagnostic disable-next-line: missing-fields
   neotest.setup({
-    adapters = {
-      require("neotest-golang")({
-        -- Resolved at use time so :cd after startup writes the profile where
-        -- nvim-coverage (plugin/nvim_coverage.lua) looks for it.
-        go_test_args = function()
-          return {
-            "-v",
-            "-count=1",
-            "-race",
-            "-coverprofile=" .. vim.fs.joinpath(vim.fn.getcwd(), "coverage.out"),
-            "-parallel=1",
-          }
-        end,
-        runner = "gotestsum",
-        gotestsum_args = { "--format=standard-verbose" },
-      }),
-      require("neotest-plenary"),
-      require("neotest-python")({
-        runner = "pytest",
-        args = { "--log-level", "INFO", "--color", "yes", "-vv", "-s" },
-        dap = { justMyCode = false },
-      }),
-      require("neotest-zig")({
-        dap = { adapter = "lldb" },
-      }),
-    },
+    adapters = adapters,
     log_level = vim.log.levels.WARN,
   })
 
