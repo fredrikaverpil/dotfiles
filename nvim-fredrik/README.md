@@ -30,8 +30,8 @@ The `init.lua` defines `_G.Config` (for global states), `vim.opt` options, some
 keymaps and custom behaviors.
 
 Core plugin files (`plugin/*.lua`) own each plugin's host setup and any config
-shared across languages (e.g. completion sources, DAP adapters). Anything
-language-specific is contributed by the language files.
+shared across languages (e.g. completion sources). Anything language-specific is
+contributed by the language files.
 
 Language files (`plugin/lang/*.lua`) handle language-specific concerns: which
 LSP servers, Mason tools, formatters, linters and test adapters a language uses
@@ -174,9 +174,10 @@ Use the `:Pack` TUI or the built-in commands:
 
 A language describes its own tooling in `plugin/lang/<ft>.lua` via
 `require("lang").register()` at the **top level** of the file. The core plugins
-(`lsp.lua`, `mason.lua`, `conform.lua`, `lint.lua`, `neotest.lua`) read the
-merged spec via `require("lang").spec()` at `VimEnter`, so registering is all
-that's needed to wire up LSP, Mason, formatting, linting and testing.
+(`lsp.lua`, `mason.lua`, `conform.lua`, `lint.lua`, `neotest.lua`, `dap.lua`)
+read the merged spec via `require("lang").spec()` at `VimEnter`, so registering
+is all that's needed to wire up LSP, Mason, formatting, linting, testing and
+debugging.
 
 The spec field names are the only vocabulary: they mirror the consumer's own
 option names where one exists (conform's `formatters_by_ft`/`formatters`,
@@ -214,6 +215,17 @@ require("lang").register("<name>", {
     packs = { { src = "https://github.com/<adapter-plugin>" } },
     adapter = function()
       return require("<adapter>")({ --[[ adapter opts ]] })
+    end,
+  },
+
+  -- dap: the per-language adapter plugin(s) and an imperative setup hook. packs
+  -- are batch-added by dap.lua before any hook runs; each hook receives the dap
+  -- module and wires up dap.adapters/dap.configurations (or calls the adapter's
+  -- own setup).
+  dap = {
+    packs = { { src = "https://github.com/<adapter-plugin>" } },
+    setup = function(dap)
+      require("<adapter>").setup(--[[ adapter opts ]])
     end,
   },
 })

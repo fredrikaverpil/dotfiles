@@ -12,6 +12,33 @@ require("lang").register("lua", {
       return adapter
     end,
   },
+  dap = {
+    packs = {
+      { src = "https://github.com/jbyuki/one-small-step-for-vimkind" }, -- Lua DAP adapter
+    },
+    setup = function(dap)
+      local osv = require("osv")
+
+      dap.adapters.nlua = function(callback, config)
+        callback({ type = "server", host = config.host or "127.0.0.1", port = config.port or 8086 })
+      end
+
+      dap.configurations.lua = {
+        {
+          type = "nlua",
+          request = "attach",
+          name = "Attach to running Neovim instance",
+        },
+      }
+
+      vim.keymap.set("n", "<leader>dLl", function()
+        osv.launch({ port = 8086 })
+      end, { desc = "Debug Lua: launch server" })
+      vim.keymap.set("n", "<leader>dLr", function()
+        osv.run_this()
+      end, { desc = "Debug Lua: run this" })
+    end,
+  },
 })
 
 require("lazyload").on_vim_enter(function()
@@ -29,7 +56,6 @@ require("lazyload").on_vim_enter(function()
   vim.pack.add({
     { src = "https://github.com/folke/lazydev.nvim", version = vim.version.range("*") },
     { src = "https://github.com/Bilal2453/luvit-meta" }, -- vim.uv typings
-    { src = "https://github.com/jbyuki/one-small-step-for-vimkind" }, -- Lua DAP adapter
   })
 
   require("lazydev").setup({

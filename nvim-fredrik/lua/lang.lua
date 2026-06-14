@@ -5,9 +5,9 @@
 -- call runs while plugin/ files are sourced — before any consumer reads the
 -- registry at VimEnter.
 --
--- Consumers (plugin/lsp.lua, mason.lua, conform.lua, lint.lua, neotest.lua)
--- call spec() inside their own on_vim_enter blocks and read the field they
--- consume. File
+-- Consumers (plugin/lsp.lua, mason.lua, conform.lua, lint.lua, neotest.lua,
+-- dap.lua) call spec() inside their own on_vim_enter blocks and read the field
+-- they consume. File
 -- sourcing order is therefore irrelevant: every register() has run by the
 -- time spec() is called.
 --
@@ -29,6 +29,7 @@ local registry = {}
 ---@field linters? table<string, table>      nvim-lint per-linter config, merged into lint.linters
 ---@field lint_setup? fun(lint: table)       imperative lint wiring (autocmds, dynamic cwd)
 ---@field neotest? { packs?: table[], adapter: fun(): table }  neotest adapter plugin packs + a builder returning the adapter
+---@field dap? { packs?: table[], setup: fun(dap: table) }  dap adapter plugin packs + an imperative setup hook receiving the dap module
 
 -- Keyed-table fields that spec() merges with "last write wins". The registry
 -- is iterated with pairs(), which has no defined order, so a key registered by
@@ -79,10 +80,10 @@ end
 
 --- The merged LangSpec across all registered languages. Lists are
 --- concatenated and deduplicated; keyed tables merge per key (last write
---- wins); lint_setup functions are collected into a list. The neotest field
---- groups every language's adapter packs (concatenated) and adapter builders
---- (collected into a list) so the consumer can batch-add the packs and build
---- all adapters for neotest's single setup() call.
+--- wins); lint_setup functions are collected into a list. The neotest and dap
+--- fields each group every language's adapter packs (concatenated) and hooks
+--- (collected into a list) so the consumer can batch-add the packs, then build
+--- all adapters for neotest's single setup() / run each dap setup hook.
 ---@class MergedLangSpec
 ---@field servers string[]
 ---@field mason string[]
@@ -93,6 +94,7 @@ end
 ---@field linters table<string, table>
 ---@field lint_setup (fun(lint: table))[]
 ---@field neotest { packs: table[], adapters: (fun(): table)[] }
+---@field dap { packs: table[], setups: (fun(dap: table))[] }
 
 ---@return MergedLangSpec
 function M.spec()
@@ -106,6 +108,7 @@ function M.spec()
     linters = {},
     lint_setup = {},
     neotest = { packs = {}, adapters = {} },
+    dap = { packs = {}, setups = {} },
   }
   for _, spec in pairs(registry) do
     vim.list_extend(out.servers, spec.servers or {})
@@ -132,6 +135,12 @@ function M.spec()
       vim.list_extend(out.neotest.packs, spec.neotest.packs or {})
       if spec.neotest.adapter then
         out.neotest.adapters[#out.neotest.adapters + 1] = spec.neotest.adapter
+      end
+    end
+    if spec.dap then
+      vim.list_extend(out.dap.packs, spec.dap.packs or {})
+      if spec.dap.setup then
+        out.dap.setups[#out.dap.setups + 1] = spec.dap.setup
       end
     end
   end

@@ -14,6 +14,14 @@ require("lang").register("python", {
       })
     end,
   },
+  dap = {
+    packs = {
+      { src = "https://codeberg.org/mfussenegger/nvim-dap-python" },
+    },
+    setup = function()
+      require("dap-python").setup("uv")
+    end,
+  },
 })
 
 require("lazyload").on_vim_enter(function()
