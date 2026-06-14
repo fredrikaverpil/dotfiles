@@ -240,6 +240,10 @@ All fields are optional. `register()` **must** run at the top level (not inside
 `on_vim_enter`) so it fires during plugin sourcing, before any consumer reads
 the registry.
 
+The `neotest`/`dap` `packs` are ordinary `vim.pack` specs (so they take
+`version`, etc.); the consumer batch-adds them in one call before running any
+builder/hook, so adapters never each install separately or race on load order.
+
 The only tool config that stays in a core plugin is config shared across
 languages — currently just `prettier` (used by markdown and js/ts) in
 `conform.lua`. Everything language-specific lives in its `plugin/lang/<ft>.lua`.
