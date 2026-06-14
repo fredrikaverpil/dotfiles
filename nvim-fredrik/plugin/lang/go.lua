@@ -2,6 +2,7 @@ require("lang").register("go", {
   servers = { "gopls" },
   mason = { "gopls", "goimports", "gci", "gofumpt", "golines", "golangci-lint", "delve", "gotestsum", "impl" },
   formatters_by_ft = { go = { "goimports", "gci", "gofumpt", "golines" } },
+  code_runner = { go = { "go run" } },
   formatters = {
     gci = {
       args = { "write", "--skip-generated", "-s", "standard", "-s", "default", "--skip-vendor", "$FILENAME" },
