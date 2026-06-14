@@ -4,32 +4,7 @@ if Config.use_arborist then
       { src = "https://github.com/arborist-ts/arborist.nvim", version = vim.version.range("*") },
     })
 
-    local custom_parsers = {
-      {
-        lang = "fga",
-        filetype = "fga",
-        config = {
-          install_info = {
-            url = "https://github.com/matoous/tree-sitter-fga",
-            branch = "main",
-            generate = false,
-            queries = "queries",
-          },
-        },
-      },
-      {
-        lang = "godoc",
-        filetype = "godoc",
-        config = {
-          install_info = {
-            url = "https://github.com/fredrikaverpil/tree-sitter-godoc",
-            branch = "main",
-            generate = false,
-            queries = "queries",
-          },
-        },
-      },
-    }
+    local custom_parsers = require("lang").spec().treesitter_custom_parsers
 
     local opts = {
       install_popular = false,
@@ -37,11 +12,10 @@ if Config.use_arborist then
       overrides = {},
     }
 
-    for _, p in ipairs(custom_parsers) do
-      local install_info = p.config.install_info
-      require("merge")(opts, { overrides = { [p.lang] = install_info } })
+    for lang, p in pairs(custom_parsers) do
+      require("merge")(opts, { overrides = { [lang] = p.install_info } })
 
-      vim.treesitter.language.register(p.lang, p.filetype)
+      vim.treesitter.language.register(lang, p.filetype)
     end
 
     require("arborist").setup(opts)

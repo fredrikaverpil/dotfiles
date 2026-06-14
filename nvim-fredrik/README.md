@@ -175,10 +175,10 @@ Use the `:Pack` TUI or the built-in commands:
 A language describes its own tooling in `plugin/lang/<ft>.lua` via
 `require("lang").register()` at the **top level** of the file. The core plugins
 (`lsp.lua`, `mason.lua`, `conform.lua`, `lint.lua`, `code_runner.lua`,
-`nvim_coverage.lua`, `neotest.lua`, `dap.lua`) read the merged spec via
-`require("lang").spec()` at `VimEnter`, so registering is all that's needed to
-wire up LSP, Mason, formatting, linting, file running, coverage, testing and
-debugging.
+`nvim_coverage.lua`, `nvim_treesitter.lua`, `arborist.lua`, `neotest.lua`,
+`dap.lua`) read the merged spec via `require("lang").spec()` at `VimEnter`, so
+registering is all that's needed to wire up LSP, Mason, formatting, linting,
+file running, coverage, custom treesitter parsers, testing and debugging.
 
 The spec field names are the only vocabulary: they mirror the consumer's own
 option names where one exists (conform's `formatters_by_ft`/`formatters`,
@@ -215,6 +215,19 @@ require("lang").register("<name>", {
   -- nvim-coverage per-language config
   coverage = {
     <ft> = { coverage_file = function() return "coverage.out" end },
+  },
+
+  -- custom treesitter parsers consumed by nvim-treesitter/arborist
+  treesitter_custom_parsers = {
+    <lang> = {
+      filetype = "<ft>",
+      install_info = {
+        url = "https://github.com/<tree-sitter-parser>",
+        branch = "main",
+        generate = false,
+        queries = "queries",
+      },
+    },
   },
 
   -- neotest: the per-language adapter plugin(s) and a builder returning the

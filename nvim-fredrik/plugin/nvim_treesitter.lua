@@ -13,43 +13,17 @@ if Config.use_nvim_treesitter then
       { src = "https://github.com/nvim-treesitter/nvim-treesitter-context" },
     })
 
-    --- Custom parsers not shipped with nvim-treesitter.
-    --- Each entry: { lang = "name", register = { lang, ft }, config = { install_info = { ... } } }
-    local custom_parsers = {
-      {
-        lang = "fga",
-        register = { "fga", "fga" },
-        config = {
-          install_info = {
-            url = "https://github.com/matoous/tree-sitter-fga",
-            branch = "main",
-            generate = false,
-            queries = "queries",
-          },
-        },
-      },
-      {
-        lang = "godoc",
-        register = { "godoc", "godoc" },
-        config = {
-          install_info = {
-            url = "https://github.com/fredrikaverpil/tree-sitter-godoc",
-            branch = "main",
-            generate = false,
-            queries = "queries",
-          },
-        },
-      },
-    }
+    -- Custom parsers not shipped with nvim-treesitter.
+    local custom_parsers = require("lang").spec().treesitter_custom_parsers
 
-    for _, p in ipairs(custom_parsers) do
-      vim.treesitter.language.register(unpack(p.register))
+    for lang, p in pairs(custom_parsers) do
+      vim.treesitter.language.register(lang, p.filetype)
     end
 
     local function inject_custom_parsers()
       local parsers = require("nvim-treesitter.parsers")
-      for _, p in ipairs(custom_parsers) do
-        parsers[p.lang] = p.config
+      for lang, p in pairs(custom_parsers) do
+        parsers[lang] = { install_info = p.install_info }
       end
     end
 

@@ -10,6 +10,17 @@ require("lang").register("go", {
   formatters_by_ft = { go = { "goimports", "gci", "gofumpt", "golines" } },
   code_runner = { go = { "go run" } },
   coverage = { go = { coverage_file = coverage_file } },
+  treesitter_custom_parsers = {
+    godoc = {
+      filetype = "godoc",
+      install_info = {
+        url = "https://github.com/fredrikaverpil/tree-sitter-godoc",
+        branch = "main",
+        generate = false,
+        queries = "queries",
+      },
+    },
+  },
   formatters = {
     gci = {
       args = { "write", "--skip-generated", "-s", "standard", "-s", "default", "--skip-vendor", "$FILENAME" },
