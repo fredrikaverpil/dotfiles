@@ -6,15 +6,19 @@ vim.pack.add({
 })
 
 require("lazyload").on_vim_enter(function()
+  local lang = require("lang").spec()
+
+  if #lang.blink_packs > 0 then
+    vim.pack.add(lang.blink_packs)
+  end
+  for _, setup in ipairs(lang.blink_setup) do
+    setup()
+  end
+
   local default_sources = { "lsp", "path", "snippets", "buffer", "lazydev" }
   -- Filetype-bound sources stay out of `default` so they aren't queried in
   -- every buffer.
-  local per_filetype = {
-    sql = { inherit_defaults = true, "dadbod" },
-    mysql = { inherit_defaults = true, "dadbod" },
-    plsql = { inherit_defaults = true, "dadbod" },
-    markdown = { inherit_defaults = true, "markdown" },
-  }
+  local per_filetype = lang.blink_per_filetype
   local providers = {
     snippets = {
       opts = {
@@ -22,27 +26,14 @@ require("lazyload").on_vim_enter(function()
         search_paths = { vim.env.DOTFILES .. "/nvim-fredrik/snippets" },
       },
     },
-    dadbod = {
-      name = "Dadbod",
-      module = "vim_dadbod_completion.blink",
-    },
     lazydev = {
       name = "LazyDev",
       module = "lazydev.integrations.blink",
       score_offset = 100,
     },
-    markdown = {
-      name = "RenderMarkdown",
-      module = "render-markdown.integ.blink",
-    },
   }
-
-  if Config.use_treesitter_parser then
-    per_filetype.go = { inherit_defaults = true, "go_pkgs" }
-    providers.go_pkgs = {
-      name = "Import",
-      module = "blink-go-import",
-    }
+  for name, provider in pairs(lang.blink_providers) do
+    providers[name] = provider
   end
 
   require("blink.cmp").setup({

@@ -175,10 +175,11 @@ Use the `:Pack` TUI or the built-in commands:
 A language describes its own tooling in `plugin/lang/<ft>.lua` via
 `require("lang").register()` at the **top level** of the file. The core plugins
 (`lsp.lua`, `mason.lua`, `conform.lua`, `lint.lua`, `code_runner.lua`,
-`nvim_coverage.lua`, `nvim_treesitter.lua`, `arborist.lua`, `neotest.lua`,
-`dap.lua`) read the merged spec via `require("lang").spec()` at `VimEnter`, so
-registering is all that's needed to wire up LSP, Mason, formatting, linting,
-file running, coverage, custom treesitter parsers, testing and debugging.
+`nvim_coverage.lua`, `nvim_treesitter.lua`, `arborist.lua`, `blink.lua`,
+`neotest.lua`, `dap.lua`) read the merged spec via `require("lang").spec()` at
+`VimEnter`, so registering is all that's needed to wire up LSP, Mason,
+formatting, linting, file running, coverage, custom treesitter parsers,
+completion providers, testing and debugging.
 
 The spec field names are the only vocabulary: they mirror the consumer's own
 option names where one exists (conform's `formatters_by_ft`/`formatters`,
@@ -230,6 +231,20 @@ require("lang").register("<name>", {
     },
   },
 
+  -- blink.cmp per-filetype providers. packs are batch-added by blink.lua before
+  -- any setup hook runs, then provider config is merged into blink.cmp's setup.
+  blink_packs = { { src = "https://github.com/<blink-provider>" } },
+  blink_per_filetype = { <ft> = { inherit_defaults = true, "<provider>" } },
+  blink_providers = {
+    <provider> = {
+      name = "<Provider>",
+      module = "<provider-module>",
+    },
+  },
+  blink_setup = function()
+    require("<provider-module>").setup()
+  end,
+
   -- neotest: the per-language adapter plugin(s) and a builder returning the
   -- adapter. packs are batch-added by neotest.lua before any builder runs, then
   -- every adapter is collected into neotest's single setup({ adapters = ... }).
@@ -262,9 +277,10 @@ All fields are optional. `register()` **must** run at the top level (not inside
 `on_vim_enter`) so it fires during plugin sourcing, before any consumer reads
 the registry.
 
-The `neotest`/`dap` `packs` are ordinary `vim.pack` specs (so they take
-`version`, etc.); the consumer batch-adds them in one call before running any
-builder/hook, so adapters never each install separately or race on load order.
+The `blink_packs` and `neotest`/`dap` `packs` are ordinary `vim.pack` specs
+(so they take `version`, etc.); the consumer batch-adds them in one call before
+running any setup/builder/hook, so providers/adapters never each install
+separately or race on load order.
 
 The only tool config that stays in a core plugin is config shared across
 languages — currently just `prettier` (used by markdown and js/ts) in

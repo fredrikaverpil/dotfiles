@@ -7,8 +7,8 @@
 --
 -- Consumers (plugin/lsp.lua, mason.lua, conform.lua, lint.lua,
 -- code_runner.lua, nvim_coverage.lua, nvim_treesitter.lua, arborist.lua,
--- neotest.lua, dap.lua) call spec() inside their own on_vim_enter blocks and
--- read the field they consume. File
+-- blink.lua, neotest.lua, dap.lua) call spec() inside their own on_vim_enter
+-- blocks and read the field they consume. File
 -- sourcing order is therefore irrelevant: every register() has run by the
 -- time spec() is called.
 --
@@ -32,6 +32,10 @@ local registry = {}
 ---@field code_runner? table<string, string[]> code_runner.nvim filetype commands
 ---@field coverage? table<string, table>      nvim-coverage lang entries
 ---@field treesitter_custom_parsers? table<string, table> custom treesitter parser configs
+---@field blink_packs? table[]             blink.cmp provider plugin packs
+---@field blink_per_filetype? table<string, table> blink.cmp per-filetype sources
+---@field blink_providers? table<string, table> blink.cmp provider configs
+---@field blink_setup? fun()               imperative blink provider setup hook
 ---@field neotest? { packs?: table[], adapter: fun(): table }  neotest adapter plugin packs + a builder returning the adapter
 ---@field dap? { packs?: table[], setup: fun(dap: table) }  dap adapter plugin packs + an imperative setup hook receiving the dap module
 
@@ -46,6 +50,8 @@ local keyed_fields = {
   "code_runner",
   "coverage",
   "treesitter_custom_parsers",
+  "blink_per_filetype",
+  "blink_providers",
 }
 
 --- Register a language's tooling. Call at the top level of plugin/lang/<ft>.lua.
@@ -108,6 +114,10 @@ end
 ---@field code_runner table<string, string[]>
 ---@field coverage table<string, table>
 ---@field treesitter_custom_parsers table<string, table>
+---@field blink_packs table[]
+---@field blink_per_filetype table<string, table>
+---@field blink_providers table<string, table>
+---@field blink_setup (fun())[]
 ---@field neotest { packs: table[], adapters: (fun(): table)[] }
 ---@field dap { packs: table[], setups: (fun(dap: table))[] }
 
@@ -125,6 +135,10 @@ function M.spec()
     code_runner = {},
     coverage = {},
     treesitter_custom_parsers = {},
+    blink_packs = {},
+    blink_per_filetype = {},
+    blink_providers = {},
+    blink_setup = {},
     neotest = { packs = {}, adapters = {} },
     dap = { packs = {}, setups = {} },
   }
@@ -157,6 +171,16 @@ function M.spec()
     end
     for lang, cfg in pairs(spec.treesitter_custom_parsers or {}) do
       out.treesitter_custom_parsers[lang] = cfg
+    end
+    vim.list_extend(out.blink_packs, spec.blink_packs or {})
+    for ft, sources in pairs(spec.blink_per_filetype or {}) do
+      out.blink_per_filetype[ft] = sources
+    end
+    for name, provider in pairs(spec.blink_providers or {}) do
+      out.blink_providers[name] = provider
+    end
+    if spec.blink_setup then
+      out.blink_setup[#out.blink_setup + 1] = spec.blink_setup
     end
     if spec.neotest then
       vim.list_extend(out.neotest.packs, spec.neotest.packs or {})
