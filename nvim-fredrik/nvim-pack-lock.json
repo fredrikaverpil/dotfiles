@@ -9,7 +9,7 @@
       "src": "https://github.com/afonsofrancof/OSC11.nvim"
     },
     "SchemaStore.nvim": {
-      "rev": "30d47907079474907f24d4a546932119a8b9f641",
+      "rev": "e1a36239e4e36759546852dae5f4737375b388f6",
       "src": "https://github.com/b0o/SchemaStore.nvim"
     },
     "arrow.nvim": {
@@ -26,7 +26,7 @@
       "version": "1.0.0 - 2.0.0"
     },
     "blink.indent": {
-      "rev": "9c80820ca77218a8d28e70075d6f44a1609911fe",
+      "rev": "3fc92e6b0e702a630cec7408f8f7947afa951d96",
       "src": "https://github.com/Saghen/blink.indent",
       "version": ">=0.0.0"
     },
@@ -49,7 +49,7 @@
       "src": "https://github.com/CRAG666/code_runner.nvim"
     },
     "codediff.nvim": {
-      "rev": "cbfcc451504ce14c71ea1d5d92a00a84253aa0ee",
+      "rev": "636cd3e5d8faac46aea1c4150f8129ef100786d0",
       "src": "https://github.com/fredrikaverpil/codediff.nvim"
     },
     "conform.nvim": {
@@ -118,13 +118,8 @@
       "rev": "b75e2de585637a61b2fb818dc33dad7863b7b0c4",
       "src": "https://github.com/zapling/mason-lock.nvim"
     },
-    "mason-lspconfig.nvim": {
-      "rev": "0c2823e0418f3d9230ff8b201c976e84de1cb401",
-      "src": "https://github.com/mason-org/mason-lspconfig.nvim",
-      "version": ">=0.0.0"
-    },
     "mason.nvim": {
-      "rev": "b03fb0f20bc1d43daf558cda981a2be22e73ac42",
+      "rev": "2a6940af80375532e5e9e7c1f2fc6319a1b7a69d",
       "src": "https://github.com/mason-org/mason.nvim",
       "version": ">=0.0.0"
     },
@@ -193,7 +188,7 @@
       "src": "https://codeberg.org/mfussenegger/nvim-lint"
     },
     "nvim-lspconfig": {
-      "rev": "f6738ef65dabade340b473d4ff2a1ad3352c10e7",
+      "rev": "229b79051b380377664edc4cbd534930154921a1",
       "src": "https://github.com/neovim/nvim-lspconfig",
       "version": ">=0.0.0"
     },
@@ -272,7 +267,7 @@
       "src": "https://github.com/gbprod/substitute.nvim"
     },
     "tiny-inline-diagnostic.nvim": {
-      "rev": "680762989e8b05a72e90769959d0fb9a557e6917",
+      "rev": "e930d0a46031645040d5492595b46cdf6ab3514f",
       "src": "https://github.com/rachartier/tiny-inline-diagnostic.nvim"
     },
     "todo-comments.nvim": {
@@ -319,7 +314,7 @@
       "src": "https://github.com/artemave/workspace-diagnostics.nvim"
     },
     "yanky.nvim": {
-      "rev": "257716a5649e35eaebf2015a488b0f22b3907a47",
+      "rev": "020c22d0cfa60358569e49d1d7b91630f175aef0",
       "src": "https://github.com/gbprod/yanky.nvim"
     },
     "zenbones.nvim": {
