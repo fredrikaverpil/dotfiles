@@ -1,5 +1,4 @@
 require("lang").register("python", {
-  servers = { "basedpyright", "ruff" },
   mason = { "basedpyright", "ruff", "mypy", "debugpy" },
   neotest = {
     packs = {

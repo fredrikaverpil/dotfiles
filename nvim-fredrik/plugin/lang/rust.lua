@@ -1,5 +1,4 @@
 require("lang").register("rust", {
-  servers = { "rust_analyzer" },
   mason = { "rust-analyzer", "codelldb" },
 })
 

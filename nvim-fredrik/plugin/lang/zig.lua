@@ -1,5 +1,4 @@
 require("lang").register("zig", {
-  servers = { "zls" },
   mason = { "zls" },
   neotest = {
     packs = {

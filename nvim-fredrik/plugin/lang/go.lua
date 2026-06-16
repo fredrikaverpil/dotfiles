@@ -1,5 +1,4 @@
 require("lang").register("go", {
-  servers = { "gopls" },
   mason = { "gopls", "goimports", "gci", "gofumpt", "golines", "golangci-lint", "delve", "gotestsum", "impl" },
   neotest = {
     packs = {

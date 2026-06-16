@@ -1,5 +1,4 @@
 require("lang").register("templ", {
-  servers = { "templ" },
   mason = { "templ" },
 })
 

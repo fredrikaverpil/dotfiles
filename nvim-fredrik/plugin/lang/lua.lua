@@ -1,5 +1,4 @@
 require("lang").register("lua", {
-  servers = { "lua_ls" },
   mason = { "lua-language-server", "stylua" },
   neotest = {
     packs = {

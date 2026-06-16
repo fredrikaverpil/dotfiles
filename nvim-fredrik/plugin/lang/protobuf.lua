@@ -1,5 +1,4 @@
 require("lang").register("protobuf", {
-  servers = { "buf_ls" },
   mason = { "buf", "protolint", "api-linter" },
 })
 

@@ -1,5 +1,4 @@
 require("lang").register("json", {
-  servers = { "jsonls" },
   mason = { "json-lsp", "biome" },
 })
 

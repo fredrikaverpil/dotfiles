@@ -1,5 +1,4 @@
 require("lang").register("yaml", {
-  servers = { "yamlls" },
   mason = { "yaml-language-server", "yamlfmt", "yamllint", "actionlint" },
 })
 
