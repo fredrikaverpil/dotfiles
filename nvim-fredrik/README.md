@@ -17,8 +17,8 @@ nvim-fredrik/
   init.lua                    requires core modules
   lua/                        libraries called by init.lua and plugins
   plugin/                     plugins, often deferred to load on VimEnter
-    lang/                     per-language plugins, filetypes, editor settings, autocmds
-  ftplugin/                   (unused; use plugin/lang instead)
+    lang/                     per-language plugins, filetypes, autocmds
+  ftplugin/                   per-filetype editor settings (indent, wrap, conceal)
   lsp/                        (unused; nvim-lspconfig provides base configs)
   after/
     lsp/                      overrides for nvim-lspconfig base configs
@@ -29,17 +29,22 @@ nvim-fredrik/
 The `init.lua` defines `_G.Config` (for global states), `vim.opt` options, some
 keymaps and custom behaviors.
 
-Core plugin files (`plugin/*.lua`) own each plugin's host setup and any config
-shared across languages (e.g. completion sources). Anything language-specific is
-contributed by the language files.
+Core plugin files (`plugin/*.lua`) each own **all** of their tool's
+configuration inline: `conform.lua` lists every formatter, `lint.lua` every
+linter, `lsp.lua` every server, `mason.lua` every tool, and so on. To see or
+change a tool's setup you open that one file.
 
-Language files (`plugin/lang/*.lua`) handle language-specific concerns: which
-LSP servers, Mason tools, formatters, linters and test adapters a language uses
-(declared via `require("lang").register()`, see
-[Adding new language support](#adding-new-language-support)), plus per-filetype
-editor settings (`vim.opt_local` via `FileType` autocmds), extra
-`vim.pack.add()` calls, custom filetypes, SchemaStore loading, build hooks, and
-autocmds.
+Language files (`plugin/lang/*.lua`) hold only what is genuinely
+language-specific and cannot live in a shared plugin file: extra
+`vim.pack.add()` calls for language-specific plugins, custom filetypes
+(`vim.filetype.add`), SchemaStore loading, build hooks, and autocmds. Many
+languages need none of this and so have no file at all.
+
+Per-filetype editor settings (indent, wrap, conceal) live in `ftplugin/<ft>.lua`
+— the native mechanism, sourced for every buffer of that filetype (including the
+first one opened, which a `FileType` autocmd registered at `VimEnter` would
+miss). Settings that Neovim's built-in ftplugins already provide (e.g. Go's
+`noexpandtab`, Python's 4-space indent) are not duplicated.
 
 I wrote
 [a blog post](https://fredrikaverpil.github.io/blog/2026/04/15/from-lazy.nvim-to-vim.pack/)
@@ -124,7 +129,7 @@ Example:
 --
 -- install mdformat via mason, with the plugins pinned by einride/sage
 -- (tools/sgmdformat/requirements.txt) in the mdformat venv
-require("lang").register("work", {
+Config.mason_extra = {
     mason = { "mdformat" },
     mason_pip = {
         mdformat = {
@@ -133,7 +138,7 @@ require("lang").register("work", {
             "mdformat-front-matters==2.0.0",
         },
     },
-})
+}
 
 require("lazyload").on_override(function()
     -- Override markdown formatter
@@ -172,119 +177,40 @@ Use the `:Pack` TUI or the built-in commands:
 
 ## Adding new language support
 
-A language describes its own tooling in `plugin/lang/<ft>.lua` via
-`require("lang").register()` at the **top level** of the file. The core plugins
-(`lsp.lua`, `mason.lua`, `conform.lua`, `lint.lua`, `code_runner.lua`,
-`nvim_coverage.lua`, `nvim_treesitter.lua`, `arborist.lua`, `blink.lua`,
-`neotest.lua`, `dap.lua`) read the merged spec via `require("lang").spec()` at
-`VimEnter`, so registering is all that's needed to wire up LSP, Mason,
-formatting, linting, file running, coverage, custom treesitter parsers,
-completion providers, testing and debugging.
+There is no registry — each tool is configured inline in its own core plugin
+file. To add a language, edit the files for the tools it needs (all are plain
+literal tables, so you see the whole picture for a tool in one place):
 
-The spec field names are the only vocabulary: they mirror the consumer's own
-option names where one exists (conform's `formatters_by_ft`/`formatters`,
-nvim-lint's `linters_by_ft`/`linters`), and `spec()` returns the merged result
-under the same names.
+- **LSP**: add the server name to the `servers` list in `plugin/lsp.lua`.
+- **Mason**: add the tool(s) to `ensure_installed` in `plugin/mason.lua`.
+- **Formatting**: add `formatters_by_ft` (and any per-formatter config) in
+  `plugin/conform.lua`.
+- **Linting**: add `linters_by_ft` (and any per-linter config) in
+  `plugin/lint.lua`. Imperative wiring (dynamic cwd, custom linters) goes in a
+  `do`/`end` block in the same file.
+- **Running files**: add a `filetype` command in `plugin/code_runner.lua`.
+- **Coverage**: add a `lang` entry in `plugin/nvim_coverage.lua`.
+- **Treesitter**: built-in parsers install on demand; custom parsers go in the
+  `custom_parsers` table in both `plugin/nvim_treesitter.lua` and
+  `plugin/arborist.lua`.
+- **Completion**: add per-filetype providers in `plugin/blink.lua` (install the
+  provider plugin itself from the language's `plugin/lang/<ft>.lua`).
+- **Testing**: add the adapter pack and adapter in `plugin/neotest.lua`.
+- **Debugging**: add the adapter pack and configuration in `plugin/dap.lua`.
 
-```lua
--- plugin/lang/<ft>.lua
-require("lang").register("<name>", {
-  servers = { "<lspconfig_server>" },  -- e.g. "gopls"
-  mason = { "<mason_package>" },         -- e.g. "gopls", "goimports"
+For concerns that don't belong in a shared plugin file:
 
-  -- extra pip packages installed into a mason pypi package's venv
-  -- (re-applied when mason installs/updates the package)
-  mason_pip = { ["<mason_package>"] = { "<pip_package>==<version>" } },
+- **Editor settings** (indent, wrap, conceal): add `ftplugin/<ft>.lua` with
+  `vim.opt_local` — but first check whether Neovim's built-in ftplugin already
+  sets what you want (run `:e $VIMRUNTIME/ftplugin/<ft>.vim`); if so, don't
+  duplicate it.
+- **Language-specific plugins, custom filetypes, build hooks, autocmds**: add
+  `plugin/lang/<ft>.lua` (see [Plugin file layout](#plugin-file-layout)).
+  `vim.filetype.add` belongs at the top level of that file (so detection applies
+  to the first buffer too), everything else inside `on_vim_enter`.
+- **LSP server config**: add `after/lsp/<server>.lua` to override the
+  nvim-lspconfig base config.
 
-  -- conform: which formatters run, and their config
-  formatters_by_ft = { <ft> = { "<formatter>" } },
-  formatters = { <formatter> = { prepend_args = { ... } } },
-
-  -- nvim-lint: which linters run, and their config
-  linters_by_ft = { <ft> = { "<linter>" } },
-  linters = { <linter> = { args = { ... } } },
-
-  -- imperative lint wiring that can't be a table (e.g. dynamic cwd); receives
-  -- the nvim-lint module and runs inside lint.lua's VimEnter
-  lint_setup = function(lint)
-    -- custom autocmds, lint.try_lint(...) with computed cwd, etc.
-  end,
-
-  -- code_runner.nvim filetype command(s)
-  code_runner = { <ft> = { "<command>" } },
-
-  -- nvim-coverage per-language config
-  coverage = {
-    <ft> = { coverage_file = function() return "coverage.out" end },
-  },
-
-  -- custom treesitter parsers consumed by nvim-treesitter/arborist
-  treesitter_custom_parsers = {
-    <lang> = {
-      filetype = "<ft>",
-      install_info = {
-        url = "https://github.com/<tree-sitter-parser>",
-        branch = "main",
-        generate = false,
-        queries = "queries",
-      },
-    },
-  },
-
-  -- blink.cmp per-filetype providers. packs are batch-added by blink.lua before
-  -- any setup hook runs, then provider config is merged into blink.cmp's setup.
-  blink_packs = { { src = "https://github.com/<blink-provider>" } },
-  blink_per_filetype = { <ft> = { inherit_defaults = true, "<provider>" } },
-  blink_providers = {
-    <provider> = {
-      name = "<Provider>",
-      module = "<provider-module>",
-    },
-  },
-  blink_setup = function()
-    require("<provider-module>").setup()
-  end,
-
-  -- neotest: the per-language adapter plugin(s) and a builder returning the
-  -- adapter. packs are batch-added by neotest.lua before any builder runs, then
-  -- every adapter is collected into neotest's single setup({ adapters = ... }).
-  neotest = {
-    packs = { { src = "https://github.com/<adapter-plugin>" } },
-    adapter = function()
-      return require("<adapter>")({ --[[ adapter opts ]] })
-    end,
-  },
-
-  -- dap: the per-language adapter plugin(s) and an imperative setup hook. packs
-  -- are batch-added by dap.lua before any hook runs; each hook receives the dap
-  -- module and wires up dap.adapters/dap.configurations (or calls the adapter's
-  -- own setup).
-  dap = {
-    packs = { { src = "https://github.com/<adapter-plugin>" } },
-    setup = function(dap)
-      require("<adapter>").setup(--[[ adapter opts ]])
-    end,
-  },
-})
-
-require("lazyload").on_vim_enter(function()
-  -- editor settings (vim.opt_local via FileType autocmd), plugins, filetypes,
-  -- autocmds
-end)
-```
-
-All fields are optional. `register()` **must** run at the top level (not inside
-`on_vim_enter`) so it fires during plugin sourcing, before any consumer reads
-the registry.
-
-The `blink_packs` and `neotest`/`dap` `packs` are ordinary `vim.pack` specs
-(so they take `version`, etc.); the consumer batch-adds them in one call before
-running any setup/builder/hook, so providers/adapters never each install
-separately or race on load order.
-
-The only tool config that stays in a core plugin is config shared across
-languages — currently just `prettier` (used by markdown and js/ts) in
-`conform.lua`. Everything language-specific lives in its `plugin/lang/<ft>.lua`.
-
-_(optional)_ `after/lsp/<server>.lua` — override the base config from
-nvim-lspconfig.
+Project-local additions (a Mason tool / pip extras only needed in one repo) go
+through `Config.mason_extra` in a `.nvim.lua` — see
+[Per-project overrides](#per-project-overrides).

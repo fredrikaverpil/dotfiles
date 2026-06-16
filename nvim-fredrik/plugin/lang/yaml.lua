@@ -1,5 +1,3 @@
-require("lang").register("yaml", {})
-
 -- Custom filetypes for GitHub Actions and Dependabot. Registered at file scope
 -- (step 11) so detection applies to the first buffer opened, not only buffers
 -- opened after VimEnter.

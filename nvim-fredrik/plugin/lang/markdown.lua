@@ -1,5 +1,3 @@
-require("lang").register("markdown", {})
-
 require("lazyload").on_vim_enter(function()
   vim.pack.add({
     { src = "https://github.com/MeanderingProgrammer/render-markdown.nvim", version = vim.version.range("*") },

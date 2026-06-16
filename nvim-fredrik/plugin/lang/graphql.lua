@@ -1,1 +1,0 @@
-require("lang").register("graphql", {})

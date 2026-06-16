@@ -1,5 +1,3 @@
-require("lang").register("lua", {})
-
 require("lazyload").on_vim_enter(function()
   vim.pack.add({
     { src = "https://github.com/folke/lazydev.nvim", version = vim.version.range("*") },
