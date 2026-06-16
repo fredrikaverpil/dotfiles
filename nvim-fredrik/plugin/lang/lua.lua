@@ -1,14 +1,4 @@
 require("lang").register("lua", {
-  neotest = {
-    packs = {
-      { src = "https://github.com/nvim-neotest/neotest-plenary" },
-    },
-    adapter = function()
-      -- neotest-plenary's module table is itself the adapter (no call needed)
-      local adapter = require("neotest-plenary")
-      return adapter
-    end,
-  },
   dap = {
     packs = {
       { src = "https://github.com/jbyuki/one-small-step-for-vimkind" }, -- Lua DAP adapter

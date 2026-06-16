@@ -1,16 +1,4 @@
 require("lang").register("python", {
-  neotest = {
-    packs = {
-      { src = "https://github.com/nvim-neotest/neotest-python" },
-    },
-    adapter = function()
-      return require("neotest-python")({
-        runner = "pytest",
-        args = { "--log-level", "INFO", "--color", "yes", "-vv", "-s" },
-        dap = { justMyCode = false },
-      })
-    end,
-  },
   dap = {
     packs = {
       { src = "https://codeberg.org/mfussenegger/nvim-dap-python" },
