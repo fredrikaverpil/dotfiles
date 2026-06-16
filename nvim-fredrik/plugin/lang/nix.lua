@@ -1,3 +1,1 @@
-require("lang").register("nix", {
-  mason = { "nil" },
-})
+require("lang").register("nix", {})

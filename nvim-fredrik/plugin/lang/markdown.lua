@@ -1,6 +1,4 @@
-require("lang").register("markdown", {
-  mason = { "markdownlint", "prettier" },
-})
+require("lang").register("markdown", {})
 
 require("lazyload").on_vim_enter(function()
   vim.api.nvim_create_autocmd("FileType", {

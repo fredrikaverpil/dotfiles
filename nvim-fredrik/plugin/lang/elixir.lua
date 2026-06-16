@@ -1,3 +1,1 @@
-require("lang").register("elixir", {
-  mason = { "elixir-ls" },
-})
+require("lang").register("elixir", {})

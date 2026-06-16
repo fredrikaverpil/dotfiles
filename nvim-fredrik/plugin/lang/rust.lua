@@ -1,6 +1,4 @@
-require("lang").register("rust", {
-  mason = { "rust-analyzer", "codelldb" },
-})
+require("lang").register("rust", {})
 
 require("lazyload").on_vim_enter(function()
   vim.api.nvim_create_autocmd("FileType", {

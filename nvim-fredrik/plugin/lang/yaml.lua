@@ -1,6 +1,4 @@
-require("lang").register("yaml", {
-  mason = { "yaml-language-server", "yamlfmt", "yamllint", "actionlint" },
-})
+require("lang").register("yaml", {})
 
 require("lazyload").on_vim_enter(function()
   -- Custom filetypes for GitHub Actions and Dependabot

@@ -1,3 +1,1 @@
-require("lang").register("terraform", {
-  mason = { "terraform-ls", "tflint" },
-})
+require("lang").register("terraform", {})

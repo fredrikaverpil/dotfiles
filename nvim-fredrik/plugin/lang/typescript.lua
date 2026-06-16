@@ -1,3 +1,1 @@
-require("lang").register("typescript", {
-  mason = { "vtsls", "prettier" },
-})
+require("lang").register("typescript", {})

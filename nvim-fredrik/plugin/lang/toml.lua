@@ -1,3 +1,1 @@
-require("lang").register("toml", {
-  mason = { "taplo" },
-})
+require("lang").register("toml", {})

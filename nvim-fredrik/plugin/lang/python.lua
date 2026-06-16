@@ -1,5 +1,4 @@
 require("lang").register("python", {
-  mason = { "basedpyright", "ruff", "mypy", "debugpy" },
   neotest = {
     packs = {
       { src = "https://github.com/nvim-neotest/neotest-python" },

@@ -1,5 +1,4 @@
 require("lang").register("go", {
-  mason = { "gopls", "goimports", "gci", "gofumpt", "golines", "golangci-lint", "delve", "gotestsum", "impl" },
   neotest = {
     packs = {
       -- neotest-golang dep; the adapter itself is loaded via dev.load_local below.

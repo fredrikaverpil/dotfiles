@@ -1,6 +1,4 @@
-require("lang").register("json", {
-  mason = { "json-lsp", "biome" },
-})
+require("lang").register("json", {})
 
 require("lazyload").on_vim_enter(function()
   vim.api.nvim_create_autocmd("FileType", {

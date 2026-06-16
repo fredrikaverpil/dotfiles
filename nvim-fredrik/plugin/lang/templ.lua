@@ -1,6 +1,4 @@
-require("lang").register("templ", {
-  mason = { "templ" },
-})
+require("lang").register("templ", {})
 
 require("lazyload").on_vim_enter(function()
   vim.api.nvim_create_autocmd("FileType", {

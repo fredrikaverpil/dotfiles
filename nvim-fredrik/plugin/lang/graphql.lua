@@ -1,3 +1,1 @@
-require("lang").register("graphql", {
-  mason = { "graphql-language-service-cli" },
-})
+require("lang").register("graphql", {})

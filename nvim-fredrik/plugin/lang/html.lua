@@ -1,3 +1,1 @@
-require("lang").register("html", {
-  mason = { "superhtml" },
-})
+require("lang").register("html", {})

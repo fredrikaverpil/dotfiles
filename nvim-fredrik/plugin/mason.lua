@@ -10,16 +10,70 @@ require("lazyload").on_vim_enter(function()
     lockfile_path = vim.env.DOTFILES .. "/nvim-fredrik/mason-lock.json",
   })
 
-  -- mason (package list) and mason_pip aggregated from plugin/lang/*.lua via
-  -- require("lang").register().
-  local lang = require("lang").spec()
+  local ensure_installed = {
+    "actionlint",
+    "api-linter",
+    "basedpyright",
+    "bash-language-server",
+    "biome",
+    "buf",
+    "codelldb",
+    "debugpy",
+    "delve",
+    "dockerfile-language-server",
+    "elixir-ls",
+    "gci",
+    "gofumpt",
+    "goimports",
+    "golangci-lint",
+    "golines",
+    "gopls",
+    "gotestsum",
+    "graphql-language-service-cli",
+    "hadolint",
+    "impl", -- used by go-impl.nvim
+    "json-lsp",
+    "lua-language-server",
+    "markdownlint",
+    "mypy",
+    "nil",
+    "prettier",
+    "protolint",
+    "ruff",
+    "rust-analyzer",
+    "shellcheck", -- bashls runs shellcheck itself; not wired into nvim-lint to avoid dupes
+    "shfmt",
+    "stylua",
+    "superhtml",
+    "taplo",
+    "templ",
+    "terraform-ls",
+    "tflint",
+    "ts_query_ls",
+    "vtsls",
+    "yaml-language-server",
+    "yamlfmt",
+    "yamllint",
+    "zls",
+  }
+
+  -- Project-local additions from a .nvim.lua (exrc), e.g.:
+  --   Config.mason_extra = {
+  --     mason = { "mdformat" },
+  --     mason_pip = { mdformat = { "mdformat-gfm==1.0.0" } },
+  --   }
+  -- exrc runs at startup step 7c, before this VimEnter callback, so the table is
+  -- always populated by the time it is read here.
+  local extra = Config.mason_extra or {}
+  ensure_installed = vim.list_extend(ensure_installed, extra.mason or {})
+  local mason_pip = extra.mason_pip or {}
 
   -- mason_pip packages are installed into the mason package's venv. Mason
   -- recreates the venv on install/update (wiping them), so they are re-applied
   -- via the install:success event; the pass after refresh() covers packages
   -- that are already installed.
   local function install_mason_pip(pkg_name)
-    local extras = lang.mason_pip[pkg_name]
+    local extras = mason_pip[pkg_name]
     if not extras then
       return
     end
@@ -51,16 +105,16 @@ require("lazyload").on_vim_enter(function()
   )
 
   mason_registry.refresh(function()
-    for _, pkg_name in ipairs(lang.mason) do
+    for _, pkg_name in ipairs(ensure_installed) do
       local ok, pkg = pcall(mason_registry.get_package, pkg_name)
       if not ok then
-        vim.notify(("mason: unknown package %q (typo in a lang spec?)"):format(pkg_name), vim.log.levels.WARN)
+        vim.notify(("mason: unknown package %q"):format(pkg_name), vim.log.levels.WARN)
       elseif not pkg:is_installed() then
         pkg:install()
       end
     end
 
-    for pkg_name in pairs(lang.mason_pip) do
+    for pkg_name in pairs(mason_pip) do
       local ok, pkg = pcall(mason_registry.get_package, pkg_name)
       if ok and pkg:is_installed() then
         install_mason_pip(pkg_name)

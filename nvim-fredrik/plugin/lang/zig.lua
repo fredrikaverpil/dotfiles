@@ -1,5 +1,4 @@
 require("lang").register("zig", {
-  mason = { "zls" },
   neotest = {
     packs = {
       { src = "https://github.com/lawrence-laz/neotest-zig" },

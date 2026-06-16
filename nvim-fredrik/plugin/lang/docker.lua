@@ -1,3 +1,1 @@
-require("lang").register("docker", {
-  mason = { "dockerfile-language-server", "hadolint" },
-})
+require("lang").register("docker", {})
