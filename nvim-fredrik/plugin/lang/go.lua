@@ -30,7 +30,6 @@ require("lang").register("go", {
   servers = { "gopls" },
   mason = { "gopls", "goimports", "gci", "gofumpt", "golines", "golangci-lint", "delve", "gotestsum", "impl" },
   formatters_by_ft = { go = { "goimports", "gci", "gofumpt", "golines" } },
-  code_runner = { go = { "go run" } },
   coverage = { go = { coverage_file = coverage_file } },
   blink_packs = blink_packs,
   blink_per_filetype = blink_per_filetype,

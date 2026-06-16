@@ -5,5 +5,4 @@ require("lang").register("elixir", {
     elixir = { "mix" },
     heex = { "mix" },
   },
-  code_runner = { elixir = { "elixir" } },
 })

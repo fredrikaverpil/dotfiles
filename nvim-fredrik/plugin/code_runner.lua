@@ -5,7 +5,12 @@ require("lazyload").on_vim_enter(function()
 
   require("code_runner").setup({
     focus = false,
-    filetype = require("lang").spec().code_runner,
+    filetype = {
+      elixir = { "elixir" },
+      go = { "go run" },
+      typescript = { "bun" },
+      zig = { "zig run" },
+    },
   })
 
   vim.keymap.set("n", "<leader>r", "<cmd>RunFile<CR>", { desc = "Run file" })
