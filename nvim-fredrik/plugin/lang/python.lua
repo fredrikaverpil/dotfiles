@@ -1,13 +1,4 @@
-require("lang").register("python", {
-  dap = {
-    packs = {
-      { src = "https://codeberg.org/mfussenegger/nvim-dap-python" },
-    },
-    setup = function()
-      require("dap-python").setup("uv")
-    end,
-  },
-})
+require("lang").register("python", {})
 
 require("lazyload").on_vim_enter(function()
   vim.api.nvim_create_autocmd("FileType", {

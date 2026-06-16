@@ -1,14 +1,13 @@
 require("lazyload").on_vim_enter(function()
-  -- Adapters/configs (and their plugin packs) are contributed per-language via
-  -- require("lang").register({ dap = { packs = ..., setup = ... } }).
-  local dap_spec = require("lang").spec().dap
-
-  vim.pack.add(vim.list_extend({
+  vim.pack.add({
     { src = "https://codeberg.org/mfussenegger/nvim-dap" },
     { src = "https://github.com/rcarriga/nvim-dap-ui" },
     { src = "https://github.com/nvim-neotest/nvim-nio", version = vim.version.range("*") },
     { src = "https://github.com/theHamsta/nvim-dap-virtual-text" },
-  }, dap_spec.packs))
+    { src = "https://github.com/leoluz/nvim-dap-go" },
+    { src = "https://codeberg.org/mfussenegger/nvim-dap-python" },
+    { src = "https://github.com/jbyuki/one-small-step-for-vimkind" },
+  })
 
   for name, sign in pairs(require("icons").dap) do
     ---@type string[]
@@ -25,6 +24,7 @@ require("lazyload").on_vim_enter(function()
 
   local dap = require("dap")
   local dapui = require("dapui")
+  local osv = require("osv")
 
   dapui.setup()
 
@@ -38,14 +38,56 @@ require("lazyload").on_vim_enter(function()
     dapui.close()
   end
 
-  -- Per-language adapters and configurations.
-  for _, setup in ipairs(dap_spec.setups) do
-    setup(dap)
+  -- lua (one-small-step-for-vimkind)
+  dap.adapters.nlua = function(callback, config)
+    callback({ type = "server", host = config.host or "127.0.0.1", port = config.port or 8086 })
   end
+
+  dap.configurations.lua = {
+    {
+      type = "nlua",
+      request = "attach",
+      name = "Attach to running Neovim instance",
+    },
+  }
+
+  -- go (nvim-dap-go)
+  require("dap-go").setup({
+    dap_configurations = {
+      {
+        type = "go",
+        name = "Delve: debug opened file's cmd/cli",
+        request = "launch",
+        cwd = "${fileDirname}",
+        program = "./${relativeFileDirname}",
+        args = {},
+      },
+      {
+        type = "go",
+        name = "Delve: debug test (manually enter test name)",
+        request = "launch",
+        mode = "test",
+        program = "./${relativeFileDirname}",
+        args = function()
+          local testname = vim.fn.input("Test name (^regexp$ ok): ")
+          return { "-test.run", testname }
+        end,
+      },
+    },
+  })
+
+  -- python (nvim-dap-python)
+  require("dap-python").setup("uv")
 
   vim.keymap.set("n", "<leader>db", function()
     dap.toggle_breakpoint()
   end, { desc = "Toggle breakpoint" })
+  vim.keymap.set("n", "<leader>dLl", function()
+    osv.launch({ port = 8086 })
+  end, { desc = "Debug Lua: launch server" })
+  vim.keymap.set("n", "<leader>dLr", function()
+    osv.run_this()
+  end, { desc = "Debug Lua: run this" })
   vim.keymap.set("n", "<leader>dc", function()
     dap.continue()
   end, { desc = "Continue" })

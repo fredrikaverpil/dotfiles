@@ -1,35 +1,4 @@
-require("lang").register("go", {
-  dap = {
-    packs = {
-      { src = "https://github.com/leoluz/nvim-dap-go" },
-    },
-    setup = function()
-      require("dap-go").setup({
-        dap_configurations = {
-          {
-            type = "go",
-            name = "Delve: debug opened file's cmd/cli",
-            request = "launch",
-            cwd = "${fileDirname}",
-            program = "./${relativeFileDirname}",
-            args = {},
-          },
-          {
-            type = "go",
-            name = "Delve: debug test (manually enter test name)",
-            request = "launch",
-            mode = "test",
-            program = "./${relativeFileDirname}",
-            args = function()
-              local testname = vim.fn.input("Test name (^regexp$ ok): ")
-              return { "-test.run", testname }
-            end,
-          },
-        },
-      })
-    end,
-  },
-})
+require("lang").register("go", {})
 
 require("lazyload").on_vim_enter(function()
   -- filetypes
