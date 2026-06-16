@@ -1,25 +1,9 @@
-require("lang").register("sql", {
-  blink_packs = {
-    { src = "https://github.com/tpope/vim-dadbod" },
-    { src = "https://github.com/kristijanhusak/vim-dadbod-completion" },
-  },
-  blink_per_filetype = {
-    sql = { inherit_defaults = true, "dadbod" },
-    mysql = { inherit_defaults = true, "dadbod" },
-    plsql = { inherit_defaults = true, "dadbod" },
-  },
-  blink_providers = {
-    dadbod = {
-      name = "Dadbod",
-      module = "vim_dadbod_completion.blink",
-    },
-  },
-})
-
 require("lazyload").on_vim_enter(function()
   vim.pack.add({
     { src = "https://github.com/jsborjesson/vim-uppercase-sql" },
+    { src = "https://github.com/tpope/vim-dadbod" },
     { src = "https://github.com/kristijanhusak/vim-dadbod-ui" },
+    { src = "https://github.com/kristijanhusak/vim-dadbod-completion" },
     { src = "https://github.com/Maxteabag/sqlit.nvim" },
   })
 

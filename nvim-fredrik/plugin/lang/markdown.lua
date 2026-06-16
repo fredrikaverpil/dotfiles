@@ -2,18 +2,6 @@ require("lang").register("markdown", {
   mason = { "markdownlint", "prettier" },
   formatters_by_ft = { markdown = { "prettier" } },
   linters_by_ft = { markdown = { "markdownlint" } },
-  blink_packs = {
-    { src = "https://github.com/MeanderingProgrammer/render-markdown.nvim", version = vim.version.range("*") },
-  },
-  blink_per_filetype = {
-    markdown = { inherit_defaults = true, "markdown" },
-  },
-  blink_providers = {
-    markdown = {
-      name = "RenderMarkdown",
-      module = "render-markdown.integ.blink",
-    },
-  },
   linters = {
     markdownlint = {
       args = {

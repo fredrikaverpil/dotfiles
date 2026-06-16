@@ -1,33 +1,7 @@
-local blink_packs = {}
-local blink_per_filetype = {}
-local blink_providers = {}
-local blink_setup = nil
-if Config.use_treesitter_parser then
-  blink_packs = {
-    { src = "https://github.com/edte/blink-go-import.nvim" },
-  }
-  blink_per_filetype = {
-    go = { inherit_defaults = true, "go_pkgs" },
-  }
-  blink_providers = {
-    go_pkgs = {
-      name = "Import",
-      module = "blink-go-import",
-    },
-  }
-  blink_setup = function()
-    require("blink-go-import").setup()
-  end
-end
-
 require("lang").register("go", {
   servers = { "gopls" },
   mason = { "gopls", "goimports", "gci", "gofumpt", "golines", "golangci-lint", "delve", "gotestsum", "impl" },
   formatters_by_ft = { go = { "goimports", "gci", "gofumpt", "golines" } },
-  blink_packs = blink_packs,
-  blink_per_filetype = blink_per_filetype,
-  blink_providers = blink_providers,
-  blink_setup = blink_setup,
   formatters = {
     gci = {
       args = { "write", "--skip-generated", "-s", "standard", "-s", "default", "--skip-vendor", "$FILENAME" },
@@ -164,6 +138,11 @@ require("lazyload").on_vim_enter(function()
         { src = "https://github.com/maxandron/goplements.nvim" },
       })
       require("goplements").setup()
+
+      vim.pack.add({
+        { src = "https://github.com/edte/blink-go-import.nvim" },
+      })
+      require("blink-go-import").setup()
     end
   end
 
