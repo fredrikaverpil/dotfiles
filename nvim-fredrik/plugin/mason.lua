@@ -10,51 +10,52 @@ require("lazyload").on_vim_enter(function()
     lockfile_path = vim.env.DOTFILES .. "/nvim-fredrik/mason-lock.json",
   })
 
+  -- Kept alphabetical; the trailing comment is the language/tool that needs it.
   local ensure_installed = {
-    "actionlint",
-    "api-linter",
-    "basedpyright",
-    "bash-language-server",
-    "biome",
-    "buf",
-    "codelldb",
-    "debugpy",
-    "delve",
-    "dockerfile-language-server",
-    "elixir-ls",
-    "gci",
-    "gofumpt",
-    "goimports",
-    "golangci-lint",
-    "golines",
-    "gopls",
-    "gotestsum",
-    "graphql-language-service-cli",
-    "hadolint",
-    "impl", -- used by go-impl.nvim
-    "json-lsp",
-    "lua-language-server",
-    "markdownlint",
-    "mypy",
-    "nil",
-    "prettier",
-    "protolint",
-    "ruff",
-    "rust-analyzer",
-    "shellcheck", -- bashls runs shellcheck itself; not wired into nvim-lint to avoid dupes
-    "shfmt",
-    "stylua",
-    "superhtml",
-    "taplo",
-    "templ",
-    "terraform-ls",
-    "tflint",
-    "ts_query_ls",
-    "vtsls",
-    "yaml-language-server",
-    "yamlfmt",
-    "yamllint",
-    "zls",
+    "actionlint", -- yaml (github actions)
+    "api-linter", -- protobuf
+    "basedpyright", -- python
+    "bash-language-server", -- bash
+    "biome", -- json
+    "buf", -- protobuf
+    "codelldb", -- rust
+    "debugpy", -- python
+    "delve", -- go
+    "dockerfile-language-server", -- docker
+    "elixir-ls", -- elixir
+    "gci", -- go
+    "gofumpt", -- go
+    "goimports", -- go
+    "golangci-lint", -- go
+    "golines", -- go
+    "gopls", -- go
+    "gotestsum", -- go (neotest)
+    "graphql-language-service-cli", -- graphql
+    "hadolint", -- docker
+    "impl", -- go (go-impl.nvim)
+    "json-lsp", -- json
+    "lua-language-server", -- lua
+    "markdownlint", -- markdown
+    "mypy", -- python
+    "nil", -- nix
+    "prettier", -- markdown, typescript/javascript
+    "protolint", -- protobuf
+    "ruff", -- python
+    "rust-analyzer", -- rust
+    "shellcheck", -- bash (bashls runs it itself; not a nvim-lint linter)
+    "shfmt", -- bash
+    "stylua", -- lua
+    "superhtml", -- html
+    "taplo", -- toml
+    "templ", -- templ
+    "terraform-ls", -- terraform
+    "tflint", -- terraform
+    "ts_query_ls", -- query
+    "vtsls", -- typescript
+    "yaml-language-server", -- yaml
+    "yamlfmt", -- yaml
+    "yamllint", -- yaml
+    "zls", -- zig
   }
 
   -- Project-local additions from a .nvim.lua (exrc), e.g.:
