@@ -28,17 +28,6 @@ require("lang").register("go", {
   blink_per_filetype = blink_per_filetype,
   blink_providers = blink_providers,
   blink_setup = blink_setup,
-  treesitter_custom_parsers = {
-    godoc = {
-      filetype = "godoc",
-      install_info = {
-        url = "https://github.com/fredrikaverpil/tree-sitter-godoc",
-        branch = "main",
-        generate = false,
-        queries = "queries",
-      },
-    },
-  },
   formatters = {
     gci = {
       args = { "write", "--skip-generated", "-s", "standard", "-s", "default", "--skip-vendor", "$FILENAME" },

@@ -4,7 +4,26 @@ if Config.use_arborist then
       { src = "https://github.com/arborist-ts/arborist.nvim", version = vim.version.range("*") },
     })
 
-    local custom_parsers = require("lang").spec().treesitter_custom_parsers
+    local custom_parsers = {
+      godoc = {
+        filetype = "godoc",
+        install_info = {
+          url = "https://github.com/fredrikaverpil/tree-sitter-godoc",
+          branch = "main",
+          generate = false,
+          queries = "queries",
+        },
+      },
+      fga = {
+        filetype = "fga",
+        install_info = {
+          url = "https://github.com/matoous/tree-sitter-fga",
+          branch = "main",
+          generate = false,
+          queries = "queries",
+        },
+      },
+    }
 
     local opts = {
       install_popular = false,

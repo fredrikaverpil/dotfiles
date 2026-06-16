@@ -14,7 +14,26 @@ if Config.use_nvim_treesitter then
     })
 
     -- Custom parsers not shipped with nvim-treesitter.
-    local custom_parsers = require("lang").spec().treesitter_custom_parsers
+    local custom_parsers = {
+      godoc = {
+        filetype = "godoc",
+        install_info = {
+          url = "https://github.com/fredrikaverpil/tree-sitter-godoc",
+          branch = "main",
+          generate = false,
+          queries = "queries",
+        },
+      },
+      fga = {
+        filetype = "fga",
+        install_info = {
+          url = "https://github.com/matoous/tree-sitter-fga",
+          branch = "main",
+          generate = false,
+          queries = "queries",
+        },
+      },
+    }
 
     for lang, p in pairs(custom_parsers) do
       vim.treesitter.language.register(lang, p.filetype)
