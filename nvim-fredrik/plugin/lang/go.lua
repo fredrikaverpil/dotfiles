@@ -1,27 +1,19 @@
 require("lang").register("go", {})
 
+-- Custom gotmpl filetype (also covers .gohtml and *.go.tmpl). Registered at file
+-- scope (step 11) so detection applies to the first buffer opened, not only
+-- buffers opened after VimEnter.
+vim.filetype.add({
+  extension = {
+    gotmpl = "gotmpl",
+    gohtml = "gotmpl",
+  },
+  pattern = {
+    [".*%.go%.tmpl"] = "gotmpl",
+  },
+})
+
 require("lazyload").on_vim_enter(function()
-  -- filetypes
-  do
-    vim.filetype.add({
-      extension = {
-        gotmpl = "gotmpl",
-        gohtml = "gotmpl",
-      },
-      pattern = {
-        [".*%.go%.tmpl"] = "gotmpl",
-      },
-    })
-
-    vim.api.nvim_create_autocmd("FileType", {
-      group = vim.api.nvim_create_augroup("go-opts", { clear = true }),
-      pattern = { "go", "gomod", "gowork", "gohtml", "gotmpl" },
-      callback = function()
-        vim.opt_local.expandtab = false
-      end,
-    })
-  end
-
   -- tree-sitter dependent plugins
   do
     if Config.use_treesitter_parser then
