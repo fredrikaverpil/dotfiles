@@ -1,12 +1,6 @@
 require("lang").register("json", {
   servers = { "jsonls" },
   mason = { "json-lsp", "biome" },
-  formatters_by_ft = { json = { "biome" }, json5 = { "biome" }, jsonc = { "biome" } },
-  formatters = {
-    biome = {
-      args = { "format", "--indent-style", "space", "--stdin-file-path", "$FILENAME" },
-    },
-  },
 })
 
 require("lazyload").on_vim_enter(function()

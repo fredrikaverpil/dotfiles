@@ -1,17 +1,6 @@
 require("lang").register("yaml", {
   servers = { "yamlls" },
   mason = { "yaml-language-server", "yamlfmt", "yamllint", "actionlint" },
-  formatters_by_ft = { yaml = { "yamlfmt" }, gha = { "yamlfmt" }, dependabot = { "yamlfmt" } },
-  formatters = {
-    yamlfmt = {
-      prepend_args = {
-        "-formatter",
-        "retain_line_breaks_single=true",
-        "-formatter",
-        "pad_line_comments=2",
-      },
-    },
-  },
   linters_by_ft = { yaml = { "yamllint" }, gha = { "actionlint" } },
   linters = {
     yamllint = {

@@ -1,22 +1,6 @@
 require("lang").register("go", {
   servers = { "gopls" },
   mason = { "gopls", "goimports", "gci", "gofumpt", "golines", "golangci-lint", "delve", "gotestsum", "impl" },
-  formatters_by_ft = { go = { "goimports", "gci", "gofumpt", "golines" } },
-  formatters = {
-    gci = {
-      args = { "write", "--skip-generated", "-s", "standard", "-s", "default", "--skip-vendor", "$FILENAME" },
-    },
-    gofumpt = {
-      prepend_args = { "-extra", "-w", "$FILENAME" },
-      stdin = false,
-    },
-    goimports = {
-      args = { "-srcdir", "$FILENAME" },
-    },
-    golines = {
-      prepend_args = { "--base-formatter=gofumpt", "--ignore-generated", "--tab-len=1", "--max-len=120" },
-    },
-  },
   -- golangci-lint with cwd at the nearest go.mod (handles nested modules)
   lint_setup = function(lint)
     local find = require("find")

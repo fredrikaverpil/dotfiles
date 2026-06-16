@@ -1,7 +1,6 @@
 require("lang").register("protobuf", {
   servers = { "buf_ls" },
   mason = { "buf", "protolint", "api-linter" },
-  formatters_by_ft = { proto = { "buf" } },
   linters_by_ft = { proto = { "protolint" } },
   linters = {
     protolint = {

@@ -1,7 +1,6 @@
 require("lang").register("lua", {
   servers = { "lua_ls" },
   mason = { "lua-language-server", "stylua" },
-  formatters_by_ft = { lua = { "stylua" } },
   neotest = {
     packs = {
       { src = "https://github.com/nvim-neotest/neotest-plenary" },
