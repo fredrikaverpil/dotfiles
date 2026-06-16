@@ -1,15 +1,5 @@
 require("lang").register("markdown", {
   mason = { "markdownlint", "prettier" },
-  linters_by_ft = { markdown = { "markdownlint" } },
-  linters = {
-    markdownlint = {
-      args = {
-        "--config",
-        vim.env.DOTFILES .. "/extras/templates/.markdownlint.json",
-        "--stdin",
-      },
-    },
-  },
 })
 
 require("lazyload").on_vim_enter(function()

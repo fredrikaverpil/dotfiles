@@ -1,41 +1,6 @@
 require("lang").register("go", {
   servers = { "gopls" },
   mason = { "gopls", "goimports", "gci", "gofumpt", "golines", "golangci-lint", "delve", "gotestsum", "impl" },
-  -- golangci-lint with cwd at the nearest go.mod (handles nested modules)
-  lint_setup = function(lint)
-    local find = require("find")
-    local go_mod_dir_cache = {}
-
-    local function go_mod_dir()
-      local buffer_parent_dir = vim.fn.expand("%:p:h")
-      local cached = go_mod_dir_cache[buffer_parent_dir]
-      if cached == false then
-        return nil
-      end
-      if cached then
-        return cached
-      end
-      local dir = find.dir_upward("go.mod", { path = buffer_parent_dir })
-      if dir == nil then
-        go_mod_dir_cache[buffer_parent_dir] = false
-        return nil
-      end
-      go_mod_dir_cache[buffer_parent_dir] = dir
-      return dir
-    end
-
-    vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
-      group = vim.api.nvim_create_augroup("lint-go", { clear = true }),
-      pattern = { "*.go" },
-      callback = function()
-        local cwd = go_mod_dir()
-        if cwd == nil then
-          return
-        end
-        lint.try_lint("golangcilint", { cwd = cwd })
-      end,
-    })
-  end,
   neotest = {
     packs = {
       -- neotest-golang dep; the adapter itself is loaded via dev.load_local below.

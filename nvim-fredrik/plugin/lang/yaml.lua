@@ -1,18 +1,6 @@
 require("lang").register("yaml", {
   servers = { "yamlls" },
   mason = { "yaml-language-server", "yamlfmt", "yamllint", "actionlint" },
-  linters_by_ft = { yaml = { "yamllint" }, gha = { "actionlint" } },
-  linters = {
-    yamllint = {
-      args = {
-        "--config-file",
-        vim.env.DOTFILES .. "/extras/templates/.yamllint.yml",
-        "--format",
-        "parsable",
-        "-",
-      },
-    },
-  },
 })
 
 require("lazyload").on_vim_enter(function()
