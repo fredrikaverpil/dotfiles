@@ -11,7 +11,6 @@
 ] @injection.content
   (#match? @injection.content
     "(SELECT|select|INSERT|insert|UPDATE|update|DELETE|delete).+(FROM|from|INTO|into|VALUES|values|SET|set).*(WHERE|where|GROUP BY|group by)?")
-  (#offset! @injection.content 0 1 0 -1)
   (#set! injection.language "sql"))
 
 ; a general query injection
@@ -20,8 +19,7 @@
   (raw_string_literal_content)
 ] @sql
   (#match? @sql
-    "(SELECT|select|INSERT|insert|UPDATE|update|DELETE|delete).+(FROM|from|INTO|into|VALUES|values|SET|set).*(WHERE|where|GROUP BY|group by)?")
-  (#offset! @sql 0 1 0 -1))
+    "(SELECT|select|INSERT|insert|UPDATE|update|DELETE|delete).+(FROM|from|INTO|into|VALUES|values|SET|set).*(WHERE|where|GROUP BY|group by)?"))
 
 ; ----------------------------------------------------------------
 ; fallback keyword and comment based injection
@@ -34,8 +32,7 @@
     "GROUP BY" "HAVING" "CREATE INDEX" "INSERT INTO" "NOT NULL" "PRIMARY KEY" "UPDATE SET"
     "TRUNCATE TABLE" "LEFT JOIN" "add constraint" "alter table" "alter column" "database"
     "foreign key" "group by" "having" "create index" "insert into" "not null" "primary key"
-    "update set" "truncate table" "left join")
-  (#offset! @sql 0 1 0 -1))
+    "update set" "truncate table" "left join"))
 
 ; nvim 0.10
 ([
@@ -48,7 +45,6 @@
     "TRUNCATE TABLE" "LEFT JOIN" "add constraint" "alter table" "alter column" "database"
     "foreign key" "group by" "having" "create index" "insert into" "not null" "primary key"
     "update set" "truncate table" "left join")
-  (#offset! @injection.content 0 1 0 -1)
   (#set! injection.language "sql"))
 
 ; json
