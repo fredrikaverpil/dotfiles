@@ -141,9 +141,17 @@ Config.mason_extra = {
 }
 
 require("lazyload").on_override(function()
-    -- Override markdown formatter
+    -- Override markdown formatter.
+    -- Prefer the mason mdformat (it carries the pip extras pinned above);
+    -- inside sage projects .sage/bin is ahead on $PATH and shadows it with a
+    -- shim whose venv can break (e.g. Homebrew python upgrades), so resolve the
+    -- mason binary explicitly. Fall back to $PATH mdformat when mason has none.
     require("conform").formatters_by_ft.markdown = { "mdformat" }
     require("conform").formatters.mdformat = {
+        command = function()
+            local mason_bin = vim.fn.stdpath("data") .. "/mason/bin/mdformat"
+            return vim.uv.fs_stat(mason_bin) and mason_bin or "mdformat"
+        end,
         prepend_args = { "--number", "--wrap", "80" },
     }
 
