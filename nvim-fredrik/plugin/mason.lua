@@ -38,9 +38,10 @@ require("lazyload").on_vim_enter(function()
     "markdownlint", -- markdown
     "mypy", -- python
     "nil", -- nix
-    "prettier", -- markdown, typescript/javascript
+    "prettier", -- typescript/javascript
     "protolint", -- protobuf
     "ruff", -- python
+    "rumdl", -- markdown
     "rust-analyzer", -- rust
     "shellcheck", -- bash (bashls runs it itself; not a nvim-lint linter)
     "shfmt", -- bash
