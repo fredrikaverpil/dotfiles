@@ -12,7 +12,7 @@ Symlinked via GNU Stow. Run `./rebuild.sh --stow` from `~/.dotfiles/` to apply.
 
 ## Structure
 
-```
+```text
 nvim-fredrik/
   init.lua                    requires core modules
   lua/                        libraries called by init.lua and plugins
