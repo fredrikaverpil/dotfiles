@@ -5,8 +5,7 @@ vim.filetype.add({
   pattern = {
     [".*/%.github/dependabot.yml"] = "dependabot",
     [".*/%.github/dependabot.yaml"] = "dependabot",
-    [".*/%.github/workflows[%w/]+.*%.yml"] = "gha",
-    [".*/%.github/workflows/[%w/]+.*%.yaml"] = "gha",
+    [".*/%.github/workflows/.*%.ya?ml"] = "gha",
   },
 })
 
