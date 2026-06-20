@@ -55,6 +55,9 @@ require("lazyload").on_vim_enter(function()
       prettier = {
         prepend_args = { "--prose-wrap", "always", "--print-width", "80", "--tab-width", "2" },
       },
+      rumdl = {
+        prepend_args = { "--config", "MD013.line-length = 80", "--config", "MD013.reflow = true" },
+      },
       yamlfmt = {
         prepend_args = {
           "-formatter",
