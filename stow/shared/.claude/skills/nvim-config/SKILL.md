@@ -37,11 +37,6 @@ To apply stow symlinks after changes: `./rebuild.sh --stow` from `~/.dotfiles/`.
 Neovim itself is managed by [Bob](https://github.com/MordechaiHadad/bob), not
 nixpkgs -- binary at `~/.local/share/bob/nvim-bin/nvim`.
 
-The dotfiles repo also contains `nvim-legacy/` -- the previous lazy.nvim-based
-config (heavily inspired by LazyVim). It can be useful as a reference for how
-things were solved in the old paradigm. Launched with
-`NVIM_APPNAME=nvim-legacy nvim`.
-
 ## Documentation
 
 **Local disk** -- docs ship with Neovim at `$VIMRUNTIME/doc/`. With Bob-managed

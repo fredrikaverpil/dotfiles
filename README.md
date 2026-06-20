@@ -62,7 +62,6 @@ initialization, direnv, and per-project tooling.
 
 - Neovim ⌨️
   - [My Neovim config](nvim-fredrik/README.md) - uses `vim.pack`
-  - [My legacy Neovim config](nvim-legacy/README.md) - uses `lazy.nvim`
   - [Minimalistic config](nvim-simple/README.md)
 - Workflows 🌊
   - [Git config](extras/README_GIT.md)
