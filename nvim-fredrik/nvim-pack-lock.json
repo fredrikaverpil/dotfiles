@@ -78,6 +78,10 @@
       "src": "https://github.com/fang2hou/go-impl.nvim",
       "version": ">=0.0.0"
     },
+    "godoc.nvim": {
+      "rev": "54a7c3b14f6391a299b94db7c18d3a9ee1e31bde",
+      "src": "https://github.com/fredrikaverpil/godoc.nvim"
+    },
     "goplements.nvim": {
       "rev": "1750ace64d42efcbc1ce36eef848a3cea5f88c79",
       "src": "https://github.com/maxandron/goplements.nvim"
