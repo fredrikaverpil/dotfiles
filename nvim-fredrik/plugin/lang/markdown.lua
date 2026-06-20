@@ -13,16 +13,16 @@ require("lazyload").on_vim_enter(function()
       enabled = false,
     },
   })
-end)
 
-vim.keymap.set("n", "<leader>uM", function()
-  local m = require("render-markdown")
-  local enabled = require("render-markdown.state").enabled
-  if enabled then
-    m.disable()
-    vim.cmd("setlocal conceallevel=0")
-  else
-    m.enable()
-    vim.cmd("setlocal conceallevel=2")
-  end
-end, { desc = "Toggle markdown render", silent = true })
+  vim.keymap.set("n", "<leader>uM", function()
+    local m = require("render-markdown")
+    local enabled = require("render-markdown.state").enabled
+    if enabled then
+      m.disable()
+      vim.cmd("setlocal conceallevel=0")
+    else
+      m.enable()
+      vim.cmd("setlocal conceallevel=2")
+    end
+  end, { desc = "Toggle markdown render", silent = true })
+end)
