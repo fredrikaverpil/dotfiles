@@ -24,7 +24,7 @@ require("lazyload").on_vim_enter(function()
     "dockerfile-language-server", -- docker
     "elixir-ls", -- elixir
     "gci", -- go
-    "gofumpt", -- go
+    "gofumpt", -- go (golines runs it as --base-formatter)
     "goimports", -- go
     "golangci-lint", -- go
     "golines", -- go

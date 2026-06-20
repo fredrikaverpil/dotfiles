@@ -16,7 +16,7 @@ require("lazyload").on_vim_enter(function()
       dependabot = { "yamlfmt" },
       elixir = { "mix" },
       gha = { "yamlfmt" },
-      go = { "goimports", "gci", "gofumpt", "golines" },
+      go = { "goimports", "gci", "golines" },
       heex = { "mix" },
       javascript = { "prettier" },
       javascriptreact = { "prettier" },
@@ -42,15 +42,12 @@ require("lazyload").on_vim_enter(function()
       gci = {
         args = { "write", "--skip-generated", "-s", "standard", "-s", "default", "--skip-vendor", "$FILENAME" },
       },
-      gofumpt = {
-        prepend_args = { "-extra", "-w", "$FILENAME" },
-        stdin = false,
-      },
       goimports = {
         args = { "-srcdir", "$FILENAME" },
       },
       golines = {
-        prepend_args = { "--base-formatter=gofumpt", "--ignore-generated", "--tab-len=1", "--max-len=120" },
+        -- golines runs gofumpt prior to running itself
+        prepend_args = { "--base-formatter=gofumpt -extra", "--ignore-generated", "--tab-len=1", "--max-len=120" },
       },
       prettier = {
         prepend_args = { "--prose-wrap", "always", "--print-width", "80", "--tab-width", "2" },
