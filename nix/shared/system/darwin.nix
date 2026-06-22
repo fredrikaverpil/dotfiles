@@ -59,7 +59,6 @@
         "1password/tap"
         "nikitabobko/tap"
         # "sst/tap" # for opencode
-        "socktainer/tap"
       ]
       ++ config.host.extraTaps;
 
@@ -68,10 +67,10 @@
         "cloud-sql-proxy"
         "container"
 
-        # Packages from custom taps that aren't in nixpkgs
+        # Homebrew-managed CLIs
         # "joshmedeski/sesh/sesh"
         # "sst/tap/opencode"
-        "socktainer/tap/socktainer"
+        "socktainer"
         "pkgx"
 
         # Mac App Store CLI
