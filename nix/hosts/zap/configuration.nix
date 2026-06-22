@@ -62,7 +62,8 @@ in
     "cyberduck"
     "pgadmin4"
     "podman-desktop"
-    "siddharthvaddem/openscreen/openscreen"
+    # Disabled because the upstream app repo is archived; use EtienneLescot/openscreen instead.
+    # "siddharthvaddem/openscreen/openscreen"
   ];
 
   host.extraMasApps = {
