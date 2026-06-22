@@ -35,14 +35,14 @@ in
   ];
 
   host.extraTaps = [
-    "slp/krun" # krunkit
+    "libkrun/krun" # krunkit
   ];
 
   host.extraBrews = [
     # podman added here as it also adds podman-mac-helper (not installed if installed via nix)
     "podman"
     "podman-compose"
-    "slp/krun/krunkit" # required by podman to create VMs
+    "libkrun/krun/krunkit" # required by podman to create VMs
   ];
 
   host.extraCasks = [
