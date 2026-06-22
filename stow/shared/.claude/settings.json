@@ -65,11 +65,11 @@
       }
     }
   },
+  "effortLevel": "xhigh",
   "showClearContextOnPlanAccept": true,
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true,
-  "effortLevel": "medium"
+  "skipAutoPermissionPrompt": true
 }
