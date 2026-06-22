@@ -46,11 +46,6 @@
         autoUpdate = true;
         upgrade = true;
         cleanup = "zap";
-        extraFlags = [
-          # Homebrew Bundle requires explicit confirmation for cleanup. We use
-          # force-cleanup because Homebrew is declaratively managed here.
-          "--force-cleanup"
-        ];
       };
 
       taps = [
