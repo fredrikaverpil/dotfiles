@@ -1,10 +1,20 @@
 {
-  "skills": ["~/.claude-work/skills", "~/.claude-work/plugins/cache"],
-  "prompts": ["~/.claude/plugins/cache/*/*/*/commands/*.md"],
-  "npmCommand": ["bun"],
-  "packages": ["npm:pi-system-theme"],
-  "lastChangelogVersion": "0.74.0",
-  "defaultProvider": "anthropic",
-  "defaultModel": "claude-opus-4-7"
+  "skills": [
+    "~/.claude-work/skills",
+    "~/.claude-work/plugins/cache",
+    ".claude/skills"
+  ],
+  "prompts": [
+    "~/.claude-work/plugins/cache/*/*/*/commands/*.md"
+  ],
+  "npmCommand": [
+    "bun"
+  ],
+  "packages": [
+    "npm:pi-system-theme"
+  ],
+  "lastChangelogVersion": "0.79.9",
+  "defaultProvider": "omlx",
+  "defaultModel": "Qwen3.5-4B-MLX-4bit",
+  "theme": "light"
 }
-

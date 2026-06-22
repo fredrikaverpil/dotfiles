@@ -1,7 +1,8 @@
 {
   "skills": [
     "~/.claude/skills",
-    "~/.claude/plugins/cache"
+    "~/.claude/plugins/cache",
+    ".claude/skills"
   ],
   "prompts": [
     "~/.claude/plugins/cache/*/*/*/commands/*.md"
@@ -11,9 +12,10 @@
   ],
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-5.5",
-  "lastChangelogVersion": "0.74.1",
+  "lastChangelogVersion": "0.79.9",
   "packages": [
     "npm:pi-system-theme"
   ],
-  "theme": "dark"
+  "theme": "light",
+  "defaultThinkingLevel": "medium"
 }
