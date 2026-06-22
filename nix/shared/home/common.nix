@@ -188,7 +188,6 @@ in
       gnused # GNU tools (for macOS compatibility)
       imagemagick
       llama-cpp
-      ollama
       slides
       chafa # Required for showing images in slides
 
