@@ -12,7 +12,7 @@ Thumbs.db
 .nvim.lua
 .lazy.lua
 .opencode/
-/.claude
+/.claude/settings.local.json
 .serena
 /AGENTS.md
 /CLAUDE.md
