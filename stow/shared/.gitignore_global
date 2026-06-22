@@ -1,40 +1,44 @@
+# Legend
+# - leading slash: repo root pattern
+# - trailing slash: directory only
+# - leading AND trailing slash: repo root folder
+
 # os generated files
 .DS_Store
 .DS_Store?
+.Spotlight-V100/
+.Trashes/
 ._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
+ehthumbs.db
 
 # Editing
-.vscode
-.nvim.lua
-.lazy.lua
-.opencode/
+/.antigravitycli/
 /.claude/settings.local.json
-.serena
-/AGENTS.md
-/CLAUDE.md
-/GEMINI.md
-/conductor
-/.playwright-mcp
-/.antigravitycli
+/.lazy.lua
+/.nvim.lua
+/.opencode/
+/.playwright-mcp/
+/.serena/
+/.vscode/
+/conductor/
 
 # Environments
-.pkgx.yml
-.pkgx.yaml
-.envrc
 .direnv/
-/.nix-devshell
+/.envrc
+/.mise.local.toml
+/.mise.toml
+/.nix-devshell/
+/.pkgx.yaml
+/.pkgx.yml
 
 # Node
-/node_modules
+node_modules/
 
 # byte-compiled / optimized / dll files
-__pycache__/
-*.py[cod]
 *$py.class
+*.py[cod]
+__pycache__/
 
 # go
 coverage.out
@@ -43,30 +47,30 @@ coverage.out
 *.so
 
 # python distribution / packaging
+*.egg
+*.egg-info/
 .Python
+.coverage*
+.eggs/
+.installed.cfg
+.nox/
+.pytest_cache/
+.tox/
 build/
 develop-eggs/
 dist/
 downloads/
 eggs/
-.eggs/
+htmlcov/
 lib64/
 parts/
 sdist/
+share/python-wheels/
 var/
 wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-.nox
-.tox
-.pytest_cache
-htmlcov
-.coverage*
 
 # zig
-.zig-cache
+.zig-cache/
 
 # misc
 /TODO.md
