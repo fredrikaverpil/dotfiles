@@ -80,13 +80,20 @@ require("lazyload").on_vim_enter(function()
     end
   end
 
+  -- A vault pinned via the switcher; nil means follow the cwd.
+  local vault_override ---@type string?
+
+  local function current_vault()
+    return vault_override or vault_for_cwd()
+  end
+
   -- Obsidian commands act on the *active* workspace, so align it with the cwd
   -- before running them; otherwise notes land in the wrong vault. The active
   -- workspace defaults to the first one (vaults live in iCloud, so cwd never
   -- matches a vault path). Guarded to avoid obsidian's "Already in workspace"
   -- notification on every keypress.
   local function in_vault(action)
-    local name = vault_for_cwd()
+    local name = current_vault()
     ---@diagnostic disable-next-line: undefined-global
     if Obsidian.workspace.name ~= name then
       vim.cmd("Obsidian workspace " .. name)
@@ -95,6 +102,21 @@ require("lazyload").on_vim_enter(function()
   end
 
   -- Keymaps
+  vim.keymap.set("n", "<leader>nW", function()
+    local choices = vim.tbl_keys(vaults)
+    table.sort(choices)
+    vim.ui.select(choices, {
+      prompt = "Notes: vault",
+      format_item = function(choice)
+        return (current_vault() == choice and "* " or "  ") .. choice
+      end,
+    }, function(choice)
+      if choice then
+        vault_override = choice
+      end
+    end)
+  end, { desc = "Notes: switch vault" })
+
   vim.keymap.set("n", "<leader>ns", function()
     in_vault(function(vault)
       ---@diagnostic disable-next-line: undefined-global
