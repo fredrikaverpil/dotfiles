@@ -9,17 +9,11 @@ require("lazyload").on_vim_enter(function()
     { src = "https://github.com/folke/snacks.nvim", version = vim.version.range("*") }, -- sub-dependency
   })
 
-  local base = vim.fn.expand("~/Library/Mobile Documents/iCloud~md~obsidian/Documents")
-  local vaults = vim.tbl_filter(function(v)
-    return vim.fn.isdirectory(v.path) == 1
-  end, {
-    { name = "personal", path = base .. "/personal" },
-    { name = "work", path = base .. "/work" },
-  })
-
-  if #vaults == 0 then
-    return
-  end
+  local icloud = vim.fn.expand("~/Library/Mobile Documents/iCloud~md~obsidian/Documents")
+  local vaults = {
+    personal = { path = vim.fs.joinpath(icloud, "personal") },
+    work = { path = vim.fs.joinpath(icloud, "work") },
+  }
 
   ---@param title string
   local function date_prefixed_id(title)
@@ -27,7 +21,7 @@ require("lazyload").on_vim_enter(function()
   end
 
   require("obsidian").setup({
-    workspaces = vaults,
+    workspaces = vim.tbl_values(vaults),
 
     picker = {
       name = "snacks.pick",
@@ -76,91 +70,71 @@ require("lazyload").on_vim_enter(function()
     legacy_commands = false,
   })
 
-  do
-    local function find_vault(name)
-      for _, v in ipairs(vaults) do
-        if v.name == name then
-          return v
-        end
-      end
-    end
-
-    local default = require("path").cwd_is_under("~/code/work") and find_vault("work") or find_vault("personal")
-    if default then
-      _G.Config.obsidian_vault = default
-    end
-  end
-
-  local function pick_vault(callback)
-    vim.ui.select(vaults, {
-      prompt = "Select vault",
-      format_item = function(v)
-        local active = _G.Config.obsidian_vault and _G.Config.obsidian_vault.name == v.name
-        return (active and "* " or "  ") .. v.name
-      end,
-    }, function(v)
-      if not v then
-        return
-      end
-      _G.Config.obsidian_vault = v
-      vim.cmd("Obsidian workspace " .. v.name)
-      if callback then
-        callback(v)
-      end
-    end)
-  end
-
-  local function with_vault(callback)
-    if _G.Config.obsidian_vault then
-      callback(_G.Config.obsidian_vault)
+  -- The vault follows the cwd: work notes under ~/code/work, personal elsewhere.
+  -- Re-evaluated on every keymap so changing directory changes the vault.
+  local function vault_for_cwd()
+    if require("path").cwd_is_under("~/code/work") then
+      return "work"
     else
-      pick_vault(callback)
+      return "personal"
     end
+  end
+
+  -- Obsidian commands act on the *active* workspace, so align it with the cwd
+  -- before running them; otherwise notes land in the wrong vault. The active
+  -- workspace defaults to the first one (vaults live in iCloud, so cwd never
+  -- matches a vault path). Guarded to avoid obsidian's "Already in workspace"
+  -- notification on every keypress.
+  local function in_vault(action)
+    local name = vault_for_cwd()
+    ---@diagnostic disable-next-line: undefined-global
+    if Obsidian.workspace.name ~= name then
+      vim.cmd("Obsidian workspace " .. name)
+    end
+    action(vaults[name], name)
   end
 
   -- Keymaps
-  vim.keymap.set("n", "<leader>nW", pick_vault, { desc = "Notes: switch vault" })
-
   vim.keymap.set("n", "<leader>ns", function()
-    with_vault(function(v)
+    in_vault(function(vault)
       ---@diagnostic disable-next-line: undefined-global
-      Snacks.picker.grep({ dirs = { v.path } })
+      Snacks.picker.grep({ dirs = { vault.path } })
     end)
   end, { desc = "Notes: search text" })
 
   vim.keymap.set("n", "<leader>nf", function()
-    with_vault(function(_)
+    in_vault(function()
       vim.cmd("Obsidian quick_switch")
     end)
   end, { desc = "Notes: search filenames" })
 
   vim.keymap.set("n", "<leader>nn", function()
-    with_vault(function(_)
+    in_vault(function()
       vim.cmd("Obsidian new")
     end)
   end, { desc = "Notes: new" })
 
   vim.keymap.set("n", "<leader>nd", function()
-    with_vault(function(_)
+    in_vault(function()
       vim.cmd("Obsidian today")
     end)
   end, { desc = "Notes: daily note" })
 
   vim.keymap.set("n", "<leader>nt", function()
-    with_vault(function(_)
+    in_vault(function()
       vim.cmd("Obsidian new_from_template")
     end)
   end, { desc = "Notes: new from template" })
 
   vim.keymap.set("n", "<leader>nS", function()
-    with_vault(function(v)
-      vim.cmd.tabnew(v.path .. "/scratchpad.md")
+    in_vault(function(vault)
+      vim.cmd.tabnew(vim.fs.joinpath(vault.path, "scratchpad.md"))
     end)
   end, { desc = "Notes: scratchpad" })
 
   vim.keymap.set("n", "<leader>no", function()
-    with_vault(function(v)
-      vim.fn.jobstart({ "open", "obsidian://open?vault=" .. v.name })
+    in_vault(function(_, name)
+      vim.fn.jobstart({ "open", "obsidian://open?vault=" .. name })
     end)
   end, { desc = "Notes: open Obsidian" })
 end)
