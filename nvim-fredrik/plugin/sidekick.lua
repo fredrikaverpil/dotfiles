@@ -3,28 +3,11 @@ require("lazyload").on_vim_enter(function()
     { src = "https://github.com/folke/sidekick.nvim", version = vim.version.range("*") },
   })
 
-  -- taken from sidekick.nvim
-  -- https://github.com/folke/sidekick.nvim/blob/main/sk/cli/claude.lua
-  local claude_format = function(text)
-    local Text = require("sidekick.text")
-
-    Text.transform(text, function(str)
-      return str:find("[^%w/_%.%-]") and ('"' .. str .. '"') or str
-    end, "SidekickLocFile")
-
-    local ret = Text.to_string(text)
-
-    -- transform line ranges to a format that Claude understands
-    ret = ret:gsub("@([^@]-) :L(%d+)%-L(%d+)", "@%1#L%2-%3")
-
-    return ret
-  end
-
   require("sidekick").setup({
     cli = {
       win = {
         split = {
-          width = 140,
+          width = 120,
         },
       },
       ---@type table<string, sidekick.cli.Config|{}>
