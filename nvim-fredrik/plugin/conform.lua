@@ -53,7 +53,17 @@ require("lazyload").on_vim_enter(function()
         prepend_args = { "--prose-wrap", "always", "--print-width", "80", "--tab-width", "2" },
       },
       rumdl = {
-        prepend_args = { "--config", "MD013.line-length = 80", "--config", "MD013.reflow = true" },
+        prepend_args = {
+          -- MD034: leave bare URLs/emails untouched (no <...> wrapping).
+          -- MD036: don't rewrite bold-only paragraphs (e.g. **Example:**) into
+          -- level-2 headings.
+          "--config",
+          'global.disable = ["MD034", "MD036"]',
+          "--config",
+          "MD013.line-length = 80",
+          "--config",
+          "MD013.reflow = true",
+        },
       },
       yamlfmt = {
         prepend_args = {

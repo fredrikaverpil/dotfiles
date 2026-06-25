@@ -9,7 +9,7 @@ require("lazyload").on_vim_enter(function()
   lint.linters_by_ft = {
     dockerfile = { "hadolint" },
     gha = { "actionlint" },
-    markdown = { "markdownlint" },
+    markdown = { "rumdl" }, -- "markdownlint" },
     proto = { "protolint" },
     python = { "mypy" },
     terraform = { "terraform_validate", "tflint" },
