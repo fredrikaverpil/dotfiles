@@ -1,7 +1,6 @@
 {
   "skills": [
     "~/.claude/skills",
-    "~/.claude/plugins/cache",
     ".claude/skills"
   ],
   "prompts": [
@@ -16,6 +15,6 @@
   "packages": [
     "npm:pi-system-theme"
   ],
-  "theme": "light",
+  "theme": "dark",
   "defaultThinkingLevel": "xhigh"
 }

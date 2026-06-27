@@ -1,7 +1,6 @@
 {
   "skills": [
     "~/.claude-work/skills",
-    "~/.claude-work/plugins/cache",
     ".claude/skills"
   ],
   "prompts": [
