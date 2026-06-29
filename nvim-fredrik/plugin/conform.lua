@@ -57,8 +57,9 @@ require("lazyload").on_vim_enter(function()
           -- MD034: leave bare URLs/emails untouched (no <...> wrapping).
           -- MD036: don't rewrite bold-only paragraphs (e.g. **Example:**) into
           -- level-2 headings.
+          -- MD040: don't require or auto-fill fenced code block languages.
           "--config",
-          'global.disable = ["MD034", "MD036"]',
+          'global.disable = ["MD034", "MD036", "MD040"]',
           "--config",
           "MD013.line-length = 80",
           "--config",
