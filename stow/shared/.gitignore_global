@@ -72,6 +72,9 @@ wheels/
 # zig
 .zig-cache/
 
+# graphify (knowledge graph output)
+/graphify-out/
+
 # misc
 /TODO.md
 /PLAN.md
