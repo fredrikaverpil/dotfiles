@@ -15,7 +15,7 @@
 
   inputs = {
     # Mixed stability approach:
-    # - Linux/NixOS: Uses stable (nixos-25.05 + home-manager/release-25.05)
+    # - Linux/NixOS: Uses stable (nixos-26.05 + home-manager/release-26.05)
     # - Darwin/macOS: Uses unstable (nixpkgs-unstable + home-manager-unstable + nix-darwin)
     #
     # Rationale: Darwin ecosystem moves faster, benefits from latest packages.
@@ -25,7 +25,7 @@
     # - home-manager releases: https://github.com/nix-community/home-manager/releases
     # - Darwin state versions: https://github.com/LnL7/nix-darwin/blob/master/modules/system/default.nix
 
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     # nixos-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nix-darwin = {
@@ -38,7 +38,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager-unstable = {
