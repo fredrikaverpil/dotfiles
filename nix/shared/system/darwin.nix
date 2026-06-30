@@ -6,6 +6,27 @@
   inputs,
   ...
 }:
+let
+  trustedTaps =
+    taps:
+    map (name: {
+      inherit name;
+      trusted = true;
+    }) taps;
+
+  homebrewTaps = lib.unique (
+    [
+      "dustinblackman/tap"
+      # "joshmedeski/sesh"
+      "1password/tap"
+      "nikitabobko/tap"
+      # "sst/tap" # for opencode
+    ]
+    ++ config.host.extraTaps
+  );
+
+  trustedTapArgs = lib.concatMapStringsSep " " lib.escapeShellArg homebrewTaps;
+in
 {
   options = {
     host.extraBrews = lib.mkOption {
@@ -48,14 +69,7 @@
         cleanup = "zap";
       };
 
-      taps = [
-        "dustinblackman/tap"
-        # "joshmedeski/sesh"
-        "1password/tap"
-        "nikitabobko/tap"
-        # "sst/tap" # for opencode
-      ]
-      ++ config.host.extraTaps;
+      taps = trustedTaps homebrewTaps;
 
       brews = [
         # Packages not available in nixpkgs
@@ -107,6 +121,20 @@
       }
       // config.host.extraMasApps;
     };
+
+    system.activationScripts.homebrew.text = lib.mkIf config.homebrew.enable (
+      lib.mkBefore ''
+        # Trust configured Homebrew taps before `brew bundle` loads formulae from them.
+        if [ -f "${config.homebrew.prefix}/bin/brew" ]; then
+          PATH="${config.homebrew.prefix}/bin:$PATH" sudo \
+            --preserve-env=PATH \
+            --user=${lib.escapeShellArg config.homebrew.user} \
+            --set-home \
+            env HOMEBREW_NO_AUTO_UPDATE=1 \
+            brew trust --quiet --tap ${trustedTapArgs}
+        fi
+      ''
+    );
 
     # NOTE: Run socktainer with `socktainer --no-check-compatibility` manually during
     # the experimentation phase.
