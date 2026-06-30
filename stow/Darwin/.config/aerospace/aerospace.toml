@@ -260,6 +260,9 @@ run = "move-node-to-workspace D"
 if.app-id = "com.1password.1password"
 run = ["layout floating"]
 [[on-window-detected]]
+if.app-id = "me.proton.pass.electron"
+run = ["layout floating"]
+[[on-window-detected]]
 if.app-id = "md.obsidian"
 run = "move-node-to-workspace O"
 [[on-window-detected]]
