@@ -154,7 +154,7 @@ in
       bfs
       devbox
       devenv
-      mise
+      # mise
       dust
       fd
       gnumake
@@ -211,7 +211,7 @@ in
       [
         bun
         cmake
-        elixir
+        beamPackages.elixir
         gcc
         go_latest
         lua51Packages.lua # Neovim requires Lua 5.1

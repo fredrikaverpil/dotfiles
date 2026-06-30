@@ -130,7 +130,7 @@ fi
 if [ -n "$brew_prefix" ] || [ -d "/nix/store" ]; then
 	eval "$(atuin init "$shell" --disable-up-arrow)"
 	eval "$(direnv hook "$shell")"
-	eval "$(mise activate "$shell")"
+	# eval "$(mise activate "$shell")"
 	eval "$(zoxide init "$shell")"
 	eval "$(starship init "$shell")"
 

@@ -57,7 +57,10 @@
       nerd-fonts.jetbrains-mono
       maple-mono.truetype
       maple-mono.variable
-      noto-fonts-color-emoji # NOTE: takes a very long time to build
+      # noto-fonts-color-emoji # NOTE: takes a very long time to build
+      #   ^ disabled: afdko 5.0.x (its build dependency via nototools) is
+      #   currently broken in nixpkgs-unstable (test suite fails, 93 tests).
+      #   See darwin.nix for full note. Re-enable once nixpkgs fixes afdko.
       nerd-fonts.symbols-only
     ];
 
