@@ -1,6 +1,6 @@
 [user]
 	name = Fredrik Averpil
-	email = fredrik.averpil@gmail.com
+	email = fredrik.averpil@proton.me
 	# for github only, fredrikaverpil@users.noreply.github.com
 [core]
 	excludesfile = ~/.gitignore_global
