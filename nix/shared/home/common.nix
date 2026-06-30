@@ -154,7 +154,7 @@ in
       bfs
       devbox
       devenv
-      # mise
+      mise
       dust
       fd
       gnumake

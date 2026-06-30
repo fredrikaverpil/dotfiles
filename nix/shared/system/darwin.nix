@@ -192,15 +192,7 @@
       nerd-fonts.jetbrains-mono
       maple-mono.truetype
       maple-mono.variable
-      # noto-fonts-color-emoji
-      #   ^ disabled: its build chain (nototools -> afdko) is currently broken
-      #   in nixpkgs-unstable. afdko 5.0.x (released 2026-03-22, a major C->C++
-      #   rewrite) fails its test suite (93 tests, all addfeatures/makeotf
-      #   subprocess crashes), which cascades up through nototools ->
-      #   noto-fonts-color-emoji -> fonts -> darwin-system and breaks the whole
-      #   rebuild. macOS already ships Apple Color Emoji system-wide, so this is
-      #   not needed here. Re-enable once nixpkgs fixes afdko.
-      #   See: https://github.com/NixOS/nixpkgs/issues/396793 (related, broken TTF)
+      noto-fonts-color-emoji
       nerd-fonts.symbols-only
     ];
   };
