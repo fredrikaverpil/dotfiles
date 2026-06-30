@@ -87,6 +87,7 @@
         "kitty"
         "obs"
         "obsidian"
+        "proton-pass"
         "raycast"
         "signal"
         "slack"
