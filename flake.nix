@@ -58,10 +58,14 @@
       lib = import ./nix/lib { inherit inputs; };
       stable = inputs.nixpkgs.legacyPackages;
       unstable = inputs.nixpkgs-unstable.legacyPackages;
+      # NOTE: All dev shells use unstable nixpkgs, regardless of platform.
+      # This intentionally diverges from the mixed-stability policy for system
+      # builds (Linux = stable, Darwin = unstable): dev shells are for local
+      # toolchain work and benefit from latest packages on every platform.
       mkDevShells = system: {
-        default = stable.${system}.mkShell {
+        default = unstable.${system}.mkShell {
           packages = [
-            stable.${system}.nixfmt
+            unstable.${system}.nixfmt
           ];
         };
         dotfiles-toolchain = unstable.${system}.mkShell {
