@@ -81,6 +81,7 @@ in
         # "sst/tap/opencode"
         "socktainer"
         "pkgx"
+        "proton-pass-cli"
 
         # Mac App Store CLI
         "mas"
