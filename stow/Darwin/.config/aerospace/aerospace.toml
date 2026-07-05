@@ -1,5 +1,5 @@
 # https://nikitabobko.github.io/AeroSpace/guide
-
+config-version = 2
 
 # You can use it to add commands that run after login to macOS user session.
 # 'start-at-login' needs to be 'true' for 'after-login-command' to work
@@ -42,6 +42,104 @@ key-mapping.preset = 'qwerty'
 # Fallback value (if you omit the key): on-focused-monitor-changed = []
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 # on-focus-changed = "move-mouse window-lazy-center"
+
+on-window-detected = [
+  {
+    if = 'test %{app-bundle-id} = com.mitchellh.ghostty',
+    run = [
+      # FIX: this is a workaround for https://github.com/nikitabobko/AeroSpace/issues/68
+      # this was also observed in:
+      # - https://github.com/ghostty-org/ghostty/issues/1840
+      # - https://github.com/ghostty-org/ghostty/issues/2006
+      "layout floating",
+      "move-node-to-workspace T",
+    ],
+  },
+  {
+    if = 'test %{app-bundle-id} = com.apple.finder',
+    run = ["layout floating"],
+  },
+  {
+    if = 'test %{app-bundle-id} = net.kovidgoyal.kitty',
+    run = "move-node-to-workspace T",
+  },
+  {
+    if = 'test %{app-bundle-id} = com.github.wez.wezterm',
+    run = "move-node-to-workspace T",
+  },
+  {
+    if = 'test %{app-bundle-id} = com.microsoft.VSCode',
+    run = "move-node-to-workspace E",
+  },
+  {
+    if = 'test %{app-bundle-id} = com.todesktop.230313mzl4w4u92', # Cursor
+    run = "move-node-to-workspace E",
+  },
+  {
+    if = 'test %{app-bundle-id} = company.thebrowser.Browser', # Arc
+    run = "move-node-to-workspace B",
+  },
+  {
+    if = 'test %{app-bundle-id} = app.zen-browser.zen',
+    run = "move-node-to-workspace Z",
+  },
+  {
+    if = 'test %{app-bundle-id} = com.tinyspeck.slackmacgap', # Slack
+    run = "move-node-to-workspace S",
+  },
+  {
+    if = 'test %{app-bundle-id} = com.spotify.client',
+    run = "move-node-to-workspace M", # Music; Spotify
+  },
+  {
+    if = 'test %{app-bundle-id} = com.google.Chrome.app.kjgfgldnnfoeklkmfkjfagphfepbbdan',
+    run = "move-node-to-workspace G", # Google Meet
+  },
+  {
+    if = 'test %{app-bundle-id} = com.apple.iCal',
+    run = "move-node-to-workspace C",
+  },
+  {
+    if = 'test %{app-bundle-id} = com.apple.reminders',
+    run = "move-node-to-workspace C",
+  },
+  {
+    if = 'test %{app-bundle-id} = io.podmandesktop.PodmanDesktop',
+    run = "move-node-to-workspace D",
+  },
+  {
+    if = 'test %{app-bundle-id} = com.1password.1password',
+    run = ["layout floating"],
+  },
+  {
+    if = 'test %{app-bundle-id} = me.proton.pass.electron',
+    run = ["layout floating"],
+  },
+  {
+    if = 'test %{app-bundle-id} = md.obsidian',
+    run = "move-node-to-workspace O",
+  },
+  {
+    if = 'test %{app-bundle-id} = org.whispersystems.signal-desktop',
+    run = "move-node-to-workspace A",
+  },
+  {
+    if = 'test %{app-bundle-id} = com.fujifilm.denji.X-RAW-STUDIO',
+    run = "move-node-to-workspace X",
+  },
+  {
+    if = 'test %{app-bundle-id} = com.pixelmatorteam.pixelmator.touch.x.photo',
+    run = "move-node-to-workspace P",
+  },
+  {
+    if = 'test %{app-bundle-id} = com.anthropic.claudefordesktop',
+    run = "move-node-to-workspace C",
+  },
+]# Move apps directly to a workspace
+# Use 'aerospace list-apps' to get the app-id
+# NOTE: as a top-level key (not a [[table]]), this must appear before any
+# table header such as [gaps] or [mode.*], otherwise it is parsed as a key
+# nested inside the preceding table.
 
 # Gaps between windows (inner-*) and between monitor edges (outer-*).
 # Possible values:
@@ -204,76 +302,3 @@ alt-shift-left = ['join-with left', 'mode main']
 alt-shift-down = ['join-with down', 'mode main']
 alt-shift-up = ['join-with up', 'mode main']
 alt-shift-right = ['join-with right', 'mode main']
-
-# Move apps directly to a workspace
-# Use 'aerospace list-apps' to get the app-id
-[[on-window-detected]]
-if.app-id = "com.mitchellh.ghostty"
-run = [
-  # FIX: this is a workaround for https://github.com/nikitabobko/AeroSpace/issues/68
-  # this was also observed in:
-  # - https://github.com/ghostty-org/ghostty/issues/1840
-  # - https://github.com/ghostty-org/ghostty/issues/2006
-  "layout floating",
-  "move-node-to-workspace T",
-]
-[[on-window-detected]]
-if.app-id = "com.apple.finder"
-run = ["layout floating"]
-[[on-window-detected]]
-if.app-id = "net.kovidgoyal.kitty"
-run = "move-node-to-workspace T"
-[[on-window-detected]]
-if.app-id = "com.github.wez.wezterm"
-run = "move-node-to-workspace T"
-[[on-window-detected]]
-if.app-id = "com.microsoft.VSCode"
-run = "move-node-to-workspace E"
-[[on-window-detected]]
-if.app-id = "com.todesktop.230313mzl4w4u92" # Cursor
-run = "move-node-to-workspace E"
-[[on-window-detected]]
-if.app-id = "company.thebrowser.Browser" # Arc
-run = "move-node-to-workspace B"
-[[on-window-detected]]
-if.app-id = "app.zen-browser.zen"
-run = "move-node-to-workspace Z"
-[[on-window-detected]]
-if.app-id = "com.tinyspeck.slackmacgap" # Slack
-run = "move-node-to-workspace S"
-[[on-window-detected]]
-if.app-id = "com.spotify.client"
-run = "move-node-to-workspace M" # Music; Spotify
-[[on-window-detected]]
-if.app-id = "com.google.Chrome.app.kjgfgldnnfoeklkmfkjfagphfepbbdan"
-run = "move-node-to-workspace G"                                     # Google Meet
-[[on-window-detected]]
-if.app-id = "com.apple.iCal"
-run = "move-node-to-workspace C"
-[[on-window-detected]]
-if.app-id = "com.apple.reminders"
-run = "move-node-to-workspace C"
-[[on-window-detected]]
-if.app-id = "io.podmandesktop.PodmanDesktop"
-run = "move-node-to-workspace D"
-[[on-window-detected]]
-if.app-id = "com.1password.1password"
-run = ["layout floating"]
-[[on-window-detected]]
-if.app-id = "me.proton.pass.electron"
-run = ["layout floating"]
-[[on-window-detected]]
-if.app-id = "md.obsidian"
-run = "move-node-to-workspace O"
-[[on-window-detected]]
-if.app-id = "org.whispersystems.signal-desktop"
-run = "move-node-to-workspace A"
-[[on-window-detected]]
-if.app-id = "com.fujifilm.denji.X-RAW-STUDIO"
-run = "move-node-to-workspace X"
-[[on-window-detected]]
-if.app-id = "com.pixelmatorteam.pixelmator.touch.x.photo"
-run = "move-node-to-workspace P"
-[[on-window-detected]]
-if.app-id = "com.anthropic.claudefordesktop"
-run = "move-node-to-workspace C"
