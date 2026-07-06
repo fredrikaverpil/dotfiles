@@ -184,7 +184,7 @@ sudo nixos-rebuild switch --flake ~/.dotfiles --show-trace  # Linux
 darwin-rebuild switch --flake ~/.dotfiles --show-trace      # macOS
 
 # Clean cache
-nix-collect-garbage -d
+sudo nix-collect-garbage -d
 
 # Rollback
 sudo nixos-rebuild --rollback  # Linux
