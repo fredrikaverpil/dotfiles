@@ -119,7 +119,6 @@ in
         # NOTE: apps run in sandboxed mode and DefaultKeyBinding.dict won't work here.
         "Keka" = 470158793;
         "Pandan" = 1569600264;
-        "Proton Authenticator" = 6741758667;
       }
       // config.host.extraMasApps;
     };
