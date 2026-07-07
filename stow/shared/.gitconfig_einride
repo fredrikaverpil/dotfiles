@@ -1,0 +1,14 @@
+[user]
+	name = Fredrik Averpil
+	email = fredrik.averpil@einride.tech
+
+# Pin SSH auth to the einride key. The agent holds several keys and ssh offers
+# them in agent order, so authentication would otherwise happen with whichever
+# personal key it recognizes first. -i with a .pub still gets the private key
+# from the agent; IdentitiesOnly restricts the offer to that key.
+[core]
+	sshCommand = ssh -o IdentitiesOnly=yes -i ~/.ssh/einride.pub
+
+# Manage key(s) via 1Password
+# [include]
+# 	path = ~/.gitconfig_1password

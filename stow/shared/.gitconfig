@@ -1,7 +1,7 @@
 [user]
 	name = Fredrik Averpil
 	email = fredrik.averpil@proton.me
-	# for github only, fredrikaverpil@users.noreply.github.com
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPeHRovOKf1tcBNm9na64YrePSTSaxkT/UCUviSaAEQd
 [core]
 	excludesfile = ~/.gitignore_global
 	# editor = code --wait  # vscode
@@ -28,12 +28,15 @@
 	autostash = true
 [commit]
 	template = ~/.gitcommit
+	gpgsign = true
 [push]
 	autoSetupRemote = true
 
-# Git commit signing
-[include]
-    path = ~/.gitconfig_1password
+# Git commit signing + SSH auth.
+[gpg]
+  format = ssh
+[gpg "ssh"]
+  program = "/usr/bin/ssh-keygen"
 
 # GitHub https authentication
 # Credential helpers are cumulative, not override: this host-scoped helper does
@@ -56,6 +59,8 @@
 	required = true
 
 # Always keep gitconfig for work at bottom of this file
-[includeIf "gitdir:~/code/work/**/.git"]
-	path = ~/.gitconfig_work
+[includeIf "hasconfig:remote.*.url:git@github.com:einride*/**"]
+	path = ~/.gitconfig_einride
+[includeIf "hasconfig:remote.*.url:https://github.com/einride*/**"]
+	path = ~/.gitconfig_einride
 

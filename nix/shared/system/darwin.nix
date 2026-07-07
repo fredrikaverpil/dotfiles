@@ -161,6 +161,28 @@ in
     #   };
     # };
 
+    # Load Proton Pass SSH keys into the native ssh-agent at login, so git/ssh
+    # auth works without manually running `pass-cli ssh-agent load` (keys
+    # persist in the agent for the whole login session). SSH_AUTH_SOCK is
+    # inherited from the launchd user domain.
+    # ponytail: RunAtLoad only, no retry — if login races the network and
+    # loading fails, add KeepAlive.SuccessfulExit = false; check /tmp logs.
+    launchd.user.agents.pass-cli-ssh-agent-load = {
+      serviceConfig = {
+        Label = "com.fredrik.pass-cli-ssh-agent-load";
+        ProgramArguments = [
+          "/opt/homebrew/bin/pass-cli"
+          "ssh-agent"
+          "load"
+          "--vault-name"
+          "Personal"
+        ];
+        RunAtLoad = true;
+        StandardOutPath = "/tmp/pass-cli-ssh-agent-load.log";
+        StandardErrorPath = "/tmp/pass-cli-ssh-agent-load.err";
+      };
+    };
+
     nix.settings.experimental-features = "nix-command flakes";
 
     # Home-manager configuration

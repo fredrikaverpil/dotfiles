@@ -88,6 +88,9 @@ function zsh_completion() {
 	zstyle ':completion:*:*:make:*' tag-order 'targets'
 	zstyle ':completion:*:make:*:targets' call-command true
 
+  # mkdir -p ~/.zfunc
+  # pass-cli completions zsh > ~/.zfunc/_pass-cli
+
 	autoload -Uz compinit
 	compinit
 }
