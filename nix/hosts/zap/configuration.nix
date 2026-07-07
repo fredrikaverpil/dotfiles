@@ -60,7 +60,6 @@ in
     "cursor-cli"
 
     "cyberduck"
-    "ollama-app"
     "pgadmin4"
     "podman-desktop"
     # Disabled because the upstream app repo is archived; use EtienneLescot/openscreen instead.

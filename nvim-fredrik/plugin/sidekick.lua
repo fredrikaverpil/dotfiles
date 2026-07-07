@@ -33,9 +33,6 @@ require("lazyload").on_vim_enter(function()
         ["pi via omlx"] = {
           cmd = { "omlx", "launch", "pi", "--continue" },
         },
-        ["pi via ollama"] = {
-          cmd = { "ollama", "launch", "pi", "--", "--continue" },
-        },
       },
     },
   })

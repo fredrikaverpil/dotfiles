@@ -47,9 +47,6 @@ in
       #   "$HOME/.local/bin/agy"
       # )
 
-      # NOTE: disabled in favor for llama.cpp
-      # (mkCurlInstaller "ollama" "Ollama" "https://ollama.com/install.sh" "$HOME/.local/bin/ollama")
-
       # OpenCode installs to ~/.opencode/bin/opencode, use --no-modify-path to prevent shell config modification
       (mkCustomInstaller "opencode" "OpenCode AI" ''
         ${pkgs.curl}/bin/curl -fsSL https://opencode.ai/install | ${pkgs.bash}/bin/bash -s -- --no-modify-path
