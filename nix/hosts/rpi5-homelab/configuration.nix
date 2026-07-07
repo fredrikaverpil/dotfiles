@@ -25,6 +25,14 @@ in {
 
   nixpkgs.hostPlatform = "aarch64-linux";
 
+  # Keep the legacy Raspberry Pi kernelboot behavior for now. The replacement
+  # `kernel` bootloader stores NixOS generations under /boot/firmware/nixos;
+  # upstream installer images use a 1024M firmware partition for that, while
+  # this host currently declares a 512M firmware partition in hardware.nix.
+  # Revisit migrating to `kernel` after checking/resizing /boot/firmware or
+  # lowering boot.loader.raspberry-pi.configurationLimit.
+  boot.loader.raspberry-pi.bootloader = "kernelboot-legacy-unsupported";
+
   time.timeZone = "Europe/Stockholm";
 
   host.users = {
@@ -47,7 +55,6 @@ in {
 
   # Wireless network configuration
   # Use NetworkManager with wpa_supplicant backend for better Pi stability under load
-  networking.wireless.enable = false; # Let NetworkManager handle WiFi
   networking.wireless.iwd.enable = false; # Disable iwd (less stable on Pi under load)
   networking.networkmanager = {
     enable = true;
@@ -343,7 +350,7 @@ in {
   # These tags help identify the system variant and configuration
   # Following the nixos-raspberrypi project conventions
   system.nixos.tags = let
-    cfg = config.boot.loader.raspberryPi;
+    cfg = config.boot.loader.raspberry-pi;
   in [
     "raspberry-pi-${cfg.variant}" # e.g., "raspberry-pi-5"
     cfg.bootloader # Bootloader type

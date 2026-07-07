@@ -44,7 +44,7 @@
         [
           {nixpkgs.overlays = [(import ../shared/overlays)];}
           inputs.disko.nixosModules.disko
-          inputs.home-manager.nixosModules.home-manager # stable pkgs
+          inputs.home-manager-rpi.nixosModules.home-manager # follows nixos-raspberrypi's nixpkgs
           ./users.nix
           ../shared/system/common.nix
           ../shared/system/linux.nix

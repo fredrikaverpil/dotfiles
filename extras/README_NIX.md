@@ -108,13 +108,28 @@ sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- sw
 ### Package sources
 
 The intent here is to follow "unstable" sources on development machines, but
-remain "stable" on e.g. production servers.
+keep servers anchored to a single, deliberately updated version source. The
+Raspberry Pi is anchored to the `nixos-raspberrypi` input: its nixpkgs,
+home-manager (`home-manager-rpi`) and disko all follow the nixpkgs pinned by
+that flake, so Darwin-motivated input updates cannot move the Pi, and kernel
+builds hit the nixos-raspberrypi.cachix.org binary cache.
 
-| Component    | macOS Source           | Linux Source    | Rationale                    |
-| ------------ | ---------------------- | --------------- | ---------------------------- |
-| nixpkgs      | nixpkgs-unstable       | nixpkgs (25.05) | macOS: latest, Linux: stable |
-| home-manager | master (unstable)      | release-25.05   | macOS: latest, Linux: stable |
-| nix-darwin   | master (uses unstable) | -               | Always latest features       |
+| Component    | macOS Source           | Raspberry Pi Source                       | Rationale                            |
+| ------------ | ---------------------- | ----------------------------------------- | ------------------------------------ |
+| nixpkgs      | nixpkgs-unstable       | nixos-raspberrypi's pin (nixos-25.11)     | macOS: latest, Pi: one version anchor |
+| home-manager | master (unstable)      | release-25.11 (matches the pin)           | macOS: latest, Pi: one version anchor |
+| nix-darwin   | master (uses unstable) | -                                         | Always latest features               |
+
+The stable `nixpkgs` input (nixos-26.05) is only used for the Linux
+formatters and the `n` registry shortcut — not for any system.
+
+RPi bootloader note: `nixos-raspberrypi` deprecates `kernelboot` in favor
+of the newer generational `kernel` bootloader. `rpi5-homelab` currently
+sets `boot.loader.raspberry-pi.bootloader = "kernelboot-legacy-unsupported"`
+to preserve the existing boot layout. Migrate to `kernel` only after checking
+or resizing `/boot/firmware`: the `kernel` bootloader stores generations under
+`/boot/firmware/nixos`, and upstream installer images use a 1024M firmware
+partition while this host currently declares 512M in `hardware.nix`.
 
 Registry shortcuts:
 
@@ -128,7 +143,7 @@ nix shell u#nodejs_22
 
 ## Troubleshooting
 
-### Update stable vs unstable
+### Update inputs
 
 By default, `./rebuild.sh` aims to be "reproducible" and uses the locked
 `flake.lock`. Use `--update-unstable` to update Darwin-related inputs, or
@@ -139,9 +154,17 @@ By default, `./rebuild.sh` aims to be "reproducible" and uses the locked
 ./rebuild.sh --update-unstable
 # Or manually (flake inputs only): nix flake update nixpkgs-unstable nix-darwin home-manager-unstable dotfiles
 
-# Update only stable/Linux-related inputs
-nix flake update nixpkgs home-manager nixos-raspberrypi disko
+# Update only Raspberry Pi-related inputs
+nix flake update nixos-raspberrypi home-manager-rpi disko
 ```
+
+When updating `nixos-raspberrypi`:
+
+1. Verify that the re-locked `nixpkgs` node in `flake.lock` matches the rev
+   pinned in nixos-raspberrypi's own `flake.lock` (Nix may re-resolve the
+   branch head instead, which breaks binary cache hits for the kernel).
+2. If their pin moved to a new NixOS release, bump the `home-manager-rpi`
+   branch in `flake.nix` to the matching release.
 
 ### macOS permissions
 

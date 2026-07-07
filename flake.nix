@@ -15,16 +15,21 @@
 
   inputs = {
     # Mixed stability approach:
-    # - Linux/NixOS: Uses stable (nixos-26.05 + home-manager/release-26.05)
+    # - Raspberry Pi/NixOS: Anchored to nixos-raspberrypi's pinned nixpkgs
+    #   (home-manager-rpi + disko follow that pin)
     # - Darwin/macOS: Uses unstable (nixpkgs-unstable + home-manager-unstable + nix-darwin)
     #
     # Rationale: Darwin ecosystem moves faster, benefits from latest packages.
-    # Linux systems prioritize stability.
+    # The Pi has a single version anchor (the nixos-raspberrypi input), so
+    # Darwin-motivated input updates cannot break the Pi, and kernel builds
+    # hit the nixos-raspberrypi.cachix.org binary cache.
     #
     # Version alignment references:
     # - home-manager releases: https://github.com/nix-community/home-manager/releases
     # - Darwin state versions: https://github.com/LnL7/nix-darwin/blob/master/modules/system/default.nix
 
+    # Stable nixpkgs: used for the Linux formatters and the `n` nix registry
+    # entry — NOT for the Pi system (which uses nixos-raspberrypi's pin).
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     # nixos-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -32,14 +37,20 @@
       url = "github:LnL7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    # NOTE: Do NOT make nixos-raspberrypi follow another nixpkgs: the Pi
+    # system is instantiated from its pinned nixpkgs, and the upstream binary
+    # cache only serves kernels built against that pin.
     nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
     disko = {
       url = "github:nix-community/disko";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
-    home-manager = {
-      url = "github:nix-community/home-manager/release-26.05";
-      inputs.nixpkgs.follows = "nixpkgs";
+    home-manager-rpi = {
+      # NOTE: The branch must match the release of nixos-raspberrypi's pinned
+      # nixpkgs (check `nixpkgs.original.ref` under the nixos-raspberrypi node
+      # in flake.lock). Bump this branch when updating nixos-raspberrypi.
+      url = "github:nix-community/home-manager/release-25.11";
+      inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
     home-manager-unstable = {
       url = "github:nix-community/home-manager/master";
@@ -60,8 +71,9 @@
       unstable = inputs.nixpkgs-unstable.legacyPackages;
       # NOTE: All dev shells use unstable nixpkgs, regardless of platform.
       # This intentionally diverges from the mixed-stability policy for system
-      # builds (Linux = stable, Darwin = unstable): dev shells are for local
-      # toolchain work and benefit from latest packages on every platform.
+      # builds (Pi = nixos-raspberrypi's pin, Darwin = unstable): dev shells
+      # are for local toolchain work and benefit from latest packages on
+      # every platform.
       mkDevShells = system: {
         default = unstable.${system}.mkShell {
           packages = [
