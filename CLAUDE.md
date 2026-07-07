@@ -40,7 +40,10 @@ and **GNU Stow** for dotfile symlinking.
 
 ### Nix Architecture Patterns
 
-- **Mixed stability**: Darwin uses unstable nixpkgs, Linux uses stable (25.05)
+- **Mixed stability**: Darwin uses unstable nixpkgs; the Raspberry Pi is
+  anchored to the nixpkgs pinned by the `nixos-raspberrypi` input (its
+  nixpkgs, `home-manager-rpi` and `disko` all follow that pin — do not make
+  them follow another nixpkgs, or kernel binary cache hits are lost)
 - **Configuration helpers**: Use `lib.mkDarwin` and `lib.mkRpiNixos` functions from
   `nix/lib/`
 - **Host discovery**: Configurations auto-match hostname from
