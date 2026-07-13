@@ -118,10 +118,12 @@ reading the whole file.
 
 Use the "golang-style" skill.
 
-## Npm and bun
+## Npm and deno
 
-- Always prefer `bun` (or `bunx`) over `npm` (or `npmx`), unless the project
-  explicitly already uses Node/npm.
+- Always prefer `deno` over `npm`, unless the project explicitly already uses
+  Node/npm or Bun.
+- For one-off npm CLI runs, use `deno run -A npm:<pkg>` instead of `npx` or
+  `bunx`.
 
 ## Python
 

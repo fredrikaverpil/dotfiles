@@ -23,9 +23,11 @@
       "env": {}
     },
     "playwright": {
-      "command": "bunx",
+      "command": "deno",
       "args": [
-        "@playwright/mcp@latest"
+        "run",
+        "-A",
+        "npm:@playwright/mcp@latest"
       ]
     }
   },

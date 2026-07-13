@@ -8,7 +8,7 @@ require("lazyload").on_vim_enter(function()
     filetype = {
       elixir = { "elixir" },
       go = { "go run" },
-      typescript = { "bun" },
+      typescript = { "deno run -A" },
       zig = { "zig run" },
     },
   })
