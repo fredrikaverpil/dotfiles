@@ -8,6 +8,7 @@
 }:
 let
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+  llmAgents = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
 
   # Bob's neovim proxy (~/.local/share/bob/nvim-bin/nvim) is a copy of the bob
   # binary and inherits its permissions. The Nix-store bob is read-only, so the
@@ -54,11 +55,7 @@ in
     ];
 
     # npm packages via bun (macOS only, mergeable across config levels)
-    packageTools.npmPackages = [
-      "@google/gemini-cli"
-      "@openai/codex"
-      "@earendil-works/pi-coding-agent"
-    ];
+    packageTools.npmPackages = [ ];
 
     # Python CLI tools via uv (mergeable across config levels)
     packageTools.uvTools = [
@@ -187,6 +184,12 @@ in
       llama-cpp
       slides
       chafa # Required for showing images in slides
+
+      # AI coding agents from the llm-agents flake input (see flake.nix).
+      # Update via `./rebuild.sh --update-unstable` (or --update).
+      llmAgents.codex # @openai/codex
+      llmAgents.gemini-cli # @google/gemini-cli
+      llmAgents.pi # @earendil-works/pi-coding-agent
 
       # ========================================================================
       # Infrastructure & Cloud
