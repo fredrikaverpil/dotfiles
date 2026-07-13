@@ -143,6 +143,7 @@ in
       # ========================================================================
       # Language-specific
       uv
+      unstable.deno # JS/TS runtime; also installs/runs the npm-managed CLI tools
 
       # Generic development
       bfs

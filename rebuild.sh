@@ -31,8 +31,8 @@ while [[ $# -gt 0 ]]; do
 		echo ""
 		echo "Options:"
 		echo "  --stow             Use Stow-only mode (bypass Nix, dotfiles only)"
-		echo "  --update           Update ALL flake inputs + uv tools + bun packages before rebuilding"
-		echo "  --update-unstable  Update unstable flake inputs + uv tools + bun packages before rebuilding"
+		echo "  --update           Update ALL flake inputs + uv tools + npm tools before rebuilding"
+		echo "  --update-unstable  Update unstable flake inputs + uv tools + npm tools before rebuilding"
 		echo "  --help             Show this help message"
 		exit 0
 		;;
@@ -93,7 +93,8 @@ use_nix() {
 		exit 1
 	fi
 
-	# Upgrade package-managed tools when updating (after rebuild so uv/bun are available)
+	# Upgrade package-managed tools when updating (after rebuild so the
+	# upgrade helpers are available)
 	if [[ "$UPDATE_FLAKE" == "true" || "$UPDATE_UNSTABLE" == "true" ]]; then
 		if command -v uv &>/dev/null; then
 			echo ""
@@ -101,10 +102,10 @@ use_nix() {
 			uv tool upgrade --all
 		fi
 
-		if command -v bun &>/dev/null; then
+		if command -v npm-tools-upgrade &>/dev/null; then
 			echo ""
-			echo "📦 Upgrading npm packages..."
-			bun update -g
+			echo "📦 Upgrading npm tools..."
+			npm-tools-upgrade
 		fi
 	fi
 

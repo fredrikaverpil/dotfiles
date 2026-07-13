@@ -1,27 +1,29 @@
 # Package-managed CLI tools module
-# Handles installation of tools managed by bun (npm) and uv (Python).
+# Handles installation of tools managed by deno (npm) and uv (Python).
 #
 # Unlike self-managed CLIs (which install once and self-update), these tools
 # require explicit upgrades via rebuild.sh --update-unstable or --update.
 #
-# npm tools (bun):
+# npm tools (deno):
 #   - Declared via packageTools.npmPackages option (mergeable per-host/platform)
-#   - Each package installed globally via `bun install -g` (isolated in ~/.bun/)
-#   - Binaries symlinked to ~/.bun/bin/ (added to PATH by this module)
-#   - macOS only (npm binaries have dynamic linking issues on NixOS)
-#   - Upgrade: npm-tools/install.sh --upgrade (runs bun update -g)
+#   - Each package installed globally via `deno install --global npm:<pkg>`
+#     (isolated in ~/.deno/)
+#   - Shims placed in ~/.deno/bin/ (added to PATH by this module)
+#   - macOS only for now (Linux support pending validation)
+#   - Upgrade: rebuild.sh --update-unstable or --update (runs the generated
+#     npm-tools-upgrade script)
 #
 # Python tools (uv):
 #   - Declared via packageTools.uvTools option (mergeable per-host/platform)
 #   - Each tool gets its own isolated venv (managed by uv tool)
 #   - Binaries symlinked to ~/.local/bin/ (already on PATH)
-#   - Upgrade: uv-tools/install.sh --upgrade (runs uv tool upgrade --all)
+#   - Upgrade: rebuild.sh --update-unstable or --update (runs uv tool upgrade --all)
 #
 # Usage:
 #   # In any config level (common.nix, darwin.nix, host/users/user.nix):
 #   packageTools.npmPackages = [
-#     "@google/gemini-cli"
-#     "@openai/codex"
+#     { package = "@google/gemini-cli"; bin = "gemini"; }
+#     { package = "@openai/codex"; bin = "codex"; }
 #   ];
 #   packageTools.uvTools = [
 #     { package = "sqlit-tui"; }
@@ -38,16 +40,28 @@
 let
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
 
-  # Generate bun install -g commands from the merged npm packages option
-  npmInstallScript = lib.concatMapStringsSep "\n" (pkg: ''
-    if ${unstable.bun}/bin/bun pm bin -g &>/dev/null && \
-       [[ -f "$(${unstable.bun}/bin/bun pm bin -g)/${lib.last (lib.splitString "/" pkg)}" ]]; then
-      echo "Already installed: ${pkg}"
+  # Generate deno install commands from the merged npm packages option
+  npmInstallScript = lib.concatMapStringsSep "\n" (tool: ''
+    if [[ -f "$HOME/.deno/bin/${tool.bin}" ]]; then
+      echo "Already installed: ${tool.package}"
     else
-      echo "Installing ${pkg}..."
-      ${unstable.bun}/bin/bun install -g "${pkg}" || echo "Warning: Failed to install ${pkg}"
+      echo "Installing ${tool.package}..."
+      ${unstable.deno}/bin/deno install --global --allow-all --force \
+        --name "${tool.bin}" "npm:${tool.package}" \
+        || echo "Warning: Failed to install ${tool.package}"
     fi
   '') config.packageTools.npmPackages;
+
+  # Upgrade helper for rebuild.sh --update-unstable/--update: deno has no
+  # equivalent of `bun update -g`, so force-reinstall every declared package
+  # at its latest version (--reload bypasses the cached registry response).
+  npmUpgradeScript = pkgs.writeShellScriptBin "npm-tools-upgrade" (
+    lib.concatMapStringsSep "\n" (tool: ''
+      echo "Upgrading ${tool.package}..."
+      ${unstable.deno}/bin/deno install --global --allow-all --force --reload \
+        --name "${tool.bin}" "npm:${tool.package}"
+    '') config.packageTools.npmPackages
+  );
 
   # Generate uv tool install commands from the merged uv tools option
   uvToolInstallScript = lib.concatMapStringsSep "\n" (
@@ -73,15 +87,35 @@ in
 {
   options.packageTools = {
     npmPackages = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            package = lib.mkOption {
+              type = lib.types.str;
+              description = "npm package name (e.g., '@google/gemini-cli')";
+              example = "@google/gemini-cli";
+            };
+            bin = lib.mkOption {
+              type = lib.types.str;
+              description = ''
+                Executable name the package provides (its package.json "bin" entry).
+                Used to name the deno shim and to detect existing installs.
+              '';
+              example = "gemini";
+            };
+          };
+        }
+      );
       default = [ ];
       description = ''
-        npm packages to install globally via bun. Declarations merge across config levels.
-        macOS only (npm binaries have dynamic linking issues on NixOS).
+        npm packages to install globally via deno. Declarations merge across config levels.
+        macOS only for now (Linux support pending validation).
       '';
       example = [
-        "@google/gemini-cli"
-        "@openai/codex"
+        {
+          package = "@google/gemini-cli";
+          bin = "gemini";
+        }
       ];
       apply = lib.unique;
     };
@@ -123,10 +157,14 @@ in
   };
 
   config = {
-    # Add global bun bin directory to PATH (macOS only)
-    # Linux/NixOS: npm binaries have dynamic linking issues and won't run
+    # Add deno's global shim directory to PATH (macOS only for now)
     home.sessionPath = lib.optionals pkgs.stdenv.isDarwin [
-      "$HOME/.bun/bin"
+      "$HOME/.deno/bin"
+    ];
+
+    # Upgrade helper invoked by rebuild.sh --update-unstable/--update
+    home.packages = lib.optionals (pkgs.stdenv.isDarwin && config.packageTools.npmPackages != [ ]) [
+      npmUpgradeScript
     ];
 
     # Install package-managed tools on activation (install-if-missing, no upgrades)
@@ -135,7 +173,7 @@ in
       # --- uv tools (Python CLI tools, all platforms) ---
       ${uvToolInstallScript}
 
-      # --- npm tools via bun (macOS only) ---
+      # --- npm tools via deno (macOS only for now) ---
       CURRENT_PLATFORM="$(uname -s)"
       if [[ "$CURRENT_PLATFORM" == "Darwin" ]]; then
         ${npmInstallScript}
