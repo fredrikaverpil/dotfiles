@@ -53,6 +53,11 @@ and **GNU Stow** for dotfile symlinking.
 - **Self-managed CLIs**: Tools with native installers that auto-update (e.g.,
   Claude Code) are declared in `selfManagedCLIs` lists at any config level
   (common, platform-specific, or user-specific)
+- **LLM agent CLIs**: Packaged agents (codex, gemini-cli, pi, ...) come from
+  the `llm-agents` flake input (numtide/llm-agents.nix) and are added to
+  `home.packages` in `nix/shared/home/common.nix`. Do not make this input
+  follow another nixpkgs — it is built/cached against its own pin
+  (cache.numtide.com). Update via `./rebuild.sh --update-unstable`
 
 ### Self-Managed CLIs
 
