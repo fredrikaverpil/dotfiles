@@ -210,7 +210,6 @@ in
     home.file.".config/nvim-deps-path".text = lib.makeBinPath (
       with unstable;
       [
-        bun
         cmake
         beamPackages.elixir
         gcc
