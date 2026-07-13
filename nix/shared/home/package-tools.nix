@@ -9,7 +9,6 @@
 #   - Each package installed globally via `deno install --global npm:<pkg>`
 #     (isolated in ~/.deno/)
 #   - Shims placed in ~/.deno/bin/ (added to PATH by this module)
-#   - macOS only for now (Linux support pending validation)
 #   - Upgrade: rebuild.sh --update-unstable or --update (runs the generated
 #     npm-tools-upgrade script)
 #
@@ -109,7 +108,6 @@ in
       default = [ ];
       description = ''
         npm packages to install globally via deno. Declarations merge across config levels.
-        macOS only for now (Linux support pending validation).
       '';
       example = [
         {
@@ -157,13 +155,13 @@ in
   };
 
   config = {
-    # Add deno's global shim directory to PATH (macOS only for now)
-    home.sessionPath = lib.optionals pkgs.stdenv.isDarwin [
+    # Add deno's global shim directory to PATH
+    home.sessionPath = [
       "$HOME/.deno/bin"
     ];
 
     # Upgrade helper invoked by rebuild.sh --update-unstable/--update
-    home.packages = lib.optionals (pkgs.stdenv.isDarwin && config.packageTools.npmPackages != [ ]) [
+    home.packages = lib.optionals (config.packageTools.npmPackages != [ ]) [
       npmUpgradeScript
     ];
 
@@ -173,11 +171,8 @@ in
       # --- uv tools (Python CLI tools, all platforms) ---
       ${uvToolInstallScript}
 
-      # --- npm tools via deno (macOS only for now) ---
-      CURRENT_PLATFORM="$(uname -s)"
-      if [[ "$CURRENT_PLATFORM" == "Darwin" ]]; then
-        ${npmInstallScript}
-      fi
+      # --- npm tools via deno (all platforms) ---
+      ${npmInstallScript}
     '';
   };
 }

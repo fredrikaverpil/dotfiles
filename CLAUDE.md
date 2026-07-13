@@ -147,8 +147,6 @@ For each language, consult the corresponding file in
 
 ## Gotchas
 
-- **npm packages are macOS-only**: `packageTools.npmPackages` has dynamic
-  linking issues on NixOS — only add npm tools in Darwin configs
 - **Neovim is managed by Bob**, not nixpkgs — binary is at
   `~/.local/share/bob/nvim-bin/nvim`
 - **`stow/` changes take effect immediately** (just re-run
