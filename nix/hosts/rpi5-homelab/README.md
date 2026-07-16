@@ -257,6 +257,31 @@ tailscale status
   running as a systemd service (`hermes:hermes`, state in `/var/lib/hermes`),
   configured for Anthropic (default), OpenAI, and the local ollama endpoint
 
+#### Design
+
+- **Upstream NixOS module, managed mode**: the service comes from the
+  `hermes-agent` flake input's `nixosModules.default`. Hermes detects this
+  ("managed mode") and blocks `hermes setup` / `hermes config set` on the
+  host — all configuration is declarative in `llm.nix`, deep-merged into
+  `$HERMES_HOME/config.yaml` on each rebuild.
+- **Own nixpkgs pin**: the input does not `follow` another nixpkgs. It is a
+  uv2nix workspace built against upstream's pin; overriding it is untested
+  upstream and would rebuild the whole Python closure. Same anchoring
+  rationale as the `nixos-raspberrypi` input — but note this host service
+  (unlike the base system) is updated via `./rebuild.sh --update-unstable`.
+- **Secrets stay on the host**: API keys are read from
+  `/etc/hermes/secrets.env`, a manually placed file — the same pattern as
+  `/etc/cloudflared/tunnel.json`. `config.yaml` only contains `${VAR}`
+  references, so no secret ever enters the repo or the nix store.
+- **Network model**: nothing new is exposed. The firewall already trusts
+  `tailscale+` interfaces, so both `hermes` (via SSH) and the ollama endpoint
+  are reachable from the tailnet without opening LAN ports; port `11434` is
+  deliberately absent from `allowedTCPPorts`. Mobile access is intended to go
+  through Hermes' outbound messaging gateway rather than inbound ports.
+- **Local vs cloud**: Anthropic is the daily-driver default; the local ollama
+  provider exists for experimentation, since CPU-only inference on the Pi is
+  slow (see note below).
+
 #### One-time: API keys
 
 Keys are kept out of the repo/nix store (same pattern as the Cloudflare tunnel
