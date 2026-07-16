@@ -63,6 +63,13 @@
     # cached against its own pinned nixpkgs-unstable, and cache.numtide.com
     # only serves those builds.
     llm-agents.url = "github:numtide/llm-agents.nix";
+    # Hermes Agent (NousResearch): NixOS module + packages for the agent
+    # service on rpi5-homelab (see nix/hosts/rpi5-homelab/llm.nix).
+    # NOTE: Do NOT make this follow another nixpkgs: the package set is a
+    # uv2nix workspace built against upstream's own nixpkgs-unstable pin;
+    # overriding the pin is untested upstream and would rebuild the whole
+    # Python closure without any binary cache hits.
+    hermes-agent.url = "github:NousResearch/hermes-agent";
     dotfiles = {
       # Used by home-manager for dotfiles bootstrapping.
       url = "github:fredrikaverpil/dotfiles";

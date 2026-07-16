@@ -58,6 +58,12 @@ and **GNU Stow** for dotfile symlinking.
   `home.packages` in `nix/shared/home/common.nix`. Do not make this input
   follow another nixpkgs — it is built/cached against its own pin
   (cache.numtide.com). Update via `./rebuild.sh --update-unstable`
+- **Hermes Agent on rpi5-homelab**: The `hermes-agent` flake input
+  (NousResearch/hermes-agent) provides `nixosModules.default`, wired up in
+  `nix/hosts/rpi5-homelab/llm.nix` together with `services.ollama` for local
+  models. Do not make this input follow another nixpkgs (uv2nix workspace
+  built against its own pin). API keys live in `/etc/hermes/secrets.env` on
+  the host, never in the repo. Update via `./rebuild.sh --update-unstable`
 
 ### Self-Managed CLIs
 

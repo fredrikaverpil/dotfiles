@@ -65,7 +65,7 @@ use_nix() {
 	# Update only unstable inputs if requested
 	elif [[ "$UPDATE_UNSTABLE" == "true" ]]; then
 		echo "🔄 Updating unstable inputs..."
-		nix flake update nixpkgs-unstable nix-darwin home-manager-unstable llm-agents dotfiles
+		nix flake update nixpkgs-unstable nix-darwin home-manager-unstable llm-agents hermes-agent dotfiles
 		echo "✅ Unstable inputs updated!"
 	fi
 

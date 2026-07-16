@@ -247,6 +247,74 @@ tailscale status
 - View banned IPs: `fail2ban-client status sshd`
 - Unban an IP: `fail2ban-client set sshd unbanip <IP>`
 
+### Configure Hermes Agent + local LLM
+
+`nix/hosts/rpi5-homelab/llm.nix` runs two services:
+
+- **ollama** — serves local models over an OpenAI-compatible API on port
+  `11434` (reachable from Tailscale machines only, not the LAN)
+- **hermes-agent** — [Hermes Agent](https://hermes-agent.nousresearch.com/)
+  running as a systemd service (`hermes:hermes`, state in `/var/lib/hermes`),
+  configured for Anthropic (default), OpenAI, and the local ollama endpoint
+
+#### One-time: API keys
+
+Keys are kept out of the repo/nix store (same pattern as the Cloudflare tunnel
+token). Create the secrets file on the Pi before (or after) rebuilding:
+
+```sh
+sudo mkdir -p /etc/hermes
+sudo install -m 600 /dev/null /etc/hermes/secrets.env
+sudoedit /etc/hermes/secrets.env
+```
+
+```ini
+ANTHROPIC_API_KEY=sk-ant-...
+OPENAI_API_KEY=sk-...
+```
+
+A missing file is skipped at activation, so rebuilds work either way — but
+cloud models won't respond until the keys exist and you've re-run
+`./rebuild.sh` (activation merges the file into `$HERMES_HOME/.env`).
+
+#### Usage
+
+```sh
+# From any machine on the tailnet
+ssh fredrik@rpi5-homelab
+
+hermes            # interactive CLI, attaches to the service state
+hermes version
+```
+
+Inside a session, switch models with `/model` — e.g. an OpenAI model or the
+local ollama model. The daily driver default (`claude-sonnet-5`) is set
+declaratively in `llm.nix`; note that `hermes setup` / `hermes config set` are
+intentionally blocked (managed mode) — edit `llm.nix` and rebuild instead.
+
+The local endpoint also works from other Tailscale machines, e.g.:
+
+```sh
+curl http://rpi5-homelab:11434/v1/models
+```
+
+> [!NOTE]
+>
+> Local inference on the Pi 5 is CPU-only and slow (a few tokens/s on a 4B
+> model) — treat it as an experiment; the cloud providers are the practical
+> default. For phone access, the nicest path is Hermes' messaging gateway
+> (Telegram/Discord/...): add `"messaging"` to `extraDependencyGroups` plus a
+> bot token in `/etc/hermes/secrets.env` — it connects outbound, so no ports
+> or Tailscale needed on the phone.
+
+#### Monitoring
+
+```sh
+sudo systemctl status hermes-agent ollama
+sudo journalctl -u hermes-agent -f
+ollama ps  # loaded models
+```
+
 ### Configure Cloudflare Tunnel
 
 The homelab uses Cloudflare Tunnel to securely expose services like Immich to

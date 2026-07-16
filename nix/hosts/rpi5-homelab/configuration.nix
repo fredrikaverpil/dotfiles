@@ -9,7 +9,10 @@
     nixos = "25.05";
   };
 in {
-  imports = [./restic.nix];
+  imports = [
+    ./restic.nix
+    ./llm.nix
+  ];
 
   # NixOS state version "25.05" - defines system configuration schema/compatibility
   # See flake.nix for actual package channel selection (stable vs unstable)
