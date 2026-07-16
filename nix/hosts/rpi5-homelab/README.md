@@ -251,11 +251,13 @@ tailscale status
 
 `nix/hosts/rpi5-homelab/llm.nix` runs two services:
 
-- **ollama** — serves local models over an OpenAI-compatible API on port
-  `11434` (reachable from Tailscale machines only, not the LAN)
+- **llama-cpp** — serves
+  [Ternary Bonsai 27B](https://prismml.com/news/bonsai-27b) (PrismML's
+  ternary-weight build of Qwen3.6-27B, ~7.2 GB GGUF) over an OpenAI-compatible
+  API on port `8080` (reachable from Tailscale machines only, not the LAN)
 - **hermes-agent** — [Hermes Agent](https://hermes-agent.nousresearch.com/)
   running as a systemd service (`hermes:hermes`, state in `/var/lib/hermes`),
-  configured for Anthropic (default), OpenAI, and the local ollama endpoint
+  configured for Anthropic (default), OpenAI, and the local Bonsai endpoint
 
 #### Design
 
@@ -274,13 +276,24 @@ tailscale status
   `/etc/cloudflared/tunnel.json`. `config.yaml` only contains `${VAR}`
   references, so no secret ever enters the repo or the nix store.
 - **Network model**: nothing new is exposed. The firewall already trusts
-  `tailscale+` interfaces, so both `hermes` (via SSH) and the ollama endpoint
-  are reachable from the tailnet without opening LAN ports; port `11434` is
-  deliberately absent from `allowedTCPPorts`. Mobile access is intended to go
-  through Hermes' outbound messaging gateway rather than inbound ports.
-- **Local vs cloud**: Anthropic is the daily-driver default; the local ollama
-  provider exists for experimentation, since CPU-only inference on the Pi is
-  slow (see note below).
+  `tailscale+` interfaces, so both `hermes` (via SSH) and the llama.cpp
+  endpoint are reachable from the tailnet without opening LAN ports; port
+  `8080` is deliberately absent from `allowedTCPPorts`. Mobile access is
+  intended to go through Hermes' outbound messaging gateway rather than
+  inbound ports.
+- **Why llama.cpp (not ollama) for the local model**: Bonsai's ternary
+  `Q2_0` GGUF needs a very recent llama.cpp; ollama's vendored llama.cpp
+  can't load it. The `llama-cpp` package comes from `nixpkgs-unstable`
+  (established pattern in this repo) since the Pi's pinned nixpkgs predates
+  ternary support — an app-level exception that doesn't affect the base
+  system's anchoring. The model file itself is downloaded manually to
+  `/var/lib/llama-cpp/` (7 GB doesn't belong in the nix store), and the
+  service has a `ConditionPathExists` guard so it won't crash-loop before
+  the download — same pattern as the cloudflared tunnel token.
+- **Local vs cloud**: Anthropic is the daily-driver default; local Bonsai is
+  for experimentation and tailnet-private inference. Ternary weights make a
+  27B-class model feasible in 16 GB, but CPU-only decode on the Pi is slow
+  (see note below).
 
 #### One-time: API keys
 
@@ -302,6 +315,23 @@ A missing file is skipped at activation, so rebuilds work either way — but
 cloud models won't respond until the keys exist and you've re-run
 `./rebuild.sh` (activation merges the file into `$HERMES_HOME/.env`).
 
+#### One-time: download the Bonsai model
+
+The llama-cpp service expects the GGUF at
+`/var/lib/llama-cpp/ternary-bonsai-27b.gguf` and stays inactive
+(`ConditionPathExists`) until it's there:
+
+```sh
+sudo mkdir -p /var/lib/llama-cpp
+
+# Check the exact .gguf filename in the HF repo first:
+# https://huggingface.co/prism-ml/Ternary-Bonsai-27B-gguf/tree/main
+sudo curl -L -o /var/lib/llama-cpp/ternary-bonsai-27b.gguf \
+  "https://huggingface.co/prism-ml/Ternary-Bonsai-27B-gguf/resolve/main/<file>.gguf"
+
+sudo systemctl restart llama-cpp
+```
+
 #### Usage
 
 ```sh
@@ -313,31 +343,33 @@ hermes version
 ```
 
 Inside a session, switch models with `/model` — e.g. an OpenAI model or the
-local ollama model. The daily driver default (`claude-sonnet-5`) is set
+local `bonsai-27b`. The daily driver default (`claude-sonnet-5`) is set
 declaratively in `llm.nix`; note that `hermes setup` / `hermes config set` are
 intentionally blocked (managed mode) — edit `llm.nix` and rebuild instead.
 
 The local endpoint also works from other Tailscale machines, e.g.:
 
 ```sh
-curl http://rpi5-homelab:11434/v1/models
+curl http://rpi5-homelab:8080/v1/models
 ```
 
 > [!NOTE]
 >
-> Local inference on the Pi 5 is CPU-only and slow (a few tokens/s on a 4B
-> model) — treat it as an experiment; the cloud providers are the practical
-> default. For phone access, the nicest path is Hermes' messaging gateway
-> (Telegram/Discord/...): add `"messaging"` to `extraDependencyGroups` plus a
-> bot token in `/etc/hermes/secrets.env` — it connects outbound, so no ports
-> or Tailscale needed on the phone.
+> Local inference on the Pi 5 is CPU-only: expect a couple of tokens/s decode
+> and slow prompt prefill (Bonsai does ~26 tok/s on an Apple M5 Pro; the Pi
+> has a fraction of that memory bandwidth). Impressive that a 27B-class model
+> runs at all — but the cloud providers are the practical default. For phone
+> access, the nicest path is Hermes' messaging gateway (Telegram/Discord/...):
+> add `"messaging"` to `extraDependencyGroups` plus a bot token in
+> `/etc/hermes/secrets.env` — it connects outbound, so no ports or Tailscale
+> needed on the phone.
 
 #### Monitoring
 
 ```sh
-sudo systemctl status hermes-agent ollama
+sudo systemctl status hermes-agent llama-cpp
 sudo journalctl -u hermes-agent -f
-ollama ps  # loaded models
+sudo journalctl -u llama-cpp -f
 ```
 
 ### Configure Cloudflare Tunnel

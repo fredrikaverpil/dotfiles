@@ -60,10 +60,12 @@ and **GNU Stow** for dotfile symlinking.
   (cache.numtide.com). Update via `./rebuild.sh --update-unstable`
 - **Hermes Agent on rpi5-homelab**: The `hermes-agent` flake input
   (NousResearch/hermes-agent) provides `nixosModules.default`, wired up in
-  `nix/hosts/rpi5-homelab/llm.nix` together with `services.ollama` for local
-  models. Do not make this input follow another nixpkgs (uv2nix workspace
-  built against its own pin). API keys live in `/etc/hermes/secrets.env` on
-  the host, never in the repo. Update via `./rebuild.sh --update-unstable`
+  `nix/hosts/rpi5-homelab/llm.nix` together with `services.llama-cpp`
+  (llama-cpp from nixpkgs-unstable) serving Ternary Bonsai 27B as the local
+  model. Do not make this input follow another nixpkgs (uv2nix workspace
+  built against its own pin). API keys live in `/etc/hermes/secrets.env` and
+  the model GGUF in `/var/lib/llama-cpp/` on the host, never in the repo.
+  Update via `./rebuild.sh --update-unstable`
 
 ### Self-Managed CLIs
 
