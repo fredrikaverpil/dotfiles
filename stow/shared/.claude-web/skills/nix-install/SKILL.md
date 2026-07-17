@@ -53,7 +53,7 @@ from the reachable `channels.nixos.org`, so this needs no GitHub:
 
 ```bash
 TARBALL=https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz
-nix-env -iA ripgrep -f "$TARBALL"     # attribute name = nixpkgs attr path
+nix-env -f "$TARBALL" -iA ripgrep     # attribute name = nixpkgs attr path
 export PATH="$HOME/.nix-profile/bin:$PATH"
 rg --version
 ```

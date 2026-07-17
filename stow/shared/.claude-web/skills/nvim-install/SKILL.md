@@ -19,8 +19,9 @@ machine — there Neovim is managed by bob at `~/.local/share/bob/nvim-bin/nvim`
 ## Why Nix, not bob
 
 Nix installs Neovim from `*.nixos.org` (allow-listed by default), so the binary
-needs **no GitHub access** — and `nixpkgs-unstable` ships Neovim 0.12.x, which
-has both `vim.pack` and `vim._core.ui2`, exactly what `nvim-fredrik` requires.
+needs **no GitHub access** — and `nixpkgs-unstable` ships a current Neovim (0.12
+or newer), which has both `vim.pack` and `vim._core.ui2`, exactly what
+`nvim-fredrik` requires.
 bob is available too (see the end), but `bob install` downloads Neovim as a
 **GitHub release asset**, which the GitHub proxy blocks unless `neovim/neovim`
 is attached to the session — regardless of network level. So Nix is the default;
@@ -169,10 +170,13 @@ git -C /home/user/dotfiles fetch origin <pr-branch>
 git -C /home/user/dotfiles checkout <pr-branch>
 ```
 
-Then restart the headless instance so the new config is sourced:
+Then restart the headless instance so the new config is sourced. Stop the old
+instance deterministically first — a `--remote-expr` quit can race the relaunch
+below and leave the old process orphaned, still serving the previous config —
+then relaunch exactly as in Step 4:
 
 ```bash
-nvim --server "$NVIM" --remote-expr 'execute("qa!")' 2>/dev/null || true
+pkill -f 'nvim --headless --listen' 2>/dev/null || true
 rm -f "$NVIM"
 nohup nvim --headless --listen "$NVIM" >/tmp/nvim-headless.log 2>&1 &
 for i in $(seq 1 120); do
