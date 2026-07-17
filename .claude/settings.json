@@ -9,7 +9,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/sandbox-git-identity.sh"
+            "command": "if [ \"${CLAUDE_CODE_REMOTE:-}\" = \"true\" ]; then git config --global user.name 'Fredrik Averpil' && git config --global user.email 'fredrik.averpil@proton.me' && git config --global commit.gpgsign false; fi"
           }
         ]
       }
