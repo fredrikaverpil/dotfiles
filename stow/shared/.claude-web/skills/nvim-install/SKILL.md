@@ -1,80 +1,83 @@
 ---
 name: nvim-install
-description: Install Neovim and stand up the nvim-fredrik config in the Claude Code web sandbox (the cloud environment), where no Neovim exists. Use this before testing any Neovim config change in a web session, e.g. checking out a PR branch that touches nvim-fredrik and observing its runtime behavior. Downloads the nightly Neovim tarball, wires the repo's config into place, launches Neovim headless with a listen socket, and exports $NVIM so the `neovim` RPC skill can drive it. Web-sandbox only; on a real machine Neovim is managed by Bob.
+description: Install Neovim (via bob) and stand up the nvim-fredrik config in the Claude Code web sandbox (the cloud environment), where no Neovim exists. Use this before testing any Neovim config change in a web session, e.g. checking out a PR branch that touches nvim-fredrik and observing its runtime behavior. Installs bob with cargo, uses bob to install a stable or nightly Neovim, wires the repo's config into place, launches Neovim headless with a listen socket, and exports $NVIM so the `neovim` RPC skill can drive it. Web-sandbox only; on a real machine Neovim is already managed by bob.
 ---
 
 # Install Neovim in the web sandbox
 
 This skill bootstraps a real, running Neovim in the Claude Code web sandbox so
-that config changes (e.g. a PR against `nvim-fredrik`) can be exercised and
-observed. It is the missing half of the `neovim` RPC skill: that skill assumes
-a running Neovim exposed via `$NVIM`, but the sandbox has neither the binary
-nor a parent editor. This skill installs the binary, launches Neovim
+config changes (e.g. a PR against `nvim-fredrik`) can be exercised and observed.
+It is the missing half of the `neovim` RPC skill: that skill assumes a running
+Neovim exposed via `$NVIM`, but the sandbox has neither the binary nor a parent
+editor. This skill installs Neovim with **bob** (the same version manager used
+on the real machines, so stable/nightly is a one-word switch), launches Neovim
 **headless** with a listen socket, and exports `$NVIM` so every command in the
 `neovim` skill works verbatim afterwards.
 
 **Scope:** web sandbox only (`CLAUDE_CODE_REMOTE=true`). Do not run on a real
-machine — there Neovim is managed by Bob at `~/.local/share/bob/nvim-bin/nvim`.
+machine — there bob already manages Neovim at
+`~/.local/share/bob/nvim-bin/nvim`.
 
-## Step 0 — Network policy is a hard prerequisite
+## Step 0 — GitHub access is a hard prerequisite
 
-The `nvim-fredrik` config bootstraps plugins with `vim.pack.add`, which clones
-from **github.com** on first launch. Mason and treesitter fetch from GitHub
-too. The sandbox network policy is registry-only by default, so GitHub is
-**blocked** until the environment allowlists it.
+bob fetches Neovim from **github.com/neovim/neovim** (release list via
+`api.github.com`, binaries via the release asset host). In the sandbox, GitHub
+traffic is gated by the agent proxy to the **repos in this session's scope** —
+by default only this dotfiles repo. bob's calls to `neovim/neovim` are denied
+until that repo is in scope, failing with:
 
-Check reachability first:
+> ERROR Error: GitHub access to this repository is not enabled for this
+> session. Use add_repo to request access.
+
+**Enable access before continuing.** The simplest path is to bring
+`neovim/neovim` into the session scope with `add_repo` (ask Claude: *"add the
+neovim/neovim repo"* — Claude only runs `add_repo` when you ask). Alternatively,
+widen the environment's network policy / allowed hosts to include
+`github.com`, `api.github.com`, `objects.githubusercontent.com`, and
+`github-releases.githubusercontent.com`, then rebuild the environment. See
+https://code.claude.com/docs/en/claude-code-on-the-web for how network policy
+and session scope work.
+
+Preflight — once access is enabled, this lists remote versions instead of
+erroring:
 
 ```bash
-curl -sSI -o /dev/null -w "%{http_code}\n" https://github.com/neovim/neovim/releases/tag/nightly
+export PATH="$HOME/.cargo/bin:$PATH"
+bob list-remote 2>&1 | tail -5    # errors here => GitHub access still not enabled
 ```
 
-`200`/`302` → proceed. `403`/`000` → **stop.** The environment must allowlist
-these hosts before anything here can work:
+## Step 1 — Install bob (via cargo)
 
-- `github.com`
-- `objects.githubusercontent.com`
-- `raw.githubusercontent.com`
-- `github-releases.githubusercontent.com`
-
-Tell the user to add them to the environment's allowed hosts (claude.ai
-environment editor → network / allowed hosts) and rebuild the environment, then
-re-run this skill. This is an environment-config change; nothing in the repo can
-route around it. See
-https://code.claude.com/docs/en/claude-code-on-the-web for how network policy
-and allowed hosts work.
-
-## Step 1 — Install the Neovim binary (nightly)
-
-`nvim-fredrik` requires **nightly** Neovim: it uses `vim.pack.add` and
-`vim._core.ui2`, which are not in any stable release. Use the `.tar.gz`
-(no FUSE/AppImage dependency):
+The sandbox ships the Rust toolchain (`cargo`, `rustc`), and cargo can reach
+crates.io, so bob builds from source in ~90s. bob itself needs **no** GitHub
+access to install — only its later Neovim downloads do (Step 0).
 
 ```bash
-set -e
-arch="$(uname -m)"   # x86_64 in the sandbox; arm64 hosts use nvim-linux-arm64
-asset="nvim-linux-${arch}.tar.gz"
-curl -fL -o "/tmp/${asset}" \
-  "https://github.com/neovim/neovim/releases/download/nightly/${asset}"
-rm -rf /opt/nvim && mkdir -p /opt/nvim
-tar -xzf "/tmp/${asset}" -C /opt/nvim --strip-components=1
-export PATH="/opt/nvim/bin:$PATH"
+command -v bob >/dev/null || cargo install bob-nvim
+export PATH="$HOME/.cargo/bin:$PATH"
+bob --version
+```
+
+## Step 2 — Install and select a Neovim version
+
+`nvim-fredrik` requires **nightly** Neovim: it uses `vim.pack.add` and
+`vim._core.ui2`, which are not in any stable release. (For other configs, swap
+`nightly` for `stable` or a version like `v0.11.0` — that's the whole benefit
+of bob.)
+
+```bash
+bob use nightly        # installs if missing, then makes it the active version
+```
+
+bob places the active binary at `~/.local/share/bob/nvim-bin/nvim`. Add that to
+`PATH`:
+
+```bash
+export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
 nvim --version | head -1   # expect a v0.12.0-dev... nightly build
 ```
 
-(This `export` is only for the immediate check — Step 2 persists `PATH` and the
-rest so they survive across shells.)
-
-If the asset name 404s, list the release assets and pick the current Linux
-tarball name — Neovim has renamed these before (`nvim-linux64.tar.gz` →
-`nvim-linux-x86_64.tar.gz`):
-
-```bash
-curl -fL https://api.github.com/repos/neovim/neovim/releases/tags/nightly \
-  | grep -o '"name": "nvim-linux[^"]*"'
-```
-
-## Step 2 — Wire the nvim-fredrik config into place
+## Step 3 — Wire the config into place and persist the environment
 
 The config lives in the cloned repo. `NVIM_APPNAME=nvim-fredrik` makes Neovim
 read `~/.config/nvim-fredrik`, and the config expects `$DOTFILES` set (it
@@ -92,7 +95,7 @@ mkdir -p ~/.config
 ln -sfn "$repo/nvim-fredrik" ~/.config/nvim-fredrik
 
 cat > ~/.nvim-sandbox.env <<EOF
-export PATH="/opt/nvim/bin:\$PATH"
+export PATH="\$HOME/.cargo/bin:\$HOME/.local/share/bob/nvim-bin:\$PATH"
 export DOTFILES="$repo"
 export NVIM_APPNAME=nvim-fredrik
 export NVIM=/tmp/nvim-fredrik.sock
@@ -102,12 +105,12 @@ grep -qxF 'source ~/.nvim-sandbox.env' ~/.bashrc 2>/dev/null \
 source ~/.nvim-sandbox.env
 ```
 
-## Step 3 — Launch Neovim headless with a listen socket
+## Step 4 — Launch Neovim headless with a listen socket
 
 This is the bridge to the `neovim` skill. Start a backgrounded headless
-instance listening on `$NVIM` (persisted in Step 2), so the RPC skill's
+instance listening on `$NVIM` (persisted in Step 3), so the RPC skill's
 commands — which all key off `$NVIM` — work unchanged. The **first** launch
-clones all plugins via `vim.pack.add` (needs the Step 0 network access) and can
+clones all plugins via `vim.pack.add` (needs the Step 0 GitHub access) and can
 take a few minutes.
 
 ```bash
@@ -123,9 +126,9 @@ echo "NVIM socket: $NVIM"; tail -5 /tmp/nvim-headless.log
 ```
 
 If the loop times out, read `/tmp/nvim-headless.log` — plugin clone failures
-almost always mean a GitHub host is still not allowlisted (back to Step 0).
+almost always mean GitHub access is still not enabled (back to Step 0).
 
-## Step 4 — Verify and hand off to the `neovim` skill
+## Step 5 — Verify and hand off to the `neovim` skill
 
 Because `NVIM_APPNAME` is set, every `nvim --server` command prints a
 `Warning: Using NVIM_APPNAME=...` line on **stdout** that corrupts parsed
@@ -168,7 +171,7 @@ exercise a neotest/diagnostics change: open a test file, run the relevant
 command, then read the diagnostics namespace:
 
 ```bash
-nvim --server "$NVIM" --remote-expr 'luaeval("vim.json.encode(vim.diagnostic.get(0))")'
+result=$(nvim --server "$NVIM" --remote-expr 'luaeval("vim.json.encode(vim.diagnostic.get(0))")') && echo "$result" | grep -v '^Warning: Using NVIM_APPNAME='
 ```
 
 ## Caveats
@@ -180,5 +183,9 @@ nvim --server "$NVIM" --remote-expr 'luaeval("vim.json.encode(vim.diagnostic.get
   `/tmp/nvim-headless.log` and don't prevent the rest of the config loading.
 - **Headless has no UI.** Inspect state via RPC (`vim.diagnostic.get`,
   `vim.lsp.get_clients`, buffer APIs), not by looking at a screen.
-- **Ephemeral.** The install lives only for this environment's lifetime; nothing
-  is committed. Re-run the skill in a fresh environment.
+- **Ephemeral.** bob's install and the config live only for this environment's
+  lifetime; nothing is committed. Re-run the skill in a fresh environment.
+- **Fallback without bob:** if cargo/bob is unavailable, download a release
+  tarball directly (no Rust needed) — the tag selects the channel:
+  `curl -fL https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-$(uname -m).tar.gz | tar -xz -C /opt/nvim --strip-components=1`
+  (same GitHub-access prerequisite as Step 0).
