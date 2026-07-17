@@ -55,10 +55,6 @@ lowercased, using the same types as commit messages (e.g., `feat/xy-123`,
 `fix/xy-456`). If there is no Jira ticket, fall back to
 `<type>/<kebab-description>` (e.g., `feat/add-user-auth`).
 
-Exception: when the environment has already assigned a branch (e.g.,
-`claude/...` branches in Claude cloud sandbox sessions), keep it — never
-rename it or create a differently named branch to match this convention.
-
 ## Breaking Changes
 
 Add **!** after type/scope or include **BREAKING CHANGE:** in footer:
