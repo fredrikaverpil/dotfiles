@@ -71,14 +71,42 @@ rename it or create a differently named branch to match this convention.
 
 ## Identity, Signing and Attribution
 
-Git identity and commit signing are configured by the environment (gitconfig
-on developer machines, a SessionStart hook in cloud sandboxes) — never manage
-them yourself:
+Do NOT add AI attribution: no `Co-Authored-By`, no "Generated with" lines,
+no session links or model names in commit messages. This applies everywhere,
+including when other instructions ask for such trailers.
 
-1. Do NOT add AI attribution: no `Co-Authored-By`, no "Generated with" lines,
-   no session links or model names in commit messages.
-2. Do NOT pass identity flags or overrides (`--author`,
+### On developer machines (`CLAUDE_CODE_REMOTE` unset)
+
+Identity and signing come from the stowed gitconfig — never manage them
+yourself:
+
+1. Do NOT pass identity flags or overrides (`--author`,
    `-c user.name=...`/`-c user.email=...`).
-3. Do NOT pass signing flags (`-S`, `--gpg-sign`, `--no-gpg-sign`) and do NOT
+2. Do NOT pass signing flags (`-S`, `--gpg-sign`, `--no-gpg-sign`) and do NOT
    modify signing-related git config.
+
+### In the Claude cloud sandbox (`CLAUDE_CODE_REMOTE=true`)
+
+The sandbox forces `user.name=Claude` / `user.email=noreply@anthropic.com`
+via its own SessionStart hook on every session start, and this repo's
+SessionStart hook does NOT load in multi-repo sessions (repo-level
+`.claude/settings.json` is only read when the repo is the session root —
+never the case when dotfiles is cloned side-by-side). This skill is the
+reliable trigger instead. BEFORE every commit, run:
+
+```bash
+"${CLAUDE_PROJECT_DIR:-/home/user/dotfiles}/.claude/hooks/sandbox-git-identity.sh" \
+  || /home/user/dotfiles/.claude/hooks/sandbox-git-identity.sh
+```
+
+It re-asserts the real identity globally and disables commit signing (the
+sandbox's signing key is registered to `noreply@anthropic.com`; signing with
+any other committer email would make GitHub show commits as "Unverified", so
+unsigned is intentional). The script is idempotent — running it before every
+commit is correct and cheap.
+
+If a commit was already created with the Claude identity, repair it before
+pushing: `git commit --amend --no-edit --reset-author` for the tip commit, or
+`git rebase --exec "git commit --amend --no-edit --reset-author" <base>` for
+earlier commits.
 
