@@ -32,12 +32,40 @@ through all changed files and evaluate the work as a whole.
   from now by someone unfamiliar with the change?
 - **Robustness**: Is the code brittle or potentially buggy? Look for edge cases,
   race conditions, or assumptions that could break.
+- **Testability**: Can this be tested? Look for clear seams, injectable
+  dependencies, and logic separated from side effects. Hard-to-test code is a
+  design smell — flag it rather than leaving it untested.
+
+## Laziness ladder
+
+For every piece of code the change added, check it climbed no higher than
+necessary. Walk the ladder and stop at the first rung that holds:
+
+1. **Does this need to exist?** — if not, remove it (YAGNI).
+2. **Already in this codebase?** — reuse it, don't rewrite.
+3. **Standard library does it?** — use it.
+4. **Native platform feature?** — use it.
+5. **Already-installed dependency?** — use it.
+6. **One line?** — one line.
+7. **Only then**: the minimum that works.
+
+Flag anything that skipped a lower rung — a new dependency where the stdlib or a
+native feature would do, a reimplementation of something the codebase already
+has, or an abstraction with a single caller.
+
+This is about the _solution_, never about _reading_: still trace the real flow
+through the code the change touches before judging a rung. And the ladder never
+touches safety — trust-boundary and input validation, security, data-loss and
+error handling, and accessibility are out of scope for trimming.
+
+_Adapted from the "laziness ladder" in
+[ponytail](https://github.com/DietrichGebert/ponytail)._
 
 ## Process
 
 1. Identify all files you changed in this session
 2. Re-read each file in full context (not just the diff)
-3. Evaluate against the criteria above
+3. Evaluate against the criteria above and the laziness ladder
 4. If you find issues, fix them
 5. Summarize what you reviewed and any changes made
 
