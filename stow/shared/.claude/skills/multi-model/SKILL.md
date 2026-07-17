@@ -69,9 +69,15 @@ the main context lean.
 1. Ensure `/model` is Fable (or Opus) and `/effort` is high.
 2. Run the `plan-interview` skill: work back and forth with the user, leading
    with open questions and an outline before writing the plan.
-3. Write the agreed plan, settled decisions, and any open questions into
+3. **Plan the least-code solution.** Before proposing that anything be built,
+   walk the laziness ladder (defined in the `self-review` skill): does it need
+   to exist at all, and can existing code, the standard library, a native
+   feature, or an already-installed dependency do it before you write anything
+   new? Never trim safety (validation, security, error handling,
+   accessibility).
+4. Write the agreed plan, settled decisions, and any open questions into
    `MEMORY.md`.
-4. Do **not** start implementing in this phase.
+5. Do **not** start implementing in this phase.
 
 ## Phase 2 — Implement (Sonnet, orchestrator)
 
