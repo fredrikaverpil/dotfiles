@@ -125,6 +125,7 @@ source ~/.nvim-sandbox.env        # env doesn't persist across calls; re-source
 rm -f "$NVIM"
 # --headless keeps it alive as long as the socket is served; run detached.
 nohup nvim --headless --listen "$NVIM" >/tmp/nvim-headless.log 2>&1 &
+echo $! > /tmp/nvim-fredrik.pid   # record PID so a later restart can kill it
 # Wait for the socket to accept RPC (plugin cloning happens during startup).
 for i in $(seq 1 120); do
   [ -S "$NVIM" ] && nvim --server "$NVIM" --remote-expr '1' >/dev/null 2>&1 && break
@@ -152,6 +153,41 @@ all further interaction (buffer state, running Lua, inspecting diagnostics, LSP,
 plugins). Start each of those Bash calls with `source ~/.nvim-sandbox.env` too —
 the env doesn't carry over on its own.
 
+## One-shot checks (skip the persistent server)
+
+Steps 4–5 stand up a *persistent* `--listen` server so the `neovim` skill can
+drive it across turns. You only need that for interactive, multi-step work. For
+an observe-once question — *does this config change load cleanly? what does the
+formatter do to this file?* — skip the socket entirely and use a
+**self-terminating** headless run that loads the real config, does its thing,
+prints, and quits with `qa!`. It exits cleanly and sidesteps all of the
+launch/restart/socket handling (and its footguns) above. Prefer it whenever you
+don't actually need cross-turn RPC.
+
+```bash
+source ~/.nvim-sandbox.env
+# "does my config change load without error?"
+nvim --headless \
+  -c 'lua io.write("config="..vim.fn.stdpath("config").."\n")' \
+  -c 'qa!'
+```
+
+Exercising behaviour follows the same shape — open a file so its filetype
+plugins load, run the operation, print, quit:
+
+```bash
+source ~/.nvim-sandbox.env
+nvim --headless path/to/file.go \
+  -c '<command that performs the operation, e.g. runs the formatter>' \
+  -c 'lua io.write(table.concat(vim.fn.getline(1, "$"), "\n").."\n")' \
+  -c 'qa!'
+```
+
+`-c` commands run in order after startup. Opening a file fires `FileType`
+loading, but a plugin that lazy-loads on its *own* event or command only
+activates once you invoke that command — so trigger the real operation rather
+than assuming the plugin is already loaded.
+
 ## Testing a config-change PR
 
 The `nvim-fredrik` config is part of *this* repo, so a PR that changes it is
@@ -162,16 +198,32 @@ git -C /home/user/dotfiles fetch origin <pr-branch>
 git -C /home/user/dotfiles checkout <pr-branch>
 ```
 
-Then restart the headless instance so the new config is sourced. Stop the old
-instance deterministically first — a `--remote-expr` quit can race the relaunch
-below and leave the old process orphaned, still serving the previous config —
-then relaunch exactly as in Step 4:
+Then restart the headless instance so the new config is sourced. Kill the old
+instance by the PID recorded at launch and **wait until it is actually gone**
+before relaunching. Two traps make this fiddlier than it looks:
+
+- **Don't `pkill -f 'nvim --headless --listen'`.** Each Bash call runs as
+  `bash -c '<the whole script>'`, so that string is in the script shell's own
+  arguments; `pkill -f` matches and kills the script itself, which dies with a
+  `128 + signal` exit (e.g. `143`/`144`) before it ever relaunches. Killing the
+  recorded PID sidesteps the pattern entirely.
+- **Let the old process exit before reusing `$NVIM`.** A dying nvim unlinks its
+  own socket on the way out. Relaunch on the same path too soon and the old
+  instance's cleanup deletes the *new* socket — RPC then fails with "connection
+  refused" even though the new process is alive. So confirm it's gone (SIGKILL
+  as a fallback) before `rm`-ing the path and starting fresh.
 
 ```bash
 source ~/.nvim-sandbox.env
-pkill -f 'nvim --headless --listen' 2>/dev/null || true
+oldpid="$(cat /tmp/nvim-fredrik.pid 2>/dev/null)"
+if [ -n "$oldpid" ]; then
+  kill "$oldpid" 2>/dev/null || true
+  for i in $(seq 1 50); do kill -0 "$oldpid" 2>/dev/null || break; sleep 0.2; done
+  kill -9 "$oldpid" 2>/dev/null || true   # force if it ignored SIGTERM
+fi
 rm -f "$NVIM"
 nohup nvim --headless --listen "$NVIM" >/tmp/nvim-headless.log 2>&1 &
+echo $! > /tmp/nvim-fredrik.pid
 for i in $(seq 1 120); do
   [ -S "$NVIM" ] && nvim --server "$NVIM" --remote-expr '1' >/dev/null 2>&1 && break
   sleep 2
