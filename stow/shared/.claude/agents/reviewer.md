@@ -4,7 +4,7 @@ description:
   Independent second-opinion reviewer (Fable) for a risky or ambiguous diff.
   Spawn from the `smart` orchestrator when you want a fresh set of eyes
   without forming an agent team.
-tools: Read, Glob, Grep, Bash, Skill
+tools: Read, Glob, Grep, Skill
 model: fable
 effort: xhigh
 ---

@@ -113,9 +113,10 @@ yourself.**
    spawn a `researcher` (Haiku) subagent rather than doing it in the main
    context — only its summary returns.
 4. **Verify every return.** Read each worker's diff against its spec and against
-   the `self-review` criteria (placement, simplicity, DRY, YAGNI, idiom,
-   robustness). If it falls short, send precise feedback and re-delegate. Answer
-   worker questions.
+   the `self-review` criteria and its laziness ladder (placement, simplicity,
+   DRY, YAGNI, idiom, robustness, and whether the worker over-built past the
+   rung you picked). If it falls short, send precise feedback and re-delegate.
+   Answer worker questions.
 5. **Escalate, don't guess.** For ambiguous product decisions, ask the user with
    `AskUserQuestion` and record the answer in `MEMORY.md`. For a second opinion
    on a risky diff, spawn a `reviewer` (Fable) subagent.
