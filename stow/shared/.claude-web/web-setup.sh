@@ -4,16 +4,14 @@ set -e
 
 # Setup script for Claude Code on the web (the cloud sandbox).
 #
-# This is NOT run automatically by being in the repo. Register it in the cloud
-# environment's "Setup script" field (web UI: environment selector -> edit
-# environment -> Setup script) with a one-line bootstrap that calls this file:
+# Not run automatically. Add this exact command to the claude.ai environment's
+# "Setup script" field (web UI: environment selector -> edit environment):
 #
 #   bash /home/user/dotfiles/stow/shared/.claude-web/web-setup.sh || true
 #
-# The environment clones the repo before the setup script runs, so that path
-# exists. Setup scripts run as root, once per environment build (result is
-# cached; skipped on later/resumed sessions until the script or allowed hosts
-# change, or the cache expires), before Claude Code launches. Scope is
+# The repo is cloned before this runs, so the path exists. Setup scripts run as
+# root, once per environment build (cached; re-runs when the script or allowed
+# hosts change, or the cache expires), before Claude Code launches. Scope is
 # cloud-only, but guard anyway so a stray local invocation is a no-op.
 if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
   exit 0
