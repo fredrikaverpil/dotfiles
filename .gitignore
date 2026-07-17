@@ -37,3 +37,6 @@ stow/Darwin/Library/Application Support/lazygit/state.yml
 
 # npm-tools installed packages (lockfile bun.lockb IS tracked)
 npm-tools/node_modules/
+
+# Runtime symlink created by stow/shared/.claude-web/web-setup.sh on the web sandbox
+/.claude
