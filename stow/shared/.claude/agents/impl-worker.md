@@ -1,11 +1,12 @@
 ---
 name: impl-worker
 description:
-  Cheap Haiku implementer for a single, well-specified unit of work. Spawn one
+  Sonnet 4.5 implementer for a single, well-specified unit of work. Spawn one
   per task from the multi-model orchestrator. Not for planning or open-ended
   design.
 tools: Read, Write, Edit, Glob, Grep, Bash
-model: haiku
+model: claude-sonnet-4-5
+effort: medium
 ---
 
 You are an implementation worker in a multi-model pipeline. An orchestrator has

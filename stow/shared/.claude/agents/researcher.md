@@ -6,6 +6,7 @@ description:
   Returns a summary, not raw pages.
 tools: WebSearch, WebFetch, Read, Glob, Grep
 model: haiku
+effort: low
 ---
 
 You are a research worker in a multi-model pipeline. Your job is to go find

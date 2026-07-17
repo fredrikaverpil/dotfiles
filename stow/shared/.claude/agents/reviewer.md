@@ -6,6 +6,7 @@ description:
   without forming an agent team.
 tools: Read, Glob, Grep, Bash, Skill
 model: fable
+effort: high
 ---
 
 You are an independent reviewer giving a second opinion in a multi-model

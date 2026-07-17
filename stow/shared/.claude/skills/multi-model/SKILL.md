@@ -1,20 +1,21 @@
 ---
 name: multi-model
 description:
-  "Run a task through a budget-aware multi-model pipeline: plan and interview
-  (Fable), orchestrate Haiku implementer subagents (Sonnet), then self-review
-  (Fable). Use when the user wants planning, implementation, and review handled
-  by different models."
+  "Run a task through a budget-aware multi-model pipeline from a Fable/Opus main
+  chat that never switches model: plan and interview, orchestrate Sonnet 4.5
+  implementer subagents, then self-review. Use when the user wants planning,
+  implementation, and review handled by different models."
 user-invocable: true
 disable-model-invocation: false
 ---
 
 # Multi-model workflow
 
-Run a task through three phases, each on the model best suited to it. The point
-is to spend expensive tokens only where judgment is needed and delegate the
-mechanical work to cheap Haiku subagents — **without** the token blow-up of
-agent teams.
+Run a task through three phases from a single main chat on the smart model
+(Fable, or Opus). The point is to keep expensive tokens on the judgment work —
+planning, verifying, reviewing — and delegate implementation and research to
+subagents that each carry their own pinned, cheaper model — **without** the
+token blow-up of agent teams.
 
 ## Why subagents, not teams
 
@@ -31,20 +32,27 @@ overhead we don't need here. So we do **not** set
 `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`. When the orchestrator wants a second
 opinion, it spawns a one-off `reviewer` subagent instead of forming a team.
 
-## The one thing a skill can't do
+## Models: one main chat, subagents carry their own
 
-A skill can't switch the **main session's** model, and the plan/review phases
-are interactive or want full session context. So the model per phase is set by
-**you** with `/model`, and the skill drives delegation within a phase:
+Run the **whole session from the main chat on one model** — Fable (or Opus if
+Fable is unavailable) — and never switch `/model`. Two phases *must* live in the
+main chat because a subagent can't do them: the **interview** (only the main
+chat talks to you) and the final **self-review** (wants the full session). Both
+want the smart model anyway, so it's already there.
 
-| Phase          | Main session model  | Effort | Delegates to                 |
-| -------------- | ------------------- | ------ | ---------------------------- |
-| 1. Plan        | Fable (→ Opus)      | high   | —                            |
-| 2. Implement   | Sonnet 4.5          | medium | `impl-worker`, `researcher`  |
-| 3. Review      | Fable (→ Opus)      | high   | `reviewer` (optional)        |
+Everything delegated carries its own model and effort from its subagent
+definition, so the sub-context switches model for you:
 
-Switch `/model` and `/effort` at each phase boundary. If Fable is unavailable,
-use Opus.
+| Phase / role     | Runs in                      | Model          | Effort |
+| ---------------- | ---------------------------- | -------------- | ------ |
+| Plan & interview | main chat                    | Fable (→ Opus) | high   |
+| Implement        | `impl-worker` subagents      | Sonnet 4.5     | medium |
+| Research         | `researcher` subagents       | Haiku          | low    |
+| Review           | main chat + `reviewer` (opt) | Fable (→ Opus) | high   |
+
+Set the main chat to Fable (or Opus) at `high` effort once, at the start. The
+`impl-worker` pins the full ID `claude-sonnet-4-5`, because the bare `sonnet`
+alias resolves to Sonnet 5 — the pricier model we don't want here.
 
 ## Shared brain: MEMORY.md
 
@@ -66,7 +74,8 @@ the main context lean.
 
 ## Phase 1 — Plan & interview (Fable, high effort)
 
-1. Ensure `/model` is Fable (or Opus) and `/effort` is high.
+1. Set `/model` to Fable (or Opus) and `/effort` to high — and leave it there;
+   you won't switch again this session.
 2. Run the `plan-interview` skill: work back and forth with the user, leading
    with open questions and an outline before writing the plan.
 3. **Choose the least-code approach — this is the planner's job, not the
@@ -76,16 +85,17 @@ the main context lean.
    pick the lowest workable rung: does it need to exist at all, and can existing
    code, the standard library, a native feature, or an already-installed
    dependency do it before anything new is written? Record the chosen approach
-   in the plan so it flows into the task specs — the Haiku workers implement the
-   rung you picked rather than exercising this judgment themselves. Never trim
-   safety (validation, security, error handling, accessibility).
+   in the plan so it flows into the task specs — the Sonnet 4.5 workers
+   implement the rung you picked rather than exercising this judgment
+   themselves. Never trim safety (validation, security, error handling,
+   accessibility).
 4. Write the agreed plan, settled decisions, and any open questions into
    `MEMORY.md`.
 5. Do **not** start implementing in this phase.
 
-## Phase 2 — Implement (Sonnet, orchestrator)
+## Phase 2 — Implement (orchestrate from the main chat)
 
-Switch `/model` to Sonnet 4.5 and `/effort` to medium. **You are the
+Stay in the main chat (Fable/Opus) — no model switch. **You are the
 orchestrator: you verify and coordinate, you do not write the implementation
 yourself.**
 
@@ -95,7 +105,7 @@ yourself.**
    done criteria). Include the minimal approach chosen in planning — which
    existing code, stdlib, native feature, or dependency to use — so the worker
    builds that, not its own idea of the solution.
-2. **Delegate.** Spawn an `impl-worker` (Haiku) subagent per task. Keep the
+2. **Delegate.** Spawn an `impl-worker` (Sonnet 4.5) subagent per task. Keep the
    spawn prompt short: point it at its `MEMORY.md` section and the relevant
    files. Independent tasks can run in parallel; give each worker a disjoint set
    of files to avoid conflicts.
@@ -112,7 +122,7 @@ yourself.**
 
 ## Phase 3 — Self-review (Fable, high effort)
 
-1. Switch `/model` back to Fable (or Opus) and `/effort` to high.
+1. Still in the main chat (Fable/Opus) — no model switch needed.
 2. Run the `self-review` skill across the whole change — read every changed file
    in full, not just diffs.
 3. Fix issues found, or delegate fixes back to an `impl-worker` if mechanical.
