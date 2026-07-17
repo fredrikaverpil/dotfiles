@@ -9,14 +9,17 @@ set -e
 # .claude/settings.json, which only loads when the repo is the session root
 # (never the case when dotfiles is cloned side-by-side with a work repo).
 #
-# Invocation paths:
-#   1. Environment setup script (configured once on claude.ai, runs before
-#      Claude Code launches; the filesystem snapshot then carries the
-#      user-scope config into every future session in that environment):
+# Invocation paths (sessions always include this repo side-by-side with the
+# work repos, so the script is always on the VM):
+#   1. The agent, instructed by this repo's CLAUDE.md, on the first turn of
+#      a session where the hooks are not yet registered.
+#   2. The SessionStart hook registered below (refreshes config each session).
+#   3. Optional hardening — environment setup script (configured once on
+#      claude.ai, stored in the environment, runs before Claude Code
+#      launches; the filesystem snapshot then carries the user-scope config
+#      into every future session in that environment):
 #        git clone --depth=1 https://github.com/fredrikaverpil/dotfiles /root/dotfiles \
 #          && SANDBOX_BOOTSTRAP=1 /root/dotfiles/.claude/sandbox/bootstrap.sh
-#   2. The SessionStart hook registered below (refreshes config each session).
-#   3. The agent, instructed by CLAUDE.md, when neither of the above has run.
 #
 # User scope on a developer machine is managed by stow, so refuse to run
 # outside the sandbox. CLAUDE_CODE_REMOTE alone is not proof enough: this

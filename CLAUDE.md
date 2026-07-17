@@ -161,16 +161,21 @@ hooks do NOT load when this repo is cloned side-by-side with a work repo
 (only the session root's settings are read), so user scope is the only
 reliable home for sandbox config.
 
-- **Preferred**: the cloud environment's setup script (configured once on
-  claude.ai) clones this repo and runs the bootstrap; the environment
-  snapshot then carries the config into every session. See the header of
-  `.claude/sandbox/bootstrap.sh` for the exact one-liner.
-- **Fallback (instruction to the agent)**: in a cloud sandbox session
+Cloud sessions are always started with this repo selected side-by-side with
+the work repo(s) — that is how the bootstrap gets onto the VM.
+
+- **Primary (instruction to the agent)**: in a cloud sandbox session
   (`CLAUDE_CODE_REMOTE=true`), if `~/.claude/settings.json` does not
   register the sandbox hooks, immediately run
   `SANDBOX_BOOTSTRAP=1 ./.claude/sandbox/bootstrap.sh` from the dotfiles
-  repo. Hooks reload dynamically, so it takes effect for the rest of the
-  session.
+  repo — before doing anything else, and without being asked. Hooks reload
+  dynamically, so it takes effect for the rest of the session.
+- **Optional hardening**: the cloud environment's setup script (configured
+  once on claude.ai, stored in the environment — not in any repo) can clone
+  this repo and run the bootstrap at container boot, so the hooks exist
+  before the first turn instead of being installed by the agent on the
+  first turn. See the header of `.claude/sandbox/bootstrap.sh` for the
+  exact one-liner.
 
 ## Gotchas
 
