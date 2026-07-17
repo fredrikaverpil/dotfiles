@@ -59,6 +59,16 @@ BREAKING CHANGE: The /v1/users endpoint has been removed.
 
 Optional. Use to specify area of change (e.g., `api`, `ui`, `auth`, `db`).
 
+## Branch Naming
+
+When creating a new branch, name it `<type>/<kebab-description>` using the
+same types as commit messages (e.g., `feat/add-user-auth`,
+`fix/broken-symlinks`).
+
+Exception: when the environment has already assigned a branch (e.g.,
+`claude/...` branches in Claude cloud sandbox sessions), keep it — never
+rename it or create a differently named branch to match this convention.
+
 ## Identity, Signing and Attribution
 
 Git identity and commit signing are configured by the environment (gitconfig
