@@ -153,6 +153,41 @@ all further interaction (buffer state, running Lua, inspecting diagnostics, LSP,
 plugins). Start each of those Bash calls with `source ~/.nvim-sandbox.env` too —
 the env doesn't carry over on its own.
 
+## One-shot checks (skip the persistent server)
+
+Steps 4–5 stand up a *persistent* `--listen` server so the `neovim` skill can
+drive it across turns. You only need that for interactive, multi-step work. For
+an observe-once question — *does this config change load cleanly? what does the
+formatter do to this file?* — skip the socket entirely and use a
+**self-terminating** headless run that loads the real config, does its thing,
+prints, and quits with `qa!`. It exits cleanly and sidesteps all of the
+launch/restart/socket handling (and its footguns) above. Prefer it whenever you
+don't actually need cross-turn RPC.
+
+```bash
+source ~/.nvim-sandbox.env
+# "does my config change load without error?"
+nvim --headless \
+  -c 'lua io.write("config="..vim.fn.stdpath("config").."\n")' \
+  -c 'qa!'
+```
+
+Exercising behaviour follows the same shape — open a file so its filetype
+plugins load, run the operation, print, quit:
+
+```bash
+source ~/.nvim-sandbox.env
+nvim --headless path/to/file.go \
+  -c '<command that performs the operation, e.g. runs the formatter>' \
+  -c 'lua io.write(table.concat(vim.fn.getline(1, "$"), "\n").."\n")' \
+  -c 'qa!'
+```
+
+`-c` commands run in order after startup. Opening a file fires `FileType`
+loading, but a plugin that lazy-loads on its *own* event or command only
+activates once you invoke that command — so trigger the real operation rather
+than assuming the plugin is already loaded.
+
 ## Testing a config-change PR
 
 The `nvim-fredrik` config is part of *this* repo, so a PR that changes it is
