@@ -69,12 +69,16 @@ the main context lean.
 1. Ensure `/model` is Fable (or Opus) and `/effort` is high.
 2. Run the `plan-interview` skill: work back and forth with the user, leading
    with open questions and an outline before writing the plan.
-3. **Plan the least-code solution.** Before proposing that anything be built,
-   walk the laziness ladder (defined in the `self-review` skill): does it need
-   to exist at all, and can existing code, the standard library, a native
-   feature, or an already-installed dependency do it before you write anything
-   new? Never trim safety (validation, security, error handling,
-   accessibility).
+3. **Choose the least-code approach — this is the planner's job, not the
+   worker's.** First read the code the change will touch and trace the real
+   flow; be lazy about the solution, never about reading. Then, for each piece
+   of work, walk the laziness ladder (defined in the `self-review` skill) and
+   pick the lowest workable rung: does it need to exist at all, and can existing
+   code, the standard library, a native feature, or an already-installed
+   dependency do it before anything new is written? Record the chosen approach
+   in the plan so it flows into the task specs — the Haiku workers implement the
+   rung you picked rather than exercising this judgment themselves. Never trim
+   safety (validation, security, error handling, accessibility).
 4. Write the agreed plan, settled decisions, and any open questions into
    `MEMORY.md`.
 5. Do **not** start implementing in this phase.
@@ -88,7 +92,9 @@ yourself.**
 1. **Decompose.** Break the plan into self-contained tasks — a function, a file,
    a test suite — each producing a clear deliverable. Write one **task spec**
    per task into `MEMORY.md` (files to touch, expected behaviour, constraints,
-   done criteria).
+   done criteria). Include the minimal approach chosen in planning — which
+   existing code, stdlib, native feature, or dependency to use — so the worker
+   builds that, not its own idea of the solution.
 2. **Delegate.** Spawn an `impl-worker` (Haiku) subagent per task. Keep the
    spawn prompt short: point it at its `MEMORY.md` section and the relevant
    files. Independent tasks can run in parallel; give each worker a disjoint set
