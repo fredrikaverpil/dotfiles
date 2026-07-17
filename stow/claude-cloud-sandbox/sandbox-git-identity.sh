@@ -18,8 +18,17 @@ set -e
 # Use global config: the sandbox may hold multiple repos, and this covers
 # all of them, including ones added mid-session. On a developer machine the
 # stowed ~/.gitconfig already handles identity and signing, so do nothing.
-if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
-  exit 0
+# Same defense-in-depth as bootstrap.sh: CLAUDE_CODE_REMOTE alone could in
+# principle leak into a local session's environment, and this script rewrites
+# global git config — so also require a cloud-container marker (or the
+# explicit SANDBOX_BOOTSTRAP override used during the setup-script phase).
+if [ "${SANDBOX_BOOTSTRAP:-}" != "1" ]; then
+  if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
+    exit 0
+  fi
+  if [ -z "${CLAUDE_CODE_CONTAINER_ID:-}" ] && [ -z "${CLAUDE_CODE_REMOTE_ENVIRONMENT_TYPE:-}" ]; then
+    exit 0
+  fi
 fi
 
 git config --global user.name "Fredrik Averpil"

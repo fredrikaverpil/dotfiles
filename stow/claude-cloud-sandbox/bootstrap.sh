@@ -19,8 +19,17 @@ set -e
 #   3. The agent, instructed by CLAUDE.md, when neither of the above has run.
 #
 # User scope on a developer machine is managed by stow, so refuse to run
-# outside the sandbox.
-if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ] && [ "${SANDBOX_BOOTSTRAP:-}" != "1" ]; then
+# outside the sandbox. CLAUDE_CODE_REMOTE alone is not proof enough: this
+# must never fire on a real machine (e.g. a Remote Control / Dispatch
+# session, which runs locally), so additionally require a marker that only
+# the Anthropic cloud container runner sets. SANDBOX_BOOTSTRAP=1 is the
+# explicit override for the setup-script phase, where Claude Code has not
+# launched yet and none of its variables exist.
+in_cloud_vm() {
+  [ "${CLAUDE_CODE_REMOTE:-}" = "true" ] &&
+    { [ -n "${CLAUDE_CODE_CONTAINER_ID:-}" ] || [ -n "${CLAUDE_CODE_REMOTE_ENVIRONMENT_TYPE:-}" ]; }
+}
+if ! in_cloud_vm && [ "${SANDBOX_BOOTSTRAP:-}" != "1" ]; then
   echo "Refusing to run outside the Claude cloud sandbox (set SANDBOX_BOOTSTRAP=1 to override)." >&2
   exit 1
 fi
