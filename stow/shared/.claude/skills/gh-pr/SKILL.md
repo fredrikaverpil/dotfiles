@@ -2,47 +2,15 @@
 name: gh-pr
 description: >-
   This skill should be used when creating a GitHub pull request via `gh pr
-  create`. Defines PR body format with Why/What/Notes sections and ensures
-  proper assignment.
+  create`. Covers the gh CLI mechanics; PR title and body conventions come
+  from the pr-style skill.
 ---
 
-# GitHub Pull Request Creation
+# GitHub Pull Request Creation with gh
 
-When creating a pull request, use the `gh` CLI with the following format and
-conventions.
-
-- Always create draft PRs.
-- Keep PR titles, descriptions, and comments concise and clear.
-- Include only useful information. Remove redundancy and over-explanation.
-- Prefer explicitness and clarity over verbosity.
-- Express Why/What/Notes content as concise, to-the-point bullet lists. Avoid
-  prose paragraphs.
-- Include a small, illustrative code snippet whenever it conveys the change
-  faster than prose. This is desired for PRs in general, and especially for bug
-  fixes: a minimal example of the triggering case (and what went wrong) makes
-  the problem concrete for reviewers. Keep it short — just enough to convey the
-  point, not a full reproduction.
-
-## PR title format
-
-Write the title as if the whole PR was squashed into a single commit using
-conventional commits.
-
-## PR Body Format
-
-```markdown
-## Why?
-
-[Explain the motivation for this change. What problem does it solve?]
-
-## What?
-
-[Describe what was changed. List the key modifications.]
-
-## Notes
-
-[Optional. Additional context, testing notes, or follow-up items.]
-```
+When creating a pull request with the `gh` CLI, use the command template below.
+For the title and body content, follow the "pr-style" skill (conventional
+commit title, Why/What/Notes body, draft PRs).
 
 ## Command Template
 
@@ -63,44 +31,7 @@ EOF
 )"
 ```
 
-## File References
-
-Use `[file:lineno](url)` with SHA-pinned URLs:
-`https://github.com/<owner>/<repo>/blob/<sha>/<path>#L<lineno>`
-
-- SHA: `git rev-parse HEAD`
-- Repo: `gh repo view --json nameWithOwner -q .nameWithOwner`
-
 ## Rules
 
-1. Always assign PR to `@me` using `--assignee @me`
-2. `## Why?` - Required. Explain motivation and problem being solved
-3. `## What?` - Required. Describe the changes made
-4. `## Notes` - Optional. Omit entirely if no notes are needed
-5. Use imperative mood in title (e.g., "Add feature" not "Added feature")
-6. Keep title concise and descriptive
-7. When referencing files, always use `[file:lineno](url)` format with
-   SHA-pinned URLs
-
-## Example
-
-```bash
-gh pr create --draft --assignee @me --title "Add user authentication" --body "$(cat <<'EOF'
-## Why?
-
-Users need secure access to their accounts. Currently there is no
-authentication mechanism in place.
-
-## What?
-
-- Add login/logout endpoints
-- Implement JWT token generation
-- Add password hashing with bcrypt
-- Create auth middleware for protected routes
-
-## Notes
-
-Requires `JWT_SECRET` env variable to be set in production.
-EOF
-)"
-```
+1. Always create draft PRs (`--draft`)
+2. Always assign the PR to me (`--assignee @me`)
