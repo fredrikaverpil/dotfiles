@@ -125,6 +125,7 @@ source ~/.nvim-sandbox.env        # env doesn't persist across calls; re-source
 rm -f "$NVIM"
 # --headless keeps it alive as long as the socket is served; run detached.
 nohup nvim --headless --listen "$NVIM" >/tmp/nvim-headless.log 2>&1 &
+echo $! > /tmp/nvim-fredrik.pid   # record PID so a later restart can kill it
 # Wait for the socket to accept RPC (plugin cloning happens during startup).
 for i in $(seq 1 120); do
   [ -S "$NVIM" ] && nvim --server "$NVIM" --remote-expr '1' >/dev/null 2>&1 && break
@@ -162,16 +163,32 @@ git -C /home/user/dotfiles fetch origin <pr-branch>
 git -C /home/user/dotfiles checkout <pr-branch>
 ```
 
-Then restart the headless instance so the new config is sourced. Stop the old
-instance deterministically first — a `--remote-expr` quit can race the relaunch
-below and leave the old process orphaned, still serving the previous config —
-then relaunch exactly as in Step 4:
+Then restart the headless instance so the new config is sourced. Kill the old
+instance by the PID recorded at launch and **wait until it is actually gone**
+before relaunching. Two traps make this fiddlier than it looks:
+
+- **Don't `pkill -f 'nvim --headless --listen'`.** Each Bash call runs as
+  `bash -c '<the whole script>'`, so that string is in the script shell's own
+  arguments; `pkill -f` matches and kills the script itself, which dies with a
+  `128 + signal` exit (e.g. `143`/`144`) before it ever relaunches. Killing the
+  recorded PID sidesteps the pattern entirely.
+- **Let the old process exit before reusing `$NVIM`.** A dying nvim unlinks its
+  own socket on the way out. Relaunch on the same path too soon and the old
+  instance's cleanup deletes the *new* socket — RPC then fails with "connection
+  refused" even though the new process is alive. So confirm it's gone (SIGKILL
+  as a fallback) before `rm`-ing the path and starting fresh.
 
 ```bash
 source ~/.nvim-sandbox.env
-pkill -f 'nvim --headless --listen' 2>/dev/null || true
+oldpid="$(cat /tmp/nvim-fredrik.pid 2>/dev/null)"
+if [ -n "$oldpid" ]; then
+  kill "$oldpid" 2>/dev/null || true
+  for i in $(seq 1 50); do kill -0 "$oldpid" 2>/dev/null || break; sleep 0.2; done
+  kill -9 "$oldpid" 2>/dev/null || true   # force if it ignored SIGTERM
+fi
 rm -f "$NVIM"
 nohup nvim --headless --listen "$NVIM" >/tmp/nvim-headless.log 2>&1 &
+echo $! > /tmp/nvim-fredrik.pid
 for i in $(seq 1 120); do
   [ -S "$NVIM" ] && nvim --server "$NVIM" --remote-expr '1' >/dev/null 2>&1 && break
   sleep 2
