@@ -59,3 +59,26 @@ BREAKING CHANGE: The /v1/users endpoint has been removed.
 
 Optional. Use to specify area of change (e.g., `api`, `ui`, `auth`, `db`).
 
+## Branch Naming
+
+When creating a new branch, name it `<type>/<kebab-description>` using the
+same types as commit messages (e.g., `feat/add-user-auth`,
+`fix/broken-symlinks`).
+
+Exception: when the environment has already assigned a branch (e.g.,
+`claude/...` branches in Claude cloud sandbox sessions), keep it — never
+rename it or create a differently named branch to match this convention.
+
+## Identity, Signing and Attribution
+
+Git identity and commit signing are configured by the environment (gitconfig
+on developer machines, a SessionStart hook in cloud sandboxes) — never manage
+them yourself:
+
+1. Do NOT add AI attribution: no `Co-Authored-By`, no "Generated with" lines,
+   no session links or model names in commit messages.
+2. Do NOT pass identity flags or overrides (`--author`,
+   `-c user.name=...`/`-c user.email=...`).
+3. Do NOT pass signing flags (`-S`, `--gpg-sign`, `--no-gpg-sign`) and do NOT
+   modify signing-related git config.
+

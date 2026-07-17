@@ -48,6 +48,13 @@ Write commit messages following the Conventional Commits specification.
    is one, include it as the last line in the commit body (e.g., XY-123).
    If there isn't one, omit it.
 
+## Branch Naming
+
+When creating a new branch, name it `<type>/<jira-ticket>` with the ticket
+lowercased, using the same types as commit messages (e.g., `feat/xy-123`,
+`fix/xy-456`). If there is no Jira ticket, fall back to
+`<type>/<kebab-description>` (e.g., `feat/add-user-auth`).
+
 ## Breaking Changes
 
 Add **!** after type/scope or include **BREAKING CHANGE:** in footer:

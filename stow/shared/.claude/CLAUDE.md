@@ -82,7 +82,9 @@ When I provide github.com links (PRs, issues, comments, actions, etc.), ALWAYS
 use the `gh` CLI to fetch the content instead of WebFetch. WebFetch often fails
 on GitHub pages.
 
-Use the "gh-cli" skill for `gh` commands and "gh-pr" skill for creating PRs.
+Use the "gh-cli" skill for `gh` commands, the "pr-style" skill for PR
+title/description conventions, and the "gh-pr" skill when creating PRs with
+`gh`.
 
 ## Jira
 
