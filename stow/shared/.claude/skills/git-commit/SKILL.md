@@ -88,22 +88,28 @@ yourself:
 ### In the Claude cloud sandbox (`CLAUDE_CODE_REMOTE=true`)
 
 The sandbox forces `user.name=Claude` / `user.email=noreply@anthropic.com`
-via its own SessionStart hook on every session start, and this repo's
-SessionStart hook does NOT load in multi-repo sessions (repo-level
-`.claude/settings.json` is only read when the repo is the session root —
-never the case when dotfiles is cloned side-by-side). This skill is the
-reliable trigger instead. BEFORE every commit, run:
+via its own SessionStart hook on every session start. The dotfiles sandbox
+bootstrap (`.claude/sandbox/bootstrap.sh`) counters this with a user-scope
+PreToolUse hook that re-asserts the real identity before every Bash call.
+
+BEFORE committing, verify the countermeasure is active — this must NOT
+print `noreply@anthropic.com`:
 
 ```bash
-"${CLAUDE_PROJECT_DIR:-/home/user/dotfiles}/.claude/hooks/sandbox-git-identity.sh" \
-  || /home/user/dotfiles/.claude/hooks/sandbox-git-identity.sh
+git config --global user.email
 ```
 
-It re-asserts the real identity globally and disables commit signing (the
-sandbox's signing key is registered to `noreply@anthropic.com`; signing with
-any other committer email would make GitHub show commits as "Unverified", so
-unsigned is intentional). The script is idempotent — running it before every
-commit is correct and cheap.
+If it shows the Claude identity, the bootstrap has not run in this session.
+Run it (hooks reload dynamically, so it takes effect immediately):
+
+```bash
+SANDBOX_BOOTSTRAP=1 "${CLAUDE_PROJECT_DIR:-/home/user/dotfiles}/.claude/sandbox/bootstrap.sh" \
+  || SANDBOX_BOOTSTRAP=1 /home/user/dotfiles/.claude/sandbox/bootstrap.sh
+```
+
+Commit signing stays disabled on purpose: the sandbox's signing key is
+registered to `noreply@anthropic.com`, so signing with any other committer
+email would make GitHub show commits as "Unverified".
 
 If a commit was already created with the Claude identity, repair it before
 pushing: `git commit --amend --no-edit --reset-author` for the tip commit, or
