@@ -1,6 +1,6 @@
 ---
 name: nvim-install
-description: Install Neovim and stand up the nvim-fredrik config in the Claude Code web sandbox (the cloud environment), where no Neovim exists. Use this before testing any Neovim config change in a web session, e.g. checking out a PR branch that touches nvim-fredrik and observing its runtime behavior. Installs bob via Nix and a stable/nightly Neovim via bob, wires the repo's config into place, launches Neovim headless with a listen socket, and exports $NVIM so the `neovim` RPC skill can drive it. Web-sandbox only.
+description: Install Neovim and stand up the nvim-fredrik config in the Claude Code web sandbox (the cloud environment), where no Neovim exists. Use this before testing any Neovim config change in a web session, e.g. checking out a PR branch that touches nvim-fredrik and observing its runtime behavior. Installs Neovim via Nix from the binary cache with no GitHub access, wires the repo's config into place, launches Neovim headless with a listen socket, and exports $NVIM so the `neovim` RPC skill can drive it. Web-sandbox only.
 ---
 
 # Install Neovim in the web sandbox
@@ -13,35 +13,47 @@ editor. This skill installs the binary, launches Neovim **headless** with a
 listen socket, and exports `$NVIM` so every command in the `neovim` skill works
 verbatim afterwards.
 
-Neovim is installed with **bob** — the same version manager used on the real
-machines, so stable/nightly is a one-word switch — and bob itself is installed
-with **Nix**.
-
 **Scope:** web sandbox only (`CLAUDE_CODE_REMOTE=true`). Do not run on a real
-machine — there bob already manages Neovim at
-`~/.local/share/bob/nvim-bin/nvim`.
+machine — there Neovim is managed by bob at `~/.local/share/bob/nvim-bin/nvim`.
+
+## Why Nix, not bob
+
+Nix installs Neovim from `*.nixos.org` (allow-listed by default), so the binary
+needs **no GitHub access** — and `nixpkgs-unstable` ships Neovim 0.12.x, which
+has both `vim.pack` and `vim._core.ui2`, exactly what `nvim-fredrik` requires.
+bob is available too (see the end), but `bob install` downloads Neovim as a
+**GitHub release asset**, which the GitHub proxy blocks unless `neovim/neovim`
+is attached to the session — regardless of network level. So Nix is the default;
+bob is an opt-in.
 
 ## Step 0 — Network prerequisites
 
-Two independent needs, in order of when they bite:
+Two independent mechanisms gate traffic; they bite at different points.
 
-1. **bob + the Neovim binary:** bob is installed from the Nix cache (no GitHub),
-   but bob then downloads Neovim from **github.com/neovim/neovim**. In the
-   sandbox, GitHub is gated by the proxy to this session's repo scope, so bob's
-   download is denied until `neovim/neovim` is in scope. Enable it with
-   `add_repo neovim/neovim` (ask Claude: *"add the neovim/neovim repo"* — Claude
-   only runs `add_repo` when you ask), or widen the environment network policy
-   to allow `github.com` / `api.github.com` / `objects.githubusercontent.com`.
-2. **The plugins (to actually run `nvim-fredrik`):** at startup `vim.pack` clones
-   ~50 plugins from **github.com** and **codeberg.org**. Both are blocked by
-   default (`403`), so the config installs and *starts* but plugin cloning fails
-   until the environment network policy allows those hosts. This is an
-   environment-config change (claude.ai environment editor → network / allowed
-   hosts: add `github.com` and `codeberg.org`), then rebuild. See
-   https://code.claude.com/docs/en/claude-code-on-the-web.
+1. **The binary (this skill):** substituted from the Nix cache (`*.nixos.org`),
+   reachable under the default **Trusted** network policy. No GitHub, no action.
+   Verify:
 
-Widening the network policy to allow `github.com` satisfies both at once, which
-is the simplest route to a full config run.
+   ```bash
+   curl -sSI -o /dev/null -w "cache:    %{http_code}\n" https://cache.nixos.org
+   curl -sSI -o /dev/null -w "channels: %{http_code}\n" https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz
+   ```
+
+2. **The plugins (a full `nvim-fredrik` run):** at startup `vim.pack` clones ~50
+   plugins. These split three ways:
+   - **Public GitHub clones** — already work under the default Trusted policy
+     (`github.com` is allow-listed). No action.
+   - **codeberg.org plugins** (nvim-lint, nvim-dap, nvim-dap-python) —
+     **required and blocked by default.** Edit the environment → **Network
+     access** selector → **Custom** → in **Allowed domains** add `codeberg.org`
+     → tick *"Also include default list of common package managers"* → save.
+     This rebuilds the environment. See
+     https://code.claude.com/docs/en/claude-code-on-the-web.
+   - **GitHub release assets** (codediff's prebuilt lib, Mason LSP servers,
+     treesitter parsers) — gated by the GitHub proxy to *attached* repos
+     **regardless of network level**, so they may 403. Optional for observing
+     most config behavior; attach a specific repo with `add_repo` only if the
+     change under test needs it.
 
 ## Step 1 — Ensure Nix is installed
 
@@ -56,21 +68,14 @@ grep -q '^build-users-group' /etc/nix/nix.conf 2>/dev/null \
   || echo 'build-users-group =' >> /etc/nix/nix.conf
 ```
 
-## Step 2 — Install bob via Nix, then Neovim via bob
+## Step 2 — Install Neovim from nixpkgs-unstable
 
-The nixpkgs attribute is `bob-nvim` (the binary is `bob`), substituted from the
-cache with no GitHub. Then bob installs Neovim (needs Step 0 item 1).
-`nvim-fredrik` requires **nightly** (`vim.pack` + `vim._core.ui2`); for other
-configs swap `nightly` for `stable` or a version like `v0.11.0`.
+Everything is substituted from `cache.nixos.org`; nothing is compiled and no
+GitHub is touched.
 
 ```bash
-TARBALL=https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz
-nix-env -iA bob-nvim -f "$TARBALL"
+nix-env -iA neovim -f https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz
 export PATH="$HOME/.nix-profile/bin:$PATH"
-bob --version
-
-bob use nightly     # installs if missing, then makes it the active version
-export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
 nvim --version | head -1                                              # NVIM v0.12.x
 nvim --headless -c 'lua io.write(tostring(vim.pack ~= nil))' -c 'qa'  # expect: true
 ```
@@ -93,7 +98,7 @@ mkdir -p ~/.config
 ln -sfn "$repo/nvim-fredrik" ~/.config/nvim-fredrik
 
 cat > ~/.nvim-sandbox.env <<EOF
-export PATH="\$HOME/.nix-profile/bin:\$HOME/.local/share/bob/nvim-bin:\$PATH"
+export PATH="\$HOME/.nix-profile/bin:\$PATH"
 export DOTFILES="$repo"
 export NVIM_APPNAME=nvim-fredrik
 export NVIM=/tmp/nvim-fredrik.sock
@@ -123,9 +128,10 @@ done
 echo "NVIM socket: $NVIM"; tail -8 /tmp/nvim-headless.log
 ```
 
-`403` / `CONNECT tunnel failed` lines in the log mean github.com/codeberg.org
-are still not allowed (back to Step 0 item 2). The editor still runs; only the
-plugins that failed to clone are missing.
+`403` / `CONNECT tunnel failed` lines in the log point at the Step 0 item 2
+gaps (usually `codeberg.org` if it isn't allowed yet, or a GitHub release
+asset). The editor still runs; only the plugins that failed to clone are
+missing.
 
 ## Step 5 — Verify and hand off to the `neovim` skill
 
@@ -171,27 +177,34 @@ diagnostics:
 nvim --server "$NVIM" --remote-expr 'luaeval("vim.json.encode(vim.diagnostic.get(0))")'
 ```
 
-## Alternative: Neovim directly via Nix (no GitHub for the binary)
+## Optional: bob for explicit stable/nightly management
 
-If you only need a modern Neovim and don't want to allowlist GitHub for the
-binary, skip bob — `nixpkgs-unstable` currently ships Neovim 0.12.x (which has
-`vim.pack` and `vim._core.ui2`), substituted straight from the cache:
+If you specifically want a bob-managed version (one-word stable/nightly switch,
+matching the real machines), install bob from Nix and let it fetch Neovim — but
+note bob's download is a GitHub **release asset**, so `neovim/neovim` must be
+attached to the session first (`add_repo neovim/neovim`; Claude only runs it
+when you ask). Network level alone will not unblock it.
 
 ```bash
-nix-env -iA neovim -f https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz
+TARBALL=https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz
+nix-env -iA bob-nvim -f "$TARBALL"          # the binary is `bob`
 export PATH="$HOME/.nix-profile/bin:$PATH"
+bob use nightly                              # needs neovim/neovim attached
+export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
 ```
 
-Update Step 3's persisted `PATH` to drop the bob path if you use this. The
-plugin-network prerequisite (Step 0 item 2) still applies to a full config run.
+If you use this, add `$HOME/.local/share/bob/nvim-bin` to the persisted `PATH`
+in Step 3. For most sandbox testing the Step 2 Nix binary is simpler and needs
+no attachment.
 
 ## Caveats
 
 - **First launch is slow** — plugin cloning is network-bound and serial.
 - **Mason / LSP servers and treesitter parsers are best-effort.** They pull
-  extra tools from GitHub and compile locally; if a change under test doesn't
-  depend on a language server, you don't need them. Failures are logged in
-  `/tmp/nvim-headless.log` and don't prevent the rest of the config loading.
+  extra tools from GitHub release assets and compile locally; if a change under
+  test doesn't depend on a language server, you don't need them. Failures are
+  logged in `/tmp/nvim-headless.log` and don't prevent the rest of the config
+  loading.
 - **Headless has no UI.** Inspect state via RPC (`vim.diagnostic.get`,
   `vim.lsp.get_clients`, buffer APIs), not by looking at a screen.
 - **Ephemeral.** The install and config live only for this environment's
