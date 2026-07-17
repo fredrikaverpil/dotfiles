@@ -8,7 +8,7 @@ set -e
 # environment's "Setup script" field (web UI: environment selector -> edit
 # environment -> Setup script) with a one-line bootstrap that calls this file:
 #
-#   bash /home/user/dotfiles/.claude/web-setup.sh || true
+#   bash /home/user/dotfiles/stow/shared/.claude-web/web-setup.sh || true
 #
 # The environment clones the repo before the setup script runs, so that path
 # exists. Setup scripts run as root, once per environment build (result is
@@ -17,6 +17,19 @@ set -e
 # cloud-only, but guard anyway so a stray local invocation is a no-op.
 if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
   exit 0
+fi
+
+# Project-level Claude config for the dotfiles repo.
+#
+# The real content lives here in stow/shared/.claude-web (settings + a curated
+# subset of skill symlinks into stow/shared/.claude/skills). Claude Code on the
+# web reads <repo>/.claude, so link this package into place at the repo root.
+# The link is recreated on every run so it always tracks the current target; it
+# is git-ignored, so it never exists on local (non-web) checkouts.
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+if [ -d "$repo_root/stow/shared/.claude-web" ]; then
+  rm -rf "$repo_root/.claude"
+  ln -s stow/shared/.claude-web "$repo_root/.claude"
 fi
 
 # Git identity.
