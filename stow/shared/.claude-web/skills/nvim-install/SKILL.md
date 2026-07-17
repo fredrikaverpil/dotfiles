@@ -5,13 +5,10 @@ description: Install Neovim and stand up the nvim-fredrik config in the Claude C
 
 # Install Neovim in the web sandbox
 
-This skill bootstraps a real, running Neovim in the Claude Code web sandbox so
-config changes (e.g. a PR against `nvim-fredrik`) can be exercised and observed.
-It is the missing half of the `neovim` RPC skill: that skill assumes a running
-Neovim exposed via `$NVIM`, but the sandbox has neither the binary nor a parent
-editor. This skill installs the binary, launches Neovim **headless** with a
-listen socket, and exports `$NVIM` so every command in the `neovim` skill works
-verbatim afterwards.
+This is the missing half of the `neovim` RPC skill: that skill drives a running
+Neovim via `$NVIM`, but the sandbox ships neither the binary nor a parent
+editor. This skill installs Neovim, launches it **headless** on a listen socket,
+and exports `$NVIM` so the `neovim` skill's commands work verbatim afterwards.
 
 **Scope:** web sandbox only (`CLAUDE_CODE_REMOTE=true`). Do not run on a real
 machine — there Neovim is managed by bob at `~/.local/share/bob/nvim-bin/nvim`.
@@ -19,9 +16,8 @@ machine — there Neovim is managed by bob at `~/.local/share/bob/nvim-bin/nvim`
 ## Why Nix, not bob
 
 Nix installs Neovim from `*.nixos.org` (allow-listed by default), so the binary
-needs **no GitHub access** — and `nixpkgs-unstable` ships a current Neovim (0.12
-or newer), which has both `vim.pack` and `vim._core.ui2`, exactly what
-`nvim-fredrik` requires.
+needs **no GitHub access** — and `nixpkgs-unstable` ships a current Neovim with
+`vim.pack`, which `nvim-fredrik` requires.
 bob is available too (see the end), but `bob install` downloads Neovim as a
 **GitHub release asset**, which the GitHub proxy blocks unless `neovim/neovim`
 is attached to the session — regardless of network level. So Nix is the default;
@@ -92,18 +88,13 @@ The config lives in the cloned repo. Two env vars point Neovim at it:
 - **`NVIM_APPNAME=nvim-fredrik`** makes Neovim read `~/.config/nvim-fredrik`
   (the symlink created below).
 - **`$DOTFILES`** is the **dotfiles repo root**. The config builds paths from it
-  to other repo files — the Mason lockfile
-  (`$DOTFILES/nvim-fredrik/mason-lock.json`), lint configs
-  (`$DOTFILES/extras/templates/...`), and snippets. Left unset, `init.lua` falls
-  back to `~/.dotfiles`; startup still succeeds, but that path doesn't exist in
-  the sandbox, so those lockfile/lint/snippet lookups silently resolve to
-  missing files. Point it at the clone root so they resolve.
+  (Mason lockfile, lint configs, snippets); left unset it falls back to
+  `~/.dotfiles`, which doesn't exist in the sandbox, so those lookups silently
+  resolve to missing files. Point it at the clone root.
 
-**The sandbox runs each command in a fresh shell initialized from your
-profile**, so plain `export`s do not survive from one Bash call to the next —
-and the `neovim` skill you hand off to later relies on `$NVIM` being present.
-Persist the environment into a file the profile sources, so every subsequent
-shell (and the `neovim` skill) inherits it:
+**The sandbox runs each Bash call in a fresh shell**, so plain `export`s don't
+survive to the next one. Persist the env into a profile-sourced file so every
+later shell — and the `neovim` skill, which needs `$NVIM` — inherits it:
 
 ```bash
 repo="/home/user/dotfiles"        # adjust if the repo is cloned elsewhere
@@ -155,10 +146,7 @@ nvim --server "$NVIM" --remote-expr 'luaeval("vim.fn.stdpath(\"config\")")'
 
 `$NVIM` is now set exactly as if Claude Code were running inside a Neovim
 terminal, so **switch to the `neovim` skill** for all further interaction
-(buffer state, running Lua, inspecting diagnostics, LSP, plugins). Note: the
-`neovim` skill's `NVIM_APPNAME` stdout-warning filter targets the dotfiles
-`nvim` wrapper; here you invoke the real binary directly, so the warning usually
-does not appear — the filter is harmless either way.
+(buffer state, running Lua, inspecting diagnostics, LSP, plugins).
 
 ## Testing a config-change PR
 

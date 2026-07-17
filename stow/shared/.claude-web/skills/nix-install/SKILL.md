@@ -30,8 +30,7 @@ network / allowed hosts) to include `cache.nixos.org` and `channels.nixos.org`.
 
 ## Step 1 — Install Nix (via apt)
 
-The Claude Code web docs recommend refreshing the apt index first; do that, then
-install `nix-bin`:
+Refresh the apt index, then install `nix-bin`:
 
 ```bash
 apt-get update
