@@ -26,6 +26,11 @@ rather than guessing.
 present in the files you edit. Read neighbouring code before writing. Consult
 `CLAUDE.md` for repo-specific rules.
 
+**Write it testable.** Structure the code so it can be tested — separate pure
+logic from side effects, inject dependencies, avoid hidden global state. If the
+task genuinely can't be made reasonably testable, **stop and tell the
+orchestrator** rather than shipping it untestable.
+
 **Verify before reporting.** Run the project's own checks where they apply
 (formatters, linters, `nix flake check`, tests). Never run `./rebuild.sh`.
 

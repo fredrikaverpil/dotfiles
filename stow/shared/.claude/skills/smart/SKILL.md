@@ -72,6 +72,18 @@ The orchestrator points each subagent at the relevant section instead of
 re-explaining context in the spawn prompt. This keeps spawn prompts small and
 the main context lean.
 
+## Testability (non-negotiable)
+
+Every change the pipeline produces must be written to be testable — clear seams,
+injectable dependencies, pure logic separated from side effects, no hidden
+global state a test can't reach. Design this in during planning; it is not a
+later concern.
+
+If a piece genuinely can't be made reasonably testable, it does **not** get
+waved through silently: the worker flags it to the orchestrator, and the
+orchestrator gets the user's explicit OK with `AskUserQuestion` before accepting
+it, recording the decision in `MEMORY.md`.
+
 ## Phase 1 — Plan & interview (Fable, xhigh effort)
 
 1. Set `/model` to Fable (or Opus) and `/effort` to xhigh — and leave it there;
@@ -118,8 +130,10 @@ yourself.**
    rung you picked). If it falls short, send precise feedback and re-delegate.
    Answer worker questions.
 5. **Escalate, don't guess.** For ambiguous product decisions, ask the user with
-   `AskUserQuestion` and record the answer in `MEMORY.md`. For a second opinion
-   on a risky diff, spawn a `reviewer` (Fable) subagent.
+   `AskUserQuestion` and record the answer in `MEMORY.md`. When a worker flags
+   something as hard to test, follow **Testability** above — get the user's OK
+   before accepting it. For a second opinion on a risky diff, spawn a `reviewer`
+   (Fable) subagent.
 
 ## Phase 3 — Self-review (Fable, xhigh effort)
 

@@ -32,6 +32,9 @@ through all changed files and evaluate the work as a whole.
   from now by someone unfamiliar with the change?
 - **Robustness**: Is the code brittle or potentially buggy? Look for edge cases,
   race conditions, or assumptions that could break.
+- **Testability**: Can this be tested? Look for clear seams, injectable
+  dependencies, and logic separated from side effects. Hard-to-test code is a
+  design smell — flag it rather than leaving it untested.
 
 ## Laziness ladder
 
