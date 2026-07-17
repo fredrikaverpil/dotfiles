@@ -1,5 +1,5 @@
 ---
-name: multi-model
+name: smart
 description:
   "Run a task through a budget-aware multi-model pipeline from a Fable/Opus main
   chat that never switches model: plan and interview, orchestrate Sonnet 4.5
@@ -9,7 +9,7 @@ user-invocable: true
 disable-model-invocation: false
 ---
 
-# Multi-model workflow
+# Smart — multi-model workflow
 
 Run a task through three phases from a single main chat on the smart model
 (Fable, or Opus). The point is to keep expensive tokens on the judgment work —
@@ -45,12 +45,12 @@ definition, so the sub-context switches model for you:
 
 | Phase / role     | Runs in                      | Model          | Effort |
 | ---------------- | ---------------------------- | -------------- | ------ |
-| Plan & interview | main chat                    | Fable (→ Opus) | high   |
+| Plan & interview | main chat                    | Fable (→ Opus) | xhigh  |
 | Implement        | `impl-worker` subagents      | Sonnet 4.5     | medium |
 | Research         | `researcher` subagents       | Haiku          | low    |
-| Review           | main chat + `reviewer` (opt) | Fable (→ Opus) | high   |
+| Review           | main chat + `reviewer` (opt) | Fable (→ Opus) | xhigh  |
 
-Set the main chat to Fable (or Opus) at `high` effort once, at the start. The
+Set the main chat to Fable (or Opus) at `xhigh` effort once, at the start. The
 `impl-worker` pins the full ID `claude-sonnet-4-5`, because the bare `sonnet`
 alias resolves to Sonnet 5 — the pricier model we don't want here.
 
@@ -72,9 +72,9 @@ The orchestrator points each subagent at the relevant section instead of
 re-explaining context in the spawn prompt. This keeps spawn prompts small and
 the main context lean.
 
-## Phase 1 — Plan & interview (Fable, high effort)
+## Phase 1 — Plan & interview (Fable, xhigh effort)
 
-1. Set `/model` to Fable (or Opus) and `/effort` to high — and leave it there;
+1. Set `/model` to Fable (or Opus) and `/effort` to xhigh — and leave it there;
    you won't switch again this session.
 2. Run the `plan-interview` skill: work back and forth with the user, leading
    with open questions and an outline before writing the plan.
@@ -120,7 +120,7 @@ yourself.**
    `AskUserQuestion` and record the answer in `MEMORY.md`. For a second opinion
    on a risky diff, spawn a `reviewer` (Fable) subagent.
 
-## Phase 3 — Self-review (Fable, high effort)
+## Phase 3 — Self-review (Fable, xhigh effort)
 
 1. Still in the main chat (Fable/Opus) — no model switch needed.
 2. Run the `self-review` skill across the whole change — read every changed file

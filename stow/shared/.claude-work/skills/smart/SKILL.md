@@ -1,0 +1,1 @@
+../../../.claude/skills/smart/SKILL.md
