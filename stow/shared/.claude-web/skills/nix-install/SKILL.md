@@ -30,8 +30,7 @@ network / allowed hosts) to include `cache.nixos.org` and `channels.nixos.org`.
 
 ## Step 1 — Install Nix (via apt)
 
-The Claude Code web docs recommend refreshing the apt index first; do that, then
-install `nix-bin`:
+Refresh the apt index, then install `nix-bin`:
 
 ```bash
 apt-get update
@@ -53,7 +52,7 @@ from the reachable `channels.nixos.org`, so this needs no GitHub:
 
 ```bash
 TARBALL=https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz
-nix-env -iA ripgrep -f "$TARBALL"     # attribute name = nixpkgs attr path
+nix-env -f "$TARBALL" -iA ripgrep     # attribute name = nixpkgs attr path
 export PATH="$HOME/.nix-profile/bin:$PATH"
 rg --version
 ```
@@ -65,14 +64,22 @@ nixpkgs (a bare `nix-env -qaP` evaluates everything and is very slow):
 nix-env -f "$TARBALL" -qaP -A ripgrep   # -> "ripgrep  ripgrep-14.x"
 ```
 
-## Persisting the environment
+## Using the tools in later Bash calls
 
-The sandbox runs each command in a fresh shell initialized from your profile, so
-a plain `export PATH=...` does not survive to the next Bash call. Persist it:
+Each Bash call is a fresh shell whose environment is snapshotted at session
+start, and `~/.bashrc` is not re-run per call (its non-interactive `return`
+guard exits early), so appending an `export` there does **not** put the tool on
+`PATH` in later calls. Either call the binary by its full path:
 
 ```bash
-grep -qxF 'export PATH="$HOME/.nix-profile/bin:$PATH"' ~/.bashrc 2>/dev/null \
-  || echo 'export PATH="$HOME/.nix-profile/bin:$PATH"' >> ~/.bashrc
+~/.nix-profile/bin/rg --version
+```
+
+or prepend the profile to `PATH` at the start of any call that needs it:
+
+```bash
+export PATH="$HOME/.nix-profile/bin:$PATH"
+rg --version
 ```
 
 ## Caveats

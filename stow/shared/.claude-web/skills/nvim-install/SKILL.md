@@ -5,13 +5,10 @@ description: Install Neovim and stand up the nvim-fredrik config in the Claude C
 
 # Install Neovim in the web sandbox
 
-This skill bootstraps a real, running Neovim in the Claude Code web sandbox so
-config changes (e.g. a PR against `nvim-fredrik`) can be exercised and observed.
-It is the missing half of the `neovim` RPC skill: that skill assumes a running
-Neovim exposed via `$NVIM`, but the sandbox has neither the binary nor a parent
-editor. This skill installs the binary, launches Neovim **headless** with a
-listen socket, and exports `$NVIM` so every command in the `neovim` skill works
-verbatim afterwards.
+This is the missing half of the `neovim` RPC skill: that skill drives a running
+Neovim via `$NVIM`, but the sandbox ships neither the binary nor a parent
+editor. This skill installs Neovim, launches it **headless** on a listen socket,
+and exports `$NVIM` so the `neovim` skill's commands work verbatim afterwards.
 
 **Scope:** web sandbox only (`CLAUDE_CODE_REMOTE=true`). Do not run on a real
 machine — there Neovim is managed by bob at `~/.local/share/bob/nvim-bin/nvim`.
@@ -19,8 +16,8 @@ machine — there Neovim is managed by bob at `~/.local/share/bob/nvim-bin/nvim`
 ## Why Nix, not bob
 
 Nix installs Neovim from `*.nixos.org` (allow-listed by default), so the binary
-needs **no GitHub access** — and `nixpkgs-unstable` ships Neovim 0.12.x, which
-has both `vim.pack` and `vim._core.ui2`, exactly what `nvim-fredrik` requires.
+needs **no GitHub access** — and `nixpkgs-unstable` ships a current Neovim with
+`vim.pack`, which `nvim-fredrik` requires.
 bob is available too (see the end), but `bob install` downloads Neovim as a
 **GitHub release asset**, which the GitHub proxy blocks unless `neovim/neovim`
 is attached to the session — regardless of network level. So Nix is the default;
@@ -91,18 +88,16 @@ The config lives in the cloned repo. Two env vars point Neovim at it:
 - **`NVIM_APPNAME=nvim-fredrik`** makes Neovim read `~/.config/nvim-fredrik`
   (the symlink created below).
 - **`$DOTFILES`** is the **dotfiles repo root**. The config builds paths from it
-  to other repo files — the Mason lockfile
-  (`$DOTFILES/nvim-fredrik/mason-lock.json`), lint configs
-  (`$DOTFILES/extras/templates/...`), and snippets. Left unset, `init.lua` falls
-  back to `~/.dotfiles`; startup still succeeds, but that path doesn't exist in
-  the sandbox, so those lockfile/lint/snippet lookups silently resolve to
-  missing files. Point it at the clone root so they resolve.
+  (Mason lockfile, lint configs, snippets); left unset it falls back to
+  `~/.dotfiles`, which doesn't exist in the sandbox, so those lookups silently
+  resolve to missing files. Point it at the clone root.
 
-**The sandbox runs each command in a fresh shell initialized from your
-profile**, so plain `export`s do not survive from one Bash call to the next —
-and the `neovim` skill you hand off to later relies on `$NVIM` being present.
-Persist the environment into a file the profile sources, so every subsequent
-shell (and the `neovim` skill) inherits it:
+**Each Bash call is a fresh shell whose environment is snapshotted at session
+start** — `~/.bashrc` is not re-run per call (its non-interactive `return` guard
+exits early), so appending an `export` or `source` line there does **not** reach
+later calls. The filesystem does persist, though: write the env to a file and
+`source` it at the top of every later call that needs it — including every
+`neovim`-skill call, which keys off `$NVIM`.
 
 ```bash
 repo="/home/user/dotfiles"        # adjust if the repo is cloned elsewhere
@@ -115,20 +110,18 @@ export DOTFILES="$repo"
 export NVIM_APPNAME=nvim-fredrik
 export NVIM=/tmp/nvim-fredrik.sock
 EOF
-grep -qxF 'source ~/.nvim-sandbox.env' ~/.bashrc 2>/dev/null \
-  || echo 'source ~/.nvim-sandbox.env' >> ~/.bashrc
 source ~/.nvim-sandbox.env
 ```
 
 ## Step 4 — Launch Neovim headless with a listen socket
 
 This is the bridge to the `neovim` skill. Start a backgrounded headless
-instance listening on `$NVIM` (persisted in Step 3), so the RPC skill's
-commands — which all key off `$NVIM` — work unchanged. The **first** launch
-clones all plugins via `vim.pack` (needs Step 0 item 2) and can take a few
-minutes.
+instance listening on `$NVIM`, so the RPC skill's commands — which all key off
+`$NVIM` — work unchanged. The **first** launch clones all plugins via `vim.pack`
+(needs Step 0 item 2) and can take a few minutes.
 
 ```bash
+source ~/.nvim-sandbox.env        # env doesn't persist across calls; re-source
 rm -f "$NVIM"
 # --headless keeps it alive as long as the socket is served; run detached.
 nohup nvim --headless --listen "$NVIM" >/tmp/nvim-headless.log 2>&1 &
@@ -148,16 +141,16 @@ missing.
 ## Step 5 — Verify and hand off to the `neovim` skill
 
 ```bash
+source ~/.nvim-sandbox.env
 nvim --server "$NVIM" --remote-expr 'v:version'
 nvim --server "$NVIM" --remote-expr 'luaeval("vim.fn.stdpath(\"config\")")'
 ```
 
-`$NVIM` is now set exactly as if Claude Code were running inside a Neovim
-terminal, so **switch to the `neovim` skill** for all further interaction
-(buffer state, running Lua, inspecting diagnostics, LSP, plugins). Note: the
-`neovim` skill's `NVIM_APPNAME` stdout-warning filter targets the dotfiles
-`nvim` wrapper; here you invoke the real binary directly, so the warning usually
-does not appear — the filter is harmless either way.
+With `~/.nvim-sandbox.env` sourced, `$NVIM` is set exactly as if Claude Code
+were running inside a Neovim terminal, so **switch to the `neovim` skill** for
+all further interaction (buffer state, running Lua, inspecting diagnostics, LSP,
+plugins). Start each of those Bash calls with `source ~/.nvim-sandbox.env` too —
+the env doesn't carry over on its own.
 
 ## Testing a config-change PR
 
@@ -169,10 +162,14 @@ git -C /home/user/dotfiles fetch origin <pr-branch>
 git -C /home/user/dotfiles checkout <pr-branch>
 ```
 
-Then restart the headless instance so the new config is sourced:
+Then restart the headless instance so the new config is sourced. Stop the old
+instance deterministically first — a `--remote-expr` quit can race the relaunch
+below and leave the old process orphaned, still serving the previous config —
+then relaunch exactly as in Step 4:
 
 ```bash
-nvim --server "$NVIM" --remote-expr 'execute("qa!")' 2>/dev/null || true
+source ~/.nvim-sandbox.env
+pkill -f 'nvim --headless --listen' 2>/dev/null || true
 rm -f "$NVIM"
 nohup nvim --headless --listen "$NVIM" >/tmp/nvim-headless.log 2>&1 &
 for i in $(seq 1 120); do
@@ -205,9 +202,9 @@ bob use nightly                              # needs neovim/neovim attached
 export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
 ```
 
-If you use this, add `$HOME/.local/share/bob/nvim-bin` to the persisted `PATH`
-in Step 3. For most sandbox testing the Step 2 Nix binary is simpler and needs
-no attachment.
+If you use this, add `$HOME/.local/share/bob/nvim-bin` to the `PATH` line in
+`~/.nvim-sandbox.env` (Step 3). For most sandbox testing the Step 2 Nix binary
+is simpler and needs no attachment.
 
 ## Caveats
 
