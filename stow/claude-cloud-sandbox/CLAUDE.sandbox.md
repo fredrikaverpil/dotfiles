@@ -24,5 +24,6 @@ sandbox-only.
 ## Adding sandbox customizations
 
 Sandbox-only behavior (config, hooks, instructions) belongs in
-`dotfiles/.claude/sandbox/` — extend `bootstrap.sh` and this file rather
-than adding per-repo or per-session configuration.
+`dotfiles/stow/claude-cloud-sandbox/` (symlinked as `dotfiles/.claude/sandbox/`)
+— extend `bootstrap.sh` and this file rather than adding per-repo or
+per-session configuration.

@@ -9,7 +9,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "s=\"${CLAUDE_PROJECT_DIR:-/home/user/dotfiles}/.claude/hooks/sandbox-git-identity.sh\"; [ -x \"$s\" ] || s=\"/home/user/dotfiles/.claude/hooks/sandbox-git-identity.sh\"; if [ -x \"$s\" ]; then \"$s\"; else echo \"WARNING: sandbox-git-identity.sh not found via \\$CLAUDE_PROJECT_DIR or /home/user/dotfiles — git identity was NOT configured, commits will be misattributed to Claude. Locate and run the script from the dotfiles repo before committing.\"; fi"
+            "command": "if [ \"${CLAUDE_CODE_REMOTE:-}\" = \"true\" ]; then s=\"${CLAUDE_PROJECT_DIR:-/home/user/dotfiles}/.claude/sandbox/bootstrap.sh\"; [ -x \"$s\" ] || s=/home/user/dotfiles/.claude/sandbox/bootstrap.sh; \"$s\"; fi"
           }
         ]
       }

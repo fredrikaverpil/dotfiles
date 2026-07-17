@@ -31,7 +31,7 @@ mkdir -p "$CLAUDE_DIR/skills"
 
 # Git identity + signing off. The script guards on CLAUDE_CODE_REMOTE, which
 # is not set in the setup-script phase, so assert it explicitly.
-CLAUDE_CODE_REMOTE=true "$DOTFILES_ROOT/.claude/hooks/sandbox-git-identity.sh"
+CLAUDE_CODE_REMOTE=true "$DOTFILES_ROOT/.claude/sandbox/sandbox-git-identity.sh"
 
 # User-scope settings. The PreToolUse hook re-asserts the git identity before
 # every Bash call: the sandbox's own SessionStart hook re-writes the Claude
@@ -62,7 +62,7 @@ settings=$(cat <<EOF
         "hooks": [
           {
             "type": "command",
-            "command": "CLAUDE_CODE_REMOTE=true $DOTFILES_ROOT/.claude/hooks/sandbox-git-identity.sh"
+            "command": "CLAUDE_CODE_REMOTE=true $DOTFILES_ROOT/.claude/sandbox/sandbox-git-identity.sh"
           }
         ]
       }

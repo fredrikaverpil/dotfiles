@@ -32,6 +32,9 @@ and **GNU Stow** for dotfile symlinking.
   - `shared/`: Cross-platform dotfiles
   - `Darwin/`: macOS-specific dotfiles
   - `Linux/`: Linux-specific dotfiles
+  - `claude-cloud-sandbox/`: Claude cloud sandbox setup — never stowed to
+    `$HOME` (install.sh only stows `shared` + platform); deployed by its own
+    `bootstrap.sh` (see Claude Cloud Sandbox section)
 - `extras/`: One-off platform-specific extras, legacy configs, and additional
   READMEs
 - `nvim-fredrik/`: Complete Neovim configuration with modular per-language setup
@@ -141,12 +144,22 @@ For each language, consult the corresponding file in
 
 ## Claude Cloud Sandbox
 
+There are three Claude Code setups in this repo:
+
+1. **Developer machines**: `stow/shared/.claude/` (plus platform packages),
+   stowed to `~/.claude` by `./rebuild.sh --stow`
+2. **Dotfiles repo scope**: root `.claude/` (settings.json, skills symlinked
+   into `stow/shared/.claude/skills/`)
+3. **Claude cloud sandbox**: `stow/claude-cloud-sandbox/`, symlinked as
+   `.claude/sandbox/`, deployed into the sandbox's user scope (`~/.claude/`)
+   by its `bootstrap.sh` — never stowed on developer machines
+
 Sandbox-only customizations (git identity override, hooks, attribution,
-skills) live in `.claude/sandbox/` and are installed into user scope
-(`~/.claude/`) by `.claude/sandbox/bootstrap.sh`. Repo-level
-`.claude/settings.json` hooks do NOT load when this repo is cloned
-side-by-side with a work repo (only the session root's settings are read),
-so user scope is the only reliable home for sandbox config.
+skills) live in `stow/claude-cloud-sandbox/` and are installed into user
+scope by `.claude/sandbox/bootstrap.sh`. Repo-level `.claude/settings.json`
+hooks do NOT load when this repo is cloned side-by-side with a work repo
+(only the session root's settings are read), so user scope is the only
+reliable home for sandbox config.
 
 - **Preferred**: the cloud environment's setup script (configured once on
   claude.ai) clones this repo and runs the bootstrap; the environment

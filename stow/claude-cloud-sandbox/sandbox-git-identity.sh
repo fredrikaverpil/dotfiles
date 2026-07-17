@@ -10,16 +10,14 @@ set -e
 # commit.gpgsign also skips the sandbox Stop hook's identity check, which
 # would otherwise instruct the agent to reset the identity back to Claude.
 #
-# Invocation: the git-commit skill runs this before every commit. That is
-# the primary path — the SessionStart hook in .claude/settings.json only
-# fires when this repo is the session root (single-repo session); in
-# multi-repo sessions repo-level settings.json is never loaded. Even when it
-# does fire, the sandbox's own SessionStart hook re-asserts the Claude
-# identity on every session start, so per-commit re-assertion is what makes
-# this stick. Use global config: the sandbox may hold multiple repos, and
-# this covers all of them, including ones added mid-session. On a developer
-# machine the stowed ~/.gitconfig already handles identity and signing, so
-# do nothing.
+# Invocation: the user-scope PreToolUse hook registered by bootstrap.sh
+# runs this before every Bash call — the sandbox's own SessionStart hook
+# re-asserts the Claude identity on every session start, so per-call
+# re-assertion is what makes this stick. bootstrap.sh also runs it once
+# directly, and the git-commit skill verifies the result before committing.
+# Use global config: the sandbox may hold multiple repos, and this covers
+# all of them, including ones added mid-session. On a developer machine the
+# stowed ~/.gitconfig already handles identity and signing, so do nothing.
 if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
   exit 0
 fi
