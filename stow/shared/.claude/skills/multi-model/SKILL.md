@@ -1,0 +1,109 @@
+---
+name: multi-model
+description:
+  "Run a task through a budget-aware multi-model pipeline: plan and interview
+  (Fable), orchestrate Haiku implementer subagents (Sonnet), then self-review
+  (Fable). Use when the user wants planning, implementation, and review handled
+  by different models."
+user-invocable: true
+disable-model-invocation: false
+---
+
+# Multi-model workflow
+
+Run a task through three phases, each on the model best suited to it. The point
+is to spend expensive tokens only where judgment is needed and delegate the
+mechanical work to cheap Haiku subagents — **without** the token blow-up of
+agent teams.
+
+## Why subagents, not teams
+
+This is a **hub-and-spoke** workflow: an orchestrator hands out self-contained
+work and workers report back. That is exactly what
+[subagents](https://code.claude.com/docs/en/sub-agents) are for — each runs in
+its own context window and only a summary returns to the main context, so both
+cost and main-context bloat stay low.
+
+[Agent teams](https://code.claude.com/docs/en/agent-teams) exist for the
+opposite case: teammates that talk to _each other_. They spin up a full Claude
+instance per teammate (token cost scales linearly) and add coordination
+overhead we don't need here. So we do **not** set
+`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`. When the orchestrator wants a second
+opinion, it spawns a one-off `reviewer` subagent instead of forming a team.
+
+## The one thing a skill can't do
+
+A skill can't switch the **main session's** model, and the plan/review phases
+are interactive or want full session context. So the model per phase is set by
+**you** with `/model`, and the skill drives delegation within a phase:
+
+| Phase          | Main session model  | Effort | Delegates to                 |
+| -------------- | ------------------- | ------ | ---------------------------- |
+| 1. Plan        | Fable (→ Opus)      | high   | —                            |
+| 2. Implement   | Sonnet 4.5          | medium | `impl-worker`, `researcher`  |
+| 3. Review      | Fable (→ Opus)      | high   | `reviewer` (optional)        |
+
+Switch `/model` and `/effort` at each phase boundary. If Fable is unavailable,
+use Opus.
+
+## Shared brain: MEMORY.md
+
+Subagents are stateless cold starts and this flow spans three phases, so keep a
+single working doc as the shared state. Put it in the scratchpad (or a
+gitignored path) — **do not commit it**.
+
+It holds:
+
+- **Plan** — the agreed approach and scope.
+- **Decisions** — settled questions and their answers.
+- **Open questions** — anything still blocking, for you to resolve.
+- **Task specs** — one section per delegated unit of work (see Phase 2).
+- **Review findings** — what Phase 3 surfaced and what was fixed.
+
+The orchestrator points each subagent at the relevant section instead of
+re-explaining context in the spawn prompt. This keeps spawn prompts small and
+the main context lean.
+
+## Phase 1 — Plan & interview (Fable, high effort)
+
+1. Ensure `/model` is Fable (or Opus) and `/effort` is high.
+2. Run the `plan-interview` skill: work back and forth with the user, leading
+   with open questions and an outline before writing the plan.
+3. Write the agreed plan, settled decisions, and any open questions into
+   `MEMORY.md`.
+4. Do **not** start implementing in this phase.
+
+## Phase 2 — Implement (Sonnet, orchestrator)
+
+Switch `/model` to Sonnet 4.5 and `/effort` to medium. **You are the
+orchestrator: you verify and coordinate, you do not write the implementation
+yourself.**
+
+1. **Decompose.** Break the plan into self-contained tasks — a function, a file,
+   a test suite — each producing a clear deliverable. Write one **task spec**
+   per task into `MEMORY.md` (files to touch, expected behaviour, constraints,
+   done criteria).
+2. **Delegate.** Spawn an `impl-worker` (Haiku) subagent per task. Keep the
+   spawn prompt short: point it at its `MEMORY.md` section and the relevant
+   files. Independent tasks can run in parallel; give each worker a disjoint set
+   of files to avoid conflicts.
+3. **Research cheaply.** For any web lookup, docs check, or library research,
+   spawn a `researcher` (Haiku) subagent rather than doing it in the main
+   context — only its summary returns.
+4. **Verify every return.** Read each worker's diff against its spec and against
+   the `self-review` criteria (placement, simplicity, DRY, YAGNI, idiom,
+   robustness). If it falls short, send precise feedback and re-delegate. Answer
+   worker questions.
+5. **Escalate, don't guess.** For ambiguous product decisions, ask the user with
+   `AskUserQuestion` and record the answer in `MEMORY.md`. For a second opinion
+   on a risky diff, spawn a `reviewer` (Fable) subagent.
+
+## Phase 3 — Self-review (Fable, high effort)
+
+1. Switch `/model` back to Fable (or Opus) and `/effort` to high.
+2. Run the `self-review` skill across the whole change — read every changed file
+   in full, not just diffs.
+3. Fix issues found, or delegate fixes back to an `impl-worker` if mechanical.
+4. Record findings and fixes in `MEMORY.md`, then summarize for the user.
+
+$ARGUMENTS
