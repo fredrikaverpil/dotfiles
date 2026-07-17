@@ -86,9 +86,17 @@ nvim --headless -c 'lua io.write(tostring(vim.pack ~= nil))' -c 'qa'  # expect: 
 
 ## Step 3 — Wire the config into place and persist the environment
 
-The config lives in the cloned repo. `NVIM_APPNAME=nvim-fredrik` makes Neovim
-read `~/.config/nvim-fredrik`, and the config expects `$DOTFILES` set (it
-defaults to `~/.dotfiles`, which does not exist here).
+The config lives in the cloned repo. Two env vars point Neovim at it:
+
+- **`NVIM_APPNAME=nvim-fredrik`** makes Neovim read `~/.config/nvim-fredrik`
+  (the symlink created below).
+- **`$DOTFILES`** is the **dotfiles repo root**. The config builds paths from it
+  to other repo files — the Mason lockfile
+  (`$DOTFILES/nvim-fredrik/mason-lock.json`), lint configs
+  (`$DOTFILES/extras/templates/...`), and snippets. Left unset, `init.lua` falls
+  back to `~/.dotfiles`; startup still succeeds, but that path doesn't exist in
+  the sandbox, so those lockfile/lint/snippet lookups silently resolve to
+  missing files. Point it at the clone root so they resolve.
 
 **The sandbox runs each command in a fresh shell initialized from your
 profile**, so plain `export`s do not survive from one Bash call to the next —
