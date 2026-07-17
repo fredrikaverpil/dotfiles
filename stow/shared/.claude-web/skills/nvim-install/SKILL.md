@@ -45,10 +45,14 @@ Two independent mechanisms gate traffic; they bite at different points.
      (`github.com` is allow-listed). No action.
    - **codeberg.org plugins** (nvim-lint, nvim-dap, nvim-dap-python) —
      **required and blocked by default.** Edit the environment → **Network
-     access** selector → **Custom** → in **Allowed domains** add `codeberg.org`
-     → tick *"Also include default list of common package managers"* → save.
-     This rebuilds the environment. See
-     https://code.claude.com/docs/en/claude-code-on-the-web.
+     access** selector → **Custom** → in **Allowed domains** add the bare
+     `codeberg.org` → tick *"Also include default list of common package
+     managers"* → save. This rebuilds the environment. See
+     https://code.claude.com/docs/en/claude-code-on-the-web. **Gotcha:** use the
+     apex `codeberg.org`, not `*.codeberg.org` — the wildcard matches only
+     subdomains, but the plugin `src` URLs are `https://codeberg.org/...`, so a
+     `*.codeberg.org`-only allowlist still 403s the clones. (`Full` network
+     access also works but is broader than needed.)
    - **GitHub release assets** (codediff's prebuilt lib, Mason LSP servers,
      treesitter parsers) — gated by the GitHub proxy to *attached* repos
      **regardless of network level**, so they may 403. Optional for observing
