@@ -143,6 +143,10 @@ in
       # ========================================================================
       # Language-specific
       uv
+      # Deno installs/runs the npm-managed CLI tools. Unlike node/bun global
+      # installs (FHS shebangs, glibc-linked shims), deno shims are /bin/sh
+      # scripts exec'ing the nix store deno -> works on NixOS. Unstable for
+      # the latest Node-compat fixes (no-op on macOS, where pkgs IS unstable).
       unstable.deno
 
       # Generic development
