@@ -54,10 +54,10 @@ in
       '' "$HOME/.opencode/bin/opencode")
     ];
 
-    # npm packages via bun (macOS only, mergeable across config levels)
+    # npm packages (mergeable across config levels)
     packageTools.npmPackages = [ ];
 
-    # Python CLI tools via uv (mergeable across config levels)
+    # Python CLI tools (mergeable across config levels)
     packageTools.uvTools = [
       {
         package = "sqlit-tui";
@@ -143,7 +143,7 @@ in
       # ========================================================================
       # Language-specific
       uv
-      unstable.deno # JS/TS runtime; also installs/runs the npm-managed CLI tools
+      unstable.deno
 
       # Generic development
       bfs
@@ -186,11 +186,9 @@ in
       slides
       chafa # Required for showing images in slides
 
-      # AI coding agents from the llm-agents flake input (see flake.nix).
-      # Update via `./rebuild.sh --update-unstable` (or --update).
-      llmAgents.codex # @openai/codex
-      llmAgents.gemini-cli # @google/gemini-cli
-      llmAgents.pi # @earendil-works/pi-coding-agent
+      llmAgents.codex
+      llmAgents.gemini-cli
+      llmAgents.pi
 
       # ========================================================================
       # Infrastructure & Cloud
