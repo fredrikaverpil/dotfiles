@@ -7,9 +7,11 @@
   nixConfig = {
     extra-substituters = [
       "https://nixos-raspberrypi.cachix.org"
+      "https://cache.numtide.com"
     ];
     extra-trusted-public-keys = [
       "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
+      "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
     ];
   };
 
@@ -56,6 +58,11 @@
       url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    # AI coding agent CLIs (codex, gemini-cli, pi, ...), updated daily upstream.
+    # NOTE: Do NOT make this follow another nixpkgs: packages are built and
+    # cached against its own pinned nixpkgs-unstable, and cache.numtide.com
+    # only serves those builds.
+    llm-agents.url = "github:numtide/llm-agents.nix";
     dotfiles = {
       # Used by home-manager for dotfiles bootstrapping.
       url = "github:fredrikaverpil/dotfiles";
