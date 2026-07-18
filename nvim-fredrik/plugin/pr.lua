@@ -1,8 +1,10 @@
 require("lazyload").on_vim_enter(function()
-  require("dev").load_local("~/code/public/pr.nvim")
-  vim.pack.add({
-    -- { src = "https://github.com/fredrikaverpil/pr.nvim" },
-  })
+  -- Load from disk if checked out locally, otherwise from GitHub.
+  if not require("dev").load_local("~/code/public/pr.nvim") then
+    vim.pack.add({
+      { src = "https://github.com/fredrikaverpil/pr.nvim" },
+    })
+  end
 
   require("pr").setup({})
 
