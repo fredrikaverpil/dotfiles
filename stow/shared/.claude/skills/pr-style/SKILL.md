@@ -20,6 +20,7 @@ is created (`gh` CLI, GitHub MCP tools, API).
 - Prefer explicitness and clarity over verbosity.
 - Express Why/What/Notes content as concise, to-the-point bullet lists. Avoid
   prose paragraphs.
+- All references to functions, libraries, projects, products must be linked.
 - Include a small, illustrative code snippet whenever it conveys the change
   faster than prose. This is desired for PRs in general, and especially for bug
   fixes: a minimal example of the triggering case (and what went wrong) makes
