@@ -7,7 +7,7 @@
     "~/.claude/plugins/cache/*/*/*/commands/*.md"
   ],
   "npmCommand": [
-    "bun"
+    "npm"
   ],
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-5.5",

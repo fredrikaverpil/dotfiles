@@ -116,7 +116,7 @@
     "playwright": {
       "enabled": false,
       "type": "local",
-      "command": ["bunx", "@playwright/mcp@latest"]
+      "command": ["deno", "run", "-A", "npm:@playwright/mcp@latest"]
     }
   }
 }

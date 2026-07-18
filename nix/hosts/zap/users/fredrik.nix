@@ -30,7 +30,10 @@ in
 
   # zap-specific package-managed tools
   packageTools.npmPackages = [
-    "@googleworkspace/cli"
+    {
+      package = "@googleworkspace/cli";
+      bin = "gws";
+    }
   ];
   packageTools.uvTools = [ ];
 

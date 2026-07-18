@@ -79,8 +79,8 @@ Example locations:
 
 ### Package-Managed Tools (npm and Python)
 
-For CLI tools installed via bun (npm) or uv (Python). Unlike self-managed CLIs,
-these require explicit upgrades via `./rebuild.sh --update-unstable` or
+For CLI tools installed via deno (npm) or uv (Python). Unlike self-managed
+CLIs, these require explicit upgrades via `./rebuild.sh --update-unstable` or
 `--update`.
 
 - **Module**: `nix/shared/home/package-tools.nix`
@@ -89,9 +89,10 @@ these require explicit upgrades via `./rebuild.sh --update-unstable` or
 
 **Adding npm tools:**
 
-1. Add the package to `packageTools.npmPackages` in the appropriate Nix config
+1. Add a `{ package, bin }` entry to `packageTools.npmPackages` in the
+   appropriate Nix config (`bin` is the package.json "bin" name)
 2. Run `./rebuild.sh` to install
-3. Update later: `./rebuild.sh --update-unstable` or `bun update -g`
+3. Update later: `./rebuild.sh --update-unstable` or `npm-tools-upgrade`
 
 **Adding Python CLI tools (via uv):**
 
@@ -146,8 +147,6 @@ For each language, consult the corresponding file in
 
 ## Gotchas
 
-- **npm packages are macOS-only**: `packageTools.npmPackages` has dynamic
-  linking issues on NixOS — only add npm tools in Darwin configs
 - **Neovim is managed by Bob**, not nixpkgs — binary is at
   `~/.local/share/bob/nvim-bin/nvim`
 - **`stow/` changes take effect immediately** (just re-run

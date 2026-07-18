@@ -93,7 +93,7 @@
             # stable.${system}.xxx
 
             # Unstable packages
-            unstable.${system}.bun
+            unstable.${system}.deno
             unstable.${system}.go_latest
             unstable.${system}.nodejs
             unstable.${system}.pnpm
@@ -101,7 +101,7 @@
             unstable.${system}.ruby
           ];
           shellHook = ''
-            echo -e "\033[32m[dotfiles-toolchain] bun $(bun --version) | $(go version | awk '{print $1" "$3}') | lua $(lua -v 2>&1 | awk '{print $2}') | node $(node -v) (npm $(npm -v)) | pnpm $(pnpm -v) | python $(python --version | awk '{print $2}') | $(ruby -v | cut -d' ' -f1-2)\033[0m"
+            echo -e "\033[32m[dotfiles-toolchain] $(deno --version | awk 'NR==1{print $1" "$2}') | $(go version | awk '{print $1" "$3}') | lua $(lua -v 2>&1 | awk '{print $2}') | node $(node -v) (npm $(npm -v)) | pnpm $(pnpm -v) | python $(python --version | awk '{print $2}') | $(ruby -v | cut -d' ' -f1-2)\033[0m"
           '';
         };
       };

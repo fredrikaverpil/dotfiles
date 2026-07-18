@@ -13,18 +13,19 @@
       "tools": []
     },
     "context7": {
-      "command": "bunx",
+      "command": "deno",
       "args": [
-        "-y",
-        "@upstash/context7-mcp",
+        "run",
+        "-A",
+        "npm:@upstash/context7-mcp",
         "--api-key",
         "${CONTEXT7_API_KEY}"
       ],
       "tools": []
     },
     "playwright": {
-      "command": "bunx",
-      "args": ["@playwright/mcp@latest"],
+      "command": "deno",
+      "args": ["run", "-A", "npm:@playwright/mcp@latest"],
       "tools": []
     }
   }

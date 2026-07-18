@@ -83,7 +83,7 @@ sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- sw
 | User packages      | home-manager                  | Per-user    | `nix/shared/home/`                      |
 | User preferences   | home-manager                  | Per-user    | `nix/shared/home/` + host-specific      |
 | Self-managed CLIs  | Native installers (curl/wget) | Per-user    | `nix/shared/home/self-managed-clis.nix` |
-| Package tools      | bun (npm), uv (Python)        | Per-user    | `nix/shared/home/package-tools.nix`     |
+| Package tools      | deno (npm), uv (Python)       | Per-user    | `nix/shared/home/package-tools.nix`     |
 | Host configuration | nix-darwin/NixOS              | System-wide | `nix/hosts/*/configuration.nix`         |
 | System packages    | nix-darwin/NixOS              | System-wide | `nix/shared/system/`                    |
 | System settings    | nix-darwin/NixOS              | System-wide | `nix/shared/system/`                    |
@@ -150,7 +150,7 @@ By default, `./rebuild.sh` aims to be "reproducible" and uses the locked
 `--update` to update all inputs.
 
 ```sh
-# Update unstable/Darwin-related inputs + upgrade uv tools + upgrade bun packages
+# Update unstable/Darwin-related inputs + upgrade uv tools + upgrade npm tools
 ./rebuild.sh --update-unstable
 # Or manually (flake inputs only): nix flake update nixpkgs-unstable nix-darwin home-manager-unstable dotfiles
 

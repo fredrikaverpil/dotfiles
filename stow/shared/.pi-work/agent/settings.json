@@ -7,7 +7,7 @@
     "~/.claude-work/plugins/cache/*/*/*/commands/*.md"
   ],
   "npmCommand": [
-    "bun"
+    "npm"
   ],
   "packages": [
     "npm:pi-system-theme"

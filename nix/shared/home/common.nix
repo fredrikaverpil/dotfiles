@@ -42,7 +42,7 @@ in
     # Self-managed CLI tools (installed once, auto-update thereafter)
     selfManagedCLIs.clis = [
       (mkCurlInstaller "claude" "Claude Code" "https://claude.ai/install.sh" "$HOME/.local/bin/claude")
-      (mkCurlInstaller "agent" "Cursor Agent" "https://cursor.com/install" "$HOME/.local/bin/agent")
+      # (mkCurlInstaller "agent" "Cursor Agent" "https://cursor.com/install" "$HOME/.local/bin/agent")
       # (mkCurlInstaller "vibe" "Mistral Vibe" "https://mistral.ai/vibe/install.sh" "$HOME/.local/bin/vibe")
       # (mkCurlInstaller "agy" "Antigravity CLI" "https://antigravity.google/cli/install.sh"
       #   "$HOME/.local/bin/agy"
@@ -54,10 +54,10 @@ in
       '' "$HOME/.opencode/bin/opencode")
     ];
 
-    # npm packages via bun (macOS only, mergeable across config levels)
+    # npm packages (mergeable across config levels)
     packageTools.npmPackages = [ ];
 
-    # Python CLI tools via uv (mergeable across config levels)
+    # Python CLI tools (mergeable across config levels)
     packageTools.uvTools = [
       {
         package = "sqlit-tui";
@@ -143,6 +143,11 @@ in
       # ========================================================================
       # Language-specific
       uv
+      # Deno installs/runs the npm-managed CLI tools. Unlike node/bun global
+      # installs (FHS shebangs, glibc-linked shims), deno shims are /bin/sh
+      # scripts exec'ing the nix store deno -> works on NixOS. Unstable for
+      # the latest Node-compat fixes (no-op on macOS, where pkgs IS unstable).
+      unstable.deno
 
       # Generic development
       bfs
@@ -152,7 +157,6 @@ in
       dust
       fd
       gnumake
-      go-task
       # pre-commit # requires swift, which is problematic and very expensive to build on macOS
       ripgrep
       ugrep
@@ -185,11 +189,9 @@ in
       slides
       chafa # Required for showing images in slides
 
-      # AI coding agents from the llm-agents flake input (see flake.nix).
-      # Update via `./rebuild.sh --update-unstable` (or --update).
-      llmAgents.codex # @openai/codex
-      llmAgents.gemini-cli # @google/gemini-cli
-      llmAgents.pi # @earendil-works/pi-coding-agent
+      llmAgents.codex
+      llmAgents.gemini-cli
+      llmAgents.pi
 
       # ========================================================================
       # Infrastructure & Cloud
@@ -209,7 +211,6 @@ in
     home.file.".config/nvim-deps-path".text = lib.makeBinPath (
       with unstable;
       [
-        bun
         cmake
         beamPackages.elixir
         gcc
