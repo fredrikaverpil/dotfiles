@@ -17,6 +17,7 @@ require("lazyload").on_vim_enter(function()
     { src = "https://github.com/nvim-neotest/neotest-python" },
     { src = "https://github.com/lawrence-laz/neotest-zig" },
 
+    -- neotest-golang dependency (the adapter itself is loaded above)
     { src = "https://github.com/uga-rosa/utf8.nvim" },
   })
 
