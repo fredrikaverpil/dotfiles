@@ -4,25 +4,6 @@
   lib,
   ...
 }:
-let
-  # Bob's neovim proxy (~/.local/share/bob/nvim-bin/nvim) is a copy of the bob
-  # binary and inherits its permissions. The Nix-store bob is read-only, so the
-  # proxy is too, and the next `bob use` fails to overwrite it ("Failed to copy
-  # file"). Wrap bob to make the proxy writable right before every invocation.
-  #
-  # NOTE: bob is macOS-only. It downloads prebuilt glibc neovim binaries which
-  # cannot run on NixOS (stub-ld) — Linux gets neovim from nixpkgs instead
-  # (see linux.nix).
-  bobWrapped = pkgs.symlinkJoin {
-    name = "bob-nvim-wrapped";
-    paths = [ pkgs.bob-nvim ];
-    nativeBuildInputs = [ pkgs.makeWrapper ];
-    postBuild = ''
-      wrapProgram $out/bin/bob \
-        --run 'p="$HOME/.local/share/bob/nvim-bin/nvim"; [ -e "$p" ] && chmod u+w "$p" 2>/dev/null || true'
-    '';
-  };
-in
 # This file contains home-manager settings specific to macOS.
 {
   imports = [
@@ -32,14 +13,18 @@ in
   home.packages = with pkgs; [
     pngpaste # for obsidian, macOS-only
     uv
-    bobWrapped
   ];
 
-  # Bootstrap Neovim via Bob on first rebuild
+  # Bootstrap Neovim via Bob on first rebuild. Bob is installed via Homebrew
+  # (see nix/shared/system/darwin.nix): the brew binary is writable, which
+  # bob requires since it copies itself as the nvim proxy — the nixpkgs
+  # binary is read-only and needed a wrapper. Bob is macOS-only; it downloads
+  # prebuilt glibc neovim binaries which cannot run on NixOS (stub-ld), so
+  # Linux gets neovim from nixpkgs instead (see linux.nix).
   home.activation.bobNeovimBootstrap = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     if [[ ! -x "$HOME/.local/share/bob/nvim-bin/nvim" ]]; then
       echo "Bootstrapping Neovim via Bob..."
-      ${bobWrapped}/bin/bob use stable
+      /opt/homebrew/bin/bob use stable
     fi
   '';
 

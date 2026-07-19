@@ -79,6 +79,7 @@ in
         # Homebrew-managed CLIs
         # "joshmedeski/sesh/sesh"
         # "sst/tap/opencode"
+        "bob" # Neovim version manager; brew binary is writable, nixpkgs' is not
         "socktainer"
         "pkgx"
         "proton-pass-cli"
