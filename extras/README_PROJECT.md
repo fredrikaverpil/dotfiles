@@ -474,13 +474,12 @@ writing the plugin spec; opening Neovim takes care of the rest.
 
 ### Claude Code
 
-Claude Code is installed via native installer (declared in
-`nix/shared/home/common.nix` as a self-managed CLI). It auto-updates
-independently of Nix rebuilds.
+Claude Code is installed as a Nix package from the `llm-agents` flake input
+(declared via `packageTools.llmAgents` in `nix/shared/home/common.nix`).
 
 - [Claude code docs](https://docs.claude.com/en/docs/claude-code)
-- Installation: Automatic on first `./rebuild.sh`
-- Updates: Auto-updates itself (no manual intervention)
+- Installation: Automatic on `./rebuild.sh`
+- Updates: `./rebuild.sh --update-unstable` (updates the llm-agents flake input)
 - Settings: Managed in `stow/shared/.claude/` (synced via Stow)
 
 #### Claude Work profile

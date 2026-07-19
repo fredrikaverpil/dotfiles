@@ -7,9 +7,6 @@
 }:
 let
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
-
-  # Import helper functions for self-managed CLIs (if needed)
-  inherit (config.selfManagedCLIs.helpers) mkCurlInstaller mkWgetInstaller mkCustomInstaller;
 in
 {
   imports = [
@@ -30,11 +27,9 @@ in
   ];
   packageTools.uvTools = [ ];
 
-  # User/host-specific self-managed CLI tools
-  # Example (uncomment to add tools specific to this user/host):
-  # selfManagedCLIs.clis = [
-  #   (mkCurlInstaller "user-tool" "User-specific Tool" "https://example.com/install.sh")
-  # ];
+  # User/host-specific LLM agent CLIs
+  # Example (uncomment to add agents specific to this user/host):
+  # packageTools.llmAgents = [ "cursor-agent" ];
 
   home.file = {
   };

@@ -50,38 +50,21 @@ and **GNU Stow** for dotfile symlinking.
   `nix/hosts/$HOSTNAME/`
 - **Package management**: CLI tools via Nix, GUI apps via Homebrew (macOS) or
   Nix (Linux)
-- **Self-managed CLIs**: Tools with native installers that auto-update (e.g.,
-  Claude Code) are declared in `selfManagedCLIs` lists at any config level
-  (common, platform-specific, or user-specific)
-- **LLM agent CLIs**: Packaged agents (codex, gemini-cli, pi, ...) come from
-  the `llm-agents` flake input (numtide/llm-agents.nix) and are added to
-  `home.packages` in `nix/shared/home/common.nix`. Do not make this input
+- **LLM agent CLIs**: Packaged agents (claude-code, codex, gemini-cli,
+  kimi-code, opencode, pi, ...) come from the `llm-agents` flake input
+  (numtide/llm-agents.nix) and are declared via `packageTools.llmAgents`
+  (mergeable across common → platform → host configs). Do not make this input
   follow another nixpkgs — it is built/cached against its own pin
   (cache.numtide.com). Update via `./rebuild.sh --update-unstable`
-
-### Self-Managed CLIs
-
-For CLI tools that provide native installers and manage their own updates (e.g.,
-Claude Code, Amp, Copilot). These are installed once on rebuild and self-update
-thereafter.
-
-- **Module**: `nix/shared/home/self-managed-clis.nix`
-- **Helpers**: `mkCurlInstaller`, `mkWgetInstaller`, `mkCustomInstaller`
-- **Hierarchy**: Lists merge across common → platform → user configs
-- **Behavior**: Install-if-missing on each rebuild, then auto-update
-  independently
-
-Example locations:
-
-- Cross-platform: `nix/shared/home/common.nix`
-- macOS-only: `nix/shared/home/darwin.nix`
-- User-specific: `nix/hosts/{hostname}/users/{username}.nix`
+- **No curl|bash installers in activation**: AI/agent CLIs must come from
+  llm-agents (patched, cached), not native installers. Prebuilt glibc
+  binaries cannot run on NixOS (stub-ld), and install-if-missing activation
+  scripts make rebuilds depend on third-party servers.
 
 ### Package-Managed Tools (npm and Python)
 
-For CLI tools installed via deno (npm) or uv (Python). Unlike self-managed
-CLIs, these require explicit upgrades via `./rebuild.sh --update-unstable` or
-`--update`.
+For CLI tools installed via deno (npm) or uv (Python). These require explicit
+upgrades via `./rebuild.sh --update-unstable` or `--update`.
 
 - **Module**: `nix/shared/home/package-tools.nix`
 - **Behavior**: Installed on each rebuild; upgraded when `--update-unstable` or
@@ -99,6 +82,14 @@ CLIs, these require explicit upgrades via `./rebuild.sh --update-unstable` or
 1. Add a tool entry to `packageTools.uvTools` in the appropriate Nix config
 2. Run `./rebuild.sh` to install
 3. Update later: `./rebuild.sh --update-unstable` or `uv tool upgrade --all`
+
+**Adding LLM agent CLIs:**
+
+1. Add the package name (an attribute of the llm-agents flake's `packages`,
+   e.g. `"claude-code"`) to `packageTools.llmAgents` at the appropriate config
+   level (common, platform, or host user config)
+2. Run `./rebuild.sh` to install
+3. Update later: `./rebuild.sh --update-unstable`
 
 ### Neovim Configuration
 

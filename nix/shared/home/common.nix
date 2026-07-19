@@ -8,7 +8,6 @@
 }:
 let
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
-  llmAgents = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
 
   # Bob's neovim proxy (~/.local/share/bob/nvim-bin/nvim) is a copy of the bob
   # binary and inherits its permissions. The Nix-store bob is read-only, so the
@@ -23,35 +22,23 @@ let
         --run 'p="$HOME/.local/share/bob/nvim-bin/nvim"; [ -e "$p" ] && chmod u+w "$p" 2>/dev/null || true'
     '';
   };
-
-  # Import helper functions for self-managed CLIs
-  inherit (config.selfManagedCLIs.helpers)
-    mkCurlInstaller
-    mkWgetInstaller
-    mkCustomInstaller
-    ;
 in
 {
   imports = [
-    ./self-managed-clis.nix
     ./package-tools.nix
   ];
 
   config = {
 
-    # Self-managed CLI tools (installed once, auto-update thereafter)
-    selfManagedCLIs.clis = [
-      (mkCurlInstaller "claude" "Claude Code" "https://claude.ai/install.sh" "$HOME/.local/bin/claude")
-      # (mkCurlInstaller "agent" "Cursor Agent" "https://cursor.com/install" "$HOME/.local/bin/agent")
-      # (mkCurlInstaller "vibe" "Mistral Vibe" "https://mistral.ai/vibe/install.sh" "$HOME/.local/bin/vibe")
-      # (mkCurlInstaller "agy" "Antigravity CLI" "https://antigravity.google/cli/install.sh"
-      #   "$HOME/.local/bin/agy"
-      # )
-
-      # OpenCode installs to ~/.opencode/bin/opencode, use --no-modify-path to prevent shell config modification
-      (mkCustomInstaller "opencode" "OpenCode AI" ''
-        ${pkgs.curl}/bin/curl -fsSL https://opencode.ai/install | ${pkgs.bash}/bin/bash -s -- --no-modify-path
-      '' "$HOME/.opencode/bin/opencode")
+    # LLM agent CLIs from the numtide/llm-agents.nix flake input (mergeable
+    # across config levels; platform/host configs can add more)
+    packageTools.llmAgents = [
+      "claude-code"
+      "codex"
+      "gemini-cli"
+      "kimi-code"
+      "opencode"
+      "pi"
     ];
 
     # npm packages (mergeable across config levels)
@@ -190,11 +177,6 @@ in
       llama-cpp
       slides
       chafa # Required for showing images in slides
-
-      llmAgents.codex
-      llmAgents.gemini-cli
-      llmAgents.kimi-code
-      llmAgents.pi
 
       # ========================================================================
       # Infrastructure & Cloud

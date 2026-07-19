@@ -4,10 +4,6 @@
   lib,
   ...
 }:
-let
-  # Import helper functions for self-managed CLIs (if needed)
-  inherit (config.selfManagedCLIs.helpers) mkCurlInstaller mkWgetInstaller mkCustomInstaller;
-in
 # This file contains home-manager settings specific to macOS.
 {
   imports = [
@@ -23,15 +19,10 @@ in
   packageTools.npmPackages = [ ];
   packageTools.uvTools = [ ];
 
-  # macOS-specific self-managed CLI tools
-  selfManagedCLIs.clis = [
-    (mkCurlInstaller "amp" "Amp Code" "https://ampcode.com/install.sh" "$HOME/.local/bin/amp")
-    # GitHub Copilot CLI installer will ask interactively if it should modify .zshrc
-    # Answer "N" since PATH is already configured in shell/exports.sh
-    # Note: Cannot bypass prompt - installer reads directly from /dev/tty
-    (mkCurlInstaller "copilot" "GitHub Copilot CLI" "https://gh.io/copilot-install"
-      "$HOME/.local/bin/copilot"
-    )
+  # macOS-specific LLM agent CLIs
+  packageTools.llmAgents = [
+    "amp"
+    "copilot-cli"
   ];
 
   programs = {

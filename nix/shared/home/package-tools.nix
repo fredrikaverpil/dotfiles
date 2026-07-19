@@ -1,8 +1,10 @@
 # Package-managed CLI tools module
-# Handles installation of tools managed by deno (npm) and uv (Python).
+# Handles installation of tools managed by deno (npm) and uv (Python),
+# plus LLM agent CLIs from the numtide/llm-agents.nix flake input.
 #
-# Unlike self-managed CLIs (which install once and self-update), these tools
-# require explicit upgrades via rebuild.sh --update-unstable or --update.
+# Unlike package-managed tools, LLM agents are plain Nix packages (patched,
+# binary-cached on cache.numtide.com) and upgrade with the llm-agents flake
+# input via rebuild.sh --update-unstable or --update.
 #
 # npm tools (deno):
 #   - Declared via packageTools.npmPackages option (mergeable per-host/platform)
@@ -38,6 +40,7 @@
 }:
 let
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+  llmAgentPackages = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
 
   # Generate deno install commands from the merged npm packages option
   npmInstallScript = lib.concatMapStringsSep "\n" (tool: ''
@@ -156,6 +159,22 @@ in
         Declarations merge across config levels (common, platform, host).
       '';
     };
+
+    llmAgents = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = ''
+        LLM agent CLIs to install from the numtide/llm-agents.nix flake input.
+        Each entry must be an attribute name in that flake's packages set
+        (e.g., "claude-code", "opencode"). Declarations merge across config
+        levels (common, platform, host).
+      '';
+      example = [
+        "claude-code"
+        "opencode"
+      ];
+      apply = lib.unique;
+    };
   };
 
   config = {
@@ -165,9 +184,11 @@ in
     ];
 
     # Upgrade helper invoked by rebuild.sh --update-unstable/--update
-    home.packages = lib.optionals (config.packageTools.npmPackages != [ ]) [
-      npmUpgradeScript
-    ];
+    home.packages =
+      lib.optionals (config.packageTools.npmPackages != [ ]) [
+        npmUpgradeScript
+      ]
+      ++ map (name: llmAgentPackages.${name}) config.packageTools.llmAgents;
 
     # Install package-managed tools on activation (install-if-missing, no upgrades)
     # Upgrades are triggered by rebuild.sh --update-unstable/--update

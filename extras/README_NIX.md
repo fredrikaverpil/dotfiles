@@ -77,18 +77,18 @@ sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- sw
 
 ### Components
 
-| Component          | Tool                          | Scope       | Configuration Location                  |
-| ------------------ | ----------------------------- | ----------- | --------------------------------------- |
-| User dotfiles      | GNU Stow                      | Per-user    | `stow/`                                 |
-| User packages      | home-manager                  | Per-user    | `nix/shared/home/`                      |
-| User preferences   | home-manager                  | Per-user    | `nix/shared/home/` + host-specific      |
-| Self-managed CLIs  | Native installers (curl/wget) | Per-user    | `nix/shared/home/self-managed-clis.nix` |
-| Package tools      | deno (npm), uv (Python)       | Per-user    | `nix/shared/home/package-tools.nix`     |
-| Host configuration | nix-darwin/NixOS              | System-wide | `nix/hosts/*/configuration.nix`         |
-| System packages    | nix-darwin/NixOS              | System-wide | `nix/shared/system/`                    |
-| System settings    | nix-darwin/NixOS              | System-wide | `nix/shared/system/`                    |
-| Homebrew packages  | nix-darwin                    | System-wide | `nix/shared/system/darwin.nix`          |
-| Package overlays   | Nix                           | System-wide | `nix/shared/overlays/`                  |
+| Component          | Tool                            | Scope       | Configuration Location                  |
+| ------------------ | ------------------------------- | ----------- | --------------------------------------- |
+| User dotfiles      | GNU Stow                        | Per-user    | `stow/`                                 |
+| User packages      | home-manager                    | Per-user    | `nix/shared/home/`                      |
+| User preferences   | home-manager                    | Per-user    | `nix/shared/home/` + host-specific      |
+| LLM agent CLIs     | llm-agents.nix flake input      | Per-user    | `nix/shared/home/package-tools.nix`     |
+| Package tools      | deno (npm), uv (Python)         | Per-user    | `nix/shared/home/package-tools.nix`     |
+| Host configuration | nix-darwin/NixOS                | System-wide | `nix/hosts/*/configuration.nix`         |
+| System packages    | nix-darwin/NixOS                | System-wide | `nix/shared/system/`                    |
+| System settings    | nix-darwin/NixOS                | System-wide | `nix/shared/system/`                    |
+| Homebrew packages  | nix-darwin                      | System-wide | `nix/shared/system/darwin.nix`          |
+| Package overlays   | Nix                             | System-wide | `nix/shared/overlays/`                  |
 
 - NixOS configuration options:
   [stable](https://nixos.org/manual/nixos/stable/options) |

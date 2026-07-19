@@ -7,9 +7,6 @@
 }:
 let
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
-
-  # Import helper functions for self-managed CLIs
-  inherit (config.selfManagedCLIs.helpers) mkCurlInstaller mkWgetInstaller mkCustomInstaller;
 in
 {
   imports = [
@@ -37,10 +34,8 @@ in
   ];
   packageTools.uvTools = [ ];
 
-  # zap-specific self-managed CLI tools
-  selfManagedCLIs.clis = [
-    (mkCurlInstaller "agent" "Cursor Agent" "https://cursor.com/install" "$HOME/.local/bin/agent")
-  ];
+  # zap-specific LLM agent CLIs
+  packageTools.llmAgents = [ "cursor-agent" ];
 
   home.file = {
   };
