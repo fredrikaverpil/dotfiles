@@ -19,10 +19,12 @@ in
     # LLM agent CLIs from the numtide/llm-agents.nix flake input (mergeable
     # across config levels; platform/host configs can add more)
     packageTools.llmAgents = [
+      "antigravity-cli"
       "claude-code"
       "codex"
       "gemini-cli"
       "kimi-code"
+      "mistral-vibe"
       "opencode"
       "pi"
     ];
