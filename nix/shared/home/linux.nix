@@ -25,6 +25,10 @@ in
     lsof # List open files - essential for debugging file/network issues
     strace # System call tracer - useful for debugging application behavior
     unstable.uv # see let-block note above
+    # Neovim from nixpkgs: bob (used on macOS) downloads prebuilt glibc
+    # binaries which cannot run on NixOS (stub-ld). The shell/bin/nvim
+    # wrapper falls back to the Nix profile binary automatically.
+    unstable.neovim
   ];
 
   home.file = {

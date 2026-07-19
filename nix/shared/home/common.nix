@@ -8,20 +8,6 @@
 }:
 let
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
-
-  # Bob's neovim proxy (~/.local/share/bob/nvim-bin/nvim) is a copy of the bob
-  # binary and inherits its permissions. The Nix-store bob is read-only, so the
-  # proxy is too, and the next `bob use` fails to overwrite it ("Failed to copy
-  # file"). Wrap bob to make the proxy writable right before every invocation.
-  bobWrapped = pkgs.symlinkJoin {
-    name = "bob-nvim-wrapped";
-    paths = [ unstable.bob-nvim ];
-    nativeBuildInputs = [ pkgs.makeWrapper ];
-    postBuild = ''
-      wrapProgram $out/bin/bob \
-        --run 'p="$HOME/.local/share/bob/nvim-bin/nvim"; [ -e "$p" ] && chmod u+w "$p" 2>/dev/null || true'
-    '';
-  };
 in
 {
   imports = [
@@ -110,7 +96,6 @@ in
       stow # GNU Stow for dotfile management
       tmux
       tree
-      bobWrapped
       wget
       yq
       yazi
@@ -213,17 +198,6 @@ in
         yarn
       ]
     );
-
-    # Bootstrap Neovim via Bob on first rebuild
-    home.activation.bobNeovimBootstrap = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      if [[ ! -x "$HOME/.local/share/bob/nvim-bin/nvim" ]]; then
-        echo "Bootstrapping Neovim via Bob..."
-        ${bobWrapped}/bin/bob use stable
-      fi
-    '';
-
-    # Bob config path (unified across macOS/Linux, since defaults differ)
-    home.sessionVariables.BOB_CONFIG = "$HOME/.config/bob/config.toml";
 
   };
 }
