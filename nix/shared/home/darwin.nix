@@ -16,6 +16,7 @@ in
 
   home.packages = with pkgs; [
     pngpaste # for obsidian, macOS-only
+    uv # pkgs IS nixpkgs-unstable on macOS, so this is the latest uv
   ];
 
   # macOS-specific package-managed tools

@@ -62,22 +62,26 @@ let
     '') config.packageTools.npmPackages
   );
 
-  # Generate uv tool install commands from the merged uv tools option
+  # Generate uv tool install commands from the merged uv tools option.
+  # Uses unstable.uv to match the CLI installed via home.packages (see
+  # linux.nix) and to support the uv.toml syntax in use on all platforms.
+  # Venvs are created with the Nix python: uv-managed CPython downloads are
+  # generic glibc binaries which cannot execute on NixOS (stub-ld).
   uvToolInstallScript = lib.concatMapStringsSep "\n" (
     tool:
     let
       spec = if tool.extras != "" then "${tool.package}[${tool.extras}]" else tool.package;
       installCmd = ''
-        if ${pkgs.uv}/bin/uv tool list 2>/dev/null | grep -q "^${tool.package} "; then
+        if ${unstable.uv}/bin/uv tool list 2>/dev/null | grep -q "^${tool.package} "; then
           echo "Already installed: ${tool.package}"
         else
           echo "Installing ${tool.package}..."
-          ${pkgs.uv}/bin/uv tool install "${spec}"
+          ${unstable.uv}/bin/uv tool install --python ${pkgs.python3}/bin/python "${spec}"
         fi
       '';
       injectCmds = lib.concatMapStringsSep "\n" (dep: ''
         echo "Injecting ${dep} into ${tool.package}..."
-        ${pkgs.uv}/bin/uv tool inject "${tool.package}" "${dep}" 2>/dev/null || true
+        ${unstable.uv}/bin/uv tool inject "${tool.package}" "${dep}" 2>/dev/null || true
       '') tool.inject;
     in
     installCmd + injectCmds
