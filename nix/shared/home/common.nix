@@ -144,7 +144,8 @@ in
       # Language-specific
       # NOTE: uv is installed per-platform (darwin.nix / linux.nix), since the
       # stable-pin uv on NixOS is too old for the uv.toml syntax in use.
-      # Deno installs/runs the npm-managed CLI tools. Unlike node/bun global
+      #
+      # NOTE: Deno installs/runs the npm-managed CLI tools. Unlike node/bun global
       # installs (FHS shebangs, glibc-linked shims), deno shims are /bin/sh
       # scripts exec'ing the nix store deno -> works on NixOS. Unstable for
       # the latest Node-compat fixes (no-op on macOS, where pkgs IS unstable).
