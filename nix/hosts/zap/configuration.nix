@@ -62,7 +62,6 @@ in
     "cyberduck"
     "pgadmin4"
     "podman-desktop"
-    "spotify"
     # Disabled because the upstream app repo is archived; use EtienneLescot/openscreen instead.
     # "siddharthvaddem/openscreen/openscreen"
   ];
