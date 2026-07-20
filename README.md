@@ -2,9 +2,17 @@
 
 ![screenshot](https://github.com/user-attachments/assets/51c05d03-d997-40dc-8757-4d13993fcafb)
 
-Personal dotfiles using [Nix](https://nixos.org) for reproducible system/package
-management and [GNU Stow](https://www.gnu.org/software/stow/) for dotfile
-symlinking.
+Personal dotfiles, managed in three layers:
+
+- **[Nix](https://nixos.org)** (`nix/`) — system configuration and packages,
+  pinned by `flake.lock` and applied with a rebuild. Fully reproducible.
+- **Stow** (`stow/`) — dotfiles symlinked into `$HOME` with
+  [GNU Stow](https://www.gnu.org/software/stow/). Changes take effect
+  immediately, no rebuild needed.
+- **Package tools** — CLI tools installed by their own package managers
+  (currently `uv` for Python, `deno` for npm). Nix declares _which_ tools and
+  installs missing ones on rebuild, but versions are unpinned and upgraded
+  manually.
 
 ## Quickstart
 
@@ -27,20 +35,16 @@ nix flake update
 # Update only the unstable-pinned inputs, then rebuild
 nix flake update nixpkgs-unstable nix-darwin home-manager-unstable llm-agents dotfiles
 
-# After updating, refresh package-managed CLI tools
-uv tool upgrade --all
-npm-tools-upgrade
-
 # Clean up old Nix generations, keeping the last 5 days for rollback safety
 sudo nix-collect-garbage --delete-older-than 5d
 ```
 
 > [!NOTE]
-> On macOS, home-manager's per-user activation can silently fail to apply
-> (a known upstream `launchctl asuser` flakiness — no config-level fix
-> exists). After rebuilding, verify with `readlink /run/current-system` and
-> `nix profile list | grep -A1 home-manager-path`; see `CLAUDE.md` for the
-> fallback command if it's stale.
+> On macOS, home-manager's per-user activation can silently fail to apply (a
+> known upstream `launchctl asuser` flakiness). The rebuild self-heals this: a
+> guard in `nix/shared/system/darwin.nix` verifies the activation landed and
+> retries it, failing loudly otherwise. See `CLAUDE.md` for manual
+> verification and recovery.
 
 ### Stow
 
@@ -63,7 +67,7 @@ stow --target="$HOME" --restow --no-folding --adopt shared Linux    # Linux
 `--adopt` absorbs any real file that has replaced a managed symlink into the
 repo instead of aborting; review the result with `git diff` before committing.
 
-### Shell
+#### Shell
 
 The shell entrypoint is `stow/shared/.zshrc`, which sources
 `stow/shared/.zshrc_user`. The user file loads the shell configuration chain:
@@ -76,6 +80,26 @@ The shell entrypoint is `stow/shared/.zshrc`, which sources
 
 See [Project config](extras/README_PROJECT.md) for details on shell
 initialization, direnv, and per-project tooling.
+
+### Package tools
+
+> [!NOTE]
+>
+> I'm not happy with how this is designed, see
+> [dotfiles#202](https://github.com/fredrikaverpil/dotfiles/issues/202).
+
+CLI tools that come from language ecosystems rather than nixpkgs are declared
+in Nix (see `nix/shared/home/package-tools.nix`) but installed by their native
+package manager. A rebuild installs anything missing; upgrades are manual:
+
+```sh
+uv tool upgrade --all   # Python tools (uv)
+npm-tools-upgrade       # npm tools (deno)
+```
+
+LLM agent CLIs (claude-code, opencode,...) are the exception: they are plain Nix
+packages from the `llm-agents` flake input, upgraded via
+`nix flake update llm-agents` + rebuild.
 
 ## Other READMEs and references
 
