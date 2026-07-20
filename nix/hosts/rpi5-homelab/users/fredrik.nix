@@ -40,7 +40,7 @@ in
       Type = "simple";
       WorkingDirectory = "%h/code/public";
       ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p %h/code/public";
-      ExecStart = "${pkgs.bash}/bin/bash -c 'exec claude remote-control --permission-mode auto'";
+      ExecStart = "${pkgs.bash}/bin/bash -c 'exec $HOME/.nix-profile/bin/claude remote-control --permission-mode auto'";
       Restart = "always";
       RestartSec = "10";
 
@@ -50,7 +50,7 @@ in
 
       # Environment
       Environment = [
-        "PATH=${lib.makeBinPath [ pkgs.git pkgs.coreutils pkgs.findutils pkgs.gnugrep pkgs.gnused pkgs.gawk ]}"
+        "PATH=%h/.nix-profile/bin:${lib.makeBinPath [ pkgs.git pkgs.coreutils pkgs.findutils pkgs.gnugrep pkgs.gnused pkgs.gawk ]}"
       ];
     };
 
