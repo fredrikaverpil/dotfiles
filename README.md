@@ -52,7 +52,6 @@ Dotfiles are managed with GNU Stow, not Nix.
 
 - Edit files in `stow/` directory and run stow
 - Changes are immediately active (no rebuild needed)
-- Nix runs the same stow command during home-manager activation
 
 ```bash
 # Apply dotfiles (no Nix rebuild needed)
