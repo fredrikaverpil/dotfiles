@@ -28,7 +28,7 @@ in
 
   packageTools.llmAgents = [
     # "cursor-agent"
-    # "antigravity-cli"
+    "antigravity-cli"
   ];
 
   home.file = {
