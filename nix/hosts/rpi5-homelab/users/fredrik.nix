@@ -40,7 +40,7 @@ in
       Type = "simple";
       WorkingDirectory = "%h/code/public";
       ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p %h/code/public";
-      ExecStart = "${pkgs.bash}/bin/bash -c 'exec claude-code remote-control --permission-mode auto'";
+      ExecStart = "${pkgs.bash}/bin/bash -c 'exec claude remote-control --permission-mode auto'";
       Restart = "always";
       RestartSec = "10";
 
