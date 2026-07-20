@@ -79,6 +79,7 @@
       NewWindowTarget = "PfDe";
       NewWindowTargetPath = "file://${config.home.homeDirectory}/Desktop/";
       AppleShowAllExtensions = true;
+      AppleShowAllFiles = true;
       FXEnableExtensionChangeWarning = false;
       ShowStatusBar = true;
       ShowPathbar = true;
