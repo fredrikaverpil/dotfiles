@@ -10,7 +10,7 @@ let
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
 
   # Stow package dir matching `uname -s`; Nix knows the platform at build time.
-  stowPlatform = if pkgs.stdenv.hostPlatform.isDarwin then "Darwin" else "Linux";
+  stowPlatform = if pkgs.stdenv.hostPlatform.isDarwin then "darwin" else "linux";
 in
 {
   imports = [
