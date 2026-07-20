@@ -25,6 +25,12 @@ in
   home.packages = with pkgs; [
     lsof # List open files - essential for debugging file/network issues
     strace # System call tracer - useful for debugging application behavior
+    # xterm-ghostty terminfo so SSH-ins from a Ghostty terminal resolve the
+    # terminal type (no "can't find terminal definition for xterm-ghostty"
+    # warnings / garbled line editing). Linux-only rather than in common.nix
+    # alongside kitty.terminfo: the ghostty package does not evaluate on
+    # aarch64-darwin. Only the small terminfo output is installed, not the app.
+    ghostty.terminfo
     unstable.uv # see let-block note above
     # Neovim from nixpkgs: bob (used on macOS) downloads prebuilt glibc
     # binaries which cannot run on NixOS (stub-ld). The shell/bin/nvim

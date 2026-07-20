@@ -173,7 +173,8 @@ in
       # Terminal Support
       # ========================================================================
       kitty.terminfo # Terminal emulator terminfo for SSH compatibility
-      # ghostty.terminfo  # Terminal emulator terminfo - disabled due to broken package
+      # ghostty.terminfo lives in home/linux.nix (ghostty doesn't eval on
+      # aarch64-darwin; macOS gets the entry from the Ghostty app itself).
     ];
 
     # Tooling available only in Neovim.
