@@ -33,7 +33,7 @@ To launch this config:
 NVIM_APPNAME=nvim-fredrik nvim
 ```
 
-To apply stow symlinks after changes: `./rebuild.sh --stow` from `~/.dotfiles/`.
+To apply stow symlinks after changes: `cd ~/.dotfiles/stow && ./install.sh`.
 Neovim itself is managed by [Bob](https://github.com/MordechaiHadad/bob), not
 nixpkgs -- binary at `~/.local/share/bob/nvim-bin/nvim`.
 

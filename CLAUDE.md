@@ -5,17 +5,44 @@ code in this repository.
 
 ## Core Commands
 
-- **Full rebuild**: `./rebuild.sh` (Nix rebuild + Stow, reproducible by default)
-- **Update unstable inputs**: `./rebuild.sh --update-unstable` (then rebuild)
-- **Update all inputs**: `./rebuild.sh --update` (then rebuild)
-- **Symlink dotfiles only**: `./rebuild.sh --stow` (GNU Stow without Nix
-  rebuild)
+- **Full rebuild (Darwin)**: `sudo darwin-rebuild switch --flake ~/.dotfiles#<host>`
+  (hosts: `zap`, `plumbus`)
+- **Full rebuild (NixOS)**: `sudo nixos-rebuild switch --flake ~/.dotfiles#rpi5-homelab`
+- **Symlink dotfiles only**: `cd ~/.dotfiles/stow && ./install.sh` (GNU Stow,
+  no Nix rebuild)
+- **Update all flake inputs**: `nix flake update`, then rebuild
+- **Update only unstable-pinned inputs**: `nix flake update nixpkgs-unstable
+  nix-darwin home-manager-unstable llm-agents dotfiles`, then rebuild
+- **Refresh package-managed CLI tools after an update**: `uv tool upgrade --all`
+  and `npm-tools-upgrade`
 - **Nix rebuild**: ask user to run this, NEVER run it yourself
 - **Nix validation**: `nix flake check` or `nix flake check --all-systems`
 - **Nix builds**: `nix build .#darwinConfigurations.<host>.system` (hosts:
   `zap`, `plumbus` on Darwin; `rpi5-homelab` on NixOS)
 - **Format Nix files**: `nix fmt` (uses nixfmt-rfc-style)
 - **CI testing**: Follow `.github/workflows/test.yml` workflow
+
+### Verifying a Darwin rebuild actually landed
+
+On macOS, home-manager's per-user activation runs via `launchctl asuser`,
+which intermittently fails silently — `darwin-rebuild switch` can exit 0 even
+when the new generation never applied (known upstream issue, no config-level
+fix exists: it's unconditional in every nix-darwin + home-manager setup).
+After rebuilding, verify:
+
+```sh
+readlink /run/current-system   # should point at a fresh store path
+nix profile list | grep -A1 home-manager-path
+```
+
+If it's stale, run the per-user activation directly (bypasses the flaky
+`launchctl asuser` call):
+
+```sh
+sudo -u "$USER" --set-home "$(grep -oE '/nix/store/[a-z0-9]+-activation-'"$USER" /nix/var/nix/profiles/system/activate | head -1)"
+```
+
+Then re-run the rebuild command once more so `/run/current-system` catches up.
 
 ## Repository Architecture
 
@@ -55,7 +82,7 @@ and **GNU Stow** for dotfile symlinking.
   (numtide/llm-agents.nix) and are declared via `packageTools.llmAgents`
   (mergeable across common → platform → host configs). Do not make this input
   follow another nixpkgs — it is built/cached against its own pin
-  (cache.numtide.com). Update via `./rebuild.sh --update-unstable`
+  (cache.numtide.com). Update via `nix flake update llm-agents`, then rebuild
 - **No curl|bash installers in activation**: AI/agent CLIs must come from
   llm-agents (patched, cached), not native installers. Prebuilt glibc
   binaries cannot run on NixOS (stub-ld), and install-if-missing activation
@@ -63,33 +90,34 @@ and **GNU Stow** for dotfile symlinking.
 
 ### Package-Managed Tools (npm and Python)
 
-For CLI tools installed via deno (npm) or uv (Python). These require explicit
-upgrades via `./rebuild.sh --update-unstable` or `--update`.
+For CLI tools installed via deno (npm) or uv (Python). These require an
+explicit `uv tool upgrade --all` / `npm-tools-upgrade` after updating flake
+inputs to actually pick up new versions.
 
 - **Module**: `nix/shared/home/package-tools.nix`
-- **Behavior**: Installed on each rebuild; upgraded when `--update-unstable` or
-  `--update` is passed to `rebuild.sh`
+- **Behavior**: Installed on each rebuild; upgraded manually via
+  `uv tool upgrade --all` / `npm-tools-upgrade`
 
 **Adding npm tools:**
 
 1. Add a `{ package, bin }` entry to `packageTools.npmPackages` in the
    appropriate Nix config (`bin` is the package.json "bin" name)
-2. Run `./rebuild.sh` to install
-3. Update later: `./rebuild.sh --update-unstable` or `npm-tools-upgrade`
+2. Rebuild to install
+3. Update later: `npm-tools-upgrade`
 
 **Adding Python CLI tools (via uv):**
 
 1. Add a tool entry to `packageTools.uvTools` in the appropriate Nix config
-2. Run `./rebuild.sh` to install
-3. Update later: `./rebuild.sh --update-unstable` or `uv tool upgrade --all`
+2. Rebuild to install
+3. Update later: `uv tool upgrade --all`
 
 **Adding LLM agent CLIs:**
 
 1. Add the package name (an attribute of the llm-agents flake's `packages`,
    e.g. `"claude-code"`) to `packageTools.llmAgents` at the appropriate config
    level (common, platform, or host user config)
-2. Run `./rebuild.sh` to install
-3. Update later: `./rebuild.sh --update-unstable`
+2. Rebuild to install
+3. Update later: `nix flake update llm-agents`, then rebuild
 
 ### Neovim Configuration
 
@@ -141,4 +169,4 @@ For each language, consult the corresponding file in
 - **Neovim is managed by Bob**, not nixpkgs — binary is at
   `~/.local/share/bob/nvim-bin/nvim`
 - **`stow/` changes take effect immediately** (just re-run
-  `./rebuild.sh --stow`) — no Nix rebuild needed
+  `cd ~/.dotfiles/stow && ./install.sh`) — no Nix rebuild needed

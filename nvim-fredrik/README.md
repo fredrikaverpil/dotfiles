@@ -8,7 +8,7 @@
 NVIM_APPNAME=nvim-fredrik nvim
 ```
 
-Symlinked via GNU Stow. Run `./rebuild.sh --stow` from `~/.dotfiles/` to apply.
+Symlinked via GNU Stow. Run `cd ~/.dotfiles/stow && ./install.sh` to apply.
 
 ## Structure
 

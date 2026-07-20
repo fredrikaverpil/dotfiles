@@ -4,7 +4,7 @@
 
 ```bash
 git clone --recursive https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
-cd .dotfiles && ./rebuild.sh --stow
+cd ~/.dotfiles/stow && ./install.sh
 ```
 
 <details>

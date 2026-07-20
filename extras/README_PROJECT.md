@@ -478,8 +478,8 @@ Claude Code is installed as a Nix package from the `llm-agents` flake input
 (declared via `packageTools.llmAgents` in `nix/shared/home/common.nix`).
 
 - [Claude code docs](https://docs.claude.com/en/docs/claude-code)
-- Installation: Automatic on `./rebuild.sh`
-- Updates: `./rebuild.sh --update-unstable` (updates the llm-agents flake input)
+- Installation: Automatic on rebuild
+- Updates: `nix flake update llm-agents`, then rebuild
 - Settings: Managed in `stow/shared/.claude/` (synced via Stow)
 
 #### Claude Work profile

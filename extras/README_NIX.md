@@ -29,8 +29,9 @@ sudo nixos-rebuild switch --flake ~/.dotfiles#$(hostname)
 # macOS (first time only):
 sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- switch --flake ~/.dotfiles#$(hostname)
 
-# After first-time setup, use the rebuild script:
-./rebuild.sh
+# After first-time setup, rebuild with:
+sudo darwin-rebuild switch --flake ~/.dotfiles#$(hostname -s)   # macOS
+sudo nixos-rebuild switch --flake ~/.dotfiles#$(hostname)       # NixOS
 ```
 
 ## Nix management responsibilities
@@ -69,8 +70,7 @@ sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- sw
 │   └── sourcing.sh                  # Shell sourcing logic
 ├── stow/                            # GNU Stow dotfiles
 ├── extras/                          # One-off platform-specific extras and legacy configs
-├── flake.nix                        # Nix flake configuration
-└── rebuild.sh                       # Main rebuild script
+└── flake.nix                        # Nix flake configuration
 ```
 
 </details>
@@ -145,17 +145,22 @@ nix shell u#nodejs_22
 
 ### Update inputs
 
-By default, `./rebuild.sh` aims to be "reproducible" and uses the locked
-`flake.lock`. Use `--update-unstable` to update Darwin-related inputs, or
-`--update` to update all inputs.
+By default, rebuilding is "reproducible" and uses the locked `flake.lock`.
+Update inputs explicitly, then rebuild:
 
 ```sh
-# Update unstable/Darwin-related inputs + upgrade uv tools + upgrade npm tools
-./rebuild.sh --update-unstable
-# Or manually (flake inputs only): nix flake update nixpkgs-unstable nix-darwin home-manager-unstable dotfiles
+# Update unstable/Darwin-related inputs, then rebuild
+nix flake update nixpkgs-unstable nix-darwin home-manager-unstable llm-agents dotfiles
+
+# Update ALL inputs, then rebuild
+nix flake update
 
 # Update only Raspberry Pi-related inputs
 nix flake update nixos-raspberrypi home-manager-rpi disko
+
+# After updating, refresh package-managed CLI tools
+uv tool upgrade --all
+npm-tools-upgrade
 ```
 
 When updating `nixos-raspberrypi`:

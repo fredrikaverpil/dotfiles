@@ -32,7 +32,8 @@ task genuinely can't be made reasonably testable, **stop and tell the
 orchestrator** rather than shipping it untestable.
 
 **Verify before reporting.** Run the project's own checks where they apply
-(formatters, linters, `nix flake check`, tests). Never run `./rebuild.sh`.
+(formatters, linters, `nix flake check`, tests). Never run a Nix rebuild
+(`darwin-rebuild switch`, `nixos-rebuild switch`, or `stow/install.sh`).
 
 **Report back** with: what you changed (files + a one-line summary each), how
 you verified it, and any assumptions you made or questions you have. Keep it

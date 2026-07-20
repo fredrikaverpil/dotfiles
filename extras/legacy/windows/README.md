@@ -78,7 +78,7 @@ From the Ubuntu prompt:
 
 ```bash
 git clone --recursive https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
-cd .dotfiles && ./rebuild.sh --stow
+cd ~/.dotfiles/stow && ./install.sh
 ```
 
 <details>
@@ -233,7 +233,7 @@ cd ~/.dotfiles
 extras/installers/neovim_distros.sh
 
 # re-run dotfiles installer, to symlink LazyVim config
-../rebuild.sh --stow
+cd ~/.dotfiles/stow && ./install.sh
 ```
 
 ```bash

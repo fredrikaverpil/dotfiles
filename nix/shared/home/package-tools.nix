@@ -4,21 +4,20 @@
 #
 # Unlike package-managed tools, LLM agents are plain Nix packages (patched,
 # binary-cached on cache.numtide.com) and upgrade with the llm-agents flake
-# input via rebuild.sh --update-unstable or --update.
+# input via `nix flake update llm-agents`, then rebuild.
 #
 # npm tools (deno):
 #   - Declared via packageTools.npmPackages option (mergeable per-host/platform)
 #   - Each package installed globally via `deno install --global npm:<pkg>`
 #     (isolated in ~/.deno/)
 #   - Shims placed in ~/.deno/bin/ (added to PATH by this module)
-#   - Upgrade: rebuild.sh --update-unstable or --update (runs the generated
-#     npm-tools-upgrade script)
+#   - Upgrade: `npm-tools-upgrade` (the generated script)
 #
 # Python tools (uv):
 #   - Declared via packageTools.uvTools option (mergeable per-host/platform)
 #   - Each tool gets its own isolated venv (managed by uv tool)
 #   - Binaries symlinked to ~/.local/bin/ (already on PATH)
-#   - Upgrade: rebuild.sh --update-unstable or --update (runs uv tool upgrade --all)
+#   - Upgrade: `uv tool upgrade --all`
 #
 # Usage:
 #   # In any config level (common.nix, darwin.nix, host/users/user.nix):
@@ -54,7 +53,7 @@ let
     fi
   '') config.packageTools.npmPackages;
 
-  # Upgrade helper for rebuild.sh --update-unstable/--update: deno has no
+  # Upgrade helper (run manually after `nix flake update`): deno has no
   # equivalent of `bun update -g`, so force-reinstall every declared package
   # at its latest version (--reload bypasses the cached registry response).
   npmUpgradeScript = pkgs.writeShellScriptBin "npm-tools-upgrade" (
@@ -183,7 +182,7 @@ in
       "$HOME/.deno/bin"
     ];
 
-    # Upgrade helper invoked by rebuild.sh --update-unstable/--update
+    # Upgrade helper, run manually: npm-tools-upgrade
     home.packages =
       lib.optionals (config.packageTools.npmPackages != [ ]) [
         npmUpgradeScript
@@ -191,7 +190,7 @@ in
       ++ map (name: llmAgentPackages.${name}) config.packageTools.llmAgents;
 
     # Install package-managed tools on activation (install-if-missing, no upgrades)
-    # Upgrades are triggered by rebuild.sh --update-unstable/--update
+    # Upgrades are manual: uv tool upgrade --all / npm-tools-upgrade
     home.activation.installPackageTools = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       # --- uv tools (Python CLI tools, all platforms) ---
       ${uvToolInstallScript}

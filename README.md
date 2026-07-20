@@ -18,17 +18,29 @@ symlinking.
 
 ```sh
 # Rebuild system + packages + dotfiles (reproducible, uses flake.lock)
-./rebuild.sh
+sudo darwin-rebuild switch --flake ~/.dotfiles#<host>   # macOS (zap, plumbus)
+sudo nixos-rebuild switch --flake ~/.dotfiles#rpi5-homelab  # NixOS
 
-# Update ALL flake inputs + upgrade uv tools + upgrade npm tools
-./rebuild.sh --update
+# Update ALL flake inputs, then rebuild
+nix flake update
 
-# Update unstable inputs + upgrade uv tools + upgrade npm tools
-./rebuild.sh --update-unstable
+# Update only the unstable-pinned inputs, then rebuild
+nix flake update nixpkgs-unstable nix-darwin home-manager-unstable llm-agents dotfiles
+
+# After updating, refresh package-managed CLI tools
+uv tool upgrade --all
+npm-tools-upgrade
 
 # Dotfiles only (no Nix rebuild)
-./rebuild.sh --stow
+cd ~/.dotfiles/stow && ./install.sh
 ```
+
+> [!NOTE]
+> On macOS, home-manager's per-user activation can silently fail to apply
+> (a known upstream `launchctl asuser` flakiness — no config-level fix
+> exists). After rebuilding, verify with `readlink /run/current-system` and
+> `nix profile list | grep -A1 home-manager-path`; see `CLAUDE.md` for the
+> fallback command if it's stale.
 
 ### Dotfiles
 

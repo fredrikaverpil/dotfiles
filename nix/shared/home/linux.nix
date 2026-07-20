@@ -9,7 +9,7 @@ let
   # The stable-pin nixpkgs (nixos-raspberrypi) ships a uv too old for the
   # relative-date `exclude-newer = "3d"` syntax in
   # stow/shared/.config/uv/uv.toml. Use the unstable input instead — it is
-  # pinned in flake.lock and only changes on `rebuild.sh --update-unstable`.
+  # pinned in flake.lock and only changes on `nix flake update nixpkgs-unstable`.
   unstable = args.inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
 in
 {
