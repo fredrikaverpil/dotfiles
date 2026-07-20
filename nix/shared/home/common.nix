@@ -173,7 +173,18 @@ in
       # Terminal Support
       # ========================================================================
       kitty.terminfo # Terminal emulator terminfo for SSH compatibility
-      # ghostty.terminfo  # Terminal emulator terminfo - disabled due to broken package
+      # NOTE: do NOT add `ghostty.terminfo` here (or anywhere built for the Pi).
+      # Unlike kitty's, ghostty's terminfo is an output of the full ghostty
+      # build, which is uncached for nixos-raspberrypi's nixpkgs — pulling it in
+      # recompiles GTK/Ghostty from source on the Pi and crashes it.
+      #
+      # How xterm-ghostty is provided instead:
+      #   - macOS: the Ghostty app installs it.
+      #   - SSH targets (e.g. the Pi): Ghostty's client-side ssh-terminfo
+      #     integration (shell-integration-features in ghostty/config) installs
+      #     it automatically on first connect from a fresh Ghostty window.
+      #   - Manual one-off, if ever needed:
+      #       infocmp -x xterm-ghostty | ssh <host> 'tic -x -o "$HOME/.terminfo" -'
     ];
 
     # Tooling available only in Neovim.
