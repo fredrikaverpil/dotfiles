@@ -80,30 +80,38 @@ echo "Total number of repositories: $repo_count"
 # Ask for confirmation
 read -p "Do you want to clone these repositories? (y/n) " -n 1 -r
 
-# Loop over all repos and clone into different directories based on their status
+# Loop over all repos and clone them (skipping archived repos)
 IFS=$'\n' # Change the delimiter to newline
 for row in $all_repos; do
 	repo=$(echo "$row" | jq -r '.ssh_url')
 	repo_name=$(echo "$row" | jq -r '.name')
+	repo_owner=$(echo "$row" | jq -r '.owner.login')
 	private=$(echo "$row" | jq -r '.private')
 	archived=$(echo "$row" | jq -r '.archived')
-	dir=""
-	if [ "$private" = "true" ]; then
-		dir="$HOME/code/work/private/$repo_name"
-	elif [ "$private" = "false" ]; then
-		dir="$HOME/code/work/public/$repo_name"
-	elif [ "$archived" = "true" ]; then
-		dir="$HOME/code/work/archived/$repo_name"
+
+	# Skip archived repos
+	if [ "$archived" = "true" ]; then
+		debug_echo "Skipping archived repo: $repo_name"
+		continue
 	fi
-	if [ -n "$dir" ]; then
-		if [ -d "$dir" ]; then
-			debug_echo "Directory $dir already exists, skipping..."
-		else
-			debug_echo "Cloning $repo into $dir..."
-			git clone --recursive "$repo" "$dir"
-		fi
+
+	# Determine directory based on repo visibility (public/private)
+	if [ "$private" = "true" ]; then
+		dir="$HOME/code/private/github.com/$repo_owner/$repo_name"
+		debug_echo "Repo $repo_name is private"
+	elif [ "$private" = "false" ]; then
+		dir="$HOME/code/public/github.com/$repo_owner/$repo_name"
+		debug_echo "Repo $repo_name is public"
 	else
-		debug_echo "Warning: Directory not set for $repo, skipping..."
+		debug_echo "Warning: Unable to determine visibility for $repo_name (private=$private)"
+		continue
+	fi
+
+	if [ -d "$dir" ]; then
+		debug_echo "Directory $dir already exists, skipping..."
+	else
+		debug_echo "Cloning $repo into $dir..."
+		git clone --recursive "$repo" "$dir"
 	fi
 done
 IFS=$' ' # Restore the original delimiter

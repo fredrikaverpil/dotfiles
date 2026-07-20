@@ -1,6 +1,6 @@
 require("lazyload").on_vim_enter(function()
   -- neotest-golang: load from disk if checked out locally, otherwise from GitHub.
-  if not require("dev").load_local("~/code/public/neotest-golang") then
+  if not require("dev").load_local("~/code/public/github.com/fredrikaverpil/neotest-golang") then
     vim.pack.add({
       { src = "https://github.com/fredrikaverpil/neotest-golang" },
     })

@@ -26,7 +26,7 @@ require("lazyload").on_vim_enter(function()
             "--continue",
             "--allowedTools=Bash(gh:*)",
             "--allowedTools=RunBash(go:*)",
-            "--allowedTools=Read(~/code/public)",
+            "--allowedTools=Read(~/code/public/**)",
           },
         },
 

@@ -53,7 +53,7 @@ require("lazyload").on_vim_enter(function()
       end,
     })
 
-    --require("dev").load_local("~/code/public/godoc.nvim")
+    --require("dev").load_local("~/code/public/github.com/fredrikaverpil/godoc.nvim")
     --
     vim.pack.add({
       { src = "https://github.com/fredrikaverpil/godoc.nvim" },

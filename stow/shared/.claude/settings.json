@@ -41,7 +41,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "~/code/public/claudeline/claudeline -debug"
+    "command": "~/code/public/github.com/fredrikaverpil/claudeline/claudeline -debug"
   },
   "enabledPlugins": {
     "context7@claude-plugins-official": true,

@@ -253,7 +253,39 @@ vim.keymap.set("n", "<leader>sj", function()
   Snacks.picker.jumps()
 end, { desc = "Jumplist" })
 vim.keymap.set("n", "<leader>sp", function()
-  Snacks.picker.projects({ dev = { "~/code/public", "~/code/work/private", "~/code/work/public" } })
+  -- Collect all org/user directories under ~/code/{public,private}/{forge}/*
+  local function collect_project_dirs()
+    local dirs = {}
+    local code_base = vim.fn.expand("~/code")
+
+    if vim.fn.isdirectory(code_base) ~= 1 then
+      return dirs
+    end
+
+    -- Search under public and private visibility
+    for _, visibility in ipairs({ "private", "public" }) do
+      local visibility_path = vim.fs.joinpath(code_base, visibility)
+      if vim.fn.isdirectory(visibility_path) == 1 then
+        -- Get all forge directories (e.g., github.com, codeberg.org)
+        local forges = vim.fn.glob(visibility_path .. "/*", false, true)
+        for _, forge_path in ipairs(forges) do
+          if vim.fn.isdirectory(forge_path) == 1 then
+            -- Get all org/user directories under each forge
+            local orgs = vim.fn.glob(forge_path .. "/*", false, true)
+            for _, org_path in ipairs(orgs) do
+              if vim.fn.isdirectory(org_path) == 1 then
+                table.insert(dirs, org_path)
+              end
+            end
+          end
+        end
+      end
+    end
+
+    return dirs
+  end
+
+  Snacks.picker.projects({ dev = collect_project_dirs() })
 end, { desc = "Projects" })
 vim.keymap.set("n", "<leader>sq", function()
   Snacks.picker.qflist()
