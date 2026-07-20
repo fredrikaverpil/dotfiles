@@ -158,6 +158,10 @@ nix flake update
 # Update only Raspberry Pi-related inputs
 nix flake update nixos-raspberrypi home-manager-rpi disko
 
+# Update only the root stable nixpkgs (Linux formatters + the `n` registry
+# shortcut; not used by any system configuration)
+nix flake update nixpkgs
+
 # After updating, refresh package-managed CLI tools
 uv tool upgrade --all
 npm-tools-upgrade

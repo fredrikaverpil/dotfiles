@@ -33,6 +33,9 @@ npm-tools-upgrade
 
 # Dotfiles only (no Nix rebuild)
 cd ~/.dotfiles/stow && ./install.sh
+
+# Clean up old Nix generations, keeping the last 5 days for rollback safety
+sudo nix-collect-garbage --delete-older-than 5d
 ```
 
 > [!NOTE]
