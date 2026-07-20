@@ -41,6 +41,12 @@ cursor-color = cell-foreground
 
 mouse-hide-while-typing = true
 
+# SSH integration: install ghostty's terminfo on remote hosts (ssh-terminfo),
+# and fall back to TERM=xterm-256color if that fails (ssh-env). Fixes
+# "can't find terminal definition for xterm-ghostty" warnings and garbled
+# line editing on hosts that lack the xterm-ghostty terminfo entry.
+shell-integration-features = ssh-env,ssh-terminfo
+
 window-inherit-working-directory = false
 tab-inherit-working-directory = false
 working-directory = home
