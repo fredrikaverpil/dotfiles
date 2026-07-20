@@ -31,9 +31,6 @@ nix flake update nixpkgs-unstable nix-darwin home-manager-unstable llm-agents do
 uv tool upgrade --all
 npm-tools-upgrade
 
-# Dotfiles only (no Nix rebuild)
-cd ~/.dotfiles/stow && ./install.sh
-
 # Clean up old Nix generations, keeping the last 5 days for rollback safety
 sudo nix-collect-garbage --delete-older-than 5d
 ```
@@ -45,24 +42,27 @@ sudo nix-collect-garbage --delete-older-than 5d
 > `nix profile list | grep -A1 home-manager-path`; see `CLAUDE.md` for the
 > fallback command if it's stale.
 
-### Dotfiles
+### Stow
 
-Dotfiles are managed with GNU Stow, not Nix:
+Dotfiles are managed with GNU Stow, not Nix.
+
+> [!NOTE]
+>
+> The `darwin-rebuild` and `nixos-rebuild` commands will run stow as well.
 
 - Edit files in `stow/` directory and run stow
 - Changes are immediately active (no rebuild needed)
-- Nix runs stow commands during home-manager activation
+- Nix runs the same stow command during home-manager activation
 
 ```bash
-# Manual stow (if needed)
+# Apply dotfiles (no Nix rebuild needed)
 cd ~/.dotfiles/stow
-stow --target="$HOME" --restow shared "$(uname -s)"
-
-# If some tool replaced a symlinked config with a real file (breaking the
-# stow), re-run with --adopt to absorb it into the repo instead of aborting.
-# Review with `git diff` before committing -- nothing is staged automatically.
-./install.sh --adopt
+stow --target="$HOME" --restow --no-folding --adopt shared Darwin   # macOS
+stow --target="$HOME" --restow --no-folding --adopt shared Linux    # Linux
 ```
+
+`--adopt` absorbs any real file that has replaced a managed symlink into the
+repo instead of aborting; review the result with `git diff` before committing.
 
 ### Shell
 

@@ -8,7 +8,8 @@
 NVIM_APPNAME=nvim-fredrik nvim
 ```
 
-Symlinked via GNU Stow. Run `cd ~/.dotfiles/stow && ./install.sh` to apply.
+Symlinked via GNU Stow. Run `cd ~/.dotfiles/stow && stow --target="$HOME"
+--restow --no-folding --adopt shared "$(uname -s)"` to apply.
 
 ## Structure
 

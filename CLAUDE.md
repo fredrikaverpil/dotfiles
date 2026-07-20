@@ -9,8 +9,8 @@ code in this repository.
   ~/.dotfiles#"$(hostname -s)"` (hosts: `zap`, `plumbus`)
 - **Full rebuild (NixOS)**: `sudo nixos-rebuild switch --flake
   ~/.dotfiles#"$(hostname -s)"` (host: `rpi5-homelab`)
-- **Symlink dotfiles only**: `cd ~/.dotfiles/stow && ./install.sh` (GNU Stow,
-  no Nix rebuild)
+- **Symlink dotfiles only**: `cd ~/.dotfiles/stow && stow --target="$HOME"
+  --restow --no-folding --adopt shared "$(uname -s)"` (GNU Stow, no Nix rebuild)
 - **Update all flake inputs**: `nix flake update`, then rebuild
 - **Update only unstable-pinned inputs**: `nix flake update nixpkgs-unstable
   nix-darwin home-manager-unstable llm-agents dotfiles`, then rebuild
@@ -170,4 +170,5 @@ For each language, consult the corresponding file in
 - **Neovim is managed by Bob**, not nixpkgs — binary is at
   `~/.local/share/bob/nvim-bin/nvim`
 - **`stow/` changes take effect immediately** (just re-run
-  `cd ~/.dotfiles/stow && ./install.sh`) — no Nix rebuild needed
+  `cd ~/.dotfiles/stow && stow --target="$HOME" --restow --no-folding --adopt
+  shared "$(uname -s)"`) — no Nix rebuild needed

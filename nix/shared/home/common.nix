@@ -8,6 +8,9 @@
 }:
 let
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+
+  # Stow package dir matching `uname -s`; Nix knows the platform at build time.
+  stowPlatform = if pkgs.stdenv.hostPlatform.isDarwin then "Darwin" else "Linux";
 in
 {
   imports = [
@@ -58,16 +61,16 @@ in
         DOTFILES_PATH="${inputs.dotfiles}"
       fi
 
-      # Run stow installer script from determined path
-      if [ -f "$DOTFILES_PATH/stow/install.sh" ] && [ -x "$DOTFILES_PATH/stow/install.sh" ]; then
-        echo "Running stow installer from $DOTFILES_PATH..."
-        export PATH="${pkgs.stow}/bin:${pkgs.bash}/bin:$PATH"
-        if ! $DRY_RUN_CMD "$DOTFILES_PATH/stow/install.sh"; then
-          echo "Warning: Stow installation failed"
-          exit 1
-        fi
-      else
-        echo "Warning: install.sh not found or not executable in $DOTFILES_PATH/stow"
+      # Symlink dotfiles with GNU Stow. --adopt absorbs any real file that has
+      # replaced a managed symlink into the repo (shows up in `git diff`);
+      # --no-folding links individual files so other tools can write siblings
+      # into the same dir (e.g. ~/.config).
+      echo "Stowing dotfiles from $DOTFILES_PATH..."
+      if ! $DRY_RUN_CMD ${pkgs.stow}/bin/stow \
+        --dir="$DOTFILES_PATH/stow" --target="$HOME" \
+        --restow --no-folding --adopt \
+        shared ${stowPlatform}; then
+        echo "Warning: Stow installation failed"
         exit 1
       fi
     '';
