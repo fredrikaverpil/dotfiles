@@ -206,7 +206,7 @@ in
         ruby
         rustup # run `rustup update stable` to get latest rustc, cargo, rust-analyzer etc.
         tree-sitter
-        uv
+        # uv  # defined outside of Neovim for automatic venv activation in shell
         yarn
       ]
     );
