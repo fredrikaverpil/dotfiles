@@ -18,8 +18,8 @@ symlinking.
 
 ```sh
 # Rebuild system + packages + dotfiles (reproducible, uses flake.lock)
-sudo darwin-rebuild switch --flake ~/.dotfiles#<host>   # macOS (zap, plumbus)
-sudo nixos-rebuild switch --flake ~/.dotfiles#rpi5-homelab  # NixOS
+sudo darwin-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"  # macOS
+sudo nixos-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"   # NixOS
 
 # Update ALL flake inputs, then rebuild
 nix flake update

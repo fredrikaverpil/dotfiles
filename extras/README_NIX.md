@@ -30,8 +30,8 @@ sudo nixos-rebuild switch --flake ~/.dotfiles#$(hostname)
 sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- switch --flake ~/.dotfiles#$(hostname)
 
 # After first-time setup, rebuild with:
-sudo darwin-rebuild switch --flake ~/.dotfiles#$(hostname -s)   # macOS
-sudo nixos-rebuild switch --flake ~/.dotfiles#$(hostname)       # NixOS
+sudo darwin-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"  # macOS
+sudo nixos-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"   # NixOS
 ```
 
 ## Nix management responsibilities

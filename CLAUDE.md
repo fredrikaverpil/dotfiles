@@ -5,9 +5,10 @@ code in this repository.
 
 ## Core Commands
 
-- **Full rebuild (Darwin)**: `sudo darwin-rebuild switch --flake ~/.dotfiles#<host>`
-  (hosts: `zap`, `plumbus`)
-- **Full rebuild (NixOS)**: `sudo nixos-rebuild switch --flake ~/.dotfiles#rpi5-homelab`
+- **Full rebuild (Darwin)**: `sudo darwin-rebuild switch --flake
+  ~/.dotfiles#"$(hostname -s)"` (hosts: `zap`, `plumbus`)
+- **Full rebuild (NixOS)**: `sudo nixos-rebuild switch --flake
+  ~/.dotfiles#"$(hostname -s)"` (host: `rpi5-homelab`)
 - **Symlink dotfiles only**: `cd ~/.dotfiles/stow && ./install.sh` (GNU Stow,
   no Nix rebuild)
 - **Update all flake inputs**: `nix flake update`, then rebuild
