@@ -31,16 +31,14 @@
   # Bob config path (unified across macOS/Linux, since defaults differ)
   home.sessionVariables.BOB_CONFIG = "$HOME/.config/bob/config.toml";
 
-  # macOS-specific package-managed tools
   packageTools.npmPackages = [ ];
   packageTools.uvTools = [ ];
 
-  # macOS-specific LLM agent CLIs
   packageTools.llmAgents = [
-    "amp"
-    "codex"
-    "copilot-cli"
-    "mistral-vibe"
+    # "amp"
+    # "codex"
+    # "copilot-cli"
+    # "mistral-vibe"
   ];
 
   programs = {

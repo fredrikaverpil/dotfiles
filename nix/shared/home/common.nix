@@ -24,7 +24,6 @@ in
     packageTools.llmAgents = [
       "claude-code"
       "gemini-cli"
-      "kimi-code"
       "opencode"
       "pi"
     ];

@@ -34,7 +34,8 @@ in
   packageTools.uvTools = [ ];
 
   packageTools.llmAgents = [
-    "cursor-agent"
+    # "cursor-agent"
+    "kimi-code"
   ];
 
   home.file = {
