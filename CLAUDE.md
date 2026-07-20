@@ -26,24 +26,26 @@ code in this repository.
 ### Verifying a Darwin rebuild actually landed
 
 On macOS, home-manager's per-user activation runs via `launchctl asuser`,
-which intermittently fails silently — `darwin-rebuild switch` can exit 0 even
-when the new generation never applied (known upstream issue, no config-level
-fix exists: it's unconditional in every nix-darwin + home-manager setup).
-After rebuilding, verify:
+which intermittently no-ops silently (known upstream issue, home-manager#4413).
+This repo guards against it: `nix/shared/system/darwin.nix` appends a
+verify-or-retry step to `postActivation` that reruns the activation via plain
+`sudo -u` on a miss and fails the rebuild loudly if that also fails.
+
+To verify manually, check the home-manager gcroot (NOT
+`readlink /run/current-system` — that updates even on a silent miss):
 
 ```sh
-readlink /run/current-system   # should point at a fresh store path
-nix profile list | grep -A1 home-manager-path
+readlink ~/.local/state/home-manager/gcroots/current-home
+# should match the generation embedded in the system's activation wrapper:
+grep -oE '/nix/store/[a-z0-9]+-home-manager-generation' \
+  "$(grep -oE '/nix/store/[a-z0-9]+-activation-'"$USER" /nix/var/nix/profiles/system/activate | head -1)"
 ```
 
-If it's stale, run the per-user activation directly (bypasses the flaky
-`launchctl asuser` call):
+Manual recovery (what the guard does automatically):
 
 ```sh
 sudo -u "$USER" --set-home "$(grep -oE '/nix/store/[a-z0-9]+-activation-'"$USER" /nix/var/nix/profiles/system/activate | head -1)"
 ```
-
-Then re-run the rebuild command once more so `/run/current-system` catches up.
 
 ## Repository Architecture
 

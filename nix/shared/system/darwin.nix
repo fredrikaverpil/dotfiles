@@ -193,6 +193,33 @@ in
       backupFileExtension = "backup";
     };
 
+    # home-manager launches the per-user activation via `launchctl asuser`,
+    # which can exit 0 without running anything (over SSH, unbootstrapped
+    # launchd domain — home-manager#4413). Verify the new
+    # generation actually landed and, if not, run the activation directly via
+    # plain sudo (no launchd hop). Runs in the same `set -e` script as the
+    # flaky hop, so a genuine failure here aborts the rebuild loudly instead
+    # of exiting 0.
+    system.activationScripts.postActivation.text =
+      let
+        hmBackupEnv = lib.optionalString (
+          config.home-manager.backupFileExtension != null
+        ) "env HOME_MANAGER_BACKUP_EXT=${lib.escapeShellArg config.home-manager.backupFileExtension}";
+        hmDriverVersion = if config.home-manager.enableLegacyProfileManagement then "0" else "1";
+      in
+      lib.mkAfter (
+        lib.concatStringsSep "\n" (
+          lib.mapAttrsToList (_: usercfg: ''
+            hmVerifyParentArgs="$(ps -p "$PPID" -ww -o args= || true)"
+            if [[ ! -v DRY_RUN && "$hmVerifyParentArgs" != *" --dry-run"* ]] &&
+              [ "$(readlink "${usercfg.home.homeDirectory}/.local/state/home-manager/gcroots/current-home" 2>/dev/null)" != "${usercfg.home.activationPackage}" ]; then
+              echo "home-manager activation for ${usercfg.home.username} did not apply; running it directly" >&2
+              sudo -u ${usercfg.home.username} --set-home ${hmBackupEnv} ${usercfg.home.activationPackage}/activate --driver-version ${hmDriverVersion} >&2
+            fi
+          '') config.home-manager.users
+        )
+      );
+
     # Primary user for user-specific settings (homebrew, system defaults, etc.)
     # Find the user marked as isPrimary = true
     system.primaryUser =
