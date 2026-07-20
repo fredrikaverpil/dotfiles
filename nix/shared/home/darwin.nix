@@ -38,7 +38,6 @@
   # macOS-specific LLM agent CLIs
   packageTools.llmAgents = [
     "amp"
-    "antigravity-cli"
     "codex"
     "copilot-cli"
     "mistral-vibe"

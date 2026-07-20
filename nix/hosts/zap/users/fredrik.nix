@@ -25,7 +25,6 @@ in
     TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = "/run/user/$UID/podman/podman.sock";
   };
 
-  # zap-specific package-managed tools
   packageTools.npmPackages = [
     {
       package = "@googleworkspace/cli";
@@ -34,8 +33,9 @@ in
   ];
   packageTools.uvTools = [ ];
 
-  # zap-specific LLM agent CLIs
-  packageTools.llmAgents = [ "cursor-agent" ];
+  packageTools.llmAgents = [
+    "cursor-agent"
+  ];
 
   home.file = {
   };

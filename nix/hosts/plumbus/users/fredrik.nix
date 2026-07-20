@@ -18,7 +18,6 @@ in
   home.packages = with pkgs; [
   ];
 
-  # plumbus-specific package-managed tools
   packageTools.npmPackages = [
     {
       package = "@googleworkspace/cli";
@@ -27,9 +26,10 @@ in
   ];
   packageTools.uvTools = [ ];
 
-  # User/host-specific LLM agent CLIs
-  # Example (uncomment to add agents specific to this user/host):
-  # packageTools.llmAgents = [ "cursor-agent" ];
+  packageTools.llmAgents = [
+    "cursor-agent"
+    "antigravity-cli"
+  ];
 
   home.file = {
   };
@@ -37,7 +37,6 @@ in
   programs = {
   };
 
-  # Plumbus-specific user settings for Raycast integration
   # Disable Spotlight keyboard shortcut (Cmd+Space) to allow Raycast usage
   home.activation.disableSpotlightShortcut = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     echo "Disabling Spotlight shortcut (Cmd+Space) for fredrik user on plumbus..."
