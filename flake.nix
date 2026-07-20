@@ -76,35 +76,6 @@
       lib = import ./nix/lib { inherit inputs; };
       stable = inputs.nixpkgs.legacyPackages;
       unstable = inputs.nixpkgs-unstable.legacyPackages;
-      # NOTE: All dev shells use unstable nixpkgs, regardless of platform.
-      # This intentionally diverges from the mixed-stability policy for system
-      # builds (Pi = nixos-raspberrypi's pin, Darwin = unstable): dev shells
-      # are for local toolchain work and benefit from latest packages on
-      # every platform.
-      mkDevShells = system: {
-        default = unstable.${system}.mkShell {
-          packages = [
-            unstable.${system}.nixfmt
-          ];
-        };
-        dotfiles-toolchain = unstable.${system}.mkShell {
-          packages = [
-            # Stable packages
-            # stable.${system}.xxx
-
-            # Unstable packages
-            unstable.${system}.deno
-            unstable.${system}.go_latest
-            unstable.${system}.nodejs
-            unstable.${system}.pnpm
-            unstable.${system}.python3
-            unstable.${system}.ruby
-          ];
-          shellHook = ''
-            echo -e "\033[32m[dotfiles-toolchain] $(deno --version | awk 'NR==1{print $1" "$2}') | $(go version | awk '{print $1" "$3}') | lua $(lua -v 2>&1 | awk '{print $2}') | node $(node -v) (npm $(npm -v)) | pnpm $(pnpm -v) | python $(python --version | awk '{print $2}') | $(ruby -v | cut -d' ' -f1-2)\033[0m"
-          '';
-        };
-      };
     in
     {
       overlays.default = import ./nix/shared/overlays;
@@ -131,12 +102,5 @@
       formatter.x86_64-linux = stable.x86_64-linux.nixfmt;
       formatter.aarch64-linux = stable.aarch64-linux.nixfmt;
       formatter.aarch64-darwin = unstable.aarch64-darwin.nixfmt;
-
-      # Development shells for `nix develop` or direnv's `use flake` - provides toolchains for each architecture
-      devShells = {
-        x86_64-linux = mkDevShells "x86_64-linux";
-        aarch64-linux = mkDevShells "aarch64-linux";
-        aarch64-darwin = mkDevShells "aarch64-darwin";
-      };
     };
 }
