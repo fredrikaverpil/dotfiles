@@ -33,10 +33,7 @@ in
   ];
   packageTools.uvTools = [ ];
 
-  packageTools.llmAgents = [
-    # "cursor-agent"
-    "kimi-code"
-  ];
+  packageTools.llmAgents = [ ];
 
   home.file = {
   };

@@ -74,14 +74,14 @@ and **GNU Stow** for dotfile symlinking.
   anchored to the nixpkgs pinned by the `nixos-raspberrypi` input (its
   nixpkgs, `home-manager-rpi` and `disko` all follow that pin — do not make
   them follow another nixpkgs, or kernel binary cache hits are lost)
-- **Configuration helpers**: Use `lib.mkDarwin` and `lib.mkRpiNixos` functions from
-  `nix/lib/`
+- **Configuration helpers**: Use `lib.mkDarwin` and `lib.mkRpiNixos` functions
+  from `nix/lib/`
 - **Host discovery**: Configurations auto-match hostname from
   `nix/hosts/$HOSTNAME/`
 - **Package management**: CLI tools via Nix, GUI apps via Homebrew (macOS) or
   Nix (Linux)
 - **LLM agent CLIs**: Packaged agents (claude-code, codex, gemini-cli,
-  kimi-code, opencode, pi, ...) come from the `llm-agents` flake input
+  opencode, pi, ...) come from the `llm-agents` flake input
   (numtide/llm-agents.nix) and are declared via `packageTools.llmAgents`
   (mergeable across common → platform → host configs). Do not make this input
   follow another nixpkgs — it is built/cached against its own pin
