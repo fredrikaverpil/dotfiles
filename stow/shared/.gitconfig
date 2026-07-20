@@ -36,7 +36,7 @@
 [gpg]
   format = ssh
 [gpg "ssh"]
-   program = "/usr/bin/ssh-keygen"
+   program = "ssh-keygen"
 
 # GitHub https authentication
 # Credential helpers are cumulative, not override: this host-scoped helper does
