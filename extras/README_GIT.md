@@ -61,15 +61,30 @@ signing. See `~/.gitconfig_1password` for the current setup.
 
 > [!IMPORTANT]
 >
-> For SSH access to e.g. GitHub organizations requiring SSO/SAML, a
-> `~/.ssh/<workplace>.pub` is required which should contain the public key.
+> After having authenticated with `pass-cli auth login`, the session stays
+> authenticated indefinitely by default. Therefore, it's important to run
+> `pass-cli session create-lock` to create a lock, which kicks in after some
+> idle time.
+>
+> The lock only gates `pass-cli` itself. It does not lock keys already held by a
+> running `ssh-agent`, so loaded SSH keys stay usable until the agent exits.
+>
+> Hopefully, `pass-cli` will gain the same level of security as 1Password
+> provides.
 
 - Check which keys will be loaded into the native ssh-agent:
   `pass-cli ssh-agent debug --vault-name Personal`
 - Load all keys into the native ssh-agent:
   `pass-cli ssh-agent load --vault Personal`
 - See which keys were loaded into the ssh-agent: `ssh-add -l`
-- Loading of keys happens on startup, via Nix home-manager.
+- Loading of keys is manual: unlock the session with `pass-cli session unlock`
+  first, then run the load command above. Auto-loading at login was removed — a
+  PIN-locked session can't be unlocked non-interactively.
+
+> [!NOTE]
+>
+> For SSH access to e.g. GitHub organizations requiring SSO/SAML, a
+> `~/.ssh/<workplace>.pub` is required which should contain the public key.
 
 > [!TIP]
 >
