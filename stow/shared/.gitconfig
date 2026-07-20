@@ -28,15 +28,15 @@
 	autostash = true
 [commit]
 	template = ~/.gitcommit
-	gpgsign = true
+	gpgsign = false
 [push]
 	autoSetupRemote = true
 
 # Git commit signing + SSH auth.
 [gpg]
-  format = ssh
+#  format = ssh
 [gpg "ssh"]
-  program = "/usr/bin/ssh-keygen"
+#  program = "/run/current-system/sw/bin/ssh-keygen"
 
 # GitHub https authentication
 # Credential helpers are cumulative, not override: this host-scoped helper does
