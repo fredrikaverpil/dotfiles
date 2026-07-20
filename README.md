@@ -54,6 +54,11 @@ Dotfiles are managed with GNU Stow, not Nix:
 # Manual stow (if needed)
 cd ~/.dotfiles/stow
 stow --target="$HOME" --restow shared "$(uname -s)"
+
+# If some tool replaced a symlinked config with a real file (breaking the
+# stow), re-run with --adopt to absorb it into the repo instead of aborting.
+# Review with `git diff` before committing -- nothing is staged automatically.
+./install.sh --adopt
 ```
 
 ### Shell
