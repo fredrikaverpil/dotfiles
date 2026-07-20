@@ -60,8 +60,7 @@ Dotfiles are managed with GNU Stow, not Nix.
 ```bash
 # Apply dotfiles (no Nix rebuild needed)
 cd ~/.dotfiles/stow
-stow --target="$HOME" --restow --no-folding --adopt shared Darwin   # macOS
-stow --target="$HOME" --restow --no-folding --adopt shared Linux    # Linux
+stow --target="$HOME" --restow --no-folding --adopt shared "$(uname -s)"
 ```
 
 `--adopt` absorbs any real file that has replaced a managed symlink into the
