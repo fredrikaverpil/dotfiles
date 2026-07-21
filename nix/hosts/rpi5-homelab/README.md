@@ -141,9 +141,19 @@ to SSH into the new system:
 ssh fredrik@<ip-to-rpi5-homelab>
 ```
 
-Change the password using `passwd`:
+Change the password using `passwd`.
 
-If you did not set the Wi-Fi password, log into the homelab locally and...
+### Connect to Wi-Fi (optional)
+
+This host normally runs on Ethernet, and the install flow above assumes it. Wi-Fi
+is a fallback. Credentials are deliberately kept out of this (public) repo, so
+there is no declarative SSID/password in the flake — WiFi is connected
+imperatively via NetworkManager, which then persists the connection across
+reboots.
+
+Because this is a headless box, connecting Wi-Fi requires a local console
+(attach a keyboard and monitor); if you can already SSH in over Ethernet you do
+not need this step. From a local session:
 
 ```sh
 # Using NetworkManager with wpa_supplicant backend
