@@ -8,7 +8,3 @@
 # from the agent; IdentitiesOnly restricts the offer to that key.
 [core]
 	sshCommand = ssh -o IdentitiesOnly=yes -i ~/.ssh/einride.pub
-
-# Manage key(s) via 1Password
-# [include]
-# 	path = ~/.gitconfig_1password

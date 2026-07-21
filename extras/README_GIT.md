@@ -1,5 +1,8 @@
 # git config
 
+See this repo's [`.gitconfig`](../stow/shared/.gitconfig) for the base setup
+which enables the below functionality.
+
 ## HTTPS
 
 ### Repository access via HTTPS
@@ -8,12 +11,11 @@
 - When HTTPS is desired, use
   `git clone --recursive https://github.com/user/repo.git`.
 
-> [!NOTE] Please note that the GitHub CLI must be installed via `brew`. See the
-> how the helper is invoked in [gitconfig](gitconfig).
-
 ## Repository access via SSH
 
-### Set up `~/.ssh`
+- Clone with `git clone --recursive git@github.com:user/repo.git`
+
+### Vanilla ssh agent
 
 ```bash
 # Fix directory permissions
@@ -29,20 +31,36 @@ chmod 644 ~/.ssh/known_hosts
 chmod 644 ~/.ssh/config
 ```
 
-- Add the machine's `id_rsa.pub` or `id_ed25519.pub` SSH key to GitHub. Skip
-  this step if the SSH key exists in 1Password or Proton Pass.
-- When SSH is desired, use `git clone --recursive git@github.com:user/repo.git`.
+- Verify keys `ssh-add -l`
 
-## Notes on SSH key management via Proton Pass and 1Password
+Optionally enable specific key for e.g. SSO with `~/.gitconfig_ssh`:
 
-The git config in this repo dictates SSH keys management with either Proton Pass
-or 1Password. See `~/.gitconfig` (and its includes) for the split. The default
-is to load keys from Proton Pass into the native `ssh-agent`.
+```gitconfig
+[core]
+	sshCommand = ssh -o IdentitiesOnly=yes -i ~/.ssh/<workplace>.pub
+```
 
-### 1Password notes
+Optionally enable commit signing with `~/.gitconfig_signing`. With
+`gpg.format = ssh`, git signs via `ssh-keygen` by default, so no `program` line
+is needed:
 
-Configure SSH agent setup and git commit signing via the menu inside any SSH key
-entry inside 1Password.
+```gitconfig
+[user]
+	signingkey = ~/.ssh/id_ed25519.pub
+[commit]
+	gpgsign = true
+[gpg]
+	format = ssh
+```
+
+### 1Password
+
+> [!NOTE]
+>
+> A biometric lock or password will have to be supplied before either git commit
+> signing or accessing the 1Password agent.
+
+Set up the agent for key access:
 
 Example `~/.config/1Password/ssh/agent.toml`:
 
@@ -53,40 +71,142 @@ vault = "Workplace"
 vault = "Personal"
 ```
 
-Then setup `IdentityAgent` (can be done via `~/.ssh/config` or in
-`~/.gitconfig`) to run 1Password's own agent and `op-ssh-sign` for git commit
-signing. See `~/.gitconfig_1password` for the current setup.
+Example `~/.gitconfig_ssh` which points git's SSH at the 1Password agent socket
+([1Password docs](https://www.1password.dev/ssh/agent)). This git-scopes the
+1Password agent; the official global alternative is `Host *` + `IdentityAgent`
+in `~/.ssh/config`. The path below is 1Password's fixed macOS socket location:
 
-### Proton Pass notes
+```gitconfig
+[core]
+	sshCommand = ssh -o 'IdentityAgent="~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"'
+```
+
+Note that `core.sshCommand` is single-valued: a later include that also sets it
+(e.g. `~/.gitconfig_einride`, which pins a work key) replaces this line
+entirely — it does not merge. When using this mode, repeat the `IdentityAgent`
+option in that file's `sshCommand` too.
+
+Optionally enable commit signing
+([1Password docs](https://www.1password.dev/ssh/git-commit-signing)) with
+`~/.gitconfig_signing`:
+
+```gitconfig
+[user]
+	signingkey = ssh-ed25519 AAAA...
+[commit]
+	gpgsign = true
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+```
+
+### Proton Pass (using `ssh-keygen`)
 
 > [!IMPORTANT]
 >
-> After having authenticated with `pass-cli auth login`, the session stays
+> After having authenticated with `pass-cli login`, the session stays
 > authenticated indefinitely by default. Therefore, it's important to run
-> `pass-cli session create-lock` to create a lock, which kicks in after some
-> idle time.
+> `pass-cli session create-lock` to create a lock, which kicks in after an idle
+> timeout (`--idle-timeout`, 30–900 seconds, default 300). And after reach
+> reboot:
+>
+> ```sh
+> pass-cli session unlock && \
+>   pass-cli ssh-agent load --vault-name Personal && \
+>   pass-cli session lock
+> ```
 >
 > The lock only gates `pass-cli` itself. It does not lock keys already held by a
 > running `ssh-agent`, so loaded SSH keys stay usable until the agent exits.
->
-> Hopefully, `pass-cli` will gain the same level of security as 1Password
-> provides.
+> Hopefully, `pass-cli` will in the future gain the same level of security as
+> 1Password provides with its biometrick lock/password on each access of an SSH
+> key.
 
-- Check which keys will be loaded into the native ssh-agent:
-  `pass-cli ssh-agent debug --vault-name Personal`
-- Load all keys into the native ssh-agent:
-  `pass-cli ssh-agent load --vault Personal`
+- Authenticate once with `pass-cli login`
+- Create lock with `pass-cli session create-lock`
+- Load keys into the ssh-agent (on e.g. login) with
+  `pass-cli ssh-agent load --vault-name Personal`
+- Debug with e.g. `pass-cli ssh-agent debug --vault-name Personal`
 - See which keys were loaded into the ssh-agent: `ssh-add -l`
-- Loading of keys is manual: unlock the session with `pass-cli session unlock`
-  first, then run the load command above. Auto-loading at login was removed — a
-  PIN-locked session can't be unlocked non-interactively.
-
-> [!NOTE]
->
-> For SSH access to e.g. GitHub organizations requiring SSO/SAML, a
-> `~/.ssh/<workplace>.pub` is required which should contain the public key.
 
 > [!TIP]
 >
 > To see the fingerprint of SSH keys stored in Proton Pass, run
 > `pass-cli ssh-agent debug --vault-name "Personal" | grep "Fingerprint" -B 3`.
+
+No `~/.gitconfig_ssh` is needed for this mode. `pass-cli ssh-agent load` puts
+the keys into your default system SSH agent, which git and `ssh` already reach
+via `SSH_AUTH_SOCK` — so both authentication and signing work with no
+git-specific SSH config. Leave `~/.gitconfig_ssh` absent (git silently skips
+missing includes).
+
+Optionally enable commit signing with `~/.gitconfig_signing`:
+
+```gitconfig
+[user]
+	signingkey = ssh-ed25519 AAAA...
+[commit]
+	gpgsign = true
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = "ssh-keygen"
+```
+
+### Proton Pass (using its own agent)
+
+Instead of loading keys into the system agent, run `pass-cli` as the SSH agent
+itself. It listens on `$HOME/.ssh/proton-pass-agent.sock`
+([pass-cli docs](https://protonpass.github.io/pass-cli/commands/ssh-agent/)).
+
+- Start it in the background: `pass-cli ssh-agent daemon start` (inspect/stop
+  with `pass-cli ssh-agent daemon status` / `daemon stop`). You must already be
+  logged in with `pass-cli login`, otherwise the daemon fails silently — use
+  `--log-file` to capture startup errors.
+- Point everything at that socket by exporting it in your shell profile:
+
+  ```sh
+  export SSH_AUTH_SOCK="$HOME/.ssh/proton-pass-agent.sock"
+  ```
+
+With `SSH_AUTH_SOCK` set, both `ssh` (auth) and `ssh-keygen` (signing) use the
+Proton agent, so — as with the `ssh-keygen` mode above — no `~/.gitconfig_ssh`
+is needed.
+
+> [!NOTE]
+>
+> A git-only `core.sshCommand`/`IdentityAgent` override would cover
+> authentication but not signing: git's SSH signer (`ssh-keygen`) locates the
+> agent through `SSH_AUTH_SOCK`, not through git's SSH config. Export
+> `SSH_AUTH_SOCK` if you want signing too.
+
+The session lock behaves the same as in the mode above: the lock gates
+pass-cli's API operations (enforced server-side), while serving keys already
+held in the daemon's memory needs no API access — so auth and signing keep
+working while the session is locked. Per the
+[session docs](https://protonpass.github.io/pass-cli/commands/session/), a
+locked session only stops the daemon from refreshing keys from Proton Pass and
+from creating new items via `ssh-add`. To actually revoke key access, stop the
+daemon: `pass-cli ssh-agent daemon stop`.
+
+Starting the daemon while the session is locked does NOT work (verified with
+pass-cli 2.2.3): the launcher prints "Daemon started", but the daemon exits
+immediately when its initial key fetch hits `SessionLocked` — no socket, no
+keys. Check `daemon status` or `--log-file` to catch this.
+
+A `~/.gitconfig_signing` is still needed for commit signing: the agent only
+holds the key, while this file is what enables signing and names which key to
+use. It is identical to the `ssh-keygen` mode above — `ssh-keygen` finds the
+key via `SSH_AUTH_SOCK`, which now points at the Proton agent:
+
+```gitconfig
+[user]
+	signingkey = ssh-ed25519 AAAA...
+[commit]
+	gpgsign = true
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = "ssh-keygen"
+```

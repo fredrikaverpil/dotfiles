@@ -1,7 +1,6 @@
 [user]
 	name = Fredrik Averpil
 	email = fredrik.averpil@proton.me
-	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPeHRovOKf1tcBNm9na64YrePSTSaxkT/UCUviSaAEQd
 [core]
 	excludesfile = ~/.gitignore_global
 	# editor = code --wait  # vscode
@@ -28,15 +27,15 @@
 	autostash = true
 [commit]
 	template = ~/.gitcommit
-	gpgsign = true
 [push]
 	autoSetupRemote = true
 
-# Git commit signing + SSH auth.
-[gpg]
-  format = ssh
-[gpg "ssh"]
-   program = "ssh-keygen"
+# Large file support via git-lfs
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
 
 # GitHub https authentication
 # Credential helpers are cumulative, not override: this host-scoped helper does
@@ -52,15 +51,19 @@
 	helper =
 	helper = !gh auth git-credential
 
-[filter "lfs"]
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
-	process = git-lfs filter-process
-	required = true
+# Optional host-level SSH auth
+[include]
+	path = ~/.gitconfig_ssh
+
+# Optional commit signing
+[include]
+	path = ~/.gitconfig_signing
 
 # Always keep gitconfig for work at bottom of this file
 [includeIf "hasconfig:remote.*.url:git@github.com:einride*/**"]
 	path = ~/.gitconfig_einride
 [includeIf "hasconfig:remote.*.url:https://github.com/einride*/**"]
+	path = ~/.gitconfig_einride
+[includeIf "hasconfig:remote.*.url:ssh://git@github.com/einride*/**"]
 	path = ~/.gitconfig_einride
 
