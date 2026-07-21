@@ -1,9 +1,10 @@
 {
   description = "Fredrik's unified Nix configurations";
 
-  # NOTE: To eliminate substituter warnings, add your username to trusted users:
-  # Edit /etc/nix/nix.conf: change "trusted-users = root" to "trusted-users = root fredrik"
-  # Then restart nix daemon: sudo launchctl kickstart -k system/org.nixos.nix-daemon
+  # NOTE: The extra caches below are only honored for users in `trusted-users`,
+  # which is set in the system config (Darwin: nix.settings.trusted-users in
+  # nix/shared/system/darwin.nix; Pi: see nix/hosts/rpi5-homelab/README.md).
+  # Do NOT hand-edit /etc/nix/nix.conf — nix-darwin regenerates it on rebuild.
   nixConfig = {
     extra-substituters = [
       "https://nixos-raspberrypi.cachix.org"

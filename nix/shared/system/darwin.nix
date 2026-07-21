@@ -163,6 +163,12 @@ in
     # };
 
     nix.settings.experimental-features = "nix-command flakes";
+    # Trust this admin user so the flake's extra-substituters (flake.nix) are
+    # actually used; otherwise the daemon ignores them and warns on every
+    # command. (root is always trusted, so only fredrik is added here.)
+    # nix-darwin manages /etc/nix/nix.conf, so set it here — a manual edit would
+    # be clobbered on the next rebuild.
+    nix.settings.trusted-users = [ "fredrik" ];
 
     # Home-manager configuration
     home-manager = {
