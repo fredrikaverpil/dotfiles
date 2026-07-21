@@ -102,5 +102,21 @@
       formatter.x86_64-linux = stable.x86_64-linux.nixfmt;
       formatter.aarch64-linux = stable.aarch64-linux.nixfmt;
       formatter.aarch64-darwin = unstable.aarch64-darwin.nixfmt;
+
+      # Dev shell exposing the shared Neovim toolchain (nix/shared/toolchain.nix)
+      # for use outside Neovim, e.g. `nix develop ~/.dotfiles#dev -c <cmd>`.
+      devShells =
+        let
+          mkDevShell = system: {
+            dev = unstable.${system}.mkShell {
+              packages = import ./nix/shared/toolchain.nix unstable.${system};
+            };
+          };
+        in
+        {
+          x86_64-linux = mkDevShell "x86_64-linux";
+          aarch64-linux = mkDevShell "aarch64-linux";
+          aarch64-darwin = mkDevShell "aarch64-darwin";
+        };
     };
 }

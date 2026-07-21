@@ -189,26 +189,17 @@ in
 
     # Tooling available only in Neovim.
     # Written to a file so the nvim wrapper can inject them into PATH at launch,
-    # keeping these tools off the regular shell PATH.
+    # keeping these tools off the regular shell PATH. The shared toolchain (also
+    # the `dev` devshell in flake.nix) is imported so Neovim and the devshell
+    # resolve to identical store paths; the extras below are Neovim-only.
     home.file.".config/nvim-deps-path".text = lib.makeBinPath (
-      with unstable;
-      [
-        cmake
-        beamPackages.elixir
+      (import ../toolchain.nix unstable)
+      ++ (with unstable; [
+        cmake # Neovim's injected PATH has no stdenv cc (devshell gets it from stdenv)
         gcc
-        go_latest
         lua51Packages.lua # Neovim requires Lua 5.1
         lua51Packages.luarocks # Neovim requires Lua 5.1
-        nixfmt # cannot be installed via Mason on macOS, so installed here instead
-        nodejs # required by github copilot
-        npm-check-updates
-        python3
-        ruby
-        rustup # run `rustup update stable` to get latest rustc, cargo, rust-analyzer etc.
-        tree-sitter
-        # uv  # defined outside of Neovim for automatic venv activation in shell
-        yarn
-      ]
+      ])
     );
 
   };
