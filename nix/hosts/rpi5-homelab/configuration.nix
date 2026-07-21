@@ -53,6 +53,11 @@ in {
     };
   };
 
+  # Enable systemd linger for fredrik so user services (e.g. the Claude Code
+  # remote-control server) start on boot and keep running without an
+  # interactive login session.
+  users.users.fredrik.linger = true;
+
   # Wireless network configuration
   # Use NetworkManager with wpa_supplicant backend for better Pi stability under load
   networking.wireless.iwd.enable = false; # Disable iwd (less stable on Pi under load)

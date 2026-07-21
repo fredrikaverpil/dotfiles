@@ -32,8 +32,9 @@ in
   systemd.user.services.claude-code-server = {
     Unit = {
       Description = "Claude Code Remote Control Server";
-      After = [ "network-online.target" ];
-      Wants = [ "network-online.target" ];
+      # No network-online.target dependency: user services cannot meaningfully
+      # order against that system target, and it can stall boot on WiFi ARM
+      # hosts. Restart=always below reconnects once the network is up.
     };
 
     Service = {
