@@ -100,7 +100,6 @@ in
         "gcloud-cli"
         "ghostty"
         "gitify"
-        "kitty"
         "obs"
         "obsidian"
         "proton-pass"

@@ -173,7 +173,7 @@ in
       # ========================================================================
       # Terminal Support
       # ========================================================================
-      kitty.terminfo # Terminal emulator terminfo for SSH compatibility
+
       # NOTE: do NOT add `ghostty.terminfo` here (or anywhere built for the Pi).
       # Unlike kitty's, ghostty's terminfo is an output of the full ghostty
       # build, which is uncached for nixos-raspberrypi's nixpkgs — pulling it in
