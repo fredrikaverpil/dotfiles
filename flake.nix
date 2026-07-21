@@ -121,16 +121,17 @@
                 packages =
                   (import ./nix/shared/toolchain.nix channels)
                   # Linux: nixpkgs replacements for Mason's prebuilt binaries,
-                  # which fail on NixOS (stub-ld, no nix-ld). Authored
-                  # `with unstable` (bare name = unstable); pin an entry with
-                  # `stable.<name>`. Grow this list over time.
-                  ++ channels.unstable.lib.optionals channels.unstable.stdenv.isLinux (
-                    with channels;
-                    with unstable;
-                    [
-                      gopls
-                    ]
-                  );
+                  # which fail on NixOS (stub-ld, no nix-ld). Unstable-only, so
+                  # the whole devshell resolves to one nixpkgs generation — the
+                  # same nixpkgs-unstable as the shared toolchain (and Neovim's
+                  # nvim-deps-path). Reference each entry fully qualified as
+                  # `channels.unstable.<name>`: a bare `with unstable;` would
+                  # bind to the flake's top-level `unstable` (the by-system
+                  # legacyPackages set) and break with `undefined variable`.
+                  # Grow this list over time.
+                  ++ channels.unstable.lib.optionals channels.unstable.stdenv.isLinux [
+                    channels.unstable.gopls
+                  ];
                 # macOS: Mason binaries are native Mach-O — put them on PATH so
                 # the devshell reaches the same tooling Neovim uses.
                 shellHook = channels.unstable.lib.optionalString channels.unstable.stdenv.isDarwin ''
