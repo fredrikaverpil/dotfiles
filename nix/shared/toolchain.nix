@@ -15,7 +15,14 @@
 # are inherited into both Neovim and this devshell. Keeping uv out of the list
 # also keeps it out of the Neovim context (see commit "comment out uv inside
 # neovim context").
-pkgs: with pkgs; [
+#
+# Channels: this list is authored `with unstable`, so a bare name resolves to
+# nixpkgs-unstable (the default — everything here comes from unstable, all
+# platforms). To pin an individual entry to stable nixpkgs, write it explicitly
+# as `stable.<name>`.
+{ stable, unstable }:
+with unstable;
+[
   beamPackages.elixir
   go_latest
   nixfmt # cannot be installed via Mason on macOS, so installed here instead

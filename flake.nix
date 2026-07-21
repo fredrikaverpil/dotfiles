@@ -107,11 +107,36 @@
       # for use outside Neovim, e.g. `nix develop ~/.dotfiles#dev -c <cmd>`.
       devShells =
         let
-          mkDevShell = system: {
-            dev = unstable.${system}.mkShell {
-              packages = import ./nix/shared/toolchain.nix unstable.${system};
+          mkDevShell =
+            system:
+            let
+              channels = {
+                stable = stable.${system};
+                unstable = unstable.${system};
+              };
+            in
+            {
+              dev = channels.unstable.mkShell {
+                packages =
+                  (import ./nix/shared/toolchain.nix channels)
+                  # Linux: nixpkgs replacements for Mason's prebuilt binaries,
+                  # which fail on NixOS (stub-ld, no nix-ld). Authored
+                  # `with unstable` (bare name = unstable); pin an entry with
+                  # `stable.<name>`. Grow this list over time.
+                  ++ channels.unstable.lib.optionals channels.unstable.stdenv.isLinux (
+                    with channels;
+                    with unstable;
+                    [
+                      gopls
+                    ]
+                  );
+                # macOS: Mason binaries are native Mach-O — put them on PATH so
+                # the devshell reaches the same tooling Neovim uses.
+                shellHook = channels.unstable.lib.optionalString channels.unstable.stdenv.isDarwin ''
+                  export PATH="$HOME/.local/share/nvim-fredrik/mason/bin:$PATH"
+                '';
+              };
             };
-          };
         in
         {
           x86_64-linux = mkDevShell "x86_64-linux";

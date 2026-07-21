@@ -7,6 +7,7 @@
   ...
 }:
 let
+  stable = inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system};
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
 
   # Stow package dir matching `uname -s`; Nix knows the platform at build time.
@@ -193,7 +194,7 @@ in
     # the `dev` devshell in flake.nix) is imported so Neovim and the devshell
     # resolve to identical store paths; the extras below are Neovim-only.
     home.file.".config/nvim-deps-path".text = lib.makeBinPath (
-      (import ../toolchain.nix unstable)
+      (import ../toolchain.nix { inherit stable unstable; })
       ++ (with unstable; [
         cmake # Neovim's injected PATH has no stdenv cc (devshell gets it from stdenv)
         gcc
