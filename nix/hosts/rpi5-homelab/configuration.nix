@@ -75,6 +75,83 @@ in {
     ACTION=="add", SUBSYSTEM=="net", KERNEL=="wlan*", RUN+="${pkgs.iw}/bin/iw dev $name set power_save off"
   '';
 
+  # WiFi watchdog: reconnects wlan if NM reports it disconnected, or if it
+  # appears connected but pings to the default gateway fail. Escalates to a
+  # brcmfmac driver reload if nmcli connect fails (targets the "never recovered"
+  # wedged-driver case documented in https://github.com/fredrikaverpil/dotfiles/issues/204).
+  systemd.services.wifi-watchdog = {
+    description = "WiFi connectivity watchdog";
+    after = ["network-online.target"];
+    wants = ["network-online.target"];
+    serviceConfig = {
+      Type = "oneshot";
+      # Budget: ping(15s) + sleep(3s) + nmcli-connect(30s) + driver-reload(5s) +
+      # nmcli-connect-retry(30s) = ~83s worst case; 120s gives comfortable headroom.
+      TimeoutStartSec = "120s";
+      ExecStart = pkgs.writeShellScript "wifi-watchdog" ''
+        # Use nmcli for interface discovery to avoid picking up p2p-dev-wlan0
+        iface=$(${pkgs.networkmanager}/bin/nmcli -t -f DEVICE,TYPE device | \
+                ${pkgs.gawk}/bin/awk -F: '$2=="wifi"{print $1; exit}')
+        [ -z "$iface" ] && exit 0
+
+        reconnect() {
+          echo "wifi-watchdog: reconnecting $iface..."
+          ${pkgs.networkmanager}/bin/nmcli device disconnect "$iface" || true
+          ${pkgs.coreutils}/bin/sleep 3
+          # --wait 30 bounds the blocking connect so it always returns within budget.
+          if ! ${pkgs.networkmanager}/bin/nmcli --wait 30 device connect "$iface"; then
+            # nmcli connect failed — escalate to driver reload to recover a wedged
+            # brcmfmac, which nmcli retries alone cannot fix.
+            echo "wifi-watchdog: nmcli connect failed, reloading brcmfmac driver..."
+            ${pkgs.kmod}/bin/modprobe -r brcmfmac || true
+            ${pkgs.coreutils}/bin/sleep 2
+            ${pkgs.kmod}/bin/modprobe brcmfmac || true
+            ${pkgs.coreutils}/bin/sleep 3
+            if ! ${pkgs.networkmanager}/bin/nmcli --wait 30 device connect "$iface"; then
+              echo "wifi-watchdog: reconnect after driver reload failed, will retry on next tick"
+            fi
+          fi
+        }
+
+        state=$(${pkgs.networkmanager}/bin/nmcli -g GENERAL.STATE device show "$iface" 2>/dev/null)
+        state_code="''${state%% *}"
+
+        # NM device state codes: 100=connected, 40-90=connecting (leave alone),
+        # everything else (0/10/20/30/110/120) = reconnect.
+        case "$state_code" in
+          100)
+            # Connected — verify actual reachability via ping
+            gateway=$(${pkgs.iproute2}/bin/ip route show dev "$iface" | \
+                      ${pkgs.gawk}/bin/awk '/default/{print $3; exit}')
+            [ -z "$gateway" ] && exit 0
+            if ! ${pkgs.iputils}/bin/ping -c 3 -W 5 -I "$iface" "$gateway" >/dev/null 2>&1; then
+              echo "wifi-watchdog: no ping response on $iface, reconnecting..."
+              reconnect
+            fi
+            ;;
+          4*|5*|6*|7*|8*|9*)
+            # Association in progress — leave alone
+            echo "wifi-watchdog: $iface connecting (state: $state), skipping"
+            ;;
+          *)
+            # Disconnected, unavailable, failed, or unknown
+            echo "wifi-watchdog: $iface not connected (state: $state), reconnecting..."
+            reconnect
+            ;;
+        esac
+      '';
+    };
+  };
+
+  systemd.timers.wifi-watchdog = {
+    description = "WiFi watchdog timer";
+    wantedBy = ["timers.target"];
+    timerConfig = {
+      OnBootSec = "2min";
+      OnUnitActiveSec = "1min";
+    };
+  };
+
   # Firewall configuration for homelab services
   # NOTE: for maximum security, do not expose SSH to internet, only via Tailscale VPN
   networking.firewall = {
