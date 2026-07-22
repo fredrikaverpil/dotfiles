@@ -26,6 +26,13 @@ in
   programs = {
   };
 
+  # Restart agent services after every activation so the running binary
+  # matches the version installed by the latest rebuild.
+  home.activation.restartAgentServices = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    $DRY_RUN_CMD systemctl --user restart claude-code-server.service || true
+    $DRY_RUN_CMD systemctl --user restart opencode-server.service || true
+  '';
+
   # Claude Code remote-control server service
   # Runs automatically on boot, accessible via remote-control protocol
   # Working directory: ~/code/public
