@@ -125,6 +125,10 @@ if = 'test %{app-bundle-id} = org.whispersystems.signal-desktop'
 run = "move-node-to-workspace A"
 
 [[on-window-detected]]
+if = 'test %{app-bundle-id} = com.apple.MobileSMS'
+run = "move-node-to-workspace A"
+
+[[on-window-detected]]
 if = 'test %{app-bundle-id} = com.fujifilm.denji.X-RAW-STUDIO'
 run = "move-node-to-workspace X"
 
