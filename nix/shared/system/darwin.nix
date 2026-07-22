@@ -107,6 +107,7 @@ in
         "signal"
         "slack"
         "spotify"
+        "tailscale-app"
         "visual-studio-code"
         "wacom-tablet"
         "wezterm"
