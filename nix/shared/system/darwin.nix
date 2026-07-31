@@ -249,14 +249,11 @@ in
     # Font management
     # NOTE: Berkeley Mono is installed manually, as it requires a license.
     fonts.packages = with pkgs; [
-      nerd-fonts.fira-code
-      nerd-fonts.fira-mono
-      nerd-fonts.hack
-      nerd-fonts.jetbrains-mono
       maple-mono.truetype
       maple-mono.variable
-      noto-fonts-color-emoji
+      nerd-fonts.jetbrains-mono
       nerd-fonts.symbols-only
+      noto-fonts-color-emoji
     ];
   };
 }
