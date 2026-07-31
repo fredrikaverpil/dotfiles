@@ -182,6 +182,11 @@ in {
   # Docker containerization platform
   virtualisation.docker = {
     enable = true;
+    # Pinned explicitly: on nixos-25.11 the `pkgs.docker` alias still points at
+    # docker_28, which that same nixpkgs marks insecure (unmaintained since
+    # November 2025), so the module default refuses to evaluate.
+    # Drop this pin once upstream moves the alias -- see issue #212.
+    package = pkgs.docker_29;
   };
 
   # Host-specific system users
