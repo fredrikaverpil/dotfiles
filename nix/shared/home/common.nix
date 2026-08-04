@@ -144,12 +144,7 @@ in
       jujutsu
       lazygit
       lazydocker
-      # Docker CLI only (no engine); routes to whatever DOCKER_HOST points at.
-      # Built from docker_29 rather than the `docker-client` alias: that alias
-      # derives from `pkgs.docker`, which on nixos-25.11 is still docker_28 and
-      # is marked insecure there (unmaintained since November 2025).
-      # Drop this pin once upstream moves the alias -- see issue #212.
-      (docker_29.override { clientOnly = true; })
+      docker-client # Docker CLI only (no engine); routes to whatever DOCKER_HOST points at
 
       # ========================================================================
       # Network, API & Database
