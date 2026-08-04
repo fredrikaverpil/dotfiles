@@ -71,8 +71,11 @@ in {
   };
 
   # Disable WiFi power management to prevent connection drops under high CPU load
+  # NOTE: match `wl*`, not `wlan*` — systemd 260 (nixpkgs 26.05) names the
+  # onboard radio `wld0` via the DeviceTree alias scheme, the same way the
+  # ethernet port is `end0`. A `wlan*` match silently stops applying.
   services.udev.extraRules = ''
-    ACTION=="add", SUBSYSTEM=="net", KERNEL=="wlan*", RUN+="${pkgs.iw}/bin/iw dev $name set power_save off"
+    ACTION=="add", SUBSYSTEM=="net", KERNEL=="wl*", RUN+="${pkgs.iw}/bin/iw dev $name set power_save off"
   '';
 
   # Firewall configuration for homelab services

@@ -169,6 +169,15 @@ systemctl is-enabled sshd  # check if sshd is enabled
 systemctl is-active sshd  # check if sshd is running
 ```
 
+The saved profile is pinned to the interface name (`interface-name=wlan0`), and
+that name can change on a nixpkgs bump — systemd 260 renamed the radio `wlan0`
+→ `wld0`, after which the Pi silently stopped reconnecting on boot. Unpin it so
+the profile keeps working across renames:
+
+```sh
+sudo nmcli connection modify "YOUR_SSID" connection.interface-name ""
+```
+
 ## Post-install setup
 
 ### Second NVMe SSD for media storage
