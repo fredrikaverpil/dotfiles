@@ -52,7 +52,7 @@
       # NOTE: The branch must match the release of nixos-raspberrypi's pinned
       # nixpkgs (check `nixpkgs.original.ref` under the nixos-raspberrypi node
       # in flake.lock). Bump this branch when updating nixos-raspberrypi.
-      url = "github:nix-community/home-manager/release-25.11";
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
     home-manager-unstable = {
