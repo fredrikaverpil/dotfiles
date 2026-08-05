@@ -100,11 +100,6 @@
       "rev": "4e4bef34498e821bcbd5203f44db8b67e4f10e04",
       "src": "https://github.com/meznaric/key-analyzer.nvim"
     },
-    "lazydev.nvim": {
-      "rev": "01bc2aacd51cf9021eb19d048e70ce3dd09f7f93",
-      "src": "https://github.com/folke/lazydev.nvim",
-      "version": ">=0.0.0"
-    },
     "log-highlight.nvim": {
       "rev": "2538129ddbd0c4a35b8c6bb8486725bbc6d184b6",
       "src": "https://github.com/fei6409/log-highlight.nvim",

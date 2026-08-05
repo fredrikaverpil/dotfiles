@@ -6,7 +6,7 @@ vim.pack.add({
 })
 
 require("lazyload").on_vim_enter(function()
-  local default_sources = { "lsp", "path", "snippets", "buffer", "lazydev" }
+  local default_sources = { "lsp", "path", "snippets", "buffer" }
   -- Filetype-bound sources stay out of `default` so they aren't queried in
   -- every buffer. The provider plugins themselves are installed by the
   -- respective plugin/lang/*.lua files.
@@ -26,11 +26,6 @@ require("lazyload").on_vim_enter(function()
     dadbod = {
       name = "Dadbod",
       module = "vim_dadbod_completion.blink",
-    },
-    lazydev = {
-      name = "LazyDev",
-      module = "lazydev.integrations.blink",
-      score_offset = 100,
     },
     markdown = {
       name = "RenderMarkdown",
