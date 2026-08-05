@@ -17,7 +17,10 @@ return {
       runtime = { version = "LuaJIT" },
       workspace = {
         checkThirdParty = false,
-        -- ignoreDir is set in .luarc.json (lazydev overwrites LSP settings)
+        -- LuaLS only scans `workspace.library` while it starts up; what lazydev
+        -- pushes afterwards is accepted but never scanned. Seed the runtime
+        -- paths here so `vim` and plugin types (neotest, plenary, ...) resolve.
+        library = vim.api.nvim_get_runtime_file("", true),
       },
       codeLens = { enable = false }, -- causes annoying flickering
       completion = { callSnippet = "Replace" },
