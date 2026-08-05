@@ -42,6 +42,7 @@ return {
       workspace = {
         checkThirdParty = false,
         library = runtime_library(), -- instead of lazydev.nvim
+        ignoreDir = { ".vscode", ".pocket", ".tests", ".venv", "node_modules" }, -- avoid >10k scanned files
       },
       codeLens = { enable = false }, -- causes annoying flickering
       completion = { callSnippet = "Replace" },
