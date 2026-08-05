@@ -39,26 +39,46 @@ end
 
 ---@param opts? snacks.picker.Config
 function M.pull_requests(opts)
-  local pr_cache = {} ---@type table<string, snacks.picker.finder.Item[]>
+  local pr_cache = nil ---@type snacks.picker.finder.Item[]?
+  local did_auto_switch = false
+
+  ---@param items snacks.picker.finder.Item[]
+  ---@param filter string
+  local function filter_items(items, filter)
+    local filtered = {}
+    for _, item in ipairs(items) do
+      local include = (filter == "open" and item.pr_state == "OPEN" and not item.pr_draft)
+        or (filter == "draft" and item.pr_state == "OPEN" and item.pr_draft)
+        or (filter == "closed" and item.pr_state == "CLOSED")
+        or (filter == "merged" and item.pr_state == "MERGED")
+      if include then
+        table.insert(filtered, item)
+      end
+    end
+    return filtered
+  end
+
+  ---@param picker snacks.Picker
+  ---@param filter string
+  local function set_filter(picker, filter)
+    picker.opts.pr_filter = picker.opts.pr_filter == filter and "open" or filter
+    picker.title = "Pull Requests (" .. picker.opts.pr_filter .. ")"
+    picker.list:set_target()
+    picker:find()
+  end
 
   return Snacks.picker.pick(vim.tbl_deep_extend("keep", opts or {}, {
-    title = "Pull Requests",
+    title = "Pull Requests (open)",
     pr_filter = "open",
     actions = {
       filter_draft = function(picker)
-        picker.opts.pr_filter = picker.opts.pr_filter == "draft" and "open" or "draft"
-        picker.list:set_target()
-        picker:find()
+        set_filter(picker, "draft")
       end,
       filter_closed = function(picker)
-        picker.opts.pr_filter = picker.opts.pr_filter == "closed" and "open" or "closed"
-        picker.list:set_target()
-        picker:find()
+        set_filter(picker, "closed")
       end,
       filter_merged = function(picker)
-        picker.opts.pr_filter = picker.opts.pr_filter == "merged" and "open" or "merged"
-        picker.list:set_target()
-        picker:find()
+        set_filter(picker, "merged")
       end,
     },
     win = {
@@ -72,13 +92,11 @@ function M.pull_requests(opts)
     },
     finder = function(_f_opts, ctx)
       local filter = ctx.picker.opts.pr_filter
-      local gh_state = (filter == "draft" or filter == "open") and "open" or filter
-      local cache_key = gh_state
 
-      if not pr_cache[cache_key] then
+      if not pr_cache then
         local result = vim
           .system(
-            { "gh", "pr", "list", "--state", gh_state, "--limit", "200", "--json", "number,title,body,isDraft,state" },
+            { "gh", "pr", "list", "--state", "all", "--limit", "200", "--json", "number,title,body,isDraft,state" },
             { text = true }
           )
           :wait()
@@ -90,9 +108,9 @@ function M.pull_requests(opts)
         if not ok or not prs then
           return {}
         end
-        pr_cache[cache_key] = {}
+        pr_cache = {}
         for _, pr in ipairs(prs) do
-          table.insert(pr_cache[cache_key], {
+          table.insert(pr_cache, {
             text = "#" .. pr.number .. " " .. pr.title,
             pr_number = tostring(pr.number),
             pr_title = pr.title,
@@ -103,16 +121,20 @@ function M.pull_requests(opts)
         end
       end
 
-      local items = {}
-      for _, item in ipairs(pr_cache[cache_key]) do
-        local include = (filter == "open" and not item.pr_draft)
-          or (filter == "draft" and item.pr_draft)
-          or (filter == "closed")
-          or (filter == "merged")
-        if include then
-          table.insert(items, item)
+      local items = filter_items(pr_cache, filter)
+
+      -- On the first open with no non-draft PRs, fall back to the draft filter
+      -- so the picker isn't empty. Only once: toggling back to "open" stays empty.
+      if not did_auto_switch and filter == "open" and #items == 0 then
+        did_auto_switch = true
+        local drafts = filter_items(pr_cache, "draft")
+        if #drafts > 0 then
+          ctx.picker.opts.pr_filter = "draft"
+          ctx.picker.title = "Pull Requests (draft)"
+          return drafts
         end
       end
+
       return items
     end,
     confirm = function(picker, item)
