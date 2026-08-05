@@ -98,31 +98,66 @@ local function place_signs(bufnr, file_path, side, comments, pending_review_ids)
   end
 end
 
+--- Repo-relative path out of a codediff path value.
+---
+--- Standalone sessions store a Path (`{ relative, absolute }`); placeholder
+--- sessions store an empty string or an empty Path.
+--- @param ref table|string|nil
+--- @param git_root string?
+--- @return string?
+local function relative_path_of(ref, git_root)
+  if type(ref) == "table" then
+    if type(ref.relative) == "string" and ref.relative ~= "" then
+      return ref.relative
+    end
+    ref = ref.absolute
+  end
+  if type(ref) ~= "string" or ref == "" then
+    return nil
+  end
+  -- An absolute path with no relative form recorded.
+  if git_root and git_root ~= "" then
+    local prefix = git_root .. "/"
+    if ref:sub(1, #prefix) == prefix then
+      return ref:sub(#prefix + 1)
+    end
+  end
+  return ref
+end
+
+--- Repo-relative path of the file currently shown in the diff panes.
+---
+--- codediff keeps this in two places. Explorer and history sessions leave the
+--- session's own paths empty and track the selected file on the panel object;
+--- standalone diffs put the paths on the session. Both are consulted, so this
+--- works whichever way the diff was opened.
 --- @return string? file_path
 --- @return table? session
 local function get_session_file_path()
-  local tabpage = vim.api.nvim_get_current_tabpage()
   local ok, lifecycle = pcall(require, "codediff.ui.lifecycle")
   if not ok then
     return nil
   end
+  local tabpage = vim.api.nvim_get_current_tabpage()
   local session = lifecycle.get_session(tabpage)
   if not session then
     return nil
   end
 
-  local file_path = (session.original_path ~= "" and session.original_path)
-    or (session.modified_path ~= "" and session.modified_path)
-  if not file_path then
-    return nil
+  -- Explorer/history mode: the panel knows the selected file, already
+  -- repo-relative. Explorer calls it current_file_path, history current_file.
+  local panel = lifecycle.get_explorer(tabpage)
+  if panel then
+    local selected = panel.current_file_path or panel.current_file
+    if type(selected) == "string" and selected ~= "" then
+      return selected, session
+    end
   end
 
-  local git_root = vim.fn.trim(vim.fn.system("git rev-parse --show-toplevel"))
-  if git_root ~= "" then
-    local prefix = git_root .. "/"
-    if file_path:sub(1, #prefix) == prefix then
-      file_path = file_path:sub(#prefix + 1)
-    end
+  -- Standalone mode: the session carries the paths itself.
+  local file_path = relative_path_of(session.original, session.git_root) or relative_path_of(session.modified, session.git_root)
+  if not file_path then
+    return nil
   end
 
   return file_path, session
@@ -460,9 +495,7 @@ local function get_visual_diff_context()
   end
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "x", false)
 
-  local tabpage = vim.api.nvim_get_current_tabpage()
-  local lifecycle = require("codediff.ui.lifecycle")
-  local session = lifecycle.get_session(tabpage)
+  local file_path, session = get_session_file_path()
   if not session then
     vim.notify("Not in a codediff session", vim.log.levels.WARN)
     return nil
@@ -479,19 +512,9 @@ local function get_visual_diff_context()
     return nil
   end
 
-  local file_path = (session.original_path ~= "" and session.original_path)
-    or (session.modified_path ~= "" and session.modified_path)
   if not file_path then
     vim.notify("No file path in codediff session", vim.log.levels.WARN)
     return nil
-  end
-
-  local git_root = vim.fn.trim(vim.fn.system("git rev-parse --show-toplevel"))
-  if git_root ~= "" then
-    local prefix = git_root .. "/"
-    if file_path:sub(1, #prefix) == prefix then
-      file_path = file_path:sub(#prefix + 1)
-    end
   end
 
   return file_path, start_line, end_line, side
