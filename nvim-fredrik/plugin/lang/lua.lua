@@ -9,7 +9,7 @@ require("lazyload").on_vim_enter(function()
       { path = "${3rd}/luv/library", words = { "vim%.uv" } },
       { path = "snacks.nvim", words = { "Snacks" } },
       "neotest",
-      "plenary",
+      "plenary.nvim",
     },
   })
 end)
