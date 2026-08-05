@@ -142,7 +142,7 @@
       "version": ">=0.0.0"
     },
     "neotest": {
-      "rev": "ad991822b7076b1d940b33a9d6d0d30416d5df81",
+      "rev": "1c529a1ef9c82e8131e872368415cecc2bb86ea2",
       "src": "https://github.com/nvim-neotest/neotest",
       "version": ">=0.0.0"
     },
@@ -151,7 +151,7 @@
       "src": "https://github.com/nvim-neotest/neotest-plenary"
     },
     "neotest-python": {
-      "rev": "e6df4f1892f6137f58135917db24d1655937d831",
+      "rev": "1b56ca4ba51c6014f986d6548ee629bdc95589d1",
       "src": "https://github.com/nvim-neotest/neotest-python"
     },
     "neotest-zig": {
@@ -180,7 +180,7 @@
       "src": "https://codeberg.org/mfussenegger/nvim-dap-python"
     },
     "nvim-dap-ui": {
-      "rev": "1a66cabaa4a4da0be107d5eda6d57242f0fe7e49",
+      "rev": "cc9dd33aade7f20bae414d0cba163bc60d4d4b43",
       "src": "https://github.com/rcarriga/nvim-dap-ui"
     },
     "nvim-dap-virtual-text": {
