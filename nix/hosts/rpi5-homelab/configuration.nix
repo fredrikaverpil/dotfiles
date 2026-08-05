@@ -47,8 +47,7 @@ in {
       # Generate key: ssh-keygen -t ed25519 -C "your-email@example.com"
       # Then add your ~/.ssh/id_ed25519.pub content below:
       sshKeys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIElRYEYxPt8po0TToz1U5bNZYJgnho7xIgApCh9DTfyn"
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJKGKlggcQ6VquiOwiXz5505VnlzRXz6LWW8odDx6URk"
+				"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKte3qmH2qXRfdbVIfl6HgFvhRE6MCCiL9ho7xW3KSZB"
       ];
     };
   };
