@@ -49,7 +49,7 @@
       "src": "https://github.com/CRAG666/code_runner.nvim"
     },
     "codediff.nvim": {
-      "rev": "636cd3e5d8faac46aea1c4150f8129ef100786d0",
+      "rev": "e80ed6b4f13044ec4b5994b3b41b4bfd3f3a8cfe",
       "src": "https://github.com/fredrikaverpil/codediff.nvim"
     },
     "conform.nvim": {
