@@ -132,6 +132,26 @@ Keys that merely restate what lazydev already sets — `runtime.version`,
 `workspace.checkThirdParty` — are harmless, and worth keeping in a shared
 repo's `.luarc.json` for contributors who do not configure `lua_ls` themselves.
 
+`diagnostics.globals = { "vim" }` is an anti-pattern here. It silences the
+`Undefined global vim` diagnostic without giving `vim` a type, so there is no
+completion or goto-definition either — it hides the library-not-loaded problem
+rather than fixing it, and costs the safety net for genuinely undefined
+globals. If it seems necessary, the library is not loading; fix that instead.
+
+### This repo's own `.luarc.json`
+
+`~/.dotfiles/.luarc.json` keeps `workspace.ignoreDir = { "stow", ... }` because
+`stow/shared/.config/nvim-fredrik` symlinks back to `nvim-fredrik/`; without it
+the Neovim config is indexed twice and every goto-definition offers duplicates.
+
+It also makes `~/.dotfiles` the LuaLS root for the Neovim config. There is no
+top-level `lua/` there, so `require("lazyload")` cannot resolve through the
+workspace — it resolves via the seeded library at
+`~/.config/nvim-fredrik/lua/lazyload.lua`. The config's own require resolution
+therefore depends on the seeding described above. Dropping a `.luarc.json` into
+`nvim-fredrik/` would make it a workspace root in its own right and remove that
+coupling, if it ever becomes a problem.
+
 ### The trade-off in a shared repo
 
 nvim-lspconfig ships **no `on_init`** for `lua_ls`. The `on_init` snippet in
