@@ -114,6 +114,7 @@ return {
           "vendor",
         },
       },
+      -- diagnostics = { libraryFiles = "Disable" }, -- if noisy, disable
       codeLens = { enable = false }, -- causes annoying flickering
       completion = { callSnippet = "Replace" },
       doc = { privateName = { "^_" } },
