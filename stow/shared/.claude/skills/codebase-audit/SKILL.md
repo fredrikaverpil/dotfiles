@@ -6,14 +6,11 @@ description: >
   hotspots, momentum trends, and firefighting patterns. Use this skill whenever
   the user wants to understand a codebase, assess repo health, or orient
   themselves before reading code — even if they don't explicitly say "audit".
+  Examples: "audit this repo", "analyze this repo's history", "what's the state
+  of this codebase?", "bus factor", "churn analysis", "tell me about this repo",
+  "who owns this code?", "is this repo healthy?".
 allowed-tools:
   - Bash
-when_to_use: >
-  Use when the user wants to understand the health, ownership, or risk profile
-  of a git repository before reading the code. Examples: "audit this repo",
-  "codebase audit", "analyze this repo's history", "what's the state of this
-  codebase?", "bus factor", "churn analysis", "tell me about this repo",
-  "who owns this code?", "is this repo healthy?".
 context: fork
 ---
 
