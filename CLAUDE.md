@@ -32,48 +32,18 @@ code in this repository.
 
 ### Verifying a Darwin rebuild actually landed
 
-On macOS, home-manager's per-user activation runs via `launchctl asuser`,
-which intermittently no-ops silently (known upstream issue, home-manager#4413).
-This repo guards against it: `nix/shared/system/darwin.nix` appends a
-verify-or-retry step to `postActivation` that reruns the activation via plain
-`sudo -u` on a miss and fails the rebuild loudly if that also fails.
-
-To verify manually, check the home-manager gcroot (NOT
-`readlink /run/current-system` — that updates even on a silent miss):
-
-```sh
-readlink ~/.local/state/home-manager/gcroots/current-home
-# should match the generation embedded in the system's activation wrapper:
-grep -oE '/nix/store/[a-z0-9]+-home-manager-generation' \
-  "$(grep -oE '/nix/store/[a-z0-9]+-activation-'"$USER" /nix/var/nix/profiles/system/activate | head -1)"
-```
-
-Manual recovery (what the guard does automatically):
-
-```sh
-sudo -u "$USER" --set-home "$(grep -oE '/nix/store/[a-z0-9]+-activation-'"$USER" /nix/var/nix/profiles/system/activate | head -1)"
-```
+home-manager's per-user activation on macOS can silently no-op
+(home-manager#4413). `nix/shared/system/darwin.nix` guards against it with a
+verify-or-retry `postActivation` step. To check manually, compare the
+home-manager gcroot (`readlink
+~/.local/state/home-manager/gcroots/current-home`) against the expected
+generation — `readlink /run/current-system` updates even on a silent miss, so
+it proves nothing.
 
 ## Repository Architecture
 
 This is a dotfiles repository using **Nix flakes** for system/package management
 and **GNU Stow** for dotfile symlinking.
-
-### Key Structure
-
-- `nix/`: Nix configurations organized by host and shared components
-  - `hosts/`: Per-host configurations (system settings, hardware configs, users)
-  - `shared/`: Cross-platform shared configurations (home, system, overlays)
-  - `lib/`: Helper functions for system/user configuration generation
-- `stow/`: GNU Stow packages for dotfile symlinking
-  - `shared/`: Cross-platform dotfiles
-  - `Darwin/`: macOS-specific dotfiles
-  - `Linux/`: Linux-specific dotfiles
-- `extras/`: One-off platform-specific extras, legacy configs, and additional
-  READMEs
-- `nvim-fredrik/`: Complete Neovim configuration with modular per-language setup
-- `shell/`: Shell configuration, aliases, and custom scripts
-- `flake.nix`: Main Nix flake defining system configurations and package sources
 
 ### Nix Architecture Patterns
 
@@ -108,45 +78,19 @@ inputs to actually pick up new versions.
 - **Behavior**: Installed on each rebuild; upgraded manually via
   `uv tool upgrade --all` / `npm-tools-upgrade`
 
-**Adding npm tools:**
-
-1. Add a `{ package, bin }` entry to `packageTools.npmPackages` in the
-   appropriate Nix config (`bin` is the package.json "bin" name)
-2. Rebuild to install
-3. Update later: `npm-tools-upgrade`
-
-**Adding Python CLI tools (via uv):**
-
-1. Add a tool entry to `packageTools.uvTools` in the appropriate Nix config
-2. Rebuild to install
-3. Update later: `uv tool upgrade --all`
-
-**Adding LLM agent CLIs:**
-
-1. Add the package name (an attribute of the llm-agents flake's `packages`,
-   e.g. `"claude-code"`) to `packageTools.llmAgents` at the appropriate config
-   level (common, platform, or host user config)
-2. Rebuild to install
-3. Update later: `nix flake update llm-agents`, then rebuild
+To add a tool, add an entry to `packageTools.npmPackages` (a `{ package, bin }`
+pair), `packageTools.uvTools`, or `packageTools.llmAgents` (a package name from
+the `llm-agents` flake) at the appropriate config level, then rebuild.
 
 ### Neovim Configuration
 
-- Modular setup with per-language configurations in
-  `nvim-fredrik/lua/fredrik/plugins/lang/`
-- Plugin loading order: generic plugins → language-specific → core → local
-  overrides
-- Per-project customization via local `.lazy.lua` files
+- Plugins are managed with `vim.pack` (no plugin-manager framework), pinned in
+  `nvim-fredrik/nvim-pack-lock.json`
+- Per-language configuration lives in `nvim-fredrik/plugin/lang/`
+- Per-project customization via local `.nvim.lua` files (exrc), with trust
+  helpers in `nvim-fredrik/lua/exrc.lua`
 - Simple setup in `nvim-simple`, for trying out new nightly features and for a
   much simpler setup on e.g. remote shells
-
-## Development Workflow
-
-1. **Making changes**: Edit files in `stow/` for dotfiles, `nix/` for system
-   configs
-2. **Testing**: Run `nix flake check` for Nix validation
-3. **Applying**: ALWAYS ask the user to apply, NEVER apply yourself
-4. **Language tools**: Check `nvim-fredrik/lua/fredrik/plugins/lang/*.lua` for
-   formatter/linter configs
 
 ## Code Style Requirements
 
@@ -154,22 +98,20 @@ inputs to actually pick up new versions.
   for options
 - **Shell**: Use `#!/usr/bin/env bash` or `#!/usr/bin/env sh`, include
   `# shellcheck shell=bash`, always add `set -e` or `set -ex` after shebang
-- **Lua**: 2-space indentation, double quotes preferred, 120 char width, sort
-  requires (per `.stylua.toml`)
 - **Go**: 2-space tabs (not spaces), 120 char width, use gci for import
   organization
 - **Python**: 4-space indentation, 88/120 char width, use ruff for formatting
   and imports
 - **TypeScript**: 2-space indentation, 80 char width, prettier with prose-wrap
   always
-- **Rust**: Follow rustfmt defaults, use clippy suggestions
 - **YAML**: 2-space indentation, use `---` document separator
 
 ## Language-Specific Tooling
 
 For each language, consult the corresponding file in
-`nvim-fredrik/lua/fredrik/plugins/lang/` (e.g., `go.lua`, `python.lua`,
-`typescript.lua`) to get exact formatter/linter tools and configurations.
+`nvim-fredrik/plugin/lang/` (e.g., `go.lua`, `lua.lua`, `yaml.lua`) to get
+exact formatter/linter tools and configurations. Formatters are wired up in
+`nvim-fredrik/plugin/conform.lua`.
 
 **Note**: If LSP/formatter not found, check Mason install path:
 `~/.local/share/nvim-fredrik/mason/bin/` or `~/.local/share/nvim/mason/bin/`

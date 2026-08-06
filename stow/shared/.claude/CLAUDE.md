@@ -28,7 +28,7 @@ After implementing something, always look back and critically review what you
 did with the following in mind:
 
 - Explicitness/simplicity over implicitness/cleverness
-- Concistent and systematic approach instead of fragemented and ad-hoc solutions
+- Consistent and systematic approach instead of fragmented and ad-hoc solutions
 - YAGNI
 - Great DX and UX
 - Ease of long-term maintenance
@@ -92,8 +92,6 @@ If you come by a Jira ticket number or Jira URL, use `jira`
 ([jira-cli](https://github.com/ankitpokhrel/jira-cli)) to acquire more details
 for increased understanding of the problem at hand.
 
-Use the "jira-cli" skill.
-
 ## LSP
 
 When tracing where a symbol is defined or finding all references to it, use LSP
@@ -111,10 +109,10 @@ reading the whole file.
 - Use the `gopls` LSP at all times when searching for references to symbols,
   renaming packages/variables/functions etc.
 - If a package is not installed locally, search
-  [https://pkg.go.dev](pkg.go.dev). Standard library functions are available
-  (example: [`https://pkg.go.dev/fmt`](fmt package)).
+  [pkg.go.dev](https://pkg.go.dev). Standard library functions are available
+  (example: [`fmt` package](https://pkg.go.dev/fmt)).
 - You can run `go mod tidy` recursively in the repo with the custom
-  [`go-mod-tidy`](shell/bin/go-mod-tidy) shell script.
+  [`go-mod-tidy`](~/.dotfiles/shell/bin/go-mod-tidy) shell script.
 
 Use the "golang-style" skill.
 
