@@ -40,18 +40,13 @@
       }
     ]
   },
+  "respondToBashCommands": false,
   "statusLine": {
     "type": "command",
     "command": "~/code/public/github.com/fredrikaverpil/claudeline/claudeline -debug"
   },
   "enabledPlugins": {
     "context7@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
-    "playwright@claude-plugins-official": true,
-    "claude-md-management@claude-plugins-official": true,
-    "pr-review-toolkit@claude-plugins-official": true,
-    "pyright-lsp@claude-plugins-official": true,
-    "claude-code-setup@claude-plugins-official": true,
     "plugin-dev@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
@@ -66,12 +61,11 @@
       }
     }
   },
-  "effortLevel": "xhigh",
+  "effortLevel": "medium",
   "showClearContextOnPlanAccept": true,
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true,
-  "respondToBashCommands": false
+  "skipAutoPermissionPrompt": true
 }
