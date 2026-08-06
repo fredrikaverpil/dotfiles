@@ -53,7 +53,8 @@
     "lua-lsp@claude-plugins-official": true,
     "code-review@claude-plugins-official": false,
     "ponytail@ponytail": true,
-    "caveman@caveman": true
+    "caveman@caveman": true,
+    "gopls-mcp@local": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
@@ -72,6 +73,12 @@
       "source": {
         "source": "github",
         "repo": "JuliusBrussee/caveman"
+      }
+    },
+    "local": {
+      "source": {
+        "source": "directory",
+        "path": "~/.claude/local-plugins"
       }
     }
   },
