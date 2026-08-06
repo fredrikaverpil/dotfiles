@@ -287,3 +287,13 @@ report with the following sections:
 If GitHub data was available, note this at the top of the report. If not,
 mention that the analysis is git-only and could be enriched by running against a
 GitHub-hosted repo with `gh` authenticated.
+
+### Length
+
+Each section is its table plus 2-4 observation bullets. An observation says
+something the table doesn't already show — a cross-reference, an outlier, a
+caveat that changes how the numbers read. Prose that restates the table earns
+nothing and costs the reader a paragraph.
+
+Spend the budget where the findings are. A repo with one real risk gets one
+substantial section and four thin ones, not five padded to match.

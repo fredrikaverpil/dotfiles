@@ -63,6 +63,11 @@ Rules:
 2. `## What?` - Required. Describe the changes made
 3. `## Notes` - Optional. Omit entirely if no notes are needed
 
+Why? and What? get 3-5 bullets each. Group related changes into one bullet
+rather than enumerating every file touched — reviewers read the diff for that.
+If the change genuinely resists 5 bullets, the PR is too big; say so and offer
+to split it.
+
 ## File References
 
 Use `[file:lineno](url)` with SHA-pinned URLs:
