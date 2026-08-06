@@ -3,7 +3,7 @@ name: git-commit
 description: >-
   This skill should be used BEFORE running any git commit command. Triggers when
   about to run `git commit`. Ensures commit messages follow Conventional Commits
-  specification and prompts for Jira ticket number.
+  specification and prompts for the Jira ticket number.
 ---
 
 # Git Commit Messages
@@ -44,16 +44,9 @@ Write commit messages following the Conventional Commits specification.
 4. Separate subject from body with a blank line
 5. Use the body to explain intent, nuances, gotchas, or background behind the
    change — not a paraphrase of the diff
-6. Always ask the user for the Jira ticket number before committing. If there
-   is one, include it as the last line in the commit body (e.g., XY-123).
-   If there isn't one, omit it.
-
-## Branch Naming
-
-When creating a new branch, name it `<type>/<jira-ticket>` with the ticket
-lowercased, using the same types as commit messages (e.g., `feat/xy-123`,
-`fix/xy-456`). If there is no Jira ticket, fall back to
-`<type>/<kebab-description>` (e.g., `feat/add-user-auth`).
+6. Always ask me for the Jira ticket number before committing. If there is one,
+   include it as the last line in the commit body (e.g., `XY-123`). If there
+   isn't one, omit it.
 
 ## Breaking Changes
 
@@ -68,3 +61,28 @@ BREAKING CHANGE: The /v1/users endpoint has been removed.
 ## Scope
 
 Optional. Use to specify area of change (e.g., `api`, `ui`, `auth`, `db`).
+
+## Branch Naming
+
+When creating a new branch, name it `<type>/<jira-ticket>` with the ticket
+lowercased, using the same types as commit messages (e.g., `feat/xy-123`,
+`fix/xy-456`). If there is no Jira ticket, fall back to
+`<type>/<kebab-description>` (e.g., `feat/add-user-auth`).
+
+Exception: when the environment has already assigned a branch (e.g.,
+`claude/...` branches in Claude cloud sandbox sessions), keep it — never
+rename it or create a differently named branch to match this convention.
+
+## Identity, Signing and Attribution
+
+Git identity and commit signing are configured by the environment (gitconfig
+on developer machines, a SessionStart hook in cloud sandboxes) — leave both to
+it:
+
+1. The message describes the change only: no `Co-Authored-By`, no "Generated
+   with" lines, no session links or model names.
+2. Let git resolve the author from config — commit without `--author` or
+   `-c user.name=...`/`-c user.email=...`.
+3. Let git resolve signing from config — commit without `-S`, `--gpg-sign` or
+   `--no-gpg-sign`, and leave signing-related config as it is.
+
