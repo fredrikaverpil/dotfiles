@@ -53,7 +53,22 @@ return {
       workspace = {
         checkThirdParty = false,
         library = runtime_library(), -- instead of lazydev.nvim
-        ignoreDir = { ".vscode", ".pocket", ".tests", ".venv", "node_modules" }, -- avoid >10k scanned files
+        -- LuaLS builds one of these matchers per library root as well as for
+        -- the workspace, so this prunes plugin trees too — vendored copies and
+        -- test suites hold no definitions worth jumping to, and every entry is
+        -- a file LuaLS would otherwise parse on startup. Patterns are
+        -- gitignore-style and match at any depth.
+        ignoreDir = {
+          ".pocket",
+          ".tests",
+          ".venv",
+          ".vscode",
+          "node_modules",
+          "spec",
+          "test",
+          "tests",
+          "vendor",
+        },
       },
       codeLens = { enable = false }, -- causes annoying flickering
       completion = { callSnippet = "Replace" },
