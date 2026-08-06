@@ -9,18 +9,17 @@ before writing the plan.
 
 ### Atomic, logical changes
 
-- Every set of code modifications that forms a distinct logical unit MUST live
-  in its own commit/change.
-- Each commit/change MUST be able to stand on its own: the code builds, tests
-  pass, and linters pass.
+- Every set of code modifications that forms a distinct logical unit lives in
+  its own commit/change.
+- Each commit/change stands on its own: the code builds, tests pass, and
+  linters pass.
 - Do NOT bundle unrelated modifications into a single commit/change.
 - Code modification related to feedback and reviews belong in the commit/change
   that originally introduced them, not a separate commit/change.
 
 ### Avoid over-editing
 
-IMPORTANT: Try to preserve the original code and the logic of the original code
-as much as possible.
+Preserve the original code and its logic as much as possible.
 
 When unsure, ask questions — mid-implementation, not only while planning.
 
@@ -64,9 +63,9 @@ the related details.
 
 ## GitHub
 
-When I provide github.com links (PRs, issues, comments, actions, etc.), ALWAYS
-use the `gh` CLI to fetch the content instead of WebFetch. WebFetch often fails
-on GitHub pages.
+When I provide github.com links (PRs, issues, comments, actions, etc.), use the
+`gh` CLI to fetch the content instead of WebFetch. WebFetch often fails on
+GitHub pages.
 
 Use the "gh-cli" skill for `gh` commands, the "pr-style" skill for PR
 title/description conventions, and the "gh-pr" skill when creating PRs with
