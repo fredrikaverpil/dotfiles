@@ -28,17 +28,32 @@ Your idea of "current Go" is frozen at your training cutoff and is usually out
 of sync with the project in both directions. Before writing code, read the `go`
 directive in `go.mod` and check `go version`, and target the lower of the two.
 
-That drift cuts both ways, so treat the toolchain as the authority over memory:
+That drift cuts both ways:
 
-- Newer than you know: a stdlib package or function you have never seen may
-  exist, and a helper you would hand-roll may have landed in `slices`, `maps`,
-  `cmp`, or `testing`. Check with `go doc <pkg>` before writing your own.
-- Older than you assume: a feature you consider ordinary may postdate the `go`
-  directive and fail to build. Confirm with `go doc` or the release notes rather
-  than assuming availability.
+- Newer than you know: a helper you are about to hand-roll may already exist in
+  `slices`, `maps`, `cmp`, `testing`, or a package you have never heard of.
+- Older than you assume: a feature you treat as ordinary may postdate the `go`
+  directive and simply not build.
 
-`go doc` reads the toolchain actually installed, so it is the cheapest way to
-settle any of this.
+`go doc <pkg>` answers both, but only for the toolchain installed here. To ask
+about the version the module actually targets, use the pkg.go.dev API — no auth,
+GET only ([announcement](https://go.dev/blog/pkgsite-api), spec at
+`https://pkg.go.dev/v1beta/openapi.yaml`):
+
+```sh
+# Which symbols does a stdlib package have at a specific Go version?
+curl -s "https://pkg.go.dev/v1beta/symbols/slices?version=v1.21.0"
+
+# Current Go release, and any release candidate in flight.
+curl -s "https://pkg.go.dev/v1beta/versions/std"
+
+# Third-party: latest version, and the symbols it declares.
+curl -s "https://pkg.go.dev/v1beta/module/github.com/google/go-cmp"
+curl -s "https://pkg.go.dev/v1beta/symbols/github.com/google/go-cmp/cmp"
+```
+
+Release notes are not in the API — fetch https://go.dev/doc/go1.N for a
+release's changes, or https://go.dev/doc/devel/release for the index.
 
 ## Formatting
 
