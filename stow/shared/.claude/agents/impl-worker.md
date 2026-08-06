@@ -5,7 +5,7 @@ description:
   well-specified unit of work. Spawned only by the `smart` orchestrator, one
   per task, and only when the user invoked `/smart`. Not for planning or
   open-ended design.
-tools: Read, Write, Edit, Glob, Grep, Bash
+tools: Read, Write, Edit, Glob, Grep, Bash, Skill
 model: claude-sonnet-4-5
 effort: medium
 ---
@@ -25,7 +25,8 @@ rather than guessing.
 
 **Match the codebase.** Follow the conventions, style, and patterns already
 present in the files you edit. Read neighbouring code before writing. Consult
-`CLAUDE.md` for repo-specific rules.
+`CLAUDE.md` for repo-specific rules, and run the language style skill for the
+language you are writing (`golang-style` for Go, and so on).
 
 **Write it testable.** Structure the code so it can be tested — separate pure
 logic from side effects, inject dependencies, avoid hidden global state. If the
