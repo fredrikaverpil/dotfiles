@@ -13,7 +13,7 @@ before writing the plan.
   its own commit/change.
 - Each commit/change stands on its own: the code builds, tests pass, and
   linters pass.
-- Do NOT bundle unrelated modifications into a single commit/change.
+- Unrelated modifications go in separate commits/changes.
 - Code modification related to feedback and reviews belong in the commit/change
   that originally introduced them, not a separate commit/change.
 
