@@ -73,17 +73,12 @@ end
 return {
   cmd = { "lua-language-server" },
   filetypes = { "lua" },
-  root_markers = root_markers, -- unused while `root_dir` is set, but kept in sync with it
-  --- Every plugin is its own git repo and `.git` is a root marker, so opening
-  --- plugin source — which goto-definition does constantly — would otherwise
-  --- start a fresh lua_ls rooted at that plugin, each one parsing the whole
-  --- library again. Neovim reuses a client only when the buffer's root is
-  --- already one of that client's workspace folders, but it does reuse a
-  --- rootless client for any other rootless buffer, so leaving vendored source
-  --- without a root collapses it all onto one shared client. Definitions still
-  --- resolve, since those come from `workspace.library` rather than the root.
-  ---@param bufnr integer
-  ---@param on_dir fun(dir?: string)
+  -- Documented as unused when `root_dir` is defined, but Neovim still re-derives
+  -- a root from it whenever `root_dir` yields nil — which would re-root every
+  -- plugin buffer at its own git repo. `root_dir` does the marker search.
+  root_markers = {},
+  -- Vendored source gets no root, so `reuse_client` can fold it into a running
+  -- client instead of starting one lua_ls per plugin repo.
   root_dir = function(bufnr, on_dir)
     if is_vendored(vim.api.nvim_buf_get_name(bufnr)) then
       on_dir(nil)
@@ -91,26 +86,31 @@ return {
       on_dir(vim.fs.root(bufnr, root_markers))
     end
   end,
+  -- Rootless (vendored) buffers join any running lua_ls rather than starting a
+  -- second one that would preload the whole library again.
+  reuse_client = function(client, config)
+    if client.name ~= config.name or client:is_stopped() then
+      return false
+    end
+    if config.root_dir then
+      return client.root_dir == config.root_dir
+    end
+    return true
+  end,
   settings = {
     Lua = {
       runtime = {
         version = "LuaJIT",
-        -- Needed for `require("plugin")` to bind to that module's return value.
-        -- These patterns are matched against each library root, and plugin
-        -- modules sit under `lua/`, which the default `?.lua;?/init.lua` does
-        -- not reach there. Without this LuaLS still jumps to the file from the
-        -- require string, but member access on it — `require("conform").setup`
-        -- — resolves to nothing. Workspace-local requires already worked.
+        -- Matched against each library root, where plugin modules sit under
+        -- `lua/` and the default `?.lua;?/init.lua` does not reach them.
+        -- Without this, `require("conform").setup` resolves to nothing.
         path = { "lua/?.lua", "lua/?/init.lua" },
       },
       workspace = {
         checkThirdParty = false,
-        library = runtime_library(), -- instead of lazydev.nvim
-        -- LuaLS builds one of these matchers per library root as well as for
-        -- the workspace, so this prunes plugin trees too — vendored copies and
-        -- test suites hold no definitions worth jumping to, and every entry is
-        -- a file LuaLS would otherwise parse on startup. Patterns are
-        -- gitignore-style and match at any depth.
+        library = runtime_library(),
+        -- Applied per library root as well as to the workspace, so this prunes
+        -- plugin trees too. Gitignore-style, matching at any depth.
         ignoreDir = {
           ".pocket",
           ".tests",
