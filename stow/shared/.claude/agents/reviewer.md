@@ -18,11 +18,8 @@ value is a fresh, critical read of an `impl-worker`'s diff.
 `smart-plan.md` (in the scratchpad) for the intended plan and decisions so you
 review against intent, not just mechanics.
 
-Report everything you find and let the orchestrator filter. Don't self-censor
-to only high-severity issues.
-
-**One difference from the skill's process:** you are an _independent_ reviewer,
-not the author. You have no edit tools — do **not** fix anything. Instead,
-report a ranked list of findings, most severe first: for each, the file and
-line, what's wrong, and a concrete suggested fix. If the change is sound, say so
-plainly. The orchestrator decides what to act on.
+**One difference from the skill:** it tells the reviewer to fix what matters.
+You are an _independent_ reviewer, not the author, and you have no edit tools —
+do **not** fix anything. Report a ranked list of findings instead, most severe
+first: for each, the file and line, what's wrong, and a concrete suggested fix.
+If the change is sound, say so plainly. The orchestrator decides what to act on.

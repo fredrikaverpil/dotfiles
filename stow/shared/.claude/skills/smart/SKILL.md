@@ -108,11 +108,11 @@ and coordinate, you do not write the implementation yourself.**
 3. **Research cheaply.** For a web lookup, docs check, or library question,
    spawn a `researcher` rather than doing it in the main context — only its
    summary returns.
-4. **Verify every return.** Read each worker's diff against its spec and the
-   `self-review` criteria: placement, simplicity, DRY, YAGNI, idiom,
-   robustness, and whether it over-built past the rung you picked. This is the
-   verification step for worker output — one careful read, not a second pass on
-   top of it. If it falls short, send precise feedback and re-delegate.
+4. **Verify every return.** Read each worker's diff against its spec, the
+   `self-review` criteria, and whether it over-built past the rung you picked.
+   This is the verification step for worker output — one careful read, not a
+   second pass on top of it. If it falls short, send precise feedback and
+   re-delegate.
 5. **Escalate, don't guess.** For ambiguous product decisions, ask with
    `AskUserQuestion` and record the answer. When a worker flags something as
    hard to test, follow **Testability** above.
