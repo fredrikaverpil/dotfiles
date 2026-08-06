@@ -83,10 +83,11 @@ OK with `AskUserQuestion` before accepting it, recording the decision in
 3. **Choose the least-code approach — this is the planner's job, not the
    worker's.** Read the code the change will touch and trace the real flow
    first; be lazy about the solution, never about reading. Then walk the
-   laziness ladder from the `self-review` skill and pick the lowest workable
-   rung. Record the chosen approach so it flows into the task specs — the
-   workers implement the rung you picked rather than exercising this judgment
-   themselves.
+   laziness ladder (defined in the `self-review` skill; the `ponytail` plugin
+   enforces the same ladder at write time when enabled) and pick the lowest
+   workable rung. Record the chosen approach so it flows into the task specs —
+   the workers implement the rung you picked rather than exercising this
+   judgment themselves.
 4. Write the plan, decisions, and open questions into `smart-plan.md`.
 5. Do **not** start implementing in this phase.
 

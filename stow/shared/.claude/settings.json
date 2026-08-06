@@ -51,13 +51,27 @@
     "gopls-lsp@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
     "lua-lsp@claude-plugins-official": true,
-    "code-review@claude-plugins-official": false
+    "code-review@claude-plugins-official": false,
+    "ponytail@ponytail": true,
+    "caveman@caveman": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
       "source": {
         "source": "git",
         "url": "https://github.com/anthropics/claude-plugins-official.git"
+      }
+    },
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
+      }
+    },
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
       }
     }
   },
