@@ -93,7 +93,16 @@ return {
   end,
   settings = {
     Lua = {
-      runtime = { version = "LuaJIT" },
+      runtime = {
+        version = "LuaJIT",
+        -- Needed for `require("plugin")` to bind to that module's return value.
+        -- These patterns are matched against each library root, and plugin
+        -- modules sit under `lua/`, which the default `?.lua;?/init.lua` does
+        -- not reach there. Without this LuaLS still jumps to the file from the
+        -- require string, but member access on it — `require("conform").setup`
+        -- — resolves to nothing. Workspace-local requires already worked.
+        path = { "lua/?.lua", "lua/?/init.lua" },
+      },
       workspace = {
         checkThirdParty = false,
         library = runtime_library(), -- instead of lazydev.nvim
