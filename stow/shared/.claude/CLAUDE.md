@@ -26,8 +26,7 @@ When unsure, ask questions — mid-implementation, not only while planning.
 ## AIP
 
 When working with backends, adhere to
-[Google's AIP](https://google.aip.dev/general). Look up rules when in doubt. Use
-the "aip" skill.
+[Google's AIP](https://google.aip.dev/general). Look up rules when in doubt.
 
 ## Sage
 
@@ -52,10 +51,6 @@ For Go, use `assert.DeepEquals` from
 [gotest.tools](https://pkg.go.dev/gotest.tools/v3/assert) for whole object
 assertion with the got/want pattern. Always prefer table tests.
 
-## Git
-
-Use the "git-commit" skill.
-
 ## GCP
 
 If you see `console.cloud.google.com` links, use the `gcloud` command to access
@@ -66,10 +61,6 @@ the related details.
 When I provide github.com links (PRs, issues, comments, actions, etc.), use the
 `gh` CLI to fetch the content instead of WebFetch. WebFetch often fails on
 GitHub pages.
-
-Use the "gh-cli" skill for `gh` commands, the "pr-style" skill for PR
-title/description conventions, and the "gh-pr" skill when creating PRs with
-`gh`.
 
 ## Jira
 
@@ -98,8 +89,6 @@ reading the whole file.
   (example: [`fmt` package](https://pkg.go.dev/fmt)).
 - You can run `go mod tidy` recursively in the repo with the custom
   [`go-mod-tidy`](~/.dotfiles/shell/bin/go-mod-tidy) shell script.
-
-Use the "golang-style" skill.
 
 ## Npm and deno
 
