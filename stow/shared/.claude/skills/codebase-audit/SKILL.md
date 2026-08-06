@@ -46,12 +46,45 @@ use what's available.
 
 ### 1a. High-Churn Files
 
+#### 1a-i. Raw churn
+
 ```bash
-git log --format=format: --name-only --since="1 year ago" | sort | uniq -c | sort -nr | head -20
+git log --format=format: --name-only --since="1 year ago" | grep . | sort | uniq -c | sort -nr | head -20
 ```
 
 Report the top 20 most-modified files in the past year. Flag any file that
 appears disproportionately often -- this is the clearest signal of codebase drag.
+
+#### 1a-ii. De-noised churn
+
+Lockfiles, generated output and vendored trees dominate raw churn without
+telling you anything about the code. If 5 or more of the top 10 are noise of
+this kind, run a filtered second pass:
+
+```bash
+NOISE='(^|/)([^/]*-lock\.(json|yaml)|[^/]*\.lock|package\.json|go\.sum|CHANGELOG\.md|[^/]*\.snap)$|(^|/)(__snapshots__|dist|build|coverage|generated|vendor|node_modules|\.terraform)/'
+git log --format=format: --name-only --since="1 year ago" | grep . | grep -vE "$NOISE" | sort | uniq -c | sort -nr | head -20
+```
+
+Extend `$NOISE` with repo-specific paths when the filtered pass is still
+dominated by bulk content (`docs/`, `locales/`, `i18n/`). Label that as a
+repo-specific pass, separate from the generic de-noising above.
+
+Report both passes and name what was excluded — a lockfile churning 80 times
+is itself a finding about dependency pressure, it just isn't a finding about
+the code.
+
+Keep the blank-line strip as its own `grep .` rather than folding `^$` into
+`$NOISE`. BSD grep (macOS) drops the `^$` branch when the alternation contains
+a leading `.*`, silently leaving every blank line in the count.
+
+#### 1a-iii. Directory-level triage
+
+When file-level hotspots are too noisy to read — large repos, monorepos:
+
+```bash
+git log --format=format: --name-only --since="1 year ago" | grep . | cut -d/ -f1-2 | sort | uniq -c | sort -nr | head -20
+```
 
 ### 1b. Team Ownership / Bus Factor
 
@@ -68,6 +101,16 @@ git shortlog -sn --no-merges
 ```bash
 git shortlog -sn --no-merges --since="6 months ago"
 ```
+
+Under a squash-merge workflow these counts reflect who *merged*, not who wrote
+the code — which can invert the ranking entirely. Check before trusting it:
+
+```bash
+gh pr list --state merged --limit 20 --json mergeCommit,author
+```
+
+If GitHub is unavailable, a history of single-commit merges with no branch
+topology is the tell.
 
 #### 1b-ii. Lines changed per author
 
@@ -143,10 +186,15 @@ reveal knowledge sharing — or the lack of it.
 #### 1c-i. Git commit grep
 
 ```bash
-git log -i -E --grep="fix|bug|broken" --name-only --format='' | sort | uniq -c | sort -nr | head -20
+git log -i -E --grep="fix|bug|broken" --name-only --format='' | grep . | sort | uniq -c | sort -nr | head -20
 ```
 
-Show the top 20 files most frequently touched in bug-related commits.
+Show the top 20 files most frequently touched in bug-related commits. If step
+1a-ii needed de-noising, apply the same `$NOISE` filter here.
+
+Commit-message discipline sets the ceiling on this signal — a repo where fixes
+are titled "update" produces a thin list, which says nothing about its actual
+defect rate.
 
 #### 1c-ii. (gh) GitHub issues labeled as bugs
 
@@ -208,6 +256,10 @@ git log --oneline --since="1 year ago" | grep -iE 'revert|hotfix|emergency|rollb
 ```
 
 Count and list reverts, hotfixes, and emergency commits from the past year.
+
+`grep` exits 1 on no match. That is a real result — a quiet year, or vague
+commit messages — not a failed command, so report it as a finding rather than
+retrying with a looser pattern.
 
 #### 1e-ii. (gh) Reverted PRs
 
