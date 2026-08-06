@@ -33,20 +33,64 @@ local function runtime_library()
   return paths
 end
 
+local root_markers = {
+  ".luarc.json",
+  ".luarc.jsonc",
+  ".luacheckrc",
+  ".stylua.toml",
+  "stylua.toml",
+  "selene.toml",
+  "selene.yml",
+  ".git",
+}
+
+--- Roots of read-only source: installed plugins and the Neovim runtime.
+local vendored = {} ---@type string[]
+for _, dir in ipairs({ vim.fn.stdpath("data") .. "/site/pack", vim.env.VIMRUNTIME }) do
+  local real = vim.uv.fs_realpath(dir)
+  if real then
+    table.insert(vendored, real)
+  end
+end
+
+--- Whether `path` is vendored source rather than something being worked on.
+---@param path string
+---@return boolean
+local function is_vendored(path)
+  local real = vim.uv.fs_realpath(path)
+  if not real then
+    return false
+  end
+  for _, dir in ipairs(vendored) do
+    if vim.startswith(real, dir .. "/") then
+      return true
+    end
+  end
+  return false
+end
+
 ---@type vim.lsp.Config
 return {
   cmd = { "lua-language-server" },
   filetypes = { "lua" },
-  root_markers = {
-    ".luarc.json",
-    ".luarc.jsonc",
-    ".luacheckrc",
-    ".stylua.toml",
-    "stylua.toml",
-    "selene.toml",
-    "selene.yml",
-    ".git",
-  },
+  root_markers = root_markers, -- unused while `root_dir` is set, but kept in sync with it
+  --- Every plugin is its own git repo and `.git` is a root marker, so opening
+  --- plugin source — which goto-definition does constantly — would otherwise
+  --- start a fresh lua_ls rooted at that plugin, each one parsing the whole
+  --- library again. Neovim reuses a client only when the buffer's root is
+  --- already one of that client's workspace folders, but it does reuse a
+  --- rootless client for any other rootless buffer, so leaving vendored source
+  --- without a root collapses it all onto one shared client. Definitions still
+  --- resolve, since those come from `workspace.library` rather than the root.
+  ---@param bufnr integer
+  ---@param on_dir fun(dir?: string)
+  root_dir = function(bufnr, on_dir)
+    if is_vendored(vim.api.nvim_buf_get_name(bufnr)) then
+      on_dir(nil)
+    else
+      on_dir(vim.fs.root(bufnr, root_markers))
+    end
+  end,
   settings = {
     Lua = {
       runtime = { version = "LuaJIT" },
