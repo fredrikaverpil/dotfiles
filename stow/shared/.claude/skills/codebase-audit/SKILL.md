@@ -28,6 +28,8 @@ reading code.
 
 ## Steps
 
+Steps 1a-1e are independent — run them in parallel, then synthesize in step 2.
+
 ### 0. Detect GitHub availability
 
 Before starting the analysis, check whether the repo is GitHub-hosted and `gh`
@@ -44,8 +46,6 @@ use what's available.
 
 ### 1a. High-Churn Files
 
-Run in parallel with steps 1b-1e.
-
 ```bash
 git log --format=format: --name-only --since="1 year ago" | sort | uniq -c | sort -nr | head -20
 ```
@@ -53,11 +53,7 @@ git log --format=format: --name-only --since="1 year ago" | sort | uniq -c | sor
 Report the top 20 most-modified files in the past year. Flag any file that
 appears disproportionately often -- this is the clearest signal of codebase drag.
 
-**Success criteria**: A ranked list of files with change counts is produced.
-
 ### 1b. Team Ownership / Bus Factor
-
-Run in parallel with steps 1a, 1c-1e.
 
 Commit count alone is a poor proxy for ownership. Someone reformatting config
 files 100 times looks more "important" than someone who architected a core
@@ -142,14 +138,7 @@ suggests. Conversely, someone with many commits that are mostly formatting or
 config changes carries less bus-factor risk. PR review patterns (if available)
 reveal knowledge sharing — or the lack of it.
 
-**Success criteria**: Contributor rankings (all-time and recent), lines-changed
-breakdown, per-subsystem ownership, commit samples, and (if GitHub is available)
-review patterns are produced, with a nuanced bus-factor assessment that goes
-beyond raw commit counts.
-
 ### 1c. Bug Hotspots
-
-Run in parallel with steps 1a-1b, 1d-1e.
 
 #### 1c-i. Git commit grep
 
@@ -177,12 +166,7 @@ Together they paint a fuller picture.
 Overlay bug hotspots against churn data from step 1a to identify highest-risk
 code — files that both change frequently and attract bug fixes.
 
-**Success criteria**: A ranked list of bug-hotspot files is produced, enriched
-with issue data if GitHub is available.
-
 ### 1d. Project Momentum
-
-Run in parallel with steps 1a-1c, 1e.
 
 #### 1d-i. Monthly commit counts
 
@@ -215,12 +199,7 @@ gh release list --limit 20
 Regular releases indicate a healthy delivery rhythm. Long gaps between releases
 may signal stalled work or big-bang deployments.
 
-**Success criteria**: A monthly commit-count timeline is produced with trend
-observations, enriched with PR merge and release cadence if GitHub is available.
-
 ### 1e. Firefighting Patterns
-
-Run in parallel with steps 1a-1d.
 
 #### 1e-i. Git commit grep
 
@@ -241,9 +220,6 @@ gh pr list --state merged --search "revert OR hotfix OR emergency" --limit 50 --
 
 Frequent reverts indicate deploy instability and test reliability issues.
 
-**Success criteria**: A count and list of firefighting commits (and PRs if
-GitHub is available) is produced.
-
 ### 2. Synthesize Report
 
 After all parallel steps complete, combine findings into a structured markdown
@@ -259,6 +235,3 @@ report with the following sections:
 If GitHub data was available, note this at the top of the report. If not,
 mention that the analysis is git-only and could be enriched by running against a
 GitHub-hosted repo with `gh` authenticated.
-
-**Success criteria**: A single, coherent markdown report covering all 5
-dimensions with actionable observations is returned to the user.
