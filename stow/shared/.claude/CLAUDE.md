@@ -22,21 +22,7 @@ before writing the plan.
 IMPORTANT: Try to preserve the original code and the logic of the original code
 as much as possible.
 
-### Self review
-
-After implementing something, always look back and critically review what you
-did with the following in mind:
-
-- Explicitness/simplicity over implicitness/cleverness
-- Consistent and systematic approach instead of fragmented and ad-hoc solutions
-- YAGNI
-- Great DX and UX
-- Ease of long-term maintenance
-- Follow conventions by the language, ecosystem, open source community
-- Brittle or potentially buggy code
-
-If you discover apparent improvement areas, go back and refactor. When unsure,
-ask questions.
+When unsure, ask questions — mid-implementation, not only while planning.
 
 ## AIP
 
