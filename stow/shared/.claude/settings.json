@@ -46,12 +46,12 @@
     "command": "~/code/public/github.com/fredrikaverpil/claudeline/claudeline -debug"
   },
   "enabledPlugins": {
-    "context7@claude-plugins-official": true,
-    "plugin-dev@claude-plugins-official": true,
+    "context7@claude-plugins-official": false,
+    "plugin-dev@claude-plugins-official": false,
     "gopls-lsp@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
     "lua-lsp@claude-plugins-official": true,
-    "code-review@claude-plugins-official": true
+    "code-review@claude-plugins-official": false
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
