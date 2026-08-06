@@ -100,25 +100,6 @@ LLM agent CLIs (claude-code, opencode,...) are the exception: they are plain Nix
 packages from the `llm-agents` flake input, upgraded via
 `nix flake update llm-agents` + rebuild.
 
-### Claude Code MCP servers
-
-Most of `~/.claude/` is stowed from this repo, but MCP servers are not: Claude
-Code stores user-scoped servers in `~/.claude.json`, which also holds
-per-project state and is deliberately untracked. Re-add them on a new machine
-with:
-
-```sh
-# gopls (v0.20+) — Go diagnostics, vulncheck, package APIs, file context
-claude mcp add -s user gopls -- \
-  ~/.local/share/nvim-fredrik/mason/bin/gopls mcp
-```
-
-The binary is the Mason-managed one, so it stays current with Neovim rather
-than with a `go install` into `~/go/bin` that nothing upgrades. This complements
-the `gopls-lsp` plugin rather than replacing it — that plugin provides
-definitions, hover, implementations and call hierarchy, none of which the MCP
-server exposes.
-
 ## Other READMEs and references
 
 - Neovim ⌨️
