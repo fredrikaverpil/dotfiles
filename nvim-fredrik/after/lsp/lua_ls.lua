@@ -1,18 +1,14 @@
---- Directories LuaLS indexes, with symlinks resolved and duplicates dropped.
+--- Library directories for LuaLS, symlinks resolved and duplicates dropped.
 ---
---- LuaLS only scans `workspace.library` while it starts up, so the paths have
---- to be in `settings` before its first `workspace/configuration` pull.
+--- LuaLS only scans `workspace.library` at startup, so these have to be in
+--- `settings` before its first `workspace/configuration` pull.
 ---
---- The package directories are globbed rather than read off `runtimepath`:
---- vim.pack installs plugins as `opt`, so at attach time the runtimepath holds
---- only whatever happened to load first, and goto-definition would resolve
---- differently from one session to the next.
+--- Globbed rather than read off `runtimepath`, which holds only the plugins
+--- loaded so far since vim.pack installs them as `opt`.
 ---
---- Symlinks must be resolved: `~/.config/nvim-fredrik` is stowed from this
---- repo, so without `fs_realpath` LuaLS sees the same files twice — once as
---- the workspace (`~/.dotfiles/nvim-fredrik`) and once as a library
---- (`~/.config/nvim-fredrik`). Definitions then bind to the library copy while
---- the cursor sits in the workspace copy, and references find nothing.
+--- `fs_realpath` matters because `~/.config/nvim-fredrik` is stowed from this
+--- repo: without it LuaLS indexes the same files twice, as workspace and as
+--- library, and definitions bind to the copy the cursor is not in.
 ---@return string[]
 local function runtime_library()
   local dirs = { vim.env.VIMRUNTIME, vim.fn.stdpath("config") }
@@ -33,6 +29,7 @@ local function runtime_library()
   return paths
 end
 
+--- Workspace markers, searched by `root_dir` below.
 local root_markers = {
   ".luarc.json",
   ".luarc.jsonc",
