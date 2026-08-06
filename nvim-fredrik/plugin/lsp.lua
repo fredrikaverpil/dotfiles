@@ -5,9 +5,17 @@ require("lazyload").on_vim_enter(function()
   })
 
   -- Extend LSP capabilities with blink.cmp completions for all servers.
-  vim.lsp.config("*", {
-    capabilities = require("blink.cmp").get_lsp_capabilities(),
-  })
+  -- Guarded because this runs before vim.lsp.enable() below: an error here
+  -- would abort the whole callback and silently leave every server disabled,
+  -- with nothing pointing at completion as the cause.
+  local ok, capabilities = pcall(function()
+    return require("blink.cmp").get_lsp_capabilities()
+  end)
+  if ok then
+    vim.lsp.config("*", { capabilities = capabilities })
+  else
+    vim.notify("blink.cmp capabilities unavailable: " .. tostring(capabilities), vim.log.levels.WARN)
+  end
 
   local servers = {
     "basedpyright",
