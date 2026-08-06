@@ -53,7 +53,19 @@ require("lazyload").on_vim_enter(function()
         prepend_args = { "--prose-wrap", "always", "--print-width", "80", "--tab-width", "2" },
       },
       rumdl = {
-        prepend_args = {
+        -- rumdl discovers rumdl.toml by walking up from the cwd, and matches
+        -- per-file settings (e.g. per-file-flavor) against the file path. The
+        -- default `rumdl fmt -` gives it neither, so a project's config is
+        -- silently ignored -- which mangles e.g. mkdocs admonitions.
+        cwd = function(_, ctx)
+          return ctx.dirname
+        end,
+        args = {
+          "fmt",
+          "--stdin-filename",
+          "$FILENAME",
+          "-",
+          -- Fallback defaults for projects without a rumdl.toml of their own.
           -- MD034: leave bare URLs/emails untouched (no <...> wrapping).
           -- MD036: don't rewrite bold-only paragraphs (e.g. **Example:**) into
           -- level-2 headings.
