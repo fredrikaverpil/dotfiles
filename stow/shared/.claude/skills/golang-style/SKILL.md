@@ -1,199 +1,79 @@
 ---
 name: golang-style
 description:
-  Use this skill BEFORE writing or editing any Go (.go) files. Triggers when
-  about to create, modify, or add code to .go files. Enforces happy path coding,
-  error wrapping, sentinel errors, godoc-style comments, and `go doc` usage.
+  Go conventions specific to this author. Use before writing or editing any Go
+  (.go) file.
 ---
 
+# Go conventions
 
+Where this author deviates from, or tightens, idiomatic Go defaults.
 
-# Go Coding Conventions
+## Errors and control flow
 
-## Proverbs
+- Structure functions so the happy path flows straight down: handle each error
+  and return early, then continue with the main logic. Main logic never nests
+  inside an `if err == nil` branch.
+- Only wrap errors with `%w` if the underlying error should be
+  exposed.
+- Define expected error conditions as package-level sentinel errors
+  (`var ErrNotFound = errors.New("not found")`) and check them with
+  `errors.Is`, not `==` or string matching.
 
-Try to follow the proverbs:
+## Go version
 
-> Go Proverbs
-> Simple, Poetic, Pithy
-> Don't communicate by sharing memory, share memory by communicating.
-> Concurrency is not parallelism.
-> Channels orchestrate; mutexes serialize.
-> The bigger the interface, the weaker the abstraction.
-> Make the zero value useful.
-> interface{} says nothing.
-> Gofmt's style is no one's favorite, yet gofmt is everyone's favorite.
-> A little copying is better than a little dependency.
-> Syscall must always be guarded with build tags.
-> Cgo must always be guarded with build tags.
-> Cgo is not Go.
-> With the unsafe package there are no guarantees.
-> Clear is better than clever.
-> Reflection is never clear.
-> Errors are values.
-> Don't just check errors, handle them gracefully.
-> Design the architecture, name the components, document the details.
-> Documentation is for users.
-> Don't panic.
+Your idea of "current Go" is frozen at your training cutoff and is usually out
+of sync with the project in both directions. Before writing code, read the `go`
+directive in `go.mod` and check `go version`, and target the lower of the two.
 
-Follow these conventions strictly when writing Go code.
+That drift cuts both ways:
 
-## Happy Path Coding
+- Newer than you know: a helper you are about to hand-roll may already exist in
+  `slices`, `maps`, `cmp`, `testing`, or a package you have never heard of.
+- Older than you assume: a feature you treat as ordinary may postdate the `go`
+  directive and simply not build.
 
-Structure code so the successful path flows straight down. Handle errors
-immediately, then continue with main logic.
+`go doc <pkg>` answers both, but only for the toolchain installed here. To ask
+about the version the module actually targets, use the pkg.go.dev API — no auth,
+GET only ([announcement](https://go.dev/blog/pkgsite-api), spec at
+`https://pkg.go.dev/v1beta/openapi.yaml`):
 
-```go
-// Correct: happy path flows down.
-func ProcessUser(id string) (*User, error) {
-    user, err := db.GetUser(id)
-    if err != nil {
-        return nil, fmt.Errorf("get user %s: %w", id, err)
-    }
+```sh
+# Which symbols does a stdlib package have at a specific Go version?
+curl -s "https://pkg.go.dev/v1beta/symbols/slices?version=v1.21.0"
 
-    if err := user.Validate(); err != nil {
-        return nil, fmt.Errorf("validate user %s: %w", id, err)
-    }
+# Current Go release, and any release candidate in flight.
+curl -s "https://pkg.go.dev/v1beta/versions/std"
 
-    return user, nil
-}
-
-// Wrong: main logic nested inside conditions.
-func ProcessUser(id string) (*User, error) {
-    user, err := db.GetUser(id)
-    if err == nil {
-        if err := user.Validate(); err == nil {
-            return user, nil
-        } else {
-            return nil, err
-        }
-    }
-    return nil, err
-}
+# Third-party: latest version, and the symbols it declares.
+curl -s "https://pkg.go.dev/v1beta/module/github.com/google/go-cmp"
+curl -s "https://pkg.go.dev/v1beta/symbols/github.com/google/go-cmp/cmp"
 ```
 
-## Error Wrapping
+Release notes are not in the API — fetch https://go.dev/doc/go1.N for a
+release's changes, or https://go.dev/doc/devel/release for the index.
 
-Always wrap errors with context using `%w`. Include the operation and relevant
-identifiers.
+## Formatting
 
-```go
-// Correct: wrapped with context.
-if err != nil {
-    return fmt.Errorf("create order for customer %s: %w", customerID, err)
-}
-
-// Wrong: no context.
-if err != nil {
-    return err
-}
-```
-
-## Sentinel Errors
-
-Define package-level sentinel errors for expected error conditions. Use
-`errors.Is()` to check.
-
-```go
-// Define at package level.
-var (
-    ErrNotFound     = errors.New("not found")
-    ErrUnauthorized = errors.New("unauthorized")
-    ErrInvalidInput = errors.New("invalid input")
-)
-
-// Return sentinel errors.
-func GetUser(id string) (*User, error) {
-    user := db.Find(id)
-    if user == nil {
-        return nil, ErrNotFound
-    }
-    return user, nil
-}
-
-// Check with errors.Is().
-user, err := GetUser(id)
-if errors.Is(err, ErrNotFound) {
-    // Handle not found case.
-}
-```
+- Maximum line length 120 characters. Break long signatures and `fmt.Errorf`
+  calls one argument per line.
+- Indent with tabs rendered 2 wide.
+- Organize imports with `gci`.
+- End documentation comments with a period sign.
 
 ## Comments
 
-All comments end with a period.
+Every comment ends with a period, including inline ones inside a function body.
 
-```go
-// ProcessOrder handles order creation and validation.
-func ProcessOrder(o *Order) error {
-    // Validate the order before processing.
-    if err := o.Validate(); err != nil {
-        return err
-    }
-    // Continue with order processing.
-    return nil
-}
-```
+## Naming
 
-## Naming Conventions
-
-Never use Go's predeclared identifiers as variable or parameter names. These
-include built-in functions and constants that can be shadowed but should not be.
-
-```go
-// Wrong: shadows built-in identifiers.
-func process(new string, len int, make bool) error {
-    copy := "data"
-    return nil
-}
-
-// Correct: use descriptive names instead.
-func process(name string, length int, shouldCreate bool) error {
-    dataCopy := "data"
-    return nil
-}
-```
-
-Predeclared identifiers to avoid:
-
-- Functions: `new`, `make`, `len`, `cap`, `append`, `copy`, `delete`, `close`,
-  `panic`, `recover`, `print`, `println`, `complex`, `real`, `imag`, `clear`,
-  `min`, `max`
-- Constants: `true`, `false`, `iota`, `nil`
-- Types: `error`, `bool`, `string`, `int`, `int8`, `int16`, `int32`, `int64`,
-  `uint`, `uint8`, `uint16`, `uint32`, `uint64`, `uintptr`, `float32`,
-  `float64`, `complex64`, `complex128`, `byte`, `rune`, `any`, `comparable`
-
-## Line Length
-
-Maximum line length is 120 characters. Break long lines at logical points.
-
-```go
-// Correct: break at logical points.
-func ProcessOrderWithValidation(
-    ctx context.Context,
-    order *Order,
-    validator OrderValidator,
-) (*Result, error) {
-    return nil, fmt.Errorf(
-        "process order %s for customer %s: %w",
-        order.ID,
-        order.CustomerID,
-        err,
-    )
-}
-```
-
-## Documentation Lookup
-
-Use `go doc` to look up standard library and package documentation:
-
-```bash
-go doc fmt.Errorf
-go doc errors.Is
-go doc context
-```
+Never shadow a predeclared identifier with a variable or parameter name — not
+`new`, `len`, `make`, `copy`, `max`, `min`, `clear`, `any`, `error`, `string`,
+or any other builtin function, constant, or type. Pick a descriptive name
+instead: `length` over `len`, `dataCopy` over `copy`.
 
 ## Einride
 
-If the project is under the Einride organization, always use the Makefiles in
-the project which are generated by Sage (the `.sage` folder).
+If the project is under the Einride organization, run tasks through the
+project's Sage-generated Makefiles (the `.sage` folder) rather than invoking
+`go` directly.

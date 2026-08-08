@@ -3,7 +3,8 @@ name: pr-style
 description: >-
   This skill should be used when creating or editing a GitHub pull request
   title or description, regardless of tool (gh CLI, GitHub MCP tools, API).
-  Defines PR title format and body format with Why/What/Notes sections.
+  Defines PR title format and body format with Why/What/Notes sections, and
+  prompts for the Jira ticket number.
 ---
 
 # Pull Request Style
@@ -44,6 +45,8 @@ feature"). Keep it concise and descriptive.
 ## PR Body Format
 
 ```markdown
+# XY-123
+
 ## Why?
 
 [Explain the motivation for this change. What problem does it solve?]
@@ -59,9 +62,12 @@ feature"). Keep it concise and descriptive.
 
 Rules:
 
-1. `## Why?` - Required. Explain motivation and problem being solved
-2. `## What?` - Required. Describe the changes made
-3. `## Notes` - Optional. Omit entirely if no notes are needed
+1. `# XY-123` - Always ask me for the Jira ticket number before creating the
+   PR. If there is one, include it as an H1 header at the top of the body. If
+   there isn't one, omit it.
+2. `## Why?` - Required. Explain motivation and problem being solved
+3. `## What?` - Required. Describe the changes made
+4. `## Notes` - Optional. Omit entirely if no notes are needed
 
 Try keeping Why? and What? around maximum 3 bullets each. Group related changes
 into one bullet rather than enumerating every file touched — reviewers read the
@@ -82,6 +88,8 @@ Use `[file:lineno](url)` with SHA-pinned URLs:
 ## Example Body
 
 ```markdown
+# XY-123
+
 ## Why?
 
 Users need secure access to their accounts. Currently there is no

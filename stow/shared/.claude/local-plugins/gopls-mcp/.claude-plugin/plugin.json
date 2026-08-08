@@ -1,0 +1,8 @@
+{
+  "name": "gopls-mcp",
+  "description": "gopls MCP server: Go diagnostics, vulncheck, package APIs and file context",
+  "version": "1.0.0",
+  "author": {
+    "name": "Fredrik Averpil"
+  }
+}

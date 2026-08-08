@@ -1,87 +1,27 @@
 ---
 name: gh-cli
-description: GitHub CLI (gh) command reference. Use when working with GitHub repositories, PRs, issues, actions, `gh api`, or any GitHub operations from the command line.
+description: GitHub CLI (gh) conventions and the inline PR review recipe. Use when working with GitHub repositories, PRs, issues, actions, `gh api`, or any GitHub operations from the command line.
 ---
 
-# GitHub CLI Quick Reference
+# gh CLI
 
-The `gh` CLI is GitHub's official command-line tool. This is a quick reference for
-common workflows—for comprehensive docs, see https://cli.github.com/manual
+`gh --help` and https://cli.github.com/manual cover the command surface. This
+skill covers only what they don't.
 
-## Getting Help
+## Conventions
 
-```bash
-gh --help                    # List all commands
-gh <command> --help          # Help for specific command
-gh auth status               # Check authentication
-```
+- Pass `--limit N` on every list command (`pr list`, `issue list`, `run list`).
+  The defaults dump far more than a terminal needs.
+- `--json FIELDS` when the output feeds a script; pipe to `jq` from there.
 
-## Discovery Patterns
+## Reviewing a PR with line-level comments
 
-```bash
-gh <command> --web           # Open in browser
-gh <command> --json FIELDS   # JSON output for scripting
-gh <command> <subcommand> -h # Quick help for any command
-gh <command> list --limit N  # Limit results to avoid large output (default: 20-30)
-```
-
-Use tab completion to explore available commands and flags.
-
-**Important:** Always use `--limit` when querying lists to avoid overwhelming output,
-especially with `pr list`, `issue list`, `run list`, etc.
-
-## Common Workflows
-
-### PR Workflow
+`gh pr review` only submits an overall body. Inline comments need `gh api`,
+which posts the comments and the summary in one call. Read the diff first
+(`gh pr diff NUMBER`), then:
 
 ```bash
-# Create PR
-gh pr create --fill          # Use commit messages for title/body
-gh pr create --web           # Open browser to create PR
-
-# View and checkout
-gh pr list                   # List PRs
-gh pr view [NUMBER]          # View PR details
-gh pr checkout NUMBER        # Checkout PR locally
-
-# Review (simple, no line comments)
-gh pr review NUMBER --approve
-gh pr review NUMBER --comment -b "feedback"
-gh pr review NUMBER --request-changes -b "needs work"
-
-# Merge
-gh pr merge --squash --delete-branch
-```
-
-### Review Workflow
-
-When reviewing a PR, follow this process:
-
-1. Inspect the PR diff and understand the changes
-2. Submit the review with line-level comments and an overall summary
-
-Always ask the user whether to submit the review as "approve", "request changes",
-or "comment" (default to "comment").
-
-#### Step 1: Inspect the PR
-
-```bash
-# Find PRs needing your review
-gh pr list --search "review-requested:@me"
-
-# View PR details and diff
-gh pr view NUMBER
-gh pr diff NUMBER
-```
-
-#### Step 2: Submit the review with line-level comments
-
-Use `gh api` to submit a review with inline comments and an overall summary in
-a single call. Set `event` to `COMMENT`, `APPROVE`, or `REQUEST_CHANGES`.
-
-```bash
-gh api repos/{owner}/{repo}/pulls/NUMBER/reviews \
-  --input - <<'EOF'
+gh api repos/{owner}/{repo}/pulls/NUMBER/reviews --input - <<'EOF'
 {
   "commit_id": "LATEST_COMMIT_SHA",
   "event": "COMMENT",
@@ -92,145 +32,15 @@ gh api repos/{owner}/{repo}/pulls/NUMBER/reviews \
       "line": 42,
       "side": "RIGHT",
       "body": "This variable is unused."
-    },
-    {
-      "path": "src/example.go",
-      "line": 55,
-      "side": "RIGHT",
-      "body": "Consider using a constant here:\n\n```suggestion\nconst maxRetries = 3\n```"
     }
   ]
 }
 EOF
 ```
 
-**Comment field reference:**
+`side` is `RIGHT` for additions, `LEFT` for deletions; multi-line comments add
+`start_line` and `start_side`. A `body` may contain a GitHub suggestion block
+(```` ```suggestion ````) to propose replacement code.
 
-| Field        | Description                                          |
-|--------------|------------------------------------------------------|
-| `path`       | Relative file path in the repo                       |
-| `line`       | Line number in the file (for single-line comments)   |
-| `side`       | `RIGHT` (additions) or `LEFT` (deletions)            |
-| `start_line` | Starting line (for multi-line comments)              |
-| `start_side` | Starting side (for multi-line comments)              |
-| `body`       | Comment text (supports markdown and code suggestions) |
-
-**Code suggestions** use GitHub's suggestion syntax inside the body:
-
-````markdown
-```suggestion
-replacement code here
-```
-````
-
-### CI/CD Debugging
-
-```bash
-# Check recent runs
-gh run list --limit 5
-gh run list --status failure
-
-# View logs
-gh run view RUN_ID --log-failed
-
-# Rerun after fix
-gh run rerun RUN_ID --failed
-```
-
-### Issue Triage
-
-```bash
-gh issue list
-gh issue list --assignee @me
-gh issue create --title "Title" --body "Description"
-gh issue view NUMBER
-gh issue comment NUMBER -b "Comment"
-gh issue close NUMBER
-```
-
-## Core Commands Quick Reference
-
-### Pull Requests
-
-```bash
-gh pr list [--state open|closed|merged] [--author @me]
-gh pr create [--draft] [--title "..."] [--body "..."]
-gh pr view [NUMBER] [--web]
-gh pr checkout NUMBER
-gh pr diff [NUMBER]
-gh pr merge [NUMBER] [--squash|--merge|--rebase]
-```
-
-### Issues
-
-```bash
-gh issue list [--assignee @me] [--label "bug"]
-gh issue create [--title "..."] [--body "..."]
-gh issue view NUMBER [--web]
-gh issue close NUMBER
-```
-
-### Workflows & Runs
-
-```bash
-gh run list [--workflow "CI"] [--status failure]
-gh run view RUN_ID [--log] [--log-failed]
-gh run watch RUN_ID
-gh workflow run WORKFLOW_FILE [--ref branch]
-```
-
-### Repositories
-
-```bash
-gh repo clone OWNER/REPO
-gh repo view [--web]
-gh repo fork OWNER/REPO
-gh repo create NAME [--public|--private]
-```
-
-## Power User Tips
-
-### JSON Output
-
-```bash
-# Get structured data
-gh pr list --json number,title,author
-
-# Filter with jq
-gh pr list --json number,title | jq '.[] | select(.number > 100)'
-```
-
-### API Access
-
-```bash
-# Direct API calls
-gh api repos/OWNER/REPO
-gh api repos/OWNER/REPO/pulls -f title="PR Title" -f head=branch -f base=main
-
-# GraphQL
-gh api graphql -f query='{ viewer { login } }'
-```
-
-### Aliases
-
-```bash
-gh alias set pv 'pr view'
-gh alias set co 'pr checkout'
-gh alias list
-```
-
-### Environment Variables
-
-- `GH_TOKEN`: Authentication token
-- `GH_REPO`: Default repository (OWNER/REPO format)
-- `GH_EDITOR`: Preferred editor for interactive commands
-- `GH_PAGER`: Pager for output (e.g., `less`)
-
-## Finding Your Work
-
-```bash
-gh pr list --author @me
-gh issue list --assignee @me
-gh search prs "author:username is:open"
-gh search issues "assignee:username is:open"
-```
+`event` is `COMMENT`, `APPROVE`, or `REQUEST_CHANGES` — ask me which one before
+submitting, and default to `COMMENT`.
