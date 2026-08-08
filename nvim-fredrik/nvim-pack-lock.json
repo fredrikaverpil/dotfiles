@@ -9,7 +9,7 @@
       "src": "https://github.com/afonsofrancof/OSC11.nvim"
     },
     "SchemaStore.nvim": {
-      "rev": "885ecf4fa0ffcd20d052b14701540a451898fb34",
+      "rev": "427b0ff24377a6cdd18aa822a984a5adf156c3fa",
       "src": "https://github.com/b0o/SchemaStore.nvim"
     },
     "arrow.nvim": {
@@ -100,10 +100,6 @@
       "rev": "4e4bef34498e821bcbd5203f44db8b67e4f10e04",
       "src": "https://github.com/meznaric/key-analyzer.nvim"
     },
-    "lazydev.nvim": {
-      "rev": "01bc2aacd51cf9021eb19d048e70ce3dd09f7f93",
-      "src": "https://github.com/folke/lazydev.nvim"
-    },
     "log-highlight.nvim": {
       "rev": "2538129ddbd0c4a35b8c6bb8486725bbc6d184b6",
       "src": "https://github.com/fei6409/log-highlight.nvim",
@@ -120,10 +116,6 @@
     "mason-lock.nvim": {
       "rev": "b75e2de585637a61b2fb818dc33dad7863b7b0c4",
       "src": "https://github.com/zapling/mason-lock.nvim"
-    },
-    "mason-lspconfig.nvim": {
-      "rev": "50bf3871b539896bd0650b882f6e6b467cc1c1eb",
-      "src": "https://github.com/mason-org/mason-lspconfig.nvim"
     },
     "mason.nvim": {
       "rev": "2a6940af80375532e5e9e7c1f2fc6319a1b7a69d",
@@ -148,10 +140,6 @@
       "rev": "1c529a1ef9c82e8131e872368415cecc2bb86ea2",
       "src": "https://github.com/nvim-neotest/neotest",
       "version": ">=0.0.0"
-    },
-    "neotest-golang": {
-      "rev": "9fecd5b952a0ae357f520f0c13ab5e0dc6e07876",
-      "src": "https://github.com/fredrikaverpil/neotest-golang"
     },
     "neotest-plenary": {
       "rev": "3523adcf9ffaad1911960c5813b0136c1b63a2ec",
@@ -213,7 +201,7 @@
       "src": "https://github.com/chrisgrieser/nvim-rip-substitute"
     },
     "nvim-treesitter": {
-      "rev": "7b6cc8949f9999c5ed91436cbe24aa5f99c42025",
+      "rev": "c9f9ed6c1892f629ea399f4ee7905f2686fa13f2",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
       "version": "'main'"
     },
@@ -249,10 +237,6 @@
     "plenary.nvim": {
       "rev": "74b06c6c75e4eeb3108ec01852001636d85a932b",
       "src": "https://github.com/nvim-lua/plenary.nvim"
-    },
-    "pr.nvim": {
-      "rev": "5e7bec503e88a9cf0eb0e11206f7f2130aa205c9",
-      "src": "https://github.com/fredrikaverpil/pr.nvim"
     },
     "render-markdown.nvim": {
       "rev": "f422cb5c6855f150e2ddcfaf44e7157b98b34f6a",
