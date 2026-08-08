@@ -212,11 +212,8 @@
   // Extension: Project Manager
   "projectManager.sortList": "Name",
   "projectManager.git.baseFolders": [
-    "~/code/public",
-    "~/code/work/public",
-    "~/code/work/private",
     "\\\\wsl.localhost\\Ubuntu-20.04\\home\\fredrik\\code",
-    "~/code",
+    "~/code"
   ],
   "projectManager.git.maxDepthRecursion": 1,
 
