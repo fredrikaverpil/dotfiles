@@ -14,10 +14,8 @@ Where this author deviates from, or tightens, idiomatic Go defaults.
 - Structure functions so the happy path flows straight down: handle each error
   and return early, then continue with the main logic. Main logic never nests
   inside an `if err == nil` branch.
-- Wrap every propagated error with `%w` and context naming the operation and
-  the relevant identifiers — no "failed to" prefix:
-  `fmt.Errorf("create order for customer %s: %w", customerID, err)`. A bare
-  `return err` loses the trail.
+- Only wrap errors with `%w` if the underlying error should be
+  exposed.
 - Define expected error conditions as package-level sentinel errors
   (`var ErrNotFound = errors.New("not found")`) and check them with
   `errors.Is`, not `==` or string matching.
