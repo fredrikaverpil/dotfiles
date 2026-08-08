@@ -126,7 +126,7 @@ Place a `.nvim.lua` in the the `$cwd` or above it. It runs at step 7c of
 Example:
 
 ```lua
--- ~/code/work/.nvim.lua
+-- ~/code/private/<workplace>/.nvim.lua
 --
 -- install mdformat via mason, with the plugins pinned by einride/sage
 -- (tools/sgmdformat/requirements.txt) in the mdformat venv

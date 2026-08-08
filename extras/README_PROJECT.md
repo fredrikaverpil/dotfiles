@@ -8,8 +8,7 @@ Workflow takes folder path into consideration when e.g. enabling LLMs etc.
 
 ```bash
 mkdir -p ~/code/public
-mkdir -p ~/code/work/public
-mkdir -p ~/code/work/private
+mkdir -p ~/code/private
 ```
 
 Tools become available in layers, each building on the previous one:
@@ -59,8 +58,8 @@ and dev shells when entering/leaving directories.
 
 Add `.envrc` files in strategic locations:
 
-- `~/code/work/.envrc` — work-wide env vars (gcloud config, etc.)
-- `~/code/work/project/.envrc` — project-specific tooling
+- `~/code/private/<workplace>/.envrc` — work-wide env vars (gcloud config, etc.)
+- `~/code/private/<workplace>/project/.envrc` — project-specific tooling
 
 Run `direnv allow .` in each location to authorize.
 
@@ -143,7 +142,8 @@ disable_usage_reporting = False
 account = my@email.com
 ```
 
-Switch configs automatically via `.envrc` (e.g. in `~/code/work/.envrc`):
+Switch configs automatically via `.envrc` (e.g. in
+`~/code/private/<workplace>/.envrc`):
 
 ```sh
 export CLOUDSDK_ACTIVE_CONFIG_NAME="work"
@@ -485,7 +485,7 @@ Claude Code is installed as a Nix package from the `llm-agents` flake input
 #### Claude Work profile
 
 Use a separate Claude config dir for work contexts (different settings, skills,
-commands). Add to `~/code/work/.envrc`:
+commands). Add to `~/code/private/<workplace>/.envrc`:
 
 ```sh
 export CLAUDE_CONFIG_DIR="/Users/fredrik/.claude-work"
