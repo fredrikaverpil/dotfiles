@@ -1,9 +1,9 @@
 ---
 name: researcher
 description:
-  Cheap Haiku web/docs research worker. Spawn for any lookup, library research,
-  or documentation check so expensive models and the main context stay clean.
-  Returns a summary, not raw pages.
+  Haiku web/docs research worker belonging to the `/smart` pipeline. Spawned
+  only by the `smart` orchestrator, and only when the user invoked `/smart`.
+  Outside that pipeline, do the lookup yourself instead of delegating.
 tools: WebSearch, WebFetch, Read, Glob, Grep
 model: haiku
 effort: low

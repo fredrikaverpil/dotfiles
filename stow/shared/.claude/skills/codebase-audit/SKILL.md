@@ -6,14 +6,11 @@ description: >
   hotspots, momentum trends, and firefighting patterns. Use this skill whenever
   the user wants to understand a codebase, assess repo health, or orient
   themselves before reading code — even if they don't explicitly say "audit".
+  Examples: "audit this repo", "analyze this repo's history", "what's the state
+  of this codebase?", "bus factor", "churn analysis", "tell me about this repo",
+  "who owns this code?", "is this repo healthy?".
 allowed-tools:
   - Bash
-when_to_use: >
-  Use when the user wants to understand the health, ownership, or risk profile
-  of a git repository before reading the code. Examples: "audit this repo",
-  "codebase audit", "analyze this repo's history", "what's the state of this
-  codebase?", "bus factor", "churn analysis", "tell me about this repo",
-  "who owns this code?", "is this repo healthy?".
 context: fork
 ---
 
@@ -31,6 +28,8 @@ reading code.
 
 ## Steps
 
+Steps 1a-1e are independent — run them in parallel, then synthesize in step 2.
+
 ### 0. Detect GitHub availability
 
 Before starting the analysis, check whether the repo is GitHub-hosted and `gh`
@@ -47,20 +46,47 @@ use what's available.
 
 ### 1a. High-Churn Files
 
-Run in parallel with steps 1b-1e.
+#### 1a-i. Raw churn
 
 ```bash
-git log --format=format: --name-only --since="1 year ago" | sort | uniq -c | sort -nr | head -20
+git log --format=format: --name-only --since="1 year ago" | grep . | sort | uniq -c | sort -nr | head -20
 ```
 
 Report the top 20 most-modified files in the past year. Flag any file that
 appears disproportionately often -- this is the clearest signal of codebase drag.
 
-**Success criteria**: A ranked list of files with change counts is produced.
+#### 1a-ii. De-noised churn
+
+Lockfiles, generated output and vendored trees dominate raw churn without
+telling you anything about the code. If 5 or more of the top 10 are noise of
+this kind, run a filtered second pass:
+
+```bash
+NOISE='(^|/)([^/]*-lock\.(json|yaml)|[^/]*\.lock|package\.json|go\.sum|CHANGELOG\.md|[^/]*\.snap)$|(^|/)(__snapshots__|dist|build|coverage|generated|vendor|node_modules|\.terraform)/'
+git log --format=format: --name-only --since="1 year ago" | grep . | grep -vE "$NOISE" | sort | uniq -c | sort -nr | head -20
+```
+
+Extend `$NOISE` with repo-specific paths when the filtered pass is still
+dominated by bulk content (`docs/`, `locales/`, `i18n/`). Label that as a
+repo-specific pass, separate from the generic de-noising above.
+
+Report both passes and name what was excluded — a lockfile churning 80 times
+is itself a finding about dependency pressure, it just isn't a finding about
+the code.
+
+Keep the blank-line strip as its own `grep .` rather than folding `^$` into
+`$NOISE`. BSD grep (macOS) drops the `^$` branch when the alternation contains
+a leading `.*`, silently leaving every blank line in the count.
+
+#### 1a-iii. Directory-level triage
+
+When file-level hotspots are too noisy to read — large repos, monorepos:
+
+```bash
+git log --format=format: --name-only --since="1 year ago" | grep . | cut -d/ -f1-2 | sort | uniq -c | sort -nr | head -20
+```
 
 ### 1b. Team Ownership / Bus Factor
-
-Run in parallel with steps 1a, 1c-1e.
 
 Commit count alone is a poor proxy for ownership. Someone reformatting config
 files 100 times looks more "important" than someone who architected a core
@@ -75,6 +101,16 @@ git shortlog -sn --no-merges
 ```bash
 git shortlog -sn --no-merges --since="6 months ago"
 ```
+
+Under a squash-merge workflow these counts reflect who *merged*, not who wrote
+the code — which can invert the ranking entirely. Check before trusting it:
+
+```bash
+gh pr list --state merged --limit 20 --json mergeCommit,author
+```
+
+If GitHub is unavailable, a history of single-commit merges with no branch
+topology is the tell.
 
 #### 1b-ii. Lines changed per author
 
@@ -145,22 +181,20 @@ suggests. Conversely, someone with many commits that are mostly formatting or
 config changes carries less bus-factor risk. PR review patterns (if available)
 reveal knowledge sharing — or the lack of it.
 
-**Success criteria**: Contributor rankings (all-time and recent), lines-changed
-breakdown, per-subsystem ownership, commit samples, and (if GitHub is available)
-review patterns are produced, with a nuanced bus-factor assessment that goes
-beyond raw commit counts.
-
 ### 1c. Bug Hotspots
-
-Run in parallel with steps 1a-1b, 1d-1e.
 
 #### 1c-i. Git commit grep
 
 ```bash
-git log -i -E --grep="fix|bug|broken" --name-only --format='' | sort | uniq -c | sort -nr | head -20
+git log -i -E --grep="fix|bug|broken" --name-only --format='' | grep . | sort | uniq -c | sort -nr | head -20
 ```
 
-Show the top 20 files most frequently touched in bug-related commits.
+Show the top 20 files most frequently touched in bug-related commits. If step
+1a-ii needed de-noising, apply the same `$NOISE` filter here.
+
+Commit-message discipline sets the ceiling on this signal — a repo where fixes
+are titled "update" produces a thin list, which says nothing about its actual
+defect rate.
 
 #### 1c-ii. (gh) GitHub issues labeled as bugs
 
@@ -180,12 +214,7 @@ Together they paint a fuller picture.
 Overlay bug hotspots against churn data from step 1a to identify highest-risk
 code — files that both change frequently and attract bug fixes.
 
-**Success criteria**: A ranked list of bug-hotspot files is produced, enriched
-with issue data if GitHub is available.
-
 ### 1d. Project Momentum
-
-Run in parallel with steps 1a-1c, 1e.
 
 #### 1d-i. Monthly commit counts
 
@@ -218,12 +247,7 @@ gh release list --limit 20
 Regular releases indicate a healthy delivery rhythm. Long gaps between releases
 may signal stalled work or big-bang deployments.
 
-**Success criteria**: A monthly commit-count timeline is produced with trend
-observations, enriched with PR merge and release cadence if GitHub is available.
-
 ### 1e. Firefighting Patterns
-
-Run in parallel with steps 1a-1d.
 
 #### 1e-i. Git commit grep
 
@@ -232,6 +256,10 @@ git log --oneline --since="1 year ago" | grep -iE 'revert|hotfix|emergency|rollb
 ```
 
 Count and list reverts, hotfixes, and emergency commits from the past year.
+
+`grep` exits 1 on no match. That is a real result — a quiet year, or vague
+commit messages — not a failed command, so report it as a finding rather than
+retrying with a looser pattern.
 
 #### 1e-ii. (gh) Reverted PRs
 
@@ -243,9 +271,6 @@ gh pr list --state merged --search "revert OR hotfix OR emergency" --limit 50 --
 ```
 
 Frequent reverts indicate deploy instability and test reliability issues.
-
-**Success criteria**: A count and list of firefighting commits (and PRs if
-GitHub is available) is produced.
 
 ### 2. Synthesize Report
 
@@ -263,5 +288,12 @@ If GitHub data was available, note this at the top of the report. If not,
 mention that the analysis is git-only and could be enriched by running against a
 GitHub-hosted repo with `gh` authenticated.
 
-**Success criteria**: A single, coherent markdown report covering all 5
-dimensions with actionable observations is returned to the user.
+### Length
+
+Each section is its table plus 2-4 observation bullets. An observation says
+something the table doesn't already show — a cross-reference, an outlier, a
+caveat that changes how the numbers read. Prose that restates the table earns
+nothing and costs the reader a paragraph.
+
+Spend the budget where the findings are. A repo with one real risk gets one
+substantial section and four thin ones, not five padded to match.

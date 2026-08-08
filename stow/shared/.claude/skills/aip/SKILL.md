@@ -8,11 +8,8 @@ description: Google API Improvement Proposals (AIP) reference. Use BEFORE design
 When working on API design, protobuf definitions, or any task involving Google
 API standards, refresh your understanding of the relevant AIP rules.
 
-## Critical Rule
-
-**NEVER assume you know what an AIP rule says from memory.** Always fetch and
-read the actual AIP documentation before applying or referencing any rule. Your
-memory of AIP rules may be inaccurate or outdated.
+The AIPs are living documents, so treat the published page as the rule and your
+recollection as a lead to verify — including for rules you are confident about.
 
 ## Process
 
@@ -21,8 +18,7 @@ memory of AIP rules may be inaccurate or outdated.
 2. **Identify relevant AIPs** - Based on the task at hand, determine which AIP
    rules may apply
 3. **Fetch and read the relevant AIPs** - Use WebFetch to retrieve the specific
-   AIP pages. Do NOT skip this step, even if you think you know what the rule
-   says
+   AIP pages
 4. **Apply the standards** - Ensure your work follows the AIP guidelines as
    documented
 

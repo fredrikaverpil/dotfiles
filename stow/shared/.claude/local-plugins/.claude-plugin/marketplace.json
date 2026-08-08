@@ -1,0 +1,18 @@
+{
+  "name": "local",
+  "owner": {
+    "name": "Fredrik Averpil"
+  },
+  "metadata": {
+    "description": "Personal plugins, stowed from ~/.dotfiles"
+  },
+  "plugins": [
+    {
+      "name": "gopls-mcp",
+      "source": "./gopls-mcp",
+      "description": "gopls MCP server: Go diagnostics, vulncheck, package APIs and file context",
+      "version": "1.0.0",
+      "category": "development"
+    }
+  ]
+}

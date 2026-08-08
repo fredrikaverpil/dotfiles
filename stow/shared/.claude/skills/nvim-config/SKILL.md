@@ -11,10 +11,18 @@ description: >
   "configure LSP" in a native-style config.
 ---
 
-# Native Neovim Config
+# Native Neovim config
 
-Reference for Neovim configs using built-in conventions (vim.pack, lsp/,
-plugin/) without a plugin manager framework. Requires Neovim >= v0.12.0.
+Conventions for Neovim configs built on `vim.pack`, `lsp/` and `plugin/` with no
+plugin manager framework. Requires Neovim >= v0.12.0.
+
+References — read the one the task needs:
+
+| File                             | Covers                                                                                         |
+| -------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `references/loading-patterns.md` | `vim.pack.add`'s `load` option, the three loading patterns, build hooks, profiling             |
+| `references/plugin-files.md`     | File skeleton per pattern, `_G.Config` sharing, `do/end` blocks, ftplugin, option interfaces   |
+| `references/startup.md`          | `:h initialization` step table, runtime directories, `after/`, exrc, help tags, standard paths |
 
 ## This config's location
 
@@ -27,139 +35,15 @@ repo. It is symlinked into place via GNU Stow:
 ~/.config/nvim-fredrik -> ~/.dotfiles/stow/shared/.config/nvim-fredrik  (stow result)
 ```
 
-To launch this config:
+Launch it with `NVIM_APPNAME=nvim-fredrik nvim`. Apply stow symlinks after
+changes with `cd ~/.dotfiles/stow && stow --target="$HOME" --restow
+--no-folding --adopt shared "$(uname -s)"`. Neovim itself is managed by
+[Bob](https://github.com/MordechaiHadad/bob), not nixpkgs -- binary at
+`~/.local/share/bob/nvim-bin/nvim`.
 
-```sh
-NVIM_APPNAME=nvim-fredrik nvim
-```
+## Architecture
 
-To apply stow symlinks after changes: `cd ~/.dotfiles/stow && stow
---target="$HOME" --restow --no-folding --adopt shared "$(uname -s)"`.
-Neovim itself is managed by [Bob](https://github.com/MordechaiHadad/bob), not
-nixpkgs -- binary at `~/.local/share/bob/nvim-bin/nvim`.
-
-## Documentation
-
-**Local disk** -- docs ship with Neovim at `$VIMRUNTIME/doc/`. With Bob-managed
-nightly the path is `~/.local/share/bob/nightly/share/nvim/runtime/doc/`. Read
-them with `:h <tag>` inside Neovim or directly with your editor/pager.
-
-Key help files for native config work:
-
-| Topic                     | Help tag              | File           |
-| ------------------------- | --------------------- | -------------- |
-| Startup & init order      | `:h initialization`   | `starting.txt` |
-| Native package manager    | `:h vim.pack`         | `pack.txt`     |
-| packages / packpath       | `:h packages`         | `pack.txt`     |
-| LSP config auto-discovery | `:h lsp-config`       | `lsp.txt`      |
-| Enable/disable servers    | `:h vim.lsp.enable()` | `lsp.txt`      |
-| ftplugin directory        | `:h ftplugin`         | `usr_41.txt`   |
-| after/ directory          | `:h after-directory`  | `options.txt`  |
-| runtimepath               | `:h runtimepath`      | `options.txt`  |
-| autoload/                 | `:h autoload`         | `userfunc.txt` |
-| colors/                   | `:h colorscheme`      | `syntax.txt`   |
-
-**Online** -- https://neovim.io/doc/user/ (mirrors the same help pages).
-Searching the web for `:h <tag>` plus "neovim" also works well.
-
----
-
-## Startup sequence (`:h initialization`)
-
-The complete Neovim startup sequence, from `:h initialization`:
-
-| Step   | What happens                                                              |
-| ------ | ------------------------------------------------------------------------- |
-| 1      | Set `'shell'` from `$SHELL`                                               |
-| 2      | Process arguments, execute `--cmd` args, create buffers (not loaded yet)  |
-| 3      | Start server, set `v:servername`                                          |
-| 4      | Wait for UI to connect (if `--embed`)                                     |
-| 5      | Setup default mappings and autocmds                                       |
-| 6      | Enable filetype and indent plugins (`:runtime! ftplugin.vim indent.vim`)  |
-| **7a** | System vimrc (`sysinit.vim`)                                              |
-| **7b** | **User config (`init.lua`)** -- leader keys, `require("options")`, etc.   |
-| **7c** | **`.nvim.lua` (exrc)** -- project-local config, if `'exrc'` is on         |
-| 8      | Enable filetype detection (`:runtime! filetype.lua`)                      |
-| 9      | Enable syntax highlighting                                                |
-| 10     | Set `v:vim_did_init = 1`                                                  |
-| **11** | **Load plugins**: `plugin/**/*.lua`, then packages, then `after/` plugins |
-| 12     | Set `'shellpipe'` and `'shellredir'`                                      |
-| 13     | Set `'updatecount'` to zero if `-n` was given                             |
-| 14     | Set binary options if `-b` was given                                      |
-| 15     | Read ShaDa file                                                           |
-| 16     | Read quickfix file if `-q` was given                                      |
-| 17     | Open windows, load buffers -> triggers **`VimEnter`**, then **`UIEnter`** |
-
-**Key takeaway:** All `plugin/` files run at step 11. `VimEnter` (step 17) fires
-**after** everything. The `lazyload.lua` module queues setup callbacks to run at
-VimEnter/UIEnter -- async by default (via `vim.schedule()`), or synchronous with
-`{ sync = true }`. Only lualine uses `{ sync = true }`; everything else runs
-async.
-
----
-
-## Runtime directories
-
-Neovim searches these directories in every runtimepath entry
-(`:h 'runtimepath'`). Each directory has a specific purpose and timing:
-
-| Directory                 | When                    | Purpose                                                                       |
-| ------------------------- | ----------------------- | ----------------------------------------------------------------------------- |
-| `init.lua`                | Step 7b, once           | Leader keys, `require("options")`, diagnostics                                |
-| `lua/`                    | On `require()`          | Lua modules (never auto-sourced)                                              |
-| `plugin/**/*.lua`         | Step 11, once           | Plugin install + setup (alphabetical, subdirs included)                       |
-| `ftplugin/<ft>.lua`       | Per-buffer, on FileType | Buffer-local settings (`vim.opt_local`)                                       |
-| `indent/<ft>.lua`         | Per-buffer, on FileType | Indent expressions                                                            |
-| `syntax/<ft>.vim`         | Per-buffer, on FileType | Legacy syntax highlighting (treesitter overrides)                             |
-| `lsp/<server>.lua`        | Startup (discovery)     | LSP config tables, auto-discovered by `vim.lsp.config` (see after/lsp/ below) |
-| `parser/<lang>.so`        | On demand               | Treesitter parsers                                                            |
-| `queries/<lang>/*.scm`    | On demand               | Treesitter queries (highlights, injections, folds, indents)                   |
-| `colors/<name>.{vim,lua}` | On demand               | Colorschemes, loaded by `:colorscheme`                                        |
-| `autoload/`               | On first call           | Auto-loaded Vimscript/Lua functions                                           |
-| `compiler/`               | On `:compiler`          | Compiler settings                                                             |
-| `spell/`                  | On demand               | Spell checking files                                                          |
-
-### after/ directory
-
-The `after/` tree loads _after_ all non-after paths. This config uses
-nvim-lspconfig for base LSP server configs and puts **overrides** in
-`after/lsp/` (not `lsp/`). Because nvim-lspconfig ships its own `lsp/` defaults,
-placing overrides in `after/lsp/` ensures they take precedence. Docs:
-`:h after-directory`
-
-### Per-project overrides (exrc)
-
-With `vim.opt.exrc = true` (set in `lua/options.lua`), Neovim sources
-`.nvim.lua` from the current working directory at **step 7c** -- **before**
-`plugin/` files (step 11), and before filetype detection (step 8). This is the
-native equivalent of lazy.nvim's `.lazy.lua`. Docs: `:h exrc`,
-`:h initialization`
-
-Because `.nvim.lua` runs before plugins, direct `require("conform").setup()`
-calls will be overwritten by plugin setup at VimEnter. Use
-`lazyload.on_override` to patch plugin config per-project -- it runs after all
-VimEnter callbacks:
-
-```lua
--- .nvim.lua (project root)
-require("lazyload").on_override(function()
-  require("conform").setup({
-    formatters_by_ft = { markdown = { "mdformat" } },
-  })
-end)
-```
-
-### Notes
-
-- The `LspAttach` autocmd (in the lsp.lua plugin file) bridges startup and
-  per-buffer: keymaps are registered per-buffer when the LSP server attaches,
-  even though the autocmd itself is registered once at startup.
-
----
-
-## Architecture: layers and their roles
-
-This config has no framework -- each directory has a single responsibility:
+No framework -- each directory has a single responsibility:
 
 | Layer               | Directory         | Role                                                                                     |
 | ------------------- | ----------------- | ---------------------------------------------------------------------------------------- |
@@ -169,33 +53,6 @@ This config has no framework -- each directory has a single responsibility:
 | **lang plugins**    | `plugin/lang/`    | Per-language plugin installs, custom filetypes, autocmds, and setup                      |
 | **editor settings** | `ftplugin/`       | Per-filetype `vim.opt_local` (indent, wrap, conceal)                                     |
 | **server config**   | `after/lsp/`      | All LSP server config tables (in after/ to override package defaults)                    |
-
-Each plugin file is **self-contained** -- it installs its own packages, sets up
-the plugin inline, and defines its own keymaps.
-
-**Cross-plugin data sharing** via `_G.Config`: Write to `_G.Config` at the **top
-level** of the producer file (outside `on_vim_enter`), and read it inside the
-consumer's lazyload block. Top-level assignments execute when Neovim sources
-`plugin/` files (step 11, before any `VimEnter` callback runs), so the data is
-always available by the time lazyload blocks fire:
-
-```lua
--- plugin/producer.lua
-_G.Config.some_data = { "foo", "bar" }
-require("lazyload").on_vim_enter(function() ... end)
-
--- plugin/consumer.lua
-require("lazyload").on_vim_enter(function()
-  local some_data = _G.Config.some_data or {}
-end)
-```
-
----
-
-## Directory structure
-
-Conceptual layout (`:h initialization`, step 11 uses `plugin/**/*.{vim,lua}` --
-**subdirectories included**):
 
 ```
 ~/.config/nvim-fredrik/
@@ -228,53 +85,28 @@ Conceptual layout (`:h initialization`, step 11 uses `plugin/**/*.{vim,lua}` --
     syntax/<ft>.vim      -- legacy syntax overrides/extensions
 ```
 
-**`init.lua`** -- Minimal entrypoint: leader keys, `require("options")`,
-diagnostics, keymaps. Docs: `:h initialization`
+Notes on the layers:
 
-**`lua/`** -- Lua modules loaded via `require()`. Never auto-sourced. Includes
-`lazyload.lua` (VimEnter/UIEnter setup queues), `merge.lua` (deep merge with
-list append+dedup), `options.lua` (editor options), and shared utilities (fold,
-toggle, pickers, icons, dev).
+- **`lua/lazyload.lua`** provides `on_vim_enter(fn, opts?)` and `on_ui_enter(fn,
+  opts?)` for queuing setup functions. Default is async (via `vim.schedule()`);
+  `{ sync = true }` runs synchronously. Also provides `on_override(fn)` for
+  project-local overrides (runs after all VimEnter callbacks). Only lualine uses
+  `{ sync = true }`.
+- **`lua/merge.lua`** deep-merges: appends and deduplicates lists, recurses into
+  dicts, overwrites scalars. `vim.NIL` as a value removes a key.
+- **`lua/dev.lua`** loads a plugin from a local clone if it exists, otherwise
+  falls back to `vim.pack.add()`.
+- **`plugin/`** files are self-contained: `vim.pack.add()` -> setup -> keymaps.
+  Sourced alphabetically at step 11; subdirectories included via the `**` glob.
+- **`plugin/lang/`** is one file per language, only for languages needing
+  genuinely language-specific wiring: plugins, custom filetypes
+  (`vim.filetype.add`), build hooks, autocmds. Tool config (servers, formatters,
+  linters) lives inline in the core plugin files; per-filetype editor settings
+  live in `ftplugin/`.
 
-**`lua/lazyload.lua`** -- Provides `on_vim_enter(fn, opts?)` and
-`on_ui_enter(fn, opts?)` for queuing setup functions. Default is async (via
-`vim.schedule()`). Pass `{ sync = true }` for synchronous execution. Also
-provides `on_override(fn)` for project-local overrides (runs after all VimEnter
-callbacks). Only lualine uses `{ sync = true }`; everything else runs async.
-
-**`lua/merge.lua`** -- Deep merge function. Appends and deduplicates lists,
-recurses into dicts, overwrites scalars. Use `vim.NIL` as a value to explicitly
-remove a key.
-
-**`lua/dev.lua`** -- Local development plugin loader. Loads a plugin from a
-local clone if it exists, otherwise falls back to `vim.pack.add()`.
-
-**`plugin/`** -- Each file is self-contained: `vim.pack.add()` -> setup ->
-keymaps. Sourced alphabetically; subdirectories included via the `**` glob.
-Docs: `:h initialization` (step 11)
-
-**`plugin/lang/`** -- One file per language, only for languages that need
-genuinely language-specific wiring: language-specific plugins
-(`vim.pack.add()`), custom filetypes (`vim.filetype.add`), build hooks, and
-autocmds. Tool config (servers, formatters, linters, etc.) lives inline in the
-core plugin files, not here. Per-filetype editor settings live in `ftplugin/`,
-not here.
-
-**`ftplugin/`** -- One file per filetype for per-buffer editor settings
-(`vim.opt_local`: indent, wrap, conceal). Sourced by Neovim's built-in filetype
-handling, so it applies to the first buffer opened too.
-
-**`after/lsp/`** -- Each file returns a `vim.lsp.Config` table; filename becomes
-the server name. Placed in `after/` so they override any base configs from
-packages. No `setup()` call needed. Enable servers in `plugin/lsp.lua`
-(`vim.lsp.enable(...)`). Docs: `:h lsp-config`
-
----
-
-## vim.pack -- built-in plugin management
+## vim.pack
 
 ```lua
--- Install (if missing) and load plugins. Code is available immediately after.
 vim.pack.add({
   "https://github.com/user/repo",                                    -- string form
   { src = "https://github.com/user/repo" },                          -- table form
@@ -282,45 +114,28 @@ vim.pack.add({
   { src = "https://github.com/user/repo", version = "main" },                   -- branch/tag/commit
   { src = "https://github.com/user/repo", version = vim.version.range("1.*") }, -- semver range
 })
-```
 
-- **`load` option**:
-  - During `init.lua`/`plugin/` sourcing, defaults to `false` (`:packadd!` -- on
-    runtimepath but the plugin's own `plugin/` files are deferred to Neovim's
-    normal runtime loader pass instead of sourced inline).
-  - After startup, defaults to `true` (`:packadd` without bang -- the plugin's
-    `plugin/` and `after/plugin/` files source immediately).
-  - Pass `load = true` explicitly when you need a plugin's `plugin/` files
-    sourced right now (rare -- only matters if `vim.pack.add` runs during
-    startup _and_ something inspects the plugin's runtime state before step 11
-    finishes).
-  - Pass **`load = function() end`** (empty function) to register the plugin on
-    disk without loading it at all. The plugin stays off the packpath entirely
-    until you explicitly call `vim.cmd.packadd("<name>")`. This is the
-    cornerstone of the "truly lazy" pattern (see below).
-- **Install location**: `stdpath("data") .. "/site/pack/core/opt/<name>"`
-- **Lockfile**: `$XDG_CONFIG_HOME/nvim/nvim-pack-lock.json` -- commit to VCS for
-  reproducible installs across machines.
-
-```lua
-vim.pack.update()               -- interactive update with confirmation buffer
+vim.pack.update()                             -- interactive update with confirmation buffer
 vim.pack.update({"name"}, { force = true })   -- update specific plugin, skip confirm
-vim.pack.del({"name"})          -- remove from disk
-vim.pack.get()                  -- list all managed plugins
+vim.pack.del({"name"})                        -- remove from disk
+vim.pack.get()                                -- list all managed plugins
 ```
 
-**No URL shorthand helpers** in this config. The upstream docs suggest
-`local gh = function(x) ... end` but since we scatter `vim.pack.add()` across
-many `plugin/` files (one per plugin), a central helper adds no value. Use full
-URLs directly.
+Install location is `stdpath("data") .. "/site/pack/core/opt/<name>"`; the
+lockfile is `$XDG_CONFIG_HOME/nvim/nvim-pack-lock.json`, committed to VCS.
 
----
+**No URL shorthand helpers** in this config. The upstream docs suggest a `local
+gh = function(x) ... end`, but since `vim.pack.add()` is scattered across many
+`plugin/` files (one per plugin), a central helper adds no value. Use full URLs.
+
+The `load` option decides which of the three loading patterns a file uses — see
+`references/loading-patterns.md`.
 
 ## after/lsp/ config files
 
-Each file returns a `vim.lsp.Config` table. The filename (without `.lua`)
-becomes the server name. Placed in `after/lsp/` to override any base configs
-shipped by packages.
+Each file returns a `vim.lsp.Config` table; the filename (without `.lua`)
+becomes the server name. Placed in `after/lsp/` to override base configs shipped
+by packages. No `setup()` call needed.
 
 ```lua
 -- after/lsp/gopls.lua
@@ -339,347 +154,7 @@ return {
 ```
 
 Servers are enabled in `plugin/lsp.lua` via `vim.lsp.enable(servers)`. To
-disable a server: `vim.lsp.enable("gopls", false)`.
-
----
-
-## Key idioms
-
-Three patterns cover every plugin in this config. Pick the one that matches
-**when the plugin's code needs to run**, not how fancy you want the file to
-look.
-
-### Pattern 1: eager (setup at step 11)
-
-Use when the plugin must take effect before the first paint, or when another
-plugin's deferred setup callback or a pre-VimEnter autocmd `require()`s it.
-Colorscheme, `snacks.nvim` (dashboard), `mini.icons`, `treesitter.lua`,
-`blink.cmp` (dependency of `lsp.lua`'s callback).
-
-```lua
--- plugin/oil.lua
-vim.pack.add({
-  { src = "https://github.com/stevearc/oil.nvim" },
-})
-
-require("oil").setup({
-  view_options = { show_hidden = true },
-})
-
-vim.keymap.set("n", "-", "<cmd>Oil<cr>", { desc = "Open file explorer" })
-```
-
-### Pattern 2: deferred to VimEnter (pack.add inside the callback)
-
-Use for plugins you want loaded every session but that don't need to be ready
-before the first paint. This is the **default** pattern for deferred plugins in
-this config. Fold `vim.pack.add` into the same `on_vim_enter` callback as
-`setup()` so both the install/source cost and the setup cost land after startup
-rather than at step 11:
-
-```lua
--- plugin/conform.lua
-vim.g.auto_format = true
-
-require("lazyload").on_vim_enter(function()
-  vim.pack.add({
-    { src = "https://github.com/stevearc/conform.nvim" },
-  })
-
-  require("conform").setup({
-    formatters_by_ft = {
-      go = { "goimports", "gci", "gofumpt", "golines" },
-      lua = { "stylua" },
-    },
-  })
-end)
-
-vim.keymap.set("n", "<leader>uf", require("toggle").auto_format, { desc = "Toggle auto-format" })
-```
-
-**Why not bare `vim.schedule()`?** `lazyload.on_vim_enter` gives you
-sync-vs-async control, VimEnter/UIEnter split, and the `on_override` hook for
-exrc overrides -- none of which bare `vim.schedule` provides.
-
-**Build hooks (`PackChanged`) must stay eager** when the plugin uses this
-pattern. Register the autocmd at file scope _before_ the `on_vim_enter` call --
-autocmd registration is cheap and the hook needs to be live by the time the
-deferred `vim.pack.add` triggers a first-bootstrap install.
-
-### Pattern 3: truly lazy via `{ load = function() end }` (first use)
-
-Use for plugins that may never run in a session: debuggers, test runners, diff
-viewers, etc. The empty `load` callback registers the plugin on disk (so
-install + lockfile still work) but keeps it off the packpath entirely. The
-plugin is fully invisible until the user triggers the first-use gate (typically
-a keymap, command, or filetype autocmd), at which point `vim.cmd.packadd` brings
-it in:
-
-```lua
--- plugin/dap.lua
-local packages = {
-  { src = "https://codeberg.org/mfussenegger/nvim-dap", name = "nvim-dap" },
-  { src = "https://github.com/rcarriga/nvim-dap-ui", name = "nvim-dap-ui" },
-  { src = "https://github.com/nvim-neotest/nvim-nio", name = "nvim-nio" },
-}
-vim.pack.add(packages, { load = function() end })
-
-local initialized = false
-
-local function init()
-  if initialized then
-    return
-  end
-  initialized = true
-
-  for _, p in ipairs(packages) do
-    vim.cmd.packadd(p.name)
-  end
-
-  require("dapui").setup()
-  -- ... rest of setup
-end
-
-vim.keymap.set("n", "<leader>dc", function()
-  init()
-  require("dap").continue()
-end, { desc = "Continue" })
-```
-
-Notes:
-
-- **Give every spec an explicit `name`**. The `init()` loop uses those names for
-  `:packadd`, so leaving them implicit forces the file to re-derive the name
-  from the URL.
-- **`after/plugin/` files of the lazy-loaded plugin do not source**
-  automatically via bare `:packadd`. `vim.pack`'s normal path sources them (see
-  `pack.lua:801`) but the truly-lazy path bypasses that. If a plugin you
-  lazy-load this way ships `after/plugin/*.lua` and you rely on them, source
-  them manually in `init()`. (None of the config's current lazy plugins -- dap,
-  neotest, codediff -- have `after/plugin/` files.)
-- **Compare to Pattern 2**: Pattern 2 still loads the plugin every session, just
-  not during startup. Pattern 3 doesn't load it at all if the user never
-  triggers the gate. For DAP, you pay zero cost on sessions where you never
-  debug.
-
-**Deferred filetype-specific plugin** (csv, log, schemastore, etc.). Wrap
-`require()` + `.setup()` in a `FileType` autocmd with `once = true`:
-
-```lua
--- plugin/lang/csv.lua
-vim.pack.add({
-  { src = "https://github.com/hat0uma/csvview.nvim" },
-})
-
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "csv",
-  once = true,
-  callback = function()
-    require("csvview").setup()
-  end,
-})
-```
-
-**Local dev plugins** via `lua/dev.lua` -- loads from a local clone if it
-exists, otherwise falls back to `vim.pack.add()`:
-
-```lua
--- plugin/lang/go.lua
-require("dev").use({
-  dev = "~/code/public/neotest-golang",
-  fallback = function()
-    vim.pack.add({
-      { src = "https://github.com/fredrikaverpil/neotest-golang" },
-    })
-  end,
-})
-```
-
-**Build hooks** for plugins that need a build step after install or update. Use
-the `PackChanged` autocmd:
-
-**Important:** PackChanged hooks must be registered **before** the
-`vim.pack.add()` call that installs the plugin. Otherwise the hook won't fire on
-first bootstrap.
-
-```lua
-vim.api.nvim_create_autocmd("PackChanged", {
-  callback = function(ev)
-    if ev.data.spec.name == "nvim-treesitter" then
-      vim.cmd("TSUpdate")
-    end
-  end,
-})
-
-vim.pack.add({
-  { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
-})
-```
-
-Event data: `ev.data.kind` (`"install"`, `"update"`, `"delete"`), `ev.data.spec`
-(plugin spec), `ev.data.path` (full path to plugin directory).
-
-**Use `do/end` blocks** to scope locals and visually separate sections in long
-plugin files. This keeps helpers from leaking into the rest of the file and
-makes boundaries between logical sections obvious:
-
-```lua
-require("lazyload").on_vim_enter(function()
-  local lint = require("lint")
-
-  lint.linters_by_ft = { ... }
-
-  -- protobuf linters
-  do
-    local cached_config = nil
-    local function find_config() ... end
-    vim.api.nvim_create_autocmd(...)
-  end
-
-  lint.try_lint()
-end)
-```
-
-**Always** pass `{ clear = true }` to `nvim_create_augroup` -- prevents
-duplicate autocmds if the file is re-sourced.
-
-**Do NOT defer** plugins needed from the first frame or first keystroke:
-colorscheme, snacks (dashboard). Most plugins use `lazyload.on_vim_enter(fn)`
-(async). Only lualine uses `lazyload.on_vim_enter(fn, { sync = true })`
-(synchronous, must be ready before paint).
-
-**Profile startup with `--startuptime`:**
-
-```sh
-NVIM_APPNAME=nvim-fredrik nvim --startuptime /tmp/startup.log --headless +q
-```
-
-The log columns are:
-
-| Column           | Meaning                                                     |
-| ---------------- | ----------------------------------------------------------- |
-| **clock**        | Wall clock time since process start (ms)                    |
-| **self+sourced** | Total time for a file including everything it `require()`'d |
-| **self**         | Time spent in that file alone (excluding nested requires)   |
-
-**Per-filetype editor settings** (indent, wrap, conceal) live in native
-`ftplugin/<ft>.lua` files, not in `FileType` autocmds. `ftplugin/` is sourced by
-Neovim's built-in filetype handling for **every** buffer of that filetype,
-including the first one opened — a `FileType` autocmd registered inside an
-`on_vim_enter` callback runs too late to catch the initial buffer.
-
-```lua
--- ftplugin/templ.lua
-vim.opt_local.expandtab = false
-```
-
-Before adding one, check whether Neovim's built-in ftplugin already sets what
-you want (`:e $VIMRUNTIME/ftplugin/<ft>.vim`) — e.g. Go's `noexpandtab` and
-Python's 4-space indent are already provided, so don't duplicate them. Custom
-filetypes (registered with `vim.filetype.add` at the top level of a
-`plugin/lang/<ft>.lua` file) get their own `ftplugin/<ft>.lua`.
-
----
-
-## Plugin file layout
-
-Layout depends on which pattern the file uses (see "Key idioms" above).
-
-**Eager (Pattern 1):**
-
-```lua
--- 1. Build hooks (must be registered BEFORE vim.pack.add)
-vim.api.nvim_create_autocmd("PackChanged", { ... })
-
--- 2. Install + load
-vim.pack.add(...)
-
--- 3. Setup
-require("plugin").setup({ ... })
-
--- 4. Keymaps
-vim.keymap.set(...)
-```
-
-**Deferred to VimEnter (Pattern 2):**
-
-```lua
--- 1. File-scope setup that doesn't need the plugin loaded (globals, etc.)
-vim.g.some_flag = true
-
--- 2. Build hooks (must be registered BEFORE the deferred vim.pack.add fires)
-vim.api.nvim_create_autocmd("PackChanged", { ... })
-
--- 3. Install + load + setup, all deferred
-require("lazyload").on_vim_enter(function()
-  vim.pack.add(...)
-  require("plugin").setup({ ... })
-end)
-
--- 4. Keymaps (file scope -- Neovim routes them to the plugin after load)
-vim.keymap.set(...)
-```
-
-**Truly lazy (Pattern 3):**
-
-```lua
--- 1. Register on disk without loading
-local packages = { { src = "...", name = "plugin-name" } }
-vim.pack.add(packages, { load = function() end })
-
--- 2. First-use gate
-local initialized = false
-local function init()
-  if initialized then return end
-  initialized = true
-  for _, p in ipairs(packages) do
-    vim.cmd.packadd(p.name)
-  end
-  require("plugin").setup({ ... })
-end
-
--- 3. Keymaps / commands / FileType autocmds call init() before first use
-vim.keymap.set("n", "<leader>xx", function() init(); ... end, ...)
-```
-
----
-
-## Option interfaces
-
-Neovim exposes several Lua interfaces for setting options (`:h vim.o`,
-`:h vim.opt`). This config uses **`vim.opt`** and **`vim.opt_local`**
-exclusively:
-
-| Interface           | Equivalent to        | Notes                                                                |
-| ------------------- | -------------------- | -------------------------------------------------------------------- |
-| `vim.o`             | `:set`               | Raw string get/set -- no table support                               |
-| `vim.bo`            | `:setlocal` (buffer) | Raw buffer-scoped options                                            |
-| `vim.wo`            | `:setlocal` (window) | Raw window-scoped options                                            |
-| `vim.go`            | `:setglobal`         | Global-only (skips local copy)                                       |
-| **`vim.opt`**       | `:set`               | Rich `Option` object: tables, `:append()`, `:remove()`, `:prepend()` |
-| **`vim.opt_local`** | `:setlocal`          | Same as `vim.opt` but buffer/window-local                            |
-
-**Convention:** use `vim.opt` in `init.lua` and `lua/options.lua`, use
-`vim.opt_local` in `ftplugin/<ft>.lua` files. The only exception is
-`vim.wo[win][0]` for setting window+buffer-scoped options on a specific window
-(e.g. LSP foldexpr override in `LspAttach`).
-
----
-
-## Standard paths
-
-| Purpose        | Lua                                         | Typical path             |
-| -------------- | ------------------------------------------- | ------------------------ |
-| Config dir     | `vim.fn.stdpath("config")`                  | `~/.config/nvim`         |
-| Data dir       | `vim.fn.stdpath("data")`                    | `~/.local/share/nvim`    |
-| Plugin install | `stdpath("data") .. "/site/pack/core/opt/"` | --                       |
-| State dir      | `vim.fn.stdpath("state")`                   | `~/.local/state/nvim`    |
-| Runtime        | `vim.fn.expand("$VIMRUNTIME")`              | `.../share/nvim/runtime` |
-| Cache          | `vim.fn.stdpath("cache")`                   | `~/.cache/nvim`          |
-
-With `NVIM_APPNAME=nvim-fredrik`, paths use `nvim-fredrik` instead of `nvim`.
-
----
+disable one: `vim.lsp.enable("gopls", false)`.
 
 ## Adding a new language
 
@@ -694,25 +169,3 @@ With `NVIM_APPNAME=nvim-fredrik`, paths use `nvim-fredrik` instead of `nvim`.
 7. _(if needed)_ `plugin/lang/<ft>.lua` -- language-specific plugins, custom
    filetypes, autocmds
 8. _(optional)_ `after/lsp/<server>.lua` -- override nvim-lspconfig base config
-
-## Adding a shared utility (toggle, custom picker, etc.)
-
-1. Create `lua/<name>.lua` returning a module table
-2. `require("<name>")` it from whatever `plugin/` file needs it
-
-Example -- `lua/toggle.lua`:
-
-```lua
-local M = {}
-function M.auto_format()
-  vim.g.auto_format = not vim.g.auto_format
-  vim.notify("Auto-format: " .. (vim.g.auto_format and "on" or "off"))
-end
-return M
-```
-
-Used in `plugin/conform.lua`:
-
-```lua
-vim.keymap.set("n", "<leader>uf", require("toggle").auto_format, { desc = "Toggle auto-format" })
-```

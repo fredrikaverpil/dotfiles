@@ -16,17 +16,8 @@ commit title, Why/What/Notes body, draft PRs).
 
 ```bash
 gh pr create --draft --assignee @me --title "<title>" --body "$(cat <<'EOF'
-## Why?
 
-<motivation>
-
-## What?
-
-<changes>
-
-## Notes
-
-<optional notes>
+body here
 EOF
 )"
 ```

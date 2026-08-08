@@ -9,40 +9,24 @@ before writing the plan.
 
 ### Atomic, logical changes
 
-- Every set of code modifications that forms a distinct logical unit MUST live
-  in its own commit/change.
-- Each commit/change MUST be able to stand on its own: the code builds, tests
-  pass, and linters pass.
-- Do NOT bundle unrelated modifications into a single commit/change.
+- Every set of code modifications that forms a distinct logical unit lives in
+  its own commit/change.
+- Each commit/change stands on its own: the code builds, tests pass, and
+  linters pass.
+- Unrelated modifications go in separate commits/changes.
 - Code modification related to feedback and reviews belong in the commit/change
   that originally introduced them, not a separate commit/change.
 
 ### Avoid over-editing
 
-IMPORTANT: Try to preserve the original code and the logic of the original code
-as much as possible.
+Preserve the original code and its logic as much as possible.
 
-### Self review
-
-After implementing something, always look back and critically review what you
-did with the following in mind:
-
-- Explicitness/simplicity over implicitness/cleverness
-- Concistent and systematic approach instead of fragemented and ad-hoc solutions
-- YAGNI
-- Great DX and UX
-- Ease of long-term maintenance
-- Follow conventions by the language, ecosystem, open source community
-- Brittle or potentially buggy code
-
-If you discover apparent improvement areas, go back and refactor. When unsure,
-ask questions.
+When unsure, ask questions — mid-implementation, not only while planning.
 
 ## AIP
 
 When working with backends, adhere to
-[Google's AIP](https://google.aip.dev/general). Look up rules when in doubt. Use
-the "aip" skill.
+[Google's AIP](https://google.aip.dev/general). Look up rules when in doubt.
 
 ## Sage
 
@@ -67,10 +51,6 @@ For Go, use `assert.DeepEquals` from
 [gotest.tools](https://pkg.go.dev/gotest.tools/v3/assert) for whole object
 assertion with the got/want pattern. Always prefer table tests.
 
-## Git
-
-Use the "git-commit" skill.
-
 ## GCP
 
 If you see `console.cloud.google.com` links, use the `gcloud` command to access
@@ -78,21 +58,15 @@ the related details.
 
 ## GitHub
 
-When I provide github.com links (PRs, issues, comments, actions, etc.), ALWAYS
-use the `gh` CLI to fetch the content instead of WebFetch. WebFetch often fails
-on GitHub pages.
-
-Use the "gh-cli" skill for `gh` commands, the "pr-style" skill for PR
-title/description conventions, and the "gh-pr" skill when creating PRs with
-`gh`.
+When I provide github.com links (PRs, issues, comments, actions, etc.), use the
+`gh` CLI to fetch the content instead of WebFetch. WebFetch often fails on
+GitHub pages.
 
 ## Jira
 
 If you come by a Jira ticket number or Jira URL, use `jira`
 ([jira-cli](https://github.com/ankitpokhrel/jira-cli)) to acquire more details
 for increased understanding of the problem at hand.
-
-Use the "jira-cli" skill.
 
 ## LSP
 
@@ -108,15 +82,13 @@ reading the whole file.
 
 ## Go
 
-- Use the `gopls` LSP at all times when searching for references to symbols,
+- Use the `gopls` LSP/MCP at all times when searching for references to symbols,
   renaming packages/variables/functions etc.
 - If a package is not installed locally, search
-  [https://pkg.go.dev](pkg.go.dev). Standard library functions are available
-  (example: [`https://pkg.go.dev/fmt`](fmt package)).
+  [pkg.go.dev](https://pkg.go.dev). Standard library functions are available
+  (example: [`fmt` package](https://pkg.go.dev/fmt)).
 - You can run `go mod tidy` recursively in the repo with the custom
-  [`go-mod-tidy`](shell/bin/go-mod-tidy) shell script.
-
-Use the "golang-style" skill.
+  [`go-mod-tidy`](~/.dotfiles/shell/bin/go-mod-tidy) shell script.
 
 ## Npm and deno
 
