@@ -118,7 +118,7 @@ exact formatter/linter tools and configurations. Formatters are wired up in
 
 ## Gotchas
 
-- **Neovim is managed by Bob**, not nixpkgs — binary is at
+- **Neovim is managed by Bob on Darwin**, not nixpkgs — binary is at
   `~/.local/share/bob/nvim-bin/nvim`
 - **`stow/` changes take effect immediately** (just re-run
   `cd ~/.dotfiles/stow && stow --target="$HOME" --restow --no-folding --adopt
