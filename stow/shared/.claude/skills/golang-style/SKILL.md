@@ -59,6 +59,7 @@ release's changes, or https://go.dev/doc/devel/release for the index.
   calls one argument per line.
 - Indent with tabs rendered 2 wide.
 - Organize imports with `gci`.
+- End documentation comments with a period sign.
 
 ## Comments
 
