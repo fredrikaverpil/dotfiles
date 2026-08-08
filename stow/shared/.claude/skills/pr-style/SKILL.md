@@ -63,10 +63,12 @@ Rules:
 2. `## What?` - Required. Describe the changes made
 3. `## Notes` - Optional. Omit entirely if no notes are needed
 
-Why? and What? get 3-5 bullets each. Group related changes into one bullet
-rather than enumerating every file touched — reviewers read the diff for that.
-If the change genuinely resists 5 bullets, the PR is too big; say so and offer
-to split it.
+Try keeping Why? and What? around maximum 3 bullets each. Group related changes
+into one bullet rather than enumerating every file touched — reviewers read the
+diff for that. But keep each bullet concise and direct. Preferably only one
+sentence per bullet point. If it is hard to fit the PR description within these
+constraints, it's possible the PR is too large and discuss whether to split it
+up.
 
 ## File References
 
