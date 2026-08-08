@@ -53,7 +53,6 @@
     "lua-lsp@claude-plugins-official": true,
     "code-review@claude-plugins-official": false,
     "ponytail@ponytail": true,
-    "caveman@caveman": true,
     "gopls-mcp@local": true
   },
   "extraKnownMarketplaces": {
@@ -67,12 +66,6 @@
       "source": {
         "source": "github",
         "repo": "DietrichGebert/ponytail"
-      }
-    },
-    "caveman": {
-      "source": {
-        "source": "github",
-        "repo": "JuliusBrussee/caveman"
       }
     },
     "local": {
