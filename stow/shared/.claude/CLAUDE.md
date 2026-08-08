@@ -82,7 +82,7 @@ reading the whole file.
 
 ## Go
 
-- Use the `gopls` LSP at all times when searching for references to symbols,
+- Use the `gopls` LSP/MCP at all times when searching for references to symbols,
   renaming packages/variables/functions etc.
 - If a package is not installed locally, search
   [pkg.go.dev](https://pkg.go.dev). Standard library functions are available
