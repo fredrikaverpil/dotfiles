@@ -23,6 +23,21 @@ require("lazyload").on_vim_enter(function()
 
   local neotest = require("neotest")
 
+  -- Get neotest namespace (api call creates or returns namespace). This is
+  -- optional but recommended if you enabled the diagnostic option of neotest.
+  -- Especially testify makes heavy use of tabs and newlines in the error
+  -- messages, which reduces the readability of the generated virtual text
+  -- otherwise.
+  local neotest_ns = vim.api.nvim_create_namespace("neotest")
+  vim.diagnostic.config({
+    virtual_text = {
+      format = function(diagnostic)
+        local message = diagnostic.message:gsub("\n", " "):gsub("\t", " "):gsub("%s+", " "):gsub("^%s+", "")
+        return message
+      end,
+    },
+  }, neotest_ns)
+
   ---@diagnostic disable-next-line: missing-fields
   neotest.setup({
     adapters = {
