@@ -78,6 +78,7 @@
   "effortLevel": "medium",
   "showClearContextOnPlanAccept": true,
   "tui": "fullscreen",
+  "showThinkingSummaries": true,
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
   "agentPushNotifEnabled": true,
