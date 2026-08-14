@@ -69,6 +69,43 @@
       url = "github:fredrikaverpil/dotfiles";
       flake = false;
     };
+
+    # Homebrew pinning: nix-homebrew installs Homebrew itself from a pinned
+    # revision and mounts the taps below read-only from the nix store. That
+    # makes the `homebrew-*` inputs the version pins for every brew/cask —
+    # a rebuild never moves them on its own. Bump them explicitly with:
+    #   nix flake update homebrew-core homebrew-cask homebrew-1password-tap \
+    #     homebrew-nikitabobko-tap homebrew-dustinblackman-tap homebrew-libkrun-krun
+    # then rebuild.
+    #
+    # Caveat: cask pins are best-effort. Formula bottles live on ghcr and are
+    # retained, but casks download from vendor URLs that rot, so an old pin can
+    # fail to install. masApps cannot be pinned at all.
+    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+    homebrew-core = {
+      url = "github:homebrew/homebrew-core";
+      flake = false;
+    };
+    homebrew-cask = {
+      url = "github:homebrew/homebrew-cask";
+      flake = false;
+    };
+    homebrew-1password-tap = {
+      url = "github:1password/homebrew-tap";
+      flake = false;
+    };
+    homebrew-nikitabobko-tap = {
+      url = "github:nikitabobko/homebrew-tap";
+      flake = false;
+    };
+    homebrew-dustinblackman-tap = {
+      url = "github:dustinblackman/homebrew-tap/master";
+      flake = false;
+    };
+    homebrew-libkrun-krun = {
+      url = "github:libkrun/homebrew-krun";
+      flake = false;
+    };
   };
 
   outputs =
