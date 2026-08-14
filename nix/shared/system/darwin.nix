@@ -34,8 +34,6 @@ let
       parts = lib.splitString "/" name;
     in
     "${lib.head parts}/homebrew-${lib.last parts}";
-
-  trustedTapArgs = lib.concatMapStringsSep " " lib.escapeShellArg tapNames;
 in
 {
   options = {
@@ -83,6 +81,8 @@ in
       user = config.homebrew.user;
       mutableTaps = false;
       autoMigrate = true; # adopt the existing /opt/homebrew instead of reinstalling
+      # Trust third-party taps before `brew bundle` loads formulae from them.
+      trust.taps = tapNames;
       taps = {
         "homebrew/homebrew-core" = inputs.homebrew-core;
         "homebrew/homebrew-cask" = inputs.homebrew-cask;
@@ -155,20 +155,6 @@ in
       }
       // config.host.extraMasApps;
     };
-
-    system.activationScripts.homebrew.text = lib.mkIf config.homebrew.enable (
-      lib.mkBefore ''
-        # Trust configured Homebrew taps before `brew bundle` loads formulae from them.
-        if [ -f "${config.homebrew.prefix}/bin/brew" ]; then
-          PATH="${config.homebrew.prefix}/bin:$PATH" sudo \
-            --preserve-env=PATH \
-            --user=${lib.escapeShellArg config.homebrew.user} \
-            --set-home \
-            env HOMEBREW_NO_AUTO_UPDATE=1 \
-            brew trust --quiet --tap ${trustedTapArgs}
-        fi
-      ''
-    );
 
     # NOTE: Run socktainer with `socktainer --no-check-compatibility` manually during
     # the experimentation phase.
