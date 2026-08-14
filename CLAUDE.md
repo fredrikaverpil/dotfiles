@@ -14,6 +14,10 @@ code in this repository.
 - **Update all flake inputs**: `nix flake update`, then rebuild
 - **Update only unstable-pinned inputs**: `nix flake update nixpkgs-unstable
   nix-darwin home-manager-unstable llm-agents dotfiles`, then rebuild
+- **Update Homebrew software** (nothing moves until this is run):
+  `nix flake update homebrew-core homebrew-cask homebrew-1password-tap
+  homebrew-nikitabobko-tap homebrew-dustinblackman-tap homebrew-libkrun-krun`,
+  then rebuild
 - **Refresh package-managed CLI tools after an update**: `uv tool upgrade --all`
   and `npm-tools-upgrade`
 - **Nix rebuild**: ask user to run this, NEVER run it yourself
@@ -120,6 +124,14 @@ exact formatter/linter tools and configurations. Formatters are wired up in
 
 - **Neovim is managed by Bob on Darwin**, not nixpkgs — binary is at
   `~/.local/share/bob/nvim-bin/nvim`
+- **Homebrew is pinned via nix-homebrew** (`nix/shared/system/darwin.nix`):
+  brew itself and every tap are mounted read-only from `flake.lock`, so a
+  rebuild never updates brews/casks on its own. Consequences: formulae resolve
+  from the local taps rather than the JSON API, so `brew search`/`brew info`
+  are slower; an ad-hoc `brew install foo` installs the *pinned* version, not
+  the latest; and cask pins can rot, since vendors delete old download
+  artifacts (bump `homebrew-cask` if a cask fails to download). `masApps`
+  cannot be pinned at all.
 - **`stow/` changes take effect immediately** (just re-run
   `cd ~/.dotfiles/stow && stow --target="$HOME" --restow --no-folding --adopt
   shared "$(uname -s)"`) — no Nix rebuild needed
