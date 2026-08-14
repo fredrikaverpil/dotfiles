@@ -34,9 +34,9 @@ in
   host.extraPackages = with pkgs; [
   ];
 
-  host.extraTaps = [
-    "libkrun/krun" # krunkit
-  ];
+  host.extraTaps = {
+    "libkrun/krun" = inputs.homebrew-libkrun-krun; # krunkit
+  };
 
   host.extraBrews = [
     # podman added here as it also adds podman-mac-helper (not installed if installed via nix)

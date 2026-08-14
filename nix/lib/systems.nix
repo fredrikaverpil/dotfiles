@@ -6,6 +6,7 @@
         [
           {nixpkgs.overlays = [(import ../shared/overlays)];}
           inputs.home-manager-unstable.darwinModules.home-manager # unstable pkgs
+          inputs.nix-homebrew.darwinModules.nix-homebrew
           ./users.nix
           ../shared/system/darwin.nix
           ../shared/system/common.nix

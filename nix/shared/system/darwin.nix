@@ -14,18 +14,28 @@ let
       trusted = true;
     }) taps;
 
-  homebrewTaps = lib.unique (
-    [
-      "dustinblackman/tap"
-      # "joshmedeski/sesh"
-      "1password/tap"
-      "nikitabobko/tap"
-      # "sst/tap" # for opencode
-    ]
-    ++ config.host.extraTaps
-  );
+  # Single source of truth for taps: brew's short name -> pinned flake input.
+  # Both `homebrew.taps` and `nix-homebrew.taps` are derived from this, so the
+  # two name forms cannot drift apart.
+  homebrewTaps = {
+    "dustinblackman/tap" = inputs.homebrew-dustinblackman-tap;
+    "1password/tap" = inputs.homebrew-1password-tap;
+    "nikitabobko/tap" = inputs.homebrew-nikitabobko-tap;
+  }
+  // config.host.extraTaps;
 
-  trustedTapArgs = lib.concatMapStringsSep " " lib.escapeShellArg homebrewTaps;
+  tapNames = lib.attrNames homebrewTaps;
+
+  # nix-homebrew wants the full repo name: "user/tap" -> "user/homebrew-tap".
+  # homebrew-core and homebrew-cask are already in that form.
+  fullTapName =
+    name:
+    let
+      parts = lib.splitString "/" name;
+    in
+    "${lib.head parts}/homebrew-${lib.last parts}";
+
+  trustedTapArgs = lib.concatMapStringsSep " " lib.escapeShellArg tapNames;
 in
 {
   options = {
@@ -36,9 +46,12 @@ in
     };
 
     host.extraTaps = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ ];
-      description = "Additional homebrew taps for this host";
+      type = lib.types.attrsOf lib.types.path;
+      default = { };
+      description = ''
+        Additional homebrew taps for this host, as brew's short name
+        ("user/tap") mapped to the pinned `flake = false` input providing it.
+      '';
     };
 
     host.extraCasks = lib.mkOption {
@@ -61,15 +74,34 @@ in
   };
 
   config = {
+    # Homebrew itself and all taps come from pinned flake inputs, so nothing
+    # moves until `nix flake update homebrew-*` (see flake.nix). nix-homebrew
+    # sets HOMEBREW_NO_INSTALL_FROM_API and HOMEBREW_NO_AUTO_UPDATE for us.
+    nix-homebrew = {
+      enable = true;
+      enableRosetta = false;
+      user = config.homebrew.user;
+      mutableTaps = false;
+      autoMigrate = true; # adopt the existing /opt/homebrew instead of reinstalling
+      taps = {
+        "homebrew/homebrew-core" = inputs.homebrew-core;
+        "homebrew/homebrew-cask" = inputs.homebrew-cask;
+      }
+      // lib.mapAttrs' (name: input: lib.nameValuePair (fullTapName name) input) homebrewTaps;
+    };
+
     homebrew = {
       enable = true;
       onActivation = {
-        autoUpdate = true;
+        # Never update Homebrew on switch — versions come from the pinned taps.
+        # `upgrade` is deterministic against frozen taps and is what makes a
+        # switch converge on the pins after a `nix flake update`.
+        autoUpdate = false;
         upgrade = true;
         cleanup = "zap";
       };
 
-      taps = trustedTaps homebrewTaps;
+      taps = trustedTaps tapNames;
 
       brews = [
         # Packages not available in nixpkgs
