@@ -129,12 +129,12 @@
                   # bind to the flake's top-level `unstable` (the by-system
                   # legacyPackages set) and break with `undefined variable`.
                   # Grow this list over time.
-                  ++ channels.unstable.lib.optionals channels.unstable.stdenv.isLinux [
+                  ++ channels.unstable.lib.optionals channels.unstable.stdenv.hostPlatform.isLinux [
                     channels.unstable.gopls
                   ];
                 # macOS: Mason binaries are native Mach-O — put them on PATH so
                 # the devshell reaches the same tooling Neovim uses.
-                shellHook = channels.unstable.lib.optionalString channels.unstable.stdenv.isDarwin ''
+                shellHook = channels.unstable.lib.optionalString channels.unstable.stdenv.hostPlatform.isDarwin ''
                   export PATH="$HOME/.local/share/nvim-fredrik/mason/bin:$PATH"
                 '';
               };
