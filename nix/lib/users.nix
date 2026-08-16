@@ -66,13 +66,13 @@
         }
 
         # Darwin-specific user settings
-        (lib.mkIf pkgs.stdenv.isDarwin {
+        (lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
           name = username;
           home = "/Users/${username}";
         })
 
         # Linux-specific user settings
-        (lib.mkIf pkgs.stdenv.isLinux {
+        (lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
           isNormalUser = true;
           extraGroups = userConfig.groups ++ (lib.optional userConfig.isAdmin "wheel");
           # Security: Change this password immediately after first login
