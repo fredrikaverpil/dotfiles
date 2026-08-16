@@ -167,6 +167,14 @@ uv tool upgrade --all
 npm-tools-upgrade
 ```
 
+Homebrew is not covered by `flake.lock`. A rebuild only installs and removes
+packages to match the declared set in `nix/shared/system/darwin.nix`; upgrading
+is a separate, deliberate step:
+
+```sh
+brew update && brew upgrade   # add --greedy to also bump self-updating casks
+```
+
 When updating `nixos-raspberrypi`:
 
 1. Verify that the re-locked `nixpkgs` node in `flake.lock` matches the rev

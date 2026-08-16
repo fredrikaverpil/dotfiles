@@ -64,8 +64,9 @@ in
     homebrew = {
       enable = true;
       onActivation = {
-        autoUpdate = true;
-        upgrade = true;
+        # Versions bump only via `brew update && brew upgrade`.
+        autoUpdate = false;
+        upgrade = false;
         cleanup = "zap";
       };
 

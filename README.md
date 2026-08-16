@@ -9,8 +9,8 @@ Personal dotfiles, managed in three layers:
 - **Stow** (`stow/`) — dotfiles symlinked into `$HOME` with
   [GNU Stow](https://www.gnu.org/software/stow/). Changes take effect
   immediately, no rebuild needed.
-- **Package tools** — CLI tools installed by their own package managers
-  (currently `uv` for Python, `deno` for npm). Nix declares _which_ tools and
+- **Package tools** — software installed by its own package manager (Homebrew
+  on macOS, `uv` for Python, `deno` for npm). Nix declares _which_ packages and
   installs missing ones on rebuild, but versions are unpinned and upgraded
   manually.
 
@@ -95,6 +95,20 @@ package manager. A rebuild installs anything missing; upgrades are manual:
 uv tool upgrade --all   # Python tools (uv)
 npm-tools-upgrade       # npm tools (deno)
 ```
+
+Homebrew works the same way: `nix/shared/system/darwin.nix` declares the taps,
+brews, casks and Mac App Store apps, and a rebuild installs or removes packages
+to match that set (`cleanup = "zap"`, so anything undeclared is uninstalled).
+Versions are not pinned — bump them deliberately:
+
+```sh
+brew update && brew upgrade   # add --greedy to also bump self-updating casks
+```
+
+Pinning Homebrew versions is possible via
+[nix-homebrew](https://github.com/zhaofengli/nix-homebrew) with locked taps, but
+it buys little here: casks that self-update ignore the pin, vendors delete old
+cask artifacts, and Mac App Store apps cannot be pinned at all.
 
 LLM agent CLIs (claude-code, opencode,...) are the exception: they are plain Nix
 packages from the `llm-agents` flake input, upgraded via

@@ -16,6 +16,9 @@ code in this repository.
   nix-darwin home-manager-unstable llm-agents dotfiles`, then rebuild
 - **Refresh package-managed CLI tools after an update**: `uv tool upgrade --all`
   and `npm-tools-upgrade`
+- **Upgrade Homebrew packages (Darwin)**: `brew update && brew upgrade` —
+  rebuilds only install/remove to match the declared set, they never bump
+  versions (add `--greedy` to also bump self-updating casks)
 - **Nix rebuild**: ask user to run this, NEVER run it yourself
 - **Nix validation**: `nix flake check` or `nix flake check --all-systems`
 - **Nix builds**: `nix build .#darwinConfigurations.<host>.system` (hosts:
