@@ -23,6 +23,12 @@ Preserve the original code and its logic as much as possible.
 
 When unsure, ask questions — mid-implementation, not only while planning.
 
+### Comments
+
+Write comments as terse as possible. Describe only the code as it stands now —
+never the change, the previous behavior, or what something used to do. Git
+covers the history.
+
 ## AIP
 
 When working with backends, adhere to
