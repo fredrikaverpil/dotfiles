@@ -26,8 +26,7 @@ are about to do.
 - A real problem noticed on the way. Flag it in a sentence; don't drop it to
   keep the reply short.
 
-Short is the default, not the goal. Say the whole thing in as few words as it
-takes.
+Default to short, but say the whole thing in as few words as it takes.
 
 ## Vocabulary
 
@@ -57,7 +56,7 @@ intensifier, and not twice in one reply.
 
 ### Shape
 
-The deeper problem isn't vocabulary, it's uniformity: every paragraph the same
+Uniformity does more damage than any single word: every paragraph the same
 length, every sentence the same clause rhythm, abstract nouns doing work a
 specific noun should do. Vary sentence length. Prefer concrete nouns over
 metaphor. If a sentence needs an analogy to land, the explanation is probably
