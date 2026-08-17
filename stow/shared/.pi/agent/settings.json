@@ -9,12 +9,12 @@
   "npmCommand": [
     "npm"
   ],
-  "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.5",
-  "lastChangelogVersion": "0.79.9",
+  "defaultProvider": "google-antigravity",
+  "defaultModel": "gemini-3-flash",
+  "lastChangelogVersion": "0.83.0",
   "packages": [
     "npm:pi-system-theme"
   ],
-  "theme": "dark",
-  "defaultThinkingLevel": "xhigh"
+  "theme": "light",
+  "defaultThinkingLevel": "high"
 }
