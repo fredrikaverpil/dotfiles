@@ -23,8 +23,7 @@
       "Bash(gh *)",
       "Bash(docker *)",
       "Bash(docker-compose *)"
-    ],
-    "defaultMode": "auto"
+    ]
   },
   "outputStyle": "Terse",
   "model": "opus",
@@ -81,7 +80,6 @@
   "tui": "fullscreen",
   "showThinkingSummaries": true,
   "skipDangerousModePermissionPrompt": true,
-  "theme": "auto",
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true
 }
