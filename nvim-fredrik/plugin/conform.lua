@@ -60,11 +60,7 @@ require("lazyload").on_vim_enter(function()
         cwd = function(_, ctx)
           return ctx.dirname
         end,
-        args = {
-          "fmt",
-          "--stdin-filename",
-          "$FILENAME",
-          "-",
+        prepend_args = {
           -- Fallback defaults for projects without a rumdl.toml of their own.
           -- MD034: leave bare URLs/emails untouched (no <...> wrapping).
           -- MD036: don't rewrite bold-only paragraphs (e.g. **Example:**) into
