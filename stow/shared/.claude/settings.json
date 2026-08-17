@@ -26,6 +26,7 @@
     ],
     "defaultMode": "auto"
   },
+  "outputStyle": "Terse",
   "model": "opus",
   "hooks": {
     "Notification": [
