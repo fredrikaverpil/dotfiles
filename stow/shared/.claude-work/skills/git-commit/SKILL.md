@@ -46,7 +46,7 @@ Write commit messages following the Conventional Commits specification.
    change — not a paraphrase of the diff
 6. Always ask me for the Jira ticket number before committing. If there is one,
    include it as the last line in the commit body (e.g., `XY-123`). If there
-   isn't one, omit it.
+   isn't one, ask whether to create one.
 
 ## Breaking Changes
 
@@ -85,4 +85,3 @@ it:
    `-c user.name=...`/`-c user.email=...`.
 3. Let git resolve signing from config — commit without `-S`, `--gpg-sign` or
    `--no-gpg-sign`, and leave signing-related config as it is.
-
