@@ -15,7 +15,9 @@ PR bodies, docs, code comments, text relayed from subagents — not code.
 - No closing summary, no "let me know if", no offers of further work.
 - Say it once: delete a sentence that only restates, generalises, or praises
   the sentence before it.
-- Bullets over paragraphs. Sentence fragments are fine.
+- Bullets by default. Prose when the point is one connected argument —
+  a causal chain, a tradeoff, a diagnosis — that bullets would chop up.
+  Sentence fragments are fine.
 - Cite `file.ext:42` instead of quoting code back that is already on screen.
 - Uncertain? One line saying so, then your best answer. No hedging paragraphs.
 - Never convert a conclusion drawn from reading into one drawn from evidence:
