@@ -160,6 +160,19 @@ Instead of loading keys into the system agent, run `pass-cli` as the SSH agent
 itself. It listens on `$HOME/.ssh/proton-pass-agent.sock`
 ([pass-cli docs](https://protonpass.github.io/pass-cli/commands/ssh-agent/)).
 
+#### Using Proton Pass desktop app
+
+- In Settings -> General -> SSH agent, enable it (and export the
+  `SSH_AUTH_SOCK`)
+
+> [!NOTE]
+>
+> You will need the Proton Pass desktop app to be open when performing ssh/git
+commands. If Proton Pass is locked, you will have to unlock it when a key
+needs to be accessed.
+
+#### Using `pass-cli`
+
 - Start it in the background: `pass-cli ssh-agent daemon start` (inspect/stop
   with `pass-cli ssh-agent daemon status` / `daemon stop`). You must already be
   logged in with `pass-cli login`, otherwise the daemon fails silently — use
@@ -194,6 +207,8 @@ Starting the daemon while the session is locked does NOT work (verified with
 pass-cli 2.2.3): the launcher prints "Daemon started", but the daemon exits
 immediately when its initial key fetch hits `SessionLocked` — no socket, no
 keys. Check `daemon status` or `--log-file` to catch this.
+
+#### Git commit signing
 
 A `~/.gitconfig_signing` is still needed for commit signing: the agent only
 holds the key, while this file is what enables signing and names which key to
