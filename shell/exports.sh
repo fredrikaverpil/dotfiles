@@ -117,11 +117,11 @@ fi
 # Per-platform settings
 case $(uname) in
 Darwin)
-	# commands for macOS go here
+  # commands for macOS go here
+  add_to_path append "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  add_to_path append "/Applications/Obsidian.app/Contents/MacOS"
 
-	add_to_path append "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
-
-	add_to_path append "/Applications/Obsidian.app/Contents/MacOS"
+  export SSH_AUTH_SOCK=$HOME/.ssh/proton-pass-ssh-agent.sock
 
 	;;
 
