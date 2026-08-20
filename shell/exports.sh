@@ -5,48 +5,48 @@
 # ----------------------------
 
 function add_to_path() {
-	# NOTE: zsh only
+  # NOTE: zsh only
 
-	# usage:
-	# add_to_path prepend /path/to/prepend
-	# add_to_path append /path/to/append
+  # usage:
+  # add_to_path prepend /path/to/prepend
+  # add_to_path append /path/to/append
 
-	if [ -d "$2" ]; then
-		# If the given path exist, proceed...
-		if [[ ":$PATH:" == *":$2:"* ]]; then
-			remove_from_path "$2"
-		fi
+  if [ -d "$2" ]; then
+    # If the given path exist, proceed...
+    if [[ ":$PATH:" == *":$2:"* ]]; then
+      remove_from_path "$2"
+    fi
 
-		if [ "$1" = "prepend" ]; then
-			PATH="$2:$PATH"
-			export PATH
-		elif [ "$1" = "append" ]; then
-			PATH="$PATH:$2"
-			export PATH
-		else
-			echo "Unknown option. Use 'prepend' or 'append'."
-		fi
-	fi
+    if [ "$1" = "prepend" ]; then
+      PATH="$2:$PATH"
+      export PATH
+    elif [ "$1" = "append" ]; then
+      PATH="$PATH:$2"
+      export PATH
+    else
+      echo "Unknown option. Use 'prepend' or 'append'."
+    fi
+  fi
 }
 
 function remove_from_path() {
-	# NOTE: zsh only
+  # NOTE: zsh only
 
-	# usage:
-	# remove_from_path /path/to/remove
+  # usage:
+  # remove_from_path /path/to/remove
 
-	local path_to_remove="$1"
-	if [[ -n "$path_to_remove" && ":$PATH:" == *":$path_to_remove:"* ]]; then
-		while [[ ":$PATH:" == *":$path_to_remove:"* ]]; do
-			# Remove
-			PATH="${PATH/#$path_to_remove:/}"   # If it's at the beginning
-			PATH="${PATH/%:$path_to_remove/}"   # If it's at the end
-			PATH="${PATH//:$path_to_remove:/:}" # If it's in the middle
-		done
-		PATH="${PATH#:}" # Remove leading colon
-		PATH="${PATH%:}" # Remove trailing colon
-		export PATH
-	fi
+  local path_to_remove="$1"
+  if [[ -n "$path_to_remove" && ":$PATH:" == *":$path_to_remove:"* ]]; then
+    while [[ ":$PATH:" == *":$path_to_remove:"* ]]; do
+      # Remove
+      PATH="${PATH/#$path_to_remove:/}"   # If it's at the beginning
+      PATH="${PATH/%:$path_to_remove/}"   # If it's at the end
+      PATH="${PATH//:$path_to_remove:/:}" # If it's in the middle
+    done
+    PATH="${PATH#:}" # Remove leading colon
+    PATH="${PATH%:}" # Remove trailing colon
+    export PATH
+  fi
 }
 
 # ----------------------------
@@ -54,13 +54,13 @@ function remove_from_path() {
 # ----------------------------
 
 if [ -n "${ZSH_VERSION}" ]; then
-	shell="zsh"
-	export DOTFILES_DEBUG_SHELL_ZSH="true"
+  shell="zsh"
+  export DOTFILES_DEBUG_SHELL_ZSH="true"
 elif [ -n "${BASH_VERSION}" ]; then
-	shell="bash"
-	export DOTFILES_DEBUG_SHELL_BASH="true"
+  shell="bash"
+  export DOTFILES_DEBUG_SHELL_BASH="true"
 else
-	shell=""
+  shell=""
 fi
 
 # ----------------------------
@@ -69,13 +69,13 @@ fi
 
 # NOTE: brew shellenv exports several environment variables and extends $PATH
 if [ -f /opt/homebrew/bin/brew ]; then
-	eval "$(/opt/homebrew/bin/brew shellenv)"
-	brew_prefix="$(brew --prefix)"
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+  brew_prefix="$(brew --prefix)"
 elif [ -f /home/linuxbrew/.linuxbrew/bin/brew ]; then
-	eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-	brew_prefix="$(brew --prefix)"
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+  brew_prefix="$(brew --prefix)"
 else
-	brew_prefix=""
+  brew_prefix=""
 fi
 
 export DOTFILES="$HOME/.dotfiles"
@@ -100,18 +100,18 @@ add_to_path prepend "$HOME/.local/bin" # user-installed binaries
 
 # Source Home Manager session variables (includes sessionPath)
 if [ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]; then
-	# shellcheck source=/dev/null
-	source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+  # shellcheck source=/dev/null
+  source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
 fi
 
 # load .env file if it exists
 if [ -f "$HOME/.shell/.env" ]; then
-	set -a
-	# shellcheck source=/dev/null
-	source "$HOME/.shell/.env"
-	set +a
+  set -a
+  # shellcheck source=/dev/null
+  source "$HOME/.shell/.env"
+  set +a
 else
-	echo "Warning: $HOME/.shell/.env does not exist"
+  echo "Warning: $HOME/.shell/.env does not exist"
 fi
 
 # Per-platform settings
@@ -123,12 +123,12 @@ Darwin)
 
   export SSH_AUTH_SOCK=$HOME/.ssh/proton-pass-ssh-agent.sock
 
-	;;
+  ;;
 
 Linux)
-	# commands for Linux go here
+  # commands for Linux go here
 
-	;;
+  ;;
 
 *) ;;
 esac
