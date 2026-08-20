@@ -39,6 +39,7 @@
     # "codex"
     # "copilot-cli"
     # "mistral-vibe"
+    "omp"
   ];
 
   programs = {
