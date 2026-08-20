@@ -137,6 +137,9 @@ do
     hl("OilGitUntracked", { fg = palette.water })
     hl("OilGitIgnored", { fg = colors.blend(palette.bg, palette.fg, 30) })
 
+    -- Codediff
+    hl("CodeDiffFiller", { link = "NonText" })
+
     -- Snacks explorer
     hl("SnacksPickerGitStatusUntracked", { fg = palette.wood })
   end
