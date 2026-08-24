@@ -9,7 +9,7 @@
       "src": "https://github.com/afonsofrancof/OSC11.nvim"
     },
     "SchemaStore.nvim": {
-      "rev": "cef8d093b63c9be7e8b49f7dc341e8447fc4c300",
+      "rev": "73e89eb3e536a4dd8f991c963bd37189520c9919",
       "src": "https://github.com/b0o/SchemaStore.nvim"
     },
     "arrow.nvim": {
@@ -45,7 +45,7 @@
       "src": "https://github.com/y3owk1n/cmd.nvim"
     },
     "code_runner.nvim": {
-      "rev": "97e6c71f3d96baac078ceb516da83258996c1517",
+      "rev": "ae11f6cb469ee5547cd0e076ecb41d74a7322cb8",
       "src": "https://github.com/CRAG666/code_runner.nvim"
     },
     "codediff.nvim": {
@@ -183,7 +183,7 @@
       "src": "https://github.com/theHamsta/nvim-dap-virtual-text"
     },
     "nvim-lint": {
-      "rev": "5b5b794458b5ff0b17d26c9d7400faaebd00b32d",
+      "rev": "0370fe965697aa8f04252a1562441bdc13723cd1",
       "src": "https://codeberg.org/mfussenegger/nvim-lint"
     },
     "nvim-lspconfig": {
@@ -201,7 +201,7 @@
       "src": "https://github.com/chrisgrieser/nvim-rip-substitute"
     },
     "nvim-treesitter": {
-      "rev": "074aa4422bf029908338e855d0c0f71470a971bb",
+      "rev": "8b98b4470eb326f1c7b50dae79f8c963568e5720",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
       "version": "'main'"
     },
