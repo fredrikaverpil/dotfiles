@@ -144,6 +144,8 @@ local exclude = {
   "**/node_modules",
   ".sage/tools",
   ".pocket/tools",
+  "**/.terraform/modules",
+  "**/.terraform/providers",
 }
 
 -- Misc
