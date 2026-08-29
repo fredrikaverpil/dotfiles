@@ -1,0 +1,4 @@
+name = macOS-hypr
+description = macOS hyprcursor theme
+version = 0.1
+cursors_directory = hyprcursors

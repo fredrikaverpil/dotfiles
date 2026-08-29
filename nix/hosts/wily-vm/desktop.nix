@@ -25,6 +25,13 @@ in
     withUWSM = true;
   };
 
+  # Hyprland's cursor manager reads these at startup; a config reload is too
+  # late to replace the already-loaded cursor theme.
+  environment.sessionVariables = {
+    HYPRCURSOR_THEME = "macOS-hypr";
+    HYPRCURSOR_SIZE = "24";
+  };
+
   # Autologin straight into Hyprland: no greeter UI, greetd only supplies the
   # session. greetd refuses to start unless default_session is set, even when
   # only initial_session is wanted. SSH stays up independently, so a crashing
