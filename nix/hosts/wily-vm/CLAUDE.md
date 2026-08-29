@@ -272,8 +272,20 @@ stays visible. Those are the rows to edit when the feature lands, and they are
 the running list of what this desktop does not do yet.
 
 Reachable as `qs ipc call menu toggle|open|close` and `level <id>`; bound to
-`SUPER + SPACE`, with `SUPER + ALT + SPACE` (apps), `SUPER + ESCAPE` (system)
-and `SUPER + SHIFT + CTRL + SPACE` (theme) opening a level directly.
+`SUPER + SPACE`, with `SUPER + ALT + SPACE` (apps), `SUPER + ESCAPE` (system),
+`SUPER + K` (keybindings) and `SUPER + SHIFT + CTRL + SPACE` (theme) opening a
+level directly.
+
+The keybinding sheet is the `binds` provider, reading
+`~/.local/state/hypr-binds.tsv` through a `FileView` with `watchChanges`, so a
+config reload refreshes it without restarting the shell. Rows carry a `chord`
+instead of an icon, which is also what widens the window for that level — 28
+characters of chord before the description starts, and ~100 rows. It is
+**display only**: the recorder keeps the chord and the label, not the action,
+so Enter does nothing there. Making it fire would mean serializing every
+dispatcher back to Lua source, which is the expensive half of Omarchy's
+script (their `lua_literal` alone is ~40 lines, and our binds are almost all
+table arguments).
 
 Escape and Left back out one level and only close at the root. Selection lands
 on the first *enabled* row, deferred through `Qt.callLater` because ListView
@@ -326,21 +338,15 @@ the one that reads as a sun at 14px.
 
 The plumbing is in place — portals (`xdg-desktop-portal` + `-hyprland` +
 `-gtk`), pipewire/wireplumber and NetworkManager are all running, and the menu
-now covers apps, wallpaper, theme, screenshots and power. The dim rows in it
-are the shortest list of what is still missing.
+now covers apps, wallpaper, theme, screenshots, power and the keybinding
+sheet. The dim rows in it are the shortest list of what is still missing.
 
-1. **Keybinding cheatsheet**, as a leaf of the menu rather than a panel of
-   its own — the `learn.keybindings` row is already there, dim. Reads
-   `~/.local/state/hypr-binds.tsv`, which `hyprland.lua` writes as it
-   registers each bind — not `hyprctl binds`, which cannot name a
-   `code:` chord. Display only: the recorder keeps the chord and the label,
-   not the action, so Enter cannot fire the bind the way Omarchy's does.
-2. Notifications, then lock/idle, then a polkit agent.
-3. **A display panel**, ported from Omarchy's
+1. Notifications, then lock/idle, then a polkit agent.
+2. **A display panel**, ported from Omarchy's
    `shell/plugins/panels/monitor/` (resolution, scaling, text size). Light/dark
    and nightlight belong in there rather than as their own bar buttons — so
    the  /  button is a placeholder, not a design.
-4. **Nightlight**, the equivalent of macOS Night Shift: `hyprsunset` shifts
+3. **Nightlight**, the equivalent of macOS Night Shift: `hyprsunset` shifts
    colour temperature, and Omarchy drives it with a toggle plus a restart
    script. Wants a schedule; composes with light/dark rather than replacing
    it.
