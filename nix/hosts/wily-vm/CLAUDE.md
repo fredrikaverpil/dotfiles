@@ -60,13 +60,24 @@ Hyprland config in `config/hypr/`, and package list in
 `install/omarchy-base.packages`. Approach is vendor-and-prune: port pieces
 across on request rather than rewriting from scratch.
 
+## Newly added stow files need a nudge
+
+`nixos-rebuild switch` restarts `home-manager-fredrik.service` — which is what
+runs the stow step — only when the home-manager *generation* changes. A change
+that touches system config and `stow/` alone leaves the generation identical,
+so the unit stays `active (exited)` and nothing gets stowed. Editing an
+already-stowed file is unaffected (it is a symlink), but a **new** file under
+`stow/` needs one of:
+
+    sudo systemctl restart home-manager-fredrik.service
+
+a reboot, or a manual `stow` run. Not a bug — a fresh machine always has a new
+generation, so first-boot bootstrap works.
+
 ## Known, not yet done
 
 - Hyprland warns the `.conf` config format is removed in 0.57. Currently on
   0.56.2. Needs a migration before that bump.
-- home-manager's stow activation step did not run on the switch that
-  introduced these files; `cd ~/.dotfiles/stow && stow --target="$HOME"
-  --restow --no-folding --adopt shared Linux` fixed it. Watch for a repeat.
 - Keyboard layout is left at default (us). Unset deliberately — confirm before
   adding `input { kb_layout }`.
 - No wallpaper, launcher, notifications, lock, OSD or polkit agent yet.
