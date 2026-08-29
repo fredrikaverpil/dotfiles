@@ -85,7 +85,13 @@ snippets port straight across. The `hl` API, dumped live from 0.56.2:
   center pin tag swap kill drag pseudo bring_to_top alter_zorder cycle_next
   set_prop signal toggle_swallow clear_tags deny_from_group`
 - also `hl.exec_cmd hl.dispatch hl.on hl.timer hl.env hl.gesture
-  hl.window_rule hl.layer_rule hl.workspace_rule hl.notification hl.get_*`
+  hl.window_rule hl.layer_rule hl.workspace_rule hl.get_*`
+- `hl.notification` is a **table**, not a function:
+  `hl.notification.create{ text = …, timeout = … }` and `.get`.
+- Nothing in `hl` watches a file. Hyprland auto-reloads `hyprland.lua`
+  itself, but a `dofile`/`require`d second file is not a tracked
+  dependency — editing it changes nothing until `hyprctl reload`. That is
+  why the binds are inline rather than in their own `bindings.lua`.
 
 Gotchas found the hard way:
 
@@ -95,9 +101,28 @@ Gotchas found the hard way:
 - **A Lua error aborts the rest of the file silently.** Everything below the
   failing line simply never registers, which looks exactly like "that API does
   nothing". Check `hyprctl binds` and the on-screen error overlay before
-  concluding a function is broken.
+  concluding a function is broken. The bind block runs under `pcall` for
+  this reason: without it a single bad bind also skips the recorder at the
+  bottom of the file, so a typo blanks the cheatsheet as well as the
+  keymap. `pcall` catches a runtime error, not a syntax error.
 - **`hyprctl dispatch` takes Lua now**: `hyprctl dispatch 'hl.dsp.exec_cmd("ghostty")'`.
-- Bind workspace keys as `code:10`..`code:19` so they survive a layout change.
+- Bind workspace keys as `code:10`..`code:19` so they survive a layout
+  change — but **`hyprctl binds` reports a `code:` bind with an empty
+  `key` and `keycode: 0`**, and every Lua bind as `dispatcher: __lua` with
+  an opaque registry index for `arg`. So hyprctl can list the binds and
+  their descriptions, and can tell you neither the chord nor the action.
+  `hyprland.lua` therefore records its own chords to
+  `~/.local/state/hypr-binds.tsv` as it registers them, and the cheatsheet
+  reads that. A bare `hl.bind()` that skips the local `bind()` helper
+  registers fine and is invisible in the cheatsheet. (Omarchy solves the
+  same problem by re-evaluating `hyprland.lua` in a fake-`hl` Lua sandbox
+  — `omarchy-menu-keybindings`, ~500 lines — because their menu also
+  *dispatches* the selected bind, and their users write raw `hl.bind` in
+  `~/.config/hypr/bindings/`. Neither applies here.)
+- **`hyprctl -j binds` reports `mouse: false` on a working drag bind.**
+  `SUPER + mouse:272` with `{ mouse = true }` moves windows correctly; the
+  JSON field is not the way to check. Verify by dragging and reading
+  `hyprctl -j clients` for a changed `at`/`size`.
 - **Emergency mode** appears as a red banner when no binds register at all
   (bad config, or the file went missing). It provides SUPER+Q → a terminal,
   SUPER+R → hyprland-run, SUPER+M → exit. Recover with `hyprctl reload` once
@@ -105,6 +130,38 @@ Gotchas found the hard way:
 - Hyprland auto-reloads on config change, so anything that momentarily removes
   `hyprland.lua` — `git clean -fd` on the VM clone, for instance — trips
   emergency mode even if the file reappears a second later.
+
+## The keymap is Omarchy's
+
+`hyprland.lua` mirrors Omarchy's `default/hypr/bindings/*.lua` — same chords,
+same wording in the descriptions, so their cheatsheet and ours read alike.
+Dropped, all for want of a target rather than by preference:
+
+- anything invoking an `omarchy-*` script (close-all, tiled fullscreen, pop
+  window out, window width save/restore, workspace layout, monitor scaling,
+  transparency and gap toggles)
+- every monitor bind — one scanout here
+- all of `media.lua` (XF86 volume/brightness/media keys): no such keys on the
+  VM, and each one routes through an `omarchy-*` script anyway. Wanted on the
+  ThinkPad.
+
+Consequences of following them exactly: `SUPER + W` is a second Close window,
+so the wallpaper picker moved to `SUPER + CTRL + SPACE` (their "Background
+switcher"), and there is no hjkl focus — Omarchy puts focus on `SUPER +
+arrows` and uses `SUPER + J`/`SUPER + L` for split and layout.
+
+## From a Mac, macOS eats the SUPER binds
+
+SUPER is Command on a Mac host, and macOS claims `Cmd + W`, `Cmd + Q`,
+`Cmd + Space` and `Cmd + Tab` before the guest sees them — so Close window
+kills the UTM window, and `SUPER + SPACE` opens Spotlight. Omarchy's keymap is
+overwhelmingly SUPER-based, so a large slice of it is untestable from the Mac
+until UTM captures the keyboard. **A chord that appears dead is a host-capture
+question before it is a config question** — check `hyprctl -j binds` first, it
+is authoritative. None of this exists on the ThinkPad, where SUPER is a real
+Super key.
+
+This is also why the bar has Apps and Wall buttons at all.
 
 ## uwsm: never restart greetd, reboot
 
@@ -199,8 +256,8 @@ binaries get committed. The shell scans it recursively (`find`,
 png/jpg/jpeg/webp), so subfolders are for tidiness only, not meaning. The pick
 is **per mode**: `~/.local/state/wallpaper-dark` and `-light`, each a plain
 path, so flipping light/dark also swaps the picture and each side remembers its
-own. A mode with no pick yet shows the gradient. `SUPER + W` (or the bar's
-Wall button) opens the picker; `qs ipc call wallpaper` also takes
+own. A mode with no pick yet shows the gradient. `SUPER + CTRL + SPACE` (or
+the bar's Wall button) opens the picker; `qs ipc call wallpaper` also takes
 `open/close/toggle`, `set <path>`, and `rescan` after adding files.
 
 webp works, but only because `desktop.nix` sets `QT_PLUGIN_PATH` to
@@ -241,24 +298,31 @@ The plumbing is in place — portals (`xdg-desktop-portal` + `-hyprland` +
 missing is the shell itself, which is exactly what Quattro moved into
 Quickshell.
 
-1. **Keybinding cheatsheet.** Nearly free now that IPC exists — read
-   `hyprctl binds -j`, which already carries the `description` fields set in
-   `hyprland.lua`.
-2. Notifications, then lock/idle, then a polkit agent.
-3. **A display panel**, ported from Omarchy's
+1. **The root menu**, Omarchy's `omarchy-menu.jsonc` shape: one level stack
+   over the existing launcher panel, entries as dotted ids in a JS literal,
+   Enter either descends or fires. Apps becomes one level rather than its own
+   panel, and the Apps and Wall bar buttons go away in favour of a single
+   left-hand icon. Rows whose feature does not exist yet are listed but dim.
+   Not porting their `Menu.qml` + `MenuModel.js` (~2000 lines of jsonc
+   parsing, plugin manifests and provider indirection) for ~15 entries.
+2. **Keybinding cheatsheet**, as a leaf of that menu rather than a panel of
+   its own. Reads `~/.local/state/hypr-binds.tsv`, which `hyprland.lua` writes
+   as it registers each bind — not `hyprctl binds`, which cannot name a
+   `code:` chord. Display only: the recorder keeps the chord and the label,
+   not the action, so Enter cannot fire the bind the way Omarchy's does.
+3. Notifications, then lock/idle, then a polkit agent.
+4. **A display panel**, ported from Omarchy's
    `shell/plugins/panels/monitor/` (resolution, scaling, text size). Light/dark
    and nightlight belong in there rather than as their own bar buttons — so
    the  /  button is a placeholder, not a design.
-4. **Nightlight**, the equivalent of macOS Night Shift: `hyprsunset` shifts
+5. **Nightlight**, the equivalent of macOS Night Shift: `hyprsunset` shifts
    colour temperature, and Omarchy drives it with a toggle plus a restart
    script. Wants a schedule; composes with light/dark rather than replacing
    it.
 
-The Apps and Wall buttons are scaffolding — they exist because the keybinds are
-awkward to press from a Mac driving the VM. The goal is one Omarchy-style root
-menu (power, screenshots, settings, themes) over `SUPER + SPACE`, with the
-apps-only view moving to `SUPER + ALT + SPACE` as Quattro has it, not a row of
-buttons on the bar.
+Half of Omarchy's tree cannot port: Install / Remove / Update are `pacman`
+operations, and on NixOS that is a rebuild. The root menu here is necessarily
+smaller than theirs.
 
 ## Known, not yet done
 
@@ -267,6 +331,11 @@ buttons on the bar.
   when the time comes.
 - No notifications, lock, OSD or polkit agent yet — no polkit agent is running
   at all, so any privileged GUI action will fail.
+- Four packages the Omarchy keymap and menu assume are not installed in
+  `desktop.nix`: `hyprlock` (lock), `wl-clipboard` (clipboard history, share),
+  `slurp` (region select, so `grim` can only take the whole screen) and
+  `hyprsunset` (nightlight). Menu rows and binds for these stay dim until they
+  land.
 - The bar uses JetBrains Mono Nerd Font (`nix/shared/system/linux.nix` installs
   several nerd fonts). Berkeley Mono is wanted as the system font eventually,
   but it is a paid font and needs vendoring before Nix can install it.
