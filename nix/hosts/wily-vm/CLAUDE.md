@@ -172,6 +172,31 @@ would kill them all on `systemctl --user restart quickshell`.
 starts, so the app list must be a QML binding. Building it once when the
 launcher opens gives an empty list on the first open after a restart.
 
+## Light and dark
+
+One key drives everything: `/org/gnome/desktop/interface/color-scheme` in
+dconf. `xdg-desktop-portal-gtk` republishes it as the portal's
+`org.freedesktop.appearance color-scheme`, Ghostty switches between the
+`zenbones_dark`/`zenbones_light` themes named in its config, and Neovim follows
+the terminal over OSC 11 (`OSC11.nvim`). Verified live — no restart of either.
+The same mechanism macOS drives from its system appearance, which is why the
+Ghostty and Neovim configs need nothing platform-specific.
+
+The bar's  /  button writes that key plus `gtk-theme`
+(`Adwaita`/`Adwaita-dark`, what Omarchy's `omarchy-theme-set-gnome` does) and
+also answers `qs ipc call theme toggle|dark|light`. It *watches* the key with a
+long-running `dconf watch` rather than trusting its own writes, so a
+`dconf write` from anywhere else moves the bar too. dconf persists, so the mode
+survives a reboot for free.
+
+Bar and launcher colours are the zenbones palettes, lifted from
+`stow/shared/.config/ghostty/themes/zenbones_{dark,light}` so the bar and the
+terminal are literally the same colours. `gsettings` is not installed; `dconf`
+is, and writes the same database.
+
+`\uf185` renders as a cog in JetBrains Mono Nerd Font, not a sun; `\uf522` is
+the one that reads as a sun at 14px.
+
 ## Next steps
 
 The plumbing is in place — portals (`xdg-desktop-portal` + `-hyprland` +
@@ -195,11 +220,11 @@ for when a root menu takes over `SUPER + SPACE`.
 - Keyboard layout is `us`. Swedish is wanted eventually as a second layout,
   but not yet — `kb_layout = "us,se"` with a `grp:` toggle in `kb_options`
   when the time comes.
-- Ghostty renders the light theme here because nothing publishes a dark-mode
-  preference yet (no xdg-desktop-portal appearance setting). It should follow
-  the system once that is in place.
 - No wallpaper, notifications, lock, OSD or polkit agent yet — no polkit agent
   is running at all, so any privileged GUI action will fail.
+- The bar uses JetBrains Mono Nerd Font (`nix/shared/system/linux.nix` installs
+  several nerd fonts). Berkeley Mono is wanted as the system font eventually,
+  but it is a paid font and needs vendoring before Nix can install it.
 - Only one emoji font is installed; `noto-fonts-color-emoji` is commented out
   in `nix/shared/system/linux.nix` as slow to build. Quickshell UI will want it.
 - Mason installs prebuilt glibc binaries, which cannot run on NixOS. Neovim
