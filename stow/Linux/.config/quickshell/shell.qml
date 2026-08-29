@@ -4,6 +4,86 @@ import Quickshell.Io
 import Quickshell.Wayland
 
 ShellRoot {
+  id: root
+
+  // Light/dark. The dconf key is the source of truth, not a property of ours:
+  // xdg-desktop-portal-gtk republishes it as org.freedesktop.appearance, which
+  // is what flips Ghostty's theme live, and Neovim follows the terminal over
+  // OSC 11. gtk-theme comes along so GTK apps switch too.
+  property bool dark: true
+  readonly property var palette: dark
+    ? ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833" })
+    : ({ bg: "#F0EDEC", fg: "#2C363C", sel: "#CBD9E3", dim: "#CFC1BA" })
+
+  function setDark(on) {
+    const scheme = on ? "prefer-dark" : "prefer-light"
+    const gtk = on ? "Adwaita-dark" : "Adwaita"
+    write.command = ["sh", "-c",
+      "dconf write /org/gnome/desktop/interface/color-scheme \"'" + scheme + "'\"; " +
+      "dconf write /org/gnome/desktop/interface/gtk-theme \"'" + gtk + "'\""]
+    write.running = true
+  }
+
+  Process { id: write }
+
+  IpcHandler {
+    target: "theme"
+
+    function toggle(): void { root.setDark(!root.dark) }
+    function dark(): void { root.setDark(true) }
+    function light(): void { root.setDark(false) }
+  }
+
+  // Watched, not just written, so a `dconf write` from a shell moves the bar
+  // too. dconf watch prints the key on one line and the value on the next.
+  Process {
+    running: true
+    command: ["dconf", "watch", "/org/gnome/desktop/interface/"]
+    stdout: SplitParser {
+      onRead: line => {
+        if (line.indexOf("prefer-dark") >= 0) root.dark = true
+        else if (line.indexOf("prefer-light") >= 0) root.dark = false
+      }
+    }
+  }
+
+  Process {
+    running: true
+    command: ["dconf", "read", "/org/gnome/desktop/interface/color-scheme"]
+    stdout: StdioCollector {
+      onStreamFinished: root.dark = text.indexOf("prefer-light") < 0
+    }
+  }
+
+  // Bar chrome, so every button hovers and reads the same.
+  component BarButton: Rectangle {
+    id: btn
+
+    property alias label: btnLabel.text
+    signal activated
+
+    implicitWidth: btnLabel.implicitWidth + 16
+    width: implicitWidth
+    height: 24
+    radius: 4
+    color: btnMouse.containsMouse ? root.palette.sel : "transparent"
+
+    Text {
+      id: btnLabel
+      anchors.centerIn: parent
+      color: root.palette.fg
+      font.family: "JetBrainsMono Nerd Font"
+      font.pixelSize: 14
+    }
+
+    MouseArea {
+      id: btnMouse
+      anchors.fill: parent
+      hoverEnabled: true
+      onClicked: btn.activated()
+    }
+  }
+
   SystemClock {
     id: clock
     precision: SystemClock.Seconds
@@ -65,8 +145,8 @@ ShellRoot {
       width: 600
       height: 420
       radius: 8
-      color: "#1e1e2e"
-      border.color: "#45475a"
+      color: root.palette.bg
+      border.color: root.palette.dim
       border.width: 1
 
       Column {
@@ -78,14 +158,15 @@ ShellRoot {
           id: input
           width: parent.width
           clip: true
-          color: "#cdd6f4"
+          color: root.palette.fg
+          font.family: "JetBrainsMono Nerd Font"
           font.pixelSize: 18
           focus: true
 
           Text {
             anchors.fill: parent
             visible: input.text.length === 0
-            color: "#6c7086"
+            color: root.palette.dim
             font: input.font
             text: "Search apps…"
           }
@@ -105,7 +186,7 @@ ShellRoot {
         Rectangle {
           width: parent.width
           height: 1
-          color: "#45475a"
+          color: root.palette.dim
         }
 
         ListView {
@@ -121,14 +202,15 @@ ShellRoot {
 
             width: list.width
             height: 36
-            color: index === list.currentIndex ? "#45475a" : "transparent"
+            color: index === list.currentIndex ? root.palette.sel : "transparent"
             radius: 4
 
             Text {
               anchors.verticalCenter: parent.verticalCenter
               anchors.left: parent.left
               anchors.leftMargin: 8
-              color: "#cdd6f4"
+              color: root.palette.fg
+              font.family: "JetBrainsMono Nerd Font"
               font.pixelSize: 15
               text: modelData.name
             }
@@ -159,38 +241,42 @@ ShellRoot {
         right: true
       }
       implicitHeight: 32
-      color: "#1e1e2e"
+      color: root.palette.bg
 
-      Rectangle {
+      Row {
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.leftMargin: 4
-        width: apps.implicitWidth + 16
-        height: 24
-        radius: 4
-        color: appsMouse.containsMouse ? "#45475a" : "transparent"
+        spacing: 4
 
-        Text {
-          id: apps
-          anchors.centerIn: parent
-          color: "#cdd6f4"
-          font.pixelSize: 14
-          text: "Apps"
-        }
+        Repeater {
+          model: [
+            { label: "Apps", action: () => launcher.toggle() },
+          ]
 
-        MouseArea {
-          id: appsMouse
-          anchors.fill: parent
-          hoverEnabled: true
-          onClicked: launcher.toggle()
+          BarButton {
+            required property var modelData
+
+            label: modelData.label
+            onActivated: modelData.action()
+          }
         }
       }
 
       Text {
         anchors.centerIn: parent
-        color: "#cdd6f4"
+        color: root.palette.fg
+        font.family: "JetBrainsMono Nerd Font"
         font.pixelSize: 14
         text: Qt.formatDateTime(clock.date, "ddd d MMM  HH:mm:ss")
+      }
+
+      BarButton {
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: 4
+        label: root.dark ? "\uf186" : "\uf522"
+        onActivated: root.setDark(!root.dark)
       }
     }
   }
