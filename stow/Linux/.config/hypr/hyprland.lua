@@ -1,5 +1,10 @@
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1 })
 
+-- macOS-like black pointer with a white outline, loaded from the stowed
+-- ~/.local/share/icons/macOS-hypr theme.
+hl.env("HYPRCURSOR_THEME", "macOS-hypr")
+hl.env("HYPRCURSOR_SIZE", "24")
+
 hl.config({
   general = {
     gaps_in = 4,
