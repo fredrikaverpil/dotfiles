@@ -19,20 +19,31 @@
     };
 
   # Standard NixOS systems (x86_64, regular ARM, etc.)
-  # mkNixos = { configPath, ... }:
-  #   inputs.nixpkgs.lib.nixosSystem {
-  #     specialArgs = inputs // {
-  #       inherit (inputs) dotfiles;
-  #     };
-  #     modules = [
-  #       inputs.disko.nixosModules.disko
-  #       inputs.home-manager.nixosModules.home-manager
-  #       ./users.nix
-  #       ../shared/system/common.nix  #       ../shared/system/linux.nix
-  #       configPath
-  #     ] ++ (if builtins.pathExists (builtins.dirOf configPath + "/home.nix") then [ (builtins.dirOf configPath + "/home.nix") ] else [ ])
-  #       ++ (if builtins.pathExists (builtins.dirOf configPath + "/hardware.nix") then [ (builtins.dirOf configPath + "/hardware.nix") ] else [ ]);
-  #   };
+  # Built from nixpkgs-unstable; set `nixpkgs.hostPlatform` in the host's
+  # configuration.nix, the same way mkRpiNixos hosts do.
+  mkNixos = {configPath, ...}:
+    inputs.nixpkgs-unstable.lib.nixosSystem {
+      specialArgs = {inherit inputs;};
+      modules =
+        [
+          {nixpkgs.overlays = [(import ../shared/overlays)];}
+          inputs.home-manager-unstable.nixosModules.home-manager
+          ./users.nix
+          ../shared/system/common.nix
+          ../shared/system/linux.nix
+          configPath
+        ]
+        ++ (
+          if builtins.pathExists (builtins.dirOf configPath + "/home.nix")
+          then [(builtins.dirOf configPath + "/home.nix")]
+          else []
+        )
+        ++ (
+          if builtins.pathExists (builtins.dirOf configPath + "/hardware.nix")
+          then [(builtins.dirOf configPath + "/hardware.nix")]
+          else []
+        );
+    };
 
   mkRpiNixos = {configPath, ...}:
     inputs.nixos-raspberrypi.lib.nixosSystemFull {
