@@ -25,7 +25,7 @@ missing one, because it gets believed and acted on.
 
 ## Driving it over SSH
 
-Three things get used constantly. `HYPRLAND_INSTANCE_SIGNATURE` must be the
+These get used constantly. `HYPRLAND_INSTANCE_SIGNATURE` must be the
 **newest** directory — stale ones accumulate under `/run/user/1000/hypr/`.
 
 ```sh
@@ -48,9 +48,39 @@ Looking at the screenshot is not optional — the on-screen error overlays
 (Hyprland's config errors, Ghostty's dialog) never reach any log this side of
 the SSH connection.
 
+**The shell can be driven end to end without a keyboard**, which is the only
+way to test it from a Mac (see the SUPER-binds section below). `qs ipc` opens
+a panel and `hl.dsp.send_key_state` types into it — synthetic keys do reach a
+layer-shell surface, so navigation, search and Enter are all exercisable:
+
+```sh
+qs ipc call menu level system          # or: toggle, close, level learn.keybindings
+press() {                              # one key, down then up
+  hyprctl dispatch "hl.dsp.send_key_state({ mods = \"\", key = \"$1\", state = \"down\" })"
+  sleep 0.15
+  hyprctl dispatch "hl.dsp.send_key_state({ mods = \"\", key = \"$1\", state = \"up\" })"
+}
+for k in s c r a t c h; do press $k; done   # type into the search box
+press Return
+```
+
+Assert on state rather than on the picture where possible: `hyprctl -j clients`
+for window geometry, `dconf read` for the theme, `ls` for a screenshot the menu
+was asked to take.
+
 Do **not** `git clean -fd` in the VM clone: it deletes the rsync'd
 `hyprland.lua`, Hyprland auto-reloads, and the session drops into emergency
 mode. `rm` the specific files instead.
+
+`stow` cannot be re-run on the VM: the existing links are absolute into
+`~/.dotfiles`, so it reports *"Ignoring an absolute symlink"* and then
+*"existing target is not owned by stow"* and aborts the whole run. Editing an
+already-linked file is unaffected — rsync writes through the link — but a
+**new** file under `stow/` needs the link made by hand:
+
+```sh
+ln -sfn ~/.dotfiles/stow/Linux/.config/hypr/newfile.lua ~/.config/hypr/newfile.lua
+```
 
 ## Split of responsibilities
 
@@ -58,7 +88,7 @@ mode. `rm` the specific files instead.
   with `withUWSM`, greetd autologin, and Quickshell as a systemd **user**
   service bound to `graphical-session.target`. greetd refuses to start unless
   `default_session` is set, even when only `initial_session` is wanted.
-  `environment.PATH = lib.mkForce null` on that unit is what makes the launcher
+  `environment.PATH = lib.mkForce null` on that unit is what makes the menu
   able to start anything: NixOS otherwise pins a sparse PATH on user units, and
   unsetting it is the only way to inherit the session PATH uwsm imports into
   the user manager. Both hops need it — finding `uwsm-app`, and then the bare
@@ -231,8 +261,11 @@ already-stowed file is unaffected (it is a symlink), but a **new** file under
 
     sudo systemctl restart home-manager-fredrik.service
 
-a reboot, or a manual `stow` run. Not a bug — a fresh machine always has a new
-generation, so first-boot bootstrap works.
+or a reboot. Not a bug — a fresh machine always has a new generation, so
+first-boot bootstrap works.
+
+A manual `stow` run is *not* the third option it looks like: on this VM it
+aborts (see "Driving it over SSH"), so make the link by hand instead.
 
 ## Reaching Quickshell from a keybind
 
