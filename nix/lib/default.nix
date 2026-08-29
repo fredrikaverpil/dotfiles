@@ -6,6 +6,7 @@ in
 {
   inherit (systems)
     mkDarwin
+    mkNixos
     mkRpiNixos
     ;
   inherit users;
