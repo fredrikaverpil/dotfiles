@@ -76,6 +76,7 @@
   },
   "outputStyle": "Terse",
   "effortLevel": "medium",
+  "advisorModel": "opus",
   "showClearContextOnPlanAccept": true,
   "tui": "fullscreen",
   "showThinkingSummaries": true,
