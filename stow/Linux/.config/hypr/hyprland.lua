@@ -32,21 +32,161 @@ hl.config({
   },
 })
 
-hl.bind("SUPER + RETURN", hl.dsp.exec_cmd("ghostty"), { description = "Terminal" })
-hl.bind("SUPER + SPACE", hl.dsp.exec_cmd("qs ipc call launcher toggle"), { description = "App launcher" })
-hl.bind("SUPER + W", hl.dsp.exec_cmd("qs ipc call wallpaper toggle"), { description = "Wallpaper picker" })
-hl.bind("SUPER + Q", hl.dsp.window.close(), { description = "Close window" })
-hl.bind("SUPER + V", hl.dsp.window.float(), { description = "Toggle floating" })
-hl.bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "fullscreen" }), { description = "Full screen" })
-hl.bind("SUPER + SHIFT + E", hl.dsp.exit(), { description = "Exit Hyprland" })
+-- Every bind goes through this rather than hl.bind directly. `hyprctl binds`
+-- reports Lua binds with an empty key whenever the chord uses code:NN, so this
+-- file is the only place the chord still exists in readable form: the
+-- cheatsheet reads what is recorded here, not hyprctl. A bare hl.bind()
+-- registers with Hyprland but stays invisible in the cheatsheet.
+local binds = {}
 
-for key, dir in pairs({ H = "l", J = "d", K = "u", L = "r" }) do
-  hl.bind("SUPER + " .. key, hl.dsp.focus({ direction = dir }), { description = "Focus " .. dir })
+local function bind(keys, description, dispatcher, opts)
+  opts = opts or {}
+  local options = { description = description }
+  for key, value in pairs(opts) do
+    if key ~= "display" then
+      options[key] = value
+    end
+  end
+  binds[#binds + 1] = (opts.display or keys) .. "\t" .. description
+  hl.bind(keys, dispatcher, options)
 end
 
--- code:10..19 are the physical 1..0 keys, so these survive a layout change.
-for ws = 1, 10 do
-  local key = "code:" .. (ws + 9)
-  hl.bind("SUPER + " .. key, hl.dsp.focus({ workspace = tostring(ws) }), { description = "Workspace " .. ws })
-  hl.bind("SUPER + SHIFT + " .. key, hl.dsp.window.move({ workspace = tostring(ws) }), { description = "Move to workspace " .. ws })
+-- Omarchy's chords and wording, minus what needs a binary or a monitor this
+-- host does not have; nix/hosts/wily-vm/CLAUDE.md lists what was dropped.
+--
+-- Source order is cheatsheet display order. Reordering for tidiness reorders
+-- the cheatsheet.
+--
+-- The block runs under pcall because a runtime error in any one bind would
+-- otherwise stop the file dead: every later bind would go unregistered and the
+-- recorder below would never run, blanking the cheatsheet as well. Hyprland
+-- reports such an error nowhere but the on-screen overlay.
+local ok, err = pcall(function()
+  -- Applications
+  bind("SUPER + RETURN", "Terminal", hl.dsp.exec_cmd("ghostty"))
+  bind("SUPER + SHIFT + N", "Editor", hl.dsp.exec_cmd("ghostty -e nvim"))
+
+  -- Shell
+  bind("SUPER + SPACE", "Launch apps", hl.dsp.exec_cmd("qs ipc call launcher toggle"))
+  bind("SUPER + CTRL + SPACE", "Background switcher", hl.dsp.exec_cmd("qs ipc call wallpaper toggle"))
+  bind("SUPER + SHIFT + CTRL + SPACE", "Toggle light/dark", hl.dsp.exec_cmd("qs ipc call theme toggle"))
+
+  -- Windows
+  bind("SUPER + W", "Close window", hl.dsp.window.close())
+  bind("SUPER + Q", "Close window", hl.dsp.window.close())
+  bind("SUPER + J", "Toggle window split", hl.dsp.layout("togglesplit"))
+  bind("SUPER + P", "Pseudo window", hl.dsp.window.pseudo())
+  bind("SUPER + T", "Toggle window floating/tiling", hl.dsp.window.float({ action = "toggle" }))
+  bind("SUPER + F", "Full screen", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
+  bind("SUPER + ALT + F", "Full width", hl.dsp.window.fullscreen({ mode = "maximized" }))
+
+  bind("SUPER + LEFT", "Focus on left window", hl.dsp.focus({ direction = "l" }))
+  bind("SUPER + RIGHT", "Focus on right window", hl.dsp.focus({ direction = "r" }))
+  bind("SUPER + UP", "Focus on above window", hl.dsp.focus({ direction = "u" }))
+  bind("SUPER + DOWN", "Focus on below window", hl.dsp.focus({ direction = "d" }))
+
+  bind("SUPER + SHIFT + LEFT", "Swap window to the left", hl.dsp.window.swap({ direction = "l" }))
+  bind("SUPER + SHIFT + RIGHT", "Swap window to the right", hl.dsp.window.swap({ direction = "r" }))
+  bind("SUPER + SHIFT + UP", "Swap window up", hl.dsp.window.swap({ direction = "u" }))
+  bind("SUPER + SHIFT + DOWN", "Swap window down", hl.dsp.window.swap({ direction = "d" }))
+
+  bind("ALT + TAB", "Focus on next window", hl.dsp.window.cycle_next())
+  bind("ALT + SHIFT + TAB", "Focus on previous window", hl.dsp.window.cycle_next({ next = false }))
+  bind("ALT + TAB", "Reveal active window on top", hl.dsp.window.bring_to_top())
+  bind("ALT + SHIFT + TAB", "Reveal active window on top", hl.dsp.window.bring_to_top())
+
+  -- Workspaces. code:10..19 are the physical 1..0 keys, so these survive a
+  -- layout change; the display string is what the cheatsheet shows instead.
+  for ws = 1, 10 do
+    local key = "code:" .. (ws + 9)
+    local digit = ws == 10 and "0" or tostring(ws)
+    bind("SUPER + " .. key, "Switch to workspace " .. ws, hl.dsp.focus({ workspace = tostring(ws) }), { display = "SUPER + " .. digit })
+    bind(
+      "SUPER + SHIFT + " .. key,
+      "Move window to workspace " .. ws,
+      hl.dsp.window.move({ workspace = tostring(ws) }),
+      { display = "SUPER + SHIFT + " .. digit }
+    )
+    bind(
+      "SUPER + SHIFT + ALT + " .. key,
+      "Move window silently to workspace " .. ws,
+      hl.dsp.window.move({ workspace = tostring(ws), follow = false }),
+      { display = "SUPER + SHIFT + ALT + " .. digit }
+    )
+  end
+
+  bind("SUPER + TAB", "Next workspace", hl.dsp.focus({ workspace = "e+1" }))
+  bind("SUPER + SHIFT + TAB", "Previous workspace", hl.dsp.focus({ workspace = "e-1" }))
+  bind("SUPER + CTRL + TAB", "Former workspace", hl.dsp.focus({ workspace = "previous" }))
+
+  bind("SUPER + S", "Toggle scratchpad", hl.dsp.workspace.toggle_special("scratchpad"))
+  bind("SUPER + grave", "Toggle scratchpad", hl.dsp.workspace.toggle_special("scratchpad"), { display = "SUPER + ~" })
+  bind("SUPER + ALT + S", "Move window to scratchpad", hl.dsp.window.move({ workspace = "special:scratchpad", follow = false }))
+  bind(
+    "SUPER + SHIFT + grave",
+    "Move window to scratchpad",
+    hl.dsp.window.move({ workspace = "special:scratchpad", follow = false }),
+    { display = "SUPER + SHIFT + ~" }
+  )
+
+  -- Resize. code:20/21 are the physical minus/equal keys.
+  bind("SUPER + code:20", "Expand window left", hl.dsp.window.resize({ x = -100, y = 0, relative = true }), { display = "SUPER + MINUS" })
+  bind("SUPER + code:21", "Shrink window left", hl.dsp.window.resize({ x = 100, y = 0, relative = true }), { display = "SUPER + EQUAL" })
+  bind("SUPER + SHIFT + code:20", "Shrink window up", hl.dsp.window.resize({ x = 0, y = -100, relative = true }), { display = "SUPER + SHIFT + MINUS" })
+  bind("SUPER + SHIFT + code:21", "Expand window down", hl.dsp.window.resize({ x = 0, y = 100, relative = true }), { display = "SUPER + SHIFT + EQUAL" })
+
+  bind("SUPER + ALT + code:20", "Expand window left a little", hl.dsp.window.resize({ x = -25, y = 0, relative = true }), { display = "SUPER + ALT + MINUS" })
+  bind("SUPER + ALT + code:21", "Shrink window left a little", hl.dsp.window.resize({ x = 25, y = 0, relative = true }), { display = "SUPER + ALT + EQUAL" })
+  bind("SUPER + SHIFT + ALT + code:20", "Shrink window up a little", hl.dsp.window.resize({ x = 0, y = -25, relative = true }), { display = "SUPER + SHIFT + ALT + MINUS" })
+  bind("SUPER + SHIFT + ALT + code:21", "Expand window down a little", hl.dsp.window.resize({ x = 0, y = 25, relative = true }), { display = "SUPER + SHIFT + ALT + EQUAL" })
+
+  bind("SUPER + CTRL + code:20", "Expand window left a lot", hl.dsp.window.resize({ x = -300, y = 0, relative = true }), { display = "SUPER + CTRL + MINUS" })
+  bind("SUPER + CTRL + code:21", "Shrink window left a lot", hl.dsp.window.resize({ x = 300, y = 0, relative = true }), { display = "SUPER + CTRL + EQUAL" })
+  bind("SUPER + CTRL + SHIFT + code:20", "Shrink window up a lot", hl.dsp.window.resize({ x = 0, y = -300, relative = true }), { display = "SUPER + CTRL + SHIFT + MINUS" })
+  bind("SUPER + CTRL + SHIFT + code:21", "Expand window down a lot", hl.dsp.window.resize({ x = 0, y = 300, relative = true }), { display = "SUPER + CTRL + SHIFT + EQUAL" })
+
+  -- Groups
+  bind("SUPER + G", "Toggle window grouping", hl.dsp.group.toggle())
+  bind("SUPER + ALT + G", "Move active window out of group", hl.dsp.window.move({ out_of_group = true }))
+  bind("SUPER + ALT + LEFT", "Move window to group on left", hl.dsp.window.move({ into_group = "l" }))
+  bind("SUPER + ALT + RIGHT", "Move window to group on right", hl.dsp.window.move({ into_group = "r" }))
+  bind("SUPER + ALT + UP", "Move window to group on top", hl.dsp.window.move({ into_group = "u" }))
+  bind("SUPER + ALT + DOWN", "Move window to group on bottom", hl.dsp.window.move({ into_group = "d" }))
+  bind("SUPER + ALT + TAB", "Next window in group", hl.dsp.group.next())
+  bind("SUPER + ALT + SHIFT + TAB", "Previous window in group", hl.dsp.group.prev())
+  bind("SUPER + CTRL + LEFT", "Move grouped window focus left", hl.dsp.group.prev())
+  bind("SUPER + CTRL + RIGHT", "Move grouped window focus right", hl.dsp.group.next())
+
+  for index = 1, 5 do
+    bind(
+      "SUPER + ALT + code:" .. (index + 9),
+      "Switch to group window " .. index,
+      hl.dsp.group.active({ index = index }),
+      { display = "SUPER + ALT + " .. index }
+    )
+  end
+
+  bind("SUPER + mouse_down", "Scroll active workspace forward", hl.dsp.focus({ workspace = "e+1" }))
+  bind("SUPER + mouse_up", "Scroll active workspace backward", hl.dsp.focus({ workspace = "e-1" }))
+  bind("SUPER + ALT + mouse_down", "Next window in group", hl.dsp.group.next())
+  bind("SUPER + ALT + mouse_up", "Previous window in group", hl.dsp.group.prev())
+
+  bind("SUPER + mouse:272", "Move window", hl.dsp.window.drag(), { display = "SUPER + LEFT MOUSE BUTTON", mouse = true })
+  bind("SUPER + mouse:273", "Resize window", hl.dsp.window.resize(), { display = "SUPER + RIGHT MOUSE BUTTON", mouse = true })
+
+  bind("SUPER + SHIFT + E", "Exit Hyprland", hl.dsp.exit())
+end)
+
+if not ok then
+  hl.notification.create({ text = "hyprland.lua: " .. tostring(err), timeout = 15000 })
+end
+
+-- Written atomically: Hyprland re-runs this file on every config change, and
+-- the cheatsheet may be reading it while that happens.
+local path = os.getenv("HOME") .. "/.local/state/hypr-binds.tsv"
+local out = io.open(path .. ".tmp", "w")
+if out then
+  out:write(table.concat(binds, "\n"), "\n")
+  out:close()
+  os.rename(path .. ".tmp", path)
 end
