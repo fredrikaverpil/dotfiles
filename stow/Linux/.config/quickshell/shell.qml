@@ -67,9 +67,13 @@ ShellRoot {
   // is what flips Ghostty's theme live, and Neovim follows the terminal over
   // OSC 11. gtk-theme comes along so GTK apps switch too.
   property bool dark: true
+  // `dim` is chrome — borders, placeholder text — and is deliberately close to
+  // the background. `off` is for text that must stay readable while reading as
+  // inactive, so it sits between the two; `dim` on `bg` is around 1.5:1 in
+  // dark mode, which is invisible rather than subdued.
   readonly property var palette: dark
-    ? ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833" })
-    : ({ bg: "#F0EDEC", fg: "#2C363C", sel: "#CBD9E3", dim: "#CFC1BA" })
+    ? ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864" })
+    : ({ bg: "#F0EDEC", fg: "#2C363C", sel: "#CBD9E3", dim: "#CFC1BA", off: "#8F857D" })
 
   function setDark(on) {
     const scheme = on ? "prefer-dark" : "prefer-light"
@@ -145,43 +149,171 @@ ShellRoot {
     precision: SystemClock.Seconds
   }
 
-  // Reached from Hyprland with `qs ipc call launcher toggle`. The bar button
-  // calls launcher.toggle() directly — same process, no subprocess needed.
-  IpcHandler {
-    target: "launcher"
+  // Menu. Omarchy's omarchy-menu.jsonc shape, minus its machinery: dotted ids
+  // imply the hierarchy, so "style.theme.dark" is a child of "style.theme" and
+  // no nesting syntax is needed. Kind is inferred -- an entry with an action
+  // fires, one with children descends, one with a provider fills its level
+  // from somewhere else. Their Menu.qml and MenuModel.js are ~2000 lines of
+  // jsonc parsing, plugin manifests and provider indirection; this is ~25
+  // entries and does not need any of it.
+  //
+  // `enabled: false` lists a row that has nothing behind it yet: dim and
+  // inert, rather than absent, so the shape of what is still missing stays
+  // visible. Those rows are the ones to edit when the feature lands.
+  readonly property var menuItems: ({
+    "apps": { icon: "󰀻", label: "Apps", provider: "apps" },
+    "learn": { icon: "󰧑", label: "Learn" },
+    "learn.keybindings": { icon: "", label: "Keybindings", enabled: false },
+    "learn.hyprland": { icon: "", label: "Hyprland", enabled: false },
+    "learn.nixos": { icon: "", label: "NixOS", enabled: false },
+    "style": { icon: "", label: "Style" },
+    "style.background": { icon: "", label: "Background", action: () => picker.open() },
+    "style.theme": { icon: "", label: "Theme" },
+    "style.theme.dark": { icon: "", label: "Dark", action: () => root.setDark(true) },
+    "style.theme.light": { icon: "", label: "Light", action: () => root.setDark(false) },
+    "trigger": { icon: "󱓞", label: "Trigger" },
+    "trigger.screenshot": { icon: "", label: "Screenshot", action: () => root.run(
+      "mkdir -p ~/Pictures/screenshots && " +
+      "grim ~/Pictures/screenshots/screenshot-$(date +%Y%m%d-%H%M%S).png") },
+    "trigger.emoji": { icon: "", label: "Emoji", enabled: false },
+    "trigger.color": { icon: "󰃉", label: "Color picker", enabled: false },
+    "trigger.share": { icon: "", label: "Share", enabled: false },
+    "setup": { icon: "", label: "Setup" },
+    "setup.display": { icon: "󰍹", label: "Display", enabled: false },
+    "setup.nightlight": { icon: "󰆔", label: "Nightlight", enabled: false },
+    "system": { icon: "", label: "System" },
+    "system.lock": { icon: "", label: "Lock", enabled: false },
+    "system.suspend": { icon: "󰒲", label: "Suspend", action: () => root.run("systemctl suspend") },
+    "system.logout": { icon: "󰍃", label: "Logout", action: () => root.run("uwsm stop") },
+    "system.reboot": { icon: "󰜉", label: "Reboot", action: () => root.run("systemctl reboot") },
+    "system.shutdown": { icon: "󰐥", label: "Shutdown", action: () => root.run("systemctl poweroff") },
+  })
 
-    function toggle(): void { launcher.toggle() }
-    function open(): void { launcher.open() }
-    function close(): void { launcher.close() }
+  function run(cmd) { Quickshell.execDetached(["sh", "-c", cmd]) }
+
+  // Children are the ids one dot deeper than their parent; "root" is the ids
+  // with no dot at all.
+  function childrenOf(parent) {
+    const prefix = parent === "root" ? "" : parent + "."
+    const depth = parent === "root" ? 1 : parent.split(".").length + 1
+    return Object.keys(menuItems).filter(id =>
+      id.startsWith(prefix) && id.split(".").length === depth)
+  }
+
+  // Reached from Hyprland with `qs ipc call menu toggle`. The bar button calls
+  // menu.toggle() directly -- same process, no subprocess needed.
+  IpcHandler {
+    target: "menu"
+
+    function toggle(): void { menu.toggle() }
+    function open(): void { menu.open("root") }
+    function close(): void { menu.close() }
+    // Not `show`: `qs ipc show` is a CLI subcommand, so the argument parser
+    // eats the name before the call ever reaches this handler.
+    function level(id: string): void { menu.open(id) }
   }
 
   PanelWindow {
-    id: launcher
+    id: menu
 
     property bool shown: false
+    property string level: "root"
 
     // A binding, not a one-shot: the desktop-entry scan finishes a few seconds
-    // after startup, so a list built once at open() comes up empty.
-    property var results: DesktopEntries.applications.values.filter(entry =>
-      !entry.noDisplay && entry.name.toLowerCase().includes(input.text.toLowerCase()))
-      .sort((a, b) => a.name.localeCompare(b.name))
-    onResultsChanged: list.currentIndex = 0
+    // after startup, so an app list built once at open() comes up empty.
+    readonly property var rows: {
+      const item = root.menuItems[level]
+      const query = input.text.toLowerCase()
+      let out
 
-    function open() {
+      if (item && item.provider === "apps") {
+        out = DesktopEntries.applications.values
+          .filter(entry => !entry.noDisplay)
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map(entry => ({ label: entry.name, icon: "", enabled: true, entry: entry }))
+      } else {
+        out = root.childrenOf(level).map(id => {
+          const child = root.menuItems[id]
+          return {
+            id: id,
+            label: child.label,
+            icon: child.icon,
+            enabled: child.enabled !== false,
+            entry: null,
+            action: child.action || null,
+            submenu: child.provider !== undefined || root.childrenOf(id).length > 0,
+          }
+        })
+      }
+
+      return query.length > 0 ? out.filter(row => row.label.toLowerCase().indexOf(query) >= 0) : out
+    }
+
+    // Deferred: ListView resets currentIndex itself when the model changes,
+    // and does it after this handler runs.
+    onRowsChanged: Qt.callLater(selectFirstEnabled)
+
+    function selectFirstEnabled() {
+      const first = rows.findIndex(row => row.enabled)
+      list.currentIndex = first < 0 ? 0 : first
+    }
+
+    // A dim row is skipped rather than merely inert, so holding Down never
+    // parks the highlight on something Enter will ignore. Wraps, so the last
+    // row leads back to the first.
+    function move(steps) {
+      const count = rows.length
+      if (count === 0) return
+      const delta = steps > 0 ? 1 : -1
+      let index = list.currentIndex
+
+      for (let moved = 0; moved < Math.abs(steps); moved++) {
+        let candidate = index
+        for (let tried = 0; tried < count; tried++) {
+          candidate = (candidate + delta + count) % count
+          if (rows[candidate].enabled) break
+        }
+        index = candidate
+      }
+
+      list.currentIndex = index
+    }
+
+    readonly property string title: level === "root" ? "Go" : root.menuItems[level].label
+
+    function open(target) {
+      level = target
       input.text = ""
       shown = true
       input.forceActiveFocus()
+      Qt.callLater(selectFirstEnabled)
     }
 
     function close() { shown = false }
-    function toggle() { shown ? close() : open() }
+    function toggle() { shown ? close() : open("root") }
 
-    function launch() {
-      const entry = results[list.currentIndex]
-      close()
-      // uwsm-app puts the app in its own scope under app-graphical.slice, so it
-      // survives `systemctl --user restart quickshell` while iterating on QML.
-      if (entry) Quickshell.execDetached(["uwsm-app", "--", entry.id + ".desktop"])
+    // Escape and Left back out one level and only close at the root, so a
+    // wrong turn costs one key rather than reopening the menu.
+    function back() {
+      if (level === "root") close()
+      else open(level.indexOf(".") >= 0 ? level.split(".").slice(0, -1).join(".") : "root")
+    }
+
+    function activate() {
+      const row = rows[list.currentIndex]
+      if (!row || !row.enabled) return
+
+      if (row.entry) {
+        close()
+        // uwsm-app puts the app in its own scope under app-graphical.slice, so
+        // it survives `systemctl --user restart quickshell` while iterating.
+        Quickshell.execDetached(["uwsm-app", "--", row.entry.id + ".desktop"])
+      } else if (row.action) {
+        close()
+        row.action()
+      } else {
+        open(row.id)
+      }
     }
 
     visible: shown
@@ -193,7 +325,7 @@ ShellRoot {
 
     MouseArea {
       anchors.fill: parent
-      onClicked: launcher.close()
+      onClicked: menu.close()
     }
 
     Rectangle {
@@ -210,6 +342,13 @@ ShellRoot {
         anchors.margins: 12
         spacing: 8
 
+        Text {
+          color: root.palette.dim
+          font.family: "JetBrainsMono Nerd Font"
+          font.pixelSize: 13
+          text: menu.title
+        }
+
         TextInput {
           id: input
           width: parent.width
@@ -224,16 +363,18 @@ ShellRoot {
             visible: input.text.length === 0
             color: root.palette.dim
             font: input.font
-            text: "Search apps…"
+            text: "Search…"
           }
 
           Keys.onPressed: function (event) {
-            if (event.key === Qt.Key_Escape) launcher.close()
-            else if (event.key === Qt.Key_Down) list.incrementCurrentIndex()
-            else if (event.key === Qt.Key_Up) list.decrementCurrentIndex()
-            else if (event.key === Qt.Key_PageDown) list.currentIndex = Math.min(list.count - 1, list.currentIndex + 10)
-            else if (event.key === Qt.Key_PageUp) list.currentIndex = Math.max(0, list.currentIndex - 10)
-            else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) launcher.launch()
+            if (event.key === Qt.Key_Escape) menu.back()
+            else if (event.key === Qt.Key_Left && input.text.length === 0) menu.back()
+            else if (event.key === Qt.Key_Down) menu.move(1)
+            else if (event.key === Qt.Key_Up) menu.move(-1)
+            else if (event.key === Qt.Key_PageDown) menu.move(10)
+            else if (event.key === Qt.Key_PageUp) menu.move(-10)
+            else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) menu.activate()
+            else if (event.key === Qt.Key_Right && input.text.length === 0) menu.activate()
             else return
             event.accepted = true
           }
@@ -250,7 +391,7 @@ ShellRoot {
           width: parent.width
           height: parent.height - y
           clip: true
-          model: launcher.results
+          model: menu.rows
 
           delegate: Rectangle {
             required property var modelData
@@ -261,21 +402,34 @@ ShellRoot {
             color: index === list.currentIndex ? root.palette.sel : "transparent"
             radius: 4
 
-            Text {
+            Row {
               anchors.verticalCenter: parent.verticalCenter
               anchors.left: parent.left
               anchors.leftMargin: 8
-              color: root.palette.fg
-              font.family: "JetBrainsMono Nerd Font"
-              font.pixelSize: 15
-              text: modelData.name
+              spacing: 10
+
+              Text {
+                width: 20
+                color: modelData.enabled ? root.palette.fg : root.palette.off
+                font.family: "JetBrainsMono Nerd Font"
+                font.pixelSize: 15
+                text: modelData.icon
+              }
+
+              Text {
+                color: modelData.enabled ? root.palette.fg : root.palette.off
+                font.family: "JetBrainsMono Nerd Font"
+                font.pixelSize: 15
+                text: modelData.label + (modelData.submenu ? " ›" : "")
+              }
             }
 
             MouseArea {
               anchors.fill: parent
               onClicked: {
+                if (!modelData.enabled) return
                 list.currentIndex = index
-                launcher.launch()
+                menu.activate()
               }
             }
           }
@@ -439,25 +593,12 @@ ShellRoot {
       implicitHeight: 32
       color: root.palette.bg
 
-      Row {
+      BarButton {
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.leftMargin: 4
-        spacing: 4
-
-        Repeater {
-          model: [
-            { label: "Apps", action: () => launcher.toggle() },
-            { label: "Wall", action: () => picker.toggle() },
-          ]
-
-          BarButton {
-            required property var modelData
-
-            label: modelData.label
-            onActivated: modelData.action()
-          }
-        }
+        label: "󰣇"
+        onActivated: menu.toggle()
       }
 
       Text {
