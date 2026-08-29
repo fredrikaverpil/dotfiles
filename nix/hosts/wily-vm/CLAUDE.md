@@ -115,6 +115,26 @@ instead. This is also why Quickshell is a systemd user service — it can be
 restarted on its own (`systemctl --user restart quickshell`) while iterating on
 QML, without touching the compositor.
 
+## What a rebuild does and does not restart
+
+`nixos-rebuild switch` leaves the running session alone, which is mostly what
+you want and occasionally the trap:
+
+- **`hyprland.lua`** — nothing to do. It is stowed and Hyprland auto-reloads it.
+- **The Quickshell unit** — user units are *reloaded*, not restarted: a switch
+  writes the new `quickshell.service` but the running process keeps the old
+  environment. Changing `QT_PLUGIN_PATH` or anything else on that unit needs an
+  explicit `systemctl --user restart quickshell`.
+- **The compositor** — keeps running its old binary out of the store, which
+  stays alive because the old generation is still referenced. A rebuild that
+  bumps the hyprland package therefore does nothing until logout or reboot, and
+  in the meantime the new `hyprctl` is talking to an older compositor. Compare
+  `pgrep -af "bin/Hyprland"` against
+  `readlink -f /run/current-system/sw/bin/Hyprland` to see whether they have
+  drifted apart. (Not yet exercised here — no package bump has landed.)
+- **greetd / the session itself** — reboot; see the uwsm section above for why
+  restarting it is not an option.
+
 ## VM graphics facts
 
 virtio-gpu, `+virgl` (GLES works, Hyprland renders), `-context_init` (no
