@@ -11,10 +11,10 @@
   ],
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-5.5",
-  "lastChangelogVersion": "0.79.9",
+  "lastChangelogVersion": "0.84.2",
   "packages": [
     "npm:pi-system-theme"
   ],
-  "theme": "dark",
+  "theme": "light",
   "defaultThinkingLevel": "xhigh"
 }
