@@ -6,6 +6,8 @@
   ...
 }:
 {
+  imports = [ ./desktop.nix ];
+
   # Install-time compatibility marker, not the nixpkgs channel — see flake.nix
   # for the channel (this host tracks nixpkgs-unstable via mkNixos).
   system.stateVersion = "26.05";
