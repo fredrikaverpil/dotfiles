@@ -5,6 +5,15 @@ lands on the real machine (ThinkPad T14 G6, Core Ultra 7 258V / Lunar Lake,
 x86_64). Keep the config portable — nothing VM-specific outside the notes
 below.
 
+This file is worked on as the setup grows — update it in the same commit as
+the change it describes. Worth writing down: a fact that cost time to
+establish (an API shape, a hardware limit, why a mechanism was chosen over the
+obvious one), and anything that will bite the next person the same way. Not
+worth writing down: what the code already says.
+
+**Delete entries as they stop being true.** A stale line here is worse than a
+missing one, because it gets believed and acted on.
+
 ## Reaching it
 
 - `ssh fredrik@192.168.64.15` (key auth; password auth also on)
