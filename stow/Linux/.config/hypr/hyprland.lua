@@ -79,6 +79,13 @@ local ok, err = pcall(function()
   bind("SUPER + K", "Keybindings", hl.dsp.exec_cmd("qs ipc call menu level learn.keybindings"))
   bind("SUPER + CTRL + SPACE", "Background switcher", hl.dsp.exec_cmd("qs ipc call wallpaper toggle"))
   bind("SUPER + SHIFT + CTRL + SPACE", "Theme menu", hl.dsp.exec_cmd("qs ipc call menu level style.theme"))
+  bind("SUPER + comma", "Dismiss latest notification", hl.dsp.exec_cmd("qs ipc call notifications dismissOne"))
+  bind("SUPER + SHIFT + comma", "Dismiss all notifications", hl.dsp.exec_cmd("qs ipc call notifications dismissAll"))
+  bind("SUPER + CTRL + comma", "Toggle Do Not Disturb", hl.dsp.exec_cmd("qs ipc call notifications toggleDnd"))
+  bind("SUPER + ALT + comma", "Invoke latest notification", hl.dsp.exec_cmd("qs ipc call notifications invokeLast"))
+  bind("SUPER + SHIFT + ALT + comma", "Open notification history", hl.dsp.exec_cmd("qs ipc call notifications showHistory"))
+  bind("SUPER + CTRL + I", "Toggle idle locking", hl.dsp.exec_cmd("qs ipc call idle toggle"))
+  bind("SUPER + CTRL + L", "Lock system", hl.dsp.exec_cmd("qs ipc call lock lock"))
 
   -- Windows
   bind("SUPER + W", "Close window", hl.dsp.window.close())

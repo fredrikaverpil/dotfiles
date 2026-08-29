@@ -3,6 +3,11 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 
+import "plugins/lock" as Lock
+import "plugins/notifications" as Notifications
+import "plugins/polkit" as Polkit
+import "plugins/services/idle" as Idle
+
 ShellRoot {
   id: root
 
@@ -115,6 +120,29 @@ ShellRoot {
     }
   }
 
+  // These use Omarchy-compatible plugin paths while remaining independent of
+  // its plugin loader and shared QML framework. Keeping the paths aligned
+  // makes it practical to compare later fixes and features upstream.
+  Notifications.Service {
+    id: notifications
+    shell: root
+  }
+
+  Lock.Service {
+    id: lock
+    shell: root
+  }
+
+  Idle.Service {
+    id: idle
+    lockService: lock
+  }
+
+  Polkit.PolkitAgent {
+    id: polkit
+    shell: root
+  }
+
   // Bar chrome, so every button hovers and reads the same.
   component BarButton: Rectangle {
     id: btn
@@ -182,7 +210,11 @@ ShellRoot {
     "setup.display": { icon: "󰍹", label: "Display", enabled: false },
     "setup.nightlight": { icon: "󰆔", label: "Nightlight", enabled: false },
     "system": { icon: "", label: "System" },
-    "system.lock": { icon: "", label: "Lock", enabled: false },
+    "system.notifications": { icon: "󰂚", label: "Notifications" },
+    "system.notifications.history": { icon: "󰎟", label: "History", action: () => notifications.showHistory() },
+    "system.notifications.dnd": { icon: "󰂛", label: "Toggle Do Not Disturb", action: () => notifications.setDoNotDisturb(!notifications.doNotDisturb) },
+    "system.lock": { icon: "", label: "Lock", action: () => lock.beginLock() },
+    "system.idle": { icon: "󰅶", label: "Toggle idle locking", action: () => idle.setEnabled(!idle.enabled) },
     "system.suspend": { icon: "󰒲", label: "Suspend", action: () => root.run("systemctl suspend") },
     "system.logout": { icon: "󰍃", label: "Logout", action: () => root.run("uwsm stop") },
     "system.reboot": { icon: "󰜉", label: "Reboot", action: () => root.run("systemctl reboot") },
@@ -654,11 +686,20 @@ ShellRoot {
       }
 
       BarButton {
+        id: themeButton
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
         label: root.dark ? "\uf186" : "\uf522"
         onActivated: root.setDark(!root.dark)
+      }
+
+      BarButton {
+        anchors.right: themeButton.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: 4
+        label: notifications.doNotDisturb ? "󰂛" : "󰂚"
+        onActivated: notifications.showHistory()
       }
     }
   }
