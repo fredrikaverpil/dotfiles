@@ -44,9 +44,14 @@ ssh fredrik@192.168.64.15 "export XDG_RUNTIME_DIR=/run/user/1000 WAYLAND_DISPLAY
 … 'grim /tmp/shot.png'; scp fredrik@192.168.64.15:/tmp/shot.png .
 ```
 
-Looking at the screenshot is not optional — the on-screen error overlays
-(Hyprland's config errors, Ghostty's dialog) never reach any log this side of
-the SSH connection.
+For Hyprland's red config-error overlay, run `hyprctl configerrors` first — it
+prints the current messages and is empty when the config is clean. The
+compositor's per-instance log is
+`$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/hyprland.log` (also
+available through `hyprctl rollinglog`), but neither it nor the journal gets
+that overlay's message. A screenshot is still required for an app's own dialog
+(such as Ghostty's) and to verify visual work, but not as the first diagnostic
+for a Hyprland config failure.
 
 **The shell can be driven end to end without a keyboard**, which is the only
 way to test it from a Mac (see the SUPER-binds section below). `qs ipc` opens
