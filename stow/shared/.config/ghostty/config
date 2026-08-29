@@ -34,7 +34,10 @@ background-blur-radius = 40
 
 # ghostty +list-themes
 # theme = dark:/Users/fredrik/.local/share/nvim-fredrik/lazy/tokyonight.nvim/extras/ghostty/tokyonight_moon,light:/Users/fredrik/.local/share/nvim-fredrik/lazy/nightfox.nvim/extra/dayfox/dayfox.ghostty
-theme = dark:/Users/fredrik/.local/share/nvim-fredrik/site/pack/core/opt/zenbones.nvim/extras/ghostty/zenbones_dark,light:/Users/fredrik/.local/share/nvim-fredrik/site/pack/core/opt/zenbones.nvim/extras/ghostty/zenbones_light
+# Vendored under themes/ rather than referenced inside the zenbones.nvim
+# checkout: ghostty resolves bare names from the config dir, but does not
+# expand ~ in a path, so an absolute path would pin this to one machine.
+theme = dark:zenbones_dark,light:zenbones_light
 
 # NOTE: workaround for https://github.com/ghostty-org/ghostty/discussions/12708
 cursor-color = cell-foreground
