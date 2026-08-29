@@ -72,6 +72,13 @@ Gotchas found the hard way:
   concluding a function is broken.
 - **`hyprctl dispatch` takes Lua now**: `hyprctl dispatch 'hl.dsp.exec_cmd("ghostty")'`.
 - Bind workspace keys as `code:10`..`code:19` so they survive a layout change.
+- **Emergency mode** appears as a red banner when no binds register at all
+  (bad config, or the file went missing). It provides SUPER+Q → a terminal,
+  SUPER+R → hyprland-run, SUPER+M → exit. Recover with `hyprctl reload` once
+  the config is valid again.
+- Hyprland auto-reloads on config change, so anything that momentarily removes
+  `hyprland.lua` — `git clean -fd` on the VM clone, for instance — trips
+  emergency mode even if the file reappears a second later.
 
 ## uwsm: never restart greetd, reboot
 
