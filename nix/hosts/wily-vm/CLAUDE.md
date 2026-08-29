@@ -11,14 +11,8 @@ below.
 - Rebuild: `sudo nixos-rebuild switch --flake ~/.dotfiles#wily-vm`. Running
   this on **wily-vm only** is pre-authorized; every other host stays
   ask-first.
-- `~/.dotfiles` on the VM is a clone of the GitHub repo. To test uncommitted
-  work from a laptop:
-  `rsync -a --delete --exclude .git --exclude result ~/.dotfiles/ fredrik@192.168.64.15:~/.dotfiles/`
-  (**`--delete`** matters: without it, files deleted locally linger on the VM
-  and keep getting stowed)
-  then `git add -AN .` on the VM — **flakes ignore untracked files**, so a new
-  file that is not at least intent-to-added fails evaluation with "Path ... is
-  not tracked by Git".
+- `~/.dotfiles` on the VM is a clone of the GitHub repo; see the next section
+  for pushing uncommitted work to it.
 
 ## Driving it over SSH
 
@@ -27,7 +21,9 @@ Three things get used constantly. `HYPRLAND_INSTANCE_SIGNATURE` must be the
 
 ```sh
 # push uncommitted work from the laptop (--delete matters: without it, files
-# deleted locally linger on the VM and keep getting stowed)
+# deleted locally linger on the VM and keep getting stowed). The git add -AN is
+# not optional: flakes ignore untracked files, and a new file that is not at
+# least intent-to-added fails evaluation with "Path ... is not tracked by Git".
 rsync -a --delete --exclude .git --exclude result ~/.dotfiles/ fredrik@192.168.64.15:~/.dotfiles/
 ssh fredrik@192.168.64.15 'cd ~/.dotfiles && git add -AN .'   # flakes ignore untracked files
 
@@ -171,8 +167,6 @@ set up a theme system now or hardcode colours and lift theming later.
 
 ## Known, not yet done
 
-- Hyprland warns the `.conf` config format is removed in 0.57. Currently on
-  0.56.2. Needs a migration before that bump.
 - Keyboard layout is `us`. Swedish is wanted eventually as a second layout,
   but not yet — `kb_layout = "us,se"` with a `grp:` toggle in `kb_options`
   when the time comes.
