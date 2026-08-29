@@ -172,6 +172,23 @@ would kill them all on `systemctl --user restart quickshell`.
 starts, so the app list must be a QML binding. Building it once when the
 launcher opens gives an empty list on the first open after a restart.
 
+## Wallpapers
+
+Images live in `~/Pictures/wallpapers` — deliberately outside the repo, so no
+binaries get committed. The shell scans it recursively (`find`,
+png/jpg/jpeg/webp), so subfolders are for tidiness only, not meaning. The pick
+is **per mode**: `~/.local/state/wallpaper-dark` and `-light`, each a plain
+path, so flipping light/dark also swaps the picture and each side remembers its
+own. A mode with no pick yet shows the gradient. `SUPER + W` (or the bar's
+Wall button) opens the picker; `qs ipc call wallpaper` also takes
+`open/close/toggle`, `set <path>`, and `rescan` after adding files.
+
+webp works, but only because `desktop.nix` sets `QT_PLUGIN_PATH` to
+`qt6.qtimageformats` on the Quickshell unit — the package ships no webp
+decoder, and without it a webp wallpaper silently falls back to the gradient.
+The wrapper prefixes its own plugin paths, so setting the variable does not
+displace them.
+
 ## Light and dark
 
 One key drives everything: `/org/gnome/desktop/interface/color-scheme` in
@@ -204,24 +221,32 @@ The plumbing is in place — portals (`xdg-desktop-portal` + `-hyprland` +
 missing is the shell itself, which is exactly what Quattro moved into
 Quickshell.
 
-1. **Wallpaper.** The desktop is black.
-2. **Keybinding cheatsheet.** Nearly free now that IPC exists — read
+1. **Keybinding cheatsheet.** Nearly free now that IPC exists — read
    `hyprctl binds -j`, which already carries the `description` fields set in
    `hyprland.lua`.
-3. Notifications, then lock/idle, then a polkit agent.
+2. Notifications, then lock/idle, then a polkit agent.
+3. **A display panel**, ported from Omarchy's
+   `shell/plugins/panels/monitor/` (resolution, scaling, text size). Light/dark
+   and nightlight belong in there rather than as their own bar buttons — so
+   the  /  button is a placeholder, not a design.
+4. **Nightlight**, the equivalent of macOS Night Shift: `hyprsunset` shifts
+   colour temperature, and Omarchy drives it with a toggle plus a restart
+   script. Wants a schedule; composes with light/dark rather than replacing
+   it.
 
-The launcher is apps-only with hardcoded colours. Quattro's menu tree (power,
-screenshots, settings, themes) and a theme system are both still open;
-Quattro binds the apps-only view to `SUPER + ALT + SPACE`, so keep that free
-for when a root menu takes over `SUPER + SPACE`.
+The Apps and Wall buttons are scaffolding — they exist because the keybinds are
+awkward to press from a Mac driving the VM. The goal is one Omarchy-style root
+menu (power, screenshots, settings, themes) over `SUPER + SPACE`, with the
+apps-only view moving to `SUPER + ALT + SPACE` as Quattro has it, not a row of
+buttons on the bar.
 
 ## Known, not yet done
 
 - Keyboard layout is `us`. Swedish is wanted eventually as a second layout,
   but not yet — `kb_layout = "us,se"` with a `grp:` toggle in `kb_options`
   when the time comes.
-- No wallpaper, notifications, lock, OSD or polkit agent yet — no polkit agent
-  is running at all, so any privileged GUI action will fail.
+- No notifications, lock, OSD or polkit agent yet — no polkit agent is running
+  at all, so any privileged GUI action will fail.
 - The bar uses JetBrains Mono Nerd Font (`nix/shared/system/linux.nix` installs
   several nerd fonts). Berkeley Mono is wanted as the system font eventually,
   but it is a paid font and needs vendoring before Nix can install it.
