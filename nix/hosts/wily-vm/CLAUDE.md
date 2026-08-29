@@ -13,7 +13,9 @@ below.
   ask-first.
 - `~/.dotfiles` on the VM is a clone of the GitHub repo. To test uncommitted
   work from a laptop:
-  `rsync -a --exclude .git --exclude result ~/.dotfiles/ fredrik@192.168.64.15:~/.dotfiles/`
+  `rsync -a --delete --exclude .git --exclude result ~/.dotfiles/ fredrik@192.168.64.15:~/.dotfiles/`
+  (**`--delete`** matters: without it, files deleted locally linger on the VM
+  and keep getting stowed)
   then `git add -AN .` on the VM — **flakes ignore untracked files**, so a new
   file that is not at least intent-to-added fails evaluation with "Path ... is
   not tracked by Git".
@@ -34,13 +36,51 @@ The same env prefix is what `hyprctl` needs.
 ## Split of responsibilities
 
 - **Nix** (`desktop.nix`) declares packages and the session: `programs.hyprland`
-  plus greetd autologin. greetd runs `start-hyprland`, not `Hyprland` — the
-  bare binary boots but prints a "started without start-hyprland" warning.
-  greetd also refuses to start unless `default_session` is set, even when only
-  `initial_session` is wanted.
+  with `withUWSM`, greetd autologin, and Quickshell as a systemd **user**
+  service bound to `graphical-session.target`. greetd refuses to start unless
+  `default_session` is set, even when only `initial_session` is wanted.
 - **stow** (`stow/Linux/.config/{hypr,quickshell}/`) carries the config and
   QML. Deliberate: the Quickshell tree gets edited constantly and stow
   symlinks take effect with no rebuild. Do not move QML into the Nix store.
+
+## Hyprland config is Lua, not .conf
+
+hyprlang (`hyprland.conf`) is deprecated since 0.55 and removed in 0.57. The
+config is `~/.config/hypr/hyprland.lua`; Omarchy Quattro is Lua-only too, so
+snippets port straight across. The `hl` API, dumped live from 0.56.2:
+
+- `hl.config{ general=…, decoration=…, input=…, misc=…, … }`
+- `hl.monitor{ output="", mode="preferred", position="auto", scale=1 }`
+- `hl.bind(keys, dispatcher, { description = … })`, `hl.unbind`
+- `hl.dsp.*`: `exec_cmd exec_raw exit focus group layout workspace window
+  cursor dpms submap send_key_state send_shortcut global pass no_op event
+  force_idle force_renderer_reload release_input_capture`
+- `hl.dsp.window.*`: `close move float fullscreen fullscreen_state resize
+  center pin tag swap kill drag pseudo bring_to_top alter_zorder cycle_next
+  set_prop signal toggle_swallow clear_tags deny_from_group`
+- also `hl.exec_cmd hl.dispatch hl.on hl.timer hl.env hl.gesture
+  hl.window_rule hl.layer_rule hl.workspace_rule hl.notification hl.get_*`
+
+Gotchas found the hard way:
+
+- **Switching workspace is `hl.dsp.focus{ workspace = "1" }`.**
+  `hl.dsp.workspace` is a *table* (`.move`, `.toggle_special`), so calling it
+  raises "attempt to call a table value".
+- **A Lua error aborts the rest of the file silently.** Everything below the
+  failing line simply never registers, which looks exactly like "that API does
+  nothing". Check `hyprctl binds` and the on-screen error overlay before
+  concluding a function is broken.
+- **`hyprctl dispatch` takes Lua now**: `hyprctl dispatch 'hl.dsp.exec_cmd("ghostty")'`.
+- Bind workspace keys as `code:10`..`code:19` so they survive a layout change.
+
+## uwsm: never restart greetd, reboot
+
+`systemctl restart greetd` races the old session's user-unit teardown; the new
+uwsm start then dies with *"A compositor or graphical-session* target is
+already active"* and you get a black screen with greetd stopped. Reboot
+instead. This is also why Quickshell is a systemd user service — it can be
+restarted on its own (`systemctl --user restart quickshell`) while iterating on
+QML, without touching the compositor.
 
 ## VM graphics facts
 
@@ -78,6 +118,13 @@ generation, so first-boot bootstrap works.
 
 - Hyprland warns the `.conf` config format is removed in 0.57. Currently on
   0.56.2. Needs a migration before that bump.
-- Keyboard layout is left at default (us). Unset deliberately — confirm before
-  adding `input { kb_layout }`.
+- Keyboard layout is `us`. Swedish is wanted eventually as a second layout,
+  but not yet — `kb_layout = "us,se"` with a `grp:` toggle in `kb_options`
+  when the time comes.
+- Ghostty shows a "Configuration Errors" dialog on the VM: the shared config
+  (`stow/shared/.config/ghostty/config`) sets `theme =` to zenbones theme files
+  under `~/.local/share/nvim-fredrik/site/...`, which only exist where the
+  Neovim plugins are installed. Fix is to vendor those two theme files into the
+  repo — not done, it touches the macOS setup too.
 - No wallpaper, launcher, notifications, lock, OSD or polkit agent yet.
+- Root filesystem is at 63%; consider `nix.gc` before it matters.
