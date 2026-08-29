@@ -28,6 +28,7 @@ ShellRoot {
     // after startup, so a list built once at open() comes up empty.
     property var results: DesktopEntries.applications.values.filter(entry =>
       !entry.noDisplay && entry.name.toLowerCase().includes(input.text.toLowerCase()))
+      .sort((a, b) => a.name.localeCompare(b.name))
     onResultsChanged: list.currentIndex = 0
 
     function open() {

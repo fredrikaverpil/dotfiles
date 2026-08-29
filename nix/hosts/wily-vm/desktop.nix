@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 let
   # VM-only. UTM's virgl runs on ANGLE over Metal, which exposes desktop
   # OpenGL 2.1 (GLES tops out at 3.0). Ghostty is GTK4 and sets
@@ -49,9 +49,11 @@ in
     partOf = [ "graphical-session.target" ];
     after = [ "graphical-session.target" ];
     wantedBy = [ "graphical-session.target" ];
-    # A user unit gets systemd's bare PATH, so the launcher cannot find
-    # uwsm-app to start apps with.
-    path = [ pkgs.uwsm ];
+    # NixOS pins a sparse PATH on every user unit. Unsetting it is the only way
+    # to let the unit inherit the session PATH uwsm imports into the user
+    # manager, which is what the launcher needs: uwsm-app to spawn apps with,
+    # and then every app's own Exec, which is a bare command name.
+    environment.PATH = lib.mkForce null;
     serviceConfig = {
       ExecStart = "${pkgs.quickshell}/bin/quickshell";
       Restart = "on-failure";

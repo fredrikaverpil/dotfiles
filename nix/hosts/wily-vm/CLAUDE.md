@@ -57,11 +57,14 @@ mode. `rm` the specific files instead.
 - **Nix** (`desktop.nix`) declares packages and the session: `programs.hyprland`
   with `withUWSM`, greetd autologin, and Quickshell as a systemd **user**
   service bound to `graphical-session.target`. greetd refuses to start unless
-  `default_session` is set, even when only `initial_session` is wanted. A user
-  unit inherits systemd's bare PATH, not the session's, so anything the shell
-  spawns by name needs its package in the unit's `path` — that is why
-  `pkgs.uwsm` is listed there. `Quickshell.execDetached` fails silently when
-  the binary is missing, so this looks like a QML bug.
+  `default_session` is set, even when only `initial_session` is wanted.
+  `environment.PATH = lib.mkForce null` on that unit is what makes the launcher
+  able to start anything: NixOS otherwise pins a sparse PATH on user units, and
+  unsetting it is the only way to inherit the session PATH uwsm imports into
+  the user manager. Both hops need it — finding `uwsm-app`, and then the bare
+  command name in each app's `Exec`. Nothing reports the failure:
+  `Quickshell.execDetached` is silent, and `systemd-run` inherits the same
+  broken PATH, so a launch just does nothing.
 - **stow** (`stow/Linux/.config/{hypr,quickshell}/`) carries the config and
   QML. Deliberate: the Quickshell tree gets edited constantly and stow
   symlinks take effect with no rebuild. Do not move QML into the Nix store.
