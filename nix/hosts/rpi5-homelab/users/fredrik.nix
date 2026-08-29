@@ -17,6 +17,7 @@ in
 
   packageTools.npmPackages = [ ];
   packageTools.uvTools = [ ];
+  packageTools.llmAgents = [ ];
 
   home.packages = with pkgs; [ ];
 
