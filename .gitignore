@@ -1,4 +1,9 @@
 Brewfile.lock.json
+
+# nixos-rebuild/nix build output symlink (also a GC root)
+result
+result-*
+
 automatic_backups
 .env
 .nvim.lua
