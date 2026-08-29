@@ -70,6 +70,7 @@ local ok, err = pcall(function()
   bind("SUPER + SPACE", "Menu", hl.dsp.exec_cmd("qs ipc call menu toggle"))
   bind("SUPER + ALT + SPACE", "Apps menu", hl.dsp.exec_cmd("qs ipc call menu level apps"))
   bind("SUPER + ESCAPE", "System menu", hl.dsp.exec_cmd("qs ipc call menu level system"))
+  bind("SUPER + K", "Keybindings", hl.dsp.exec_cmd("qs ipc call menu level learn.keybindings"))
   bind("SUPER + CTRL + SPACE", "Background switcher", hl.dsp.exec_cmd("qs ipc call wallpaper toggle"))
   bind("SUPER + SHIFT + CTRL + SPACE", "Theme menu", hl.dsp.exec_cmd("qs ipc call menu level style.theme"))
 

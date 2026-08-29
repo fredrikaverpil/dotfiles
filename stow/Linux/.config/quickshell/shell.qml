@@ -163,7 +163,7 @@ ShellRoot {
   readonly property var menuItems: ({
     "apps": { icon: "󰀻", label: "Apps", provider: "apps" },
     "learn": { icon: "󰧑", label: "Learn" },
-    "learn.keybindings": { icon: "", label: "Keybindings", enabled: false },
+    "learn.keybindings": { icon: "", label: "Keybindings", provider: "binds" },
     "learn.hyprland": { icon: "", label: "Hyprland", enabled: false },
     "learn.nixos": { icon: "", label: "NixOS", enabled: false },
     "style": { icon: "", label: "Style" },
@@ -190,6 +190,25 @@ ShellRoot {
   })
 
   function run(cmd) { Quickshell.execDetached(["sh", "-c", cmd]) }
+
+  // Keybindings. hyprland.lua writes this as it registers each bind, because
+  // `hyprctl binds` cannot name a code: chord -- see that file. Watched, so a
+  // config reload refreshes the sheet without restarting the shell.
+  property var binds: []
+
+  FileView {
+    id: bindsFile
+    path: Quickshell.env("HOME") + "/.local/state/hypr-binds.tsv"
+    watchChanges: true
+    printErrors: false
+    onFileChanged: reload()
+    onLoaded: root.binds = text().trim().split("\n")
+      .filter(line => line.length > 0)
+      .map(line => {
+        const columns = line.split("\t")
+        return { chord: columns[0], label: columns[1] || "", enabled: true }
+      })
+  }
 
   // Children are the ids one dot deeper than their parent; "root" is the ids
   // with no dot at all.
@@ -226,7 +245,9 @@ ShellRoot {
       const query = input.text.toLowerCase()
       let out
 
-      if (item && item.provider === "apps") {
+      if (item && item.provider === "binds") {
+        out = root.binds
+      } else if (item && item.provider === "apps") {
         out = DesktopEntries.applications.values
           .filter(entry => !entry.noDisplay)
           .sort((a, b) => a.name.localeCompare(b.name))
@@ -246,7 +267,13 @@ ShellRoot {
         })
       }
 
-      return query.length > 0 ? out.filter(row => row.label.toLowerCase().indexOf(query) >= 0) : out
+      if (query.length === 0) return out
+
+      // Chord as well as label, so "super" and "workspace" both narrow the
+      // keybinding sheet.
+      return out.filter(row =>
+        row.label.toLowerCase().indexOf(query) >= 0
+        || (row.chord !== undefined && row.chord.toLowerCase().indexOf(query) >= 0))
     }
 
     // Deferred: ListView resets currentIndex itself when the model changes,
@@ -281,6 +308,10 @@ ShellRoot {
 
     readonly property string title: level === "root" ? "Go" : root.menuItems[level].label
 
+    // The keybinding sheet needs a bigger window: its longest chord is 28
+    // characters before the description even starts, and it is ~100 rows.
+    readonly property bool wide: level !== "root" && root.menuItems[level].provider === "binds"
+
     function open(target) {
       level = target
       input.text = ""
@@ -311,7 +342,7 @@ ShellRoot {
       } else if (row.action) {
         close()
         row.action()
-      } else {
+      } else if (row.id) {
         open(row.id)
       }
     }
@@ -330,8 +361,8 @@ ShellRoot {
 
     Rectangle {
       anchors.centerIn: parent
-      width: 600
-      height: 420
+      width: menu.wide ? 900 : 600
+      height: menu.wide ? 640 : 420
       radius: 8
       color: root.palette.bg
       border.color: root.palette.dim
@@ -410,10 +441,22 @@ ShellRoot {
 
               Text {
                 width: 20
+                visible: modelData.chord === undefined
                 color: modelData.enabled ? root.palette.fg : root.palette.off
                 font.family: "JetBrainsMono Nerd Font"
                 font.pixelSize: 15
-                text: modelData.icon
+                text: modelData.icon || ""
+              }
+
+              // Monospace, so a fixed width lines every chord up in a column
+              // the eye can read straight down.
+              Text {
+                width: 290
+                visible: modelData.chord !== undefined
+                color: root.palette.off
+                font.family: "JetBrainsMono Nerd Font"
+                font.pixelSize: 15
+                text: modelData.chord || ""
               }
 
               Text {
@@ -421,6 +464,7 @@ ShellRoot {
                 font.family: "JetBrainsMono Nerd Font"
                 font.pixelSize: 15
                 text: modelData.label + (modelData.submenu ? " ›" : "")
+                elide: Text.ElideRight
               }
             }
 
