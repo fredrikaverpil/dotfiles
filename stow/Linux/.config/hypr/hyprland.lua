@@ -1,7 +1,3 @@
--- Hyprland's Lua config. hyprlang (.conf) is deprecated since 0.55 and is
--- removed in 0.57; Omarchy Quattro is Lua-only too, so ports come across
--- directly.
-
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1 })
 
 hl.config({
@@ -37,6 +33,7 @@ hl.config({
 })
 
 hl.bind("SUPER + RETURN", hl.dsp.exec_cmd("ghostty"), { description = "Terminal" })
+hl.bind("SUPER + SPACE", hl.dsp.exec_cmd("qs ipc call launcher toggle"), { description = "App launcher" })
 hl.bind("SUPER + Q", hl.dsp.window.close(), { description = "Close window" })
 hl.bind("SUPER + V", hl.dsp.window.float(), { description = "Toggle floating" })
 hl.bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "fullscreen" }), { description = "Full screen" })

@@ -57,7 +57,11 @@ mode. `rm` the specific files instead.
 - **Nix** (`desktop.nix`) declares packages and the session: `programs.hyprland`
   with `withUWSM`, greetd autologin, and Quickshell as a systemd **user**
   service bound to `graphical-session.target`. greetd refuses to start unless
-  `default_session` is set, even when only `initial_session` is wanted.
+  `default_session` is set, even when only `initial_session` is wanted. A user
+  unit inherits systemd's bare PATH, not the session's, so anything the shell
+  spawns by name needs its package in the unit's `path` — that is why
+  `pkgs.uwsm` is listed there. `Quickshell.execDetached` fails silently when
+  the binary is missing, so this looks like a QML bug.
 - **stow** (`stow/Linux/.config/{hypr,quickshell}/`) carries the config and
   QML. Deliberate: the Quickshell tree gets edited constantly and stow
   symlinks take effect with no rebuild. Do not move QML into the Nix store.
@@ -149,6 +153,22 @@ already-stowed file is unaffected (it is a symlink), but a **new** file under
 a reboot, or a manual `stow` run. Not a bug — a fresh machine always has a new
 generation, so first-boot bootstrap works.
 
+## Reaching Quickshell from a keybind
+
+`qs ipc call launcher toggle` — the launcher's `IpcHandler { target = "launcher" }`
+in `shell.qml`. No config selection is needed: `~/.config/quickshell/shell.qml`
+registers as the `default` config and `qs ipc` picks the instance on the
+current display. Every future panel reuses this; the bar button instead calls
+`launcher.toggle()` directly, being the same process.
+
+Apps start with `uwsm-app -- <id>.desktop`, which puts each app in its own
+scope under `app-graphical.slice`. Launching them as children of the shell
+would kill them all on `systemctl --user restart quickshell`.
+
+`DesktopEntries.applications` fills in a few seconds **after** the shell
+starts, so the app list must be a QML binding. Building it once when the
+launcher opens gives an empty list on the first open after a restart.
+
 ## Next steps
 
 The plumbing is in place — portals (`xdg-desktop-portal` + `-hyprland` +
@@ -156,23 +176,16 @@ The plumbing is in place — portals (`xdg-desktop-portal` + `-hyprland` +
 missing is the shell itself, which is exactly what Quattro moved into
 Quickshell.
 
-1. **Wallpaper.** The desktop is black. Small; do it alongside the next item.
-2. **IPC + an app launcher on `SUPER+SPACE`.** Do this before any other
-   widget: it forces the mechanism everything else reuses — how a Hyprland
-   bind reaches the already-running Quickshell process. Quattro does it with
-   `omarchy-shell shell toggle <component>` calling into Quickshell's
-   `IpcHandler`; use `DesktopEntries` for the app list. Write ~100 lines first
-   to establish IPC and window mechanics, *then* port Quattro's behaviour onto
-   it — their launcher is deep and coupled to the `omarchy-*` bash CLI, so
-   prune before importing rather than after.
-3. **Keybinding cheatsheet.** Nearly free once IPC exists — read
+1. **Wallpaper.** The desktop is black.
+2. **Keybinding cheatsheet.** Nearly free now that IPC exists — read
    `hyprctl binds -j`, which already carries the `description` fields set in
    `hyprland.lua`.
-4. Notifications, then lock/idle, then a polkit agent.
+3. Notifications, then lock/idle, then a polkit agent.
 
-Undecided, worth asking before building: whether the launcher is apps-only or
-also Quattro's menu tree (power, screenshots, settings, themes); and whether to
-set up a theme system now or hardcode colours and lift theming later.
+The launcher is apps-only with hardcoded colours. Quattro's menu tree (power,
+screenshots, settings, themes) and a theme system are both still open;
+Quattro binds the apps-only view to `SUPER + ALT + SPACE`, so keep that free
+for when a root menu takes over `SUPER + SPACE`.
 
 ## Known, not yet done
 
@@ -182,8 +195,8 @@ set up a theme system now or hardcode colours and lift theming later.
 - Ghostty renders the light theme here because nothing publishes a dark-mode
   preference yet (no xdg-desktop-portal appearance setting). It should follow
   the system once that is in place.
-- No wallpaper, launcher, notifications, lock, OSD or polkit agent yet — no
-  polkit agent is running at all, so any privileged GUI action will fail.
+- No wallpaper, notifications, lock, OSD or polkit agent yet — no polkit agent
+  is running at all, so any privileged GUI action will fail.
 - Only one emoji font is installed; `noto-fonts-color-emoji` is commented out
   in `nix/shared/system/linux.nix` as slow to build. Quickshell UI will want it.
 - Mason installs prebuilt glibc binaries, which cannot run on NixOS. Neovim

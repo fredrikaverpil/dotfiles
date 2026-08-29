@@ -49,6 +49,9 @@ in
     partOf = [ "graphical-session.target" ];
     after = [ "graphical-session.target" ];
     wantedBy = [ "graphical-session.target" ];
+    # A user unit gets systemd's bare PATH, so the launcher cannot find
+    # uwsm-app to start apps with.
+    path = [ pkgs.uwsm ];
     serviceConfig = {
       ExecStart = "${pkgs.quickshell}/bin/quickshell";
       Restart = "on-failure";
