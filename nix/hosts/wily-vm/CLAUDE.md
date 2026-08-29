@@ -96,7 +96,16 @@ Vulkan — if anything reaches for it, `QSG_RHI_BACKEND=opengl`),
 `-resource_blob -host_visible` (no zero-copy dmabuf, so sluggishness and
 screencopy/portal oddities are environmental, not config bugs), 1 scanout (no
 multi-monitor testing possible here — don't write multi-monitor logic).
-`cursor { no_hardware_cursors = true }` in `hyprland.conf` is for this.
+`no_hardware_cursors` in `hyprland.lua` is for this.
+
+Concretely, from `eglinfo` on the VM: renderer `virgl (ANGLE (Apple, Apple M1,
+OpenGL 4.1 Metal))`, **desktop OpenGL 2.1**, **OpenGL ES 3.0**. Hyprland is
+happy because it uses GLES. GTK4 apps are not: Ghostty sets
+`GDK_DISABLE=gles-api,vulkan` itself, so it requires desktop GL >= 3.3 and dies
+with "Unable to acquire an OpenGL context". `LIBGL_ALWAYS_SOFTWARE=1` gives
+llvmpipe at GL 4.6, which is why `desktop.nix` wraps Ghostty in it. No UTM
+setting lifts this — the ceiling is the host's ANGLE-over-Metal translation,
+and turning acceleration *off* would remove the GLES 3.0 Hyprland depends on.
 
 ## Reference
 
@@ -128,10 +137,9 @@ generation, so first-boot bootstrap works.
 - Keyboard layout is `us`. Swedish is wanted eventually as a second layout,
   but not yet — `kb_layout = "us,se"` with a `grp:` toggle in `kb_options`
   when the time comes.
-- Ghostty shows a "Configuration Errors" dialog on the VM: the shared config
-  (`stow/shared/.config/ghostty/config`) sets `theme =` to zenbones theme files
-  under `~/.local/share/nvim-fredrik/site/...`, which only exist where the
-  Neovim plugins are installed. Fix is to vendor those two theme files into the
-  repo — not done, it touches the macOS setup too.
+- Ghostty shows a "Configuration Errors" dialog until Neovim has been run on
+  the host: the shared config (`stow/shared/.config/ghostty/config`) points
+  `theme =` at zenbones files under `~/.local/share/nvim-fredrik/site/...`,
+  which the plugin install creates. Run Neovim once; no repo change needed.
 - No wallpaper, launcher, notifications, lock, OSD or polkit agent yet.
 - Root filesystem is at 63%; consider `nix.gc` before it matters.
