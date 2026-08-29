@@ -27,6 +27,14 @@
       "flakes"
     ];
 
+    # Required for flake.nix's nixConfig.extra-substituters to be honored —
+    # untrusted users get them silently dropped, and everything from
+    # cache.numtide.com (llm-agents) then builds from source.
+    nix.settings.trusted-users = [
+      "root"
+      "fredrik"
+    ];
+
     # Home-manager configuration
     home-manager = {
       useGlobalPkgs = true;
