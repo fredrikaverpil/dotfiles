@@ -1,4 +1,20 @@
 { pkgs, ... }:
+let
+  # VM-only. UTM's virgl runs on ANGLE over Metal, which exposes desktop
+  # OpenGL 2.1 (GLES tops out at 3.0). Ghostty is GTK4 and sets
+  # GDK_DISABLE=gles-api itself, so it demands desktop GL >= 3.3 and dies with
+  # "Unable to acquire an OpenGL context". llvmpipe gives it 4.6. Hyprland is
+  # unaffected — it uses GLES 3.0 — so the override is scoped to this one
+  # program rather than the session. Drop it on real hardware.
+  ghostty-softgl = pkgs.symlinkJoin {
+    name = "ghostty-softgl";
+    paths = [ pkgs.ghostty ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram $out/bin/ghostty --set LIBGL_ALWAYS_SOFTWARE 1
+    '';
+  };
+in
 {
   # uwsm wraps the session in systemd units so graphical-session.target is
   # actually activated, which is what the Quickshell service below binds to.
@@ -40,7 +56,7 @@
   };
 
   host.extraSystemPackages = with pkgs; [
-    ghostty # terminal
+    ghostty-softgl # terminal; see the let-block above
     grim # screenshots, for verifying the session over SSH
     quickshell
   ];
