@@ -40,6 +40,7 @@ in
   host.extraCasks = [
     "google-chrome"
     "raycast"
+    "utm"
   ];
 
   host.extraMasApps = {
