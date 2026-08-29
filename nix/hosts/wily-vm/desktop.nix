@@ -54,6 +54,9 @@ in
     # manager, which is what the launcher needs: uwsm-app to spawn apps with,
     # and then every app's own Exec, which is a bare command name.
     environment.PATH = lib.mkForce null;
+    # Quickshell ships no webp decoder; the wrapper prefixes its own plugin
+    # paths to this, so the two sets merge. Omarchy's backgrounds are all webp.
+    environment.QT_PLUGIN_PATH = "${pkgs.qt6.qtimageformats}/lib/qt-6/plugins";
     serviceConfig = {
       ExecStart = "${pkgs.quickshell}/bin/quickshell";
       Restart = "on-failure";

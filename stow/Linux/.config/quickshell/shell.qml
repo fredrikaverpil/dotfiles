@@ -6,6 +6,62 @@ import Quickshell.Wayland
 ShellRoot {
   id: root
 
+  // Wallpaper. Images live in ~/Pictures/wallpapers — outside this repo, so
+  // nothing binary gets committed — and the pick is per mode, persisted as a
+  // path in ~/.local/state/wallpaper-{dark,light}. The gradient below shows
+  // through until a mode has been given a picture.
+  readonly property string wallpaperDir: Quickshell.env("HOME") + "/Pictures/wallpapers"
+  property list<string> wallpapers: []
+  property string darkPick: ""
+  property string lightPick: ""
+  readonly property string wallpaper: dark ? darkPick : lightPick
+
+  function setWallpaper(path) {
+    if (dark) {
+      darkPick = path
+      darkState.setText(path + "\n")
+    } else {
+      lightPick = path
+      lightState.setText(path + "\n")
+    }
+  }
+
+  Process {
+    id: scan
+    running: true
+    command: ["find", root.wallpaperDir, "-type", "f",
+              "-iregex", ".*\\.\\(png\\|jpg\\|jpeg\\|webp\\)"]
+    stdout: StdioCollector {
+      onStreamFinished: root.wallpapers = text.trim().split("\n").filter(l => l.length > 0).sort()
+    }
+  }
+
+  FileView {
+    id: darkState
+    path: Quickshell.env("HOME") + "/.local/state/wallpaper-dark"
+    atomicWrites: true
+    printErrors: false
+    onLoaded: root.darkPick = text().trim()
+  }
+
+  FileView {
+    id: lightState
+    path: Quickshell.env("HOME") + "/.local/state/wallpaper-light"
+    atomicWrites: true
+    printErrors: false
+    onLoaded: root.lightPick = text().trim()
+  }
+
+  IpcHandler {
+    target: "wallpaper"
+
+    function toggle(): void { picker.toggle() }
+    function open(): void { picker.open() }
+    function close(): void { picker.close() }
+    function rescan(): void { scan.running = true }
+    function set(path: string): void { root.setWallpaper(path) }
+  }
+
   // Light/dark. The dconf key is the source of truth, not a property of ours:
   // xdg-desktop-portal-gtk republishes it as org.freedesktop.appearance, which
   // is what flips Ghostty's theme live, and Neovim follows the terminal over
@@ -228,6 +284,146 @@ ShellRoot {
     }
   }
 
+  PanelWindow {
+    id: picker
+
+    property bool shown: false
+
+    function open() {
+      shown = true
+      grid.currentIndex = Math.max(0, root.wallpapers.indexOf(root.wallpaper))
+      grid.forceActiveFocus()
+    }
+
+    function close() { shown = false }
+    function toggle() { shown ? close() : open() }
+
+    function choose() {
+      const path = root.wallpapers[grid.currentIndex]
+      close()
+      if (path) root.setWallpaper(path)
+    }
+
+    visible: shown
+    anchors { top: true; bottom: true; left: true; right: true }
+    exclusiveZone: 0
+    color: "transparent"
+    WlrLayershell.layer: WlrLayer.Overlay
+    WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+
+    MouseArea {
+      anchors.fill: parent
+      onClicked: picker.close()
+    }
+
+    Rectangle {
+      anchors.centerIn: parent
+      width: 840
+      height: 540
+      radius: 8
+      color: root.palette.bg
+      border.color: root.palette.dim
+      border.width: 1
+
+      Column {
+        anchors.fill: parent
+        anchors.margins: 12
+        spacing: 8
+
+        Text {
+          color: root.palette.fg
+          font.family: "JetBrainsMono Nerd Font"
+          font.pixelSize: 15
+          // The pick applies to the mode that is on now, so name it.
+          text: "Wallpaper · " + (root.dark ? "dark" : "light")
+        }
+
+        GridView {
+          id: grid
+          width: parent.width
+          height: parent.height - y
+          clip: true
+          focus: true
+          cellWidth: width / 4
+          cellHeight: cellWidth * 9 / 16
+          model: root.wallpapers
+
+          delegate: Item {
+            required property var modelData
+            required property int index
+
+            width: grid.cellWidth
+            height: grid.cellHeight
+
+            Rectangle {
+              anchors.fill: parent
+              anchors.margins: 4
+              radius: 4
+              clip: true
+              color: root.palette.dim
+              border.color: index === grid.currentIndex ? root.palette.fg : "transparent"
+              border.width: 2
+
+              Image {
+                anchors.fill: parent
+                anchors.margins: 2
+                fillMode: Image.PreserveAspectCrop
+                asynchronous: true
+                // Thumbnails, not full decodes: the source images run to megabytes.
+                sourceSize.width: 480
+                source: "file://" + modelData
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                  grid.currentIndex = index
+                  picker.choose()
+                }
+              }
+            }
+          }
+
+          Keys.onPressed: function (event) {
+            if (event.key === Qt.Key_Escape) picker.close()
+            else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) picker.choose()
+            else return
+            event.accepted = true
+          }
+        }
+      }
+    }
+  }
+
+  Variants {
+    model: Quickshell.screens
+
+    PanelWindow {
+      required property var modelData
+      screen: modelData
+
+      WlrLayershell.layer: WlrLayer.Background
+      exclusionMode: ExclusionMode.Ignore
+      anchors { top: true; bottom: true; left: true; right: true }
+      color: "transparent"
+
+      Rectangle {
+        anchors.fill: parent
+        gradient: Gradient {
+          GradientStop { position: 0.0; color: root.palette.dim }
+          GradientStop { position: 1.0; color: root.palette.bg }
+        }
+      }
+
+      Image {
+        anchors.fill: parent
+        fillMode: Image.PreserveAspectCrop
+        asynchronous: true
+        source: root.wallpaper ? "file://" + root.wallpaper : ""
+      }
+    }
+  }
+
   Variants {
     model: Quickshell.screens
 
@@ -252,6 +448,7 @@ ShellRoot {
         Repeater {
           model: [
             { label: "Apps", action: () => launcher.toggle() },
+            { label: "Wall", action: () => picker.toggle() },
           ]
 
           BarButton {
