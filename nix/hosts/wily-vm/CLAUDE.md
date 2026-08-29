@@ -105,8 +105,9 @@ ln -sfn ~/.dotfiles/stow/Linux/.config/hypr/newfile.lua ~/.config/hypr/newfile.l
   symlinks take effect with no rebuild. Do not move QML into the Nix store.
 - **Cursor** — the small `macOS-hypr` v0.1 Hyprcursor data tree is stowed at
   `stow/Linux/.local/share/icons/macOS-hypr/`, so it needs no Nix package
-  build. Download updates from [the upstream releases](https://github.com/6ooker/apple_hyprcursor/releases).
-  The cursor manager reads `HYPRCURSOR_*` only at compositor startup:
+  build. Download updates from [the upstream releases](https://github.com/6ooker/apple_hyprcursor/releases);
+  its [source code](https://github.com/6ooker/apple_hyprcursor) is in the same
+  project. The cursor manager reads `HYPRCURSOR_*` only at compositor startup:
   `hl.env` records the choice but a reload cannot replace the loaded theme, so
   its `environment.sessionVariables` in `desktop.nix` need a reboot to apply.
 
