@@ -91,15 +91,16 @@ ln -sfn ~/.dotfiles/stow/Linux/.config/hypr/newfile.lua ~/.config/hypr/newfile.l
 
 - **Nix** (`desktop.nix`) declares packages and the session: `programs.hyprland`
   with `withUWSM`, greetd autologin, and Quickshell as a systemd **user**
-  service bound to `graphical-session.target`. greetd refuses to start unless
-  `default_session` is set, even when only `initial_session` is wanted.
-  `environment.PATH = lib.mkForce null` on that unit is what makes the menu
-  able to start anything: NixOS otherwise pins a sparse PATH on user units, and
-  unsetting it is the only way to inherit the session PATH uwsm imports into
-  the user manager. Both hops need it — finding `uwsm-app`, and then the bare
-  command name in each app's `Exec`. Nothing reports the failure:
-  `Quickshell.execDetached` is silent, and `systemd-run` inherits the same
-  broken PATH, so a launch just does nothing.
+  service bound to `graphical-session.target`. It also owns polkit, the
+  pre-suspend delay-inhibitor unit and the small `wily-lock` PAM entry. greetd
+  refuses to start unless `default_session` is set, even when only
+  `initial_session` is wanted. `environment.PATH = lib.mkForce null` on the
+  Quickshell unit is what makes the menu able to start anything: NixOS otherwise
+  pins a sparse PATH on user units, and unsetting it is the only way to inherit
+  the session PATH uwsm imports into the user manager. Both hops need it —
+  finding `uwsm-app`, and then the bare command name in each app's `Exec`.
+  Nothing reports the failure: `Quickshell.execDetached` is silent, and
+  `systemd-run` inherits the same broken PATH, so a launch just does nothing.
 - **stow** (`stow/Linux/.config/{hypr,quickshell}/`) carries the config and
   QML. Deliberate: the Quickshell tree gets edited constantly and stow
   symlinks take effect with no rebuild. Do not move QML into the Nix store.
@@ -224,7 +225,10 @@ you want and occasionally the trap:
 - **The Quickshell unit** — user units are *reloaded*, not restarted: a switch
   writes the new `quickshell.service` but the running process keeps the old
   environment. Changing `QT_PLUGIN_PATH` or anything else on that unit needs an
-  explicit `systemctl --user restart quickshell`.
+  explicit `systemctl --user restart quickshell`. **Do not restart it while the
+  native lock is active:** `ext-session-lock` outlives its client, so this lean
+  first version cannot recover the stranded compositor lock; see the ThinkPad
+  deferrals below.
 - **The compositor** — keeps running its old binary out of the store, which
   stays alive because the old generation is still referenced. A rebuild that
   bumps the hyprland package therefore does nothing until logout or reboot, and
@@ -262,22 +266,26 @@ Hyprland config in `config/hypr/`, and package list in
 `install/omarchy-base.packages`. Approach is vendor-and-prune: port pieces
 across on request rather than rewriting from scratch.
 
-## Newly added stow files need a nudge
+## Newly added stow files need a manual link
 
-`nixos-rebuild switch` restarts `home-manager-fredrik.service` — which is what
-runs the stow step — only when the home-manager *generation* changes. A change
-that touches system config and `stow/` alone leaves the generation identical,
-so the unit stays `active (exited)` and nothing gets stowed. Editing an
-already-stowed file is unaffected (it is a symlink), but a **new** file under
-`stow/` needs one of:
+An existing VM clone has absolute links, so an activation that tries to rerun
+Stow fails as described above — do **not** use restarting
+`home-manager-fredrik.service` or rebooting as a way to create a new link. A
+system switch has still activated its system changes before reporting that
+home-manager failure; make the required link by hand instead. For example, the
+Omarchy-shaped Quickshell plugin tree needs:
 
-    sudo systemctl restart home-manager-fredrik.service
+```sh
+ln -sfn ~/.dotfiles/stow/Linux/.config/quickshell/plugins \
+  ~/.config/quickshell/plugins
+```
 
-or a reboot. Not a bug — a fresh machine always has a new generation, so
-first-boot bootstrap works.
+Editing an already-linked file remains immediate after rsync. The generic
+pattern is still:
 
-A manual `stow` run is *not* the third option it looks like: on this VM it
-aborts (see "Driving it over SSH"), so make the link by hand instead.
+```sh
+ln -sfn ~/.dotfiles/stow/Linux/.config/hypr/newfile.lua ~/.config/hypr/newfile.lua
+```
 
 ## Reaching Quickshell from a keybind
 
@@ -286,6 +294,12 @@ aborts (see "Driving it over SSH"), so make the link by hand instead.
 registers as the `default` config and `qs ipc` picks the instance on the
 current display. Every future panel reuses this; the bar icon instead calls
 `menu.toggle()` directly, being the same process.
+
+The Omarchy-shaped services use their upstream-compatible targets too:
+`notifications` (`showHistory`, `toggleDnd`, `dismissOne`, `dismissAll`,
+`invokeLast`), `lock` (`lock`, `status`, `isLocked`) and `idle`
+(`enable`, `disable`, `toggle`, `status`). From SSH they need the live-session
+`XDG_RUNTIME_DIR` and `WAYLAND_DISPLAY` export from "Driving it over SSH".
 
 **Do not name an IPC function `show`.** `qs ipc show` is a CLI subcommand, so
 the argument parser rejects the call with "The following argument was not
@@ -379,19 +393,87 @@ is, and writes the same database.
 `\uf185` renders as a cog in JetBrains Mono Nerd Font, not a sun; `\uf522` is
 the one that reads as a sun at 14px.
 
+## Notifications, lock, idle and polkit
+
+Quickshell 0.3.0 on this VM supplies `NotificationServer`, `PolkitAgent`,
+`PamContext`, `WlSessionLock` and `IdleMonitor`, so this deliberately follows
+Omarchy Quattro's native architecture rather than installing `hyprlock`,
+`hypridle` or `hyprpolkitagent`. The files live under the matching
+`stow/Linux/.config/quickshell/plugins/{notifications,lock,polkit,services/idle}`
+paths, but `shell.qml` loads them directly — we do not carry Omarchy's general
+plugin registry or `qs.Commons` framework. That makes upstream diffs useful
+without coupling the VM to their whole shell.
+
+- **Notifications** own `org.freedesktop.Notifications`, show top-right toast
+  cards (low: 5s, normal: 8s, critical: until dismissed), expose standard
+  actions, and keep the newest ten non-transient entries plus DND state in
+  `~/.local/state/wily-notifications.json`. The bar bell and System ›
+  Notifications open the history panel; `libnotify` supplies `notify-send` for
+  smoke tests and CLI callers. History records the display data only — it does
+  not retain an action after the sender has gone away. A critical notification
+  still toasts under DND; everything else is recorded silently. Clicking a
+  card's body, and `invokeLast`, fire only an action registered under the
+  canonical identifier `default` — any other identifier is reachable from its
+  own button and nothing else. (Omarchy falls back to focusing the sending app
+  by class, which needs one of their scripts.)
+- **Lock / idle** use `WlSessionLock` plus `PamContext` against
+  `/etc/pam.d/wily-lock`, a conventional `auth include login` entry.
+  `WlSessionLock` has **no `unlock()`** — clearing its `locked` property is the
+  unlock. Calling the method that does not exist throws *after* the PAM success
+  has already reset the service's own state, which strands the lock surface
+  with its input disabled and no way back in. Its `WlSessionLockSurface` is a
+  per-screen component, so an `id` declared inside it is not addressable from
+  the enclosing service. Do not
+  replace it with `security.pam.services`: on this aarch64 nixpkgs revision the
+  PAM renderer evaluates disabled Howdy/Kanidm module paths and fails before it
+  can render a custom service. `IdleMonitor` honours inhibitors, locks at five
+  minutes and the lock surface requests DPMS off five minutes later; input
+  wakes it. `wily-sleep-lock.service` holds a logind delay inhibitor, requests
+  the lock on `PrepareForSleep`, and waits up to three seconds for its `secure`
+  state.
+- **Polkit** is Quickshell's `PolkitAgent`, registered at
+  `/org/wily/PolkitAgent`; NixOS runs the authority. It is a password dialog in
+  the existing palette, so privileged desktop requests have an agent rather
+  than failing without a prompt. `security.polkit.enable` does not imply the
+  setuid `pkexec` wrapper — `enablePkexecWrapper` is its own option, and
+  without it `pkexec` aborts with "must be setuid root" before reaching any
+  agent. D-Bus callers such as `systemctl` prompt either way, which makes
+  `systemctl restart <unit>` from inside the session the way to test the
+  dialog; `pkexec` from an SSH shell is the wrong subject anyway.
+
+The matching Omarchy keybinds are `SUPER + comma` (dismiss latest),
+`SUPER + SHIFT + comma` (dismiss all), `SUPER + CTRL + comma` (DND),
+`SUPER + ALT + comma` (invoke latest), `SUPER + SHIFT + ALT + comma` (history),
+`SUPER + CTRL + I` (toggle idle locking), and `SUPER + CTRL + L` (lock).
+
+## Deferred for the ThinkPad
+
+- Fingerprint unlock, including its separate PAM stack, reader indicator and
+  clamshell/lid handling.
+- Recovery of an orphaned `ext-session-lock` after Quickshell restarts while
+  locked. Omarchy detects Hyprland's `solitaryBlockedBy: LOCK` state and
+  reacquires the surface; until this is ported, never restart Quickshell while
+  locked.
+- Full notification durability: on-screen toast restoration across a shell
+  restart, persistent image copies and cleanup, rich body markup/image
+  sanitization, inline replies, and preserving trusted actions in history.
+- Omarchy's 150-second screensaver stage before the five-minute lock, its
+  stay-awake indicator/control, and hardware validation of DPMS plus the
+  pre-suspend delay budget.
+
 ## Next steps
 
 The plumbing is in place — portals (`xdg-desktop-portal` + `-hyprland` +
 `-gtk`), pipewire/wireplumber and NetworkManager are all running, and the menu
-now covers apps, wallpaper, theme, screenshots, power and the keybinding
-sheet. The dim rows in it are the shortest list of what is still missing.
+now covers apps, wallpaper, theme, screenshots, power, notifications and the
+keybinding sheet. The dim rows in it are the shortest list of what is still
+missing.
 
-1. Notifications, then lock/idle, then a polkit agent.
-2. **A display panel**, ported from Omarchy's
+1. **A display panel**, ported from Omarchy's
    `shell/plugins/panels/monitor/` (resolution, scaling, text size). Light/dark
    and nightlight belong in there rather than as their own bar buttons — so
    the  /  button is a placeholder, not a design.
-3. **Nightlight**, the equivalent of macOS Night Shift: `hyprsunset` shifts
+2. **Nightlight**, the equivalent of macOS Night Shift: `hyprsunset` shifts
    colour temperature, and Omarchy drives it with a toggle plus a restart
    script. Wants a schedule; composes with light/dark rather than replacing
    it.
@@ -402,16 +484,28 @@ smaller than theirs.
 
 ## Known, not yet done
 
+- The notification, lock and polkit services are verified live on the VM
+  (toasts and their timeout bar, DND with critical breaking through, dismiss
+  one/all, history and its `Clear`, `default`-action invoke, the lock surface
+  with a wrong-password counter, a real PAM unlock, and the polkit dialog
+  through both `pkexec` and a D-Bus caller, and `IdleMonitor` taking the lock
+  on its own after the idle timeout). Testing that last one means leaving the
+  VM genuinely untouched for over five minutes: SSH polling does not reset the
+  timer, but any use of the UTM window does, and a run interrupted that way
+  looks exactly like a broken monitor. **Two paths are not yet exercised**:
+  the lock surface's DPMS-off stage five minutes after locking, and
+  `wily-sleep-lock` locking on a real `systemctl suspend` —
+  resume-from-suspend under UTM is itself unknown.
 - Keyboard layout is `us`. Swedish is wanted eventually as a second layout,
   but not yet — `kb_layout = "us,se"` with a `grp:` toggle in `kb_options`
   when the time comes.
-- No notifications, lock, OSD or polkit agent yet — no polkit agent is running
-  at all, so any privileged GUI action will fail.
-- Four packages the Omarchy keymap and menu assume are not installed in
-  `desktop.nix`: `hyprlock` (lock), `wl-clipboard` (clipboard history, share),
-  `slurp` (region select, so `grim` can only take the whole screen) and
-  `hyprsunset` (nightlight). Menu rows and binds for these stay dim until they
-  land.
+- No OSD yet.
+- Three packages the Omarchy keymap and menu assume are not installed in
+  `desktop.nix`: `wl-clipboard` (clipboard history, share), `slurp` (region
+  select, so `grim` can only take the whole screen) and `hyprsunset`
+  (nightlight). Menu rows and binds for these stay dim until they land.
+  `hyprlock`, `hypridle` and `hyprpolkitagent` are deliberate omissions: the
+  equivalents here are native Quickshell services.
 - The bar uses JetBrains Mono Nerd Font (`nix/shared/system/linux.nix` installs
   several nerd fonts). Berkeley Mono is wanted as the system font eventually,
   but it is a paid font and needs vendoring before Nix can install it.
