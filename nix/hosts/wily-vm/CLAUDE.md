@@ -161,7 +161,8 @@ question before it is a config question** — check `hyprctl -j binds` first, it
 is authoritative. None of this exists on the ThinkPad, where SUPER is a real
 Super key.
 
-This is also why the bar has Apps and Wall buttons at all.
+This is also why the bar carries a menu icon at all, rather than leaving
+`SUPER + SPACE` as the only way in.
 
 ## uwsm: never restart greetd, reboot
 
@@ -235,19 +236,49 @@ generation, so first-boot bootstrap works.
 
 ## Reaching Quickshell from a keybind
 
-`qs ipc call launcher toggle` — the launcher's `IpcHandler { target = "launcher" }`
-in `shell.qml`. No config selection is needed: `~/.config/quickshell/shell.qml`
+`qs ipc call menu toggle` — the `IpcHandler { target = "menu" }` in
+`shell.qml`. No config selection is needed: `~/.config/quickshell/shell.qml`
 registers as the `default` config and `qs ipc` picks the instance on the
-current display. Every future panel reuses this; the bar button instead calls
-`launcher.toggle()` directly, being the same process.
+current display. Every future panel reuses this; the bar icon instead calls
+`menu.toggle()` directly, being the same process.
+
+**Do not name an IPC function `show`.** `qs ipc show` is a CLI subcommand, so
+the argument parser rejects the call with "The following argument was not
+expected" before it ever reaches the handler — and `qs ipc show` will happily
+list the function as registered while it is unreachable. The one that opens a
+given level is `level` for this reason: `qs ipc call menu level style.theme`.
 
 Apps start with `uwsm-app -- <id>.desktop`, which puts each app in its own
 scope under `app-graphical.slice`. Launching them as children of the shell
 would kill them all on `systemctl --user restart quickshell`.
 
 `DesktopEntries.applications` fills in a few seconds **after** the shell
-starts, so the app list must be a QML binding. Building it once when the
-launcher opens gives an empty list on the first open after a restart.
+starts, so the app list must be a QML binding. Building it once when the menu
+opens gives an empty list on the first open after a restart.
+
+## The menu
+
+One panel with a level stack, in Omarchy's `omarchy-menu.jsonc` shape: dotted
+ids imply the hierarchy, so `style.theme.dark` is a child of `style.theme` and
+no nesting syntax is needed. Kind is inferred — an entry with an `action`
+fires, one with children descends, one with a `provider` fills its level from
+elsewhere (only `apps` so far, from `DesktopEntries`). Their `Menu.qml` plus
+`MenuModel.js` is ~2000 lines of jsonc parsing, plugin manifests and provider
+indirection; this is ~25 entries in a QML object literal and needs none of it.
+
+`enabled: false` lists a row with nothing behind it yet: dim, skipped by the
+arrow keys and inert on Enter, rather than absent — so what is still missing
+stays visible. Those are the rows to edit when the feature lands, and they are
+the running list of what this desktop does not do yet.
+
+Reachable as `qs ipc call menu toggle|open|close` and `level <id>`; bound to
+`SUPER + SPACE`, with `SUPER + ALT + SPACE` (apps), `SUPER + ESCAPE` (system)
+and `SUPER + SHIFT + CTRL + SPACE` (theme) opening a level directly.
+
+Escape and Left back out one level and only close at the root. Selection lands
+on the first *enabled* row, deferred through `Qt.callLater` because ListView
+resets `currentIndex` itself when the model changes, after `onRowsChanged`
+runs.
 
 ## Wallpapers
 
@@ -257,7 +288,7 @@ png/jpg/jpeg/webp), so subfolders are for tidiness only, not meaning. The pick
 is **per mode**: `~/.local/state/wallpaper-dark` and `-light`, each a plain
 path, so flipping light/dark also swaps the picture and each side remembers its
 own. A mode with no pick yet shows the gradient. `SUPER + CTRL + SPACE` (or
-the bar's Wall button) opens the picker; `qs ipc call wallpaper` also takes
+the menu's Style › Background) opens the picker; `qs ipc call wallpaper` also takes
 `open/close/toggle`, `set <path>`, and `rescan` after adding files.
 
 webp works, but only because `desktop.nix` sets `QT_PLUGIN_PATH` to
@@ -283,7 +314,7 @@ long-running `dconf watch` rather than trusting its own writes, so a
 `dconf write` from anywhere else moves the bar too. dconf persists, so the mode
 survives a reboot for free.
 
-Bar and launcher colours are the zenbones palettes, lifted from
+Bar and menu colours are the zenbones palettes, lifted from
 `stow/shared/.config/ghostty/themes/zenbones_{dark,light}` so the bar and the
 terminal are literally the same colours. `gsettings` is not installed; `dconf`
 is, and writes the same database.
@@ -294,28 +325,22 @@ the one that reads as a sun at 14px.
 ## Next steps
 
 The plumbing is in place — portals (`xdg-desktop-portal` + `-hyprland` +
-`-gtk`), pipewire/wireplumber and NetworkManager are all running. What is
-missing is the shell itself, which is exactly what Quattro moved into
-Quickshell.
+`-gtk`), pipewire/wireplumber and NetworkManager are all running, and the menu
+now covers apps, wallpaper, theme, screenshots and power. The dim rows in it
+are the shortest list of what is still missing.
 
-1. **The root menu**, Omarchy's `omarchy-menu.jsonc` shape: one level stack
-   over the existing launcher panel, entries as dotted ids in a JS literal,
-   Enter either descends or fires. Apps becomes one level rather than its own
-   panel, and the Apps and Wall bar buttons go away in favour of a single
-   left-hand icon. Rows whose feature does not exist yet are listed but dim.
-   Not porting their `Menu.qml` + `MenuModel.js` (~2000 lines of jsonc
-   parsing, plugin manifests and provider indirection) for ~15 entries.
-2. **Keybinding cheatsheet**, as a leaf of that menu rather than a panel of
-   its own. Reads `~/.local/state/hypr-binds.tsv`, which `hyprland.lua` writes
-   as it registers each bind — not `hyprctl binds`, which cannot name a
+1. **Keybinding cheatsheet**, as a leaf of the menu rather than a panel of
+   its own — the `learn.keybindings` row is already there, dim. Reads
+   `~/.local/state/hypr-binds.tsv`, which `hyprland.lua` writes as it
+   registers each bind — not `hyprctl binds`, which cannot name a
    `code:` chord. Display only: the recorder keeps the chord and the label,
    not the action, so Enter cannot fire the bind the way Omarchy's does.
-3. Notifications, then lock/idle, then a polkit agent.
-4. **A display panel**, ported from Omarchy's
+2. Notifications, then lock/idle, then a polkit agent.
+3. **A display panel**, ported from Omarchy's
    `shell/plugins/panels/monitor/` (resolution, scaling, text size). Light/dark
    and nightlight belong in there rather than as their own bar buttons — so
    the  /  button is a placeholder, not a design.
-5. **Nightlight**, the equivalent of macOS Night Shift: `hyprsunset` shifts
+4. **Nightlight**, the equivalent of macOS Night Shift: `hyprsunset` shifts
    colour temperature, and Omarchy drives it with a toggle plus a restart
    script. Wants a schedule; composes with light/dark rather than replacing
    it.
@@ -344,4 +369,11 @@ smaller than theirs.
 - Mason installs prebuilt glibc binaries, which cannot run on NixOS. Neovim
   itself works on the VM (all 74 vim.pack plugins installed cleanly), but the
   Mason-managed language servers are expected to be broken. Untested.
+- No LSP for either config yet. `qmlls` is the QML one and ships inside
+  `qt6.qtdeclarative` (confirmed present in nixpkgs, `bin/qmlls`), so it is a
+  package plus an `nvim-fredrik/lsp/` entry — it must come from Nix, not
+  Mason, whose prebuilt binaries cannot run here. For `hyprland.lua` the
+  situation is worse: `hyprls` only understands hyprlang `.conf`, which is the
+  format we do not use, so the realistic option is `lua_ls` plus a hand-written
+  LuaCATS stub for the `hl` API. Unverified — nobody has tried either here.
 - Root filesystem is at 63%; consider `nix.gc` before it matters.

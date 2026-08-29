@@ -67,9 +67,11 @@ local ok, err = pcall(function()
   bind("SUPER + SHIFT + N", "Editor", hl.dsp.exec_cmd("ghostty -e nvim"))
 
   -- Shell
-  bind("SUPER + SPACE", "Launch apps", hl.dsp.exec_cmd("qs ipc call launcher toggle"))
+  bind("SUPER + SPACE", "Menu", hl.dsp.exec_cmd("qs ipc call menu toggle"))
+  bind("SUPER + ALT + SPACE", "Apps menu", hl.dsp.exec_cmd("qs ipc call menu level apps"))
+  bind("SUPER + ESCAPE", "System menu", hl.dsp.exec_cmd("qs ipc call menu level system"))
   bind("SUPER + CTRL + SPACE", "Background switcher", hl.dsp.exec_cmd("qs ipc call wallpaper toggle"))
-  bind("SUPER + SHIFT + CTRL + SPACE", "Toggle light/dark", hl.dsp.exec_cmd("qs ipc call theme toggle"))
+  bind("SUPER + SHIFT + CTRL + SPACE", "Theme menu", hl.dsp.exec_cmd("qs ipc call menu level style.theme"))
 
   -- Windows
   bind("SUPER + W", "Close window", hl.dsp.window.close())
