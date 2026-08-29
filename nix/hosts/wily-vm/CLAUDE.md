@@ -20,18 +20,32 @@ below.
   file that is not at least intent-to-added fails evaluation with "Path ... is
   not tracked by Git".
 
-## Seeing the screen over SSH
+## Driving it over SSH
 
-`grim` is installed. It needs the live session's env, and stale socket
-directories accumulate under `/run/user/1000/hypr/` — always pick the newest:
+Three things get used constantly. `HYPRLAND_INSTANCE_SIGNATURE` must be the
+**newest** directory — stale ones accumulate under `/run/user/1000/hypr/`.
 
 ```sh
+# push uncommitted work from the laptop (--delete matters: without it, files
+# deleted locally linger on the VM and keep getting stowed)
+rsync -a --delete --exclude .git --exclude result ~/.dotfiles/ fredrik@192.168.64.15:~/.dotfiles/
+ssh fredrik@192.168.64.15 'cd ~/.dotfiles && git add -AN .'   # flakes ignore untracked files
+
+# run something inside the live session (hyprctl, grim, an app)
 ssh fredrik@192.168.64.15 "export XDG_RUNTIME_DIR=/run/user/1000 WAYLAND_DISPLAY=wayland-1 \
-  HYPRLAND_INSTANCE_SIGNATURE=\$(ls -t /run/user/1000/hypr | head -1); grim /tmp/shot.png"
-scp fredrik@192.168.64.15:/tmp/shot.png .
+  HYPRLAND_INSTANCE_SIGNATURE=\$(ls -t /run/user/1000/hypr | head -1); <cmd>"
+
+# screenshot, then pull it back and look at it
+… 'grim /tmp/shot.png'; scp fredrik@192.168.64.15:/tmp/shot.png .
 ```
 
-The same env prefix is what `hyprctl` needs.
+Looking at the screenshot is not optional — the on-screen error overlays
+(Hyprland's config errors, Ghostty's dialog) never reach any log this side of
+the SSH connection.
+
+Do **not** `git clean -fd` in the VM clone: it deletes the rsync'd
+`hyprland.lua`, Hyprland auto-reloads, and the session drops into emergency
+mode. `rm` the specific files instead.
 
 ## Split of responsibilities
 
@@ -130,6 +144,31 @@ already-stowed file is unaffected (it is a symlink), but a **new** file under
 a reboot, or a manual `stow` run. Not a bug — a fresh machine always has a new
 generation, so first-boot bootstrap works.
 
+## Next steps
+
+The plumbing is in place — portals (`xdg-desktop-portal` + `-hyprland` +
+`-gtk`), pipewire/wireplumber and NetworkManager are all running. What is
+missing is the shell itself, which is exactly what Quattro moved into
+Quickshell.
+
+1. **Wallpaper.** The desktop is black. Small; do it alongside the next item.
+2. **IPC + an app launcher on `SUPER+SPACE`.** Do this before any other
+   widget: it forces the mechanism everything else reuses — how a Hyprland
+   bind reaches the already-running Quickshell process. Quattro does it with
+   `omarchy-shell shell toggle <component>` calling into Quickshell's
+   `IpcHandler`; use `DesktopEntries` for the app list. Write ~100 lines first
+   to establish IPC and window mechanics, *then* port Quattro's behaviour onto
+   it — their launcher is deep and coupled to the `omarchy-*` bash CLI, so
+   prune before importing rather than after.
+3. **Keybinding cheatsheet.** Nearly free once IPC exists — read
+   `hyprctl binds -j`, which already carries the `description` fields set in
+   `hyprland.lua`.
+4. Notifications, then lock/idle, then a polkit agent.
+
+Undecided, worth asking before building: whether the launcher is apps-only or
+also Quattro's menu tree (power, screenshots, settings, themes); and whether to
+set up a theme system now or hardcode colours and lift theming later.
+
 ## Known, not yet done
 
 - Hyprland warns the `.conf` config format is removed in 0.57. Currently on
@@ -140,5 +179,11 @@ generation, so first-boot bootstrap works.
 - Ghostty renders the light theme here because nothing publishes a dark-mode
   preference yet (no xdg-desktop-portal appearance setting). It should follow
   the system once that is in place.
-- No wallpaper, launcher, notifications, lock, OSD or polkit agent yet.
+- No wallpaper, launcher, notifications, lock, OSD or polkit agent yet — no
+  polkit agent is running at all, so any privileged GUI action will fail.
+- Only one emoji font is installed; `noto-fonts-color-emoji` is commented out
+  in `nix/shared/system/linux.nix` as slow to build. Quickshell UI will want it.
+- Mason installs prebuilt glibc binaries, which cannot run on NixOS. Neovim
+  itself works on the VM (all 74 vim.pack plugins installed cleanly), but the
+  Mason-managed language servers are expected to be broken. Untested.
 - Root filesystem is at 63%; consider `nix.gc` before it matters.
