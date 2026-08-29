@@ -34,6 +34,12 @@ sudo darwin-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"  # macOS
 sudo nixos-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"   # NixOS
 ```
 
+> [!TIP]
+>
+> Installing NixOS from scratch (UTM VM on Apple Silicon, ThinkPad T14 G6) is
+> documented separately in
+> [the NixOS install README](README_NIXOS_INSTALL.md).
+
 ## Nix management responsibilities
 
 <details>
@@ -44,7 +50,7 @@ sudo nixos-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"   # NixOS
 │   ├── hosts/                       # Host-specific configurations
 │   │   └── $host/                   # Individual host directory
 │   │       ├── configuration.nix    # System settings
-│   │       ├── hardware.nix         # Hardware config (optional, for NixOS)
+│   │       ├── hardware-configuration.nix  # Hardware config (NixOS)
 │   │       └── users/
 │   │           └── $username.nix    # User config
 │   ├── lib/                         # Helper functions
@@ -129,7 +135,7 @@ sets `boot.loader.raspberry-pi.bootloader = "kernelboot-legacy-unsupported"`
 to preserve the existing boot layout. Migrate to `kernel` only after checking
 or resizing `/boot/firmware`: the `kernel` bootloader stores generations under
 `/boot/firmware/nixos`, and upstream installer images use a 1024M firmware
-partition while this host currently declares 512M in `hardware.nix`.
+partition while this host currently declares 512M in `hardware-configuration.nix`.
 
 Registry shortcuts:
 

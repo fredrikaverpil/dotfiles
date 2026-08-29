@@ -28,7 +28,7 @@ in {
   # Keep the legacy Raspberry Pi kernelboot behavior for now. The replacement
   # `kernel` bootloader stores NixOS generations under /boot/firmware/nixos;
   # upstream installer images use a 1024M firmware partition for that, while
-  # this host currently declares a 512M firmware partition in hardware.nix.
+  # this host currently declares a 512M firmware partition in hardware-configuration.nix.
   # Revisit migrating to `kernel` after checking/resizing /boot/firmware or
   # lowering boot.loader.raspberry-pi.configurationLimit.
   boot.loader.raspberry-pi.bootloader = "kernelboot-legacy-unsupported";

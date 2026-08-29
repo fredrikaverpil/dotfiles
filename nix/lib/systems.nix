@@ -39,8 +39,8 @@
           else []
         )
         ++ (
-          if builtins.pathExists (builtins.dirOf configPath + "/hardware.nix")
-          then [(builtins.dirOf configPath + "/hardware.nix")]
+          if builtins.pathExists (builtins.dirOf configPath + "/hardware-configuration.nix")
+          then [(builtins.dirOf configPath + "/hardware-configuration.nix")]
           else []
         );
     };
@@ -67,8 +67,8 @@
           else []
         )
         ++ (
-          if builtins.pathExists (builtins.dirOf configPath + "/hardware.nix")
-          then [(builtins.dirOf configPath + "/hardware.nix")]
+          if builtins.pathExists (builtins.dirOf configPath + "/hardware-configuration.nix")
+          then [(builtins.dirOf configPath + "/hardware-configuration.nix")]
           else []
         );
     };
