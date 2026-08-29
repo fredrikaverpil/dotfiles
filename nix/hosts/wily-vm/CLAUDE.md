@@ -137,9 +137,8 @@ generation, so first-boot bootstrap works.
 - Keyboard layout is `us`. Swedish is wanted eventually as a second layout,
   but not yet — `kb_layout = "us,se"` with a `grp:` toggle in `kb_options`
   when the time comes.
-- Ghostty shows a "Configuration Errors" dialog until Neovim has been run on
-  the host: the shared config (`stow/shared/.config/ghostty/config`) points
-  `theme =` at zenbones files under `~/.local/share/nvim-fredrik/site/...`,
-  which the plugin install creates. Run Neovim once; no repo change needed.
+- Ghostty renders the light theme here because nothing publishes a dark-mode
+  preference yet (no xdg-desktop-portal appearance setting). It should follow
+  the system once that is in place.
 - No wallpaper, launcher, notifications, lock, OSD or polkit agent yet.
 - Root filesystem is at 63%; consider `nix.gc` before it matters.
