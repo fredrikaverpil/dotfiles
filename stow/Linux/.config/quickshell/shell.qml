@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 
+import "plugins/bar/widgets" as BarWidgets
 import "plugins/lock" as Lock
 import "plugins/notifications" as Notifications
 import "plugins/polkit" as Polkit
@@ -150,6 +151,7 @@ ShellRoot {
     id: btn
 
     property alias label: btnLabel.text
+    property string fontFamily: "JetBrainsMono Nerd Font"
     signal activated
 
     implicitWidth: 28
@@ -174,7 +176,7 @@ ShellRoot {
       anchors.horizontalCenterOffset: implicitWidth / 2
         - (btnMetrics.tightBoundingRect.x + btnMetrics.tightBoundingRect.width / 2)
       color: root.palette.fg
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: btn.fontFamily
       font.pixelSize: 14
     }
 
@@ -684,11 +686,22 @@ ShellRoot {
       color: root.palette.bg
 
       BarButton {
+        id: menuButton
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.leftMargin: 4
-        label: "󰣇"
+        // U+E900 in the vendored Omarchy icon font; see wily-vm/CLAUDE.md.
+        label: "\ue900"
+        fontFamily: "omarchy"
         onActivated: menu.toggle()
+      }
+
+      BarWidgets.Workspaces {
+        anchors.left: menuButton.right
+        anchors.leftMargin: 4
+        anchors.verticalCenter: parent.verticalCenter
+        foreground: root.palette.fg
+        selection: root.palette.sel
       }
 
       Text {

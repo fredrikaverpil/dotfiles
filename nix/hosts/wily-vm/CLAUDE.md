@@ -506,6 +506,29 @@ decoder, and without it a webp wallpaper silently falls back to the gradient.
 The wrapper prefixes its own plugin paths, so setting the variable does not
 displace them.
 
+## Workspaces
+
+The top bar's `plugins/bar/widgets/Workspaces.qml` is a pared-down port of
+Omarchy's file at the same path. It shows 1–5 even when empty, adds existing
+normal workspaces through 10, dims empty ones, and replaces the focused number
+with Omarchy's glyph. It reads Quickshell's `Hyprland` singleton rather than
+polling `hyprctl`; clicking an indicator dispatches the same
+`hl.dsp.focus({ workspace = ... })` action as `SUPER + 1` through `SUPER + 0`.
+
+`hl.animation({ leaf = "workspaces", enabled = false })` is Omarchy's exact
+setting for instant workspace changes. It is deliberately a workspace leaf,
+not global animation disablement, so window open/close animations stay on.
+
+New tiled clients use `dwindle.force_split = 2`, Hyprland's right/bottom
+insertion direction and the same setting Omarchy uses. Its `preserve_split =
+true` is deliberately not ported: it controls manual split resizing, not new
+client placement.
+
+The launcher mark is Omarchy's private `omarchy` font at U+E900, vendored with
+its upstream MIT licence under `stow/Linux/.local/share/fonts/omarchy/`. Nerd
+Fonts do not carry it. After a fresh stow run, call `fc-cache -f` and restart
+Quickshell to make a new user font available to the running shell.
+
 ## Light and dark
 
 One key drives everything: `/org/gnome/desktop/interface/color-scheme` in

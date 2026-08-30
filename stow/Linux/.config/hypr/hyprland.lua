@@ -17,6 +17,13 @@ hl.config({
     rounding = 8,
   },
 
+  -- 2 is Hyprland's right/bottom insertion direction. This matches Omarchy;
+  -- leave preserve_split at its default because that controls manual resizing,
+  -- not where a new client opens.
+  dwindle = {
+    force_split = 2,
+  },
+
   input = {
     kb_layout = "us",
   },
@@ -37,6 +44,10 @@ hl.config({
     force_default_wallpaper = 0,
   },
 })
+
+-- Match Omarchy's look and feel: workspace changes are instant, while the
+-- global and window animation settings still animate opening and closing.
+hl.animation({ leaf = "workspaces", enabled = false })
 
 -- Tagging a window "noidle" holds the whole session awake, per Omarchy's
 -- default/hypr/apps/system.lua. hyprctl -j clients reports the result as
