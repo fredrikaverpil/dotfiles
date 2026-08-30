@@ -17,8 +17,6 @@ PanelWindow {
 
   required property var shell
   property bool shown: false
-  property bool pinnable: false
-  property bool pinned: false
   property bool focusPrimed: false
   property int cardWidth: 600
   property int cardHeight: 420
@@ -38,11 +36,7 @@ PanelWindow {
     shown = true
   }
 
-  // A pin is intentionally the only control that can unpin or close a pinned
-  // panel. Its bar button and outside clicks leave it in place.
-  function close() {
-    if (!pinned) shown = false
-  }
+  function close() { shown = false }
 
   function toggle() { shown ? close() : open() }
 
@@ -60,33 +54,16 @@ PanelWindow {
     if (next) next.forceActiveFocus(Qt.TabFocusReason)
   }
 
-  function togglePinned() {
-    if (!pinnable) return
-    pinned = !pinned
-    if (pinned) open()
-  }
-
-  onPinnableChanged: if (!pinnable) pinned = false
   onShownChanged: {
     if (!shown) {
-      pinned = false
       focusPrimed = false
       focusPrimeTimer.stop()
-    } else if (!pinned) {
+    } else {
       focusPrimed = false
       focusPrimeTimer.restart()
       // Start every open from the top of the chain rather than wherever the
       // last visit left it.
       if (keyNavigation) column.forceActiveFocus()
-    }
-  }
-  onPinnedChanged: {
-    if (pinned) {
-      focusPrimed = false
-      focusPrimeTimer.stop()
-    } else if (shown) {
-      focusPrimed = false
-      focusPrimeTimer.restart()
     }
   }
   Component.onCompleted: if (shell && shell.registerPanel) shell.registerPanel(panel)
@@ -95,21 +72,20 @@ PanelWindow {
   anchors { top: true; bottom: true; left: true; right: true }
   exclusiveZone: 0
   color: "transparent"
-  // The modal surface owns the screen except the bar. A pinned surface only
-  // owns its card, leaving ordinary apps and the bar fully interactive.
-  mask: panel.pinned ? pinnedMask : modalMask
+  // The surface owns the screen except the bar.
+  mask: modalMask
   WlrLayershell.layer: WlrLayer.Overlay
   // Exclusive reliably acquires focus on every open. Settle on OnDemand as
   // soon as it has mapped so the compositor can route pointer input through
   // the bar-strip cutout to the bar below.
-  WlrLayershell.keyboardFocus: shown && !pinned
+  WlrLayershell.keyboardFocus: shown
     ? (focusPrimed ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive)
     : WlrKeyboardFocus.None
 
   Timer {
     id: focusPrimeTimer
     interval: 75
-    onTriggered: if (panel.shown && !panel.pinned) panel.focusPrimed = true
+    onTriggered: if (panel.shown) panel.focusPrimed = true
   }
 
   data: [
@@ -124,11 +100,6 @@ PanelWindow {
       }
     },
 
-    Region {
-      id: pinnedMask
-      item: card
-    },
-
     Item {
       id: modalInput
       anchors.fill: parent
@@ -136,7 +107,7 @@ PanelWindow {
 
     MouseArea {
       anchors.fill: parent
-      enabled: panel.shown && !panel.pinned
+      enabled: panel.shown
       onClicked: panel.close()
     },
 
@@ -150,9 +121,8 @@ PanelWindow {
       border.color: panel.shell.palette.dim
       border.width: 1
 
-      // Keys bubble up from whichever control holds focus, so the handler sits
-      // on the card: their only common ancestor, since the pin control is a
-      // sibling of the content column rather than inside it.
+      // Keys bubble up from whichever button holds focus, so the handler sits
+      // on their common ancestor rather than on each of them.
       Keys.onPressed: function (event) {
         if (!panel.keyNavigation) return
         if (event.key === Qt.Key_Escape) panel.close()
@@ -173,51 +143,10 @@ PanelWindow {
       Column {
         id: column
         anchors.fill: parent
-        anchors.leftMargin: 12
-        anchors.topMargin: 12
-        anchors.bottomMargin: 12
-        anchors.rightMargin: panel.pinnable ? pinControl.width + 20 : 12
+        anchors.margins: 12
         spacing: 8
 
         focus: panel.keyNavigation
-      }
-
-      Rectangle {
-        id: pinControl
-        visible: panel.pinnable
-        z: 1
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.topMargin: 8
-        anchors.rightMargin: 8
-        width: pinLabel.implicitWidth + 14
-        height: 24
-        radius: 4
-        color: pinMouse.containsMouse ? panel.shell.palette.sel : "transparent"
-        border.color: pinControl.activeFocus ? panel.shell.palette.fg : panel.shell.palette.dim
-        border.width: 1
-
-        activeFocusOnTab: panel.keyNavigation && panel.pinnable
-        Keys.onReturnPressed: panel.togglePinned()
-        Keys.onEnterPressed: panel.togglePinned()
-        Keys.onSpacePressed: panel.togglePinned()
-
-        Text {
-          id: pinLabel
-          anchors.centerIn: parent
-          text: panel.pinned ? "Unpin" : "Pin"
-          color: panel.shell.palette.fg
-          font.family: "JetBrainsMono Nerd Font"
-          font.pixelSize: 12
-        }
-
-        MouseArea {
-          id: pinMouse
-          anchors.fill: parent
-          hoverEnabled: true
-          cursorShape: Qt.PointingHandCursor
-          onClicked: panel.togglePinned()
-        }
       }
     }
   ]
