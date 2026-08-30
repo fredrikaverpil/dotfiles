@@ -481,6 +481,11 @@ arrow keys and inert on Enter, rather than absent — so what is still missing
 stays visible. Those are the rows to edit when the feature lands, and they are
 the running list of what this desktop does not do yet.
 
+**System › Close window** is a deliberate UTM accessibility divergence:
+macOS consumes the upstream `SUPER + W` and `SUPER + Q` chords before the VM
+sees them. Omarchy has only those direct binds; this row runs the same
+`hl.dsp.window.close()` dispatcher after the menu hides.
+
 Reachable as `qs ipc call menu toggle|open|close` and `level <id>`; bound to
 `SUPER + SPACE`, with `SUPER + ALT + SPACE` (apps), `SUPER + ESCAPE` (system),
 `SUPER + K` (keybindings) and `SUPER + SHIFT + CTRL + SPACE` (theme) opening a
