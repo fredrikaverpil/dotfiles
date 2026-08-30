@@ -8,8 +8,15 @@
 NVIM_APPNAME=nvim-fredrik nvim
 ```
 
-Symlinked via GNU Stow. Run `cd ~/.dotfiles/stow && stow --target="$HOME"
---restow --no-folding --adopt shared "$(uname -s)"` to apply.
+Symlinked via GNU Stow. From `~/.dotfiles/stow`, apply `shared`, the platform,
+and the optional matching host package with:
+
+```bash
+packages=(shared "$(uname -s)")
+host="$(hostname -s)"
+[ -d "$host" ] && packages+=("$host")
+stow --target="$HOME" --restow --no-folding --adopt "${packages[@]}"
+```
 
 ## Structure
 

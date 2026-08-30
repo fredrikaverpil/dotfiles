@@ -129,9 +129,12 @@ Editing an already-linked file needs nothing — rsync writes through the link. 
 **new** file under `stow/` just needs stow re-run, which is the same command
 home-manager activation runs:
 
-```sh
-stow --dir=$HOME/.dotfiles/stow --target=$HOME --restow --no-folding --adopt \
-  shared Linux
+```bash
+packages=(shared Linux)
+host="$(hostname -s)"
+[ -d "$HOME/.dotfiles/stow/$host" ] && packages+=("$host")
+stow --dir="$HOME/.dotfiles/stow" --target="$HOME" --restow --no-folding --adopt \
+  "${packages[@]}"
 ```
 
 If it ever reports the conflict above, `rm` the offending links (they are

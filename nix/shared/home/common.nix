@@ -4,6 +4,7 @@
   lib,
   pkgs,
   inputs,
+  hostName,
   ...
 }:
 let
@@ -12,6 +13,7 @@ let
 
   # Stow package dir matching `uname -s`; Nix knows the platform at build time.
   stowPlatform = if pkgs.stdenv.hostPlatform.isDarwin then "Darwin" else "Linux";
+  stowHost = lib.escapeShellArg hostName;
 in
 {
   imports = [
@@ -66,10 +68,15 @@ in
       # --no-folding links individual files so other tools can write siblings
       # into the same dir (e.g. ~/.config).
       echo "Stowing dotfiles from $DOTFILES_PATH..."
+      stowPackages=(shared ${stowPlatform})
+      if [ -d "$DOTFILES_PATH/stow"/${stowHost} ]; then
+        stowPackages+=(${stowHost})
+      fi
+
       if ! $DRY_RUN_CMD ${pkgs.stow}/bin/stow \
         --dir="$DOTFILES_PATH/stow" --target="$HOME" \
         --restow --no-folding --adopt \
-        shared ${stowPlatform}; then
+        "''${stowPackages[@]}"; then
         echo "Warning: Stow installation failed"
         exit 1
       fi
