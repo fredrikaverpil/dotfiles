@@ -83,24 +83,11 @@ in
     HYPRCURSOR_SIZE = "24";
   };
 
-  # Autologin straight into Hyprland: no greeter UI, greetd only supplies the
-  # session. greetd refuses to start unless default_session is set, even when
-  # only initial_session is wanted. SSH stays up independently, so a crashing
-  # session is recoverable.
-  services.greetd = {
-    enable = true;
-    settings =
-      let
-        session = {
-          command = "${pkgs.uwsm}/bin/uwsm start -F -e -D Hyprland ${pkgs.hyprland}/bin/start-hyprland";
-          user = "fredrik";
-        };
-      in
-      {
-        initial_session = session;
-        default_session = session;
-      };
-  };
+  # Terminal-first login: no display manager. Agetty authenticates fredrik on
+  # the console, then the `hypr` zsh function starts this UWSM-managed session.
+  # When it exits, the user returns to the same terminal rather than a greeter.
+  # Keep programs.hyprland's graphical.target default: it does not start a
+  # greeter, but UWSM's `check may-start` requires that target to be active.
 
   # Quickshell provides both the lock surface (PAM service below) and the
   # desktop polkit agent. NixOS owns the authorization daemon itself.

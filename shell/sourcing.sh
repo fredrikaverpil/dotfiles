@@ -5,6 +5,15 @@
 # functions and shell-agnostic
 # ----------------------------
 
+# Start the configured Hyprland session from a console login. Defining this
+# only when UWSM is installed keeps the shared shell setup inert on macOS.
+if command -v uwsm >/dev/null 2>&1; then
+	function hypr() {
+		uwsm check may-start || return
+		uwsm start -e -D Hyprland hyprland.desktop
+	}
+fi
+
 function virtual_env_activate() {
 	if [[ -n "$VIRTUAL_ENV" ]]; then
 		# check the current folder belong to earlier VIRTUAL_ENV folder
