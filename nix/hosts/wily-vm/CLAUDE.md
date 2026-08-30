@@ -909,6 +909,19 @@ missing.
    it has no focused key handler and Display/Network have no selection state.
    Port a lean shared `PanelKeyCatcher` concept from Omarchy, then give each
    panel a section/selection cursor for `hjkl`/arrows, Enter/Space and Escape.
+3. **Make bar-panel behaviour consistent, and add optional pinning** — every
+   bar button should explicitly toggle its surface. Launcher, Display and
+   Network already call `toggle()`; Notifications calls `showHistory()`, so its
+   second-click close is only an outside-click side effect and needs a real
+   toggle API. Add a shared `Ui/Panel` `pinnable` capability (off by default;
+   Network opts in first) with generic chrome, rather than duplicating a pin
+   control in each panel. A pinned panel stays visible above ordinary app
+   windows, and its own button/outside clicks do not close it; only the pin
+   control unpins it. It must become non-modal while pinned: remove the
+   full-screen dismissal input capture and release exclusive keyboard focus so
+   normal apps remain usable. Lock and other layer-shell overlays may still
+   cover it, which is correct. Pinning Network is how a future graph can
+   accumulate history while visible without adding a hidden background sampler.
 
 Half of Omarchy's tree cannot port: Install / Remove / Update are `pacman`
 operations, and on NixOS that is a rebuild. The root menu here is necessarily
