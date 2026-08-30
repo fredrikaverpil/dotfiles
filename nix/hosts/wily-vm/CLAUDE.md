@@ -878,7 +878,11 @@ without coupling the VM to their whole shell.
   reset the idle timer that blanked the output in the first place. Do not
   replace it with `security.pam.services`: on this aarch64 nixpkgs revision the
   PAM renderer evaluates disabled Howdy/Kanidm module paths and fails before it
-  can render a custom service. `IdleMonitor` honours inhibitors, locks at five
+  can render a custom service. Setting options on services that already exist is
+  unaffected -- `security.pam.services.login.enableGnomeKeyring` evaluates, and
+  `services.gnome.gnome-keyring.enable` renders its own entries into
+  `/etc/pam.d/login` -- so the limit is defining a *new* service, not touching
+  the option tree. `IdleMonitor` honours inhibitors, locks at five
   minutes and the lock surface requests DPMS off five minutes later; input
   wakes it. `wily-sleep-lock.service` holds a logind delay inhibitor, requests
   the lock on `PrepareForSleep`, and waits up to three seconds for its `secure`
