@@ -679,12 +679,36 @@ smaller than theirs.
   `respectInhibitors: true` (`shell/plugins/services/idle/Service.qml:250`),
   so this result carries to their code — and their `test/shell.d/idle-test.sh`
   does not cover it either (Node unit tests over `IdleModel.js` plus the
-  stay-awake toggle's state file; no compositor, no Wayland), so there is
-  nothing upstream to port here. Where they differ is the policy on top: two timers staging a screensaver before the lock, and a "stay awake"
-  toggle that gates the monitor rather than taking an inhibitor. Their
-  `o.window({ tag = "noidle" }, { idle_inhibit = "always" })`
-  (`default/hypr/apps/system.lua:57`) — tag any window to keep the session
-  awake — is not ported. Nothing here needs it yet.
+  stay-awake toggle's state file; no compositor, no Wayland), so there is no
+  test upstream to port. Where they differ is the policy on top: two timers
+  staging a screensaver before the lock, and a "stay awake" toggle that gates
+  the monitor rather than taking an inhibitor.
+
+  Their `o.window({ tag = "noidle" }, { idle_inhibit = "always" })`
+  (`default/hypr/apps/system.lua:57`) **is** ported — tag a window and the
+  whole session stays awake. Upstream leaves applying the tag to the user;
+  `SUPER + CTRL + ALT + I` here toggles it on the active window and reports
+  which way it landed, since their affordance for this is a bar indicator we
+  have not ported. The chord follows their modifier scheme rather than being
+  free real estate: `SUPER + SHIFT + <letter>` launches an application,
+  `SUPER + CTRL + <letter>` is a system toggle or panel, bare `SUPER` is
+  window management, and `+ ALT` marks the variant of the chord without it —
+  which is how they pair `SUPER + CTRL + R` with `SUPER + CTRL + ALT + R`.
+  So the per-window form of `SUPER + CTRL + I` is that chord, and it is unused
+  upstream. The readback is `inhibitingIdle` rather than the tag, so the
+  message says the rule fired, not merely that the tag exists.
+  `hl.dsp.window.tag({ tag = "noidle" })` with no `action` toggles; the
+  argument must be a table, and a bare string raises.
+
+  **Reach for it last.** Firefox and Chromium take a
+  `zwp_idle_inhibit_manager_v1` inhibitor themselves while a video plays, which
+  is the protocol verified above, so video should need no tag and no keypress.
+  Neither is installed here, so that is mechanism, not a test — it is a
+  30-second check on the ThinkPad and worth doing before assuming otherwise.
+  An app that turns out not to inhibit wants a rule matched on its class with
+  `idle_inhibit = "fullscreen"`, the way Omarchy ships Steam, Moonlight,
+  RetroArch and GeForce NOW in `default/hypr/apps/*.lua` — config, so it
+  survives a reboot. The tag is for the case nobody anticipated.
 - Keyboard layout is `us`. Swedish is wanted eventually as a second layout,
   but not yet — `kb_layout = "us,se"` with a `grp:` toggle in `kb_options`
   when the time comes.

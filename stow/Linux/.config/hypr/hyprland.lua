@@ -38,6 +38,22 @@ hl.config({
   },
 })
 
+-- Tagging a window "noidle" holds the whole session awake, per Omarchy's
+-- default/hypr/apps/system.lua. hyprctl -j clients reports the result as
+-- inhibitingIdle, which is what the bind below reads back. The tag is window
+-- state, so it is gone on close or reboot; an app that always needs this wants
+-- its own rule matched on class with idle_inhibit = "fullscreen" instead.
+hl.window_rule({ match = { tag = "noidle" }, idle_inhibit = "always" })
+
+-- Toggling the tag is otherwise invisible, and Omarchy's equivalent
+-- affordance is a bar indicator we have not ported.
+local stay_awake = table.concat({
+  [[hyprctl dispatch 'hl.dsp.window.tag({ tag = "noidle" })' >/dev/null;]],
+  [[hyprctl -j activewindow | jq -e .inhibitingIdle >/dev/null]],
+  [[&& notify-send -u low "Stay awake" "On for this window"]],
+  [[|| notify-send -u low "Stay awake" "Off for this window"]],
+}, " ")
+
 -- Every bind goes through this rather than hl.bind directly. `hyprctl binds`
 -- reports Lua binds with an empty key whenever the chord uses code:NN, so this
 -- file is the only place the chord still exists in readable form: the
@@ -85,6 +101,7 @@ local ok, err = pcall(function()
   bind("SUPER + ALT + comma", "Invoke latest notification", hl.dsp.exec_cmd("qs ipc call notifications invokeLast"))
   bind("SUPER + SHIFT + ALT + comma", "Open notification history", hl.dsp.exec_cmd("qs ipc call notifications showHistory"))
   bind("SUPER + CTRL + I", "Toggle idle locking", hl.dsp.exec_cmd("qs ipc call idle toggle"))
+  bind("SUPER + CTRL + ALT + I", "Keep this window awake", hl.dsp.exec_cmd(stay_awake))
   bind("SUPER + CTRL + L", "Lock system", hl.dsp.exec_cmd("qs ipc call lock lock"))
 
   -- Windows
