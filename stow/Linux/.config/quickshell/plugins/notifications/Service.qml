@@ -26,7 +26,6 @@ Item {
   property bool doNotDisturb: false
   property bool historyShown: false
   readonly property bool shown: historyShown
-  readonly property bool pinned: false
   property var popupRows: []
   property var historyRows: []
   property var live: ({})

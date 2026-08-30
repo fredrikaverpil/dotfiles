@@ -18,7 +18,6 @@ Ui.Panel {
   id: root
 
   cardHeight: 560
-  pinnable: true
   keyNavigation: true
 
   readonly property bool networkManagerAvailable: Networking.backend === NetworkBackendType.NetworkManager

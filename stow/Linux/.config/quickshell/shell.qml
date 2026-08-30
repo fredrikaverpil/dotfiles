@@ -35,13 +35,11 @@ ShellRoot {
     if (panel && panels.indexOf(panel) < 0) panels = panels.concat([panel])
   }
 
-  // Opening a panel replaces any unpinned panel. Pinned panels deliberately
-  // stay up, which lets Network keep collecting visible history while another
-  // surface is open.
+  // Opening a panel closes any other. Only one overlay surface at a time.
   function claimPanel(panel) {
     for (let index = 0; index < panels.length; index++) {
       const candidate = panels[index]
-      if (candidate !== panel && candidate.shown && !candidate.pinned) candidate.close()
+      if (candidate !== panel && candidate.shown) candidate.close()
     }
   }
 

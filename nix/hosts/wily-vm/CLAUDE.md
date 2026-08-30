@@ -198,29 +198,29 @@ symlinks into the repo, so nothing real is lost) and run it again.
   small panel coordinator; the surfaces live in `plugins/{bar,menu,background}/`
   and share `Ui/Panel.qml`, which is the overlay chrome (transparent
   layer-shell surface, keyboard focus while modal, click-outside dismissal and
-  a centred card). The coordinator closes other unpinned surfaces when one
+  a centred card). The coordinator closes any other open surface when one
   opens; the notification history registers with it too. **Panel's full-screen
   input mask cuts out the top-bar strip.** Without that cutout, a modal panel
   consumes a repeat click before its bar button can toggle it or open another
   panel. It must also settle from a brief `Exclusive` focus prime to `OnDemand`:
   Hyprland routes pointer input to an exclusive surface despite that cutout.
-  `pinnable` is off by default; Network enables it. A pinned card owns
-  input only inside itself, releases keyboard focus, ignores outside and bar
-  clicks, and has no persistence — only its generic Pin/Unpin control changes
-  that state. **Releasing keyboard focus costs a pinned card every key and
-  every modifier**: with no `wl_keyboard.enter` the client is never told which
-  modifiers are held, so a pinned panel cannot be keyboard-navigated and no
-  modifier-gated pointer gesture (a SUPER+drag to move it, say) can be
-  detected inside it. Anything a pinned card must support has to work from an
-  unmodified pointer alone.
+  **Pinning was built and then removed** — a pinned card kept its surface up
+  with input masked to itself alone. It cost its keyboard focus to do that,
+  and a layer-shell surface with no `wl_keyboard.enter` is never told which
+  modifiers are held: a pinned panel could not be keyboard-navigated, could
+  not be unpinned by any key, and no modifier-gated gesture (a SUPER+drag to
+  move it) could be detected inside it. That left it mouse-only in a shell
+  that is otherwise keyboard-first, for one panel. Do not reintroduce it
+  without an answer to the focus problem — the readout it existed for
+  (Network's live ping and transfer rates) is better served by a bar widget,
+  which never takes focus in the first place.
   `keyNavigation` opts a panel into keyboard control: buttons set
   `activeFocusOnTab` and draw their border from `activeFocus`, and **Qt's own
   focus chain does the walking** — `nextItemInFocusChain` in document order,
   so no panel keeps a cursor of its own. It is deliberately one linear chain
   rather than a grid: `l`/`j` step forward and wrap from a row's last option
   into the next row's first, `h`/`k` step back. The handler sits on the card,
-  the only ancestor common to both the content column and the pin control;
-  keys bubble to it from whichever button holds focus. **Chain membership is
+  the buttons' common ancestor; keys bubble to it from whichever holds focus. **Chain membership is
   never conditioned on a button's `available`**, only on its visibility: a
   button that goes unavailable while its own action runs — every scale preset
   during `scaleChanging`, every Wi-Fi control during `busy` — would otherwise
