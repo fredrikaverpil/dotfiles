@@ -25,6 +25,8 @@ Item {
   property bool stateLoaded: false
   property bool doNotDisturb: false
   property bool historyShown: false
+  readonly property bool shown: historyShown
+  readonly property bool pinned: false
   property var popupRows: []
   property var historyRows: []
   property var live: ({})
@@ -194,8 +196,19 @@ Item {
     for (var index = 0; index < rows.length; index++) dismiss(rows[index])
   }
 
+  function close() {
+    historyShown = false
+  }
+
   function showHistory() {
+    if (shell && shell.registerPanel) shell.registerPanel(root)
+    if (shell && shell.claimPanel) shell.claimPanel(root)
     historyShown = true
+  }
+
+  function toggleHistory() {
+    if (historyShown) close()
+    else showHistory()
   }
 
   onDoNotDisturbChanged: saveState()
@@ -204,6 +217,7 @@ Item {
   // defaults writable immediately, then let a later load replace them when a
   // persisted state already exists.
   Component.onCompleted: {
+    if (shell && shell.registerPanel) shell.registerPanel(root)
     stateLoaded = true
     stateFile.reload()
   }
@@ -253,6 +267,11 @@ Item {
 
     function showHistory(): string {
       root.showHistory()
+      return "ok"
+    }
+
+    function toggleHistory(): string {
+      root.toggleHistory()
       return "ok"
     }
 
@@ -328,13 +347,25 @@ Item {
     anchors { top: true; bottom: true; left: true; right: true }
     exclusionMode: ExclusionMode.Ignore
     color: "transparent"
+    // Keep the bell reachable: a full-screen modal surface otherwise owns its
+    // repeat click, so the bar never gets the chance to toggle this history.
+    mask: Region {
+      width: historyWindow.width
+      height: historyWindow.height
+
+      Region {
+        width: historyWindow.width
+        height: root.shell ? root.shell.barHeight : 32
+        intersection: Intersection.Subtract
+      }
+    }
     WlrLayershell.namespace: "wily-notification-history"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     MouseArea {
       anchors.fill: parent
-      onClicked: root.historyShown = false
+      onClicked: root.close()
     }
 
     Rectangle {

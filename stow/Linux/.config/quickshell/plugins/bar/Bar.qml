@@ -70,7 +70,7 @@ Scope {
         left: true
         right: true
       }
-      implicitHeight: 32
+      implicitHeight: bar.shell.barHeight
       color: bar.shell.palette.bg
 
       BarButton {
@@ -107,7 +107,7 @@ Scope {
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
         label: bar.shell.notifications.doNotDisturb ? "󰂛" : "󰂚"
-        onActivated: bar.shell.notifications.showHistory()
+        onActivated: bar.shell.notifications.toggleHistory()
       }
 
       BarButton {

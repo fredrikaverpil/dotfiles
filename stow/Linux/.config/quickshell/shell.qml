@@ -26,6 +26,25 @@ ShellRoot {
   readonly property alias display: display
   readonly property alias network: network
 
+  // All overlay panels leave this strip click-through so a second click
+  // reaches its bar button rather than their full-screen dismissal surface.
+  readonly property int barHeight: 32
+  property var panels: []
+
+  function registerPanel(panel) {
+    if (panel && panels.indexOf(panel) < 0) panels = panels.concat([panel])
+  }
+
+  // Opening a panel replaces any unpinned panel. Pinned panels deliberately
+  // stay up, which lets Network keep collecting visible history while another
+  // surface is open.
+  function claimPanel(panel) {
+    for (let index = 0; index < panels.length; index++) {
+      const candidate = panels[index]
+      if (candidate !== panel && candidate.shown && !candidate.pinned) candidate.close()
+    }
+  }
+
   // Light/dark. The dconf key is the source of truth, not a property of ours:
   // xdg-desktop-portal-gtk republishes it as org.freedesktop.appearance, which
   // is what flips Ghostty's theme live, and Neovim follows the terminal over
