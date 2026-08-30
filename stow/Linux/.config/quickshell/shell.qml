@@ -143,22 +143,36 @@ ShellRoot {
     shell: root
   }
 
-  // Bar chrome, so every button hovers and reads the same.
+  // Bar chrome, so every button hovers and reads the same. Keep an icon slot
+  // independent of its glyph: the light and dark symbols have different font
+  // advances, and a content-sized slot makes its neighbour jump on a toggle.
   component BarButton: Rectangle {
     id: btn
 
     property alias label: btnLabel.text
     signal activated
 
-    implicitWidth: btnLabel.implicitWidth + 16
+    implicitWidth: 28
     width: implicitWidth
     height: 24
     radius: 4
     color: btnMouse.containsMouse ? root.palette.sel : "transparent"
 
+    TextMetrics {
+      id: btnMetrics
+      font.family: btnLabel.font.family
+      font.pixelSize: btnLabel.font.pixelSize
+      text: btnLabel.text
+    }
+
     Text {
       id: btnLabel
       anchors.centerIn: parent
+      // Text centers its advance box, not the pixels it paints. Correct that
+      // horizontal difference so differently shaped Nerd Font glyphs share a
+      // visual centre in the fixed slot.
+      anchors.horizontalCenterOffset: implicitWidth / 2
+        - (btnMetrics.tightBoundingRect.x + btnMetrics.tightBoundingRect.width / 2)
       color: root.palette.fg
       font.family: "JetBrainsMono Nerd Font"
       font.pixelSize: 14
