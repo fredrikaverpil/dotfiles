@@ -17,9 +17,12 @@ missing one, because it gets believed and acted on.
 ## Reaching it
 
 - `ssh fredrik@192.168.64.15` (key auth; password auth also on)
-- Rebuild: `sudo nixos-rebuild switch --flake ~/.dotfiles#wily-vm`. Running
-  this on **wily-vm only** is pre-authorized; every other host stays
-  ask-first.
+- Rebuild: `sudo nixos-rebuild switch --flake ~/.dotfiles#wily-vm`. Intended
+  to be pre-authorized on **wily-vm only**, but in practice the permission
+  layer refuses it over SSH along with `sudo reboot` — hand both to the user
+  rather than retrying. Every other host stays ask-first regardless. The
+  switch always ends with `home-manager-fredrik.service` failing on the stow
+  conflict below; that is after activation and is not a failed rebuild.
 - `~/.dotfiles` on the VM is a clone of the GitHub repo; see the next section
   for pushing uncommitted work to it.
 
