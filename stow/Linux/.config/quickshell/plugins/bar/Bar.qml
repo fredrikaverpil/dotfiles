@@ -102,8 +102,17 @@ Scope {
       }
 
       BarButton {
-        id: displayButton
+        id: notificationButton
         anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: 4
+        label: bar.shell.notifications.doNotDisturb ? "󰂛" : "󰂚"
+        onActivated: bar.shell.notifications.showHistory()
+      }
+
+      BarButton {
+        id: displayButton
+        anchors.right: notificationButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
         label: "󰍹"
@@ -114,8 +123,8 @@ Scope {
         anchors.right: displayButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
-        label: bar.shell.notifications.doNotDisturb ? "󰂛" : "󰂚"
-        onActivated: bar.shell.notifications.showHistory()
+        label: bar.shell.network.icon
+        onActivated: bar.shell.network.toggle()
       }
     }
   }

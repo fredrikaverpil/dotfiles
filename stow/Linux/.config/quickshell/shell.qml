@@ -8,6 +8,7 @@ import "plugins/lock" as Lock
 import "plugins/menu" as Menu
 import "plugins/notifications" as Notifications
 import "plugins/panels/monitor" as Monitor
+import "plugins/panels/network" as Network
 import "plugins/polkit" as Polkit
 import "plugins/services/idle" as Idle
 import "plugins/services/nightlight" as Nightlight
@@ -23,6 +24,7 @@ ShellRoot {
   readonly property alias notifications: notifications
   readonly property alias nightlight: nightlight
   readonly property alias display: display
+  readonly property alias network: network
 
   // Light/dark. The dconf key is the source of truth, not a property of ours:
   // xdg-desktop-portal-gtk republishes it as org.freedesktop.appearance, which
@@ -148,6 +150,7 @@ ShellRoot {
     "trigger.share": { icon: "", label: "Share", enabled: false },
     "setup": { icon: "", label: "Setup" },
     "setup.display": { icon: "󰍹", label: "Display", action: () => display.open() },
+    "setup.network": { icon: "󰈀", label: "Network", action: () => network.open() },
     "setup.nightlight": { icon: "󰆔", label: "Nightlight", action: () => nightlight.toggle() },
     "system": { icon: "", label: "System" },
     "system.close": { icon: "󰅖", label: "Close window", action: () => Quickshell.execDetached(
@@ -201,6 +204,11 @@ ShellRoot {
 
   Monitor.Panel {
     id: display
+    shell: root
+  }
+
+  Network.Panel {
+    id: network
     shell: root
   }
 
