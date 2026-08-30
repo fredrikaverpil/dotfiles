@@ -468,7 +468,13 @@ without coupling the VM to their whole shell.
   underneath the surface and takes the whole shell down with
   *"Tried to show lockscreen surfaces without active lock"* (the last line in
   `~/.cache/quickshell/crashes/*/log.qslog.log`, which is where a crash is
-  actually explained; the journal only carries the stack trace). Do not
+  actually explained; the journal only carries the stack trace). Nor
+  redundantly: `wake()` runs on every keystroke, and dispatching `dpms on` to
+  an output that is already on forces a modeset that flashes the lock screen
+  black between characters. The service therefore tracks its own `blanked`
+  flag and dispatches only on a change — which assumes nothing else drives
+  DPMS, since an outside `dpms off` would desync the flag and leave a
+  keystroke unable to bring the screen back. Do not
   replace it with `security.pam.services`: on this aarch64 nixpkgs revision the
   PAM renderer evaluates disabled Howdy/Kanidm module paths and fails before it
   can render a custom service. `IdleMonitor` honours inhibitors, locks at five

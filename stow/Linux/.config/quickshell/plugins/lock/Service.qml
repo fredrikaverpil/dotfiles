@@ -21,6 +21,7 @@ Item {
   property string enteredPassword: ""
   property string failureMessage: ""
   property int failedAttempts: 0
+  property bool blanked: false
 
   readonly property bool locked: lockRequested || sessionLock.locked || sessionLock.secure
 
@@ -84,7 +85,12 @@ Item {
   }
 
   function dpms(on) {
-    if (dpmsProcess.running) return
+    // Turning on an output that is already on forces a modeset, and wake() runs
+    // on every keystroke — so an unguarded dispatch flashes the lock screen
+    // black under typing. "on" is only needed while blanked, "off" only while
+    // not.
+    if (dpmsProcess.running || blanked !== on) return
+    blanked = !on
     // hyprctl dispatch takes Lua on 0.56; the hyprlang form "dpms off" is a
     // parse error that only shows up on hyprctl's stdout, which nothing reads.
     dpmsProcess.command = ["hyprctl", "dispatch", on ? 'hl.dsp.dpms("on")' : 'hl.dsp.dpms("off")']
