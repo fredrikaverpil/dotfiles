@@ -1082,6 +1082,15 @@ smaller than theirs.
 - The bar uses JetBrains Mono Nerd Font (`nix/shared/system/linux.nix` installs
   several nerd fonts). Berkeley Mono is wanted as the system font eventually,
   but it is a paid font and needs vendoring before Nix can install it.
+- Ghostty's `font-size` is in points converted through display DPI, which is 96
+  on Linux/GTK but 72 on macOS, so the shared 14pt renders a third larger here.
+  `stow/Linux/.config/ghostty/config-linux` overrides it to 10.5 and swaps the
+  (unvendored) Berkeley Mono for JetBrains Mono Nerd Font; the shared config
+  pulls it in with `config-file = ?config-linux`, which is silently skipped on
+  macOS. Relative includes resolve against the stow *symlink's* directory
+  (`~/.config/ghostty`), not the repository target, so both files must be
+  stowed. All 17 `macos-*` keys parse fine on the Linux build — no split
+  needed beyond these overrides.
 - Only one emoji font is installed; `noto-fonts-color-emoji` is commented out
   in `nix/shared/system/linux.nix` as slow to build. Quickshell UI will want it.
 - Mason installs prebuilt glibc binaries, which cannot run on NixOS. Neovim

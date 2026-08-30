@@ -70,3 +70,6 @@ keybind = cmd+ctrl+e=equalize_splits
 # - https://github.com/hackr-sh/ghostty-shaders
 # custom-shader = /Users/fredrik/code/public/ghostty-shaders/cursor_blaze.glsl
 # custom-shader-animation = false
+
+# Linux-only overrides (ignored when missing).
+config-file = ?config-linux

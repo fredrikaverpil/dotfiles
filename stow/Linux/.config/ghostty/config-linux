@@ -1,0 +1,10 @@
+# Included from the shared config; Linux-only overrides.
+
+# Ghostty converts points via display DPI: 96 on Linux/GTK vs 72 on macOS, so
+# the shared 14pt renders ~33% larger here. 10.5 = 14 * 72/96.
+font-size = 10.5
+
+# Berkeley Mono is a paid font and not vendored into Nix yet, so the shared
+# family falls back to DejaVu Sans Mono. Maple Mono (italics) is installed.
+font-family = "JetBrainsMono Nerd Font"
+font-family-bold = "JetBrainsMono Nerd Font"
