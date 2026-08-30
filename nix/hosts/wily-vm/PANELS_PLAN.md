@@ -59,12 +59,36 @@ Upstream model: Omarchy Quattro at `~/code/public/github.com/omacom/omarchy`.
   which is atomic — unlike git's unlink-then-create, it does not trip the
   missing-file overlay. Verified on the VM: a `sed -i` insert and its revert on
   the live `hyprland.lua` both left `hyprctl configerrors` empty.
-- **Scale persistence dirties the repo**, because `hyprland.lua` is a stowed,
-  git-tracked file. On the VM the next rsync from the laptop reverts it; on the
-  ThinkPad it is an uncommitted change. Upstream has the same property —
-  `monitors.lua` is user config for them. Decide when writing the scale row
-  whether that is acceptable or whether the value belongs in a state file that
-  `hyprland.lua` reads.
+- **How Omarchy persists scale, and why we cannot copy it directly.**
+  `bin/omarchy-hyprland-monitor-scaling` applies live with
+  `hyprctl eval "hl.monitor({...})"` and then `sed -i`s two variables --
+  `omarchy_monitor_scale` and `omarchy_gdk_scale` -- in
+  `~/.config/hypr/monitors.lua`, a per-machine file `require`d from their
+  `hyprland.lua`. Dirtying it costs them nothing because it is a user-owned
+  copy, not a tracked file.
+
+  Ours is one `hyprland.lua`, and `stow/Linux` is stowed to **every** Linux
+  host (`nix/shared/home/common.nix:14`) -- rpi5-homelab, wily-vm, and the
+  ThinkPad. A per-host monitor scale sed'd into it is therefore wrong on the
+  other hosts by construction.
+
+  **Open decision, blocking the scale row:**
+  1. A state file, `~/.local/state/wily-monitor-scale`, read by `hyprland.lua`
+     at load. ~8 lines of Lua, repo stays clean, and it matches the existing
+     precedent -- wallpaper picks and `hypr-binds.tsv` already live in
+     `~/.local/state`. Diverges from upstream in shape.
+  2. **Per-host stow packages** (`stow/<hostname>/`) added to the two stow
+     invocations, then a per-host `monitors.lua` `require`d from the shared
+     `hyprland.lua` -- structurally Omarchy's layout, and the scale becomes a
+     meaningful per-host commit. More machinery than one number needs, but it
+     is the thing that makes per-host divergence possible at all, which the
+     ThinkPad will want beyond this. The stow call is
+     `nix/shared/home/common.nix:69`, plus the manual command documented in
+     the root `CLAUDE.md`; note stow errors on a package directory that does
+     not exist.
+
+  Whichever wins, `hl.env("GDK_SCALE", ...)` comes along for XWayland sizing
+  and only takes effect at compositor startup, as `hl.env` is read once.
 - **Hyprland only accepts scales that divide the mode into whole logical
   pixels** (1/120 steps; clean scales divide `gcd(w*120, h*120)`). Port
   `panels/monitor/Model.js`'s `cleanScale` / `availableScales` verbatim.
@@ -136,7 +160,7 @@ Check: `hyprctl hyprsunset temperature` reports 4000 after a toggle; a forced
 boundary (feed the model a fake clock in the `node` check) flips it; the
 morning `identity` profile does not leave it stuck.
 
-### 3. `feat(wily-vm): display panel`
+### 3. `feat(wily-vm): display panel` — in progress: `Model.js` landed, `Panel.qml` not started
 
 `plugins/panels/monitor/{Panel.qml,Model.js}` on the shared `Ui/Panel`.
 
