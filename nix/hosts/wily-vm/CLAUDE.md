@@ -188,7 +188,19 @@ symlinks into the repo, so nothing real is lost) and run it again.
   Chromium dark, which is what isolates it. Firefox and Zen read `color-scheme`
   directly and ignore `gtk-theme`, so nothing else on the VM showed the fault.
 - **stow** (`stow/Linux/.config/{hypr,quickshell}/`) carries the config and
-  QML. Deliberate: the Quickshell tree gets edited constantly and stow
+  QML. `shell.qml` is wiring only — the palette, the menu's entry table and
+  the instantiations; the surfaces live in `plugins/{bar,menu,background}/`
+  and share `Ui/Panel.qml`, which is the overlay chrome (transparent
+  layer-shell surface, keyboard focus only while shown, click-outside to
+  dismiss, centred card). **Panel aliases its default property to the card's
+  column**, so its own fixed children are assigned through `data` — an
+  ordinary child there would be reparented into the column. A consumer's
+  non-visual objects (`FileView`, `IpcHandler`) land in that column too, which
+  is harmless: `Column` lays out `Item`s and ignores the rest.
+  `Variants` takes exactly one child as its delegate, so anything else a
+  surface needs — `Bar.qml`'s `SystemClock`, `Background.qml`'s state files —
+  sits beside it under a `Scope`, not inside it. Putting it inside costs a
+  `ReferenceError` at runtime, not a load failure. Deliberate: the Quickshell tree gets edited constantly and stow
   symlinks take effect with no rebuild. Do not move QML into the Nix store.
   Under `--no-folding` that immediacy covers **edits** only — stow links each
   file individually, so a *new* file needs stow re-run (see above).
