@@ -515,8 +515,23 @@ indirection; this is ~25 entries in a QML object literal and needs none of it.
 
 `enabled: false` lists a row with nothing behind it yet: dim, skipped by the
 arrow keys and inert on Enter, rather than absent — so what is still missing
-stays visible. Those are the rows to edit when the feature lands, and they are
-the running list of what this desktop does not do yet.
+stays visible while browsing. Those are the rows to edit when the feature
+lands. They are not the record of what is missing, though: this file is, so
+that a row can be deleted without losing the note. Still dim: Learn ›
+Hyprland and NixOS, Trigger › Emoji / Color picker / Share, Setup › Display
+and Nightlight.
+
+Typing filters the whole subtree below the current level, not just the rows on
+screen, which is what Omarchy's `rebuildDisplay` does — so `ghostty` or `lock`
+from the root reaches the action without walking down to it. A hit deeper than
+one level carries its path (`Style › Theme`) and sorts after the direct
+children. Pruned from theirs: the divider between the two groups and the
+`searchScore` tier system, ~20 lines that mostly re-rank app rows against menu
+rows. Apps are ordinary tree items upstream; here they are the one provider
+joined into a root search — the keybinding sheet's ~100 chord rows would swamp
+it, and upstream never faces that because their Keybindings row is an external
+`omarchy-menu-keybindings` action rather than tree items. Dim rows drop out of
+search results, as they do upstream: there is nothing behind them to reach.
 
 **System › Close window** is a deliberate UTM accessibility divergence:
 macOS consumes the upstream `SUPER + W` and `SUPER + Q` chords before the VM

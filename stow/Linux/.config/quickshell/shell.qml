@@ -270,6 +270,42 @@ ShellRoot {
       id.startsWith(prefix) && id.split(".").length === depth)
   }
 
+  // Every id below `parent` at any depth, which is what a search covers.
+  function descendantsOf(parent) {
+    const prefix = parent === "root" ? "" : parent + "."
+    return Object.keys(menuItems).filter(id => id !== parent && id.startsWith(prefix))
+  }
+
+  // "Style › Theme" for a hit further down; empty for a direct child of the
+  // level being searched, which needs no breadcrumb.
+  function pathFrom(id, level) {
+    const parts = id.split(".").slice(0, -1)
+    const skip = level === "root" ? 0 : level.split(".").length
+    return parts.slice(skip).map((part, i) =>
+      menuItems[parts.slice(0, skip + i + 1).join(".")].label).join(" › ")
+  }
+
+  function rowFor(id, level) {
+    const child = menuItems[id]
+    return {
+      id: id,
+      label: child.label,
+      icon: child.icon,
+      detail: pathFrom(id, level),
+      enabled: child.enabled !== false,
+      entry: null,
+      action: child.action || null,
+      submenu: child.provider !== undefined || childrenOf(id).length > 0,
+    }
+  }
+
+  function appRows(detail) {
+    return DesktopEntries.applications.values
+      .filter(entry => !entry.noDisplay)
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map(entry => ({ label: entry.name, icon: "", detail: detail || "", enabled: true, entry: entry }))
+  }
+
   // Reached from Hyprland with `qs ipc call menu toggle`. The bar button calls
   // menu.toggle() directly -- same process, no subprocess needed.
   IpcHandler {
@@ -294,37 +330,31 @@ ShellRoot {
     readonly property var rows: {
       const item = root.menuItems[level]
       const query = input.text.toLowerCase()
-      let out
-
-      if (item && item.provider === "binds") {
-        out = root.binds
-      } else if (item && item.provider === "apps") {
-        out = DesktopEntries.applications.values
-          .filter(entry => !entry.noDisplay)
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .map(entry => ({ label: entry.name, icon: "", enabled: true, entry: entry }))
-      } else {
-        out = root.childrenOf(level).map(id => {
-          const child = root.menuItems[id]
-          return {
-            id: id,
-            label: child.label,
-            icon: child.icon,
-            enabled: child.enabled !== false,
-            entry: null,
-            action: child.action || null,
-            submenu: child.provider !== undefined || root.childrenOf(id).length > 0,
-          }
-        })
-      }
-
-      if (query.length === 0) return out
 
       // Chord as well as label, so "super" and "workspace" both narrow the
       // keybinding sheet.
-      return out.filter(row =>
-        row.label.toLowerCase().indexOf(query) >= 0
-        || (row.chord !== undefined && row.chord.toLowerCase().indexOf(query) >= 0))
+      const matches = row => row.label.toLowerCase().indexOf(query) >= 0
+        || (row.chord !== undefined && row.chord.toLowerCase().indexOf(query) >= 0)
+
+      if (item && item.provider === "binds")
+        return query.length === 0 ? root.binds : root.binds.filter(matches)
+      if (item && item.provider === "apps")
+        return query.length === 0 ? root.appRows() : root.appRows().filter(matches)
+      if (query.length === 0)
+        return root.childrenOf(level).map(id => root.rowFor(id, level))
+
+      // A search covers the whole subtree below the current level, the way
+      // Omarchy's rebuildDisplay does, so "ghostty" or "lock" reaches an
+      // action from the root without walking down to it. Deeper hits carry
+      // their path and sort after the direct children -- their divider and
+      // score tiers are not ported. Apps are in the tree upstream; here they
+      // are the one provider joined in, since the ~100 keybinding rows would
+      // swamp any root search. Dim rows drop out, as they do upstream: there
+      // is nothing behind them to reach.
+      const found = root.descendantsOf(level).map(id => root.rowFor(id, level))
+      return (level === "root" ? found.concat(root.appRows("Apps")) : found)
+        .filter(row => row.enabled && matches(row))
+        .sort((a, b) => (a.detail ? 1 : 0) - (b.detail ? 1 : 0))
     }
 
     // Deferred: ListView resets currentIndex itself when the model changes,
@@ -514,7 +544,21 @@ ShellRoot {
                 color: modelData.enabled ? root.palette.fg : root.palette.off
                 font.family: "JetBrainsMono Nerd Font"
                 font.pixelSize: 15
+                // Capped only where a breadcrumb follows, so a long label
+                // elides instead of pushing it off the panel. Uncapped
+                // otherwise -- the keybinding sheet has 36-character labels.
+                width: modelData.detail ? Math.min(implicitWidth, 300) : implicitWidth
                 text: modelData.label + (modelData.submenu ? " ›" : "")
+                elide: Text.ElideRight
+              }
+
+              // Where a search hit below the current level lives.
+              Text {
+                visible: (modelData.detail || "") !== ""
+                color: root.palette.off
+                font.family: "JetBrainsMono Nerd Font"
+                font.pixelSize: 15
+                text: modelData.detail || ""
                 elide: Text.ElideRight
               }
             }
