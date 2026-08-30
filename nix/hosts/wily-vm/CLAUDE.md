@@ -649,17 +649,42 @@ smaller than theirs.
   nobody listens, and the machine sits unlocked with the lid closed. Omarchy
   covers that case with `bin/omarchy-system-lid-close`, not by subscribing to
   the signal.
-- **"`IdleMonitor` honours inhibitors" is an API claim, not a test.**
-  `respectInhibitors: true` is set (`plugins/services/idle/Service.qml`), and
-  that is all that has been established. The mechanism is the **Wayland**
-  idle-inhibit protocol (`zwp_idle_inhibit_manager_v1`, which
-  xdg-desktop-portal-hyprland binds at startup) — *not* logind, so
-  `systemd-inhibit --what=idle` proves nothing about it. Nothing installed here
-  takes one, as far as anything installed goes — no media player, no browser,
-  and ghostty is not known to. Faking
-  it needs a Hyprland `idleinhibit` window rule plus a temporarily shortened
-  `lockAfterSeconds`, which is a lot of scaffolding for one upstream boolean.
-  Left for the ThinkPad, where playing a video makes it a 30-second check.
+- **`IdleMonitor` honours a real Wayland idle inhibitor — verified.** With
+  `nix run nixpkgs#wlinhibit` holding a `zwp_idle_inhibit_manager_v1`
+  inhibitor, the session sat 400s past its 300s timeout still reporting
+  `idle:false, locked:false`. Unaided it then locked at the timeout in the
+  same session, so the inhibitor is what changed the outcome. Hyprland's own
+  `idle_inhibit` window rule does the same, tested first and superseded by
+  this. `wlinhibit` is not installed — `nix run` it, there is nothing to add
+  to `desktop.nix`.
+
+  Three ways a re-run passes or fails for the wrong reason, all hit here:
+  `qs ipc call idle status` must read `enabled:true` **before** the wait, or
+  `idle:false` means only that the monitor is off. Any host-side input
+  restarts the timer, so check `pmset -g log` on the Mac afterwards for a
+  `UserIsActive` HID assertion inside the window — a locked Mac is fine and
+  actually helps, since nothing then reaches UTM. And a host *sleep* pauses
+  the VM: run `caffeinate -i` on the Mac for the duration, use a guest-side
+  `sleep` (monotonic, so a pause and chrony's catch-up step do not shorten
+  it) and ignore the wall-clock delta — a 400s wait spanning a step reads as
+  827s of `date`.
+
+  `hyprctl -j clients` reports **`inhibitingIdle`** per client, which is the
+  way to tell an inhibitor that never took from one that is not honoured.
+  Nothing in `hyprctl --help` mentions it — it was found in Omarchy's
+  `bin/omarchy-debug-idle`, which is worth reading before debugging this
+  again. Whether a client like `wlinhibit`, which has no ordinary window,
+  shows up there at all is untested; the tag rule below does.
+- Omarchy's idle service uses the same `IdleMonitor` with the same
+  `respectInhibitors: true` (`shell/plugins/services/idle/Service.qml:250`),
+  so this result carries to their code — and their `test/shell.d/idle-test.sh`
+  does not cover it either (Node unit tests over `IdleModel.js` plus the
+  stay-awake toggle's state file; no compositor, no Wayland), so there is
+  nothing upstream to port here. Where they differ is the policy on top: two timers staging a screensaver before the lock, and a "stay awake"
+  toggle that gates the monitor rather than taking an inhibitor. Their
+  `o.window({ tag = "noidle" }, { idle_inhibit = "always" })`
+  (`default/hypr/apps/system.lua:57`) — tag any window to keep the session
+  awake — is not ported. Nothing here needs it yet.
 - Keyboard layout is `us`. Swedish is wanted eventually as a second layout,
   but not yet — `kb_layout = "us,se"` with a `grp:` toggle in `kb_options`
   when the time comes.
