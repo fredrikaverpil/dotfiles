@@ -639,8 +639,8 @@ displace them.
 
 The top bar's `plugins/bar/widgets/Workspaces.qml` is a pared-down port of
 Omarchy's file at the same path. It shows 1–5 even when empty, adds existing
-normal workspaces through 10, dims empty ones, and replaces the focused number
-with Omarchy's glyph. It reads Quickshell's `Hyprland` singleton rather than
+normal workspaces through 10, dims empty ones, and outlines the focused one
+(the digit stays visible, unlike Omarchy's glyph substitution). It reads Quickshell's `Hyprland` singleton rather than
 polling `hyprctl`; clicking an indicator dispatches the same
 `hl.dsp.focus({ workspace = ... })` action as `SUPER + 1` through `SUPER + 0`.
 

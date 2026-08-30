@@ -62,13 +62,15 @@ Item {
         radius: 4
         color: mouse.containsMouse ? root.selection : "transparent"
         opacity: occupied || focused ? 1 : 0.5
+        border.width: focused ? 1 : 0
+        border.color: root.foreground
 
         Text {
           anchors.centerIn: parent
           color: root.foreground
           font.family: "JetBrainsMono Nerd Font"
           font.pixelSize: 14 * root.fontScale
-          text: focused ? "\uDB85\uDCFB" : (modelData === 10 ? "0" : String(modelData))
+          text: modelData === 10 ? "0" : String(modelData)
         }
 
         MouseArea {
