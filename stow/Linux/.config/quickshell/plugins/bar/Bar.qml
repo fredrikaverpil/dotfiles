@@ -42,7 +42,7 @@ Scope {
         - (btnMetrics.tightBoundingRect.x + btnMetrics.tightBoundingRect.width / 2)
       color: bar.shell.palette.fg
       font.family: btn.fontFamily
-      font.pixelSize: 14
+      font.pixelSize: 14 * bar.shell.textScale
     }
 
     MouseArea {
@@ -90,27 +90,28 @@ Scope {
         anchors.verticalCenter: parent.verticalCenter
         foreground: bar.shell.palette.fg
         selection: bar.shell.palette.sel
+        fontScale: bar.shell.textScale
       }
 
       Text {
         anchors.centerIn: parent
         color: bar.shell.palette.fg
         font.family: "JetBrainsMono Nerd Font"
-        font.pixelSize: 14
+        font.pixelSize: 14 * bar.shell.textScale
         text: Qt.formatDateTime(clock.date, "ddd d MMM  HH:mm:ss")
       }
 
       BarButton {
-        id: themeButton
+        id: displayButton
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
-        label: bar.shell.dark ? "\uf186" : "\uf522"
-        onActivated: bar.shell.setDark(!bar.shell.dark)
+        label: "󰍹"
+        onActivated: bar.shell.display.toggle()
       }
 
       BarButton {
-        anchors.right: themeButton.left
+        anchors.right: displayButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
         label: bar.shell.notifications.doNotDisturb ? "󰂛" : "󰂚"

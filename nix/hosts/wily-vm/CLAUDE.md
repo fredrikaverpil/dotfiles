@@ -190,10 +190,13 @@ symlinks into the repo, so nothing real is lost) and run it again.
   `color-scheme` at `prefer-dark` and writing `gtk-theme = "Adwaita"` turns
   Chromium dark, which is what isolates it. Firefox and Zen read `color-scheme`
   directly and ignore `gtk-theme`, so nothing else on the VM showed the fault.
-- **stow** (`stow/Linux/.config/{hypr,quickshell}/`) carries the config and
-  QML. `shell.qml` is wiring only — the palette, the menu's entry table and
-  the instantiations; the surfaces live in `plugins/{bar,menu,background}/`
-  and share `Ui/Panel.qml`, which is the overlay chrome (transparent
+- **stow** (`stow/Linux/.config/{hypr,quickshell}/`) carries the shared config
+  and QML; the optional `stow/wily-vm/` package carries host-only files. Its
+  `hypr/monitors.lua` supplies the monitor and GDK scales which the display
+  panel updates, without leaking a VM-specific scale to the other Linux hosts.
+  `shell.qml` is wiring only — the palette, the menu's entry table and the
+  instantiations; the surfaces live in `plugins/{bar,menu,background}/` and
+  share `Ui/Panel.qml`, which is the overlay chrome (transparent
   layer-shell surface, keyboard focus only while shown, click-outside to
   dismiss, centred card). **Panel aliases its default property to the card's
   column**, so its own fixed children are assigned through `data` — an
@@ -502,8 +505,11 @@ current display. Every future panel reuses this; the bar icon instead calls
 The Omarchy-shaped services use their upstream-compatible targets too:
 `notifications` (`showHistory`, `toggleDnd`, `dismissOne`, `dismissAll`,
 `invokeLast`), `lock` (`lock`, `status`, `isLocked`) and `idle`
-(`enable`, `disable`, `toggle`, `status`). From SSH they need the live-session
-`XDG_RUNTIME_DIR` and `WAYLAND_DISPLAY` export from "Driving it over SSH".
+(`enable`, `disable`, `toggle`, `status`). The local display panel is
+`display` (`open`, `close`, `toggle`, `status`), deliberately bare like the
+other local targets rather than upstream's `omarchy.monitor`. From SSH they
+need the live-session `XDG_RUNTIME_DIR` and `WAYLAND_DISPLAY` export from
+"Driving it over SSH".
 
 **Do not name an IPC function `show`.** `qs ipc show` is a CLI subcommand, so
 the argument parser rejects the call with "The following argument was not
@@ -620,6 +626,36 @@ its upstream MIT licence under `stow/Linux/.local/share/fonts/omarchy/`. Nerd
 Fonts do not carry it. After a fresh stow run, call `fc-cache -f` and restart
 Quickshell to make a new user font available to the running shell.
 
+## Display
+
+`plugins/panels/monitor/Panel.qml` is the one-scanout subset of Omarchy's
+panel: light/dark, nightlight, the focused output's clean scale presets and
+text size work; Brightness and Displays are visibly dim because this VM has no
+backlight and one scanout. It opens from the `󰍹` bar button, Setup › Display,
+or `SUPER + CTRL + D` / `qs ipc call display toggle`. The bar's theme button is
+gone, so theme and nightlight now live together with their display-adjacent
+controls.
+
+Scale applies the output's current mode with `hyprctl eval`, then persists to
+the Stow-linked `~/.config/hypr/monitors.lua`. **Use
+`sed -i --follow-symlinks` there.** Plain GNU `sed -i` replaces the link with a
+regular file, which Stow cannot own on the next activation; following it keeps
+the relative link and updates its repository target. Shared `hyprland.lua`
+loads the optional file and otherwise defaults to 1, so rpi5-homelab remains
+safe without a host package. `GDK_SCALE` is persisted beside the compositor
+scale but takes effect only on the next compositor start.
+
+Text size writes dconf's `text-scaling-factor`, which GTK consumes directly;
+the bar (buttons, clock and workspaces) watches the same key and scales with
+it. The panel offers 80–150%. It deliberately leaves Ghostty alone: its config
+is shared with macOS through `stow/shared`, so rewriting it would dirty the
+repo and make a Linux setting follow the user to the Mac.
+
+Verified live: `qs ipc call display open` identifies Virtual-1 at 1280×800;
+the text-scale watch reports a 1.25 dconf write immediately; and applying 1.6,
+rewriting the host file, then `hyprctl reload` retains 1.6. The test resets the
+VM and host file to scale/GDK scale 1 afterwards.
+
 ## Light and dark
 
 One key drives everything: `/org/gnome/desktop/interface/color-scheme` in
@@ -630,12 +666,12 @@ the terminal over OSC 11 (`OSC11.nvim`). Verified live — no restart of either.
 The same mechanism macOS drives from its system appearance, which is why the
 Ghostty and Neovim configs need nothing platform-specific.
 
-The bar's  /  button writes that key plus `gtk-theme`
-(`Adwaita`/`Adwaita-dark`, what Omarchy's `omarchy-theme-set-gnome` does) and
-also answers `qs ipc call theme toggle|dark|light`. It *watches* the key with a
-long-running `dconf watch` rather than trusting its own writes, so a
-`dconf write` from anywhere else moves the bar too. dconf persists, so the mode
-survives a reboot for free.
+The Display panel's Light / Dark row writes that key plus `gtk-theme`
+(`Adwaita`/`Adwaita-dark`, what Omarchy's `omarchy-theme-set-gnome` does); the
+compatibility IPC target still answers `qs ipc call theme toggle|dark|light`.
+It *watches* the key with a long-running `dconf watch` rather than trusting its
+own writes, so a `dconf write` from anywhere else moves the panel state too.
+dconf persists, so the mode survives a reboot for free.
 
 Bar and menu colours are the zenbones palettes, lifted from
 `stow/shared/.config/ghostty/themes/zenbones_{dark,light}` so the bar and the
@@ -830,10 +866,9 @@ now covers apps, wallpaper, theme, nightlight, screenshots, power,
 notifications and the keybinding sheet. The dim rows in it are the shortest list of what is still
 missing.
 
-1. **A display panel**, ported from Omarchy's
-   `shell/plugins/panels/monitor/` (resolution, scaling, text size). Light/dark
-   and nightlight belong in there rather than as their own bar buttons — so
-   the  /  button is a placeholder, not a design.
+1. **A network panel**, ported from Omarchy's
+   `shell/plugins/panels/network/` (ethernet status on the VM; Wi-Fi scanning,
+   signal, passphrase entry and forget validated later on the ThinkPad).
 
 Half of Omarchy's tree cannot port: Install / Remove / Update are `pacman`
 operations, and on NixOS that is a rebuild. The root menu here is necessarily

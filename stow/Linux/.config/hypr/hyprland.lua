@@ -1,4 +1,20 @@
-hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1 })
+-- The optional host package supplies persistent scale defaults. Keep the
+-- fallback here: this shared config is also stowed to Linux hosts without a
+-- monitors.lua. Hyprland only watches this entry file, so a change to the
+-- host file takes effect on the next explicit reload or compositor start.
+local monitor_config = { scale = 1, gdkScale = 1 }
+local monitor_config_file = os.getenv("HOME") .. "/.config/hypr/monitors.lua"
+local monitor_config_loader = loadfile(monitor_config_file)
+if monitor_config_loader then
+  local ok, config = pcall(monitor_config_loader)
+  if ok and type(config) == "table" then
+    if type(config.scale) == "number" and config.scale > 0 then monitor_config.scale = config.scale end
+    if type(config.gdkScale) == "number" and config.gdkScale > 0 then monitor_config.gdkScale = config.gdkScale end
+  end
+end
+
+hl.monitor({ output = "", mode = "preferred", position = "auto", scale = monitor_config.scale })
+hl.env("GDK_SCALE", tostring(monitor_config.gdkScale))
 
 -- macOS-like black pointer with a white outline, loaded from the stowed
 -- ~/.local/share/icons/macOS-hypr theme. Source:
@@ -114,6 +130,7 @@ local ok, err = pcall(function()
   bind("SUPER + ALT + comma", "Invoke latest notification", hl.dsp.exec_cmd("qs ipc call notifications invokeLast"))
   bind("SUPER + SHIFT + ALT + comma", "Open notification history", hl.dsp.exec_cmd("qs ipc call notifications showHistory"))
   bind("SUPER + CTRL + N", "Toggle nightlight", hl.dsp.exec_cmd("qs ipc call nightlight toggle"))
+  bind("SUPER + CTRL + D", "Display settings", hl.dsp.exec_cmd("qs ipc call display toggle"))
   bind("SUPER + CTRL + I", "Toggle idle locking", hl.dsp.exec_cmd("qs ipc call idle toggle"))
   bind("SUPER + CTRL + ALT + I", "Keep this window awake", hl.dsp.exec_cmd(stay_awake))
   bind("SUPER + CTRL + L", "Lock system", hl.dsp.exec_cmd("qs ipc call lock lock"))

@@ -7,6 +7,7 @@ import "plugins/bar" as Bar
 import "plugins/lock" as Lock
 import "plugins/menu" as Menu
 import "plugins/notifications" as Notifications
+import "plugins/panels/monitor" as Monitor
 import "plugins/polkit" as Polkit
 import "plugins/services/idle" as Idle
 import "plugins/services/nightlight" as Nightlight
@@ -20,12 +21,17 @@ ShellRoot {
   readonly property alias menu: menu
   readonly property alias background: background
   readonly property alias notifications: notifications
+  readonly property alias nightlight: nightlight
+  readonly property alias display: display
 
   // Light/dark. The dconf key is the source of truth, not a property of ours:
   // xdg-desktop-portal-gtk republishes it as org.freedesktop.appearance, which
   // is what flips Ghostty's theme live, and Neovim follows the terminal over
   // OSC 11. gtk-theme comes along so GTK apps switch too.
   property bool dark: true
+  // GTK reads this dconf key itself; the bar reads the same value so its text
+  // changes size with the rest of the desktop rather than remaining fixed.
+  property real textScale: 1
   // `dim` is chrome — borders, placeholder text — and is deliberately close to
   // the background. `off` is for text that must stay readable while reading as
   // inactive, so it sits between the two; `dim` on `bg` is around 1.5:1 in
@@ -44,6 +50,26 @@ ShellRoot {
   }
 
   Process { id: write }
+
+  function setTextScale(value) {
+    const scale = Number(value)
+    if (!isFinite(scale) || scale < 0.8 || scale > 1.5) return
+    textScale = scale
+    textScaleWrite.command = [
+      "dconf",
+      "write",
+      "/org/gnome/desktop/interface/text-scaling-factor",
+      String(scale),
+    ]
+    textScaleWrite.running = true
+  }
+
+  function updateTextScale(value) {
+    const scale = parseFloat(String(value))
+    if (isFinite(scale) && scale > 0) textScale = scale
+  }
+
+  Process { id: textScaleWrite }
 
   IpcHandler {
     target: "theme"
@@ -71,6 +97,22 @@ ShellRoot {
     command: ["dconf", "read", "/org/gnome/desktop/interface/color-scheme"]
     stdout: StdioCollector {
       onStreamFinished: root.dark = text.indexOf("prefer-light") < 0
+    }
+  }
+
+  Process {
+    running: true
+    command: ["dconf", "watch", "/org/gnome/desktop/interface/text-scaling-factor"]
+    stdout: SplitParser {
+      onRead: line => root.updateTextScale(line)
+    }
+  }
+
+  Process {
+    running: true
+    command: ["dconf", "read", "/org/gnome/desktop/interface/text-scaling-factor"]
+    stdout: StdioCollector {
+      onStreamFinished: root.updateTextScale(text)
     }
   }
 
@@ -105,7 +147,7 @@ ShellRoot {
     "trigger.color": { icon: "󰃉", label: "Color picker", enabled: false },
     "trigger.share": { icon: "", label: "Share", enabled: false },
     "setup": { icon: "", label: "Setup" },
-    "setup.display": { icon: "󰍹", label: "Display", enabled: false },
+    "setup.display": { icon: "󰍹", label: "Display", action: () => display.open() },
     "setup.nightlight": { icon: "󰆔", label: "Nightlight", action: () => nightlight.toggle() },
     "system": { icon: "", label: "System" },
     "system.close": { icon: "󰅖", label: "Close window", action: () => Quickshell.execDetached(
@@ -154,6 +196,11 @@ ShellRoot {
 
   Background.Background {
     id: background
+    shell: root
+  }
+
+  Monitor.Panel {
+    id: display
     shell: root
   }
 

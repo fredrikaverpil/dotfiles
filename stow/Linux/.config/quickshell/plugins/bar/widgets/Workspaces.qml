@@ -7,6 +7,7 @@ Item {
 
   property color foreground: "#B4BDC3"
   property color selection: "#3D4042"
+  property real fontScale: 1
 
   function workspaceById(id) {
     const values = Hyprland.workspaces.values
@@ -66,7 +67,7 @@ Item {
           anchors.centerIn: parent
           color: root.foreground
           font.family: "JetBrainsMono Nerd Font"
-          font.pixelSize: 14
+          font.pixelSize: 14 * root.fontScale
           text: focused ? "\uDB85\uDCFB" : (modelData === 10 ? "0" : String(modelData))
         }
 
