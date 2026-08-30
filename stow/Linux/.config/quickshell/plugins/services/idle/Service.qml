@@ -1,6 +1,5 @@
 // Quickshell-native idle policy, following Omarchy's service location.
-// IdleMonitor honours Wayland idle inhibitors, so video calls and media players
-// can keep the session awake without a second daemon such as hypridle.
+// IdleMonitor honours idle inhibitors, so no second daemon such as hypridle.
 
 import QtQuick
 import Quickshell
