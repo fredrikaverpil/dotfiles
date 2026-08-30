@@ -34,6 +34,7 @@ let
 
         for _ in $(seq 1 30); do
           if qs ipc call lock status 2>/dev/null | grep -q '"secure":true'; then
+            echo "wily: session lock is secure, releasing the suspend delay"
             return 0
           fi
           sleep 0.1

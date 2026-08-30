@@ -501,6 +501,17 @@ without coupling the VM to their whole shell.
   canonical identifier `default` — any other identifier is reachable from its
   own button and nothing else. (Omarchy falls back to focusing the sending app
   by class, which needs one of their scripts.)
+
+  **Nothing couples notifications to the lock**, here or in Omarchy, and it
+  works out anyway — verified live. `ext-session-lock` renders above the
+  overlay layer, so a toast arriving while locked is hidden rather than leaked;
+  the `wily-notifications` layer is still listed in `hyprctl -j layers`, just
+  covered. What differs is what survives the lock, and it falls out of
+  `addHistory` being reachable only from `finish()`: a normal toast runs its 8s
+  timer unseen behind the lock, expires, and is findable only in history,
+  while a critical one has no timeout, never finishes, and is still on screen
+  at unlock. So urgency already decides what waits for you — do not "fix" this
+  by suppressing toasts while locked without replacing that property.
 - **Lock / idle** use `WlSessionLock` plus `PamContext` against
   `/etc/pam.d/wily-lock`, a conventional `auth include login` entry.
   `WlSessionLock` has **no `unlock()`** — clearing its `locked` property is the
@@ -544,8 +555,14 @@ The matching Omarchy keybinds are `SUPER + comma` (dismiss latest),
 
 ## Deferred for the ThinkPad
 
-- Fingerprint unlock, including its separate PAM stack, reader indicator and
-  clamshell/lid handling.
+- Fingerprint unlock, including its separate PAM stack and reader indicator.
+- Lid close, which is the laptop's actual sleep and lock trigger and has no
+  equivalent here — one scanout, no lid. Omarchy carries a whole
+  `bin/omarchy-system-lid-close` plus `test/shell.d/lid-close-test.sh` for it,
+  and its sleep-lock script calls `omarchy-hyprland-monitor-clamshell` inside
+  the delay window, which is also why they need the longer inhibitor budget.
+  Settle the `loginctl lock-session` question as part of this — see "Known, not
+  yet done"; the choice of `HandleLidSwitch` is what decides it.
 - Reacquiring an orphaned `ext-session-lock` from inside the shell. Omarchy
   detects Hyprland's `solitaryBlockedBy: LOCK` state and takes the surface
   back; here the compositor-side escape below is the recovery instead, so the
@@ -556,6 +573,10 @@ The matching Omarchy keybinds are `SUPER + comma` (dismiss latest),
 - Omarchy's 150-second screensaver stage before the five-minute lock, its
   stay-awake indicator/control, and hardware validation of DPMS plus the
   pre-suspend delay budget.
+- Unlock after a real resume, and the two sleep-path pieces the VM cannot
+  justify: the `InhibitDelayMaxSec=15` logind drop-in and a critical
+  notification when the pre-suspend lock fails. See the sleep divergences under
+  "Reference".
 
 ## Next steps
 
@@ -583,15 +604,67 @@ smaller than theirs.
 - The notification, lock and polkit services are verified live on the VM
   (toasts and their timeout bar, DND with critical breaking through, dismiss
   one/all, history and its `Clear`, `default`-action invoke, the lock surface
-  with a wrong-password counter, a real PAM unlock, and the polkit dialog
-  through both `pkexec` and a D-Bus caller, and `IdleMonitor` taking the lock
-  on its own after the idle timeout, and the lock surface blanking the output
-  301s after locking). Testing either timer means leaving the VM genuinely
-  untouched for over five minutes: SSH polling does not reset them, but any
-  use of the UTM window does, and a run interrupted that way looks exactly
-  like a broken timer. **One path is not yet exercised**: `wily-sleep-lock`
-  locking on a real `systemctl suspend` — resume-from-suspend under UTM is
-  itself unknown.
+  with a wrong-password counter, a real PAM unlock, toasts staying hidden
+  behind the lock surface while a critical one survives to unlock, the polkit
+  dialog through both `pkexec` and a D-Bus caller, `IdleMonitor` taking the
+  lock on its own after the idle timeout, and the lock surface blanking the
+  output 301s after locking). Testing either timer means leaving the VM
+  genuinely untouched for over five minutes: SSH polling does not reset them,
+  but any use of the UTM window does, and a run interrupted that way looks
+  exactly like a broken timer.
+- `wily-sleep-lock` is verified as far as this VM allows. On a real
+  `systemctl suspend` it locked inside the delay window: logind logged
+  *suspend requested* and *The system will suspend now!* in the same second —
+  a monitor that missed `PrepareForSleep` would instead have made logind burn
+  the whole inhibitor window — and the script's failure line, *"session lock
+  was not secure before suspend"*, is absent from that boot. The unit exits
+  after each `PrepareForSleep` by design, so every suspend after the first
+  depends on `Restart=always`; verified separately with `systemctl --user kill
+  wily-sleep-lock`, after which it returns within 2s, `NRestarts` increments,
+  and the delay inhibitor is re-acquired. Resume-specific timing is covered by
+  none of this.
+- **Suspend is a one-way trip on this VM, so plan for a forced power cycle.**
+  The only clock is `rtc-efi`, which exposes no `wakealarm`, so `rtcwake`
+  cannot arm a timed wake; virtio input and `utmctl stop --request` both leave
+  the vCPUs halted while UTM still reports the VM as `started`. Recover with
+  `utmctl stop --force` and a restart, and read the evidence from
+  `journalctl -b -1`, which survives it. Unlock-after-resume waits for the
+  ThinkPad.
+- `wily-sleep-lock` logs *"dbus-monitor: unable to enable new-style monitoring:
+  AccessDenied … Falling back to eavesdropping"* on every boot. It is noise: the
+  match is on a broadcast signal, which needs no eavesdropping, and the suspend
+  test above proves the monitor receives it.
+- **`loginctl lock-session` reports success and does nothing.** Nothing listens
+  for logind's `Lock`/`Unlock` signals — verified: the call returns cleanly and
+  `lock status` still reports `locked:false`. Omarchy is the same (`grep -rniE
+  "login1|loginctl" shell/` is empty; their entry point is
+  `bin/omarchy-system-lock`, which calls `omarchy-shell lock lock`, the same IPC
+  path as ours), so this is left alone deliberately rather than fixed into a
+  divergence. Nothing here emits the signal: greetd autologins, and idle locking
+  is `IdleMonitor` rather than logind's `IdleAction=lock`.
+
+  **Read this before touching lid handling on the ThinkPad.** The lid is safe
+  under `HandleLidSwitch=suspend`, which is what logind actually reports here
+  (`busctl get-property org.freedesktop.login1 /org/freedesktop/login1 \
+  org.freedesktop.login1.Manager HandleLidSwitch` → `s "suspend"`) — the lid
+  suspends, which raises `PrepareForSleep`, which `wily-sleep-lock` already
+  handles. Setting
+  `HandleLidSwitch=lock` instead — lid shut, machine awake, clamshell on an
+  external monitor — is the one configuration that breaks: logind emits `Lock`,
+  nobody listens, and the machine sits unlocked with the lid closed. Omarchy
+  covers that case with `bin/omarchy-system-lid-close`, not by subscribing to
+  the signal.
+- **"`IdleMonitor` honours inhibitors" is an API claim, not a test.**
+  `respectInhibitors: true` is set (`plugins/services/idle/Service.qml`), and
+  that is all that has been established. The mechanism is the **Wayland**
+  idle-inhibit protocol (`zwp_idle_inhibit_manager_v1`, which
+  xdg-desktop-portal-hyprland binds at startup) — *not* logind, so
+  `systemd-inhibit --what=idle` proves nothing about it. Nothing installed here
+  takes one, as far as anything installed goes — no media player, no browser,
+  and ghostty is not known to. Faking
+  it needs a Hyprland `idleinhibit` window rule plus a temporarily shortened
+  `lockAfterSeconds`, which is a lot of scaffolding for one upstream boolean.
+  Left for the ThinkPad, where playing a video makes it a 30-second check.
 - Keyboard layout is `us`. Swedish is wanted eventually as a second layout,
   but not yet — `kb_layout = "us,se"` with a `grp:` toggle in `kb_options`
   when the time comes.
