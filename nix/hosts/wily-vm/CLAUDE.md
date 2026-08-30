@@ -309,6 +309,45 @@ Hyprland config in `config/hypr/`, and package list in
 `install/omarchy-base.packages`. Approach is vendor-and-prune: port pieces
 across on request rather than rewriting from scratch.
 
+**Staying diffable against upstream is a design constraint, not a nicety.**
+The point of vendoring is to pull their bugfixes later, and that only works if
+a ported piece still resembles its origin. So, when writing or changing
+anything that has an Omarchy counterpart:
+
+- **Read their version first.** Find it in the clone before designing ours —
+  `grep -rl` over `bin/`, `shell/` and `etc/` — even when the mechanism seems
+  obvious. Theirs usually encodes a failure this VM has not hit yet.
+- **Keep their file paths, IPC target names and function names** where the
+  concept is the same, so `diff` lines up. This is why the Quickshell services
+  live under matching `plugins/…` paths and answer the same `qs ipc` targets.
+- **Prune deliberately, and say so here.** A simplification we chose is fine;
+  a divergence nobody remembers making is what makes the next upstream diff
+  unreadable. Record what was dropped and why, in this file.
+- **Where we diverge in shape rather than in behaviour, note the counterpart**
+  so the next person knows where to look upstream.
+
+Known divergences in the sleep path — ours is `wily-sleep-lock.service` running
+an inline `writeShellApplication` in `desktop.nix`; theirs is
+`bin/omarchy-system-sleep-lock` plus `bin/omarchy-system-sleep-monitor`, with
+tests in `test/shell.d/sleep-lock-test.sh`. Same mechanism (a logind delay
+inhibitor that locks on `PrepareForSleep` and waits for `secure`), but they
+also:
+
+- ship `etc/systemd/logind.conf.d/20-inhibit-delay.conf` raising
+  `InhibitDelayMaxSec` to 15, because logind's 5s default is not enough when a
+  lid close reconfigures displays first. Our fixed 3s poll fits inside the
+  default; that stops being true on a laptop.
+- derive the wait budget from logind's actual `InhibitDelayMaxUSec` rather than
+  hardcoding it, and clamp every IPC call to what is left of it.
+- **send a critical notification when the lock did not go secure.** logind
+  suspends regardless, so this is the only way anyone learns the machine slept
+  with the session exposed. Ours only writes to stderr, where nobody looks.
+- handle a `missing-pam` refusal and re-request a lock that never landed.
+
+The first is a lid consequence and cannot matter here — no lid, one scanout.
+The third is wanted regardless and was simply not built: a stderr line nobody
+reads is a poor way to learn the machine slept unlocked.
+
 ## Newly added stow files need a manual link
 
 An existing VM clone has absolute links, so an activation that tries to rerun
