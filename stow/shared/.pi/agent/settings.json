@@ -15,6 +15,6 @@
   "packages": [
     "npm:pi-system-theme"
   ],
-  "theme": "light",
+  "theme": "dark",
   "defaultThinkingLevel": "xhigh"
 }
