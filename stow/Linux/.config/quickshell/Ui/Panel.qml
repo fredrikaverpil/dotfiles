@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Window
 import Quickshell
 import Quickshell.Wayland
 
@@ -23,6 +24,12 @@ PanelWindow {
   property int cardHeight: 420
   readonly property int barHeight: shell ? shell.barHeight : 32
 
+  // Opt-in keyboard navigation. A panel that sets this marks its buttons
+  // `activeFocusOnTab` and highlights them on `activeFocus`; Qt's own focus
+  // chain then does the walking, so no panel keeps a cursor of its own. Off
+  // for the menu, which drives its list from its search field instead.
+  property bool keyNavigation: false
+
   default property alias content: column.data
 
   function open() {
@@ -39,6 +46,20 @@ PanelWindow {
 
   function toggle() { shown ? close() : open() }
 
+  // One linear chain in document order, so the last option of a row leads into
+  // the first of the next. h/k step back, l/j step forward.
+  function focusStep(forward) {
+    // Via the Window attached property rather than the window object: this is
+    // plain QtQuick and does not depend on what PanelWindow chooses to expose.
+    const current = column.Window.activeFocusItem
+    if (!current) {
+      column.forceActiveFocus()
+      return
+    }
+    const next = current.nextItemInFocusChain(forward)
+    if (next) next.forceActiveFocus(Qt.TabFocusReason)
+  }
+
   function togglePinned() {
     if (!pinnable) return
     pinned = !pinned
@@ -54,6 +75,9 @@ PanelWindow {
     } else if (!pinned) {
       focusPrimed = false
       focusPrimeTimer.restart()
+      // Start every open from the top of the chain rather than wherever the
+      // last visit left it.
+      if (keyNavigation) column.forceActiveFocus()
     }
   }
   onPinnedChanged: {
@@ -126,6 +150,20 @@ PanelWindow {
       border.color: panel.shell.palette.dim
       border.width: 1
 
+      // Keys bubble up from whichever control holds focus, so the handler sits
+      // on the card: their only common ancestor, since the pin control is a
+      // sibling of the content column rather than inside it.
+      Keys.onPressed: function (event) {
+        if (!panel.keyNavigation) return
+        if (event.key === Qt.Key_Escape) panel.close()
+        else if (event.key === Qt.Key_Down || event.key === Qt.Key_Right
+          || event.text === "j" || event.text === "l") panel.focusStep(true)
+        else if (event.key === Qt.Key_Up || event.key === Qt.Key_Left
+          || event.text === "k" || event.text === "h") panel.focusStep(false)
+        else return
+        event.accepted = true
+      }
+
       // Prevent clicks in unused card space from reaching the modal dismissal
       // area behind it. Interactive content is stacked above this catcher.
       MouseArea {
@@ -140,6 +178,8 @@ PanelWindow {
         anchors.bottomMargin: 12
         anchors.rightMargin: panel.pinnable ? pinControl.width + 20 : 12
         spacing: 8
+
+        focus: panel.keyNavigation
       }
 
       Rectangle {
@@ -154,8 +194,13 @@ PanelWindow {
         height: 24
         radius: 4
         color: pinMouse.containsMouse ? panel.shell.palette.sel : "transparent"
-        border.color: panel.shell.palette.dim
+        border.color: pinControl.activeFocus ? panel.shell.palette.fg : panel.shell.palette.dim
         border.width: 1
+
+        activeFocusOnTab: panel.keyNavigation && panel.pinnable
+        Keys.onReturnPressed: panel.togglePinned()
+        Keys.onEnterPressed: panel.togglePinned()
+        Keys.onSpacePressed: panel.togglePinned()
 
         Text {
           id: pinLabel

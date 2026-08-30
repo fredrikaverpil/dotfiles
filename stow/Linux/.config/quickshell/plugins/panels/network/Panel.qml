@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Window
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
@@ -18,6 +19,7 @@ Ui.Panel {
 
   cardHeight: 560
   pinnable: true
+  keyNavigation: true
 
   readonly property bool networkManagerAvailable: Networking.backend === NetworkBackendType.NetworkManager
   readonly property var networkDevices: Networking.devices ? Networking.devices.values : []
@@ -330,6 +332,21 @@ Ui.Panel {
     })
   }
 
+  // The Wi-Fi list outgrows the card, and Qt does not scroll a Flickable to
+  // follow the focus chain. Map to `content`, not to the Flickable: the latter
+  // yields viewport coordinates, which compare against contentY almost but not
+  // quite correctly.
+  readonly property var focusedItem: scroller.Window.activeFocusItem
+  onFocusedItemChanged: {
+    const item = focusedItem
+    if (!item || !shown) return
+    const top = item.mapToItem(content, 0, 0).y
+    if (!isFinite(top)) return
+    if (top < scroller.contentY) scroller.contentY = Math.max(0, top)
+    else if (top + item.height > scroller.contentY + scroller.height)
+      scroller.contentY = top + item.height - scroller.height
+  }
+
   onShownChanged: {
     if (shown) {
       refresh()
@@ -619,6 +636,8 @@ Ui.Panel {
   }
 
   component ActionButton: Rectangle {
+    id: button
+
     property string label: ""
     property bool active: false
     property bool available: true
@@ -627,23 +646,33 @@ Ui.Panel {
     height: 28
     radius: 4
     color: active ? root.shell.palette.sel : "transparent"
-    border.color: root.shell.palette.dim
+    // `active` is the current state, `activeFocus` is where the keyboard is.
+    // The border carries the second so both stay readable at once.
+    border.color: button.activeFocus ? root.shell.palette.fg : root.shell.palette.dim
     border.width: 1
     opacity: available ? 1 : 0.45
+
+    // Visibility governs chain membership, `available` does not: every Wi-Fi
+    // action sets `busy`, and dropping the focused button out of the chain
+    // while its own action runs would strand the focus.
+    activeFocusOnTab: button.visible
+    Keys.onReturnPressed: if (button.available) button.activated()
+    Keys.onEnterPressed: if (button.available) button.activated()
+    Keys.onSpacePressed: if (button.available) button.activated()
 
     Text {
       anchors.centerIn: parent
       color: root.shell.palette.fg
       font.family: "JetBrainsMono Nerd Font"
       font.pixelSize: 12
-      text: parent.label
+      text: button.label
     }
 
     MouseArea {
       anchors.fill: parent
-      enabled: parent.available
+      enabled: button.available
       hoverEnabled: true
-      onClicked: parent.activated()
+      onClicked: button.activated()
     }
   }
 
