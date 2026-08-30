@@ -28,6 +28,18 @@ missing one, because it gets believed and acted on.
 
 ## Driving it over SSH
 
+### Deployment gate
+
+**Before asking the user to rebuild, or treating a live-VM check as validation
+of a local change, rsync the laptop checkout to the VM.** `nixos-rebuild`
+evaluates `~/.dotfiles` *on the VM*, never this checkout; skipping that transfer
+therefore cleanly rebuilds stale configuration and leaves new packages, desktop
+entries and binds absent. The first two commands below are mandatory together
+before every rebuild after a local edit. Re-run them after every later local
+edit before another VM test or rebuild, and only then tell the user the VM is
+ready to switch. If the result looks unchanged, verify this gate before
+debugging the feature.
+
 These get used constantly. `HYPRLAND_INSTANCE_SIGNATURE` must be the
 **newest** directory — stale ones accumulate under `/run/user/1000/hypr/`.
 
