@@ -64,6 +64,12 @@
     # cached against its own pinned nixpkgs-unstable, and cache.numtide.com
     # only serves those builds.
     llm-agents.url = "github:numtide/llm-agents.nix";
+    # Zen's normal upstream release channel is named Beta; Twilight is nightly.
+    zen-browser = {
+      url = "github:0xc000022070/zen-browser-flake/beta";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.home-manager.follows = "home-manager-unstable";
+    };
     dotfiles = {
       # Used by home-manager for dotfiles bootstrapping.
       url = "github:fredrikaverpil/dotfiles";
