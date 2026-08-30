@@ -162,6 +162,8 @@ Ui.Panel {
   readonly property bool wide: level !== "root" && menu.items[level].provider === "binds"
 
   function open(target) {
+    if (shell && shell.registerPanel) shell.registerPanel(menu)
+    if (shell && shell.claimPanel) shell.claimPanel(menu)
     level = target
     input.text = ""
     shown = true

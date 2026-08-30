@@ -17,6 +17,7 @@ Ui.Panel {
   id: root
 
   cardHeight: 560
+  pinnable: true
 
   readonly property bool networkManagerAvailable: Networking.backend === NetworkBackendType.NetworkManager
   readonly property var networkDevices: Networking.devices ? Networking.devices.values : []

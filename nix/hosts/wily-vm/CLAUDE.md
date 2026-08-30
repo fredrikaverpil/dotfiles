@@ -194,12 +194,21 @@ symlinks into the repo, so nothing real is lost) and run it again.
   and QML; the optional `stow/wily-vm/` package carries host-only files. Its
   `hypr/monitors.lua` supplies the monitor and GDK scales which the display
   panel updates, without leaking a VM-specific scale to the other Linux hosts.
-  `shell.qml` is wiring only — the palette, the menu's entry table and the
-  instantiations; the surfaces live in `plugins/{bar,menu,background}/` and
-  share `Ui/Panel.qml`, which is the overlay chrome (transparent
-  layer-shell surface, keyboard focus only while shown, click-outside to
-  dismiss, centred card). **Panel aliases its default property to the card's
-  column**, so its own fixed children are assigned through `data` — an
+  `shell.qml` owns the palette, menu entry table, instantiations and the
+  small panel coordinator; the surfaces live in `plugins/{bar,menu,background}/`
+  and share `Ui/Panel.qml`, which is the overlay chrome (transparent
+  layer-shell surface, keyboard focus while modal, click-outside dismissal and
+  a centred card). The coordinator closes other unpinned surfaces when one
+  opens; the notification history registers with it too. **Panel's full-screen
+  input mask cuts out the top-bar strip.** Without that cutout, a modal panel
+  consumes a repeat click before its bar button can toggle it or open another
+  panel. It must also settle from a brief `Exclusive` focus prime to `OnDemand`:
+  Hyprland routes pointer input to an exclusive surface despite that cutout.
+  `pinnable` is off by default; Network enables it. A pinned card owns
+  input only inside itself, releases keyboard focus, ignores outside and bar
+  clicks, and has no persistence — only its generic Pin/Unpin control changes
+  that state. **Panel aliases its default property to the card's column**, so
+  its own fixed children are assigned through `data` — an
   ordinary child there would be reparented into the column. A consumer's
   non-visual objects (`FileView`, `IpcHandler`) land in that column too, which
   is harmless: `Column` lays out `Item`s and ignores the rest.
@@ -505,8 +514,8 @@ current display. Every future panel reuses this; the bar icon instead calls
 `menu.toggle()` directly, being the same process.
 
 The Omarchy-shaped services use their upstream-compatible targets too:
-`notifications` (`showHistory`, `toggleDnd`, `dismissOne`, `dismissAll`,
-`invokeLast`), `lock` (`lock`, `status`, `isLocked`) and `idle`
+`notifications` (`showHistory`, `toggleHistory`, `toggleDnd`, `dismissOne`,
+`dismissAll`, `invokeLast`), `lock` (`lock`, `status`, `isLocked`) and `idle`
 (`enable`, `disable`, `toggle`, `status`). The local panels are `display` and
 `network` (each `open`, `close`, `toggle`, `status`), deliberately bare like
 the other local targets rather than upstream's `omarchy.monitor` and
@@ -909,19 +918,6 @@ missing.
    it has no focused key handler and Display/Network have no selection state.
    Port a lean shared `PanelKeyCatcher` concept from Omarchy, then give each
    panel a section/selection cursor for `hjkl`/arrows, Enter/Space and Escape.
-3. **Make bar-panel behaviour consistent, and add optional pinning** — every
-   bar button should explicitly toggle its surface. Launcher, Display and
-   Network already call `toggle()`; Notifications calls `showHistory()`, so its
-   second-click close is only an outside-click side effect and needs a real
-   toggle API. Add a shared `Ui/Panel` `pinnable` capability (off by default;
-   Network opts in first) with generic chrome, rather than duplicating a pin
-   control in each panel. A pinned panel stays visible above ordinary app
-   windows, and its own button/outside clicks do not close it; only the pin
-   control unpins it. It must become non-modal while pinned: remove the
-   full-screen dismissal input capture and release exclusive keyboard focus so
-   normal apps remain usable. Lock and other layer-shell overlays may still
-   cover it, which is correct. Pinning Network is how a future graph can
-   accumulate history while visible without adding a hidden background sampler.
 
 Half of Omarchy's tree cannot port: Install / Remove / Update are `pacman`
 operations, and on NixOS that is a rebuild. The root menu here is necessarily

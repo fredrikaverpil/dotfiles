@@ -110,6 +110,8 @@ Scope {
     cardHeight: 540
 
     function open() {
+      if (background.shell && background.shell.registerPanel) background.shell.registerPanel(picker)
+      if (background.shell && background.shell.claimPanel) background.shell.claimPanel(picker)
       shown = true
       grid.currentIndex = Math.max(0, background.wallpapers.indexOf(background.wallpaper))
       grid.forceActiveFocus()
