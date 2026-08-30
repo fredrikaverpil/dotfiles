@@ -213,6 +213,28 @@ Dropped, all for want of a target rather than by preference:
   VM, and each one routes through an `omarchy-*` script anyway. Wanted on the
   ThinkPad.
 
+**The modifiers are layers, and a new bind belongs in the right one.** Derived
+from their whole keymap, not stated anywhere upstream:
+
+| Chord | Layer |
+| --- | --- |
+| `SUPER + <key>` | window and workspace management — close, split, float, fullscreen, focus, group, scratchpad |
+| `SUPER + SHIFT + <letter>` | launch an application — nearly all of their `applications.lua` |
+| `SUPER + CTRL + <letter>` | system toggle or panel — lock, idle, nightlight, audio, bluetooth, display, network, power |
+| `+ ALT` | not a layer: the variant of the chord without it |
+
+`+ ALT` is the one that reads wrong at first. `SUPER + F` is full screen and
+`SUPER + ALT + F` full width; `SUPER + S` toggles the scratchpad and
+`SUPER + ALT + S` moves a window to it; `SUPER + CTRL + R` sets a reminder and
+`SUPER + CTRL + ALT + R` shows them. So the per-window form of a system toggle
+is that toggle's chord plus ALT — which is how `SUPER + CTRL + ALT + I` (keep
+*this* window awake) sits next to `SUPER + CTRL + I` (idle locking for the
+session).
+
+Ours is nearly empty in the application layer — `SUPER + RETURN` and
+`SUPER + SHIFT + N`, against their ~25. Most of theirs are webapps launched
+through `omarchy-launch-webapp`, which is not ported.
+
 Consequences of following them exactly: `SUPER + W` is a second Close window,
 so the wallpaper picker moved to `SUPER + CTRL + SPACE` (their "Background
 switcher"), and there is no hjkl focus — Omarchy puts focus on `SUPER +
@@ -689,12 +711,8 @@ smaller than theirs.
   whole session stays awake. Upstream leaves applying the tag to the user;
   `SUPER + CTRL + ALT + I` here toggles it on the active window and reports
   which way it landed, since their affordance for this is a bar indicator we
-  have not ported. The chord follows their modifier scheme rather than being
-  free real estate: `SUPER + SHIFT + <letter>` launches an application,
-  `SUPER + CTRL + <letter>` is a system toggle or panel, bare `SUPER` is
-  window management, and `+ ALT` marks the variant of the chord without it —
-  which is how they pair `SUPER + CTRL + R` with `SUPER + CTRL + ALT + R`.
-  So the per-window form of `SUPER + CTRL + I` is that chord, and it is unused
+  have not ported. The chord is the per-window variant of `SUPER + CTRL + I`
+  under the modifier scheme in "The keymap is Omarchy's", and is unused
   upstream. The readback is `inhibitingIdle` rather than the tag, so the
   message says the rule fired, not merely that the tag exists.
   `hl.dsp.window.tag({ tag = "noidle" })` with no `action` toggles; the
