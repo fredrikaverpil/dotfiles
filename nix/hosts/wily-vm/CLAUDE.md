@@ -423,6 +423,12 @@ Vulkan — if anything reaches for it, `QSG_RHI_BACKEND=opengl`),
 `-resource_blob -host_visible` (no zero-copy dmabuf, so sluggishness and
 screencopy/portal oddities are environmental, not config bugs), 1 scanout (no
 multi-monitor testing possible here — don't write multi-monitor logic).
+
+Concretely, **`grim` sometimes never returns**, and a wedged `grim` blocks
+Quickshell's IPC as well — `qs ipc call menu close` hangs behind it, which
+looks like a broken shell. Always run it under `timeout`, and `pkill -9 grim`
+before concluding anything about the QML. A `grim` left running also survives
+to blank-screen debugging later, so check `pgrep -a grim` first.
 `no_hardware_cursors` in `hyprland.lua` is for this.
 
 Concretely, from `eglinfo` on the VM: renderer `virgl (ANGLE (Apple, Apple M1,
@@ -692,7 +698,17 @@ without coupling the VM to their whole shell.
   black between characters. The service therefore tracks its own `blanked`
   flag and dispatches only on a change — which assumes nothing else drives
   DPMS, since an outside `dpms off` would desync the flag and leave a
-  keystroke unable to bring the screen back. Do not
+  keystroke unable to bring the screen back.
+
+  **A Quickshell restart while the output is blanked desyncs it the same
+  way**, and this is the likely one: the new instance starts with
+  `blanked = false` against hardware that is off, so no keystroke ever turns
+  the screen back on. It presents as a dead VM — black screen, no lock
+  surface, no way to reach the console — and it is not: `hyprctl -j monitors`
+  reports `dpmsStatus: false` while `qs ipc call lock status` reports
+  `locked:false`. Recover over SSH with `hyprctl dispatch 'hl.dsp.dpms("on")'`.
+  Iterating on QML over SSH walks into this, because SSH polling does not
+  reset the idle timer that blanked the output in the first place. Do not
   replace it with `security.pam.services`: on this aarch64 nixpkgs revision the
   PAM renderer evaluates disabled Howdy/Kanidm module paths and fails before it
   can render a custom service. `IdleMonitor` honours inhibitors, locks at five
