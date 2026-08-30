@@ -81,6 +81,8 @@ in
   environment.sessionVariables = {
     HYPRCURSOR_THEME = "macOS-hypr";
     HYPRCURSOR_SIZE = "24";
+    # Chromium's wrapper reads this to opt into its native Wayland backend.
+    NIXOS_OZONE_WL = "1";
   };
 
   # Terminal-first login: no display manager. Agetty authenticates fredrik on
@@ -142,6 +144,9 @@ in
   };
 
   host.extraSystemPackages = with pkgs; [
+    # Without --no-first-run the profile stays pinned to the light UI and
+    # ignores the portal's color-scheme; see the browsers entry in CLAUDE.md.
+    (chromium.override { commandLineArgs = "--no-first-run"; })
     firefox
     ghostty-softgl # terminal; see the let-block above
     grim # screenshots, for verifying the session over SSH
