@@ -20,9 +20,9 @@ missing one, because it gets believed and acted on.
 - Rebuild: `sudo nixos-rebuild switch --flake ~/.dotfiles#wily-vm`. Intended
   to be pre-authorized on **wily-vm only**, but in practice the permission
   layer refuses it over SSH along with `sudo reboot` — hand both to the user
-  rather than retrying. Every other host stays ask-first regardless. The
-  switch always ends with `home-manager-fredrik.service` failing on the stow
-  conflict below; that is after activation and is not a failed rebuild.
+  rather than retrying. Every other host stays ask-first regardless. If
+  `home-manager-fredrik.service` fails at the end, read the stow section
+  below: that step runs after activation, so it is not a failed rebuild.
 - `~/.dotfiles` on the VM is a clone of the GitHub repo; see the next section
   for pushing uncommitted work to it.
 
@@ -82,15 +82,24 @@ Do **not** `git clean -fd` in the VM clone: it deletes the rsync'd
 `hyprland.lua`, Hyprland auto-reloads, and the session drops into emergency
 mode. `rm` the specific files instead.
 
-`stow` cannot be re-run on the VM: the existing links are absolute into
-`~/.dotfiles`, so it reports *"Ignoring an absolute symlink"* and then
-*"existing target is not owned by stow"* and aborts the whole run. Editing an
-already-linked file is unaffected — rsync writes through the link — but a
-**new** file under `stow/` needs the link made by hand:
+**Never hand-link a new stow file with `ln -sfn`.** stow only recognises
+*relative* links as its own, so an absolute one becomes *"Ignoring an absolute
+symlink"* followed by *"existing target is not owned by stow"* — and stow
+aborts the entire run, failing `home-manager-fredrik.service` on every rebuild
+from then on. Three such links once made the whole thing look unfixable; the
+rest of `$HOME` was stow's own relative links all along.
+
+Editing an already-linked file needs nothing — rsync writes through the link. A
+**new** file under `stow/` just needs stow re-run, which is the same command
+home-manager activation runs:
 
 ```sh
-ln -sfn ~/.dotfiles/stow/Linux/.config/hypr/newfile.lua ~/.config/hypr/newfile.lua
+stow --dir=$HOME/.dotfiles/stow --target=$HOME --restow --no-folding --adopt \
+  shared Linux
 ```
+
+If it ever reports the conflict above, `rm` the offending links (they are
+symlinks into the repo, so nothing real is lost) and run it again.
 
 ## Split of responsibilities
 
@@ -109,6 +118,8 @@ ln -sfn ~/.dotfiles/stow/Linux/.config/hypr/newfile.lua ~/.config/hypr/newfile.l
 - **stow** (`stow/Linux/.config/{hypr,quickshell}/`) carries the config and
   QML. Deliberate: the Quickshell tree gets edited constantly and stow
   symlinks take effect with no rebuild. Do not move QML into the Nix store.
+  Under `--no-folding` that immediacy covers **edits** only — stow links each
+  file individually, so a *new* file needs stow re-run (see above).
 - **Cursor** — the small `macOS-hypr` v0.1 Hyprcursor data tree is stowed at
   `stow/Linux/.local/share/icons/macOS-hypr/`, so it needs no Nix package
   build. Download updates from [the upstream releases](https://github.com/6ooker/apple_hyprcursor/releases);
@@ -350,27 +361,6 @@ also:
 The first is a lid consequence and cannot matter here — no lid, one scanout.
 The third is wanted regardless and was simply not built: a stderr line nobody
 reads is a poor way to learn the machine slept unlocked.
-
-## Newly added stow files need a manual link
-
-An existing VM clone has absolute links, so an activation that tries to rerun
-Stow fails as described above — do **not** use restarting
-`home-manager-fredrik.service` or rebooting as a way to create a new link. A
-system switch has still activated its system changes before reporting that
-home-manager failure; make the required link by hand instead. For example, the
-Omarchy-shaped Quickshell plugin tree needs:
-
-```sh
-ln -sfn ~/.dotfiles/stow/Linux/.config/quickshell/plugins \
-  ~/.config/quickshell/plugins
-```
-
-Editing an already-linked file remains immediate after rsync. The generic
-pattern is still:
-
-```sh
-ln -sfn ~/.dotfiles/stow/Linux/.config/hypr/newfile.lua ~/.config/hypr/newfile.lua
-```
 
 ## Reaching Quickshell from a keybind
 
