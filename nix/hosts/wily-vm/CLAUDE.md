@@ -179,6 +179,14 @@ symlinks into the repo, so nothing real is lost) and run it again.
   `/usr/lib/chromium/initial_preferences` (`install/config/theme-system.sh`);
   that path is read-only in the Nix store, and it would only cover new profiles
   anyway.
+  That flag is necessary but not sufficient: Chromium follows GTK, and the
+  toggle writes `gtk-theme = "Adwaita-dark"` — a name GTK3 cannot resolve
+  without `gnome-themes-extra`, since only `Adwaita` is compiled into the
+  library. An unresolvable name falls back to the default light theme, and
+  Chromium goes light no matter what `color-scheme` says. Holding
+  `color-scheme` at `prefer-dark` and writing `gtk-theme = "Adwaita"` turns
+  Chromium dark, which is what isolates it. Firefox and Zen read `color-scheme`
+  directly and ignore `gtk-theme`, so nothing else on the VM showed the fault.
 - **stow** (`stow/Linux/.config/{hypr,quickshell}/`) carries the config and
   QML. Deliberate: the Quickshell tree gets edited constantly and stow
   symlinks take effect with no rebuild. Do not move QML into the Nix store.
