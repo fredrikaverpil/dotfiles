@@ -82,6 +82,17 @@ Do **not** `git clean -fd` in the VM clone: it deletes the rsync'd
 `hyprland.lua`, Hyprland auto-reloads, and the session drops into emergency
 mode. `rm` the specific files instead.
 
+**Any git operation that rewrites `hyprland.lua` costs a `hyprctl reload`**,
+not just `clean`: `checkout`, `reset --hard`, `pull` and `stash pop` all
+materialize a file by `unlink()` then create, so the path vanishes for an
+instant and Hyprland's re-parse records *"cannot open … No such file or
+directory"* — the red overlay, with every bind still registered. `rsync` and
+`scp` write in place with `O_TRUNC` and never do this; verified both ways.
+Note that git rewrites the file whenever the **index** disagrees with the
+target commit, so a worktree whose bytes already match is no protection: work
+pushed here with `rsync` and never committed *on the VM* leaves the index
+stale, and the next `pull` touches the file anyway.
+
 **Never hand-link a new stow file with `ln -sfn`.** stow only recognises
 *relative* links as its own, so an absolute one becomes *"Ignoring an absolute
 symlink"* followed by *"existing target is not owned by stow"* — and stow
