@@ -536,8 +536,8 @@ arrow keys and inert on Enter, rather than absent — so what is still missing
 stays visible while browsing. Those are the rows to edit when the feature
 lands. They are not the record of what is missing, though: this file is, so
 that a row can be deleted without losing the note. Still dim: Learn ›
-Hyprland and NixOS, Trigger › Emoji / Color picker / Share, Setup › Display
-and Nightlight.
+Hyprland and NixOS, Trigger › Emoji / Color picker / Share, and Setup ›
+Display.
 
 Typing filters the whole subtree below the current level, not just the rows on
 screen, which is what Omarchy's `rebuildDisplay` does — so `ghostty` or `lock`
@@ -646,6 +646,68 @@ otherwise the narrower moon makes the notification button jump on a theme
 toggle. This is the same principle as Omarchy's `BarIconButton` (27px slot,
 16px optical canvas, `OpticalGlyph` tight-bound centring).
 
+## Nightlight
+
+`plugins/services/nightlight/` is Omarchy's service at the same path, plus the
+one thing they do not have: a solar schedule. **hyprsunset has no
+sunrise/sunset support** — from `hyprwm/hyprsunset`'s `ConfigManager.cpp` the
+whole config surface is `max-gamma` plus
+`profile { time = HH:MM, temperature, gamma, identity }`, and its IPC is
+`temperature|gamma|identity|profile|reset|get`. No geolocation, no solar
+keyword. So `hyprsunset.conf` carries only Omarchy's inert `identity` profile
+(without a profile it applies a tint of its own) and the schedule lives in QML.
+
+`mode` is `auto`, `on` or `off`. A manual toggle pins the temperature until the
+next sunrise or sunset and then reverts to `auto`, which is what Night Shift
+does; the service records the solar period the override was made in and expires
+it when that changes. 4000K/6500K are Omarchy's pair, kept identical so a
+temperature set from either side reads back the same on the other.
+
+A **one-minute tick** carries the schedule, and it is deliberately doing three
+jobs at once: crossing the solar boundary, expiring a stale override, and
+re-asserting the temperature. That last one is why the morning `identity`
+profile needs no special handling — it fires at 07:00, clobbers the runtime
+temperature, and the next tick puts it back.
+
+**The tick probes before it decides.** Reconciling against the previous
+minute's reading makes an outside change take two ticks to correct, which is
+long enough to look like the schedule not working at all; caught live. Only a
+tick reconciles, though — the probe that follows every apply must not turn a
+temperature that will not stick into an apply loop, which is what the
+`reconciling` flag is for. Upstream's ten-attempt retry (from
+`bin/omarchy-toggle-nightlight`, for the fresh daemon overwriting the
+temperature at the end of its boot) is kept, inside the apply command rather
+than in QML.
+
+**Applies are serialized, and dropping that guard costs a crash rather than a
+race on the temperature.** The apply command starts hyprsunset when none is
+running, and `pgrep -x hyprsunset || launch` is not atomic: two applies
+overlapping while it comes up each launch one, and the loser exits with
+*"A CTM manager is already running"* and a stack trace in the journal. Seen
+live. Upstream's `hasPendingTemperature`/`runApply` pair is what prevents it.
+
+Location comes from the **system timezone**, so it follows the laptop with no
+network, no geoclue and nothing to configure: `timedatectl show -p Timezone`
+gives `Europe/Stockholm` and `/etc/zoneinfo/zone.tab` gives its ISO 6709
+coordinates. **Read `zone.tab`, not `zone1970.tab`** — tzdata's 2022
+consolidation merged Sweden into `Europe/Berlin`, so the newer table no longer
+lists the name `timedatectl` reports. The coordinates are the zone's principal
+city, so Malmo is around fifteen minutes off Stockholm's winter sunset;
+acceptable for a blue-light filter, and the `latitude`/`longitude` properties
+override it. `services.automatic-timezoned` was considered and rejected: it
+drives geoclue2, whose Wi-Fi backend depended on the Mozilla Location Service,
+retired in 2024.
+
+`NightlightModel.js` holds the NOAA sunrise equation and a `demo()` self-check
+runnable as `node NightlightModel.js` — which is how upstream tests its
+`*Model.js` files, and which caught a sign error on longitude that put sunrise
+2h25m out. Polar day and night have no solution to that equation, so
+`solarPeriod` falls back to the hemisphere and the month there.
+
+Reachable as `qs ipc call nightlight toggle|enable|disable|auto|status` and
+bound to `SUPER + CTRL + N`. `enable`/`disable` rather than `on`/`off`, which
+is what upstream's handler and our idle service both call these.
+
 ## Notifications, lock, idle and polkit
 
 Quickshell 0.3.0 on this VM supplies `NotificationServer`, `PolkitAgent`,
@@ -729,7 +791,8 @@ without coupling the VM to their whole shell.
 The matching Omarchy keybinds are `SUPER + comma` (dismiss latest),
 `SUPER + SHIFT + comma` (dismiss all), `SUPER + CTRL + comma` (DND),
 `SUPER + ALT + comma` (invoke latest), `SUPER + SHIFT + ALT + comma` (history),
-`SUPER + CTRL + I` (toggle idle locking), and `SUPER + CTRL + L` (lock).
+`SUPER + CTRL + I` (toggle idle locking), `SUPER + CTRL + L` (lock), and
+`SUPER + CTRL + N` (toggle nightlight).
 
 ## Deferred for the ThinkPad
 
@@ -760,18 +823,14 @@ The matching Omarchy keybinds are `SUPER + comma` (dismiss latest),
 
 The plumbing is in place — portals (`xdg-desktop-portal` + `-hyprland` +
 `-gtk`), pipewire/wireplumber and NetworkManager are all running, and the menu
-now covers apps, wallpaper, theme, screenshots, power, notifications and the
-keybinding sheet. The dim rows in it are the shortest list of what is still
+now covers apps, wallpaper, theme, nightlight, screenshots, power,
+notifications and the keybinding sheet. The dim rows in it are the shortest list of what is still
 missing.
 
 1. **A display panel**, ported from Omarchy's
    `shell/plugins/panels/monitor/` (resolution, scaling, text size). Light/dark
    and nightlight belong in there rather than as their own bar buttons — so
    the  /  button is a placeholder, not a design.
-2. **Nightlight**, the equivalent of macOS Night Shift: `hyprsunset` shifts
-   colour temperature, and Omarchy drives it with a toggle plus a restart
-   script. Wants a schedule; composes with light/dark rather than replacing
-   it.
 
 Half of Omarchy's tree cannot port: Install / Remove / Update are `pacman`
 operations, and on NixOS that is a rebuild. The root menu here is necessarily
@@ -889,14 +948,24 @@ smaller than theirs.
   `idle_inhibit = "fullscreen"`, the way Omarchy ships Steam, Moonlight,
   RetroArch and GeForce NOW in `default/hypr/apps/*.lua` — config, so it
   survives a reboot. The tag is for the case nobody anticipated.
+- **Nightlight is verified live except for two things.** Confirmed on the VM:
+  the location resolving to Stockholm from the timezone, `toggle`/`enable`/
+  `disable`/`auto` round-tripping through `hyprctl hyprsunset temperature`, a
+  manual override surviving the ticks, and an outside `hyprctl hyprsunset
+  temperature 4000` being healed back inside one tick. Not covered: the
+  override expiring at a real sunrise or sunset (the boundary itself is under
+  the `node` self-check, the expiry is not). The auto-launch **is** verified
+  since the rebuild: `pkill -x hyprsunset` followed by a toggle brings it back
+  in its own `app-Hyprland-hyprsunset` scope, and four applies fired back to
+  back leave exactly one process and no crash.
 - Keyboard layout is `us`. Swedish is wanted eventually as a second layout,
   but not yet — `kb_layout = "us,se"` with a `grp:` toggle in `kb_options`
   when the time comes.
 - No OSD yet.
-- Three packages the Omarchy keymap and menu assume are not installed in
-  `desktop.nix`: `wl-clipboard` (clipboard history, share), `slurp` (region
-  select, so `grim` can only take the whole screen) and `hyprsunset`
-  (nightlight). Menu rows and binds for these stay dim until they land.
+- Two packages the Omarchy keymap and menu assume are not installed in
+  `desktop.nix`: `wl-clipboard` (clipboard history, share) and `slurp` (region
+  select, so `grim` can only take the whole screen). Menu rows and binds for
+  these stay dim until they land.
   `hyprlock`, `hypridle` and `hyprpolkitagent` are deliberate omissions: the
   equivalents here are native Quickshell services.
 - The bar uses JetBrains Mono Nerd Font (`nix/shared/system/linux.nix` installs
