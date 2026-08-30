@@ -153,6 +153,9 @@ Gotchas found the hard way:
   this reason: without it a single bad bind also skips the recorder at the
   bottom of the file, so a typo blanks the cheatsheet as well as the
   keymap. `pcall` catches a runtime error, not a syntax error.
+- **`hyprctl keyword` no longer works at all**: it answers *"keyword can't work
+  with non-legacy parsers. Use eval."* Runtime config changes go through
+  `hyprctl eval "hl.<...>"` instead, which is the same Lua the config file uses.
 - **`hyprctl dispatch` takes Lua now**: `hyprctl dispatch 'hl.dsp.exec_cmd("ghostty")'`.
   A hyprlang-shaped dispatch is a *parse* error, and it is reported only on
   hyprctl's own stdout — nothing logs it. A caller that does not read that
