@@ -153,6 +153,7 @@ in
     grim # screenshots, for verifying the session over SSH
     hyprsunset # nightlight; the schedule lives in the Quickshell service
     libnotify # notify-send smoke tests and CLI desktop notifications
+    # proton-pass # unsupported on aarch64-linux; enable in the ThinkPad config
     quickshell
   ];
 }
