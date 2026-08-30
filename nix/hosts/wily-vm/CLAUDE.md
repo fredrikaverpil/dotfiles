@@ -144,12 +144,29 @@ symlinks into the repo, so nothing real is lost) and run it again.
   finding `uwsm-app`, and then the bare command name in each app's `Exec`.
   Nothing reports the failure: `Quickshell.execDetached` is silent, and
   `systemd-run` inherits the same broken PATH, so a launch just does nothing.
-- **Browsers** — Firefox is a `desktop.nix` package. Zen comes from the
-  `zen-browser` Home Manager module in `users/fredrik.nix`, which also makes
-  it the user's XDG and `$BROWSER` default. Its `beta` branch packages Zen's
-  normal upstream releases — Zen has no separate stable channel — while
-  `twilight` is nightly. Both wrappers already set `MOZ_ENABLE_WAYLAND=1`, so
-  neither needs a session variable to get a native Wayland window.
+- **Browsers** — Chromium and Firefox are `desktop.nix` packages. Zen comes
+  from the `zen-browser` Home Manager module in `users/fredrik.nix`, which
+  also makes it the user's XDG and `$BROWSER` default. Its `beta` branch
+  packages Zen's normal upstream releases — Zen has no separate stable
+  channel — while `twilight` is nightly. `NIXOS_OZONE_WL=1` selects
+  Chromium's native Wayland backend; the Firefox and Zen wrappers already
+  set `MOZ_ENABLE_WAYLAND=1` themselves.
+- **Chromium ignores the light/dark switch until `--no-first-run`.** Its
+  profile sits in a first-run state that pins the UI light and makes it ignore
+  the portal's `color-scheme`, so the package is overridden with
+  `commandLineArgs = "--no-first-run"`. Verified on the real profile: launched
+  normally under `prefer-dark` it stayed light and logged *"Requested load of
+  chrome://newtab/ for incorrect profile type"*; with the flag it came up dark
+  and then followed live toggles with no restart. Everything else was ruled out
+  first — the portal answers correctly (`busctl --user call
+  org.freedesktop.portal.Desktop /org/freedesktop/portal/desktop
+  org.freedesktop.portal.Settings ReadOne ss org.freedesktop.appearance
+  color-scheme` returns 1 for dark, 2 for light), Firefox and Zen follow it, and
+  writing `browser.theme.color_scheme = 0` into the profile changed nothing.
+  Omarchy fixes the same thing with `{"distribution":{"require_eula":false}}` in
+  `/usr/lib/chromium/initial_preferences` (`install/config/theme-system.sh`);
+  that path is read-only in the Nix store, and it would only cover new profiles
+  anyway.
 - **stow** (`stow/Linux/.config/{hypr,quickshell}/`) carries the config and
   QML. Deliberate: the Quickshell tree gets edited constantly and stow
   symlinks take effect with no rebuild. Do not move QML into the Nix store.
