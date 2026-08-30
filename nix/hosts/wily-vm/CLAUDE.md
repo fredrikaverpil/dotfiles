@@ -17,10 +17,10 @@ missing one, because it gets believed and acted on.
 ## Reaching it
 
 - `ssh fredrik@192.168.64.15` (key auth; password auth also on)
-- Rebuild: `sudo nixos-rebuild switch --flake ~/.dotfiles#wily-vm`. Intended
-  to be pre-authorized on **wily-vm only**, but in practice the permission
-  layer refuses it over SSH along with `sudo reboot` — hand both to the user
-  rather than retrying. Every other host stays ask-first regardless. If
+- Rebuild: `sudo nixos-rebuild switch --flake ~/.dotfiles#wily-vm`. sudo now
+  requires the user's password, and the permission layer also refuses it over
+  SSH along with `sudo reboot` — hand both to the user rather than retrying.
+  Every other host stays ask-first regardless. If
   `home-manager-fredrik.service` fails at the end, read the stow section
   below: that step runs after activation, so it is not a failed rebuild.
 - `~/.dotfiles` on the VM is a clone of the GitHub repo; see the next section
@@ -115,12 +115,16 @@ symlinks into the repo, so nothing real is lost) and run it again.
 ## Split of responsibilities
 
 - **Nix** (`desktop.nix`) declares packages and the session: `programs.hyprland`
-  with `withUWSM`, greetd autologin, and Quickshell as a systemd **user**
-  service bound to `graphical-session.target`. It also owns polkit, the
-  pre-suspend delay-inhibitor unit and the small `wily-lock` PAM entry. greetd
-  refuses to start unless `default_session` is set, even when only
-  `initial_session` is wanted. `environment.PATH = lib.mkForce null` on the
-  Quickshell unit is what makes the menu able to start anything: NixOS otherwise
+  with `withUWSM`, but deliberately no display manager. It retains
+  `programs.hyprland`'s `graphical.target` default: with no display manager,
+  agetty still supplies the password-authenticated console, while UWSM's
+  `check may-start` requires `graphical.target` to be active. The `hypr` shell
+  function from `shell/sourcing.sh` starts Hyprland through UWSM. Quickshell is a systemd
+  **user** service bound to `graphical-session.target`. Nix also owns polkit,
+  the pre-suspend delay-inhibitor unit and the small `wily-lock` PAM entry.
+  `fredrik` remains a wheel user, but sudo requires their password.
+  `environment.PATH = lib.mkForce null` on the Quickshell unit is what makes
+  the menu able to start anything: NixOS otherwise
   pins a sparse PATH on user units, and unsetting it is the only way to inherit
   the session PATH uwsm imports into the user manager. Both hops need it —
   finding `uwsm-app`, and then the bare command name in each app's `Exec`.
@@ -287,14 +291,21 @@ The screen suggests `hyprctl --instance 0` and a `killall` of the lock
 process; neither is needed when `HYPRLAND_INSTANCE_SIGNATURE` is exported and
 the client is already gone. Verified live.
 
-## uwsm: never restart greetd, reboot
+## Starting and stopping the graphical session
 
-`systemctl restart greetd` races the old session's user-unit teardown; the new
-uwsm start then dies with *"A compositor or graphical-session* target is
-already active"* and you get a black screen with greetd stopped. Reboot
-instead. This is also why Quickshell is a systemd user service — it can be
-restarted on its own (`systemctl --user restart quickshell`) while iterating on
-QML, without touching the compositor.
+The machine boots to a password-authenticated text console: it reaches
+`graphical.target`, but without a display manager it has no graphical login.
+From zsh, run `hypr`: the function in `shell/sourcing.sh` checks that UWSM may
+start, then runs `uwsm start -e -D Hyprland hyprland.desktop`. The check stops
+an accidental start from SSH or from an already graphical session, and requires
+`graphical.target`; do not force `multi-user.target` to make the console appear.
+Verified live: `hypr` enters Hyprland, and the System > Logout action runs
+`uwsm stop` and returns to the same console rather than a greeter.
+
+Apply login or session-launcher changes with a boot generation and reboot rather
+than restarting services in place. Quickshell remains safe to restart on its own
+(`systemctl --user restart quickshell`) while iterating on QML, without touching
+the compositor.
 
 ## What a rebuild does and does not restart
 
@@ -321,8 +332,9 @@ you want and occasionally the trap:
   `pgrep -af "bin/Hyprland"` against
   `readlink -f /run/current-system/sw/bin/Hyprland` to see whether they have
   drifted apart. (Not yet exercised here — no package bump has landed.)
-- **greetd / the session itself** — reboot; see the uwsm section above for why
-  restarting it is not an option.
+- **The console / session itself** — reboot after changing login or
+  session-launcher configuration; see "Starting and stopping the graphical
+  session" above.
 
 ## The clock stops when the Mac sleeps
 
@@ -662,14 +674,15 @@ smaller than theirs.
   AccessDenied … Falling back to eavesdropping"* on every boot. It is noise: the
   match is on a broadcast signal, which needs no eavesdropping, and the suspend
   test above proves the monitor receives it.
-- **`loginctl lock-session` reports success and does nothing.** Nothing listens
-  for logind's `Lock`/`Unlock` signals — verified: the call returns cleanly and
-  `lock status` still reports `locked:false`. Omarchy is the same (`grep -rniE
-  "login1|loginctl" shell/` is empty; their entry point is
-  `bin/omarchy-system-lock`, which calls `omarchy-shell lock lock`, the same IPC
-  path as ours), so this is left alone deliberately rather than fixed into a
-  divergence. Nothing here emits the signal: greetd autologins, and idle locking
-  is `IdleMonitor` rather than logind's `IdleAction=lock`.
+- **`loginctl lock-session` reported success and did nothing under the former
+  greetd setup.** Nothing then listened for logind's `Lock`/`Unlock` signals:
+  the call returned cleanly while `lock status` still reported `locked:false`.
+  Omarchy is the same (`grep -rniE "login1|loginctl" shell/` is empty; their
+  entry point is `bin/omarchy-system-lock`, which calls `omarchy-shell lock lock`,
+  the same IPC path as ours), so it was left alone deliberately rather than
+  fixed into a divergence. A console login adds no listener, but re-verify that
+  observation after the terminal-first session has been exercised before relying
+  on it for ThinkPad lid handling.
 
   **Read this before touching lid handling on the ThinkPad.** The lid is safe
   under `HandleLidSwitch=suspend`, which is what logind actually reports here

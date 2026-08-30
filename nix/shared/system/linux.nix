@@ -39,9 +39,9 @@
       backupFileExtension = "backup";
     };
 
-    # TODO: Security considerations:
-    # - Consider enabling passwordless sudo only for specific commands
-    security.sudo.wheelNeedsPassword = false;
+    # Wheel users authenticate before privilege escalation. A fresh login
+    # session therefore has no ambient root-equivalent access.
+    security.sudo.wheelNeedsPassword = true;
 
     # Note: User configuration is handled by lib/users.nix
 
