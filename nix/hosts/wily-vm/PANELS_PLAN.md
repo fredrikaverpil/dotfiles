@@ -56,8 +56,15 @@ Upstream model: Omarchy Quattro at `~/code/public/github.com/omacom/omarchy`.
   next `hyprland.lua` auto-reload, so upstream `sed`s
   `local omarchy_monitor_scale = ...` in `monitors.lua`. Ours needs the same
   variable in `hyprland.lua`. `sed -i` writes a temp file and `rename()`s it,
-  which is atomic — unlike git's unlink-then-create, it should not trip the
-  missing-file overlay. **Verify this on the VM before relying on it.**
+  which is atomic — unlike git's unlink-then-create, it does not trip the
+  missing-file overlay. Verified on the VM: a `sed -i` insert and its revert on
+  the live `hyprland.lua` both left `hyprctl configerrors` empty.
+- **Scale persistence dirties the repo**, because `hyprland.lua` is a stowed,
+  git-tracked file. On the VM the next rsync from the laptop reverts it; on the
+  ThinkPad it is an uncommitted change. Upstream has the same property —
+  `monitors.lua` is user config for them. Decide when writing the scale row
+  whether that is acceptable or whether the value belongs in a state file that
+  `hyprland.lua` reads.
 - **Hyprland only accepts scales that divide the mode into whole logical
   pixels** (1/120 steps; clean scales divide `gcd(w*120, h*120)`). Port
   `panels/monitor/Model.js`'s `cleanScale` / `availableScales` verbatim.
