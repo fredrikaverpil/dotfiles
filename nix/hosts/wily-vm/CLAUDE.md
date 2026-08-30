@@ -269,11 +269,16 @@ QML, without touching the compositor.
 you want and occasionally the trap:
 
 - **`hyprland.lua`** — nothing to do. It is stowed and Hyprland auto-reloads it.
-- **The Quickshell unit** — user units are *reloaded*, not restarted: a switch
-  writes the new `quickshell.service` but the running process keeps the old
-  environment. Changing `QT_PLUGIN_PATH` or anything else on that unit needs an
-  explicit `systemctl --user restart quickshell`. **Do not restart it while the
-  native lock is active:** `ext-session-lock` outlives its client, so this lean
+- **User units** — a unit whose definition changed **is** stopped and started,
+  and the switch names it: *"stopping … starting the following user units:
+  wily-sleep-lock.service"*. Verified when a one-line edit to that script gave
+  it a new store path. (This entry used to claim user units are only
+  *reloaded*; that was wrong. Anything on the unit, `QT_PLUGIN_PATH` included,
+  is part of its definition, so a change to it restarts the unit.) Read the
+  switch output — it is authoritative about what was touched.
+- **The Quickshell unit** — restarts with everything else when its definition
+  changes, which is usually what you want. **Do not restart it while the native
+  lock is active:** `ext-session-lock` outlives its client, so this lean
   first version cannot recover the stranded compositor lock; see the ThinkPad
   deferrals below.
 - **The compositor** — keeps running its old binary out of the store, which
