@@ -65,6 +65,126 @@ let
       fi
     '';
   };
+
+  # Report silent failures in the alarm daemon, calendar sync, and Google token.
+  calendar-watchdog = pkgs.writeShellApplication {
+    name = "wily-calendar-watchdog";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.dbus
+      pkgs.findutils
+      pkgs.gnugrep
+      pkgs.libnotify
+    ];
+    text = ''
+      set -euo pipefail
+
+      state_path="''${XDG_STATE_HOME:-"$HOME/.local/state"}/wily-calendar-watchdog-faults"
+      cache_dir="$HOME/.cache/evolution/calendar"
+      alarm_bus_name="org.gnome.Evolution-alarm-notify"
+      sync_stall_seconds=$((2 * 60 * 60))
+      declare -a faults=()
+
+      notify_fault() {
+        case "$1" in
+          evolution-alarm-notify-unavailable)
+            notify-send --app-name=wily-calendar-watchdog --urgency=critical \
+              "Calendar reminder watchdog" \
+              "Evolution's reminder notifier is not running; meeting alarms will not fire."
+            ;;
+          calendar-cache-missing)
+            notify-send --app-name=wily-calendar-watchdog --urgency=critical \
+              "Calendar reminder watchdog" \
+              "No Evolution calendar cache was found; calendar sync cannot be verified."
+            ;;
+          calendar-sync-stalled)
+            notify-send --app-name=wily-calendar-watchdog --urgency=critical \
+              "Calendar reminder watchdog" \
+              "Evolution's calendar cache has not updated for over two hours."
+            ;;
+          google-token-unavailable)
+            notify-send --app-name=wily-calendar-watchdog --urgency=critical \
+              "Calendar reminder watchdog" \
+              "Google Online Accounts is unavailable or its access token could not be read."
+            ;;
+        esac
+      }
+
+      notify_recovery() {
+        notify-send --app-name=wily-calendar-watchdog --expire-time=8000 \
+          "Calendar reminder watchdog recovered" \
+          "''${1//-/ } is healthy again."
+      }
+
+      add_fault() {
+        faults+=("$1")
+      }
+
+      if ! busctl --user status "$alarm_bus_name" >/dev/null 2>&1; then
+        add_fault evolution-alarm-notify-unavailable
+      fi
+
+      if [[ ! -d $cache_dir ]]; then
+        add_fault calendar-cache-missing
+      else
+        newest_cache_mtime="$(
+          find "$cache_dir" -mindepth 2 -maxdepth 2 -type f -name cache.db \
+            ! -path "$cache_dir/trash/*" -printf '%T@\n' 2>/dev/null | sort -n | tail -n 1
+        )"
+        if [[ -z $newest_cache_mtime ]]; then
+          add_fault calendar-cache-missing
+        elif (( $(date +%s) - ''${newest_cache_mtime%%.*} > sync_stall_seconds )); then
+          add_fault calendar-sync-stalled
+        fi
+      fi
+
+      declare -a google_accounts=()
+      while IFS= read -r account_path; do
+        provider="$(busctl --user get-property org.gnome.OnlineAccounts "$account_path" \
+          org.gnome.OnlineAccounts.Account ProviderType 2>/dev/null || true)"
+        [[ $provider == 's "google"' ]] && google_accounts+=("$account_path")
+      done < <(
+        busctl --user tree org.gnome.OnlineAccounts 2>/dev/null |
+          grep -o '/org/gnome/OnlineAccounts/Accounts/[^[:space:]]*' || true
+      )
+
+      if (( ''${#google_accounts[@]} == 0 )); then
+        add_fault google-token-unavailable
+      else
+        for account_path in "''${google_accounts[@]}"; do
+          if ! busctl --user call org.gnome.OnlineAccounts "$account_path" \
+            org.gnome.OnlineAccounts.OAuth2Based GetAccessToken >/dev/null 2>&1; then
+            add_fault google-token-unavailable
+          fi
+        done
+      fi
+
+      mkdir -p "$(dirname "$state_path")"
+      previous_faults="$(mktemp "''${state_path}.XXXXXX")"
+      current_faults="$(mktemp "''${state_path}.XXXXXX")"
+      trap 'rm -f "$previous_faults" "$current_faults"' EXIT
+
+      if [[ -f $state_path ]]; then
+        sort -u "$state_path" > "$previous_faults"
+      else
+        : > "$previous_faults"
+      fi
+      if (( ''${#faults[@]} > 0 )); then
+        printf '%s\n' "''${faults[@]}" | sort -u > "$current_faults"
+      else
+        : > "$current_faults"
+      fi
+
+      while IFS= read -r fault; do
+        grep -Fxq "$fault" "$previous_faults" || notify_fault "$fault"
+      done < "$current_faults"
+      while IFS= read -r fault; do
+        grep -Fxq "$fault" "$current_faults" || notify_recovery "$fault"
+      done < "$previous_faults"
+
+      mv "$current_faults" "$state_path"
+    '';
+  };
 in
 {
   # uwsm wraps the session in systemd units so graphical-session.target is
@@ -146,12 +266,73 @@ in
     };
   };
 
+  # Calendar reads EDS accounts; Evolution retains the Proton ICS wizard and
+  # invitation fallback, while Google authentication is supplied by GOA.
+  programs.evolution.enable = true;
+  services.gnome.gnome-online-accounts.enable = true;
+  # GOA refresh tokens are libsecret-backed and unlock through PAM at login.
+  services.gnome.gnome-keyring.enable = true;
+  programs.dconf.enable = true;
+
+  # EDS already ships this Type=dbus service with ExecStart and Restart=on-failure.
+  # A second instance exits after finding its D-Bus name owned, so only enable it.
+  systemd.user.services.evolution-alarm-notify.wantedBy = [ "graphical-session.target" ];
+
+  # Wall-clock scheduling lets Persistent catch a missed check after resume.
+  systemd.user.services.wily-calendar-watchdog = {
+    description = "Check calendar reminder dependencies";
+    partOf = [ "graphical-session.target" ];
+    after = [
+      "dbus.socket"
+      "graphical-session.target"
+    ];
+    requires = [ "dbus.socket" ];
+    unitConfig.OnFailure = "wily-calendar-watchdog-failed.service";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${calendar-watchdog}/bin/wily-calendar-watchdog";
+      # A D-Bus call stuck on a dead GOA process must become an observable
+      # watchdog failure rather than blocking every later timer elapse.
+      TimeoutStartSec = "1min";
+    };
+  };
+
+  systemd.user.services.wily-calendar-watchdog-failed = {
+    description = "Report a failed calendar reminder watchdog";
+    partOf = [ "graphical-session.target" ];
+    after = [
+      "dbus.socket"
+      "graphical-session.target"
+    ];
+    requires = [ "dbus.socket" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.libnotify}/bin/notify-send --app-name=wily-calendar-watchdog --urgency=critical \"Calendar reminder watchdog failed\" \"The watchdog itself crashed; inspect journalctl --user -u wily-calendar-watchdog.\"";
+    };
+  };
+
+  systemd.user.timers.wily-calendar-watchdog = {
+    description = "Periodically check calendar reminder dependencies";
+    partOf = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    wantedBy = [ "graphical-session.target" ];
+    timerConfig = {
+      OnActiveSec = "2m";
+      OnCalendar = "*:0/15";
+      Persistent = true;
+      Unit = "wily-calendar-watchdog.service";
+    };
+  };
+
   host.extraSystemPackages = with pkgs; [
     # Without --no-first-run the profile stays pinned to the light UI and
     # ignores the portal's color-scheme; see the browsers entry in CLAUDE.md.
     (chromium.override { commandLineArgs = "--no-first-run"; })
     firefox
     ghostty-softgl # terminal; see the let-block above
+    gnome-calendar
+    # EDS lacks Google's OAuth client; use GOA's small standalone account UI.
+    gnome-online-accounts-gtk
     gnome-themes-extra # Adwaita-dark, the GTK theme the light/dark toggle names
     grim # screenshots, for verifying the session over SSH
     hyprsunset # nightlight; the schedule lives in the Quickshell service
