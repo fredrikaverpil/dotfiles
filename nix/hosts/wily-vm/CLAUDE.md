@@ -127,7 +127,8 @@ symlinks into the repo, so nothing real is lost) and run it again.
 
 ## Split of responsibilities
 
-- **Nix** (`desktop.nix`) declares packages and the session: `programs.hyprland`
+- **Nix** (`desktop.nix`, plus `users/fredrik.nix` for user-owned browser
+  configuration) declares packages and the session: `programs.hyprland`
   with `withUWSM`, but deliberately no display manager. It retains
   `programs.hyprland`'s `graphical.target` default: with no display manager,
   agetty still supplies the password-authenticated console, while UWSM's
@@ -143,9 +144,12 @@ symlinks into the repo, so nothing real is lost) and run it again.
   finding `uwsm-app`, and then the bare command name in each app's `Exec`.
   Nothing reports the failure: `Quickshell.execDetached` is silent, and
   `systemd-run` inherits the same broken PATH, so a launch just does nothing.
-- **Browsers** — Firefox is a `desktop.nix` package. Its wrapper already sets
-  `MOZ_ENABLE_WAYLAND=1`, so it needs no session variable to get a native
-  Wayland window.
+- **Browsers** — Firefox is a `desktop.nix` package. Zen comes from the
+  `zen-browser` Home Manager module in `users/fredrik.nix`, which also makes
+  it the user's XDG and `$BROWSER` default. Its `beta` branch packages Zen's
+  normal upstream releases — Zen has no separate stable channel — while
+  `twilight` is nightly. Both wrappers already set `MOZ_ENABLE_WAYLAND=1`, so
+  neither needs a session variable to get a native Wayland window.
 - **stow** (`stow/Linux/.config/{hypr,quickshell}/`) carries the config and
   QML. Deliberate: the Quickshell tree gets edited constantly and stow
   symlinks take effect with no rebuild. Do not move QML into the Nix store.
@@ -262,9 +266,10 @@ is that toggle's chord plus ALT — which is how `SUPER + CTRL + ALT + I` (keep
 *this* window awake) sits next to `SUPER + CTRL + I` (idle locking for the
 session).
 
-Ours is nearly empty in the application layer — `SUPER + RETURN` and
-`SUPER + SHIFT + N`, against their ~25. Most of theirs are webapps launched
-through `omarchy-launch-webapp`, which is not ported.
+Ours keeps Omarchy's terminal, both Browser aliases (`SUPER + SHIFT + RETURN`
+and `SUPER + SHIFT + B`), and editor, against their ~25 application binds. Most
+of theirs are webapps launched through `omarchy-launch-webapp`, which is not
+ported.
 
 Consequences of following them exactly: `SUPER + W` is a second Close window,
 so the wallpaper picker moved to `SUPER + CTRL + SPACE` (their "Background
@@ -454,7 +459,12 @@ would kill them all on `systemctl --user restart quickshell`.
 
 `DesktopEntries.applications` fills in a few seconds **after** the shell
 starts, so the app list must be a QML binding. Building it once when the menu
-opens gives an empty list on the first open after a restart.
+opens gives an empty list on the first open after a restart. Like Omarchy's
+`AppLibrary`, it watches that model: an installed app with a conventional
+`.desktop` entry needs no launcher-menu change. Add a direct app keybind only
+when it has a counterpart in Omarchy's `default/hypr/bindings/applications.lua`;
+retain the chord and label, and launch it with `uwsm-app -- <desktop-id>` so it
+gets its own app scope.
 
 ## The menu
 
