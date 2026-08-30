@@ -226,6 +226,9 @@ ShellRoot {
     "setup.display": { icon: "󰍹", label: "Display", enabled: false },
     "setup.nightlight": { icon: "󰆔", label: "Nightlight", enabled: false },
     "system": { icon: "", label: "System" },
+    "system.close": { icon: "󰅖", label: "Close window", action: () => Quickshell.execDetached(
+      ["hyprctl", "dispatch", "hl.dsp.window.close()"])
+    },
     "system.notifications": { icon: "󰂚", label: "Notifications" },
     "system.notifications.history": { icon: "󰎟", label: "History", action: () => notifications.showHistory() },
     "system.notifications.dnd": { icon: "󰂛", label: "Toggle Do Not Disturb", action: () => notifications.setDoNotDisturb(!notifications.doNotDisturb) },
