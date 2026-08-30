@@ -25,6 +25,7 @@ Ui.Panel {
   readonly property var textScales: [0.8, 0.9, 1, 1.1, 1.25, 1.5]
 
   cardHeight: 460
+  keyNavigation: true
 
   function refresh() {
     if (!monitorState.running) monitorState.running = true
@@ -264,6 +265,8 @@ Ui.Panel {
   }
 
   component ChoiceButton: Rectangle {
+    id: button
+
     property string label: ""
     property bool active: false
     property bool available: true
@@ -272,23 +275,33 @@ Ui.Panel {
     height: 30
     radius: 4
     color: active ? root.shell.palette.sel : "transparent"
-    border.color: root.shell.palette.dim
+    // `active` is the chosen setting, `activeFocus` is where the keyboard is.
+    // The border carries the second so both stay readable at once.
+    border.color: button.activeFocus ? root.shell.palette.fg : root.shell.palette.dim
     border.width: 1
     opacity: available ? 1 : 0.45
+
+    // Chain membership is not conditioned on `available`: a button that goes
+    // unavailable under the cursor would drop out of the chain mid-interaction
+    // and strand the focus. It stays reachable and refuses to fire instead.
+    activeFocusOnTab: true
+    Keys.onReturnPressed: if (button.available) button.activated()
+    Keys.onEnterPressed: if (button.available) button.activated()
+    Keys.onSpacePressed: if (button.available) button.activated()
 
     Text {
       anchors.centerIn: parent
       color: root.shell.palette.fg
       font.family: "JetBrainsMono Nerd Font"
       font.pixelSize: 14
-      text: parent.label
+      text: button.label
     }
 
     MouseArea {
       anchors.fill: parent
-      enabled: parent.available
+      enabled: button.available
       hoverEnabled: true
-      onClicked: parent.activated()
+      onClicked: button.activated()
     }
   }
 

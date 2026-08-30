@@ -207,7 +207,29 @@ symlinks into the repo, so nothing real is lost) and run it again.
   `pinnable` is off by default; Network enables it. A pinned card owns
   input only inside itself, releases keyboard focus, ignores outside and bar
   clicks, and has no persistence — only its generic Pin/Unpin control changes
-  that state. **Panel aliases its default property to the card's column**, so
+  that state. **Releasing keyboard focus costs a pinned card every key and
+  every modifier**: with no `wl_keyboard.enter` the client is never told which
+  modifiers are held, so a pinned panel cannot be keyboard-navigated and no
+  modifier-gated pointer gesture (a SUPER+drag to move it, say) can be
+  detected inside it. Anything a pinned card must support has to work from an
+  unmodified pointer alone.
+  `keyNavigation` opts a panel into keyboard control: buttons set
+  `activeFocusOnTab` and draw their border from `activeFocus`, and **Qt's own
+  focus chain does the walking** — `nextItemInFocusChain` in document order,
+  so no panel keeps a cursor of its own. It is deliberately one linear chain
+  rather than a grid: `l`/`j` step forward and wrap from a row's last option
+  into the next row's first, `h`/`k` step back. The handler sits on the card,
+  the only ancestor common to both the content column and the pin control;
+  keys bubble to it from whichever button holds focus. **Chain membership is
+  never conditioned on a button's `available`**, only on its visibility: a
+  button that goes unavailable while its own action runs — every scale preset
+  during `scaleChanging`, every Wi-Fi control during `busy` — would otherwise
+  drop out of the chain under the cursor and strand the focus. It stays
+  reachable and its Enter handler refuses instead. Menu leaves the flag
+  off — its search field owns the keyboard instead. Omarchy's shared
+  `PanelKeyCatcher` plus a per-panel section/selection cursor was the
+  alternative, and it is why their Display panel is 929 lines to this one's
+  ~340. **Panel aliases its default property to the card's column**, so
   its own fixed children are assigned through `data` — an
   ordinary child there would be reparented into the column. A consumer's
   non-visual objects (`FileView`, `IpcHandler`) land in that column too, which
@@ -913,11 +935,13 @@ missing.
 1. **Validate the network panel's Wi-Fi path on the ThinkPad** — scanning,
    signal strength, radio state, passphrase entry, connect, disconnect and
    forget all need a real radio.
-2. **Make panels keyboard-first** — the menu can reach a panel with typing,
-   arrows and Enter, but `Ui/Panel.qml` only grants layer-shell keyboard focus;
-   it has no focused key handler and Display/Network have no selection state.
-   Port a lean shared `PanelKeyCatcher` concept from Omarchy, then give each
-   panel a section/selection cursor for `hjkl`/arrows, Enter/Space and Escape.
+2. **Exercise the network panel's keyboard chain on the ThinkPad** — the VM
+   has no Wi-Fi adapter, so its Wi-Fi toggle, Scan and every per-network
+   button are hidden. Its focus chain holds nothing but Pin, which comes from
+   `Ui/Panel.qml`, so **no line of that panel's own keyboard code has ever
+   run** — not the `ActionButton` focus border, not the `focusedItem`
+   scroll-into-view block, which has never once been entered. Only the
+   Display panel's traversal is verified live.
 
 Half of Omarchy's tree cannot port: Install / Remove / Update are `pacman`
 operations, and on NixOS that is a rebuild. The root menu here is necessarily
