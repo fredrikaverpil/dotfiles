@@ -45,9 +45,22 @@ ssh fredrik@192.168.64.15 'cd ~/.dotfiles && git add -AN .'   # flakes ignore un
 ssh fredrik@192.168.64.15 "export XDG_RUNTIME_DIR=/run/user/1000 WAYLAND_DISPLAY=wayland-1 \
   HYPRLAND_INSTANCE_SIGNATURE=\$(ls -t /run/user/1000/hypr | head -1); <cmd>"
 
-# screenshot, then pull it back and look at it
-… 'grim /tmp/shot.png'; scp fredrik@192.168.64.15:/tmp/shot.png .
+# Screenshot only the affected UI at native resolution — this 100×32px crop
+# is the right end of the current 1280×800 top bar. It is still pixel-accurate
+# for measuring. `hyprctl -j monitors` gives the geometry when it changes.
+… 'grim -g "1180,0 100x32" -l 9 /tmp/shot.png'; scp fredrik@192.168.64.15:/tmp/shot.png .
+
+# Capture the whole desktop only when composition matters; halve it first.
+… 'grim -s 0.5 -t jpeg -q 75 /tmp/shot.jpg'; scp fredrik@192.168.64.15:/tmp/shot.jpg .
 ```
+
+**Do not default to full-resolution screenshots.** Cropping with `grim -g`
+reduces the image dimensions, and therefore the visual context sent to the
+agent; changing compression alone does not. Use a native-scale crop when
+counting pixels or checking a local visual change, and `-s 0.5` only when the
+whole screen is needed. For small, flat UI crops, lossless PNG is usually
+smaller than JPEG; JPEG is for a photo-heavy whole desktop. Grim 1.5 supports
+PNG, JPEG and PPM, but not WebP, so no extra image tool is warranted.
 
 For Hyprland's red config-error overlay, run `hyprctl configerrors` first — it
 prints the current messages and is empty when the config is clean. The
