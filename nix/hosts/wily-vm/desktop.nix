@@ -142,6 +142,7 @@ in
   };
 
   host.extraSystemPackages = with pkgs; [
+    firefox
     ghostty-softgl # terminal; see the let-block above
     grim # screenshots, for verifying the session over SSH
     libnotify # notify-send smoke tests and CLI desktop notifications
