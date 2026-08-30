@@ -34,6 +34,11 @@ Item {
     failedAttempts = 0
     lockRequested = true
     sessionLock.locked = true
+    // Nothing else arms the blank timer at lock time, so a lock nobody touches
+    // would never blank the output. Not `wake()`: its dpms(true) drives output
+    // churn while the lock surface is still being acquired, which crashes the
+    // shell with "Tried to show lockscreen surfaces without active lock".
+    blankTimer.restart()
     return true
   }
 
@@ -80,7 +85,9 @@ Item {
 
   function dpms(on) {
     if (dpmsProcess.running) return
-    dpmsProcess.command = ["hyprctl", "dispatch", "dpms", on ? "on" : "off"]
+    // hyprctl dispatch takes Lua on 0.56; the hyprlang form "dpms off" is a
+    // parse error that only shows up on hyprctl's stdout, which nothing reads.
+    dpmsProcess.command = ["hyprctl", "dispatch", on ? 'hl.dsp.dpms("on")' : 'hl.dsp.dpms("off")']
     dpmsProcess.running = true
   }
 

@@ -33,6 +33,8 @@ These get used constantly. `HYPRLAND_INSTANCE_SIGNATURE` must be the
 # deleted locally linger on the VM and keep getting stowed). The git add -AN is
 # not optional: flakes ignore untracked files, and a new file that is not at
 # least intent-to-added fails evaluation with "Path ... is not tracked by Git".
+# unlock the session first: this reloads Quickshell, and a reload under a lock
+# strands it (see "Losing the lock surface" below).
 rsync -a --delete --exclude .git --exclude result ~/.dotfiles/ fredrik@192.168.64.15:~/.dotfiles/
 ssh fredrik@192.168.64.15 'cd ~/.dotfiles && git add -AN .'   # flakes ignore untracked files
 
@@ -149,6 +151,12 @@ Gotchas found the hard way:
   bottom of the file, so a typo blanks the cheatsheet as well as the
   keymap. `pcall` catches a runtime error, not a syntax error.
 - **`hyprctl dispatch` takes Lua now**: `hyprctl dispatch 'hl.dsp.exec_cmd("ghostty")'`.
+  A hyprlang-shaped dispatch is a *parse* error, and it is reported only on
+  hyprctl's own stdout — nothing logs it. A caller that does not read that
+  output, such as Quickshell's `Process`, sees a silent no-op: the lock
+  screen's `hyprctl dispatch dpms off` never blanked anything, and looked
+  exactly like a timer that was not firing. The DPMS one is
+  `hl.dsp.dpms("on")` / `hl.dsp.dpms("off")`.
 - Bind workspace keys as `code:10`..`code:19` so they survive a layout
   change — but **`hyprctl binds` reports a `code:` bind with an empty
   `key` and `keycode: 0`**, and every Lua bind as `dispatcher: __lua` with
@@ -206,6 +214,28 @@ Super key.
 
 This is also why the bar carries a menu icon at all, rather than leaving
 `SUPER + SPACE` as the only way in.
+
+## Losing the lock surface, and getting out of it
+
+**Quickshell hot-reloads on any change to a file it has loaded**, which
+includes an `rsync` from the laptop. Do that while the session is locked and
+the lock client dies under a compositor lock that stays up: Hyprland replaces
+the screen with *"Oopsie daisy, it looks like you locked your screen but the
+lockscreen app died"*. `qs ipc call lock status` then reports
+`locked:false, secure:true` — the shell no longer owns the lock it cannot
+release. Editing QML while locked is the easy way to hit this; so is
+`systemctl --user restart quickshell`.
+
+That screen names its own way out, and it works over SSH with the usual
+session exports — no tty switch, no reboot:
+
+```sh
+hyprctl eval "hl.clear_crashed_lockscreen()"
+```
+
+The screen suggests `hyprctl --instance 0` and a `killall` of the lock
+process; neither is needed when `HYPRLAND_INSTANCE_SIGNATURE` is exported and
+the client is already gone. Verified live.
 
 ## uwsm: never restart greetd, reboot
 
@@ -433,7 +463,12 @@ without coupling the VM to their whole shell.
   has already reset the service's own state, which strands the lock surface
   with its input disabled and no way back in. Its `WlSessionLockSurface` is a
   per-screen component, so an `id` declared inside it is not addressable from
-  the enclosing service. Do not
+  the enclosing service. **Do not drive DPMS while the lock is being
+  acquired** — a `dpms on` dispatched from `beginLock` churns the output
+  underneath the surface and takes the whole shell down with
+  *"Tried to show lockscreen surfaces without active lock"* (the last line in
+  `~/.cache/quickshell/crashes/*/log.qslog.log`, which is where a crash is
+  actually explained; the journal only carries the stack trace). Do not
   replace it with `security.pam.services`: on this aarch64 nixpkgs revision the
   PAM renderer evaluates disabled Howdy/Kanidm module paths and fails before it
   can render a custom service. `IdleMonitor` honours inhibitors, locks at five
@@ -460,10 +495,10 @@ The matching Omarchy keybinds are `SUPER + comma` (dismiss latest),
 
 - Fingerprint unlock, including its separate PAM stack, reader indicator and
   clamshell/lid handling.
-- Recovery of an orphaned `ext-session-lock` after Quickshell restarts while
-  locked. Omarchy detects Hyprland's `solitaryBlockedBy: LOCK` state and
-  reacquires the surface; until this is ported, never restart Quickshell while
-  locked.
+- Reacquiring an orphaned `ext-session-lock` from inside the shell. Omarchy
+  detects Hyprland's `solitaryBlockedBy: LOCK` state and takes the surface
+  back; here the compositor-side escape below is the recovery instead, so the
+  port only becomes worth it if the shell should heal itself silently.
 - Full notification durability: on-screen toast restoration across a shell
   restart, persistent image copies and cleanup, rich body markup/image
   sanitization, inline replies, and preserving trusted actions in history.
@@ -499,13 +534,13 @@ smaller than theirs.
   one/all, history and its `Clear`, `default`-action invoke, the lock surface
   with a wrong-password counter, a real PAM unlock, and the polkit dialog
   through both `pkexec` and a D-Bus caller, and `IdleMonitor` taking the lock
-  on its own after the idle timeout). Testing that last one means leaving the
-  VM genuinely untouched for over five minutes: SSH polling does not reset the
-  timer, but any use of the UTM window does, and a run interrupted that way
-  looks exactly like a broken monitor. **Two paths are not yet exercised**:
-  the lock surface's DPMS-off stage five minutes after locking, and
-  `wily-sleep-lock` locking on a real `systemctl suspend` —
-  resume-from-suspend under UTM is itself unknown.
+  on its own after the idle timeout, and the lock surface blanking the output
+  301s after locking). Testing either timer means leaving the VM genuinely
+  untouched for over five minutes: SSH polling does not reset them, but any
+  use of the UTM window does, and a run interrupted that way looks exactly
+  like a broken timer. **One path is not yet exercised**: `wily-sleep-lock`
+  locking on a real `systemctl suspend` — resume-from-suspend under UTM is
+  itself unknown.
 - Keyboard layout is `us`. Swedish is wanted eventually as a second layout,
   but not yet — `kb_layout = "us,se"` with a `grp:` toggle in `kb_options`
   when the time comes.
