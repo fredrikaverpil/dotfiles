@@ -151,6 +151,7 @@ in
     ghostty-softgl # terminal; see the let-block above
     gnome-themes-extra # Adwaita-dark, the GTK theme the light/dark toggle names
     grim # screenshots, for verifying the session over SSH
+    hyprsunset # nightlight; the schedule lives in the Quickshell service
     libnotify # notify-send smoke tests and CLI desktop notifications
     quickshell
   ];
