@@ -149,6 +149,7 @@ in
     (chromium.override { commandLineArgs = "--no-first-run"; })
     firefox
     ghostty-softgl # terminal; see the let-block above
+    gnome-themes-extra # Adwaita-dark, the GTK theme the light/dark toggle names
     grim # screenshots, for verifying the session over SSH
     libnotify # notify-send smoke tests and CLI desktop notifications
     quickshell
