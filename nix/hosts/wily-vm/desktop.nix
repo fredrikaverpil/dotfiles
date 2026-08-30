@@ -133,7 +133,10 @@ in
   systemd.user.services.wily-sleep-lock = {
     description = "Lock Quickshell before suspend";
     partOf = [ "graphical-session.target" ];
-    after = [ "dbus.socket" "graphical-session.target" ];
+    after = [
+      "dbus.socket"
+      "graphical-session.target"
+    ];
     requires = [ "dbus.socket" ];
     wantedBy = [ "graphical-session.target" ];
     serviceConfig = {
@@ -152,6 +155,8 @@ in
     gnome-themes-extra # Adwaita-dark, the GTK theme the light/dark toggle names
     grim # screenshots, for verifying the session over SSH
     hyprsunset # nightlight; the schedule lives in the Quickshell service
+    iproute2 # `ip` supplies the network panel's active route and counters
+    iputils # `ping` supplies the network panel's latency and loss samples
     libnotify # notify-send smoke tests and CLI desktop notifications
     # proton-pass # unsupported on aarch64-linux; enable in the ThinkPad config
     quickshell

@@ -34,6 +34,8 @@ Upstream model: Omarchy Quattro at `~/code/public/github.com/omacom/omarchy`.
 - `Quickshell.Networking` **is** present in 0.3.0 on the VM
   (`.../qml/Quickshell/Networking`), so the Wi-Fi list, scan and connect come
   from the singleton. Upstream's `nmcli` shelling is only for the extras.
+  Its `NetworkDevice.address` is the MAC address, not an IP, so the panel maps
+  each device to its global IPv4 address with `ip -j -4 address`.
 - **hyprsunset has no sunrise/sunset support.** From
   `hyprwm/hyprsunset` `src/ConfigManager.cpp`, the whole config surface is
   `max-gamma` plus `profile { time = HH:MM, temperature, gamma, identity }`;
@@ -145,7 +147,7 @@ Check: `hyprctl hyprsunset temperature` reports 4000 after a toggle; a forced
 boundary (feed the model a fake clock in the `node` check) flips it; the
 morning `identity` profile does not leave it stuck.
 
-### 3. `feat(wily-vm): display panel` — validated, ready to commit
+### 3. `feat(wily-vm): display panel` — landed
 
 `plugins/panels/monitor/{Panel.qml,Model.js}` on the shared `Ui/Panel`.
 
@@ -175,23 +177,25 @@ Check: scale change applies live, survives `hyprctl reload`, and
 `hyprctl -j monitors` agrees; light/dark still flips Ghostty and Neovim; the
 bar no longer carries a theme button.
 
-### 4. `feat(wily-vm): network panel`
+### 4. `feat(wily-vm): network panel` — wired path validated; Wi-Fi untested
 
 `plugins/panels/network/{Panel.qml,Model.js}`, from `Quickshell.Networking`.
 
-In: device list with type and state; current connection with IP; Wi-Fi scan and
-list sorted by signal; connect with a passphrase prompt; disconnect; forget;
-Wi-Fi radio toggle. Bar icon reflecting state (wired / signal strength /
-disconnected).
+In: device list with type and state; current connection with IP; live internet
+latency, packet loss, transfer rate and total bytes; Wi-Fi scan and list sorted
+by signal; connect with a passphrase prompt; disconnect; forget; Wi-Fi radio
+toggle. Bar icon reflecting state (wired / signal strength / disconnected).
 
-Out, and recorded as such: throughput graph, ping latency and packet loss, DNS
-provider switching, 2.4/5GHz band pinning, WPA-Enterprise, the Wi-Fi QR panel.
-All of them are upstream `omarchy-*` scripts we have no counterpart for.
+Revisit the remainder of Omarchy's network functionality once actual hardware
+is available; its separate scripts are not, on their own, a reason to rule out
+a NixOS port.
 
 Bind `SUPER + CTRL + W`; menu's Setup › Network row wired up.
 
-Check: ethernet state and IP are correct on the VM. Everything Wi-Fi is
-**untested until the ThinkPad** and says so in `CLAUDE.md`.
+Check: ethernet state, global IPv4, default gateway, totals, rates, latency and
+packet loss are correct on the VM; the bar shows the wired icon, and the panel
+opens through IPC. Everything Wi-Fi is **untested until the ThinkPad** and says
+so in `CLAUDE.md`.
 
 ### 5. `docs(wily-vm): delete this file`
 

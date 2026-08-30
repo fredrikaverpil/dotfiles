@@ -339,8 +339,10 @@ kills the UTM window, and `SUPER + SPACE` opens Spotlight. Omarchy's keymap is
 overwhelmingly SUPER-based, so a large slice of it is untestable from the Mac
 until UTM captures the keyboard. **A chord that appears dead is a host-capture
 question before it is a config question** — check `hyprctl -j binds` first, it
-is authoritative. None of this exists on the ThinkPad, where SUPER is a real
-Super key.
+is authoritative. `hl.dsp.send_key_state` injects into the focused surface; it
+can exercise a panel's navigation but does **not** invoke the compositor's own
+keybinds, so it cannot bypass macOS to test a SUPER chord. None of this exists
+on the ThinkPad, where SUPER is a real Super key.
 
 This is also why the bar carries a menu icon at all, rather than leaving
 `SUPER + SPACE` as the only way in.
@@ -505,11 +507,11 @@ current display. Every future panel reuses this; the bar icon instead calls
 The Omarchy-shaped services use their upstream-compatible targets too:
 `notifications` (`showHistory`, `toggleDnd`, `dismissOne`, `dismissAll`,
 `invokeLast`), `lock` (`lock`, `status`, `isLocked`) and `idle`
-(`enable`, `disable`, `toggle`, `status`). The local display panel is
-`display` (`open`, `close`, `toggle`, `status`), deliberately bare like the
-other local targets rather than upstream's `omarchy.monitor`. From SSH they
-need the live-session `XDG_RUNTIME_DIR` and `WAYLAND_DISPLAY` export from
-"Driving it over SSH".
+(`enable`, `disable`, `toggle`, `status`). The local panels are `display` and
+`network` (each `open`, `close`, `toggle`, `status`), deliberately bare like
+the other local targets rather than upstream's `omarchy.monitor` and
+`omarchy.network`. From SSH they need the live-session `XDG_RUNTIME_DIR` and
+`WAYLAND_DISPLAY` export from "Driving it over SSH".
 
 **Do not name an IPC function `show`.** `qs ipc show` is a CLI subcommand, so
 the argument parser rejects the call with "The following argument was not
@@ -544,9 +546,8 @@ indirection; this is ~25 entries in a QML object literal and needs none of it.
 arrow keys and inert on Enter, rather than absent — so what is still missing
 stays visible while browsing. Those are the rows to edit when the feature
 lands. They are not the record of what is missing, though: this file is, so
-that a row can be deleted without losing the note. Still dim: Learn ›
-Hyprland and NixOS, Trigger › Emoji / Color picker / Share, and Setup ›
-Display.
+that a row can be deleted without losing the note. Still dim: Learn › Hyprland and NixOS, and Trigger › Emoji / Color picker /
+Share.
 
 Typing filters the whole subtree below the current level, not just the rows on
 screen, which is what Omarchy's `rebuildDisplay` does — so `ghostty` or `lock`
@@ -655,6 +656,40 @@ Verified live: `qs ipc call display open` identifies Virtual-1 at 1280×800;
 the text-scale watch reports a 1.25 dconf write immediately; and applying 1.6,
 rewriting the host file, then `hyprctl reload` retains 1.6. The test resets the
 VM and host file to scale/GDK scale 1 afterwards.
+
+## Network
+
+`plugins/panels/network/Panel.qml` is the NixOS-sized port of Omarchy's network
+panel: it lists NetworkManager devices, their state and global IPv4 address;
+scans Wi-Fi; connects (including a passphrase prompt), disconnects, forgets
+saved networks and toggles the radio. `NetworkDevice.address` is the MAC
+address, not an IP, so the panel obtains addresses from `ip -j -4 address`.
+Wi-Fi objects are reduced to plain rows before delegates receive them, because
+the scan model is live and its objects can disappear during a refresh.
+
+The Connection grid matches Omarchy's visible metrics: internet latency and
+packet loss, receive/send rates, transferred totals, IP and gateway. Every
+1.5s while open, `ip route get 1.1.1.1` selects the active interface and
+source/gateway, `ip -s link` supplies its 64-bit byte counters, and a
+`ping -I <interface> 1.1.1.1` supplies one sample. Rates are counter deltas;
+the last 24 ping samples are kept and the displayed latency averages the most
+recent five. `iproute2` and `iputils` are explicit `desktop.nix` dependencies,
+not accidental base-system tools.
+
+It opens from the leftmost right-side bar icon (the order is network, display,
+bell), Setup › Network, or `SUPER + CTRL + W` / `qs ipc call network toggle`.
+The scanner is enabled only while this panel is open. The wired icon wins when
+both transports are connected, matching the default route. The VM verifies the
+wired path end-to-end: `enp0s1` reports Connected with `192.168.64.15`, the
+panel renders it, the bar shows the ethernet icon, metrics update, and both IPC
+and the menu open the panel. The bind is registered, but its physical
+invocation cannot be tested from the Mac; see "From a Mac, macOS eats the
+SUPER binds".
+
+Wi-Fi scanning, signal, radio state, passphrase entry, connect, disconnect and
+forget are untested until the ThinkPad: the VM has no radio. **Revisit the
+remaining Omarchy network functionality on real hardware** before deciding
+what else belongs here; its scripts are not a reason to rule out a port.
 
 ## Light and dark
 
@@ -866,9 +901,14 @@ now covers apps, wallpaper, theme, nightlight, screenshots, power,
 notifications and the keybinding sheet. The dim rows in it are the shortest list of what is still
 missing.
 
-1. **A network panel**, ported from Omarchy's
-   `shell/plugins/panels/network/` (ethernet status on the VM; Wi-Fi scanning,
-   signal, passphrase entry and forget validated later on the ThinkPad).
+1. **Validate the network panel's Wi-Fi path on the ThinkPad** — scanning,
+   signal strength, radio state, passphrase entry, connect, disconnect and
+   forget all need a real radio.
+2. **Make panels keyboard-first** — the menu can reach a panel with typing,
+   arrows and Enter, but `Ui/Panel.qml` only grants layer-shell keyboard focus;
+   it has no focused key handler and Display/Network have no selection state.
+   Port a lean shared `PanelKeyCatcher` concept from Omarchy, then give each
+   panel a section/selection cursor for `hjkl`/arrows, Enter/Space and Escape.
 
 Half of Omarchy's tree cannot port: Install / Remove / Update are `pacman`
 operations, and on NixOS that is a rebuild. The root menu here is necessarily
