@@ -239,6 +239,16 @@ you want and occasionally the trap:
 - **greetd / the session itself** — reboot; see the uwsm section above for why
   restarting it is not an option.
 
+## The clock stops when the Mac sleeps
+
+UTM pauses the VM with the host, and the guest clock simply stops — a night's
+sleep leaves it hours behind. `systemd-timesyncd` does not recover from that:
+it steps only on its *first* sync and slews afterwards, so it reports
+`System clock synchronized: yes` while sitting hours out, with a huge
+`Frequency` in `timedatectl show-timesync`. `configuration.nix` therefore runs
+chrony with `makestep 1.0 -1` instead, which steps at any poll. Check with
+`chronyc tracking`.
+
 ## VM graphics facts
 
 virtio-gpu, `+virgl` (GLES works, Hyprland renders), `-context_init` (no
