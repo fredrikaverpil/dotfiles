@@ -143,6 +143,9 @@ symlinks into the repo, so nothing real is lost) and run it again.
   finding `uwsm-app`, and then the bare command name in each app's `Exec`.
   Nothing reports the failure: `Quickshell.execDetached` is silent, and
   `systemd-run` inherits the same broken PATH, so a launch just does nothing.
+- **Browsers** — Firefox is a `desktop.nix` package. Its wrapper already sets
+  `MOZ_ENABLE_WAYLAND=1`, so it needs no session variable to get a native
+  Wayland window.
 - **stow** (`stow/Linux/.config/{hypr,quickshell}/`) carries the config and
   QML. Deliberate: the Quickshell tree gets edited constantly and stow
   symlinks take effect with no rebuild. Do not move QML into the Nix store.
