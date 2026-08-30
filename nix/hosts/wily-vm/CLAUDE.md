@@ -516,7 +516,11 @@ terminal are literally the same colours. `gsettings` is not installed; `dconf`
 is, and writes the same database.
 
 `\uf185` renders as a cog in JetBrains Mono Nerd Font, not a sun; `\uf522` is
-the one that reads as a sun at 14px.
+the one that reads as a sun at 14px. The bar's icon buttons use fixed 28×24px
+slots and centre the glyph's tight painted bounds rather than its font advance;
+otherwise the narrower moon makes the notification button jump on a theme
+toggle. This is the same principle as Omarchy's `BarIconButton` (27px slot,
+16px optical canvas, `OpticalGlyph` tight-bound centring).
 
 ## Notifications, lock, idle and polkit
 
