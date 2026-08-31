@@ -165,6 +165,26 @@
         "type": "github"
       }
     },
+    "hyprmod": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1787844471,
+        "narHash": "sha256-AKnBFjkZs4UGZqMT3yIkaCdpvM2fVccU1dVuK5AVZBk=",
+        "owner": "BlueManCZ",
+        "repo": "hyprmod",
+        "rev": "ffd47d804d8996cf3852dbb7ca1c949c424a57fb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "BlueManCZ",
+        "repo": "hyprmod",
+        "type": "github"
+      }
+    },
     "llm-agents": {
       "inputs": {
         "bun2nix": "bun2nix",
@@ -325,6 +345,7 @@
         "dotfiles": "dotfiles",
         "home-manager-rpi": "home-manager-rpi",
         "home-manager-unstable": "home-manager-unstable",
+        "hyprmod": "hyprmod",
         "llm-agents": "llm-agents",
         "nix-darwin": "nix-darwin",
         "nixos-raspberrypi": "nixos-raspberrypi",
