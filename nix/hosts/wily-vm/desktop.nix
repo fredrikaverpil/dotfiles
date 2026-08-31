@@ -76,10 +76,13 @@ in
     withUWSM = true;
   };
 
-  # Second console session to compare against Hyprland. No display manager:
-  # plasma-workspace runs its own systemd user session, so the `plasma` zsh
-  # function just execs startplasma-wayland.
-  services.desktopManager.plasma6.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    pulse.enable = true;
+  };
+
+  security.rtkit.enable = true;
 
   # Hyprland's cursor manager reads these at startup; a config reload is too
   # late to replace the already-loaded cursor theme.
