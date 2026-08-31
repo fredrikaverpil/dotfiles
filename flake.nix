@@ -64,11 +64,6 @@
     # cached against its own pinned nixpkgs-unstable, and cache.numtide.com
     # only serves those builds.
     llm-agents.url = "github:numtide/llm-agents.nix";
-    # GTK4 settings app for Hyprland. Not in nixpkgs; trialled on wily-vm.
-    hyprmod = {
-      url = "github:BlueManCZ/hyprmod";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
     # Zen's normal upstream release channel is named Beta; Twilight is nightly.
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake/beta";
