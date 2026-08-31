@@ -453,6 +453,15 @@ rather than the unit:
 journalctl --user -b -u graphical-session.target | grep -i "ordering cycle"
 ```
 
+The same cycle breaks **logout**, and there it is fatal rather than silent:
+`uwsm stop` — what the menu's System > Logout runs — fails with
+`org.freedesktop.systemd1.TransactionOrderIsCyclic` and the session stays up,
+because systemd reports `Unable to break cycle` on the stop transaction instead
+of dropping a job from it. A session whose bar was revived by hand therefore
+cannot be logged out of the normal way. `systemctl --user stop quickshell &&
+uwsm stop` gets out of one: with the unit already stopped it is no longer part
+of the transaction.
+
 Order against `wayland-wm@hyprland.desktop.service` instead — the compositor
 service both targets already follow. `systemctl --user start quickshell` by
 hand still works, because with the target already active there is no cycle left
