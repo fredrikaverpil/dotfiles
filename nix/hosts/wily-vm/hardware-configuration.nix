@@ -25,13 +25,16 @@
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
 
+  # by-label, not the by-uuid nixos-generate-config emits: this VM gets
+  # reimaged, which mints fresh UUIDs, and the stale ones then ride back over
+  # the VM's regenerated copy on the next rsync. The install labels are stable.
   fileSystems."/" = {
-    device = "/dev/disk/by-uuid/ec6fc177-1044-4e07-9ffa-90a15e630b19";
+    device = "/dev/disk/by-label/nixos";
     fsType = "ext4";
   };
 
   fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/6850-FD7B";
+    device = "/dev/disk/by-label/boot";
     fsType = "vfat";
     options = [
       "fmask=0022"

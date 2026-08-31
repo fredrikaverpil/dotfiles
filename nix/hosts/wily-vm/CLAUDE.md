@@ -49,6 +49,14 @@ edit before another VM test or rebuild, and only then tell the user the VM is
 ready to switch. If the result looks unchanged, verify this gate before
 debugging the feature.
 
+`--delete` also overwrites `hardware-configuration.nix`, so that file must
+never name anything the VM mints at install time. It uses `/dev/disk/by-label/`
+(`nixos`, `boot`) rather than the by-uuid `nixos-generate-config` emits: a
+reimage gives the disk fresh UUIDs, and the committed stale ones then ride back
+over the VM's regenerated copy on the next rsync. The result is a generation
+whose `/boot` and `/` do not exist — local-fs.target fails and the boot lands in
+**emergency mode**. Recover by picking the previous generation at the boot menu.
+
 These get used constantly. `HYPRLAND_INSTANCE_SIGNATURE` must be the
 **newest** directory — stale ones accumulate under `/run/user/1000/hypr/`.
 
