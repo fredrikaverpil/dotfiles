@@ -11,7 +11,8 @@ let
   stable = inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system};
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
 
-  # Stow package dir matching `uname -s`; Nix knows the platform at build time.
+  # Stow package under stow/platform/ matching `uname -s`; Nix knows the
+  # platform at build time.
   stowPlatform = if pkgs.stdenv.hostPlatform.isDarwin then "Darwin" else "Linux";
   stowHost = lib.escapeShellArg hostName;
 in
@@ -66,19 +67,23 @@ in
       # Symlink dotfiles with GNU Stow. --adopt absorbs any real file that has
       # replaced a managed symlink into the repo (shows up in `git diff`);
       # --no-folding links individual files so other tools can write siblings
-      # into the same dir (e.g. ~/.config).
+      # into the same dir (e.g. ~/.config). Stow forbids slashes in package
+      # names, so each level (shared, platform/, host/) is its own invocation
+      # with its own --dir. Order: shared first, then platform, then host.
       echo "Stowing dotfiles from $DOTFILES_PATH..."
-      stowPackages=(shared ${stowPlatform})
-      if [ -d "$DOTFILES_PATH/stow"/${stowHost} ]; then
-        stowPackages+=(${stowHost})
-      fi
-
-      if ! $DRY_RUN_CMD ${pkgs.stow}/bin/stow \
-        --dir="$DOTFILES_PATH/stow" --target="$HOME" \
-        --restow --no-folding --adopt \
-        "''${stowPackages[@]}"; then
-        echo "Warning: Stow installation failed"
-        exit 1
+      stow_pkg() {
+        if ! $DRY_RUN_CMD ${pkgs.stow}/bin/stow \
+          --dir="$1" --target="$HOME" \
+          --restow --no-folding --adopt \
+          "$2"; then
+          echo "Warning: Stow failed for $1/$2"
+          exit 1
+        fi
+      }
+      stow_pkg "$DOTFILES_PATH/stow" shared
+      stow_pkg "$DOTFILES_PATH/stow/platform" ${stowPlatform}
+      if [ -d "$DOTFILES_PATH/stow/host"/${stowHost} ]; then
+        stow_pkg "$DOTFILES_PATH/stow/host" ${stowHost}
       fi
     '';
 

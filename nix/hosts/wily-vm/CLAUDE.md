@@ -130,11 +130,12 @@ Editing an already-linked file needs nothing — rsync writes through the link. 
 home-manager activation runs:
 
 ```bash
-packages=(shared Linux)
+cd "$HOME/.dotfiles"
+stow --dir=stow --target="$HOME" --restow --no-folding --adopt shared
+stow --dir=stow/platform --target="$HOME" --restow --no-folding --adopt Linux
 host="$(hostname -s)"
-[ -d "$HOME/.dotfiles/stow/$host" ] && packages+=("$host")
-stow --dir="$HOME/.dotfiles/stow" --target="$HOME" --restow --no-folding --adopt \
-  "${packages[@]}"
+[ -d "stow/host/$host" ] && \
+  stow --dir=stow/host --target="$HOME" --restow --no-folding --adopt "$host"
 ```
 
 If it ever reports the conflict above, `rm` the offending links (they are
@@ -190,8 +191,9 @@ symlinks into the repo, so nothing real is lost) and run it again.
   `color-scheme` at `prefer-dark` and writing `gtk-theme = "Adwaita"` turns
   Chromium dark, which is what isolates it. Firefox and Zen read `color-scheme`
   directly and ignore `gtk-theme`, so nothing else on the VM showed the fault.
-- **stow** (`stow/Linux/.config/{hypr,quickshell}/`) carries the shared config
-  and QML; the optional `stow/wily-vm/` package carries host-only files. Its
+- **stow** (`stow/platform/Linux/.config/{hypr,quickshell}/`) carries the shared
+  config and QML; the optional `stow/host/wily-vm/` package carries host-only
+  files. Its
   `hypr/monitors.lua` supplies the monitor and GDK scales which the display
   panel updates, without leaking a VM-specific scale to the other Linux hosts.
   `shell.qml` owns the palette, menu entry table, instantiations and the
@@ -242,7 +244,7 @@ symlinks into the repo, so nothing real is lost) and run it again.
   Under `--no-folding` that immediacy covers **edits** only — stow links each
   file individually, so a *new* file needs stow re-run (see above).
 - **Cursor** — the small `macOS-hypr` v0.1 Hyprcursor data tree is stowed at
-  `stow/Linux/.local/share/icons/macOS-hypr/`, so it needs no Nix package
+  `stow/platform/Linux/.local/share/icons/macOS-hypr/`, so it needs no Nix package
   build. Download updates from [the upstream releases](https://github.com/6ooker/apple_hyprcursor/releases);
   its [source code](https://github.com/6ooker/apple_hyprcursor) is in the same
   project. The cursor manager reads `HYPRCURSOR_*` only at compositor startup:
@@ -654,7 +656,7 @@ true` is deliberately not ported: it controls manual split resizing, not new
 client placement.
 
 The launcher mark is Omarchy's private `omarchy` font at U+E900, vendored with
-its upstream MIT licence under `stow/Linux/.local/share/fonts/omarchy/`. Nerd
+its upstream MIT licence under `stow/platform/Linux/.local/share/fonts/omarchy/`. Nerd
 Fonts do not carry it. After a fresh stow run, call `fc-cache -f` and restart
 Quickshell to make a new user font available to the running shell.
 
@@ -819,7 +821,7 @@ Quickshell 0.3.0 on this VM supplies `NotificationServer`, `PolkitAgent`,
 `PamContext`, `WlSessionLock` and `IdleMonitor`, so this deliberately follows
 Omarchy Quattro's native architecture rather than installing `hyprlock`,
 `hypridle` or `hyprpolkitagent`. The files live under the matching
-`stow/Linux/.config/quickshell/plugins/{notifications,lock,polkit,services/idle}`
+`stow/platform/Linux/.config/quickshell/plugins/{notifications,lock,polkit,services/idle}`
 paths, but `shell.qml` loads them directly — we do not carry Omarchy's general
 plugin registry or `qs.Commons` framework. That makes upstream diffs useful
 without coupling the VM to their whole shell.
@@ -1189,7 +1191,7 @@ smaller than theirs.
   but it is a paid font and needs vendoring before Nix can install it.
 - Ghostty's `font-size` is in points converted through display DPI, which is 96
   on Linux/GTK but 72 on macOS, so the shared 14pt renders a third larger here.
-  `stow/Linux/.config/ghostty/config-linux` overrides it to 10.5 and swaps the
+  `stow/platform/Linux/.config/ghostty/config-linux` overrides it to 10.5 and swaps the
   (unvendored) Berkeley Mono for JetBrains Mono Nerd Font; the shared config
   pulls it in with `config-file = ?config-linux`, which is silently skipped on
   macOS. Relative includes resolve against the stow *symlink's* directory

@@ -62,8 +62,8 @@ Upstream model: Omarchy Quattro at `~/code/public/github.com/omacom/omarchy`.
   insert and its revert on the live `hyprland.lua` both left
   `hyprctl configerrors` empty.
 - **Per-host Stow packages settle the persistence shape.** `e82630a9` makes
-  `stow/<hostname>/` optional in both activation and the documented manual
-  command. `stow/wily-vm/.config/hypr/monitors.lua` therefore owns
+  `stow/host/<hostname>/` optional in both activation and the documented manual
+  command. `stow/host/wily-vm/.config/hypr/monitors.lua` therefore owns
   `wily_monitor_scale` and `wily_gdk_scale`; shared `hyprland.lua` loads it
   when present and otherwise falls back to scale 1. This matches Omarchy's
   separate monitor file without leaking a VM-specific scale to rpi5-homelab or
@@ -125,7 +125,7 @@ toggle and every keybind still work.
 
 ### 2. `feat(wily-vm): nightlight on a solar schedule` — landed
 
-- `hyprsunset` into `desktop.nix`; `stow/Linux/.config/hypr/hyprsunset.conf`
+- `hyprsunset` into `desktop.nix`; `stow/platform/Linux/.config/hypr/hyprsunset.conf`
   with the single inert `identity` profile.
 - `plugins/services/nightlight/Service.qml` — port of upstream's, including the
   boot-race retry loop and the 4000K/6500K pair.
@@ -159,7 +159,7 @@ Live rows:
 - **Scale** — upstream's preset list (1, 1.25, 1.6, 2, 3, 4) filtered through
   the ported `availableScales`, applied with
   `hyprctl eval "hl.monitor({...})"`, persisted by rewriting the
-  host-owned `stow/wily-vm/.config/hypr/monitors.lua`.
+  host-owned `stow/host/wily-vm/.config/hypr/monitors.lua`.
 - **Text size** — GTK `text-scaling-factor` via `dconf`, plus the bar's own
   font size. A compact preset row (80–150%) fits the smaller local panel rather
   than upstream's slider. **Not** the terminal: upstream `sed`s

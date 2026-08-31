@@ -9,10 +9,12 @@ code in this repository.
   ~/.dotfiles#"$(hostname -s)"` (hosts: `zap`, `plumbus`)
 - **Full rebuild (NixOS)**: `sudo nixos-rebuild switch --flake
   ~/.dotfiles#"$(hostname -s)"` (host: `rpi5-homelab`)
-- **Symlink dotfiles only**: `cd ~/.dotfiles/stow`; then run
-  `packages=(shared "$(uname -s)"); host="$(hostname -s)"; [ -d "$host" ] &&
-  packages+=("$host"); stow --target="$HOME" --restow --no-folding --adopt
-  "${packages[@]}"` (GNU Stow, no Nix rebuild)
+- **Symlink dotfiles only** (GNU Stow, no Nix rebuild): `cd ~/.dotfiles`; then
+  run `stow --dir=stow --target="$HOME" --restow --no-folding --adopt shared &&
+  stow --dir=stow/platform --target="$HOME" --restow --no-folding --adopt
+  "$(uname -s)"; host="$(hostname -s)"; [ -d "stow/host/$host" ] && stow
+  --dir=stow/host --target="$HOME" --restow --no-folding --adopt "$host"`
+  (shared first, then platform, then the optional host package)
 - **Update all flake inputs**: `nix flake update`, then rebuild
 - **Update only unstable-pinned inputs**: `nix flake update nixpkgs-unstable
   nix-darwin home-manager-unstable llm-agents dotfiles`, then rebuild
@@ -126,5 +128,5 @@ exact formatter/linter tools and configurations. Formatters are wired up in
 - **Neovim is managed by Bob on Darwin**, not nixpkgs — binary is at
   `~/.local/share/bob/nvim-bin/nvim`
 - **`stow/` changes take effect immediately** (just re-run the “Symlink
-  dotfiles only” command above, which includes the optional `stow/<hostname>`
-  package) — no Nix rebuild needed
+  dotfiles only” command above, which includes the optional
+  `stow/host/<hostname>` package) — no Nix rebuild needed
