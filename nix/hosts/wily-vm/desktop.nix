@@ -1,4 +1,9 @@
-{ lib, pkgs, ... }:
+{
+  inputs,
+  lib,
+  pkgs,
+  ...
+}:
 let
   # VM-only. UTM's virgl runs on ANGLE over Metal, which exposes desktop
   # OpenGL 2.1 (GLES tops out at 3.0). Ghostty is GTK4 and sets
@@ -171,6 +176,10 @@ in
     gnome-themes-extra # Adwaita-dark, the GTK theme the light/dark toggle names
     grim # screenshots, for verifying the session over SSH
     hyprsunset # nightlight; the schedule lives in the Quickshell service
+    # GTK4 settings GUI. Writes a sidecar hyprland-gui.lua and appends a
+    # dofile line to hyprland.lua — which is stowed, so its edits land in the
+    # repo clone. Being trialled; drop it if it does not earn its keep.
+    inputs.hyprmod.packages.${pkgs.stdenv.hostPlatform.system}.hyprmod
     iproute2 # `ip` supplies the network panel's active route and counters
     iputils # `ping` supplies the network panel's latency and loss samples
     libnotify # notify-send smoke tests and CLI desktop notifications
