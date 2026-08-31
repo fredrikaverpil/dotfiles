@@ -472,15 +472,14 @@ an accidental start from SSH or from an already graphical session, and requires
 Verified live: `hypr` enters Hyprland, and the System > Logout action runs
 `uwsm stop` and returns to the same console rather than a greeter.
 
-`plasma` is the second choice from the same console: Plasma 6 runs its own
-systemd user session, so the function just execs `startplasma-wayland` — no
-UWSM, which does not wrap compositors that manage their own session. Verified
-live. It is there to try KDE out, not as the target desktop.
-
-Because Plasma activates `graphical-session.target` as well, the Quickshell and
-`wily-sleep-lock` units are `wantedBy` `wayland-session@hyprland.desktop.target`
-instead — otherwise a Plasma login stacks a second bar, lock surface and polkit
-agent on top of KWin's.
+The Quickshell and `wily-sleep-lock` units are `wantedBy`
+`wayland-session@hyprland.desktop.target` rather than `graphical-session.target`,
+so they follow the compositor they belong to. Any second desktop reaching
+`graphical-session.target` would otherwise stack a second bar, lock surface and
+polkit agent on top of the one that session brings. Plasma 6 was that second
+desktop until it was dropped; `shell/sourcing.sh` still defines a `plasma`
+function, guarded on `command -v startplasma-wayland`, so it disables itself
+while nothing installs Plasma.
 
 **Those units must not be `After` `graphical-session.target`.** systemd orders
 a target after every unit that is `wantedBy` it, and `graphical-session.target`
@@ -1033,6 +1032,19 @@ The matching Omarchy keybinds are `SUPER + comma` (dismiss latest),
   notification when the pre-suspend lock fails. See the sleep divergences under
   "Reference".
 
+- **What Plasma 6 was silently supplying.** Its NixOS module enabled
+  `services.upower`, `services.power-profiles-daemon`, `services.fwupd`,
+  `services.udisks2`, `services.accounts-daemon`, `services.geoclue2` and
+  `qt.enable` as defaults, none of them declared here. Dropping the module
+  replaced only PipeWire, so all of those are now off — confirmed by
+  evaluating the config after the change. A battery widget wants `upower`,
+  the power panel's profiles want `power-profiles-daemon`, and firmware
+  updates want `fwupd`; declare each when the ThinkPad actually needs it
+  rather than restoring the whole set here, where there is no battery and no
+  firmware to flash. Portals and XWayland were never Plasma's —
+  `programs.hyprland` sets both, and `xdg.portal.extraPortals` still
+  evaluates to the hyprland and gtk portals with Plasma gone.
+
 ## Next steps
 
 The plumbing is in place — portals (`xdg-desktop-portal` + `-hyprland` +
@@ -1070,8 +1082,8 @@ Runnable on the VM today:
 - **`omarchy.tray`** (`widgets/Tray.qml`, `TrayModel.js`) — SNI tray. Nothing
   else in this shell surfaces a tray icon.
 - **`omarchy.audio`** (`panels/audio/`) — master slider, output-device picker,
-  per-app mixer. pipewire runs here, but note it is declared nowhere in `nix/`:
-  it arrives via `services.desktopManager.plasma6`.
+  per-app mixer. `services.pipewire` with `alsa` and `pulse` is declared in
+  `desktop.nix`, alongside `security.rtkit`.
 - **`omarchy.microphone`** (`widgets/Microphone.qml`) — mute toggle, source
   volume on scroll.
 - **`omarchy.media`** (`plugins/services/media/`) — MPRIS track and cover art.
