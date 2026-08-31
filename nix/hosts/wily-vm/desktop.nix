@@ -116,7 +116,14 @@ in
   systemd.user.services.quickshell = {
     description = "Quickshell desktop shell";
     partOf = [ "graphical-session.target" ];
-    after = [ "graphical-session.target" ];
+    # Ordered against the compositor service, not graphical-session.target.
+    # systemd orders a target after the units that are wantedBy it, and
+    # graphical-session.target is itself after the session target below — so
+    # `after = graphical-session.target` closes a cycle, which systemd breaks
+    # by silently deleting this unit's start job. The session comes up with no
+    # bar and no lock, and only the journal for graphical-session.target says
+    # why.
+    after = [ "wayland-wm@hyprland.desktop.service" ];
     # Not graphical-session.target: Plasma activates that too, and this shell
     # would then stack a second bar, lock surface and polkit agent onto KWin.
     wantedBy = [ "wayland-session@hyprland.desktop.target" ];
@@ -140,9 +147,11 @@ in
   systemd.user.services.wily-sleep-lock = {
     description = "Lock Quickshell before suspend";
     partOf = [ "graphical-session.target" ];
+    # See the quickshell unit above: an After on graphical-session.target is
+    # an ordering cycle here.
     after = [
       "dbus.socket"
-      "graphical-session.target"
+      "wayland-wm@hyprland.desktop.service"
     ];
     requires = [ "dbus.socket" ];
     wantedBy = [ "wayland-session@hyprland.desktop.target" ];
