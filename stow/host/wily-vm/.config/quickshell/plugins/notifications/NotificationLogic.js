@@ -14,41 +14,25 @@ function iconSource(icon) {
   return value
 }
 
-// Evolution sends normal-urgency meeting reminders. Keep them visible through
-// unlock; desktopEntry is preferred and appName supports older notifications.
-var criticalSenders = ["org.gnome.Evolution-alarm-notify", "evolution-alarm-notify"]
-
-function isCriticalSender(notification) {
-  if (criticalSenders.indexOf(asString(notification.desktopEntry)) >= 0) return true
-  if (criticalSenders.indexOf(asString(notification.appName)) >= 0) return true
-  return false
-}
-
-function urgencyFor(notification, criticalUrgency) {
-  if (isCriticalSender(notification)) return criticalUrgency
-  return Number(notification.urgency)
-}
-
-function snapshotOf(notification, timestamp, criticalUrgency) {
+function snapshotOf(notification, timestamp) {
   return {
     app: asString(notification.appName),
     appIcon: asString(notification.appIcon),
     summary: asString(notification.summary),
     body: asString(notification.body),
     image: asString(notification.image),
-    urgency: urgencyFor(notification, criticalUrgency),
+    urgency: Number(notification.urgency),
     timestamp: timestamp === undefined ? Date.now() : timestamp
   }
 }
 
 function durationFor(notification, lowUrgency, criticalUrgency) {
-  var urgency = urgencyFor(notification, criticalUrgency)
-  if (urgency === criticalUrgency || notification.resident) return 0
+  if (notification.urgency === criticalUrgency || notification.resident) return 0
 
   var requested = Number(notification.expireTimeout)
   if (!isFinite(requested) || requested <= 0) requested = 0
 
-  var minimum = urgency === lowUrgency ? 5000 : 8000
+  var minimum = notification.urgency === lowUrgency ? 5000 : 8000
   return Math.min(30000, Math.max(minimum, requested))
 }
 
@@ -63,8 +47,6 @@ if (typeof module !== "undefined") {
     asString: asString,
     iconSource: iconSource,
     snapshotOf: snapshotOf,
-    isCriticalSender: isCriticalSender,
-    urgencyFor: urgencyFor,
     durationFor: durationFor,
     displayTime: displayTime
   }

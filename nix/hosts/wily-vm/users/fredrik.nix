@@ -14,10 +14,5 @@
     setAsDefaultBrowser = true;
   };
 
-  # Prefer Monday without changing LC_TIME or date/time formats.
-  dconf.settings = {
-    "org/gnome/desktop/calendar".week-start-day = "monday";
-  };
-
   packageTools.llmAgents = [ ];
 }
