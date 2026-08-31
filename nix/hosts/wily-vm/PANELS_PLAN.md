@@ -125,7 +125,7 @@ toggle and every keybind still work.
 
 ### 2. `feat(wily-vm): nightlight on a solar schedule` — landed
 
-- `hyprsunset` into `desktop.nix`; `stow/platform/Linux/.config/hypr/hyprsunset.conf`
+- `hyprsunset` into `desktop.nix`; `stow/host/wily-vm/.config/hypr/hyprsunset.conf`
   with the single inert `identity` profile.
 - `plugins/services/nightlight/Service.qml` — port of upstream's, including the
   boot-race retry loop and the 4000K/6500K pair.

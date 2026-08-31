@@ -191,11 +191,11 @@ symlinks into the repo, so nothing real is lost) and run it again.
   `color-scheme` at `prefer-dark` and writing `gtk-theme = "Adwaita"` turns
   Chromium dark, which is what isolates it. Firefox and Zen read `color-scheme`
   directly and ignore `gtk-theme`, so nothing else on the VM showed the fault.
-- **stow** (`stow/platform/Linux/.config/{hypr,quickshell}/`) carries the shared
-  config and QML; the optional `stow/host/wily-vm/` package carries host-only
-  files. Its
+- **stow** — the `stow/host/wily-vm/` package carries the Hyprland config and
+  Quickshell QML (`.config/{hypr,quickshell}/`) plus the vendored fonts and
+  icons (`.local/share/{fonts,icons}/`); wily-vm is the only desktop Linux host.
   `hypr/monitors.lua` supplies the monitor and GDK scales which the display
-  panel updates, without leaking a VM-specific scale to the other Linux hosts.
+  panel updates.
   `shell.qml` owns the palette, menu entry table, instantiations and the
   small panel coordinator; the surfaces live in `plugins/{bar,menu,background}/`
   and share `Ui/Panel.qml`, which is the overlay chrome (transparent
@@ -244,7 +244,7 @@ symlinks into the repo, so nothing real is lost) and run it again.
   Under `--no-folding` that immediacy covers **edits** only — stow links each
   file individually, so a *new* file needs stow re-run (see above).
 - **Cursor** — the small `macOS-hypr` v0.1 Hyprcursor data tree is stowed at
-  `stow/platform/Linux/.local/share/icons/macOS-hypr/`, so it needs no Nix package
+  `stow/host/wily-vm/.local/share/icons/macOS-hypr/`, so it needs no Nix package
   build. Download updates from [the upstream releases](https://github.com/6ooker/apple_hyprcursor/releases);
   its [source code](https://github.com/6ooker/apple_hyprcursor) is in the same
   project. The cursor manager reads `HYPRCURSOR_*` only at compositor startup:
@@ -656,7 +656,7 @@ true` is deliberately not ported: it controls manual split resizing, not new
 client placement.
 
 The launcher mark is Omarchy's private `omarchy` font at U+E900, vendored with
-its upstream MIT licence under `stow/platform/Linux/.local/share/fonts/omarchy/`. Nerd
+its upstream MIT licence under `stow/host/wily-vm/.local/share/fonts/omarchy/`. Nerd
 Fonts do not carry it. After a fresh stow run, call `fc-cache -f` and restart
 Quickshell to make a new user font available to the running shell.
 
@@ -821,7 +821,7 @@ Quickshell 0.3.0 on this VM supplies `NotificationServer`, `PolkitAgent`,
 `PamContext`, `WlSessionLock` and `IdleMonitor`, so this deliberately follows
 Omarchy Quattro's native architecture rather than installing `hyprlock`,
 `hypridle` or `hyprpolkitagent`. The files live under the matching
-`stow/platform/Linux/.config/quickshell/plugins/{notifications,lock,polkit,services/idle}`
+`stow/host/wily-vm/.config/quickshell/plugins/{notifications,lock,polkit,services/idle}`
 paths, but `shell.qml` loads them directly — we do not carry Omarchy's general
 plugin registry or `qs.Commons` framework. That makes upstream diffs useful
 without coupling the VM to their whole shell.
