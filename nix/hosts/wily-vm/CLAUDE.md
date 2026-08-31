@@ -461,6 +461,37 @@ The screen suggests `hyprctl --instance 0` and a `killall` of the lock
 process; neither is needed when `HYPRLAND_INSTANCE_SIGNATURE` is exported and
 the client is already gone. Verified live.
 
+## A dark screen is DPMS, not a freeze
+
+Hyprland ships `misc:key_press_enables_dpms` and `misc:mouse_move_enables_dpms`
+**off**. With those defaults a blanked output has no way back from the
+keyboard, and every path that blanks one strands the session: the idle
+service's post-lock blank, a shell restart that drops the only client that
+would restore it, and a fresh session inheriting a connector the previous one
+left off.
+
+It presents as a hung VM rather than a dark one. UTM reports *"Display output
+is not available"*, and **`grim` never returns**, because a compositor with no
+output produces no frames — that wedged `grim` then blocks Quickshell's IPC, so
+the session looks doubly dead.
+
+`hyprland.lua` turns both on, so the compositor itself wakes the output on any
+input. Being compositor-side, that also covers the case Quickshell cannot: a
+blank that outlives the shell that caused it. Synthetic keys do not exercise
+it — `hl.dsp.send_key_state` bypasses the libinput path that arms the wake, so
+this is only testable with real input at the machine.
+
+Over SSH there is no input to give, so the manual path still matters:
+
+```sh
+pkill -x grim                             # if a screenshot is already hanging
+hyprctl -j monitors | grep dpmsStatus     # false means blanked, not crashed
+hyprctl dispatch 'hl.dsp.dpms("on")'
+```
+
+`hyprctl`, `qs ipc` and the clock all keep answering throughout — check them
+before concluding the VM is gone.
+
 ## Starting and stopping the graphical session
 
 The machine boots to a password-authenticated text console: it reaches
