@@ -208,6 +208,12 @@ symlinks into the repo, so nothing real is lost) and run it again.
   `color-scheme` at `prefer-dark` and writing `gtk-theme = "Adwaita"` turns
   Chromium dark, which is what isolates it. Firefox and Zen read `color-scheme`
   directly and ignore `gtk-theme`, so nothing else on the VM showed the fault.
+- **A GUI that edits a stowed file replaces the symlink with a copy.** Seen
+  with a settings app appending an include to `hyprland.lua`: the live config
+  silently detaches from the repo, and because the documented restow runs
+  `--adopt`, the next restow adopts the copy *into* `stow/` instead of
+  restoring the link. After letting any such tool touch `.config/hypr` or
+  `.config/quickshell`, check with `stat -c %F` before restowing.
 - **stow** — the `stow/host/wily-vm/` package carries the Hyprland config and
   Quickshell QML (`.config/{hypr,quickshell}/`) plus the vendored fonts and
   icons (`.local/share/{fonts,icons}/`); wily-vm is the only desktop Linux host.
