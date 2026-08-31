@@ -76,6 +76,11 @@ in
     withUWSM = true;
   };
 
+  # Second console session to compare against Hyprland. No display manager:
+  # plasma-workspace runs its own systemd user session, so the `plasma` zsh
+  # function just execs startplasma-wayland.
+  services.desktopManager.plasma6.enable = true;
+
   # Hyprland's cursor manager reads these at startup; a config reload is too
   # late to replace the already-loaded cursor theme.
   environment.sessionVariables = {
@@ -112,7 +117,9 @@ in
     description = "Quickshell desktop shell";
     partOf = [ "graphical-session.target" ];
     after = [ "graphical-session.target" ];
-    wantedBy = [ "graphical-session.target" ];
+    # Not graphical-session.target: Plasma activates that too, and this shell
+    # would then stack a second bar, lock surface and polkit agent onto KWin.
+    wantedBy = [ "wayland-session@hyprland.desktop.target" ];
     # NixOS pins a sparse PATH on every user unit. Unsetting it is the only way
     # to let the unit inherit the session PATH uwsm imports into the user
     # manager, which is what the launcher needs: uwsm-app to spawn apps with,
@@ -138,7 +145,7 @@ in
       "graphical-session.target"
     ];
     requires = [ "dbus.socket" ];
-    wantedBy = [ "graphical-session.target" ];
+    wantedBy = [ "wayland-session@hyprland.desktop.target" ];
     serviceConfig = {
       ExecStart = "${sleep-lock-monitor}/bin/wily-sleep-lock-monitor";
       Restart = "always";

@@ -430,6 +430,16 @@ an accidental start from SSH or from an already graphical session, and requires
 Verified live: `hypr` enters Hyprland, and the System > Logout action runs
 `uwsm stop` and returns to the same console rather than a greeter.
 
+`plasma` is the second choice from the same console: Plasma 6 runs its own
+systemd user session, so the function just execs `startplasma-wayland` — no
+UWSM, which does not wrap compositors that manage their own session. Verified
+live. It is there to try KDE out, not as the target desktop.
+
+Because Plasma activates `graphical-session.target` as well, the Quickshell and
+`wily-sleep-lock` units are `wantedBy` `wayland-session@hyprland.desktop.target`
+instead — otherwise a Plasma login stacks a second bar, lock surface and polkit
+agent on top of KWin's.
+
 Apply login or session-launcher changes with a boot generation and reboot rather
 than restarting services in place. Quickshell remains safe to restart on its own
 (`systemctl --user restart quickshell`) while iterating on QML, without touching
