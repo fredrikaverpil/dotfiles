@@ -46,7 +46,6 @@ in
   ];
 
   host.extraCasks = [
-    "claude-devtools"
     "cursor"
     "podman-desktop"
 
