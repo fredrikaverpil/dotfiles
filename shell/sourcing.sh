@@ -5,13 +5,24 @@
 # functions and shell-agnostic
 # ----------------------------
 
-# Start the configured Hyprland session from a console login. Defining this
-# only when UWSM is installed keeps the shared shell setup inert on macOS.
-if command -v uwsm >/dev/null 2>&1; then
-	function hypr() {
-		uwsm check may-start || return
-		uwsm start -e -D Hyprland hyprland.desktop
-	}
+# Session launchers for a console login. /etc/NIXOS is the NixOS marker file,
+# so it rules out macOS and every other Linux in one test; the inner checks
+# then skip whichever session that host does not install.
+if [ -e /etc/NIXOS ]; then
+	if command -v uwsm >/dev/null 2>&1; then
+		function hypr() {
+			uwsm check may-start || return
+			uwsm start -e -D Hyprland hyprland.desktop
+		}
+	fi
+
+	# Plasma runs its own systemd user session, so it is started directly
+	# rather than through UWSM.
+	if command -v startplasma-wayland >/dev/null 2>&1; then
+		function plasma() {
+			exec startplasma-wayland
+		}
+	fi
 fi
 
 function virtual_env_activate() {
