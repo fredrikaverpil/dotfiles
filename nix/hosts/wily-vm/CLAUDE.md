@@ -16,7 +16,16 @@ missing one, because it gets believed and acted on.
 
 ## Reaching it
 
-- `ssh fredrik@192.168.64.15` (key auth; password auth also on)
+- The VM's IP is DHCP-assigned and changes across reboots — never hard-code it.
+  Look it up on the Mac each session and reuse it:
+
+  ```sh
+  VM=$(awk -F= '/name=wily-vm/{f=1} f&&/ip_address/{print $2; exit}' /var/db/dhcpd_leases)
+  ```
+
+  Then `ssh fredrik@"$VM"` (key auth; password auth also on). Shell state does
+  not persist between tool calls, so prefix each command with that `VM=…`
+  assignment, or substitute the address you looked up.
 - Rebuild: `sudo nixos-rebuild switch --flake ~/.dotfiles#wily-vm`. sudo now
   requires the user's password, and the permission layer also refuses it over
   SSH along with `sudo reboot` — hand both to the user rather than retrying.
@@ -50,20 +59,20 @@ These get used constantly. `HYPRLAND_INSTANCE_SIGNATURE` must be the
 # least intent-to-added fails evaluation with "Path ... is not tracked by Git".
 # unlock the session first: this reloads Quickshell, and a reload under a lock
 # strands it (see "Losing the lock surface" below).
-rsync -a --delete --exclude .git --exclude result ~/.dotfiles/ fredrik@192.168.64.15:~/.dotfiles/
-ssh fredrik@192.168.64.15 'cd ~/.dotfiles && git add -AN .'   # flakes ignore untracked files
+rsync -a --delete --exclude .git --exclude result ~/.dotfiles/ fredrik@"$VM":~/.dotfiles/
+ssh fredrik@"$VM" 'cd ~/.dotfiles && git add -AN .'   # flakes ignore untracked files
 
 # run something inside the live session (hyprctl, grim, an app)
-ssh fredrik@192.168.64.15 "export XDG_RUNTIME_DIR=/run/user/1000 WAYLAND_DISPLAY=wayland-1 \
+ssh fredrik@"$VM" "export XDG_RUNTIME_DIR=/run/user/1000 WAYLAND_DISPLAY=wayland-1 \
   HYPRLAND_INSTANCE_SIGNATURE=\$(ls -t /run/user/1000/hypr | head -1); <cmd>"
 
 # Screenshot only the affected UI at native resolution — this 100×32px crop
 # is the right end of the current 1280×800 top bar. It is still pixel-accurate
 # for measuring. `hyprctl -j monitors` gives the geometry when it changes.
-… 'grim -g "1180,0 100x32" -l 9 /tmp/shot.png'; scp fredrik@192.168.64.15:/tmp/shot.png .
+… 'grim -g "1180,0 100x32" -l 9 /tmp/shot.png'; scp fredrik@"$VM":/tmp/shot.png .
 
 # Capture the whole desktop only when composition matters; halve it first.
-… 'grim -s 0.5 -t jpeg -q 75 /tmp/shot.jpg'; scp fredrik@192.168.64.15:/tmp/shot.jpg .
+… 'grim -s 0.5 -t jpeg -q 75 /tmp/shot.jpg'; scp fredrik@"$VM":/tmp/shot.jpg .
 ```
 
 **Do not default to full-resolution screenshots.** Cropping with `grim -g`
@@ -144,22 +153,22 @@ symlinks into the repo, so nothing real is lost) and run it again.
 ## Split of responsibilities
 
 - **Nix** (`desktop.nix`, plus `users/fredrik.nix` for user-owned browser
-  configuration) declares packages and the session: `programs.hyprland`
-  with `withUWSM`, but deliberately no display manager. It retains
+  configuration) declares packages and the session: `programs.hyprland` with
+  `withUWSM`, but deliberately no display manager. It retains
   `programs.hyprland`'s `graphical.target` default: with no display manager,
   agetty still supplies the password-authenticated console, while UWSM's
   `check may-start` requires `graphical.target` to be active. The `hypr` shell
-  function from `shell/sourcing.sh` starts Hyprland through UWSM. Quickshell is a systemd
-  **user** service bound to `graphical-session.target`. Nix also owns polkit,
-  the pre-suspend delay-inhibitor unit and the small `wily-lock` PAM entry.
-  `fredrik` remains a wheel user, but sudo requires their password.
-  `environment.PATH = lib.mkForce null` on the Quickshell unit is what makes
-  the menu able to start anything: NixOS otherwise
-  pins a sparse PATH on user units, and unsetting it is the only way to inherit
-  the session PATH uwsm imports into the user manager. Both hops need it —
-  finding `uwsm-app`, and then the bare command name in each app's `Exec`.
-  Nothing reports the failure: `Quickshell.execDetached` is silent, and
-  `systemd-run` inherits the same broken PATH, so a launch just does nothing.
+  function from `shell/sourcing.sh` starts Hyprland through UWSM. Quickshell is
+  a systemd **user** service bound to `graphical-session.target`. Nix also owns
+  polkit, the pre-suspend delay-inhibitor unit and the small `wily-lock` PAM
+  entry. `fredrik` remains a wheel user, but sudo requires their password.
+  `environment.PATH = lib.mkForce null` on the Quickshell unit is what makes the
+  menu able to start anything: NixOS otherwise pins a sparse PATH on user units,
+  and unsetting it is the only way to inherit the session PATH uwsm imports into
+  the user manager. Both hops need it — finding `uwsm-app`, and then the bare
+  command name in each app's `Exec`. Nothing reports the failure:
+  `Quickshell.execDetached` is silent, and `systemd-run` inherits the same
+  broken PATH, so a launch just does nothing.
 - **Browsers** — Chromium and Firefox are `desktop.nix` packages. Zen comes
   from the `zen-browser` Home Manager module in `users/fredrik.nix`, which
   also makes it the user's XDG and `$BROWSER` default. Its `beta` branch
@@ -195,57 +204,57 @@ symlinks into the repo, so nothing real is lost) and run it again.
   Quickshell QML (`.config/{hypr,quickshell}/`) plus the vendored fonts and
   icons (`.local/share/{fonts,icons}/`); wily-vm is the only desktop Linux host.
   `hypr/monitors.lua` supplies the monitor and GDK scales which the display
-  panel updates.
-  `shell.qml` owns the palette, menu entry table, instantiations and the
-  small panel coordinator; the surfaces live in `plugins/{bar,menu,background}/`
-  and share `Ui/Panel.qml`, which is the overlay chrome (transparent
-  layer-shell surface, keyboard focus while modal, click-outside dismissal and
-  a centred card). The coordinator closes any other open surface when one
-  opens; the notification history registers with it too. **Panel's full-screen
-  input mask cuts out the top-bar strip.** Without that cutout, a modal panel
-  consumes a repeat click before its bar button can toggle it or open another
-  panel. It must also settle from a brief `Exclusive` focus prime to `OnDemand`:
-  Hyprland routes pointer input to an exclusive surface despite that cutout.
-  **Pinning was built and then removed** — a pinned card kept its surface up
-  with input masked to itself alone. It cost its keyboard focus to do that,
-  and a layer-shell surface with no `wl_keyboard.enter` is never told which
-  modifiers are held: a pinned panel could not be keyboard-navigated, could
-  not be unpinned by any key, and no modifier-gated gesture (a SUPER+drag to
-  move it) could be detected inside it. That left it mouse-only in a shell
-  that is otherwise keyboard-first, for one panel. Do not reintroduce it
-  without an answer to the focus problem — the readout it existed for
-  (Network's live ping and transfer rates) is better served by a bar widget,
-  which never takes focus in the first place.
-  `keyNavigation` opts a panel into keyboard control: buttons set
-  `activeFocusOnTab` and draw their border from `activeFocus`, and **Qt's own
-  focus chain does the walking** — `nextItemInFocusChain` in document order,
-  so no panel keeps a cursor of its own. It is deliberately one linear chain
-  rather than a grid: `l`/`j` step forward and wrap from a row's last option
-  into the next row's first, `h`/`k` step back. The handler sits on the card,
-  the buttons' common ancestor; keys bubble to it from whichever holds focus. **Chain membership is
-  never conditioned on a button's `available`**, only on its visibility: a
-  button that goes unavailable while its own action runs — every scale preset
-  during `scaleChanging`, every Wi-Fi control during `busy` — would otherwise
-  drop out of the chain under the cursor and strand the focus. It stays
-  reachable and its Enter handler refuses instead. Menu leaves the flag
+  panel updates. `shell.qml` owns the palette, menu entry table, instantiations
+  and the small panel coordinator; the surfaces live in
+  `plugins/{bar,menu,background}/` and share `Ui/Panel.qml`, which is the
+  overlay chrome (transparent layer-shell surface, keyboard focus while modal,
+  click-outside dismissal and a centred card). The coordinator closes any other
+  open surface when one opens; the notification history registers with it too.
+  **Panel's full-screen input mask cuts out the top-bar strip.** Without that
+  cutout, a modal panel consumes a repeat click before its bar button can toggle
+  it or open another panel. It must also settle from a brief `Exclusive` focus
+  prime to `OnDemand`: Hyprland routes pointer input to an exclusive surface
+  despite that cutout. **Pinning was built and then removed** — a pinned card
+  kept its surface up with input masked to itself alone. It cost its keyboard
+  focus to do that, and a layer-shell surface with no `wl_keyboard.enter` is
+  never told which modifiers are held: a pinned panel could not be
+  keyboard-navigated, could not be unpinned by any key, and no modifier-gated
+  gesture (a SUPER+drag to move it) could be detected inside it. That left it
+  mouse-only in a shell that is otherwise keyboard-first, for one panel. Do not
+  reintroduce it without an answer to the focus problem — the readout it existed
+  for (Network's live ping and transfer rates) is better served by a bar widget,
+  which never takes focus in the first place. `keyNavigation` opts a panel into
+  keyboard control: buttons set `activeFocusOnTab` and draw their border from
+  `activeFocus`, and **Qt's own focus chain does the walking** —
+  `nextItemInFocusChain` in document order, so no panel keeps a cursor of its
+  own. It is deliberately one linear chain rather than a grid: `l`/`j` step
+  forward and wrap from a row's last option into the next row's first, `h`/`k`
+  step back. The handler sits on the card, the buttons' common ancestor; keys
+  bubble to it from whichever holds focus.
+  **Chain membership is never conditioned on a button's `available`**, only on
+  its visibility: a button that goes unavailable while its own action runs —
+  every scale preset during `scaleChanging`, every Wi-Fi control during `busy` —
+  would otherwise drop out of the chain under the cursor and strand the focus.
+  It stays reachable and its Enter handler refuses instead. Menu leaves the flag
   off — its search field owns the keyboard instead. Omarchy's shared
   `PanelKeyCatcher` plus a per-panel section/selection cursor was the
   alternative, and it is why their Display panel is 929 lines to this one's
-  ~340. **Panel aliases its default property to the card's column**, so
-  its own fixed children are assigned through `data` — an
-  ordinary child there would be reparented into the column. A consumer's
-  non-visual objects (`FileView`, `IpcHandler`) land in that column too, which
-  is harmless: `Column` lays out `Item`s and ignores the rest.
-  `Variants` takes exactly one child as its delegate, so anything else a
-  surface needs — `Bar.qml`'s `SystemClock`, `Background.qml`'s state files —
-  sits beside it under a `Scope`, not inside it. Putting it inside costs a
-  `ReferenceError` at runtime, not a load failure. Deliberate: the Quickshell tree gets edited constantly and stow
-  symlinks take effect with no rebuild. Do not move QML into the Nix store.
-  Under `--no-folding` that immediacy covers **edits** only — stow links each
-  file individually, so a *new* file needs stow re-run (see above).
+  ~340. **Panel aliases its default property to the card's column**, so its own
+  fixed children are assigned through `data` — an ordinary child there would be
+  reparented into the column. A consumer's non-visual objects (`FileView`,
+  `IpcHandler`) land in that column too, which is harmless: `Column` lays out
+  `Item`s and ignores the rest. `Variants` takes exactly one child as its
+  delegate, so anything else a surface needs — `Bar.qml`'s `SystemClock`,
+  `Background.qml`'s state files — sits beside it under a `Scope`, not inside
+  it. Putting it inside costs a `ReferenceError` at runtime, not a load failure.
+  Deliberate: the Quickshell tree gets edited constantly and stow symlinks take
+  effect with no rebuild. Do not move QML into the Nix store. Under
+  `--no-folding` that immediacy covers **edits** only — stow links each file
+  individually, so a *new* file needs stow re-run (see above).
 - **Cursor** — the small `macOS-hypr` v0.1 Hyprcursor data tree is stowed at
   `stow/host/wily-vm/.local/share/icons/macOS-hypr/`, so it needs no Nix package
-  build. Download updates from [the upstream releases](https://github.com/6ooker/apple_hyprcursor/releases);
+  build. Download updates from
+  [the upstream releases](https://github.com/6ooker/apple_hyprcursor/releases);
   its [source code](https://github.com/6ooker/apple_hyprcursor) is in the same
   project. The cursor manager reads `HYPRCURSOR_*` only at compositor startup:
   `hl.env` records the choice but a reload cannot replace the loaded theme, so
@@ -290,13 +299,13 @@ Gotchas found the hard way:
 - **`hyprctl keyword` no longer works at all**: it answers *"keyword can't work
   with non-legacy parsers. Use eval."* Runtime config changes go through
   `hyprctl eval "hl.<...>"` instead, which is the same Lua the config file uses.
-- **`hyprctl dispatch` takes Lua now**: `hyprctl dispatch 'hl.dsp.exec_cmd("ghostty")'`.
-  A hyprlang-shaped dispatch is a *parse* error, and it is reported only on
-  hyprctl's own stdout — nothing logs it. A caller that does not read that
-  output, such as Quickshell's `Process`, sees a silent no-op: the lock
-  screen's `hyprctl dispatch dpms off` never blanked anything, and looked
-  exactly like a timer that was not firing. The DPMS one is
-  `hl.dsp.dpms("on")` / `hl.dsp.dpms("off")`.
+- **`hyprctl dispatch` takes Lua now**:
+  `hyprctl dispatch 'hl.dsp.exec_cmd("ghostty")'`. A hyprlang-shaped dispatch is
+  a *parse* error, and it is reported only on hyprctl's own stdout — nothing
+  logs it. A caller that does not read that output, such as Quickshell's
+  `Process`, sees a silent no-op: the lock screen's `hyprctl dispatch dpms off`
+  never blanked anything, and looked exactly like a timer that was not firing.
+  The DPMS one is `hl.dsp.dpms("on")` / `hl.dsp.dpms("off")`.
 - Bind workspace keys as `code:10`..`code:19` so they survive a layout
   change — but **`hyprctl binds` reports a `code:` bind with an empty
   `key` and `keycode: 0`**, and every Lua bind as `dispatcher: __lua` with
@@ -577,10 +586,10 @@ indirection; this is ~25 entries in a QML object literal and needs none of it.
 
 `enabled: false` lists a row with nothing behind it yet: dim, skipped by the
 arrow keys and inert on Enter, rather than absent — so what is still missing
-stays visible while browsing. Those are the rows to edit when the feature
-lands. They are not the record of what is missing, though: this file is, so
-that a row can be deleted without losing the note. Still dim: Learn › Hyprland and NixOS, and Trigger › Emoji / Color picker /
-Share.
+stays visible while browsing. Those are the rows to edit when the feature lands.
+They are not the record of what is missing, though: this file is, so that a row
+can be deleted without losing the note. Still dim: Learn › Hyprland and NixOS,
+and Trigger › Emoji / Color picker / Share.
 
 Typing filters the whole subtree below the current level, not just the rows on
 screen, which is what Omarchy's `rebuildDisplay` does — so `ghostty` or `lock`
@@ -627,8 +636,8 @@ binaries get committed. The shell scans it recursively (`find`,
 png/jpg/jpeg/webp), so subfolders are for tidiness only, not meaning. The pick
 is **per mode**: `~/.local/state/wallpaper-dark` and `-light`, each a plain
 path, so flipping light/dark also swaps the picture and each side remembers its
-own. A mode with no pick yet shows the gradient. `SUPER + CTRL + SPACE` (or
-the menu's Style › Background) opens the picker; `qs ipc call wallpaper` also takes
+own. A mode with no pick yet shows the gradient. `SUPER + CTRL + SPACE` (or the
+menu's Style › Background) opens the picker; `qs ipc call wallpaper` also takes
 `open/close/toggle`, `set <path>`, and `rescan` after adding files.
 
 webp works, but only because `desktop.nix` sets `QT_PLUGIN_PATH` to
@@ -641,10 +650,11 @@ displace them.
 
 The top bar's `plugins/bar/widgets/Workspaces.qml` is a pared-down port of
 Omarchy's file at the same path. It shows 1–5 even when empty, adds existing
-normal workspaces through 10, dims empty ones, and outlines the focused one
-(the digit stays visible, unlike Omarchy's glyph substitution). It reads Quickshell's `Hyprland` singleton rather than
-polling `hyprctl`; clicking an indicator dispatches the same
-`hl.dsp.focus({ workspace = ... })` action as `SUPER + 1` through `SUPER + 0`.
+normal workspaces through 10, dims empty ones, and outlines the focused one (the
+digit stays visible, unlike Omarchy's glyph substitution). It reads Quickshell's
+`Hyprland` singleton rather than polling `hyprctl`; clicking an indicator
+dispatches the same `hl.dsp.focus({ workspace = ... })` action as `SUPER + 1`
+through `SUPER + 0`.
 
 `hl.animation({ leaf = "workspaces", enabled = false })` is Omarchy's exact
 setting for instant workspace changes. It is deliberately a workspace leaf,
@@ -656,9 +666,9 @@ true` is deliberately not ported: it controls manual split resizing, not new
 client placement.
 
 The launcher mark is Omarchy's private `omarchy` font at U+E900, vendored with
-its upstream MIT licence under `stow/host/wily-vm/.local/share/fonts/omarchy/`. Nerd
-Fonts do not carry it. After a fresh stow run, call `fc-cache -f` and restart
-Quickshell to make a new user font available to the running shell.
+its upstream MIT licence under `stow/host/wily-vm/.local/share/fonts/omarchy/`.
+Nerd Fonts do not carry it. After a fresh stow run, call `fc-cache -f` and
+restart Quickshell to make a new user font available to the running shell.
 
 ## Display
 
@@ -713,7 +723,7 @@ It opens from the leftmost right-side bar icon (the order is network, display,
 bell), Setup › Network, or `SUPER + CTRL + W` / `qs ipc call network toggle`.
 The scanner is enabled only while this panel is open. The wired icon wins when
 both transports are connected, matching the default route. The VM verifies the
-wired path end-to-end: `enp0s1` reports Connected with `192.168.64.15`, the
+wired path end-to-end: `enp0s1` reports Connected with its DHCP address, the
 panel renders it, the bar shows the ethernet icon, metrics update, and both IPC
 and the menu open the panel. The bind is registered, but its physical
 invocation cannot be tested from the Mac; see "From a Mac, macOS eats the
@@ -934,9 +944,9 @@ The matching Omarchy keybinds are `SUPER + comma` (dismiss latest),
 
 The plumbing is in place — portals (`xdg-desktop-portal` + `-hyprland` +
 `-gtk`), pipewire/wireplumber and NetworkManager are all running, and the menu
-now covers apps, wallpaper, theme, nightlight, screenshots, power,
-notifications and the keybinding sheet. The dim rows in it are the shortest list of what is still
-missing.
+now covers apps, wallpaper, theme, nightlight, screenshots, power, notifications
+and the keybinding sheet. The dim rows in it are the shortest list of what is
+still missing.
 
 1. **Validate the network panel's Wi-Fi path on the ThinkPad** — scanning,
    signal strength, radio state, passphrase entry, connect, disconnect and
@@ -992,23 +1002,18 @@ smaller than theirs.
   greetd setup.** Nothing then listened for logind's `Lock`/`Unlock` signals:
   the call returned cleanly while `lock status` still reported `locked:false`.
   Omarchy is the same (`grep -rniE "login1|loginctl" shell/` is empty; their
-  entry point is `bin/omarchy-system-lock`, which calls `omarchy-shell lock lock`,
-  the same IPC path as ours), so it was left alone deliberately rather than
-  fixed into a divergence. A console login adds no listener, but re-verify that
-  observation after the terminal-first session has been exercised before relying
-  on it for ThinkPad lid handling.
+  entry point is `bin/omarchy-system-lock`, which calls
+  `omarchy-shell lock lock`, the same IPC path as ours), so it was left alone
+  deliberately rather than fixed into a divergence. A console login adds no
+  listener, but re-verify that observation after the terminal-first session has
+  been exercised before relying on it for ThinkPad lid handling.
 
   **Read this before touching lid handling on the ThinkPad.** The lid is safe
   under `HandleLidSwitch=suspend`, which is what logind actually reports here
-  (`busctl get-property org.freedesktop.login1 /org/freedesktop/login1 \
-  org.freedesktop.login1.Manager HandleLidSwitch` → `s "suspend"`) — the lid
-  suspends, which raises `PrepareForSleep`, which `wily-sleep-lock` already
-  handles. Setting
-  `HandleLidSwitch=lock` instead — lid shut, machine awake, clamshell on an
-  external monitor — is the one configuration that breaks: logind emits `Lock`,
-  nobody listens, and the machine sits unlocked with the lid closed. Omarchy
-  covers that case with `bin/omarchy-system-lid-close`, not by subscribing to
-  the signal.
+  (`busctl get-property org.freedesktop.login1 /org/freedesktop/login1\
+  org.freedesktop.login1.Manager HandleLidSwitch` → `s
+  "suspend"`) — the lid suspends, which raises `PrepareForSleep`, which `wily-sleep-lock` already handles. Setting `HandleLidSwitch=lock` instead — lid shut, machine awake, clamshell on an external monitor — is the one configuration that breaks: logind emits `Lock`, nobody listens, and the machine sits unlocked with the lid closed. Omarchy covers that case with `bin/omarchy-system-lid-close`,
+  not by subscribing to the signal.
 - **`IdleMonitor` honours a real Wayland idle inhibitor — verified.** With
   `nix run nixpkgs#wlinhibit` holding a `zwp_idle_inhibit_manager_v1`
   inhibitor, the session sat 400s past its 300s timeout still reporting
@@ -1090,12 +1095,12 @@ smaller than theirs.
   but it is a paid font and needs vendoring before Nix can install it.
 - Ghostty's `font-size` is in points converted through display DPI, which is 96
   on Linux/GTK but 72 on macOS, so the shared 14pt renders a third larger here.
-  `stow/platform/Linux/.config/ghostty/config-linux` overrides it to 10.5 and swaps the
-  (unvendored) Berkeley Mono for JetBrains Mono Nerd Font; the shared config
-  pulls it in with `config-file = ?config-linux`, which is silently skipped on
-  macOS. Relative includes resolve against the stow *symlink's* directory
-  (`~/.config/ghostty`), not the repository target, so both files must be
-  stowed. All 17 `macos-*` keys parse fine on the Linux build — no split
+  `stow/platform/Linux/.config/ghostty/config-linux` overrides it to 10.5 and
+  swaps the (unvendored) Berkeley Mono for JetBrains Mono Nerd Font; the shared
+  config pulls it in with `config-file = ?config-linux`, which is silently
+  skipped on macOS. Relative includes resolve against the stow *symlink's*
+  directory (`~/.config/ghostty`), not the repository target, so both files must
+  be stowed. All 17 `macos-*` keys parse fine on the Linux build — no split
   needed beyond these overrides.
 - Only one emoji font is installed; `noto-fonts-color-emoji` is commented out
   in `nix/shared/system/linux.nix` as slow to build. Quickshell UI will want it.
