@@ -274,6 +274,42 @@ symlinks into the repo, so nothing real is lost) and run it again.
   `hl.env` records the choice but a reload cannot replace the loaded theme, so
   its `environment.sessionVariables` in `desktop.nix` need a reboot to apply.
 
+## The shell is replaceable; the compositor config is not
+
+Hyprland has no concept of a bar, a lock screen or a notification popup. Each
+is an ordinary Wayland client using `wlr-layer-shell` for its surfaces and
+`ext-session-lock-v1` for the lock, so a whole shell swaps by stopping one
+process and starting another. Verified live: `systemctl --user stop quickshell`
+then `nix run nixpkgs#noctalia` brought up a complete rival desktop in this
+session, no compositor change and no rebuild.
+
+- **The compositor config is the durable asset.** `hyprland.lua`,
+  `monitors.lua` and the keymap belong to Hyprland and outlive any shell.
+  The one coupled part is every bind that calls `qs ipc call …`.
+- **Wholesale swap yes, cherry-picking one panel no.** Noctalia v5 installs
+  exactly one binary, `bin/noctalia`, and its C++ rewrite dropped Qt and QML
+  entirely — so there is neither a component to run on its own nor source to
+  lift into a Quickshell config. nixpkgs carries both generations under
+  confusingly close names: `noctalia` is v5 (5.0.0-beta.8 on 2026-08-31),
+  `noctalia-shell` is the old QML v4 (4.7.7).
+- **Several desktop roles are singletons**, so "run both, keep the better
+  half" is not on offer: `ext-session-lock-v1` allows one lock client per
+  session, `org.freedesktop.Notifications` is a single D-Bus name held by
+  whichever daemon claims it first, and polkit registers one agent per
+  session. Idle is worse rather than better — several watchers coexist happily
+  on `ext-idle-notify-v1`, so two lockers race instead of colliding loudly.
+  Bars are the genuine exception: two layer-shell bars stack, each reserving
+  its own exclusive zone. Read from the protocols, not measured here; only the
+  wholesale swap above was exercised.
+
+So the two shapes are a choice, not a spectrum. This host takes the first: one
+shell owning every surface, which is why `hyprlock`, `hypridle` and
+`hyprpolkitagent` are omitted in favour of native Quickshell services. The
+second is a compositor plus single-purpose daemons — a notification daemon, a
+locker, an idle daemon, a tray — stitched together, and that is what filling a
+Quickshell gap from outside actually costs, since no piece of a rival shell can
+be borrowed on its own.
+
 ## Hyprland config is Lua, not .conf
 
 hyprlang (`hyprland.conf`) is deprecated since 0.55 and removed in 0.57. The
