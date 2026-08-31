@@ -440,6 +440,24 @@ Because Plasma activates `graphical-session.target` as well, the Quickshell and
 instead — otherwise a Plasma login stacks a second bar, lock surface and polkit
 agent on top of KWin's.
 
+**Those units must not be `After` `graphical-session.target`.** systemd orders
+a target after every unit that is `wantedBy` it, and `graphical-session.target`
+is itself ordered after `wayland-session@hyprland.desktop.target` — so an
+`After` on it closes a cycle. systemd breaks the cycle by deleting the
+*service's* start job, and the session then comes up with no bar, no lock and
+no sleep inhibitor while `hyprctl configerrors` stays clean and the binds all
+register. The only trace is in the user journal, logged against the target
+rather than the unit:
+
+```sh
+journalctl --user -b -u graphical-session.target | grep -i "ordering cycle"
+```
+
+Order against `wayland-wm@hyprland.desktop.service` instead — the compositor
+service both targets already follow. `systemctl --user start quickshell` by
+hand still works, because with the target already active there is no cycle left
+to resolve; that revives a running session but does not fix the next login.
+
 Apply login or session-launcher changes with a boot generation and reboot rather
 than restarting services in place. Quickshell remains safe to restart on its own
 (`systemctl --user restart quickshell`) while iterating on QML, without touching
