@@ -543,12 +543,18 @@ and turning acceleration *off* would remove the GLES 3.0 Hyprland depends on.
 
 ## Reference
 
-Omarchy 4 "Quattro" is the model, cloned at
-`~/code/public/github.com/omacom/omarchy` (branch `quattro`). Its Quickshell
-tree is `shell/` (~95 QML files: `shell.qml`, `Ui/`, `services/`, `plugins/`),
-Hyprland config in `config/hypr/`, and package list in
-`install/omarchy-base.packages`. Approach is vendor-and-prune: port pieces
-across on request rather than rewriting from scratch.
+Omarchy 4 "Quattro" is the model: `github.com/basecamp/omarchy`, branch
+`quattro`, cloned at `~/code/public/github.com/basecamp/omarchy`. Its
+Quickshell tree is `shell/` (`shell.qml`, `Ui/`, `plugins/`), Hyprland config
+in `config/hypr/`, and package list in `install/omarchy-base.packages`.
+Approach is vendor-and-prune: port pieces across on request rather than
+rewriting from scratch.
+
+**Upstream has moved on since these pieces were ported.** Its shell is now
+plugin-manifest driven: every bar widget and panel carries a `manifest.json`
+under `shell/plugins/`, and the bar layout is data in
+`config/omarchy/shell.json` rather than QML. Expect a wider diff than the
+matching file paths suggest.
 
 **Staying diffable against upstream is a design constraint, not a nicety.**
 The point of vendoring is to pull their bugfixes later, and that only works if
@@ -1009,6 +1015,55 @@ still missing.
    run** — not the `ActionButton` focus border, not the `focusedItem`
    scroll-into-view block, which has never once been entered. Only the
    Display panel's traversal is verified live.
+
+### Bar widgets not yet ported
+
+Upstream's default bar is data, in `config/omarchy/shell.json`: left `menu`,
+`workspaces`; centre `indicators`, `clock`, `keyboard-layout`, `weather`,
+`system-update`; right `tray`, `agents`, `bluetooth`, `network`, `audio`,
+`monitor`, `power`. Ours is menu, workspaces, clock, network, display, bell.
+None of the below is blocked on the two items above — pick freely.
+
+Runnable on the VM today:
+
+- **`omarchy.indicators`** (`widgets/Indicators.qml` plus `indicators/Dnd`,
+  `NightLight`, `StayAwake`, `Reminder`, `ScreenRecording`, `Dictation`) —
+  cheapest of the lot: DND and nightlight state already exist here, so this is
+  only their display. `StayAwake` is the bar affordance skipped under "Known,
+  not yet done".
+- **`omarchy.tray`** (`widgets/Tray.qml`, `TrayModel.js`) — SNI tray. Nothing
+  else in this shell surfaces a tray icon.
+- **`omarchy.audio`** (`panels/audio/`) — master slider, output-device picker,
+  per-app mixer. pipewire runs here, but note it is declared nowhere in `nix/`:
+  it arrives via `services.desktopManager.plasma6`.
+- **`omarchy.microphone`** (`widgets/Microphone.qml`) — mute toggle, source
+  volume on scroll.
+- **`omarchy.media`** (`plugins/services/media/`) — MPRIS track and cover art.
+- **`omarchy.keyboard-layout`** — dim until `kb_layout = "us,se"` lands; the
+  two are one task.
+- **The clock popup** — ours is a bare `Text`. Upstream adds a month grid, ISO
+  week numbers, format cycling and a timezone picker.
+- **`omarchy.weather`** (`panels/weather/`), **`omarchy.tailscale`**,
+  **`omarchy.agents`** — network only, nothing hardware-blocked.
+- **The bar's own configurability** — edge position, transparency,
+  drag-to-reorder, the `shell.json` layout. Ours is a fixed anchored layout.
+
+Hardware-blocked, so ThinkPad work:
+
+- **`omarchy.bluetooth`** (`panels/bluetooth/Panel.qml`, on
+  `Quickshell.Bluetooth`) — UTM passes no radio through, and
+  `hardware.bluetooth.enable` is set nowhere in `nix/`, so there is no
+  `bluetoothd` to talk to either. Same shape as the Wi-Fi panel: writable
+  blind, unverifiable here.
+- **`omarchy.power`** (`panels/power/`, `services/battery/`) — no battery.
+- **`omarchy.monitor`'s brightness half** — already dim, no backlight device.
+
+`omarchy.system-update` cannot port: it is pacman, same reason as the menu's
+Install / Remove / Update rows.
+
+Beyond the bar, also unported: `plugins/osd`, `clipboard` (wants
+`wl-clipboard`), `emojis`, `image-picker`, `reminders`, and the `wifiqr`,
+`dropbox`, `speedtest` and `disk-speedtest` panels.
 
 Half of Omarchy's tree cannot port: Install / Remove / Update are `pacman`
 operations, and on NixOS that is a rebuild. The root menu here is necessarily
