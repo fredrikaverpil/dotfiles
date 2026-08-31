@@ -21,7 +21,6 @@ Item {
   readonly property var palette: shell ? shell.palette : ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864" })
   readonly property string statePath: Quickshell.env("HOME") + "/.local/state/wily-notifications.json"
   readonly property int historyLimit: 10
-  readonly property string alarmSound: "/run/current-system/sw/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga"
 
   property bool stateLoaded: false
   property bool doNotDisturb: false
@@ -58,7 +57,7 @@ Item {
   }
 
   function recordFor(notification, existing) {
-    var record = NotificationLogic.snapshotOf(notification, undefined, NotificationUrgency.Critical)
+    var record = NotificationLogic.snapshotOf(notification)
     record.key = existing ? existing.key : String(++nextKey)
     record.notification = notification
     record.duration = NotificationLogic.durationFor(notification, NotificationUrgency.Low, NotificationUrgency.Critical)
@@ -138,7 +137,7 @@ Item {
 
     // Critical messages remain visible; every other notification is recorded
     // silently while DND is enabled.
-    if (doNotDisturb && record.urgency !== NotificationUrgency.Critical) {
+    if (doNotDisturb && notification.urgency !== NotificationUrgency.Critical) {
       addHistory(record)
       return
     }
@@ -147,11 +146,6 @@ Item {
     live[record.key] = record
     popupRows = [record].concat(popupRows)
     watch(record)
-
-    // Reserve the meeting alarm for Evolution reminders, not all critical toasts.
-    if (NotificationLogic.isCriticalSender(notification)) {
-      Quickshell.execDetached(["pw-play", alarmSound])
-    }
   }
 
   // `live` is the tracker: `finish` drops the key as soon as the server closes
