@@ -42,7 +42,7 @@
       homeConfig = ./users/fredrik.nix;
       groups = [ "networkmanager" ];
       sshKeys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKte3qmH2qXRfdbVIfl6HgFvhRE6MCCiL9ho7xW3KSZB"
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIutqzZ2V93KOXtPpkdVSxCJwnjhNf/jENvBayDDhAP2"
       ];
     };
   };

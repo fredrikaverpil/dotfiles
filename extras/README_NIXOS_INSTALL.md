@@ -64,7 +64,7 @@ NetworkManager, so one command does it:
 Then from the Mac:
 
 ```sh
-ssh-copy-id -i ~/.ssh/id_ed25519.pub nixos@<ip>
+ssh-copy-id -o IdentitiesOnly=yes -i ~/.ssh/id_ed25519.pub nixos@<ip>
 ssh nixos@<ip>
 ```
 
