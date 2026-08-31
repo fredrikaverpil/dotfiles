@@ -58,6 +58,13 @@ hl.config({
     disable_hyprland_logo = true,
     disable_splash_rendering = true,
     force_default_wallpaper = 0,
+    -- Both default to false, which leaves a blanked output with no way back
+    -- from the keyboard: the screen reads as a hung machine rather than a dark
+    -- one, and nothing but `hyprctl dispatch dpms on` over SSH recovers it.
+    -- The compositor owns the wake, so it still works when the shell that
+    -- blanked the output is gone.
+    key_press_enables_dpms = true,
+    mouse_move_enables_dpms = true,
   },
 })
 
