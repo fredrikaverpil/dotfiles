@@ -46,6 +46,7 @@ in
   ];
 
   host.extraCasks = [
+    "utm"
     "cursor"
     "podman-desktop"
 
