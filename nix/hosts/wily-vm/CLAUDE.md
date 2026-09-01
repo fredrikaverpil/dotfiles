@@ -848,6 +848,23 @@ elsewhere (only `apps` so far, from `DesktopEntries`). Their `Menu.qml` plus
 `MenuModel.js` is ~2000 lines of jsonc parsing, plugin manifests and provider
 indirection; this is ~25 entries in a QML object literal and needs none of it.
 
+Menu rows carry a Nerd Font glyph; app rows carry the desktop entry's icon,
+resolved with `Quickshell.iconPath(name, true)` and drawn as an `Image` whose
+`sourceSize` is multiplied by `Screen.devicePixelRatio` — a logical-size decode
+leaves PNG icons blurry. **Only `hicolor` resolves here.** No Qt platform theme
+is loaded, so `QIcon` has no theme name and any themed lookup
+(`applications-system`, `application-x-executable`) comes back empty no matter
+what the dconf or GTK `icon-theme` says — that setting was a stale `breeze` from
+Plasma, now `Adwaita`, and it changed nothing. `QT_QPA_PLATFORMTHEME=gnome` does
+make Qt read gsettings and resolve them, at the price of Qt also taking its
+fonts and dialogs from GNOME; the glyph fallback on an unresolved row costs
+nothing and also covers icons no theme will ever have. Omarchy instead keeps a
+bash-built index of every `apps/`+`devices/` icon, rescanned on a debounce
+(`services/AppLibrary.qml:122`), because Qt's icon cache never re-scans after a
+post-start install and an unconstrained lookup can resolve "zoom" to an action
+icon. Not ported: here a new app arrives with a rebuild, which restarts the
+shell anyway.
+
 `enabled: false` lists a row with nothing behind it yet: dim, skipped by the
 arrow keys and inert on Enter, rather than absent — so what is still missing
 stays visible while browsing. Those are the rows to edit when the feature lands.

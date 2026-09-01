@@ -74,11 +74,22 @@ Ui.Panel {
     }
   }
 
+  // A desktop entry names either a themed icon, an absolute path or a URL;
+  // only the first needs a lookup. Empty when nothing resolves, which leaves
+  // the row on its glyph -- see wily-vm/CLAUDE.md for why that is common here.
+  function iconUrl(icon) {
+    const value = String(icon || "")
+    if (value.length === 0) return ""
+    if (value.startsWith("/")) return "file://" + value
+    if (value.startsWith("file://") || value.startsWith("image://")) return value
+    return Quickshell.iconPath(value, true)
+  }
+
   function appRows(detail) {
     return DesktopEntries.applications.values
       .filter(entry => !entry.noDisplay)
       .sort((a, b) => a.name.localeCompare(b.name))
-      .map(entry => ({ label: entry.name, icon: "", detail: detail || "", enabled: true, entry: entry }))
+      .map(entry => ({ label: entry.name, icon: "󰀻", image: menu.iconUrl(entry.icon), detail: detail || "", enabled: true, entry: entry }))
   }
 
   // Reached from Hyprland with `qs ipc call menu toggle`. The bar button calls
@@ -265,13 +276,35 @@ Ui.Panel {
         anchors.leftMargin: 8
         spacing: 10
 
-        Text {
+        // One slot, two sources: an app's own icon when it resolves, the
+        // row's glyph otherwise.
+        Item {
           width: 20
+          height: 20
           visible: modelData.chord === undefined
-          color: modelData.enabled ? menu.shell.palette.fg : menu.shell.palette.off
-          font.family: "JetBrainsMono Nerd Font"
-          font.pixelSize: 15
-          text: modelData.icon || ""
+
+          Image {
+            id: rowImage
+            anchors.fill: parent
+            source: modelData.image || ""
+            visible: status === Image.Ready
+            fillMode: Image.PreserveAspectFit
+            asynchronous: true
+            // Decode at physical pixels; a logical-size decode leaves PNG
+            // icons upscaled and blurry.
+            sourceSize.width: width * Screen.devicePixelRatio
+            sourceSize.height: height * Screen.devicePixelRatio
+          }
+
+          Text {
+            anchors.fill: parent
+            visible: !rowImage.visible
+            verticalAlignment: Text.AlignVCenter
+            color: modelData.enabled ? menu.shell.palette.fg : menu.shell.palette.off
+            font.family: "JetBrainsMono Nerd Font"
+            font.pixelSize: 15
+            text: modelData.icon || ""
+          }
         }
 
         // Monospace, so a fixed width lines every chord up in a column
