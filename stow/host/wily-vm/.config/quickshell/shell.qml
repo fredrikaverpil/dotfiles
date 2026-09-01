@@ -152,7 +152,7 @@ ShellRoot {
     "apps": { icon: "󰀻", label: "Apps", provider: "apps" },
     "learn": { icon: "󰧑", label: "Learn" },
     "learn.keybindings": { icon: "", label: "Keybindings", provider: "binds" },
-    "learn.hyprland": { icon: "", label: "Hyprland", enabled: false },
+    "learn.compositor": { icon: "", label: Ui.Compositor.niri ? "niri" : "Hyprland", enabled: false },
     "learn.nixos": { icon: "", label: "NixOS", enabled: false },
     "style": { icon: "", label: "Style" },
     "style.background": { icon: "", label: "Background", action: () => background.open() },
