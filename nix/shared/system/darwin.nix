@@ -16,11 +16,8 @@ let
 
   homebrewTaps = lib.unique (
     [
-      "dustinblackman/tap"
-      # "joshmedeski/sesh"
       "1password/tap"
       "barutsrb/tap"
-      # "sst/tap" # for opencode
     ]
     ++ config.host.extraTaps
   );
