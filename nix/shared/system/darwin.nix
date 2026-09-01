@@ -19,7 +19,6 @@ let
       "dustinblackman/tap"
       # "joshmedeski/sesh"
       "1password/tap"
-      "nikitabobko/tap"
       # "sst/tap" # for opencode
     ]
     ++ config.host.extraTaps
@@ -93,7 +92,6 @@ in
       casks = [
         "1password"
         "1password-cli"
-        "aerospace"
         "appcleaner"
         "brainfm"
         "exifrenamer"
