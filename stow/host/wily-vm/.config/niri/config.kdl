@@ -1,0 +1,145 @@
+// niri, running the same Quickshell config as Hyprland. The chords mirror
+// hyprland.lua, which mirrors Omarchy; nix/hosts/wily-vm/CLAUDE.md lists what
+// niri has no equivalent for.
+//
+// niri reloads this file on save, so writing it is also applying it. The
+// display panel rewrites the `scale` and `GDK_SCALE` lines in place, which is
+// why each is alone on its line and appears exactly once in the file.
+
+input {
+    keyboard {
+        xkb {
+            layout "us"
+        }
+    }
+}
+
+// The connector name must match `niri msg -j outputs` or the block is inert
+// and a scale set from the display panel lasts only until the next restart.
+// Virtual-1 is what virtio-gpu presents in this VM.
+output "Virtual-1" {
+    mode "1280x800"
+    scale 1
+}
+
+layout {
+    gaps 8
+    border {
+        width 2
+    }
+}
+
+environment {
+    GDK_SCALE "1"
+}
+
+prefer-no-csd
+
+cursor {
+    xcursor-size 24
+}
+
+// uwsm starts the compositor as its own unit, so the Quickshell unit inherits
+// nothing from it. finalize exports WAYLAND_DISPLAY to the systemd user
+// manager, and NIRI_SOCKET has to be named explicitly -- without it `niri msg`
+// fails inside the shell and Ui/Compositor.qml sees Hyprland.
+spawn-at-startup "uwsm" "finalize" "NIRI_SOCKET"
+
+// The keybinding cheatsheet reads this TSV. hyprland.lua writes it as it
+// registers each bind; niri's config is declarative, so it is extracted from
+// the file instead -- which is why every bind below carries a title.
+spawn-at-startup "sh" "-c" "sed -n '/^spawn-at-startup/d; s|^ *\\([^ ]*\\).*hotkey-overlay-title=\"\\([^\"]*\\)\".*|\\1\t\\2|p' ~/.config/niri/config.kdl > ~/.local/state/wm-binds.tsv.tmp && mv ~/.local/state/wm-binds.tsv.tmp ~/.local/state/wm-binds.tsv"
+
+binds {
+    // Applications
+    Mod+Return hotkey-overlay-title="Terminal" { spawn "ghostty"; }
+    Mod+Shift+Return hotkey-overlay-title="Browser" { spawn "uwsm-app" "--" "zen-beta.desktop"; }
+    Mod+Shift+B hotkey-overlay-title="Browser" { spawn "uwsm-app" "--" "zen-beta.desktop"; }
+    Mod+Shift+N hotkey-overlay-title="Editor" { spawn "ghostty" "-e" "nvim"; }
+
+    // Shell. Identical under both compositors: these are the shell's own IPC.
+    Mod+Space hotkey-overlay-title="Menu" { spawn "qs" "ipc" "call" "menu" "toggle"; }
+    Mod+Alt+Space hotkey-overlay-title="Apps menu" { spawn "qs" "ipc" "call" "menu" "level" "apps"; }
+    Mod+Escape hotkey-overlay-title="System menu" { spawn "qs" "ipc" "call" "menu" "level" "system"; }
+    Mod+K hotkey-overlay-title="Keybindings" { spawn "qs" "ipc" "call" "menu" "level" "learn.keybindings"; }
+    Mod+Ctrl+Space hotkey-overlay-title="Background switcher" { spawn "qs" "ipc" "call" "wallpaper" "toggle"; }
+    Mod+Shift+Ctrl+Space hotkey-overlay-title="Theme menu" { spawn "qs" "ipc" "call" "menu" "level" "style.theme"; }
+    Mod+Comma hotkey-overlay-title="Dismiss latest notification" { spawn "qs" "ipc" "call" "notifications" "dismissOne"; }
+    Mod+Shift+Comma hotkey-overlay-title="Dismiss all notifications" { spawn "qs" "ipc" "call" "notifications" "dismissAll"; }
+    Mod+Ctrl+Comma hotkey-overlay-title="Toggle Do Not Disturb" { spawn "qs" "ipc" "call" "notifications" "toggleDnd"; }
+    Mod+Alt+Comma hotkey-overlay-title="Invoke latest notification" { spawn "qs" "ipc" "call" "notifications" "invokeLast"; }
+    Mod+Shift+Alt+Comma hotkey-overlay-title="Open notification history" { spawn "qs" "ipc" "call" "notifications" "showHistory"; }
+    Mod+Ctrl+N hotkey-overlay-title="Toggle nightlight" { spawn "qs" "ipc" "call" "nightlight" "toggle"; }
+    Mod+Ctrl+D hotkey-overlay-title="Display settings" { spawn "qs" "ipc" "call" "display" "toggle"; }
+    Mod+Ctrl+W hotkey-overlay-title="Network settings" { spawn "qs" "ipc" "call" "network" "toggle"; }
+    Mod+Ctrl+I hotkey-overlay-title="Toggle idle locking" { spawn "qs" "ipc" "call" "idle" "toggle"; }
+    Mod+Ctrl+L hotkey-overlay-title="Lock system" { spawn "qs" "ipc" "call" "lock" "lock"; }
+
+    // Windows
+    Mod+W hotkey-overlay-title="Close window" { close-window; }
+    Mod+Q hotkey-overlay-title="Close window" { close-window; }
+    Mod+T hotkey-overlay-title="Toggle window floating/tiling" { toggle-window-floating; }
+    Mod+F hotkey-overlay-title="Full screen" { fullscreen-window; }
+    Mod+Alt+F hotkey-overlay-title="Full width" { maximize-column; }
+
+    Mod+Left hotkey-overlay-title="Focus on left window" { focus-column-left; }
+    Mod+Right hotkey-overlay-title="Focus on right window" { focus-column-right; }
+    Mod+Up hotkey-overlay-title="Focus on above window" { focus-window-up; }
+    Mod+Down hotkey-overlay-title="Focus on below window" { focus-window-down; }
+
+    Mod+Shift+Left hotkey-overlay-title="Swap window to the left" { move-column-left; }
+    Mod+Shift+Right hotkey-overlay-title="Swap window to the right" { move-column-right; }
+    Mod+Shift+Up hotkey-overlay-title="Swap window up" { move-window-up; }
+    Mod+Shift+Down hotkey-overlay-title="Swap window down" { move-window-down; }
+
+    Alt+Tab hotkey-overlay-title="Focus on next window" { focus-window-previous; }
+
+    // Workspaces
+    Mod+1 hotkey-overlay-title="Switch to workspace 1" { focus-workspace 1; }
+    Mod+2 hotkey-overlay-title="Switch to workspace 2" { focus-workspace 2; }
+    Mod+3 hotkey-overlay-title="Switch to workspace 3" { focus-workspace 3; }
+    Mod+4 hotkey-overlay-title="Switch to workspace 4" { focus-workspace 4; }
+    Mod+5 hotkey-overlay-title="Switch to workspace 5" { focus-workspace 5; }
+    Mod+6 hotkey-overlay-title="Switch to workspace 6" { focus-workspace 6; }
+    Mod+7 hotkey-overlay-title="Switch to workspace 7" { focus-workspace 7; }
+    Mod+8 hotkey-overlay-title="Switch to workspace 8" { focus-workspace 8; }
+    Mod+9 hotkey-overlay-title="Switch to workspace 9" { focus-workspace 9; }
+
+    Mod+Shift+1 hotkey-overlay-title="Move window to workspace 1" { move-window-to-workspace 1; }
+    Mod+Shift+2 hotkey-overlay-title="Move window to workspace 2" { move-window-to-workspace 2; }
+    Mod+Shift+3 hotkey-overlay-title="Move window to workspace 3" { move-window-to-workspace 3; }
+    Mod+Shift+4 hotkey-overlay-title="Move window to workspace 4" { move-window-to-workspace 4; }
+    Mod+Shift+5 hotkey-overlay-title="Move window to workspace 5" { move-window-to-workspace 5; }
+    Mod+Shift+6 hotkey-overlay-title="Move window to workspace 6" { move-window-to-workspace 6; }
+    Mod+Shift+7 hotkey-overlay-title="Move window to workspace 7" { move-window-to-workspace 7; }
+    Mod+Shift+8 hotkey-overlay-title="Move window to workspace 8" { move-window-to-workspace 8; }
+    Mod+Shift+9 hotkey-overlay-title="Move window to workspace 9" { move-window-to-workspace 9; }
+
+    Mod+Tab hotkey-overlay-title="Next workspace" { focus-workspace-down; }
+    Mod+Shift+Tab hotkey-overlay-title="Previous workspace" { focus-workspace-up; }
+    Mod+Ctrl+Tab hotkey-overlay-title="Former workspace" { focus-workspace-previous; }
+
+    Mod+WheelScrollDown cooldown-ms=150 hotkey-overlay-title="Scroll active workspace forward" { focus-workspace-down; }
+    Mod+WheelScrollUp cooldown-ms=150 hotkey-overlay-title="Scroll active workspace backward" { focus-workspace-up; }
+
+    // Resize. niri sizes columns, not windows, so the horizontal pair is a
+    // column width and the vertical pair a window height within it.
+    Mod+Minus hotkey-overlay-title="Expand window left" { set-column-width "-10%"; }
+    Mod+Equal hotkey-overlay-title="Shrink window left" { set-column-width "+10%"; }
+    Mod+Shift+Minus hotkey-overlay-title="Shrink window up" { set-window-height "-10%"; }
+    Mod+Shift+Equal hotkey-overlay-title="Expand window down" { set-window-height "+10%"; }
+
+    Mod+Alt+Minus hotkey-overlay-title="Expand window left a little" { set-column-width "-2%"; }
+    Mod+Alt+Equal hotkey-overlay-title="Shrink window left a little" { set-column-width "+2%"; }
+    Mod+Ctrl+Minus hotkey-overlay-title="Expand window left a lot" { set-column-width "-25%"; }
+    Mod+Ctrl+Equal hotkey-overlay-title="Shrink window left a lot" { set-column-width "+25%"; }
+
+    // Columns, which is the nearest thing niri has to Hyprland's groups.
+    Mod+G hotkey-overlay-title="Toggle window grouping" { toggle-column-tabbed-display; }
+    Mod+Alt+Left hotkey-overlay-title="Move window to group on left" { consume-or-expel-window-left; }
+    Mod+Alt+Right hotkey-overlay-title="Move window to group on right" { consume-or-expel-window-right; }
+    Mod+Alt+Tab hotkey-overlay-title="Next window in group" { focus-window-down; }
+    Mod+Alt+Shift+Tab hotkey-overlay-title="Previous window in group" { focus-window-up; }
+
+    Mod+Shift+E hotkey-overlay-title="Exit niri" { quit; }
+}

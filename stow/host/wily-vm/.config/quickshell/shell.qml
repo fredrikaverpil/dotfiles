@@ -12,6 +12,7 @@ import "plugins/panels/network" as Network
 import "plugins/polkit" as Polkit
 import "plugins/services/idle" as Idle
 import "plugins/services/nightlight" as Nightlight
+import "Ui" as Ui
 
 // Wiring only: the palette every surface reads, the menu's entry table, and
 // the services and surfaces themselves. Each of those lives in its own file
@@ -171,7 +172,7 @@ ShellRoot {
     "setup.nightlight": { icon: "󰆔", label: "Nightlight", action: () => nightlight.toggle() },
     "system": { icon: "", label: "System" },
     "system.close": { icon: "󰅖", label: "Close window", action: () => Quickshell.execDetached(
-      ["hyprctl", "dispatch", "hl.dsp.window.close()"])
+      Ui.Compositor.closeWindow())
     },
     "system.notifications": { icon: "󰂚", label: "Notifications" },
     "system.notifications.history": { icon: "󰎟", label: "History", action: () => notifications.showHistory() },

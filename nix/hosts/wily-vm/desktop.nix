@@ -76,6 +76,14 @@ in
     withUWSM = true;
   };
 
+  # xdg-desktop-portal keys its backend choice off XDG_CURRENT_DESKTOP, and
+  # nothing declares one for "niri". Without this it finds no implementation
+  # and every portal call fails -- including the Settings one that carries
+  # org.freedesktop.appearance, which is what the light/dark toggle drives.
+  # xdph is Hyprland-only, so gtk is the whole answer here; screencast under
+  # niri would want xdg-desktop-portal-gnome instead.
+  xdg.portal.config.niri.default = [ "gtk" ];
+
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -126,10 +134,18 @@ in
     # by silently deleting this unit's start job. The session comes up with no
     # bar and no lock, and only the journal for graphical-session.target says
     # why.
-    after = [ "wayland-wm@hyprland.desktop.service" ];
+    # Both compositors, and only one of them is ever in the start transaction,
+    # so the unused After is inert.
+    after = [
+      "wayland-wm@hyprland.desktop.service"
+      "wayland-wm@niri.service"
+    ];
     # Not graphical-session.target: Plasma activates that too, and this shell
     # would then stack a second bar, lock surface and polkit agent onto KWin.
-    wantedBy = [ "wayland-session@hyprland.desktop.target" ];
+    wantedBy = [
+      "wayland-session@hyprland.desktop.target"
+      "wayland-session@niri.target"
+    ];
     # NixOS pins a sparse PATH on every user unit. Unsetting it is the only way
     # to let the unit inherit the session PATH uwsm imports into the user
     # manager, which is what the launcher needs: uwsm-app to spawn apps with,
@@ -155,9 +171,13 @@ in
     after = [
       "dbus.socket"
       "wayland-wm@hyprland.desktop.service"
+      "wayland-wm@niri.service"
     ];
     requires = [ "dbus.socket" ];
-    wantedBy = [ "wayland-session@hyprland.desktop.target" ];
+    wantedBy = [
+      "wayland-session@hyprland.desktop.target"
+      "wayland-session@niri.target"
+    ];
     serviceConfig = {
       ExecStart = "${sleep-lock-monitor}/bin/wily-sleep-lock-monitor";
       Restart = "always";
@@ -177,7 +197,12 @@ in
     iproute2 # `ip` supplies the network panel's active route and counters
     iputils # `ping` supplies the network panel's latency and loss samples
     libnotify # notify-send smoke tests and CLI desktop notifications
+    niri # second compositor; the same Quickshell config runs under either
     # proton-pass # unsupported on aarch64-linux; enable in the ThinkPad config
     quickshell
+    # niri's nightlight backend. Hyprland dropped wlr-gamma-control for its own
+    # CTM protocol, which is what hyprsunset speaks and this does not, so the
+    # two are not interchangeable -- each compositor gets its own.
+    wl-gammarelay-rs
   ];
 }

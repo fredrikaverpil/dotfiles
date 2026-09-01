@@ -1,12 +1,14 @@
 // Nightlight, ported from Omarchy's service at this path, plus the solar
 // schedule they leave to hand-written hyprsunset profiles. hyprsunset takes
 // fixed clock times only, so the schedule lives here and hyprsunset.conf
-// stays inert.
+// stays inert. The daemon underneath differs per compositor and is the only
+// part that does -- see Ui/Compositor.qml's nightlightBackend.
 
 import QtQuick
 import Quickshell
 import Quickshell.Io
 
+import "../../../Ui" as Ui
 import "NightlightModel.js" as NightlightModel
 
 Item {
@@ -55,6 +57,8 @@ Item {
   function setNightlight(value) { setMode(value ? "on" : "off") }
   function toggle() { setNightlight(!enabled) }
 
+  readonly property var backend: Ui.Compositor.nightlightBackend
+
   // Runs every minute: crosses the solar boundary, expires a manual override
   // on the far side of it, and re-asserts the temperature. That last part is
   // also what heals hyprsunset's own morning `identity` profile, which
@@ -77,10 +81,10 @@ Item {
     root.stateLoaded = true
 
     // Upstream's guard, and it does more than order the writes: the apply
-    // command starts hyprsunset when none is running, and that check is not
+    // command starts the daemon when none is running, and that check is not
     // atomic. Two applies overlapping while it is coming up each launch one,
-    // and the loser exits with "A CTM manager is already running" plus a
-    // stack trace in the journal. Seen live.
+    // and the hyprsunset loser exits with "A CTM manager is already running"
+    // plus a stack trace in the journal. Seen live.
     if (applyProcess.running) {
       root.pendingTemperature = temp
       root.hasPendingTemperature = true
@@ -93,19 +97,20 @@ Item {
   function runApply(temp) {
     // Upstream's retry loop, from bin/omarchy-toggle-nightlight: a freshly
     // started hyprsunset applies its own default at the end of its boot and
-    // overwrites anything set before then.
+    // overwrites anything set before then. wl-gammarelay-rs has no such
+    // window, but it is equally cheap to wait for it to claim its bus name.
     applyProcess.command = ["bash", "-lc",
-      "pgrep -x hyprsunset >/dev/null || { setsid uwsm-app -- hyprsunset >/dev/null 2>&1 & sleep 1; }; " +
+      backend.running + " || { " + backend.launch + " >/dev/null 2>&1 & sleep 1; }; " +
       "for _ in $(seq 10); do " +
-      "hyprctl hyprsunset temperature " + Number(temp) + " >/dev/null 2>&1; sleep 0.2; " +
-      "[ \"$(hyprctl hyprsunset temperature 2>/dev/null | grep -oE '[0-9]+' | head -n1)\" = \"" +
+      backend.set + Number(temp) + " >/dev/null 2>&1; sleep 0.2; " +
+      "[ \"$(" + backend.get + " 2>/dev/null | grep -oE '[0-9]+' | head -n1)\" = \"" +
       Number(temp) + "\" ] && break; done"]
     applyProcess.running = true
   }
 
   Process {
     id: probe
-    command: ["hyprctl", "hyprsunset", "temperature"]
+    command: root.backend.probe
     stdout: StdioCollector {
       waitForEnd: true
       onStreamFinished: {

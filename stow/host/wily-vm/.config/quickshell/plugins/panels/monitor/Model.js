@@ -86,6 +86,40 @@ function availableScales(scales, width, height) {
 
 // GTK draws its own UI at whole factors only, so a fractional monitor scale
 // still has to pick an integer here. Upstream persists the same rounding.
+// The two compositors' monitor queries folded into one shape. hyprctl lists
+// every monitor and flags the focused one; `niri msg -j focused-output`
+// answers with that one output directly, or null.
+function focusedMonitor(raw, niri) {
+  var parsed
+  try {
+    parsed = JSON.parse(String(raw || ""))
+  } catch (error) {
+    return null
+  }
+
+  if (!niri) {
+    if (!Array.isArray(parsed)) return null
+    return parsed.find(function (m) { return m && m.focused })
+      || parsed.find(function (m) { return m && Number(m.width) > 0 })
+      || null
+  }
+
+  if (!parsed || !parsed.logical || parsed.current_mode === null
+      || parsed.current_mode === undefined) return null
+  var mode = (parsed.modes || [])[parsed.current_mode]
+  if (!mode) return null
+
+  return {
+    name: parsed.name,
+    width: mode.width,
+    height: mode.height,
+    // niri reports millihertz; hyprctl reports Hz, which is what the mode
+    // string handed back to the compositor has to be in.
+    refreshRate: mode.refresh_rate / 1000,
+    scale: parsed.logical.scale
+  }
+}
+
 function gdkScale(scale) {
   var n = Number(scale)
   if (!isFinite(n) || n < 1) return 1
@@ -134,6 +168,30 @@ function demo() {
   assert.strictEqual(gdkScale(2), 2)
   assert.strictEqual(gdkScale("nonsense"), 1)
 
+  // Both monitor shapes normalize to the same fields.
+  var hypr = focusedMonitor(JSON.stringify([
+    { name: "eDP-1", width: 1920, height: 1080, refreshRate: 60, scale: 1, focused: false },
+    { name: "Virtual-1", width: 1280, height: 800, refreshRate: 60, scale: 2, focused: true }
+  ]), false)
+  assert.deepStrictEqual(hypr, {
+    name: "Virtual-1", width: 1280, height: 800, refreshRate: 60, scale: 2, focused: true
+  })
+
+  var niri = focusedMonitor(JSON.stringify({
+    name: "Virtual-1",
+    modes: [{ width: 1920, height: 1080, refresh_rate: 59997 },
+            { width: 1280, height: 800, refresh_rate: 60000 }],
+    current_mode: 1,
+    logical: { x: 0, y: 0, width: 640, height: 400, scale: 2 }
+  }), true)
+  assert.deepStrictEqual(niri, {
+    name: "Virtual-1", width: 1280, height: 800, refreshRate: 60, scale: 2
+  })
+
+  // A disabled output, and unparseable output, are both "no monitor".
+  assert.strictEqual(focusedMonitor(JSON.stringify(null), true), null)
+  assert.strictEqual(focusedMonitor("not json", false), null)
+
   console.log("ok")
 }
 
@@ -143,6 +201,7 @@ if (typeof module !== "undefined") {
     cleanScale: cleanScale,
     matchingScaleIndex: matchingScaleIndex,
     availableScales: availableScales,
+    focusedMonitor: focusedMonitor,
     gdkScale: gdkScale
   }
   if (require.main === module) demo()
