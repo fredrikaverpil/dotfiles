@@ -19,6 +19,7 @@ let
       "dustinblackman/tap"
       # "joshmedeski/sesh"
       "1password/tap"
+      "barutsrb/tap"
       # "sst/tap" # for opencode
     ]
     ++ config.host.extraTaps
@@ -101,6 +102,7 @@ in
         "gitify"
         "obs"
         "obsidian"
+        "omniwm"
         "proton-pass"
         "raycast"
         "signal"
