@@ -75,11 +75,16 @@ PanelWindow {
   // The surface owns the screen except the bar.
   mask: modalMask
   WlrLayershell.layer: WlrLayer.Overlay
-  // Exclusive reliably acquires focus on every open. Settle on OnDemand as
-  // soon as it has mapped so the compositor can route pointer input through
-  // the bar-strip cutout to the bar below.
+  // Exclusive reliably acquires focus on every open. On Hyprland it then has to
+  // settle on OnDemand, or the compositor routes pointer input to this surface
+  // despite the bar-strip cutout and the bar below stops responding. niri
+  // routes the pointer by the input region either way, and demoting there
+  // hands the keyboard straight back to the window underneath -- an open
+  // launcher that cannot be typed into.
   WlrLayershell.keyboardFocus: shown
-    ? (focusPrimed ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive)
+    ? (focusPrimed && !Compositor.niri
+        ? WlrKeyboardFocus.OnDemand
+        : WlrKeyboardFocus.Exclusive)
     : WlrKeyboardFocus.None
 
   Timer {

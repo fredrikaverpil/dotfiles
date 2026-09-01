@@ -17,13 +17,14 @@ Ui.Panel {
   cardHeight: wide ? 640 : 420
 
   // Keybindings. hyprland.lua writes this as it registers each bind, because
-  // `hyprctl binds` cannot name a code: chord -- see that file. Watched, so a
+  // `hyprctl binds` cannot name a code: chord -- see that file; niri's
+  // config.kdl sed's the same columns out of itself at startup. Watched, so a
   // config reload refreshes the sheet without restarting the shell.
   property var binds: []
 
   FileView {
     id: bindsFile
-    path: Quickshell.env("HOME") + "/.local/state/hypr-binds.tsv"
+    path: Quickshell.env("HOME") + "/.local/state/wm-binds.tsv"
     watchChanges: true
     printErrors: false
     onFileChanged: reload()

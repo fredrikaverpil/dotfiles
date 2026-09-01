@@ -1,7 +1,12 @@
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
 
+import "../../../Ui" as Ui
+
+// The visuals; the data comes from whichever compositor is up. The source is
+// loaded by URL rather than by type so the unused one is never compiled --
+// Quickshell.Hyprland connects on import, and there is no socket for it under
+// niri.
 Item {
   id: root
 
@@ -9,21 +14,15 @@ Item {
   property color selection: "#3D4042"
   property real fontScale: 1
 
-  function workspaceById(id) {
-    const values = Hyprland.workspaces.values
-    for (let i = 0; i < values.length; i++) {
-      if (values[i].id === id) return values[i]
-    }
-
-    return null
-  }
-
+  // 1..5 always shown, as Omarchy does, plus any further workspace that
+  // exists. niri numbers its workspaces per output from 1, so the same range
+  // reads the same way under both.
   function workspaceIds() {
     const ids = [1, 2, 3, 4, 5]
-    const values = Hyprland.workspaces.values
+    const live = source.item ? source.item.ids : []
 
-    for (let i = 0; i < values.length; i++) {
-      const id = values[i].id
+    for (let i = 0; i < live.length; i++) {
+      const id = live[i]
       if (id > 0 && id <= 10 && ids.indexOf(id) === -1) ids.push(id)
     }
 
@@ -32,9 +31,7 @@ Item {
   }
 
   function focusWorkspace(id) {
-    Quickshell.execDetached([
-      "hyprctl", "dispatch", "hl.dsp.focus({ workspace = \"" + id + "\" })",
-    ])
+    Quickshell.execDetached(Ui.Compositor.focusWorkspace(id))
   }
 
   implicitWidth: workspaces.implicitWidth
@@ -42,20 +39,23 @@ Item {
   width: implicitWidth
   height: implicitHeight
 
+  Loader {
+    id: source
+    source: Ui.Compositor.niri ? "WorkspacesNiri.qml" : "WorkspacesHyprland.qml"
+  }
+
   Row {
     id: workspaces
     spacing: 2
 
     Repeater {
-      model: root.workspaceIds()
+      model: source.item ? root.workspaceIds() : []
 
       delegate: Rectangle {
         required property int modelData
 
-        readonly property var workspace: root.workspaceById(modelData)
-        readonly property bool occupied: workspace !== null && workspace.toplevels.values.length > 0
-        readonly property bool focused: Hyprland.focusedWorkspace !== null
-          && Hyprland.focusedWorkspace.id === modelData
+        readonly property bool occupied: source.item.occupied(modelData)
+        readonly property bool focused: source.item.focusedId === modelData
 
         width: 20
         height: 24

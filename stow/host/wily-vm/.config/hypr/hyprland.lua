@@ -254,8 +254,10 @@ if not ok then
 end
 
 -- Written atomically: Hyprland re-runs this file on every config change, and
--- the cheatsheet may be reading it while that happens.
-local path = os.getenv("HOME") .. "/.local/state/hypr-binds.tsv"
+-- the cheatsheet may be reading it while that happens. niri's config.kdl
+-- extracts the same two columns into the same file, so the cheatsheet reads
+-- one path under either compositor.
+local path = os.getenv("HOME") .. "/.local/state/wm-binds.tsv"
 local out = io.open(path .. ".tmp", "w")
 if out then
   out:write(table.concat(binds, "\n"), "\n")

@@ -1,9 +1,13 @@
 # wily-vm
 
-Throwaway NixOS VM used to build up a Hyprland + Quickshell desktop before it
-lands on the real machine (ThinkPad T14 G6, Core Ultra 7 258V / Lunar Lake,
-x86_64). Keep the config portable — nothing VM-specific outside the notes
-below.
+Throwaway NixOS VM used to build up a Quickshell desktop before it lands on the
+real machine (ThinkPad T14 G6, Core Ultra 7 258V / Lunar Lake, x86_64). Keep
+the config portable — nothing VM-specific outside the notes below.
+
+**Two compositors are installed, Hyprland and niri, and one shell runs under
+either.** `hypr` and `niri` at the console start them; they are alternatives,
+never concurrent. Hyprland is the one with history here, so anything below that
+does not say otherwise was established under it. See "Running under niri".
 
 This file is worked on as the setup grows — update it in the same commit as
 the change it describes. Worth writing down: a fact that cost time to
@@ -214,8 +218,8 @@ symlinks into the repo, so nothing real is lost) and run it again.
   `--adopt`, the next restow adopts the copy *into* `stow/` instead of
   restoring the link. After letting any such tool touch `.config/hypr` or
   `.config/quickshell`, check with `stat -c %F` before restowing.
-- **stow** — the `stow/host/wily-vm/` package carries the Hyprland config and
-  Quickshell QML (`.config/{hypr,quickshell}/`) plus the vendored fonts and
+- **stow** — the `stow/host/wily-vm/` package carries both compositor configs
+  and the Quickshell QML (`.config/{hypr,niri,quickshell}/`) plus the vendored fonts and
   icons (`.local/share/{fonts,icons}/`); wily-vm is the only desktop Linux host.
   `hypr/monitors.lua` supplies the monitor and GDK scales which the display
   panel updates. `shell.qml` owns the palette, menu entry table, instantiations
@@ -286,6 +290,11 @@ session, no compositor change and no rebuild.
 - **The compositor config is the durable asset.** `hyprland.lua`,
   `monitors.lua` and the keymap belong to Hyprland and outlive any shell.
   The one coupled part is every bind that calls `qs ipc call …`.
+- **The converse holds too, and is now exercised**: the shell survives a
+  change of compositor. Adding niri needed five command sites changed, all of
+  them now in `Ui/Compositor.qml`; the lock, polkit, notification and idle
+  services were untouched, because each is a Wayland protocol or a D-Bus name
+  rather than a Hyprland feature.
 - **Wholesale swap yes, cherry-picking one panel no.** Noctalia v5 installs
   exactly one binary, `bin/noctalia`, and its C++ rewrite dropped Qt and QML
   entirely — so there is neither a component to run on its own nor source to
@@ -309,6 +318,138 @@ second is a compositor plus single-purpose daemons — a notification daemon, a
 locker, an idle daemon, a tray — stitched together, and that is what filling a
 Quickshell gap from outside actually costs, since no piece of a rival shell can
 be borrowed on its own.
+
+## Running under niri
+
+`niri` at the console starts it, from the same `shell/sourcing.sh` block as
+`hypr`. Both go through uwsm, so the shell's systemd unit, its inherited PATH,
+`uwsm-app` launching and `uwsm stop` logout all work identically. Two details
+that are not interchangeable:
+
+- **The bare binary is started, not `niri.desktop`.** That entry execs
+  `niri-session`, which builds a systemd session of its own and would collide
+  with the one uwsm is building. The instance name follows from the executable,
+  so the units are `wayland-wm@niri.service` and `wayland-session@niri.target`
+  — both named in `desktop.nix` alongside their `hyprland.desktop` twins. The
+  shell function forwards arguments to the real binary, so `niri msg …` from an
+  interactive shell still reaches it rather than starting a session.
+- **`uwsm finalize` has to name `NIRI_SOCKET`.** It exports `WAYLAND_DISPLAY`
+  on its own, but the shell runs as a separate unit and gets nothing else from
+  the compositor. Without that export `niri msg` fails inside the shell *and*
+  `Ui/Compositor.qml` decides it is on Hyprland, so every compositor call goes
+  to `hyprctl` and silently does nothing.
+
+**`Ui/Compositor.qml` is the whole coupling** — a Quickshell singleton keyed on
+`NIRI_SOCKET`, holding the five commands that differ and nothing else. Adding a
+compositor means editing that file, not the services:
+
+| What | Hyprland | niri |
+| --- | --- | --- |
+| DPMS | `hyprctl dispatch hl.dsp.dpms(…)` | `niri msg action power-{on,off}-monitors` |
+| Close window | `hl.dsp.window.close()` | `niri msg action close-window` |
+| Focus workspace | `hl.dsp.focus{workspace=…}` | `niri msg action focus-workspace N` |
+| Monitor query | `hyprctl -j monitors` | `niri msg -j focused-output` |
+| Scale | `hyprctl eval hl.monitor{}` | `niri msg output <name> scale <s>` |
+| Nightlight | hyprsunset | wl-gammarelay-rs |
+
+`Model.focusedMonitor()` folds the two monitor shapes together; niri answers
+with the focused output directly rather than a list with a flag on it, and
+reports refresh rate in millihertz.
+
+**Panel keyboard focus does not demote under niri.** `Ui/Panel.qml` opens every
+overlay `Exclusive` and then settles on `OnDemand`, because Hyprland otherwise
+routes pointer input to the panel despite the bar-strip cutout. niri drops the
+keyboard the instant that demotion lands — `niri msg -j layers` shows the
+Overlay surface at `OnDemand` while `niri msg -j focused-window` still names the
+window underneath — so the launcher opens with its search field unable to
+receive a keystroke. The prime is therefore Hyprland-only; under niri the
+surface stays `Exclusive` for as long as it is shown, and `focused-window` goes
+`null`. niri routes the pointer by the input region regardless of
+keyboard-interactivity, so the cutout is unaffected.
+
+**The workspaces widget is the one thing that could not be a branch.**
+Quickshell has no niri module, so `WorkspacesNiri.qml` reads
+`niri msg -j event-stream` itself. `Workspaces.qml` loads one of the two
+sources **by URL**, not by type: naming `WorkspacesHyprland` in QML would
+compile it, and `import Quickshell.Hyprland` connects at import against a
+socket that is not there. niri's workspace objects carry no window count, so
+occupancy is counted from the window events, and any window event that cannot
+be applied incrementally re-asks `niri msg -j windows` instead.
+
+**Nightlight is two daemons, not one with a flag.** Hyprland dropped
+`wlr-gamma-control-unstable-v1` in favour of its own `hyprland-ctm-control-v1`,
+which is what hyprsunset speaks; niri implements the wlr protocol and not the
+CTM one. So neither tool works on the other compositor. Everything above the
+daemon is shared: `NightlightModel.js`, the solar schedule, the one-minute
+tick, the override expiry and the serialize-and-retry apply are all unchanged,
+because the backend is three shell fragments (`running`, `launch`, `set`,
+`get`) in `Ui/Compositor.qml`. `pgrep -f`, not `-x`, for wl-gammarelay-rs:
+`/proc` truncates `comm` to 15 characters, so the name reads
+`wl-gammarelay-r` and an exact match never hits.
+
+**The cheatsheet reads `~/.local/state/wm-binds.tsv` under both.**
+`hyprland.lua` writes it as it registers each bind; niri's config is
+declarative, so `config.kdl` sed's the two columns out of itself at startup —
+which is why every bind there carries a `hotkey-overlay-title`. The extractor
+deletes `^spawn-at-startup` lines first, or the line holding the sed script
+matches its own pattern.
+
+**The display panel writes `config.kdl` in place.** niri reloads on save, so
+writing the file is also applying it; the apply-then-persist pair is kept
+anyway because `niri msg output` is explicitly temporary. Both rewritten values
+— `scale` and `GDK_SCALE` — are alone on their line and appear exactly once in
+the file, which is what makes the `sed -E` safe. **The `output` block's
+connector name must match `niri msg -j outputs`** (`Virtual-1` for this VM's
+virtio-gpu) or the block is inert and a chosen scale lasts only until restart.
+
+**Portals need `xdg.portal.config.niri.default`.** Nothing declares a backend
+for `XDG_CURRENT_DESKTOP=niri`, and with no implementation every portal call
+fails — including the Settings one carrying `org.freedesktop.appearance`, which
+is what drives the light/dark toggle. xdph is Hyprland-only, so gtk is the
+whole answer; screencast under niri would want xdg-desktop-portal-gnome.
+
+### Two ways niri is worse here, both upstream
+
+- **A locker restart under an active lock is unrecoverable**
+  ([niri#2986](https://github.com/YaLTeR/niri/issues/2986)). Hyprland's
+  equivalent has an escape hatch — `hyprctl eval
+  "hl.clear_crashed_lockscreen()"`, see "Losing the lock surface" — and niri
+  has none: exiting the whole session is the only way out. This is exactly the
+  rsync-while-locked path, and Quickshell hot-reloads on any file it has
+  loaded, so **unlock before rsyncing under niri** is not advice, it is the
+  only recovery.
+- **Locking is refused while the outputs are powered off**
+  ([niri#205](https://github.com/YaLTeR/niri/issues/205)): niri cannot submit
+  the blank frame the lock waits for. That is the mirror of Hyprland's "do not
+  drive DPMS while the lock is being acquired" rule rather than a relief from
+  it — the ordering constraint inverts, it does not go away. Neither has been
+  reproduced here yet.
+
+### Dropped from the keymap
+
+niri is scrollable-tiling, so a chunk of Omarchy's SUPER layer has no target
+and is simply absent from `config.kdl`: the scratchpad pair (`SUPER + S`,
+`SUPER + grave` and their move variants), `SUPER + J` toggle split, `SUPER + P`
+pseudo, workspace 10 (niri indexes from 1 with no tenth key bound), the
+per-group window index binds, and the `SUPER + drag` move/resize mouse binds —
+niri has no configurable pointer drag. `SUPER + CTRL + ALT + I` (keep this
+window awake) goes too: it rides on Hyprland window tags and an
+`idle_inhibit` window rule, neither of which niri has. Groups map onto columns
+approximately — `SUPER + G` is `toggle-column-tabbed-display` and
+`SUPER + ALT + LEFT/RIGHT` are consume/expel — which is close enough to keep
+the chord and the wording, not close enough to call it the same feature.
+
+**The cursor is niri's default.** The stowed `macOS-hypr` theme is Hyprcursor
+data, and niri reads XCursor only.
+
+### Not yet verified
+
+Nothing in this section has run: niri needs a rebuild first. Static checks that
+did pass — `niri validate` on `config.kdl` (from `nix shell nixpkgs#niri`), the
+bind extractor against the real file (71 rows, no self-match),
+`node Model.js`, and evaluation of the whole host. Everything else, starting
+with whether the shell comes up at all under `wayland-session@niri.target`, is
+open.
 
 ## Hyprland config is Lua, not .conf
 
@@ -362,7 +503,7 @@ Gotchas found the hard way:
   an opaque registry index for `arg`. So hyprctl can list the binds and
   their descriptions, and can tell you neither the chord nor the action.
   `hyprland.lua` therefore records its own chords to
-  `~/.local/state/hypr-binds.tsv` as it registers them, and the cheatsheet
+  `~/.local/state/wm-binds.tsv` as it registers them, and the cheatsheet
   reads that. A bare `hl.bind()` that skips the local `bind()` helper
   registers fine and is invisible in the cheatsheet. (Omarchy solves the
   same problem by re-evaluating `hyprland.lua` in a fake-`hl` Lua sandbox
@@ -737,7 +878,7 @@ Reachable as `qs ipc call menu toggle|open|close` and `level <id>`; bound to
 level directly.
 
 The keybinding sheet is the `binds` provider, reading
-`~/.local/state/hypr-binds.tsv` through a `FileView` with `watchChanges`, so a
+`~/.local/state/wm-binds.tsv` through a `FileView` with `watchChanges`, so a
 config reload refreshes it without restarting the shell. Rows carry a `chord`
 instead of an icon, which is also what widens the window for that level — 28
 characters of chord before the description starts, and ~100 rows. It is
@@ -774,10 +915,13 @@ displace them.
 The top bar's `plugins/bar/widgets/Workspaces.qml` is a pared-down port of
 Omarchy's file at the same path. It shows 1–5 even when empty, adds existing
 normal workspaces through 10, dims empty ones, and outlines the focused one (the
-digit stays visible, unlike Omarchy's glyph substitution). It reads Quickshell's
-`Hyprland` singleton rather than polling `hyprctl`; clicking an indicator
-dispatches the same `hl.dsp.focus({ workspace = ... })` action as `SUPER + 1`
-through `SUPER + 0`.
+digit stays visible, unlike Omarchy's glyph substitution). Clicking an indicator
+dispatches the same action as `SUPER + 1` through `SUPER + 0`.
+
+The data source is per compositor and lives beside it —
+`WorkspacesHyprland.qml` reads Quickshell's `Hyprland` singleton rather than
+polling `hyprctl`, `WorkspacesNiri.qml` reads niri's event stream. See "Running
+under niri" for why the choice is a URL and not a type.
 
 `hl.animation({ leaf = "workspaces", enabled = false })` is Omarchy's exact
 setting for instant workspace changes. It is deliberately a workspace leaf,
@@ -804,7 +948,8 @@ gone, so theme and nightlight now live together with their display-adjacent
 controls.
 
 Scale applies the output's current mode with `hyprctl eval`, then persists to
-the Stow-linked `~/.config/hypr/monitors.lua`. **Use
+the Stow-linked `~/.config/hypr/monitors.lua` (under niri:
+`niri msg output` and `~/.config/niri/config.kdl`). **Use
 `sed -i --follow-symlinks` there.** Plain GNU `sed -i` replaces the link with a
 regular file, which Stow cannot own on the next activation; following it keeps
 the relative link and updates its repository target. Shared `hyprland.lua`
@@ -818,7 +963,8 @@ it. The panel offers 80–150%. It deliberately leaves Ghostty alone: its config
 is shared with macOS through `stow/shared`, so rewriting it would dirty the
 repo and make a Linux setting follow the user to the Mac.
 
-Verified live: `qs ipc call display open` identifies Virtual-1 at 1280×800;
+Verified live under Hyprland: `qs ipc call display open` identifies Virtual-1
+at 1280×800;
 the text-scale watch reports a 1.25 dconf write immediately; and applying 1.6,
 rewriting the host file, then `hyprctl reload` retains 1.6. The test resets the
 VM and host file to scale/GDK scale 1 afterwards.
@@ -943,6 +1089,9 @@ runnable as `node NightlightModel.js` — which is how upstream tests its
 `*Model.js` files, and which caught a sign error on longitude that put sunrise
 2h25m out. Polar day and night have no solution to that equation, so
 `solarPeriod` falls back to the hemisphere and the month there.
+
+Under niri the daemon is wl-gammarelay-rs instead, and only the daemon
+changes; see "Running under niri".
 
 Reachable as `qs ipc call nightlight toggle|enable|disable|auto|status` and
 bound to `SUPER + CTRL + N`. `enable`/`disable` rather than `on`/`off`, which

@@ -8,6 +8,8 @@ import Quickshell.Io
 import Quickshell.Services.Pam
 import Quickshell.Wayland
 
+import "../../Ui" as Ui
+
 Item {
   id: root
 
@@ -91,9 +93,7 @@ Item {
     // not.
     if (dpmsProcess.running || blanked !== on) return
     blanked = !on
-    // hyprctl dispatch takes Lua on 0.56; the hyprlang form "dpms off" is a
-    // parse error that only shows up on hyprctl's stdout, which nothing reads.
-    dpmsProcess.command = ["hyprctl", "dispatch", on ? 'hl.dsp.dpms("on")' : 'hl.dsp.dpms("off")']
+    dpmsProcess.command = Ui.Compositor.dpms(on)
     dpmsProcess.running = true
   }
 

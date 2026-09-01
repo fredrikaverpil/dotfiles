@@ -32,17 +32,7 @@ Ui.Panel {
   }
 
   function setMonitorState(raw) {
-    var monitors = []
-    try {
-      monitors = JSON.parse(String(raw || ""))
-    } catch (error) {
-      monitors = []
-    }
-
-    if (!Array.isArray(monitors)) monitors = []
-    focusedMonitor = monitors.find(monitor => monitor && monitor.focused)
-      || monitors.find(monitor => monitor && Number(monitor.width) > 0)
-      || null
+    focusedMonitor = Model.focusedMonitor(raw, Ui.Compositor.niri)
   }
 
   function setScale(requested) {
@@ -57,30 +47,16 @@ Ui.Panel {
 
     pendingScale = scale
     scaleChanging = true
-    applyScale.command = [
-      "hyprctl",
-      "eval",
-      "hl.monitor({ output = " + JSON.stringify(focusedMonitor.name) +
-        ", mode = " + JSON.stringify(mode) +
-        ", position = \"auto\", scale = " + scale + " })",
-    ]
+    applyScale.command = Ui.Compositor.setScale(focusedMonitor.name, mode, scale)
     applyScale.running = true
   }
 
   function persistScale(scale) {
     // GNU sed ordinarily replaces a symlink with a regular file. Following it
     // keeps this host's Stow link intact while atomically updating its target.
-    persistScaleProcess.command = [
-      "sed",
-      "-i",
-      "--follow-symlinks",
-      "-E",
-      "-e",
-      "s|^local wily_monitor_scale = .*|local wily_monitor_scale = " + scale + "|",
-      "-e",
-      "s|^local wily_gdk_scale = .*|local wily_gdk_scale = " + Model.gdkScale(scale) + "|",
-      Quickshell.env("HOME") + "/.config/hypr/monitors.lua",
-    ]
+    persistScaleProcess.command = ["sed", "-i", "--follow-symlinks", "-E"]
+      .concat(Ui.Compositor.scaleEdits(scale, Model.gdkScale(scale)))
+      .concat([Ui.Compositor.scaleConfig])
     persistScaleProcess.running = true
   }
 
@@ -103,7 +79,7 @@ Ui.Panel {
 
   Process {
     id: monitorState
-    command: ["hyprctl", "-j", "monitors"]
+    command: Ui.Compositor.outputs()
     stdout: StdioCollector {
       waitForEnd: true
       onStreamFinished: root.setMonitorState(text)

@@ -16,6 +16,23 @@ if [ -e /etc/NIXOS ]; then
 		}
 	fi
 
+	# Started as the bare binary, not niri.desktop: that entry execs
+	# niri-session, which sets up a systemd session of its own and would
+	# collide with the one uwsm is building. The instance name follows from
+	# the executable, so the units are wayland-wm@niri.service and
+	# wayland-session@niri.target -- both named in wily-vm's desktop.nix.
+	# Arguments are forwarded so `niri msg ...` still reaches the real binary.
+	if command -v uwsm >/dev/null 2>&1 && command -v niri >/dev/null 2>&1; then
+		function niri() {
+			if [ "$#" -gt 0 ]; then
+				command niri "$@"
+				return
+			fi
+			uwsm check may-start || return
+			uwsm start -e -D niri -- niri
+		}
+	fi
+
 	# Plasma runs its own systemd user session, so it is started directly
 	# rather than through UWSM.
 	if command -v startplasma-wayland >/dev/null 2>&1; then
