@@ -242,6 +242,36 @@ in
           # Install System data files & security updates
           CriticalUpdateInstall = 1;
         };
+
+        # Free up ctrl-space / ctrl-opt-space (input source switching) for other apps.
+        "com.apple.symbolichotkeys" = {
+          AppleSymbolicHotKeys = {
+            # Select the previous input source (ctrl-space).
+            "60" = {
+              enabled = false;
+              value = {
+                parameters = [
+                  32
+                  49
+                  262144
+                ];
+                type = "standard";
+              };
+            };
+            # Select next source in Input menu (ctrl-opt-space).
+            "61" = {
+              enabled = false;
+              value = {
+                parameters = [
+                  32
+                  49
+                  786432
+                ];
+                type = "standard";
+              };
+            };
+          };
+        };
       };
     };
 
