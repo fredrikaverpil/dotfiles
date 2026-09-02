@@ -76,6 +76,12 @@ binds {
     Mod+Ctrl+I hotkey-overlay-title="Toggle idle locking" { spawn "qs" "ipc" "call" "idle" "toggle"; }
     Mod+Ctrl+L hotkey-overlay-title="Lock system" { spawn "qs" "ipc" "call" "lock" "lock"; }
 
+    // Media. allow-when-locked keeps volume working on the lock screen; niri
+    // repeats a held bind by default.
+    XF86AudioRaiseVolume allow-when-locked=true hotkey-overlay-title="Volume up" { spawn "qs" "ipc" "call" "audio" "up"; }
+    XF86AudioLowerVolume allow-when-locked=true hotkey-overlay-title="Volume down" { spawn "qs" "ipc" "call" "audio" "down"; }
+    XF86AudioMute allow-when-locked=true repeat=false hotkey-overlay-title="Mute" { spawn "qs" "ipc" "call" "audio" "mute"; }
+
     // Windows
     Mod+W hotkey-overlay-title="Close window" { close-window; }
     Mod+Q hotkey-overlay-title="Close window" { close-window; }

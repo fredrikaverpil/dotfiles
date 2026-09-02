@@ -144,6 +144,12 @@ local ok, err = pcall(function()
   bind("SUPER + CTRL + ALT + I", "Keep this window awake", hl.dsp.exec_cmd(stay_awake))
   bind("SUPER + CTRL + L", "Lock system", hl.dsp.exec_cmd("qs ipc call lock lock"))
 
+  -- Media. `locked` keeps volume working on the lock screen, `repeating` makes
+  -- a held key keep stepping; both go straight through to hl.bind.
+  bind("XF86AudioRaiseVolume", "Volume up", hl.dsp.exec_cmd("qs ipc call audio up"), { locked = true, repeating = true })
+  bind("XF86AudioLowerVolume", "Volume down", hl.dsp.exec_cmd("qs ipc call audio down"), { locked = true, repeating = true })
+  bind("XF86AudioMute", "Mute", hl.dsp.exec_cmd("qs ipc call audio mute"), { locked = true })
+
   -- Windows
   bind("SUPER + W", "Close window", hl.dsp.window.close())
   bind("SUPER + Q", "Close window", hl.dsp.window.close())
