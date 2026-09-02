@@ -881,6 +881,12 @@ the first of these.
   canonical one. The bar is a shortcut to it, never the only way in — this
   shell is keyboard-first, and a mouse-only affordance is a missing feature.
   Panels reached from the bar set `keyNavigation` for the same reason.
+- **A button whose actions are already a launcher level opens that level**
+  rather than growing a panel. The power button is `menu.toggleLevel("system")`
+  — the level already holds lock, keep-awake, suspend, logout, reboot and
+  shutdown, `SUPER + ESCAPE` already goes there, and the menu already has
+  search and list navigation. A panel is for state a list cannot show: a
+  toggle grid, live readouts, per-row controls.
 
 Upstream's equivalent is a single `omarchy.indicators` widget holding `Dnd`,
 `NightLight`, `StayAwake` and friends as a cluster. Same idea; a per-button

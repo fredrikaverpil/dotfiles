@@ -105,9 +105,21 @@ Scope {
         text: Qt.formatDateTime(clock.date, "ddd d MMM  HH:mm:ss")
       }
 
+      // Opens the launcher at its system level rather than owning a panel:
+      // that level already holds lock, idle, suspend, logout, reboot and
+      // shutdown, and SUPER + ESCAPE already goes there.
+      BarButton {
+        id: powerButton
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: 4
+        label: "󰐥"
+        onActivated: bar.shell.menu.toggleLevel("system")
+      }
+
       BarButton {
         id: notificationButton
-        anchors.right: parent.right
+        anchors.right: powerButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
         label: bar.shell.notifications.doNotDisturb ? "󰂛" : "󰂚"
