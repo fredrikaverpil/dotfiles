@@ -11,6 +11,7 @@ import Quickshell.Io
 import Quickshell.Services.Notifications
 import Quickshell.Wayland
 
+import "../../Ui" as Ui
 import "components"
 import "NotificationLogic.js" as NotificationLogic
 
@@ -24,8 +25,7 @@ Item {
 
   property bool stateLoaded: false
   property bool doNotDisturb: false
-  property bool historyShown: false
-  readonly property bool shown: historyShown
+  readonly property alias historyShown: historyPanel.shown
   property var popupRows: []
   property var historyRows: []
   property var live: ({})
@@ -195,20 +195,11 @@ Item {
     for (var index = 0; index < rows.length; index++) dismiss(rows[index])
   }
 
-  function close() {
-    historyShown = false
-  }
+  function close() { historyPanel.close() }
 
-  function showHistory() {
-    if (shell && shell.registerPanel) shell.registerPanel(root)
-    if (shell && shell.claimPanel) shell.claimPanel(root)
-    historyShown = true
-  }
+  function showHistory() { historyPanel.open() }
 
-  function toggleHistory() {
-    if (historyShown) close()
-    else showHistory()
-  }
+  function toggleHistory() { historyPanel.toggle() }
 
   onDoNotDisturbChanged: saveState()
 
@@ -216,7 +207,6 @@ Item {
   // defaults writable immediately, then let a later load replace them when a
   // persisted state already exists.
   Component.onCompleted: {
-    if (shell && shell.registerPanel) shell.registerPanel(root)
     stateLoaded = true
     stateFile.reload()
   }
@@ -340,145 +330,118 @@ Item {
     }
   }
 
-  PanelWindow {
-    id: historyWindow
-    visible: root.historyShown
-    anchors { top: true; bottom: true; left: true; right: true }
-    exclusionMode: ExclusionMode.Ignore
-    color: "transparent"
-    // Keep the bell reachable: a full-screen modal surface otherwise owns its
-    // repeat click, so the bar never gets the chance to toggle this history.
-    mask: Region {
-      width: historyWindow.width
-      height: historyWindow.height
+  Ui.Panel {
+    id: historyPanel
 
-      Region {
-        width: historyWindow.width
-        height: root.shell ? root.shell.barHeight : 32
-        intersection: Intersection.Subtract
+    shell: root.shell
+    cardWidth: 620
+    cardHeight: 560
+    keyNavigation: true
+
+    RowLayout {
+      id: historyHeader
+      width: parent.width
+      spacing: 8
+
+      Text {
+        Layout.fillWidth: true
+        text: "Notifications"
+        color: root.palette.fg
+        font.family: "JetBrainsMono Nerd Font"
+        font.pixelSize: 18
       }
-    }
-    WlrLayershell.namespace: "wily-notification-history"
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-    MouseArea {
-      anchors.fill: parent
-      onClicked: root.close()
+      HeaderButton {
+        label: "Do Not Disturb"
+        active: root.doNotDisturb
+        onActivated: root.setDoNotDisturb(!root.doNotDisturb)
+      }
+
+      HeaderButton {
+        label: "Clear"
+        onActivated: root.clearHistory()
+      }
     }
 
     Rectangle {
-      id: historyPanel
-      anchors.centerIn: parent
-      width: 620
-      height: 560
-      radius: 8
-      color: root.palette.bg
-      border.color: root.palette.dim
-      border.width: 1
-
-      ColumnLayout {
-        anchors.fill: parent
-        anchors.margins: 16
-        spacing: 12
-
-        RowLayout {
-          Layout.fillWidth: true
-
-          Text {
-            Layout.fillWidth: true
-            text: "Notifications"
-            color: root.palette.fg
-            font.family: "JetBrainsMono Nerd Font"
-            font.pixelSize: 18
-          }
-
-          Text {
-            text: root.doNotDisturb ? "Do Not Disturb" : ""
-            color: root.palette.off
-            font.family: "JetBrainsMono Nerd Font"
-            font.pixelSize: 12
-          }
-
-          Rectangle {
-            width: clearLabel.implicitWidth + 14
-            height: 26
-            radius: 4
-            color: clearMouse.containsMouse ? root.palette.sel : "transparent"
-            border.color: root.palette.dim
-            border.width: 1
-
-            Text {
-              id: clearLabel
-              anchors.centerIn: parent
-              text: "Clear"
-              color: root.palette.fg
-              font.family: "JetBrainsMono Nerd Font"
-              font.pixelSize: 12
-            }
-
-            MouseArea {
-              id: clearMouse
-              anchors.fill: parent
-              hoverEnabled: true
-              cursorShape: Qt.PointingHandCursor
-              onClicked: root.clearHistory()
-            }
-          }
-        }
-
-        Rectangle {
-          Layout.fillWidth: true
-          height: 1
-          color: root.palette.dim
-        }
-
-        ListView {
-          id: historyList
-          Layout.fillWidth: true
-          Layout.fillHeight: true
-          clip: true
-          spacing: 8
-          model: root.historyRows
-
-          delegate: NotificationCard {
-            required property var modelData
-            required property int index
-
-            width: historyList.width
-            palette: root.palette
-            row: modelData
-            toast: false
-            onCloseRequested: {
-              var rows = root.historyRows.slice()
-              rows.splice(index, 1)
-              root.historyRows = rows
-              root.saveState()
-            }
-            onInvokeRequested: {}
-          }
-
-          Text {
-            anchors.centerIn: parent
-            visible: historyList.count === 0
-            text: "No recent notifications"
-            color: root.palette.off
-            font.family: "JetBrainsMono Nerd Font"
-            font.pixelSize: 14
-          }
-        }
-      }
+      id: historySeparator
+      width: parent.width
+      height: 1
+      color: root.palette.dim
     }
 
-    Item {
-      anchors.fill: parent
-      focus: root.historyShown
+    ListView {
+      id: historyList
+      width: parent.width
+      height: parent.height - historyHeader.height - historySeparator.height - 2 * parent.spacing
+      clip: true
+      spacing: 8
+      model: root.historyRows
 
-      Keys.onPressed: function(event) {
-        if (event.key !== Qt.Key_Escape) return
-        root.historyShown = false
-        event.accepted = true
+      delegate: NotificationCard {
+        required property var modelData
+        required property int index
+
+        width: historyList.width
+        palette: root.palette
+        row: modelData
+        toast: false
+        onCloseRequested: {
+          var rows = root.historyRows.slice()
+          rows.splice(index, 1)
+          root.historyRows = rows
+          root.saveState()
+        }
+        onInvokeRequested: {}
       }
+
+      Text {
+        anchors.centerIn: parent
+        visible: historyList.count === 0
+        text: "No recent notifications"
+        color: root.palette.off
+        font.family: "JetBrainsMono Nerd Font"
+        font.pixelSize: 14
+      }
+    }
+  }
+
+  // Same shape as the panels' ChoiceButton: `active` is the setting, the
+  // border carries where the keyboard is, so both stay readable at once.
+  component HeaderButton: Rectangle {
+    id: button
+
+    property string label: ""
+    property bool active: false
+    signal activated
+
+    implicitWidth: buttonLabel.implicitWidth + 14
+    implicitHeight: 26
+    radius: 4
+    color: active || buttonMouse.containsMouse ? root.palette.sel : "transparent"
+    border.color: button.activeFocus ? root.palette.fg : root.palette.dim
+    border.width: 1
+
+    activeFocusOnTab: true
+    Keys.onReturnPressed: button.activated()
+    Keys.onEnterPressed: button.activated()
+    Keys.onSpacePressed: button.activated()
+
+    Text {
+      id: buttonLabel
+      anchors.centerIn: parent
+      text: button.label
+      color: root.palette.fg
+      font.family: "JetBrainsMono Nerd Font"
+      font.pixelSize: 12
+    }
+
+    MouseArea {
+      id: buttonMouse
+      anchors.fill: parent
+      hoverEnabled: true
+      cursorShape: Qt.PointingHandCursor
+      onClicked: button.activated()
     }
   }
 }
