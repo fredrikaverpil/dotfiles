@@ -764,8 +764,10 @@ and turning acceleration *off* would remove the GLES 3.0 Hyprland depends on.
 
 ## Reference
 
-Omarchy 4 "Quattro" is the model: `github.com/basecamp/omarchy`, branch
-`quattro`, cloned at `~/code/public/github.com/basecamp/omarchy`. Its
+Omarchy 4 "Quattro" is the model: `github.com/omacom/omarchy` (the org renamed
+from `basecamp`), branch `quattro`, cloned at
+`~/code/public/github.com/omarchy` — one level shallower than the rest of that
+tree, so the usual `<org>/<repo>` guess misses it. Its
 Quickshell tree is `shell/` (`shell.qml`, `Ui/`, `plugins/`), Hyprland config
 in `config/hypr/`, and package list in `install/omarchy-base.packages`.
 Approach is vendor-and-prune: port pieces across on request rather than
@@ -881,16 +883,50 @@ the first of these.
   canonical one. The bar is a shortcut to it, never the only way in — this
   shell is keyboard-first, and a mouse-only affordance is a missing feature.
   Panels reached from the bar set `keyNavigation` for the same reason.
+  **Upstream is no help here** — their toast stack is `keyboardFocus: None` and
+  they have no history panel at all, so there is nothing of theirs to diff
+  against.
 - **A button whose actions are already a launcher level opens that level**
   rather than growing a panel. The power button is `menu.toggleLevel("system")`
   — the level already holds lock, keep-awake, suspend, logout, reboot and
   shutdown, `SUPER + ESCAPE` already goes there, and the menu already has
   search and list navigation. A panel is for state a list cannot show: a
-  toggle grid, live readouts, per-row controls.
+  toggle grid, live readouts, per-row controls. Upstream agrees on where those
+  actions live: their `system` level is aliased `power-menu` in
+  `default/omarchy/omarchy-menu.jsonc`. They just have no bar button for it.
 
-Upstream's equivalent is a single `omarchy.indicators` widget holding `Dnd`,
-`NightLight`, `StayAwake` and friends as a cluster. Same idea; a per-button
-`visible` needs no widget to hold them.
+  **`omarchy.power` is not that.** Their power *widget* is battery and power
+  profile — charge, cycles, time left, `omarchy-powerprofiles-set` — in a
+  536-line panel worth porting when the ThinkPad arrives with a battery. It
+  will want the far-right slot, which is where our power button now is; decide
+  then which of the two moves.
+
+### How Omarchy does the same thing
+
+Compared after ours was built; it converges more than it diverges.
+
+- **`shell/plugins/bar/indicators/StayAwake.qml` is our coffee**, down to the
+  `󰅶` glyph and click-to-restore. `Dnd.qml` is the same shape. Their
+  `Ui/BarIndicator.qml` is a `BarIconButton` with `active`, `activeText` /
+  `inactiveText` and `onPressed` — an indicator is a button there too.
+- **They hit the same shifting problem and solved it the same direction.**
+  `Indicators.qml:145` — *"The active block sits closest to the clock, so
+  newcomers go on the far side of it. Appending would shove everything already
+  showing sideways."*
+- **They reveal inactive indicators instead of hiding them.** Ours vanish;
+  theirs go to opacity 0, then 0.45 on hovering the cluster (`concealed`,
+  `dimmed`, `revealInactiveIndicators`), with an `alwaysShow` setting. So their
+  bar can turn Stay Awake *on*, and ours can only turn it off — discovery lives
+  in the launcher here. Deliberate: a hover-reveal is invisible to the keyboard,
+  and the launcher already lists every one of these.
+- **Their indicators sit in the centre section, left of the clock**
+  (`config/omarchy/shell.json`), because their bar layout is data and the right
+  side is full of widgets. Ours is one anchored chain, so inward off the
+  innermost fixed button is the same position by a different route.
+- **There is no bell in their bar at all** — DND is only an indicator, and both
+  its states draw `󰂛`, separated by opacity. Ours puts the state on the
+  bell that opens the history, so one slot does both jobs and reads without a
+  hover. Theirs is the more uniform: every state lives in the one cluster.
 
 ## The menu
 
@@ -1327,9 +1363,10 @@ Runnable on the VM today:
 
 - **`omarchy.indicators`** (`widgets/Indicators.qml` plus `indicators/Dnd`,
   `NightLight`, `StayAwake`, `Reminder`, `ScreenRecording`, `Dictation`) —
-  cheapest of the lot: DND and nightlight state already exist here, so this is
-  only their display. `StayAwake` is the bar affordance skipped under "Known,
-  not yet done".
+  `Dnd` and `StayAwake` are covered in our own idiom; see "The bar: every slot
+  is a button" for what we took and what we left. What is left here is
+  `NightLight` (state exists, no bar affordance), the three we have no service
+  for, and their hover-reveal of inactive indicators.
 - **`omarchy.tray`** (`widgets/Tray.qml`, `TrayModel.js`) — SNI tray. Nothing
   else in this shell surfaces a tray icon.
 - **`omarchy.audio`** (`panels/audio/`) — master slider, output-device picker,
