@@ -1134,6 +1134,9 @@ level, so no OSD exists: volume feedback is that you can hear it.
   tracker binds to the whole sink list unconditionally, so the bar icon and the
   media keys work with the panel closed.
 - Volume steps 5% per key or IPC call; `setVolume` takes a percent.
+- Media keys are bound in both compositors to the same IPC calls, and both
+  reach the shell while the screen is locked (Hyprland `{ locked = true,
+  repeating = true }`, niri `allow-when-locked=true`).
 - **Deliberately absent:** the per-app stream mixer (the bulk of Omarchy's
   1248-line panel) and the input/mic section. `Pipewire.defaultAudioSource` is
   ~20 lines away when a mic-mute key or a call habit makes it real.
@@ -1143,7 +1146,8 @@ alongside `security.rtkit`.
 
 Verified on the VM against `wpctl get-volume @DEFAULT_AUDIO_SINK@`: IPC
 up/down/mute/setVolume, and `h`/`l`/`m`/`j` from the keyboard. The Hyprland
-binds are not written yet.
+media binds are written but unexercised — the VM session runs niri, whose own
+binds passed `niri validate` and call the IPC verified above.
 
 ## Light and dark
 
