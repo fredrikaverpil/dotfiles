@@ -17,7 +17,6 @@ let
   homebrewTaps = lib.unique (
     [
       "1password/tap"
-      "barutsrb/tap"
     ]
     ++ config.host.extraTaps
   );
@@ -99,7 +98,6 @@ in
         "gitify"
         "obs"
         "obsidian"
-        "omniwm"
         "proton-pass"
         "raycast"
         "signal"
