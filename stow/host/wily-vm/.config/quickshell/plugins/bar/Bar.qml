@@ -144,11 +144,20 @@ Scope {
         onActivated: bar.shell.network.toggle()
       }
 
+      BarButton {
+        id: audioButton
+        anchors.right: networkButton.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: 4
+        label: bar.shell.audio.icon
+        onActivated: bar.shell.audio.toggle()
+      }
+
       // Indicators grow inward from here, so the buttons above keep their
       // places at the right edge when one appears. Clicking restores the
       // default, which is the only thing anyone wants from a coffee cup.
       BarButton {
-        anchors.right: networkButton.left
+        anchors.right: audioButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: visible ? 4 : 0
         visible: !bar.shell.idle.enabled

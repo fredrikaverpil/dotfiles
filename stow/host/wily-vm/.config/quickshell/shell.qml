@@ -7,6 +7,7 @@ import "plugins/bar" as Bar
 import "plugins/lock" as Lock
 import "plugins/menu" as Menu
 import "plugins/notifications" as Notifications
+import "plugins/panels/audio" as Audio
 import "plugins/panels/monitor" as Monitor
 import "plugins/panels/network" as Network
 import "plugins/polkit" as Polkit
@@ -27,6 +28,7 @@ ShellRoot {
   readonly property alias idle: idle
   readonly property alias display: display
   readonly property alias network: network
+  readonly property alias audio: audio
 
   // All overlay panels leave this strip click-through so a second click
   // reaches its bar button rather than their full-screen dismissal surface.
@@ -170,6 +172,7 @@ ShellRoot {
     "setup": { icon: "", label: "Setup" },
     "setup.display": { icon: "󰍹", label: "Display", action: () => display.open() },
     "setup.network": { icon: "󰈀", label: "Network", action: () => network.open() },
+    "setup.audio": { icon: "󰕾", label: "Audio", action: () => audio.open() },
     "setup.nightlight": { icon: "󰆔", label: "Nightlight", action: () => nightlight.toggle() },
     "system": { icon: "", label: "System" },
     "system.close": { icon: "󰅖", label: "Close window", action: () => Quickshell.execDetached(
@@ -228,6 +231,11 @@ ShellRoot {
 
   Network.Panel {
     id: network
+    shell: root
+  }
+
+  Audio.Panel {
+    id: audio
     shell: root
   }
 

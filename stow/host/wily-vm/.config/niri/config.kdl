@@ -72,6 +72,7 @@ binds {
     Mod+Ctrl+N hotkey-overlay-title="Toggle nightlight" { spawn "qs" "ipc" "call" "nightlight" "toggle"; }
     Mod+Ctrl+D hotkey-overlay-title="Display settings" { spawn "qs" "ipc" "call" "display" "toggle"; }
     Mod+Ctrl+W hotkey-overlay-title="Network settings" { spawn "qs" "ipc" "call" "network" "toggle"; }
+    Mod+Ctrl+A hotkey-overlay-title="Audio settings" { spawn "qs" "ipc" "call" "audio" "toggle"; }
     Mod+Ctrl+I hotkey-overlay-title="Toggle idle locking" { spawn "qs" "ipc" "call" "idle" "toggle"; }
     Mod+Ctrl+L hotkey-overlay-title="Lock system" { spawn "qs" "ipc" "call" "lock" "lock"; }
 
