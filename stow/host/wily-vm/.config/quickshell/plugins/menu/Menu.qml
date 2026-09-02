@@ -185,6 +185,13 @@ Ui.Panel {
 
   function toggle() { shown ? close() : open("root") }
 
+  // For a bar button that opens the launcher at a level instead of owning a
+  // panel: a second click closes, but arriving from another level switches.
+  function toggleLevel(target) {
+    if (shown && level === target) close()
+    else open(target)
+  }
+
   // Escape and Left back out one level and only close at the root, so a
   // wrong turn costs one key rather than reopening the menu.
   function back() {
