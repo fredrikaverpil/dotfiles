@@ -829,9 +829,9 @@ current display. Every future panel reuses this; the bar icon instead calls
 The Omarchy-shaped services use their upstream-compatible targets too:
 `notifications` (`showHistory`, `toggleHistory`, `toggleDnd`, `dismissOne`,
 `dismissAll`, `invokeLast`), `lock` (`lock`, `status`, `isLocked`) and `idle`
-(`enable`, `disable`, `toggle`, `status`). The local panels are `display` and
-`network` (each `open`, `close`, `toggle`, `status`), deliberately bare like
-the other local targets rather than upstream's `omarchy.monitor` and
+(`enable`, `disable`, `toggle`, `status`). The local panels are `display`,
+`network` and `audio` (each `open`, `close`, `toggle`, `status`, and audio also
+`up`, `down`, `mute`, `setVolume`), deliberately bare like the other local targets rather than upstream's `omarchy.monitor` and
 `omarchy.network`. From SSH they need the live-session `XDG_RUNTIME_DIR` and
 `WAYLAND_DISPLAY` export from "Driving it over SSH".
 
@@ -879,6 +879,16 @@ the first of these.
   under the pointer when an indicator appears or goes away. Putting them
   outboard instead shifts every icon each time one toggles, which defeats the
   fixed 28px slot the buttons already go to some trouble to keep.
+- **Two navigation models, and the panel picks one.** `keyNavigation: true`
+  walks Qt's focus chain and is right for a panel that is rows of buttons
+  (display, network, notifications). A panel with a continuous control keeps
+  its own cursor instead — the audio panel holds `cursor`, `-1` being the
+  slider row, takes the keys on a focused `Item` of its own the way the
+  wallpaper picker does, and needs no change to `Ui/Panel.qml`. Hover moves
+  that cursor and the visuals read the cursor, never `containsMouse`, so only
+  one highlight is ever on screen. `h`/`l` adjusts on the slider row and is a
+  deliberate no-op on a device row: moving the output volume from a row that
+  is not the slider surprises people (Omarchy's `adjustVolume` says the same).
 - **Every bar action is also a launcher entry**, and the launcher is the
   canonical one. The bar is a shortcut to it, never the only way in — this
   shell is keyboard-first, and a mouse-only affordance is a missing feature.
@@ -1095,8 +1105,9 @@ the last 24 ping samples are kept and the displayed latency averages the most
 recent five. `iproute2` and `iputils` are explicit `desktop.nix` dependencies,
 not accidental base-system tools.
 
-It opens from its right-side bar icon (the order is network, display, bell,
-power, with conditional indicators inboard of network), Setup › Network, or `SUPER + CTRL + W` / `qs ipc call network toggle`.
+It opens from its right-side bar icon (the order is audio, network, display,
+bell, power, with conditional indicators inboard of audio), Setup › Network, or
+`SUPER + CTRL + W` / `qs ipc call network toggle`.
 The scanner is enabled only while this panel is open. The wired icon wins when
 both transports are connected, matching the default route. The VM verifies the
 wired path end-to-end: `enp0s1` reports Connected with its DHCP address, the
@@ -1109,6 +1120,30 @@ Wi-Fi scanning, signal, radio state, passphrase entry, connect, disconnect and
 forget are untested until the ThinkPad: the VM has no radio. **Revisit the
 remaining Omarchy network functionality on real hardware** before deciding
 what else belongs here; its scripts are not a reason to rule out a port.
+
+## Audio
+
+`plugins/panels/audio/Panel.qml` is output volume, mute and the default-sink
+pick, on `Quickshell.Services.Pipewire` — no `wpctl` subprocess. It opens from
+the `󰕾` bar button, Setup › Audio, or `SUPER + CTRL + A` /
+`qs ipc call audio toggle`, and the bar glyph carries mute (`󰝟`) and the
+level, so no OSD exists: volume feedback is that you can hear it.
+
+- **`PwObjectTracker` is required.** Node properties are not bound until the
+  node is tracked; without it `audio.volume` reads 0 and never updates. The
+  tracker binds to the whole sink list unconditionally, so the bar icon and the
+  media keys work with the panel closed.
+- Volume steps 5% per key or IPC call; `setVolume` takes a percent.
+- **Deliberately absent:** the per-app stream mixer (the bulk of Omarchy's
+  1248-line panel) and the input/mic section. `Pipewire.defaultAudioSource` is
+  ~20 lines away when a mic-mute key or a call habit makes it real.
+
+`services.pipewire` with `alsa` and `pulse` is declared in `desktop.nix`,
+alongside `security.rtkit`.
+
+Verified on the VM against `wpctl get-volume @DEFAULT_AUDIO_SINK@`: IPC
+up/down/mute/setVolume, and `h`/`l`/`m`/`j` from the keyboard. The Hyprland
+binds are not written yet.
 
 ## Light and dark
 
@@ -1356,7 +1391,8 @@ still missing.
 Upstream's default bar is data, in `config/omarchy/shell.json`: left `menu`,
 `workspaces`; centre `indicators`, `clock`, `keyboard-layout`, `weather`,
 `system-update`; right `tray`, `agents`, `bluetooth`, `network`, `audio`,
-`monitor`, `power`. Ours is menu, workspaces, clock, network, display, bell.
+`monitor`, `power`. Ours is menu, workspaces, clock, audio, network, display,
+bell, power.
 None of the below is blocked on the two items above — pick freely.
 
 Runnable on the VM today:
@@ -1369,9 +1405,8 @@ Runnable on the VM today:
   for, and their hover-reveal of inactive indicators.
 - **`omarchy.tray`** (`widgets/Tray.qml`, `TrayModel.js`) — SNI tray. Nothing
   else in this shell surfaces a tray icon.
-- **`omarchy.audio`** (`panels/audio/`) — master slider, output-device picker,
-  per-app mixer. `services.pipewire` with `alsa` and `pulse` is declared in
-  `desktop.nix`, alongside `security.rtkit`.
+- **`omarchy.audio`'s per-app mixer and input section** — the master slider and
+  output-device picker are ported; see "Audio".
 - **`omarchy.microphone`** (`widgets/Microphone.qml`) — mute toggle, source
   volume on scroll.
 - **`omarchy.media`** (`plugins/services/media/`) — MPRIS track and cover art.
