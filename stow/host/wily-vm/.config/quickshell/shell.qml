@@ -24,6 +24,7 @@ ShellRoot {
   readonly property alias background: background
   readonly property alias notifications: notifications
   readonly property alias nightlight: nightlight
+  readonly property alias idle: idle
   readonly property alias display: display
   readonly property alias network: network
 

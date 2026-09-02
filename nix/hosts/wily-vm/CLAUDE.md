@@ -852,6 +852,40 @@ when it has a counterpart in Omarchy's `default/hypr/bindings/applications.lua`;
 retain the chord and label, and launch it with `uwsm-app -- <desktop-id>` so it
 gets its own app scope.
 
+## The bar: every slot is a button
+
+There is no separate "indicator" kind. A bar slot is a `BarButton`, its glyph
+carries its own state, and clicking it changes that state or opens the panel
+that owns it. The bell is the pattern: DND does not add an icon, it turns
+`󰂚` into `󰂛`. That costs no extra slot, and the thing that
+shows you the state is also the thing that changes it.
+
+A state whose owner has no bar button gets a button that is **only visible
+while the state is non-default** — `BarButton` gives its 28px slot back when
+`visible` is false, so it costs nothing while it is off. It stays clickable,
+and clicking it restores the default. The idle-lock coffee (`󰅶`) is
+the first of these.
+
+- **A slot is earned by a state that persists and is otherwise invisible.**
+  Idle-disable lives in `~/.local/state/wily-idle.json` and survives reboots;
+  DND persists the same way. Both are things you can leave on for days without
+  a reason to remember. A state that is transient, or already visible in the
+  panel performing it (`busy` during a Wi-Fi action, `scaleChanging`), does not
+  get one.
+- **Conditional buttons grow inward, off the innermost fixed button's `left`.**
+  The always-visible buttons stay pinned to the right edge, so nothing moves
+  under the pointer when an indicator appears or goes away. Putting them
+  outboard instead shifts every icon each time one toggles, which defeats the
+  fixed 28px slot the buttons already go to some trouble to keep.
+- **Every bar action is also a launcher entry**, and the launcher is the
+  canonical one. The bar is a shortcut to it, never the only way in — this
+  shell is keyboard-first, and a mouse-only affordance is a missing feature.
+  Panels reached from the bar set `keyNavigation` for the same reason.
+
+Upstream's equivalent is a single `omarchy.indicators` widget holding `Dnd`,
+`NightLight`, `StayAwake` and friends as a cluster. Same idea; a per-button
+`visible` needs no widget to hold them.
+
 ## The menu
 
 One panel with a level stack, in Omarchy's `omarchy-menu.jsonc` shape: dotted
