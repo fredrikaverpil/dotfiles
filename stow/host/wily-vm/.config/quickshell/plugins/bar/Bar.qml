@@ -12,6 +12,10 @@ Scope {
   // Bar chrome, so every button hovers and reads the same. Keep an icon slot
   // independent of its glyph: the light and dark symbols have different font
   // advances, and a content-sized slot makes its neighbour jump on a toggle.
+  //
+  // A button hidden by `visible` gives its slot back, so an indicator that only
+  // appears while its state is non-default costs nothing while it is off. See
+  // the bar strategy in wily-vm/CLAUDE.md.
   component BarButton: Rectangle {
     id: btn
 
@@ -19,7 +23,7 @@ Scope {
     property string fontFamily: "JetBrainsMono Nerd Font"
     signal activated
 
-    implicitWidth: 28
+    implicitWidth: visible ? 28 : 0
     width: implicitWidth
     height: 24
     radius: 4
@@ -120,11 +124,24 @@ Scope {
       }
 
       BarButton {
+        id: networkButton
         anchors.right: displayButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
         label: bar.shell.network.icon
         onActivated: bar.shell.network.toggle()
+      }
+
+      // Indicators grow inward from here, so the buttons above keep their
+      // places at the right edge when one appears. Clicking restores the
+      // default, which is the only thing anyone wants from a coffee cup.
+      BarButton {
+        anchors.right: networkButton.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: visible ? 4 : 0
+        visible: !bar.shell.idle.enabled
+        label: "󰅶"
+        onActivated: bar.shell.idle.setEnabled(true)
       }
     }
   }
