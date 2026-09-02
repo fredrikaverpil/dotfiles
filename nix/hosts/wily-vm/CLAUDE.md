@@ -1095,8 +1095,8 @@ the last 24 ping samples are kept and the displayed latency averages the most
 recent five. `iproute2` and `iputils` are explicit `desktop.nix` dependencies,
 not accidental base-system tools.
 
-It opens from the leftmost right-side bar icon (the order is network, display,
-bell), Setup › Network, or `SUPER + CTRL + W` / `qs ipc call network toggle`.
+It opens from its right-side bar icon (the order is network, display, bell,
+power, with conditional indicators inboard of network), Setup › Network, or `SUPER + CTRL + W` / `qs ipc call network toggle`.
 The scanner is enabled only while this panel is open. The wired icon wins when
 both transports are connected, matching the default route. The VM verifies the
 wired path end-to-end: `enp0s1` reports Connected with its DHCP address, the
