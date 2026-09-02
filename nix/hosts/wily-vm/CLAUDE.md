@@ -410,14 +410,15 @@ whole answer; screencast under niri would want xdg-desktop-portal-gnome.
 
 ### Two ways niri is worse here, both upstream
 
-- **A locker restart under an active lock is unrecoverable**
-  ([niri#2986](https://github.com/YaLTeR/niri/issues/2986)). Hyprland's
-  equivalent has an escape hatch — `hyprctl eval
-  "hl.clear_crashed_lockscreen()"`, see "Losing the lock surface" — and niri
-  has none: exiting the whole session is the only way out. This is exactly the
-  rsync-while-locked path, and Quickshell hot-reloads on any file it has
-  loaded, so **unlock before rsyncing under niri** is not advice, it is the
-  only recovery.
+- **A locker restart under an active lock strands the screen**
+  ([niri#2986](https://github.com/YaLTeR/niri/issues/2986)). niri keeps the
+  session locked and paints its fallback — a solid dark red fill, no bar, no
+  windows, which reads as a dead VM rather than a lock. There is no equivalent
+  of Hyprland's `hyprctl eval "hl.clear_crashed_lockscreen()"`, but **exiting
+  the session is not the only way out**: niri accepts a new `ext-session-lock`
+  client, so `qs ipc call lock lock` on the restarted Quickshell takes the lock
+  back, `status` reports `secure:true`, and the real lock surface returns, to
+  be unlocked with the password as usual. Verified live under niri.
 - **Locking is refused while the outputs are powered off**
   ([niri#205](https://github.com/YaLTeR/niri/issues/205)): niri cannot submit
   the blank frame the lock waits for. That is the mirror of Hyprland's "do not
@@ -590,6 +591,19 @@ lockscreen app died"*. `qs ipc call lock status` then reports
 `locked:false, secure:true` — the shell no longer owns the lock it cannot
 release. Editing QML while locked is the easy way to hit this; so is
 `systemctl --user restart quickshell`.
+
+**Stop the lock happening at all while working on the shell.** The idle
+service's own switch is enough, and it persists in
+`~/.local/state/wily-idle.json`, so it holds across the Quickshell restarts
+that this work is made of:
+
+```sh
+qs ipc call idle disable   # … and `enable` when done — it will not come back on its own
+```
+
+Do that first, then `qs ipc call lock isLocked` before any restart or rsync:
+`false` is the only safe answer, and it costs one round trip against a
+recovery that the user has to drive from the keyboard.
 
 That screen names its own way out, and it works over SSH with the usual
 session exports — no tty switch, no reboot:
