@@ -583,9 +583,13 @@ This is also why the bar carries a menu icon at all, rather than leaving
 
 ## Losing the lock surface, and getting out of it
 
-**Quickshell hot-reloads on any change to a file it has loaded**, which
-includes an `rsync` from the laptop. Do that while the session is locked and
-the lock client dies under a compositor lock that stays up: Hyprland replaces
+**Quickshell hot-reloads on any change to a file it has loaded** — but *not*
+on an `rsync` from the laptop: rsync writes a temp file and renames it over the
+target, and the watcher does not fire, so a deploy needs an explicit
+`systemctl --user restart quickshell` (measured 2026-09-02). Editing a loaded
+file in place on the VM does reload. Reload or restart the shell while the
+session is locked and the lock client dies under a compositor lock that stays
+up: Hyprland replaces
 the screen with *"Oopsie daisy, it looks like you locked your screen but the
 lockscreen app died"*. `qs ipc call lock status` then reports
 `locked:false, secure:true` — the shell no longer owns the lock it cannot
