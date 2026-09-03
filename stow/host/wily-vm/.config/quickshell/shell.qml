@@ -182,7 +182,13 @@ ShellRoot {
     "system.notifications.history": { icon: "󰎟", label: "History", action: () => notifications.showHistory() },
     "system.notifications.dnd": { icon: "󰂛", label: "Toggle Do Not Disturb", action: () => notifications.setDoNotDisturb(!notifications.doNotDisturb) },
     "system.lock": { icon: "", label: "Lock", action: () => lock.beginLock() },
-    "system.idle": { icon: "󰅶", label: "Toggle idle locking", action: () => idle.setEnabled(!idle.enabled) },
+    // Coffee means "staying awake": shown only while idle locking is off, the
+    // same state the bar's conditional coffee button reports.
+    "system.idle": {
+      icon: idle.enabled ? "󰾪" : "󰅶",
+      label: idle.enabled ? "Disable idle locking" : "Enable idle locking",
+      action: () => idle.setEnabled(!idle.enabled)
+    },
     "system.suspend": { icon: "󰒲", label: "Suspend", action: () => root.run("systemctl suspend") },
     "system.logout": { icon: "󰍃", label: "Logout", action: () => root.run("uwsm stop") },
     "system.reboot": { icon: "󰜉", label: "Reboot", action: () => root.run("systemctl reboot") },
