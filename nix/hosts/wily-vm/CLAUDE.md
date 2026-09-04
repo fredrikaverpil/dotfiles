@@ -376,6 +376,22 @@ socket that is not there. niri's workspace objects carry no window count, so
 occupancy is counted from the window events, and any window event that cannot
 be applied incrementally re-asks `niri msg -j windows` instead.
 
+**niri workspaces carry two numbers and only one of them is the key you
+press.** `id` is a global counter that is never reused and never renumbers;
+`idx` is the 1-based position on the output, which is what `focus-workspace N`
+takes and what the bar draws. They agree until a workspace is dropped, after
+which `{id: 2, idx: 1}` is ordinary — and a widget reading `id` then outlines
+"2" while you are on 1. `WorkspacesNiri.qml` therefore exposes `idx`
+throughout and keeps an id→idx map, because `WorkspaceActivated` and a window's
+`workspace_id` both name the workspace by `id`.
+
+**Workspaces are dynamic under niri: `SUPER + 2` on an empty session does
+nothing, and that is niri, not a bug.** Each output keeps its populated
+workspaces plus exactly one trailing empty one, so with no windows open only
+workspace 1 exists and `niri msg action focus-workspace 2` exits 0 having
+moved nothing. Open a window first and workspace 2 appears. Hyprland's static
+1–10 do not behave this way.
+
 **Nightlight is two daemons, not one with a flag.** Hyprland dropped
 `wlr-gamma-control-unstable-v1` in favour of its own `hyprland-ctm-control-v1`,
 which is what hyprsunset speaks; niri implements the wlr protocol and not the
