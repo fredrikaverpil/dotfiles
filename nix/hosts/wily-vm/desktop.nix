@@ -189,6 +189,7 @@ in
     # Without --no-first-run the profile stays pinned to the light UI and
     # ignores the portal's color-scheme; see the browsers entry in CLAUDE.md.
     (chromium.override { commandLineArgs = "--no-first-run"; })
+    cliamp # terminal Winamp; music player
     firefox
     # GUI file manager; the launcher's apps provider picks up its .desktop
     # entry with no menu change. Pulls KDE Frameworks 6, and the rest of the
@@ -204,6 +205,7 @@ in
     niri # second compositor; the same Quickshell config runs under either
     # proton-pass # unsupported on aarch64-linux; enable in the ThinkPad config
     quickshell
+    # spotify # unsupported on aarch64-linux; psst or spotify-qt if wanted here
     # niri's nightlight backend. Hyprland dropped wlr-gamma-control for its own
     # CTM protocol, which is what hyprsunset speaks and this does not, so the
     # two are not interchangeable -- each compositor gets its own.
