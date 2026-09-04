@@ -514,17 +514,21 @@ Gotchas found the hard way:
   `Process`, sees a silent no-op: the lock screen's `hyprctl dispatch dpms off`
   never blanked anything, and looked exactly like a timer that was not firing.
   The DPMS one is `hl.dsp.dpms("on")` / `hl.dsp.dpms("off")`.
-- Bind workspace keys as `code:10`..`code:19` so they survive a layout
-  change — but **`hyprctl binds` reports a `code:` bind with an empty
-  `key` and `keycode: 0`**, and every Lua bind as `dispatcher: __lua` with
-  an opaque registry index for `arg`. So hyprctl can list the binds and
-  their descriptions, and can tell you neither the chord nor the action.
+- **`hl.bind()` understands keysym names only — `code:NN` silently never
+  fires.** Given `"SUPER + SHIFT + code:12"` it parses the modifiers and then
+  stores the whole chord string as the key name, so `hyprctl binds` shows
+  `modmask: 65`, `key: SUPER + SHIFT + code:12`, `keycode: 0`, the bind appears
+  in the cheatsheet, and no key ever matches it. A `keycode` option on the bind
+  is ignored too. Chords therefore follow the keyboard layout; there is no
+  layout-independent form.
+- Every Lua bind lists as `dispatcher: __lua` with an opaque registry index for
+  `arg`, so hyprctl can tell you a bind's description and not its action.
   `hyprland.lua` therefore records its own chords to
-  `~/.local/state/wm-binds.tsv` as it registers them, and the cheatsheet
-  reads that. A bare `hl.bind()` that skips the local `bind()` helper
-  registers fine and is invisible in the cheatsheet. (Omarchy solves the
-  same problem by re-evaluating `hyprland.lua` in a fake-`hl` Lua sandbox
-  — `omarchy-menu-keybindings`, ~500 lines — because their menu also
+  `~/.local/state/wm-binds.tsv` as it registers them, and the cheatsheet reads
+  that. A bare `hl.bind()` that skips the local `bind()` helper registers fine
+  and is invisible in the cheatsheet. (Omarchy solves the same problem by
+  re-evaluating `hyprland.lua` in a fake-`hl` Lua sandbox —
+  `omarchy-menu-keybindings`, ~500 lines — because their menu also
   *dispatches* the selected bind, and their users write raw `hl.bind` in
   `~/.config/hypr/bindings/`. Neither applies here.)
 - **`hyprctl -j binds` reports `mouse: false` on a working drag bind.**

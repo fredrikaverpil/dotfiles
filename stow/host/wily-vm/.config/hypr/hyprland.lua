@@ -89,8 +89,8 @@ local stay_awake = table.concat({
 }, " ")
 
 -- Every bind goes through this rather than hl.bind directly. `hyprctl binds`
--- reports Lua binds with an empty key whenever the chord uses code:NN, so this
--- file is the only place the chord still exists in readable form: the
+-- reports Lua binds with an opaque __lua dispatcher, so this file is the only
+-- place the action still exists in readable form: the
 -- cheatsheet reads what is recorded here, not hyprctl. A bare hl.bind()
 -- registers with Hyprland but stays invisible in the cheatsheet.
 local binds = {}
@@ -175,23 +175,16 @@ local ok, err = pcall(function()
   bind("ALT + TAB", "Reveal active window on top", hl.dsp.window.bring_to_top())
   bind("ALT + SHIFT + TAB", "Reveal active window on top", hl.dsp.window.bring_to_top())
 
-  -- Workspaces. code:10..19 are the physical 1..0 keys, so these survive a
-  -- layout change; the display string is what the cheatsheet shows instead.
+  -- Workspaces. hl.bind() only understands keysym names, not code:NN, so these
+  -- follow the keyboard layout.
   for ws = 1, 10 do
-    local key = "code:" .. (ws + 9)
-    local digit = ws == 10 and "0" or tostring(ws)
-    bind("SUPER + " .. key, "Switch to workspace " .. ws, hl.dsp.focus({ workspace = tostring(ws) }), { display = "SUPER + " .. digit })
-    bind(
-      "SUPER + SHIFT + " .. key,
-      "Move window to workspace " .. ws,
-      hl.dsp.window.move({ workspace = tostring(ws) }),
-      { display = "SUPER + SHIFT + " .. digit }
-    )
+    local key = ws == 10 and "0" or tostring(ws)
+    bind("SUPER + " .. key, "Switch to workspace " .. ws, hl.dsp.focus({ workspace = tostring(ws) }))
+    bind("SUPER + SHIFT + " .. key, "Move window to workspace " .. ws, hl.dsp.window.move({ workspace = tostring(ws) }))
     bind(
       "SUPER + SHIFT + ALT + " .. key,
       "Move window silently to workspace " .. ws,
-      hl.dsp.window.move({ workspace = tostring(ws), follow = false }),
-      { display = "SUPER + SHIFT + ALT + " .. digit }
+      hl.dsp.window.move({ workspace = tostring(ws), follow = false })
     )
   end
 
@@ -209,21 +202,21 @@ local ok, err = pcall(function()
     { display = "SUPER + SHIFT + ~" }
   )
 
-  -- Resize. code:20/21 are the physical minus/equal keys.
-  bind("SUPER + code:20", "Expand window left", hl.dsp.window.resize({ x = -100, y = 0, relative = true }), { display = "SUPER + MINUS" })
-  bind("SUPER + code:21", "Shrink window left", hl.dsp.window.resize({ x = 100, y = 0, relative = true }), { display = "SUPER + EQUAL" })
-  bind("SUPER + SHIFT + code:20", "Shrink window up", hl.dsp.window.resize({ x = 0, y = -100, relative = true }), { display = "SUPER + SHIFT + MINUS" })
-  bind("SUPER + SHIFT + code:21", "Expand window down", hl.dsp.window.resize({ x = 0, y = 100, relative = true }), { display = "SUPER + SHIFT + EQUAL" })
+  -- Resize.
+  bind("SUPER + minus", "Expand window left", hl.dsp.window.resize({ x = -100, y = 0, relative = true }), { display = "SUPER + MINUS" })
+  bind("SUPER + equal", "Shrink window left", hl.dsp.window.resize({ x = 100, y = 0, relative = true }), { display = "SUPER + EQUAL" })
+  bind("SUPER + SHIFT + minus", "Shrink window up", hl.dsp.window.resize({ x = 0, y = -100, relative = true }), { display = "SUPER + SHIFT + MINUS" })
+  bind("SUPER + SHIFT + equal", "Expand window down", hl.dsp.window.resize({ x = 0, y = 100, relative = true }), { display = "SUPER + SHIFT + EQUAL" })
 
-  bind("SUPER + ALT + code:20", "Expand window left a little", hl.dsp.window.resize({ x = -25, y = 0, relative = true }), { display = "SUPER + ALT + MINUS" })
-  bind("SUPER + ALT + code:21", "Shrink window left a little", hl.dsp.window.resize({ x = 25, y = 0, relative = true }), { display = "SUPER + ALT + EQUAL" })
-  bind("SUPER + SHIFT + ALT + code:20", "Shrink window up a little", hl.dsp.window.resize({ x = 0, y = -25, relative = true }), { display = "SUPER + SHIFT + ALT + MINUS" })
-  bind("SUPER + SHIFT + ALT + code:21", "Expand window down a little", hl.dsp.window.resize({ x = 0, y = 25, relative = true }), { display = "SUPER + SHIFT + ALT + EQUAL" })
+  bind("SUPER + ALT + minus", "Expand window left a little", hl.dsp.window.resize({ x = -25, y = 0, relative = true }), { display = "SUPER + ALT + MINUS" })
+  bind("SUPER + ALT + equal", "Shrink window left a little", hl.dsp.window.resize({ x = 25, y = 0, relative = true }), { display = "SUPER + ALT + EQUAL" })
+  bind("SUPER + SHIFT + ALT + minus", "Shrink window up a little", hl.dsp.window.resize({ x = 0, y = -25, relative = true }), { display = "SUPER + SHIFT + ALT + MINUS" })
+  bind("SUPER + SHIFT + ALT + equal", "Expand window down a little", hl.dsp.window.resize({ x = 0, y = 25, relative = true }), { display = "SUPER + SHIFT + ALT + EQUAL" })
 
-  bind("SUPER + CTRL + code:20", "Expand window left a lot", hl.dsp.window.resize({ x = -300, y = 0, relative = true }), { display = "SUPER + CTRL + MINUS" })
-  bind("SUPER + CTRL + code:21", "Shrink window left a lot", hl.dsp.window.resize({ x = 300, y = 0, relative = true }), { display = "SUPER + CTRL + EQUAL" })
-  bind("SUPER + CTRL + SHIFT + code:20", "Shrink window up a lot", hl.dsp.window.resize({ x = 0, y = -300, relative = true }), { display = "SUPER + CTRL + SHIFT + MINUS" })
-  bind("SUPER + CTRL + SHIFT + code:21", "Expand window down a lot", hl.dsp.window.resize({ x = 0, y = 300, relative = true }), { display = "SUPER + CTRL + SHIFT + EQUAL" })
+  bind("SUPER + CTRL + minus", "Expand window left a lot", hl.dsp.window.resize({ x = -300, y = 0, relative = true }), { display = "SUPER + CTRL + MINUS" })
+  bind("SUPER + CTRL + equal", "Shrink window left a lot", hl.dsp.window.resize({ x = 300, y = 0, relative = true }), { display = "SUPER + CTRL + EQUAL" })
+  bind("SUPER + CTRL + SHIFT + minus", "Shrink window up a lot", hl.dsp.window.resize({ x = 0, y = -300, relative = true }), { display = "SUPER + CTRL + SHIFT + MINUS" })
+  bind("SUPER + CTRL + SHIFT + equal", "Expand window down a lot", hl.dsp.window.resize({ x = 0, y = 300, relative = true }), { display = "SUPER + CTRL + SHIFT + EQUAL" })
 
   -- Groups
   bind("SUPER + G", "Toggle window grouping", hl.dsp.group.toggle())
@@ -238,12 +231,7 @@ local ok, err = pcall(function()
   bind("SUPER + CTRL + RIGHT", "Move grouped window focus right", hl.dsp.group.next())
 
   for index = 1, 5 do
-    bind(
-      "SUPER + ALT + code:" .. (index + 9),
-      "Switch to group window " .. index,
-      hl.dsp.group.active({ index = index }),
-      { display = "SUPER + ALT + " .. index }
-    )
+    bind("SUPER + ALT + " .. index, "Switch to group window " .. index, hl.dsp.group.active({ index = index }))
   end
 
   bind("SUPER + mouse_down", "Scroll active workspace forward", hl.dsp.focus({ workspace = "e+1" }))
