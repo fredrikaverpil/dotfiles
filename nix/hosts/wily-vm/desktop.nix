@@ -65,6 +65,22 @@ let
       fi
     '';
   };
+  # cliamp is a TUI, so nixpkgs ships the bare binary and the launcher's apps
+  # provider has no entry to find. Omarchy's convention for these is
+  # Terminal=false plus an explicit terminal in Exec (applications/*.desktop);
+  # theirs calls xdg-terminal-exec, which is not installed here. `ghostty` is a
+  # bare command name, so it resolves through PATH to the softgl wrapper above.
+  cliamp-desktop = pkgs.makeDesktopItem {
+    name = "cliamp";
+    desktopName = "cliamp";
+    comment = "Terminal Winamp";
+    exec = "ghostty -e cliamp";
+    terminal = false;
+    categories = [
+      "Audio"
+      "Player"
+    ];
+  };
 in
 {
   # uwsm wraps the session in systemd units so graphical-session.target is
@@ -221,6 +237,7 @@ in
     # ignores the portal's color-scheme; see the browsers entry in CLAUDE.md.
     (chromium.override { commandLineArgs = "--no-first-run"; })
     cliamp # terminal Winamp; music player
+    cliamp-desktop # its launcher entry; see the let-block above
     firefox
     grim # screenshots, for verifying the session over SSH
     # proton-pass # unsupported on aarch64-linux; enable in the ThinkPad config
