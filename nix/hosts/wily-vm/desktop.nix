@@ -241,6 +241,7 @@ in
     firefox
     grim # screenshots, for verifying the session over SSH
     signal-desktop
+    zed-editor
     # proton-pass # unsupported on aarch64-linux; enable in the ThinkPad config
     # spotify # unsupported on aarch64-linux; psst or spotify-qt if wanted here
   ];
