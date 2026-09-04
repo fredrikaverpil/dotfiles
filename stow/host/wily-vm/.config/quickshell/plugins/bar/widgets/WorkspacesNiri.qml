@@ -9,29 +9,39 @@ import Quickshell.Io
 QtObject {
   id: root
 
+  // Everything exposed here is the per-output index, the number on the key and
+  // the one `focus-workspace` takes. niri's own `id` is a global counter that
+  // never renumbers, so the two diverge as soon as a workspace is dropped.
   property int focusedId: -1
   property var ids: []
-  // Workspace id -> window count, maintained from the window events. niri's
-  // workspace objects do not carry one.
+  // niri workspace id -> index, so the events that carry only an id can be
+  // translated.
+  property var idxById: ({})
+  // Workspace index -> window count. niri's workspace objects do not carry one.
   property var windowCounts: ({})
 
-  function occupied(id) { return (windowCounts[id] || 0) > 0 }
+  function occupied(idx) { return (windowCounts[idx] || 0) > 0 }
 
   function setWorkspaces(list) {
     var next = []
+    var map = {}
     for (var i = 0; i < list.length; i++) {
-      next.push(list[i].id)
-      if (list[i].is_focused) root.focusedId = list[i].id
+      map[list[i].id] = list[i].idx
+      next.push(list[i].idx)
+      if (list[i].is_focused) root.focusedId = list[i].idx
     }
     next.sort(function (a, b) { return a - b })
     root.ids = next
+    root.idxById = map
+    // The counts are keyed by index, so a renumbering invalidates them.
+    windowQuery.running = true
   }
 
   function setWindows(list) {
     var counts = {}
     for (var i = 0; i < list.length; i++) {
-      var ws = list[i].workspace_id
-      if (ws !== null && ws !== undefined) counts[ws] = (counts[ws] || 0) + 1
+      var idx = root.idxById[list[i].workspace_id]
+      if (idx !== undefined) counts[idx] = (counts[idx] || 0) + 1
     }
     root.windowCounts = counts
   }
@@ -40,8 +50,11 @@ QtObject {
     if (event.WorkspacesChanged) {
       setWorkspaces(event.WorkspacesChanged.workspaces)
     } else if (event.WorkspaceActivated) {
-      // Only the focused flag moves; the id set is unchanged.
-      if (event.WorkspaceActivated.focused) root.focusedId = event.WorkspaceActivated.id
+      // Only the focused flag moves; the id set is unchanged. The event names
+      // the workspace by id, and a workspace new to us arrives with its own
+      // WorkspacesChanged.
+      var idx = root.idxById[event.WorkspaceActivated.id]
+      if (event.WorkspaceActivated.focused && idx !== undefined) root.focusedId = idx
     } else if (event.WindowsChanged) {
       setWindows(event.WindowsChanged.windows)
     } else if (event.WindowOpenedOrChanged || event.WindowClosed
