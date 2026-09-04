@@ -185,6 +185,20 @@ in
     };
   };
 
+  # cliamp propagates yt-dlp, which pulls python3Packages.curl-cffi, whose test
+  # suite fails on aarch64-linux: its localhost TLS tests reject the certificate
+  # for 127.0.0.1. cache.nixos.org has no build of it either, so this is not a
+  # local fault and no nixpkgs bump fixes it. The library itself is fine.
+  nixpkgs.overlays = [
+    (final: prev: {
+      python3Packages = prev.python3Packages.overrideScope (
+        pyFinal: pyPrev: {
+          curl-cffi = pyPrev.curl-cffi.overridePythonAttrs { doCheck = false; };
+        }
+      );
+    })
+  ];
+
   host.extraSystemPackages = with pkgs; [
     quickshell
     hyprsunset # nightlight; the schedule lives in the Quickshell service
