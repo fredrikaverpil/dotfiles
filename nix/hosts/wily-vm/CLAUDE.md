@@ -18,6 +18,19 @@ worth writing down: what the code already says.
 **Delete entries as they stop being true.** A stale line here is worse than a
 missing one, because it gets believed and acted on.
 
+## Prior art to steal from
+
+Two other Quickshell setups cover the same ground; read theirs before
+designing ours. Both are cloned locally (each within days of upstream as of
+2026-09-04 — `git -C <clone> pull` before relying on one):
+
+- **Omarchy 4 "Quattro"**, `~/code/public/github.com/omarchy` — one level
+  shallower than the rest of that tree. The model for this setup; "Reference"
+  below has the vendor-and-prune rules, which apply to this one only.
+- **caelestia**, `~/code/public/github.com/caelestia-dots/shell` — ~280 QML
+  files, a widget per directory under `modules/` and a singleton per concern
+  under `services/`. The closest thing to a second opinion on any QML we write.
+
 ## Reaching it
 
 - The VM's IP is DHCP-assigned and changes across reboots — never hard-code it.
