@@ -190,6 +190,10 @@ in
     # ignores the portal's color-scheme; see the browsers entry in CLAUDE.md.
     (chromium.override { commandLineArgs = "--no-first-run"; })
     firefox
+    # GUI file manager; the launcher's apps provider picks up its .desktop
+    # entry with no menu change. Pulls KDE Frameworks 6, and the rest of the
+    # session has no KDE stack -- it is here for its keyboard coverage.
+    kdePackages.dolphin
     ghostty-softgl # terminal; see the let-block above
     gnome-themes-extra # Adwaita-dark, the GTK theme the light/dark toggle names
     grim # screenshots, for verifying the session over SSH
