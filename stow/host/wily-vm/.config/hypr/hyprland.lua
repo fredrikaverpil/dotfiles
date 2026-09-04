@@ -122,6 +122,7 @@ local ok, err = pcall(function()
   bind("SUPER + RETURN", "Terminal", hl.dsp.exec_cmd("ghostty"))
   bind("SUPER + SHIFT + RETURN", "Browser", hl.dsp.exec_cmd("uwsm-app -- zen-beta.desktop"))
   bind("SUPER + SHIFT + B", "Browser", hl.dsp.exec_cmd("uwsm-app -- zen-beta.desktop"))
+  bind("SUPER + SHIFT + F", "File manager", hl.dsp.exec_cmd("uwsm-app -- org.kde.dolphin.desktop"))
   bind("SUPER + SHIFT + N", "Editor", hl.dsp.exec_cmd("ghostty -e nvim"))
 
   -- Shell

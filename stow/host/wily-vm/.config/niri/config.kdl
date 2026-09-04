@@ -55,6 +55,7 @@ binds {
     Mod+Return hotkey-overlay-title="Terminal" { spawn "ghostty"; }
     Mod+Shift+Return hotkey-overlay-title="Browser" { spawn "uwsm-app" "--" "zen-beta.desktop"; }
     Mod+Shift+B hotkey-overlay-title="Browser" { spawn "uwsm-app" "--" "zen-beta.desktop"; }
+    Mod+Shift+F hotkey-overlay-title="File manager" { spawn "uwsm-app" "--" "org.kde.dolphin.desktop"; }
     Mod+Shift+N hotkey-overlay-title="Editor" { spawn "ghostty" "-e" "nvim"; }
 
     // Shell. Identical under both compositors: these are the shell's own IPC.
