@@ -11,17 +11,13 @@ editor. This skill installs Neovim, launches it **headless** on a listen socket,
 and exports `$NVIM` so the `neovim` skill's commands work verbatim afterwards.
 
 **Scope:** web sandbox only (`CLAUDE_CODE_REMOTE=true`). Do not run on a real
-machine — there Neovim is managed by bob at `~/.local/share/bob/nvim-bin/nvim`.
+machine — there Neovim comes from nixpkgs-unstable via home-manager.
 
-## Why Nix, not bob
+## Why Nix
 
 Nix installs Neovim from `*.nixos.org` (allow-listed by default), so the binary
 needs **no GitHub access** — and `nixpkgs-unstable` ships a current Neovim with
-`vim.pack`, which `nvim-fredrik` requires.
-bob is available too (see the end), but `bob install` downloads Neovim as a
-**GitHub release asset**, which the GitHub proxy blocks unless `neovim/neovim`
-is attached to the session — regardless of network level. So Nix is the default;
-bob is an opt-in.
+`vim.pack`, which `nvim-fredrik` requires. Same source as the real machines.
 
 ## Step 0 — Network prerequisites
 
@@ -237,26 +233,6 @@ diagnostics:
 ```bash
 nvim --server "$NVIM" --remote-expr 'luaeval("vim.json.encode(vim.diagnostic.get(0))")'
 ```
-
-## Optional: bob for explicit stable/nightly management
-
-If you specifically want a bob-managed version (one-word stable/nightly switch,
-matching the real machines), install bob from Nix and let it fetch Neovim — but
-note bob's download is a GitHub **release asset**, so `neovim/neovim` must be
-attached to the session first (`add_repo neovim/neovim`; Claude only runs it
-when you ask). Network level alone will not unblock it.
-
-```bash
-TARBALL=https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz
-nix-env -iA bob-nvim -f "$TARBALL"          # the binary is `bob`
-export PATH="$HOME/.nix-profile/bin:$PATH"
-bob use nightly                              # needs neovim/neovim attached
-export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
-```
-
-If you use this, add `$HOME/.local/share/bob/nvim-bin` to the `PATH` line in
-`~/.nvim-sandbox.env` (Step 3). For most sandbox testing the Step 2 Nix binary
-is simpler and needs no attachment.
 
 ## Caveats
 

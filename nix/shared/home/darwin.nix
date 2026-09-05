@@ -15,22 +15,6 @@
     uv
   ];
 
-  # Bootstrap Neovim via Bob on first rebuild. Bob is installed via Homebrew
-  # (see nix/shared/system/darwin.nix): the brew binary is writable, which
-  # bob requires since it copies itself as the nvim proxy — the nixpkgs
-  # binary is read-only and needed a wrapper. Bob is macOS-only; it downloads
-  # prebuilt glibc neovim binaries which cannot run on NixOS (stub-ld), so
-  # Linux gets neovim from nixpkgs instead (see linux.nix).
-  home.activation.bobNeovimBootstrap = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    if [[ ! -x "$HOME/.local/share/bob/nvim-bin/nvim" ]]; then
-      echo "Bootstrapping Neovim via Bob..."
-      /opt/homebrew/bin/bob use stable
-    fi
-  '';
-
-  # Bob config path (unified across macOS/Linux, since defaults differ)
-  home.sessionVariables.BOB_CONFIG = "$HOME/.config/bob/config.toml";
-
   packageTools.npmPackages = [ ];
   packageTools.uvTools = [ ];
 

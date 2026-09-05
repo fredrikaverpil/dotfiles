@@ -39,8 +39,8 @@ Launch it with `NVIM_APPNAME=nvim-fredrik nvim`. Apply stow symlinks after
 changes from `~/.dotfiles/stow` with `packages=(shared "$(uname -s)");
 host="$(hostname -s)"; [ -d "$host" ] && packages+=("$host"); stow
 --target="$HOME" --restow --no-folding --adopt "${packages[@]}"`. Neovim itself
-is managed by [Bob](https://github.com/MordechaiHadad/bob), not nixpkgs -- binary at
-`~/.local/share/bob/nvim-bin/nvim`.
+comes from nixpkgs-unstable via home-manager (`nix/shared/home/common.nix`) --
+binary at `~/.nix-profile/bin/nvim`.
 
 ## Architecture
 

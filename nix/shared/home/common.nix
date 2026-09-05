@@ -104,6 +104,7 @@ in
       git-lfs
       htop
       jq
+      unstable.neovim
       ncurses
       rsync
       stow # GNU Stow for dotfile management

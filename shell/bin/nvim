@@ -2,7 +2,6 @@
 set -e
 
 # Binary locations (try multiple paths, in priority order)
-BOB_NVIM_BINARY="$HOME/.local/share/bob/nvim-bin/nvim"
 NIX_NVIM_BINARY="$HOME/.nix-profile/bin/nvim"
 NIXOS_NVIM_BINARY="/etc/profiles/per-user/$(whoami)/bin/nvim"
 BREW_NVIM_BINARY="$DOTFILES_BREW_PREFIX/bin/nvim"
@@ -19,11 +18,6 @@ fi
 # Count available binaries
 available_count=0
 available_binaries=""
-
-if [ -x "$BOB_NVIM_BINARY" ]; then
-  available_count=$((available_count + 1))
-  available_binaries="$available_binaries\n  - $BOB_NVIM_BINARY (installed via Bob)"
-fi
 
 if [ -x "$NIX_NVIM_BINARY" ]; then
   available_count=$((available_count + 1))
@@ -42,14 +36,12 @@ fi
 
 # Check for conflicts
 if [ $available_count -gt 1 ]; then
-  echo "Warning: Multiple nvim binaries found. Using priority order: Bob > Nix User > NixOS System > Homebrew"
+  echo "Warning: Multiple nvim binaries found. Using priority order: Nix User > NixOS System > Homebrew"
   echo -e "Available binaries:$available_binaries"
   echo ""
 fi
 
-if [ -x "$BOB_NVIM_BINARY" ]; then
-  NVIM_BINARY="$BOB_NVIM_BINARY"
-elif [ -x "$NIX_NVIM_BINARY" ]; then
+if [ -x "$NIX_NVIM_BINARY" ]; then
   NVIM_BINARY="$NIX_NVIM_BINARY"
 elif [ -x "$NIXOS_NVIM_BINARY" ]; then
   NVIM_BINARY="$NIXOS_NVIM_BINARY"
@@ -57,9 +49,7 @@ elif [ -x "$BREW_NVIM_BINARY" ]; then
   NVIM_BINARY="$BREW_NVIM_BINARY"
 else
   echo "Error: No nvim binary found."
-  echo "Please install Neovim via:"
-  echo "  - Bob: bob use stable"
-  echo "  - Homebrew: brew install neovim"
+  echo "Please rebuild (neovim comes from nixpkgs via home-manager)."
   exit 1
 fi
 
