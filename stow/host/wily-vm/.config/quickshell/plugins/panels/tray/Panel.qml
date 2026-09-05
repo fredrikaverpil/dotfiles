@@ -33,7 +33,7 @@ Ui.Panel {
   readonly property string title: item
     ? (depth > 0
       ? stack.map(level => level.title).join(" › ")
-      : (item.title || item.tooltipTitle || item.id))
+      : TrayModel.labelFor(item))
     : ""
 
   cardWidth: 420
@@ -91,12 +91,19 @@ Ui.Panel {
   }
 
   function openFor(trayItem) {
+    // Clicking the icon whose menu is already showing closes it, so a tray
+    // icon behaves like every other bar button (Ui/Panel.qml's toggle()).
+    // onShownChanged tears the stack down, so close() is the whole job.
+    if (shown && item === trayItem) {
+      close()
+      return
+    }
     // Reset before switching items: the root opener binds to the item's menu,
     // so assigning a new item invalidates the old root's children immediately.
     reset()
     item = trayItem
     if (!trayItem || !trayItem.hasMenu) return
-    push(trayItem.menu, trayItem.title || trayItem.id)
+    push(trayItem.menu, TrayModel.labelFor(trayItem))
     open()
   }
 
