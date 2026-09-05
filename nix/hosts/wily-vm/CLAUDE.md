@@ -1486,6 +1486,15 @@ needed each one:
 With both, Dolphin follows the toggle live — verified in each direction with no
 restart.
 
+One thing the Qt palette does not carry: **a KDE app repaints its view area
+from `~/.config/kdeglobals` `[Colors:View]` on a palette change**, so with no
+such file Dolphin's file area took KColorScheme's built-in Breeze light — white
+under a dark window, and only in that direction, since white is right in light
+mode. `setDark` writes the two colours from the zenbones palette before it
+touches dconf; the file is re-read on the palette change, so the order matters.
+A running app ignores the file otherwise — `kwriteconfig6 --notify` does not
+repaint it, only the palette change does.
+
 Per-user leftovers from the Plasma session once installed here had to go first,
 none of them in `stow/`. `~/.config/dolphinrc`'s `[UiSettings]
 ColorScheme=BreezeDark` was the worst of them: a per-app override that pins the
