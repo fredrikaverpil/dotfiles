@@ -1195,7 +1195,12 @@ row — label, nesting, what a click does — and we own only how it is drawn.
 - **`status` is the only state the protocol maintains for us.** `Passive` and
   `Active` both show — most apps set `Passive` once and never touch it again,
   so hiding those would hide Signal permanently. `NeedsAttention` takes
-  `palette.sel`, which is the unread-badge behaviour without a second slot.
+  `palette.sel`, which should be the unread-badge behaviour without a second
+  slot. **Unverified** — nm-applet never sets it, and Signal ships
+  `"system-tray-setting": "DoNotUseSystemTray"` in
+  `~/.config/Signal/ephemeral.json`, so it has never registered a tray item on
+  this VM at all. Flip that (Settings → General → minimize to system tray) and
+  restart Signal before trusting the sentence above.
 - **`qs ipc call tray list` / `menu <id>` / `close`.** The bar icon is a
   mouse-only affordance; this is the path the launcher's Tray level uses, and
   the only way to drive the menu from a script or a test.
@@ -1229,15 +1234,15 @@ there are several real icons side by side to judge.
 nix run nixpkgs#networkmanagerapplet -- --indicator
 ```
 
-`nix run` alone is not enough — it leaves the applet's own
-`share/icons` off `XDG_DATA_DIRS`, so every icon misses and renders magenta,
-which looks exactly like the bug above. Point `XDG_DATA_DIRS` at the store
-path first, or the test lies to you:
+That is the whole recipe — no `XDG_DATA_DIRS` juggling. The nixpkgs wrapper
+already puts the applet's own `share` at the front of `XDG_DATA_DIRS`, so
+`nm-device-wired` resolves and the bar icon renders. (Verified 2026-09-05 by
+reading `/proc/<pid>/environ` of a plainly-`nix run` applet.)
 
-```sh
-NMA=$(nix build --no-link --print-out-paths nixpkgs#networkmanagerapplet)
-XDG_DATA_DIRS="$NMA/share:$XDG_DATA_DIRS" "$NMA/bin/nm-applet" --indicator
-```
+Kill it with `pkill -x nm-applet` — **not** `pkill -f`, which also matches the
+SSH command string carrying the pattern and kills the invoking shell. `pgrep
+-x nm-applet` is unreliable here for reasons not chased down; `ps -eo pid,args
+| awk '/[n]m-applet --indicator/{print $1}'` is what actually finds it.
 
 ## Wallpapers
 
