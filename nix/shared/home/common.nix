@@ -5,6 +5,7 @@
   pkgs,
   inputs,
   hostName,
+  osConfig ? { },
   ...
 }:
 let
@@ -206,7 +207,10 @@ in
     # the `dev` devshell in flake.nix) is imported so Neovim and the devshell
     # resolve to identical store paths; the extras below are Neovim-only.
     home.file.".config/nvim-deps-path".text = lib.makeBinPath (
-      (import ../toolchain.nix { inherit stable unstable; })
+      (import ../toolchain.nix {
+        inherit stable unstable;
+        nixos = osConfig ? system.nixos; # absent under nix-darwin
+      })
       ++ (with unstable; [
         cmake # Neovim's injected PATH has no stdenv cc (devshell gets it from stdenv)
         gcc

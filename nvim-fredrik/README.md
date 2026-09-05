@@ -198,7 +198,9 @@ file. To add a language, edit the files for the tools it needs (all are plain
 literal tables, so you see the whole picture for a tool in one place):
 
 - **LSP**: add the server name to the `servers` list in `plugin/lsp.lua`.
-- **Mason**: add the tool(s) to `ensure_installed` in `plugin/mason.lua`.
+- **Mason** (macOS): add the tool(s) to `ensure_installed` in
+  `plugin/mason.lua`. On NixOS Mason is disabled; add the nixpkgs equivalent
+  to the Linux list in `nix/shared/toolchain.nix` instead.
 - **Formatting**: add `formatters_by_ft` (and any per-formatter config) in
   `plugin/conform.lua`.
 - **Linting**: add `linters_by_ft` (and any per-linter config) in
