@@ -238,6 +238,9 @@ in
     # entry with no menu change. Pulls KDE Frameworks 6, and the rest of the
     # session has no KDE stack -- it is here for its keyboard coverage.
     kdePackages.dolphin
+    # kwriteconfig6: the shell's theme toggle writes kdeglobals through it,
+    # since only KConfig's --notify drops the per-process cache of that file.
+    kdePackages.kconfig
     ghostty-softgl # terminal; see the let-block above
     gnome-themes-extra # Adwaita-dark, the GTK theme the light/dark toggle names
     iproute2 # `ip` supplies the network panel's active route and counters
