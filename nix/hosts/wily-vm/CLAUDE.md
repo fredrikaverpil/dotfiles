@@ -1309,6 +1309,20 @@ decoder, and without it a webp wallpaper silently falls back to the gradient.
 The wrapper prefixes its own plugin paths, so setting the variable does not
 displace them.
 
+There is no downloader here — images are fetched by hand, from
+[wallhaven.cc](https://wallhaven.cc) in a browser, and dropped in the
+directory. Variety, the usual suggestion, is a timed feed rather than a
+browser: it downloads first and you cull afterwards.
+
+**Try [skwd-wall](https://github.com/liixini/skwd-wall) once it has NixOS
+packaging** (its README marks NixOS and Debian WIP; Arch AUR and Fedora COPR
+are done). It is the one tool that matches how the picking actually goes —
+browse Wallhaven inside the app, then download the one you chose — and it also
+plays Wallpaper Engine scenes and video wallpapers. Two reasons to wait rather
+than package it now: it is a v2 beta by the author's own account, and its four
+picker styles and scene playback are GPU-rendered, which this VM cannot do (see
+"VM graphics facts" — llvmpipe). It is a ThinkPad candidate, not a VM one.
+
 ## Workspaces
 
 The top bar's `plugins/bar/widgets/Workspaces.qml` is a pared-down port of
