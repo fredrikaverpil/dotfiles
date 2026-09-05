@@ -1303,6 +1303,11 @@ menu's Style › Wallpaper) opens the picker; `qs ipc call wallpaper` also takes
 rescans on open, so a file added while the shell is running shows up without
 the explicit `rescan`.
 
+The picker previews: the highlighted thumbnail becomes the desktop wallpaper
+while the panel is open, and Escape puts the committed one back. The preview is
+debounced by 250ms, since each step is a full-size decode and arrowing through
+the grid otherwise runs behind the keys.
+
 webp works, but only because `desktop.nix` sets `QT_PLUGIN_PATH` to
 `qt6.qtimageformats` on the Quickshell unit — the package ships no webp
 decoder, and without it a webp wallpaper silently falls back to the gradient.

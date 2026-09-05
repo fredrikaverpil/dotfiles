@@ -25,6 +25,31 @@ Scope {
   property string darkPick: ""
   property string lightPick: ""
   readonly property string wallpaper: shell.dark ? darkPick : lightPick
+  // The highlighted picture while the picker is open, so the background shows
+  // the pick before it is committed. Cleared on close, so Escape reverts.
+  // Debounced: each step otherwise queues a full-size decode, and arrowing
+  // through the grid then runs behind the keys.
+  property string preview: ""
+  readonly property string shownWallpaper: preview || wallpaper
+
+  Timer {
+    id: previewDelay
+    interval: 250
+    onTriggered: background.preview = picker.shown && grid.currentIndex >= 0
+      ? (background.wallpapers[grid.currentIndex] || "") : ""
+  }
+
+  Connections {
+    target: picker
+    function onShownChanged() {
+      if (picker.shown) {
+        previewDelay.restart()
+      } else {
+        previewDelay.stop()
+        background.preview = ""
+      }
+    }
+  }
 
   function setWallpaper(path) {
     if (shell.dark) {
@@ -96,7 +121,7 @@ Scope {
         anchors.fill: parent
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
-        source: background.wallpaper ? "file://" + background.wallpaper : ""
+        source: background.shownWallpaper ? "file://" + background.shownWallpaper : ""
       }
     }
   }
@@ -142,6 +167,7 @@ Scope {
       cellWidth: width / 4
       cellHeight: cellWidth * 9 / 16
       model: background.wallpapers
+      onCurrentIndexChanged: previewDelay.restart()
 
       delegate: Item {
         required property var modelData
