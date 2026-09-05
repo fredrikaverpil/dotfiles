@@ -366,6 +366,9 @@ that are not interchangeable:
   — both named in `desktop.nix` alongside their `hyprland.desktop` twins. The
   shell function forwards arguments to the real binary, so `niri msg …` from an
   interactive shell still reaches it rather than starting a session.
+- **Boolean KDL options are presence-only.** `natural-scroll` enables it;
+  `natural-scroll true` is a parse error, not an accepted false/true setting.
+  Run `niri validate --config ~/.config/niri/config.kdl` after editing the file.
 - **`uwsm finalize` has to name `NIRI_SOCKET`.** It exports `WAYLAND_DISPLAY`
   on its own, but the shell runs as a separate unit and gets nothing else from
   the compositor. Without that export `niri msg` fails inside the shell *and*
