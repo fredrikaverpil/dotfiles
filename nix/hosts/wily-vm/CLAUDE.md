@@ -1468,13 +1468,31 @@ It *watches* the key with a long-running `dconf watch` rather than trusting its
 own writes, so a `dconf write` from anywhere else moves the panel state too.
 dconf persists, so the mode survives a reboot for free.
 
-Qt apps need `QT_QPA_PLATFORMTHEME=gtk3` (`desktop.nix` session variables, what
-Omarchy sets too). Without a platform theme Qt uses its generic Unix one, whose
-palette is a static light and reads neither dconf nor the portal — Dolphin came
-up light under `prefer-dark` until the variable was set. The plugin is
-`libqgtk3.so` in qtbase, so no extra package. Stale Plasma leftovers
-(`~/.config/kdeglobals`, `~/.config/kdedefaults/`) pin `BreezeLight`, but the
-gtk3 theme overrides them; they were removed anyway.
+Qt apps need **two** session variables, both in `desktop.nix`, and Dolphin
+needed each one:
+
+- `QT_QPA_PLATFORMTHEME=gtk3` (what Omarchy sets too). With no platform theme
+  Qt uses its generic Unix one, whose palette is a static light that reads
+  neither dconf nor the portal. `libqgtk3.so` ships in qtbase — no package.
+- `GTK_USE_PORTAL=1`. GTK3's other route to the theme name is the
+  `org.gnome.desktop.interface` GSettings schema, and **no directory in
+  `XDG_DATA_DIRS` has a compiled schema** — `gsettings-desktop-schemas` is not
+  installed, the same reason `gsettings` is absent. So GTK3 silently fell back
+  to plain Adwaita and Dolphin stayed light in *both* modes with only the first
+  variable set. GTK4 (Ghostty) asks the portal by itself; GTK3 does not unless
+  told. Adding the schemas package instead would work too, and would cost a
+  dependency to duplicate a portal that already answers correctly.
+
+With both, Dolphin follows the toggle live — verified in each direction with no
+restart.
+
+Two per-user leftovers from the Plasma session that was once installed here had
+to go first, neither of them in `stow/`: `~/.config/dolphinrc`'s `[UiSettings]
+ColorScheme=BreezeDark`, a per-app override that pins the palette and made an
+early test look like a fix, and `~/.config/kdeglobals` plus
+`~/.config/kdedefaults/`, which pin `BreezeLight`. `~/.config/gtk-3.0/`,
+`gtkrc*` and the rest of the `kde*rc` pile are from the same era and still
+there.
 
 Bar and menu colours are the zenbones palettes, lifted from
 `stow/shared/.config/ghostty/themes/zenbones_{dark,light}` so the bar and the
