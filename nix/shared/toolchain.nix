@@ -90,4 +90,16 @@ with unstable;
   yamlfmt # yaml
   yamllint # yaml
   zls # zig
+
+  # Newer than nixpkgs: comment out the plain entry above and override here.
+  # Start with lib.fakeHash for every hash; `nix build` reports the real one on
+  # mismatch. Go tools need vendorHash, Rust tools cargoHash.
+  # (gopls.overrideAttrs (old: rec {
+  #   version = "0.24.0";
+  #   src = old.src.override {
+  #     tag = "gopls/v${version}";
+  #     hash = lib.fakeHash;
+  #   };
+  #   vendorHash = lib.fakeHash;
+  # }))
 ]
