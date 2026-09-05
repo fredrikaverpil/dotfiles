@@ -20,7 +20,17 @@
 # nixpkgs-unstable (the default — everything here comes from unstable, all
 # platforms). To pin an individual entry to stable nixpkgs, write it explicitly
 # as `stable.<name>`.
-{ stable, unstable }:
+#
+# LSPs/linters/formatters: on macOS Mason installs them
+# (nvim-fredrik/plugin/mason.lua). On NixOS Mason is disabled — its prebuilt
+# glibc binaries fail under stub-ld — so the NixOS-only list below mirrors
+# Mason's `ensure_installed`. Keep the two lists in sync. `nixos` is passed by
+# the caller: nothing in nixpkgs distinguishes NixOS from other Linux.
+{
+  stable,
+  unstable,
+  nixos ? false,
+}:
 with unstable;
 [
   beamPackages.elixir
@@ -33,4 +43,51 @@ with unstable;
   rustup # run `rustup update stable` to get latest rustc, cargo, rust-analyzer etc.
   tree-sitter
   yarn
+]
+++ lib.optionals nixos [
+  # Kept alphabetical by Mason name; the trailing comment is the language/tool.
+  # Not mirrored: codelldb/debugpy (no DAP adapter uses them), rust-analyzer
+  # (rustup component).
+  actionlint # yaml (github actions)
+  api-linter # protobuf
+  basedpyright # python
+  bash-language-server # bash
+  biome # json
+  buf # protobuf
+  delve # go
+  dockerfile-language-server # docker
+  elixir-ls # elixir
+  gci # go
+  gofumpt # go (golines runs it as --base-formatter)
+  gotools # go (goimports)
+  golangci-lint # go
+  golines # go
+  gopls # go
+  gotestsum # go (neotest)
+  graphql-language-service-cli # graphql
+  hadolint # docker
+  impl # go (go-impl.nvim)
+  vscode-langservers-extracted # json (json-lsp)
+  lua-language-server # lua
+  markdownlint-cli # markdown
+  mypy # python
+  nil # nix
+  prettier # typescript/javascript
+  protolint # protobuf
+  ruff # python
+  rumdl # markdown
+  shellcheck # bash (bashls runs it itself; not a nvim-lint linter)
+  shfmt # bash
+  stylua # lua
+  superhtml # html
+  taplo # toml
+  templ # templ
+  terraform-ls # terraform
+  tflint # terraform
+  ts_query_ls # query
+  vtsls # typescript
+  yaml-language-server # yaml
+  yamlfmt # yaml
+  yamllint # yaml
+  zls # zig
 ]
