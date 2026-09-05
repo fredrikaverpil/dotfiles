@@ -6,3 +6,4 @@
 # here or it becomes unimportable.
 singleton Compositor 1.0 Compositor.qml
 Panel 1.0 Panel.qml
+BarButton 1.0 BarButton.qml

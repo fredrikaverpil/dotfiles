@@ -1,6 +1,9 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.SystemTray
+
+import "../bar/widgets/TrayModel.js" as TrayModel
 
 import "../../Ui" as Ui
 
@@ -85,6 +88,25 @@ Ui.Panel {
     return Quickshell.iconPath(value, true)
   }
 
+  // Same sort as the bar's, so a row sits where its icon does.
+  function trayRows() {
+    return [...SystemTray.items.values]
+      .sort((a, b) => String(a.id).localeCompare(String(b.id)))
+      .map(item => ({
+        label: item.title || item.tooltipTitle || item.id,
+        icon: "󰘔",
+        // Same theme-name resolution as the bar's; see Tray.qml for why the
+        // `image://icon/` provider is not handed the name directly.
+        image: TrayModel.themeIconName(item.icon) === ""
+          ? (item.icon || "")
+          : menu.iconUrl(TrayModel.themeIconName(item.icon)),
+        detail: item.tooltipTitle && item.title !== item.tooltipTitle ? item.tooltipTitle : "",
+        enabled: true,
+        entry: null,
+        trayItem: item,
+      }))
+  }
+
   function appRows(detail) {
     return DesktopEntries.applications.values
       .filter(entry => !entry.noDisplay)
@@ -118,6 +140,8 @@ Ui.Panel {
 
     if (item && item.provider === "binds")
       return query.length === 0 ? menu.binds : menu.binds.filter(matches)
+    if (item && item.provider === "tray")
+      return query.length === 0 ? menu.trayRows() : menu.trayRows().filter(matches)
     if (item && item.provider === "apps")
       return query.length === 0 ? menu.appRows() : menu.appRows().filter(matches)
     if (query.length === 0)
@@ -203,7 +227,11 @@ Ui.Panel {
     const row = rows[list.currentIndex]
     if (!row || !row.enabled) return
 
-    if (row.entry) {
+    if (row.trayItem) {
+      close()
+      if (row.trayItem.onlyMenu) menu.shell.tray.openFor(row.trayItem)
+      else row.trayItem.activate()
+    } else if (row.entry) {
       close()
       // uwsm-app puts the app in its own scope under app-graphical.slice, so
       // it survives `systemctl --user restart quickshell` while iterating.

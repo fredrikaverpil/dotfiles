@@ -2,60 +2,13 @@ import QtQuick
 import Quickshell
 
 import "widgets" as BarWidgets
+import "../../Ui" as Ui
 
 // The top bar, one per screen.
 Scope {
   id: bar
 
   required property var shell
-
-  // Bar chrome, so every button hovers and reads the same. Keep an icon slot
-  // independent of its glyph: the light and dark symbols have different font
-  // advances, and a content-sized slot makes its neighbour jump on a toggle.
-  //
-  // A button hidden by `visible` gives its slot back, so an indicator that only
-  // appears while its state is non-default costs nothing while it is off. See
-  // the bar strategy in wily-vm/CLAUDE.md.
-  component BarButton: Rectangle {
-    id: btn
-
-    property alias label: btnLabel.text
-    property string fontFamily: "JetBrainsMono Nerd Font"
-    signal activated
-
-    implicitWidth: visible ? 28 : 0
-    width: implicitWidth
-    height: 24
-    radius: 4
-    color: btnMouse.containsMouse ? bar.shell.palette.sel : "transparent"
-
-    TextMetrics {
-      id: btnMetrics
-      font.family: btnLabel.font.family
-      font.pixelSize: btnLabel.font.pixelSize
-      text: btnLabel.text
-    }
-
-    Text {
-      id: btnLabel
-      anchors.centerIn: parent
-      // Text centers its advance box, not the pixels it paints. Correct that
-      // horizontal difference so differently shaped Nerd Font glyphs share a
-      // visual centre in the fixed slot.
-      anchors.horizontalCenterOffset: implicitWidth / 2
-        - (btnMetrics.tightBoundingRect.x + btnMetrics.tightBoundingRect.width / 2)
-      color: bar.shell.palette.fg
-      font.family: btn.fontFamily
-      font.pixelSize: 14 * bar.shell.textScale
-    }
-
-    MouseArea {
-      id: btnMouse
-      anchors.fill: parent
-      hoverEnabled: true
-      onClicked: btn.activated()
-    }
-  }
 
   SystemClock {
     id: clock
@@ -77,8 +30,9 @@ Scope {
       implicitHeight: bar.shell.barHeight
       color: bar.shell.palette.bg
 
-      BarButton {
+      Ui.BarButton {
         id: menuButton
+        shell: bar.shell
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.leftMargin: 4
@@ -108,8 +62,9 @@ Scope {
       // Opens the launcher at its system level rather than owning a panel:
       // that level already holds lock, idle, suspend, logout, reboot and
       // shutdown, and SUPER + ESCAPE already goes there.
-      BarButton {
+      Ui.BarButton {
         id: powerButton
+        shell: bar.shell
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
@@ -117,8 +72,9 @@ Scope {
         onActivated: bar.shell.menu.toggleLevel("system")
       }
 
-      BarButton {
+      Ui.BarButton {
         id: notificationButton
+        shell: bar.shell
         anchors.right: powerButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
@@ -126,8 +82,9 @@ Scope {
         onActivated: bar.shell.notifications.toggleHistory()
       }
 
-      BarButton {
+      Ui.BarButton {
         id: displayButton
+        shell: bar.shell
         anchors.right: notificationButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
@@ -135,8 +92,9 @@ Scope {
         onActivated: bar.shell.display.toggle()
       }
 
-      BarButton {
+      Ui.BarButton {
         id: networkButton
+        shell: bar.shell
         anchors.right: displayButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
@@ -144,8 +102,9 @@ Scope {
         onActivated: bar.shell.network.toggle()
       }
 
-      BarButton {
+      Ui.BarButton {
         id: audioButton
+        shell: bar.shell
         anchors.right: networkButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
@@ -156,13 +115,23 @@ Scope {
       // Indicators grow inward from here, so the buttons above keep their
       // places at the right edge when one appears. Clicking restores the
       // default, which is the only thing anyone wants from a coffee cup.
-      BarButton {
+      Ui.BarButton {
+        id: idleButton
+        shell: bar.shell
         anchors.right: audioButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: visible ? 4 : 0
         visible: !bar.shell.idle.enabled
         label: "󰅶"
         onActivated: bar.shell.idle.setEnabled(true)
+      }
+
+      BarWidgets.Tray {
+        anchors.right: idleButton.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: 4
+        shell: bar.shell
+        panel: bar.shell.tray
       }
     }
   }

@@ -20,8 +20,8 @@ missing one, because it gets believed and acted on.
 
 ## Prior art to steal from
 
-Two other Quickshell setups cover the same ground; read theirs before
-designing ours. Both are cloned locally (each within days of upstream as of
+Three other Quickshell setups cover the same ground; read theirs before
+designing ours. All are cloned locally (each within days of upstream as of
 2026-09-04 — `git -C <clone> pull` before relying on one):
 
 - **Omarchy 4 "Quattro"**, `~/code/public/github.com/omarchy` — one level
@@ -30,6 +30,17 @@ designing ours. Both are cloned locally (each within days of upstream as of
 - **caelestia**, `~/code/public/github.com/caelestia-dots/shell` — ~280 QML
   files, a widget per directory under `modules/` and a singleton per concern
   under `services/`. The closest thing to a second opinion on any QML we write.
+- **DankMaterialShell**, `~/code/public/github.com/AvengeMedia/DankMaterialShell`
+  — the QML is under `quickshell/`, laid out as `Modules/<Surface>/Widgets/`
+  with singletons in `Common/`. Its widgets run large (the tray is 2268 lines
+  across `SystemTrayBar.qml` and `Common/TrayMenuManager.qml`, against
+  caelestia's 388 in three files), so it is the one to read for what a
+  feature's full surface looks like, not for how to shape one.
+
+Where the three disagree, the disagreement is usually the interesting part:
+caelestia is the minimal expression, Omarchy the considered one, Dank the
+exhaustive one. Reading the same widget in all three costs ten minutes and has
+so far been worth it every time.
 
 ## Reaching it
 
@@ -1146,6 +1157,88 @@ on the first *enabled* row, deferred through `Qt.callLater` because ListView
 resets `currentIndex` itself when the model changes, after `onRowsChanged`
 runs.
 
+## The tray
+
+`Quickshell.Services.SystemTray` supplies the items; `plugins/bar/widgets/`
+holds `Tray.qml` and a `TrayModel.js` for the string handling, and
+`plugins/panels/tray/Panel.qml` draws an item's own menu. The app owns every
+row — label, nesting, what a click does — and we own only how it is drawn.
+
+- **The rows are drawn here, not through `QsMenuEntry.display()`.** That
+  renders a *platform* menu, which Quickshell refuses unless the shell root
+  sets `//@ pragma UseQApplication`; `shell.qml` does not, so `display()` is a
+  silent no-op and an app whose whole UI is submenus would be unusable.
+  Omarchy hit this and documents it at `widgets/Tray.qml:36`. Drawing them
+  also means they get the palette and `Ui/Panel`'s keyboard chain for free.
+- **One live `QsMenuOpener` per level.** A child entry is owned by its parent
+  opener's children model, so collapsing the stack to a single opener destroys
+  the entry being displayed and the submenu comes up empty. Tear down deepest
+  first, and clear the reactive stack before destroying anything.
+- **Never hand a theme name to the `image://icon/` provider.** It looks the
+  theme up at the exact pixel size asked for and does not scale: nm-applet's
+  `nm-device-wired` exists at 16 and not at 20, so the same icon rendered in
+  the 16px bar slot and failed in the launcher's 20px one. **It answers a miss
+  with a magenta placeholder at `Image.Ready`, not `Image.Error`**, so
+  `visible: status === Image.Ready` — which Omarchy, caelestia and Dank all
+  use — cannot tell a missing icon from a real one, and the failure is a
+  magenta checkerboard in the bar rather than a fallback. Resolve the name with
+  `Quickshell.iconPath(name, true)` and let `Image` scale the file; an
+  unresolvable name returns `""`, which falls back to the glyph.
+  `TrayModel.themeIconName()` is what decides a url is a plain theme lookup —
+  a `?path=` query means the app ships its icon outside any theme and
+  Quickshell searches that directory, so the name alone would not resolve and
+  must be left alone.
+- **Sorted by `id`, growing inward from the coffee.** Registration order is a
+  startup race between apps, so an unsorted tray puts a given icon in a
+  different slot on each boot. Growing inward keeps the fixed right-edge
+  buttons still when an app registers or exits.
+- **`status` is the only state the protocol maintains for us.** `Passive` and
+  `Active` both show — most apps set `Passive` once and never touch it again,
+  so hiding those would hide Signal permanently. `NeedsAttention` takes
+  `palette.sel`, which is the unread-badge behaviour without a second slot.
+- **`qs ipc call tray list` / `menu <id>` / `close`.** The bar icon is a
+  mouse-only affordance; this is the path the launcher's Tray level uses, and
+  the only way to drive the menu from a script or a test.
+
+Not ported, all of it deliberate: pin/hide buckets and their persisted config,
+the hover-reveal drawer, and per-app icon overrides. Omarchy's `TrayModel.js`
+exists only to hide LocalSend and Dropbox items it replaces with its own
+widgets, neither of which is installed here.
+
+**Our submenu handling is not the one caelestia uses, and that was checked.**
+Theirs is a `StackView` of `SubMenu` items
+(`modules/bar/popouts/TrayMenu.qml`), ours an array of openers with explicit
+`destroy()`. Both enforce the same one-opener-per-level invariant; theirs gets
+it from `StackView.onRemoved`, and is about ten lines shorter for it. It is not
+the simpler file overall — 228 lines against our 241, and those 228 render no
+checkboxes or radio buttons (`checkState` and `buttonType` appear nowhere in
+their tray) and bind no keys. The one thing worth taking is their **Back row**,
+a `chevron_left` at the foot of a submenu; ours has Backspace and nothing
+visible.
+
+**Icon recolouring is the one thing all three upstreams have and we do not.**
+caelestia has `Config.bar.tray.recolour` over a `ColouredIcon`, Dank has
+`trayIconTintEnabled` over a `MultiEffect` with saturation and colorization.
+Ours renders app icons at their own colours, which is the only place the bar
+is not monochrome. Deferred rather than rejected — worth revisiting once
+there are several real icons side by side to judge.
+
+**A tray producer for testing, with nothing to install:**
+
+```sh
+nix run nixpkgs#networkmanagerapplet -- --indicator
+```
+
+`nix run` alone is not enough — it leaves the applet's own
+`share/icons` off `XDG_DATA_DIRS`, so every icon misses and renders magenta,
+which looks exactly like the bug above. Point `XDG_DATA_DIRS` at the store
+path first, or the test lies to you:
+
+```sh
+NMA=$(nix build --no-link --print-out-paths nixpkgs#networkmanagerapplet)
+XDG_DATA_DIRS="$NMA/share:$XDG_DATA_DIRS" "$NMA/bin/nm-applet" --indicator
+```
+
 ## Wallpapers
 
 Images live in `~/Pictures/wallpapers` — deliberately outside the repo, so no
@@ -1569,8 +1662,8 @@ still missing.
 Upstream's default bar is data, in `config/omarchy/shell.json`: left `menu`,
 `workspaces`; centre `indicators`, `clock`, `keyboard-layout`, `weather`,
 `system-update`; right `tray`, `agents`, `bluetooth`, `network`, `audio`,
-`monitor`, `power`. Ours is menu, workspaces, clock, audio, network, display,
-bell, power.
+`monitor`, `power`. Ours is menu, workspaces, clock, tray, audio, network,
+display, bell, power.
 None of the below is blocked on the two items above — pick freely.
 
 Runnable on the VM today:
@@ -1581,8 +1674,6 @@ Runnable on the VM today:
   is a button" for what we took and what we left. What is left here is
   `NightLight` (state exists, no bar affordance), the three we have no service
   for, and their hover-reveal of inactive indicators.
-- **`omarchy.tray`** (`widgets/Tray.qml`, `TrayModel.js`) — SNI tray. Nothing
-  else in this shell surfaces a tray icon.
 - **`omarchy.audio`'s per-app mixer and input section** — the master slider and
   output-device picker are ported; see "Audio".
 - **`omarchy.microphone`** (`widgets/Microphone.qml`) — mute toggle, source
