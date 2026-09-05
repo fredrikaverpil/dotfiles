@@ -10,6 +10,7 @@ import "plugins/notifications" as Notifications
 import "plugins/panels/audio" as Audio
 import "plugins/panels/monitor" as Monitor
 import "plugins/panels/network" as Network
+import "plugins/panels/tray" as Tray
 import "plugins/polkit" as Polkit
 import "plugins/services/idle" as Idle
 import "plugins/services/network" as NetworkService
@@ -31,6 +32,7 @@ ShellRoot {
   readonly property alias network: network
   readonly property alias networkService: networkService
   readonly property alias audio: audio
+  readonly property alias tray: tray
 
   // All overlay panels leave this strip click-through so a second click
   // reaches its bar button rather than their full-screen dismissal surface.
@@ -171,6 +173,10 @@ ShellRoot {
     "trigger.emoji": { icon: "", label: "Emoji", enabled: false },
     "trigger.color": { icon: "󰃉", label: "Color picker", enabled: false },
     "trigger.share": { icon: "", label: "Share", enabled: false },
+    // The bar's tray icons are mouse-only; every bar action is also a
+    // launcher entry. Enter raises the app, which is the common case --
+    // its own menu stays on the bar icon's right click.
+    "tray": { icon: "󰘔", label: "Tray", provider: "tray" },
     "setup": { icon: "", label: "Setup" },
     "setup.display": { icon: "󰍹", label: "Display", action: () => display.open() },
     "setup.network": { icon: "󰈀", label: "Network", action: () => network.open() },
@@ -249,6 +255,11 @@ ShellRoot {
 
   Audio.Panel {
     id: audio
+    shell: root
+  }
+
+  Tray.Panel {
+    id: tray
     shell: root
   }
 

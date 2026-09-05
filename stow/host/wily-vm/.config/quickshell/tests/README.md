@@ -1,9 +1,13 @@
-# Test examples
+# Tests
 
-Nothing here is loaded by the shell. These four files are a worked example of
-the two kinds of test this tree can support, and of the boundary between them.
-`BatteryModel.js` and `BatteryIndicator.qml` are stand-ins with no counterpart
-in `plugins/` — delete them once real code is under test.
+Nothing here is loaded by the shell.
+
+`TrayModel_test.js` covers real code: `plugins/bar/widgets/TrayModel.js`.
+
+The four `Battery*` files are a worked example of the two kinds of test this
+tree can support, and of the boundary between them; they are stand-ins with no
+counterpart in `plugins/`. `tst_BatteryIndicator.qml` is still the only example
+of the QML component kind, which is why they have not been deleted.
 
 ## Running
 
