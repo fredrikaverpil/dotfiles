@@ -93,10 +93,19 @@ These get used constantly. `HYPRLAND_INSTANCE_SIGNATURE` must be the
 # deleted locally linger on the VM and keep getting stowed). The git add -AN is
 # not optional: flakes ignore untracked files, and a new file that is not at
 # least intent-to-added fails evaluation with "Path ... is not tracked by Git".
-# unlock the session first: this reloads Quickshell, and a reload under a lock
-# strands it (see "Losing the lock surface" below).
+# rsync does NOT reload Quickshell -- it writes via rename, which the watcher
+# misses and which orphans that file's watch until a restart. Follow a deploy
+# that touches QML with `systemctl --user restart quickshell.service`, and
+# unlock the session first: a restart under a lock strands it (see "Losing the
+# lock surface" below).
 rsync -a --delete --exclude .git --exclude result ~/.dotfiles/ fredrik@"$VM":~/.dotfiles/
 ssh fredrik@"$VM" 'cd ~/.dotfiles && git add -AN .'   # flakes ignore untracked files
+
+# `qs ipc` matches instances by DISPLAY CONNECTION, not just XDG_RUNTIME_DIR.
+# Run it without WAYLAND_DISPLAY and it reports "No running instances for
+# .../shell.qml" plus a list of dead ones -- which reads exactly like a crashed
+# shell and is not one. Check `systemctl --user is-active quickshell.service`
+# and `qs list` before believing it died.
 
 # run something inside the live session (hyprctl, grim, an app)
 ssh fredrik@"$VM" "export XDG_RUNTIME_DIR=/run/user/1000 WAYLAND_DISPLAY=wayland-1 \
@@ -627,13 +636,52 @@ This is also why the bar carries a menu icon at all, rather than leaving
 
 ## Losing the lock surface, and getting out of it
 
-**Quickshell hot-reloads on any change to a file it has loaded** — but *not*
-on an `rsync` from the laptop: rsync writes a temp file and renames it over the
-target, and the watcher does not fire, so a deploy needs an explicit
-`systemctl --user restart quickshell` (measured 2026-09-02). Editing a loaded
-file in place on the VM does reload. Reload or restart the shell while the
-session is locked and the lock client dies under a compositor lock that stays
-up: Hyprland replaces
+**Quickshell's file watcher is bound to the inode, not the path.** Measured
+2026-09-05, each case on a freshly restarted shell:
+
+| Write | Reloads? |
+| --- | --- |
+| In-place content change on the VM (`cat > file`, an editor that truncates) | **yes** |
+| `touch` — mtime bump, content unchanged | no |
+| Write via rename (`rsync`, `mv`, `git checkout`, `sed -i`) | no |
+| In-place change *after* a rename touched that file | **no** — see below |
+
+Two consequences, and the second is the one that wastes an afternoon:
+
+- A deploy by `rsync` never reloads, so it needs an explicit
+  `systemctl --user restart quickshell.service`. There is no cheaper trick:
+  `touch`ing the file afterwards does nothing (no content change), and neither
+  does touching `shell.qml` (its own watcher is fine, but a bare touch is not
+  a change).
+- **A rename does not just fail to reload — it orphans that file's watcher.**
+  The watch stays on the old inode, so every later in-place edit of that file
+  is ignored too, silently, until the shell is restarted. Once you have
+  rsynced a file, hot reload is dead for it until a restart, and the shell
+  goes on serving the old code while the file on disk plainly shows the new.
+
+`journalctl --user -u quickshell.service | grep Reloading` is the ground truth:
+a hot reload logs `INFO: Reloading configuration...` then
+`INFO: Configuration Loaded`, while a restart logs `INFO: Launching config:`
+instead. Count over a *tight* window (`--since "@$(date +%s)"` captured before
+the write) — a 30-second window will happily attribute an earlier write's
+reload to whatever you just did.
+
+**A restart resets the theme to light.** There is no state file for it (only
+`wily-idle.json` and `wily-notifications.json` persist), so the palette comes
+back at its default and every restart during QML work silently flips a dark
+session. `qs ipc call theme dark` puts it back — worth doing before handing the
+VM back, since the user notices the light bar long before they notice anything
+else you changed.
+
+Two process-name traps on this host, both of which cost real time:
+`pgrep -x quickshell` and `pgrep -x nm-applet` find nothing, because `comm` is
+the truncated wrapper name (`.quickshell-wra`) — use
+`ps -eo pid,args | grep '[q]uickshell'`. And `pkill -f <pattern>` run over SSH
+kills the invoking shell, whose own command line contains the pattern; use
+`pkill -x`.
+
+**Reload or restart the shell while the session is locked** and the lock
+client dies under a compositor lock that stays up: Hyprland replaces
 the screen with *"Oopsie daisy, it looks like you locked your screen but the
 lockscreen app died"*. `qs ipc call lock status` then reports
 `locked:false, secure:true` — the shell no longer owns the lock it cannot
@@ -1239,10 +1287,8 @@ already puts the applet's own `share` at the front of `XDG_DATA_DIRS`, so
 `nm-device-wired` resolves and the bar icon renders. (Verified 2026-09-05 by
 reading `/proc/<pid>/environ` of a plainly-`nix run` applet.)
 
-Kill it with `pkill -x nm-applet` — **not** `pkill -f`, which also matches the
-SSH command string carrying the pattern and kills the invoking shell. `pgrep
--x nm-applet` is unreliable here for reasons not chased down; `ps -eo pid,args
-| awk '/[n]m-applet --indicator/{print $1}'` is what actually finds it.
+Kill it with `pkill -x nm-applet` — see the process-name traps under "Losing
+the lock surface" for why `-f` and `pgrep -x` both misfire here.
 
 ## Wallpapers
 
