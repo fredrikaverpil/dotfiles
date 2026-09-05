@@ -1306,7 +1306,15 @@ the explicit `rescan`.
 The picker previews: the highlighted thumbnail becomes the desktop wallpaper
 while the panel is open, and Escape puts the committed one back. The preview is
 debounced by 250ms, since each step is a full-size decode and arrowing through
-the grid otherwise runs behind the keys.
+the grid otherwise runs behind the keys. Every change — picker, preview, and
+the light/dark flip — crossfades over 400ms: a hidden `loader` Image decodes
+the incoming picture, and only when it is in memory do the two visible layers
+move, so the fade never runs against a half-decoded picture.
+
+**An `Image` whose source is already in Qt's cache is `Ready` the instant the
+source is assigned**, so `onStatusChanged` never fires for it and a handler
+hung there alone silently does nothing — which is exactly the light/dark case,
+where both pictures are already decoded. Handle `onSourceChanged` too.
 
 webp works, but only because `desktop.nix` sets `QT_PLUGIN_PATH` to
 `qt6.qtimageformats` on the Quickshell unit — the package ships no webp
