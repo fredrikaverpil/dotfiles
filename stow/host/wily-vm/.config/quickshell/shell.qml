@@ -63,20 +63,46 @@ ShellRoot {
   // the background. `off` is for text that must stay readable while reading as
   // inactive, so it sits between the two; `dim` on `bg` is around 1.5:1 in
   // dark mode, which is invisible rather than subdued.
-  readonly property var palette: dark
-    ? ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864" })
-    : ({ bg: "#F0EDEC", fg: "#2C363C", sel: "#CBD9E3", dim: "#CFC1BA", off: "#8F857D" })
+  readonly property var darkPalette: ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864" })
+  readonly property var lightPalette: ({ bg: "#F0EDEC", fg: "#2C363C", sel: "#CBD9E3", dim: "#CFC1BA", off: "#8F857D" })
+  readonly property var palette: dark ? darkPalette : lightPalette
+
+  // A KDE app repaints its view area from kdeglobals' [Colors:View] when the
+  // palette changes -- not from the palette itself, which is what the gtk3
+  // platform theme supplies and what the rest of its window follows. With no
+  // kdeglobals that read falls back to Breeze light, which is why Dolphin's
+  // file area stayed white in dark mode. Two colours are the whole fix; the
+  // file is re-read on the palette change, so it must be written first.
+  function kdeglobalsWrite(on) {
+    const p = on ? darkPalette : lightPalette
+    const rgb = hex => {
+      const c = Qt.color(hex)
+      return [Math.round(c.r * 255), Math.round(c.g * 255), Math.round(c.b * 255)].join(",")
+    }
+    return "printf '[Colors:View]\\nBackgroundNormal=" + rgb(p.bg) +
+      "\\nForegroundNormal=" + rgb(p.fg) + "\\n' > \"$HOME/.config/kdeglobals\"; "
+  }
 
   function setDark(on) {
     const scheme = on ? "prefer-dark" : "prefer-light"
     const gtk = on ? "Adwaita-dark" : "Adwaita"
     write.command = ["sh", "-c",
+      kdeglobalsWrite(on) +
       "dconf write /org/gnome/desktop/interface/color-scheme \"'" + scheme + "'\"; " +
       "dconf write /org/gnome/desktop/interface/gtk-theme \"'" + gtk + "'\""]
     write.running = true
   }
 
+  // A dconf write from a shell bypasses setDark, so keep the file in step
+  // with the watcher too. That write can land after the app has repainted;
+  // the next toggle corrects it.
+  onDarkChanged: {
+    kdeglobals.command = ["sh", "-c", kdeglobalsWrite(root.dark)]
+    kdeglobals.running = true
+  }
+
   Process { id: write }
+  Process { id: kdeglobals }
 
   function setTextScale(value) {
     const scale = Number(value)
