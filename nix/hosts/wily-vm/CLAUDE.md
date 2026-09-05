@@ -1438,6 +1438,38 @@ The matching Omarchy keybinds are `SUPER + comma` (dismiss latest),
 `SUPER + CTRL + I` (toggle idle locking), `SUPER + CTRL + L` (lock), and
 `SUPER + CTRL + N` (toggle nightlight).
 
+## System settings we should not build
+
+The long tail — printers, pairing, VPN and 802.1X profiles, GTK theming — is
+not worth a panel each. There is also no hub to reach for: GNOME's
+control-center and KDE's systemsettings delegate their interesting panels to
+Mutter and KWin over D-Bus, so on either compositor here half of them grey out
+or crash. The ecosystem answer is one small GUI per domain, launched from the
+menu, which is what Omarchy does too.
+
+None of these are installed yet. All exist in nixpkgs on aarch64 (checked, not
+run), so adding one is a `host.extraSystemPackages` entry plus a menu row
+under a new `System` level.
+
+| Domain | Tool | Notes |
+| --- | --- | --- |
+| Printers | `services.printing.enable`, CUPS UI at `localhost:631` | no GUI package at all; with avahi, IPP-Everywhere printers self-configure. `system-config-printer` if a GTK dialog is wanted |
+| Bluetooth | `blueman` or `overskride` | ships the pairing agent — the single largest thing not worth reimplementing |
+| Wi-Fi, VPN, 802.1X | `nm-connection-editor` (`networkmanagerapplet`) | the tail our network panel should not grow into |
+| Audio routing | `pwvucontrol` | per-stream sinks, card profiles, ports |
+| GTK theme, cursor, font | `nwg-look` | writes the gsettings the portal already reads; see "Light and dark" |
+| Display arrangement | `nwg-displays` | Hyprland and sway only, and it writes its own `monitors.conf` — a second writer against `hypr/monitors.lua`. Probably still not worth it |
+| Per-monitor hotplug profiles | `shikane` | only if the ThinkPad's dock/undock needs them |
+| Keyboard layout, input rules | none exists | compositor config file, by hand |
+
+**The Display panel stays ours regardless.** niri is not a
+wlr-output-management server, so `nwg-displays` and `wdisplays` cannot see it
+at all, and the panel already writes `config.kdl` and `hypr/monitors.lua` in
+place.
+
+The split to hold to: a panel for what gets touched from the bar daily, an
+external app for what gets touched twice a year.
+
 ## Deferred for the ThinkPad
 
 - Fingerprint unlock, including its separate PAM stack and reader indicator.
