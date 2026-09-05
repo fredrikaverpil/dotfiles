@@ -883,7 +883,9 @@ Why it is worth the extra file:
 - **Polling is gated on display, not on the panel.** A service exposes
   `property bool active` and the panel drives it with a `Binding`. The
   Processes and poll timers run only while something shows their output; the
-  properties Quickshell keeps current stay live regardless.
+  properties Quickshell keeps current stay live regardless. It is a plain bool
+  with exactly one writer; a second consumer of the same metrics would need it
+  to become a refcount.
 - Panels stay readable. `plugins/panels/network/Panel.qml` went from 843 lines
   to 449.
 
