@@ -1486,13 +1486,20 @@ needed each one:
 With both, Dolphin follows the toggle live — verified in each direction with no
 restart.
 
-Two per-user leftovers from the Plasma session that was once installed here had
-to go first, neither of them in `stow/`: `~/.config/dolphinrc`'s `[UiSettings]
-ColorScheme=BreezeDark`, a per-app override that pins the palette and made an
-early test look like a fix, and `~/.config/kdeglobals` plus
-`~/.config/kdedefaults/`, which pin `BreezeLight`. `~/.config/gtk-3.0/`,
-`gtkrc*` and the rest of the `kde*rc` pile are from the same era and still
-there.
+Per-user leftovers from the Plasma session once installed here had to go first,
+none of them in `stow/`. `~/.config/dolphinrc`'s `[UiSettings]
+ColorScheme=BreezeDark` was the worst of them: a per-app override that pins the
+palette and made an early test look like a fix. `kdeglobals` and `kdedefaults/`
+pin `BreezeLight`; `gtk-3.0/`, `gtk-4.0/` and `gtkrc*` pin Breeze and
+`prefer-dark-theme=false` for GTK. The whole set — those plus `kwin*`,
+`plasma*`, `kglobalshortcutsrc`, `Trolltech.conf`, `xsettingsd/` and the other
+`kde*rc` files, with the matching `~/.local/share` and `~/.cache` directories —
+was cleared out on 2026-09-05. `dolphinrc` and `baloofilerc` stay: Dolphin is
+still installed. So do `~/.local/share/{dolphin,baloo,user-places.xbel}`, which
+hold its view settings and sidebar.
+
+Expect a fresh install to grow these again only if Plasma is installed again;
+nothing in the current session writes them.
 
 Bar and menu colours are the zenbones palettes, lifted from
 `stow/shared/.config/ghostty/themes/zenbones_{dark,light}` so the bar and the
