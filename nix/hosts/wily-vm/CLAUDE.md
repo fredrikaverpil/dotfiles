@@ -924,11 +924,22 @@ Two mechanical gotchas when adding a directory under `stow/`:
 `qmlls`, `qmllint` and `qmltestrunner` come from the repo's devshell
 (`flake.nix` `devShells.default`, entered via the root `.envrc`), on both the
 Mac and the VM. `qml-lint`, `qml-test-js` and `qml-test-qml` are on that PATH;
-Neovim launched from a shell in the repo gets `qmlls` on `.qml` buffers. Setup
-and the version story live beside the tree they apply to, in
-`stow/host/wily-vm/.config/quickshell/README.md`; the two things worth knowing
-from here:
+Neovim launched from a shell in the repo gets `qmlls` on `.qml` buffers —
+verified headless, `nvim-lspconfig`'s `lsp/qmlls.lua` supplying the filetypes
+and `nvim-fredrik/after/lsp/qmlls.lua` the `-E`. Setup and the version story
+live beside the tree they apply to, in
+`stow/host/wily-vm/.config/quickshell/README.md`; the three things worth
+knowing from here:
 
+- **direnv is what delivers it, not the `nvim` and `claude` shims.** Those
+  inject `~/.config/nvim-deps-path` (`nix/shared/toolchain.nix`), which has no
+  Qt and sets no env; `qmlls` and `QML_IMPORT_PATH` come from
+  `devShells.default` via `.envrc`, so both shims get them by inheritance when
+  launched from a shell inside this repo and not otherwise. Editing the
+  **stowed** `~/.config/quickshell/` path instead of the repo is therefore
+  unserved — no `qmlls`, no import path. Deliberate: the Qt closure has no
+  business on every host's Neovim, and the workflow is to edit in the repo and
+  rsync to the VM.
 - **`Ui/qmldir` exists for the tooling only.** Neither tool can resolve a
   `pragma Singleton` reached through `import "Ui" as Ui` without it, and the
   failure looks like every member of `Compositor` having vanished. A qmldir
@@ -1749,15 +1760,12 @@ smaller than theirs.
 - Only one emoji font is installed; `noto-fonts-color-emoji` is commented out
   in `nix/shared/system/linux.nix` as slow to build. Quickshell UI will want it.
 - Mason installs prebuilt glibc binaries, which cannot run on NixOS. Neovim
-  itself works on the VM (all 74 vim.pack plugins installed cleanly), but the
+  itself works on the VM (every vim.pack plugin installed cleanly), but the
   Mason-managed language servers are expected to be broken. Untested.
-- No LSP for either config yet. `qmlls` is the QML one and ships inside
-  `qt6.qtdeclarative` (confirmed present in nixpkgs, `bin/qmlls`), so it is a
-  package plus an `nvim-fredrik/lsp/` entry — it must come from Nix, not
-  Mason, whose prebuilt binaries cannot run here. For `hyprland.lua` the
-  situation is worse: `hyprls` only understands hyprlang `.conf`, which is the
-  format we do not use, so the realistic option is `lua_ls` plus a hand-written
-  LuaCATS stub for the `hl` API. Unverified — nobody has tried either here.
+- No LSP for `hyprland.lua`. `hyprls` only understands hyprlang `.conf`, which
+  is the format we do not use, so the realistic option is `lua_ls` plus a
+  hand-written LuaCATS stub for the `hl` API. Unverified — nobody has tried it.
+  QML is covered; see "Linting QML and getting the LSP to attach".
 
 ## Disk
 
