@@ -17,7 +17,7 @@ input {
         repeat-rate 60
     }
     mouse {
-        natural-scroll false
+        natural-scroll true
     }
     touchpad {
         tap
