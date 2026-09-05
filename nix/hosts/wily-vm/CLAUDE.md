@@ -500,7 +500,7 @@ data, and niri reads XCursor only.
 ### Not yet verified
 
 Nothing in this section has run: niri needs a rebuild first. Static checks that
-did pass — `niri validate` on `config.kdl` (from `nix shell nixpkgs#niri`), the
+did pass — `niri-validate` on `config.kdl` (from the Linux devshell), the
 bind extractor against the real file (71 rows, no self-match),
 `node Model.js`, and evaluation of the whole host. Everything else, starting
 with whether the shell comes up at all under `wayland-session@niri.target`, is
