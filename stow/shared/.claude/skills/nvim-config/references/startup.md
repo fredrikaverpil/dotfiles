@@ -86,8 +86,8 @@ though the autocmd itself is registered once at startup.
 
 ## Documentation
 
-Docs ship with Neovim at `$VIMRUNTIME/doc/`. With Bob-managed nightly the path
-is `~/.local/share/bob/nightly/share/nvim/runtime/doc/`. Read with `:h <tag>`
+Docs ship with Neovim at `$VIMRUNTIME/doc/` (resolve with `nvim --clean
+--headless +'echo $VIMRUNTIME' +q`). Read with `:h <tag>`
 inside Neovim or directly with your editor/pager. Online mirror:
 https://neovim.io/doc/user/
 

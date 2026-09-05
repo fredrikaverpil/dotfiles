@@ -125,8 +125,9 @@ exact formatter/linter tools and configurations. Formatters are wired up in
 
 ## Gotchas
 
-- **Neovim is managed by Bob on Darwin**, not nixpkgs — binary is at
-  `~/.local/share/bob/nvim-bin/nvim`
+- **Neovim comes from nixpkgs-unstable on all hosts** (declared in
+  `nix/shared/home/common.nix`); a commented `overrideAttrs` there builds a
+  specific sha/tag instead
 - **`stow/` changes take effect immediately** (just re-run the “Symlink
   dotfiles only” command above, which includes the optional
   `stow/host/<hostname>` package) — no Nix rebuild needed
