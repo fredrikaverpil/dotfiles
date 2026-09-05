@@ -162,7 +162,7 @@ ShellRoot {
     "learn.compositor": { icon: "", label: Ui.Compositor.niri ? "niri" : "Hyprland", enabled: false },
     "learn.nixos": { icon: "", label: "NixOS", enabled: false },
     "style": { icon: "", label: "Style" },
-    "style.background": { icon: "", label: "Background", action: () => background.open() },
+    "style.wallpaper": { icon: "", label: "Wallpaper", action: () => background.open() },
     "style.theme": { icon: "", label: "Theme" },
     "style.theme.dark": { icon: "", label: "Dark", action: () => root.setDark(true) },
     "style.theme.light": { icon: "", label: "Light", action: () => root.setDark(false) },

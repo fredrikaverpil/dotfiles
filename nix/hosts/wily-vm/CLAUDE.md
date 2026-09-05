@@ -1298,7 +1298,7 @@ png/jpg/jpeg/webp), so subfolders are for tidiness only, not meaning. The pick
 is **per mode**: `~/.local/state/wallpaper-dark` and `-light`, each a plain
 path, so flipping light/dark also swaps the picture and each side remembers its
 own. A mode with no pick yet shows the gradient. `SUPER + CTRL + SPACE` (or the
-menu's Style › Background) opens the picker; `qs ipc call wallpaper` also takes
+menu's Style › Wallpaper) opens the picker; `qs ipc call wallpaper` also takes
 `open/close/toggle`, `set <path>`, and `rescan` after adding files. The picker
 rescans on open, so a file added while the shell is running shows up without
 the explicit `rescan`.
