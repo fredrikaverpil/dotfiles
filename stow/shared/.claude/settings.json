@@ -75,7 +75,12 @@
     }
   },
   "outputStyle": "Terse",
-  "effortLevel": "medium",
+  "effortLevel": "low",
+  "modelSettings": {
+    "claude-opus-5": {
+      "effortLevel": "medium"
+    }
+  },
   "showClearContextOnPlanAccept": true,
   "tui": "fullscreen",
   "showThinkingSummaries": true,
