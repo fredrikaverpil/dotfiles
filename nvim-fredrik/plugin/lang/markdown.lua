@@ -1,9 +1,6 @@
 require("lazyload").on_vim_enter(function()
-  vim.pack.add({
-    { src = "https://github.com/MeanderingProgrammer/render-markdown.nvim", version = vim.version.range("*") },
-  })
-
-  require("render-markdown").setup({
+  -- NOTE: the plugin auto-calls setup(vim.g.render_markdown_config), so we need to set it here first
+  vim.g.render_markdown_config = {
     code = {
       sign = false,
       width = "block",
@@ -12,6 +9,10 @@ require("lazyload").on_vim_enter(function()
     heading = {
       enabled = false,
     },
+  }
+
+  vim.pack.add({
+    { src = "https://github.com/MeanderingProgrammer/render-markdown.nvim", version = vim.version.range("*") },
   })
 
   vim.keymap.set("n", "<leader>uM", function()
