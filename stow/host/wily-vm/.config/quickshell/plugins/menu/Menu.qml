@@ -88,12 +88,12 @@ Ui.Panel {
     return Quickshell.iconPath(value, true)
   }
 
-  // Same sort as the bar's, so a row sits where its icon does.
+  // Sort and label come from TrayModel so a row sits where its icon does;
+  // the bar reads the same two functions.
   function trayRows() {
-    return [...SystemTray.items.values]
-      .sort((a, b) => String(a.id).localeCompare(String(b.id)))
+    return TrayModel.sortItems(SystemTray.items.values)
       .map(item => ({
-        label: item.title || item.tooltipTitle || item.id,
+        label: TrayModel.labelFor(item),
         icon: "󰘔",
         // Same theme-name resolution as the bar's; see Tray.qml for why the
         // `image://icon/` provider is not handed the name directly.
