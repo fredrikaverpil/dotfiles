@@ -162,9 +162,20 @@ in
     # why.
     # Both compositors, and only one of them is ever in the start transaction,
     # so the unused After is inert.
+    #
+    # waitenv is what actually makes this safe under niri. niri sd_notifies
+    # READY=1 itself ~1ms after binding its Wayland socket, long before its
+    # `spawn-at-startup uwsm finalize` publishes WAYLAND_DISPLAY to the user
+    # manager -- so an After on the compositor service alone releases this unit
+    # into an environment with no WAYLAND_DISPLAY, libwayland falls back to
+    # wayland-0, and Quickshell dies on ENOENT. uwsm's waitenv unit blocks
+    # until the variable is in the activation environment, which is the
+    # condition this unit actually needs. Hyprland does not self-notify, so it
+    # never had the gap.
     after = [
       "wayland-wm@hyprland.desktop.service"
       "wayland-wm@niri.service"
+      "wayland-session-waitenv.service"
     ];
     # Not graphical-session.target: Plasma activates that too, and this shell
     # would then stack a second bar, lock surface and polkit agent onto KWin.
@@ -194,10 +205,12 @@ in
     partOf = [ "graphical-session.target" ];
     # See the quickshell unit above: an After on graphical-session.target is
     # an ordering cycle here.
+    # waitenv for the same reason as the quickshell unit above.
     after = [
       "dbus.socket"
       "wayland-wm@hyprland.desktop.service"
       "wayland-wm@niri.service"
+      "wayland-session-waitenv.service"
     ];
     requires = [ "dbus.socket" ];
     wantedBy = [

@@ -369,11 +369,15 @@ that are not interchangeable:
 - **Boolean KDL options are presence-only.** `natural-scroll` enables it;
   `natural-scroll true` is a parse error, not an accepted false/true setting.
   Run `niri validate --config ~/.config/niri/config.kdl` after editing the file.
-- **`uwsm finalize` has to name `NIRI_SOCKET`.** It exports `WAYLAND_DISPLAY`
-  on its own, but the shell runs as a separate unit and gets nothing else from
-  the compositor. Without that export `niri msg` fails inside the shell *and*
-  `Ui/Compositor.qml` decides it is on Hyprland, so every compositor call goes
-  to `hyprctl` and silently does nothing.
+- **`NIRI_SOCKET` must reach the systemd user manager.** The shell runs as a
+  separate unit and gets nothing from the compositor otherwise; without that
+  export `niri msg` fails inside the shell *and* `Ui/Compositor.qml` decides it
+  is on Hyprland, so every compositor call goes to `hyprctl` and silently does
+  nothing. `config.kdl` names it on `uwsm finalize`, but that argument is
+  **redundant** — uwsm's own niri plugin
+  (`/run/current-system/sw/share/uwsm/plugins/niri.sh`) already puts
+  `NIRI_SOCKET XCURSOR_SIZE XCURSOR_THEME` into `UWSM_FINALIZE_VARNAMES`.
+  Keeping it costs nothing and documents the requirement at the call site.
 
 **`Ui/Compositor.qml` is the whole coupling** — a Quickshell singleton keyed on
 `NIRI_SOCKET`, holding the compositor-specific command table and nothing else.
@@ -497,14 +501,96 @@ the chord and the wording, not close enough to call it the same feature.
 **The cursor is niri's default.** The stowed `macOS-hypr` theme is Hyprcursor
 data, and niri reads XCursor only.
 
-### Not yet verified
+### Verified in the VM
 
-Nothing in this section has run: niri needs a rebuild first. Static checks that
-did pass — `niri-validate` on `config.kdl` (from the Linux devshell), the
-bind extractor against the real file (71 rows, no self-match),
-`node Model.js`, and evaluation of the whole host. Everything else, starting
-with whether the shell comes up at all under `wayland-session@niri.target`, is
-open.
+Static checks: `niri-validate` on `config.kdl` (from the Linux devshell), the
+bind extractor against the real file (71 rows, no self-match), `node Model.js`,
+and evaluation of the whole host.
+
+Running under `wayland-session@niri.target`: UWSM launches niri, its user units
+come up, and `NIRI_SOCKET`, `WAYLAND_DISPLAY` and `XDG_CURRENT_DESKTOP=niri`
+are all exported. Every niri branch that could be exercised works — the display
+panel finds `Virtual-1`, the keyboard service switches US <-> SE, the workspace
+event stream runs and workspace actions land, and the portal appearance call
+answers. The display panel rendered correctly in a screenshot, with the menu
+mapped as an exclusive overlay.
+
+### Not testable in the VM
+
+- **Nightlight.** The virtio output rejects gamma control outright:
+  `gamma_control::Event::Failed`. wl-gammarelay-rs has nothing to drive.
+- Wi-Fi, Bluetooth, battery, brightness, and lid/resume — no such hardware.
+- Panel focus traversal and lock interaction need a real keyboard at the
+  console, not a screenshot.
+
+### Quickshell's first start under niri raced WAYLAND_DISPLAY
+
+Fixed 2026-09-06 by adding `wayland-session-waitenv.service` to the `after` of
+both `quickshell` and `wily-sleep-lock` in `desktop.nix`. What it was:
+
+Quickshell died once on every niri start and `Restart=on-failure` brought it
+back a third of a second later, so the session always came up and the failure
+was easy to write off. The journal (boot of 2026-09-06 00:55:08, times in ms):
+
+```
+08.710844  niri: listening on Wayland socket: wayland-1
+08.712142  systemd: Started Main service for niri            <- READY=1
+08.714041  systemd: Started Quickshell desktop shell
+08.954501  quickshell: Failed to create wl_display (No such file or directory)
+09.019     quickshell: crashed ... Not restarting to avoid a crash loop
+09.158941  uwsm_waitenv: All expected variables appeared     <- WAYLAND_DISPLAY
+09.324185  systemd: Started Quickshell desktop shell         <- restart, fine
+```
+
+**niri sends `READY=1` itself**, 1.3 ms after binding its socket, with no
+`--session` flag involved — the binary carries both `READY=1` and
+`NOTIFY_SOCKET`. `uwsm finalize` never gets to declare it: by the time finalize
+runs it reports *"Autoready: Unit for niri is already active."*
+
+So `wayland-wm@niri.service` goes active ~650 ms before anything publishes
+`WAYLAND_DISPLAY` to the systemd user manager. An `After=` on that service
+alone released Quickshell into an environment that had no `WAYLAND_DISPLAY` at
+all, libwayland fell back to its default `wayland-0`, niri was on `wayland-1`,
+and the client failed with `ENOENT` before it ever connected — hence no Qt
+platform plugin and `status=255/EXCEPTION`. The socket was fine the whole time.
+Nothing here is a socket race, and a `connect()` to a listening `AF_UNIX`
+socket would have queued in the backlog anyway.
+
+**Hyprland never had the gap**, verified at `NRestarts=0`. It does not
+self-notify, so `READY=1` comes from uwsm's autoready fork, which first waits
+for `WAYLAND_DISPLAY` *and* `HYPRLAND_INSTANCE_SIGNATURE` (uwsm's hyprland
+plugin sets `UWSM_WAIT_VARNAMES` to the latter) to appear in the activation
+environment. Both arrive with `finalize`, so the environment is provably in
+place before anything ordered after the compositor runs.
+
+The niri plugin has the same guard in `quirks_niri_session`
+(`UWSM_WAIT_VARNAMES=NIRI_SOCKET`), but that variant only runs for
+`niri.desktop` / `--session`, which this host deliberately does not use — its
+own comment is `# can't detect if niri has --session arg`. It would not have
+helped regardless: niri's self-notify preempts autoready either way.
+
+`wayland-session-waitenv.service` is uwsm's unit for exactly this condition. It
+is already pulled in (`Wants=` of `wayland-session@%i.target`), blocks until the
+variables are in the activation environment, and is
+`Before=graphical-session.target` — which these two units are deliberately
+*not* ordered against, so it adds no cycle.
+
+Two things this was **not**, both tried on 2026-09-06 and reverted before the
+journal was read:
+
+- **`sleep N; uwsm finalize`** does delay the shell, by withholding nothing —
+  niri had already notified — so it only worked by delaying `finalize`'s
+  export. It buys a fixed stall on every login and treats the symptom.
+- **`UWSM_WAIT_VARNAMES=WILY_NIRI_READY`** is read by the autoready fork in
+  `uwsm aux exec` (not by `wayland-session-waitenv.service`, which gates only
+  `graphical-session.target`). Inert here: niri's own `READY=1` beats autoready
+  to the notification, so no wait list of any length changes when the unit goes
+  active.
+
+The general lesson, and the reason both attempts missed: **an `After=` on a
+`Type=notify` compositor guarantees the compositor is running, not that the
+session environment has been published.** Those are separate events, and which
+one comes first depends on whether the compositor notifies for itself.
 
 ## lua_ls OOMs the VM
 
