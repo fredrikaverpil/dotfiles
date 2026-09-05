@@ -917,6 +917,30 @@ Two mechanical gotchas when adding a directory under `stow/`:
 - **rsync does not trigger Quickshell's file watcher** (see "Losing the lock
   surface"), so a deploy needs `systemctl --user restart quickshell`.
 
+## Linting QML and getting the LSP to attach
+
+`qmlls`, `qmllint` and `qmltestrunner` come from the repo's devshell
+(`flake.nix` `devShells.default`, entered via the root `.envrc`), on both the
+Mac and the VM. `qml-lint`, `qml-test-js` and `qml-test-qml` are on that PATH;
+Neovim launched from a shell in the repo gets `qmlls` on `.qml` buffers. Setup
+and the version story live beside the tree they apply to, in
+`stow/host/wily-vm/.config/quickshell/README.md`; the two things worth knowing
+from here:
+
+- **`Ui/qmldir` exists for the tooling only.** Neither tool can resolve a
+  `pragma Singleton` reached through `import "Ui" as Ui` without it, and the
+  failure looks like every member of `Compositor` having vanished. A qmldir
+  hides what it does not list, so a new file under `Ui/` needs a line in it.
+- **Both import paths come from the flake, never from the VM and never from
+  the qmlls binary's prefix.** The devshell's `QML_IMPORT_PATH` names the exact
+  aarch64-linux quickshell store path the VM runs (both track the same
+  `nixpkgs-unstable` input), which substitutes onto Darwin from cache.nixos.org.
+  Copying `lib/qt-6/qml` off the VM by hand would work today and be silently
+  stale after the next `nix flake update`. Taking Qt's builtins from
+  `exepath("qmlls")` is the other trap: Mason's `qmlls` is a standalone binary
+  with no Qt module directory, so `import QtQuick` fails whenever it wins the
+  PATH.
+
 ## Reaching Quickshell from a keybind
 
 `qs ipc call menu toggle` — the `IpcHandler { target = "menu" }` in
