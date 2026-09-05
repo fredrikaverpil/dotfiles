@@ -110,6 +110,8 @@ Scope {
     cardHeight: 540
 
     function open() {
+      // Pick up anything added to the directory since the last look.
+      scan.running = true
       if (background.shell && background.shell.registerPanel) background.shell.registerPanel(picker)
       if (background.shell && background.shell.claimPanel) background.shell.claimPanel(picker)
       shown = true
