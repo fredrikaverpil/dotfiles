@@ -98,8 +98,6 @@ in
       bat
       coreutils # provides e.g. timout
       curl
-      direnv
-      nix-direnv
       eza
       fzf
       git
@@ -218,6 +216,13 @@ in
         lua51Packages.luarocks # Neovim requires Lua 5.1
       ])
     );
+
+    # Writes ~/.config/direnv/direnvrc sourcing nix-direnv by store path, so
+    # `use flake` (.envrc) is cached and correct under both profile modes.
+    programs.direnv = {
+      enable = true;
+      nix-direnv.enable = true;
+    };
 
   };
 }
