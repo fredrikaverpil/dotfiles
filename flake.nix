@@ -134,6 +134,33 @@
                   export PATH="$HOME/.local/share/nvim-fredrik/mason/bin:$PATH"
                 '';
               };
+              # Entered by direnv (.envrc) for work on this repo itself: the QML
+              # tooling for the wily-vm Quickshell tree, which does not belong
+              # in the toolchain every Neovim carries. Neovim inherits the env
+              # when launched from a shell in this directory.
+              default =
+                let
+                  pkgs = channels.unstable;
+                  # Linux-only. Never built on Darwin: the aarch64-linux path
+                  # substitutes from cache.nixos.org, and only lib/qt-6/qml
+                  # (.qmltypes) is used here. Same nixpkgs as wily-vm, so the
+                  # same store path the VM runs.
+                  quickshell = unstable.aarch64-linux.quickshell;
+                  qml = "stow/host/wily-vm/.config/quickshell";
+                  task =
+                    name: text: pkgs.writeShellScriptBin name "cd \"$(git rev-parse --show-toplevel)/${qml}\"\n${text}";
+                in
+                pkgs.mkShell {
+                  packages = [
+                    pkgs.qt6.qtdeclarative # qmlls, qmllint, qmlformat, qmltestrunner
+                    (task "qml-lint" "qmllint -E $(find . -name '*.qml')")
+                    (task "qml-test-js" "deno test --allow-read tests/")
+                    (task "qml-test-qml" "QT_QPA_PLATFORM=offscreen qmltestrunner -input tests")
+                  ];
+                  # qmlls/qmllint/qmltestrunner take import paths from argv or
+                  # env only (`-E` reads this); .qmlls.ini has no key for them.
+                  QML_IMPORT_PATH = "${quickshell}/lib/qt-6/qml:${pkgs.qt6.qtdeclarative}/lib/qt-6/qml";
+                };
             };
         in
         {
