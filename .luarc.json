@@ -1,3 +1,15 @@
 {
-  "workspace.ignoreDir": ["stow", ".pocket/tools"]
+  "workspace.ignoreDir": [
+    "stow",
+    ".pocket",
+    ".pocket/tools",
+    ".tests",
+    ".venv",
+    ".vscode",
+    "node_modules",
+    "spec",
+    "test",
+    "tests",
+    "vendor"
+  ]
 }
