@@ -45,7 +45,10 @@ hl.config({
   },
 
   input = {
-    kb_layout = "us",
+    -- No grp: toggle in kb_options on purpose: the shell owns the current
+    -- index (qs ipc call keyboard ...), and a compositor-side switch would
+    -- desync the bar indicator. Order must match the service's `codes`.
+    kb_layout = "us,se",
     -- 60/s is past the point where the compositor, not libinput, is the limit;
     -- 200ms is short without turning a held modifier chord into a repeat.
     repeat_rate = 60,
@@ -163,6 +166,7 @@ local ok, err = pcall(function()
   bind("SUPER + CTRL + I", "Toggle idle locking", hl.dsp.exec_cmd("qs ipc call idle toggle"))
   bind("SUPER + CTRL + ALT + I", "Keep this window awake", hl.dsp.exec_cmd(stay_awake))
   bind("SUPER + CTRL + L", "Lock system", hl.dsp.exec_cmd("qs ipc call lock lock"))
+  bind("SUPER + CTRL + K", "Next keyboard layout", hl.dsp.exec_cmd("qs ipc call keyboard next"))
 
   -- Media. `locked` keeps volume working on the lock screen, `repeating` makes
   -- a held key keep stepping; both go straight through to hl.bind.

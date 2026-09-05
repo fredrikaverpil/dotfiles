@@ -13,6 +13,7 @@ import "plugins/panels/network" as Network
 import "plugins/panels/tray" as Tray
 import "plugins/polkit" as Polkit
 import "plugins/services/idle" as Idle
+import "plugins/services/keyboard" as Keyboard
 import "plugins/services/network" as NetworkService
 import "plugins/services/nightlight" as Nightlight
 import "Ui" as Ui
@@ -28,6 +29,7 @@ ShellRoot {
   readonly property alias notifications: notifications
   readonly property alias nightlight: nightlight
   readonly property alias idle: idle
+  readonly property alias keyboard: keyboard
   readonly property alias display: display
   readonly property alias network: network
   readonly property alias networkService: networkService
@@ -221,6 +223,20 @@ ShellRoot {
     "setup.network": { icon: "󰈀", label: "Network", action: () => network.open() },
     "setup.audio": { icon: "󰕾", label: "Audio", action: () => audio.open() },
     "setup.nightlight": { icon: "󰆔", label: "Nightlight", action: () => nightlight.toggle() },
+    // The layout names are here and the short codes are in the service; both
+    // lists sit next to what renders them, and both must match the order of
+    // `kb_layout` / `layout` in the two compositor configs.
+    "setup.keyboard": { icon: "󰌌", label: "Keyboard layout" },
+    "setup.keyboard.us": {
+      icon: keyboard.index === 0 ? "󰄬" : "󰌌",
+      label: "English (US)",
+      action: () => keyboard.set(0)
+    },
+    "setup.keyboard.se": {
+      icon: keyboard.index === 1 ? "󰄬" : "󰌌",
+      label: "Swedish",
+      action: () => keyboard.set(1)
+    },
     "system": { icon: "", label: "System" },
     "system.close": { icon: "󰅖", label: "Close window", action: () => Quickshell.execDetached(
       Ui.Compositor.closeWindow())
@@ -260,6 +276,10 @@ ShellRoot {
   Idle.Service {
     id: idle
     lockService: lock
+  }
+
+  Keyboard.Service {
+    id: keyboard
   }
 
   Nightlight.Service {
