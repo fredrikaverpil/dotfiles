@@ -1487,13 +1487,29 @@ With both, Dolphin follows the toggle live — verified in each direction with n
 restart.
 
 One thing the Qt palette does not carry: **a KDE app repaints its view area
-from `~/.config/kdeglobals` `[Colors:View]` on a palette change**, so with no
-such file Dolphin's file area took KColorScheme's built-in Breeze light — white
-under a dark window, and only in that direction, since white is right in light
-mode. `setDark` writes the two colours from the zenbones palette before it
-touches dconf; the file is re-read on the palette change, so the order matters.
-A running app ignores the file otherwise — `kwriteconfig6 --notify` does not
-repaint it, only the palette change does.
+from `~/.config/kdeglobals` `[Colors:View]` on a palette change**, not from the
+palette the platform theme just handed it. With no such file that read returns
+KColorScheme's built-in Breeze light, so Dolphin's file area went white under a
+dark window — and only in that direction, since white is right in light mode.
+`setDark` writes the two colours from the zenbones palette before it moves the
+dconf keys.
+
+**The write must go through `kwriteconfig6 --notify`** (`kdePackages.kconfig`).
+KConfig caches that file per process, and only its notify signal drops the
+cache; a file written any other way is invisible until the app restarts. The
+notify does not repaint anything by itself — the palette change does that, with
+the refreshed values — which is why the order is notify first, dconf second.
+Measured on a running Dolphin, toggling to dark:
+
+| kdeglobals at app start | write before the toggle | resulting view |
+| --- | --- | --- |
+| absent | none | white |
+| present | plain file write | the value from app start |
+| absent | plain file write | white |
+| present | `kwriteconfig6 --notify` | the new value |
+
+The shell also writes the file once when it reads dconf at startup, so an app
+launched later never caches the white.
 
 Per-user leftovers from the Plasma session once installed here had to go first,
 none of them in `stow/`. `~/.config/dolphinrc`'s `[UiSettings]

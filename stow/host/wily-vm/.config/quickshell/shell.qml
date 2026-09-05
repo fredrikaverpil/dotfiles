@@ -71,16 +71,27 @@ ShellRoot {
   // palette changes -- not from the palette itself, which is what the gtk3
   // platform theme supplies and what the rest of its window follows. With no
   // kdeglobals that read falls back to Breeze light, which is why Dolphin's
-  // file area stayed white in dark mode. Two colours are the whole fix; the
-  // file is re-read on the palette change, so it must be written first.
+  // file area stayed white in dark mode.
+  // kwriteconfig6, not a plain write: KConfig caches the file per process and
+  // only its --notify D-Bus signal drops that cache, so a file written any
+  // other way is invisible until the app restarts. The notify does not repaint
+  // anything by itself -- the palette change does that, with the refreshed
+  // values -- which is why this has to run before the dconf keys move.
   function kdeglobalsWrite(on) {
     const p = on ? darkPalette : lightPalette
     const rgb = hex => {
       const c = Qt.color(hex)
       return [Math.round(c.r * 255), Math.round(c.g * 255), Math.round(c.b * 255)].join(",")
     }
-    return "printf '[Colors:View]\\nBackgroundNormal=" + rgb(p.bg) +
-      "\\nForegroundNormal=" + rgb(p.fg) + "\\n' > \"$HOME/.config/kdeglobals\"; "
+    const set = (key, hex) =>
+      "kwriteconfig6 --notify --file kdeglobals --group 'Colors:View' --key " +
+      key + " '" + rgb(hex) + "'; "
+    return set("BackgroundNormal", p.bg) + set("ForegroundNormal", p.fg)
+  }
+
+  function writeKdeglobals() {
+    kdeglobals.command = ["sh", "-c", kdeglobalsWrite(root.dark)]
+    kdeglobals.running = true
   }
 
   function setDark(on) {
@@ -96,10 +107,7 @@ ShellRoot {
   // A dconf write from a shell bypasses setDark, so keep the file in step
   // with the watcher too. That write can land after the app has repainted;
   // the next toggle corrects it.
-  onDarkChanged: {
-    kdeglobals.command = ["sh", "-c", kdeglobalsWrite(root.dark)]
-    kdeglobals.running = true
-  }
+  onDarkChanged: writeKdeglobals()
 
   Process { id: write }
   Process { id: kdeglobals }
@@ -149,7 +157,12 @@ ShellRoot {
     running: true
     command: ["dconf", "read", "/org/gnome/desktop/interface/color-scheme"]
     stdout: StdioCollector {
-      onStreamFinished: root.dark = text.indexOf("prefer-light") < 0
+      onStreamFinished: {
+        root.dark = text.indexOf("prefer-light") < 0
+        // Unconditional: onDarkChanged stays silent when dconf agrees with the
+        // default, and an app started before the file exists caches the white.
+        root.writeKdeglobals()
+      }
     }
   }
 
