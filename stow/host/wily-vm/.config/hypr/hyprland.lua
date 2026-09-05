@@ -8,8 +8,12 @@ local monitor_config_loader = loadfile(monitor_config_file)
 if monitor_config_loader then
   local ok, config = pcall(monitor_config_loader)
   if ok and type(config) == "table" then
-    if type(config.scale) == "number" and config.scale > 0 then monitor_config.scale = config.scale end
-    if type(config.gdkScale) == "number" and config.gdkScale > 0 then monitor_config.gdkScale = config.gdkScale end
+    if type(config.scale) == "number" and config.scale > 0 then
+      monitor_config.scale = config.scale
+    end
+    if type(config.gdkScale) == "number" and config.gdkScale > 0 then
+      monitor_config.gdkScale = config.gdkScale
+    end
   end
 end
 
@@ -46,7 +50,7 @@ hl.config({
     -- 200ms is short without turning a held modifier chord into a repeat.
     repeat_rate = 60,
     repeat_delay = 200,
-    natural_scroll = false,
+    natural_scroll = true,
     -- No touchpad exists in this VM, so this block is inert until the
     -- ThinkPad.
     touchpad = {
@@ -147,7 +151,11 @@ local ok, err = pcall(function()
   bind("SUPER + SHIFT + comma", "Dismiss all notifications", hl.dsp.exec_cmd("qs ipc call notifications dismissAll"))
   bind("SUPER + CTRL + comma", "Toggle Do Not Disturb", hl.dsp.exec_cmd("qs ipc call notifications toggleDnd"))
   bind("SUPER + ALT + comma", "Invoke latest notification", hl.dsp.exec_cmd("qs ipc call notifications invokeLast"))
-  bind("SUPER + SHIFT + ALT + comma", "Open notification history", hl.dsp.exec_cmd("qs ipc call notifications showHistory"))
+  bind(
+    "SUPER + SHIFT + ALT + comma",
+    "Open notification history",
+    hl.dsp.exec_cmd("qs ipc call notifications showHistory")
+  )
   bind("SUPER + CTRL + N", "Toggle nightlight", hl.dsp.exec_cmd("qs ipc call nightlight toggle"))
   bind("SUPER + CTRL + D", "Display settings", hl.dsp.exec_cmd("qs ipc call display toggle"))
   bind("SUPER + CTRL + W", "Network settings", hl.dsp.exec_cmd("qs ipc call network toggle"))
@@ -158,8 +166,18 @@ local ok, err = pcall(function()
 
   -- Media. `locked` keeps volume working on the lock screen, `repeating` makes
   -- a held key keep stepping; both go straight through to hl.bind.
-  bind("XF86AudioRaiseVolume", "Volume up", hl.dsp.exec_cmd("qs ipc call audio up"), { locked = true, repeating = true })
-  bind("XF86AudioLowerVolume", "Volume down", hl.dsp.exec_cmd("qs ipc call audio down"), { locked = true, repeating = true })
+  bind(
+    "XF86AudioRaiseVolume",
+    "Volume up",
+    hl.dsp.exec_cmd("qs ipc call audio up"),
+    { locked = true, repeating = true }
+  )
+  bind(
+    "XF86AudioLowerVolume",
+    "Volume down",
+    hl.dsp.exec_cmd("qs ipc call audio down"),
+    { locked = true, repeating = true }
+  )
   bind("XF86AudioMute", "Mute", hl.dsp.exec_cmd("qs ipc call audio mute"), { locked = true })
 
   -- Windows
@@ -205,7 +223,11 @@ local ok, err = pcall(function()
 
   bind("SUPER + S", "Toggle scratchpad", hl.dsp.workspace.toggle_special("scratchpad"))
   bind("SUPER + grave", "Toggle scratchpad", hl.dsp.workspace.toggle_special("scratchpad"), { display = "SUPER + ~" })
-  bind("SUPER + ALT + S", "Move window to scratchpad", hl.dsp.window.move({ workspace = "special:scratchpad", follow = false }))
+  bind(
+    "SUPER + ALT + S",
+    "Move window to scratchpad",
+    hl.dsp.window.move({ workspace = "special:scratchpad", follow = false })
+  )
   bind(
     "SUPER + SHIFT + grave",
     "Move window to scratchpad",
@@ -214,20 +236,80 @@ local ok, err = pcall(function()
   )
 
   -- Resize.
-  bind("SUPER + minus", "Expand window left", hl.dsp.window.resize({ x = -100, y = 0, relative = true }), { display = "SUPER + MINUS" })
-  bind("SUPER + equal", "Shrink window left", hl.dsp.window.resize({ x = 100, y = 0, relative = true }), { display = "SUPER + EQUAL" })
-  bind("SUPER + SHIFT + minus", "Shrink window up", hl.dsp.window.resize({ x = 0, y = -100, relative = true }), { display = "SUPER + SHIFT + MINUS" })
-  bind("SUPER + SHIFT + equal", "Expand window down", hl.dsp.window.resize({ x = 0, y = 100, relative = true }), { display = "SUPER + SHIFT + EQUAL" })
+  bind(
+    "SUPER + minus",
+    "Expand window left",
+    hl.dsp.window.resize({ x = -100, y = 0, relative = true }),
+    { display = "SUPER + MINUS" }
+  )
+  bind(
+    "SUPER + equal",
+    "Shrink window left",
+    hl.dsp.window.resize({ x = 100, y = 0, relative = true }),
+    { display = "SUPER + EQUAL" }
+  )
+  bind(
+    "SUPER + SHIFT + minus",
+    "Shrink window up",
+    hl.dsp.window.resize({ x = 0, y = -100, relative = true }),
+    { display = "SUPER + SHIFT + MINUS" }
+  )
+  bind(
+    "SUPER + SHIFT + equal",
+    "Expand window down",
+    hl.dsp.window.resize({ x = 0, y = 100, relative = true }),
+    { display = "SUPER + SHIFT + EQUAL" }
+  )
 
-  bind("SUPER + ALT + minus", "Expand window left a little", hl.dsp.window.resize({ x = -25, y = 0, relative = true }), { display = "SUPER + ALT + MINUS" })
-  bind("SUPER + ALT + equal", "Shrink window left a little", hl.dsp.window.resize({ x = 25, y = 0, relative = true }), { display = "SUPER + ALT + EQUAL" })
-  bind("SUPER + SHIFT + ALT + minus", "Shrink window up a little", hl.dsp.window.resize({ x = 0, y = -25, relative = true }), { display = "SUPER + SHIFT + ALT + MINUS" })
-  bind("SUPER + SHIFT + ALT + equal", "Expand window down a little", hl.dsp.window.resize({ x = 0, y = 25, relative = true }), { display = "SUPER + SHIFT + ALT + EQUAL" })
+  bind(
+    "SUPER + ALT + minus",
+    "Expand window left a little",
+    hl.dsp.window.resize({ x = -25, y = 0, relative = true }),
+    { display = "SUPER + ALT + MINUS" }
+  )
+  bind(
+    "SUPER + ALT + equal",
+    "Shrink window left a little",
+    hl.dsp.window.resize({ x = 25, y = 0, relative = true }),
+    { display = "SUPER + ALT + EQUAL" }
+  )
+  bind(
+    "SUPER + SHIFT + ALT + minus",
+    "Shrink window up a little",
+    hl.dsp.window.resize({ x = 0, y = -25, relative = true }),
+    { display = "SUPER + SHIFT + ALT + MINUS" }
+  )
+  bind(
+    "SUPER + SHIFT + ALT + equal",
+    "Expand window down a little",
+    hl.dsp.window.resize({ x = 0, y = 25, relative = true }),
+    { display = "SUPER + SHIFT + ALT + EQUAL" }
+  )
 
-  bind("SUPER + CTRL + minus", "Expand window left a lot", hl.dsp.window.resize({ x = -300, y = 0, relative = true }), { display = "SUPER + CTRL + MINUS" })
-  bind("SUPER + CTRL + equal", "Shrink window left a lot", hl.dsp.window.resize({ x = 300, y = 0, relative = true }), { display = "SUPER + CTRL + EQUAL" })
-  bind("SUPER + CTRL + SHIFT + minus", "Shrink window up a lot", hl.dsp.window.resize({ x = 0, y = -300, relative = true }), { display = "SUPER + CTRL + SHIFT + MINUS" })
-  bind("SUPER + CTRL + SHIFT + equal", "Expand window down a lot", hl.dsp.window.resize({ x = 0, y = 300, relative = true }), { display = "SUPER + CTRL + SHIFT + EQUAL" })
+  bind(
+    "SUPER + CTRL + minus",
+    "Expand window left a lot",
+    hl.dsp.window.resize({ x = -300, y = 0, relative = true }),
+    { display = "SUPER + CTRL + MINUS" }
+  )
+  bind(
+    "SUPER + CTRL + equal",
+    "Shrink window left a lot",
+    hl.dsp.window.resize({ x = 300, y = 0, relative = true }),
+    { display = "SUPER + CTRL + EQUAL" }
+  )
+  bind(
+    "SUPER + CTRL + SHIFT + minus",
+    "Shrink window up a lot",
+    hl.dsp.window.resize({ x = 0, y = -300, relative = true }),
+    { display = "SUPER + CTRL + SHIFT + MINUS" }
+  )
+  bind(
+    "SUPER + CTRL + SHIFT + equal",
+    "Expand window down a lot",
+    hl.dsp.window.resize({ x = 0, y = 300, relative = true }),
+    { display = "SUPER + CTRL + SHIFT + EQUAL" }
+  )
 
   -- Groups
   bind("SUPER + G", "Toggle window grouping", hl.dsp.group.toggle())
@@ -250,8 +332,18 @@ local ok, err = pcall(function()
   bind("SUPER + ALT + mouse_down", "Next window in group", hl.dsp.group.next())
   bind("SUPER + ALT + mouse_up", "Previous window in group", hl.dsp.group.prev())
 
-  bind("SUPER + mouse:272", "Move window", hl.dsp.window.drag(), { display = "SUPER + LEFT MOUSE BUTTON", mouse = true })
-  bind("SUPER + mouse:273", "Resize window", hl.dsp.window.resize(), { display = "SUPER + RIGHT MOUSE BUTTON", mouse = true })
+  bind(
+    "SUPER + mouse:272",
+    "Move window",
+    hl.dsp.window.drag(),
+    { display = "SUPER + LEFT MOUSE BUTTON", mouse = true }
+  )
+  bind(
+    "SUPER + mouse:273",
+    "Resize window",
+    hl.dsp.window.resize(),
+    { display = "SUPER + RIGHT MOUSE BUTTON", mouse = true }
+  )
 
   bind("SUPER + SHIFT + E", "Exit Hyprland", hl.dsp.exit())
 end)
