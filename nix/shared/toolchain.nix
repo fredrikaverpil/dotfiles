@@ -103,18 +103,4 @@ with unstable;
   #   vendorHash = lib.fakeHash;
   # }))
 
-  # Not in nixpkgs: build from source. Same hash workflow as above.
-  (buildGoModule rec {
-    pname = "claudeline";
-    version = "0.24.2";
-    src = fetchFromGitHub {
-      owner = "fredrikaverpil";
-      repo = "claudeline";
-      tag = "v${version}";
-      hash = "sha256-iIXRCjS1IN/T061t4fObMFrZltP9ukLVZPU5FLfrQJ4=";
-    };
-    vendorHash = null; # no go.sum: stdlib only
-    subPackages = [ "." ]; # .pocket/ holds a separate Go tool
-    ldflags = [ "-X main.version=${version}" ]; # else --version reports (devel)
-  })
 ]
