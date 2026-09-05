@@ -1468,6 +1468,14 @@ It *watches* the key with a long-running `dconf watch` rather than trusting its
 own writes, so a `dconf write` from anywhere else moves the panel state too.
 dconf persists, so the mode survives a reboot for free.
 
+Qt apps need `QT_QPA_PLATFORMTHEME=gtk3` (`desktop.nix` session variables, what
+Omarchy sets too). Without a platform theme Qt uses its generic Unix one, whose
+palette is a static light and reads neither dconf nor the portal — Dolphin came
+up light under `prefer-dark` until the variable was set. The plugin is
+`libqgtk3.so` in qtbase, so no extra package. Stale Plasma leftovers
+(`~/.config/kdeglobals`, `~/.config/kdedefaults/`) pin `BreezeLight`, but the
+gtk3 theme overrides them; they were removed anyway.
+
 Bar and menu colours are the zenbones palettes, lifted from
 `stow/shared/.config/ghostty/themes/zenbones_{dark,light}` so the bar and the
 terminal are literally the same colours. `gsettings` is not installed; `dconf`
