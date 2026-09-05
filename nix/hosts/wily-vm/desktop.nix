@@ -119,6 +119,12 @@ in
     # light palette and never see the light/dark toggle. gtk3 (libqgtk3.so,
     # already in qtbase) makes them follow the GTK theme the toggle writes.
     QT_QPA_PLATFORMTHEME = "gtk3";
+    # ...but GTK3 only finds that theme through the settings portal here. Its
+    # other source is the org.gnome.desktop.interface GSettings schema, and no
+    # directory in XDG_DATA_DIRS ships a compiled one -- gsettings-desktop-
+    # schemas is not installed, which is also why `gsettings` is absent. GTK4
+    # (Ghostty) asks the portal on its own; GTK3 needs telling.
+    GTK_USE_PORTAL = "1";
   };
 
   # Terminal-first login: no display manager. Agetty authenticates fredrik on
