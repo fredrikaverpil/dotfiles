@@ -1758,4 +1758,40 @@ smaller than theirs.
   situation is worse: `hyprls` only understands hyprlang `.conf`, which is the
   format we do not use, so the realistic option is `lua_ls` plus a hand-written
   LuaCATS stub for the `hl` API. Unverified — nobody has tried either here.
-- Root filesystem is at 63%; consider `nix.gc` before it matters.
+
+## Disk
+
+30G, and `vda2` (ext4) fills all of it bar the 487M ESP — there are no free
+extents to grow into, so more room means enlarging the drive first.
+`configuration.nix` collects garbage weekly and sets `min-free`/`max-free` so
+a build that runs low collects mid-flight rather than dying. That is the cheap
+fix and it is already spent: after a `nix-collect-garbage --delete-older-than
+7d` the store still holds ~22G of *live* paths, which is simply what this
+desktop plus its build closures weigh.
+
+To grow it, with the VM shut down, raise the drive size in UTM (VM settings ›
+the VirtIO drive › Resize). qcow2 only grows, and the image is already fully
+allocated on the host — check host free space first, the increase is spent
+1:1. Then boot and run, noting where the `sudo` goes and that the last command
+takes the *partition*, not the disk:
+
+```sh
+echo ',+' | sudo sfdisk -N 2 --force /dev/vda  # partition 2 takes the new space
+sudo partx -u /dev/vda                         # re-read while mounted
+sudo resize2fs /dev/vda2                       # ext4 grows online, no unmount
+```
+
+`sudo echo ',+' | sfdisk …` elevates the `echo` and leaves `sfdisk`
+unprivileged — it fails with `cannot open /dev/vda: Permission denied`.
+`resize2fs /dev/vda` (the disk) fails with `Device or resource busy` /
+`Couldn't find valid filesystem superblock`.
+
+`sfdisk`, `partx` and `resize2fs` are all in the base system — no
+`cloud-utils-growpart`, which is not installed. `sfdisk` warns that the GPT
+backup header is not at the end of the disk and relocates it; that is the
+expected message, not a failure. `lsblk` and `df -h /` confirm.
+
+**Deleting from the guest never shrinks the host image.** virtio-blk here
+advertises discard (`lsblk -D` shows a 512B granularity), so `fstrim -av`
+after a large GC punches the freed blocks out of the qcow2 and hands the space
+back to macOS.

@@ -35,6 +35,18 @@
   boot.loader.systemd-boot.configurationLimit = 5;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # Small disk: collect weekly; min-free/max-free also collects mid-build.
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 7d";
+  };
+  nix.optimise.automatic = true;
+  nix.settings = {
+    min-free = 3 * 1024 * 1024 * 1024;
+    max-free = 8 * 1024 * 1024 * 1024;
+  };
+
   host.users = {
     fredrik = {
       isAdmin = true;
