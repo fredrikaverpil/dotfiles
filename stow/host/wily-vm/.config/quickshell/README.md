@@ -17,6 +17,7 @@ entered by direnv through the `.envrc` at the repo root. From any shell inside
 qml-lint       # qmllint -E over every .qml in this tree
 qml-test-js    # deno test tests/
 qml-test-qml   # qmltestrunner -input tests (offscreen)
+niri-validate  # niri validate against the host config (VM/Linux only)
 ```
 
 Inside Neovim, `qmlls` attaches to `.qml` buffers automatically
@@ -24,7 +25,8 @@ Inside Neovim, `qmlls` attaches to `.qml` buffers automatically
 in this repo, so it inherits the devshell's `PATH` and `QML_IMPORT_PATH`.
 Opened from elsewhere, only the QML LSP fails to start; nothing else notices.
 
-Without direnv: `nix develop ~/.dotfiles -c qml-lint`.
+Without direnv: `nix develop ~/.dotfiles -c qml-lint`. `niri-validate` is
+available only in the Linux devshell, so run it in the VM checkout.
 
 ## Which versions, and why they cannot drift
 

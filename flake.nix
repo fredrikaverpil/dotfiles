@@ -149,6 +149,8 @@
                   qml = "stow/host/wily-vm/.config/quickshell";
                   task =
                     name: text: pkgs.writeShellScriptBin name "cd \"$(git rev-parse --show-toplevel)/${qml}\"\n${text}";
+                  rootTask =
+                    name: text: pkgs.writeShellScriptBin name "cd \"$(git rev-parse --show-toplevel)\"\n${text}";
                 in
                 pkgs.mkShell {
                   packages = [
@@ -156,6 +158,10 @@
                     (task "qml-lint" "qmllint -E $(find . -name '*.qml')")
                     (task "qml-test-js" "deno test --allow-read tests/")
                     (task "qml-test-qml" "QT_QPA_PLATFORM=offscreen qmltestrunner -input tests")
+                  ]
+                  ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+                    pkgs.niri
+                    (rootTask "niri-validate" "niri validate --config stow/host/wily-vm/.config/niri/config.kdl")
                   ];
                   # qmlls/qmllint/qmltestrunner take import paths from argv or
                   # env only (`-E` reads this); .qmlls.ini has no key for them.
