@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -e
+
+DEPS_PATH_FILE="$HOME/.config/nvim-deps-path"
+if [ -f "$DEPS_PATH_FILE" ]; then
+  export PATH="$PATH:$(cat "$DEPS_PATH_FILE")"
+fi
+
+exec "$HOME/.nix-profile/bin/claude" "$@"
