@@ -115,6 +115,10 @@ in
     HYPRCURSOR_SIZE = "24";
     # Chromium's wrapper reads this to opt into its native Wayland backend.
     NIXOS_OZONE_WL = "1";
+    # Without a platform theme Qt apps get the generic Unix theme's static
+    # light palette and never see the light/dark toggle. gtk3 (libqgtk3.so,
+    # already in qtbase) makes them follow the GTK theme the toggle writes.
+    QT_QPA_PLATFORMTHEME = "gtk3";
   };
 
   # Terminal-first login: no display manager. Agetty authenticates fredrik on
