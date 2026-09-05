@@ -855,6 +855,68 @@ The first is a lid consequence and cannot matter here — no lid, one scanout.
 The third is wanted regardless and was simply not built: a stderr line nobody
 reads is a poor way to learn the machine slept unlocked.
 
+## How the Quickshell tree is split
+
+Directories mirror Omarchy's `plugins/…` paths so diffs line up. What goes in
+which *file* follows caelestia
+(`~/code/public/github.com/caelestia-dots/shell`), which is the more useful
+model here because it is far bigger than ours: 282 QML files against our 20.
+Their *wiring* we do not copy — 16 of their 17 services are
+`pragma Singleton`, ours are plain `Item`s instantiated in `shell.qml` and
+reached through `readonly property alias`es on the root, which is what every
+service here already did.
+
+**A panel is a view. Everything that talks to a daemon or spawns a process
+lives in a service.** caelestia keeps `services/Nmcli.qml` (1841 lines) and
+`services/VPN.qml` (961) entirely apart from the popouts that display them.
+Ours are `plugins/services/<name>/Service.qml` with a sibling
+`<Name>Model.js` for pure functions, and `plugins/panels/<name>/Panel.qml` for
+the view. shell.qml wires the two and both are `readonly property alias`es on
+the root, so the bar reads the service directly.
+
+Why it is worth the extra file:
+
+- **The bar needs the state whether or not the panel exists.** `Bar.qml` binds
+  `shell.networkService.icon`; before the split it reached into the panel for
+  it, which only worked because shell.qml happens to instantiate every panel at
+  startup.
+- **Polling is gated on display, not on the panel.** A service exposes
+  `property bool active` and the panel drives it with a `Binding`. The
+  Processes and poll timers run only while something shows their output; the
+  properties Quickshell keeps current stay live regardless.
+- Panels stay readable. `plugins/panels/network/Panel.qml` went from 843 lines
+  to 449.
+
+Two rules that keep the split from eroding:
+
+- **The `Quickshell.Networking` (or equivalent daemon) import belongs to the
+  service only.** A view that reaches the daemon singleton directly is back to
+  the old shape one property at a time. Where the view needs an enum name, the
+  service exposes a function — `deviceTypeName(device)`, not
+  `Model.deviceType(device.type, DeviceType)` in a delegate.
+- **The `<Name>Model.js` beside the service is shared with the view**, and is
+  the only file both import: parsing on the service side, `format*` on the
+  view side, no QML types in either. It is plain enough to run under node, and
+  `node NetworkModel.js` executes its `demo()` self-check — the only automated
+  test any of this has.
+
+**Where we differ from caelestia: we are keyboard-first and they are not.**
+Their components carry hover states and cursor shapes; ours carry
+`activeFocusOnTab`, `Keys.on*Pressed` and a border that tracks `activeFocus`
+(see `Ui/Panel.qml`, which owns the focus chain and the h/j/k/l stepping). Do
+not port their interaction model along with their structure — a control that
+is only reachable by pointer is a bug here.
+
+Two mechanical gotchas when adding a directory under `stow/`:
+
+- **A new directory needs stow re-run on the VM**, not just an rsync — the
+  tree is stowed with `--no-folding`, so `~/.config/quickshell/plugins/...` is
+  a directory of symlinks and a path stow has never seen does not exist. It
+  fails as `Ignoring unresolvable import` plus `Type X unavailable`, which
+  reads like a QML error and is not one.
+- **rsync does not trigger Quickshell's file watcher** (see "Losing the lock
+  surface"), so a deploy needs `systemctl --user restart quickshell`.
+
 ## Reaching Quickshell from a keybind
 
 `qs ipc call menu toggle` — the `IpcHandler { target = "menu" }` in
@@ -1125,11 +1187,13 @@ VM and host file to scale/GDK scale 1 afterwards.
 
 ## Network
 
-`plugins/panels/network/Panel.qml` is the NixOS-sized port of Omarchy's network
-panel: it lists NetworkManager devices, their state and global IPv4 address;
-scans Wi-Fi; connects (including a passphrase prompt), disconnects, forgets
-saved networks and toggles the radio. `NetworkDevice.address` is the MAC
-address, not an IP, so the panel obtains addresses from `ip -j -4 address`.
+`plugins/services/network/Service.qml` plus `plugins/panels/network/Panel.qml`
+are the NixOS-sized port of Omarchy's network panel — data and view, per "How
+the Quickshell tree is split". Together they list NetworkManager devices,
+their state and global IPv4 address; scan Wi-Fi; connect (with a passphrase
+prompt), disconnect and forget saved networks; and toggle the radio.
+`NetworkDevice.address` is the MAC address, not an IP, so the service obtains
+addresses from `ip -j -4 address`.
 Wi-Fi objects are reduced to plain rows before delegates receive them, because
 the scan model is live and its objects can disappear during a refresh.
 
@@ -1145,8 +1209,12 @@ not accidental base-system tools.
 It opens from its right-side bar icon (the order is audio, network, display,
 bell, power, with conditional indicators inboard of audio), Setup › Network, or
 `SUPER + CTRL + W` / `qs ipc call network toggle`.
-The scanner is enabled only while this panel is open. The wired icon wins when
-both transports are connected, matching the default route. The VM verifies the
+The scanner and the metric polling run only while the panel is open, through
+the service's `active` property; the bar icon reads the service directly and
+needs neither. Ping shows Timeout on this VM and always will — UTM's NAT drops
+ICMP to 1.1.1.1, which `ping -c 1 -W 1 1.1.1.1` confirms from a plain shell.
+The wired icon wins when both transports are connected, matching the default
+route. The VM verifies the
 wired path end-to-end: `enp0s1` reports Connected with its DHCP address, the
 panel renders it, the bar shows the ethernet icon, metrics update, and both IPC
 and the menu open the panel. The bind is registered, but its physical

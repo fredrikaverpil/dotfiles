@@ -12,6 +12,7 @@ import "plugins/panels/monitor" as Monitor
 import "plugins/panels/network" as Network
 import "plugins/polkit" as Polkit
 import "plugins/services/idle" as Idle
+import "plugins/services/network" as NetworkService
 import "plugins/services/nightlight" as Nightlight
 import "Ui" as Ui
 
@@ -28,6 +29,7 @@ ShellRoot {
   readonly property alias idle: idle
   readonly property alias display: display
   readonly property alias network: network
+  readonly property alias networkService: networkService
   readonly property alias audio: audio
 
   // All overlay panels leave this strip click-through so a second click
@@ -235,9 +237,14 @@ ShellRoot {
     shell: root
   }
 
+  NetworkService.Service {
+    id: networkService
+  }
+
   Network.Panel {
     id: network
     shell: root
+    service: networkService
   }
 
   Audio.Panel {

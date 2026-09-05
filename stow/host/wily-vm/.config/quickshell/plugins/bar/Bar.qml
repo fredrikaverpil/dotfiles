@@ -140,7 +140,7 @@ Scope {
         anchors.right: displayButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
-        label: bar.shell.network.icon
+        label: bar.shell.networkService.icon
         onActivated: bar.shell.network.toggle()
       }
 
