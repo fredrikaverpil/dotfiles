@@ -9,7 +9,11 @@
 input {
     keyboard {
         xkb {
-            layout "us"
+            // No grp: toggle in options on purpose: the shell owns the
+            // current index (qs ipc call keyboard ...), and a compositor-side
+            // switch would desync the bar indicator. Order must match the
+            // service's `codes`.
+            layout "us,se"
         }
         // Mirrors hyprland.lua: as fast as the compositor usefully goes, with
         // a delay short of retriggering on a held chord.
@@ -87,6 +91,7 @@ binds {
     Mod+Ctrl+A hotkey-overlay-title="Audio settings" { spawn "qs" "ipc" "call" "audio" "toggle"; }
     Mod+Ctrl+I hotkey-overlay-title="Toggle idle locking" { spawn "qs" "ipc" "call" "idle" "toggle"; }
     Mod+Ctrl+L hotkey-overlay-title="Lock system" { spawn "qs" "ipc" "call" "lock" "lock"; }
+    Mod+Ctrl+K hotkey-overlay-title="Next keyboard layout" { spawn "qs" "ipc" "call" "keyboard" "next"; }
 
     // Media. allow-when-locked keeps volume working on the lock screen; niri
     // repeats a held bind by default.

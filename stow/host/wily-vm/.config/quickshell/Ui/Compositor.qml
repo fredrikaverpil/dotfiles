@@ -70,6 +70,24 @@ Singleton {
         ]
   }
 
+  // Keyboard layout, by absolute index rather than "next": that keeps every
+  // device on the same layout, so a read from any of them agrees. Omarchy
+  // cycles one named keyboard instead and pays for it with ~150 lines picking
+  // which -- see wily-vm/CLAUDE.md. Hyprland reports the index on the keyboard
+  // it marks `main`; niri answers with it directly.
+  function layoutQuery() {
+    return niri
+      ? ["niri", "msg", "-j", "keyboard-layouts"]
+      : ["hyprctl", "-j", "devices"]
+  }
+
+  function setLayout(index) {
+    return niri
+      ? ["niri", "msg", "action", "switch-layout", String(index)]
+      // Not a dispatcher, so it cannot go over the dispatch socket.
+      : ["hyprctl", "switchxkblayout", "all", String(index)]
+  }
+
   // Nightlight. hyprsunset speaks Hyprland's own CTM protocol and nothing
   // else; niri implements wlr-gamma-control, which is what wl-gammarelay-rs
   // uses. Neither works on the other compositor.

@@ -324,10 +324,10 @@ session, no compositor change and no rebuild.
   `monitors.lua` and the keymap belong to Hyprland and outlive any shell.
   The one coupled part is every bind that calls `qs ipc call …`.
 - **The converse holds too, and is now exercised**: the shell survives a
-  change of compositor. Adding niri needed five command sites changed, all of
-  them now in `Ui/Compositor.qml`; the lock, polkit, notification and idle
-  services were untouched, because each is a Wayland protocol or a D-Bus name
-  rather than a Hyprland feature.
+  change of compositor. The compositor-specific command sites are all in
+  `Ui/Compositor.qml`; the lock, polkit, notification and idle services were
+  untouched, because each is a Wayland protocol or a D-Bus name rather than a
+  Hyprland feature.
 - **Wholesale swap yes, cherry-picking one panel no.** Noctalia v5 installs
   exactly one binary, `bin/noctalia`, and its C++ rewrite dropped Qt and QML
   entirely — so there is neither a component to run on its own nor source to
@@ -373,8 +373,8 @@ that are not interchangeable:
   to `hyprctl` and silently does nothing.
 
 **`Ui/Compositor.qml` is the whole coupling** — a Quickshell singleton keyed on
-`NIRI_SOCKET`, holding the five commands that differ and nothing else. Adding a
-compositor means editing that file, not the services:
+`NIRI_SOCKET`, holding the compositor-specific command table and nothing else.
+Adding a compositor means editing that file, not the services:
 
 | What | Hyprland | niri |
 | --- | --- | --- |
@@ -383,6 +383,8 @@ compositor means editing that file, not the services:
 | Focus workspace | `hl.dsp.focus{workspace=…}` | `niri msg action focus-workspace N` |
 | Monitor query | `hyprctl -j monitors` | `niri msg -j focused-output` |
 | Scale | `hyprctl eval hl.monitor{}` | `niri msg output <name> scale <s>` |
+| Keyboard layout query | `hyprctl -j devices` | `niri msg -j keyboard-layouts` |
+| Keyboard layout change | `hyprctl switchxkblayout all <index>` | `niri msg action switch-layout <index>` |
 | Nightlight | hyprsunset | wl-gammarelay-rs |
 
 `Model.focusedMonitor()` folds the two monitor shapes together; niri answers
@@ -1113,8 +1115,8 @@ shows you the state is also the thing that changes it.
 A state whose owner has no bar button gets a button that is **only visible
 while the state is non-default** — `BarButton` gives its 28px slot back when
 `visible` is false, so it costs nothing while it is off. It stays clickable,
-and clicking it restores the default. The idle-lock coffee (`󰅶`) is
-the first of these.
+and clicking it restores the default. The idle-lock coffee (`󰅶`) and the
+`SE` keyboard layout are the two of these.
 
 - **A slot is earned by a state that persists and is otherwise invisible.**
   Idle-disable lives in `~/.local/state/wily-idle.json` and survives reboots;
@@ -1517,6 +1519,40 @@ up/down/mute/setVolume, and `h`/`l`/`m`/`j` from the keyboard. The Hyprland
 media binds are written but unexercised — the VM session runs niri, whose own
 binds passed `niri validate` and call the IPC verified above.
 
+## Keyboard layout
+
+US English is layout 0 and Swedish is layout 1 (`us,se`) in both
+`hypr/hyprland.lua` and `niri/config.kdl`. `plugins/services/keyboard/Service.qml`
+owns that index: the bar, Setup › Keyboard layout and `SUPER + CTRL + K` all
+call it, rather than asking the compositor to cycle independently. This is why
+there is deliberately no `grp:` option in either compositor config — an XKB
+shortcut would switch behind the service and leave its UI stale.
+
+The service asks the compositor for its actual index when Quickshell starts,
+since a shell restart need not coincide with a new graphical session. Its
+process tables come from `Ui/Compositor.qml`: Hyprland's `main` keyboard (or
+the first available keyboard) supplies `active_layout_index`, while niri
+returns `current_idx` directly. A switch is by absolute index —
+`switchxkblayout all` under Hyprland, `switch-layout <index>` under niri (the
+integer itself, not an `index` subcommand) — so all Hyprland keyboards stay in
+agreement rather than cycling an arbitrary named device. `KeyboardModel.js`
+contains only that JSON parsing and is covered by `qml-test-js`.
+
+The launcher is the canonical selector and marks the active layout. The `SE`
+bar button follows the conditional-indicator rule: it is absent while US is
+active, appears only for the non-default Swedish layout, and returns to US when
+clicked. Keep the service's `codes`, the launcher rows and both compositor
+layout lists in the same order; the short-code map is deliberately local for
+two layouts rather than a runtime dependency on the xkeyboard-config catalog.
+
+Verified live under Hyprland: a Quickshell restart seeds US from the compositor;
+`set 1` moves both keyboards to Swedish; `next` restores both to US; and a
+launcher search for Swedish invokes the same service. The bind is registered in
+both `hyprctl binds` and the generated cheatsheet, and the `SE` bar button is
+visible while Swedish is active. `niri validate` accepts the config and niri
+accepts the numeric layout action syntactically, but this feature has not run
+in a live niri session yet.
+
 ## Light and dark
 
 One key drives everything: `/org/gnome/desktop/interface/color-scheme` in
@@ -1870,8 +1906,8 @@ Runnable on the VM today:
 - **`omarchy.microphone`** (`widgets/Microphone.qml`) — mute toggle, source
   volume on scroll.
 - **`omarchy.media`** (`plugins/services/media/`) — MPRIS track and cover art.
-- **`omarchy.keyboard-layout`** — dim until `kb_layout = "us,se"` lands; the
-  two are one task.
+- **`omarchy.keyboard-layout`** — ported in our own idiom; see "Keyboard
+  layout".
 - **The clock popup** — ours is a bare `Text`. Upstream adds a month grid, ISO
   week numbers, format cycling and a timezone picker.
 - **`omarchy.weather`** (`panels/weather/`), **`omarchy.tailscale`**,
@@ -2017,9 +2053,8 @@ smaller than theirs.
   since the rebuild: `pkill -x hyprsunset` followed by a toggle brings it back
   in its own `app-Hyprland-hyprsunset` scope, and four applies fired back to
   back leave exactly one process and no crash.
-- Keyboard layout is `us`. Swedish is wanted eventually as a second layout,
-  but not yet — `kb_layout = "us,se"` with a `grp:` toggle in `kb_options`
-  when the time comes.
+- Keyboard layouts are `us,se`; see "Keyboard layout". Deliberately no `grp:`
+  toggle in `kb_options`.
 - No OSD yet.
 - Two packages the Omarchy keymap and menu assume are not installed in
   `desktop.nix`: `wl-clipboard` (clipboard history, share) and `slurp` (region

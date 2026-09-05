@@ -18,6 +18,9 @@ Rectangle {
   property alias label: btnLabel.text
   property alias image: btnImage.source
   property string fontFamily: "JetBrainsMono Nerd Font"
+  // Nerd Font glyphs are drawn at their design size; a button labelled with
+  // letters instead needs to come down to fit the same 28px slot.
+  property real fontSize: 14
   // Overridable so a button can mark itself without taking a second slot;
   // the tray raises it to `sel` for a NeedsAttention item.
   property color foreground: btn.shell.palette.fg
@@ -67,7 +70,7 @@ Rectangle {
       - (btnMetrics.tightBoundingRect.x + btnMetrics.tightBoundingRect.width / 2)
     color: btn.foreground
     font.family: btn.fontFamily
-    font.pixelSize: 14 * btn.shell.textScale
+    font.pixelSize: btn.fontSize * btn.shell.textScale
   }
 
   MouseArea {

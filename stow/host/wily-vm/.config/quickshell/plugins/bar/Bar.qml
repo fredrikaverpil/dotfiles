@@ -126,8 +126,24 @@ Scope {
         onActivated: bar.shell.idle.setEnabled(true)
       }
 
-      BarWidgets.Tray {
+      // Only while a non-default layout is up, like the coffee: the shell is
+      // keyboard-first, so US needs no permanent slot to announce itself, and
+      // the launcher lists both layouts either way. Omarchy's widget instead
+      // shows the code at all times and cycles on click.
+      Ui.BarButton {
+        id: keyboardButton
+        shell: bar.shell
         anchors.right: idleButton.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: visible ? 4 : 0
+        visible: !bar.shell.keyboard.isDefault
+        label: bar.shell.keyboard.code
+        fontSize: 11
+        onActivated: bar.shell.keyboard.set(0)
+      }
+
+      BarWidgets.Tray {
+        anchors.right: keyboardButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
         shell: bar.shell

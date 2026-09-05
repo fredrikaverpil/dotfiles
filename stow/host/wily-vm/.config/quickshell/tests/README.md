@@ -2,7 +2,8 @@
 
 Nothing here is loaded by the shell.
 
-`TrayModel_test.js` covers real code: `plugins/bar/widgets/TrayModel.js`.
+`TrayModel_test.js` and `KeyboardModel_test.js` cover real code:
+`plugins/bar/widgets/TrayModel.js` and `plugins/services/keyboard/KeyboardModel.js`.
 
 The four `Battery*` files are a worked example of the two kinds of test this
 tree can support, and of the boundary between them; they are stand-ins with no
