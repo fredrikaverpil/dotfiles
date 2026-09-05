@@ -117,11 +117,64 @@ Scope {
         }
       }
 
-      Image {
+      // Two layers so a change crossfades. `loader` decodes the incoming
+      // picture off-screen; only once it is in memory do the visible layers
+      // move -- the outgoing one down to `under`, the new one onto `over`,
+      // faded in from zero. Both visible layers are synchronous because
+      // everything they are given is already cached by then.
+      Item {
+        id: wall
         anchors.fill: parent
-        fillMode: Image.PreserveAspectCrop
-        asynchronous: true
-        source: background.shownWallpaper ? "file://" + background.shownWallpaper : ""
+        readonly property string src: background.shownWallpaper
+          ? "file://" + background.shownWallpaper : ""
+
+        function swap() {
+          if (!src) {
+            under.source = ""
+            over.source = ""
+            return
+          }
+          if (String(over.source) === src) return
+          // Reset without animating, so the fade below runs from zero.
+          fade.enabled = false
+          over.opacity = 0
+          fade.enabled = true
+
+          under.source = over.source
+          over.source = src
+          over.opacity = 1
+        }
+
+        Image {
+          id: loader
+          source: wall.src
+          asynchronous: true
+          visible: false
+          // A cached picture is Ready the moment the source is assigned, so
+          // its status never changes and only sourceChanged runs -- hence
+          // both handlers, plus completion for the first picture of all.
+          // `swap` is idempotent, so a double call costs nothing.
+          onStatusChanged: if (status === Image.Ready) wall.swap()
+          onSourceChanged: if (status === Image.Ready) wall.swap()
+          Component.onCompleted: if (status === Image.Ready) wall.swap()
+        }
+
+        Image {
+          id: under
+          anchors.fill: parent
+          fillMode: Image.PreserveAspectCrop
+        }
+
+        Image {
+          id: over
+          anchors.fill: parent
+          fillMode: Image.PreserveAspectCrop
+          opacity: 0
+          Behavior on opacity {
+            id: fade
+            NumberAnimation { duration: 400; easing.type: Easing.InOutQuad }
+          }
+        }
       }
     }
   }
