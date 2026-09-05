@@ -28,6 +28,7 @@ require("lazyload").on_vim_enter(function()
     "jsonls",
     "lua_ls",
     "nil_ls",
+    "qmlls",
     "ruff",
     "rust_analyzer",
     "superhtml",
