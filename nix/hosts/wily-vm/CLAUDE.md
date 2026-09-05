@@ -527,6 +527,11 @@ snippets port straight across. The `hl` API, dumped live from 0.56.2:
 
 Gotchas found the hard way:
 
+- **The Lua option names are underscored; `hyprctl`'s are not.**
+  `input.touchpad.tap_to_click` in `hl.config` is the same option as
+  `hyprctl getoption input:touchpad:tap-to-click`. Writing the hyphenated
+  spelling as a Lua key (`["tap-to-click"]`) is accepted silently, logs
+  nothing, and does nothing — `set: false` in `getoption` is the only tell.
 - **Switching workspace is `hl.dsp.focus{ workspace = "1" }`.**
   `hl.dsp.workspace` is a *table* (`.move`, `.toggle_special`), so calling it
   raises "attempt to call a table value".
@@ -841,6 +846,14 @@ Vulkan — if anything reaches for it, `QSG_RHI_BACKEND=opengl`),
 `-resource_blob -host_visible` (no zero-copy dmabuf, so sluggishness and
 screencopy/portal oddities are environmental, not config bugs), 1 scanout (no
 multi-monitor testing possible here — don't write multi-monitor logic).
+
+**There is no touchpad either.** `hyprctl devices` lists `qemu-qemu-usb-tablet`
+and `qemu-qemu-usb-mouse` under mice and nothing under Touch, so every
+`input:touchpad:*` option is inert here and only takes effect on the ThinkPad.
+`input:natural_scroll` also reads false here whether set or not — it is
+Hyprland's default — so a mouse-scroll change is not observable from the UTM
+window; whether the Mac inverts the wheel host-side before the guest sees it is
+untested.
 
 Concretely, **`grim` sometimes never returns**, and a wedged `grim` blocks
 Quickshell's IPC as well — `qs ipc call menu close` hangs behind it, which

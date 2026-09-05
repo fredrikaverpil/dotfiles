@@ -11,6 +11,17 @@ input {
         xkb {
             layout "us"
         }
+        // Mirrors hyprland.lua: as fast as the compositor usefully goes, with
+        // a delay short of retriggering on a held chord.
+        repeat-delay 200
+        repeat-rate 60
+    }
+    mouse {
+        natural-scroll false
+    }
+    touchpad {
+        tap
+        natural-scroll
     }
 }
 

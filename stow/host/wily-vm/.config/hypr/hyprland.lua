@@ -42,6 +42,17 @@ hl.config({
 
   input = {
     kb_layout = "us",
+    -- 60/s is past the point where the compositor, not libinput, is the limit;
+    -- 200ms is short without turning a held modifier chord into a repeat.
+    repeat_rate = 60,
+    repeat_delay = 200,
+    natural_scroll = false,
+    -- No touchpad exists in this VM, so this block is inert until the
+    -- ThinkPad.
+    touchpad = {
+      natural_scroll = true,
+      tap_to_click = true,
+    },
   },
 
   -- virtio-gpu exposes no cursor plane
