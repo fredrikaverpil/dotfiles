@@ -1,8 +1,3 @@
-// Dummy subject for tst_BatteryIndicator.qml.
-//
-// Deliberately imports nothing from Quickshell: that is the entire condition
-// for being testable under qmltestrunner. It reads the same BatteryModel.js the
-// shell would, so the JS tests and the QML tests cover one implementation.
 
 import QtQuick
 import "BatteryModel.js" as BatteryModel

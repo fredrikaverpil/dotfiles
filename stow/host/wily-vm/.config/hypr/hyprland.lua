@@ -1,6 +1,3 @@
--- monitors.lua is host-owned and optional; hosts without one get the fallback.
--- Hyprland watches only this entry file, so edits to monitors.lua apply on the
--- next explicit reload.
 local monitor_config = { scale = 1, gdkScale = 1 }
 local monitor_config_file = os.getenv("HOME") .. "/.config/hypr/monitors.lua"
 local monitor_config_loader = loadfile(monitor_config_file)
@@ -19,8 +16,6 @@ end
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = monitor_config.scale })
 hl.env("GDK_SCALE", tostring(monitor_config.gdkScale))
 
--- Theme is stowed to ~/.local/share/icons/macOS-hypr.
--- Source: https://github.com/6ooker/apple_hyprcursor
 hl.env("HYPRCURSOR_THEME", "macOS-hypr")
 hl.env("HYPRCURSOR_SIZE", "24")
 
@@ -35,27 +30,22 @@ hl.config({
     rounding = 8,
   },
 
-  -- 2 = insert new clients right/bottom.
   dwindle = {
     force_split = 2,
   },
 
   input = {
-    -- No grp: toggle in kb_options: the shell owns the current index
-    -- (qs ipc call keyboard ...) and a compositor-side switch desyncs the bar
-    -- indicator. Order must match the keyboard service's `codes`.
+    -- The shell owns the layout index; a compositor-side toggle would desynchronise its label.
     kb_layout = "us,se",
     repeat_rate = 60,
     repeat_delay = 200,
     natural_scroll = true,
-    -- Inert in this VM; no touchpad.
     touchpad = {
       natural_scroll = true,
       tap_to_click = true,
     },
   },
 
-  -- virtio-gpu exposes no cursor plane
   cursor = {
     no_hardware_cursors = true,
   },
@@ -69,8 +59,7 @@ hl.config({
     disable_hyprland_logo = true,
     disable_splash_rendering = true,
     force_default_wallpaper = 0,
-    -- Default false leaves a blanked output with no input-driven way back;
-    -- only `hyprctl dispatch dpms on` over SSH recovers it.
+    -- Hyprland otherwise cannot wake a DPMS-off output from physical input.
     key_press_enables_dpms = true,
     mouse_move_enables_dpms = true,
   },
@@ -78,11 +67,8 @@ hl.config({
 
 hl.animation({ leaf = "workspaces", enabled = false })
 
--- Tagging a window "noidle" holds the whole session awake; hyprctl reports it
--- as inhibitingIdle. The tag is window state, so it dies with the window.
 hl.window_rule({ match = { tag = "noidle" }, idle_inhibit = "always" })
 
--- Notifies because the tag is otherwise invisible.
 local stay_awake = table.concat({
   [[hyprctl dispatch 'hl.dsp.window.tag({ tag = "noidle" })' >/dev/null;]],
   [[hyprctl -j activewindow | jq -e .inhibitingIdle >/dev/null]],
@@ -90,9 +76,7 @@ local stay_awake = table.concat({
   [[|| notify-send -u low "Stay awake" "Off for this window"]],
 }, " ")
 
--- `hyprctl binds` reports Lua binds with an opaque __lua dispatcher, so the
--- cheatsheet reads what this wrapper records. A bare hl.bind() is invisible
--- to it.
+-- Hyprland exposes Lua binds as opaque dispatchers; record the cheatsheet here.
 local binds = {}
 
 local function bind(keys, description, dispatcher, opts)
@@ -107,20 +91,14 @@ local function bind(keys, description, dispatcher, opts)
   hl.bind(keys, dispatcher, options)
 end
 
--- Source order is cheatsheet display order.
---
--- pcall: an error in one bind would otherwise leave every later bind
--- unregistered and blank the cheatsheet, and Hyprland reports it nowhere but
--- the on-screen overlay.
+-- A bind error must not prevent later binds or the cheatsheet from registering.
 local ok, err = pcall(function()
-  -- Applications
   bind("SUPER + RETURN", "Terminal", hl.dsp.exec_cmd("ghostty"))
   bind("SUPER + SHIFT + RETURN", "Browser", hl.dsp.exec_cmd("uwsm-app -- zen-beta.desktop"))
   bind("SUPER + SHIFT + B", "Browser", hl.dsp.exec_cmd("uwsm-app -- zen-beta.desktop"))
   bind("SUPER + SHIFT + F", "File manager", hl.dsp.exec_cmd("uwsm-app -- org.kde.dolphin.desktop"))
   bind("SUPER + SHIFT + N", "Editor", hl.dsp.exec_cmd("ghostty -e nvim"))
 
-  -- Shell
   bind("SUPER + SPACE", "Menu", hl.dsp.exec_cmd("qs ipc call menu toggle"))
   bind("SUPER + ALT + SPACE", "Apps menu", hl.dsp.exec_cmd("qs ipc call menu level apps"))
   bind("SUPER + ESCAPE", "System menu", hl.dsp.exec_cmd("qs ipc call menu level system"))
@@ -145,7 +123,6 @@ local ok, err = pcall(function()
   bind("SUPER + CTRL + L", "Lock system", hl.dsp.exec_cmd("qs ipc call lock lock"))
   bind("SUPER + CTRL + K", "Next keyboard layout", hl.dsp.exec_cmd("qs ipc call keyboard next"))
 
-  -- `locked` keeps these working on the lock screen.
   bind(
     "XF86AudioRaiseVolume",
     "Volume up",
@@ -166,7 +143,6 @@ local ok, err = pcall(function()
   bind("XF86AudioPrev", "Previous track", hl.dsp.exec_cmd("qs ipc call media previous"), { locked = true })
   bind("ALT + SHIFT + XF86AudioPlay", "Previous track", hl.dsp.exec_cmd("qs ipc call media previous"), { locked = true })
 
-  -- Windows
   bind("SUPER + W", "Close window", hl.dsp.window.close())
   bind("SUPER + Q", "Close window", hl.dsp.window.close())
   bind("SUPER + J", "Toggle window split", hl.dsp.layout("togglesplit"))
@@ -190,7 +166,7 @@ local ok, err = pcall(function()
   bind("ALT + TAB", "Reveal active window on top", hl.dsp.window.bring_to_top())
   bind("ALT + SHIFT + TAB", "Reveal active window on top", hl.dsp.window.bring_to_top())
 
-  -- hl.bind() takes keysym names, not code:NN, so these follow the layout.
+  -- hl.bind accepts keysyms, not code:NN, so these follow the active layout.
   for ws = 1, 10 do
     local key = ws == 10 and "0" or tostring(ws)
     bind("SUPER + " .. key, "Switch to workspace " .. ws, hl.dsp.focus({ workspace = tostring(ws) }))
@@ -220,7 +196,6 @@ local ok, err = pcall(function()
     { display = "SUPER + SHIFT + ~" }
   )
 
-  -- Resize.
   bind(
     "SUPER + minus",
     "Expand window left",
@@ -296,7 +271,6 @@ local ok, err = pcall(function()
     { display = "SUPER + CTRL + SHIFT + EQUAL" }
   )
 
-  -- Groups
   bind("SUPER + G", "Toggle window grouping", hl.dsp.group.toggle())
   bind("SUPER + ALT + G", "Move active window out of group", hl.dsp.window.move({ out_of_group = true }))
   bind("SUPER + ALT + LEFT", "Move window to group on left", hl.dsp.window.move({ into_group = "l" }))
@@ -337,8 +311,7 @@ if not ok then
   hl.notification.create({ text = "hyprland.lua: " .. tostring(err), timeout = 15000 })
 end
 
--- Written atomically: Hyprland re-runs this file on every config change while
--- the cheatsheet may be reading it. niri's config.kdl writes the same path.
+-- The niri config writes the same file; replace it atomically for concurrent readers.
 local path = os.getenv("HOME") .. "/.local/state/wm-binds.tsv"
 local out = io.open(path .. ".tmp", "w")
 if out then

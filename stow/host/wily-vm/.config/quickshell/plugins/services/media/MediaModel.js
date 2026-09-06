@@ -1,6 +1,3 @@
-// MPRIS player selection and labels, kept Qt-free for tests/. A playing real
-// player beats a proxy, and an explicit pick holds only until another player
-// starts playback.
 
 function playerKey(player) {
   if (!player) return ""
@@ -47,9 +44,8 @@ function detailFor(player) {
   return String(player.trackArtist || player.identity || player.desktopEntry || "")
 }
 
+// Quickshell's ObjectModel.values is list-like but not reliably an Array.
 function sourcePlayers(players) {
-  // ObjectModel.values is list-like but not an Array in every QML runtime, so
-  // copy by index rather than trusting Array.isArray().
   var list = []
   var count = players && typeof players.length === "number" ? players.length : 0
   for (var index = 0; index < count; index++) {
@@ -69,7 +65,6 @@ function activePlayer(players, preferredKey) {
   var list = sourcePlayers(players)
   var preferred = list.find(function(player) { return playerKey(player) === preferredKey })
 
-  // The explicit pick only wins while it is itself playing.
   if (preferred && preferred.isPlaying) return preferred
 
   var playing = list.find(function(player) { return player.isPlaying && !isProxyPlayer(player) })

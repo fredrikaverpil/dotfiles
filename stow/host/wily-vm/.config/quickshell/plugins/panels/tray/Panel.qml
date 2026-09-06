@@ -6,20 +6,10 @@ import Quickshell.Services.SystemTray
 import "../../../Ui" as Ui
 import "../../bar/widgets/TrayModel.js" as TrayModel
 
-// A tray item's own menu: presentation over a QsMenuOpener, since the app owns
-// every row.
-//
-// Drawn here rather than through QsMenuEntry.display(), which renders a
-// platform menu and is a silent no-op unless the shell root sets
-// `//@ pragma UseQApplication`. Drawing them also gets the palette and the
-// panel's keyboard chain for free.
 Ui.Panel {
   id: root
 
   property var item: null
-  // One live opener per level: a child entry is owned by its parent opener's
-  // children model, so collapsing the stack to a single opener would destroy
-  // the very entry being displayed and the submenu would come up empty.
   property var stack: []
 
   readonly property int depth: stack.length
@@ -36,8 +26,6 @@ Ui.Panel {
   cardHeight: 380
   keyNavigation: true
 
-  // The launcher's Tray level calls this too, since the bar icon's right click
-  // is mouse-only.
   IpcHandler {
     target: "tray"
 
@@ -52,6 +40,7 @@ Ui.Panel {
     function close(): void { root.close() }
   }
 
+  // Child entries belong to their parent opener, so every menu level needs its own opener.
   Component {
     id: openerComponent
     QsMenuOpener {}
@@ -74,25 +63,19 @@ Ui.Panel {
   }
 
   function reset() {
+    // Clear bindings before destroying openers, deepest first.
     settling = false
     settleTimer.stop()
-    // Clear the reactive stack first, so no binding reads a half-destroyed
-    // opener. Then destroy deepest first: a parent's children model owns the
-    // inner opener's entry.
     const levels = stack
     stack = []
     for (let i = levels.length - 1; i >= 0; i--) levels[i].opener.destroy()
   }
 
   function openFor(trayItem) {
-    // Clicking the icon whose menu is already showing closes it, like every
-    // other bar button. onShownChanged tears the stack down.
     if (shown && item === trayItem) {
       close()
       return
     }
-    // The root opener binds to the item's menu, so assigning a new item
-    // invalidates the old root's children immediately.
     reset()
     item = trayItem
     if (!trayItem || !trayItem.hasMenu) return
@@ -100,8 +83,6 @@ Ui.Panel {
     open()
   }
 
-  // Changing level rebuilds the delegates synchronously, so the next row lands
-  // under a cursor that has not moved. Ignore clicks for a beat.
   property bool settling: false
 
   function settle() {
@@ -137,8 +118,6 @@ Ui.Panel {
     height: parent.height - y
     clip: true
     contentHeight: rows.height
-    // Panel.qml already spends Left on focus stepping, so this handler sits
-    // above it and takes Backspace too.
     Keys.onPressed: function (event) {
       if (event.key === Qt.Key_Backspace) {
         root.pop()
@@ -167,7 +146,6 @@ Ui.Panel {
           border.width: 1
           opacity: modelData.enabled ? 1 : 0.45
 
-          // A separator is not a stop on the way to anything.
           activeFocusOnTab: !modelData.isSeparator
 
           function trigger() {
@@ -202,8 +180,6 @@ Ui.Panel {
             anchors.rightMargin: 8
             spacing: 8
 
-            // The app says checkbox or radio; the look is ours. Qt.Checked is
-            // 2, PartiallyChecked 1.
             Text {
               width: 14
               color: root.shell.palette.fg

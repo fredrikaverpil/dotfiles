@@ -3,22 +3,14 @@ pragma Singleton
 import QtQuick
 import Quickshell
 
-// The whole compositor coupling: every command that differs between Hyprland
-// and niri lives here. The one exception is the workspaces widget, split into
-// two files because importing Quickshell.Hyprland under niri would connect to
-// a socket that is not there.
 Singleton {
   id: root
 
-  // config.kdl passes NIRI_SOCKET to `uwsm finalize` so it reaches the systemd
-  // user manager. Without that, the shell silently decides it is on Hyprland.
   readonly property bool niri: !!Quickshell.env("NIRI_SOCKET")
 
   function dpms(on) {
     return niri
       ? ["niri", "msg", "action", on ? "power-on-monitors" : "power-off-monitors"]
-      // hyprctl dispatch takes Lua on 0.56; the hyprlang form "dpms off" is a
-      // parse error that only shows up on hyprctl's stdout, which nothing reads.
       : ["hyprctl", "dispatch", on ? 'hl.dsp.dpms("on")' : 'hl.dsp.dpms("off")']
   }
 
@@ -34,8 +26,6 @@ Singleton {
       : ["hyprctl", "dispatch", 'hl.dsp.focus({ workspace = "' + id + '" })']
   }
 
-  // niri answers with the focused output; hyprctl lists all and marks it.
-  // Model.focusedMonitor() folds the two shapes together.
   function outputs() {
     return niri
       ? ["niri", "msg", "-j", "focused-output"]
@@ -50,7 +40,6 @@ Singleton {
           ", position = \"auto\", scale = " + scale + " })"]
   }
 
-  // Where the display panel persists a chosen scale, rewritten with sed.
   readonly property string scaleConfig: Quickshell.env("HOME") +
     (niri ? "/.config/niri/config.kdl" : "/.config/hypr/monitors.lua")
 
@@ -66,9 +55,6 @@ Singleton {
         ]
   }
 
-  // By absolute index rather than "next", so every device stays on the same
-  // layout and a read from any of them agrees. Hyprland reports the index on
-  // the keyboard it marks `main`; niri answers with it directly.
   function layoutQuery() {
     return niri
       ? ["niri", "msg", "-j", "keyboard-layouts"]
@@ -78,15 +64,9 @@ Singleton {
   function setLayout(index) {
     return niri
       ? ["niri", "msg", "action", "switch-layout", String(index)]
-      // Not a dispatcher, so it cannot go over the dispatch socket.
       : ["hyprctl", "switchxkblayout", "all", String(index)]
   }
 
-  // hyprsunset speaks Hyprland's own CTM protocol; wl-gammarelay-rs speaks
-  // wlr-gamma-control, which is what niri implements. Neither crosses over.
-  //
-  // `pgrep -f`, not `-x`: /proc comm truncates to 15 characters, so the
-  // process name reads "wl-gammarelay-r" and an exact match never hits.
   readonly property var nightlightBackend: niri
     ? ({
         running: "pgrep -f 'wl-gammarelay-rs run' >/dev/null",

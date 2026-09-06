@@ -1,6 +1,3 @@
-// Component tests: instantiate real QML, drive properties, assert on bindings
-// and signals. This is what qmltestrunner is good for, and it is available to
-// any component in this tree that does not import Quickshell.
 
 import QtQuick
 import QtTest
@@ -43,8 +40,6 @@ TestCase {
     compare(indicator.low, data.low)
   }
 
-  // The reason a component test earns its place over a JS test: the JS is
-  // pure, but the binding graph and the signal it drives are not.
   function test_wentLow_fires_once_per_transition() {
     indicator.percent = 10
     compare(lowSpy.count, 1)

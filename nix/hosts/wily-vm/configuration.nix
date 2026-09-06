@@ -8,8 +8,6 @@
 {
   imports = [ ./desktop.nix ];
 
-  # Install-time compatibility marker, not the nixpkgs channel — see flake.nix
-  # for the channel (this host tracks nixpkgs-unstable via mkNixos).
   system.stateVersion = "26.05";
 
   networking.hostName = "wily-vm";
@@ -18,24 +16,17 @@
 
   time.timeZone = "Europe/Stockholm";
 
-  # When the Mac host sleeps, UTM pauses the VM and its clock simply stops, so
-  # the guest wakes hours behind. systemd-timesyncd steps only on its first
-  # sync and slews after that, which never closes a gap that large. chrony
-  # with an unlimited makestep corrects it on the next poll instead.
+  # UTM pauses the guest with the Mac; chrony must step the resulting time gap.
   services.timesyncd.enable = false;
   services.chrony = {
     enable = true;
     extraConfig = "makestep 1.0 -1";
   };
 
-  # UEFI. nixos-generate-config emits these into the throwaway
-  # /etc/nixos/configuration.nix, which this file replaces — without them the
-  # generation has no bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.systemd-boot.configurationLimit = 5;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # Small disk: collect weekly; min-free/max-free also collects mid-build.
   nix.gc = {
     automatic = true;
     dates = "weekly";

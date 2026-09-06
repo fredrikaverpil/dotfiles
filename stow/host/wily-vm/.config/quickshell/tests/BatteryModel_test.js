@@ -1,8 +1,3 @@
-// Unit tests for BatteryModel.js, the layer that needs no Qt at all.
-//
-// The model files are QML-flavoured JS with a `module.exports` guard, not ES
-// modules, so they are pulled in through node compat rather than `import`.
-// This is the whole reason the guard is there.
 
 import { createRequire } from "node:module"
 import { assertEquals } from "jsr:@std/assert"

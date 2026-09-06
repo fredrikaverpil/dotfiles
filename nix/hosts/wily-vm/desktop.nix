@@ -1,11 +1,6 @@
 { lib, pkgs, ... }:
 let
-  # VM-only. UTM's virgl runs on ANGLE over Metal, which exposes desktop
-  # OpenGL 2.1 (GLES tops out at 3.0). Ghostty is GTK4 and sets
-  # GDK_DISABLE=gles-api itself, so it demands desktop GL >= 3.3 and dies with
-  # "Unable to acquire an OpenGL context". llvmpipe gives it 4.6. Hyprland is
-  # unaffected — it uses GLES 3.0 — so the override is scoped to this one
-  # program rather than the session. Drop it on real hardware.
+  # UTM's virgl lacks the desktop GL version Ghostty requires; keep software GL scoped to it.
   ghostty-softgl = pkgs.symlinkJoin {
     name = "ghostty-softgl";
     paths = [ pkgs.ghostty ];
@@ -15,10 +10,6 @@ let
     '';
   };
 
-  # Runs for the graphical session's lifetime with a logind delay inhibitor.
-  # PrepareForSleep gives the running Quickshell lock surface a bounded window
-  # to become secure before the VM suspends. It lives in Nix rather than stow
-  # so every dependency is an absolute store path in the generated wrapper.
   sleep-lock-monitor = pkgs.writeShellApplication {
     name = "wily-sleep-lock-monitor";
     runtimeInputs = [
@@ -65,11 +56,6 @@ let
       fi
     '';
   };
-  # cliamp is a TUI, so nixpkgs ships the bare binary and the launcher's apps
-  # provider has no entry to find. Omarchy's convention for these is
-  # Terminal=false plus an explicit terminal in Exec (applications/*.desktop);
-  # theirs calls xdg-terminal-exec, which is not installed here. `ghostty` is a
-  # bare command name, so it resolves through PATH to the softgl wrapper above.
   cliamp-desktop = pkgs.makeDesktopItem {
     name = "cliamp";
     desktopName = "cliamp";
@@ -83,21 +69,12 @@ let
   };
 in
 {
-  # uwsm wraps the session in systemd units so graphical-session.target is
-  # actually activated, which is what the Quickshell service below binds to.
-  # Running the shell as its own unit also means it can be restarted without
-  # touching the compositor — useful when iterating on the QML.
   programs.hyprland = {
     enable = true;
     withUWSM = true;
   };
 
-  # xdg-desktop-portal keys its backend choice off XDG_CURRENT_DESKTOP, and
-  # nothing declares one for "niri". Without this it finds no implementation
-  # and every portal call fails -- including the Settings one that carries
-  # org.freedesktop.appearance, which is what the light/dark toggle drives.
-  # xdph is Hyprland-only, so gtk is the whole answer here; screencast under
-  # niri would want xdg-desktop-portal-gnome instead.
+  # niri has no portal default; the GTK settings portal supplies the shell's theme setting.
   xdg.portal.config.niri.default = [ "gtk" ];
 
   services.pipewire = {
@@ -108,44 +85,21 @@ in
 
   security.rtkit.enable = true;
 
-  # Hyprland's cursor manager reads these at startup; a config reload is too
-  # late to replace the already-loaded cursor theme.
+  # GTK3 needs the portal to follow the dconf theme; Qt uses the GTK platform theme.
   environment.sessionVariables = {
     HYPRCURSOR_THEME = "macOS-hypr";
     HYPRCURSOR_SIZE = "24";
-    # Chromium's wrapper reads this to opt into its native Wayland backend.
     NIXOS_OZONE_WL = "1";
-    # Without a platform theme Qt apps get the generic Unix theme's static
-    # light palette and never see the light/dark toggle. gtk3 (libqgtk3.so,
-    # already in qtbase) makes them follow the GTK theme the toggle writes.
     QT_QPA_PLATFORMTHEME = "gtk3";
-    # ...but GTK3 only finds that theme through the settings portal here. Its
-    # other source is the org.gnome.desktop.interface GSettings schema, and no
-    # directory in XDG_DATA_DIRS ships a compiled one -- gsettings-desktop-
-    # schemas is not installed, which is also why `gsettings` is absent. GTK4
-    # (Ghostty) asks the portal on its own; GTK3 needs telling.
     GTK_USE_PORTAL = "1";
   };
 
-  # Terminal-first login: no display manager. Agetty authenticates fredrik on
-  # the console, then the `hypr` zsh function starts this UWSM-managed session.
-  # When it exits, the user returns to the same terminal rather than a greeter.
-  # Keep programs.hyprland's graphical.target default: it does not start a
-  # greeter, but UWSM's `check may-start` requires that target to be active.
-
-  # Quickshell provides both the lock surface (PAM service below) and the
-  # desktop polkit agent. NixOS owns the authorization daemon itself.
   security.polkit.enable = true;
 
-  # Not implied by polkit.enable: without the setuid wrapper, pkexec aborts with
-  # "pkexec must be setuid root" and never reaches the agent. D-Bus callers
-  # (systemctl and friends) prompt either way.
+  # polkit.enable does not install the setuid pkexec wrapper.
   security.polkit.enablePkexecWrapper = true;
 
-  # Keep this as a conventional PAM include rather than security.pam.services:
-  # the current aarch64 nixpkgs PAM renderer evaluates disabled howdy/Kanidm
-  # module paths and fails before it can render any custom service. PamContext
-  # only calls pam_authenticate, and login's auth stack supplies pam_unix.
+  # The custom PAM service bypasses an aarch64 NixOS PAM-module evaluation bug.
   environment.etc."pam.d/wily-lock".text = ''
     auth include login
   '';
@@ -153,43 +107,21 @@ in
   systemd.user.services.quickshell = {
     description = "Quickshell desktop shell";
     partOf = [ "graphical-session.target" ];
-    # Ordered against the compositor service, not graphical-session.target.
-    # systemd orders a target after the units that are wantedBy it, and
-    # graphical-session.target is itself after the session target below — so
-    # `after = graphical-session.target` closes a cycle, which systemd breaks
-    # by silently deleting this unit's start job. The session comes up with no
-    # bar and no lock, and only the journal for graphical-session.target says
-    # why.
-    # Both compositors, and only one of them is ever in the start transaction,
-    # so the unused After is inert.
-    #
-    # waitenv is what actually makes this safe under niri. niri sd_notifies
-    # READY=1 itself ~1ms after binding its Wayland socket, long before its
-    # `spawn-at-startup uwsm finalize` publishes WAYLAND_DISPLAY to the user
-    # manager -- so an After on the compositor service alone releases this unit
-    # into an environment with no WAYLAND_DISPLAY, libwayland falls back to
-    # wayland-0, and Quickshell dies on ENOENT. uwsm's waitenv unit blocks
-    # until the variable is in the activation environment, which is the
-    # condition this unit actually needs. Hyprland does not self-notify, so it
-    # never had the gap.
+    # Never order after graphical-session.target: that creates a systemd cycle.
+    # waitenv closes niri's readiness-before-WAYLAND_DISPLAY race.
     after = [
       "wayland-wm@hyprland.desktop.service"
       "wayland-wm@niri.service"
       "wayland-session-waitenv.service"
     ];
-    # Not graphical-session.target: Plasma activates that too, and this shell
-    # would then stack a second bar, lock surface and polkit agent onto KWin.
+    # Bind to compositor-specific sessions so another desktop cannot start a second shell.
     wantedBy = [
       "wayland-session@hyprland.desktop.target"
       "wayland-session@niri.target"
     ];
-    # NixOS pins a sparse PATH on every user unit. Unsetting it is the only way
-    # to let the unit inherit the session PATH uwsm imports into the user
-    # manager, which is what the launcher needs: uwsm-app to spawn apps with,
-    # and then every app's own Exec, which is a bare command name.
+    # NixOS pins a sparse user-unit PATH; inherit UWSM's session PATH for app launchers.
     environment.PATH = lib.mkForce null;
-    # Quickshell ships no webp decoder; the wrapper prefixes its own plugin
-    # paths to this, so the two sets merge. Omarchy's backgrounds are all webp.
+    # qtimageformats supplies Quickshell's WebP decoder.
     environment.QT_PLUGIN_PATH = "${pkgs.qt6.qtimageformats}/lib/qt-6/plugins";
     serviceConfig = {
       ExecStart = "${pkgs.quickshell}/bin/quickshell";
@@ -197,15 +129,10 @@ in
     };
   };
 
-  # A delay inhibitor must already be active when logind broadcasts
-  # PrepareForSleep. It is tied to the graphical target so its inherited
-  # Quickshell IPC environment cannot leak into a later login session.
   systemd.user.services.wily-sleep-lock = {
     description = "Lock Quickshell before suspend";
     partOf = [ "graphical-session.target" ];
-    # See the quickshell unit above: an After on graphical-session.target is
-    # an ordering cycle here.
-    # waitenv for the same reason as the quickshell unit above.
+    # Match Quickshell's ordering: waitenv is required for niri, and graphical-session.target cycles.
     after = [
       "dbus.socket"
       "wayland-wm@hyprland.desktop.service"
@@ -224,10 +151,7 @@ in
     };
   };
 
-  # cliamp propagates yt-dlp, which pulls python3Packages.curl-cffi, whose test
-  # suite fails on aarch64-linux: its localhost TLS tests reject the certificate
-  # for 127.0.0.1. cache.nixos.org has no build of it either, so this is not a
-  # local fault and no nixpkgs bump fixes it. The library itself is fine.
+  # curl-cffi's aarch64 TLS tests fail, though the package itself works.
   nixpkgs.overlays = [
     (final: prev: {
       python3Packages = prev.python3Packages.overrideScope (
@@ -240,39 +164,25 @@ in
 
   host.extraSystemPackages = with pkgs; [
     quickshell
-    hyprsunset # nightlight; the schedule lives in the Quickshell service
-    niri # second compositor; the same Quickshell config runs under either
-    # niri's nightlight backend. Hyprland dropped wlr-gamma-control for its own
-    # CTM protocol, which is what hyprsunset speaks and this does not, so the
-    # two are not interchangeable -- each compositor gets its own.
+    hyprsunset
+    niri
     wl-gammarelay-rs
-    libnotify # notify-send smoke tests and CLI desktop notifications
-    # The notification toast sound; the shell plays message.oga from it with
-    # pw-play. Present transitively via the KDE stack, declared so it stays.
+    libnotify
     sound-theme-freedesktop
-    # GUI file manager; the launcher's apps provider picks up its .desktop
-    # entry with no menu change. Pulls KDE Frameworks 6, and the rest of the
-    # session has no KDE stack -- it is here for its keyboard coverage.
     kdePackages.dolphin
-    # kwriteconfig6: the shell's theme toggle writes kdeglobals through it,
-    # since only KConfig's --notify drops the per-process cache of that file.
     kdePackages.kconfig
-    ghostty-softgl # terminal; see the let-block above
-    gnome-themes-extra # Adwaita-dark, the GTK theme the light/dark toggle names
-    iproute2 # `ip` supplies the network panel's active route and counters
-    iputils # `ping` supplies the network panel's latency and loss samples
+    ghostty-softgl
+    gnome-themes-extra
+    iproute2
+    iputils
 
-    # Without --no-first-run the profile stays pinned to the light UI and
-    # ignores the portal's color-scheme; see the browsers entry in CLAUDE.md.
     (chromium.override { commandLineArgs = "--no-first-run"; })
-    cliamp # terminal Winamp; music player
-    cliamp-desktop # its launcher entry; see the let-block above
+    cliamp
+    cliamp-desktop
     firefox
-    grim # screenshots, for verifying the session over SSH
+    grim
     wl-clipboard
     signal-desktop
     zed-editor
-    # proton-pass # unsupported on aarch64-linux; enable in the ThinkPad config
-    # spotify # unsupported on aarch64-linux; psst or spotify-qt if wanted here
   ];
 }

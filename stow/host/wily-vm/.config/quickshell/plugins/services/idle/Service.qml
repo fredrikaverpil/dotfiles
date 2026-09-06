@@ -1,5 +1,3 @@
-// IdleMonitor honours idle inhibitors, so no second daemon (hypridle) is
-// needed.
 
 import QtQuick
 import Quickshell

@@ -1,6 +1,3 @@
-// Unit tests for plugins/services/media/MediaModel.js. Player objects stand in
-// for Quickshell's MprisPlayer type; selection and labels are intentionally
-// pure data so Deno can cover them without a running D-Bus media player.
 
 import { createRequire } from "node:module"
 import { assertEquals } from "jsr:@std/assert"

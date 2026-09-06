@@ -4,14 +4,11 @@ import Quickshell.Io
 import "../../../Ui" as Ui
 import "../../services/media/MediaModel.js" as Model
 
-// Title, art, controls and sources, all reachable through Ui.Panel's focus
-// chain. The bar button and the launcher both land here.
 Ui.Panel {
   id: root
 
   required property var service
 
-  // shell.media names this panel, so proxy the service state the bar reads.
   readonly property bool hasMedia: service.hasMedia
   readonly property string icon: service.icon
   readonly property var players: service.sourcePlayers
@@ -179,9 +176,6 @@ Ui.Panel {
     }
   }
 
-  // Keyed on visibility, never availability: an MPRIS player can change a
-  // capability while a button has focus, and dropping it from the chain then
-  // would strand the cursor.
   component ControlButton: Rectangle {
     property string label: ""
     property bool available: true

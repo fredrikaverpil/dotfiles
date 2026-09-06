@@ -5,7 +5,6 @@ import Quickshell.Wayland
 
 import "../../Ui" as Ui
 
-// The wallpaper surface and the picker that chooses it.
 Scope {
   id: background
 
@@ -15,17 +14,11 @@ Scope {
   function close() { picker.close() }
   function toggle() { picker.toggle() }
 
-  // Images live in ~/Pictures/wallpapers, outside this repo. The pick is per
-  // mode, persisted in ~/.local/state/wallpaper-{dark,light}; the gradient
-  // below shows through until a mode has one.
   readonly property string wallpaperDir: Quickshell.env("HOME") + "/Pictures/wallpapers"
   property list<string> wallpapers: []
   property string darkPick: ""
   property string lightPick: ""
   readonly property string wallpaper: shell.dark ? darkPick : lightPick
-  // Previews the highlighted picture while the picker is open; cleared on
-  // close, so Escape reverts. Debounced, or each step queues a full-size
-  // decode and arrowing through the grid runs behind the keys.
   property string preview: ""
   readonly property string shownWallpaper: preview || wallpaper
 
@@ -114,9 +107,6 @@ Scope {
         }
       }
 
-      // Two layers so a change crossfades. `loader` decodes the incoming
-      // picture off-screen; only once it is in memory do the visible layers
-      // move. Both are synchronous because what they get is already cached.
       Item {
         id: wall
         anchors.fill: parent
@@ -130,7 +120,6 @@ Scope {
             return
           }
           if (String(over.source) === src) return
-          // Reset without animating, so the fade below runs from zero.
           fade.enabled = false
           over.opacity = 0
           fade.enabled = true
@@ -145,10 +134,6 @@ Scope {
           source: wall.src
           asynchronous: true
           visible: false
-          // A cached picture is Ready the moment the source is assigned, so
-          // its status never changes and only sourceChanged runs -- hence both
-          // handlers, plus completion for the first picture. `swap` is
-          // idempotent.
           onStatusChanged: if (status === Image.Ready) wall.swap()
           onSourceChanged: if (status === Image.Ready) wall.swap()
           Component.onCompleted: if (status === Image.Ready) wall.swap()
@@ -174,7 +159,6 @@ Scope {
     }
   }
 
-  // Escape and Enter sit on the grid, which is what holds focus while open.
   Ui.Panel {
     id: picker
     shell: background.shell
@@ -182,7 +166,6 @@ Scope {
     cardHeight: 540
 
     function open() {
-      // Pick up anything added to the directory since the last look.
       scan.running = true
       if (background.shell && background.shell.registerPanel) background.shell.registerPanel(picker)
       if (background.shell && background.shell.claimPanel) background.shell.claimPanel(picker)
@@ -201,7 +184,6 @@ Scope {
       color: background.shell.palette.fg
       font.family: "JetBrainsMono Nerd Font"
       font.pixelSize: 15
-      // The pick applies to the mode that is on now, so name it.
       text: "Wallpaper · " + (background.shell.dark ? "dark" : "light")
     }
 
@@ -237,7 +219,6 @@ Scope {
             anchors.margins: 2
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
-            // Thumbnails: the source images run to megabytes.
             sourceSize.width: 480
             source: "file://" + modelData
           }

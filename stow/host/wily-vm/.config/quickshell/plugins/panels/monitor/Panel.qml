@@ -5,8 +5,6 @@ import Quickshell.Io
 import "../../../Ui" as Ui
 import "Model.js" as Model
 
-// Single-monitor display panel. Brightness and multi-display rows stay
-// visibly unavailable until hardware can back them.
 Ui.Panel {
   id: root
 
@@ -50,9 +48,8 @@ Ui.Panel {
     applyScale.running = true
   }
 
+  // GNU sed otherwise replaces the Stow link rather than its target.
   function persistScale(scale) {
-    // --follow-symlinks: GNU sed otherwise replaces this host's Stow symlink
-    // with a regular file.
     persistScaleProcess.command = ["sed", "-i", "--follow-symlinks", "-E"]
       .concat(Ui.Compositor.scaleEdits(scale, Model.gdkScale(scale)))
       .concat([Ui.Compositor.scaleConfig])
@@ -250,14 +247,11 @@ Ui.Panel {
     height: 30
     radius: 4
     color: active ? root.shell.palette.sel : "transparent"
-    // Fill is the chosen setting, border is focus, so both read at once.
     border.color: button.activeFocus ? root.shell.palette.fg : root.shell.palette.dim
     border.width: 1
     opacity: available ? 1 : 0.45
 
-    // Not conditioned on `available`: a button going unavailable under the
-    // cursor would drop out of the focus chain and strand it. It stays
-    // reachable and refuses to fire instead.
+    // Keep an unavailable visible button in the chain; removing focused controls strands focus.
     activeFocusOnTab: true
     Keys.onReturnPressed: if (button.available) button.activated()
     Keys.onEnterPressed: if (button.available) button.activated()
