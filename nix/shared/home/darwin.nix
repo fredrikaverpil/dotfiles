@@ -77,7 +77,7 @@
       show-process-indicators = true;
       orientation = "bottom";
       tilesize = 36;
-      minimize-to-application = true;
+      minimize-to-application = false;
       mineffect = "scale";
       enable-window-tool = false;
       magnification = false;
