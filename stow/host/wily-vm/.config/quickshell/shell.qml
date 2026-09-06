@@ -211,9 +211,13 @@ ShellRoot {
     "style.theme.dark": { icon: "", label: "Dark", action: () => root.setDark(true) },
     "style.theme.light": { icon: "", label: "Light", action: () => root.setDark(false) },
     "trigger": { icon: "󱓞", label: "Trigger" },
+    // Saved and copied, not one or the other: the file is what survives, the
+    // clipboard is what gets pasted into a chat a second later. wl-copy needs
+    // an explicit --type -- it does not sniff the PNG.
     "trigger.screenshot": { icon: "", label: "Screenshot", action: () => root.run(
-      "mkdir -p ~/Pictures/screenshots && " +
-      "grim ~/Pictures/screenshots/screenshot-$(date +%Y%m%d-%H%M%S).png") },
+      "mkdir -p $HOME/Pictures/screenshots && " +
+      "f=$HOME/Pictures/screenshots/screenshot-$(date +%Y%m%d-%H%M%S).png && " +
+      "grim \"$f\" && wl-copy --type image/png < \"$f\"") },
     "trigger.emoji": { icon: "", label: "Emoji", enabled: false },
     "trigger.color": { icon: "󰃉", label: "Color picker", enabled: false },
     "trigger.share": { icon: "", label: "Share", enabled: false },
