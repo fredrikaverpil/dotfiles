@@ -1,12 +1,7 @@
-// Keyboard layout. Omarchy's counterpart is a bar widget
-// (shell/plugins/bar/widgets/KeyboardLayout.qml) that owns its own state; this
-// is a service because the bar, the launcher and an IPC chord all reach it.
-//
-// The shell owns the index. Every way to switch -- the bar button, the
-// launcher, the SUPER + CTRL + K chord -- comes through here, so there is no
-// activelayout listener and no second niri event-stream. That holds only while
-// the compositors have no layout toggle of their own: adding a `grp:` option
-// to kb_options would switch behind this and desync the label.
+// The shell owns the layout index: every way to switch comes through here, so
+// there is no activelayout listener. That holds only while the compositors
+// have no toggle of their own -- a `grp:` option in kb_options would switch
+// behind this and desync the label.
 
 import QtQuick
 import Quickshell
@@ -19,11 +14,8 @@ Item {
   id: root
 
   // Same layouts, same order, as `kb_layout` in hypr/hyprland.lua and `layout`
-  // in niri/config.kdl. Both compositors can be asked for the list, but only
-  // in shapes that need an xkb description table to reach a short code from:
-  // Omarchy shells out to `xkbcli list --load-exotic`, caelestia xmllints
-  // base.xml, DankMaterialShell ships a hand-written LANG_CODES map. Two
-  // entries are not worth any of those.
+  // in niri/config.kdl. Hardcoded: reaching a short code from what the
+  // compositors report needs an xkb description table.
   readonly property var codes: ["US", "SE"]
 
   property int index: 0
@@ -39,7 +31,7 @@ Item {
   function next() { root.set((root.index + 1) % root.codes.length) }
 
   // A shell restart mid-session leaves the compositor on whatever layout it
-  // was, so seed from it rather than assuming the configured default.
+  // was, so seed from it rather than assuming the default.
   Component.onCompleted: query.running = true
 
   Process {

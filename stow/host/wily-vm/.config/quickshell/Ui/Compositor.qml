@@ -3,17 +3,15 @@ pragma Singleton
 import QtQuick
 import Quickshell
 
-// The whole compositor coupling. Hyprland and niri both run this shell, and
-// every command that differs between them is here -- nothing else in the tree
-// branches on which one is up. The exception is the workspaces widget, whose
-// two data sources are separate files because importing Quickshell.Hyprland
-// under niri would connect to a socket that is not there.
+// The whole compositor coupling: every command that differs between Hyprland
+// and niri lives here. The one exception is the workspaces widget, split into
+// two files because importing Quickshell.Hyprland under niri would connect to
+// a socket that is not there.
 Singleton {
   id: root
 
-  // niri exports NIRI_SOCKET to what it spawns, and config.kdl passes the name
-  // to `uwsm finalize` so it reaches the systemd user manager this unit starts
-  // under. Without that export the shell silently decides it is on Hyprland.
+  // config.kdl passes NIRI_SOCKET to `uwsm finalize` so it reaches the systemd
+  // user manager. Without that, the shell silently decides it is on Hyprland.
   readonly property bool niri: !!Quickshell.env("NIRI_SOCKET")
 
   function dpms(on) {
@@ -36,9 +34,8 @@ Singleton {
       : ["hyprctl", "dispatch", 'hl.dsp.focus({ workspace = "' + id + '" })']
   }
 
-  // One output either way: niri answers with the focused one directly, while
-  // hyprctl lists every monitor and marks it. Model.focusedMonitor() folds the
-  // two shapes together.
+  // niri answers with the focused output; hyprctl lists all and marks it.
+  // Model.focusedMonitor() folds the two shapes together.
   function outputs() {
     return niri
       ? ["niri", "msg", "-j", "focused-output"]
@@ -53,8 +50,7 @@ Singleton {
           ", position = \"auto\", scale = " + scale + " })"]
   }
 
-  // Where a scale chosen in the display panel is written so it survives a
-  // restart. Both are rewritten line-by-line with sed; see the panel.
+  // Where the display panel persists a chosen scale, rewritten with sed.
   readonly property string scaleConfig: Quickshell.env("HOME") +
     (niri ? "/.config/niri/config.kdl" : "/.config/hypr/monitors.lua")
 
@@ -70,11 +66,9 @@ Singleton {
         ]
   }
 
-  // Keyboard layout, by absolute index rather than "next": that keeps every
-  // device on the same layout, so a read from any of them agrees. Omarchy
-  // cycles one named keyboard instead and pays for it with ~150 lines picking
-  // which -- see wily-vm/CLAUDE.md. Hyprland reports the index on the keyboard
-  // it marks `main`; niri answers with it directly.
+  // By absolute index rather than "next", so every device stays on the same
+  // layout and a read from any of them agrees. Hyprland reports the index on
+  // the keyboard it marks `main`; niri answers with it directly.
   function layoutQuery() {
     return niri
       ? ["niri", "msg", "-j", "keyboard-layouts"]
@@ -88,9 +82,8 @@ Singleton {
       : ["hyprctl", "switchxkblayout", "all", String(index)]
   }
 
-  // Nightlight. hyprsunset speaks Hyprland's own CTM protocol and nothing
-  // else; niri implements wlr-gamma-control, which is what wl-gammarelay-rs
-  // uses. Neither works on the other compositor.
+  // hyprsunset speaks Hyprland's own CTM protocol; wl-gammarelay-rs speaks
+  // wlr-gamma-control, which is what niri implements. Neither crosses over.
   //
   // `pgrep -f`, not `-x`: /proc comm truncates to 15 characters, so the
   // process name reads "wl-gammarelay-r" and an exact match never hits.

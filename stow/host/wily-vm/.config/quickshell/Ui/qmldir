@@ -1,9 +1,5 @@
-# Without this, qmlls and qmllint cannot resolve `pragma Singleton` reached
-# through the `import "Ui" as Ui` directory import, and every member access on
-# Compositor reports as missing. Quickshell itself does not need it.
-#
-# A qmldir hides every type it does not list: a new file under Ui/ needs a line
-# here or it becomes unimportable.
+# Only qmlls/qmllint need this; Quickshell resolves these without it. A qmldir
+# hides every type it does not list, so a new file under Ui/ needs a line here.
 singleton Compositor 1.0 Compositor.qml
 Panel 1.0 Panel.qml
 BarButton 1.0 BarButton.qml

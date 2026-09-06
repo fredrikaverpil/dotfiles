@@ -20,9 +20,8 @@ import "plugins/services/network" as NetworkService
 import "plugins/services/nightlight" as Nightlight
 import "Ui" as Ui
 
-// Wiring only: the palette every surface reads, the menu's entry table, and
-// the services and surfaces themselves. Each of those lives in its own file
-// under plugins/, on the paths Omarchy uses, so upstream stays diffable.
+// Wiring only: the palette, the menu's entry table, and the services and
+// surfaces themselves.
 ShellRoot {
   id: root
 
@@ -39,8 +38,8 @@ ShellRoot {
   readonly property alias audio: audio
   readonly property alias tray: tray
 
-  // All overlay panels leave this strip click-through so a second click
-  // reaches its bar button rather than their full-screen dismissal surface.
+  // Overlay panels leave this strip click-through, so a click reaches the bar
+  // button behind them rather than their dismissal surface.
   readonly property int barHeight: 32
   property var panels: []
 
@@ -48,7 +47,7 @@ ShellRoot {
     if (panel && panels.indexOf(panel) < 0) panels = panels.concat([panel])
   }
 
-  // Opening a panel closes any other. Only one overlay surface at a time.
+  // Only one overlay surface at a time.
   function claimPanel(panel) {
     for (let index = 0; index < panels.length; index++) {
       const candidate = panels[index]
@@ -56,32 +55,26 @@ ShellRoot {
     }
   }
 
-  // Light/dark. The dconf key is the source of truth, not a property of ours:
+  // The dconf key is the source of truth, not this property:
   // xdg-desktop-portal-gtk republishes it as org.freedesktop.appearance, which
-  // is what flips Ghostty's theme live, and Neovim follows the terminal over
-  // OSC 11. gtk-theme comes along so GTK apps switch too.
+  // is what flips Ghostty live, and Neovim follows the terminal over OSC 11.
   property bool dark: true
   // GTK reads this dconf key itself; the bar reads the same value so its text
-  // changes size with the rest of the desktop rather than remaining fixed.
+  // scales with the rest of the desktop.
   property real textScale: 1
-  // `dim` is chrome — borders, placeholder text — and is deliberately close to
-  // the background. `off` is for text that must stay readable while reading as
-  // inactive, so it sits between the two; `dim` on `bg` is around 1.5:1 in
-  // dark mode, which is invisible rather than subdued.
+  // `dim` is chrome (borders, placeholder text) and sits close to the
+  // background — around 1.5:1 on `bg` in dark mode, so it is unreadable as
+  // text. `off` is for text that must stay legible while reading as inactive.
   readonly property var darkPalette: ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864" })
   readonly property var lightPalette: ({ bg: "#F0EDEC", fg: "#2C363C", sel: "#CBD9E3", dim: "#CFC1BA", off: "#8F857D" })
   readonly property var palette: dark ? darkPalette : lightPalette
 
-  // A KDE app repaints its view area from kdeglobals' [Colors:View] when the
-  // palette changes -- not from the palette itself, which is what the gtk3
-  // platform theme supplies and what the rest of its window follows. With no
-  // kdeglobals that read falls back to Breeze light, which is why Dolphin's
-  // file area stayed white in dark mode.
+  // A KDE app repaints its view area from kdeglobals' [Colors:View], not from
+  // the palette the rest of its window follows; with no kdeglobals it falls
+  // back to Breeze light (Dolphin's file area stays white in dark mode).
   // kwriteconfig6, not a plain write: KConfig caches the file per process and
-  // only its --notify D-Bus signal drops that cache, so a file written any
-  // other way is invisible until the app restarts. The notify does not repaint
-  // anything by itself -- the palette change does that, with the refreshed
-  // values -- which is why this has to run before the dconf keys move.
+  // only its --notify D-Bus signal drops that cache. The notify does not
+  // repaint by itself, so this must run before the dconf keys move.
   function kdeglobalsWrite(on) {
     const p = on ? darkPalette : lightPalette
     const rgb = hex => {
@@ -109,9 +102,8 @@ ShellRoot {
     write.running = true
   }
 
-  // A dconf write from a shell bypasses setDark, so keep the file in step
-  // with the watcher too. That write can land after the app has repainted;
-  // the next toggle corrects it.
+  // A dconf write from a shell bypasses setDark. That write can land after the
+  // app has repainted; the next toggle corrects it.
   onDarkChanged: writeKdeglobals()
 
   Process { id: write }
@@ -145,8 +137,7 @@ ShellRoot {
     function light(): void { root.setDark(false) }
   }
 
-  // Watched, not just written, so a `dconf write` from a shell moves the bar
-  // too. dconf watch prints the key on one line and the value on the next.
+  // Watched as well as written, so a `dconf write` from a shell moves the bar.
   Process {
     running: true
     command: ["dconf", "watch", "/org/gnome/desktop/interface/"]
@@ -187,18 +178,13 @@ ShellRoot {
     }
   }
 
-  // The menu's entries, in Omarchy's omarchy-menu.jsonc shape minus its
-  // machinery: dotted ids imply the hierarchy, so "style.theme.dark" is a
-  // child of "style.theme" and no nesting syntax is needed. Kind is inferred -- an entry with an action
-  // fires, one with children descends, one with a provider fills its level
-  // from somewhere else. Their Menu.qml and MenuModel.js are ~2000 lines of
-  // jsonc parsing, plugin manifests and provider indirection; this is ~25
-  // entries and does not need any of it. The table sits here rather than in
-  // Menu.qml because its actions reach every other service.
+  // Dotted ids imply the hierarchy: "style.theme.dark" is a child of
+  // "style.theme". Kind is inferred -- an entry with an action fires, one with
+  // children descends, one with a provider fills its level from elsewhere.
+  // Lives here rather than in Menu.qml because the actions reach every service.
   //
-  // `enabled: false` lists a row that has nothing behind it yet: dim and
-  // inert, rather than absent, so the shape of what is still missing stays
-  // visible. Those rows are the ones to edit when the feature lands.
+  // `enabled: false` is a row with nothing behind it yet: dim and inert rather
+  // than absent, so what is still missing stays visible.
   readonly property var menuItems: ({
     "apps": { icon: "󰀻", label: "Apps", provider: "apps" },
     "learn": { icon: "󰧑", label: "Learn" },
@@ -211,9 +197,7 @@ ShellRoot {
     "style.theme.dark": { icon: "", label: "Dark", action: () => root.setDark(true) },
     "style.theme.light": { icon: "", label: "Light", action: () => root.setDark(false) },
     "trigger": { icon: "󱓞", label: "Trigger" },
-    // Saved and copied, not one or the other: the file is what survives, the
-    // clipboard is what gets pasted into a chat a second later. wl-copy needs
-    // an explicit --type -- it does not sniff the PNG.
+    // wl-copy needs an explicit --type; it does not sniff the PNG.
     "trigger.screenshot": { icon: "", label: "Screenshot", action: () => root.run(
       "mkdir -p $HOME/Pictures/screenshots && " +
       "f=$HOME/Pictures/screenshots/screenshot-$(date +%Y%m%d-%H%M%S).png && " +
@@ -222,18 +206,16 @@ ShellRoot {
     "trigger.color": { icon: "󰃉", label: "Color picker", enabled: false },
     "trigger.share": { icon: "", label: "Share", enabled: false },
     "media": { icon: media.icon, label: "Media", action: () => media.open() },
-    // The bar's tray icons are mouse-only; every bar action is also a
-    // launcher entry. Enter raises the app, which is the common case --
-    // its own menu stays on the bar icon's right click.
+    // The bar's tray icons are mouse-only, so Enter here raises the app; its
+    // own menu stays on the bar icon's right click.
     "tray": { icon: "󰘔", label: "Tray", provider: "tray" },
     "setup": { icon: "", label: "Setup" },
     "setup.display": { icon: "󰍹", label: "Display", action: () => display.open() },
     "setup.network": { icon: "󰈀", label: "Network", action: () => network.open() },
     "setup.audio": { icon: "󰕾", label: "Audio", action: () => audio.open() },
     "setup.nightlight": { icon: "󰆔", label: "Nightlight", action: () => nightlight.toggle() },
-    // The layout names are here and the short codes are in the service; both
-    // lists sit next to what renders them, and both must match the order of
-    // `kb_layout` / `layout` in the two compositor configs.
+    // Order must match `kb_layout` / `layout` in the compositor configs, and
+    // the `codes` in the keyboard service.
     "setup.keyboard": { icon: "󰌌", label: "Keyboard layout" },
     "setup.keyboard.us": {
       icon: keyboard.index === 0 ? "󰄬" : "󰌌",
@@ -253,8 +235,6 @@ ShellRoot {
     "system.notifications.history": { icon: "󰎟", label: "History", action: () => notifications.showHistory() },
     "system.notifications.dnd": { icon: "󰂛", label: "Toggle Do Not Disturb", action: () => notifications.setDoNotDisturb(!notifications.doNotDisturb) },
     "system.lock": { icon: "", label: "Lock", action: () => lock.beginLock() },
-    // Coffee means "staying awake": shown only while idle locking is off, the
-    // same state the bar's conditional coffee button reports.
     "system.idle": {
       icon: idle.enabled ? "󰾪" : "󰅶",
       label: idle.enabled ? "Disable idle locking" : "Enable idle locking",
@@ -268,9 +248,6 @@ ShellRoot {
 
   function run(cmd) { Quickshell.execDetached(["sh", "-c", cmd]) }
 
-  // These use Omarchy-compatible plugin paths while remaining independent of
-  // its plugin loader and shared QML framework. Keeping the paths aligned
-  // makes it practical to compare later fixes and features upstream.
   Notifications.Service {
     id: notifications
     shell: root

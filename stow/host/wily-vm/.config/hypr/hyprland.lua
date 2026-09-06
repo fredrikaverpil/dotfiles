@@ -1,7 +1,6 @@
--- The optional host package supplies persistent scale defaults. Keep the
--- fallback here: this shared config is also stowed to Linux hosts without a
--- monitors.lua. Hyprland only watches this entry file, so a change to the
--- host file takes effect on the next explicit reload or compositor start.
+-- monitors.lua is host-owned and optional; hosts without one get the fallback.
+-- Hyprland watches only this entry file, so edits to monitors.lua apply on the
+-- next explicit reload.
 local monitor_config = { scale = 1, gdkScale = 1 }
 local monitor_config_file = os.getenv("HOME") .. "/.config/hypr/monitors.lua"
 local monitor_config_loader = loadfile(monitor_config_file)
@@ -20,9 +19,8 @@ end
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = monitor_config.scale })
 hl.env("GDK_SCALE", tostring(monitor_config.gdkScale))
 
--- macOS-like black pointer with a white outline, loaded from the stowed
--- ~/.local/share/icons/macOS-hypr theme. Source:
--- https://github.com/6ooker/apple_hyprcursor
+-- Theme is stowed to ~/.local/share/icons/macOS-hypr.
+-- Source: https://github.com/6ooker/apple_hyprcursor
 hl.env("HYPRCURSOR_THEME", "macOS-hypr")
 hl.env("HYPRCURSOR_SIZE", "24")
 
@@ -37,25 +35,20 @@ hl.config({
     rounding = 8,
   },
 
-  -- 2 is Hyprland's right/bottom insertion direction. This matches Omarchy;
-  -- leave preserve_split at its default because that controls manual resizing,
-  -- not where a new client opens.
+  -- 2 = insert new clients right/bottom.
   dwindle = {
     force_split = 2,
   },
 
   input = {
-    -- No grp: toggle in kb_options on purpose: the shell owns the current
-    -- index (qs ipc call keyboard ...), and a compositor-side switch would
-    -- desync the bar indicator. Order must match the service's `codes`.
+    -- No grp: toggle in kb_options: the shell owns the current index
+    -- (qs ipc call keyboard ...) and a compositor-side switch desyncs the bar
+    -- indicator. Order must match the keyboard service's `codes`.
     kb_layout = "us,se",
-    -- 60/s is past the point where the compositor, not libinput, is the limit;
-    -- 200ms is short without turning a held modifier chord into a repeat.
     repeat_rate = 60,
     repeat_delay = 200,
     natural_scroll = true,
-    -- No touchpad exists in this VM, so this block is inert until the
-    -- ThinkPad.
+    -- Inert in this VM; no touchpad.
     touchpad = {
       natural_scroll = true,
       tap_to_click = true,
@@ -76,29 +69,20 @@ hl.config({
     disable_hyprland_logo = true,
     disable_splash_rendering = true,
     force_default_wallpaper = 0,
-    -- Both default to false, which leaves a blanked output with no way back
-    -- from the keyboard: the screen reads as a hung machine rather than a dark
-    -- one, and nothing but `hyprctl dispatch dpms on` over SSH recovers it.
-    -- The compositor owns the wake, so it still works when the shell that
-    -- blanked the output is gone.
+    -- Default false leaves a blanked output with no input-driven way back;
+    -- only `hyprctl dispatch dpms on` over SSH recovers it.
     key_press_enables_dpms = true,
     mouse_move_enables_dpms = true,
   },
 })
 
--- Match Omarchy's look and feel: workspace changes are instant, while the
--- global and window animation settings still animate opening and closing.
 hl.animation({ leaf = "workspaces", enabled = false })
 
--- Tagging a window "noidle" holds the whole session awake, per Omarchy's
--- default/hypr/apps/system.lua. hyprctl -j clients reports the result as
--- inhibitingIdle, which is what the bind below reads back. The tag is window
--- state, so it is gone on close or reboot; an app that always needs this wants
--- its own rule matched on class with idle_inhibit = "fullscreen" instead.
+-- Tagging a window "noidle" holds the whole session awake; hyprctl reports it
+-- as inhibitingIdle. The tag is window state, so it dies with the window.
 hl.window_rule({ match = { tag = "noidle" }, idle_inhibit = "always" })
 
--- Toggling the tag is otherwise invisible, and Omarchy's equivalent
--- affordance is a bar indicator we have not ported.
+-- Notifies because the tag is otherwise invisible.
 local stay_awake = table.concat({
   [[hyprctl dispatch 'hl.dsp.window.tag({ tag = "noidle" })' >/dev/null;]],
   [[hyprctl -j activewindow | jq -e .inhibitingIdle >/dev/null]],
@@ -106,11 +90,9 @@ local stay_awake = table.concat({
   [[|| notify-send -u low "Stay awake" "Off for this window"]],
 }, " ")
 
--- Every bind goes through this rather than hl.bind directly. `hyprctl binds`
--- reports Lua binds with an opaque __lua dispatcher, so this file is the only
--- place the action still exists in readable form: the
--- cheatsheet reads what is recorded here, not hyprctl. A bare hl.bind()
--- registers with Hyprland but stays invisible in the cheatsheet.
+-- `hyprctl binds` reports Lua binds with an opaque __lua dispatcher, so the
+-- cheatsheet reads what this wrapper records. A bare hl.bind() is invisible
+-- to it.
 local binds = {}
 
 local function bind(keys, description, dispatcher, opts)
@@ -125,16 +107,11 @@ local function bind(keys, description, dispatcher, opts)
   hl.bind(keys, dispatcher, options)
 end
 
--- Omarchy's chords and wording, minus what needs a binary or a monitor this
--- host does not have; nix/hosts/wily-vm/CLAUDE.md lists what was dropped.
+-- Source order is cheatsheet display order.
 --
--- Source order is cheatsheet display order. Reordering for tidiness reorders
--- the cheatsheet.
---
--- The block runs under pcall because a runtime error in any one bind would
--- otherwise stop the file dead: every later bind would go unregistered and the
--- recorder below would never run, blanking the cheatsheet as well. Hyprland
--- reports such an error nowhere but the on-screen overlay.
+-- pcall: an error in one bind would otherwise leave every later bind
+-- unregistered and blank the cheatsheet, and Hyprland reports it nowhere but
+-- the on-screen overlay.
 local ok, err = pcall(function()
   -- Applications
   bind("SUPER + RETURN", "Terminal", hl.dsp.exec_cmd("ghostty"))
@@ -168,8 +145,7 @@ local ok, err = pcall(function()
   bind("SUPER + CTRL + L", "Lock system", hl.dsp.exec_cmd("qs ipc call lock lock"))
   bind("SUPER + CTRL + K", "Next keyboard layout", hl.dsp.exec_cmd("qs ipc call keyboard next"))
 
-  -- Media. `locked` keeps volume working on the lock screen, `repeating` makes
-  -- a held key keep stepping; both go straight through to hl.bind.
+  -- `locked` keeps these working on the lock screen.
   bind(
     "XF86AudioRaiseVolume",
     "Volume up",
@@ -214,8 +190,7 @@ local ok, err = pcall(function()
   bind("ALT + TAB", "Reveal active window on top", hl.dsp.window.bring_to_top())
   bind("ALT + SHIFT + TAB", "Reveal active window on top", hl.dsp.window.bring_to_top())
 
-  -- Workspaces. hl.bind() only understands keysym names, not code:NN, so these
-  -- follow the keyboard layout.
+  -- hl.bind() takes keysym names, not code:NN, so these follow the layout.
   for ws = 1, 10 do
     local key = ws == 10 and "0" or tostring(ws)
     bind("SUPER + " .. key, "Switch to workspace " .. ws, hl.dsp.focus({ workspace = tostring(ws) }))
@@ -362,10 +337,8 @@ if not ok then
   hl.notification.create({ text = "hyprland.lua: " .. tostring(err), timeout = 15000 })
 end
 
--- Written atomically: Hyprland re-runs this file on every config change, and
--- the cheatsheet may be reading it while that happens. niri's config.kdl
--- extracts the same two columns into the same file, so the cheatsheet reads
--- one path under either compositor.
+-- Written atomically: Hyprland re-runs this file on every config change while
+-- the cheatsheet may be reading it. niri's config.kdl writes the same path.
 local path = os.getenv("HOME") .. "/.local/state/wm-binds.tsv"
 local out = io.open(path .. ".tmp", "w")
 if out then

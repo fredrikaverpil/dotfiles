@@ -1,9 +1,8 @@
-// Omarchy's nightlight helper plus the solar schedule they do not have:
-// hyprsunset only understands fixed clock times, so sunrise and sunset are
-// computed here. Run `node NightlightModel.js` for the self-check.
+// Nightlight helpers and the solar schedule: hyprsunset takes fixed clock
+// times only, so sunrise and sunset are computed here. Run
+// `node NightlightModel.js` for the self-check.
 
-// Temperatures below the identity point count as night light. Kept at
-// Omarchy's value so a temperature set by either side reads the same.
+// Temperatures below the identity point count as night light.
 var IDENTITY_TEMPERATURE = 6000
 
 // The sun's centre this far below the horizon at sunrise and sunset, in
@@ -46,10 +45,8 @@ function coordsFromZoneTab(text) {
 function radians(degrees) { return degrees * Math.PI / 180 }
 
 // The sunrise equation, NOAA's low-precision form: good to about a minute,
-// which is far inside the error already introduced by using the timezone's
-// principal city as the location. Returns null where the sun does not cross
-// the horizon that day, so the caller can tell polar day from polar night by
-// the period instead.
+// well inside the error from using the timezone's principal city as the
+// location. Returns null where the sun does not cross the horizon that day.
 function solarTimes(date, latitude, longitude) {
   if (!isFinite(latitude) || !isFinite(longitude)) return null
 
@@ -75,8 +72,7 @@ function solarTimes(date, latitude, longitude) {
 }
 
 // "day", "night", or "" when the location is not known yet. Above the polar
-// circles the sun may not cross the horizon at all, and then its noon
-// altitude is what decides which one it is.
+// circles the sun may not cross at all, and noon altitude decides instead.
 function solarPeriod(date, latitude, longitude) {
   var times = solarTimes(date, latitude, longitude)
   if (!times) {
@@ -88,9 +84,9 @@ function solarPeriod(date, latitude, longitude) {
   return (date < times.sunrise || date >= times.sunset) ? "night" : "day"
 }
 
-// A manual override lasts until the sun crosses. An override made before the
-// location is known records an empty period, and must not expire against the
-// first real one.
+// A manual override lasts until the sun crosses. One made before the location
+// is known records an empty period, and must not expire against the first real
+// one.
 function expiresOverride(mode, period, overridePeriod) {
   return mode !== "auto" && overridePeriod !== "" && period !== overridePeriod
 }

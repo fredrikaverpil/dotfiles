@@ -7,8 +7,7 @@ import "../bar/widgets/TrayModel.js" as TrayModel
 
 import "../../Ui" as Ui
 
-// The launcher. `items` is the entry table, injected by shell.qml so this file
-// stays the mechanism and that one stays the wiring.
+// The launcher. `items` is the entry table, injected by shell.qml.
 Ui.Panel {
   id: menu
 
@@ -19,10 +18,9 @@ Ui.Panel {
   cardWidth: wide ? 900 : 600
   cardHeight: wide ? 640 : 420
 
-  // Keybindings. hyprland.lua writes this as it registers each bind, because
-  // `hyprctl binds` cannot name a code: chord -- see that file; niri's
-  // config.kdl sed's the same columns out of itself at startup. Watched, so a
-  // config reload refreshes the sheet without restarting the shell.
+  // Written by hyprland.lua as it registers each bind, or sed'd out of niri's
+  // config.kdl at startup. Watched, so a config reload refreshes the sheet
+  // without restarting the shell.
   property var binds: []
 
   FileView {
@@ -77,9 +75,8 @@ Ui.Panel {
     }
   }
 
-  // A desktop entry names either a themed icon, an absolute path or a URL;
-  // only the first needs a lookup. Empty when nothing resolves, which leaves
-  // the row on its glyph -- see wily-vm/CLAUDE.md for why that is common here.
+  // A desktop entry names a themed icon, an absolute path or a URL; only the
+  // first needs a lookup. Empty when nothing resolves, leaving the row's glyph.
   function iconUrl(icon) {
     const value = String(icon || "")
     if (value.length === 0) return ""
@@ -88,15 +85,13 @@ Ui.Panel {
     return Quickshell.iconPath(value, true)
   }
 
-  // Sort and label come from TrayModel so a row sits where its icon does;
-  // the bar reads the same two functions.
+  // Sort and label come from TrayModel, so a row sits where its icon does.
   function trayRows() {
     return TrayModel.sortItems(SystemTray.items.values)
       .map(item => ({
         label: TrayModel.labelFor(item),
         icon: "󰘔",
-        // Same theme-name resolution as the bar's; see Tray.qml for why the
-        // `image://icon/` provider is not handed the name directly.
+        // Same theme-name resolution as the bar's; see Tray.qml.
         image: TrayModel.themeIconName(item.icon) === ""
           ? (item.icon || "")
           : menu.iconUrl(TrayModel.themeIconName(item.icon)),
@@ -114,8 +109,6 @@ Ui.Panel {
       .map(entry => ({ label: entry.name, icon: "󰀻", image: menu.iconUrl(entry.icon), detail: detail || "", enabled: true, entry: entry }))
   }
 
-  // Reached from Hyprland with `qs ipc call menu toggle`. The bar button calls
-  // menu.toggle() directly -- same process, no subprocess needed.
   IpcHandler {
     target: "menu"
 
@@ -123,7 +116,7 @@ Ui.Panel {
     function open(): void { menu.open("root") }
     function close(): void { menu.close() }
     // Not `show`: `qs ipc show` is a CLI subcommand, so the argument parser
-    // eats the name before the call ever reaches this handler.
+    // eats the name before the call reaches this handler.
     function level(id: string): void { menu.open(id) }
   }
 
@@ -147,14 +140,11 @@ Ui.Panel {
     if (query.length === 0)
       return menu.childrenOf(level).map(id => menu.rowFor(id, level))
 
-    // A search covers the whole subtree below the current level, the way
-    // Omarchy's rebuildDisplay does, so "ghostty" or "lock" reaches an
-    // action from the root without walking down to it. Deeper hits carry
-    // their path and sort after the direct children -- their divider and
-    // score tiers are not ported. Apps are in the tree upstream; here they
-    // are the one provider joined in, since the ~100 keybinding rows would
-    // swamp any root search. Dim rows drop out, as they do upstream: there
-    // is nothing behind them to reach.
+    // A search covers the whole subtree below the current level, so "ghostty"
+    // or "lock" reaches an action from the root without walking down to it.
+    // Deeper hits carry their path and sort after the direct children. Apps
+    // are the one provider joined in -- the ~100 keybinding rows would swamp
+    // any root search. Dim rows drop out; there is nothing behind them.
     const found = menu.descendantsOf(level).map(id => menu.rowFor(id, level))
     return (level === "root" ? found.concat(menu.appRows("Apps")) : found)
       .filter(row => row.enabled && matches(row))
@@ -170,9 +160,8 @@ Ui.Panel {
     list.currentIndex = first < 0 ? 0 : first
   }
 
-  // A dim row is skipped rather than merely inert, so holding Down never
-  // parks the highlight on something Enter will ignore. Wraps, so the last
-  // row leads back to the first.
+  // Dim rows are skipped, not just inert, so holding Down never parks the
+  // highlight on something Enter ignores. Wraps.
   function move(steps) {
     const count = rows.length
     if (count === 0) return
@@ -193,8 +182,8 @@ Ui.Panel {
 
   readonly property string title: level === "root" ? "Go" : menu.items[level].label
 
-  // The keybinding sheet needs a bigger window: its longest chord is 28
-  // characters before the description even starts, and it is ~100 rows.
+  // The keybinding sheet needs a bigger window: ~100 rows, and its longest
+  // chord is 28 characters before the description starts.
   readonly property bool wide: level !== "root" && menu.items[level].provider === "binds"
 
   function open(target) {
@@ -209,15 +198,14 @@ Ui.Panel {
 
   function toggle() { shown ? close() : open("root") }
 
-  // For a bar button that opens the launcher at a level instead of owning a
-  // panel: a second click closes, but arriving from another level switches.
+  // For a bar button that opens the launcher at a level: a second click
+  // closes, but arriving from another level switches.
   function toggleLevel(target) {
     if (shown && level === target) close()
     else open(target)
   }
 
-  // Escape and Left back out one level and only close at the root, so a
-  // wrong turn costs one key rather than reopening the menu.
+  // Escape and Left back out one level and only close at the root.
   function back() {
     if (level === "root") close()
     else open(level.indexOf(".") >= 0 ? level.split(".").slice(0, -1).join(".") : "root")
@@ -233,8 +221,8 @@ Ui.Panel {
       else row.trayItem.activate()
     } else if (row.entry) {
       close()
-      // uwsm-app puts the app in its own scope under app-graphical.slice, so
-      // it survives `systemctl --user restart quickshell` while iterating.
+      // uwsm-app puts the app in its own scope under app-graphical.slice, so it
+      // survives `systemctl --user restart quickshell`.
       Quickshell.execDetached(["uwsm-app", "--", row.entry.id + ".desktop"])
     } else if (row.action) {
       close()
@@ -243,7 +231,6 @@ Ui.Panel {
       open(row.id)
     }
   }
-
 
   Text {
     color: menu.shell.palette.dim
@@ -311,8 +298,7 @@ Ui.Panel {
         anchors.leftMargin: 8
         spacing: 10
 
-        // One slot, two sources: an app's own icon when it resolves, the
-        // row's glyph otherwise.
+        // One slot: the app's own icon when it resolves, the glyph otherwise.
         Item {
           width: 20
           height: 20
@@ -342,8 +328,7 @@ Ui.Panel {
           }
         }
 
-        // Monospace, so a fixed width lines every chord up in a column
-        // the eye can read straight down.
+        // Monospace, so a fixed width lines every chord up in a column.
         Text {
           width: 290
           visible: modelData.chord !== undefined
@@ -357,9 +342,9 @@ Ui.Panel {
           color: modelData.enabled ? menu.shell.palette.fg : menu.shell.palette.off
           font.family: "JetBrainsMono Nerd Font"
           font.pixelSize: 15
-          // Capped only where a breadcrumb follows, so a long label
-          // elides instead of pushing it off the panel. Uncapped
-          // otherwise -- the keybinding sheet has 36-character labels.
+          // Capped only where a breadcrumb follows, so a long label elides
+          // instead of pushing it off the panel. The keybinding sheet has
+          // 36-character labels.
           width: modelData.detail ? Math.min(implicitWidth, 300) : implicitWidth
           text: modelData.label + (modelData.submenu ? " ›" : "")
           elide: Text.ElideRight

@@ -1,7 +1,6 @@
-// MPRIS player selection and labels, kept Qt-free for tests/. The service
-// deliberately follows Omarchy's policy in the cases that matter here: a
-// playing real player beats a proxy, and an explicit source remains selected
-// only until another player starts playback.
+// MPRIS player selection and labels, kept Qt-free for tests/. A playing real
+// player beats a proxy, and an explicit pick holds only until another player
+// starts playback.
 
 function playerKey(player) {
   if (!player) return ""
@@ -49,9 +48,8 @@ function detailFor(player) {
 }
 
 function sourcePlayers(players) {
-  // ObjectModel.values is list-like but is not an Array in every QML runtime.
-  // Copy by index before filtering so MPRIS players do not disappear merely
-  // because the engine's object wrapper fails Array.isArray().
+  // ObjectModel.values is list-like but not an Array in every QML runtime, so
+  // copy by index rather than trusting Array.isArray().
   var list = []
   var count = players && typeof players.length === "number" ? players.length : 0
   for (var index = 0; index < count; index++) {
@@ -71,9 +69,7 @@ function activePlayer(players, preferredKey) {
   var list = sourcePlayers(players)
   var preferred = list.find(function(player) { return playerKey(player) === preferredKey })
 
-  // A current playback stream should become the target automatically. The
-  // explicit pick still wins when it, too, is playing, which is useful with
-  // two simultaneous sources.
+  // The explicit pick only wins while it is itself playing.
   if (preferred && preferred.isPlaying) return preferred
 
   var playing = list.find(function(player) { return player.isPlaying && !isProxyPlayer(player) })

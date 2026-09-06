@@ -3,15 +3,13 @@ import QtQuick.Window
 import Quickshell
 import Quickshell.Wayland
 
-// Chrome shared by every overlay panel: a full-screen transparent layer-shell
-// surface that only takes the keyboard while shown, click-outside to dismiss,
-// and a centred card in the palette. The top-bar strip is click-through, so
-// its buttons can toggle or switch panels even while one is open. Children are
-// laid out in that card.
+// Chrome shared by every overlay panel: a full-screen layer-shell surface,
+// click-outside to dismiss, and a centred card children are laid out in. The
+// top-bar strip stays click-through so its buttons work while a panel is open.
 //
-// The fixed children below are assigned through `data` rather than declared as
-// plain children, because the default property is aliased away to the card's
-// column -- an ordinary child here would be reparented into it.
+// The fixed children below go through `data` rather than being declared as
+// plain children: the default property is aliased to the card's column, so an
+// ordinary child would be reparented into it.
 PanelWindow {
   id: panel
 
@@ -22,10 +20,9 @@ PanelWindow {
   property int cardHeight: 420
   readonly property int barHeight: shell ? shell.barHeight : 32
 
-  // Opt-in keyboard navigation. A panel that sets this marks its buttons
-  // `activeFocusOnTab` and highlights them on `activeFocus`; Qt's own focus
-  // chain then does the walking, so no panel keeps a cursor of its own. Off
-  // for the menu, which drives its list from its search field instead.
+  // A panel that opts in marks its buttons `activeFocusOnTab` and highlights
+  // them on `activeFocus`; Qt's focus chain does the walking, so no panel
+  // keeps a cursor of its own.
   property bool keyNavigation: false
 
   default property alias content: column.data
@@ -41,10 +38,8 @@ PanelWindow {
   function toggle() { shown ? close() : open() }
 
   // One linear chain in document order, so the last option of a row leads into
-  // the first of the next. h/k step back, l/j step forward.
+  // the first of the next.
   function focusStep(forward) {
-    // Via the Window attached property rather than the window object: this is
-    // plain QtQuick and does not depend on what PanelWindow chooses to expose.
     const current = column.Window.activeFocusItem
     if (!current) {
       column.forceActiveFocus()
@@ -61,8 +56,7 @@ PanelWindow {
     } else {
       focusPrimed = false
       focusPrimeTimer.restart()
-      // Start every open from the top of the chain rather than wherever the
-      // last visit left it.
+      // Start every open from the top of the chain.
       if (keyNavigation) column.forceActiveFocus()
     }
   }
@@ -72,15 +66,12 @@ PanelWindow {
   anchors { top: true; bottom: true; left: true; right: true }
   exclusiveZone: 0
   color: "transparent"
-  // The surface owns the screen except the bar.
   mask: modalMask
   WlrLayershell.layer: WlrLayer.Overlay
-  // Exclusive reliably acquires focus on every open. On Hyprland it then has to
-  // settle on OnDemand, or the compositor routes pointer input to this surface
-  // despite the bar-strip cutout and the bar below stops responding. niri
-  // routes the pointer by the input region either way, and demoting there
-  // hands the keyboard straight back to the window underneath -- an open
-  // launcher that cannot be typed into.
+  // Exclusive reliably acquires focus on open. On Hyprland it must then settle
+  // on OnDemand, or the compositor routes pointer input here despite the
+  // bar-strip cutout and the bar stops responding. Demoting on niri instead
+  // hands the keyboard back to the window underneath.
   WlrLayershell.keyboardFocus: shown
     ? (focusPrimed && !Compositor.niri
         ? WlrKeyboardFocus.OnDemand
@@ -126,8 +117,7 @@ PanelWindow {
       border.color: panel.shell.palette.dim
       border.width: 1
 
-      // Keys bubble up from whichever button holds focus, so the handler sits
-      // on their common ancestor rather than on each of them.
+      // Keys bubble up from whichever button holds focus.
       Keys.onPressed: function (event) {
         if (!panel.keyNavigation) return
         if (event.key === Qt.Key_Escape) panel.close()
@@ -139,8 +129,8 @@ PanelWindow {
         event.accepted = true
       }
 
-      // Prevent clicks in unused card space from reaching the modal dismissal
-      // area behind it. Interactive content is stacked above this catcher.
+      // Keeps clicks in unused card space off the dismissal area behind it;
+      // interactive content stacks above.
       MouseArea {
         anchors.fill: parent
       }

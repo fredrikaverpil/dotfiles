@@ -3,11 +3,8 @@ import Quickshell.Services.Mpris
 
 import "MediaModel.js" as Model
 
-// The MPRIS half of media. It has no UI dependency, so the bar and panel can
-// both read the same selected player while it stays current when neither is
-// visible. The matching Omarchy service also looks at PipeWire streams and
-// emits OSD feedback; those are deliberately left for when this shell has an
-// OSD and a per-app mixer.
+// The MPRIS half of media, with no UI dependency: the bar and panel read the
+// same selected player, and it stays current when neither is visible.
 Item {
   id: root
 

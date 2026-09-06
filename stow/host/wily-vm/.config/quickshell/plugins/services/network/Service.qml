@@ -1,10 +1,8 @@
 // NetworkManager state and actions. Quickshell's Networking module supplies
-// devices, scans and Wi-Fi actions; the connection metrics come from the same
-// standard kernel and iproute data Omarchy's helper collects.
+// devices, scans and Wi-Fi actions; the connection metrics come from iproute.
 //
-// Split from the panel so the bar can read `icon` and `kind` without a panel
-// being open, and so the view stays a view. `active` gates the polling that
-// only the open panel displays.
+// Split from the panel so the bar can read `icon` and `kind` with no panel
+// open. `active` gates the polling only the open panel displays.
 
 import QtQuick
 import Quickshell.Io
@@ -15,9 +13,9 @@ import "NetworkModel.js" as Model
 Item {
   id: root
 
-  // Set while something displays the per-connection metrics. The Processes
-  // and the poll timer below run only then; the properties Quickshell keeps
-  // current are live regardless, which is what the bar icon needs.
+  // Set while something displays the per-connection metrics; the Processes and
+  // poll timer run only then. Quickshell's own properties stay live regardless,
+  // which is what the bar icon needs.
   property bool active: false
 
   readonly property bool networkManagerAvailable: Networking.backend === NetworkBackendType.NetworkManager
@@ -181,8 +179,7 @@ Item {
     return ipAddresses[device.name] || ""
   }
 
-  // The Quickshell.Networking enums stay on this side, so the view needs no
-  // import of it.
+  // Keeps the Quickshell.Networking enums out of the view.
   function deviceTypeName(device) {
     return Model.deviceType(device.type, DeviceType)
   }

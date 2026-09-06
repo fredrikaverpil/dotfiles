@@ -1,5 +1,5 @@
-// Quickshell-native idle policy, following Omarchy's service location.
-// IdleMonitor honours idle inhibitors, so no second daemon such as hypridle.
+// IdleMonitor honours idle inhibitors, so no second daemon (hypridle) is
+// needed.
 
 import QtQuick
 import Quickshell
@@ -33,8 +33,6 @@ Item {
 
   onEnabledChanged: saveState()
 
-  // A missing state file is a normal first run, not a reason to make the
-  // user's first toggle disappear when Quickshell next restarts.
   Component.onCompleted: {
     stateLoaded = true
     stateFile.reload()

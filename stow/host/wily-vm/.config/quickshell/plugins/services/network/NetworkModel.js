@@ -1,6 +1,6 @@
-// Network presentation helpers. Keep this data-only: Quickshell.Networking
-// objects can disappear during a scan, so Panel.qml reduces them to plain rows
-// before handing them to delegates. Run `node Model.js` for the self-check.
+// Network presentation helpers, data-only: Quickshell.Networking objects can
+// disappear during a scan, so Panel.qml reduces them to plain rows first. Run
+// `node NetworkModel.js` for the self-check.
 
 function wifiIconFor(strength) {
   var icons = ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"]
@@ -53,8 +53,8 @@ function sortWifiRows(rows) {
   return networks
 }
 
-// OWE encrypts traffic without authenticating the user, so it needs no
-// passphrase. Unknown security remains credentialed as the safe fallback.
+// OWE encrypts without authenticating, so it needs no passphrase. Unknown
+// security stays credentialed as the safe fallback.
 function requiresCredentials(security, openSecurity, oweSecurity) {
   return security !== openSecurity && security !== oweSecurity
 }
@@ -63,8 +63,7 @@ function canForgetNetwork(network) {
   return !!(network && network.known && !network.connected)
 }
 
-// NetworkDevice.address is its MAC address, not an IP address. `ip -j` fills
-// that gap; retain the first global IPv4 address for each interface.
+// NetworkDevice.address is a MAC, not an IP, so `ip -j` fills the gap.
 function parseIpv4Addresses(raw) {
   var interfaces
   try {
@@ -127,9 +126,8 @@ function parseLinkStats(raw) {
   }
 }
 
-// Rates are deltas between consecutive counter samples. Reset when the active
-// interface changes or a counter rolls over, so a reconnect never produces a
-// giant made-up transfer spike.
+// Deltas between consecutive counter samples, reset when the interface changes
+// or a counter rolls over so a reconnect shows no made-up spike.
 function transferState(previous, sample, now) {
   var prev = previous || {}
   var next = sample || {}

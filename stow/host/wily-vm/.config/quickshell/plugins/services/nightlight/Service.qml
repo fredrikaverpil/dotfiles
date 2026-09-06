@@ -1,8 +1,6 @@
-// Nightlight, ported from Omarchy's service at this path, plus the solar
-// schedule they leave to hand-written hyprsunset profiles. hyprsunset takes
-// fixed clock times only, so the schedule lives here and hyprsunset.conf
-// stays inert. The daemon underneath differs per compositor and is the only
-// part that does -- see Ui/Compositor.qml's nightlightBackend.
+// hyprsunset takes fixed clock times only, so the solar schedule lives here
+// and hyprsunset.conf stays inert. The daemon underneath differs per
+// compositor -- see Ui/Compositor.qml's nightlightBackend.
 
 import QtQuick
 import Quickshell
@@ -16,21 +14,17 @@ Item {
 
   property var shell: null
 
-  // Omarchy's pair, kept identical so a temperature set from either side
-  // reads back the same on the other.
   readonly property int nightTemperature: 4000
   readonly property int dayTemperature: 6500
 
-  // "auto" follows the sun. "on" and "off" pin it until the next sunrise or
-  // sunset, which is what Night Shift's manual toggle does; overridePeriod is
-  // the solar period the override was made in, and the tick expires it when
-  // that changes.
+  // "auto" follows the sun; "on" and "off" pin it until the next crossing.
+  // overridePeriod is the solar period the override was made in, and the tick
+  // expires it when that changes.
   property string mode: "auto"
   property string overridePeriod: ""
   property string period: ""
 
-  // From the system timezone unless something assigns them first; see
-  // locateProcess below.
+  // From the system timezone unless assigned first; see locateProcess.
   property real latitude: NaN
   property real longitude: NaN
 
@@ -59,18 +53,14 @@ Item {
 
   readonly property var backend: Ui.Compositor.nightlightBackend
 
-  // Runs every minute: crosses the solar boundary, expires a manual override
-  // on the far side of it, and re-asserts the temperature. That last part is
-  // also what heals hyprsunset's own morning `identity` profile, which
-  // otherwise clobbers a runtime temperature once a day.
+  // Every minute. Re-asserting the temperature is also what heals hyprsunset's
+  // morning `identity` profile, which otherwise clobbers it once a day.
   function tick() {
     period = NightlightModel.solarPeriod(new Date(), latitude, longitude)
     if (NightlightModel.expiresOverride(mode, period, overridePeriod)) mode = "auto"
-    // Read the real temperature before deciding, or the reconcile below is
-    // made against the previous minute's reading and an outside change takes
-    // two ticks to correct. Only a tick reconciles: the probe that follows
-    // every apply must not turn a temperature that will not stick into an
-    // apply loop.
+    // Read before deciding, or an outside change takes two ticks to correct.
+    // Only a tick reconciles: the probe after every apply must not turn a
+    // temperature that will not stick into an apply loop.
     reconciling = true
     probe.running = true
   }
@@ -80,11 +70,9 @@ Item {
     root.temperature = temp
     root.stateLoaded = true
 
-    // Upstream's guard, and it does more than order the writes: the apply
-    // command starts the daemon when none is running, and that check is not
-    // atomic. Two applies overlapping while it is coming up each launch one,
-    // and the hyprsunset loser exits with "A CTM manager is already running"
-    // plus a stack trace in the journal. Seen live.
+    // The apply command starts the daemon when none is running, and that check
+    // is not atomic: two overlapping applies each launch one, and the
+    // hyprsunset loser dies with "A CTM manager is already running".
     if (applyProcess.running) {
       root.pendingTemperature = temp
       root.hasPendingTemperature = true
@@ -95,10 +83,8 @@ Item {
   }
 
   function runApply(temp) {
-    // Upstream's retry loop, from bin/omarchy-toggle-nightlight: a freshly
-    // started hyprsunset applies its own default at the end of its boot and
-    // overwrites anything set before then. wl-gammarelay-rs has no such
-    // window, but it is equally cheap to wait for it to claim its bus name.
+    // A freshly started hyprsunset applies its own default at the end of its
+    // boot, overwriting anything set before then; hence the retry loop.
     applyProcess.command = ["bash", "-lc",
       backend.running + " || { " + backend.launch + " >/dev/null 2>&1 & sleep 1; }; " +
       "for _ in $(seq 10); do " +
@@ -142,10 +128,9 @@ Item {
     }
   }
 
-  // The zone's principal city, which is up to a few hundred kilometres off
-  // for a large zone -- around fifteen minutes of winter sunset between
-  // Stockholm and Malmo. Fine for a blue-light filter, and it follows the
-  // laptop when the timezone changes.
+  // The zone's principal city: up to a few hundred kilometres off for a large
+  // zone (~15 min of winter sunset between Stockholm and Malmo), which is fine
+  // for a blue-light filter and follows the laptop when the timezone changes.
   Process {
     id: locateProcess
     running: true
@@ -186,8 +171,6 @@ Item {
       })
     }
 
-    // enable/disable rather than the plan's on/off: it is what upstream's
-    // handler and our idle service both call these.
     function enable(): string { root.setNightlight(true); return "enabled" }
     function disable(): string { root.setNightlight(false); return "disabled" }
     function auto(): string { root.setMode("auto"); return "auto" }

@@ -5,8 +5,7 @@ import Quickshell.Io
 import "../../../Ui" as Ui
 import "Model.js" as Model
 
-// The single-monitor display panel. Its scale choices are the same clean-scale
-// arithmetic as Omarchy's panel; brightness and multi-display controls stay
+// Single-monitor display panel. Brightness and multi-display rows stay
 // visibly unavailable until hardware can back them.
 Ui.Panel {
   id: root
@@ -52,8 +51,8 @@ Ui.Panel {
   }
 
   function persistScale(scale) {
-    // GNU sed ordinarily replaces a symlink with a regular file. Following it
-    // keeps this host's Stow link intact while atomically updating its target.
+    // --follow-symlinks: GNU sed otherwise replaces this host's Stow symlink
+    // with a regular file.
     persistScaleProcess.command = ["sed", "-i", "--follow-symlinks", "-E"]
       .concat(Ui.Compositor.scaleEdits(scale, Model.gdkScale(scale)))
       .concat([Ui.Compositor.scaleConfig])
@@ -251,15 +250,14 @@ Ui.Panel {
     height: 30
     radius: 4
     color: active ? root.shell.palette.sel : "transparent"
-    // `active` is the chosen setting, `activeFocus` is where the keyboard is.
-    // The border carries the second so both stay readable at once.
+    // Fill is the chosen setting, border is focus, so both read at once.
     border.color: button.activeFocus ? root.shell.palette.fg : root.shell.palette.dim
     border.width: 1
     opacity: available ? 1 : 0.45
 
-    // Chain membership is not conditioned on `available`: a button that goes
-    // unavailable under the cursor would drop out of the chain mid-interaction
-    // and strand the focus. It stays reachable and refuses to fire instead.
+    // Not conditioned on `available`: a button going unavailable under the
+    // cursor would drop out of the focus chain and strand it. It stays
+    // reachable and refuses to fire instead.
     activeFocusOnTab: true
     Keys.onReturnPressed: if (button.available) button.activated()
     Keys.onEnterPressed: if (button.available) button.activated()
