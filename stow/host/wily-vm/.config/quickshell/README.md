@@ -15,8 +15,9 @@ entered by direnv through the `.envrc` at the repo root. From any shell inside
 
 ```sh
 qml-lint       # qmllint -E over every .qml in this tree
-qml-test-js    # deno test tests/
+qml-test-js    # Deno tests for the extracted JS models
 qml-test-qml   # qmltestrunner -input tests (offscreen)
+hypr-test      # sandboxed Hyprland Lua and bind TSV contract test
 niri-validate  # niri validate against the host config (VM/Linux only)
 ```
 
@@ -69,8 +70,9 @@ that 6.11.1 does not.
 
 Required by the tooling, ignored by Quickshell. Without it neither tool can
 resolve `pragma Singleton` through `import "Ui" as Ui`, and every member access
-on `Compositor` reports as missing. A qmldir also hides what it does not list,
-so **a new file under `Ui/` needs a line in it**.
+on `Compositor` reports as missing. A qmldir also hides QML types it does not
+list, so **a new QML type under `Ui/` needs a line in it**. Imported JS models
+do not declare a QML type.
 
 ## `.qmllint.ini`
 
@@ -86,15 +88,13 @@ those are cleared.
 
 ## Tests
 
-`tests/` holds a worked example of both kinds, with a `README.md` of its own
-covering the boundary between them. Its subjects are stand-ins with no
-counterpart in `plugins/`. There is no CI gate yet; `qml-test-js` and
-`qml-test-qml` (above) are the two runners. `QML_IMPORT_PATH` is not optional
-for the QML half — without it `QtTest` itself fails to resolve, which reports
-as `Type TestCase unavailable` rather than as a missing import path.
-
-The `*Model.js` files also self-check directly (`node NetworkModel.js` runs its
-`demo()`); three of the six have one, and nothing runs them.
+`tests/` contains Deno coverage for every extracted JS model, a Qt-only worked
+example, and the Hyprland harness; its `README.md` explains their boundaries.
+These are manual validation gates, with the required trigger conditions in
+`nix/hosts/wily-vm/CLAUDE.md`; do not rely on CI to run them. `QML_IMPORT_PATH`
+is not optional for the QML half — without it `QtTest` itself fails to resolve,
+which reports as `Type TestCase unavailable` rather than as a missing import
+path.
 
 ### What the QML half can reach
 
