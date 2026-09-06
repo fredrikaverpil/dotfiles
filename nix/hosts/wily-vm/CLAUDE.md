@@ -4,6 +4,15 @@ Throwaway NixOS VM for developing a portable Quickshell desktop before it moves
 to the ThinkPad. Keep the configuration portable; host-specific work belongs in
 `stow/host/wily-vm/` or this host's Nix files.
 
+The actual Thinkpad hardware this VM is preparing for:
+
+```txt
+LENOVO ThinkPad T14 G6 Intel
+Core Ultra 7 258V Lunar Lake 14inch
+WUXGA AG 500n LP 32GB 1TB
+UMA W11P 3YPS
+```
+
 Comments and this document should preserve constraints, surprising behaviour,
 and rationale that the code cannot express. Do not record routine settings,
 commands that can be discovered from the code, investigation history, or
