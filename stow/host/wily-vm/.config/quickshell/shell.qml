@@ -2,6 +2,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
+import "ShellModel.js" as Model
+
 import "plugins/background" as Background
 import "plugins/bar" as Bar
 import "plugins/lock" as Lock
@@ -44,10 +46,7 @@ ShellRoot {
   }
 
   function claimPanel(panel) {
-    for (let index = 0; index < panels.length; index++) {
-      const candidate = panels[index]
-      if (candidate !== panel && candidate.shown) candidate.close()
-    }
+    Model.panelsToClose(panels, panel).forEach(function(candidate) { candidate.close() })
   }
 
   property bool dark: true
@@ -57,17 +56,7 @@ ShellRoot {
   readonly property var palette: dark ? darkPalette : lightPalette
 
   // KConfig needs --notify before the dconf palette change or running Dolphin keeps cached view colours.
-  function kdeglobalsWrite(on) {
-    const p = on ? darkPalette : lightPalette
-    const rgb = hex => {
-      const c = Qt.color(hex)
-      return [Math.round(c.r * 255), Math.round(c.g * 255), Math.round(c.b * 255)].join(",")
-    }
-    const set = (key, hex) =>
-      "kwriteconfig6 --notify --file kdeglobals --group 'Colors:View' --key " +
-      key + " '" + rgb(hex) + "'; "
-    return set("BackgroundNormal", p.bg) + set("ForegroundNormal", p.fg)
-  }
+  function kdeglobalsWrite(on) { return Model.kdeglobalsWrite(on, darkPalette, lightPalette) }
 
   function writeKdeglobals() {
     kdeglobals.command = ["sh", "-c", kdeglobalsWrite(root.dark)]
@@ -90,8 +79,8 @@ ShellRoot {
   Process { id: kdeglobals }
 
   function setTextScale(value) {
-    const scale = Number(value)
-    if (!isFinite(scale) || scale < 0.8 || scale > 1.5) return
+    const scale = Model.textScale(value)
+    if (scale === null) return
     textScale = scale
     textScaleWrite.command = [
       "dconf",
@@ -103,8 +92,8 @@ ShellRoot {
   }
 
   function updateTextScale(value) {
-    const scale = parseFloat(String(value))
-    if (isFinite(scale) && scale > 0) textScale = scale
+    const scale = Model.observedTextScale(value)
+    if (scale !== null) textScale = scale
   }
 
   Process { id: textScaleWrite }

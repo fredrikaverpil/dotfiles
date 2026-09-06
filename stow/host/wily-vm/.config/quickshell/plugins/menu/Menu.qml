@@ -4,6 +4,7 @@ import Quickshell.Io
 import Quickshell.Services.SystemTray
 
 import "../bar/widgets/TrayModel.js" as TrayModel
+import "MenuModel.js" as Model
 
 import "../../Ui" as Ui
 
@@ -25,45 +26,7 @@ Ui.Panel {
     watchChanges: true
     printErrors: false
     onFileChanged: reload()
-    onLoaded: menu.binds = text().trim().split("\n")
-      .filter(line => line.length > 0)
-      .map(line => {
-        const columns = line.split("\t")
-        return { chord: columns[0], label: columns[1] || "", enabled: true }
-      })
-  }
-
-  function childrenOf(parent) {
-    const prefix = parent === "root" ? "" : parent + "."
-    const depth = parent === "root" ? 1 : parent.split(".").length + 1
-    return Object.keys(menuItems).filter(id =>
-      id.startsWith(prefix) && id.split(".").length === depth)
-  }
-
-  function descendantsOf(parent) {
-    const prefix = parent === "root" ? "" : parent + "."
-    return Object.keys(menuItems).filter(id => id !== parent && id.startsWith(prefix))
-  }
-
-  function pathFrom(id, level) {
-    const parts = id.split(".").slice(0, -1)
-    const skip = level === "root" ? 0 : level.split(".").length
-    return parts.slice(skip).map((part, i) =>
-      menuItems[parts.slice(0, skip + i + 1).join(".")].label).join(" › ")
-  }
-
-  function rowFor(id, level) {
-    const child = menuItems[id]
-    return {
-      id: id,
-      label: child.label,
-      icon: child.icon,
-      detail: pathFrom(id, level),
-      enabled: child.enabled !== false,
-      entry: null,
-      action: child.action || null,
-      submenu: child.provider !== undefined || childrenOf(id).length > 0,
-    }
+    onLoaded: menu.binds = Model.parseBinds(text())
   }
 
   function iconUrl(icon) {
@@ -105,52 +68,25 @@ Ui.Panel {
     function level(id: string): void { menu.open(id) }
   }
 
-  readonly property var rows: {
-    const item = menu.items[level]
-    const query = input.text.toLowerCase()
-
-    const matches = row => row.label.toLowerCase().indexOf(query) >= 0
-      || (row.chord !== undefined && row.chord.toLowerCase().indexOf(query) >= 0)
-
-    if (item && item.provider === "binds")
-      return query.length === 0 ? menu.binds : menu.binds.filter(matches)
-    if (item && item.provider === "tray")
-      return query.length === 0 ? menu.trayRows() : menu.trayRows().filter(matches)
-    if (item && item.provider === "apps")
-      return query.length === 0 ? menu.appRows() : menu.appRows().filter(matches)
-    if (query.length === 0)
-      return menu.childrenOf(level).map(id => menu.rowFor(id, level))
-
-    const found = menu.descendantsOf(level).map(id => menu.rowFor(id, level))
-    return (level === "root" ? found.concat(menu.appRows("Apps")) : found)
-      .filter(row => row.enabled && matches(row))
-      .sort((a, b) => (a.detail ? 1 : 0) - (b.detail ? 1 : 0))
-  }
+  readonly property var rows: Model.rowsFor(
+    menu.items,
+    level,
+    input.text,
+    menu.binds,
+    function() { return menu.trayRows() },
+    function(detail) { return menu.appRows(detail) },
+  )
 
   // ListView resets currentIndex after this handler runs.
   onRowsChanged: Qt.callLater(selectFirstEnabled)
 
   function selectFirstEnabled() {
-    const first = rows.findIndex(row => row.enabled)
-    list.currentIndex = first < 0 ? 0 : first
+    list.currentIndex = Model.selectFirstEnabled(rows)
   }
 
   function move(steps) {
-    const count = rows.length
-    if (count === 0) return
-    const delta = steps > 0 ? 1 : -1
-    let index = list.currentIndex
-
-    for (let moved = 0; moved < Math.abs(steps); moved++) {
-      let candidate = index
-      for (let tried = 0; tried < count; tried++) {
-        candidate = (candidate + delta + count) % count
-        if (rows[candidate].enabled) break
-      }
-      index = candidate
-    }
-
-    list.currentIndex = index
+    if (rows.length === 0) return
+    list.currentIndex = Model.moveIndex(rows, list.currentIndex, steps)
   }
 
   readonly property string title: level === "root" ? "Go" : menu.items[level].label
@@ -176,7 +112,7 @@ Ui.Panel {
 
   function back() {
     if (level === "root") close()
-    else open(level.indexOf(".") >= 0 ? level.split(".").slice(0, -1).join(".") : "root")
+    else open(Model.parentLevel(level))
   }
 
   function activate() {

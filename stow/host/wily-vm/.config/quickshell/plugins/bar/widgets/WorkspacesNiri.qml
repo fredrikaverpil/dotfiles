@@ -2,6 +2,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
+import "WorkspaceModel.js" as Model
+
 QtObject {
   id: root
 
@@ -11,43 +13,36 @@ QtObject {
   property var idxById: ({})
   property var windowCounts: ({})
 
-  function occupied(idx) { return (windowCounts[idx] || 0) > 0 }
+  function occupied(idx) { return Model.occupied(windowCounts, idx) }
+
+  function apply(result) {
+    root.ids = result.ids
+    root.idxById = result.idxById
+    root.focusedId = result.focusedId
+    root.windowCounts = result.windowCounts
+    if (result.queryWindows) windowQuery.running = true
+  }
 
   function setWorkspaces(list) {
-    var next = []
-    var map = {}
-    for (var i = 0; i < list.length; i++) {
-      map[list[i].id] = list[i].idx
-      next.push(list[i].idx)
-      if (list[i].is_focused) root.focusedId = list[i].idx
-    }
-    next.sort(function (a, b) { return a - b })
-    root.ids = next
-    root.idxById = map
-    windowQuery.running = true
+    apply(Model.eventResult({
+      ids: root.ids,
+      idxById: root.idxById,
+      focusedId: root.focusedId,
+      windowCounts: root.windowCounts,
+    }, { WorkspacesChanged: { workspaces: list } }))
   }
 
   function setWindows(list) {
-    var counts = {}
-    for (var i = 0; i < list.length; i++) {
-      var idx = root.idxById[list[i].workspace_id]
-      if (idx !== undefined) counts[idx] = (counts[idx] || 0) + 1
-    }
-    root.windowCounts = counts
+    root.windowCounts = Model.windowCounts(list, root.idxById)
   }
 
   function handle(event) {
-    if (event.WorkspacesChanged) {
-      setWorkspaces(event.WorkspacesChanged.workspaces)
-    } else if (event.WorkspaceActivated) {
-      var idx = root.idxById[event.WorkspaceActivated.id]
-      if (event.WorkspaceActivated.focused && idx !== undefined) root.focusedId = idx
-    } else if (event.WindowsChanged) {
-      setWindows(event.WindowsChanged.windows)
-    } else if (event.WindowOpenedOrChanged || event.WindowClosed
-        || event.WindowLayoutsChanged) {
-      windowQuery.running = true
-    }
+    apply(Model.eventResult({
+      ids: root.ids,
+      idxById: root.idxById,
+      focusedId: root.focusedId,
+      windowCounts: root.windowCounts,
+    }, event))
   }
 
   property Process stream: Process {

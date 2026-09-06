@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 
 import "../../../Ui" as Ui
+import "WorkspaceModel.js" as Model
 
 Item {
   id: root
@@ -11,16 +12,7 @@ Item {
   property real fontScale: 1
 
   function workspaceIds() {
-    const ids = [1, 2, 3, 4, 5]
-    const live = source.item ? source.item.ids : []
-
-    for (let i = 0; i < live.length; i++) {
-      const id = live[i]
-      if (id > 0 && id <= 10 && ids.indexOf(id) === -1) ids.push(id)
-    }
-
-    ids.sort((left, right) => left - right)
-    return ids
+    return Model.workspaceIds(source.item ? source.item.ids : [])
   }
 
   function focusWorkspace(id) {
