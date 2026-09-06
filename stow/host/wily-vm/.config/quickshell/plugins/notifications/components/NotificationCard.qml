@@ -1,4 +1,3 @@
-// Shared by the live toast stack and the history panel.
 
 import QtQuick
 import QtQuick.Layouts
@@ -46,7 +45,6 @@ Rectangle {
 
   HoverHandler { id: hoverHandler }
 
-  // Behind the content, so an explicit action or the close button wins.
   MouseArea {
     anchors.fill: parent
     acceptedButtons: Qt.LeftButton | Qt.RightButton

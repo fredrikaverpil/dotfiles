@@ -1,4 +1,3 @@
-// Polkit agent. No fingerprint or clamshell handling.
 
 import QtQuick
 import Quickshell

@@ -1,5 +1,3 @@
-// org.freedesktop.Notifications: toast stack, actions, DND and persisted
-// history. No restart persistence or image archival.
 
 import QtQuick
 import QtQuick.Layouts
@@ -123,8 +121,6 @@ Item {
   function handleNotification(notification) {
     var record
 
-    // A replacing client updates this object in place, so refresh the existing
-    // record through its change signals rather than duplicating it.
     for (var key in live) {
       if (live[key].notification === notification) {
         refresh(live[key])
@@ -134,7 +130,6 @@ Item {
 
     record = recordFor(notification)
 
-    // Critical stays visible; the rest are recorded silently under DND.
     if (doNotDisturb && notification.urgency !== NotificationUrgency.Critical) {
       addHistory(record)
       return
@@ -147,8 +142,6 @@ Item {
     sound.startDetached()
   }
 
-  // `finish` drops the key as soon as the server closes the notification, so a
-  // record missing from `live` means the object is already gone.
   function dismiss(record) {
     if (!record || !record.notification || !live[record.key]) return
     record.notification.dismiss()
@@ -188,7 +181,6 @@ Item {
   }
 
   function dismissAll() {
-    // Copy before dismissing: Notification.closed mutates popupRows.
     var rows = popupRows.slice()
     for (var index = 0; index < rows.length; index++) dismiss(rows[index])
   }
@@ -201,15 +193,11 @@ Item {
 
   onDoNotDisturbChanged: saveState()
 
-  // FileView emits no loaded for a missing first-run file, so mark the
-  // defaults writable now and let a later load replace them.
   Component.onCompleted: {
     stateLoaded = true
     stateFile.reload()
   }
 
-  // Detached: a Process plays one at a time, so a burst would otherwise drop
-  // every sound but the first.
   Process {
     id: sound
     command: ["pw-play", "--volume", String(root.soundVolume), root.soundPath]
@@ -291,8 +279,6 @@ Item {
     }
   }
 
-  // A fixed-size surface avoids the compositor scaling a stale buffer while a
-  // toast is added or removed.
   PanelWindow {
     id: popupWindow
     visible: root.popupRows.length > 0
@@ -410,8 +396,6 @@ Item {
     }
   }
 
-  // Like the panels' ChoiceButton: fill is the setting, border is focus, so
-  // both read at once.
   component HeaderButton: Rectangle {
     id: button
 

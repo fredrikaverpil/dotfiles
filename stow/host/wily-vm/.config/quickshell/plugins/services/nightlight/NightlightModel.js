@@ -1,12 +1,6 @@
-// Nightlight helpers and the solar schedule: hyprsunset takes fixed clock
-// times only, so sunrise and sunset are computed here. Run
-// `node NightlightModel.js` for the self-check.
 
-// Temperatures below the identity point count as night light.
 var IDENTITY_TEMPERATURE = 6000
 
-// The sun's centre this far below the horizon at sunrise and sunset, in
-// degrees: refraction plus the solar radius.
 var HORIZON = -0.833
 
 var UNIX_EPOCH_JULIAN_DAY = 2440587.5
@@ -22,10 +16,7 @@ function isNightlight(temperature) {
   return temperature !== null && temperature !== undefined && temperature < IDENTITY_TEMPERATURE
 }
 
-// One row of tzdata's zone.tab holds the zone's principal city as ISO 6709,
-// either ±DDMM±DDDMM or ±DDMMSS±DDDMMSS. Read zone.tab and not zone1970.tab:
-// the 2022 consolidation merged Sweden into Europe/Berlin, so the newer table
-// no longer lists the name timedatectl reports.
+// zone1970.tab omits zones such as Europe/Stockholm that timedatectl reports.
 function coordsFromZoneTab(text) {
   var match = String(text || "").trim()
     .match(/^([+-])(\d{2})(\d{2})(\d{2})?([+-])(\d{3})(\d{2})(\d{2})?$/)
@@ -44,9 +35,6 @@ function coordsFromZoneTab(text) {
 
 function radians(degrees) { return degrees * Math.PI / 180 }
 
-// The sunrise equation, NOAA's low-precision form: good to about a minute,
-// well inside the error from using the timezone's principal city as the
-// location. Returns null where the sun does not cross the horizon that day.
 function solarTimes(date, latitude, longitude) {
   if (!isFinite(latitude) || !isFinite(longitude)) return null
 
@@ -71,8 +59,6 @@ function solarTimes(date, latitude, longitude) {
   return { sunrise: toDate(transit - offset), sunset: toDate(transit + offset) }
 }
 
-// "day", "night", or "" when the location is not known yet. Above the polar
-// circles the sun may not cross at all, and noon altitude decides instead.
 function solarPeriod(date, latitude, longitude) {
   var times = solarTimes(date, latitude, longitude)
   if (!times) {
@@ -84,9 +70,6 @@ function solarPeriod(date, latitude, longitude) {
   return (date < times.sunrise || date >= times.sunset) ? "night" : "day"
 }
 
-// A manual override lasts until the sun crosses. One made before the location
-// is known records an empty period, and must not expire against the first real
-// one.
 function expiresOverride(mode, period, overridePeriod) {
   return mode !== "auto" && overridePeriod !== "" && period !== overridePeriod
 }
@@ -108,8 +91,6 @@ function demo() {
     { latitude: 40 + 42 / 60 + 51 / 3600, longitude: -(74 + 0 / 60 + 23 / 3600) })
   assert.strictEqual(coordsFromZoneTab("nonsense"), null)
 
-  // Stockholm, against timeanddate.com. Both are UTC here; local time that
-  // day is UTC+2 in June and UTC+1 in December.
   var stockholm = { latitude: 59 + 20 / 60, longitude: 18 + 3 / 60 }
   function minutesApart(a, b) { return Math.abs(a.getTime() - b.getTime()) / 60000 }
 
@@ -125,13 +106,11 @@ function demo() {
   assert.ok(minutesApart(midwinter.sunset, new Date("2024-12-21T13:48:00Z")) < 5,
     "midwinter sunset: " + midwinter.sunset.toISOString())
 
-  // The boundary the schedule turns on.
   assert.strictEqual(solarPeriod(new Date("2024-06-21T12:00:00Z"), stockholm.latitude, stockholm.longitude), "day")
   assert.strictEqual(solarPeriod(new Date("2024-06-21T21:00:00Z"), stockholm.latitude, stockholm.longitude), "night")
   assert.strictEqual(solarPeriod(new Date("2024-12-21T12:00:00Z"), stockholm.latitude, stockholm.longitude), "day")
   assert.strictEqual(solarPeriod(new Date("2024-12-21T15:00:00Z"), stockholm.latitude, stockholm.longitude), "night")
 
-  // Polar day and polar night, which the equation has no solution for.
   assert.strictEqual(solarTimes(new Date("2024-06-21T12:00:00Z"), 78.2, 15.6), null)
   assert.strictEqual(solarPeriod(new Date("2024-06-21T12:00:00Z"), 78.2, 15.6), "day")
   assert.strictEqual(solarPeriod(new Date("2024-12-21T12:00:00Z"), 78.2, 15.6), "night")

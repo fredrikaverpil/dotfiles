@@ -7,9 +7,6 @@ import Quickshell.Io
 import "../../../Ui" as Ui
 import "../../services/network/NetworkModel.js" as Model
 
-// The view over plugins/services/network. Everything that talks to
-// NetworkManager or spawns a process lives in that service; this file lays it
-// out and takes the keyboard.
 Ui.Panel {
   id: root
 
@@ -18,17 +15,14 @@ Ui.Panel {
   cardHeight: 560
   keyNavigation: true
 
-  // The metrics the service polls for are only on screen while the panel is.
   Binding {
     target: root.service
     property: "active"
     value: root.shown
   }
 
-  // Qt does not scroll a Flickable to follow the focus chain. Map to
-  // `content`, not the Flickable: the latter yields viewport coordinates,
-  // which compare against contentY almost but not quite correctly.
   readonly property var focusedItem: scroller.Window.activeFocusItem
+  // Map to content coordinates: Flickable coordinates are relative to its viewport.
   onFocusedItemChanged: {
     const item = focusedItem
     if (!item || !shown) return
@@ -248,13 +242,11 @@ Ui.Panel {
     height: 28
     radius: 4
     color: active ? root.shell.palette.sel : "transparent"
-    // Fill is the current state, border is focus, so both read at once.
     border.color: button.activeFocus ? root.shell.palette.fg : root.shell.palette.dim
     border.width: 1
     opacity: available ? 1 : 0.45
 
-    // Keyed on visibility, not `available`: every Wi-Fi action sets `busy`, and
-    // dropping the focused button from the chain mid-action would strand it.
+    // Availability changes during Wi-Fi actions; visibility alone controls focus membership.
     activeFocusOnTab: button.visible
     Keys.onReturnPressed: if (button.available) button.activated()
     Keys.onEnterPressed: if (button.available) button.activated()

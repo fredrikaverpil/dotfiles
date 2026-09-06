@@ -1,6 +1,3 @@
-// Unit tests for TrayModel.js. The tray widget itself imports Quickshell and
-// so cannot be instantiated here; this is the half of it that is pure string
-// handling, which is where the bugs actually were.
 
 import { createRequire } from "node:module"
 import { assertEquals } from "jsr:@std/assert"
@@ -30,8 +27,6 @@ Deno.test("sortItems orders by id and does not mutate", () => {
 Deno.test("themeIconName", async (t) => {
   const cases = [
     { name: "plain theme lookup", url: "image://icon/nm-device-wired", want: "nm-device-wired" },
-    // Quickshell searches the app's own directory here, so the bare name would
-    // not resolve against any theme and must not be checked against one.
     { name: "path fallback is not a theme lookup", url: "image://icon/steam_tray?path=/opt/steam/public", want: "" },
     { name: "other query is still a theme lookup", url: "image://icon/foo?size=22", want: "foo" },
     { name: "file url", url: "file:///tmp/icon.png", want: "" },

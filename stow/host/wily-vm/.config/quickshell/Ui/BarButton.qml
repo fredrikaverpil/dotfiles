@@ -1,11 +1,5 @@
 import QtQuick
 
-// Fixed-width icon slot: glyphs differ in font advance, so a content-sized
-// slot would make neighbours jump on a toggle. A button hidden by `visible`
-// gives its slot back.
-//
-// Two sources for the slot: an app-supplied image when it loads, the glyph
-// otherwise. Only tray items use the image path.
 Rectangle {
   id: btn
 
@@ -14,8 +8,6 @@ Rectangle {
   property alias image: btnImage.source
   property string fontFamily: "JetBrainsMono Nerd Font"
   property real fontSize: 14
-  // Overridable so a button can mark itself without taking a second slot; the
-  // tray raises it to `sel` for a NeedsAttention item.
   property color foreground: btn.shell.palette.fg
 
   signal activated
@@ -42,8 +34,6 @@ Rectangle {
     visible: status === Image.Ready
     fillMode: Image.PreserveAspectFit
     asynchronous: true
-    // Decode at physical pixels; a logical-size decode leaves PNG icons
-    // upscaled and blurry.
     sourceSize.width: width * Screen.devicePixelRatio
     sourceSize.height: height * Screen.devicePixelRatio
   }
@@ -52,8 +42,6 @@ Rectangle {
     id: btnLabel
     anchors.centerIn: parent
     visible: !btnImage.visible
-    // Text centers its advance box, not the ink. Correct the difference
-    // between the two so differently shaped glyphs share a visual centre.
     anchors.horizontalCenterOffset: btnLabel.implicitWidth / 2
       - (btnMetrics.tightBoundingRect.x + btnMetrics.tightBoundingRect.width / 2)
     color: btn.foreground

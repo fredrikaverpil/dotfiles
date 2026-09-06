@@ -1,4 +1,3 @@
-// Password lock surface.
 
 import QtQuick
 

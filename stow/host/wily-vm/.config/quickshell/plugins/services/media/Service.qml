@@ -3,8 +3,6 @@ import Quickshell.Services.Mpris
 
 import "MediaModel.js" as Model
 
-// The MPRIS half of media, with no UI dependency: the bar and panel read the
-// same selected player, and it stays current when neither is visible.
 Item {
   id: root
 

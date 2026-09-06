@@ -7,7 +7,6 @@ import "../bar/widgets/TrayModel.js" as TrayModel
 
 import "../../Ui" as Ui
 
-// The launcher. `items` is the entry table, injected by shell.qml.
 Ui.Panel {
   id: menu
 
@@ -18,9 +17,6 @@ Ui.Panel {
   cardWidth: wide ? 900 : 600
   cardHeight: wide ? 640 : 420
 
-  // Written by hyprland.lua as it registers each bind, or sed'd out of niri's
-  // config.kdl at startup. Watched, so a config reload refreshes the sheet
-  // without restarting the shell.
   property var binds: []
 
   FileView {
@@ -37,8 +33,6 @@ Ui.Panel {
       })
   }
 
-  // Children are the ids one dot deeper than their parent; "root" is the ids
-  // with no dot at all.
   function childrenOf(parent) {
     const prefix = parent === "root" ? "" : parent + "."
     const depth = parent === "root" ? 1 : parent.split(".").length + 1
@@ -46,14 +40,11 @@ Ui.Panel {
       id.startsWith(prefix) && id.split(".").length === depth)
   }
 
-  // Every id below `parent` at any depth, which is what a search covers.
   function descendantsOf(parent) {
     const prefix = parent === "root" ? "" : parent + "."
     return Object.keys(menuItems).filter(id => id !== parent && id.startsWith(prefix))
   }
 
-  // "Style › Theme" for a hit further down; empty for a direct child of the
-  // level being searched, which needs no breadcrumb.
   function pathFrom(id, level) {
     const parts = id.split(".").slice(0, -1)
     const skip = level === "root" ? 0 : level.split(".").length
@@ -75,8 +66,6 @@ Ui.Panel {
     }
   }
 
-  // A desktop entry names a themed icon, an absolute path or a URL; only the
-  // first needs a lookup. Empty when nothing resolves, leaving the row's glyph.
   function iconUrl(icon) {
     const value = String(icon || "")
     if (value.length === 0) return ""
@@ -85,13 +74,11 @@ Ui.Panel {
     return Quickshell.iconPath(value, true)
   }
 
-  // Sort and label come from TrayModel, so a row sits where its icon does.
   function trayRows() {
     return TrayModel.sortItems(SystemTray.items.values)
       .map(item => ({
         label: TrayModel.labelFor(item),
         icon: "󰘔",
-        // Same theme-name resolution as the bar's; see Tray.qml.
         image: TrayModel.themeIconName(item.icon) === ""
           ? (item.icon || "")
           : menu.iconUrl(TrayModel.themeIconName(item.icon)),
@@ -115,19 +102,13 @@ Ui.Panel {
     function toggle(): void { menu.toggle() }
     function open(): void { menu.open("root") }
     function close(): void { menu.close() }
-    // Not `show`: `qs ipc show` is a CLI subcommand, so the argument parser
-    // eats the name before the call reaches this handler.
     function level(id: string): void { menu.open(id) }
   }
 
-  // A binding, not a one-shot: the desktop-entry scan finishes a few seconds
-  // after startup, so an app list built once at open() comes up empty.
   readonly property var rows: {
     const item = menu.items[level]
     const query = input.text.toLowerCase()
 
-    // Chord as well as label, so "super" and "workspace" both narrow the
-    // keybinding sheet.
     const matches = row => row.label.toLowerCase().indexOf(query) >= 0
       || (row.chord !== undefined && row.chord.toLowerCase().indexOf(query) >= 0)
 
@@ -140,19 +121,13 @@ Ui.Panel {
     if (query.length === 0)
       return menu.childrenOf(level).map(id => menu.rowFor(id, level))
 
-    // A search covers the whole subtree below the current level, so "ghostty"
-    // or "lock" reaches an action from the root without walking down to it.
-    // Deeper hits carry their path and sort after the direct children. Apps
-    // are the one provider joined in -- the ~100 keybinding rows would swamp
-    // any root search. Dim rows drop out; there is nothing behind them.
     const found = menu.descendantsOf(level).map(id => menu.rowFor(id, level))
     return (level === "root" ? found.concat(menu.appRows("Apps")) : found)
       .filter(row => row.enabled && matches(row))
       .sort((a, b) => (a.detail ? 1 : 0) - (b.detail ? 1 : 0))
   }
 
-  // Deferred: ListView resets currentIndex itself when the model changes,
-  // and does it after this handler runs.
+  // ListView resets currentIndex after this handler runs.
   onRowsChanged: Qt.callLater(selectFirstEnabled)
 
   function selectFirstEnabled() {
@@ -160,8 +135,6 @@ Ui.Panel {
     list.currentIndex = first < 0 ? 0 : first
   }
 
-  // Dim rows are skipped, not just inert, so holding Down never parks the
-  // highlight on something Enter ignores. Wraps.
   function move(steps) {
     const count = rows.length
     if (count === 0) return
@@ -182,8 +155,6 @@ Ui.Panel {
 
   readonly property string title: level === "root" ? "Go" : menu.items[level].label
 
-  // The keybinding sheet needs a bigger window: ~100 rows, and its longest
-  // chord is 28 characters before the description starts.
   readonly property bool wide: level !== "root" && menu.items[level].provider === "binds"
 
   function open(target) {
@@ -198,14 +169,11 @@ Ui.Panel {
 
   function toggle() { shown ? close() : open("root") }
 
-  // For a bar button that opens the launcher at a level: a second click
-  // closes, but arriving from another level switches.
   function toggleLevel(target) {
     if (shown && level === target) close()
     else open(target)
   }
 
-  // Escape and Left back out one level and only close at the root.
   function back() {
     if (level === "root") close()
     else open(level.indexOf(".") >= 0 ? level.split(".").slice(0, -1).join(".") : "root")
@@ -221,8 +189,7 @@ Ui.Panel {
       else row.trayItem.activate()
     } else if (row.entry) {
       close()
-      // uwsm-app puts the app in its own scope under app-graphical.slice, so it
-      // survives `systemctl --user restart quickshell`.
+      // Keep launched apps out of Quickshell's service scope.
       Quickshell.execDetached(["uwsm-app", "--", row.entry.id + ".desktop"])
     } else if (row.action) {
       close()
@@ -298,7 +265,6 @@ Ui.Panel {
         anchors.leftMargin: 8
         spacing: 10
 
-        // One slot: the app's own icon when it resolves, the glyph otherwise.
         Item {
           width: 20
           height: 20
@@ -311,8 +277,6 @@ Ui.Panel {
             visible: status === Image.Ready
             fillMode: Image.PreserveAspectFit
             asynchronous: true
-            // Decode at physical pixels; a logical-size decode leaves PNG
-            // icons upscaled and blurry.
             sourceSize.width: width * Screen.devicePixelRatio
             sourceSize.height: height * Screen.devicePixelRatio
           }
@@ -328,7 +292,6 @@ Ui.Panel {
           }
         }
 
-        // Monospace, so a fixed width lines every chord up in a column.
         Text {
           width: 290
           visible: modelData.chord !== undefined
@@ -342,15 +305,11 @@ Ui.Panel {
           color: modelData.enabled ? menu.shell.palette.fg : menu.shell.palette.off
           font.family: "JetBrainsMono Nerd Font"
           font.pixelSize: 15
-          // Capped only where a breadcrumb follows, so a long label elides
-          // instead of pushing it off the panel. The keybinding sheet has
-          // 36-character labels.
           width: modelData.detail ? Math.min(implicitWidth, 300) : implicitWidth
           text: modelData.label + (modelData.submenu ? " ›" : "")
           elide: Text.ElideRight
         }
 
-        // Where a search hit below the current level lives.
         Text {
           visible: (modelData.detail || "") !== ""
           color: menu.shell.palette.off

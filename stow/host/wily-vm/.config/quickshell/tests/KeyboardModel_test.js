@@ -1,5 +1,3 @@
-// Unit tests for plugins/services/keyboard/KeyboardModel.js -- the one piece
-// of that service that is neither a Quickshell type nor a command table.
 
 import { createRequire } from "node:module"
 import { assertEquals } from "jsr:@std/assert"
@@ -15,7 +13,6 @@ Deno.test("currentIndex", async (t) => {
     { name: "hyprland falls back to the first", niri: false, text: '{"keyboards":[{"name":"at-translated-set-2","active_layout_index":1}]}', want: 1 },
     { name: "hyprland with no keyboards", niri: false, text: '{"keyboards":[]}', want: -1 },
     { name: "hyprland without the field", niri: false, text: '{"keyboards":[{"main":true}]}', want: -1 },
-    // Number(null) is 0, so a null index must not read as the default layout.
     { name: "null index is not zero", niri: true, text: '{"current_idx":null}', want: -1 },
     { name: "a killed query returns nothing", niri: true, text: "", want: -1 },
     { name: "unparseable output", niri: false, text: "hyprctl: not running", want: -1 },

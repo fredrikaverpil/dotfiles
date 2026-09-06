@@ -1,4 +1,3 @@
-// Session lock. No fingerprint or orphaned-session-lock recovery.
 
 import QtQuick
 import Quickshell
@@ -35,10 +34,6 @@ Item {
     failedAttempts = 0
     lockRequested = true
     sessionLock.locked = true
-    // Nothing else arms the blank timer at lock time, so a lock nobody touches
-    // would never blank. Not `wake()`: its dpms(true) churns outputs while the
-    // lock surface is still being acquired, which crashes the shell with
-    // "Tried to show lockscreen surfaces without active lock".
     blankTimer.restart()
     return true
   }
@@ -84,10 +79,8 @@ Item {
     wake()
   }
 
+  // Repeated dpms-on forces a modeset and flashes the lock surface on every keypress.
   function dpms(on) {
-    // Turning on an output that is already on forces a modeset, and wake() runs
-    // on every keystroke, so an unguarded dispatch flashes the lock screen
-    // black under typing.
     if (dpmsProcess.running || blanked !== on) return
     blanked = !on
     dpmsProcess.command = Ui.Compositor.dpms(on)
@@ -108,8 +101,6 @@ Item {
     locked: false
 
     onLockStateChanged: {
-      // A compositor-side unlock bypasses the PAM success path, which would
-      // otherwise leave stale auth state in this long-lived process.
       if (!locked && root.lockRequested) {
         root.lockRequested = false
         root.authenticating = false
@@ -154,7 +145,6 @@ Item {
     onError: root.failAuthentication()
   }
 
-  // Another five minutes after the lock itself before blanking the output.
   Timer {
     id: blankTimer
     interval: 300000

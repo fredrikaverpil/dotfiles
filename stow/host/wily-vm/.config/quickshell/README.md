@@ -1,8 +1,8 @@
 # Editor, lint and test setup for this tree
 
-Design notes for the tree itself live in `nix/hosts/wily-vm/CLAUDE.md` ("How
-the Quickshell tree is split"). This file covers only the tooling, which is
-what you need when the LSP goes quiet.
+Design notes for the tree itself live in `nix/hosts/wily-vm/CLAUDE.md`
+("Architecture"). This file covers only the tooling, which is what you need
+when the LSP goes quiet.
 
 Everything here runs **on the Mac or on the VM**, against this checkout, with
 no running shell.

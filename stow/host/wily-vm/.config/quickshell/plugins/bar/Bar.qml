@@ -5,7 +5,6 @@ import "widgets" as BarWidgets
 import "../services/media" as Media
 import "../../Ui" as Ui
 
-// The top bar, one per screen.
 Scope {
   id: bar
 
@@ -37,7 +36,6 @@ Scope {
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.leftMargin: 4
-        // U+E900 in the vendored omarchy icon font.
         label: "\ue900"
         fontFamily: "omarchy"
         onActivated: bar.shell.menu.toggle()
@@ -118,8 +116,6 @@ Scope {
         onActivated: bar.shell.audio.toggle()
       }
 
-      // Indicators grow inward from here, so the fixed buttons above keep
-      // their places at the right edge when one appears.
       Ui.BarButton {
         id: idleButton
         shell: bar.shell
@@ -131,7 +127,6 @@ Scope {
         onActivated: bar.shell.idle.setEnabled(true)
       }
 
-      // Shown only while a non-default layout is up; clicking restores US.
       Ui.BarButton {
         id: keyboardButton
         shell: bar.shell

@@ -2,20 +2,13 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// niri's workspace source for Workspaces.qml. Quickshell has no niri module,
-// so this reads niri's event stream: one JSON object per line, with the full
-// current state sent up front.
 QtObject {
   id: root
 
-  // Everything exposed here is the per-output index (the number on the key,
-  // and what `focus-workspace` takes), not niri's global `id` counter.
+  // niri events use global IDs, but focus-workspace and the UI use per-output idx values.
   property int focusedId: -1
   property var ids: []
-  // niri workspace id -> index, so the events that carry only an id can be
-  // translated.
   property var idxById: ({})
-  // Workspace index -> window count. niri's workspace objects do not carry one.
   property var windowCounts: ({})
 
   function occupied(idx) { return (windowCounts[idx] || 0) > 0 }
@@ -31,7 +24,6 @@ QtObject {
     next.sort(function (a, b) { return a - b })
     root.ids = next
     root.idxById = map
-    // The counts are keyed by index, so a renumbering invalidates them.
     windowQuery.running = true
   }
 
@@ -48,16 +40,12 @@ QtObject {
     if (event.WorkspacesChanged) {
       setWorkspaces(event.WorkspacesChanged.workspaces)
     } else if (event.WorkspaceActivated) {
-      // Only the focused flag moves; a workspace new to us arrives with its
-      // own WorkspacesChanged.
       var idx = root.idxById[event.WorkspaceActivated.id]
       if (event.WorkspaceActivated.focused && idx !== undefined) root.focusedId = idx
     } else if (event.WindowsChanged) {
       setWindows(event.WindowsChanged.windows)
     } else if (event.WindowOpenedOrChanged || event.WindowClosed
         || event.WindowLayoutsChanged) {
-      // Counting incrementally would need the window's previous workspace,
-      // which the event does not carry.
       windowQuery.running = true
     }
   }
@@ -65,16 +53,13 @@ QtObject {
   property Process stream: Process {
     running: true
     command: ["niri", "msg", "-j", "event-stream"]
-    // The stream can end quietly while the compositor stays up, stranding the
-    // widget. A restart resends full state, so it is also a resync.
+    // Restarting resynchronises from the stream's initial full state.
     onExited: restart.start()
     stdout: SplitParser {
       onRead: function (line) {
         try {
           root.handle(JSON.parse(line))
         } catch (error) {
-          // A line that does not parse is one event lost, not a reason to drop
-          // the stream.
         }
       }
     }

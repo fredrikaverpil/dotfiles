@@ -5,8 +5,6 @@ import Quickshell.Services.Pipewire
 
 import "../../../Ui" as Ui
 
-// Output volume, mute and the default-sink pick, straight off Quickshell's
-// PipeWire service. No per-app mixer, no input section.
 Ui.Panel {
   id: root
 
@@ -20,8 +18,6 @@ Ui.Panel {
     ? "󰝟"
     : volume < 0.34 ? "󰕿" : volume < 0.67 ? "󰖀" : "󰕾"
 
-  // One cursor for keyboard and mouse: -1 is the slider row, 0..n-1 the device
-  // rows. Hover moves it too, so only one highlight is ever on screen.
   property int cursor: -1
 
   cardWidth: 480
@@ -36,7 +32,6 @@ Ui.Panel {
     sink.audio.volume = Math.max(0, Math.min(1, value))
   }
 
-  // No-op on a device row: only the slider row changes the volume.
   function adjust(delta) { if (cursor < 0) setVolume(volume + delta) }
 
   function toggleMute() { if (sink && sink.audio) sink.audio.muted = !sink.audio.muted }
@@ -52,17 +47,14 @@ Ui.Panel {
     else setDefault(sinks[cursor])
   }
 
-  // Every open starts on the slider.
   onShownChanged: if (shown) {
     cursor = -1
     keys.forceActiveFocus()
   }
 
-  // Without this the node properties never bind: volume reads 0 forever.
+  // PipeWire node properties do not bind until their objects are tracked.
   PwObjectTracker { objects: root.sinks }
 
-  // No `show` function: `qs ipc show` is a CLI subcommand and the call never
-  // reaches the handler.
   IpcHandler {
     target: "audio"
 
@@ -82,8 +74,7 @@ Ui.Panel {
     }
   }
 
-  // Keeps its own cursor rather than using Ui.Panel's keyNavigation: h/l on
-  // the slider row changes a value, which a focus chain cannot express.
+  // The slider and device rows need one cursor; Ui.Panel's focus chain cannot express slider adjustment.
   Item {
     id: keys
     width: 0

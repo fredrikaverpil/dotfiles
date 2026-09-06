@@ -1,6 +1,3 @@
-// hyprsunset takes fixed clock times only, so the solar schedule lives here
-// and hyprsunset.conf stays inert. The daemon underneath differs per
-// compositor -- see Ui/Compositor.qml's nightlightBackend.
 
 import QtQuick
 import Quickshell
@@ -17,14 +14,10 @@ Item {
   readonly property int nightTemperature: 4000
   readonly property int dayTemperature: 6500
 
-  // "auto" follows the sun; "on" and "off" pin it until the next crossing.
-  // overridePeriod is the solar period the override was made in, and the tick
-  // expires it when that changes.
   property string mode: "auto"
   property string overridePeriod: ""
   property string period: ""
 
-  // From the system timezone unless assigned first; see locateProcess.
   property real latitude: NaN
   property real longitude: NaN
 
@@ -38,7 +31,7 @@ Item {
   function desiredTemperature() {
     if (mode === "on") return nightTemperature
     if (mode === "off") return dayTemperature
-    if (period === "") return NaN // location not known yet, so leave it alone
+    if (period === "") return NaN
     return period === "night" ? nightTemperature : dayTemperature
   }
 
@@ -53,26 +46,19 @@ Item {
 
   readonly property var backend: Ui.Compositor.nightlightBackend
 
-  // Every minute. Re-asserting the temperature is also what heals hyprsunset's
-  // morning `identity` profile, which otherwise clobbers it once a day.
   function tick() {
     period = NightlightModel.solarPeriod(new Date(), latitude, longitude)
     if (NightlightModel.expiresOverride(mode, period, overridePeriod)) mode = "auto"
-    // Read before deciding, or an outside change takes two ticks to correct.
-    // Only a tick reconciles: the probe after every apply must not turn a
-    // temperature that will not stick into an apply loop.
     reconciling = true
     probe.running = true
   }
 
+  // Concurrent starts race for the compositor's gamma manager, so apply requests are serialized.
   function apply(temp) {
     if (!isFinite(temp) || temperature === temp) return
     root.temperature = temp
     root.stateLoaded = true
 
-    // The apply command starts the daemon when none is running, and that check
-    // is not atomic: two overlapping applies each launch one, and the
-    // hyprsunset loser dies with "A CTM manager is already running".
     if (applyProcess.running) {
       root.pendingTemperature = temp
       root.hasPendingTemperature = true
@@ -83,8 +69,6 @@ Item {
   }
 
   function runApply(temp) {
-    // A freshly started hyprsunset applies its own default at the end of its
-    // boot, overwriting anything set before then; hence the retry loop.
     applyProcess.command = ["bash", "-lc",
       backend.running + " || { " + backend.launch + " >/dev/null 2>&1 & sleep 1; }; " +
       "for _ in $(seq 10); do " +
@@ -128,9 +112,6 @@ Item {
     }
   }
 
-  // The zone's principal city: up to a few hundred kilometres off for a large
-  // zone (~15 min of winter sunset between Stockholm and Malmo), which is fine
-  // for a blue-light filter and follows the laptop when the timezone changes.
   Process {
     id: locateProcess
     running: true

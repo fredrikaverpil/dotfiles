@@ -1,4 +1,3 @@
--- The display panel rewrites these two values in place.
 local wily_monitor_scale = 1
 local wily_gdk_scale = 1
 

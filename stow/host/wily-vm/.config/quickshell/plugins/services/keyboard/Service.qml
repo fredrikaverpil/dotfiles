@@ -1,7 +1,3 @@
-// The shell owns the layout index: every way to switch comes through here, so
-// there is no activelayout listener. That holds only while the compositors
-// have no toggle of their own -- a `grp:` option in kb_options would switch
-// behind this and desync the label.
 
 import QtQuick
 import Quickshell
@@ -13,9 +9,7 @@ import "KeyboardModel.js" as KeyboardModel
 Item {
   id: root
 
-  // Same layouts, same order, as `kb_layout` in hypr/hyprland.lua and `layout`
-  // in niri/config.kdl. Hardcoded: reaching a short code from what the
-  // compositors report needs an xkb description table.
+  // Order must match both compositor configurations; the shell is the only layout switcher.
   readonly property var codes: ["US", "SE"]
 
   property int index: 0
@@ -30,8 +24,6 @@ Item {
 
   function next() { root.set((root.index + 1) % root.codes.length) }
 
-  // A shell restart mid-session leaves the compositor on whatever layout it
-  // was, so seed from it rather than assuming the default.
   Component.onCompleted: query.running = true
 
   Process {

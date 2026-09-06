@@ -1,5 +1,3 @@
-// Owns only the state that stays useful after a notification's D-Bus object is
-// released. No restart persistence or image archival.
 
 function asString(value) {
   return value === undefined || value === null ? "" : String(value)

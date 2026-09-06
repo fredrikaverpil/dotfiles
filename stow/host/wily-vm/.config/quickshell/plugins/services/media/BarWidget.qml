@@ -2,13 +2,9 @@ import QtQuick
 
 import "../../../Ui" as Ui
 
-// One 28px button that opens the media panel.
 Item {
   id: root
 
-  // Not `required`: QML evaluates bindings before assigning required
-  // properties, so BarButton would log a transient undefined shell. The Loader
-  // creates it only once Bar.qml has supplied one.
   property var shell: null
   readonly property bool mediaVisible: shell !== null && shell.media.hasMedia
 
