@@ -247,78 +247,119 @@ function formatPacketLoss(loss, hasSamples) {
   return Math.round(value) + "%"
 }
 
-function demo() {
-  var assert = require("assert")
-  var types = { Wifi: "wifi", Wired: "wired" }
-  var states = {
-    Connected: "connected",
-    Connecting: "connecting",
-    Disconnecting: "disconnecting",
-    Disconnected: "disconnected",
+function findDevice(devices, type) {
+  var source = devices || []
+  var fallback = null
+  for (var index = 0; index < source.length; index++) {
+    var device = source[index]
+    if (!device || device.type !== type) continue
+    if (device.connected) return device
+    if (!fallback) fallback = device
   }
+  return fallback
+}
 
-  assert.strictEqual(connectionIcon("ethernet", -1), "󰈀")
-  assert.strictEqual(connectionIcon("disconnected", -1), "󰤮")
-  assert.strictEqual(wifiIconFor(0), "󰤯")
-  assert.strictEqual(wifiIconFor(100), "󰤨")
-  assert.strictEqual(deviceType(types.Wifi, types), "Wi-Fi")
-  assert.strictEqual(deviceType(types.Wired, types), "Ethernet")
-  assert.strictEqual(connectionState(states.Connected, states), "Connected")
-  assert.strictEqual(connectionState("other", states), "Unknown")
+function findConnectedWifiNetwork(networks) {
+  var source = networks || []
+  for (var index = 0; index < source.length; index++) {
+    if (source[index] && source[index].connected) return source[index]
+  }
+  return null
+}
 
-  var rows = sortWifiRows([
-    { ssid: "weak", connected: false, known: false, signal: 10 },
-    { ssid: "saved", connected: false, known: true, signal: 20 },
-    { ssid: "current", connected: true, known: true, signal: 5 },
-  ])
-  assert.deepStrictEqual(rows.map(function(row) { return row.ssid }), ["current", "saved", "weak"])
-  assert.strictEqual(requiresCredentials("open", "open", "owe"), false)
-  assert.strictEqual(requiresCredentials("owe", "open", "owe"), false)
-  assert.strictEqual(requiresCredentials("wpa2", "open", "owe"), true)
-  assert.strictEqual(canForgetNetwork({ known: true, connected: false }), true)
-  assert.strictEqual(canForgetNetwork({ known: true, connected: true }), false)
+function networkForSsid(networks, ssid) {
+  var source = networks || []
+  for (var index = 0; index < source.length; index++) {
+    if (source[index] && source[index].name === ssid) return source[index]
+  }
+  return null
+}
 
-  var addresses = parseIpv4Addresses(JSON.stringify([
-    {
-      ifname: "lo",
-      addr_info: [{ family: "inet", local: "127.0.0.1", scope: "host" }],
-    },
-    {
-      ifname: "enp0s1",
-      addr_info: [
-        { family: "inet6", local: "fe80::1", scope: "link" },
-        { family: "inet", local: "192.0.2.4", scope: "global" },
-      ],
-    },
-  ]))
-  assert.deepStrictEqual(addresses, { enp0s1: "192.0.2.4" })
-  assert.deepStrictEqual(parseIpv4Addresses("invalid"), {})
+function ipFor(device, addresses) {
+  if (!device || !device.name) return ""
+  return (addresses || {})[device.name] || ""
+}
 
-  assert.deepStrictEqual(parseRoute('[{"dev":"wlan0","prefsrc":"192.0.2.4","gateway":"192.0.2.1"}]'), {
-    iface: "wlan0", ip: "192.0.2.4", gateway: "192.0.2.1",
-  })
-  assert.deepStrictEqual(parseLinkStats('[{"ifname":"wlan0","stats64":{"rx":{"bytes":2048},"tx":{"bytes":1024}}}]'), {
-    iface: "wlan0", rxBytes: 2048, txBytes: 1024,
-  })
+function deviceDetail(device, addresses, types, states) {
+  var state = connectionState(device.state, states)
+  var ip = ipFor(device, addresses)
+  return ip ? state + " · " + ip : state
+}
 
-  var firstTransfer = transferState({}, { iface: "wlan0", rxBytes: 1000, txBytes: 2000 }, 10)
-  var secondTransfer = transferState(firstTransfer, { iface: "wlan0", rxBytes: 3000, txBytes: 2500 }, 12)
-  assert.strictEqual(secondTransfer.receivingRate, 1000)
-  assert.strictEqual(secondTransfer.sendingRate, 250)
-  assert.strictEqual(transferState(secondTransfer, { iface: "eth0", rxBytes: 3, txBytes: 4 }, 14).receivingRate, 0)
+function wifiStatus(network, actionSsid, actionKind) {
+  if (!network) return ""
+  if (actionSsid === network.ssid) {
+    if (actionKind === "connect") return "Connecting…"
+    if (actionKind === "disconnect") return "Disconnecting…"
+    if (actionKind === "forget") return "Forgetting…"
+  }
+  return network.connected ? "Connected" : network.known ? "Saved" : "Available"
+}
 
-  assert.strictEqual(parsePing("64 bytes from 1.1.1.1: time=12.5 ms"), 12.5)
-  assert.strictEqual(parsePing("100% packet loss"), null)
-  var firstPing = pingState({}, "wlan0", 10, 24, 5)
-  var secondPing = pingState(firstPing, "wlan0", null, 24, 5)
-  assert.strictEqual(secondPing.latency, 10)
-  assert.strictEqual(secondPing.packetLoss, 50)
-  assert.strictEqual(formatBytes(1024), "1.0 KB")
-  assert.strictEqual(formatRate(1024), "1.0 KB/s")
-  assert.strictEqual(formatPing(-1, true), "Timeout")
-  assert.strictEqual(formatPacketLoss(50, true), "50%")
+function wifiAction(network, actionSsid, openSecurity, oweSecurity) {
+  if (!network || actionSsid === network.ssid) return ""
+  if (network.connected) return "Disconnect"
+  return requiresCredentials(network.security, openSecurity, oweSecurity) && !network.known
+    ? "Join"
+    : "Connect"
+}
 
-  console.log("ok")
+function connectionFailureReason(reason, reasons) {
+  if (reason === reasons.NoSecrets) return "Passphrase required"
+  if (reason === reasons.WifiAuthTimeout) return "Wrong password"
+  if (reason === reasons.WifiNetworkLost) return "Network lost"
+  if (reason === reasons.WifiClientDisconnected) return "Disconnected"
+  if (reason === reasons.WifiClientFailed) return "Connection failed"
+  return "Failed to connect"
+}
+
+function beginAction(state, kind, network) {
+  var current = state || {}
+  if (!network || current.actionKind) return null
+  return {
+    actionNetwork: network,
+    actionSsid: network.name || "",
+    actionKind: kind,
+    passwordSsid: current.passwordSsid || "",
+    failureSsid: "",
+    failureReason: "",
+  }
+}
+
+function clearAction(state) {
+  var current = state || {}
+  return {
+    actionNetwork: null,
+    actionSsid: "",
+    actionKind: "",
+    passwordSsid: current.actionKind === "connect" ? "" : (current.passwordSsid || ""),
+    failureSsid: current.failureSsid || "",
+    failureReason: current.failureReason || "",
+  }
+}
+
+function failedAction(state, reason, reasons, openSecurity, oweSecurity) {
+  var current = state || {}
+  if (!current.actionKind) return null
+  var retryPassword = current.actionKind === "connect" && current.actionNetwork
+    && requiresCredentials(current.actionNetwork.security, openSecurity, oweSecurity)
+  return {
+    actionNetwork: null,
+    actionSsid: "",
+    actionKind: "",
+    passwordSsid: retryPassword ? current.actionSsid : (current.passwordSsid || ""),
+    failureSsid: current.actionSsid || "",
+    failureReason: connectionFailureReason(reason, reasons),
+  }
+}
+
+function isActionComplete(state) {
+  var current = state || {}
+  var network = current.actionNetwork
+  if (!network || !current.actionKind) return false
+  if (current.actionKind === "connect") return !!network.connected
+  if (current.actionKind === "disconnect") return !network.connected && !network.stateChanging
+  return current.actionKind === "forget" && !network.known && !network.stateChanging
 }
 
 if (typeof module !== "undefined") {
@@ -336,11 +377,25 @@ if (typeof module !== "undefined") {
     parseLinkStats: parseLinkStats,
     transferState: transferState,
     parsePing: parsePing,
+    appendPingSample: appendPingSample,
+    averagePing: averagePing,
+    packetLoss: packetLoss,
     pingState: pingState,
     formatBytes: formatBytes,
     formatRate: formatRate,
     formatPing: formatPing,
     formatPacketLoss: formatPacketLoss,
+    findDevice: findDevice,
+    findConnectedWifiNetwork: findConnectedWifiNetwork,
+    networkForSsid: networkForSsid,
+    ipFor: ipFor,
+    deviceDetail: deviceDetail,
+    wifiStatus: wifiStatus,
+    wifiAction: wifiAction,
+    connectionFailureReason: connectionFailureReason,
+    beginAction: beginAction,
+    clearAction: clearAction,
+    failedAction: failedAction,
+    isActionComplete: isActionComplete,
   }
-  if (require.main === module) demo()
 }

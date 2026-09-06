@@ -50,33 +50,33 @@ Item {
   readonly property bool hasTransfer: connection.rxBytes !== null && connection.txBytes !== null
   readonly property bool hasPing: ping.samples && ping.samples.length > 0
 
-  function findDevice(type) {
-    var fallback = null
-    var devices = networkDevices || []
-    for (var i = 0; i < devices.length; i++) {
-      var device = devices[i]
-      if (!device || device.type !== type) continue
-      if (device.connected) return device
-      if (!fallback) fallback = device
+  function actionState() {
+    return {
+      actionNetwork: actionNetwork,
+      actionSsid: actionSsid,
+      actionKind: actionKind,
+      passwordSsid: passwordSsid,
+      failureSsid: failureSsid,
+      failureReason: failureReason,
     }
-    return fallback
   }
+
+  function applyActionState(state) {
+    actionNetwork = state.actionNetwork
+    actionSsid = state.actionSsid
+    actionKind = state.actionKind
+    passwordSsid = state.passwordSsid
+    failureSsid = state.failureSsid
+    failureReason = state.failureReason
+  }
+
+  function findDevice(type) { return Model.findDevice(networkDevices, type) }
 
   function findConnectedWifiNetwork() {
-    var networks = wifiNetworkObjects || []
-    for (var i = 0; i < networks.length; i++) {
-      if (networks[i] && networks[i].connected) return networks[i]
-    }
-    return null
+    return Model.findConnectedWifiNetwork(wifiNetworkObjects)
   }
 
-  function networkForSsid(ssid) {
-    var networks = wifiNetworkObjects || []
-    for (var i = 0; i < networks.length; i++) {
-      if (networks[i] && networks[i].name === ssid) return networks[i]
-    }
-    return null
-  }
+  function networkForSsid(ssid) { return Model.networkForSsid(wifiNetworkObjects, ssid) }
 
   function syncWifiNetworks() {
     var rows = []
@@ -166,38 +166,22 @@ Item {
     ipAddresses = Model.parseIpv4Addresses(raw)
   }
 
-  function ipFor(device) {
-    if (!device || !device.name) return ""
-    return ipAddresses[device.name] || ""
-  }
+  function ipFor(device) { return Model.ipFor(device, ipAddresses) }
 
   function deviceTypeName(device) {
     return Model.deviceType(device.type, DeviceType)
   }
 
   function deviceDetail(device) {
-    var state = Model.connectionState(device.state, ConnectionState)
-    var ip = ipFor(device)
-    return ip ? state + " · " + ip : state
+    return Model.deviceDetail(device, ipAddresses, DeviceType, ConnectionState)
   }
 
   function wifiStatus(network) {
-    if (!network) return ""
-    if (actionSsid === network.ssid) {
-      if (actionKind === "connect") return "Connecting…"
-      if (actionKind === "disconnect") return "Disconnecting…"
-      if (actionKind === "forget") return "Forgetting…"
-    }
-    return network.connected ? "Connected" : network.known ? "Saved" : "Available"
+    return Model.wifiStatus(network, actionSsid, actionKind)
   }
 
   function wifiAction(network) {
-    if (!network) return ""
-    if (actionSsid === network.ssid) return ""
-    if (network.connected) return "Disconnect"
-    if (Model.requiresCredentials(network.security, WifiSecurityType.Open, WifiSecurityType.Owe)
-        && !network.known) return "Join"
-    return "Connect"
+    return Model.wifiAction(network, actionSsid, WifiSecurityType.Open, WifiSecurityType.Owe)
   }
 
   function activate(network) {
@@ -217,12 +201,9 @@ Item {
   }
 
   function beginAction(kind, network) {
-    if (!network || busy) return false
-    actionNetwork = network
-    actionSsid = network.name || ""
-    actionKind = kind
-    failureSsid = ""
-    failureReason = ""
+    var next = Model.beginAction(actionState(), kind, network)
+    if (!next) return false
+    applyActionState(next)
     actionTimeout.restart()
     return true
   }
@@ -250,43 +231,25 @@ Item {
 
   function clearAction() {
     actionTimeout.stop()
-    if (actionKind === "connect") passwordSsid = ""
-    actionNetwork = null
-    actionSsid = ""
-    actionKind = ""
+    applyActionState(Model.clearAction(actionState()))
     refresh()
   }
 
   function failAction(reason) {
-    if (!actionKind) return
+    var next = Model.failedAction(
+      actionState(), reason, ConnectionFailReason, WifiSecurityType.Open, WifiSecurityType.Owe)
+    if (!next) return
     actionTimeout.stop()
-    failureSsid = actionSsid
-    failureReason = connectionFailureReason(reason)
-    var retryPassword = actionKind === "connect"
-      && actionNetwork
-      && Model.requiresCredentials(actionNetwork.security, WifiSecurityType.Open, WifiSecurityType.Owe)
-    if (retryPassword) passwordSsid = actionSsid
-    actionNetwork = null
-    actionSsid = ""
-    actionKind = ""
+    applyActionState(next)
     refresh()
   }
 
   function checkActionCompletion() {
-    var network = actionNetwork
-    if (!network || !actionKind) return
-    if (actionKind === "connect" && network.connected) clearAction()
-    else if (actionKind === "disconnect" && !network.connected && !network.stateChanging) clearAction()
-    else if (actionKind === "forget" && !network.known && !network.stateChanging) clearAction()
+    if (Model.isActionComplete(actionState())) clearAction()
   }
 
   function connectionFailureReason(reason) {
-    if (reason === ConnectionFailReason.NoSecrets) return "Passphrase required"
-    if (reason === ConnectionFailReason.WifiAuthTimeout) return "Wrong password"
-    if (reason === ConnectionFailReason.WifiNetworkLost) return "Network lost"
-    if (reason === ConnectionFailReason.WifiClientDisconnected) return "Disconnected"
-    if (reason === ConnectionFailReason.WifiClientFailed) return "Connection failed"
-    return "Failed to connect"
+    return Model.connectionFailureReason(reason, ConnectionFailReason)
   }
 
   function toggleWifi() {

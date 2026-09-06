@@ -18,10 +18,16 @@ Deno.test("player metadata and actions", async (t) => {
     })
   }
 
+  assertEquals(MediaModel.playerCanControl({ canPause: true }), true)
+  assertEquals(MediaModel.isProxyPlayer({ desktopEntry: "playerctld" }), true)
   assertEquals(MediaModel.canHandleAction({ canTogglePlaying: true }, "playPause"), true)
   assertEquals(MediaModel.canHandleAction({ canGoNext: true }, "next"), true)
+  assertEquals(MediaModel.canHandleAction({ canGoPrevious: true }, "previous"), true)
+  assertEquals(MediaModel.canHandleAction({ canPlay: true }, "play"), true)
+  assertEquals(MediaModel.canHandleAction({ canPause: true }, "pause"), true)
   assertEquals(MediaModel.canHandleAction({ canGoNext: true }, "previous"), false)
   assertEquals(MediaModel.playerKey({ dbusName: "org.mpris.MediaPlayer2.spotify" }), "org.mpris.MediaPlayer2.spotify")
+  assertEquals(MediaModel.playerKey({ desktopEntry: "spotify" }), "spotify")
 })
 
 Deno.test("sourcePlayers orders playing real players first without mutation", () => {
@@ -51,8 +57,20 @@ Deno.test("activePlayer follows playback before a paused explicit source", () =>
   assertEquals(MediaModel.activePlayer([], ""), null)
 })
 
+Deno.test("player lookups resolve selectable and actionable fallbacks", () => {
+  const paused = { identity: "Paused", dbusName: "paused", canPlay: true }
+  const playing = { identity: "Playing", dbusName: "playing", isPlaying: true, canGoNext: true }
+  assertEquals(MediaModel.playerForKey([paused, playing], "playing"), playing)
+  assertEquals(MediaModel.playerForKey([paused], "missing"), null)
+  assertEquals(MediaModel.selectablePlayer([paused], "paused"), paused)
+  assertEquals(MediaModel.selectablePlayer([{ dbusName: "empty" }], "empty"), null)
+  assertEquals(MediaModel.playerForAction([paused, playing], [paused, playing], paused, "next", "missing"), playing)
+  assertEquals(MediaModel.playerForAction([paused], [paused], paused, "play", "missing"), paused)
+})
+
 Deno.test("labels prefer the track and avoid repeating the source", () => {
   assertEquals(MediaModel.labelFor({ trackTitle: "Song", identity: "Spotify" }), "Song")
+  assertEquals(MediaModel.labelFor({ desktopEntry: "spotify" }), "spotify")
   assertEquals(MediaModel.detailFor({ trackArtist: "Artist", identity: "Spotify" }), "Artist")
   assertEquals(MediaModel.detailFor({ identity: "Spotify" }), "Spotify")
 })

@@ -6,6 +6,7 @@ import Quickshell.Services.Pam
 import Quickshell.Wayland
 
 import "../../Ui" as Ui
+import "LockModel.js" as Model
 
 Item {
   id: root
@@ -24,15 +25,32 @@ Item {
 
   readonly property bool locked: lockRequested || sessionLock.locked || sessionLock.secure
 
+  function authState() {
+    return {
+      lockRequested: lockRequested,
+      authenticating: authenticating,
+      pendingPassword: pendingPassword,
+      enteredPassword: enteredPassword,
+      failureMessage: failureMessage,
+      failedAttempts: failedAttempts,
+    }
+  }
+
+  function applyAuthState(state) {
+    lockRequested = state.lockRequested
+    authenticating = state.authenticating
+    pendingPassword = state.pendingPassword
+    enteredPassword = state.enteredPassword
+    failureMessage = state.failureMessage
+    failedAttempts = state.failedAttempts
+  }
+
   function beginLock() {
-    if (!passwordPamConfigured) return false
+    var transition = Model.begin(authState(), passwordPamConfigured, locked)
+    if (!transition.started) return false
     if (locked) return true
 
-    enteredPassword = ""
-    pendingPassword = ""
-    failureMessage = ""
-    failedAttempts = 0
-    lockRequested = true
+    applyAuthState(transition.state)
     sessionLock.locked = true
     blankTimer.restart()
     return true
@@ -40,24 +58,17 @@ Item {
 
   function finishUnlock() {
     if (passwordPam.active) passwordPam.abort()
-    lockRequested = false
-    authenticating = false
-    pendingPassword = ""
-    enteredPassword = ""
-    failureMessage = ""
+    applyAuthState(Model.unlocked(authState()))
     blankTimer.stop()
     sessionLock.locked = false
     wake()
   }
 
   function submitPassword(password) {
-    var value = String(password || "")
-    if (!lockRequested || authenticating || value.length === 0) return
+    var next = Model.submit(authState(), password)
+    if (!next) return
 
-    pendingPassword = value
-    enteredPassword = ""
-    failureMessage = ""
-    authenticating = true
+    applyAuthState(next)
     wake()
 
     if (!passwordPam.start()) failAuthentication()
@@ -71,17 +82,13 @@ Item {
 
   function failAuthentication() {
     if (!lockRequested) return
-    authenticating = false
-    pendingPassword = ""
-    enteredPassword = ""
-    failedAttempts += 1
-    failureMessage = "Authentication failed (" + failedAttempts + ")"
+    applyAuthState(Model.fail(authState()))
     wake()
   }
 
   // Repeated dpms-on forces a modeset and flashes the lock surface on every keypress.
   function dpms(on) {
-    if (dpmsProcess.running || blanked !== on) return
+    if (!Model.shouldSetDpms(dpmsProcess.running, blanked, on)) return
     blanked = !on
     dpmsProcess.command = Ui.Compositor.dpms(on)
     dpmsProcess.running = true
@@ -93,7 +100,7 @@ Item {
   }
 
   function blank() {
-    if (lockRequested && !authenticating) dpms(false)
+    if (Model.shouldBlank(authState())) dpms(false)
   }
 
   WlSessionLock {
@@ -101,13 +108,7 @@ Item {
     locked: false
 
     onLockStateChanged: {
-      if (!locked && root.lockRequested) {
-        root.lockRequested = false
-        root.authenticating = false
-        root.pendingPassword = ""
-        root.enteredPassword = ""
-        root.failureMessage = ""
-      }
+      if (!locked && root.lockRequested) root.applyAuthState(Model.cancelled(root.authState()))
     }
 
     WlSessionLockSurface {

@@ -26,30 +26,17 @@ Item {
     return Model.playerKey(player)
   }
 
-  function playerForKey(key) {
-    for (var index = 0; index < players.length; index++) {
-      var player = players[index]
-      if (Model.playerKey(player) === key) return player
-    }
-    return null
-  }
+  function playerForKey(key) { return Model.playerForKey(players, key) }
 
   function selectPlayer(key) {
-    var player = playerForKey(key)
-    if (!player || !(Model.hasMetadata(player) || Model.playerCanControl(player))) return false
+    var player = Model.selectablePlayer(players, key)
+    if (!player) return false
     preferredPlayerKey = Model.playerKey(player)
     return true
   }
 
   function playerForAction(action, targetKey) {
-    var targeted = playerForKey(targetKey)
-    if (Model.canHandleAction(targeted, action)) return targeted
-    if (Model.canHandleAction(activePlayer, action)) return activePlayer
-
-    for (var index = 0; index < sourcePlayers.length; index++) {
-      if (Model.canHandleAction(sourcePlayers[index], action)) return sourcePlayers[index]
-    }
-    return null
+    return Model.playerForAction(players, sourcePlayers, activePlayer, action, targetKey)
   }
 
   function runAction(action, targetKey) {

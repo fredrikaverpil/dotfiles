@@ -74,55 +74,27 @@ function expiresOverride(mode, period, overridePeriod) {
   return mode !== "auto" && overridePeriod !== "" && period !== overridePeriod
 }
 
-function demo() {
-  var assert = require("assert")
+function desiredTemperature(mode, period, nightTemperature, dayTemperature) {
+  if (mode === "on") return nightTemperature
+  if (mode === "off") return dayTemperature
+  if (period === "") return NaN
+  return period === "night" ? nightTemperature : dayTemperature
+}
 
-  assert.strictEqual(temperatureFromOutput("temperature: 4000\n"), 4000)
-  assert.strictEqual(temperatureFromOutput(""), null)
-  assert.strictEqual(isNightlight(4000), true)
-  assert.strictEqual(isNightlight(6500), false)
-  assert.strictEqual(isNightlight(null), false)
+function modeState(mode, period) {
+  return {
+    mode: mode,
+    overridePeriod: mode === "auto" ? "" : period,
+  }
+}
 
-  assert.deepStrictEqual(coordsFromZoneTab("+5920+01803\n"),
-    { latitude: 59 + 20 / 60, longitude: 18 + 3 / 60 })
-  assert.deepStrictEqual(coordsFromZoneTab("-3352-01827"),
-    { latitude: -(33 + 52 / 60), longitude: -(18 + 27 / 60) })
-  assert.deepStrictEqual(coordsFromZoneTab("+404251-0740023"),
-    { latitude: 40 + 42 / 60 + 51 / 3600, longitude: -(74 + 0 / 60 + 23 / 3600) })
-  assert.strictEqual(coordsFromZoneTab("nonsense"), null)
+function modeForPeriod(mode, period, overridePeriod) {
+  return expiresOverride(mode, period, overridePeriod) ? "auto" : mode
+}
 
-  var stockholm = { latitude: 59 + 20 / 60, longitude: 18 + 3 / 60 }
-  function minutesApart(a, b) { return Math.abs(a.getTime() - b.getTime()) / 60000 }
-
-  var midsummer = solarTimes(new Date("2024-06-21T12:00:00Z"), stockholm.latitude, stockholm.longitude)
-  assert.ok(minutesApart(midsummer.sunrise, new Date("2024-06-21T01:31:00Z")) < 5,
-    "midsummer sunrise: " + midsummer.sunrise.toISOString())
-  assert.ok(minutesApart(midsummer.sunset, new Date("2024-06-21T20:08:00Z")) < 5,
-    "midsummer sunset: " + midsummer.sunset.toISOString())
-
-  var midwinter = solarTimes(new Date("2024-12-21T12:00:00Z"), stockholm.latitude, stockholm.longitude)
-  assert.ok(minutesApart(midwinter.sunrise, new Date("2024-12-21T07:44:00Z")) < 5,
-    "midwinter sunrise: " + midwinter.sunrise.toISOString())
-  assert.ok(minutesApart(midwinter.sunset, new Date("2024-12-21T13:48:00Z")) < 5,
-    "midwinter sunset: " + midwinter.sunset.toISOString())
-
-  assert.strictEqual(solarPeriod(new Date("2024-06-21T12:00:00Z"), stockholm.latitude, stockholm.longitude), "day")
-  assert.strictEqual(solarPeriod(new Date("2024-06-21T21:00:00Z"), stockholm.latitude, stockholm.longitude), "night")
-  assert.strictEqual(solarPeriod(new Date("2024-12-21T12:00:00Z"), stockholm.latitude, stockholm.longitude), "day")
-  assert.strictEqual(solarPeriod(new Date("2024-12-21T15:00:00Z"), stockholm.latitude, stockholm.longitude), "night")
-
-  assert.strictEqual(solarTimes(new Date("2024-06-21T12:00:00Z"), 78.2, 15.6), null)
-  assert.strictEqual(solarPeriod(new Date("2024-06-21T12:00:00Z"), 78.2, 15.6), "day")
-  assert.strictEqual(solarPeriod(new Date("2024-12-21T12:00:00Z"), 78.2, 15.6), "night")
-  assert.strictEqual(solarPeriod(new Date(), NaN, NaN), "")
-
-  assert.strictEqual(expiresOverride("on", "day", "day"), false)
-  assert.strictEqual(expiresOverride("on", "night", "day"), true)
-  assert.strictEqual(expiresOverride("off", "day", "night"), true)
-  assert.strictEqual(expiresOverride("auto", "night", ""), false)
-  assert.strictEqual(expiresOverride("on", "day", ""), false)
-
-  console.log("ok")
+function applyDecision(currentTemperature, requestedTemperature, running) {
+  if (!isFinite(requestedTemperature) || currentTemperature === requestedTemperature) return "ignore"
+  return running ? "queue" : "start"
 }
 
 if (typeof module !== "undefined") {
@@ -133,7 +105,10 @@ if (typeof module !== "undefined") {
     coordsFromZoneTab: coordsFromZoneTab,
     solarTimes: solarTimes,
     solarPeriod: solarPeriod,
-    expiresOverride: expiresOverride
+    expiresOverride: expiresOverride,
+    desiredTemperature: desiredTemperature,
+    modeState: modeState,
+    modeForPeriod: modeForPeriod,
+    applyDecision: applyDecision,
   }
-  if (require.main === module) demo()
 }
