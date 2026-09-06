@@ -629,6 +629,65 @@ too, and a root file naming only `stow` silently un-prunes every plugin's
 under the VM's ceiling is untested; if the OOM returns, `workspace.maxPreload`
 and `workspace.preloadFileSize` are the next caps.
 
+## Strata, an unbuilt alternative to Dolphin
+
+[Strata](https://github.com/lgse/strata) (GPL-3.0, Rust/GTK4, v0.11.1 at the
+time of writing) is a keyboard-first file manager aimed at Omarchy — the same
+lineage as this session's keymap. It was investigated on 2026-09-06 as a
+replacement for `kdePackages.dolphin`, which is here only for its keyboard
+coverage and drags in KDE Frameworks 6 that nothing else in the session uses.
+**It is not installed.** What follows is so the next attempt does not redo the
+research.
+
+There is no `strata` in nixpkgs and no packaging PR open. Upstream ships a
+`curl | bash` installer and prebuilt glibc binaries; both are barred here (see
+the root `CLAUDE.md` on activation-time installers, and note the binaries
+cannot run on NixOS at all). So it has to be a from-source
+`rustPlatform.buildRustPackage`. These were verified against v0.11.1:
+
+- `src` = `fetchFromGitHub { owner = "lgse"; repo = "strata"; tag = "v0.11.1"; }`,
+  `hash = "sha256-kGrY/tSjlf/y16jUr01ZhZm71B5mIg/aN2M5Dqy/jns="`
+- `cargoHash = "sha256-nnO741Gb4E+wHTjAcuZfRWosGZwYhxVoaQ8CMw45eZ8="`
+- `nativeBuildInputs`: `pkg-config`, `glib` (build.rs calls
+  `glib-compile-resources` for the gresource bundle), `wrapGAppsHook4`
+- `buildInputs`: `gtk4`, `gtksourceview5`, `poppler` (the nixpkgs attribute is
+  poppler-glib), `fontconfig`, `wayland`
+- `bubblewrap` on PATH via `gappsWrapperArgs` — preview parsers are exec'd
+  under `bwrap` by bare name
+- `doCheck = false`; the suite wants a display and a session bus
+- the desktop entry and icon are not installed by `cargo`;
+  `data/io.github.lgse.Strata.desktop` and
+  `data/icons/scalable/apps/io.github.lgse.Strata.svg` need a `postInstall`.
+  `Exec=strata` is a bare command name, so PATH resolves it
+- optional at runtime, all skipped: ffmpeg/gst (video previews), gvfs-smb,
+  imagemagick or libraw (RAW previews)
+
+**What stopped it is the VM's RAM, not the packaging.** Strata's release
+profile is `lto = true` with `codegen-units = 1`. Four parallel rustc jobs at
+that setting exhaust 3.8 GB, and the OOM killer took the `nix`
+process out of the `app-ghostty-surface-transient-*.scope` — which presents as
+*the terminal crashed*, not as a build failure. Same ceiling as
+"lua_ls OOMs the VM" above; check `journalctl -k | grep oom-kill` before
+believing any heavy build died of its own accord. Note also that a `nix build`
+driven over SSH and a `sudo nixos-rebuild build` in the GUI compete for that
+same 3.8 GB — run one at a time.
+
+Two mitigations were written and then reverted, **neither one ever verified**
+by a completed build:
+
+- `env.CARGO_PROFILE_RELEASE_LTO = "thin"` plus
+  `CARGO_PROFILE_RELEASE_CODEGEN_UNITS = "16"` on the derivation, to replace
+  the one huge single-threaded link with bounded parallel ones
+- `zramSwap.enable = true` in `configuration.nix`. **This host has no swap of
+  any kind** and never has — `hardware-configuration.nix` has carried
+  `swapDevices = [ ]` since it was added, there is no swap partition on `vda`
+  and no swapfile, so the OOM killer has nothing to fall back on. Adding it is
+  chicken-and-egg: it does not exist until a switch, so the build that first
+  introduces it still runs swapless
+
+If it is picked up again, more RAM in UTM is the honest fix, and packaging it
+for nixpkgs rather than this host is the better home for the derivation.
+
 ## Hyprland config is Lua, not .conf
 
 hyprlang (`hyprland.conf`) is deprecated since 0.55 and removed in 0.57. The
