@@ -6,8 +6,7 @@ import Quickshell.Services.Pipewire
 import "../../../Ui" as Ui
 
 // Output volume, mute and the default-sink pick, straight off Quickshell's
-// PipeWire service -- no wpctl subprocess. Deliberately without Omarchy's
-// per-app stream mixer and input section; see wily-vm/CLAUDE.md.
+// PipeWire service. No per-app mixer, no input section.
 Ui.Panel {
   id: root
 
@@ -21,9 +20,8 @@ Ui.Panel {
     ? "󰝟"
     : volume < 0.34 ? "󰕿" : volume < 0.67 ? "󰖀" : "󰕾"
 
-  // One cursor for keyboard and mouse: -1 is the slider row, 0..n-1 the
-  // device rows. Hover moves it, the visuals read it, so only ever one
-  // highlight is on screen.
+  // One cursor for keyboard and mouse: -1 is the slider row, 0..n-1 the device
+  // rows. Hover moves it too, so only one highlight is ever on screen.
   property int cursor: -1
 
   cardWidth: 480
@@ -38,8 +36,7 @@ Ui.Panel {
     sink.audio.volume = Math.max(0, Math.min(1, value))
   }
 
-  // h/l is a no-op on a device row: moving the output volume from a row that
-  // is not the slider surprises people.
+  // No-op on a device row: only the slider row changes the volume.
   function adjust(delta) { if (cursor < 0) setVolume(volume + delta) }
 
   function toggleMute() { if (sink && sink.audio) sink.audio.muted = !sink.audio.muted }
@@ -55,8 +52,7 @@ Ui.Panel {
     else setDefault(sinks[cursor])
   }
 
-  // Every open starts on the slider rather than wherever the last visit left
-  // the cursor.
+  // Every open starts on the slider.
   onShownChanged: if (shown) {
     cursor = -1
     keys.forceActiveFocus()
@@ -86,9 +82,8 @@ Ui.Panel {
     }
   }
 
-  // This panel keeps its own cursor instead of walking Qt's focus chain like
-  // the keyNavigation panels, so it takes the keys itself: h/l on the slider
-  // row changes a value, which a focus chain cannot express.
+  // Keeps its own cursor rather than using Ui.Panel's keyNavigation: h/l on
+  // the slider row changes a value, which a focus chain cannot express.
   Item {
     id: keys
     width: 0

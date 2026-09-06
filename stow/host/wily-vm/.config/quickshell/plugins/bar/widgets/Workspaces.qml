@@ -3,10 +3,9 @@ import Quickshell
 
 import "../../../Ui" as Ui
 
-// The visuals; the data comes from whichever compositor is up. The source is
-// loaded by URL rather than by type so the unused one is never compiled --
-// Quickshell.Hyprland connects on import, and there is no socket for it under
-// niri.
+// The visuals; the data comes from whichever compositor is up. Loaded by URL
+// rather than by type so the unused source is never compiled --
+// Quickshell.Hyprland connects on import, and under niri there is no socket.
 Item {
   id: root
 
@@ -14,9 +13,7 @@ Item {
   property color selection: "#3D4042"
   property real fontScale: 1
 
-  // 1..5 always shown, as Omarchy does, plus any further workspace that
-  // exists. niri numbers its workspaces per output from 1, so the same range
-  // reads the same way under both.
+  // 1..5 always shown, plus any further workspace that exists.
   function workspaceIds() {
     const ids = [1, 2, 3, 4, 5]
     const live = source.item ? source.item.ids : []

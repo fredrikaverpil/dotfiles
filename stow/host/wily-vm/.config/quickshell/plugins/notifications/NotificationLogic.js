@@ -1,6 +1,5 @@
-// Deliberately kept beside Omarchy's notification helper at the same path.
-// This lean version owns only state that remains useful after a notification's
-// D-Bus object is released; restart persistence and image archival are deferred.
+// Owns only the state that stays useful after a notification's D-Bus object is
+// released. No restart persistence or image archival.
 
 function asString(value) {
   return value === undefined || value === null ? "" : String(value)

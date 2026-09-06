@@ -2,16 +2,13 @@ import QtQuick
 
 import "../../../Ui" as Ui
 
-// The local equivalent of Omarchy's bar widget. Their movable layout makes
-// room for a scrolling track label and a mouse-only popup; this fixed,
-// keyboard-first bar keeps one 28px button that opens the media panel instead.
+// One 28px button that opens the media panel.
 Item {
   id: root
 
-  // This cannot be required: QML evaluates bindings before assigning required
-  // properties, and BarButton would log a transient undefined shell. Null is
-  // a real initial value; Loader creates the required child only after Bar.qml
-  // supplies the shell.
+  // Not `required`: QML evaluates bindings before assigning required
+  // properties, so BarButton would log a transient undefined shell. The Loader
+  // creates it only once Bar.qml has supplied one.
   property var shell: null
   readonly property bool mediaVisible: shell !== null && shell.media.hasMedia
 

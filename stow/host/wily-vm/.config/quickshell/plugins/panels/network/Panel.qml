@@ -9,9 +9,7 @@ import "../../services/network/NetworkModel.js" as Model
 
 // The view over plugins/services/network. Everything that talks to
 // NetworkManager or spawns a process lives in that service; this file lays it
-// out and takes the keyboard. Keep the panel deliberately smaller than
-// Omarchy's counterpart: the remaining extras wait for real hardware before
-// deciding which of their scripts are worth porting.
+// out and takes the keyboard.
 Ui.Panel {
   id: root
 
@@ -27,10 +25,9 @@ Ui.Panel {
     value: root.shown
   }
 
-  // The Wi-Fi list outgrows the card, and Qt does not scroll a Flickable to
-  // follow the focus chain. Map to `content`, not to the Flickable: the latter
-  // yields viewport coordinates, which compare against contentY almost but not
-  // quite correctly.
+  // Qt does not scroll a Flickable to follow the focus chain. Map to
+  // `content`, not the Flickable: the latter yields viewport coordinates,
+  // which compare against contentY almost but not quite correctly.
   readonly property var focusedItem: scroller.Window.activeFocusItem
   onFocusedItemChanged: {
     const item = focusedItem
@@ -251,15 +248,13 @@ Ui.Panel {
     height: 28
     radius: 4
     color: active ? root.shell.palette.sel : "transparent"
-    // `active` is the current state, `activeFocus` is where the keyboard is.
-    // The border carries the second so both stay readable at once.
+    // Fill is the current state, border is focus, so both read at once.
     border.color: button.activeFocus ? root.shell.palette.fg : root.shell.palette.dim
     border.width: 1
     opacity: available ? 1 : 0.45
 
-    // Visibility governs chain membership, `available` does not: every Wi-Fi
-    // action sets `busy`, and dropping the focused button out of the chain
-    // while its own action runs would strand the focus.
+    // Keyed on visibility, not `available`: every Wi-Fi action sets `busy`, and
+    // dropping the focused button from the chain mid-action would strand it.
     activeFocusOnTab: button.visible
     Keys.onReturnPressed: if (button.available) button.activated()
     Keys.onEnterPressed: if (button.available) button.activated()

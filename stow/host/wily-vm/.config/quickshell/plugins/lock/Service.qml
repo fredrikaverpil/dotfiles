@@ -1,6 +1,4 @@
-// Quickshell-native session lock. The component layout and IPC target mirror
-// Omarchy's lock plugin while intentionally deferring its fingerprint and
-// orphaned-session-lock recovery paths until the ThinkPad work begins.
+// Session lock. No fingerprint or orphaned-session-lock recovery.
 
 import QtQuick
 import Quickshell
@@ -38,9 +36,9 @@ Item {
     lockRequested = true
     sessionLock.locked = true
     // Nothing else arms the blank timer at lock time, so a lock nobody touches
-    // would never blank the output. Not `wake()`: its dpms(true) drives output
-    // churn while the lock surface is still being acquired, which crashes the
-    // shell with "Tried to show lockscreen surfaces without active lock".
+    // would never blank. Not `wake()`: its dpms(true) churns outputs while the
+    // lock surface is still being acquired, which crashes the shell with
+    // "Tried to show lockscreen surfaces without active lock".
     blankTimer.restart()
     return true
   }
@@ -88,9 +86,8 @@ Item {
 
   function dpms(on) {
     // Turning on an output that is already on forces a modeset, and wake() runs
-    // on every keystroke — so an unguarded dispatch flashes the lock screen
-    // black under typing. "on" is only needed while blanked, "off" only while
-    // not.
+    // on every keystroke, so an unguarded dispatch flashes the lock screen
+    // black under typing.
     if (dpmsProcess.running || blanked !== on) return
     blanked = !on
     dpmsProcess.command = Ui.Compositor.dpms(on)
@@ -111,8 +108,8 @@ Item {
     locked: false
 
     onLockStateChanged: {
-      // A compositor-side unlock outside the normal PAM success path must not
-      // leave stale authentication state in this long-lived shell process.
+      // A compositor-side unlock bypasses the PAM success path, which would
+      // otherwise leave stale auth state in this long-lived process.
       if (!locked && root.lockRequested) {
         root.lockRequested = false
         root.authenticating = false
@@ -157,8 +154,7 @@ Item {
     onError: root.failAuthentication()
   }
 
-  // The lock is taken after five idle minutes. Once secure, leave another five
-  // minutes before blanking the output; any lock-screen interaction wakes it.
+  // Another five minutes after the lock itself before blanking the output.
   Timer {
     id: blankTimer
     interval: 300000

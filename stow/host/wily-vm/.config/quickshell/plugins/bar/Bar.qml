@@ -37,7 +37,7 @@ Scope {
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.leftMargin: 4
-        // U+E900 in the vendored Omarchy icon font; see wily-vm/CLAUDE.md.
+        // U+E900 in the vendored omarchy icon font.
         label: "\ue900"
         fontFamily: "omarchy"
         onActivated: bar.shell.menu.toggle()
@@ -68,9 +68,6 @@ Scope {
         shell: bar.shell
       }
 
-      // Opens the launcher at its system level rather than owning a panel:
-      // that level already holds lock, idle, suspend, logout, reboot and
-      // shutdown, and SUPER + ESCAPE already goes there.
       Ui.BarButton {
         id: powerButton
         shell: bar.shell
@@ -121,9 +118,8 @@ Scope {
         onActivated: bar.shell.audio.toggle()
       }
 
-      // Indicators grow inward from here, so the buttons above keep their
-      // places at the right edge when one appears. Clicking restores the
-      // default, which is the only thing anyone wants from a coffee cup.
+      // Indicators grow inward from here, so the fixed buttons above keep
+      // their places at the right edge when one appears.
       Ui.BarButton {
         id: idleButton
         shell: bar.shell
@@ -135,10 +131,7 @@ Scope {
         onActivated: bar.shell.idle.setEnabled(true)
       }
 
-      // Only while a non-default layout is up, like the coffee: the shell is
-      // keyboard-first, so US needs no permanent slot to announce itself, and
-      // the launcher lists both layouts either way. Omarchy's widget instead
-      // shows the code at all times and cycles on click.
+      // Shown only while a non-default layout is up; clicking restores US.
       Ui.BarButton {
         id: keyboardButton
         shell: bar.shell

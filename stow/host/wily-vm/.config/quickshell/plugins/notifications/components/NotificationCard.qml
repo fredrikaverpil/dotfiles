@@ -1,6 +1,4 @@
-// Notification card shared by the live toast stack and recent-history panel.
-// Its path mirrors Omarchy's component so upstream visual and behavior changes
-// remain easy to compare without bringing in Omarchy's shared QML framework.
+// Shared by the live toast stack and the history panel.
 
 import QtQuick
 import QtQuick.Layouts
@@ -48,7 +46,7 @@ Rectangle {
 
   HoverHandler { id: hoverHandler }
 
-  // This is behind the content so an explicit action or close button wins.
+  // Behind the content, so an explicit action or the close button wins.
   MouseArea {
     anchors.fill: parent
     acceptedButtons: Qt.LeftButton | Qt.RightButton

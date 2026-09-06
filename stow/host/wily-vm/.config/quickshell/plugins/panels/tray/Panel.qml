@@ -6,17 +6,13 @@ import Quickshell.Services.SystemTray
 import "../../../Ui" as Ui
 import "../../bar/widgets/TrayModel.js" as TrayModel
 
-// A tray item's own menu. The app owns every row -- the label, the nesting,
-// what a click does -- and we own only how it is drawn, so this file is all
-// presentation over a QsMenuOpener.
+// A tray item's own menu: presentation over a QsMenuOpener, since the app owns
+// every row.
 //
-// The rows are drawn here rather than through QsMenuEntry.display(), which
-// renders a *platform* menu and is refused unless the shell root sets
-// `//@ pragma UseQApplication`. shell.qml does not, so display() is a silent
-// no-op ("Cannot display PlatformMenuEntry as quickshell was not started in
-// QApplication mode" in the log) and an app whose whole UI is submenus would
-// be unusable. Drawing them also means they get the palette and the panel's
-// keyboard chain for free.
+// Drawn here rather than through QsMenuEntry.display(), which renders a
+// platform menu and is a silent no-op unless the shell root sets
+// `//@ pragma UseQApplication`. Drawing them also gets the palette and the
+// panel's keyboard chain for free.
 Ui.Panel {
   id: root
 
@@ -40,8 +36,8 @@ Ui.Panel {
   cardHeight: 380
   keyNavigation: true
 
-  // The bar icon is a mouse-only affordance, so the menu needs a way in that
-  // is not a right click -- the launcher's Tray level calls the same path.
+  // The launcher's Tray level calls this too, since the bar icon's right click
+  // is mouse-only.
   IpcHandler {
     target: "tray"
 
@@ -80,26 +76,23 @@ Ui.Panel {
   function reset() {
     settling = false
     settleTimer.stop()
-    // Clear the reactive stack before tearing anything down, so no binding can
-    // read a partially-destroyed opener while this runs. Then destroy deepest
-    // first: an inner opener's menu entry is owned by its parent's children
-    // model, so destroying a parent first would invalidate an entry a still-
-    // live child opener references.
+    // Clear the reactive stack first, so no binding reads a half-destroyed
+    // opener. Then destroy deepest first: a parent's children model owns the
+    // inner opener's entry.
     const levels = stack
     stack = []
     for (let i = levels.length - 1; i >= 0; i--) levels[i].opener.destroy()
   }
 
   function openFor(trayItem) {
-    // Clicking the icon whose menu is already showing closes it, so a tray
-    // icon behaves like every other bar button (Ui/Panel.qml's toggle()).
-    // onShownChanged tears the stack down, so close() is the whole job.
+    // Clicking the icon whose menu is already showing closes it, like every
+    // other bar button. onShownChanged tears the stack down.
     if (shown && item === trayItem) {
       close()
       return
     }
-    // Reset before switching items: the root opener binds to the item's menu,
-    // so assigning a new item invalidates the old root's children immediately.
+    // The root opener binds to the item's menu, so assigning a new item
+    // invalidates the old root's children immediately.
     reset()
     item = trayItem
     if (!trayItem || !trayItem.hasMenu) return
@@ -107,9 +100,8 @@ Ui.Panel {
     open()
   }
 
-  // Changing level rebuilds the row delegates synchronously, so the next row
-  // lands under a cursor that has not moved. Ignore row clicks for a beat
-  // after each level change; a deliberate follow-up click is slower.
+  // Changing level rebuilds the delegates synchronously, so the next row lands
+  // under a cursor that has not moved. Ignore clicks for a beat.
   property bool settling: false
 
   function settle() {
@@ -145,9 +137,8 @@ Ui.Panel {
     height: parent.height - y
     clip: true
     contentHeight: rows.height
-    // Backing out of a level is Escape at the root, so Left is the only key
-    // that means "up one" everywhere. Panel.qml already spends Left on focus
-    // stepping, so this handler sits above it and takes Backspace instead.
+    // Panel.qml already spends Left on focus stepping, so this handler sits
+    // above it and takes Backspace too.
     Keys.onPressed: function (event) {
       if (event.key === Qt.Key_Backspace) {
         root.pop()
@@ -211,8 +202,8 @@ Ui.Panel {
             anchors.rightMargin: 8
             spacing: 8
 
-            // The app says whether a row is a checkbox or a radio; we decide
-            // what one looks like. Qt.Checked is 2, PartiallyChecked 1.
+            // The app says checkbox or radio; the look is ours. Qt.Checked is
+            // 2, PartiallyChecked 1.
             Text {
               width: 14
               color: root.shell.palette.fg

@@ -5,8 +5,7 @@ import Quickshell.Wayland
 
 import "../../Ui" as Ui
 
-// The wallpaper: the surface behind every window, and the picker that chooses
-// it.
+// The wallpaper surface and the picker that chooses it.
 Scope {
   id: background
 
@@ -16,19 +15,17 @@ Scope {
   function close() { picker.close() }
   function toggle() { picker.toggle() }
 
-  // Wallpaper. Images live in ~/Pictures/wallpapers — outside this repo, so
-  // nothing binary gets committed — and the pick is per mode, persisted as a
-  // path in ~/.local/state/wallpaper-{dark,light}. The gradient below shows
-  // through until a mode has been given a picture.
+  // Images live in ~/Pictures/wallpapers, outside this repo. The pick is per
+  // mode, persisted in ~/.local/state/wallpaper-{dark,light}; the gradient
+  // below shows through until a mode has one.
   readonly property string wallpaperDir: Quickshell.env("HOME") + "/Pictures/wallpapers"
   property list<string> wallpapers: []
   property string darkPick: ""
   property string lightPick: ""
   readonly property string wallpaper: shell.dark ? darkPick : lightPick
-  // The highlighted picture while the picker is open, so the background shows
-  // the pick before it is committed. Cleared on close, so Escape reverts.
-  // Debounced: each step otherwise queues a full-size decode, and arrowing
-  // through the grid then runs behind the keys.
+  // Previews the highlighted picture while the picker is open; cleared on
+  // close, so Escape reverts. Debounced, or each step queues a full-size
+  // decode and arrowing through the grid runs behind the keys.
   property string preview: ""
   readonly property string shownWallpaper: preview || wallpaper
 
@@ -119,9 +116,7 @@ Scope {
 
       // Two layers so a change crossfades. `loader` decodes the incoming
       // picture off-screen; only once it is in memory do the visible layers
-      // move -- the outgoing one down to `under`, the new one onto `over`,
-      // faded in from zero. Both visible layers are synchronous because
-      // everything they are given is already cached by then.
+      // move. Both are synchronous because what they get is already cached.
       Item {
         id: wall
         anchors.fill: parent
@@ -151,9 +146,9 @@ Scope {
           asynchronous: true
           visible: false
           // A cached picture is Ready the moment the source is assigned, so
-          // its status never changes and only sourceChanged runs -- hence
-          // both handlers, plus completion for the first picture of all.
-          // `swap` is idempotent, so a double call costs nothing.
+          // its status never changes and only sourceChanged runs -- hence both
+          // handlers, plus completion for the first picture. `swap` is
+          // idempotent.
           onStatusChanged: if (status === Image.Ready) wall.swap()
           onSourceChanged: if (status === Image.Ready) wall.swap()
           Component.onCompleted: if (status === Image.Ready) wall.swap()
@@ -179,8 +174,7 @@ Scope {
     }
   }
 
-  // The picker. Escape and Enter are on the grid rather than the panel,
-  // since the grid is what holds focus while it is open.
+  // Escape and Enter sit on the grid, which is what holds focus while open.
   Ui.Panel {
     id: picker
     shell: background.shell
@@ -243,7 +237,7 @@ Scope {
             anchors.margins: 2
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
-            // Thumbnails, not full decodes: the source images run to megabytes.
+            // Thumbnails: the source images run to megabytes.
             sourceSize.width: 480
             source: "file://" + modelData
           }

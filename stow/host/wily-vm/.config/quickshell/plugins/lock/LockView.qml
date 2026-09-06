@@ -1,5 +1,4 @@
-// Password lock surface. The shape follows Omarchy's LockView component, but
-// uses this shell's wallpaper and palette rather than Omarchy's theme module.
+// Password lock surface.
 
 import QtQuick
 

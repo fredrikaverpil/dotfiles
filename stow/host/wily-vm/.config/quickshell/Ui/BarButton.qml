@@ -1,16 +1,11 @@
 import QtQuick
 
-// Bar chrome, so every button hovers and reads the same. Keep an icon slot
-// independent of its glyph: the light and dark symbols have different font
-// advances, and a content-sized slot makes its neighbour jump on a toggle.
+// Fixed-width icon slot: glyphs differ in font advance, so a content-sized
+// slot would make neighbours jump on a toggle. A button hidden by `visible`
+// gives its slot back.
 //
-// A button hidden by `visible` gives its slot back, so an indicator that only
-// appears while its state is non-default costs nothing while it is off. See
-// the bar strategy in wily-vm/CLAUDE.md.
-//
-// One slot, two sources: an app-supplied image when it loads, the glyph
-// otherwise. Tray items are the only user of the image path -- their icon is
-// a pixmap the app chose, not something we can express in the Nerd Font.
+// Two sources for the slot: an app-supplied image when it loads, the glyph
+// otherwise. Only tray items use the image path.
 Rectangle {
   id: btn
 
@@ -18,15 +13,12 @@ Rectangle {
   property alias label: btnLabel.text
   property alias image: btnImage.source
   property string fontFamily: "JetBrainsMono Nerd Font"
-  // Nerd Font glyphs are drawn at their design size; a button labelled with
-  // letters instead needs to come down to fit the same 28px slot.
   property real fontSize: 14
-  // Overridable so a button can mark itself without taking a second slot;
-  // the tray raises it to `sel` for a NeedsAttention item.
+  // Overridable so a button can mark itself without taking a second slot; the
+  // tray raises it to `sel` for a NeedsAttention item.
   property color foreground: btn.shell.palette.fg
 
   signal activated
-  // Right click. The fixed buttons ignore it; a tray item opens its menu.
   signal secondary
 
   implicitWidth: visible ? 28 : 0
@@ -60,12 +52,8 @@ Rectangle {
     id: btnLabel
     anchors.centerIn: parent
     visible: !btnImage.visible
-    // Text centers its advance box, not the pixels it paints. Correct that
-    // horizontal difference so differently shaped Nerd Font glyphs share a
-    // visual centre in the fixed slot.
-    // The glyph's own advance width, not the button's fixed slot: the
-    // correction is between where Text puts the advance box and where the ink
-    // actually sits inside it.
+    // Text centers its advance box, not the ink. Correct the difference
+    // between the two so differently shaped glyphs share a visual centre.
     anchors.horizontalCenterOffset: btnLabel.implicitWidth / 2
       - (btnMetrics.tightBoundingRect.x + btnMetrics.tightBoundingRect.width / 2)
     color: btn.foreground

@@ -1,5 +1,4 @@
-// Theme-aware Polkit agent. This retains Omarchy's native Quickshell approach
-// and path while omitting its ThinkPad fingerprint and clamshell handling.
+// Polkit agent. No fingerprint or clamshell handling.
 
 import QtQuick
 import Quickshell

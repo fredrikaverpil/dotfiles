@@ -1,8 +1,5 @@
-// Quickshell-native org.freedesktop.Notifications service.
-//
-// This deliberately follows Omarchy's plugin path and public IPC shape. It
-// keeps the user-facing core (toast stack, actions, DND and persisted history)
-// while leaving its restart-persistence and image-archive machinery for later.
+// org.freedesktop.Notifications: toast stack, actions, DND and persisted
+// history. No restart persistence or image archival.
 
 import QtQuick
 import QtQuick.Layouts
@@ -126,8 +123,8 @@ Item {
   function handleNotification(notification) {
     var record
 
-    // A replacing client updates this object in place. The original record is
-    // therefore refreshed through its change signals rather than duplicated.
+    // A replacing client updates this object in place, so refresh the existing
+    // record through its change signals rather than duplicating it.
     for (var key in live) {
       if (live[key].notification === notification) {
         refresh(live[key])
@@ -137,8 +134,7 @@ Item {
 
     record = recordFor(notification)
 
-    // Critical messages remain visible; every other notification is recorded
-    // silently while DND is enabled.
+    // Critical stays visible; the rest are recorded silently under DND.
     if (doNotDisturb && notification.urgency !== NotificationUrgency.Critical) {
       addHistory(record)
       return
@@ -151,9 +147,8 @@ Item {
     sound.startDetached()
   }
 
-  // `live` is the tracker: `finish` drops the key as soon as the server closes
-  // the notification, so a stale record here means the object is already gone.
-  // Invoking an action closes it, which is how the action paths reach this.
+  // `finish` drops the key as soon as the server closes the notification, so a
+  // record missing from `live` means the object is already gone.
   function dismiss(record) {
     if (!record || !record.notification || !live[record.key]) return
     record.notification.dismiss()
@@ -206,18 +201,15 @@ Item {
 
   onDoNotDisturbChanged: saveState()
 
-  // FileView does not emit loaded for a missing first-run file. Mark the
-  // defaults writable immediately, then let a later load replace them when a
-  // persisted state already exists.
+  // FileView emits no loaded for a missing first-run file, so mark the
+  // defaults writable now and let a later load replace them.
   Component.onCompleted: {
     stateLoaded = true
     stateFile.reload()
   }
 
-  // Toast sound. A plain PipeWire playback stream, so the default sink's own
-  // volume and mute apply to it like any other audio -- muting the sink mutes
-  // this. Detached because a burst of notifications would otherwise drop every
-  // sound but the first: a Process plays one at a time.
+  // Detached: a Process plays one at a time, so a burst would otherwise drop
+  // every sound but the first.
   Process {
     id: sound
     command: ["pw-play", "--volume", String(root.soundVolume), root.soundPath]
@@ -299,8 +291,8 @@ Item {
     }
   }
 
-  // Full-screen, click-through overlay. A fixed-size surface avoids the
-  // compositor scaling a stale buffer while a toast is added or removed.
+  // A fixed-size surface avoids the compositor scaling a stale buffer while a
+  // toast is added or removed.
   PanelWindow {
     id: popupWindow
     visible: root.popupRows.length > 0
@@ -418,8 +410,8 @@ Item {
     }
   }
 
-  // Same shape as the panels' ChoiceButton: `active` is the setting, the
-  // border carries where the keyboard is, so both stay readable at once.
+  // Like the panels' ChoiceButton: fill is the setting, border is focus, so
+  // both read at once.
   component HeaderButton: Rectangle {
     id: button
 

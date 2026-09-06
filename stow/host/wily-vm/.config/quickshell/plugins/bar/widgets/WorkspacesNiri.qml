@@ -3,15 +3,13 @@ import Quickshell
 import Quickshell.Io
 
 // niri's workspace source for Workspaces.qml. Quickshell has no niri module,
-// so this reads the compositor's own event stream: one JSON object per line on
-// stdout, with the full current state sent up front, so no separate query is
-// needed at startup.
+// so this reads niri's event stream: one JSON object per line, with the full
+// current state sent up front.
 QtObject {
   id: root
 
-  // Everything exposed here is the per-output index, the number on the key and
-  // the one `focus-workspace` takes. niri's own `id` is a global counter that
-  // never renumbers, so the two diverge as soon as a workspace is dropped.
+  // Everything exposed here is the per-output index (the number on the key,
+  // and what `focus-workspace` takes), not niri's global `id` counter.
   property int focusedId: -1
   property var ids: []
   // niri workspace id -> index, so the events that carry only an id can be
@@ -50,18 +48,16 @@ QtObject {
     if (event.WorkspacesChanged) {
       setWorkspaces(event.WorkspacesChanged.workspaces)
     } else if (event.WorkspaceActivated) {
-      // Only the focused flag moves; the id set is unchanged. The event names
-      // the workspace by id, and a workspace new to us arrives with its own
-      // WorkspacesChanged.
+      // Only the focused flag moves; a workspace new to us arrives with its
+      // own WorkspacesChanged.
       var idx = root.idxById[event.WorkspaceActivated.id]
       if (event.WorkspaceActivated.focused && idx !== undefined) root.focusedId = idx
     } else if (event.WindowsChanged) {
       setWindows(event.WindowsChanged.windows)
     } else if (event.WindowOpenedOrChanged || event.WindowClosed
         || event.WindowLayoutsChanged) {
-      // Counting from a single event would need the window's previous
-      // workspace, which the event does not carry. Re-ask instead; these are
-      // not frequent enough for the extra process to matter.
+      // Counting incrementally would need the window's previous workspace,
+      // which the event does not carry.
       windowQuery.running = true
     }
   }
@@ -69,9 +65,8 @@ QtObject {
   property Process stream: Process {
     running: true
     command: ["niri", "msg", "-j", "event-stream"]
-    // The stream has been seen to end quietly while the compositor stays up,
-    // which strands the widget on its last state. Re-establishing it costs a
-    // full state resend, so a restart is also a resync.
+    // The stream can end quietly while the compositor stays up, stranding the
+    // widget. A restart resends full state, so it is also a resync.
     onExited: restart.start()
     stdout: SplitParser {
       onRead: function (line) {

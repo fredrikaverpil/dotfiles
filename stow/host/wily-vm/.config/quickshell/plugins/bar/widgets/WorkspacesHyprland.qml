@@ -2,9 +2,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 
-// Hyprland's workspace source for Workspaces.qml. Loaded by URL so that this
-// file, and the Quickshell.Hyprland import with it, is never compiled under
-// niri.
+// Hyprland's workspace source for Workspaces.qml, loaded by URL so the
+// Quickshell.Hyprland import is never compiled under niri.
 QtObject {
   readonly property int focusedId: Hyprland.focusedWorkspace
     ? Hyprland.focusedWorkspace.id

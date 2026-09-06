@@ -1,6 +1,4 @@
-// Scale arithmetic, ported from Omarchy's file at this path. Their brightness
-// and multi-display helpers are not here: both rows are dim on this hardware.
-// Run `node Model.js` for the self-check.
+// Scale arithmetic. Run `node Model.js` for the self-check.
 
 function normalizeScale(scale) {
   var n = parseFloat(String(scale || ""))
@@ -19,7 +17,7 @@ function gcd(a, b) {
 
 // Hyprland only accepts scales where the mode divides into whole logical
 // pixels, in 1/120 steps, so a clean scale is a divisor of gcd(w*120, h*120).
-// Rounds the request up to the nearest clean value, as upstream does.
+// Rounds the request up to the nearest clean value.
 function cleanScale(scale, width, height) {
   var requested = Number(scale)
   var modeWidth = Number(width)
@@ -84,8 +82,6 @@ function availableScales(scales, width, height) {
     .map(function (candidate) { return candidate.value })
 }
 
-// GTK draws its own UI at whole factors only, so a fractional monitor scale
-// still has to pick an integer here. Upstream persists the same rounding.
 // The two compositors' monitor queries folded into one shape. hyprctl lists
 // every monitor and flags the focused one; `niri msg -j focused-output`
 // answers with that one output directly, or null.
@@ -120,6 +116,8 @@ function focusedMonitor(raw, niri) {
   }
 }
 
+// GTK draws its own UI at whole factors only, so a fractional monitor scale
+// still has to pick an integer here.
 function gdkScale(scale) {
   var n = Number(scale)
   if (!isFinite(n) || n < 1) return 1

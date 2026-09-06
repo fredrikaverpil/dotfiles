@@ -4,9 +4,8 @@ import Quickshell.Io
 import "../../../Ui" as Ui
 import "../../services/media/MediaModel.js" as Model
 
-// The bar button and launcher both land here. Unlike Omarchy's right-click
-// popup, this is a normal keyboard-first panel: title, art, controls and
-// sources are all reachable through Ui.Panel's shared focus chain.
+// Title, art, controls and sources, all reachable through Ui.Panel's focus
+// chain. The bar button and the launcher both land here.
 Ui.Panel {
   id: root
 
@@ -180,9 +179,9 @@ Ui.Panel {
     }
   }
 
-  // Focus membership is keyed on visibility, never availability: an MPRIS
-  // player can change a capability while a button has focus, and dropping it
-  // from the chain then would strand the keyboard cursor.
+  // Keyed on visibility, never availability: an MPRIS player can change a
+  // capability while a button has focus, and dropping it from the chain then
+  // would strand the cursor.
   component ControlButton: Rectangle {
     property string label: ""
     property bool available: true
