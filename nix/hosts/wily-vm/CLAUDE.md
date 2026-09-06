@@ -45,12 +45,22 @@ Run the QML tools from the repository devshell (normally entered by direnv):
 qml-lint
 qml-test-js
 qml-test-qml
+hypr-test
 niri-validate  # Linux only
 ```
 
+Run the relevant checks before copying a shell change to the VM; they are
+manual gates, not CI jobs. `qml-test-js` covers every extracted pure JS model
+and must run for any shell logic change. Run `qml-lint` after every QML edit,
+`qml-test-qml` after changing a Qt-only component or its bindings, and
+`hypr-test` after changing `hyprland.lua`, `monitors.lua`, or the bind TSV
+contract. On Linux, run `niri-validate` after every `config.kdl` edit. Changes
+to `Ui/Compositor.qml` or a shared compositor feature require `qml-test-js`,
+`hypr-test`, and validation of the affected live compositor path.
+
 `stow/host/wily-vm/.config/quickshell/README.md` owns the tooling details.
 `qmlls` needs the devshell's `PATH` and `QML_IMPORT_PATH`, so launch Neovim
-from the repository. `Ui/qmldir` is tooling-only but must list every `Ui` file.
+from the repository. `Ui/qmldir` is tooling-only but must list every `Ui` QML type.
 
 LuaLS can exhaust the VM when rooted at the repository. The stowed
 `hypr/.luarc.json` makes the Hypr config a small workspace and supplies the
