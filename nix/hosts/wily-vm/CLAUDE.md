@@ -1697,6 +1697,49 @@ visible while Swedish is active. `niri validate` accepts the config and niri
 accepts the numeric layout action syntactically, but this feature has not run
 in a live niri session yet.
 
+## Clipboard
+
+`wl-clipboard` is in `desktop.nix` next to `grim`, and the reason it is
+declared there is worth knowing, because it cost time to establish.
+
+**Neovim's clipboard worked long before that line existed, and not because
+anything in `nix/` provided it.** The nixpkgs `neovim` wrapper is a shell
+script that appends its own `wl-clipboard` to `PATH` for the nvim process
+only:
+
+```sh
+$ readlink -f ~/.nix-profile/bin/nvim   # a wrapper, not the binary
+PATH=$PATH'/nix/store/…-wl-clipboard-2.3.0/bin'
+```
+
+So `provider#clipboard#Executable()` returns `wl-copy` inside nvim while
+`command -v wl-copy` finds nothing in a login shell. Grepping `nix/` for
+`wl-clipboard` and concluding the clipboard is broken is wrong twice over:
+window-to-window copy-paste is `wl_data_device_manager`, a compositor
+protocol that needs no binary at all, and nvim had a private copy regardless.
+The declared package exists so the *session* has `wl-copy` — systemd units and
+Quickshell's `execDetached` run with the session PATH and cannot see inside
+neovim's closure — and so that nvim's clipboard stops depending on a wrapper
+detail that a future `overrideAttrs` in `nix/shared/home/common.nix` would
+silently remove.
+
+Its first user is the menu's Screenshot row, which now saves *and* copies:
+`grim "$f" && wl-copy --type image/png < "$f"`. `wl-copy` does not sniff
+content, so the `--type` is required or the PNG lands on the clipboard as
+`text/plain`.
+
+Two behaviours to expect when testing over SSH: `wl-copy` forks and stays
+resident to serve the selection, so a plain `ssh … 'wl-copy …'` does not
+return until that process is killed — background it or `pkill -x wl-copy`
+afterwards. And `wl-paste --watch` sets `CLIPBOARD_STATE=sensitive` when the
+offer carries `x-kde-passwordManagerHint`, which is the hook any future
+history feature must honour so password-manager copies never reach disk.
+
+**There is no clipboard history and that is a decision, not a gap.** Neovim's
+registers cover it for the way this desktop is used. Omarchy's port
+(`shell/plugins/clipboard/`, ~1200 lines) and `cliphist` in nixpkgs are both
+available if that changes.
+
 ## Light and dark
 
 One key drives everything: `/org/gnome/desktop/interface/color-scheme` in
@@ -2071,9 +2114,10 @@ Hardware-blocked, so ThinkPad work:
 `omarchy.system-update` cannot port: it is pacman, same reason as the menu's
 Install / Remove / Update rows.
 
-Beyond the bar, also unported: `plugins/osd`, `clipboard` (wants
-`wl-clipboard`), `emojis`, `image-picker`, `reminders`, and the `wifiqr`,
-`dropbox`, `speedtest` and `disk-speedtest` panels.
+Beyond the bar, also unported: `plugins/osd`, `clipboard`, `emojis`,
+`image-picker`, `reminders`, and the `wifiqr`, `dropbox`, `speedtest` and
+`disk-speedtest` panels. Clipboard history is deliberate, not blocked --
+Neovim's own registers cover it; see "Clipboard".
 
 Half of Omarchy's tree cannot port: Install / Remove / Update are `pacman`
 operations, and on NixOS that is a rebuild. The root menu here is necessarily
@@ -2199,10 +2243,9 @@ smaller than theirs.
 - Keyboard layouts are `us,se`; see "Keyboard layout". Deliberately no `grp:`
   toggle in `kb_options`.
 - No OSD yet.
-- Two packages the Omarchy keymap and menu assume are not installed in
-  `desktop.nix`: `wl-clipboard` (clipboard history, share) and `slurp` (region
-  select, so `grim` can only take the whole screen). Menu rows and binds for
-  these stay dim until they land.
+- One package the Omarchy keymap and menu assume is not installed in
+  `desktop.nix`: `slurp` (region select, so `grim` can only take the whole
+  screen). Menu rows and binds for it stay dim until it lands.
   `hyprlock`, `hypridle` and `hyprpolkitagent` are deliberate omissions: the
   equivalents here are native Quickshell services.
 - The bar uses JetBrains Mono Nerd Font (`nix/shared/system/linux.nix` installs

@@ -266,6 +266,7 @@ in
     cliamp-desktop # its launcher entry; see the let-block above
     firefox
     grim # screenshots, for verifying the session over SSH
+    wl-clipboard
     signal-desktop
     zed-editor
     # proton-pass # unsupported on aarch64-linux; enable in the ThinkPad config
