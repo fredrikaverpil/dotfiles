@@ -504,7 +504,7 @@ data, and niri reads XCursor only.
 ### Verified in the VM
 
 Static checks: `niri-validate` on `config.kdl` (from the Linux devshell), the
-bind extractor against the real file (71 rows, no self-match), `node Model.js`,
+bind extractor against the real file (83 rows, no self-match), `node Model.js`,
 and evaluation of the whole host.
 
 Running under `wayland-session@niri.target`: UWSM launches niri, its user units
@@ -513,15 +513,21 @@ are all exported. Every niri branch that could be exercised works — the displa
 panel finds `Virtual-1`, the keyboard service switches US <-> SE, the workspace
 event stream runs and workspace actions land, and the portal appearance call
 answers. The display panel rendered correctly in a screenshot, with the menu
-mapped as an exclusive overlay.
+mapped as an exclusive overlay. Its real keyboard path is exercised too:
+`qs ipc call display open` gives the UTM keyboard to the focus chain, which
+traverses and activates a theme choice, and Escape closes the panel.
+
+The native lock works under niri. `qs ipc call lock lock` reached
+`locked:true, secure:true`; the UTM surface displayed, counted a wrong password
+as `auth failed (1)`, and unlocked with the real password. Afterwards IPC
+reported `locked:false, requested:false, secure:false` and Quickshell remained
+active.
 
 ### Not testable in the VM
 
 - **Nightlight.** The virtio output rejects gamma control outright:
   `gamma_control::Event::Failed`. wl-gammarelay-rs has nothing to drive.
 - Wi-Fi, Bluetooth, battery, brightness, and lid/resume — no such hardware.
-- Panel focus traversal and lock interaction need a real keyboard at the
-  console, not a screenshot.
 
 ### Quickshell's first start under niri raced WAYLAND_DISPLAY
 
@@ -1593,9 +1599,11 @@ level, so no OSD exists: volume feedback is that you can hear it.
   tracker binds to the whole sink list unconditionally, so the bar icon and the
   media keys work with the panel closed.
 - Volume steps 5% per key or IPC call; `setVolume` takes a percent.
-- Media keys are bound in both compositors to the same IPC calls, and both
+- Volume keys are bound in both compositors to the same audio IPC calls, and
   reach the shell while the screen is locked (Hyprland `{ locked = true,
-  repeating = true }`, niri `allow-when-locked=true`).
+  repeating = true }`, niri `allow-when-locked=true`). Playback keys use the
+  separate MPRIS `media` target; they are one-shot under niri rather than
+  repeating while held.
 - **Deliberately absent:** the per-app stream mixer (the bulk of Omarchy's
   1248-line panel) and the input/mic section. `Pipewire.defaultAudioSource` is
   ~20 lines away when a mic-mute key or a call habit makes it real.
@@ -1607,6 +1615,53 @@ Verified on the VM against `wpctl get-volume @DEFAULT_AUDIO_SINK@`: IPC
 up/down/mute/setVolume, and `h`/`l`/`m`/`j` from the keyboard. The Hyprland
 media binds are written but unexercised — the VM session runs niri, whose own
 binds passed `niri validate` and call the IPC verified above.
+
+## Media
+
+`plugins/services/media/Service.qml` is the MPRIS service, retaining Omarchy's
+path, `MediaModel.js` split and `media` IPC target. It watches
+`Quickshell.Services.Mpris` directly: a playing real player beats a
+`playerctld` proxy and a paused manual source, while an explicitly selected
+source wins if it is also playing. **`Mpris.players.values` is list-like, not
+reliably an `Array`** — `Array.isArray()` rejected the live ObjectModel and
+made a registered VLC player disappear. `MediaModel.sourcePlayers()` copies it
+by numeric index before filtering. The model keeps that policy and the
+capability checks Qt-free, so `qml-test-js` covers them without a D-Bus player.
+
+`BarWidget.qml` keeps the matching upstream path too, but follows this bar's
+fixed-button rule rather than Omarchy's movable, scrolling-label widget. It is
+a single conditional 28px play/pause button beside the clock, visible only with
+a title or artist, and opens `plugins/panels/media/Panel.qml`. That panel is the
+keyboard-first replacement for Omarchy's right-click popup: cover art, track
+metadata, previous/play-next controls and selectable sources all use
+`Ui.Panel`'s focus chain. The root launcher’s Media row is canonical; the bar
+is only its shortcut.
+
+`qs ipc call media open|close|toggle|status` drives the panel/service; `play`,
+`pause`, `playPause`, `previous`, `next` and `select <player-key>` control the
+active source. The standard playback keys are registered under both
+compositors, including at the lock screen. Verified with a temporary VLC MPRIS
+player on the VM: tagged title/artist/album reached `status`, the conditional
+bar glyph appeared beside the clock, the panel rendered its no-art fallback,
+and pause/play, previous and next all returned `ok` and changed playback state
+where applicable.
+
+Cover art was then verified against two live sources at once, VLC and a
+Chromium YouTube tab. **Both `mpris:artUrl` shapes load unchanged into
+`Image.source`**: Chromium hands over an extension-less temp file
+(`/tmp/.org.chromium.Chromium.pWgJBf`), which Qt sniffs by content, and VLC a
+percent-encoded path with a space in it
+(`.../artistalbum/wily-vm/VM%20checks/art.jpg`). No decoding or scheme handling
+is needed on our side. A flat grey tile is not a failure to chase: VLC's cached
+`art.jpg` here is a 330-byte solid square, and the `󰝚` fallback correctly stays
+hidden whenever `Image.status` is `Ready`. The same run covered the two-source
+list, `select` switching the active player, and capability gating — previous
+and next dim for Chromium (`canGoNext:false`) and go solid for VLC.
+
+Omarchy also matches MPRIS sources to PipeWire streams and emits OSD
+feedback. Those pieces are deliberately pruned: this shell has neither a
+per-app mixer nor an OSD, so guessing a player from a stream would only add
+policy without an interface to explain it.
 
 ## Keyboard layout
 
@@ -1958,9 +2013,9 @@ external app for what gets touched twice a year.
 
 The plumbing is in place — portals (`xdg-desktop-portal` + `-hyprland` +
 `-gtk`), pipewire/wireplumber and NetworkManager are all running, and the menu
-now covers apps, wallpaper, theme, nightlight, screenshots, power, notifications
-and the keybinding sheet. The dim rows in it are the shortest list of what is
-still missing.
+now covers apps, wallpaper, theme, nightlight, screenshots, media, power,
+notifications and the keybinding sheet. The dim rows in it are the shortest
+list of what is still missing.
 
 1. **Validate the network panel's Wi-Fi path on the ThinkPad** — scanning,
    signal strength, radio state, passphrase entry, connect, disconnect and
@@ -1979,8 +2034,8 @@ Upstream's default bar is data, in `config/omarchy/shell.json`: left `menu`,
 `workspaces`; centre `indicators`, `clock`, `keyboard-layout`, `weather`,
 `system-update`; right `tray`, `agents`, `bluetooth`, `network`, `audio`,
 `monitor`, `power`. Ours is menu, workspaces, clock, tray, audio, network,
-display, bell, power.
-None of the below is blocked on the two items above — pick freely.
+display, bell, power, plus a conditional media button beside the clock.
+None of the below is hardware-blocked — pick freely.
 
 Runnable on the VM today:
 
@@ -1994,7 +2049,6 @@ Runnable on the VM today:
   output-device picker are ported; see "Audio".
 - **`omarchy.microphone`** (`widgets/Microphone.qml`) — mute toggle, source
   volume on scroll.
-- **`omarchy.media`** (`plugins/services/media/`) — MPRIS track and cover art.
 - **`omarchy.keyboard-layout`** — ported in our own idiom; see "Keyboard
   layout".
 - **The clock popup** — ours is a bare `Text`. Upstream adds a month grid, ISO

@@ -98,6 +98,12 @@ binds {
     XF86AudioRaiseVolume allow-when-locked=true hotkey-overlay-title="Volume up" { spawn "qs" "ipc" "call" "audio" "up"; }
     XF86AudioLowerVolume allow-when-locked=true hotkey-overlay-title="Volume down" { spawn "qs" "ipc" "call" "audio" "down"; }
     XF86AudioMute allow-when-locked=true repeat=false hotkey-overlay-title="Mute" { spawn "qs" "ipc" "call" "audio" "mute"; }
+    XF86AudioNext allow-when-locked=true repeat=false hotkey-overlay-title="Next track" { spawn "qs" "ipc" "call" "media" "next"; }
+    Alt+XF86AudioPlay allow-when-locked=true repeat=false hotkey-overlay-title="Next track" { spawn "qs" "ipc" "call" "media" "next"; }
+    XF86AudioPause allow-when-locked=true repeat=false hotkey-overlay-title="Play/pause" { spawn "qs" "ipc" "call" "media" "playPause"; }
+    XF86AudioPlay allow-when-locked=true repeat=false hotkey-overlay-title="Play/pause" { spawn "qs" "ipc" "call" "media" "playPause"; }
+    XF86AudioPrev allow-when-locked=true repeat=false hotkey-overlay-title="Previous track" { spawn "qs" "ipc" "call" "media" "previous"; }
+    Alt+Shift+XF86AudioPlay allow-when-locked=true repeat=false hotkey-overlay-title="Previous track" { spawn "qs" "ipc" "call" "media" "previous"; }
 
     // Windows
     Mod+W hotkey-overlay-title="Close window" { close-window; }

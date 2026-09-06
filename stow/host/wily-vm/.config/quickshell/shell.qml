@@ -8,12 +8,14 @@ import "plugins/lock" as Lock
 import "plugins/menu" as Menu
 import "plugins/notifications" as Notifications
 import "plugins/panels/audio" as Audio
+import "plugins/panels/media" as Media
 import "plugins/panels/monitor" as Monitor
 import "plugins/panels/network" as Network
 import "plugins/panels/tray" as Tray
 import "plugins/polkit" as Polkit
 import "plugins/services/idle" as Idle
 import "plugins/services/keyboard" as Keyboard
+import "plugins/services/media" as MediaService
 import "plugins/services/network" as NetworkService
 import "plugins/services/nightlight" as Nightlight
 import "Ui" as Ui
@@ -30,6 +32,7 @@ ShellRoot {
   readonly property alias nightlight: nightlight
   readonly property alias idle: idle
   readonly property alias keyboard: keyboard
+  readonly property alias media: media
   readonly property alias display: display
   readonly property alias network: network
   readonly property alias networkService: networkService
@@ -214,6 +217,7 @@ ShellRoot {
     "trigger.emoji": { icon: "", label: "Emoji", enabled: false },
     "trigger.color": { icon: "󰃉", label: "Color picker", enabled: false },
     "trigger.share": { icon: "", label: "Share", enabled: false },
+    "media": { icon: media.icon, label: "Media", action: () => media.open() },
     // The bar's tray icons are mouse-only; every bar action is also a
     // launcher entry. Enter raises the app, which is the common case --
     // its own menu stays on the bar icon's right click.
@@ -287,6 +291,10 @@ ShellRoot {
     shell: root
   }
 
+  MediaService.Service {
+    id: mediaService
+  }
+
   Polkit.PolkitAgent {
     id: polkit
     shell: root
@@ -295,6 +303,12 @@ ShellRoot {
   Background.Background {
     id: background
     shell: root
+  }
+
+  Media.Panel {
+    id: media
+    shell: root
+    service: mediaService
   }
 
   Monitor.Panel {
