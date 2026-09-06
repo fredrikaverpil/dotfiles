@@ -1975,6 +1975,14 @@ without coupling the VM to their whole shell.
   own button and nothing else. (Omarchy falls back to focusing the sending app
   by class, which needs one of their scripts.)
 
+  **A toast also plays `message.oga`** from `sound-theme-freedesktop` through
+  `pw-play` (`startDetached`, so a burst does not swallow all but the first
+  sound). It is a plain PipeWire stream on the default sink, so the audio
+  panel's volume and mute govern it with no wiring of our own — muting the
+  sink mutes it. It follows the toast, not the notification: DND and
+  transience silence it exactly where they suppress the card. No sound in
+  history, and none for a replace-in-place refresh.
+
   **Nothing couples notifications to the lock**, here or in Omarchy, and it
   works out anyway — verified live. `ext-session-lock` renders above the
   overlay layer, so a toast arriving while locked is hidden rather than leaked;

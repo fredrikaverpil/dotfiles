@@ -247,6 +247,9 @@ in
     # two are not interchangeable -- each compositor gets its own.
     wl-gammarelay-rs
     libnotify # notify-send smoke tests and CLI desktop notifications
+    # The notification toast sound; the shell plays message.oga from it with
+    # pw-play. Present transitively via the KDE stack, declared so it stays.
+    sound-theme-freedesktop
     # GUI file manager; the launcher's apps provider picks up its .desktop
     # entry with no menu change. Pulls KDE Frameworks 6, and the rest of the
     # session has no KDE stack -- it is here for its keyboard coverage.
