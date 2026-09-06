@@ -22,6 +22,8 @@ Item {
   readonly property var palette: shell ? shell.palette : ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864" })
   readonly property string statePath: Quickshell.env("HOME") + "/.local/state/wily-notifications.json"
   readonly property int historyLimit: 10
+  readonly property string soundPath: "/run/current-system/sw/share/sounds/freedesktop/stereo/message.oga"
+  readonly property real soundVolume: 0.4
 
   property bool stateLoaded: false
   property bool doNotDisturb: false
@@ -146,6 +148,7 @@ Item {
     live[record.key] = record
     popupRows = [record].concat(popupRows)
     watch(record)
+    sound.startDetached()
   }
 
   // `live` is the tracker: `finish` drops the key as soon as the server closes
@@ -209,6 +212,15 @@ Item {
   Component.onCompleted: {
     stateLoaded = true
     stateFile.reload()
+  }
+
+  // Toast sound. A plain PipeWire playback stream, so the default sink's own
+  // volume and mute apply to it like any other audio -- muting the sink mutes
+  // this. Detached because a burst of notifications would otherwise drop every
+  // sound but the first: a Process plays one at a time.
+  Process {
+    id: sound
+    command: ["pw-play", "--volume", String(root.soundVolume), root.soundPath]
   }
 
   FileView {
