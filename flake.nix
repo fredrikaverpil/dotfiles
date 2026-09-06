@@ -158,6 +158,8 @@
                     (task "qml-lint" "qmllint -E $(find . -name '*.qml')")
                     (task "qml-test-js" "deno test --allow-read tests/")
                     (task "qml-test-qml" "QT_QPA_PLATFORM=offscreen qmltestrunner -input tests")
+                    pkgs.lua
+                    (task "hypr-test" "tests/hyprland_test.sh ../hypr/hyprland.lua")
                   ]
                   ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
                     pkgs.niri
