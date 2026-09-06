@@ -29,15 +29,13 @@ Item {
   readonly property bool enabled: stateLoaded && NightlightModel.isNightlight(temperature)
 
   function desiredTemperature() {
-    if (mode === "on") return nightTemperature
-    if (mode === "off") return dayTemperature
-    if (period === "") return NaN
-    return period === "night" ? nightTemperature : dayTemperature
+    return NightlightModel.desiredTemperature(mode, period, nightTemperature, dayTemperature)
   }
 
   function setMode(value) {
-    mode = value
-    overridePeriod = value === "auto" ? "" : period
+    var next = NightlightModel.modeState(value, period)
+    mode = next.mode
+    overridePeriod = next.overridePeriod
     apply(desiredTemperature())
   }
 
@@ -48,18 +46,19 @@ Item {
 
   function tick() {
     period = NightlightModel.solarPeriod(new Date(), latitude, longitude)
-    if (NightlightModel.expiresOverride(mode, period, overridePeriod)) mode = "auto"
+    mode = NightlightModel.modeForPeriod(mode, period, overridePeriod)
     reconciling = true
     probe.running = true
   }
 
   // Concurrent starts race for the compositor's gamma manager, so apply requests are serialized.
   function apply(temp) {
-    if (!isFinite(temp) || temperature === temp) return
+    var decision = NightlightModel.applyDecision(temperature, temp, applyProcess.running)
+    if (decision === "ignore") return
     root.temperature = temp
     root.stateLoaded = true
 
-    if (applyProcess.running) {
+    if (decision === "queue") {
       root.pendingTemperature = temp
       root.hasPendingTemperature = true
       return

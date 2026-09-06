@@ -9,6 +9,7 @@ import Quickshell.Wayland
 import "../../Ui" as Ui
 import "components"
 import "NotificationLogic.js" as NotificationLogic
+import "NotificationModel.js" as Model
 
 Item {
   id: root
@@ -28,28 +29,17 @@ Item {
   property var live: ({})
   property int nextKey: 0
 
-  function state() {
-    return JSON.stringify({
-      version: 1,
-      doNotDisturb: doNotDisturb,
-      history: historyRows
-    }, null, 2) + "\n"
-  }
+  function state() { return Model.stateText(doNotDisturb, historyRows) }
 
   function saveState() {
     if (stateLoaded) stateFile.setText(state())
   }
 
   function loadState(raw) {
-    var parsed = {}
-    try {
-      parsed = JSON.parse(String(raw || ""))
-    } catch (error) {
-      console.warn("notifications: ignoring invalid saved state:", error)
-    }
-
-    doNotDisturb = !!parsed.doNotDisturb
-    historyRows = Array.isArray(parsed.history) ? parsed.history.slice(0, historyLimit) : []
+    var saved = Model.loadedState(raw, historyLimit)
+    if (!saved.valid) console.warn("notifications: ignoring invalid saved state")
+    doNotDisturb = saved.doNotDisturb
+    historyRows = saved.history
     stateLoaded = true
   }
 
@@ -63,28 +53,12 @@ Item {
   }
 
   function replacePopup(record) {
-    var rows = popupRows.slice()
-    var index = rows.findIndex(function(row) { return row.key === record.key })
-    if (index < 0) return
-    rows[index] = record
-    popupRows = rows
+    popupRows = Model.replacePopup(popupRows, record)
   }
 
   function addHistory(record) {
-    if (record.transient) return
-
-    var saved = {
-      app: record.app,
-      appIcon: record.appIcon,
-      summary: record.summary,
-      body: record.body,
-      image: record.image,
-      urgency: record.urgency,
-      timestamp: record.timestamp
-    }
-    var rows = historyRows.slice()
-    rows.unshift(saved)
-    historyRows = rows.slice(0, historyLimit)
+    if (!record || record.transient) return
+    historyRows = Model.historyWith(historyRows, record, historyLimit)
     saveState()
   }
 
@@ -92,7 +66,7 @@ Item {
     if (!record || !live[record.key]) return
 
     delete live[record.key]
-    popupRows = popupRows.filter(function(row) { return row.key !== record.key })
+    popupRows = Model.withoutRecord(popupRows, record.key)
     addHistory(record)
   }
 
@@ -241,8 +215,7 @@ Item {
     }
 
     function setDnd(value: string): string {
-      var normalized = String(value || "").toLowerCase()
-      root.setDoNotDisturb(normalized === "true" || normalized === "1" || normalized === "on" || normalized === "yes")
+      root.setDoNotDisturb(Model.dndValue(value))
       return dndState()
     }
 

@@ -73,6 +73,32 @@ function activePlayer(players, preferredKey) {
   return playing || preferred || list[0] || null
 }
 
+function playerForKey(players, key) {
+  var count = players && typeof players.length === "number" ? players.length : 0
+  for (var index = 0; index < count; index++) {
+    var player = players[index]
+    if (playerKey(player) === key) return player
+  }
+  return null
+}
+
+function selectablePlayer(players, key) {
+  var player = playerForKey(players, key)
+  return player && (hasMetadata(player) || playerCanControl(player)) ? player : null
+}
+
+function playerForAction(players, source, active, action, targetKey) {
+  var targeted = playerForKey(players, targetKey)
+  if (canHandleAction(targeted, action)) return targeted
+  if (canHandleAction(active, action)) return active
+
+  var list = Array.isArray(source) ? source : []
+  for (var index = 0; index < list.length; index++) {
+    if (canHandleAction(list[index], action)) return list[index]
+  }
+  return null
+}
+
 if (typeof module !== "undefined") {
   module.exports = {
     playerKey: playerKey,
@@ -85,5 +111,8 @@ if (typeof module !== "undefined") {
     detailFor: detailFor,
     sourcePlayers: sourcePlayers,
     activePlayer: activePlayer,
+    playerForKey: playerForKey,
+    selectablePlayer: selectablePlayer,
+    playerForAction: playerForAction,
   }
 }
