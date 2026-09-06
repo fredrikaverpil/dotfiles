@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 
 import "widgets" as BarWidgets
+import "../services/media" as Media
 import "../../Ui" as Ui
 
 // The top bar, one per screen.
@@ -52,11 +53,19 @@ Scope {
       }
 
       Text {
+        id: clockLabel
         anchors.centerIn: parent
         color: bar.shell.palette.fg
         font.family: "JetBrainsMono Nerd Font"
         font.pixelSize: 14 * bar.shell.textScale
         text: Qt.formatDateTime(clock.date, "ddd d MMM  HH:mm:ss")
+      }
+
+      Media.BarWidget {
+        anchors.left: clockLabel.right
+        anchors.leftMargin: 6
+        anchors.verticalCenter: parent.verticalCenter
+        shell: bar.shell
       }
 
       // Opens the launcher at its system level rather than owning a panel:
