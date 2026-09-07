@@ -68,11 +68,14 @@ function setLayout(index) {
   return ["niri", "msg", "action", "switch-layout", String(index)]
 }
 
+var nightlightProbe = ["busctl", "--user", "get-property", "rs.wl-gammarelay", "/",
+  "rs.wl.gammarelay", "Temperature"]
+
 var nightlight = {
-  running: "pgrep -f 'wl-gammarelay-rs run' >/dev/null",
+  // pgrep -f would match the launching shell's own command line, so ask DBus instead.
+  running: nightlightProbe.join(" ") + " >/dev/null 2>&1",
   launch: "setsid uwsm-app -- wl-gammarelay-rs run",
   set: "busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Temperature q ",
   get: "busctl --user get-property rs.wl-gammarelay / rs.wl.gammarelay Temperature",
-  probe: ["busctl", "--user", "get-property", "rs.wl-gammarelay", "/",
-    "rs.wl.gammarelay", "Temperature"],
+  probe: nightlightProbe,
 }
