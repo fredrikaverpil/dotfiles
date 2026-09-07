@@ -16,6 +16,7 @@ PanelWindow {
   property bool keyNavigation: false
 
   default property alias content: column.data
+  readonly property alias contentSpacing: column.spacing
 
   function open() {
     if (shell && shell.registerPanel) shell.registerPanel(panel)

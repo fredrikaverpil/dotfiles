@@ -15,7 +15,7 @@ Item {
   id: root
 
   property var shell: null
-  readonly property var palette: shell ? shell.palette : ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864" })
+  readonly property var palette: shell ? shell.palette : ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864" }) // qmllint disable property-override
   readonly property string statePath: Quickshell.env("HOME") + "/.local/state/wily-notifications.json"
   readonly property int historyLimit: 10
   readonly property string soundPath: "/run/current-system/sw/share/sounds/freedesktop/stereo/message.oga"
@@ -29,10 +29,10 @@ Item {
   property var live: ({})
   property int nextKey: 0
 
-  function state() { return Model.stateText(doNotDisturb, historyRows) }
+  function stateText() { return Model.stateText(doNotDisturb, historyRows) }
 
   function saveState() {
-    if (stateLoaded) stateFile.setText(state())
+    if (stateLoaded) stateFile.setText(stateText())
   }
 
   function loadState(raw) {
@@ -336,7 +336,7 @@ Item {
     ListView {
       id: historyList
       width: parent.width
-      height: parent.height - historyHeader.height - historySeparator.height - 2 * parent.spacing
+      height: parent.height - historyHeader.height - historySeparator.height - 2 * historyPanel.contentSpacing
       clip: true
       spacing: 8
       model: root.historyRows

@@ -12,7 +12,8 @@ Item {
   property real fontScale: 1
 
   function workspaceIds() {
-    return Model.workspaceIds(source.item ? source.item.ids : [])
+    // Loader.item is typed QObject; every workspace source exposes ids.
+    return Model.workspaceIds(source.item ? source.item.ids : []) // qmllint disable missing-property
   }
 
   function focusWorkspace(id) {

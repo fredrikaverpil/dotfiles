@@ -6,7 +6,7 @@ import Quickshell
 Rectangle {
   id: root
 
-  property var palette: ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864" })
+  property var palette: ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864" }) // qmllint disable property-override
   property var row: ({})
   property var notification: null
   property bool toast: false
@@ -118,8 +118,8 @@ Rectangle {
 
       Rectangle {
         Layout.alignment: Qt.AlignTop
-        width: 20
-        height: 20
+        Layout.preferredWidth: 20
+        Layout.preferredHeight: 20
         radius: 4
         color: closeArea.containsMouse ? root.palette.sel : "transparent"
 
