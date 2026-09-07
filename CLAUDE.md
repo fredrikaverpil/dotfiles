@@ -89,6 +89,12 @@ To add a tool, add an entry to `packageTools.npmPackages` (a `{ package, bin }`
 pair), `packageTools.uvTools`, or `packageTools.llmAgents` (a package name from
 the `llm-agents` flake) at the appropriate config level, then rebuild.
 
+### Wily shell development (VM and ThinkPad)
+
+Read `nix/hosts/wily-vm/CLAUDE.md` before changing Quickshell or its compositor
+configurations. It owns the required local before/after checks, platform
+boundaries, and safe deployment process for `wily-vm` and the future `wily`.
+
 ### Neovim Configuration
 
 - Plugins are managed with `vim.pack` (no plugin-manager framework), pinned in
