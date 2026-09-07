@@ -4,8 +4,8 @@
 Intel (Lunar Lake). Keep the shell portable; machine-specific settings belong
 in the host's Nix/Stow configuration.
 
-Document constraints and rationale, not implementation inventories, previous
-states, or investigation history.
+Document constraints, rationale and gotchas, not implementation inventories or
+previous states.
 
 ## Architecture
 
