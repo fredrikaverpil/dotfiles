@@ -59,8 +59,22 @@ Scope {
         text: Qt.formatDateTime(clock.date, "ddd d MMM  HH:mm:ss")
       }
 
-      Media.BarWidget {
+      Ui.BarButton {
+        id: weatherButton
+        shell: bar.shell
         anchors.left: clockLabel.right
+        anchors.leftMargin: 6
+        anchors.verticalCenter: parent.verticalCenter
+        implicitWidth: 58
+        label: bar.shell.weatherService.ready
+          ? bar.shell.weatherService.icon + " " + bar.shell.weatherService.temperature
+          : bar.shell.weatherService.icon
+        onActivated: bar.shell.weather.toggle()
+        onSecondary: bar.shell.weatherService.refresh()
+      }
+
+      Media.BarWidget {
+        anchors.left: weatherButton.right
         anchors.leftMargin: 6
         anchors.verticalCenter: parent.verticalCenter
         shell: bar.shell
