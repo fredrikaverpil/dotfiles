@@ -78,6 +78,14 @@ from the shell on macOS.
   `Keyboard interactivity: exclusive` layer in `niri msg layers`, then use
   `wtype -k z`. Niri drops virtual-keyboard input before bind handling, so
   `wtype` cannot test compositor binds. Verified in both sessions.
+- Use `grim` to check how the shell looks. To check its internal state, use
+  `qs ipc` and `shell-smoke` instead. Crop screenshots to the area you need
+  with `-g`, for example `-g "0,0 1280x32"`, and use `-o` to select the output.
+  Capture cost depends on the area captured; changing the image format,
+  quality (`-q`), or scale (`-s`) does not reduce it. Hyprland reports layer
+  positions and sizes in `hyprctl layers -j`. Niri does not, so work out the
+  bar's position and size from `niri msg --json outputs` and the `barHeight`
+  value in `shell.qml`.
 - Report host/session, before/after results, existing diagnostics, and
   omissions. Ask the user to run Nix rebuilds; never run them yourself.
 
