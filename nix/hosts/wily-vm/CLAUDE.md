@@ -160,6 +160,9 @@ PID.
   creates a cycle.
 - Quickshell unsets systemd's sparse `PATH` to inherit the UWSM session path.
   Removing that breaks launcher entries and `uwsm-app`.
+- Every surface is operable from the keyboard alone. Panels take `keyNavigation`
+  for a plain focus chain, or drive their own cursor when the chain cannot
+  express the control (a slider). A control reachable only by pointer is a bug.
 - `Ui/Panel.qml` has a top-bar cutout so bar buttons can switch panels. Preserve
   focus-chain membership for visible but unavailable controls. The shell owns
   keyboard-layout state; compositor-side XKB toggles would desynchronize it.
