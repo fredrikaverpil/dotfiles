@@ -113,6 +113,8 @@ binds {
     Alt+Tab hotkey-overlay-title="Focus on next window" { focus-window-previous; }
 
     // Workspaces
+    Mod+O repeat=false hotkey-overlay-title="Overlay" { toggle-overview; }
+
     Mod+1 hotkey-overlay-title="Switch to workspace 1" { focus-workspace 1; }
     Mod+2 hotkey-overlay-title="Switch to workspace 2" { focus-workspace 2; }
     Mod+3 hotkey-overlay-title="Switch to workspace 3" { focus-workspace 3; }
