@@ -14,12 +14,14 @@ import "plugins/panels/media" as Media
 import "plugins/panels/monitor" as Monitor
 import "plugins/panels/network" as Network
 import "plugins/panels/tray" as Tray
+import "plugins/panels/weather" as Weather
 import "plugins/polkit" as Polkit
 import "plugins/services/idle" as Idle
 import "plugins/services/keyboard" as Keyboard
 import "plugins/services/media" as MediaService
 import "plugins/services/network" as NetworkService
 import "plugins/services/nightlight" as Nightlight
+import "plugins/services/weather" as WeatherService
 import "Ui" as Ui
 
 ShellRoot {
@@ -37,6 +39,8 @@ ShellRoot {
   readonly property alias networkService: networkService
   readonly property alias audio: audio
   readonly property alias tray: tray
+  readonly property alias weather: weather
+  readonly property alias weatherService: weatherService
 
   readonly property int barHeight: 32
   property var panels: []
@@ -166,6 +170,7 @@ ShellRoot {
     "trigger.color": { icon: "󰃉", label: "Color picker", enabled: false },
     "trigger.share": { icon: "", label: "Share", enabled: false },
     "media": { icon: media.icon, label: "Media", action: () => media.open() },
+    "weather": { icon: weatherService.icon, label: "Weather", action: () => weather.open() },
     "tray": { icon: "󰘔", label: "Tray", provider: "tray" },
     "setup": { icon: "", label: "Setup" },
     "setup.display": { icon: "󰍹", label: "Display", action: () => display.open() },
@@ -271,6 +276,16 @@ ShellRoot {
   Tray.Panel {
     id: tray
     shell: root
+  }
+
+  WeatherService.Service {
+    id: weatherService
+  }
+
+  Weather.Panel {
+    id: weather
+    shell: root
+    service: weatherService
   }
 
   Menu.Menu {
