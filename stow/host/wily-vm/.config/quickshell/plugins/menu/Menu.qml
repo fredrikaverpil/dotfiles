@@ -4,6 +4,7 @@ import Quickshell.Io
 import Quickshell.Services.SystemTray
 
 import "../bar/widgets/TrayModel.js" as TrayModel
+import "../services/weather/PlacesModel.js" as PlacesModel
 import "MenuModel.js" as Model
 
 import "../../Ui" as Ui
@@ -59,6 +60,19 @@ Ui.Panel {
       .map(entry => ({ label: entry.name, icon: "󰀻", image: menu.iconUrl(entry.icon), detail: detail || "", enabled: true, entry: entry }))
   }
 
+  function placeRows() {
+    const service = menu.shell.weatherService
+    return PlacesModel.places.map(place => ({
+      label: place.name,
+      icon: service.place === place.name ? "󰄬" : "󰖐",
+      image: "",
+      detail: place.country,
+      enabled: true,
+      entry: null,
+      action: () => service.setLocation(place.latitude, place.longitude, place.name),
+    }))
+  }
+
   IpcHandler {
     target: "menu"
 
@@ -68,14 +82,12 @@ Ui.Panel {
     function level(id: string): void { menu.open(id) }
   }
 
-  readonly property var rows: Model.rowsFor(
-    menu.items,
-    level,
-    input.text,
-    menu.binds,
-    function() { return menu.trayRows() },
-    function(detail) { return menu.appRows(detail) },
-  )
+  readonly property var rows: Model.rowsFor(menu.items, level, input.text, {
+    binds: function() { return menu.binds },
+    tray: function() { return menu.trayRows() },
+    apps: function(detail) { return menu.appRows(detail) },
+    places: function() { return menu.placeRows() },
+  })
 
   // ListView resets currentIndex after this handler runs.
   onRowsChanged: Qt.callLater(selectFirstEnabled)

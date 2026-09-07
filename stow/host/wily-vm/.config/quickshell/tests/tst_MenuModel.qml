@@ -35,13 +35,22 @@ TestCase {
 
   function test_row_selection_filters_providers_and_sorts_direct_descendants_first() {
     const apps = detail => [{ label: "Alacritty", detail, enabled: true, entry: {} }]
-    const trays = () => [{ label: "Network", enabled: true }]
     const binds = [{ chord: "SUPER + K", label: "Keybindings", enabled: true }]
+    const providers = {
+      apps,
+      binds: () => binds,
+      tray: () => [{ label: "Network", enabled: true }],
+    }
 
-    compare(Menu.rowsFor(items, "learn.keys", "k", binds, trays, apps), binds)
-    compare(Menu.rowsFor(items, "apps", "", binds, trays, apps), apps(""))
-    compare(Menu.rowsFor(items, "root", "a", binds, trays, apps).map(row => row.label), ["Apps", "Learn", "Dark", "Alacritty"])
-    compare(Menu.rowsFor(items, "root", "", binds, trays, apps).map(row => row.id), ["apps", "learn", "style"])
+    compare(Menu.rowsFor(items, "learn.keys", "k", providers), binds)
+    compare(Menu.rowsFor(items, "apps", "", providers), apps(""))
+    compare(Menu.rowsFor(items, "root", "a", providers).map(row => row.label), ["Apps", "Learn", "Dark", "Alacritty"])
+    compare(Menu.rowsFor(items, "root", "", providers).map(row => row.id), ["apps", "learn", "style"])
+    compare(Menu.rowsFor({ t: { label: "Tray", provider: "tray" } }, "t", "net", providers).map(row => row.label), ["Network"])
+
+    // A level naming a provider nobody registered is empty, not a dead menu.
+    compare(Menu.rowsFor({ gone: { label: "Gone", provider: "absent" } }, "gone", "", providers), [])
+    compare(Menu.rowsFor(items, "root", "", {}).map(row => row.id), ["apps", "learn", "style"])
   }
 
   function test_keyboard_movement_wraps_and_skips_disabled_rows() {

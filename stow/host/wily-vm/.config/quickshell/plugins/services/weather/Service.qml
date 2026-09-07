@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell.Io
 
+import "PlacesModel.js" as Places
 import "WeatherModel.js" as Model
 
 Item {
@@ -10,9 +11,9 @@ Item {
   // repository URL is one of the forms their terms accept.
   readonly property string userAgent: "wily-shell/1.0 github.com/fredrikaverpil/dotfiles"
 
-  property real latitude: Model.home.latitude
-  property real longitude: Model.home.longitude
-  property string place: Model.home.place
+  property real latitude: Places.home.latitude
+  property real longitude: Places.home.longitude
+  property string place: Places.home.name
   property var current: null
   property var days: []
   property bool failed: false
@@ -57,7 +58,7 @@ Item {
   }
 
   function resetLocation() {
-    setLocation(Model.home.latitude, Model.home.longitude, Model.home.place)
+    setLocation(Places.home.latitude, Places.home.longitude, Places.home.name)
   }
 
   // Cache plus If-Modified-Since is required by MET's terms; -w prints the

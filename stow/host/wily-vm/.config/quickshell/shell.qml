@@ -177,6 +177,7 @@ ShellRoot {
     "setup.network": { icon: "󰈀", label: "Network", action: () => network.open() },
     "setup.audio": { icon: "󰕾", label: "Audio", action: () => audio.open() },
     "setup.nightlight": { icon: "󰆔", label: "Nightlight", action: () => nightlight.toggle() },
+    "setup.weather": { icon: weatherService.icon, label: "Weather location", provider: "places" },
     "setup.keyboard": { icon: "󰌌", label: "Keyboard layout" },
     "setup.keyboard.us": {
       icon: keyboard.index === 0 ? "󰄬" : "󰌌",

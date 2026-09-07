@@ -52,29 +52,28 @@ function matches(row, query) {
     || (row.chord !== undefined && row.chord.toLowerCase().indexOf(value) >= 0)
 }
 
-function rowsFor(items, level, query, binds, trayRows, appRows) {
+// Every provider is a function of the detail column, so an unknown name is an
+// empty level rather than a dead menu.
+function rowsFrom(providers, name, detail) {
+  var source = (providers || {})[name]
+  return source ? source(detail || "") : []
+}
+
+function rowsFor(items, level, query, providers) {
   var item = items[level]
   var normalizedQuery = String(query || "").toLowerCase()
   var filterMatches = function(row) { return matches(row, normalizedQuery) }
 
-  if (item && item.provider === "binds") {
-    var bindRows = binds || []
-    return normalizedQuery.length === 0 ? bindRows : bindRows.filter(filterMatches)
-  }
-  if (item && item.provider === "tray") {
-    var tray = trayRows()
-    return normalizedQuery.length === 0 ? tray : tray.filter(filterMatches)
-  }
-  if (item && item.provider === "apps") {
-    var apps = appRows("")
-    return normalizedQuery.length === 0 ? apps : apps.filter(filterMatches)
+  if (item && item.provider !== undefined) {
+    var rows = rowsFrom(providers, item.provider, "")
+    return normalizedQuery.length === 0 ? rows : rows.filter(filterMatches)
   }
   if (normalizedQuery.length === 0) {
     return childrenOf(items, level).map(function(id) { return rowFor(items, id, level) })
   }
 
   var found = descendantsOf(items, level).map(function(id) { return rowFor(items, id, level) })
-  if (level === "root") found = found.concat(appRows("Apps"))
+  if (level === "root") found = found.concat(rowsFrom(providers, "apps", "Apps"))
   return found.filter(function(row) { return row.enabled && filterMatches(row) })
     .sort(function(a, b) { return (a.detail ? 1 : 0) - (b.detail ? 1 : 0) })
 }
