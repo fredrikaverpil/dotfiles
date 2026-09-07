@@ -164,7 +164,6 @@ in
 
   host.extraSystemPackages = with pkgs; [
     quickshell
-    hyprsunset
     niri
     wl-gammarelay-rs
     libnotify

@@ -13,7 +13,6 @@ Singleton {
   readonly property bool releaseExclusiveFocus: backend.releaseExclusiveFocus
   readonly property url workspaceSource: Qt.resolvedUrl("compositors/" + backend.workspaceComponent)
   readonly property string scaleConfig: Quickshell.env("HOME") + backend.scaleConfig
-  readonly property var nightlightBackend: backend.nightlight
 
   function dpms(on) { return backend.dpms(on) }
   function closeWindow() { return backend.closeWindow() }

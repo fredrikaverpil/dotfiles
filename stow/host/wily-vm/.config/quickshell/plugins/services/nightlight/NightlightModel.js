@@ -1,4 +1,17 @@
 
+var PROBE = ["busctl", "--user", "get-property", "rs.wl-gammarelay", "/",
+  "rs.wl.gammarelay", "Temperature"]
+
+// wl-gammarelay-rs drives zwlr_gamma_control_v1, which niri and Hyprland both implement.
+var backend = {
+  // pgrep -f would match the launching shell's own command line, so ask DBus instead.
+  running: PROBE.join(" ") + " >/dev/null 2>&1",
+  launch: "setsid uwsm-app -- wl-gammarelay-rs run",
+  set: "busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Temperature q ",
+  get: "busctl --user get-property rs.wl-gammarelay / rs.wl.gammarelay Temperature",
+  probe: PROBE,
+}
+
 var IDENTITY_TEMPERATURE = 6000
 
 var HORIZON = -0.833
