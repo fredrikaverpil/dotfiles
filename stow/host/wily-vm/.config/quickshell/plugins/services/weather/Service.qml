@@ -27,8 +27,15 @@ Item {
   readonly property string humidity: current && isFinite(current.humidity) ? Math.round(current.humidity) + "%" : ""
   readonly property int pollMinutes: Math.round(poll.interval / 60000)
 
+  // A switch made while the previous city is still in flight must not be
+  // dropped: the next scheduled poll can be an hour away.
+  property bool queued: false
+
   function refresh() {
-    if (fetch.running) return
+    if (fetch.running) {
+      queued = true
+      return
+    }
     fetch.command = fetchCommand()
     fetch.running = true
   }
@@ -44,6 +51,7 @@ Item {
     longitude = lon
     place = String(name || "").length > 0 ? String(name) : lat + ", " + lon
     current = null
+    days = []
     refresh()
     return true
   }
@@ -87,6 +95,12 @@ Item {
     id: fetch
     stdout: StdioCollector {
       onStreamFinished: root.apply(text)
+    }
+    // Deferred: `running` and the collector settle after this signal.
+    onExited: {
+      if (!root.queued) return
+      root.queued = false
+      Qt.callLater(root.refresh)
     }
   }
 
