@@ -24,10 +24,10 @@ Item {
   width: implicitWidth
   height: implicitHeight
 
-  // Loading by URL avoids importing Quickshell.Hyprland when niri has no Hyprland socket.
+  // Only the selected backend may import compositor-specific Quickshell modules.
   Loader {
     id: source
-    source: Ui.Compositor.niri ? "WorkspacesNiri.qml" : "WorkspacesHyprland.qml"
+    source: Ui.Compositor.workspaceSource
   }
 
   Row {

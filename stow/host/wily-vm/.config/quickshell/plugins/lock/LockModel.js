@@ -68,15 +68,3 @@ function shouldBlank(state) {
 function shouldSetDpms(running, blanked, on) {
   return !running && blanked === on
 }
-
-if (typeof module !== "undefined") {
-  module.exports = {
-    begin: begin,
-    submit: submit,
-    fail: fail,
-    unlocked: unlocked,
-    cancelled: cancelled,
-    shouldBlank: shouldBlank,
-    shouldSetDpms: shouldSetDpms,
-  }
-}

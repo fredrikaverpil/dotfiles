@@ -46,7 +46,9 @@ ShellRoot {
   }
 
   function claimPanel(panel) {
-    Model.panelsToClose(panels, panel).forEach(function(candidate) { candidate.close() })
+    for (const candidate of panels) {
+      if (candidate && candidate !== panel && candidate.shown) candidate.close()
+    }
   }
 
   property bool dark: true
@@ -148,7 +150,7 @@ ShellRoot {
     "apps": { icon: "󰀻", label: "Apps", provider: "apps" },
     "learn": { icon: "󰧑", label: "Learn" },
     "learn.keybindings": { icon: "", label: "Keybindings", provider: "binds" },
-    "learn.compositor": { icon: "", label: Ui.Compositor.niri ? "niri" : "Hyprland", enabled: false },
+    "learn.compositor": { icon: "", label: Ui.Compositor.name, enabled: false },
     "learn.nixos": { icon: "", label: "NixOS", enabled: false },
     "style": { icon: "", label: "Style" },
     "style.wallpaper": { icon: "", label: "Wallpaper", action: () => background.open() },

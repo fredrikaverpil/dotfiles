@@ -30,19 +30,3 @@ function observedTextScale(value) {
   var scale = parseFloat(String(value))
   return isFinite(scale) && scale > 0 ? scale : null
 }
-
-function panelsToClose(panels, claimed) {
-  return (Array.isArray(panels) ? panels : []).filter(function(panel) {
-    return panel && panel !== claimed && panel.shown
-  })
-}
-
-if (typeof module !== "undefined") {
-  module.exports = {
-    rgb: rgb,
-    kdeglobalsWrite: kdeglobalsWrite,
-    textScale: textScale,
-    observedTextScale: observedTextScale,
-    panelsToClose: panelsToClose,
-  }
-}

@@ -4,6 +4,7 @@ import Quickshell.Io
 
 import "../../../Ui" as Ui
 import "Model.js" as Model
+import "../../../Ui/compositors/Scale.js" as Scale
 
 Ui.Panel {
   id: root
@@ -14,10 +15,10 @@ Ui.Panel {
 
   readonly property var scalePresets: ["1", "1.25", "1.6", "2", "3", "4"]
   readonly property var scaleValues: focusedMonitor
-    ? Model.availableScales(scalePresets, focusedMonitor.width, focusedMonitor.height)
+    ? Ui.Compositor.availableScales(scalePresets, focusedMonitor.width, focusedMonitor.height)
     : []
   readonly property string currentScale: focusedMonitor
-    ? Model.normalizeScale(focusedMonitor.scale)
+    ? Scale.normalizeScale(focusedMonitor.scale)
     : ""
   readonly property var textScales: [0.8, 0.9, 1, 1.1, 1.25, 1.5]
 
@@ -29,13 +30,13 @@ Ui.Panel {
   }
 
   function setMonitorState(raw) {
-    focusedMonitor = Model.focusedMonitor(raw, Ui.Compositor.niri)
+    focusedMonitor = Ui.Compositor.focusedMonitor(raw)
   }
 
   function setScale(requested) {
     if (!focusedMonitor || scaleChanging) return
 
-    var scale = Model.cleanScale(requested, focusedMonitor.width, focusedMonitor.height)
+    var scale = Ui.Compositor.cleanScale(requested, focusedMonitor.width, focusedMonitor.height)
     if (!scale) return
 
     var refreshRate = Number(focusedMonitor.refreshRate)
@@ -161,13 +162,13 @@ Ui.Panel {
 
     ChoiceRow {
       options: root.scaleValues.map(value => ({
-        label: Model.cleanScale(value, root.focusedMonitor.width, root.focusedMonitor.height) + "×",
+        label: Ui.Compositor.cleanScale(value, root.focusedMonitor.width, root.focusedMonitor.height) + "×",
         value: value,
       }))
       selected: root.currentScale
       available: !root.scaleChanging && root.focusedMonitor !== null
       matches: (value, selected) => root.focusedMonitor
-        && Model.cleanScale(value, root.focusedMonitor.width, root.focusedMonitor.height) === selected
+        && Ui.Compositor.cleanScale(value, root.focusedMonitor.width, root.focusedMonitor.height) === selected
       onChosen: value => root.setScale(value)
     }
   }

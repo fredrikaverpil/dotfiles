@@ -32,19 +32,3 @@ function durationFor(notification, lowUrgency, criticalUrgency) {
   var minimum = notification.urgency === lowUrgency ? 5000 : 8000
   return Math.min(30000, Math.max(minimum, requested))
 }
-
-function displayTime(timestamp) {
-  var date = new Date(Number(timestamp))
-  if (isNaN(date.getTime())) return ""
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-}
-
-if (typeof module !== "undefined") {
-  module.exports = {
-    asString: asString,
-    iconSource: iconSource,
-    snapshotOf: snapshotOf,
-    durationFor: durationFor,
-    displayTime: displayTime
-  }
-}

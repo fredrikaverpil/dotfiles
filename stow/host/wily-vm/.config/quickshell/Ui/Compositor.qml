@@ -2,32 +2,42 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
-
+import Quickshell.Io
 import "CompositorModel.js" as Model
 
 Singleton {
   id: root
 
-  readonly property bool niri: !!Quickshell.env("NIRI_SOCKET")
+  readonly property var backend: Model.select(Quickshell.env)
+  readonly property string name: backend.name
+  readonly property bool releaseExclusiveFocus: backend.releaseExclusiveFocus
+  readonly property url workspaceSource: Qt.resolvedUrl("compositors/" + backend.workspaceComponent)
+  readonly property string scaleConfig: Quickshell.env("HOME") + backend.scaleConfig
+  readonly property var nightlightBackend: backend.nightlight
 
-  function dpms(on) { return Model.dpms(niri, on) }
+  function dpms(on) { return backend.dpms(on) }
+  function closeWindow() { return backend.closeWindow() }
+  function focusWorkspace(id) { return backend.focusWorkspace(id) }
+  function outputs() { return backend.outputs() }
+  function focusedMonitor(raw) { return backend.focusedMonitor(raw) }
+  function setScale(name, mode, scale) { return backend.setScale(name, mode, scale) }
+  function cleanScale(scale, width, height) { return backend.cleanScale(scale, width, height) }
+  function availableScales(scales, width, height) { return backend.availableScales(scales, width, height) }
+  function scaleEdits(scale, gdkScale) { return backend.scaleEdits(scale, gdkScale) }
+  function layoutQuery() { return backend.layoutQuery() }
+  function currentLayout(raw) { return backend.currentLayout(raw) }
+  function setLayout(index) { return backend.setLayout(index) }
 
-  function closeWindow() { return Model.closeWindow(niri) }
+  IpcHandler {
+    target: "compositor"
 
-  function focusWorkspace(id) { return Model.focusWorkspace(niri, id) }
-
-  function outputs() { return Model.outputs(niri) }
-
-  function setScale(name, mode, scale) { return Model.setScale(niri, name, mode, scale) }
-
-  readonly property string scaleConfig: Quickshell.env("HOME") +
-    (niri ? "/.config/niri/config.kdl" : "/.config/hypr/monitors.lua")
-
-  function scaleEdits(scale, gdkScale) { return Model.scaleEdits(niri, scale, gdkScale) }
-
-  function layoutQuery() { return Model.layoutQuery(niri) }
-
-  function setLayout(index) { return Model.setLayout(niri, index) }
-
-  readonly property var nightlightBackend: Model.nightlightBackend(niri)
+    function status(): string {
+      return JSON.stringify({
+        id: root.backend.id,
+        name: root.name,
+        workspaceSource: root.workspaceSource.toString(),
+        releaseExclusiveFocus: root.releaseExclusiveFocus
+      })
+    }
+  }
 }

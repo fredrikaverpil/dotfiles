@@ -4,7 +4,6 @@ import Quickshell
 import Quickshell.Io
 
 import "../../../Ui" as Ui
-import "KeyboardModel.js" as KeyboardModel
 
 Item {
   id: root
@@ -32,7 +31,7 @@ Item {
     stdout: StdioCollector {
       waitForEnd: true
       onStreamFinished: {
-        const read = KeyboardModel.currentIndex(text, Ui.Compositor.niri)
+        const read = Ui.Compositor.currentLayout(text)
         if (read >= 0 && read < root.codes.length) root.index = read
       }
     }
