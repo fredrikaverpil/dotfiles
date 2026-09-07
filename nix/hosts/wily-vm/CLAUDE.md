@@ -1,4 +1,4 @@
-# Wily desktop
+# Wily desktop VM
 
 `wily-vm` is the NixOS development VM for the future `wily` ThinkPad T14 Gen 6
 Intel (Lunar Lake). Keep the shell portable; machine-specific settings belong
@@ -15,11 +15,13 @@ previous states.
   lock inhibitor. `stow/host/wily-vm/` owns compositor configuration and QML.
 - `shell.qml` wires services and surfaces. Views belong in `plugins/panels/`;
   daemon/process state belongs in `plugins/services/`.
-- `Ui/Compositor.qml` selects a named backend registered in `CompositorModel.js`.
-  `Ui/compositors/` owns commands, response parsing, scaling/focus policies, and
-  workspace sources. Views use that interface, not compositor-identity booleans.
-  Keep scheduling and shared state above it; no speculative plugin framework.
-- Prefer purpose-built applications to large bespoke panels for infrequent tasks.
+- `Ui/Compositor.qml` selects a named backend registered in
+  `CompositorModel.js`. `Ui/compositors/` owns commands, response parsing,
+  scaling/focus policies, and workspace sources. Views use that interface, not
+  compositor-identity booleans. Keep scheduling and shared state above it; no
+  speculative plugin framework.
+- Prefer purpose-built applications to large bespoke panels for infrequent
+  tasks.
 - Selection requires exactly one session marker: `NIRI_SOCKET` or
   `HYPRLAND_INSTANCE_SIGNATURE`. Missing/ambiguous markers are errors, never an
   implicit Hyprland fallback.
@@ -27,17 +29,21 @@ previous states.
   Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Hyprland Lua option names use underscores even where `hyprctl` prints hyphens.
   Use the LuaLS stub. Niri KDL booleans are presence-only, not `option true`.
-- Read the relevant Omarchy source before changing a ported feature:
-  `~/code/public/github.com/omacom/omarchy`. Complementary references are
-  `~/code/public/github.com/caelestia-dots/shell` and
-  `~/code/public/github.com/AvengeMedia/DankMaterialShell`.
+- Read the relevant Omarchy source before changing a ported feature (and
+  `git pull` its source before reading):
+  `~/code/public/github.com/omacom/omarchy`. Complementary references are:
+  - `~/code/public/github.com/caelestia-dots/shell`
+  - `~/code/public/github.com/AvengeMedia/DankMaterialShell`
+  - `~/code/public/github.com/0xbbuddha/dotfiles_nothing_os`.
 
 ## Required local validation
 
 Run relevant checks **before and after editing**, on the correct platform.
-These are development gates, not CI jobs. Use the repository devshell (`direnv`
-or `nix develop ~/.dotfiles -c <command>`) from
-`stow/host/wily-vm/.config/quickshell/`, which holds `tests/`.
+These are development gates, not CI jobs. They live only in the repository's
+default devshell (`flake.nix`), entered by `direnv` at the repo root or run as
+`nix develop ~/.dotfiles -c <command>` (not `#dev`) from anywhere in the
+checkout. `compositor-test` and `shell-smoke` are Linux-only and are absent
+from the shell on macOS.
 
 | Change | Checks |
 | --- | --- |
@@ -63,8 +69,8 @@ or `nix develop ~/.dotfiles -c <command>`) from
 - Smoke checks do not prove focus, object lifetime, authentication, daemon
   recovery, or physical input. Exercise affected paths explicitly. Agree on a
   recovery path before lock/PAM, suspend, DPMS-off, or connectivity tests.
-- Report host/session, before/after results, existing diagnostics, and omissions.
-  Ask the user to run Nix rebuilds; never run them yourself.
+- Report host/session, before/after results, existing diagnostics, and
+  omissions. Ask the user to run Nix rebuilds; never run them yourself.
 
 ### Tests
 
@@ -72,29 +78,32 @@ or `nix develop ~/.dotfiles -c <command>`) from
   parsing, transforms, and transitions; inline trivial single-use bindings.
   There is no independent JS consumer here, so no Deno/Node/Bun test suite or
   CommonJS export guards.
-- QtTest can test Qt-only components, but all transitive imports must be Qt-only.
-  Quickshell's native types are linked into its executable, not loadable through
-  its installed metadata. Even `Ui/BarButton.qml` shares the Quickshell-dependent
-  `Compositor` singleton's module. Do not mock Quickshell to cross this boundary.
+- QtTest can test Qt-only components, but all transitive imports must be
+  Qt-only. Quickshell's native types are linked into its executable, not
+  loadable through its installed metadata. Even `Ui/BarButton.qml` shares the
+  Quickshell-dependent `Compositor` singleton's module. Do not mock Quickshell
+  to cross this boundary.
 - `compare()` handles objects/arrays but tolerates small numeric differences.
   Use `verify(actual === expected)` for exact values/identity and `fuzzyCompare`
   for explicit tolerances. Do not compare objects via JSON serialization.
-- `compositor-test` checks real scale-config anchors, Hyprland's Lua/TSV contract
-  with an `hl` spy and temporary `HOME`, and niri's KDL. It does not test dispatch.
+- `compositor-test` checks real scale-config anchors, Hyprland's Lua/TSV
+  contract with an `hl` spy and temporary `HOME`, and niri's KDL. It does not
+  test dispatch.
 
 ### Tooling
 
 - `qml-lint` fails on any warning. Shadowing an Item member that is public API
-  (`palette`, IPC-visible `enabled`) or a lookup on an untyped `Loader.item` gets
-  an inline `// qmllint disable <category>`; anything else gets fixed.
+  (`palette`, IPC-visible `enabled`) or a lookup on an untyped `Loader.item`
+  gets an inline `// qmllint disable <category>`; anything else gets fixed.
 - Use the devshell's pinned Qt tools, not Mason's standalone `qmlls`. Launch
   Neovim from the repo so it inherits `PATH` and `QML_IMPORT_PATH`. The flake
   supplies both Qt imports and Quickshell metadata; deployed Qt must match the
   pin after updates. `qml-test` clears the GTK platform theme for offscreen SSH.
 - `Ui/qmldir` must list new QML types in `Ui/` for tooling. `.qmllint.ini` is
   shared by the editor and CLI.
-- Keep `hypr/.luarc.json`: rooting LuaLS at the entire repository can exhaust the
-  VM. Hyprland watches only `hyprland.lua`; changes to `monitors.lua` need reload.
+- Keep `hypr/.luarc.json`: rooting LuaLS at the entire repository can exhaust
+  the VM. Hyprland watches only `hyprland.lua`; changes to `monitors.lua` need
+  reload.
 
 ## Deployment safety
 
@@ -137,7 +146,8 @@ systemctl --user restart quickshell.service
 For ordinary `qs ipc` and compositor commands over SSH, provide the active
 session's `XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY`, and compositor socket/signature
 from `systemctl --user show-environment`. Missing display context can make live
-Quickshell instances appear dead. `shell-smoke` avoids that by selecting the PID.
+Quickshell instances appear dead. `shell-smoke` avoids that by selecting the
+PID.
 
 ## Session and hardware constraints
 
@@ -152,8 +162,8 @@ Quickshell instances appear dead. `shell-smoke` avoids that by selecting the PID
   keyboard-layout state; compositor-side XKB toggles would desynchronize it.
 - Tray submenus require one live opener per level. `QsMenuEntry.display()` needs
   a platform menu this shell does not have.
-- UTM has one virtio output, no Wi-Fi/Bluetooth, battery, backlight, lid, touchpad,
-  fingerprint reader, or hardware cursor plane.
+- UTM has one virtio output, no Wi-Fi/Bluetooth, battery, backlight, lid,
+  touchpad, fingerprint reader, or hardware cursor plane.
 - UTM pauses time while macOS sleeps; keep chrony. Its old virgl OpenGL requires
   software rendering for Ghostty. macOS captures some SUPER chords; distinguish
   host key capture from compositor bind failures.
