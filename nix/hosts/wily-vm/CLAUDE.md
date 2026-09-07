@@ -15,6 +15,9 @@ previous states.
   lock inhibitor. `stow/host/wily-vm/` owns compositor configuration and QML.
 - `shell.qml` wires services and surfaces. Views belong in `plugins/panels/`;
   daemon/process state belongs in `plugins/services/`.
+- Nightlight is not compositor-specific: both sessions drive wl-gammarelay-rs
+  over `zwlr_gamma_control_v1`, so its commands live in the nightlight
+  service, not the compositor backends. Do not reintroduce hyprsunset.
 - `Ui/Compositor.qml` selects a named backend registered in
   `CompositorModel.js`. `Ui/compositors/` owns commands, response parsing,
   scaling/focus policies, and workspace sources. Views use that interface, not
@@ -163,7 +166,9 @@ PID.
 - Tray submenus require one live opener per level. `QsMenuEntry.display()` needs
   a platform menu this shell does not have.
 - UTM has one virtio output, no Wi-Fi/Bluetooth, battery, backlight, lid,
-  touchpad, fingerprint reader, or hardware cursor plane.
+  touchpad, fingerprint reader, or hardware cursor plane. That output has no
+  `GAMMA_LUT`, so nightlight cannot apply here: wl-gammarelay-rs accepts the
+  DBus write and silently reverts. Verify nightlight on the ThinkPad.
 - UTM pauses time while macOS sleeps; keep chrony. Its old virgl OpenGL requires
   software rendering for Ghostty. macOS captures some SUPER chords; distinguish
   host key capture from compositor bind failures.
