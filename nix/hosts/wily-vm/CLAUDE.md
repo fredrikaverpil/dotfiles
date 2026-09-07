@@ -19,6 +19,7 @@ previous states.
   `Ui/compositors/` owns commands, response parsing, scaling/focus policies, and
   workspace sources. Views use that interface, not compositor-identity booleans.
   Keep scheduling and shared state above it; no speculative plugin framework.
+- Prefer purpose-built applications to large bespoke panels for infrequent tasks.
 - Selection requires exactly one session marker: `NIRI_SOCKET` or
   `HYPRLAND_INSTANCE_SIGNATURE`. Missing/ambiguous markers are errors, never an
   implicit Hyprland fallback.
@@ -35,12 +36,13 @@ previous states.
 
 Run relevant checks **before and after editing**, on the correct platform.
 These are development gates, not CI jobs. Use the repository devshell (`direnv`
-or `nix develop ~/.dotfiles -c <command>`):
+or `nix develop ~/.dotfiles -c <command>`) from
+`stow/host/wily-vm/.config/quickshell/`, which holds `tests/`.
 
 | Change | Checks |
 | --- | --- |
-| JS/QML | `qml-test`, `qml-lint` on Linux |
-| Backend, compositor config, or bind contract | Also `compositor-test` |
+| JS/QML | `qml-test`, `qml-lint` (any platform) |
+| Backend, compositor config, or bind contract | Also `compositor-test` (Linux) |
 | Service IPC, `shell.qml` wiring, or systemd units | Also `shell-smoke <hyprland\|niri>` on the VM after deploy and restart, and exercise the affected path |
 | Panel views | Also `shell-smoke <hyprland\|niri> --panels` |
 | Device-dependent behaviour | Also validate on the actual ThinkPad |
@@ -64,13 +66,12 @@ or `nix develop ~/.dotfiles -c <command>`):
 - Report host/session, before/after results, existing diagnostics, and omissions.
   Ask the user to run Nix rebuilds; never run them yourself.
 
-### Test boundaries and tooling
+### Tests
 
 - `tst_*.qml` imports production JS directly into QtTest. Keep meaningful pure
   parsing, transforms, and transitions; inline trivial single-use bindings.
   There is no independent JS consumer here, so no Deno/Node/Bun test suite or
-  CommonJS export guards. For future independent JS tools, prefer Node's built-in
-  test runner/assertions unless the tool specifically targets another runtime.
+  CommonJS export guards.
 - QtTest can test Qt-only components, but all transitive imports must be Qt-only.
   Quickshell's native types are linked into its executable, not loadable through
   its installed metadata. Even `Ui/BarButton.qml` shares the Quickshell-dependent
@@ -80,13 +81,18 @@ or `nix develop ~/.dotfiles -c <command>`):
   for explicit tolerances. Do not compare objects via JSON serialization.
 - `compositor-test` checks real scale-config anchors, Hyprland's Lua/TSV contract
   with an `hl` spy and temporary `HOME`, and niri's KDL. It does not test dispatch.
+
+### Tooling
+
+- `qml-lint` fails on any warning. Shadowing an Item member that is public API
+  (`palette`, IPC-visible `enabled`) or a lookup on an untyped `Loader.item` gets
+  an inline `// qmllint disable <category>`; anything else gets fixed.
 - Use the devshell's pinned Qt tools, not Mason's standalone `qmlls`. Launch
   Neovim from the repo so it inherits `PATH` and `QML_IMPORT_PATH`. The flake
   supplies both Qt imports and Quickshell metadata; deployed Qt must match the
   pin after updates. `qml-test` clears the GTK platform theme for offscreen SSH.
-- `Ui/qmldir` must list new QML types in `Ui/` for tooling. `.qmllint.ini` is shared
-  by the editor and CLI. Lint currently reports pre-existing warnings without
-  failing; compare diagnostics with the baseline.
+- `Ui/qmldir` must list new QML types in `Ui/` for tooling. `.qmllint.ini` is
+  shared by the editor and CLI.
 - Keep `hypr/.luarc.json`: rooting LuaLS at the entire repository can exhaust the
   VM. Hyprland watches only `hyprland.lua`; changes to `monitors.lua` need reload.
 
@@ -98,11 +104,11 @@ Discover the VM address each session:
 VM=$(awk -F= '/name=wily-vm/{f=1} f&&/ip_address/{print $2; exit}' /var/db/dhcpd_leases)
 ```
 
-Inspect target changes and preserve unrelated edits before syncing. Before any
-live file replacement or restart, check the lock and record/temporarily disable
-idle locking; hot reload can happen during copying. Restore the previous idle
-setting afterward. **Never restart Quickshell while locked**: the compositor
-keeps the session lock after its client dies.
+Before any live file replacement or restart, inspect target changes and
+preserve unrelated edits, check the lock, and record/temporarily disable idle
+locking; hot reload can happen during copying. Restore the idle setting
+afterward. **Never restart Quickshell while locked**: the compositor keeps the
+session lock after its client dies.
 
 ```sh
 qs ipc call idle status
@@ -111,18 +117,18 @@ qs ipc call lock isLocked
 ```
 
 Sync the checkout before live validation or a user-run rebuild, which evaluates
-the VM clone. Exclude platform-specific direnv state; checksums avoid replacing
-identical compositor files solely because timestamps differ.
+the VM clone. Checksums avoid replacing identical compositor files solely
+because timestamps differ. New/moved files then need the normal Stow activation
+from the root `CLAUDE.md`; never create Stow links manually or run
+`git clean -fd` in the VM clone.
 
 ```sh
 rsync -ac --delete --exclude .git --exclude result --exclude .direnv ~/.dotfiles/ fredrik@"$VM":~/.dotfiles/
 ssh fredrik@"$VM" 'cd ~/.dotfiles && git add -AN .'
 ```
 
-New/moved files need the normal Stow activation from the root `CLAUDE.md`.
-Never create Stow links manually or run `git clean -fd` in the VM clone.
-`rsync`, Git checkouts, and `sed -i` can replace inodes; restart the unlocked
-shell after deployment rather than relying on its watcher:
+`rsync`, Git checkouts, and `sed -i` can replace inodes, so restart the
+unlocked shell after deployment rather than relying on its watcher:
 
 ```sh
 systemctl --user restart quickshell.service
@@ -147,10 +153,9 @@ Quickshell instances appear dead. `shell-smoke` avoids that by selecting the PID
 - Tray submenus require one live opener per level. `QsMenuEntry.display()` needs
   a platform menu this shell does not have.
 - UTM has one virtio output, no Wi-Fi/Bluetooth, battery, backlight, lid, touchpad,
-  fingerprint reader, or hardware cursor plane. Validate those on the ThinkPad.
+  fingerprint reader, or hardware cursor plane.
 - UTM pauses time while macOS sleeps; keep chrony. Its old virgl OpenGL requires
   software rendering for Ghostty. macOS captures some SUPER chords; distinguish
   host key capture from compositor bind failures.
 - DPMS-off can resemble a frozen VM. Use bounded commands; `grim` can hang while
   no output produces frames. Recovery is `hyprctl dispatch 'hl.dsp.dpms("on")'`.
-- Prefer purpose-built applications to large bespoke panels for infrequent tasks.
