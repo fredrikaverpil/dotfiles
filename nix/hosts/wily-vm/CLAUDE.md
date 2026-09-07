@@ -41,7 +41,8 @@ or `nix develop ~/.dotfiles -c <command>`):
 | --- | --- |
 | JS/QML | `qml-test`, `qml-lint` on Linux |
 | Backend, compositor config, or bind contract | Also `compositor-test` |
-| Live shell behaviour | Also `shell-smoke <hyprland\|niri>` and exercise the affected path |
+| Service IPC, `shell.qml` wiring, or systemd units | Also `shell-smoke <hyprland\|niri>` on the VM after deploy and restart, and exercise the affected path |
+| Panel views | Also `shell-smoke <hyprland\|niri> --panels` |
 | Device-dependent behaviour | Also validate on the actual ThinkPad |
 
 - Establish the target checkout, flake pin, and session first. Record baseline
@@ -55,6 +56,8 @@ or `nix develop ~/.dotfiles -c <command>`):
   It checks actual service IPC and runtime errors. `--panels` additionally
   opens, queries, then closes Display, closing any competing panel. It refuses
   that operation while locked and does not change scaling or device settings.
+  Its journal scan covers everything since the last service start; restart the
+  service before re-running to clear stale errors.
 - Smoke checks do not prove focus, object lifetime, authentication, daemon
   recovery, or physical input. Exercise affected paths explicitly. Agree on a
   recovery path before lock/PAM, suspend, DPMS-off, or connectivity tests.
