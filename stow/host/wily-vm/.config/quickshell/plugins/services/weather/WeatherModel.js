@@ -1,8 +1,3 @@
-// api.met.no rejects coordinates finer than 4 decimals. Two decimals is ~1 km,
-// indistinguishable in a forecast, and keeps a home address out of a public
-// repository.
-var home = { latitude: 57.71, longitude: 11.97, place: "Göteborg" }
-
 var DEFAULT_INTERVAL = 30 * 60 * 1000
 var MINIMUM_INTERVAL = 5 * 60 * 1000
 var MAXIMUM_INTERVAL = 60 * 60 * 1000
