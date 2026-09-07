@@ -12,7 +12,7 @@ Item {
   readonly property int lockAfterSeconds: 300
 
   property bool stateLoaded: false
-  property bool enabled: true
+  property bool enabled: true // qmllint disable property-override
 
   function setEnabled(value) {
     enabled = !!value

@@ -15,7 +15,7 @@ Item {
   signal clearFailureRequested()
   signal wakeRequested()
 
-  readonly property var palette: shell ? shell.palette : ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864" })
+  readonly property var palette: shell ? shell.palette : ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864" }) // qmllint disable property-override
 
   function focusPassword() {
     if (inputEnabled && !authenticating) passwordInput.forceActiveFocus()

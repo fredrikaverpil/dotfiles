@@ -154,7 +154,7 @@
                 pkgs.mkShell {
                   packages = [
                     pkgs.qt6.qtdeclarative # qmlls, qmllint, qmlformat, qmltestrunner
-                    (task "qml-lint" "qmllint -E $(find . -name '*.qml')")
+                    (task "qml-lint" "qmllint -E -W 0 $(find . -name '*.qml')")
                     (task "qml-test" "QT_QPA_PLATFORM=offscreen QT_QPA_PLATFORMTHEME= qmltestrunner -input tests")
                     pkgs.lua
                   ]

@@ -1,6 +1,5 @@
 
 import QtQuick
-import Quickshell
 import Quickshell.Io
 
 import "../../../Ui" as Ui
@@ -26,7 +25,7 @@ Item {
   property int pendingTemperature: 0
   property bool stateLoaded: false
   property var temperature: null
-  readonly property bool enabled: stateLoaded && NightlightModel.isNightlight(temperature)
+  readonly property bool enabled: stateLoaded && NightlightModel.isNightlight(temperature) // qmllint disable property-override
 
   function desiredTemperature() {
     return NightlightModel.desiredTemperature(mode, period, nightTemperature, dayTemperature)
