@@ -2,7 +2,6 @@
 import QtQuick
 import Quickshell.Io
 
-import "../../../Ui" as Ui
 import "NightlightModel.js" as NightlightModel
 
 Item {
@@ -41,7 +40,7 @@ Item {
   function setNightlight(value) { setMode(value ? "on" : "off") }
   function toggle() { setNightlight(!enabled) }
 
-  readonly property var backend: Ui.Compositor.nightlightBackend
+  readonly property var backend: NightlightModel.backend
 
   function tick() {
     period = NightlightModel.solarPeriod(new Date(), latitude, longitude)

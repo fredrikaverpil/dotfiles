@@ -5,6 +5,10 @@ import "../plugins/services/nightlight/NightlightModel.js" as Nightlight
 TestCase {
   name: "NightlightModel"
 
+  function test_nightlight_readiness_checks_dbus() {
+    compare(Nightlight.backend.running, Nightlight.backend.probe.join(" ") + " >/dev/null 2>&1")
+  }
+
   function test_nightlight_parses_daemon_output_and_time_zone_coordinates() {
     compare(Nightlight.temperatureFromOutput("temperature: 4000\n"), 4000)
     compare(Nightlight.temperatureFromOutput(""), null)

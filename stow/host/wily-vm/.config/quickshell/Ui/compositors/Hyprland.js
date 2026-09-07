@@ -112,11 +112,3 @@ function currentLayout(raw) {
 }
 
 function setLayout(index) { return ["hyprctl", "switchxkblayout", "all", String(index)] }
-
-var nightlight = {
-  running: "pgrep -x hyprsunset >/dev/null",
-  launch: "setsid uwsm-app -- hyprsunset",
-  set: "hyprctl hyprsunset temperature ",
-  get: "hyprctl hyprsunset temperature",
-  probe: ["hyprctl", "hyprsunset", "temperature"],
-}
