@@ -55,15 +55,3 @@ function dndValue(value) {
   var normalized = String(value || "").toLowerCase()
   return normalized === "true" || normalized === "1" || normalized === "on" || normalized === "yes"
 }
-
-if (typeof module !== "undefined") {
-  module.exports = {
-    savedRecord: savedRecord,
-    historyWith: historyWith,
-    loadedState: loadedState,
-    stateText: stateText,
-    replacePopup: replacePopup,
-    withoutRecord: withoutRecord,
-    dndValue: dndValue,
-  }
-}

@@ -1,8 +1,7 @@
 import QtQuick
-import Quickshell
 import Quickshell.Io
 
-import "WorkspaceModel.js" as Model
+import "NiriWorkspaces.js" as Model
 
 QtObject {
   id: root
@@ -13,36 +12,20 @@ QtObject {
   property var idxById: ({})
   property var windowCounts: ({})
 
-  function occupied(idx) { return Model.occupied(windowCounts, idx) }
+  function occupied(idx) { return (windowCounts[idx] || 0) > 0 }
 
-  function apply(result) {
+  function handle(event) {
+    var result = Model.eventResult({
+      ids: root.ids,
+      idxById: root.idxById,
+      focusedId: root.focusedId,
+      windowCounts: root.windowCounts,
+    }, event)
     root.ids = result.ids
     root.idxById = result.idxById
     root.focusedId = result.focusedId
     root.windowCounts = result.windowCounts
     if (result.queryWindows) windowQuery.running = true
-  }
-
-  function setWorkspaces(list) {
-    apply(Model.eventResult({
-      ids: root.ids,
-      idxById: root.idxById,
-      focusedId: root.focusedId,
-      windowCounts: root.windowCounts,
-    }, { WorkspacesChanged: { workspaces: list } }))
-  }
-
-  function setWindows(list) {
-    root.windowCounts = Model.windowCounts(list, root.idxById)
-  }
-
-  function handle(event) {
-    apply(Model.eventResult({
-      ids: root.ids,
-      idxById: root.idxById,
-      focusedId: root.focusedId,
-      windowCounts: root.windowCounts,
-    }, event))
   }
 
   property Process stream: Process {
@@ -66,7 +49,7 @@ QtObject {
       waitForEnd: true
       onStreamFinished: {
         try {
-          root.setWindows(JSON.parse(text))
+          root.windowCounts = Model.windowCounts(JSON.parse(text), root.idxById)
         } catch (error) {}
       }
     }

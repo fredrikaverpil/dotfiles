@@ -55,9 +55,8 @@ PanelWindow {
   color: "transparent"
   mask: modalMask
   WlrLayershell.layer: WlrLayer.Overlay
-  // Hyprland needs an Exclusive focus prime; niri loses focus after that demotion.
   WlrLayershell.keyboardFocus: shown
-    ? (focusPrimed && !Compositor.niri
+    ? (focusPrimed && Compositor.releaseExclusiveFocus
         ? WlrKeyboardFocus.OnDemand
         : WlrKeyboardFocus.Exclusive)
     : WlrKeyboardFocus.None

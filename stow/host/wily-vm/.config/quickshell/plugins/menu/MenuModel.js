@@ -106,17 +106,3 @@ function parentLevel(level) {
   if (level === "root") return "root"
   return level.indexOf(".") >= 0 ? level.split(".").slice(0, -1).join(".") : "root"
 }
-
-if (typeof module !== "undefined") {
-  module.exports = {
-    parseBinds: parseBinds,
-    childrenOf: childrenOf,
-    descendantsOf: descendantsOf,
-    pathFrom: pathFrom,
-    rowFor: rowFor,
-    rowsFor: rowsFor,
-    selectFirstEnabled: selectFirstEnabled,
-    moveIndex: moveIndex,
-    parentLevel: parentLevel,
-  }
-}

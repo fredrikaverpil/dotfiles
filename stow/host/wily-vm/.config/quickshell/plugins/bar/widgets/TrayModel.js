@@ -16,7 +16,3 @@ function themeIconName(url) {
   if (query >= 0 && value.indexOf("path=", query) >= 0) return ""
   return query >= 0 ? value.slice(prefix.length, query) : value.slice(prefix.length)
 }
-
-if (typeof module !== "undefined") {
-  module.exports = { labelFor, sortItems, themeIconName }
-}

@@ -98,21 +98,3 @@ function playerForAction(players, source, active, action, targetKey) {
   }
   return null
 }
-
-if (typeof module !== "undefined") {
-  module.exports = {
-    playerKey: playerKey,
-    isProxyPlayer: isProxyPlayer,
-    hasMetadata: hasMetadata,
-    hasTrackMetadata: hasTrackMetadata,
-    playerCanControl: playerCanControl,
-    canHandleAction: canHandleAction,
-    labelFor: labelFor,
-    detailFor: detailFor,
-    sourcePlayers: sourcePlayers,
-    activePlayer: activePlayer,
-    playerForKey: playerForKey,
-    selectablePlayer: selectablePlayer,
-    playerForAction: playerForAction,
-  }
-}

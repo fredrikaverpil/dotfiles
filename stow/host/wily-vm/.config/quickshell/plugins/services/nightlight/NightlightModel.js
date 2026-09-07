@@ -96,19 +96,3 @@ function applyDecision(currentTemperature, requestedTemperature, running) {
   if (!isFinite(requestedTemperature) || currentTemperature === requestedTemperature) return "ignore"
   return running ? "queue" : "start"
 }
-
-if (typeof module !== "undefined") {
-  module.exports = {
-    IDENTITY_TEMPERATURE: IDENTITY_TEMPERATURE,
-    temperatureFromOutput: temperatureFromOutput,
-    isNightlight: isNightlight,
-    coordsFromZoneTab: coordsFromZoneTab,
-    solarTimes: solarTimes,
-    solarPeriod: solarPeriod,
-    expiresOverride: expiresOverride,
-    desiredTemperature: desiredTemperature,
-    modeState: modeState,
-    modeForPeriod: modeForPeriod,
-    applyDecision: applyDecision,
-  }
-}

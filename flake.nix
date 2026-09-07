@@ -148,22 +148,21 @@
                   quickshell = unstable.aarch64-linux.quickshell;
                   qml = "stow/host/wily-vm/.config/quickshell";
                   task =
-                    name: text: pkgs.writeShellScriptBin name "cd \"$(git rev-parse --show-toplevel)/${qml}\"\n${text}";
-                  rootTask =
-                    name: text: pkgs.writeShellScriptBin name "cd \"$(git rev-parse --show-toplevel)\"\n${text}";
+                    name: text:
+                    pkgs.writeShellScriptBin name "set -e\ncd \"$(git rev-parse --show-toplevel)/${qml}\"\n${text}";
                 in
                 pkgs.mkShell {
                   packages = [
                     pkgs.qt6.qtdeclarative # qmlls, qmllint, qmlformat, qmltestrunner
                     (task "qml-lint" "qmllint -E $(find . -name '*.qml')")
-                    (task "qml-test-js" "deno test --allow-read tests/")
-                    (task "qml-test-qml" "QT_QPA_PLATFORM=offscreen qmltestrunner -input tests")
+                    (task "qml-test" "QT_QPA_PLATFORM=offscreen QT_QPA_PLATFORMTHEME= qmltestrunner -input tests")
                     pkgs.lua
-                    (task "hypr-test" "tests/hyprland_test.sh ../hypr/hyprland.lua")
                   ]
                   ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
                     pkgs.niri
-                    (rootTask "niri-validate" "niri validate --config stow/host/wily-vm/.config/niri/config.kdl")
+                    pkgs.jq
+                    (task "compositor-test" "tests/config_test.sh")
+                    (task "shell-smoke" "tests/shell_smoke.sh \"$@\"")
                   ];
                   # qmlls/qmllint/qmltestrunner take import paths from argv or
                   # env only (`-E` reads this); .qmlls.ini has no key for them.
