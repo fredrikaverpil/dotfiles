@@ -72,6 +72,12 @@ from the shell on macOS.
 - Smoke checks do not prove focus, object lifetime, authentication, daemon
   recovery, or physical input. Exercise affected paths explicitly. Agree on a
   recovery path before lock/PAM, suspend, DPMS-off, or connectivity tests.
+- Test keyboard-first panels over SSH with Hyprland's native
+  `hyprctl dispatch 'hl.dsp.send_shortcut({ mods = "", key = "z" })'`.
+  In niri, open the panel with `qs ipc call`, confirm it is the only
+  `Keyboard interactivity: exclusive` layer in `niri msg layers`, then use
+  `wtype -k z`. Niri drops virtual-keyboard input before bind handling, so
+  `wtype` cannot test compositor binds. Verified in both sessions.
 - Report host/session, before/after results, existing diagnostics, and
   omissions. Ask the user to run Nix rebuilds; never run them yourself.
 
@@ -160,9 +166,9 @@ PID.
   creates a cycle.
 - Quickshell unsets systemd's sparse `PATH` to inherit the UWSM session path.
   Removing that breaks launcher entries and `uwsm-app`.
-- Every surface is operable from the keyboard alone. Panels take `keyNavigation`
-  for a plain focus chain, or drive their own cursor when the chain cannot
-  express the control (a slider). A control reachable only by pointer is a bug.
+- Every surface must be usable from the keyboard. Use `keyNavigation` for
+  ordinary focus chains; use a panel-managed cursor where it cannot represent
+  a control, such as a slider. Pointer-only controls are bugs.
 - `Ui/Panel.qml` has a top-bar cutout so bar buttons can switch panels. Preserve
   focus-chain membership for visible but unavailable controls. The shell owns
   keyboard-layout state; compositor-side XKB toggles would desynchronize it.
