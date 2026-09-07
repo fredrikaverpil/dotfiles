@@ -181,6 +181,7 @@ in
     firefox
     grim
     wl-clipboard
+    wtype
     signal-desktop
     zed-editor
   ];
