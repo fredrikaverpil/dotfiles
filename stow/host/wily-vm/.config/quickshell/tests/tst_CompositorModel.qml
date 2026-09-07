@@ -69,4 +69,7 @@ TestCase {
       compare(Niri.focusedMonitor(raw), null, raw)
     }
   }
+  function test_niri_readiness_checks_dbus() {
+    compare(Niri.nightlight.running, Niri.nightlight.probe.join(" ") + " >/dev/null 2>&1")
+  }
 }
