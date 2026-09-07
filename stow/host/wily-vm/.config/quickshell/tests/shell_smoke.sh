@@ -70,8 +70,6 @@ if [[ "${2-}" == --panels ]]; then
   done
   [[ "$ready" == true ]]
   printf 'PASS: live display query and bindings\n'
-  ipc display close
-  trap - EXIT
 fi
 
 started=$(systemctl --user show quickshell.service --property=ActiveEnterTimestamp --value)
