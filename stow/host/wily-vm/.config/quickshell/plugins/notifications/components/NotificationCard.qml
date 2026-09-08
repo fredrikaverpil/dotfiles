@@ -3,6 +3,8 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 
+import "../../../Ui" as Ui
+
 Rectangle {
   id: root
 
@@ -85,7 +87,7 @@ Rectangle {
           text: root.summary || root.app
           textFormat: Text.PlainText
           color: root.palette.fg
-          font.family: "JetBrainsMono Nerd Font"
+          font.family: Ui.Fonts.mono
           font.pixelSize: 14
           font.bold: true
           wrapMode: Text.WordWrap
@@ -99,7 +101,7 @@ Rectangle {
           text: root.body
           textFormat: Text.PlainText
           color: root.palette.off
-          font.family: "JetBrainsMono Nerd Font"
+          font.family: Ui.Fonts.mono
           font.pixelSize: 13
           wrapMode: Text.WordWrap
           maximumLineCount: root.toast ? 3 : 8
@@ -111,7 +113,7 @@ Rectangle {
           visible: !root.toast && Number(root.row.timestamp) > 0
           text: Qt.formatDateTime(new Date(Number(root.row.timestamp)), "ddd HH:mm")
           color: root.palette.off
-          font.family: "JetBrainsMono Nerd Font"
+          font.family: Ui.Fonts.mono
           font.pixelSize: 11
         }
       }
@@ -165,7 +167,7 @@ Rectangle {
             text: modelData.text
             textFormat: Text.PlainText
             color: root.palette.fg
-            font.family: "JetBrainsMono Nerd Font"
+            font.family: Ui.Fonts.mono
             font.pixelSize: 12
           }
 

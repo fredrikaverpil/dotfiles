@@ -310,7 +310,7 @@ Item {
         Layout.fillWidth: true
         text: "Notifications"
         color: root.palette.fg
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 18
       }
 
@@ -363,7 +363,7 @@ Item {
         visible: historyList.count === 0
         text: "No recent notifications"
         color: root.palette.off
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 14
       }
     }
@@ -393,7 +393,7 @@ Item {
       anchors.centerIn: parent
       text: button.label
       color: root.palette.fg
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: Ui.Fonts.mono
       font.pixelSize: 12
     }
 

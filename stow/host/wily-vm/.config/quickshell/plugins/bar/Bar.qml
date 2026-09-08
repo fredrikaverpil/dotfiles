@@ -54,7 +54,7 @@ Scope {
         id: clockLabel
         anchors.centerIn: parent
         color: bar.shell.palette.fg
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 14 * bar.shell.textScale
         text: Qt.formatDateTime(clock.date, "ddd d MMM  HH:mm:ss")
       }

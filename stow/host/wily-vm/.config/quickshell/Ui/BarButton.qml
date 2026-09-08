@@ -6,7 +6,7 @@ Rectangle {
   required property var shell
   property alias label: btnLabel.text
   property alias image: btnImage.source
-  property string fontFamily: "JetBrainsMono Nerd Font"
+  property string fontFamily: Fonts.mono
   property real fontSize: 14
   property color foreground: btn.shell.palette.fg
 

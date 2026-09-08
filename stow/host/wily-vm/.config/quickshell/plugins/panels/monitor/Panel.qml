@@ -106,7 +106,7 @@ Ui.Panel {
   Text {
     width: parent.width
     color: root.shell.palette.fg
-    font.family: "JetBrainsMono Nerd Font"
+    font.family: Ui.Fonts.mono
     font.pixelSize: 18
     text: "Display"
   }
@@ -114,7 +114,7 @@ Ui.Panel {
   Text {
     width: parent.width
     color: root.shell.palette.off
-    font.family: "JetBrainsMono Nerd Font"
+    font.family: Ui.Fonts.mono
     font.pixelSize: 13
     text: root.focusedMonitor
       ? root.focusedMonitor.name + " · " + root.focusedMonitor.width + "×" + root.focusedMonitor.height
@@ -201,7 +201,7 @@ Ui.Panel {
 
     Text {
       color: root.shell.palette.off
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: Ui.Fonts.mono
       font.pixelSize: 13
       text: parent.title
     }
@@ -260,7 +260,7 @@ Ui.Panel {
     Text {
       anchors.centerIn: parent
       color: root.shell.palette.fg
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: Ui.Fonts.mono
       font.pixelSize: 14
       text: button.label
     }
@@ -289,7 +289,7 @@ Ui.Panel {
       anchors.leftMargin: 8
       anchors.verticalCenter: parent.verticalCenter
       color: root.shell.palette.off
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: Ui.Fonts.mono
       font.pixelSize: 13
       text: parent.label
     }
@@ -299,7 +299,7 @@ Ui.Panel {
       anchors.rightMargin: 8
       anchors.verticalCenter: parent.verticalCenter
       color: root.shell.palette.off
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: Ui.Fonts.mono
       font.pixelSize: 13
       text: parent.detail
     }

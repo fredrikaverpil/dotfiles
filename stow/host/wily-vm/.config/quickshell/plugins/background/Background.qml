@@ -182,7 +182,7 @@ Scope {
 
     Text {
       color: background.shell.palette.fg
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: Ui.Fonts.mono
       font.pixelSize: 15
       text: "Wallpaper · " + (background.shell.dark ? "dark" : "light")
     }

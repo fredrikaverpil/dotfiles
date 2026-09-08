@@ -36,7 +36,7 @@ Ui.Panel {
   Text {
     width: parent.width
     color: root.shell.palette.fg
-    font.family: "JetBrainsMono Nerd Font"
+    font.family: Ui.Fonts.mono
     font.pixelSize: 18
     text: "Media"
   }
@@ -44,7 +44,7 @@ Ui.Panel {
   Text {
     width: parent.width
     color: root.shell.palette.off
-    font.family: "JetBrainsMono Nerd Font"
+    font.family: Ui.Fonts.mono
     font.pixelSize: 13
     text: root.service.identity || "No MPRIS player"
   }
@@ -81,7 +81,7 @@ Ui.Panel {
         anchors.centerIn: parent
         visible: art.status !== Image.Ready
         color: root.shell.palette.fg
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 30
         text: "󰝚"
       }
@@ -96,7 +96,7 @@ Ui.Panel {
         width: parent.width
         elide: Text.ElideRight
         color: root.shell.palette.fg
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 16
         font.bold: true
         text: root.service.title || "Nothing playing"
@@ -107,7 +107,7 @@ Ui.Panel {
         elide: Text.ElideRight
         visible: text.length > 0
         color: root.shell.palette.off
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 14
         text: root.service.artist
       }
@@ -117,7 +117,7 @@ Ui.Panel {
         elide: Text.ElideRight
         visible: text.length > 0
         color: root.shell.palette.off
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 13
         text: root.service.album
       }
@@ -155,7 +155,7 @@ Ui.Panel {
     width: parent.width
     visible: root.multipleSources
     color: root.shell.palette.off
-    font.family: "JetBrainsMono Nerd Font"
+    font.family: Ui.Fonts.mono
     font.pixelSize: 13
     text: "Sources"
   }
@@ -196,7 +196,7 @@ Ui.Panel {
     Text {
       anchors.centerIn: parent
       color: root.shell.palette.fg
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: Ui.Fonts.mono
       font.pixelSize: 16
       text: parent.label
     }
@@ -232,7 +232,7 @@ Ui.Panel {
       anchors.leftMargin: 8
       anchors.verticalCenter: parent.verticalCenter
       color: root.shell.palette.fg
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: Ui.Fonts.mono
       font.pixelSize: 14
       text: parent.playing ? "󰏤" : "󰐊"
     }
@@ -245,7 +245,7 @@ Ui.Panel {
       anchors.verticalCenter: parent.verticalCenter
       elide: Text.ElideRight
       color: root.shell.palette.fg
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: Ui.Fonts.mono
       font.pixelSize: 13
       font.bold: parent.selected
       text: parent.label + (parent.detail && parent.detail !== parent.label

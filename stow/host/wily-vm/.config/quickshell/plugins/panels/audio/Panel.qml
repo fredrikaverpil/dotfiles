@@ -97,7 +97,7 @@ Ui.Panel {
   Text {
     width: parent.width
     color: root.shell.palette.fg
-    font.family: "JetBrainsMono Nerd Font"
+    font.family: Ui.Fonts.mono
     font.pixelSize: 18
     text: "Audio"
   }
@@ -106,7 +106,7 @@ Ui.Panel {
     width: parent.width
     elide: Text.ElideRight
     color: root.shell.palette.off
-    font.family: "JetBrainsMono Nerd Font"
+    font.family: Ui.Fonts.mono
     font.pixelSize: 13
     text: root.sink
       ? root.label(root.sink) + " · " + Math.round(root.volume * 100) + "%"
@@ -135,7 +135,7 @@ Ui.Panel {
       anchors.leftMargin: 10
       anchors.verticalCenter: parent.verticalCenter
       color: root.shell.palette.fg
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: Ui.Fonts.mono
       font.pixelSize: 16
       text: root.icon
     }
@@ -198,7 +198,7 @@ Ui.Panel {
         anchors.verticalCenter: parent.verticalCenter
         elide: Text.ElideRight
         color: root.shell.palette.fg
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 13
         text: root.label(modelData)
       }
@@ -209,7 +209,7 @@ Ui.Panel {
         anchors.rightMargin: 8
         anchors.verticalCenter: parent.verticalCenter
         color: root.shell.palette.fg
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 13
         text: modelData === root.sink ? "󰄬" : ""
       }

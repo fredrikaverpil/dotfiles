@@ -55,7 +55,7 @@ Item {
         Text {
           anchors.centerIn: parent
           color: root.foreground
-          font.family: "JetBrainsMono Nerd Font"
+          font.family: Ui.Fonts.mono
           font.pixelSize: 14 * root.fontScale
           text: modelData === 10 ? "0" : String(modelData)
         }
