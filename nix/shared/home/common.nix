@@ -19,29 +19,18 @@ let
 in
 {
   imports = [
-    ./package-tools.nix
+    ./llm-agents.nix
   ];
 
   config = {
 
     # LLM agent CLIs from the numtide/llm-agents.nix flake input (mergeable
     # across config levels; platform/host configs can add more)
-    packageTools.llmAgents = [
+    llmAgents = [
       "claude-code"
       "gemini-cli"
       "opencode"
       "pi"
-    ];
-
-    # npm packages (mergeable across config levels)
-    packageTools.npmPackages = [ ];
-
-    # Python CLI tools (mergeable across config levels)
-    packageTools.uvTools = [
-      {
-        package = "sqlit-tui";
-        inject = [ "google-cloud-bigquery" ];
-      }
     ];
 
     home.activation.handleDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -131,10 +120,9 @@ in
       # NOTE: uv is installed per-platform (darwin.nix / linux.nix), since the
       # stable-pin uv on NixOS is too old for the uv.toml syntax in use.
       #
-      # NOTE: Deno installs/runs the npm-managed CLI tools. Unlike node/bun global
-      # installs (FHS shebangs, glibc-linked shims), deno shims are /bin/sh
-      # scripts exec'ing the nix store deno -> works on NixOS. Unstable for
-      # the latest Node-compat fixes (no-op on macOS, where pkgs IS unstable).
+      # NOTE: Deno is the preferred runtime for one-off npm CLI runs
+      # (`deno run -A npm:<pkg>`). Unstable for the latest Node-compat fixes
+      # (no-op on macOS, where pkgs IS unstable).
       unstable.deno
 
       # Generic development

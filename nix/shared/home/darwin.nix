@@ -15,10 +15,7 @@
     uv
   ];
 
-  packageTools.npmPackages = [ ];
-  packageTools.uvTools = [ ];
-
-  packageTools.llmAgents = [
+  llmAgents = [
     # "amp"
     # "codex"
     # "copilot-cli"

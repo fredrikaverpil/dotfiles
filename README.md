@@ -9,10 +9,9 @@ Personal dotfiles, managed in three layers:
 - **Stow** (`stow/`) — dotfiles symlinked into `$HOME` with
   [GNU Stow](https://www.gnu.org/software/stow/). Changes take effect
   immediately, no rebuild needed.
-- **Package tools** — software installed by its own package manager (Homebrew
-  on macOS, `uv` for Python, `deno` for npm). Nix declares _which_ packages and
-  installs missing ones on rebuild, but versions are unpinned and upgraded
-  manually.
+- **Homebrew** (macOS) — GUI apps and Mac App Store apps. Nix declares _which_
+  packages and a rebuild installs or removes to match, but versions are
+  unpinned and upgraded manually.
 
 ## Quickstart
 
@@ -89,23 +88,9 @@ The shell entrypoint is `stow/shared/.zshrc`, which sources
 See [Project config](extras/README_PROJECT.md) for details on shell
 initialization, direnv, and per-project tooling.
 
-### Package tools
+### Homebrew
 
-> [!NOTE]
->
-> I'm not happy with how this is designed, see
-> [dotfiles#202](https://github.com/fredrikaverpil/dotfiles/issues/202).
-
-CLI tools that come from language ecosystems rather than nixpkgs are declared
-in Nix (see `nix/shared/home/package-tools.nix`) but installed by their native
-package manager. A rebuild installs anything missing; upgrades are manual:
-
-```sh
-uv tool upgrade --all   # Python tools (uv)
-npm-tools-upgrade       # npm tools (deno)
-```
-
-Homebrew works the same way: `nix/shared/system/darwin.nix` declares the taps,
+`nix/shared/system/darwin.nix` declares the Homebrew taps,
 brews, casks and Mac App Store apps, and a rebuild installs or removes packages
 to match that set (`cleanup = "zap"`, so anything undeclared is uninstalled).
 Versions are not pinned — bump them deliberately:

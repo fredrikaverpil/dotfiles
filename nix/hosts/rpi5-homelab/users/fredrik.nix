@@ -15,9 +15,7 @@ in
 
   home.stateVersion = "25.05";
 
-  packageTools.npmPackages = [ ];
-  packageTools.uvTools = [ ];
-  packageTools.llmAgents = [ ];
+  llmAgents = [ ];
 
   home.packages = with pkgs; [ ];
 
