@@ -70,6 +70,10 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
       inputs.home-manager.follows = "home-manager-unstable";
     };
+    dankcalendar = {
+      url = "github:AvengeMedia/dankcalendar";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     dotfiles = {
       # Used by home-manager for dotfiles bootstrapping.
       url = "github:fredrikaverpil/dotfiles";

@@ -25,6 +25,18 @@ previous states.
   speculative plugin framework.
 - Prefer purpose-built applications to large bespoke panels for infrequent
   tasks.
+- Calendar credentials and bearer feed URLs are private user state, never
+  Nix/Stow values. Keep Secret Service available before starting `dcal`: its
+  local encrypted-keyring fallback uses a fixed password. Verify keyring use
+  before adding real accounts; the service's startup probe does not guard
+  manually launched instances. Password login unlocks GNOME Keyring via PAM;
+  fingerprint-only login cannot supply that password.
+- On first use, GNOME Keyring can advertise `login` without exporting the
+  collection when keyring creation follows D-Bus startup. `OpenSession` alone
+  misses this; also probe the collection. Recover by restarting the keyring
+  daemon and unlocking it, then retry account setup. Do not delete keyring
+  files. Console logout may leave the daemon alive while SSH keeps the user
+  manager running.
 - Selection requires exactly one session marker: `NIRI_SOCKET` or
   `HYPRLAND_INSTANCE_SIGNATURE`. Missing/ambiguous markers are errors, never an
   implicit Hyprland fallback.
