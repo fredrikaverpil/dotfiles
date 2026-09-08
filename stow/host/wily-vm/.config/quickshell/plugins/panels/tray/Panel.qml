@@ -100,7 +100,7 @@ Ui.Panel {
 
   Text {
     color: root.shell.palette.dim
-    font.family: "JetBrainsMono Nerd Font"
+    font.family: Ui.Fonts.mono
     font.pixelSize: 13
     text: root.title
     width: parent.width
@@ -183,7 +183,7 @@ Ui.Panel {
             Text {
               width: 14
               color: root.shell.palette.fg
-              font.family: "JetBrainsMono Nerd Font"
+              font.family: Ui.Fonts.mono
               font.pixelSize: 14
               text: row.modelData.buttonType === QsMenuButtonType.CheckBox
                 ? (row.modelData.checkState === Qt.Checked ? "󰄲" : "󰄱")
@@ -194,7 +194,7 @@ Ui.Panel {
 
             Text {
               color: root.shell.palette.fg
-              font.family: "JetBrainsMono Nerd Font"
+              font.family: Ui.Fonts.mono
               font.pixelSize: 14
               text: (row.modelData.text || "") + (row.modelData.hasChildren ? " ›" : "")
               elide: Text.ElideRight

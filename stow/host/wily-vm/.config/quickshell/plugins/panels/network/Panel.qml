@@ -63,7 +63,7 @@ Ui.Panel {
         Text {
           width: parent.width - (wifiToggle.visible ? wifiToggle.width + parent.spacing : 0)
           color: root.shell.palette.fg
-          font.family: "JetBrainsMono Nerd Font"
+          font.family: Ui.Fonts.mono
           font.pixelSize: 18
           text: "Network"
         }
@@ -82,7 +82,7 @@ Ui.Panel {
         width: parent.width
         visible: !root.service.networkManagerAvailable
         color: root.shell.palette.off
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 13
         text: "NetworkManager is unavailable"
       }
@@ -109,7 +109,7 @@ Ui.Panel {
           width: parent.width
           visible: root.service.networkDevices.length === 0
           color: root.shell.palette.off
-          font.family: "JetBrainsMono Nerd Font"
+          font.family: Ui.Fonts.mono
           font.pixelSize: 13
           text: "No network devices"
         }
@@ -175,7 +175,7 @@ Ui.Panel {
           width: parent.width
           visible: root.service.wifiDevice === null
           color: root.shell.palette.off
-          font.family: "JetBrainsMono Nerd Font"
+          font.family: Ui.Fonts.mono
           font.pixelSize: 13
           text: "No Wi-Fi adapter"
         }
@@ -193,7 +193,7 @@ Ui.Panel {
           width: parent.width
           visible: root.service.wifiDevice !== null && !root.service.scanning && root.service.wifiNetworks.length === 0
           color: root.shell.palette.off
-          font.family: "JetBrainsMono Nerd Font"
+          font.family: Ui.Fonts.mono
           font.pixelSize: 13
           text: root.service.wifiEnabled ? "No networks found" : "Wi-Fi is off"
         }
@@ -209,7 +209,7 @@ Ui.Panel {
 
     Text {
       color: root.shell.palette.off
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: Ui.Fonts.mono
       font.pixelSize: 13
       text: parent.title
     }
@@ -218,14 +218,14 @@ Ui.Panel {
   component MetricLabel: Text {
     Layout.fillWidth: true
     color: root.shell.palette.off
-    font.family: "JetBrainsMono Nerd Font"
+    font.family: Ui.Fonts.mono
     font.pixelSize: 12
   }
 
   component MetricValue: Text {
     Layout.fillWidth: true
     color: root.shell.palette.fg
-    font.family: "JetBrainsMono Nerd Font"
+    font.family: Ui.Fonts.mono
     font.pixelSize: 12
     horizontalAlignment: Text.AlignRight
     elide: Text.ElideLeft
@@ -255,7 +255,7 @@ Ui.Panel {
     Text {
       anchors.centerIn: parent
       color: root.shell.palette.fg
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: Ui.Fonts.mono
       font.pixelSize: 12
       text: button.label
     }
@@ -283,7 +283,7 @@ Ui.Panel {
       anchors.leftMargin: 8
       anchors.verticalCenter: parent.verticalCenter
       color: root.shell.palette.fg
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: Ui.Fonts.mono
       font.pixelSize: 14
       text: root.service.deviceTypeName(parent.device)
     }
@@ -293,7 +293,7 @@ Ui.Panel {
       anchors.rightMargin: 8
       anchors.verticalCenter: parent.verticalCenter
       color: root.shell.palette.off
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: Ui.Fonts.mono
       font.pixelSize: 13
       text: root.service.deviceDetail(parent.device)
     }
@@ -305,7 +305,7 @@ Ui.Panel {
       anchors.rightMargin: 160
       anchors.verticalCenter: parent.verticalCenter
       color: root.shell.palette.off
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: Ui.Fonts.mono
       font.pixelSize: 13
       text: parent.device.name
       elide: Text.ElideRight
@@ -333,7 +333,7 @@ Ui.Panel {
         anchors.leftMargin: 8
         anchors.verticalCenter: parent.verticalCenter
         color: root.shell.palette.fg
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 16
         text: Model.wifiIconFor(row.network.signal)
       }
@@ -345,7 +345,7 @@ Ui.Panel {
         anchors.rightMargin: 8
         anchors.verticalCenter: parent.verticalCenter
         color: root.shell.palette.fg
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 14
         text: row.network.ssid + " · " + root.service.wifiStatus(row.network)
         elide: Text.ElideRight
@@ -389,7 +389,7 @@ Ui.Panel {
         anchors.verticalCenter: parent.verticalCenter
         height: 28
         color: root.shell.palette.fg
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 13
         placeholderText: "Passphrase"
         placeholderTextColor: root.shell.palette.off
@@ -420,7 +420,7 @@ Ui.Panel {
       width: parent.width
       visible: root.service.failureSsid === row.network.ssid && root.service.failureReason !== ""
       color: root.shell.palette.off
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: Ui.Fonts.mono
       font.pixelSize: 12
       text: root.service.failureReason
     }

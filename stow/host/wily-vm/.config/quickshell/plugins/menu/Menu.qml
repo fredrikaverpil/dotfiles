@@ -149,7 +149,7 @@ Ui.Panel {
 
   Text {
     color: menu.shell.palette.dim
-    font.family: "JetBrainsMono Nerd Font"
+    font.family: Ui.Fonts.mono
     font.pixelSize: 13
     text: menu.title
   }
@@ -159,7 +159,7 @@ Ui.Panel {
     width: parent.width
     clip: true
     color: menu.shell.palette.fg
-    font.family: "JetBrainsMono Nerd Font"
+    font.family: Ui.Fonts.mono
     font.pixelSize: 18
     focus: true
 
@@ -234,7 +234,7 @@ Ui.Panel {
             visible: !rowImage.visible
             verticalAlignment: Text.AlignVCenter
             color: modelData.enabled ? menu.shell.palette.fg : menu.shell.palette.off
-            font.family: "JetBrainsMono Nerd Font"
+            font.family: Ui.Fonts.mono
             font.pixelSize: 15
             text: modelData.icon || ""
           }
@@ -244,14 +244,14 @@ Ui.Panel {
           width: 290
           visible: modelData.chord !== undefined
           color: menu.shell.palette.off
-          font.family: "JetBrainsMono Nerd Font"
+          font.family: Ui.Fonts.mono
           font.pixelSize: 15
           text: modelData.chord || ""
         }
 
         Text {
           color: modelData.enabled ? menu.shell.palette.fg : menu.shell.palette.off
-          font.family: "JetBrainsMono Nerd Font"
+          font.family: Ui.Fonts.mono
           font.pixelSize: 15
           width: modelData.detail ? Math.min(implicitWidth, 300) : implicitWidth
           text: modelData.label + (modelData.submenu ? " ›" : "")
@@ -261,7 +261,7 @@ Ui.Panel {
         Text {
           visible: (modelData.detail || "") !== ""
           color: menu.shell.palette.off
-          font.family: "JetBrainsMono Nerd Font"
+          font.family: Ui.Fonts.mono
           font.pixelSize: 15
           text: modelData.detail || ""
           elide: Text.ElideRight

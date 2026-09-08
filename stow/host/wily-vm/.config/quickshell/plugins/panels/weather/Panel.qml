@@ -41,7 +41,7 @@ Ui.Panel {
   Text {
     width: parent.width
     color: root.shell.palette.fg
-    font.family: "JetBrainsMono Nerd Font"
+    font.family: Ui.Fonts.mono
     font.pixelSize: 18
     text: "Weather"
   }
@@ -50,7 +50,7 @@ Ui.Panel {
     width: parent.width
     elide: Text.ElideRight
     color: root.shell.palette.off
-    font.family: "JetBrainsMono Nerd Font"
+    font.family: Ui.Fonts.mono
     font.pixelSize: 13
     text: (root.service.place === "" ? "Unknown location" : root.service.place)
       + (root.service.updatedAt
@@ -72,7 +72,7 @@ Ui.Panel {
     Text {
       anchors.verticalCenter: parent.verticalCenter
       color: root.shell.palette.fg
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: Ui.Fonts.mono
       font.pixelSize: 46
       text: root.service.icon
     }
@@ -80,7 +80,7 @@ Ui.Panel {
     Text {
       anchors.verticalCenter: parent.verticalCenter
       color: root.shell.palette.fg
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: Ui.Fonts.mono
       font.pixelSize: 34
       text: root.service.ready ? root.service.temperature : "--"
     }
@@ -91,7 +91,7 @@ Ui.Panel {
 
       Text {
         color: root.shell.palette.fg
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 14
         text: root.service.failed ? "Unavailable" : root.service.condition
       }
@@ -99,7 +99,7 @@ Ui.Panel {
       Text {
         visible: text.length > 0
         color: root.shell.palette.off
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 13
         text: root.service.wind === "" ? "" : "󰖝 " + root.service.wind + "   󰖎 " + root.service.humidity
       }
@@ -128,7 +128,7 @@ Ui.Panel {
         width: 44
         anchors.verticalCenter: parent.verticalCenter
         color: root.shell.palette.fg
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 14
         text: dayRow.modelData.name
       }
@@ -137,7 +137,7 @@ Ui.Panel {
         width: 24
         anchors.verticalCenter: parent.verticalCenter
         color: root.shell.palette.fg
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 16
         text: Model.icon(dayRow.modelData.symbol)
       }
@@ -146,7 +146,7 @@ Ui.Panel {
         width: 96
         anchors.verticalCenter: parent.verticalCenter
         color: root.shell.palette.fg
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 13
         text: Model.temperature(dayRow.modelData.maximum) + " / " + Model.temperature(dayRow.modelData.minimum)
       }
@@ -155,7 +155,7 @@ Ui.Panel {
         anchors.verticalCenter: parent.verticalCenter
         elide: Text.ElideRight
         color: root.shell.palette.off
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 13
         text: Model.condition(dayRow.modelData.symbol)
       }
@@ -184,7 +184,7 @@ Ui.Panel {
     Text {
       anchors.centerIn: parent
       color: root.shell.palette.fg
-      font.family: "JetBrainsMono Nerd Font"
+      font.family: Ui.Fonts.mono
       font.pixelSize: 13
       text: root.service.busy ? "󰑐 Refreshing…" : "󰑐 Refresh"
     }
@@ -200,7 +200,7 @@ Ui.Panel {
   Text {
     width: parent.width
     color: root.shell.palette.off
-    font.family: "JetBrainsMono Nerd Font"
+    font.family: Ui.Fonts.mono
     font.pixelSize: 11
     text: "Data from MET Norway (yr.no), CC BY 4.0"
   }

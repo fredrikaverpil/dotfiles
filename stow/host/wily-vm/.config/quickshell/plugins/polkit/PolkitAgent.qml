@@ -6,6 +6,8 @@ import Quickshell.Wayland
 
 import "PolkitModel.js" as PolkitModel
 
+import "../../Ui" as Ui
+
 Item {
   id: root
 
@@ -160,7 +162,7 @@ Item {
           textFormat: Text.PlainText
           wrapMode: Text.WordWrap
           color: root.palette.fg
-          font.family: "JetBrainsMono Nerd Font"
+          font.family: Ui.Fonts.mono
           font.pixelSize: 16
         }
 
@@ -171,7 +173,7 @@ Item {
           textFormat: Text.PlainText
           wrapMode: Text.WordWrap
           color: root.failed ? "#C94F46" : root.palette.off
-          font.family: "JetBrainsMono Nerd Font"
+          font.family: Ui.Fonts.mono
           font.pixelSize: 13
         }
 
@@ -194,7 +196,7 @@ Item {
             passwordCharacter: "●"
             passwordMaskDelay: 0
             color: root.palette.fg
-            font.family: "JetBrainsMono Nerd Font"
+            font.family: Ui.Fonts.mono
             font.pixelSize: 16
 
             onAccepted: root.submit()
@@ -220,7 +222,7 @@ Item {
           width: parent.width
           text: "Enter to authorize · Esc to cancel"
           color: root.palette.off
-          font.family: "JetBrainsMono Nerd Font"
+          font.family: Ui.Fonts.mono
           font.pixelSize: 11
         }
       }

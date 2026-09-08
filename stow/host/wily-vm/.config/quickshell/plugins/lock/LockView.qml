@@ -1,6 +1,8 @@
 
 import QtQuick
 
+import "../../Ui" as Ui
+
 Item {
   id: root
 
@@ -80,7 +82,7 @@ Item {
         color: root.palette.fg
         selectionColor: root.palette.sel
         selectedTextColor: root.palette.fg
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: text.length > 0 ? 24 : 18
         cursorVisible: activeFocus && text.length > 0
 
@@ -109,7 +111,7 @@ Item {
         visible: passwordInput.text.length === 0
         text: root.authenticating ? "Checking…" : (root.failureMessage || "Enter password")
         color: root.authenticating ? root.palette.fg : (root.failureMessage ? "#C94F46" : root.palette.off)
-        font.family: "JetBrainsMono Nerd Font"
+        font.family: Ui.Fonts.mono
         font.pixelSize: 18
         font.italic: root.failureMessage.length > 0
         horizontalAlignment: Text.AlignHCenter
