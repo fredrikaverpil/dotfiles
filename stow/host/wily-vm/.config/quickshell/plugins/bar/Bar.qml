@@ -36,8 +36,8 @@ Scope {
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.leftMargin: 4
-        label: "\ue900"
-        fontFamily: "omarchy"
+        label: "改"
+        fontFamily: "Noto Sans CJK JP"
         onActivated: bar.shell.menu.toggle()
       }
 

@@ -94,6 +94,9 @@ in
     GTK_USE_PORTAL = "1";
   };
 
+  # The bar's kaizen launcher glyph needs a CJK face.
+  fonts.packages = [ pkgs.noto-fonts-cjk-sans ];
+
   security.polkit.enable = true;
 
   # polkit.enable does not install the setuid pkexec wrapper.
