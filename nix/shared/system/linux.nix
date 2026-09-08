@@ -67,8 +67,15 @@
     ];
 
     # Berkeley Mono is licensed, so it is copied into ~/.local/share/fonts by
-    # hand. Prefer it wherever JetBrains Mono is requested; fontconfig drops
-    # the rule on hosts where the font is absent, leaving JetBrains Mono.
+    # hand. Both rules below name JetBrains Mono as the next candidate, so a
+    # host without Berkeley Mono falls back to it instead of DejaVu.
+    fonts.fontconfig.defaultFonts.monospace = [
+      "Berkeley Mono"
+      "JetBrainsMono Nerd Font"
+    ];
+
+    # Applications that ask for JetBrains Mono by name bypass the generic
+    # monospace alias, and the shell's QML hardcodes that family ~75 times.
     fonts.fontconfig.localConf = ''
       <?xml version="1.0"?>
       <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
