@@ -66,6 +66,22 @@
       nerd-fonts.symbols-only
     ];
 
+    # Berkeley Mono is licensed, so it is copied into ~/.local/share/fonts by
+    # hand. Prefer it wherever JetBrains Mono is requested; fontconfig drops
+    # the rule on hosts where the font is absent, leaving JetBrains Mono.
+    fonts.fontconfig.localConf = ''
+      <?xml version="1.0"?>
+      <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+      <fontconfig>
+        <match target="pattern">
+          <test name="family"><string>JetBrainsMono Nerd Font</string></test>
+          <edit name="family" mode="prepend" binding="strong">
+            <string>Berkeley Mono</string>
+          </edit>
+        </match>
+      </fontconfig>
+    '';
+
     # Apply additional services configuration
     services = lib.mkMerge [
       { } # Default empty services
