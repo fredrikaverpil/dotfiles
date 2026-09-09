@@ -36,8 +36,7 @@ Scope {
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.leftMargin: 4
-        label: "改"
-        fontFamily: "Noto Sans CJK JP"
+        label: "❄"
         onActivated: bar.shell.menu.toggle()
       }
 
