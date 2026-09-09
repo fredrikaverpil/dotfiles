@@ -86,12 +86,24 @@ TestCase {
     verify(Weather.temperature("") === "")
   }
 
-  function test_current_conditions_come_from_the_first_entry() {
+  function test_current_conditions_come_from_the_hour_under_way() {
+    const raw = report([
+      entry("2026-09-07T19:00:00Z", 16.6, "cloudy"),
+      entry("2026-09-07T20:00:00Z", 15.2, "rainandthunder"),
+      entry("2026-09-07T21:00:00Z", 13.4, "clearsky_night"),
+    ])
+    // MET leaves the finished 19:00 hour at the head of the timeseries.
+    const parsed = Weather.parse(raw, new Date("2026-09-07T20:09:00Z"))
+    verify(parsed.current.symbol === "rainandthunder")
+    verify(parsed.current.temperature === 15.2)
+    verify(parsed.days.length === 0)
+  }
+
+  function test_current_conditions_fall_back_to_the_first_entry() {
     const raw = report([entry("2026-09-07T19:00:00Z", 16.6, "cloudy")])
-    const parsed = Weather.parse(raw, new Date("2026-09-07T19:00:00Z"))
+    const parsed = Weather.parse(raw, new Date("2026-09-07T18:30:00Z"))
     verify(parsed.current.symbol === "cloudy")
     verify(parsed.current.temperature === 16.6)
-    verify(parsed.days.length === 0)
   }
 
   function test_unusable_responses_parse_to_null() {
