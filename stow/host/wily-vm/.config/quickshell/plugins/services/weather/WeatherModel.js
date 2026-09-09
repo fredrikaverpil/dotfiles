@@ -126,8 +126,17 @@ function symbolOf(entry) {
   return next && next.summary ? String(next.summary.symbol_code || "") : ""
 }
 
-function currentFrom(series) {
+// MET keeps the elapsed hour at the head of the timeseries, so series[0]'s
+// next_1_hours symbol can describe weather that is already over. Take the
+// latest entry that has started.
+function currentFrom(series, now) {
+  var reference = (now instanceof Date ? now : new Date()).getTime()
   var entry = series[0]
+  for (var i = 1; i < series.length; i++) {
+    var when = Date.parse(String(series[i].time || ""))
+    if (isNaN(when) || when > reference) break
+    entry = series[i]
+  }
   var details = entry && entry.data && entry.data.instant ? entry.data.instant.details : null
   if (!details) return null
   return {
@@ -194,7 +203,7 @@ function parse(raw, now) {
   var series = data && data.properties ? data.properties.timeseries : null
   if (!series || series.length === 0) return null
 
-  var current = currentFrom(series)
+  var current = currentFrom(series, now)
   if (!current) return null
   return { current: current, days: dailyFrom(series, now) }
 }
