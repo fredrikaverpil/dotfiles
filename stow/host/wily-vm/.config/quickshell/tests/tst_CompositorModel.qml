@@ -43,6 +43,14 @@ TestCase {
     ])
   }
 
+  function test_theme_edits() {
+    const palette = { dim: "#403833" }
+    compare(Niri.themeEdits(palette), [
+      "-e", "s|^( *inactive-color ).*|\\1\"#403833\"|"
+    ])
+    compare(Hyprland.themeEdits(palette), [])
+  }
+
   function test_scale_policy() {
     compare(Hyprland.cleanScale(1, 1280, 800), "1")
     compare(Hyprland.cleanScale(0, 1280, 800), "")

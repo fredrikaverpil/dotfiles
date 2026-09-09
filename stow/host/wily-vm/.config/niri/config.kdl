@@ -31,8 +31,16 @@ output "Virtual-1" {
 
 layout {
     gaps 8
+    // The shell rewrites the `inactive-color` line on every theme change to
+    // the panel border colour, which is why it is alone on its line and
+    // appears exactly once.
+    focus-ring {
+        off
+    }
     border {
         width 2
+        active-color "#6099C0"
+        inactive-color "#403833"
     }
 }
 
