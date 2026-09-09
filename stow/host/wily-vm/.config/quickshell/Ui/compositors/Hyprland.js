@@ -5,6 +5,8 @@ var name = "Hyprland"
 var sessionVariable = "HYPRLAND_INSTANCE_SIGNATURE"
 var workspaceComponent = "HyprlandWorkspaces.qml"
 var scaleConfig = "/.config/hypr/monitors.lua"
+// Hyprland keeps its default border colours; nothing to rewrite per theme.
+var themeConfig = ""
 // Start exclusive to acquire focus, then allow on-demand focus between panels.
 var releaseExclusiveFocus = true
 
@@ -49,6 +51,10 @@ function scaleEdits(scale, gdkScale) {
     "-e", "s|^local wily_monitor_scale = .*|local wily_monitor_scale = " + scale + "|",
     "-e", "s|^local wily_gdk_scale = .*|local wily_gdk_scale = " + gdkScale + "|",
   ]
+}
+
+function themeEdits(palette) {
+  return []
 }
 
 function gcd(a, b) {

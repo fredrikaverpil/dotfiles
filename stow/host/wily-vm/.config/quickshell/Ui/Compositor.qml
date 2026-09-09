@@ -13,6 +13,7 @@ Singleton {
   readonly property bool releaseExclusiveFocus: backend.releaseExclusiveFocus
   readonly property url workspaceSource: Qt.resolvedUrl("compositors/" + backend.workspaceComponent)
   readonly property string scaleConfig: Quickshell.env("HOME") + backend.scaleConfig
+  readonly property string themeConfig: Quickshell.env("HOME") + backend.themeConfig
 
   function dpms(on) { return backend.dpms(on) }
   function closeWindow() { return backend.closeWindow() }
@@ -23,6 +24,7 @@ Singleton {
   function cleanScale(scale, width, height) { return backend.cleanScale(scale, width, height) }
   function availableScales(scales, width, height) { return backend.availableScales(scales, width, height) }
   function scaleEdits(scale, gdkScale) { return backend.scaleEdits(scale, gdkScale) }
+  function themeEdits(palette) { return backend.themeEdits(palette) }
   function layoutQuery() { return backend.layoutQuery() }
   function currentLayout(raw) { return backend.currentLayout(raw) }
   function setLayout(index) { return backend.setLayout(index) }

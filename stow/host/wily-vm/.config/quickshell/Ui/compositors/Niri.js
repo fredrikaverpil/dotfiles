@@ -5,6 +5,7 @@ var name = "niri"
 var sessionVariable = "NIRI_SOCKET"
 var workspaceComponent = "NiriWorkspaces.qml"
 var scaleConfig = "/.config/niri/config.kdl"
+var themeConfig = "/.config/niri/config.kdl"
 // Demoting an exclusive panel loses its keyboard focus on niri.
 var releaseExclusiveFocus = false
 
@@ -44,6 +45,10 @@ function scaleEdits(scale, gdkScale) {
     "-e", "s|^( *scale ).*|\\1" + scale + "|",
     "-e", "s|^( *GDK_SCALE ).*|\\1\"" + gdkScale + "\"|",
   ]
+}
+
+function themeEdits(palette) {
+  return ["-e", "s|^( *inactive-color ).*|\\1\"" + palette.dim + "\"|"]
 }
 
 function cleanScale(scale, width, height) {
