@@ -48,7 +48,9 @@ TestCase {
     compare(Niri.themeEdits(palette), [
       "-e", "s|^( *inactive-color ).*|\\1\"#403833\"|"
     ])
-    compare(Hyprland.themeEdits(palette), [])
+    compare(Hyprland.themeEdits(palette), [
+      "-e", "s|^( *inactive_border = ).*|\\1\"rgb(403833)\",|"
+    ])
   }
 
   function test_scale_policy() {
