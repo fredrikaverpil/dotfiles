@@ -10,6 +10,7 @@ grep -q '^local wily_gdk_scale = ' ../hypr/monitors.lua
 grep -q '^    scale ' ../niri/config.kdl
 grep -q '^    GDK_SCALE ' ../niri/config.kdl
 grep -q '^        inactive-color ' ../niri/config.kdl
+grep -q '^      inactive_border = ' ../hypr/hyprland.lua
 
 tests/hyprland_test.sh ../hypr/hyprland.lua
 niri validate --config ../niri/config.kdl

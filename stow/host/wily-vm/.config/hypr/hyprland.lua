@@ -24,6 +24,13 @@ hl.config({
     gaps_in = 4,
     gaps_out = 8,
     border_size = 2,
+    col = {
+      active_border = "rgb(6099C0)",
+      -- The shell rewrites this line on every theme change to the panel
+      -- border colour, which is why it is alone on its line and appears
+      -- exactly once.
+      inactive_border = "rgb(403833)",
+    },
   },
 
   decoration = {
