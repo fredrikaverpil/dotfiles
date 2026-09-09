@@ -18,8 +18,6 @@ code in this repository.
 - **Update all flake inputs**: `nix flake update`, then rebuild
 - **Update only unstable-pinned inputs**: `nix flake update nixpkgs-unstable
   nix-darwin home-manager-unstable llm-agents dotfiles`, then rebuild
-- **Refresh package-managed CLI tools after an update**: `uv tool upgrade --all`
-  and `npm-tools-upgrade`
 - **Upgrade Homebrew packages (Darwin)**: `brew update && brew upgrade` —
   rebuilds only install/remove to match the declared set, they never bump
   versions (add `--greedy` to also bump self-updating casks)
@@ -66,8 +64,9 @@ and **GNU Stow** for dotfile symlinking.
   Nix (Linux)
 - **LLM agent CLIs**: Packaged agents (claude-code, codex, gemini-cli,
   opencode, pi, ...) come from the `llm-agents` flake input
-  (numtide/llm-agents.nix) and are declared via `packageTools.llmAgents`
-  (mergeable across common → platform → host configs). Do not make this input
+  (numtide/llm-agents.nix) and are declared via the `llmAgents` option in
+  `nix/shared/home/llm-agents.nix` (mergeable across common → platform → host
+  configs). Do not make this input
   follow another nixpkgs — it is built/cached against its own pin
   (cache.numtide.com). Update via `nix flake update llm-agents`, then rebuild
 - **No curl|bash installers in activation**: AI/agent CLIs must come from
@@ -75,19 +74,13 @@ and **GNU Stow** for dotfile symlinking.
   binaries cannot run on NixOS (stub-ld), and install-if-missing activation
   scripts make rebuilds depend on third-party servers.
 
-### Package-Managed Tools (npm and Python)
+### CLI tools outside nixpkgs
 
-For CLI tools installed via deno (npm) or uv (Python). These require an
-explicit `uv tool upgrade --all` / `npm-tools-upgrade` after updating flake
-inputs to actually pick up new versions.
-
-- **Module**: `nix/shared/home/package-tools.nix`
-- **Behavior**: Installed on each rebuild; upgraded manually via
-  `uv tool upgrade --all` / `npm-tools-upgrade`
-
-To add a tool, add an entry to `packageTools.npmPackages` (a `{ package, bin }`
-pair), `packageTools.uvTools`, or `packageTools.llmAgents` (a package name from
-the `llm-agents` flake) at the appropriate config level, then rebuild.
+There is no mechanism for installing CLI tools with a language package manager
+(npm, uv, ...) — a tool must come from nixpkgs or the `llm-agents` flake.
+Wheels and prebuilt npm binaries are glibc-linked and fail to load on NixOS
+(`libstdc++.so.6: cannot open shared object file`). For a one-off run, use
+`deno run -A npm:<pkg>` or `uvx <pkg>` from a shell instead of installing.
 
 ### Wily shell development (VM and ThinkPad)
 

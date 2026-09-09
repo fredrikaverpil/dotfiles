@@ -17,10 +17,7 @@ in
     ./common.nix
   ];
 
-  # Linux-specific package-managed tools
-  packageTools.npmPackages = [ ];
-  packageTools.uvTools = [ ];
-  packageTools.llmAgents = [ ];
+  llmAgents = [ ];
 
   home.packages = with pkgs; [
     lsof # List open files - essential for debugging file/network issues

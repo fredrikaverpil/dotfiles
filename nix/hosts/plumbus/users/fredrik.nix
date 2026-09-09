@@ -18,15 +18,7 @@ in
   home.packages = with pkgs; [
   ];
 
-  packageTools.npmPackages = [
-    {
-      package = "@googleworkspace/cli";
-      bin = "gws";
-    }
-  ];
-  packageTools.uvTools = [ ];
-
-  packageTools.llmAgents = [
+  llmAgents = [
     # "cursor-agent"
     "antigravity-cli"
   ];

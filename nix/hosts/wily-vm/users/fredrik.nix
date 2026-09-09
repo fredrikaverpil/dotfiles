@@ -12,5 +12,5 @@
     setAsDefaultBrowser = true;
   };
 
-  packageTools.llmAgents = [ ];
+  llmAgents = [ ];
 }
