@@ -83,28 +83,13 @@ binds {
     Mod+Return hotkey-overlay-title="Terminal" { spawn "ghostty"; }
     Mod+Shift+Return hotkey-overlay-title="Browser" { spawn "uwsm-app" "--" "zen-beta.desktop"; }
     Mod+Shift+B hotkey-overlay-title="Browser" { spawn "uwsm-app" "--" "zen-beta.desktop"; }
-    Mod+Shift+F hotkey-overlay-title="File manager" { spawn "uwsm-app" "--" "org.kde.dolphin.desktop"; }
     Mod+Shift+N hotkey-overlay-title="Editor" { spawn "ghostty" "-e" "nvim"; }
 
     // Shell
     Mod+Space hotkey-overlay-title="Menu" { spawn "qs" "ipc" "call" "menu" "toggle"; }
-    Mod+Alt+Space hotkey-overlay-title="Apps menu" { spawn "qs" "ipc" "call" "menu" "level" "apps"; }
-    Mod+Escape hotkey-overlay-title="System menu" { spawn "qs" "ipc" "call" "menu" "level" "system"; }
-    Mod+K hotkey-overlay-title="Keybindings" { spawn "qs" "ipc" "call" "menu" "level" "learn.keybindings"; }
-    Mod+Ctrl+Space hotkey-overlay-title="Background switcher" { spawn "qs" "ipc" "call" "wallpaper" "toggle"; }
-    Mod+Shift+Ctrl+Space hotkey-overlay-title="Theme menu" { spawn "qs" "ipc" "call" "menu" "level" "style.theme"; }
-    Mod+Comma hotkey-overlay-title="Dismiss latest notification" { spawn "qs" "ipc" "call" "notifications" "dismissOne"; }
+    Mod+N hotkey-overlay-title="Dismiss latest notification" { spawn "qs" "ipc" "call" "notifications" "dismissOne"; }
     Mod+Shift+Comma hotkey-overlay-title="Dismiss all notifications" { spawn "qs" "ipc" "call" "notifications" "dismissAll"; }
-    Mod+Ctrl+Comma hotkey-overlay-title="Toggle Do Not Disturb" { spawn "qs" "ipc" "call" "notifications" "toggleDnd"; }
     Mod+Alt+Comma hotkey-overlay-title="Invoke latest notification" { spawn "qs" "ipc" "call" "notifications" "invokeLast"; }
-    Mod+Shift+Alt+Comma hotkey-overlay-title="Open notification history" { spawn "qs" "ipc" "call" "notifications" "showHistory"; }
-    Mod+Ctrl+N hotkey-overlay-title="Toggle nightlight" { spawn "qs" "ipc" "call" "nightlight" "toggle"; }
-    Mod+Ctrl+D hotkey-overlay-title="Display settings" { spawn "qs" "ipc" "call" "display" "toggle"; }
-    Mod+Ctrl+W hotkey-overlay-title="Network settings" { spawn "qs" "ipc" "call" "network" "toggle"; }
-    Mod+Ctrl+A hotkey-overlay-title="Audio settings" { spawn "qs" "ipc" "call" "audio" "toggle"; }
-    Mod+Ctrl+I hotkey-overlay-title="Toggle idle locking" { spawn "qs" "ipc" "call" "idle" "toggle"; }
-    Mod+Ctrl+L hotkey-overlay-title="Lock system" { spawn "qs" "ipc" "call" "lock" "lock"; }
-    Mod+Ctrl+K hotkey-overlay-title="Next keyboard layout" { spawn "qs" "ipc" "call" "keyboard" "next"; }
 
     // allow-when-locked keeps these working on the lock screen.
     XF86AudioRaiseVolume allow-when-locked=true hotkey-overlay-title="Volume up" { spawn "qs" "ipc" "call" "audio" "up"; }
