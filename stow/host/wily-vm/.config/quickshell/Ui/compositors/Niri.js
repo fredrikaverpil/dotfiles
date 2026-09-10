@@ -15,6 +15,12 @@ function dpms(on) {
 
 function closeWindow() { return ["niri", "msg", "action", "close-window"] }
 
+// niri saves to screenshot-path and copies to the clipboard on its own.
+function screenshot(mode) {
+  return ["niri", "msg", "action",
+    mode === "window" ? "screenshot-window" : "screenshot-screen"]
+}
+
 function focusWorkspace(id) {
   return ["niri", "msg", "action", "focus-workspace", String(id)]
 }
