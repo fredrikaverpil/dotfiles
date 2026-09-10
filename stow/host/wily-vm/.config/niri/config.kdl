@@ -117,6 +117,12 @@ binds {
     XF86AudioPrev allow-when-locked=true repeat=false hotkey-overlay-title="Previous track" { spawn "qs" "ipc" "call" "media" "previous"; }
     Alt+Shift+XF86AudioPlay allow-when-locked=true repeat=false hotkey-overlay-title="Previous track" { spawn "qs" "ipc" "call" "media" "previous"; }
 
+    // Screenshots. niri saves to screenshot-path, default
+    // ~/Pictures/Screenshots, and copies to the clipboard.
+    Print repeat=false hotkey-overlay-title="Screenshot a selection" { screenshot; }
+    Ctrl+Print repeat=false hotkey-overlay-title="Screenshot the screen" { screenshot-screen; }
+    Alt+Print repeat=false hotkey-overlay-title="Screenshot the window" { screenshot-window; }
+
     // Windows
     Mod+W hotkey-overlay-title="Close window" { close-window; }
     Mod+Q hotkey-overlay-title="Close window" { close-window; }
