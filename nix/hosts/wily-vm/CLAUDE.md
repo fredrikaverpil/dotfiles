@@ -40,6 +40,8 @@ previous states.
   - `~/code/public/github.com/caelestia-dots/shell`
   - `~/code/public/github.com/AvengeMedia/DankMaterialShell`
   - `~/code/public/github.com/0xbbuddha/dotfiles_nothing_os`.
+- Any open source/public projects we might want to adopt/inspect can be cloned
+  into `~/code/public/`.
 
 ## Required local validation
 
