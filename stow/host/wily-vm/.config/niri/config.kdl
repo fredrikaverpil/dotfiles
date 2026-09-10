@@ -50,6 +50,22 @@ environment {
 
 prefer-no-csd
 
+workspace "1"
+workspace "2"
+workspace "3"
+workspace "4"
+workspace "5"
+
+window-rule {
+    match app-id=r#"^zen-beta$"#
+    open-on-workspace "1"
+}
+
+window-rule {
+    match app-id=r#"^signal$"#
+    open-on-workspace "3"
+}
+
 cursor {
     xcursor-size 24
 }
@@ -146,6 +162,11 @@ binds {
     Mod+Tab hotkey-overlay-title="Next workspace" { focus-workspace-down; }
     Mod+Shift+Tab hotkey-overlay-title="Previous workspace" { focus-workspace-up; }
     Mod+Ctrl+Tab hotkey-overlay-title="Former workspace" { focus-workspace-previous; }
+
+    Mod+Shift+Page_Up hotkey-overlay-title="Move workspace up" { move-workspace-up; }
+    Mod+Shift+Page_Down hotkey-overlay-title="Move workspace down" { move-workspace-down; }
+    Mod+Shift+I hotkey-overlay-title="Move workspace up" { move-workspace-up; }
+    Mod+Shift+U hotkey-overlay-title="Move workspace down" { move-workspace-down; }
 
     Mod+WheelScrollDown cooldown-ms=150 hotkey-overlay-title="Scroll active workspace forward" { focus-workspace-down; }
     Mod+WheelScrollUp cooldown-ms=150 hotkey-overlay-title="Scroll active workspace backward" { focus-workspace-up; }
