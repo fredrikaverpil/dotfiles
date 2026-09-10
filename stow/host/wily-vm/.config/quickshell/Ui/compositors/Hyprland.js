@@ -17,6 +17,20 @@ function closeWindow() {
   return ["hyprctl", "dispatch", "hl.dsp.window.close()"]
 }
 
+// Hyprland has no screenshot action, so grim needs the saving and copying
+// niri does natively. Window geometry comes from the plain-text dump to avoid
+// depending on jq, which is not declared anywhere in the flake.
+function screenshot(mode) {
+  var geometry = mode === "window"
+    ? " -g \"$(hyprctl activewindow | awk '/^\\tat:/{a=$2} /^\\tsize:/{s=$2} " +
+      "END{split(s, d, \",\"); print a \" \" d[1] \"x\" d[2]}')\""
+    : ""
+  return ["sh", "-c",
+    "d=\"$HOME/Pictures/Screenshots\" && mkdir -p \"$d\" && " +
+    "f=\"$d/Screenshot from $(date '+%Y-%m-%d %H-%M-%S').png\" && " +
+    "grim" + geometry + " \"$f\" && wl-copy --type image/png < \"$f\""]
+}
+
 function focusWorkspace(id) {
   return ["hyprctl", "dispatch", 'hl.dsp.focus({ workspace = "' + id + '" })']
 }

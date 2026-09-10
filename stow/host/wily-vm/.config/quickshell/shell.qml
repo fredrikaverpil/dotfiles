@@ -178,10 +178,10 @@ ShellRoot {
     "style.theme.dark": { icon: "", label: "Dark", action: () => root.setDark(true) },
     "style.theme.light": { icon: "", label: "Light", action: () => root.setDark(false) },
     "trigger": { icon: "󱓞", label: "Trigger" },
-    "trigger.screenshot": { icon: "", label: "Screenshot", action: () => root.run(
-      "mkdir -p $HOME/Pictures/Screenshots && " +
-      "f=$HOME/Pictures/Screenshots/screenshot-$(date +%Y%m%d-%H%M%S).png && " +
-      "grim \"$f\" && wl-copy --type image/png < \"$f\"") },
+    "trigger.screenshot": { icon: "", label: "Screenshot (desktop)",
+      action: () => Quickshell.execDetached(Ui.Compositor.screenshot("screen")) },
+    "trigger.screenshotWindow": { icon: "", label: "Screenshot (window)",
+      action: () => Quickshell.execDetached(Ui.Compositor.screenshot("window")) },
     "trigger.emoji": { icon: "", label: "Emoji", enabled: false },
     "trigger.color": { icon: "󰃉", label: "Color picker", enabled: false },
     "trigger.share": { icon: "", label: "Share", enabled: false },
