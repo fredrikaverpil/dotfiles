@@ -78,12 +78,6 @@ spawn-at-startup "uwsm" "finalize" "NIRI_SOCKET"
 spawn-at-startup "sh" "-c" "sed -n '/^spawn-at-startup/d; s|^ *\\([^ ]*\\).*hotkey-overlay-title=\"\\([^\"]*\\)\".*|\\1\t\\2|p' ~/.config/niri/config.kdl > ~/.local/state/wm-binds.tsv.tmp && mv ~/.local/state/wm-binds.tsv.tmp ~/.local/state/wm-binds.tsv"
 
 binds {
-    // Applications
-    Mod+Return hotkey-overlay-title="Terminal" { spawn "ghostty"; }
-    Mod+Shift+Return hotkey-overlay-title="Browser" { spawn "uwsm-app" "--" "zen-beta.desktop"; }
-    Mod+Shift+B hotkey-overlay-title="Browser" { spawn "uwsm-app" "--" "zen-beta.desktop"; }
-    Mod+Shift+N hotkey-overlay-title="Editor" { spawn "ghostty" "-e" "nvim"; }
-
     // Shell
     Mod+Space hotkey-overlay-title="Menu" { spawn "qs" "ipc" "call" "menu" "toggle"; }
     Mod+N hotkey-overlay-title="Dismiss latest notification" { spawn "qs" "ipc" "call" "notifications" "dismissOne"; }
