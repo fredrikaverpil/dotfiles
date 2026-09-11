@@ -1,6 +1,4 @@
-// Chords mirror hyprland.lua. niri reloads this file on save. The display
-// panel rewrites the `scale` and `GDK_SCALE` lines in place, which is why each
-// is alone on its line and appears exactly once.
+// Chords mirror hyprland.lua. niri reloads this file on save.
 
 // nwg-displays owns outputs in the untracked monitor.kdl. It prepends its own
 // include unless a line contains `include "monitor.kdl"`, as this comment does;
@@ -28,12 +26,6 @@ input {
         dwtp
         natural-scroll
     }
-}
-
-// The connector name must match `niri msg -j outputs` or the block is inert
-// and a scale set from the display panel lasts only until the next restart.
-output "eDP-1" {
-    scale 1
 }
 
 layout {

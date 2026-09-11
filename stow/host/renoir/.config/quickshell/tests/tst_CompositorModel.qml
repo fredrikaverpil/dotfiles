@@ -32,17 +32,6 @@ TestCase {
     verify(error.indexOf("Unsupported or ambiguous compositor session") >= 0)
   }
 
-  function test_scale_edits() {
-    compare(Hyprland.scaleEdits("1.25", 1), [
-      "-e", "s|^local wily_monitor_scale = .*|local wily_monitor_scale = 1.25|",
-      "-e", "s|^local wily_gdk_scale = .*|local wily_gdk_scale = 1|"
-    ])
-    compare(Niri.scaleEdits("1.25", 1), [
-      "-e", "s|^( *scale ).*|\\11.25|",
-      "-e", "s|^( *GDK_SCALE ).*|\\1\"1\"|"
-    ])
-  }
-
   function test_theme_edits() {
     const palette = { dim: "#403833" }
     compare(Niri.themeEdits(palette), [
@@ -53,21 +42,8 @@ TestCase {
     ])
   }
 
-  function test_scale_policy() {
-    compare(Hyprland.cleanScale(1, 1280, 800), "1")
-    compare(Hyprland.cleanScale(0, 1280, 800), "")
-    const scale = Hyprland.cleanScale(1.25, 1920, 1080)
-    verify(Number(scale) >= 1.25)
-    compare(43200 % Math.round(Number(scale) * 120), 0)
-    verify(Number(Hyprland.cleanScale(0.001, 1280, 800)) > 0)
-    verify(Hyprland.availableScales([1, 1.25, 1.6, 2], 1920, 1080).length > 0)
-    compare(Niri.cleanScale(1.25, 1920, 1080), "1.25")
-    compare(Niri.cleanScale(0, 1920, 1080), "")
-    compare(Niri.availableScales([1, 1.25, 1.6, 2], 1920, 1080), ["1", "1.25", "1.6", "2"])
-  }
-
   function test_output_parsers() {
-    const monitor = { name: "Virtual-1", width: 1280, height: 800, refreshRate: 60, scale: 2 }
+    const monitor = { name: "Virtual-1", width: 1280, height: 800 }
     const other = Object.assign({}, monitor, { name: "Other", focused: false })
     const focused = Object.assign({}, monitor, { focused: true })
     compare(Hyprland.focusedMonitor(JSON.stringify([other, focused])), monitor)
