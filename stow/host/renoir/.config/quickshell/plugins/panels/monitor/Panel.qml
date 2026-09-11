@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
 
 import "../../../Ui" as Ui
@@ -10,7 +11,7 @@ Ui.Panel {
 
   readonly property var textScales: [0.8, 0.9, 1, 1.1, 1.25, 1.5]
 
-  cardHeight: 460
+  cardHeight: 410
   keyNavigation: true
 
   function refresh() {
@@ -115,9 +116,14 @@ Ui.Panel {
     detail: "Unavailable in this VM"
   }
 
-  DimRow {
-    label: "Displays"
-    detail: "One scanout"
+  // Layout, mode and scale are saved by nwg-displays to niri/monitor.kdl.
+  ChoiceButton {
+    width: parent.width
+    label: "Arrange displays…"
+    onActivated: {
+      Quickshell.execDetached(["uwsm-app", "--", "nwg-displays.desktop"])
+      root.close()
+    }
   }
 
   component Section: Column {
