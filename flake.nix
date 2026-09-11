@@ -93,6 +93,9 @@
         wily-vm = lib.mkNixos {
           configPath = ./nix/hosts/wily-vm/configuration.nix;
         };
+        renoir = lib.mkNixos {
+          configPath = ./nix/hosts/renoir/configuration.nix;
+        };
       };
 
       darwinConfigurations = {

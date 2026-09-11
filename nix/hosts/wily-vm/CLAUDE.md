@@ -1,10 +1,11 @@
 # Wily desktop VM
 
 `wily-vm` is the NixOS development VM for the future `wily` ThinkPad T14 Gen 6
-Intel (Lunar Lake); a second ThinkPad T14 Gen 1 (AMD Renoir) will run the same
-configuration. Keep the shell portable and vendor-neutral; machine-specific
-settings (microcode, VAAPI driver, kernel choice, thermald) belong in the
-host's Nix/Stow configuration.
+Intel (Lunar Lake). `nix/hosts/renoir` (ThinkPad T14 Gen 1, AMD Renoir) is a
+copy of this host and may drift; changes here are not mirrored there. Keep
+the shell portable and vendor-neutral; machine-specific settings (microcode,
+VAAPI driver, kernel choice, thermald) belong in the host's Nix/Stow
+configuration.
 
 Document constraints, rationale and gotchas, not implementation inventories or
 previous states.

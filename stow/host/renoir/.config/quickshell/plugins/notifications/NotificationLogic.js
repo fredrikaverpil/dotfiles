@@ -1,0 +1,34 @@
+
+function asString(value) {
+  return value === undefined || value === null ? "" : String(value)
+}
+
+function iconSource(icon) {
+  var value = asString(icon)
+  if (!value) return ""
+  if (value.indexOf("file://") === 0 || value.indexOf("image://") === 0) return value
+  if (value.charAt(0) === "/") return "file://" + value
+  return value
+}
+
+function snapshotOf(notification, timestamp) {
+  return {
+    app: asString(notification.appName),
+    appIcon: asString(notification.appIcon),
+    summary: asString(notification.summary),
+    body: asString(notification.body),
+    image: asString(notification.image),
+    urgency: Number(notification.urgency),
+    timestamp: timestamp === undefined ? Date.now() : timestamp
+  }
+}
+
+function durationFor(notification, lowUrgency, criticalUrgency) {
+  if (notification.urgency === criticalUrgency || notification.resident) return 0
+
+  var requested = Number(notification.expireTimeout)
+  if (!isFinite(requested) || requested <= 0) requested = 0
+
+  var minimum = notification.urgency === lowUrgency ? 5000 : 8000
+  return Math.min(30000, Math.max(minimum, requested))
+}

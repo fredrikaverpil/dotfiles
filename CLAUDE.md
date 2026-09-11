@@ -8,7 +8,7 @@ code in this repository.
 - **Full rebuild (Darwin)**: `sudo darwin-rebuild switch --flake
   ~/.dotfiles#"$(hostname -s)"` (hosts: `zap`, `plumbus`)
 - **Full rebuild (NixOS)**: `sudo nixos-rebuild switch --flake
-  ~/.dotfiles#"$(hostname -s)"` (host: `rpi5-homelab`)
+  ~/.dotfiles#"$(hostname -s)"` (hosts: `rpi5-homelab`, `wily-vm`, `renoir`)
 - **Symlink dotfiles only** (GNU Stow, no Nix rebuild): `cd ~/.dotfiles`; then
   run `stow --dir=stow --target="$HOME" --restow --no-folding --adopt shared &&
   stow --dir=stow/platform --target="$HOME" --restow --no-folding --adopt
@@ -24,7 +24,7 @@ code in this repository.
 - **Nix rebuild**: ask user to run this, NEVER run it yourself
 - **Nix validation**: `nix flake check` or `nix flake check --all-systems`
 - **Nix builds**: `nix build .#darwinConfigurations.<host>.system` (hosts:
-  `zap`, `plumbus` on Darwin; `rpi5-homelab` on NixOS)
+  `zap`, `plumbus` on Darwin; `rpi5-homelab`, `wily-vm`, `renoir` on NixOS)
 - **Format Nix files**: `nix fmt` (uses nixfmt-rfc-style)
 - **CI testing**: Follow `.github/workflows/test.yml` workflow
 - **Toolchain outside Neovim**: language toolchains (go, python3, node, ruby,
@@ -86,7 +86,8 @@ Wheels and prebuilt npm binaries are glibc-linked and fail to load on NixOS
 
 Read `nix/hosts/wily-vm/CLAUDE.md` before changing Quickshell or its compositor
 configurations. It owns the required local before/after checks, platform
-boundaries, and safe deployment process for `wily-vm` and the future `wily`.
+boundaries, and safe deployment process for `wily-vm`; `renoir` (ThinkPad T14
+Gen 1) is a copy of it that is allowed to drift.
 
 ### Neovim Configuration
 
