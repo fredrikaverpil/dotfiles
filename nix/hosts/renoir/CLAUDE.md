@@ -167,6 +167,30 @@ from `systemctl --user show-environment`. Missing display context can make live
 Quickshell instances appear dead. `shell-smoke` avoids that by selecting the
 PID.
 
+## Firmware
+
+BIOS and device firmware come from LVFS through fwupd (`services.fwupd`).
+Updates reboot the machine, so the user runs them.
+
+```sh
+fwupdmgr refresh --force               # stale metadata reports "no updates"
+fwupdmgr get-updates                   # lists each device's "Device ID"
+cat /sys/class/power_supply/AC/online   # must print 1
+fwupdmgr update <device-id>
+```
+
+- Refresh first; without it `get-updates` can falsely report nothing pending.
+- The BIOS update needs AC power and reboots into a UEFI capsule flash. It
+  is staged on the ESP (`/boot`); keep room there.
+- Secure Boot is disabled, so the KEK CA, UEFI CA and dbx updates are
+  unnecessary. Update only the device you need, by ID.
+- After the reboot, confirm `/sys/class/dmi/id/bios_version` and recheck
+  `journalctl -b -k -p warning`.
+- A BIOS update can reset EFI settings; recheck Config → Power → Sleep State.
+  "Linux" enables S3 (`deep` in `/sys/power/mem_sleep`).
+- The BIOS has no CPPC option, so `amd_pstate` stays disabled and cpufreq
+  uses `acpi-cpufreq`.
+
 ## Session and hardware constraints
 
 - Keep `wayland-session-waitenv.service`: niri announces readiness before it
