@@ -168,8 +168,6 @@ binds {
     Mod+Shift+Ctrl+J hotkey-overlay-title="Move window to below monitor" { move-column-to-monitor-down; }
     Mod+Shift+P hotkey-overlay-title="Power off monitors" { power-off-monitors; }
 
-    Alt+Tab hotkey-overlay-title="Focus on next window" { focus-window-previous; }
-
     // Workspaces
     Mod+O repeat=false hotkey-overlay-title="Overview" { toggle-overview; }
 
@@ -202,8 +200,7 @@ binds {
     Mod+Ctrl+U hotkey-overlay-title="Move column to next workspace" { move-column-to-workspace-down; }
     Mod+Ctrl+I hotkey-overlay-title="Move column to previous workspace" { move-column-to-workspace-up; }
 
-    Mod+Tab hotkey-overlay-title="Next workspace" { focus-workspace-down; }
-    Mod+Shift+Tab hotkey-overlay-title="Previous workspace" { focus-workspace-up; }
+    // Alt/Mod+Tab and Alt/Mod+grave are left to recent-windows' default binds.
     Mod+Ctrl+Tab hotkey-overlay-title="Former workspace" { focus-workspace-previous; }
 
     Mod+Shift+Page_Up hotkey-overlay-title="Move workspace up" { move-workspace-up; }
