@@ -181,6 +181,7 @@ in
     wl-clipboard
     wl-mirror
     wtype
+    proton-pass
     signal-desktop
     slack
     spotify
