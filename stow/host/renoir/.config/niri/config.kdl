@@ -61,7 +61,13 @@ window-rule {
 
 window-rule {
     match app-id=r#"^signal$"#
+    match app-id=r#"(?i)^slack$"#
     open-on-workspace "3"
+}
+
+window-rule {
+    match app-id=r#"(?i)^spotify$"#
+    open-on-workspace "5"
 }
 
 cursor {

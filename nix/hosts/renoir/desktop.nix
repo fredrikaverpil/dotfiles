@@ -182,6 +182,8 @@ in
     wl-mirror
     wtype
     signal-desktop
+    slack
+    spotify
     zed-editor
   ];
 }
