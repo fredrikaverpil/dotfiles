@@ -191,6 +191,31 @@ fwupdmgr update <device-id>
 - The BIOS has no CPPC option, so `amd_pstate` stays disabled and cpufreq
   uses `acpi-cpufreq`.
 
+## Fingerprint reader
+
+The Synaptics reader (`06cb:00bd`) is not enabled; it is unused by choice.
+To enable it:
+
+```nix
+# fprintAuth defaults to on for every PAM service. login (and wily-lock,
+# which includes it) and sudo stay password-only until tested on hardware.
+services.fprintd.enable = true;
+security.pam.services.login.fprintAuth = false;
+security.pam.services.sudo.fprintAuth = false;
+```
+
+Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
+
+- Check the generated PAM with
+  `nix eval --raw .#nixosConfigurations.renoir.config.security.pam.services.<name>.text`;
+  `environment.etc."pam.d/<name>".text` is null because it uses `source`.
+- The lock screen starts PAM only after a password is submitted, so
+  fprintd in its stack would block typing until the finger prompt times
+  out. It needs a separate, concurrent fingerprint `PamContext`. Test
+  it with a recovery plan before enabling it for `login`.
+- fwupd cannot read the reader's firmware version: it answers with an
+  unmapped status `0x315`. libfprint talks to it independently; untested.
+
 ## Session and hardware constraints
 
 - Keep `wayland-session-waitenv.service`: niri announces readiness before it
