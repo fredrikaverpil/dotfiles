@@ -240,6 +240,11 @@ Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
 - Charge thresholds are set by a boot unit in `configuration.nix`; the battery
   panel only displays them and never writes sysfs. power-profiles-daemon
   conflicts with TLP; keep TLP disabled.
+- Lid close uses logind defaults: suspend (the pre-suspend unit locks first),
+  or nothing when docked. Niri turns off `eDP-1` while docked with the lid
+  closed; Hyprland does not, and that is deferred since Hyprland is unused. A
+  runtime `hyprctl` disable would not survive the reload a theme change
+  triggers; decide it in `hyprland.lua` at load instead.
 - DPMS-off can resemble a frozen machine. Use bounded commands; `grim` can hang
   while no output produces frames. Recovery is
   `hyprctl dispatch 'hl.dsp.dpms("on")'`.
