@@ -2,6 +2,12 @@
 // panel rewrites the `scale` and `GDK_SCALE` lines in place, which is why each
 // is alone on its line and appears exactly once.
 
+// nwg-displays owns outputs in the untracked monitor.kdl. It prepends its own
+// include unless a line contains `include "monitor.kdl"`, as this comment does;
+// a required include would fail while the file does not exist. niri uses the
+// first matching output block, so this stays above any other.
+include optional=true "monitor.kdl"
+
 input {
     keyboard {
         xkb {
