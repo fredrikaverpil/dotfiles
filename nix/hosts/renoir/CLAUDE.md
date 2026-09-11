@@ -239,6 +239,10 @@ Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
 - Real hardware here that the VM never had: Wi-Fi/Bluetooth, battery,
   backlight, lid, touchpad, fingerprint reader, `GAMMA_LUT` (nightlight).
   Validate those paths on this machine, not on the VM.
+- Bluetooth pairing belongs to bluetui, which registers its own BlueZ agent;
+  the shell registers none and never scans. The panel only toggles power and
+  connects paired devices. It uses `adapter.enabled`, which BlueZ does not
+  persist, so `powerOnBoot` turns the radio back on after every boot.
 - Charge thresholds are set by a boot unit in `configuration.nix`; the battery
   panel only displays them and never writes sysfs. power-profiles-daemon
   conflicts with TLP; keep TLP disabled.

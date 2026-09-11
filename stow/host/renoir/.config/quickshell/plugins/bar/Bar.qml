@@ -120,9 +120,20 @@ Scope {
       }
 
       Ui.BarButton {
-        id: batteryButton
+        id: bluetoothButton
         shell: bar.shell
         anchors.right: networkButton.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: 4
+        label: bar.shell.bluetoothService.icon
+        onActivated: bar.shell.bluetooth.toggle()
+        onSecondary: bar.shell.bluetoothService.togglePower()
+      }
+
+      Ui.BarButton {
+        id: batteryButton
+        shell: bar.shell
+        anchors.right: bluetoothButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: visible ? 4 : 0
         visible: bar.shell.batteryService.present
