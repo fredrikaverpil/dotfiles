@@ -51,7 +51,8 @@ These are development gates, not CI jobs. They live only in the repository's
 default devshell (`flake.nix`), entered by `direnv` at the repo root or run as
 `nix develop ~/.dotfiles -c <command>` (not `#dev`) from anywhere in the
 checkout. `compositor-test` and `shell-smoke` are Linux-only and are absent
-from the shell on macOS.
+from the shell on macOS. Static checks run against every host's tree;
+`shell-smoke` uses the tree of the host it runs on (`hostname -s`).
 
 | Change | Checks |
 | --- | --- |
