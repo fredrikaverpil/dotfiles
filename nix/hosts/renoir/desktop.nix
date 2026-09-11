@@ -164,6 +164,7 @@ in
     firefox
     grim
     wl-clipboard
+    wl-mirror
     wtype
     signal-desktop
     zed-editor
