@@ -128,12 +128,12 @@ binds {
 
     Mod+Left hotkey-overlay-title="Focus on left window" { focus-column-left; }
     Mod+Right hotkey-overlay-title="Focus on right window" { focus-column-right; }
-    Mod+Up hotkey-overlay-title="Focus on above window" { focus-window-up; }
-    Mod+Down hotkey-overlay-title="Focus on below window" { focus-window-down; }
+    Mod+Up hotkey-overlay-title="Focus on above window or previous workspace" { focus-window-or-workspace-up; }
+    Mod+Down hotkey-overlay-title="Focus on below window or next workspace" { focus-window-or-workspace-down; }
     Mod+H hotkey-overlay-title="Focus on left window" { focus-column-left; }
     Mod+L hotkey-overlay-title="Focus on right window" { focus-column-right; }
-    Mod+K hotkey-overlay-title="Focus on above window" { focus-window-up; }
-    Mod+J hotkey-overlay-title="Focus on below window" { focus-window-down; }
+    Mod+K hotkey-overlay-title="Focus on above window or previous workspace" { focus-window-or-workspace-up; }
+    Mod+J hotkey-overlay-title="Focus on below window or next workspace" { focus-window-or-workspace-down; }
     Mod+Home hotkey-overlay-title="Focus on first column" { focus-column-first; }
     Mod+End hotkey-overlay-title="Focus on last column" { focus-column-last; }
 
