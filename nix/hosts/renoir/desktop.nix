@@ -163,6 +163,7 @@ in
     cliamp-desktop
     firefox
     grim
+    nwg-displays
     wl-clipboard
     wl-mirror
     wtype
