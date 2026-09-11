@@ -11,6 +11,7 @@ import "plugins/menu" as Menu
 import "plugins/notifications" as Notifications
 import "plugins/panels/audio" as Audio
 import "plugins/panels/battery" as Battery
+import "plugins/panels/bluetooth" as Bluetooth
 import "plugins/panels/media" as Media
 import "plugins/panels/monitor" as Monitor
 import "plugins/panels/network" as Network
@@ -18,6 +19,7 @@ import "plugins/panels/tray" as Tray
 import "plugins/panels/weather" as Weather
 import "plugins/polkit" as Polkit
 import "plugins/services/battery" as BatteryService
+import "plugins/services/bluetooth" as BluetoothService
 import "plugins/services/idle" as Idle
 import "plugins/services/keyboard" as Keyboard
 import "plugins/services/media" as MediaService
@@ -39,6 +41,8 @@ ShellRoot {
   readonly property alias display: display
   readonly property alias network: network
   readonly property alias networkService: networkService
+  readonly property alias bluetooth: bluetooth
+  readonly property alias bluetoothService: bluetoothService
   readonly property alias audio: audio
   readonly property alias battery: battery
   readonly property alias batteryService: batteryService
@@ -195,6 +199,7 @@ ShellRoot {
     "setup": { icon: "", label: "Setup" },
     "setup.display": { icon: "󰍹", label: "Display", action: () => display.open() },
     "setup.network": { icon: "󰈀", label: "Network", action: () => network.open() },
+    "setup.bluetooth": { icon: "󰂯", label: "Bluetooth", action: () => bluetooth.open() },
     "setup.audio": { icon: "󰕾", label: "Audio", action: () => audio.open() },
     "setup.power": { icon: "󰂄", label: "Power", action: () => battery.open() },
     "setup.nightlight": { icon: "󰆔", label: "Nightlight", action: () => nightlight.toggle() },
@@ -298,6 +303,16 @@ ShellRoot {
     id: network
     shell: root
     service: networkService
+  }
+
+  BluetoothService.Service {
+    id: bluetoothService
+  }
+
+  Bluetooth.Panel {
+    id: bluetooth
+    shell: root
+    service: bluetoothService
   }
 
   Audio.Panel {
