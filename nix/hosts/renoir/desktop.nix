@@ -75,6 +75,10 @@ in
 
   security.rtkit.enable = true;
 
+  # The shell's battery service reads UPower and power-profiles-daemon over D-Bus.
+  services.upower.enable = true;
+  services.power-profiles-daemon.enable = true;
+
   # GTK3 needs the portal to follow the dconf theme; Qt uses the GTK platform theme.
   environment.sessionVariables = {
     HYPRCURSOR_THEME = "macOS-hypr";
