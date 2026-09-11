@@ -18,9 +18,6 @@ input {
         repeat-delay 200
         repeat-rate 60
     }
-    mouse {
-        natural-scroll
-    }
     touchpad {
         tap
         dwt
