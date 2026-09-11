@@ -57,6 +57,18 @@ let
       "Player"
     ];
   };
+  # bluetui registers its own pairing agent; the shell has none.
+  bluetui-desktop = pkgs.makeDesktopItem {
+    name = "bluetui";
+    desktopName = "bluetui";
+    comment = "Bluetooth pairing";
+    exec = "ghostty -e bluetui";
+    terminal = false;
+    categories = [
+      "Settings"
+      "HardwareSettings"
+    ];
+  };
 in
 {
   programs.hyprland = {
@@ -159,6 +171,8 @@ in
     iputils
 
     (chromium.override { commandLineArgs = "--no-first-run"; })
+    bluetui
+    bluetui-desktop
     cliamp
     cliamp-desktop
     firefox

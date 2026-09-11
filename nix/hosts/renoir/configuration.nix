@@ -57,6 +57,12 @@
   networking.networkmanager.enable = true;
   networking.firewall.allowedTCPPorts = [ 22 ];
 
+  # BlueZ does not persist Powered; the radio is on after every boot.
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+  };
+
   host.extraServices.openssh = {
     enable = true;
     settings = {
