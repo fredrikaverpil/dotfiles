@@ -46,7 +46,6 @@ hl.config({
     kb_layout = "us,se",
     repeat_rate = 60,
     repeat_delay = 200,
-    natural_scroll = true,
     touchpad = {
       natural_scroll = true,
       tap_to_click = true,
