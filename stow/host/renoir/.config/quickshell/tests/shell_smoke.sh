@@ -63,7 +63,7 @@ if [[ "${2-}" == --panels ]]; then
   ipc display open
   ready=false
   for ((attempt = 0; attempt < 30; attempt++)); do
-    if ipc display status | jq -e '(.monitor | length) > 0 and (.scale | tonumber) > 0' >/dev/null; then
+    if ipc display status | jq -e '(.monitor | length) > 0' >/dev/null; then
       ready=true
       break
     fi

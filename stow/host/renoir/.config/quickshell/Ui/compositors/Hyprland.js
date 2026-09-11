@@ -1,10 +1,7 @@
-.import "Scale.js" as Scale
-
 var id = "hyprland"
 var name = "Hyprland"
 var sessionVariable = "HYPRLAND_INSTANCE_SIGNATURE"
 var workspaceComponent = "HyprlandWorkspaces.qml"
-var scaleConfig = "/.config/hypr/monitors.lua"
 var themeConfig = "/.config/hypr/hyprland.lua"
 // Start exclusive to acquire focus, then allow on-demand focus between panels.
 var releaseExclusiveFocus = true
@@ -48,76 +45,12 @@ function focusedMonitor(raw) {
     name: monitor.name,
     width: monitor.width,
     height: monitor.height,
-    refreshRate: monitor.refreshRate,
-    scale: monitor.scale,
   }
-}
-
-function setScale(name, mode, scale) {
-  return ["hyprctl", "eval", "hl.monitor({ output = " + JSON.stringify(name) +
-    ", mode = " + JSON.stringify(mode) +
-    ", position = \"auto\", scale = " + scale + " })"]
-}
-
-function scaleEdits(scale, gdkScale) {
-  return [
-    "-e", "s|^local wily_monitor_scale = .*|local wily_monitor_scale = " + scale + "|",
-    "-e", "s|^local wily_gdk_scale = .*|local wily_gdk_scale = " + gdkScale + "|",
-  ]
 }
 
 function themeEdits(palette) {
   var color = "rgb(" + String(palette.dim).replace("#", "") + ")"
   return ["-e", "s|^( *inactive_border = ).*|\\1\"" + color + "\",|"]
-}
-
-function gcd(a, b) {
-  while (b) {
-    var remainder = a % b
-    a = b
-    b = remainder
-  }
-  return a
-}
-
-// Hyprland accepts only 1/120 scales that leave whole logical pixels.
-function cleanScale(scale, width, height) {
-  var requested = Number(scale)
-  var modeWidth = Number(width)
-  var modeHeight = Number(height)
-  if (!isFinite(requested) || !isFinite(modeWidth) || !isFinite(modeHeight)
-      || requested <= 0 || modeWidth <= 0 || modeHeight <= 0) return ""
-
-  var divisor = gcd(Math.round(modeWidth * 120), Math.round(modeHeight * 120))
-  var scaleUnits = Math.max(1, Math.round(requested * 120))
-  if (scaleUnits > divisor) scaleUnits = divisor
-  while (divisor % scaleUnits !== 0) scaleUnits++
-  return Scale.normalizeScale(scaleUnits / 120)
-}
-
-function availableScales(scales, width, height) {
-  if (!Array.isArray(scales) || Number(width) <= 0 || Number(height) <= 0) return scales || []
-
-  var byEffectiveScale = {}
-  for (var i = 0; i < scales.length; i++) {
-    var requested = Number(scales[i])
-    var effective = Number(cleanScale(requested, width, height))
-    if (!isFinite(requested) || !isFinite(effective) || effective <= 0) continue
-
-    var key = Scale.normalizeScale(effective)
-    var existing = byEffectiveScale[key]
-    if (!existing || Math.abs(requested - effective) < existing.distance) {
-      byEffectiveScale[key] = {
-        value: String(scales[i]),
-        index: i,
-        distance: Math.abs(requested - effective),
-      }
-    }
-  }
-  return Object.keys(byEffectiveScale)
-    .map(function(key) { return byEffectiveScale[key] })
-    .sort(function(a, b) { return a.index - b.index })
-    .map(function(candidate) { return candidate.value })
 }
 
 function layoutQuery() { return ["hyprctl", "-j", "devices"] }

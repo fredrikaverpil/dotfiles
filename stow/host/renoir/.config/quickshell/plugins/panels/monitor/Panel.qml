@@ -2,23 +2,12 @@ import QtQuick
 import Quickshell.Io
 
 import "../../../Ui" as Ui
-import "Model.js" as Model
-import "../../../Ui/compositors/Scale.js" as Scale
 
 Ui.Panel {
   id: root
 
   property var focusedMonitor: null
-  property string pendingScale: ""
-  property bool scaleChanging: false
 
-  readonly property var scalePresets: ["1", "1.25", "1.6", "2", "3", "4"]
-  readonly property var scaleValues: focusedMonitor
-    ? Ui.Compositor.availableScales(scalePresets, focusedMonitor.width, focusedMonitor.height)
-    : []
-  readonly property string currentScale: focusedMonitor
-    ? Scale.normalizeScale(focusedMonitor.scale)
-    : ""
   readonly property var textScales: [0.8, 0.9, 1, 1.1, 1.25, 1.5]
 
   cardHeight: 460
@@ -32,30 +21,6 @@ Ui.Panel {
     focusedMonitor = Ui.Compositor.focusedMonitor(raw)
   }
 
-  function setScale(requested) {
-    if (!focusedMonitor || scaleChanging) return
-
-    var scale = Ui.Compositor.cleanScale(requested, focusedMonitor.width, focusedMonitor.height)
-    if (!scale) return
-
-    var refreshRate = Number(focusedMonitor.refreshRate)
-    var mode = String(focusedMonitor.width) + "x" + String(focusedMonitor.height)
-    if (isFinite(refreshRate) && refreshRate > 0) mode += "@" + String(refreshRate)
-
-    pendingScale = scale
-    scaleChanging = true
-    applyScale.command = Ui.Compositor.setScale(focusedMonitor.name, mode, scale)
-    applyScale.running = true
-  }
-
-  // GNU sed otherwise replaces the Stow link rather than its target.
-  function persistScale(scale) {
-    persistScaleProcess.command = ["sed", "-i", "--follow-symlinks", "-E"]
-      .concat(Ui.Compositor.scaleEdits(scale, Model.gdkScale(scale)))
-      .concat([Ui.Compositor.scaleConfig])
-    persistScaleProcess.running = true
-  }
-
   onShownChanged: if (shown) refresh()
 
   IpcHandler {
@@ -67,7 +32,6 @@ Ui.Panel {
     function status(): string {
       return JSON.stringify({
         monitor: root.focusedMonitor ? root.focusedMonitor.name : "",
-        scale: root.currentScale,
         textScale: root.shell.textScale,
       })
     }
@@ -79,27 +43,6 @@ Ui.Panel {
     stdout: StdioCollector {
       waitForEnd: true
       onStreamFinished: root.setMonitorState(text)
-    }
-  }
-
-  Process {
-    id: applyScale
-    onExited: function(exitCode) {
-      if (exitCode === 0) root.persistScale(root.pendingScale)
-      else {
-        root.pendingScale = ""
-        root.scaleChanging = false
-        root.refresh()
-      }
-    }
-  }
-
-  Process {
-    id: persistScaleProcess
-    onExited: {
-      root.pendingScale = ""
-      root.scaleChanging = false
-      root.refresh()
     }
   }
 
@@ -153,22 +96,6 @@ Ui.Panel {
       ]
       selected: root.shell.nightlight.mode
       onChosen: value => root.shell.nightlight.setMode(value)
-    }
-  }
-
-  Section {
-    title: currentScale ? "Scale · " + currentScale + "×" : "Scale"
-
-    ChoiceRow {
-      options: root.scaleValues.map(value => ({
-        label: Ui.Compositor.cleanScale(value, root.focusedMonitor.width, root.focusedMonitor.height) + "×",
-        value: value,
-      }))
-      selected: root.currentScale
-      available: !root.scaleChanging && root.focusedMonitor !== null
-      matches: (value, selected) => root.focusedMonitor
-        && Ui.Compositor.cleanScale(value, root.focusedMonitor.width, root.focusedMonitor.height) === selected
-      onChosen: value => root.setScale(value)
     }
   }
 

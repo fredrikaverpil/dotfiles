@@ -107,7 +107,7 @@ from the shell on macOS.
 - `compare()` handles objects/arrays but tolerates small numeric differences.
   Use `verify(actual === expected)` for exact values/identity and `fuzzyCompare`
   for explicit tolerances. Do not compare objects via JSON serialization.
-- `compositor-test` checks real scale-config anchors, Hyprland's Lua/TSV
+- `compositor-test` checks real theme-edit anchors, Hyprland's Lua/TSV
   contract with an `hl` spy and temporary `HOME`, and niri's KDL. It does not
   test dispatch.
 
@@ -232,8 +232,9 @@ Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
   keyboard-layout state; compositor-side XKB toggles would desynchronize it.
 - Tray submenus require one live opener per level. `QsMenuEntry.display()` needs
   a platform menu this shell does not have.
-- The panel connector is assumed to be `eDP-1`; confirm with
-  `niri msg -j outputs` or the output block in `config.kdl` is inert.
+- nwg-displays owns output layout, mode and scale in the untracked
+  `~/.config/niri/monitor.kdl`; the shell never writes output config. niri
+  cannot mirror outputs; `wl-mirror` shows one in a fullscreen window.
 - Real hardware here that the VM never had: Wi-Fi/Bluetooth, battery,
   backlight, lid, touchpad, fingerprint reader, `GAMMA_LUT` (nightlight).
   Validate those paths on this machine, not on the VM.
