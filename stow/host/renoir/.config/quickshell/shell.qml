@@ -10,12 +10,14 @@ import "plugins/lock" as Lock
 import "plugins/menu" as Menu
 import "plugins/notifications" as Notifications
 import "plugins/panels/audio" as Audio
+import "plugins/panels/battery" as Battery
 import "plugins/panels/media" as Media
 import "plugins/panels/monitor" as Monitor
 import "plugins/panels/network" as Network
 import "plugins/panels/tray" as Tray
 import "plugins/panels/weather" as Weather
 import "plugins/polkit" as Polkit
+import "plugins/services/battery" as BatteryService
 import "plugins/services/idle" as Idle
 import "plugins/services/keyboard" as Keyboard
 import "plugins/services/media" as MediaService
@@ -38,6 +40,8 @@ ShellRoot {
   readonly property alias network: network
   readonly property alias networkService: networkService
   readonly property alias audio: audio
+  readonly property alias battery: battery
+  readonly property alias batteryService: batteryService
   readonly property alias tray: tray
   readonly property alias weather: weather
   readonly property alias weatherService: weatherService
@@ -192,6 +196,7 @@ ShellRoot {
     "setup.display": { icon: "󰍹", label: "Display", action: () => display.open() },
     "setup.network": { icon: "󰈀", label: "Network", action: () => network.open() },
     "setup.audio": { icon: "󰕾", label: "Audio", action: () => audio.open() },
+    "setup.power": { icon: "󰂄", label: "Power", action: () => battery.open() },
     "setup.nightlight": { icon: "󰆔", label: "Nightlight", action: () => nightlight.toggle() },
     "setup.weather": { icon: weatherService.icon, label: "Weather location", provider: "places" },
     "setup.keyboard": { icon: "󰌌", label: "Keyboard layout" },
@@ -273,6 +278,16 @@ ShellRoot {
   Monitor.Panel {
     id: display
     shell: root
+  }
+
+  BatteryService.Service {
+    id: batteryService
+  }
+
+  Battery.Panel {
+    id: battery
+    shell: root
+    service: batteryService
   }
 
   NetworkService.Service {

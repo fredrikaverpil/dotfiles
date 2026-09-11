@@ -188,6 +188,9 @@ PID.
 - Real hardware here that the VM never had: Wi-Fi/Bluetooth, battery,
   backlight, lid, touchpad, fingerprint reader, `GAMMA_LUT` (nightlight).
   Validate those paths on this machine, not on the VM.
+- Charge thresholds are set by a boot unit in `configuration.nix`; the battery
+  panel only displays them and never writes sysfs. power-profiles-daemon
+  conflicts with TLP; keep TLP disabled.
 - DPMS-off can resemble a frozen machine. Use bounded commands; `grim` can hang
   while no output produces frames. Recovery is
   `hyprctl dispatch 'hl.dsp.dpms("on")'`.

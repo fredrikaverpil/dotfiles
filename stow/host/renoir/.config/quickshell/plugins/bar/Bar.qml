@@ -120,9 +120,21 @@ Scope {
       }
 
       Ui.BarButton {
-        id: audioButton
+        id: batteryButton
         shell: bar.shell
         anchors.right: networkButton.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: visible ? 4 : 0
+        visible: bar.shell.batteryService.present
+        implicitWidth: visible ? 64 : 0
+        label: bar.shell.batteryService.icon + " " + bar.shell.batteryService.percentage + "%"
+        onActivated: bar.shell.battery.toggle()
+      }
+
+      Ui.BarButton {
+        id: audioButton
+        shell: bar.shell
+        anchors.right: batteryButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
         label: bar.shell.audio.icon
