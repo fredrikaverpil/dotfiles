@@ -33,6 +33,9 @@ jobs:
           - name: wily-vm
             os: ubuntu-24.04-arm  # https://github.com/actions/partner-runner-images
             nix_config: nixosConfigurations.wily-vm.config.system.build.toplevel
+          - name: renoir
+            os: ubuntu-24.04
+            nix_config: nixosConfigurations.renoir.config.system.build.toplevel
       fail-fast: false
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
@@ -66,9 +69,9 @@ jobs:
           nix build .#${{ matrix.nix_config }} --show-trace --accept-flake-config --dry-run
         if: matrix.name == 'zap' || matrix.name == 'plumbus'
 
-      # Build ARM configuration on native ARM64 runner (much faster than emulation)
+      # Build NixOS configurations on runners of the matching architecture
       - name: test nix build ${{ matrix.name }}
         run: |
           nix build .#${{ matrix.nix_config }} --show-trace --accept-flake-config --dry-run
-        if: matrix.name == 'rpi5-homelab' || matrix.name == 'wily-vm'
+        if: matrix.name == 'rpi5-homelab' || matrix.name == 'wily-vm' || matrix.name == 'renoir'
 

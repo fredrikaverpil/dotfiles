@@ -1,11 +1,10 @@
-# Wily desktop VM
+# Renoir desktop (ThinkPad T14 Gen 1)
 
-`wily-vm` is the NixOS development VM for the future `wily` ThinkPad T14 Gen 6
-Intel (Lunar Lake). `nix/hosts/renoir` (ThinkPad T14 Gen 1, AMD Renoir) is a
-copy of this host and may drift; changes here are not mirrored there. Keep
-the shell portable and vendor-neutral; machine-specific settings (microcode,
-VAAPI driver, kernel choice, thermald) belong in the host's Nix/Stow
-configuration.
+`renoir` is the personal ThinkPad T14 Gen 1 (AMD Renoir, x86_64) running the
+Wily desktop. It started as a copy of `nix/hosts/wily-vm` and
+`stow/host/wily-vm` and is allowed to drift; changes are not mirrored between
+the two. Machine-specific settings (microcode, VAAPI driver, kernel choice)
+belong in `configuration.nix`.
 
 Document constraints, rationale and gotchas, not implementation inventories or
 previous states.
@@ -15,7 +14,7 @@ previous states.
 - Hyprland and niri are alternative UWSM sessions, started with `hypr` or `niri`
   from the console. They never run together.
 - `desktop.nix` owns packages, portals, PAM, systemd units, and the pre-suspend
-  lock inhibitor. `stow/host/wily-vm/` owns compositor configuration and QML.
+  lock inhibitor. `stow/host/renoir/` owns compositor configuration and QML.
 - `shell.qml` wires services and surfaces. Views belong in `plugins/panels/`;
   daemon/process state belongs in `plugins/services/`.
 - Nightlight is not compositor-specific: both sessions drive wl-gammarelay-rs
@@ -57,7 +56,7 @@ from the shell on macOS.
 | --- | --- |
 | JS/QML | `qml-test`, `qml-lint` (any platform) |
 | Backend, compositor config, or bind contract | Also `compositor-test` (Linux) |
-| Service IPC, `shell.qml` wiring, or systemd units | Also `shell-smoke <hyprland\|niri>` on the VM after deploy and restart, and exercise the affected path |
+| Service IPC, `shell.qml` wiring, or systemd units | Also `shell-smoke <hyprland\|niri>` on the machine after deploy and restart, and exercise the affected path |
 | Panel views | Also `shell-smoke <hyprland\|niri> --panels` |
 | Device-dependent behaviour | Also validate on the actual ThinkPad |
 
@@ -124,16 +123,13 @@ from the shell on macOS.
 - `Ui/qmldir` must list new QML types in `Ui/` for tooling. `.qmllint.ini` is
   shared by the editor and CLI.
 - Keep `hypr/.luarc.json`: rooting LuaLS at the entire repository can exhaust
-  the VM. Hyprland watches only `hyprland.lua`; changes to `monitors.lua` need
+  the machine. Hyprland watches only `hyprland.lua`; changes to `monitors.lua` need
   reload.
 
 ## Deployment safety
 
-Discover the VM address each session:
-
-```sh
-VM=$(awk -F= '/name=wily-vm/{f=1} f&&/ip_address/{print $2; exit}' /var/db/dhcpd_leases)
-```
+The machine is reached over SSH as `fredrik@renoir` (set `VM` to its address
+so the commands below apply unchanged).
 
 Before any live file replacement or restart, inspect target changes and
 preserve unrelated edits, check the lock, and record/temporarily disable idle
@@ -148,10 +144,10 @@ qs ipc call lock isLocked
 ```
 
 Sync the checkout before live validation or a user-run rebuild, which evaluates
-the VM clone. Checksums avoid replacing identical compositor files solely
+the ThinkPad clone. Checksums avoid replacing identical compositor files solely
 because timestamps differ. New/moved files then need the normal Stow activation
 from the root `CLAUDE.md`; never create Stow links manually or run
-`git clean -fd` in the VM clone.
+`git clean -fd` in the ThinkPad clone.
 
 ```sh
 rsync -ac --delete --exclude .git --exclude result --exclude .direnv ~/.dotfiles/ fredrik@"$VM":~/.dotfiles/
@@ -187,12 +183,11 @@ PID.
   keyboard-layout state; compositor-side XKB toggles would desynchronize it.
 - Tray submenus require one live opener per level. `QsMenuEntry.display()` needs
   a platform menu this shell does not have.
-- UTM has one virtio output, no Wi-Fi/Bluetooth, battery, backlight, lid,
-  touchpad, fingerprint reader, or hardware cursor plane. That output has no
-  `GAMMA_LUT`, so nightlight cannot apply here: wl-gammarelay-rs accepts the
-  DBus write and silently reverts. Verify nightlight on the ThinkPad.
-- UTM pauses time while macOS sleeps; keep chrony. Its old virgl OpenGL requires
-  software rendering for Ghostty. macOS captures some SUPER chords; distinguish
-  host key capture from compositor bind failures.
-- DPMS-off can resemble a frozen VM. Use bounded commands; `grim` can hang while
-  no output produces frames. Recovery is `hyprctl dispatch 'hl.dsp.dpms("on")'`.
+- The panel connector is assumed to be `eDP-1`; confirm with
+  `niri msg -j outputs` or the output block in `config.kdl` is inert.
+- Real hardware here that the VM never had: Wi-Fi/Bluetooth, battery,
+  backlight, lid, touchpad, fingerprint reader, `GAMMA_LUT` (nightlight).
+  Validate those paths on this machine, not on the VM.
+- DPMS-off can resemble a frozen machine. Use bounded commands; `grim` can hang
+  while no output produces frames. Recovery is
+  `hyprctl dispatch 'hl.dsp.dpms("on")'`.
