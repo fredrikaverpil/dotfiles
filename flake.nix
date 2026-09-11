@@ -138,7 +138,7 @@
                 '';
               };
               # Entered by direnv (.envrc) for work on this repo itself: the QML
-              # tooling for the wily-vm Quickshell tree, which does not belong
+              # tooling for the hosts' Quickshell trees, which does not belong
               # in the toolchain every Neovim carries. Neovim inherits the env
               # when launched from a shell in this directory.
               default =
@@ -149,10 +149,25 @@
                   # (.qmltypes) is used here. Same nixpkgs as wily-vm, so the
                   # same store path the VM runs.
                   quickshell = unstable.aarch64-linux.quickshell;
-                  qml = "stow/host/wily-vm/.config/quickshell";
+                  # Static checks cover every host's tree and stop at the first failure.
                   task =
                     name: text:
-                    pkgs.writeShellScriptBin name "set -e\ncd \"$(git rev-parse --show-toplevel)/${qml}\"\n${text}";
+                    pkgs.writeShellScriptBin name ''
+                      set -e
+                      cd "$(git rev-parse --show-toplevel)"
+                      for dir in stow/host/*/.config/quickshell; do
+                        printf '== %s\n' "$dir"
+                        (cd "$dir" && ${text})
+                      done
+                    '';
+                  # The live shell only matches the running host's tree.
+                  hostTask =
+                    name: text:
+                    pkgs.writeShellScriptBin name ''
+                      set -e
+                      cd "$(git rev-parse --show-toplevel)/stow/host/$(hostname -s)/.config/quickshell"
+                      ${text}
+                    '';
                 in
                 pkgs.mkShell {
                   packages = [
@@ -165,7 +180,7 @@
                     pkgs.niri
                     pkgs.jq
                     (task "compositor-test" "tests/config_test.sh")
-                    (task "shell-smoke" "tests/shell_smoke.sh \"$@\"")
+                    (hostTask "shell-smoke" "tests/shell_smoke.sh \"$@\"")
                   ];
                   # qmlls/qmllint/qmltestrunner take import paths from argv or
                   # env only (`-E` reads this); .qmlls.ini has no key for them.
