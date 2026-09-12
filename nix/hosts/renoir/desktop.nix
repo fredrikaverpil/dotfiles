@@ -235,6 +235,8 @@ in
     firefox
     grim
     imv
+    # Trims recordings by stream copy, without re-encoding.
+    losslesscut-bin
     mpv
     nwg-displays
     wl-clipboard

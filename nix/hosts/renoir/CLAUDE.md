@@ -239,6 +239,8 @@ Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
   overlay stays mapped, click-through, while recording; its outline sits a few
   pixels outside the region so rounding never captures it.
 - Agents record with `qs ipc call recording capture WxH+X+Y` (`0x0+X+Y` is the
+- LosslessCut trims clips by stream copy, so cuts snap to keyframes; it is
+  not a default handler, and mpv still opens finished recordings.
   whole monitor there): no countdown, audio, camera or opening, and the bar
   shows it. It returns the file; `qs ipc call recording stop` finalizes it.
   Extract frames with `nix shell nixpkgs#ffmpeg`.
