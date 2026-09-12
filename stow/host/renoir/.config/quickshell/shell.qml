@@ -20,6 +20,7 @@ import "plugins/panels/weather" as Weather
 import "plugins/polkit" as Polkit
 import "plugins/services/battery" as BatteryService
 import "plugins/services/bluetooth" as BluetoothService
+import "plugins/services/brightness" as Brightness
 import "plugins/services/idle" as Idle
 import "plugins/services/keyboard" as Keyboard
 import "plugins/services/media" as MediaService
@@ -39,6 +40,7 @@ ShellRoot {
   readonly property alias keyboard: keyboard
   readonly property alias media: media
   readonly property alias display: display
+  readonly property alias brightness: brightness
   readonly property alias network: network
   readonly property alias networkService: networkService
   readonly property alias bluetooth: bluetooth
@@ -278,6 +280,10 @@ ShellRoot {
     id: media
     shell: root
     service: mediaService
+  }
+
+  Brightness.Service {
+    id: brightness
   }
 
   Monitor.Panel {

@@ -142,6 +142,18 @@ local ok, err = pcall(function()
     { locked = true, repeating = true }
   )
   bind("XF86AudioMute", "Mute", hl.dsp.exec_cmd("qs ipc call audio mute"), { locked = true })
+  bind(
+    "XF86MonBrightnessUp",
+    "Brightness up",
+    hl.dsp.exec_cmd("qs ipc call brightness up"),
+    { locked = true, repeating = true }
+  )
+  bind(
+    "XF86MonBrightnessDown",
+    "Brightness down",
+    hl.dsp.exec_cmd("qs ipc call brightness down"),
+    { locked = true, repeating = true }
+  )
   bind("XF86AudioNext", "Next track", hl.dsp.exec_cmd("qs ipc call media next"), { locked = true })
   bind("ALT + XF86AudioPlay", "Next track", hl.dsp.exec_cmd("qs ipc call media next"), { locked = true })
   bind("XF86AudioPause", "Play/pause", hl.dsp.exec_cmd("qs ipc call media playPause"), { locked = true })
