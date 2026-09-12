@@ -181,6 +181,7 @@
                     pkgs.jq
                     (task "compositor-test" "tests/config_test.sh")
                     (hostTask "shell-smoke" "tests/shell_smoke.sh \"$@\"")
+                    (hostTask "shell-perf" "tests/shell_perf.sh \"$@\"")
                   ];
                   # qmlls/qmllint/qmltestrunner take import paths from argv or
                   # env only (`-E` reads this); .qmlls.ini has no key for them.

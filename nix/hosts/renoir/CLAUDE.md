@@ -51,6 +51,7 @@ from the shell on macOS. Static checks run against every host's tree;
 | Service IPC, `shell.qml` wiring, or systemd units | Also `shell-smoke` on the machine after deploy and restart, and exercise the affected path |
 | Panel views | Also `shell-smoke --panels` |
 | Device-dependent behaviour | Also validate on the actual ThinkPad |
+| Timers, `Process`/`FileView`, services, panels, or `shell.qml` wiring | Ask the user whether to run `shell-perf` after deploy (see Performance) |
 
 - Establish the target checkout, flake pin, and session first. Record baseline
   failures; after editing, check an isolated Linux copy before deploying into
@@ -113,6 +114,29 @@ from the shell on macOS. Static checks run against every host's tree;
   pin after updates. `qml-test` clears the GTK platform theme for offscreen SSH.
 - `Ui/qmldir` must list new QML types in `Ui/` for tooling. `.qmllint.ini` is
   shared by the editor and CLI.
+
+### Performance
+
+`shell-perf` (devshell, on renoir) restarts the unlocked shell, measures it,
+appends a row to `nix/hosts/renoir/shell-perf.tsv` and compares it with the
+last row on the same Quickshell build and outputs. Commit the row with the
+change it measures.
+
+- Ask the user before running it; it restarts the shell and needs the machine
+  untouched for about 10 minutes.
+- It refuses to run off AC, outside the `balanced` profile, while locked, or
+  at a 1-minute load of 1.5 or more. It warns when the system was over 10%
+  busy; discard such rows.
+- Rows are comparable only within the same `quickshell` build (Qt included)
+  and `outputs`. After a flake update or a monitor change, run it on the old
+  commit first to get a new baseline.
+- Run-to-run noise is uncalibrated. Short test runs varied by about 5 MB PSS
+  and 15 MB peak; repeat a run before trusting a delta of that size.
+- `shell-perf --soak HOURS [PANEL]` samples PSS each minute, with PANEL held
+  open, and records growth in MB/h. Use it for suspected leaks; a few hours
+  distinguishes growth from warm-up.
+- For per-binding cost, restart with `qs --debug PORT` and attach the
+  devshell's `qmlprofiler --attach localhost:PORT`.
 
 ## Deployment safety
 
