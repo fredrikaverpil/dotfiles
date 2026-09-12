@@ -2,18 +2,10 @@
 # shellcheck shell=bash
 set -euo pipefail
 
-expected=${1:?usage: shell-smoke <hyprland|niri> [--panels]}
-case "$expected" in
-  hyprland | niri) ;;
-  *)
-    printf 'Unknown compositor: %s\n' "$expected" >&2
-    exit 1
-    ;;
-esac
-case "${2-}" in
+case "${1-}" in
   '' | --panels) ;;
   *)
-    printf 'Unknown option: %s\n' "$2" >&2
+    printf 'usage: shell-smoke [--panels]\n' >&2
     exit 1
     ;;
 esac
@@ -28,15 +20,13 @@ ipc() { timeout 10 qs ipc --pid "$pid" call "$@"; }
 check() {
   local value
   value=$(ipc "$1" status)
-  if ! jq -e --arg backend "$expected" "$2" <<<"$value" >/dev/null; then
+  if ! jq -e "$2" <<<"$value" >/dev/null; then
     printf 'FAIL: %s status: %s\n' "$1" "$value" >&2
     return 1
   fi
   printf 'PASS: %s\n' "$1"
 }
 
-# shellcheck disable=SC2016 # $backend is a jq variable.
-check compositor '.id == $backend and (.workspaceSource | endswith("Workspaces.qml"))'
 check lock '(.locked | type) == "boolean" and .passwordPam == true'
 check idle '(.enabled | type) == "boolean"'
 check keyboard '.index >= 0 and .index < (.codes | length) and .code == .codes[.index]'
@@ -58,7 +48,7 @@ printf 'PASS: tray\n'
 
 # Opt-in: opens and then closes the display panel, also closing any competing
 # panel. This exercises the real Process -> backend parser -> QML binding path.
-if [[ "${2-}" == --panels ]]; then
+if [[ "${1-}" == --panels ]]; then
   [[ "$(ipc lock isLocked)" == false ]]
   trap 'ipc display close' EXIT
   ipc display open
@@ -82,4 +72,4 @@ if grep -E '(^|[[:space:]])(ERROR|FATAL):|ReferenceError:|TypeError:|SyntaxError
   printf 'FAIL: Quickshell runtime errors since service start\n' >&2
   exit 1
 fi
-printf 'PASS: %s Quickshell smoke checks (hardware interactions not exercised)\n' "$expected"
+printf 'PASS: Quickshell smoke checks (hardware interactions not exercised)\n'

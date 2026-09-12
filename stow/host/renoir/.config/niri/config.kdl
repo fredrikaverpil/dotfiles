@@ -75,8 +75,7 @@ cursor {
 }
 
 // Exports WAYLAND_DISPLAY to the systemd user manager. NIRI_SOCKET must be
-// named explicitly, or `niri msg` fails inside the shell and
-// Ui/Compositor.qml misdetects Hyprland.
+// named explicitly, or `niri msg` fails inside the shell.
 spawn-at-startup "uwsm" "finalize" "NIRI_SOCKET"
 
 // The keybinding cheatsheet reads this TSV, extracted from the titles below.

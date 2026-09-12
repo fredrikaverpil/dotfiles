@@ -8,7 +8,6 @@ PanelWindow {
 
   required property var shell
   property bool shown: false
-  property bool focusPrimed: false
   property int cardWidth: 600
   property int cardHeight: 420
   readonly property int barHeight: shell ? shell.barHeight : 32
@@ -38,16 +37,7 @@ PanelWindow {
     if (next) next.forceActiveFocus(Qt.TabFocusReason)
   }
 
-  onShownChanged: {
-    if (!shown) {
-      focusPrimed = false
-      focusPrimeTimer.stop()
-    } else {
-      focusPrimed = false
-      focusPrimeTimer.restart()
-      if (keyNavigation) column.forceActiveFocus()
-    }
-  }
+  onShownChanged: if (shown && keyNavigation) column.forceActiveFocus()
   Component.onCompleted: if (shell && shell.registerPanel) shell.registerPanel(panel)
 
   visible: shown
@@ -56,17 +46,8 @@ PanelWindow {
   color: "transparent"
   mask: modalMask
   WlrLayershell.layer: WlrLayer.Overlay
-  WlrLayershell.keyboardFocus: shown
-    ? (focusPrimed && Compositor.releaseExclusiveFocus
-        ? WlrKeyboardFocus.OnDemand
-        : WlrKeyboardFocus.Exclusive)
-    : WlrKeyboardFocus.None
-
-  Timer {
-    id: focusPrimeTimer
-    interval: 75
-    onTriggered: if (panel.shown) panel.focusPrimed = true
-  }
+  // Demoting an exclusive panel loses its keyboard focus on niri.
+  WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
   data: [
     Region {
