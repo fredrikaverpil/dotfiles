@@ -184,6 +184,10 @@ Item {
     return Model.wifiAction(network, actionSsid, WifiSecurityType.Open, WifiSecurityType.Owe)
   }
 
+  function wifiSecured(network) {
+    return Model.requiresCredentials(network.security, WifiSecurityType.Open, WifiSecurityType.Owe)
+  }
+
   function activate(network) {
     if (!network || busy) return
     if (network.connected) {

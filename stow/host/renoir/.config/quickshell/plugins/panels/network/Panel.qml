@@ -347,7 +347,8 @@ Ui.Panel {
         color: root.shell.palette.fg
         font.family: Ui.Fonts.mono
         font.pixelSize: 14
-        text: row.network.ssid + " · " + root.service.wifiStatus(row.network)
+        text: row.network.ssid + (root.service.wifiSecured(row.network) ? " 󰌾" : "")
+          + " · " + root.service.wifiStatus(row.network)
         elide: Text.ElideRight
       }
 
