@@ -106,6 +106,12 @@ in
     </Menu>
   '';
 
+  # uwsm-app launches Terminal=true entries through xdg-terminal-exec.
+  xdg.terminal-exec = {
+    enable = true;
+    settings.default = [ "com.mitchellh.ghostty.desktop" ];
+  };
+
   # The setcap wrapper lets monitor capture skip the portal dialog.
   programs.gpu-screen-recorder.enable = true;
 
@@ -231,6 +237,7 @@ in
     (chromium.override { commandLineArgs = "--no-first-run"; })
     bluetui
     bluetui-desktop
+    btop
     cliamp
     cliamp-desktop
     firefox
