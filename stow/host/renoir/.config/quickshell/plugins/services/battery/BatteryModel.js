@@ -26,10 +26,9 @@ function status(battery, states, end) {
   return "Plugged in"
 }
 
-function icon(battery, states, end) {
+function icon(battery) {
   var index = Math.min(9, Math.floor(percent(battery.fraction) / 10))
-  var charging = !battery.onBattery && !holding(battery, states, end)
-  return (charging ? chargingIcons : dischargingIcons)[index]
+  return (battery.onBattery ? dischargingIcons : chargingIcons)[index]
 }
 
 function formatDuration(seconds) {
