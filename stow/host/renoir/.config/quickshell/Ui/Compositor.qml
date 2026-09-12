@@ -2,40 +2,21 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
-import Quickshell.Io
-import "CompositorModel.js" as Model
+import "compositors/Niri.js" as Niri
 
 Singleton {
-  id: root
+  readonly property string name: Niri.name
+  readonly property string themeConfig: Quickshell.env("HOME") + Niri.themeConfig
 
-  readonly property var backend: Model.select(Quickshell.env)
-  readonly property string name: backend.name
-  readonly property bool releaseExclusiveFocus: backend.releaseExclusiveFocus
-  readonly property url workspaceSource: Qt.resolvedUrl("compositors/" + backend.workspaceComponent)
-  readonly property string themeConfig: Quickshell.env("HOME") + backend.themeConfig
-
-  function dpms(on) { return backend.dpms(on) }
-  function closeWindow() { return backend.closeWindow() }
-  function screenshot(mode) { return backend.screenshot(mode) }
-  function focusWorkspace(id, output) { return backend.focusWorkspace(id, output) }
-  function focusMonitor(output) { return backend.focusMonitor(output) }
-  function outputs() { return backend.outputs() }
-  function focusedMonitor(raw) { return backend.focusedMonitor(raw) }
-  function themeEdits(palette) { return backend.themeEdits(palette) }
-  function layoutQuery() { return backend.layoutQuery() }
-  function currentLayout(raw) { return backend.currentLayout(raw) }
-  function setLayout(index) { return backend.setLayout(index) }
-
-  IpcHandler {
-    target: "compositor"
-
-    function status(): string {
-      return JSON.stringify({
-        id: root.backend.id,
-        name: root.name,
-        workspaceSource: root.workspaceSource.toString(),
-        releaseExclusiveFocus: root.releaseExclusiveFocus
-      })
-    }
-  }
+  function dpms(on) { return Niri.dpms(on) }
+  function closeWindow() { return Niri.closeWindow() }
+  function screenshot(mode) { return Niri.screenshot(mode) }
+  function focusWorkspace(id, output) { return Niri.focusWorkspace(id, output) }
+  function focusMonitor(output) { return Niri.focusMonitor(output) }
+  function outputs() { return Niri.outputs() }
+  function focusedMonitor(raw) { return Niri.focusedMonitor(raw) }
+  function themeEdits(palette) { return Niri.themeEdits(palette) }
+  function layoutQuery() { return Niri.layoutQuery() }
+  function currentLayout(raw) { return Niri.currentLayout(raw) }
+  function setLayout(index) { return Niri.setLayout(index) }
 }

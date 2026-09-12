@@ -2,7 +2,7 @@
 var PROBE = ["busctl", "--user", "get-property", "rs.wl-gammarelay", "/",
   "rs.wl.gammarelay", "Temperature"]
 
-// wl-gammarelay-rs drives zwlr_gamma_control_v1, which niri and Hyprland both implement.
+// wl-gammarelay-rs drives zwlr_gamma_control_v1, which niri implements.
 var backend = {
   // pgrep -f would match the launching shell's own command line, so ask DBus instead.
   running: PROBE.join(" ") + " >/dev/null 2>&1",

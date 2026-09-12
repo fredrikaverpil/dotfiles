@@ -1,10 +1,5 @@
-var id = "niri"
 var name = "niri"
-var sessionVariable = "NIRI_SOCKET"
-var workspaceComponent = "NiriWorkspaces.qml"
 var themeConfig = "/.config/niri/config.kdl"
-// Demoting an exclusive panel loses its keyboard focus on niri.
-var releaseExclusiveFocus = false
 
 function dpms(on) {
   return ["niri", "msg", "action", on ? "power-on-monitors" : "power-off-monitors"]
