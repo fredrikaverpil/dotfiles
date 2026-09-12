@@ -16,6 +16,7 @@ import "plugins/panels/media" as Media
 import "plugins/panels/monitor" as Monitor
 import "plugins/panels/network" as Network
 import "plugins/panels/recording" as Recording
+import "plugins/panels/system" as SystemMonitor
 import "plugins/panels/tray" as Tray
 import "plugins/panels/weather" as Weather
 import "plugins/polkit" as Polkit
@@ -28,6 +29,7 @@ import "plugins/services/media" as MediaService
 import "plugins/services/network" as NetworkService
 import "plugins/services/nightlight" as Nightlight
 import "plugins/services/recording" as RecordingService
+import "plugins/services/system" as SystemService
 import "plugins/services/weather" as WeatherService
 import "Ui" as Ui
 
@@ -202,6 +204,7 @@ ShellRoot {
     "trigger.share": { icon: "", label: "Share", enabled: false },
     "media": { icon: media.icon, label: "Media", action: () => media.open() },
     "weather": { icon: weatherService.icon, label: "Weather", action: () => weather.open() },
+    "monitor": { icon: "󰍛", label: "System monitor", action: () => systemMonitor.open() },
     "tray": { icon: "󰘔", label: "Tray", provider: "tray" },
     "setup": { icon: "", label: "Setup" },
     "setup.display": { icon: "󰍹", label: "Display", action: () => display.open() },
@@ -364,6 +367,17 @@ ShellRoot {
     id: weather
     shell: root
     service: weatherService
+  }
+
+  SystemService.Service {
+    id: systemService
+    live: systemMonitor.shown
+  }
+
+  SystemMonitor.Panel {
+    id: systemMonitor
+    shell: root
+    service: systemService
   }
 
   Menu.Menu {

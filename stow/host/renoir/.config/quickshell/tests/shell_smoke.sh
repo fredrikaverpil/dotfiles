@@ -35,6 +35,7 @@ check media '(.hasPlayer | type) == "boolean" and (.hasMedia | type) == "boolean
 check network '(.devices | type) == "array" and (.connection | type) == "object"'
 check audio '(.volume | type) == "number" and (.muted | type) == "boolean"'
 check battery '(.present | type) == "boolean" and (.profiles | type) == "array"'
+check system '(.cpu | type) == "number" and (.memory | type) == "number" and (.interface | type) == "string"'
 check recording '(.recording | type) == "boolean" and (.monitor as $m | $m == "region" or any(.monitors[]; . == $m))'
 case "$(ipc notifications dndState)" in
   on | off) printf 'PASS: notifications\n' ;;
