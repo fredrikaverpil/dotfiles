@@ -74,6 +74,11 @@ from the shell on macOS. Static checks run against every host's tree;
   that operation while locked and does not change scaling or device settings.
   Its journal scan covers everything since the last service start; restart the
   service before re-running to clear stale errors.
+- Every Quickshell start logs `qt.qpa.services: Failed to register with host
+  portal ... Connection already associated with an application ID`. It is a
+  known baseline (since at least 2026-09-11), passes `shell-smoke`, and has no
+  observed effect; the root cause is unverified. Do not attribute it to a
+  change.
 - Smoke checks do not prove focus, object lifetime, authentication, daemon
   recovery, or physical input. Exercise affected paths explicitly. Agree on a
   recovery path before lock/PAM, suspend, DPMS-off, or connectivity tests.
