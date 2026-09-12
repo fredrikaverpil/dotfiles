@@ -18,7 +18,7 @@ Item {
   }
 
   function focusWorkspace(id) {
-    Quickshell.execDetached(Ui.Compositor.focusWorkspace(id))
+    Quickshell.execDetached(Ui.Compositor.focusWorkspace(id, root.output))
   }
 
   implicitWidth: workspaces.implicitWidth

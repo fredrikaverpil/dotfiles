@@ -18,8 +18,10 @@ function screenshot(mode) {
     mode === "window" ? "screenshot-window" : "screenshot-screen"]
 }
 
-function focusWorkspace(id) {
-  return ["niri", "msg", "action", "focus-workspace", String(id)]
+// focus-workspace acts on the focused output, so focus the target output first.
+function focusWorkspace(id, output) {
+  return ["sh", "-c", 'niri msg action focus-monitor "$1" && niri msg action focus-workspace "$2"',
+    "sh", output, String(id)]
 }
 
 function outputs() { return ["niri", "msg", "-j", "focused-output"] }
