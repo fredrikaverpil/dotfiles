@@ -1,9 +1,7 @@
 # Renoir desktop (ThinkPad T14 Gen 1)
 
 `renoir` is the personal ThinkPad T14 Gen 1 (AMD Renoir, x86_64) running the
-Wily desktop. It started as a copy of `nix/hosts/wily-vm` and
-`stow/host/wily-vm` and is allowed to drift; changes are not mirrored between
-the two. Machine-specific settings (microcode, VAAPI driver, kernel choice)
+Wily desktop. Machine-specific settings (microcode, VAAPI driver, kernel choice)
 belong in `configuration.nix`.
 
 Document constraints, rationale and gotchas, not implementation inventories or
@@ -134,8 +132,9 @@ from the shell on macOS. Static checks run against every host's tree;
 
 ## Deployment safety
 
-The machine is reached over SSH as `fredrik@renoir` (set `VM` to its address
-so the commands below apply unchanged).
+On renoir, `~/.dotfiles` is this checkout and the live stowed tree: edits
+deploy as they are saved. From another host, it is reached over SSH as
+`fredrik@renoir`.
 
 Before any live file replacement or restart, inspect target changes and
 preserve unrelated edits, check the lock, and record/temporarily disable idle
@@ -149,15 +148,16 @@ qs ipc call idle disable
 qs ipc call lock isLocked
 ```
 
-Sync the checkout before live validation or a user-run rebuild, which evaluates
-the ThinkPad clone. Checksums avoid replacing identical compositor files solely
-because timestamps differ. New/moved files then need the normal Stow activation
-from the root `CLAUDE.md`; never create Stow links manually or run
-`git clean -fd` in the ThinkPad clone.
+New/moved files need the normal Stow activation from the root `CLAUDE.md`;
+never create Stow links manually or run `git clean -fd` in the ThinkPad clone.
+
+When working from another host, sync the checkout before live validation or a
+user-run rebuild, which evaluates the ThinkPad clone. Checksums avoid replacing
+identical compositor files solely because timestamps differ.
 
 ```sh
-rsync -ac --delete --exclude .git --exclude result --exclude .direnv ~/.dotfiles/ fredrik@"$VM":~/.dotfiles/
-ssh fredrik@"$VM" 'cd ~/.dotfiles && git add -AN .'
+rsync -ac --delete --exclude .git --exclude result --exclude .direnv ~/.dotfiles/ fredrik@renoir:~/.dotfiles/
+ssh fredrik@renoir 'cd ~/.dotfiles && git add -AN .'
 ```
 
 `rsync`, Git checkouts, and `sed -i` can replace inodes, so restart the
@@ -239,11 +239,11 @@ Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
   overlay stays mapped, click-through, while recording; its outline sits a few
   pixels outside the region so rounding never captures it.
 - Agents record with `qs ipc call recording capture WxH+X+Y` (`0x0+X+Y` is the
-- LosslessCut trims clips by stream copy, so cuts snap to keyframes; it is
-  not a default handler, and mpv still opens finished recordings.
   whole monitor there): no countdown, audio, camera or opening, and the bar
   shows it. It returns the file; `qs ipc call recording stop` finalizes it.
   Extract frames with `nix shell nixpkgs#ffmpeg`.
+- LosslessCut trims clips by stream copy, so cuts snap to keyframes; it is
+  not a default handler, and mpv still opens finished recordings.
 - Window recording is deferred; a region covers it. Window capture goes through
   `xdg-desktop-portal-gnome` (routed as niri's
   `org.freedesktop.impl.portal.ScreenCast`, not installed), which needs
@@ -252,8 +252,8 @@ Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
   `niri` under UWSM, so the portal reports no source types. `--session` would
   also make niri import the environment into systemd (not cleaned up by UWSM),
   take the power key from logind (`disable-power-key-handling` keeps logind),
-  and serve `org.freedesktop.ScreenSaver` idle inhibitors. It changes wily-vm
-  too, and needs a relogin. `debug { dbus-interfaces-in-non-session-instances }`
+  and serve `org.freedesktop.ScreenSaver` idle inhibitors. It needs a
+  relogin. `debug { dbus-interfaces-in-non-session-instances }`
   enables the D-Bus interfaces without it, minus the portal-dialog service
   channel.
 
@@ -276,9 +276,9 @@ Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
 - nwg-displays owns output layout, mode and scale in the untracked
   `~/.config/niri/monitor.kdl`; the shell never writes output config. niri
   cannot mirror outputs; `wl-mirror` shows one in a fullscreen window.
-- Real hardware here that the VM never had: Wi-Fi/Bluetooth, battery,
-  backlight, lid, touchpad, fingerprint reader, `GAMMA_LUT` (nightlight).
-  Validate those paths on this machine, not on the VM.
+- Hardware-dependent paths: Wi-Fi/Bluetooth, battery, backlight, lid,
+  touchpad, fingerprint reader, `GAMMA_LUT` (nightlight). Validate those on
+  this machine.
 - Bluetooth pairing belongs to bluetui, which registers its own BlueZ agent;
   the shell registers none and never scans. The panel only toggles power and
   connects paired devices. It uses `adapter.enabled`, which BlueZ does not
