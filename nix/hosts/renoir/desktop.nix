@@ -245,6 +245,7 @@ in
     imv
     # Trims recordings by stream copy, without re-encoding.
     losslesscut-bin
+    mission-center
     mpv
     nwg-displays
     wl-clipboard

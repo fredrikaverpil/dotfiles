@@ -28,6 +28,7 @@ import "plugins/services/media" as MediaService
 import "plugins/services/network" as NetworkService
 import "plugins/services/nightlight" as Nightlight
 import "plugins/services/recording" as RecordingService
+import "plugins/services/system" as SystemService
 import "plugins/services/weather" as WeatherService
 import "Ui" as Ui
 
@@ -55,6 +56,7 @@ ShellRoot {
   readonly property alias recordingService: recordingService
   readonly property alias weather: weather
   readonly property alias weatherService: weatherService
+  readonly property alias systemService: systemService
 
   readonly property int barHeight: 32
   property var panels: []
@@ -364,6 +366,10 @@ ShellRoot {
     id: weather
     shell: root
     service: weatherService
+  }
+
+  SystemService.Service {
+    id: systemService
   }
 
   Menu.Menu {
