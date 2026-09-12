@@ -71,9 +71,17 @@ let
   };
 in
 {
-  programs.hyprland = {
+  programs.uwsm.enable = true;
+
+  # Window-manager session defaults. programs.niri is not used: it adds the GNOME portal and keyring.
+  programs.dconf.enable = true;
+  # xwayland-satellite runs the Xwayland binary.
+  programs.xwayland.enable = true;
+  services.graphical-desktop.enable = true;
+  services.xserver.desktopManager.runXdgAutostartIfNone = true;
+  xdg.portal = {
     enable = true;
-    withUWSM = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
 
   # Also enables 32-bit graphics; Proton versions are picked in Steam.
@@ -129,8 +137,6 @@ in
 
   # GTK3 needs the portal to follow the dconf theme; Qt uses the GTK platform theme.
   environment.sessionVariables = {
-    HYPRCURSOR_THEME = "macOS-hypr";
-    HYPRCURSOR_SIZE = "24";
     NIXOS_OZONE_WL = "1";
     QT_QPA_PLATFORMTHEME = "gtk3";
     GTK_USE_PORTAL = "1";
@@ -152,15 +158,11 @@ in
     # Never order after graphical-session.target: that creates a systemd cycle.
     # waitenv closes niri's readiness-before-WAYLAND_DISPLAY race.
     after = [
-      "wayland-wm@hyprland.desktop.service"
       "wayland-wm@niri.service"
       "wayland-session-waitenv.service"
     ];
-    # Bind to compositor-specific sessions so another desktop cannot start a second shell.
-    wantedBy = [
-      "wayland-session@hyprland.desktop.target"
-      "wayland-session@niri.target"
-    ];
+    # Bind to the niri session so another desktop cannot start a second shell.
+    wantedBy = [ "wayland-session@niri.target" ];
     # NixOS pins a sparse user-unit PATH; inherit UWSM's session PATH for app launchers.
     environment.PATH = lib.mkForce null;
     # qtimageformats supplies Quickshell's WebP decoder.
@@ -177,15 +179,11 @@ in
     # Match Quickshell's ordering: waitenv is required for niri, and graphical-session.target cycles.
     after = [
       "dbus.socket"
-      "wayland-wm@hyprland.desktop.service"
       "wayland-wm@niri.service"
       "wayland-session-waitenv.service"
     ];
     requires = [ "dbus.socket" ];
-    wantedBy = [
-      "wayland-session@hyprland.desktop.target"
-      "wayland-session@niri.target"
-    ];
+    wantedBy = [ "wayland-session@niri.target" ];
     serviceConfig = {
       ExecStart = "${sleep-lock-monitor}/bin/wily-sleep-lock-monitor";
       Restart = "always";
