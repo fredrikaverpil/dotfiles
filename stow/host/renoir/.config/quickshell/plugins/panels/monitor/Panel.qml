@@ -11,11 +11,12 @@ Ui.Panel {
 
   readonly property var textScales: [0.8, 0.9, 1, 1.1, 1.25, 1.5]
 
-  cardHeight: 410
+  cardHeight: 430
   keyNavigation: true
 
   function refresh() {
     if (!monitorState.running) monitorState.running = true
+    shell.brightness.refresh()
   }
 
   function setMonitorState(raw) {
@@ -111,9 +112,67 @@ Ui.Panel {
     }
   }
 
-  DimRow {
-    label: "Brightness"
-    detail: "Unavailable in this VM"
+  Section {
+    title: root.shell.brightness.present
+      ? "Brightness · " + root.shell.brightness.percent + "%"
+      : "Brightness · not applicable, no backlight device"
+
+    Rectangle {
+      id: brightnessSlider
+
+      visible: root.shell.brightness.present
+      width: parent.width
+      height: 30
+      radius: 4
+      color: "transparent"
+      border.color: activeFocus ? root.shell.palette.fg : root.shell.palette.dim
+      border.width: 1
+
+      activeFocusOnTab: visible
+      // Left/right adjust here; up/down fall through to the panel's focus chain.
+      Keys.onPressed: function (event) {
+        if (event.key === Qt.Key_Right || event.text === "l") root.shell.brightness.adjust(root.shell.brightness.step)
+        else if (event.key === Qt.Key_Left || event.text === "h") root.shell.brightness.adjust(-root.shell.brightness.step)
+        else return
+        event.accepted = true
+      }
+
+      Text {
+        id: brightnessIcon
+        anchors.left: parent.left
+        anchors.leftMargin: 10
+        anchors.verticalCenter: parent.verticalCenter
+        color: root.shell.palette.fg
+        font.family: Ui.Fonts.mono
+        font.pixelSize: 16
+        text: "󰃠"
+      }
+
+      Rectangle {
+        anchors.left: brightnessIcon.right
+        anchors.leftMargin: 10
+        anchors.right: parent.right
+        anchors.rightMargin: 10
+        anchors.verticalCenter: parent.verticalCenter
+        height: 6
+        radius: 3
+        color: root.shell.palette.dim
+
+        Rectangle {
+          width: parent.width * root.shell.brightness.percent / 100
+          height: parent.height
+          radius: parent.radius
+          color: root.shell.palette.fg
+        }
+
+        MouseArea {
+          anchors.fill: parent
+          anchors.margins: -12
+          onPositionChanged: function (mouse) { if (pressed) root.shell.brightness.set(100 * mouse.x / width) }
+          onPressed: function (mouse) { root.shell.brightness.set(100 * mouse.x / width) }
+        }
+      }
+    }
   }
 
   // Layout, mode and scale are saved by nwg-displays to niri/monitor.kdl.
@@ -203,38 +262,6 @@ Ui.Panel {
       enabled: button.available
       hoverEnabled: true
       onClicked: button.activated()
-    }
-  }
-
-  component DimRow: Rectangle {
-    required property string label
-    required property string detail
-
-    width: parent.width
-    height: 28
-    radius: 4
-    color: "transparent"
-    border.color: root.shell.palette.dim
-    border.width: 1
-
-    Text {
-      anchors.left: parent.left
-      anchors.leftMargin: 8
-      anchors.verticalCenter: parent.verticalCenter
-      color: root.shell.palette.off
-      font.family: Ui.Fonts.mono
-      font.pixelSize: 13
-      text: parent.label
-    }
-
-    Text {
-      anchors.right: parent.right
-      anchors.rightMargin: 8
-      anchors.verticalCenter: parent.verticalCenter
-      color: root.shell.palette.off
-      font.family: Ui.Fonts.mono
-      font.pixelSize: 13
-      text: parent.detail
     }
   }
 }
