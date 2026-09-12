@@ -143,6 +143,12 @@ local ok, err = pcall(function()
   )
   bind("XF86AudioMute", "Mute", hl.dsp.exec_cmd("qs ipc call audio mute"), { locked = true })
   bind(
+    "XF86AudioMicMute",
+    "Mute microphone",
+    hl.dsp.exec_cmd("qs ipc call audio micMute"),
+    { locked = true }
+  )
+  bind(
     "XF86MonBrightnessUp",
     "Brightness up",
     hl.dsp.exec_cmd("qs ipc call brightness up"),

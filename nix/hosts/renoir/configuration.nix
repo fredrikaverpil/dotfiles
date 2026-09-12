@@ -20,6 +20,11 @@
 
   services.fwupd.enable = true;
 
+  # Quickshell drives the mic-mute LED from the default PipeWire source.
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="leds", KERNEL=="platform::micmute", ATTR{trigger}="none"
+  '';
+
   # thinkpad_acpi rejects a start above the end threshold and an end below the
   # start threshold, so the first end write may fail until start is lowered.
   systemd.services.battery-charge-thresholds = {

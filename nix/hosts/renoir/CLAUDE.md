@@ -248,6 +248,11 @@ Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
   the shell registers none and never scans. The panel only toggles power and
   connects paired devices. It uses `adapter.enabled`, which BlueZ does not
   persist, so `powerOnBoot` turns the radio back on after every boot.
+- The mic-mute key mutes every PipeWire source, not only the default: muting
+  yourself must survive default changes such as a headset connecting. The LED
+  is lit only while all are muted. The kernel's `audio-micmute` trigger
+  follows only the built-in ALSA capture switches, so a udev rule clears it
+  and the audio panel writes `platform::micmute` via logind. The keyboard backlight is firmware-driven (Fn+Space); leave it alone.
 - Charge thresholds are set by a boot unit in `configuration.nix`; the battery
   panel only displays them and never writes sysfs. power-profiles-daemon
   conflicts with TLP; keep TLP disabled.
