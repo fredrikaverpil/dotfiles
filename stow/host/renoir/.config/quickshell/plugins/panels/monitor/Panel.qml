@@ -11,7 +11,7 @@ Ui.Panel {
 
   readonly property var textScales: [0.8, 0.9, 1, 1.1, 1.25, 1.5]
 
-  cardHeight: 430
+  cardHeight: 440
   keyNavigation: true
 
   function refresh() {
@@ -172,6 +172,16 @@ Ui.Panel {
           onPressed: function (mouse) { root.shell.brightness.set(100 * mouse.x / width) }
         }
       }
+    }
+  }
+
+  Section {
+    title: "Wallpaper · " + (root.shell.dark ? "dark" : "light")
+
+    ChoiceButton {
+      width: parent.width
+      label: "Choose wallpaper…"
+      onActivated: root.shell.background.open()
     }
   }
 
