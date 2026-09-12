@@ -341,7 +341,7 @@ Ui.Panel {
       Text {
         anchors.left: parent.left
         anchors.leftMargin: 34
-        anchors.right: action.left
+        anchors.right: lock.left
         anchors.rightMargin: 8
         anchors.verticalCenter: parent.verticalCenter
         color: root.shell.palette.fg
@@ -349,6 +349,19 @@ Ui.Panel {
         font.pixelSize: 14
         text: row.network.ssid + " · " + root.service.wifiStatus(row.network)
         elide: Text.ElideRight
+      }
+
+      // Fixed offset keeps the column aligned while the action button is hidden.
+      Text {
+        id: lock
+        anchors.right: parent.right
+        anchors.rightMargin: 88
+        anchors.verticalCenter: parent.verticalCenter
+        visible: root.service.wifiSecured(row.network)
+        color: root.shell.palette.fg
+        font.family: Ui.Fonts.mono
+        font.pixelSize: 14
+        text: "󰌾"
       }
 
       ActionButton {
