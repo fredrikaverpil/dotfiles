@@ -136,6 +136,11 @@ Ui.Panel {
           MetricLabel { text: "Packet loss" }
           MetricValue { text: Model.formatPacketLoss(root.service.ping.packetLoss, root.service.hasPing) }
 
+          MetricLabel { text: "Ping (gateway)" }
+          MetricValue { text: Model.formatPing(root.service.gatewayPing.latency, root.service.hasGatewayPing) }
+          MetricLabel { text: "Packet loss" }
+          MetricValue { text: Model.formatPacketLoss(root.service.gatewayPing.packetLoss, root.service.hasGatewayPing) }
+
           MetricLabel { text: "Receiving" }
           MetricValue { text: root.service.hasTransfer ? Model.formatRate(root.service.transfer.receivingRate) : "--" }
           MetricLabel { text: "Sending" }
