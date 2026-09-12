@@ -82,6 +82,23 @@ in
   # niri has no portal default; the GTK settings portal supplies the shell's theme setting.
   xdg.portal.config.niri.default = [ "gtk" ];
 
+  xdg.mime.defaultApplications =
+    lib.genAttrs [
+      "image/png"
+      "image/jpeg"
+      "image/gif"
+      "image/webp"
+      "image/bmp"
+      "image/tiff"
+    ] (_: "imv.desktop")
+    // lib.genAttrs [
+      "video/mp4"
+      "video/webm"
+      "video/x-matroska"
+      "video/quicktime"
+      "video/x-msvideo"
+    ] (_: "mpv.desktop");
+
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -198,6 +215,8 @@ in
     cliamp-desktop
     firefox
     grim
+    imv
+    mpv
     nwg-displays
     wl-clipboard
     wl-mirror
