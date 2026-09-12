@@ -20,6 +20,19 @@
 
   services.fwupd.enable = true;
 
+  # Swaps Super and left Alt on the built-in keyboard; other keyboards are
+  # untouched.
+  services.keyd = {
+    enable = true;
+    keyboards.laptop = {
+      ids = [ "0001:0001" ];
+      settings.main = {
+        leftmeta = "leftalt";
+        leftalt = "leftmeta";
+      };
+    };
+  };
+
   # Quickshell drives the mic-mute LED from the default PipeWire source.
   services.udev.extraRules = ''
     ACTION=="add", SUBSYSTEM=="leds", KERNEL=="platform::micmute", ATTR{trigger}="none"
