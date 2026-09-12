@@ -131,7 +131,7 @@ Ui.Panel {
           columnSpacing: 14
           rowSpacing: 5
 
-          MetricLabel { text: "Ping" }
+          MetricLabel { text: "Ping (Cloudflare)" }
           MetricValue { text: Model.formatPing(root.service.ping.latency, root.service.hasPing) }
           MetricLabel { text: "Packet loss" }
           MetricValue { text: Model.formatPacketLoss(root.service.ping.packetLoss, root.service.hasPing) }
