@@ -133,7 +133,7 @@ Ui.Panel {
 
     if (row.trayItem) {
       close()
-      if (row.trayItem.onlyMenu) menu.shell.tray.openFor(row.trayItem)
+      if (row.trayItem.hasMenu) menu.shell.tray.openFor(row.trayItem)
       else row.trayItem.activate()
     } else if (row.entry) {
       close()
