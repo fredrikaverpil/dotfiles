@@ -117,6 +117,7 @@ binds {
     // Windows
     Mod+Q hotkey-overlay-title="Close window" { close-window; }
     Mod+T hotkey-overlay-title="Terminal" { spawn "ghostty"; }
+    Mod+Ctrl+T hotkey-overlay-title="System monitor" { spawn "ghostty" "-e" "btop"; }
     Mod+F hotkey-overlay-title="Full width" { maximize-column; }
     Mod+W hotkey-overlay-title="Toggle window grouping" { toggle-column-tabbed-display; }
     Mod+Shift+F hotkey-overlay-title="Full screen" { fullscreen-window; }
