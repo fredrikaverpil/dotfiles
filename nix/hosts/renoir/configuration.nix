@@ -20,8 +20,8 @@
 
   services.fwupd.enable = true;
 
-  # Swaps Super and left Alt on the built-in keyboard; other keyboards are
-  # untouched.
+  # Swaps Super and left Alt and makes Caps Lock Ctrl on the built-in keyboard;
+  # other keyboards are untouched.
   services.keyd = {
     enable = true;
     keyboards.laptop = {
@@ -29,6 +29,7 @@
       settings.main = {
         leftmeta = "leftalt";
         leftalt = "leftmeta";
+        capslock = "leftcontrol";
       };
     };
   };
