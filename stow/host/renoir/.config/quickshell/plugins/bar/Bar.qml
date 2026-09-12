@@ -153,12 +153,24 @@ Scope {
         onActivated: bar.shell.audio.toggle()
       }
 
+      // Separates status indicators from the system buttons.
+      Rectangle {
+        id: indicatorDivider
+        anchors.right: audioButton.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: visible ? 6 : 0
+        visible: idleButton.visible || keyboardButton.visible
+        width: visible ? 1 : 0
+        height: 16
+        color: bar.shell.palette.dim
+      }
+
       Ui.BarButton {
         id: idleButton
         shell: bar.shell
-        anchors.right: audioButton.left
+        anchors.right: indicatorDivider.left
         anchors.verticalCenter: parent.verticalCenter
-        anchors.rightMargin: visible ? 4 : 0
+        anchors.rightMargin: visible ? 6 : 0
         visible: !bar.shell.idle.enabled
         label: "󰅶"
         onActivated: bar.shell.idle.setEnabled(true)
@@ -176,10 +188,23 @@ Scope {
         onActivated: bar.shell.keyboard.set(0)
       }
 
-      BarWidgets.Tray {
+      // Separates app tray icons from the indicators and system buttons.
+      Rectangle {
+        id: trayDivider
         anchors.right: keyboardButton.left
         anchors.verticalCenter: parent.verticalCenter
-        anchors.rightMargin: 4
+        anchors.rightMargin: visible ? 6 : 0
+        visible: tray.width > 0
+        width: visible ? 1 : 0
+        height: 16
+        color: bar.shell.palette.dim
+      }
+
+      BarWidgets.Tray {
+        id: tray
+        anchors.right: trayDivider.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: trayDivider.visible ? 6 : 0
         shell: bar.shell
         panel: bar.shell.tray
       }
