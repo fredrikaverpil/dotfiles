@@ -213,5 +213,12 @@ in
       nix-direnv.enable = true;
     };
 
+    # nh: nix rebuild wrapper with diffs (`nh os switch`, `nh darwin switch`).
+    # Sets NH_FLAKE so no flake path argument is needed.
+    programs.nh = {
+      enable = true;
+      flake = "${config.home.homeDirectory}/.dotfiles";
+    };
+
   };
 }
