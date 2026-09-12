@@ -100,20 +100,43 @@ Scope {
         onActivated: bar.shell.notifications.toggleHistory()
       }
 
-      Ui.BarButton {
-        id: displayButton
-        shell: bar.shell
+      // Separates settings from the session buttons.
+      Rectangle {
+        id: sessionDivider
         anchors.right: notificationButton.left
         anchors.verticalCenter: parent.verticalCenter
-        anchors.rightMargin: 4
-        label: "󰍹"
-        onActivated: bar.shell.display.toggle()
+        anchors.rightMargin: 6
+        width: 1
+        height: 16
+        color: bar.shell.palette.dim
+      }
+
+      Ui.BarButton {
+        id: batteryButton
+        shell: bar.shell
+        anchors.right: sessionDivider.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: visible ? 6 : 0
+        visible: bar.shell.batteryService.present
+        implicitWidth: visible ? 64 : 0
+        label: bar.shell.batteryService.icon + " " + bar.shell.batteryService.percentage + "%"
+        onActivated: bar.shell.battery.toggle()
+      }
+
+      Ui.BarButton {
+        id: audioButton
+        shell: bar.shell
+        anchors.right: batteryButton.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: batteryButton.visible ? 4 : 6
+        label: bar.shell.audio.icon
+        onActivated: bar.shell.audio.toggle()
       }
 
       Ui.BarButton {
         id: networkButton
         shell: bar.shell
-        anchors.right: displayButton.left
+        anchors.right: audioButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
         label: bar.shell.networkService.icon
@@ -132,31 +155,19 @@ Scope {
       }
 
       Ui.BarButton {
-        id: batteryButton
+        id: displayButton
         shell: bar.shell
         anchors.right: bluetoothButton.left
         anchors.verticalCenter: parent.verticalCenter
-        anchors.rightMargin: visible ? 4 : 0
-        visible: bar.shell.batteryService.present
-        implicitWidth: visible ? 64 : 0
-        label: bar.shell.batteryService.icon + " " + bar.shell.batteryService.percentage + "%"
-        onActivated: bar.shell.battery.toggle()
-      }
-
-      Ui.BarButton {
-        id: audioButton
-        shell: bar.shell
-        anchors.right: batteryButton.left
-        anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
-        label: bar.shell.audio.icon
-        onActivated: bar.shell.audio.toggle()
+        label: "󰍹"
+        onActivated: bar.shell.display.toggle()
       }
 
-      // Separates status indicators from the system buttons.
+      // Separates status indicators from the settings.
       Rectangle {
         id: indicatorDivider
-        anchors.right: audioButton.left
+        anchors.right: displayButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: visible ? 6 : 0
         visible: idleButton.visible || keyboardButton.visible
