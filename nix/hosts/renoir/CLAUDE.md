@@ -222,6 +222,30 @@ Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
 - fwupd cannot read the reader's firmware version: it answers with an
   unmapped status `0x315`. libfprint talks to it independently; untested.
 
+## Screen recording
+
+- `gpu-screen-recorder` captures monitors over KMS through the setcap
+  `gsr-kms-server` wrapper (`programs.gpu-screen-recorder`), with no dialog.
+  Cameras are composited in-process (`monitor:DP-1|v4l2:/dev/video2;...`), and
+  SIGUSR2 toggles pause within one file. A camera held by a recording is
+  unavailable to other applications.
+- The countdown overlay unmaps before capture starts; the bar indicator is
+  recorded. An `IdleInhibitor` on each bar window keeps idle locking from
+  interrupting a recording. `xdg-open` runs mpv in the foreground, and mpv
+  quits at the end of the clip.
+- Window and region recording are deferred. Window capture goes through
+  `xdg-desktop-portal-gnome` (routed as niri's
+  `org.freedesktop.impl.portal.ScreenCast`, not installed), which needs
+  niri's Mutter D-Bus services; niri starts those
+  only as `niri --session` (`src/dbus/mod.rs`). `shell/sourcing.sh` starts bare
+  `niri` under UWSM, so the portal reports no source types. `--session` would
+  also make niri import the environment into systemd (not cleaned up by UWSM),
+  take the power key from logind (`disable-power-key-handling` keeps logind),
+  and serve `org.freedesktop.ScreenSaver` idle inhibitors. It changes wily-vm
+  too, and needs a relogin. `debug { dbus-interfaces-in-non-session-instances }`
+  enables the D-Bus interfaces without it, minus the portal-dialog service
+  channel. Region capture would add `slurp` and `-w region -region WxH+X+Y`.
+
 ## Session and hardware constraints
 
 - Keep `wayland-session-waitenv.service`: niri announces readiness before it

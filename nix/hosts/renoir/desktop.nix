@@ -95,6 +95,9 @@ in
     </Menu>
   '';
 
+  # The setcap wrapper lets monitor capture skip the portal dialog.
+  programs.gpu-screen-recorder.enable = true;
+
   xdg.mime.defaultApplications =
     lib.genAttrs [
       "image/png"

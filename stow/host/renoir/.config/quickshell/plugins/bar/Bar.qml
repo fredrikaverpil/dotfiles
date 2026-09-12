@@ -1,8 +1,10 @@
 import QtQuick
 import Quickshell
+import Quickshell.Wayland
 
 import "widgets" as BarWidgets
 import "../services/media" as Media
+import "../services/recording/RecordingModel.js" as RecordingModel
 import "../../Ui" as Ui
 
 Scope {
@@ -19,8 +21,15 @@ Scope {
     model: Quickshell.screens
 
     PanelWindow {
+      id: barWindow
       required property var modelData
       screen: modelData
+
+      // Idle locking would interrupt a long recording.
+      IdleInhibitor {
+        window: barWindow
+        enabled: bar.shell.recordingService.recording
+      }
 
       anchors {
         top: true
@@ -170,7 +179,7 @@ Scope {
         anchors.right: displayButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: visible ? 6 : 0
-        visible: idleButton.visible || keyboardButton.visible
+        visible: idleButton.visible || keyboardButton.visible || recordingButton.visible
         width: visible ? 1 : 0
         height: 16
         color: bar.shell.palette.dim
@@ -199,10 +208,26 @@ Scope {
         onActivated: bar.shell.keyboard.set(0)
       }
 
+      Ui.BarButton {
+        id: recordingButton
+        shell: bar.shell
+        anchors.right: keyboardButton.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: visible ? 4 : 0
+        visible: bar.shell.recordingService.busy
+        implicitWidth: visible ? 76 : 0
+        foreground: bar.shell.recordingService.paused ? bar.shell.palette.off : "#D9534F"
+        label: "󰑊 " + (bar.shell.recordingService.countdown > 0
+          ? bar.shell.recordingService.countdown
+          : RecordingModel.elapsed(bar.shell.recordingService.seconds))
+        onActivated: bar.shell.recordingService.stop()
+        onSecondary: bar.shell.recordingService.togglePause()
+      }
+
       // Separates app tray icons from the indicators and system buttons.
       Rectangle {
         id: trayDivider
-        anchors.right: keyboardButton.left
+        anchors.right: recordingButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: visible ? 6 : 0
         visible: tray.width > 0

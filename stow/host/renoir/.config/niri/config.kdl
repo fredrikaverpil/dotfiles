@@ -111,6 +111,10 @@ binds {
     Ctrl+Print repeat=false hotkey-overlay-title="Screenshot the screen" { screenshot-screen; }
     Alt+Print repeat=false hotkey-overlay-title="Screenshot the window" { screenshot-window; }
 
+    // Opens the recording panel, or stops a running recording.
+    Mod+Print repeat=false hotkey-overlay-title="Record the screen" { spawn "qs" "ipc" "call" "recording" "toggle"; }
+    Mod+Shift+Print repeat=false hotkey-overlay-title="Pause or resume the recording" { spawn "qs" "ipc" "call" "recording" "pause"; }
+
     // Windows
     Mod+Q hotkey-overlay-title="Close window" { close-window; }
     Mod+T hotkey-overlay-title="Terminal" { spawn "ghostty"; }
