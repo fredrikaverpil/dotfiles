@@ -291,6 +291,8 @@ Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
   the shell registers none and never scans. The panel only toggles power and
   connects paired devices. It uses `adapter.enabled`, which BlueZ does not
   persist, so `powerOnBoot` turns the radio back on after every boot.
+- Connection profiles (wired, static IP, DNS) belong to nm-connection-editor;
+  the network panel only launches it. Its `nm-applet` tray is not run.
 - The mic-mute key mutes every PipeWire source, not only the default: muting
   yourself must survive default changes such as a headset connecting. The LED
   is lit only while all are muted. The kernel's `audio-micmute` trigger

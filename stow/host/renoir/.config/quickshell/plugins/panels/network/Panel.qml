@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Window
 import QtQuick.Layouts
+import Quickshell
 import Quickshell.Io
 
 import "../../../Ui" as Ui
@@ -112,6 +113,16 @@ Ui.Panel {
           font.family: Ui.Fonts.mono
           font.pixelSize: 13
           text: "No network devices"
+        }
+
+        ActionButton {
+          visible: root.service.networkManagerAvailable
+          width: 180
+          label: "Connection settings…"
+          onActivated: {
+            root.close()
+            Quickshell.execDetached(["nm-connection-editor"])
+          }
         }
       }
 
