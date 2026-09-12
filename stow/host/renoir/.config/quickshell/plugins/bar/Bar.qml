@@ -179,7 +179,7 @@ Scope {
         anchors.right: displayButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: visible ? 6 : 0
-        visible: idleButton.visible || keyboardButton.visible || recordingButton.visible
+        visible: idleButton.visible || keyboardButton.visible || recordingButton.visible || systemButton.visible
         width: visible ? 1 : 0
         height: 16
         color: bar.shell.palette.dim
@@ -224,10 +224,21 @@ Scope {
         onSecondary: bar.shell.recordingService.togglePause()
       }
 
+      Ui.BarButton {
+        id: systemButton
+        shell: bar.shell
+        anchors.right: recordingButton.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: visible ? 4 : 0
+        visible: bar.shell.systemService.alert !== null
+        label: bar.shell.systemService.alert ? bar.shell.systemService.alert.icon : ""
+        onActivated: bar.shell.systemService.openMonitor()
+      }
+
       // Separates app tray icons from the indicators and system buttons.
       Rectangle {
         id: trayDivider
-        anchors.right: recordingButton.left
+        anchors.right: systemButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: visible ? 6 : 0
         visible: tray.width > 0
