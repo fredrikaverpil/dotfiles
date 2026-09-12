@@ -21,6 +21,14 @@ Ui.Panel {
     function close(): void { root.close() }
     function toggle(): void { root.toggle() }
     function status(): string { return root.service.status() }
+    function enable(): string {
+      root.service.setMonitoring(true)
+      return "enabled"
+    }
+    function disable(): string {
+      root.service.setMonitoring(false)
+      return "disabled"
+    }
   }
 
   Row {
@@ -28,11 +36,21 @@ Ui.Panel {
     spacing: 8
 
     Text {
-      width: parent.width - btopButton.width - parent.spacing
+      width: parent.width - alertsButton.width - btopButton.width - parent.spacing * 2
+      elide: Text.ElideRight
       color: root.shell.palette.fg
       font.family: Ui.Fonts.mono
       font.pixelSize: 18
-      text: "System"
+      text: ["System"].concat(root.service.alerts.map(alert => alert.icon + " " + alert.label)).join(" · ")
+    }
+
+    // Background sampling drives the bar indicator.
+    ActionButton {
+      id: alertsButton
+      width: 100
+      label: "Alerts " + (root.service.monitoring ? "on" : "off")
+      active: root.service.monitoring
+      onActivated: root.service.setMonitoring(!root.service.monitoring)
     }
 
     ActionButton {

@@ -1,4 +1,38 @@
 var historyLength = 60
+var sustainMilliseconds = 30000
+
+// Most severe first.
+var alertKinds = [
+  { kind: "memory", icon: "\u{F035B}", label: "Memory low" },
+  { kind: "temperature", icon: "\u{F050F}", label: "CPU hot" },
+  { kind: "cpu", icon: "\u{F0EE0}", label: "CPU busy" },
+  { kind: "upload", icon: "\u{F0552}", label: "Uploading" },
+]
+
+// Tctl throttles at 105 °C; big downloads are routine, big uploads are not.
+function conditions(sample) {
+  return {
+    memory: sample.memory.total > 0 && sample.memory.available < sample.memory.total * 0.1,
+    temperature: sample.temperature >= 90,
+    cpu: sample.cpu >= 80,
+    upload: sample.txRate >= 2000000,
+  }
+}
+
+// Start of each condition's current run; 0 while it is not met.
+function since(previous, met, now) {
+  var next = {}
+  Object.keys(met).forEach(function(kind) {
+    next[kind] = met[kind] ? (previous[kind] || now) : 0
+  })
+  return next
+}
+
+function sustained(starts, now) {
+  return alertKinds.filter(function(alert) {
+    return starts[alert.kind] > 0 && now - starts[alert.kind] >= sustainMilliseconds
+  })
+}
 
 // Total and idle jiffies for "cpu" (index 0) and each "cpuN" line.
 function parseCpuTimes(text) {

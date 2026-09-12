@@ -97,6 +97,52 @@ TestCase {
     compare(System.parseTop("", 5), [])
   }
 
+  function sample(fields) {
+    return Object.assign({ cpu: 10, memory: { total: 100, available: 50 }, temperature: 60, txRate: 0 }, fields)
+  }
+
+  function test_conditions_data() {
+    return [
+      { tag: "idle", sample: sample({}), want: { memory: false, temperature: false, cpu: false, upload: false } },
+      {
+        tag: "at thresholds",
+        sample: sample({ cpu: 80, memory: { total: 100, available: 9 }, temperature: 90, txRate: 2000000 }),
+        want: { memory: true, temperature: true, cpu: true, upload: true },
+      },
+      {
+        tag: "unread sensors",
+        sample: sample({ memory: { total: 0, available: 0 }, temperature: NaN }),
+        want: { memory: false, temperature: false, cpu: false, upload: false },
+      },
+    ]
+  }
+
+  function test_conditions(data) {
+    compare(System.conditions(data.sample), data.want)
+  }
+
+  function test_alerts_need_a_sustained_condition() {
+    const kinds = alerts => alerts.map(alert => alert.kind)
+    const busy = System.conditions(sample({ cpu: 95 }))
+    const starts = System.since({}, busy, 1000)
+    const held = System.since(starts, busy, 31000)
+    const cleared = System.since(held, System.conditions(sample({})), 41000)
+    const all = { memory: 1, temperature: 1, cpu: 1, upload: 1 }
+    compare({
+      starts: starts,
+      early: kinds(System.sustained(held, 30999)),
+      held: kinds(System.sustained(held, 31000)),
+      cleared: kinds(System.sustained(cleared, 41000)),
+      ordered: kinds(System.sustained(all, 30001)),
+    }, {
+      starts: { memory: 0, temperature: 0, cpu: 1000, upload: 0 },
+      early: [],
+      held: ["cpu"],
+      cleared: [],
+      ordered: ["memory", "temperature", "cpu", "upload"],
+    })
+  }
+
   function test_formatting() {
     compare({
       zero: System.formatRate(0),

@@ -57,6 +57,8 @@ ShellRoot {
   readonly property alias recordingService: recordingService
   readonly property alias weather: weather
   readonly property alias weatherService: weatherService
+  readonly property alias systemMonitor: systemMonitor
+  readonly property alias systemService: systemService
 
   readonly property int barHeight: 32
   property var panels: []

@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
 
 import "SystemModel.js" as Model
@@ -8,6 +9,14 @@ Item {
 
   // Samples, keeps history and lists top processes while true.
   property bool live: false
+  // Samples every 10 s in the background to raise alerts.
+  property bool monitoring: true
+  property bool stateLoaded: false
+  readonly property string statePath: Quickshell.env("HOME") + "/.local/state/wily-system-monitor.json"
+
+  property var alertStarts: ({})
+  property var alerts: []
+  readonly property var alert: alerts.length > 0 ? alerts[0] : null
 
   property real cpu: 0
   property var cores: []
@@ -51,12 +60,12 @@ Item {
     if (usage.length === 0) return
     cpu = usage[0]
     cores = usage.slice(1)
-    cpuHistory = record(cpuHistory, cpu)
+    if (live) cpuHistory = record(cpuHistory, cpu)
   }
 
   function updateMemory(text) {
     memory = Model.parseMemory(text)
-    memoryHistory = record(memoryHistory, memoryPercent)
+    if (live) memoryHistory = record(memoryHistory, memoryPercent)
   }
 
   // An interface change restarts the rate instead of reading as a spike.
@@ -68,13 +77,32 @@ Item {
     rxRate = previous ? Model.rate(previous.rx, next.rx, seconds) : 0
     txRate = previous ? Model.rate(previous.tx, next.tx, seconds) : 0
     netSample = next
+    if (!live) return
     rxHistory = record(rxHistory, rxRate)
     txHistory = record(txHistory, txRate)
+  }
+
+  function evaluate() {
+    if (!monitoring) return
+    const now = Date.now()
+    const met = Model.conditions({ cpu: cpu, memory: memory, temperature: temperature, txRate: txRate })
+    alertStarts = Model.since(alertStarts, met, now)
+    alerts = Model.sustained(alertStarts, now)
+  }
+
+  function setMonitoring(value) {
+    monitoring = !!value
+  }
+
+  function saveState() {
+    if (stateLoaded) stateFile.setText(JSON.stringify({ version: 1, monitoring: monitoring }) + "\n")
   }
 
   function status() {
     return JSON.stringify({
       live: live,
+      monitoring: monitoring,
+      alerts: alerts.map(alert => alert.kind),
       cpu: Math.round(cpu),
       cores: cores.length,
       temperature: isFinite(temperature) ? Math.round(temperature) : null,
@@ -87,11 +115,13 @@ Item {
     })
   }
 
-  // Old baselines would average over the whole time sampling was off.
   onLiveChanged: {
     if (!live) return
-    cpuTimes = null
-    netSample = null
+    // Old baselines would average over the whole time sampling was off.
+    if (!monitoring) {
+      cpuTimes = null
+      netSample = null
+    }
     cpuHistory = []
     memoryHistory = []
     rxHistory = []
@@ -99,11 +129,41 @@ Item {
     sample()
   }
 
+  onMonitoringChanged: {
+    saveState()
+    if (monitoring) return
+    alertStarts = ({})
+    alerts = []
+  }
+
+  Component.onCompleted: {
+    stateLoaded = true
+    stateFile.reload()
+  }
+
+  // Alerts use the previous tick's values, loaded right after it.
   Timer {
-    interval: 2000
-    running: root.live
+    interval: root.live ? 2000 : 10000
+    running: root.live || root.monitoring
     repeat: true
-    onTriggered: root.sample()
+    onTriggered: {
+      root.evaluate()
+      root.sample()
+    }
+  }
+
+  FileView {
+    id: stateFile
+    path: root.statePath
+    atomicWrites: true
+    printErrors: false
+    onLoaded: {
+      try {
+        root.monitoring = JSON.parse(String(text() || "")).monitoring !== false
+      } catch (error) {
+        root.monitoring = true
+      }
+    }
   }
 
   FileView {
