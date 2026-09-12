@@ -95,7 +95,9 @@ Scope {
         anchors.right: powerButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
-        label: bar.shell.notifications.doNotDisturb ? "󰂛" : "󰂚"
+        readonly property int pending: bar.shell.notifications.historyRows.length
+        label: (bar.shell.notifications.doNotDisturb ? "󰂛" : "󰂚")
+          + (notificationButton.pending > 0 ? " " + notificationButton.pending : "")
         onActivated: bar.shell.notifications.toggleHistory()
       }
 
