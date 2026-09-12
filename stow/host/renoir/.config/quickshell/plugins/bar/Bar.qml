@@ -44,6 +44,7 @@ Scope {
         anchors.left: menuButton.right
         anchors.leftMargin: 4
         anchors.verticalCenter: parent.verticalCenter
+        output: modelData.name
         foreground: bar.shell.palette.fg
         selection: bar.shell.palette.sel
         fontScale: bar.shell.textScale

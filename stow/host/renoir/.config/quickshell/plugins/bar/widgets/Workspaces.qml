@@ -7,13 +7,14 @@ import "WorkspaceModel.js" as Model
 Item {
   id: root
 
+  required property string output
   property color foreground: "#B4BDC3"
   property color selection: "#3D4042"
   property real fontScale: 1
 
   function workspaceIds() {
-    // Loader.item is typed QObject; every workspace source exposes ids.
-    return Model.workspaceIds(source.item ? source.item.ids : []) // qmllint disable missing-property
+    // Loader.item is typed QObject; every workspace source exposes ids().
+    return Model.workspaceIds(source.item ? source.item.ids(root.output) : []) // qmllint disable missing-property
   }
 
   function focusWorkspace(id) {
@@ -41,8 +42,8 @@ Item {
       delegate: Rectangle {
         required property int modelData
 
-        readonly property bool occupied: source.item.occupied(modelData)
-        readonly property bool focused: source.item.focusedId === modelData
+        readonly property bool occupied: source.item.occupied(modelData, root.output)
+        readonly property bool focused: source.item.activeId(root.output) === modelData
 
         width: 20
         height: 24
