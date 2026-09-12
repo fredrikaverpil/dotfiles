@@ -12,7 +12,9 @@ Item {
   readonly property string directory: Quickshell.env("HOME") + "/Videos"
 
   // Saved choices. An empty camera or mic means off; unavailable ones fall back.
+  // monitor is an output name or "region"; region is logical, global {x, y, width, height}.
   property string monitor: ""
+  property var region: null
   property string camera: ""
   property string mic: "default_input"
   property bool desktop: true
@@ -20,16 +22,24 @@ Item {
 
   property var cameras: []
   readonly property var monitors: Quickshell.screens.map(screen => screen.name)
+  readonly property var screens: Quickshell.screens.map(screen =>
+    ({ name: screen.name, x: screen.x, y: screen.y, width: screen.width, height: screen.height }))
   readonly property var mics: Pipewire.nodes
     ? Pipewire.nodes.values.filter(node => node && node.audio && !node.isSink && !node.isStream)
     : []
 
-  readonly property string activeMonitor: Model.pick(monitors, monitor, monitors[0] || "")
+  readonly property string activeMonitor: Model.pick(monitors.concat(["region"]), monitor, monitors[0] || "")
+  readonly property bool regionMode: activeMonitor === "region"
   readonly property string activeCamera: Model.pick(cameras.map(entry => entry.path), camera, "")
   readonly property string activeMic: Model.pick(["", "default_input"].concat(mics.map(node => node.name)),
     mic, "default_input")
 
+  property bool selecting: false
+  // The region being counted down or recorded, kept visible by the selector.
+  property var shownRegion: null
   property int countdown: 0
+  // Set for agent captures: no countdown, audio, camera, or opening the file.
+  property bool quiet: false
   property bool paused: false
   property int seconds: 0
   property string file: ""
@@ -39,18 +49,41 @@ Item {
   function refreshCameras() { if (!busy) cameraList.running = true }
 
   function start() {
-    if (busy || !activeMonitor) return
+    if (busy || selecting || !activeMonitor) return
+    if (regionMode) selecting = true
+    else startCountdown()
+  }
+
+  function confirmRegion(rect) {
+    selecting = false
+    region = rect
+    shownRegion = rect
+    startCountdown()
+  }
+
+  function startCountdown() {
     countdown = 3
     countdownTimer.restart()
   }
 
   function cancel() {
+    selecting = false
+    shownRegion = null
     countdownTimer.stop()
     countdown = 0
   }
 
+  // Returns the file, or "" when busy or the geometry is not WxH+X+Y.
+  function capture(geometry) {
+    const rect = Model.parseRegion(geometry)
+    if (!rect || busy || selecting) return ""
+    shownRegion = rect.width > 0 ? rect : null
+    launch({ region: rect, camera: "", mic: "", desktop: false }, true)
+    return file
+  }
+
   function stop() {
-    if (countdown > 0) cancel()
+    if (selecting || countdown > 0) cancel()
     else if (recording) recorder.signal(2) // SIGINT finalizes the file.
   }
 
@@ -60,9 +93,9 @@ Item {
     paused = !paused
   }
 
-  function launch() {
+  function launch(options, isQuiet) {
     file = directory + "/" + Model.fileName(new Date())
-    const options = { monitor: activeMonitor, camera: activeCamera, mic: activeMic, desktop: desktop }
+    quiet = isQuiet
     recorder.command = ["sh", "-c", 'mkdir -p "$0" && exec "$@"', directory].concat(Model.command(options, file))
     seconds = 0
     paused = false
@@ -71,10 +104,12 @@ Item {
 
   function saveState() {
     if (!stateLoaded) return
-    stateFile.setText(JSON.stringify({ version: 1, monitor: monitor, camera: camera, mic: mic, desktop: desktop }) + "\n")
+    stateFile.setText(JSON.stringify({ version: 1, monitor: monitor, region: region, camera: camera, mic: mic,
+      desktop: desktop }) + "\n")
   }
 
   onMonitorChanged: saveState()
+  onRegionChanged: saveState()
   onCameraChanged: saveState()
   onMicChanged: saveState()
   onDesktopChanged: saveState()
@@ -90,6 +125,7 @@ Item {
       try {
         const saved = JSON.parse(String(text() || ""))
         root.monitor = saved.monitor || ""
+        root.region = Model.parseRegion(saved.region ? Model.formatRegion(saved.region) : "")
         root.camera = saved.camera || ""
         root.mic = typeof saved.mic === "string" ? saved.mic : "default_input"
         root.desktop = saved.desktop !== false
@@ -107,7 +143,8 @@ Item {
       root.countdown -= 1
       if (root.countdown > 0) return
       countdownTimer.stop()
-      root.launch()
+      root.launch({ monitor: root.activeMonitor, region: root.regionMode ? root.region : null,
+        camera: root.activeCamera, mic: root.activeMic, desktop: root.desktop }, false)
     }
   }
 
@@ -133,6 +170,8 @@ Item {
     stderr: StdioCollector { id: recorderErrors }
     onExited: function (exitCode) {
       root.paused = false
+      root.shownRegion = null
+      if (exitCode === 0 && root.quiet) return
       if (exitCode === 0) {
         Quickshell.execDetached(["wl-copy", root.file])
         Quickshell.execDetached(["notify-send", "-a", "Recording", "Recording saved", root.file])

@@ -233,7 +233,16 @@ Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
   recorded. An `IdleInhibitor` on each bar window keeps idle locking from
   interrupting a recording. `xdg-open` runs mpv in the foreground, and mpv
   quits at the end of the clip.
-- Window and region recording are deferred. Window capture goes through
+- Region capture (`-w region -region WxH+X+Y`) takes logical, global
+  coordinates — Quickshell's screen geometry — and gsr scales them and rounds
+  to even pixels itself. `region|v4l2:...` composites the camera. The selector
+  overlay stays mapped, click-through, while recording; its outline sits a few
+  pixels outside the region so rounding never captures it.
+- Agents record with `qs ipc call recording capture WxH+X+Y` (`0x0+X+Y` is the
+  whole monitor there): no countdown, audio, camera or opening, and the bar
+  shows it. It returns the file; `qs ipc call recording stop` finalizes it.
+  Extract frames with `nix shell nixpkgs#ffmpeg`.
+- Window recording is deferred; a region covers it. Window capture goes through
   `xdg-desktop-portal-gnome` (routed as niri's
   `org.freedesktop.impl.portal.ScreenCast`, not installed), which needs
   niri's Mutter D-Bus services; niri starts those
@@ -244,7 +253,7 @@ Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
   and serve `org.freedesktop.ScreenSaver` idle inhibitors. It changes wily-vm
   too, and needs a relogin. `debug { dbus-interfaces-in-non-session-instances }`
   enables the D-Bus interfaces without it, minus the portal-dialog service
-  channel. Region capture would add `slurp` and `-w region -region WxH+X+Y`.
+  channel.
 
 ## Session and hardware constraints
 

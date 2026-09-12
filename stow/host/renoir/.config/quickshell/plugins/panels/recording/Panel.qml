@@ -13,8 +13,8 @@ Ui.Panel {
   readonly property var rows: service.busy ? [] : [
     {
       label: "Source",
-      values: service.monitors,
-      labels: service.monitors,
+      values: service.monitors.concat(["region"]),
+      labels: service.monitors.concat(["Region"]),
       value: service.activeMonitor,
       set: value => root.service.monitor = value,
     },
@@ -89,8 +89,12 @@ Ui.Panel {
     function start(): void { root.service.start() }
     function stop(): void { root.service.stop() }
     function pause(): void { root.service.togglePause() }
+    // Records WxH+X+Y (logical, global) at once, silently; returns the file or "".
+    function capture(geometry: string): string { return root.service.capture(geometry) }
     function status(): string {
       return JSON.stringify({
+        selecting: root.service.selecting,
+        region: root.service.region,
         recording: root.service.recording,
         paused: root.service.paused,
         countdown: root.service.countdown,
