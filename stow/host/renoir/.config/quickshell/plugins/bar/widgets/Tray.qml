@@ -39,6 +39,7 @@ Row {
         ? tray.panel.openFor(modelData)
         : modelData.activate()
       onSecondary: tray.panel.openFor(modelData)
+      onMiddle: modelData.secondaryActivate()
     }
   }
 }

@@ -12,6 +12,7 @@ Rectangle {
 
   signal activated
   signal secondary
+  signal middle
 
   implicitWidth: visible ? 28 : 0
   width: implicitWidth
@@ -53,9 +54,10 @@ Rectangle {
     id: btnMouse
     anchors.fill: parent
     hoverEnabled: true
-    acceptedButtons: Qt.LeftButton | Qt.RightButton
+    acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
     onClicked: function (mouse) {
       if (mouse.button === Qt.RightButton) btn.secondary()
+      else if (mouse.button === Qt.MiddleButton) btn.middle()
       else btn.activated()
     }
   }
