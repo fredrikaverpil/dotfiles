@@ -44,11 +44,14 @@ Item {
     iface: "", rxBytes: 0, txBytes: 0, sampleTime: 0, receivingRate: 0, sendingRate: 0,
   })
   property var ping: ({ iface: "", samples: [], latency: -1, packetLoss: 0 })
+  // Keyed by "<iface> <gateway>" so switching networks on one iface resets samples.
+  property var gatewayPing: ({ iface: "", samples: [], latency: -1, packetLoss: 0 })
 
   readonly property bool busy: actionKind !== ""
   readonly property bool hasConnection: connection.iface !== ""
   readonly property bool hasTransfer: connection.rxBytes !== null && connection.txBytes !== null
   readonly property bool hasPing: ping.samples && ping.samples.length > 0
+  readonly property bool hasGatewayPing: gatewayPing.samples && gatewayPing.samples.length > 0
 
   function actionState() {
     return {
@@ -134,6 +137,7 @@ Item {
       linkStatsProcess.running = true
     }
     startInternetPing(route.iface)
+    startGatewayPing(route.iface, route.gateway)
   }
 
   function updateLinkStats(raw) {
@@ -160,6 +164,18 @@ Item {
   function recordInternetPing(iface, raw) {
     if (iface !== connection.iface) return
     ping = Model.pingState(ping, iface, Model.parsePing(raw), 24, 5)
+  }
+
+  function startGatewayPing(iface, gateway) {
+    if (!active || !iface || !gateway || gatewayPingProcess.running) return
+    gatewayPingProcess.key = iface + " " + gateway
+    gatewayPingProcess.command = ["ping", "-n", "-I", iface, "-c", "1", "-W", "1", gateway]
+    gatewayPingProcess.running = true
+  }
+
+  function recordGatewayPing(key, raw) {
+    if (key !== connection.iface + " " + connection.gateway) return
+    gatewayPing = Model.pingState(gatewayPing, key, Model.parsePing(raw), 24, 5)
   }
 
   function setIpAddresses(raw) {
@@ -289,6 +305,8 @@ Item {
         txBytes: connection.txBytes,
         ping: ping.latency,
         packetLoss: ping.packetLoss,
+        gatewayPing: gatewayPing.latency,
+        gatewayPacketLoss: gatewayPing.packetLoss,
       },
     })
   }
@@ -355,6 +373,15 @@ Item {
     stdout: StdioCollector {
       waitForEnd: true
       onStreamFinished: root.recordInternetPing(internetPing.iface, text)
+    }
+  }
+
+  Process {
+    id: gatewayPingProcess
+    property string key: ""
+    stdout: StdioCollector {
+      waitForEnd: true
+      onStreamFinished: root.recordGatewayPing(gatewayPingProcess.key, text)
     }
   }
 
