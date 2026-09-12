@@ -18,6 +18,7 @@ Singleton {
   function closeWindow() { return backend.closeWindow() }
   function screenshot(mode) { return backend.screenshot(mode) }
   function focusWorkspace(id, output) { return backend.focusWorkspace(id, output) }
+  function focusMonitor(output) { return backend.focusMonitor(output) }
   function outputs() { return backend.outputs() }
   function focusedMonitor(raw) { return backend.focusedMonitor(raw) }
   function themeEdits(palette) { return backend.themeEdits(palette) }
