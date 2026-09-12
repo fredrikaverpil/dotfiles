@@ -13,6 +13,10 @@ Ui.Panel {
     : []
   readonly property real volume: sink && sink.audio ? sink.audio.volume : 0
   readonly property bool muted: sink && sink.audio ? sink.audio.muted : false
+  readonly property var sources: Pipewire.nodes
+    ? Pipewire.nodes.values.filter(node => node && node.audio && !node.isSink && !node.isStream)
+    : []
+  readonly property bool micMuted: sources.length > 0 && sources.every(node => node.audio.muted)
   readonly property string icon: muted || volume <= 0
     ? "󰝟"
     : volume < 0.34 ? "󰕿" : volume < 0.67 ? "󰖀" : "󰕾"
@@ -35,6 +39,21 @@ Ui.Panel {
 
   function toggleMute() { if (sink && sink.audio) sink.audio.muted = !sink.audio.muted }
 
+  function toggleMicMute() {
+    const muted = !micMuted
+    for (const node of sources) node.audio.muted = muted
+  }
+
+  // Serialized so a quick toggle cannot land an older value last.
+  function syncMicLed() {
+    if (micLed.running) return
+    micLed.value = micMuted ? "1" : "0"
+    micLed.running = true
+  }
+
+  onMicMutedChanged: syncMicLed()
+  Component.onCompleted: syncMicLed()
+
   function setDefault(node) { if (node) Pipewire.preferredDefaultAudioSink = node }
 
   function moveCursor(delta) {
@@ -52,7 +71,16 @@ Ui.Panel {
   }
 
   // PipeWire node properties do not bind until their objects are tracked.
-  PwObjectTracker { objects: root.sinks }
+  PwObjectTracker { objects: root.sinks.concat(root.sources) }
+
+  // The kernel drives platform::micmute from ALSA capture switches, which miss other sources.
+  Process {
+    id: micLed
+    property string value: "0"
+    command: ["busctl", "call", "org.freedesktop.login1", "/org/freedesktop/login1/session/auto",
+      "org.freedesktop.login1.Session", "SetBrightness", "ssu", "leds", "platform::micmute", value]
+    onExited: if (value !== (root.micMuted ? "1" : "0")) root.syncMicLed()
+  }
 
   IpcHandler {
     target: "audio"
@@ -63,12 +91,15 @@ Ui.Panel {
     function up(): void { root.setVolume(root.volume + 0.05) }
     function down(): void { root.setVolume(root.volume - 0.05) }
     function mute(): void { root.toggleMute() }
+    function micMute(): void { root.toggleMicMute() }
     function setVolume(percent: int): void { root.setVolume(percent / 100) }
     function status(): string {
       return JSON.stringify({
         volume: Math.round(root.volume * 100),
         muted: root.muted,
         sink: root.label(root.sink),
+        micMuted: root.micMuted,
+        sources: root.sources.map(node => root.label(node)),
       })
     }
   }
