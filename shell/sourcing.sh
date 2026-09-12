@@ -9,7 +9,7 @@
 # so it rules out macOS and every other Linux in one test; the inner checks
 # then skip whichever session that host does not install.
 if [ -e /etc/NIXOS ]; then
-	if command -v uwsm >/dev/null 2>&1; then
+	if command -v uwsm >/dev/null 2>&1 && command -v Hyprland >/dev/null 2>&1; then
 		function hypr() {
 			uwsm check may-start || return
 			uwsm start -e -D Hyprland hyprland.desktop
