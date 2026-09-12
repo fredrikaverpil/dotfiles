@@ -32,6 +32,10 @@ function focusWorkspace(id) {
   return ["hyprctl", "dispatch", 'hl.dsp.focus({ workspace = "' + id + '" })']
 }
 
+function focusMonitor(output) {
+  return ["hyprctl", "dispatch", 'hl.dsp.focus({ monitor = "' + output + '" })']
+}
+
 function outputs() { return ["hyprctl", "-j", "monitors"] }
 
 function focusedMonitor(raw) {

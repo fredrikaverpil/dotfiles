@@ -24,6 +24,8 @@ function focusWorkspace(id, output) {
     "sh", output, String(id)]
 }
 
+function focusMonitor(output) { return ["niri", "msg", "action", "focus-monitor", output] }
+
 function outputs() { return ["niri", "msg", "-j", "focused-output"] }
 
 function focusedMonitor(raw) {

@@ -148,7 +148,10 @@ Scope {
           const step = event.modifiers & Qt.ControlModifier ? 1 : 20
           if (event.key === Qt.Key_Escape) root.service.cancel()
           else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) root.service.confirmRegion(root.rect)
-          else if (event.key === Qt.Key_Tab) root.rect = Model.nextScreenRegion(root.rect, root.service.screens)
+          else if (event.key === Qt.Key_Tab) {
+            root.rect = Model.nextScreenRegion(root.rect, root.service.screens)
+            Quickshell.execDetached(Ui.Compositor.focusMonitor(root.screen.name))
+          }
           else if (event.text === "h" || event.key === Qt.Key_Left) root.move(-step, 0)
           else if (event.text === "l" || event.key === Qt.Key_Right) root.move(step, 0)
           else if (event.text === "k" || event.key === Qt.Key_Up) root.move(0, -step)
