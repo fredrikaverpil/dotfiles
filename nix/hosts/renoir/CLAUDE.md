@@ -9,29 +9,22 @@ previous states.
 
 ## Architecture
 
-- Hyprland and niri are alternative UWSM sessions, started with `hypr` or `niri`
-  from the console. They never run together.
+- niri is the only session, run under UWSM and started with `niri` from the
+  console.
 - `desktop.nix` owns packages, portals, PAM, systemd units, and the pre-suspend
   lock inhibitor. `stow/host/renoir/` owns compositor configuration and QML.
 - `shell.qml` wires services and surfaces. Views belong in `plugins/panels/`;
   daemon/process state belongs in `plugins/services/`.
-- Nightlight is not compositor-specific: both sessions drive wl-gammarelay-rs
-  over `zwlr_gamma_control_v1`, so its commands live in the nightlight
-  service, not the compositor backends. Do not reintroduce hyprsunset.
-- `Ui/Compositor.qml` selects a named backend registered in
-  `CompositorModel.js`. `Ui/compositors/` owns commands, response parsing,
-  scaling/focus policies, and workspace sources. Views use that interface, not
-  compositor-identity booleans. Keep scheduling and shared state above it; no
-  speculative plugin framework.
+- Nightlight is not compositor-specific: wl-gammarelay-rs drives
+  `zwlr_gamma_control_v1`, so its commands live in the nightlight service, not
+  `Ui/Compositor.qml`.
+- `Ui/Compositor.qml` is the compositor interface; `Ui/compositors/` owns niri
+  commands, response parsing, and the workspace source. Views use that
+  interface. Keep scheduling and shared state above it.
 - Prefer purpose-built applications to large bespoke panels for infrequent
   tasks.
-- Selection requires exactly one session marker: `NIRI_SOCKET` or
-  `HYPRLAND_INSTANCE_SIGNATURE`. Missing/ambiguous markers are errors, never an
-  implicit Hyprland fallback.
-- Load workspace sources by URL: importing `Quickshell.Hyprland` opens a socket.
-  Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
-- Hyprland Lua option names use underscores even where `hyprctl` prints hyphens.
-  Use the LuaLS stub. Niri KDL booleans are presence-only, not `option true`.
+- Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
+- Niri KDL booleans are presence-only, not `option true`.
 - Read the relevant Omarchy source before changing a ported feature (and
   `git pull` its source before reading):
   `~/code/public/github.com/omacom/omarchy`. Complementary references are:
@@ -54,16 +47,14 @@ from the shell on macOS. Static checks run against every host's tree;
 | Change | Checks |
 | --- | --- |
 | JS/QML | `qml-test`, `qml-lint` (any platform) |
-| Backend, compositor config, or bind contract | Also `compositor-test` (Linux) |
-| Service IPC, `shell.qml` wiring, or systemd units | Also `shell-smoke <hyprland\|niri>` on the machine after deploy and restart, and exercise the affected path |
-| Panel views | Also `shell-smoke <hyprland\|niri> --panels` |
+| Compositor interface, config, or bind contract | Also `compositor-test` (Linux) |
+| Service IPC, `shell.qml` wiring, or systemd units | Also `shell-smoke` on the machine after deploy and restart, and exercise the affected path |
+| Panel views | Also `shell-smoke --panels` |
 | Device-dependent behaviour | Also validate on the actual ThinkPad |
 
 - Establish the target checkout, flake pin, and session first. Record baseline
   failures; after editing, check an isolated Linux copy before deploying into
   the live stowed tree. Repeat checks against the deployed shell.
-- Shared compositor changes require live checks in **both** sessions. Coordinate
-  switching with the user; do not automatically log out or switch compositors.
 - Mac tests are supplementary. Report unavailable session/hardware coverage as
   **pending**, never substitute another platform or claim full validation.
 - `shell-smoke` selects the running systemd service's PID and works over SSH.
@@ -80,19 +71,16 @@ from the shell on macOS. Static checks run against every host's tree;
 - Smoke checks do not prove focus, object lifetime, authentication, daemon
   recovery, or physical input. Exercise affected paths explicitly. Agree on a
   recovery path before lock/PAM, suspend, DPMS-off, or connectivity tests.
-- Test keyboard-first panels over SSH with Hyprland's native
-  `hyprctl dispatch 'hl.dsp.send_shortcut({ mods = "", key = "z" })'`.
-  In niri, open the panel with `qs ipc call`, confirm it is the only
-  `Keyboard interactivity: exclusive` layer in `niri msg layers`, then use
-  `wtype -k z`. Niri drops virtual-keyboard input before bind handling, so
-  `wtype` cannot test compositor binds. Verified in both sessions.
+- Test keyboard-first panels over SSH: open the panel with `qs ipc call`,
+  confirm it is the only `Keyboard interactivity: exclusive` layer in
+  `niri msg layers`, then use `wtype -k z`. Niri drops virtual-keyboard input
+  before bind handling, so `wtype` cannot test compositor binds.
 - Use `grim` to check how the shell looks. To check its internal state, use
   `qs ipc` and `shell-smoke` instead. Crop screenshots to the area you need
   with `-g`, for example `-g "0,0 1280x32"`, and use `-o` to select the output.
   Capture cost depends on the area captured; changing the image format,
-  quality (`-q`), or scale (`-s`) does not reduce it. Hyprland reports layer
-  positions and sizes in `hyprctl layers -j`. Niri does not, so work out the
-  bar's position and size from `niri msg --json outputs` and the `barHeight`
+  quality (`-q`), or scale (`-s`) does not reduce it. Niri does not report
+  layer positions and sizes, so work out the bar's position and size from `niri msg --json outputs` and the `barHeight`
   value in `shell.qml`.
 - Report host/session, before/after results, existing diagnostics, and
   omissions. Ask the user to run Nix rebuilds; never run them yourself.
@@ -111,9 +99,8 @@ from the shell on macOS. Static checks run against every host's tree;
 - `compare()` handles objects/arrays but tolerates small numeric differences.
   Use `verify(actual === expected)` for exact values/identity and `fuzzyCompare`
   for explicit tolerances. Do not compare objects via JSON serialization.
-- `compositor-test` checks real theme-edit anchors, Hyprland's Lua/TSV
-  contract with an `hl` spy and temporary `HOME`, and niri's KDL. It does not
-  test dispatch.
+- `compositor-test` checks the real theme-edit anchor and niri's KDL. It does
+  not test dispatch.
 
 ### Tooling
 
@@ -126,9 +113,6 @@ from the shell on macOS. Static checks run against every host's tree;
   pin after updates. `qml-test` clears the GTK platform theme for offscreen SSH.
 - `Ui/qmldir` must list new QML types in `Ui/` for tooling. `.qmllint.ini` is
   shared by the editor and CLI.
-- Keep `hypr/.luarc.json`: rooting LuaLS at the entire repository can exhaust
-  the machine. Hyprland watches only `hyprland.lua`; changes to `monitors.lua` need
-  reload.
 
 ## Deployment safety
 
@@ -168,8 +152,7 @@ systemctl --user restart quickshell.service
 ```
 
 For ordinary `qs ipc` and compositor commands over SSH, provide the active
-session's `XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY`, and compositor socket/signature
-from `systemctl --user show-environment`. Missing display context can make live
+session's `XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY`, and `NIRI_SOCKET` from `systemctl --user show-environment`. Missing display context can make live
 Quickshell instances appear dead. `shell-smoke` avoids that by selecting the
 PID.
 
@@ -293,9 +276,7 @@ Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
   conflicts with TLP; keep TLP disabled.
 - Lid close uses logind defaults: suspend (the pre-suspend unit locks first),
   or nothing when docked. Niri turns off `eDP-1` while docked with the lid
-  closed; Hyprland does not, and that is deferred since Hyprland is unused. A
-  runtime `hyprctl` disable would not survive the reload a theme change
-  triggers; decide it in `hyprland.lua` at load instead.
+  closed.
 - DPMS-off can resemble a frozen machine. Use bounded commands; `grim` can hang
   while no output produces frames. Recovery is
-  `hyprctl dispatch 'hl.dsp.dpms("on")'`.
+  `niri msg action power-on-monitors`.
