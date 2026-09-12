@@ -247,6 +247,8 @@ in
     losslesscut-bin
     mission-center
     mpv
+    # nm-connection-editor edits wired, static-IP and other connection settings.
+    networkmanagerapplet
     nwg-displays
     wl-clipboard
     wl-mirror
