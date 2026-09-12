@@ -69,17 +69,6 @@ let
       "HardwareSettings"
     ];
   };
-  btop-desktop = pkgs.makeDesktopItem {
-    name = "btop";
-    desktopName = "btop";
-    comment = "System monitor";
-    exec = "ghostty -e btop";
-    terminal = false;
-    categories = [
-      "System"
-      "Monitor"
-    ];
-  };
 in
 {
   programs.uwsm.enable = true;
@@ -116,6 +105,12 @@ in
       <Include><All/></Include>
     </Menu>
   '';
+
+  # uwsm-app launches Terminal=true entries through xdg-terminal-exec.
+  xdg.terminal-exec = {
+    enable = true;
+    settings.default = [ "com.mitchellh.ghostty.desktop" ];
+  };
 
   # The setcap wrapper lets monitor capture skip the portal dialog.
   programs.gpu-screen-recorder.enable = true;
@@ -243,7 +238,6 @@ in
     bluetui
     bluetui-desktop
     btop
-    btop-desktop
     cliamp
     cliamp-desktop
     firefox
