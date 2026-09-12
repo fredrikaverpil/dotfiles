@@ -87,6 +87,9 @@ in
   # Also enables 32-bit graphics; Proton versions are picked in Steam.
   programs.steam.enable = true;
 
+  # Opens port 53317 for receiving files and text from the iPhone.
+  programs.localsend.enable = true;
+
   # niri has no portal default; the GTK settings portal supplies the shell's theme setting.
   xdg.portal.config.niri.default = [ "gtk" ];
 
