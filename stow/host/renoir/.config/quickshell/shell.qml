@@ -351,6 +351,11 @@ ShellRoot {
     service: recordingService
   }
 
+  Recording.Selector {
+    shell: root
+    service: recordingService
+  }
+
   WeatherService.Service {
     id: weatherService
   }
