@@ -82,6 +82,19 @@ in
   # niri has no portal default; the GTK settings portal supplies the shell's theme setting.
   xdg.portal.config.niri.default = [ "gtk" ];
 
+  # KService builds Dolphin's application list from an applications menu, which only Plasma ships.
+  # Plasma's own menu would pull in plasma-workspace; KService only needs every app listed.
+  environment.etc."xdg/menus/applications.menu".text = ''
+    <!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
+      "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
+    <Menu>
+      <Name>Applications</Name>
+      <DefaultAppDirs/>
+      <DefaultDirectoryDirs/>
+      <Include><All/></Include>
+    </Menu>
+  '';
+
   xdg.mime.defaultApplications =
     lib.genAttrs [
       "image/png"
@@ -202,6 +215,9 @@ in
     libnotify
     sound-theme-freedesktop
     kdePackages.dolphin
+    # Dolphin thumbnails for images and videos.
+    kdePackages.kio-extras
+    kdePackages.ffmpegthumbs
     kdePackages.kconfig
     ghostty
     gnome-themes-extra
