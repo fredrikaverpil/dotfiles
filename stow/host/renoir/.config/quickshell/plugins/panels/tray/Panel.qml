@@ -16,6 +16,15 @@ Ui.Panel {
   readonly property var currentChildren: depth > 0
     ? stack[depth - 1].opener.children
     : null
+  // The item's primary action heads its root menu, so the menu reaches everything.
+  readonly property var rows: {
+    const entries = currentChildren ? currentChildren.values : []
+    if (depth !== 1 || !item || item.onlyMenu) return entries
+    return [
+      { text: "Activate", enabled: true, isSeparator: false, triggered: () => root.item.activate() },
+      { isSeparator: true, enabled: true },
+    ].concat(entries)
+  }
   readonly property string title: item
     ? (depth > 0
       ? stack.map(level => level.title).join(" › ")
@@ -131,7 +140,7 @@ Ui.Panel {
       spacing: 2
 
       Repeater {
-        model: root.currentChildren
+        model: root.rows
 
         Rectangle {
           id: row
