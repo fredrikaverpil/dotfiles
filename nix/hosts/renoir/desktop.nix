@@ -69,6 +69,17 @@ let
       "HardwareSettings"
     ];
   };
+  btop-desktop = pkgs.makeDesktopItem {
+    name = "btop";
+    desktopName = "btop";
+    comment = "System monitor";
+    exec = "ghostty -e btop";
+    terminal = false;
+    categories = [
+      "System"
+      "Monitor"
+    ];
+  };
 in
 {
   programs.uwsm.enable = true;
@@ -231,6 +242,8 @@ in
     (chromium.override { commandLineArgs = "--no-first-run"; })
     bluetui
     bluetui-desktop
+    btop
+    btop-desktop
     cliamp
     cliamp-desktop
     firefox
