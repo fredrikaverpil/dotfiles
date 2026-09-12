@@ -22,7 +22,6 @@ input {
         tap
         dwt
         dwtp
-        natural-scroll
     }
 }
 
