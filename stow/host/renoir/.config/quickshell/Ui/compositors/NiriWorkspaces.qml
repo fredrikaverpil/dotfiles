@@ -7,23 +7,22 @@ QtObject {
   id: root
 
   // niri events use global IDs, but focus-workspace and the UI use per-output idx values.
-  property int focusedId: -1
-  property var ids: []
-  property var idxById: ({})
+  property var workspaces: ({})
+  property var activeByOutput: ({})
   property var windowCounts: ({})
 
-  function occupied(idx) { return (windowCounts[idx] || 0) > 0 }
+  function ids(output) { return Model.ids(workspaces, output) }
+  function activeId(output) { return output in activeByOutput ? activeByOutput[output] : -1 }
+  function occupied(idx, output) { return Model.occupied(workspaces, windowCounts, output, idx) }
 
   function handle(event) {
     var result = Model.eventResult({
-      ids: root.ids,
-      idxById: root.idxById,
-      focusedId: root.focusedId,
+      workspaces: root.workspaces,
+      activeByOutput: root.activeByOutput,
       windowCounts: root.windowCounts,
     }, event)
-    root.ids = result.ids
-    root.idxById = result.idxById
-    root.focusedId = result.focusedId
+    root.workspaces = result.workspaces
+    root.activeByOutput = result.activeByOutput
     root.windowCounts = result.windowCounts
     if (result.queryWindows) windowQuery.running = true
   }
@@ -49,7 +48,7 @@ QtObject {
       waitForEnd: true
       onStreamFinished: {
         try {
-          root.windowCounts = Model.windowCounts(JSON.parse(text), root.idxById)
+          root.windowCounts = Model.windowCounts(JSON.parse(text))
         } catch (error) {}
       }
     }
