@@ -15,6 +15,7 @@ import "plugins/panels/bluetooth" as Bluetooth
 import "plugins/panels/media" as Media
 import "plugins/panels/monitor" as Monitor
 import "plugins/panels/network" as Network
+import "plugins/panels/recording" as Recording
 import "plugins/panels/tray" as Tray
 import "plugins/panels/weather" as Weather
 import "plugins/polkit" as Polkit
@@ -26,6 +27,7 @@ import "plugins/services/keyboard" as Keyboard
 import "plugins/services/media" as MediaService
 import "plugins/services/network" as NetworkService
 import "plugins/services/nightlight" as Nightlight
+import "plugins/services/recording" as RecordingService
 import "plugins/services/weather" as WeatherService
 import "Ui" as Ui
 
@@ -49,6 +51,8 @@ ShellRoot {
   readonly property alias battery: battery
   readonly property alias batteryService: batteryService
   readonly property alias tray: tray
+  readonly property alias recording: recording
+  readonly property alias recordingService: recordingService
   readonly property alias weather: weather
   readonly property alias weatherService: weatherService
 
@@ -192,6 +196,7 @@ ShellRoot {
       action: () => Quickshell.execDetached(Ui.Compositor.screenshot("screen")) },
     "trigger.screenshotWindow": { icon: "", label: "Screenshot (window)",
       action: () => Quickshell.execDetached(Ui.Compositor.screenshot("window")) },
+    "trigger.record": { icon: "󰑊", label: "Record screen", action: () => recording.open() },
     "trigger.emoji": { icon: "", label: "Emoji", enabled: false },
     "trigger.color": { icon: "󰃉", label: "Color picker", enabled: false },
     "trigger.share": { icon: "", label: "Share", enabled: false },
@@ -329,6 +334,21 @@ ShellRoot {
   Tray.Panel {
     id: tray
     shell: root
+  }
+
+  RecordingService.Service {
+    id: recordingService
+  }
+
+  Recording.Panel {
+    id: recording
+    shell: root
+    service: recordingService
+  }
+
+  Recording.Countdown {
+    shell: root
+    service: recordingService
   }
 
   WeatherService.Service {
