@@ -35,7 +35,7 @@ Item {
 
   readonly property int percentage: Model.percent(snapshot.fraction)
   readonly property string stateLabel: Model.status(snapshot, deviceStates, endThreshold)
-  readonly property string icon: Model.icon(snapshot)
+  readonly property string icon: Model.icon(snapshot, deviceStates, endThreshold)
   readonly property string timeRemaining: Model.timeRemaining(snapshot, deviceStates, endThreshold)
   readonly property string rate: present ? Model.formatRate(device.changeRate) : "--"
   readonly property string energy: present ? Model.formatEnergy(device.energy, device.energyCapacity) : "--"

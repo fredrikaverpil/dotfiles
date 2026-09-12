@@ -32,14 +32,14 @@ TestCase {
     return [
       { tag: "discharging", battery: battery({ fraction: 0.42, timeToEmpty: 7500 }), want: { icon: "󰁾", time: "2h 5m" } },
       { tag: "charging", battery: battery({ state: 1, fraction: 0.42, onBattery: false, timeToFull: 1800 }), want: { icon: "󰢝", time: "30m" } },
-      { tag: "holding", battery: battery({ state: 5, fraction: 0.8, onBattery: false, timeToFull: 1800 }), want: { icon: "󰂋", time: "" } },
+      { tag: "holding", battery: battery({ state: 5, fraction: 0.8, onBattery: false, timeToFull: 1800 }), want: { icon: "󱞜", time: "" } },
       { tag: "full", battery: battery({ state: 4, fraction: 1, onBattery: false, rate: 0 }), want: { icon: "󰂅", time: "" } },
     ]
   }
 
   function test_icon_and_time_follow_power_flow(data) {
     compare({
-      icon: Battery.icon(data.battery),
+      icon: Battery.icon(data.battery, deviceStates, 80),
       time: Battery.timeRemaining(data.battery, deviceStates, 80),
     }, data.want)
   }
