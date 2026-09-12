@@ -57,9 +57,15 @@ rates() {
   }'
 }
 
-# Conditions every row is measured under.
-[[ "$(cat /sys/class/power_supply/AC/online)" == 1 ]] || fail 'not on AC power'
-[[ "$(powerprofilesctl get)" == balanced ]] || fail 'power profile is not balanced'
+# Conditions every row is measured under. Rechecked after the restart, which
+# applies the profile the shell saved for this power source, and at the end.
+power() {
+  [[ "$(cat /sys/class/power_supply/AC/online)" == 1 ]] || fail 'not on AC power'
+  local profile
+  profile=$(powerprofilesctl get)
+  [[ "$profile" == balanced ]] || fail "power profile is $profile, not balanced"
+}
+power
 systemctl --user is-active --quiet quickshell.service || fail 'quickshell.service is not active'
 pid=$(prop MainPID)
 [[ "$(ipc lock isLocked)" == false ]] || fail 'session is locked'
@@ -94,6 +100,7 @@ commit=$(git rev-parse --short HEAD)
 
 printf 'Warming up for %s s\n' "$warmup"
 sleep "$warmup"
+power
 
 idle_cpu=- idle_pss=- panels_cpu=- panels_pss=- soak_slope=-
 if [[ "$mode" == bench ]]; then
@@ -136,6 +143,7 @@ else
     END { d = n * sxx - sx * sx; printf "%.2f", (d > 0 ? (n * sxy - sx * sy) / d : 0) }' <<<"$samples")
 fi
 
+power
 peak=$(mb "$(prop MemoryPeak)")
 threads=$(awk '/^Threads:/ { print $2 }' "/proc/$pid/status")
 
