@@ -109,10 +109,20 @@ Scope {
         onActivated: bar.shell.notifications.toggleHistory()
       }
 
+      Ui.BarButton {
+        id: clipboardButton
+        shell: bar.shell
+        anchors.right: notificationButton.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: 4
+        label: "\u{F014C}"
+        onActivated: bar.shell.clipboard.toggle()
+      }
+
       // Separates settings from the session buttons.
       Rectangle {
         id: sessionDivider
-        anchors.right: notificationButton.left
+        anchors.right: clipboardButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 6
         width: 1
