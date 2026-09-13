@@ -74,6 +74,42 @@ TestCase {
     })
   }
 
+  function test_kill_targets() {
+    const unit = "0::/user.slice/user-1001.slice/user@1001.service/app.slice/"
+    const text = "   10     1 Sl    5.0  102400 " + unit + "app-niri-ghostty-10.scope .ghostty-wrappe\n"
+      + "   11    10 Ss    0.1    4096 " + unit + "app-ghostty-surface-transient-11.scope zsh\n"
+      + "   12    11 Sl   95.0  204800 " + unit + "app-ghostty-surface-transient-11.scope .claude-wrapped\n"
+      + "   13    11 Sl    1.0   51200 " + unit + "app-ghostty-surface-transient-11.scope gimp\n"
+      + "   14     1 Dl    0.0 1024000 " + unit + "app-slack-14.scope slack\n"
+      + "   15     1 Z     0.0       0 " + unit + "app-slack-14.scope zombie\n"
+      + "   16    11 R   200      1000 " + unit + "app-ghostty-surface-transient-11.scope ps\n"
+    const windows = [
+      { title: "a", appId: "com.mitchellh.ghostty", pid: 10, focused: true },
+      { title: "b", appId: "com.mitchellh.ghostty", pid: 10, focused: false },
+      { title: "Chat", appId: "Slack", pid: 14, focused: false },
+      { title: "img", appId: "org.gimp.GIMP", pid: 13, focused: false },
+    ]
+    compare(System.killTargets(windows, System.parseProcesses(text), 2), [
+      { label: "ghostty", detail: "2 windows · 5% · 100 MB", hint: "", window: true, pid: 10, unit: "app-niri-ghostty-10.scope" },
+      { label: "Slack", detail: "stuck · Chat · 0% · 1000 MB", hint: "stuck", window: true, pid: 14, unit: "app-slack-14.scope" },
+      // Started from the shell, so its scope is the shell's.
+      { label: "GIMP", detail: "img · 1% · 50 MB", hint: "", window: true, pid: 13, unit: "" },
+      { label: "claude", detail: "busy · pid 12 · 95% · 200 MB", hint: "busy", window: false, pid: 12, unit: "" },
+      { label: "zsh", detail: "pid 11 · 0% · 4 MB", hint: "", window: false, pid: 11, unit: "" },
+    ])
+    compare(System.killTargets([], System.parseProcesses(""), 10), [])
+  }
+
+  function test_kill_command() {
+    compare({
+      scope: System.killCommand({ pid: 10, unit: "app-slack-14.scope" }),
+      process: System.killCommand({ pid: 12, unit: "" }),
+    }, {
+      scope: ["systemctl", "--user", "kill", "--signal=KILL", "app-slack-14.scope"],
+      process: ["kill", "-KILL", "12"],
+    })
+  }
+
   function sample(fields) {
     return Object.assign({ cpu: 10, memory: { total: 100, available: 50 }, temperature: 60, txRate: 0 }, fields)
   }

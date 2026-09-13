@@ -4,6 +4,8 @@ import Quickshell.Io
 
 import "SystemModel.js" as Model
 
+import "../../../Ui" as Ui
+
 // Samples every 10 s and raises alerts on sustained load.
 Item {
   id: root
@@ -56,6 +58,38 @@ Item {
 
   function openMonitor() {
     Quickshell.execDetached(["uwsm-app", "--", "io.missioncenter.MissionCenter.desktop"])
+  }
+
+  // null until loaded, so no target is offered from a half or stale listing.
+  property var windows: null
+  property var processes: null
+  readonly property var killTargets: windows && processes ? Model.killTargets(windows, processes, 10) : []
+
+  function refreshKillTargets() {
+    windows = null
+    processes = null
+    windowList.running = true
+    processList.running = true
+  }
+
+  function kill(target) {
+    Quickshell.execDetached(Model.killCommand(target))
+  }
+
+  Process {
+    id: windowList
+    command: Ui.Compositor.windows()
+    stdout: StdioCollector {
+      onStreamFinished: root.windows = Ui.Compositor.parseWindows(text)
+    }
+  }
+
+  Process {
+    id: processList
+    command: ["ps", "x", "-o", "pid=,ppid=,stat=,pcpu=,rss=,cgroup:512=,comm="]
+    stdout: StdioCollector {
+      onStreamFinished: root.processes = Model.parseProcesses(text)
+    }
   }
 
   Component.onCompleted: sample()

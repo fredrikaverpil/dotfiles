@@ -73,6 +73,28 @@ Ui.Panel {
     }))
   }
 
+  function killRows() {
+    const service = menu.shell.systemService
+    return service.killTargets.map(target => ({
+      label: target.label,
+      icon: target.hint !== "" ? "󰀦" : target.window ? "󰖯" : "󰍛",
+      image: "",
+      detail: target.detail,
+      enabled: true,
+      entry: null,
+      confirm: "Enter again to kill " + target.label,
+      action: () => service.kill(target),
+    })).concat([{
+      label: "Mission Center",
+      icon: "󰍛",
+      image: menu.iconUrl("io.missioncenter.MissionCenter"),
+      detail: "",
+      enabled: true,
+      entry: null,
+      action: () => service.openMonitor(),
+    }])
+  }
+
   IpcHandler {
     target: "menu"
 
@@ -87,10 +109,17 @@ Ui.Panel {
     tray: function() { return menu.trayRows() },
     apps: function(detail) { return menu.appRows(detail) },
     places: function() { return menu.placeRows() },
+    kill: function() { return menu.killRows() },
   })
 
+  // Index of a row with `confirm` awaiting its second activation.
+  property int armed: -1
+
   // ListView resets currentIndex after this handler runs.
-  onRowsChanged: Qt.callLater(selectFirstEnabled)
+  onRowsChanged: {
+    armed = -1
+    Qt.callLater(selectFirstEnabled)
+  }
 
   function selectFirstEnabled() {
     list.currentIndex = Model.selectFirstEnabled(rows)
@@ -109,6 +138,7 @@ Ui.Panel {
     if (shell && shell.registerPanel) shell.registerPanel(menu)
     if (shell && shell.claimPanel) shell.claimPanel(menu)
     level = target
+    if (menu.items[target] && menu.items[target].refresh) menu.items[target].refresh()
     input.text = ""
     shown = true
     input.forceActiveFocus()
@@ -131,7 +161,9 @@ Ui.Panel {
     const row = rows[list.currentIndex]
     if (!row || !row.enabled) return
 
-    if (row.trayItem) {
+    if (row.confirm && armed !== list.currentIndex) {
+      armed = list.currentIndex
+    } else if (row.trayItem) {
       close()
       if (row.trayItem.hasMenu) menu.shell.tray.openFor(row.trayItem)
       else row.trayItem.activate()
@@ -197,6 +229,7 @@ Ui.Panel {
     height: parent.height - y
     clip: true
     model: menu.rows
+    onCurrentIndexChanged: menu.armed = -1
 
     delegate: Rectangle {
       required property var modelData
@@ -250,11 +283,13 @@ Ui.Panel {
         }
 
         Text {
-          color: modelData.enabled ? menu.shell.palette.fg : menu.shell.palette.off
+          readonly property bool armed: index === menu.armed
+
+          color: armed ? "#D9534F" : modelData.enabled ? menu.shell.palette.fg : menu.shell.palette.off
           font.family: Ui.Fonts.mono
           font.pixelSize: 15
           width: modelData.detail ? Math.min(implicitWidth, 300) : implicitWidth
-          text: modelData.label + (modelData.submenu ? " ›" : "")
+          text: armed ? modelData.confirm : modelData.label + (modelData.submenu ? " ›" : "")
           elide: Text.ElideRight
         }
 

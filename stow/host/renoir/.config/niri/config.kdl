@@ -128,6 +128,7 @@ binds {
 
     // Windows
     Mod+Q hotkey-overlay-title="Close window" { close-window; }
+    Mod+Ctrl+Q hotkey-overlay-title="Kill a window or process" { spawn "qs" "ipc" "call" "menu" "level" "system.kill"; }
     Mod+T hotkey-overlay-title="Terminal" { spawn "ghostty"; }
     Mod+F hotkey-overlay-title="Full width" { maximize-column; }
     Mod+W hotkey-overlay-title="Toggle window grouping" { toggle-column-tabbed-display; }

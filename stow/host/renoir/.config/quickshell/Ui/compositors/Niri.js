@@ -7,6 +7,21 @@ function dpms(on) {
 
 function closeWindow() { return ["niri", "msg", "action", "close-window"] }
 
+function windows() { return ["niri", "msg", "-j", "windows"] }
+
+// Focused window first; windows without a client pid are dropped.
+function parseWindows(raw) {
+  var list
+  try { list = JSON.parse(String(raw || "")) } catch (error) { return [] }
+  if (!Array.isArray(list)) return []
+  return list
+    .filter(function(window) { return window && Number.isInteger(window.pid) && window.pid > 0 })
+    .map(function(window) {
+      return { title: window.title || "", appId: window.app_id || "", pid: window.pid, focused: window.is_focused === true }
+    })
+    .sort(function(a, b) { return (b.focused ? 1 : 0) - (a.focused ? 1 : 0) })
+}
+
 // niri saves to screenshot-path and copies to the clipboard on its own.
 function screenshot(mode) {
   return ["niri", "msg", "action",

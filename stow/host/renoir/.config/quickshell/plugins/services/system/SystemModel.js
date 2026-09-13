@@ -93,6 +93,100 @@ function transmittedBytes(text, name) {
   return null
 }
 
+// `ps x -o pid=,ppid=,stat=,pcpu=,rss=,cgroup:512=,comm=`; ps itself is dropped.
+// ponytail: pcpu is the lifetime average, sample /proc twice if busy hangs get missed.
+function parseProcesses(text) {
+  var list = []
+  String(text || "").split("\n").forEach(function(line) {
+    var fields = line.trim().split(/\s+/)
+    if (fields.length < 7) return
+    var comm = fields.slice(6).join(" ")
+    if (comm === "ps") return
+    list.push({
+      pid: Number(fields[0]),
+      ppid: Number(fields[1]),
+      state: fields[2],
+      cpu: Number(fields[3]) || 0,
+      rss: Number(fields[4]) || 0,
+      unit: fields[5].split("/").pop(),
+      // Nix wrappers show up as ".name-wrapped", truncated to 15 characters.
+      name: comm.replace(/^\.(.+)-wrap\w*$/, "$1"),
+    })
+  })
+  return list
+}
+
+function hint(process) {
+  if (!process) return ""
+  if (process.state.indexOf("D") >= 0) return "stuck"
+  if (process.cpu >= 90) return "busy"
+  return ""
+}
+
+function usage(process) {
+  return process ? Math.round(process.cpu) + "% · " + Math.round(process.rss / 1024) + " MB" : ""
+}
+
+function describe(parts) {
+  return parts.filter(function(part) { return part !== "" }).join(" · ")
+}
+
+// One target per window client, then the busiest and largest other processes.
+function killTargets(windows, processes, hogCount) {
+  var byPid = {}
+  processes.forEach(function(process) { byPid[process.pid] = process })
+
+  var clients = []
+  var byClient = {}
+  windows.forEach(function(window) {
+    if (byClient[window.pid]) {
+      byClient[window.pid].count++
+      return
+    }
+    byClient[window.pid] = { window: window, count: 1 }
+    clients.push(byClient[window.pid])
+  })
+
+  var targets = clients.map(function(client) {
+    var process = byPid[client.window.pid]
+    var parent = process && byPid[process.ppid]
+    // An app started from a terminal shares the shell's scope, so only its root gets the whole scope.
+    var ownsScope = process && /\.scope$/.test(process.unit) && !(parent && parent.unit === process.unit)
+    return {
+      label: client.window.appId.split(".").pop() || (process ? process.name : String(client.window.pid)),
+      detail: describe([hint(process), client.count > 1 ? client.count + " windows" : client.window.title, usage(process)]),
+      hint: hint(process),
+      window: true,
+      pid: client.window.pid,
+      unit: ownsScope ? process.unit : "",
+    }
+  })
+
+  var others = processes.filter(function(process) { return !byClient[process.pid] && process.state[0] !== "Z" })
+  var half = Math.ceil(hogCount / 2)
+  var busiest = others.slice().sort(function(a, b) { return b.cpu - a.cpu }).slice(0, half)
+  var largest = others.slice().sort(function(a, b) { return b.rss - a.rss })
+  var hogs = busiest.concat(largest.filter(function(process) { return busiest.indexOf(process) < 0 }))
+    .slice(0, hogCount)
+
+  return targets.concat(hogs.map(function(process) {
+    return {
+      label: process.name,
+      detail: describe([hint(process), "pid " + process.pid, usage(process)]),
+      hint: hint(process),
+      window: false,
+      pid: process.pid,
+      unit: "",
+    }
+  }))
+}
+
+function killCommand(target) {
+  return target.unit !== ""
+    ? ["systemctl", "--user", "kill", "--signal=KILL", target.unit]
+    : ["kill", "-KILL", String(target.pid)]
+}
+
 // Bytes per second; a counter reset reads as 0.
 function rate(previous, current, seconds) {
   if (!(seconds > 0) || !(current >= previous)) return 0

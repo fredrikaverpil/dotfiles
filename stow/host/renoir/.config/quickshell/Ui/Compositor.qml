@@ -10,6 +10,8 @@ Singleton {
 
   function dpms(on) { return Niri.dpms(on) }
   function closeWindow() { return Niri.closeWindow() }
+  function windows() { return Niri.windows() }
+  function parseWindows(raw) { return Niri.parseWindows(raw) }
   function screenshot(mode) { return Niri.screenshot(mode) }
   function focusWorkspace(id, output) { return Niri.focusWorkspace(id, output) }
   function focusMonitor(output) { return Niri.focusMonitor(output) }

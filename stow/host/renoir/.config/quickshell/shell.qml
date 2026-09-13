@@ -228,6 +228,7 @@ ShellRoot {
     "system.close": { icon: "󰅖", label: "Close window", action: () => Quickshell.execDetached(
       Ui.Compositor.closeWindow())
     },
+    "system.kill": { icon: "󰚌", label: "Kill…", provider: "kill", refresh: () => systemService.refreshKillTargets() },
     "system.notifications": { icon: "󰂚", label: "Notifications" },
     "system.notifications.history": { icon: "󰎟", label: "History", action: () => notifications.showHistory() },
     "system.notifications.dnd": { icon: "󰂛", label: "Toggle Do Not Disturb", action: () => notifications.setDoNotDisturb(!notifications.doNotDisturb) },
