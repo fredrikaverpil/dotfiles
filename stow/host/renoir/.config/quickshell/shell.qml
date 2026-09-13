@@ -201,7 +201,7 @@ ShellRoot {
     "trigger.screenshotWindow": { icon: "", label: "Screenshot (window)",
       action: () => Quickshell.execDetached(Ui.Compositor.screenshot("window")) },
     "trigger.record": { icon: "󰑊", label: "Record screen", action: () => recording.open() },
-    "trigger.emoji": { icon: "", label: "Emoji", enabled: false },
+    "trigger.emoji": { icon: "", label: "Emoji", provider: "emoji" },
     "trigger.color": { icon: "󰃉", label: "Color picker",
       action: () => Quickshell.execDetached(["sh", "-c",
         'hex=$("$@") && [ -n "$hex" ] && wl-copy "$hex" && notify-send -a "Color picker" "$hex" "Copied to clipboard"',

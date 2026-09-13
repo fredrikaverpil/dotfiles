@@ -173,6 +173,8 @@ in
     environment.PATH = lib.mkForce null;
     # qtimageformats supplies Quickshell's WebP decoder.
     environment.QT_PLUGIN_PATH = "${pkgs.qt6.qtimageformats}/lib/qt-6/plugins";
+    # The menu's emoji picker reads names from Unicode's test file.
+    environment.EMOJI_TEST = "${pkgs.unicode-emoji}/share/unicode/emoji/emoji-test.txt";
     serviceConfig = {
       ExecStart = "${pkgs.quickshell}/bin/quickshell";
       Restart = "on-failure";
