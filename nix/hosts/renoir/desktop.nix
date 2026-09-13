@@ -84,8 +84,12 @@ in
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
 
-  # Also enables 32-bit graphics; Proton versions are picked in Steam.
-  programs.steam.enable = true;
+  programs.steam = {
+    # Also enables 32-bit graphics; Proton versions are picked in Steam.
+    enable = true;
+    # steam-gamescope: Big Picture in standalone gamescope, run from a TTY.
+    gamescopeSession.enable = true;
+  };
 
   # Opens port 53317 for receiving files and text from the iPhone.
   programs.localsend.enable = true;
