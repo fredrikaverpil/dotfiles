@@ -23,6 +23,9 @@ Ui.Panel {
 
   property int cursor: -1
 
+  // Emitted by the volume and mic-mute keys, for the OSD.
+  signal adjusted(bool mic)
+
   cardWidth: 480
   cardHeight: 140 + sinks.length * 38
 
@@ -88,10 +91,22 @@ Ui.Panel {
     function open(): void { root.open() }
     function close(): void { root.close() }
     function toggle(): void { root.toggle() }
-    function up(): void { root.setVolume(root.volume + 0.05) }
-    function down(): void { root.setVolume(root.volume - 0.05) }
-    function mute(): void { root.toggleMute() }
-    function micMute(): void { root.toggleMicMute() }
+    function up(): void {
+      root.setVolume(root.volume + 0.05)
+      root.adjusted(false)
+    }
+    function down(): void {
+      root.setVolume(root.volume - 0.05)
+      root.adjusted(false)
+    }
+    function mute(): void {
+      root.toggleMute()
+      root.adjusted(false)
+    }
+    function micMute(): void {
+      root.toggleMicMute()
+      root.adjusted(true)
+    }
     function setVolume(percent: int): void { root.setVolume(percent / 100) }
     function status(): string {
       return JSON.stringify({

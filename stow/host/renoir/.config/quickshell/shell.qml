@@ -333,6 +333,11 @@ ShellRoot {
     shell: root
   }
 
+  Audio.Osd {
+    shell: root
+    audio: audio
+  }
+
   Tray.Panel {
     id: tray
     shell: root
