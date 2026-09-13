@@ -70,7 +70,7 @@
     # hand. Both rules below name JetBrains Mono as the next candidate, so a
     # host without Berkeley Mono falls back to it instead of DejaVu.
     fonts.fontconfig.defaultFonts.monospace = [
-      "Berkeley Mono"
+      "Berkeley Mono Variable"
       "JetBrainsMono Nerd Font"
     ];
 
@@ -84,7 +84,7 @@
         <match target="pattern">
           <test name="family"><string>JetBrainsMono Nerd Font</string></test>
           <edit name="family" mode="prepend" binding="strong">
-            <string>Berkeley Mono</string>
+            <string>Berkeley Mono Variable</string>
           </edit>
         </match>
       </fontconfig>
