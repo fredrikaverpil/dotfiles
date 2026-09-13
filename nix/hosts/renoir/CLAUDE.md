@@ -128,6 +128,8 @@ change it measures.
   at a 1-minute load of 1.5 or more. The restart applies the profile the shell
   saved for AC, so it rechecks power after warm-up and before writing the row.
   It warns when the system was over 10% busy; discard such rows.
+- Measure with `eDP-1` only: lid open, no external monitor, on a plain
+  USB-C charger (the monitor supplies power; unplugging it drops AC).
 - Rows are comparable only within the same `quickshell` build (Qt included)
   and `outputs`. After a flake update or a monitor change, run it on the old
   commit first to get a new baseline.
