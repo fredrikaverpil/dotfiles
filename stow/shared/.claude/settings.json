@@ -25,7 +25,7 @@
       "Bash(docker-compose *)"
     ]
   },
-  "model": "opus",
+  "model": "opus[1m]",
   "hooks": {
     "Notification": [
       {
@@ -87,7 +87,6 @@
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true,
   "autoMode": {
     "environment": [
       "### Org-wide",
