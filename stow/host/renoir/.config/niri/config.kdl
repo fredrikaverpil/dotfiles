@@ -96,7 +96,6 @@ spawn-at-startup "sh" "-c" "sed -n '/^spawn-at-startup/d; s|^ *\\([^ ]*\\).*hotk
 binds {
     // Shell
     Mod+Space hotkey-overlay-title="Menu" { spawn "qs" "ipc" "call" "menu" "toggle"; }
-    Mod+D hotkey-overlay-title="Menu" { spawn "qs" "ipc" "call" "menu" "toggle"; }
     Super+Alt+L hotkey-overlay-title="Lock the screen" { spawn "qs" "ipc" "call" "lock" "lock"; }
     Mod+N hotkey-overlay-title="Dismiss latest notification" { spawn "qs" "ipc" "call" "notifications" "dismissOne"; }
     Mod+Shift+Comma hotkey-overlay-title="Dismiss all notifications" { spawn "qs" "ipc" "call" "notifications" "dismissAll"; }
@@ -110,11 +109,9 @@ binds {
     XF86MonBrightnessUp allow-when-locked=true hotkey-overlay-title="Brightness up" { spawn "qs" "ipc" "call" "brightness" "up"; }
     XF86MonBrightnessDown allow-when-locked=true hotkey-overlay-title="Brightness down" { spawn "qs" "ipc" "call" "brightness" "down"; }
     XF86AudioNext allow-when-locked=true repeat=false hotkey-overlay-title="Next track" { spawn "qs" "ipc" "call" "media" "next"; }
-    Alt+XF86AudioPlay allow-when-locked=true repeat=false hotkey-overlay-title="Next track" { spawn "qs" "ipc" "call" "media" "next"; }
     XF86AudioPause allow-when-locked=true repeat=false hotkey-overlay-title="Play/pause" { spawn "qs" "ipc" "call" "media" "playPause"; }
     XF86AudioPlay allow-when-locked=true repeat=false hotkey-overlay-title="Play/pause" { spawn "qs" "ipc" "call" "media" "playPause"; }
     XF86AudioPrev allow-when-locked=true repeat=false hotkey-overlay-title="Previous track" { spawn "qs" "ipc" "call" "media" "previous"; }
-    Alt+Shift+XF86AudioPlay allow-when-locked=true repeat=false hotkey-overlay-title="Previous track" { spawn "qs" "ipc" "call" "media" "previous"; }
 
     // Screenshots. niri saves to screenshot-path, default
     // ~/Pictures/Screenshots, and copies to the clipboard.
@@ -130,9 +127,7 @@ binds {
     Mod+Q hotkey-overlay-title="Close window" { close-window; }
     Mod+T hotkey-overlay-title="Terminal" { spawn "ghostty"; }
     Mod+F hotkey-overlay-title="Full width" { maximize-column; }
-    Mod+W hotkey-overlay-title="Toggle window grouping" { toggle-column-tabbed-display; }
     Mod+Shift+F hotkey-overlay-title="Full screen" { fullscreen-window; }
-    Mod+Alt+F hotkey-overlay-title="Full width" { maximize-column; }
     Mod+M hotkey-overlay-title="Maximize window to edges" { maximize-window-to-edges; }
     Mod+Ctrl+F hotkey-overlay-title="Expand column to available width" { expand-column-to-available-width; }
     Mod+V hotkey-overlay-title="Toggle window floating/tiling" { toggle-window-floating; }
@@ -257,8 +252,6 @@ binds {
     Mod+Alt+Right hotkey-overlay-title="Move window to group on right" { consume-or-expel-window-right; }
     Mod+Alt+Tab hotkey-overlay-title="Next window in group" { focus-window-down; }
     Mod+Alt+Shift+Tab hotkey-overlay-title="Previous window in group" { focus-window-up; }
-    Mod+BracketLeft hotkey-overlay-title="Move window to group on left" { consume-or-expel-window-left; }
-    Mod+BracketRight hotkey-overlay-title="Move window to group on right" { consume-or-expel-window-right; }
     Mod+Comma hotkey-overlay-title="Consume window into group" { consume-window-into-column; }
     Mod+Period hotkey-overlay-title="Expel window from group" { expel-window-from-column; }
 
