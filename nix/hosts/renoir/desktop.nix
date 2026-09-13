@@ -46,6 +46,54 @@ let
       fi
     '';
   };
+  # Port of Omarchy's screensaver: random tte effects in a fullscreen terminal.
+  screensaver = pkgs.writeShellApplication {
+    name = "wily-screensaver";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.ghostty
+      pkgs.jq
+      pkgs.niri
+      pkgs.procps
+      pkgs.terminaltexteffects
+    ];
+    text = ''
+      app_id=wily.screensaver
+
+      if [[ ''${1:-} != --run ]]; then
+        pgrep -f "class=$app_id" >/dev/null && exit 0
+        exec ghostty --gtk-single-instance=false --class="$app_id" --font-size=18 \
+          --window-padding-x=0 --window-padding-y=0 --window-padding-color=extend-always \
+          -e "$0" --run
+      fi
+
+      # Black background, hidden cursor.
+      printf '\033]11;rgb:00/00/00\007\033[?25l'
+
+      focused() {
+        niri msg --json focused-window | jq -e --arg id "$app_id" '.app_id == $id' >/dev/null
+      }
+
+      # tte sizes its canvas once; wait for the pty to leave its 80x24 default
+      # and for the window to map, so the focus check below does not fire early.
+      deadline=$((SECONDS + 3))
+      while ((SECONDS < deadline)) && { [[ $(stty size) == "24 80" ]] || ! focused; }; do
+        sleep 0.05
+      done
+
+      while true; do
+        tte -i ${./screensaver.txt} \
+          --frame-rate 120 --canvas-width 0 --canvas-height 0 --reuse-canvas \
+          --anchor-canvas c --anchor-text c --random-effect --no-eol --no-restore-cursor &
+        while kill -0 $! 2>/dev/null; do
+          if read -rsn1 -t 1 || ! focused; then
+            kill $! 2>/dev/null || true
+            exit 0
+          fi
+        done
+      done
+    '';
+  };
   cliamp-desktop = pkgs.makeDesktopItem {
     name = "cliamp";
     desktopName = "cliamp";
@@ -225,6 +273,7 @@ in
         };
       }
     ))
+    screensaver
     lutris # Battle.net and other non-Steam launchers.
     wl-gammarelay-rs
     libnotify
