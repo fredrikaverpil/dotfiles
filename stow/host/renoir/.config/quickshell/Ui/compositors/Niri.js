@@ -14,6 +14,11 @@ function screenshot(mode) {
     mode === "window" ? "screenshot-window" : "screenshot-screen"]
 }
 
+// Prints the picked color as #rrggbb, or nothing when cancelled.
+function pickColor() {
+  return ["sh", "-c", "niri msg pick-color | sed -n 's/^Hex: //p'"]
+}
+
 // focus-workspace acts on the focused output, so focus the target output first.
 function focusWorkspace(id, output) {
   return ["sh", "-c", 'niri msg action focus-monitor "$1" && niri msg action focus-workspace "$2"',
