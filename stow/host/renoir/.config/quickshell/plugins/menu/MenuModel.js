@@ -7,6 +7,14 @@ function parseBinds(raw) {
     })
 }
 
+// Reads Unicode's emoji-test.txt; skin-tone variants are dropped.
+function parseEmoji(raw) {
+  return String(raw || "").split("\n")
+    .map(function(line) { return /; fully-qualified\s+# (\S+) E\d+\.\d+ (.+)$/.exec(line) })
+    .filter(function(match) { return match && match[2].indexOf("skin tone") < 0 })
+    .map(function(match) { return { emoji: match[1], name: match[2] } })
+}
+
 function childrenOf(items, parent) {
   var entries = items || {}
   var prefix = parent === "root" ? "" : parent + "."
