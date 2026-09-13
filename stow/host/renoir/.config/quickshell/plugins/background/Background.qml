@@ -176,8 +176,8 @@ Scope {
 
     function choose() {
       const path = background.wallpapers[grid.currentIndex]
-      close()
       if (path) background.setWallpaper(path)
+      close()
     }
 
     Text {
