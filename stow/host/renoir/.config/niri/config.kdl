@@ -176,14 +176,14 @@ binds {
     Mod+Shift+R hotkey-overlay-title="Previous preset column width" { switch-preset-column-width-back; }
     Mod+Ctrl+Shift+R hotkey-overlay-title="Next preset window height" { switch-preset-window-height; }
     Mod+Ctrl+R hotkey-overlay-title="Reset window height" { reset-window-height; }
-    Mod+Minus hotkey-overlay-title="Expand window left" { set-column-width "-10%"; }
-    Mod+Equal hotkey-overlay-title="Shrink window left" { set-column-width "+10%"; }
-    Mod+Shift+Minus hotkey-overlay-title="Shrink window up" { set-window-height "-10%"; }
-    Mod+Shift+Equal hotkey-overlay-title="Expand window down" { set-window-height "+10%"; }
-    Mod+Alt+Minus hotkey-overlay-title="Expand window left a little" { set-column-width "-2%"; }
-    Mod+Alt+Equal hotkey-overlay-title="Shrink window left a little" { set-column-width "+2%"; }
-    Mod+Ctrl+Minus hotkey-overlay-title="Expand window left a lot" { set-column-width "-25%"; }
-    Mod+Ctrl+Equal hotkey-overlay-title="Shrink window left a lot" { set-column-width "+25%"; }
+    Mod+Minus hotkey-overlay-title="Narrow column" { set-column-width "-10%"; }
+    Mod+Equal hotkey-overlay-title="Widen column" { set-column-width "+10%"; }
+    Mod+Shift+Minus hotkey-overlay-title="Shorten window" { set-window-height "-10%"; }
+    Mod+Shift+Equal hotkey-overlay-title="Heighten window" { set-window-height "+10%"; }
+    Mod+Alt+Minus hotkey-overlay-title="Narrow column a little" { set-column-width "-2%"; }
+    Mod+Alt+Equal hotkey-overlay-title="Widen column a little" { set-column-width "+2%"; }
+    Mod+Ctrl+Minus hotkey-overlay-title="Narrow column a lot" { set-column-width "-25%"; }
+    Mod+Ctrl+Equal hotkey-overlay-title="Widen column a lot" { set-column-width "+25%"; }
     Mod+C hotkey-overlay-title="Center column" { center-column; }
     Mod+Ctrl+C hotkey-overlay-title="Center visible columns" { center-visible-columns; }
 
