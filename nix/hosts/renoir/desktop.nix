@@ -225,6 +225,7 @@ in
         };
       }
     ))
+    lutris # Battle.net and other non-Steam launchers.
     wl-gammarelay-rs
     libnotify
     sound-theme-freedesktop
