@@ -83,6 +83,11 @@ window-rule {
     open-on-workspace "5"
 }
 
+window-rule {
+    match app-id=r#"^wily\.screensaver$"#
+    open-fullscreen true
+}
+
 cursor {
     xcursor-size 24
 }
@@ -101,6 +106,7 @@ binds {
     // Shell
     Mod+Space hotkey-overlay-title="Menu" { spawn "qs" "ipc" "call" "menu" "toggle"; }
     Super+Alt+L hotkey-overlay-title="Lock the screen" { spawn "qs" "ipc" "call" "lock" "lock"; }
+    Mod+Alt+S hotkey-overlay-title="Screensaver" { spawn "wily-screensaver"; }
     Mod+N hotkey-overlay-title="Dismiss latest notification" { spawn "qs" "ipc" "call" "notifications" "dismissOne"; }
     Mod+Shift+Comma hotkey-overlay-title="Dismiss all notifications" { spawn "qs" "ipc" "call" "notifications" "dismissAll"; }
     Mod+Alt+Comma hotkey-overlay-title="Invoke latest notification" { spawn "qs" "ipc" "call" "notifications" "invokeLast"; }

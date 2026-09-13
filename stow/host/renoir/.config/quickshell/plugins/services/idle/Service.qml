@@ -9,6 +9,7 @@ Item {
 
   property var lockService: null
   readonly property string statePath: Quickshell.env("HOME") + "/.local/state/wily-idle.json"
+  readonly property int screensaverAfterSeconds: 150
   readonly property int lockAfterSeconds: 300
 
   property bool stateLoaded: false
@@ -51,6 +52,15 @@ Item {
   }
 
   IdleMonitor {
+    enabled: root.enabled
+    timeout: root.screensaverAfterSeconds
+    respectInhibitors: true
+    onIsIdleChanged: {
+      if (isIdle && !(root.lockService && root.lockService.locked)) Quickshell.execDetached(["wily-screensaver"])
+    }
+  }
+
+  IdleMonitor {
     id: idleMonitor
     enabled: root.enabled
     timeout: root.lockAfterSeconds
@@ -68,6 +78,7 @@ Item {
       return JSON.stringify({
         enabled: root.enabled,
         idle: idleMonitor.isIdle,
+        screensaverAfterSeconds: root.screensaverAfterSeconds,
         lockAfterSeconds: root.lockAfterSeconds
       })
     }
