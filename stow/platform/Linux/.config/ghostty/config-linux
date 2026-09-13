@@ -4,7 +4,7 @@
 # the shared 14pt renders ~33% larger here. 10.5 = 14 * 72/96.
 font-size = 10.5
 
-# Berkeley Mono is a paid font and not vendored into Nix yet, so the shared
-# family falls back to DejaVu Sans Mono. Maple Mono (italics) is installed.
+# Berkeley Mono is licensed and installed by hand into ~/.local/share/fonts.
+# These append to the shared family, so hosts without it use JetBrains Mono.
 font-family = "JetBrainsMono Nerd Font"
 font-family-bold = "JetBrainsMono Nerd Font"
