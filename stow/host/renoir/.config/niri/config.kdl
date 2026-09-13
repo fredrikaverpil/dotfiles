@@ -1,5 +1,5 @@
-// Binds follow niri's default-config.kdl, plus shell binds. niri reloads this
-// file on save.
+// Binds follow niri's default-config.kdl. niri reloads this file on save.
+// Defaults: https://github.com/niri-wm/niri/blob/main/resources/default-config.kdl
 
 // nwg-displays owns outputs in the untracked monitor.kdl. It prepends its own
 // include unless a line contains `include "monitor.kdl"`, as this comment does;
