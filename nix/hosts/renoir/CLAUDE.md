@@ -23,6 +23,9 @@ previous states.
   interface. Keep scheduling and shared state above it.
 - Prefer purpose-built applications to large bespoke panels for infrequent
   tasks.
+- Clipboard history is in memory only and skips offers carrying
+  `x-kde-passwordManagerHint`. Proton Pass and 1Password set it (both copy via
+  arboard); a password manager that does not would be recorded.
 - Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Niri KDL booleans are presence-only, not `option true`.
 - Read the relevant Omarchy source before changing a ported feature (and

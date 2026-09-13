@@ -12,6 +12,7 @@ import "plugins/notifications" as Notifications
 import "plugins/panels/audio" as Audio
 import "plugins/panels/battery" as Battery
 import "plugins/panels/bluetooth" as Bluetooth
+import "plugins/panels/clipboard" as Clipboard
 import "plugins/panels/media" as Media
 import "plugins/panels/monitor" as Monitor
 import "plugins/panels/network" as Network
@@ -22,6 +23,7 @@ import "plugins/polkit" as Polkit
 import "plugins/services/battery" as BatteryService
 import "plugins/services/bluetooth" as BluetoothService
 import "plugins/services/brightness" as Brightness
+import "plugins/services/clipboard" as ClipboardService
 import "plugins/services/idle" as Idle
 import "plugins/services/keyboard" as Keyboard
 import "plugins/services/media" as MediaService
@@ -57,6 +59,7 @@ ShellRoot {
   readonly property alias weather: weather
   readonly property alias weatherService: weatherService
   readonly property alias systemService: systemService
+  readonly property alias clipboard: clipboard
 
   readonly property int barHeight: 32
   property var panels: []
@@ -206,6 +209,7 @@ ShellRoot {
       action: () => Quickshell.execDetached(["sh", "-c",
         'hex=$("$@") && [ -n "$hex" ] && wl-copy "$hex" && notify-send -a "Color picker" "$hex" "Copied to clipboard"',
         "sh", ...Ui.Compositor.pickColor()]) },
+    "trigger.clipboard": { icon: "\u{F014C}", label: "Clipboard", action: () => clipboard.open() },
     "media": { icon: media.icon, label: "Media", action: () => media.open() },
     "weather": { icon: weatherService.icon, label: "Weather", action: () => weather.open() },
     "tray": { icon: "󰘔", label: "Tray", provider: "tray" },
@@ -379,6 +383,16 @@ ShellRoot {
 
   SystemService.Service {
     id: systemService
+  }
+
+  ClipboardService.Service {
+    id: clipboardService
+  }
+
+  Clipboard.Panel {
+    id: clipboard
+    shell: root
+    service: clipboardService
   }
 
   Menu.Menu {
