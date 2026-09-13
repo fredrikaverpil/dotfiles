@@ -6,7 +6,6 @@ import "compositors/Niri.js" as Niri
 
 Singleton {
   readonly property string name: Niri.name
-  readonly property string docs: Niri.docs
   readonly property string themeConfig: Quickshell.env("HOME") + Niri.themeConfig
 
   function dpms(on) { return Niri.dpms(on) }

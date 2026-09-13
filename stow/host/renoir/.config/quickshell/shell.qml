@@ -187,12 +187,7 @@ ShellRoot {
 
   readonly property var menuItems: ({
     "apps": { icon: "󰀻", label: "Apps", provider: "apps" },
-    "learn": { icon: "󰧑", label: "Learn" },
-    "learn.keybindings": { icon: "", label: "Keybindings", provider: "binds" },
-    "learn.compositor": { icon: "", label: Ui.Compositor.name,
-      action: () => Quickshell.execDetached(["uwsm-app", "--", "xdg-open", Ui.Compositor.docs]) },
-    "learn.nixos": { icon: "", label: "NixOS",
-      action: () => Quickshell.execDetached(["uwsm-app", "--", "xdg-open", "https://nixos.org/manual/nixos/stable/"]) },
+    "keybindings": { icon: "", label: "Keybindings", provider: "binds" },
     "style": { icon: "", label: "Style" },
     "style.wallpaper": { icon: "", label: "Wallpaper", action: () => background.open() },
     "style.theme": { icon: "", label: "Theme" },

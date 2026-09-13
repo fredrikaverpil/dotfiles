@@ -1,5 +1,4 @@
 var name = "niri"
-var docs = "https://yalter.github.io/niri/"
 var themeConfig = "/.config/niri/config.kdl"
 
 function dpms(on) {
