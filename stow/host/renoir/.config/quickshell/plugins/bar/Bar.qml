@@ -232,7 +232,7 @@ Scope {
         anchors.rightMargin: visible ? 4 : 0
         visible: bar.shell.systemService.alert !== null
         label: bar.shell.systemService.alert ? bar.shell.systemService.alert.icon : ""
-        onActivated: bar.shell.systemService.openMonitor()
+        onActivated: bar.shell.menu.open("system.kill")
       }
 
       // Separates app tray icons from the indicators and system buttons.
