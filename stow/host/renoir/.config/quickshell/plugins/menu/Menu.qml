@@ -30,6 +30,22 @@ Ui.Panel {
     onLoaded: menu.binds = Model.parseBinds(text())
   }
 
+  property var emojis: []
+
+  FileView {
+    path: Quickshell.env("EMOJI_TEST") || ""
+    printErrors: false
+    onLoaded: menu.emojis = Model.parseEmoji(text()).map(e => ({
+      label: e.name,
+      icon: e.emoji,
+      image: "",
+      detail: "",
+      enabled: true,
+      entry: null,
+      action: () => Quickshell.execDetached(["wl-copy", e.emoji]),
+    }))
+  }
+
   function iconUrl(icon) {
     const value = String(icon || "")
     if (value.length === 0) return ""
@@ -87,6 +103,7 @@ Ui.Panel {
     tray: function() { return menu.trayRows() },
     apps: function(detail) { return menu.appRows(detail) },
     places: function() { return menu.placeRows() },
+    emoji: function() { return menu.emojis },
   })
 
   // ListView resets currentIndex after this handler runs.
