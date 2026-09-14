@@ -310,7 +310,7 @@ Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
   conflicts with TLP; keep TLP disabled.
 - Lid close uses logind defaults: suspend (the pre-suspend unit locks first),
   or nothing when docked. Niri turns off `eDP-1` while docked with the lid
-  closed.
+  closed. The power key suspends too: `niri --session` takes it from logind.
 - DPMS-off can resemble a frozen machine. Use bounded commands; `grim` can hang
   while no output produces frames. Recovery is
   `niri msg action power-on-monitors`.
