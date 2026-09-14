@@ -32,7 +32,28 @@ function clock(date) {
   return pad(date.getHours()) + ":" + pad(date.getMinutes())
 }
 
-function row(event, dayStart, dayEnd) {
+// iCal feeds are tagged by calendar name; every Google calendar shares one tag.
+var TAGS = { "Family": "🏠", "Johannas kalender": "❤️", "My calendar": "👤" }
+var GOOGLE_TAG = "G"
+
+// Maps calendar id to tag from a calendars.list reply.
+function tags(text) {
+  var calendars
+  try {
+    calendars = JSON.parse(text)
+  } catch (error) {
+    return {}
+  }
+  var result = {}
+  if (!Array.isArray(calendars)) return result
+  calendars.forEach(function(calendar) {
+    if (!calendar) return
+    result[calendar.id] = calendar.accountKind === "google" ? GOOGLE_TAG : (TAGS[calendar.name] || "")
+  })
+  return result
+}
+
+function row(event, dayStart, dayEnd, tagsById) {
   var start = event.allDay ? allDayDate(event.start) : new Date(event.start)
   var end = event.allDay ? allDayDate(event.end) : new Date(event.end)
   if (isNaN(start) || isNaN(end)) return null
@@ -41,6 +62,7 @@ function row(event, dayStart, dayEnd) {
   return {
     uid: String(event.uid || ""),
     start: String(event.start || ""),
+    tag: (tagsById || {})[event.calendarId] || "",
     summary: String(event.summary || "") || "(no title)",
     location: String(event.location || ""),
     // Invites come from others; only web links reach xdg-open.
@@ -53,7 +75,7 @@ function row(event, dayStart, dayEnd) {
 }
 
 // Returns DAY_COUNT days from now's midnight, or null for anything but an events.list reply.
-function parse(text, now) {
+function parse(text, now, tagsById) {
   var events
   try {
     events = JSON.parse(text).events
@@ -68,7 +90,7 @@ function parse(text, now) {
     var dayEnd = midnight(now, index + 1)
     var rows = events
       .filter(function(event) { return event && event.status !== "cancelled" })
-      .map(function(event) { return row(event, dayStart, dayEnd) })
+      .map(function(event) { return row(event, dayStart, dayEnd, tagsById) })
       .filter(function(entry) { return entry !== null })
       .sort(function(a, b) {
         return (b.allDay - a.allDay) || (a.at - b.at) || a.summary.localeCompare(b.summary)

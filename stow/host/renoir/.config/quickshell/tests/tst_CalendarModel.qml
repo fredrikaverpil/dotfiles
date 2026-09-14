@@ -19,29 +19,46 @@ TestCase {
     verify(/^to=2026-09-17T00:00:00[+-]\d\d:\d\d$/.test(command[5]))
   }
 
+  function test_calendars_map_to_google_or_named_tags() {
+    const text = JSON.stringify([
+      { id: "g-family", name: "Family", accountKind: "google" },
+      { id: "g-week", name: "Veckonummer", accountKind: "google" },
+      { id: "family", name: "Family", accountKind: "ical" },
+      { id: "johanna", name: "Johannas kalender", accountKind: "ical" },
+      { id: "mine", name: "My calendar", accountKind: "ical" },
+      { id: "other", name: "Holidays", accountKind: "ical" },
+    ])
+
+    const tags = Calendar.tags(text)
+
+    compare(tags, { "g-family": "G", "g-week": "G", family: "🏠", johanna: "❤️", mine: "👤", other: "" })
+    compare(Calendar.tags("Error: dcal daemon not running"), {})
+  }
+
   function test_events_split_into_days_with_all_day_first() {
     const text = JSON.stringify({ events: [
       { uid: "late", summary: "Late", start: local(14, 17), end: local(14, 17, 30),
-        meetingUrl: "https://meet.example/abc", location: "Room" },
-      { uid: "week", summary: "Week 38", allDay: true,
+        meetingUrl: "https://meet.example/abc", location: "Room", calendarId: "johanna" },
+      { uid: "week", summary: "Week 38", allDay: true, calendarId: "g-week",
         start: "2026-09-14T00:00:00Z", end: "2026-09-16T00:00:00Z" },
       { uid: "night", summary: "", start: local(15, 23), end: local(16, 1),
-        meetingUrl: "file:///etc/passwd" },
+        meetingUrl: "file:///etc/passwd", calendarId: "unknown" },
       { uid: "gone", summary: "Cancelled", status: "cancelled", start: local(14, 9), end: local(14, 10) },
       { uid: "past", summary: "Yesterday", start: local(13, 9), end: local(13, 10) },
     ] })
+    const tags = { johanna: "❤️", "g-week": "G" }
 
-    const days = Calendar.parse(text, now)
+    const days = Calendar.parse(text, now, tags)
 
     compare(days.map(day => day.date.getTime()), [
       new Date(2026, 8, 14).getTime(), new Date(2026, 8, 15).getTime(), new Date(2026, 8, 16).getTime(),
     ])
-    const week = { uid: "week", start: "2026-09-14T00:00:00Z", summary: "Week 38", location: "",
+    const week = { uid: "week", start: "2026-09-14T00:00:00Z", tag: "G", summary: "Week 38", location: "",
       meetingUrl: "", allDay: true, at: new Date(2026, 8, 14).getTime(), time: "all day" }
-    const night = (time) => ({ uid: "night", start: local(15, 23), summary: "(no title)", location: "",
+    const night = (time) => ({ uid: "night", start: local(15, 23), tag: "", summary: "(no title)", location: "",
       meetingUrl: "", allDay: false, at: new Date(2026, 8, 15, 23).getTime(), time: time })
     compare(days.map(day => day.events), [
-      [week, { uid: "late", start: local(14, 17), summary: "Late", location: "Room",
+      [week, { uid: "late", start: local(14, 17), tag: "❤️", summary: "Late", location: "Room",
         meetingUrl: "https://meet.example/abc", allDay: false,
         at: new Date(2026, 8, 14, 17).getTime(), time: "17:00–17:30" }],
       [week, night("23:00–…")],
