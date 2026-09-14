@@ -66,6 +66,29 @@ TestCase {
     ])
   }
 
+  function test_unreadable_dates_show_once_on_the_first_day() {
+    const text = JSON.stringify({ events: [
+      { uid: "timed", summary: "Timed", start: local(14, 9), end: local(14, 10) },
+      { uid: "garbage", summary: "Garbage", start: "soon", end: local(14, 10), calendarId: "mine" },
+      { uid: "endless", summary: "Endless", start: local(15, 9) },
+    ] })
+
+    const days = Calendar.parse(text, now, { mine: "👤" })
+
+    const unreadable = (uid, summary, start, tag) => ({ uid: uid, start: start, tag: tag, summary: summary,
+      location: "", meetingUrl: "", allDay: false, at: 0, time: "?" })
+    compare(days.map(day => day.events), [
+      [
+        unreadable("endless", "Endless", local(15, 9), ""),
+        unreadable("garbage", "Garbage", "soon", "👤"),
+        { uid: "timed", start: local(14, 9), tag: "", summary: "Timed", location: "", meetingUrl: "",
+          allDay: false, at: new Date(2026, 8, 14, 9).getTime(), time: "09:00–10:00" },
+      ],
+      [],
+      [],
+    ])
+  }
+
   function test_non_list_replies_are_rejected() {
     verify(Calendar.parse("", now) === null)
     verify(Calendar.parse("{}", now) === null)
