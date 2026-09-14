@@ -1,7 +1,7 @@
 # Included from the shared config; Linux-only overrides.
 
 # Ghostty converts points via display DPI: 96 on Linux/GTK vs 72 on macOS.
-font-size = 10
+font-size = 10.5
 
 # Light weights turn spindly on a low-DPI panel. An empty value clears the
 # shared list before re-adding.
