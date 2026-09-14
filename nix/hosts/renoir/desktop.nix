@@ -236,7 +236,8 @@ in
     iproute2
     iputils
 
-    (chromium.override { commandLineArgs = "--no-first-run"; })
+    # Chromium picks its password store per desktop; switching stores drops cookies and logins.
+    (chromium.override { commandLineArgs = "--no-first-run --password-store=gnome-libsecret"; })
     bluetui
     bluetui-desktop
     btop
