@@ -19,7 +19,8 @@ previous states.
   window. Calendar credentials and bearer feed URLs are private user state,
   never Nix/Stow values. `dcal` requires Secret Service before starting: its
   local encrypted-keyring fallback uses a fixed password. The unit's startup
-  probe does not guard manually launched instances.
+  probe does not guard manually launched instances. DankCalendar's Quit (tray,
+  window) terminates the daemon cleanly, so the unit restarts on any exit.
 - On first use, gnome-keyring can advertise `login` without exporting the
   collection when keyring creation follows D-Bus startup. `OpenSession` alone
   misses this; also probe the collection. Recover by restarting the keyring

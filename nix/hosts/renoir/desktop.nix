@@ -201,6 +201,8 @@ in
     # NixOS pins a sparse user-unit PATH; inherit UWSM's session PATH so dcal can
     # launch its Quickshell UI and open OAuth URLs with the session's tools.
     environment.PATH = lib.mkForce null;
+    # Retry indefinitely, e.g. while the keyring is not yet unlocked.
+    unitConfig.StartLimitIntervalSec = 0;
     serviceConfig = {
       # OpenSession prevents the weak local fallback; the collection probe catches broken first-use initialization.
       ExecStartPre = [
@@ -208,7 +210,8 @@ in
         "${pkgs.systemd}/bin/busctl --user --timeout=15 --quiet get-property org.freedesktop.secrets /org/freedesktop/secrets/collection/login org.freedesktop.Secret.Collection Locked"
       ];
       ExecStart = "${lib.getExe config.programs.dank-calendar.package} run --session --hidden";
-      Restart = "on-failure";
+      # The UI's Quit makes the daemon SIGTERM itself and exit 0.
+      Restart = "always";
       RestartSec = "2s";
       Slice = "app.slice";
       UMask = "0077";
