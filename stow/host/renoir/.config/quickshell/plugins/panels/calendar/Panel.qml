@@ -154,9 +154,23 @@ Ui.Panel {
     }
 
     Text {
-      id: time
+      id: tag
       anchors.left: parent.left
-      anchors.leftMargin: 8
+      anchors.leftMargin: 4
+      anchors.verticalCenter: parent.verticalCenter
+      width: 24
+      horizontalAlignment: Text.AlignHCenter
+      color: root.shell.palette.fg
+      font.family: Ui.Fonts.mono
+      font.pixelSize: 13
+      font.bold: true
+      text: row.modelData.tag
+    }
+
+    Text {
+      id: time
+      anchors.left: tag.right
+      anchors.leftMargin: 6
       anchors.verticalCenter: parent.verticalCenter
       width: 104
       color: root.shell.palette.off
