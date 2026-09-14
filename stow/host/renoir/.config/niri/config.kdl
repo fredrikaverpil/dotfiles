@@ -101,6 +101,7 @@ spawn-at-startup "sh" "-c" "sed -n '/^spawn-at-startup/d; s|^ *\\([^ ]*\\).*hotk
 binds {
     // Shell
     Mod+Space hotkey-overlay-title="Menu" { spawn "qs" "ipc" "call" "menu" "toggle"; }
+    Mod+Shift+Space hotkey-overlay-title="Toggle US/SE layout" { spawn "qs" "ipc" "call" "keyboard" "next"; }
     Super+Alt+L hotkey-overlay-title="Lock the screen" { spawn "qs" "ipc" "call" "lock" "lock"; }
     Mod+N hotkey-overlay-title="Dismiss latest notification" { spawn "qs" "ipc" "call" "notifications" "dismissOne"; }
     Mod+Shift+Comma hotkey-overlay-title="Dismiss all notifications" { spawn "qs" "ipc" "call" "notifications" "dismissAll"; }
