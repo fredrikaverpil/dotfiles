@@ -1,6 +1,9 @@
 { pkgs, ... }:
 {
-  imports = [ ./desktop.nix ];
+  imports = [
+    ./desktop.nix
+    ./gaming.nix
+  ];
 
   system.stateVersion = "26.05";
 
