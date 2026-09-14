@@ -133,6 +133,10 @@ binds {
     // Launch
     Mod+T hotkey-overlay-title="Terminal" { spawn "ghostty"; }
 
+    // Focus the app's most recently focused window, switching workspace.
+    Mod+Z hotkey-overlay-title="Focus Zen" { spawn-sh r#"niri msg action focus-window --id "$(niri msg -j windows | jq '[.[] | select(.app_id == "zen-beta")] | max_by(.focus_timestamp | [.secs, .nanos]) | .id')""#; }
+    Mod+S hotkey-overlay-title="Focus Slack" { spawn-sh r#"niri msg action focus-window --id "$(niri msg -j windows | jq '[.[] | select(.app_id | test("^slack$"; "i"))] | max_by(.focus_timestamp | [.secs, .nanos]) | .id')""#; }
+
     // Window state
     Mod+Q hotkey-overlay-title="Close window" { close-window; }
     Mod+Shift+F hotkey-overlay-title="Full screen" { fullscreen-window; }
