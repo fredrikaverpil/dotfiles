@@ -23,6 +23,7 @@ input {
         tap
         dwt
         dwtp
+        scroll-factor 0.2
     }
 }
 
