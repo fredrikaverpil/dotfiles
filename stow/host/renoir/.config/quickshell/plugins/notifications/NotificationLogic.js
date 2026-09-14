@@ -26,8 +26,10 @@ function snapshotOf(notification, timestamp) {
 function durationFor(notification, lowUrgency, criticalUrgency) {
   if (notification.urgency === criticalUrgency || notification.resident) return 0
 
+  // Zero is the spec's "never expire"; negative or unparseable means server default.
   var requested = Number(notification.expireTimeout)
-  if (!isFinite(requested) || requested <= 0) requested = 0
+  if (requested === 0) return 0
+  if (!isFinite(requested) || requested < 0) requested = 0
 
   var minimum = notification.urgency === lowUrgency ? 5000 : 8000
   return Math.min(30000, Math.max(minimum, requested))

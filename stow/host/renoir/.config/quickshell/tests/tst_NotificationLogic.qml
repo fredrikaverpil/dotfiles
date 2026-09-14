@@ -30,5 +30,7 @@ TestCase {
     compare(Notification.durationFor({ urgency: 1, expireTimeout: 1 }, low, critical), 8000)
     compare(Notification.durationFor({ urgency: 1, expireTimeout: 99999 }, low, critical), 30000)
     compare(Notification.durationFor({ urgency: 1, expireTimeout: "invalid" }, low, critical), 8000)
+    compare(Notification.durationFor({ urgency: 1, expireTimeout: 0 }, low, critical), 0)
+    compare(Notification.durationFor({ urgency: 1, expireTimeout: -1 }, low, critical), 8000)
   }
 }

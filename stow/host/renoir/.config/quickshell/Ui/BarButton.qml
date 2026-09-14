@@ -14,7 +14,7 @@ Rectangle {
   signal secondary
   signal middle
 
-  implicitWidth: visible ? 28 : 0
+  implicitWidth: visible ? Math.max(28, btnLabel.implicitWidth + 12) : 0
   width: implicitWidth
   height: 24
   radius: 4

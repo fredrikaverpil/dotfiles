@@ -15,6 +15,16 @@ previous states.
   gnome-keyring. Its `niri.service`, session file and swaylock PAM go unused
   under UWSM. gnome-keyring is the Secret Service, unlocked by the `login` PAM
   stack; fingerprint login cannot unlock it.
+- DankCalendar's `dcal` daemon owns calendar sync and reminders, outliving its
+  window. Calendar credentials and bearer feed URLs are private user state,
+  never Nix/Stow values. `dcal` requires Secret Service before starting: its
+  local encrypted-keyring fallback uses a fixed password. The unit's startup
+  probe does not guard manually launched instances.
+- On first use, gnome-keyring can advertise `login` without exporting the
+  collection when keyring creation follows D-Bus startup. `OpenSession` alone
+  misses this; also probe the collection. Recover by restarting the keyring
+  daemon and unlocking it, then retry account setup. Do not delete keyring
+  files.
 - Nautilus and Dolphin are installed side by side until one is chosen; yazi
   stays the `inode/directory` handler. Both provide
   `org.freedesktop.FileManager1`, so "Show in folder" may open either.
