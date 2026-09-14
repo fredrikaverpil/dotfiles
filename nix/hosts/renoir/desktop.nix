@@ -73,22 +73,18 @@ in
 {
   programs.uwsm.enable = true;
 
-  # Window-manager session defaults. programs.niri is not used: it adds the GNOME portal and keyring.
-  programs.dconf.enable = true;
-  # xwayland-satellite runs the Xwayland binary.
+  # Session defaults, GNOME (screencast) and GTK portals, gnome-keyring as Secret Service,
+  # and Nautilus as the GNOME portal's file chooser.
+  programs.niri.enable = true;
+  # The keyring stores secrets only; it provides no SSH agent.
+  services.gnome.gcr-ssh-agent.enable = false;
+  # Nautilus's trash, network locations and removable media.
+  services.gvfs.enable = true;
+  # niri's module leaves Xwayland off; xwayland-satellite runs the Xwayland binary.
   programs.xwayland.enable = true;
-  services.graphical-desktop.enable = true;
-  services.xserver.desktopManager.runXdgAutostartIfNone = true;
-  xdg.portal = {
-    enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-  };
 
   # Opens port 53317 for receiving files and text from the iPhone.
   programs.localsend.enable = true;
-
-  # niri has no portal default; the GTK settings portal supplies the shell's theme setting.
-  xdg.portal.config.niri.default = [ "gtk" ];
 
   # KService builds Dolphin's application list from an applications menu, which only Plasma ships.
   # Plasma's own menu would pull in plasma-workspace; KService only needs every app listed.
@@ -148,8 +144,6 @@ in
     GTK_USE_PORTAL = "1";
   };
 
-  security.polkit.enable = true;
-
   # polkit.enable does not install the setuid pkexec wrapper.
   security.polkit.enablePkexecWrapper = true;
 
@@ -208,7 +202,6 @@ in
 
   host.extraSystemPackages = with pkgs; [
     quickshell
-    niri
     # niri spawns it on demand and exports DISPLAY for X11 apps.
     # 0.8.2 closes Steam menus instantly (Supreeeme/xwayland-satellite#468, fixed
     # on main by #494); drop this pin once a newer release lands in nixpkgs.
@@ -236,6 +229,8 @@ in
     kdePackages.kio-extras
     kdePackages.ffmpegthumbs
     kdePackages.kconfig
+    # Trialled side by side with Dolphin.
+    nautilus
     ghostty
     gnome-themes-extra
     iproute2
