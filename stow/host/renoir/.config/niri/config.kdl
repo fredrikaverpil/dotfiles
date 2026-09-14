@@ -23,7 +23,6 @@ input {
         tap
         dwt
         dwtp
-        scroll-factor 0.2
     }
 }
 
@@ -57,6 +56,12 @@ workspace "2"
 workspace "3"
 workspace "4"
 workspace "5"
+
+// Matches all windows but not layer surfaces, so Quickshell panels keep 1:1
+// scrolling.
+window-rule {
+    scroll-factor 0.2
+}
 
 window-rule {
     match app-id=r#"^zen-beta$"#
