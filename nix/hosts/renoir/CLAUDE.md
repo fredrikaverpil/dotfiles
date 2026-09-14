@@ -11,6 +11,13 @@ previous states.
 
 - niri is the only session, run under UWSM and started with `niri` from the
   console.
+- `programs.niri` supplies the session defaults, the `gnome;gtk` portals and
+  gnome-keyring. Its `niri.service`, session file and swaylock PAM go unused
+  under UWSM. gnome-keyring is the Secret Service, unlocked by the `login` PAM
+  stack; fingerprint login cannot unlock it.
+- Nautilus and Dolphin are installed side by side until one is chosen; yazi
+  stays the `inode/directory` handler. Both provide
+  `org.freedesktop.FileManager1`, so "Show in folder" may open either.
 - `desktop.nix` owns packages, portals, PAM, systemd units, and the pre-suspend
   lock inhibitor. `stow/host/renoir/` owns compositor configuration and QML.
 - `shell.qml` wires services and surfaces. Views belong in `plugins/panels/`;
@@ -257,18 +264,17 @@ Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
   Extract frames with `nix shell nixpkgs#ffmpeg`.
 - LosslessCut trims clips by stream copy, so cuts snap to keyframes; it is
   not a default handler, and mpv still opens finished recordings.
-- Window recording is deferred; a region covers it. Window capture goes through
-  `xdg-desktop-portal-gnome` (routed as niri's
-  `org.freedesktop.impl.portal.ScreenCast`, not installed), which needs
-  niri's Mutter D-Bus services; niri starts those
-  only as `niri --session` (`src/dbus/mod.rs`). `shell/sourcing.sh` starts bare
-  `niri` under UWSM, so the portal reports no source types. `--session` would
-  also make niri import the environment into systemd (not cleaned up by UWSM),
-  take the power key from logind (`disable-power-key-handling` keeps logind),
-  and serve `org.freedesktop.ScreenSaver` idle inhibitors. It needs a
-  relogin. `debug { dbus-interfaces-in-non-session-instances }`
-  enables the D-Bus interfaces without it, minus the portal-dialog service
-  channel.
+- Recording never uses a portal. Other apps' screen sharing goes through
+  `xdg-desktop-portal-gnome`, which needs niri's Mutter D-Bus services
+  (`src/dbus/mod.rs`). `shell/sourcing.sh` starts bare `niri` under UWSM, so
+  `config.kdl` sets `debug { dbus-interfaces-in-non-session-instances }`. That
+  also serves `org.freedesktop.ScreenSaver` idle inhibitors, but not the Mutter
+  ServiceChannel: the portal's picker opens as an ordinary client (libgxdp
+  warns "portals dialogs may missbehave"). `niri --session` serves it too, but
+  imports the environment into systemd (not cleaned up by UWSM), takes the
+  power key from logind (`disable-power-key-handling` keeps logind) and needs
+  a relogin.
+- Window recording is deferred; a region covers it.
 
 ## Session and hardware constraints
 
