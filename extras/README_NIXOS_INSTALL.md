@@ -324,7 +324,7 @@ sudo cp /etc/nixos/hardware-configuration.nix ~/.dotfiles/nix/hosts/<hostname>/h
 
 The host also needs `configuration.nix` and `users/<username>.nix` in that
 directory, plus a `nixosConfigurations.<hostname> = lib.mkNixos { ... }` entry
-in `flake.nix`. If they are not there yet, copy `nix/hosts/wily-vm/` and change
+in `flake.nix`. If they are not there yet, copy `nix/hosts/renoir/` and change
 the hostname and `nixpkgs.hostPlatform`.
 
 **ThinkPad extras** (not needed in the VM). Lunar Lake needs the

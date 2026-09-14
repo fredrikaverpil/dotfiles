@@ -30,9 +30,6 @@ jobs:
           - name: rpi5-homelab
             os: ubuntu-24.04-arm  # https://github.com/actions/partner-runner-images
             nix_config: nixosConfigurations.rpi5-homelab.config.system.build.toplevel
-          - name: wily-vm
-            os: ubuntu-24.04-arm  # https://github.com/actions/partner-runner-images
-            nix_config: nixosConfigurations.wily-vm.config.system.build.toplevel
           - name: renoir
             os: ubuntu-24.04
             nix_config: nixosConfigurations.renoir.config.system.build.toplevel
@@ -73,5 +70,5 @@ jobs:
       - name: test nix build ${{ matrix.name }}
         run: |
           nix build .#${{ matrix.nix_config }} --show-trace --accept-flake-config --dry-run
-        if: matrix.name == 'rpi5-homelab' || matrix.name == 'wily-vm' || matrix.name == 'renoir'
+        if: matrix.name == 'rpi5-homelab' || matrix.name == 'renoir'
 
