@@ -94,9 +94,6 @@
         rpi5-homelab = lib.mkRpiNixos {
           configPath = ./nix/hosts/rpi5-homelab/configuration.nix;
         };
-        wily-vm = lib.mkNixos {
-          configPath = ./nix/hosts/wily-vm/configuration.nix;
-        };
         renoir = lib.mkNixos {
           configPath = ./nix/hosts/renoir/configuration.nix;
         };
@@ -148,11 +145,11 @@
               default =
                 let
                   pkgs = channels.unstable;
-                  # Linux-only. Never built on Darwin: the aarch64-linux path
+                  # Linux-only. Never built on Darwin: the x86_64-linux path
                   # substitutes from cache.nixos.org, and only lib/qt-6/qml
-                  # (.qmltypes) is used here. Same nixpkgs as wily-vm, so the
-                  # same store path the VM runs.
-                  quickshell = unstable.aarch64-linux.quickshell;
+                  # (.qmltypes) is used here. Same nixpkgs as renoir, so the
+                  # same store path the ThinkPad runs.
+                  quickshell = unstable.x86_64-linux.quickshell;
                   # Static checks cover every host's tree and stop at the first failure.
                   task =
                     name: text:
