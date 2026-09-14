@@ -66,7 +66,7 @@ stow --target="$HOME" --restow --no-folding --adopt "${packages[@]}"
 ```
 
 Put machine-specific files in `stow/<hostname>/` (for example,
-`stow/wily-vm/`). That package is optional, so hosts without one continue to
+`stow/renoir/`). That package is optional, so hosts without one continue to
 stow only `shared` and their platform package. A per-host file must not target
 a path already supplied by another Stow package; GNU Stow reports that as a
 conflict rather than treating it as an override.

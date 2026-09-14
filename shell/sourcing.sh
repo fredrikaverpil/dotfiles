@@ -5,17 +5,10 @@
 # functions and shell-agnostic
 # ----------------------------
 
-# Session launchers for a console login. /etc/NIXOS is the NixOS marker file,
-# so it rules out macOS and every other Linux in one test; the inner checks
-# then skip whichever session that host does not install.
+# Session launcher for a console login. /etc/NIXOS is the NixOS marker file,
+# so it rules out macOS and every other Linux in one test; the inner check
+# then skips hosts that do not install niri.
 if [ -e /etc/NIXOS ]; then
-	if command -v uwsm >/dev/null 2>&1 && command -v Hyprland >/dev/null 2>&1; then
-		function hypr() {
-			uwsm check may-start || return
-			uwsm start -e -D Hyprland hyprland.desktop
-		}
-	fi
-
 	# --session serves niri's D-Bus interfaces (screencast portal, a11y) and
 	# imports its environment, which uwsm cleans up on exit. The instance name
 	# follows from the executable, so the units are wayland-wm@niri.service and
