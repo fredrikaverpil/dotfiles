@@ -59,13 +59,24 @@ Scope {
         fontScale: bar.shell.textScale
       }
 
-      Text {
+      Row {
         id: clockLabel
         anchors.centerIn: parent
-        color: bar.shell.palette.fg
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 14 * bar.shell.textScale
-        text: Qt.formatDateTime(clock.date, "ddd d MMM  HH:mm:ss")
+
+        Ui.BarButton {
+          shell: bar.shell
+          anchors.verticalCenter: parent.verticalCenter
+          label: Qt.formatDateTime(clock.date, "ddd d MMM")
+          onActivated: bar.shell.calendar.toggle()
+        }
+
+        Text {
+          anchors.verticalCenter: parent.verticalCenter
+          color: bar.shell.palette.fg
+          font.family: Ui.Fonts.mono
+          font.pixelSize: 14 * bar.shell.textScale
+          text: Qt.formatDateTime(clock.date, "HH:mm:ss")
+        }
       }
 
       Ui.BarButton {
