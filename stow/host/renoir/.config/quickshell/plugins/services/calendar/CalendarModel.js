@@ -53,11 +53,13 @@ function tags(text) {
   return result
 }
 
-function row(event, dayStart, dayEnd, tagsById) {
+// Unreadable dates land on the first day with a "?" time rather than vanish.
+function row(event, dayStart, dayEnd, tagsById, first) {
   var start = event.allDay ? allDayDate(event.start) : new Date(event.start)
   var end = event.allDay ? allDayDate(event.end) : new Date(event.end)
-  if (isNaN(start) || isNaN(end)) return null
-  if (start >= dayEnd || (end <= dayStart && start < dayStart)) return null
+  var readable = !isNaN(start) && !isNaN(end)
+  if (!readable && !first) return null
+  if (readable && (start >= dayEnd || (end <= dayStart && start < dayStart))) return null
   var url = String(event.meetingUrl || "")
   return {
     uid: String(event.uid || ""),
@@ -68,8 +70,8 @@ function row(event, dayStart, dayEnd, tagsById) {
     // Invites come from others; only web links reach xdg-open.
     meetingUrl: /^https:\/\//i.test(url) ? url : "",
     allDay: event.allDay === true,
-    at: start.getTime(),
-    time: event.allDay ? "all day"
+    at: readable ? start.getTime() : 0,
+    time: !readable ? "?" : event.allDay ? "all day"
       : (start >= dayStart ? clock(start) : "…") + "–" + (end <= dayEnd ? clock(end) : "…"),
   }
 }
@@ -90,7 +92,7 @@ function parse(text, now, tagsById) {
     var dayEnd = midnight(now, index + 1)
     var rows = events
       .filter(function(event) { return event && event.status !== "cancelled" })
-      .map(function(event) { return row(event, dayStart, dayEnd, tagsById) })
+      .map(function(event) { return row(event, dayStart, dayEnd, tagsById, index === 0) })
       .filter(function(entry) { return entry !== null })
       .sort(function(a, b) {
         return (b.allDay - a.allDay) || (a.at - b.at) || a.summary.localeCompare(b.summary)
