@@ -7,13 +7,10 @@
 // first matching output block, so this stays above any other.
 include optional=true "monitor.kdl"
 
-// UWSM starts niri as a non-session instance, which serves no Mutter D-Bus
-// interfaces by default; xdg-desktop-portal-gnome's screencast needs them.
-debug {
-    dbus-interfaces-in-non-session-instances
-}
-
 input {
+    // logind keeps the power key; niri --session would take it to suspend.
+    disable-power-key-handling
+
     keyboard {
         xkb {
             // No grp: toggle: the shell owns the current index

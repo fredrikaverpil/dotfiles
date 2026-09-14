@@ -9,8 +9,8 @@ previous states.
 
 ## Architecture
 
-- niri is the only session, run under UWSM and started with `niri` from the
-  console.
+- niri is the only session, run under UWSM as `niri --session` and started
+  with `niri` from the console.
 - `programs.niri` supplies the session defaults, the `gnome;gtk` portals and
   gnome-keyring. Its `niri.service`, session file and swaylock PAM go unused
   under UWSM. gnome-keyring is the Secret Service, unlocked by the `login` PAM
@@ -265,15 +265,11 @@ Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
 - LosslessCut trims clips by stream copy, so cuts snap to keyframes; it is
   not a default handler, and mpv still opens finished recordings.
 - Recording never uses a portal. Other apps' screen sharing goes through
-  `xdg-desktop-portal-gnome`, which needs niri's Mutter D-Bus services
-  (`src/dbus/mod.rs`). `shell/sourcing.sh` starts bare `niri` under UWSM, so
-  `config.kdl` sets `debug { dbus-interfaces-in-non-session-instances }`. That
-  also serves `org.freedesktop.ScreenSaver` idle inhibitors, but not the Mutter
-  ServiceChannel: the portal's picker opens as an ordinary client (libgxdp
-  warns "portals dialogs may missbehave"). `niri --session` serves it too, but
-  imports the environment into systemd (not cleaned up by UWSM), takes the
-  power key from logind (`disable-power-key-handling` keeps logind) and needs
-  a relogin.
+  `xdg-desktop-portal-gnome`, which needs the Mutter D-Bus services and
+  ServiceChannel that niri serves only as `niri --session` (`src/dbus/mod.rs`).
+  Session mode also serves `org.freedesktop.ScreenSaver` idle inhibitors and
+  the a11y bus, and takes the power key from logind unless
+  `disable-power-key-handling` is set.
 - Window recording is deferred; a region covers it.
 
 ## Session and hardware constraints
