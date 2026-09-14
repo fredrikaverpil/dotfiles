@@ -24,6 +24,9 @@ TestCase {
     verify(Weather.forecastUrl(57.7089, 11.9746)
       === "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=57.71&lon=11.97")
     verify(Weather.forecastUrl("nowhere", 11.97) === "")
+    verify(Weather.yrUrl(57.7089, 11.9746)
+      === "https://www.yr.no/en/forecast/hourly-table/57.71,11.97?i=0")
+    verify(Weather.yrUrl("nowhere", 11.97) === "")
   }
 
   function test_poll_interval_lands_after_expires_within_bounds() {

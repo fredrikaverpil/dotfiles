@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
 
 import "../../../Ui" as Ui
@@ -167,32 +168,71 @@ Ui.Panel {
     height: 4
   }
 
-  Rectangle {
-    id: refreshButton
+  Row {
     width: parent.width
-    height: 28
-    radius: 4
-    color: activeFocus ? root.shell.palette.sel : "transparent"
-    border.color: activeFocus ? root.shell.palette.fg : root.shell.palette.dim
-    border.width: 1
-    activeFocusOnTab: true
+    spacing: 8
 
-    Keys.onReturnPressed: root.service.refresh()
-    Keys.onEnterPressed: root.service.refresh()
-    Keys.onSpacePressed: root.service.refresh()
+    Rectangle {
+      id: refreshButton
+      width: (parent.width - parent.spacing) / 2
+      height: 28
+      radius: 4
+      color: activeFocus ? root.shell.palette.sel : "transparent"
+      border.color: activeFocus ? root.shell.palette.fg : root.shell.palette.dim
+      border.width: 1
+      activeFocusOnTab: true
 
-    Text {
-      anchors.centerIn: parent
-      color: root.shell.palette.fg
-      font.family: Ui.Fonts.mono
-      font.pixelSize: 13
-      text: root.service.busy ? "󰑐 Refreshing…" : "󰑐 Refresh"
+      Keys.onReturnPressed: root.service.refresh()
+      Keys.onEnterPressed: root.service.refresh()
+      Keys.onSpacePressed: root.service.refresh()
+
+      Text {
+        anchors.centerIn: parent
+        color: root.shell.palette.fg
+        font.family: Ui.Fonts.mono
+        font.pixelSize: 13
+        text: root.service.busy ? "󰑐 Refreshing…" : "󰑐 Refresh"
+      }
+
+      MouseArea {
+        anchors.fill: parent
+        enabled: !root.service.busy
+        onClicked: root.service.refresh()
+      }
     }
 
-    MouseArea {
-      anchors.fill: parent
-      enabled: !root.service.busy
-      onClicked: root.service.refresh()
+    Rectangle {
+      id: yrButton
+
+      function openForecast() {
+        Quickshell.execDetached(["xdg-open", Model.yrUrl(root.service.latitude, root.service.longitude)])
+        root.close()
+      }
+
+      width: (parent.width - parent.spacing) / 2
+      height: 28
+      radius: 4
+      color: activeFocus ? root.shell.palette.sel : "transparent"
+      border.color: activeFocus ? root.shell.palette.fg : root.shell.palette.dim
+      border.width: 1
+      activeFocusOnTab: true
+
+      Keys.onReturnPressed: openForecast()
+      Keys.onEnterPressed: openForecast()
+      Keys.onSpacePressed: openForecast()
+
+      Text {
+        anchors.centerIn: parent
+        color: root.shell.palette.fg
+        font.family: Ui.Fonts.mono
+        font.pixelSize: 13
+        text: "󰖐 Today on yr.no"
+      }
+
+      MouseArea {
+        anchors.fill: parent
+        onClicked: yrButton.openForecast()
+      }
     }
   }
 
