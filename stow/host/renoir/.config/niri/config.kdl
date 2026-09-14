@@ -8,9 +8,6 @@
 include optional=true "monitor.kdl"
 
 input {
-    // logind keeps the power key; niri --session would take it to suspend.
-    disable-power-key-handling
-
     keyboard {
         xkb {
             // No grp: toggle: the shell owns the current index
