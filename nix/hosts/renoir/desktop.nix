@@ -1,4 +1,10 @@
-{ lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 let
   sleep-lock-monitor = pkgs.writeShellApplication {
     name = "wily-sleep-lock-monitor";
@@ -71,7 +77,12 @@ let
   };
 in
 {
+  imports = [ inputs.dankcalendar.nixosModules.default ];
+
   programs.uwsm.enable = true;
+
+  # OAuth tokens stay in gnome-keyring (from programs.niri), unlocked by the login PAM stack.
+  programs.dank-calendar.enable = true;
 
   # Session defaults, GNOME (screencast) and GTK portals, gnome-keyring as Secret Service,
   # and Nautilus as the GNOME portal's file chooser.
@@ -172,6 +183,35 @@ in
     serviceConfig = {
       ExecStart = "${pkgs.quickshell}/bin/quickshell";
       Restart = "on-failure";
+    };
+  };
+
+  # Keep the upstream systemd option off: its unit orders after graphical-session.target.
+  # Sync and reminders outlive the calendar window and run independently of our shell.
+  systemd.user.services.dcal = {
+    description = "DankCalendar sync and reminders";
+    partOf = [ "graphical-session.target" ];
+    after = [
+      "dbus.socket"
+      "quickshell.service"
+      "wayland-wm@niri.service"
+      "wayland-session-waitenv.service"
+    ];
+    wantedBy = [ "wayland-session@niri.target" ];
+    # NixOS pins a sparse user-unit PATH; inherit UWSM's session PATH so dcal can
+    # launch its Quickshell UI and open OAuth URLs with the session's tools.
+    environment.PATH = lib.mkForce null;
+    serviceConfig = {
+      # OpenSession prevents the weak local fallback; the collection probe catches broken first-use initialization.
+      ExecStartPre = [
+        "${pkgs.systemd}/bin/busctl --user --timeout=15 --quiet call org.freedesktop.secrets /org/freedesktop/secrets org.freedesktop.Secret.Service OpenSession sv plain s \"\""
+        "${pkgs.systemd}/bin/busctl --user --timeout=15 --quiet get-property org.freedesktop.secrets /org/freedesktop/secrets/collection/login org.freedesktop.Secret.Collection Locked"
+      ];
+      ExecStart = "${lib.getExe config.programs.dank-calendar.package} run --session --hidden";
+      Restart = "on-failure";
+      RestartSec = "2s";
+      Slice = "app.slice";
+      UMask = "0077";
     };
   };
 
