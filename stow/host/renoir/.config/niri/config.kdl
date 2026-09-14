@@ -13,7 +13,8 @@ input {
             // No grp: toggle: the shell owns the current index
             // (qs ipc call keyboard ...) and a compositor-side switch desyncs
             // the bar indicator. Order must match the keyboard service's `codes`.
-            layout "us,se"
+            // us_se is US plus RightAlt+[ ; ' for å ö ä (~/.config/xkb/symbols).
+            layout "us_se,se"
         }
         repeat-delay 200
         repeat-rate 60
