@@ -1,3 +1,4 @@
 date	commit	mode	quickshell	outputs	startup_ms	idle_cpu_s_min	idle_pss_mb	panels_cpu_s_min	panels_pss_mb	peak_mb	threads	system_busy_pct	soak_hours	soak_panel	soak_slope_mb_h
 2026-09-12T18:14:27+02:00	7bab25c0-dirty	bench	j1xwwpw-quickshell-0.3.0	DP-1:2560x1440@1.5,eDP-1:1600x900@1.2	618	0.509	184.5	1.200	199.6	181.9	58	2.6	-	-	-
 2026-09-13T17:05:58+02:00	c4567e7c-dirty	bench	bizld3m-quickshell-0.3.1	eDP-1:1600x900@1.2	548	0.194	154.5	0.640	169.1	135.5	39	1.4	-	-	-
+2026-09-14T08:40:51+02:00	f74017a9	bench	bizld3m-quickshell-0.3.1	eDP-1:1600x900@1.2	552	0.224	228.5	0.783	242.0	238.4	38	0.6	-	-	-
