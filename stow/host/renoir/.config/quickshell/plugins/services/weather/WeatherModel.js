@@ -31,6 +31,14 @@ function forecastUrl(latitude, longitude) {
   return "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=" + lat + "&lon=" + lon
 }
 
+// Today's hourly forecast on yr.no.
+function yrUrl(latitude, longitude) {
+  var lat = coordinate(latitude)
+  var lon = coordinate(longitude)
+  if (lat === null || lon === null) return ""
+  return "https://www.yr.no/en/forecast/hourly-table/" + lat + "," + lon + "?i=0"
+}
+
 // MET's terms require honouring Expires. The clamp guards against a missing,
 // stale, or absurdly distant header.
 function expiresInterval(header, now) {
