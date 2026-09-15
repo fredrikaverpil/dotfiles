@@ -82,11 +82,12 @@ Wheels and prebuilt npm binaries are glibc-linked and fail to load on NixOS
 (`libstdc++.so.6: cannot open shared object file`). For a one-off run, use
 `deno run -A npm:<pkg>` or `uvx <pkg>` from a shell instead of installing.
 
-### Wily shell development (ThinkPad)
+### niri + Quickshell desktop (ThinkPads)
 
-Read `nix/hosts/renoir/CLAUDE.md` before changing Quickshell or its compositor
-configurations. It owns the required local before/after checks, platform
-boundaries, and safe deployment process for `renoir` (ThinkPad T14 Gen 1).
+Read `nix/hosts/<host>/CLAUDE.md` (identical on `renoir` and `wily`) before
+changing Quickshell, niri or their Nix modules. It owns the local checks,
+platform boundaries and safe deployment process. Hardware notes are in the
+host's `README.md`.
 
 ### Neovim Configuration
 
