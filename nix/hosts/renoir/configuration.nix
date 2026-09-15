@@ -2,7 +2,6 @@
 {
   imports = [
     ./desktop.nix
-    ./gaming.nix
     ./personal.nix
     ./thinkpad.nix
   ];
