@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 {
   imports = [
     ./desktop.nix
@@ -62,4 +62,7 @@
       KbdInteractiveAuthentication = false;
     };
   };
+
+  # Host-only system packages; shared ones live in nix/shared/system/.
+  host.extraSystemPackages = with pkgs; [ ];
 }
