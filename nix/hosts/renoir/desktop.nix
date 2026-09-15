@@ -276,7 +276,6 @@ in
     wl-mirror
     wtype
     proton-pass
-    ente-desktop
     signal-desktop
     slack
     spotify

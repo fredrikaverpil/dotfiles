@@ -3,6 +3,7 @@
   imports = [
     ./desktop.nix
     ./gaming.nix
+    ./personal.nix
   ];
 
   system.stateVersion = "26.05";
@@ -10,8 +11,6 @@
   networking.hostName = "renoir";
   nixpkgs.hostPlatform = "x86_64-linux";
   nixpkgs.config.allowUnfree = true;
-  # ente-desktop pins EOL electron; drop once nixpkgs bumps it.
-  nixpkgs.config.permittedInsecurePackages = [ "electron-41.10.6" ];
 
   time.timeZone = "Europe/Stockholm";
 
