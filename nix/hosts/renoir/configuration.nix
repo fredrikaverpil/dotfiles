@@ -4,6 +4,7 @@
     ./desktop.nix
     ./gaming.nix
     ./personal.nix
+    ./thinkpad.nix
   ];
 
   system.stateVersion = "26.05";
@@ -21,42 +22,6 @@
   # Encrypted swap; the installer keeps it out of hardware-configuration.nix.
   boot.initrd.luks.devices."luks-7389e541-9360-4c4e-b4cf-13a7b66e771a".device =
     "/dev/disk/by-uuid/7389e541-9360-4c4e-b4cf-13a7b66e771a";
-
-  services.fwupd.enable = true;
-
-  # Swaps Super and left Alt and makes Caps Lock Ctrl on the built-in keyboard;
-  # other keyboards are untouched.
-  services.keyd = {
-    enable = true;
-    keyboards.laptop = {
-      ids = [ "0001:0001" ];
-      settings.main = {
-        leftmeta = "leftalt";
-        leftalt = "leftmeta";
-        capslock = "leftcontrol";
-      };
-    };
-  };
-
-  # Quickshell drives the mic-mute LED from the default PipeWire source.
-  services.udev.extraRules = ''
-    ACTION=="add", SUBSYSTEM=="leds", KERNEL=="platform::micmute", ATTR{trigger}="none"
-  '';
-
-  # thinkpad_acpi rejects a start above the end threshold and an end below the
-  # start threshold, so the first end write may fail until start is lowered.
-  systemd.services.battery-charge-thresholds = {
-    description = "Set battery charge thresholds";
-    wantedBy = [ "multi-user.target" ];
-    unitConfig.ConditionPathExists = "/sys/class/power_supply/BAT0/charge_control_end_threshold";
-    serviceConfig.Type = "oneshot";
-    script = ''
-      bat=/sys/class/power_supply/BAT0
-      echo 80 > "$bat/charge_control_end_threshold" || true
-      echo 75 > "$bat/charge_control_start_threshold"
-      echo 80 > "$bat/charge_control_end_threshold"
-    '';
-  };
 
   nix.gc = {
     automatic = true;
@@ -79,12 +44,6 @@
 
   networking.networkmanager.enable = true;
   networking.firewall.allowedTCPPorts = [ 22 ];
-
-  # BlueZ does not persist Powered; the radio is on after every boot.
-  hardware.bluetooth = {
-    enable = true;
-    powerOnBoot = true;
-  };
 
   # CUPS on loopback only; Avahi discovers driverless (IPP Everywhere) printers.
   services.printing.enable = true;
