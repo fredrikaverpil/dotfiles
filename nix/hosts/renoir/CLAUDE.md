@@ -1,51 +1,65 @@
-# Renoir desktop (ThinkPad T14 Gen 1)
+# niri + Quickshell desktop
 
-`renoir` is the personal ThinkPad T14 Gen 1 (AMD Renoir, x86_64) running the
-Wily desktop. Machine-specific settings (microcode, VAAPI driver, kernel choice)
-belong in `configuration.nix`.
+This file documents the niri + Quickshell desktop and travels with it: `renoir`
+is the experiment host, and changes there (code and this file alike) are later
+either rolled back or promoted to `wily` by copying files. Hosts share nothing
+by import or symlink, so `diff -r nix/hosts/renoir nix/hosts/wily` and
+`diff -r stow/host/renoir stow/host/wily` show the whole drift, including
+in-progress experiments. Host-only modules (`personal.nix`) are not copied.
+
+Machine facts (firmware, BIOS, hardware quirks) go in the host's `README.md`
+and are never promoted.
+
+## Working model
+
+- The desktop is keyboard-first. Every panel, dialog and bind works without a
+  pointer; pointer-only controls are bugs.
+- The desktop is built to be developed by an agent, usually run on the host
+  itself, sometimes over SSH. Every part is reachable: `qs ipc` queries and
+  drives shell services and panels, `niri msg` the compositor,
+  `systemctl --user` the units, `grim` and the recording service capture what
+  is on screen. Use them to verify your own work; what they cannot prove is
+  listed under "Required local validation".
 
 Document constraints, rationale and gotchas, not implementation inventories or
-previous states.
+previous states. Explain a declaration next to it, not here.
+
+## Gotchas
+
+- "wily" names the shell (PAM `wily-lock`, `wily-*` units, layer namespaces,
+  state files) and is also the work host's hostname. Historical accident; the
+  shell name is kept to avoid moving state. Read "wily" in Nix and QML as the
+  shell unless it is `networking.hostName`.
+- Nix comments carry the "why" for packages, portals, PAM, units and hardware
+  integration. Read `desktop.nix`, `thinkpad.nix`, `configuration.nix` before
+  asking.
 
 ## Architecture
 
-- niri is the only session, run under UWSM as `niri --session` and started
-  with `niri` from the console.
-- `programs.niri` supplies the session defaults, the `gnome;gtk` portals and
-  gnome-keyring. Its `niri.service`, session file and swaylock PAM go unused
-  under UWSM. gnome-keyring is the Secret Service, unlocked by the `login` PAM
-  stack; fingerprint login cannot unlock it.
-- DankCalendar's `dcal` daemon owns calendar sync and reminders, outliving its
-  window. Calendar credentials and bearer feed URLs are private user state,
-  never Nix/Stow values. `dcal` requires Secret Service before starting: its
-  local encrypted-keyring fallback uses a fixed password. The unit's startup
-  probe does not guard manually launched instances. DankCalendar's Quit (tray,
-  window) terminates the daemon cleanly, so the unit restarts on any exit.
-- On first use, gnome-keyring can advertise `login` without exporting the
-  collection when keyring creation follows D-Bus startup. `OpenSession` alone
-  misses this; also probe the collection. Recover by restarting the keyring
-  daemon and unlocking it, then retry account setup. Do not delete keyring
-  files.
-- Nautilus and Dolphin are installed side by side until one is chosen; yazi
-  stays the `inode/directory` handler. Both provide
-  `org.freedesktop.FileManager1`, so "Show in folder" may open either.
-- `desktop.nix` owns packages, portals, PAM, systemd units, and the pre-suspend
-  lock inhibitor. `stow/host/renoir/` owns compositor configuration and QML.
+- `desktop.nix` owns packages, portals, PAM, systemd units and the pre-suspend
+  lock. `stow/host/<host>/` owns compositor configuration and QML.
 - `shell.qml` wires services and surfaces. Views belong in `plugins/panels/`;
   daemon/process state belongs in `plugins/services/`.
-- Nightlight is not compositor-specific: wl-gammarelay-rs drives
-  `zwlr_gamma_control_v1`, so its commands live in the nightlight service, not
-  `Ui/Compositor.qml`.
 - `Ui/Compositor.qml` is the compositor interface; `Ui/compositors/` owns niri
   commands, response parsing, and the workspace source. Views use that
-  interface. Keep scheduling and shared state above it.
+  interface. Keep scheduling and shared state above it. Nightlight is not
+  compositor-specific and lives in its service.
 - Prefer purpose-built applications to large bespoke panels for infrequent
-  tasks.
+  tasks (bluetui pairs, nm-connection-editor edits connections, nwg-displays
+  owns outputs).
 - Clipboard history is in memory only and skips offers carrying
-  `x-kde-passwordManagerHint`. Proton Pass and 1Password set it (both copy via
-  arboard); a password manager that does not would be recorded.
+  `x-kde-passwordManagerHint`. Proton Pass and 1Password set it; a password
+  manager that does not would be recorded.
 - Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Niri KDL booleans are presence-only, not `option true`.
+- Every surface must be usable from the keyboard. Use `keyNavigation` for
+  ordinary focus chains; use a panel-managed cursor where it cannot represent
+  a control, such as a slider. Pointer-only controls are bugs.
+- `Ui/Panel.qml` has a top-bar cutout so bar buttons can switch panels. Preserve
+  focus-chain membership for visible but unavailable controls. The shell owns
+  keyboard-layout state; compositor-side XKB toggles would desynchronize it.
+- Tray submenus require one live opener per level. `QsMenuEntry.display()` needs
+  a platform menu this shell does not have.
 - Read the relevant Omarchy source before changing a ported feature (and
   `git pull` its source before reading):
   `~/code/public/github.com/omacom/omarchy`. Complementary references are:
@@ -67,6 +81,7 @@ from the shell on macOS. Static checks run against every host's tree;
 
 | Change | Checks |
 | --- | --- |
+| Nix | `nix fmt`, `nix build .#nixosConfigurations.<host>.system` on the host |
 | JS/QML | `qml-test`, `qml-lint` (any platform) |
 | Compositor interface, config, or bind contract | Also `compositor-test` (Linux) |
 | Service IPC, `shell.qml` wiring, or systemd units | Also `shell-smoke` on the machine after deploy and restart, and exercise the affected path |
@@ -93,17 +108,25 @@ from the shell on macOS. Static checks run against every host's tree;
 - Smoke checks do not prove focus, object lifetime, authentication, daemon
   recovery, or physical input. Exercise affected paths explicitly. Agree on a
   recovery path before lock/PAM, suspend, DPMS-off, or connectivity tests.
+- Hardware-dependent paths: Wi-Fi/Bluetooth, battery, backlight, lid,
+  touchpad, fingerprint reader, `GAMMA_LUT` (nightlight). Validate on the
+  machine.
 - Test keyboard-first panels over SSH: open the panel with `qs ipc call`,
   confirm it is the only `Keyboard interactivity: exclusive` layer in
   `niri msg layers`, then use `wtype -k z`. Niri drops virtual-keyboard input
   before bind handling, so `wtype` cannot test compositor binds.
-- Use `grim` to check how the shell looks. To check its internal state, use
-  `qs ipc` and `shell-smoke` instead. Crop screenshots to the area you need
-  with `-g`, for example `-g "0,0 1280x32"`, and use `-o` to select the output.
-  Capture cost depends on the area captured; changing the image format,
-  quality (`-q`), or scale (`-s`) does not reduce it. Niri does not report
-  layer positions and sizes, so work out the bar's position and size from `niri msg --json outputs` and the `barHeight`
-  value in `shell.qml`.
+- Use `grim` to check how the shell looks; `qs ipc` and `shell-smoke` for
+  internal state. Crop with `-g "0,0 1280x32"` and pick the output with `-o`;
+  capture cost depends only on the area. Niri does not report layer geometry,
+  so derive the bar's from `niri msg --json outputs` and `barHeight` in
+  `shell.qml`.
+- To record, `qs ipc call recording capture WxH+X+Y` (`0x0+X+Y` is the whole
+  monitor): no countdown, audio or camera, and the bar shows it. It returns the
+  file; `qs ipc call recording stop` finalizes it. Extract frames with
+  `nix shell nixpkgs#ffmpeg`.
+- DPMS-off can resemble a frozen machine. Use bounded commands; `grim` can hang
+  while no output produces frames. Recovery is
+  `niri msg action power-on-monitors`.
 - Report host/session, before/after results, existing diagnostics, and
   omissions. Ask the user to run Nix rebuilds; never run them yourself.
 
@@ -138,8 +161,8 @@ from the shell on macOS. Static checks run against every host's tree;
 
 ### Performance
 
-`shell-perf` (devshell, on renoir) restarts the unlocked shell, measures it,
-appends a row to `nix/hosts/renoir/shell-perf.tsv` and compares it with the
+`shell-perf` (devshell, on the host) restarts the unlocked shell, measures it,
+appends a row to `nix/hosts/<host>/shell-perf.tsv` and compares it with the
 last row on the same Quickshell build and outputs. Commit the row with the
 change it measures.
 
@@ -164,9 +187,9 @@ change it measures.
 
 ## Deployment safety
 
-On renoir, `~/.dotfiles` is this checkout and the live stowed tree: edits
-deploy as they are saved. From another host, it is reached over SSH as
-`fredrik@renoir`.
+On the host, `~/.dotfiles` is this checkout and the live stowed tree: edits
+deploy as they are saved. From another host it is reached over SSH as
+`fredrik@<host>`.
 
 Before any live file replacement or restart, inspect target changes and
 preserve unrelated edits, check the lock, and record/temporarily disable idle
@@ -181,15 +204,17 @@ qs ipc call lock isLocked
 ```
 
 New/moved files need the normal Stow activation from the root `CLAUDE.md`;
-never create Stow links manually or run `git clean -fd` in the ThinkPad clone.
+never create Stow links manually or run `git clean -fd` in the host clone.
 
 When working from another host, sync the checkout before live validation or a
-user-run rebuild, which evaluates the ThinkPad clone. Checksums avoid replacing
-identical compositor files solely because timestamps differ.
+user-run rebuild, which evaluates the host's clone. Checksums avoid replacing
+identical compositor files solely because timestamps differ. The host may
+carry uncommitted theme edits in `stow/host/<host>/`; check `git status`
+there before `--delete`.
 
 ```sh
-rsync -ac --delete --exclude .git --exclude result --exclude .direnv ~/.dotfiles/ fredrik@renoir:~/.dotfiles/
-ssh fredrik@renoir 'cd ~/.dotfiles && git add -AN .'
+rsync -ac --delete --exclude .git --exclude result --exclude .direnv ~/.dotfiles/ fredrik@<host>:~/.dotfiles/
+ssh fredrik@<host> 'cd ~/.dotfiles && git add -AN .'
 ```
 
 `rsync`, Git checkouts, and `sed -i` can replace inodes, so restart the
@@ -200,128 +225,27 @@ systemctl --user restart quickshell.service
 ```
 
 For ordinary `qs ipc` and compositor commands over SSH, provide the active
-session's `XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY`, and `NIRI_SOCKET` from `systemctl --user show-environment`. Missing display context can make live
+session's `XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY`, and `NIRI_SOCKET` from
+`systemctl --user show-environment`. Missing display context can make live
 Quickshell instances appear dead. `shell-smoke` avoids that by selecting the
 PID.
 
-## Firmware
-
-BIOS and device firmware come from LVFS through fwupd (`services.fwupd`).
-Updates reboot the machine, so the user runs them.
-
-```sh
-fwupdmgr refresh --force               # stale metadata reports "no updates"
-fwupdmgr get-updates                   # lists each device's "Device ID"
-cat /sys/class/power_supply/AC/online   # must print 1
-fwupdmgr update <device-id>
-```
-
-- Refresh first; without it `get-updates` can falsely report nothing pending.
-- The BIOS update needs AC power and reboots into a UEFI capsule flash. It
-  is staged on the ESP (`/boot`); keep room there.
-- Secure Boot is disabled, so the KEK CA, UEFI CA and dbx updates are
-  unnecessary. Update only the device you need, by ID.
-- After the reboot, confirm `/sys/class/dmi/id/bios_version` and recheck
-  `journalctl -b -k -p warning`.
-- A BIOS update can reset EFI settings; recheck Config → Power → Sleep State.
-  "Linux" enables S3 (`deep` in `/sys/power/mem_sleep`).
-- The BIOS has no CPPC option, so `amd_pstate` stays disabled and cpufreq
-  uses `acpi-cpufreq`.
-
-## Fingerprint reader
-
-The Synaptics reader (`06cb:00bd`) is not enabled; it is unused by choice.
-To enable it:
-
-```nix
-# fprintAuth defaults to on for every PAM service. login (and wily-lock,
-# which includes it) and sudo stay password-only until tested on hardware.
-services.fprintd.enable = true;
-security.pam.services.login.fprintAuth = false;
-security.pam.services.sudo.fprintAuth = false;
-```
-
-Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
-
-- Check the generated PAM with
-  `nix eval --raw .#nixosConfigurations.renoir.config.security.pam.services.<name>.text`;
-  `environment.etc."pam.d/<name>".text` is null because it uses `source`.
-- The lock screen starts PAM only after a password is submitted, so
-  fprintd in its stack would block typing until the finger prompt times
-  out. It needs a separate, concurrent fingerprint `PamContext`. Test
-  it with a recovery plan before enabling it for `login`.
-- fwupd cannot read the reader's firmware version: it answers with an
-  unmapped status `0x315`. libfprint talks to it independently; untested.
-
-## Screen recording
-
-- `gpu-screen-recorder` captures monitors over KMS through the setcap
-  `gsr-kms-server` wrapper (`programs.gpu-screen-recorder`), with no dialog.
-  Cameras are composited in-process (`monitor:DP-1|v4l2:/dev/video2;...`), and
-  SIGUSR2 toggles pause within one file. A camera held by a recording is
-  unavailable to other applications.
-- The countdown overlay unmaps before capture starts; the bar indicator is
-  recorded. An `IdleInhibitor` on each bar window keeps idle locking from
-  interrupting a recording. `xdg-open` runs mpv in the foreground, and mpv
-  quits at the end of the clip.
-- Region capture (`-w region -region WxH+X+Y`) takes logical, global
-  coordinates — Quickshell's screen geometry — and gsr scales them and rounds
-  to even pixels itself. `region|v4l2:...` composites the camera. The selector
-  overlay stays mapped, click-through, while recording; its outline sits a few
-  pixels outside the region so rounding never captures it.
-- Agents record with `qs ipc call recording capture WxH+X+Y` (`0x0+X+Y` is the
-  whole monitor there): no countdown, audio, camera or opening, and the bar
-  shows it. It returns the file; `qs ipc call recording stop` finalizes it.
-  Extract frames with `nix shell nixpkgs#ffmpeg`.
-- LosslessCut trims clips by stream copy, so cuts snap to keyframes; it is
-  not a default handler, and mpv still opens finished recordings.
-- Recording never uses a portal. Other apps' screen sharing goes through
-  `xdg-desktop-portal-gnome`, which needs the Mutter D-Bus services and
-  ServiceChannel that niri serves only as `niri --session` (`src/dbus/mod.rs`).
-  Session mode also serves `org.freedesktop.ScreenSaver` idle inhibitors and
-  the a11y bus, and takes the power key from logind unless
-  `disable-power-key-handling` is set.
-- Window recording is deferred; a region covers it.
-
-## Session and hardware constraints
+## Session constraints
 
 - Keep `wayland-session-waitenv.service`: niri announces readiness before it
   publishes `WAYLAND_DISPLAY` to the user manager. Bind shell/sleep-lock units
   to compositor-specific targets; ordering after `graphical-session.target`
   creates a cycle.
-- Quickshell unsets systemd's sparse `PATH` to inherit the UWSM session path.
-  Removing that breaks launcher entries and `uwsm-app`.
-- Every surface must be usable from the keyboard. Use `keyNavigation` for
-  ordinary focus chains; use a panel-managed cursor where it cannot represent
-  a control, such as a slider. Pointer-only controls are bugs.
-- `Ui/Panel.qml` has a top-bar cutout so bar buttons can switch panels. Preserve
-  focus-chain membership for visible but unavailable controls. The shell owns
-  keyboard-layout state; compositor-side XKB toggles would desynchronize it.
-- Tray submenus require one live opener per level. `QsMenuEntry.display()` needs
-  a platform menu this shell does not have.
-- nwg-displays owns output layout, mode and scale in the untracked
-  `~/.config/niri/monitor.kdl`; the shell never writes output config. niri
-  cannot mirror outputs; `wl-mirror` shows one in a fullscreen window.
-- Hardware-dependent paths: Wi-Fi/Bluetooth, battery, backlight, lid,
-  touchpad, fingerprint reader, `GAMMA_LUT` (nightlight). Validate those on
-  this machine.
-- Bluetooth pairing belongs to bluetui, which registers its own BlueZ agent;
-  the shell registers none and never scans. The panel only toggles power and
-  connects paired devices. It uses `adapter.enabled`, which BlueZ does not
-  persist, so `powerOnBoot` turns the radio back on after every boot.
-- Connection profiles (wired, static IP, DNS) belong to nm-connection-editor;
-  the network panel only launches it. Its `nm-applet` tray is not run.
-- The mic-mute key mutes every PipeWire source, not only the default: muting
-  yourself must survive default changes such as a headset connecting. The LED
-  is lit only while all are muted. The kernel's `audio-micmute` trigger
-  follows only the built-in ALSA capture switches, so a udev rule clears it
-  and the audio panel writes `platform::micmute` via logind. The keyboard backlight is firmware-driven (Fn+Space); leave it alone.
-- Charge thresholds are set by a boot unit in `configuration.nix`; the battery
-  panel only displays them and never writes sysfs. power-profiles-daemon
-  conflicts with TLP; keep TLP disabled.
-- Lid close uses logind defaults: suspend (the pre-suspend unit locks first),
+- Screen sharing from other apps goes through `xdg-desktop-portal-gnome`,
+  which needs the Mutter D-Bus services that niri serves only as
+  `niri --session`. Session mode also serves `org.freedesktop.ScreenSaver`
+  idle inhibitors and the a11y bus, and takes the power key from logind unless
+  `disable-power-key-handling` is set. The shell's own recording never uses a
+  portal (`programs.gpu-screen-recorder`).
+- On first use, gnome-keyring can advertise `login` without exporting the
+  collection when keyring creation follows D-Bus startup. Recover by
+  restarting the keyring daemon and unlocking it, then retry account setup.
+  Do not delete keyring files.
+- Lid close uses logind defaults: suspend (the sleep-lock unit locks first),
   or nothing when docked. Niri turns off `eDP-1` while docked with the lid
-  closed. The power key suspends too: `niri --session` takes it from logind.
-- DPMS-off can resemble a frozen machine. Use bounded commands; `grim` can hang
-  while no output produces frames. Recovery is
-  `niri msg action power-on-monitors`.
+  closed.
