@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ ... }:
 {
   imports = [
     ./desktop.nix
@@ -105,10 +105,4 @@
       KbdInteractiveAuthentication = false;
     };
   };
-
-  host.extraSystemPackages = with pkgs; [
-    curl
-    git
-    wget
-  ];
 }
