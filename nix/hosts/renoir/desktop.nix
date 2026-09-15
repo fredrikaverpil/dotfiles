@@ -76,16 +76,22 @@ let
     ];
   };
 in
+# The niri + Quickshell desktop: packages, portals, PAM, user units and the
+# pre-suspend lock. Compositor config and QML live in stow/host/<host>/.
 {
   imports = [ inputs.dankcalendar.nixosModules.default ];
 
+  # niri is the only session: `niri --session` under UWSM, started from the console.
   programs.uwsm.enable = true;
 
   # OAuth tokens stay in gnome-keyring (from programs.niri), unlocked by the login PAM stack.
+  # Calendar credentials and feed URLs are private user state, never Nix/Stow values.
   programs.dank-calendar.enable = true;
 
   # Session defaults, GNOME (screencast) and GTK portals, gnome-keyring as Secret Service,
-  # and Nautilus as the GNOME portal's file chooser.
+  # and Nautilus as the GNOME portal's file chooser (useNautilus defaults on).
+  # Its niri.service, session file and swaylock PAM go unused under UWSM.
+  # gnome-keyring is unlocked by the login PAM stack; fingerprint login cannot unlock it.
   programs.niri.enable = true;
   # gnome-keyring would also start gcr-ssh-agent as the SSH agent.
   services.gnome.gcr-ssh-agent.enable = false;
@@ -94,7 +100,7 @@ in
   # niri's module leaves Xwayland off; xwayland-satellite runs the Xwayland binary.
   programs.xwayland.enable = true;
 
-  # Opens port 53317 for receiving files and text from the iPhone.
+  # Opens port 53317 for receiving files and text from phones.
   programs.localsend.enable = true;
 
   # KService builds Dolphin's application list from an applications menu, which only Plasma ships.
@@ -145,6 +151,7 @@ in
   security.rtkit.enable = true;
 
   # The shell's battery service reads UPower and power-profiles-daemon over D-Bus.
+  # power-profiles-daemon conflicts with TLP; keep TLP disabled.
   services.upower.enable = true;
   services.power-profiles-daemon.enable = true;
 
@@ -158,7 +165,9 @@ in
   # polkit.enable does not install the setuid pkexec wrapper.
   security.polkit.enablePkexecWrapper = true;
 
-  # Dedicated PAM service for the Quickshell lock screen.
+  # PAM service for the Quickshell lock screen (plugins/lock/Service.qml).
+  # The lock screen starts PAM only after a password is submitted, so fprintd in
+  # this stack would block typing; fingerprint unlock needs a separate PamContext.
   environment.etc."pam.d/wily-lock".text = ''
     auth include login
   '';
@@ -173,6 +182,7 @@ in
       "wayland-session-waitenv.service"
     ];
     # Bind to the niri session so another desktop cannot start a second shell.
+    # Quickshell unsets systemd's sparse PATH below; removing that breaks launcher entries and uwsm-app.
     wantedBy = [ "wayland-session@niri.target" ];
     # NixOS pins a sparse user-unit PATH; inherit UWSM's session PATH for app launchers.
     environment.PATH = lib.mkForce null;
@@ -204,7 +214,10 @@ in
     # Retry indefinitely, e.g. while the keyring is not yet unlocked.
     unitConfig.StartLimitIntervalSec = 0;
     serviceConfig = {
-      # OpenSession prevents the weak local fallback; the collection probe catches broken first-use initialization.
+      # dcal must see Secret Service before starting: its local keyring fallback uses a fixed password.
+      # OpenSession prevents that fallback; the collection probe catches first-use keyring
+      # initialization that advertises `login` without exporting it. Manually launched
+      # instances bypass both probes.
       ExecStartPre = [
         "${pkgs.systemd}/bin/busctl --user --timeout=15 --quiet call org.freedesktop.secrets /org/freedesktop/secrets org.freedesktop.Secret.Service OpenSession sv plain s \"\""
         "${pkgs.systemd}/bin/busctl --user --timeout=15 --quiet get-property org.freedesktop.secrets /org/freedesktop/secrets/collection/login org.freedesktop.Secret.Collection Locked"
@@ -218,6 +231,8 @@ in
     };
   };
 
+  # Lid close and the power key suspend via logind; this delay inhibitor locks
+  # the shell first and releases once the lock reports secure.
   systemd.user.services.wily-sleep-lock = {
     description = "Lock Quickshell before suspend";
     partOf = [ "graphical-session.target" ];
@@ -240,6 +255,7 @@ in
     quickshell
     # niri spawns it on demand and exports DISPLAY for X11 apps.
     xwayland-satellite
+    # Nightlight: drives zwlr_gamma_control_v1, so it is compositor-agnostic.
     wl-gammarelay-rs
     libnotify
     sound-theme-freedesktop
@@ -248,8 +264,9 @@ in
     kdePackages.kio-extras
     kdePackages.ffmpegthumbs
     kdePackages.kconfig
-    # Trialled side by side with Dolphin.
-    nautilus
+    # Nautilus (from programs.niri) is trialled side by side with Dolphin; yazi stays
+    # the inode/directory handler. Both provide org.freedesktop.FileManager1, so
+    # "Show in folder" may open either.
     ghostty
     gnome-themes-extra
     iproute2
@@ -269,10 +286,14 @@ in
     losslesscut-bin
     mission-center
     mpv
-    # nm-connection-editor edits wired, static-IP and other connection settings.
+    # nm-connection-editor edits wired, static-IP and other connection settings;
+    # the network panel only launches it. Its nm-applet tray is not run.
     networkmanagerapplet
+    # Owns output layout, mode and scale in the untracked ~/.config/niri/monitor.kdl;
+    # the shell never writes output config.
     nwg-displays
     wl-clipboard
+    # niri cannot mirror outputs; wl-mirror shows one in a fullscreen window.
     wl-mirror
     wtype
     proton-pass
