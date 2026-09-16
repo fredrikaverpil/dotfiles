@@ -140,7 +140,26 @@ in
       "video/x-matroska"
       "video/quicktime"
       "video/x-msvideo"
-    ] (_: "mpv.desktop");
+    ] (_: "mpv.desktop")
+    # Same types zen-browser's home-manager setAsDefaultBrowser claims. Firefox
+    # and Chromium also claim html/xhtml/http/https; without a default either may win.
+    // lib.genAttrs [
+      "application/x-extension-shtml"
+      "application/x-extension-xhtml"
+      "application/x-extension-html"
+      "application/x-extension-xht"
+      "application/x-extension-htm"
+      "x-scheme-handler/unknown"
+      "x-scheme-handler/mailto"
+      "x-scheme-handler/chrome"
+      "x-scheme-handler/about"
+      "x-scheme-handler/https"
+      "x-scheme-handler/http"
+      "application/xhtml+xml"
+      "application/json"
+      "text/plain"
+      "text/html"
+    ] (_: "zen-beta.desktop");
 
   services.pipewire = {
     enable = true;
@@ -314,6 +333,7 @@ in
     cliamp
     cliamp-desktop
     firefox
+    inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.beta
     grim
     imv
     # Trims recordings by stream copy, without re-encoding.
