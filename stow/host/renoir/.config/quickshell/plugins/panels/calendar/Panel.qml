@@ -135,6 +135,7 @@ Ui.Panel {
     id: row
 
     required property var modelData
+    readonly property real textOpacity: modelData.ends && modelData.ends <= root.service.requestedAt.getTime() ? 0.5 : 1
 
     width: parent.width
     height: 30
@@ -165,6 +166,7 @@ Ui.Panel {
       font.pixelSize: 13
       font.bold: true
       text: row.modelData.tag
+      opacity: row.textOpacity
     }
 
     Text {
@@ -177,6 +179,7 @@ Ui.Panel {
       font.family: Ui.Fonts.mono
       font.pixelSize: 13
       text: row.modelData.time
+      opacity: row.textOpacity
     }
 
     Text {
@@ -189,6 +192,7 @@ Ui.Panel {
       font.family: Ui.Fonts.mono
       font.pixelSize: 14
       text: row.modelData.summary + (row.modelData.location ? "  · " + row.modelData.location : "")
+      opacity: row.textOpacity
     }
 
     Rectangle {

@@ -54,13 +54,16 @@ TestCase {
       new Date(2026, 8, 14).getTime(), new Date(2026, 8, 15).getTime(), new Date(2026, 8, 16).getTime(),
     ])
     const week = { uid: "week", start: "2026-09-14T00:00:00Z", tag: "G", summary: "Week 38", location: "",
-      meetingUrl: "", allDay: true, at: new Date(2026, 8, 14).getTime(), time: "all day" }
+      meetingUrl: "", allDay: true, at: new Date(2026, 8, 14).getTime(),
+      ends: new Date(2026, 8, 16).getTime(), time: "all day" }
     const night = (time) => ({ uid: "night", start: local(15, 23), tag: "", summary: "(no title)", location: "",
-      meetingUrl: "", allDay: false, at: new Date(2026, 8, 15, 23).getTime(), time: time })
+      meetingUrl: "", allDay: false, at: new Date(2026, 8, 15, 23).getTime(),
+      ends: new Date(2026, 8, 16, 1).getTime(), time: time })
     compare(days.map(day => day.events), [
       [week, { uid: "late", start: local(14, 17), tag: "❤️", summary: "Late", location: "Room",
         meetingUrl: "https://meet.example/abc", allDay: false,
-        at: new Date(2026, 8, 14, 17).getTime(), time: "17:00–17:30" }],
+        at: new Date(2026, 8, 14, 17).getTime(), ends: new Date(2026, 8, 14, 17, 30).getTime(),
+        time: "17:00–17:30" }],
       [week, night("23:00–…")],
       [night("…–01:00")],
     ])
@@ -76,13 +79,14 @@ TestCase {
     const days = Calendar.parse(text, now, { mine: "👤" })
 
     const unreadable = (uid, summary, start, tag) => ({ uid: uid, start: start, tag: tag, summary: summary,
-      location: "", meetingUrl: "", allDay: false, at: 0, time: "?" })
+      location: "", meetingUrl: "", allDay: false, at: 0, ends: 0, time: "?" })
     compare(days.map(day => day.events), [
       [
         unreadable("endless", "Endless", local(15, 9), ""),
         unreadable("garbage", "Garbage", "soon", "👤"),
         { uid: "timed", start: local(14, 9), tag: "", summary: "Timed", location: "", meetingUrl: "",
-          allDay: false, at: new Date(2026, 8, 14, 9).getTime(), time: "09:00–10:00" },
+          allDay: false, at: new Date(2026, 8, 14, 9).getTime(),
+          ends: new Date(2026, 8, 14, 10).getTime(), time: "09:00–10:00" },
       ],
       [],
       [],
