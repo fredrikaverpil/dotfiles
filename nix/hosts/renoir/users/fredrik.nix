@@ -17,6 +17,7 @@
   home.file = { };
 
   programs = {
+    # Not in desktop.nix: zen-browser ships only a home-manager module.
     zen-browser = {
       enable = true;
       setAsDefaultBrowser = true;
