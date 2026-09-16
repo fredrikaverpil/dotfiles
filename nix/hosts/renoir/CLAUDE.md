@@ -128,7 +128,7 @@ from the shell on macOS. Static checks run against every host's tree;
   while no output produces frames. Recovery is
   `niri msg action power-on-monitors`.
 - Report host/session, before/after results, existing diagnostics, and
-  omissions. Ask the user to run Nix rebuilds; never run them yourself.
+  omissions. Ask the user to run Nix rebuilds; never run them without asking.
 
 ### Tests
 
