@@ -70,7 +70,7 @@
       "src": "https://github.com/f-person/git-blame.nvim"
     },
     "gitsigns.nvim": {
-      "rev": "5be654f2232c10ddcad19c1607a67b6b4b78fc29",
+      "rev": "aafce231e57bf2c06940b6de90b9f396aee94754",
       "src": "https://github.com/lewis6991/gitsigns.nvim"
     },
     "go-impl.nvim": {
