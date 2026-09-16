@@ -34,7 +34,7 @@
   ];
 
   host.extraSystemPackages = with pkgs; [
-    ente-desktop
+    (withGnomeLibsecret ente-desktop)
     lutris # Battle.net and other non-Steam launchers.
   ];
 }
