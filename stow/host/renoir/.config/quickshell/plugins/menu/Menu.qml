@@ -106,9 +106,6 @@ Ui.Panel {
     emoji: function() { return menu.emojis },
   })
 
-  // ListView resets currentIndex after this handler runs.
-  onRowsChanged: Qt.callLater(selectFirstEnabled)
-
   function selectFirstEnabled() {
     list.currentIndex = Model.selectFirstEnabled(rows)
   }
@@ -179,6 +176,11 @@ Ui.Panel {
     font.family: Ui.Fonts.mono
     font.pixelSize: 18
     focus: true
+
+    // Keyed on the query, not on rows: the rows binding returns a fresh array
+    // whenever any provider notifies, which would reset the selection mid-scroll.
+    // ListView resets currentIndex after this handler runs.
+    onTextChanged: Qt.callLater(menu.selectFirstEnabled)
 
     Text {
       anchors.fill: parent
