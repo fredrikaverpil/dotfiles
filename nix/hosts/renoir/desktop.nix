@@ -322,6 +322,8 @@ in
     # programs.niri only registers Nautilus's D-Bus services, not its launcher entry.
     # Both provide org.freedesktop.FileManager1, so "Show in folder" may open either.
     nautilus
+    # Nautilus video thumbnails.
+    ffmpegthumbnailer
     ghostty
     gnome-themes-extra
     iproute2
