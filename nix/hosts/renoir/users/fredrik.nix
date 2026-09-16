@@ -1,8 +1,7 @@
-{ inputs, pkgs, ... }:
+{ pkgs, ... }:
 {
   imports = [
     ../../../shared/home/linux.nix
-    inputs.zen-browser.homeModules.beta
   ];
 
   home.stateVersion = "26.05";
@@ -16,11 +15,5 @@
 
   home.file = { };
 
-  programs = {
-    # Not in desktop.nix: zen-browser ships only a home-manager module.
-    zen-browser = {
-      enable = true;
-      setAsDefaultBrowser = true;
-    };
-  };
+  programs = { };
 }
