@@ -20,6 +20,7 @@ in
   llmAgents = [ ];
 
   home.packages = with pkgs; [
+    btop
     lsof # List open files - essential for debugging file/network issues
     strace # System call tracer - useful for debugging application behavior
     unstable.uv # see let-block note above

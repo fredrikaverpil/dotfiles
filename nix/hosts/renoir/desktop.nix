@@ -311,7 +311,6 @@ in
     (chromium.override { commandLineArgs = "--no-first-run --password-store=gnome-libsecret"; })
     bluetui
     bluetui-desktop
-    btop
     cliamp
     cliamp-desktop
     firefox
