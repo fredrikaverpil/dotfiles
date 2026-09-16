@@ -141,12 +141,24 @@ in
       "video/quicktime"
       "video/x-msvideo"
     ] (_: "mpv.desktop")
-    # Firefox and Chromium claim these too; without a default either may win.
+    # Same types zen-browser's home-manager setAsDefaultBrowser claims. Firefox
+    # and Chromium also claim html/xhtml/http/https; without a default either may win.
     // lib.genAttrs [
-      "text/html"
-      "application/xhtml+xml"
-      "x-scheme-handler/http"
+      "application/x-extension-shtml"
+      "application/x-extension-xhtml"
+      "application/x-extension-html"
+      "application/x-extension-xht"
+      "application/x-extension-htm"
+      "x-scheme-handler/unknown"
+      "x-scheme-handler/mailto"
+      "x-scheme-handler/chrome"
+      "x-scheme-handler/about"
       "x-scheme-handler/https"
+      "x-scheme-handler/http"
+      "application/xhtml+xml"
+      "application/json"
+      "text/plain"
+      "text/html"
     ] (_: "zen-beta.desktop");
 
   services.pipewire = {
