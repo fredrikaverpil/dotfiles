@@ -12,7 +12,7 @@
 
   home.sessionVariables = { };
 
-  llmAgents = [ ];
+  llmAgents = [ "claude-desktop" ];
 
   home.file = { };
 
