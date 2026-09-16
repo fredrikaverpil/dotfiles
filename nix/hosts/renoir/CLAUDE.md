@@ -59,6 +59,9 @@ previous states. Explain a declaration next to it, not here.
   before drawing the prompt, so the prompt is never painted onto a dark panel.
   Being only a layer surface, it dies with Quickshell — use the lock where that
   matters.
+  It is a home-device feature and is deliberately not promoted to the work
+  host: a curtain that anyone at the keyboard can work around is the wrong
+  posture for a work machine, which wants the lock.
 - Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Niri KDL booleans are presence-only, not `option true`.
 - Every surface must be usable from the keyboard. Use `keyNavigation` for
