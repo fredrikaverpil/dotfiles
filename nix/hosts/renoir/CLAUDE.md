@@ -50,6 +50,15 @@ previous states. Explain a declaration next to it, not here.
 - Clipboard history is in memory only and skips offers carrying
   `x-kde-passwordManagerHint`. Proton Pass and 1Password set it; a password
   manager that does not would be recorded.
+- The screensaver is a privacy curtain, not a lock: an overlay layer surface
+  (`wily-screensaver`), never `WlSessionLock`, and it never touches DPMS. Both
+  are deliberate. A session lock replaces output content and a disabled output
+  has nothing to copy, so either one defeats wlr-screencopy; the curtain exists
+  so `qs ipc call screensaver close` leaves a desktop `grim` can still capture
+  remotely. It dims the internal backlight to 0 while black and restores it
+  before drawing the prompt, so the prompt is never painted onto a dark panel.
+  Being only a layer surface, it dies with Quickshell — use the lock where that
+  matters.
 - Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Niri KDL booleans are presence-only, not `option true`.
 - Every surface must be usable from the keyboard. Use `keyNavigation` for

@@ -21,6 +21,7 @@ import "plugins/panels/recording" as Recording
 import "plugins/panels/tray" as Tray
 import "plugins/panels/weather" as Weather
 import "plugins/polkit" as Polkit
+import "plugins/screensaver" as Screensaver
 import "plugins/services/battery" as BatteryService
 import "plugins/services/bluetooth" as BluetoothService
 import "plugins/services/brightness" as Brightness
@@ -48,6 +49,7 @@ ShellRoot {
   readonly property alias media: media
   readonly property alias display: display
   readonly property alias brightness: brightness
+  readonly property alias screensaver: screensaver
   readonly property alias network: network
   readonly property alias networkService: networkService
   readonly property alias bluetooth: bluetooth
@@ -239,6 +241,7 @@ ShellRoot {
     "system.notifications.history": { icon: "󰎟", label: "History", action: () => notifications.showHistory() },
     "system.notifications.dnd": { icon: "󰂛", label: "Toggle Do Not Disturb", action: () => notifications.setDoNotDisturb(!notifications.doNotDisturb) },
     "system.lock": { icon: "", label: "Lock", action: () => lock.beginLock() },
+    "system.screensaver": { icon: "󰛑", label: "Screensaver", action: () => screensaver.show() },
     "system.idle": {
       icon: idle.enabled ? "󰾪" : "󰅶",
       label: idle.enabled ? "Disable idle locking" : "Enable idle locking",
@@ -265,6 +268,12 @@ ShellRoot {
   Idle.Service {
     id: idle
     lockService: lock
+  }
+
+  Screensaver.Service {
+    id: screensaver
+    shell: root
+    brightnessService: brightness
   }
 
   Keyboard.Service {
