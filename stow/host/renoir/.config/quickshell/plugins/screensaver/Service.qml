@@ -128,10 +128,6 @@ Item {
       id: surface
       required property var modelData
 
-      // One surface owns the prompt and the keyboard; the rest are plain
-      // black. Two focused TextInputs would fight over the seat.
-      readonly property bool primary: modelData === Quickshell.screens[0]
-
       screen: modelData
       visible: root.active
       color: root.shell ? root.shell.palette.bg : "#1C1817"
@@ -145,18 +141,18 @@ Item {
 
       WlrLayershell.layer: WlrLayer.Overlay
       WlrLayershell.namespace: "wily-screensaver"
-      WlrLayershell.keyboardFocus: root.active && surface.primary
-        ? WlrKeyboardFocus.Exclusive
-        : WlrKeyboardFocus.None
+      // Every output is exclusive: niri focuses only the active output's
+      // exclusive layer, and a click makes the output under it active.
+      WlrLayershell.keyboardFocus: root.active ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
       LockUi.LockView {
         anchors.fill: parent
-        visible: surface.primary && Model.shouldShowPrompt(root.curtainState())
+        visible: Model.shouldShowPrompt(root.curtainState())
         shell: root.shell
         authenticating: root.authenticating
         failureMessage: root.failureMessage
         password: root.enteredPassword
-        inputEnabled: root.active && surface.primary && root.awake
+        inputEnabled: root.active && root.awake
         onPasswordEdited: function(value) { root.enteredPassword = value }
         onSubmitPassword: function(value) { root.submitPassword(value) }
         onClearFailureRequested: root.failureMessage = ""
@@ -169,7 +165,7 @@ Item {
         enabled: !root.awake
         visible: enabled
         hoverEnabled: true
-        focus: surface.primary && !root.awake
+        focus: !root.awake
 
         // A stationary pointer reports its position as soon as this enables;
         // only movement away from that first report wakes.
