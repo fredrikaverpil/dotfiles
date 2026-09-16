@@ -131,7 +131,7 @@ Item {
 
   PamContext {
     id: passwordPam
-    config: "wily-lock"
+    config: "kaizen-lock"
     user: root.userName
 
     onResponseRequiredChanged: root.respondToPasswordPrompt()
@@ -158,7 +158,7 @@ Item {
   }
 
   FileView {
-    path: "/etc/pam.d/wily-lock"
+    path: "/etc/pam.d/kaizen-lock"
     watchChanges: true
     printErrors: false
     onLoaded: root.passwordPamConfigured = true

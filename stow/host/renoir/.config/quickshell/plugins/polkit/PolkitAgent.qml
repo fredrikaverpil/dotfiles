@@ -87,7 +87,7 @@ Item {
 
   PolkitAgent {
     id: polkitAgent
-    path: "/org/wily/PolkitAgent"
+    path: "/org/kaizen/PolkitAgent"
 
     onAuthenticationRequestStarted: root.beginFlow()
     onIsActiveChanged: {
@@ -95,8 +95,8 @@ Item {
       else if (!root.closing) root.finish()
     }
     onIsRegisteredChanged: {
-      if (isRegistered) console.log("wily polkit agent registered")
-      else console.warn("wily polkit agent is not registered; another agent may be running")
+      if (isRegistered) console.log("kaizen polkit agent registered")
+      else console.warn("kaizen polkit agent is not registered; another agent may be running")
     }
   }
 
@@ -129,7 +129,7 @@ Item {
     anchors { top: true; bottom: true; left: true; right: true }
     exclusionMode: ExclusionMode.Ignore
     color: "transparent"
-    WlrLayershell.namespace: "wily-polkit"
+    WlrLayershell.namespace: "kaizen-polkit"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 

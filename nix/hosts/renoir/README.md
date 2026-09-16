@@ -32,7 +32,7 @@ fwupdmgr update <device-id>
 The Synaptics reader (`06cb:00bd`) is unused by choice. To enable it:
 
 ```nix
-# fprintAuth defaults to on for every PAM service. login (and wily-lock,
+# fprintAuth defaults to on for every PAM service. login (and kaizen-lock,
 # which includes it) and sudo stay password-only until tested on hardware.
 services.fprintd.enable = true;
 security.pam.services.login.fprintAuth = false;
@@ -45,7 +45,7 @@ Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
   `nix eval --raw .#nixosConfigurations.renoir.config.security.pam.services.<name>.text`;
   `environment.etc."pam.d/<name>".text` is null because it uses `source`.
 - The lock screen needs a separate, concurrent fingerprint `PamContext` (see
-  the `wily-lock` comment in `desktop.nix`). Test it with a recovery plan
+  the `kaizen-lock` comment in `desktop.nix`). Test it with a recovery plan
   before enabling it for `login`.
 - fwupd cannot read the reader's firmware version: it answers with an
   unmapped status `0x315`. libfprint talks to it independently; untested.

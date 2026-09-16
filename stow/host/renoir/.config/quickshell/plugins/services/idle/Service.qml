@@ -8,7 +8,7 @@ Item {
   id: root
 
   property var lockService: null
-  readonly property string statePath: Quickshell.env("HOME") + "/.local/state/wily-idle.json"
+  readonly property string statePath: Quickshell.env("HOME") + "/.local/state/kaizen-idle.json"
   readonly property int lockAfterSeconds: 300
 
   property bool stateLoaded: false

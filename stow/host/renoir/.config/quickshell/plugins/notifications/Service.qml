@@ -16,7 +16,7 @@ Item {
 
   property var shell: null
   readonly property var palette: shell ? shell.palette : ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864" }) // qmllint disable property-override
-  readonly property string statePath: Quickshell.env("HOME") + "/.local/state/wily-notifications.json"
+  readonly property string statePath: Quickshell.env("HOME") + "/.local/state/kaizen-notifications.json"
   readonly property int historyLimit: 10
   readonly property string soundPath: "/run/current-system/sw/share/sounds/freedesktop/stereo/message.oga"
   readonly property real soundVolume: 0.4
@@ -259,7 +259,7 @@ Item {
     exclusionMode: ExclusionMode.Ignore
     color: "transparent"
     mask: Region { item: popupColumn }
-    WlrLayershell.namespace: "wily-notifications"
+    WlrLayershell.namespace: "kaizen-notifications"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
