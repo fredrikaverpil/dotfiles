@@ -183,7 +183,6 @@ Scope {
         anchors.rightMargin: 4
         label: bar.shell.bluetoothService.icon
         onActivated: bar.shell.bluetooth.toggle()
-        onSecondary: bar.shell.bluetoothService.togglePower()
       }
 
       Ui.BarButton {
