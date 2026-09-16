@@ -3,6 +3,7 @@
   imports = [
     ./desktop.nix
     ./personal.nix
+    ./tether.nix
     ./thinkpad.nix
   ];
 

@@ -74,6 +74,15 @@
       url = "github:AvengeMedia/dankcalendar";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    # iPhone bridge (clipboard, files, messages, notifications), used by renoir.
+    # nixpkgs has the package but no NixOS module, and lags upstream by many
+    # releases; this input supplies both. Its flake builds from its own tree, so
+    # it is pinned to a release tag: `nix flake update` would otherwise track
+    # main. Bump the tag by hand.
+    tether = {
+      url = "github:zackb/tether/v0.2.33";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     dotfiles = {
       # Used by home-manager for dotfiles bootstrapping.
       url = "github:fredrikaverpil/dotfiles";
