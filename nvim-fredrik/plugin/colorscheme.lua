@@ -120,7 +120,7 @@ do
     hl("SnacksNotifierBorderWarn", { fg = palette.wood })
 
     -- Gitsigns
-    hl("GitSignsAddPreview", { link = "DiffChange" })
+    hl("GitSignsAddPreview", { link = "DiffAdd" })
     hl("GitSignsAddInline", { link = "DiffText" })
     hl("GitSignsChangeInline", { link = "DiffText" })
     hl("GitSignsDeleteInline", { link = "DiffText" })
