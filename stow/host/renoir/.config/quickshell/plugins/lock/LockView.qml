@@ -27,6 +27,10 @@ Item {
     passwordInput.text = ""
   }
 
+  // Mirrors input typed on another output's lock surface.
+  onPasswordChanged: {
+    if (passwordInput.text !== password) passwordInput.text = password
+  }
   onInputEnabledChanged: Qt.callLater(focusPassword)
   onAuthenticatingChanged: {
     if (!authenticating) Qt.callLater(focusPassword)
