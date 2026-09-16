@@ -52,7 +52,7 @@ Scope {
       anchors { top: true; bottom: true; left: true; right: true }
       exclusionMode: ExclusionMode.Ignore
       color: "transparent"
-      WlrLayershell.namespace: "wily-recording-region"
+      WlrLayershell.namespace: "kaizen-recording-region"
       WlrLayershell.layer: WlrLayer.Overlay
       // Only one surface may hold exclusive focus; the others still take the pointer.
       WlrLayershell.keyboardFocus: root.service.selecting && active ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None

@@ -140,7 +140,7 @@ Item {
       }
 
       WlrLayershell.layer: WlrLayer.Overlay
-      WlrLayershell.namespace: "wily-screensaver"
+      WlrLayershell.namespace: "kaizen-screensaver"
       // Every output is exclusive: niri focuses only the active output's
       // exclusive layer, and a click makes the output under it active.
       WlrLayershell.keyboardFocus: root.active ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
@@ -190,7 +190,7 @@ Item {
 
   PamContext {
     id: passwordPam
-    config: "wily-lock"
+    config: "kaizen-lock"
     user: root.userName
 
     onResponseRequiredChanged: root.respondToPasswordPrompt()
@@ -213,7 +213,7 @@ Item {
   }
 
   FileView {
-    path: "/etc/pam.d/wily-lock"
+    path: "/etc/pam.d/kaizen-lock"
     watchChanges: true
     printErrors: false
     onLoaded: root.passwordPamConfigured = true

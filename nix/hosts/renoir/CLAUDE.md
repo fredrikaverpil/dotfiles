@@ -26,10 +26,9 @@ previous states. Explain a declaration next to it, not here.
 
 ## Gotchas
 
-- "wily" names the shell (PAM `wily-lock`, `wily-*` units, layer namespaces,
-  state files) and is also the work host's hostname. Historical accident; the
-  shell name is kept to avoid moving state. Read "wily" in Nix and QML as the
-  shell unless it is `networking.hostName`.
+- "kaizen" names the shell (PAM `kaizen-lock`, `kaizen-*` units, layer
+  namespaces, D-Bus path, state files). It is host-agnostic; "wily" is only
+  a hostname.
 - Nix comments carry the "why" for packages, portals, PAM, units and hardware
   integration. Read `desktop.nix`, `thinkpad.nix`, `configuration.nix` before
   asking.
@@ -51,7 +50,7 @@ previous states. Explain a declaration next to it, not here.
   `x-kde-passwordManagerHint`. Proton Pass and 1Password set it; a password
   manager that does not would be recorded.
 - The screensaver is a privacy curtain, not a lock: an overlay layer surface
-  (`wily-screensaver`), never `WlSessionLock`, and it never touches DPMS. Both
+  (`kaizen-screensaver`), never `WlSessionLock`, and it never touches DPMS. Both
   are deliberate. A session lock replaces output content and a disabled output
   has nothing to copy, so either one defeats wlr-screencopy; the curtain exists
   so `qs ipc call screensaver close` leaves a desktop `grim` can still capture

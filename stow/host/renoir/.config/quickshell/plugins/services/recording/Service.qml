@@ -8,7 +8,7 @@ import "RecordingModel.js" as Model
 Item {
   id: root
 
-  readonly property string statePath: Quickshell.env("HOME") + "/.local/state/wily-recording.json"
+  readonly property string statePath: Quickshell.env("HOME") + "/.local/state/kaizen-recording.json"
   readonly property string directory: Quickshell.env("HOME") + "/Videos"
 
   // Saved choices. An empty camera or mic means off; unavailable ones fall back.

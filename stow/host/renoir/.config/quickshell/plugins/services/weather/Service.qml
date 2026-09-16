@@ -9,7 +9,7 @@ Item {
 
   // MET blocks generic User-Agents and requires contact information; the
   // repository URL is one of the forms their terms accept.
-  readonly property string userAgent: "wily-shell/1.0 github.com/fredrikaverpil/dotfiles"
+  readonly property string userAgent: "kaizen-shell/1.0 github.com/fredrikaverpil/dotfiles"
 
   property real latitude: Places.home.latitude
   property real longitude: Places.home.longitude
@@ -68,7 +68,7 @@ Item {
   function fetchCommand() {
     return ["sh", "-c",
       'set -e; ' +
-      'directory="${XDG_CACHE_HOME:-$HOME/.cache}/wily-shell"; ' +
+      'directory="${XDG_CACHE_HOME:-$HOME/.cache}/kaizen-shell"; ' +
       'cache="$directory/weather-' + latitude + '_' + longitude + '.json"; ' +
       'mkdir -p "$directory"; ' +
       'if [ -f "$cache" ]; then set -- -z "$cache"; fi; ' +
