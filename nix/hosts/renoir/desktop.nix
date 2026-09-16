@@ -7,7 +7,7 @@
 }:
 let
   sleep-lock-monitor = pkgs.writeShellApplication {
-    name = "wily-sleep-lock-monitor";
+    name = "kaizen-sleep-lock-monitor";
     runtimeInputs = [
       pkgs.coreutils
       pkgs.dbus
@@ -21,7 +21,7 @@ let
 
         for _ in $(seq 1 30); do
           if qs ipc call lock status 2>/dev/null | grep -q '"secure":true'; then
-            echo "wily: session lock is secure, releasing the suspend delay"
+            echo "kaizen: session lock is secure, releasing the suspend delay"
             return 0
           fi
           sleep 0.1
@@ -33,7 +33,7 @@ let
       monitor_sleep() {
         while IFS= read -r line; do
           if [[ $line == *"boolean true"* ]]; then
-            lock_and_wait || echo "wily: session lock was not secure before suspend" >&2
+            lock_and_wait || echo "kaizen: session lock was not secure before suspend" >&2
             return
           fi
         done < <(dbus-monitor --system \
@@ -46,7 +46,7 @@ let
         exec systemd-inhibit \
           --what=sleep \
           --mode=delay \
-          --who=wily \
+          --who=kaizen \
           --why="Secure the Quickshell lock screen before suspend" \
           "$0" --monitor
       fi
@@ -187,7 +187,7 @@ in
   # PAM service for the Quickshell lock screen (plugins/lock/Service.qml).
   # The lock screen starts PAM only after a password is submitted, so fprintd in
   # this stack would block typing; fingerprint unlock needs a separate PamContext.
-  environment.etc."pam.d/wily-lock".text = ''
+  environment.etc."pam.d/kaizen-lock".text = ''
     auth include login
   '';
 
@@ -252,7 +252,7 @@ in
 
   # Lid close and the power key suspend via logind; this delay inhibitor locks
   # the shell first and releases once the lock reports secure.
-  systemd.user.services.wily-sleep-lock = {
+  systemd.user.services.kaizen-sleep-lock = {
     description = "Lock Quickshell before suspend";
     partOf = [ "graphical-session.target" ];
     # Match Quickshell's ordering: waitenv is required for niri, and graphical-session.target cycles.
@@ -264,7 +264,7 @@ in
     requires = [ "dbus.socket" ];
     wantedBy = [ "wayland-session@niri.target" ];
     serviceConfig = {
-      ExecStart = "${sleep-lock-monitor}/bin/wily-sleep-lock-monitor";
+      ExecStart = "${sleep-lock-monitor}/bin/kaizen-sleep-lock-monitor";
       Restart = "always";
       RestartSec = "2s";
     };
