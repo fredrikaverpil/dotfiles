@@ -69,11 +69,15 @@ Ui.Panel {
       }))
   }
 
+  // Built when entries load, not per keystroke: a first icon-theme lookup costs
+  // ~25 ms per app.
+  readonly property var apps: DesktopEntries.applications.values
+    .filter(entry => !entry.noDisplay)
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(entry => ({ label: entry.name, icon: "󰀻", image: menu.iconUrl(entry.icon), detail: "", enabled: true, entry: entry }))
+
   function appRows(detail) {
-    return DesktopEntries.applications.values
-      .filter(entry => !entry.noDisplay)
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map(entry => ({ label: entry.name, icon: "󰀻", image: menu.iconUrl(entry.icon), detail: detail || "", enabled: true, entry: entry }))
+    return apps.map(row => Object.assign({}, row, { detail: detail || "" }))
   }
 
   function placeRows() {
