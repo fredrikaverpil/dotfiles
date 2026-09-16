@@ -1,6 +1,18 @@
 # Personal-machine only; a work host imports desktop.nix without this file.
-{ pkgs, ... }:
+{ inputs, pkgs, ... }:
 {
+  imports = [ inputs.tether.nixosModules.default ];
+
+  # iPhone bridge; tether-gtk spawns tetherd on demand.
+  programs.tether = {
+    enable = true;
+    wifi = {
+      enable = true;
+      openFirewall = true;
+    };
+    bluetooth.enable = true;
+  };
+
   # ente-desktop pins EOL electron; drop once nixpkgs bumps it.
   nixpkgs.config.permittedInsecurePackages = [ "electron-41.10.6" ];
 

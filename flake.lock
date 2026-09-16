@@ -369,6 +369,7 @@
         "nixos-raspberrypi": "nixos-raspberrypi",
         "nixpkgs": "nixpkgs_3",
         "nixpkgs-unstable": "nixpkgs-unstable",
+        "tether": "tether",
         "zen-browser": "zen-browser"
       }
     },
@@ -384,6 +385,26 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "tether": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1789527003,
+        "narHash": "sha256-zgbUHwc9Ud7LZUsUQYuEGQab+8a4W1KePt1+CG7LYOY=",
+        "owner": "zackb",
+        "repo": "tether",
+        "rev": "22543045bfc5534b98beb763a6bfbf5924c8979c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "zackb",
+        "repo": "tether",
         "type": "github"
       }
     },
