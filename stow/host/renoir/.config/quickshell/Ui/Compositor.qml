@@ -6,7 +6,6 @@ import "compositors/Niri.js" as Niri
 
 Singleton {
   readonly property string name: Niri.name
-  readonly property string themeConfig: Quickshell.env("HOME") + Niri.themeConfig
 
   function dpms(on) { return Niri.dpms(on) }
   function closeWindow() { return Niri.closeWindow() }
@@ -20,7 +19,6 @@ Singleton {
   function events() { return Niri.events() }
   function moveFloatingWindow(id, x, y) { return Niri.moveFloatingWindow(id, x, y) }
   function pinWindow(raw, appId, state) { return Niri.pinWindow(raw, appId, state) }
-  function themeEdits(palette) { return Niri.themeEdits(palette) }
   function layoutQuery() { return Niri.layoutQuery() }
   function currentLayout(raw) { return Niri.currentLayout(raw) }
   function setLayout(index) { return Niri.setLayout(index) }

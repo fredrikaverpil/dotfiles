@@ -178,8 +178,7 @@ from the shell on macOS. Static checks run against every host's tree;
 - `compare()` handles objects/arrays but tolerates small numeric differences.
   Use `verify(actual === expected)` for exact values/identity and `fuzzyCompare`
   for explicit tolerances. Do not compare objects via JSON serialization.
-- `compositor-test` checks the real theme-edit anchor and niri's KDL. It does
-  not test dispatch.
+- `compositor-test` validates niri's KDL. It does not test dispatch.
 
 ### Tooling
 

@@ -103,25 +103,10 @@ ShellRoot {
     write.running = true
   }
 
-  // GNU sed otherwise replaces the Stow link rather than its target.
-  function writeCompositorTheme() {
-    // `palette` still holds the previous theme while this handler runs.
-    const edits = Ui.Compositor.themeEdits(dark ? darkPalette : lightPalette)
-    if (edits.length === 0) return
-    compositorTheme.command = ["sed", "-i", "--follow-symlinks", "-E"]
-      .concat(edits)
-      .concat([Ui.Compositor.themeConfig])
-    compositorTheme.running = true
-  }
-
-  onDarkChanged: {
-    writeKdeglobals()
-    writeCompositorTheme()
-  }
+  onDarkChanged: writeKdeglobals()
 
   Process { id: write }
   Process { id: kdeglobals }
-  Process { id: compositorTheme }
 
   function setTextScale(value) {
     const scale = Model.textScale(value)
@@ -169,7 +154,6 @@ ShellRoot {
       onStreamFinished: {
         root.dark = text.indexOf("prefer-light") < 0
         root.writeKdeglobals()
-        root.writeCompositorTheme()
       }
     }
   }
