@@ -13,14 +13,14 @@ Ui.Panel {
   readonly property var rows: service.busy ? [] : [
     {
       label: "Source",
-      values: service.monitors.concat(["region"]),
+      values: service.monitorOptions,
       labels: service.monitors.concat(["Region"]),
       value: service.activeMonitor,
       set: value => root.service.monitor = value,
     },
     {
       label: "Camera",
-      values: [""].concat(service.cameras.map(entry => entry.path)),
+      values: service.cameraOptions,
       labels: ["Off"].concat(service.cameras.map(entry => entry.name)),
       value: service.activeCamera,
       set: value => root.service.camera = value,
@@ -34,7 +34,7 @@ Ui.Panel {
     },
     {
       label: "Microphone",
-      values: ["", "default_input"].concat(service.mics.map(node => node.name)),
+      values: service.micOptions,
       labels: ["Off", "Default input"].concat(service.mics.map(node => node.description || node.nickname || node.name)),
       value: service.activeMic,
       set: value => root.service.mic = value,
