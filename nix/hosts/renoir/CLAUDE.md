@@ -81,6 +81,9 @@ previous states. Explain a declaration next to it, not here.
   Both the scale and those coordinates belong to the output the circle opened
   on, which is whichever one had focus, so starting a recording *with a camera*
   focuses the output being captured. Recording without one never moves focus.
+- The recording service also owns the region screenshot (`grim`), because that
+  reuses its region selector; `selectMode` says which of the two the selection
+  feeds. Niri's own `screenshot` binds are unrelated and stay compositor-side.
 - Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Niri KDL booleans are presence-only, not `option true`.
 - Every surface must be usable from the keyboard. Use `keyNavigation` for
