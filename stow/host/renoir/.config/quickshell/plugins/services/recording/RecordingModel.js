@@ -1,9 +1,23 @@
-// The camera is composited into the bottom-right corner of the recording.
-function captureSource(monitor, region, camera) {
-  var source = region ? "region" : monitor
-  if (!camera) return source
-  return (region ? source : "monitor:" + source) + "|v4l2:" + camera + ";halign=end;valign=end;width=20%"
+// gpu-screen-recorder cannot mask its own camera overlay, so the camera is a
+// niri-rounded mpv window the screen capture picks up (see cameraCommand).
+function captureSource(monitor, region) {
+  return region ? "region" : monitor
 }
+
+// A square centre crop, under the app id of the niri window rule that rounds it.
+// mpv asks for device pixels, so size is the logical size times the screen scale.
+function cameraCommand(camera, scale) {
+  var size = Math.round(cameraSize * (scale || 1))
+  return ["mpv", "--wayland-app-id=kaizen-camera", "--profile=low-latency", "--no-audio", "--no-osc",
+    "--no-input-default-bindings", "--really-quiet", "--vf=crop=ih:ih", "--autofit=" + size + "x" + size,
+    // Without this the v4l2 demuxer picks raw yuyv, which the camera only
+    // delivers at 5 fps.
+    "--demuxer-lavf-o=input_format=mjpeg,framerate=30,video_size=1280x720",
+    "av://v4l2:" + camera]
+}
+
+// The circle's diameter in logical pixels.
+var cameraSize = 320
 
 // One merged track: most players only play the first of several.
 function audioSource(mic, desktop) {
@@ -14,7 +28,7 @@ function audioSource(mic, desktop) {
 }
 
 function command(options, file) {
-  var args = ["gpu-screen-recorder", "-w", captureSource(options.monitor, options.region, options.camera)]
+  var args = ["gpu-screen-recorder", "-w", captureSource(options.monitor, options.region)]
   if (options.region) args.push("-region", formatRegion(options.region))
   args.push("-f", "30")
   var audio = audioSource(options.mic, options.desktop)

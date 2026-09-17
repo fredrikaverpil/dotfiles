@@ -43,7 +43,7 @@ layout {
     border {
         width 2
         active-color "#6099C0"
-        inactive-color "#403833"
+        inactive-color "#CFC1BA"
     }
 }
 
@@ -94,6 +94,25 @@ window-rule {
 window-rule {
     match app-id=r#"(?i)^spotify$"#
     open-on-workspace "5"
+}
+
+// The recording service's camera preview: gpu-screen-recorder cannot mask its
+// own camera overlay, so the screen capture records this window instead. mpv
+// sets its title after the initial configure, so opening rules need the app id
+// to match. niri clamps the radius to half the window, so any square mpv asks
+// for comes out a circle; the size is mpv's, since a rule size is in device
+// pixels and a proportion does not apply to floating windows.
+window-rule {
+    match app-id=r#"^kaizen-camera$"#
+
+    open-floating true
+    open-focused false
+    default-floating-position x=32 y=32 relative-to="bottom-right"
+    geometry-corner-radius 9999
+    clip-to-geometry true
+    border {
+        off
+    }
 }
 
 cursor {
