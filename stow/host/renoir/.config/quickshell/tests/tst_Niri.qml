@@ -5,13 +5,6 @@ import "../Ui/compositors/Niri.js" as Niri
 TestCase {
   name: "Niri"
 
-  function test_theme_edits() {
-    const palette = { dim: "#403833" }
-    compare(Niri.themeEdits(palette), [
-      "-e", "s|^( *inactive-color ).*|\\1\"#403833\"|"
-    ])
-  }
-
   function test_pin_window() {
     const none = { id: 0, requested: 0, spaces: ({}) }
     compare(Niri.pinWindow("invalid", "cam", none), none)

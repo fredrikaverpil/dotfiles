@@ -1,5 +1,4 @@
 var name = "niri"
-var themeConfig = "/.config/niri/config.kdl"
 
 function dpms(on) {
   return ["niri", "msg", "action", on ? "power-on-monitors" : "power-off-monitors"]
@@ -113,10 +112,6 @@ function held(state) {
 
 function command(state, argv) {
   return { id: state.id, requested: state.requested, spaces: state.spaces, command: argv }
-}
-
-function themeEdits(palette) {
-  return ["-e", "s|^( *inactive-color ).*|\\1\"" + palette.dim + "\"|"]
 }
 
 function layoutQuery() { return ["niri", "msg", "-j", "keyboard-layouts"] }
