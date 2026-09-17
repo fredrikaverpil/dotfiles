@@ -51,4 +51,11 @@ TestCase {
       compare(Niri.focusedMonitor(raw), null, raw)
     }
   }
+
+  function test_focused_output_on() {
+    compare(Niri.focusedOutputOn("DP-1"),
+      ["sh", "-c", 'niri msg action focus-monitor "$1" && niri msg -j focused-output', "sh", "DP-1"])
+    // Without an output there is nothing to focus, so the plain query is used.
+    compare(Niri.focusedOutputOn(""), Niri.outputs())
+  }
 }

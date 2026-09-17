@@ -15,6 +15,7 @@ Singleton {
   function focusWorkspace(id, output) { return Niri.focusWorkspace(id, output) }
   function focusMonitor(output) { return Niri.focusMonitor(output) }
   function outputs() { return Niri.outputs() }
+  function focusedOutputOn(output) { return Niri.focusedOutputOn(output) }
   function focusedMonitor(raw) { return Niri.focusedMonitor(raw) }
   function events() { return Niri.events() }
   function moveFloatingWindow(id, x, y) { return Niri.moveFloatingWindow(id, x, y) }

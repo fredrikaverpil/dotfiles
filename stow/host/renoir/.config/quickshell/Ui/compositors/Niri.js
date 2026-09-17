@@ -28,6 +28,15 @@ function focusMonitor(output) { return ["niri", "msg", "action", "focus-monitor"
 
 function outputs() { return ["niri", "msg", "-j", "focused-output"] }
 
+// The same query, after focusing output. A window opens on the focused output
+// and move-floating-window is relative to it, so a caller placing a window on
+// output must both focus it and read its scale, in that order.
+function focusedOutputOn(output) {
+  return output
+    ? ["sh", "-c", 'niri msg action focus-monitor "$1" && niri msg -j focused-output', "sh", output]
+    : outputs()
+}
+
 function focusedMonitor(raw) {
   var output
   try { output = JSON.parse(String(raw || "")) } catch (error) { return null }
