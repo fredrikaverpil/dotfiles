@@ -25,13 +25,15 @@ Ui.Panel {
       value: service.activeCamera,
       set: value => root.service.camera = value,
     },
-    {
+    // Only the Camera row above can turn this one off, so the cursor never
+    // sits on a row the change moves.
+    ...(service.activeCamera ? [{
       label: "Camera size",
       values: Model.cameraFractions,
       labels: Model.cameraFractions.map(value => Math.round(value * 100) + "%"),
       value: service.cameraFraction,
       set: value => root.service.cameraFraction = value,
-    },
+    }] : []),
     {
       label: "Microphone",
       values: service.micOptions,
