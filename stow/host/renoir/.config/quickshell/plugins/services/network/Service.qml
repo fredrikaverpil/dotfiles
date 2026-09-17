@@ -82,13 +82,8 @@ Item {
   function networkForSsid(ssid) { return Model.networkForSsid(wifiNetworkObjects, ssid) }
 
   function syncWifiNetworks() {
-    var rows = []
-    var networks = wifiNetworkObjects || []
-    for (var i = 0; i < networks.length; i++) {
-      var row = Model.wifiRow(networks[i])
-      if (row) rows.push(row)
-    }
-    wifiNetworks = Model.sortWifiRows(rows)
+    var ordered = Model.orderWifiNetworks(wifiNetworks, wifiNetworkObjects)
+    if (!Model.sameWifiNetworks(ordered, wifiNetworks)) wifiNetworks = ordered
     checkActionCompletion()
   }
 
@@ -207,17 +202,17 @@ Item {
   function activate(network) {
     if (!network || busy) return
     if (network.connected) {
-      disconnect(network.ssid)
+      disconnect(network.name)
       return
     }
     if (Model.requiresCredentials(network.security, WifiSecurityType.Open, WifiSecurityType.Owe)
         && !network.known) {
-      passwordSsid = network.ssid
+      passwordSsid = network.name
       failureSsid = ""
       failureReason = ""
       return
     }
-    connect(network.ssid)
+    connect(network.name)
   }
 
   function beginAction(kind, network) {
@@ -313,6 +308,8 @@ Item {
 
   onActiveChanged: {
     if (active) {
+      // Drop the frozen order so the list is sorted by strength again on open.
+      wifiNetworks = []
       refresh()
       if (wifiDevice) scan()
     } else {

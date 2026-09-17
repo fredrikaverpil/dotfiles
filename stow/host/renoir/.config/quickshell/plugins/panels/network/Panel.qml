@@ -351,7 +351,7 @@ Ui.Panel {
         color: root.shell.palette.fg
         font.family: Ui.Fonts.mono
         font.pixelSize: 16
-        text: Model.wifiIconFor(row.network.signal)
+        text: Model.wifiIconFor(Model.wifiSignal(row.network))
       }
 
       Text {
@@ -363,7 +363,7 @@ Ui.Panel {
         color: root.shell.palette.fg
         font.family: Ui.Fonts.mono
         font.pixelSize: 14
-        text: row.network.ssid + " · " + root.service.wifiStatus(row.network)
+        text: row.network.name + " · " + root.service.wifiStatus(row.network)
         elide: Text.ElideRight
       }
 
@@ -405,7 +405,7 @@ Ui.Panel {
     Rectangle {
       width: parent.width
       height: visible ? 38 : 0
-      visible: root.service.passwordSsid === row.network.ssid
+      visible: root.service.passwordSsid === row.network.name
       radius: 4
       color: root.shell.palette.sel
 
@@ -430,7 +430,7 @@ Ui.Panel {
           border.color: root.shell.palette.dim
           border.width: 1
         }
-        onAccepted: root.service.connectWithPassphrase(row.network.ssid, text)
+        onAccepted: root.service.connectWithPassphrase(row.network.name, text)
       }
 
       ActionButton {
@@ -441,13 +441,13 @@ Ui.Panel {
         width: 54
         label: "Join"
         available: passphrase.text.length > 0 && !root.service.busy
-        onActivated: root.service.connectWithPassphrase(row.network.ssid, passphrase.text)
+        onActivated: root.service.connectWithPassphrase(row.network.name, passphrase.text)
       }
     }
 
     Text {
       width: parent.width
-      visible: root.service.failureSsid === row.network.ssid && root.service.failureReason !== ""
+      visible: root.service.failureSsid === row.network.name && root.service.failureReason !== ""
       color: root.shell.palette.off
       font.family: Ui.Fonts.mono
       font.pixelSize: 12
@@ -459,7 +459,7 @@ Ui.Panel {
       width: 74
       label: "Forget"
       available: !root.service.busy
-      onActivated: root.service.forget(row.network.ssid)
+      onActivated: root.service.forget(row.network.name)
     }
   }
 }

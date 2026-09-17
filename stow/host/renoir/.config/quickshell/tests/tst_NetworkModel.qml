@@ -18,13 +18,24 @@ TestCase {
     compare(Network.connectionIcon("ethernet", 0), "󰈀")
     compare(Network.deviceType(types.Wifi, types), "Wi-Fi")
     compare(Network.connectionState(connectionStates.Connected, connectionStates), "Connected")
-    compare(Network.wifiRow({ name: "Home", signalStrength: 0.72, known: true }), {
-      connected: false, known: true, ssid: "Home", signal: 72, security: undefined,
-    })
-    compare(Network.wifiRow({}), null)
-    compare(Network.sortWifiRows([{ ssid: "b", connected: false, known: false, signal: 1 }, { ssid: "a", connected: true, known: false, signal: 1 }]).map(row => row.ssid), ["a", "b"])
-    compare(Network.wifiStatus({ ssid: "Home", connected: false, known: true }, "Home", "connect"), "Connecting…")
-    compare(Network.wifiAction({ ssid: "Home", security: "wpa", known: false }, "", "open", "owe"), "Join")
+    compare(Network.wifiSignal({ signalStrength: 0.72 }), 72)
+    compare(Network.wifiSignal(null), 0)
+    compare(Network.sortWifiNetworks([{ name: "b", signalStrength: 0.9 }, { name: "a", connected: true, signalStrength: 0.1 }]).map(network => network.name), ["a", "b"])
+    compare(Network.wifiStatus({ name: "Home", connected: false, known: true }, "Home", "connect"), "Connecting…")
+    compare(Network.wifiAction({ name: "Home", security: "wpa", known: false }, "", "open", "owe"), "Join")
+  }
+
+  function test_wifi_order_holds_positions_and_appends_new_networks() {
+    const weak = { name: "Weak", signalStrength: 0.2 }
+    const strong = { name: "Strong", signalStrength: 0.9 }
+    const extra = { name: "Extra", signalStrength: 0.5 }
+    compare(Network.orderWifiNetworks([], [weak, strong]).map(network => network.name), ["Strong", "Weak"])
+    compare(Network.orderWifiNetworks([weak, strong], [strong, weak, extra]).map(network => network.name), ["Weak", "Strong", "Extra"])
+    compare(Network.orderWifiNetworks([weak, strong], [strong]).map(network => network.name), ["Strong"])
+    compare(Network.orderWifiNetworks([], [{ signalStrength: 0.5 }]), [])
+    verify(Network.sameWifiNetworks([weak, strong], [weak, strong]))
+    verify(!Network.sameWifiNetworks([weak, strong], [strong, weak]))
+    verify(!Network.sameWifiNetworks([weak], []))
   }
 
   function test_network_parsers_and_rolling_measurements_handle_bad_output() {
