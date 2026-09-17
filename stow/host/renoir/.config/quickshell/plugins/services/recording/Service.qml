@@ -154,6 +154,7 @@ Item {
     file = directory + "/" + Model.fileName(new Date())
     quiet = isQuiet
     recorder.command = ["sh", "-c", 'mkdir -p "$0" && exec "$@"', directory].concat(Model.command(options, file))
+    recorder.lastError = ""
     seconds = 0
     paused = false
     recorder.running = true
@@ -283,7 +284,12 @@ Item {
 
   Process {
     id: recorder
-    stderr: StdioCollector { id: recorderErrors }
+    // Only the last line is ever reported, and a recording runs for hours, so
+    // the stream is read a line at a time rather than collected.
+    property string lastError: ""
+    stderr: SplitParser {
+      onRead: function (line) { if (line.trim()) recorder.lastError = line.trim() }
+    }
     onExited: function (exitCode) {
       root.launched = false
       root.paused = false
@@ -294,9 +300,8 @@ Item {
         Quickshell.execDetached(["notify-send", "-a", "Recording", "Recording saved", root.file])
         Quickshell.execDetached(["xdg-open", root.file])
       } else {
-        const lines = String(recorderErrors.text || "").trim().split("\n")
         Quickshell.execDetached(["notify-send", "-a", "Recording", "-u", "critical",
-          "Recording failed", lines[lines.length - 1] || "exit code " + exitCode])
+          "Recording failed", recorder.lastError || "exit code " + exitCode])
       }
     }
   }
