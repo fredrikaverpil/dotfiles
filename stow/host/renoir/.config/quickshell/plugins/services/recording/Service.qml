@@ -70,9 +70,15 @@ Item {
     recorder.signal(2)
   }
 
-  // The circle opens on the focused output; niri's scale converts its logical
-  // size to the device pixels mpv asks for. Qt's devicePixelRatio cannot: it
-  // rounds a fractional scale up.
+  // The output the capture covers. The circle has to open on it to be recorded
+  // at all, and placeCamera's coordinates are read against the output the
+  // window opened on, so it is focused before its scale is read.
+  readonly property string captureOutput: regionMode
+    ? (region && Model.screenAt(screens, region) ? Model.screenAt(screens, region).name : "")
+    : activeMonitor
+
+  // niri's scale converts the circle's logical size to the device pixels mpv
+  // asks for. Qt's devicePixelRatio cannot: it rounds a fractional scale up.
   property real cameraScale: 1
   // The preview waits for that query: a scale arriving mid-countdown changes
   // mpv's command, and Quickshell restarts a process whose command changes, so
@@ -124,6 +130,8 @@ Item {
     quiet = false
     if (activeCamera) {
       cameraScaleKnown = false
+      // Set here, not bound: Quickshell restarts a process whose command changes.
+      outputState.command = Ui.Compositor.focusedOutputOn(captureOutput)
       outputState.running = true
     }
     countdown = 3
@@ -243,7 +251,6 @@ Item {
 
   Process {
     id: outputState
-    command: Ui.Compositor.outputs()
     // Also on a failed query, which leaves the scale of the last one.
     onExited: root.cameraScaleKnown = true
     stdout: StdioCollector {

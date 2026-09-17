@@ -78,6 +78,9 @@ previous states. Explain a declaration next to it, not here.
   `move-floating-window` takes coordinates in the output's working area, which
   the bar shortens at the top, and reads a bare negative number as a relative
   move.
+  Both the scale and those coordinates belong to the output the circle opened
+  on, which is whichever one had focus, so starting a recording *with a camera*
+  focuses the output being captured. Recording without one never moves focus.
 - Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Niri KDL booleans are presence-only, not `option true`.
 - Every surface must be usable from the keyboard. Use `keyNavigation` for
