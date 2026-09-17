@@ -60,7 +60,15 @@ Item {
   // recorder is asked for here as well: busy dipping between the countdown and
   // the recorder would tear the camera preview down and open a second one.
   property bool launched: false
+  // A stop asked for in that same window, replayed once the recorder can be
+  // signalled. Without it the bar's Stop and the bind do nothing for a tick.
+  property bool stopRequested: false
   readonly property bool busy: recording || launched || countdown > 0
+
+  onRecordingChanged: if (recording && stopRequested) {
+    stopRequested = false
+    recorder.signal(2)
+  }
 
   // The circle opens on the focused output; niri's scale converts its logical
   // size to the device pixels mpv asks for. Qt's devicePixelRatio cannot: it
@@ -141,6 +149,7 @@ Item {
   function stop() {
     if (selecting || countdown > 0) cancel()
     else if (recording) recorder.signal(2) // SIGINT finalizes the file.
+    else if (launched) stopRequested = true
   }
 
   function togglePause() {
@@ -155,6 +164,7 @@ Item {
     quiet = isQuiet
     recorder.command = ["sh", "-c", 'mkdir -p "$0" && exec "$@"', directory].concat(Model.command(options, file))
     recorder.lastError = ""
+    stopRequested = false
     seconds = 0
     paused = false
     recorder.running = true
