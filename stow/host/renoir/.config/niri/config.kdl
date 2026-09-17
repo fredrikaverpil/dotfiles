@@ -24,6 +24,12 @@ input {
         dwt
         dwtp
     }
+    mouse {
+        // Cancels the 0.2 window-rule scroll-factor below: 0.2 * 5.0 = 1:1 in
+        // windows. Layer surfaces skip window rules, so Quickshell panels get
+        // the raw 5.0.
+        scroll-factor 5.0
+    }
 }
 
 layout {
