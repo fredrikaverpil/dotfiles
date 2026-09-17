@@ -367,11 +367,11 @@ Ui.Panel {
         elide: Text.ElideRight
       }
 
-      // Fixed offset keeps the column aligned while the action button is hidden.
+      // Fixed offsets keep the columns aligned while the action buttons are hidden.
       Text {
         id: lock
         anchors.right: parent.right
-        anchors.rightMargin: 88
+        anchors.rightMargin: forget.visible ? 168 : 88
         anchors.verticalCenter: parent.verticalCenter
         visible: root.service.wifiSecured(row.network)
         color: root.shell.palette.fg
@@ -392,9 +392,21 @@ Ui.Panel {
         onActivated: root.service.activate(row.network)
       }
 
+      ActionButton {
+        id: forget
+        anchors.right: parent.right
+        anchors.rightMargin: 86
+        anchors.verticalCenter: parent.verticalCenter
+        visible: Model.canForgetNetwork(row.network)
+        width: visible ? 74 : 0
+        label: "Forget"
+        available: !root.service.busy
+        onActivated: root.service.forget(row.network.name)
+      }
+
       MouseArea {
         anchors.left: parent.left
-        anchors.right: action.left
+        anchors.right: forget.visible ? forget.left : action.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         enabled: !root.service.busy
@@ -454,14 +466,6 @@ Ui.Panel {
       font.family: Ui.Fonts.mono
       font.pixelSize: 12
       text: root.service.failureReason
-    }
-
-    ActionButton {
-      visible: Model.canForgetNetwork(row.network)
-      width: 74
-      label: "Forget"
-      available: !root.service.busy
-      onActivated: root.service.forget(row.network.name)
     }
   }
 }
