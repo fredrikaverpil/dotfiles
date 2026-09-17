@@ -44,13 +44,16 @@ TestCase {
     compare(Media.sourcePlayers(arrayLike).map(player => player.identity), ["Array-like list"])
   }
 
-  function test_active_player_prefers_playback() {
+  function test_active_player_follows_selection_then_playback() {
     const players = [
-      { identity: "Paused", dbusName: "paused", isPlaying: false },
+      { identity: "Paused", dbusName: "paused", isPlaying: false, canPlay: true },
       { identity: "Playing", dbusName: "playing", isPlaying: true }
     ]
-    compare(Media.activePlayer(players, "paused").identity, "Playing")
+    compare(Media.activePlayer(players, "paused").identity, "Paused")
     compare(Media.activePlayer(players, "playing").identity, "Playing")
+    compare(Media.activePlayer(players, "gone").identity, "Playing")
+    const stale = { identity: "Chromium", dbusName: "stale", isPlaying: false }
+    compare(Media.activePlayer([stale].concat(players), "stale").identity, "Playing")
     compare(Media.activePlayer([{ identity: "Only", dbusName: "only" }], "only").identity, "Only")
     compare(Media.activePlayer([], ""), null)
   }
