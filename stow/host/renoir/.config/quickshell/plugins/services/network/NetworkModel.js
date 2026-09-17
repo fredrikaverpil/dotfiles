@@ -27,27 +27,45 @@ function connectionState(state, states) {
   return "Unknown"
 }
 
-function wifiRow(network) {
-  if (!network || !network.name) return null
-
-  return {
-    connected: !!network.connected,
-    known: !!network.known,
-    ssid: String(network.name),
-    signal: Math.round(Number(network.signalStrength || 0) * 100),
-    security: network.security,
-  }
+function wifiSignal(network) {
+  return Math.round(Number((network && network.signalStrength) || 0) * 100)
 }
 
-function sortWifiRows(rows) {
-  var networks = Array.isArray(rows) ? rows.slice() : []
-  networks.sort(function(a, b) {
-    if (a.connected !== b.connected) return a.connected ? -1 : 1
-    if (a.known !== b.known) return a.known ? -1 : 1
-    if (a.signal !== b.signal) return b.signal - a.signal
-    return a.ssid.localeCompare(b.ssid)
+function sortWifiNetworks(networks) {
+  return networks.slice().sort(function(a, b) {
+    if (!!a.connected !== !!b.connected) return a.connected ? -1 : 1
+    if (!!a.known !== !!b.known) return a.known ? -1 : 1
+    var strength = wifiSignal(b) - wifiSignal(a)
+    return strength !== 0 ? strength : String(a.name).localeCompare(String(b.name))
   })
-  return networks
+}
+
+// Rows hold live networks and keep their position while the panel is open: reordering
+// recreates the delegates, dropping clicks, focus and the scroll position mid-interaction.
+// New networks land at the end; the sort runs again when the panel reopens.
+function orderWifiNetworks(previous, networks) {
+  var live = []
+  for (var i = 0; i < (networks || []).length; i++) {
+    if (networks[i] && networks[i].name) live.push(networks[i])
+  }
+  var ordered = []
+  for (var p = 0; p < (previous || []).length; p++) {
+    for (var l = 0; l < live.length; l++) {
+      if (live[l].name === previous[p].name) {
+        ordered.push(live.splice(l, 1)[0])
+        break
+      }
+    }
+  }
+  return ordered.concat(sortWifiNetworks(live))
+}
+
+function sameWifiNetworks(a, b) {
+  if (!a || !b || a.length !== b.length) return false
+  for (var i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false
+  }
+  return true
 }
 
 function requiresCredentials(security, openSecurity, oweSecurity) {
@@ -288,7 +306,7 @@ function deviceDetail(device, addresses, types, states) {
 
 function wifiStatus(network, actionSsid, actionKind) {
   if (!network) return ""
-  if (actionSsid === network.ssid) {
+  if (actionSsid === network.name) {
     if (actionKind === "connect") return "Connecting…"
     if (actionKind === "disconnect") return "Disconnecting…"
     if (actionKind === "forget") return "Forgetting…"
@@ -297,7 +315,7 @@ function wifiStatus(network, actionSsid, actionKind) {
 }
 
 function wifiAction(network, actionSsid, openSecurity, oweSecurity) {
-  if (!network || actionSsid === network.ssid) return ""
+  if (!network || actionSsid === network.name) return ""
   if (network.connected) return "Disconnect"
   return requiresCredentials(network.security, openSecurity, oweSecurity) && !network.known
     ? "Join"
