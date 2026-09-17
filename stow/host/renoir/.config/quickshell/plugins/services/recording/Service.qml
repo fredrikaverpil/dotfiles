@@ -184,6 +184,7 @@ Item {
       try {
         const saved = JSON.parse(String(text() || ""))
         root.monitor = saved.monitor || ""
+        // The round trip validates: anything but four numbers parses back to null.
         root.region = Model.parseRegion(saved.region ? Model.formatRegion(saved.region) : "")
         root.camera = saved.camera || ""
         root.cameraFraction = Model.pick(Model.cameraFractions, saved.cameraFraction, Model.cameraFraction)
