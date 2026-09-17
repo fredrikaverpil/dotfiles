@@ -364,6 +364,7 @@ ShellRoot {
 
   RecordingService.Service {
     id: recordingService
+    barHeight: root.barHeight
   }
 
   Recording.Panel {

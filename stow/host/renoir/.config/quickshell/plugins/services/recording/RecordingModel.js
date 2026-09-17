@@ -6,8 +6,8 @@ function captureSource(monitor, region) {
 
 // A square centre crop, under the app id of the niri window rule that rounds it.
 // mpv asks for device pixels, so size is the logical size times the screen scale.
-function cameraCommand(camera, scale) {
-  var size = Math.round(cameraSize * (scale || 1))
+function cameraCommand(camera, scale, region) {
+  var size = Math.round(cameraSize(region) * (scale || 1))
   return ["mpv", "--wayland-app-id=" + cameraAppId, "--profile=low-latency", "--no-audio", "--no-osc",
     "--no-input-default-bindings", "--really-quiet", "--vf=crop=ih:ih", "--autofit=" + size + "x" + size,
     // Without this the v4l2 demuxer picks raw yuyv, which the camera only
@@ -16,8 +16,34 @@ function cameraCommand(camera, scale) {
     "av://v4l2:" + camera]
 }
 
-// The circle's diameter in logical pixels.
-var cameraSize = 320
+// The circle's diameter on a whole monitor, in logical pixels.
+var cameraFullSize = 320
+
+// Its margin to the bottom-right corner it sits in, shrunk for a region too
+// small to hold both the circle and the full margin.
+var cameraMargin = 32
+
+// A quarter of a region's short side, so the circle stays an accent rather
+// than filling a small region; a whole monitor keeps the full size.
+function cameraSize(region) {
+  return region ? Math.min(cameraFullSize, Math.round(cameraShort(region) * 0.25)) : cameraFullSize
+}
+
+function cameraShort(region) { return Math.min(region.width, region.height) }
+
+function cameraInset(region) { return Math.min(cameraMargin, Math.round(cameraShort(region) * 0.1)) }
+
+// The circle's top-left for the bottom-right corner of region, in the
+// coordinates niri's move-floating-window takes: relative to the output's
+// working area, which the bar shortens at the top. Negative values would read
+// as relative moves, so they are clamped away.
+function cameraPosition(region, screen, barHeight) {
+  var offset = cameraSize(region) + cameraInset(region)
+  return {
+    x: Math.max(0, Math.round(region.x - screen.x + region.width - offset)),
+    y: Math.max(0, Math.round(region.y - screen.y - barHeight + region.height - offset)),
+  }
+}
 
 // The app id the niri window rule rounds and places.
 var cameraAppId = "kaizen-camera"
