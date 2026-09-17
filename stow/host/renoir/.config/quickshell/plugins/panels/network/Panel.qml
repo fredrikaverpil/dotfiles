@@ -406,6 +406,8 @@ Ui.Panel {
       width: parent.width
       height: visible ? 38 : 0
       visible: root.service.passwordSsid === row.network.name
+      // Focus scrolls the field into view; it can open below the fold.
+      onVisibleChanged: if (visible) passphrase.forceActiveFocus()
       radius: 4
       color: root.shell.palette.sel
 
