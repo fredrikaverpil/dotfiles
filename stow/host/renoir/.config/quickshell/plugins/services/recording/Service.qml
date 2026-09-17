@@ -104,9 +104,9 @@ Item {
   // The sleep lets the selection overlay leave the output before grim copies it.
   function grab(rect) {
     Quickshell.execDetached(["sh", "-c",
-      'sleep 0.2; dir="$HOME/Pictures/Screenshots"; mkdir -p "$dir" || exit 1; '
+      'sleep 0.2; dir="$HOME/Pictures/Screenshots"; '
       + 'file="$dir/Screenshot from $(date "+%Y-%m-%d %H-%M-%S").png"; '
-      + 'grim -g "$1" "$file" && wl-copy --type image/png < "$file" '
+      + 'mkdir -p "$dir" && grim -g "$1" "$file" && wl-copy --type image/png < "$file" '
       + '&& notify-send -a Screenshot "Screenshot saved" "$file" '
       + '|| notify-send -a Screenshot -u critical "Screenshot failed" "$1"',
       "sh", Model.formatGrimRegion(rect)])
