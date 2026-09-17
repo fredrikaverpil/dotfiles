@@ -87,6 +87,8 @@ Ui.Panel {
     // Stops or cancels while busy, so one key both opens the panel and ends the recording.
     function toggle(): void { root.service.busy ? root.service.stop() : root.toggle() }
     function start(): void { root.service.start() }
+    // Selects a region and saves a screenshot of it.
+    function screenshot(): void { root.service.screenshot() }
     function stop(): void { root.service.stop() }
     function pause(): void { root.service.togglePause() }
     // Records WxH+X+Y (logical, global) at once, silently; returns the file or "".

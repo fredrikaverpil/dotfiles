@@ -108,7 +108,8 @@ Scope {
           font.family: Ui.Fonts.mono
           font.pixelSize: 13
           text: Math.round(window.rw) + "×" + Math.round(window.rh)
-            + "  hjkl move · HJKL size · Ctrl fine · Tab monitor · Enter record · Esc cancel"
+            + "  hjkl move · HJKL size · Ctrl fine · Tab monitor · Enter "
+            + (root.service.selectMode === "shot" ? "capture" : "record") + " · Esc cancel"
         }
       }
 

@@ -203,6 +203,8 @@ ShellRoot {
       action: () => Quickshell.execDetached(Ui.Compositor.screenshot("screen")) },
     "trigger.screenshotWindow": { icon: "", label: "Screenshot (window)",
       action: () => Quickshell.execDetached(Ui.Compositor.screenshot("window")) },
+    "trigger.screenshotRegion": { icon: "", label: "Screenshot (region)",
+      action: () => recordingService.screenshot() },
     "trigger.record": { icon: "󰑊", label: "Record screen", action: () => recording.open() },
     "trigger.emoji": { icon: "", label: "Emoji", provider: "emoji" },
     "trigger.color": { icon: "󰃉", label: "Color picker",

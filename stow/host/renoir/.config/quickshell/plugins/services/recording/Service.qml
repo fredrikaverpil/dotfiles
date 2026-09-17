@@ -35,6 +35,8 @@ Item {
     mic, "default_input")
 
   property bool selecting: false
+  // What the selected region feeds: "record" the recorder, "shot" grim.
+  property string selectMode: "record"
   // The region being counted down or recorded, kept visible by the selector.
   property var shownRegion: null
   property int countdown: 0
@@ -50,15 +52,38 @@ Item {
 
   function start() {
     if (busy || selecting || !activeMonitor) return
+    selectMode = "record"
     if (regionMode) selecting = true
     else startCountdown()
+  }
+
+  // Selects a region with the same overlay and grabs it with grim.
+  function screenshot() {
+    if (busy || selecting) return
+    selectMode = "shot"
+    selecting = true
   }
 
   function confirmRegion(rect) {
     selecting = false
     region = rect
+    if (selectMode === "shot") {
+      grab(rect)
+      return
+    }
     shownRegion = rect
     startCountdown()
+  }
+
+  // The sleep lets the selection overlay leave the output before grim copies it.
+  function grab(rect) {
+    Quickshell.execDetached(["sh", "-c",
+      'sleep 0.2; dir="$HOME/Pictures/Screenshots"; mkdir -p "$dir" || exit 1; '
+      + 'file="$dir/Screenshot from $(date "+%Y-%m-%d %H-%M-%S").png"; '
+      + 'grim -g "$1" "$file" && wl-copy --type image/png < "$file" '
+      + '&& notify-send -a Screenshot "Screenshot saved" "$file" '
+      + '|| notify-send -a Screenshot -u critical "Screenshot failed" "$1"',
+      "sh", Model.formatGrimRegion(rect)])
   }
 
   function startCountdown() {
