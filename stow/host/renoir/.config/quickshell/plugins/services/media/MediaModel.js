@@ -65,7 +65,9 @@ function activePlayer(players, preferredKey) {
   var list = sourcePlayers(players)
   var preferred = list.find(function(player) { return playerKey(player) === preferredKey })
 
-  if (preferred && preferred.isPlaying) return preferred
+  // An explicit selection wins even while paused, until it goes away or turns into a
+  // bare shell with neither track nor controls (a browser tab that stopped holding media).
+  if (preferred && (hasTrackMetadata(preferred) || playerCanControl(preferred))) return preferred
 
   var playing = list.find(function(player) { return player.isPlaying && !isProxyPlayer(player) })
   if (playing) return playing
