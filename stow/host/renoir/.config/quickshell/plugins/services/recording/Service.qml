@@ -55,6 +55,9 @@ Item {
   // rounds a fractional scale up.
   property real cameraScale: 1
 
+  // The bar's exclusive zone: niri's floating coordinates start below it.
+  required property int barHeight
+
   function refreshCameras() { if (!busy) cameraList.running = true }
 
   function start() {
@@ -215,6 +218,20 @@ Item {
   // see Compositor.pinWindow.
   property var cameraWindow: ({ id: 0, requested: 0, spaces: ({}) })
 
+  // The window already placed, so each new circle is moved once.
+  property int placedWindow: 0
+
+  // The niri rule puts the circle in the output's bottom-right, which a region
+  // rarely reaches, so a region's circle is moved into its own corner instead.
+  function placeCamera() {
+    if (!regionMode || !region || !cameraWindow.id || cameraWindow.id === placedWindow) return
+    const screen = Model.screenAt(screens, region)
+    if (!screen) return
+    placedWindow = cameraWindow.id
+    const at = Model.cameraPosition(region, screen, barHeight)
+    Quickshell.execDetached(Ui.Compositor.moveFloatingWindow(cameraWindow.id, at.x, at.y))
+  }
+
   Process {
     id: cameraShape
     running: cameraPreview.running
@@ -223,6 +240,7 @@ Item {
       onRead: function (line) {
         root.cameraWindow = Ui.Compositor.pinWindow(line, Model.cameraAppId, root.cameraWindow)
         if (root.cameraWindow.command) Quickshell.execDetached(root.cameraWindow.command)
+        root.placeCamera()
       }
     }
   }
@@ -231,7 +249,7 @@ Item {
   Process {
     id: cameraPreview
     running: root.busy && !root.quiet && root.activeCamera !== ""
-    command: Model.cameraCommand(root.activeCamera, root.cameraScale)
+    command: Model.cameraCommand(root.activeCamera, root.cameraScale, root.regionMode ? root.region : null)
   }
 
   Process {
