@@ -31,14 +31,18 @@ Item {
     ? Pipewire.nodes.values.filter(node => node && node.audio && !node.isSink && !node.isStream)
     : []
 
-  readonly property string activeMonitor: Model.pick(monitors.concat(["region"]), monitor, monitors[0] || "")
+  // The choices each saved value falls back over, and the ones the panel offers.
+  readonly property var monitorOptions: monitors.concat(["region"])
+  readonly property var cameraOptions: [""].concat(cameras.map(entry => entry.path))
+  readonly property var micOptions: ["", "default_input"].concat(mics.map(node => node.name))
+
+  readonly property string activeMonitor: Model.pick(monitorOptions, monitor, monitors[0] || "")
   readonly property bool regionMode: activeMonitor === "region"
-  readonly property string activeCamera: Model.pick(cameras.map(entry => entry.path), camera, "")
+  readonly property string activeCamera: Model.pick(cameraOptions, camera, "")
   // What the circle is sized against: the region, or the whole output.
   readonly property var cameraFrame: regionMode ? region
     : screens.filter(screen => screen.name === activeMonitor)[0] || null
-  readonly property string activeMic: Model.pick(["", "default_input"].concat(mics.map(node => node.name)),
-    mic, "default_input")
+  readonly property string activeMic: Model.pick(micOptions, mic, "default_input")
 
   property bool selecting: false
   // What the selected region feeds: "record" the recorder, "shot" grim.
