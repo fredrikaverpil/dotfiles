@@ -44,6 +44,12 @@ function focusedMonitor(raw) {
 
 function events() { return ["niri", "msg", "-j", "event-stream"] }
 
+// Absolute x and y, in the output's working area. `--x=` keeps a leading minus
+// from being read as a flag; a bare negative number would mean a relative move.
+function moveFloatingWindow(id, x, y) {
+  return ["niri", "msg", "action", "move-floating-window", "--id", String(id), "--x=" + x, "--y=" + y]
+}
+
 // niri has neither an aspect-ratio rule nor sticky windows (FAQ, issue 932),
 // so the window of appId is kept square and moved to each workspace that gains
 // focus. state is {id, requested, spaces}: the requested height is remembered

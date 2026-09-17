@@ -71,6 +71,11 @@ previous states. Explain a declaration next to it, not here.
   size it is given, so while the preview is up the service follows the event
   stream: it sets the window's height back to its width and moves it to each
   workspace that gains focus.
+  The window rule's corner is the output's, which a region rarely reaches, so a
+  region's circle is sized from the region and moved into the region's own
+  bottom-right. `move-floating-window` takes coordinates in the output's
+  working area, which the bar shortens at the top, and reads a bare negative
+  number as a relative move.
 - Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Niri KDL booleans are presence-only, not `option true`.
 - Every surface must be usable from the keyboard. Use `keyNavigation` for
