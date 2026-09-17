@@ -42,6 +42,43 @@ function focusedMonitor(raw) {
   }
 }
 
+function events() { return ["niri", "msg", "-j", "event-stream"] }
+
+// niri cannot lock a window's aspect ratio, so a window of appId that ends up
+// oblong gets its height set back to its width. state is {id, requested}; the
+// requested height is remembered so a height niri will not grant is asked for
+// once instead of on every event it provokes.
+function keepSquare(raw, appId, state) {
+  var event
+  try { event = JSON.parse(String(raw || "")) } catch (error) { return state }
+  if (event.WindowsChanged) {
+    var match = (event.WindowsChanged.windows || []).filter(function(window) {
+      return window && window.app_id === appId
+    })[0]
+    return { id: match ? match.id : 0, requested: 0 }
+  }
+  if (event.WindowOpenedOrChanged) {
+    var opened = event.WindowOpenedOrChanged.window
+    return opened && opened.app_id === appId ? { id: opened.id, requested: 0 } : state
+  }
+  if (event.WindowClosed) {
+    return event.WindowClosed.id === state.id ? { id: 0, requested: 0 } : state
+  }
+  if (!event.WindowLayoutsChanged || !state.id) return state
+  var changes = event.WindowLayoutsChanged.changes || []
+  for (var i = 0; i < changes.length; i++) {
+    if (changes[i][0] !== state.id) continue
+    var size = (changes[i][1] || {}).window_size || []
+    if (size[0] === size[1] || size[0] === state.requested) return state
+    return {
+      id: state.id,
+      requested: size[0],
+      command: ["niri", "msg", "action", "set-window-height", "--id", String(state.id), String(size[0])],
+    }
+  }
+  return state
+}
+
 function themeEdits(palette) {
   return ["-e", "s|^( *inactive-color ).*|\\1\"" + palette.dim + "\"|"]
 }

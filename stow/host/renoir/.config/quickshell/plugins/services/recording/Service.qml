@@ -211,6 +211,22 @@ Item {
     }
   }
 
+  // niri has no aspect-ratio rule, so a one-sided resize is squared again and
+  // the circle survives it. State is {id, requested}; see Compositor.keepSquare.
+  property var cameraWindow: ({ id: 0, requested: 0 })
+
+  Process {
+    id: cameraShape
+    running: cameraPreview.running
+    command: Ui.Compositor.events()
+    stdout: SplitParser {
+      onRead: function (line) {
+        root.cameraWindow = Ui.Compositor.keepSquare(line, Model.cameraAppId, root.cameraWindow)
+        if (root.cameraWindow.command) Quickshell.execDetached(root.cameraWindow.command)
+      }
+    }
+  }
+
   // Visible from the countdown on, so it is warm and framed before recording.
   Process {
     id: cameraPreview
