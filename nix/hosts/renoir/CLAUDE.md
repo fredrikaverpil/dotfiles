@@ -67,6 +67,9 @@ previous states. Explain a declaration next to it, not here.
   ordinary screen content. It must therefore sit inside a recorded region, and
   mpv sizes in device pixels, which is why the service asks niri for the
   focused output's scale instead of using Qt's rounded `devicePixelRatio`.
+  niri has no aspect-ratio rule and mpv accepts any size it is given, so the
+  service watches the event stream while the preview is up and sets the
+  window's height back to its width.
 - Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Niri KDL booleans are presence-only, not `option true`.
 - Every surface must be usable from the keyboard. Use `keyNavigation` for

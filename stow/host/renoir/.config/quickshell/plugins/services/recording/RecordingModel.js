@@ -8,7 +8,7 @@ function captureSource(monitor, region) {
 // mpv asks for device pixels, so size is the logical size times the screen scale.
 function cameraCommand(camera, scale) {
   var size = Math.round(cameraSize * (scale || 1))
-  return ["mpv", "--wayland-app-id=kaizen-camera", "--profile=low-latency", "--no-audio", "--no-osc",
+  return ["mpv", "--wayland-app-id=" + cameraAppId, "--profile=low-latency", "--no-audio", "--no-osc",
     "--no-input-default-bindings", "--really-quiet", "--vf=crop=ih:ih", "--autofit=" + size + "x" + size,
     // Without this the v4l2 demuxer picks raw yuyv, which the camera only
     // delivers at 5 fps.
@@ -18,6 +18,9 @@ function cameraCommand(camera, scale) {
 
 // The circle's diameter in logical pixels.
 var cameraSize = 320
+
+// The app id the niri window rule rounds and places.
+var cameraAppId = "kaizen-camera"
 
 // One merged track: most players only play the first of several.
 function audioSource(mic, desktop) {
