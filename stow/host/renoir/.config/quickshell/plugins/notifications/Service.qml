@@ -315,14 +315,14 @@ Item {
       }
 
       HeaderButton {
-        label: "Do Not Disturb"
-        active: root.doNotDisturb
-        onActivated: root.setDoNotDisturb(!root.doNotDisturb)
+        label: "Clear"
+        onActivated: root.clearHistory()
       }
 
       HeaderButton {
-        label: "Clear"
-        onActivated: root.clearHistory()
+        label: "Do Not Disturb"
+        active: root.doNotDisturb
+        onActivated: root.setDoNotDisturb(!root.doNotDisturb)
       }
     }
 
