@@ -147,16 +147,18 @@ Scope {
         focus: true
         Keys.onPressed: function (event) {
           const step = event.modifiers & Qt.ControlModifier ? 1 : 20
+          // Shift+arrow sizes, like HJKL; Shift+hjkl arrives as HJKL and never reaches here.
+          const nudge = (dx, dy) => event.modifiers & Qt.ShiftModifier ? root.resize(dx, dy) : root.move(dx, dy)
           if (event.key === Qt.Key_Escape) root.service.cancel()
           else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) root.service.confirmRegion(root.rect)
           else if (event.key === Qt.Key_Tab) {
             root.rect = Model.nextScreenRegion(root.rect, root.service.screens)
             Quickshell.execDetached(Ui.Compositor.focusMonitor(root.screen.name))
           }
-          else if (event.text === "h" || event.key === Qt.Key_Left) root.move(-step, 0)
-          else if (event.text === "l" || event.key === Qt.Key_Right) root.move(step, 0)
-          else if (event.text === "k" || event.key === Qt.Key_Up) root.move(0, -step)
-          else if (event.text === "j" || event.key === Qt.Key_Down) root.move(0, step)
+          else if (event.text === "h" || event.key === Qt.Key_Left) nudge(-step, 0)
+          else if (event.text === "l" || event.key === Qt.Key_Right) nudge(step, 0)
+          else if (event.text === "k" || event.key === Qt.Key_Up) nudge(0, -step)
+          else if (event.text === "j" || event.key === Qt.Key_Down) nudge(0, step)
           else if (event.text === "H") root.resize(-step, 0)
           else if (event.text === "L") root.resize(step, 0)
           else if (event.text === "K") root.resize(0, -step)
