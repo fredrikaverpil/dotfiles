@@ -41,11 +41,13 @@ TestCase {
     verify(command.indexOf("--autofit=480x480") > 0)
     verify(command.indexOf("--demuxer-lavf-o=input_format=mjpeg,framerate=30,video_size=1280x720") > 0)
     verify(Recording.cameraCommand("/dev/video2").indexOf("--autofit=320x320") > 0)
-    // A quarter of the region's short side, and never more than a monitor's circle.
-    verify(Recording.cameraCommand("/dev/video0", 1, { x: 0, y: 0, width: 800, height: 480 })
+    // A share of the captured frame's short side, whatever that frame is.
+    verify(Recording.cameraCommand("/dev/video0", 1, { width: 800, height: 480 })
       .indexOf("--autofit=120x120") > 0)
-    verify(Recording.cameraCommand("/dev/video0", 1, { x: 0, y: 0, width: 3840, height: 2160 })
-      .indexOf("--autofit=320x320") > 0)
+    verify(Recording.cameraCommand("/dev/video0", 1, { width: 2560, height: 1440 })
+      .indexOf("--autofit=360x360") > 0)
+    verify(Recording.cameraCommand("/dev/video0", 1, { width: 2560, height: 1440 }, 0.15)
+      .indexOf("--autofit=216x216") > 0)
   }
 
   function test_camera_position_data() {
@@ -76,7 +78,17 @@ TestCase {
 
   function test_camera_position(data) {
     const screen = Recording.screenAt(screens, data.region)
-    compare(Recording.cameraPosition(data.region, screen, 32), data.want)
+    compare(Recording.cameraPosition(data.region, screen, 32, data.fraction), data.want)
+  }
+
+  // A larger share leaves the same margin and starts further up and left.
+  function test_camera_position_follows_the_size() {
+    const region = { x: 0, y: 200, width: 800, height: 800 }
+    const screen = Recording.screenAt(screens, region)
+    compare(Recording.cameraPosition(region, screen, 32, 0.15),
+      { x: 800 - 120 - 32, y: 200 - 32 + 800 - 120 - 32 })
+    compare(Recording.cameraPosition(region, screen, 32, 0.35),
+      { x: 800 - 280 - 32, y: 200 - 32 + 800 - 280 - 32 })
   }
 
   function test_command(data) {
