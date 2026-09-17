@@ -61,6 +61,12 @@ previous states. Explain a declaration next to it, not here.
   It is a home-device feature and is deliberately not promoted to the work
   host: a curtain that anyone at the keyboard can work around is the wrong
   posture for a work machine, which wants the lock.
+- The recording camera is a circle because gpu-screen-recorder cannot mask its
+  own camera overlay: the service runs mpv under the `kaizen-camera` app id and
+  a niri window rule rounds and places it, so the screen capture records it as
+  ordinary screen content. It must therefore sit inside a recorded region, and
+  mpv sizes in device pixels, which is why the service asks niri for the
+  focused output's scale instead of using Qt's rounded `devicePixelRatio`.
 - Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Niri KDL booleans are presence-only, not `option true`.
 - Every surface must be usable from the keyboard. Use `keyNavigation` for

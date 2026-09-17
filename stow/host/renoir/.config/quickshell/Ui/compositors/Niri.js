@@ -38,6 +38,7 @@ function focusedMonitor(raw) {
     name: output.name,
     width: mode.width,
     height: mode.height,
+    scale: output.logical.scale || 1,
   }
 }
 
