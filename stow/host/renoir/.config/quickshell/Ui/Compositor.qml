@@ -17,7 +17,7 @@ Singleton {
   function outputs() { return Niri.outputs() }
   function focusedMonitor(raw) { return Niri.focusedMonitor(raw) }
   function events() { return Niri.events() }
-  function keepSquare(raw, appId, state) { return Niri.keepSquare(raw, appId, state) }
+  function pinWindow(raw, appId, state) { return Niri.pinWindow(raw, appId, state) }
   function themeEdits(palette) { return Niri.themeEdits(palette) }
   function layoutQuery() { return Niri.layoutQuery() }
   function currentLayout(raw) { return Niri.currentLayout(raw) }

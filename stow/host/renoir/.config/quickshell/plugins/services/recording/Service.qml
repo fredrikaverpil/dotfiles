@@ -211,9 +211,9 @@ Item {
     }
   }
 
-  // niri has no aspect-ratio rule, so a one-sided resize is squared again and
-  // the circle survives it. State is {id, requested}; see Compositor.keepSquare.
-  property var cameraWindow: ({ id: 0, requested: 0 })
+  // The circle stays round through a resize and follows the focused workspace;
+  // see Compositor.pinWindow.
+  property var cameraWindow: ({ id: 0, requested: 0, spaces: ({}) })
 
   Process {
     id: cameraShape
@@ -221,7 +221,7 @@ Item {
     command: Ui.Compositor.events()
     stdout: SplitParser {
       onRead: function (line) {
-        root.cameraWindow = Ui.Compositor.keepSquare(line, Model.cameraAppId, root.cameraWindow)
+        root.cameraWindow = Ui.Compositor.pinWindow(line, Model.cameraAppId, root.cameraWindow)
         if (root.cameraWindow.command) Quickshell.execDetached(root.cameraWindow.command)
       }
     }
