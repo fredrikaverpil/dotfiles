@@ -3,6 +3,8 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pipewire
 
+import "../../../Ui" as Ui
+
 import "RecordingModel.js" as Model
 
 Item {
@@ -48,6 +50,11 @@ Item {
   readonly property bool recording: recorder.running
   readonly property bool busy: recording || countdown > 0
 
+  // The circle opens on the focused output; niri's scale converts its logical
+  // size to the device pixels mpv asks for. Qt's devicePixelRatio cannot: it
+  // rounds a fractional scale up.
+  property real cameraScale: 1
+
   function refreshCameras() { if (!busy) cameraList.running = true }
 
   function start() {
@@ -87,6 +94,8 @@ Item {
   }
 
   function startCountdown() {
+    quiet = false
+    if (activeCamera) outputState.running = true
     countdown = 3
     countdownTimer.restart()
   }
@@ -188,6 +197,25 @@ Item {
     stdout: StdioCollector {
       onStreamFinished: root.cameras = Model.parseCameras(text)
     }
+  }
+
+  Process {
+    id: outputState
+    command: Ui.Compositor.outputs()
+    stdout: StdioCollector {
+      waitForEnd: true
+      onStreamFinished: {
+        const monitor = Ui.Compositor.focusedMonitor(text)
+        root.cameraScale = monitor ? monitor.scale : 1
+      }
+    }
+  }
+
+  // Visible from the countdown on, so it is warm and framed before recording.
+  Process {
+    id: cameraPreview
+    running: root.busy && !root.quiet && root.activeCamera !== ""
+    command: Model.cameraCommand(root.activeCamera, root.cameraScale)
   }
 
   Process {

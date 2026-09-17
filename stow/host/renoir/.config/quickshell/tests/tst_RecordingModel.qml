@@ -15,15 +15,14 @@ TestCase {
       {
         tag: "camera and merged audio",
         options: { monitor: "eDP-1", camera: "/dev/video2", mic: "default_input", desktop: true },
-        want: ["gpu-screen-recorder", "-w",
-          "monitor:eDP-1|v4l2:/dev/video2;halign=end;valign=end;width=20%", "-f", "30",
+        want: ["gpu-screen-recorder", "-w", "eDP-1", "-f", "30",
           "-a", "default_output|default_input", "-ac", "aac", "-o", "/v/a.mp4"],
       },
       {
         tag: "region with camera",
         options: { region: { x: 100, y: 50.4, width: 800, height: 600 }, camera: "/dev/video0", mic: "",
           desktop: false },
-        want: ["gpu-screen-recorder", "-w", "region|v4l2:/dev/video0;halign=end;valign=end;width=20%",
+        want: ["gpu-screen-recorder", "-w", "region",
           "-region", "800x600+100+50", "-f", "30", "-o", "/v/a.mp4"],
       },
       {
@@ -33,6 +32,15 @@ TestCase {
           "-a", "alsa_input.usb", "-ac", "aac", "-o", "/v/a.mp4"],
       },
     ]
+  }
+
+  function test_camera_command() {
+    const command = Recording.cameraCommand("/dev/video2", 1.5)
+    verify(command.indexOf("av://v4l2:/dev/video2") > 0)
+    verify(command.indexOf("--wayland-app-id=kaizen-camera") > 0)
+    verify(command.indexOf("--autofit=480x480") > 0)
+    verify(command.indexOf("--demuxer-lavf-o=input_format=mjpeg,framerate=30,video_size=1280x720") > 0)
+    verify(Recording.cameraCommand("/dev/video2").indexOf("--autofit=320x320") > 0)
   }
 
   function test_command(data) {
