@@ -140,6 +140,8 @@ binds {
     Print repeat=false hotkey-overlay-title="Screenshot a selection" { screenshot; }
     Ctrl+Print repeat=false hotkey-overlay-title="Screenshot the screen" { screenshot-screen; }
     Alt+Print repeat=false hotkey-overlay-title="Screenshot the window" { screenshot-window; }
+    // The shell's keyboard-first region selector; niri's own is pointer-driven.
+    Shift+Print repeat=false hotkey-overlay-title="Screenshot a region" { spawn "qs" "ipc" "call" "recording" "screenshot"; }
     // Opens the recording panel, or stops a running recording.
     Mod+Print repeat=false hotkey-overlay-title="Record the screen" { spawn "qs" "ipc" "call" "recording" "toggle"; }
     Mod+Shift+Print repeat=false hotkey-overlay-title="Pause or resume the recording" { spawn "qs" "ipc" "call" "recording" "pause"; }
