@@ -34,16 +34,15 @@ input {
 
 layout {
     gaps 8
-    // The shell rewrites the `inactive-color` line on every theme change to
-    // the panel border colour, which is why it is alone on its line and
-    // appears exactly once.
     focus-ring {
         off
     }
+    // Only the focused window is outlined; a transparent inactive border keeps
+    // the layout identical and needs no colour per light/dark theme.
     border {
         width 2
         active-color "#6099C0"
-        inactive-color "#CFC1BA"
+        inactive-color "transparent"
     }
 }
 
