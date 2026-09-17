@@ -44,6 +44,8 @@
   networking.networkmanager.enable = true;
   networking.firewall.allowedTCPPorts = [ 22 ];
 
+  services.tailscale.enable = true;
+
   # CUPS on loopback only; Avahi discovers driverless (IPP Everywhere) printers.
   services.printing.enable = true;
   services.avahi = {
