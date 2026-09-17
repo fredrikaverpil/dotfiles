@@ -117,6 +117,7 @@ TestCase {
   }
 
   function test_file_name() {
+    verify(Recording.formatGrimRegion({ x: 10.4, y: 20.6, width: 300.5, height: 200 }) === "10,21 301x200")
     verify(Recording.fileName(new Date(2026, 8, 2, 7, 5, 9)) === "recording-2026-09-02_07-05-09.mp4")
   }
 

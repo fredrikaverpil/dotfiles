@@ -28,6 +28,12 @@ function formatRegion(rect) {
   return Math.round(rect.width) + "x" + Math.round(rect.height) + "+" + Math.round(rect.x) + "+" + Math.round(rect.y)
 }
 
+// grim takes logical, global coordinates as "X,Y WxH".
+function formatGrimRegion(rect) {
+  return Math.round(rect.x) + "," + Math.round(rect.y) + " "
+    + Math.round(rect.width) + "x" + Math.round(rect.height)
+}
+
 // 0x0 is valid: gsr then records the whole monitor containing the position.
 function parseRegion(text) {
   var match = /^(\d+)x(\d+)\+(-?\d+)\+(-?\d+)$/.exec(String(text || "").trim())
