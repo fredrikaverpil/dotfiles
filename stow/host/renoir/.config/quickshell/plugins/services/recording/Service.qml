@@ -18,6 +18,7 @@ Item {
   property string monitor: ""
   property var region: null
   property string camera: ""
+  property real cameraFraction: Model.cameraFraction
   property string mic: "default_input"
   property bool desktop: true
   property bool stateLoaded: false
@@ -33,6 +34,9 @@ Item {
   readonly property string activeMonitor: Model.pick(monitors.concat(["region"]), monitor, monitors[0] || "")
   readonly property bool regionMode: activeMonitor === "region"
   readonly property string activeCamera: Model.pick(cameras.map(entry => entry.path), camera, "")
+  // What the circle is sized against: the region, or the whole output.
+  readonly property var cameraFrame: regionMode ? region
+    : screens.filter(screen => screen.name === activeMonitor)[0] || null
   readonly property string activeMic: Model.pick(["", "default_input"].concat(mics.map(node => node.name)),
     mic, "default_input")
 
@@ -141,13 +145,14 @@ Item {
 
   function saveState() {
     if (!stateLoaded) return
-    stateFile.setText(JSON.stringify({ version: 1, monitor: monitor, region: region, camera: camera, mic: mic,
-      desktop: desktop }) + "\n")
+    stateFile.setText(JSON.stringify({ version: 1, monitor: monitor, region: region, camera: camera,
+      cameraFraction: cameraFraction, mic: mic, desktop: desktop }) + "\n")
   }
 
   onMonitorChanged: saveState()
   onRegionChanged: saveState()
   onCameraChanged: saveState()
+  onCameraFractionChanged: saveState()
   onMicChanged: saveState()
   onDesktopChanged: saveState()
 
@@ -164,6 +169,7 @@ Item {
         root.monitor = saved.monitor || ""
         root.region = Model.parseRegion(saved.region ? Model.formatRegion(saved.region) : "")
         root.camera = saved.camera || ""
+        root.cameraFraction = Model.pick(Model.cameraFractions, saved.cameraFraction, Model.cameraFraction)
         root.mic = typeof saved.mic === "string" ? saved.mic : "default_input"
         root.desktop = saved.desktop !== false
       } catch (error) {}
@@ -228,7 +234,7 @@ Item {
     const screen = Model.screenAt(screens, region)
     if (!screen) return
     placedWindow = cameraWindow.id
-    const at = Model.cameraPosition(region, screen, barHeight)
+    const at = Model.cameraPosition(region, screen, barHeight, cameraFraction)
     Quickshell.execDetached(Ui.Compositor.moveFloatingWindow(cameraWindow.id, at.x, at.y))
   }
 
@@ -249,7 +255,7 @@ Item {
   Process {
     id: cameraPreview
     running: root.busy && !root.quiet && root.activeCamera !== ""
-    command: Model.cameraCommand(root.activeCamera, root.cameraScale, root.regionMode ? root.region : null)
+    command: Model.cameraCommand(root.activeCamera, root.cameraScale, root.cameraFrame, root.cameraFraction)
   }
 
   Process {

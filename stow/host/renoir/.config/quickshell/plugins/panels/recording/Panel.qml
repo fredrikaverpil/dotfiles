@@ -26,6 +26,13 @@ Ui.Panel {
       set: value => root.service.camera = value,
     },
     {
+      label: "Camera size",
+      values: Model.cameraFractions,
+      labels: Model.cameraFractions.map(value => Math.round(value * 100) + "%"),
+      value: service.cameraFraction,
+      set: value => root.service.cameraFraction = value,
+    },
+    {
       label: "Microphone",
       values: ["", "default_input"].concat(service.mics.map(node => node.name)),
       labels: ["Off", "Default input"].concat(service.mics.map(node => node.description || node.nickname || node.name)),
@@ -104,6 +111,7 @@ Ui.Panel {
         file: root.service.file,
         monitor: root.service.activeMonitor,
         camera: root.service.activeCamera,
+        cameraFraction: root.service.cameraFraction,
         mic: root.service.activeMic,
         desktop: root.service.desktop,
         monitors: root.service.monitors,
