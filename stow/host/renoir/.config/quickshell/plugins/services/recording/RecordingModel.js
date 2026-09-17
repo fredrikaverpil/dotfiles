@@ -6,8 +6,8 @@ function captureSource(monitor, region) {
 
 // A square centre crop, under the app id of the niri window rule that rounds it.
 // mpv asks for device pixels, so size is the logical size times the screen scale.
-function cameraCommand(camera, scale, region) {
-  var size = Math.round(cameraSize(region) * (scale || 1))
+function cameraCommand(camera, scale, frame, fraction) {
+  var size = Math.round(cameraSize(frame, fraction) * (scale || 1))
   return ["mpv", "--wayland-app-id=" + cameraAppId, "--profile=low-latency", "--no-audio", "--no-osc",
     "--no-input-default-bindings", "--really-quiet", "--vf=crop=ih:ih", "--autofit=" + size + "x" + size,
     // Without this the v4l2 demuxer picks raw yuyv, which the camera only
@@ -16,29 +16,31 @@ function cameraCommand(camera, scale, region) {
     "av://v4l2:" + camera]
 }
 
-// The circle's diameter on a whole monitor, in logical pixels.
-var cameraFullSize = 320
+// The offered shares of the captured frame's short side, and the default.
+var cameraFractions = [0.15, 0.2, 0.25, 0.3, 0.35]
+var cameraFraction = 0.25
 
-// Its margin to the bottom-right corner it sits in, shrunk for a region too
-// small to hold both the circle and the full margin.
+// The circle's margin to the bottom-right corner it sits in, shrunk for a
+// frame too small to hold both the circle and the full margin.
 var cameraMargin = 32
 
-// A quarter of a region's short side, so the circle stays an accent rather
-// than filling a small region; a whole monitor keeps the full size.
-function cameraSize(region) {
-  return region ? Math.min(cameraFullSize, Math.round(cameraShort(region) * 0.25)) : cameraFullSize
+// Sizing the circle off the captured frame keeps it the same share of the
+// recording, whether that is a region or an output of any resolution. The
+// diameter is logical; 320 only stands in for a frame that is not known yet.
+function cameraSize(frame, fraction) {
+  return frame ? Math.round(cameraShort(frame) * (fraction || cameraFraction)) : 320
 }
 
-function cameraShort(region) { return Math.min(region.width, region.height) }
+function cameraShort(frame) { return Math.min(frame.width, frame.height) }
 
-function cameraInset(region) { return Math.min(cameraMargin, Math.round(cameraShort(region) * 0.1)) }
+function cameraInset(frame) { return Math.min(cameraMargin, Math.round(cameraShort(frame) * 0.1)) }
 
 // The circle's top-left for the bottom-right corner of region, in the
 // coordinates niri's move-floating-window takes: relative to the output's
 // working area, which the bar shortens at the top. Negative values would read
 // as relative moves, so they are clamped away.
-function cameraPosition(region, screen, barHeight) {
-  var offset = cameraSize(region) + cameraInset(region)
+function cameraPosition(region, screen, barHeight, fraction) {
+  var offset = cameraSize(region, fraction) + cameraInset(region)
   return {
     x: Math.max(0, Math.round(region.x - screen.x + region.width - offset)),
     y: Math.max(0, Math.round(region.y - screen.y - barHeight + region.height - offset)),
