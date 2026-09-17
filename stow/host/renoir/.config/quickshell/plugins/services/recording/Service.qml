@@ -52,12 +52,20 @@ Item {
   property int seconds: 0
   property string file: ""
   readonly property bool recording: recorder.running
-  readonly property bool busy: recording || countdown > 0
+  // Process.running only turns true on the tick after it is set, so the
+  // recorder is asked for here as well: busy dipping between the countdown and
+  // the recorder would tear the camera preview down and open a second one.
+  property bool launched: false
+  readonly property bool busy: recording || launched || countdown > 0
 
   // The circle opens on the focused output; niri's scale converts its logical
   // size to the device pixels mpv asks for. Qt's devicePixelRatio cannot: it
   // rounds a fractional scale up.
   property real cameraScale: 1
+  // The preview waits for that query: a scale arriving mid-countdown changes
+  // mpv's command, and Quickshell restarts a process whose command changes, so
+  // the circle would vanish and open a second time.
+  property bool cameraScaleKnown: false
 
   // The bar's exclusive zone: niri's floating coordinates start below it.
   required property int barHeight
@@ -102,7 +110,10 @@ Item {
 
   function startCountdown() {
     quiet = false
-    if (activeCamera) outputState.running = true
+    if (activeCamera) {
+      cameraScaleKnown = false
+      outputState.running = true
+    }
     countdown = 3
     countdownTimer.restart()
   }
@@ -135,6 +146,7 @@ Item {
   }
 
   function launch(options, isQuiet) {
+    launched = true
     file = directory + "/" + Model.fileName(new Date())
     quiet = isQuiet
     recorder.command = ["sh", "-c", 'mkdir -p "$0" && exec "$@"', directory].concat(Model.command(options, file))
@@ -183,11 +195,16 @@ Item {
     interval: 1000
     repeat: true
     onTriggered: {
-      root.countdown -= 1
-      if (root.countdown > 0) return
+      if (root.countdown > 1) {
+        root.countdown -= 1
+        return
+      }
       countdownTimer.stop()
+      // Launched while the countdown still reads 1, so busy never dips: see the
+      // launched property.
       root.launch({ monitor: root.activeMonitor, region: root.regionMode ? root.region : null,
         camera: root.activeCamera, mic: root.activeMic, desktop: root.desktop }, false)
+      root.countdown = 0
     }
   }
 
@@ -211,6 +228,8 @@ Item {
   Process {
     id: outputState
     command: Ui.Compositor.outputs()
+    // Also on a failed query, which leaves the scale of the last one.
+    onExited: root.cameraScaleKnown = true
     stdout: StdioCollector {
       waitForEnd: true
       onStreamFinished: {
@@ -254,7 +273,7 @@ Item {
   // Visible from the countdown on, so it is warm and framed before recording.
   Process {
     id: cameraPreview
-    running: root.busy && !root.quiet && root.activeCamera !== ""
+    running: root.busy && !root.quiet && root.activeCamera !== "" && root.cameraScaleKnown
     command: Model.cameraCommand(root.activeCamera, root.cameraScale, root.cameraFrame, root.cameraFraction)
   }
 
@@ -262,6 +281,7 @@ Item {
     id: recorder
     stderr: StdioCollector { id: recorderErrors }
     onExited: function (exitCode) {
+      root.launched = false
       root.paused = false
       root.shownRegion = null
       if (exitCode === 0 && root.quiet) return
