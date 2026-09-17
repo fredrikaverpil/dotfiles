@@ -62,6 +62,12 @@ workspace "3"
 workspace "4"
 workspace "5"
 
+// Quickshell draws two wallpapers: one inside the workspaces, one behind them.
+layer-rule {
+    match namespace=r#"^quickshell-backdrop$"#
+    place-within-backdrop true
+}
+
 // Matches all windows but not layer surfaces, so Quickshell panels keep 1:1
 // scrolling.
 window-rule {
