@@ -34,6 +34,7 @@ input {
 
 layout {
     gaps 8
+    always-center-single-column
     focus-ring {
         off
     }
