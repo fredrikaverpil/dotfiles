@@ -11,6 +11,7 @@
     maple-mono.variable
     # noto-fonts-color-emoji # NOTE: takes a very long time to build
     nerd-fonts.symbols-only
+    noto-fonts
   ];
 
   # Berkeley Mono is licensed, so it is copied into ~/.local/share/fonts by
