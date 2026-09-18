@@ -15,6 +15,8 @@ Item {
 
   function clear() { history = [] }
 
+  function remove(index) { history = Model.removeAt(history, index) }
+
   // Password managers (Proton Pass, 1Password) mark secrets with
   // x-kde-passwordManagerHint; those offers are never read.
   Process {

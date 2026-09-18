@@ -24,6 +24,20 @@ TestCase {
     compare(Model.add(data.history, data.text, 3, data.limit), data.want)
   }
 
+  function test_remove_at_data() {
+    const history = [{ text: "b", at: 2 }, { text: "a", at: 1 }]
+    return [
+      { tag: "newest", history: history, index: 0, want: [{ text: "a", at: 1 }] },
+      { tag: "oldest", history: history, index: 1, want: [{ text: "b", at: 2 }] },
+      { tag: "past the end", history: history, index: 2, want: history },
+      { tag: "negative", history: history, index: -1, want: history },
+    ]
+  }
+
+  function test_remove_at(data) {
+    compare(Model.removeAt(data.history, data.index), data.want)
+  }
+
   function test_preview_data() {
     return [
       { tag: "plain", text: "hello", want: "hello" },
