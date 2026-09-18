@@ -12,6 +12,7 @@ Rectangle {
   property var row: ({})
   property var notification: null
   property bool toast: false
+  property bool selectable: false
   property int duration: 0
   property bool hovered: hoverHandler.hovered
   property real remaining: 1.0
@@ -40,10 +41,17 @@ Rectangle {
   width: 400
   implicitHeight: content.implicitHeight + 24
   radius: 8
-  color: palette.bg
+  color: activeFocus ? palette.sel : palette.bg
   border.color: accent
   border.width: 1
   clip: true
+
+  activeFocusOnTab: selectable
+  Keys.onPressed: function(event) {
+    if (!root.selectable || event.key !== Qt.Key_Backspace) return
+    root.closeRequested()
+    event.accepted = true
+  }
 
   HoverHandler { id: hoverHandler }
 

@@ -1,6 +1,7 @@
 
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Window
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Notifications
@@ -17,7 +18,7 @@ Item {
   property var shell: null
   readonly property var palette: shell ? shell.palette : ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864" }) // qmllint disable property-override
   readonly property string statePath: Quickshell.env("HOME") + "/.local/state/kaizen-notifications.json"
-  readonly property int historyLimit: 10
+  readonly property int historyLimit: 99
   readonly property string soundPath: "/run/current-system/sw/share/sounds/freedesktop/stereo/message.oga"
   readonly property real soundVolume: 0.4
 
@@ -301,6 +302,33 @@ Item {
     cardHeight: 560
     keyNavigation: true
 
+    readonly property var focusedItem: historyList.Window.activeFocusItem
+    // Map to content coordinates: Flickable coordinates are relative to its viewport.
+    onFocusedItemChanged: {
+      const item = focusedItem
+      if (!item || !shown || item.parent !== historyContent) return
+      const top = item.mapToItem(historyContent, 0, 0).y
+      if (!isFinite(top)) return
+      if (top < historyList.contentY) historyList.contentY = Math.max(0, top)
+      else if (top + item.height > historyList.contentY + historyList.height)
+        historyList.contentY = top + item.height - historyList.height
+    }
+
+    // Removing rebuilds every delegate, so the focus has to be placed again by
+    // position: the card that took the removed one's place, or the header.
+    function drop(index) {
+      root.historyRows = Model.withoutIndex(root.historyRows, index)
+      root.saveState()
+      Qt.callLater(function() {
+        if (historyCards.count === 0) {
+          clearButton.forceActiveFocus(Qt.TabFocusReason)
+          return
+        }
+        const card = historyCards.itemAt(Math.min(index, historyCards.count - 1))
+        if (card) card.forceActiveFocus(Qt.TabFocusReason)
+      })
+    }
+
     RowLayout {
       id: historyHeader
       width: parent.width
@@ -315,6 +343,7 @@ Item {
       }
 
       HeaderButton {
+        id: clearButton
         label: "Clear"
         onActivated: root.clearHistory()
       }
@@ -333,38 +362,47 @@ Item {
       color: root.palette.dim
     }
 
-    ListView {
+    // A Flickable over a Column, not a ListView: every card must exist for the
+    // panel's focus chain to reach it, and a virtualized delegate does not.
+    Flickable {
       id: historyList
       width: parent.width
       height: parent.height - historyHeader.height - historySeparator.height - 2 * historyPanel.contentSpacing
+      contentWidth: width
+      contentHeight: historyContent.implicitHeight
       clip: true
-      spacing: 8
-      model: root.historyRows
+      boundsBehavior: Flickable.StopAtBounds
 
-      delegate: NotificationCard {
-        required property var modelData
-        required property int index
-
+      Column {
+        id: historyContent
         width: historyList.width
-        palette: root.palette
-        row: modelData
-        toast: false
-        onCloseRequested: {
-          var rows = root.historyRows.slice()
-          rows.splice(index, 1)
-          root.historyRows = rows
-          root.saveState()
-        }
-        onInvokeRequested: {}
-      }
+        spacing: 8
 
-      Text {
-        anchors.centerIn: parent
-        visible: historyList.count === 0
-        text: "No recent notifications"
-        color: root.palette.off
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 14
+        Repeater {
+          id: historyCards
+          model: root.historyRows
+
+          delegate: NotificationCard {
+            required property var modelData
+            required property int index
+
+            width: historyContent.width
+            palette: root.palette
+            row: modelData
+            toast: false
+            selectable: true
+            onCloseRequested: historyPanel.drop(index)
+            onInvokeRequested: {}
+          }
+        }
+
+        Text {
+          visible: historyCards.count === 0
+          text: "No recent notifications"
+          color: root.palette.off
+          font.family: Ui.Fonts.mono
+          font.pixelSize: 14
+        }
       }
     }
   }
