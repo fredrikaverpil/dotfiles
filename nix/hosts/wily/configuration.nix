@@ -7,7 +7,7 @@
   # Work-only config from the private dotfiles-einride submodule; an
   # uninitialised submodule is an empty directory, so public clones and CI
   # evaluate without it.
-  ++ lib.optional (builtins.pathExists ./private/default.nix) ./private/default.nix;
+  ++ lib.optional (builtins.pathExists ./einride/default.nix) ./einride/default.nix;
 
   system.stateVersion = "26.05";
 

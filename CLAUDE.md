@@ -11,7 +11,7 @@ code in this repository.
   ~/.dotfiles#"$(hostname -s)"` (hosts: `rpi5-homelab`, `renoir`, `wily`).
   On `wily` use `nh os switch` instead: its flake path carries
   `?submodules=1`, which a bare `--flake ~/.dotfiles#wily` lacks, silently
-  dropping the private `nix/hosts/wily/private` submodule
+  dropping the private `nix/hosts/wily/einride` submodule
 - **Symlink dotfiles only** (GNU Stow, no Nix rebuild): `cd ~/.dotfiles`; then
   run `stow --dir=stow --target="$HOME" --restow --no-folding --adopt shared &&
   stow --dir=stow/platform --target="$HOME" --restow --no-folding --adopt
