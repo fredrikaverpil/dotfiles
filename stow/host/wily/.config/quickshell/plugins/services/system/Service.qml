@@ -120,10 +120,11 @@ Item {
     onLoaded: root.temperature = Number(text()) / 1000
   }
 
-  // hwmon numbering changes between boots.
+  // hwmon numbering changes between boots. k10temp is AMD, coretemp Intel;
+  // temp1_input is the package sensor on both.
   Process {
     running: true
-    command: ["sh", "-c", "grep -lx k10temp /sys/class/hwmon/hwmon*/name"]
+    command: ["sh", "-c", "grep -lx -e k10temp -e coretemp /sys/class/hwmon/hwmon*/name"]
     stdout: StdioCollector {
       onStreamFinished: {
         const name = text.trim().split("\n")[0]
