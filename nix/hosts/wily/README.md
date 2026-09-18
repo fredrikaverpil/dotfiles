@@ -1,10 +1,9 @@
 # wily (ThinkPad T14 Gen 6 Intel, Core Ultra 7 258V "Lunar Lake")
 
-Work machine (Lenovo 21QG006CMX). The desktop is promoted here from `renoir` by copying files;
-see `CLAUDE.md`. Work-only configuration (YubiKey, CrowdStrike, ...) lives in
-the private `fredrikaverpil/dotfiles-einride` repo, mounted as the git
-submodule `private/` and imported by `configuration.nix` only when checked
-out.
+Work machine (Lenovo 21QG006CMX). The desktop is promoted here from `renoir` by
+copying files; see `CLAUDE.md`. Work-only configuration lives in the private
+`fredrikaverpil/dotfiles-einride` repo, mounted as the git submodule `private/`
+and imported by `configuration.nix` only when checked out.
 
 ## Rebuilding
 
