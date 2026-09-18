@@ -35,7 +35,7 @@ pinned commit. CI builds the host without the submodule checked out.
 - CPU frequency: `intel_pstate`; power-profiles-daemon uses
   `platform_profile`. Package temperature is `coretemp` `temp1_input`.
 - Sleep: `s2idle` only (`/sys/power/mem_sleep`), no S3. Lid close is
-  `suspend-then-hibernate`: suspend, then after systemd's default 2 h a
+  `suspend-then-hibernate`: suspend, then after `HibernateDelaySec=2h` a
   hibernate to the encrypted swap (`boot.resumeDevice`, 33.9 GB for 30 GB
   RAM). Waking from hibernate asks for the LUKS passphrase, then restores
   the session. Verified with `systemctl hibernate`; the kernel log shows
