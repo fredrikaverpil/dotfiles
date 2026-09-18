@@ -11,6 +11,8 @@
     maple-mono.variable
     # noto-fonts-color-emoji # NOTE: takes a very long time to build
     nerd-fonts.symbols-only
+    # Latin Noto Sans: first Linux candidate in GitHub's font stack.
+    noto-fonts
   ];
 
   # Berkeley Mono is licensed, so it is copied into ~/.local/share/fonts by
