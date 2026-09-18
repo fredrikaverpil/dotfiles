@@ -16,6 +16,8 @@
   nixpkgs.config.allowUnfree = true;
   # Lunar Lake Intel Wi-Fi and Xe2 firmware blobs.
   hardware.enableRedistributableFirmware = true;
+  # VA-API for gpu-screen-recorder and mpv; Mesa ships none for Intel.
+  hardware.graphics.extraPackages = [ pkgs.intel-media-driver ];
 
   time.timeZone = "Europe/Stockholm";
 
