@@ -6,6 +6,13 @@ function add(history, text, at, limit) {
     .slice(0, limit)
 }
 
+function removeAt(history, index) {
+  var next = Array.isArray(history) ? history.slice() : []
+  if (index < 0 || index >= next.length) return next
+  next.splice(index, 1)
+  return next
+}
+
 // One line, bounded so a huge copy does not lay out a huge Text.
 function preview(text) {
   return text.slice(0, 500).replace(/\s+/g, " ").trim()

@@ -18,6 +18,20 @@ Ui.Panel {
     root.close()
   }
 
+  // Removing rebuilds every delegate, so the focus has to be placed again by
+  // position: the row that took the removed one's place, or the button below.
+  function drop(index) {
+    root.service.remove(index)
+    Qt.callLater(function() {
+      if (entries.count === 0) {
+        clearButton.forceActiveFocus(Qt.TabFocusReason)
+        return
+      }
+      const row = entries.itemAt(Math.min(index, entries.count - 1))
+      if (row) row.forceActiveFocus(Qt.TabFocusReason)
+    })
+  }
+
   readonly property var focusedItem: scroller.Window.activeFocusItem
   // Map to content coordinates: Flickable coordinates are relative to its viewport.
   onFocusedItemChanged: {
@@ -70,6 +84,7 @@ Ui.Panel {
       spacing: 2
 
       Repeater {
+        id: entries
         model: root.service.history
 
         delegate: EntryRow {}
@@ -117,6 +132,7 @@ Ui.Panel {
     id: row
 
     required property var modelData
+    required property int index
 
     width: parent.width
     height: 32
@@ -127,6 +143,11 @@ Ui.Panel {
     Keys.onReturnPressed: root.pick(row.modelData.text)
     Keys.onEnterPressed: root.pick(row.modelData.text)
     Keys.onSpacePressed: root.pick(row.modelData.text)
+    Keys.onPressed: function (event) {
+      if (event.key !== Qt.Key_Backspace) return
+      root.drop(row.index)
+      event.accepted = true
+    }
 
     Text {
       anchors.left: parent.left
