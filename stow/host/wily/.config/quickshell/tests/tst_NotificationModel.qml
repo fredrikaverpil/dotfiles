@@ -32,6 +32,9 @@ TestCase {
     compare(Notification.replacePopup([record], replacement), [replacement])
     compare(Notification.replacePopup([], replacement), [])
     compare(Notification.withoutRecord([record, replacement], "1"), [])
+    compare(Notification.withoutIndex([record, replacement], 0), [replacement])
+    compare(Notification.withoutIndex([record], 1), [record])
+    compare(Notification.withoutIndex([record], -1), [record])
     for (const value of ["true", "1", "on", "yes", "YES"]) compare(Notification.dndValue(value), true)
     for (const value of ["", "false", "0", "off", "no"]) compare(Notification.dndValue(value), false)
   }
