@@ -33,7 +33,8 @@ pinned commit. CI builds the host without the submodule checked out.
   decodes HEVC 4:2:2 10-bit camera footage in hardware, unlike renoir.
 - Display: 14" 1920x1200 (AU Optronics B140UAN02.7), niri auto-scale 1.25.
 - CPU frequency: `intel_pstate`; power-profiles-daemon uses
-  `platform_profile`. Package temperature is `coretemp` `temp1_input`.
+  `platform_profile`; thermald caps RAPL/P-states near TjMax (105 °C).
+  Package temperature is `coretemp` `temp1_input`.
 - Sleep: `s2idle` only (`/sys/power/mem_sleep`), no S3. Lid close is
   `suspend-then-hibernate`: suspend, then after `HibernateDelaySec=2h` a
   hibernate to the encrypted swap (`boot.resumeDevice`, 33.9 GB for 30 GB
@@ -43,8 +44,9 @@ pinned commit. CI builds the host without the submodule checked out.
 - Wi-Fi: `iwlwifi` (Wi-Fi 7). The boot warning
   `Direct firmware load for iwlwifi-bz-...-c99.ucode failed` is the driver
   probing newer firmware API versions before falling back; harmless.
-- Fingerprint reader: Goodix `27c6:6594`, unused; see renoir's README for
-  the fprintd notes, they apply unchanged.
+- Fingerprint reader: Goodix `27c6:6594`, unused. libfprint's `goodixmoc`
+  driver lists it; renoir's README has the fprintd enabling notes, untested
+  on this reader.
 - Camera: `/dev/video0` is the capture node (MJPEG up to 2592x1944@30);
   `video1`-`video3` are metadata and duplicate nodes.
 - Battery: Sunwoda 57 Wh, thresholds 75/80 % via `thinkpad.nix`.
