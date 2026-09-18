@@ -33,8 +33,10 @@
   boot.resumeDevice = "/dev/mapper/luks-2bc8d428-9495-4fd8-aaba-9208e0bbaf0f";
 
   # Lunar Lake has s2idle only, which drains 1-2 %/h; lid close suspends and
-  # hibernates after HibernateDelaySec (systemd default 2 h).
+  # hibernates after 2 h. Unset, systemd instead hibernates when the battery
+  # is predicted to hit 5 %, days away at that drain.
   services.logind.settings.Login.HandleLidSwitch = "suspend-then-hibernate";
+  systemd.sleep.extraConfig = "HibernateDelaySec=2h";
 
   nix.gc = {
     automatic = true;
