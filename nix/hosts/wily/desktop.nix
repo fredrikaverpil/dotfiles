@@ -103,6 +103,12 @@ in
   # Opens port 53317 for receiving files and text from phones.
   programs.localsend.enable = true;
 
+  programs._1password.enable = true;
+  programs._1password-gui = {
+    enable = true;
+    polkitPolicyOwners = [ "fredrik" ];
+  };
+
   # KService builds Dolphin's application list from an applications menu, which only Plasma ships.
   # Plasma's own menu would pull in plasma-workspace; KService only needs every app listed.
   environment.etc."xdg/menus/applications.menu".text = ''
