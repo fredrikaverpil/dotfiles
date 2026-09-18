@@ -38,11 +38,6 @@
   services.logind.settings.Login.HandleLidSwitch = "suspend-then-hibernate";
   systemd.sleep.settings.Sleep.HibernateDelaySec = "2h";
 
-  # Caps RAPL power and P-states before the package reaches TjMax, so sustained
-  # loads settle at the firmware design power instead of hard-throttling.
-  # Thermal only; power-profiles-daemon owns platform_profile.
-  services.thermald.enable = true;
-
   nix.gc = {
     automatic = true;
     dates = "weekly";
