@@ -47,6 +47,13 @@ function replacePopup(rows, record) {
   return next
 }
 
+function withoutIndex(rows, index) {
+  var next = Array.isArray(rows) ? rows.slice() : []
+  if (index < 0 || index >= next.length) return next
+  next.splice(index, 1)
+  return next
+}
+
 function withoutRecord(rows, key) {
   return (Array.isArray(rows) ? rows : []).filter(function(row) { return row.key !== key })
 }
