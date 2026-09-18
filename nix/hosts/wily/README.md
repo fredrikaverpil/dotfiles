@@ -49,6 +49,12 @@ pinned commit. CI builds the host without the submodule checked out.
   on this reader.
 - Camera: `/dev/video0` is the capture node (MJPEG up to 2592x1944@30);
   `video1`-`video3` are metadata and duplicate nodes.
+- Audio: `sof-hda-dsp` with a Realtek ALC257. Its UCM declares Headphones
+  and Speaker as conflicting devices; PipeWire's split mode
+  (`api.alsa.split-enable`) then generates two card profiles and only one
+  output exists at a time, with no jack switching. `configuration.nix`
+  disables split mode for the card so both are routes on one profile. Check
+  with `wpctl status`: one analog sink whose name follows the plugged port.
 - Battery: Sunwoda 57 Wh, thresholds 75/80 % via `thinkpad.nix`.
 - Built-in keyboard is `0001:0001` (keyd), keyboard backlight is
   `tpacpi::kbd_backlight` (Fn+Space, firmware-driven).
