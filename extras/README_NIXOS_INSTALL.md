@@ -256,14 +256,20 @@ users.users.<username> = {
   isNormalUser = true;
   extraGroups = [ "wheel" ];       # sudo
   initialPassword = "changeme";    # see below
-  openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAA... you@mac" ];
+  openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAA... you@mac" ];   # optional, see below
 };
 ```
+
+The key line is optional: with `initialPassword` set, sshd accepts password
+logins, so the key can be pushed with `ssh-copy-id` after first boot instead of
+typed into the console (step 5). Skipping it saves transcribing a long string
+by hand; `services.openssh.enable` is not optional, without it the installed
+system has no `sshd.service` at all.
 
 `isNormalUser` on its own creates the account with a locked password, and
 `wheel` membership still asks for one — so without `initialPassword` you can
 SSH in on your key and then find `sudo` unusable, which blocks the rebuild in
-step 5. It applies only at account creation, so a later `passwd` sticks. The
+step 5 (and `ssh-copy-id` cannot log in at all). It applies only at account creation, so a later `passwd` sticks. The
 alternatives are setting the password from the console as root after first
 boot, or `security.sudo.wheelNeedsPassword = false;` — reasonable on a scratch
 VM, less so on a laptop.
@@ -310,6 +316,18 @@ grep -B2 '<hostname>' /var/db/dhcpd_leases   # VM: the lease now shows the new h
 ssh-keygen -R <ip>                           # host key changed at reboot, the IP usually did not
 ssh <username>@<ip>
 ```
+
+On the ThinkPad, `ip -4 addr` on the console gives the IP. If step 4 skipped
+the authorized key, push it now, authenticating with `initialPassword`:
+
+```sh
+ssh-copy-id -o IdentitiesOnly=yes -i ~/.ssh/id_ed25519.pub <username>@<ip>
+```
+
+If `sudo systemctl start sshd` on the console says `Unit sshd.service not
+found`, `services.openssh.enable` did not make it into step 4's config. Add it
+to `/etc/nixos/configuration.nix` and run a plain `sudo nixos-rebuild switch`
+— that file is still the live config until the flake takes over below.
 
 Clone the repo and copy the generated hardware config into it.
 `hardware-configuration.nix` must be generated on the machine it describes — it
