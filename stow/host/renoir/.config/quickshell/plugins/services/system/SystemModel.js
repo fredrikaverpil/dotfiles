@@ -8,7 +8,8 @@ var alertKinds = [
   { kind: "upload", icon: "\u{F0552}", label: "Uploading" },
 ]
 
-// Tctl throttles at 105 °C; big downloads are routine, big uploads are not.
+// Package TjMax is 105 °C on both k10temp and coretemp; big downloads are
+// routine, big uploads are not.
 // Swap use is ignored: swapped pages linger long after the pressure is gone.
 function conditions(sample) {
   return {
