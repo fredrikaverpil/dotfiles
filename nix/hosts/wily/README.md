@@ -33,8 +33,8 @@ pinned commit. CI builds the host without the submodule checked out.
   decodes HEVC 4:2:2 10-bit camera footage in hardware, unlike renoir.
 - Display: 14" 1920x1200 (AU Optronics B140UAN02.7), niri auto-scale 1.25.
 - CPU frequency: `intel_pstate`; power-profiles-daemon uses
-  `platform_profile`; thermald caps RAPL/P-states near TjMax (105 °C).
-  Package temperature is `coretemp` `temp1_input`.
+  `platform_profile`. The EC owns thermal throttling (DYTC): thermald exits
+  when `dytc_lapmode` exists. Package temperature is `coretemp` `temp1_input`.
 - Sleep: `s2idle` only (`/sys/power/mem_sleep`), no S3. Lid close is
   `suspend-then-hibernate`: suspend, then after `HibernateDelaySec=2h` a
   hibernate to the encrypted swap (`boot.resumeDevice`, 33.9 GB for 30 GB
