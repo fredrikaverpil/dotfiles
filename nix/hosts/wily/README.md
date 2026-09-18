@@ -34,9 +34,12 @@ pinned commit. CI builds the host without the submodule checked out.
 - Display: 14" 1920x1200 (AU Optronics B140UAN02.7), niri auto-scale 1.25.
 - CPU frequency: `intel_pstate`; power-profiles-daemon uses
   `platform_profile`. Package temperature is `coretemp` `temp1_input`.
-- Sleep: `s2idle` only (`/sys/power/mem_sleep`), no S3. Hibernate needs
-  `boot.resumeDevice` on the encrypted swap (`/dev/mapper/luks-2bc8...`,
-  33.9 GB for 30 GB RAM); not enabled.
+- Sleep: `s2idle` only (`/sys/power/mem_sleep`), no S3. Lid close is
+  `suspend-then-hibernate`: suspend, then after systemd's default 2 h a
+  hibernate to the encrypted swap (`boot.resumeDevice`, 33.9 GB for 30 GB
+  RAM). Waking from hibernate asks for the LUKS passphrase, then restores
+  the session. Verified with `systemctl hibernate`; the kernel log shows
+  `hibernation entry`/`exit` under the same boot ID.
 - Wi-Fi: `iwlwifi` (Wi-Fi 7). The boot warning
   `Direct firmware load for iwlwifi-bz-...-c99.ucode failed` is the driver
   probing newer firmware API versions before falling back; harmless.
