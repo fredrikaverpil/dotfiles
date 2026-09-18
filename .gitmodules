@@ -1,0 +1,3 @@
+[submodule "nix/hosts/wily/private"]
+	path = nix/hosts/wily/private
+	url = https://github.com/fredrikaverpil/dotfiles-einride.git
