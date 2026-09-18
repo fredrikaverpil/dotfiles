@@ -38,19 +38,6 @@
   services.logind.settings.Login.HandleLidSwitch = "suspend-then-hibernate";
   systemd.sleep.settings.Sleep.HibernateDelaySec = "2h";
 
-  # The SOF card's UCM marks Headphones and Speaker as conflicting; in split
-  # mode ACP turns that into two profiles, WirePlumber sticks to the one it
-  # picked and the jack never switches output. Unsplit, they are routes on one
-  # profile and jack detection toggles them.
-  services.pipewire.wireplumber.extraConfig."51-sof-hda-no-split" = {
-    "monitor.alsa.rules" = [
-      {
-        matches = [ { "device.name" = "alsa_card.pci-0000_00_1f.3-platform-skl_hda_dsp_generic"; } ];
-        actions.update-props."api.alsa.split-enable" = false;
-      }
-    ];
-  };
-
   nix.gc = {
     automatic = true;
     dates = "weekly";
