@@ -8,7 +8,10 @@ code in this repository.
 - **Full rebuild (Darwin)**: `sudo darwin-rebuild switch --flake
   ~/.dotfiles#"$(hostname -s)"` (hosts: `zap`, `plumbus`)
 - **Full rebuild (NixOS)**: `sudo nixos-rebuild switch --flake
-  ~/.dotfiles#"$(hostname -s)"` (hosts: `rpi5-homelab`, `renoir`)
+  ~/.dotfiles#"$(hostname -s)"` (hosts: `rpi5-homelab`, `renoir`, `wily`).
+  On `wily` use `nh os switch` instead: its flake path carries
+  `?submodules=1`, which a bare `--flake ~/.dotfiles#wily` lacks, silently
+  dropping the private `nix/hosts/wily/private` submodule
 - **Symlink dotfiles only** (GNU Stow, no Nix rebuild): `cd ~/.dotfiles`; then
   run `stow --dir=stow --target="$HOME" --restow --no-folding --adopt shared &&
   stow --dir=stow/platform --target="$HOME" --restow --no-folding --adopt
