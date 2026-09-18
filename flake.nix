@@ -97,6 +97,9 @@
         renoir = lib.mkNixos {
           configPath = ./nix/hosts/renoir/configuration.nix;
         };
+        wily = lib.mkNixos {
+          configPath = ./nix/hosts/wily/configuration.nix;
+        };
       };
 
       darwinConfigurations = {
