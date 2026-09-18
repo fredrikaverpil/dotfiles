@@ -33,6 +33,9 @@ jobs:
           - name: renoir
             os: ubuntu-24.04
             nix_config: nixosConfigurations.renoir.config.system.build.toplevel
+          - name: wily
+            os: ubuntu-24.04
+            nix_config: nixosConfigurations.wily.config.system.build.toplevel
       fail-fast: false
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
@@ -70,5 +73,5 @@ jobs:
       - name: test nix build ${{ matrix.name }}
         run: |
           nix build .#${{ matrix.nix_config }} --show-trace --accept-flake-config --dry-run
-        if: matrix.name == 'rpi5-homelab' || matrix.name == 'renoir'
+        if: matrix.name == 'rpi5-homelab' || matrix.name == 'renoir' || matrix.name == 'wily'
 
