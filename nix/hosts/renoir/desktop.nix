@@ -79,7 +79,10 @@ in
 # The niri + Quickshell desktop: packages, portals, PAM, user units and the
 # pre-suspend lock. Compositor config and QML live in stow/host/<host>/.
 {
-  imports = [ inputs.dankcalendar.nixosModules.default ];
+  imports = [
+    inputs.dankcalendar.nixosModules.default
+    ../../shared/system/fonts.nix
+  ];
 
   # niri is the only session: `niri --session` under UWSM, started from the console.
   programs.uwsm.enable = true;
