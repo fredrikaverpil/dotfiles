@@ -36,7 +36,7 @@
   # hibernates after 2 h. Unset, systemd instead hibernates when the battery
   # is predicted to hit 5 %, days away at that drain.
   services.logind.settings.Login.HandleLidSwitch = "suspend-then-hibernate";
-  systemd.sleep.extraConfig = "HibernateDelaySec=2h";
+  systemd.sleep.settings.Sleep.HibernateDelaySec = "2h";
 
   nix.gc = {
     automatic = true;
