@@ -21,7 +21,7 @@
   home.file = { };
 
   programs = {
-    # `?submodules=1` pulls in the private submodule at nix/hosts/wily/private;
+    # `?submodules=1` pulls in the private submodule at nix/hosts/wily/einride;
     # `inputs.self.submodules` cannot be used, it makes public clones and CI
     # try to fetch the private repo.
     nh.flake = lib.mkForce "${config.home.homeDirectory}/.dotfiles?submodules=1";
