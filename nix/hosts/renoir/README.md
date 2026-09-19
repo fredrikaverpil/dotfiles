@@ -4,6 +4,10 @@ Personal machine and the desktop's experiment host; see `CLAUDE.md`.
 Machine-specific settings (microcode, VAAPI driver, kernel choice) belong in
 `configuration.nix`; ThinkPad integration in `thinkpad.nix`.
 
+> [!NOTE]
+>
+> Awaiting the Proton Pass v1.40+ SSH agent, so per-usage PIN can be used.
+
 ## Firmware
 
 BIOS and device firmware come from LVFS through fwupd. Updates reboot the
