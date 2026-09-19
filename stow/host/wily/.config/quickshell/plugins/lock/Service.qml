@@ -13,6 +13,8 @@ Item {
 
   property var shell: null
   readonly property string userName: Quickshell.env("USER") || Quickshell.env("LOGNAME")
+  // Runtime dir: a lock outlives a shell crash, not a logout or reboot.
+  readonly property string statePath: Quickshell.env("XDG_RUNTIME_DIR") + "/kaizen-lock.json"
 
   property bool passwordPamConfigured: false
   property bool lockRequested: false
@@ -22,6 +24,7 @@ Item {
   property string failureMessage: ""
   property int failedAttempts: 0
   property bool blanked: false
+  property bool restorePending: false
 
   readonly property bool locked: lockRequested || sessionLock.locked || sessionLock.secure
 
@@ -55,6 +58,16 @@ Item {
     blankTimer.restart()
     return true
   }
+
+  // niri keeps a dead client's lock and accepts a new one in its place.
+  function restoreLock() {
+    if (!restorePending || !passwordPamConfigured) return
+    restorePending = false
+    beginLock()
+  }
+
+  onLockRequestedChanged: stateFile.setText(JSON.stringify({ locked: lockRequested }) + "\n")
+  onPasswordPamConfiguredChanged: restoreLock()
 
   function finishUnlock() {
     if (passwordPam.active) passwordPam.abort()
@@ -155,6 +168,21 @@ Item {
 
   Process {
     id: dpmsProcess
+  }
+
+  FileView {
+    id: stateFile
+    path: root.statePath
+    atomicWrites: true
+    printErrors: false
+    onLoaded: {
+      try {
+        root.restorePending = JSON.parse(String(text() || "")).locked === true
+      } catch (error) {
+        root.restorePending = false
+      }
+      root.restoreLock()
+    }
   }
 
   FileView {
