@@ -148,9 +148,6 @@ niri's readiness-before-`WAYLAND_DISPLAY` race.
   client dies; whether the restarted shell re-creates the lock surface is
   unverified (auth state is in memory only). Verify, then add a lock-aware
   restart or a fallback unlocker if needed.
-- **State file naming is mixed.** `kaizen-*.json` next to `wallpaper-dark`,
-  `backdrop-light`, `wm-binds.tsv` in `~/.local/state/`. Pick the `kaizen-`
-  prefix or one `kaizen/` directory.
 - **Display vs Monitor.** The panel is `plugins/panels/monitor`, the IPC
   target and launcher entry are `display`. One name.
 - **Keybinding list is a startup `sed` over `config.kdl`.**
