@@ -28,6 +28,27 @@ public clones and CI try to fetch the private repo.
 After pulling, `git submodule update --init` brings the submodule to the
 pinned commit. CI builds the host without the submodule checked out.
 
+## Test-driving Noctalia
+
+Noctalia v5 (nixpkgs `noctalia`, a C++ shell; `noctalia-shell` is the v4
+Quickshell config) can replace the shell in the running niri session. It runs
+as a transient user unit, so it outlives the terminal that started it:
+
+```sh
+systemctl --user stop quickshell
+systemd-run --user --unit=noctalia-trial --collect -p Slice=app.slice \
+  nix run ~/.dotfiles#nixosConfigurations.wily.pkgs.noctalia
+journalctl --user -u noctalia-trial -f   # logs
+
+# back
+systemctl --user stop noctalia-trial && systemctl --user start quickshell
+```
+
+While it runs, the `qs ipc` binds in `config.kdl` (menu, lock, volume,
+notifications) do nothing, and `kaizen-sleep-lock` cannot lock before suspend,
+so do not suspend. Its state lives in `~/.config/noctalia/` and
+`~/.local/state/noctalia/`, outside the dotfiles.
+
 ## Hardware
 
 - GPU: Xe2 on the `xe` driver. Mesa has no Intel VA-API, so
