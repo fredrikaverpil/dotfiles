@@ -3,15 +3,12 @@
 {
   # NOTE: Berkeley Mono is installed manually, as it requires a license.
   fonts.packages = with pkgs; [
-    nerd-fonts.fira-code
-    nerd-fonts.fira-mono
-    nerd-fonts.hack
     nerd-fonts.jetbrains-mono
     maple-mono.truetype
     maple-mono.variable
-    # noto-fonts-color-emoji # NOTE: takes a very long time to build
     nerd-fonts.symbols-only
     noto-fonts
+    noto-fonts-color-emoji
   ];
 
   # Berkeley Mono is licensed, so it is copied into ~/.local/share/fonts by
