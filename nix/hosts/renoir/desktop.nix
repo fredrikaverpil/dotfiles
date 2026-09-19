@@ -84,7 +84,7 @@ in
     ../../shared/system/fonts.nix
   ];
 
-  # niri is the only session: `niri --session` under UWSM, started from the console.
+  # niri is the only session: `niri --session` under UWSM, started with `kaizen` from the console.
   programs.uwsm.enable = true;
 
   # OAuth tokens stay in gnome-keyring (from programs.niri), unlocked by the login PAM stack.
