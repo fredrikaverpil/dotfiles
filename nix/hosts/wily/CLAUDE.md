@@ -8,7 +8,8 @@ by import or symlink, so `diff -r nix/hosts/renoir nix/hosts/wily` and
 in-progress experiments. Host-only modules (`personal.nix`) are not copied.
 
 Machine facts (firmware, BIOS, hardware quirks) go in the host's `README.md`
-and are never promoted.
+and are never promoted. Design intent and the layer model are in `KAIZEN.md`;
+read it before adding a surface or service.
 
 ## Working model
 
