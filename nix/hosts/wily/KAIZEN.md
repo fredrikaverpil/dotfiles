@@ -166,9 +166,3 @@ niri's readiness-before-`WAYLAND_DISPLAY` race.
 4. Then: daemon/process state → `plugins/services/`, view →
    `plugins/panels/`, packages/units/PAM → `desktop.nix`, compositor →
    `Ui/compositors/` and `niri/config.kdl`, IPC target for every new action.
-
-## Known debt
-
-- **dcal is a second Quickshell.** It launches its own UI; only the daemon
-  and JSON IPC are used. Track whether the daemon can run without the
-  Quickshell dependency.
