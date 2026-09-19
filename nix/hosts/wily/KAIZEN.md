@@ -169,8 +169,6 @@ niri's readiness-before-`WAYLAND_DISPLAY` race.
 
 ## Known debt
 
-- **The launcher tree lives in `shell.qml`.** Fine at this size; move it to
-  `plugins/menu/` if it grows or gets host-specific entries.
 - **dcal is a second Quickshell.** It launches its own UI; only the daemon
   and JSON IPC are used. Track whether the daemon can run without the
   Quickshell dependency.
