@@ -5,6 +5,10 @@ copying files; see `CLAUDE.md`. Work-only configuration lives in the private
 `fredrikaverpil/dotfiles-einride` repo, mounted as the git submodule `private/`
 and imported by `configuration.nix` only when checked out.
 
+> [!NOTE]
+>
+> Awaiting the Proton Pass v1.40+ SSH agent, so per-usage PIN can be used.
+
 ## Rebuilding
 
 Flakes copy the tree from `git ls-files`, which lists the submodule pointer
