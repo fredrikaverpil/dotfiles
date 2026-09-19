@@ -68,11 +68,8 @@ previous states. Explain a declaration next to it, not here.
   so `qs ipc call screensaver close` leaves a desktop `grim` can still capture
   remotely. It dims the internal backlight to 0 while black and restores it
   before drawing the prompt, so the prompt is never painted onto a dark panel.
-  Being only a layer surface, it dies with Quickshell — use the lock where that
-  matters.
-  It is a home-device feature and is deliberately not promoted to the work
-  host: a curtain that anyone at the keyboard can work around is the wrong
-  posture for a work machine, which wants the lock.
+  Being only a layer surface, it dies with Quickshell, and anyone at the
+  keyboard can close it. Use the lock whenever the machine is left alone.
 - The recording camera is a circle because gpu-screen-recorder cannot mask its
   own camera overlay: the service runs mpv under the `kaizen-camera` app id and
   a niri window rule rounds and places it, so the screen capture records it as
