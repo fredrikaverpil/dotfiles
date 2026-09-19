@@ -148,10 +148,6 @@ niri's readiness-before-`WAYLAND_DISPLAY` race.
   client dies; whether the restarted shell re-creates the lock surface is
   unverified (auth state is in memory only). Verify, then add a lock-aware
   restart or a fallback unlocker if needed.
-- **Keybinding list is a startup `sed` over `config.kdl`.**
-  `spawn-at-startup sh -c sed ...` writes `wm-binds.tsv`; the launcher reads
-  it. A parse in `Ui/compositors/` from `niri msg` or the file would remove
-  the shell one-liner.
 - **Color picker is an inline shell pipeline in `shell.qml`.** Belongs in a
   service or the compositor interface like screenshots.
 - **The launcher tree lives in `shell.qml`.** Fine at this size; move it to
