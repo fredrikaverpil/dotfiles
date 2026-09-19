@@ -1,12 +1,3 @@
-function parseBinds(raw) {
-  return String(raw || "").trim().split("\n")
-    .filter(function(line) { return line.length > 0 })
-    .map(function(line) {
-      var columns = line.split("\t")
-      return { chord: columns[0], label: columns[1] || "", enabled: true }
-    })
-}
-
 // Reads Unicode's emoji-test.txt; skin-tone variants are dropped.
 function parseEmoji(raw) {
   return String(raw || "").split("\n")

@@ -5,6 +5,21 @@ import "../Ui/compositors/Niri.js" as Niri
 TestCase {
   name: "Niri"
 
+  function test_parse_binds_reads_titled_binds_from_the_config() {
+    const raw = 'spawn-at-startup "sh" "-c" "hotkey-overlay-title=\\"x\\""\n'
+      + 'binds {\n'
+      + '    Mod+Space hotkey-overlay-title="Menu" { spawn "qs"; }\n'
+      + '    // Mod+Q hotkey-overlay-title="Old" { quit; }\n'
+      + '    XF86AudioMute allow-when-locked=true repeat=false hotkey-overlay-title="Mute" { spawn "qs"; }\n'
+      + '    Mod+T { spawn "kitty"; }\n'
+      + '}\n'
+    compare(Niri.parseBinds(raw), [
+      { chord: "Mod+Space", label: "Menu", enabled: true },
+      { chord: "XF86AudioMute", label: "Mute", enabled: true },
+    ])
+    compare(Niri.parseBinds(""), [])
+  }
+
   function test_pin_window() {
     const none = { id: 0, requested: 0, spaces: ({}) }
     compare(Niri.pinWindow("invalid", "cam", none), none)
