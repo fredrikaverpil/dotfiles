@@ -76,7 +76,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | network | NetworkManager, `ip -j` | button | Setup › Network | `network` |
 | nightlight | wl-gammarelay-rs over D-Bus (wlr-gamma-control) | – | Setup › Nightlight | `nightlight` |
 | recording | gpu-screen-recorder, grim, PipeWire | recording indicator | Trigger › Record, Screenshot (region) | `recording` |
-| system | hwmon, load | monitor button | Setup › Display (monitor panel) | `system`, `display` |
+| system | hwmon, load | monitor button | Setup › Display | `system`, `display` |
 | weather | api.met.no | button | Panels › Weather, Setup › Weather location | `weather` |
 | notifications | freedesktop Notifications server | – | System › Notifications | `notifications` |
 | lock | WlSessionLock + PAM `kaizen-lock` | – | System › Lock | `lock` |
@@ -148,8 +148,6 @@ niri's readiness-before-`WAYLAND_DISPLAY` race.
   client dies; whether the restarted shell re-creates the lock surface is
   unverified (auth state is in memory only). Verify, then add a lock-aware
   restart or a fallback unlocker if needed.
-- **Display vs Monitor.** The panel is `plugins/panels/monitor`, the IPC
-  target and launcher entry are `display`. One name.
 - **Keybinding list is a startup `sed` over `config.kdl`.**
   `spawn-at-startup sh -c sed ...` writes `wm-binds.tsv`; the launcher reads
   it. A parse in `Ui/compositors/` from `niri msg` or the file would remove

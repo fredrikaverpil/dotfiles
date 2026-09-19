@@ -15,7 +15,7 @@ import "plugins/panels/bluetooth" as Bluetooth
 import "plugins/panels/calendar" as Calendar
 import "plugins/panels/clipboard" as Clipboard
 import "plugins/panels/media" as Media
-import "plugins/panels/monitor" as Monitor
+import "plugins/panels/display" as Display
 import "plugins/panels/network" as Network
 import "plugins/panels/recording" as Recording
 import "plugins/panels/tray" as Tray
@@ -297,7 +297,7 @@ ShellRoot {
     id: brightness
   }
 
-  Monitor.Panel {
+  Display.Panel {
     id: display
     shell: root
   }
