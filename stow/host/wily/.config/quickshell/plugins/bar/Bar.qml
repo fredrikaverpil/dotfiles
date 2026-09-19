@@ -276,6 +276,7 @@ Scope {
         anchors.rightMargin: trayDivider.visible ? 6 : 0
         shell: bar.shell
         panel: bar.shell.tray
+        output: modelData.name
       }
     }
   }
