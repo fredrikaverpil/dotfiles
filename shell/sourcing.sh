@@ -13,13 +13,10 @@ if [ -e /etc/NIXOS ]; then
 	# imports its environment, which uwsm cleans up on exit. The instance name
 	# follows from the executable, so the units are wayland-wm@niri.service and
 	# wayland-session@niri.target -- both named in the hosts' desktop.nix.
-	# Arguments are forwarded so `niri msg ...` still reaches the real binary.
+	# `kaizen` starts the niri session; the Quickshell shell and other user
+	# units bind to wayland-session@niri.target.
 	if command -v uwsm >/dev/null 2>&1 && command -v niri >/dev/null 2>&1; then
-		function niri() {
-			if [ "$#" -gt 0 ]; then
-				command niri "$@"
-				return
-			fi
+		function kaizen() {
 			uwsm check may-start || return
 			uwsm start -e -D niri -- niri --session
 		}
