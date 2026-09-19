@@ -23,11 +23,11 @@ Ui.Panel {
 
   FileView {
     id: bindsFile
-    path: Quickshell.env("HOME") + "/.local/state/wm-binds.tsv"
+    path: Ui.Compositor.configFile(Quickshell.env("HOME"))
     watchChanges: true
     printErrors: false
     onFileChanged: reload()
-    onLoaded: menu.binds = Model.parseBinds(text())
+    onLoaded: menu.binds = Ui.Compositor.parseBinds(text())
   }
 
   property var emojis: []
