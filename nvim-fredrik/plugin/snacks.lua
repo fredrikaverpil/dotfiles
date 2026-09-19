@@ -146,6 +146,7 @@ local exclude = {
   ".pocket/tools",
   "**/.terraform/modules",
   "**/.terraform/providers",
+  ".claude/worktrees",
 }
 
 -- Misc
