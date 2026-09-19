@@ -143,9 +143,6 @@ niri's readiness-before-`WAYLAND_DISPLAY` race.
 
 ## Known debt
 
-- **Screensaver is wired on wily.** `CLAUDE.md` says it is a home-device
-  feature and not promoted, yet `shell.qml` imports it and the launcher lists
-  System › Screensaver. Remove it or fix the doc.
 - **Shell crash while locked.** `quickshell.service` is `Restart=on-failure`
   and the lock is a Quickshell client. niri keeps the session lock after the
   client dies; whether the restarted shell re-creates the lock surface is
