@@ -171,7 +171,7 @@ itself. It listens on `$HOME/.ssh/proton-pass-agent.sock`
 commands. If Proton Pass is locked, you will have to unlock it when a key
 needs to be accessed.
 
-#### Using `pass-cli`
+#### Using `pass-cli` in macOS
 
 - Start it in the background: `pass-cli ssh-agent daemon start` (inspect/stop
   with `pass-cli ssh-agent daemon status` / `daemon stop`). You must already be
@@ -207,6 +207,20 @@ Starting the daemon while the session is locked does NOT work (verified with
 pass-cli 2.2.3): the launcher prints "Daemon started", but the daemon exits
 immediately when its initial key fetch hits `SessionLocked` — no socket, no
 keys. Check `daemon status` or `--log-file` to catch this.
+
+#### Using `pass-cli` in NixOS
+
+Home-manager's `services.proton-pass-agent` can run the daemon, set
+`SSH_AUTH_SOCK`. `PROTON_PASS_LINUX_KEYRING=dbus` (for the service and shell)
+and keep the login in gnome-keyring across reboots.
+First login, with the agent stopped (a failing agent can wipe a login in
+progress):
+
+```sh
+systemctl --user stop proton-pass-agent
+pass-cli login
+systemctl --user start proton-pass-agent
+```
 
 #### Git commit signing
 
