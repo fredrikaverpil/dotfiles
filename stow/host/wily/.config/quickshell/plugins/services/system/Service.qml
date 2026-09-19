@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Io
 
 import "SystemModel.js" as Model
+import "../../../Ui" as Ui
 
 // Samples every 10 s and raises alerts on sustained load.
 Item {
@@ -71,8 +72,17 @@ Item {
     }
   }
 
+  // Copies the picked color and confirms with a notification.
+  function pickColor() {
+    Quickshell.execDetached(["sh", "-c",
+      'hex=$("$@") && [ -n "$hex" ] && wl-copy "$hex" && notify-send -a "Color picker" "$hex" "Copied to clipboard"',
+      "sh", ...Ui.Compositor.pickColor()])
+  }
+
   IpcHandler {
     target: "system"
+
+    function pickColor(): void { root.pickColor() }
 
     function status(): string {
       return JSON.stringify({
