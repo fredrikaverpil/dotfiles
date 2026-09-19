@@ -148,8 +148,6 @@ niri's readiness-before-`WAYLAND_DISPLAY` race.
   client dies; whether the restarted shell re-creates the lock surface is
   unverified (auth state is in memory only). Verify, then add a lock-aware
   restart or a fallback unlocker if needed.
-- **Color picker is an inline shell pipeline in `shell.qml`.** Belongs in a
-  service or the compositor interface like screenshots.
 - **The launcher tree lives in `shell.qml`.** Fine at this size; move it to
   `plugins/menu/` if it grows or gets host-specific entries.
 - **dcal is a second Quickshell.** It launches its own UI; only the daemon
