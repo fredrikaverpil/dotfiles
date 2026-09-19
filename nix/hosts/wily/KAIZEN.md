@@ -169,13 +169,6 @@ niri's readiness-before-`WAYLAND_DISPLAY` race.
 
 ## Known debt
 
-- **Shell crash while locked leaves no prompt.** niri keeps the session
-  locked when the lock client dies and accepts a new lock that replaces the
-  dead one (`Niri::lock`, "replacing existing dead lock"). `Lock.Service`
-  starts with `locked: false` and never asks whether the compositor is
-  already locked, so the restarted shell draws the bar behind black outputs
-  and only `qs ipc call lock lock` over SSH brings the prompt back. Fix:
-  persist lock state to `kaizen-lock.json` and re-lock on start.
 - **The launcher tree lives in `shell.qml`.** Fine at this size; move it to
   `plugins/menu/` if it grows or gets host-specific entries.
 - **dcal is a second Quickshell.** It launches its own UI; only the daemon
