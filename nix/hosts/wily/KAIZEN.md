@@ -13,7 +13,8 @@ distraction-free. Read with `CLAUDE.md` (working rules, validation) and
 - The GUI is bespoke and minimal: only what is used, nothing speculative,
   nothing built because it can be. A panel exists only where a subsystem has
   no keyboard-first face.
-- Keyboard-first everywhere. Pointer-only controls are bugs.
+- Keyboard-first everywhere. Pointer-only controls are considered when no other
+  reasonable option exists.
 - Prefer a purpose-built application over a bespoke panel for infrequent
   tasks (bluetui, nm-connection-editor, nwg-displays).
 - Everything is reachable from a terminal (`qs ipc`, `niri msg`,
