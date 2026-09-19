@@ -64,27 +64,53 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 
 | Service | Subsystem | Bar | Panel / launcher | IPC |
 | --- | --- | --- | --- | --- |
-| audio (panel only) | PipeWire (Quickshell.Services.Pipewire) | volume button | Setup › Audio | `audio` |
-| battery | UPower, sysfs thresholds, power-profiles-daemon | battery button | Setup › Power | `battery` |
-| bluetooth | BlueZ (Quickshell.Bluetooth) | button | Setup › Bluetooth | `bluetooth` |
-| brightness | sysfs backlight via logind SetBrightness | – | XF86 keys | `brightness` |
-| calendar | dcal JSON IPC | clock | Panels › Calendar | `calendar` |
-| clipboard | wl-paste watcher, in memory | – | Trigger › Clipboard | `clipboard` |
-| idle | Wayland idle-notify, lock service | – | System › Idle | `idle` |
-| keyboard | niri XKB layouts | layout button | Setup › Keyboard | `keyboard` |
-| media | MPRIS | now-playing widget | Panels › Media | `media` |
-| network | NetworkManager, `ip -j` | button | Setup › Network | `network` |
-| nightlight | wl-gammarelay-rs over D-Bus (wlr-gamma-control) | – | Setup › Nightlight | `nightlight` |
-| recording | gpu-screen-recorder, grim, PipeWire | recording indicator | Trigger › Record, Screenshot (region) | `recording` |
-| system | hwmon, load | monitor button | Setup › Display | `system`, `display` |
-| weather | api.met.no | button | Panels › Weather, Setup › Weather location | `weather` |
-| notifications | freedesktop Notifications server | – | System › Notifications | `notifications` |
-| lock | WlSessionLock + PAM `kaizen-lock` | – | System › Lock | `lock` |
-| screensaver | layer-shell curtain + PAM | – | System › Screensaver | `screensaver` |
-| polkit agent | polkit | – | dialog on request | – |
-| tray | StatusNotifierItem | tray | Tray | `tray` |
+| audio (panel only) | [PipeWire] via [Quickshell] | volume button | Setup › Audio | `audio` |
+| battery | [UPower], [sysfs power_supply] thresholds, [power-profiles-daemon] | battery button | Setup › Power | `battery` |
+| bluetooth | [BlueZ] via [Quickshell] | button | Setup › Bluetooth | `bluetooth` |
+| brightness | [sysfs backlight] via [logind] SetBrightness | – | XF86 keys | `brightness` |
+| calendar | [dcal] JSON IPC | clock | Panels › Calendar | `calendar` |
+| clipboard | [wl-clipboard] watcher, in memory | – | Trigger › Clipboard | `clipboard` |
+| idle | [ext-idle-notify], lock service | – | System › Idle | `idle` |
+| keyboard | [niri] XKB layouts | layout button | Setup › Keyboard | `keyboard` |
+| media | [MPRIS] | now-playing widget | Panels › Media | `media` |
+| network | [NetworkManager], `ip -j` | button | Setup › Network | `network` |
+| nightlight | [wl-gammarelay-rs] over D-Bus | – | Setup › Nightlight | `nightlight` |
+| recording | [gpu-screen-recorder], [grim], [PipeWire] | recording indicator | Trigger › Record, Screenshot (region) | `recording` |
+| system | [hwmon], `/proc` load | monitor button | Setup › Display | `system`, `display` |
+| weather | [met.no locationforecast] | button | Panels › Weather, Setup › Weather location | `weather` |
+| notifications | [Desktop Notifications] server | – | System › Notifications | `notifications` |
+| lock | [ext-session-lock] + [PAM] `kaizen-lock` | – | System › Lock | `lock` |
+| screensaver | [wlr-layer-shell] curtain + [PAM] | – | System › Screensaver | `screensaver` |
+| polkit agent | [polkit] | – | dialog on request | – |
+| tray | [StatusNotifierItem] | tray | Tray | `tray` |
 | background | wallpaper files, theme state | – | Style | `wallpaper`, `theme` |
 | menu | launcher | menu button | `Mod+Space` | `menu` |
+
+[PipeWire]: https://pipewire.org
+[Quickshell]: https://quickshell.org/docs/types/
+[UPower]: https://upower.freedesktop.org
+[sysfs power_supply]: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-power
+[power-profiles-daemon]: https://gitlab.freedesktop.org/upower/power-profiles-daemon
+[BlueZ]: https://github.com/bluez/bluez
+[sysfs backlight]: https://www.kernel.org/doc/Documentation/ABI/stable/sysfs-class-backlight
+[logind]: https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.login1.html
+[dcal]: https://github.com/AvengeMedia/dankcalendar
+[wl-clipboard]: https://github.com/bugaevc/wl-clipboard
+[ext-idle-notify]: https://wayland.app/protocols/ext-idle-notify-v1
+[niri]: https://github.com/YaLTeR/niri/wiki
+[MPRIS]: https://specifications.freedesktop.org/mpris-spec/latest/
+[NetworkManager]: https://networkmanager.dev
+[wl-gammarelay-rs]: https://github.com/MaxVerevkin/wl-gammarelay-rs
+[gpu-screen-recorder]: https://git.dec05eba.com/gpu-screen-recorder/about/
+[grim]: https://sr.ht/~emersion/grim/
+[hwmon]: https://docs.kernel.org/hwmon/sysfs-interface.html
+[met.no locationforecast]: https://api.met.no/weatherapi/locationforecast/2.0/documentation
+[Desktop Notifications]: https://specifications.freedesktop.org/notification-spec/latest/
+[ext-session-lock]: https://wayland.app/protocols/ext-session-lock-v1
+[PAM]: https://github.com/linux-pam/linux-pam
+[wlr-layer-shell]: https://wayland.app/protocols/wlr-layer-shell-unstable-v1
+[polkit]: https://www.freedesktop.org/software/polkit/docs/latest/
+[StatusNotifierItem]: https://www.freedesktop.org/wiki/Specifications/StatusNotifierItem/
 
 ## Surfaces
 
