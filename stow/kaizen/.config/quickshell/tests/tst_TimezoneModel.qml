@@ -9,6 +9,7 @@ TestCase {
   // what the parser has to survive.
   readonly property string stockholm: [
     "zone|Europe/Stockholm",
+    "link|/nix/store/fh8svr4ds87z84iarfnxrlfpjlbmc816-tzdata-2026c/share/zoneinfo/Europe/Stockholm",
     "ntp|yes",
     "clock|20:05:20|2026-09-20|Sun|+0200|CEST",
     "utc|18:05:20|2026-09-20",
@@ -33,6 +34,7 @@ TestCase {
 
   readonly property string tokyo: [
     "zone|Asia/Tokyo",
+    "link|/nix/store/fh8svr4ds87z84iarfnxrlfpjlbmc816-tzdata-2026c/share/zoneinfo/Asia/Tokyo",
     "ntp|yes",
     "clock|03:05:20|2026-09-21|Mon|+0900|JST",
     "utc|18:05:20|2026-09-20",
@@ -90,6 +92,27 @@ TestCase {
     verify(parsed.dst.inEffect === false)
     verify(Timezone.dstLabel(parsed.dst) === "Standard time")
     verify(Timezone.nextLabel(parsed.dst) === "Sun 29 Mar 2026, 03:00 → CEST (UTC+02:00)")
+  }
+
+  // What a pick rejected by a read-only /etc/localtime leaves behind: timedated
+  // reports the new zone, the link still points at the old one.
+  function test_a_zone_timedated_could_not_write_reads_back_as_not_applied() {
+    const parsed = Timezone.parse(stockholm.replace("zone|Europe/Stockholm", "zone|Asia/Tokyo"), now)
+    verify(parsed.zone === "Asia/Tokyo")
+    verify(Timezone.zoneMismatch(parsed.zone, parsed.link) === "Europe/Stockholm")
+    // The clock keeps reporting the zone actually in force.
+    verify(parsed.abbreviation === "CEST")
+  }
+
+  function test_an_applied_zone_and_an_unreadable_link_both_make_no_claim() {
+    const parsed = Timezone.parse(stockholm, now)
+    verify(Timezone.zoneMismatch(parsed.zone, parsed.link) === "")
+    verify(Timezone.effectiveZone("/etc/zoneinfo/Europe/Stockholm") === "Europe/Stockholm")
+    verify(Timezone.effectiveZone("/nix/store/abc-tzdata-2026c/share/zoneinfo/Asia/Tokyo") === "Asia/Tokyo")
+    // No localtime at all, as right after a rebuild drops the managed entry.
+    verify(Timezone.effectiveZone("/etc/localtime") === "")
+    verify(Timezone.zoneMismatch("Asia/Tokyo", "/etc/localtime") === "")
+    verify(Timezone.zoneMismatch("", "/etc/zoneinfo/Europe/Stockholm") === "")
   }
 
   function test_offsets_read_back_in_both_directions_including_odd_ones() {

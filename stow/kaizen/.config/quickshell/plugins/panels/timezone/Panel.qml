@@ -9,11 +9,29 @@ Ui.Panel {
 
   required property var service
 
+  readonly property var info: service.info
+
+  // The zone in force when it is not the one timedated reports, else "".
+  readonly property string mismatch: Model.zoneMismatch(info.zone, info.link)
+  readonly property bool stale: Model.staleClock(info.offset, new Date().getTimezoneOffset())
+  readonly property var warnings: [
+    mismatch === ""
+      ? ""
+      : "󰀦 Not applied: timedated reports " + info.zone + " but /etc/localtime is "
+        + mismatch + ".",
+    !stale
+      ? ""
+      : "󰀦 Bar clock is still on the previous zone. Restart with: "
+        + "systemctl --user restart quickshell dcal",
+    root.service.lastError,
+  ].filter(text => text !== "")
+
   cardWidth: 460
-  cardHeight: 330
+  // Each warning wraps to about two lines; the card grows rather than clipping
+  // the rows or swallowing the reason a change did not land.
+  cardHeight: 344 + warnings.length * 40
   keyNavigation: true
 
-  readonly property var info: service.info
   readonly property var rows: [
     { label: "Zone", value: info.zone === "" ? "unknown" : info.zone },
     { label: "Date", value: info.weekday + " " + info.date },
@@ -50,6 +68,7 @@ Ui.Panel {
     function status(): string {
       return JSON.stringify({
         zone: root.info.zone,
+        effective: root.mismatch === "" ? root.info.zone : root.mismatch,
         time: root.info.time,
         date: root.info.date,
         offset: root.info.offset,
@@ -92,6 +111,22 @@ Ui.Panel {
     text: root.info.time === "" ? "--:--:--" : root.info.time
   }
 
+  // Above the rows: a change that did not land is the reason to have opened this.
+  Repeater {
+    model: root.warnings
+
+    delegate: Text {
+      required property string modelData
+
+      width: root.cardWidth - 24
+      wrapMode: Text.WordWrap
+      color: root.shell.palette.fg
+      font.family: Ui.Fonts.mono
+      font.pixelSize: 12
+      text: modelData
+    }
+  }
+
   Repeater {
     model: root.rows
 
@@ -123,28 +158,5 @@ Ui.Panel {
         text: fieldRow.modelData.value
       }
     }
-  }
-
-  // The bar clock comes from Qt, which resolves the zone once at startup, so a
-  // change lands here before it lands there.
-  Text {
-    width: parent.width
-    wrapMode: Text.WordWrap
-    visible: Model.staleClock(root.info.offset, new Date().getTimezoneOffset())
-    color: root.shell.palette.fg
-    font.family: Ui.Fonts.mono
-    font.pixelSize: 12
-    text: "󰀦 Bar clock is still on the previous zone. "
-      + "Restart with: systemctl --user restart quickshell dcal"
-  }
-
-  Text {
-    width: parent.width
-    wrapMode: Text.WordWrap
-    visible: text.length > 0
-    color: root.shell.palette.fg
-    font.family: Ui.Fonts.mono
-    font.pixelSize: 12
-    text: root.service.lastError
   }
 }
