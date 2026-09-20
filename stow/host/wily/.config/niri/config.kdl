@@ -192,6 +192,7 @@ binds {
 
     // Launch
     Mod+T hotkey-overlay-title="Terminal" { spawn "ghostty"; }
+    Mod+Y hotkey-overlay-title="Files" { spawn "ghostty" "-e" "yazi"; }
     Mod+B hotkey-overlay-title="Browser" { spawn "chromium"; }
 
     // Focus the app's most recently focused window, switching workspace.
