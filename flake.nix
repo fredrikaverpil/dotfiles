@@ -153,23 +153,12 @@
                   # (.qmltypes) is used here. Same nixpkgs as renoir, so the
                   # same store path the ThinkPad runs.
                   quickshell = unstable.x86_64-linux.quickshell;
-                  # Static checks cover every host's tree and stop at the first failure.
+                  # Every kaizen host runs the one tree in stow/kaizen/.
                   task =
                     name: text:
                     pkgs.writeShellScriptBin name ''
                       set -e
-                      cd "$(git rev-parse --show-toplevel)"
-                      for dir in stow/host/*/.config/quickshell; do
-                        printf '== %s\n' "$dir"
-                        (cd "$dir" && ${text})
-                      done
-                    '';
-                  # The live shell only matches the running host's tree.
-                  hostTask =
-                    name: text:
-                    pkgs.writeShellScriptBin name ''
-                      set -e
-                      cd "$(git rev-parse --show-toplevel)/stow/host/$(hostname -s)/.config/quickshell"
+                      cd "$(git rev-parse --show-toplevel)/stow/kaizen/.config/quickshell"
                       ${text}
                     '';
                 in
@@ -184,8 +173,8 @@
                     pkgs.niri
                     pkgs.jq
                     (task "compositor-test" "tests/config_test.sh")
-                    (hostTask "shell-smoke" "tests/shell_smoke.sh \"$@\"")
-                    (hostTask "shell-perf" "tests/shell_perf.sh \"$@\"")
+                    (task "shell-smoke" "tests/shell_smoke.sh \"$@\"")
+                    (task "shell-perf" "tests/shell_perf.sh \"$@\"")
                   ];
                   # qmlls/qmllint/qmltestrunner take import paths from argv or
                   # env only (`-E` reads this); .qmlls.ini has no key for them.
