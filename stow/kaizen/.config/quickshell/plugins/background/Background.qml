@@ -22,7 +22,7 @@ Scope {
     }
 
     readonly property string wallpaperDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
-    readonly property string thumbDir: Quickshell.env("HOME") + "/.cache/kaizen/wallpaper-thumbs"
+    readonly property string thumbDir: Quickshell.env("HOME") + "/.cache/kaizen-shell/wallpaper-thumbs"
     property list<string> wallpapers: []
     // Wallpapers the current thumbnail pass has reached, generated or not.
     property int thumbsDone: 0
