@@ -1,1 +1,0 @@
-../wily/KAIZEN.md
