@@ -145,6 +145,7 @@ Notifications, Lock, Polkit, Background, Screensaver   own layer surfaces
 - Launcher, panel and context menu hold exclusive keyboard focus and close
   each other through `shell.claimPanel`. Pick by what opens the surface.
 - Every surface opens over IPC; niri binds are `spawn qs ipc call ...`.
+- The bar mirrors the launcher; nothing is reachable only from it.
 - `Ui/Compositor.qml` is the only path to niri.
 
 ## Session lifecycle
@@ -200,5 +201,7 @@ closes niri's readiness-before-`WAYLAND_DISPLAY` race.
 2. Does a purpose-built app do it acceptably? Launch that instead.
 3. Can it be used with the keyboard only? If not, redesign.
 4. Then: daemon/process state → `plugins/services/`, view →
-   `plugins/panels/`, packages/units/PAM → `desktop.nix`, compositor →
-   `Ui/compositors/` and `niri/config.kdl`, IPC target for every new action.
+   `plugins/panels/`; a protocol-driven surface with no other consumer of its
+   state (lock, notifications, polkit) keeps both in `plugins/<name>/`.
+   Packages/units/PAM → `desktop.nix`, compositor → `Ui/compositors/` and
+   `niri/config.kdl`, IPC target for every new action.
