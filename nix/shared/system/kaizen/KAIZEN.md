@@ -171,10 +171,21 @@ producer writing one file writes one file
 (`kaizen-shell/weather-<lat>_<lon>.json`). A directory per producer would
 mean descending into eight of them to find eight single-value files.
 
-Nothing prunes `~/.cache` on these hosts, so a cache that grows with the
-data it mirrors has to bound itself; the wallpaper thumbnails do it by
-dropping entries left untouched for 30 days. A single-file producer that
-starts writing one file per input has crossed into subdirectory territory.
+Nothing prunes `~/.cache` on these hosts, so every cache producer prunes its
+own entries. A producer that writes to the cache root without a sweep is
+incomplete, however small its entries look today: nothing else will ever
+delete them, and "one small file" is a claim about this week's usage, not
+about the path.
+
+The sweep both producers use: refresh an entry's mtime every time it is
+used, then delete what is older than 30 days in the same pass. Reuse counts
+as use, so a cache hit and a 304 both touch the file they served. The
+filesystem already records what is live, so this needs no index, and it
+expires exactly what stopped being asked for. A producer whose entries
+cannot age this way says in a comment what bounds it instead.
+
+A single-file producer that starts writing one file per input has crossed
+into subdirectory territory, and it needs a sweep before it gets there.
 
 Write nowhere else. `~/.config/quickshell/` is Stow's tree, not a writable
 location, and a fourth root only creates somewhere to forget.
