@@ -303,11 +303,62 @@ Scope {
             close();
         }
 
-        Text {
-            color: background.shell.palette.fg
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 15
-            text: "Wallpaper (" + background.slot + ") · " + (background.shell.dark ? "dark" : "light")
+        function clear() {
+            background.setWallpaper("");
+            close();
+        }
+
+        Item {
+            width: parent.width
+            height: Math.max(title.height, clearButton.height)
+
+            Text {
+                id: title
+                anchors.verticalCenter: parent.verticalCenter
+                color: background.shell.palette.fg
+                font.family: Ui.Fonts.mono
+                font.pixelSize: 15
+                text: "Wallpaper (" + background.slot + ") · " + (background.shell.dark ? "dark" : "light")
+            }
+
+            Rectangle {
+                id: clearButton
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                width: clearLabel.width + 20
+                height: clearLabel.height + 10
+                radius: 4
+                activeFocusOnTab: true
+                color: activeFocus ? background.shell.palette.dim : "transparent"
+                border.color: activeFocus ? background.shell.palette.fg : background.shell.palette.dim
+                border.width: 1
+
+                Text {
+                    id: clearLabel
+                    anchors.centerIn: parent
+                    color: background.shell.palette.fg
+                    font.family: Ui.Fonts.mono
+                    font.pixelSize: 13
+                    text: "󰅖 Clear"
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: picker.clear()
+                }
+
+                Keys.onPressed: function (event) {
+                    if (event.key === Qt.Key_Escape)
+                        picker.close();
+                    else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space)
+                        picker.clear();
+                    else if (event.key === Qt.Key_Down || event.key === Qt.Key_Up)
+                        grid.forceActiveFocus();
+                    else
+                        return;
+                    event.accepted = true;
+                }
+            }
         }
 
         GridView {
@@ -316,7 +367,9 @@ Scope {
             height: parent.height - y
             clip: true
             focus: true
-            cellWidth: width / 4
+            activeFocusOnTab: true
+            readonly property int columns: 4
+            cellWidth: width / columns
             cellHeight: cellWidth * 9 / 16
             model: background.wallpapers
             onCurrentIndexChanged: previewDelay.restart()
@@ -364,6 +417,8 @@ Scope {
                     picker.close();
                 else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
                     picker.choose();
+                else if (event.key === Qt.Key_Up && grid.currentIndex < grid.columns)
+                    clearButton.forceActiveFocus();
                 else
                     return;
                 event.accepted = true;
