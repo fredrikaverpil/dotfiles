@@ -77,11 +77,11 @@ let
   };
 in
 # The niri + Quickshell desktop: packages, portals, PAM, user units and the
-# pre-suspend lock. Compositor config and QML live in stow/host/<host>/.
+# pre-suspend lock. Compositor config and QML live in stow/kaizen/.
 {
   imports = [
     inputs.dankcalendar.nixosModules.default
-    ../../shared/system/fonts.nix
+    ../fonts.nix
   ];
 
   # niri is the only session: `niri --session` under UWSM, started with `kaizen` from the console.
@@ -105,12 +105,6 @@ in
 
   # Opens port 53317 for receiving files and text from phones.
   programs.localsend.enable = true;
-
-  programs._1password.enable = true;
-  programs._1password-gui = {
-    enable = true;
-    polkitPolicyOwners = [ "fredrik" ];
-  };
 
   # KService builds Dolphin's application list from an applications menu, which only Plasma ships.
   # Plasma's own menu would pull in plasma-workspace; KService only needs every app listed.
