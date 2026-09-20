@@ -1,10 +1,9 @@
 # kaizen
 
-Design intent and current shape of the desktop on `wily`. `kaizen` is
-the shell's name and the command that starts the session from the TTY. Kaizen:
-the setup is polished and refined continuously, never rebuilt. Zen: minimal,
-distraction-free. Read with `CLAUDE.md` (working rules, validation) and
-`README.md` (hardware).
+This document outlines `kaizen`; a combination of the Wayland compositor
+[niri](https://niri-wm.github.io/niri/) and
+[Quickshell](https://quickshell.org) - to form a tailor-made (for me),
+minimalistic and productive desktop environment which can be agent-testable.
 
 ## Intent
 
