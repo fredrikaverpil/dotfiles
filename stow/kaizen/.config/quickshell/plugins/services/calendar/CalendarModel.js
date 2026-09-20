@@ -71,6 +71,7 @@ function row(event, dayStart, dayEnd, tagsById, first) {
     meetingUrl: /^https:\/\//i.test(url) ? url : "",
     allDay: event.allDay === true,
     at: readable ? start.getTime() : 0,
+    until: readable ? end.getTime() : 0,
     time: !readable ? "?" : event.allDay ? "all day"
       : (start >= dayStart ? clock(start) : "…") + "–" + (end <= dayEnd ? clock(end) : "…"),
   }
