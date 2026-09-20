@@ -87,7 +87,7 @@ Scope {
 
     FileView {
         id: darkState
-        path: Quickshell.env("HOME") + "/.local/state/wallpaper-dark"
+        path: Quickshell.env("HOME") + "/.local/state/kaizen-wallpaper-dark"
         atomicWrites: true
         printErrors: false
         onLoaded: background.darkPick = text().trim()
@@ -95,7 +95,7 @@ Scope {
 
     FileView {
         id: lightState
-        path: Quickshell.env("HOME") + "/.local/state/wallpaper-light"
+        path: Quickshell.env("HOME") + "/.local/state/kaizen-wallpaper-light"
         atomicWrites: true
         printErrors: false
         onLoaded: background.lightPick = text().trim()
@@ -103,7 +103,7 @@ Scope {
 
     FileView {
         id: backdropDarkState
-        path: Quickshell.env("HOME") + "/.local/state/backdrop-dark"
+        path: Quickshell.env("HOME") + "/.local/state/kaizen-backdrop-dark"
         atomicWrites: true
         printErrors: false
         onLoaded: background.backdropDarkPick = text().trim()
@@ -111,7 +111,7 @@ Scope {
 
     FileView {
         id: backdropLightState
-        path: Quickshell.env("HOME") + "/.local/state/backdrop-light"
+        path: Quickshell.env("HOME") + "/.local/state/kaizen-backdrop-light"
         atomicWrites: true
         printErrors: false
         onLoaded: background.backdropLightPick = text().trim()

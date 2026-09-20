@@ -11,6 +11,8 @@ Singleton {
   function closeWindow() { return Niri.closeWindow() }
   function screenshot(mode) { return Niri.screenshot(mode) }
   function pickColor() { return Niri.pickColor() }
+  function configFile(home) { return Niri.configFile(home) }
+  function parseBinds(raw) { return Niri.parseBinds(raw) }
   function focusWorkspace(id, output) { return Niri.focusWorkspace(id, output) }
   function focusMonitor(output) { return Niri.focusMonitor(output) }
   function outputs() { return Niri.outputs() }

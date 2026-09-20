@@ -14,14 +14,6 @@ TestCase {
     "style.disabled": { label: "Disabled", enabled: false },
   })
 
-  function test_bind_parser_accepts_the_tsv_contract_written_by_both_compositors() {
-    compare(Menu.parseBinds("SUPER + K\tKeybindings\nMod+K\tKeybindings\n"), [
-      { chord: "SUPER + K", label: "Keybindings", enabled: true },
-      { chord: "Mod+K", label: "Keybindings", enabled: true },
-    ])
-    compare(Menu.parseBinds("\n"), [])
-  }
-
   function test_emoji_parser_keeps_fully_qualified_emoji_without_skin_tones() {
     const raw = "# group: Smileys & Emotion\n"
       + "1F600 ; fully-qualified # 😀 E1.0 grinning face\n"

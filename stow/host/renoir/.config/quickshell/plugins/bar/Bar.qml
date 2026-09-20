@@ -14,7 +14,7 @@ Scope {
 
   SystemClock {
     id: clock
-    precision: SystemClock.Seconds
+    precision: SystemClock.Minutes
   }
 
   Variants {
@@ -62,6 +62,7 @@ Scope {
       Row {
         id: clockLabel
         anchors.centerIn: parent
+        spacing: 6
 
         Ui.BarButton {
           shell: bar.shell
@@ -70,19 +71,57 @@ Scope {
           onActivated: bar.shell.calendar.toggle()
         }
 
+        Rectangle {
+          anchors.verticalCenter: parent.verticalCenter
+          width: 1
+          height: 16
+          color: bar.shell.palette.dim
+        }
+
         Text {
+          id: timeLabel
           anchors.verticalCenter: parent.verticalCenter
           color: bar.shell.palette.fg
           font.family: Ui.Fonts.mono
           font.pixelSize: 14 * bar.shell.textScale
-          text: Qt.formatDateTime(clock.date, "HH:mm:ss")
+          text: Qt.formatDateTime(clock.date, "HH:mm")
+          onTextChanged: if (text.endsWith(":00")) hourPulse.restart()
+
+          SequentialAnimation {
+            id: hourPulse
+            loops: 3
+            NumberAnimation {
+              target: timeLabel
+              property: "scale"
+              to: 1.25
+              duration: 200
+              easing.type: Easing.OutQuad
+            }
+            NumberAnimation {
+              target: timeLabel
+              property: "scale"
+              to: 1.0
+              duration: 200
+              easing.type: Easing.InQuad
+            }
+          }
         }
+      }
+
+      Rectangle {
+        id: weatherDivider
+        anchors.left: clockLabel.right
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.leftMargin: 6
+        width: 1
+        height: 16
+        color: bar.shell.palette.dim
       }
 
       Ui.BarButton {
         id: weatherButton
         shell: bar.shell
-        anchors.left: clockLabel.right
+        anchors.left: weatherDivider.right
         anchors.leftMargin: 6
         anchors.verticalCenter: parent.verticalCenter
         implicitWidth: 58
@@ -93,9 +132,20 @@ Scope {
         onSecondary: bar.shell.weatherService.refresh()
       }
 
-      Media.BarWidget {
+      Rectangle {
+        id: mediaDivider
         anchors.left: weatherButton.right
+        anchors.verticalCenter: parent.verticalCenter
         anchors.leftMargin: 6
+        width: mediaWidget.width > 0 ? 1 : 0
+        height: 16
+        color: bar.shell.palette.dim
+      }
+
+      Media.BarWidget {
+        id: mediaWidget
+        anchors.left: mediaDivider.right
+        anchors.leftMargin: mediaDivider.width > 0 ? 6 : 0
         anchors.verticalCenter: parent.verticalCenter
         shell: bar.shell
       }
@@ -276,6 +326,7 @@ Scope {
         anchors.rightMargin: trayDivider.visible ? 6 : 0
         shell: bar.shell
         panel: bar.shell.tray
+        output: modelData.name
       }
     }
   }
