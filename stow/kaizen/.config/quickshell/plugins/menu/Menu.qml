@@ -4,6 +4,7 @@ import Quickshell.Io
 import Quickshell.Services.SystemTray
 
 import "../bar/widgets/TrayModel.js" as TrayModel
+import "../services/timezone/ZonesModel.js" as ZonesModel
 import "../services/weather/PlacesModel.js" as PlacesModel
 import "MenuModel.js" as Model
 
@@ -36,6 +37,7 @@ Ui.Panel {
     "panels.media": { icon: menu.shell.media.icon, label: "Media", action: () => menu.shell.media.open() },
     "panels.weather": { icon: menu.shell.weatherService.icon, label: "Weather", action: () => menu.shell.weather.open() },
     "panels.calendar": { icon: "󰃭", label: "Calendar", action: () => menu.shell.calendar.open() },
+    "panels.clock": { icon: "󰅐", label: "Clock", action: () => menu.shell.timezone.open() },
     "tray": { icon: "󰘔", label: "Tray", provider: "tray" },
     "setup": { icon: "", label: "Setup" },
     "setup.display": { icon: "󰍹", label: "Display", action: () => menu.shell.display.open() },
@@ -45,6 +47,7 @@ Ui.Panel {
     "setup.power": { icon: "󰂄", label: "Power", action: () => menu.shell.battery.open() },
     "setup.nightlight": { icon: "󰆔", label: "Nightlight", action: () => menu.shell.nightlight.toggle() },
     "setup.weather": { icon: menu.shell.weatherService.icon, label: "Weather location", provider: "places" },
+    "setup.timezone": { icon: "󰅐", label: "Timezone", provider: "zones" },
     "setup.keyboard": { icon: "󰌌", label: "Keyboard layout" },
     "setup.keyboard.us": {
       icon: menu.shell.keyboard.index === 0 ? "󰄬" : "󰌌",
@@ -157,6 +160,20 @@ Ui.Panel {
     }))
   }
 
+  // Setting the zone goes through polkit, so the agent may ask before it lands.
+  function zoneRows() {
+    const service = menu.shell.timezoneService
+    return ZonesModel.zones.map(zone => ({
+      label: zone.name,
+      icon: service.zone === zone.zone ? "󰄬" : "󰅐",
+      image: "",
+      detail: zone.zone,
+      enabled: true,
+      entry: null,
+      action: () => service.setZone(zone.zone),
+    }))
+  }
+
   IpcHandler {
     target: "menu"
 
@@ -171,6 +188,7 @@ Ui.Panel {
     tray: function() { return menu.trayRows() },
     apps: function(detail) { return menu.appRows(detail) },
     places: function() { return menu.placeRows() },
+    zones: function() { return menu.zoneRows() },
     emoji: function() { return menu.emojis },
   })
 
