@@ -57,11 +57,13 @@ hotkey-overlay {
     skip-at-startup
 }
 
-workspace "1"
-workspace "2"
-workspace "3"
-workspace "4"
-workspace "5"
+// The named workspaces move over onto DP-1 when connected,
+// and moves back to the default (eDP-1) when disconnected.
+workspace "1" { open-on-output "DP-1"; }
+workspace "2" { open-on-output "DP-1"; }
+workspace "3" { open-on-output "DP-1"; }
+workspace "4" { open-on-output "DP-1"; }
+workspace "5" { open-on-output "DP-1"; }
 
 // Quickshell draws two wallpapers: one inside the workspaces, one behind them.
 layer-rule {
