@@ -115,6 +115,15 @@ TestCase {
     verify(Timezone.zoneMismatch("", "/etc/zoneinfo/Europe/Stockholm") === "")
   }
 
+  // Both sides are date(1) %z form: the system's, and Qt's "tt".
+  function test_a_shell_left_on_its_starting_zone_is_caught_by_the_offset() {
+    verify(Timezone.staleClock("+0200", "+0000") === true)
+    verify(Timezone.staleClock("+0200", "+0200") === false)
+    // Nothing to compare against is not staleness.
+    verify(Timezone.staleClock("", "+0200") === false)
+    verify(Timezone.staleClock("+0200", "") === false)
+  }
+
   function test_offsets_read_back_in_both_directions_including_odd_ones() {
     verify(Timezone.offsetSeconds("+0900") === 32400)
     verify(Timezone.offsetSeconds("-0430") === -16200)

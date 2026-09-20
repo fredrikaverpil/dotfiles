@@ -93,8 +93,22 @@ function parse(text, nowMs) {
   return result
 }
 
-// date(1) prints +0900. Seconds, so the panel can compare it with what the
-// shell's own engine believes and spot a zone change it has not picked up.
+// glibc caches the parsed tzfile, and replacing /etc/localtime does not
+// invalidate it, so a running shell keeps the zone it started with. Both
+// arguments are date(1) %z form: the system's, and what Qt renders as "tt".
+//
+// Removing /etc/localtime is the misleading case — the read fails and glibc
+// falls back to UTC, which looks like the change being picked up. Replacing
+// the file, which is what setting a zone does, is not noticed at all.
+function staleClock(systemOffset, renderedOffset) {
+  var system = String(systemOffset || "")
+  var rendered = String(renderedOffset || "")
+  if (system === "" || rendered === "") return false
+  return system !== rendered
+}
+
+// date(1) prints +0900. Seconds, so the panel can render the same form the
+// transition rows use.
 function offsetSeconds(offset) {
   var match = /^([+-])(\d{2})(\d{2})$/.exec(String(offset || ""))
   if (!match) return null
