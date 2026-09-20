@@ -158,7 +158,11 @@ niri's readiness-before-`WAYLAND_DISPLAY` race.
 One cache root, so clearing everything the shell caches is one directory.
 State files stay flat because each holds a single value or one small JSON
 document, and the `kaizen-` prefix keeps them legible beside other
-applications' state.
+applications' state. That skips the per-application directory XDG expects
+and the cache root already uses, knowingly: the prefix groups eight
+single-value files well enough to not be worth a migration. Revisit when a
+producer needs a second state file, because the prefix stops grouping at
+that point and the directory has to exist anyway.
 
 The runtime directory is the third root because a lock has to outlive a
 shell crash but must not outlive the session: XDG guarantees it is
