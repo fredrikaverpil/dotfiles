@@ -1,22 +1,23 @@
 # niri + Quickshell desktop
 
-This file documents the niri + Quickshell desktop and travels with it. Any
-desktop host can be the one experimented on; changes (code and this file alike)
-are later either rolled back or promoted to the other hosts by copying files,
-in either direction. Hosts share nothing by import or symlink, so
-`diff -r nix/hosts/renoir nix/hosts/wily` and
-`diff -r stow/host/renoir stow/host/wily` show the whole drift, including
-in-progress experiments. Host-only modules (`personal.nix`) and the machine
-differences listed below are not copied.
+This file documents the niri + Quickshell desktop and lives with it. Every
+host running it shares one copy of everything: `desktop.nix` in this
+directory, `../thinkpad.nix` next to it, and the compositor config and QML in
+`stow/kaizen/`. An edit lands on every kaizen host at once, so there is no
+promotion step and no drift to diff for.
 
-What stays per host: hardware and firmware settings
+What stays per host, in `nix/hosts/<host>/`: hardware and firmware settings
 (`hardware-configuration.nix`, disk and resume devices, GPU drivers, sleep
-policy), the mpv decode profile, and work-only configuration (the `einride`
-submodule and what it pulls in). Everything else in `desktop.nix`,
-`thinkpad.nix` and `stow/host/<host>/` is meant to be identical.
+policy), host-only programs and packages (`programs.*` set directly in
+`configuration.nix`, `host.extraSystemPackages`, `personal.nix`), work-only
+configuration (the `einride` submodule and what it pulls in), and the mpv
+decode profile in `stow/host/<host>/`.
 
-Machine facts (firmware, BIOS, hardware quirks) go in the host's `README.md`
-and are never promoted. Design intent and the layer model are in `KAIZEN.md`;
+To try another shell, compositor or panel on one machine, use a git branch or
+worktree, not a per-host copy of the tree.
+
+Machine facts (firmware, BIOS, hardware quirks) belong in the host's
+`README.md`, never here. Design intent and the layer model are in `KAIZEN.md`;
 read it before adding a surface or service.
 
 ## Working model
@@ -36,16 +37,16 @@ previous states. Explain a declaration next to it, not here.
 ## Gotchas
 
 - "kaizen" names the shell (PAM `kaizen-lock`, `kaizen-*` units, layer
-  namespaces, D-Bus path, state files). It is host-agnostic; "wily" is only
-  a hostname.
+  namespaces, D-Bus path, state files). It is host-agnostic; `renoir` and
+  `wily` are only hostnames.
 - Nix comments carry the "why" for packages, portals, PAM, units and hardware
-  integration. Read `desktop.nix`, `thinkpad.nix`, `configuration.nix` before
-  asking.
+  integration. Read `desktop.nix` here and `../thinkpad.nix`, plus the host's
+  `configuration.nix`, before asking.
 
 ## Architecture
 
 - `desktop.nix` owns packages, portals, PAM, systemd units and the pre-suspend
-  lock. `stow/host/<host>/` owns compositor configuration and QML.
+  lock. `stow/kaizen/` owns compositor configuration and QML.
 - `shell.qml` wires services and surfaces. Views belong in `plugins/panels/`;
   daemon/process state belongs in `plugins/services/`.
 - Interactive surfaces come in three kinds; pick by what opens them:
@@ -127,12 +128,12 @@ These are development gates, not CI jobs. They live only in the repository's
 default devshell (`flake.nix`), entered by `direnv` at the repo root or run as
 `nix develop ~/.dotfiles -c <command>` (not `#dev`) from anywhere in the
 checkout. `compositor-test` and `shell-smoke` are Linux-only and are absent
-from the shell on macOS. Static checks run against every host's tree;
-`shell-smoke` uses the tree of the host it runs on (`hostname -s`).
+from the shell on macOS. All of them run against the single `stow/kaizen/`
+tree, so a static check passing here passes for every kaizen host.
 
 | Change | Checks |
 | --- | --- |
-| Nix | `nix fmt`, `nix build .#nixosConfigurations.<host>.system` on the host |
+| Nix | `nix fmt`, `nix build .#nixosConfigurations.<host>.config.system.build.toplevel`; build both kaizen hosts, a shared module breaks both |
 | JS/QML | `qml-test`, `qml-lint` (any platform) |
 | Compositor interface, config, or bind contract | Also `compositor-test` (Linux) |
 | Service IPC, `shell.qml` wiring, or systemd units | Also `shell-smoke` on the machine after deploy and restart, and exercise the affected path |
@@ -259,7 +260,7 @@ never create Stow links manually or run `git clean -fd` in the host clone.
 When working from another host, sync the checkout before live validation or a
 user-run rebuild, which evaluates the host's clone. Checksums avoid replacing
 identical compositor files solely because timestamps differ. The host may
-carry uncommitted theme edits in `stow/host/<host>/`; check `git status`
+carry uncommitted theme edits in `stow/kaizen/`; check `git status`
 there before `--delete`.
 
 ```sh

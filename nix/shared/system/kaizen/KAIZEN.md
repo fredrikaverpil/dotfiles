@@ -19,7 +19,7 @@ minimalistic and productive desktop environment which can be agent-testable.
 - Everything is reachable from a terminal (`qs ipc`, `niri msg`,
   `systemctl --user`) so an agent can drive and verify it.
 - Host-agnostic naming: "kaizen" in units, PAM, layer namespaces, state
-  files. "wily" is only a hostname.
+  files. A hostname never appears in the desktop's configuration.
 
 ## Foundational model
 
@@ -54,8 +54,8 @@ flowchart BT
 
 Each layer only calls downward. The shell never owns a daemon's state; it
 reads and drives it. Nix (`desktop.nix`, `thinkpad.nix`) owns the two lower
-layers and the systemd units; Stow (`stow/host/<host>/`) owns compositor config
-and QML.
+layers and the systemd units; Stow (`stow/kaizen/`) owns compositor config
+and QML. Both are shared by every host running kaizen.
 
 ## Services to surfaces
 
