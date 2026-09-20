@@ -10,38 +10,6 @@ and imported by `configuration.nix` only when checked out.
 >
 > Awaiting the Proton Pass v1.40+ SSH agent, so per-usage PIN can be used.
 
-> [!TODO]
->
-> Shell state moved from `~/.local/state/kaizen-<name>` to
-> `~/.local/state/kaizen-shell/<name>`, done on `renoir` but not here. The
-> shell starts on defaults and the old files sit unread until moved.
->
-> Rebuild first: `StateDirectory=` in the quickshell unit is what creates
-> the directory. Migrating before the rebuild means doing it twice, because
-> the old shell writes `kaizen-*` back as it exits. Then, with the shell
-> stopped:
->
-> ```sh
-> cd ~/.local/state
-> for f in kaizen-*; do [ -d "$f" ] && continue; mv "$f" "kaizen-shell/${f#kaizen-}"; done
-> rm -f kaizen-shell/wallpaper-dark kaizen-shell/wallpaper-light \
->       kaizen-shell/backdrop-dark kaizen-shell/backdrop-light
-> ```
->
-> The `[ -d ]` guard skips `kaizen-shell` itself. The four wallpaper files
-> carry no JSON, so they are dropped and the wallpapers re-picked once
-> (light and dark, workspace and backdrop); everything else survives.
->
-> The cache root was renamed too, and `renoir` still held a `wily-shell/`
-> directory from before it. Drop whatever is neither the thumbnails nor a
-> weather file:
->
-> ```sh
-> ls ~/.cache/kaizen-shell   # expect only wallpaper-thumbs/ and weather-*.json
-> ```
->
-> Delete this note afterwards.
-
 ## Rebuilding
 
 Flakes copy the tree from `git ls-files`, which lists the submodule pointer
