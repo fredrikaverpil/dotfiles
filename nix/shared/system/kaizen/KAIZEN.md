@@ -74,7 +74,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | keyboard | [niri] XKB layouts | layout button | Setup › Keyboard | `keyboard` |
 | media | [MPRIS] | now-playing widget | Panels › Media | `media` |
 | network | [NetworkManager], `ip -j` | button | Setup › Network | `network` |
-| nightlight | [wl-gammarelay-rs] over D-Bus | – | Setup › Nightlight | `nightlight` |
+| nightlight | [wl-gammarelay-rs] over D-Bus, [timedated] for the solar position | – | Setup › Nightlight | `nightlight` |
 | recording | [gpu-screen-recorder], [grim], [PipeWire] | recording indicator | Trigger › Record, Screenshot (region) | `recording` |
 | system | [hwmon], `/proc` load | monitor button | Setup › Display | `system`, `display` |
 | weather | [met.no locationforecast] | button | Panels › Weather, Setup › Weather location | `weather` |
@@ -111,6 +111,29 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 [wlr-layer-shell]: https://wayland.app/protocols/wlr-layer-shell-unstable-v1
 [polkit]: https://www.freedesktop.org/software/polkit/docs/latest/
 [StatusNotifierItem]: https://www.freedesktop.org/wiki/Specifications/StatusNotifierItem/
+[timedated]: https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.timedate1.html
+
+## Time and place
+
+Two separate inputs, neither configured in the shell.
+
+The timezone is whatever [timedated] holds in `/etc/localtime`. The clock, the
+calendar panel and dcal read local time from it, and nightlight derives
+sunrise and sunset by looking the zone up in `/etc/zoneinfo/zone.tab`. The
+ThinkPads leave `time.timeZone` unset so `timedatectl set-timezone` persists
+across rebuilds; the stationary hosts pin it. DST is handled nowhere in this
+repository: a zone name is a rule set and tzdata evaluates it per instant.
+Storing an offset instead is what would break twice a year.
+
+The weather location is a coordinate and cannot be derived from a zone —
+`Europe/Stockholm` resolves to Stockholm, 400 km from home. It is picked from
+`PlacesModel.js` and saved, because these machines cannot sense where they
+are: a ThinkPad only has GNSS when a WWAN card carrying it is fitted, and none
+is.
+
+A process resolves the zone once at startup, so after changing it restart
+`quickshell.service` and `dcal.service`. Never automate that restart on
+`/etc/localtime` changing: the shell must not be restarted while locked.
 
 ## Surfaces
 

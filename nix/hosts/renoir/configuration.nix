@@ -12,7 +12,9 @@
   nixpkgs.hostPlatform = "x86_64-linux";
   nixpkgs.config.allowUnfree = true;
 
-  time.timeZone = "Europe/Stockholm";
+  # Unset so timedated owns /etc/localtime and `timedatectl set-timezone`
+  # persists across rebuilds; this laptop travels. UTC until first set.
+  time.timeZone = null;
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.systemd-boot.configurationLimit = 5;
