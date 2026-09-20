@@ -54,7 +54,7 @@ flowchart BT
 
 Each layer only calls downward. The shell never owns a daemon's state; it
 reads and drives it. Nix (`desktop.nix`, `thinkpad.nix`) owns the two lower
-layers and the systemd units; Stow (`stow/host/wily/`) owns compositor config
+layers and the systemd units; Stow (`stow/host/<host>/`) owns compositor config
 and QML.
 
 ## Services to surfaces
