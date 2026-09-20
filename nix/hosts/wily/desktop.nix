@@ -339,6 +339,7 @@ in
 
     # Chromium picks its password store per desktop; switching stores drops cookies and logins.
     (chromium.override { commandLineArgs = "--no-first-run --password-store=gnome-libsecret"; })
+    blanket
     bluetui
     bluetui-desktop
     cliamp
