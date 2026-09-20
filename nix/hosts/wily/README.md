@@ -1,7 +1,8 @@
 # wily (ThinkPad T14 Gen 6 Intel, Core Ultra 7 258V "Lunar Lake")
 
-Work machine (Lenovo 21QG006CMX). The niri + Quickshell desktop is documented
-in `CLAUDE.md`. Work-only configuration lives in the private
+Work machine (Lenovo 21QG006CMX). The niri + Quickshell desktop it runs is
+shared with `renoir` and documented in `nix/shared/system/kaizen/CLAUDE.md`.
+Work-only configuration lives in the private
 `fredrikaverpil/dotfiles-einride` repo, mounted as the git submodule `einride/`
 and imported by `configuration.nix` only when checked out.
 
@@ -82,7 +83,8 @@ Here `kaizen-sleep-lock` is still running but cannot lock, so do not suspend.
   on this reader.
 - Camera: `/dev/video0` is the capture node (MJPEG up to 2592x1944@30);
   `video1`-`video3` are metadata and duplicate nodes.
-- Battery: Sunwoda 57 Wh, thresholds 75/80 % via `thinkpad.nix`.
+- Battery: Sunwoda 57 Wh, thresholds 75/80 % via
+  `nix/shared/system/thinkpad.nix`.
 - Built-in keyboard is `0001:0001` (keyd), keyboard backlight is
   `tpacpi::kbd_backlight` (Fn+Space, firmware-driven).
 

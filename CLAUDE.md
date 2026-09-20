@@ -28,8 +28,10 @@ code in this repository.
   versions (add `--greedy` to also bump self-updating casks)
 - **Nix rebuild**: ask user to run this, NEVER run it yourself
 - **Nix validation**: `nix flake check` or `nix flake check --all-systems`
-- **Nix builds**: `nix build .#darwinConfigurations.<host>.system` (hosts:
-  `zap`, `plumbus` on Darwin; `rpi5-homelab`, `renoir` on NixOS)
+- **Nix builds**: `nix build .#darwinConfigurations.<host>.system` on Darwin
+  (`zap`, `plumbus`);
+  `nix build .#nixosConfigurations.<host>.config.system.build.toplevel` on
+  NixOS (`rpi5-homelab`, `renoir`, `wily`) — NixOS has no `.system` attribute
 - **Format Nix files**: `nix fmt` (uses nixfmt-rfc-style)
 - **CI testing**: Follow `.github/workflows/test.yml` workflow
 - **Toolchain outside Neovim**: language toolchains (go, python3, node, ruby,
@@ -61,8 +63,10 @@ and **GNU Stow** for dotfile symlinking.
   anchored to the nixpkgs pinned by the `nixos-raspberrypi` input (its
   nixpkgs, `home-manager-rpi` and `disko` all follow that pin — do not make
   them follow another nixpkgs, or kernel binary cache hits are lost)
-- **Module scope**: host modules are split by concern (`desktop.nix`,
-  `personal.nix`, `thinkpad.nix`). Use system config only when a NixOS or
+- **Module scope**: modules are split by concern. Shared ones live in
+  `nix/shared/system/` (`kaizen/desktop.nix`, `thinkpad.nix`) and are imported
+  by every host that wants them; host-only ones stay in `nix/hosts/<host>/`
+  (`personal.nix`). Use system config only when a NixOS or
   nix-darwin module, or root-level integration, is needed; portable user
   tooling goes in home-manager (`nix/shared/home/`)
 - **Configuration helpers**: Use `lib.mkDarwin` and `lib.mkRpiNixos` functions
@@ -93,10 +97,11 @@ Wheels and prebuilt npm binaries are glibc-linked and fail to load on NixOS
 
 ### niri + Quickshell desktop (ThinkPads)
 
-Read `nix/hosts/<host>/CLAUDE.md` (identical on `renoir` and `wily`) before
-changing Quickshell, niri or their Nix modules. It owns the local checks,
-platform boundaries and safe deployment process. Hardware notes are in the
-host's `README.md`.
+Read `nix/shared/system/kaizen/CLAUDE.md` before changing Quickshell, niri or
+their Nix modules. It owns the local checks, platform boundaries and safe
+deployment process. `renoir` and `wily` share one copy of that desktop:
+`nix/shared/system/kaizen/` and `stow/kaizen/` apply to both, so an edit there
+lands on both. Hardware notes are in the host's `README.md`.
 
 ### Neovim Configuration
 

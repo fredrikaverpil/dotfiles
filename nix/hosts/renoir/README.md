@@ -1,12 +1,33 @@
 # renoir (ThinkPad T14 Gen 1, AMD Renoir)
 
-Personal machine; the niri + Quickshell desktop is documented in `CLAUDE.md`.
-Machine-specific settings (microcode, VAAPI driver, kernel choice) belong in
-`configuration.nix`; ThinkPad integration in `thinkpad.nix`.
+Personal machine. The niri + Quickshell desktop it runs is shared with `wily`
+and documented in `nix/shared/system/kaizen/CLAUDE.md`; its Nix modules are
+`nix/shared/system/kaizen/desktop.nix` and `nix/shared/system/thinkpad.nix`.
+Machine-specific settings (microcode, VAAPI driver, kernel choice) and
+host-only programs belong in `configuration.nix`, personal-only ones in
+`personal.nix`.
 
 > [!NOTE]
 >
 > Awaiting the Proton Pass v1.40+ SSH agent, so per-usage PIN can be used.
+
+> [!NOTE]
+>
+> One-time, after pulling the commit that moved the compositor tree to
+> `stow/kaizen/`: the old `stow/host/renoir/` symlinks in `$HOME` are left
+> dangling, since Stow computes deletions from a package's current contents.
+> Run `find ~/.config/niri ~/.config/quickshell ~/.config/xkb
+> ~/.local/share/fonts -xtype l -delete`, then the usual stow commands from
+> the root `CLAUDE.md`, then `systemctl --user restart quickshell.service`
+> while unlocked. Delete this note once done.
+
+## Sleep
+
+Lid close uses the logind default, plain suspend; there is no hibernate.
+`wily` adds `suspend-then-hibernate` with a `resumeDevice` in its LUKS swap,
+which needs a swap device at least as large as RAM. Whether this machine's
+swap fits its 16 GB has not been checked — do that before copying wily's
+sleep settings, and keep them out of the shared modules either way.
 
 ## Firmware
 
@@ -49,7 +70,7 @@ Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
   `nix eval --raw .#nixosConfigurations.renoir.config.security.pam.services.<name>.text`;
   `environment.etc."pam.d/<name>".text` is null because it uses `source`.
 - The lock screen needs a separate, concurrent fingerprint `PamContext` (see
-  the `kaizen-lock` comment in `desktop.nix`). Test it with a recovery plan
+  the `kaizen-lock` comment in `nix/shared/system/kaizen/desktop.nix`). Test it with a recovery plan
   before enabling it for `login`.
 - fwupd cannot read the reader's firmware version: it answers with an
   unmapped status `0x315`. libfprint talks to it independently; untested.
