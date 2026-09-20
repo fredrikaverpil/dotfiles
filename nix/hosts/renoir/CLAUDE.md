@@ -8,7 +8,8 @@ by import or symlink, so `diff -r nix/hosts/renoir nix/hosts/wily` and
 in-progress experiments. Host-only modules (`personal.nix`) are not copied.
 
 Machine facts (firmware, BIOS, hardware quirks) go in the host's `README.md`
-and are never promoted.
+and are never promoted. Design intent and the layer model are in `KAIZEN.md`;
+read it before adding a surface or service.
 
 ## Working model
 
@@ -39,6 +40,17 @@ previous states. Explain a declaration next to it, not here.
   lock. `stow/host/<host>/` owns compositor configuration and QML.
 - `shell.qml` wires services and surfaces. Views belong in `plugins/panels/`;
   daemon/process state belongs in `plugins/services/`.
+- Interactive surfaces come in three kinds; pick by what opens them:
+  - Launcher (`plugins/menu/`): a large `Ui.Panel` drilling down through
+    levels; the keyboard entry point to everything, tray menus included.
+  - Panel (`Ui/Panel.qml`): a centered card for settings and views; `h`/`l`
+    step focus.
+  - Context menu (`Ui/ContextMenu.qml`): hangs from the bar button that opened
+    it, on that button's output, sized to its rows; submenus cascade beside
+    their row and `h`/`l` close and open them. Opened without a button
+    (launcher, IPC), it resolves the focused output from the compositor.
+  All three hold exclusive keyboard focus and close each other through
+  `shell.claimPanel`.
 - `Ui/Compositor.qml` is the compositor interface; `Ui/compositors/` owns niri
   commands, response parsing, and the workspace source. Views use that
   interface. Keep scheduling and shared state above it. Nightlight is not
