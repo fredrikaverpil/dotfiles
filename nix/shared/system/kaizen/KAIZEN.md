@@ -68,7 +68,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | battery | [UPower], [sysfs power_supply] thresholds, [power-profiles-daemon] | battery button | Setup › Power | `battery` |
 | bluetooth | [BlueZ] via [Quickshell] | button | Setup › Bluetooth | `bluetooth` |
 | brightness | [sysfs backlight] via [logind] SetBrightness | – | XF86 keys | `brightness` |
-| calendar | [dcal] JSON IPC | clock | Panels › Calendar | `calendar` |
+| calendar | [dcal] JSON IPC | date button | Panels › Calendar | `calendar` |
 | clipboard | [wl-clipboard] watcher, in memory | – | Trigger › Clipboard | `clipboard` |
 | idle | [ext-idle-notify], lock service | – | System › Idle | `idle` |
 | keyboard | [niri] XKB layouts | layout button | Setup › Keyboard | `keyboard` |
@@ -77,6 +77,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | nightlight | [wl-gammarelay-rs] over D-Bus, [timedated] for the solar position | – | Setup › Nightlight | `nightlight` |
 | recording | [gpu-screen-recorder], [grim], [PipeWire] | recording indicator | Trigger › Record, Screenshot (region) | `recording` |
 | system | [hwmon], `/proc` load | monitor button | Setup › Display | `system`, `display` |
+| timezone | [timedated] via `timedatectl`, `zdump` for the DST rules | time button | Panels › Clock, Setup › Timezone | `timezone` |
 | weather | [met.no locationforecast] | button | Panels › Weather, Setup › Weather location | `weather` |
 | notifications | [Desktop Notifications] server | – | System › Notifications | `notifications` |
 | lock | [ext-session-lock] + [PAM] `kaizen-lock` | – | System › Lock | `lock` |
@@ -115,15 +116,27 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 
 ## Time and place
 
-Two separate inputs, neither configured in the shell.
+Two separate inputs, and neither is stored by the shell.
 
 The timezone is whatever [timedated] holds in `/etc/localtime`. The clock, the
 calendar panel and dcal read local time from it, and nightlight derives
 sunrise and sunset by looking the zone up in `/etc/zoneinfo/zone.tab`. The
 ThinkPads leave `time.timeZone` unset so `timedatectl set-timezone` persists
-across rebuilds; the stationary hosts pin it. DST is handled nowhere in this
-repository: a zone name is a rule set and tzdata evaluates it per instant.
-Storing an offset instead is what would break twice a year.
+across rebuilds; the stationary hosts pin it. The timezone service drives that
+command from `ZonesModel.js` and reads the result back — timedated already
+persists the zone, and a second copy in the shell's own state could disagree
+with the system every other process reads. Setting it goes through polkit, so
+the agent may ask before the change lands.
+
+DST is handled nowhere in this repository: a zone name is a rule set and
+tzdata evaluates it per instant, so the list holds IANA ids and never offsets.
+Storing an offset is what would break twice a year. The Clock panel exists to
+show that this is actually so — offset, abbreviation, UTC, whether DST is in
+effect and when it next changes, the last two read from `zdump`.
+
+Zone-aware formatting has to come from `date(1)`. Qt's JS engine has no `Intl`
+and silently ignores `toLocaleString`'s `timeZone` option rather than failing,
+so every zone renders as the local one.
 
 The weather location is a coordinate and cannot be derived from a zone —
 `Europe/Stockholm` resolves to Stockholm, 400 km from home. It is picked from
@@ -132,8 +145,10 @@ are: a ThinkPad only has GNSS when a WWAN card carrying it is fitted, and none
 is.
 
 A process resolves the zone once at startup, so after changing it restart
-`quickshell.service` and `dcal.service`. Never automate that restart on
-`/etc/localtime` changing: the shell must not be restarted while locked.
+`quickshell.service` and `dcal.service`. The Clock panel compares `date(1)`'s
+offset against the shell's own and says so while they disagree. Never automate
+that restart on `/etc/localtime` changing: the shell must not be restarted
+while locked.
 
 ## Surfaces
 
