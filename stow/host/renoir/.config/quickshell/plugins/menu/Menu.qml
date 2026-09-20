@@ -12,7 +12,71 @@ import "../../Ui" as Ui
 Ui.Panel {
   id: menu
 
-  required property var items
+  readonly property var items: ({
+    "apps": { icon: "󰀻", label: "Apps", provider: "apps" },
+    "keybindings": { icon: "", label: "Keybindings", provider: "binds" },
+    "style": { icon: "", label: "Style" },
+    "style.wallpaper": { icon: "", label: "Wallpaper (workspace)", action: () => menu.shell.background.open("workspace") },
+    "style.backdrop": { icon: "", label: "Wallpaper (backdrop)", action: () => menu.shell.background.open("backdrop") },
+    "style.theme": { icon: "", label: "Theme" },
+    "style.theme.dark": { icon: "", label: "Dark", action: () => menu.shell.setDark(true) },
+    "style.theme.light": { icon: "", label: "Light", action: () => menu.shell.setDark(false) },
+    "trigger": { icon: "󱓞", label: "Trigger" },
+    "trigger.screenshot": { icon: "", label: "Screenshot (desktop)",
+      action: () => Quickshell.execDetached(Ui.Compositor.screenshot("screen")) },
+    "trigger.screenshotWindow": { icon: "", label: "Screenshot (window)",
+      action: () => Quickshell.execDetached(Ui.Compositor.screenshot("window")) },
+    "trigger.screenshotRegion": { icon: "", label: "Screenshot (region)",
+      action: () => menu.shell.recordingService.screenshot() },
+    "trigger.record": { icon: "󰑊", label: "Record screen", action: () => menu.shell.recording.open() },
+    "trigger.emoji": { icon: "", label: "Emoji", provider: "emoji" },
+    "trigger.color": { icon: "󰃉", label: "Color picker", action: () => menu.shell.systemService.pickColor() },
+    "trigger.clipboard": { icon: "\u{F014C}", label: "Clipboard", action: () => menu.shell.clipboard.open() },
+    "panels": { icon: "󰕮", label: "Panels" },
+    "panels.media": { icon: menu.shell.media.icon, label: "Media", action: () => menu.shell.media.open() },
+    "panels.weather": { icon: menu.shell.weatherService.icon, label: "Weather", action: () => menu.shell.weather.open() },
+    "panels.calendar": { icon: "󰃭", label: "Calendar", action: () => menu.shell.calendar.open() },
+    "tray": { icon: "󰘔", label: "Tray", provider: "tray" },
+    "setup": { icon: "", label: "Setup" },
+    "setup.display": { icon: "󰍹", label: "Display", action: () => menu.shell.display.open() },
+    "setup.network": { icon: "󰈀", label: "Network", action: () => menu.shell.network.open() },
+    "setup.bluetooth": { icon: "󰂯", label: "Bluetooth", action: () => menu.shell.bluetooth.open() },
+    "setup.audio": { icon: "󰕾", label: "Audio", action: () => menu.shell.audio.open() },
+    "setup.power": { icon: "󰂄", label: "Power", action: () => menu.shell.battery.open() },
+    "setup.nightlight": { icon: "󰆔", label: "Nightlight", action: () => menu.shell.nightlight.toggle() },
+    "setup.weather": { icon: menu.shell.weatherService.icon, label: "Weather location", provider: "places" },
+    "setup.keyboard": { icon: "󰌌", label: "Keyboard layout" },
+    "setup.keyboard.us": {
+      icon: menu.shell.keyboard.index === 0 ? "󰄬" : "󰌌",
+      label: "English (US)",
+      action: () => menu.shell.keyboard.set(0)
+    },
+    "setup.keyboard.se": {
+      icon: menu.shell.keyboard.index === 1 ? "󰄬" : "󰌌",
+      label: "Swedish",
+      action: () => menu.shell.keyboard.set(1)
+    },
+    "system": { icon: "", label: "System" },
+    "system.close": { icon: "󰅖", label: "Close window", action: () => Quickshell.execDetached(
+      Ui.Compositor.closeWindow())
+    },
+    "system.notifications": { icon: "󰂚", label: "Notifications" },
+    "system.notifications.history": { icon: "󰎟", label: "History", action: () => menu.shell.notifications.showHistory() },
+    "system.notifications.dnd": { icon: "󰂛", label: "Toggle Do Not Disturb", action: () => menu.shell.notifications.setDoNotDisturb(!menu.shell.notifications.doNotDisturb) },
+    "system.lock": { icon: "", label: "Lock", action: () => menu.shell.lock.beginLock() },
+    "system.screensaver": { icon: "󰛑", label: "Screensaver", action: () => menu.shell.screensaver.show() },
+    "system.idle": {
+      icon: menu.shell.idle.enabled ? "󰾪" : "󰅶",
+      label: menu.shell.idle.enabled ? "Disable idle locking" : "Enable idle locking",
+      action: () => menu.shell.idle.setEnabled(!menu.shell.idle.enabled)
+    },
+    "system.suspend": { icon: "󰒲", label: "Suspend", action: () => menu.run("systemctl suspend") },
+    "system.logout": { icon: "󰍃", label: "Logout", action: () => menu.run("uwsm stop") },
+    "system.reboot": { icon: "󰜉", label: "Reboot", action: () => menu.run("systemctl reboot") },
+    "system.shutdown": { icon: "󰐥", label: "Shutdown", action: () => menu.run("systemctl poweroff") },
+  })
+
+  function run(cmd) { Quickshell.execDetached(["sh", "-c", cmd]) }
 
   property string level: "root"
 
@@ -23,11 +87,11 @@ Ui.Panel {
 
   FileView {
     id: bindsFile
-    path: Quickshell.env("HOME") + "/.local/state/wm-binds.tsv"
+    path: Ui.Compositor.configFile(Quickshell.env("HOME"))
     watchChanges: true
     printErrors: false
     onFileChanged: reload()
-    onLoaded: menu.binds = Model.parseBinds(text())
+    onLoaded: menu.binds = Ui.Compositor.parseBinds(text())
   }
 
   property var emojis: []

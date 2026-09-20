@@ -10,12 +10,21 @@ Row {
 
   required property var shell
   required property var panel
+  required property string output
 
   readonly property var items: TrayModel.sortItems(SystemTray.items.values)
+
+  function buttonFor(item) {
+    return buttons.itemAt(items.indexOf(item))
+  }
+
+  Component.onCompleted: panel.registerTray(tray)
+  Component.onDestruction: panel.unregisterTray(tray)
 
   spacing: 4
 
   Repeater {
+    id: buttons
     model: tray.items
 
     Ui.BarButton {
@@ -36,9 +45,9 @@ Row {
         : tray.shell.palette.fg
 
       onActivated: modelData.onlyMenu
-        ? tray.panel.openFor(modelData)
+        ? tray.panel.openFor(modelData, tray.output)
         : modelData.activate()
-      onSecondary: tray.panel.openFor(modelData)
+      onSecondary: tray.panel.openFor(modelData, tray.output)
       onMiddle: modelData.secondaryActivate()
     }
   }

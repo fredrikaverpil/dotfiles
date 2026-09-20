@@ -15,7 +15,7 @@ import "plugins/panels/bluetooth" as Bluetooth
 import "plugins/panels/calendar" as Calendar
 import "plugins/panels/clipboard" as Clipboard
 import "plugins/panels/media" as Media
-import "plugins/panels/monitor" as Monitor
+import "plugins/panels/display" as Display
 import "plugins/panels/network" as Network
 import "plugins/panels/recording" as Recording
 import "plugins/panels/tray" as Tray
@@ -35,7 +35,6 @@ import "plugins/services/nightlight" as Nightlight
 import "plugins/services/recording" as RecordingService
 import "plugins/services/system" as SystemService
 import "plugins/services/weather" as WeatherService
-import "Ui" as Ui
 
 ShellRoot {
   id: root
@@ -45,6 +44,7 @@ ShellRoot {
   readonly property alias notifications: notifications
   readonly property alias nightlight: nightlight
   readonly property alias idle: idle
+  readonly property alias lock: lock
   readonly property alias keyboard: keyboard
   readonly property alias media: media
   readonly property alias display: display
@@ -174,75 +174,6 @@ ShellRoot {
     }
   }
 
-  readonly property var menuItems: ({
-    "apps": { icon: "󰀻", label: "Apps", provider: "apps" },
-    "keybindings": { icon: "", label: "Keybindings", provider: "binds" },
-    "style": { icon: "", label: "Style" },
-    "style.wallpaper": { icon: "", label: "Wallpaper (workspace)", action: () => background.open("workspace") },
-    "style.backdrop": { icon: "", label: "Wallpaper (backdrop)", action: () => background.open("backdrop") },
-    "style.theme": { icon: "", label: "Theme" },
-    "style.theme.dark": { icon: "", label: "Dark", action: () => root.setDark(true) },
-    "style.theme.light": { icon: "", label: "Light", action: () => root.setDark(false) },
-    "trigger": { icon: "󱓞", label: "Trigger" },
-    "trigger.screenshot": { icon: "", label: "Screenshot (desktop)",
-      action: () => Quickshell.execDetached(Ui.Compositor.screenshot("screen")) },
-    "trigger.screenshotWindow": { icon: "", label: "Screenshot (window)",
-      action: () => Quickshell.execDetached(Ui.Compositor.screenshot("window")) },
-    "trigger.screenshotRegion": { icon: "", label: "Screenshot (region)",
-      action: () => recordingService.screenshot() },
-    "trigger.record": { icon: "󰑊", label: "Record screen", action: () => recording.open() },
-    "trigger.emoji": { icon: "", label: "Emoji", provider: "emoji" },
-    "trigger.color": { icon: "󰃉", label: "Color picker",
-      action: () => Quickshell.execDetached(["sh", "-c",
-        'hex=$("$@") && [ -n "$hex" ] && wl-copy "$hex" && notify-send -a "Color picker" "$hex" "Copied to clipboard"',
-        "sh", ...Ui.Compositor.pickColor()]) },
-    "trigger.clipboard": { icon: "\u{F014C}", label: "Clipboard", action: () => clipboard.open() },
-    "panels": { icon: "󰕮", label: "Panels" },
-    "panels.media": { icon: media.icon, label: "Media", action: () => media.open() },
-    "panels.weather": { icon: weatherService.icon, label: "Weather", action: () => weather.open() },
-    "panels.calendar": { icon: "󰃭", label: "Calendar", action: () => calendar.open() },
-    "tray": { icon: "󰘔", label: "Tray", provider: "tray" },
-    "setup": { icon: "", label: "Setup" },
-    "setup.display": { icon: "󰍹", label: "Display", action: () => display.open() },
-    "setup.network": { icon: "󰈀", label: "Network", action: () => network.open() },
-    "setup.bluetooth": { icon: "󰂯", label: "Bluetooth", action: () => bluetooth.open() },
-    "setup.audio": { icon: "󰕾", label: "Audio", action: () => audio.open() },
-    "setup.power": { icon: "󰂄", label: "Power", action: () => battery.open() },
-    "setup.nightlight": { icon: "󰆔", label: "Nightlight", action: () => nightlight.toggle() },
-    "setup.weather": { icon: weatherService.icon, label: "Weather location", provider: "places" },
-    "setup.keyboard": { icon: "󰌌", label: "Keyboard layout" },
-    "setup.keyboard.us": {
-      icon: keyboard.index === 0 ? "󰄬" : "󰌌",
-      label: "English (US)",
-      action: () => keyboard.set(0)
-    },
-    "setup.keyboard.se": {
-      icon: keyboard.index === 1 ? "󰄬" : "󰌌",
-      label: "Swedish",
-      action: () => keyboard.set(1)
-    },
-    "system": { icon: "", label: "System" },
-    "system.close": { icon: "󰅖", label: "Close window", action: () => Quickshell.execDetached(
-      Ui.Compositor.closeWindow())
-    },
-    "system.notifications": { icon: "󰂚", label: "Notifications" },
-    "system.notifications.history": { icon: "󰎟", label: "History", action: () => notifications.showHistory() },
-    "system.notifications.dnd": { icon: "󰂛", label: "Toggle Do Not Disturb", action: () => notifications.setDoNotDisturb(!notifications.doNotDisturb) },
-    "system.lock": { icon: "", label: "Lock", action: () => lock.beginLock() },
-    "system.screensaver": { icon: "󰛑", label: "Screensaver", action: () => screensaver.show() },
-    "system.idle": {
-      icon: idle.enabled ? "󰾪" : "󰅶",
-      label: idle.enabled ? "Disable idle locking" : "Enable idle locking",
-      action: () => idle.setEnabled(!idle.enabled)
-    },
-    "system.suspend": { icon: "󰒲", label: "Suspend", action: () => root.run("systemctl suspend") },
-    "system.logout": { icon: "󰍃", label: "Logout", action: () => root.run("uwsm stop") },
-    "system.reboot": { icon: "󰜉", label: "Reboot", action: () => root.run("systemctl reboot") },
-    "system.shutdown": { icon: "󰐥", label: "Shutdown", action: () => root.run("systemctl poweroff") },
-  })
-
-  function run(cmd) { Quickshell.execDetached(["sh", "-c", cmd]) }
-
   Notifications.Service {
     id: notifications
     shell: root
@@ -297,7 +228,7 @@ ShellRoot {
     id: brightness
   }
 
-  Monitor.Panel {
+  Display.Panel {
     id: display
     shell: root
   }
@@ -405,7 +336,6 @@ ShellRoot {
   Menu.Menu {
     id: menu
     shell: root
-    items: root.menuItems
   }
 
   Bar.Bar {
