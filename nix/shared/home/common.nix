@@ -41,14 +41,23 @@ in
         echo "Using existing dotfiles at ~/.dotfiles"
         DOTFILES_PATH="$HOME/.dotfiles"
 
-        # Initialize git submodules for local clone
-        echo "Initializing any git submodules..."
+        # Initialize git submodules for local clone, skipping the ones under
+        # another host's directory: those are that host's private config, which
+        # this host cannot clone. The flake reads an uninitialised submodule as
+        # an empty directory, so a failure here only warns; git's credential
+        # helper is not on the activation PATH either way.
         cd "$DOTFILES_PATH"
-        if ! $DRY_RUN_CMD ${pkgs.git}/bin/git submodule update --init --recursive; then
-          echo "Warning: Failed to initialize git submodules"
-          exit 1
+        submodules=$(${pkgs.git}/bin/git config -f .gitmodules --get-regexp '\.path$' \
+          | cut -d' ' -f2 \
+          | ${pkgs.gawk}/bin/awk -v host="$(uname -n | cut -d. -f1)" \
+              '$0 !~ "^nix/hosts/" || $0 ~ "^nix/hosts/" host "/"')
+        if [ -z "$submodules" ]; then
+          echo "No git submodules for this host"
+        elif $DRY_RUN_CMD ${pkgs.git}/bin/git submodule update --init --recursive -- $submodules; then
+          echo "Git submodules initialized"
+        else
+          echo "Warning: git submodules were not initialized; this host's config falls back to what is checked out"
         fi
-        echo "Git submodules initialized"
       else
         echo "Using dotfiles from flake input"
         DOTFILES_PATH="${inputs.dotfiles}"
