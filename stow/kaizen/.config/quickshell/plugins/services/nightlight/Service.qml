@@ -16,8 +16,12 @@ Item {
   property string overridePeriod: ""
   property string period: ""
 
+  // The saved weather place, bound in shell.qml: the one coordinate the shell
+  // holds. A zone cannot stand in for it (Europe/Stockholm is 400 km from home).
   property real latitude: NaN
   property real longitude: NaN
+  onLatitudeChanged: Qt.callLater(tick)
+  onLongitudeChanged: Qt.callLater(tick)
 
   property bool reconciling: false
   property bool hasPendingTemperature: false
@@ -109,31 +113,14 @@ Item {
     }
   }
 
-  Process {
-    id: locateProcess
-    running: true
-    command: ["sh", "-c",
-      "tz=$(timedatectl show -p Timezone --value); " +
-      "awk -v t=\"$tz\" '$3 == t { print $2; exit }' /etc/zoneinfo/zone.tab"]
-    stdout: StdioCollector {
-      waitForEnd: true
-      onStreamFinished: {
-        var coords = NightlightModel.coordsFromZoneTab(text)
-        if (coords && isNaN(root.latitude) && isNaN(root.longitude)) {
-          root.latitude = coords.latitude
-          root.longitude = coords.longitude
-        }
-        root.tick()
-      }
-    }
-  }
-
   Timer {
     interval: 60000
     repeat: true
     running: true
     onTriggered: root.tick()
   }
+
+  Component.onCompleted: tick()
 
   IpcHandler {
     target: "nightlight"

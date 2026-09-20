@@ -206,6 +206,8 @@ ShellRoot {
   Nightlight.Service {
     id: nightlight
     shell: root
+    latitude: weatherService.latitude
+    longitude: weatherService.longitude
   }
 
   MediaService.Service {
