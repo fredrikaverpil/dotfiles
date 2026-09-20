@@ -135,6 +135,8 @@ Ui.Panel {
     id: row
 
     required property var modelData
+    // Ended before the fetch; dimmed like the time column.
+    readonly property bool past: modelData.until > 0 && modelData.until <= root.service.requestedAt.getTime()
 
     width: parent.width
     height: 30
@@ -160,7 +162,7 @@ Ui.Panel {
       anchors.verticalCenter: parent.verticalCenter
       width: 24
       horizontalAlignment: Text.AlignHCenter
-      color: root.shell.palette.fg
+      color: row.past ? root.shell.palette.off : root.shell.palette.fg
       font.family: Ui.Fonts.mono
       font.pixelSize: 13
       font.bold: true
@@ -185,7 +187,7 @@ Ui.Panel {
       anchors.rightMargin: 8
       anchors.verticalCenter: parent.verticalCenter
       elide: Text.ElideRight
-      color: root.shell.palette.fg
+      color: row.past ? root.shell.palette.off : root.shell.palette.fg
       font.family: Ui.Fonts.mono
       font.pixelSize: 14
       text: row.modelData.summary + (row.modelData.location ? "  · " + row.modelData.location : "")
