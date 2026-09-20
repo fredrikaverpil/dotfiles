@@ -1,11 +1,19 @@
 # niri + Quickshell desktop
 
-This file documents the niri + Quickshell desktop and travels with it: `renoir`
-is the experiment host, and changes there (code and this file alike) are later
-either rolled back or promoted to `wily` by copying files. Hosts share nothing
-by import or symlink, so `diff -r nix/hosts/renoir nix/hosts/wily` and
+This file documents the niri + Quickshell desktop and travels with it. Any
+desktop host can be the one experimented on; changes (code and this file alike)
+are later either rolled back or promoted to the other hosts by copying files,
+in either direction. Hosts share nothing by import or symlink, so
+`diff -r nix/hosts/renoir nix/hosts/wily` and
 `diff -r stow/host/renoir stow/host/wily` show the whole drift, including
-in-progress experiments. Host-only modules (`personal.nix`) are not copied.
+in-progress experiments. Host-only modules (`personal.nix`) and the machine
+differences listed below are not copied.
+
+What stays per host: hardware and firmware settings
+(`hardware-configuration.nix`, disk and resume devices, GPU drivers, sleep
+policy), the mpv decode profile, and work-only configuration (the `einride`
+submodule and what it pulls in). Everything else in `desktop.nix`,
+`thinkpad.nix` and `stow/host/<host>/` is meant to be identical.
 
 Machine facts (firmware, BIOS, hardware quirks) go in the host's `README.md`
 and are never promoted. Design intent and the layer model are in `KAIZEN.md`;

@@ -1,6 +1,6 @@
 # renoir (ThinkPad T14 Gen 1, AMD Renoir)
 
-Personal machine and the desktop's experiment host; see `CLAUDE.md`.
+Personal machine; the niri + Quickshell desktop is documented in `CLAUDE.md`.
 Machine-specific settings (microcode, VAAPI driver, kernel choice) belong in
 `configuration.nix`; ThinkPad integration in `thinkpad.nix`.
 
