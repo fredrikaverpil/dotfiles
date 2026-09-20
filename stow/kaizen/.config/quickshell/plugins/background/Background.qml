@@ -21,6 +21,7 @@ Scope {
     }
 
     readonly property string wallpaperDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
+    readonly property string thumbDir: Quickshell.env("HOME") + "/.cache/kaizen/wallpaper-thumbs"
     property list<string> wallpapers: []
     property string darkPick: ""
     property string lightPick: ""
@@ -58,6 +59,12 @@ Scope {
         return slot === "backdrop" ? backdrop : wallpaper;
     }
 
+    // Qt.md5 of the path matches `printf %s <path> | md5sum`, so the generator
+    // below and the grid derive the same name without sharing a list.
+    function thumbFor(path) {
+        return background.thumbDir + "/" + Qt.md5(path) + ".jpg";
+    }
+
     function setWallpaper(path) {
         if (slot === "backdrop") {
             if (shell.dark) {
@@ -81,8 +88,33 @@ Scope {
         running: true
         command: ["find", background.wallpaperDir, "-type", "f", "-iregex", ".*\\.\\(png\\|jpg\\|jpeg\\|webp\\)"]
         stdout: StdioCollector {
-            onStreamFinished: background.wallpapers = text.trim().split("\n").filter(l => l.length > 0).sort()
+            onStreamFinished: {
+                background.wallpapers = text.trim().split("\n").filter(l => l.length > 0).sort();
+                if (!thumbs.running)
+                    thumbs.running = true;
+            }
         }
+    }
+
+    // The grid renders thumbnails because most of the library is PNG, which Qt
+    // decodes in full before scaling. Each pass refreshes the mtime of every
+    // thumbnail still wanted, so thumbnails of removed wallpapers age out and
+    // nothing else has to prune the cache.
+    Process {
+        id: thumbs
+        command: ["sh", "-c", `
+            set -e
+            mkdir -p "$2"
+            find "$1" -type f -iregex '.*\\.\\(png\\|jpg\\|jpeg\\|webp\\)' | while IFS= read -r f; do
+                t="$2/$(printf %s "$f" | md5sum | cut -d' ' -f1).jpg"
+                if [ -e "$t" ]; then
+                    touch "$t"
+                else
+                    magick "$f" -auto-orient -thumbnail '480x480>' -quality 82 "$t" || :
+                fi
+            done
+            find "$2" -type f -mtime +30 -delete
+        `, "sh", background.wallpaperDir, background.thumbDir]
     }
 
     FileView {
@@ -311,7 +343,10 @@ Scope {
                         fillMode: Image.PreserveAspectCrop
                         asynchronous: true
                         sourceSize.width: 480
-                        source: "file://" + modelData
+                        source: "file://" + background.thumbFor(modelData)
+                        // Not yet generated, or magick could not read it.
+                        onStatusChanged: if (status === Image.Error)
+                            source = "file://" + modelData
                     }
 
                     MouseArea {
