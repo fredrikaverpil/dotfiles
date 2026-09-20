@@ -94,12 +94,8 @@
       )
       config.host.users;
 
-    # Pass flake inputs and the selected system hostname to home-manager modules.
-    # The hostname selects an optional matching per-host Stow package.
-    home-manager.extraSpecialArgs = {
-      inherit inputs;
-      hostName = config.networking.hostName;
-    };
+    # Pass flake inputs to home-manager modules.
+    home-manager.extraSpecialArgs = { inherit inputs; };
 
     # Note: Darwin's system.primaryUser is set by the Darwin system configuration
     # Note: Linux-specific security settings are handled in shared/system/linux.nix
