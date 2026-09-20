@@ -78,6 +78,16 @@ window-rule {
 }
 
 window-rule {
+    popups {
+        geometry-corner-radius 15
+        opacity 0.8
+        background-effect {
+            blur true
+        }
+    }
+}
+
+window-rule {
     match app-id=r#"^zen-beta$"#
     open-on-workspace "1"
     open-focused true
