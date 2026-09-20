@@ -1,8 +1,8 @@
 { lib, pkgs, ... }:
 {
   imports = [
-    ./desktop.nix
-    ./thinkpad.nix
+    ../../shared/system/kaizen/desktop.nix
+    ../../shared/system/thinkpad.nix
   ]
   # Work-only config from the private dotfiles-einride submodule; an
   # uninitialised submodule is an empty directory, so public clones and CI
@@ -79,6 +79,13 @@
       PubkeyAuthentication = true;
       KbdInteractiveAuthentication = false;
     };
+  };
+
+  # Work-issued machine: 1Password holds the work vaults.
+  programs._1password.enable = true;
+  programs._1password-gui = {
+    enable = true;
+    polkitPolicyOwners = [ "fredrik" ];
   };
 
   # Host-only system packages; shared ones live in nix/shared/system/.

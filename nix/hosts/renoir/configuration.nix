@@ -1,9 +1,9 @@
 { pkgs, ... }:
 {
   imports = [
-    ./desktop.nix
+    ../../shared/system/kaizen/desktop.nix
+    ../../shared/system/thinkpad.nix
     ./personal.nix
-    ./thinkpad.nix
   ];
 
   system.stateVersion = "26.05";
