@@ -1,27 +1,23 @@
 # kaizen
 
-This document outlines `kaizen`; a combination of the Wayland compositor
-[niri](https://niri-wm.github.io/niri/) and
-[Quickshell](https://quickshell.org) - to form a tailor-made (for me),
-minimalistic and productive desktop environment which can be agent-testable.
+`kaizen` is [niri](https://niri-wm.github.io/niri/) plus a
+[Quickshell](https://quickshell.org) shell: a minimal, keyboard-first desktop
+that an agent can drive and verify from a terminal.
 
 ## Intent
 
-- NixOS is the base. Proven subsystems (systemd, D-Bus, logind, PipeWire,
-  NetworkManager, BlueZ, UPower, PAM, polkit, portals) do their jobs untouched.
-- The GUI is bespoke and minimal: only what is used, nothing speculative,
-  nothing built because it can be. A panel exists only where a subsystem has
-  no keyboard-first face.
-- Keyboard-first everywhere. Pointer-only controls are considered when no other
-  reasonable option exists.
-- Prefer a purpose-built application over a bespoke panel for infrequent
-  tasks (bluetui, nm-connection-editor, nwg-displays).
-- Everything is reachable from a terminal (`qs ipc`, `niri msg`,
-  `systemctl --user`) so an agent can drive and verify it.
-- Host-agnostic naming: "kaizen" in units, PAM, layer namespaces, state
-  files. A hostname never appears in the desktop's configuration.
+- NixOS is the base. systemd, D-Bus, logind, PipeWire, NetworkManager, BlueZ,
+  UPower, PAM, polkit and the portals do their jobs untouched; the shell reads
+  and drives their state, never owns a copy of it.
+- Build only what is used. A panel exists only where a subsystem has no
+  keyboard-first face; infrequent tasks go to a purpose-built application
+  (bluetui, nm-connection-editor, nwg-displays).
+- Keyboard-first everywhere. Pointer-only controls are bugs.
+- Every action is reachable over `qs ipc`, `niri msg` or `systemctl --user`.
+- Host-agnostic naming: "kaizen" in units, PAM, layer namespaces and state
+  files. No hostname in the desktop's configuration.
 
-## Foundational model
+## Layers
 
 ```mermaid
 flowchart BT
@@ -52,10 +48,9 @@ flowchart BT
   HW --> SYS --> WM --> SHELL
 ```
 
-Each layer only calls downward. The shell never owns a daemon's state; it
-reads and drives it. Nix (`desktop.nix`, `thinkpad.nix`) owns the two lower
-layers and the systemd units; Stow (`stow/kaizen/`) owns compositor config
-and QML. Both are shared by every host running kaizen.
+Each layer calls downward only. Nix (`desktop.nix`, `thinkpad.nix`) owns the
+two lower layers and the systemd units; Stow (`stow/kaizen/`) owns compositor
+config and QML. Both are shared by every kaizen host.
 
 ## Services to surfaces
 
@@ -116,49 +111,22 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 
 ## Time and place
 
-Two separate inputs. The zone belongs to the system; the location is the one
-value the shell saves itself.
-
-The timezone is whatever [timedated] holds in `/etc/localtime`. The clock, the
-calendar panel and dcal read local time from it. The ThinkPads leave
-`time.timeZone` unset so `timedatectl set-timezone` persists across rebuilds;
-the stationary hosts pin it. The timezone service drives that
-command from `ZonesModel.js` and reads the result back — timedated already
-persists the zone, and a second copy in the shell's own state could disagree
-with the system every other process reads. Setting it goes through polkit, so
-the agent may ask before the change lands.
-
-DST is handled nowhere in this repository: a zone name is a rule set and
-tzdata evaluates it per instant, so the list holds IANA ids and never offsets.
-Storing an offset is what would break twice a year. The Clock panel exists to
-show that this is actually so — offset, abbreviation, UTC, whether DST is in
-effect and when it next changes, the last two read from `zdump`.
-
-Zone-aware formatting has to come from `date(1)`. Qt's JS engine has no `Intl`
-and silently ignores `toLocaleString`'s `timeZone` option rather than failing,
-so every zone renders as the local one.
-
-The weather location is a coordinate and cannot be derived from a zone —
-`Europe/Stockholm` resolves to Stockholm, 400 km from home. It is picked from
-`PlacesModel.js` and saved, because these machines cannot sense where they
-are: a ThinkPad only has GNSS when a WWAN card carrying it is fitted, and none
-is. Nightlight takes sunrise and sunset from that same coordinate, so there is
-one saved place and a change of it moves both.
-
-After changing the zone, restart `quickshell.service` and `dcal.service`.
-glibc caches the parsed tzfile, and replacing `/etc/localtime` — which is what
-setting a zone does — does not invalidate it, so a running process keeps the
-zone it started with. The calendar panel is affected too: dcal hands over
-absolute UTC instants and `CalendarModel.js` converts them in the shell.
-
-Do not conclude from a test that removes `/etc/localtime` that the change is
-picked up live. That case fails the read and falls back to UTC, which looks
-like it followed; replacing the file is not noticed at all. The Clock panel
-compares `date(1)`'s offset against Qt's own `"tt"` and says which is which,
-so the difference is visible rather than inferred.
-
-Never automate that restart on `/etc/localtime` changing: the shell must not
-be restarted while locked.
+- The timezone lives in [timedated] (`/etc/localtime`). The timezone service
+  runs `timedatectl set-timezone` with an id from `ZonesModel.js` and reads the
+  result back; polkit may prompt. ThinkPads leave `time.timeZone` unset so the
+  choice survives rebuilds; stationary hosts pin it.
+- Zones are IANA ids. tzdata evaluates DST per instant; the Clock panel shows
+  offset, abbreviation, UTC and the next DST change, the last from `zdump`.
+- Zone-aware formatting goes through `date(1)`. Qt's JS engine has no `Intl`
+  and ignores `toLocaleString`'s `timeZone` option.
+- The weather location is a coordinate picked from `PlacesModel.js` and saved
+  by the shell; the machines have no GNSS. Nightlight takes sunrise and sunset
+  from the same coordinate, so one saved place moves both.
+- After a zone change, restart `quickshell.service` and `dcal.service` by
+  hand: glibc caches the parsed tzfile, so a running process keeps the zone it
+  started with. The restart stays manual because the shell must never restart
+  while locked. Removing `/etc/localtime` is not a test; that falls back to
+  UTC, which only looks like a live pickup.
 
 ## Surfaces
 
@@ -177,7 +145,7 @@ Notifications, Lock, Polkit, Background, Screensaver   own layer surfaces
 - Launcher, panel and context menu hold exclusive keyboard focus and close
   each other through `shell.claimPanel`. Pick by what opens the surface.
 - Every surface opens over IPC; niri binds are `spawn qs ipc call ...`.
-- `Ui/Compositor.qml` is the only path to niri. Views never call `niri msg`.
+- `Ui/Compositor.qml` is the only path to niri.
 
 ## Session lifecycle
 
@@ -191,9 +159,9 @@ lid close / power key ─ logind ─ sleep-lock locks shell ─ waits for secure
   └─ HibernateDelaySec=2h ─ hibernate to LUKS swap
 ```
 
-Units bind to `wayland-session@niri.target`, never after
-`graphical-session.target` (cycle). `wayland-session-waitenv.service` closes
-niri's readiness-before-`WAYLAND_DISPLAY` race.
+Units bind to `wayland-session@niri.target`; ordering after
+`graphical-session.target` is a cycle. `wayland-session-waitenv.service`
+closes niri's readiness-before-`WAYLAND_DISPLAY` race.
 
 ## Where the shell writes
 
@@ -203,31 +171,19 @@ niri's readiness-before-`WAYLAND_DISPLAY` race.
 | State that must survive | `~/.local/state/kaizen-shell/` | across reboots |
 | Lock and socket state | `$XDG_RUNTIME_DIR/kaizen-<name>` | until logout |
 
-One cache root, so clearing everything the shell caches is one directory.
-State files stay flat inside that directory: each holds one value or a small
-JSON document. The unit's `StateDirectory=` creates it before the shell
-starts, which is why no producer has to.
+- These three roots only. `~/.config/quickshell/` is Stow's tree.
+- Files are flat in the root, one value or small JSON document each. The
+  unit's `StateDirectory=` creates the state root.
+- Many or unbounded entries get a subdirectory
+  (`kaizen-shell/wallpaper-thumbs/`); a single file is written directly
+  (`kaizen-shell/weather-<lat>_<lon>.json`). Moving from one file to one per
+  input needs a sweep first.
+- Every cache producer prunes its own entries, since nothing prunes `~/.cache`
+  on these hosts: touch an entry on use (a hit or a 304 counts) and delete
+  entries older than 30 days in the same pass. A producer that cannot age
+  entries this way says in a comment what bounds it.
 
-Locks and sockets go in the runtime directory: it is user-owned, mode 0700
-and cleared at logout, which is a lock's lifetime. Nothing that must survive
-a reboot goes there.
-
-Within a root, cardinality picks the shape: many or unbounded entries get a
-subdirectory (`kaizen-shell/wallpaper-thumbs/`), one file is written directly
-(`kaizen-shell/weather-<lat>_<lon>.json`). A producer that moves from one file
-to one per input needs a sweep first.
-
-Nothing prunes `~/.cache` on these hosts, so every cache producer prunes its
-own entries, however small they look today.
-
-The sweep: touch an entry whenever it is used (a cache hit or a 304 counts),
-and delete entries older than 30 days in the same pass. No index needed. A
-producer that cannot age entries this way says in a comment what bounds it.
-
-Write nowhere else. `~/.config/quickshell/` is Stow's tree, not a writable
-location, and a fourth root only creates somewhere to forget.
-
-## Deliberately not built
+## Out of scope
 
 - Bluetooth pairing, connection editing, output layout: bluetui,
   nm-connection-editor, nwg-displays.
