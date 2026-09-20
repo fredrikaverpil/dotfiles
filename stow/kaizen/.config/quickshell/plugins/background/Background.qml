@@ -23,6 +23,8 @@ Scope {
 
     readonly property string wallpaperDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
     readonly property string thumbDir: Quickshell.env("HOME") + "/.cache/kaizen-shell/wallpaper-thumbs"
+    readonly property string statePath: Quickshell.env("HOME") + "/.local/state/kaizen-shell/wallpaper.json"
+    property bool stateLoaded: false
     property list<string> wallpapers: []
     // Wallpapers the current thumbnail pass has reached, generated or not.
     property int thumbsDone: 0
@@ -68,22 +70,35 @@ Scope {
         return background.thumbDir + "/" + Qt.md5(path) + ".jpg";
     }
 
+    function saveState() {
+        if (!stateLoaded)
+            return;
+        stateFile.setText(JSON.stringify({
+            version: 1,
+            wallpaperDark: darkPick,
+            wallpaperLight: lightPick,
+            backdropDark: backdropDarkPick,
+            backdropLight: backdropLightPick
+        }) + "\n");
+    }
+
     function setWallpaper(path) {
         if (slot === "backdrop") {
-            if (shell.dark) {
+            if (shell.dark)
                 backdropDarkPick = path;
-                backdropDarkState.setText(path + "\n");
-            } else {
+            else
                 backdropLightPick = path;
-                backdropLightState.setText(path + "\n");
-            }
         } else if (shell.dark) {
             darkPick = path;
-            darkState.setText(path + "\n");
         } else {
             lightPick = path;
-            lightState.setText(path + "\n");
         }
+        saveState();
+    }
+
+    Component.onCompleted: {
+        stateLoaded = true;
+        stateFile.reload();
     }
 
     Process {
@@ -130,35 +145,22 @@ Scope {
     }
 
     FileView {
-        id: darkState
-        path: Quickshell.env("HOME") + "/.local/state/kaizen-shell/wallpaper-dark"
+        id: stateFile
+        path: background.statePath
         atomicWrites: true
         printErrors: false
-        onLoaded: background.darkPick = text().trim()
-    }
-
-    FileView {
-        id: lightState
-        path: Quickshell.env("HOME") + "/.local/state/kaizen-shell/wallpaper-light"
-        atomicWrites: true
-        printErrors: false
-        onLoaded: background.lightPick = text().trim()
-    }
-
-    FileView {
-        id: backdropDarkState
-        path: Quickshell.env("HOME") + "/.local/state/kaizen-shell/backdrop-dark"
-        atomicWrites: true
-        printErrors: false
-        onLoaded: background.backdropDarkPick = text().trim()
-    }
-
-    FileView {
-        id: backdropLightState
-        path: Quickshell.env("HOME") + "/.local/state/kaizen-shell/backdrop-light"
-        atomicWrites: true
-        printErrors: false
-        onLoaded: background.backdropLightPick = text().trim()
+        onLoaded: {
+            try {
+                const parsed = JSON.parse(String(text() || ""));
+                background.darkPick = parsed.wallpaperDark || "";
+                background.lightPick = parsed.wallpaperLight || "";
+                background.backdropDarkPick = parsed.backdropDark || "";
+                background.backdropLightPick = parsed.backdropLight || "";
+            } catch (error) {
+                // No readable state: the picks stay empty and the views fall back.
+            }
+            background.stateLoaded = true;
+        }
     }
 
     IpcHandler {

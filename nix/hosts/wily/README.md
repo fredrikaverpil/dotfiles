@@ -20,9 +20,13 @@ and imported by `configuration.nix` only when checked out.
 > ```sh
 > cd ~/.local/state && mkdir -p kaizen-shell
 > for f in kaizen-*; do [ -d "$f" ] && continue; mv "$f" "kaizen-shell/${f#kaizen-}"; done
+> rm -f kaizen-shell/wallpaper-dark kaizen-shell/wallpaper-light \
+>       kaizen-shell/backdrop-dark kaizen-shell/backdrop-light
 > ```
 >
-> The `[ -d ]` guard skips `kaizen-shell` itself. Delete this note afterwards.
+> The `[ -d ]` guard skips `kaizen-shell` itself. The four wallpaper files
+> carry no JSON, so they are dropped and the wallpapers re-picked once;
+> everything else survives the move. Delete this note afterwards.
 
 ## Rebuilding
 
