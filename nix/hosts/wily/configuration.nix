@@ -19,7 +19,9 @@
   # VA-API for gpu-screen-recorder and mpv; Mesa ships none for Intel.
   hardware.graphics.extraPackages = [ pkgs.intel-media-driver ];
 
-  time.timeZone = "Europe/Stockholm";
+  # Unset so timedated owns /etc/localtime and `timedatectl set-timezone`
+  # persists across rebuilds; this laptop travels. UTC until first set.
+  time.timeZone = null;
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.systemd-boot.configurationLimit = 20;
