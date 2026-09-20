@@ -86,7 +86,9 @@ Scope {
     Process {
         id: scan
         running: true
-        command: ["find", background.wallpaperDir, "-type", "f", "-iregex", ".*\\.\\(png\\|jpg\\|jpeg\\|webp\\)"]
+        // Skips macOS resource-fork stubs and the empty files a failed download
+        // leaves behind; neither is an image.
+        command: ["find", background.wallpaperDir, "-type", "f", "-iregex", ".*\\.\\(png\\|jpg\\|jpeg\\|webp\\)", "!", "-name", "._*", "!", "-size", "0"]
         stdout: StdioCollector {
             onStreamFinished: {
                 background.wallpapers = text.trim().split("\n").filter(l => l.length > 0).sort();
@@ -105,7 +107,7 @@ Scope {
         command: ["sh", "-c", `
             set -e
             mkdir -p "$2"
-            find "$1" -type f -iregex '.*\\.\\(png\\|jpg\\|jpeg\\|webp\\)' | while IFS= read -r f; do
+            find "$1" -type f -iregex '.*\\.\\(png\\|jpg\\|jpeg\\|webp\\)' ! -name '._*' ! -size 0 | while IFS= read -r f; do
                 t="$2/$(printf %s "$f" | md5sum | cut -d' ' -f1).jpg"
                 if [ -e "$t" ]; then
                     touch "$t"
