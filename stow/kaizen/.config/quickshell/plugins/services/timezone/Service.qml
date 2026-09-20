@@ -44,6 +44,9 @@ Item {
       'tz=$(timedatectl show -p Timezone --value); ' +
       'year=$(date +%Y); ' +
       'printf "zone|%s\\n" "$tz"; ' +
+      // timedated reports a zone it may have failed to write; the link is what
+      // every other process actually reads.
+      'printf "link|%s\\n" "$(readlink -f /etc/localtime)"; ' +
       'printf "ntp|%s\\n" "$(timedatectl show -p NTPSynchronized --value)"; ' +
       'date "+clock|%H:%M:%S|%Y-%m-%d|%a|%z|%Z"; ' +
       'date -u "+utc|%H:%M:%S|%Y-%m-%d"; ' +
