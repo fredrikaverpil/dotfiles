@@ -57,19 +57,30 @@ Dotfiles are managed with GNU Stow, not Nix.
 - Changes are immediately active (no rebuild needed)
 
 ```bash
-# Apply dotfiles (no Nix rebuild needed). Uses stow/<hostname>/ when present.
-cd ~/.dotfiles/stow
-packages=(shared "$(uname -s)")
+# Apply dotfiles (no Nix rebuild needed).
+cd ~/.dotfiles
+stow --dir=stow          --target="$HOME" --restow --no-folding --adopt shared
+stow --dir=stow/platform --target="$HOME" --restow --no-folding --adopt "$(uname -s)"
+command -v niri >/dev/null &&
+  stow --dir=stow        --target="$HOME" --restow --no-folding --adopt kaizen
 host="$(hostname -s)"
-[ -d "$host" ] && packages+=("$host")
-stow --target="$HOME" --restow --no-folding --adopt "${packages[@]}"
+[ -d "stow/host/$host" ] &&
+  stow --dir=stow/host   --target="$HOME" --restow --no-folding --adopt "$host"
 ```
 
-Put machine-specific files in `stow/<hostname>/` (for example,
-`stow/renoir/`). That package is optional, so hosts without one continue to
-stow only `shared` and their platform package. A per-host file must not target
-a path already supplied by another Stow package; GNU Stow reports that as a
-conflict rather than treating it as an override.
+Stow forbids slashes in package names, so each level is its own invocation:
+
+| Package | Applies to |
+| --- | --- |
+| `stow/shared/` | every machine |
+| `stow/platform/{Darwin,Linux}/` | matching `uname -s` |
+| `stow/kaizen/` | the niri + Quickshell hosts (`renoir`, `wily`) |
+| `stow/host/<hostname>/` | that machine only; optional |
+
+A file in a later package must not target a path an earlier one already
+supplies; GNU Stow reports that as a conflict rather than treating it as an
+override, so per-host drift means keeping that file out of the shared
+package entirely.
 
 `--adopt` absorbs any real file that has replaced a managed symlink into the
 repo instead of aborting; review the result with `git diff` before committing.

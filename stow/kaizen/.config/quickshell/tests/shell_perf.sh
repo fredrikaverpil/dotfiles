@@ -96,7 +96,7 @@ exe=$(readlink "/proc/$pid/exe")
 quickshell=$(sed -E 's|^/nix/store/([a-z0-9]{7})[a-z0-9]*-([^/]*)/.*|\1-\2|' <<<"$exe")
 outputs=$(niri msg --json outputs | jq -r '[.[] | "\(.name):\(.logical.width)x\(.logical.height)@\(.logical.scale)"] | sort | join(",")')
 commit=$(git rev-parse --short HEAD)
-[[ -z "$(git status --porcelain -- "$root/stow/host/$host")" ]] || commit="$commit-dirty"
+[[ -z "$(git status --porcelain -- "$root/stow/kaizen")" ]] || commit="$commit-dirty"
 
 printf 'Warming up for %s s\n' "$warmup"
 sleep "$warmup"
