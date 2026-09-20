@@ -118,13 +118,6 @@ function zoneMismatch(reported, path) {
   return effective === String(reported) ? "" : effective
 }
 
-// Qt resolves the zone once at startup, so after a change the bar clock can
-// still be on the old one while date(1) reports the new.
-function staleClock(offset, engineMinutes) {
-  var actual = offsetSeconds(offset)
-  if (actual === null || !isFinite(engineMinutes)) return false
-  return actual !== -engineMinutes * 60
-}
 
 // An abbreviation is only worth showing when it is not the offset repeated:
 // zones without a name print "+0545" for both.

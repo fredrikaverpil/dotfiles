@@ -144,11 +144,15 @@ The weather location is a coordinate and cannot be derived from a zone —
 are: a ThinkPad only has GNSS when a WWAN card carrying it is fitted, and none
 is.
 
-A process resolves the zone once at startup, so after changing it restart
-`quickshell.service` and `dcal.service`. The Clock panel compares `date(1)`'s
-offset against the shell's own and says so while they disagree. Never automate
-that restart on `/etc/localtime` changing: the shell must not be restarted
-while locked.
+A zone change needs no restart. glibc re-reads `/etc/localtime` per call, so
+the bar clock follows it in a running shell (observed: a shell started under
+`Europe/Stockholm` showed UTC minutes after the zone changed beneath it). dcal
+hands over absolute UTC instants and `CalendarModel.js` converts them, so the
+calendar panel follows too. Only dcal's own window and its reminder scheduling
+can hold the zone its process started with.
+
+Never restart the shell automatically on `/etc/localtime` changing anyway: it
+must not be restarted while locked.
 
 ## Surfaces
 
