@@ -29,6 +29,20 @@ TestCase {
     verify(Weather.yrUrl("nowhere", 11.97) === "")
   }
 
+  function test_saved_location_falls_back_to_the_seed_unless_both_coordinates_read() {
+    const home = { name: "Göteborg", latitude: 57.71, longitude: 11.97 }
+    const tokyo = '{"version":1,"latitude":35.68,"longitude":139.69,"place":"Tokyo"}'
+    compare(Weather.loadedLocation(tokyo, home), { latitude: 35.68, longitude: 139.69, name: "Tokyo" })
+    // A half-written or hand-edited file must not forecast nowhere.
+    verify(Weather.loadedLocation('{"latitude":35.68}', home) === home)
+    verify(Weather.loadedLocation('{"latitude":"x","longitude":139.69}', home) === home)
+    verify(Weather.loadedLocation("{ truncated", home) === home)
+    verify(Weather.loadedLocation("", home) === home)
+    // A saved pick without a name still shows where it is.
+    compare(Weather.loadedLocation('{"latitude":35.68,"longitude":139.69}', home),
+      { latitude: 35.68, longitude: 139.69, name: "35.68, 139.69" })
+  }
+
   function test_poll_interval_lands_after_expires_within_bounds() {
     const now = new Date("2026-09-07T19:00:00Z")
     // A minute past Expires, never on it: MET asks that we not re-request before it.

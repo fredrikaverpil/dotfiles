@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
 
 import "PlacesModel.js" as Places
@@ -10,10 +11,13 @@ Item {
   // MET blocks generic User-Agents and requires contact information; the
   // repository URL is one of the forms their terms accept.
   readonly property string userAgent: "kaizen-shell/1.0 github.com/fredrikaverpil/dotfiles"
+  readonly property string statePath: Quickshell.env("HOME") + "/.local/state/kaizen-shell/weather.json"
 
+  // Places.home seeds the first run only; the saved pick replaces it on load.
   property real latitude: Places.home.latitude
   property real longitude: Places.home.longitude
   property string place: Places.home.name
+  property bool stateLoaded: false
   property var current: null
   property var days: []
   property bool failed: false
@@ -41,8 +45,9 @@ Item {
     fetch.running = true
   }
 
-  // Travel is rare enough not to justify an IP-geolocation service; move the
-  // location by hand instead.
+  // Travel is rare enough not to justify an IP-geolocation service, and the
+  // ThinkPads have no GNSS to read: the place is picked by hand. It is saved,
+  // so a trip costs one choice rather than one per session.
   function setLocation(newLatitude, newLongitude, name) {
     const lat = Model.coordinate(newLatitude)
     const lon = Model.coordinate(newLongitude)
@@ -53,12 +58,20 @@ Item {
     place = String(name || "").length > 0 ? String(name) : lat + ", " + lon
     current = null
     days = []
+    saveState()
     refresh()
     return true
   }
 
   function resetLocation() {
     setLocation(Places.home.latitude, Places.home.longitude, Places.home.name)
+  }
+
+  function saveState() {
+    if (!stateLoaded) return
+    stateFile.setText(JSON.stringify({
+      version: 1, latitude: latitude, longitude: longitude, place: place
+    }) + "\n")
   }
 
   // Cache plus If-Modified-Since is required by MET's terms; -w prints the
@@ -116,5 +129,24 @@ Item {
     onTriggered: root.refresh()
   }
 
-  Component.onCompleted: refresh()
+  // The first fetch waits for this: starting on Places.home and correcting
+  // afterwards would spend two MET requests to show the wrong city first.
+  FileView {
+    id: stateFile
+    path: root.statePath
+    atomicWrites: true
+    printErrors: false
+    onLoaded: {
+      const saved = Model.loadedLocation(text(), Places.home)
+      root.latitude = saved.latitude
+      root.longitude = saved.longitude
+      root.place = saved.name
+      root.stateLoaded = true
+      root.refresh()
+    }
+    onLoadFailed: {
+      root.stateLoaded = true
+      root.refresh()
+    }
+  }
 }
