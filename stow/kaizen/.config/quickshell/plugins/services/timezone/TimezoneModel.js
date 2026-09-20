@@ -66,7 +66,7 @@ function dstFor(list, nowMs) {
 // empty rather than rendering "undefined" into the panel.
 function parse(text, nowMs) {
   var result = {
-    zone: "", synchronized: false, time: "", date: "", weekday: "",
+    zone: "", link: "", synchronized: false, time: "", date: "", weekday: "",
     offset: "", abbreviation: "", utcTime: "", utcDate: "",
     dst: { observed: false, inEffect: false, next: null },
   }
@@ -75,6 +75,7 @@ function parse(text, nowMs) {
   String(text || "").split("\n").forEach(function (line) {
     var parts = line.split("|")
     if (parts[0] === "zone") result.zone = parts[1] || ""
+    else if (parts[0] === "link") result.link = parts[1] || ""
     else if (parts[0] === "ntp") result.synchronized = parts[1] === "yes"
     else if (parts[0] === "clock" && parts.length >= 6) {
       result.time = parts[1]
@@ -99,6 +100,22 @@ function offsetSeconds(offset) {
   if (!match) return null
   var value = Number(match[2]) * 3600 + Number(match[3]) * 60
   return match[1] === "-" ? -value : value
+}
+
+// /etc/localtime resolves into tzdata, so the zone is whatever follows
+// zoneinfo/. An unresolvable path yields "" rather than a wrong zone.
+function effectiveZone(path) {
+  var match = /\/zoneinfo\/(.+)$/.exec(String(path || ""))
+  return match ? match[1] : ""
+}
+
+// timedated updates its own property even when it could not write
+// /etc/localtime, so a pick that failed still reads back as applied. The link
+// is the truth. Returns the zone actually in force, or "" when they agree.
+function zoneMismatch(reported, path) {
+  var effective = effectiveZone(path)
+  if (effective === "" || String(reported || "") === "") return ""
+  return effective === String(reported) ? "" : effective
 }
 
 // Qt resolves the zone once at startup, so after a change the bar clock can
