@@ -151,7 +151,7 @@ Ui.Panel {
     const service = menu.shell.weatherService
     return PlacesModel.places.map(place => ({
       label: place.name,
-      icon: service.place === place.name ? "󰄬" : "󰖐",
+      icon: service.latitude === place.latitude && service.longitude === place.longitude ? "󰄬" : "󰖐",
       image: "",
       detail: place.country,
       enabled: true,

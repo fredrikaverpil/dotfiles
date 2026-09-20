@@ -74,7 +74,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | keyboard | [niri] XKB layouts | layout button | Setup › Keyboard | `keyboard` |
 | media | [MPRIS] | now-playing widget | Panels › Media | `media` |
 | network | [NetworkManager], `ip -j` | button | Setup › Network | `network` |
-| nightlight | [wl-gammarelay-rs] over D-Bus, [timedated] for the solar position | – | Setup › Nightlight | `nightlight` |
+| nightlight | [wl-gammarelay-rs] over D-Bus, the weather location for the solar position | – | Setup › Nightlight | `nightlight` |
 | recording | [gpu-screen-recorder], [grim], [PipeWire] | recording indicator | Trigger › Record, Screenshot (region) | `recording` |
 | system | [hwmon], `/proc` load | monitor button | Setup › Display | `system`, `display` |
 | timezone | [timedated] via `timedatectl`, `zdump` for the DST rules | time button | Panels › Clock, Setup › Timezone | `timezone` |
@@ -116,13 +116,13 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 
 ## Time and place
 
-Two separate inputs, and neither is stored by the shell.
+Two separate inputs. The zone belongs to the system; the location is the one
+value the shell saves itself.
 
 The timezone is whatever [timedated] holds in `/etc/localtime`. The clock, the
-calendar panel and dcal read local time from it, and nightlight derives
-sunrise and sunset by looking the zone up in `/etc/zoneinfo/zone.tab`. The
-ThinkPads leave `time.timeZone` unset so `timedatectl set-timezone` persists
-across rebuilds; the stationary hosts pin it. The timezone service drives that
+calendar panel and dcal read local time from it. The ThinkPads leave
+`time.timeZone` unset so `timedatectl set-timezone` persists across rebuilds;
+the stationary hosts pin it. The timezone service drives that
 command from `ZonesModel.js` and reads the result back — timedated already
 persists the zone, and a second copy in the shell's own state could disagree
 with the system every other process reads. Setting it goes through polkit, so
@@ -142,7 +142,8 @@ The weather location is a coordinate and cannot be derived from a zone —
 `Europe/Stockholm` resolves to Stockholm, 400 km from home. It is picked from
 `PlacesModel.js` and saved, because these machines cannot sense where they
 are: a ThinkPad only has GNSS when a WWAN card carrying it is fitted, and none
-is.
+is. Nightlight takes sunrise and sunset from that same coordinate, so there is
+one saved place and a change of it moves both.
 
 After changing the zone, restart `quickshell.service` and `dcal.service`.
 glibc caches the parsed tzfile, and replacing `/etc/localtime` — which is what

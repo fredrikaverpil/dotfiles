@@ -9,13 +9,11 @@ TestCase {
     compare(Nightlight.backend.running, Nightlight.backend.probe.join(" ") + " >/dev/null 2>&1")
   }
 
-  function test_nightlight_parses_daemon_output_and_time_zone_coordinates() {
+  function test_nightlight_parses_daemon_output() {
     compare(Nightlight.temperatureFromOutput("temperature: 4000\n"), 4000)
     compare(Nightlight.temperatureFromOutput(""), null)
     compare(Nightlight.isNightlight(4000), true)
     compare(Nightlight.isNightlight(6500), false)
-    compare(Nightlight.coordsFromZoneTab("+5920+01803"), { latitude: 59 + 20 / 60, longitude: 18 + 3 / 60 })
-    compare(Nightlight.coordsFromZoneTab("invalid"), null)
   }
 
   function test_nightlight_solar_times_agree_with_known_stockholm_dates() {
