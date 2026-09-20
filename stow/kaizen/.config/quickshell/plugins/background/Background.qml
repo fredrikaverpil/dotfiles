@@ -23,6 +23,8 @@ Scope {
     readonly property string wallpaperDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
     readonly property string thumbDir: Quickshell.env("HOME") + "/.cache/kaizen/wallpaper-thumbs"
     property list<string> wallpapers: []
+    // Wallpapers the current thumbnail pass has reached, generated or not.
+    property int thumbsDone: 0
     property string darkPick: ""
     property string lightPick: ""
     property string backdropDarkPick: ""
@@ -104,6 +106,8 @@ Scope {
     // nothing else has to prune the cache.
     Process {
         id: thumbs
+        onRunningChanged: if (thumbs.running)
+            background.thumbsDone = 0
         command: ["sh", "-c", `
             set -e
             mkdir -p "$2"
@@ -114,9 +118,14 @@ Scope {
                 else
                     magick "$f" -auto-orient -thumbnail '480x480>' -quality 82 "$t" || :
                 fi
+                echo .
             done
             find "$2" -type f -mtime +30 -delete
         `, "sh", background.wallpaperDir, background.thumbDir]
+        // One line per wallpaper reached, counted for the picker's header.
+        stdout: SplitParser {
+            onRead: background.thumbsDone++
+        }
     }
 
     FileView {
@@ -320,7 +329,7 @@ Scope {
                 color: background.shell.palette.fg
                 font.family: Ui.Fonts.mono
                 font.pixelSize: 15
-                text: "Wallpaper (" + background.slot + ") · " + (background.shell.dark ? "dark" : "light")
+                text: "Wallpaper (" + background.slot + ") · " + (background.shell.dark ? "dark" : "light") + (thumbs.running ? " · thumbnails " + background.thumbsDone + "/" + background.wallpapers.length : "")
             }
 
             Rectangle {
