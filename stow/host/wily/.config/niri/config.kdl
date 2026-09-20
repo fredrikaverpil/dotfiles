@@ -88,6 +88,16 @@ window-rule {
     open-on-workspace "3"
 }
 
+window-rule {
+    match app-id=r#"^com\.mitchellh\.ghostty$"#
+
+    geometry-corner-radius 8
+    clip-to-geometry true
+    background-effect {
+        blur true
+    }
+}
+
 // NOTE: example of Slack auto-start.
 // at-startup=true limits the rule to windows opened within niri's first 60 s,
 // so the autostarted main window goes to "3" and later Slack windows (threads)
