@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
@@ -374,7 +375,8 @@ Scope {
 
         GridView {
             id: grid
-            width: parent.width
+            // Narrowed by the scrollbar's width so it never covers a thumbnail.
+            width: parent.width - 10
             height: parent.height - y
             clip: true
             focus: true
@@ -384,6 +386,19 @@ Scope {
             cellHeight: cellWidth * 9 / 16
             model: background.wallpapers
             onCurrentIndexChanged: previewDelay.restart()
+
+            // AlwaysOn because the point is to show how much library is left,
+            // not only to react to a flick. Dragging it comes with the type.
+            ScrollBar.vertical: ScrollBar {
+                id: gridScroll
+                policy: ScrollBar.AlwaysOn
+                contentItem: Rectangle {
+                    implicitWidth: 6
+                    radius: width / 2
+                    color: background.shell.palette.fg
+                    opacity: gridScroll.pressed ? 0.9 : 0.4
+                }
+            }
 
             delegate: Item {
                 required property var modelData
