@@ -29,23 +29,6 @@ function isNightlight(temperature) {
   return temperature !== null && temperature !== undefined && temperature < IDENTITY_TEMPERATURE
 }
 
-// zone1970.tab omits zones such as Europe/Stockholm that timedatectl reports.
-function coordsFromZoneTab(text) {
-  var match = String(text || "").trim()
-    .match(/^([+-])(\d{2})(\d{2})(\d{2})?([+-])(\d{3})(\d{2})(\d{2})?$/)
-  if (!match) return null
-
-  function sexagesimal(sign, deg, min, sec) {
-    var value = Number(deg) + Number(min) / 60 + (sec ? Number(sec) / 3600 : 0)
-    return sign === "-" ? -value : value
-  }
-
-  return {
-    latitude: sexagesimal(match[1], match[2], match[3], match[4]),
-    longitude: sexagesimal(match[5], match[6], match[7], match[8])
-  }
-}
-
 function radians(degrees) { return degrees * Math.PI / 180 }
 
 function solarTimes(date, latitude, longitude) {
