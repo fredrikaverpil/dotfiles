@@ -64,7 +64,8 @@ Item {
   // Cache plus If-Modified-Since is required by MET's terms; -w prints the
   // Expires header ahead of the body so the poll can honour it. The cache is
   // per-location: one shared file would answer 304 after a location change and
-  // serve the previous city's forecast under the new name.
+  // serve the previous city's forecast under the new name. A 304 touches the
+  // file it reused, so the 30-day sweep drops only locations left behind.
   function fetchCommand() {
     return ["sh", "-c",
       'set -e; ' +
@@ -75,6 +76,8 @@ Item {
       'curl -sf -m 15 -A "' + userAgent + '" -o "$cache.new" "$@" -w "%header{expires}\\n" ' +
       '"' + Model.forecastUrl(latitude, longitude) + '"; ' +
       'if [ -s "$cache.new" ]; then mv "$cache.new" "$cache"; else rm -f "$cache.new"; fi; ' +
+      'if [ -f "$cache" ]; then touch "$cache"; fi; ' +
+      'find "$directory" -maxdepth 1 -name "weather-*.json" -mtime +30 -delete; ' +
       'cat "$cache"']
   }
 
