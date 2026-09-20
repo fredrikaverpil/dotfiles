@@ -78,14 +78,14 @@ Scope {
           color: bar.shell.palette.dim
         }
 
-        Text {
+        Ui.BarButton {
           id: timeLabel
+          shell: bar.shell
           anchors.verticalCenter: parent.verticalCenter
-          color: bar.shell.palette.fg
-          font.family: Ui.Fonts.mono
-          font.pixelSize: 14 * bar.shell.textScale
-          text: Qt.formatDateTime(clock.date, "HH:mm")
-          onTextChanged: if (text.endsWith(":00")) hourPulse.restart()
+          fontSize: 14 * bar.shell.textScale
+          label: Qt.formatDateTime(clock.date, "HH:mm")
+          onActivated: bar.shell.timezone.toggle()
+          onLabelChanged: if (label.endsWith(":00")) hourPulse.restart()
 
           SequentialAnimation {
             id: hourPulse

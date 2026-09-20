@@ -18,6 +18,7 @@ import "plugins/panels/media" as Media
 import "plugins/panels/display" as Display
 import "plugins/panels/network" as Network
 import "plugins/panels/recording" as Recording
+import "plugins/panels/timezone" as Timezone
 import "plugins/panels/tray" as Tray
 import "plugins/panels/weather" as Weather
 import "plugins/polkit" as Polkit
@@ -34,6 +35,7 @@ import "plugins/services/network" as NetworkService
 import "plugins/services/nightlight" as Nightlight
 import "plugins/services/recording" as RecordingService
 import "plugins/services/system" as SystemService
+import "plugins/services/timezone" as TimezoneService
 import "plugins/services/weather" as WeatherService
 
 ShellRoot {
@@ -65,6 +67,8 @@ ShellRoot {
   readonly property alias systemService: systemService
   readonly property alias clipboard: clipboard
   readonly property alias calendar: calendar
+  readonly property alias timezone: timezone
+  readonly property alias timezoneService: timezoneService
 
   readonly property int barHeight: 32
   property var panels: []
@@ -331,6 +335,16 @@ ShellRoot {
     id: calendar
     shell: root
     service: calendarService
+  }
+
+  TimezoneService.Service {
+    id: timezoneService
+  }
+
+  Timezone.Panel {
+    id: timezone
+    shell: root
+    service: timezoneService
   }
 
   Menu.Menu {
