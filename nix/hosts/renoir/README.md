@@ -11,16 +11,6 @@ host-only programs belong in `configuration.nix`, personal-only ones in
 >
 > Awaiting the Proton Pass v1.40+ SSH agent, so per-usage PIN can be used.
 
-> [!NOTE]
->
-> One-time, after pulling the commit that moved the compositor tree to
-> `stow/kaizen/`: the old `stow/host/renoir/` symlinks in `$HOME` are left
-> dangling, since Stow computes deletions from a package's current contents.
-> Run `find ~/.config/niri ~/.config/quickshell ~/.config/xkb
-> ~/.local/share/fonts -xtype l -delete`, then the usual stow commands from
-> the root `CLAUDE.md`, then `systemctl --user restart quickshell.service`
-> while unlocked. Delete this note once done.
-
 ## Sleep
 
 Lid close uses the logind default, plain suspend; there is no hibernate.
