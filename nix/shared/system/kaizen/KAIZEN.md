@@ -147,6 +147,25 @@ Units bind to `wayland-session@niri.target`, never after
 `graphical-session.target` (cycle). `wayland-session-waitenv.service` closes
 niri's readiness-before-`WAYLAND_DISPLAY` race.
 
+## Where the shell writes
+
+| Kind | Path | Shape |
+| --- | --- | --- |
+| Regenerable cache | `~/.cache/kaizen-shell/` | a subdirectory per producer |
+| State that must survive | `~/.local/state/kaizen-<name>` | a flat file per producer |
+
+One cache root, so clearing everything the shell caches is one directory.
+State files stay flat because each holds a single value or one small JSON
+document, and the `kaizen-` prefix keeps them legible beside other
+applications' state.
+
+Nothing prunes `~/.cache` on these hosts, so a cache that grows with the
+data it mirrors has to bound itself; the wallpaper thumbnails do it by
+dropping entries left untouched for 30 days.
+
+Write nowhere else. `~/.config/quickshell/` is Stow's tree, not a writable
+location, and a second cache or state root only creates somewhere to forget.
+
 ## Deliberately not built
 
 - Bluetooth pairing, connection editing, output layout: bluetui,
