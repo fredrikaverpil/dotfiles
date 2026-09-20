@@ -357,6 +357,7 @@ in
     # Owns output layout, mode and scale in the untracked ~/.config/niri/monitor.kdl;
     # the shell never writes output config.
     nwg-displays
+    resources
     wl-clipboard
     # niri cannot mirror outputs; wl-mirror shows one in a fullscreen window.
     wl-mirror
