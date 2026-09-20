@@ -149,22 +149,36 @@ niri's readiness-before-`WAYLAND_DISPLAY` race.
 
 ## Where the shell writes
 
-| Kind | Path | Shape |
+| Kind | Path | Lifetime |
 | --- | --- | --- |
-| Regenerable cache | `~/.cache/kaizen-shell/` | a subdirectory per producer |
-| State that must survive | `~/.local/state/kaizen-<name>` | a flat file per producer |
+| Regenerable cache | `~/.cache/kaizen-shell/` | until deleted |
+| State that must survive | `~/.local/state/kaizen-<name>` | across reboots |
+| Lock and socket state | `$XDG_RUNTIME_DIR/kaizen-<name>` | until logout |
 
 One cache root, so clearing everything the shell caches is one directory.
-State files stay flat because each holds a single value or one small JSON
-document, and the `kaizen-` prefix keeps them legible beside other
-applications' state.
+State files stay flat: each holds one value or a small JSON document, and the
+`kaizen-` prefix keeps them legible beside other applications' state. This
+skips the per-application directory XDG expects, knowingly. Revisit when a
+producer needs a second state file.
 
-Nothing prunes `~/.cache` on these hosts, so a cache that grows with the
-data it mirrors has to bound itself; the wallpaper thumbnails do it by
-dropping entries left untouched for 30 days.
+Locks and sockets go in the runtime directory: it is user-owned, mode 0700
+and cleared at logout, which is a lock's lifetime. Nothing that must survive
+a reboot goes there.
+
+Within a root, cardinality picks the shape: many or unbounded entries get a
+subdirectory (`kaizen-shell/wallpaper-thumbs/`), one file is written directly
+(`kaizen-shell/weather-<lat>_<lon>.json`). A producer that moves from one file
+to one per input needs a sweep first.
+
+Nothing prunes `~/.cache` on these hosts, so every cache producer prunes its
+own entries, however small they look today.
+
+The sweep: touch an entry whenever it is used (a cache hit or a 304 counts),
+and delete entries older than 30 days in the same pass. No index needed. A
+producer that cannot age entries this way says in a comment what bounds it.
 
 Write nowhere else. `~/.config/quickshell/` is Stow's tree, not a writable
-location, and a second cache or state root only creates somewhere to forget.
+location, and a fourth root only creates somewhere to forget.
 
 ## Deliberately not built
 
