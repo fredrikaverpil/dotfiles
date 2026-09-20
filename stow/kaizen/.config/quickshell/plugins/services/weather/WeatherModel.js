@@ -24,6 +24,23 @@ function coordinate(value) {
   return isFinite(number) ? Math.round(number * 100) / 100 : null
 }
 
+// A saved place replaces the seed only when both coordinates survive
+// coordinate(); a truncated or hand-edited file falls back rather than
+// forecasting nowhere.
+function loadedLocation(raw, fallback) {
+  var saved
+  try {
+    saved = JSON.parse(String(raw || ""))
+  } catch (error) {
+    return fallback
+  }
+  var lat = coordinate(saved && saved.latitude)
+  var lon = coordinate(saved && saved.longitude)
+  if (lat === null || lon === null) return fallback
+  var name = String((saved && saved.place) || "")
+  return { latitude: lat, longitude: lon, name: name.length > 0 ? name : lat + ", " + lon }
+}
+
 function forecastUrl(latitude, longitude) {
   var lat = coordinate(latitude)
   var lon = coordinate(longitude)
