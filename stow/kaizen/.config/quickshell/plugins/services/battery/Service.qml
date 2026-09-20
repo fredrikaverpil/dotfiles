@@ -8,7 +8,7 @@ import "BatteryModel.js" as Model
 Item {
   id: root
 
-  readonly property string statePath: Quickshell.env("HOME") + "/.local/state/kaizen-power-profiles.json"
+  readonly property string statePath: Quickshell.env("HOME") + "/.local/state/kaizen-shell/power-profiles.json"
   readonly property int lowLevel: 10
   readonly property int criticalLevel: 5
 

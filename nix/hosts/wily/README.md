@@ -10,6 +10,20 @@ and imported by `configuration.nix` only when checked out.
 >
 > Awaiting the Proton Pass v1.40+ SSH agent, so per-usage PIN can be used.
 
+> [!TODO]
+>
+> Shell state moved from `~/.local/state/kaizen-<name>` to
+> `~/.local/state/kaizen-shell/<name>`, done on `renoir` but not here. The
+> unit creates the directory, so the shell starts on defaults and the old
+> files sit unread until moved. With the shell stopped:
+>
+> ```sh
+> cd ~/.local/state && mkdir -p kaizen-shell
+> for f in kaizen-*; do [ -d "$f" ] && continue; mv "$f" "kaizen-shell/${f#kaizen-}"; done
+> ```
+>
+> The `[ -d ]` guard skips `kaizen-shell` itself. Delete this note afterwards.
+
 ## Rebuilding
 
 Flakes copy the tree from `git ls-files`, which lists the submodule pointer
