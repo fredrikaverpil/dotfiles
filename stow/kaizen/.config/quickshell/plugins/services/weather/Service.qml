@@ -75,24 +75,10 @@ Item {
     }) + "\n")
   }
 
-  // Cache plus If-Modified-Since is required by MET's terms; -w prints the
-  // Expires header ahead of the body so the poll can honour it. The cache is
-  // per-location: one shared file would answer 304 after a location change and
-  // serve the previous city's forecast under the new name. A 304 touches the
-  // file it reused, so the 30-day sweep drops only locations left behind.
   function fetchCommand() {
-    return ["sh", "-c",
-      'set -e; ' +
-      'directory="${XDG_CACHE_HOME:-$HOME/.cache}/kaizen-shell"; ' +
-      'cache="$directory/weather-' + latitude + '_' + longitude + '.json"; ' +
-      'mkdir -p "$directory"; ' +
-      'if [ -f "$cache" ]; then set -- -z "$cache"; fi; ' +
-      'curl -sf -m 15 -A "' + userAgent + '" -o "$cache.new" "$@" -w "%header{expires}\\n" ' +
-      '"' + Model.forecastUrl(latitude, longitude) + '"; ' +
-      'if [ -s "$cache.new" ]; then mv "$cache.new" "$cache"; else rm -f "$cache.new"; fi; ' +
-      'if [ -f "$cache" ]; then touch "$cache"; fi; ' +
-      'find "$directory" -maxdepth 1 -name "weather-*.json" -mtime +30 -delete; ' +
-      'cat "$cache"']
+    return ["sh", Quickshell.shellPath("plugins/services/weather/fetch.sh"),
+      Ui.Paths.cache, String(latitude), String(longitude),
+      Model.forecastUrl(latitude, longitude), userAgent]
   }
 
   function apply(text) {
