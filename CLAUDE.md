@@ -12,14 +12,9 @@ code in this repository.
   On `wily` use `nh os switch` instead: its flake path carries
   `?submodules=1`, which a bare `--flake ~/.dotfiles#wily` lacks, silently
   dropping the private `nix/hosts/wily/einride` submodule
-- **Symlink dotfiles only** (GNU Stow, no Nix rebuild): `cd ~/.dotfiles`; then
-  run `stow --dir=stow --target="$HOME" --restow --no-folding --adopt shared &&
-  stow --dir=stow/platform --target="$HOME" --restow --no-folding --adopt
-  "$(uname -s)"; command -v niri >/dev/null && stow --dir=stow --target="$HOME"
-  --restow --no-folding --adopt kaizen; host="$(hostname -s)"; [ -d
-  "stow/host/$host" ] && stow --dir=stow/host --target="$HOME" --restow
-  --no-folding --adopt "$host"` (shared, then platform, then `kaizen` on the
-  niri hosts, then the optional host package)
+- **Symlink dotfiles only** (GNU Stow, no Nix rebuild): `dotfiles-stow`
+  (`shell/bin/dotfiles-stow`: shared, then platform, then `kaizen` on the niri
+  hosts, then the optional host package)
 - **Update all flake inputs**: `nix flake update`, then rebuild
 - **Update only unstable-pinned inputs**: `nix flake update nixpkgs-unstable
   nix-darwin home-manager-unstable llm-agents dotfiles`, then rebuild
@@ -142,6 +137,5 @@ exact formatter/linter tools and configurations. Formatters are wired up in
 - **Neovim comes from nixpkgs-unstable on all hosts** (declared in
   `nix/shared/home/common.nix`); a commented `overrideAttrs` there builds a
   specific sha/tag instead
-- **`stow/` changes take effect immediately** (just re-run the “Symlink
-  dotfiles only” command above, which includes the optional
-  `stow/host/<hostname>` package) — no Nix rebuild needed
+- **`stow/` changes take effect immediately**: run `dotfiles-stow` — no Nix
+  rebuild needed

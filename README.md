@@ -51,22 +51,11 @@ Dotfiles are managed with GNU Stow, not Nix.
 
 > [!NOTE]
 >
-> The `darwin-rebuild` and `nixos-rebuild` commands will run stow as well.
+> Rebuilds run stow too. On NixOS only when the home-manager generation
+> changed, so after editing just `stow/`, run `dotfiles-stow`.
 
-- Edit files in `stow/` directory and run stow
+- Edit files in `stow/` and run `dotfiles-stow`
 - Changes are immediately active (no rebuild needed)
-
-```bash
-# Apply dotfiles (no Nix rebuild needed).
-cd ~/.dotfiles
-stow --dir=stow          --target="$HOME" --restow --no-folding --adopt shared
-stow --dir=stow/platform --target="$HOME" --restow --no-folding --adopt "$(uname -s)"
-command -v niri >/dev/null &&
-  stow --dir=stow        --target="$HOME" --restow --no-folding --adopt kaizen
-host="$(hostname -s)"
-[ -d "stow/host/$host" ] &&
-  stow --dir=stow/host   --target="$HOME" --restow --no-folding --adopt "$host"
-```
 
 Stow forbids slashes in package names, so each level is its own invocation:
 
