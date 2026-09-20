@@ -156,40 +156,26 @@ niri's readiness-before-`WAYLAND_DISPLAY` race.
 | Lock and socket state | `$XDG_RUNTIME_DIR/kaizen-<name>` | until logout |
 
 One cache root, so clearing everything the shell caches is one directory.
-State files stay flat because each holds a single value or one small JSON
-document, and the `kaizen-` prefix keeps them legible beside other
-applications' state. That skips the per-application directory XDG expects
-and the cache root already uses, knowingly: the prefix groups eight
-single-value files well enough to not be worth a migration. Revisit when a
-producer needs a second state file, because the prefix stops grouping at
-that point and the directory has to exist anyway.
+State files stay flat: each holds one value or a small JSON document, and the
+`kaizen-` prefix keeps them legible beside other applications' state. This
+skips the per-application directory XDG expects, knowingly. Revisit when a
+producer needs a second state file.
 
-The runtime directory is the third root because a lock has to outlive a
-shell crash but must not outlive the session: XDG guarantees it is
-user-owned, mode 0700, and cleared at logout, which is exactly a lock's
-lifetime. Nothing that must survive a reboot goes there.
+Locks and sockets go in the runtime directory: it is user-owned, mode 0700
+and cleared at logout, which is a lock's lifetime. Nothing that must survive
+a reboot goes there.
 
-Within a root, cardinality picks the shape. A producer writing many or
-unbounded entries gets a subdirectory (`kaizen-shell/wallpaper-thumbs/`); a
-producer writing one file writes one file
-(`kaizen-shell/weather-<lat>_<lon>.json`). A directory per producer would
-mean descending into eight of them to find eight single-value files.
+Within a root, cardinality picks the shape: many or unbounded entries get a
+subdirectory (`kaizen-shell/wallpaper-thumbs/`), one file is written directly
+(`kaizen-shell/weather-<lat>_<lon>.json`). A producer that moves from one file
+to one per input needs a sweep first.
 
 Nothing prunes `~/.cache` on these hosts, so every cache producer prunes its
-own entries. A producer that writes to the cache root without a sweep is
-incomplete, however small its entries look today: nothing else will ever
-delete them, and "one small file" is a claim about this week's usage, not
-about the path.
+own entries, however small they look today.
 
-The sweep both producers use: refresh an entry's mtime every time it is
-used, then delete what is older than 30 days in the same pass. Reuse counts
-as use, so a cache hit and a 304 both touch the file they served. The
-filesystem already records what is live, so this needs no index, and it
-expires exactly what stopped being asked for. A producer whose entries
-cannot age this way says in a comment what bounds it instead.
-
-A single-file producer that starts writing one file per input has crossed
-into subdirectory territory, and it needs a sweep before it gets there.
+The sweep: touch an entry whenever it is used (a cache hit or a 304 counts),
+and delete entries older than 30 days in the same pass. No index needed. A
+producer that cannot age entries this way says in a comment what bounds it.
 
 Write nowhere else. `~/.config/quickshell/` is Stow's tree, not a writable
 location, and a fourth root only creates somewhere to forget.
