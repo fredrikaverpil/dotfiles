@@ -15,9 +15,11 @@ code in this repository.
 - **Symlink dotfiles only** (GNU Stow, no Nix rebuild): `cd ~/.dotfiles`; then
   run `stow --dir=stow --target="$HOME" --restow --no-folding --adopt shared &&
   stow --dir=stow/platform --target="$HOME" --restow --no-folding --adopt
-  "$(uname -s)"; host="$(hostname -s)"; [ -d "stow/host/$host" ] && stow
-  --dir=stow/host --target="$HOME" --restow --no-folding --adopt "$host"`
-  (shared first, then platform, then the optional host package)
+  "$(uname -s)"; command -v niri >/dev/null && stow --dir=stow --target="$HOME"
+  --restow --no-folding --adopt kaizen; host="$(hostname -s)"; [ -d
+  "stow/host/$host" ] && stow --dir=stow/host --target="$HOME" --restow
+  --no-folding --adopt "$host"` (shared, then platform, then `kaizen` on the
+  niri hosts, then the optional host package)
 - **Update all flake inputs**: `nix flake update`, then rebuild
 - **Update only unstable-pinned inputs**: `nix flake update nixpkgs-unstable
   nix-darwin home-manager-unstable llm-agents dotfiles`, then rebuild
