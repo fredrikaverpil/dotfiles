@@ -17,6 +17,17 @@ function pickColor() {
   return ["sh", "-c", "niri msg pick-color | sed -n 's/^Hex: //p'"]
 }
 
+function configFile(home) { return home + "/.config/niri/config.kdl" }
+
+// Binds are the config lines carrying hotkey-overlay-title; the chord is the
+// first word. Commented-out binds are skipped.
+function parseBinds(raw) {
+  return String(raw || "").split("\n")
+    .map(function(line) { return /^\s*([^\s\/]\S*)\s.*hotkey-overlay-title="([^"]*)"/.exec(line) })
+    .filter(function(match) { return match && match[1] !== "spawn-at-startup" })
+    .map(function(match) { return { chord: match[1], label: match[2], enabled: true } })
+}
+
 // focus-workspace acts on the focused output, so focus the target output first.
 function focusWorkspace(id, output) {
   return ["sh", "-c", 'niri msg action focus-monitor "$1" && niri msg action focus-workspace "$2"',

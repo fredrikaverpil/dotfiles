@@ -3,4 +3,5 @@
 singleton Compositor 1.0 Compositor.qml
 singleton Fonts 1.0 Fonts.qml
 Panel 1.0 Panel.qml
+ContextMenu 1.0 ContextMenu.qml
 BarButton 1.0 BarButton.qml

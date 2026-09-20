@@ -1,39 +1,48 @@
 import QtQuick
-import Quickshell
 import Quickshell.Io
 import Quickshell.Services.SystemTray
 
 import "../../../Ui" as Ui
 import "../../bar/widgets/TrayModel.js" as TrayModel
 
-Ui.Panel {
+Ui.ContextMenu {
   id: root
 
   property var item: null
-  property var stack: []
+  // Bar Tray widgets, one per output.
+  property var trays: []
 
-  readonly property int depth: stack.length
-  readonly property var currentChildren: depth > 0
-    ? stack[depth - 1].opener.children
-    : null
   // The item's primary action heads its root menu, so the menu reaches everything.
-  readonly property var rows: {
-    const entries = currentChildren ? currentChildren.values : []
-    if (depth !== 1 || !item || item.onlyMenu) return entries
-    return [
+  headRows: item && !item.onlyMenu
+    ? [
       { text: "Activate", enabled: true, isSeparator: false, triggered: () => root.item.activate() },
       { isSeparator: true, enabled: true },
-    ].concat(entries)
-  }
-  readonly property string title: item
-    ? (depth > 0
-      ? stack.map(level => level.title).join(" › ")
-      : TrayModel.labelFor(item))
-    : ""
+    ]
+    : []
 
-  cardWidth: 420
-  cardHeight: 380
-  keyNavigation: true
+  function registerTray(tray) {
+    if (trays.indexOf(tray) < 0) trays = trays.concat([tray])
+  }
+
+  function unregisterTray(tray) {
+    trays = trays.filter(candidate => candidate !== tray)
+  }
+
+  // output is the bar's screen name; without one the menu opens on the focused output.
+  function openFor(trayItem, output) {
+    if (shown && item === trayItem) {
+      close()
+      return
+    }
+    if (!trayItem || !trayItem.hasMenu) return
+    item = trayItem
+    popup(trayItem.menu, output, screenName => {
+      const tray = trays.find(candidate => candidate.output === screenName)
+      const button = tray ? tray.buttonFor(trayItem) : null
+      const point = button ? button.mapToItem(null, 0, 0) : null
+      return point ? { below: true, x: point.x, width: button.width } : null
+    })
+  }
 
   IpcHandler {
     target: "tray"
@@ -47,178 +56,5 @@ Ui.Panel {
         .map(item => item.id + "\t" + TrayModel.labelFor(item)).join("\n")
     }
     function close(): void { root.close() }
-  }
-
-  // Child entries belong to their parent opener, so every menu level needs its own opener.
-  Component {
-    id: openerComponent
-    QsMenuOpener {}
-  }
-
-  function push(handle, title) {
-    const opener = openerComponent.createObject(root, { menu: handle })
-    if (!opener) return
-    stack = stack.concat([{ opener: opener, title: title }])
-    settle()
-  }
-
-  function pop() {
-    if (stack.length <= 1) { close(); return }
-    const levels = stack.slice()
-    const top = levels.pop()
-    stack = levels
-    top.opener.destroy()
-    settle()
-  }
-
-  function reset() {
-    // Clear bindings before destroying openers, deepest first.
-    settling = false
-    settleTimer.stop()
-    const levels = stack
-    stack = []
-    for (let i = levels.length - 1; i >= 0; i--) levels[i].opener.destroy()
-  }
-
-  function openFor(trayItem) {
-    if (shown && item === trayItem) {
-      close()
-      return
-    }
-    reset()
-    item = trayItem
-    if (!trayItem || !trayItem.hasMenu) return
-    push(trayItem.menu, TrayModel.labelFor(trayItem))
-    open()
-  }
-
-  property bool settling: false
-
-  function settle() {
-    settling = true
-    settleTimer.restart()
-  }
-
-  Timer {
-    id: settleTimer
-    interval: 250
-    onTriggered: root.settling = false
-  }
-
-  onShownChanged: if (!shown) reset()
-
-  Text {
-    color: root.shell.palette.dim
-    font.family: Ui.Fonts.mono
-    font.pixelSize: 13
-    text: root.title
-    width: parent.width
-    elide: Text.ElideRight
-  }
-
-  Rectangle {
-    width: parent.width
-    height: 1
-    color: root.shell.palette.dim
-  }
-
-  Flickable {
-    width: parent.width
-    height: parent.height - y
-    clip: true
-    contentHeight: rows.height
-    Keys.onPressed: function (event) {
-      if (event.key === Qt.Key_Backspace) {
-        root.pop()
-        event.accepted = true
-      }
-    }
-
-    Column {
-      id: rows
-      width: parent.width
-      spacing: 2
-
-      Repeater {
-        model: root.rows
-
-        Rectangle {
-          id: row
-
-          required property var modelData
-
-          width: rows.width
-          height: modelData.isSeparator ? 9 : 28
-          radius: 4
-          color: "transparent"
-          border.color: row.activeFocus ? root.shell.palette.fg : "transparent"
-          border.width: 1
-          opacity: modelData.enabled ? 1 : 0.45
-
-          activeFocusOnTab: !modelData.isSeparator
-
-          function trigger() {
-            if (!modelData.enabled || root.settling) return
-            if (modelData.hasChildren) {
-              root.push(modelData, modelData.text || "")
-              return
-            }
-            modelData.triggered()
-            root.close()
-          }
-
-          Keys.onReturnPressed: row.trigger()
-          Keys.onEnterPressed: row.trigger()
-          Keys.onSpacePressed: row.trigger()
-
-          Rectangle {
-            visible: row.modelData.isSeparator
-            anchors.verticalCenter: parent.verticalCenter
-            width: parent.width - 16
-            x: 8
-            height: 1
-            color: root.shell.palette.dim
-          }
-
-          Row {
-            visible: !row.modelData.isSeparator
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left
-            anchors.leftMargin: 8
-            anchors.right: parent.right
-            anchors.rightMargin: 8
-            spacing: 8
-
-            Text {
-              width: 14
-              color: root.shell.palette.fg
-              font.family: Ui.Fonts.mono
-              font.pixelSize: 14
-              text: row.modelData.buttonType === QsMenuButtonType.CheckBox
-                ? (row.modelData.checkState === Qt.Checked ? "󰄲" : "󰄱")
-                : row.modelData.buttonType === QsMenuButtonType.RadioButton
-                  ? (row.modelData.checkState === Qt.Checked ? "󰐾" : "󰄴")
-                  : ""
-            }
-
-            Text {
-              color: root.shell.palette.fg
-              font.family: Ui.Fonts.mono
-              font.pixelSize: 14
-              text: (row.modelData.text || "") + (row.modelData.hasChildren ? " ›" : "")
-              elide: Text.ElideRight
-            }
-          }
-
-          MouseArea {
-            anchors.fill: parent
-            enabled: !row.modelData.isSeparator
-            hoverEnabled: true
-            onEntered: if (row.activeFocusOnTab) row.forceActiveFocus()
-            onClicked: row.trigger()
-          }
-        }
-      }
-    }
   }
 }
