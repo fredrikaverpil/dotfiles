@@ -13,11 +13,17 @@ Ui.Panel {
 
   // The zone in force when it is not the one timedated reports, else "".
   readonly property string mismatch: Model.zoneMismatch(info.zone, info.link)
+  // "tt" is what the bar's own clock resolves to, in date(1)'s %z form.
+  readonly property bool stale: Model.staleClock(info.offset, Qt.formatDateTime(new Date(), "tt"))
   readonly property var warnings: [
     mismatch === ""
       ? ""
       : "󰀦 Not applied: timedated reports " + info.zone + " but /etc/localtime is "
         + mismatch + ".",
+    !stale
+      ? ""
+      : "󰀦 The bar clock is still on the zone this shell started with. "
+        + "Apply with: systemctl --user restart quickshell dcal",
     root.service.lastError,
   ].filter(text => text !== "")
 
