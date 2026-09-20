@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+set -e
+
+# Opens the everyday apps, one per workspace. niri's own window rules place
+# them, so this only spawns. Idempotent against niri's window list rather than
+# a state file: an app already running is skipped, so a rerun after closing one
+# brings back just that one.
+
+case "$1" in
+-h | --help)
+  echo "usage: kaizen-apps    open the everyday apps that are not running yet"
+  exit 0
+  ;;
+esac
+
+running="$(niri msg -j windows)"
+
+# $1 app-id regex (as niri reports it), rest: the command to spawn.
+spawn_missing() {
+  local id="$1"
+  shift
+  if jq -e --arg id "$id" 'any(.[]; .app_id | test($id))' >/dev/null <<<"$running"; then
+    return
+  fi
+  setsid "$@" >/dev/null 2>&1 &
+}
+
+spawn_missing '^zen-beta$' zen-beta
+spawn_missing '^slack$' slack
+# dcal.service already runs the sync daemon headless; `show` only opens its
+# window, and reattaches to that daemon rather than starting a second one.
+spawn_missing '^com\.danklinux\.dankcalendar$' dcal show
+spawn_missing '(?i)^spotify$' spotify
+spawn_missing '^signal$' signal-desktop
+spawn_missing '^proton-pass$' proton-pass
+
+# No window rule sends a terminal to workspace 2 -- ghostty's rules must stay
+# app-wide -- so focus it first and let the terminal open where focus is. Keyed
+# on workspace "2" being terminal-free, since ghostty windows elsewhere are
+# ordinary ones.
+ws2="$(jq -r '.[] | select(.name == "2") | .id' <<<"$(niri msg -j workspaces)")"
+if ! jq -e --argjson ws "${ws2:-null}" \
+  'any(.[]; .app_id == "com.mitchellh.ghostty" and .workspace_id == $ws)' \
+  >/dev/null <<<"$running"; then
+  niri msg action focus-workspace "2"
+  setsid ghostty >/dev/null 2>&1 &
+fi

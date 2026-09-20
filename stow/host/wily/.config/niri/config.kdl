@@ -64,6 +64,8 @@ workspace "2" { open-on-output "DP-1"; }
 workspace "3" { open-on-output "DP-1"; }
 workspace "4" { open-on-output "DP-1"; }
 workspace "5" { open-on-output "DP-1"; }
+workspace "6" { open-on-output "DP-1"; }
+workspace "7" { open-on-output "DP-1"; }
 
 // Quickshell draws two wallpapers: one inside the workspaces, one behind them.
 layer-rule {
@@ -98,16 +100,6 @@ window-rule {
     }
 }
 
-window-rule {
-    match app-id=r#"^zen-beta$"#
-    open-on-workspace "1"
-    open-focused true
-}
-
-window-rule {
-    match app-id=r#"^signal$"#
-    open-on-workspace "3"
-}
 
 window-rule {
     match app-id=r#"^com\.mitchellh\.ghostty$"#
@@ -128,21 +120,49 @@ window-rule {
     }
 }
 
-// NOTE: example of Slack auto-start.
-// at-startup=true limits the rule to windows opened within niri's first 60 s,
-// so the autostarted main window goes to "3" and later Slack windows (threads)
-// open on the focused workspace. Rules match on app-id, title and window state,
-// not on which window spawned them, so a Slack started by hand after that
-// window is not moved either.
-// window-rule {
-//     match app-id=r#"(?i)^slack$"# at-startup=true
-//     open-on-workspace "3"
-// }
+// Open apps on given workspace.
+// List running windows: `niri msg -j windows | jq -r '.[] | "\(.app_id)\t\(.title)"'`
+
+window-rule {
+    match app-id=r#"^zen-beta$"#
+    open-on-workspace "1"
+    open-focused true
+}
+
+window-rule {
+    match app-id=r#"^slack$"#
+    open-on-workspace "3"
+}
+
+
+// dcal.service runs the sync daemon headless; this is the window `dcal show`
+// opens.
+window-rule {
+    match app-id=r#"^com\.danklinux\.dankcalendar$"#
+    open-on-workspace "4"
+}
 
 window-rule {
     match app-id=r#"(?i)^spotify$"#
     open-on-workspace "5"
 }
+
+// Brain.fm
+window-rule {
+    match app-id=r#"^chrome-dcllmfmjlkpljanfegjgohmlnfipachj-Default$"#
+    open-on-workspace "5"
+}
+
+window-rule {
+    match app-id=r#"^signal$"#
+    open-on-workspace "6"
+}
+
+window-rule {
+    match app-id=r#"^proton-pass$"#
+    open-on-workspace "7"
+}
+
 
 // The recording service's camera preview: gpu-screen-recorder cannot mask its
 // own camera overlay, so the screen capture records this window instead. mpv
@@ -170,9 +190,6 @@ cursor {
 // Exports WAYLAND_DISPLAY to the systemd user manager. NIRI_SOCKET must be
 // named explicitly, or `niri msg` fails inside the shell.
 spawn-at-startup "uwsm" "finalize" "NIRI_SOCKET"
-
-// NOTE: needed for Slack auto-start
-// spawn-at-startup "uwsm-app" "--" "slack"
 
 binds {
     // Shell
@@ -214,6 +231,8 @@ binds {
     Mod+T hotkey-overlay-title="Terminal" { spawn "ghostty"; }
     Mod+Y hotkey-overlay-title="Files" { spawn "ghostty" "-e" "yazi"; }
     Mod+B hotkey-overlay-title="Browser" { spawn "chromium"; }
+    // Skips whatever is already running, so it is safe to press twice.
+    Mod+A hotkey-overlay-title="Open the everyday apps" { spawn "kaizen-apps"; }
 
     // Focus the app's most recently focused window, switching workspace.
     Mod+Z hotkey-overlay-title="Focus Zen" { spawn-sh r#"niri msg action focus-window --id "$(niri msg -j windows | jq '[.[] | select(.app_id == "zen-beta")] | max_by(.focus_timestamp | [.secs, .nanos]) | .id')""#; }
