@@ -71,6 +71,17 @@ layer-rule {
     place-within-backdrop true
 }
 
+// Make top and overlay layers use the regular blur (if enabled),
+// while bottom and background layers keep using the efficient xray blur.
+layer-rule {
+    match layer="top"
+    match layer="overlay"
+
+    background-effect {
+        xray false
+    }
+}
+
 // Matches all windows but not layer surfaces, so Quickshell panels keep 1:1
 // scrolling.
 window-rule {
@@ -105,6 +116,15 @@ window-rule {
     clip-to-geometry true
     background-effect {
         blur true
+    }
+}
+
+// Tell floating windows to use the non-xray (computationally expensive) background transparency algorithm.
+window-rule {
+    match app-id=r#"^com\.mitchellh\.ghostty$"# is-floating=true
+
+    background-effect {
+        xray false
     }
 }
 
