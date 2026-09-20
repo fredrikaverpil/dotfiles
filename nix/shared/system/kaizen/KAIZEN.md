@@ -149,22 +149,35 @@ niri's readiness-before-`WAYLAND_DISPLAY` race.
 
 ## Where the shell writes
 
-| Kind | Path | Shape |
+| Kind | Path | Lifetime |
 | --- | --- | --- |
-| Regenerable cache | `~/.cache/kaizen-shell/` | a subdirectory per producer |
-| State that must survive | `~/.local/state/kaizen-<name>` | a flat file per producer |
+| Regenerable cache | `~/.cache/kaizen-shell/` | until deleted |
+| State that must survive | `~/.local/state/kaizen-<name>` | across reboots |
+| Lock and socket state | `$XDG_RUNTIME_DIR/kaizen-<name>` | until logout |
 
 One cache root, so clearing everything the shell caches is one directory.
 State files stay flat because each holds a single value or one small JSON
 document, and the `kaizen-` prefix keeps them legible beside other
 applications' state.
 
+The runtime directory is the third root because a lock has to outlive a
+shell crash but must not outlive the session: XDG guarantees it is
+user-owned, mode 0700, and cleared at logout, which is exactly a lock's
+lifetime. Nothing that must survive a reboot goes there.
+
+Within a root, cardinality picks the shape. A producer writing many or
+unbounded entries gets a subdirectory (`kaizen-shell/wallpaper-thumbs/`); a
+producer writing one file writes one file
+(`kaizen-shell/weather-<lat>_<lon>.json`). A directory per producer would
+mean descending into eight of them to find eight single-value files.
+
 Nothing prunes `~/.cache` on these hosts, so a cache that grows with the
 data it mirrors has to bound itself; the wallpaper thumbnails do it by
-dropping entries left untouched for 30 days.
+dropping entries left untouched for 30 days. A single-file producer that
+starts writing one file per input has crossed into subdirectory territory.
 
 Write nowhere else. `~/.config/quickshell/` is Stow's tree, not a writable
-location, and a second cache or state root only creates somewhere to forget.
+location, and a fourth root only creates somewhere to forget.
 
 ## Deliberately not built
 
