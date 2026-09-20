@@ -375,14 +375,15 @@ Scope {
 
         GridView {
             id: grid
-            // Narrowed by the scrollbar's width so it never covers a thumbnail.
-            width: parent.width - 10
+            width: parent.width
             height: parent.height - y
             clip: true
             focus: true
             activeFocusOnTab: true
             readonly property int columns: 4
-            cellWidth: width / columns
+            // The scrollbar sits at the view's right edge, so the cells have to
+            // stop short of it rather than the view being narrowed with it.
+            cellWidth: (width - 16) / columns
             cellHeight: cellWidth * 9 / 16
             model: background.wallpapers
             onCurrentIndexChanged: previewDelay.restart()
