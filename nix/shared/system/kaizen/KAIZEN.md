@@ -152,14 +152,13 @@ niri's readiness-before-`WAYLAND_DISPLAY` race.
 | Kind | Path | Lifetime |
 | --- | --- | --- |
 | Regenerable cache | `~/.cache/kaizen-shell/` | until deleted |
-| State that must survive | `~/.local/state/kaizen-<name>` | across reboots |
+| State that must survive | `~/.local/state/kaizen-shell/` | across reboots |
 | Lock and socket state | `$XDG_RUNTIME_DIR/kaizen-<name>` | until logout |
 
 One cache root, so clearing everything the shell caches is one directory.
-State files stay flat: each holds one value or a small JSON document, and the
-`kaizen-` prefix keeps them legible beside other applications' state. This
-skips the per-application directory XDG expects, knowingly. Revisit when a
-producer needs a second state file.
+State files stay flat inside that directory: each holds one value or a small
+JSON document. The unit's `StateDirectory=` creates it before the shell
+starts, which is why no producer has to.
 
 Locks and sockets go in the runtime directory: it is user-owned, mode 0700
 and cleared at logout, which is a lock's lifetime. Nothing that must survive

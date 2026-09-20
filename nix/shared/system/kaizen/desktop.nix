@@ -215,6 +215,9 @@ in
     serviceConfig = {
       ExecStart = "${pkgs.quickshell}/bin/quickshell";
       Restart = "on-failure";
+      # Creates ~/.local/state/kaizen-shell before ExecStart: for user units
+      # StateDirectory resolves under $XDG_STATE_HOME.
+      StateDirectory = "kaizen-shell";
     };
   };
 
