@@ -31,8 +31,20 @@ pinned commit. CI builds the host without the submodule checked out.
 ## Test-driving Noctalia
 
 Noctalia v5 (nixpkgs `noctalia`, a C++ shell; `noctalia-shell` is the v4
-Quickshell config) can replace the shell in the running niri session. It runs
-as a transient user unit, so it outlives the terminal that started it:
+Quickshell config) is evaluated, never installed: both routes below run it
+from the host's own nixpkgs and leave its state in `~/.config/noctalia/` and
+`~/.local/state/noctalia/`, outside the dotfiles.
+
+A whole session without kaizen: `noctalia` from the TTY, the counterpart to
+`kaizen` in `shell/sourcing.sh`. It masks `quickshell`, `dcal` and
+`kaizen-sleep-lock` for the session and lets niri start Noctalia instead.
+niri's config is kaizen's, so its `qs ipc` binds do nothing and Noctalia's own
+binds are absent. Its logs are `journalctl --user -u noctalia-trial -f`,
+the same unit name as the swap below. The masks are `--runtime`, so they are gone after a reboot,
+and `kaizen` clears them before starting; either command always reaches the
+other session.
+
+Swapping shells inside a running kaizen session, keeping its niri and units:
 
 ```sh
 systemctl --user stop quickshell
@@ -44,10 +56,7 @@ journalctl --user -u noctalia-trial -f   # logs
 systemctl --user stop noctalia-trial && systemctl --user start quickshell
 ```
 
-While it runs, the `qs ipc` binds in `config.kdl` (menu, lock, volume,
-notifications) do nothing, and `kaizen-sleep-lock` cannot lock before suspend,
-so do not suspend. Its state lives in `~/.config/noctalia/` and
-`~/.local/state/noctalia/`, outside the dotfiles.
+Here `kaizen-sleep-lock` is still running but cannot lock, so do not suspend.
 
 ## Hardware
 
