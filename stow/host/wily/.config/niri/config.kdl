@@ -134,7 +134,6 @@ window-rule {
     open-on-workspace "3"
 }
 
-
 window-rule {
     // dcal.service runs the sync daemon headless; this is the window `dcal show`
     // opens.
