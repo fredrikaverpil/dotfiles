@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
+import "../../../Ui" as Ui
 import "PlacesModel.js" as Places
 import "WeatherModel.js" as Model
 
@@ -11,7 +12,7 @@ Item {
   // MET blocks generic User-Agents and requires contact information; the
   // repository URL is one of the forms their terms accept.
   readonly property string userAgent: "kaizen-shell/1.0 github.com/fredrikaverpil/dotfiles"
-  readonly property string statePath: Quickshell.env("HOME") + "/.local/state/kaizen-shell/weather.json"
+  readonly property string statePath: Ui.Paths.state + "/weather.json"
 
   // Places.home seeds the first run only; the saved pick replaces it on load.
   property real latitude: Places.home.latitude

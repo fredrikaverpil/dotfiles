@@ -22,8 +22,8 @@ Scope {
     }
 
     readonly property string wallpaperDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
-    readonly property string thumbDir: Quickshell.env("HOME") + "/.cache/kaizen-shell/wallpaper-thumbs"
-    readonly property string statePath: Quickshell.env("HOME") + "/.local/state/kaizen-shell/wallpaper.json"
+    readonly property string thumbDir: Ui.Paths.cache + "/wallpaper-thumbs"
+    readonly property string statePath: Ui.Paths.state + "/wallpaper.json"
     property bool stateLoaded: false
     property list<string> wallpapers: []
     readonly property int columns: 4
