@@ -4,21 +4,12 @@
   lib,
   pkgs,
   inputs,
-  hostName,
   osConfig ? { },
   ...
 }:
 let
   stable = inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system};
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
-
-  # Stow package under stow/platform/ matching `uname -s`; Nix knows the
-  # platform at build time.
-  stowPlatform = if pkgs.stdenv.hostPlatform.isDarwin then "Darwin" else "Linux";
-  stowHost = lib.escapeShellArg hostName;
-  # stow/kaizen/ is the niri + Quickshell desktop's compositor config and QML;
-  # the hosts that run that desktop are exactly the ones enabling niri.
-  stowKaizen = osConfig.programs.niri.enable or false;
 in
 {
   imports = [
@@ -66,28 +57,9 @@ in
         DOTFILES_PATH="${inputs.dotfiles}"
       fi
 
-      # Symlink dotfiles with GNU Stow. --adopt absorbs any real file that has
-      # replaced a managed symlink into the repo (shows up in `git diff`);
-      # --no-folding links individual files so other tools can write siblings
-      # into the same dir (e.g. ~/.config). Stow forbids slashes in package
-      # names, so each level (shared, kaizen, platform/, host/) is its own
-      # invocation with its own --dir. Order: shared, platform, kaizen, host.
       echo "Stowing dotfiles from $DOTFILES_PATH..."
-      stow_pkg() {
-        if ! $DRY_RUN_CMD ${pkgs.stow}/bin/stow \
-          --dir="$1" --target="$HOME" \
-          --restow --no-folding --adopt \
-          "$2"; then
-          echo "Warning: Stow failed for $1/$2"
-          exit 1
-        fi
-      }
-      stow_pkg "$DOTFILES_PATH/stow" shared
-      stow_pkg "$DOTFILES_PATH/stow/platform" ${stowPlatform}
-      ${lib.optionalString stowKaizen ''stow_pkg "$DOTFILES_PATH/stow" kaizen''}
-      if [ -d "$DOTFILES_PATH/stow/host"/${stowHost} ]; then
-        stow_pkg "$DOTFILES_PATH/stow/host" ${stowHost}
-      fi
+      PATH="${pkgs.stow}/bin:${pkgs.bash}/bin:$PATH" \
+        $DRY_RUN_CMD bash "$DOTFILES_PATH/shell/bin/dotfiles-stow" "$DOTFILES_PATH"
     '';
 
     # Common packages available on all platforms

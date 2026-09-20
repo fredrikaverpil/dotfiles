@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+set -e
+
+# Symlinks the stow/ tree into $HOME: shared, platform, kaizen (niri hosts),
+# then the optional host package. Also what home-manager activation runs.
+# --adopt absorbs a real file that replaced a managed symlink into the repo;
+# --no-folding links files, not dirs, so other tools can write siblings.
+
+case "$1" in
+-h | --help)
+  echo "usage: dotfiles-stow [DOTFILES_DIR]    restow DOTFILES_DIR/stow (default ~/.dotfiles) into \$HOME"
+  exit 0
+  ;;
+esac
+
+cd "${1:-$HOME/.dotfiles}"
+stow_pkg() {
+  stow --dir="$1" --target="$HOME" --restow --no-folding --adopt "$2"
+}
+stow_pkg stow shared
+stow_pkg stow/platform "$(uname -s)"
+# niri lives in the system profile; the activation PATH has no `niri`.
+[ -e /run/current-system/sw/bin/niri ] && stow_pkg stow kaizen
+host="$(uname -n | cut -d. -f1)"
+[ -d "stow/host/$host" ] && stow_pkg stow/host "$host"
+echo "stowed"
