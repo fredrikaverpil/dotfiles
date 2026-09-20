@@ -132,13 +132,6 @@ TestCase {
     verify(Timezone.abbreviationLabel("JST", "+0900") === "JST")
   }
 
-  function test_a_shell_zone_behind_the_system_is_detected_by_its_offset() {
-    // Qt still on CEST (-120) while date(1) reports Tokyo.
-    verify(Timezone.staleClock("+0900", -120) === true)
-    verify(Timezone.staleClock("+0200", -120) === false)
-    verify(Timezone.staleClock("", -120) === false)
-  }
-
   function test_an_empty_or_truncated_probe_renders_blanks_not_undefined() {
     const parsed = Timezone.parse("", now)
     verify(parsed.zone === "")

@@ -13,16 +13,11 @@ Ui.Panel {
 
   // The zone in force when it is not the one timedated reports, else "".
   readonly property string mismatch: Model.zoneMismatch(info.zone, info.link)
-  readonly property bool stale: Model.staleClock(info.offset, new Date().getTimezoneOffset())
   readonly property var warnings: [
     mismatch === ""
       ? ""
       : "󰀦 Not applied: timedated reports " + info.zone + " but /etc/localtime is "
         + mismatch + ".",
-    !stale
-      ? ""
-      : "󰀦 Bar clock is still on the previous zone. Restart with: "
-        + "systemctl --user restart quickshell dcal",
     root.service.lastError,
   ].filter(text => text !== "")
 
