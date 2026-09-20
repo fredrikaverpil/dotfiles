@@ -2,13 +2,15 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+
+import "../../../Ui" as Ui
 import Quickshell.Wayland
 
 Item {
   id: root
 
   property var lockService: null
-  readonly property string statePath: Quickshell.env("HOME") + "/.local/state/kaizen-shell/idle.json"
+  readonly property string statePath: Ui.Paths.state + "/idle.json"
   readonly property int lockAfterSeconds: 300
 
   property bool stateLoaded: false

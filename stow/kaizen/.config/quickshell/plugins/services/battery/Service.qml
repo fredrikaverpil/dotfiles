@@ -1,6 +1,8 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+
+import "../../../Ui" as Ui
 import Quickshell.Services.UPower
 
 import "BatteryModel.js" as Model
@@ -8,7 +10,7 @@ import "BatteryModel.js" as Model
 Item {
   id: root
 
-  readonly property string statePath: Quickshell.env("HOME") + "/.local/state/kaizen-shell/power-profiles.json"
+  readonly property string statePath: Ui.Paths.state + "/power-profiles.json"
   readonly property int lowLevel: 10
   readonly property int criticalLevel: 5
 
