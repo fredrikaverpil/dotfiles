@@ -30,6 +30,11 @@
 
   # Chromium web apps on the work profile.
   xdg.desktopEntries = {
+    calendar = {
+      name = "Google Calendar";
+      exec = "chromium --profile-directory=Work --app=https://calendar.google.com";
+      icon = ../../../shared/home/webapps/calendar.png;
+    };
     linear = {
       name = "Linear";
       exec = "chromium --profile-directory=Work --app=https://linear.app";
