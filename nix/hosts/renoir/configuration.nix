@@ -3,7 +3,6 @@
   imports = [
     ../../shared/system/kaizen/desktop.nix
     ../../shared/system/thinkpad.nix
-    ./personal.nix
   ];
 
   system.stateVersion = "26.05";
@@ -11,6 +10,30 @@
   networking.hostName = "renoir";
   nixpkgs.hostPlatform = "x86_64-linux";
   nixpkgs.config.allowUnfree = true;
+  # ente-desktop pins EOL electron; drop once nixpkgs bumps it.
+  nixpkgs.config.permittedInsecurePackages = [ "electron-41.10.6" ];
+
+  # 0.8.2 closes Steam menus instantly (Supreeeme/xwayland-satellite#468, fixed
+  # on main by #494); drop this pin once a newer release lands in nixpkgs.
+  nixpkgs.overlays = [
+    (_: prev: {
+      xwayland-satellite = prev.xwayland-satellite.overrideAttrs (
+        finalAttrs: _: {
+          version = "0.8.1";
+          src = prev.fetchFromGitHub {
+            owner = "Supreeeme";
+            repo = "xwayland-satellite";
+            tag = "v${finalAttrs.version}";
+            hash = "sha256-BUE41HjLIGPjq3U8VXPjf8asH8GaMI7FYdgrIHKFMXA=";
+          };
+          cargoDeps = prev.rustPlatform.fetchCargoVendor {
+            inherit (finalAttrs) src;
+            hash = "sha256-16L6gsvze+m7XCJlOA1lsPNELE3D364ef2FTdkh0rVY=";
+          };
+        }
+      );
+    })
+  ];
 
   # Unset so timedated owns /etc/localtime and `timedatectl set-timezone`
   # persists across rebuilds; this laptop travels. UTC until first set.
@@ -67,6 +90,16 @@
     };
   };
 
+  programs.steam = {
+    # Also enables 32-bit graphics; Proton versions are picked in Steam.
+    enable = true;
+    # steam-gamescope: Big Picture in standalone gamescope, run from a TTY.
+    gamescopeSession.enable = true;
+  };
+
   # Host-only system packages; shared ones live in nix/shared/system/.
-  host.extraSystemPackages = with pkgs; [ ];
+  host.extraSystemPackages = with pkgs; [
+    (withGnomeLibsecret ente-desktop)
+    lutris # Battle.net and other non-Steam launchers.
+  ];
 }

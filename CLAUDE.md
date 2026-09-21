@@ -60,8 +60,8 @@ and **GNU Stow** for dotfile symlinking.
   them follow another nixpkgs, or kernel binary cache hits are lost)
 - **Module scope**: modules are split by concern. Shared ones live in
   `nix/shared/system/` (`kaizen/desktop.nix`, `thinkpad.nix`) and are imported
-  by every host that wants them; host-only ones stay in `nix/hosts/<host>/`
-  (`personal.nix`). Use system config only when a NixOS or
+  by every host that wants them; host-only config stays in
+  `nix/hosts/<host>/configuration.nix`. Use system config only when a NixOS or
   nix-darwin module, or root-level integration, is needed; portable user
   tooling goes in home-manager (`nix/shared/home/`)
 - **Configuration helpers**: Use `lib.mkDarwin` and `lib.mkRpiNixos` functions
