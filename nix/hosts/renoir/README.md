@@ -4,8 +4,7 @@ Personal machine. The niri + Quickshell desktop it runs is shared with `wily`
 and documented in `nix/shared/system/kaizen/CLAUDE.md`; its Nix modules are
 `nix/shared/system/kaizen/desktop.nix` and `nix/shared/system/thinkpad.nix`.
 Machine-specific settings (microcode, VAAPI driver, kernel choice) and
-host-only programs belong in `configuration.nix`, personal-only ones in
-`personal.nix`.
+host-only programs belong in `configuration.nix`.
 
 > [!NOTE]
 >
