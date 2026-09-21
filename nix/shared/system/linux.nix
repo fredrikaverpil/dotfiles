@@ -14,6 +14,12 @@
       description = "Additional system packages for this host";
     };
 
+    host.chromiumFeatures = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "Extra Chromium --enable-features for this host";
+    };
+
     host.extraServices = lib.mkOption {
       type = lib.types.attrs;
       default = { };

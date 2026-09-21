@@ -18,6 +18,8 @@
   hardware.enableRedistributableFirmware = true;
   # VA-API for gpu-screen-recorder and mpv; Mesa ships none for Intel.
   hardware.graphics.extraPackages = [ pkgs.intel-media-driver ];
+  # VA-API decode is on by default; encode (video calls) needs AcceleratedVideoEncoder.
+  host.chromiumFeatures = [ "AcceleratedVideoEncoder" ];
 
   # Unset so timedated owns /etc/localtime and `timedatectl set-timezone`
   # persists across rebuilds; this laptop travels. UTC until first set.
