@@ -29,6 +29,7 @@ Item {
   property var historyRows: []
   property var live: ({})
   property int nextKey: 0
+  property var shortcodes: JSON.parse(shortcodeFile.text() || "{}")
 
   function stateText() { return Model.stateText(doNotDisturb, historyRows) }
 
@@ -46,6 +47,8 @@ Item {
 
   function recordFor(notification, existing) {
     var record = NotificationLogic.snapshotOf(notification)
+    record.summary = NotificationLogic.emojify(record.summary, shortcodes)
+    record.body = NotificationLogic.emojify(record.body, shortcodes)
     record.key = existing ? existing.key : String(++nextKey)
     record.notification = notification
     record.duration = NotificationLogic.durationFor(notification, NotificationUrgency.Low, NotificationUrgency.Critical)
@@ -184,6 +187,14 @@ Item {
     atomicWrites: true
     printErrors: false
     onLoaded: root.loadState(text())
+  }
+
+  FileView {
+    id: shortcodeFile
+    path: Quickshell.env("EMOJI_SHORTCODES") || ""
+    // Blocks the first read, so no notification is handled before the map exists.
+    blockLoading: true
+    printErrors: false
   }
 
   NotificationServer {

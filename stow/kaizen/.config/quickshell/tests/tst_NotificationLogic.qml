@@ -21,6 +21,12 @@ TestCase {
     compare(Notification.iconSource(null), "")
   }
 
+  function test_notification_emojify_replaces_known_shortcodes_only() {
+    const codes = { hammer_and_wrench: "🛠️", memo: "📝", "+1": "👍", "skin-tone-2": "🏻" }
+    compare(Notification.emojify("Up next: :hammer_and_wrench::memo: Sprint :+1::skin-tone-2: :custom: 10:30:00", codes),
+      "Up next: 🛠️📝 Sprint 👍🏻 :custom: 10:30:00")
+  }
+
   function test_notification_duration_honors_urgency_residency_and_bounds() {
     const low = 0
     const critical = 2
