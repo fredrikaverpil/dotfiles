@@ -234,7 +234,8 @@ binds {
     // Launch
     Mod+T hotkey-overlay-title="Terminal" { spawn "ghostty"; }
     Mod+Y hotkey-overlay-title="Files" { spawn "ghostty" "-e" "yazi"; }
-    Mod+B hotkey-overlay-title="Browser" { spawn "chromium"; }
+    // Work profile on wily, personal (Default) elsewhere.
+    Mod+B hotkey-overlay-title="Browser" { spawn-sh r#"chromium --profile-directory="$([ "$(hostname)" = wily ] && echo Work || echo Default)""#; }
     // Skips whatever is already running, so it is safe to press twice.
     Mod+A hotkey-overlay-title="Open the everyday apps" { spawn "kaizen-apps"; }
 
