@@ -23,5 +23,11 @@
 
   home.file = { };
 
+  xdg.desktopEntries.calendar = {
+    name = "Google Calendar";
+    exec = "chromium --profile-directory=Default --app=https://calendar.google.com";
+    icon = ../../../shared/home/webapps/calendar.png;
+  };
+
   programs = { };
 }
