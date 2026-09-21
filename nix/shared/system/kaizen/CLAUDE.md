@@ -298,14 +298,14 @@ PID.
   collection when keyring creation follows D-Bus startup. Recover by
   restarting the keyring daemon and unlocking it, then retry account setup.
   Do not delete keyring files.
-- Chromium and Electron pick their secret store from `XDG_CURRENT_DESKTOP`.
-  They do not recognise `niri` and fall back to `basic_text`, so logins and
-  secrets do not persist or are stored under a hardcoded key. Wrap each such
-  app with `pkgs.withGnomeLibsecret` (`desktop.nix`), which adds
-  `--password-store=gnome-libsecret`; `chromium` passes the flag directly.
-  Do not add `GNOME` to `XDG_CURRENT_DESKTOP`: autostart entries such as
-  `nm-applet` and `print-applet` use `NotShowIn=GNOME`. Once an app has encrypted secrets with
-  the keyring, removing the flag locks it out of them.
+- Chromium and Electron pick their secret store from `XDG_CURRENT_DESKTOP`. They
+  do not recognise `niri` and fall back to `basic_text`, so logins and secrets
+  do not persist or are stored under a hardcoded key. Wrap each such app with
+  `pkgs.withGnomeLibsecret` (`desktop.nix`), which adds
+  `--password-store=gnome-libsecret`; `chromium` passes the flag directly. Do
+  not add `GNOME` to `XDG_CURRENT_DESKTOP`: autostart entries such as
+  `nm-applet` and `print-applet` use `NotShowIn=GNOME`. Once an app has
+  encrypted secrets with the keyring, removing the flag locks it out of them.
 - Lid close uses logind defaults: suspend (the sleep-lock unit locks first),
   or nothing when docked. Niri turns off `eDP-1` while docked with the lid
   closed.
