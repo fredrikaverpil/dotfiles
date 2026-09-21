@@ -6,10 +6,10 @@ function dpms(on) {
 
 function closeWindow() { return ["niri", "msg", "action", "close-window"] }
 
-// niri saves to screenshot-path and copies to the clipboard on its own.
-function screenshot(mode) {
+// niri writes path asynchronously, after the action returns.
+function screenshot(mode, path) {
   return ["niri", "msg", "action",
-    mode === "window" ? "screenshot-window" : "screenshot-screen"]
+    mode === "window" ? "screenshot-window" : "screenshot-screen", "--path", path]
 }
 
 // Prints the picked color as #rrggbb, or nothing when cancelled.
