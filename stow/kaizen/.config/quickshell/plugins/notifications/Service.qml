@@ -108,7 +108,7 @@ Item {
 
     record = recordFor(notification)
 
-    if (doNotDisturb && notification.urgency !== NotificationUrgency.Critical) {
+    if (doNotDisturb && record.urgency !== NotificationUrgency.Critical) {
       addHistory(record)
       return
     }
