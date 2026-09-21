@@ -115,6 +115,7 @@ previous states. Explain a declaration next to it, not here.
 - Read the relevant Omarchy source before changing a ported feature (and
   `git pull` its source before reading):
   `~/code/public/github.com/omacom/omarchy`. Complementary references are:
+  - `https://noctalia.dev/plugins`
   - `~/code/public/github.com/caelestia-dots/shell`
   - `~/code/public/github.com/AvengeMedia/DankMaterialShell`
   - `~/code/public/github.com/0xbbuddha/dotfiles_nothing_os`.
