@@ -71,12 +71,6 @@
 
   services.tailscale.enable = true;
 
-  # S3 resume needs the USB Bluetooth adapter (MediaTek) armed to wake, or the
-  # wireless mouse cannot wake the laptop.
-  services.udev.extraRules = ''
-    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0489", ATTR{idProduct}=="e0cd", ATTR{power/wakeup}="enabled"
-  '';
-
   # CUPS on loopback only; Avahi discovers driverless (IPP Everywhere) printers.
   services.printing.enable = true;
   services.avahi = {
