@@ -7,6 +7,7 @@
 {
   imports = [
     ../../../shared/home/linux.nix
+    ../../../shared/home/webapps.nix
   ];
 
   home.stateVersion = "26.05";
@@ -26,6 +27,25 @@
   llmAgents = [ ];
 
   home.file = { };
+
+  # Chromium web apps on the work profile.
+  xdg.desktopEntries = {
+    linear = {
+      name = "Linear";
+      exec = "chromium --profile-directory=Work --app=https://linear.app";
+      icon = ../webapps/linear.png;
+    };
+    meet = {
+      name = "Google Meet";
+      exec = "chromium --profile-directory=Work --app=https://meet.google.com";
+      icon = ../webapps/meet.png;
+    };
+    miro = {
+      name = "Miro";
+      exec = "chromium --profile-directory=Work --app=https://miro.com/app/dashboard/";
+      icon = ../webapps/miro.png;
+    };
+  };
 
   programs = {
     # `?submodules=1` pulls in the private submodule at nix/hosts/wily/einride;
