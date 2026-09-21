@@ -42,6 +42,13 @@
   services.logind.settings.Login.HandleLidSwitch = "suspend-then-hibernate";
   systemd.sleep.settings.Sleep.HibernateDelaySec = "2h";
 
+  # Bluetooth devices with BlueZ WakeAllowed can wake from suspend. The HHKB
+  # reconnects right after suspend, waking it at once, so its WakeAllowed is
+  # set false in BlueZ; the MX mouse wakes on click.
+  services.udev.extraRules = ''
+    ACTION=="add|bind", SUBSYSTEM=="pci", DRIVER=="btintel_pcie", ATTR{power/wakeup}="enabled"
+  '';
+
   nix.gc = {
     automatic = true;
     dates = "weekly";
