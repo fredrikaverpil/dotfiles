@@ -34,3 +34,10 @@ function durationFor(notification, lowUrgency, criticalUrgency) {
   var minimum = notification.urgency === lowUrgency ? 5000 : 8000
   return Math.min(30000, Math.max(minimum, requested))
 }
+
+// Replaces known `:shortcode:`s; unknown ones (custom Slack emoji) stay as text.
+function emojify(text, shortcodes) {
+  return text.replace(/:([\w+-]+):/g, function(match, name) {
+    return Object.prototype.hasOwnProperty.call(shortcodes, name) ? shortcodes[name] : match
+  })
+}

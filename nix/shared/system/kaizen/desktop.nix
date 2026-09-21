@@ -6,6 +6,23 @@
   ...
 }:
 let
+  # Shortcode -> emoji, for apps (Slack) that send `:name:` in notification text.
+  emoji-shortcodes =
+    pkgs.runCommand "emoji-shortcodes.json"
+      { nativeBuildInputs = [ (pkgs.python3.withPackages (p: [ p.emoji ])) ]; }
+      ''
+        python3 - > $out <<'EOF'
+        import json, emoji
+        codes = {}
+        for char, data in emoji.EMOJI_DATA.items():
+            for name in [data["en"], *data.get("alias", [])]:
+                codes.setdefault(name.strip(":"), char)
+        for tone, char in enumerate("🏻🏼🏽🏾🏿", start=2):
+            codes[f"skin-tone-{tone}"] = char
+        json.dump(codes, open(1, "w", encoding="utf-8", closefd=False), ensure_ascii=False)
+        EOF
+      '';
+
   sleep-lock-monitor = pkgs.writeShellApplication {
     name = "kaizen-sleep-lock-monitor";
     runtimeInputs = [
@@ -212,6 +229,7 @@ in
     environment.QT_PLUGIN_PATH = "${pkgs.qt6.qtimageformats}/lib/qt-6/plugins";
     # The menu's emoji picker reads names from Unicode's test file.
     environment.EMOJI_TEST = "${pkgs.unicode-emoji}/share/unicode/emoji/emoji-test.txt";
+    environment.EMOJI_SHORTCODES = "${emoji-shortcodes}";
     serviceConfig = {
       ExecStart = "${pkgs.quickshell}/bin/quickshell";
       Restart = "on-failure";
