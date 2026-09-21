@@ -9,7 +9,7 @@ Singleton {
 
   function dpms(on) { return Niri.dpms(on) }
   function closeWindow() { return Niri.closeWindow() }
-  function screenshot(mode) { return Niri.screenshot(mode) }
+  function screenshot(mode, path) { return Niri.screenshot(mode, path) }
   function pickColor() { return Niri.pickColor() }
   function configFile(home) { return Niri.configFile(home) }
   function parseBinds(raw) { return Niri.parseBinds(raw) }

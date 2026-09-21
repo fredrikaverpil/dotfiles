@@ -70,7 +70,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | media | [MPRIS] | now-playing widget | Panels › Media | `media` |
 | network | [NetworkManager], `ip -j` | button | Setup › Network | `network` |
 | nightlight | [wl-gammarelay-rs] over D-Bus, the weather location for the solar position | – | Setup › Nightlight | `nightlight` |
-| recording | [gpu-screen-recorder], [grim], [PipeWire] | recording indicator | Trigger › Record, Screenshot (region) | `recording` |
+| recording | [gpu-screen-recorder], [grim], [satty], [PipeWire] | recording indicator | Trigger › Record, Screenshot (region, desktop, window) | `recording` |
 | system | [hwmon], `/proc` load | monitor button | Setup › Display | `system`, `display` |
 | timezone | [timedated] via `timedatectl`, `zdump` for the DST rules | time button | Panels › Clock, Setup › Timezone | `timezone` |
 | weather | [met.no locationforecast] | button | Panels › Weather, Setup › Weather location | `weather` |
@@ -99,6 +99,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 [wl-gammarelay-rs]: https://github.com/MaxVerevkin/wl-gammarelay-rs
 [gpu-screen-recorder]: https://git.dec05eba.com/gpu-screen-recorder/about/
 [grim]: https://sr.ht/~emersion/grim/
+[satty]: https://github.com/gabm/Satty
 [hwmon]: https://docs.kernel.org/hwmon/sysfs-interface.html
 [met.no locationforecast]: https://api.met.no/weatherapi/locationforecast/2.0/documentation
 [Desktop Notifications]: https://specifications.freedesktop.org/notification-spec/latest/

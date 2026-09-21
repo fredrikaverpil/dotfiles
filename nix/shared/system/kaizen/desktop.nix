@@ -356,6 +356,8 @@ in
     # the shell never writes output config.
     nwg-displays
     resources
+    # Annotates screenshots from the notification's Edit action.
+    satty
     wl-clipboard
     # niri cannot mirror outputs; wl-mirror shows one in a fullscreen window.
     wl-mirror
