@@ -13,6 +13,15 @@ TestCase {
     })
   }
 
+  function test_notification_urgency_raises_calendar_reminders_to_critical() {
+    compare(Notification.urgencyOf({ appName: "Slack", summary: "[einride] from Google Calendar", urgency: 1 }), 2)
+    compare(Notification.urgencyOf({ appName: "Slack", summary: "[einride] from Jira", urgency: 1 }), 1)
+    compare(Notification.urgencyOf({ appName: "Chromium", summary: "Standup", body: "calendar.google.com\n10:00 – 10:15", urgency: 1 }), 2)
+    compare(Notification.urgencyOf({ appName: "Chromium", summary: "Mail", body: "mail.google.com\ncalendar.google.com", urgency: 1 }), 1)
+    compare(Notification.urgencyOf({ appName: "Mail", summary: "from Google Calendar", urgency: 0 }), 0)
+    compare(Notification.durationFor({ appName: "Slack", summary: "[x] from Google Calendar", urgency: 1, expireTimeout: 1 }, 0, 2), 0)
+  }
+
   function test_notification_icon_sources_preserve_schemes_and_normalize_paths() {
     compare(Notification.iconSource("/tmp/icon.png"), "file:///tmp/icon.png")
     compare(Notification.iconSource("file:///tmp/icon.png"), "file:///tmp/icon.png")
