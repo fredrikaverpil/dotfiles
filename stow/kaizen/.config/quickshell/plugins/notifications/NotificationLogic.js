@@ -11,6 +11,15 @@ function iconSource(icon) {
   return value
 }
 
+// Google Calendar reminders arrive at normal urgency; they are raised to critical (2).
+// Slack relays them "from Google Calendar"; Chromium prefixes the body with the origin.
+function urgencyOf(notification) {
+  var app = asString(notification.appName)
+  if (app === "Slack" && / from Google Calendar$/.test(asString(notification.summary))) return 2
+  if (app === "Chromium" && /^calendar\.google\.com\n/.test(asString(notification.body))) return 2
+  return Number(notification.urgency)
+}
+
 function snapshotOf(notification, timestamp) {
   return {
     app: asString(notification.appName),
@@ -18,20 +27,21 @@ function snapshotOf(notification, timestamp) {
     summary: asString(notification.summary),
     body: asString(notification.body),
     image: asString(notification.image),
-    urgency: Number(notification.urgency),
+    urgency: urgencyOf(notification),
     timestamp: timestamp === undefined ? Date.now() : timestamp
   }
 }
 
 function durationFor(notification, lowUrgency, criticalUrgency) {
-  if (notification.urgency === criticalUrgency || notification.resident) return 0
+  var urgency = urgencyOf(notification)
+  if (urgency === criticalUrgency || notification.resident) return 0
 
   // Zero is the spec's "never expire"; negative or unparseable means server default.
   var requested = Number(notification.expireTimeout)
   if (requested === 0) return 0
   if (!isFinite(requested) || requested < 0) requested = 0
 
-  var minimum = notification.urgency === lowUrgency ? 5000 : 8000
+  var minimum = urgency === lowUrgency ? 5000 : 8000
   return Math.min(30000, Math.max(minimum, requested))
 }
 
