@@ -115,15 +115,30 @@ Item {
     startCountdown()
   }
 
-  // The sleep lets the selection overlay leave the output before grim copies it.
   function grab(rect) {
+    snap(file => ["grim", "-g", Model.formatGrimRegion(rect), file])
+  }
+
+  // Screenshots the focused "screen" or "window".
+  function shoot(mode) {
+    snap(file => Ui.Compositor.screenshot(mode, file))
+  }
+
+  // Runs command(file), copies the file and offers to annotate it in satty.
+  // The sleep lets the overlay or menu leave the output before capture; the
+  // loop waits for writers that return before the file exists.
+  function snap(command) {
+    const file = Quickshell.env("HOME") + "/Pictures/Screenshots/Screenshot from "
+      + Qt.formatDateTime(new Date(), "yyyy-MM-dd HH-mm-ss") + ".png"
     Quickshell.execDetached(["sh", "-c",
-      'sleep 0.2; dir="$HOME/Pictures/Screenshots"; '
-      + 'file="$dir/Screenshot from $(date "+%Y-%m-%d %H-%M-%S").png"; '
-      + 'mkdir -p "$dir" && grim -g "$1" "$file" && wl-copy --type image/png < "$file" '
-      + '&& notify-send -a Screenshot "Screenshot saved" "$file" '
-      + '|| notify-send -a Screenshot -u critical "Screenshot failed" "$1"',
-      "sh", Model.formatGrimRegion(rect)])
+      'sleep 0.2; file=$1; shift; mkdir -p "${file%/*}" && "$@" '
+      + '&& for _ in 1 2 3 4 5 6 7 8 9 10; do [ -s "$file" ] && break; sleep 0.2; done '
+      + '&& wl-copy --type image/png < "$file" '
+      + '|| { notify-send -a Screenshot -u critical "Screenshot failed" "$file"; exit 1; }; '
+      + 'action=$(notify-send -a Screenshot -A default=Edit -A edit=Edit "Screenshot saved" "$file"); '
+      + '[ -z "$action" ] || exec satty --filename "$file" --output-filename "$file" --early-exit '
+      + '--actions-on-enter save-to-clipboard --save-after-copy --copy-command wl-copy',
+      "sh", file].concat(command(file)))
   }
 
   function startCountdown() {
