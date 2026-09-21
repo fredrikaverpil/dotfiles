@@ -353,13 +353,14 @@ in
     iputils
 
     # Chromium picks its password store per desktop; switching stores drops cookies and logins.
-    # VA-API decode is on by default; encode (video calls) needs AcceleratedVideoEncoder.
     # The last --enable-features wins, so repeat the wrapper's WaylandWindowDecorations.
     (chromium.override {
       commandLineArgs = lib.concatStringsSep " " [
         "--no-first-run"
         "--password-store=gnome-libsecret"
-        "--enable-features=AcceleratedVideoEncoder,WaylandWindowDecorations"
+        "--enable-features=${
+          lib.concatStringsSep "," ([ "WaylandWindowDecorations" ] ++ config.host.chromiumFeatures)
+        }"
       ];
     })
     blanket
