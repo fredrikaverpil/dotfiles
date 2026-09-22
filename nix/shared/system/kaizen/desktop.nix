@@ -390,6 +390,7 @@ in
     wl-mirror
     wtype
     (withGnomeLibsecret inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-desktop)
+    (withGnomeLibsecret obsidian)
     (withGnomeLibsecret proton-pass)
     (withGnomeLibsecret signal-desktop)
     (withGnomeLibsecret slack)
