@@ -112,13 +112,15 @@ previous states. Explain a declaration next to it, not here.
   keyboard-layout state; compositor-side XKB toggles would desynchronize it.
 - Tray submenus require one live opener per level. `QsMenuEntry.display()` needs
   a platform menu this shell does not have.
-- Read the relevant Omarchy source before changing a ported feature (and
-  `git pull` its source before reading):
-  `~/code/public/github.com/omacom/omarchy`. Complementary references are:
-  - `https://noctalia.dev/plugins`
+- Read the relevant Omarchy source before changing a ported feature (`git clone`
+  if missing and `git pull` its source before reading):
   - `~/code/public/github.com/caelestia-dots/shell`
   - `~/code/public/github.com/AvengeMedia/DankMaterialShell`
-  - `~/code/public/github.com/0xbbuddha/dotfiles_nothing_os`.
+  - `~/code/public/github.com/snowarch/iNiR`
+  - `~/code/public/github.com/Gakuseei/Ricelin`
+  - `~/code/public/github.com/0xbbuddha/dotfiles_nothing_os`
+  - `~/code/public/github.com/omacom/omarchy`
+  - and `https://noctalia.dev/plugins` which contains a registry of plugins
 - Any open source/public projects we might want to adopt/inspect can be cloned
   into `~/code/public/`.
 
