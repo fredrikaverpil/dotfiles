@@ -349,6 +349,8 @@ in
     ffmpegthumbnailer # Nautilus video thumbnails.
     ghostty
     gnome-themes-extra
+    # Cursor theme for niri, GTK and Qt; without one niri draws a fixed 64px fallback.
+    bibata-cursors
     iproute2
     iputils
 
