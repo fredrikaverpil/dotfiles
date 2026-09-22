@@ -27,6 +27,10 @@ code in this repository.
   (`zap`, `plumbus`);
   `nix build .#nixosConfigurations.<host>.config.system.build.toplevel` on
   NixOS (`rpi5-homelab`, `renoir`, `wily`) — NixOS has no `.system` attribute
+- **wily in a git worktree**: submodules aren't checked out, and
+  `configuration.nix` skips `einride/` when absent, so a build there passes
+  without the work config. Run `git submodule update --init
+  nix/hosts/wily/einride` first when a change could interact with it
 - **Format Nix files**: `nix fmt` (uses nixfmt-rfc-style)
 - **CI testing**: Follow `.github/workflows/test.yml` workflow
 - **Toolchain outside Neovim**: language toolchains (go, python3, node, ruby,
