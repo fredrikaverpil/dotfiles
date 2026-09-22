@@ -10,8 +10,6 @@
   networking.hostName = "renoir";
   nixpkgs.hostPlatform = "x86_64-linux";
   nixpkgs.config.allowUnfree = true;
-  # ente-desktop pins EOL electron; drop once nixpkgs bumps it.
-  nixpkgs.config.permittedInsecurePackages = [ "electron-41.10.6" ];
 
   # 0.8.2 closes Steam menus instantly (Supreeeme/xwayland-satellite#468, fixed
   # on main by #494); drop this pin once a newer release lands in nixpkgs.
