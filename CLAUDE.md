@@ -125,6 +125,8 @@ lands on both. Hardware notes are in the host's `README.md`.
 - **TypeScript**: 2-space indentation, 80 char width, prettier with prose-wrap
   always
 - **YAML**: 2-space indentation, use `---` document separator
+- **Markdown**: rumdl, 80 char width with reflow; flags in
+  `nvim-fredrik/plugin/conform.lua`
 
 ## Language-Specific Tooling
 
