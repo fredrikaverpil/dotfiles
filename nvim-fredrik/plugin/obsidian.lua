@@ -1,18 +1,15 @@
 require("lazyload").on_vim_enter(function()
-  -- Vaults live in iCloud; don't even install the plugin elsewhere.
-  if vim.fn.has("mac") ~= 1 then
-    return
-  end
-
   vim.pack.add({
     { src = "https://github.com/obsidian-nvim/obsidian.nvim", version = vim.version.range("*") },
     { src = "https://github.com/folke/snacks.nvim", version = vim.version.range("*") }, -- sub-dependency
   })
 
-  local icloud = vim.fn.expand("~/Library/Mobile Documents/iCloud~md~obsidian/Documents")
+  -- Vaults live in iCloud on macOS.
+  local base = vim.fn.has("mac") == 1 and vim.fn.expand("~/Library/Mobile Documents/iCloud~md~obsidian/Documents")
+    or vim.fn.expand("~/Documents/Obsidian")
   local vaults = {
-    personal = { path = vim.fs.joinpath(icloud, "personal") },
-    work = { path = vim.fs.joinpath(icloud, "work") },
+    personal = { path = vim.fs.joinpath(base, "personal") },
+    work = { path = vim.fs.joinpath(base, "work") },
   }
 
   ---@param title string
@@ -91,9 +88,9 @@ require("lazyload").on_vim_enter(function()
 
   -- Obsidian commands act on the *active* workspace, so align it with the cwd
   -- before running them; otherwise notes land in the wrong vault. The active
-  -- workspace defaults to the first one (vaults live in iCloud, so cwd never
-  -- matches a vault path). Guarded to avoid obsidian's "Already in workspace"
-  -- notification on every keypress.
+  -- workspace defaults to the first one (cwd rarely matches a vault path).
+  -- Guarded to avoid obsidian's "Already in workspace" notification on every
+  -- keypress.
   local function in_vault(action)
     local name = current_vault()
     ---@diagnostic disable-next-line: undefined-global
@@ -158,7 +155,7 @@ require("lazyload").on_vim_enter(function()
 
   vim.keymap.set("n", "<leader>no", function()
     in_vault(function(_, name)
-      vim.fn.jobstart({ "open", "obsidian://open?vault=" .. name })
+      vim.ui.open("obsidian://open?vault=" .. name)
     end)
   end, { desc = "Notes: open Obsidian" })
 end)
