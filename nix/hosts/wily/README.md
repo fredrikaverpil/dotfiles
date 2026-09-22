@@ -69,12 +69,10 @@ Here `kaizen-sleep-lock` is still running but cannot lock, so do not suspend.
 - CPU frequency: `intel_pstate`; power-profiles-daemon uses
   `platform_profile`. The EC owns thermal throttling (DYTC): thermald exits
   when `dytc_lapmode` exists. Package temperature is `coretemp` `temp1_input`.
-- Sleep: `s2idle` only (`/sys/power/mem_sleep`), no S3. Lid close is
-  `suspend-then-hibernate`: suspend, then after `HibernateDelaySec=2h` a
-  hibernate to the encrypted swap (`boot.resumeDevice`, 33.9 GB for 30 GB
-  RAM). Waking from hibernate asks for the LUKS passphrase, then restores
-  the session. Verified with `systemctl hibernate`; the kernel log shows
-  `hibernation entry`/`exit` under the same boot ID.
+- Sleep: `s2idle` only (`/sys/power/mem_sleep`), no S3; it drains 1-2 %/h.
+  Lid close uses the logind default, plain suspend. Hibernate is not set up:
+  on kernel 6.18 it aborted or hung in the snapshot, with `intel_vpu` (NPU)
+  failing to power down (`PWR_D0I3_ENTER ... ret -110`, `returns -16`).
 - Wi-Fi: `iwlwifi` (Wi-Fi 7). The boot warning
   `Direct firmware load for iwlwifi-bz-...-c99.ucode failed` is the driver
   probing newer firmware API versions before falling back; harmless.
