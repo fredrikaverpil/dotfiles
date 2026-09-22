@@ -67,7 +67,7 @@ Ui.Panel {
     "system.notifications.history": { icon: "󰎟", label: "History", action: () => menu.shell.notifications.showHistory() },
     "system.notifications.dnd": { icon: "󰂛", label: "Toggle Do Not Disturb", action: () => menu.shell.notifications.setDoNotDisturb(!menu.shell.notifications.doNotDisturb) },
     "system.lock": { icon: "", label: "Lock", action: () => menu.shell.lock.beginLock() },
-    "system.screensaver": { icon: "󰛑", label: "Screensaver", action: () => menu.shell.screensaver.show() },
+    "system.screensaver": { icon: "󰛑", label: "Curtain (no lock)", action: () => menu.shell.screensaver.show() },
     "system.idle": {
       icon: menu.shell.idle.enabled ? "󰾪" : "󰅶",
       label: menu.shell.idle.enabled ? "Disable idle locking" : "Enable idle locking",

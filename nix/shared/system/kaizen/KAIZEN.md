@@ -76,7 +76,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | weather | [met.no locationforecast] | button | Panels › Weather, Setup › Weather location | `weather` |
 | notifications | [Desktop Notifications] server | – | System › Notifications | `notifications` |
 | lock | [ext-session-lock] + [PAM] `kaizen-lock` | – | System › Lock | `lock` |
-| screensaver | [wlr-layer-shell] curtain + [PAM] | – | System › Screensaver | `screensaver` |
+| screensaver | [wlr-layer-shell] curtain + [PAM] | – | System › Curtain (no lock) | `screensaver` |
 | polkit agent | [polkit] | – | dialog on request | – |
 | tray | [StatusNotifierItem] | tray | Tray | `tray` |
 | background | wallpaper files, theme state | – | Style | `wallpaper`, `theme` |
