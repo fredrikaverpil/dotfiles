@@ -32,6 +32,8 @@ Ui.Panel {
   // the rows or swallowing the reason a change did not land.
   cardHeight: 344 + warnings.length * 40
   keyNavigation: true
+  // Held unmapped until a probe replaces the time left from the last open.
+  visible: shown && service.fresh
 
   readonly property var rows: [
     { label: "Zone", value: info.zone === "" ? "unknown" : info.zone },

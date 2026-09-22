@@ -15,6 +15,8 @@ Item {
 
   // date(1) and zdump only run while the panel is on screen.
   property bool polling: false
+  // info was probed while polling; false until the first probe after it starts.
+  property bool fresh: false
 
   readonly property string zone: info.zone
 
@@ -36,7 +38,10 @@ Item {
     return setZone(Zones.home.zone)
   }
 
-  onPollingChanged: if (polling) refresh()
+  onPollingChanged: {
+    if (polling) refresh()
+    else fresh = false
+  }
 
   Process {
     id: probe
@@ -55,7 +60,10 @@ Item {
       'zdump -v -c "$((year-1)),$((year+2))" "$tz" | sed "s/^/dump|/"']
     stdout: StdioCollector {
       waitForEnd: true
-      onStreamFinished: root.info = Model.parse(text, Date.now())
+      onStreamFinished: {
+        root.info = Model.parse(text, Date.now())
+        root.fresh = root.polling
+      }
     }
   }
 
