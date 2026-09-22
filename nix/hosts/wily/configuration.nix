@@ -32,15 +32,6 @@
   # Encrypted swap; the installer keeps it out of hardware-configuration.nix.
   boot.initrd.luks.devices."luks-2bc8d428-9495-4fd8-aaba-9208e0bbaf0f".device =
     "/dev/disk/by-uuid/2bc8d428-9495-4fd8-aaba-9208e0bbaf0f";
-  # Hibernate image lives in that swap (33.9 GB for 30 GB RAM); the mapper
-  # name is what initrd unlocks, so resume finds it after the passphrase.
-  boot.resumeDevice = "/dev/mapper/luks-2bc8d428-9495-4fd8-aaba-9208e0bbaf0f";
-
-  # Lunar Lake has s2idle only, which drains 1-2 %/h; lid close suspends and
-  # hibernates after 2 h. Unset, systemd instead hibernates when the battery
-  # is predicted to hit 5 %, days away at that drain.
-  services.logind.settings.Login.HandleLidSwitch = "suspend-then-hibernate";
-  systemd.sleep.settings.Sleep.HibernateDelaySec = "2h";
 
   # Bluetooth devices with BlueZ WakeAllowed can wake from suspend. The HHKB
   # reconnects right after suspend, waking it at once, so its WakeAllowed is

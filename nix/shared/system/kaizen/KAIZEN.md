@@ -24,7 +24,7 @@ flowchart BT
   subgraph HW[Hardware / kernel]
     sysfs[sysfs: backlight, hwmon, battery thresholds]
     keyd[keyd: key remaps]
-    drv[xe, iwlwifi, LUKS swap for hibernate]
+    drv[xe, iwlwifi]
   end
   subgraph SYS[NixOS system services and D-Bus]
     logind[logind: lid, power key, sleep, SetBrightness]
@@ -158,7 +158,6 @@ TTY login ─ kaizen() ─ uwsm start niri --session
        ├─ dcal.service              waits for Secret Service
        └─ kaizen-sleep-lock.service logind delay inhibitor
 lid close / power key ─ logind ─ sleep-lock locks shell ─ waits for secure ─ suspend
-  └─ HibernateDelaySec=2h ─ hibernate to LUKS swap
 ```
 
 Units bind to `wayland-session@niri.target`; ordering after
