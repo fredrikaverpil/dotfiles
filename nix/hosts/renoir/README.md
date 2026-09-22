@@ -13,10 +13,6 @@ host-only programs belong in `configuration.nix`.
 ## Sleep
 
 Lid close uses the logind default, plain suspend; there is no hibernate.
-`wily` adds `suspend-then-hibernate` with a `resumeDevice` in its LUKS swap,
-which needs a swap device at least as large as RAM. Whether this machine's
-swap fits its 16 GB has not been checked — do that before copying wily's
-sleep settings, and keep them out of the shared modules either way.
 
 ## Firmware
 
