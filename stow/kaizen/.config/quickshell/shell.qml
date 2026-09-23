@@ -71,7 +71,7 @@ ShellRoot {
   readonly property alias timezone: timezone
   readonly property alias timezoneService: timezoneService
 
-  readonly property int barHeight: 32
+  readonly property int barHeight: Math.round(32 * textScale)
   property var panels: []
 
   function registerPanel(panel) {

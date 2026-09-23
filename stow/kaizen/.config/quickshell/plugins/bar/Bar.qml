@@ -76,7 +76,7 @@ Scope {
         Rectangle {
           anchors.verticalCenter: parent.verticalCenter
           width: 1
-          height: 16
+          height: 16 * bar.shell.textScale
           color: bar.shell.palette.dim
         }
 
@@ -115,7 +115,7 @@ Scope {
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 6
         width: 1
-        height: 16
+        height: 16 * bar.shell.textScale
         color: bar.shell.palette.dim
       }
 
@@ -125,7 +125,7 @@ Scope {
         anchors.right: weatherDivider.left
         anchors.rightMargin: 6
         anchors.verticalCenter: parent.verticalCenter
-        implicitWidth: 58
+        implicitWidth: 58 * bar.shell.textScale
         label: bar.shell.weatherService.ready
           ? bar.shell.weatherService.icon + " " + bar.shell.weatherService.temperature
           : bar.shell.weatherService.icon
@@ -140,7 +140,7 @@ Scope {
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 6
         width: 1
-        height: 16
+        height: 16 * bar.shell.textScale
         color: bar.shell.palette.dim
       }
 
@@ -184,7 +184,7 @@ Scope {
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 6
         width: 1
-        height: 16
+        height: 16 * bar.shell.textScale
         color: bar.shell.palette.dim
       }
 
@@ -195,7 +195,7 @@ Scope {
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: visible ? 6 : 0
         visible: bar.shell.batteryService.present
-        implicitWidth: visible ? 64 : 0
+        implicitWidth: visible ? 64 * bar.shell.textScale : 0
         foreground: !bar.shell.batteryService.onBattery ? bar.shell.palette.fg
           : bar.shell.batteryService.percentage <= bar.shell.batteryService.lowLevel ? bar.shell.palette.rose
           : bar.shell.batteryService.percentage <= bar.shell.batteryService.warnLevel ? bar.shell.palette.wood
@@ -259,7 +259,7 @@ Scope {
         visible: idleButton.visible || keyboardButton.visible || recordingButton.visible || systemButton.visible
           || mediaWidget.width > 0
         width: visible ? 1 : 0
-        height: 16
+        height: 16 * bar.shell.textScale
         color: bar.shell.palette.dim
       }
 
@@ -302,7 +302,7 @@ Scope {
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: visible ? 4 : 0
         visible: bar.shell.recordingService.busy
-        implicitWidth: visible ? 76 : 0
+        implicitWidth: visible ? 76 * bar.shell.textScale : 0
         foreground: bar.shell.recordingService.paused ? bar.shell.palette.off : bar.shell.palette.rose
         label: "󰑊 " + (bar.shell.recordingService.countdown > 0
           ? bar.shell.recordingService.countdown
@@ -330,7 +330,7 @@ Scope {
         anchors.rightMargin: visible ? 6 : 0
         visible: tray.width > 0
         width: visible ? 1 : 0
-        height: 16
+        height: 16 * bar.shell.textScale
         color: bar.shell.palette.dim
       }
 
