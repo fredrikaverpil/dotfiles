@@ -39,10 +39,13 @@ layout {
     // the layout identical and needs no colour per light/dark theme.
     border {
         width 2
-        active-color "#6099C0"
         inactive-color "transparent"
     }
 }
+
+// The shell writes the active border colour from its palette on each theme
+// change.
+include optional=true "~/.local/state/kaizen-shell/niri-colors.kdl"
 
 environment {
     GDK_SCALE "1"
