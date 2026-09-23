@@ -16,7 +16,7 @@ import "ScreensaverModel.js" as Model
 Item {
   id: root
 
-  property var shell: null
+  required property var shell
   property var brightnessService: null
   readonly property string userName: Quickshell.env("USER") || Quickshell.env("LOGNAME")
   readonly property int sleepAfterMs: 20000
@@ -130,7 +130,7 @@ Item {
 
       screen: modelData
       visible: root.active
-      color: root.shell ? root.shell.palette.bg : "#1C1817"
+      color: root.shell.palette.bg
       exclusionMode: ExclusionMode.Ignore
       anchors {
         top: true

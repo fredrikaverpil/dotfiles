@@ -15,8 +15,8 @@ import "NotificationModel.js" as Model
 Item {
   id: root
 
-  property var shell: null
-  readonly property var palette: shell ? shell.palette : ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864" }) // qmllint disable property-override
+  required property var shell
+  readonly property var palette: shell.palette // qmllint disable property-override
   readonly property string statePath: Ui.Paths.state + "/notifications.json"
   readonly property int historyLimit: 99
   readonly property string soundPath: "/run/current-system/sw/share/sounds/freedesktop/stereo/message.oga"

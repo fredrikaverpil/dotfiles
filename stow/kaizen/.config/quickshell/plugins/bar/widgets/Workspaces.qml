@@ -9,8 +9,8 @@ Item {
   id: root
 
   required property string output
-  property color foreground: "#B4BDC3"
-  property color selection: "#3D4042"
+  required property color foreground
+  required property color selection
   property real fontScale: 1
 
   function workspaceIds() {
