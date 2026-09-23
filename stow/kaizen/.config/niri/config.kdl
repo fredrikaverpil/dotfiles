@@ -153,7 +153,7 @@ window-rule {
 
 // Brain.fm
 window-rule {
-    match app-id=r#"^chrome-dcllmfmjlkpljanfegjgohmlnfipachj-Default$"#
+    match app-id=r#"^chrome-my\.brain\.fm__-"#
     open-on-workspace "5"
 }
 
@@ -233,16 +233,18 @@ binds {
     Mod+Shift+Print repeat=false hotkey-overlay-title="Pause or resume the recording" { spawn "qs" "ipc" "call" "recording" "pause"; }
 
     // Launch
-    Mod+T hotkey-overlay-title="Terminal" { spawn "ghostty"; }
+    Mod+T hotkey-overlay-title="Focus or open a terminal" { spawn "kaizen-focus" r#"^com\.mitchellh\.ghostty$"# "ghostty"; }
+    Mod+Shift+T hotkey-overlay-title="New terminal" { spawn "ghostty"; }
     Mod+Y hotkey-overlay-title="Files" { spawn "ghostty" "-e" "yazi"; }
     // Work profile on wily, personal (Default) elsewhere.
     Mod+B hotkey-overlay-title="Browser" { spawn-sh r#"chromium --profile-directory="$([ "$(hostname)" = wily ] && echo Work || echo Default)""#; }
     // Skips whatever is already running, so it is safe to press twice.
     Mod+A hotkey-overlay-title="Open the everyday apps" { spawn "kaizen-apps"; }
 
-    // Focus the app's most recently focused window, switching workspace.
-    Mod+Z hotkey-overlay-title="Focus Zen" { spawn-sh r#"niri msg action focus-window --id "$(niri msg -j windows | jq '[.[] | select(.app_id == "zen-beta")] | max_by(.focus_timestamp | [.secs, .nanos]) | .id')""#; }
-    Mod+S hotkey-overlay-title="Focus Slack" { spawn-sh r#"niri msg action focus-window --id "$(niri msg -j windows | jq '[.[] | select(.app_id | test("^slack$"; "i"))] | max_by(.focus_timestamp | [.secs, .nanos]) | .id')""#; }
+    // Focus the app's most recently focused window, switching workspace, or
+    // open it.
+    Mod+Z hotkey-overlay-title="Focus or open Zen" { spawn "kaizen-focus" r#"^zen-beta$"# "zen-beta"; }
+    Mod+S hotkey-overlay-title="Focus or open Slack" { spawn "kaizen-focus" r#"(?i)^slack$"# "slack"; }
 
     // Window state
     Mod+Q hotkey-overlay-title="Close window" { close-window; }
@@ -373,3 +375,7 @@ binds {
     Mod+Shift+Ctrl+J hotkey-overlay-title="Move window to below monitor" { move-column-to-monitor-down; }
     Mod+Shift+P hotkey-overlay-title="Power off monitors" { power-off-monitors; }
 }
+
+// Host-only settings, from the host stow package (stow/host/<host>). Last, so
+// its binds override the ones above.
+include optional=true "host.kdl"
