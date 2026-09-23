@@ -11,8 +11,8 @@ import "../../Ui" as Ui
 Item {
   id: root
 
-  property var shell: null
-  readonly property var palette: shell ? shell.palette : ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864" }) // qmllint disable property-override
+  required property var shell
+  readonly property var palette: shell.palette // qmllint disable property-override
 
   property bool closing: false
   property bool submitted: false
@@ -135,7 +135,7 @@ Item {
 
     Rectangle {
       anchors.fill: parent
-      color: root.shell && root.shell.dark ? "#991C1917" : "#99F0EDEC"
+      color: Qt.alpha(root.palette.bg, 0.6)
     }
 
     Rectangle {
@@ -145,7 +145,7 @@ Item {
       height: content.implicitHeight + 32
       radius: 8
       color: root.palette.bg
-      border.color: root.failed ? "#C94F46" : root.palette.fg
+      border.color: root.failed ? root.palette.red : root.palette.fg
       border.width: 1
 
       Column {
@@ -172,7 +172,7 @@ Item {
           text: root.supplementary
           textFormat: Text.PlainText
           wrapMode: Text.WordWrap
-          color: root.failed ? "#C94F46" : root.palette.off
+          color: root.failed ? root.palette.red : root.palette.off
           font.family: Ui.Fonts.mono
           font.pixelSize: 13
         }
@@ -182,7 +182,7 @@ Item {
           height: 46
           radius: 4
           color: root.palette.sel
-          border.color: root.failed ? "#C94F46" : root.palette.dim
+          border.color: root.failed ? root.palette.red : root.palette.dim
           border.width: 1
 
           TextInput {

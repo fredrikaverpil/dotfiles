@@ -6,7 +6,7 @@ import "../../Ui" as Ui
 Item {
   id: root
 
-  property var shell: null
+  required property var shell
   property bool authenticating: false
   property string failureMessage: ""
   property string password: ""
@@ -17,7 +17,7 @@ Item {
   signal clearFailureRequested()
   signal wakeRequested()
 
-  readonly property var palette: shell ? shell.palette : ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864" }) // qmllint disable property-override
+  readonly property var palette: shell.palette // qmllint disable property-override
 
   function focusPassword() {
     if (inputEnabled && !authenticating) passwordInput.forceActiveFocus()
@@ -50,7 +50,7 @@ Item {
 
     Rectangle {
       anchors.fill: parent
-      color: root.shell && root.shell.dark ? "#D91C1917" : "#D9F0EDEC"
+      color: Qt.alpha(root.palette.bg, 0.85)
     }
 
     MouseArea {
@@ -69,7 +69,7 @@ Item {
       height: 64
       radius: 8
       color: root.palette.bg
-      border.color: root.failureMessage.length > 0 ? "#C94F46" : root.palette.fg
+      border.color: root.failureMessage.length > 0 ? root.palette.red : root.palette.fg
       border.width: 2
 
       TextInput {
@@ -114,7 +114,7 @@ Item {
         anchors.fill: passwordInput
         visible: passwordInput.text.length === 0
         text: root.authenticating ? "Checking…" : (root.failureMessage || "Enter password")
-        color: root.authenticating ? root.palette.fg : (root.failureMessage ? "#C94F46" : root.palette.off)
+        color: root.authenticating ? root.palette.fg : (root.failureMessage ? root.palette.red : root.palette.off)
         font.family: Ui.Fonts.mono
         font.pixelSize: 18
         font.italic: root.failureMessage.length > 0
