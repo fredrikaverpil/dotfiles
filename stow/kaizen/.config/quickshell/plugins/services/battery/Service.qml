@@ -11,6 +11,7 @@ Item {
   id: root
 
   readonly property string statePath: Ui.Paths.state + "/power-profiles.json"
+  readonly property int warnLevel: 20
   readonly property int lowLevel: 10
   readonly property int criticalLevel: 5
 
