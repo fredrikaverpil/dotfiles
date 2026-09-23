@@ -212,7 +212,7 @@ Scope {
         anchors.rightMargin: batteryButton.visible ? 4 : 6
         foreground: bar.shell.networkService.kind === "disconnected" ? bar.shell.palette.red : bar.shell.palette.fg
         label: bar.shell.networkService.icon
-          + (bar.shell.networkService.kind === "wifi"
+          + (bar.shell.networkService.kind === "wifi" && bar.shell.networkService.connectedWifiNetwork
             ? " " + bar.shell.networkService.connectedWifiNetwork.name
             : "")
         onActivated: bar.shell.network.toggle()
