@@ -394,6 +394,16 @@ in
     (withGnomeLibsecret inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-desktop)
     (withGnomeLibsecret obsidian)
     (withGnomeLibsecret proton-pass)
+    # uwsm-app rejects the upstream entry ID, which contains a space.
+    (symlinkJoin {
+      inherit (proton-authenticator) name;
+      paths = [ proton-authenticator ];
+      postBuild = ''
+        mv "$out/share/applications/Proton Authenticator.desktop" \
+          $out/share/applications/proton-authenticator.desktop
+      '';
+    })
+    proton-vpn
     (withGnomeLibsecret signal-desktop)
     (withGnomeLibsecret slack)
     spotify
