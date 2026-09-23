@@ -379,7 +379,7 @@ in
     mission-center
     mpv
     # nm-connection-editor edits wired, static-IP and other connection settings;
-    # the network panel only launches it. Its nm-applet tray is not run.
+    # the network panel launches it. nm-applet runs via XDG autostart for its tray menu.
     networkmanagerapplet
     # Owns output layout, mode and scale in the untracked ~/.config/niri/monitor.kdl;
     # the shell never writes output config.
