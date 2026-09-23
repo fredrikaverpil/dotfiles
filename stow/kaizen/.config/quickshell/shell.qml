@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Io
 
 import "ShellModel.js" as Model
+import "Ui" as Ui
 
 import "plugins/background" as Background
 import "plugins/bar" as Bar
@@ -108,10 +109,24 @@ ShellRoot {
     write.running = true
   }
 
-  onDarkChanged: writeKdeglobals()
+  // Not palette: onDarkChanged runs before palette re-evaluates.
+  function writeNiriColors() { niriColors.setText(Model.niriColors(dark ? darkPalette : lightPalette)) }
+
+  onDarkChanged: {
+    writeKdeglobals()
+    writeNiriColors()
+  }
 
   Process { id: write }
   Process { id: kdeglobals }
+
+  // Included by niri/config.kdl.
+  FileView {
+    id: niriColors
+    path: Ui.Paths.state + "/niri-colors.kdl"
+    atomicWrites: true
+    printErrors: false
+  }
 
   function setTextScale(value) {
     const scale = Model.textScale(value)
@@ -159,6 +174,7 @@ ShellRoot {
       onStreamFinished: {
         root.dark = text.indexOf("prefer-light") < 0
         root.writeKdeglobals()
+        root.writeNiriColors()
       }
     }
   }

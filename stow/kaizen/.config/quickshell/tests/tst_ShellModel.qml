@@ -15,6 +15,10 @@ TestCase {
     compare(Shell.kdeglobalsWrite(false, dark, light), "kwriteconfig6 --notify --file kdeglobals --group 'Colors:View' --key BackgroundNormal '240,237,236'; kwriteconfig6 --notify --file kdeglobals --group 'Colors:View' --key ForegroundNormal '44,54,60'; ")
   }
 
+  function test_niri_colours_set_the_border_from_water() {
+    compare(Shell.niriColors({ water: "#6099C0" }), "layout {\n    border {\n        active-color \"#6099C0\"\n    }\n}\n")
+  }
+
   function test_text_scale_parsing_distinguishes_invalid_values_from_valid_limits() {
     compare(Shell.textScale("1.25"), 1.25)
     compare(Shell.textScale(0.7), null)
