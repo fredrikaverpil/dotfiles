@@ -72,13 +72,15 @@ PanelWindow {
       onClicked: panel.close()
     },
 
-    Card {
+    Rectangle {
       id: card
-      palette: panel.shell.palette
       anchors.centerIn: parent
       width: panel.cardWidth
       height: panel.cardHeight
-      radius: 16
+      radius: 8
+      color: panel.shell.palette.bg
+      border.color: panel.shell.palette.dim
+      border.width: 1
 
       Keys.onPressed: function (event) {
         if (!panel.keyNavigation) return

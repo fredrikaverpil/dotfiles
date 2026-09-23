@@ -5,9 +5,10 @@ import Quickshell
 
 import "../../../Ui" as Ui
 
-Ui.Card {
+Rectangle {
   id: root
 
+  required property var palette // qmllint disable property-override
   property var row: ({})
   property var notification: null
   property bool toast: false
@@ -39,11 +40,10 @@ Ui.Card {
 
   width: 400
   implicitHeight: content.implicitHeight + 24
-  radius: 10
-  topColor: activeFocus ? palette.sel : palette.cardTop
-  bottomColor: activeFocus ? palette.sel : palette.cardBottom
+  radius: 8
+  color: activeFocus ? palette.sel : palette.bg
   border.color: accent
-  shadow: toast
+  border.width: 1
   clip: true
 
   activeFocusOnTab: selectable
