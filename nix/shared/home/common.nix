@@ -28,8 +28,6 @@ in
     ];
 
     home.activation.handleDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      DOTFILES_PATH=""
-
       # Check if dotfiles are already cloned locally
       if [ -d "$HOME/.dotfiles/.git" ]; then
         echo "Using existing dotfiles at ~/.dotfiles"
@@ -52,14 +50,13 @@ in
         else
           echo "Warning: git submodules were not initialized; this host's config falls back to what is checked out"
         fi
-      else
-        echo "Using dotfiles from flake input"
-        DOTFILES_PATH="${inputs.dotfiles}"
-      fi
 
-      echo "Stowing dotfiles from $DOTFILES_PATH..."
-      PATH="${pkgs.stow}/bin:${pkgs.bash}/bin:$PATH" \
-        $DRY_RUN_CMD bash "$DOTFILES_PATH/shell/bin/dotfiles-stow" "$DOTFILES_PATH"
+        echo "Stowing dotfiles from $DOTFILES_PATH..."
+        PATH="${pkgs.stow}/bin:${pkgs.bash}/bin:$PATH" \
+          $DRY_RUN_CMD bash "$DOTFILES_PATH/shell/bin/dotfiles-stow" "$DOTFILES_PATH"
+      else
+        echo "Warning: ~/.dotfiles is not cloned; clone github.com/fredrikaverpil/dotfiles there and rebuild to stow"
+      fi
     '';
 
     # Common packages available on all platforms

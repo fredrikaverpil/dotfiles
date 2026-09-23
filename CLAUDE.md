@@ -17,7 +17,7 @@ code in this repository.
   hosts, then the optional host package)
 - **Update all flake inputs**: `nix flake update`, then rebuild
 - **Update only unstable-pinned inputs**: `nix flake update nixpkgs-unstable
-  nix-darwin home-manager-unstable llm-agents dotfiles`, then rebuild
+  nix-darwin home-manager-unstable llm-agents`, then rebuild
 - **Upgrade Homebrew packages (Darwin)**: `brew update && brew upgrade` —
   rebuilds only install/remove to match the declared set, they never bump
   versions (add `--greedy` to also bump self-updating casks)

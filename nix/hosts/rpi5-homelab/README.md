@@ -143,6 +143,14 @@ ssh fredrik@<ip-to-rpi5-homelab>
 
 Change the password using `passwd`.
 
+The install above skips stowing the dotfiles, as `~/.dotfiles` is not cloned
+yet. Clone it and rebuild from it:
+
+```sh
+git clone https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
+sudo nixos-rebuild switch --flake ~/.dotfiles#rpi5-homelab
+```
+
 ### Connect to Wi-Fi (optional)
 
 This host normally runs on Ethernet, and the install flow above assumes it. Wi-Fi

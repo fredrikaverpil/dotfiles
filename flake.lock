@@ -108,22 +108,6 @@
         "type": "github"
       }
     },
-    "dotfiles": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1790183124,
-        "narHash": "sha256-KIJjtrJy8FmnJt4EL+dTD+RbFEeY69ZRHNTkBEyBahA=",
-        "owner": "fredrikaverpil",
-        "repo": "dotfiles",
-        "rev": "2cced07fad48f1f796051f500d918504ad0e6a1f",
-        "type": "github"
-      },
-      "original": {
-        "owner": "fredrikaverpil",
-        "repo": "dotfiles",
-        "type": "github"
-      }
-    },
     "flake-compat": {
       "locked": {
         "lastModified": 1767039857,
@@ -361,7 +345,6 @@
       "inputs": {
         "dankcalendar": "dankcalendar",
         "disko": "disko",
-        "dotfiles": "dotfiles",
         "home-manager-rpi": "home-manager-rpi",
         "home-manager-unstable": "home-manager-unstable",
         "llm-agents": "llm-agents",
