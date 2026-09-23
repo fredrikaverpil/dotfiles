@@ -72,7 +72,8 @@ Ui.Panel {
     color: root.shell.palette.dim
   }
 
-  Section {
+  Ui.Section {
+    shell: root.shell
     title: "Theme"
 
     ChoiceRow {
@@ -85,7 +86,8 @@ Ui.Panel {
     }
   }
 
-  Section {
+  Ui.Section {
+    shell: root.shell
     title: root.shell.nightlight.temperature === null
       ? "Nightlight"
       : "Nightlight · " + root.shell.nightlight.temperature + "K"
@@ -101,7 +103,8 @@ Ui.Panel {
     }
   }
 
-  Section {
+  Ui.Section {
+    shell: root.shell
     title: "Text size · " + Math.round(root.shell.textScale * 100) + "%"
 
     ChoiceRow {
@@ -112,7 +115,8 @@ Ui.Panel {
     }
   }
 
-  Section {
+  Ui.Section {
+    shell: root.shell
     title: root.shell.brightness.present
       ? "Brightness · " + root.shell.brightness.percent + "%"
       : "Brightness · not applicable, no backlight device"
@@ -175,7 +179,8 @@ Ui.Panel {
     }
   }
 
-  Section {
+  Ui.Section {
+    shell: root.shell
     title: "Wallpaper · " + (root.shell.dark ? "dark" : "light")
 
     ChoiceButton {
@@ -185,19 +190,6 @@ Ui.Panel {
     }
   }
 
-  component Section: Column {
-    required property string title
-
-    width: parent.width
-    spacing: 5
-
-    Text {
-      color: root.shell.palette.off
-      font.family: Ui.Fonts.mono
-      font.pixelSize: 13
-      text: parent.title
-    }
-  }
 
   component ChoiceRow: Row {
     id: choices

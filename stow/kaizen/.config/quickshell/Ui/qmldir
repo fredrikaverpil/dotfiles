@@ -6,3 +6,4 @@ Panel 1.0 Panel.qml
 ContextMenu 1.0 ContextMenu.qml
 BarButton 1.0 BarButton.qml
 singleton Paths 1.0 Paths.qml
+Section 1.0 Section.qml
