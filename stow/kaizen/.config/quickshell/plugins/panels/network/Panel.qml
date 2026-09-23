@@ -57,26 +57,12 @@ Ui.Panel {
       width: scroller.width
       spacing: 10
 
-      Row {
+      Text {
         width: parent.width
-        spacing: 8
-
-        Text {
-          width: parent.width - (wifiToggle.visible ? wifiToggle.width + parent.spacing : 0)
-          color: root.shell.palette.fg
-          font.family: Ui.Fonts.mono
-          font.pixelSize: 18
-          text: "Network"
-        }
-
-        ActionButton {
-          id: wifiToggle
-          visible: root.service.wifiDevice !== null
-          width: 92
-          label: root.service.wifiEnabled ? "Wi-Fi on" : "Wi-Fi off"
-          active: root.service.wifiEnabled
-          onActivated: root.service.toggleWifi()
-        }
+        color: root.shell.palette.fg
+        font.family: Ui.Fonts.mono
+        font.pixelSize: 18
+        text: "Network"
       }
 
       Text {
@@ -179,12 +165,22 @@ Ui.Panel {
       Section {
         title: root.service.wifiDevice ? "Wi-Fi" : "Wi-Fi · unavailable"
 
-        ActionButton {
+        Row {
           visible: root.service.wifiDevice !== null
-          width: 88
-          label: root.service.scanning ? "Scanning…" : "Scan"
-          available: !root.service.scanning
-          onActivated: root.service.scan()
+          spacing: 8
+
+          ActionButton {
+            width: 116
+            label: root.service.wifiEnabled ? "Disable Wi-Fi" : "Enable Wi-Fi"
+            onActivated: root.service.toggleWifi()
+          }
+
+          ActionButton {
+            width: 88
+            label: root.service.scanning ? "Scanning…" : "Scan"
+            available: root.service.wifiEnabled && !root.service.scanning
+            onActivated: root.service.scan()
+          }
         }
 
         Text {
