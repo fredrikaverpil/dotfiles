@@ -196,6 +196,10 @@ Scope {
         anchors.rightMargin: visible ? 6 : 0
         visible: bar.shell.batteryService.present
         implicitWidth: visible ? 64 : 0
+        foreground: !bar.shell.batteryService.onBattery ? bar.shell.palette.fg
+          : bar.shell.batteryService.percentage <= bar.shell.batteryService.lowLevel ? bar.shell.palette.red
+          : bar.shell.batteryService.percentage <= bar.shell.batteryService.warnLevel ? bar.shell.palette.yellow
+          : bar.shell.palette.fg
         label: bar.shell.batteryService.icon + " " + bar.shell.batteryService.percentage + "%"
         onActivated: bar.shell.battery.toggle()
       }
