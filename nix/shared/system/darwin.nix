@@ -95,6 +95,7 @@ in
         "gcloud-cli"
         "ghostty"
         "gitify"
+        "localsend"
         "obs"
         "obsidian"
         "proton-pass"
