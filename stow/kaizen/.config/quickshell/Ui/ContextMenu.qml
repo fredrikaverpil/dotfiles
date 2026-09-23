@@ -20,6 +20,7 @@ PanelWindow {
   // Selected row per level; -1 until one is picked, -2 for the first selectable row.
   property var cursor: []
   readonly property int depth: stack.length
+  readonly property real zoom: shell.textScale
 
   function close() { shown = false }
 
@@ -249,19 +250,21 @@ PanelWindow {
       readonly property int labelWidth: rows.reduce((widest, row) => row.isSeparator ? widest
         : Math.max(widest, metrics.advanceWidth((row.text || "") + (row.hasChildren ? " ›" : ""))), 0)
       readonly property var position: Model.place(level ? level.anchor : null,
-        width, height, root.width, root.height)
+        width * root.zoom, height * root.zoom, root.width, root.height)
 
       // Anchor for the submenu of row, in window coordinates.
       function rowAnchor(row) {
         const delegate = list.itemAtIndex(row)
         const y = delegate ? delegate.mapToItem(null, 0, 0).y : card.y
-        return { x: card.x, width: card.width, y: y }
+        return { x: card.x, width: card.width * root.zoom, y: y }
       }
 
       x: position.x
       y: position.y
       width: Model.clamp(Math.ceil(labelWidth) + 54, 160, 360)
-      height: Math.max(40, Math.min(rowsHeight + 12, root.height - 16))
+      height: Math.max(40, Math.min(rowsHeight + 12, (root.height - 16) / root.zoom))
+      scale: root.zoom
+      transformOrigin: Item.TopLeft
       radius: 8
       // A card below a bar button hangs from the bar.
       readonly property bool hangs: level && level.anchor ? level.anchor.below === true : false

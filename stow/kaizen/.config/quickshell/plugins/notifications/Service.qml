@@ -269,36 +269,45 @@ Item {
     anchors { top: true; bottom: true; left: true; right: true }
     exclusionMode: ExclusionMode.Ignore
     color: "transparent"
-    mask: Region { item: popupColumn }
+    mask: Region { item: popupArea }
     WlrLayershell.namespace: "kaizen-notifications"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
-    Column {
-      id: popupColumn
+    // Sized to the scaled column, so the input mask covers what is drawn.
+    Item {
+      id: popupArea
       anchors.top: parent.top
       anchors.right: parent.right
-      anchors.topMargin: 40
+      anchors.topMargin: root.shell.barHeight + 8
       anchors.rightMargin: 16
-      width: 400
-      spacing: 8
+      width: popupColumn.width * popupColumn.scale
+      height: popupColumn.implicitHeight * popupColumn.scale
 
-      Repeater {
-        model: root.popupRows
+      Column {
+        id: popupColumn
+        width: 400
+        spacing: 8
+        scale: root.shell.textScale
+        transformOrigin: Item.TopLeft
 
-        delegate: NotificationCard {
-          required property var modelData
+        Repeater {
+          model: root.popupRows
 
-          width: popupColumn.width
-          palette: root.palette
-          row: modelData
-          notification: modelData.notification
-          toast: true
-          duration: modelData.duration
-          onCloseRequested: root.dismiss(modelData)
-          onInvokeRequested: root.defaultAction(modelData)
-          onActionRequested: function(selectedAction) { root.action(modelData, selectedAction) }
-          onExpired: root.expire(modelData)
+          delegate: NotificationCard {
+            required property var modelData
+
+            width: popupColumn.width
+            palette: root.palette
+            row: modelData
+            notification: modelData.notification
+            toast: true
+            duration: modelData.duration
+            onCloseRequested: root.dismiss(modelData)
+            onInvokeRequested: root.defaultAction(modelData)
+            onActionRequested: function(selectedAction) { root.action(modelData, selectedAction) }
+            onExpired: root.expire(modelData)
+          }
         }
       }
     }

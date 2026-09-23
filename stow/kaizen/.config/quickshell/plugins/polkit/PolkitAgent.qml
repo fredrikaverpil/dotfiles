@@ -143,6 +143,7 @@ Item {
       anchors.centerIn: parent
       width: Math.min(420, parent.width - 48)
       height: content.implicitHeight + 32
+      scale: root.shell.textScale
       radius: 8
       color: root.palette.bg
       border.color: root.failed ? root.palette.rose : root.palette.fg
