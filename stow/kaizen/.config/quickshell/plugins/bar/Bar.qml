@@ -222,6 +222,9 @@ Scope {
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
         label: bar.shell.networkService.icon
+          + (bar.shell.networkService.kind === "wifi"
+            ? " " + bar.shell.networkService.connectedWifiNetwork.name
+            : "")
         onActivated: bar.shell.network.toggle()
       }
 
