@@ -8,7 +8,7 @@ import "../../../Ui" as Ui
 Rectangle {
   id: root
 
-  property var palette: ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864" }) // qmllint disable property-override
+  required property var palette // qmllint disable property-override
   property var row: ({})
   property var notification: null
   property bool toast: false
@@ -29,7 +29,7 @@ Rectangle {
   readonly property string image: String(row.image || "")
   readonly property int urgency: Number(row.urgency)
   readonly property var actions: notification ? notification.actions : []
-  readonly property color accent: urgency === 2 ? "#C94F46" : (urgency === 0 ? palette.off : palette.fg)
+  readonly property color accent: urgency === 2 ? palette.red : (urgency === 0 ? palette.off : palette.fg)
   readonly property string icon: {
     if (image) return image
     if (!appIcon) return ""

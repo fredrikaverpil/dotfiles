@@ -60,7 +60,7 @@ Scope {
 
       Region { id: passThrough }
 
-      readonly property color shade: root.shell.dark ? "#991C1917" : "#99F0EDEC"
+      readonly property color shade: Qt.alpha(root.shell.palette.bg, 0.6)
 
       Rectangle { x: 0; y: 0; width: parent.width; height: window.active ? Math.max(0, window.ry) : parent.height; color: window.shade }
       Rectangle {
@@ -87,7 +87,7 @@ Scope {
         x: window.rx - 4; y: window.ry - 4
         width: window.rw + 8; height: window.rh + 8
         color: "transparent"
-        border.color: "#D9534F"
+        border.color: root.shell.palette.red
         border.width: 2
       }
 

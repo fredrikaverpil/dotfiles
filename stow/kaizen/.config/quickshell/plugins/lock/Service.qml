@@ -11,7 +11,7 @@ import "LockModel.js" as Model
 Item {
   id: root
 
-  property var shell: null
+  required property var shell
   readonly property string userName: Quickshell.env("USER") || Quickshell.env("LOGNAME")
   // Runtime dir: a lock outlives a shell crash, not a logout or reboot.
   readonly property string statePath: Quickshell.env("XDG_RUNTIME_DIR") + "/kaizen-lock.json"
@@ -125,7 +125,7 @@ Item {
     }
 
     WlSessionLockSurface {
-      color: root.shell ? root.shell.palette.bg : "#1C1917"
+      color: root.shell.palette.bg
 
       LockView {
         anchors.fill: parent
