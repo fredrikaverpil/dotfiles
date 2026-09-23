@@ -136,7 +136,7 @@ ShellRoot {
       "dconf",
       "write",
       "/org/gnome/desktop/interface/text-scaling-factor",
-      String(scale),
+      scale.toFixed(2), // GVariant double; "2" would store an int32 that GSettings ignores.
     ]
     textScaleWrite.running = true
   }
