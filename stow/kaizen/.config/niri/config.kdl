@@ -1,11 +1,8 @@
 // Binds follow niri's default-config.kdl. niri reloads this file on save.
 // Defaults: https://github.com/niri-wm/niri/blob/main/resources/default-config.kdl
 
-// nwg-displays owns outputs in the untracked monitor.kdl. It prepends its own
-// include unless a line contains `include "monitor.kdl"`, as this comment does;
-// a required include would fail while the file does not exist. niri uses the
-// first matching output block, so this stays above any other.
-include optional=true "monitor.kdl"
+// niri uses the first matching output block, so this stays above any other.
+include "outputs.kdl"
 
 input {
     keyboard {

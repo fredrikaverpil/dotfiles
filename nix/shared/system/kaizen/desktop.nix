@@ -381,9 +381,6 @@ in
     # nm-connection-editor edits wired, static-IP and other connection settings;
     # the network panel launches it. nm-applet runs via XDG autostart for its tray menu.
     networkmanagerapplet
-    # Owns output layout, mode and scale in the untracked ~/.config/niri/monitor.kdl;
-    # the shell never writes output config.
-    nwg-displays
     resources
     # Annotates screenshots from the notification's Edit action.
     satty

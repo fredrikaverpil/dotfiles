@@ -1,0 +1,28 @@
+// Output layout, keyed by make/model/serial so it follows the monitor across
+// ports. Positions are logical pixels with the laptop panel at the origin;
+// blocks for disconnected monitors are ignored. Try positions live with
+// `niri msg output <connector> position set <x> <y>`, then record them here.
+// Names come from `niri msg outputs`.
+
+output "eDP-1" {
+    scale 1
+    position x=0 y=0
+}
+
+// Above, centered.
+output "LG Electronics LG SIGNAGE 0x01010101" {
+    scale 1
+    position x=-960 y=-2160
+}
+
+// Right, bottoms aligned.
+output "Dell Inc. DELL P3221D GN2ZQ83" {
+    scale 1
+    position x=1920 y=-240
+}
+
+// Left, bottoms aligned.
+output "Dell Inc. DELL U2723QE 13B95P3" {
+    scale 1
+    position x=-3840 y=-960
+}
