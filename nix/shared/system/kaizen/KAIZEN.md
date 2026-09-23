@@ -11,7 +11,7 @@ that an agent can drive and verify from a terminal.
   and drives their state, never owns a copy of it.
 - Build only what is used. A panel exists only where a subsystem has no
   keyboard-first face; infrequent tasks go to a purpose-built application
-  (bluetui, nm-connection-editor, nwg-displays).
+  (bluetui, nm-connection-editor).
 - Keyboard-first everywhere. Pointer-only controls are bugs.
 - Every action is reachable over `qs ipc`, `niri msg` or `systemctl --user`.
 - Host-agnostic naming: "kaizen" in units, PAM, layer namespaces and state
@@ -186,8 +186,8 @@ closes niri's readiness-before-`WAYLAND_DISPLAY` race.
 
 ## Out of scope
 
-- Bluetooth pairing, connection editing, output layout: bluetui,
-  nm-connection-editor, nwg-displays.
+- Bluetooth pairing, connection editing: bluetui, nm-connection-editor.
+- Output layout: hand-kept in `niri/outputs.kdl`, keyed by monitor, not port.
 - Compositor-side XKB toggling: the shell owns layout state.
 - Clipboard persistence: memory only, skips password-manager offers.
 - Portal-based recording: gpu-screen-recorder talks to PipeWire directly.
