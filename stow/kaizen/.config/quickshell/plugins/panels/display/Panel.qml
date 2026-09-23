@@ -185,16 +185,6 @@ Ui.Panel {
     }
   }
 
-  // Layout, mode and scale are saved by nwg-displays to niri/monitor.kdl.
-  ChoiceButton {
-    width: parent.width
-    label: "Arrange displays…"
-    onActivated: {
-      Quickshell.execDetached(["uwsm-app", "--", "nwg-displays.desktop"])
-      root.close()
-    }
-  }
-
   component Section: Column {
     required property string title
 

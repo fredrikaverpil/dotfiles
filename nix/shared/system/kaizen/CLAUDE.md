@@ -65,8 +65,8 @@ previous states. Explain a declaration next to it, not here.
   interface. Keep scheduling and shared state above it. Nightlight is not
   compositor-specific and lives in its service.
 - Prefer purpose-built applications to large bespoke panels for infrequent
-  tasks (bluetui pairs, nm-connection-editor edits connections, nwg-displays
-  owns outputs).
+  tasks (bluetui pairs, nm-connection-editor edits connections). Output layout
+  is hand-kept in `niri/outputs.kdl`, keyed by monitor, not port.
 - Clipboard history is in memory only and skips offers carrying
   `x-kde-passwordManagerHint`. Proton Pass and 1Password set it; a password
   manager that does not would be recorded.
