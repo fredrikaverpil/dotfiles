@@ -13,7 +13,9 @@ Column {
   Text {
     color: section.shell.palette.off
     font.family: Fonts.mono
-    font.pixelSize: 13
+    font.pixelSize: 11
+    font.capitalization: Font.AllUppercase
+    font.letterSpacing: 1.5
     text: section.title
   }
 }
