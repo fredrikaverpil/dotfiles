@@ -25,8 +25,8 @@ function niriColors(palette) {
 
 function textScale(value, minimum, maximum) {
   var scale = Number(value)
-  var min = minimum === undefined ? 0.8 : minimum
-  var max = maximum === undefined ? 1.5 : maximum
+  var min = minimum === undefined ? 1 : minimum
+  var max = maximum === undefined ? 2 : maximum
   return isFinite(scale) && scale >= min && scale <= max ? scale : null
 }
 

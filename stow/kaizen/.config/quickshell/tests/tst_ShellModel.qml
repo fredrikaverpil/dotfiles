@@ -21,8 +21,8 @@ TestCase {
 
   function test_text_scale_parsing_distinguishes_invalid_values_from_valid_limits() {
     compare(Shell.textScale("1.25"), 1.25)
-    compare(Shell.textScale(0.7), null)
-    compare(Shell.textScale(1.6), null)
+    compare(Shell.textScale(0.9), null)
+    compare(Shell.textScale(2.1), null)
     compare(Shell.textScale(null), null)
     compare(Shell.observedTextScale(" 1.1\n"), 1.1)
     compare(Shell.observedTextScale("invalid"), null)
