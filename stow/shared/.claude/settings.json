@@ -78,7 +78,7 @@
   "effortLevel": "low",
   "modelSettings": {
     "claude-opus-5": {
-      "effortLevel": "medium"
+      "effortLevel": "xhigh"
     }
   },
   "showClearContextOnPlanAccept": true,
