@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+set -e
+
+# Focuses the most recently focused niri window whose app id matches, or runs
+# the command when none does.
+
+case "$1" in
+"" | -h | --help)
+  echo "usage: kaizen-focus APP_ID_REGEX COMMAND [ARGS...]    focus the app, or open it"
+  exit 0
+  ;;
+esac
+
+regex="$1"
+shift
+id="$(niri msg -j windows | jq --arg re "$regex" \
+  '[.[] | select(.app_id | test($re))] | max_by(.focus_timestamp | [.secs, .nanos]) | .id // empty')"
+if [ -n "$id" ]; then
+  exec niri msg action focus-window --id "$id"
+fi
+exec "$@"

@@ -1,0 +1,20 @@
+// Included by stow/kaizen/.config/niri/config.kdl on wily only.
+
+// Chromium --app windows; the suffix is the profile directory.
+window-rule {
+    match app-id=r#"^chrome-linear\.app__-"#
+    open-on-workspace "3"
+}
+
+window-rule {
+    match app-id=r#"^chrome-calendar\.google\.com__-"#
+    match app-id=r#"^chrome-meet\.google\.com__-"#
+    open-on-workspace "4"
+}
+
+binds {
+    // Focus the app's most recently focused window, or open it.
+    Mod+E hotkey-overlay-title="Focus or open Google Calendar" { spawn "kaizen-focus" r#"^chrome-calendar\.google\.com__-"# "chromium" "--profile-directory=Work" "--app=https://calendar.google.com/"; }
+    Mod+W hotkey-overlay-title="Focus or open Google Meet" { spawn "kaizen-focus" r#"^chrome-meet\.google\.com__-"# "chromium" "--profile-directory=Work" "--app=https://meet.google.com/"; }
+    Mod+P hotkey-overlay-title="Focus or open Linear" { spawn "kaizen-focus" r#"^chrome-linear\.app__-"# "chromium" "--profile-directory=Work" "--app=https://linear.app/"; }
+}
