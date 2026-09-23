@@ -65,7 +65,7 @@ Ui.Panel {
     },
     "system.notifications": { icon: "󰂚", label: "Notifications" },
     "system.notifications.history": { icon: "󰎟", label: "History", action: () => menu.shell.notifications.showHistory() },
-    "system.notifications.dnd": { icon: "󰂛", label: "Toggle Do Not Disturb", action: () => menu.shell.notifications.setDoNotDisturb(!menu.shell.notifications.doNotDisturb) },
+    "system.notifications.dnd": { icon: "󰂛", label: "Toggle Do Not Disturb (DnD)", action: () => menu.shell.notifications.setDoNotDisturb(!menu.shell.notifications.doNotDisturb) },
     "system.lock": { icon: "", label: "Lock", action: () => menu.shell.lock.beginLock() },
     "system.screensaver": { icon: "󰛑", label: "Screensaver", action: () => menu.shell.screensaver.show() },
     "system.idle": {
