@@ -29,7 +29,7 @@ Rectangle {
   readonly property string image: String(row.image || "")
   readonly property int urgency: Number(row.urgency)
   readonly property var actions: notification ? notification.actions : []
-  readonly property color accent: urgency === 2 ? palette.red : (urgency === 0 ? palette.off : palette.fg)
+  readonly property color accent: urgency === 2 ? palette.rose : (urgency === 0 ? palette.off : palette.fg)
   readonly property string icon: {
     if (image) return image
     if (!appIcon) return ""

@@ -161,7 +161,7 @@ Scope {
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
         readonly property int pending: bar.shell.notifications.historyRows.length
-        foreground: bar.shell.notifications.doNotDisturb ? bar.shell.palette.red : bar.shell.palette.fg
+        foreground: bar.shell.notifications.doNotDisturb ? bar.shell.palette.rose : bar.shell.palette.fg
         label: (bar.shell.notifications.doNotDisturb ? "󰂛" : "󰂚")
           + (notificationButton.pending > 0 ? " " + notificationButton.pending : "")
         onActivated: bar.shell.notifications.toggleHistory()
@@ -197,8 +197,8 @@ Scope {
         visible: bar.shell.batteryService.present
         implicitWidth: visible ? 64 : 0
         foreground: !bar.shell.batteryService.onBattery ? bar.shell.palette.fg
-          : bar.shell.batteryService.percentage <= bar.shell.batteryService.lowLevel ? bar.shell.palette.red
-          : bar.shell.batteryService.percentage <= bar.shell.batteryService.warnLevel ? bar.shell.palette.yellow
+          : bar.shell.batteryService.percentage <= bar.shell.batteryService.lowLevel ? bar.shell.palette.rose
+          : bar.shell.batteryService.percentage <= bar.shell.batteryService.warnLevel ? bar.shell.palette.wood
           : bar.shell.palette.fg
         label: bar.shell.batteryService.icon + " " + bar.shell.batteryService.percentage + "%"
         onActivated: bar.shell.battery.toggle()
@@ -210,7 +210,7 @@ Scope {
         anchors.right: batteryButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: batteryButton.visible ? 4 : 6
-        foreground: bar.shell.networkService.kind === "disconnected" ? bar.shell.palette.red : bar.shell.palette.fg
+        foreground: bar.shell.networkService.kind === "disconnected" ? bar.shell.palette.rose : bar.shell.palette.fg
         label: bar.shell.networkService.icon
           + (bar.shell.networkService.kind === "wifi" && bar.shell.networkService.connectedWifiNetwork
             ? " " + bar.shell.networkService.connectedWifiNetwork.name
@@ -224,7 +224,7 @@ Scope {
         anchors.right: networkButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
-        foreground: bar.shell.bluetoothService.powered ? bar.shell.palette.fg : bar.shell.palette.red
+        foreground: bar.shell.bluetoothService.powered ? bar.shell.palette.fg : bar.shell.palette.rose
         label: bar.shell.bluetoothService.icon
         onActivated: bar.shell.bluetooth.toggle()
       }
@@ -245,7 +245,7 @@ Scope {
         anchors.right: displayButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
-        foreground: bar.shell.audio.muted ? bar.shell.palette.red : bar.shell.palette.fg
+        foreground: bar.shell.audio.muted ? bar.shell.palette.rose : bar.shell.palette.fg
         label: bar.shell.audio.icon
         onActivated: bar.shell.audio.toggle()
       }
@@ -278,7 +278,7 @@ Scope {
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: visible ? (mediaWidget.width > 0 ? 4 : 6) : 0
         visible: !bar.shell.idle.enabled
-        foreground: bar.shell.palette.red
+        foreground: bar.shell.palette.rose
         label: "󰅶"
         onActivated: bar.shell.idle.setEnabled(true)
       }
@@ -303,7 +303,7 @@ Scope {
         anchors.rightMargin: visible ? 4 : 0
         visible: bar.shell.recordingService.busy
         implicitWidth: visible ? 76 : 0
-        foreground: bar.shell.recordingService.paused ? bar.shell.palette.off : bar.shell.palette.red
+        foreground: bar.shell.recordingService.paused ? bar.shell.palette.off : bar.shell.palette.rose
         label: "󰑊 " + (bar.shell.recordingService.countdown > 0
           ? bar.shell.recordingService.countdown
           : RecordingModel.elapsed(bar.shell.recordingService.seconds))
