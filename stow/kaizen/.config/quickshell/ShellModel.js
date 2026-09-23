@@ -19,6 +19,10 @@ function kdeglobalsWrite(dark, darkPalette, lightPalette) {
   return set("BackgroundNormal", palette.bg) + set("ForegroundNormal", palette.fg)
 }
 
+function niriColors(palette) {
+  return "layout {\n    border {\n        active-color \"" + palette.water + "\"\n    }\n}\n"
+}
+
 function textScale(value, minimum, maximum) {
   var scale = Number(value)
   var min = minimum === undefined ? 0.8 : minimum
