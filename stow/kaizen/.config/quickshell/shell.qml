@@ -85,8 +85,8 @@ ShellRoot {
 
   property bool dark: true
   property real textScale: 1
-  readonly property var darkPalette: ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864", red: "#D9534F" })
-  readonly property var lightPalette: ({ bg: "#F0EDEC", fg: "#2C363C", sel: "#CBD9E3", dim: "#CFC1BA", off: "#8F857D", red: "#D9534F" })
+  readonly property var darkPalette: ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864", red: "#D9534F", yellow: "#E5C07B" })
+  readonly property var lightPalette: ({ bg: "#F0EDEC", fg: "#2C363C", sel: "#CBD9E3", dim: "#CFC1BA", off: "#8F857D", red: "#D9534F", yellow: "#A67C00" })
   readonly property var palette: dark ? darkPalette : lightPalette
 
   // KConfig needs --notify before the dconf palette change or running Dolphin keeps cached view colours.
