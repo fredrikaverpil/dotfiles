@@ -197,7 +197,8 @@ Ui.Panel {
         }
 
         Repeater {
-          model: root.service.wifiNetworks
+          // ScriptModel diffs by identity, keeping delegates (and a passphrase being typed) alive.
+          model: ScriptModel { values: root.service.wifiNetworks }
 
           delegate: WifiRow {
             required property var modelData
