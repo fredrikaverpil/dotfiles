@@ -71,7 +71,6 @@ Item {
 
     delete live[record.key]
     popupRows = Model.withoutRecord(popupRows, record.key)
-    addHistory(record)
   }
 
   function refresh(record) {
@@ -347,7 +346,7 @@ Item {
 
       Text {
         Layout.fillWidth: true
-        text: "Notifications"
+        text: "Received during Do Not Disturb"
         color: root.palette.fg
         font.family: Ui.Fonts.mono
         font.pixelSize: 18
@@ -409,7 +408,7 @@ Item {
 
         Text {
           visible: historyCards.count === 0
-          text: "No recent notifications"
+          text: "Nothing arrived during Do Not Disturb"
           color: root.palette.off
           font.family: Ui.Fonts.mono
           font.pixelSize: 14
