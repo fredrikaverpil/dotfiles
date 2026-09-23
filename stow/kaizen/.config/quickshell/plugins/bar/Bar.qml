@@ -84,7 +84,6 @@ Scope {
           id: timeLabel
           shell: bar.shell
           anchors.verticalCenter: parent.verticalCenter
-          fontSize: 14 * bar.shell.textScale
           label: Qt.formatDateTime(clock.date, "HH:mm")
           onActivated: bar.shell.timezone.toggle()
           onLabelChanged: if (label.endsWith(":00")) hourPulse.restart()
