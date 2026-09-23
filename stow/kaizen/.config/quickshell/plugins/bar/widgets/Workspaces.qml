@@ -43,8 +43,8 @@ Item {
         readonly property bool occupied: source.occupied(modelData, root.output)
         readonly property bool focused: source.activeId(root.output) === modelData
 
-        width: 20
-        height: 24
+        width: 20 * root.fontScale
+        height: Math.round(24 * root.fontScale)
         radius: 4
         color: mouse.containsMouse ? root.selection : "transparent"
         opacity: occupied || focused ? 1 : 0.5

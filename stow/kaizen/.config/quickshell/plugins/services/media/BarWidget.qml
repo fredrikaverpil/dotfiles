@@ -8,9 +8,9 @@ Item {
   property var shell: null
   readonly property bool mediaVisible: shell !== null && shell.media.hasMedia
 
-  implicitWidth: mediaVisible ? 28 : 0
+  implicitWidth: mediaVisible ? 28 * shell.textScale : 0
   width: implicitWidth
-  height: 24
+  height: shell ? Math.round(24 * shell.textScale) : 24
 
   Loader {
     anchors.fill: parent

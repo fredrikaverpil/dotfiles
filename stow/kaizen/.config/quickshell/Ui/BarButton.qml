@@ -14,9 +14,9 @@ Rectangle {
   signal secondary
   signal middle
 
-  implicitWidth: visible ? Math.max(28, btnLabel.implicitWidth + 12) : 0
+  implicitWidth: visible ? Math.max(28 * btn.shell.textScale, btnLabel.implicitWidth + 12 * btn.shell.textScale) : 0
   width: implicitWidth
-  height: 24
+  height: Math.round(24 * btn.shell.textScale)
   radius: 4
   color: btnMouse.containsMouse ? btn.shell.palette.sel : "transparent"
 
@@ -30,8 +30,8 @@ Rectangle {
   Image {
     id: btnImage
     anchors.centerIn: parent
-    width: 16
-    height: 16
+    width: 16 * btn.shell.textScale
+    height: 16 * btn.shell.textScale
     visible: status === Image.Ready
     fillMode: Image.PreserveAspectFit
     asynchronous: true
