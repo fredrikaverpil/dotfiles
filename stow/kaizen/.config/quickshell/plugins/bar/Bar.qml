@@ -61,7 +61,9 @@ Scope {
 
       Row {
         id: clockLabel
-        anchors.centerIn: parent
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: 4
         spacing: 6
 
         Ui.BarButton {
@@ -110,9 +112,9 @@ Scope {
 
       Rectangle {
         id: weatherDivider
-        anchors.left: clockLabel.right
+        anchors.right: clockLabel.left
         anchors.verticalCenter: parent.verticalCenter
-        anchors.leftMargin: 6
+        anchors.rightMargin: 6
         width: 1
         height: 16
         color: bar.shell.palette.dim
@@ -121,8 +123,8 @@ Scope {
       Ui.BarButton {
         id: weatherButton
         shell: bar.shell
-        anchors.left: weatherDivider.right
-        anchors.leftMargin: 6
+        anchors.right: weatherDivider.left
+        anchors.rightMargin: 6
         anchors.verticalCenter: parent.verticalCenter
         implicitWidth: 58
         label: bar.shell.weatherService.ready
@@ -132,30 +134,23 @@ Scope {
         onSecondary: bar.shell.weatherService.refresh()
       }
 
+      // Separates the clock and weather from the session buttons.
       Rectangle {
-        id: mediaDivider
-        anchors.left: weatherButton.right
+        id: clockDivider
+        anchors.right: weatherButton.left
         anchors.verticalCenter: parent.verticalCenter
-        anchors.leftMargin: 6
-        width: mediaWidget.width > 0 ? 1 : 0
+        anchors.rightMargin: 6
+        width: 1
         height: 16
         color: bar.shell.palette.dim
-      }
-
-      Media.BarWidget {
-        id: mediaWidget
-        anchors.left: mediaDivider.right
-        anchors.leftMargin: mediaDivider.width > 0 ? 6 : 0
-        anchors.verticalCenter: parent.verticalCenter
-        shell: bar.shell
       }
 
       Ui.BarButton {
         id: powerButton
         shell: bar.shell
-        anchors.right: parent.right
+        anchors.right: clockDivider.left
         anchors.verticalCenter: parent.verticalCenter
-        anchors.rightMargin: 4
+        anchors.rightMargin: 6
         label: "󰐥"
         onActivated: bar.shell.menu.toggleLevel("system")
       }
@@ -206,21 +201,11 @@ Scope {
       }
 
       Ui.BarButton {
-        id: audioButton
+        id: networkButton
         shell: bar.shell
         anchors.right: batteryButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: batteryButton.visible ? 4 : 6
-        label: bar.shell.audio.icon
-        onActivated: bar.shell.audio.toggle()
-      }
-
-      Ui.BarButton {
-        id: networkButton
-        shell: bar.shell
-        anchors.right: audioButton.left
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.rightMargin: 4
         label: bar.shell.networkService.icon
           + (bar.shell.networkService.kind === "wifi"
             ? " " + bar.shell.networkService.connectedWifiNetwork.name
@@ -248,24 +233,43 @@ Scope {
         onActivated: bar.shell.display.toggle()
       }
 
+      Ui.BarButton {
+        id: audioButton
+        shell: bar.shell
+        anchors.right: displayButton.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: 4
+        label: bar.shell.audio.icon
+        onActivated: bar.shell.audio.toggle()
+      }
+
       // Separates status indicators from the settings.
       Rectangle {
         id: indicatorDivider
-        anchors.right: displayButton.left
+        anchors.right: audioButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: visible ? 6 : 0
         visible: idleButton.visible || keyboardButton.visible || recordingButton.visible || systemButton.visible
+          || mediaWidget.width > 0
         width: visible ? 1 : 0
         height: 16
         color: bar.shell.palette.dim
       }
 
+      Media.BarWidget {
+        id: mediaWidget
+        anchors.right: indicatorDivider.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: width > 0 ? 6 : 0
+        shell: bar.shell
+      }
+
       Ui.BarButton {
         id: idleButton
         shell: bar.shell
-        anchors.right: indicatorDivider.left
+        anchors.right: mediaWidget.left
         anchors.verticalCenter: parent.verticalCenter
-        anchors.rightMargin: visible ? 6 : 0
+        anchors.rightMargin: visible ? (mediaWidget.width > 0 ? 4 : 6) : 0
         visible: !bar.shell.idle.enabled
         label: "󰅶"
         onActivated: bar.shell.idle.setEnabled(true)
