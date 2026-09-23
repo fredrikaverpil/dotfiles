@@ -369,7 +369,7 @@ Item {
       id: historySeparator
       width: parent.width
       height: 1
-      color: root.palette.dim
+      color: root.palette.hair
     }
 
     // A Flickable over a Column, not a ListView: every card must exist for the
