@@ -76,6 +76,31 @@ function canForgetNetwork(network) {
   return !!(network && network.known && !network.connected)
 }
 
+// Parses `nmcli -t -f connection.uuid,802-11-wireless.ssid connection show <uuid>...`.
+function parseSavedWifi(raw) {
+  var saved = []
+  var uuid = ""
+  var lines = String(raw || "").split("\n")
+  for (var i = 0; i < lines.length; i++) {
+    var sep = lines[i].indexOf(":")
+    if (sep < 0) continue
+    var key = lines[i].slice(0, sep)
+    var value = lines[i].slice(sep + 1).replace(/\\(.)/g, "$1")
+    if (key === "connection.uuid") uuid = value
+    else if (key === "802-11-wireless.ssid" && uuid && value) {
+      saved.push({ uuid: uuid, ssid: value })
+      uuid = ""
+    }
+  }
+  return saved
+}
+
+function outOfRangeWifi(saved, networks) {
+  return (saved || []).filter(function(entry) {
+    return !(networks || []).some(function(network) { return network && network.name === entry.ssid })
+  })
+}
+
 function parseIpv4Addresses(raw) {
   var interfaces
   try {
