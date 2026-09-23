@@ -80,7 +80,8 @@ Ui.Panel {
         color: root.shell.palette.dim
       }
 
-      Section {
+      Ui.Section {
+        shell: root.shell
         title: "Devices"
 
         Repeater {
@@ -118,7 +119,8 @@ Ui.Panel {
         color: root.shell.palette.dim
       }
 
-      Section {
+      Ui.Section {
+        shell: root.shell
         visible: root.service.hasConnection
         title: "Connection · " + root.service.connection.iface
 
@@ -162,7 +164,8 @@ Ui.Panel {
         color: root.shell.palette.dim
       }
 
-      Section {
+      Ui.Section {
+        shell: root.shell
         title: root.service.wifiDevice ? "Wi-Fi" : "Wi-Fi · unavailable"
 
         Row {
@@ -228,19 +231,6 @@ Ui.Panel {
     }
   }
 
-  component Section: Column {
-    required property string title
-
-    width: parent.width
-    spacing: 6
-
-    Text {
-      color: root.shell.palette.off
-      font.family: Ui.Fonts.mono
-      font.pixelSize: 13
-      text: parent.title
-    }
-  }
 
   component MetricLabel: Text {
     Layout.fillWidth: true

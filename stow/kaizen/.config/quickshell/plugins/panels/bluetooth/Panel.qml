@@ -76,7 +76,8 @@ Ui.Panel {
         color: root.shell.palette.dim
       }
 
-      Section {
+      Ui.Section {
+        shell: root.shell
         title: "Paired devices"
 
         Repeater {
@@ -118,19 +119,6 @@ Ui.Panel {
     }
   }
 
-  component Section: Column {
-    required property string title
-
-    width: parent.width
-    spacing: 6
-
-    Text {
-      color: root.shell.palette.off
-      font.family: Ui.Fonts.mono
-      font.pixelSize: 13
-      text: parent.title
-    }
-  }
 
   component ActionButton: Rectangle {
     id: button
