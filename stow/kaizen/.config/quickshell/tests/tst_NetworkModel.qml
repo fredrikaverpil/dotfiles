@@ -25,6 +25,15 @@ TestCase {
     compare(Network.wifiAction({ name: "Home", security: "wpa", known: false }, "", "open", "owe"), "Join")
   }
 
+  function test_saved_wifi_parses_nmcli_and_filters_networks_in_range() {
+    const raw = "connection.uuid:a\n802-11-wireless.ssid:Attic\n\n"
+      + "connection.uuid:b\n802-11-wireless.ssid:Cafe\\:5G\n\nconnection.uuid:c\n802-11-wireless.ssid:\n"
+    const saved = Network.parseSavedWifi(raw)
+    compare(saved, [{ uuid: "a", ssid: "Attic" }, { uuid: "b", ssid: "Cafe:5G" }])
+    compare(Network.outOfRangeWifi(saved, [{ name: "Attic" }, null]), [{ uuid: "b", ssid: "Cafe:5G" }])
+    compare(Network.parseSavedWifi(""), [])
+  }
+
   function test_wifi_order_holds_positions_and_appends_new_networks() {
     const weak = { name: "Weak", signalStrength: 0.2 }
     const strong = { name: "Strong", signalStrength: 0.9 }

@@ -206,13 +206,27 @@ Ui.Panel {
           }
         }
 
+        Repeater {
+          model: ScriptModel {
+            values: root.service.outOfRangeWifi
+            objectProp: "uuid"
+          }
+
+          delegate: SavedRow {
+            required property var modelData
+            saved: modelData
+          }
+        }
+
         Text {
           width: parent.width
           visible: root.service.wifiDevice !== null && !root.service.scanning && root.service.wifiNetworks.length === 0
           color: root.shell.palette.off
           font.family: Ui.Fonts.mono
           font.pixelSize: 13
-          text: root.service.wifiEnabled ? "No networks found" : "Wi-Fi is off"
+          text: !root.service.wifiEnabled
+            ? "Wi-Fi is off"
+            : root.service.wifiDevice && root.service.wifiDevice.scannerEnabled ? "No networks found" : "No known networks in range"
         }
       }
     }
@@ -326,6 +340,43 @@ Ui.Panel {
       font.pixelSize: 13
       text: parent.device.name
       elide: Text.ElideRight
+    }
+  }
+
+  component SavedRow: Rectangle {
+    id: savedRow
+
+    required property var saved
+
+    width: parent.width
+    height: 42
+    radius: 4
+    color: "transparent"
+    border.color: root.shell.palette.dim
+    border.width: 1
+
+    Text {
+      anchors.left: parent.left
+      anchors.leftMargin: 34
+      anchors.right: forgetSaved.left
+      anchors.rightMargin: 8
+      anchors.verticalCenter: parent.verticalCenter
+      color: root.shell.palette.off
+      font.family: Ui.Fonts.mono
+      font.pixelSize: 14
+      text: savedRow.saved.ssid + " · Out of range"
+      elide: Text.ElideRight
+    }
+
+    ActionButton {
+      id: forgetSaved
+      anchors.right: parent.right
+      anchors.rightMargin: 6
+      anchors.verticalCenter: parent.verticalCenter
+      width: 74
+      label: "Forget"
+      available: !root.service.busy
+      onActivated: root.service.forgetSaved(savedRow.saved.uuid)
     }
   }
 
