@@ -191,10 +191,12 @@ Rectangle {
     }
   }
 
+  // Aligned with the content, centered in the bottom padding.
   Rectangle {
-    anchors.left: parent.left
+    anchors.left: content.left
     anchors.bottom: parent.bottom
-    width: parent.width * root.remaining
+    anchors.bottomMargin: (content.anchors.bottomMargin - height) / 2
+    width: content.width * root.remaining
     height: root.toast && root.duration > 0 ? 2 : 0
     color: root.accent
   }
