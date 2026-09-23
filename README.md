@@ -32,7 +32,7 @@ sudo nixos-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"   # NixOS
 nix flake update
 
 # Update only the unstable-pinned inputs, then rebuild
-nix flake update nixpkgs-unstable nix-darwin home-manager-unstable llm-agents dotfiles
+nix flake update nixpkgs-unstable nix-darwin home-manager-unstable llm-agents
 
 # Clean up old Nix generations, keeping the last 5 days for rollback safety
 sudo nix-collect-garbage --delete-older-than 5d

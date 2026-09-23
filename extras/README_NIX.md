@@ -155,7 +155,7 @@ Update inputs explicitly, then rebuild:
 
 ```sh
 # Update unstable/Darwin-related inputs, then rebuild
-nix flake update nixpkgs-unstable nix-darwin home-manager-unstable llm-agents dotfiles
+nix flake update nixpkgs-unstable nix-darwin home-manager-unstable llm-agents
 
 # Update ALL inputs, then rebuild
 nix flake update
