@@ -30,6 +30,9 @@ Item {
   readonly property bool wifiEnabled: Networking.wifiEnabled
 
   property var wifiNetworks: []
+  // Saved connections, including ones out of range that Quickshell does not list.
+  property var savedWifi: []
+  readonly property var outOfRangeWifi: Model.outOfRangeWifi(savedWifi, wifiNetworkObjects)
   property var ipAddresses: ({})
   property var scannerDevice: null
   property var actionNetwork: null
@@ -94,14 +97,13 @@ Item {
     if (scannerDevice) scannerDevice.scannerEnabled = enabled
   }
 
+  // Quickshell lists only known and connected networks while the scanner is off. Once on,
+  // it stays on until the panel closes, or found networks would vanish again.
   function scan() {
-    if (!wifiDevice) return
+    if (!wifiDevice || !active) return
     scanning = true
-    setScannerEnabled(false)
-    Qt.callLater(function() {
-      if (root.active) root.setScannerEnabled(true)
-      scanFinished.restart()
-    })
+    setScannerEnabled(true)
+    scanFinished.restart()
   }
 
   function refresh() {
@@ -244,10 +246,21 @@ Item {
     if (beginAction("forget", network)) network.forget()
   }
 
+  function forgetSaved(uuid) {
+    if (busy || forgetSavedProcess.running) return
+    forgetSavedProcess.command = ["nmcli", "connection", "delete", "uuid", uuid]
+    forgetSavedProcess.running = true
+  }
+
+  function loadSavedWifi() {
+    if (!savedWifiProcess.running) savedWifiProcess.running = true
+  }
+
   function clearAction() {
     actionTimeout.stop()
     applyActionState(Model.clearAction(actionState()))
     refresh()
+    loadSavedWifi()
   }
 
   function failAction(reason) {
@@ -270,7 +283,6 @@ Item {
   function toggleWifi() {
     if (!networkManagerAvailable || !wifiDevice) return
     Networking.wifiEnabled = !Networking.wifiEnabled
-    if (Networking.wifiEnabled) scan()
   }
 
   function status() {
@@ -311,7 +323,7 @@ Item {
       // Drop the frozen order so the list is sorted by strength again on open.
       wifiNetworks = []
       refresh()
-      if (wifiDevice) scan()
+      loadSavedWifi()
     } else {
       passwordSsid = ""
       setScannerEnabled(false)
@@ -319,7 +331,7 @@ Item {
   }
 
   onWifiDeviceChanged: {
-    setScannerEnabled(active)
+    setScannerEnabled(false)
     syncWifiNetworks()
   }
   onWifiNetworkObjectsChanged: syncWifiNetworks()
@@ -354,6 +366,21 @@ Item {
       waitForEnd: true
       onStreamFinished: root.updateRoute(text)
     }
+  }
+
+  Process {
+    id: savedWifiProcess
+    command: ["sh", "-c", "nmcli -t -f connection.uuid,802-11-wireless.ssid connection show"
+      + " $(nmcli -g UUID,TYPE connection show | awk -F: '$2 == \"802-11-wireless\" { print $1 }')"]
+    stdout: StdioCollector {
+      waitForEnd: true
+      onStreamFinished: root.savedWifi = Model.parseSavedWifi(text)
+    }
+  }
+
+  Process {
+    id: forgetSavedProcess
+    onExited: root.loadSavedWifi()
   }
 
   Process {
