@@ -293,7 +293,7 @@ Ui.Panel {
   Rectangle {
     width: parent.width
     height: 1
-    color: menu.shell.palette.dim
+    color: menu.shell.palette.hair
   }
 
   ListView {

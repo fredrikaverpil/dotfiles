@@ -231,7 +231,7 @@ PanelWindow {
     id: cards
     model: levels
 
-    Rectangle {
+    Card {
       id: card
 
       required property int index
@@ -262,14 +262,12 @@ PanelWindow {
       y: position.y
       width: Model.clamp(Math.ceil(labelWidth) + 54, 160, 360)
       height: Math.max(40, Math.min(rowsHeight + 12, root.height - 16))
-      radius: 8
+      radius: 10
       // A card below a bar button hangs from the bar.
       readonly property bool hangs: level && level.anchor ? level.anchor.below === true : false
       topLeftRadius: hangs ? 0 : radius
       topRightRadius: hangs ? 0 : radius
-      color: root.shell.palette.bg
-      border.color: root.shell.palette.dim
-      border.width: 1
+      palette: root.shell.palette
 
       MouseArea {
         anchors.fill: parent
@@ -307,7 +305,7 @@ PanelWindow {
             width: parent.width - 16
             x: 8
             height: 1
-            color: root.shell.palette.dim
+            color: root.shell.palette.hair
           }
 
           Row {

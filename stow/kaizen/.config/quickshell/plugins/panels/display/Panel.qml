@@ -69,7 +69,7 @@ Ui.Panel {
   Rectangle {
     width: parent.width
     height: 1
-    color: root.shell.palette.dim
+    color: root.shell.palette.hair
   }
 
   Ui.Section {
