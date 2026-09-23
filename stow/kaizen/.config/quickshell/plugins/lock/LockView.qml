@@ -67,6 +67,7 @@ Item {
       anchors.centerIn: parent
       width: Math.min(380, parent.width - 48)
       height: 64
+      scale: root.shell.textScale
       radius: 8
       color: root.palette.bg
       border.color: root.failureMessage.length > 0 ? root.palette.rose : root.palette.fg

@@ -22,8 +22,8 @@ PanelWindow {
   visible: false
   anchors.bottom: true
   margins.bottom: 64
-  implicitWidth: 320
-  implicitHeight: 48
+  implicitWidth: 320 * shell.textScale
+  implicitHeight: 48 * shell.textScale
   exclusiveZone: 0
   color: "transparent"
   mask: Region {}
@@ -43,7 +43,10 @@ PanelWindow {
   }
 
   Rectangle {
-    anchors.fill: parent
+    anchors.centerIn: parent
+    width: 320
+    height: 48
+    scale: root.shell.textScale
     radius: 8
     color: root.shell.palette.bg
     border.color: root.shell.palette.dim
