@@ -21,6 +21,8 @@ Item {
   readonly property int historyLimit: 99
   readonly property string soundPath: "/run/current-system/sw/share/sounds/freedesktop/stereo/message.oga"
   readonly property real soundVolume: 0.4
+  // How far apart Slack's and Chromium's copies of one calendar reminder may arrive.
+  readonly property int reminderWindow: 5000
 
   property bool stateLoaded: false
   property bool doNotDisturb: false
@@ -29,6 +31,9 @@ Item {
   property var historyRows: []
   property var live: ({})
   property int nextKey: 0
+  // Slack's calendar reminders, held back in case Chromium's own copy arrives.
+  property var heldReminders: []
+  property real lastChromiumReminder: 0
   property var shortcodes: JSON.parse(shortcodeFile.text() || "{}")
 
   function stateText() { return Model.stateText(doNotDisturb, historyRows) }
@@ -115,8 +120,29 @@ Item {
 
     notification.tracked = true
     live[record.key] = record
-    popupRows = [record].concat(popupRows)
     watch(record)
+
+    // Chromium's calendar reminder carries the actions, so it replaces Slack's.
+    var reminder = NotificationLogic.calendarReminder(notification)
+    if (reminder === "chromium") {
+      lastChromiumReminder = Date.now()
+      heldReminders.forEach(function(key) { root.dismiss(root.live[key]) })
+      heldReminders = []
+    } else if (reminder === "slack") {
+      if (Date.now() - lastChromiumReminder < reminderWindow) {
+        dismiss(record)
+      } else {
+        heldReminders = heldReminders.concat(record.key)
+        reminderHold.restart()
+      }
+      return
+    }
+
+    show(record)
+  }
+
+  function show(record) {
+    popupRows = [record].concat(popupRows)
     sound.startDetached()
   }
 
@@ -216,6 +242,17 @@ Item {
     readonly property bool shown: key !== ""
 
     function close() { key = "" }
+  }
+
+  Timer {
+    id: reminderHold
+    interval: root.reminderWindow
+    onTriggered: {
+      root.heldReminders.forEach(function(key) {
+        if (root.live[key]) root.show(root.live[key])
+      })
+      root.heldReminders = []
+    }
   }
 
   Process {
