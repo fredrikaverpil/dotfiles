@@ -69,6 +69,7 @@ Item {
   function finish(record) {
     if (!record || !live[record.key]) return
 
+    if (record.key === selection.key) select(Model.keyAfter(popupRows, record.key))
     delete live[record.key]
     popupRows = Model.withoutRecord(popupRows, record.key)
   }
@@ -148,6 +149,36 @@ Item {
     dismiss(record)
   }
 
+  function select(key) {
+    if (key && !selection.shown) {
+      shell.registerPanel(selection)
+      shell.claimPanel(selection)
+    }
+    selection.key = key
+    selection.button = 0
+  }
+
+  function stepSelection(delta) {
+    if (popupRows.length === 0) return false
+    select(selection.shown ? Model.stepKey(popupRows, selection.key, delta) : popupRows[0].key)
+    return true
+  }
+
+  function stepButton(delta) {
+    var count = NotificationLogic.buttons(live[selection.key].notification.actions).length
+    selection.button = Model.step(selection.button, delta, count)
+  }
+
+  // Ends the selection: a button usually hands focus to its app.
+  function activate() {
+    var record = live[selection.key]
+    var buttons = NotificationLogic.buttons(record.notification.actions)
+    var button = buttons[Math.min(selection.button, buttons.length - 1)]
+    selection.close()
+    if (button) action(record, button)
+    else defaultAction(record)
+  }
+
   function setDoNotDisturb(value) {
     doNotDisturb = !!value
   }
@@ -173,6 +204,18 @@ Item {
   Component.onCompleted: {
     stateLoaded = true
     stateFile.reload()
+  }
+
+  // The toast and button driven from the keyboard; `shown` and `close()` let
+  // shell.claimPanel treat it as a panel.
+  QtObject {
+    id: selection
+
+    property string key: ""
+    property int button: 0
+    readonly property bool shown: key !== ""
+
+    function close() { key = "" }
   }
 
   Process {
@@ -256,10 +299,9 @@ Item {
       return "ok"
     }
 
-    function invokeLast(): string {
-      if (root.popupRows.length === 0) return "none"
-      root.defaultAction(root.popupRows[0])
-      return "ok"
+    // Selects the newest toast, then each older one in turn.
+    function select(): string {
+      return root.stepSelection(1) ? "ok" : "none"
     }
   }
 
@@ -272,7 +314,7 @@ Item {
     mask: Region { item: popupArea }
     WlrLayershell.namespace: "kaizen-notifications"
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: selection.shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     // Sized to the scaled column, so the input mask covers what is drawn.
     Item {
@@ -283,6 +325,20 @@ Item {
       anchors.rightMargin: 16
       width: popupColumn.width * popupColumn.scale
       height: popupColumn.implicitHeight * popupColumn.scale
+
+      focus: true
+      Keys.onPressed: function(event) {
+        if (!selection.shown) return
+        if (event.key === Qt.Key_Escape) selection.close()
+        else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) root.activate()
+        else if (event.key === Qt.Key_Backspace) root.dismiss(root.live[selection.key])
+        else if (event.key === Qt.Key_Tab || event.key === Qt.Key_Right || event.text === "l") root.stepButton(1)
+        else if (event.key === Qt.Key_Backtab || event.key === Qt.Key_Left || event.text === "h") root.stepButton(-1)
+        else if (event.key === Qt.Key_Down || event.text === "j") root.stepSelection(1)
+        else if (event.key === Qt.Key_Up || event.text === "k") root.stepSelection(-1)
+        else return
+        event.accepted = true
+      }
 
       Column {
         id: popupColumn
@@ -302,6 +358,8 @@ Item {
             row: modelData
             notification: modelData.notification
             toast: true
+            selected: modelData.key === selection.key
+            selectedButton: selected ? selection.button : -1
             duration: modelData.duration
             onCloseRequested: root.dismiss(modelData)
             onInvokeRequested: root.defaultAction(modelData)
