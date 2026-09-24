@@ -51,3 +51,8 @@ function emojify(text, shortcodes) {
     return Object.prototype.hasOwnProperty.call(shortcodes, name) ? shortcodes[name] : match
   })
 }
+
+// "default" is the body click, not a button.
+function buttons(actions) {
+  return Array.prototype.filter.call(actions || [], function(action) { return action.identifier !== "default" })
+}

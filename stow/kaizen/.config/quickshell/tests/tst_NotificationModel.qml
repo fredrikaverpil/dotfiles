@@ -38,4 +38,19 @@ TestCase {
     for (const value of ["true", "1", "on", "yes", "YES"]) compare(Notification.dndValue(value), true)
     for (const value of ["", "false", "0", "off", "no"]) compare(Notification.dndValue(value), false)
   }
+
+  function test_popup_selection_steps_wrap_and_follow_removal() {
+    const rows = [{ key: "3" }, { key: "2" }, { key: "1" }]
+    verify(Notification.step(2, 1, 3) === 0)
+    verify(Notification.step(0, -1, 3) === 2)
+    verify(Notification.step(0, 1, 0) === 0)
+    compare(Notification.stepKey(rows, "3", 1), "2")
+    compare(Notification.stepKey(rows, "1", 1), "3")
+    compare(Notification.stepKey(rows, "3", -1), "1")
+    compare(Notification.stepKey([], "3", 1), "")
+    compare(Notification.keyAfter(rows, "3"), "2")
+    compare(Notification.keyAfter(rows, "1"), "2")
+    compare(Notification.keyAfter([{ key: "1" }], "1"), "")
+    compare(Notification.keyAfter(rows, "9"), "")
+  }
 }
