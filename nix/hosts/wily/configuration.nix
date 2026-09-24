@@ -52,7 +52,7 @@
       isAdmin = true;
       shell = "zsh";
       homeConfig = ./users/fredrik.nix;
-      groups = [ "networkmanager" ];
+      groups = [ "networkmanager" "docker" ];
       sshKeys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIutqzZ2V93KOXtPpkdVSxCJwnjhNf/jENvBayDDhAP2"
       ];
@@ -63,6 +63,9 @@
   networking.firewall.allowedTCPPorts = [ 22 ];
 
   services.tailscale.enable = true;
+
+  # Daemon for testcontainers.
+  virtualisation.docker.enable = true;
 
   # CUPS on loopback only; Avahi discovers driverless (IPP Everywhere) printers.
   services.printing.enable = true;
