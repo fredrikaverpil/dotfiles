@@ -90,6 +90,9 @@
     polkitPolicyOwners = [ "fredrik" ];
   };
 
+  # Lets prebuilt glibc binaries run instead of hitting stub-ld.
+  programs.nix-ld.enable = true;
+
   # Host-only system packages; shared ones live in nix/shared/system/.
   host.extraSystemPackages = with pkgs; [ ];
 }
