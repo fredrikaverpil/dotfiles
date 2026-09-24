@@ -62,3 +62,21 @@ function dndValue(value) {
   var normalized = String(value || "").toLowerCase()
   return normalized === "true" || normalized === "1" || normalized === "on" || normalized === "yes"
 }
+
+function step(index, delta, count) {
+  return count > 0 ? (index + delta + count) % count : 0
+}
+
+function stepKey(rows, key, delta) {
+  if (rows.length === 0) return ""
+  var index = rows.findIndex(function(row) { return row.key === key })
+  return rows[step(index, delta, rows.length)].key
+}
+
+// The row taking the removed row's place, else the new last row.
+function keyAfter(rows, key) {
+  var index = rows.findIndex(function(row) { return row.key === key })
+  var rest = withoutRecord(rows, key)
+  if (index < 0 || rest.length === 0) return ""
+  return rest[Math.min(index, rest.length - 1)].key
+}

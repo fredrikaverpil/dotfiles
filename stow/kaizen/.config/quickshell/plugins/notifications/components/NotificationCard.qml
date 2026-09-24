@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import Quickshell
 
 import "../../../Ui" as Ui
+import "../NotificationLogic.js" as NotificationLogic
 
 Rectangle {
   id: root
@@ -13,6 +14,8 @@ Rectangle {
   property var notification: null
   property bool toast: false
   property bool selectable: false
+  property bool selected: false
+  property int selectedButton: -1
   property int duration: 0
   property bool hovered: hoverHandler.hovered
   property real remaining: 1.0
@@ -28,7 +31,7 @@ Rectangle {
   readonly property string body: String(row.body || "")
   readonly property string image: String(row.image || "")
   readonly property int urgency: Number(row.urgency)
-  readonly property var actions: notification ? notification.actions : []
+  readonly property var buttons: NotificationLogic.buttons(notification ? notification.actions : [])
   readonly property color accent: urgency === 2 ? palette.rose : (urgency === 0 ? palette.off : palette.fg)
   readonly property string icon: {
     if (image) return image
@@ -41,7 +44,7 @@ Rectangle {
   width: 400
   implicitHeight: content.implicitHeight + 24
   radius: 8
-  color: activeFocus ? palette.sel : palette.bg
+  color: activeFocus || selected ? palette.sel : palette.bg
   border.color: accent
   border.width: 1
   clip: true
@@ -152,21 +155,21 @@ Rectangle {
 
     RowLayout {
       Layout.fillWidth: true
-      visible: root.actions.length > 0
+      visible: root.buttons.length > 0
       spacing: 6
 
       Repeater {
-        model: root.actions
+        model: root.buttons
 
         delegate: Rectangle {
           required property var modelData
+          required property int index
 
-          visible: modelData.identifier !== "default"
           implicitWidth: actionLabel.implicitWidth + 16
           implicitHeight: 26
           radius: 4
           color: actionArea.containsMouse ? root.palette.sel : "transparent"
-          border.color: root.palette.dim
+          border.color: index === root.selectedButton ? root.palette.fg : root.palette.dim
           border.width: 1
 
           Text {
@@ -204,7 +207,7 @@ Rectangle {
   Timer {
     interval: 50
     repeat: true
-    running: root.toast && root.duration > 0 && !root.hovered
+    running: root.toast && root.duration > 0 && !root.hovered && !root.selected
     onTriggered: {
       root.remaining -= interval / root.duration
       if (root.remaining <= 0) {

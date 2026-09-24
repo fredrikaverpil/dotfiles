@@ -48,4 +48,13 @@ TestCase {
     compare(Notification.durationFor({ urgency: 1, expireTimeout: 0 }, low, critical), 0)
     compare(Notification.durationFor({ urgency: 1, expireTimeout: -1 }, low, critical), 8000)
   }
+
+  function test_notification_buttons_skip_the_default_action() {
+    const open = { identifier: "default", text: "Open" }
+    const reply = { identifier: "reply", text: "Reply" }
+    const mute = { identifier: "mute", text: "Mute" }
+    compare(Notification.buttons([open, reply, mute]), [reply, mute])
+    compare(Notification.buttons([open]), [])
+    compare(Notification.buttons(null), [])
+  }
 }
