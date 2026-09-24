@@ -13,6 +13,13 @@ TestCase {
     })
   }
 
+  function test_notification_calendar_reminders_name_their_source() {
+    compare(Notification.calendarReminder({ appName: "Slack", summary: "[einride] from Google Calendar" }), "slack")
+    compare(Notification.calendarReminder({ appName: "Chromium", body: "calendar.google.com\n\n09:00 – 09:30" }), "chromium")
+    compare(Notification.calendarReminder({ appName: "Slack", summary: "[einride] from Jira" }), "")
+    compare(Notification.calendarReminder({}), "")
+  }
+
   function test_notification_urgency_raises_calendar_reminders_to_critical() {
     compare(Notification.urgencyOf({ appName: "Slack", summary: "[einride] from Google Calendar", urgency: 1 }), 2)
     compare(Notification.urgencyOf({ appName: "Slack", summary: "[einride] from Jira", urgency: 1 }), 1)

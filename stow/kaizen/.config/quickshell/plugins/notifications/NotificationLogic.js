@@ -11,13 +11,18 @@ function iconSource(icon) {
   return value
 }
 
-// Google Calendar reminders arrive at normal urgency; they are raised to critical (2).
+// The source of a Google Calendar reminder, else "".
 // Slack relays them "from Google Calendar"; Chromium prefixes the body with the origin.
-function urgencyOf(notification) {
+function calendarReminder(notification) {
   var app = asString(notification.appName)
-  if (app === "Slack" && / from Google Calendar$/.test(asString(notification.summary))) return 2
-  if (app === "Chromium" && /^calendar\.google\.com\n/.test(asString(notification.body))) return 2
-  return Number(notification.urgency)
+  if (app === "Slack" && / from Google Calendar$/.test(asString(notification.summary))) return "slack"
+  if (app === "Chromium" && /^calendar\.google\.com\n/.test(asString(notification.body))) return "chromium"
+  return ""
+}
+
+// Google Calendar reminders arrive at normal urgency; they are raised to critical (2).
+function urgencyOf(notification) {
+  return calendarReminder(notification) ? 2 : Number(notification.urgency)
 }
 
 function snapshotOf(notification, timestamp) {
