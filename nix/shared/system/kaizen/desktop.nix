@@ -402,6 +402,8 @@ in
     })
     proton-vpn
     (withGnomeLibsecret signal-desktop)
+    # Sluggish? Check Preferences → Advanced → "Disable hardware acceleration" is
+    # unticked; ticked, Slack renders on the CPU (`--use-gl=disabled`).
     (withGnomeLibsecret slack)
     spotify
     zed-editor
