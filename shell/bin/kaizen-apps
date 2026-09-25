@@ -28,9 +28,6 @@ spawn_missing() {
 
 spawn_missing '^zen-beta$' zen-beta
 spawn_missing '^slack$' slack
-# dcal.service already runs the sync daemon headless; `show` only opens its
-# window, and reattaches to that daemon rather than starting a second one.
-spawn_missing '^com\.danklinux\.dankcalendar$' dcal show
 if [ "$(hostname)" = wily ]; then
   spawn_missing '^chrome-linear\.app__-' \
     chromium --profile-directory=Work --app=https://linear.app/
