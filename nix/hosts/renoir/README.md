@@ -6,10 +6,6 @@ and documented in `nix/shared/system/kaizen/CLAUDE.md`; its Nix modules are
 Machine-specific settings (microcode, VAAPI driver, kernel choice) and
 host-only programs belong in `configuration.nix`.
 
-> [!NOTE]
->
-> Awaiting the Proton Pass v1.40+ SSH agent, so per-usage PIN can be used.
-
 ## Sleep
 
 Lid close uses the logind default, plain suspend; there is no hibernate.
