@@ -22,7 +22,8 @@ function compileRules(rules) {
       return {
         checks: fields.map(function(field) { return { field: field, pattern: new RegExp(match[field]) } }),
         critical: !!rule.critical,
-        dedup: rule.dedup || null
+        dedup: rule.dedup || null,
+        icon: iconSource(rule.icon)
       }
     } catch (error) {
       console.warn("notifications: dropping rule " + JSON.stringify(rule) + ": " + error)
@@ -51,6 +52,12 @@ function dedupOf(notification, rules) {
   return rule ? rule.dedup : null
 }
 
+// The icon of the first matching rule with one, else "".
+function iconOf(notification, rules) {
+  var rule = matchingRules(notification, rules).find(function(rule) { return rule.icon })
+  return rule ? rule.icon : ""
+}
+
 function snapshotOf(notification, timestamp, rules) {
   return {
     app: asString(notification.appName),
@@ -58,6 +65,7 @@ function snapshotOf(notification, timestamp, rules) {
     summary: asString(notification.summary),
     body: asString(notification.body),
     image: asString(notification.image),
+    icon: iconOf(notification, rules),
     urgency: urgencyOf(notification, rules),
     timestamp: timestamp === undefined ? Date.now() : timestamp
   }
