@@ -35,6 +35,9 @@ Item {
   // and when that copy last did.
   property var held: ({})
   property var keptAt: ({})
+  // Per toast key: the share of its countdown left. The Repeater rebuilds every
+  // card whenever popupRows changes, so a card cannot hold it.
+  property var countdowns: ({})
   property var shortcodes: JSON.parse(shortcodeFile.text() || "{}")
   property var rules: NotificationLogic.compileRules(JSON.parse(rulesFile.text() || "[]"))
 
@@ -78,6 +81,7 @@ Item {
 
     if (record.key === selection.key) select(Model.keyAfter(popupRows, record.key))
     delete live[record.key]
+    delete countdowns[record.key]
     popupRows = Model.withoutRecord(popupRows, record.key)
   }
 
@@ -412,6 +416,8 @@ Item {
             selected: modelData.key === selection.key
             selectedButton: selected ? selection.button : -1
             duration: modelData.duration
+            remaining: root.countdowns[modelData.key] ?? 1
+            onRemainingChanged: root.countdowns[modelData.key] = remaining
             onCloseRequested: root.dismiss(modelData)
             onInvokeRequested: root.defaultAction(modelData)
             onActionRequested: function(selectedAction) { root.action(modelData, selectedAction) }
