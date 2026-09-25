@@ -70,6 +70,12 @@ previous states. Explain a declaration next to it, not here.
 - Clipboard history is in memory only and skips offers carrying
   `x-kde-passwordManagerHint`. Proton Pass and 1Password set it; a password
   manager that does not would be recorded.
+- SSH keys come from the Proton Pass app's agent (`SSH_AUTH_SOCK` in
+  `desktop.nix`), so the app must be running. While it is locked, a key
+  request waits 60 s for an unlock, then fails as `Permission denied
+  (publickey)`. The app asks by showing its window, which niri ignores for a
+  mapped window (no focus, no urgency), so the prompt stays on workspace 7;
+  unlocking there within the minute lets the waiting `ssh`/`git` proceed.
 - The screensaver is a privacy curtain, not a lock: an overlay layer surface
   (`kaizen-screensaver`), never `WlSessionLock`, and it never touches DPMS. Both
   are deliberate. A session lock replaces output content and a disabled output
