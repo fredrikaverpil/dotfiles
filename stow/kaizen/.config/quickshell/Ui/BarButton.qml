@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 
 Rectangle {
   id: btn
@@ -37,6 +38,8 @@ Rectangle {
     asynchronous: true
     sourceSize.width: width * Screen.devicePixelRatio
     sourceSize.height: height * Screen.devicePixelRatio
+    layer.enabled: true
+    layer.effect: MultiEffect { saturation: -1 }
   }
 
   Text {
