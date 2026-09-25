@@ -20,16 +20,47 @@
       description = "Extra Chromium --enable-features for this host";
     };
 
-    host.criticalNotifications = lib.mkOption {
-      type = lib.types.listOf (lib.types.attrsOf lib.types.str);
-      default = [ ];
-      example = [
-        {
-          app = "^Slack$";
-          summary = " in #?alerts$";
+    host.notificationRules = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            match = lib.mkOption {
+              type = lib.types.attrsOf lib.types.str;
+              example = {
+                app = "^Slack$";
+                summary = " in #?alerts$";
+              };
+              description = "JavaScript regexes keyed by notification field (app, summary, body); the rule applies when all match";
+            };
+            critical = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+              description = "Raise to critical, so it sticks and bypasses Do Not Disturb";
+            };
+            dedup = lib.mkOption {
+              type = lib.types.nullOr (
+                lib.types.submodule {
+                  options = {
+                    group = lib.mkOption {
+                      type = lib.types.str;
+                      description = "One event reported by several apps";
+                    };
+                    keep = lib.mkOption {
+                      type = lib.types.bool;
+                      default = false;
+                      description = "Show this copy and dismiss the group's others; they are held briefly in case it arrives";
+                    };
+                  };
+                }
+              );
+              default = null;
+              description = "Show one copy of an event reported by several apps";
+            };
+          };
         }
-      ];
-      description = "Kaizen raises a notification to critical when its fields (app, summary, body) match every JavaScript regex of a rule";
+      );
+      default = [ ];
+      description = "Kaizen's notification rules";
     };
 
     host.extraServices = lib.mkOption {
