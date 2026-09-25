@@ -9,7 +9,7 @@ TestCase {
     compare(Notification.asString(null), "")
     compare(Notification.asString(4), "4")
     compare(Notification.snapshotOf({ appName: "Mail", urgency: 2 }, 123), {
-      app: "Mail", appIcon: "", summary: "", body: "", image: "", urgency: 2, timestamp: 123,
+      app: "Mail", appIcon: "", summary: "", body: "", image: "", icon: "", urgency: 2, timestamp: 123,
     })
   }
 
@@ -31,7 +31,7 @@ TestCase {
     compare(Notification.urgencyOf({ appName: "Slack", summary: "[x] in #alerts", urgency: 1 }), 1)
     compare(Notification.durationFor({ appName: "Slack", summary: "[x] in #alerts", urgency: 1, expireTimeout: 1 }, 0, 2, rules), 0)
     compare(Notification.snapshotOf({ appName: "Slack", summary: "[x] in #alerts", urgency: 1 }, 123, rules), {
-      app: "Slack", appIcon: "", summary: "[x] in #alerts", body: "", image: "", urgency: 2, timestamp: 123,
+      app: "Slack", appIcon: "", summary: "[x] in #alerts", body: "", image: "", icon: "", urgency: 2, timestamp: 123,
     })
   }
 
@@ -48,6 +48,22 @@ TestCase {
     compare(Notification.dedupOf({ appName: "Slack", summary: "[x] from Google Calendar" }, rules), { group: "calendar", keep: false })
     compare(Notification.dedupOf({ appName: "Slack", summary: "[x] in #general" }, rules), { group: "slack", keep: false })
     compare(Notification.dedupOf({ appName: "Slack", summary: "[x] from Google Calendar" }), null)
+  }
+
+  function test_notification_icon_comes_from_the_first_matching_rule_with_one() {
+    const rules = Notification.compileRules([
+      { match: { app: "^Slack$", summary: " from Google Calendar$" }, critical: true, icon: null },
+      { match: { app: "^Slack$", summary: " from GitHub$" }, icon: "/nix/store/x-github.svg" },
+      { match: { app: "^Slack$" }, icon: "image://icon/slack" },
+    ])
+
+    compare(Notification.iconOf({ appName: "Slack", summary: "[x] from GitHub" }, rules), "file:///nix/store/x-github.svg")
+    compare(Notification.iconOf({ appName: "Slack", summary: "[x] from Google Calendar" }, rules), "image://icon/slack")
+    compare(Notification.iconOf({ appName: "Chromium", summary: "[x] from GitHub" }, rules), "")
+    compare(Notification.iconOf({ appName: "Slack", summary: "[x] from GitHub" }), "")
+    compare(Notification.snapshotOf({ appName: "Slack", summary: "[x] from GitHub", urgency: 1 }, 123, rules), {
+      app: "Slack", appIcon: "", summary: "[x] from GitHub", body: "", image: "", icon: "file:///nix/store/x-github.svg", urgency: 1, timestamp: 123,
+    })
   }
 
   function test_notification_icon_sources_preserve_schemes_and_normalize_paths() {
