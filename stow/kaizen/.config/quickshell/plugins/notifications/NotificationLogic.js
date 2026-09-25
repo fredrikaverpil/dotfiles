@@ -11,41 +11,44 @@ function iconSource(icon) {
   return value
 }
 
-// The source of a Google Calendar reminder, else "".
-// Slack relays them "from Google Calendar"; Chromium prefixes the body with the origin.
-function calendarReminder(notification) {
-  var app = asString(notification.appName)
-  if (app === "Slack" && / from Google Calendar$/.test(asString(notification.summary))) return "slack"
-  if (app === "Chromium" && /^calendar\.google\.com\n/.test(asString(notification.body))) return "chromium"
-  return ""
-}
-
-// Compiles host rules of `field: pattern` (app, summary, body); a rule with a bad
-// pattern or no fields is dropped.
-function criticalRules(rules) {
+// Compiles host rules (host.notificationRules) matching `field: pattern` (app,
+// summary, body); a rule with a bad pattern or no fields is dropped.
+function compileRules(rules) {
   return (Array.isArray(rules) ? rules : []).map(function(rule) {
-    var fields = Object.keys(rule || {})
+    var match = (rule && rule.match) || {}
+    var fields = Object.keys(match)
     if (fields.length === 0) return null
     try {
-      return fields.map(function(field) { return { field: field, pattern: new RegExp(rule[field]) } })
+      return {
+        checks: fields.map(function(field) { return { field: field, pattern: new RegExp(match[field]) } }),
+        critical: !!rule.critical,
+        dedup: rule.dedup || null
+      }
     } catch (error) {
-      console.warn("notifications: dropping critical rule " + JSON.stringify(rule) + ": " + error)
+      console.warn("notifications: dropping rule " + JSON.stringify(rule) + ": " + error)
       return null
     }
   }).filter(Boolean)
 }
 
-// Whether every field of some rule matches; an unknown field matches as "".
-function matchesRule(notification, rules) {
+// The rules whose every field matches; an unknown field matches as "".
+function matchingRules(notification, rules) {
   var fields = { app: notification.appName, summary: notification.summary, body: notification.body }
-  return (rules || []).some(function(rule) {
-    return rule.every(function(check) { return check.pattern.test(asString(fields[check.field])) })
+  return (rules || []).filter(function(rule) {
+    return rule.checks.every(function(check) { return check.pattern.test(asString(fields[check.field])) })
   })
 }
 
-// Google Calendar reminders and rule matches are raised to critical (2).
+// Raised to critical (2) by any matching critical rule.
 function urgencyOf(notification, rules) {
-  return calendarReminder(notification) || matchesRule(notification, rules) ? 2 : Number(notification.urgency)
+  var critical = matchingRules(notification, rules).some(function(rule) { return rule.critical })
+  return critical ? 2 : Number(notification.urgency)
+}
+
+// The `{ group, keep }` of the first matching rule with one, else null.
+function dedupOf(notification, rules) {
+  var rule = matchingRules(notification, rules).find(function(rule) { return rule.dedup })
+  return rule ? rule.dedup : null
 }
 
 function snapshotOf(notification, timestamp, rules) {

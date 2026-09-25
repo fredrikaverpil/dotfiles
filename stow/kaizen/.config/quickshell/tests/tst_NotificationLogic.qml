@@ -13,28 +13,14 @@ TestCase {
     })
   }
 
-  function test_notification_calendar_reminders_name_their_source() {
-    compare(Notification.calendarReminder({ appName: "Slack", summary: "[x] from Google Calendar" }), "slack")
-    compare(Notification.calendarReminder({ appName: "Chromium", body: "calendar.google.com\n\n09:00 – 09:30" }), "chromium")
-    compare(Notification.calendarReminder({ appName: "Slack", summary: "[x] from Jira" }), "")
-    compare(Notification.calendarReminder({}), "")
-  }
-
-  function test_notification_urgency_raises_calendar_reminders_to_critical() {
-    compare(Notification.urgencyOf({ appName: "Slack", summary: "[x] from Google Calendar", urgency: 1 }), 2)
-    compare(Notification.urgencyOf({ appName: "Slack", summary: "[x] from Jira", urgency: 1 }), 1)
-    compare(Notification.urgencyOf({ appName: "Chromium", summary: "Standup", body: "calendar.google.com\n10:00 – 10:15", urgency: 1 }), 2)
-    compare(Notification.urgencyOf({ appName: "Chromium", summary: "Mail", body: "mail.google.com\ncalendar.google.com", urgency: 1 }), 1)
-    compare(Notification.urgencyOf({ appName: "Mail", summary: "from Google Calendar", urgency: 0 }), 0)
-    compare(Notification.durationFor({ appName: "Slack", summary: "[x] from Google Calendar", urgency: 1, expireTimeout: 1 }, 0, 2), 0)
-  }
-
-  function test_notification_urgency_raises_notifications_matching_every_field_of_a_rule() {
-    const rules = Notification.criticalRules([
-      { app: "^Slack$", summary: " in #?alerts$" },
-      { body: "[" },
-      {},
-      { sumary: "x" },
+  function test_notification_urgency_raises_notifications_matching_every_field_of_a_critical_rule() {
+    const rules = Notification.compileRules([
+      { match: { app: "^Slack$", summary: " in #?alerts$" }, critical: true },
+      { match: { app: "^Slack$", summary: " in #general$" } },
+      { match: { body: "[" }, critical: true },
+      { match: {}, critical: true },
+      { critical: true },
+      { match: { sumary: "x" }, critical: true },
     ])
 
     compare(Notification.urgencyOf({ appName: "Slack", summary: "[x] in #alerts", urgency: 1 }, rules), 2)
@@ -47,6 +33,21 @@ TestCase {
     compare(Notification.snapshotOf({ appName: "Slack", summary: "[x] in #alerts", urgency: 1 }, 123, rules), {
       app: "Slack", appIcon: "", summary: "[x] in #alerts", body: "", image: "", urgency: 2, timestamp: 123,
     })
+  }
+
+  function test_notification_dedup_comes_from_the_first_matching_rule_with_a_group() {
+    const rules = Notification.compileRules([
+      { match: { app: "^Chromium$", body: "^calendar\\.google\\.com\\n" }, dedup: { group: "calendar", keep: true } },
+      { match: { app: "^Slack$", summary: " from Google Calendar$" }, critical: true },
+      { match: { app: "^Slack$", summary: " from Google Calendar$" }, dedup: { group: "calendar", keep: false } },
+      { match: { app: "^Slack$" }, dedup: { group: "slack", keep: false } },
+    ])
+
+    compare(Notification.dedupOf({ appName: "Chromium", body: "calendar.google.com\n09:00 – 09:30" }, rules), { group: "calendar", keep: true })
+    compare(Notification.dedupOf({ appName: "Chromium", body: "mail.google.com\ncalendar.google.com" }, rules), null)
+    compare(Notification.dedupOf({ appName: "Slack", summary: "[x] from Google Calendar" }, rules), { group: "calendar", keep: false })
+    compare(Notification.dedupOf({ appName: "Slack", summary: "[x] in #general" }, rules), { group: "slack", keep: false })
+    compare(Notification.dedupOf({ appName: "Slack", summary: "[x] from Google Calendar" }), null)
   }
 
   function test_notification_icon_sources_preserve_schemes_and_normalize_paths() {
