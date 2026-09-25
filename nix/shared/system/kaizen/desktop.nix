@@ -199,6 +199,8 @@ in
     NIXOS_OZONE_WL = "1";
     QT_QPA_PLATFORMTHEME = "gtk3";
     GTK_USE_PORTAL = "1";
+    # The Proton Pass app's SSH agent; the socket exists only while the app runs.
+    SSH_AUTH_SOCK = "$HOME/.ssh/proton-pass-ssh-agent.sock";
   };
 
   # polkit.enable does not install the setuid pkexec wrapper.
@@ -419,6 +421,7 @@ in
     (withGnomeLibsecret inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-desktop)
     (withGnomeLibsecret obsidian)
     (withGnomeLibsecret proton-pass)
+    proton-pass-cli
     # uwsm-app rejects the upstream entry ID, which contains a space.
     (symlinkJoin {
       inherit (proton-authenticator) name;
