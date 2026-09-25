@@ -20,6 +20,18 @@
       description = "Extra Chromium --enable-features for this host";
     };
 
+    host.criticalNotifications = lib.mkOption {
+      type = lib.types.listOf (lib.types.attrsOf lib.types.str);
+      default = [ ];
+      example = [
+        {
+          app = "^Slack$";
+          summary = " in #?alerts$";
+        }
+      ];
+      description = "Kaizen raises a notification to critical when its fields (app, summary, body) match every JavaScript regex of a rule";
+    };
+
     host.extraServices = lib.mkOption {
       type = lib.types.attrs;
       default = { };

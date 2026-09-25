@@ -29,6 +29,26 @@ TestCase {
     compare(Notification.durationFor({ appName: "Slack", summary: "[x] from Google Calendar", urgency: 1, expireTimeout: 1 }, 0, 2), 0)
   }
 
+  function test_notification_urgency_raises_notifications_matching_every_field_of_a_rule() {
+    const rules = Notification.criticalRules([
+      { app: "^Slack$", summary: " in #?alerts$" },
+      { body: "[" },
+      {},
+      { sumary: "x" },
+    ])
+
+    compare(Notification.urgencyOf({ appName: "Slack", summary: "[x] in #alerts", urgency: 1 }, rules), 2)
+    compare(Notification.urgencyOf({ appName: "Slack", summary: "New message in alerts", urgency: 1 }, rules), 2)
+    compare(Notification.urgencyOf({ appName: "Slack", summary: "[x] in #general", urgency: 1 }, rules), 1)
+    compare(Notification.urgencyOf({ appName: "Chromium", summary: "[x] in #alerts", urgency: 1 }, rules), 1)
+    compare(Notification.urgencyOf({ appName: "Mail", summary: "x", body: "[", urgency: 1 }, rules), 1)
+    compare(Notification.urgencyOf({ appName: "Slack", summary: "[x] in #alerts", urgency: 1 }), 1)
+    compare(Notification.durationFor({ appName: "Slack", summary: "[x] in #alerts", urgency: 1, expireTimeout: 1 }, 0, 2, rules), 0)
+    compare(Notification.snapshotOf({ appName: "Slack", summary: "[x] in #alerts", urgency: 1 }, 123, rules), {
+      app: "Slack", appIcon: "", summary: "[x] in #alerts", body: "", image: "", urgency: 2, timestamp: 123,
+    })
+  }
+
   function test_notification_icon_sources_preserve_schemes_and_normalize_paths() {
     compare(Notification.iconSource("/tmp/icon.png"), "file:///tmp/icon.png")
     compare(Notification.iconSource("file:///tmp/icon.png"), "file:///tmp/icon.png")

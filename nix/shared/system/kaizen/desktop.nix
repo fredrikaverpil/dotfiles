@@ -230,6 +230,9 @@ in
     # The menu's emoji picker reads names from Unicode's test file.
     environment.EMOJI_TEST = "${pkgs.unicode-emoji}/share/unicode/emoji/emoji-test.txt";
     environment.EMOJI_SHORTCODES = "${emoji-shortcodes}";
+    environment.CRITICAL_NOTIFICATIONS = "${pkgs.writeText "critical-notifications.json" (
+      builtins.toJSON config.host.criticalNotifications
+    )}";
     serviceConfig = {
       ExecStart = "${pkgs.quickshell}/bin/quickshell";
       Restart = "on-failure";

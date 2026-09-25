@@ -35,6 +35,7 @@ Item {
   property var heldReminders: []
   property real lastChromiumReminder: 0
   property var shortcodes: JSON.parse(shortcodeFile.text() || "{}")
+  property var criticalRules: NotificationLogic.criticalRules(JSON.parse(criticalFile.text() || "[]"))
 
   function stateText() { return Model.stateText(doNotDisturb, historyRows) }
 
@@ -51,12 +52,12 @@ Item {
   }
 
   function recordFor(notification, existing) {
-    var record = NotificationLogic.snapshotOf(notification)
+    var record = NotificationLogic.snapshotOf(notification, Date.now(), criticalRules)
     record.summary = NotificationLogic.emojify(record.summary, shortcodes)
     record.body = NotificationLogic.emojify(record.body, shortcodes)
     record.key = existing ? existing.key : String(++nextKey)
     record.notification = notification
-    record.duration = NotificationLogic.durationFor(notification, NotificationUrgency.Low, NotificationUrgency.Critical)
+    record.duration = NotificationLogic.durationFor(notification, NotificationUrgency.Low, NotificationUrgency.Critical, criticalRules)
     record.transient = notification.transient
     return record
   }
@@ -272,6 +273,15 @@ Item {
     id: shortcodeFile
     path: Quickshell.env("EMOJI_SHORTCODES") || ""
     // Blocks the first read, so no notification is handled before the map exists.
+    blockLoading: true
+    printErrors: false
+  }
+
+  // The host's rules raising notifications to critical (host.criticalNotifications).
+  FileView {
+    id: criticalFile
+    path: Quickshell.env("CRITICAL_NOTIFICATIONS") || ""
+    // Blocks the first read, so no notification is handled before the rules exist.
     blockLoading: true
     printErrors: false
   }

@@ -20,25 +20,48 @@ function calendarReminder(notification) {
   return ""
 }
 
-// Google Calendar reminders arrive at normal urgency; they are raised to critical (2).
-function urgencyOf(notification) {
-  return calendarReminder(notification) ? 2 : Number(notification.urgency)
+// Compiles host rules of `field: pattern` (app, summary, body); a rule with a bad
+// pattern or no fields is dropped.
+function criticalRules(rules) {
+  return (Array.isArray(rules) ? rules : []).map(function(rule) {
+    var fields = Object.keys(rule || {})
+    if (fields.length === 0) return null
+    try {
+      return fields.map(function(field) { return { field: field, pattern: new RegExp(rule[field]) } })
+    } catch (error) {
+      console.warn("notifications: dropping critical rule " + JSON.stringify(rule) + ": " + error)
+      return null
+    }
+  }).filter(Boolean)
 }
 
-function snapshotOf(notification, timestamp) {
+// Whether every field of some rule matches; an unknown field matches as "".
+function matchesRule(notification, rules) {
+  var fields = { app: notification.appName, summary: notification.summary, body: notification.body }
+  return (rules || []).some(function(rule) {
+    return rule.every(function(check) { return check.pattern.test(asString(fields[check.field])) })
+  })
+}
+
+// Google Calendar reminders and rule matches are raised to critical (2).
+function urgencyOf(notification, rules) {
+  return calendarReminder(notification) || matchesRule(notification, rules) ? 2 : Number(notification.urgency)
+}
+
+function snapshotOf(notification, timestamp, rules) {
   return {
     app: asString(notification.appName),
     appIcon: asString(notification.appIcon),
     summary: asString(notification.summary),
     body: asString(notification.body),
     image: asString(notification.image),
-    urgency: urgencyOf(notification),
+    urgency: urgencyOf(notification, rules),
     timestamp: timestamp === undefined ? Date.now() : timestamp
   }
 }
 
-function durationFor(notification, lowUrgency, criticalUrgency) {
-  var urgency = urgencyOf(notification)
+function durationFor(notification, lowUrgency, criticalUrgency, rules) {
+  var urgency = urgencyOf(notification, rules)
   if (urgency === criticalUrgency || notification.resident) return 0
 
   // Zero is the spec's "never expire"; negative or unparseable means server default.
