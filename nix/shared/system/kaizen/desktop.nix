@@ -230,8 +230,8 @@ in
     # The menu's emoji picker reads names from Unicode's test file.
     environment.EMOJI_TEST = "${pkgs.unicode-emoji}/share/unicode/emoji/emoji-test.txt";
     environment.EMOJI_SHORTCODES = "${emoji-shortcodes}";
-    environment.CRITICAL_NOTIFICATIONS = "${pkgs.writeText "critical-notifications.json" (
-      builtins.toJSON config.host.criticalNotifications
+    environment.NOTIFICATION_RULES = "${pkgs.writeText "notification-rules.json" (
+      builtins.toJSON config.host.notificationRules
     )}";
     serviceConfig = {
       ExecStart = "${pkgs.quickshell}/bin/quickshell";
@@ -330,6 +330,31 @@ in
           '';
         };
     })
+  ];
+
+  # Google Calendar reminders arrive from both Slack and Chromium; Chromium's
+  # copy carries the buttons.
+  host.notificationRules = [
+    {
+      # Chromium prefixes the body with the origin.
+      match = {
+        app = "^Chromium$";
+        body = "^calendar\\.google\\.com\\n";
+      };
+      critical = true;
+      dedup = {
+        group = "calendar";
+        keep = true;
+      };
+    }
+    {
+      match = {
+        app = "^Slack$";
+        summary = " from Google Calendar$";
+      };
+      critical = true;
+      dedup.group = "calendar";
+    }
   ];
 
   host.extraSystemPackages = with pkgs; [

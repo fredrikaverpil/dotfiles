@@ -21,8 +21,8 @@ Item {
   readonly property int historyLimit: 99
   readonly property string soundPath: "/run/current-system/sw/share/sounds/freedesktop/stereo/message.oga"
   readonly property real soundVolume: 0.4
-  // How far apart Slack's and Chromium's copies of one calendar reminder may arrive.
-  readonly property int reminderWindow: 5000
+  // How far apart the copies of one dedup group's event may arrive.
+  readonly property int dedupWindow: 5000
 
   property bool stateLoaded: false
   property bool doNotDisturb: false
@@ -31,11 +31,12 @@ Item {
   property var historyRows: []
   property var live: ({})
   property int nextKey: 0
-  // Slack's calendar reminders, held back in case Chromium's own copy arrives.
-  property var heldReminders: []
-  property real lastChromiumReminder: 0
+  // Per dedup group: keys of copies held back in case its `keep` copy arrives,
+  // and when that copy last did.
+  property var held: ({})
+  property var keptAt: ({})
   property var shortcodes: JSON.parse(shortcodeFile.text() || "{}")
-  property var criticalRules: NotificationLogic.criticalRules(JSON.parse(criticalFile.text() || "[]"))
+  property var rules: NotificationLogic.compileRules(JSON.parse(rulesFile.text() || "[]"))
 
   function stateText() { return Model.stateText(doNotDisturb, historyRows) }
 
@@ -52,12 +53,12 @@ Item {
   }
 
   function recordFor(notification, existing) {
-    var record = NotificationLogic.snapshotOf(notification, Date.now(), criticalRules)
+    var record = NotificationLogic.snapshotOf(notification, Date.now(), rules)
     record.summary = NotificationLogic.emojify(record.summary, shortcodes)
     record.body = NotificationLogic.emojify(record.body, shortcodes)
     record.key = existing ? existing.key : String(++nextKey)
     record.notification = notification
-    record.duration = NotificationLogic.durationFor(notification, NotificationUrgency.Low, NotificationUrgency.Critical, criticalRules)
+    record.duration = NotificationLogic.durationFor(notification, NotificationUrgency.Low, NotificationUrgency.Critical, rules)
     record.transient = notification.transient
     return record
   }
@@ -123,18 +124,19 @@ Item {
     live[record.key] = record
     watch(record)
 
-    // Chromium's calendar reminder carries the actions, so it replaces Slack's.
-    var reminder = NotificationLogic.calendarReminder(notification)
-    if (reminder === "chromium") {
-      lastChromiumReminder = Date.now()
-      heldReminders.forEach(function(key) { root.dismiss(root.live[key]) })
-      heldReminders = []
-    } else if (reminder === "slack") {
-      if (Date.now() - lastChromiumReminder < reminderWindow) {
+    // A dedup group's `keep` copy replaces its others.
+    var dedup = NotificationLogic.dedupOf(notification, rules)
+    if (dedup && dedup.keep) {
+      var copies = held[dedup.group] || []
+      delete held[dedup.group]
+      keptAt[dedup.group] = Date.now()
+      copies.forEach(function(key) { root.dismiss(root.live[key]) })
+    } else if (dedup) {
+      if (Date.now() - (keptAt[dedup.group] || 0) < dedupWindow) {
         dismiss(record)
       } else {
-        heldReminders = heldReminders.concat(record.key)
-        reminderHold.restart()
+        held[dedup.group] = (held[dedup.group] || []).concat(record.key)
+        dedupHold.restart()
       }
       return
     }
@@ -246,13 +248,15 @@ Item {
   }
 
   Timer {
-    id: reminderHold
-    interval: root.reminderWindow
+    id: dedupHold
+    interval: root.dedupWindow
     onTriggered: {
-      root.heldReminders.forEach(function(key) {
-        if (root.live[key]) root.show(root.live[key])
-      })
-      root.heldReminders = []
+      for (var group in root.held) {
+        root.held[group].forEach(function(key) {
+          if (root.live[key]) root.show(root.live[key])
+        })
+      }
+      root.held = ({})
     }
   }
 
@@ -277,10 +281,10 @@ Item {
     printErrors: false
   }
 
-  // The host's rules raising notifications to critical (host.criticalNotifications).
+  // The host's notification rules (host.notificationRules).
   FileView {
-    id: criticalFile
-    path: Quickshell.env("CRITICAL_NOTIFICATIONS") || ""
+    id: rulesFile
+    path: Quickshell.env("NOTIFICATION_RULES") || ""
     // Blocks the first read, so no notification is handled before the rules exist.
     blockLoading: true
     printErrors: false
