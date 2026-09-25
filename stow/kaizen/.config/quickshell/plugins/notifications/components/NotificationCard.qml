@@ -30,10 +30,14 @@ Rectangle {
   readonly property string summary: String(row.summary || "")
   readonly property string body: String(row.body || "")
   readonly property string image: String(row.image || "")
+  readonly property string ruleIcon: String(row.icon || "")
   readonly property int urgency: Number(row.urgency)
   readonly property var buttons: NotificationLogic.buttons(notification ? notification.actions : [])
   readonly property color accent: urgency === 2 ? palette.rose : (urgency === 0 ? palette.off : palette.fg)
-  readonly property string icon: {
+  // A rule's icon takes the notification's place, which moves to the badge.
+  readonly property string icon: ruleIcon || ownIcon
+  readonly property string badge: ruleIcon ? ownIcon : ""
+  readonly property string ownIcon: {
     if (image) return image
     if (!appIcon) return ""
     if (appIcon.indexOf("file://") === 0 || appIcon.indexOf("image://") === 0) return appIcon
@@ -87,6 +91,29 @@ Rectangle {
         sourceSize.height: 80
         fillMode: Image.PreserveAspectFit
         asynchronous: true
+
+        // Ringed in the card's colour to set it apart from the icon.
+        Rectangle {
+          anchors.right: parent.right
+          anchors.bottom: parent.bottom
+          anchors.margins: -5
+          width: 22
+          height: 22
+          radius: 11
+          color: root.color
+          visible: root.badge.length > 0 && badgeImage.status !== Image.Error
+
+          Image {
+            id: badgeImage
+            anchors.fill: parent
+            anchors.margins: 2
+            source: root.badge
+            sourceSize.width: 36
+            sourceSize.height: 36
+            fillMode: Image.PreserveAspectFit
+            asynchronous: true
+          }
+        }
       }
 
       ColumnLayout {

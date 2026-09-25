@@ -6,7 +6,7 @@ TestCase {
   name: "NotificationModel"
 
   readonly property var record: ({
-    key: "1", app: "Mail", appIcon: "mail", summary: "Hi", body: "Body", image: "", urgency: 1, timestamp: 10,
+    key: "1", app: "Mail", appIcon: "mail", summary: "Hi", body: "Body", image: "", icon: "", urgency: 1, timestamp: 10,
   })
 
   function test_notification_state_loading_rejects_invalid_data_and_caps_history() {
@@ -22,7 +22,7 @@ TestCase {
     const newer = Object.assign({}, record, { key: "2", summary: "New" })
     const saved = Notification.savedRecord(record)
     compare(Notification.historyWith([saved, Object.assign({}, saved, { summary: "Old" })], newer, 2), [
-      { app: "Mail", appIcon: "mail", summary: "New", body: "Body", image: "", urgency: 1, timestamp: 10 },
+      { app: "Mail", appIcon: "mail", summary: "New", body: "Body", image: "", icon: "", urgency: 1, timestamp: 10 },
       saved,
     ])
   }
