@@ -8,6 +8,11 @@ function step(rows, current, forward) {
   return -1
 }
 
+// Launcher rows are rebuilt on every change and match by key; tray entries by identity.
+function sameRow(a, b) {
+  return a === b || (!!b && a.key !== undefined && a.key === b.key)
+}
+
 function clamp(value, low, high) {
   return Math.max(low, Math.min(value, high))
 }

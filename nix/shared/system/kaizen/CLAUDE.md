@@ -57,7 +57,9 @@ previous states. Explain a declaration next to it, not here.
   - Context menu (`Ui/ContextMenu.qml`): hangs from the bar button that opened
     it, on that button's output, sized to its rows; submenus cascade beside
     their row and `h`/`l` close and open them. Opened without a button
-    (launcher, IPC), it resolves the focused output from the compositor.
+    (launcher, IPC), it resolves the focused output from the compositor. It
+    shows a tray item's menu or a launcher level (`menu popup <id>`); a level
+    marked `search` opens in the launcher instead.
   All three hold exclusive keyboard focus and close each other through
   `shell.claimPanel`.
 - `Ui/Compositor.qml` is the compositor interface; `Ui/compositors/` owns niri

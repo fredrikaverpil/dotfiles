@@ -6,6 +6,8 @@ Item {
   id: root
 
   property var shell: null
+  // The bar's screen name.
+  property string output: ""
   readonly property bool mediaVisible: shell !== null && shell.media.hasMedia
 
   implicitWidth: mediaVisible ? 28 * shell.textScale : 0
@@ -22,10 +24,12 @@ Item {
     id: buttonComponent
 
     Ui.BarButton {
+      id: button
       shell: root.shell
       visible: root.mediaVisible
       label: root.mediaVisible ? root.shell.media.icon : ""
       onActivated: root.shell.media.toggle()
+      onSecondary: root.shell.menu.popup("settings.media", root.output, button)
     }
   }
 }
