@@ -57,11 +57,11 @@ Ui.Panel {
     "settings.media.player": { icon: "󰌳", label: "Player", provider: "players" },
     "settings.audio": { icon: menu.shell.audio.icon, label: "Audio" },
     "settings.audio.panel": { icon: "󰕮", label: "Audio panel", action: () => menu.shell.audio.open() },
-    "settings.audio.mute": { icon: menu.checkbox(menu.shell.audio.muted), label: "Mute output",
+    "settings.audio.mute": { icon: menu.checkbox(!menu.shell.audio.muted), label: "Sound",
       action: () => menu.shell.audio.toggleMute() },
     "settings.audio.micMute": {
-      icon: menu.checkbox(menu.shell.audio.micMuted),
-      label: "Mute microphone",
+      icon: menu.checkbox(!menu.shell.audio.micMuted),
+      label: "Microphone",
       enabled: menu.shell.audio.sources.length > 0,
       action: () => menu.shell.audio.toggleMicMute()
     },
@@ -89,7 +89,7 @@ Ui.Panel {
     "settings.bluetooth.panel": { icon: "󰕮", label: "Bluetooth panel", action: () => menu.shell.bluetooth.open() },
     "settings.bluetooth.power": {
       icon: menu.checkbox(menu.shell.bluetoothService.powered),
-      label: "Powered",
+      label: "Bluetooth",
       enabled: menu.shell.bluetoothService.available,
       action: () => menu.shell.bluetoothService.togglePower()
     },
@@ -133,8 +133,8 @@ Ui.Panel {
     "settings.notifications.clear": { icon: "󰃢", label: "Clear",
       action: () => menu.shell.notifications.clearHistory() },
     "settings.notifications.dnd": {
-      icon: menu.checkbox(menu.shell.notifications.doNotDisturb),
-      label: "Do Not Disturb",
+      icon: menu.checkbox(!menu.shell.notifications.doNotDisturb),
+      label: "Notifications",
       action: () => menu.shell.notifications.setDoNotDisturb(!menu.shell.notifications.doNotDisturb)
     },
     "settings.weather": { icon: menu.shell.weatherService.icon, label: "Weather" },

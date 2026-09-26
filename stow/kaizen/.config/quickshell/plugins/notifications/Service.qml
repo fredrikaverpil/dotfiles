@@ -470,7 +470,7 @@ Item {
 
       Text {
         Layout.fillWidth: true
-        text: "Received during Do Not Disturb"
+        text: "Arrived while notifications were off"
         color: root.palette.fg
         font.family: Ui.Fonts.mono
         font.pixelSize: 18
@@ -483,8 +483,8 @@ Item {
       }
 
       HeaderButton {
-        label: "Do Not Disturb"
-        active: root.doNotDisturb
+        label: "Notifications"
+        active: !root.doNotDisturb
         onActivated: root.setDoNotDisturb(!root.doNotDisturb)
       }
     }
@@ -532,7 +532,7 @@ Item {
 
         Text {
           visible: historyCards.count === 0
-          text: "Nothing arrived during Do Not Disturb"
+          text: "Nothing arrived while notifications were off"
           color: root.palette.off
           font.family: Ui.Fonts.mono
           font.pixelSize: 14
