@@ -30,7 +30,7 @@ Ui.Panel {
   cardWidth: 460
   // Each warning wraps to about two lines; the card grows rather than clipping
   // the rows or swallowing the reason a change did not land.
-  cardHeight: 344 + warnings.length * 40
+  cardHeight: 356 + warnings.length * 40
   keyNavigation: true
   // Held unmapped until a probe replaces the time left from the last open.
   visible: shown && service.fresh
@@ -51,6 +51,9 @@ Ui.Panel {
     const abbreviation = Model.abbreviationLabel(info.abbreviation, info.offset)
     return (abbreviation === "" ? "" : abbreviation + "   ") + Model.offsetLabel(seconds)
   }
+
+  // The launcher claims focus and closes this panel.
+  function pickZone() { root.shell.menu.open("settings.clock.timezone") }
 
   // date(1) and zdump run only while this is on screen.
   Binding {
@@ -90,14 +93,6 @@ Ui.Panel {
     font.family: Ui.Fonts.mono
     font.pixelSize: 18
     text: "Clock"
-  }
-
-  Text {
-    width: parent.width
-    color: root.shell.palette.off
-    font.family: Ui.Fonts.mono
-    font.pixelSize: 13
-    text: "Pick a timezone from Go › Settings › Clock › Timezone"
   }
 
   Rectangle {
@@ -160,6 +155,38 @@ Ui.Panel {
         font.pixelSize: 13
         text: fieldRow.modelData.value
       }
+    }
+  }
+
+  Item {
+    width: parent.width
+    height: 4
+  }
+
+  Rectangle {
+    width: parent.width
+    height: 28
+    radius: 4
+    color: activeFocus ? root.shell.palette.sel : "transparent"
+    border.color: activeFocus ? root.shell.palette.fg : root.shell.palette.dim
+    border.width: 1
+    activeFocusOnTab: true
+
+    Keys.onReturnPressed: root.pickZone()
+    Keys.onEnterPressed: root.pickZone()
+    Keys.onSpacePressed: root.pickZone()
+
+    Text {
+      anchors.centerIn: parent
+      color: root.shell.palette.fg
+      font.family: Ui.Fonts.mono
+      font.pixelSize: 13
+      text: "󰅐 Change timezone"
+    }
+
+    MouseArea {
+      anchors.fill: parent
+      onClicked: root.pickZone()
     }
   }
 }
