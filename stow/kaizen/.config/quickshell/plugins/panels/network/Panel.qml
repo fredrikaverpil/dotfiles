@@ -174,7 +174,7 @@ Ui.Panel {
 
           ActionButton {
             width: 88
-            label: "Wi-Fi"
+            label: "Enabled"
             active: root.service.wifiEnabled
             onActivated: root.service.toggleWifi()
           }

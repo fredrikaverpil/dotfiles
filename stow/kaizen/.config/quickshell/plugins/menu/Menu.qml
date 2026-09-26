@@ -161,7 +161,7 @@ Ui.Panel {
     },
     "settings.session": { icon: "󰐥", label: "Session" },
     "settings.session.lock": { icon: "", label: "Lock", action: () => menu.shell.lock.beginLock() },
-    "settings.session.screensaver": { icon: "󰛑", label: "Screensaver", action: () => menu.shell.screensaver.show() },
+    "settings.session.curtain": { icon: "󰛑", label: "Curtain", action: () => menu.shell.curtain.show() },
     "settings.session.idle": {
       icon: menu.checkbox(menu.shell.idle.enabled),
       label: "Idle locking",
