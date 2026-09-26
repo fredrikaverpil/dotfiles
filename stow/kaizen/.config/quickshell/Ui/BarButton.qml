@@ -19,7 +19,7 @@ Rectangle {
   width: implicitWidth
   height: Math.round(24 * btn.shell.textScale)
   radius: 4
-  color: btnMouse.containsMouse ? btn.shell.palette.sel : "transparent"
+  color: btnHover.hovered ?btn.shell.palette.sel : "transparent"
 
   TextMetrics {
     id: btnMetrics
@@ -53,14 +53,18 @@ Rectangle {
     font.pixelSize: btn.fontSize * btn.shell.textScale
   }
 
-  MouseArea {
-    id: btnMouse
-    anchors.fill: parent
-    hoverEnabled: true
+  HoverHandler {
+    id: btnHover
+  }
+
+  // Not a MouseArea: a press that moves compositor focus off a focused surface on
+  // another output deactivates the app, which cancels exclusive grabs. A tap's
+  // passive grab survives, so the release still clicks.
+  TapHandler {
     acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-    onClicked: function (mouse) {
-      if (mouse.button === Qt.RightButton) btn.secondary()
-      else if (mouse.button === Qt.MiddleButton) btn.middle()
+    onTapped: function (eventPoint, button) {
+      if (button === Qt.RightButton) btn.secondary()
+      else if (button === Qt.MiddleButton) btn.middle()
       else btn.activated()
     }
   }
