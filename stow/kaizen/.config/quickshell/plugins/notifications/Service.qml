@@ -483,7 +483,7 @@ Item {
       }
 
       HeaderButton {
-        label: "Notifications"
+        label: "Enabled"
         active: !root.doNotDisturb
         onActivated: root.setDoNotDisturb(!root.doNotDisturb)
       }

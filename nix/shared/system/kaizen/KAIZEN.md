@@ -76,7 +76,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | weather | [met.no locationforecast] | button | Settings › Weather | `weather` |
 | notifications | [Desktop Notifications] server | bell button | Settings › Notifications | `notifications` |
 | lock | [ext-session-lock] + [PAM] `kaizen-lock` | – | Settings › Session | `lock` |
-| screensaver | [wlr-layer-shell] curtain + [PAM] | – | Settings › Session | `screensaver` |
+| curtain | [wlr-layer-shell] + [PAM] | – | Settings › Session | `curtain` |
 | polkit agent | [polkit] | – | dialog on request | – |
 | tray | [StatusNotifierItem] | tray | Tray | `tray` |
 | background | wallpaper files, theme state | – | Settings › Display | `wallpaper`, `theme` |
@@ -140,7 +140,7 @@ Launcher (plugins/menu)            keyboard entry point; drills down levels
 Panel (Ui/Panel)                   centered card; h/l step focus
 Context menu (Ui/ContextMenu)      hangs from the bar button that opened it
 Bar (plugins/bar)                  one PanelWindow per output
-Notifications, Lock, Polkit, Background, Screensaver   own layer surfaces
+Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 ```
 
 - Launcher, panel and context menu hold exclusive keyboard focus and close

@@ -23,7 +23,7 @@ import "plugins/panels/timezone" as Timezone
 import "plugins/panels/tray" as Tray
 import "plugins/panels/weather" as Weather
 import "plugins/polkit" as Polkit
-import "plugins/screensaver" as Screensaver
+import "plugins/curtain" as Curtain
 import "plugins/services/battery" as BatteryService
 import "plugins/services/bluetooth" as BluetoothService
 import "plugins/services/brightness" as Brightness
@@ -52,7 +52,7 @@ ShellRoot {
   readonly property alias media: media
   readonly property alias display: display
   readonly property alias brightness: brightness
-  readonly property alias screensaver: screensaver
+  readonly property alias curtain: curtain
   readonly property alias network: network
   readonly property alias networkService: networkService
   readonly property alias bluetooth: bluetooth
@@ -210,8 +210,8 @@ ShellRoot {
     lockService: lock
   }
 
-  Screensaver.Service {
-    id: screensaver
+  Curtain.Service {
+    id: curtain
     shell: root
     brightnessService: brightness
   }

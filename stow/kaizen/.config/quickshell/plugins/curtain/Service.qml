@@ -6,7 +6,7 @@ import Quickshell.Wayland
 
 import "../lock" as LockUi
 import "../lock/LockModel.js" as Auth
-import "ScreensaverModel.js" as Model
+import "CurtainModel.js" as Model
 
 // A privacy curtain, not a lock. It is a layer surface rather than a
 // WlSessionLock so that toggling it off leaves a capturable desktop behind:
@@ -140,7 +140,7 @@ Item {
       }
 
       WlrLayershell.layer: WlrLayer.Overlay
-      WlrLayershell.namespace: "kaizen-screensaver"
+      WlrLayershell.namespace: "kaizen-curtain"
       // Every output is exclusive: niri focuses only the active output's
       // exclusive layer, and a click makes the output under it active.
       WlrLayershell.keyboardFocus: root.active ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
@@ -222,7 +222,7 @@ Item {
   }
 
   IpcHandler {
-    target: "screensaver"
+    target: "curtain"
 
     // `qs ipc call <target> show` is parsed as the CLI's own `show`.
     function open(): string {
