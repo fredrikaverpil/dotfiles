@@ -59,27 +59,27 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 
 | Service | Subsystem | Bar | Panel / launcher | IPC |
 | --- | --- | --- | --- | --- |
-| audio (panel only) | [PipeWire] via [Quickshell] | volume button | Setup › Audio | `audio` |
-| battery | [UPower], [sysfs power_supply] thresholds, [power-profiles-daemon] | battery button | Setup › Power | `battery` |
-| bluetooth | [BlueZ] via [Quickshell] | button | Setup › Bluetooth | `bluetooth` |
+| audio (panel only) | [PipeWire] via [Quickshell] | volume button | Settings › Audio | `audio` |
+| battery | [UPower], [sysfs power_supply] thresholds, [power-profiles-daemon] | battery button | Settings › Power | `battery` |
+| bluetooth | [BlueZ] via [Quickshell] | button | Settings › Bluetooth | `bluetooth` |
 | brightness | [sysfs backlight] via [logind] SetBrightness | – | XF86 keys | `brightness` |
-| calendar | [dcal] JSON IPC | date button | Panels › Calendar | `calendar` |
-| clipboard | [wl-clipboard] watcher, in memory | – | Trigger › Clipboard | `clipboard` |
-| idle | [ext-idle-notify], lock service | – | System › Idle | `idle` |
-| keyboard | [niri] XKB layouts | layout button | Setup › Keyboard | `keyboard` |
-| media | [MPRIS] | now-playing widget | Panels › Media | `media` |
-| network | [NetworkManager], `ip -j` | button | Setup › Network | `network` |
-| nightlight | [wl-gammarelay-rs] over D-Bus, the weather location for the solar position | – | Setup › Nightlight | `nightlight` |
-| recording | [gpu-screen-recorder], [grim], [satty], [PipeWire] | recording indicator | Trigger › Record, Screenshot (region, desktop, window) | `recording` |
-| system | [hwmon], `/proc` load | monitor button | Setup › Display | `system`, `display` |
-| timezone | [timedated] via `timedatectl`, `zdump` for the DST rules | time button | Panels › Clock, Setup › Timezone | `timezone` |
-| weather | [met.no locationforecast] | button | Panels › Weather, Setup › Weather location | `weather` |
-| notifications | [Desktop Notifications] server | – | System › Notifications | `notifications` |
-| lock | [ext-session-lock] + [PAM] `kaizen-lock` | – | System › Lock | `lock` |
-| screensaver | [wlr-layer-shell] curtain + [PAM] | – | System › Screensaver | `screensaver` |
+| calendar | [dcal] JSON IPC | date button | Settings › Calendar | `calendar` |
+| clipboard | [wl-clipboard] watcher, in memory | clipboard button | Settings › Clipboard | `clipboard` |
+| idle | [ext-idle-notify], lock service | idle indicator | Settings › Session | `idle` |
+| keyboard | [niri] XKB layouts | layout indicator | Settings › Keyboard layout | `keyboard` |
+| media | [MPRIS] | now-playing widget | Settings › Media | `media` |
+| network | [NetworkManager], `ip -j` | button | Settings › Network | `network` |
+| nightlight | [wl-gammarelay-rs] over D-Bus, the weather location for the solar position | – | Settings › Display › Nightlight | `nightlight` |
+| recording | [gpu-screen-recorder], [grim], [satty], [PipeWire] | recording indicator | Trigger › Record, Pause, Stop, Screenshot (region, desktop, window) | `recording` |
+| system | [hwmon], `/proc` load | monitor button | Settings › Display | `system`, `display` |
+| timezone | [timedated] via `timedatectl`, `zdump` for the DST rules | time button | Settings › Clock | `timezone` |
+| weather | [met.no locationforecast] | button | Settings › Weather | `weather` |
+| notifications | [Desktop Notifications] server | bell button | Settings › Notifications | `notifications` |
+| lock | [ext-session-lock] + [PAM] `kaizen-lock` | – | Settings › Session | `lock` |
+| screensaver | [wlr-layer-shell] curtain + [PAM] | – | Settings › Session | `screensaver` |
 | polkit agent | [polkit] | – | dialog on request | – |
 | tray | [StatusNotifierItem] | tray | Tray | `tray` |
-| background | wallpaper files, theme state | – | Style | `wallpaper`, `theme` |
+| background | wallpaper files, theme state | – | Settings › Display | `wallpaper`, `theme` |
 | menu | launcher | menu button | `Mod+Space` | `menu` |
 
 [PipeWire]: https://pipewire.org
@@ -134,8 +134,8 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 ```
 Launcher (plugins/menu)            keyboard entry point; drills down levels
   ├─ Apps, Keybindings, Emoji     providers
-  ├─ Style / Trigger / Panels     open panels or run compositor actions
-  ├─ Setup / System               settings panels, session actions
+  ├─ Trigger                      screenshots, recording, window actions
+  ├─ Settings                     per bar button: its panel, then its actions; Session
   └─ Tray                         tray menus, cascaded per level
 Panel (Ui/Panel)                   centered card; h/l step focus
 Context menu (Ui/ContextMenu)      hangs from the bar button that opened it
@@ -146,7 +146,9 @@ Notifications, Lock, Polkit, Background, Screensaver   own layer surfaces
 - Launcher, panel and context menu hold exclusive keyboard focus and close
   each other through `shell.claimPanel`. Pick by what opens the surface.
 - Every surface opens over IPC; niri binds are `spawn qs ipc call ...`.
-- The bar mirrors the launcher; nothing is reachable only from it.
+- The bar mirrors the launcher; nothing is reachable only from it. Every
+  panel action is a launcher row under Settings, except sliders and per-item
+  detail (forgetting a network, recording options).
 - `Ui/Compositor.qml` is the only path to niri.
 
 ## Session lifecycle

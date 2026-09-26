@@ -14,6 +14,11 @@ Ui.Panel {
   cardHeight: 350
   keyNavigation: true
 
+  function openForecast() {
+    Quickshell.execDetached(["xdg-open", Model.yrUrl(root.service.latitude, root.service.longitude)])
+    root.close()
+  }
+
   IpcHandler {
     target: "weather"
 
@@ -204,11 +209,6 @@ Ui.Panel {
     Rectangle {
       id: yrButton
 
-      function openForecast() {
-        Quickshell.execDetached(["xdg-open", Model.yrUrl(root.service.latitude, root.service.longitude)])
-        root.close()
-      }
-
       width: (parent.width - parent.spacing) / 2
       height: 28
       radius: 4
@@ -217,9 +217,9 @@ Ui.Panel {
       border.width: 1
       activeFocusOnTab: true
 
-      Keys.onReturnPressed: openForecast()
-      Keys.onEnterPressed: openForecast()
-      Keys.onSpacePressed: openForecast()
+      Keys.onReturnPressed: root.openForecast()
+      Keys.onEnterPressed: root.openForecast()
+      Keys.onSpacePressed: root.openForecast()
 
       Text {
         anchors.centerIn: parent
@@ -231,7 +231,7 @@ Ui.Panel {
 
       MouseArea {
         anchors.fill: parent
-        onClicked: yrButton.openForecast()
+        onClicked: root.openForecast()
       }
     }
   }

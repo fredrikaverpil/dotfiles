@@ -97,7 +97,7 @@ Ui.Panel {
     color: root.shell.palette.off
     font.family: Ui.Fonts.mono
     font.pixelSize: 13
-    text: "Pick a timezone from Go › Setup › Timezone"
+    text: "Pick a timezone from Go › Settings › Clock › Timezone"
   }
 
   Rectangle {

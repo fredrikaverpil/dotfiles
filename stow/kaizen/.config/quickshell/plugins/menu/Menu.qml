@@ -4,6 +4,8 @@ import Quickshell.Io
 import Quickshell.Services.SystemTray
 
 import "../bar/widgets/TrayModel.js" as TrayModel
+import "../services/bluetooth/BluetoothModel.js" as BluetoothModel
+import "../services/media/MediaModel.js" as MediaModel
 import "../services/timezone/ZonesModel.js" as ZonesModel
 import "../services/weather/PlacesModel.js" as PlacesModel
 import "MenuModel.js" as Model
@@ -16,12 +18,7 @@ Ui.Panel {
   readonly property var items: ({
     "apps": { icon: "󰀻", label: "Apps", provider: "apps" },
     "keybindings": { icon: "", label: "Keybindings", provider: "binds" },
-    "style": { icon: "", label: "Style" },
-    "style.wallpaper": { icon: "", label: "Wallpaper (workspace)", action: () => menu.shell.background.open("workspace") },
-    "style.backdrop": { icon: "", label: "Wallpaper (backdrop)", action: () => menu.shell.background.open("backdrop") },
-    "style.theme": { icon: "", label: "Theme" },
-    "style.theme.dark": { icon: "", label: "Dark", action: () => menu.shell.setDark(true) },
-    "style.theme.light": { icon: "", label: "Light", action: () => menu.shell.setDark(false) },
+    "tray": { icon: "󰘔", label: "Tray", provider: "tray" },
     "trigger": { icon: "󱓞", label: "Trigger" },
     "trigger.screenshot": { icon: "", label: "Screenshot (desktop)",
       action: () => menu.shell.recordingService.shoot("screen") },
@@ -30,54 +27,161 @@ Ui.Panel {
     "trigger.screenshotRegion": { icon: "", label: "Screenshot (region)",
       action: () => menu.shell.recordingService.screenshot() },
     "trigger.record": { icon: "󰑊", label: "Record screen", action: () => menu.shell.recording.open() },
+    "trigger.pause": {
+      icon: menu.checkbox(menu.shell.recordingService.paused),
+      label: "Pause recording",
+      enabled: menu.shell.recordingService.recording,
+      action: () => menu.shell.recordingService.togglePause()
+    },
+    "trigger.stop": { icon: "󰓛", label: "Stop recording", enabled: menu.shell.recordingService.busy,
+      action: () => menu.shell.recordingService.stop() },
     "trigger.emoji": { icon: "", label: "Emoji", provider: "emoji" },
     "trigger.color": { icon: "󰃉", label: "Color picker", action: () => menu.shell.systemService.pickColor() },
-    "trigger.clipboard": { icon: "\u{F014C}", label: "Clipboard", action: () => menu.shell.clipboard.open() },
-    "panels": { icon: "󰕮", label: "Panels" },
-    "panels.media": { icon: menu.shell.media.icon, label: "Media", action: () => menu.shell.media.open() },
-    "panels.weather": { icon: menu.shell.weatherService.icon, label: "Weather", action: () => menu.shell.weather.open() },
-    "panels.calendar": { icon: "󰃭", label: "Calendar", action: () => menu.shell.calendar.open() },
-    "panels.clock": { icon: "󰅐", label: "Clock", action: () => menu.shell.timezone.open() },
-    "tray": { icon: "󰘔", label: "Tray", provider: "tray" },
-    "setup": { icon: "", label: "Setup" },
-    "setup.display": { icon: "󰍹", label: "Display", action: () => menu.shell.display.open() },
-    "setup.network": { icon: "󰈀", label: "Network", action: () => menu.shell.network.open() },
-    "setup.bluetooth": { icon: "󰂯", label: "Bluetooth", action: () => menu.shell.bluetooth.open() },
-    "setup.audio": { icon: "󰕾", label: "Audio", action: () => menu.shell.audio.open() },
-    "setup.power": { icon: "󰂄", label: "Power", action: () => menu.shell.battery.open() },
-    "setup.nightlight": { icon: "󰆔", label: "Nightlight", action: () => menu.shell.nightlight.toggle() },
-    "setup.weather": { icon: menu.shell.weatherService.icon, label: "Weather location", provider: "places" },
-    "setup.timezone": { icon: "󰅐", label: "Timezone", provider: "zones" },
-    "setup.keyboard": { icon: "󰌌", label: "Keyboard layout" },
-    "setup.keyboard.us": {
+    "trigger.close": { icon: "󰅖", label: "Close window", action: () => Quickshell.execDetached(
+      Ui.Compositor.closeWindow())
+    },
+    // One node per panel button, in bar order, each opening its panel first.
+    "settings": { icon: "", label: "Settings" },
+    "settings.media": { icon: menu.shell.media.icon, label: "Media" },
+    "settings.media.panel": { icon: "󰕮", label: "Media panel", action: () => menu.shell.media.open() },
+    "settings.media.playPause": { icon: "󰐎", label: "Play/Pause", enabled: menu.hasPlayer,
+      action: () => menu.shell.media.service.runAction("playPause") },
+    "settings.media.next": { icon: "󰒭", label: "Next", enabled: menu.hasPlayer,
+      action: () => menu.shell.media.service.runAction("next") },
+    "settings.media.previous": { icon: "󰒮", label: "Previous", enabled: menu.hasPlayer,
+      action: () => menu.shell.media.service.runAction("previous") },
+    "settings.media.player": { icon: "󰌳", label: "Player", provider: "players" },
+    "settings.audio": { icon: menu.shell.audio.icon, label: "Audio" },
+    "settings.audio.panel": { icon: "󰕮", label: "Audio panel", action: () => menu.shell.audio.open() },
+    "settings.audio.mute": { icon: menu.checkbox(menu.shell.audio.muted), label: "Mute output",
+      action: () => menu.shell.audio.toggleMute() },
+    "settings.audio.micMute": {
+      icon: menu.checkbox(menu.shell.audio.micMuted),
+      label: "Mute microphone",
+      enabled: menu.shell.audio.sources.length > 0,
+      action: () => menu.shell.audio.toggleMicMute()
+    },
+    "settings.audio.output": { icon: "󰓃", label: "Output", provider: "sinks" },
+    "settings.display": { icon: "󰍹", label: "Display" },
+    "settings.display.panel": { icon: "󰕮", label: "Display panel", action: () => menu.shell.display.open() },
+    "settings.display.theme": { icon: "", label: "Theme" },
+    "settings.display.theme.dark": { icon: menu.shell.dark ? "󰄬" : "", label: "Dark",
+      action: () => menu.shell.setDark(true) },
+    "settings.display.theme.light": { icon: menu.shell.dark ? "" : "󰄬", label: "Light",
+      action: () => menu.shell.setDark(false) },
+    "settings.display.nightlight": { icon: "󰆔", label: "Nightlight" },
+    "settings.display.nightlight.off": { icon: menu.shell.nightlight.mode === "off" ? "󰄬" : "󰆔", label: "Off",
+      action: () => menu.shell.nightlight.setMode("off") },
+    "settings.display.nightlight.auto": { icon: menu.shell.nightlight.mode === "auto" ? "󰄬" : "󰆔", label: "Auto",
+      action: () => menu.shell.nightlight.setMode("auto") },
+    "settings.display.nightlight.on": { icon: menu.shell.nightlight.mode === "on" ? "󰄬" : "󰆔", label: "On",
+      action: () => menu.shell.nightlight.setMode("on") },
+    "settings.display.textSize": { icon: "󰛖", label: "Text size", provider: "textScales" },
+    "settings.display.wallpaper": { icon: "", label: "Wallpaper (workspace)",
+      action: () => menu.shell.background.open("workspace") },
+    "settings.display.backdrop": { icon: "", label: "Wallpaper (backdrop)",
+      action: () => menu.shell.background.open("backdrop") },
+    "settings.bluetooth": { icon: menu.shell.bluetoothService.icon, label: "Bluetooth" },
+    "settings.bluetooth.panel": { icon: "󰕮", label: "Bluetooth panel", action: () => menu.shell.bluetooth.open() },
+    "settings.bluetooth.power": {
+      icon: menu.checkbox(menu.shell.bluetoothService.powered),
+      label: "Powered",
+      enabled: menu.shell.bluetoothService.available,
+      action: () => menu.shell.bluetoothService.togglePower()
+    },
+    "settings.bluetooth.devices": { icon: "󰂱", label: "Devices", provider: "devices" },
+    "settings.bluetooth.pair": { icon: "󰐕", label: "Pair new device…", enabled: menu.shell.bluetoothService.available,
+      action: () => Quickshell.execDetached(["ghostty", "-e", "bluetui"]) },
+    "settings.network": { icon: menu.shell.networkService.icon, label: "Network" },
+    "settings.network.panel": { icon: "󰕮", label: "Network panel", action: () => menu.shell.network.open() },
+    "settings.network.wifi": {
+      icon: menu.checkbox(menu.shell.networkService.wifiEnabled),
+      label: "Wi-Fi",
+      enabled: menu.shell.networkService.wifiDevice !== null,
+      action: () => menu.shell.networkService.toggleWifi()
+    },
+    // The scanner runs only while the panel is open.
+    "settings.network.scan": {
+      icon: "󰐷",
+      label: "Scan",
+      enabled: menu.shell.networkService.wifiEnabled,
+      action: () => {
+        menu.shell.network.open()
+        menu.shell.networkService.scan()
+      }
+    },
+    "settings.network.networks": { icon: "󰖩", label: "Wi-Fi networks", provider: "networks" },
+    "settings.network.editor": { icon: "󰌘", label: "Connection settings…",
+      action: () => Quickshell.execDetached(["nm-connection-editor"]) },
+    "settings.power": { icon: menu.shell.batteryService.icon, label: "Power" },
+    "settings.power.panel": { icon: "󰕮", label: "Power panel", action: () => menu.shell.battery.open() },
+    "settings.power.profile": { icon: "󰓅", label: "Profile" },
+    "settings.power.profile.saver": menu.profileItem("power-saver", "󰌪", "Saver"),
+    "settings.power.profile.balanced": menu.profileItem("balanced", "󰊚", "Balanced"),
+    "settings.power.profile.performance": menu.profileItem("performance", "󰓅", "Performance"),
+    "settings.clipboard": { icon: "\u{F014C}", label: "Clipboard" },
+    "settings.clipboard.panel": { icon: "󰕮", label: "Clipboard panel", action: () => menu.shell.clipboard.open() },
+    "settings.clipboard.clear": { icon: "󰃢", label: "Clear history",
+      action: () => menu.shell.clipboard.service.clear() },
+    "settings.notifications": { icon: "󰂚", label: "Notifications" },
+    "settings.notifications.panel": { icon: "󰕮", label: "Notifications panel",
+      action: () => menu.shell.notifications.showHistory() },
+    "settings.notifications.clear": { icon: "󰃢", label: "Clear",
+      action: () => menu.shell.notifications.clearHistory() },
+    "settings.notifications.dnd": {
+      icon: menu.checkbox(menu.shell.notifications.doNotDisturb),
+      label: "Do Not Disturb",
+      action: () => menu.shell.notifications.setDoNotDisturb(!menu.shell.notifications.doNotDisturb)
+    },
+    "settings.weather": { icon: menu.shell.weatherService.icon, label: "Weather" },
+    "settings.weather.panel": { icon: "󰕮", label: "Weather panel", action: () => menu.shell.weather.open() },
+    "settings.weather.refresh": { icon: "󰑐", label: "Refresh", action: () => menu.shell.weatherService.refresh() },
+    "settings.weather.forecast": { icon: "󰖐", label: "Today on yr.no", action: () => menu.shell.weather.openForecast() },
+    "settings.weather.location": { icon: "󰖐", label: "Location", provider: "places" },
+    "settings.calendar": { icon: "󰃭", label: "Calendar" },
+    "settings.calendar.panel": { icon: "󰕮", label: "Calendar panel", action: () => menu.shell.calendar.open() },
+    "settings.calendar.refresh": { icon: "󰑐", label: "Refresh", action: () => menu.shell.calendar.service.refresh() },
+    "settings.clock": { icon: "󰅐", label: "Clock" },
+    "settings.clock.panel": { icon: "󰕮", label: "Clock panel", action: () => menu.shell.timezone.open() },
+    "settings.clock.timezone": { icon: "󰅐", label: "Timezone", provider: "zones" },
+    "settings.keyboard": { icon: "󰌌", label: "Keyboard layout" },
+    "settings.keyboard.us": {
       icon: menu.shell.keyboard.index === 0 ? "󰄬" : "󰌌",
       label: "English (US)",
       action: () => menu.shell.keyboard.set(0)
     },
-    "setup.keyboard.se": {
+    "settings.keyboard.se": {
       icon: menu.shell.keyboard.index === 1 ? "󰄬" : "󰌌",
       label: "Swedish",
       action: () => menu.shell.keyboard.set(1)
     },
-    "system": { icon: "", label: "System" },
-    "system.close": { icon: "󰅖", label: "Close window", action: () => Quickshell.execDetached(
-      Ui.Compositor.closeWindow())
-    },
-    "system.notifications": { icon: "󰂚", label: "Notifications" },
-    "system.notifications.history": { icon: "󰎟", label: "History", action: () => menu.shell.notifications.showHistory() },
-    "system.notifications.dnd": { icon: "󰂛", label: "Toggle Do Not Disturb (DnD)", action: () => menu.shell.notifications.setDoNotDisturb(!menu.shell.notifications.doNotDisturb) },
-    "system.lock": { icon: "", label: "Lock", action: () => menu.shell.lock.beginLock() },
-    "system.screensaver": { icon: "󰛑", label: "Screensaver", action: () => menu.shell.screensaver.show() },
-    "system.idle": {
-      icon: menu.shell.idle.enabled ? "󰾪" : "󰅶",
-      label: menu.shell.idle.enabled ? "Disable idle locking" : "Enable idle locking",
+    "settings.session": { icon: "󰐥", label: "Session" },
+    "settings.session.lock": { icon: "", label: "Lock", action: () => menu.shell.lock.beginLock() },
+    "settings.session.screensaver": { icon: "󰛑", label: "Screensaver", action: () => menu.shell.screensaver.show() },
+    "settings.session.idle": {
+      icon: menu.checkbox(menu.shell.idle.enabled),
+      label: "Idle locking",
       action: () => menu.shell.idle.setEnabled(!menu.shell.idle.enabled)
     },
-    "system.suspend": { icon: "󰒲", label: "Suspend", action: () => menu.run("systemctl suspend") },
-    "system.logout": { icon: "󰍃", label: "Logout", action: () => menu.run("uwsm stop") },
-    "system.reboot": { icon: "󰜉", label: "Reboot", action: () => menu.run("systemctl reboot") },
-    "system.shutdown": { icon: "󰐥", label: "Shutdown", action: () => menu.run("systemctl poweroff") },
+    "settings.session.suspend": { icon: "󰒲", label: "Suspend", action: () => menu.run("systemctl suspend") },
+    "settings.session.logout": { icon: "󰍃", label: "Logout", action: () => menu.run("uwsm stop") },
+    "settings.session.reboot": { icon: "󰜉", label: "Reboot", action: () => menu.run("systemctl reboot") },
+    "settings.session.shutdown": { icon: "󰐥", label: "Shutdown", action: () => menu.run("systemctl poweroff") },
   })
+
+  readonly property bool hasPlayer: menu.shell.media.service.activePlayer !== null
+
+  function checkbox(on) { return on ? "󰄲" : "󰄱" }
+
+  function profileItem(name, icon, label) {
+    const service = menu.shell.batteryService
+    return {
+      icon: service.profile === name ? "󰄬" : icon,
+      label: label,
+      enabled: service.profiles.indexOf(name) >= 0,
+      action: () => service.setProfile(name),
+    }
+  }
 
   function run(cmd) { Quickshell.execDetached(["sh", "-c", cmd]) }
 
@@ -174,6 +278,62 @@ Ui.Panel {
     }))
   }
 
+  function playerRows() {
+    const service = menu.shell.media.service
+    const active = service.playerKey(service.activePlayer)
+    return service.sourcePlayers.map(player => ({
+      label: MediaModel.labelFor(player),
+      icon: service.playerKey(player) === active ? "󰄬" : "󰌳",
+      detail: MediaModel.detailFor(player),
+      enabled: true,
+      action: () => service.selectPlayer(service.playerKey(player)),
+    }))
+  }
+
+  function sinkRows() {
+    const audio = menu.shell.audio
+    return audio.sinks.map(node => ({
+      label: audio.label(node),
+      icon: node === audio.sink ? "󰄬" : "󰓃",
+      detail: "",
+      enabled: true,
+      action: () => audio.setDefault(node),
+    }))
+  }
+
+  function textScaleRows() {
+    return menu.shell.display.textScales.map(value => ({
+      label: Math.round(value * 100) + "%",
+      icon: Math.abs(value - menu.shell.textScale) < 0.01 ? "󰄬" : "󰛖",
+      detail: "",
+      enabled: true,
+      action: () => menu.shell.setTextScale(value),
+    }))
+  }
+
+  function deviceRows() {
+    const service = menu.shell.bluetoothService
+    return (service.powered ? service.devices : []).map(device => ({
+      label: BluetoothModel.deviceName(device),
+      icon: device.connected ? "󰄬" : service.deviceIcon(device),
+      detail: service.deviceStatus(device),
+      enabled: true,
+      action: () => service.toggleConnection(device),
+    }))
+  }
+
+  // Known networks only: the scanner runs while the Network panel is open.
+  function networkRows() {
+    const service = menu.shell.networkService
+    return (service.wifiEnabled ? service.wifiNetworks : []).map(network => ({
+      label: network.name,
+      icon: network.connected ? "󰄬" : "󰖩",
+      detail: service.wifiStatus(network),
+      enabled: true,
+      action: () => service.activate(network),
+    }))
+  }
+
   IpcHandler {
     target: "menu"
 
@@ -190,6 +350,11 @@ Ui.Panel {
     places: function() { return menu.placeRows() },
     zones: function() { return menu.zoneRows() },
     emoji: function() { return menu.emojis },
+    players: function() { return menu.playerRows() },
+    sinks: function() { return menu.sinkRows() },
+    textScales: function() { return menu.textScaleRows() },
+    devices: function() { return menu.deviceRows() },
+    networks: function() { return menu.networkRows() },
   })
 
   function selectFirstEnabled() {
