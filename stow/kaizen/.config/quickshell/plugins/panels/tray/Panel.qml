@@ -30,7 +30,7 @@ Ui.ContextMenu {
 
   // output is the bar's screen name; without one the menu opens on the focused output.
   function openFor(trayItem, output) {
-    if (shown && item === trayItem) {
+    if (shown && item === trayItem && (!output || screen?.name === output)) {
       close()
       return
     }
