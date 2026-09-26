@@ -21,7 +21,7 @@ Ui.Panel {
     // search: too many rows to scan without it, so a context menu hands the
     // level to the launcher.
     "apps": { icon: "󰀻", label: "Apps", provider: "apps", search: true },
-    "keybindings": { icon: "", label: "Keybindings", provider: "binds", search: true },
+    "keybindings": { icon: "\u{F11C}", label: "Keybindings", provider: "binds", search: true },
     "tray": { icon: "󰘔", label: "Tray", provider: "tray" },
     "trigger": { icon: "󱓞", label: "Trigger" },
     "trigger.screenshot": { icon: "", label: "Screenshot (desktop)",
