@@ -78,11 +78,11 @@ previous states. Explain a declaration next to it, not here.
   (publickey)`. The app asks by showing its window, which niri ignores for a
   mapped window (no focus, no urgency), so the prompt stays on workspace 7;
   unlocking there within the minute lets the waiting `ssh`/`git` proceed.
-- The screensaver is a privacy curtain, not a lock: an overlay layer surface
-  (`kaizen-screensaver`), never `WlSessionLock`, and it never touches DPMS. Both
+- The curtain hides the screen, it is not a lock: an overlay layer surface
+  (`kaizen-curtain`), never `WlSessionLock`, and it never touches DPMS. Both
   are deliberate. A session lock replaces output content and a disabled output
   has nothing to copy, so either one defeats wlr-screencopy; the curtain exists
-  so `qs ipc call screensaver close` leaves a desktop `grim` can still capture
+  so `qs ipc call curtain close` leaves a desktop `grim` can still capture
   remotely. It dims the internal backlight to 0 while black and restores it
   before drawing the prompt, so the prompt is never painted onto a dark panel.
   Being only a layer surface, it dies with Quickshell, and anyone at the

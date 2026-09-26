@@ -64,7 +64,7 @@ Ui.Panel {
           id: powerToggle
           visible: root.service.available
           width: 92
-          label: root.service.powered ? "On" : "Off"
+          label: "Enabled"
           active: root.service.powered
           onActivated: root.service.togglePower()
         }
