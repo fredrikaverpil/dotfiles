@@ -15,6 +15,8 @@ import "../../Ui" as Ui
 Ui.Panel {
   id: menu
 
+  required property var contextMenu
+
   readonly property var items: ({
     "apps": { icon: "󰀻", label: "Apps", provider: "apps" },
     "keybindings": { icon: "", label: "Keybindings", provider: "binds" },
@@ -137,13 +139,15 @@ Ui.Panel {
     "settings.weather.panel": { icon: "󰕮", label: "Weather panel", action: () => menu.shell.weather.open() },
     "settings.weather.refresh": { icon: "󰑐", label: "Refresh", action: () => menu.shell.weatherService.refresh() },
     "settings.weather.forecast": { icon: "󰖐", label: "Today on yr.no", action: () => menu.shell.weather.openForecast() },
-    "settings.weather.location": { icon: "󰖐", label: "Location", provider: "places" },
+    // search: too many rows to scan without it, so a context menu hands the
+    // level to the launcher.
+    "settings.weather.location": { icon: "󰖐", label: "Location", provider: "places", search: true },
     "settings.calendar": { icon: "󰃭", label: "Calendar" },
     "settings.calendar.panel": { icon: "󰕮", label: "Calendar panel", action: () => menu.shell.calendar.open() },
     "settings.calendar.refresh": { icon: "󰑐", label: "Refresh", action: () => menu.shell.calendar.service.refresh() },
     "settings.clock": { icon: "󰅐", label: "Clock" },
     "settings.clock.panel": { icon: "󰕮", label: "Clock panel", action: () => menu.shell.timezone.open() },
-    "settings.clock.timezone": { icon: "󰅐", label: "Timezone", provider: "zones" },
+    "settings.clock.timezone": { icon: "󰅐", label: "Timezone", provider: "zones", search: true },
     "settings.keyboard": { icon: "󰌌", label: "Keyboard layout" },
     "settings.keyboard.us": {
       icon: menu.shell.keyboard.index === 0 ? "󰄬" : "󰌌",
@@ -341,9 +345,10 @@ Ui.Panel {
     function open(): void { menu.open("root") }
     function close(): void { menu.close() }
     function level(id: string): void { menu.open(id) }
+    function popup(id: string): void { menu.popup(id, "", null) }
   }
 
-  readonly property var rows: Model.rowsFor(menu.items, level, input.text, {
+  readonly property var providers: ({
     binds: function() { return menu.binds },
     tray: function() { return menu.trayRows() },
     apps: function(detail) { return menu.appRows(detail) },
@@ -356,6 +361,47 @@ Ui.Panel {
     devices: function() { return menu.deviceRows() },
     networks: function() { return menu.networkRows() },
   })
+
+  readonly property var rows: Model.rowsFor(menu.items, level, input.text, menu.providers)
+
+  // Launcher rows shaped like QsMenuEntry, for the context menu.
+  function contextRows(target) {
+    const rows = Model.rowsFor(menu.items, target, "", menu.providers).map(row => {
+      const cascades = row.submenu && !menu.items[row.id].search
+      const handsOff = row.submenu && !cascades
+      const run = handsOff ? () => menu.open(row.id) : row.action
+      return {
+        text: row.label + (handsOff ? "…" : ""),
+        glyph: row.icon,
+        enabled: row.enabled && (cascades || !!run),
+        isSeparator: false,
+        hasChildren: cascades,
+        rows: cascades ? () => menu.contextRows(row.id) : undefined,
+        triggered: run,
+        key: row.id,
+      }
+    })
+    // Sets a node's panel row apart from its actions.
+    if (rows[0]?.key === target + ".panel") rows.splice(1, 0, { isSeparator: true, enabled: true })
+    return rows
+  }
+
+  property string popped: ""
+
+  // Opens target as a context menu hanging from button on output; without them
+  // it centers on the focused output. Opening the shown one again on its output
+  // closes it.
+  function popup(target, output, button) {
+    if (contextMenu.shown && popped === target && (!output || contextMenu.screen?.name === output)) {
+      contextMenu.close()
+      return
+    }
+    popped = target
+    contextMenu.popup({ rows: () => menu.contextRows(target) }, output, button ? () => {
+      const point = button.mapToItem(null, 0, 0)
+      return { below: true, x: point.x, width: button.width }
+    } : null)
+  }
 
   function selectFirstEnabled() {
     list.currentIndex = Model.selectFirstEnabled(rows)

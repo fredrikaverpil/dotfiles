@@ -28,8 +28,10 @@ PanelWindow {
     return cards.itemAt(level)?.rows ?? [] // qmllint disable missing-property
   }
 
-  function rowsFor(opener, level) {
-    const entries = opener && opener.children ? opener.children.values : []
+  // Launcher rows list their children through rows(); tray entries through an opener.
+  function rowsFor(entry, level) {
+    const entries = entry.source.rows ? entry.source.rows()
+      : entry.opener.children ? entry.opener.children.values : []
     return level === 0 ? headRows.concat(entries) : entries
   }
 
@@ -40,8 +42,8 @@ PanelWindow {
   }
 
   function push(handle, anchor, selectFirst) {
-    const opener = openerComponent.createObject(root, { menu: handle })
-    if (!opener) return
+    const opener = handle.rows ? null : openerComponent.createObject(root, { menu: handle })
+    if (!handle.rows && !opener) return
     cursor = cursor.slice(0, depth).concat([selectFirst ? -2 : -1])
     stack = stack.concat([{ opener: opener, source: handle, anchor: anchor }])
     levels.append({})
@@ -56,7 +58,7 @@ PanelWindow {
     stack = stack.slice(0, level)
     cursor = cursor.slice(0, level)
     levels.remove(level, removed.length)
-    for (let i = removed.length - 1; i >= 0; i--) removed[i].opener.destroy()
+    for (let i = removed.length - 1; i >= 0; i--) removed[i].opener?.destroy()
   }
 
   function pop() {
@@ -79,7 +81,8 @@ PanelWindow {
 
   // Opens handle's menu on output (a screen name), at anchorFor(output): a bar button as
   // { below: true, x, width } in window coordinates, or null to center. Without an
-  // output the menu opens on the focused one.
+  // output the menu opens on the focused one. handle is a tray menu handle, or
+  // { rows } whose rows() returns rows shaped like QsMenuEntry plus a glyph and a key.
   function popup(handle, output, anchorFor) {
     if (!output) {
       pending = { handle: handle, anchorFor: anchorFor }
@@ -123,7 +126,7 @@ PanelWindow {
 
   function openChild(level, row, selectFirst) {
     const open = stack[level + 1]
-    if (open && open.source === row) return
+    if (open && Model.sameRow(open.source, row)) return
     truncate(level + 1)
     const card = cards.itemAt(level)
     if (card) push(row, card.rowAnchor(card.current), selectFirst) // qmllint disable missing-property
@@ -190,7 +193,7 @@ PanelWindow {
     select(level, index)
     const row = rowsAt(level)[index]
     const open = stack[level + 1]
-    if (open && open.source !== row) truncate(level + 1)
+    if (open && !Model.sameRow(open.source, row)) truncate(level + 1)
     hoverTarget = row && row.hasChildren && row.enabled ? { level: level, index: index } : null
     if (hoverTarget) hoverTimer.restart()
   }
@@ -241,7 +244,7 @@ PanelWindow {
       property var level: null
       Component.onCompleted: level = root.stack[index]
 
-      readonly property var rows: level ? root.rowsFor(level.opener, index) : []
+      readonly property var rows: level ? root.rowsFor(level, index) : []
       readonly property int current: root.cursor[index] === -2
         ? Model.step(rows, -1, true)
         : root.cursor[index] ?? -1
@@ -331,7 +334,7 @@ PanelWindow {
                 ? (row.modelData.checkState === Qt.Checked ? "󰄲" : "󰄱")
                 : row.modelData.buttonType === QsMenuButtonType.RadioButton
                   ? (row.modelData.checkState === Qt.Checked ? "󰐾" : "󰄴")
-                  : ""
+                  : row.modelData.glyph ?? ""
             }
 
             Text {

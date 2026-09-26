@@ -22,6 +22,21 @@ TestCase {
     verify(Model.step(data.rows, data.current, data.forward) === data.want)
   }
 
+  function test_sameRow_data() {
+    const entry = { text: "Tray" }
+    return [
+      { tag: "same object", a: entry, b: entry, want: true },
+      { tag: "same key", a: { key: "settings.audio" }, b: { key: "settings.audio" }, want: true },
+      { tag: "other key", a: { key: "settings.audio" }, b: { key: "settings.display" }, want: false },
+      { tag: "no key", a: { text: "Tray" }, b: { text: "Tray" }, want: false },
+      { tag: "missing row", a: entry, b: undefined, want: false }
+    ]
+  }
+
+  function test_sameRow(data) {
+    verify(Model.sameRow(data.a, data.b) === data.want)
+  }
+
   // 200x100 card in a 1000x600 area.
   function test_place_data() {
     return [

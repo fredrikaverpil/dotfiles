@@ -366,9 +366,16 @@ ShellRoot {
     service: timezoneService
   }
 
+  // Shows a launcher level hanging from a bar button.
+  Ui.ContextMenu {
+    id: launcherMenu
+    shell: root
+  }
+
   Menu.Menu {
     id: menu
     shell: root
+    contextMenu: launcherMenu
   }
 
   Bar.Bar {
