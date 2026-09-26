@@ -32,8 +32,8 @@ Ui.Panel {
       action: () => menu.shell.recordingService.screenshot() },
     "trigger.record": { icon: "󰑊", label: "Record screen", action: () => menu.shell.recording.open() },
     "trigger.pause": {
-      icon: menu.checkbox(menu.shell.recordingService.paused),
-      label: "Pause recording",
+      icon: menu.shell.recordingService.paused ? "󰐊" : "󰏤",
+      label: menu.shell.recordingService.paused ? "Resume recording" : "Pause recording",
       enabled: menu.shell.recordingService.recording,
       action: () => menu.shell.recordingService.togglePause()
     },
