@@ -145,21 +145,11 @@ Scope {
       }
 
       Ui.BarButton {
-        id: powerButton
+        id: notificationButton
         shell: bar.shell
         anchors.right: clockDivider.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 6
-        label: "󰐥"
-        onActivated: bar.shell.menu.toggleLevel("system")
-      }
-
-      Ui.BarButton {
-        id: notificationButton
-        shell: bar.shell
-        anchors.right: powerButton.left
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.rightMargin: 4
         readonly property int pending: bar.shell.notifications.historyRows.length
         foreground: bar.shell.notifications.doNotDisturb ? bar.shell.palette.rose : bar.shell.palette.fg
         label: (bar.shell.notifications.doNotDisturb ? "󰂛" : "󰂚")
