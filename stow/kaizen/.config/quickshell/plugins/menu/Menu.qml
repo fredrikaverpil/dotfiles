@@ -384,7 +384,7 @@ Ui.Panel {
       }
     })
     // The top level opens the launcher where a node opens its panel.
-    if (target === "root") rows.unshift({ text: "Launcher", glyph: "\u{F056E}", enabled: true,
+    if (target === "root") rows.unshift({ text: "Launcher", glyph: "\u{F0349}", enabled: true,
       isSeparator: false, hasChildren: false, triggered: () => menu.open("root"), key: "root.panel" })
     // Sets a node's panel row apart from its actions.
     if (rows[0]?.key === target + ".panel") rows.splice(1, 0, { isSeparator: true, enabled: true })
