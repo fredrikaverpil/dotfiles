@@ -18,8 +18,10 @@ Ui.Panel {
   required property var contextMenu
 
   readonly property var items: ({
-    "apps": { icon: "󰀻", label: "Apps", provider: "apps" },
-    "keybindings": { icon: "", label: "Keybindings", provider: "binds" },
+    // search: too many rows to scan without it, so a context menu hands the
+    // level to the launcher.
+    "apps": { icon: "󰀻", label: "Apps", provider: "apps", search: true },
+    "keybindings": { icon: "", label: "Keybindings", provider: "binds", search: true },
     "tray": { icon: "󰘔", label: "Tray", provider: "tray" },
     "trigger": { icon: "󱓞", label: "Trigger" },
     "trigger.screenshot": { icon: "", label: "Screenshot (desktop)",
@@ -37,7 +39,7 @@ Ui.Panel {
     },
     "trigger.stop": { icon: "󰓛", label: "Stop recording", enabled: menu.shell.recordingService.busy,
       action: () => menu.shell.recordingService.stop() },
-    "trigger.emoji": { icon: "", label: "Emoji", provider: "emoji" },
+    "trigger.emoji": { icon: "", label: "Emoji", provider: "emoji", search: true },
     "trigger.color": { icon: "󰃉", label: "Color picker", action: () => menu.shell.systemService.pickColor() },
     "trigger.close": { icon: "󰅖", label: "Close window", action: () => Quickshell.execDetached(
       Ui.Compositor.closeWindow())
@@ -139,8 +141,6 @@ Ui.Panel {
     "settings.weather.panel": { icon: "󰕮", label: "Weather panel", action: () => menu.shell.weather.open() },
     "settings.weather.refresh": { icon: "󰑐", label: "Refresh", action: () => menu.shell.weatherService.refresh() },
     "settings.weather.forecast": { icon: "󰖐", label: "Today on yr.no", action: () => menu.shell.weather.openForecast() },
-    // search: too many rows to scan without it, so a context menu hands the
-    // level to the launcher.
     "settings.weather.location": { icon: "󰖐", label: "Location", provider: "places", search: true },
     "settings.calendar": { icon: "󰃭", label: "Calendar" },
     "settings.calendar.panel": { icon: "󰕮", label: "Calendar panel", action: () => menu.shell.calendar.open() },
@@ -369,7 +369,8 @@ Ui.Panel {
     const rows = Model.rowsFor(menu.items, target, "", menu.providers).map(row => {
       const cascades = row.submenu && !menu.items[row.id].search
       const handsOff = row.submenu && !cascades
-      const run = handsOff ? () => menu.open(row.id) : row.action
+      const run = handsOff ? () => menu.open(row.id)
+        : row.trayItem || row.entry || row.action ? () => menu.launch(row) : null
       return {
         text: row.label + (handsOff ? "…" : ""),
         glyph: row.icon,
@@ -381,6 +382,9 @@ Ui.Panel {
         key: row.id,
       }
     })
+    // The top level opens the launcher where a node opens its panel.
+    if (target === "root") rows.unshift({ text: "Launcher", glyph: "\u{F056E}", enabled: true,
+      isSeparator: false, hasChildren: false, triggered: () => menu.open("root"), key: "root.panel" })
     // Sets a node's panel row apart from its actions.
     if (rows[0]?.key === target + ".panel") rows.splice(1, 0, { isSeparator: true, enabled: true })
     return rows
@@ -437,19 +441,23 @@ Ui.Panel {
     const row = rows[list.currentIndex]
     if (!row || !row.enabled) return
 
-    if (row.trayItem) {
+    if (row.trayItem || row.entry || row.action) {
       close()
+      launch(row)
+    } else if (row.id) {
+      open(row.id)
+    }
+  }
+
+  function launch(row) {
+    if (row.trayItem) {
       if (row.trayItem.hasMenu) menu.shell.tray.openFor(row.trayItem)
       else row.trayItem.activate()
     } else if (row.entry) {
-      close()
       // Keep launched apps out of Quickshell's service scope.
       Quickshell.execDetached(["uwsm-app", "--", row.entry.id + ".desktop"])
-    } else if (row.action) {
-      close()
+    } else {
       row.action()
-    } else if (row.id) {
-      open(row.id)
     }
   }
 
