@@ -217,11 +217,6 @@ Ui.Panel {
 
   function toggle() { shown ? close() : open("root") }
 
-  function toggleLevel(target) {
-    if (shown && level === target) close()
-    else open(target)
-  }
-
   function back() {
     if (level === "root") close()
     else open(Model.parentLevel(level))
