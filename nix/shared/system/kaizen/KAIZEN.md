@@ -149,6 +149,14 @@ Notifications, Lock, Polkit, Background, Screensaver   own layer surfaces
 - The bar mirrors the launcher; nothing is reachable only from it. Every
   panel action is a launcher row under Settings, except sliders and per-item
   detail (forgetting a network, recording options).
+- Bar buttons come in four kinds, told apart by what a click does:
+  - ❄ and the workspaces: the launcher and workspace focus.
+  - Panel buttons: left-click opens the panel, right-click the button's
+    Settings node as a context menu.
+  - Indicators, shown only off the default state: left-click acts on it
+    (stops the recording, re-enables idle locking, resets the layout, opens
+    the system monitor).
+  - Tray items: the app's own activation and menu.
 - `Ui/Compositor.qml` is the only path to niri.
 
 ## Session lifecycle

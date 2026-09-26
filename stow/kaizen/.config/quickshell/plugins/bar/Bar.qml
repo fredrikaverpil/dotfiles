@@ -67,10 +67,12 @@ Scope {
         spacing: 6
 
         Ui.BarButton {
+          id: dateLabel
           shell: bar.shell
           anchors.verticalCenter: parent.verticalCenter
           label: Qt.formatDateTime(clock.date, "ddd d MMM")
           onActivated: bar.shell.calendar.toggle()
+          onSecondary: bar.shell.menu.popup("settings.calendar", modelData.name, dateLabel)
         }
 
         Rectangle {
@@ -86,6 +88,7 @@ Scope {
           anchors.verticalCenter: parent.verticalCenter
           label: Qt.formatDateTime(clock.date, "HH:mm")
           onActivated: bar.shell.timezone.toggle()
+          onSecondary: bar.shell.menu.popup("settings.clock", modelData.name, timeLabel)
           onLabelChanged: if (label.endsWith(":00")) hourPulse.restart()
 
           SequentialAnimation {
@@ -130,7 +133,7 @@ Scope {
           ? bar.shell.weatherService.icon + " " + bar.shell.weatherService.temperature
           : bar.shell.weatherService.icon
         onActivated: bar.shell.weather.toggle()
-        onSecondary: bar.shell.weatherService.refresh()
+        onSecondary: bar.shell.menu.popup("settings.weather", modelData.name, weatherButton)
       }
 
       // Separates the clock and weather from the session buttons.
@@ -155,6 +158,7 @@ Scope {
         label: (bar.shell.notifications.doNotDisturb ? "󰂛" : "󰂚")
           + (notificationButton.pending > 0 ? " " + notificationButton.pending : "")
         onActivated: bar.shell.notifications.toggleHistory()
+        onSecondary: bar.shell.menu.popup("settings.notifications", modelData.name, notificationButton)
       }
 
       Ui.BarButton {
@@ -165,6 +169,7 @@ Scope {
         anchors.rightMargin: 4
         label: "\u{F014C}"
         onActivated: bar.shell.clipboard.toggle()
+        onSecondary: bar.shell.menu.popup("settings.clipboard", modelData.name, clipboardButton)
       }
 
       // Separates settings from the session buttons.
@@ -192,6 +197,7 @@ Scope {
           : bar.shell.palette.fg
         label: bar.shell.batteryService.icon + " " + bar.shell.batteryService.percentage + "%"
         onActivated: bar.shell.battery.toggle()
+        onSecondary: bar.shell.menu.popup("settings.power", modelData.name, batteryButton)
       }
 
       Ui.BarButton {
@@ -206,6 +212,7 @@ Scope {
             ? " " + bar.shell.networkService.connectedWifiNetwork.name
             : "")
         onActivated: bar.shell.network.toggle()
+        onSecondary: bar.shell.menu.popup("settings.network", modelData.name, networkButton)
       }
 
       Ui.BarButton {
@@ -217,6 +224,7 @@ Scope {
         foreground: bar.shell.bluetoothService.powered ? bar.shell.palette.fg : bar.shell.palette.rose
         label: bar.shell.bluetoothService.icon
         onActivated: bar.shell.bluetooth.toggle()
+        onSecondary: bar.shell.menu.popup("settings.bluetooth", modelData.name, bluetoothButton)
       }
 
       Ui.BarButton {
@@ -227,6 +235,7 @@ Scope {
         anchors.rightMargin: 4
         label: "󰍹"
         onActivated: bar.shell.display.toggle()
+        onSecondary: bar.shell.menu.popup("settings.display", modelData.name, displayButton)
       }
 
       Ui.BarButton {
@@ -238,6 +247,7 @@ Scope {
         foreground: bar.shell.audio.muted ? bar.shell.palette.rose : bar.shell.palette.fg
         label: bar.shell.audio.icon
         onActivated: bar.shell.audio.toggle()
+        onSecondary: bar.shell.menu.popup("settings.audio", modelData.name, audioButton)
       }
 
       // Separates status indicators from the settings.
@@ -259,6 +269,7 @@ Scope {
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: width > 0 ? 6 : 0
         shell: bar.shell
+        output: modelData.name
       }
 
       Ui.BarButton {
