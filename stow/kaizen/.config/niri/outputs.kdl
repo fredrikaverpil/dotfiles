@@ -11,8 +11,8 @@ output "eDP-1" {
 
 // Above, centered.
 output "LG Electronics LG SIGNAGE 0x01010101" {
-    scale 1
-    position x=-960 y=-2160
+    scale 1.2
+    position x=-640 y=-1800
 }
 
 // Right, bottoms aligned.
@@ -23,6 +23,6 @@ output "Dell Inc. DELL P3221D GN2ZQ83" {
 
 // Left, bottoms aligned.
 output "Dell Inc. DELL U2723QE 13B95P3" {
-    scale 1
-    position x=-3840 y=-960
+    scale 1.2
+    position x=-3200 y=-600
 }
