@@ -47,6 +47,7 @@ Scope {
         anchors.leftMargin: 4
         label: "❄"
         onActivated: bar.shell.menu.toggle()
+        onSecondary: bar.shell.menu.popup("root", modelData.name, menuButton)
       }
 
       BarWidgets.Workspaces {

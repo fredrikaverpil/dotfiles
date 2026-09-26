@@ -150,7 +150,8 @@ Notifications, Lock, Polkit, Background, Screensaver   own layer surfaces
   panel action is a launcher row under Settings, except sliders and per-item
   detail (forgetting a network, recording options).
 - Bar buttons come in four kinds, told apart by what a click does:
-  - ❄ and the workspaces: the launcher and workspace focus.
+  - ❄ and the workspaces: left-click opens the launcher, right-click its top
+    level as a context menu; a workspace takes focus.
   - Panel buttons: left-click opens the panel, right-click the button's
     Settings node as a context menu.
   - Indicators, shown only off the default state: left-click acts on it
