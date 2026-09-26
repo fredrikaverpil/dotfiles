@@ -69,16 +69,16 @@ Ui.Panel {
     "settings.display": { icon: "󰍹", label: "Display" },
     "settings.display.panel": { icon: "󰕮", label: "Display panel", action: () => menu.shell.display.open() },
     "settings.display.theme": { icon: "", label: "Theme" },
-    "settings.display.theme.dark": { icon: menu.shell.dark ? "󰄬" : "", label: "Dark",
+    "settings.display.theme.dark": { icon: menu.radio(menu.shell.dark), label: "Dark",
       action: () => menu.shell.setDark(true) },
-    "settings.display.theme.light": { icon: menu.shell.dark ? "" : "󰄬", label: "Light",
+    "settings.display.theme.light": { icon: menu.radio(!menu.shell.dark), label: "Light",
       action: () => menu.shell.setDark(false) },
     "settings.display.nightlight": { icon: "󰆔", label: "Nightlight" },
-    "settings.display.nightlight.off": { icon: menu.shell.nightlight.mode === "off" ? "󰄬" : "󰆔", label: "Off",
+    "settings.display.nightlight.off": { icon: menu.radio(menu.shell.nightlight.mode === "off"), label: "Off",
       action: () => menu.shell.nightlight.setMode("off") },
-    "settings.display.nightlight.auto": { icon: menu.shell.nightlight.mode === "auto" ? "󰄬" : "󰆔", label: "Auto",
+    "settings.display.nightlight.auto": { icon: menu.radio(menu.shell.nightlight.mode === "auto"), label: "Auto",
       action: () => menu.shell.nightlight.setMode("auto") },
-    "settings.display.nightlight.on": { icon: menu.shell.nightlight.mode === "on" ? "󰄬" : "󰆔", label: "On",
+    "settings.display.nightlight.on": { icon: menu.radio(menu.shell.nightlight.mode === "on"), label: "On",
       action: () => menu.shell.nightlight.setMode("on") },
     "settings.display.textSize": { icon: "󰛖", label: "Text size", provider: "textScales" },
     "settings.display.wallpaper": { icon: "", label: "Wallpaper (workspace)",
@@ -120,9 +120,9 @@ Ui.Panel {
     "settings.power": { icon: menu.shell.batteryService.icon, label: "Power" },
     "settings.power.panel": { icon: "󰕮", label: "Power panel", action: () => menu.shell.battery.open() },
     "settings.power.profile": { icon: "󰓅", label: "Profile" },
-    "settings.power.profile.saver": menu.profileItem("power-saver", "󰌪", "Saver"),
-    "settings.power.profile.balanced": menu.profileItem("balanced", "󰊚", "Balanced"),
-    "settings.power.profile.performance": menu.profileItem("performance", "󰓅", "Performance"),
+    "settings.power.profile.saver": menu.profileItem("power-saver", "Saver"),
+    "settings.power.profile.balanced": menu.profileItem("balanced", "Balanced"),
+    "settings.power.profile.performance": menu.profileItem("performance", "Performance"),
     "settings.clipboard": { icon: "\u{F014C}", label: "Clipboard" },
     "settings.clipboard.panel": { icon: "󰕮", label: "Clipboard panel", action: () => menu.shell.clipboard.open() },
     "settings.clipboard.clear": { icon: "󰃢", label: "Clear history",
@@ -150,12 +150,12 @@ Ui.Panel {
     "settings.clock.timezone": { icon: "󰅐", label: "Timezone", provider: "zones", search: true },
     "settings.keyboard": { icon: "󰌌", label: "Keyboard layout" },
     "settings.keyboard.us": {
-      icon: menu.shell.keyboard.index === 0 ? "󰄬" : "󰌌",
+      icon: menu.radio(menu.shell.keyboard.index === 0),
       label: "English (US)",
       action: () => menu.shell.keyboard.set(0)
     },
     "settings.keyboard.se": {
-      icon: menu.shell.keyboard.index === 1 ? "󰄬" : "󰌌",
+      icon: menu.radio(menu.shell.keyboard.index === 1),
       label: "Swedish",
       action: () => menu.shell.keyboard.set(1)
     },
@@ -176,11 +176,12 @@ Ui.Panel {
   readonly property bool hasPlayer: menu.shell.media.service.activePlayer !== null
 
   function checkbox(on) { return on ? "󰄲" : "󰄱" }
+  function radio(on) { return on ? "󰐾" : "󰐽" }
 
-  function profileItem(name, icon, label) {
+  function profileItem(name, label) {
     const service = menu.shell.batteryService
     return {
-      icon: service.profile === name ? "󰄬" : icon,
+      icon: menu.radio(service.profile === name),
       label: label,
       enabled: service.profiles.indexOf(name) >= 0,
       action: () => service.setProfile(name),
@@ -259,7 +260,7 @@ Ui.Panel {
     const service = menu.shell.weatherService
     return PlacesModel.places.map(place => ({
       label: place.name,
-      icon: service.latitude === place.latitude && service.longitude === place.longitude ? "󰄬" : "󰖐",
+      icon: menu.radio(service.latitude === place.latitude && service.longitude === place.longitude),
       image: "",
       detail: place.country,
       enabled: true,
@@ -273,7 +274,7 @@ Ui.Panel {
     const service = menu.shell.timezoneService
     return ZonesModel.zones.map(zone => ({
       label: zone.name,
-      icon: service.zone === zone.zone ? "󰄬" : "󰅐",
+      icon: menu.radio(service.zone === zone.zone),
       image: "",
       detail: zone.zone,
       enabled: true,
@@ -287,7 +288,7 @@ Ui.Panel {
     const active = service.playerKey(service.activePlayer)
     return service.sourcePlayers.map(player => ({
       label: MediaModel.labelFor(player),
-      icon: service.playerKey(player) === active ? "󰄬" : "󰌳",
+      icon: menu.radio(service.playerKey(player) === active),
       detail: MediaModel.detailFor(player),
       enabled: true,
       action: () => service.selectPlayer(service.playerKey(player)),
@@ -298,7 +299,7 @@ Ui.Panel {
     const audio = menu.shell.audio
     return audio.sinks.map(node => ({
       label: audio.label(node),
-      icon: node === audio.sink ? "󰄬" : "󰓃",
+      icon: menu.radio(node === audio.sink),
       detail: "",
       enabled: true,
       action: () => audio.setDefault(node),
@@ -308,7 +309,7 @@ Ui.Panel {
   function textScaleRows() {
     return menu.shell.display.textScales.map(value => ({
       label: Math.round(value * 100) + "%",
-      icon: Math.abs(value - menu.shell.textScale) < 0.01 ? "󰄬" : "󰛖",
+      icon: menu.radio(Math.abs(value - menu.shell.textScale) < 0.01),
       detail: "",
       enabled: true,
       action: () => menu.shell.setTextScale(value),
@@ -319,7 +320,7 @@ Ui.Panel {
     const service = menu.shell.bluetoothService
     return (service.powered ? service.devices : []).map(device => ({
       label: BluetoothModel.deviceName(device),
-      icon: device.connected ? "󰄬" : service.deviceIcon(device),
+      icon: menu.checkbox(device.connected),
       detail: service.deviceStatus(device),
       enabled: true,
       action: () => service.toggleConnection(device),
@@ -331,7 +332,7 @@ Ui.Panel {
     const service = menu.shell.networkService
     return (service.wifiEnabled ? service.wifiNetworks : []).map(network => ({
       label: network.name,
-      icon: network.connected ? "󰄬" : "󰖩",
+      icon: menu.radio(network.connected),
       detail: service.wifiStatus(network),
       enabled: true,
       action: () => service.activate(network),
