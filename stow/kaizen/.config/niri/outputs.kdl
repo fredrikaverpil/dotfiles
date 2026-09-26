@@ -21,8 +21,8 @@ output "Dell Inc. DELL P3221D GN2ZQ83" {
     position x=1920 y=-240
 }
 
-// Left, bottoms aligned.
+// Left, tops aligned.
 output "Dell Inc. DELL U2723QE 13B95P3" {
     scale 1.2
-    position x=-3200 y=-600
+    position x=-3200 y=0
 }
