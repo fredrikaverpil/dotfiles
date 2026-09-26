@@ -46,7 +46,7 @@ Item {
         width: 20 * root.fontScale
         height: Math.round(24 * root.fontScale)
         radius: 4
-        color: mouse.containsMouse ? root.selection : "transparent"
+        color: hover.hovered ?root.selection : "transparent"
         opacity: occupied || focused ? 1 : 0.5
         border.width: focused ? 1 : 0
         border.color: root.foreground
@@ -59,11 +59,13 @@ Item {
           text: modelData === 10 ? "0" : String(modelData)
         }
 
-        MouseArea {
-          id: mouse
-          anchors.fill: parent
-          hoverEnabled: true
-          onClicked: root.focusWorkspace(modelData)
+        HoverHandler {
+          id: hover
+        }
+
+        // Not a MouseArea, for the reason in Ui/BarButton.qml.
+        TapHandler {
+          onTapped: root.focusWorkspace(modelData)
         }
       }
     }
