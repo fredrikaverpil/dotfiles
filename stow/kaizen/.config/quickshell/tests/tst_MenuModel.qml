@@ -58,6 +58,19 @@ TestCase {
     compare(Menu.rowsFor(items, "root", "", {}).map(row => row.id), ["apps", "learn", "style"])
   }
 
+  function test_search_ignores_hyphens() {
+    const items = { wifi: { label: "Wi-Fi" }, email: { label: "Email" } }
+    const cases = [
+      { query: "wifi", want: ["Wi-Fi"] },
+      { query: "wi-fi", want: ["Wi-Fi"] },
+      { query: "e-mail", want: ["Email"] },
+    ]
+    for (const c of cases) {
+      const got = Menu.rowsFor(items, "root", c.query, {}).map(row => row.label)
+      compare(got, c.want, c.query)
+    }
+  }
+
   function test_keyboard_movement_wraps_and_skips_disabled_rows() {
     const rows = [{ enabled: true }, { enabled: false }, { enabled: true }]
     compare(Menu.selectFirstEnabled([{ enabled: false }, { enabled: true }]), 1)

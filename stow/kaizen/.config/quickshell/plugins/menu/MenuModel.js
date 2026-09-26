@@ -45,10 +45,15 @@ function rowFor(items, id, level) {
   }
 }
 
+// Hyphens are ignored, so "wifi" finds "Wi-Fi".
+function searchable(text) {
+  return String(text || "").toLowerCase().replace(/-/g, "")
+}
+
 function matches(row, query) {
-  var value = String(query || "").toLowerCase()
-  return row.label.toLowerCase().indexOf(value) >= 0
-    || (row.chord !== undefined && row.chord.toLowerCase().indexOf(value) >= 0)
+  var value = searchable(query)
+  return searchable(row.label).indexOf(value) >= 0
+    || (row.chord !== undefined && searchable(row.chord).indexOf(value) >= 0)
 }
 
 // Every provider is a function of the detail column, so an unknown name is an
