@@ -333,7 +333,7 @@ PanelWindow {
               text: row.modelData.buttonType === QsMenuButtonType.CheckBox
                 ? (row.modelData.checkState === Qt.Checked ? "󰄲" : "󰄱")
                 : row.modelData.buttonType === QsMenuButtonType.RadioButton
-                  ? (row.modelData.checkState === Qt.Checked ? "󰐾" : "󰄴")
+                  ? (row.modelData.checkState === Qt.Checked ? "󰐾" : "󰐽")
                   : row.modelData.glyph ?? ""
             }
 
