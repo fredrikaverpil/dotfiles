@@ -55,6 +55,8 @@ Item {
 
     MouseArea {
       anchors.fill: parent
+      // Plain pointer motion must also restart the blank timer.
+      hoverEnabled: true
       onClicked: {
         root.wakeRequested()
         root.focusPassword()
