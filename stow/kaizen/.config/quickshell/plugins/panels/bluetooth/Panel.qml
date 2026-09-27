@@ -113,7 +113,7 @@ Ui.Panel {
         label: "Pair new device…"
         onActivated: {
           root.close()
-          Quickshell.execDetached(["ghostty", "-e", "bluetui"])
+          Quickshell.execDetached(["xdg-terminal-exec", "bluetui"])
         }
       }
     }
