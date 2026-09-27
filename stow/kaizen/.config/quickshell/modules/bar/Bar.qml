@@ -91,14 +91,15 @@ Scope {
           color: bar.shell.palette.dim
         }
 
+        // A plain label unless a plugin takes it over.
         Ui.BarButton {
           id: dateLabel
           shell: bar.shell
           anchors.verticalCenter: parent.verticalCenter
+          enabled: bar.datePlugin !== undefined
           label: Qt.formatDateTime(clock.date, "ddd d MMM")
-          onActivated: bar.datePlugin ? bar.datePlugin.barActions.date() : bar.shell.calendar.toggle()
-          onSecondary: bar.shell.menu.popup(bar.datePlugin ? "settings." + bar.datePlugin.name : "settings.calendar",
-            modelData.name, dateLabel)
+          onActivated: bar.datePlugin.barActions.date()
+          onSecondary: bar.shell.menu.popup("settings." + bar.datePlugin.name, modelData.name, dateLabel)
         }
 
         Rectangle {

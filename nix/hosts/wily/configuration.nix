@@ -2,6 +2,7 @@
 {
   imports = [
     ../../shared/system/kaizen/desktop.nix
+    ../../shared/system/kaizen/plugins/calendar
     ../../shared/system/thinkpad.nix
   ]
   # Work-only config from the private dotfiles-einride submodule; an
