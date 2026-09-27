@@ -81,6 +81,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | tray | [StatusNotifierItem] | tray | Tray | `tray` |
 | background | wallpaper files, theme state | – | Settings › Display | `wallpaper`, `theme` |
 | menu | launcher | menu button | `Mod+Space` | `menu` |
+| plugins | `Plugin.qml` in each `host.kaizenPlugins` directory | date button, when taken over | Settings › each plugin | `shell` (reload) |
 
 [PipeWire]: https://pipewire.org
 [Quickshell]: https://quickshell.org/docs/types/
@@ -158,6 +159,9 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
     (stops the recording, re-enables idle locking, resets the layout, opens
     the system monitor).
   - Tray items: the app's own activation and menu.
+- A plugin (`Ui/Plugin.qml`) adds launcher items, its own panels and IPC
+  targets, and may take over the date button (`barActions.date`):
+  left-click calls the plugin, right-click opens its `settings.<name>` node.
 - `Ui/Compositor.qml` is the only path to niri.
 
 ## Session lifecycle
@@ -215,4 +219,5 @@ closes niri's readiness-before-`WAYLAND_DISPLAY` race.
    `modules/panels/`; a protocol-driven surface with no other consumer of its
    state (lock, notifications, polkit) keeps both in `modules/<name>/`.
    Packages/units/PAM → `session.nix`, compositor → `Ui/compositors/` and
-   `niri/config.kdl`, IPC target for every new action.
+   `niri/config.kdl`, IPC target for every new action. Something only some
+   hosts want is a plugin (`host.kaizenPlugins`).
