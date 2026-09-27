@@ -109,3 +109,11 @@ function parentLevel(level) {
   if (level === "root") return "root"
   return level.indexOf(".") >= 0 ? level.split(".").slice(0, -1).join(".") : "root"
 }
+
+// Adds each plugin's table under key, in load order; a later id replaces an
+// earlier one.
+function merge(table, plugins, key) {
+  return (plugins || []).reduce(function(all, plugin) {
+    return Object.assign(all, plugin[key])
+  }, Object.assign({}, table))
+}

@@ -184,10 +184,49 @@ Scope {
         color: bar.shell.palette.dim
       }
 
+      Row {
+        id: pluginButtons
+        anchors.right: sessionDivider.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: width > 0 ? 6 : 0
+        spacing: 4
+
+        Repeater {
+          model: bar.shell.plugins.filter(plugin => plugin.barButton)
+
+          Loader {
+            id: pluginButton
+            required property var modelData
+            sourceComponent: modelData.barButton
+
+            // Opens the plugin's launcher node, as a core panel button's right-click does.
+            Connections {
+              target: pluginButton.item as Ui.BarButton
+              function onSecondary() {
+                bar.shell.menu.popup("settings." + pluginButton.modelData.name, barWindow.modelData.name,
+                  pluginButton.item)
+              }
+            }
+          }
+        }
+      }
+
+      // Separates plugin buttons from the settings.
+      Rectangle {
+        id: pluginDivider
+        anchors.right: pluginButtons.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: visible ? 6 : 0
+        visible: pluginButtons.width > 0
+        width: visible ? 1 : 0
+        height: 16 * bar.shell.textScale
+        color: bar.shell.palette.dim
+      }
+
       Ui.BarButton {
         id: batteryButton
         shell: bar.shell
-        anchors.right: sessionDivider.left
+        anchors.right: pluginDivider.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: visible ? 6 : 0
         visible: bar.shell.batteryService.present

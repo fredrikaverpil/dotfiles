@@ -124,6 +124,13 @@ in
       description = "Font family of the shell, used when installed; otherwise JetBrainsMono Nerd Font, which also supplies the icons";
     };
 
+    plugins = lib.mkOption {
+      type = lib.types.listOf lib.types.path;
+      default = [ ];
+      example = lib.literalExpression ''[ ./calendar "/home/me/src/kaizen-weather" ]'';
+      description = "Plugin directories, each holding a Plugin.qml, loaded in order. A path is copied to the store; an absolute path as a string is read in place, for live editing, and `qs -c kaizen ipc call shell reload` applies its edits";
+    };
+
     notificationRules = lib.mkOption {
       type = lib.types.listOf (
         lib.types.submodule {
@@ -251,6 +258,9 @@ in
         lib.mapAttrs (_: lib.filterAttrs (_: colour: colour != null)) cfg.theme
       );
       environment.KAIZEN_FONT = cfg.font;
+      environment.KAIZEN_PLUGINS = lib.concatMapStringsSep ":" (
+        dir: if builtins.isPath dir then "${dir}" else toString dir
+      ) cfg.plugins;
       serviceConfig = {
         ExecStart = "${cfg.package}/bin/kaizen-shell";
         Restart = "on-failure";

@@ -17,7 +17,7 @@ Ui.Panel {
 
   required property var contextMenu
 
-  readonly property var items: Object.assign({
+  readonly property var items: Model.merge(Object.assign({
     // search: too many rows to scan without it, so a context menu hands the
     // level to the launcher.
     "apps": { icon: "󰀻", label: "Apps", provider: "apps", search: true },
@@ -161,7 +161,7 @@ Ui.Panel {
     "settings.session.logout": { icon: "󰍃", label: "Logout", action: () => menu.run("uwsm stop") },
     "settings.session.reboot": { icon: "󰜉", label: "Reboot", action: () => menu.run("systemctl reboot") },
     "settings.session.shutdown": { icon: "󰐥", label: "Shutdown", action: () => menu.run("systemctl poweroff") },
-  }, menu.layoutItems())
+  }, menu.layoutItems()), menu.shell.plugins, "menuItems")
 
   readonly property bool hasPlayer: menu.shell.media.service.activePlayer !== null
 
@@ -364,7 +364,7 @@ Ui.Panel {
     function popup(id: string): void { menu.popup(id, "", null) }
   }
 
-  readonly property var providers: ({
+  readonly property var providers: Model.merge({
     binds: function() { return menu.binds },
     tray: function() { return menu.trayRows() },
     apps: function(detail) { return menu.appRows(detail) },
@@ -376,7 +376,7 @@ Ui.Panel {
     textScales: function() { return menu.textScaleRows() },
     devices: function() { return menu.deviceRows() },
     networks: function() { return menu.networkRows() },
-  })
+  }, menu.shell.plugins, "providers")
 
   readonly property var rows: Model.rowsFor(menu.items, level, input.text, menu.providers)
 

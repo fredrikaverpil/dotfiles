@@ -58,6 +58,9 @@ previous states. Explain a declaration next to it, not here.
   both first and owns everything else.
 - `shell.qml` wires services and surfaces. Views belong in `plugins/panels/`;
   daemon/process state belongs in `plugins/services/`.
+- External plugins (`programs.kaizen.plugins`, passed as `KAIZEN_PLUGINS`)
+  load from outside the tree, which Quickshell does not watch: apply an edit
+  with `qs -c kaizen ipc call shell reload`. The contract is `Ui/Plugin.qml`.
 - Interactive surfaces come in three kinds; pick by what opens them:
   - Launcher (`plugins/menu/`): a large `Ui.Panel` drilling down through
     levels; the keyboard entry point to everything, tray menus included.

@@ -80,4 +80,20 @@ TestCase {
     compare(Menu.moveIndex(rows, 0, -1), 2)
     compare(Menu.moveIndex(rows, 0, 10), 0)
   }
+
+  function test_merge_adds_plugin_tables_in_load_order() {
+    const core = { apps: "core", style: "core" }
+    const plugins = [
+      { menuItems: { style: "first", clock: "first" } },
+      { providers: { ignored: "first" } },
+      { menuItems: { clock: "second", calendar: "second" } },
+    ]
+
+    const got = Menu.merge(core, plugins, "menuItems")
+
+    compare(got, { apps: "core", style: "first", clock: "second", calendar: "second" })
+    compare(Object.keys(got), ["apps", "style", "clock", "calendar"])
+    compare(core, { apps: "core", style: "core" })
+    compare(Menu.merge(core, [], "menuItems"), core)
+  }
 }
