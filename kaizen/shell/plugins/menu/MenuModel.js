@@ -117,3 +117,18 @@ function merge(table, plugins, key) {
     return Object.assign(all, plugin[key])
   }, Object.assign({}, table))
 }
+
+// The core bar buttons a plugin can take over.
+var barButtons = ["date", "time", "weather", "notifications", "clipboard", "battery", "network", "bluetooth",
+  "display", "audio"]
+
+// Each plugin's barActions by button name, with the plugin's settings node for
+// the right-click; a later plugin replaces an earlier one.
+function barTakeovers(plugins) {
+  return (plugins || []).reduce(function(all, plugin) {
+    Object.keys(plugin.barActions || {}).forEach(function(name) {
+      all[name] = { action: plugin.barActions[name], node: "settings." + plugin.name }
+    })
+    return all
+  }, {})
+}

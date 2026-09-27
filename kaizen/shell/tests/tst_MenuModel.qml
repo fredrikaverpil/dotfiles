@@ -96,4 +96,20 @@ TestCase {
     compare(core, { apps: "core", style: "core" })
     compare(Menu.merge(core, [], "menuItems"), core)
   }
+
+  function test_barTakeovers_maps_buttons_to_the_last_plugin() {
+    const plugins = [
+      { name: "clock", barActions: { date: "clock date", time: "clock time" } },
+      { name: "plain" },
+      { name: "calendar", barActions: { date: "calendar date" } },
+    ]
+
+    const got = Menu.barTakeovers(plugins)
+
+    compare(got, {
+      date: { action: "calendar date", node: "settings.calendar" },
+      time: { action: "clock time", node: "settings.clock" },
+    })
+    compare(Menu.barTakeovers([]), {})
+  }
 }

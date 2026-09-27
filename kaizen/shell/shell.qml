@@ -4,6 +4,7 @@ import Quickshell.Io
 
 import "ShellModel.js" as Model
 import "Ui" as Ui
+import "plugins/menu/MenuModel.js" as MenuModel
 
 import "plugins/background" as Background
 import "plugins/bar" as Bar
@@ -83,8 +84,12 @@ ShellRoot {
       Component.onCompleted: setSource("file://" + modelData + "/Plugin.qml", { shell: root })
       onLoaded: {
         const plugin = item as Ui.Plugin
-        if (plugin?.barButton && !(("settings." + plugin.name) in plugin.menuItems))
-          console.warn("kaizen: plugin " + plugin.name + " has a bar button but no settings." + plugin.name + " launcher node")
+        if (!plugin) return
+        const takeovers = Object.keys(plugin.barActions)
+        if ((plugin.barButton || takeovers.length > 0) && !(("settings." + plugin.name) in plugin.menuItems))
+          console.warn("kaizen: plugin " + plugin.name + " has bar buttons but no settings." + plugin.name + " launcher node")
+        takeovers.filter(name => !MenuModel.barButtons.includes(name))
+          .forEach(name => console.warn("kaizen: plugin " + plugin.name + " takes over an unknown bar button: " + name))
       }
     }
   }

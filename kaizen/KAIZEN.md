@@ -164,8 +164,10 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   - Tray items: the app's own activation and menu.
 - A plugin (`Ui/Plugin.qml`) adds launcher items and providers, its own
   panels and IPC targets, and at most one panel button, placed between the
-  settings and session buttons. The shell wires that button's right-click to
-  the plugin's `settings.<name>` node, and warns when the node is missing.
+  settings and session buttons. It may also take over core panel buttons
+  (`barActions`): the label stays, left-click calls the plugin. The shell
+  wires the right-click of all its buttons to the plugin's `settings.<name>`
+  node, and warns when the node is missing or a taken-over button is unknown.
 - `Ui/Compositor.qml` is the only path to niri.
 
 ## Session lifecycle

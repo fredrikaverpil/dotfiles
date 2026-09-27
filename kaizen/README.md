@@ -156,13 +156,17 @@ programs.kaizen.theme.dark =
 kaizen bundles no plugins. A plugin is a directory holding a `Plugin.qml` whose
 root is `Ui.Plugin` ([`shell/Ui/Plugin.qml`](shell/Ui/Plugin.qml)):
 
-- `name` (required): its launcher node is `settings.<name>`, which its bar
-  button's right-click opens.
+- `name` (required): its launcher node is `settings.<name>`, which a
+  right-click on its bar buttons opens.
 - `menuItems`: launcher items keyed by dotted id, merged into the launcher's.
   An item has `icon`, `label` and optionally `action`, or `provider`, the name
   of a function in `providers` that returns a level's rows.
 - `providers`: row functions, merged into the launcher's.
 - `barButton`: a `Ui.BarButton` component, placed in the bar on every output.
+- `barActions`: core bar buttons it takes over, each mapped to the function
+  its left-click calls; the button keeps its label. Names: `date`, `time`,
+  `weather`, `notifications`, `clipboard`, `battery`, `network`, `bluetooth`,
+  `display`, `audio`. A later plugin wins.
 - `shell` is set by kaizen; pass it to `Ui.BarButton` and `Ui.Panel`.
 
 A plugin creates its own panels (`Ui.Panel`) and `IpcHandler`s, as the core

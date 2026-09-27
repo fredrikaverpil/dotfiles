@@ -4,6 +4,7 @@ import Quickshell.Wayland
 
 import "widgets" as BarWidgets
 import "../services/media" as Media
+import "../menu/MenuModel.js" as MenuModel
 import "../services/recording/RecordingModel.js" as RecordingModel
 import "../../Ui" as Ui
 
@@ -11,6 +12,20 @@ Scope {
   id: bar
 
   required property var shell
+
+  readonly property var takeovers: MenuModel.barTakeovers(bar.shell.plugins)
+
+  // Calls the plugin that took over the named core button; false when none did.
+  function takeOver(name: string): bool {
+    const takeover = bar.takeovers[name]
+    if (takeover) takeover.action()
+    return takeover !== undefined
+  }
+
+  // The launcher node a right-click on the named core button opens.
+  function node(name: string, core: string): string {
+    return bar.takeovers[name]?.node ?? core
+  }
 
   SystemClock {
     id: clock
@@ -72,8 +87,8 @@ Scope {
           shell: bar.shell
           anchors.verticalCenter: parent.verticalCenter
           label: Qt.formatDateTime(clock.date, "ddd d MMM")
-          onActivated: bar.shell.timezone.toggle()
-          onSecondary: bar.shell.menu.popup("settings.clock", modelData.name, dateLabel)
+          onActivated: if (!bar.takeOver("date")) bar.shell.timezone.toggle()
+          onSecondary: bar.shell.menu.popup(bar.node("date", "settings.clock"), modelData.name, dateLabel)
         }
 
         Rectangle {
@@ -88,8 +103,8 @@ Scope {
           shell: bar.shell
           anchors.verticalCenter: parent.verticalCenter
           label: Qt.formatDateTime(clock.date, "HH:mm")
-          onActivated: bar.shell.timezone.toggle()
-          onSecondary: bar.shell.menu.popup("settings.clock", modelData.name, timeLabel)
+          onActivated: if (!bar.takeOver("time")) bar.shell.timezone.toggle()
+          onSecondary: bar.shell.menu.popup(bar.node("time", "settings.clock"), modelData.name, timeLabel)
           onLabelChanged: if (label.endsWith(":00")) hourPulse.restart()
 
           SequentialAnimation {
@@ -133,8 +148,8 @@ Scope {
         label: bar.shell.weatherService.ready
           ? bar.shell.weatherService.icon + " " + bar.shell.weatherService.temperature
           : bar.shell.weatherService.icon
-        onActivated: bar.shell.weather.toggle()
-        onSecondary: bar.shell.menu.popup("settings.weather", modelData.name, weatherButton)
+        onActivated: if (!bar.takeOver("weather")) bar.shell.weather.toggle()
+        onSecondary: bar.shell.menu.popup(bar.node("weather", "settings.weather"), modelData.name, weatherButton)
       }
 
       // Separates the clock and weather from the session buttons.
@@ -158,8 +173,8 @@ Scope {
         foreground: bar.shell.notifications.doNotDisturb ? bar.shell.palette.alert : bar.shell.palette.fg
         label: (bar.shell.notifications.doNotDisturb ? "󰂛" : "󰂚")
           + (notificationButton.pending > 0 ? " " + notificationButton.pending : "")
-        onActivated: bar.shell.notifications.toggleHistory()
-        onSecondary: bar.shell.menu.popup("settings.notifications", modelData.name, notificationButton)
+        onActivated: if (!bar.takeOver("notifications")) bar.shell.notifications.toggleHistory()
+        onSecondary: bar.shell.menu.popup(bar.node("notifications", "settings.notifications"), modelData.name, notificationButton)
       }
 
       Ui.BarButton {
@@ -169,8 +184,8 @@ Scope {
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
         label: "\u{F014C}"
-        onActivated: bar.shell.clipboard.toggle()
-        onSecondary: bar.shell.menu.popup("settings.clipboard", modelData.name, clipboardButton)
+        onActivated: if (!bar.takeOver("clipboard")) bar.shell.clipboard.toggle()
+        onSecondary: bar.shell.menu.popup(bar.node("clipboard", "settings.clipboard"), modelData.name, clipboardButton)
       }
 
       // Separates settings from the session buttons.
@@ -236,8 +251,8 @@ Scope {
           : bar.shell.batteryService.percentage <= bar.shell.batteryService.warnLevel ? bar.shell.palette.warn
           : bar.shell.palette.fg
         label: bar.shell.batteryService.icon + " " + bar.shell.batteryService.percentage + "%"
-        onActivated: bar.shell.battery.toggle()
-        onSecondary: bar.shell.menu.popup("settings.power", modelData.name, batteryButton)
+        onActivated: if (!bar.takeOver("battery")) bar.shell.battery.toggle()
+        onSecondary: bar.shell.menu.popup(bar.node("battery", "settings.power"), modelData.name, batteryButton)
       }
 
       Ui.BarButton {
@@ -251,8 +266,8 @@ Scope {
           + (bar.shell.networkService.kind === "wifi" && bar.shell.networkService.connectedWifiNetwork
             ? " " + bar.shell.networkService.connectedWifiNetwork.name
             : "")
-        onActivated: bar.shell.network.toggle()
-        onSecondary: bar.shell.menu.popup("settings.network", modelData.name, networkButton)
+        onActivated: if (!bar.takeOver("network")) bar.shell.network.toggle()
+        onSecondary: bar.shell.menu.popup(bar.node("network", "settings.network"), modelData.name, networkButton)
       }
 
       Ui.BarButton {
@@ -263,8 +278,8 @@ Scope {
         anchors.rightMargin: 4
         foreground: bar.shell.bluetoothService.powered ? bar.shell.palette.fg : bar.shell.palette.alert
         label: bar.shell.bluetoothService.icon
-        onActivated: bar.shell.bluetooth.toggle()
-        onSecondary: bar.shell.menu.popup("settings.bluetooth", modelData.name, bluetoothButton)
+        onActivated: if (!bar.takeOver("bluetooth")) bar.shell.bluetooth.toggle()
+        onSecondary: bar.shell.menu.popup(bar.node("bluetooth", "settings.bluetooth"), modelData.name, bluetoothButton)
       }
 
       Ui.BarButton {
@@ -274,8 +289,8 @@ Scope {
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 4
         label: "󰍹"
-        onActivated: bar.shell.display.toggle()
-        onSecondary: bar.shell.menu.popup("settings.display", modelData.name, displayButton)
+        onActivated: if (!bar.takeOver("display")) bar.shell.display.toggle()
+        onSecondary: bar.shell.menu.popup(bar.node("display", "settings.display"), modelData.name, displayButton)
       }
 
       Ui.BarButton {
@@ -286,8 +301,8 @@ Scope {
         anchors.rightMargin: 4
         foreground: bar.shell.audio.muted ? bar.shell.palette.alert : bar.shell.palette.fg
         label: bar.shell.audio.icon
-        onActivated: bar.shell.audio.toggle()
-        onSecondary: bar.shell.menu.popup("settings.audio", modelData.name, audioButton)
+        onActivated: if (!bar.takeOver("audio")) bar.shell.audio.toggle()
+        onSecondary: bar.shell.menu.popup(bar.node("audio", "settings.audio"), modelData.name, audioButton)
       }
 
       // Separates status indicators from the settings.
