@@ -176,6 +176,11 @@ window-rule {
     open-floating true
 }
 
+window-rule {
+    match app-id=r#"^(org\.kde\.dolphin|org\.gnome\.Nautilus)$"#
+    open-floating true
+}
+
 
 // The recording service's camera preview: gpu-screen-recorder cannot mask its
 // own camera overlay, so the screen capture records this window instead. mpv
