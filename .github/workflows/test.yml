@@ -63,6 +63,10 @@ jobs:
       - name: test nix flake check
         run: nix flake check --show-trace --accept-flake-config
 
+      - name: test nix flake check kaizen
+        run: nix flake check ./kaizen --show-trace --accept-flake-config
+        if: matrix.name == 'renoir'
+
       # Build Darwin configurations on native macos runners (same architecture)
       - name: test nix build ${{ matrix.name }}
         run: |

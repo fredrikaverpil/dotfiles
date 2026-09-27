@@ -49,9 +49,11 @@ previous states. Explain a declaration next to it, not here.
 
 - `kaizen/nix/module.nix` owns the session: packages, portals, PAM, systemd
   units and the pre-suspend lock. `kaizen/nix/package.nix` builds the
-  `kaizen`, `kaizen-shell` and `kaizen-focus` commands.
-  `nix/shared/system/kaizen/desktop.nix` adds apps and personal settings.
-  `stow/kaizen/` owns compositor configuration, `kaizen/shell/` the QML.
+  `kaizen`, `kaizen-shell` and `kaizen-focus` commands. `kaizen/flake.nix`
+  exposes the module, package, devshell and checks to others; these hosts
+  import the module as a plain file. `nix/shared/system/kaizen/desktop.nix`
+  adds apps and personal settings. `stow/kaizen/` owns compositor
+  configuration, `kaizen/shell/` the QML.
 - `shell.qml` wires services and surfaces. Views belong in `plugins/panels/`;
   daemon/process state belongs in `plugins/services/`.
 - Interactive surfaces come in three kinds; pick by what opens them:
@@ -141,12 +143,14 @@ previous states. Explain a declaration next to it, not here.
 ## Required local validation
 
 Run relevant checks **before and after editing**, on the correct platform.
-These are development gates, not CI jobs. They live only in the repository's
-default devshell (`flake.nix`), entered by `direnv` at the repo root or run as
-`nix develop ~/.dotfiles -c <command>` (not `#dev`) from anywhere in the
-checkout. `compositor-test` and `shell-smoke` are Linux-only and are absent
-from the shell on macOS. All of them run against the one copy in `kaizen/shell/`
-and `stow/kaizen/`, so a static check passing here passes for every kaizen host.
+They are defined in `kaizen/nix/devshell.nix`, which both the repository's
+default devshell (`flake.nix`, entered by `direnv` at the repo root or run as
+`nix develop ~/.dotfiles -c <command>`, not `#dev`) and the subflake's
+(`nix develop ./kaizen`) provide; run them from anywhere in the checkout. CI
+runs only `qml-lint` and `qml-test`, through `nix flake check ./kaizen`.
+`compositor-test` and `shell-smoke` are Linux-only and are absent from the
+shell on macOS. All of them run against the one copy in `kaizen/shell/` and
+`stow/kaizen/`, so a static check passing here passes for every kaizen host.
 
 | Change | Checks |
 | --- | --- |

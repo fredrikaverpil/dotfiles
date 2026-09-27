@@ -136,44 +136,25 @@
                   export PATH="$HOME/.local/share/nvim-fredrik/mason/bin:$PATH"
                 '';
               };
-              # Entered by direnv (.envrc) for work on this repo itself: the QML
-              # tooling for the hosts' Quickshell trees, which does not belong
-              # in the toolchain every Neovim carries. Neovim inherits the env
-              # when launched from a shell in this directory.
+              # Entered by direnv (.envrc) for work on this repo itself: the
+              # kaizen devshell, which does not belong in the toolchain every
+              # Neovim carries. Neovim inherits the env when launched from a
+              # shell in this directory.
               default =
                 let
                   pkgs = channels.unstable;
-                  # Linux-only. Never built on Darwin: the x86_64-linux path
-                  # substitutes from cache.nixos.org, and only lib/qt-6/qml
-                  # (.qmltypes) is used here. Same nixpkgs as renoir, so the
-                  # same store path the ThinkPad runs.
-                  quickshell = unstable.x86_64-linux.quickshell;
-                  # Every kaizen host runs the one tree in kaizen/shell/.
-                  task =
-                    name: text:
-                    pkgs.writeShellScriptBin name ''
-                      set -e
-                      cd "$(git rev-parse --show-toplevel)/kaizen/shell"
-                      ${text}
-                    '';
+                  kaizen = pkgs.callPackage ./kaizen/nix/devshell.nix {
+                    # Linux-only. Never built on Darwin: the x86_64-linux path
+                    # substitutes from cache.nixos.org, and only lib/qt-6/qml
+                    # (.qmltypes) is used here. Same nixpkgs as renoir, so the
+                    # same store path the ThinkPad runs.
+                    quickshell = unstable.x86_64-linux.quickshell;
+                  };
                 in
                 pkgs.mkShell {
-                  packages = [
-                    pkgs.qt6.qtdeclarative # qmlls, qmllint, qmlformat, qmltestrunner
-                    (task "qml-lint" "qmllint -E -W 0 $(find . -name '*.qml')")
-                    (task "qml-test" "QT_QPA_PLATFORM=offscreen QT_QPA_PLATFORMTHEME= qmltestrunner -input tests")
-                    pkgs.lua
-                  ]
-                  ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
-                    pkgs.niri
-                    pkgs.jq
-                    (task "compositor-test" "tests/config_test.sh")
-                    (task "shell-smoke" "tests/shell_smoke.sh \"$@\"")
-                    (task "shell-perf" "tests/shell_perf.sh \"$@\"")
-                  ];
-                  # qmlls/qmllint/qmltestrunner take import paths from argv or
-                  # env only (`-E` reads this); .qmlls.ini has no key for them.
-                  QML_IMPORT_PATH = "${quickshell}/lib/qt-6/qml:${pkgs.qt6.qtdeclarative}/lib/qt-6/qml";
+                  inputsFrom = [ kaizen ];
+                  packages = [ pkgs.lua ];
+                  inherit (kaizen) QML_IMPORT_PATH;
                 };
             };
         in
