@@ -64,7 +64,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | bluetooth | [BlueZ] via [Quickshell] | button | Settings › Bluetooth | `bluetooth` |
 | brightness | [sysfs backlight] via [logind] SetBrightness | – | XF86 keys | `brightness` |
 | calendar | [dcal] JSON IPC | date button | Settings › Calendar | `calendar` |
-| clipboard | [wl-clipboard] watcher, in memory | clipboard button | Settings › Clipboard | `clipboard` |
+| clipboard | [wl-clipboard] watcher, in memory | – | Trigger › Clipboard | `clipboard` |
 | idle | [ext-idle-notify], lock service | idle indicator | Settings › Session | `idle` |
 | keyboard | [niri] XKB layouts | layout indicator | Settings › Keyboard layout | `keyboard` |
 | media | [MPRIS] | now-playing widget | Settings › Media | `media` |
@@ -134,7 +134,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 ```
 Launcher (plugins/menu)            keyboard entry point; drills down levels
   ├─ Apps, Keybindings, Emoji     providers
-  ├─ Trigger                      screenshots, recording, window actions
+  ├─ Trigger                      screenshots, recording, clipboard, window actions
   ├─ Settings                     per bar button: its panel, then its actions; Session
   └─ Tray                         tray menus, cascaded per level
 Panel (Ui/Panel)                   centered card; h/l step focus
