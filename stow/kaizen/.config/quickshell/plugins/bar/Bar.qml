@@ -51,6 +51,7 @@ Scope {
       }
 
       BarWidgets.Workspaces {
+        id: workspaces
         anchors.left: menuButton.right
         anchors.leftMargin: 4
         anchors.verticalCenter: parent.verticalCenter
@@ -60,12 +61,32 @@ Scope {
         fontScale: bar.shell.textScale
       }
 
+      // Centered until a side group reaches it, then pushed aside.
       Row {
-        id: clockLabel
-        anchors.right: parent.right
+        id: clockGroup
+        x: Math.max(workspaces.x + workspaces.width + 12,
+          Math.min((parent.width - width) / 2, tray.x - width - 12))
         anchors.verticalCenter: parent.verticalCenter
-        anchors.rightMargin: 4
         spacing: 6
+
+        Ui.BarButton {
+          id: weatherButton
+          shell: bar.shell
+          anchors.verticalCenter: parent.verticalCenter
+          implicitWidth: 58 * bar.shell.textScale
+          label: bar.shell.weatherService.ready
+            ? bar.shell.weatherService.icon + " " + bar.shell.weatherService.temperature
+            : bar.shell.weatherService.icon
+          onActivated: bar.shell.weather.toggle()
+          onSecondary: bar.shell.menu.popup("settings.weather", modelData.name, weatherButton)
+        }
+
+        Rectangle {
+          anchors.verticalCenter: parent.verticalCenter
+          width: 1
+          height: 16 * bar.shell.textScale
+          color: bar.shell.palette.dim
+        }
 
         Ui.BarButton {
           id: dateLabel
@@ -113,47 +134,12 @@ Scope {
         }
       }
 
-      Rectangle {
-        id: weatherDivider
-        anchors.right: clockLabel.left
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.rightMargin: 6
-        width: 1
-        height: 16 * bar.shell.textScale
-        color: bar.shell.palette.dim
-      }
-
-      Ui.BarButton {
-        id: weatherButton
-        shell: bar.shell
-        anchors.right: weatherDivider.left
-        anchors.rightMargin: 6
-        anchors.verticalCenter: parent.verticalCenter
-        implicitWidth: 58 * bar.shell.textScale
-        label: bar.shell.weatherService.ready
-          ? bar.shell.weatherService.icon + " " + bar.shell.weatherService.temperature
-          : bar.shell.weatherService.icon
-        onActivated: bar.shell.weather.toggle()
-        onSecondary: bar.shell.menu.popup("settings.weather", modelData.name, weatherButton)
-      }
-
-      // Separates the clock and weather from the session buttons.
-      Rectangle {
-        id: clockDivider
-        anchors.right: weatherButton.left
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.rightMargin: 6
-        width: 1
-        height: 16 * bar.shell.textScale
-        color: bar.shell.palette.dim
-      }
-
       Ui.BarButton {
         id: notificationButton
         shell: bar.shell
-        anchors.right: clockDivider.left
+        anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
-        anchors.rightMargin: 6
+        anchors.rightMargin: 4
         readonly property int pending: bar.shell.notifications.historyRows.length
         foreground: bar.shell.notifications.doNotDisturb ? bar.shell.palette.rose : bar.shell.palette.fg
         label: (bar.shell.notifications.doNotDisturb ? "󰂛" : "󰂚")
