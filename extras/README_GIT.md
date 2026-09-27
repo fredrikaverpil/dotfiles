@@ -156,8 +156,9 @@ Optionally enable commit signing with `~/.gitconfig_signing`:
 
 ### Proton Pass (using its own agent)
 
-Instead of loading keys into the system agent, run `pass-cli` as the SSH agent
-itself. It listens on `$HOME/.ssh/proton-pass-agent.sock`
+Instead of loading keys into the system agent, let Proton Pass be the SSH agent
+itself. The desktop app listens on `$HOME/.ssh/proton-pass-ssh-agent.sock`, and
+`pass-cli` on `$HOME/.ssh/proton-pass-agent.sock`
 ([pass-cli docs](https://protonpass.github.io/pass-cli/commands/ssh-agent/)).
 
 #### Using Proton Pass desktop app
