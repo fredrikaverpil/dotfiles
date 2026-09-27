@@ -32,18 +32,24 @@ function parseBinds(raw) {
 // The binds of file with its includes expanded in place, resolved as niri does:
 // ~ is home, other paths are relative to the including file, and nesting stops
 // at 10 levels. read(path) returns a file's text, or null for a file it cannot
-// read, which is skipped.
+// read, which is skipped. A chord bound again overrides the earlier bind, so
+// only the last is kept; niri ignores case and modifier order.
 function readBinds(file, home, read, depth) {
   var raw = (depth || 0) < 10 ? read(file) : null
   if (raw === null) return []
   var dir = file.slice(0, file.lastIndexOf("/") + 1)
   // Splitting on a capture group alternates text and include paths.
-  return String(raw).split(/^[ \t]*include[ \t][^"\n]*"([^"]*)".*$/m)
+  var binds = String(raw).split(/^[ \t]*include[ \t][^"\n]*"([^"]*)".*$/m)
     .reduce(function(binds, part, index) {
       if (index % 2 === 0) return binds.concat(parseBinds(part))
       var path = /^~(\/|$)/.test(part) ? home + part.slice(1) : part.startsWith("/") ? part : dir + part
       return binds.concat(readBinds(path, home, read, (depth || 0) + 1))
     }, [])
+  if (depth) return binds
+  var key = function(bind) { return bind.chord.toLowerCase().split("+").sort().join("+") }
+  return binds.filter(function(bind, index) {
+    return !binds.slice(index + 1).some(function(later) { return key(later) === key(bind) })
+  })
 }
 
 // focus-workspace acts on the focused output, so focus the target output first.
