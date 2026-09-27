@@ -322,6 +322,9 @@ Scope {
         shell: bar.shell
         panel: bar.shell.tray
         output: modelData.name
+        // Between the centered clock group, with its 12px gap, and the indicators, less
+        // the tray divider and its margins.
+        maxWidth: systemButton.x - 13 - (parent.width + clockGroup.width) / 2 - 12
       }
     }
   }
