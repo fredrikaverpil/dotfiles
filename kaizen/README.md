@@ -217,8 +217,9 @@ edit with `qs -c kaizen ipc call shell reload`.
 
 This repository's
 [calendar plugin](../nix/shared/system/kaizen/calendar/) is a complete
-example: a bar button, launcher items, a panel, a service and IPC, with the
-calendar daemon it reads set up in its `default.nix`.
+example: it takes over the date button and adds launcher items, a panel, a
+service and IPC, with the calendar daemon it reads set up in its
+`default.nix`.
 
 ## Further reading
 

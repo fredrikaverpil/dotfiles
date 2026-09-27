@@ -1,4 +1,3 @@
-import QtQuick
 
 import qs.Ui as Ui
 
@@ -12,13 +11,7 @@ Ui.Plugin {
     "settings.calendar.panel": { icon: "󰕮", label: "Calendar panel", action: () => calendarPanel.open() },
     "settings.calendar.refresh": { icon: "󰑐", label: "Refresh", action: () => calendarService.refresh() },
   })
-  barButton: Component {
-    Ui.BarButton {
-      shell: plugin.shell
-      label: "󰃭"
-      onActivated: calendarPanel.toggle()
-    }
-  }
+  barActions: ({ date: () => calendarPanel.toggle() })
 
   Service {
     id: calendarService
