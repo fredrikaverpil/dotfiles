@@ -95,7 +95,7 @@ Ui.Panel {
     },
     "settings.bluetooth.devices": { icon: "󰂱", label: "Devices", provider: "devices" },
     "settings.bluetooth.pair": { icon: "󰐕", label: "Pair new device…", enabled: menu.shell.bluetoothService.available,
-      action: () => Quickshell.execDetached(["ghostty", "-e", "bluetui"]) },
+      action: () => Quickshell.execDetached(["xdg-terminal-exec", "bluetui"]) },
     "settings.network": { icon: menu.shell.networkService.icon, label: "Network" },
     "settings.network.panel": { icon: "󰕮", label: "Network panel", action: () => menu.shell.network.open() },
     "settings.network.wifi": {
