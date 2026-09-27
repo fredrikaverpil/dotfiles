@@ -171,6 +171,11 @@ window-rule {
     open-on-workspace "7"
 }
 
+window-rule {
+    match app-id=r#"^system-config-printer$"#
+    open-floating true
+}
+
 
 // The recording service's camera preview: gpu-screen-recorder cannot mask its
 // own camera overlay, so the screen capture records this window instead. mpv
