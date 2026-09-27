@@ -201,13 +201,24 @@ Ui.Panel {
 
   property var binds: []
 
+  // readBinds() points it at each config file in turn and reads it blocking.
   FileView {
     id: bindsFile
-    path: Ui.Compositor.configFile(Quickshell.env("HOME"))
-    watchChanges: true
+    preload: false
+    blockAllReads: true
     printErrors: false
-    onFileChanged: reload()
-    onLoaded: menu.binds = Ui.Compositor.parseBinds(text())
+  }
+
+  // Called on each open of the level, so edits to any included file show.
+  function readBinds() {
+    const home = Quickshell.env("HOME")
+    const file = Ui.Compositor.configFile(home, Quickshell.env("NIRI_CONFIG"))
+    binds = Ui.Compositor.readBinds(file, home, path => {
+      bindsFile.path = path
+      bindsFile.reload()
+      const text = bindsFile.text()
+      return bindsFile.loaded ? text : null
+    })
   }
 
   property var emojis: []
@@ -428,6 +439,7 @@ Ui.Panel {
   function open(target) {
     if (shell && shell.registerPanel) shell.registerPanel(menu)
     if (shell && shell.claimPanel) shell.claimPanel(menu)
+    if (menu.items[target]?.provider === "binds") readBinds()
     level = target
     input.text = ""
     shown = true
