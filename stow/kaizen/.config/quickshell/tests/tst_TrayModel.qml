@@ -25,6 +25,21 @@ TestCase {
     compare(items.map(i => i.id), ["signal", "dropbox", "nm-applet"])
   }
 
+  function test_visible_count_data() {
+    return [
+      { tag: "all fit exactly", count: 4, maxWidth: 236, want: 4 },
+      { tag: "one short keeps an overflow slot", count: 4, maxWidth: 235, want: 2 },
+      { tag: "unbounded", count: 4, maxWidth: Infinity, want: 4 },
+      { tag: "room for overflow only", count: 4, maxWidth: 56, want: 0 },
+      { tag: "negative", count: 4, maxWidth: -50, want: 0 },
+      { tag: "empty", count: 0, maxWidth: 0, want: 0 }
+    ]
+  }
+
+  function test_visible_count(data) {
+    verify(Tray.visibleCount(data.count, data.maxWidth, 56, 4) === data.want)
+  }
+
   function test_theme_icon_data() {
     return [
       { tag: "theme lookup", url: "image://icon/nm-device-wired", want: "nm-device-wired" },

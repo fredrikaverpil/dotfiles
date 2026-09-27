@@ -380,9 +380,10 @@ Ui.Panel {
 
   readonly property var rows: Model.rowsFor(menu.items, level, input.text, menu.providers)
 
-  // Launcher rows shaped like QsMenuEntry, for the context menu.
-  function contextRows(target) {
-    const rows = Model.rowsFor(menu.items, target, "", menu.providers).map(row => {
+  // Launcher rows shaped like QsMenuEntry, for the context menu; keep filters
+  // the target's own rows.
+  function contextRows(target, keep) {
+    const rows = Model.rowsFor(menu.items, target, "", menu.providers).filter(keep || (() => true)).map(row => {
       const cascades = row.submenu && !menu.items[row.id].search
       const handsOff = row.submenu && !cascades
       const run = handsOff ? () => menu.open(row.id)
@@ -411,13 +412,13 @@ Ui.Panel {
   // Opens target as a context menu hanging from button on output; without them
   // it centers on the focused output. Opening the shown one again on its output
   // closes it.
-  function popup(target, output, button) {
+  function popup(target, output, button, keep) {
     if (contextMenu.shown && popped === target && (!output || contextMenu.screen?.name === output)) {
       contextMenu.close()
       return
     }
     popped = target
-    contextMenu.popup({ rows: () => menu.contextRows(target) }, output, button ? () => {
+    contextMenu.popup({ rows: () => menu.contextRows(target, keep) }, output, button ? () => {
       const point = button.mapToItem(null, 0, 0)
       return { below: true, x: point.x, width: button.width }
     } : null)
