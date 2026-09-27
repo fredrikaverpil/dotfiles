@@ -1,10 +1,10 @@
 # niri + Quickshell desktop
 
 This file documents the niri + Quickshell desktop and lives with it. Every
-host running it shares one copy of everything: `desktop.nix` in this
-directory, `../thinkpad.nix` next to it, and the compositor config and QML in
-`stow/kaizen/`. An edit lands on every kaizen host at once, so there is no
-promotion step and no drift to diff for.
+host running it shares one copy of everything: `session.nix` and
+`desktop.nix` in this directory, `../thinkpad.nix` next to it, and the
+compositor config and QML in `stow/kaizen/`. An edit lands on every kaizen host
+at once, so there is no promotion step and no drift to diff for.
 
 What stays per host, in `nix/hosts/<host>/`: hardware and firmware settings
 (`hardware-configuration.nix`, disk and resume devices, GPU drivers, sleep
@@ -40,13 +40,15 @@ previous states. Explain a declaration next to it, not here.
   namespaces, D-Bus path, state files). It is host-agnostic; `renoir` and
   `wily` are only hostnames.
 - Nix comments carry the "why" for packages, portals, PAM, units and hardware
-  integration. Read `desktop.nix` here and `../thinkpad.nix`, plus the host's
-  `configuration.nix`, before asking.
+  integration. Read `session.nix` and `desktop.nix` here and
+  `../thinkpad.nix`, plus the host's `configuration.nix`, before asking.
 
 ## Architecture
 
-- `desktop.nix` owns packages, portals, PAM, systemd units and the pre-suspend
-  lock. `stow/kaizen/` owns compositor configuration and QML.
+- `session.nix` owns the session: niri under UWSM, portals, PAM, the shell's
+  systemd units, the pre-suspend lock and the packages the shell runs.
+  `desktop.nix` imports it and adds apps and personal settings. `stow/kaizen/`
+  owns compositor configuration and QML.
 - `shell.qml` wires services and surfaces. Views belong in `plugins/panels/`;
   daemon/process state belongs in `plugins/services/`.
 - Interactive surfaces come in three kinds; pick by what opens them:

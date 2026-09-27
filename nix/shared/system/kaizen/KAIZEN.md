@@ -48,7 +48,7 @@ flowchart BT
   HW --> SYS --> WM --> SHELL
 ```
 
-Each layer calls downward only. Nix (`desktop.nix`, `thinkpad.nix`) owns the
+Each layer calls downward only. Nix (`session.nix`, `desktop.nix`, `thinkpad.nix`) owns the
 two lower layers and the systemd units; Stow (`stow/kaizen/`) owns compositor
 config and QML. Both are shared by every kaizen host.
 
@@ -214,5 +214,5 @@ closes niri's readiness-before-`WAYLAND_DISPLAY` race.
 4. Then: daemon/process state → `plugins/services/`, view →
    `plugins/panels/`; a protocol-driven surface with no other consumer of its
    state (lock, notifications, polkit) keeps both in `plugins/<name>/`.
-   Packages/units/PAM → `desktop.nix`, compositor → `Ui/compositors/` and
+   Packages/units/PAM → `session.nix`, compositor → `Ui/compositors/` and
    `niri/config.kdl`, IPC target for every new action.

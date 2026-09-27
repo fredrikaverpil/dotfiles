@@ -2,7 +2,7 @@
 
 Personal machine. The niri + Quickshell desktop it runs is shared with `wily`
 and documented in `nix/shared/system/kaizen/CLAUDE.md`; its Nix modules are
-`nix/shared/system/kaizen/desktop.nix` and `nix/shared/system/thinkpad.nix`.
+`nix/shared/system/kaizen/` and `nix/shared/system/thinkpad.nix`.
 Machine-specific settings (microcode, VAAPI driver, kernel choice) and
 host-only programs belong in `configuration.nix`.
 
@@ -51,7 +51,7 @@ Then rebuild, and run `fprintd-enroll` and `fprintd-verify`.
   `nix eval --raw .#nixosConfigurations.renoir.config.security.pam.services.<name>.text`;
   `environment.etc."pam.d/<name>".text` is null because it uses `source`.
 - The lock screen needs a separate, concurrent fingerprint `PamContext` (see
-  the `kaizen-lock` comment in `nix/shared/system/kaizen/desktop.nix`). Test it with a recovery plan
+  the `kaizen-lock` comment in `nix/shared/system/kaizen/session.nix`). Test it with a recovery plan
   before enabling it for `login`.
 - fwupd cannot read the reader's firmware version: it answers with an
   unmapped status `0x315`. libfprint talks to it independently; untested.
