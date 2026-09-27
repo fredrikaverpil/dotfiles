@@ -10,8 +10,59 @@
   qt6,
   unicode-emoji,
   jq,
+  niri,
+  dconf,
+  xdg-utils,
+  wl-clipboard,
+  libnotify,
+  iproute2,
+  iputils,
+  uwsm,
+  xdg-terminal-exec,
+  pipewire,
+  mpv,
+  grim,
+  gpu-screen-recorder,
+  satty,
+  imagemagick,
+  kdePackages,
+  curl,
+  wl-gammarelay-rs,
+  bluetui,
+  networkmanager,
+  networkmanagerapplet,
+  glibc,
 }:
 let
+  # What the shell runs. Suffixed onto PATH, so the host's own win, such as the
+  # setcap gpu-screen-recorder and ping wrappers.
+  runtime = [
+    niri
+    dconf
+    xdg-utils
+    wl-clipboard
+    libnotify
+    iproute2
+    iputils
+    uwsm
+    xdg-terminal-exec
+    pipewire
+    mpv
+    grim
+    gpu-screen-recorder
+    satty
+    imagemagick
+    kdePackages.kconfig
+    curl
+    jq
+    wl-gammarelay-rs
+    bluetui
+    networkmanager
+    networkmanagerapplet
+    # zdump
+    glibc.bin
+  ];
+
   # Shortcode -> emoji, for apps (Slack) that send `:name:` in notification text.
   emoji-shortcodes =
     runCommand "emoji-shortcodes.json"
@@ -56,7 +107,8 @@ stdenvNoCC.mkDerivation {
       --add-flags "-c kaizen" \
       --set QT_PLUGIN_PATH ${qt6.qtimageformats}/lib/qt-6/plugins \
       --set EMOJI_TEST ${unicode-emoji}/share/unicode/emoji/emoji-test.txt \
-      --set EMOJI_SHORTCODES ${emoji-shortcodes}
+      --set EMOJI_SHORTCODES ${emoji-shortcodes} \
+      --suffix PATH : ${lib.makeBinPath runtime}
     runHook postInstall
   '';
 

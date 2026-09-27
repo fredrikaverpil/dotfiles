@@ -4,8 +4,8 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-# kaizen's niri files as a user's config includes them.
-niri validate --config <(printf 'include "%s"\n' "$(realpath ../niri)"/kaizen{,-binds}.kdl)
+# kaizen's niri files, through the trial config that includes them.
+niri validate --config ../niri/trial.kdl
 printf 'PASS: compositor configuration contracts\n'
 
 # KAIZEN.md rules with a mechanical check: the IPC column of the services

@@ -19,6 +19,18 @@
         default = pkgs.callPackage ./nix/package.nix { };
       });
 
+      apps = forAllSystems (pkgs: {
+        default = {
+          type = "app";
+          program = pkgs.lib.getExe (
+            pkgs.callPackage ./nix/trial.nix {
+              kaizen = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            }
+          );
+          meta.description = "Try kaizen from a console login, without installing it";
+        };
+      });
+
       devShells = forAllSystems (pkgs: {
         default = pkgs.callPackage ./nix/devshell.nix { };
       });

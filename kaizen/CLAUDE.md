@@ -50,8 +50,9 @@ previous states. Explain a declaration next to it, not here.
 - `kaizen/nix/module.nix` owns the session: packages, portals, PAM, systemd
   units and the pre-suspend lock. `kaizen/nix/package.nix` builds the
   `kaizen`, `kaizen-shell` and `kaizen-focus` commands. `kaizen/flake.nix`
-  exposes the module, package, devshell and checks to others; these hosts
-  import the module as a plain file. `nix/shared/system/kaizen/desktop.nix`
+  exposes the module, package, devshell and checks to others, and the
+  `nix run` trial (`kaizen/nix/trial.nix`, niri config
+  `kaizen/niri/trial.kdl`); these hosts import the module as a plain file. `nix/shared/system/kaizen/desktop.nix`
   adds apps and personal settings. `kaizen/shell/` holds the QML.
   `kaizen/niri/kaizen.kdl` holds the niri settings the shell needs and
   `kaizen-binds.kdl` its binds; the niri config in `stow/kaizen/` includes
