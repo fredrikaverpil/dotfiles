@@ -181,6 +181,10 @@ in
     # ~/.config/quickshell/kaizen takes precedence.
     environment.etc."xdg/quickshell/kaizen".source = "${cfg.package}/share/kaizen/shell";
 
+    # For the user's niri config to include: kaizen.kdl (required) and
+    # kaizen-binds.kdl.
+    environment.etc."kaizen/niri".source = "${cfg.package}/share/kaizen/niri";
+
     systemd.user.services.kaizen-shell = {
       description = "Quickshell desktop shell";
       partOf = [ "graphical-session.target" ];

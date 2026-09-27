@@ -50,9 +50,11 @@ flowchart BT
 ```
 
 Each layer calls downward only. Nix (`kaizen/nix/`, `desktop.nix`,
-`thinkpad.nix`) owns the two lower layers and the systemd units; Stow
-(`stow/kaizen/`) owns compositor config and links the QML (`kaizen/shell/`) as
-`~/.config/quickshell/kaizen`. Both are shared by every kaizen host.
+`thinkpad.nix`) owns the two lower layers and the systemd units. The niri
+config (`stow/kaizen/`) includes what the shell needs from niri
+(`niri/kaizen.kdl`) and its binds (`niri/kaizen-binds.kdl`); Stow links it and
+the QML (`kaizen/shell/`, as `~/.config/quickshell/kaizen`). All are shared by
+every kaizen host.
 
 ## Services to surfaces
 
@@ -148,7 +150,7 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 - Launcher, panel and context menu hold exclusive keyboard focus and close
   each other through `shell.claimPanel`. Pick by what opens the surface.
 - Every surface opens over IPC; niri binds are
-  `spawn qs -c kaizen ipc call ...`.
+  `spawn qs -c kaizen ipc call ...`, in `niri/kaizen-binds.kdl`.
 - The bar mirrors the launcher; nothing is reachable only from it. Every
   panel action is a launcher row under Settings, except sliders and per-item
   detail (forgetting a network, recording options).
@@ -218,4 +220,4 @@ closes niri's readiness-before-`WAYLAND_DISPLAY` race.
    protocol-driven surface with no other consumer of its state (lock,
    notifications, polkit) keeps both in `plugins/<name>/`. Packages/units/PAM →
    `kaizen/nix/module.nix`, compositor → `Ui/compositors/` and
-   `niri/config.kdl`, IPC target for every new action.
+   `niri/kaizen.kdl`, IPC target for every new action.

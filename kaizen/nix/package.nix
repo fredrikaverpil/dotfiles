@@ -1,5 +1,5 @@
-# The QML tree, the `kaizen` launcher, `kaizen-focus`, and `kaizen-shell`,
-# which runs the tree as Quickshell config "kaizen".
+# The QML tree, the niri includes, the `kaizen` launcher, `kaizen-focus`, and
+# `kaizen-shell`, which runs the tree as Quickshell config "kaizen".
 {
   lib,
   stdenvNoCC,
@@ -37,6 +37,7 @@ stdenvNoCC.mkDerivation {
     root = ../.;
     fileset = lib.fileset.unions [
       ../bin
+      ../niri
       (lib.fileset.difference ../shell ../shell/tests)
     ];
   };
@@ -46,7 +47,7 @@ stdenvNoCC.mkDerivation {
   installPhase = ''
     runHook preInstall
     mkdir -p $out/share/kaizen
-    cp -r shell $out/share/kaizen/shell
+    cp -r shell niri $out/share/kaizen
     install -Dm755 -t $out/bin bin/*
     wrapProgram $out/bin/kaizen-focus --prefix PATH : ${lib.makeBinPath [ jq ]}
     # qtimageformats supplies Quickshell's WebP decoder.

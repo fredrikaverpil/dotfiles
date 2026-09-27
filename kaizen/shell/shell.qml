@@ -120,7 +120,7 @@ ShellRoot {
   Process { id: write }
   Process { id: kdeglobals }
 
-  // Included by niri/config.kdl.
+  // Included by niri/kaizen.kdl.
   FileView {
     id: niriColors
     path: Ui.Paths.state + "/niri-colors.kdl"

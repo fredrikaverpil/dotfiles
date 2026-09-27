@@ -2,10 +2,10 @@
 
 This file documents the niri + Quickshell desktop and lives with it. Every host
 running it shares one copy of everything: the module in `kaizen/nix/`, the QML
-in `kaizen/shell/`, `nix/shared/system/kaizen/desktop.nix`,
-`nix/shared/system/thinkpad.nix` and the compositor config in `stow/kaizen/`.
-An edit lands on every kaizen host at once, so there is no promotion step and
-no drift to diff for.
+in `kaizen/shell/`, the niri includes in `kaizen/niri/`,
+`nix/shared/system/kaizen/desktop.nix`, `nix/shared/system/thinkpad.nix` and
+the niri config in `stow/kaizen/`. An edit lands on every kaizen host at once,
+so there is no promotion step and no drift to diff for.
 
 What stays per host, in `nix/hosts/<host>/`: hardware and firmware settings
 (`hardware-configuration.nix`, disk and resume devices, GPU drivers, sleep
@@ -52,8 +52,10 @@ previous states. Explain a declaration next to it, not here.
   `kaizen`, `kaizen-shell` and `kaizen-focus` commands. `kaizen/flake.nix`
   exposes the module, package, devshell and checks to others; these hosts
   import the module as a plain file. `nix/shared/system/kaizen/desktop.nix`
-  adds apps and personal settings. `stow/kaizen/` owns compositor
-  configuration, `kaizen/shell/` the QML.
+  adds apps and personal settings. `kaizen/shell/` holds the QML.
+  `kaizen/niri/kaizen.kdl` holds the niri settings the shell needs and
+  `kaizen-binds.kdl` its binds; the niri config in `stow/kaizen/` includes
+  both first and owns everything else.
 - `shell.qml` wires services and surfaces. Views belong in `plugins/panels/`;
   daemon/process state belongs in `plugins/services/`.
 - Interactive surfaces come in three kinds; pick by what opens them:
@@ -147,16 +149,16 @@ They are defined in `kaizen/nix/devshell.nix`, which both the repository's
 default devshell (`flake.nix`, entered by `direnv` at the repo root or run as
 `nix develop ~/.dotfiles -c <command>`, not `#dev`) and the subflake's
 (`nix develop ./kaizen`) provide; run them from anywhere in the checkout. CI
-runs only `qml-lint` and `qml-test`, through `nix flake check ./kaizen`.
-`compositor-test` and `shell-smoke` are Linux-only and are absent from the
-shell on macOS. All of them run against the one copy in `kaizen/shell/` and
-`stow/kaizen/`, so a static check passing here passes for every kaizen host.
+runs `qml-lint`, `qml-test` and `compositor-test`, through
+`nix flake check ./kaizen`. `compositor-test` and `shell-smoke` are Linux-only
+and are absent from the shell on macOS. All of them run against the one copy
+in `kaizen/`, so a static check passing here passes for every kaizen host.
 
 | Change | Checks |
 | --- | --- |
 | Nix | `nix fmt`, `nix build .#nixosConfigurations.<host>.config.system.build.toplevel`; build both kaizen hosts, a shared module breaks both |
 | JS/QML | `qml-test`, `qml-lint` (any platform) |
-| Compositor interface, config, or bind contract | Also `compositor-test` (Linux) |
+| Compositor interface, config, or bind contract | Also `compositor-test` (Linux); `niri validate` for `stow/kaizen/` |
 | Service IPC, `shell.qml` wiring, or systemd units | Also `shell-smoke` on the machine after deploy and restart, and exercise the affected path |
 | Panel views | Also `shell-smoke --panels` |
 | Device-dependent behaviour | Also validate on the actual ThinkPad |
@@ -218,7 +220,9 @@ shell on macOS. All of them run against the one copy in `kaizen/shell/` and
 - `compare()` handles objects/arrays but tolerates small numeric differences.
   Use `verify(actual === expected)` for exact values/identity and `fuzzyCompare`
   for explicit tolerances. Do not compare objects via JSON serialization.
-- `compositor-test` validates niri's KDL. It does not test dispatch.
+- `compositor-test` validates `kaizen/niri/`'s KDL. It does not test dispatch,
+  nor the niri config in `stow/kaizen/`, whose includes resolve through
+  `~/.dotfiles`.
 
 ### Tooling
 

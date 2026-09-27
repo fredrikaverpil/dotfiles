@@ -4,6 +4,10 @@
 // niri uses the first matching output block, so this stays above any other.
 include "outputs.kdl"
 
+// kaizen's required settings and shell binds; what follows overrides them.
+include "~/.dotfiles/kaizen/niri/kaizen.kdl"
+include "~/.dotfiles/kaizen/niri/kaizen-binds.kdl"
+
 input {
     keyboard {
         xkb {
@@ -33,20 +37,7 @@ input {
 layout {
     gaps 8
     always-center-single-column
-    focus-ring {
-        off
-    }
-    // Only the focused window is outlined; a transparent inactive border keeps
-    // the layout identical and needs no colour per light/dark theme.
-    border {
-        width 2
-        inactive-color "transparent"
-    }
 }
-
-// The shell writes the active border colour from its palette on each theme
-// change.
-include optional=true "~/.local/state/kaizen-shell/niri-colors.kdl"
 
 environment {
     GDK_SCALE "1"
@@ -67,12 +58,6 @@ workspace "4" { open-on-output "DP-1"; }
 workspace "5" { open-on-output "DP-1"; }
 workspace "6" { open-on-output "DP-1"; }
 workspace "7" { open-on-output "DP-1"; }
-
-// Quickshell draws two wallpapers: one inside the workspaces, one behind them.
-layer-rule {
-    match namespace=r#"^quickshell-backdrop$"#
-    place-within-backdrop true
-}
 
 // Make top and overlay layers use the regular blur (if enabled),
 // while bottom and background layers keep using the efficient xray blur.
@@ -182,69 +167,18 @@ window-rule {
     open-floating true
 }
 
-
-// The recording service's camera preview: gpu-screen-recorder cannot mask its
-// own camera overlay, so the screen capture records this window instead. mpv
-// sets its title after the initial configure, so opening rules need the app id
-// to match. niri clamps the radius to half the window, so any square mpv asks
-// for comes out a circle; the size is mpv's, since a rule size is in device
-// pixels and a proportion does not apply to floating windows.
-window-rule {
-    match app-id=r#"^kaizen-camera$"#
-
-    open-floating true
-    open-focused false
-    default-floating-position x=32 y=32 relative-to="bottom-right"
-    geometry-corner-radius 9999
-    clip-to-geometry true
-    border {
-        off
-    }
-}
-
-cursor {
-    xcursor-theme "Bibata-Modern-Classic"
-    xcursor-size 24
-}
-
-// Exports WAYLAND_DISPLAY to the systemd user manager. NIRI_SOCKET must be
-// named explicitly, or `niri msg` fails inside the shell.
-spawn-at-startup "uwsm" "finalize" "NIRI_SOCKET"
-
 binds {
-    // Shell
-    Mod+Space hotkey-overlay-title="Menu" { spawn "qs" "-c" "kaizen" "ipc" "call" "menu" "toggle"; }
-    Mod+Shift+Space hotkey-overlay-title="Next keyboard layout" { spawn "qs" "-c" "kaizen" "ipc" "call" "keyboard" "next"; }
-    Super+Alt+L hotkey-overlay-title="Lock the screen" { spawn "qs" "-c" "kaizen" "ipc" "call" "lock" "lock"; }
-    Mod+N hotkey-overlay-title="Select notification" { spawn "qs" "-c" "kaizen" "ipc" "call" "notifications" "select"; }
-    Mod+Shift+Comma hotkey-overlay-title="Dismiss all notifications" { spawn "qs" "-c" "kaizen" "ipc" "call" "notifications" "dismissAll"; }
+    // Session
     Mod+Shift+Slash hotkey-overlay-title="Show hotkey overlay" { show-hotkey-overlay; }
     Mod+Escape allow-inhibiting=false hotkey-overlay-title="Toggle shortcuts inhibit" { toggle-keyboard-shortcuts-inhibit; }
     Mod+Shift+E hotkey-overlay-title="Exit niri" { quit; }
     Ctrl+Alt+Delete hotkey-overlay-title="Exit niri" { quit; }
-
-    // Hardware keys. allow-when-locked keeps these working on the lock screen.
-    XF86AudioRaiseVolume allow-when-locked=true hotkey-overlay-title="Volume up" { spawn "qs" "-c" "kaizen" "ipc" "call" "audio" "up"; }
-    XF86AudioLowerVolume allow-when-locked=true hotkey-overlay-title="Volume down" { spawn "qs" "-c" "kaizen" "ipc" "call" "audio" "down"; }
-    XF86AudioMute allow-when-locked=true repeat=false hotkey-overlay-title="Mute" { spawn "qs" "-c" "kaizen" "ipc" "call" "audio" "mute"; }
-    XF86AudioMicMute allow-when-locked=true repeat=false hotkey-overlay-title="Mute microphone" { spawn "qs" "-c" "kaizen" "ipc" "call" "audio" "micMute"; }
-    XF86MonBrightnessUp allow-when-locked=true hotkey-overlay-title="Brightness up" { spawn "qs" "-c" "kaizen" "ipc" "call" "brightness" "up"; }
-    XF86MonBrightnessDown allow-when-locked=true hotkey-overlay-title="Brightness down" { spawn "qs" "-c" "kaizen" "ipc" "call" "brightness" "down"; }
-    XF86AudioNext allow-when-locked=true repeat=false hotkey-overlay-title="Next track" { spawn "qs" "-c" "kaizen" "ipc" "call" "media" "next"; }
-    XF86AudioPause allow-when-locked=true repeat=false hotkey-overlay-title="Play/pause" { spawn "qs" "-c" "kaizen" "ipc" "call" "media" "playPause"; }
-    XF86AudioPlay allow-when-locked=true repeat=false hotkey-overlay-title="Play/pause" { spawn "qs" "-c" "kaizen" "ipc" "call" "media" "playPause"; }
-    XF86AudioPrev allow-when-locked=true repeat=false hotkey-overlay-title="Previous track" { spawn "qs" "-c" "kaizen" "ipc" "call" "media" "previous"; }
 
     // Capture. niri saves screenshots to screenshot-path, default
     // ~/Pictures/Screenshots, and copies them to the clipboard.
     Print repeat=false hotkey-overlay-title="Screenshot a selection" { screenshot; }
     Ctrl+Print repeat=false hotkey-overlay-title="Screenshot the screen" { screenshot-screen; }
     Alt+Print repeat=false hotkey-overlay-title="Screenshot the window" { screenshot-window; }
-    // The shell's keyboard-first region selector; niri's own is pointer-driven.
-    Shift+Print repeat=false hotkey-overlay-title="Screenshot a region" { spawn "qs" "-c" "kaizen" "ipc" "call" "recording" "screenshot"; }
-    // Opens the recording panel, or stops a running recording.
-    Mod+Print repeat=false hotkey-overlay-title="Record the screen" { spawn "qs" "-c" "kaizen" "ipc" "call" "recording" "toggle"; }
-    Mod+Shift+Print repeat=false hotkey-overlay-title="Pause or resume the recording" { spawn "qs" "-c" "kaizen" "ipc" "call" "recording" "pause"; }
 
     // Launch
     Mod+T hotkey-overlay-title="Focus or open a terminal" { spawn "kaizen-focus" r#"^com\.mitchellh\.ghostty$"# "ghostty"; }

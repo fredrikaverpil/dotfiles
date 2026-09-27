@@ -1,0 +1,54 @@
+// The niri settings kaizen needs. Include it near the top of your config;
+// what follows the include overrides it.
+
+// Exports WAYLAND_DISPLAY to the systemd user manager. NIRI_SOCKET must be
+// named explicitly, or `niri msg` fails inside the shell.
+spawn-at-startup "uwsm" "finalize" "NIRI_SOCKET"
+
+layout {
+    focus-ring {
+        off
+    }
+    // Only the focused window is outlined; a transparent inactive border keeps
+    // the layout identical and needs no colour per light/dark theme. A border
+    // in an included file needs `on`.
+    border {
+        on
+        width 2
+        inactive-color "transparent"
+    }
+}
+
+// The shell writes the active border colour from its palette on each theme
+// change.
+include optional=true "~/.local/state/kaizen-shell/niri-colors.kdl"
+
+cursor {
+    xcursor-theme "Bibata-Modern-Classic"
+    xcursor-size 24
+}
+
+// Quickshell draws two wallpapers: one inside the workspaces, one behind them.
+layer-rule {
+    match namespace=r#"^quickshell-backdrop$"#
+    place-within-backdrop true
+}
+
+// The recording service's camera preview: gpu-screen-recorder cannot mask its
+// own camera overlay, so the screen capture records this window instead. mpv
+// sets its title after the initial configure, so opening rules need the app id
+// to match. niri clamps the radius to half the window, so any square mpv asks
+// for comes out a circle; the size is mpv's, since a rule size is in device
+// pixels and a proportion does not apply to floating windows.
+window-rule {
+    match app-id=r#"^kaizen-camera$"#
+
+    open-floating true
+    open-focused false
+    default-floating-position x=32 y=32 relative-to="bottom-right"
+    geometry-corner-radius 9999
+    clip-to-geometry true
+    border {
+        off
+    }
+}

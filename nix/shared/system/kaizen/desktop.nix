@@ -19,7 +19,7 @@ let
   };
 in
 # The kaizen hosts' apps, defaults and personal settings on top of the kaizen
-# module (kaizen/nix/module.nix). Compositor config lives in stow/kaizen/.
+# module (kaizen/nix/module.nix). The niri config lives in stow/kaizen/.
 {
   imports = [
     inputs.dankcalendar.nixosModules.default

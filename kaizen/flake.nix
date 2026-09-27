@@ -32,12 +32,14 @@
             name:
             pkgs.runCommand name {
               inherit (shell) nativeBuildInputs QML_IMPORT_PATH;
-              KAIZEN_SHELL = ./shell;
+              # The whole tree: compositor-test reads ../niri and ../KAIZEN.md.
+              KAIZEN_SHELL = "${./.}/shell";
             } "HOME=$TMPDIR ${name} && touch $out";
         in
         {
           qml-lint = check "qml-lint";
           qml-test = check "qml-test";
+          compositor-test = check "compositor-test";
         }
       );
     };

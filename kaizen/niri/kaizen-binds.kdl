@@ -1,0 +1,29 @@
+// kaizen's shell binds, all `qs -c kaizen ipc call`. Optional; include it
+// before your own binds, where binding a chord again overrides it here.
+binds {
+    // Shell
+    Mod+Space hotkey-overlay-title="Menu" { spawn "qs" "-c" "kaizen" "ipc" "call" "menu" "toggle"; }
+    Mod+Shift+Space hotkey-overlay-title="Next keyboard layout" { spawn "qs" "-c" "kaizen" "ipc" "call" "keyboard" "next"; }
+    Super+Alt+L hotkey-overlay-title="Lock the screen" { spawn "qs" "-c" "kaizen" "ipc" "call" "lock" "lock"; }
+    Mod+N hotkey-overlay-title="Select notification" { spawn "qs" "-c" "kaizen" "ipc" "call" "notifications" "select"; }
+    Mod+Shift+Comma hotkey-overlay-title="Dismiss all notifications" { spawn "qs" "-c" "kaizen" "ipc" "call" "notifications" "dismissAll"; }
+
+    // Hardware keys. allow-when-locked keeps these working on the lock screen.
+    XF86AudioRaiseVolume allow-when-locked=true hotkey-overlay-title="Volume up" { spawn "qs" "-c" "kaizen" "ipc" "call" "audio" "up"; }
+    XF86AudioLowerVolume allow-when-locked=true hotkey-overlay-title="Volume down" { spawn "qs" "-c" "kaizen" "ipc" "call" "audio" "down"; }
+    XF86AudioMute allow-when-locked=true repeat=false hotkey-overlay-title="Mute" { spawn "qs" "-c" "kaizen" "ipc" "call" "audio" "mute"; }
+    XF86AudioMicMute allow-when-locked=true repeat=false hotkey-overlay-title="Mute microphone" { spawn "qs" "-c" "kaizen" "ipc" "call" "audio" "micMute"; }
+    XF86MonBrightnessUp allow-when-locked=true hotkey-overlay-title="Brightness up" { spawn "qs" "-c" "kaizen" "ipc" "call" "brightness" "up"; }
+    XF86MonBrightnessDown allow-when-locked=true hotkey-overlay-title="Brightness down" { spawn "qs" "-c" "kaizen" "ipc" "call" "brightness" "down"; }
+    XF86AudioNext allow-when-locked=true repeat=false hotkey-overlay-title="Next track" { spawn "qs" "-c" "kaizen" "ipc" "call" "media" "next"; }
+    XF86AudioPause allow-when-locked=true repeat=false hotkey-overlay-title="Play/pause" { spawn "qs" "-c" "kaizen" "ipc" "call" "media" "playPause"; }
+    XF86AudioPlay allow-when-locked=true repeat=false hotkey-overlay-title="Play/pause" { spawn "qs" "-c" "kaizen" "ipc" "call" "media" "playPause"; }
+    XF86AudioPrev allow-when-locked=true repeat=false hotkey-overlay-title="Previous track" { spawn "qs" "-c" "kaizen" "ipc" "call" "media" "previous"; }
+
+    // Capture. The shell's keyboard-first region selector; niri's own is
+    // pointer-driven.
+    Shift+Print repeat=false hotkey-overlay-title="Screenshot a region" { spawn "qs" "-c" "kaizen" "ipc" "call" "recording" "screenshot"; }
+    // Opens the recording panel, or stops a running recording.
+    Mod+Print repeat=false hotkey-overlay-title="Record the screen" { spawn "qs" "-c" "kaizen" "ipc" "call" "recording" "toggle"; }
+    Mod+Shift+Print repeat=false hotkey-overlay-title="Pause or resume the recording" { spawn "qs" "-c" "kaizen" "ipc" "call" "recording" "pause"; }
+}

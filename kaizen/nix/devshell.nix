@@ -29,7 +29,7 @@ mkShell {
   ++ lib.optionals stdenv.hostPlatform.isLinux [
     niri
     jq
-    (task "compositor-test" "tests/config_test.sh")
+    (task "compositor-test" "bash tests/config_test.sh")
     (task "shell-smoke" "tests/shell_smoke.sh \"$@\"")
     (task "shell-perf" "tests/shell_perf.sh \"$@\"")
   ];
