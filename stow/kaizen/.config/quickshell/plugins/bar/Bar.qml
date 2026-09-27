@@ -162,21 +162,10 @@ Scope {
         onSecondary: bar.shell.menu.popup("settings.notifications", modelData.name, notificationButton)
       }
 
-      Ui.BarButton {
-        id: clipboardButton
-        shell: bar.shell
-        anchors.right: notificationButton.left
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.rightMargin: 4
-        label: "\u{F014C}"
-        onActivated: bar.shell.clipboard.toggle()
-        onSecondary: bar.shell.menu.popup("settings.clipboard", modelData.name, clipboardButton)
-      }
-
-      // Separates settings from the session buttons.
+      // Separates settings from notifications.
       Rectangle {
-        id: sessionDivider
-        anchors.right: clipboardButton.left
+        id: notificationDivider
+        anchors.right: notificationButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 6
         width: 1
@@ -187,7 +176,7 @@ Scope {
       Ui.BarButton {
         id: batteryButton
         shell: bar.shell
-        anchors.right: sessionDivider.left
+        anchors.right: notificationDivider.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: visible ? 6 : 0
         visible: bar.shell.batteryService.present

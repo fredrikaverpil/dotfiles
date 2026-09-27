@@ -40,6 +40,10 @@ Ui.Panel {
     "trigger.stop": { icon: "󰓛", label: "Stop recording", enabled: menu.shell.recordingService.busy,
       action: () => menu.shell.recordingService.stop() },
     "trigger.emoji": { icon: "", label: "Emoji", provider: "emoji", search: true },
+    "trigger.clipboard": { icon: "\u{F014C}", label: "Clipboard" },
+    "trigger.clipboard.panel": { icon: "󰕮", label: "Clipboard panel", action: () => menu.shell.clipboard.open() },
+    "trigger.clipboard.clear": { icon: "󰃢", label: "Clear history",
+      action: () => menu.shell.clipboard.service.clear() },
     "trigger.color": { icon: "󰃉", label: "Color picker", action: () => menu.shell.systemService.pickColor() },
     "trigger.close": { icon: "󰅖", label: "Close window", action: () => Quickshell.execDetached(
       Ui.Compositor.closeWindow())
@@ -123,10 +127,6 @@ Ui.Panel {
     "settings.power.profile.saver": menu.profileItem("power-saver", "Saver"),
     "settings.power.profile.balanced": menu.profileItem("balanced", "Balanced"),
     "settings.power.profile.performance": menu.profileItem("performance", "Performance"),
-    "settings.clipboard": { icon: "\u{F014C}", label: "Clipboard" },
-    "settings.clipboard.panel": { icon: "󰕮", label: "Clipboard panel", action: () => menu.shell.clipboard.open() },
-    "settings.clipboard.clear": { icon: "󰃢", label: "Clear history",
-      action: () => menu.shell.clipboard.service.clear() },
     "settings.notifications": { icon: "󰂚", label: "Notifications" },
     "settings.notifications.panel": { icon: "󰕮", label: "Notifications panel",
       action: () => menu.shell.notifications.showHistory() },
