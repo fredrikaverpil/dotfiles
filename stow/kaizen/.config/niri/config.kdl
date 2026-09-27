@@ -9,7 +9,8 @@ input {
         xkb {
             // No grp: toggle: the shell owns the current index
             // (qs ipc call keyboard ...) and a compositor-side switch desyncs
-            // the bar indicator. Order must match the keyboard service's `codes`.
+            // the bar indicator. The shell lists these by niri's names; the
+            // first is the default.
             // us_se is US plus RightAlt+[ ; ' for å ö ä (~/.config/xkb/symbols).
             layout "us_se,se"
         }
@@ -213,7 +214,7 @@ spawn-at-startup "uwsm" "finalize" "NIRI_SOCKET"
 binds {
     // Shell
     Mod+Space hotkey-overlay-title="Menu" { spawn "qs" "ipc" "call" "menu" "toggle"; }
-    Mod+Shift+Space hotkey-overlay-title="Toggle US/SE layout" { spawn "qs" "ipc" "call" "keyboard" "next"; }
+    Mod+Shift+Space hotkey-overlay-title="Next keyboard layout" { spawn "qs" "ipc" "call" "keyboard" "next"; }
     Super+Alt+L hotkey-overlay-title="Lock the screen" { spawn "qs" "ipc" "call" "lock" "lock"; }
     Mod+N hotkey-overlay-title="Select notification" { spawn "qs" "ipc" "call" "notifications" "select"; }
     Mod+Shift+Comma hotkey-overlay-title="Dismiss all notifications" { spawn "qs" "ipc" "call" "notifications" "dismissAll"; }

@@ -17,7 +17,7 @@ Ui.Panel {
 
   required property var contextMenu
 
-  readonly property var items: ({
+  readonly property var items: Object.assign({
     // search: too many rows to scan without it, so a context menu hands the
     // level to the launcher.
     "apps": { icon: "󰀻", label: "Apps", provider: "apps", search: true },
@@ -149,16 +149,6 @@ Ui.Panel {
     "settings.clock.panel": { icon: "󰕮", label: "Clock panel", action: () => menu.shell.timezone.open() },
     "settings.clock.timezone": { icon: "󰅐", label: "Timezone", provider: "zones", search: true },
     "settings.keyboard": { icon: "󰌌", label: "Keyboard layout" },
-    "settings.keyboard.us": {
-      icon: menu.radio(menu.shell.keyboard.index === 0),
-      label: "English (US)",
-      action: () => menu.shell.keyboard.set(0)
-    },
-    "settings.keyboard.se": {
-      icon: menu.radio(menu.shell.keyboard.index === 1),
-      label: "Swedish",
-      action: () => menu.shell.keyboard.set(1)
-    },
     "settings.session": { icon: "󰐥", label: "Session" },
     "settings.session.lock": { icon: "", label: "Lock", action: () => menu.shell.lock.beginLock() },
     "settings.session.curtain": { icon: "󰛑", label: "Curtain", action: () => menu.shell.curtain.show() },
@@ -171,7 +161,7 @@ Ui.Panel {
     "settings.session.logout": { icon: "󰍃", label: "Logout", action: () => menu.run("uwsm stop") },
     "settings.session.reboot": { icon: "󰜉", label: "Reboot", action: () => menu.run("systemctl reboot") },
     "settings.session.shutdown": { icon: "󰐥", label: "Shutdown", action: () => menu.run("systemctl poweroff") },
-  })
+  }, menu.layoutItems())
 
   readonly property bool hasPlayer: menu.shell.media.service.activePlayer !== null
 
@@ -186,6 +176,20 @@ Ui.Panel {
       enabled: service.profiles.indexOf(name) >= 0,
       action: () => service.setProfile(name),
     }
+  }
+
+  // Items, not a provider, so a root search finds a layout by name.
+  function layoutItems() {
+    const keyboard = menu.shell.keyboard
+    const items = {}
+    keyboard.names.forEach((name, index) => {
+      items["settings.keyboard." + index] = {
+        icon: menu.radio(keyboard.index === index),
+        label: name,
+        action: () => keyboard.set(index),
+      }
+    })
+    return items
   }
 
   function run(cmd) { Quickshell.execDetached(["sh", "-c", cmd]) }

@@ -23,5 +23,6 @@ Singleton {
   function pinWindow(raw, appId, state) { return Niri.pinWindow(raw, appId, state) }
   function layoutQuery() { return Niri.layoutQuery() }
   function currentLayout(raw) { return Niri.currentLayout(raw) }
+  function layoutNames(raw) { return Niri.layoutNames(raw) }
   function setLayout(index) { return Niri.setLayout(index) }
 }

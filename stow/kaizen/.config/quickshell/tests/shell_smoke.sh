@@ -30,7 +30,7 @@ check() {
 check lock '(.locked | type) == "boolean" and .passwordPam == true'
 check idle '(.enabled | type) == "boolean"'
 check curtain '(.active | type) == "boolean" and (.awake | type) == "boolean" and .passwordPam == true'
-check keyboard '.index >= 0 and .index < (.codes | length) and .code == .codes[.index]'
+check keyboard '.index >= 0 and .index < (.names | length) and .name == .names[.index]'
 check nightlight '(.temperature | type) == "number" and (.mode == "on" or .mode == "off" or .mode == "auto")'
 check media '(.hasPlayer | type) == "boolean" and (.hasMedia | type) == "boolean"'
 check network '(.devices | type) == "array" and (.connection | type) == "object"'
