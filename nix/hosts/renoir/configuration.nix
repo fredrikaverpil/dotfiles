@@ -2,6 +2,7 @@
 {
   imports = [
     ../../shared/system/kaizen/desktop.nix
+    ../../shared/system/kaizen/plugins/calendar
     ../../shared/system/thinkpad.nix
   ];
 

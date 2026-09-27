@@ -19,7 +19,8 @@ Rectangle {
   width: implicitWidth
   height: Math.round(24 * btn.shell.textScale)
   radius: 4
-  color: btnHover.hovered ?btn.shell.palette.sel : "transparent"
+  // Qt delivers hover to disabled items too.
+  color: btn.enabled && btnHover.hovered ? btn.shell.palette.sel : "transparent"
 
   TextMetrics {
     id: btnMetrics

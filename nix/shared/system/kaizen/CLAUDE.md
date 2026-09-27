@@ -55,7 +55,10 @@ previous states. Explain a declaration next to it, not here.
   its Nix module and a `Plugin.qml` rooted in `Ui/Plugin.qml`, listed in
   `host.kaizenPlugins` (`KAIZEN_PLUGINS`) and imported by the hosts that want
   it. Quickshell does not watch them: apply an edit with
-  `qs ipc call shell reload`.
+  `qs ipc call shell reload`. They live in `plugins/`, one directory each; a
+  private one can live anywhere, such as the `einride` submodule. `qml-test`
+  runs the calendar's tests; `qml-lint` skips plugins (their `import qs.Ui`
+  resolves only inside Quickshell).
 - Interactive surfaces come in three kinds; pick by what opens them:
   - Launcher (`modules/menu/`): a large `Ui.Panel` drilling down through
     levels; the keyboard entry point to everything, tray menus included.
