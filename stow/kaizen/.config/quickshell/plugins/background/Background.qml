@@ -348,6 +348,7 @@ Scope {
 
         function open(slot) {
             background.slot = slot || "workspace";
+            grid.pointer = Qt.point(-1, -1);
             scan.running = true;
             if (background.shell && background.shell.registerPanel)
                 background.shell.registerPanel(picker);
@@ -434,12 +435,22 @@ Scope {
             // Index into background.wallpapers; the view's own currentIndex
             // counts rows, headers included.
             property int sel: 0
+            // Cells scrolled under a resting pointer report hover too; act on real motion only.
+            property point pointer: Qt.point(-1, -1)
             readonly property real cellWidth: (width - 16) / background.columns
             readonly property real cellHeight: cellWidth * 9 / 16
             model: background.rows
             onSelChanged: {
                 previewDelay.restart();
                 reveal();
+            }
+
+            function moved(point) {
+                if (point.x === pointer.x && point.y === pointer.y)
+                    return false;
+                const first = pointer.x < 0;
+                pointer = point;
+                return !first;
             }
 
             // Keeps a section's header in view when its first row is selected.
@@ -537,6 +548,11 @@ Scope {
 
                             MouseArea {
                                 anchors.fill: parent
+                                hoverEnabled: true
+                                onPositionChanged: function (mouse) {
+                                    if (grid.moved(mapToItem(null, mouse.x, mouse.y)))
+                                        grid.sel = cell.flat;
+                                }
                                 onClicked: {
                                     grid.sel = cell.flat;
                                     picker.choose();
