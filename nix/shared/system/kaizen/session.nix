@@ -136,6 +136,12 @@ in
       default = [ ];
       description = "Kaizen's notification rules";
     };
+
+    host.kaizenPlugins = lib.mkOption {
+      type = lib.types.listOf lib.types.path;
+      default = [ ];
+      description = "Shell plugin directories, each holding a Plugin.qml, loaded in order. A path is copied to the store; an absolute path as a string is read in place, and `qs ipc call shell reload` applies its edits";
+    };
   };
 
   config = {
@@ -208,6 +214,7 @@ in
       environment.NOTIFICATION_RULES = "${pkgs.writeText "notification-rules.json" (
         builtins.toJSON config.host.notificationRules
       )}";
+      environment.KAIZEN_PLUGINS = lib.concatStringsSep ":" config.host.kaizenPlugins;
       serviceConfig = {
         ExecStart = "${pkgs.quickshell}/bin/quickshell";
         Restart = "on-failure";

@@ -12,6 +12,9 @@ Scope {
 
   required property var shell
 
+  // The plugin that took over the date button, if any.
+  readonly property var datePlugin: bar.shell.plugins.filter(plugin => plugin.barActions.date).pop()
+
   SystemClock {
     id: clock
     precision: SystemClock.Minutes
@@ -93,8 +96,9 @@ Scope {
           shell: bar.shell
           anchors.verticalCenter: parent.verticalCenter
           label: Qt.formatDateTime(clock.date, "ddd d MMM")
-          onActivated: bar.shell.calendar.toggle()
-          onSecondary: bar.shell.menu.popup("settings.calendar", modelData.name, dateLabel)
+          onActivated: bar.datePlugin ? bar.datePlugin.barActions.date() : bar.shell.calendar.toggle()
+          onSecondary: bar.shell.menu.popup(bar.datePlugin ? "settings." + bar.datePlugin.name : "settings.calendar",
+            modelData.name, dateLabel)
         }
 
         Rectangle {
