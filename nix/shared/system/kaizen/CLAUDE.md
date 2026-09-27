@@ -283,7 +283,7 @@ ssh fredrik@<host> 'cd ~/.dotfiles && git add -AN .'
 unlocked shell after deployment rather than relying on its watcher:
 
 ```sh
-systemctl --user restart quickshell.service
+systemctl --user restart kaizen-shell.service
 ```
 
 For ordinary `qs ipc` and compositor commands over SSH, provide the active

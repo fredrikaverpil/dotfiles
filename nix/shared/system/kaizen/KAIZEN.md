@@ -123,7 +123,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 - The weather location is a coordinate picked from `PlacesModel.js` and saved
   by the shell; the machines have no GNSS. Nightlight takes sunrise and sunset
   from the same coordinate, so one saved place moves both.
-- After a zone change, restart `quickshell.service` and `dcal.service` by
+- After a zone change, restart `kaizen-shell.service` and `dcal.service` by
   hand: glibc caches the parsed tzfile, so a running process keeps the zone it
   started with. The restart stays manual because the shell must never restart
   while locked. Removing `/etc/localtime` is not a test; that falls back to
@@ -165,7 +165,7 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 ```
 TTY login ─ kaizen() ─ uwsm start niri --session
   └─ wayland-session@niri.target
-       ├─ quickshell.service        Restart=on-failure
+       ├─ kaizen-shell.service      Restart=on-failure
        ├─ dcal.service              waits for Secret Service
        └─ kaizen-sleep-lock.service logind delay inhibitor
 lid close / power key ─ logind ─ sleep-lock locks shell ─ waits for secure ─ suspend

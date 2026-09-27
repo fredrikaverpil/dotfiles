@@ -213,7 +213,7 @@ in
     auth include login
   '';
 
-  systemd.user.services.quickshell = {
+  systemd.user.services.kaizen-shell = {
     description = "Quickshell desktop shell";
     partOf = [ "graphical-session.target" ];
     # Never order after graphical-session.target: that creates a systemd cycle.
@@ -251,7 +251,7 @@ in
     partOf = [ "graphical-session.target" ];
     after = [
       "dbus.socket"
-      "quickshell.service"
+      "kaizen-shell.service"
       "wayland-wm@niri.service"
       "wayland-session-waitenv.service"
     ];

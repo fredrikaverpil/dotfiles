@@ -23,7 +23,7 @@ Ui.Panel {
     !stale
       ? ""
       : "󰀦 The bar clock is still on the zone this shell started with. "
-        + "Apply with: systemctl --user restart quickshell dcal",
+        + "Apply with: systemctl --user restart kaizen-shell dcal",
     root.service.lastError,
   ].filter(text => text !== "")
 
