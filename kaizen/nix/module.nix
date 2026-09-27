@@ -67,6 +67,39 @@ let
       "HardwareSettings"
     ];
   };
+
+  palette =
+    variant:
+    lib.mkOption {
+      type = lib.types.submodule {
+        options =
+          lib.mapAttrs
+            (
+              role: use:
+              lib.mkOption {
+                type = lib.types.nullOr lib.types.str;
+                default = null;
+                description = "${use}; zenbones when null";
+              }
+            )
+            {
+              bg = "Background";
+              fg = "Text and icons";
+              sel = "Selected and focused rows";
+              dim = "Borders, dividers and tracks";
+              off = "Secondary and inactive text";
+              alert = "Errors, critical notifications and muted devices";
+              warn = "Low battery";
+              accent = "niri's active window border";
+            };
+      };
+      default = { };
+      example = {
+        bg = "#1E1E2E";
+        accent = "#89B4FA";
+      };
+      description = "Colours of the ${variant} theme by role, as #RRGGBB";
+    };
 in
 {
   options.programs.kaizen = {
@@ -77,6 +110,18 @@ in
       default = pkgs.callPackage ./package.nix { };
       defaultText = lib.literalExpression "pkgs.callPackage ./package.nix { }";
       description = "The kaizen package";
+    };
+
+    theme = {
+      dark = palette "dark";
+      light = palette "light";
+    };
+
+    font = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      example = "Maple Mono";
+      description = "Font family of the shell, used when installed; otherwise JetBrainsMono Nerd Font, which also supplies the icons";
     };
 
     notificationRules = lib.mkOption {
@@ -202,6 +247,10 @@ in
       environment.NOTIFICATION_RULES = "${pkgs.writeText "notification-rules.json" (
         builtins.toJSON cfg.notificationRules
       )}";
+      environment.KAIZEN_THEME = builtins.toJSON (
+        lib.mapAttrs (_: lib.filterAttrs (_: colour: colour != null)) cfg.theme
+      );
+      environment.KAIZEN_FONT = cfg.font;
       serviceConfig = {
         ExecStart = "${cfg.package}/bin/kaizen-shell";
         Restart = "on-failure";

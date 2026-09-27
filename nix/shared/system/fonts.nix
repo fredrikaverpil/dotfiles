@@ -21,7 +21,7 @@
 
   # Applications that ask for JetBrains Mono by name bypass the generic
   # monospace alias. Qt resolves an installed family directly, so this rule
-  # never reaches Quickshell; Ui/Fonts.qml picks the family there instead.
+  # never reaches Quickshell; programs.kaizen.font picks it there instead.
   fonts.fontconfig.localConf = ''
     <?xml version="1.0"?>
     <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">

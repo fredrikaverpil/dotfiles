@@ -29,7 +29,11 @@ in
     (lib.mkAliasOptionModule [ "host" "notificationRules" ] [ "programs" "kaizen" "notificationRules" ])
   ];
 
-  programs.kaizen.enable = true;
+  programs.kaizen = {
+    enable = true;
+    # Licensed; fonts.nix explains how it is installed.
+    font = "Berkeley Mono Variable";
+  };
 
   # OAuth tokens stay in gnome-keyring (from programs.niri), unlocked by the login PAM stack.
   # Calendar credentials and feed URLs are private user state, never Nix/Stow values.

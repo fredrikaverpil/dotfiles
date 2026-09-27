@@ -86,9 +86,11 @@ ShellRoot {
 
   property bool dark: true
   property real textScale: 1
-  // zenbones.nvim: extras/ghostty/zenbones_{dark,light}.
-  readonly property var darkPalette: ({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864", alert: "#DE6E7C", warn: "#B77E64", accent: "#6099C0" })
-  readonly property var lightPalette: ({ bg: "#F0EDEC", fg: "#2C363C", sel: "#CBD9E3", dim: "#CFC1BA", off: "#8F857D", alert: "#A8334C", warn: "#944927", accent: "#286486" })
+  // zenbones.nvim: extras/ghostty/zenbones_{dark,light}. KAIZEN_THEME
+  // (programs.kaizen.theme) overrides single roles.
+  readonly property var theme: JSON.parse(Quickshell.env("KAIZEN_THEME") || "{}")
+  readonly property var darkPalette: Object.assign({ bg: "#1C1917", fg: "#B4BDC3", sel: "#3D4042", dim: "#403833", off: "#6E6864", alert: "#DE6E7C", warn: "#B77E64", accent: "#6099C0" }, theme.dark)
+  readonly property var lightPalette: Object.assign({ bg: "#F0EDEC", fg: "#2C363C", sel: "#CBD9E3", dim: "#CFC1BA", off: "#8F857D", alert: "#A8334C", warn: "#944927", accent: "#286486" }, theme.light)
   readonly property var palette: dark ? darkPalette : lightPalette
 
   // KConfig needs --notify before the dconf palette change or running Dolphin keeps cached view colours.
