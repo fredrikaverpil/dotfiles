@@ -148,12 +148,12 @@
                   # (.qmltypes) is used here. Same nixpkgs as renoir, so the
                   # same store path the ThinkPad runs.
                   quickshell = unstable.x86_64-linux.quickshell;
-                  # Every kaizen host runs the one tree in stow/kaizen/.
+                  # Every kaizen host runs the one tree in kaizen/shell/.
                   task =
                     name: text:
                     pkgs.writeShellScriptBin name ''
                       set -e
-                      cd "$(git rev-parse --show-toplevel)/stow/kaizen/.config/quickshell"
+                      cd "$(git rev-parse --show-toplevel)/kaizen/shell"
                       ${text}
                     '';
                 in

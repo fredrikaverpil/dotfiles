@@ -44,9 +44,9 @@ if [ -e /etc/NIXOS ]; then
     }
 
     # Noctalia is evaluated, not installed, so it runs from the host's own
-    # nixpkgs. niri's config is kaizen's: its `qs ipc` binds do nothing here
-    # and noctalia's own binds are absent. State lives in ~/.config/noctalia
-    # and ~/.local/state/noctalia, outside the dotfiles.
+    # nixpkgs. niri's config is kaizen's: its `qs -c kaizen ipc` binds do
+    # nothing here and noctalia's own binds are absent. State lives in
+    # ~/.config/noctalia and ~/.local/state/noctalia, outside the dotfiles.
     function noctalia() {
       uwsm check may-start || return
       local flake

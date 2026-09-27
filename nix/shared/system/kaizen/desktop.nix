@@ -34,10 +34,10 @@ let
     ];
     text = ''
       lock_and_wait() {
-        qs ipc call lock lock >/dev/null || return 1
+        qs -c kaizen ipc call lock lock >/dev/null || return 1
 
         for _ in $(seq 1 30); do
-          if qs ipc call lock status 2>/dev/null | grep -q '"secure":true'; then
+          if qs -c kaizen ipc call lock status 2>/dev/null | grep -q '"secure":true'; then
             echo "kaizen: session lock is secure, releasing the suspend delay"
             return 0
           fi
@@ -94,7 +94,8 @@ let
   };
 in
 # The niri + Quickshell desktop: packages, portals, PAM, user units and the
-# pre-suspend lock. Compositor config and QML live in stow/kaizen/.
+# pre-suspend lock. Compositor config lives in stow/kaizen/, QML in
+# kaizen/shell/.
 {
   imports = [
     inputs.dankcalendar.nixosModules.default
@@ -236,7 +237,7 @@ in
       builtins.toJSON config.host.notificationRules
     )}";
     serviceConfig = {
-      ExecStart = "${pkgs.quickshell}/bin/quickshell";
+      ExecStart = "${pkgs.quickshell}/bin/quickshell -c kaizen";
       Restart = "on-failure";
       # Creates ~/.local/state/kaizen-shell before ExecStart: for user units
       # StateDirectory resolves under $XDG_STATE_HOME.

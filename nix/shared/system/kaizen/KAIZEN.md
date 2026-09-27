@@ -13,7 +13,8 @@ that an agent can drive and verify from a terminal.
   keyboard-first face; infrequent tasks go to a purpose-built application
   (bluetui, nm-connection-editor).
 - Keyboard-first everywhere. Pointer-only controls are bugs.
-- Every action is reachable over `qs ipc`, `niri msg` or `systemctl --user`.
+- Every action is reachable over `qs -c kaizen ipc`, `niri msg` or
+  `systemctl --user`.
 - Host-agnostic naming: "kaizen" in units, PAM, layer namespaces and state
   files. No hostname in the desktop's configuration.
 
@@ -48,14 +49,15 @@ flowchart BT
   HW --> SYS --> WM --> SHELL
 ```
 
-Each layer calls downward only. Nix (`desktop.nix`, `thinkpad.nix`) owns the
-two lower layers and the systemd units; Stow (`stow/kaizen/`) owns compositor
-config and QML. Both are shared by every kaizen host.
+Each layer calls downward only. Nix (`desktop.nix`, `thinkpad.nix`) owns the two
+lower layers and the systemd units; Stow (`stow/kaizen/`) owns compositor config
+and links the QML (`kaizen/shell/`) as `~/.config/quickshell/kaizen`. Both are
+shared by every kaizen host.
 
 ## Services to surfaces
 
 Every service wraps one subsystem and feeds the surfaces below. IPC target is
-`qs ipc call <target> ...`.
+`qs -c kaizen ipc call <target> ...`.
 
 | Service | Subsystem | Bar | Panel / launcher | IPC |
 | --- | --- | --- | --- | --- |
@@ -145,7 +147,8 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 
 - Launcher, panel and context menu hold exclusive keyboard focus and close
   each other through `shell.claimPanel`. Pick by what opens the surface.
-- Every surface opens over IPC; niri binds are `spawn qs ipc call ...`.
+- Every surface opens over IPC; niri binds are
+  `spawn qs -c kaizen ipc call ...`.
 - The bar mirrors the launcher; nothing is reachable only from it. Every
   panel action is a launcher row under Settings, except sliders and per-item
   detail (forgetting a network, recording options).

@@ -35,8 +35,9 @@ from the host's own nixpkgs and leave its state in `~/.config/noctalia/` and
 A whole session without kaizen: `noctalia` from the TTY, the counterpart to
 `kaizen` in `shell/sourcing.sh`. It masks `kaizen-shell`, `dcal` and
 `kaizen-sleep-lock` for the session and lets niri start Noctalia instead.
-niri's config is kaizen's, so its `qs ipc` binds do nothing and Noctalia's own
-binds are absent. Its logs are `journalctl --user -u noctalia-trial -f`,
+niri's config is kaizen's, so its `qs -c kaizen ipc` binds do nothing and
+Noctalia's own binds are absent. Its logs are
+`journalctl --user -u noctalia-trial -f`,
 the same unit name as the swap below. The masks are `--runtime`, so they are gone after a reboot,
 and `kaizen` clears them before starting; either command always reaches the
 other session.

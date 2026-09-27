@@ -1,10 +1,10 @@
 # niri + Quickshell desktop
 
-This file documents the niri + Quickshell desktop and lives with it. Every
-host running it shares one copy of everything: `desktop.nix` in this
-directory, `../thinkpad.nix` next to it, and the compositor config and QML in
-`stow/kaizen/`. An edit lands on every kaizen host at once, so there is no
-promotion step and no drift to diff for.
+This file documents the niri + Quickshell desktop and lives with it. Every host
+running it shares one copy of everything: `desktop.nix` in this directory,
+`../thinkpad.nix` next to it, the compositor config in `stow/kaizen/` and the
+QML in `kaizen/shell/`. An edit lands on every kaizen host at once, so there is
+no promotion step and no drift to diff for.
 
 What stays per host, in `nix/hosts/<host>/`: hardware and firmware settings
 (`hardware-configuration.nix`, disk and resume devices, GPU drivers, sleep
@@ -25,11 +25,11 @@ read it before adding a surface or service.
 - The desktop is keyboard-first. Every panel, dialog and bind works without a
   pointer; pointer-only controls are bugs.
 - The desktop is built to be developed by an agent, usually run on the host
-  itself, sometimes over SSH. Every part is reachable: `qs ipc` queries and
-  drives shell services and panels, `niri msg` the compositor,
-  `systemctl --user` the units, `grim` and the recording service capture what
-  is on screen. Use them to verify your own work; what they cannot prove is
-  listed under "Required local validation".
+  itself, sometimes over SSH. Every part is reachable: `qs -c kaizen ipc`
+  queries and drives shell services and panels, `niri msg` the compositor,
+  `systemctl --user` the units, `grim` and the recording service capture what is
+  on screen. Use them to verify your own work; what they cannot prove is listed
+  under "Required local validation".
 
 Document constraints, rationale and gotchas, not implementation inventories or
 previous states. Explain a declaration next to it, not here.
@@ -46,7 +46,7 @@ previous states. Explain a declaration next to it, not here.
 ## Architecture
 
 - `desktop.nix` owns packages, portals, PAM, systemd units and the pre-suspend
-  lock. `stow/kaizen/` owns compositor configuration and QML.
+  lock. `stow/kaizen/` owns compositor configuration, `kaizen/shell/` the QML.
 - `shell.qml` wires services and surfaces. Views belong in `plugins/panels/`;
   daemon/process state belongs in `plugins/services/`.
 - Interactive surfaces come in three kinds; pick by what opens them:
@@ -79,13 +79,13 @@ previous states. Explain a declaration next to it, not here.
   mapped window (no focus, no urgency), so the prompt stays on workspace 7;
   unlocking there within the minute lets the waiting `ssh`/`git` proceed.
 - The curtain hides the screen, it is not a lock: an overlay layer surface
-  (`kaizen-curtain`), never `WlSessionLock`, and it never touches DPMS. Both
-  are deliberate. A session lock replaces output content and a disabled output
-  has nothing to copy, so either one defeats wlr-screencopy; the curtain exists
-  so `qs ipc call curtain close` leaves a desktop `grim` can still capture
-  remotely. It dims the internal backlight to 0 while black and restores it
-  before drawing the prompt, so the prompt is never painted onto a dark panel.
-  Being only a layer surface, it dies with Quickshell, and anyone at the
+  (`kaizen-curtain`), never `WlSessionLock`, and it never touches DPMS. Both are
+  deliberate. A session lock replaces output content and a disabled output has
+  nothing to copy, so either one defeats wlr-screencopy; the curtain exists so
+  `qs -c kaizen ipc call curtain close` leaves a desktop `grim` can still
+  capture remotely. It dims the internal backlight to 0 while black and restores
+  it before drawing the prompt, so the prompt is never painted onto a dark
+  panel. Being only a layer surface, it dies with Quickshell, and anyone at the
   keyboard can close it. Use the lock whenever the machine is left alone.
 - The recording camera is a circle because gpu-screen-recorder cannot mask its
   own camera overlay: the service runs mpv under the `kaizen-camera` app id and
@@ -139,8 +139,8 @@ These are development gates, not CI jobs. They live only in the repository's
 default devshell (`flake.nix`), entered by `direnv` at the repo root or run as
 `nix develop ~/.dotfiles -c <command>` (not `#dev`) from anywhere in the
 checkout. `compositor-test` and `shell-smoke` are Linux-only and are absent
-from the shell on macOS. All of them run against the single `stow/kaizen/`
-tree, so a static check passing here passes for every kaizen host.
+from the shell on macOS. All of them run against the one copy in `kaizen/shell/`
+and `stow/kaizen/`, so a static check passing here passes for every kaizen host.
 
 | Change | Checks |
 | --- | --- |
@@ -174,19 +174,20 @@ tree, so a static check passing here passes for every kaizen host.
 - Hardware-dependent paths: Wi-Fi/Bluetooth, battery, backlight, lid,
   touchpad, fingerprint reader, `GAMMA_LUT` (nightlight). Validate on the
   machine.
-- Test keyboard-first panels over SSH: open the panel with `qs ipc call`,
-  confirm it is the only `Keyboard interactivity: exclusive` layer in
-  `niri msg layers`, then use `wtype -k z`. Niri drops virtual-keyboard input
-  before bind handling, so `wtype` cannot test compositor binds.
-- Use `grim` to check how the shell looks; `qs ipc` and `shell-smoke` for
-  internal state. Crop with `-g "0,0 1280x32"` and pick the output with `-o`;
-  capture cost depends only on the area. Niri does not report layer geometry,
-  so derive the bar's from `niri msg --json outputs` and `barHeight` in
-  `shell.qml`.
-- To record, `qs ipc call recording capture WxH+X+Y` (`0x0+X+Y` is the whole
-  monitor): no countdown, audio or camera, and the bar shows it. It returns the
-  file; `qs ipc call recording stop` finalizes it. Extract frames with
-  `nix shell nixpkgs#ffmpeg`.
+- Test keyboard-first panels over SSH: open the panel with
+  `qs -c kaizen ipc call`, confirm it is the only
+  `Keyboard interactivity: exclusive` layer in `niri msg layers`, then use
+  `wtype -k z`. Niri drops virtual-keyboard input before bind handling, so
+  `wtype` cannot test compositor binds.
+- Use `grim` to check how the shell looks; `qs -c kaizen ipc` and `shell-smoke`
+  for internal state. Crop with `-g "0,0 1280x32"` and pick the output with
+  `-o`; capture cost depends only on the area. Niri does not report layer
+  geometry, so derive the bar's from `niri msg --json outputs` and `barHeight`
+  in `shell.qml`.
+- To record, `qs -c kaizen ipc call recording capture WxH+X+Y` (`0x0+X+Y` is the
+  whole monitor): no countdown, audio or camera, and the bar shows it. It
+  returns the file; `qs -c kaizen ipc call recording stop` finalizes it. Extract
+  frames with `nix shell nixpkgs#ffmpeg`.
 - DPMS-off can resemble a frozen machine. Use bounded commands; `grim` can hang
   while no output produces frames. Recovery is
   `niri msg action power-on-monitors`.
@@ -260,18 +261,19 @@ afterward. **Never restart Quickshell while locked**: the compositor keeps the
 session lock after its client dies.
 
 ```sh
-qs ipc call idle status
-qs ipc call idle disable
-qs ipc call lock isLocked
+qs -c kaizen ipc call idle status
+qs -c kaizen ipc call idle disable
+qs -c kaizen ipc call lock isLocked
 ```
 
-New/moved files need the normal Stow activation from the root `CLAUDE.md`;
-never create Stow links manually or run `git clean -fd` in the host clone.
+New/moved files under `stow/kaizen/` need the normal Stow activation from the
+root `CLAUDE.md`; `kaizen/shell/` is linked as one directory and needs none.
+Never create Stow links manually or run `git clean -fd` in the host clone.
 
 When working from another host, sync the checkout before live validation or a
 user-run rebuild, which evaluates the host's clone. Checksums avoid replacing
 identical compositor files solely because timestamps differ. The host may
-carry uncommitted theme edits in `stow/kaizen/`; check `git status`
+carry uncommitted theme edits in `kaizen/shell/`; check `git status`
 there before `--delete`.
 
 ```sh
@@ -286,8 +288,8 @@ unlocked shell after deployment rather than relying on its watcher:
 systemctl --user restart kaizen-shell.service
 ```
 
-For ordinary `qs ipc` and compositor commands over SSH, provide the active
-session's `XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY`, and `NIRI_SOCKET` from
+For ordinary `qs -c kaizen ipc` and compositor commands over SSH, provide the
+active session's `XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY`, and `NIRI_SOCKET` from
 `systemctl --user show-environment`. Missing display context can make live
 Quickshell instances appear dead. `shell-smoke` avoids that by selecting the
 PID.

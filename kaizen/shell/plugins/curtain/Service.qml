@@ -224,7 +224,7 @@ Item {
   IpcHandler {
     target: "curtain"
 
-    // `qs ipc call <target> show` is parsed as the CLI's own `show`.
+    // `qs -c kaizen ipc call <target> show` is parsed as the CLI's own `show`.
     function open(): string {
       if (!root.passwordPamConfigured) return "missing-pam"
       return root.show() ? "shown" : "failed"
