@@ -161,7 +161,7 @@ Ui.Panel {
     "settings.session.logout": { icon: "󰍃", label: "Logout", action: () => menu.run("uwsm stop") },
     "settings.session.reboot": { icon: "󰜉", label: "Reboot", action: () => menu.run("systemctl reboot") },
     "settings.session.shutdown": { icon: "󰐥", label: "Shutdown", action: () => menu.run("systemctl poweroff") },
-  }, menu.layoutItems())
+  }, menu.layoutItems(), ...menu.shell.plugins.map(plugin => plugin.menuItems))
 
   readonly property bool hasPlayer: menu.shell.media.service.activePlayer !== null
 

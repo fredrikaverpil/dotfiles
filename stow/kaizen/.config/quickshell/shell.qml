@@ -74,6 +74,26 @@ ShellRoot {
   readonly property int barHeight: Math.round(32 * textScale)
   property var panels: []
 
+  // Ui.Plugin instances, in KAIZEN_PLUGINS order; one that fails to load is left out.
+  readonly property var plugins: pluginLoaders.instances.map(loader => loader.item).filter(plugin => plugin)
+
+  Variants {
+    id: pluginLoaders
+    model: (Quickshell.env("KAIZEN_PLUGINS") || "").split(":").filter(dir => dir)
+
+    Loader {
+      required property string modelData
+      Component.onCompleted: setSource("file://" + modelData + "/Plugin.qml", { shell: root })
+    }
+  }
+
+  // Plugins live outside the tree, so Quickshell does not watch their files.
+  IpcHandler {
+    target: "shell"
+
+    function reload(): void { Quickshell.reload(false) }
+  }
+
   function registerPanel(panel) {
     if (panel && panels.indexOf(panel) < 0) panels = panels.concat([panel])
   }

@@ -51,6 +51,11 @@ previous states. Explain a declaration next to it, not here.
   owns compositor configuration and QML.
 - `shell.qml` wires services and surfaces. Views belong in `modules/panels/`;
   daemon/process state belongs in `modules/services/`.
+- Plugins hold what only some hosts want, on top of the core: a directory with
+  its Nix module and a `Plugin.qml` rooted in `Ui/Plugin.qml`, listed in
+  `host.kaizenPlugins` (`KAIZEN_PLUGINS`) and imported by the hosts that want
+  it. Quickshell does not watch them: apply an edit with
+  `qs ipc call shell reload`.
 - Interactive surfaces come in three kinds; pick by what opens them:
   - Launcher (`modules/menu/`): a large `Ui.Panel` drilling down through
     levels; the keyboard entry point to everything, tray menus included.
