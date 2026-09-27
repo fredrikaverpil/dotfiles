@@ -82,13 +82,15 @@ Scope {
         anchors.rightMargin: 4
         spacing: 6
 
+        // A plain label unless a plugin takes it over.
         Ui.BarButton {
           id: dateLabel
           shell: bar.shell
           anchors.verticalCenter: parent.verticalCenter
+          enabled: bar.takeovers.date !== undefined
           label: Qt.formatDateTime(clock.date, "ddd d MMM")
-          onActivated: if (!bar.takeOver("date")) bar.shell.timezone.toggle()
-          onSecondary: bar.shell.menu.popup(bar.node("date", "settings.clock"), modelData.name, dateLabel)
+          onActivated: bar.takeOver("date")
+          onSecondary: bar.shell.menu.popup(bar.takeovers.date.node, modelData.name, dateLabel)
         }
 
         Rectangle {

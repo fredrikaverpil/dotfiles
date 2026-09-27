@@ -74,7 +74,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | nightlight | [wl-gammarelay-rs] over D-Bus, the weather location for the solar position | – | Settings › Display › Nightlight | `nightlight` |
 | recording | [gpu-screen-recorder], [grim], [satty], [PipeWire] | recording indicator | Trigger › Record, Pause, Stop, Screenshot (region, desktop, window) | `recording` |
 | system | [hwmon], `/proc` load | monitor button | Settings › Display | `system`, `display` |
-| timezone | [timedated] via `timedatectl`, `zdump` for the DST rules | date and time buttons | Settings › Clock | `timezone` |
+| timezone | [timedated] via `timedatectl`, `zdump` for the DST rules | time button | Settings › Clock | `timezone` |
 | weather | [met.no locationforecast] | button | Settings › Weather | `weather` |
 | notifications | [Desktop Notifications] server | bell button | Settings › Notifications | `notifications` |
 | lock | [ext-session-lock] + [PAM] `kaizen-lock` | – | Settings › Session | `lock` |
@@ -157,7 +157,8 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   - ❄ and the workspaces: left-click opens the launcher, right-click its top
     level as a context menu; a workspace takes focus.
   - Panel buttons: left-click opens the panel, right-click the button's
-    Settings node as a context menu.
+    Settings node as a context menu. The date is one only when a plugin takes
+    it over; otherwise it is a plain label.
   - Indicators, shown only off the default state: left-click acts on it
     (stops the recording, re-enables idle locking, resets the layout, opens
     the system monitor).

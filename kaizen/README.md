@@ -166,7 +166,8 @@ root is `Ui.Plugin` ([`shell/Ui/Plugin.qml`](shell/Ui/Plugin.qml)):
 - `barActions`: core bar buttons it takes over, each mapped to the function
   its left-click calls; the button keeps its label. Names: `date`, `time`,
   `weather`, `notifications`, `clipboard`, `battery`, `network`, `bluetooth`,
-  `display`, `audio`. A later plugin wins.
+  `display`, `audio`. A later plugin wins. The date is a plain label until a
+  plugin takes it over.
 - `shell` is set by kaizen; pass it to `Ui.BarButton` and `Ui.Panel`.
 
 A plugin creates its own panels (`Ui.Panel`) and `IpcHandler`s, as the core
