@@ -6,69 +6,6 @@
   ...
 }:
 let
-  # Shortcode -> emoji, for apps (Slack) that send `:name:` in notification text.
-  emoji-shortcodes =
-    pkgs.runCommand "emoji-shortcodes.json"
-      { nativeBuildInputs = [ (pkgs.python3.withPackages (p: [ p.emoji ])) ]; }
-      ''
-        python3 - > $out <<'EOF'
-        import json, emoji
-        codes = {}
-        for char, data in emoji.EMOJI_DATA.items():
-            for name in [data["en"], *data.get("alias", [])]:
-                codes.setdefault(name.strip(":"), char)
-        for tone, char in enumerate("🏻🏼🏽🏾🏿", start=2):
-            codes[f"skin-tone-{tone}"] = char
-        json.dump(codes, open(1, "w", encoding="utf-8", closefd=False), ensure_ascii=False)
-        EOF
-      '';
-
-  sleep-lock-monitor = pkgs.writeShellApplication {
-    name = "kaizen-sleep-lock-monitor";
-    runtimeInputs = [
-      pkgs.coreutils
-      pkgs.dbus
-      pkgs.gnugrep
-      pkgs.quickshell
-      pkgs.systemd
-    ];
-    text = ''
-      lock_and_wait() {
-        qs ipc call lock lock >/dev/null || return 1
-
-        for _ in $(seq 1 30); do
-          if qs ipc call lock status 2>/dev/null | grep -q '"secure":true'; then
-            echo "kaizen: session lock is secure, releasing the suspend delay"
-            return 0
-          fi
-          sleep 0.1
-        done
-
-        return 1
-      }
-
-      monitor_sleep() {
-        while IFS= read -r line; do
-          if [[ $line == *"boolean true"* ]]; then
-            lock_and_wait || echo "kaizen: session lock was not secure before suspend" >&2
-            return
-          fi
-        done < <(dbus-monitor --system \
-          "type='signal',sender='org.freedesktop.login1',interface='org.freedesktop.login1.Manager',member='PrepareForSleep'")
-      }
-
-      if [[ ''${1:-} == "--monitor" ]]; then
-        monitor_sleep
-      else
-        exec systemd-inhibit \
-          --what=sleep \
-          --mode=delay \
-          --who=kaizen \
-          --why="Secure the Quickshell lock screen before suspend" \
-          "$0" --monitor
-      fi
-    '';
-  };
   cliamp-desktop = pkgs.makeDesktopItem {
     name = "cliamp";
     desktopName = "cliamp";
@@ -80,45 +17,23 @@ let
       "Player"
     ];
   };
-  # bluetui registers its own pairing agent; the shell has none.
-  bluetui-desktop = pkgs.makeDesktopItem {
-    name = "bluetui";
-    desktopName = "bluetui";
-    comment = "Bluetooth pairing";
-    exec = "bluetui";
-    terminal = true;
-    categories = [
-      "Settings"
-      "HardwareSettings"
-    ];
-  };
 in
-# The niri + Quickshell desktop: packages, portals, PAM, user units and the
-# pre-suspend lock. Compositor config and QML live in stow/kaizen/.
+# The kaizen hosts' apps, defaults and personal settings on top of the kaizen
+# session (session.nix).
 {
   imports = [
     inputs.dankcalendar.nixosModules.default
-    ../fonts.nix
+    ./session.nix
   ];
-
-  # niri is the only session: `niri --session` under UWSM, started with `kaizen` from the console.
-  programs.uwsm.enable = true;
 
   # OAuth tokens stay in gnome-keyring (from programs.niri), unlocked by the login PAM stack.
   # Calendar credentials and feed URLs are private user state, never Nix/Stow values.
   programs.dank-calendar.enable = true;
 
-  # Session defaults, GNOME (screencast) and GTK portals, gnome-keyring as Secret Service,
-  # and Nautilus as the GNOME portal's file chooser (useNautilus defaults on).
-  # Its niri.service, session file and swaylock PAM go unused under UWSM.
-  # gnome-keyring is unlocked by the login PAM stack; fingerprint login cannot unlock it.
-  programs.niri.enable = true;
   # gnome-keyring would also start gcr-ssh-agent as the SSH agent.
   services.gnome.gcr-ssh-agent.enable = false;
   # Nautilus's trash, network locations and removable media.
   services.gvfs.enable = true;
-  # niri's module leaves Xwayland off; xwayland-satellite runs the Xwayland binary.
-  programs.xwayland.enable = true;
 
   # Opens port 53317 for receiving files and text from phones.
   programs.localsend.enable = true;
@@ -136,14 +51,7 @@ in
     </Menu>
   '';
 
-  # uwsm-app launches Terminal=true entries through xdg-terminal-exec.
-  xdg.terminal-exec = {
-    enable = true;
-    settings.default = [ "com.mitchellh.ghostty.desktop" ];
-  };
-
-  # The setcap wrapper lets monitor capture skip the portal dialog.
-  programs.gpu-screen-recorder.enable = true;
+  xdg.terminal-exec.settings.default = [ "com.mitchellh.ghostty.desktop" ];
 
   xdg.mime.defaultApplications =
     lib.genAttrs [
@@ -181,68 +89,8 @@ in
       "text/html"
     ] (_: "zen-beta.desktop");
 
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    pulse.enable = true;
-  };
-
-  security.rtkit.enable = true;
-
-  # The shell's battery service reads UPower and power-profiles-daemon over D-Bus.
-  # power-profiles-daemon conflicts with TLP; keep TLP disabled.
-  services.upower.enable = true;
-  services.power-profiles-daemon.enable = true;
-
-  # GTK3 needs the portal to follow the dconf theme; Qt uses the GTK platform theme.
-  environment.sessionVariables = {
-    NIXOS_OZONE_WL = "1";
-    QT_QPA_PLATFORMTHEME = "gtk3";
-    GTK_USE_PORTAL = "1";
-    # The Proton Pass app's SSH agent; the socket exists only while the app runs.
-    SSH_AUTH_SOCK = "$HOME/.ssh/proton-pass-ssh-agent.sock";
-  };
-
-  # polkit.enable does not install the setuid pkexec wrapper.
-  security.polkit.enablePkexecWrapper = true;
-
-  # PAM service for the Quickshell lock screen (plugins/lock/Service.qml).
-  # The lock screen starts PAM only after a password is submitted, so fprintd in
-  # this stack would block typing; fingerprint unlock needs a separate PamContext.
-  environment.etc."pam.d/kaizen-lock".text = ''
-    auth include login
-  '';
-
-  systemd.user.services.quickshell = {
-    description = "Quickshell desktop shell";
-    partOf = [ "graphical-session.target" ];
-    # Never order after graphical-session.target: that creates a systemd cycle.
-    # waitenv closes niri's readiness-before-WAYLAND_DISPLAY race.
-    after = [
-      "wayland-wm@niri.service"
-      "wayland-session-waitenv.service"
-    ];
-    # Bind to the niri session so another desktop cannot start a second shell.
-    # Quickshell unsets systemd's sparse PATH below; removing that breaks launcher entries and uwsm-app.
-    wantedBy = [ "wayland-session@niri.target" ];
-    # NixOS pins a sparse user-unit PATH; inherit UWSM's session PATH for app launchers.
-    environment.PATH = lib.mkForce null;
-    # qtimageformats supplies Quickshell's WebP decoder.
-    environment.QT_PLUGIN_PATH = "${pkgs.qt6.qtimageformats}/lib/qt-6/plugins";
-    # The menu's emoji picker reads names from Unicode's test file.
-    environment.EMOJI_TEST = "${pkgs.unicode-emoji}/share/unicode/emoji/emoji-test.txt";
-    environment.EMOJI_SHORTCODES = "${emoji-shortcodes}";
-    environment.NOTIFICATION_RULES = "${pkgs.writeText "notification-rules.json" (
-      builtins.toJSON config.host.notificationRules
-    )}";
-    serviceConfig = {
-      ExecStart = "${pkgs.quickshell}/bin/quickshell";
-      Restart = "on-failure";
-      # Creates ~/.local/state/kaizen-shell before ExecStart: for user units
-      # StateDirectory resolves under $XDG_STATE_HOME.
-      StateDirectory = "kaizen-shell";
-    };
-  };
+  # The Proton Pass app's SSH agent; the socket exists only while the app runs.
+  environment.sessionVariables.SSH_AUTH_SOCK = "$HOME/.ssh/proton-pass-ssh-agent.sock";
 
   # Keep the upstream systemd option off: its unit orders after graphical-session.target.
   # Sync and reminders outlive the calendar window and run independently of our shell.
@@ -276,26 +124,6 @@ in
       RestartSec = "2s";
       Slice = "app.slice";
       UMask = "0077";
-    };
-  };
-
-  # Lid close and the power key suspend via logind; this delay inhibitor locks
-  # the shell first and releases once the lock reports secure.
-  systemd.user.services.kaizen-sleep-lock = {
-    description = "Lock Quickshell before suspend";
-    partOf = [ "graphical-session.target" ];
-    # Match Quickshell's ordering: waitenv is required for niri, and graphical-session.target cycles.
-    after = [
-      "dbus.socket"
-      "wayland-wm@niri.service"
-      "wayland-session-waitenv.service"
-    ];
-    requires = [ "dbus.socket" ];
-    wantedBy = [ "wayland-session@niri.target" ];
-    serviceConfig = {
-      ExecStart = "${sleep-lock-monitor}/bin/kaizen-sleep-lock-monitor";
-      Restart = "always";
-      RestartSec = "2s";
     };
   };
 
@@ -384,30 +212,16 @@ in
   ];
 
   host.extraSystemPackages = with pkgs; [
-    quickshell
-    # niri spawns it on demand and exports DISPLAY for X11 apps.
-    xwayland-satellite
-    # Nightlight: drives zwlr_gamma_control_v1, so it is compositor-agnostic.
-    wl-gammarelay-rs
-    libnotify
-    sound-theme-freedesktop
     kdePackages.dolphin
     # Dolphin thumbnails for images and videos.
     kdePackages.kio-extras
     kdePackages.ffmpegthumbs
-    kdePackages.kconfig
     # Trialled side by side with Dolphin; yazi stays the inode/directory handler.
     # programs.niri only registers Nautilus's D-Bus services, not its launcher entry.
     # Both provide org.freedesktop.FileManager1, so "Show in folder" may open either.
     nautilus
     ffmpegthumbnailer # Nautilus video thumbnails.
     ghostty
-    gnome-themes-extra
-    # Cursor theme for niri, GTK and Qt; without one niri draws a fixed 64px fallback.
-    bibata-cursors
-    iproute2
-    iputils
-
     # Chromium picks its password store per desktop; switching stores drops cookies and logins.
     # The last --enable-features wins, so repeat the wrapper's WaylandWindowDecorations.
     (chromium.override {
@@ -420,25 +234,14 @@ in
       ];
     })
     blanket
-    bluetui
-    bluetui-desktop
     cliamp
     cliamp-desktop
     firefox
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.beta
-    grim
     imv
     # Trims recordings by stream copy, without re-encoding.
     losslesscut-bin
-    mission-center
-    mpv
-    # nm-connection-editor edits wired, static-IP and other connection settings;
-    # the network panel launches it. nm-applet runs via XDG autostart for its tray menu.
-    networkmanagerapplet
     resources
-    # Annotates screenshots from the notification's Edit action.
-    satty
-    wl-clipboard
     # niri cannot mirror outputs; wl-mirror shows one in a fullscreen window.
     wl-mirror
     wtype
