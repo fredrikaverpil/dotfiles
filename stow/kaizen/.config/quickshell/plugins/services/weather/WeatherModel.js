@@ -57,9 +57,10 @@ function yrUrl(latitude, longitude) {
 }
 
 // MET's terms require honouring Expires. The clamp guards against a missing,
-// stale, or absurdly distant header.
+// stale, or absurdly distant header. Qt reads a trailing GMT as a zone name:
+// London time there, NaN without tzdata; +0000 is unambiguous.
 function expiresInterval(header, now) {
-  var at = Date.parse(String(header || "").replace(/^\s+|\s+$/g, ""))
+  var at = Date.parse(String(header || "").replace(/^\s+|\s+$/g, "").replace(/ GMT$/, " +0000"))
   if (isNaN(at)) return DEFAULT_INTERVAL
   var reference = now instanceof Date ? now.getTime() : Date.now()
   return Math.min(MAXIMUM_INTERVAL, Math.max(MINIMUM_INTERVAL, at - reference + EXPIRY_MARGIN))
