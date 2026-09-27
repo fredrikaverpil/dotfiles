@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+set -e
+
+# Starts the kaizen session from a console login. --session serves niri's D-Bus
+# interfaces (screencast portal, a11y) and imports its environment, which uwsm
+# cleans up on exit. The instance name follows from the executable, so the
+# units are wayland-wm@niri.service and wayland-session@niri.target. -i skips
+# the login shell check: its parent is this script, not the login shell.
+
+uwsm check may-start -i
+exec uwsm start -e -D niri -- niri --session "$@"

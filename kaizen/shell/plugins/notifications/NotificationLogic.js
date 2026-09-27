@@ -11,8 +11,8 @@ function iconSource(icon) {
   return value
 }
 
-// Compiles host rules (host.notificationRules) matching `field: pattern` (app,
-// summary, body); a rule with a bad pattern or no fields is dropped.
+// Compiles rules (programs.kaizen.notificationRules) matching `field: pattern`
+// (app, summary, body); a rule with a bad pattern or no fields is dropped.
 function compileRules(rules) {
   return (Array.isArray(rules) ? rules : []).map(function(rule) {
     var match = (rule && rule.match) || {}

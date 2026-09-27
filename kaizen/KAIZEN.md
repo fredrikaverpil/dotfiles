@@ -49,10 +49,10 @@ flowchart BT
   HW --> SYS --> WM --> SHELL
 ```
 
-Each layer calls downward only. Nix (`desktop.nix`, `thinkpad.nix`) owns the two
-lower layers and the systemd units; Stow (`stow/kaizen/`) owns compositor config
-and links the QML (`kaizen/shell/`) as `~/.config/quickshell/kaizen`. Both are
-shared by every kaizen host.
+Each layer calls downward only. Nix (`kaizen/nix/`, `desktop.nix`,
+`thinkpad.nix`) owns the two lower layers and the systemd units; Stow
+(`stow/kaizen/`) owns compositor config and links the QML (`kaizen/shell/`) as
+`~/.config/quickshell/kaizen`. Both are shared by every kaizen host.
 
 ## Services to surfaces
 
@@ -214,8 +214,8 @@ closes niri's readiness-before-`WAYLAND_DISPLAY` race.
 1. Does a subsystem already do it? Read its state; do not duplicate it.
 2. Does a purpose-built app do it acceptably? Launch that instead.
 3. Can it be used with the keyboard only? If not, redesign.
-4. Then: daemon/process state → `plugins/services/`, view →
-   `plugins/panels/`; a protocol-driven surface with no other consumer of its
-   state (lock, notifications, polkit) keeps both in `plugins/<name>/`.
-   Packages/units/PAM → `desktop.nix`, compositor → `Ui/compositors/` and
+4. Then: daemon/process state → `plugins/services/`, view → `plugins/panels/`; a
+   protocol-driven surface with no other consumer of its state (lock,
+   notifications, polkit) keeps both in `plugins/<name>/`. Packages/units/PAM →
+   `kaizen/nix/module.nix`, compositor → `Ui/compositors/` and
    `niri/config.kdl`, IPC target for every new action.

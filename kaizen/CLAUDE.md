@@ -1,10 +1,11 @@
 # niri + Quickshell desktop
 
 This file documents the niri + Quickshell desktop and lives with it. Every host
-running it shares one copy of everything: `desktop.nix` in this directory,
-`../thinkpad.nix` next to it, the compositor config in `stow/kaizen/` and the
-QML in `kaizen/shell/`. An edit lands on every kaizen host at once, so there is
-no promotion step and no drift to diff for.
+running it shares one copy of everything: the module in `kaizen/nix/`, the QML
+in `kaizen/shell/`, `nix/shared/system/kaizen/desktop.nix`,
+`nix/shared/system/thinkpad.nix` and the compositor config in `stow/kaizen/`.
+An edit lands on every kaizen host at once, so there is no promotion step and
+no drift to diff for.
 
 What stays per host, in `nix/hosts/<host>/`: hardware and firmware settings
 (`hardware-configuration.nix`, disk and resume devices, GPU drivers, sleep
@@ -40,13 +41,17 @@ previous states. Explain a declaration next to it, not here.
   namespaces, D-Bus path, state files). It is host-agnostic; `renoir` and
   `wily` are only hostnames.
 - Nix comments carry the "why" for packages, portals, PAM, units and hardware
-  integration. Read `desktop.nix` here and `../thinkpad.nix`, plus the host's
-  `configuration.nix`, before asking.
+  integration. Read `kaizen/nix/`, `nix/shared/system/kaizen/desktop.nix` and
+  `nix/shared/system/thinkpad.nix`, plus the host's `configuration.nix`, before
+  asking.
 
 ## Architecture
 
-- `desktop.nix` owns packages, portals, PAM, systemd units and the pre-suspend
-  lock. `stow/kaizen/` owns compositor configuration, `kaizen/shell/` the QML.
+- `kaizen/nix/module.nix` owns the session: packages, portals, PAM, systemd
+  units and the pre-suspend lock. `kaizen/nix/package.nix` builds the
+  `kaizen`, `kaizen-shell` and `kaizen-focus` commands.
+  `nix/shared/system/kaizen/desktop.nix` adds apps and personal settings.
+  `stow/kaizen/` owns compositor configuration, `kaizen/shell/` the QML.
 - `shell.qml` wires services and surfaces. Views belong in `plugins/panels/`;
   daemon/process state belongs in `plugins/services/`.
 - Interactive surfaces come in three kinds; pick by what opens them:
@@ -73,11 +78,12 @@ previous states. Explain a declaration next to it, not here.
   `x-kde-passwordManagerHint`. Proton Pass and 1Password set it; a password
   manager that does not would be recorded.
 - SSH keys come from the Proton Pass app's agent (`SSH_AUTH_SOCK` in
-  `desktop.nix`), so the app must be running. While it is locked, a key
-  request waits 60 s for an unlock, then fails as `Permission denied
-  (publickey)`. The app asks by showing its window, which niri ignores for a
-  mapped window (no focus, no urgency), so the prompt stays on workspace 7;
-  unlocking there within the minute lets the waiting `ssh`/`git` proceed.
+  `nix/shared/system/kaizen/desktop.nix`), so the app must be running. While
+  it is locked, a key request waits 60 s for an unlock, then fails as
+  `Permission denied (publickey)`. The app asks by showing its window, which
+  niri ignores for a mapped window (no focus, no urgency), so the prompt stays
+  on workspace 7; unlocking there within the minute lets the waiting
+  `ssh`/`git` proceed.
 - The curtain hides the screen, it is not a lock: an overlay layer surface
   (`kaizen-curtain`), never `WlSessionLock`, and it never touches DPMS. Both are
   deliberate. A session lock replaces output content and a disabled output has
@@ -313,7 +319,7 @@ PID.
 - Chromium and Electron pick their secret store from `XDG_CURRENT_DESKTOP`. They
   do not recognise `niri` and fall back to `basic_text`, so logins and secrets
   do not persist or are stored under a hardcoded key. Wrap each such app with
-  `pkgs.withGnomeLibsecret` (`desktop.nix`), which adds
+  `pkgs.withGnomeLibsecret` (`nix/shared/system/kaizen/desktop.nix`), which adds
   `--password-store=gnome-libsecret`; `chromium` passes the flag directly. Do
   not add `GNOME` to `XDG_CURRENT_DESKTOP`: autostart entries such as
   `nm-applet` and `print-applet` use `NotShowIn=GNOME`. Once an app has

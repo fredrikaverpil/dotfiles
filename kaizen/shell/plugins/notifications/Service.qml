@@ -285,7 +285,7 @@ Item {
     printErrors: false
   }
 
-  // The host's notification rules (host.notificationRules).
+  // The notification rules (programs.kaizen.notificationRules).
   FileView {
     id: rulesFile
     path: Quickshell.env("NOTIFICATION_RULES") || ""

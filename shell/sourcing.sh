@@ -12,7 +12,7 @@ if [ -e /etc/NIXOS ]; then
   # --session serves niri's D-Bus interfaces (screencast portal, a11y) and
   # imports its environment, which uwsm cleans up on exit. The instance name
   # follows from the executable, so the units are wayland-wm@niri.service and
-  # wayland-session@niri.target -- both named in the hosts' desktop.nix.
+  # wayland-session@niri.target -- both named in kaizen/nix/module.nix.
   # `kaizen` starts the niri session; the Quickshell shell and other user
   # units bind to wayland-session@niri.target. `noctalia` starts the same
   # session with those units masked and Noctalia v5 in their place.
@@ -37,10 +37,9 @@ if [ -e /etc/NIXOS ]; then
     }
 
     function kaizen() {
-      uwsm check may-start || return
       # Undo a mask left behind by a noctalia session that died mid-function.
       kaizen_units unmask
-      uwsm start -e -D niri -- niri --session
+      command kaizen "$@"
     }
 
     # Noctalia is evaluated, not installed, so it runs from the host's own

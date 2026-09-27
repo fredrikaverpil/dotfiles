@@ -96,7 +96,7 @@ Wheels and prebuilt npm binaries are glibc-linked and fail to load on NixOS
 
 ### niri + Quickshell desktop (ThinkPads)
 
-Read `nix/shared/system/kaizen/CLAUDE.md` before changing Quickshell, niri or
+Read `kaizen/CLAUDE.md` before changing Quickshell, niri or
 their Nix modules. It owns the local checks, platform boundaries and safe
 deployment process. `renoir` and `wily` share one copy of that desktop:
 `nix/shared/system/kaizen/`, `kaizen/` and `stow/kaizen/` apply to both, so an

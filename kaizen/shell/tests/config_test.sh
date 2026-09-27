@@ -10,7 +10,7 @@ printf 'PASS: compositor configuration contracts\n'
 # KAIZEN.md rules with a mechanical check: the IPC column of the services
 # table is the set of IpcHandler targets, and the shell writes only under the
 # roots Ui/Paths.qml resolves.
-doc=../../nix/shared/system/kaizen/KAIZEN.md
+doc=../KAIZEN.md
 # shellcheck disable=SC2016
 documented=$(grep -E '^\| [a-z ()]+ \| ' "$doc" | awk -F'|' '{print $6}' | grep -o '`[a-z]*`' | tr -d '`' | sort -u)
 declared=$(grep -rho 'target: *"[a-z]*"' --include='*.qml' plugins Ui shell.qml | grep -o '"[a-z]*"' | tr -d '"' | sort -u)

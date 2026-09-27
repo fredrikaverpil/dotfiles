@@ -20,55 +20,6 @@
       description = "Extra Chromium --enable-features for this host";
     };
 
-    host.notificationRules = lib.mkOption {
-      type = lib.types.listOf (
-        lib.types.submodule {
-          options = {
-            match = lib.mkOption {
-              type = lib.types.attrsOf lib.types.str;
-              example = {
-                app = "^Slack$";
-                summary = " in #?alerts$";
-              };
-              description = "JavaScript regexes keyed by notification field (app, summary, body); the rule applies when all match";
-            };
-            critical = lib.mkOption {
-              type = lib.types.bool;
-              default = false;
-              description = "Raise to critical, so it sticks and bypasses Do Not Disturb";
-            };
-            dedup = lib.mkOption {
-              type = lib.types.nullOr (
-                lib.types.submodule {
-                  options = {
-                    group = lib.mkOption {
-                      type = lib.types.str;
-                      description = "One event reported by several apps";
-                    };
-                    keep = lib.mkOption {
-                      type = lib.types.bool;
-                      default = false;
-                      description = "Show this copy and dismiss the group's others; they are held briefly in case it arrives";
-                    };
-                  };
-                }
-              );
-              default = null;
-              description = "Show one copy of an event reported by several apps";
-            };
-            icon = lib.mkOption {
-              type = lib.types.nullOr lib.types.path;
-              default = null;
-              example = lib.literalExpression "./github.svg";
-              description = "Icon shown in place of the notification's, such as the sender an app relays for; the notification's own moves to a badge on its corner";
-            };
-          };
-        }
-      );
-      default = [ ];
-      description = "Kaizen's notification rules";
-    };
-
     host.extraServices = lib.mkOption {
       type = lib.types.attrs;
       default = { };
