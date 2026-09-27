@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../modules/services/calendar/CalendarModel.js" as Calendar
+import "CalendarModel.js" as Calendar
 
 TestCase {
   name: "CalendarModel"

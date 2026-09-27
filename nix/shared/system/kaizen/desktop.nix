@@ -22,13 +22,8 @@ in
 # session (session.nix).
 {
   imports = [
-    inputs.dankcalendar.nixosModules.default
     ./session.nix
   ];
-
-  # OAuth tokens stay in gnome-keyring (from programs.niri), unlocked by the login PAM stack.
-  # Calendar credentials and feed URLs are private user state, never Nix/Stow values.
-  programs.dank-calendar.enable = true;
 
   # gnome-keyring would also start gcr-ssh-agent as the SSH agent.
   services.gnome.gcr-ssh-agent.enable = false;
@@ -91,41 +86,6 @@ in
 
   # The Proton Pass app's SSH agent; the socket exists only while the app runs.
   environment.sessionVariables.SSH_AUTH_SOCK = "$HOME/.ssh/proton-pass-ssh-agent.sock";
-
-  # Keep the upstream systemd option off: its unit orders after graphical-session.target.
-  # Sync and reminders outlive the calendar window and run independently of our shell.
-  systemd.user.services.dcal = {
-    description = "DankCalendar sync and reminders";
-    partOf = [ "graphical-session.target" ];
-    after = [
-      "dbus.socket"
-      "quickshell.service"
-      "wayland-wm@niri.service"
-      "wayland-session-waitenv.service"
-    ];
-    wantedBy = [ "wayland-session@niri.target" ];
-    # NixOS pins a sparse user-unit PATH; inherit UWSM's session PATH so dcal can
-    # launch its Quickshell UI and open OAuth URLs with the session's tools.
-    environment.PATH = lib.mkForce null;
-    # Retry indefinitely, e.g. while the keyring is not yet unlocked.
-    unitConfig.StartLimitIntervalSec = 0;
-    serviceConfig = {
-      # dcal must see Secret Service before starting: its local keyring fallback uses a fixed password.
-      # OpenSession prevents that fallback; the collection probe catches first-use keyring
-      # initialization that advertises `login` without exporting it. Manually launched
-      # instances bypass both probes.
-      ExecStartPre = [
-        "${pkgs.systemd}/bin/busctl --user --timeout=15 --quiet call org.freedesktop.secrets /org/freedesktop/secrets org.freedesktop.Secret.Service OpenSession sv plain s \"\""
-        "${pkgs.systemd}/bin/busctl --user --timeout=15 --quiet get-property org.freedesktop.secrets /org/freedesktop/secrets/collection/login org.freedesktop.Secret.Collection Locked"
-      ];
-      ExecStart = "${lib.getExe config.programs.dank-calendar.package} run --session --hidden";
-      # The UI's Quit makes the daemon SIGTERM itself and exit 0.
-      Restart = "always";
-      RestartSec = "2s";
-      Slice = "app.slice";
-      UMask = "0077";
-    };
-  };
 
   nixpkgs.overlays = [
     (final: _: {

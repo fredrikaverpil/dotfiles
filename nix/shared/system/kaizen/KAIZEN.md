@@ -35,7 +35,6 @@ flowchart BT
     keyring[gnome-keyring: Secret Service]
     polkitd[polkit]
     portal[xdg-desktop-portal-gnome / gtk]
-    dcal[dcal: calendar sync daemon]
   end
   subgraph WM[Compositor]
     niri["niri --session under UWSM: layer-shell, session-lock, screencopy, idle-notify, niri msg"]
@@ -63,7 +62,6 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | battery | [UPower], [sysfs power_supply] thresholds, [power-profiles-daemon] | battery button | Settings › Power | `battery` |
 | bluetooth | [BlueZ] via [Quickshell] | button | Settings › Bluetooth | `bluetooth` |
 | brightness | [sysfs backlight] via [logind] SetBrightness | – | XF86 keys | `brightness` |
-| calendar | [dcal] JSON IPC | date button | Settings › Calendar | `calendar` |
 | clipboard | [wl-clipboard] watcher, in memory | – | Trigger › Clipboard | `clipboard` |
 | idle | [ext-idle-notify], lock service | idle indicator | Settings › Session | `idle` |
 | keyboard | [niri] XKB layouts | layout indicator | Settings › Keyboard layout | `keyboard` |
@@ -124,11 +122,12 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 - The weather location is a coordinate picked from `PlacesModel.js` and saved
   by the shell; the machines have no GNSS. Nightlight takes sunrise and sunset
   from the same coordinate, so one saved place moves both.
-- After a zone change, restart `quickshell.service` and `dcal.service` by
-  hand: glibc caches the parsed tzfile, so a running process keeps the zone it
-  started with. The restart stays manual because the shell must never restart
-  while locked. Removing `/etc/localtime` is not a test; that falls back to
-  UTC, which only looks like a live pickup.
+- After a zone change, restart `quickshell.service` by hand, and any other
+  long-running process that shows local time, such as the calendar plugin's
+  `dcal.service`: glibc caches the parsed tzfile, so a running process keeps
+  the zone it started with. The restart stays manual because the shell must
+  never restart while locked. Removing `/etc/localtime` is not a test; that
+  falls back to UTC, which only looks like a live pickup.
 
 ## Surfaces
 
@@ -154,7 +153,8 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   - ❄ and the workspaces: left-click opens the launcher, right-click its top
     level as a context menu; a workspace takes focus.
   - Panel buttons: left-click opens the panel, right-click the button's
-    Settings node as a context menu.
+    Settings node as a context menu. The date is one only when a plugin takes
+    it over; otherwise it is a plain label.
   - Indicators, shown only off the default state: left-click acts on it
     (stops the recording, re-enables idle locking, resets the layout, opens
     the system monitor).
@@ -162,6 +162,7 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 - A plugin (`Ui/Plugin.qml`) adds launcher items, its own panels and IPC
   targets, and may take over the date button (`barActions.date`):
   left-click calls the plugin, right-click opens its `settings.<name>` node.
+  The calendar (`plugins/calendar/`, events from [dcal]) is one.
 - `Ui/Compositor.qml` is the only path to niri.
 
 ## Session lifecycle
@@ -170,7 +171,6 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 TTY login ─ kaizen() ─ uwsm start niri --session
   └─ wayland-session@niri.target
        ├─ quickshell.service        Restart=on-failure
-       ├─ dcal.service              waits for Secret Service
        └─ kaizen-sleep-lock.service logind delay inhibitor
 lid close / power key ─ logind ─ sleep-lock locks shell ─ waits for secure ─ suspend
 ```
