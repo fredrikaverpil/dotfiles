@@ -17,7 +17,8 @@ function pickColor() {
   return ["sh", "-c", "niri msg pick-color | sed -n 's/^Hex: //p'"]
 }
 
-function configFile(home) { return home + "/.config/niri/config.kdl" }
+// niriConfig is NIRI_CONFIG, which niri prefers to the default path.
+function configFile(home, niriConfig) { return niriConfig || home + "/.config/niri/config.kdl" }
 
 // Binds are the config lines carrying hotkey-overlay-title; the chord is the
 // first word. Commented-out binds are skipped.
@@ -26,6 +27,23 @@ function parseBinds(raw) {
     .map(function(line) { return /^\s*([^\s\/]\S*)\s.*hotkey-overlay-title="([^"]*)"/.exec(line) })
     .filter(function(match) { return match && match[1] !== "spawn-at-startup" })
     .map(function(match) { return { chord: match[1], label: match[2], enabled: true } })
+}
+
+// The binds of file with its includes expanded in place, resolved as niri does:
+// ~ is home, other paths are relative to the including file, and nesting stops
+// at 10 levels. read(path) returns a file's text, or null for a file it cannot
+// read, which is skipped.
+function readBinds(file, home, read, depth) {
+  var raw = (depth || 0) < 10 ? read(file) : null
+  if (raw === null) return []
+  var dir = file.slice(0, file.lastIndexOf("/") + 1)
+  // Splitting on a capture group alternates text and include paths.
+  return String(raw).split(/^[ \t]*include[ \t][^"\n]*"([^"]*)".*$/m)
+    .reduce(function(binds, part, index) {
+      if (index % 2 === 0) return binds.concat(parseBinds(part))
+      var path = /^~(\/|$)/.test(part) ? home + part.slice(1) : part.startsWith("/") ? part : dir + part
+      return binds.concat(readBinds(path, home, read, (depth || 0) + 1))
+    }, [])
 }
 
 // focus-workspace acts on the focused output, so focus the target output first.

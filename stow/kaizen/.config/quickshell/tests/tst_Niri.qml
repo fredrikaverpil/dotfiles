@@ -20,6 +20,38 @@ TestCase {
     compare(Niri.parseBinds(""), [])
   }
 
+  function test_read_binds_expands_includes_in_place() {
+    const bind = (chord, label) => `binds {\n    ${chord} hotkey-overlay-title="${label}" { spawn "x"; }\n}\n`
+    const files = {
+      "/home/u/.config/niri/config.kdl": 'include "a.kdl"\n' + bind("Mod+A", "Main")
+        + 'include optional=true "~/extra.kdl"\n'
+        + 'include optional=true "missing.kdl"\n'
+        + '// include "commented.kdl"\n',
+      "/home/u/.config/niri/a.kdl": bind("Mod+B", "A") + 'include "/etc/b.kdl"\n',
+      "/etc/b.kdl": bind("Mod+C", "B"),
+      "/home/u/extra.kdl": bind("Mod+D", "Extra"),
+      "/home/u/.config/niri/commented.kdl": bind("Mod+E", "Commented"),
+      "/c/self.kdl": 'include "self.kdl"\n' + bind("Mod+L", "Loop"),
+    }
+    const read = path => path in files ? files[path] : null
+
+    compare(Niri.readBinds("/home/u/.config/niri/config.kdl", "/home/u", read), [
+      { chord: "Mod+B", label: "A", enabled: true },
+      { chord: "Mod+C", label: "B", enabled: true },
+      { chord: "Mod+A", label: "Main", enabled: true },
+      { chord: "Mod+D", label: "Extra", enabled: true },
+    ])
+    // niri rejects deeper nesting; a file including itself stops there too.
+    compare(Niri.readBinds("/c/self.kdl", "/home/u", read).length, 10)
+    compare(Niri.readBinds("/missing.kdl", "/home/u", read), [])
+  }
+
+  function test_config_file() {
+    compare(Niri.configFile("/home/u", null), "/home/u/.config/niri/config.kdl")
+    compare(Niri.configFile("/home/u", ""), "/home/u/.config/niri/config.kdl")
+    compare(Niri.configFile("/home/u", "/etc/niri/trial.kdl"), "/etc/niri/trial.kdl")
+  }
+
   function test_pin_window() {
     const none = { id: 0, requested: 0, spaces: ({}) }
     compare(Niri.pinWindow("invalid", "cam", none), none)
