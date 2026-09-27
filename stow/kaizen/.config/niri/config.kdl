@@ -249,7 +249,7 @@ binds {
     // Launch
     Mod+T hotkey-overlay-title="Focus or open a terminal" { spawn "kaizen-focus" r#"^com\.mitchellh\.ghostty$"# "ghostty"; }
     Mod+Shift+T hotkey-overlay-title="New terminal" { spawn "ghostty"; }
-    Mod+Y hotkey-overlay-title="Files" { spawn "ghostty" "-e" "yazi"; }
+    Mod+Y hotkey-overlay-title="Files" { spawn "xdg-terminal-exec" "yazi"; }
     // Work profile on wily, personal (Default) elsewhere.
     Mod+B hotkey-overlay-title="Browser" { spawn-sh r#"chromium --profile-directory="$([ "$(hostname)" = wily ] && echo Work || echo Default)""#; }
     // Skips whatever is already running, so it is safe to press twice.

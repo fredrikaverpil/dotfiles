@@ -73,8 +73,8 @@ let
     name = "cliamp";
     desktopName = "cliamp";
     comment = "Terminal Winamp";
-    exec = "ghostty -e cliamp";
-    terminal = false;
+    exec = "cliamp";
+    terminal = true;
     categories = [
       "Audio"
       "Player"
@@ -85,8 +85,8 @@ let
     name = "bluetui";
     desktopName = "bluetui";
     comment = "Bluetooth pairing";
-    exec = "ghostty -e bluetui";
-    terminal = false;
+    exec = "bluetui";
+    terminal = true;
     categories = [
       "Settings"
       "HardwareSettings"
