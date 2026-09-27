@@ -292,7 +292,7 @@ Scope {
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: visible ? 4 : 0
         visible: !bar.shell.keyboard.isDefault
-        label: bar.shell.keyboard.code
+        label: bar.shell.keyboard.name
         fontSize: 11
         onActivated: bar.shell.keyboard.set(0)
       }
