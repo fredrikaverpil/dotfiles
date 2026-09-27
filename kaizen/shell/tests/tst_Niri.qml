@@ -42,8 +42,26 @@ TestCase {
       { chord: "Mod+D", label: "Extra", enabled: true },
     ])
     // niri rejects deeper nesting; a file including itself stops there too.
-    compare(Niri.readBinds("/c/self.kdl", "/home/u", read).length, 10)
+    compare(Niri.readBinds("/c/self.kdl", "/home/u", read), [{ chord: "Mod+L", label: "Loop", enabled: true }])
     compare(Niri.readBinds("/missing.kdl", "/home/u", read), [])
+  }
+
+  function test_read_binds_keeps_the_last_bind_of_a_chord() {
+    const files = {
+      "/c/config.kdl": 'include "kaizen.kdl"\n'
+        + 'binds {\n    Shift+Mod+space hotkey-overlay-title="Mine" { spawn "x"; }\n}\n',
+      "/c/kaizen.kdl": 'binds {\n'
+        + '    Mod+Space hotkey-overlay-title="Menu" { spawn "qs"; }\n'
+        + '    Mod+Shift+Space hotkey-overlay-title="Next layout" { spawn "qs"; }\n'
+        + '}\n',
+    }
+
+    const binds = Niri.readBinds("/c/config.kdl", "/home/u", path => files[path] ?? null)
+
+    compare(binds, [
+      { chord: "Mod+Space", label: "Menu", enabled: true },
+      { chord: "Shift+Mod+space", label: "Mine", enabled: true },
+    ])
   }
 
   function test_config_file() {
