@@ -136,6 +136,14 @@ in
     </Menu>
   '';
 
+  # Dolphin's Open Terminal (Shift+F4) falls back to Konsole. inherit overrides Ghostty's
+  # working-directory = home so it opens in the folder. The F4 panel embeds konsolepart only.
+  # System-wide, since the shell writes ~/.config/kdeglobals.
+  environment.etc."xdg/kdeglobals".text = ''
+    [General]
+    TerminalApplication=ghostty --working-directory=inherit
+  '';
+
   # uwsm-app launches Terminal=true entries through xdg-terminal-exec.
   xdg.terminal-exec = {
     enable = true;
