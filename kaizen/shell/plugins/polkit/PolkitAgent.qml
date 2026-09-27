@@ -146,7 +146,7 @@ Item {
       scale: root.shell.textScale
       radius: 8
       color: root.palette.bg
-      border.color: root.failed ? root.palette.rose : root.palette.fg
+      border.color: root.failed ? root.palette.alert : root.palette.fg
       border.width: 1
 
       Column {
@@ -173,7 +173,7 @@ Item {
           text: root.supplementary
           textFormat: Text.PlainText
           wrapMode: Text.WordWrap
-          color: root.failed ? root.palette.rose : root.palette.off
+          color: root.failed ? root.palette.alert : root.palette.off
           font.family: Ui.Fonts.mono
           font.pixelSize: 13
         }
@@ -183,7 +183,7 @@ Item {
           height: 46
           radius: 4
           color: root.palette.sel
-          border.color: root.failed ? root.palette.rose : root.palette.dim
+          border.color: root.failed ? root.palette.alert : root.palette.dim
           border.width: 1
 
           TextInput {

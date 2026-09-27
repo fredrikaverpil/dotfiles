@@ -33,7 +33,7 @@ Rectangle {
   readonly property string ruleIcon: String(row.icon || "")
   readonly property int urgency: Number(row.urgency)
   readonly property var buttons: NotificationLogic.buttons(notification ? notification.actions : [])
-  readonly property color accent: urgency === 2 ? palette.rose : (urgency === 0 ? palette.off : palette.fg)
+  readonly property color accent: urgency === 2 ? palette.alert : (urgency === 0 ? palette.off : palette.fg)
   // A rule's icon takes the notification's place, which moves to the badge.
   readonly property string icon: ruleIcon || ownIcon
   readonly property string badge: ruleIcon ? ownIcon : ""

@@ -87,7 +87,7 @@ Scope {
         x: window.rx - 4; y: window.ry - 4
         width: window.rw + 8; height: window.rh + 8
         color: "transparent"
-        border.color: root.shell.palette.rose
+        border.color: root.shell.palette.alert
         border.width: 2
       }
 

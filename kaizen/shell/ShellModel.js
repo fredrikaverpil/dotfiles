@@ -20,7 +20,7 @@ function kdeglobalsWrite(dark, darkPalette, lightPalette) {
 }
 
 function niriColors(palette) {
-  return "layout {\n    border {\n        active-color \"" + palette.water + "\"\n    }\n}\n"
+  return "layout {\n    border {\n        active-color \"" + palette.accent + "\"\n    }\n}\n"
 }
 
 function textScale(value, minimum, maximum) {

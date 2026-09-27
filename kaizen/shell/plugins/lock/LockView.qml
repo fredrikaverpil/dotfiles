@@ -72,7 +72,7 @@ Item {
       scale: root.shell.textScale
       radius: 8
       color: root.palette.bg
-      border.color: root.failureMessage.length > 0 ? root.palette.rose : root.palette.fg
+      border.color: root.failureMessage.length > 0 ? root.palette.alert : root.palette.fg
       border.width: 2
 
       TextInput {
@@ -117,7 +117,7 @@ Item {
         anchors.fill: passwordInput
         visible: passwordInput.text.length === 0
         text: root.authenticating ? "Checking…" : (root.failureMessage || "Enter password")
-        color: root.authenticating ? root.palette.fg : (root.failureMessage ? root.palette.rose : root.palette.off)
+        color: root.authenticating ? root.palette.fg : (root.failureMessage ? root.palette.alert : root.palette.off)
         font.family: Ui.Fonts.mono
         font.pixelSize: 18
         font.italic: root.failureMessage.length > 0
