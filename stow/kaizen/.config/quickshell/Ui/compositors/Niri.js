@@ -134,6 +134,14 @@ function currentLayout(raw) {
   return Number.isInteger(index) && index >= 0 ? index : -1
 }
 
+// Names in xkb order, from the compositor's layout list.
+function layoutNames(raw) {
+  var parsed
+  try { parsed = JSON.parse(String(raw || "")) } catch (error) { return [] }
+  var names = parsed && parsed.names
+  return Array.isArray(names) ? names.map(String) : []
+}
+
 function setLayout(index) {
   return ["niri", "msg", "action", "switch-layout", String(index)]
 }

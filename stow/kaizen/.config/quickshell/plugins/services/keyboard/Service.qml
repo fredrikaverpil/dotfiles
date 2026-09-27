@@ -8,20 +8,20 @@ import "../../../Ui" as Ui
 Item {
   id: root
 
-  // Order must match both compositor configurations; the shell is the only layout switcher.
-  readonly property var codes: ["US", "SE"]
+  // The compositor's xkb layouts, read once at start; the shell is the only layout switcher.
+  property var names: []
 
   property int index: 0
-  readonly property string code: root.codes[root.index] || ""
+  readonly property string name: root.names[root.index] || ""
   readonly property bool isDefault: root.index === 0
 
   function set(next) {
-    if (next < 0 || next >= root.codes.length || next === root.index) return
+    if (!(next >= 0 && next < root.names.length) || next === root.index) return
     root.index = next
     Quickshell.execDetached(Ui.Compositor.setLayout(next))
   }
 
-  function next() { root.set((root.index + 1) % root.codes.length) }
+  function next() { root.set((root.index + 1) % root.names.length) }
 
   Component.onCompleted: query.running = true
 
@@ -31,8 +31,9 @@ Item {
     stdout: StdioCollector {
       waitForEnd: true
       onStreamFinished: {
+        root.names = Ui.Compositor.layoutNames(text)
         const read = Ui.Compositor.currentLayout(text)
-        if (read >= 0 && read < root.codes.length) root.index = read
+        if (read >= 0 && read < root.names.length) root.index = read
       }
     }
   }
@@ -43,7 +44,7 @@ Item {
     function next(): void { root.next() }
     function set(index: int): void { root.set(index) }
     function status(): string {
-      return JSON.stringify({ index: root.index, code: root.code, codes: root.codes })
+      return JSON.stringify({ index: root.index, name: root.name, names: root.names })
     }
   }
 }

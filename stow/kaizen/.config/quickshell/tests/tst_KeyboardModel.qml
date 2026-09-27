@@ -34,4 +34,21 @@ TestCase {
     const niri = data.text === undefined ? JSON.stringify({ current_idx: data.value }) : data.text
     compare(Niri.currentLayout(niri), -1)
   }
+
+  function test_layout_names_data() {
+    return [
+      { tag: "niri names", text: '{"names":["English (US, Swedish letters)","Swedish"],"current_idx":0}',
+        want: ["English (US, Swedish letters)", "Swedish"] },
+      { tag: "no layouts", text: '{"names":[],"current_idx":0}', want: [] },
+      { tag: "missing field", text: '{"current_idx":0}', want: [] },
+      { tag: "not a list", text: '{"names":"Swedish"}', want: [] },
+      { tag: "empty", text: "", want: [] },
+      { tag: "error", text: "compositor: not running", want: [] },
+      { tag: "null", text: "null", want: [] }
+    ]
+  }
+
+  function test_layout_names(data) {
+    compare(Niri.layoutNames(data.text), data.want)
+  }
 }
