@@ -3,7 +3,7 @@ import QtQuick.Window
 import Quickshell
 import Quickshell.Io
 
-import "../../../Ui" as Ui
+import qs.Ui as Ui
 
 Ui.Panel {
   id: root

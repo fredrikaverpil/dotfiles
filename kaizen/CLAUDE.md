@@ -61,6 +61,7 @@ previous states. Explain a declaration next to it, not here.
 - External plugins (`programs.kaizen.plugins`, passed as `KAIZEN_PLUGINS`)
   load from outside the tree, which Quickshell does not watch: apply an edit
   with `qs -c kaizen ipc call shell reload`. The contract is `Ui/Plugin.qml`.
+  This repository's calendar is one, in `nix/shared/system/kaizen/calendar/`.
 - Interactive surfaces come in three kinds; pick by what opens them:
   - Launcher (`plugins/menu/`): a large `Ui.Panel` drilling down through
     levels; the keyboard entry point to everything, tray menus included.
@@ -153,9 +154,12 @@ default devshell (`flake.nix`, entered by `direnv` at the repo root or run as
 `nix develop ~/.dotfiles -c <command>`, not `#dev`) and the subflake's
 (`nix develop ./kaizen`) provide; run them from anywhere in the checkout. CI
 runs `qml-lint`, `qml-test` and `compositor-test`, through
-`nix flake check ./kaizen`. `compositor-test` and `shell-smoke` are Linux-only
-and are absent from the shell on macOS. All of them run against the one copy
-in `kaizen/`, so a static check passing here passes for every kaizen host.
+`nix flake check ./kaizen`. The repository devshell's `qml-test` also runs the
+tests in its `extraTests` plugin dirs, as a separate CI step. `qml-lint` skips
+plugins: their `import qs.Ui` resolves only inside Quickshell. `compositor-test`
+and `shell-smoke` are Linux-only and are absent from the shell on macOS. All of
+them run against the one copy in `kaizen/`, so a static check passing here
+passes for every kaizen host.
 
 | Change | Checks |
 | --- | --- |

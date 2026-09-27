@@ -149,6 +149,7 @@
                     # (.qmltypes) is used here. Same nixpkgs as renoir, so the
                     # same store path the ThinkPad runs.
                     quickshell = unstable.x86_64-linux.quickshell;
+                    extraTests = [ "nix/shared/system/kaizen/calendar" ];
                   };
                 in
                 pkgs.mkShell {

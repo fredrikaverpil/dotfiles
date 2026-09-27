@@ -72,8 +72,8 @@ Scope {
           shell: bar.shell
           anchors.verticalCenter: parent.verticalCenter
           label: Qt.formatDateTime(clock.date, "ddd d MMM")
-          onActivated: bar.shell.calendar.toggle()
-          onSecondary: bar.shell.menu.popup("settings.calendar", modelData.name, dateLabel)
+          onActivated: bar.shell.timezone.toggle()
+          onSecondary: bar.shell.menu.popup("settings.clock", modelData.name, dateLabel)
         }
 
         Rectangle {

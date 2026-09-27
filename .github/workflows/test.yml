@@ -67,6 +67,11 @@ jobs:
         run: nix flake check ./kaizen --show-trace --accept-flake-config
         if: matrix.name == 'renoir'
 
+      # Also runs the tests of the plugins kept outside kaizen.
+      - name: test kaizen plugins
+        run: nix develop . --accept-flake-config -c qml-test
+        if: matrix.name == 'renoir'
+
       # Build Darwin configurations on native macos runners (same architecture)
       - name: test nix build ${{ matrix.name }}
         run: |

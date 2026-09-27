@@ -13,7 +13,6 @@ import "plugins/notifications" as Notifications
 import "plugins/panels/audio" as Audio
 import "plugins/panels/battery" as Battery
 import "plugins/panels/bluetooth" as Bluetooth
-import "plugins/panels/calendar" as Calendar
 import "plugins/panels/clipboard" as Clipboard
 import "plugins/panels/media" as Media
 import "plugins/panels/display" as Display
@@ -27,7 +26,6 @@ import "plugins/curtain" as Curtain
 import "plugins/services/battery" as BatteryService
 import "plugins/services/bluetooth" as BluetoothService
 import "plugins/services/brightness" as Brightness
-import "plugins/services/calendar" as CalendarService
 import "plugins/services/clipboard" as ClipboardService
 import "plugins/services/idle" as Idle
 import "plugins/services/keyboard" as Keyboard
@@ -67,7 +65,6 @@ ShellRoot {
   readonly property alias weatherService: weatherService
   readonly property alias systemService: systemService
   readonly property alias clipboard: clipboard
-  readonly property alias calendar: calendar
   readonly property alias timezone: timezone
   readonly property alias timezoneService: timezoneService
 
@@ -371,16 +368,6 @@ ShellRoot {
     id: clipboard
     shell: root
     service: clipboardService
-  }
-
-  CalendarService.Service {
-    id: calendarService
-  }
-
-  Calendar.Panel {
-    id: calendar
-    shell: root
-    service: calendarService
   }
 
   TimezoneService.Service {

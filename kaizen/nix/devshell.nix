@@ -10,6 +10,9 @@
   quickshell,
   niri,
   jq,
+  # Test dirs outside kaizen that qml-test also runs, relative to the checkout
+  # root: plugins kept in the user's own repo.
+  extraTests ? [ ],
 }:
 let
   task =
@@ -24,7 +27,13 @@ mkShell {
   packages = [
     qt6.qtdeclarative # qmlls, qmllint, qmlformat, qmltestrunner
     (task "qml-lint" "qmllint -E -W 0 $(find . -name '*.qml')")
-    (task "qml-test" "QT_QPA_PLATFORM=offscreen QT_QPA_PLATFORMTHEME= qmltestrunner -input tests")
+    (task "qml-test" ''
+      export QT_QPA_PLATFORM=offscreen QT_QPA_PLATFORMTHEME=
+      qmltestrunner -input tests
+      ${lib.concatMapStrings (dir: ''
+        qmltestrunner -input "$(git rev-parse --show-toplevel)/${dir}"
+      '') extraTests}
+    '')
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [
     niri
