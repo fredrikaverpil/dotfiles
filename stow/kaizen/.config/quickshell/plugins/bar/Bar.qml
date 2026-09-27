@@ -182,11 +182,14 @@ Scope {
         anchors.right: batteryButton.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: batteryButton.visible ? 4 : 6
+        readonly property string ssid: bar.shell.networkService.kind === "wifi"
+          && bar.shell.networkService.connectedWifiNetwork
+          ? bar.shell.networkService.connectedWifiNetwork.name
+          : ""
         foreground: bar.shell.networkService.kind === "disconnected" ? bar.shell.palette.rose : bar.shell.palette.fg
+        // At most 16 characters; the panel shows the full name.
         label: bar.shell.networkService.icon
-          + (bar.shell.networkService.kind === "wifi" && bar.shell.networkService.connectedWifiNetwork
-            ? " " + bar.shell.networkService.connectedWifiNetwork.name
-            : "")
+          + (ssid ? " " + (ssid.length > 16 ? ssid.slice(0, 15) + "…" : ssid) : "")
         onActivated: bar.shell.network.toggle()
         onSecondary: bar.shell.menu.popup("settings.network", modelData.name, networkButton)
       }
