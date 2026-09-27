@@ -113,6 +113,8 @@ packages from the `llm-agents` flake input, upgraded via
 - Neovim ⌨️
   - [My Neovim config](nvim-fredrik/README.md) - uses `vim.pack`
   - [Minimalistic config](nvim-simple/README.md)
+- Desktop 🖥️
+  - [kaizen](kaizen/README.md) - niri + Quickshell, installable as a flake
 - Workflows 🌊
   - [Git config](extras/README_GIT.md)
   - [Project config](extras/README_PROJECT.md)

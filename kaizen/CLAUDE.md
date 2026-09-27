@@ -19,7 +19,9 @@ worktree, not a per-host copy of the tree.
 
 Machine facts (firmware, BIOS, hardware quirks) belong in the host's
 `README.md`, never here. Design intent and the layer model are in `KAIZEN.md`;
-read it before adding a surface or service.
+read it before adding a surface or service. `kaizen/README.md` is for others:
+the trial, install, niri includes, options, theming and the plugin contract.
+Keep it in step with changes to any of them.
 
 ## Working model
 
