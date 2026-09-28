@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../plugins/services/clipboard/ClipboardModel.js" as Model
+import "../modules/services/clipboard/ClipboardModel.js" as Model
 
 TestCase {
   name: "ClipboardModel"

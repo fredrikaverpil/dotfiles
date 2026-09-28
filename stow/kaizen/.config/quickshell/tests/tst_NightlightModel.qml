@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../plugins/services/nightlight/NightlightModel.js" as Nightlight
+import "../modules/services/nightlight/NightlightModel.js" as Nightlight
 
 TestCase {
   name: "NightlightModel"

@@ -41,7 +41,7 @@ flowchart BT
     niri["niri --session under UWSM: layer-shell, session-lock, screencopy, idle-notify, niri msg"]
   end
   subgraph SHELL[kaizen: Quickshell]
-    svc[plugins/services: daemon and process state]
+    svc[modules/services: daemon and process state]
     ui[surfaces: bar, launcher, panels, context menus, notifications, lock, polkit agent, background]
     svc --> ui
   end
@@ -132,14 +132,14 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 ## Surfaces
 
 ```
-Launcher (plugins/menu)            keyboard entry point; drills down levels
+Launcher (modules/menu)            keyboard entry point; drills down levels
   ├─ Apps, Keybindings, Emoji     providers
   ├─ Trigger                      screenshots, recording, clipboard, window actions
   ├─ Settings                     per bar button: its panel, then its actions; Session
   └─ Tray                         tray menus, cascaded per level
 Panel (Ui/Panel)                   centered card; h/l step focus
 Context menu (Ui/ContextMenu)      hangs from the bar button that opened it
-Bar (plugins/bar)                  one PanelWindow per output
+Bar (modules/bar)                  one PanelWindow per output
 Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 ```
 
@@ -211,8 +211,8 @@ closes niri's readiness-before-`WAYLAND_DISPLAY` race.
 1. Does a subsystem already do it? Read its state; do not duplicate it.
 2. Does a purpose-built app do it acceptably? Launch that instead.
 3. Can it be used with the keyboard only? If not, redesign.
-4. Then: daemon/process state → `plugins/services/`, view →
-   `plugins/panels/`; a protocol-driven surface with no other consumer of its
-   state (lock, notifications, polkit) keeps both in `plugins/<name>/`.
+4. Then: daemon/process state → `modules/services/`, view →
+   `modules/panels/`; a protocol-driven surface with no other consumer of its
+   state (lock, notifications, polkit) keeps both in `modules/<name>/`.
    Packages/units/PAM → `session.nix`, compositor → `Ui/compositors/` and
    `niri/config.kdl`, IPC target for every new action.

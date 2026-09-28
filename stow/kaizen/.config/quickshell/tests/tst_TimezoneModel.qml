@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../plugins/services/timezone/TimezoneModel.js" as Timezone
+import "../modules/services/timezone/TimezoneModel.js" as Timezone
 
 TestCase {
   name: "TimezoneModel"

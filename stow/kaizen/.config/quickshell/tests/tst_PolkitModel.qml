@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../plugins/polkit/PolkitModel.js" as Polkit
+import "../modules/polkit/PolkitModel.js" as Polkit
 
 TestCase {
   name: "PolkitModel"
