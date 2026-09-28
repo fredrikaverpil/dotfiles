@@ -6,9 +6,9 @@ Ui.Plugin {
 
   name: "calendar"
   menuItems: ({
-    "settings.calendar": { icon: "󰃭", label: "Calendar" },
-    "settings.calendar.panel": { icon: "󰕮", label: "Calendar panel", action: () => calendarPanel.open() },
-    "settings.calendar.refresh": { icon: "󰑐", label: "Refresh", action: () => calendarService.refresh() },
+    "plugins.calendar": { icon: "󰃭", label: "Calendar" },
+    "plugins.calendar.panel": { icon: "󰕮", label: "Calendar panel", action: () => calendarPanel.open() },
+    "plugins.calendar.refresh": { icon: "󰑐", label: "Refresh", action: () => calendarService.refresh() },
   })
   barActions: ({ date: () => calendarPanel.toggle() })
 

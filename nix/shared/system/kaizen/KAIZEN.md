@@ -79,7 +79,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | tray | [StatusNotifierItem] | tray | Tray | `tray` |
 | background | wallpaper files, theme state | – | Settings › Display | `wallpaper`, `theme` |
 | menu | launcher | menu button | `Mod+Space` | `menu` |
-| plugins | `Plugin.qml` in each `host.kaizenPlugins` directory | date button, when taken over | Settings › each plugin | `shell` (reload) |
+| plugins | `Plugin.qml` in each `host.kaizenPlugins` directory | date button, when taken over | Plugins › each plugin | `shell` (reload) |
 
 [PipeWire]: https://pipewire.org
 [Quickshell]: https://quickshell.org/docs/types/
@@ -136,7 +136,8 @@ Launcher (modules/menu)            keyboard entry point; drills down levels
   ├─ Apps, Keybindings, Emoji     providers
   ├─ Trigger                      screenshots, recording, clipboard, window actions
   ├─ Settings                     per bar button: its panel, then its actions; Session
-  └─ Tray                         tray menus, cascaded per level
+  ├─ Tray                         tray menus, cascaded per level
+  └─ Plugins                      one node per plugin
 Panel (Ui/Panel)                   centered card; h/l step focus
 Context menu (Ui/ContextMenu)      hangs from the bar button that opened it
 Bar (modules/bar)                  one PanelWindow per output
@@ -154,14 +155,14 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
     level as a context menu; a workspace takes focus.
   - Panel buttons: left-click opens the panel, right-click the button's
     Settings node as a context menu. The date is one only when a plugin takes
-    it over; otherwise it is a plain label.
+    it over, and opens the plugin's node; otherwise it is a plain label.
   - Indicators, shown only off the default state: left-click acts on it
     (stops the recording, re-enables idle locking, resets the layout, opens
     the system monitor).
   - Tray items: the app's own activation and menu.
 - A plugin (`Ui/Plugin.qml`) adds launcher items, its own panels and IPC
   targets, and may take over the date button (`barActions.date`):
-  left-click calls the plugin, right-click opens its `settings.<name>` node.
+  left-click calls the plugin, right-click opens its `plugins.<name>` node.
   The calendar (`plugins/calendar/`, events from [dcal]) is one.
 - `Ui/Compositor.qml` is the only path to niri.
 
