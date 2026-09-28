@@ -58,7 +58,10 @@ previous states. Explain a declaration next to it, not here.
   `qs ipc call shell reload`. They live in `plugins/`, one directory each; a
   private one can live anywhere, such as the `einride` submodule. `qml-test`
   runs the calendar's tests; `qml-lint` skips plugins (their `import qs.Ui`
-  resolves only inside Quickshell).
+  resolves only inside Quickshell). A tray plugin has no `Plugin.qml`: it is
+  an app with its own StatusNotifierItem and menu, which the tray shows. Its
+  module adds a user unit, started with the session when `autostart` is set,
+  and a desktop entry that starts the unit from Apps (`plugins/hello-tray/`).
 - Interactive surfaces come in three kinds; pick by what opens them:
   - Launcher (`modules/menu/`): a large `Ui.Panel` drilling down through
     levels; the keyboard entry point to everything, tray menus included.
