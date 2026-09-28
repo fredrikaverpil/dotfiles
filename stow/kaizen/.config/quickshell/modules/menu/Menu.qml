@@ -23,6 +23,8 @@ Ui.Panel {
     "apps": { icon: "󰀻", label: "Apps", provider: "apps", search: true },
     "keybindings": { icon: "\u{F11C}", label: "Keybindings", provider: "binds", search: true },
     "tray": { icon: "󰘔", label: "Tray", provider: "tray" },
+    // One node per plugin, plugins.<name>.
+    "plugins": { icon: "\u{F0431}", label: "Plugins" },
     "trigger": { icon: "󱓞", label: "Trigger" },
     "trigger.screenshot": { icon: "", label: "Screenshot (desktop)",
       action: () => menu.shell.recordingService.shoot("screen") },

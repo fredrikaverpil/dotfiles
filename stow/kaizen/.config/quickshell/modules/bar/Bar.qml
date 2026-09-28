@@ -99,7 +99,7 @@ Scope {
           enabled: bar.datePlugin !== undefined
           label: Qt.formatDateTime(clock.date, "ddd d MMM")
           onActivated: bar.datePlugin.barActions.date()
-          onSecondary: bar.shell.menu.popup("settings." + bar.datePlugin.name, modelData.name, dateLabel)
+          onSecondary: bar.shell.menu.popup("plugins." + bar.datePlugin.name, modelData.name, dateLabel)
         }
 
         Rectangle {
