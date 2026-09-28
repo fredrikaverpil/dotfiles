@@ -163,7 +163,8 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 - A plugin (`Ui/Plugin.qml`) adds launcher items, its own panels and IPC
   targets, and may take over the date button (`barActions.date`):
   left-click calls the plugin, right-click opens its `plugins.<name>` node.
-  The calendar (`plugins/calendar/`, events from [dcal]) is one.
+  The calendar (`plugins/calendar/`, events from [dcal]) is one;
+  `plugins/hello/` is the minimal example.
 - `Ui/Compositor.qml` is the only path to niri.
 
 ## Session lifecycle
