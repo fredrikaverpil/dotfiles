@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../plugins/services/network/NetworkModel.js" as Network
+import "../modules/services/network/NetworkModel.js" as Network
 
 TestCase {
   name: "NetworkModel"

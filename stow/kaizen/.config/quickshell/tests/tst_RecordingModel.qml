@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../plugins/services/recording/RecordingModel.js" as Recording
+import "../modules/services/recording/RecordingModel.js" as Recording
 
 TestCase {
   name: "RecordingModel"

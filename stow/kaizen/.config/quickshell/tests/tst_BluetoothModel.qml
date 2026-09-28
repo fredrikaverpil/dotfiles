@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../plugins/services/bluetooth/BluetoothModel.js" as Bluetooth
+import "../modules/services/bluetooth/BluetoothModel.js" as Bluetooth
 
 TestCase {
   name: "BluetoothModel"

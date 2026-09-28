@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../plugins/notifications/NotificationLogic.js" as Notification
+import "../modules/notifications/NotificationLogic.js" as Notification
 
 TestCase {
   name: "NotificationLogic"

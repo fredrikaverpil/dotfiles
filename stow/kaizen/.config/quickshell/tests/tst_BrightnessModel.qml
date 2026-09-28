@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../plugins/services/brightness/BrightnessModel.js" as Brightness
+import "../modules/services/brightness/BrightnessModel.js" as Brightness
 
 TestCase {
   name: "BrightnessModel"

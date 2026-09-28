@@ -179,7 +179,7 @@ in
     # polkit.enable does not install the setuid pkexec wrapper.
     security.polkit.enablePkexecWrapper = true;
 
-    # PAM service for the Quickshell lock screen (plugins/lock/Service.qml).
+    # PAM service for the Quickshell lock screen (modules/lock/Service.qml).
     # The lock screen starts PAM only after a password is submitted, so fprintd in
     # this stack would block typing; fingerprint unlock needs a separate PamContext.
     environment.etc."pam.d/kaizen-lock".text = ''

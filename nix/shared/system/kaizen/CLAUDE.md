@@ -49,10 +49,10 @@ previous states. Explain a declaration next to it, not here.
   systemd units, the pre-suspend lock and the packages the shell runs.
   `desktop.nix` imports it and adds apps and personal settings. `stow/kaizen/`
   owns compositor configuration and QML.
-- `shell.qml` wires services and surfaces. Views belong in `plugins/panels/`;
-  daemon/process state belongs in `plugins/services/`.
+- `shell.qml` wires services and surfaces. Views belong in `modules/panels/`;
+  daemon/process state belongs in `modules/services/`.
 - Interactive surfaces come in three kinds; pick by what opens them:
-  - Launcher (`plugins/menu/`): a large `Ui.Panel` drilling down through
+  - Launcher (`modules/menu/`): a large `Ui.Panel` drilling down through
     levels; the keyboard entry point to everything, tray menus included.
   - Panel (`Ui/Panel.qml`): a centered card for settings and views; `h`/`l`
     step focus.
