@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../plugins/curtain/CurtainModel.js" as Curtain
+import "../modules/curtain/CurtainModel.js" as Curtain
 
 TestCase {
   name: "CurtainModel"

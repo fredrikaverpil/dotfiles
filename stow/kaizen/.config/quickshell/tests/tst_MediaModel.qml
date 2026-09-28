@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../plugins/services/media/MediaModel.js" as Media
+import "../modules/services/media/MediaModel.js" as Media
 
 TestCase {
   name: "MediaModel"

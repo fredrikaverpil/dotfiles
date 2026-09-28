@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../plugins/services/weather/WeatherModel.js" as Weather
+import "../modules/services/weather/WeatherModel.js" as Weather
 
 TestCase {
   name: "WeatherModel"

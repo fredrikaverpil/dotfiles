@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../plugins/menu/MenuModel.js" as Menu
+import "../modules/menu/MenuModel.js" as Menu
 
 TestCase {
   name: "MenuModel"

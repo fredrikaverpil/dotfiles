@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../plugins/bar/widgets/WorkspaceModel.js" as Workspaces
+import "../modules/bar/widgets/WorkspaceModel.js" as Workspaces
 import "../Ui/compositors/NiriWorkspaces.js" as Niri
 
 TestCase {

@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../plugins/services/battery/BatteryModel.js" as Battery
+import "../modules/services/battery/BatteryModel.js" as Battery
 
 TestCase {
   name: "BatteryModel"

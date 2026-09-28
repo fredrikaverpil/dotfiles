@@ -76,7 +76,7 @@ Item {
   }
 
   function fetchCommand() {
-    return ["sh", Quickshell.shellPath("plugins/services/weather/fetch.sh"),
+    return ["sh", Quickshell.shellPath("modules/services/weather/fetch.sh"),
       Ui.Paths.cache, String(latitude), String(longitude),
       Model.forecastUrl(latitude, longitude), userAgent]
   }

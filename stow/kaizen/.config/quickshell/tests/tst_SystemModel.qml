@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../plugins/services/system/SystemModel.js" as System
+import "../modules/services/system/SystemModel.js" as System
 
 TestCase {
   name: "SystemModel"

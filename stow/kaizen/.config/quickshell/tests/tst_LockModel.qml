@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../plugins/lock/LockModel.js" as Lock
+import "../modules/lock/LockModel.js" as Lock
 
 TestCase {
   name: "LockModel"

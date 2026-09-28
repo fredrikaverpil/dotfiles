@@ -1,6 +1,6 @@
 import QtQuick
 import QtTest
-import "../plugins/bar/widgets/TrayModel.js" as Tray
+import "../modules/bar/widgets/TrayModel.js" as Tray
 
 TestCase {
   name: "TrayModel"
