@@ -165,6 +165,9 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   left-click calls the plugin, right-click opens its `plugins.<name>` node.
   The calendar (`plugins/calendar/`, events from [dcal]) is one;
   `plugins/hello/` is the minimal example.
+- A tray plugin is an app with its own [StatusNotifierItem] and menu
+  (`plugins/hello-tray/`), so the tray and its launcher level show it without
+  shell code. Its unit starts it with the session or from Apps.
 - `Ui/Compositor.qml` is the only path to niri.
 
 ## Session lifecycle
