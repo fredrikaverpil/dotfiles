@@ -4,6 +4,7 @@
     ../../shared/system/kaizen/desktop.nix
     ../../shared/system/kaizen/plugins/calendar
     ../../shared/system/kaizen/plugins/hello
+    ../../shared/system/kaizen/plugins/hello-tray
     ../../shared/system/thinkpad.nix
   ];
 
