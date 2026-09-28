@@ -222,6 +222,7 @@ in
     nautilus
     ffmpegthumbnailer # Nautilus video thumbnails.
     ghostty
+    gnome-calculator
     # Chromium picks its password store per desktop; switching stores drops cookies and logins.
     # The last --enable-features wins, so repeat the wrapper's WaylandWindowDecorations.
     (chromium.override {
