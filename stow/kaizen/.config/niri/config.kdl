@@ -152,6 +152,11 @@ window-rule {
 }
 
 window-rule {
+    match app-id=r#"^org\.gnome\.NautilusPreviewer$"#
+    open-floating true
+}
+
+window-rule {
     match app-id=r#"(?i)^spotify$"#
     open-on-workspace "5"
 }

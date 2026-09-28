@@ -221,6 +221,7 @@ in
     # Both provide org.freedesktop.FileManager1, so "Show in folder" may open either.
     nautilus
     ffmpegthumbnailer # Nautilus video thumbnails.
+    sushi # Nautilus quick preview (Space).
     ghostty
     gnome-calculator
     # Chromium picks its password store per desktop; switching stores drops cookies and logins.
