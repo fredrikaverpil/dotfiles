@@ -18,13 +18,9 @@ let
     ];
   };
 in
-# The kaizen hosts' apps, defaults and personal settings on top of the kaizen
-# session (session.nix).
+# Apps and defaults every desktop host wants. The desktop session (kaizen) is
+# imported separately.
 {
-  imports = [
-    ./session.nix
-  ];
-
   # gnome-keyring would also start gcr-ssh-agent as the SSH agent.
   services.gnome.gcr-ssh-agent.enable = false;
   # Nautilus's trash, network locations and removable media.
@@ -45,8 +41,6 @@ in
       <Include><All/></Include>
     </Menu>
   '';
-
-  xdg.terminal-exec.settings.default = [ "com.mitchellh.ghostty.desktop" ];
 
   xdg.mime.defaultApplications =
     lib.genAttrs [
@@ -84,70 +78,25 @@ in
       "text/html"
     ] (_: "zen-beta.desktop");
 
-  # The Proton Pass app's SSH agent; the socket exists only while the app runs.
-  environment.sessionVariables.SSH_AUTH_SOCK = "$HOME/.ssh/proton-pass-ssh-agent.sock";
+  environment.sessionVariables = {
+    # The Proton Pass app's SSH agent; the socket exists only while the app runs.
+    SSH_AUTH_SOCK = "$HOME/.ssh/proton-pass-ssh-agent.sock";
+    # pass-cli keeps its session key in gnome-keyring; the default kernel keyring is cleared on reboot.
+    PROTON_PASS_LINUX_KEYRING = "dbus";
+  };
 
   systemd.user.services.gitify = {
     description = "Gitify";
     partOf = [ "graphical-session.target" ];
-    # The shell hosts the StatusNotifierWatcher its tray icon registers with.
+    # The kaizen shell hosts the StatusNotifierWatcher its tray icon registers with.
     after = [ "quickshell.service" ];
-    wantedBy = [ "wayland-session@niri.target" ];
+    wantedBy = [ "graphical-session.target" ];
     serviceConfig = {
       ExecStart = lib.getExe' (pkgs.withGnomeLibsecret pkgs.gitify) "gitify";
       Restart = "on-failure";
       Slice = "app.slice";
     };
   };
-
-  host.notificationRules = [
-    # Google Calendar reminders arrive from both Slack and Chromium; Chromium's
-    # copy carries the buttons.
-    {
-      # Chromium prefixes the body with the origin.
-      match = {
-        app = "^Chromium$";
-        body = "^calendar\\.google\\.com\\n";
-      };
-      critical = true;
-      dedup = {
-        group = "calendar";
-        keep = true;
-      };
-    }
-    # Slack titles messages from its apps "[workspace] from <app>", as it does a
-    # person's. Icons are simple-icons 16.32.0 (CC0) glyphs from
-    # https://cdn.jsdelivr.net/npm/simple-icons@16.32.0/icons/<slug>.svg, filled
-    # with the slug's `hex` from the package's data/simple-icons.json and scaled
-    # onto a white circle:
-    #   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-    #     <circle cx="12" cy="12" r="12" fill="#fff"/>
-    #     <path transform="translate(5 5) scale(.5833)" fill="#<hex>" d="<path>"/>
-    #   </svg>
-    {
-      match = {
-        app = "^Slack$";
-        summary = " from Google Calendar$";
-      };
-      critical = true;
-      dedup.group = "calendar";
-      icon = ./icons/google-calendar.svg;
-    }
-    {
-      match = {
-        app = "^Slack$";
-        summary = " from GitHub$";
-      };
-      icon = ./icons/github.svg;
-    }
-    {
-      match = {
-        app = "^Slack$";
-        summary = " from Linear$";
-      };
-      icon = ./icons/linear.svg;
-    }
-  ];
 
   host.extraSystemPackages = with pkgs; [
     kdePackages.dolphin
@@ -160,7 +109,6 @@ in
     nautilus
     ffmpegthumbnailer # Nautilus video thumbnails.
     sushi # Nautilus quick preview (Space).
-    ghostty
     (withGnomeLibsecret gitify)
     gnome-calculator
     # Chromium picks its password store per desktop; switching stores drops cookies and logins.
@@ -183,6 +131,8 @@ in
     # Trims recordings by stream copy, without re-encoding.
     losslesscut-bin
     resources
+    # The kaizen shell's system alert indicator opens it.
+    mission-center
     # niri cannot mirror outputs; wl-mirror shows one in a fullscreen window.
     wl-mirror
     wtype

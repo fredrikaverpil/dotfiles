@@ -47,7 +47,7 @@ flowchart BT
   HW --> SYS --> WM --> SHELL
 ```
 
-Each layer calls downward only. Nix (`session.nix`, `desktop.nix`, `thinkpad.nix`) owns the
+Each layer calls downward only. Nix (`session.nix`, `thinkpad.nix`) owns the
 two lower layers and the systemd units; Stow (`stow/kaizen/`) owns compositor
 config and QML. Both are shared by every kaizen host.
 

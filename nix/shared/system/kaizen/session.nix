@@ -82,8 +82,8 @@ let
   };
 in
 # The kaizen session every kaizen host shares: niri under UWSM, portals, PAM,
-# the shell's user units and the pre-suspend lock, and what the shell runs.
-# Compositor config and QML live in stow/kaizen/.
+# the shell's user units and the pre-suspend lock, what the shell runs and its
+# notification rules. Compositor config and QML live in stow/kaizen/.
 {
   imports = [ ../fonts.nix ];
 
@@ -158,6 +158,7 @@ in
 
     # uwsm-app launches Terminal=true entries through xdg-terminal-exec.
     xdg.terminal-exec.enable = true;
+    xdg.terminal-exec.settings.default = [ "com.mitchellh.ghostty.desktop" ];
 
     # The setcap wrapper lets monitor capture skip the portal dialog.
     programs.gpu-screen-recorder.enable = true;
@@ -244,8 +245,59 @@ in
       };
     };
 
+    host.notificationRules = [
+      # Google Calendar reminders arrive from both Slack and Chromium; Chromium's
+      # copy carries the buttons.
+      {
+        # Chromium prefixes the body with the origin.
+        match = {
+          app = "^Chromium$";
+          body = "^calendar\\.google\\.com\\n";
+        };
+        critical = true;
+        dedup = {
+          group = "calendar";
+          keep = true;
+        };
+      }
+      # Slack titles messages from its apps "[workspace] from <app>", as it does a
+      # person's. Icons are simple-icons 16.32.0 (CC0) glyphs from
+      # https://cdn.jsdelivr.net/npm/simple-icons@16.32.0/icons/<slug>.svg, filled
+      # with the slug's `hex` from the package's data/simple-icons.json and scaled
+      # onto a white circle:
+      #   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      #     <circle cx="12" cy="12" r="12" fill="#fff"/>
+      #     <path transform="translate(5 5) scale(.5833)" fill="#<hex>" d="<path>"/>
+      #   </svg>
+      {
+        match = {
+          app = "^Slack$";
+          summary = " from Google Calendar$";
+        };
+        critical = true;
+        dedup.group = "calendar";
+        icon = ./icons/google-calendar.svg;
+      }
+      {
+        match = {
+          app = "^Slack$";
+          summary = " from GitHub$";
+        };
+        icon = ./icons/github.svg;
+      }
+      {
+        match = {
+          app = "^Slack$";
+          summary = " from Linear$";
+        };
+        icon = ./icons/linear.svg;
+      }
+    ];
+
     host.extraSystemPackages = with pkgs; [
       quickshell
+      # niri's terminal binds and xdg-terminal-exec open it.
+      ghostty
       # niri spawns it on demand and exports DISPLAY for X11 apps.
       xwayland-satellite
       # Nightlight: drives zwlr_gamma_control_v1, so it is compositor-agnostic.
@@ -261,7 +313,6 @@ in
       bluetui
       bluetui-desktop
       grim
-      mission-center
       mpv
       # nm-connection-editor edits wired, static-IP and other connection settings;
       # the network panel launches it. nm-applet runs via XDG autostart for its tray menu.
