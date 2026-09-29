@@ -95,8 +95,9 @@ Wheels and prebuilt npm binaries are glibc-linked and fail to load on NixOS
 Read `nix/shared/system/kaizen/CLAUDE.md` before changing Quickshell, niri or
 their Nix modules. It owns the local checks, platform boundaries and safe
 deployment process. `renoir` and `wily` share one copy of that desktop:
-`nix/shared/system/kaizen/` and `stow/kaizen/` apply to both, so an edit there
-lands on both. Hardware notes are in the host's `README.md`.
+`session.nix` and `stow/kaizen/` apply to both, so an edit there lands on
+both; a plugin applies to the hosts that import it (`KAIZEN.md` › Where it
+lives). Hardware notes are in the host's `README.md`.
 
 ### Neovim Configuration
 

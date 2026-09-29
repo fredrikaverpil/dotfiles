@@ -14,11 +14,12 @@ Go down the list; the first match wins.
    (bluetui, nm-connection-editor). An app kaizen only opens as a convenience,
    such as Mission Center from the system alert indicator, stays an app until
    kaizen integrates it.
-2. **kaizen plugin**: `shared/system/kaizen/plugins/<name>/`, imported by the
-   hosts that want it, or `hosts/<host>/kaizen-plugins/<name>/` when one host
-   does. Written for kaizen: a `Plugin.qml`, a daemon the shell queries, or a
-   tray app built for the shell. A third-party app with a tray icon is an app,
-   not a plugin; the tray shows it anyway.
+2. **kaizen plugin**: optional; the shell runs without it. It goes in
+   `shared/system/kaizen/plugins/<name>/` when more than one host imports it,
+   `hosts/<host>/kaizen-plugins/<name>/` when one does. Written for kaizen: a
+   `Plugin.qml`, a daemon the shell queries, or a tray app built for the shell.
+   A third-party app with a tray icon is an app, not a plugin; the tray shows it
+   anyway.
 3. **Hardware class**: `shared/system/thinkpad.nix`.
 4. **Anything else is an app or a host setting**, and kaizen does not decide
    it. Pick the scope, then system or user.
@@ -46,7 +47,8 @@ A desktop host imports `shared/system/linux-desktop.nix` for its apps and opts
 into kaizen with `shared/system/kaizen/session.nix` and any plugins. Servers
 import neither. Apps build on kaizen, never the reverse: `linux-desktop.nix` and
 the hosts set kaizen's options, such as its notification rules, and kaizen
-refers to no app.
+refers to no app. `shared/system/kaizen/KAIZEN.md` maps kaizen's own parts,
+Nix and Stow.
 
 An app's niri window rules and binds go in
 `stow/host/renoir/.config/niri/apps.kdl`, which wily symlinks, or the host's
