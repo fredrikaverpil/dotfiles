@@ -87,6 +87,19 @@ in
   # The Proton Pass app's SSH agent; the socket exists only while the app runs.
   environment.sessionVariables.SSH_AUTH_SOCK = "$HOME/.ssh/proton-pass-ssh-agent.sock";
 
+  systemd.user.services.gitify = {
+    description = "Gitify";
+    partOf = [ "graphical-session.target" ];
+    # The shell hosts the StatusNotifierWatcher its tray icon registers with.
+    after = [ "quickshell.service" ];
+    wantedBy = [ "wayland-session@niri.target" ];
+    serviceConfig = {
+      ExecStart = lib.getExe' (pkgs.withGnomeLibsecret pkgs.gitify) "gitify";
+      Restart = "on-failure";
+      Slice = "app.slice";
+    };
+  };
+
   nixpkgs.overlays = [
     (final: _: {
       # NOTE: Chromium and Electron pick their secret store from XDG_CURRENT_DESKTOP and do not
@@ -183,6 +196,7 @@ in
     ffmpegthumbnailer # Nautilus video thumbnails.
     sushi # Nautilus quick preview (Space).
     ghostty
+    (withGnomeLibsecret gitify)
     gnome-calculator
     # Chromium picks its password store per desktop; switching stores drops cookies and logins.
     # The last --enable-features wins, so repeat the wrapper's WaylandWindowDecorations.
