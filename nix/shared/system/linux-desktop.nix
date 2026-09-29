@@ -18,8 +18,8 @@ let
     ];
   };
 in
-# Apps and defaults every desktop host wants, and their kaizen notification
-# rules. The desktop session (kaizen) is imported separately.
+# Apps and defaults every desktop host wants. The desktop session (kaizen) is
+# imported separately.
 {
   options = {
     host.chromiumFeatures = lib.mkOption {
@@ -102,55 +102,6 @@ in
       # pass-cli keeps its session key in gnome-keyring; the default kernel keyring is cleared on reboot.
       PROTON_PASS_LINUX_KEYRING = "dbus";
     };
-
-    host.notificationRules = [
-      # Google Calendar reminders arrive from both Slack and Chromium; Chromium's
-      # copy carries the buttons.
-      {
-        # Chromium prefixes the body with the origin.
-        match = {
-          app = "^Chromium$";
-          body = "^calendar\\.google\\.com\\n";
-        };
-        critical = true;
-        dedup = {
-          group = "calendar";
-          keep = true;
-        };
-      }
-      # Slack titles messages from its apps "[workspace] from <app>", as it does a
-      # person's. Icons are simple-icons 16.32.0 (CC0) glyphs from
-      # https://cdn.jsdelivr.net/npm/simple-icons@16.32.0/icons/<slug>.svg, filled
-      # with the slug's `hex` from the package's data/simple-icons.json and scaled
-      # onto a white circle:
-      #   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-      #     <circle cx="12" cy="12" r="12" fill="#fff"/>
-      #     <path transform="translate(5 5) scale(.5833)" fill="#<hex>" d="<path>"/>
-      #   </svg>
-      {
-        match = {
-          app = "^Slack$";
-          summary = " from Google Calendar$";
-        };
-        critical = true;
-        dedup.group = "calendar";
-        icon = ./icons/google-calendar.svg;
-      }
-      {
-        match = {
-          app = "^Slack$";
-          summary = " from GitHub$";
-        };
-        icon = ./icons/github.svg;
-      }
-      {
-        match = {
-          app = "^Slack$";
-          summary = " from Linear$";
-        };
-        icon = ./icons/linear.svg;
-      }
-    ];
 
     environment.systemPackages = with pkgs; [
       kdePackages.dolphin
