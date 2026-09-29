@@ -306,7 +306,7 @@ Scope {
         // A plain label.
         enabled: false
         foreground: bar.shell.palette.rose
-        label: bar.shell.systemService.alert ? bar.shell.systemService.alert.icon : ""
+        label: bar.shell.systemService.alertLabel
       }
 
       // Separates app tray icons from the indicators and system buttons.

@@ -98,6 +98,20 @@ TestCase {
     compare(System.conditions(data.sample), data.want)
   }
 
+  function test_alert_label_data() {
+    const alert = kind => System.alertKinds.find(alert => alert.kind === kind)
+    return [
+      { tag: "cpu", alert: alert("cpu"), want: "\u{F0EE0} 93%" },
+      { tag: "memory", alert: alert("memory"), want: "\u{F035B} 15.0/16.0G" },
+      { tag: "no figure", alert: alert("temperature"), want: "\u{F050F}" },
+    ]
+  }
+
+  function test_alert_label(data) {
+    const label = System.alertLabel(data.alert, sample({ cpu: 93.4, memory: { total: 16777216, available: 1048576 } }))
+    verify(label === data.want, "got " + label)
+  }
+
   function test_alerts_need_a_sustained_condition() {
     const kinds = alerts => alerts.map(alert => alert.kind)
     const busy = System.conditions(sample({ cpu: 95 }))
