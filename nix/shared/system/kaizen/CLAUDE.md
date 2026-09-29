@@ -13,7 +13,7 @@ To try another shell, compositor or panel on one machine, use a git branch or
 worktree, not a per-host copy of the tree.
 
 Machine facts (firmware, BIOS, hardware quirks) belong in the host's
-`README.md`, never here.
+`README.md` or `../thinkpad.nix`, never here.
 
 ## Working model
 

@@ -1,7 +1,7 @@
 # wily (ThinkPad T14 Gen 6 Intel, Core Ultra 7 258V "Lunar Lake")
 
 Work machine (Lenovo 21QG006CMX). The niri + Quickshell desktop it runs is
-shared with `renoir` and documented in `nix/shared/system/kaizen/CLAUDE.md`.
+shared with `renoir` and documented in `KAIZEN.md`.
 Work-only configuration lives in the private
 `fredrikaverpil/dotfiles-einride` repo, mounted as the git submodule `einride/`
 and imported by `configuration.nix` only when checked out.
@@ -73,8 +73,8 @@ Here `kaizen-sleep-lock` is still running but cannot lock, so do not suspend.
   `Direct firmware load for iwlwifi-bz-...-c99.ucode failed` is the driver
   probing newer firmware API versions before falling back; harmless.
 - Fingerprint reader: Goodix `27c6:6594`, unused. libfprint's `goodixmoc`
-  driver lists it; renoir's README has the fprintd enabling notes, untested
-  on this reader.
+  driver lists it; `nix/shared/system/thinkpad.nix` has the fprintd enabling
+  notes, untested on this reader.
 - Camera: `/dev/video0` is the capture node (MJPEG up to 2592x1944@30);
   `video1`-`video3` are metadata and duplicate nodes.
 - Battery: Sunwoda 57 Wh, thresholds 75/80 % via
@@ -84,16 +84,6 @@ Here `kaizen-sleep-lock` is still running but cannot lock, so do not suspend.
 
 ## Firmware
 
-BIOS and device firmware come from LVFS through fwupd; updates reboot, so the
-user runs them. BIOS N4HET22W 1.10 (2026-09). `fwupdmgr get-updates` also
-lists NVMe (SK hynix HFS001TFM9X179N) and "System Update" bundles.
-
-```sh
-fwupdmgr refresh --force
-fwupdmgr get-updates
-cat /sys/class/power_supply/AC/online   # must print 1
-fwupdmgr update <device-id>
-```
-
-Secure Boot is disabled (the NixOS installer is unsigned); the KEK/UEFI CA/dbx
-updates are unnecessary.
+The fwupd procedure is in `nix/shared/system/thinkpad.nix`. BIOS N4HET22W
+1.10 (2026-09). `fwupdmgr get-updates` also lists NVMe (SK hynix
+HFS001TFM9X179N) and "System Update" bundles.
