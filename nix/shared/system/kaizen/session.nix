@@ -310,7 +310,7 @@ in
       }
     ];
 
-    host.extraSystemPackages = with pkgs; [
+    environment.systemPackages = with pkgs; [
       quickshell
       # niri's terminal binds and xdg-terminal-exec open it.
       ghostty

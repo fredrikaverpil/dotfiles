@@ -51,7 +51,7 @@
 
   services.tailscale.enable = true;
 
-  host.extraServices.openssh = {
+  services.openssh = {
     enable = true;
     settings = {
       PermitRootLogin = "no";
@@ -69,7 +69,7 @@
   };
 
   # Host-only system packages; shared ones live in nix/shared/system/.
-  host.extraSystemPackages = with pkgs; [
+  environment.systemPackages = with pkgs; [
     (withGnomeLibsecret ente-desktop)
     (withGnomeLibsecret obsidian)
     lutris # Battle.net and other non-Steam launchers.
