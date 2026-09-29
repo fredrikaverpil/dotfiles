@@ -68,6 +68,33 @@ let
       fi
     '';
   };
+  # Focuses the most recently focused niri window whose app id matches, or runs
+  # the command when none does. niri's binds call it.
+  kaizen-focus = pkgs.writeShellApplication {
+    name = "kaizen-focus";
+    runtimeInputs = [
+      pkgs.jq
+      config.programs.niri.package
+    ];
+    text = ''
+      case "''${1:-}" in
+      "" | -h | --help)
+        echo "usage: kaizen-focus APP_ID_REGEX COMMAND [ARGS...]    focus the app, or open it"
+        exit 0
+        ;;
+      esac
+
+      regex="$1"
+      shift
+      id="$(niri msg -j windows | jq --arg re "$regex" \
+        '[.[] | select(.app_id | test($re))] | max_by(.focus_timestamp | [.secs, .nanos]) | .id // empty')"
+      if [ -n "$id" ]; then
+        exec niri msg action focus-window --id "$id"
+      fi
+      exec "$@"
+    '';
+  };
+
   # bluetui registers its own pairing agent; the shell has none.
   bluetui-desktop = pkgs.makeDesktopItem {
     name = "bluetui";
@@ -341,6 +368,7 @@ in
       grim
       imagemagick # Wallpaper thumbnails.
       jq # The clipboard watcher's JSON encoding.
+      kaizen-focus
       mpv
       # nm-connection-editor edits wired, static-IP and other connection settings;
       # the network panel launches it. nm-applet runs via XDG autostart for its tray menu.
