@@ -1,22 +1,22 @@
 # niri + Quickshell desktop
 
-This file documents the niri + Quickshell desktop and lives with it. The
-repo root's `KAIZEN.md` › Where it lives says where each part is and which
-hosts it reaches. Every kaizen host shares one copy of the core, so an edit
-lands on all of them at once: there is no promotion step and no drift to diff
-for.
+How to work on the niri + Quickshell desktop. Its design, layers and map, with
+where each part lives and which hosts it reaches, are in the repo root's
+`KAIZEN.md`:
+
+@../../../../KAIZEN.md
+
+Every kaizen host shares one copy of the core, so an edit lands on all of them
+at once: there is no promotion step and no drift to diff for.
 
 To try another shell, compositor or panel on one machine, use a git branch or
 worktree, not a per-host copy of the tree.
 
 Machine facts (firmware, BIOS, hardware quirks) belong in the host's
-`README.md`, never here. Design intent and the layer model are in `KAIZEN.md`;
-read it before adding a surface or service.
+`README.md`, never here.
 
 ## Working model
 
-- The desktop is keyboard-first. Every panel, dialog and bind works without a
-  pointer; pointer-only controls are bugs.
 - The desktop is built to be developed by an agent, usually run on the host
   itself, sometimes over SSH. Every part is reachable: `qs ipc` queries and
   drives shell services and panels, `niri msg` the compositor,
@@ -29,94 +29,35 @@ previous states. Explain a declaration next to it, not here.
 
 ## Gotchas
 
-- "kaizen" names the shell (PAM `kaizen-lock`, `kaizen-*` units, layer
-  namespaces, D-Bus path, state files). It is host-agnostic; `renoir` and
-  `wily` are only hostnames.
 - Nix comments carry the "why" for packages, portals, PAM, units and hardware
   integration. Read `session.nix` here, `../linux-desktop.nix` and
   `../thinkpad.nix`, plus the host's `configuration.nix`, before asking.
-
-## Architecture
-
-- Apps are not kaizen's: `nix/README.md` says where they and their niri rules
-  and binds go.
-- `shell.qml` wires services and surfaces. Views belong in `modules/panels/`;
-  daemon/process state belongs in `modules/services/`.
-- Plugins are described in `KAIZEN.md`. Quickshell does not watch them: apply
-  an edit with `qs ipc call shell reload`. `qml-test` runs the calendar's
-  tests; `qml-lint` skips plugins (their `import qs.Ui` resolves only inside
-  Quickshell). A tray plugin's user unit starts with the session when its
-  module sets `autostart`.
-- Interactive surfaces come in three kinds; pick by what opens them:
-  - Launcher (`modules/menu/`): a large `Ui.Panel` drilling down through
-    levels; the keyboard entry point to everything, tray menus included.
-  - Panel (`Ui/Panel.qml`): a centered card for settings and views; `h`/`l`
-    step focus.
-  - Context menu (`Ui/ContextMenu.qml`): hangs from the bar button that opened
-    it, on that button's output, sized to its rows; submenus cascade beside
-    their row and `h`/`l` close and open them. Opened without a button
-    (launcher, IPC), it resolves the focused output from the compositor. It
-    shows a tray item's menu or a launcher level (`menu popup <id>`); a level
-    marked `search` opens in the launcher instead.
-  All three hold exclusive keyboard focus and close each other through
-  `shell.claimPanel`.
-- `Ui/Compositor.qml` is the compositor interface; `Ui/compositors/` owns niri
-  commands, response parsing, and the workspace source. Views use that
-  interface. Keep scheduling and shared state above it. Nightlight is not
-  compositor-specific and lives in its service.
-- Prefer purpose-built applications to large bespoke panels for infrequent
-  tasks (bluetui pairs, nm-connection-editor edits connections). Output layout
-  is hand-kept in `stow/host/<host>/.config/niri/outputs.kdl`, keyed by
-  monitor, not port.
-- Clipboard history is in memory only and skips offers carrying
-  `x-kde-passwordManagerHint`. Proton Pass and 1Password set it; a password
-  manager that does not would be recorded.
+- Quickshell does not watch plugins: apply an edit with
+  `qs ipc call shell reload`. `qml-test` runs the calendar's tests; `qml-lint`
+  skips plugins (their `import qs.Ui` resolves only inside Quickshell). A tray
+  plugin's user unit starts with the session when its module sets
+  `autostart`.
 - SSH keys come from the Proton Pass app's agent (`SSH_AUTH_SOCK` in
   `../linux-desktop.nix`), so the app must be running. While it is locked, a key
   request waits 60 s for an unlock, then fails as `Permission denied
   (publickey)`. The app asks by showing its window, which niri ignores for a
   mapped window (no focus, no urgency), so the prompt stays on workspace 7;
   unlocking there within the minute lets the waiting `ssh`/`git` proceed.
-- The curtain hides the screen, it is not a lock: an overlay layer surface
-  (`kaizen-curtain`), never `WlSessionLock`, and it never touches DPMS. Both
-  are deliberate. A session lock replaces output content and a disabled output
-  has nothing to copy, so either one defeats wlr-screencopy; the curtain exists
-  so `qs ipc call curtain close` leaves a desktop `grim` can still capture
-  remotely. It dims the internal backlight to 0 while black and restores it
-  before drawing the prompt, so the prompt is never painted onto a dark panel.
-  Being only a layer surface, it dies with Quickshell, and anyone at the
-  keyboard can close it. Use the lock whenever the machine is left alone.
-- The recording camera is a circle because gpu-screen-recorder cannot mask its
-  own camera overlay: the service runs mpv under the `kaizen-camera` app id and
-  a niri window rule rounds and places it, so the screen capture records it as
-  ordinary screen content. It must therefore sit inside a recorded region, and
-  mpv sizes in device pixels, which is why the service asks niri for the
-  focused output's scale instead of using Qt's rounded `devicePixelRatio`.
-  niri has neither an aspect-ratio rule nor sticky windows, and mpv accepts any
-  size it is given, so while the preview is up the service follows the event
-  stream: it sets the window's height back to its width and moves it to each
-  workspace that gains focus.
-  Its diameter is a share of the captured frame's short side, so it covers the
-  same part of the recording on a region as on an output of any resolution.
-  The window rule's corner is the output's, which a region rarely reaches, so a
-  region's circle is moved into the region's own bottom-right.
+- The recording camera (`KAIZEN.md` › Recording): mpv sizes in device pixels,
+  which is why the service asks niri for the focused output's scale instead of
+  using Qt's rounded `devicePixelRatio`. niri has neither an aspect-ratio rule
+  nor sticky windows, and mpv accepts any size it is given, so while the
+  preview is up the service follows the event stream: it sets the window's
+  height back to its width and moves it to each workspace that gains focus.
   `move-floating-window` takes coordinates in the output's working area, which
   the bar shortens at the top, and reads a bare negative number as a relative
   move.
-  Both the scale and those coordinates belong to the output the circle opened
-  on, which is whichever one had focus, so starting a recording *with a camera*
-  focuses the output being captured. Recording without one never moves focus.
-- The recording service also owns the region screenshot (`grim`), because that
-  reuses its region selector; `selectMode` says which of the two the selection
-  feeds. Niri's own `screenshot` binds are unrelated and stay compositor-side.
 - Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Niri KDL booleans are presence-only, not `option true`.
-- Every surface must be usable from the keyboard. Use `keyNavigation` for
-  ordinary focus chains; use a panel-managed cursor where it cannot represent
-  a control, such as a slider. Pointer-only controls are bugs.
+- Use `keyNavigation` for ordinary focus chains; use a panel-managed cursor
+  where it cannot represent a control, such as a slider.
 - `Ui/Panel.qml` has a top-bar cutout so bar buttons can switch panels. Preserve
-  focus-chain membership for visible but unavailable controls. The shell owns
-  keyboard-layout state; compositor-side XKB toggles would desynchronize it.
+  focus-chain membership for visible but unavailable controls.
 - Tray submenus require one live opener per level. `QsMenuEntry.display()` needs
   a platform menu this shell does not have.
 - Read the relevant Omarchy source before changing a ported feature (`git clone`
@@ -265,8 +206,8 @@ qs ipc call idle disable
 qs ipc call lock isLocked
 ```
 
-New/moved files need the normal Stow activation from the root `CLAUDE.md`;
-never create Stow links manually or run `git clean -fd` in the host clone.
+New/moved files need `dotfiles-stow`; never create Stow links manually or run
+`git clean -fd` in the host clone.
 
 When working from another host, sync the checkout before live validation or a
 user-run rebuild, which evaluates the host's clone. Checksums avoid replacing
@@ -294,10 +235,6 @@ PID.
 
 ## Session constraints
 
-- Keep `wayland-session-waitenv.service`: niri announces readiness before it
-  publishes `WAYLAND_DISPLAY` to the user manager. Bind shell/sleep-lock units
-  to compositor-specific targets; ordering after `graphical-session.target`
-  creates a cycle.
 - XDG autostart apps start only once the shell's StatusNotifierWatcher is on
   the bus (`kaizen-tray-ready.service`), because Electron apps look for it once
   and never retry. Never gate `quickshell.service` or anything before
@@ -308,8 +245,7 @@ PID.
   which needs the Mutter D-Bus services that niri serves only as
   `niri --session`. Session mode also serves `org.freedesktop.ScreenSaver`
   idle inhibitors and the a11y bus, and takes the power key from logind unless
-  `disable-power-key-handling` is set. The shell's own recording never uses a
-  portal (`programs.gpu-screen-recorder`).
+  `disable-power-key-handling` is set.
 - On first use, gnome-keyring can advertise `login` without exporting the
   collection when keyring creation follows D-Bus startup. Recover by
   restarting the keyring daemon and unlocking it, then retry account setup.
@@ -322,6 +258,3 @@ PID.
   not add `GNOME` to `XDG_CURRENT_DESKTOP`: autostart entries such as
   `nm-applet` and `print-applet` use `NotShowIn=GNOME`. Once an app has
   encrypted secrets with the keyring, removing the flag locks it out of them.
-- Lid close uses logind defaults: suspend (the sleep-lock unit locks first),
-  or nothing when docked. Niri turns off `eDP-1` while docked with the lid
-  closed.

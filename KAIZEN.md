@@ -172,6 +172,11 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 
 - Launcher, panel and context menu hold exclusive keyboard focus and close
   each other through `shell.claimPanel`. Pick by what opens the surface.
+- A context menu opens on its button's output, sized to its rows; submenus
+  cascade beside their row and `h`/`l` close and open them. Opened without a
+  button (launcher, IPC), it resolves the focused output from the compositor.
+  It shows a tray item's menu or a launcher level (`menu popup <id>`); a level
+  marked `search` opens in the launcher instead.
 - Every surface opens over IPC; niri binds are `spawn qs ipc call ...`.
 - The bar mirrors the launcher; nothing is reachable only from it. Every
   panel action is a launcher row under Settings, except sliders and per-item
@@ -198,7 +203,36 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   launcher level show it without shell code. Its unit starts it with the session
   or from Apps. A third-party app with a tray icon is not a plugin; the tray
   shows it anyway.
-- `Ui/Compositor.qml` is the only path to niri.
+- The curtain hides the screen, it is not a lock: an overlay layer surface
+  (`kaizen-curtain`), never `WlSessionLock`, and it never touches DPMS. Both
+  are deliberate. A session lock replaces output content and a disabled output
+  has nothing to copy, so either one defeats wlr-screencopy; the curtain exists
+  so `qs ipc call curtain close` leaves a desktop `grim` can still capture
+  remotely. It dims the internal backlight to 0 while black and restores it
+  before drawing the prompt, so the prompt is never painted onto a dark panel.
+  Being only a layer surface, it dies with Quickshell, and anyone at the
+  keyboard can close it. Use the lock whenever the machine is left alone.
+- `Ui/Compositor.qml` is the only path to niri; `Ui/compositors/` owns niri
+  commands, response parsing, and the workspace source. Keep scheduling and
+  shared state above it. Nightlight is not compositor-specific and lives in its
+  service.
+
+## Recording
+
+- The camera is a circle because gpu-screen-recorder cannot mask its own
+  camera overlay: the service runs mpv under the `kaizen-camera` app id and a
+  niri window rule rounds and places it, so the screen capture records it as
+  ordinary screen content. It must therefore sit inside a recorded region.
+- Its diameter is a share of the captured frame's short side, so it covers the
+  same part of the recording on a region as on an output of any resolution.
+  The window rule's corner is the output's, which a region rarely reaches, so a
+  region's circle is moved into the region's own bottom-right.
+- The circle's scale and coordinates belong to the output it opened on, which
+  is whichever one had focus, so starting a recording *with a camera* focuses
+  the output being captured. Recording without one never moves focus.
+- The recording service also owns the region screenshot (`grim`), because that
+  reuses its region selector; `selectMode` says which of the two the selection
+  feeds. Niri's own `screenshot` binds are unrelated and stay compositor-side.
 
 ## Session lifecycle
 
@@ -213,6 +247,9 @@ lid close / power key ─ logind ─ sleep-lock locks shell ─ waits for secure
 Units bind to `wayland-session@niri.target`; ordering after
 `graphical-session.target` is a cycle. `wayland-session-waitenv.service`
 closes niri's readiness-before-`WAYLAND_DISPLAY` race.
+
+Lid close uses logind defaults: suspend (the sleep-lock unit locks first), or
+nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
 
 ## Where the shell writes
 
@@ -239,8 +276,11 @@ closes niri's readiness-before-`WAYLAND_DISPLAY` race.
 - Bluetooth pairing, connection editing: bluetui, nm-connection-editor.
 - Output layout: hand-kept in `stow/host/<host>/.config/niri/outputs.kdl`,
   keyed by monitor, not port.
-- Compositor-side XKB toggling: the shell owns layout state.
-- Clipboard persistence: memory only, skips password-manager offers.
+- Compositor-side XKB toggling: the shell owns layout state, and a
+  compositor-side toggle would desynchronize it.
+- Clipboard persistence: memory only. Offers carrying
+  `x-kde-passwordManagerHint` are skipped; Proton Pass and 1Password set it, a
+  password manager that does not would be recorded.
 - Portal-based recording: gpu-screen-recorder talks to PipeWire directly.
 - `GNOME` in `XDG_CURRENT_DESKTOP`: breaks `NotShowIn=GNOME` autostarts.
   Electron apps get `--password-store=gnome-libsecret` instead.
@@ -251,9 +291,9 @@ closes niri's readiness-before-`WAYLAND_DISPLAY` race.
 1. Does a subsystem already do it? Read its state; do not duplicate it.
 2. Does a purpose-built app do it acceptably? Launch that instead.
 3. Can it be used with the keyboard only? If not, redesign.
-4. Then: daemon/process state → `modules/services/`, view →
-   `modules/panels/`; a protocol-driven surface with no other consumer of its
-   state (lock, notifications, polkit) keeps both in `modules/<name>/`.
+4. Then: daemon/process state → `modules/services/`, view → `modules/panels/`,
+   both wired in `shell.qml`; a protocol-driven surface with no other consumer
+   of its state (lock, notifications, polkit) keeps both in `modules/<name>/`.
    Packages/units/PAM → `session.nix` (even a package another scope also
    installs), compositor → `Ui/compositors/` and `niri/config.kdl`, IPC target
    for every new action. An optional shell extension is a plugin, placed as in
