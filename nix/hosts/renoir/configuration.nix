@@ -1,7 +1,8 @@
 { pkgs, ... }:
 {
   imports = [
-    ../../shared/system/kaizen/desktop.nix
+    ../../shared/system/desktop.nix
+    ../../shared/system/kaizen/session.nix
     ../../shared/system/kaizen/plugins/calendar
     ../../shared/system/kaizen/plugins/hello
     ../../shared/system/kaizen/plugins/hello-tray

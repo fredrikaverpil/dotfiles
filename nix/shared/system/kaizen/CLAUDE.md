@@ -1,9 +1,9 @@
 # niri + Quickshell desktop
 
 This file documents the niri + Quickshell desktop and lives with it. Every
-host running it shares one copy of everything: `session.nix` and
-`desktop.nix` in this directory, `../thinkpad.nix` next to it, and the
-compositor config and QML in `stow/kaizen/`. An edit lands on every kaizen host
+host running it shares one copy of everything: `session.nix` in this
+directory, `../thinkpad.nix` next to it, and the compositor config and QML in
+`stow/kaizen/`. An edit lands on every kaizen host
 at once, so there is no promotion step and no drift to diff for.
 
 What stays per host, in `nix/hosts/<host>/`: hardware and firmware settings
@@ -40,15 +40,15 @@ previous states. Explain a declaration next to it, not here.
   namespaces, D-Bus path, state files). It is host-agnostic; `renoir` and
   `wily` are only hostnames.
 - Nix comments carry the "why" for packages, portals, PAM, units and hardware
-  integration. Read `session.nix` and `desktop.nix` here and
+  integration. Read `session.nix` here, `../desktop.nix` and
   `../thinkpad.nix`, plus the host's `configuration.nix`, before asking.
 
 ## Architecture
 
 - `session.nix` owns the session: niri under UWSM, portals, PAM, the shell's
   systemd units, the pre-suspend lock and the packages the shell runs.
-  `desktop.nix` imports it and adds apps and personal settings. `stow/kaizen/`
-  owns compositor configuration and QML.
+  `stow/kaizen/` owns compositor configuration and QML. Apps are not kaizen's:
+  `../desktop.nix` holds those every desktop host wants.
 - `shell.qml` wires services and surfaces. Views belong in `modules/panels/`;
   daemon/process state belongs in `modules/services/`.
 - Plugins hold what only some hosts want, on top of the core: a directory with
@@ -86,7 +86,7 @@ previous states. Explain a declaration next to it, not here.
   `x-kde-passwordManagerHint`. Proton Pass and 1Password set it; a password
   manager that does not would be recorded.
 - SSH keys come from the Proton Pass app's agent (`SSH_AUTH_SOCK` in
-  `desktop.nix`), so the app must be running. While it is locked, a key
+  `../desktop.nix`), so the app must be running. While it is locked, a key
   request waits 60 s for an unlock, then fails as `Permission denied
   (publickey)`. The app asks by showing its window, which niri ignores for a
   mapped window (no focus, no urgency), so the prompt stays on workspace 7;

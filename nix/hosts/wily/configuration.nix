@@ -1,7 +1,8 @@
 { lib, pkgs, ... }:
 {
   imports = [
-    ../../shared/system/kaizen/desktop.nix
+    ../../shared/system/desktop.nix
+    ../../shared/system/kaizen/session.nix
     ../../shared/system/kaizen/plugins/calendar
     ../../shared/system/thinkpad.nix
   ]
