@@ -16,7 +16,9 @@ esac
 
 cd "${1:-$HOME/.dotfiles}"
 stow_pkg() {
-  stow --dir="$1" --target="$HOME" --restow --no-folding --adopt "$2"
+  local cmd=(stow --dir="$1" --target="$HOME" --restow --no-folding --adopt "$2")
+  echo "${cmd[*]}"
+  "${cmd[@]}"
 }
 stow_pkg stow shared
 stow_pkg stow/platform "$(uname -s)"
