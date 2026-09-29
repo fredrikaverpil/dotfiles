@@ -1,8 +1,9 @@
 // Binds follow niri's default-config.kdl. niri reloads this file on save.
 // Defaults: https://github.com/niri-wm/niri/blob/main/resources/default-config.kdl
 
-// niri uses the first matching output block, so this stays above any other.
-include "outputs.kdl"
+// Output layout, from the host stow package (stow/host/<host>). niri uses the
+// first matching output block, so this stays above any other.
+include optional=true "outputs.kdl"
 
 input {
     keyboard {

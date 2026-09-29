@@ -211,7 +211,8 @@ closes niri's readiness-before-`WAYLAND_DISPLAY` race.
 ## Out of scope
 
 - Bluetooth pairing, connection editing: bluetui, nm-connection-editor.
-- Output layout: hand-kept in `niri/outputs.kdl`, keyed by monitor, not port.
+- Output layout: hand-kept in `stow/host/<host>/.config/niri/outputs.kdl`,
+  keyed by monitor, not port.
 - Compositor-side XKB toggling: the shell owns layout state.
 - Clipboard persistence: memory only, skips password-manager offers.
 - Portal-based recording: gpu-screen-recorder talks to PipeWire directly.

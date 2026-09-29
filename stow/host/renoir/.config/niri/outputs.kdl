@@ -1,0 +1,17 @@
+// Output layout, keyed by make/model/serial so it follows the monitor across
+// ports. Positions are logical pixels with the laptop panel at the origin;
+// blocks for disconnected monitors are ignored. Try positions live with
+// `niri msg output <connector> position set <x> <y>`, then record them here.
+// Names come from `niri msg outputs`.
+
+output "eDP-1" {
+    scale 1
+    position x=0 y=0
+}
+
+// Home 4k monitor.
+// Left, tops aligned.
+output "Dell Inc. DELL U2723QE 13B95P3" {
+    scale 1.2
+    position x=-3200 y=0
+}
