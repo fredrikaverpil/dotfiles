@@ -25,7 +25,6 @@
       "Bash(docker-compose *)"
     ]
   },
-  "model": "opus[1m]",
   "hooks": {
     "Notification": [
       {
@@ -82,6 +81,9 @@
     },
     "claude-opus-5-5": {
       "effortLevel": "xhigh"
+    },
+    "claude-sonnet-5-5": {
+      "effortLevel": "high"
     }
   },
   "showClearContextOnPlanAccept": true,
