@@ -8,15 +8,7 @@
 NVIM_APPNAME=nvim-fredrik nvim
 ```
 
-Symlinked via GNU Stow. From `~/.dotfiles/stow`, apply `shared`, the platform,
-and the optional matching host package with:
-
-```bash
-packages=(shared "$(uname -s)")
-host="$(hostname -s)"
-[ -d "$host" ] && packages+=("$host")
-stow --target="$HOME" --restow --no-folding --adopt "${packages[@]}"
-```
+`dotfiles-stow` links this directory to `~/.config/nvim-fredrik`.
 
 ## Structure
 

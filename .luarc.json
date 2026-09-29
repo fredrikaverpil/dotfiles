@@ -1,6 +1,5 @@
 {
   "workspace.ignoreDir": [
-    "stow",
     ".pocket",
     ".pocket/tools",
     ".tests",

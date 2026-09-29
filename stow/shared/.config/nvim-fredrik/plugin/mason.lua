@@ -13,7 +13,7 @@ require("lazyload").on_vim_enter(function()
   require("mason").setup({ PATH = "append" })
 
   require("mason-lock").setup({
-    lockfile_path = vim.env.DOTFILES .. "/nvim-fredrik/mason-lock.json",
+    lockfile_path = vim.env.DOTFILES .. "/stow/shared/.config/nvim-fredrik/mason-lock.json",
   })
 
   -- Kept alphabetical; the trailing comment is the language/tool that needs it.

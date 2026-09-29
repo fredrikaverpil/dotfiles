@@ -71,12 +71,13 @@ deployment process.
 ### Neovim Configuration
 
 - Plugins are managed with `vim.pack` (no plugin-manager framework), pinned in
-  `nvim-fredrik/nvim-pack-lock.json`
-- Per-language configuration lives in `nvim-fredrik/plugin/lang/`
+  `stow/shared/.config/nvim-fredrik/nvim-pack-lock.json`
+- Per-language configuration lives in
+  `stow/shared/.config/nvim-fredrik/plugin/lang/`
 - Per-project customization via local `.nvim.lua` files (exrc), with trust
-  helpers in `nvim-fredrik/lua/exrc.lua`
-- Simple setup in `nvim-simple`, for trying out new nightly features and for a
-  much simpler setup on e.g. remote shells
+  helpers in `stow/shared/.config/nvim-fredrik/lua/exrc.lua`
+- Simple setup in `stow/shared/.config/nvim-simple`, for trying out new nightly
+  features and for a much simpler setup on e.g. remote shells
 
 ## Code Style Requirements
 
@@ -92,14 +93,14 @@ deployment process.
   always
 - **YAML**: 2-space indentation, use `---` document separator
 - **Markdown**: rumdl, 80 char width with reflow; flags in
-  `nvim-fredrik/plugin/conform.lua`
+  `stow/shared/.config/nvim-fredrik/plugin/conform.lua`
 
 ## Language-Specific Tooling
 
 For each language, consult the corresponding file in
-`nvim-fredrik/plugin/lang/` (e.g., `go.lua`, `lua.lua`, `yaml.lua`) to get
-exact formatter/linter tools and configurations. Formatters are wired up in
-`nvim-fredrik/plugin/conform.lua`.
+`stow/shared/.config/nvim-fredrik/plugin/lang/` (e.g., `go.lua`, `lua.lua`,
+`yaml.lua`) to get exact formatter/linter tools and configurations. Formatters
+are wired up in `stow/shared/.config/nvim-fredrik/plugin/conform.lua`.
 
 **Note**: If LSP/formatter not found, check Mason install path:
 `~/.local/share/nvim-fredrik/mason/bin/` or `~/.local/share/nvim/mason/bin/`
