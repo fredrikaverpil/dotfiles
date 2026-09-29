@@ -43,7 +43,9 @@ wants it, move it to that scope's shared file rather than repeating it.
 
 A desktop host imports `shared/system/desktop.nix` for its apps and opts into
 kaizen with `shared/system/kaizen/session.nix` and any plugins. Servers import
-neither.
+neither. Apps build on kaizen, never the reverse: `desktop.nix` and the hosts
+set kaizen's options, such as its notification rules, and kaizen refers to no
+app.
 
 On a kaizen host, wrap Chromium and Electron apps with
 `pkgs.withGnomeLibsecret` (`shared/overlays/`); without it they cannot keep
