@@ -259,12 +259,40 @@ Ui.Panel {
       }))
   }
 
-  // Built when entries load, not per keystroke: a first icon-theme lookup costs
-  // ~25 ms per app.
-  readonly property var apps: DesktopEntries.applications.values
+  // Built when entries load, not per keystroke: a first icon-theme lookup
+  // costs ~25 ms per app. Re-sorted (cheap) on launch count changes.
+  property var launchCounts: ({})
+  property bool launchCountsLoaded: false
+  readonly property var baseApps: DesktopEntries.applications.values
     .filter(entry => !entry.noDisplay)
-    .sort((a, b) => a.name.localeCompare(b.name))
     .map(entry => ({ label: entry.name, icon: "󰀻", image: menu.iconUrl(entry.icon), detail: "", enabled: true, entry: entry }))
+  readonly property var apps: baseApps.slice().sort((a, b) =>
+    (menu.launchCounts[b.entry.id] || 0) - (menu.launchCounts[a.entry.id] || 0)
+      || a.label.localeCompare(b.label))
+
+  function recordLaunch(id) {
+    launchCounts = Object.assign({}, launchCounts, { [id]: (Number(launchCounts[id]) || 0) + 1 })
+    if (launchCountsLoaded) launchCountsFile.setText(JSON.stringify({ version: 1, counts: launchCounts }) + "\n")
+  }
+
+  FileView {
+    id: launchCountsFile
+    path: Ui.Paths.state + "/app-launches.json"
+    atomicWrites: true
+    printErrors: false
+    onLoaded: {
+      try {
+        var parsed = JSON.parse(String(text() || ""))
+        menu.launchCounts = parsed.counts || {}
+      } catch (error) {
+        menu.launchCounts = {}
+      }
+      menu.launchCountsLoaded = true
+    }
+    onLoadFailed: menu.launchCountsLoaded = true
+  }
+
+  Component.onCompleted: launchCountsFile.reload()
 
   function appRows(detail) {
     return apps.map(row => Object.assign({}, row, { detail: detail || "" }))
@@ -471,6 +499,7 @@ Ui.Panel {
       if (row.trayItem.hasMenu) menu.shell.tray.openFor(row.trayItem)
       else row.trayItem.activate()
     } else if (row.entry) {
+      menu.recordLaunch(row.entry.id)
       // Keep launched apps out of Quickshell's service scope.
       Quickshell.execDetached(["uwsm-app", "--", row.entry.id + ".desktop"])
     } else {
