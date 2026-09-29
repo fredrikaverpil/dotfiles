@@ -21,10 +21,10 @@ Stow commands:
 - **Format Nix files**: `nix fmt` (uses nixfmt-rfc-style)
 - **CI testing**: Follow `.github/workflows/test.yml` workflow
 - **Toolchain outside Neovim**: language toolchains (go, python3, node, ruby,
-  rustup, elixir, tree-sitter, ...) are NOT on the base PATH — `shell/bin/nvim`
-  injects them into Neovim only. When running outside Neovim (e.g. Claude Code
-  under Remote Control) and needing them, use the devshell:
-  `nix develop ~/.dotfiles#dev -c <cmd>` (or enter with
+  rustup, elixir, tree-sitter, ...) are NOT on the base PATH —
+  `stow/shared/.shell/bin/nvim` injects them into Neovim only. When running
+  outside Neovim (e.g. Claude Code under Remote Control) and needing them, use
+  the devshell: `nix develop ~/.dotfiles#dev -c <cmd>` (or enter with
   `nix develop ~/.dotfiles#dev`). Defined once in `nix/shared/toolchain.nix`,
   shared by the devshell and Neovim's `nvim-deps-path`.
 

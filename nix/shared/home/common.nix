@@ -53,7 +53,7 @@ in
 
         echo "Stowing dotfiles from $DOTFILES_PATH..."
         PATH="${pkgs.stow}/bin:${pkgs.bash}/bin:$PATH" \
-          $DRY_RUN_CMD bash "$DOTFILES_PATH/shell/bin/dotfiles-stow" "$DOTFILES_PATH"
+          $DRY_RUN_CMD bash "$DOTFILES_PATH/stow/shared/.shell/bin/dotfiles-stow" "$DOTFILES_PATH"
       else
         echo "Warning: ~/.dotfiles is not cloned; clone github.com/fredrikaverpil/dotfiles there and rebuild to stow"
       fi

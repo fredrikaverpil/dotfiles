@@ -6,8 +6,8 @@ set -e
 # then the optional host package. Also what home-manager activation runs.
 # --adopt absorbs a real file that replaced a managed symlink into the repo;
 # --no-folding links files, not dirs, so other tools can write siblings.
-# Neovim configs are the exception: linked as whole dirs, so new files in the
-# repo show up without a restow.
+# dir_links are the exception: linked as whole dirs, so new files in the repo
+# show up without a restow.
 
 case "$1" in
 -h | --help)
@@ -17,15 +17,17 @@ case "$1" in
 esac
 
 cd "${1:-$HOME/.dotfiles}"
+dir_links=(.config/nvim-fredrik .config/nvim-simple .shell) # in stow/shared
+dir_links_re="^($(IFS="|"; echo "${dir_links[*]//./\\.}"))"
 stow_pkg() {
   local cmd=(stow --dir="$1" --target="$HOME" --restow --no-folding --adopt
-    --ignore='\.config/nvim-(fredrik|simple)' "$2")
+    --ignore="$dir_links_re" "$2")
   echo "${cmd[*]}"
   "${cmd[@]}"
 }
 stow_pkg stow shared
-for nvim in nvim-fredrik nvim-simple; do
-  ln -sfn "$PWD/stow/shared/.config/$nvim" "$HOME/.config/$nvim"
+for dir in "${dir_links[@]}"; do
+  ln -sfn "$PWD/stow/shared/$dir" "$HOME/$dir"
 done
 stow_pkg stow/platform "$(uname -s)"
 # kaizen's session.nix creates the marker.

@@ -92,11 +92,12 @@ repo instead of aborting; review the result with `git diff` before committing.
 The shell entrypoint is `stow/shared/.zshrc`, which sources
 `stow/shared/.zshrc_user`. The user file loads the shell configuration chain:
 
-1. [`shell/exports.sh`](shell/exports.sh) — PATH (including
-   [`shell/bin/`](shell/bin/) utils), globals, env vars
-2. [`shell/aliases.sh`](shell/aliases.sh) — shell aliases
-3. [`shell/sourcing.sh`](shell/sourcing.sh) — tool initialization, plugins,
-   completions
+1. [`stow/shared/.shell/exports.sh`](stow/shared/.shell/exports.sh) — PATH
+   (including [`bin/`](stow/shared/.shell/bin/) utils), globals, env vars
+2. [`stow/shared/.shell/aliases.sh`](stow/shared/.shell/aliases.sh) — shell
+   aliases
+3. [`stow/shared/.shell/sourcing.sh`](stow/shared/.shell/sourcing.sh) — tool
+   initialization, plugins, completions
 
 See [Project config](extras/README_PROJECT.md) for details on shell
 initialization, direnv, and per-project tooling.
