@@ -135,7 +135,6 @@ in
     mission-center
     # niri cannot mirror outputs; wl-mirror shows one in a fullscreen window.
     wl-mirror
-    wtype
     (withGnomeLibsecret inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-desktop)
     (withGnomeLibsecret proton-pass)
     proton-pass-cli

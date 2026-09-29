@@ -171,6 +171,7 @@
                   ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
                     pkgs.niri
                     pkgs.jq
+                    pkgs.wtype
                     (task "compositor-test" "tests/config_test.sh")
                     (task "shell-smoke" "tests/shell_smoke.sh \"$@\"")
                     (task "shell-perf" "tests/shell_perf.sh \"$@\"")

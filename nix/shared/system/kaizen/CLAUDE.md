@@ -189,8 +189,9 @@ tree, so a static check passing here passes for every kaizen host.
   machine.
 - Test keyboard-first panels over SSH: open the panel with `qs ipc call`,
   confirm it is the only `Keyboard interactivity: exclusive` layer in
-  `niri msg layers`, then use `wtype -k z`. Niri drops virtual-keyboard input
-  before bind handling, so `wtype` cannot test compositor binds.
+  `niri msg layers`, then use the devshell's `wtype -k z`. Niri drops
+  virtual-keyboard input before bind handling, so `wtype` cannot test
+  compositor binds.
 - Use `grim` to check how the shell looks; `qs ipc` and `shell-smoke` for
   internal state. Crop with `-g "0,0 1280x32"` and pick the output with `-o`;
   capture cost depends only on the area. Niri does not report layer geometry,
