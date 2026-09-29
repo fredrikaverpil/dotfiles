@@ -1,9 +1,10 @@
 # niri + Quickshell desktop
 
-This file documents the niri + Quickshell desktop and lives with it.
-`KAIZEN.md` › Where it lives says where each part is and which hosts it
-reaches. Every kaizen host shares one copy of the core, so an edit lands on
-all of them at once: there is no promotion step and no drift to diff for.
+This file documents the niri + Quickshell desktop and lives with it. The
+repo root's `KAIZEN.md` › Where it lives says where each part is and which
+hosts it reaches. Every kaizen host shares one copy of the core, so an edit
+lands on all of them at once: there is no promotion step and no drift to diff
+for.
 
 To try another shell, compositor or panel on one machine, use a git branch or
 worktree, not a per-host copy of the tree.
