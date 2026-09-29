@@ -324,7 +324,7 @@ PID.
 - Chromium and Electron pick their secret store from `XDG_CURRENT_DESKTOP`. They
   do not recognise `niri` and fall back to `basic_text`, so logins and secrets
   do not persist or are stored under a hardcoded key. Wrap each such app with
-  `pkgs.withGnomeLibsecret` (`desktop.nix`), which adds
+  `pkgs.withGnomeLibsecret` (`nix/shared/overlays/`), which adds
   `--password-store=gnome-libsecret`; `chromium` passes the flag directly. Do
   not add `GNOME` to `XDG_CURRENT_DESKTOP`: autostart entries such as
   `nm-applet` and `print-applet` use `NotShowIn=GNOME`. Once an app has
