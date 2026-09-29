@@ -20,6 +20,8 @@
     ncurses
     rsync
     pngpaste # for obsidian, macOS-only
+    slides
+    chafa # Required for showing images in slides
     uv
   ];
 
