@@ -7,8 +7,6 @@
 }:
 {
   environment.systemPackages = with pkgs; [
-    bandwhich
-    gzip
   ];
 
   # Nix registry for easy access to stable and unstable packages
