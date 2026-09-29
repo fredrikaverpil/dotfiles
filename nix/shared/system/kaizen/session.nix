@@ -176,6 +176,13 @@ in
     services.upower.enable = true;
     services.power-profiles-daemon.enable = true;
 
+    # BlueZ does not persist Powered; the shell's panel only toggles power and
+    # connects paired devices, pairing belongs to bluetui.
+    hardware.bluetooth = {
+      enable = true;
+      powerOnBoot = true;
+    };
+
     # GTK3 needs the portal to follow the dconf theme; Qt uses the GTK platform theme.
     environment.sessionVariables = {
       NIXOS_OZONE_WL = "1";

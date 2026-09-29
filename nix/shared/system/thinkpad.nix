@@ -4,13 +4,6 @@
   # BIOS and device firmware from LVFS (fwupdmgr); see README.md.
   services.fwupd.enable = true;
 
-  # BlueZ does not persist Powered; the shell's panel only toggles power and
-  # connects paired devices, pairing belongs to bluetui.
-  hardware.bluetooth = {
-    enable = true;
-    powerOnBoot = true;
-  };
-
   # Swaps Super and left Alt and makes Caps Lock Ctrl on the built-in keyboard;
   # other keyboards are untouched.
   services.keyd = {
