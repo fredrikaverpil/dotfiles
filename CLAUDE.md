@@ -13,8 +13,8 @@ code in this repository.
   `?submodules=1`, which a bare `--flake ~/.dotfiles#wily` lacks, silently
   dropping the private `nix/hosts/wily/einride` submodule
 - **Symlink dotfiles only** (GNU Stow, no Nix rebuild): `dotfiles-stow`
-  (`shell/bin/dotfiles-stow`: shared, then platform, then `kaizen` on the niri
-  hosts, then the optional host package)
+  (`shell/bin/dotfiles-stow`: shared, then platform, then `kaizen` where
+  `/etc/kaizen` exists, then the optional host package)
 - **Update all flake inputs**: `nix flake update`, then rebuild
 - **Update only unstable-pinned inputs**: `nix flake update nixpkgs-unstable
   nix-darwin home-manager-unstable llm-agents`, then rebuild

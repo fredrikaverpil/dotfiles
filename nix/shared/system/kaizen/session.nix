@@ -193,6 +193,9 @@ in
       auth include login
     '';
 
+    # Marks a kaizen host; dotfiles-stow stows stow/kaizen/ where it exists.
+    environment.etc.kaizen.text = "";
+
     systemd.user.services.quickshell = {
       description = "Quickshell desktop shell";
       partOf = [ "graphical-session.target" ];
