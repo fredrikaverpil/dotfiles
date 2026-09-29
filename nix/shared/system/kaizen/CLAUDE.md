@@ -11,7 +11,7 @@ What stays per host, in `nix/hosts/<host>/`: hardware and firmware settings
 policy), host-only programs and packages (`programs.*` set directly in
 `configuration.nix`, `environment.systemPackages`), work-only
 configuration (the `einride` submodule and what it pulls in), and the mpv
-decode profile in `stow/host/<host>/`.
+decode profile and niri output layout in `stow/host/<host>/`.
 
 To try another shell, compositor or panel on one machine, use a git branch or
 worktree, not a per-host copy of the tree.
@@ -85,7 +85,8 @@ previous states. Explain a declaration next to it, not here.
   compositor-specific and lives in its service.
 - Prefer purpose-built applications to large bespoke panels for infrequent
   tasks (bluetui pairs, nm-connection-editor edits connections). Output layout
-  is hand-kept in `niri/outputs.kdl`, keyed by monitor, not port.
+  is hand-kept in `stow/host/<host>/.config/niri/outputs.kdl`, keyed by
+  monitor, not port.
 - Clipboard history is in memory only and skips offers carrying
   `x-kde-passwordManagerHint`. Proton Pass and 1Password set it; a password
   manager that does not would be recorded.
