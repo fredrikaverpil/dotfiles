@@ -51,7 +51,7 @@ previous states. Explain a declaration next to it, not here.
   `../desktop.nix` holds those every desktop host wants.
 - `shell.qml` wires services and surfaces. Views belong in `modules/panels/`;
   daemon/process state belongs in `modules/services/`.
-- Plugins hold what only some hosts want, on top of the core: a directory with
+- Plugins extend the shell for the hosts that want them: a directory with
   its Nix module and a `Plugin.qml` rooted in `Ui/Plugin.qml`, listed in
   `host.kaizenPlugins` (`KAIZEN_PLUGINS`) and imported by the hosts that want
   it. Quickshell does not watch them: apply an edit with
@@ -59,9 +59,11 @@ previous states. Explain a declaration next to it, not here.
   private one can live anywhere, such as the `einride` submodule. `qml-test`
   runs the calendar's tests; `qml-lint` skips plugins (their `import qs.Ui`
   resolves only inside Quickshell). A tray plugin has no `Plugin.qml`: it is
-  an app with its own StatusNotifierItem and menu, which the tray shows. Its
-  module adds a user unit, started with the session when `autostart` is set,
-  and a desktop entry that starts the unit from Apps (`plugins/hello-tray/`).
+  an app written for kaizen, with its own StatusNotifierItem and menu, which
+  the tray shows. Its module adds a user unit, started with the session when
+  `autostart` is set, and a desktop entry that starts the unit from Apps
+  (`plugins/hello-tray/`). A third-party app with a tray icon is not a plugin
+  (`nix/README.md`).
 - Interactive surfaces come in three kinds; pick by what opens them:
   - Launcher (`modules/menu/`): a large `Ui.Panel` drilling down through
     levels; the keyboard entry point to everything, tray menus included.

@@ -167,9 +167,11 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 - A plugin that needs a long-running backend brings its own daemon: its module
   adds the unit, and its QML queries the daemon's IPC. The calendar
   (`plugins/calendar/`) does this with [dcal].
-- A tray plugin is an app with its own [StatusNotifierItem] and menu
-  (`plugins/hello-tray/`), so the tray and its launcher level show it without
-  shell code. Its unit starts it with the session or from Apps.
+- A tray plugin is an app written for kaizen, with its own
+  [StatusNotifierItem] and menu (`plugins/hello-tray/`), so the tray and its
+  launcher level show it without shell code. Its unit starts it with the
+  session or from Apps. A third-party app with a tray icon is not a plugin;
+  the tray shows it anyway.
 - `Ui/Compositor.qml` is the only path to niri.
 
 ## Session lifecycle
@@ -226,5 +228,6 @@ closes niri's readiness-before-`WAYLAND_DISPLAY` race.
    `modules/panels/`; a protocol-driven surface with no other consumer of its
    state (lock, notifications, polkit) keeps both in `modules/<name>/`.
    Packages/units/PAM → `session.nix`, compositor → `Ui/compositors/` and
-   `niri/config.kdl`, IPC target for every new action. Something only some
-   hosts want is a plugin (`host.kaizenPlugins`).
+   `niri/config.kdl`, IPC target for every new action. A shell extension only
+   some hosts want is a plugin (`host.kaizenPlugins`). An app is not kaizen's
+   to install: `nix/README.md` says where it goes.
