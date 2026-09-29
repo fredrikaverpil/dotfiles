@@ -79,6 +79,7 @@
   # Host-only system packages; shared ones live in nix/shared/system/.
   host.extraSystemPackages = with pkgs; [
     (withGnomeLibsecret ente-desktop)
+    (withGnomeLibsecret obsidian)
     lutris # Battle.net and other non-Steam launchers.
   ];
 }

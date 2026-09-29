@@ -97,7 +97,6 @@ in
         "gitify"
         "localsend"
         "obs"
-        "obsidian"
         "proton-pass"
         "raycast"
         "signal"
