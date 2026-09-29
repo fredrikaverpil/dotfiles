@@ -20,7 +20,7 @@ require("lazyload").on_vim_enter(function()
     snippets = {
       opts = {
         friendly_snippets = true,
-        search_paths = { vim.env.DOTFILES .. "/nvim-fredrik/snippets" },
+        search_paths = { vim.env.DOTFILES .. "/stow/shared/.config/nvim-fredrik/snippets" },
       },
     },
     dadbod = {

@@ -454,7 +454,7 @@ Then use `pkgs-python39.python39` in your packages list.
 
 LSPs, linters, formatters, and debug adapters used inside Neovim are managed by
 [Mason](https://github.com/mason-org/mason.nvim), configured in
-[`nvim-fredrik/lua/fredrik/plugins/core/mason.lua`](nvim-fredrik/lua/fredrik/plugins/core/mason.lua).
+[`stow/shared/.config/nvim-fredrik/plugin/mason.lua`](../stow/shared/.config/nvim-fredrik/plugin/mason.lua).
 Mason installs tools into its own isolated location
 (`~/.local/share/nvim-fredrik/mason/bin/`), separate from the shell environment.
 
@@ -462,13 +462,10 @@ Mason's `PATH` is set to `"append"`, meaning project-local tools (from Nix,
 mise, etc.) take precedence over Mason-installed versions. This lets per-project
 tooling override editor defaults automatically.
 
-Per-language tool declarations (which LSPs, formatters, linters to install) live
-in `nvim-fredrik/lua/fredrik/plugins/lang/*.lua` — e.g. `go.lua`, `python.lua`,
-`typescript.lua`. Many Neovim plugins expect specific tooling (e.g. a formatter
-plugin needs the formatter binary). Each plugin spec declares which Mason
-packages it needs — on startup, Mason automatically downloads and installs any
-missing tools. This means adding a new language setup is just a matter of
-writing the plugin spec; opening Neovim takes care of the rest.
+The tools to install (LSPs, formatters, linters) are listed in
+`ensure_installed` in that file, and a project's `.nvim.lua` can add more via
+`Config.mason_extra`. On startup, Mason automatically downloads and installs any
+missing tools.
 
 ## LLM setup
 

@@ -26,21 +26,18 @@ References — read the one the task needs:
 
 ## This config's location
 
-The native config lives at **`~/.dotfiles/nvim-fredrik/`** inside the dotfiles
-repo. It is symlinked into place via GNU Stow:
+The native config lives at **`~/.dotfiles/stow/shared/.config/nvim-fredrik/`**
+inside the dotfiles repo. `dotfiles-stow` links it into place as a whole
+directory, so new files show up without a restow:
 
 ```
-~/.dotfiles/nvim-fredrik/          <- actual files (edit here)
-~/.dotfiles/stow/shared/.config/nvim-fredrik -> ../../../nvim-fredrik  (stow entry)
-~/.config/nvim-fredrik -> ~/.dotfiles/stow/shared/.config/nvim-fredrik  (stow result)
+~/.dotfiles/stow/shared/.config/nvim-fredrik/   <- actual files (edit here)
+~/.config/nvim-fredrik -> ~/.dotfiles/stow/shared/.config/nvim-fredrik
 ```
 
-Launch it with `NVIM_APPNAME=nvim-fredrik nvim`. Apply stow symlinks after
-changes from `~/.dotfiles/stow` with `packages=(shared "$(uname -s)");
-host="$(hostname -s)"; [ -d "$host" ] && packages+=("$host"); stow
---target="$HOME" --restow --no-folding --adopt "${packages[@]}"`. Neovim itself
-comes from nixpkgs-unstable via home-manager (`nix/shared/home/common.nix`) --
-binary at `~/.nix-profile/bin/nvim`.
+Launch it with `NVIM_APPNAME=nvim-fredrik nvim`. Neovim itself comes from
+nixpkgs-unstable via home-manager (`nix/shared/home/common.nix`) -- binary at
+`~/.nix-profile/bin/nvim`.
 
 ## Architecture
 

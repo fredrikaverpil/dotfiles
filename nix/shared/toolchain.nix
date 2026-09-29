@@ -22,10 +22,11 @@
 # as `stable.<name>`.
 #
 # LSPs/linters/formatters: on macOS Mason installs them
-# (nvim-fredrik/plugin/mason.lua). On NixOS Mason is disabled — its prebuilt
-# glibc binaries fail under stub-ld — so the NixOS-only list below mirrors
-# Mason's `ensure_installed`. Keep the two lists in sync. `nixos` is passed by
-# the caller: nothing in nixpkgs distinguishes NixOS from other Linux.
+# (stow/shared/.config/nvim-fredrik/plugin/mason.lua). On NixOS Mason is
+# disabled — its prebuilt glibc binaries fail under stub-ld — so the NixOS-only
+# list below mirrors Mason's `ensure_installed`. Keep the two lists in sync.
+# `nixos` is passed by the caller: nothing in nixpkgs distinguishes NixOS from
+# other Linux.
 {
   stable,
   unstable,

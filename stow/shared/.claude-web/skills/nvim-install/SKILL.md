@@ -98,7 +98,7 @@ later calls. The filesystem does persist, though: write the env to a file and
 ```bash
 repo="/home/user/dotfiles"        # adjust if the repo is cloned elsewhere
 mkdir -p ~/.config
-ln -sfn "$repo/nvim-fredrik" ~/.config/nvim-fredrik
+ln -sfn "$repo/stow/shared/.config/nvim-fredrik" ~/.config/nvim-fredrik
 
 cat > ~/.nvim-sandbox.env <<EOF
 export PATH="\$HOME/.nix-profile/bin:\$PATH"
