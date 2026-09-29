@@ -125,74 +125,6 @@ window-rule {
     }
 }
 
-// Open apps on given workspace.
-// List running windows: `niri msg -j windows | jq -r '.[] | "\(.app_id)\t\(.title)"'`
-
-window-rule {
-    match app-id=r#"^zen-beta$"#
-    open-on-workspace "1"
-    open-focused true
-}
-
-window-rule {
-    match app-id=r#"^slack$"#
-    open-on-workspace "3"
-}
-
-window-rule {
-    // dcal.service runs the sync daemon headless; this is the window `dcal show`
-    // opens.
-    match app-id=r#"^com\.danklinux\.dankcalendar$"#
-    open-on-workspace "4"
-}
-
-window-rule {
-    match app-id=r#"^org\.gnome\.Calculator$"#
-    open-floating true
-}
-
-window-rule {
-    match app-id=r#"^org\.gnome\.NautilusPreviewer$"#
-    open-floating true
-}
-
-window-rule {
-    match app-id=r#"(?i)^spotify$"#
-    open-on-workspace "5"
-}
-
-window-rule {
-    match app-id=r#"^com.rafaelmardojai.Blanket$"#
-    open-on-workspace "5"
-}
-
-// Brain.fm
-window-rule {
-    match app-id=r#"^chrome-my\.brain\.fm__-"#
-    open-on-workspace "5"
-}
-
-window-rule {
-    match app-id=r#"^signal$"#
-    open-on-workspace "6"
-}
-
-window-rule {
-    match app-id=r#"^proton-pass$"#
-    open-on-workspace "7"
-}
-
-window-rule {
-    match app-id=r#"^system-config-printer$"#
-    open-floating true
-}
-
-window-rule {
-    match app-id=r#"^(org\.kde\.dolphin|org\.gnome\.Nautilus)$"#
-    open-floating true
-}
-
-
 // The recording service's camera preview: gpu-screen-recorder cannot mask its
 // own camera overlay, so the screen capture records this window instead. mpv
 // sets its title after the initial configure, so opening rules need the app id
@@ -259,16 +191,6 @@ binds {
     // Launch
     Mod+T hotkey-overlay-title="Focus or open a terminal" { spawn "kaizen-focus" r#"^com\.mitchellh\.ghostty$"# "ghostty"; }
     Mod+Shift+T hotkey-overlay-title="New terminal" { spawn "ghostty"; }
-    Mod+Y hotkey-overlay-title="Files" { spawn "xdg-terminal-exec" "yazi"; }
-    // Work profile on wily, personal (Default) elsewhere.
-    Mod+B hotkey-overlay-title="Browser" { spawn-sh r#"chromium --profile-directory="$([ "$(hostname)" = wily ] && echo Work || echo Default)""#; }
-    // Skips whatever is already running, so it is safe to press twice.
-    Mod+A hotkey-overlay-title="Open the everyday apps" { spawn "kaizen-apps"; }
-
-    // Focus the app's most recently focused window, switching workspace, or
-    // open it.
-    Mod+Z hotkey-overlay-title="Focus or open Zen" { spawn "kaizen-focus" r#"^zen-beta$"# "zen-beta"; }
-    Mod+S hotkey-overlay-title="Focus or open Slack" { spawn "kaizen-focus" r#"(?i)^slack$"# "slack"; }
 
     // Window state
     Mod+Q hotkey-overlay-title="Close window" { close-window; }
@@ -400,6 +322,7 @@ binds {
     Mod+Shift+P hotkey-overlay-title="Power off monitors" { power-off-monitors; }
 }
 
-// Host-only settings, from the host stow package (stow/host/<host>). Last, so
-// its binds override the ones above.
+// App window rules and binds, then host-only settings, both from the host stow
+// package (stow/host/<host>). Last, so their binds override the ones above.
+include optional=true "apps.kdl"
 include optional=true "host.kdl"

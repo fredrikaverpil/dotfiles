@@ -47,6 +47,10 @@ neither. Apps build on kaizen, never the reverse: `desktop.nix` and the hosts
 set kaizen's options, such as its notification rules, and kaizen refers to no
 app.
 
+An app's niri window rules and binds go in
+`stow/host/renoir/.config/niri/apps.kdl`, which wily symlinks, or the host's
+`host.kdl`.
+
 On a kaizen host, wrap Chromium and Electron apps with
 `pkgs.withGnomeLibsecret` (`shared/overlays/`); without it they cannot keep
 logins in gnome-keyring.

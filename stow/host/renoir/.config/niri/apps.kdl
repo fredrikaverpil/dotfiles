@@ -1,0 +1,81 @@
+// App window rules and binds, shared with wily through a symlink. Included by
+// stow/kaizen/.config/niri/config.kdl; host-only ones go in host.kdl.
+
+// Open apps on given workspace.
+// List running windows: `niri msg -j windows | jq -r '.[] | "\(.app_id)\t\(.title)"'`
+
+window-rule {
+    match app-id=r#"^zen-beta$"#
+    open-on-workspace "1"
+    open-focused true
+}
+
+window-rule {
+    match app-id=r#"^slack$"#
+    open-on-workspace "3"
+}
+
+window-rule {
+    // dcal.service runs the sync daemon headless; this is the window `dcal show`
+    // opens.
+    match app-id=r#"^com\.danklinux\.dankcalendar$"#
+    open-on-workspace "4"
+}
+
+window-rule {
+    match app-id=r#"^org\.gnome\.Calculator$"#
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"^org\.gnome\.NautilusPreviewer$"#
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"(?i)^spotify$"#
+    open-on-workspace "5"
+}
+
+window-rule {
+    match app-id=r#"^com.rafaelmardojai.Blanket$"#
+    open-on-workspace "5"
+}
+
+// Brain.fm
+window-rule {
+    match app-id=r#"^chrome-my\.brain\.fm__-"#
+    open-on-workspace "5"
+}
+
+window-rule {
+    match app-id=r#"^signal$"#
+    open-on-workspace "6"
+}
+
+window-rule {
+    match app-id=r#"^proton-pass$"#
+    open-on-workspace "7"
+}
+
+window-rule {
+    match app-id=r#"^system-config-printer$"#
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"^(org\.kde\.dolphin|org\.gnome\.Nautilus)$"#
+    open-floating true
+}
+
+binds {
+    Mod+Y hotkey-overlay-title="Files" { spawn "xdg-terminal-exec" "yazi"; }
+    Mod+B hotkey-overlay-title="Browser" { spawn "chromium" "--profile-directory=Default"; }
+    // Skips whatever is already running, so it is safe to press twice.
+    Mod+A hotkey-overlay-title="Open the everyday apps" { spawn "kaizen-apps"; }
+
+    // Focus the app's most recently focused window, switching workspace, or
+    // open it.
+    Mod+Z hotkey-overlay-title="Focus or open Zen" { spawn "kaizen-focus" r#"^zen-beta$"# "zen-beta"; }
+    Mod+S hotkey-overlay-title="Focus or open Slack" { spawn "kaizen-focus" r#"(?i)^slack$"# "slack"; }
+}

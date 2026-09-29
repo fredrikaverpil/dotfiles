@@ -48,7 +48,9 @@ previous states. Explain a declaration next to it, not here.
 - `session.nix` owns the session: niri under UWSM, portals, PAM, the shell's
   systemd units, the pre-suspend lock and the packages the shell runs.
   `stow/kaizen/` owns compositor configuration and QML. Apps are not kaizen's:
-  `../desktop.nix` holds those every desktop host wants.
+  `../desktop.nix` holds those every desktop host wants, and
+  `stow/host/renoir/.config/niri/apps.kdl`, which wily symlinks, their niri
+  rules and binds.
 - `shell.qml` wires services and surfaces. Views belong in `modules/panels/`;
   daemon/process state belongs in `modules/services/`.
 - Plugins extend the shell for the hosts that want them: a directory with
