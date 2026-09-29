@@ -109,8 +109,9 @@ let
   };
 in
 # The kaizen session every kaizen host shares: niri under UWSM, portals, PAM,
-# the shell's user units and the pre-suspend lock, what the shell runs and its
-# notification rules. Compositor config and QML live in stow/kaizen/.
+# the shell's user units and the pre-suspend lock, the services and packages the
+# shell and its binds use, and its notification rules. Compositor config and QML
+# live in stow/kaizen/.
 {
   imports = [ ../fonts.nix ];
 
