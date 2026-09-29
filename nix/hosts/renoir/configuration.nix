@@ -4,8 +4,8 @@
     ../../shared/system/desktop.nix
     ../../shared/system/kaizen/session.nix
     ../../shared/system/kaizen/plugins/calendar
-    ../../shared/system/kaizen/plugins/hello
-    ../../shared/system/kaizen/plugins/hello-tray
+    ./kaizen-plugins/hello
+    ./kaizen-plugins/hello-tray
     ../../shared/system/thinkpad.nix
   ];
 
