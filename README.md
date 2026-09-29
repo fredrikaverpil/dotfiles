@@ -119,7 +119,9 @@ packages from the `llm-agents` flake input, upgraded via
   - [kaizen](KAIZEN.md) - the niri + Quickshell desktop on `renoir` and `wily`
 - Neovim ⌨️
   - [My Neovim config](nvim-fredrik/README.md) - uses `vim.pack`
-  - [Minimalistic config](nvim-simple/README.md)
+  - [Minimalistic config](nvim-simple/) - for when a full blown IDE is too much;
+    inspired by [NativeVim](https://github.com/boltlessengineer/NativeVim) and
+    [Sylvan Franklin's config](https://github.com/SylvanFranklin/.config/tree/main/nvim)
 - Workflows 🌊
   - [Git config](extras/README_GIT.md)
   - [Project config](extras/README_PROJECT.md)
