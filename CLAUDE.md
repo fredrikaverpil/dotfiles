@@ -1,26 +1,13 @@
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with
-code in this repository.
+code in this repository. The README covers the layers, rebuild, update and
+Stow commands:
+
+@README.md
 
 ## Core Commands
 
-- **Full rebuild (Darwin)**: `sudo darwin-rebuild switch --flake
-  ~/.dotfiles#"$(hostname -s)"` (hosts: `zap`, `plumbus`)
-- **Full rebuild (NixOS)**: `sudo nixos-rebuild switch --flake
-  ~/.dotfiles#"$(hostname -s)"` (hosts: `rpi5-homelab`, `renoir`, `wily`).
-  On `wily` use `nh os switch` instead: its flake path carries
-  `?submodules=1`, which a bare `--flake ~/.dotfiles#wily` lacks, silently
-  dropping the private `nix/hosts/wily/einride` submodule
-- **Symlink dotfiles only** (GNU Stow, no Nix rebuild): `dotfiles-stow`
-  (`shell/bin/dotfiles-stow`: shared, then platform, then `kaizen` where
-  `/etc/kaizen` exists, then the optional host package)
-- **Update all flake inputs**: `nix flake update`, then rebuild
-- **Update only unstable-pinned inputs**: `nix flake update nixpkgs-unstable
-  nix-darwin home-manager-unstable llm-agents`, then rebuild
-- **Upgrade Homebrew packages (Darwin)**: `brew update && brew upgrade` —
-  rebuilds only install/remove to match the declared set, they never bump
-  versions (add `--greedy` to also bump self-updating casks)
 - **Nix rebuild**: ask user to run this, NEVER run it yourself
 - **Nix validation**: `nix flake check` or `nix flake check --all-systems`
 - **Nix builds**: `nix build .#darwinConfigurations.<host>.system` on Darwin
@@ -41,20 +28,7 @@ code in this repository.
   `nix develop ~/.dotfiles#dev`). Defined once in `nix/shared/toolchain.nix`,
   shared by the devshell and Neovim's `nvim-deps-path`.
 
-### Verifying a Darwin rebuild actually landed
-
-home-manager's per-user activation on macOS can silently no-op
-(home-manager#4413). `nix/shared/system/darwin.nix` guards against it with a
-verify-or-retry `postActivation` step. To check manually, compare the
-home-manager gcroot (`readlink
-~/.local/state/home-manager/gcroots/current-home`) against the expected
-generation — `readlink /run/current-system` updates even on a silent miss, so
-it proves nothing.
-
 ## Repository Architecture
-
-This is a dotfiles repository using **Nix flakes** for system/package management
-and **GNU Stow** for dotfile symlinking.
 
 ### Nix Architecture Patterns
 
@@ -64,19 +38,17 @@ and **GNU Stow** for dotfile symlinking.
   them follow another nixpkgs, or kernel binary cache hits are lost)
 - **Module scope**: `nix/README.md` decides where a package or setting goes
   (kaizen, a shared scope, one host or one user). Read it before adding one
-- **Configuration helpers**: Use `lib.mkDarwin` and `lib.mkRpiNixos` functions
-  from `nix/lib/`
+- **Configuration helpers**: Use `lib.mkDarwin`, `lib.mkNixos` and
+  `lib.mkRpiNixos` functions from `nix/lib/`
 - **Host discovery**: Configurations auto-match hostname from
   `nix/hosts/$HOSTNAME/`
-- **Package management**: CLI tools via Nix, GUI apps via Homebrew (macOS) or
-  Nix (Linux)
 - **LLM agent CLIs**: Packaged agents (claude-code, codex, gemini-cli,
   opencode, pi, ...) come from the `llm-agents` flake input
   (numtide/llm-agents.nix) and are declared via the `llmAgents` option in
   `nix/shared/home/llm-agents.nix` (mergeable across common → platform → host
   configs). Do not make this input
   follow another nixpkgs — it is built/cached against its own pin
-  (cache.numtide.com). Update via `nix flake update llm-agents`, then rebuild
+  (cache.numtide.com)
 - **No curl|bash installers in activation**: AI/agent CLIs must come from
   llm-agents (patched, cached), not native installers. Prebuilt glibc
   binaries cannot run on NixOS (stub-ld), and install-if-missing activation
@@ -94,10 +66,7 @@ Wheels and prebuilt npm binaries are glibc-linked and fail to load on NixOS
 
 Read `nix/shared/system/kaizen/CLAUDE.md` before changing Quickshell, niri or
 their Nix modules. It owns the local checks, platform boundaries and safe
-deployment process. `renoir` and `wily` share one copy of that desktop:
-`session.nix` and `stow/kaizen/` apply to both, so an edit there lands on
-both; a plugin applies to the hosts that import it (`KAIZEN.md` › Where it
-lives). Hardware notes are in the host's `README.md`.
+deployment process.
 
 ### Neovim Configuration
 
@@ -140,5 +109,3 @@ exact formatter/linter tools and configurations. Formatters are wired up in
 - **Neovim comes from nixpkgs-unstable on all hosts** (declared in
   `nix/shared/home/common.nix`); a commented `overrideAttrs` there builds a
   specific sha/tag instead
-- **`stow/` changes take effect immediately**: run `dotfiles-stow` — no Nix
-  rebuild needed

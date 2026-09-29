@@ -27,6 +27,7 @@ Personal dotfiles, managed in three layers:
 # Rebuild system + packages + dotfiles (reproducible, uses flake.lock)
 sudo darwin-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"  # macOS
 sudo nixos-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"   # NixOS
+nh os switch  # wily: keeps its private submodule, see nix/hosts/wily/README.md
 
 # Update ALL flake inputs, then rebuild
 nix flake update
@@ -39,11 +40,14 @@ sudo nix-collect-garbage --delete-older-than 5d
 ```
 
 > [!NOTE]
-> On macOS, home-manager's per-user activation can silently fail to apply (a
-> known upstream `launchctl asuser` flakiness). The rebuild self-heals this: a
-> guard in `nix/shared/system/darwin.nix` verifies the activation landed and
-> retries it, failing loudly otherwise. See `CLAUDE.md` for manual
-> verification and recovery.
+>
+> On macOS, home-manager's per-user activation can silently fail to apply
+> (home-manager#4413). The rebuild self-heals this: a guard in
+> `nix/shared/system/darwin.nix` verifies the activation landed and retries
+> it, failing loudly otherwise. To check by hand, compare
+> `readlink ~/.local/state/home-manager/gcroots/current-home` against the
+> expected generation; `readlink /run/current-system` updates even on a silent
+> miss, so it proves nothing.
 
 ### Stow
 
@@ -63,7 +67,7 @@ Stow forbids slashes in package names, so each level is its own invocation:
 | --- | --- |
 | `stow/shared/` | every machine |
 | `stow/platform/{Darwin,Linux}/` | matching `uname -s` |
-| `stow/kaizen/` | the niri + Quickshell hosts (`renoir`, `wily`) |
+| `stow/kaizen/` | kaizen hosts, where `/etc/kaizen` exists (`renoir`, `wily`) |
 | `stow/host/<hostname>/` | that machine only; optional |
 
 A file in a later package must not target a path an earlier one already
@@ -108,8 +112,11 @@ LLM agent CLIs (claude-code, opencode,...) are the exception: they are plain Nix
 packages from the `llm-agents` flake input, upgraded via
 `nix flake update llm-agents` + rebuild.
 
-## Other READMEs and references
+## Other docs and references
 
+- Nix ❄️
+  - [Where a package or setting goes](nix/README.md)
+  - [kaizen](KAIZEN.md) - the niri + Quickshell desktop on `renoir` and `wily`
 - Neovim ⌨️
   - [My Neovim config](nvim-fredrik/README.md) - uses `vim.pack`
   - [Minimalistic config](nvim-simple/README.md)
@@ -124,3 +131,5 @@ packages from the `llm-agents` flake input, upgraded via
 - Host-specific documentation
   - [rpi5-homelab](nix/hosts/rpi5-homelab/README.md) - requires custom
     installation procedure
+  - [renoir](nix/hosts/renoir/README.md) - ThinkPad T14 Gen 1
+  - [wily](nix/hosts/wily/README.md) - ThinkPad T14 Gen 6, private submodule
