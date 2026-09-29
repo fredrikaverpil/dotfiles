@@ -259,8 +259,9 @@ Ui.Panel {
       }))
   }
 
-  // Built when entries load, not per keystroke: a first icon-theme lookup
-  // costs ~25 ms per app. Re-sorted (cheap) on launch count changes.
+  // Launch counts for frecency: apps keyed by entry.id, tree actions by their
+  // menu id. Built when entries load, not per keystroke: a first icon-theme
+  // lookup costs ~25 ms per app. Re-sorted (cheap) on launch count changes.
   property var launchCounts: ({})
   property bool launchCountsLoaded: false
   readonly property var baseApps: DesktopEntries.applications.values
@@ -277,7 +278,7 @@ Ui.Panel {
 
   FileView {
     id: launchCountsFile
-    path: Ui.Paths.state + "/app-launches.json"
+    path: Ui.Paths.state + "/launch-counts.json"
     atomicWrites: true
     printErrors: false
     onLoaded: {
@@ -405,12 +406,12 @@ Ui.Panel {
     networks: function() { return menu.networkRows() },
   })
 
-  readonly property var rows: Model.rowsFor(menu.items, level, input.text, menu.providers)
+  readonly property var rows: Model.rowsFor(menu.items, level, input.text, menu.providers, menu.launchCounts)
 
   // Launcher rows shaped like QsMenuEntry, for the context menu; keep filters
   // the target's own rows.
   function contextRows(target, keep) {
-    const rows = Model.rowsFor(menu.items, target, "", menu.providers).filter(keep || (() => true)).map(row => {
+    const rows = Model.rowsFor(menu.items, target, "", menu.providers, menu.launchCounts).filter(keep || (() => true)).map(row => {
       const cascades = row.submenu && !menu.items[row.id].search
       const handsOff = row.submenu && !cascades
       const run = handsOff ? () => menu.open(row.id)
@@ -503,6 +504,8 @@ Ui.Panel {
       // Keep launched apps out of Quickshell's service scope.
       Quickshell.execDetached(["uwsm-app", "--", row.entry.id + ".desktop"])
     } else {
+      // Provider rows (places, sinks, ...) have no stable id to key a count by.
+      if (row.id) menu.recordLaunch(row.id)
       row.action()
     }
   }

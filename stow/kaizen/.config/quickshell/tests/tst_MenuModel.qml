@@ -58,6 +58,18 @@ TestCase {
     compare(Menu.rowsFor(items, "root", "", {}).map(row => row.id), ["apps", "learn", "style"])
   }
 
+  function test_frecency_reorders_launched_items_ties_keep_declared_order() {
+    const providers = { apps: detail => [{ label: "Alacritty", detail, enabled: true, entry: { id: "alacritty" } }] }
+
+    // A launched "style" moves ahead of unlaunched siblings.
+    compare(Menu.rowsFor(items, "root", "", providers, { style: 3 })[0].id, "style")
+    compare(Menu.rowsFor(items, "root", "", providers, {}).map(row => row.id), ["apps", "learn", "style"])
+
+    // Search: a launched app outranks an unlaunched tree match with the same detail weight.
+    compare(Menu.rowsFor(items, "root", "a", providers, { alacritty: 1 }).map(row => row.label),
+      ["Alacritty", "Apps", "Learn", "Dark"])
+  }
+
   function test_search_ignores_hyphens() {
     const items = { wifi: { label: "Wi-Fi" }, email: { label: "Email" } }
     const cases = [
