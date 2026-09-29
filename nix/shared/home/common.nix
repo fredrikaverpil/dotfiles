@@ -110,7 +110,6 @@ in
       dust
       fd
       gnumake
-      # pre-commit # requires swift, which is problematic and very expensive to build on macOS
       ripgrep
       ugrep
 
@@ -129,7 +128,6 @@ in
       grpcurl
       grpcui
       postgresql
-      # mysql80  # Temporarily disabled due to boost build failure on macOS
 
       # ========================================================================
       # Media, AI & Utilities
