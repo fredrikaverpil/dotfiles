@@ -94,7 +94,7 @@ in
     PROTON_PASS_LINUX_KEYRING = "dbus";
   };
 
-  host.extraSystemPackages = with pkgs; [
+  environment.systemPackages = with pkgs; [
     kdePackages.dolphin
     # Dolphin thumbnails for images and videos.
     kdePackages.kio-extras

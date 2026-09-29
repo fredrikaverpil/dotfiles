@@ -102,7 +102,7 @@ in {
     trustedInterfaces = ["tailscale+"];
   };
 
-  host.extraServices = {
+  services = {
     # SSH service for remote access
     # Accessible via local network and Tailscale VPN only (not internet-exposed)
     openssh = {
@@ -318,7 +318,7 @@ in {
   # HOST-SPECIFIC EXTENSIONS
   # ========================================================================
   # Host-specific system packages for rpi5-homelab
-  host.extraSystemPackages = with pkgs;
+  environment.systemPackages = with pkgs;
     [
       # Essential system administration tools
       # These are kept minimal as most tools are managed via home-manager

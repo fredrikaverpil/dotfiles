@@ -8,22 +8,10 @@
 }:
 {
   options = {
-    host.extraSystemPackages = lib.mkOption {
-      type = lib.types.listOf lib.types.package;
-      default = [ ];
-      description = "Additional system packages for this host";
-    };
-
     host.chromiumFeatures = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
       description = "Extra Chromium --enable-features for this host";
-    };
-
-    host.extraServices = lib.mkOption {
-      type = lib.types.attrs;
-      default = { };
-      description = "Additional services configuration for this host";
     };
   };
 
@@ -52,17 +40,8 @@
     # Note: User configuration is handled by lib/users.nix
 
     # System-level packages
-    environment.systemPackages =
-      with pkgs;
-      [
-        vim # for recovery
-      ]
-      ++ config.host.extraSystemPackages;
-
-    # Apply additional services configuration
-    services = lib.mkMerge [
-      { } # Default empty services
-      config.host.extraServices
+    environment.systemPackages = with pkgs; [
+      vim # for recovery
     ];
   };
 }

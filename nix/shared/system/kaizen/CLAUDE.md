@@ -9,7 +9,7 @@ at once, so there is no promotion step and no drift to diff for.
 What stays per host, in `nix/hosts/<host>/`: hardware and firmware settings
 (`hardware-configuration.nix`, disk and resume devices, GPU drivers, sleep
 policy), host-only programs and packages (`programs.*` set directly in
-`configuration.nix`, `host.extraSystemPackages`), work-only
+`configuration.nix`, `environment.systemPackages`), work-only
 configuration (the `einride` submodule and what it pulls in), and the mpv
 decode profile in `stow/host/<host>/`.
 
