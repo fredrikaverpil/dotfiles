@@ -45,6 +45,20 @@ function rowFor(items, id, level) {
   }
 }
 
+// Apps carry their own identity (entry.id); everything else launched from the
+// static tree is keyed by its menu id. Rows never carry a count field of
+// their own, so this stays a pure lookup rather than shaping the row.
+function frecency(row, counts) {
+  var id = row.entry ? row.entry.id : row.id
+  return (counts || {})[id] || 0
+}
+
+// Frecency only reorders items that have actually been launched: unlaunched
+// rows tie at zero and fall back to whatever order they were already in.
+function byFrecency(counts) {
+  return function(a, b) { return frecency(b, counts) - frecency(a, counts) }
+}
+
 // Hyphens are ignored, so "wifi" finds "Wi-Fi".
 function searchable(text) {
   return String(text || "").toLowerCase().replace(/-/g, "")
@@ -63,7 +77,7 @@ function rowsFrom(providers, name, detail) {
   return source ? source(detail || "") : []
 }
 
-function rowsFor(items, level, query, providers) {
+function rowsFor(items, level, query, providers, counts) {
   var item = items[level]
   var normalizedQuery = String(query || "").toLowerCase()
   var filterMatches = function(row) { return matches(row, normalizedQuery) }
@@ -73,13 +87,13 @@ function rowsFor(items, level, query, providers) {
     return normalizedQuery.length === 0 ? rows : rows.filter(filterMatches)
   }
   if (normalizedQuery.length === 0) {
-    return childrenOf(items, level).map(function(id) { return rowFor(items, id, level) })
+    return childrenOf(items, level).map(function(id) { return rowFor(items, id, level) }).sort(byFrecency(counts))
   }
 
   var found = descendantsOf(items, level).map(function(id) { return rowFor(items, id, level) })
   if (level === "root") found = found.concat(rowsFrom(providers, "apps", "Apps"))
   return found.filter(function(row) { return row.enabled && filterMatches(row) })
-    .sort(function(a, b) { return (a.detail ? 1 : 0) - (b.detail ? 1 : 0) })
+    .sort(function(a, b) { return byFrecency(counts)(a, b) || (a.detail ? 1 : 0) - (b.detail ? 1 : 0) })
 }
 
 function selectFirstEnabled(rows) {
