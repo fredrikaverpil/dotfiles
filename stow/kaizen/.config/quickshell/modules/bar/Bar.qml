@@ -303,8 +303,10 @@ Scope {
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: visible ? 4 : 0
         visible: bar.shell.systemService.alert !== null
+        // A plain label.
+        enabled: false
+        foreground: bar.shell.palette.rose
         label: bar.shell.systemService.alert ? bar.shell.systemService.alert.icon : ""
-        onActivated: bar.shell.systemService.openMonitor()
       }
 
       // Separates app tray icons from the indicators and system buttons.

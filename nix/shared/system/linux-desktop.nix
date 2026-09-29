@@ -140,7 +140,6 @@ in
       # Trims recordings by stream copy, without re-encoding.
       losslesscut-bin
       resources
-      # The kaizen shell's system alert indicator opens it.
       mission-center
       # niri cannot mirror outputs; wl-mirror shows one in a fullscreen window.
       # TODO: add mirror controls to kaizen's Display panel.

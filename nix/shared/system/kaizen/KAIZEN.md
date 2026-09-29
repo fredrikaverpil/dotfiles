@@ -95,7 +95,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | network | [NetworkManager], `ip -j` | button | Settings › Network | `network` |
 | nightlight | [wl-gammarelay-rs] over D-Bus, the weather location for the solar position | – | Settings › Display › Nightlight | `nightlight` |
 | recording | [gpu-screen-recorder], [grim], [satty], [PipeWire] | recording indicator | Trigger › Record, Pause, Stop, Screenshot (region, desktop, window) | `recording` |
-| system | [hwmon], `/proc` load | monitor button | Settings › Display | `system`, `display` |
+| system | [hwmon], `/proc` load | alert indicator | Settings › Display | `system`, `display` |
 | timezone | [timedated] via `timedatectl`, `zdump` for the DST rules | time button | Settings › Clock | `timezone` |
 | weather | [met.no locationforecast] | button | Settings › Weather | `weather` |
 | notifications | [Desktop Notifications] server | bell button | Settings › Notifications | `notifications` |
@@ -183,8 +183,8 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
     Settings node as a context menu. The date is one only when a plugin takes
     it over, and opens the plugin's node; otherwise it is a plain label.
   - Indicators, shown only off the default state: left-click acts on it
-    (stops the recording, re-enables idle locking, resets the layout, opens
-    the system monitor).
+    (stops the recording, re-enables idle locking, resets the layout). The
+    system alert is a plain label.
   - Tray items: the app's own activation and menu.
 - A plugin (`Ui/Plugin.qml`) adds launcher items, its own panels and IPC
   targets, and may take over the date button (`barActions.date`):
