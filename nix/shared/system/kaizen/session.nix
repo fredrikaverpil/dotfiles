@@ -210,6 +210,9 @@ in
       powerOnBoot = true;
     };
 
+    # The shell's network service and panel drive NetworkManager through nmcli.
+    networking.networkmanager.enable = true;
+
     # GTK3 needs the portal to follow the dconf theme; Qt uses the GTK platform theme.
     environment.sessionVariables = {
       NIXOS_OZONE_WL = "1";
