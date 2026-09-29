@@ -69,15 +69,6 @@
   # Daemon for testcontainers.
   virtualisation.docker.enable = true;
 
-  # CUPS on loopback only; Avahi discovers driverless (IPP Everywhere) printers.
-  services.printing.enable = true;
-  services.avahi = {
-    enable = true;
-    nssmdns4 = true;
-    openFirewall = true;
-  };
-  programs.system-config-printer.enable = true;
-
   host.extraServices.openssh = {
     enable = true;
     settings = {
