@@ -6,44 +6,10 @@ Installing from scratch: [macOS](README_MACOS_INSTALL.md),
 
 ## Nix management responsibilities
 
-<details>
-<summary>Repo structure</summary>
-
-```txt
-├── nix/                             # Nix configurations
-│   ├── hosts/                       # Host-specific configurations
-│   │   └── $host/                   # Individual host directory
-│   │       ├── configuration.nix    # System settings
-│   │       ├── hardware-configuration.nix  # Hardware config (NixOS)
-│   │       └── users/
-│   │           └── $username.nix    # User config
-│   ├── lib/                         # Helper functions
-│   │   ├── default.nix              # Library entry point
-│   │   ├── systems.nix              # System configuration helpers
-│   │   └── users.nix                # User configuration helpers
-│   └── shared/                      # Shared configurations
-│       ├── home/
-│       │   ├── common.nix           # Cross-platform user packages
-│       │   ├── darwin.nix           # macOS user config
-│       │   └── linux.nix            # Linux user config
-│       ├── overlays/
-│       │   └── default.nix          # Overlay entry point
-│       └── system/
-│           ├── common.nix           # Cross-platform system packages
-│           ├── darwin.nix           # macOS system config + Homebrew
-│           └── linux.nix            # Linux system config
-├── nvim-fredrik/                    # Neovim configuration
-├── shell/                           # Shell configuration
-│   ├── bin/                         # Custom shell scripts
-│   ├── aliases.sh                   # Shell aliases
-│   ├── exports.sh                   # Environment variables
-│   └── sourcing.sh                  # Shell sourcing logic
-├── stow/                            # GNU Stow dotfiles
-├── extras/                          # One-off platform-specific extras and legacy configs
-└── flake.nix                        # Nix flake configuration
-```
-
-</details>
+The layout is built for flexibility: each package or setting is declared once,
+in the narrowest scope that covers every host that wants it, from every host
+down to one host or one user. [nix/README.md](../nix/README.md) says which file
+that is.
 
 ### Components
 
