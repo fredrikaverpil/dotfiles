@@ -55,10 +55,6 @@ Item {
     alerts = Model.sustained(alertStarts, now)
   }
 
-  function openMonitor() {
-    Quickshell.execDetached(["uwsm-app", "--", "io.missioncenter.MissionCenter.desktop"])
-  }
-
   Component.onCompleted: sample()
 
   // Alerts use the previous tick's values, loaded right after it.

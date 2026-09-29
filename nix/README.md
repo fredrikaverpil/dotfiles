@@ -11,9 +11,7 @@ Go down the list; the first match wins.
    the shell, the session or a bind in `stow/kaizen/` needs it to do its job.
    That covers the bar and its panels, the launcher, the lock, recording,
    screenshots and wallpapers, and the purpose-built apps kaizen hands tasks to
-   (bluetui, nm-connection-editor). An app kaizen only opens as a convenience,
-   such as Mission Center from the system alert indicator, stays an app until
-   kaizen integrates it.
+   (bluetui, nm-connection-editor).
 2. **kaizen plugin**: optional; the shell runs without it. It goes in
    `shared/system/kaizen/plugins/<name>/` when more than one host imports it,
    `hosts/<host>/kaizen-plugins/<name>/` when one does. Written for kaizen: a
