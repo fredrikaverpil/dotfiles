@@ -48,3 +48,9 @@ neither.
 On a kaizen host, wrap Chromium and Electron apps with
 `pkgs.withGnomeLibsecret` (`shared/overlays/`); without it they cannot keep
 logins in gnome-keyring.
+
+An app starts with the session through XDG autostart:
+`pkgs.makeAutostartItem` next to it in the package list. UWSM runs each entry
+as `app-<name>@autostart.service`. kaizen holds autostart until its tray is up,
+so a tray icon registers on the first try. Write a systemd user unit only for a
+daemon that needs restarts, ordering or start checks, which XDG autostart lacks.
