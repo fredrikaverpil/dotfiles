@@ -117,7 +117,6 @@ in
       # Git & Version Control
       # ========================================================================
       gh
-      jujutsu
       lazygit
       lazydocker
       docker-client # Docker CLI only (no engine); routes to whatever DOCKER_HOST points at
@@ -130,12 +129,11 @@ in
       postgresql
 
       # ========================================================================
-      # Media, AI & Utilities
+      # Media & Utilities
       # ========================================================================
       asciinema
       exiftool
       imagemagick
-      llama-cpp
 
       # ========================================================================
       # Infrastructure & Cloud
