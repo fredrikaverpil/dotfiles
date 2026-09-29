@@ -109,6 +109,7 @@ return {
         -- Applied per library root as well as to the workspace, so this prunes
         -- plugin trees too. Gitignore-style, matching at any depth.
         ignoreDir = {
+          ".direnv",
           ".pocket",
           ".tests",
           ".venv",
