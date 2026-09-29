@@ -163,15 +163,15 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 - A plugin (`Ui/Plugin.qml`) adds launcher items, its own panels and IPC
   targets, and may take over the date button (`barActions.date`):
   left-click calls the plugin, right-click opens its `plugins.<name>` node.
-  `plugins/hello/` is the minimal example.
+  `nix/hosts/renoir/kaizen-plugins/hello/` is the minimal example.
 - A plugin that needs a long-running backend brings its own daemon: its module
   adds the unit, and its QML queries the daemon's IPC. The calendar
   (`plugins/calendar/`) does this with [dcal].
-- A tray plugin is an app written for kaizen, with its own
-  [StatusNotifierItem] and menu (`plugins/hello-tray/`), so the tray and its
-  launcher level show it without shell code. Its unit starts it with the
-  session or from Apps. A third-party app with a tray icon is not a plugin;
-  the tray shows it anyway.
+- A tray plugin is an app written for kaizen, with its own [StatusNotifierItem]
+  and menu (`nix/hosts/renoir/kaizen-plugins/hello-tray/`), so the tray and its
+  launcher level show it without shell code. Its unit starts it with the session
+  or from Apps. A third-party app with a tray icon is not a plugin; the tray
+  shows it anyway.
 - `Ui/Compositor.qml` is the only path to niri.
 
 ## Session lifecycle

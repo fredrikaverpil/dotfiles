@@ -3,6 +3,6 @@
 {
   # Read from the checkout, so `qs ipc call shell reload` applies edits.
   host.kaizenPlugins = [
-    "${config.users.users.fredrik.home}/.dotfiles/nix/shared/system/kaizen/plugins/hello"
+    "${config.users.users.fredrik.home}/.dotfiles/nix/hosts/renoir/kaizen-plugins/hello"
   ];
 }

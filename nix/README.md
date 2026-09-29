@@ -15,9 +15,10 @@ Go down the list; the first match wins.
    such as Mission Center from the system alert indicator, stays an app until
    kaizen integrates it.
 2. **kaizen plugin**: `shared/system/kaizen/plugins/<name>/`, imported by the
-   hosts that want it. Written for kaizen: a `Plugin.qml`, a daemon the shell
-   queries, or a tray app built for the shell. A third-party app with a tray
-   icon is an app, not a plugin; the tray shows it anyway.
+   hosts that want it, or `hosts/<host>/kaizen-plugins/<name>/` when one host
+   does. Written for kaizen: a `Plugin.qml`, a daemon the shell queries, or a
+   tray app built for the shell. A third-party app with a tray icon is an app,
+   not a plugin; the tray shows it anyway.
 3. **Hardware class**: `shared/system/thinkpad.nix`.
 4. **Anything else is an app or a host setting**, and kaizen does not decide
    it. Pick the scope, then system or user.
