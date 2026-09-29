@@ -26,10 +26,17 @@ Personal dotfiles, managed in three layers:
 > - The `flake.nix` is designed to set up the machine based on its hostname.
 
 ```sh
+# Clone to ~/.dotfiles, where the rebuild stows from
+git clone https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
+
 # Rebuild system + packages + dotfiles (reproducible, uses flake.lock)
 sudo darwin-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"  # macOS
 sudo nixos-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"   # NixOS
-nh os switch  # wily: keeps its private submodule, see nix/hosts/wily/README.md
+
+# After the first switch, nh rebuilds with a diff; on wily it also keeps the
+# private submodule, see nix/hosts/wily/README.md
+nh darwin switch  # macOS
+nh os switch      # NixOS
 
 # Update ALL flake inputs, then rebuild
 nix flake update
