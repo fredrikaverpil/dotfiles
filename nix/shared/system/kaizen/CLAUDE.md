@@ -314,6 +314,12 @@ PID.
   publishes `WAYLAND_DISPLAY` to the user manager. Bind shell/sleep-lock units
   to compositor-specific targets; ordering after `graphical-session.target`
   creates a cycle.
+- XDG autostart apps start only once the shell's StatusNotifierWatcher is on
+  the bus (`kaizen-tray-ready.service`), because Electron apps look for it once
+  and never retry. Never gate `quickshell.service` or anything before
+  `graphical-session.target` on the tray: the shell registers the watcher once
+  its config loads, which waits for `xdg-desktop-portal`, and the portal is
+  ordered after `graphical-session.target`.
 - Screen sharing from other apps goes through `xdg-desktop-portal-gnome`,
   which needs the Mutter D-Bus services that niri serves only as
   `niri --session`. Session mode also serves `org.freedesktop.ScreenSaver`

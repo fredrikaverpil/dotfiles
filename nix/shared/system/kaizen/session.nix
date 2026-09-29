@@ -225,6 +225,22 @@ in
       };
     };
 
+    # Holds XDG autostart apps (UWSM orders them after this target) until the tray's
+    # StatusNotifierWatcher is up; Electron apps look for it once and never retry.
+    # The shell registers it once its config loads, which waits for xdg-desktop-portal,
+    # itself ordered after graphical-session.target: waiting in quickshell.service would deadlock.
+    systemd.user.services.kaizen-tray-ready = {
+      description = "Wait for the Quickshell tray";
+      before = [ "wayland-session-xdg-autostart@niri.target" ];
+      wantedBy = [ "wayland-session-xdg-autostart@niri.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = "${pkgs.bash}/bin/bash -c 'until ${pkgs.systemd}/bin/busctl --user status org.kde.StatusNotifierWatcher >/dev/null 2>&1; do ${pkgs.coreutils}/bin/sleep 0.2; done'";
+        # A tray that never comes up delays autostart apps, never blocks them.
+        TimeoutStartSec = 10;
+      };
+    };
+
     # Lid close and the power key suspend via logind; this delay inhibitor locks
     # the shell first and releases once the lock reports secure.
     systemd.user.services.kaizen-sleep-lock = {
