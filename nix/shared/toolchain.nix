@@ -10,7 +10,7 @@
 # compiler automatically.
 #
 # NOTE: the standalone-package managers uv and deno are intentionally NOT here.
-# They live on the base PATH (home.packages in darwin.nix/linux.nix) so they
+# They live on the base PATH (home.packages in home/common.nix) so they
 # work in a plain shell (uv venv auto-activation, deno-installed npm tools) and
 # are inherited into both Neovim and this devshell. Keeping uv out of the list
 # also keeps it out of the Neovim context (see commit "comment out uv inside

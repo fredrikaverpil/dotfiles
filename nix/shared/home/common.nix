@@ -94,13 +94,13 @@ in
       # Development & Language Toolchains
       # ========================================================================
       # Language-specific
-      # NOTE: uv is installed per-platform (darwin.nix / linux.nix), since the
-      # stable-pin uv on NixOS is too old for the uv.toml syntax in use.
-      #
       # NOTE: Deno is the preferred runtime for one-off npm CLI runs
       # (`deno run -A npm:<pkg>`). Unstable for the latest Node-compat fixes
       # (no-op on macOS, where pkgs IS unstable).
       unstable.deno
+      # Unstable: the Pi's pinned uv is too old for the relative-date
+      # `exclude-newer` in stow/shared/.config/uv/uv.toml.
+      unstable.uv
 
       # Generic development
       bfs
