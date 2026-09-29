@@ -9,18 +9,21 @@ output "eDP-1" {
     position x=0 y=0
 }
 
+// TV at work.
 // Above, centered.
 output "LG Electronics LG SIGNAGE 0x01010101" {
     scale 1.2
     position x=-640 y=-1800
 }
 
+// Work monitor.
 // Right, bottoms aligned.
 output "Dell Inc. DELL P3221D GN2ZQ83" {
     scale 1
     position x=1920 y=-240
 }
 
+// Home 4k monitor.
 // Left, tops aligned.
 output "Dell Inc. DELL U2723QE 13B95P3" {
     scale 1.2
