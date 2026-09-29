@@ -64,8 +64,6 @@
   networking.networkmanager.enable = true;
   networking.firewall.allowedTCPPorts = [ 22 ];
 
-  services.tailscale.enable = true;
-
   # Daemon for testcontainers.
   virtualisation.docker.enable = true;
 
