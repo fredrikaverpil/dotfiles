@@ -94,19 +94,6 @@ in
     PROTON_PASS_LINUX_KEYRING = "dbus";
   };
 
-  systemd.user.services.gitify = {
-    description = "Gitify";
-    partOf = [ "graphical-session.target" ];
-    # The kaizen shell hosts the StatusNotifierWatcher its tray icon registers with.
-    after = [ "quickshell.service" ];
-    wantedBy = [ "graphical-session.target" ];
-    serviceConfig = {
-      ExecStart = lib.getExe' (pkgs.withGnomeLibsecret pkgs.gitify) "gitify";
-      Restart = "on-failure";
-      Slice = "app.slice";
-    };
-  };
-
   host.extraSystemPackages = with pkgs; [
     kdePackages.dolphin
     # Dolphin thumbnails for images and videos.
@@ -119,6 +106,10 @@ in
     ffmpegthumbnailer # Nautilus video thumbnails.
     sushi # Nautilus quick preview (Space).
     (withGnomeLibsecret gitify)
+    (makeAutostartItem {
+      name = "gitify";
+      package = withGnomeLibsecret gitify;
+    })
     gnome-calculator
     # Chromium picks its password store per desktop; switching stores drops cookies and logins.
     # The last --enable-features wins, so repeat the wrapper's WaylandWindowDecorations.
