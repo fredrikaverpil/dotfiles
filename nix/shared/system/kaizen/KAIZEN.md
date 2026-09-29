@@ -47,9 +47,35 @@ flowchart BT
   HW --> SYS --> WM --> SHELL
 ```
 
-Each layer calls downward only. Nix (`session.nix`, `thinkpad.nix`) owns the
-two lower layers and the systemd units; Stow (`stow/kaizen/`) owns compositor
-config and QML. Both are shared by every kaizen host.
+Each layer calls downward only.
+
+## Where it lives
+
+Nix holds what needs a system module, root or the store: the two lower layers,
+the units and the packages, applied on rebuild. Stow holds files edited in
+place, live on save: the compositor config and the shell's QML.
+
+| Part | Path | Reaches |
+| --- | --- | --- |
+| Session: niri under UWSM, portals, PAM, units, packages the shell runs | `nix/shared/system/kaizen/session.nix` | every kaizen host |
+| Compositor config, the shell's QML | `stow/kaizen/` | every kaizen host |
+| Plugin more than one host imports | `nix/shared/system/kaizen/plugins/<name>/` | the hosts importing it |
+| Plugin one host imports | `nix/hosts/<host>/kaizen-plugins/<name>/`, or a private submodule such as wily's `einride` | that host |
+| ThinkPad hardware the shell reads (thresholds, keyd, micmute LED); not kaizen | `nix/shared/system/thinkpad.nix` | ThinkPad hosts |
+| Hardware, sleep policy, output layout, host-only programs | `nix/hosts/<host>/`, `stow/host/<host>/` | that host |
+
+- Core is what kaizen needs to work as designed; every kaizen host runs it. A
+  plugin is optional: the shell runs without it, however many hosts import it.
+- Importing `session.nix` makes a host a kaizen host: it writes `/etc/kaizen`,
+  and `dotfiles-stow` stows `stow/kaizen/` only where that exists. So
+  `stow/kaizen/` reaches every kaizen host or none, and a plugin keeps its QML
+  beside its Nix module instead. The module lists its directory in
+  `host.kaizenPlugins`, read in place from the checkout.
+- Nix hands the shell values only through `quickshell.service`'s environment
+  (`KAIZEN_PLUGINS`, `NOTIFICATION_RULES`, `EMOJI_*`).
+- Apps are not kaizen's: `nix/README.md` says where they go.
+- QML paths here (`modules/…`, `Ui/…`) are under
+  `stow/kaizen/.config/quickshell/`; `niri/…` is under `stow/kaizen/.config/`.
 
 ## Services to surfaces
 
@@ -166,7 +192,7 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   `nix/hosts/renoir/kaizen-plugins/hello/` is the minimal example.
 - A plugin that needs a long-running backend brings its own daemon: its module
   adds the unit, and its QML queries the daemon's IPC. The calendar
-  (`plugins/calendar/`) does this with [dcal].
+  (`nix/shared/system/kaizen/plugins/calendar/`) does this with [dcal].
 - A tray plugin is an app written for kaizen, with its own [StatusNotifierItem]
   and menu (`nix/hosts/renoir/kaizen-plugins/hello-tray/`), so the tray and its
   launcher level show it without shell code. Its unit starts it with the session
@@ -229,6 +255,6 @@ closes niri's readiness-before-`WAYLAND_DISPLAY` race.
    `modules/panels/`; a protocol-driven surface with no other consumer of its
    state (lock, notifications, polkit) keeps both in `modules/<name>/`.
    Packages/units/PAM → `session.nix`, compositor → `Ui/compositors/` and
-   `niri/config.kdl`, IPC target for every new action. A shell extension only
-   some hosts want is a plugin (`host.kaizenPlugins`). An app is not kaizen's
+   `niri/config.kdl`, IPC target for every new action. An optional shell
+   extension is a plugin, placed as in Where it lives. An app is not kaizen's
    to install: `nix/README.md` says where it goes.

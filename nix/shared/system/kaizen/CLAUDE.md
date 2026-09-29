@@ -1,17 +1,9 @@
 # niri + Quickshell desktop
 
-This file documents the niri + Quickshell desktop and lives with it. Every
-host running it shares one copy of everything: `session.nix` in this
-directory, `../thinkpad.nix` next to it, and the compositor config and QML in
-`stow/kaizen/`. An edit lands on every kaizen host
-at once, so there is no promotion step and no drift to diff for.
-
-What stays per host, in `nix/hosts/<host>/`: hardware and firmware settings
-(`hardware-configuration.nix`, disk and resume devices, GPU drivers, sleep
-policy), host-only programs and packages (`programs.*` set directly in
-`configuration.nix`, `environment.systemPackages`), work-only
-configuration (the `einride` submodule and what it pulls in), and the mpv
-decode profile and niri output layout in `stow/host/<host>/`.
+This file documents the niri + Quickshell desktop and lives with it.
+`KAIZEN.md` › Where it lives says where each part is and which hosts it
+reaches. Every kaizen host shares one copy of the core, so an edit lands on
+all of them at once: there is no promotion step and no drift to diff for.
 
 To try another shell, compositor or panel on one machine, use a git branch or
 worktree, not a per-host copy of the tree.
@@ -45,28 +37,15 @@ previous states. Explain a declaration next to it, not here.
 
 ## Architecture
 
-- `session.nix` owns the session: niri under UWSM, portals, PAM, the shell's
-  systemd units, the pre-suspend lock and the packages the shell runs.
-  `stow/kaizen/` owns compositor configuration and QML. Apps are not kaizen's:
-  `../linux-desktop.nix` holds those every desktop host wants, and
-  `stow/host/renoir/.config/niri/apps.kdl`, which wily symlinks, their niri
-  rules and binds.
+- Apps are not kaizen's: `nix/README.md` says where they and their niri rules
+  and binds go.
 - `shell.qml` wires services and surfaces. Views belong in `modules/panels/`;
   daemon/process state belongs in `modules/services/`.
-- Plugins extend the shell for the hosts that want them: a directory with its
-  Nix module and a `Plugin.qml` rooted in `Ui/Plugin.qml`, listed in
-  `host.kaizenPlugins` (`KAIZEN_PLUGINS`) and imported by the hosts that want
-  it. Quickshell does not watch them: apply an edit with
-  `qs ipc call shell reload`. They live in `plugins/`, or in
-  `nix/hosts/<host>/kaizen-plugins/` when one host wants them, one directory
-  each; a private one can live anywhere, such as the `einride` submodule.
-  `qml-test` runs the calendar's tests; `qml-lint` skips plugins (their
-  `import qs.Ui` resolves only inside Quickshell). A tray plugin has no
-  `Plugin.qml`: it is an app written for kaizen, with its own StatusNotifierItem
-  and menu, which the tray shows. Its module adds a user unit, started with the
-  session when `autostart` is set, and a desktop entry that starts the unit from
-  Apps (`nix/hosts/renoir/kaizen-plugins/hello-tray/`). A third-party app with a
-  tray icon is not a plugin (`nix/README.md`).
+- Plugins are described in `KAIZEN.md`. Quickshell does not watch them: apply
+  an edit with `qs ipc call shell reload`. `qml-test` runs the calendar's
+  tests; `qml-lint` skips plugins (their `import qs.Ui` resolves only inside
+  Quickshell). A tray plugin's user unit starts with the session when its
+  module sets `autostart`.
 - Interactive surfaces come in three kinds; pick by what opens them:
   - Launcher (`modules/menu/`): a large `Ui.Panel` drilling down through
     levels; the keyboard entry point to everything, tray menus included.
