@@ -9,7 +9,7 @@ set -e
 
 case "$1" in
 -h | --help)
-  echo "usage: kaizen-apps    open the everyday apps that are not running yet"
+  echo "usage: wily-apps    open the everyday apps that are not running yet"
   exit 0
   ;;
 esac
@@ -28,14 +28,12 @@ spawn_missing() {
 
 spawn_missing '^zen-beta$' zen-beta
 spawn_missing '^slack$' slack
-if [ "$(hostname)" = wily ]; then
-  spawn_missing '^chrome-linear\.app__-' \
-    chromium --profile-directory=Work --app=https://linear.app/
-  spawn_missing '^chrome-calendar\.google\.com__-' \
-    chromium --profile-directory=Work --app=https://calendar.google.com/
-  spawn_missing '^chrome-meet\.google\.com__-' \
-    chromium --profile-directory=Work --app=https://meet.google.com/
-fi
+spawn_missing '^chrome-linear\.app__-' \
+  chromium --profile-directory=Work --app=https://linear.app/
+spawn_missing '^chrome-calendar\.google\.com__-' \
+  chromium --profile-directory=Work --app=https://calendar.google.com/
+spawn_missing '^chrome-meet\.google\.com__-' \
+  chromium --profile-directory=Work --app=https://meet.google.com/
 spawn_missing '(?i)^spotify$' spotify
 spawn_missing '^signal$' signal-desktop
 spawn_missing '^proton-pass$' proton-pass
