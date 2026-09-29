@@ -134,6 +134,7 @@ in
     # The kaizen shell's system alert indicator opens it.
     mission-center
     # niri cannot mirror outputs; wl-mirror shows one in a fullscreen window.
+    # TODO: add mirror controls to kaizen's Display panel.
     wl-mirror
     (withGnomeLibsecret inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-desktop)
     (withGnomeLibsecret proton-pass)
