@@ -7,7 +7,7 @@
 {
   imports = [
     ../../../shared/home/linux.nix
-    ../../../shared/home/webapps.nix
+    ../../../shared/home/desktop.nix
   ];
 
   home.stateVersion = "26.05";

@@ -27,7 +27,7 @@ Go down the list; the first match wins.
 | every host                    | `shared/system/common.nix`       | `shared/home/common.nix`        |
 | every NixOS host, servers too | `shared/system/linux.nix`        | `shared/home/linux.nix`         |
 | every macOS host              | `shared/system/darwin.nix`       | `shared/home/darwin.nix`        |
-| every NixOS desktop host      | `shared/system/desktop.nix`      | `shared/home/webapps.nix`       |
+| every NixOS desktop host      | `shared/system/desktop.nix`      | `shared/home/desktop.nix`       |
 | one host                      | `hosts/<host>/configuration.nix` | `hosts/<host>/users/<user>.nix` |
 
 - **System**: GUI apps, and anything that needs a NixOS or nix-darwin module

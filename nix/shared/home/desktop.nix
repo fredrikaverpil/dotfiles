@@ -1,6 +1,7 @@
-# Chromium web apps on the personal (Default) profile. The explicit
-# --profile-directory stops Chromium from opening the last-used profile.
+# Home settings every NixOS desktop host wants.
 {
+  # Chromium web apps on the personal (Default) profile. The explicit
+  # --profile-directory stops Chromium from opening the last-used profile.
   xdg.desktopEntries = {
     youtube = {
       name = "YouTube";
