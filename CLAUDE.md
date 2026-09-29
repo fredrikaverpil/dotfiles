@@ -62,12 +62,8 @@ and **GNU Stow** for dotfile symlinking.
   anchored to the nixpkgs pinned by the `nixos-raspberrypi` input (its
   nixpkgs, `home-manager-rpi` and `disko` all follow that pin — do not make
   them follow another nixpkgs, or kernel binary cache hits are lost)
-- **Module scope**: modules are split by concern. Shared ones live in
-  `nix/shared/system/` (`desktop.nix`, `kaizen/session.nix`, `thinkpad.nix`)
-  and are imported by every host that wants them; host-only config stays in
-  `nix/hosts/<host>/configuration.nix`. Use system config only when a NixOS or
-  nix-darwin module, or root-level integration, is needed; portable user
-  tooling goes in home-manager (`nix/shared/home/`)
+- **Module scope**: `nix/README.md` decides where a package or setting goes
+  (kaizen, a shared scope, one host or one user). Read it before adding one
 - **Configuration helpers**: Use `lib.mkDarwin` and `lib.mkRpiNixos` functions
   from `nix/lib/`
 - **Host discovery**: Configurations auto-match hostname from
