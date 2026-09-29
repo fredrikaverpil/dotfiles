@@ -47,7 +47,7 @@ import neither. The two stay independent: `linux-desktop.nix` sets no kaizen
 option, and kaizen declares everything it runs, even a tool another scope also
 installs (`jq`, `imagemagick`). kaizen's own settings, such as its notification
 rules, may name apps; a host adds to them in its own configuration.
-`shared/system/kaizen/KAIZEN.md` maps kaizen's own parts, Nix and Stow.
+`../KAIZEN.md` maps kaizen's own parts, Nix and Stow.
 
 An app's niri window rules and binds go in
 `stow/host/renoir/.config/niri/apps.kdl`, which wily symlinks, or the host's
