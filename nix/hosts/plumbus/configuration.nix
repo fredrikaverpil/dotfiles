@@ -39,6 +39,7 @@ in
 
   host.extraCasks = [
     "google-chrome"
+    "obsidian"
     "raycast"
     "utm"
   ];

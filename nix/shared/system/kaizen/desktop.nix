@@ -208,7 +208,6 @@ in
     wl-mirror
     wtype
     (withGnomeLibsecret inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-desktop)
-    (withGnomeLibsecret obsidian)
     (withGnomeLibsecret proton-pass)
     proton-pass-cli
     # uwsm-app rejects the upstream entry ID, which contains a space.
