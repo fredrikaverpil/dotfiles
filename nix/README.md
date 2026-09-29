@@ -43,11 +43,11 @@ wants it, move it to that scope's shared file rather than repeating it.
 
 A desktop host imports `shared/system/linux-desktop.nix` for its apps and opts
 into kaizen with `shared/system/kaizen/session.nix` and any plugins. Servers
-import neither. The two stay independent: kaizen installs no app, and
-`linux-desktop.nix` sets no kaizen option. kaizen's own settings, such as its
-notification rules, may name apps; a host adds to them in its own
-configuration. `shared/system/kaizen/KAIZEN.md` maps kaizen's own parts, Nix
-and Stow.
+import neither. The two stay independent: `linux-desktop.nix` sets no kaizen
+option, and kaizen declares everything it runs, even a tool another scope also
+installs (`jq`, `imagemagick`). kaizen's own settings, such as its notification
+rules, may name apps; a host adds to them in its own configuration.
+`shared/system/kaizen/KAIZEN.md` maps kaizen's own parts, Nix and Stow.
 
 An app's niri window rules and binds go in
 `stow/host/renoir/.config/niri/apps.kdl`, which wily symlinks, or the host's

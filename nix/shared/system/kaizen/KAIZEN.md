@@ -57,7 +57,7 @@ place, live on save: the compositor config and the shell's QML.
 
 | Part | Path | Reaches |
 | --- | --- | --- |
-| Session: niri under UWSM, portals, PAM, units, packages the shell runs | `nix/shared/system/kaizen/session.nix` | every kaizen host |
+| Session: niri under UWSM, portals, PAM, units, the services and packages the shell and its binds use, notification rules | `nix/shared/system/kaizen/session.nix` | every kaizen host |
 | Compositor config, the shell's QML | `stow/kaizen/` | every kaizen host |
 | Plugin more than one host imports | `nix/shared/system/kaizen/plugins/<name>/` | the hosts importing it |
 | Plugin one host imports | `nix/hosts/<host>/kaizen-plugins/<name>/`, or a private submodule such as wily's `einride` | that host |
@@ -254,7 +254,8 @@ closes niri's readiness-before-`WAYLAND_DISPLAY` race.
 4. Then: daemon/process state → `modules/services/`, view →
    `modules/panels/`; a protocol-driven surface with no other consumer of its
    state (lock, notifications, polkit) keeps both in `modules/<name>/`.
-   Packages/units/PAM → `session.nix`, compositor → `Ui/compositors/` and
-   `niri/config.kdl`, IPC target for every new action. An optional shell
-   extension is a plugin, placed as in Where it lives. An app is not kaizen's
-   to install: `nix/README.md` says where it goes.
+   Packages/units/PAM → `session.nix` (even a package another scope also
+   installs), compositor → `Ui/compositors/` and `niri/config.kdl`, IPC target
+   for every new action. An optional shell extension is a plugin, placed as in
+   Where it lives. An app is not kaizen's to install: `nix/README.md` says where
+   it goes.
