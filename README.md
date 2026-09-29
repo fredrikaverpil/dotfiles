@@ -19,8 +19,10 @@ Personal dotfiles, managed in three layers:
 
 > [!NOTE]
 >
-> - This requires having Nix installed. See
->   [the Nix README](extras/README_NIX.md).
+> - A fresh machine needs Nix and a first switch: see
+>   [macOS](extras/README_MACOS_INSTALL.md),
+>   [NixOS](extras/README_NIXOS_INSTALL.md) or
+>   [rpi5-homelab](nix/hosts/rpi5-homelab/README.md).
 > - The `flake.nix` is designed to set up the machine based on its hostname.
 
 ```sh
@@ -116,6 +118,8 @@ packages from the `llm-agents` flake input, upgraded via
 
 - Nix ❄️
   - [Where a package or setting goes](nix/README.md)
+  - [Nix config reference](extras/README_NIX.md) - inputs, sources,
+    troubleshooting
   - [kaizen](KAIZEN.md) - the niri + Quickshell desktop on `renoir` and `wily`
 - Neovim ⌨️
   - [My Neovim config](nvim-fredrik/README.md) - uses `vim.pack`

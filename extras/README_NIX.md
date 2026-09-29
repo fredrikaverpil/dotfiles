@@ -1,44 +1,8 @@
 # Nix config
 
-## Installation
-
-> [!IMPORTANT]
->
-> Make sure your terminal has full disk access on macOS before installing.
-
-```sh
-# Clone repo
-git clone https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
-cd ~/.dotfiles
-
-# Install Nix (Determinate Systems installer - enables flakes by default, better uninstall,
-# survives macOS updates, consistent installation across Linux/macOS)
-# Choose "Determinate Nix" when prompted (performance optimized, better error messages)
-# Learn more: https://determinate.systems/nix
-# IMPORTANT: choose "no" during install, so to install upstream Nix.
-curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
-
-# Set hostname to match a configuration in nix/hosts/
-# macOS: sudo scutil --set HostName <hostname>
-# Linux: sudo hostnamectl set-hostname <hostname>
-
-# Apply configuration
-# Linux (NixOS):
-sudo nixos-rebuild switch --flake ~/.dotfiles#$(hostname)
-
-# macOS (first time only):
-sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin -- switch --flake ~/.dotfiles#$(hostname)
-
-# After first-time setup, rebuild with:
-sudo darwin-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"  # macOS
-sudo nixos-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"   # NixOS
-```
-
-> [!TIP]
->
-> Installing NixOS from scratch (UTM VM on Apple Silicon, ThinkPad T14 G6) is
-> documented separately in
-> [the NixOS install README](README_NIXOS_INSTALL.md).
+Installing from scratch: [macOS](README_MACOS_INSTALL.md),
+[NixOS](README_NIXOS_INSTALL.md), and the Raspberry Pi in
+[its host README](../nix/hosts/rpi5-homelab/README.md).
 
 ## Nix management responsibilities
 
@@ -183,36 +147,6 @@ When updating `nixos-raspberrypi`:
    branch head instead, which breaks binary cache hits for the kernel).
 2. If their pin moved to a new NixOS release, bump the `home-manager-rpi`
    branch in `flake.nix` to the matching release.
-
-### macOS permissions
-
-If you get errors about `com.apple.universalaccess` or system settings during
-nix-darwin activation:
-
-1. **Grant Full Disk Access to your terminal:**
-   - Open System Settings > Privacy & Security > Full Disk Access
-   - Click + and add your terminal app (e.g.,
-     `/Applications/Utilities/Terminal.app`)
-   - Enable the checkbox for your terminal
-
-### SSL certificate issues (when choosing upstream Nix)
-
-If you get SSL certificate errors after switching from Determinate to upstream
-Nix:
-
-```sh
-# Fix broken certificate symlink
-sudo rm /etc/ssl/certs/ca-certificates.crt
-sudo ln -s /etc/ssl/cert.pem /etc/ssl/certs/ca-certificates.crt
-
-# Clean up leftover Determinate configuration
-sudo cp /etc/nix/nix.conf /etc/nix/nix.conf.backup
-sudo tee /etc/nix/nix.conf << 'EOF'
-extra-experimental-features = nix-command flakes
-max-jobs = auto
-ssl-cert-file = /etc/ssl/cert.pem
-EOF
-```
 
 ### General troubleshooting
 
