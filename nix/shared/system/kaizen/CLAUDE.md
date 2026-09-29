@@ -40,7 +40,7 @@ previous states. Explain a declaration next to it, not here.
   namespaces, D-Bus path, state files). It is host-agnostic; `renoir` and
   `wily` are only hostnames.
 - Nix comments carry the "why" for packages, portals, PAM, units and hardware
-  integration. Read `session.nix` here, `../desktop.nix` and
+  integration. Read `session.nix` here, `../linux-desktop.nix` and
   `../thinkpad.nix`, plus the host's `configuration.nix`, before asking.
 
 ## Architecture
@@ -48,7 +48,7 @@ previous states. Explain a declaration next to it, not here.
 - `session.nix` owns the session: niri under UWSM, portals, PAM, the shell's
   systemd units, the pre-suspend lock and the packages the shell runs.
   `stow/kaizen/` owns compositor configuration and QML. Apps are not kaizen's:
-  `../desktop.nix` holds those every desktop host wants, and
+  `../linux-desktop.nix` holds those every desktop host wants, and
   `stow/host/renoir/.config/niri/apps.kdl`, which wily symlinks, their niri
   rules and binds.
 - `shell.qml` wires services and surfaces. Views belong in `modules/panels/`;
@@ -92,7 +92,7 @@ previous states. Explain a declaration next to it, not here.
   `x-kde-passwordManagerHint`. Proton Pass and 1Password set it; a password
   manager that does not would be recorded.
 - SSH keys come from the Proton Pass app's agent (`SSH_AUTH_SOCK` in
-  `../desktop.nix`), so the app must be running. While it is locked, a key
+  `../linux-desktop.nix`), so the app must be running. While it is locked, a key
   request waits 60 s for an unlock, then fails as `Permission denied
   (publickey)`. The app asks by showing its window, which niri ignores for a
   mapped window (no focus, no urgency), so the prompt stays on workspace 7;

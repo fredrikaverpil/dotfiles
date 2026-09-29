@@ -23,13 +23,13 @@ Go down the list; the first match wins.
 4. **Anything else is an app or a host setting**, and kaizen does not decide
    it. Pick the scope, then system or user.
 
-| Wanted on                     | System                           | User                            |
-| ----------------------------- | -------------------------------- | ------------------------------- |
-| every host                    | `shared/system/common.nix`       | `shared/home/common.nix`        |
-| every NixOS host, servers too | `shared/system/linux.nix`        | `shared/home/linux.nix`         |
-| every macOS host              | `shared/system/darwin.nix`       | `shared/home/darwin.nix`        |
-| every NixOS desktop host      | `shared/system/desktop.nix`      | `shared/home/desktop.nix`       |
-| one host                      | `hosts/<host>/configuration.nix` | `hosts/<host>/users/<user>.nix` |
+| Wanted on                     | System                            | User                            |
+| ----------------------------- | --------------------------------- | ------------------------------- |
+| every host                    | `shared/system/common.nix`        | `shared/home/common.nix`        |
+| every NixOS host, servers too | `shared/system/linux.nix`         | `shared/home/linux.nix`         |
+| every macOS host              | `shared/system/darwin.nix`        | `shared/home/darwin.nix`        |
+| every NixOS desktop host      | `shared/system/linux-desktop.nix` | `shared/home/linux-desktop.nix` |
+| one host                      | `hosts/<host>/configuration.nix`  | `hosts/<host>/users/<user>.nix` |
 
 - **System**: GUI apps, and anything that needs a NixOS or nix-darwin module
   (a service, the firewall, a setuid wrapper). On macOS, GUI apps are Homebrew
@@ -42,11 +42,11 @@ wants it, move it to that scope's shared file rather than repeating it.
 
 ## Desktop hosts
 
-A desktop host imports `shared/system/desktop.nix` for its apps and opts into
-kaizen with `shared/system/kaizen/session.nix` and any plugins. Servers import
-neither. Apps build on kaizen, never the reverse: `desktop.nix` and the hosts
-set kaizen's options, such as its notification rules, and kaizen refers to no
-app.
+A desktop host imports `shared/system/linux-desktop.nix` for its apps and opts
+into kaizen with `shared/system/kaizen/session.nix` and any plugins. Servers
+import neither. Apps build on kaizen, never the reverse: `linux-desktop.nix` and
+the hosts set kaizen's options, such as its notification rules, and kaizen
+refers to no app.
 
 An app's niri window rules and binds go in
 `stow/host/renoir/.config/niri/apps.kdl`, which wily symlinks, or the host's
