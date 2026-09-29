@@ -65,10 +65,7 @@ in
       # Core System & Shell Tools
       # ========================================================================
       atuin
-      bash
       bat
-      coreutils # provides e.g. timout
-      curl
       eza
       fzf
       git
@@ -76,8 +73,6 @@ in
       htop
       jq
       unstable.neovim
-      ncurses
-      rsync
       stow # GNU Stow for dotfile management
       tmux
       tree
@@ -141,7 +136,6 @@ in
       # ========================================================================
       asciinema
       exiftool
-      gnused # GNU tools (for macOS compatibility)
       imagemagick
       llama-cpp
       slides

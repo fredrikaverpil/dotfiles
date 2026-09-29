@@ -11,7 +11,14 @@
   ];
 
   home.packages = with pkgs; [
-    gzip # GNU, over Apple's /usr/bin/gzip
+    # GNU or newer versions over macOS's own; NixOS's base system ships these.
+    bash
+    coreutils # provides e.g. timeout
+    curl
+    gnused
+    gzip
+    ncurses
+    rsync
     pngpaste # for obsidian, macOS-only
     uv
   ];
