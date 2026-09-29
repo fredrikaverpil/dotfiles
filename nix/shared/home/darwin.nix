@@ -11,6 +11,7 @@
   ];
 
   home.packages = with pkgs; [
+    gzip # GNU, over Apple's /usr/bin/gzip
     pngpaste # for obsidian, macOS-only
     uv
   ];
