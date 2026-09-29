@@ -136,8 +136,6 @@ in
       exiftool
       imagemagick
       llama-cpp
-      slides
-      chafa # Required for showing images in slides
 
       # ========================================================================
       # Infrastructure & Cloud
