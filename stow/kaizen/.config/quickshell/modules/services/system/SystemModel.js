@@ -35,6 +35,19 @@ function sustained(starts, now) {
   })
 }
 
+// The alert's icon, followed by its figure for cpu (busy percent) and memory
+// (used of total, GiB).
+function alertLabel(alert, sample) {
+  if (alert.kind === "cpu") return alert.icon + " " + Math.round(sample.cpu) + "%"
+  if (alert.kind === "memory")
+    return alert.icon + " " + gib(sample.memory.total - sample.memory.available) + "/" + gib(sample.memory.total) + "G"
+  return alert.icon
+}
+
+function gib(kilobytes) {
+  return (kilobytes / 1048576).toFixed(1)
+}
+
 // Total and idle jiffies of the aggregate "cpu" line; null when missing.
 function parseCpuTimes(text) {
   var lines = String(text || "").split("\n")

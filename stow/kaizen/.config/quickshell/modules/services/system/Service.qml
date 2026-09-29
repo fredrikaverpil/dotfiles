@@ -12,6 +12,7 @@ Item {
   property var alertStarts: ({})
   property var alerts: []
   readonly property var alert: alerts.length > 0 ? alerts[0] : null
+  readonly property string alertLabel: alert ? Model.alertLabel(alert, { cpu: cpu, memory: memory }) : ""
 
   property real cpu: 0
   property real temperature: NaN
