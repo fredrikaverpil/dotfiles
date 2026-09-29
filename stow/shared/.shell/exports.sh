@@ -96,7 +96,7 @@ add_to_path append "$HOME/.opencode/bin" # Added by OpenCode AI
 
 # NOTE: the last prepend appears first in $PATH, so make sure the order is correct below
 add_to_path prepend "$HOME/.local/bin" # user-installed binaries
-# HACK: shell/bin is prepended in sourcing.sh after Nix daemon to ensure it comes first
+# HACK: ~/.shell/bin is prepended in sourcing.sh after Nix daemon to ensure it comes first
 
 # Source Home Manager session variables (includes sessionPath)
 if [ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]; then

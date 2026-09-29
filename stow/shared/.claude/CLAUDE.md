@@ -94,7 +94,7 @@ reading the whole file.
   [pkg.go.dev](https://pkg.go.dev). Standard library functions are available
   (example: [`fmt` package](https://pkg.go.dev/fmt)).
 - You can run `go mod tidy` recursively in the repo with the custom
-  [`go-mod-tidy`](~/.dotfiles/shell/bin/go-mod-tidy) shell script.
+  [`go-mod-tidy`](~/.shell/bin/go-mod-tidy) shell script.
 
 ## Npm and deno
 

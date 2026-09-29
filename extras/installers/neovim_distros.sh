@@ -25,7 +25,7 @@ esac
 
 # this will install so that nvim can be launched with NVIM_APPNAME, see aliases.sh
 #
-# see shell/bin/nvims how to start the different nvim distros
+# see ~/.shell/bin/nvims how to start the different nvim distros
 
 echo "Did you run 'dev' to activate installations of tooling in pkgx.yaml? (y/n)"
 read -r response

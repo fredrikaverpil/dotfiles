@@ -37,12 +37,13 @@ project-local tools take precedence inside Neovim too.
 The shell startup chain is:
 
 1. **`.zshrc`** → sources `.zshrc_user`
-2. **[`exports.sh`](../shell/exports.sh)** — PATH construction, Homebrew shellenv,
-   `$DOTFILES` and other globals, home-manager session vars, `~/.shell/.env`
-3. **[`aliases.sh`](../shell/aliases.sh)** — shell aliases
-4. **[`sourcing.sh`](../shell/sourcing.sh)** — Nix daemon, tool initialization
-   (atuin, direnv, mise, zoxide, starship, fzf), zsh completions/plugins, and
-   `cd` overrides
+2. **[`exports.sh`](../stow/shared/.shell/exports.sh)** — PATH construction,
+   Homebrew shellenv, `$DOTFILES` and other globals, home-manager session vars,
+   `~/.shell/.env`
+3. **[`aliases.sh`](../stow/shared/.shell/aliases.sh)** — shell aliases
+4. **[`sourcing.sh`](../stow/shared/.shell/sourcing.sh)** — Nix daemon, tool
+   initialization (atuin, direnv, mise, zoxide, starship, fzf), zsh
+   completions/plugins, and `cd` overrides
 
 The `cd` override (and `z`/`zi`) automatically activates Python virtual
 environments when entering directories with a `.python-version` or `.venv/`.
