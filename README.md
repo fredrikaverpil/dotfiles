@@ -4,7 +4,7 @@
 
 Personal dotfiles, managed in three layers:
 
-- **[Nix](https://nixos.org)** (`nix/`) — system configuration and packages,
+- **Nix** (`nix/`) — system configuration and packages,
   pinned by `flake.lock` and applied with a rebuild. Fully reproducible.
 - **Stow** (`stow/`) — dotfiles symlinked into `$HOME` with
   [GNU Stow](https://www.gnu.org/software/stow/) (not Nix). Changes take effect
@@ -15,23 +15,6 @@ Personal dotfiles, managed in three layers:
 
 The Linux desktop experience is the [kaizen](KAIZEN.md) (a homegrown combination
 of NixOS, niri and Quickshell).
-
-## Noteworthy
-
-- Neovim ⌨️
-  - [My config](stow/shared/.config/nvim-fredrik/)
-  - [Minimalistic config](stow/shared/.config/nvim-simple/) - for when a full
-    blown IDE is too much; inspired by
-    [NativeVim](https://github.com/boltlessengineer/NativeVim) and
-    [Sylvan Franklin's config](https://github.com/SylvanFranklin/.config/tree/main/nvim)
-- Workflows 🌊
-  - [Git config](extras/README_GIT.md)
-  - [Project config](extras/README_PROJECT.md)
-- Fonts
-  - [Berkeley Mono](https://berkeleygraphics.com/typefaces/berkeley-mono) ❤️
-  - [Maple Mono](https://github.com/subframe7536/maple-font)
-  - [Noto Color Emoji](https://fonts.google.com/noto/specimen/Noto+Color+Emoji)
-  - [Symbols Nerd Font Mono](https://github.com/ryanoasis/nerd-fonts)
 
 ## Quickstart
 
@@ -106,3 +89,20 @@ The shell entrypoint is `stow/shared/.zshrc`, which sources
    aliases
 3. [`stow/shared/.shell/sourcing.sh`](stow/shared/.shell/sourcing.sh) — tool
    initialization, plugins, completions
+
+## Convenience links
+
+- Neovim ⌨️
+  - [My config](stow/shared/.config/nvim-fredrik/)
+  - [Minimalistic config](stow/shared/.config/nvim-simple/) - for when a full
+    blown IDE is too much; inspired by
+    [NativeVim](https://github.com/boltlessengineer/NativeVim) and
+    [Sylvan Franklin's config](https://github.com/SylvanFranklin/.config/tree/main/nvim)
+- Workflows 🌊
+  - [Git config](extras/README_GIT.md)
+  - [Project config](extras/README_PROJECT.md)
+- Fonts
+  - [Berkeley Mono](https://berkeleygraphics.com/typefaces/berkeley-mono) ❤️
+  - [Maple Mono](https://github.com/subframe7536/maple-font)
+  - [Noto Color Emoji](https://fonts.google.com/noto/specimen/Noto+Color+Emoji)
+  - [Symbols Nerd Font Mono](https://github.com/ryanoasis/nerd-fonts)
