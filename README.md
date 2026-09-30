@@ -1,6 +1,6 @@
 # dotfiles 🍩
 
-![screenshot](https://github.com/user-attachments/assets/51c05d03-d997-40dc-8757-4d13993fcafb)
+![screenshot](https://github.com/user-attachments/assets/f24af5db-6367-497e-b596-b9b7bd6dd307)
 
 Personal dotfiles, managed in three layers:
 
