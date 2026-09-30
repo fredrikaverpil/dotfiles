@@ -7,68 +7,81 @@ Personal dotfiles, managed in three layers:
 - **[Nix](https://nixos.org)** (`nix/`) — system configuration and packages,
   pinned by `flake.lock` and applied with a rebuild. Fully reproducible.
 - **Stow** (`stow/`) — dotfiles symlinked into `$HOME` with
-  [GNU Stow](https://www.gnu.org/software/stow/). Changes take effect
+  [GNU Stow](https://www.gnu.org/software/stow/) (not Nix). Changes take effect
   immediately, no rebuild needed.
 - **Homebrew** (macOS) — GUI apps and Mac App Store apps. Nix declares _which_
   packages and a rebuild installs or removes to match, but versions are
   unpinned and upgraded manually.
 
+The Linux desktop experience is the [kaizen](KAIZEN.md) (a homegrown combination
+of NixOS, niri and Quickshell).
+
+## Noteworthy
+
+- Neovim ⌨️
+  - [My config](stow/shared/.config/nvim-fredrik/)
+  - [Minimalistic config](stow/shared/.config/nvim-simple/) - for when a full
+    blown IDE is too much; inspired by
+    [NativeVim](https://github.com/boltlessengineer/NativeVim) and
+    [Sylvan Franklin's config](https://github.com/SylvanFranklin/.config/tree/main/nvim)
+- Workflows 🌊
+  - [Git config](extras/README_GIT.md)
+  - [Project config](extras/README_PROJECT.md)
+- Fonts
+  - [Berkeley Mono](https://berkeleygraphics.com/typefaces/berkeley-mono) ❤️
+  - [Maple Mono](https://github.com/subframe7536/maple-font)
+  - [Noto Color Emoji](https://fonts.google.com/noto/specimen/Noto+Color+Emoji)
+  - [Symbols Nerd Font Mono](https://github.com/ryanoasis/nerd-fonts)
+
 ## Quickstart
+
+1. Install either...
+  a. NixOS
+  b. macOS + Homebrew + nix
+2. Clone this repo into `~/.dotfiles`
+3. Make sure `hostname` is set and run:
+
+   ```sh
+   sudo nixos-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"   # NixOS
+   sudo darwin-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"  # macOS
+   ```
 
 ### Nix
 
-> [!NOTE]
->
-> - A fresh machine needs Nix and a first switch: see
->   [macOS](extras/README_MACOS_INSTALL.md),
->   [NixOS](extras/README_NIXOS_INSTALL.md) or
->   [rpi5-homelab](nix/hosts/rpi5-homelab/README.md).
-> - The `flake.nix` is designed to set up the machine based on its hostname.
-
 ```sh
-# Clone to ~/.dotfiles, where the rebuild stows from
-git clone https://github.com/fredrikaverpil/dotfiles.git ~/.dotfiles
+# rebuild/switch after initial switch
+nh os switch --ask  # NixOS
+nh darwin switch --ask  # macOS
 
-# Rebuild system + packages + dotfiles (reproducible, uses flake.lock)
-sudo darwin-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"  # macOS
-sudo nixos-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"   # NixOS
+# run stowing of files
+dotfiles-stow
 
-# After the first switch, nh rebuilds with a diff; on wily it also keeps the
-# private submodule, see nix/hosts/wily/README.md
-nh darwin switch  # macOS
-nh os switch      # NixOS
-
-# Update ALL flake inputs, then rebuild
+# update all flake inputs
 nix flake update
 
-# Update only the unstable-pinned inputs, then rebuild
-nix flake update nixpkgs-unstable nix-darwin home-manager-unstable llm-agents
+# update only specific input
+nix flake update llm-agents  # example
 
-# Clean up old Nix generations, keeping the last 5 days for rollback safety
+# clean up old generations
 sudo nix-collect-garbage --delete-older-than 5d
+
+# update homebrew packages on macOS
+brew update && brew upgrade   # add --greedy to also bump self-updating casks
 ```
 
 > [!NOTE]
 >
-> On macOS, home-manager's per-user activation can silently fail to apply
-> (home-manager#4413). The rebuild self-heals this: a guard in
-> `nix/shared/system/darwin.nix` verifies the activation landed and retries
-> it, failing loudly otherwise. To check by hand, compare
-> `readlink ~/.local/state/home-manager/gcroots/current-home` against the
-> expected generation; `readlink /run/current-system` updates even on a silent
-> miss, so it proves nothing.
+> Pinning Homebrew versions is possible via
+> [nix-homebrew](https://github.com/zhaofengli/nix-homebrew) with locked taps,
+> but it buys little here: casks that self-update ignore the pin, vendors delete
+> old cask artifacts, and Mac App Store apps cannot be pinned at all.
 
 ### Stow
 
-Dotfiles are managed with GNU Stow, not Nix.
-
-> [!NOTE]
->
-> Rebuilds run stow too. On NixOS only when the home-manager generation
-> changed, so after editing just `stow/`, run `dotfiles-stow`.
-
-- Edit files in `stow/` and run `dotfiles-stow`
-- Changes are immediately active (no rebuild needed)
+```sh
+# edit files in stow/ and then run:
+dotfiles-stow
+```
 
 Stow forbids slashes in package names, so each level is its own invocation:
 
@@ -78,11 +91,6 @@ Stow forbids slashes in package names, so each level is its own invocation:
 | `stow/platform/{Darwin,Linux}/` | matching `uname -s` |
 | `stow/kaizen/` | kaizen hosts, where `/etc/kaizen` exists (`renoir`, `wily`) |
 | `stow/host/<hostname>/` | that machine only; optional |
-
-A file in a later package must not target a path an earlier one already
-supplies; GNU Stow reports that as a conflict rather than treating it as an
-override, so per-host drift means keeping that file out of the shared
-package entirely.
 
 `--adopt` absorbs any real file that has replaced a managed symlink into the
 repo instead of aborting; review the result with `git diff` before committing.
@@ -98,54 +106,3 @@ The shell entrypoint is `stow/shared/.zshrc`, which sources
    aliases
 3. [`stow/shared/.shell/sourcing.sh`](stow/shared/.shell/sourcing.sh) — tool
    initialization, plugins, completions
-
-See [Project config](extras/README_PROJECT.md) for details on shell
-initialization, direnv, and per-project tooling.
-
-### Homebrew
-
-`nix/shared/system/darwin.nix` declares the Homebrew taps,
-brews, casks and Mac App Store apps, and a rebuild installs or removes packages
-to match that set (`cleanup = "zap"`, so anything undeclared is uninstalled).
-Versions are not pinned — bump them deliberately:
-
-```sh
-brew update && brew upgrade   # add --greedy to also bump self-updating casks
-```
-
-Pinning Homebrew versions is possible via
-[nix-homebrew](https://github.com/zhaofengli/nix-homebrew) with locked taps, but
-it buys little here: casks that self-update ignore the pin, vendors delete old
-cask artifacts, and Mac App Store apps cannot be pinned at all.
-
-LLM agent CLIs (claude-code, opencode,...) are the exception: they are plain Nix
-packages from the `llm-agents` flake input, upgraded via
-`nix flake update llm-agents` + rebuild.
-
-## Other docs and references
-
-- Nix ❄️
-  - [Where a package or setting goes](nix/README.md)
-  - [Nix config reference](extras/README_NIX.md) - inputs, sources,
-    troubleshooting
-  - [kaizen](KAIZEN.md) - the niri + Quickshell desktop on `renoir` and `wily`
-- Neovim ⌨️
-  - [My Neovim config](stow/shared/.config/nvim-fredrik/README.md) - uses
-    `vim.pack`
-  - [Minimalistic config](stow/shared/.config/nvim-simple/) - for when a full
-    blown IDE is too much; inspired by
-    [NativeVim](https://github.com/boltlessengineer/NativeVim) and
-    [Sylvan Franklin's config](https://github.com/SylvanFranklin/.config/tree/main/nvim)
-- Workflows 🌊
-  - [Git config](extras/README_GIT.md)
-  - [Project config](extras/README_PROJECT.md)
-- Fonts
-  - [Berkeley Mono](https://berkeleygraphics.com/typefaces/berkeley-mono) ❤️
-  - [Maple Mono](https://github.com/subframe7536/maple-font)
-  - [Noto Color Emoji](https://fonts.google.com/noto/specimen/Noto+Color+Emoji)
-  - [Symbols Nerd Font Mono](https://github.com/ryanoasis/nerd-fonts)
-- Host-specific documentation
-  - [rpi5-homelab](nix/hosts/rpi5-homelab/README.md) - requires custom
-    installation procedure
-  - [renoir](nix/hosts/renoir/README.md) - ThinkPad T14 Gen 1
-  - [wily](nix/hosts/wily/README.md) - ThinkPad T14 Gen 6, private submodule
