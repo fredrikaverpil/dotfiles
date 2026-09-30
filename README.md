@@ -70,6 +70,7 @@ brew update && brew upgrade   # add --greedy to also bump self-updating casks
 - Workflows 🌊
   - [Git config](extras/README_GIT.md)
   - [Project config](extras/README_PROJECT.md)
+  - [Claude Code setup](stow/shared/.claude/)
 - Fonts
   - [Berkeley Mono](https://berkeleygraphics.com/typefaces/berkeley-mono) ❤️
   - [Maple Mono](https://github.com/subframe7536/maple-font)
