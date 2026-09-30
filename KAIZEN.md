@@ -57,25 +57,26 @@ place, live on save: the compositor config and the shell's QML.
 
 | Part | Path | Reaches |
 | --- | --- | --- |
-| Session: niri under UWSM, portals, PAM, units, the services and packages the shell and its binds use, notification rules | `nix/shared/system/kaizen/session.nix` | every kaizen host |
-| Compositor config, the shell's QML | `stow/kaizen/` | every kaizen host |
+| Session: niri under UWSM, portals, PAM, units, the services and packages the shell and its binds use, notification rules | [`nix/shared/system/kaizen/session.nix`](nix/shared/system/kaizen/session.nix) | every kaizen host |
+| Compositor config, the shell's QML | [`stow/kaizen/`](stow/kaizen/) | every kaizen host |
 | Plugin more than one host imports | `nix/shared/system/kaizen/plugins/<name>/` | the hosts importing it |
 | Plugin one host imports | `nix/hosts/<host>/kaizen-plugins/<name>/`, or a private submodule such as wily's `einride` | that host |
-| ThinkPad hardware the shell reads (thresholds, keyd, micmute LED); not kaizen | `nix/shared/system/thinkpad.nix` | ThinkPad hosts |
+| ThinkPad hardware the shell reads (thresholds, keyd, micmute LED); not kaizen | [`nix/shared/system/thinkpad.nix`](nix/shared/system/thinkpad.nix) | ThinkPad hosts |
 | Hardware, sleep policy, output layout, host-only programs | `nix/hosts/<host>/`, `stow/host/<host>/` | that host |
 
 - Core is what kaizen needs to work as designed; every kaizen host runs it. A
   plugin is optional: the shell runs without it, however many hosts import it.
 - Importing `session.nix` makes a host a kaizen host: it writes `/etc/kaizen`,
-  and `dotfiles-stow` stows `stow/kaizen/` only where that exists. So
-  `stow/kaizen/` reaches every kaizen host or none, and a plugin keeps its QML
-  beside its Nix module instead. The module lists its directory in
-  `host.kaizenPlugins`, read in place from the checkout.
+  and `dotfiles-stow` stows [`stow/kaizen/`](stow/kaizen/) only where that
+  exists. So [`stow/kaizen/`](stow/kaizen/) reaches every kaizen host or none,
+  and a plugin keeps its QML beside its Nix module instead. The module lists its
+  directory in `host.kaizenPlugins`, read in place from the checkout.
 - Nix hands the shell values only through `quickshell.service`'s environment
   (`KAIZEN_PLUGINS`, `NOTIFICATION_RULES`, `EMOJI_*`).
-- Apps are not kaizen's: `nix/README.md` says where they go.
+- Apps are not kaizen's: [`nix/README.md`](nix/README.md) says where they go.
 - QML paths here (`modules/…`, `Ui/…`) are under
-  `stow/kaizen/.config/quickshell/`; `niri/…` is under `stow/kaizen/.config/`.
+  [`stow/kaizen/.config/quickshell/`](stow/kaizen/.config/quickshell/); `niri/…`
+  is under [`stow/kaizen/.config/`](stow/kaizen/.config/).
 
 ## Services to surfaces
 
@@ -138,16 +139,18 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 ## Time and place
 
 - The timezone lives in [timedated] (`/etc/localtime`). The timezone service
-  runs `timedatectl set-timezone` with an id from `ZonesModel.js` and reads the
-  result back; polkit may prompt. ThinkPads leave `time.timeZone` unset so the
-  choice survives rebuilds; stationary hosts pin it.
+  runs `timedatectl set-timezone` with an id from
+  [`ZonesModel.js`](stow/kaizen/.config/quickshell/modules/services/timezone/ZonesModel.js)
+  and reads the result back; polkit may prompt. ThinkPads leave `time.timeZone`
+  unset so the choice survives rebuilds; stationary hosts pin it.
 - Zones are IANA ids. tzdata evaluates DST per instant; the Clock panel shows
   offset, abbreviation, UTC and the next DST change, the last from `zdump`.
 - Zone-aware formatting goes through `date(1)`. Qt's JS engine has no `Intl`
   and ignores `toLocaleString`'s `timeZone` option.
-- The weather location is a coordinate picked from `PlacesModel.js` and saved
-  by the shell; the machines have no GNSS. Nightlight takes sunrise and sunset
-  from the same coordinate, so one saved place moves both.
+- The weather location is a coordinate picked from
+  [`PlacesModel.js`](stow/kaizen/.config/quickshell/modules/services/weather/PlacesModel.js)
+  and saved by the shell; the machines have no GNSS. Nightlight takes sunrise
+  and sunset from the same coordinate, so one saved place moves both.
 - After a zone change, restart `quickshell.service` by hand, and any other
   long-running process that shows local time, such as the calendar plugin's
   `dcal.service`: glibc caches the parsed tzfile, so a running process keeps
@@ -191,18 +194,22 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
     (stops the recording, re-enables idle locking, resets the layout). The
     system alert is a plain label.
   - Tray items: the app's own activation and menu.
-- A plugin (`Ui/Plugin.qml`) adds launcher items, its own panels and IPC
-  targets, and may take over the date button (`barActions.date`):
-  left-click calls the plugin, right-click opens its `plugins.<name>` node.
-  `nix/hosts/renoir/kaizen-plugins/hello/` is the minimal example.
+- A plugin ([`Ui/Plugin.qml`](stow/kaizen/.config/quickshell/Ui/Plugin.qml))
+  adds launcher items, its own panels and IPC targets, and may take over the
+  date button (`barActions.date`): left-click calls the plugin, right-click
+  opens its `plugins.<name>` node.
+  [`nix/hosts/renoir/kaizen-plugins/hello/`](nix/hosts/renoir/kaizen-plugins/hello/)
+  is the minimal example.
 - A plugin that needs a long-running backend brings its own daemon: its module
   adds the unit, and its QML queries the daemon's IPC. The calendar
-  (`nix/shared/system/kaizen/plugins/calendar/`) does this with [dcal].
+  ([`nix/shared/system/kaizen/plugins/calendar/`](nix/shared/system/kaizen/plugins/calendar/))
+  does this with [dcal].
 - A tray plugin is an app written for kaizen, with its own [StatusNotifierItem]
-  and menu (`nix/hosts/renoir/kaizen-plugins/hello-tray/`), so the tray and its
-  launcher level show it without shell code. Its unit starts it with the session
-  or from Apps. A third-party app with a tray icon is not a plugin; the tray
-  shows it anyway.
+  and menu
+  ([`nix/hosts/renoir/kaizen-plugins/hello-tray/`](nix/hosts/renoir/kaizen-plugins/hello-tray/)),
+  so the tray and its launcher level show it without shell code. Its unit starts
+  it with the session or from Apps. A third-party app with a tray icon is not a
+  plugin; the tray shows it anyway.
 - The curtain hides the screen, it is not a lock: an overlay layer surface
   (`kaizen-curtain`), never `WlSessionLock`, and it never touches DPMS. Both
   are deliberate. A session lock replaces output content and a disabled output
@@ -212,7 +219,9 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   before drawing the prompt, so the prompt is never painted onto a dark panel.
   Being only a layer surface, it dies with Quickshell, and anyone at the
   keyboard can close it. Use the lock whenever the machine is left alone.
-- `Ui/Compositor.qml` is the only path to niri; `Ui/compositors/` owns niri
+- [`Ui/Compositor.qml`](stow/kaizen/.config/quickshell/Ui/Compositor.qml) is the
+  only path to niri;
+  [`Ui/compositors/`](stow/kaizen/.config/quickshell/Ui/compositors/) owns niri
   commands, response parsing, and the workspace source. Keep scheduling and
   shared state above it. Nightlight is not compositor-specific and lives in its
   service.
@@ -291,11 +300,16 @@ nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
 1. Does a subsystem already do it? Read its state; do not duplicate it.
 2. Does a purpose-built app do it acceptably? Launch that instead.
 3. Can it be used with the keyboard only? If not, redesign.
-4. Then: daemon/process state → `modules/services/`, view → `modules/panels/`,
-   both wired in `shell.qml`; a protocol-driven surface with no other consumer
-   of its state (lock, notifications, polkit) keeps both in `modules/<name>/`.
-   Packages/units/PAM → `session.nix` (even a package another scope also
-   installs), compositor → `Ui/compositors/` and `niri/config.kdl`, IPC target
-   for every new action. An optional shell extension is a plugin, placed as in
-   Where it lives. An app is not kaizen's to install: `nix/README.md` says where
-   it goes.
+4. Then: daemon/process state →
+   [`modules/services/`](stow/kaizen/.config/quickshell/modules/services/), view
+   → [`modules/panels/`](stow/kaizen/.config/quickshell/modules/panels/), both
+   wired in [`shell.qml`](stow/kaizen/.config/quickshell/shell.qml); a
+   protocol-driven surface with no other consumer of its state (lock,
+   notifications, polkit) keeps both in `modules/<name>/`. Packages/units/PAM →
+   [`session.nix`](nix/shared/system/kaizen/session.nix) (even a package another
+   scope also installs), compositor →
+   [`Ui/compositors/`](stow/kaizen/.config/quickshell/Ui/compositors/) and
+   [`niri/config.kdl`](stow/kaizen/.config/niri/config.kdl), IPC target for
+   every new action. An optional shell extension is a plugin, placed as in Where
+   it lives. An app is not kaizen's to install: [`nix/README.md`](nix/README.md)
+   says where it goes.
