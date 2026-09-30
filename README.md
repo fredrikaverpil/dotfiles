@@ -20,7 +20,7 @@ of NixOS, niri and Quickshell).
 
 1. Install either...\
    a. NixOS\
-   b. macOS + Homebrew + nix
+   b. macOS + Homebrew + nix-darwin
 2. Clone this repo into `~/.dotfiles`
 3. Make sure `hostname` is set and run:
 
