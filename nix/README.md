@@ -51,7 +51,8 @@ configuration. [`../KAIZEN.md`](../KAIZEN.md) maps kaizen's own parts, Nix and
 Stow.
 
 An app's niri window rules and binds go in
-[`stow/host/renoir/.config/niri/apps.kdl`](../stow/host/renoir/.config/niri/apps.kdl),
+`stow/host/<hostname>/.config/niri/apps.kdl` (example in
+[`stow/host/renoir/.config/niri/apps.kdl`](../stow/host/renoir/.config/niri/apps.kdl)),
 which wily symlinks, or the host's `host.kdl`.
 
 On a kaizen host, wrap Chromium and Electron apps with `pkgs.withGnomeLibsecret`
