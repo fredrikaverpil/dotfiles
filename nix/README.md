@@ -7,27 +7,25 @@ place that covers every host that wants it.
 
 Go down the list; the first match wins.
 
-1. **kaizen core**: `shared/system/kaizen/session.nix`. Part of kaizen's design:
-   the shell, the session or a bind in `stow/kaizen/` needs it to do its job.
-   That covers the bar and its panels, the launcher, the lock, recording,
-   screenshots and wallpapers, and the purpose-built apps kaizen hands tasks to
+1. **kaizen core**:
+   [`shared/system/kaizen/session.nix`](shared/system/kaizen/session.nix). What
+   the shell, the session or a bind in [`stow/kaizen/`](../stow/kaizen/) needs
+   to do its job, including the purpose-built apps kaizen hands tasks to
    (bluetui, nm-connection-editor).
-2. **kaizen plugin**: optional; the shell runs without it. It goes in
-   `shared/system/kaizen/plugins/<name>/` when more than one host imports it,
-   `hosts/<host>/kaizen-plugins/<name>/` when one does. Written for kaizen: a
-   `Plugin.qml`, a daemon the shell queries, or a tray app built for the shell.
-   A third-party app with a tray icon is an app, not a plugin; the tray shows it
-   anyway.
-3. **Hardware class**: `shared/system/thinkpad.nix`.
+2. **kaizen plugin**: optional; the shell runs without it. Written for kaizen,
+   not a third-party app with a tray icon. Paths are in
+   [`../KAIZEN.md`](../KAIZEN.md) › Where it lives.
+3. **Hardware class**:
+   [`shared/system/thinkpad.nix`](shared/system/thinkpad.nix).
 4. **Anything else is an app or a host setting**, and kaizen does not decide
    it. Pick the scope, then system or user.
 
 | Wanted on                     | System                            | User                            |
 | ----------------------------- | --------------------------------- | ------------------------------- |
-| every host                    | `shared/system/common.nix`        | `shared/home/common.nix`        |
-| every NixOS host, servers too | `shared/system/linux.nix`         | `shared/home/linux.nix`         |
-| every macOS host              | `shared/system/darwin.nix`        | `shared/home/darwin.nix`        |
-| every NixOS desktop host      | `shared/system/linux-desktop.nix` | `shared/home/linux-desktop.nix` |
+| every host                    | [`shared/system/common.nix`](shared/system/common.nix)        | [`shared/home/common.nix`](shared/home/common.nix)        |
+| every NixOS host, servers too | [`shared/system/linux.nix`](shared/system/linux.nix)         | [`shared/home/linux.nix`](shared/home/linux.nix)         |
+| every macOS host              | [`shared/system/darwin.nix`](shared/system/darwin.nix)        | [`shared/home/darwin.nix`](shared/home/darwin.nix)        |
+| every NixOS desktop host      | [`shared/system/linux-desktop.nix`](shared/system/linux-desktop.nix) | [`shared/home/linux-desktop.nix`](shared/home/linux-desktop.nix) |
 | one host                      | `hosts/<host>/configuration.nix`  | `hosts/<host>/users/<user>.nix` |
 
 - **System**: GUI apps, and anything that needs a NixOS or nix-darwin module
@@ -41,21 +39,24 @@ wants it, move it to that scope's shared file rather than repeating it.
 
 ## Desktop hosts
 
-A desktop host imports `shared/system/linux-desktop.nix` for its apps and opts
-into kaizen with `shared/system/kaizen/session.nix` and any plugins. Servers
-import neither. The two stay independent: `linux-desktop.nix` sets no kaizen
-option, and kaizen declares everything it runs, even a tool another scope also
-installs (`jq`, `imagemagick`). kaizen's own settings, such as its notification
-rules, may name apps; a host adds to them in its own configuration.
-`../KAIZEN.md` maps kaizen's own parts, Nix and Stow.
+A desktop host imports
+[`shared/system/linux-desktop.nix`](shared/system/linux-desktop.nix) for its
+apps and opts into kaizen with
+[`shared/system/kaizen/session.nix`](shared/system/kaizen/session.nix) and any
+plugins. Servers import neither. The two stay independent: `linux-desktop.nix`
+sets no kaizen option, and kaizen declares everything it runs, even a tool
+another scope also installs (`jq`, `imagemagick`). kaizen's own settings, such
+as its notification rules, may name apps; a host adds to them in its own
+configuration. [`../KAIZEN.md`](../KAIZEN.md) maps kaizen's own parts, Nix and
+Stow.
 
 An app's niri window rules and binds go in
-`stow/host/renoir/.config/niri/apps.kdl`, which wily symlinks, or the host's
-`host.kdl`.
+[`stow/host/renoir/.config/niri/apps.kdl`](../stow/host/renoir/.config/niri/apps.kdl),
+which wily symlinks, or the host's `host.kdl`.
 
-On a kaizen host, wrap Chromium and Electron apps with
-`pkgs.withGnomeLibsecret` (`shared/overlays/`); without it they cannot keep
-logins in gnome-keyring.
+On a kaizen host, wrap Chromium and Electron apps with `pkgs.withGnomeLibsecret`
+([`shared/overlays/`](shared/overlays/)); without it they cannot keep logins in
+gnome-keyring.
 
 An app starts with the session through XDG autostart:
 `pkgs.makeAutostartItem` next to it in the package list. UWSM runs each entry
