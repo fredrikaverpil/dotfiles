@@ -71,8 +71,9 @@ brew update && brew upgrade   # add --greedy to also bump self-updating casks
   - [Git config](extras/README_GIT.md)
   - [Project config](extras/README_PROJECT.md)
   - [Claude Code setup](stow/shared/.claude/)
-- Fonts
-  - [Berkeley Mono](https://berkeleygraphics.com/typefaces/berkeley-mono) ❤️
+- Styling 🎨
+  - [Zenbones](https://github.com/zenbones-theme/zenbones.nvim)
+  - [Berkeley Mono](https://berkeleygraphics.com/typefaces/berkeley-mono)
   - [Maple Mono](https://github.com/subframe7536/maple-font)
   - [Noto Color Emoji](https://fonts.google.com/noto/specimen/Noto+Color+Emoji)
   - [Symbols Nerd Font Mono](https://github.com/ryanoasis/nerd-fonts)
