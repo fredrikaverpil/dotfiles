@@ -29,6 +29,36 @@ of NixOS, niri and Quickshell).
    sudo darwin-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"  # macOS
    ```
 
+Then, after the first rebuild, some common commands:
+
+```sh
+# rebuild and switch using nh
+nh os switch --ask  # NixOS
+nh darwin switch --ask  # macOS
+
+# run stowing of files
+dotfiles-stow
+
+# update all flake inputs
+nix flake update
+
+# update only specific input
+nix flake update llm-agents  # example
+
+# clean up old generations
+sudo nix-collect-garbage --delete-older-than 5d
+
+# update homebrew packages on macOS
+brew update && brew upgrade   # add --greedy to also bump self-updating casks
+```
+
+> [!NOTE]
+>
+> Pinning Homebrew versions is possible via
+> [nix-homebrew](https://github.com/zhaofengli/nix-homebrew) with locked taps,
+> but it buys little here: casks that self-update ignore the pin, vendors delete
+> old cask artifacts, and Mac App Store apps cannot be pinned at all.
+
 ## Convenience links
 
 - Neovim ⌨️
