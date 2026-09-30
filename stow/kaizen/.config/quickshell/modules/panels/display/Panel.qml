@@ -9,7 +9,7 @@ Ui.Panel {
 
   property var focusedMonitor: null
 
-  readonly property var textScales: [1, 1.25, 1.5, 2]
+  readonly property var textScales: [1, 1.1, 1.25, 1.5, 2]
 
   cardHeight: 440
   keyNavigation: true
