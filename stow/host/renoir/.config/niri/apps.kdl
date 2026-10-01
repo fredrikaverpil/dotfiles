@@ -13,6 +13,7 @@ window-rule {
 window-rule {
     match app-id=r#"^slack$"#
     open-on-workspace "3"
+    default-column-width { proportion 0.33333; }
 }
 
 window-rule {
