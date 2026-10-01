@@ -241,7 +241,7 @@ Scope {
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: visible ? 6 : 0
         visible: idleButton.visible || keyboardButton.visible || recordingButton.visible || systemButton.visible
-          || mediaWidget.width > 0
+          || mediaWidget.width > 0 || pluginIndicators.width > 0
         width: visible ? 1 : 0
         height: 16 * bar.shell.textScale
         color: bar.shell.palette.dim
@@ -309,10 +309,34 @@ Scope {
         label: bar.shell.systemService.alertLabel
       }
 
+      // In plugin load order; right-click opens the plugin's node.
+      Row {
+        id: pluginIndicators
+        anchors.right: systemButton.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: width > 0 ? 4 : 0
+        spacing: 4
+
+        Repeater {
+          model: bar.shell.plugins
+
+          Ui.BarButton {
+            id: pluginIndicator
+            required property var modelData
+            shell: bar.shell
+            visible: modelData.barIndicator !== null
+            foreground: modelData.barIndicator && modelData.barIndicator.foreground || bar.shell.palette.fg
+            label: modelData.barIndicator ? modelData.barIndicator.label : ""
+            onActivated: modelData.barIndicator.action()
+            onSecondary: bar.shell.menu.popup("plugins." + modelData.name, barWindow.modelData.name, pluginIndicator)
+          }
+        }
+      }
+
       // Separates app tray icons from the indicators and system buttons.
       Rectangle {
         id: trayDivider
-        anchors.right: systemButton.left
+        anchors.right: pluginIndicators.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: visible ? 6 : 0
         visible: tray.width > 0
@@ -331,7 +355,7 @@ Scope {
         output: modelData.name
         // Between the centered clock group, with its 12px gap, and the indicators, less
         // the tray divider and its margins.
-        maxWidth: systemButton.x - 13 - (parent.width + clockGroup.width) / 2 - 12
+        maxWidth: pluginIndicators.x - 13 - (parent.width + clockGroup.width) / 2 - 12
       }
     }
   }
