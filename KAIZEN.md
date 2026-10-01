@@ -106,7 +106,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | tray | [StatusNotifierItem] | tray | Tray | `tray` |
 | background | wallpaper files, theme state | – | Settings › Display | `wallpaper`, `theme` |
 | menu | launcher | menu button | `Mod+Space` | `menu` |
-| plugins | `Plugin.qml` in each `host.kaizenPlugins` directory | date button, when taken over | Plugins › each plugin | `shell` (reload) |
+| plugins | `Plugin.qml` in each `host.kaizenPlugins` directory | date button, when taken over; indicators | Plugins › each plugin | `shell` (reload) |
 
 [PipeWire]: https://pipewire.org
 [Quickshell]: https://quickshell.org/docs/types/
@@ -196,8 +196,9 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   - Tray items: the app's own activation and menu.
 - A plugin ([`Ui/Plugin.qml`](stow/kaizen/.config/quickshell/Ui/Plugin.qml))
   adds launcher items, its own panels and IPC targets, and may take over the
-  date button (`barActions.date`): left-click calls the plugin, right-click
-  opens its `plugins.<name>` node.
+  date button (`barActions.date`) or show an indicator (`barIndicator`):
+  left-click calls the plugin, right-click opens its `plugins.<name>` node.
+  Unlike the core indicators, the plugin picks when it shows and its colour.
   [`nix/hosts/renoir/kaizen-plugins/hello/`](nix/hosts/renoir/kaizen-plugins/hello/)
   is the minimal example.
 - A plugin that needs a long-running backend brings its own daemon: its module
