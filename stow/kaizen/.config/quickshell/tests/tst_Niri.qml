@@ -116,4 +116,8 @@ TestCase {
     // Without an output there is nothing to focus, so the plain query is used.
     compare(Niri.focusedOutputOn(""), Niri.outputs())
   }
+
+  function test_focus_app_hands_the_pattern_to_kaizen_focus() {
+    compare(Niri.focusApp("^slack$"), ["kaizen-focus", "^slack$", "true"])
+  }
 }

@@ -23,6 +23,7 @@ function compileRules(rules) {
         checks: fields.map(function(field) { return { field: field, pattern: new RegExp(match[field]) } }),
         critical: !!rule.critical,
         dedup: rule.dedup || null,
+        focus: rule.focus || "",
         icon: iconSource(rule.icon)
       }
     } catch (error) {
@@ -56,6 +57,20 @@ function dedupOf(notification, rules) {
 function iconOf(notification, rules) {
   var rule = matchingRules(notification, rules).find(function(rule) { return rule.icon })
   return rule ? rule.icon : ""
+}
+
+// The window app id an app's notifications most likely belong to.
+function appIdOf(notification) {
+  return asString(notification.desktopEntry).replace(/\.desktop$/, "") || asString(notification.appName)
+}
+
+// The app id pattern of the window to focus: the first matching rule's `focus`,
+// else the notification's own app.
+function focusPatternOf(notification, rules) {
+  var rule = matchingRules(notification, rules).find(function(rule) { return rule.focus })
+  if (rule) return rule.focus
+  var appId = appIdOf(notification)
+  return appId ? "(?i)^" + appId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$" : ""
 }
 
 function snapshotOf(notification, timestamp, rules) {

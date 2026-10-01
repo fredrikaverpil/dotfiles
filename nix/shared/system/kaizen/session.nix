@@ -152,6 +152,12 @@ in
               default = null;
               description = "Show one copy of an event reported by several apps";
             };
+            focus = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              example = "^chrome-calendar\\.google\\.com";
+              description = "JavaScript regex of the app id of the window to focus when the notification is activated, in place of the notification's own app";
+            };
             icon = lib.mkOption {
               type = lib.types.nullOr lib.types.path;
               default = null;
@@ -316,6 +322,8 @@ in
           group = "calendar";
           keep = true;
         };
+        # The reminder comes from Chromium, but the window is the Calendar app's.
+        focus = "^chrome-calendar\\.google\\.com";
       }
       # Slack titles messages from its apps "[workspace] from <app>", as it does a
       # person's. Icons are simple-icons 16.32.0 (CC0) glyphs from
@@ -333,6 +341,8 @@ in
         };
         critical = true;
         dedup.group = "calendar";
+        # Slack relays the reminder, but the event is in the Calendar app.
+        focus = "^chrome-calendar\\.google\\.com";
         icon = ./icons/google-calendar.svg;
       }
       {
