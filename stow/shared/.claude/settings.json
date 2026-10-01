@@ -23,6 +23,11 @@
       "Bash(gh *)",
       "Bash(docker *)",
       "Bash(docker-compose *)"
+    ],
+    "deny": [
+      "Read(~/code/private/github.com/einride*/**)",
+      "Edit(~/code/private/github.com/einride*/**)",
+      "Bash(*code/private/github.com/einride*)"
     ]
   },
   "hooks": {
