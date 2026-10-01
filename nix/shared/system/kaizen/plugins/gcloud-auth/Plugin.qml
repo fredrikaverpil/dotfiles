@@ -25,7 +25,6 @@ Ui.Plugin {
   property var checking: null
   // Logged out until a check says otherwise.
   readonly property bool loggedIn: auth !== null && auth.ok
-  readonly property string icon: loggedIn ? "\u{F015F}" : "\u{F0164}"
   readonly property string status: failed ? "Check failed"
     : !auth ? "Checking…"
     : auth.ok ? "Logged in as " + auth.active
@@ -36,18 +35,23 @@ Ui.Plugin {
     : !adc ? "ADC: checking…"
     : adc.ok ? "ADC: logged in"
     : "ADC: logged out"
+  // Filled (and green in the bar) while gcloud is logged in, a check while ADC
+  // is, struck through while neither is.
+  readonly property string icon: loggedIn ? (adcLoggedIn ? "\u{F0160}" : "\u{F015F}")
+    : adcLoggedIn ? "\u{F12CC}" : "\u{F0164}"
 
-  // Always shown: neither state is an alert. Left-click refreshes while logged
-  // in, otherwise logs in.
+  // Always shown: no state is an alert. Left-click logs in to gcloud, else to
+  // ADC, whichever is out first; with both in it refreshes.
   barIndicator: ({
     label: plugin.icon,
     foreground: plugin.loggedIn ? plugin.shell.palette.leaf : plugin.shell.palette.off,
-    action: () => plugin.loggedIn ? plugin.refresh() : plugin.logIn(),
+    action: () => !plugin.loggedIn ? plugin.logIn() : !plugin.adcLoggedIn ? plugin.logInAdc() : plugin.refresh(),
   })
   menuItems: Object.assign({
     "plugins.gcloud-auth": { icon: plugin.icon, label: "gcloud auth" },
-    "plugins.gcloud-auth.status": { icon: plugin.icon, label: plugin.status, enabled: false },
-    "plugins.gcloud-auth.adc": { icon: plugin.adcLoggedIn ? "\u{F015F}" : "\u{F0164}", label: plugin.adcStatus,
+    "plugins.gcloud-auth.status": { icon: plugin.loggedIn ? "\u{F015F}" : "\u{F0164}", label: plugin.status,
+      enabled: false },
+    "plugins.gcloud-auth.adc": { icon: plugin.adcLoggedIn ? "\u{F0160}" : "\u{F0164}", label: plugin.adcStatus,
       enabled: false },
   }, plugin.accountItems(), {
     "plugins.gcloud-auth.refresh": { icon: "󰑐", label: "Refresh now", action: () => plugin.refresh() },
