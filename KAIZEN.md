@@ -194,11 +194,16 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
     (stops the recording, re-enables idle locking, resets the layout). The
     system alert is a plain label.
   - Tray items: the app's own activation and menu.
+- A diagonal strikethrough on an icon marks a state such as disconnected,
+  disabled, muted or logged out. A core feature that is temporarily off shows
+  it in rose, as an alert (Wi-Fi, Bluetooth, notifications). A plugin picks its
+  own colours but marks such states the same way, and may show the connected,
+  active or logged-in state in green (`leaf`).
 - A plugin ([`Ui/Plugin.qml`](stow/kaizen/.config/quickshell/Ui/Plugin.qml))
   adds launcher items, its own panels and IPC targets, and may take over the
   date button (`barActions.date`) or show an indicator (`barIndicator`):
   left-click calls the plugin, right-click opens its `plugins.<name>` node.
-  Unlike the core indicators, the plugin picks when it shows and its colour.
+  Unlike the core indicators, the plugin picks when it shows.
   [`nix/hosts/renoir/kaizen-plugins/hello/`](nix/hosts/renoir/kaizen-plugins/hello/)
   is the minimal example;
   [`nix/shared/system/kaizen/plugins/gcloud-auth/`](nix/shared/system/kaizen/plugins/gcloud-auth/)
