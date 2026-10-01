@@ -54,7 +54,7 @@ Rectangle {
   implicitHeight: content.implicitHeight + 24
   radius: 8
   color: activeFocus || selected ? palette.sel : palette.bg
-  border.color: orbiting ? Qt.alpha(tint, 0.3) : tint
+  border.color: tint
   border.width: 1
   clip: true
 
@@ -77,12 +77,13 @@ Rectangle {
     }
   }
 
-  // A short dash on the border, travelling its perimeter. Dash and gap are in
+  // A thicker dash on the border, travelling its perimeter. Dash and gap are in
   // stroke widths; the gap exceeds the perimeter, so the dash laps alone, with a pause.
   Shape {
     id: orbit
-    readonly property real dash: 28
-    readonly property real period: dash + root.perimeter / 2 + 150
+    readonly property real thickness: 3
+    readonly property real dash: 56 / thickness
+    readonly property real period: dash + (root.perimeter + 300) / thickness
     anchors.fill: parent
     visible: root.orbiting
     layer.enabled: visible
@@ -90,7 +91,7 @@ Rectangle {
 
     ShapePath {
       strokeColor: root.tint
-      strokeWidth: 2
+      strokeWidth: orbit.thickness
       fillColor: "transparent"
       capStyle: ShapePath.RoundCap
       strokeStyle: ShapePath.DashLine
@@ -101,10 +102,10 @@ Rectangle {
         loops: Animation.Infinite
         from: 0
         to: -orbit.period
-        duration: orbit.period * 5
+        duration: orbit.period * orbit.thickness * 2.5
       }
 
-      PathRectangle { x: 1; y: 1; width: root.width - 2; height: root.height - 2; radius: 7 }
+      PathRectangle { x: 1.5; y: 1.5; width: root.width - 3; height: root.height - 3; radius: 6.5 }
     }
   }
 
