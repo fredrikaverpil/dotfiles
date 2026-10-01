@@ -24,7 +24,9 @@ function compileRules(rules) {
         critical: !!rule.critical,
         dedup: rule.dedup || null,
         focus: rule.focus || "",
-        icon: iconSource(rule.icon)
+        icon: iconSource(rule.icon),
+        border: rule.border || "",
+        borderAnimation: rule.borderAnimation || ""
       }
     } catch (error) {
       console.warn("notifications: dropping rule " + JSON.stringify(rule) + ": " + error)
@@ -59,6 +61,12 @@ function iconOf(notification, rules) {
   return rule ? rule.icon : ""
 }
 
+// The `field` of the first matching rule with one, else "".
+function ruleValue(notification, rules, field) {
+  var rule = matchingRules(notification, rules).find(function(rule) { return rule[field] })
+  return rule ? rule[field] : ""
+}
+
 // The window app id an app's notifications most likely belong to.
 function appIdOf(notification) {
   return asString(notification.desktopEntry).replace(/\.desktop$/, "") || asString(notification.appName)
@@ -81,6 +89,8 @@ function snapshotOf(notification, timestamp, rules) {
     body: asString(notification.body),
     image: asString(notification.image),
     icon: iconOf(notification, rules),
+    border: ruleValue(notification, rules, "border"),
+    borderAnimation: ruleValue(notification, rules, "borderAnimation"),
     urgency: urgencyOf(notification, rules),
     timestamp: timestamp === undefined ? Date.now() : timestamp
   }
