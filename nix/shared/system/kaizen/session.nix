@@ -337,6 +337,7 @@ in
           body = "^calendar\\.google\\.com\\n";
         };
         critical = true;
+        border = "leaf";
         dedup = {
           group = "calendar";
           keep = true;
@@ -359,6 +360,7 @@ in
           summary = " from Google Calendar$";
         };
         critical = true;
+        border = "leaf";
         dedup.group = "calendar";
         # Slack relays the reminder, but the event is in the Calendar app.
         focus = "^chrome-calendar\\.google\\.com";
