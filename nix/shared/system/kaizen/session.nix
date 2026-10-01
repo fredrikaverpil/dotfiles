@@ -251,9 +251,9 @@ in
       # qtimageformats supplies Quickshell's WebP decoder.
       environment.QT_PLUGIN_PATH = "${pkgs.qt6.qtimageformats}/lib/qt-6/plugins";
       # The menu's emoji picker reads names from Unicode's test file.
-      environment.EMOJI_TEST = "${pkgs.unicode-emoji}/share/unicode/emoji/emoji-test.txt";
-      environment.EMOJI_SHORTCODES = "${emoji-shortcodes}";
-      environment.NOTIFICATION_RULES = "${pkgs.writeText "notification-rules.json" (
+      environment.KAIZEN_EMOJI_NAMES = "${pkgs.unicode-emoji}/share/unicode/emoji/emoji-test.txt";
+      environment.KAIZEN_EMOJI_SHORTCODES = "${emoji-shortcodes}";
+      environment.KAIZEN_NOTIFICATION_RULES = "${pkgs.writeText "notification-rules.json" (
         builtins.toJSON config.host.notificationRules
       )}";
       environment.KAIZEN_PLUGINS = lib.concatStringsSep ":" config.host.kaizenPlugins;

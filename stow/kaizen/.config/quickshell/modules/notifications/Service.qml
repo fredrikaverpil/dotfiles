@@ -279,7 +279,7 @@ Item {
 
   FileView {
     id: shortcodeFile
-    path: Quickshell.env("EMOJI_SHORTCODES") || ""
+    path: Quickshell.env("KAIZEN_EMOJI_SHORTCODES") || ""
     // Blocks the first read, so no notification is handled before the map exists.
     blockLoading: true
     printErrors: false
@@ -288,7 +288,7 @@ Item {
   // The host's notification rules (host.notificationRules).
   FileView {
     id: rulesFile
-    path: Quickshell.env("NOTIFICATION_RULES") || ""
+    path: Quickshell.env("KAIZEN_NOTIFICATION_RULES") || ""
     // Blocks the first read, so no notification is handled before the rules exist.
     blockLoading: true
     printErrors: false
