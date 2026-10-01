@@ -264,7 +264,7 @@ Rectangle {
     anchors.bottomMargin: (content.anchors.bottomMargin - height) / 2
     width: content.width * root.remaining
     height: root.toast && root.duration > 0 ? 2 : 0
-    color: root.accent
+    color: root.tint
   }
 
   Timer {
