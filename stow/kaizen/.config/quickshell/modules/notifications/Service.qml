@@ -68,6 +68,7 @@ Item {
     record.notification = notification
     record.duration = NotificationLogic.durationFor(notification, NotificationUrgency.Low, NotificationUrgency.Critical, rules)
     record.transient = notification.transient
+    record.actions = NotificationLogic.actionsOf(notification, rules)
     return record
   }
 
@@ -191,10 +192,15 @@ Item {
     dismiss(record)
   }
 
+  // A rule's action runs its command, not the app's.
   function action(record, selectedAction) {
     if (!record || !selectedAction) return
-    focusApp(record)
-    selectedAction.invoke()
+    if (selectedAction.command) {
+      Quickshell.execDetached(NotificationLogic.commandOf(record, selectedAction))
+    } else {
+      focusApp(record)
+      selectedAction.invoke()
+    }
     dismiss(record)
   }
 
@@ -214,14 +220,15 @@ Item {
   }
 
   function stepButton(delta) {
-    var count = NotificationLogic.buttons(live[selection.key].notification.actions).length
+    var record = live[selection.key]
+    var count = NotificationLogic.buttons(record.notification.actions, record.actions).length
     selection.button = Model.step(selection.button, delta, count)
   }
 
   // Ends the selection: a button usually hands focus to its app.
   function activate() {
     var record = live[selection.key]
-    var buttons = NotificationLogic.buttons(record.notification.actions)
+    var buttons = NotificationLogic.buttons(record.notification.actions, record.actions)
     var button = buttons[Math.min(selection.button, buttons.length - 1)]
     selection.close()
     if (button) action(record, button)

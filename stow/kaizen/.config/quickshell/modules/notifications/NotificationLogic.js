@@ -26,7 +26,11 @@ function compileRules(rules) {
         focus: rule.focus || "",
         icon: iconSource(rule.icon),
         border: rule.border || "",
-        borderAnimation: rule.borderAnimation || ""
+        borderAnimation: rule.borderAnimation || "",
+        // Shaped as buttons, like the app's actions.
+        actions: (rule.actions || []).map(function(action) {
+          return { text: action.label, command: action.command, env: action.env || {} }
+        })
       }
     } catch (error) {
       console.warn("notifications: dropping rule " + JSON.stringify(rule) + ": " + error)
@@ -61,6 +65,23 @@ function dedupOf(notification, rules) {
 function iconOf(notification, rules) {
   var rule = matchingRules(notification, rules).find(function(rule) { return rule.icon })
   return rule ? rule.icon : ""
+}
+
+// The actions of the first matching rule with any, else [].
+function actionsOf(notification, rules) {
+  var rule = matchingRules(notification, rules).find(function(rule) { return rule.actions.length })
+  return rule ? rule.actions : []
+}
+
+// A rule action's command, under `env` with the notification's fields and the
+// action's variables: execDetached's context form fails to convert on Qt 6.11.
+function commandOf(record, action) {
+  var env = Object.assign({
+    NOTIFICATION_APP: record.app,
+    NOTIFICATION_SUMMARY: record.summary,
+    NOTIFICATION_BODY: record.body
+  }, action.env)
+  return ["env"].concat(Object.keys(env).map(function(name) { return name + "=" + asString(env[name]) }), action.command)
 }
 
 // The `field` of the first matching rule with one, else "".
@@ -118,9 +139,10 @@ function emojify(text, shortcodes) {
   })
 }
 
-// "default" is the body click, not a button.
-function buttons(actions) {
+// "default" is the body click, not a button. A rule's actions follow the app's.
+function buttons(actions, ruleActions) {
   return Array.prototype.filter.call(actions || [], function(action) { return action.identifier !== "default" })
+    .concat(ruleActions || [])
 }
 
 // Everything the app sent, unprocessed, for debugging what an app supports.

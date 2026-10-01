@@ -189,6 +189,33 @@ in
               example = lib.literalExpression "./github.svg";
               description = "Icon shown in place of the notification's, such as the sender an app relays for; the notification's own moves to a badge on its corner";
             };
+            actions = lib.mkOption {
+              type = lib.types.listOf (
+                lib.types.submodule {
+                  options = {
+                    label = lib.mkOption {
+                      type = lib.types.str;
+                      description = "Text of the button";
+                    };
+                    command = lib.mkOption {
+                      type = lib.types.listOf lib.types.str;
+                      example = [
+                        "notify-send"
+                        "Pressed"
+                      ];
+                      description = "Program and arguments, run detached and not in a shell";
+                    };
+                    env = lib.mkOption {
+                      type = lib.types.attrsOf lib.types.str;
+                      default = { };
+                      description = "Variables added to the command's environment, besides NOTIFICATION_APP, NOTIFICATION_SUMMARY and NOTIFICATION_BODY";
+                    };
+                  };
+                }
+              );
+              default = [ ];
+              description = "Buttons after the toast's own; pressing one runs its command and dismisses the toast. The first matching rule with any applies";
+            };
           };
         }
       );
