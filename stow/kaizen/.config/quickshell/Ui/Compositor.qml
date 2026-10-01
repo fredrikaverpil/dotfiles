@@ -14,6 +14,7 @@ Singleton {
   function configFile(home, niriConfig) { return Niri.configFile(home, niriConfig) }
   function readBinds(file, home, read) { return Niri.readBinds(file, home, read) }
   function focusWorkspace(id, output) { return Niri.focusWorkspace(id, output) }
+  function focusApp(pattern) { return Niri.focusApp(pattern) }
   function focusMonitor(output) { return Niri.focusMonitor(output) }
   function outputs() { return Niri.outputs() }
   function focusedOutputOn(output) { return Niri.focusedOutputOn(output) }

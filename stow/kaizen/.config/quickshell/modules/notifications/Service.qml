@@ -170,8 +170,16 @@ Item {
     record.notification.expire()
   }
 
+  // Apps cannot raise their own window without an activation token, which the
+  // server has no way to pass on, so the shell focuses it.
+  function focusApp(record) {
+    var pattern = NotificationLogic.focusPatternOf(record.notification, rules)
+    if (pattern) Quickshell.execDetached(Ui.Compositor.focusApp(pattern))
+  }
+
   function defaultAction(record) {
     if (!record || !record.notification) return
+    focusApp(record)
 
     var actions = record.notification.actions || []
     for (var index = 0; index < actions.length; index++) {
@@ -185,6 +193,7 @@ Item {
 
   function action(record, selectedAction) {
     if (!record || !selectedAction) return
+    focusApp(record)
     selectedAction.invoke()
     dismiss(record)
   }

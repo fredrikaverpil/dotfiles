@@ -104,6 +104,27 @@ TestCase {
     })
   }
 
+  function test_notification_app_id_prefers_the_desktop_entry() {
+    compare(Notification.appIdOf({ desktopEntry: "slack", appName: "Slack" }), "slack")
+    compare(Notification.appIdOf({ desktopEntry: "slack.desktop", appName: "Slack" }), "slack")
+    compare(Notification.appIdOf({ desktopEntry: "", appName: "Signal" }), "Signal")
+    compare(Notification.appIdOf({}), "")
+  }
+
+  function test_notification_focus_pattern_is_the_matching_rules_else_the_apps_own_id() {
+    const rules = Notification.compileRules([
+      { match: { app: "^Slack$", summary: " from Google Calendar$" }, focus: "^chrome-calendar" },
+      { match: { app: "^Slack$" } },
+    ])
+
+    compare(Notification.focusPatternOf({ appName: "Slack", desktopEntry: "slack", summary: "[x] from Google Calendar" }, rules),
+      "^chrome-calendar")
+    compare(Notification.focusPatternOf({ appName: "Slack", desktopEntry: "slack", summary: "[x] from Egil" }, rules),
+      "(?i)^slack$")
+    compare(Notification.focusPatternOf({ appName: "Mail", desktopEntry: "org.a.b" }, rules), "(?i)^org\\.a\\.b$")
+    compare(Notification.focusPatternOf({}, rules), "")
+  }
+
   function test_notification_buttons_skip_the_default_action() {
     const open = { identifier: "default", text: "Open" }
     const reply = { identifier: "reply", text: "Reply" }

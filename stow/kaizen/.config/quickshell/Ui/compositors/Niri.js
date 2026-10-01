@@ -58,6 +58,10 @@ function focusWorkspace(id, output) {
     "sh", output, String(id)]
 }
 
+// Focuses the most recently focused window whose app id matches pattern; does
+// nothing when none does.
+function focusApp(pattern) { return ["kaizen-focus", pattern, "true"] }
+
 function focusMonitor(output) { return ["niri", "msg", "action", "focus-monitor", output] }
 
 function outputs() { return ["niri", "msg", "-j", "focused-output"] }
