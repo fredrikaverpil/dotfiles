@@ -18,7 +18,7 @@ Ui.Panel {
     : []
   readonly property bool micMuted: sources.length > 0 && sources.every(node => node.audio.muted)
   readonly property string icon: muted || volume <= 0
-    ? "󰝟"
+    ? "󰖁"
     : volume < 0.34 ? "󰕿" : volume < 0.67 ? "󰖀" : "󰕾"
 
   property int cursor: -1

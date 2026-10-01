@@ -264,7 +264,7 @@ Scope {
         anchors.rightMargin: visible ? (mediaWidget.width > 0 ? 4 : 6) : 0
         visible: !bar.shell.idle.enabled
         foreground: bar.shell.palette.rose
-        label: "󰅶"
+        label: "󱙱"
         onActivated: bar.shell.idle.setEnabled(true)
       }
 
