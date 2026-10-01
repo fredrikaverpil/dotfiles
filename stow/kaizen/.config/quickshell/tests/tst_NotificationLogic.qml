@@ -13,14 +13,14 @@ TestCase {
     })
   }
 
-  function test_notification_urgency_raises_notifications_matching_every_field_of_a_critical_rule() {
+  function test_notification_urgency_is_set_by_notifications_matching_every_field_of_a_rule() {
     const rules = Notification.compileRules([
-      { match: { app: "^Slack$", summary: " in #?alerts$" }, critical: true },
+      { match: { app: "^Slack$", summary: " in #?alerts$" }, urgency: "critical" },
       { match: { app: "^Slack$", summary: " in #general$" } },
-      { match: { body: "[" }, critical: true },
-      { match: {}, critical: true },
-      { critical: true },
-      { match: { sumary: "x" }, critical: true },
+      { match: { body: "[" }, urgency: "critical" },
+      { match: {}, urgency: "critical" },
+      { urgency: "critical" },
+      { match: { sumary: "x" }, urgency: "critical" },
     ])
 
     compare(Notification.urgencyOf({ appName: "Slack", summary: "[x] in #alerts", urgency: 1 }, rules), 2)
@@ -35,10 +35,25 @@ TestCase {
     })
   }
 
+  function test_notification_urgency_comes_from_the_first_matching_rule_with_one() {
+    const rules = Notification.compileRules([
+      { match: { app: "^Slack$", summary: " in #?alerts-dev$" }, urgency: "normal" },
+      { match: { app: "^Slack$", summary: " from Bot$" } },
+      { match: { app: "^Slack$", summary: " from Bot$" }, urgency: "low" },
+      { match: { app: "^Slack$" }, urgency: "critical" },
+    ])
+
+    compare(Notification.urgencyOf({ appName: "Slack", summary: "[x] in #alerts-dev", urgency: 2 }, rules), 1)
+    compare(Notification.urgencyOf({ appName: "Slack", summary: "[x] from Bot", urgency: 2 }, rules), 0)
+    compare(Notification.urgencyOf({ appName: "Slack", summary: "[x] in #general", urgency: 0 }, rules), 2)
+    compare(Notification.urgencyOf({ appName: "Mail", urgency: 2 }, rules), 2)
+    compare(Notification.durationFor({ appName: "Slack", summary: "[x] from Bot", urgency: 2, expireTimeout: 1 }, 0, 2, rules), 5000)
+  }
+
   function test_notification_dedup_comes_from_the_first_matching_rule_with_a_group() {
     const rules = Notification.compileRules([
       { match: { app: "^Chromium$", body: "^calendar\\.google\\.com\\n" }, dedup: { group: "calendar", keep: true } },
-      { match: { app: "^Slack$", summary: " from Google Calendar$" }, critical: true },
+      { match: { app: "^Slack$", summary: " from Google Calendar$" }, urgency: "critical" },
       { match: { app: "^Slack$", summary: " from Google Calendar$" }, dedup: { group: "calendar", keep: false } },
       { match: { app: "^Slack$" }, dedup: { group: "slack", keep: false } },
     ])
@@ -52,7 +67,7 @@ TestCase {
 
   function test_notification_icon_comes_from_the_first_matching_rule_with_one() {
     const rules = Notification.compileRules([
-      { match: { app: "^Slack$", summary: " from Google Calendar$" }, critical: true, icon: null },
+      { match: { app: "^Slack$", summary: " from Google Calendar$" }, urgency: "critical", icon: null },
       { match: { app: "^Slack$", summary: " from GitHub$" }, icon: "/nix/store/x-github.svg" },
       { match: { app: "^Slack$" }, icon: "image://icon/slack" },
     ])
@@ -68,8 +83,8 @@ TestCase {
 
   function test_notification_border_comes_from_the_first_matching_rule_with_one() {
     const rules = Notification.compileRules([
-      { match: { app: "^Slack$", summary: " in #?alerts$" }, critical: true, border: "rose", borderAnimation: "orbit" },
-      { match: { app: "^Slack$", summary: " in #?alerts-dev$" }, critical: true, border: "water" },
+      { match: { app: "^Slack$", summary: " in #?alerts$" }, urgency: "critical", border: "rose", borderAnimation: "orbit" },
+      { match: { app: "^Slack$", summary: " in #?alerts-dev$" }, urgency: "critical", border: "water" },
     ])
 
     compare(Notification.ruleValue({ appName: "Slack", summary: "[x] in #alerts" }, rules, "border"), "rose")
