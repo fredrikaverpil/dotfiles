@@ -26,6 +26,11 @@ Item {
 
   property bool stateLoaded: false
   property bool doNotDisturb: false
+  // Debug aid, driven over IPC only: records each arriving notification's raw
+  // data in memory, newest first.
+  property bool capture: false
+  readonly property int captureLimit: 50
+  property var captureRows: []
   readonly property alias historyShown: historyPanel.shown
   property var popupRows: []
   property var historyRows: []
@@ -118,6 +123,8 @@ Item {
     }
 
     record = recordFor(notification)
+
+    if (capture) captureRows = [NotificationLogic.captureOf(notification, record.timestamp)].concat(captureRows).slice(0, captureLimit)
 
     if (doNotDisturb && record.urgency !== NotificationUrgency.Critical) {
       addHistory(record)
@@ -327,6 +334,17 @@ Item {
       root.setDoNotDisturb(Model.dndValue(value))
       return dndState()
     }
+
+    function captureState(): string { return root.capture ? "on" : "off" }
+
+    // Turning it on starts a fresh capture.
+    function toggleCapture(): string {
+      root.capture = !root.capture
+      if (root.capture) root.captureRows = []
+      return captureState()
+    }
+
+    function captured(): string { return JSON.stringify(root.captureRows, null, 2) }
 
     function showHistory(): string {
       root.showHistory()

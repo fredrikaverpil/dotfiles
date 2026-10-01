@@ -93,6 +93,17 @@ TestCase {
     compare(Notification.durationFor({ urgency: 1, expireTimeout: -1 }, low, critical), 8000)
   }
 
+  function test_notification_capture_keeps_actions_and_hints_unprocessed() {
+    compare(Notification.captureOf({
+      id: 7, appName: "Slack", desktopEntry: "slack", summary: ":tada: hi", urgency: 1, expireTimeout: -1,
+      actions: [{ identifier: "default", text: "Open" }], hints: { "sender-pid": 42 },
+    }, 123), {
+      timestamp: 123, id: 7, app: "Slack", desktopEntry: "slack", appIcon: "", summary: ":tada: hi", body: "",
+      image: "", urgency: 1, expireTimeout: -1, resident: false, transient: false,
+      actions: [{ identifier: "default", text: "Open" }], hints: { "sender-pid": 42 },
+    })
+  }
+
   function test_notification_buttons_skip_the_default_action() {
     const open = { identifier: "default", text: "Open" }
     const reply = { identifier: "reply", text: "Reply" }

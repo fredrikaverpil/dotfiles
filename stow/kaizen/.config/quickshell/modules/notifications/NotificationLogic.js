@@ -95,3 +95,31 @@ function emojify(text, shortcodes) {
 function buttons(actions) {
   return Array.prototype.filter.call(actions || [], function(action) { return action.identifier !== "default" })
 }
+
+// Everything the app sent, unprocessed, for debugging what an app supports.
+function captureOf(notification, timestamp) {
+  var hints
+  try {
+    hints = JSON.parse(JSON.stringify(notification.hints || {}))
+  } catch (error) {
+    hints = String(notification.hints)
+  }
+  return {
+    timestamp: timestamp,
+    id: notification.id,
+    app: asString(notification.appName),
+    desktopEntry: asString(notification.desktopEntry),
+    appIcon: asString(notification.appIcon),
+    summary: asString(notification.summary),
+    body: asString(notification.body),
+    image: asString(notification.image),
+    urgency: Number(notification.urgency),
+    expireTimeout: Number(notification.expireTimeout),
+    resident: !!notification.resident,
+    transient: !!notification.transient,
+    actions: Array.prototype.map.call(notification.actions || [], function(action) {
+      return { identifier: action.identifier, text: action.text }
+    }),
+    hints: hints
+  }
+}
