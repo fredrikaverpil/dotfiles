@@ -13,12 +13,16 @@ function activeAccount(accounts) {
   return active ? active.account : ""
 }
 
-// The login as `gcloud auth print-access-token` reports it. Every error a new
-// login fixes says to run `gcloud auth login`; any other, a timeout included,
-// is a failed check (null).
-function token(exitCode, stderr) {
+// The errors a new login fixes: they say which login to run, except missing
+// application default credentials, whose error names none.
+var LOGIN = /gcloud auth login/
+var ADC_LOGIN = /gcloud auth application-default login|default credentials were not found/
+
+// The login as `print-access-token` reports it. An error that login does not
+// match, a timeout included, is a failed check (null).
+function token(exitCode, stderr, login) {
   if (exitCode === 0) return { ok: true, reason: "" }
-  if (stderr.indexOf("gcloud auth login") < 0) return null
+  if (!login.test(stderr)) return null
   var line = stderr.trim().split("\n")[0]
   return { ok: false, reason: line.replace(/^ERROR: \([^)]*\) /, "") }
 }

@@ -5,9 +5,10 @@ import qs.Ui as Ui
 
 import "GcloudModel.js" as Model
 
-// Whether the active gcloud account still yields an access token. Checks at
+// Whether the active gcloud account, and the application default credentials
+// (ADC) that client libraries use, still yield an access token. Checks at
 // start, hourly, and after every action. Every check and action runs gcloud;
-// the shell never reads the token.
+// the shell never reads a token.
 Ui.Plugin {
   id: plugin
 
@@ -15,6 +16,9 @@ Ui.Plugin {
   // The last check that succeeded, null until one does: { accounts, active, ok, reason }.
   property var auth: null
   property bool failed: false
+  // The last ADC check that succeeded, null until one does: { ok, reason }.
+  property var adc: null
+  property bool adcFailed: false
   // A refresh asked for while a check ran.
   property bool pending: false
   // The check in flight: { accounts, active }.
@@ -27,6 +31,11 @@ Ui.Plugin {
     : auth.ok ? "Logged in as " + auth.active
     : auth.active ? "Logged out: " + auth.active
     : "No active account"
+  readonly property bool adcLoggedIn: adc !== null && adc.ok
+  readonly property string adcStatus: adcFailed ? "ADC: check failed"
+    : !adc ? "ADC: checking…"
+    : adc.ok ? "ADC: logged in"
+    : "ADC: logged out"
 
   // Always shown: neither state is an alert. Left-click refreshes while logged
   // in, otherwise logs in.
@@ -38,10 +47,14 @@ Ui.Plugin {
   menuItems: Object.assign({
     "plugins.gcloud-auth": { icon: plugin.icon, label: "gcloud auth" },
     "plugins.gcloud-auth.status": { icon: plugin.icon, label: plugin.status, enabled: false },
+    "plugins.gcloud-auth.adc": { icon: plugin.adcLoggedIn ? "\u{F015F}" : "\u{F0164}", label: plugin.adcStatus,
+      enabled: false },
   }, plugin.accountItems(), {
     "plugins.gcloud-auth.refresh": { icon: "󰑐", label: "Refresh now", action: () => plugin.refresh() },
     "plugins.gcloud-auth.login": { icon: "\u{F0342}", label: "Log in",
       enabled: !plugin.loggedIn && !login.running, action: () => plugin.logIn() },
+    "plugins.gcloud-auth.loginAdc": { icon: "\u{F0342}", label: "Log in ADC",
+      enabled: !plugin.adcLoggedIn && !adcLogin.running, action: () => plugin.logInAdc() },
   })
 
   // Items, not a provider, so a root search finds an account.
@@ -58,16 +71,28 @@ Ui.Plugin {
     return items
   }
 
+  // `running` is read here, not through a binding: it notifies only after a
+  // Process's exited handler.
   function refresh() {
-    // Not a binding: `running` notifies only after a Process's exited handler.
-    if (list.running || token.running) {
+    if (list.running || token.running || adcToken.running) {
       plugin.pending = true
       return
     }
     list.running = true
+    adcToken.running = true
+  }
+
+  // Runs a refresh asked for while checks ran, once all have ended.
+  function settle() {
+    if (plugin.pending && !list.running && !token.running && !adcToken.running) {
+      plugin.pending = false
+      plugin.refresh()
+    }
   }
 
   function logIn() { login.running = true }
+
+  function logInAdc() { adcLogin.running = true }
 
   function activate(account) {
     switcher.command = ["timeout", "30", "gcloud", "config", "set", "account", account]
@@ -82,10 +107,7 @@ Ui.Plugin {
         Quickshell.execDetached(["notify-send", "-a", "gcloud auth", "Logged out: " + next.active, next.reason])
       plugin.auth = next
     }
-    if (plugin.pending) {
-      plugin.pending = false
-      plugin.refresh()
-    }
+    plugin.settle()
   }
 
   IpcHandler {
@@ -93,7 +115,9 @@ Ui.Plugin {
 
     function refresh(): void { plugin.refresh() }
     function login(): void { plugin.logIn() }
+    function loginAdc(): void { plugin.logInAdc() }
     function status(): string { return plugin.status }
+    function adcStatus(): string { return plugin.adcStatus }
   }
 
   Timer {
@@ -126,8 +150,22 @@ Ui.Plugin {
     id: token
     stderr: StdioCollector { id: tokenErr }
     onExited: function (exitCode) {
-      const result = Model.token(exitCode, tokenErr.text)
+      const result = Model.token(exitCode, tokenErr.text, Model.LOGIN)
       plugin.finish(result ? Object.assign({}, plugin.checking, result) : null)
+    }
+  }
+
+  // Like token, and independent of the active account. A failed check keeps
+  // the last result.
+  Process {
+    id: adcToken
+    command: ["timeout", "30", "gcloud", "auth", "application-default", "print-access-token"]
+    stderr: StdioCollector { id: adcErr }
+    onExited: function (exitCode) {
+      const result = Model.token(exitCode, adcErr.text, Model.ADC_LOGIN)
+      plugin.adcFailed = result === null
+      if (result) plugin.adc = result
+      plugin.settle()
     }
   }
 
@@ -135,6 +173,13 @@ Ui.Plugin {
   Process {
     id: login
     command: ["timeout", "300", "gcloud", "auth", "login", "--brief"]
+    onExited: plugin.refresh()
+  }
+
+  // Opens the browser; writes the ADC file client libraries read.
+  Process {
+    id: adcLogin
+    command: ["timeout", "300", "gcloud", "auth", "application-default", "login"]
     onExited: plugin.refresh()
   }
 
