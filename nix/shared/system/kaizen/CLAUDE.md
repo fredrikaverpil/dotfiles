@@ -33,10 +33,10 @@ previous states. Explain a declaration next to it, not here.
   integration. Read `session.nix` here, `../linux-desktop.nix` and
   `../thinkpad.nix`, plus the host's `configuration.nix`, before asking.
 - Quickshell does not watch plugins: apply an edit with
-  `qs ipc call shell reload`. `qml-test` runs the calendar's tests; `qml-lint`
-  skips plugins (their `import qs.Ui` resolves only inside Quickshell). A tray
-  plugin's user unit starts with the session when its module sets
-  `autostart`.
+  `qs ipc call shell reload`. `qml-test` runs the calendar's and gcloud-auth's
+  tests; `qml-lint` skips plugins (their `import qs.Ui` resolves only inside
+  Quickshell). A tray plugin's user unit starts with the session when its module
+  sets `autostart`.
 - SSH keys come from the Proton Pass app's agent (`SSH_AUTH_SOCK` in
   `../linux-desktop.nix`), so the app must be running. While it is locked, a key
   request waits 60 s for an unlock, then fails as `Permission denied
