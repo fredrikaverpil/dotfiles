@@ -165,6 +165,7 @@
                       export QT_QPA_PLATFORM=offscreen QT_QPA_PLATFORMTHEME=
                       qmltestrunner -input tests
                       qmltestrunner -input ../../../../nix/shared/system/kaizen/plugins/calendar
+                      qmltestrunner -input ../../../../nix/shared/system/kaizen/plugins/gcloud-auth
                     '')
                     pkgs.lua
                   ]

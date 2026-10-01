@@ -200,7 +200,11 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   left-click calls the plugin, right-click opens its `plugins.<name>` node.
   Unlike the core indicators, the plugin picks when it shows and its colour.
   [`nix/hosts/renoir/kaizen-plugins/hello/`](nix/hosts/renoir/kaizen-plugins/hello/)
-  is the minimal example.
+  is the minimal example;
+  [`nix/shared/system/kaizen/plugins/gcloud-auth/`](nix/shared/system/kaizen/plugins/gcloud-auth/)
+  always shows its login state as one.
+- Plugin code runs in the shell as QML/JS. It needs a process of its own only
+  for a tray item or for work that must outlive a shell reload, as below.
 - A plugin that needs a long-running backend brings its own daemon: its module
   adds the unit, and its QML queries the daemon's IPC. The calendar
   ([`nix/shared/system/kaizen/plugins/calendar/`](nix/shared/system/kaizen/plugins/calendar/))
