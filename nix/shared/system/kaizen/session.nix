@@ -133,6 +133,25 @@ in
               default = false;
               description = "Raise to critical, so it sticks and bypasses Do Not Disturb";
             };
+            border = lib.mkOption {
+              type = lib.types.nullOr (
+                lib.types.enum [
+                  "rose"
+                  "leaf"
+                  "wood"
+                  "water"
+                  "blossom"
+                  "sky"
+                ]
+              );
+              default = null;
+              description = "Palette colour of the toast's border, in place of the one its urgency gives";
+            };
+            borderAnimation = lib.mkOption {
+              type = lib.types.nullOr (lib.types.enum [ "orbit" ]);
+              default = null;
+              description = "Animation of the border: `orbit` keeps a dash travelling around it, and dims the border itself so the dash stands out";
+            };
             dedup = lib.mkOption {
               type = lib.types.nullOr (
                 lib.types.submodule {

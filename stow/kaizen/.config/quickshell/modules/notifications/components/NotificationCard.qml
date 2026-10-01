@@ -1,6 +1,7 @@
 
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Shapes
 import Quickshell
 
 import "../../../Ui" as Ui
@@ -31,9 +32,13 @@ Rectangle {
   readonly property string body: String(row.body || "")
   readonly property string image: String(row.image || "")
   readonly property string ruleIcon: String(row.icon || "")
+  readonly property real perimeter: 2 * (width + height)
   readonly property int urgency: Number(row.urgency)
   readonly property var buttons: NotificationLogic.buttons(notification ? notification.actions : [])
   readonly property color accent: urgency === 2 ? palette.rose : (urgency === 0 ? palette.off : palette.fg)
+  // A rule's border colour takes the place of the urgency's.
+  readonly property color tint: palette[String(row.border || "")] ?? accent
+  readonly property bool orbiting: toast && row.borderAnimation === "orbit"
   // A rule's icon takes the notification's place, which moves to the badge.
   readonly property string icon: ruleIcon || ownIcon
   readonly property string badge: ruleIcon ? ownIcon : ""
@@ -49,7 +54,7 @@ Rectangle {
   implicitHeight: content.implicitHeight + 24
   radius: 8
   color: activeFocus || selected ? palette.sel : palette.bg
-  border.color: accent
+  border.color: orbiting ? Qt.alpha(tint, 0.3) : tint
   border.width: 1
   clip: true
 
@@ -69,6 +74,37 @@ Rectangle {
     onClicked: function(mouse) {
       if (mouse.button === Qt.RightButton) root.closeRequested()
       else root.invokeRequested()
+    }
+  }
+
+  // A short dash on the border, travelling its perimeter. Dash and gap are in
+  // stroke widths; the gap exceeds the perimeter, so the dash laps alone, with a pause.
+  Shape {
+    id: orbit
+    readonly property real dash: 28
+    readonly property real period: dash + root.perimeter / 2 + 150
+    anchors.fill: parent
+    visible: root.orbiting
+    layer.enabled: visible
+    layer.samples: 4
+
+    ShapePath {
+      strokeColor: root.tint
+      strokeWidth: 2
+      fillColor: "transparent"
+      capStyle: ShapePath.RoundCap
+      strokeStyle: ShapePath.DashLine
+      dashPattern: [orbit.dash, orbit.period - orbit.dash]
+
+      NumberAnimation on dashOffset {
+        running: orbit.visible
+        loops: Animation.Infinite
+        from: 0
+        to: -orbit.period
+        duration: orbit.period * 5
+      }
+
+      PathRectangle { x: 1; y: 1; width: root.width - 2; height: root.height - 2; radius: 7 }
     }
   }
 
