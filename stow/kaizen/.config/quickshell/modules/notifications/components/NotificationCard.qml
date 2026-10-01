@@ -34,7 +34,7 @@ Rectangle {
   readonly property string ruleIcon: String(row.icon || "")
   readonly property real perimeter: 2 * (width + height)
   readonly property int urgency: Number(row.urgency)
-  readonly property var buttons: NotificationLogic.buttons(notification ? notification.actions : [])
+  readonly property var buttons: notification ? NotificationLogic.buttons(notification.actions, row.actions) : []
   readonly property color accent: urgency === 2 ? palette.rose : (urgency === 0 ? palette.off : palette.fg)
   // A rule's border colour takes the place of the urgency's.
   readonly property color tint: palette[String(row.border || "")] ?? accent
