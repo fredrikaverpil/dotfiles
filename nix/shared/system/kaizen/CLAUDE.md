@@ -52,6 +52,12 @@ previous states. Explain a declaration next to it, not here.
   `move-floating-window` takes coordinates in the output's working area, which
   the bar shortens at the top, and reads a bare negative number as a relative
   move.
+- Apps differ in the actions and hints their notifications carry, and the shell
+  logs none of it. `qs ipc call notifications toggleCapture` records each
+  arriving notification's raw data, message text included, in memory (a new
+  capture each time it is turned on); `captured` returns it as JSON. It is off
+  after every shell restart. Capture a real one before handling an app's
+  notifications specially.
 - Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Niri KDL booleans are presence-only, not `option true`.
 - Use `keyNavigation` for ordinary focus chains; use a panel-managed cursor
