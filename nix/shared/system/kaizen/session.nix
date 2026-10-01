@@ -128,10 +128,16 @@ in
               };
               description = "JavaScript regexes keyed by notification field (app, summary, body); the rule applies when all match";
             };
-            critical = lib.mkOption {
-              type = lib.types.bool;
-              default = false;
-              description = "Raise to critical, so it sticks and bypasses Do Not Disturb";
+            urgency = lib.mkOption {
+              type = lib.types.nullOr (
+                lib.types.enum [
+                  "low"
+                  "normal"
+                  "critical"
+                ]
+              );
+              default = null;
+              description = "Urgency in place of the one the app sent; critical sticks and bypasses Do Not Disturb, low expires sooner. The first matching rule with one applies";
             };
             border = lib.mkOption {
               type = lib.types.nullOr (
@@ -336,7 +342,7 @@ in
           app = "^Chromium$";
           body = "^calendar\\.google\\.com\\n";
         };
-        critical = true;
+        urgency = "critical";
         border = "leaf";
         dedup = {
           group = "calendar";
@@ -359,7 +365,7 @@ in
           app = "^Slack$";
           summary = " from Google Calendar$";
         };
-        critical = true;
+        urgency = "critical";
         border = "leaf";
         dedup.group = "calendar";
         # Slack relays the reminder, but the event is in the Calendar app.

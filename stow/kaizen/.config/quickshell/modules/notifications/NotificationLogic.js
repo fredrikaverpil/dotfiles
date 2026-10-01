@@ -21,7 +21,7 @@ function compileRules(rules) {
     try {
       return {
         checks: fields.map(function(field) { return { field: field, pattern: new RegExp(match[field]) } }),
-        critical: !!rule.critical,
+        urgency: rule.urgency || "",
         dedup: rule.dedup || null,
         focus: rule.focus || "",
         icon: iconSource(rule.icon),
@@ -43,10 +43,12 @@ function matchingRules(notification, rules) {
   })
 }
 
-// Raised to critical (2) by any matching critical rule.
+var urgencies = { low: 0, normal: 1, critical: 2 }
+
+// The urgency of the first matching rule with one, else the notification's own.
 function urgencyOf(notification, rules) {
-  var critical = matchingRules(notification, rules).some(function(rule) { return rule.critical })
-  return critical ? 2 : Number(notification.urgency)
+  var level = urgencies[ruleValue(notification, rules, "urgency")]
+  return level === undefined ? Number(notification.urgency) : level
 }
 
 // The `{ group, keep }` of the first matching rule with one, else null.
