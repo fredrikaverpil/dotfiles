@@ -223,7 +223,7 @@ Ui.Panel {
   property var emojis: []
 
   FileView {
-    path: Quickshell.env("EMOJI_TEST") || ""
+    path: Quickshell.env("KAIZEN_EMOJI_NAMES") || ""
     printErrors: false
     onLoaded: menu.emojis = Model.parseEmoji(text()).map(e => ({
       label: e.name,
