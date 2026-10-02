@@ -38,15 +38,6 @@ previous states. Explain a declaration next to it, not here.
   niri ignores for a mapped window (no focus, no urgency), so the prompt stays
   on workspace 7; unlocking there within the minute lets the waiting `ssh`/`git`
   proceed.
-- The recording camera (`README.md` › Recording): mpv sizes in device pixels,
-  which is why the service asks niri for the focused output's scale instead of
-  using Qt's rounded `devicePixelRatio`. niri has neither an aspect-ratio rule
-  nor sticky windows, and mpv accepts any size it is given, so while the
-  preview is up the service follows the event stream: it sets the window's
-  height back to its width and moves it to each workspace that gains focus.
-  `move-floating-window` takes coordinates in the output's working area, which
-  the bar shortens at the top, and reads a bare negative number as a relative
-  move.
 - Apps differ in the actions and hints their notifications carry, and the shell
   logs none of it. `qs ipc call notifications toggleCapture` records each
   arriving notification's raw data, message text included, in memory (a new
