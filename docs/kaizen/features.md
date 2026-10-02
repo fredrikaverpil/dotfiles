@@ -15,6 +15,16 @@ before drawing the prompt, so the prompt is never painted onto a dark panel.
 Being only a layer surface, it dies with Quickshell, and anyone at the
 keyboard can close it. Use the lock whenever the machine is left alone.
 
+## Notification rules
+
+`host.notificationRules` restyles toasts and adds buttons to them, keyed by
+regexes on a notification's app, summary and body; its option descriptions in
+[`session.nix`](../../nix/shared/system/kaizen/session.nix) cover each field.
+Rules match only on what the app sends, so a host adds the rules for its own
+apps, such as a Slack alert channel whose toast gets a button that hands the
+message to a script. A button's command gets the message as
+`NOTIFICATION_APP`, `NOTIFICATION_SUMMARY` and `NOTIFICATION_BODY`.
+
 ## Recording
 
 - The camera is a circle because gpu-screen-recorder cannot mask its own

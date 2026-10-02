@@ -42,6 +42,11 @@ under "Required local validation".
   capture each time it is turned on); `captured` returns it as JSON. It is off
   after every shell restart. Capture a real one before handling an app's
   notifications specially.
+- `notify-send -a <app> <summary> <body>` fakes an app's notification, to try a
+  notification rule without waiting for the real one, for example
+  `notify-send -a Slack "[workspace] in #alerts" "<https://example.com|View>"`.
+  It carries only what you pass, so copy the summary and body from a captured
+  one.
 - Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Niri KDL booleans are presence-only, not `option true`.
 - Use `keyNavigation` for ordinary focus chains; use a panel-managed cursor
