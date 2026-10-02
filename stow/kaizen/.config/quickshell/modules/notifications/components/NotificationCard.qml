@@ -79,17 +79,20 @@ Rectangle {
 
   // A thicker dash on the border, travelling its perimeter. Dash and gap are in
   // stroke widths; the gap exceeds the perimeter, so the dash laps alone, with a pause.
+  // The lap is timed by the wall clock, so every orbiting toast laps in step.
   Shape {
     id: orbit
     readonly property real thickness: 3
     readonly property real dash: 56 / thickness
     readonly property real period: dash + (root.perimeter + 300) / thickness
+    readonly property int lap: 3600
     anchors.fill: parent
     visible: root.orbiting
     layer.enabled: visible
     layer.samples: 4
 
     ShapePath {
+      id: orbitPath
       strokeColor: root.tint
       strokeWidth: orbit.thickness
       fillColor: "transparent"
@@ -97,15 +100,12 @@ Rectangle {
       strokeStyle: ShapePath.DashLine
       dashPattern: [orbit.dash, orbit.period - orbit.dash]
 
-      NumberAnimation on dashOffset {
-        running: orbit.visible
-        loops: Animation.Infinite
-        from: 0
-        to: -orbit.period
-        duration: orbit.period * orbit.thickness * 2.5
-      }
-
       PathRectangle { x: 1.5; y: 1.5; width: root.width - 3; height: root.height - 3; radius: 6.5 }
+    }
+
+    FrameAnimation {
+      running: orbit.visible
+      onTriggered: orbitPath.dashOffset = -(Date.now() % orbit.lap) / orbit.lap * orbit.period
     }
   }
 
