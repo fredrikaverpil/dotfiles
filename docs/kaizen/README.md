@@ -80,7 +80,7 @@ place, live on save: the compositor config and the shell's QML.
   none, and a plugin keeps its QML beside its Nix module instead. The module
   lists its directory in `host.kaizenPlugins`, read in place from the checkout.
 - Nix hands the shell values only through `quickshell.service`'s environment
-  (`KAIZEN_PLUGINS`, `KAIZEN_NOTIFICATION_RULES`, `KAIZEN_EMOJI_*`).
+  (`KAIZEN_PLUGINS`, `KAIZEN_NOTIFICATION_RULES`, `KAIZEN_EMOJI`).
 - Apps are not kaizen's: [`nix/README.md`](../../nix/README.md) says where they
   go.
 - QML paths here (`modules/…`, `Ui/…`) are under

@@ -223,9 +223,10 @@ Ui.Panel {
   property var emojis: []
 
   FileView {
-    path: Quickshell.env("KAIZEN_EMOJI_NAMES") || ""
+    path: Quickshell.env("KAIZEN_EMOJI") || ""
     printErrors: false
-    onLoaded: menu.emojis = Model.parseEmoji(text()).map(e => ({
+    // Shortcode-only entries (skin tones) have no name.
+    onLoaded: menu.emojis = JSON.parse(text()).filter(e => e.name).map(e => ({
       label: e.name,
       icon: e.emoji,
       image: "",
