@@ -46,7 +46,7 @@
   "respondToBashCommands": false,
   "statusLine": {
     "type": "command",
-    "command": "~/code/public/github.com/fredrikaverpil/claudeline/claudeline -debug"
+    "command": "~/code/public/github.com/fredrikaverpil/claudeline/claudeline -debug -effort"
   },
   "enabledPlugins": {
     "context7@claude-plugins-official": false,
