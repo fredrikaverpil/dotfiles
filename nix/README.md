@@ -14,7 +14,7 @@ Go down the list; the first match wins.
    (bluetui, nm-connection-editor).
 2. **kaizen plugin**: optional; the shell runs without it. Written for kaizen,
    not a third-party app with a tray icon. Paths are in
-   [`../KAIZEN.md`](../KAIZEN.md) › Where it lives.
+   [`../docs/kaizen/README.md`](../docs/kaizen/README.md) › Where it lives.
 3. **Hardware class**:
    [`shared/system/thinkpad.nix`](shared/system/thinkpad.nix).
 4. **Anything else is an app or a host setting**, and kaizen does not decide
@@ -47,8 +47,8 @@ plugins. Servers import neither. The two stay independent: `linux-desktop.nix`
 sets no kaizen option, and kaizen declares everything it runs, even a tool
 another scope also installs (`jq`, `imagemagick`). kaizen's own settings, such
 as its notification rules, may name apps; a host adds to them in its own
-configuration. [`../KAIZEN.md`](../KAIZEN.md) maps kaizen's own parts, Nix and
-Stow.
+configuration. [`../docs/kaizen/README.md`](../docs/kaizen/README.md) maps
+kaizen's own parts, Nix and Stow.
 
 An app's niri window rules and binds go in
 `stow/host/<hostname>/.config/niri/apps.kdl` (example in
