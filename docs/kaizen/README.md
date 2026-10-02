@@ -6,6 +6,7 @@ that an agent can drive and verify from a terminal.
 
 This file is the design and the map. The rest:
 
+- [`plugins.md`](plugins.md): optional shell extensions and how to write one.
 - [`style.md`](style.md): palette, colour roles, shapes, status marks.
 - [`development.md`](development.md): working on kaizen, validation and
   deployment.
@@ -123,7 +124,6 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 [BlueZ]: https://github.com/bluez/bluez
 [sysfs backlight]: https://www.kernel.org/doc/Documentation/ABI/stable/sysfs-class-backlight
 [logind]: https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.login1.html
-[dcal]: https://github.com/AvengeMedia/dankcalendar
 [wl-clipboard]: https://github.com/bugaevc/wl-clipboard
 [ext-idle-notify]: https://wayland.app/protocols/ext-idle-notify-v1
 [niri]: https://github.com/YaLTeR/niri/wiki
@@ -201,28 +201,8 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
     (stops the recording, re-enables idle locking, resets the layout). The
     system alert is a plain label.
   - Tray items: the app's own activation and menu.
-- A plugin
-  ([`Ui/Plugin.qml`](../../stow/kaizen/.config/quickshell/Ui/Plugin.qml)) adds
-  launcher items, its own panels and IPC targets, and may take over the date
-  button (`barActions.date`) or show an indicator (`barIndicator`): left-click
-  calls the plugin, right-click opens its `plugins.<name>` node. Unlike the core
-  indicators, the plugin picks when it shows.
-  [`nix/hosts/renoir/kaizen-plugins/hello/`](../../nix/hosts/renoir/kaizen-plugins/hello/)
-  is the minimal example;
-  [`nix/shared/system/kaizen/plugins/gcloud-auth/`](../../nix/shared/system/kaizen/plugins/gcloud-auth/)
-  always shows its login state as one.
-- Plugin code runs in the shell as QML/JS. It needs a process of its own only
-  for a tray item or for work that must outlive a shell reload, as below.
-- A plugin that needs a long-running backend brings its own daemon: its module
-  adds the unit, and its QML queries the daemon's IPC. The calendar
-  ([`nix/shared/system/kaizen/plugins/calendar/`](../../nix/shared/system/kaizen/plugins/calendar/))
-  does this with [dcal].
-- A tray plugin is an app written for kaizen, with its own [StatusNotifierItem]
-  and menu
-  ([`nix/hosts/renoir/kaizen-plugins/hello-tray/`](../../nix/hosts/renoir/kaizen-plugins/hello-tray/)),
-  so the tray and its launcher level show it without shell code. Its unit starts
-  it with the session or from Apps. A third-party app with a tray icon is not a
-  plugin; the tray shows it anyway.
+- Plugins add launcher items, panels, IPC targets and bar indicators:
+  [`plugins.md`](plugins.md).
 - The curtain hides the screen, it is not a lock: an overlay layer surface
   (`kaizen-curtain`), never `WlSessionLock`, and it never touches DPMS. Both
   are deliberate. A session lock replaces output content and a disabled output
@@ -324,6 +304,6 @@ nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
    another scope also installs), compositor →
    [`Ui/compositors/`](../../stow/kaizen/.config/quickshell/Ui/compositors/) and
    [`niri/config.kdl`](../../stow/kaizen/.config/niri/config.kdl), IPC target
-   for every new action. An optional shell extension is a plugin, placed as in
-   Where it lives. An app is not kaizen's to install:
+   for every new action. An optional shell extension is a
+   [plugin](plugins.md). An app is not kaizen's to install:
    [`nix/README.md`](../../nix/README.md) says where it goes.
