@@ -1,7 +1,7 @@
 # wily (ThinkPad T14 Gen 6 Intel, Core Ultra 7 258V "Lunar Lake")
 
 Work machine (Lenovo 21QG006CMX). The niri + Quickshell desktop it runs is
-shared with `renoir` and documented in `KAIZEN.md`.
+shared with `renoir` and documented in `docs/kaizen/README.md`.
 Work-only configuration lives in the private
 `fredrikaverpil/dotfiles-einride` repo, mounted as the git submodule `einride/`
 and imported by `configuration.nix` only when checked out.

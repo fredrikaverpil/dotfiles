@@ -1,7 +1,7 @@
 # renoir (ThinkPad T14 Gen 1, AMD Renoir)
 
 Personal machine. The niri + Quickshell desktop it runs is shared with `wily`
-and documented in `KAIZEN.md`; its Nix modules are
+and documented in `docs/kaizen/README.md`; its Nix modules are
 `nix/shared/system/kaizen/session.nix`, the kaizen plugins `configuration.nix`
 imports, and `nix/shared/system/thinkpad.nix`.
 Machine-specific settings (microcode, VAAPI driver, kernel choice) and
