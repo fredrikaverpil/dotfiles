@@ -1,8 +1,7 @@
-# niri + Quickshell desktop
+# Developing kaizen
 
-How to work on the niri + Quickshell desktop. Its design, layers and map, with
-where each part lives and which hosts it reaches, are in
-[`README.md`](README.md).
+How to work on kaizen. Its design, layers and map, with where each part lives
+and which hosts it reaches, are in [`README.md`](README.md).
 
 Every kaizen host shares one copy of the core, so an edit lands on all of them
 at once: there is no promotion step and no drift to diff for.
@@ -10,20 +9,19 @@ at once: there is no promotion step and no drift to diff for.
 To try another shell, compositor or panel on one machine, use a git branch or
 worktree, not a per-host copy of the tree.
 
-Machine facts (firmware, BIOS, hardware quirks) belong in the host's
-`README.md` or `nix/shared/system/thinkpad.nix`, never here.
+Document constraints, rationale and gotchas, not implementation inventories or
+previous states. Explain a declaration next to it, not in these docs. Machine
+facts (firmware, BIOS, hardware quirks) belong in the host's `README.md` or
+`nix/shared/system/thinkpad.nix`.
 
 ## Working model
 
-- The desktop is built to be developed by an agent, usually run on the host
-  itself, sometimes over SSH. Every part is reachable: `qs ipc` queries and
-  drives shell services and panels, `niri msg` the compositor,
-  `systemctl --user` the units, `grim` and the recording service capture what
-  is on screen. Use them to verify your own work; what they cannot prove is
-  listed under "Required local validation".
-
-Document constraints, rationale and gotchas, not implementation inventories or
-previous states. Explain a declaration next to it, not here.
+The desktop is built to be developed by an agent, usually run on the host
+itself, sometimes over SSH. Every part is reachable: `qs ipc` queries and
+drives shell services and panels, `niri msg` the compositor,
+`systemctl --user` the units, `grim` and the recording service capture what is
+on screen. Use them to verify your own work; what they cannot prove is listed
+under "Required local validation".
 
 ## Gotchas
 
@@ -52,8 +50,8 @@ previous states. Explain a declaration next to it, not here.
   focus-chain membership for visible but unavailable controls.
 - Tray submenus require one live opener per level. `QsMenuEntry.display()` needs
   a platform menu this shell does not have.
-- Read the relevant Omarchy source before changing a ported feature (`git clone`
-  if missing and `git pull` its source before reading):
+- Read the reference shell's source before changing a feature ported from it
+  (`git clone` if missing and `git pull` its source before reading):
   - `~/code/public/github.com/caelestia-dots/shell`
   - `~/code/public/github.com/AvengeMedia/DankMaterialShell`
   - `~/code/public/github.com/snowarch/iNiR`
