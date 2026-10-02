@@ -14,19 +14,6 @@ TestCase {
     "style.disabled": { label: "Disabled", enabled: false },
   })
 
-  function test_emoji_parser_keeps_fully_qualified_emoji_without_skin_tones() {
-    const raw = "# group: Smileys & Emotion\n"
-      + "1F600 ; fully-qualified # 😀 E1.0 grinning face\n"
-      + "263A ; unqualified # ☺ E0.6 smiling face\n"
-      + "1F44B 1F3FB ; fully-qualified # 👋🏻 E1.0 waving hand: light skin tone\n"
-      + "1F1F8 1F1EA ; fully-qualified # 🇸🇪 E2.0 flag: Sweden\n"
-    compare(Menu.parseEmoji(raw), [
-      { emoji: "😀", name: "grinning face" },
-      { emoji: "🇸🇪", name: "flag: Sweden" },
-    ])
-    compare(Menu.parseEmoji(""), [])
-  }
-
   function test_hierarchy_paths_and_rows_describe_menu_descendants() {
     compare(Menu.childrenOf(items, "root"), ["apps", "learn", "style"])
     compare(Menu.childrenOf(items, "learn"), ["learn.keys"])

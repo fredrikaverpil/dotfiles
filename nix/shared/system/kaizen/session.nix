@@ -335,8 +335,6 @@ in
       environment.PATH = lib.mkForce null;
       # qtimageformats supplies Quickshell's WebP decoder.
       environment.QT_PLUGIN_PATH = "${pkgs.qt6.qtimageformats}/lib/qt-6/plugins";
-      # The menu's emoji picker reads names from Unicode's test file.
-      environment.KAIZEN_EMOJI_NAMES = "${pkgs.unicode-emoji}/share/unicode/emoji/emoji-test.txt";
       environment.KAIZEN_EMOJI = "${emoji}";
       environment.KAIZEN_NOTIFICATION_RULES = "${pkgs.writeText "notification-rules.json" (
         builtins.toJSON config.host.notificationRules
