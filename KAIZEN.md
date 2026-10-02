@@ -236,6 +236,40 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   shared state above it. Nightlight is not compositor-specific and lives in its
   service.
 
+## Style
+
+The palette is [zenbones](https://github.com/zenbones-theme/zenbones.nvim)'
+dark and light variants, defined once in
+[`shell.qml`](stow/kaizen/.config/quickshell/shell.qml) and followed by the
+theme toggle. QML reads colours from `shell.palette`, never as hex literals. The
+roles below are the default: core follows them, a plugin starts from them and
+may deviate.
+
+| Role | Meaning |
+| --- | --- |
+| `bg`, `fg` | Surface, text, focused outline |
+| `dim` | Unfocused outline, card border |
+| `sel` | Hover, focus and selection fill |
+| `off` | Secondary text, hints, unavailable, cancelled, logged out |
+| `rose` | Needs attention: error, failure, a core feature off, something live (recording, idle inhibited), production |
+| `wood` | Warning, draft |
+| `leaf` | Success, done, connected, logged in |
+| `sky` | Running, in progress |
+| `water` | Accent and information: links, inline code, the active window border, a neutral tag |
+| `blossom` | Headings |
+
+- Buttons and inputs are outlined, 1 px at radius 4: `fg` focused and `dim`
+  otherwise, filled with `sel` on focus or hover. List rows show focus with the
+  `sel` fill alone. A field that failed (lock, polkit) turns its outline `rose`.
+  The lock field and selections drawn over content take 2 px.
+- Surfaces (panel, context menu, notification, OSD) have radius 8.
+- Text is `Ui.Fonts.mono`. Links are `water` and underlined; inline code is
+  `water` in the body's font and size. Qt's Markdown rendering ignores
+  `linkColor` and draws code in its own larger fixed font, so markdown text goes
+  through a helper that colours both spans first.
+- A status colours its label or icon with its role. Off states also get the
+  diagonal strikethrough (Surfaces).
+
 ## Recording
 
 - The camera is a circle because gpu-screen-recorder cannot mask its own
