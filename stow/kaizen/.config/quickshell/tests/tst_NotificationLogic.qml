@@ -65,6 +65,19 @@ TestCase {
     compare(Notification.dedupOf({ appName: "Slack", summary: "[x] from Google Calendar" }), null)
   }
 
+  function test_notification_collapse_is_the_same_object_for_every_toast_of_its_rule() {
+    const rules = Notification.compileRules([
+      { match: { app: "^Slack$", body: "^Reviews assigned" }, collapse: { summary: null, body: "Several" } },
+      { match: { app: "^Slack$" }, collapse: null },
+    ])
+
+    const first = Notification.ruleValue({ appName: "Slack", body: "Reviews assigned to you on a" }, rules, "collapse")
+    const second = Notification.ruleValue({ appName: "Slack", body: "Reviews assigned to you on b" }, rules, "collapse")
+    compare(first, { summary: null, body: "Several" })
+    verify(first === second)
+    compare(Notification.ruleValue({ appName: "Slack", body: "Hi" }, rules, "collapse"), "")
+  }
+
   function test_notification_icon_comes_from_the_first_matching_rule_with_one() {
     const rules = Notification.compileRules([
       { match: { app: "^Slack$", summary: " from Google Calendar$" }, urgency: "critical", icon: null },

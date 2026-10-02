@@ -23,6 +23,7 @@ function compileRules(rules) {
         checks: fields.map(function(field) { return { field: field, pattern: new RegExp(match[field]) } }),
         urgency: rule.urgency || "",
         dedup: rule.dedup || null,
+        collapse: rule.collapse || null,
         focus: rule.focus || "",
         icon: iconSource(rule.icon),
         border: rule.border || "",

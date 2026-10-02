@@ -21,7 +21,8 @@ Item {
   readonly property int historyLimit: 99
   readonly property string soundPath: "/run/current-system/sw/share/sounds/freedesktop/stereo/message.oga"
   readonly property real soundVolume: 0.4
-  // How far apart the copies of one dedup group's event may arrive.
+  // How far apart the copies of one dedup group's event, or the toasts of one
+  // collapse rule's burst, may arrive.
   readonly property int dedupWindow: 5000
 
   property bool stateLoaded: false
@@ -40,6 +41,8 @@ Item {
   // and when that copy last did.
   property var held: ({})
   property var keptAt: ({})
+  // Per collapse rule with toasts held: `{ collapse, keys }`, oldest first.
+  property var bursts: []
   // Per toast key: the share of its countdown left. The Repeater rebuilds every
   // card whenever popupRows changes, so a card cannot hold it.
   property var countdowns: ({})
@@ -69,7 +72,16 @@ Item {
     record.duration = NotificationLogic.durationFor(notification, NotificationUrgency.Low, NotificationUrgency.Critical, rules)
     record.transient = notification.transient
     record.actions = NotificationLogic.actionsOf(notification, rules)
+    record.collapse = NotificationLogic.ruleValue(notification, rules, "collapse")
+    if (existing && existing.collapsed) collapse(record)
     return record
+  }
+
+  // Stands the record in for a burst of its collapse rule's toasts.
+  function collapse(record) {
+    record.collapsed = true
+    record.summary = record.collapse.summary || record.summary
+    record.body = record.collapse.body || record.body
   }
 
   function replacePopup(record) {
@@ -153,7 +165,29 @@ Item {
       return
     }
 
+    // A collapse rule's toasts are held, then shown as one.
+    if (record.collapse) {
+      var burst = bursts.find(function(burst) { return burst.collapse === record.collapse })
+      if (burst) burst.keys.push(record.key)
+      else bursts.push({ collapse: record.collapse, keys: [record.key] })
+      dedupHold.restart()
+      return
+    }
+
     show(record)
+  }
+
+  // Shows a burst's latest toast in place of its others and of the rule's toast
+  // on screen; with any of those, as the rule's collapsed text.
+  function showBurst(burst) {
+    var records = burst.keys.map(function(key) { return root.live[key] }).filter(Boolean)
+    var latest = records.pop()
+    if (!latest) return
+    var previous = popupRows.find(function(row) { return row.collapse === burst.collapse })
+    if (previous) records.push(previous)
+    records.forEach(dismiss)
+    if (burst.keys.length > 1 || previous) collapse(latest)
+    show(latest)
   }
 
   function show(record) {
@@ -284,6 +318,8 @@ Item {
         })
       }
       root.held = ({})
+      root.bursts.forEach(root.showBurst)
+      root.bursts = []
     }
   }
 
