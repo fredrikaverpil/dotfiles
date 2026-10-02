@@ -181,26 +181,26 @@ TestCase {
   function test_notification_actions_come_from_the_first_matching_rule_with_any() {
     const rules = Notification.compileRules([
       { match: { app: "^Slack$", summary: " in #?alerts$" }, border: "rose", actions: [] },
-      { match: { app: "^Slack$", summary: " in #?alerts" }, actions: [{ label: "Investigate", command: ["investigate", "draft"], env: { ENV: "prod" } }] },
+      { match: { app: "^Slack$", summary: " in #?alerts" }, actions: [{ label: "Escalate", command: ["escalate"], env: { TEAM: "ops" } }] },
       { match: { app: "^Slack$" }, actions: [{ label: "Log", command: ["log"] }] },
     ])
-    const investigate = { text: "Investigate", command: ["investigate", "draft"], env: { ENV: "prod" } }
+    const escalate = { text: "Escalate", command: ["escalate"], env: { TEAM: "ops" } }
 
-    compare(Notification.actionsOf({ appName: "Slack", summary: "[x] in #alerts" }, rules), [investigate])
+    compare(Notification.actionsOf({ appName: "Slack", summary: "[x] in #alerts" }, rules), [escalate])
     compare(Notification.actionsOf({ appName: "Slack", summary: "[x] in #general" }, rules), [{ text: "Log", command: ["log"], env: {} }])
     compare(Notification.actionsOf({ appName: "Mail", summary: "[x] in #alerts" }, rules), [])
     compare(Notification.actionsOf({ appName: "Slack", summary: "[x] in #alerts" }), [])
-    compare(Notification.buttons([{ identifier: "default", text: "Open" }, { identifier: "reply", text: "Reply" }], [investigate]),
-      [{ identifier: "reply", text: "Reply" }, investigate])
+    compare(Notification.buttons([{ identifier: "default", text: "Open" }, { identifier: "reply", text: "Reply" }], [escalate]),
+      [{ identifier: "reply", text: "Reply" }, escalate])
   }
 
   function test_notification_action_commands_carry_the_notification_and_the_actions_variables() {
     const record = { app: "Slack", summary: "[x] in #alerts", body: "a\nb" }
-    const action = { text: "Investigate", command: ["investigate", "draft"], env: { INVESTIGATE_ENV: "prod" } }
+    const action = { text: "Escalate", command: ["escalate"], env: { TEAM: "ops" } }
 
     compare(Notification.commandOf(record, action), [
-      "env", "NOTIFICATION_APP=Slack", "NOTIFICATION_SUMMARY=[x] in #alerts", "NOTIFICATION_BODY=a\nb", "INVESTIGATE_ENV=prod",
-      "investigate", "draft",
+      "env", "NOTIFICATION_APP=Slack", "NOTIFICATION_SUMMARY=[x] in #alerts", "NOTIFICATION_BODY=a\nb", "TEAM=ops",
+      "escalate",
     ])
   }
 }

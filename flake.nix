@@ -166,6 +166,7 @@
                       qmltestrunner -input tests
                       qmltestrunner -input ../../../../nix/shared/system/kaizen/plugins/calendar
                       qmltestrunner -input ../../../../nix/shared/system/kaizen/plugins/gcloud-auth
+                      qmltestrunner -input ../../../../nix/shared/system/kaizen/plugins/incident-investigator
                     '')
                     pkgs.lua
                   ]
