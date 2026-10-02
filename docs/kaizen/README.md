@@ -67,8 +67,8 @@ place, live on save: the compositor config and the shell's QML.
 | --- | --- | --- |
 | Session: niri under UWSM, portals, PAM, units, the services and packages the shell and its binds use, notification rules | [`nix/shared/system/kaizen/session.nix`](../../nix/shared/system/kaizen/session.nix) | every kaizen host |
 | Compositor config, the shell's QML | [`stow/kaizen/`](../../stow/kaizen/) | every kaizen host |
-| Plugin more than one host imports | `nix/shared/system/kaizen/plugins/<name>/` | the hosts importing it |
-| Plugin one host imports | `nix/hosts/<host>/kaizen-plugins/<name>/`, or a private submodule such as wily's `einride` | that host |
+| Generic or reusable plugin, configured through its module's options | `nix/shared/system/kaizen/plugins/<name>/` | the hosts importing it |
+| Plugin specific to one host | `nix/hosts/<host>/kaizen-plugins/<name>/`, or a private submodule such as wily's `einride` | that host |
 | ThinkPad hardware the shell reads (thresholds, keyd, micmute LED); not kaizen | [`nix/shared/system/thinkpad.nix`](../../nix/shared/system/thinkpad.nix) | ThinkPad hosts |
 | Hardware, sleep policy, output layout, host-only programs | `nix/hosts/<host>/`, `stow/host/<host>/` | that host |
 
@@ -249,6 +249,7 @@ nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
   on these hosts: touch an entry on use (a hit or a 304 counts) and delete
   entries older than 30 days in the same pass. A producer that cannot age
   entries this way says in a comment what bounds it.
+- Plugins write under the same roots: [`plugins.md`](plugins.md) › Writing one.
 
 ## Out of scope
 

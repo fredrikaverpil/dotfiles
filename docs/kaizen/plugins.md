@@ -21,7 +21,17 @@ reaches, is in [`README.md`](README.md) › Where it lives.
 - A plugin that needs a long-running backend brings its own daemon: its module
   adds the unit, and its QML queries the daemon's IPC. The calendar
   ([`nix/shared/system/kaizen/plugins/calendar/`](../../nix/shared/system/kaizen/plugins/calendar/))
-  does this with [dcal].
+  does this with [dcal]. The incident investigator
+  ([`nix/shared/system/kaizen/plugins/incident-investigator/`](../../nix/shared/system/kaizen/plugins/incident-investigator/))
+  brings a daemon written for it, and takes what differs per host from its
+  module's options.
+- A plugin, and a daemon written for it, writes only under `plugins/<name>/` in
+  the shell's state and cache roots (`Ui.Paths.state` or `Ui.Paths.cache` +
+  `"/plugins/<name>"`; a daemon's unit sets `StateDirectory` or
+  `CacheDirectory = "kaizen-shell/plugins/<name>"`), and names its runtime files
+  `$XDG_RUNTIME_DIR/kaizen-<name>…`. The rules of [`README.md`](README.md) ›
+  Where the shell writes apply: a cache producer prunes its own entries. A
+  third-party daemon a plugin queries, such as dcal, keeps its own paths.
 - A tray plugin is an app written for kaizen, with its own [StatusNotifierItem]
   and menu
   ([`nix/hosts/renoir/kaizen-plugins/hello-tray/`](../../nix/hosts/renoir/kaizen-plugins/hello-tray/)),
@@ -32,10 +42,10 @@ reaches, is in [`README.md`](README.md) › Where it lives.
 ## Developing one
 
 - Quickshell does not watch plugins: apply an edit with
-  `qs ipc call shell reload`. `qml-test` runs the calendar's and gcloud-auth's
-  tests; `qml-lint` skips plugins (their `import qs.Ui` resolves only inside
-  Quickshell). A tray plugin's user unit starts with the session when its module
-  sets `autostart`.
+  `qs ipc call shell reload`. `qml-test` runs the calendar's, gcloud-auth's and
+  the incident investigator's tests; `qml-lint` skips plugins (their
+  `import qs.Ui` resolves only inside Quickshell). A tray plugin's user unit
+  starts with the session when its module sets `autostart`.
 
 [dcal]: https://github.com/AvengeMedia/dankcalendar
 [StatusNotifierItem]: https://www.freedesktop.org/wiki/Specifications/StatusNotifierItem/

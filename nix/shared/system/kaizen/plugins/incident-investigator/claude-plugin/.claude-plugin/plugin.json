@@ -1,0 +1,11 @@
+{
+  "name": "incident-investigator",
+  "lspServers": {
+    "gopls": {
+      "command": "gopls",
+      "extensionToLanguage": {
+        ".go": "go"
+      }
+    }
+  }
+}
