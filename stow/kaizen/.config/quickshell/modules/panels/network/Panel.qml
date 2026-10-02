@@ -478,9 +478,9 @@ Ui.Panel {
         echoMode: TextInput.Password
         selectByMouse: true
         background: Rectangle {
-          radius: 3
+          radius: 4
           color: root.shell.palette.bg
-          border.color: root.shell.palette.dim
+          border.color: passphrase.activeFocus ? root.shell.palette.fg : root.shell.palette.dim
           border.width: 1
         }
         onAccepted: root.service.connectWithPassphrase(row.network.name, text)
