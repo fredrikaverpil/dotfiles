@@ -485,6 +485,7 @@ func (d *daemon) begin(inv *Investigation, prompt string, resume bool) error {
 	inv.Status, inv.Error, inv.FinishedAt = "running", "", 0
 	inv.ClaudeConfigDir = d.claudeConfigDir
 	d.turns[inv.ID] = &turn{}
+	d.updateTray()
 	go d.runTurn(inv.ID, inv.SessionID, inv.Model, inv.Effort, prompt, resume)
 	return d.save(inv)
 }
@@ -522,6 +523,7 @@ func (d *daemon) runTurn(id, sessionID, model, effort, prompt string, resume boo
 	defer d.mu.Unlock()
 	t := d.turns[id]
 	delete(d.turns, id)
+	d.updateTray()
 	inv := d.items[id]
 	inv.FinishedAt = now()
 	switch {

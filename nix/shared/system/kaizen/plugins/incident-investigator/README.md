@@ -84,7 +84,8 @@ flowchart LR
   shell does not stop a run.
 - The tray icon runs inside the daemon process. It has no Quit item, as quitting
   would stop the daemon and its runs. New investigation creates the draft
-  directly, with no client in between.
+  directly, with no client in between. An amber dot on the icon marks a running
+  turn.
 - The window is a Quickshell `FloatingWindow`. It watches the state files
   (`FileView`) and runs the client verbs when you click.
 - Claude Code runs as a `claude -p` subprocess of the daemon, one per turn.
