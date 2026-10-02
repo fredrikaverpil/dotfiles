@@ -183,7 +183,7 @@ Item {
           height: 46
           radius: 4
           color: root.palette.sel
-          border.color: root.failed ? root.palette.rose : root.palette.dim
+          border.color: root.failed ? root.palette.rose : passwordInput.activeFocus ? root.palette.fg : root.palette.dim
           border.width: 1
 
           TextInput {
