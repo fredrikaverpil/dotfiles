@@ -224,29 +224,3 @@ session's `XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY`, and `NIRI_SOCKET` from
 `systemctl --user show-environment`. Missing display context can make live
 Quickshell instances appear dead. `shell-smoke` avoids that by selecting the
 PID.
-
-## Session constraints
-
-- XDG autostart apps start only once the shell's StatusNotifierWatcher is on
-  the bus (`kaizen-tray-ready.service`), because Electron apps look for it once
-  and never retry. Never gate `quickshell.service` or anything before
-  `graphical-session.target` on the tray: the shell registers the watcher once
-  its config loads, which waits for `xdg-desktop-portal`, and the portal is
-  ordered after `graphical-session.target`.
-- Screen sharing from other apps goes through `xdg-desktop-portal-gnome`,
-  which needs the Mutter D-Bus services that niri serves only as
-  `niri --session`. Session mode also serves `org.freedesktop.ScreenSaver`
-  idle inhibitors and the a11y bus, and takes the power key from logind unless
-  `disable-power-key-handling` is set.
-- On first use, gnome-keyring can advertise `login` without exporting the
-  collection when keyring creation follows D-Bus startup. Recover by
-  restarting the keyring daemon and unlocking it, then retry account setup.
-  Do not delete keyring files.
-- Chromium and Electron pick their secret store from `XDG_CURRENT_DESKTOP`. They
-  do not recognise `niri` and fall back to `basic_text`, so logins and secrets
-  do not persist or are stored under a hardcoded key. Wrap each such app with
-  `pkgs.withGnomeLibsecret` (`nix/shared/overlays/`), which adds
-  `--password-store=gnome-libsecret`; `chromium` passes the flag directly. Do
-  not add `GNOME` to `XDG_CURRENT_DESKTOP`: autostart entries such as
-  `nm-applet` and `print-applet` use `NotShowIn=GNOME`. Once an app has
-  encrypted secrets with the keyring, removing the flag locks it out of them.
