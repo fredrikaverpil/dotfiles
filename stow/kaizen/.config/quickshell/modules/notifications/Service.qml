@@ -46,7 +46,7 @@ Item {
   // Per toast key: the share of its countdown left. The Repeater rebuilds every
   // card whenever popupRows changes, so a card cannot hold it.
   property var countdowns: ({})
-  property var shortcodes: JSON.parse(shortcodeFile.text() || "{}")
+  property var shortcodes: NotificationLogic.shortcodesFrom(JSON.parse(shortcodeFile.text() || "[]"))
   property var rules: NotificationLogic.compileRules(JSON.parse(rulesFile.text() || "[]"))
 
   function stateText() { return Model.stateText(doNotDisturb, historyRows) }
@@ -338,7 +338,7 @@ Item {
 
   FileView {
     id: shortcodeFile
-    path: Quickshell.env("KAIZEN_EMOJI_SHORTCODES") || ""
+    path: Quickshell.env("KAIZEN_EMOJI") || ""
     // Blocks the first read, so no notification is handled before the map exists.
     blockLoading: true
     printErrors: false
