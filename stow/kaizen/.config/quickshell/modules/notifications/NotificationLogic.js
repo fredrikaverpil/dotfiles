@@ -133,6 +133,15 @@ function durationFor(notification, lowUrgency, criticalUrgency, rules) {
   return Math.min(30000, Math.max(minimum, requested))
 }
 
+// Shortcode -> emoji, from the session's `[{ emoji, shortcodes }]`.
+function shortcodesFrom(emoji) {
+  var codes = {}
+  emoji.forEach(function(entry) {
+    entry.shortcodes.forEach(function(name) { codes[name] = entry.emoji })
+  })
+  return codes
+}
+
 // Replaces known `:shortcode:`s; unknown ones (custom Slack emoji) stay as text.
 function emojify(text, shortcodes) {
   return text.replace(/:([\w+-]+):/g, function(match, name) {

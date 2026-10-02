@@ -118,6 +118,16 @@ TestCase {
     compare(Notification.iconSource(null), "")
   }
 
+  function test_notification_shortcodes_map_every_alias_to_its_emoji() {
+    const emoji = [
+      { emoji: "👍", name: "thumbs up", shortcodes: ["+1", "thumbsup"] },
+      { emoji: "🪾", name: "leafless tree", shortcodes: [] },
+      { emoji: "🏻", name: null, shortcodes: ["skin-tone-2"] },
+    ]
+    compare(Notification.shortcodesFrom(emoji), { "+1": "👍", thumbsup: "👍", "skin-tone-2": "🏻" })
+    compare(Notification.shortcodesFrom([]), {})
+  }
+
   function test_notification_emojify_replaces_known_shortcodes_only() {
     const codes = { hammer_and_wrench: "🛠️", memo: "📝", "+1": "👍", "skin-tone-2": "🏻" }
     compare(Notification.emojify("Up next: :hammer_and_wrench::memo: Sprint :+1::skin-tone-2: :custom: 10:30:00", codes),

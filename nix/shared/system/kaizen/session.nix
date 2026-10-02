@@ -5,22 +5,26 @@
   ...
 }:
 let
-  # Shortcode -> emoji, for apps (Slack) that send `:name:` in notification text.
-  emoji-shortcodes =
-    pkgs.runCommand "emoji-shortcodes.json"
-      { nativeBuildInputs = [ (pkgs.python3.withPackages (p: [ p.emoji ])) ]; }
-      ''
-        python3 - > $out <<'EOF'
-        import json, emoji
-        codes = {}
-        for char, data in emoji.EMOJI_DATA.items():
-            for name in [data["en"], *data.get("alias", [])]:
-                codes.setdefault(name.strip(":"), char)
-        for tone, char in enumerate("🏻🏼🏽🏾🏿", start=2):
-            codes[f"skin-tone-{tone}"] = char
-        json.dump(codes, open(1, "w", encoding="utf-8", closefd=False), ensure_ascii=False)
-        EOF
-      '';
+  # `[{ emoji, name, shortcodes }]`: Unicode's names for the menu's picker, and
+  # the shortcodes Slack sends as `:name:` in notification text, from the
+  # dataset Slack uses. Shortcode-only entries (skin tones) have a null name.
+  emoji = pkgs.runCommand "emoji.json" {
+    nativeBuildInputs = [ pkgs.jq ];
+    names = "${pkgs.unicode-emoji}/share/unicode/emoji/emoji-test.txt";
+    shortcodes = pkgs.fetchurl {
+      url = "https://raw.githubusercontent.com/iamcal/emoji-data/v16.0.0/emoji.json";
+      hash = "sha256-HWAuZb6Idyv4zDaM4WuFXXGe7duv4SjUcbgCA/SU0p8=";
+    };
+  } ''
+    jq -nc --rawfile names "$names" --slurpfile data "$shortcodes" > $out '
+      def hex: ascii_downcase | explode | reduce .[] as $c (0; . * 16 + if $c >= 97 then $c - 87 else $c - 48 end);
+      ($data[0] | map({ key: [.unified | split("-")[] | hex] | implode, value: .short_names }) | from_entries) as $codes
+      | [$names | split("\n")[] | capture("; fully-qualified +# (?<emoji>\\S+) E\\d+\\.\\d+ (?<name>.+)$") | select(.name | contains("skin tone") | not)] as $named
+      | ($named | map({ key: .emoji, value: true }) | from_entries) as $seen
+      | $named | map(.shortcodes = ($codes[.emoji] // []))
+        + [$codes | to_entries[] | select($seen[.key] | not) | { emoji: .key, name: null, shortcodes: .value }]
+    '
+  '';
 
   sleep-lock-monitor = pkgs.writeShellApplication {
     name = "kaizen-sleep-lock-monitor";
@@ -333,7 +337,7 @@ in
       environment.QT_PLUGIN_PATH = "${pkgs.qt6.qtimageformats}/lib/qt-6/plugins";
       # The menu's emoji picker reads names from Unicode's test file.
       environment.KAIZEN_EMOJI_NAMES = "${pkgs.unicode-emoji}/share/unicode/emoji/emoji-test.txt";
-      environment.KAIZEN_EMOJI_SHORTCODES = "${emoji-shortcodes}";
+      environment.KAIZEN_EMOJI = "${emoji}";
       environment.KAIZEN_NOTIFICATION_RULES = "${pkgs.writeText "notification-rules.json" (
         builtins.toJSON config.host.notificationRules
       )}";
