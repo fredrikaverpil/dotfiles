@@ -177,6 +177,29 @@ in
               default = null;
               description = "Show one copy of an event reported by several apps";
             };
+            collapse = lib.mkOption {
+              type = lib.types.nullOr (
+                lib.types.submodule {
+                  options = {
+                    summary = lib.mkOption {
+                      type = lib.types.nullOr lib.types.str;
+                      default = null;
+                      description = "Summary in place of the latest toast's";
+                    };
+                    body = lib.mkOption {
+                      type = lib.types.nullOr lib.types.str;
+                      default = null;
+                      description = "Body in place of the latest toast's";
+                    };
+                  };
+                }
+              );
+              default = null;
+              example = {
+                body = "Several new review requests";
+              };
+              description = "Show a burst of this rule's toasts as one: each is held briefly, then the latest replaces the others and the one on screen, showing these fields in place of its own. A lone toast keeps the app's text";
+            };
             focus = lib.mkOption {
               type = lib.types.nullOr lib.types.str;
               default = null;
@@ -405,6 +428,15 @@ in
           summary = " from GitHub$";
         };
         icon = ./icons/github.svg;
+      }
+      # A pull request opened across many repos assigns its reviews in a burst.
+      {
+        match = {
+          app = "^Slack$";
+          summary = " from GitHub$";
+          body = "^Reviews assigned to you on ";
+        };
+        collapse.body = "Several new review requests";
       }
       {
         match = {
