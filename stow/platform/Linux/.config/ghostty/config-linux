@@ -11,3 +11,6 @@ font-variation = wdth=100
 font-variation-italic =
 font-variation-italic = wght=400
 
+
+# Default toggles fullscreen; let ctrl+enter reach the app.
+keybind = ctrl+enter=unbind
