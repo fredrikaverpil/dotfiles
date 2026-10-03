@@ -26,6 +26,13 @@ Item {
 
     property bool stateLoaded: false
     property bool doNotDisturb: false
+    // When DnD turned on, in ms since the epoch; 0 while off.
+    property real dndSince: 0
+    // Set once DnD has been on for dndRemind.
+    property bool dndOverdue: false
+    // Whether the history holds a critical notification DnD held back.
+    readonly property bool criticalHeld: doNotDisturb && historyRows.some(row => row.urgency === NotificationUrgency.Critical && row.timestamp >= dndSince)
+    readonly property int dndRemind: 10 * 60 * 1000
     // Debug aid, driven over IPC only: records each arriving notification's raw
     // data in memory, newest first.
     property bool capture: false
@@ -49,7 +56,7 @@ Item {
     property var rules: NotificationLogic.compileRules(JSON.parse(rulesFile.text() || "[]"))
 
     function stateText() {
-        return Model.stateText(doNotDisturb, historyRows);
+        return Model.stateText(doNotDisturb, historyRows, dndSince);
     }
 
     function saveState() {
@@ -61,9 +68,11 @@ Item {
         var saved = Model.loadedState(raw, historyLimit);
         if (!saved.valid)
             console.warn("notifications: ignoring invalid saved state");
+        dndSince = saved.doNotDisturb ? saved.dndSince || Date.now() : 0;
         doNotDisturb = saved.doNotDisturb;
         historyRows = saved.history;
         stateLoaded = true;
+        remind();
     }
 
     function recordFor(notification, existing) {
@@ -306,7 +315,20 @@ Item {
     }
 
     function setDoNotDisturb(value) {
+        if (doNotDisturb === !!value)
+            return;
+        dndSince = value ? Date.now() : 0;
         doNotDisturb = !!value;
+        remind();
+    }
+
+    function remind() {
+        dndOverdue = false;
+        reminder.stop();
+        if (!doNotDisturb)
+            return;
+        reminder.interval = Math.max(0, dndSince + dndRemind - Date.now());
+        reminder.start();
     }
 
     function clearHistory() {
@@ -333,6 +355,18 @@ Item {
     }
 
     onDoNotDisturbChanged: saveState()
+
+    // Seeing the history snoozes the reminder for another dndRemind.
+    onHistoryShownChanged: if (historyShown && dndOverdue) {
+        dndOverdue = false;
+        reminder.interval = dndRemind;
+        reminder.restart();
+    }
+
+    Timer {
+        id: reminder
+        onTriggered: root.dndOverdue = true
+    }
 
     Component.onCompleted: {
         stateLoaded = true;

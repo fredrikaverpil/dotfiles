@@ -144,10 +144,26 @@ Scope {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: 4
                 readonly property int pending: bar.shell.notifications.historyRows.length
+                property bool dimmed: false
                 foreground: bar.shell.notifications.doNotDisturb ? bar.shell.palette.rose : bar.shell.palette.fg
                 label: (bar.shell.notifications.doNotDisturb ? "󰂛" : "󰂚") + (notificationButton.pending > 0 ? " " + notificationButton.pending : "")
                 onActivated: bar.shell.notifications.toggleHistory()
                 onSecondary: bar.shell.menu.popup("settings.notifications", modelData.name, notificationButton)
+
+                // Blinks while DnD is overdue, faster while it holds back a critical one.
+                opacity: blinker.running && dimmed ? 0.2 : 1
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 150
+                    }
+                }
+                Timer {
+                    id: blinker
+                    running: bar.shell.notifications.dndOverdue || bar.shell.notifications.criticalHeld
+                    interval: bar.shell.notifications.criticalHeld ? 250 : 800
+                    repeat: true
+                    onTriggered: notificationButton.dimmed = !notificationButton.dimmed
+                }
             }
 
             // Separates settings from notifications.

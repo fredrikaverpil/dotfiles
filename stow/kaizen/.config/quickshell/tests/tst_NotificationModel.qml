@@ -22,16 +22,19 @@ TestCase {
         compare(Notification.loadedState("invalid", 2), {
             valid: false,
             doNotDisturb: false,
+            dndSince: 0,
             history: []
         });
-        compare(Notification.loadedState('{"doNotDisturb":true,"history":[1,2,3]}', 2), {
+        compare(Notification.loadedState('{"doNotDisturb":true,"dndSince":5,"history":[1,2,3]}', 2), {
             valid: true,
             doNotDisturb: true,
+            dndSince: 5,
             history: [1, 2]
         });
-        compare(Notification.stateText(true, [record]), JSON.stringify({
+        compare(Notification.stateText(true, [record], 5), JSON.stringify({
             version: 1,
             doNotDisturb: true,
+            dndSince: 5,
             history: [record]
         }, null, 2) + "\n");
     }

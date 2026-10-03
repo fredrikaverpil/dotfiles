@@ -60,6 +60,11 @@ Do not disturb is for sharing the screen or recording it, so it holds back
 every notification, critical ones included. Held-back notifications go to the
 history.
 
+So it is not forgotten on, the bar's bell blinks once it has been on for 10
+minutes; opening the notifications panel snoozes that for another 10. It blinks
+fast while the history holds a critical notification it held back, until those
+are cleared. The start time is saved, so a shell restart keeps the clock.
+
 ## Recording
 
 - The camera is a circle because gpu-screen-recorder cannot mask its own
