@@ -412,7 +412,7 @@ TestCase {
                     app: "^Signal$",
                     summary: " Averpil$"
                 },
-                badge: "/nix/store/x-heart.svg"
+                badge: "❤️"
             },
         ]);
 
@@ -428,7 +428,7 @@ TestCase {
             body: "",
             image: "image://qsimage/1",
             icon: "",
-            badge: "file:///nix/store/x-heart.svg",
+            badge: "❤️",
             border: "",
             borderAnimation: "",
             urgency: 1,
