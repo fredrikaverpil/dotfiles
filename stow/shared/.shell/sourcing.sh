@@ -62,6 +62,15 @@ if [ -e /etc/NIXOS ]; then
 
 fi
 
+# /etc/kaizen is written by nix/shared/system/kaizen/session.nix.
+if [ -e /etc/kaizen ]; then
+  # Lists the shell's IPC functions, all targets or one.
+  # Usage: kaizen_ipc [target]
+  function kaizen_ipc() {
+    qs ipc show | awk -v t="$1" '/^target /{p=(t=="" || $2==t)} p'
+  }
+fi
+
 function virtual_env_activate() {
   if [[ -n "$VIRTUAL_ENV" ]]; then
     # check the current folder belong to earlier VIRTUAL_ENV folder

@@ -225,6 +225,7 @@ ShellRoot {
   Idle.Service {
     id: idle
     lockService: lock
+    curtainService: curtain
   }
 
   Curtain.Service {
