@@ -617,7 +617,7 @@ Item {
 
             Text {
                 Layout.fillWidth: true
-                text: "Arrived while notifications were off"
+                text: "Notifications"
                 color: root.palette.fg
                 font.family: Ui.Fonts.mono
                 font.pixelSize: 18
