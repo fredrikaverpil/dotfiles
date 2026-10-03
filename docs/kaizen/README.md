@@ -4,8 +4,6 @@
 [Quickshell](https://quickshell.org) shell: a minimal, keyboard-first desktop
 that an agent can drive and verify from a terminal.
 
-This file is the design and the map. The rest:
-
 - [`features.md`](features.md): constraints behind individual features.
 - [`plugins.md`](plugins.md): optional shell extensions and how to write one.
 - [`style.md`](style.md): palette, colour roles, shapes, status marks.
