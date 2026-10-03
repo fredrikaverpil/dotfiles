@@ -13,7 +13,7 @@ TestCase {
             body: "Body",
             image: "",
             icon: "",
-            badge: "",
+            badgeEmoji: "",
             urgency: 1,
             timestamp: 10
         })
@@ -55,7 +55,7 @@ TestCase {
                 body: "Body",
                 image: "",
                 icon: "",
-                badge: "",
+                badgeEmoji: "",
                 urgency: 1,
                 timestamp: 10
             },

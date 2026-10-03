@@ -29,7 +29,7 @@ function compileRules(rules) {
           collapse: rule.collapse || null,
           focus: rule.focus || "",
           icon: iconSource(rule.icon),
-          badge: rule.badge || "",
+          badgeEmoji: rule.badgeEmoji || "",
           border: rule.border || "",
           borderAnimation: rule.borderAnimation || "",
           // Shaped as buttons, like the app's actions.
@@ -153,7 +153,7 @@ function snapshotOf(notification, timestamp, rules) {
     body: asString(notification.body),
     image: asString(notification.image),
     icon: iconOf(notification, rules),
-    badge: ruleValue(notification, rules, "badge"),
+    badgeEmoji: ruleValue(notification, rules, "badgeEmoji"),
     border: ruleValue(notification, rules, "border"),
     borderAnimation: ruleValue(notification, rules, "borderAnimation"),
     urgency: urgencyOf(notification, rules),

@@ -56,7 +56,7 @@
       urgency = "critical";
       border = "rose";
       borderAnimation = "heartbeat";
-      badge = "❤️";
+      badgeEmoji = "❤️";
     }
   ];
 

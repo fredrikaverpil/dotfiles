@@ -18,7 +18,7 @@ TestCase {
             body: "",
             image: "",
             icon: "",
-            badge: "",
+            badgeEmoji: "",
             border: "",
             borderAnimation: "",
             urgency: 2,
@@ -110,7 +110,7 @@ TestCase {
             body: "",
             image: "",
             icon: "",
-            badge: "",
+            badgeEmoji: "",
             border: "",
             borderAnimation: "",
             urgency: 2,
@@ -337,7 +337,7 @@ TestCase {
             body: "",
             image: "",
             icon: "file:///nix/store/x-github.svg",
-            badge: "",
+            badgeEmoji: "",
             border: "",
             borderAnimation: "",
             urgency: 1,
@@ -397,7 +397,7 @@ TestCase {
             body: "",
             image: "",
             icon: "",
-            badge: "",
+            badgeEmoji: "",
             border: "rose",
             borderAnimation: "orbit",
             urgency: 2,
@@ -405,14 +405,14 @@ TestCase {
         });
     }
 
-    function test_notification_badge_comes_from_the_first_matching_rule_with_one() {
+    function test_notification_badge_emoji_comes_from_the_first_matching_rule_with_one() {
         const rules = Notification.compileRules([
             {
                 match: {
                     app: "^Signal$",
                     summary: " Averpil$"
                 },
-                badge: "❤️"
+                badgeEmoji: "❤️"
             },
         ]);
 
@@ -428,7 +428,7 @@ TestCase {
             body: "",
             image: "image://qsimage/1",
             icon: "",
-            badge: "❤️",
+            badgeEmoji: "❤️",
             border: "",
             borderAnimation: "",
             urgency: 1,
