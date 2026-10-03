@@ -98,6 +98,20 @@ let
       exec "$@"
     '';
   };
+  # Lists the shell's IPC functions, all targets or one, sorted by target.
+  kaizen-ipc = pkgs.writeShellApplication {
+    name = "kaizen-ipc";
+    runtimeInputs = [
+      pkgs.gawk
+      pkgs.quickshell
+    ];
+    text = ''
+      qs ipc show |
+        awk -v t="''${1:-}" '/^target /{n=$2} t=="" || n==t {print n "\t" $0}' |
+        sort -s -t "$(printf '\t')" -k1,1 |
+        cut -f2-
+    '';
+  };
 
   # bluetui registers its own pairing agent; the shell has none.
   bluetui-desktop = pkgs.makeDesktopItem {
@@ -471,6 +485,7 @@ in
       imagemagick # Wallpaper thumbnails.
       jq # The clipboard watcher's JSON encoding.
       kaizen-focus
+      kaizen-ipc
       mpv
       # nm-connection-editor edits wired, static-IP and other connection settings;
       # the network panel launches it. nm-applet runs via XDG autostart for its tray menu.

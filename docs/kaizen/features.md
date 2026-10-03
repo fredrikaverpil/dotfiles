@@ -10,7 +10,7 @@ Quickshell's IPC (inter-process communication):
 qs ipc show
 
 # show ipc calls for a given target
-kaizen_ipc <target>
+kaizen-ipc <target>
 
 # call a target's ipc function
 qs ipc call <target> <function> [args...]
