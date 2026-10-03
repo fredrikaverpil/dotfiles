@@ -74,7 +74,7 @@
       };
       urgency = "critical";
       border = "rose";
-      borderAnimation = "heartbeat";
+      borderAnimation = "glow";
       badgeEmoji = "❤️";
     }
   ];
