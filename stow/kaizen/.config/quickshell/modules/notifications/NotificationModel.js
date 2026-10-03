@@ -6,6 +6,7 @@ function savedRecord(record) {
     body: record.body,
     image: record.image,
     icon: record.icon,
+    badge: record.badge,
     urgency: record.urgency,
     timestamp: record.timestamp,
   };
