@@ -47,7 +47,8 @@
   "respondToBashCommands": false,
   "statusLine": {
     "type": "command",
-    "command": "~/code/public/github.com/fredrikaverpil/claudeline/claudeline -debug -effort"
+    "command": "~/code/public/github.com/fredrikaverpil/claudeline/claudeline -debug -effort -cache-expiry=countdown",
+    "refreshInterval": 60
   },
   "enabledPlugins": {
     "context7@claude-plugins-official": false,
