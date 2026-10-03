@@ -55,7 +55,10 @@
       isAdmin = true;
       shell = "zsh";
       homeConfig = ./users/fredrik.nix;
-      groups = [ "networkmanager" "docker" ];
+      groups = [
+        "networkmanager"
+        "docker"
+      ];
       sshKeys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIutqzZ2V93KOXtPpkdVSxCJwnjhNf/jENvBayDDhAP2"
       ];
