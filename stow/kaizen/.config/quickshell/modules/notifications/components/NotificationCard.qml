@@ -31,7 +31,7 @@ Rectangle {
     readonly property string body: String(row.body || "")
     readonly property string image: String(row.image || "")
     readonly property string ruleIcon: String(row.icon || "")
-    readonly property string badgeText: String(row.badge || "")
+    readonly property string badgeEmoji: String(row.badgeEmoji || "")
     readonly property real perimeter: 2 * (width + height)
     readonly property int urgency: Number(row.urgency)
     readonly property var buttons: notification ? NotificationLogic.buttons(notification.actions, row.actions) : []
@@ -41,7 +41,7 @@ Rectangle {
     readonly property bool orbiting: toast && row.borderAnimation === "orbit"
     readonly property bool beating: toast && row.borderAnimation === "heartbeat"
     // A rule's icon takes the notification's place, which moves to the badge;
-    // a rule's badge text takes the badge's.
+    // a rule's badge emoji takes the badge's.
     readonly property string icon: ruleIcon || ownIcon
     readonly property string badge: ruleIcon ? ownIcon : ""
     readonly property string ownIcon: {
@@ -172,11 +172,11 @@ Rectangle {
                     height: 22
                     radius: 11
                     color: root.color
-                    visible: root.badgeText.length > 0 || (root.badge.length > 0 && badgeImage.status !== Image.Error)
+                    visible: root.badgeEmoji.length > 0 || (root.badge.length > 0 && badgeImage.status !== Image.Error)
 
                     Image {
                         id: badgeImage
-                        visible: root.badgeText.length === 0
+                        visible: root.badgeEmoji.length === 0
                         anchors.fill: parent
                         anchors.margins: 2
                         source: root.badge
@@ -188,8 +188,8 @@ Rectangle {
 
                     Text {
                         anchors.centerIn: parent
-                        visible: root.badgeText.length > 0
-                        text: root.badgeText
+                        visible: root.badgeEmoji.length > 0
+                        text: root.badgeEmoji
                         textFormat: Text.PlainText
                         font.family: "Noto Color Emoji"
                         font.pixelSize: 13

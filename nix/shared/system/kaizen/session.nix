@@ -238,7 +238,7 @@ in
               example = lib.literalExpression "./github.svg";
               description = "Icon shown in place of the notification's, such as the sender an app relays for; the notification's own moves to a badge on its corner";
             };
-            badge = lib.mkOption {
+            badgeEmoji = lib.mkOption {
               type = lib.types.nullOr lib.types.str;
               default = null;
               example = "❤️";
