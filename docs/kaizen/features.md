@@ -27,9 +27,9 @@ of it as an overlay surface drawn on top of the desktop, like a screensaver of
 sorts, but without the proper security features in place. Pressing any key
 while the curtain is active will show a password prompt.
 
-The user turns the curtain on from Settings › Session › Curtain in the
-launcher. Its IPC target is `curtain`. When the agent needs to take a
-screenshot, it lifts the curtain with `close` and puts it back with `open`.
+The user turns the curtain on from Settings › Session › Curtain in the launcher.
+When the agent needs to take a screenshot, it lifts the curtain with `close` and
+puts it back with `open`.
 
 What the curtain does not do, since it would stop screenshotting from working:
 
