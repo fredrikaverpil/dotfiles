@@ -75,6 +75,11 @@
       urgency = "critical";
       border = "rose";
       borderAnimation = "orbit";
+      # Noto Color Emoji's ❤ (U+2764), at the release nixpkgs packages.
+      badge = pkgs.fetchurl {
+        url = "https://raw.githubusercontent.com/googlefonts/noto-emoji/v2.051/svg/emoji_u2764.svg";
+        hash = "sha256-KApjPg5yx/RaC9vIGdVdPecdxHQ50wJKC509fHZkICM=";
+      };
     }
   ];
 
