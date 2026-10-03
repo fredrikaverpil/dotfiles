@@ -65,6 +65,9 @@ minutes; opening the notifications panel snoozes that for another 10. It blinks
 fast while the history holds a critical notification it held back, until those
 are cleared. The start time is saved, so a shell restart keeps the clock.
 
+The recording dialog turns it on by default, and turns it off again when the
+recording ends or is cancelled, unless it was already on.
+
 ## Recording
 
 - The camera is a circle because gpu-screen-recorder cannot mask its own
