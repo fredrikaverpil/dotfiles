@@ -92,6 +92,8 @@ directory imports both when a file there is read.
   and imports
 - **TypeScript**: 2-space indentation, 80 char width, prettier with prose-wrap
   always
+- **QML/JS (kaizen)**: qmlformat and prettier defaults; run `qml-format` after
+  editing
 - **YAML**: 2-space indentation, use `---` document separator
 - **Markdown**: rumdl, 80 char width with reflow; flags in
   `stow/shared/.config/nvim-fredrik/plugin/conform.lua`

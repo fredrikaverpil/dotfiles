@@ -161,6 +161,14 @@
                   packages = [
                     pkgs.qt6.qtdeclarative # qmlls, qmllint, qmlformat, qmltestrunner
                     (task "qml-lint" "qmllint -E -W 0 $(find . -name '*.qml')")
+                    # Tool defaults; prettier's match conform's flags for JS.
+                    (task "qml-format" ''
+                      dirs=". ../../../../nix/shared/system/kaizen/plugins ../../../../nix/hosts/*/kaizen-plugins"
+                      qmlformat -i $(find $dirs -name '*.qml')
+                      # Prettier cannot parse QML's `.pragma`/`.import` JS.
+                      prettier --log-level warn --write $(grep -LE '^\.(pragma|import)' $(find $dirs -name '*.js'))
+                    '')
+                    pkgs.prettier
                     (task "qml-test" ''
                       export QT_QPA_PLATFORM=offscreen QT_QPA_PLATFORMTHEME=
                       qmltestrunner -input tests

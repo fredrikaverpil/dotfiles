@@ -27,6 +27,7 @@ require("lazyload").on_vim_enter(function()
       markdown = { "rumdl" },
       nix = { "nixfmt" },
       proto = { "buf" },
+      qml = { "qmlformat" },
       sh = { "shfmt" },
       terraform = { "terraform_fmt" },
       ["terraform-vars"] = { "terraform_fmt" },
