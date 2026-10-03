@@ -23,6 +23,28 @@ drives shell services and panels, `niri msg` the compositor,
 on screen. Use them to verify your own work; what they cannot prove is listed
 under "Required local validation".
 
+## Versions
+
+Your memory of Quickshell, Qt and niri may predate the pins, which move with
+`nix flake update`. Check them first:
+
+```sh
+qs --version
+niri --version
+nix eval --raw .#nixosConfigurations.<host>.pkgs.qt6.qtdeclarative.version
+```
+
+Look up a Quickshell type, property or signal in Context7 at the pinned version
+before using one that this tree does not already use, or when `qml-lint`
+rejects one. For niri, do the same for a config node or action missing from
+`niri/config.kdl`. `qml-lint` and `compositor-test` catch removed or misspelled
+API, not features you did not know about.
+
+Context7 indexes Quickshell per release
+(`/websites/quickshell_v<major>_<minor>_<patch>`); its niri and Qt docs track
+upstream's latest, and niri marks each option with the version it arrived in
+("Since: 26.04").
+
 ## Gotchas
 
 - Nix comments carry the "why" for packages, portals, PAM, units and hardware
