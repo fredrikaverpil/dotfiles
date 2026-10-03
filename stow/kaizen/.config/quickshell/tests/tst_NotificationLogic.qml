@@ -436,6 +436,17 @@ TestCase {
         });
     }
 
+    function test_notification_heartbeat_beats_twice_then_rests() {
+        const lub = Notification.heartbeat(150);
+        const dub = Notification.heartbeat(450);
+        const rest = Notification.heartbeat(1500);
+
+        fuzzyCompare(lub, 1, 0.01);
+        fuzzyCompare(dub, 0.6, 0.01);
+        fuzzyCompare(rest, 0, 0.01);
+        verify(Notification.heartbeat(2400 + 150) === lub);
+    }
+
     function test_notification_icon_sources_preserve_schemes_and_normalize_paths() {
         compare(Notification.iconSource("/tmp/icon.png"), "file:///tmp/icon.png");
         compare(Notification.iconSource("file:///tmp/icon.png"), "file:///tmp/icon.png");

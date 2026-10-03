@@ -175,9 +175,14 @@ in
               description = "Palette colour of the toast's border, in place of the one its urgency gives";
             };
             borderAnimation = lib.mkOption {
-              type = lib.types.nullOr (lib.types.enum [ "orbit" ]);
+              type = lib.types.nullOr (
+                lib.types.enum [
+                  "orbit"
+                  "heartbeat"
+                ]
+              );
               default = null;
-              description = "Animation of the border: `orbit` keeps a dash travelling around it, and dims the border itself so the dash stands out";
+              description = "Animation of the border: `orbit` keeps a dash travelling around it, and dims the border itself so the dash stands out; `heartbeat` thickens it in two soft beats, then rests";
             };
             dedup = lib.mkOption {
               type = lib.types.nullOr (

@@ -161,6 +161,17 @@ function snapshotOf(notification, timestamp, rules) {
   };
 }
 
+// The heartbeat border's strength, 0 to 1, at `ms` into its 2400 ms cycle: a
+// beat, a softer one 300 ms later, then rest.
+function heartbeat(ms) {
+  var t = ms % 2400;
+  function beat(at, strength) {
+    var x = (t - at) / 70;
+    return strength * Math.exp(-x * x);
+  }
+  return beat(150, 1) + beat(450, 0.6);
+}
+
 function durationFor(notification, lowUrgency, criticalUrgency, rules) {
   var urgency = urgencyOf(notification, rules);
   if (urgency === criticalUrgency || notification.resident) return 0;
