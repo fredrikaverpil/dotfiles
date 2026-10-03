@@ -1,19 +1,40 @@
 # kaizen features
 
-Constraints and rationale behind individual features. What kaizen is and where
-each part lives is in [`README.md`](README.md).
+Description of kaizen features and the rationale behind them.
+
+Most features can be driven from the launcher or the terminal through
+Quickshell's IPC (inter-process communication):
+
+```sh
+# show all ipc target functions
+qs ipc show
+
+# show ipc calls for a given target
+kaizen_ipc <target>
+
+# call a target's ipc function
+qs ipc call <target> <function> [args...]
+```
 
 ## Curtain
 
-The curtain hides the screen, it is not a lock: an overlay layer surface
-(`kaizen-curtain`), never `WlSessionLock`, and it never touches DPMS. Both
-are deliberate. A session lock replaces output content and a disabled output
-has nothing to copy, so either one defeats wlr-screencopy; the curtain exists
-so `qs ipc call curtain close` leaves a desktop `grim` can still capture
-remotely. It dims the internal backlight to 0 while black and restores it
-before drawing the prompt, so the prompt is never painted onto a dark panel.
-Being only a layer surface, it dies with Quickshell, and anyone at the
-keyboard can close it. Use the lock whenever the machine is left alone.
+When the agent verifies its work by invoking UI elements on the screen and
+interacting with them, the activity can be hidden by enabling a "curtain". Think
+of it as an overlay surface drawn on top of the desktop, like a screensaver of
+sorts, but without the proper security features in place. Pressing any key
+while the curtain is active will show a password prompt.
+
+The user turns the curtain on from Settings › Session › Curtain in the
+launcher. Its IPC target is `curtain`. When the agent needs to take a
+screenshot, it lifts the curtain with `close` and puts it back with `open`.
+
+What the curtain does not do, since it would stop screenshotting from working:
+
+- It is not a real screen lock (no `WlSessionLock`).
+- It never turns the screens off (no DPMS), but it dims the laptop screen's
+  backlight.
+- It never causes the machine to go to sleep.
+- It never locks the machine: idle locking is paused while the curtain is up.
 
 ## Notification rules
 

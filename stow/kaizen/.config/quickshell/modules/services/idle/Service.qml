@@ -10,6 +10,7 @@ Item {
   id: root
 
   property var lockService: null
+  property var curtainService: null
   readonly property string statePath: Ui.Paths.state + "/idle.json"
   readonly property int lockAfterSeconds: 300
 
@@ -54,7 +55,8 @@ Item {
 
   IdleMonitor {
     id: idleMonitor
-    enabled: root.enabled
+    // Idle locking waits until the curtain is closed.
+    enabled: root.enabled && !(root.curtainService && root.curtainService.active)
     timeout: root.lockAfterSeconds
     respectInhibitors: true
     onIsIdleChanged: {
