@@ -19,7 +19,7 @@ qs ipc call <target> <function> [args...]
 The below sections correspond to an IPC target (e.g. Curtain correlates to
 target `curtain`).
 
-## Curtain
+## Curtain (`curtain`)
 
 When the agent verifies its work by invoking UI elements on the screen and
 interacting with them, the activity can be hidden by enabling a "curtain". Think
@@ -37,7 +37,8 @@ What the curtain does not do, since it would stop screenshotting from working:
 - It never turns the screens off (no DPMS), but it dims the laptop screen's
   backlight.
 - It never causes the machine to go to sleep.
-- It never locks the machine: idle locking is paused while the curtain is up.
+- ⚠️ It never locks the machine: idle locking is paused while the curtain is up.
+  Always use the real lock when leaving the machine.
 
 ## Notification rules
 
