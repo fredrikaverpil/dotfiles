@@ -172,6 +172,18 @@ function heartbeat(ms) {
   return beat(150, 1) + beat(450, 0.6);
 }
 
+// The glow's strength, 0 to 1, at `ms` into its 3200 ms breath.
+function glow(ms) {
+  return 0.5 - 0.5 * Math.cos(((ms % 3200) / 3200) * 2 * Math.PI);
+}
+
+// The glow's arrival flare, 1 on arrival easing out to 0 over 1500 ms.
+function glowFlare(age) {
+  if (!(age >= 0) || age >= 1500) return 0;
+  var x = 1 - age / 1500;
+  return x * x * x;
+}
+
 function durationFor(notification, lowUrgency, criticalUrgency, rules) {
   var urgency = urgencyOf(notification, rules);
   if (urgency === criticalUrgency || notification.resident) return 0;

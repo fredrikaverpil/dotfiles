@@ -447,6 +447,21 @@ TestCase {
         verify(Notification.heartbeat(2400 + 150) === lub);
     }
 
+    function test_notification_glow_breathes_in_and_out() {
+        fuzzyCompare(Notification.glow(0), 0, 0.001);
+        fuzzyCompare(Notification.glow(1600), 1, 0.001);
+        fuzzyCompare(Notification.glow(800), 0.5, 0.001);
+        fuzzyCompare(Notification.glow(3200 + 1600), 1, 0.001);
+    }
+
+    function test_notification_glow_flares_on_arrival_then_settles() {
+        verify(Notification.glowFlare(0) === 1);
+        fuzzyCompare(Notification.glowFlare(750), 0.125, 0.001);
+        verify(Notification.glowFlare(1500) === 0);
+        verify(Notification.glowFlare(-1) === 0);
+        verify(Notification.glowFlare(NaN) === 0);
+    }
+
     function test_notification_icon_sources_preserve_schemes_and_normalize_paths() {
         compare(Notification.iconSource("/tmp/icon.png"), "file:///tmp/icon.png");
         compare(Notification.iconSource("file:///tmp/icon.png"), "file:///tmp/icon.png");
