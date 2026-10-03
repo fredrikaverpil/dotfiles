@@ -11,7 +11,7 @@
   ],
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-6-astra",
-  "lastChangelogVersion": "0.85.1",
+  "lastChangelogVersion": "1.0.0",
   "packages": [
     "npm:pi-system-theme"
   ],
