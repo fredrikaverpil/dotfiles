@@ -40,15 +40,19 @@ What the curtain does not do, since it would stop screenshotting from working:
 - ⚠️ It never locks the machine: idle locking is paused while the curtain is up.
   Always use the real lock when leaving the machine.
 
-## Notification rules
+## Notification rules (`notifications`)
 
-`host.notificationRules` restyles toasts and adds buttons to them, keyed by
-regexes on a notification's app, summary and body; its option descriptions in
-[`session.nix`](../../nix/shared/system/kaizen/session.nix) cover each field.
-Rules match only on what the app sends, so a host adds the rules for its own
-apps, such as a Slack alert channel whose toast gets a button that hands the
-message to a script. A button's command gets the message as
-`NOTIFICATION_APP`, `NOTIFICATION_SUMMARY` and `NOTIFICATION_BODY`.
+Notifications arriving via the D-Bus can be transformed by
+`host.notificationRules`, keyed by regexes on the notification's data. This
+offers capabilities such as restyling, adding action buttons or deduplication.
+The features available are described in
+[`session.nix`](../../nix/shared/system/kaizen/session.nix).
+
+Rules match only on what the app sends. Capture a real notification first:
+[`development.md`](development.md) › Gotchas.
+
+Rules can be specified in the core kaizen system, per-host or by an optional
+plugin.
 
 ## Recording
 
