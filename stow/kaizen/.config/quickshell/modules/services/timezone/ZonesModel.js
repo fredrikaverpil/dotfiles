@@ -5,7 +5,7 @@
 // The menu's "zones" provider lists these in order, so home comes first and
 // the rest are grouped by region. Search only matches the city, not the id.
 
-var home = { name: "Göteborg", zone: "Europe/Stockholm" }
+var home = { name: "Göteborg", zone: "Europe/Stockholm" };
 
 var zones = [
   home,
@@ -59,4 +59,4 @@ var zones = [
   { name: "Auckland", zone: "Pacific/Auckland" },
 
   { name: "UTC", zone: "UTC" },
-]
+];

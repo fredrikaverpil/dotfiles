@@ -6,12 +6,12 @@ function reset(state) {
     enteredPassword: "",
     failureMessage: "",
     failedAttempts: state.failedAttempts || 0,
-  }
+  };
 }
 
 function begin(state, passwordPamConfigured, locked) {
-  if (!passwordPamConfigured) return { started: false, state: state }
-  if (locked) return { started: true, state: state }
+  if (!passwordPamConfigured) return { started: false, state: state };
+  if (locked) return { started: true, state: state };
 
   return {
     started: true,
@@ -23,12 +23,13 @@ function begin(state, passwordPamConfigured, locked) {
       failureMessage: "",
       failedAttempts: 0,
     },
-  }
+  };
 }
 
 function submit(state, password) {
-  var value = String(password || "")
-  if (!state.lockRequested || state.authenticating || value.length === 0) return null
+  var value = String(password || "");
+  if (!state.lockRequested || state.authenticating || value.length === 0)
+    return null;
 
   return {
     lockRequested: state.lockRequested,
@@ -37,12 +38,12 @@ function submit(state, password) {
     enteredPassword: "",
     failureMessage: "",
     failedAttempts: state.failedAttempts || 0,
-  }
+  };
 }
 
 function fail(state) {
-  if (!state.lockRequested) return state
-  var attempts = (state.failedAttempts || 0) + 1
+  if (!state.lockRequested) return state;
+  var attempts = (state.failedAttempts || 0) + 1;
   return {
     lockRequested: true,
     authenticating: false,
@@ -50,21 +51,21 @@ function fail(state) {
     enteredPassword: "",
     failureMessage: "Authentication failed (" + attempts + ")",
     failedAttempts: attempts,
-  }
+  };
 }
 
 function unlocked(state) {
-  return reset(state)
+  return reset(state);
 }
 
 function cancelled(state) {
-  return reset(state)
+  return reset(state);
 }
 
 function shouldBlank(state) {
-  return !!(state.lockRequested && !state.authenticating)
+  return !!(state.lockRequested && !state.authenticating);
 }
 
 function shouldSetDpms(running, blanked, on) {
-  return !running && blanked === on
+  return !running && blanked === on;
 }

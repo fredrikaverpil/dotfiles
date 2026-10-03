@@ -1,4 +1,3 @@
-
 import QtQuick
 import Quickshell
 import Quickshell.Io
@@ -7,88 +6,95 @@ import "../../../Ui" as Ui
 import Quickshell.Wayland
 
 Item {
-  id: root
+    id: root
 
-  property var lockService: null
-  property var curtainService: null
-  readonly property string statePath: Ui.Paths.state + "/idle.json"
-  readonly property int lockAfterSeconds: 300
+    property var lockService: null
+    property var curtainService: null
+    readonly property string statePath: Ui.Paths.state + "/idle.json"
+    readonly property int lockAfterSeconds: 300
 
-  property bool stateLoaded: false
-  property bool enabled: true // qmllint disable property-override
+    property bool stateLoaded: false
+    property bool enabled: true // qmllint disable property-override
 
-  function setEnabled(value) {
-    enabled = !!value
-  }
-
-  function saveState() {
-    if (stateLoaded) stateFile.setText(JSON.stringify({ version: 1, enabled: enabled }) + "\n")
-  }
-
-  function lockNow() {
-    if (!enabled || !lockService) return
-    lockService.beginLock()
-  }
-
-  onEnabledChanged: saveState()
-
-  Component.onCompleted: {
-    stateLoaded = true
-    stateFile.reload()
-  }
-
-  FileView {
-    id: stateFile
-    path: root.statePath
-    atomicWrites: true
-    printErrors: false
-    onLoaded: {
-      try {
-        var parsed = JSON.parse(String(text() || ""))
-        root.enabled = parsed.enabled !== false
-      } catch (error) {
-        root.enabled = true
-      }
-      root.stateLoaded = true
-    }
-  }
-
-  IdleMonitor {
-    id: idleMonitor
-    // Idle locking waits until the curtain is closed.
-    enabled: root.enabled && !(root.curtainService && root.curtainService.active)
-    timeout: root.lockAfterSeconds
-    respectInhibitors: true
-    onIsIdleChanged: {
-      if (isIdle) root.lockNow()
-      else if (root.lockService && root.lockService.locked) root.lockService.wake()
-    }
-  }
-
-  IpcHandler {
-    target: "idle"
-
-    function status(): string {
-      return JSON.stringify({
-        enabled: root.enabled,
-        idle: idleMonitor.isIdle,
-        lockAfterSeconds: root.lockAfterSeconds
-      })
+    function setEnabled(value) {
+        enabled = !!value;
     }
 
-    function enable(): string {
-      root.setEnabled(true)
-      return "enabled"
+    function saveState() {
+        if (stateLoaded)
+            stateFile.setText(JSON.stringify({
+                version: 1,
+                enabled: enabled
+            }) + "\n");
     }
 
-    function disable(): string {
-      root.setEnabled(false)
-      return "disabled"
+    function lockNow() {
+        if (!enabled || !lockService)
+            return;
+        lockService.beginLock();
     }
 
-    function toggle(): string {
-      root.setEnabled(!root.enabled)
-      return root.enabled ? "enabled" : "disabled"
+    onEnabledChanged: saveState()
+
+    Component.onCompleted: {
+        stateLoaded = true;
+        stateFile.reload();
     }
-  }
+
+    FileView {
+        id: stateFile
+        path: root.statePath
+        atomicWrites: true
+        printErrors: false
+        onLoaded: {
+            try {
+                var parsed = JSON.parse(String(text() || ""));
+                root.enabled = parsed.enabled !== false;
+            } catch (error) {
+                root.enabled = true;
+            }
+            root.stateLoaded = true;
+        }
+    }
+
+    IdleMonitor {
+        id: idleMonitor
+        // Idle locking waits until the curtain is closed.
+        enabled: root.enabled && !(root.curtainService && root.curtainService.active)
+        timeout: root.lockAfterSeconds
+        respectInhibitors: true
+        onIsIdleChanged: {
+            if (isIdle)
+                root.lockNow();
+            else if (root.lockService && root.lockService.locked)
+                root.lockService.wake();
+        }
+    }
+
+    IpcHandler {
+        target: "idle"
+
+        function status(): string {
+            return JSON.stringify({
+                enabled: root.enabled,
+                idle: idleMonitor.isIdle,
+                lockAfterSeconds: root.lockAfterSeconds
+            });
+        }
+
+        function enable(): string {
+            root.setEnabled(true);
+            return "enabled";
+        }
+
+        function disable(): string {
+            root.setEnabled(false);
+            return "disabled";
+        }
+
+        function toggle(): string {
+            root.setEnabled(!root.enabled);
+            return root.enabled ? "enabled" : "disabled";
+        }
+    }
 }

@@ -1,4 +1,3 @@
-
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Window
@@ -13,638 +12,716 @@ import "NotificationLogic.js" as NotificationLogic
 import "NotificationModel.js" as Model
 
 Item {
-  id: root
+    id: root
 
-  required property var shell
-  readonly property var palette: shell.palette // qmllint disable property-override
-  readonly property string statePath: Ui.Paths.state + "/notifications.json"
-  readonly property int historyLimit: 99
-  readonly property string soundPath: "/run/current-system/sw/share/sounds/freedesktop/stereo/message.oga"
-  readonly property real soundVolume: 0.4
-  // How far apart the copies of one dedup group's event, or the toasts of one
-  // collapse rule's burst, may arrive.
-  readonly property int dedupWindow: 5000
+    required property var shell
+    readonly property var palette: shell.palette // qmllint disable property-override
+    readonly property string statePath: Ui.Paths.state + "/notifications.json"
+    readonly property int historyLimit: 99
+    readonly property string soundPath: "/run/current-system/sw/share/sounds/freedesktop/stereo/message.oga"
+    readonly property real soundVolume: 0.4
+    // How far apart the copies of one dedup group's event, or the toasts of one
+    // collapse rule's burst, may arrive.
+    readonly property int dedupWindow: 5000
 
-  property bool stateLoaded: false
-  property bool doNotDisturb: false
-  // Debug aid, driven over IPC only: records each arriving notification's raw
-  // data in memory, newest first.
-  property bool capture: false
-  readonly property int captureLimit: 50
-  property var captureRows: []
-  readonly property alias historyShown: historyPanel.shown
-  property var popupRows: []
-  property var historyRows: []
-  property var live: ({})
-  property int nextKey: 0
-  // Per dedup group: keys of copies held back in case its `keep` copy arrives,
-  // and when that copy last did.
-  property var held: ({})
-  property var keptAt: ({})
-  // Per collapse rule with toasts held: `{ collapse, keys }`, oldest first.
-  property var bursts: []
-  // Per toast key: the share of its countdown left. The Repeater rebuilds every
-  // card whenever popupRows changes, so a card cannot hold it.
-  property var countdowns: ({})
-  property var shortcodes: NotificationLogic.shortcodesFrom(JSON.parse(shortcodeFile.text() || "[]"))
-  property var rules: NotificationLogic.compileRules(JSON.parse(rulesFile.text() || "[]"))
+    property bool stateLoaded: false
+    property bool doNotDisturb: false
+    // Debug aid, driven over IPC only: records each arriving notification's raw
+    // data in memory, newest first.
+    property bool capture: false
+    readonly property int captureLimit: 50
+    property var captureRows: []
+    readonly property alias historyShown: historyPanel.shown
+    property var popupRows: []
+    property var historyRows: []
+    property var live: ({})
+    property int nextKey: 0
+    // Per dedup group: keys of copies held back in case its `keep` copy arrives,
+    // and when that copy last did.
+    property var held: ({})
+    property var keptAt: ({})
+    // Per collapse rule with toasts held: `{ collapse, keys }`, oldest first.
+    property var bursts: []
+    // Per toast key: the share of its countdown left. The Repeater rebuilds every
+    // card whenever popupRows changes, so a card cannot hold it.
+    property var countdowns: ({})
+    property var shortcodes: NotificationLogic.shortcodesFrom(JSON.parse(shortcodeFile.text() || "[]"))
+    property var rules: NotificationLogic.compileRules(JSON.parse(rulesFile.text() || "[]"))
 
-  function stateText() { return Model.stateText(doNotDisturb, historyRows) }
-
-  function saveState() {
-    if (stateLoaded) stateFile.setText(stateText())
-  }
-
-  function loadState(raw) {
-    var saved = Model.loadedState(raw, historyLimit)
-    if (!saved.valid) console.warn("notifications: ignoring invalid saved state")
-    doNotDisturb = saved.doNotDisturb
-    historyRows = saved.history
-    stateLoaded = true
-  }
-
-  function recordFor(notification, existing) {
-    var record = NotificationLogic.snapshotOf(notification, Date.now(), rules)
-    record.summary = NotificationLogic.emojify(record.summary, shortcodes)
-    record.body = NotificationLogic.emojify(record.body, shortcodes)
-    record.key = existing ? existing.key : String(++nextKey)
-    record.notification = notification
-    record.duration = NotificationLogic.durationFor(notification, NotificationUrgency.Low, NotificationUrgency.Critical, rules)
-    record.transient = notification.transient
-    record.actions = NotificationLogic.actionsOf(notification, rules)
-    record.collapse = NotificationLogic.ruleValue(notification, rules, "collapse")
-    if (existing && existing.collapsed) collapse(record)
-    return record
-  }
-
-  // Stands the record in for a burst of its collapse rule's toasts.
-  function collapse(record) {
-    record.collapsed = true
-    record.summary = record.collapse.summary || record.summary
-    record.body = record.collapse.body || record.body
-  }
-
-  function replacePopup(record) {
-    popupRows = Model.replacePopup(popupRows, record)
-  }
-
-  function addHistory(record) {
-    if (!record || record.transient) return
-    historyRows = Model.historyWith(historyRows, record, historyLimit)
-    saveState()
-  }
-
-  function finish(record) {
-    if (!record || !live[record.key]) return
-
-    if (record.key === selection.key) select(Model.keyAfter(popupRows, record.key))
-    delete live[record.key]
-    delete countdowns[record.key]
-    popupRows = Model.withoutRecord(popupRows, record.key)
-  }
-
-  function refresh(record) {
-    if (!record || !live[record.key] || !record.notification) return
-
-    var refreshed = recordFor(record.notification, record)
-    live[record.key] = refreshed
-    replacePopup(refreshed)
-  }
-
-  function watch(record) {
-    var notification = record.notification
-    notification.closed.connect(function() { root.finish(record) })
-
-    var refresh = function() { root.refresh(record) }
-    notification.appNameChanged.connect(refresh)
-    notification.appIconChanged.connect(refresh)
-    notification.summaryChanged.connect(refresh)
-    notification.bodyChanged.connect(refresh)
-    notification.imageChanged.connect(refresh)
-    notification.urgencyChanged.connect(refresh)
-    notification.expireTimeoutChanged.connect(refresh)
-  }
-
-  function handleNotification(notification) {
-    var record
-
-    for (var key in live) {
-      if (live[key].notification === notification) {
-        refresh(live[key])
-        return
-      }
+    function stateText() {
+        return Model.stateText(doNotDisturb, historyRows);
     }
 
-    record = recordFor(notification)
-
-    if (capture) captureRows = [NotificationLogic.captureOf(notification, record.timestamp)].concat(captureRows).slice(0, captureLimit)
-
-    if (doNotDisturb && record.urgency !== NotificationUrgency.Critical) {
-      addHistory(record)
-      return
+    function saveState() {
+        if (stateLoaded)
+            stateFile.setText(stateText());
     }
 
-    notification.tracked = true
-    live[record.key] = record
-    watch(record)
-
-    // A dedup group's `keep` copy replaces its others.
-    var dedup = NotificationLogic.dedupOf(notification, rules)
-    if (dedup && dedup.keep) {
-      var copies = held[dedup.group] || []
-      delete held[dedup.group]
-      keptAt[dedup.group] = Date.now()
-      copies.forEach(function(key) { root.dismiss(root.live[key]) })
-    } else if (dedup) {
-      if (Date.now() - (keptAt[dedup.group] || 0) < dedupWindow) {
-        dismiss(record)
-      } else {
-        held[dedup.group] = (held[dedup.group] || []).concat(record.key)
-        dedupHold.restart()
-      }
-      return
+    function loadState(raw) {
+        var saved = Model.loadedState(raw, historyLimit);
+        if (!saved.valid)
+            console.warn("notifications: ignoring invalid saved state");
+        doNotDisturb = saved.doNotDisturb;
+        historyRows = saved.history;
+        stateLoaded = true;
     }
 
-    // A collapse rule's toasts are held, then shown as one.
-    if (record.collapse) {
-      var burst = bursts.find(function(burst) { return burst.collapse === record.collapse })
-      if (burst) burst.keys.push(record.key)
-      else bursts.push({ collapse: record.collapse, keys: [record.key] })
-      dedupHold.restart()
-      return
+    function recordFor(notification, existing) {
+        var record = NotificationLogic.snapshotOf(notification, Date.now(), rules);
+        record.summary = NotificationLogic.emojify(record.summary, shortcodes);
+        record.body = NotificationLogic.emojify(record.body, shortcodes);
+        record.key = existing ? existing.key : String(++nextKey);
+        record.notification = notification;
+        record.duration = NotificationLogic.durationFor(notification, NotificationUrgency.Low, NotificationUrgency.Critical, rules);
+        record.transient = notification.transient;
+        record.actions = NotificationLogic.actionsOf(notification, rules);
+        record.collapse = NotificationLogic.ruleValue(notification, rules, "collapse");
+        if (existing && existing.collapsed)
+            collapse(record);
+        return record;
     }
 
-    show(record)
-  }
-
-  // Shows a burst's latest toast in place of its others and of the rule's toast
-  // on screen; with any of those, as the rule's collapsed text.
-  function showBurst(burst) {
-    var records = burst.keys.map(function(key) { return root.live[key] }).filter(Boolean)
-    var latest = records.pop()
-    if (!latest) return
-    var previous = popupRows.find(function(row) { return row.collapse === burst.collapse })
-    if (previous) records.push(previous)
-    records.forEach(dismiss)
-    if (burst.keys.length > 1 || previous) collapse(latest)
-    show(latest)
-  }
-
-  function show(record) {
-    popupRows = [record].concat(popupRows)
-    sound.startDetached()
-  }
-
-  function dismiss(record) {
-    if (!record || !record.notification || !live[record.key]) return
-    record.notification.dismiss()
-  }
-
-  function expire(record) {
-    if (!record || !record.notification || !live[record.key]) return
-    record.notification.expire()
-  }
-
-  // Apps cannot raise their own window without an activation token, which the
-  // server has no way to pass on, so the shell focuses it.
-  function focusApp(record) {
-    var pattern = NotificationLogic.focusPatternOf(record.notification, rules)
-    if (pattern) Quickshell.execDetached(Ui.Compositor.focusApp(pattern))
-  }
-
-  function defaultAction(record) {
-    if (!record || !record.notification) return
-    focusApp(record)
-
-    var actions = record.notification.actions || []
-    for (var index = 0; index < actions.length; index++) {
-      if (actions[index].identifier === "default") {
-        actions[index].invoke()
-        break
-      }
-    }
-    dismiss(record)
-  }
-
-  // A rule's action runs its command, not the app's.
-  function action(record, selectedAction) {
-    if (!record || !selectedAction) return
-    if (selectedAction.command) {
-      Quickshell.execDetached(NotificationLogic.commandOf(record, selectedAction))
-    } else {
-      focusApp(record)
-      selectedAction.invoke()
-    }
-    dismiss(record)
-  }
-
-  function select(key) {
-    if (key && !selection.shown) {
-      shell.registerPanel(selection)
-      shell.claimPanel(selection)
-    }
-    selection.key = key
-    selection.button = 0
-  }
-
-  function stepSelection(delta) {
-    if (popupRows.length === 0) return false
-    select(selection.shown ? Model.stepKey(popupRows, selection.key, delta) : popupRows[0].key)
-    return true
-  }
-
-  function stepButton(delta) {
-    var record = live[selection.key]
-    var count = NotificationLogic.buttons(record.notification.actions, record.actions).length
-    selection.button = Model.step(selection.button, delta, count)
-  }
-
-  // Ends the selection: a button usually hands focus to its app.
-  function activate() {
-    var record = live[selection.key]
-    var buttons = NotificationLogic.buttons(record.notification.actions, record.actions)
-    var button = buttons[Math.min(selection.button, buttons.length - 1)]
-    selection.close()
-    if (button) action(record, button)
-    else defaultAction(record)
-  }
-
-  function setDoNotDisturb(value) {
-    doNotDisturb = !!value
-  }
-
-  function clearHistory() {
-    historyRows = []
-    saveState()
-  }
-
-  function dismissAll() {
-    var rows = popupRows.slice()
-    for (var index = 0; index < rows.length; index++) dismiss(rows[index])
-  }
-
-  function close() { historyPanel.close() }
-
-  function showHistory() { historyPanel.open() }
-
-  function toggleHistory() { historyPanel.toggle() }
-
-  onDoNotDisturbChanged: saveState()
-
-  Component.onCompleted: {
-    stateLoaded = true
-    stateFile.reload()
-  }
-
-  // The toast and button driven from the keyboard; `shown` and `close()` let
-  // shell.claimPanel treat it as a panel.
-  QtObject {
-    id: selection
-
-    property string key: ""
-    property int button: 0
-    readonly property bool shown: key !== ""
-
-    function close() { key = "" }
-  }
-
-  Timer {
-    id: dedupHold
-    interval: root.dedupWindow
-    onTriggered: {
-      for (var group in root.held) {
-        root.held[group].forEach(function(key) {
-          if (root.live[key]) root.show(root.live[key])
-        })
-      }
-      root.held = ({})
-      root.bursts.forEach(root.showBurst)
-      root.bursts = []
-    }
-  }
-
-  Process {
-    id: sound
-    command: ["pw-play", "--volume", String(root.soundVolume), root.soundPath]
-  }
-
-  FileView {
-    id: stateFile
-    path: root.statePath
-    atomicWrites: true
-    printErrors: false
-    onLoaded: root.loadState(text())
-  }
-
-  FileView {
-    id: shortcodeFile
-    path: Quickshell.env("KAIZEN_EMOJI") || ""
-    // Blocks the first read, so no notification is handled before the map exists.
-    blockLoading: true
-    printErrors: false
-  }
-
-  // The host's notification rules (host.notificationRules).
-  FileView {
-    id: rulesFile
-    path: Quickshell.env("KAIZEN_NOTIFICATION_RULES") || ""
-    // Blocks the first read, so no notification is handled before the rules exist.
-    blockLoading: true
-    printErrors: false
-  }
-
-  NotificationServer {
-    id: server
-    keepOnReload: false
-    bodySupported: true
-    bodyMarkupSupported: false
-    bodyHyperlinksSupported: false
-    bodyImagesSupported: false
-    imageSupported: true
-    actionsSupported: true
-    actionIconsSupported: false
-    inlineReplySupported: false
-    persistenceSupported: false
-
-    onNotification: function(notification) {
-      root.handleNotification(notification)
-    }
-  }
-
-  IpcHandler {
-    target: "notifications"
-
-    function dndState(): string { return root.doNotDisturb ? "on" : "off" }
-    function isDnd(): string { return dndState() }
-
-    function toggleDnd(): string {
-      root.setDoNotDisturb(!root.doNotDisturb)
-      return dndState()
+    // Stands the record in for a burst of its collapse rule's toasts.
+    function collapse(record) {
+        record.collapsed = true;
+        record.summary = record.collapse.summary || record.summary;
+        record.body = record.collapse.body || record.body;
     }
 
-    function setDnd(value: string): string {
-      root.setDoNotDisturb(Model.dndValue(value))
-      return dndState()
+    function replacePopup(record) {
+        popupRows = Model.replacePopup(popupRows, record);
     }
 
-    function captureState(): string { return root.capture ? "on" : "off" }
-
-    // Turning it on starts a fresh capture.
-    function toggleCapture(): string {
-      root.capture = !root.capture
-      if (root.capture) root.captureRows = []
-      return captureState()
+    function addHistory(record) {
+        if (!record || record.transient)
+            return;
+        historyRows = Model.historyWith(historyRows, record, historyLimit);
+        saveState();
     }
 
-    function captured(): string { return JSON.stringify(root.captureRows, null, 2) }
-
-    function showHistory(): string {
-      root.showHistory()
-      return "ok"
+    function finish(record) {
+        if (!record || !live[record.key])
+            return;
+        if (record.key === selection.key)
+            select(Model.keyAfter(popupRows, record.key));
+        delete live[record.key];
+        delete countdowns[record.key];
+        popupRows = Model.withoutRecord(popupRows, record.key);
     }
 
-    function toggleHistory(): string {
-      root.toggleHistory()
-      return "ok"
+    function refresh(record) {
+        if (!record || !live[record.key] || !record.notification)
+            return;
+        var refreshed = recordFor(record.notification, record);
+        live[record.key] = refreshed;
+        replacePopup(refreshed);
     }
 
-    function clear(): string {
-      root.clearHistory()
-      return "ok"
+    function watch(record) {
+        var notification = record.notification;
+        notification.closed.connect(function () {
+            root.finish(record);
+        });
+
+        var refresh = function () {
+            root.refresh(record);
+        };
+        notification.appNameChanged.connect(refresh);
+        notification.appIconChanged.connect(refresh);
+        notification.summaryChanged.connect(refresh);
+        notification.bodyChanged.connect(refresh);
+        notification.imageChanged.connect(refresh);
+        notification.urgencyChanged.connect(refresh);
+        notification.expireTimeoutChanged.connect(refresh);
     }
 
-    function dismissAll(): string {
-      root.dismissAll()
-      return "ok"
-    }
+    function handleNotification(notification) {
+        var record;
 
-    function dismissOne(): string {
-      if (root.popupRows.length === 0) return "none"
-      root.dismiss(root.popupRows[0])
-      return "ok"
-    }
-
-    // Selects the newest toast, then each older one in turn.
-    function select(): string {
-      return root.stepSelection(1) ? "ok" : "none"
-    }
-  }
-
-  PanelWindow {
-    id: popupWindow
-    visible: root.popupRows.length > 0
-    anchors { top: true; bottom: true; left: true; right: true }
-    exclusionMode: ExclusionMode.Ignore
-    color: "transparent"
-    mask: Region { item: popupArea }
-    WlrLayershell.namespace: "kaizen-notifications"
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: selection.shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-
-    // Sized to the scaled column, so the input mask covers what is drawn.
-    Item {
-      id: popupArea
-      anchors.top: parent.top
-      anchors.right: parent.right
-      anchors.topMargin: root.shell.barHeight + 8
-      anchors.rightMargin: 16
-      width: popupColumn.width * popupColumn.scale
-      height: popupColumn.implicitHeight * popupColumn.scale
-
-      focus: true
-      Keys.onPressed: function(event) {
-        if (!selection.shown) return
-        if (event.key === Qt.Key_Escape) selection.close()
-        else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) root.activate()
-        else if (event.key === Qt.Key_Backspace) root.dismiss(root.live[selection.key])
-        else if (event.key === Qt.Key_Tab || event.key === Qt.Key_Right || event.text === "l") root.stepButton(1)
-        else if (event.key === Qt.Key_Backtab || event.key === Qt.Key_Left || event.text === "h") root.stepButton(-1)
-        else if (event.key === Qt.Key_Down || event.text === "j") root.stepSelection(1)
-        else if (event.key === Qt.Key_Up || event.text === "k") root.stepSelection(-1)
-        else return
-        event.accepted = true
-      }
-
-      Column {
-        id: popupColumn
-        width: 400
-        spacing: 8
-        scale: root.shell.textScale
-        transformOrigin: Item.TopLeft
-
-        Repeater {
-          model: root.popupRows
-
-          delegate: NotificationCard {
-            required property var modelData
-
-            width: popupColumn.width
-            palette: root.palette
-            row: modelData
-            notification: modelData.notification
-            toast: true
-            selected: modelData.key === selection.key
-            selectedButton: selected ? selection.button : -1
-            duration: modelData.duration
-            remaining: root.countdowns[modelData.key] ?? 1
-            onRemainingChanged: root.countdowns[modelData.key] = remaining
-            onCloseRequested: root.dismiss(modelData)
-            onInvokeRequested: root.defaultAction(modelData)
-            onActionRequested: function(selectedAction) { root.action(modelData, selectedAction) }
-            onExpired: root.expire(modelData)
-          }
+        for (var key in live) {
+            if (live[key].notification === notification) {
+                refresh(live[key]);
+                return;
+            }
         }
-      }
-    }
-  }
 
-  Ui.Panel {
-    id: historyPanel
+        record = recordFor(notification);
 
-    shell: root.shell
-    cardWidth: 620
-    cardHeight: 560
-    keyNavigation: true
+        if (capture)
+            captureRows = [NotificationLogic.captureOf(notification, record.timestamp)].concat(captureRows).slice(0, captureLimit);
 
-    readonly property var focusedItem: historyList.Window.activeFocusItem
-    // Map to content coordinates: Flickable coordinates are relative to its viewport.
-    onFocusedItemChanged: {
-      const item = focusedItem
-      if (!item || !shown || item.parent !== historyContent) return
-      const top = item.mapToItem(historyContent, 0, 0).y
-      if (!isFinite(top)) return
-      if (top < historyList.contentY) historyList.contentY = Math.max(0, top)
-      else if (top + item.height > historyList.contentY + historyList.height)
-        historyList.contentY = top + item.height - historyList.height
-    }
-
-    // Removing rebuilds every delegate, so the focus has to be placed again by
-    // position: the card that took the removed one's place, or the header.
-    function drop(index) {
-      root.historyRows = Model.withoutIndex(root.historyRows, index)
-      root.saveState()
-      Qt.callLater(function() {
-        if (historyCards.count === 0) {
-          clearButton.forceActiveFocus(Qt.TabFocusReason)
-          return
+        if (doNotDisturb && record.urgency !== NotificationUrgency.Critical) {
+            addHistory(record);
+            return;
         }
-        const card = historyCards.itemAt(Math.min(index, historyCards.count - 1))
-        if (card) card.forceActiveFocus(Qt.TabFocusReason)
-      })
-    }
 
-    RowLayout {
-      id: historyHeader
-      width: parent.width
-      spacing: 8
+        notification.tracked = true;
+        live[record.key] = record;
+        watch(record);
 
-      Text {
-        Layout.fillWidth: true
-        text: "Arrived while notifications were off"
-        color: root.palette.fg
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 18
-      }
-
-      HeaderButton {
-        id: clearButton
-        label: "Clear"
-        onActivated: root.clearHistory()
-      }
-
-      HeaderButton {
-        label: "Enabled"
-        active: !root.doNotDisturb
-        onActivated: root.setDoNotDisturb(!root.doNotDisturb)
-      }
-    }
-
-    Rectangle {
-      id: historySeparator
-      width: parent.width
-      height: 1
-      color: root.palette.dim
-    }
-
-    // A Flickable over a Column, not a ListView: every card must exist for the
-    // panel's focus chain to reach it, and a virtualized delegate does not.
-    Flickable {
-      id: historyList
-      width: parent.width
-      height: parent.height - historyHeader.height - historySeparator.height - 2 * historyPanel.contentSpacing
-      contentWidth: width
-      contentHeight: historyContent.implicitHeight
-      clip: true
-      boundsBehavior: Flickable.StopAtBounds
-
-      Column {
-        id: historyContent
-        width: historyList.width
-        spacing: 8
-
-        Repeater {
-          id: historyCards
-          model: root.historyRows
-
-          delegate: NotificationCard {
-            required property var modelData
-            required property int index
-
-            width: historyContent.width
-            palette: root.palette
-            row: modelData
-            toast: false
-            selectable: true
-            onCloseRequested: historyPanel.drop(index)
-            onInvokeRequested: {}
-          }
+        // A dedup group's `keep` copy replaces its others.
+        var dedup = NotificationLogic.dedupOf(notification, rules);
+        if (dedup && dedup.keep) {
+            var copies = held[dedup.group] || [];
+            delete held[dedup.group];
+            keptAt[dedup.group] = Date.now();
+            copies.forEach(function (key) {
+                root.dismiss(root.live[key]);
+            });
+        } else if (dedup) {
+            if (Date.now() - (keptAt[dedup.group] || 0) < dedupWindow) {
+                dismiss(record);
+            } else {
+                held[dedup.group] = (held[dedup.group] || []).concat(record.key);
+                dedupHold.restart();
+            }
+            return;
         }
+
+        // A collapse rule's toasts are held, then shown as one.
+        if (record.collapse) {
+            var burst = bursts.find(function (burst) {
+                return burst.collapse === record.collapse;
+            });
+            if (burst)
+                burst.keys.push(record.key);
+            else
+                bursts.push({
+                    collapse: record.collapse,
+                    keys: [record.key]
+                });
+            dedupHold.restart();
+            return;
+        }
+
+        show(record);
+    }
+
+    // Shows a burst's latest toast in place of its others and of the rule's toast
+    // on screen; with any of those, as the rule's collapsed text.
+    function showBurst(burst) {
+        var records = burst.keys.map(function (key) {
+            return root.live[key];
+        }).filter(Boolean);
+        var latest = records.pop();
+        if (!latest)
+            return;
+        var previous = popupRows.find(function (row) {
+            return row.collapse === burst.collapse;
+        });
+        if (previous)
+            records.push(previous);
+        records.forEach(dismiss);
+        if (burst.keys.length > 1 || previous)
+            collapse(latest);
+        show(latest);
+    }
+
+    function show(record) {
+        popupRows = [record].concat(popupRows);
+        sound.startDetached();
+    }
+
+    function dismiss(record) {
+        if (!record || !record.notification || !live[record.key])
+            return;
+        record.notification.dismiss();
+    }
+
+    function expire(record) {
+        if (!record || !record.notification || !live[record.key])
+            return;
+        record.notification.expire();
+    }
+
+    // Apps cannot raise their own window without an activation token, which the
+    // server has no way to pass on, so the shell focuses it.
+    function focusApp(record) {
+        var pattern = NotificationLogic.focusPatternOf(record.notification, rules);
+        if (pattern)
+            Quickshell.execDetached(Ui.Compositor.focusApp(pattern));
+    }
+
+    function defaultAction(record) {
+        if (!record || !record.notification)
+            return;
+        focusApp(record);
+
+        var actions = record.notification.actions || [];
+        for (var index = 0; index < actions.length; index++) {
+            if (actions[index].identifier === "default") {
+                actions[index].invoke();
+                break;
+            }
+        }
+        dismiss(record);
+    }
+
+    // A rule's action runs its command, not the app's.
+    function action(record, selectedAction) {
+        if (!record || !selectedAction)
+            return;
+        if (selectedAction.command) {
+            Quickshell.execDetached(NotificationLogic.commandOf(record, selectedAction));
+        } else {
+            focusApp(record);
+            selectedAction.invoke();
+        }
+        dismiss(record);
+    }
+
+    function select(key) {
+        if (key && !selection.shown) {
+            shell.registerPanel(selection);
+            shell.claimPanel(selection);
+        }
+        selection.key = key;
+        selection.button = 0;
+    }
+
+    function stepSelection(delta) {
+        if (popupRows.length === 0)
+            return false;
+        select(selection.shown ? Model.stepKey(popupRows, selection.key, delta) : popupRows[0].key);
+        return true;
+    }
+
+    function stepButton(delta) {
+        var record = live[selection.key];
+        var count = NotificationLogic.buttons(record.notification.actions, record.actions).length;
+        selection.button = Model.step(selection.button, delta, count);
+    }
+
+    // Ends the selection: a button usually hands focus to its app.
+    function activate() {
+        var record = live[selection.key];
+        var buttons = NotificationLogic.buttons(record.notification.actions, record.actions);
+        var button = buttons[Math.min(selection.button, buttons.length - 1)];
+        selection.close();
+        if (button)
+            action(record, button);
+        else
+            defaultAction(record);
+    }
+
+    function setDoNotDisturb(value) {
+        doNotDisturb = !!value;
+    }
+
+    function clearHistory() {
+        historyRows = [];
+        saveState();
+    }
+
+    function dismissAll() {
+        var rows = popupRows.slice();
+        for (var index = 0; index < rows.length; index++)
+            dismiss(rows[index]);
+    }
+
+    function close() {
+        historyPanel.close();
+    }
+
+    function showHistory() {
+        historyPanel.open();
+    }
+
+    function toggleHistory() {
+        historyPanel.toggle();
+    }
+
+    onDoNotDisturbChanged: saveState()
+
+    Component.onCompleted: {
+        stateLoaded = true;
+        stateFile.reload();
+    }
+
+    // The toast and button driven from the keyboard; `shown` and `close()` let
+    // shell.claimPanel treat it as a panel.
+    QtObject {
+        id: selection
+
+        property string key: ""
+        property int button: 0
+        readonly property bool shown: key !== ""
+
+        function close() {
+            key = "";
+        }
+    }
+
+    Timer {
+        id: dedupHold
+        interval: root.dedupWindow
+        onTriggered: {
+            for (var group in root.held) {
+                root.held[group].forEach(function (key) {
+                    if (root.live[key])
+                        root.show(root.live[key]);
+                });
+            }
+            root.held = ({});
+            root.bursts.forEach(root.showBurst);
+            root.bursts = [];
+        }
+    }
+
+    Process {
+        id: sound
+        command: ["pw-play", "--volume", String(root.soundVolume), root.soundPath]
+    }
+
+    FileView {
+        id: stateFile
+        path: root.statePath
+        atomicWrites: true
+        printErrors: false
+        onLoaded: root.loadState(text())
+    }
+
+    FileView {
+        id: shortcodeFile
+        path: Quickshell.env("KAIZEN_EMOJI") || ""
+        // Blocks the first read, so no notification is handled before the map exists.
+        blockLoading: true
+        printErrors: false
+    }
+
+    // The host's notification rules (host.notificationRules).
+    FileView {
+        id: rulesFile
+        path: Quickshell.env("KAIZEN_NOTIFICATION_RULES") || ""
+        // Blocks the first read, so no notification is handled before the rules exist.
+        blockLoading: true
+        printErrors: false
+    }
+
+    NotificationServer {
+        id: server
+        keepOnReload: false
+        bodySupported: true
+        bodyMarkupSupported: false
+        bodyHyperlinksSupported: false
+        bodyImagesSupported: false
+        imageSupported: true
+        actionsSupported: true
+        actionIconsSupported: false
+        inlineReplySupported: false
+        persistenceSupported: false
+
+        onNotification: function (notification) {
+            root.handleNotification(notification);
+        }
+    }
+
+    IpcHandler {
+        target: "notifications"
+
+        function dndState(): string {
+            return root.doNotDisturb ? "on" : "off";
+        }
+        function isDnd(): string {
+            return dndState();
+        }
+
+        function toggleDnd(): string {
+            root.setDoNotDisturb(!root.doNotDisturb);
+            return dndState();
+        }
+
+        function setDnd(value: string): string {
+            root.setDoNotDisturb(Model.dndValue(value));
+            return dndState();
+        }
+
+        function captureState(): string {
+            return root.capture ? "on" : "off";
+        }
+
+        // Turning it on starts a fresh capture.
+        function toggleCapture(): string {
+            root.capture = !root.capture;
+            if (root.capture)
+                root.captureRows = [];
+            return captureState();
+        }
+
+        function captured(): string {
+            return JSON.stringify(root.captureRows, null, 2);
+        }
+
+        function showHistory(): string {
+            root.showHistory();
+            return "ok";
+        }
+
+        function toggleHistory(): string {
+            root.toggleHistory();
+            return "ok";
+        }
+
+        function clear(): string {
+            root.clearHistory();
+            return "ok";
+        }
+
+        function dismissAll(): string {
+            root.dismissAll();
+            return "ok";
+        }
+
+        function dismissOne(): string {
+            if (root.popupRows.length === 0)
+                return "none";
+            root.dismiss(root.popupRows[0]);
+            return "ok";
+        }
+
+        // Selects the newest toast, then each older one in turn.
+        function select(): string {
+            return root.stepSelection(1) ? "ok" : "none";
+        }
+    }
+
+    PanelWindow {
+        id: popupWindow
+        visible: root.popupRows.length > 0
+        anchors {
+            top: true
+            bottom: true
+            left: true
+            right: true
+        }
+        exclusionMode: ExclusionMode.Ignore
+        color: "transparent"
+        mask: Region {
+            item: popupArea
+        }
+        WlrLayershell.namespace: "kaizen-notifications"
+        WlrLayershell.layer: WlrLayer.Overlay
+        WlrLayershell.keyboardFocus: selection.shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+
+        // Sized to the scaled column, so the input mask covers what is drawn.
+        Item {
+            id: popupArea
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin: root.shell.barHeight + 8
+            anchors.rightMargin: 16
+            width: popupColumn.width * popupColumn.scale
+            height: popupColumn.implicitHeight * popupColumn.scale
+
+            focus: true
+            Keys.onPressed: function (event) {
+                if (!selection.shown)
+                    return;
+                if (event.key === Qt.Key_Escape)
+                    selection.close();
+                else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
+                    root.activate();
+                else if (event.key === Qt.Key_Backspace)
+                    root.dismiss(root.live[selection.key]);
+                else if (event.key === Qt.Key_Tab || event.key === Qt.Key_Right || event.text === "l")
+                    root.stepButton(1);
+                else if (event.key === Qt.Key_Backtab || event.key === Qt.Key_Left || event.text === "h")
+                    root.stepButton(-1);
+                else if (event.key === Qt.Key_Down || event.text === "j")
+                    root.stepSelection(1);
+                else if (event.key === Qt.Key_Up || event.text === "k")
+                    root.stepSelection(-1);
+                else
+                    return;
+                event.accepted = true;
+            }
+
+            Column {
+                id: popupColumn
+                width: 400
+                spacing: 8
+                scale: root.shell.textScale
+                transformOrigin: Item.TopLeft
+
+                Repeater {
+                    model: root.popupRows
+
+                    delegate: NotificationCard {
+                        required property var modelData
+
+                        width: popupColumn.width
+                        palette: root.palette
+                        row: modelData
+                        notification: modelData.notification
+                        toast: true
+                        selected: modelData.key === selection.key
+                        selectedButton: selected ? selection.button : -1
+                        duration: modelData.duration
+                        remaining: root.countdowns[modelData.key] ?? 1
+                        onRemainingChanged: root.countdowns[modelData.key] = remaining
+                        onCloseRequested: root.dismiss(modelData)
+                        onInvokeRequested: root.defaultAction(modelData)
+                        onActionRequested: function (selectedAction) {
+                            root.action(modelData, selectedAction);
+                        }
+                        onExpired: root.expire(modelData)
+                    }
+                }
+            }
+        }
+    }
+
+    Ui.Panel {
+        id: historyPanel
+
+        shell: root.shell
+        cardWidth: 620
+        cardHeight: 560
+        keyNavigation: true
+
+        readonly property var focusedItem: historyList.Window.activeFocusItem
+        // Map to content coordinates: Flickable coordinates are relative to its viewport.
+        onFocusedItemChanged: {
+            const item = focusedItem;
+            if (!item || !shown || item.parent !== historyContent)
+                return;
+            const top = item.mapToItem(historyContent, 0, 0).y;
+            if (!isFinite(top))
+                return;
+            if (top < historyList.contentY)
+                historyList.contentY = Math.max(0, top);
+            else if (top + item.height > historyList.contentY + historyList.height)
+                historyList.contentY = top + item.height - historyList.height;
+        }
+
+        // Removing rebuilds every delegate, so the focus has to be placed again by
+        // position: the card that took the removed one's place, or the header.
+        function drop(index) {
+            root.historyRows = Model.withoutIndex(root.historyRows, index);
+            root.saveState();
+            Qt.callLater(function () {
+                if (historyCards.count === 0) {
+                    clearButton.forceActiveFocus(Qt.TabFocusReason);
+                    return;
+                }
+                const card = historyCards.itemAt(Math.min(index, historyCards.count - 1));
+                if (card)
+                    card.forceActiveFocus(Qt.TabFocusReason);
+            });
+        }
+
+        RowLayout {
+            id: historyHeader
+            width: parent.width
+            spacing: 8
+
+            Text {
+                Layout.fillWidth: true
+                text: "Arrived while notifications were off"
+                color: root.palette.fg
+                font.family: Ui.Fonts.mono
+                font.pixelSize: 18
+            }
+
+            HeaderButton {
+                id: clearButton
+                label: "Clear"
+                onActivated: root.clearHistory()
+            }
+
+            HeaderButton {
+                label: "Enabled"
+                active: !root.doNotDisturb
+                onActivated: root.setDoNotDisturb(!root.doNotDisturb)
+            }
+        }
+
+        Rectangle {
+            id: historySeparator
+            width: parent.width
+            height: 1
+            color: root.palette.dim
+        }
+
+        // A Flickable over a Column, not a ListView: every card must exist for the
+        // panel's focus chain to reach it, and a virtualized delegate does not.
+        Flickable {
+            id: historyList
+            width: parent.width
+            height: parent.height - historyHeader.height - historySeparator.height - 2 * historyPanel.contentSpacing
+            contentWidth: width
+            contentHeight: historyContent.implicitHeight
+            clip: true
+            boundsBehavior: Flickable.StopAtBounds
+
+            Column {
+                id: historyContent
+                width: historyList.width
+                spacing: 8
+
+                Repeater {
+                    id: historyCards
+                    model: root.historyRows
+
+                    delegate: NotificationCard {
+                        required property var modelData
+                        required property int index
+
+                        width: historyContent.width
+                        palette: root.palette
+                        row: modelData
+                        toast: false
+                        selectable: true
+                        onCloseRequested: historyPanel.drop(index)
+                        onInvokeRequested: {}
+                    }
+                }
+
+                Text {
+                    visible: historyCards.count === 0
+                    text: "Nothing arrived while notifications were off"
+                    color: root.palette.off
+                    font.family: Ui.Fonts.mono
+                    font.pixelSize: 14
+                }
+            }
+        }
+    }
+
+    component HeaderButton: Rectangle {
+        id: button
+
+        property string label: ""
+        property bool active: false
+        signal activated
+
+        implicitWidth: buttonLabel.implicitWidth + 14
+        implicitHeight: 26
+        radius: 4
+        color: active || buttonMouse.containsMouse ? root.palette.sel : "transparent"
+        border.color: button.activeFocus ? root.palette.fg : root.palette.dim
+        border.width: 1
+
+        activeFocusOnTab: true
+        Keys.onReturnPressed: button.activated()
+        Keys.onEnterPressed: button.activated()
+        Keys.onSpacePressed: button.activated()
 
         Text {
-          visible: historyCards.count === 0
-          text: "Nothing arrived while notifications were off"
-          color: root.palette.off
-          font.family: Ui.Fonts.mono
-          font.pixelSize: 14
+            id: buttonLabel
+            anchors.centerIn: parent
+            text: button.label
+            color: root.palette.fg
+            font.family: Ui.Fonts.mono
+            font.pixelSize: 12
         }
-      }
+
+        MouseArea {
+            id: buttonMouse
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: button.activated()
+        }
     }
-  }
-
-  component HeaderButton: Rectangle {
-    id: button
-
-    property string label: ""
-    property bool active: false
-    signal activated
-
-    implicitWidth: buttonLabel.implicitWidth + 14
-    implicitHeight: 26
-    radius: 4
-    color: active || buttonMouse.containsMouse ? root.palette.sel : "transparent"
-    border.color: button.activeFocus ? root.palette.fg : root.palette.dim
-    border.width: 1
-
-    activeFocusOnTab: true
-    Keys.onReturnPressed: button.activated()
-    Keys.onEnterPressed: button.activated()
-    Keys.onSpacePressed: button.activated()
-
-    Text {
-      id: buttonLabel
-      anchors.centerIn: parent
-      text: button.label
-      color: root.palette.fg
-      font.family: Ui.Fonts.mono
-      font.pixelSize: 12
-    }
-
-    MouseArea {
-      id: buttonMouse
-      anchors.fill: parent
-      hoverEnabled: true
-      cursorShape: Qt.PointingHandCursor
-      onClicked: button.activated()
-    }
-  }
 }
