@@ -50,6 +50,13 @@ Ui.Panel {
             value: service.desktop,
             set: value => root.service.desktop = value
         },
+        {
+            label: "Do not disturb",
+            values: [true, false],
+            labels: ["On", "Off"],
+            value: root.dnd,
+            set: value => root.dnd = value
+        },
     ]
     readonly property var actions: service.busy ? [
         {
@@ -69,6 +76,11 @@ Ui.Panel {
     readonly property int count: rows.length + actions.length
 
     property int cursor: 0
+    // On each time the panel opens; a recording that turns DnD on turns it off
+    // again once it ends.
+    property bool dnd: true
+    property bool restoreDnd: false
+    readonly property bool active: service.selecting || service.busy
 
     cardWidth: 480
     cardHeight: 90 + count * 38
@@ -76,6 +88,17 @@ Ui.Panel {
     function record() {
         close();
         service.start();
+        if (dnd && active && !shell.notifications.doNotDisturb) {
+            shell.notifications.setDoNotDisturb(true);
+            restoreDnd = true;
+        }
+    }
+
+    function restore() {
+        if (active || !restoreDnd)
+            return;
+        restoreDnd = false;
+        shell.notifications.setDoNotDisturb(false);
     }
 
     function adjust(delta) {
@@ -97,12 +120,17 @@ Ui.Panel {
 
     // Record is preselected, so Enter starts with the saved choices.
     onShownChanged: if (shown) {
+        dnd = true;
         service.refreshCameras();
         cursor = rows.length;
         keys.forceActiveFocus();
     }
 
     onCountChanged: cursor = Math.min(cursor, count - 1)
+
+    // Later: active dips while the selector hands over to the countdown.
+    onActiveChanged: if (!active)
+        Qt.callLater(restore)
 
     IpcHandler {
         target: "recording"
