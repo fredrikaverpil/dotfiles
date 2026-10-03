@@ -29,6 +29,8 @@ vim.opt.splitright = true
 vim.opt.undofile = true
 vim.opt.undolevels = 10000
 vim.opt.updatetime = 200
+-- Write in place; keeps file watchers on symlinked files working.
+vim.opt.backupcopy = "yes"
 
 -- Display
 vim.opt.termguicolors = true
