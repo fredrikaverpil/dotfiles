@@ -230,6 +230,12 @@ in
               example = lib.literalExpression "./github.svg";
               description = "Icon shown in place of the notification's, such as the sender an app relays for; the notification's own moves to a badge on its corner";
             };
+            badge = lib.mkOption {
+              type = lib.types.nullOr lib.types.path;
+              default = null;
+              example = lib.literalExpression "./heart.svg";
+              description = "Icon on the corner badge, in place of the notification's own when `icon` moves it there";
+            };
             actions = lib.mkOption {
               type = lib.types.listOf (
                 lib.types.submodule {

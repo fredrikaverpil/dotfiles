@@ -31,6 +31,7 @@ Rectangle {
     readonly property string body: String(row.body || "")
     readonly property string image: String(row.image || "")
     readonly property string ruleIcon: String(row.icon || "")
+    readonly property string ruleBadge: String(row.badge || "")
     readonly property real perimeter: 2 * (width + height)
     readonly property int urgency: Number(row.urgency)
     readonly property var buttons: notification ? NotificationLogic.buttons(notification.actions, row.actions) : []
@@ -38,9 +39,10 @@ Rectangle {
     // A rule's border colour takes the place of the urgency's.
     readonly property color tint: palette[String(row.border || "")] ?? accent
     readonly property bool orbiting: toast && row.borderAnimation === "orbit"
-    // A rule's icon takes the notification's place, which moves to the badge.
+    // A rule's icon takes the notification's place, which moves to the badge
+    // unless the rule sets its own.
     readonly property string icon: ruleIcon || ownIcon
-    readonly property string badge: ruleIcon ? ownIcon : ""
+    readonly property string badge: ruleBadge || (ruleIcon ? ownIcon : "")
     readonly property string ownIcon: {
         if (image)
             return image;

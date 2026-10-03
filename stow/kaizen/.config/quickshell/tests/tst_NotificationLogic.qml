@@ -18,6 +18,7 @@ TestCase {
             body: "",
             image: "",
             icon: "",
+            badge: "",
             border: "",
             borderAnimation: "",
             urgency: 2,
@@ -109,6 +110,7 @@ TestCase {
             body: "",
             image: "",
             icon: "",
+            badge: "",
             border: "",
             borderAnimation: "",
             urgency: 2,
@@ -335,6 +337,7 @@ TestCase {
             body: "",
             image: "",
             icon: "file:///nix/store/x-github.svg",
+            badge: "",
             border: "",
             borderAnimation: "",
             urgency: 1,
@@ -394,9 +397,41 @@ TestCase {
             body: "",
             image: "",
             icon: "",
+            badge: "",
             border: "rose",
             borderAnimation: "orbit",
             urgency: 2,
+            timestamp: 123
+        });
+    }
+
+    function test_notification_badge_comes_from_the_first_matching_rule_with_one() {
+        const rules = Notification.compileRules([
+            {
+                match: {
+                    app: "^Signal$",
+                    summary: " Averpil$"
+                },
+                badge: "/nix/store/x-heart.svg"
+            },
+        ]);
+
+        compare(Notification.snapshotOf({
+            appName: "Signal",
+            summary: "Bob Averpil",
+            image: "image://qsimage/1",
+            urgency: 1
+        }, 123, rules), {
+            app: "Signal",
+            appIcon: "",
+            summary: "Bob Averpil",
+            body: "",
+            image: "image://qsimage/1",
+            icon: "",
+            badge: "file:///nix/store/x-heart.svg",
+            border: "",
+            borderAnimation: "",
+            urgency: 1,
             timestamp: 123
         });
     }
