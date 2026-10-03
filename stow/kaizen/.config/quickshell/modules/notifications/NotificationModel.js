@@ -30,18 +30,20 @@ function loadedState(raw, limit) {
   return {
     valid: valid,
     doNotDisturb: !!parsed.doNotDisturb,
+    dndSince: Number(parsed.dndSince) || 0,
     history: Array.isArray(parsed.history)
       ? parsed.history.slice(0, limit)
       : [],
   };
 }
 
-function stateText(doNotDisturb, history) {
+function stateText(doNotDisturb, history, dndSince) {
   return (
     JSON.stringify(
       {
         version: 1,
         doNotDisturb: !!doNotDisturb,
+        dndSince: dndSince || 0,
         history: Array.isArray(history) ? history : [],
       },
       null,
