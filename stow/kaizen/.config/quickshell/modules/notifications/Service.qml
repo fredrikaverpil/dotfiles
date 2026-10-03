@@ -150,7 +150,8 @@ Item {
         if (capture)
             captureRows = [NotificationLogic.captureOf(notification, record.timestamp)].concat(captureRows).slice(0, captureLimit);
 
-        if (doNotDisturb && record.urgency !== NotificationUrgency.Critical) {
+        // Critical too: DnD is for screen sharing and recording.
+        if (doNotDisturb) {
             addHistory(record);
             return;
         }
