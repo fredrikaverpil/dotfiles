@@ -57,7 +57,8 @@
     "lua-lsp@claude-plugins-official": true,
     "code-review@claude-plugins-official": false,
     "ponytail@ponytail": true,
-    "gopls-mcp@local": true
+    "gopls-mcp@local": true,
+    "context7@anthropic-plugin-directory": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
