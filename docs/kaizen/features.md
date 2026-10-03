@@ -54,6 +54,12 @@ Rules match only on what the app sends. Capture a real notification first:
 Rules can be specified in the core kaizen system, per-host or by an optional
 plugin.
 
+## Do not disturb (`notifications`)
+
+Do not disturb is for sharing the screen or recording it, so it holds back
+every notification, critical ones included. Held-back notifications go to the
+history.
+
 ## Recording
 
 - The camera is a circle because gpu-screen-recorder cannot mask its own
