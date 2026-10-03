@@ -80,7 +80,7 @@ tree, so a static check passing here passes for every kaizen host.
 | Change | Checks |
 | --- | --- |
 | Nix | `nix fmt`, `nix build .#nixosConfigurations.<host>.config.system.build.toplevel`; build both kaizen hosts, a shared module breaks both |
-| JS/QML | `qml-test`, `qml-lint` (any platform) |
+| JS/QML | `qml-format`, `qml-test`, `qml-lint` (any platform) |
 | Compositor interface, config, or bind contract | Also `compositor-test` (Linux) |
 | Service IPC, `shell.qml` wiring, or systemd units | Also `shell-smoke` on the machine after deploy and restart, and exercise the affected path |
 | Panel views | Also `shell-smoke --panels` |
