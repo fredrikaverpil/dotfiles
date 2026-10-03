@@ -29,7 +29,7 @@ function compileRules(rules) {
           collapse: rule.collapse || null,
           focus: rule.focus || "",
           icon: iconSource(rule.icon),
-          badge: iconSource(rule.badge),
+          badge: rule.badge || "",
           border: rule.border || "",
           borderAnimation: rule.borderAnimation || "",
           // Shaped as buttons, like the app's actions.
