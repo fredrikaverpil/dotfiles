@@ -179,10 +179,11 @@ in
                 lib.types.enum [
                   "orbit"
                   "heartbeat"
+                  "glow"
                 ]
               );
               default = null;
-              description = "Animation of the border: `orbit` keeps a dash travelling around it, and dims the border itself so the dash stands out; `heartbeat` thickens it in two soft beats, then rests";
+              description = "Animation of the border: `orbit` keeps a dash travelling around it, and dims the border itself so the dash stands out; `heartbeat` thickens it in two soft beats, then rests; `glow` breathes a halo around the toast, over the bar and other toasts";
             };
             dedup = lib.mkOption {
               type = lib.types.nullOr (

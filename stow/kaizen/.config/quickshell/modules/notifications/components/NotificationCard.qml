@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import QtQuick.Shapes
 import Quickshell
@@ -40,6 +41,7 @@ Rectangle {
     readonly property color tint: palette[String(row.border || "")] ?? accent
     readonly property bool orbiting: toast && row.borderAnimation === "orbit"
     readonly property bool beating: toast && row.borderAnimation === "heartbeat"
+    readonly property bool glowing: toast && row.borderAnimation === "glow"
     // A rule's icon takes the notification's place, which moves to the badge;
     // a rule's badge emoji takes the badge's.
     readonly property string icon: ruleIcon || ownIcon
@@ -62,7 +64,9 @@ Rectangle {
     color: activeFocus || selected ? palette.sel : palette.bg
     border.color: tint
     border.width: 1
-    clip: true
+    // A glowing card draws its halo outside itself, over the toasts beside it.
+    clip: !glowing
+    z: glowing ? 1 : 0
 
     activeFocusOnTab: selectable
     Keys.onPressed: function (event) {
@@ -123,6 +127,55 @@ Rectangle {
         FrameAnimation {
             running: orbit.visible
             onTriggered: orbitPath.dashOffset = -(Date.now() % orbit.lap) / orbit.lap * orbit.period
+        }
+    }
+
+    // Halos layered below the card, so only what is outside it shows: a faint
+    // ambient one, a wide bloom breathing around a hot core that brightens on
+    // each breath, and a flare on arrival that settles into the breathing. The
+    // breath is timed by the wall clock, so every glowing toast breathes in step,
+    // and the flare by the arrival, so rebuilt delegates do not replay it.
+    Item {
+        id: glow
+        property real level: 0
+        property real flare: 0
+        anchors.fill: parent
+        z: -1
+        visible: root.glowing
+
+        RectangularShadow {
+            anchors.fill: parent
+            radius: root.radius
+            color: root.tint
+            blur: 56
+            opacity: 0.18 + 0.1 * glow.level
+        }
+
+        RectangularShadow {
+            anchors.fill: parent
+            radius: root.radius
+            color: root.tint
+            blur: 18 + 18 * glow.level + 48 * glow.flare
+            spread: 4 * glow.level + 10 * glow.flare
+            opacity: Math.min(1, 0.35 + 0.45 * glow.level + 0.5 * glow.flare)
+        }
+
+        RectangularShadow {
+            anchors.fill: parent
+            radius: root.radius
+            color: Qt.lighter(root.tint, 1 + 0.3 * glow.level)
+            blur: 6 + 4 * glow.level
+            spread: 1
+            opacity: 0.6 + 0.4 * glow.level
+        }
+
+        FrameAnimation {
+            running: glow.visible
+            onTriggered: {
+                const now = Date.now();
+                glow.level = NotificationLogic.glow(now);
+                glow.flare = NotificationLogic.glowFlare(now - Number(root.row.timestamp));
+            }
         }
     }
 
