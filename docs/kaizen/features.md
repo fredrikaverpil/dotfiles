@@ -16,6 +16,9 @@ kaizen_ipc <target>
 qs ipc call <target> <function> [args...]
 ```
 
+The below sections correspond to an IPC target (e.g. Curtain correlates to
+target `curtain`).
+
 ## Curtain
 
 When the agent verifies its work by invoking UI elements on the screen and
