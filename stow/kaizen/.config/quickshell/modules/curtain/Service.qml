@@ -14,243 +14,267 @@ import "CurtainModel.js" as Model
 // lock replaces that entirely. The trade is that the curtain dies with
 // Quickshell, where a session lock would survive a crash.
 Item {
-  id: root
+    id: root
 
-  required property var shell
-  property var brightnessService: null
-  readonly property string userName: Quickshell.env("USER") || Quickshell.env("LOGNAME")
-  readonly property int sleepAfterMs: 20000
+    required property var shell
+    property var brightnessService: null
+    readonly property string userName: Quickshell.env("USER") || Quickshell.env("LOGNAME")
+    readonly property int sleepAfterMs: 20000
 
-  property bool passwordPamConfigured: false
-  property bool active: false
-  property bool awake: false
-  property int savedBrightness: -1
+    property bool passwordPamConfigured: false
+    property bool active: false
+    property bool awake: false
+    property int savedBrightness: -1
 
-  property bool authenticating: false
-  property string pendingPassword: ""
-  property string enteredPassword: ""
-  property string failureMessage: ""
-  property int failedAttempts: 0
+    property bool authenticating: false
+    property string pendingPassword: ""
+    property string enteredPassword: ""
+    property string failureMessage: ""
+    property int failedAttempts: 0
 
-  function curtainState() {
-    return { active: active, awake: awake }
-  }
-
-  function applyCurtainState(state) {
-    active = state.active
-    awake = state.awake
-    applyBacklight()
-  }
-
-  function authState() {
-    return {
-      lockRequested: active,
-      authenticating: authenticating,
-      pendingPassword: pendingPassword,
-      enteredPassword: enteredPassword,
-      failureMessage: failureMessage,
-      failedAttempts: failedAttempts,
+    function curtainState() {
+        return {
+            active: active,
+            awake: awake
+        };
     }
-  }
 
-  function applyAuthState(state) {
-    authenticating = state.authenticating
-    pendingPassword = state.pendingPassword
-    enteredPassword = state.enteredPassword
-    failureMessage = state.failureMessage
-    failedAttempts = state.failedAttempts
-  }
+    function applyCurtainState(state) {
+        active = state.active;
+        awake = state.awake;
+        applyBacklight();
+    }
 
-  // Dim only while black, and restore before the prompt is drawn so it is
-  // never rendered onto a dark panel. Internal panel only; the external
-  // monitor is covered by the curtain itself, not by the backlight.
-  function applyBacklight() {
-    if (!brightnessService || !brightnessService.present) return
-    if (Model.shouldDimBacklight(curtainState())) brightnessService.set(0)
-    else if (savedBrightness >= 0) brightnessService.set(savedBrightness)
-  }
+    function authState() {
+        return {
+            lockRequested: active,
+            authenticating: authenticating,
+            pendingPassword: pendingPassword,
+            enteredPassword: enteredPassword,
+            failureMessage: failureMessage,
+            failedAttempts: failedAttempts
+        };
+    }
 
-  function show() {
-    if (!passwordPamConfigured) return false
-    if (active) return true
+    function applyAuthState(state) {
+        authenticating = state.authenticating;
+        pendingPassword = state.pendingPassword;
+        enteredPassword = state.enteredPassword;
+        failureMessage = state.failureMessage;
+        failedAttempts = state.failedAttempts;
+    }
 
-    if (brightnessService && brightnessService.present) savedBrightness = brightnessService.percent
-    applyAuthState(Auth.reset(authState()))
-    applyCurtainState(Model.activate(curtainState()))
-    return true
-  }
+    // Dim only while black, and restore before the prompt is drawn so it is
+    // never rendered onto a dark panel. Internal panel only; the external
+    // monitor is covered by the curtain itself, not by the backlight.
+    function applyBacklight() {
+        if (!brightnessService || !brightnessService.present)
+            return;
+        if (Model.shouldDimBacklight(curtainState()))
+            brightnessService.set(0);
+        else if (savedBrightness >= 0)
+            brightnessService.set(savedBrightness);
+    }
 
-  function hide() {
-    if (!active) return
-    if (passwordPam.active) passwordPam.abort()
-    sleepTimer.stop()
-    applyAuthState(Auth.reset(authState()))
-    applyCurtainState(Model.dismiss(curtainState()))
-    savedBrightness = -1
-  }
+    function show() {
+        if (!passwordPamConfigured)
+            return false;
+        if (active)
+            return true;
 
-  // Mouse motion or any keypress reveals the prompt.
-  function wake() {
-    if (!active) return
-    applyCurtainState(Model.wake(curtainState()))
-    sleepTimer.restart()
-  }
+        if (brightnessService && brightnessService.present)
+            savedBrightness = brightnessService.percent;
+        applyAuthState(Auth.reset(authState()));
+        applyCurtainState(Model.activate(curtainState()));
+        return true;
+    }
 
-  function sleep() {
-    if (!Model.shouldSleepOnTimeout(curtainState(), authenticating)) return
-    applyAuthState(Auth.reset(authState()))
-    applyCurtainState(Model.sleep(curtainState()))
-  }
+    function hide() {
+        if (!active)
+            return;
+        if (passwordPam.active)
+            passwordPam.abort();
+        sleepTimer.stop();
+        applyAuthState(Auth.reset(authState()));
+        applyCurtainState(Model.dismiss(curtainState()));
+        savedBrightness = -1;
+    }
 
-  function submitPassword(password) {
-    var next = Auth.submit(authState(), password)
-    if (!next) return
+    // Mouse motion or any keypress reveals the prompt.
+    function wake() {
+        if (!active)
+            return;
+        applyCurtainState(Model.wake(curtainState()));
+        sleepTimer.restart();
+    }
 
-    applyAuthState(next)
-    sleepTimer.restart()
-    if (!passwordPam.start()) failAuthentication()
-  }
+    function sleep() {
+        if (!Model.shouldSleepOnTimeout(curtainState(), authenticating))
+            return;
+        applyAuthState(Auth.reset(authState()));
+        applyCurtainState(Model.sleep(curtainState()));
+    }
 
-  function respondToPasswordPrompt() {
-    if (!authenticating || !passwordPam.active || !passwordPam.responseRequired) return
-    passwordPam.respond(pendingPassword)
-  }
+    function submitPassword(password) {
+        var next = Auth.submit(authState(), password);
+        if (!next)
+            return;
+        applyAuthState(next);
+        sleepTimer.restart();
+        if (!passwordPam.start())
+            failAuthentication();
+    }
 
-  function failAuthentication() {
-    applyAuthState(Auth.fail(authState()))
-    wake()
-  }
+    function respondToPasswordPrompt() {
+        if (!authenticating || !passwordPam.active || !passwordPam.responseRequired)
+            return;
+        passwordPam.respond(pendingPassword);
+    }
 
-  Variants {
-    model: Quickshell.screens
+    function failAuthentication() {
+        applyAuthState(Auth.fail(authState()));
+        wake();
+    }
 
-    PanelWindow {
-      id: surface
-      required property var modelData
+    Variants {
+        model: Quickshell.screens
 
-      screen: modelData
-      visible: root.active
-      color: root.shell.palette.bg
-      exclusionMode: ExclusionMode.Ignore
-      anchors {
-        top: true
-        bottom: true
-        left: true
-        right: true
-      }
+        PanelWindow {
+            id: surface
+            required property var modelData
 
-      WlrLayershell.layer: WlrLayer.Overlay
-      WlrLayershell.namespace: "kaizen-curtain"
-      // Every output is exclusive: niri focuses only the active output's
-      // exclusive layer, and a click makes the output under it active.
-      WlrLayershell.keyboardFocus: root.active ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+            screen: modelData
+            visible: root.active
+            color: root.shell.palette.bg
+            exclusionMode: ExclusionMode.Ignore
+            anchors {
+                top: true
+                bottom: true
+                left: true
+                right: true
+            }
 
-      LockUi.LockView {
-        anchors.fill: parent
-        visible: Model.shouldShowPrompt(root.curtainState())
-        shell: root.shell
-        authenticating: root.authenticating
-        failureMessage: root.failureMessage
-        password: root.enteredPassword
-        inputEnabled: root.active && root.awake
-        onPasswordEdited: function(value) { root.enteredPassword = value }
-        onSubmitPassword: function(value) { root.submitPassword(value) }
-        onClearFailureRequested: root.failureMessage = ""
-        onWakeRequested: root.wake()
-      }
+            WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.namespace: "kaizen-curtain"
+            // Every output is exclusive: niri focuses only the active output's
+            // exclusive layer, and a click makes the output under it active.
+            WlrLayershell.keyboardFocus: root.active ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-      // Black state: catches the motion or keypress that reveals the prompt.
-      MouseArea {
-        anchors.fill: parent
-        enabled: !root.awake
-        visible: enabled
-        hoverEnabled: true
-        focus: !root.awake
+            LockUi.LockView {
+                anchors.fill: parent
+                visible: Model.shouldShowPrompt(root.curtainState())
+                shell: root.shell
+                authenticating: root.authenticating
+                failureMessage: root.failureMessage
+                password: root.enteredPassword
+                inputEnabled: root.active && root.awake
+                onPasswordEdited: function (value) {
+                    root.enteredPassword = value;
+                }
+                onSubmitPassword: function (value) {
+                    root.submitPassword(value);
+                }
+                onClearFailureRequested: root.failureMessage = ""
+                onWakeRequested: root.wake()
+            }
 
-        // A stationary pointer reports its position as soon as this enables;
-        // only movement away from that first report wakes.
-        readonly property int wakeDistance: 8
-        property point origin: Qt.point(-1, -1)
-        onEnabledChanged: origin = Qt.point(-1, -1)
-        onPositionChanged: function(mouse) {
-          if (origin.x < 0) {
-            origin = Qt.point(mouse.x, mouse.y)
-            return
-          }
-          if (Math.abs(mouse.x - origin.x) + Math.abs(mouse.y - origin.y) > wakeDistance) root.wake()
+            // Black state: catches the motion or keypress that reveals the prompt.
+            MouseArea {
+                anchors.fill: parent
+                enabled: !root.awake
+                visible: enabled
+                hoverEnabled: true
+                focus: !root.awake
+
+                // A stationary pointer reports its position as soon as this enables;
+                // only movement away from that first report wakes.
+                readonly property int wakeDistance: 8
+                property point origin: Qt.point(-1, -1)
+                onEnabledChanged: origin = Qt.point(-1, -1)
+                onPositionChanged: function (mouse) {
+                    if (origin.x < 0) {
+                        origin = Qt.point(mouse.x, mouse.y);
+                        return;
+                    }
+                    if (Math.abs(mouse.x - origin.x) + Math.abs(mouse.y - origin.y) > wakeDistance)
+                        root.wake();
+                }
+                onClicked: root.wake()
+                Keys.onPressed: function (event) {
+                    root.wake();
+                    event.accepted = true;
+                }
+            }
         }
-        onClicked: root.wake()
-        Keys.onPressed: function(event) {
-          root.wake()
-          event.accepted = true
+    }
+
+    PamContext {
+        id: passwordPam
+        config: "kaizen-lock"
+        user: root.userName
+
+        onResponseRequiredChanged: root.respondToPasswordPrompt()
+        onPamMessage: root.respondToPasswordPrompt()
+        onCompleted: function (result) {
+            root.authenticating = false;
+            root.pendingPassword = "";
+            if (!root.active)
+                return;
+            if (result === PamResult.Success)
+                root.hide();
+            else
+                root.failAuthentication();
         }
-      }
-    }
-  }
-
-  PamContext {
-    id: passwordPam
-    config: "kaizen-lock"
-    user: root.userName
-
-    onResponseRequiredChanged: root.respondToPasswordPrompt()
-    onPamMessage: root.respondToPasswordPrompt()
-    onCompleted: function(result) {
-      root.authenticating = false
-      root.pendingPassword = ""
-      if (!root.active) return
-      if (result === PamResult.Success) root.hide()
-      else root.failAuthentication()
-    }
-    onError: root.failAuthentication()
-  }
-
-  Timer {
-    id: sleepTimer
-    interval: root.sleepAfterMs
-    repeat: false
-    onTriggered: root.sleep()
-  }
-
-  FileView {
-    path: "/etc/pam.d/kaizen-lock"
-    watchChanges: true
-    printErrors: false
-    onLoaded: root.passwordPamConfigured = true
-    onLoadFailed: root.passwordPamConfigured = false
-    onFileChanged: reload()
-  }
-
-  IpcHandler {
-    target: "curtain"
-
-    // `qs ipc call <target> show` is parsed as the CLI's own `show`.
-    function open(): string {
-      if (!root.passwordPamConfigured) return "missing-pam"
-      return root.show() ? "shown" : "failed"
+        onError: root.failAuthentication()
     }
 
-    // The remote escape hatch: close, grim, open.
-    function close(): string {
-      root.hide()
-      return "hidden"
+    Timer {
+        id: sleepTimer
+        interval: root.sleepAfterMs
+        repeat: false
+        onTriggered: root.sleep()
     }
 
-    function toggle(): string {
-      if (root.active) {
-        root.hide()
-        return "hidden"
-      }
-      return root.show() ? "shown" : "failed"
+    FileView {
+        path: "/etc/pam.d/kaizen-lock"
+        watchChanges: true
+        printErrors: false
+        onLoaded: root.passwordPamConfigured = true
+        onLoadFailed: root.passwordPamConfigured = false
+        onFileChanged: reload()
     }
 
-    function status(): string {
-      return JSON.stringify({
-        active: root.active,
-        awake: root.awake,
-        passwordPam: root.passwordPamConfigured,
-        authenticating: root.authenticating
-      })
+    IpcHandler {
+        target: "curtain"
+
+        // `qs ipc call <target> show` is parsed as the CLI's own `show`.
+        function open(): string {
+            if (!root.passwordPamConfigured)
+                return "missing-pam";
+            return root.show() ? "shown" : "failed";
+        }
+
+        // The remote escape hatch: close, grim, open.
+        function close(): string {
+            root.hide();
+            return "hidden";
+        }
+
+        function toggle(): string {
+            if (root.active) {
+                root.hide();
+                return "hidden";
+            }
+            return root.show() ? "shown" : "failed";
+        }
+
+        function status(): string {
+            return JSON.stringify({
+                active: root.active,
+                awake: root.awake,
+                passwordPam: root.passwordPamConfigured,
+                authenticating: root.authenticating
+            });
+        }
     }
-  }
 }

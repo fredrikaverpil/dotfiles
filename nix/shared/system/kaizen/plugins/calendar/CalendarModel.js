@@ -1,66 +1,94 @@
-var DAY_COUNT = 3
+var DAY_COUNT = 3;
 
 function pad(number) {
-  return (number < 10 ? "0" : "") + number
+  return (number < 10 ? "0" : "") + number;
 }
 
 function midnight(date, days) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + (days || 0))
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate() + (days || 0),
+  );
 }
 
 // RFC3339 with the local offset, as events.list requires.
 function stamp(date) {
-  var offset = -date.getTimezoneOffset()
-  var minutes = Math.abs(offset)
-  return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate())
-    + "T" + pad(date.getHours()) + ":" + pad(date.getMinutes()) + ":" + pad(date.getSeconds())
-    + (offset < 0 ? "-" : "+") + pad(Math.floor(minutes / 60)) + ":" + pad(minutes % 60)
+  var offset = -date.getTimezoneOffset();
+  var minutes = Math.abs(offset);
+  return (
+    date.getFullYear() +
+    "-" +
+    pad(date.getMonth() + 1) +
+    "-" +
+    pad(date.getDate()) +
+    "T" +
+    pad(date.getHours()) +
+    ":" +
+    pad(date.getMinutes()) +
+    ":" +
+    pad(date.getSeconds()) +
+    (offset < 0 ? "-" : "+") +
+    pad(Math.floor(minutes / 60)) +
+    ":" +
+    pad(minutes % 60)
+  );
 }
 
 function listCommand(now) {
-  return ["dcal", "--json", "ipc", "events.list",
-    "from=" + stamp(midnight(now)), "to=" + stamp(midnight(now, DAY_COUNT))]
+  return [
+    "dcal",
+    "--json",
+    "ipc",
+    "events.list",
+    "from=" + stamp(midnight(now)),
+    "to=" + stamp(midnight(now, DAY_COUNT)),
+  ];
 }
 
 // dcal stores all-day dates as UTC midnight; they are local calendar dates.
 function allDayDate(text) {
-  var parts = String(text).slice(0, 10).split("-")
-  return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]))
+  var parts = String(text).slice(0, 10).split("-");
+  return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
 }
 
 function clock(date) {
-  return pad(date.getHours()) + ":" + pad(date.getMinutes())
+  return pad(date.getHours()) + ":" + pad(date.getMinutes());
 }
 
 // iCal feeds are tagged by calendar name; every Google calendar shares one tag.
-var TAGS = { "Family": "🏠", "Johannas kalender": "❤️", "My calendar": "👤" }
-var GOOGLE_TAG = "G"
+var TAGS = { Family: "🏠", "Johannas kalender": "❤️", "My calendar": "👤" };
+var GOOGLE_TAG = "G";
 
 // Maps calendar id to tag from a calendars.list reply.
 function tags(text) {
-  var calendars
+  var calendars;
   try {
-    calendars = JSON.parse(text)
+    calendars = JSON.parse(text);
   } catch (error) {
-    return {}
+    return {};
   }
-  var result = {}
-  if (!Array.isArray(calendars)) return result
-  calendars.forEach(function(calendar) {
-    if (!calendar) return
-    result[calendar.id] = calendar.accountKind === "google" ? GOOGLE_TAG : (TAGS[calendar.name] || "")
-  })
-  return result
+  var result = {};
+  if (!Array.isArray(calendars)) return result;
+  calendars.forEach(function (calendar) {
+    if (!calendar) return;
+    result[calendar.id] =
+      calendar.accountKind === "google"
+        ? GOOGLE_TAG
+        : TAGS[calendar.name] || "";
+  });
+  return result;
 }
 
 // Unreadable dates land on the first day with a "?" time rather than vanish.
 function row(event, dayStart, dayEnd, tagsById, first) {
-  var start = event.allDay ? allDayDate(event.start) : new Date(event.start)
-  var end = event.allDay ? allDayDate(event.end) : new Date(event.end)
-  var readable = !isNaN(start) && !isNaN(end)
-  if (!readable && !first) return null
-  if (readable && (start >= dayEnd || (end <= dayStart && start < dayStart))) return null
-  var url = String(event.meetingUrl || "")
+  var start = event.allDay ? allDayDate(event.start) : new Date(event.start);
+  var end = event.allDay ? allDayDate(event.end) : new Date(event.end);
+  var readable = !isNaN(start) && !isNaN(end);
+  if (!readable && !first) return null;
+  if (readable && (start >= dayEnd || (end <= dayStart && start < dayStart)))
+    return null;
+  var url = String(event.meetingUrl || "");
   return {
     uid: String(event.uid || ""),
     start: String(event.start || ""),
@@ -72,33 +100,48 @@ function row(event, dayStart, dayEnd, tagsById, first) {
     allDay: event.allDay === true,
     at: readable ? start.getTime() : 0,
     until: readable ? end.getTime() : 0,
-    time: !readable ? "?" : event.allDay ? "all day"
-      : (start >= dayStart ? clock(start) : "…") + "–" + (end <= dayEnd ? clock(end) : "…"),
-  }
+    time: !readable
+      ? "?"
+      : event.allDay
+        ? "all day"
+        : (start >= dayStart ? clock(start) : "…") +
+          "–" +
+          (end <= dayEnd ? clock(end) : "…"),
+  };
 }
 
 // Returns DAY_COUNT days from now's midnight, or null for anything but an events.list reply.
 function parse(text, now, tagsById) {
-  var events
+  var events;
   try {
-    events = JSON.parse(text).events
+    events = JSON.parse(text).events;
   } catch (error) {
-    return null
+    return null;
   }
-  if (!Array.isArray(events)) return null
+  if (!Array.isArray(events)) return null;
 
-  var days = []
+  var days = [];
   for (var index = 0; index < DAY_COUNT; index++) {
-    var dayStart = midnight(now, index)
-    var dayEnd = midnight(now, index + 1)
+    var dayStart = midnight(now, index);
+    var dayEnd = midnight(now, index + 1);
     var rows = events
-      .filter(function(event) { return event && event.status !== "cancelled" })
-      .map(function(event) { return row(event, dayStart, dayEnd, tagsById, index === 0) })
-      .filter(function(entry) { return entry !== null })
-      .sort(function(a, b) {
-        return (b.allDay - a.allDay) || (a.at - b.at) || a.summary.localeCompare(b.summary)
+      .filter(function (event) {
+        return event && event.status !== "cancelled";
       })
-    days.push({ date: dayStart, events: rows })
+      .map(function (event) {
+        return row(event, dayStart, dayEnd, tagsById, index === 0);
+      })
+      .filter(function (entry) {
+        return entry !== null;
+      })
+      .sort(function (a, b) {
+        return (
+          b.allDay - a.allDay ||
+          a.at - b.at ||
+          a.summary.localeCompare(b.summary)
+        );
+      });
+    days.push({ date: dayStart, events: rows });
   }
-  return days
+  return days;
 }

@@ -1,129 +1,133 @@
-
 import QtQuick
 
 import "../../Ui" as Ui
 
 Item {
-  id: root
+    id: root
 
-  required property var shell
-  property bool authenticating: false
-  property string failureMessage: ""
-  property string password: ""
-  property bool inputEnabled: true
+    required property var shell
+    property bool authenticating: false
+    property string failureMessage: ""
+    property string password: ""
+    property bool inputEnabled: true
 
-  signal passwordEdited(string value)
-  signal submitPassword(string value)
-  signal clearFailureRequested()
-  signal wakeRequested()
+    signal passwordEdited(string value)
+    signal submitPassword(string value)
+    signal clearFailureRequested
+    signal wakeRequested
 
-  readonly property var palette: shell.palette // qmllint disable property-override
+    readonly property var palette: shell.palette // qmllint disable property-override
 
-  function focusPassword() {
-    if (inputEnabled && !authenticating) passwordInput.forceActiveFocus()
-  }
-
-  function clearPassword() {
-    passwordInput.text = ""
-  }
-
-  // Mirrors input typed on another output's lock surface.
-  onPasswordChanged: {
-    if (passwordInput.text !== password) passwordInput.text = password
-  }
-  onInputEnabledChanged: Qt.callLater(focusPassword)
-  onAuthenticatingChanged: {
-    if (!authenticating) Qt.callLater(focusPassword)
-  }
-  Component.onCompleted: Qt.callLater(focusPassword)
-
-  Rectangle {
-    anchors.fill: parent
-    color: root.palette.bg
-
-    Image {
-      anchors.fill: parent
-      source: root.shell && root.shell.wallpaper ? "file://" + root.shell.wallpaper : ""
-      fillMode: Image.PreserveAspectCrop
-      asynchronous: true
+    function focusPassword() {
+        if (inputEnabled && !authenticating)
+            passwordInput.forceActiveFocus();
     }
+
+    function clearPassword() {
+        passwordInput.text = "";
+    }
+
+    // Mirrors input typed on another output's lock surface.
+    onPasswordChanged: {
+        if (passwordInput.text !== password)
+            passwordInput.text = password;
+    }
+    onInputEnabledChanged: Qt.callLater(focusPassword)
+    onAuthenticatingChanged: {
+        if (!authenticating)
+            Qt.callLater(focusPassword);
+    }
+    Component.onCompleted: Qt.callLater(focusPassword)
 
     Rectangle {
-      anchors.fill: parent
-      color: Qt.alpha(root.palette.bg, 0.85)
-    }
-
-    MouseArea {
-      anchors.fill: parent
-      // Plain pointer motion must also restart the blank timer.
-      hoverEnabled: true
-      onClicked: {
-        root.wakeRequested()
-        root.focusPassword()
-      }
-      onPositionChanged: root.wakeRequested()
-    }
-
-    Rectangle {
-      id: field
-      anchors.centerIn: parent
-      width: Math.min(380, parent.width - 48)
-      height: 64
-      scale: root.shell.textScale
-      radius: 8
-      color: root.palette.bg
-      border.color: root.failureMessage.length > 0 ? root.palette.rose : root.palette.fg
-      border.width: 2
-
-      TextInput {
-        id: passwordInput
         anchors.fill: parent
-        anchors.leftMargin: 18
-        anchors.rightMargin: 18
-        verticalAlignment: TextInput.AlignVCenter
-        horizontalAlignment: TextInput.AlignHCenter
-        enabled: root.inputEnabled && !root.authenticating
-        echoMode: TextInput.Password
-        passwordCharacter: "●"
-        passwordMaskDelay: 0
-        color: root.palette.fg
-        selectionColor: root.palette.sel
-        selectedTextColor: root.palette.fg
-        font.family: Ui.Fonts.mono
-        font.pixelSize: text.length > 0 ? 24 : 18
-        cursorVisible: activeFocus && text.length > 0
+        color: root.palette.bg
 
-        onTextChanged: {
-          root.passwordEdited(text)
-          if (text.length > 0 && root.failureMessage.length > 0) root.clearFailureRequested()
+        Image {
+            anchors.fill: parent
+            source: root.shell && root.shell.wallpaper ? "file://" + root.shell.wallpaper : ""
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: true
         }
 
-        onAccepted: {
-          var submitted = text
-          text = ""
-          if (submitted.length > 0) root.submitPassword(submitted)
+        Rectangle {
+            anchors.fill: parent
+            color: Qt.alpha(root.palette.bg, 0.85)
         }
 
-        Keys.onPressed: function(event) {
-          root.wakeRequested()
-          if (event.key === Qt.Key_Escape || (event.modifiers & Qt.ControlModifier && event.key === Qt.Key_U)) {
-            passwordInput.text = ""
-            event.accepted = true
-          }
+        MouseArea {
+            anchors.fill: parent
+            // Plain pointer motion must also restart the blank timer.
+            hoverEnabled: true
+            onClicked: {
+                root.wakeRequested();
+                root.focusPassword();
+            }
+            onPositionChanged: root.wakeRequested()
         }
-      }
 
-      Text {
-        anchors.fill: passwordInput
-        visible: passwordInput.text.length === 0
-        text: root.authenticating ? "Checking…" : (root.failureMessage || "Enter password")
-        color: root.authenticating ? root.palette.fg : (root.failureMessage ? root.palette.rose : root.palette.off)
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 18
-        font.italic: root.failureMessage.length > 0
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-      }
+        Rectangle {
+            id: field
+            anchors.centerIn: parent
+            width: Math.min(380, parent.width - 48)
+            height: 64
+            scale: root.shell.textScale
+            radius: 8
+            color: root.palette.bg
+            border.color: root.failureMessage.length > 0 ? root.palette.rose : root.palette.fg
+            border.width: 2
+
+            TextInput {
+                id: passwordInput
+                anchors.fill: parent
+                anchors.leftMargin: 18
+                anchors.rightMargin: 18
+                verticalAlignment: TextInput.AlignVCenter
+                horizontalAlignment: TextInput.AlignHCenter
+                enabled: root.inputEnabled && !root.authenticating
+                echoMode: TextInput.Password
+                passwordCharacter: "●"
+                passwordMaskDelay: 0
+                color: root.palette.fg
+                selectionColor: root.palette.sel
+                selectedTextColor: root.palette.fg
+                font.family: Ui.Fonts.mono
+                font.pixelSize: text.length > 0 ? 24 : 18
+                cursorVisible: activeFocus && text.length > 0
+
+                onTextChanged: {
+                    root.passwordEdited(text);
+                    if (text.length > 0 && root.failureMessage.length > 0)
+                        root.clearFailureRequested();
+                }
+
+                onAccepted: {
+                    var submitted = text;
+                    text = "";
+                    if (submitted.length > 0)
+                        root.submitPassword(submitted);
+                }
+
+                Keys.onPressed: function (event) {
+                    root.wakeRequested();
+                    if (event.key === Qt.Key_Escape || (event.modifiers & Qt.ControlModifier && event.key === Qt.Key_U)) {
+                        passwordInput.text = "";
+                        event.accepted = true;
+                    }
+                }
+            }
+
+            Text {
+                anchors.fill: passwordInput
+                visible: passwordInput.text.length === 0
+                text: root.authenticating ? "Checking…" : (root.failureMessage || "Enter password")
+                color: root.authenticating ? root.palette.fg : (root.failureMessage ? root.palette.rose : root.palette.off)
+                font.family: Ui.Fonts.mono
+                font.pixelSize: 18
+                font.italic: root.failureMessage.length > 0
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+        }
     }
-  }
 }

@@ -8,76 +8,97 @@ function savedRecord(record) {
     icon: record.icon,
     urgency: record.urgency,
     timestamp: record.timestamp,
-  }
+  };
 }
 
 function historyWith(history, record, limit) {
-  var rows = Array.isArray(history) ? history : []
-  if (!record || record.transient) return rows
-  return [savedRecord(record)].concat(rows).slice(0, limit)
+  var rows = Array.isArray(history) ? history : [];
+  if (!record || record.transient) return rows;
+  return [savedRecord(record)].concat(rows).slice(0, limit);
 }
 
 function loadedState(raw, limit) {
-  var parsed = {}
-  var valid = true
+  var parsed = {};
+  var valid = true;
   try {
-    parsed = JSON.parse(String(raw || ""))
+    parsed = JSON.parse(String(raw || ""));
   } catch (error) {
-    valid = false
+    valid = false;
   }
 
   return {
     valid: valid,
     doNotDisturb: !!parsed.doNotDisturb,
-    history: Array.isArray(parsed.history) ? parsed.history.slice(0, limit) : [],
-  }
+    history: Array.isArray(parsed.history)
+      ? parsed.history.slice(0, limit)
+      : [],
+  };
 }
 
 function stateText(doNotDisturb, history) {
-  return JSON.stringify({
-    version: 1,
-    doNotDisturb: !!doNotDisturb,
-    history: Array.isArray(history) ? history : [],
-  }, null, 2) + "\n"
+  return (
+    JSON.stringify(
+      {
+        version: 1,
+        doNotDisturb: !!doNotDisturb,
+        history: Array.isArray(history) ? history : [],
+      },
+      null,
+      2,
+    ) + "\n"
+  );
 }
 
 function replacePopup(rows, record) {
-  var next = Array.isArray(rows) ? rows.slice() : []
-  var index = next.findIndex(function(row) { return row.key === record.key })
-  if (index >= 0) next[index] = record
-  return next
+  var next = Array.isArray(rows) ? rows.slice() : [];
+  var index = next.findIndex(function (row) {
+    return row.key === record.key;
+  });
+  if (index >= 0) next[index] = record;
+  return next;
 }
 
 function withoutIndex(rows, index) {
-  var next = Array.isArray(rows) ? rows.slice() : []
-  if (index < 0 || index >= next.length) return next
-  next.splice(index, 1)
-  return next
+  var next = Array.isArray(rows) ? rows.slice() : [];
+  if (index < 0 || index >= next.length) return next;
+  next.splice(index, 1);
+  return next;
 }
 
 function withoutRecord(rows, key) {
-  return (Array.isArray(rows) ? rows : []).filter(function(row) { return row.key !== key })
+  return (Array.isArray(rows) ? rows : []).filter(function (row) {
+    return row.key !== key;
+  });
 }
 
 function dndValue(value) {
-  var normalized = String(value || "").toLowerCase()
-  return normalized === "true" || normalized === "1" || normalized === "on" || normalized === "yes"
+  var normalized = String(value || "").toLowerCase();
+  return (
+    normalized === "true" ||
+    normalized === "1" ||
+    normalized === "on" ||
+    normalized === "yes"
+  );
 }
 
 function step(index, delta, count) {
-  return count > 0 ? (index + delta + count) % count : 0
+  return count > 0 ? (index + delta + count) % count : 0;
 }
 
 function stepKey(rows, key, delta) {
-  if (rows.length === 0) return ""
-  var index = rows.findIndex(function(row) { return row.key === key })
-  return rows[step(index, delta, rows.length)].key
+  if (rows.length === 0) return "";
+  var index = rows.findIndex(function (row) {
+    return row.key === key;
+  });
+  return rows[step(index, delta, rows.length)].key;
 }
 
 // The row taking the removed row's place, else the new last row.
 function keyAfter(rows, key) {
-  var index = rows.findIndex(function(row) { return row.key === key })
-  var rest = withoutRecord(rows, key)
-  if (index < 0 || rest.length === 0) return ""
-  return rest[Math.min(index, rest.length - 1)].key
+  var index = rows.findIndex(function (row) {
+    return row.key === key;
+  });
+  var rest = withoutRecord(rows, key);
+  if (index < 0 || rest.length === 0) return "";
+  return rest[Math.min(index, rest.length - 1)].key;
 }
