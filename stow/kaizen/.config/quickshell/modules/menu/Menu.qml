@@ -359,8 +359,8 @@ Ui.Panel {
             action: () => menu.shell.notifications.clearHistory()
         },
         "settings.notifications.dnd": {
-            icon: menu.checkbox(!menu.shell.notifications.doNotDisturb),
-            label: "Notifications",
+            icon: menu.checkbox(menu.shell.notifications.doNotDisturb),
+            label: "DnD (Do not disturb)",
             action: () => menu.shell.notifications.setDoNotDisturb(!menu.shell.notifications.doNotDisturb)
         },
         "settings.keyboard": {
