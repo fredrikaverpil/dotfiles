@@ -8,23 +8,26 @@ let
   # `[{ emoji, name, shortcodes }]`: Unicode's names for the menu's picker, and
   # the shortcodes Slack sends as `:name:` in notification text, from the
   # dataset Slack uses. Shortcode-only entries (skin tones) have a null name.
-  emoji = pkgs.runCommand "emoji.json" {
-    nativeBuildInputs = [ pkgs.jq ];
-    names = "${pkgs.unicode-emoji}/share/unicode/emoji/emoji-test.txt";
-    shortcodes = pkgs.fetchurl {
-      url = "https://raw.githubusercontent.com/iamcal/emoji-data/v16.0.0/emoji.json";
-      hash = "sha256-HWAuZb6Idyv4zDaM4WuFXXGe7duv4SjUcbgCA/SU0p8=";
-    };
-  } ''
-    jq -nc --rawfile names "$names" --slurpfile data "$shortcodes" > $out '
-      def hex: ascii_downcase | explode | reduce .[] as $c (0; . * 16 + if $c >= 97 then $c - 87 else $c - 48 end);
-      ($data[0] | map({ key: [.unified | split("-")[] | hex] | implode, value: .short_names }) | from_entries) as $codes
-      | [$names | split("\n")[] | capture("; fully-qualified +# (?<emoji>\\S+) E\\d+\\.\\d+ (?<name>.+)$") | select(.name | contains("skin tone") | not)] as $named
-      | ($named | map({ key: .emoji, value: true }) | from_entries) as $seen
-      | $named | map(.shortcodes = ($codes[.emoji] // []))
-        + [$codes | to_entries[] | select($seen[.key] | not) | { emoji: .key, name: null, shortcodes: .value }]
-    '
-  '';
+  emoji =
+    pkgs.runCommand "emoji.json"
+      {
+        nativeBuildInputs = [ pkgs.jq ];
+        names = "${pkgs.unicode-emoji}/share/unicode/emoji/emoji-test.txt";
+        shortcodes = pkgs.fetchurl {
+          url = "https://raw.githubusercontent.com/iamcal/emoji-data/v16.0.0/emoji.json";
+          hash = "sha256-HWAuZb6Idyv4zDaM4WuFXXGe7duv4SjUcbgCA/SU0p8=";
+        };
+      }
+      ''
+        jq -nc --rawfile names "$names" --slurpfile data "$shortcodes" > $out '
+          def hex: ascii_downcase | explode | reduce .[] as $c (0; . * 16 + if $c >= 97 then $c - 87 else $c - 48 end);
+          ($data[0] | map({ key: [.unified | split("-")[] | hex] | implode, value: .short_names }) | from_entries) as $codes
+          | [$names | split("\n")[] | capture("; fully-qualified +# (?<emoji>\\S+) E\\d+\\.\\d+ (?<name>.+)$") | select(.name | contains("skin tone") | not)] as $named
+          | ($named | map({ key: .emoji, value: true }) | from_entries) as $seen
+          | $named | map(.shortcodes = ($codes[.emoji] // []))
+            + [$codes | to_entries[] | select($seen[.key] | not) | { emoji: .key, name: null, shortcodes: .value }]
+        '
+      '';
 
   sleep-lock-monitor = pkgs.writeShellApplication {
     name = "kaizen-sleep-lock-monitor";
