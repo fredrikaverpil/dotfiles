@@ -39,6 +39,7 @@ Rectangle {
     // A rule's border colour takes the place of the urgency's.
     readonly property color tint: palette[String(row.border || "")] ?? accent
     readonly property bool orbiting: toast && row.borderAnimation === "orbit"
+    readonly property bool beating: toast && row.borderAnimation === "heartbeat"
     // A rule's icon takes the notification's place, which moves to the badge
     // unless the rule sets its own.
     readonly property string icon: ruleIcon || ownIcon
@@ -122,6 +123,23 @@ Rectangle {
         FrameAnimation {
             running: orbit.visible
             onTriggered: orbitPath.dashOffset = -(Date.now() % orbit.lap) / orbit.lap * orbit.period
+        }
+    }
+
+    // A thicker border fading in and out on the heartbeat. Timed by the wall
+    // clock, so every beating toast beats in step.
+    Rectangle {
+        id: heartbeat
+        anchors.fill: parent
+        visible: root.beating
+        radius: root.radius
+        color: "transparent"
+        border.color: root.tint
+        border.width: 3
+
+        FrameAnimation {
+            running: heartbeat.visible
+            onTriggered: heartbeat.opacity = NotificationLogic.heartbeat(Date.now())
         }
     }
 
