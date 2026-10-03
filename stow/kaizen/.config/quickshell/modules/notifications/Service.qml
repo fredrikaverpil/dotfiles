@@ -679,7 +679,7 @@ Item {
 
                 Text {
                     visible: historyCards.count === 0
-                    text: "Nothing arrived while notifications were off"
+                    text: "No notifcations here yet"
                     color: root.palette.off
                     font.family: Ui.Fonts.mono
                     font.pixelSize: 14
