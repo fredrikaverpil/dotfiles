@@ -83,7 +83,6 @@ Item {
         record.notification = notification;
         record.duration = NotificationLogic.durationFor(notification, NotificationUrgency.Low, NotificationUrgency.Critical, rules);
         record.transient = notification.transient;
-        record.actions = NotificationLogic.actionsOf(notification, rules);
         record.collapse = NotificationLogic.ruleValue(notification, rules, "collapse");
         if (existing && existing.collapsed)
             collapse(record);
@@ -728,6 +727,11 @@ Item {
                                 selectable: true
                                 onCloseRequested: historyPanel.drop(index)
                                 onInvokeRequested: {}
+                                // Closes so what the command opens is not behind the panel.
+                                onActionRequested: action => {
+                                    Quickshell.execDetached(NotificationLogic.commandOf(modelData, action));
+                                    historyPanel.close();
+                                }
                             }
                         }
 

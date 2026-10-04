@@ -1,9 +1,37 @@
 import QtQuick
 import QtTest
+import "../modules/notifications/NotificationLogic.js" as Logic
 import "../modules/notifications/NotificationModel.js" as Notification
 
 TestCase {
     name: "NotificationModel"
+
+    function test_saved_records_keep_every_snapshot_field() {
+        const snapshot = Logic.snapshotOf({
+            appName: "Slack",
+            summary: "[x] in #alerts",
+            urgency: 1
+        }, 123, Logic.compileRules([
+            {
+                match: {
+                    app: "^Slack$"
+                },
+                border: "rose",
+                borderAnimation: "glow",
+                actions: [
+                    {
+                        label: "Investigate",
+                        command: ["investigate", "draft"]
+                    }
+                ]
+            }
+        ]));
+        compare(Notification.savedRecord(Object.assign({
+            key: "1",
+            notification: {},
+            duration: 0
+        }, snapshot)), snapshot);
+    }
 
     readonly property var record: ({
             key: "1",
@@ -16,6 +44,13 @@ TestCase {
             badgeEmoji: "",
             border: "rose",
             borderAnimation: "glow",
+            actions: [
+                {
+                    text: "Investigate",
+                    command: ["investigate", "draft"],
+                    env: {}
+                }
+            ],
             urgency: 1,
             timestamp: 10
         })
@@ -63,6 +98,13 @@ TestCase {
                 badgeEmoji: "",
                 border: "rose",
                 borderAnimation: "glow",
+                actions: [
+                    {
+                        text: "Investigate",
+                        command: ["investigate", "draft"],
+                        env: {}
+                    }
+                ],
                 urgency: 1,
                 timestamp: 10
             },

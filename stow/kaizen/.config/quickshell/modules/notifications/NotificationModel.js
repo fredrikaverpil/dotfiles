@@ -1,3 +1,4 @@
+// What a card draws from a live record: its NotificationLogic.snapshotOf fields.
 function savedRecord(record) {
   return {
     app: record.app,
@@ -9,6 +10,7 @@ function savedRecord(record) {
     badgeEmoji: record.badgeEmoji,
     border: record.border,
     borderAnimation: record.borderAnimation,
+    actions: record.actions,
     urgency: record.urgency,
     timestamp: record.timestamp,
   };

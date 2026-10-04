@@ -21,6 +21,7 @@ TestCase {
             badgeEmoji: "",
             border: "",
             borderAnimation: "",
+            actions: [],
             urgency: 2,
             timestamp: 123
         });
@@ -113,6 +114,7 @@ TestCase {
             badgeEmoji: "",
             border: "",
             borderAnimation: "",
+            actions: [],
             urgency: 2,
             timestamp: 123
         });
@@ -340,6 +342,7 @@ TestCase {
             badgeEmoji: "",
             border: "",
             borderAnimation: "",
+            actions: [],
             urgency: 1,
             timestamp: 123
         });
@@ -400,6 +403,7 @@ TestCase {
             badgeEmoji: "",
             border: "rose",
             borderAnimation: "orbit",
+            actions: [],
             urgency: 2,
             timestamp: 123
         });
@@ -431,6 +435,7 @@ TestCase {
             badgeEmoji: "❤️",
             border: "",
             borderAnimation: "",
+            actions: [],
             urgency: 1,
             timestamp: 123
         });
