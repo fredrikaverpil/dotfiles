@@ -4,29 +4,40 @@ import Quickshell.Io
 import "../../../Ui" as Ui
 import "MirrorModel.js" as Model
 
-// niri cannot mirror outputs; wl-mirror shows one fullscreen on another, in a
-// transient user unit so it outlives shell reloads.
+// niri cannot mirror outputs; wl-mirror shows one fullscreen on another, in
+// transient user units so they outlive shell reloads.
 Item {
     id: root
 
-    property var mirrorState: Model.state("")
-    readonly property bool active: mirrorState.pid > 0
-    readonly property string source: mirrorState.source
-    readonly property string target: mirrorState.target
+    property var mirrors: []
+    readonly property bool active: mirrors.length > 0
+    // The launcher's source.
     property string focused: ""
-    property string pendingTarget: ""
 
-    // Mirrors the focused output onto target.
-    function start(target) {
-        pendingTarget = target;
-        focusedQuery.running = true;
+    function sourceOf(target) {
+        const mirror = mirrors.find(mirror => mirror.target === target);
+        return mirror ? mirror.source : "";
     }
 
-    function refreshFocused() {
-        focusedQuery.running = true;
+    function canMirror(source, target) {
+        return Model.canMirror(mirrors, source, target);
     }
 
-    function stop() {
+    // Replaces target's current source, if any.
+    function start(source, target) {
+        if (!canMirror(source, target))
+            return;
+        starter.command = Model.startCommand(source, target);
+        starter.running = true;
+    }
+
+    function stop(target) {
+        stopper.command = Model.stopCommand(target);
+        stopper.running = true;
+    }
+
+    function stopAll() {
+        stopper.command = Model.stopAllCommand();
         stopper.running = true;
     }
 
@@ -34,25 +45,11 @@ Item {
         query.running = true;
     }
 
-    Component.onCompleted: refresh()
-
-    Process {
-        id: focusedQuery
-        command: Ui.Compositor.outputs()
-        stdout: StdioCollector {
-            waitForEnd: true
-            onStreamFinished: {
-                const monitor = Ui.Compositor.focusedMonitor(text);
-                const target = root.pendingTarget;
-                root.pendingTarget = "";
-                root.focused = monitor ? monitor.name : "";
-                if (!target || !monitor || monitor.name === target)
-                    return;
-                starter.command = Model.startCommand(monitor.name, target);
-                starter.running = true;
-            }
-        }
+    function refreshFocused() {
+        focusedQuery.running = true;
     }
+
+    Component.onCompleted: refresh()
 
     Process {
         id: starter
@@ -61,7 +58,6 @@ Item {
 
     Process {
         id: stopper
-        command: Model.stopCommand()
         onExited: root.refresh()
     }
 
@@ -71,19 +67,35 @@ Item {
         stdout: StdioCollector {
             waitForEnd: true
             onStreamFinished: {
-                root.mirrorState = Model.state(text);
-                if (root.active && !watcher.running) {
-                    watcher.command = ["tail", "--pid=" + root.mirrorState.pid, "-f", "/dev/null"];
+                root.mirrors = Model.mirrors(text);
+                const command = Model.watchCommand(root.mirrors);
+                // A stale watcher's exit refreshes again, which watches the new set.
+                if (watcher.running && JSON.stringify(watcher.command) !== JSON.stringify(command))
+                    watcher.running = false;
+                else if (root.active && !watcher.running) {
+                    watcher.command = command;
                     watcher.running = true;
                 }
             }
         }
     }
 
-    // Exits with wl-mirror, however it ends (closed window, unplugged output).
+    // Exits with the first wl-mirror to end, however it ends (closed window, unplugged output).
     Process {
         id: watcher
         onExited: root.refresh()
+    }
+
+    Process {
+        id: focusedQuery
+        command: Ui.Compositor.outputs()
+        stdout: StdioCollector {
+            waitForEnd: true
+            onStreamFinished: {
+                const monitor = Ui.Compositor.focusedMonitor(text);
+                root.focused = monitor ? monitor.name : "";
+            }
+        }
     }
 
     IpcHandler {
@@ -91,18 +103,23 @@ Item {
 
         function status(): string {
             return JSON.stringify({
-                active: root.active,
-                source: root.source,
-                target: root.target
+                mirrors: root.mirrors.map(mirror => ({
+                            source: mirror.source,
+                            target: mirror.target
+                        }))
             });
         }
 
-        function start(target: string): void {
-            root.start(target);
+        function start(source: string, target: string): void {
+            root.start(source, target);
         }
 
-        function stop(): void {
-            root.stop();
+        function stop(target: string): void {
+            root.stop(target);
+        }
+
+        function stopAll(): void {
+            root.stopAll();
         }
     }
 }

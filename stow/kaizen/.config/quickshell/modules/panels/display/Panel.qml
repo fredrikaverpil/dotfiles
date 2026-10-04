@@ -11,7 +11,7 @@ Ui.Panel {
 
     readonly property var textScales: [1, 1.1, 1.25, 1.5, 2]
 
-    cardHeight: 440
+    cardHeight: 440 + (mirrorSection.visible ? mirrorSection.height + contentSpacing : 0)
     keyNavigation: true
 
     function refresh() {
@@ -212,23 +212,47 @@ Ui.Panel {
 
         visible: Quickshell.screens.length > 1
         shell: root.shell
-        title: root.shell.mirror.active ? "Mirror · " + root.shell.mirror.source + " → " + root.shell.mirror.target : "Mirror"
+        title: "Mirror"
 
-        ChoiceRow {
-            // The service mirrors the focused output.
-            readonly property string source: root.shell.mirror.active ? root.shell.mirror.source : root.focusedMonitor ? root.focusedMonitor.name : ""
+        // One row per output, picking what it shows.
+        Repeater {
+            model: Quickshell.screens
 
-            options: [
-                {
-                    label: "Off",
-                    value: ""
+            delegate: Row {
+                id: mirrorRow
+
+                required property var modelData
+                readonly property string target: modelData.name
+
+                width: parent.width
+                spacing: 6
+
+                Text {
+                    width: 90
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: root.shell.palette.fg
+                    font.family: Ui.Fonts.mono
+                    font.pixelSize: 13
+                    elide: Text.ElideRight
+                    text: mirrorRow.target
                 }
-            ].concat(Quickshell.screens.filter(screen => screen.name !== source).map(screen => ({
-                        label: "→ " + screen.name,
-                        value: screen.name
-                    })))
-            selected: root.shell.mirror.target
-            onChosen: value => value ? root.shell.mirror.start(value) : root.shell.mirror.stop()
+
+                ChoiceRow {
+                    width: parent.width - 96
+                    options: [
+                        {
+                            label: "Own",
+                            value: ""
+                        }
+                    ].concat(Quickshell.screens.filter(screen => screen.name !== mirrorRow.target).map(screen => ({
+                                label: screen.name,
+                                value: screen.name,
+                                available: root.shell.mirror.sourceOf(mirrorRow.target) === screen.name || root.shell.mirror.canMirror(screen.name, mirrorRow.target)
+                            })))
+                    selected: root.shell.mirror.sourceOf(mirrorRow.target)
+                    onChosen: value => value ? root.shell.mirror.start(value, mirrorRow.target) : root.shell.mirror.stop(mirrorRow.target)
+                }
+            }
         }
     }
 
@@ -266,7 +290,7 @@ Ui.Panel {
                 width: (choices.width - choices.spacing * (optionRepeater.count - 1)) / optionRepeater.count
                 label: modelData.label
                 active: choices.matches(modelData.value, choices.selected)
-                available: choices.available
+                available: choices.available && modelData.available !== false
                 onActivated: choices.chosen(modelData.value)
             }
         }
