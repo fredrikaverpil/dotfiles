@@ -92,7 +92,7 @@ Critical toasts stay until dismissed. Others will timeout and disappear.
 ### Do not disturb (DnD)
 
 DnD is for sharing the screen or recording it, so it holds back
-every notification, critical ones included, to the nostifications history panel.
+every notification, critical ones included, to the notification history panel.
 
 The status bar's bell icon blinks when critical notifications arrive or when DnD
 has been active for a longer time.
