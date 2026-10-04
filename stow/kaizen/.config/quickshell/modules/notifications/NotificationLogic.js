@@ -156,6 +156,8 @@ function snapshotOf(notification, timestamp, rules) {
     badgeEmoji: ruleValue(notification, rules, "badgeEmoji"),
     border: ruleValue(notification, rules, "border"),
     borderAnimation: ruleValue(notification, rules, "borderAnimation"),
+    // A rule's; the app's are on the live notification.
+    actions: actionsOf(notification, rules),
     urgency: urgencyOf(notification, rules),
     timestamp: timestamp === undefined ? Date.now() : timestamp,
   };

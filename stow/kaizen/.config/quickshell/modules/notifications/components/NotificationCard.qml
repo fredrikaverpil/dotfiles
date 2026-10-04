@@ -37,7 +37,7 @@ Rectangle {
     readonly property string badgeEmoji: String(row.badgeEmoji || "")
     readonly property real perimeter: 2 * (width + height)
     readonly property int urgency: Number(row.urgency)
-    readonly property var buttons: notification ? NotificationLogic.buttons(notification.actions, row.actions) : []
+    readonly property var buttons: NotificationLogic.buttons(notification ? notification.actions : [], row.actions)
     readonly property color accent: urgency === 2 ? palette.rose : (urgency === 0 ? palette.off : palette.fg)
     // A rule's border colour takes the place of the urgency's.
     readonly property color tint: palette[String(row.border || "")] ?? accent
@@ -331,9 +331,14 @@ Rectangle {
                     implicitWidth: actionLabel.implicitWidth + 16
                     implicitHeight: 26
                     radius: 4
-                    color: actionArea.containsMouse ? root.palette.sel : "transparent"
-                    border.color: index === root.selectedButton ? root.palette.fg : root.palette.dim
+                    color: actionArea.containsMouse || activeFocus ? root.palette.sel : "transparent"
+                    border.color: index === root.selectedButton || activeFocus ? root.palette.fg : root.palette.dim
                     border.width: 1
+
+                    activeFocusOnTab: root.selectable
+                    Keys.onReturnPressed: root.actionRequested(modelData)
+                    Keys.onEnterPressed: root.actionRequested(modelData)
+                    Keys.onSpacePressed: root.actionRequested(modelData)
 
                     Text {
                         id: actionLabel

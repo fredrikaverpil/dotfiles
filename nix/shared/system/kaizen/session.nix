@@ -270,7 +270,7 @@ in
                 }
               );
               default = [ ];
-              description = "Buttons after the toast's own; pressing one runs its command and dismisses the toast. The first matching rule with any applies";
+              description = "Buttons after the toast's own; pressing one runs its command and dismisses the toast. They also show on the notification in the history, where pressing one keeps the notification and closes the panel. The first matching rule with any applies";
             };
           };
         }
