@@ -158,7 +158,7 @@ in
                 ]
               );
               default = null;
-              description = "Urgency in place of the one the app sent; critical sticks and bypasses Do Not Disturb, low expires sooner. The first matching rule with one applies";
+              description = "Urgency in place of the one the app sent; critical sticks, low expires sooner. The first matching rule with one applies";
             };
             border = lib.mkOption {
               type = lib.types.nullOr (
