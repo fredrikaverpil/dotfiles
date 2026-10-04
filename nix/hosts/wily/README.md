@@ -55,6 +55,29 @@ systemctl --user stop noctalia-trial && systemctl --user start quickshell
 
 Here `kaizen-sleep-lock` is still running but cannot lock, so do not suspend.
 
+## Local LLM
+
+`llama-router` runs llama.cpp's router server (Vulkan, Xe2 iGPU) on
+`127.0.0.1:8080`. Pi connects to it: `/login llama.cpp` once, then `/llama` to
+download, load and unload models, and `/model` to pick a loaded one. Models
+live in `~/models`.
+
+Start `llama-router` before `/login llama.cpp`, which probes the URL. After
+loading a model with `/llama`, select it with `/model`; otherwise Pi keeps the
+default provider and fails with "No API key found".
+
+The CPU and iGPU share the 32 GB, so a loaded model comes out of what the
+desktop can use. Nothing runs until `llama-router` is started.
+
+Measured with the desktop running: `unsloth/Qwen3.5-2B-GGUF` ~3.5 GiB,
+`unsloth/gpt-oss-20b-GGUF` ~12 GiB, `unsloth/Qwen3.5-35B-A3B-GGUF:UD-IQ4_XS`
+~19 GiB. Mixture-of-experts models (A3B, gpt-oss) are far faster than dense
+ones of similar size, since generation is memory-bandwidth bound.
+
+After unloading, the xe driver's TTM page pool keeps up to ~15 GiB, shown as
+used. The kernel reclaims it under pressure;
+`echo 2 | sudo tee /proc/sys/vm/drop_caches` frees it immediately.
+
 ## Hardware
 
 - GPU: Xe2 on the `xe` driver. Mesa has no Intel VA-API, so
