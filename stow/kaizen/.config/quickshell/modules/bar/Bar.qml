@@ -306,6 +306,7 @@ Scope {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: visible ? 4 : 0
                 visible: bar.shell.mirror.active
+                enabled: !bar.shell.mirror.busy
                 foreground: bar.shell.palette.rose
                 label: "󰍺"
                 onActivated: bar.shell.mirror.stopAll()

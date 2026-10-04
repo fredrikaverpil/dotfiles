@@ -637,7 +637,7 @@ Ui.Panel {
                 label: "Off",
                 icon: menu.radio(!mirror.active),
                 detail: "",
-                enabled: true,
+                enabled: !mirror.busy,
                 action: () => mirror.stopAll()
             }
         ].concat(Quickshell.screens.filter(screen => source && screen.name !== source).map(screen => {
@@ -646,7 +646,7 @@ Ui.Panel {
                 label: screen.name,
                 icon: menu.checkbox(current === source),
                 detail: current && current !== source ? "shows " + current : "",
-                enabled: current === source || mirror.canMirror(source, screen.name),
+                enabled: !mirror.busy && (current === source || mirror.canMirror(source, screen.name)),
                 action: () => current === source ? mirror.stop(screen.name) : mirror.start(source, screen.name)
             };
         }));
