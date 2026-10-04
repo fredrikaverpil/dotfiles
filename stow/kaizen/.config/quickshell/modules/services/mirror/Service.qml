@@ -28,7 +28,8 @@ Item {
         if (!canMirror(source, target))
             return;
         starter.command = Model.startCommand(source, target);
-        starter.running = true;
+        focuser.command = Ui.Compositor.focusMonitor(target);
+        focuser.running = true;
     }
 
     function stop(target) {
@@ -50,6 +51,13 @@ Item {
     }
 
     Component.onCompleted: refresh()
+
+    // niri opens the window on the focused output and ignores wl-mirror's
+    // --fullscreen-output; on the source, it would mirror itself.
+    Process {
+        id: focuser
+        onExited: starter.running = true
+    }
 
     Process {
         id: starter
