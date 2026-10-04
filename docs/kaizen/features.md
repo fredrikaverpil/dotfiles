@@ -58,7 +58,7 @@ plugin.
 
 Do not disturb is for sharing the screen or recording it, so it holds back
 every notification, critical ones included. Held-back notifications go to the
-history.
+history, sorted newest first, with critical ones always at the top.
 
 So it is not forgotten on, the bar's bell blinks once it has been on for 10
 minutes; opening the notifications panel snoozes that for another 10. It blinks

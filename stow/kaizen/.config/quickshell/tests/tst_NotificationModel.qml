@@ -42,7 +42,7 @@ TestCase {
     function test_notification_history_skips_transient_records_and_keeps_newest_entries() {
         compare(Notification.historyWith([record], {
             transient: true
-        }, 2), [record]);
+        }, 2, 2), [record]);
         const newer = Object.assign({}, record, {
             key: "2",
             summary: "New"
@@ -50,7 +50,7 @@ TestCase {
         const saved = Notification.savedRecord(record);
         compare(Notification.historyWith([saved, Object.assign({}, saved, {
                 summary: "Old"
-            })], newer, 2), [
+            })], newer, 2, 2), [
             {
                 app: "Mail",
                 appIcon: "mail",
@@ -63,6 +63,21 @@ TestCase {
                 timestamp: 10
             },
             saved,]);
+    }
+
+    function test_notification_history_keeps_critical_first_and_drops_them_last() {
+        const saved = Notification.savedRecord(record);
+        const critical = Object.assign({}, saved, {
+            summary: "Critical",
+            urgency: 2
+        });
+        const newer = Object.assign({}, record, {
+            summary: "New"
+        });
+        compare(Notification.historyWith([critical, saved], newer, 2, 2), [critical, Notification.savedRecord(newer)]);
+        compare(Notification.historyWith([saved], Object.assign({}, critical, {
+            key: "2"
+        }), 3, 2), [critical, saved]);
     }
 
     function test_popup_replacement_removal_and_ipc_dnd_values_are_deterministic() {
