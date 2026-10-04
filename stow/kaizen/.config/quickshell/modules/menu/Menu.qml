@@ -628,25 +628,28 @@ Ui.Panel {
                 }));
     }
 
-    // Targets for the focused output.
+    // Targets for the focused output; Off stops every mirror.
     function mirrorRows() {
         const mirror = menu.shell.mirror;
-        const source = mirror.active ? mirror.source : mirror.focused;
+        const source = mirror.focused;
         return [
             {
                 label: "Off",
                 icon: menu.radio(!mirror.active),
                 detail: "",
                 enabled: true,
-                action: () => mirror.stop()
+                action: () => mirror.stopAll()
             }
-        ].concat(Quickshell.screens.filter(screen => screen.name !== source).map(screen => ({
-                    label: screen.name,
-                    icon: menu.radio(screen.name === mirror.target),
-                    detail: "",
-                    enabled: true,
-                    action: () => mirror.start(screen.name)
-                })));
+        ].concat(Quickshell.screens.filter(screen => source && screen.name !== source).map(screen => {
+            const current = mirror.sourceOf(screen.name);
+            return {
+                label: screen.name,
+                icon: menu.checkbox(current === source),
+                detail: current && current !== source ? "shows " + current : "",
+                enabled: current === source || mirror.canMirror(source, screen.name),
+                action: () => current === source ? mirror.stop(screen.name) : mirror.start(source, screen.name)
+            };
+        }));
     }
 
     function deviceRows() {
@@ -773,15 +776,15 @@ Ui.Panel {
 
     property string popped: ""
 
-    // Opens target as a context menu hanging from button on output; without them
-    // it centers on the focused output. Opening the shown one again on its output
-    // closes it.
-    // Only the compositor knows the focused output, which the mirror rows leave out.
+    // Only the compositor knows the focused output, the mirror rows' source.
     function refreshMirrorSource(target) {
         if (target === "root" || "settings.display.mirror".startsWith(target))
             menu.shell.mirror.refreshFocused();
     }
 
+    // Opens target as a context menu hanging from button on output; without them
+    // it centers on the focused output. Opening the shown one again on its output
+    // closes it.
     function popup(target, output, button, keep) {
         refreshMirrorSource(target);
         if (contextMenu.shown && popped === target && (!output || contextMenu.screen?.name === output)) {

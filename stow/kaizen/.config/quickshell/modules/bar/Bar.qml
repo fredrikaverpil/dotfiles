@@ -308,7 +308,7 @@ Scope {
                 visible: bar.shell.mirror.active
                 foreground: bar.shell.palette.rose
                 label: "󰍺"
-                onActivated: bar.shell.mirror.stop()
+                onActivated: bar.shell.mirror.stopAll()
             }
 
             Ui.BarButton {
