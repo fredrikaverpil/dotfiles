@@ -246,7 +246,7 @@ Scope {
                 anchors.right: audioButton.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: visible ? 6 : 0
-                visible: idleButton.visible || keyboardButton.visible || recordingButton.visible || systemButton.visible || mediaWidget.width > 0 || pluginIndicators.width > 0
+                visible: idleButton.visible || keyboardButton.visible || recordingButton.visible || mirrorButton.visible || systemButton.visible || mediaWidget.width > 0 || pluginIndicators.width > 0
                 width: visible ? 1 : 0
                 height: 16 * bar.shell.textScale
                 color: bar.shell.palette.dim
@@ -300,9 +300,21 @@ Scope {
             }
 
             Ui.BarButton {
-                id: systemButton
+                id: mirrorButton
                 shell: bar.shell
                 anchors.right: recordingButton.left
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.rightMargin: visible ? 4 : 0
+                visible: bar.shell.mirror.active
+                foreground: bar.shell.palette.rose
+                label: "󰍺"
+                onActivated: bar.shell.mirror.stop()
+            }
+
+            Ui.BarButton {
+                id: systemButton
+                shell: bar.shell
+                anchors.right: mirrorButton.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: visible ? 4 : 0
                 visible: bar.shell.systemService.alert !== null

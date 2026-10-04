@@ -30,6 +30,7 @@ import "modules/services/clipboard" as ClipboardService
 import "modules/services/idle" as Idle
 import "modules/services/keyboard" as Keyboard
 import "modules/services/media" as MediaService
+import "modules/services/mirror" as Mirror
 import "modules/services/network" as NetworkService
 import "modules/services/nightlight" as Nightlight
 import "modules/services/recording" as RecordingService
@@ -50,6 +51,7 @@ ShellRoot {
     readonly property alias media: media
     readonly property alias display: display
     readonly property alias brightness: brightness
+    readonly property alias mirror: mirror
     readonly property alias curtain: curtain
     readonly property alias network: network
     readonly property alias networkService: networkService
@@ -310,6 +312,10 @@ ShellRoot {
 
     Brightness.Service {
         id: brightness
+    }
+
+    Mirror.Service {
+        id: mirror
     }
 
     Display.Panel {

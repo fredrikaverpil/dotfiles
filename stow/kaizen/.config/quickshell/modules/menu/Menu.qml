@@ -257,6 +257,11 @@ Ui.Panel {
             label: "Text size",
             provider: "textScales"
         },
+        "settings.display.mirror": {
+            icon: "󰍺",
+            label: "Mirror",
+            provider: "mirrors"
+        },
         "settings.display.wallpaper": {
             icon: "",
             label: "Wallpaper (workspace)",
@@ -623,6 +628,27 @@ Ui.Panel {
                 }));
     }
 
+    // Targets for the focused output.
+    function mirrorRows() {
+        const mirror = menu.shell.mirror;
+        const source = mirror.active ? mirror.source : mirror.focused;
+        return [
+            {
+                label: "Off",
+                icon: menu.radio(!mirror.active),
+                detail: "",
+                enabled: true,
+                action: () => mirror.stop()
+            }
+        ].concat(Quickshell.screens.filter(screen => screen.name !== source).map(screen => ({
+                    label: screen.name,
+                    icon: menu.radio(screen.name === mirror.target),
+                    detail: "",
+                    enabled: true,
+                    action: () => mirror.start(screen.name)
+                })));
+    }
+
     function deviceRows() {
         const service = menu.shell.bluetoothService;
         return (service.powered ? service.devices : []).map(device => ({
@@ -694,6 +720,9 @@ Ui.Panel {
             textScales: function () {
                 return menu.textScaleRows();
             },
+            mirrors: function () {
+                return menu.mirrorRows();
+            },
             devices: function () {
                 return menu.deviceRows();
             },
@@ -747,7 +776,14 @@ Ui.Panel {
     // Opens target as a context menu hanging from button on output; without them
     // it centers on the focused output. Opening the shown one again on its output
     // closes it.
+    // Only the compositor knows the focused output, which the mirror rows leave out.
+    function refreshMirrorSource(target) {
+        if (target === "root" || "settings.display.mirror".startsWith(target))
+            menu.shell.mirror.refreshFocused();
+    }
+
     function popup(target, output, button, keep) {
+        refreshMirrorSource(target);
         if (contextMenu.shown && popped === target && (!output || contextMenu.screen?.name === output)) {
             contextMenu.close();
             return;
@@ -786,6 +822,7 @@ Ui.Panel {
             shell.claimPanel(menu);
         if (menu.items[target]?.provider === "binds")
             readBinds();
+        refreshMirrorSource(target);
         level = target;
         input.text = "";
         shown = true;

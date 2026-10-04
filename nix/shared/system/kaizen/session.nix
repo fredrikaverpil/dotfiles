@@ -508,6 +508,8 @@ in
       # Annotates screenshots from the notification's Edit action.
       satty
       wl-clipboard
+      # niri cannot mirror outputs; the mirror service runs it fullscreen on the target.
+      wl-mirror
     ];
   };
 }
