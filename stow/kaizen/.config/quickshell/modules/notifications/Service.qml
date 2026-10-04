@@ -104,7 +104,7 @@ Item {
     function addHistory(record) {
         if (!record || record.transient)
             return;
-        historyRows = Model.historyWith(historyRows, record, historyLimit);
+        historyRows = Model.historyWith(historyRows, record, historyLimit, NotificationUrgency.Critical);
         saveState();
     }
 

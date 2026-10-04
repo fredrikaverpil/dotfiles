@@ -12,10 +12,22 @@ function savedRecord(record) {
   };
 }
 
-function historyWith(history, record, limit) {
+// Critical rows first, then the rest, each newest first; the cap drops the
+// oldest non-critical row first.
+function historyWith(history, record, limit, critical) {
   var rows = Array.isArray(history) ? history : [];
   if (!record || record.transient) return rows;
-  return [savedRecord(record)].concat(rows).slice(0, limit);
+  rows = [savedRecord(record)].concat(rows);
+  return rows
+    .filter(function (row) {
+      return row.urgency === critical;
+    })
+    .concat(
+      rows.filter(function (row) {
+        return row.urgency !== critical;
+      }),
+    )
+    .slice(0, limit);
 }
 
 function loadedState(raw, limit) {
