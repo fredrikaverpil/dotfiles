@@ -40,7 +40,27 @@ What the curtain does not do, since it would stop screenshotting from working:
 - ⚠️ It never locks the machine: idle locking is paused while the curtain is up.
   Always use the real lock when leaving the machine.
 
-## Notification rules (`notifications`)
+## Notifications (`notifications`)
+
+Apps send notifications over D-Bus. [`notify-send`][notify-send] sends one from
+a shell or script, as the shell does for its own (battery, screenshots,
+recordings):
+
+```sh
+# show a notification
+notify-send -a <app> <summary> <body>
+
+# critical: stays until dismissed
+notify-send -u critical <summary> <body>
+
+# with buttons; prints the pressed button's id
+notify-send -A yes=Yes -A no=No <summary> <body>
+
+# with an icon: a file path, or a name from the icon theme
+notify-send -i /path/to/icon.svg <summary> <body>
+```
+
+### Rules
 
 Notifications arriving via the D-Bus can be transformed by
 `host.notificationRules`, keyed by regexes on the notification's data. This
@@ -54,19 +74,41 @@ Rules match only on what the app sends. Capture a real notification first:
 Rules can be specified in the core kaizen system, per-host or by an optional
 plugin.
 
-## Do not disturb (`notifications`)
+A plugin adds rules from its Nix module, such as a button that runs its own
+command with the notification in `NOTIFICATION_APP`, `NOTIFICATION_SUMMARY` and
+`NOTIFICATION_BODY`; the
+[incident investigator](../../nix/shared/system/kaizen/plugins/incident-investigator/README.md)
+does.
 
-Do not disturb is for sharing the screen or recording it, so it holds back
-every notification, critical ones included. Held-back notifications go to the
-history, sorted newest first, with critical ones always at the top.
+### Toasts
 
-So it is not forgotten on, the bar's bell blinks once it has been on for 10
-minutes; opening the notifications panel snoozes that for another 10. It blinks
-fast while the history holds a critical notification it held back, until those
-are cleared. The start time is saved, so a shell restart keeps the clock.
+Activating a toast focuses its app's window. Apps cannot raise their own window
+without an activation token, which the server has no way to pass on, so the
+shell does it. A rule's `focus` picks the window when it is not the sender's,
+such as a reminder Slack relays for Google Calendar.
 
-The recording dialog turns it on by default, and turns it off again when the
-recording ends or is cancelled, unless it was already on.
+Critical toasts stay until dismissed. Others will timeout and disappear.
+
+### Do not disturb (DnD)
+
+DnD is for sharing the screen or recording it, so it holds back
+every notification, critical ones included, to the nostifications history panel.
+
+The status bar's bell icon blinks when critical notifications arrive or when DnD
+has been active for a longer time.
+
+The screen recording dialog turns it on by default, and turns it off again when
+the recording ends or is cancelled, unless it was already on.
+
+### History
+
+The history holds only what DnD held back, newest first with critical ones
+always at the top. Some action buttons will not appear on the notifications in
+the history, due to how an app's own buttons only work while the app still holds
+the notification. Only buttons added via notification rules are retained in the
+history.
+
+[notify-send]: https://man.archlinux.org/man/notify-send.1
 
 ## Recording
 

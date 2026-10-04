@@ -16,6 +16,8 @@ reaches, is in [`README.md`](README.md) › Where it lives.
   is the minimal example;
   [`nix/shared/system/kaizen/plugins/gcloud-auth/`](../../nix/shared/system/kaizen/plugins/gcloud-auth/)
   always shows its login state as one.
+- Its Nix module may add notification rules, such as buttons on another app's
+  notifications: [`features.md`](features.md) › Notifications › Rules.
 - Plugin code runs in the shell as QML/JS. It needs a process of its own only
   for a tray item or for work that must outlive a shell reload, as below.
 - A plugin that needs a long-running backend brings its own daemon: its module
