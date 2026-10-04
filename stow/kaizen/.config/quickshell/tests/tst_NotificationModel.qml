@@ -14,6 +14,8 @@ TestCase {
             image: "",
             icon: "",
             badgeEmoji: "",
+            border: "rose",
+            borderAnimation: "glow",
             urgency: 1,
             timestamp: 10
         })
@@ -59,6 +61,8 @@ TestCase {
                 image: "",
                 icon: "",
                 badgeEmoji: "",
+                border: "rose",
+                borderAnimation: "glow",
                 urgency: 1,
                 timestamp: 10
             },

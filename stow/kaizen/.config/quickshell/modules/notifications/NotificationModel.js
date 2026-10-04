@@ -7,6 +7,8 @@ function savedRecord(record) {
     image: record.image,
     icon: record.icon,
     badgeEmoji: record.badgeEmoji,
+    border: record.border,
+    borderAnimation: record.borderAnimation,
     urgency: record.urgency,
     timestamp: record.timestamp,
   };

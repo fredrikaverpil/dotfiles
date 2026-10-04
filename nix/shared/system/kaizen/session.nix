@@ -172,7 +172,7 @@ in
                 ]
               );
               default = null;
-              description = "Palette colour of the toast's border, in place of the one its urgency gives";
+              description = "Palette colour of the border, on the toast and in the history, in place of the one its urgency gives";
             };
             borderAnimation = lib.mkOption {
               type = lib.types.nullOr (
@@ -183,7 +183,7 @@ in
                 ]
               );
               default = null;
-              description = "Animation of the border: `orbit` keeps a dash travelling around it, and dims the border itself so the dash stands out; `heartbeat` thickens it in two soft beats, then rests; `glow` breathes a halo around the toast, over the bar and other toasts";
+              description = "Animation of the border, on the toast and in the history: `orbit` keeps a dash travelling around it, and dims the border itself so the dash stands out; `heartbeat` thickens it in two soft beats, then rests; `glow` breathes a halo around it, over the bar, the history panel and other notifications";
             };
             dedup = lib.mkOption {
               type = lib.types.nullOr (
