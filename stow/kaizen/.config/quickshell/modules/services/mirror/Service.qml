@@ -13,8 +13,6 @@ Item {
     readonly property bool active: mirrors.length > 0
     // Until the query settles, mirrors is stale and a Process may be in use.
     readonly property bool busy: focuser.running || starter.running || stopper.running || query.running
-    // The launcher's source.
-    property string focused: ""
 
     function sourceOf(target) {
         const mirror = mirrors.find(mirror => mirror.target === target);
@@ -50,10 +48,6 @@ Item {
 
     function refresh() {
         query.running = true;
-    }
-
-    function refreshFocused() {
-        focusedQuery.running = true;
     }
 
     Component.onCompleted: refresh()
@@ -98,18 +92,6 @@ Item {
     Process {
         id: watcher
         onExited: root.refresh()
-    }
-
-    Process {
-        id: focusedQuery
-        command: Ui.Compositor.outputs()
-        stdout: StdioCollector {
-            waitForEnd: true
-            onStreamFinished: {
-                const monitor = Ui.Compositor.focusedMonitor(text);
-                root.focused = monitor ? monitor.name : "";
-            }
-        }
     }
 
     IpcHandler {

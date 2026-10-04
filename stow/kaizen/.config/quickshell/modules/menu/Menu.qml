@@ -628,10 +628,25 @@ Ui.Panel {
                 }));
     }
 
+    // The mirror rows' source. Only the compositor knows it, so each open queries it.
+    property string focusedOutput: ""
+
+    Process {
+        id: focusedOutputQuery
+        command: Ui.Compositor.outputs()
+        stdout: StdioCollector {
+            waitForEnd: true
+            onStreamFinished: {
+                const monitor = Ui.Compositor.focusedMonitor(text);
+                menu.focusedOutput = monitor ? monitor.name : "";
+            }
+        }
+    }
+
     // Targets for the focused output; Off stops every mirror.
     function mirrorRows() {
         const mirror = menu.shell.mirror;
-        const source = mirror.focused;
+        const source = menu.focusedOutput;
         return [
             {
                 label: "Off",
@@ -776,17 +791,11 @@ Ui.Panel {
 
     property string popped: ""
 
-    // Only the compositor knows the focused output, the mirror rows' source.
-    function refreshMirrorSource(target) {
-        if (target === "root" || "settings.display.mirror".startsWith(target))
-            menu.shell.mirror.refreshFocused();
-    }
-
     // Opens target as a context menu hanging from button on output; without them
     // it centers on the focused output. Opening the shown one again on its output
     // closes it.
     function popup(target, output, button, keep) {
-        refreshMirrorSource(target);
+        focusedOutputQuery.running = true;
         if (contextMenu.shown && popped === target && (!output || contextMenu.screen?.name === output)) {
             contextMenu.close();
             return;
@@ -825,7 +834,7 @@ Ui.Panel {
             shell.claimPanel(menu);
         if (menu.items[target]?.provider === "binds")
             readBinds();
-        refreshMirrorSource(target);
+        focusedOutputQuery.running = true;
         level = target;
         input.text = "";
         shown = true;
