@@ -239,6 +239,7 @@ Ui.Panel {
 
                 ChoiceRow {
                     width: parent.width - 96
+                    available: !root.shell.mirror.busy
                     options: [
                         {
                             label: "Own",

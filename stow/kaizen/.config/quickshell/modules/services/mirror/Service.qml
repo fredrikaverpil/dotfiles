@@ -11,6 +11,8 @@ Item {
 
     property var mirrors: []
     readonly property bool active: mirrors.length > 0
+    // Until the query settles, mirrors is stale and a Process may be in use.
+    readonly property bool busy: focuser.running || starter.running || stopper.running || query.running
     // The launcher's source.
     property string focused: ""
 
@@ -25,7 +27,7 @@ Item {
 
     // Replaces target's current source, if any.
     function start(source, target) {
-        if (!canMirror(source, target))
+        if (busy || !canMirror(source, target))
             return;
         starter.command = Model.startCommand(source, target);
         focuser.command = Ui.Compositor.focusMonitor(target);
@@ -33,11 +35,15 @@ Item {
     }
 
     function stop(target) {
+        if (busy)
+            return;
         stopper.command = Model.stopCommand(target);
         stopper.running = true;
     }
 
     function stopAll() {
+        if (busy)
+            return;
         stopper.command = Model.stopAllCommand();
         stopper.running = true;
     }
