@@ -14,6 +14,8 @@ Rectangle {
     property var row: ({})
     property var notification: null
     property bool toast: false
+    // Border animations run only while the card is on screen.
+    property bool animated: toast
     property bool selectable: false
     property bool selected: false
     property int selectedButton: -1
@@ -39,9 +41,9 @@ Rectangle {
     readonly property color accent: urgency === 2 ? palette.rose : (urgency === 0 ? palette.off : palette.fg)
     // A rule's border colour takes the place of the urgency's.
     readonly property color tint: palette[String(row.border || "")] ?? accent
-    readonly property bool orbiting: toast && row.borderAnimation === "orbit"
-    readonly property bool beating: toast && row.borderAnimation === "heartbeat"
-    readonly property bool glowing: toast && row.borderAnimation === "glow"
+    readonly property bool orbiting: animated && row.borderAnimation === "orbit"
+    readonly property bool beating: animated && row.borderAnimation === "heartbeat"
+    readonly property bool glowing: animated && row.borderAnimation === "glow"
     // A rule's icon takes the notification's place, which moves to the badge;
     // a rule's badge emoji takes the badge's.
     readonly property string icon: ruleIcon || ownIcon
@@ -64,7 +66,7 @@ Rectangle {
     color: activeFocus || selected ? palette.sel : palette.bg
     border.color: tint
     border.width: 1
-    // A glowing card draws its halo outside itself, over the toasts beside it.
+    // A glowing card draws its halo outside itself, over the cards beside it.
     clip: !glowing
     z: glowing ? 1 : 0
 
@@ -94,7 +96,7 @@ Rectangle {
 
     // A thicker dash on the border, travelling its perimeter. Dash and gap are in
     // stroke widths; the gap exceeds the perimeter, so the dash laps alone, with a pause.
-    // The lap is timed by the wall clock, so every orbiting toast laps in step.
+    // The lap is timed by the wall clock, so every orbiting card laps in step.
     Shape {
         id: orbit
         readonly property real thickness: 3
@@ -133,7 +135,7 @@ Rectangle {
     // Halos layered below the card, so only what is outside it shows: a faint
     // ambient one, a wide bloom breathing around a hot core that brightens on
     // each breath, and a flare on arrival that settles into the breathing. The
-    // breath is timed by the wall clock, so every glowing toast breathes in step,
+    // breath is timed by the wall clock, so every glowing card breathes in step,
     // and the flare by the arrival, so rebuilt delegates do not replay it.
     Item {
         id: glow
@@ -180,7 +182,7 @@ Rectangle {
     }
 
     // A thicker border fading in and out on the heartbeat. Timed by the wall
-    // clock, so every beating toast beats in step.
+    // clock, so every beating card beats in step.
     Rectangle {
         id: heartbeat
         anchors.fill: parent

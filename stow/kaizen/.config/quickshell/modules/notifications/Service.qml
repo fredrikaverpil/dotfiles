@@ -678,46 +678,67 @@ Item {
             color: root.palette.dim
         }
 
-        // A Flickable over a Column, not a ListView: every card must exist for the
-        // panel's focus chain to reach it, and a virtualized delegate does not.
-        Flickable {
-            id: historyList
+        Item {
+            id: historyArea
             width: parent.width
             height: parent.height - historyHeader.height - historySeparator.height - 2 * historyPanel.contentSpacing
-            contentWidth: width
-            contentHeight: historyContent.implicitHeight
-            clip: true
-            boundsBehavior: Flickable.StopAtBounds
 
-            Column {
-                id: historyContent
-                width: historyList.width
-                spacing: 8
+            // Clips scrolled-out cards but not a glowing card's halo: the clip
+            // reaches past the sides, and past an end with nothing scrolled beyond it.
+            Item {
+                id: historyClip
+                readonly property int reach: 64
+                readonly property real above: historyList.atYBeginning ? reach : 0
+                x: -reach
+                y: -above
+                width: historyArea.width + 2 * reach
+                height: historyArea.height + above + (historyList.atYEnd ? reach : 0)
+                clip: true
 
-                Repeater {
-                    id: historyCards
-                    model: root.historyRows
+                // A Flickable over a Column, not a ListView: every card must exist for the
+                // panel's focus chain to reach it, and a virtualized delegate does not.
+                Flickable {
+                    id: historyList
+                    x: historyClip.reach
+                    y: historyClip.above
+                    width: historyArea.width
+                    height: historyArea.height
+                    contentWidth: width
+                    contentHeight: historyContent.implicitHeight
+                    boundsBehavior: Flickable.StopAtBounds
 
-                    delegate: NotificationCard {
-                        required property var modelData
-                        required property int index
+                    Column {
+                        id: historyContent
+                        width: historyList.width
+                        spacing: 8
 
-                        width: historyContent.width
-                        palette: root.palette
-                        row: modelData
-                        toast: false
-                        selectable: true
-                        onCloseRequested: historyPanel.drop(index)
-                        onInvokeRequested: {}
+                        Repeater {
+                            id: historyCards
+                            model: root.historyRows
+
+                            delegate: NotificationCard {
+                                required property var modelData
+                                required property int index
+
+                                width: historyContent.width
+                                palette: root.palette
+                                row: modelData
+                                toast: false
+                                animated: historyPanel.shown
+                                selectable: true
+                                onCloseRequested: historyPanel.drop(index)
+                                onInvokeRequested: {}
+                            }
+                        }
+
+                        Text {
+                            visible: historyCards.count === 0
+                            text: "No notifcations here yet"
+                            color: root.palette.off
+                            font.family: Ui.Fonts.mono
+                            font.pixelSize: 14
+                        }
                     }
-                }
-
-                Text {
-                    visible: historyCards.count === 0
-                    text: "No notifcations here yet"
-                    color: root.palette.off
-                    font.family: Ui.Fonts.mono
-                    font.pixelSize: 14
                 }
             }
         }
