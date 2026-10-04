@@ -100,6 +100,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | idle | [ext-idle-notify], lock service | idle indicator | Settings › Session | `idle` |
 | keyboard | [niri] XKB layouts | layout indicator | Settings › Keyboard layout | `keyboard` |
 | media | [MPRIS] | now-playing widget | Settings › Media | `media` |
+| mirror | [wl-mirror] in the transient `kaizen-mirror` user unit | mirror indicator | Settings › Display › Mirror | `mirror` |
 | network | [NetworkManager], `ip -j` | button | Settings › Network | `network` |
 | nightlight | [wl-gammarelay-rs] over D-Bus, the weather location for the solar position | – | Settings › Display › Nightlight | `nightlight` |
 | recording | [gpu-screen-recorder], [grim], [satty], [PipeWire] | recording indicator | Trigger › Record, Pause, Stop, Screenshot (region, desktop, window) | `recording` |
@@ -128,6 +129,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 [niri]: https://github.com/YaLTeR/niri/wiki
 [MPRIS]: https://specifications.freedesktop.org/mpris-spec/latest/
 [NetworkManager]: https://networkmanager.dev
+[wl-mirror]: https://github.com/Ferdi265/wl-mirror
 [wl-gammarelay-rs]: https://github.com/MaxVerevkin/wl-gammarelay-rs
 [gpu-screen-recorder]: https://git.dec05eba.com/gpu-screen-recorder/about/
 [grim]: https://sr.ht/~emersion/grim/
@@ -175,8 +177,8 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
     Settings node as a context menu. The date is one only when a plugin takes
     it over, and opens the plugin's node; otherwise it is a plain label.
   - Indicators, shown only off the default state: left-click acts on it
-    (stops the recording, re-enables idle locking, resets the layout). The
-    system alert is a plain label.
+    (stops the recording or the mirror, re-enables idle locking, resets the
+    layout). The system alert is a plain label.
   - Tray items: the app's own activation and menu.
 - Plugins add launcher items, panels, IPC targets and bar indicators:
   [`plugins.md`](plugins.md).

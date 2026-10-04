@@ -208,6 +208,31 @@ Ui.Panel {
     }
 
     Ui.Section {
+        id: mirrorSection
+
+        visible: Quickshell.screens.length > 1
+        shell: root.shell
+        title: root.shell.mirror.active ? "Mirror · " + root.shell.mirror.source + " → " + root.shell.mirror.target : "Mirror"
+
+        ChoiceRow {
+            // The service mirrors the focused output.
+            readonly property string source: root.shell.mirror.active ? root.shell.mirror.source : root.focusedMonitor ? root.focusedMonitor.name : ""
+
+            options: [
+                {
+                    label: "Off",
+                    value: ""
+                }
+            ].concat(Quickshell.screens.filter(screen => screen.name !== source).map(screen => ({
+                        label: "→ " + screen.name,
+                        value: screen.name
+                    })))
+            selected: root.shell.mirror.target
+            onChosen: value => value ? root.shell.mirror.start(value) : root.shell.mirror.stop()
+        }
+    }
+
+    Ui.Section {
         shell: root.shell
         title: "Wallpaper · " + (root.shell.dark ? "dark" : "light")
 
