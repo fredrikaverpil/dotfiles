@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
 
@@ -1768,6 +1769,20 @@ Column {
             }
             onMovementEnded: follow = atYEnd
 
+            // Shows where in a long conversation the view is. Dragging it stops following
+            // the newest message, like a flick does.
+            ScrollBar.vertical: ScrollBar {
+                id: chatScroll
+                policy: ScrollBar.AsNeeded
+                onPressedChanged: scroller.follow = !pressed && scroller.atYEnd
+                contentItem: Rectangle {
+                    implicitWidth: 6
+                    radius: width / 2
+                    color: root.shell.palette.fg
+                    opacity: chatScroll.pressed ? 0.9 : 0.4
+                }
+            }
+
             // Scrolls the least that shows item and its outline whole, else to
             // its top. The conversation's inset is the outline's.
             function reveal(item) {
@@ -1814,7 +1829,7 @@ Column {
                 id: conversation
                 x: 4
                 y: 4
-                width: scroller.width - 2 * x
+                width: scroller.width - 2 * x - (chatScroll.visible ? chatScroll.width + 4 : 0)
                 spacing: 10
 
                 Repeater {
