@@ -652,6 +652,19 @@ Column {
 
             delegate: ItemRow {}
 
+            // Shows only once the investigations overflow the list.
+            ScrollBar.vertical: ScrollBar {
+                id: listScroll
+                // AsNeeded alone hides only the style's own handle, not this one.
+                visible: size < 1.0
+                contentItem: Rectangle {
+                    implicitWidth: 6
+                    radius: width / 2
+                    color: root.shell.palette.fg
+                    opacity: listScroll.pressed ? 0.9 : 0.4
+                }
+            }
+
             Text {
                 visible: list.count === 0
                 anchors.centerIn: parent
@@ -1072,7 +1085,8 @@ Column {
         readonly property string subtitle: (modelData.projects.join(", ") || "no project") + "  ·  " + Format.ago(modelData.createdAt) + marks
         readonly property bool stacked: subtitleMetrics.width > width - 44
 
-        width: ListView.view.width
+        // Clear of the list's scrollbar while it shows.
+        width: ListView.view.width - (listScroll.visible ? listScroll.width + 4 : 0)
         height: stacked ? 66 : 52
         radius: 4
         color: selected ? root.shell.palette.sel : "transparent"
