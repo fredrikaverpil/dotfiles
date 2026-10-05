@@ -93,10 +93,12 @@ flowchart LR
   next run starts with (`settings`, kept in `settings.json`). **Run**,
   **Re-run** and the other starts store them on the investigation, which shows
   them in its header; its follow-ups and branches keep using them.
-- The filters list investigations by tag, from the `tags` the daemon writes to
-  `settings.json`. **New** under a tag's filter drafts an
-  investigation with that tag, so the filter lists it. The tag buttons under an
-  investigation's header set or clear its tag (`tag`) in any status.
+- **Filter** under the search field, or Filter › in the palette, lists
+  investigations by tag (from the `tags` the daemon writes to `settings.json`,
+  each with its count) or by project. Each active filter shows as a chip beside
+  the button, and a click on it clears it. **New** under a tag's filter drafts
+  an investigation with that tag, so the filter lists it. The tag buttons under
+  an investigation's header set or clear its tag (`tag`) in any status.
 - `Ctrl+K` or `?` opens the palette over the window on what has focus, nearest
   first: a row's investigation, or the picked set when there is one; the
   draft's form, the conversation (with Copy selection while text is selected)

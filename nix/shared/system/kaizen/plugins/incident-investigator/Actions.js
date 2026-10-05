@@ -5,8 +5,9 @@
 // its action with its arg on its ids; a key shows only where it runs the row.
 //
 // state: listed (the investigations the list shows), picked (the picked ones),
-// clearable (a count), clearLabel, tags, model, effort, tagFilter,
-// projectFilter and projects (those the list names).
+// clearable (a count), clearLabel, tags, tagCounts (every investigation's,
+// by tag name, "" for all), model, effort, tagFilter, projectFilter and
+// projects (those the list names).
 
 var separator = { isSeparator: true, enabled: true }
 
@@ -130,18 +131,24 @@ function pickedRows(state, keyed) {
   return about(state.picked.map(function(item) { return item.id }), rows)
 }
 
+// The filters: Tag › with each tag's count, Project ›.
+function filterRows(state) {
+  var rows = []
+  if (state.tags.length)
+    rows.push(submenu({ key: "filter.tag", text: "Tag", glyph: Format.icons.tag, detail: state.tagFilter }, [""].concat(state.tags.map(function(tag) { return tag.name })).map(function(name) {
+      return Object.assign(radio("filter.tag." + name, name || "All", name === state.tagFilter, "filterTag", name), { detail: String(state.tagCounts[name] || 0) })
+    })))
+  if (state.projects.length)
+    rows.push(submenu({ key: "filter.project", text: "Project", glyph: Format.icons.filter, detail: state.projectFilter.join(", ") }, [radio("filter.project.", "All projects", !state.projectFilter.length, "filterProject", "")].concat(state.projects.map(function(project) {
+      return check("filter.project." + project, project, state.projectFilter.indexOf(project) >= 0, "filterProject", project)
+    }))))
+  return rows
+}
+
 // The list and its search field.
 function listRows(state) {
   var rows = [row({ key: "search", text: "Search list", glyph: Format.icons.filter, action: "search" })]
-  var filters = []
-  if (state.tags.length)
-    filters.push(submenu({ key: "filter.tag", text: "Tag", glyph: Format.icons.tag, detail: state.tagFilter }, [radio("filter.tag.", "All", !state.tagFilter, "filterTag", "")].concat(state.tags.map(function(tag) {
-      return radio("filter.tag." + tag.name, tag.name, tag.name === state.tagFilter, "filterTag", tag.name)
-    }))))
-  if (state.projects.length)
-    filters.push(submenu({ key: "filter.project", text: "Project", glyph: Format.icons.filter, detail: state.projectFilter.join(", ") }, [radio("filter.project.", "All projects", !state.projectFilter.length, "filterProject", "")].concat(state.projects.map(function(project) {
-      return check("filter.project." + project, project, state.projectFilter.indexOf(project) >= 0, "filterProject", project)
-    }))))
+  var filters = filterRows(state)
   if (filters.length)
     rows.push(submenu({ key: "filter", text: "Filter", glyph: Format.icons.filter, detail: [state.tagFilter].concat(state.projectFilter).filter(Boolean).join(", ") }, filters))
   if (state.listed.length > 1)
