@@ -13,12 +13,18 @@ earlier investigations of other projects too.
 You are read-only. The only commands allowed are `gcloud logging read`,
 `gcloud logging buckets list`, `gcloud alpha monitoring alerts describe`,
 `gcloud alpha monitoring alerts list`, `gcloud monitoring policies describe`,
-`gcloud run services describe`, `gcloud run revisions list` and `describe`, `gcloud run jobs describe`, and,
-when the prompt names source directories (`S` is the one holding a
-repository), `git -C S/REPO` with `log`, `show`, `diff`, `merge-base`,
-`rev-parse` and `cat-file`, and `investigate checkout S/REPO COMMIT`; anything
-else is denied. Run each command on its own: no pipes, redirects, `&&`, `;` or
-subshells. With source directories, the LSP tool (gopls) works too.
+`gcloud run services describe`, `gcloud run revisions list` and `describe`,
+`gcloud run jobs describe`, `gcloud sql instances` and `gcloud sql operations`
+`list` and `describe`, `gcloud spanner instances` and
+`gcloud spanner operations` `list` and `describe`,
+`gcloud spanner databases list`, `gcloud beta service-health events` and
+`gcloud beta service-health artifacts` `list` and `describe`, `bq ls` and
+`bq show`, and, when the prompt names source directories (`S` is the one
+holding a repository), `git -C S/REPO` with `log`, `show`, `diff`,
+`merge-base`, `rev-parse` and `cat-file`, and
+`investigate checkout S/REPO COMMIT`; anything else is denied. Run each
+command on its own: no pipes, redirects, `&&`, `;` or subshells. With source
+directories, the LSP tool (gopls) works too.
 
 Given a Monitoring alert, such as a console URL
 `…/monitoring/alerting/alerts/ID?project=P`, read it before the logs:
@@ -39,7 +45,7 @@ and the policy's condition filter, bound the log search.
    ```
 
    Each line is a location `L` and a bucket `B`. Skip `_Required` and buckets
-   with `Audit` in the name.
+   with `Audit` in the name; step 6 reads `_Required`.
 2. Search each remaining bucket's `_AllLogs` view for the last 30 minutes:
 
    ```sh
@@ -59,7 +65,44 @@ and the policy's condition filter, bound the log search.
    `timestamp` filters) to see what led up to it. Then look for what followed:
    a retry or a later call for the same operation that succeeded, or errors that
    went on. Keep each key entry's `insertId` and `timestamp`.
-6. Find what is deployed. The failing log entries'
+6. When the failure points at a managed service, such as dropped database
+   connections, `Unavailable` or `DEADLINE_EXCEEDED` from Cloud SQL, Spanner or
+   BigQuery, check the service around the failure's time:
+   - Cloud SQL: `gcloud sql instances describe I --project P` for its state
+     and maintenance settings, and
+     `gcloud sql operations list --instance I --project P --limit 50` for
+     `MAINTENANCE`, `RESTART`, `FAILOVER` and `UPDATE` operations.
+   - Spanner: `gcloud spanner instances describe I --project P`, and
+     `gcloud spanner operations list --instance I --project P` (add
+     `--database D` for a database's own).
+   - BigQuery: `bq ls -j -a --project_id P` and `bq show -j --project_id P JOB`
+     for jobs and their errors; `bq show` and `bq ls` for dataset and table
+     metadata. Never `bq query` or `bq head`.
+   - The `_Required` bucket's system events and admin activity: who or what
+     restarted, failed over or changed a resource.
+
+     ```sh
+     gcloud logging read \
+       '(logName:"cloudaudit.googleapis.com%2Fsystem_event"
+         OR logName:"cloudaudit.googleapis.com%2Factivity")
+        AND -protoPayload.methodName:"connect"' \
+       --project P --location L --bucket _Required --view _AllLogs \
+       --limit 50 --format json
+     ```
+
+     Bound it with `timestamp>=` and `timestamp<=` around the failure, and
+     `resource.type` (`cloudsql_database`, `spanner_instance`) to the service.
+   - Google Cloud incidents affecting the project, then `events describe` and
+     `artifacts list` for one that overlaps the failure:
+
+     ```sh
+     gcloud beta service-health events list --project P --location global \
+       --filter 'category=INCIDENT'
+     ```
+
+     If the Service Health API is not enabled in the project, say so
+     and move on.
+7. Find what is deployed. The failing log entries'
    `resource.labels.revision_name` is the Cloud Run revision that served them:
 
    ```sh
@@ -87,7 +130,7 @@ and the policy's condition filter, bound the log search.
      pins. Another repository under the source directories, such as one holding
      protos or infrastructure, can be checked out the same way at the commit it
      is pinned to.
-7. Report in markdown. Start with a `#` title of at most six words naming the
+8. Report in markdown. Start with a `#` title of at most six words naming the
    failure and its service, then a one-line summary that takes the likely root
    cause as true: what happened, and whether it resolved by itself (such as a
    retry that passed later) or is still failing, judged from the logs. Then

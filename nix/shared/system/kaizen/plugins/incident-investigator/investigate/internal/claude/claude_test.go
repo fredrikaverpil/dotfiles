@@ -175,7 +175,15 @@ func TestCommand(t *testing.T) {
 		"--allowedTools", "Bash(gcloud logging read *)", "Bash(gcloud logging buckets list *)",
 		"Bash(gcloud alpha monitoring alerts describe *)", "Bash(gcloud alpha monitoring alerts list *)",
 		"Bash(gcloud monitoring policies describe *)", "Bash(gcloud run services describe *)",
-		"Bash(gcloud run revisions list *)", "Bash(gcloud run revisions describe *)", "Bash(gcloud run jobs describe *)", "Read", "Grep",
+		"Bash(gcloud run revisions list *)", "Bash(gcloud run revisions describe *)", "Bash(gcloud run jobs describe *)",
+		"Bash(gcloud sql instances list *)", "Bash(gcloud sql instances describe *)",
+		"Bash(gcloud sql operations list *)", "Bash(gcloud sql operations describe *)",
+		"Bash(gcloud spanner instances list *)", "Bash(gcloud spanner instances describe *)",
+		"Bash(gcloud spanner databases list *)",
+		"Bash(gcloud spanner operations list *)", "Bash(gcloud spanner operations describe *)",
+		"Bash(gcloud beta service-health events list *)", "Bash(gcloud beta service-health events describe *)",
+		"Bash(gcloud beta service-health artifacts list *)", "Bash(gcloud beta service-health artifacts describe *)",
+		"Bash(bq ls *)", "Bash(bq show *)", "Read", "Grep",
 	}
 	for _, tt := range []struct {
 		name         string
@@ -185,7 +193,9 @@ func TestCommand(t *testing.T) {
 	}{
 		{
 			name: "logs only",
-			want: slices.Concat(base, []string{"--tools", "Bash,Read,Grep"}, allowed),
+			want: slices.Concat(
+				base, []string{"--tools", "Bash,Read,Grep"}, allowed, []string{"--disallowedTools", "Bash(bq * --apilog*)"},
+			),
 		},
 		{
 			name:         "source dirs and instructions",
@@ -200,7 +210,7 @@ func TestCommand(t *testing.T) {
 					"Bash(git -C " + repo + " log *)", "Bash(git -C " + repo + " show *)", "Bash(git -C " + repo + " diff *)",
 					"Bash(git -C " + repo + " merge-base *)", "Bash(git -C " + repo + " rev-parse *)",
 					"Bash(git -C " + repo + " cat-file *)", "LSP", "Bash(investigate checkout *)",
-					"--disallowedTools", "Bash(git * --output*)",
+					"--disallowedTools", "Bash(bq * --apilog*)", "Bash(git * --output*)",
 				},
 			),
 		},

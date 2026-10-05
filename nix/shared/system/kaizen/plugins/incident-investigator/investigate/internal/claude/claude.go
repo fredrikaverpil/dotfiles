@@ -40,10 +40,11 @@ type Result struct {
 
 // Command returns a turn in dir that starts sessionID, or continues it when resume is set, with instructions appended
 // to the system prompt. Only `gcloud logging read`, `gcloud logging buckets list`, describing and listing Monitoring
-// alerts, describing alert policies, describing Cloud Run services, revisions and jobs, Read and Grep are allowed; any other
-// tool call is denied. Read and Grep reach only dir, the turn's own saved tool output, sourceDirs and goModCache. With
-// sourceDirs, read-only git in the repositories directly under them, `investigate checkout` of one into dir, and LSP
-// are allowed too.
+// alerts, describing alert policies, describing Cloud Run services, revisions and jobs, listing and describing Cloud
+// SQL and Spanner instances and their operations, listing Spanner databases, Service Health events and artifacts,
+// `bq ls`, `bq show`, Read and Grep are allowed; any other tool call is denied. Read and Grep reach only dir, the
+// turn's own saved tool output, sourceDirs and goModCache. With sourceDirs, read-only git in the repositories directly
+// under them, `investigate checkout` of one into dir, and LSP are allowed too.
 func Command(
 	dir, pluginDir string, sourceDirs []string, goModCache, model, effort, sessionID, instructions, prompt string,
 	resume bool,
@@ -76,16 +77,26 @@ func Command(
 		"Bash(gcloud monitoring policies describe *)",
 		"Bash(gcloud run services describe *)", "Bash(gcloud run revisions list *)",
 		"Bash(gcloud run revisions describe *)", "Bash(gcloud run jobs describe *)",
+		"Bash(gcloud sql instances list *)", "Bash(gcloud sql instances describe *)",
+		"Bash(gcloud sql operations list *)", "Bash(gcloud sql operations describe *)",
+		"Bash(gcloud spanner instances list *)", "Bash(gcloud spanner instances describe *)",
+		"Bash(gcloud spanner databases list *)",
+		"Bash(gcloud spanner operations list *)", "Bash(gcloud spanner operations describe *)",
+		"Bash(gcloud beta service-health events list *)", "Bash(gcloud beta service-health events describe *)",
+		"Bash(gcloud beta service-health artifacts list *)", "Bash(gcloud beta service-health artifacts describe *)",
+		// Metadata and jobs only: bq query and head read rows.
+		"Bash(bq ls *)", "Bash(bq show *)",
 		"Read", "Grep",
 	}
-	var denied []string
+	// bq writes its API log to the file --apilog names.
+	denied := []string{"Bash(bq * --apilog*)"}
 	if len(sourceDirs) > 0 {
 		for _, sourceDir := range sourceDirs {
 			args = append(args, "--add-dir", sourceDir)
 			allowed = append(allowed, gitRules(sourceDir)...)
 		}
 		// diff and show write a file for --output.
-		denied = []string{"Bash(git * --output*)"}
+		denied = append(denied, "Bash(git * --output*)")
 		// The plugin's gopls serves LSP.
 		tools += ",LSP"
 		allowed = append(allowed, "LSP", "Bash(investigate checkout *)")
@@ -96,10 +107,8 @@ func Command(
 	args = append(args, "--tools", tools)
 	args = append(args, "--allowedTools")
 	args = append(args, allowed...)
-	if denied != nil {
-		args = append(args, "--disallowedTools")
-		args = append(args, denied...)
-	}
+	args = append(args, "--disallowedTools")
+	args = append(args, denied...)
 	cmd := exec.Command("claude", args...)
 	cmd.Dir = dir
 	// On stdin, so a prompt starting with "-" is not read as a flag.
