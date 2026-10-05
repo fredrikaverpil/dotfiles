@@ -48,6 +48,8 @@ Column {
     })
     readonly property var items: all.filter(item => (!tagFilter || item.tag === tagFilter) && (!projectFilter.length || item.projects.some(project => projectFilter.includes(project))) && Format.matches(item, query))
     readonly property var current: items.find(item => item.id === selectedId) || null
+    // What the selected investigation was combined from, which the list marks.
+    readonly property var sourceIds: current && current.combined ? current.combined : []
 
     // The selection as last loaded. It outlives a deleted or filtered-out selection,
     // so the view being torn down never reads null.
@@ -183,6 +185,7 @@ Column {
 
     // What the palette's scopes read.
     readonly property var actionState: ({
+            all: all,
             listed: items,
             picked: pickedItems,
             clearable: clearable.length,
@@ -287,8 +290,13 @@ Column {
             toggleProject(arg);
     }
 
-    // Selects an investigation and focuses its row.
+    // Selects an investigation and focuses its row, clearing the filters that hide it.
     function goTo(id) {
+        if (!items.some(item => item.id === id)) {
+            tagFilter = "";
+            projectFilter = [];
+            searchField.text = "";
+        }
         picked = [];
         selectedId = id;
         focusSelected();
@@ -1057,9 +1065,10 @@ Column {
         required property var modelData
         required property int index
         readonly property bool selected: root.selectedId === modelData.id || root.picked.indexOf(modelData.id) >= 0
+        readonly property string marks: (modelData.alert ? "  ·  " + Format.icons.alert : "") + (modelData.combined ? "  ·  " + Format.icons.combined : "")
 
         // The project and the age on separate lines when they do not fit on one.
-        readonly property string subtitle: (modelData.projects.join(", ") || "no project") + "  ·  " + Format.ago(modelData.createdAt) + (modelData.alert ? "  ·  " + Format.icons.alert : "")
+        readonly property string subtitle: (modelData.projects.join(", ") || "no project") + "  ·  " + Format.ago(modelData.createdAt) + marks
         readonly property bool stacked: subtitleMetrics.width > width - 44
 
         width: ListView.view.width
@@ -1110,6 +1119,18 @@ Column {
                 else
                     root.click(row.index, mouse.modifiers);
             }
+        }
+
+        // A source of the selected combined investigation.
+        Rectangle {
+            visible: root.sourceIds.indexOf(row.modelData.id) >= 0
+            anchors.left: parent.left
+            anchors.leftMargin: 2
+            anchors.verticalCenter: parent.verticalCenter
+            width: 3
+            height: parent.height - 16
+            radius: 1
+            color: root.shell.palette.water
         }
 
         Text {
@@ -1179,7 +1200,58 @@ Column {
                 color: root.shell.palette.off
                 font.family: Ui.Fonts.mono
                 font.pixelSize: 11
-                text: Format.ago(row.modelData.createdAt) + (row.modelData.alert ? "  ·  " + Format.icons.alert : "")
+                text: Format.ago(row.modelData.createdAt) + row.marks
+            }
+        }
+    }
+
+    // The investigations a combined one was drafted from, each a button to its
+    // row; a deleted one shows its id.
+    component Sources: Flow {
+        id: sources
+
+        property var ids: []
+
+        visible: ids.length > 0
+        width: parent ? parent.width : 0
+        spacing: 8
+
+        Meta {
+            height: 26
+            verticalAlignment: Text.AlignVCenter
+            text: Format.icons.combined + "  Combined from"
+        }
+
+        Repeater {
+            model: sources.ids
+
+            delegate: Loader {
+                id: sourceSlot
+
+                required property string modelData
+                readonly property var investigation: root.all.find(each => each.id === modelData) || null
+
+                sourceComponent: investigation ? sourceButton : sourceGone
+
+                Component {
+                    id: sourceButton
+
+                    Btn {
+                        icon: Format.icons[sourceSlot.investigation.status]
+                        label: Format.name(sourceSlot.investigation)
+                        onClicked: root.goTo(sourceSlot.modelData)
+                    }
+                }
+
+                Component {
+                    id: sourceGone
+
+                    Meta {
+                        height: 26
+                        verticalAlignment: Text.AlignVCenter
+                        text: sourceSlot.modelData + " (deleted)"
+                    }
+                }
             }
         }
     }
@@ -1320,7 +1392,8 @@ Column {
                     id: itemId,
                     tag: tag,
                     projects: projects,
-                    choices: [...new Set(root.projects.concat(projects))]
+                    choices: [...new Set(root.projects.concat(projects))],
+                    combined: item.combined || []
                 })
             };
         }
@@ -1370,11 +1443,15 @@ Column {
             font.family: Ui.Fonts.mono
             font.pixelSize: 16
             font.bold: true
-            text: form.item.alert ? "Draft from alert" : "New investigation"
+            text: form.item.alert ? "Draft from alert" : form.item.combined ? "Combined investigation" : "New investigation"
         }
 
         Alert {
             alert: form.item.alert
+        }
+
+        Sources {
+            ids: form.item.combined || []
         }
 
         Meta {
@@ -1601,6 +1678,10 @@ Column {
 
         Alert {
             alert: detail.item.alert
+        }
+
+        Sources {
+            ids: detail.item.combined || []
         }
 
         // The user and organization ids the tool output named; a name column joins them once they can be resolved.

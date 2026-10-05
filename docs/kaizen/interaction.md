@@ -174,6 +174,9 @@ the row.
   its notes, and runs on `Ctrl+Enter`; Projects › adds a project typed in it.
   The follow-up field carries Model and Effort, which pick what the next run
   starts with (`settings`); the conversation's header carries Tag.
+- A combined investigation's sources are buttons under Combined from, and
+  Combined from › in its palette; each goes to the source's row. While it is
+  selected, the list marks its sources.
 - A row's context menu holds Open, Run or Re-run, Tag ›, Combine (with a picked
   set) and Delete. A message's holds Copy (Copy selection while text is
   selected), Edit (your own) and Branch.

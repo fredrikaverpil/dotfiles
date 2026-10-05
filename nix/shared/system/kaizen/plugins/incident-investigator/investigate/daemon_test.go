@@ -57,6 +57,7 @@ func TestCombine(t *testing.T) {
 					{Kind: "user", ID: "alice", Count: 3},
 					{Kind: "organization", ID: "org1", Count: 1},
 				},
+				Combined: []string{"aaaaaa", "bbbbbb"},
 			},
 		},
 		{name: "one", ids: []string{"aaaaaa"}, wantErr: "at least two"},
