@@ -175,7 +175,7 @@ func TestCommand(t *testing.T) {
 		"--allowedTools", "Bash(gcloud logging read *)", "Bash(gcloud logging buckets list *)",
 		"Bash(gcloud alpha monitoring alerts describe *)", "Bash(gcloud alpha monitoring alerts list *)",
 		"Bash(gcloud monitoring policies describe *)", "Bash(gcloud run services describe *)",
-		"Bash(gcloud run revisions list *)", "Bash(gcloud run revisions describe *)", "Read", "Grep",
+		"Bash(gcloud run revisions list *)", "Bash(gcloud run revisions describe *)", "Bash(gcloud run jobs describe *)", "Read", "Grep",
 	}
 	for _, tt := range []struct {
 		name         string

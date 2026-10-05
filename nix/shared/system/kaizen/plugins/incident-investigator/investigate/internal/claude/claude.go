@@ -40,7 +40,7 @@ type Result struct {
 
 // Command returns a turn in dir that starts sessionID, or continues it when resume is set, with instructions appended
 // to the system prompt. Only `gcloud logging read`, `gcloud logging buckets list`, describing and listing Monitoring
-// alerts, describing alert policies, describing Cloud Run services and revisions, Read and Grep are allowed; any other
+// alerts, describing alert policies, describing Cloud Run services, revisions and jobs, Read and Grep are allowed; any other
 // tool call is denied. Read and Grep reach only dir, the turn's own saved tool output, sourceDirs and goModCache. With
 // sourceDirs, read-only git in the repositories directly under them, `investigate checkout` of one into dir, and LSP
 // are allowed too.
@@ -75,7 +75,7 @@ func Command(
 		"Bash(gcloud alpha monitoring alerts describe *)", "Bash(gcloud alpha monitoring alerts list *)",
 		"Bash(gcloud monitoring policies describe *)",
 		"Bash(gcloud run services describe *)", "Bash(gcloud run revisions list *)",
-		"Bash(gcloud run revisions describe *)",
+		"Bash(gcloud run revisions describe *)", "Bash(gcloud run jobs describe *)",
 		"Read", "Grep",
 	}
 	var denied []string
