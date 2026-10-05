@@ -280,9 +280,10 @@ func show(id string) error {
 	return callWindow("reveal", id)
 }
 
-// callWindow runs a function of the window's IPC handler.
+// callWindow runs a function of the window's IPC handler. The daemon's unit has no WAYLAND_DISPLAY, so instances
+// are not filtered by display.
 func callWindow(function string, args ...string) error {
-	cmd := append([]string{"ipc", "call", "incident-investigator", function}, args...)
+	cmd := append([]string{"ipc", "--any-display", "call", "incident-investigator", function}, args...)
 	if out, err := exec.Command("qs", cmd...).CombinedOutput(); err != nil {
 		return fmt.Errorf("qs ipc call %s: %v: %s", function, err, out)
 	}
