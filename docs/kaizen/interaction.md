@@ -137,38 +137,25 @@ investigator: it stays up while others have focus, and niri's window binds
 - The launcher only opens an application (its plugin node) and shows its tray
   menu. The application's own actions stay in its palette; the shell's tree
   never holds them.
-- `Ctrl+K` opens the application's palette: every action with its key, the
-  focused object's first.
-- Single-letter keys act on the focused object while no text field has focus.
-  In a text field only Esc, Enter and Ctrl chords act; `Ctrl+Enter` submits.
-  An application's keys never become niri binds.
-- Frequent actions get a single letter; every action is in the palette.
-- A property (tag, project, model) is a chip showing its value. Its key or a
-  click opens a context menu on the chip; picking a row sets it.
+- `Ctrl+K` opens the application's palette: every action, with its key when
+  it has one, the focused object's first.
+- Single-letter keys are optional. An application may give frequent actions
+  one; it acts on the focused object while no text field has focus. In a text
+  field only Esc, Enter and Ctrl chords act: Esc leaves the field, and
+  `Ctrl+Enter` submits. An application's keys never become niri binds.
+- A property (tag, project, model) is a chip showing its value. A click, or
+  its key when it has one, opens a context menu on the chip; picking a row
+  sets it.
 - A right-click on an object opens its context menu: the palette's rows for
   that object.
 - Lists: `↑` `↓` (and `j` `k`) move, Enter opens, Space picks, Esc unpicks,
-  `/` searches, Backspace or Delete deletes.
+  Backspace or Delete deletes.
 - A destructive action asks inline: `y` or Enter confirms, `n` or Esc cancels.
 
 ### Incident investigator
 
-| Key | Action |
-| --- | --- |
-| `Ctrl+K` | palette |
-| `c` | new investigation, with the filtered tag |
-| `/` | search the list |
-| `f` | filter menu: Tag ›, Project › |
-| `t` | tag the focused or picked investigations |
-| `p` | projects |
-| `m` | model of the next run |
-| `e` | effort of the next run |
-| `r` | run a draft, re-run a finished one |
-| `a` | ask a follow-up |
-| `s` | stop the running turn |
-| `b` | branch from the focused message |
-| `y` | copy the focused message |
-| `Backspace` | delete |
+The investigator has no single-letter action keys: `Ctrl+K` (or `?` outside a
+text field) opens the palette, and the list takes the keys above.
 
 - Active filters show as chips above the list; each clears with a click or
   from the filter menu.

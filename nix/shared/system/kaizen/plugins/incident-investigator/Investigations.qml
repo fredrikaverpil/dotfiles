@@ -86,10 +86,6 @@ Column {
     // Running ones stay; cancel them first.
     readonly property var deletable: pickedItems.filter(item => item.status !== "running")
 
-    function deletePicked() {
-        deleteItems(deletable.map(item => item.id));
-    }
-
     // Removes the investigations; the selection moves to the nearest one left.
     function deleteItems(gone) {
         const index = items.findIndex(item => item.id === selectedId);
@@ -120,6 +116,17 @@ Column {
         Qt.callLater(focusSelected);
     }
 
+    // An inline confirm's keys: y or Enter confirms; n, Esc or Backspace cancels.
+    function answerKey(event, answer) {
+        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Y)
+            answer(true);
+        else if (event.key === Qt.Key_Escape || event.key === Qt.Key_N || event.key === Qt.Key_Backspace)
+            answer(false);
+        else
+            return;
+        event.accepted = true;
+    }
+
     function combinePicked() {
         run(["combine"].concat(pickedItems.map(item => item.id)));
         picked = [];
@@ -129,6 +136,17 @@ Column {
     readonly property var clearable: items.filter(item => item.status !== "running")
     readonly property string clearLabel: projectFilter.length || query ? "Clear listed" : tagFilter ? "Clear " + tagFilter : "Clear all"
     property bool confirmingClear: false
+    // Set by the button, the palette and IPC alike.
+    onConfirmingClearChanged: if (confirmingClear)
+        Qt.callLater(clearBar.forceActiveFocus)
+
+    function answerClear(yes) {
+        if (yes)
+            clearListed();
+        else
+            confirmingClear = false;
+        Qt.callLater(focusSelected);
+    }
 
     // A draft with the filtered tag, so the filter lists it.
     function draft() {
@@ -262,11 +280,21 @@ Column {
         focusRow(index);
     }
 
-    // Focuses the selected row, if the filter lists it.
+    // Focuses the selected row, if the filter lists it, else the content, so keys still land.
     function focusSelected() {
         const index = items.findIndex(item => item.id === selectedId);
         if (index >= 0)
             focusRow(index);
+        else
+            root.forceActiveFocus();
+    }
+
+    // Esc in a text field: unpicks, then leaves the field.
+    function leaveField() {
+        if (picked.length)
+            picked = [];
+        else
+            focusSelected();
     }
 
     function focusRow(index) {
@@ -417,22 +445,32 @@ Column {
                 onPicked: option => root.run(["settings", "-effort=" + option])
             }
 
-            Meta {
+            // Asks to confirm Clear.
+            Row {
+                id: clearBar
                 visible: root.confirmingClear
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Clear " + root.clearable.length + "?"
-            }
+                spacing: 8
 
-            Btn {
-                visible: root.confirmingClear
-                label: "Yes"
-                danger: true
-                onClicked: root.clearListed()
-            }
-            Btn {
-                visible: root.confirmingClear
-                label: "No"
-                onClicked: root.confirmingClear = false
+                Keys.onPressed: event => root.answerKey(event, root.answerClear)
+
+                Meta {
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: clearBar.activeFocus ? root.shell.palette.fg : root.shell.palette.off
+                    text: "Clear " + root.clearable.length + "?"
+                }
+                Btn {
+                    label: "Yes"
+                    danger: true
+                    onClicked: root.answerClear(true)
+                }
+                Btn {
+                    label: "No"
+                    onClicked: root.answerClear(false)
+                }
+                Meta {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "y / n"
+                }
             }
 
             Btn {
@@ -645,15 +683,7 @@ Column {
             border.color: activeFocus ? root.shell.palette.rose : root.shell.palette.dim
             border.width: 1
 
-            Keys.onPressed: event => {
-                if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Y)
-                    root.answerDelete(true);
-                else if (event.key === Qt.Key_Escape || event.key === Qt.Key_N || event.key === Qt.Key_Backspace)
-                    root.answerDelete(false);
-                else
-                    return;
-                event.accepted = true;
-            }
+            Keys.onPressed: event => root.answerKey(event, root.answerDelete)
 
             Column {
                 id: barColumn
@@ -750,14 +780,9 @@ Column {
             }
 
             Column {
-                id: multi
-
-                property bool confirming: false
-
                 visible: root.pickedItems.length >= 2
                 width: parent.width
                 spacing: 8
-                onVisibleChanged: confirming = false
 
                 Text {
                     color: root.shell.palette.fg
@@ -793,27 +818,11 @@ Column {
                         onClicked: root.picked = []
                     }
                     Btn {
-                        visible: !multi.confirming && root.deletable.length > 0
+                        visible: root.deletable.length > 0
                         icon: Format.icons.trash
                         label: "Delete " + root.deletable.length
                         danger: true
-                        onClicked: multi.confirming = true
-                    }
-                    Meta {
-                        visible: multi.confirming
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: "Delete " + root.deletable.length + "?"
-                    }
-                    Btn {
-                        visible: multi.confirming
-                        label: "Yes"
-                        danger: true
-                        onClicked: root.deletePicked()
-                    }
-                    Btn {
-                        visible: multi.confirming
-                        label: "No"
-                        onClicked: multi.confirming = false
+                        onClicked: root.askDelete(root.selectedId)
                     }
                 }
             }
@@ -1279,6 +1288,7 @@ Column {
             font.family: Ui.Fonts.mono
             font.pixelSize: 13
             wrapMode: field.multiline ? TextEdit.Wrap : TextEdit.NoWrap
+            Keys.onEscapePressed: root.leaveField()
             // A single-line field takes Enter as submit, never a newline.
             Keys.onReturnPressed: event => {
                 if (field.multiline)
@@ -1602,7 +1612,6 @@ Column {
         readonly property int answerIndex: item.messages.map(message => message.kind).lastIndexOf("assistant")
         // A follow-up resumes the session; a draft that never ran has none.
         readonly property bool canFollowUp: !running && item.sessionId !== ""
-        property bool confirming: false
 
         function send() {
             if (!canFollowUp || !followField.text.trim())
@@ -1716,28 +1725,11 @@ Column {
                 onClicked: root.copy(detail.item.messages[detail.answerIndex].text)
             }
             Btn {
-                visible: !detail.running && !detail.confirming
+                visible: !detail.running
                 icon: Format.icons.trash
                 label: "Delete"
                 danger: true
-                onClicked: detail.confirming = true
-            }
-
-            Meta {
-                visible: detail.confirming
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Delete?"
-            }
-            Btn {
-                visible: detail.confirming
-                label: "Yes"
-                danger: true
-                onClicked: root.remove(detail.item.id)
-            }
-            Btn {
-                visible: detail.confirming
-                label: "No"
-                onClicked: detail.confirming = false
+                onClicked: root.askDelete(detail.item.id)
             }
         }
 
