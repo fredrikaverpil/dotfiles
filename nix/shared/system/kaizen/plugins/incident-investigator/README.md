@@ -106,8 +106,8 @@ flowchart LR
   investigation's header sets or clears its tag (`tag`) in any status.
 - `Ctrl+K` or `?` opens the palette over the window on what has focus, nearest
   first: a row's investigation, or the picked set when there is one; a
-  message (Copy, Copy selection while text is selected, and Edit and Branch on
-  your own); the draft's form, the conversation or the picked set's view; the
+  message (Copy, or Copy selection while text is selected, and Edit and Branch
+  on your own); the draft's form, the conversation or the picked set's view; the
   list (Search list, Filter ›, Pick all listed, Go to ›); then the window (New,
   Clear, Model ›, Effort ›). A key shows where it runs the row. `Actions.js`
   lists the rows per scope. `Ctrl+Enter` in a draft's trace id or notes runs

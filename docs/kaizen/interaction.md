@@ -175,5 +175,5 @@ the row.
   The follow-up field carries Model and Effort, which pick what the next run
   starts with (`settings`); the conversation's header carries Tag.
 - A row's context menu holds Open, Run or Re-run, Tag ›, Combine (with a picked
-  set) and Delete. A message's holds Copy, Copy selection, Edit (your own) and
-  Branch.
+  set) and Delete. A message's holds Copy (Copy selection while text is
+  selected), Edit (your own) and Branch.
