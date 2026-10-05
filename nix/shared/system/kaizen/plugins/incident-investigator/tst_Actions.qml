@@ -54,6 +54,12 @@ TestCase {
         });
     }
 
+    function counted(row, count) {
+        return Object.assign({}, row, {
+            detail: count
+        });
+    }
+
     // The rows with ids set, their submenus' too.
     function about(ids, rows) {
         return rows.map(each => Object.assign({}, each, {
@@ -95,6 +101,7 @@ TestCase {
             clearable: 0,
             clearLabel: "Clear all",
             tags: [],
+            tagCounts: {},
             model: Format.models[0],
             effort: "high",
             tagFilter: "",
@@ -460,6 +467,54 @@ TestCase {
         compare(got, data.want);
     }
 
+    function test_filterRows_data() {
+        return [
+            {
+                tag: "no tags or projects",
+                state: state({}),
+                want: []
+            },
+            {
+                tag: "tags counted, all filtered",
+                state: state({
+                    tags: tags,
+                    tagCounts: {
+                        "": 3,
+                        prod: 2
+                    }
+                }),
+                want: [row({
+                        key: "filter.tag",
+                        text: "Tag",
+                        glyph: Format.icons.tag,
+                        hasChildren: true,
+                        children: [counted(radio("filter.tag.", "All", true, "filterTag", ""), "3"), counted(radio("filter.tag.prod", "prod", false, "filterTag", "prod"), "2"), counted(radio("filter.tag.dev", "dev", false, "filterTag", "dev"), "0")]
+                    })]
+            },
+            {
+                tag: "projects only",
+                state: state({
+                    projectFilter: ["p-dev"],
+                    projects: ["p-dev", "p-prod"]
+                }),
+                want: [row({
+                        key: "filter.project",
+                        text: "Project",
+                        glyph: Format.icons.filter,
+                        detail: "p-dev",
+                        hasChildren: true,
+                        children: [radio("filter.project.", "All projects", false, "filterProject", ""), check("filter.project.p-dev", "p-dev", true, "filterProject", "p-dev"), check("filter.project.p-prod", "p-prod", false, "filterProject", "p-prod")]
+                    })]
+            }
+        ];
+    }
+
+    function test_filterRows(data) {
+        const got = Actions.filterRows(data.state);
+
+        compare(got, data.want);
+    }
+
     function test_listRows_data() {
         const search = row({
             key: "search",
@@ -488,6 +543,10 @@ TestCase {
                     listed: [first, second],
                     picked: [second],
                     tags: tags,
+                    tagCounts: {
+                        "": 2,
+                        dev: 1
+                    },
                     tagFilter: "dev",
                     projectFilter: ["p-dev"],
                     projects: ["p-dev", "p-prod"]
@@ -504,7 +563,7 @@ TestCase {
                                 glyph: Format.icons.tag,
                                 detail: "dev",
                                 hasChildren: true,
-                                children: [radio("filter.tag.", "All", false, "filterTag", ""), radio("filter.tag.prod", "prod", false, "filterTag", "prod"), radio("filter.tag.dev", "dev", true, "filterTag", "dev")]
+                                children: [counted(radio("filter.tag.", "All", false, "filterTag", ""), "2"), counted(radio("filter.tag.prod", "prod", false, "filterTag", "prod"), "0"), counted(radio("filter.tag.dev", "dev", true, "filterTag", "dev"), "1")]
                             }), row({
                                 key: "filter.project",
                                 text: "Project",

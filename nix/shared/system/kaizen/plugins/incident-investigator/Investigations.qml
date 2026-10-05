@@ -37,6 +37,14 @@ Column {
     property real listWidth: 170
     // The projects the investigations name, for the filter.
     readonly property var listedProjects: [...new Set(all.reduce((names, item) => names.concat(item.projects), []))].sort()
+    // Every investigation's count by tag, "" for all, for the filter.
+    readonly property var tagCounts: all.reduce((counts, item) => {
+        if (item.tag)
+            counts[item.tag] = (counts[item.tag] || 0) + 1;
+        return counts;
+    }, {
+        "": all.length
+    })
     readonly property var items: all.filter(item => (!tagFilter || item.tag === tagFilter) && (!projectFilter.length || item.projects.some(project => projectFilter.includes(project))) && Format.matches(item, query))
     readonly property var current: items.find(item => item.id === selectedId) || null
 
@@ -179,6 +187,7 @@ Column {
             clearable: clearable.length,
             clearLabel: clearLabel,
             tags: tags,
+            tagCounts: tagCounts,
             model: model,
             effort: effort,
             tagFilter: tagFilter,
@@ -266,7 +275,7 @@ Column {
         else if (action === "filterTag")
             tagFilter = arg;
         else if (action === "filterProject")
-            projectFilterBox.toggle(arg);
+            toggleProject(arg);
     }
 
     // Selects an investigation and focuses its row.
@@ -381,8 +390,9 @@ Column {
             row.forceActiveFocus();
     }
 
-    function countOf(tag) {
-        return all.filter(item => !tag || item.tag === tag).length;
+    // "" lists every project.
+    function toggleProject(project) {
+        projectFilter = !project ? [] : projectFilter.includes(project) ? projectFilter.filter(other => other !== project) : projectFilter.concat([project]);
     }
 
     function statusColor(status) {
@@ -444,65 +454,19 @@ Column {
         onExited: Qt.callLater(root.next)
     }
 
-    // Title, filters, model and the new button. Above the body, which the open lists overlap.
+    // Title, model and the new button. Above the body, which the open lists overlap.
     Item {
         z: 5
         width: parent.width
         height: 30
 
         Text {
-            id: title
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             color: root.shell.palette.fg
             font.family: Ui.Fonts.mono
             font.pixelSize: 18
             text: "Incident investigator"
-        }
-
-        Row {
-            anchors.left: title.right
-            anchors.leftMargin: 24
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: 6
-
-            Repeater {
-                model: root.tags.length ? [["", "All"]].concat(root.tags.map(tag => [tag.name, tag.name])) : []
-
-                delegate: Rectangle {
-                    id: chip
-
-                    required property var modelData
-                    readonly property bool on: root.tagFilter === modelData[0]
-
-                    width: chipLabel.implicitWidth + 20
-                    height: 24
-                    radius: 12
-                    color: on || chipMouse.containsMouse || activeFocus ? root.shell.palette.sel : "transparent"
-                    border.color: on ? root.tagColor(modelData[0]) : root.shell.palette.dim
-                    border.width: 1
-                    activeFocusOnTab: true
-
-                    Keys.onReturnPressed: root.tagFilter = modelData[0]
-                    Keys.onSpacePressed: root.tagFilter = modelData[0]
-
-                    Text {
-                        id: chipLabel
-                        anchors.centerIn: parent
-                        color: chip.on ? root.shell.palette.fg : root.shell.palette.off
-                        font.family: Ui.Fonts.mono
-                        font.pixelSize: 12
-                        text: chip.modelData[1] + " " + root.countOf(chip.modelData[0])
-                    }
-
-                    MouseArea {
-                        id: chipMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onClicked: root.tagFilter = chip.modelData[0]
-                    }
-                }
-            }
         }
 
         Row {
@@ -588,10 +552,9 @@ Column {
         width: parent.width
         height: parent.height - y
 
-        // Narrows the list; the open project list overlaps it.
+        // Narrows the list.
         Column {
             id: listFilters
-            z: 1
             anchors.left: parent.left
             anchors.top: parent.top
             width: root.listWidth
@@ -610,120 +573,54 @@ Column {
                 onTextChanged: root.query = text.trim()
             }
 
-            Rectangle {
-                id: projectFilterBox
-
-                property bool open: false
-
-                function toggle(project) {
-                    root.projectFilter = !project ? [] : root.projectFilter.includes(project) ? root.projectFilter.filter(other => other !== project) : root.projectFilter.concat([project]);
-                }
-
-                function close() {
-                    open = false;
-                    forceActiveFocus();
-                }
-
+            // The filter menu's button, then a chip per active filter; a click clears it.
+            Flow {
+                id: filterFlow
+                visible: root.tags.length > 0 || root.listedProjects.length > 0
                 width: parent.width
-                height: 28
-                radius: 4
-                color: projectFilterMouse.containsMouse || activeFocus ? root.shell.palette.sel : "transparent"
-                border.color: open ? root.shell.palette.fg : root.shell.palette.dim
-                border.width: 1
-                activeFocusOnTab: true
+                spacing: 6
 
-                Keys.onReturnPressed: open = !open
-                Keys.onSpacePressed: open = !open
-                Keys.onEscapePressed: event => {
-                    event.accepted = open;
-                    open = false;
+                Btn {
+                    id: filterButton
+                    icon: Format.icons.filter
+                    label: "Filter"
+                    onClicked: root.menuRequested(() => Actions.filterRows(root.actionState), filterButton.mapToItem(null, 0, filterButton.height))
                 }
 
-                Text {
-                    anchors.left: parent.left
-                    anchors.leftMargin: 8
-                    anchors.right: filterChevron.left
-                    anchors.rightMargin: 4
-                    anchors.verticalCenter: parent.verticalCenter
-                    elide: Text.ElideRight
-                    color: root.projectFilter.length ? root.shell.palette.fg : root.shell.palette.off
-                    font.family: Ui.Fonts.mono
-                    font.pixelSize: 12
-                    text: root.projectFilter.join(", ") || "All projects"
-                }
+                Repeater {
+                    model: (root.tagFilter ? [["tag", root.tagFilter]] : []).concat(root.projectFilter.map(project => ["project", project]))
 
-                Text {
-                    id: filterChevron
-                    anchors.right: parent.right
-                    anchors.rightMargin: 8
-                    anchors.verticalCenter: parent.verticalCenter
-                    color: root.shell.palette.off
-                    font.family: Ui.Fonts.mono
-                    font.pixelSize: 13
-                    text: Format.icons.chevron
-                }
+                    delegate: Rectangle {
+                        id: chip
 
-                MouseArea {
-                    id: projectFilterMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked: projectFilterBox.open = !projectFilterBox.open
-                }
+                        required property var modelData
 
-                Rectangle {
-                    visible: projectFilterBox.open
-                    anchors.top: parent.bottom
-                    anchors.topMargin: 2
-                    width: parent.width
-                    height: filterOptions.implicitHeight + 8
-                    radius: 4
-                    color: root.shell.palette.bg
-                    border.color: root.shell.palette.fg
-                    border.width: 1
+                        width: Math.min(chipLabel.implicitWidth, filterFlow.width - 20) + 20
+                        height: 26
+                        radius: 13
+                        color: chipMouse.containsMouse ? root.shell.palette.sel : "transparent"
+                        border.color: modelData[0] === "tag" ? root.tagColor(modelData[1]) : root.shell.palette.dim
+                        border.width: 1
 
-                    Column {
-                        id: filterOptions
-                        anchors.fill: parent
-                        anchors.margins: 4
+                        Text {
+                            id: chipLabel
+                            anchors.left: parent.left
+                            anchors.leftMargin: 10
+                            anchors.right: parent.right
+                            anchors.rightMargin: 10
+                            anchors.verticalCenter: parent.verticalCenter
+                            elide: Text.ElideLeft
+                            color: root.shell.palette.fg
+                            font.family: Ui.Fonts.mono
+                            font.pixelSize: 12
+                            text: chip.modelData[1] + " " + Format.icons.close
+                        }
 
-                        Repeater {
-                            model: [""].concat(root.listedProjects)
-
-                            delegate: Rectangle {
-                                id: filterOption
-
-                                required property string modelData
-
-                                width: parent.width
-                                height: 24
-                                radius: 3
-                                color: filterOptionMouse.containsMouse || activeFocus ? root.shell.palette.sel : "transparent"
-                                activeFocusOnTab: true
-
-                                Keys.onReturnPressed: projectFilterBox.toggle(modelData)
-                                Keys.onSpacePressed: projectFilterBox.toggle(modelData)
-                                Keys.onEscapePressed: projectFilterBox.close()
-
-                                Text {
-                                    anchors.left: parent.left
-                                    anchors.leftMargin: 6
-                                    anchors.right: parent.right
-                                    anchors.rightMargin: 6
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    elide: Text.ElideRight
-                                    color: filterOption.modelData ? (root.projectFilter.includes(filterOption.modelData) ? root.shell.palette.fg : root.shell.palette.off) : (root.projectFilter.length ? root.shell.palette.off : root.shell.palette.fg)
-                                    font.family: Ui.Fonts.mono
-                                    font.pixelSize: 12
-                                    text: (root.projectFilter.includes(filterOption.modelData) ? Format.icons.done + " " : "") + (filterOption.modelData || "All projects")
-                                }
-
-                                MouseArea {
-                                    id: filterOptionMouse
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    onClicked: projectFilterBox.toggle(filterOption.modelData)
-                                }
-                            }
+                        MouseArea {
+                            id: chipMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onClicked: chip.modelData[0] === "tag" ? root.tagFilter = "" : root.toggleProject(chip.modelData[1])
                         }
                     }
                 }
