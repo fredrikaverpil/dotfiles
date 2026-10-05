@@ -97,9 +97,13 @@ flowchart LR
   `settings.json`. **New** under a tag's filter drafts an
   investigation with that tag, so the filter lists it. The tag buttons under an
   investigation's header set or clear its tag (`tag`) in any status.
-- `Ctrl+K` or `?` opens the palette over the window: the selected
-  investigation's actions, or the picked set's, then the window's (New, Clear,
-  Model ›, Effort ›, Filter ›), each with its key. `Actions.js` lists them.
+- `Ctrl+K` or `?` opens the palette over the window on what has focus, nearest
+  first: a row's investigation, or the picked set when there is one; the
+  draft's form, the conversation (with Copy selection while text is selected)
+  or the picked set's view; the list (Search list, Filter ›, Pick all listed,
+  Go to ›); then the window (New, Clear, Model ›, Effort ›). A key shows where
+  it runs the row. `Actions.js` lists the rows per scope. `Ctrl+Enter` in a
+  draft's trace id or notes runs it; Enter in the trace id does not.
 - The list is one Tab stop, its selected row. On a focused row, `j`/`k` (or
   `↑`/`↓`) move, and with Shift pick the range from the selected row. Enter
   opens it and moves focus to its draft's notes or its follow-up field. Space

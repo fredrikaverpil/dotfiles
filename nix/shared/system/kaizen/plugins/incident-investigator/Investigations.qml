@@ -116,12 +116,12 @@ Column {
     // The ids that Backspace on a row asks to delete; empty when not asking.
     property var confirmingDelete: []
 
-    // Backspace deletes the picked rows, or else the focused one; running ones stay.
-    function askDelete(id) {
-        const ids = (picked.length ? picked : [id]).filter(other => items.some(item => item.id === other && item.status !== "running"));
-        if (!ids.length)
+    // Asks to delete the investigations; running ones stay.
+    function askDelete(ids) {
+        const gone = ids.filter(id => items.some(item => item.id === id && item.status !== "running"));
+        if (!gone.length)
             return;
-        confirmingDelete = ids;
+        confirmingDelete = gone;
         listBar.forceActiveFocus();
     }
 
@@ -170,49 +170,83 @@ Column {
         run(tagFilter ? ["draft", "-tag=" + tagFilter] : ["draft"]);
     }
 
-    // The palette's rows.
-    readonly property var actions: Actions.actions({
-        current: current,
-        picked: pickedItems,
-        deletable: deletable.length,
-        clearable: clearable.length,
-        clearLabel: clearLabel,
-        tags: tags,
-        model: model,
-        effort: effort,
-        tagFilter: tagFilter,
-        projectFilter: projectFilter,
-        projects: listedProjects
-    })
+    // What the palette's scopes read.
+    readonly property var actionState: ({
+            listed: items,
+            picked: pickedItems,
+            clearable: clearable.length,
+            clearLabel: clearLabel,
+            tags: tags,
+            model: model,
+            effort: effort,
+            tagFilter: tagFilter,
+            projectFilter: projectFilter,
+            projects: listedProjects
+        })
 
-    // Runs a palette row's action on the selection, or on the picked set.
-    function runAction(action, arg) {
-        const form = formView.count ? formView.itemAt(0) : null;
-        const detail = detailView.count ? detailView.itemAt(0) : null;
-        if (action === "run" && form)
-            form.start();
-        else if (action === "discard" && form)
-            form.discard();
+    // The window's palette scope.
+    function menuScope() {
+        return {
+            title: "",
+            rows: Actions.windowRows(actionState)
+        };
+    }
+
+    // Runs a palette row's action on its ids. The shown draft's form and
+    // conversation act for their own investigation.
+    function runAction(row) {
+        const action = row.action;
+        const arg = row.arg;
+        const id = row.ids.length ? row.ids[0] : "";
+        const item = all.find(item => item.id === id);
+        const shown = formView.count ? formView.itemAt(0) : null;
+        const form = shown && shown.itemId === id ? shown : null;
+        const detail = detailView.count && detailId === id ? detailView.itemAt(0) : null;
+        if (action === "open")
+            open(id);
+        else if (action === "run")
+            form ? form.start() : run(["start", id]);
+        else if (action === "discard")
+            form ? form.discard() : remove(id);
         else if (action === "stop")
-            run(["cancel", current.id]);
+            run(["cancel", id]);
         else if (action === "rerun")
-            run(["start", current.id]);
-        else if (action === "followUp" && detail)
-            detail.followUp();
-        else if (action === "terminal")
-            terminal(current);
+            run(["start", id]);
+        else if (action === "followUp")
+            detail ? detail.followUp() : open(id);
+        else if (action === "terminal" && item)
+            terminal(item);
         else if (action === "copy")
             copy(arg);
-        else if (action === "tag" && form)
-            form.tag = arg;
         else if (action === "tag")
-            run(["tag", current.id].concat(arg ? [arg] : []));
+            for (const each of row.ids) {
+                if (shown && each === shown.itemId)
+                    shown.tag = arg;
+                else
+                    run(["tag", each].concat(arg ? [arg] : []));
+            }
+        else if (action === "pick")
+            togglePick(id);
+        else if (action === "pickAll")
+            picked = items.map(item => item.id);
         else if (action === "delete")
-            askDelete(selectedId);
+            askDelete(row.ids);
         else if (action === "combine")
             combinePicked();
         else if (action === "unpick")
             picked = [];
+        else if (action === "search")
+            searchField.focusInput();
+        else if (action === "select")
+            goTo(arg);
+        else if (action === "project" && form)
+            form.toggle(arg);
+        else if (action === "addProject" && form)
+            form.addProject();
+        else if (action === "focusTrace" && form)
+            form.focusTrace();
+        else if (action === "focusNotes" && form)
+            form.focusNotes();
         else if (action === "new")
             draft();
         else if (action === "clear")
@@ -225,6 +259,13 @@ Column {
             tagFilter = arg;
         else if (action === "filterProject")
             projectFilterBox.toggle(arg);
+    }
+
+    // Selects an investigation and focuses its row.
+    function goTo(id) {
+        picked = [];
+        selectedId = id;
+        focusSelected();
     }
 
     Keys.onPressed: event => {
@@ -323,7 +364,9 @@ Column {
         focusRow(index);
     }
 
+    // currentIndex first, so the row stays the Tab stop as it takes focus.
     function focusRow(index) {
+        list.currentIndex = index;
         list.positionViewAtIndex(index, ListView.Contain);
         const row = list.itemAtIndex(index);
         if (row)
@@ -546,7 +589,15 @@ Column {
             width: root.listWidth
             spacing: 6
 
+            function menuScope() {
+                return {
+                    title: "List",
+                    rows: Actions.listRows(root.actionState)
+                };
+            }
+
             Field {
+                id: searchField
                 placeholder: "Search"
                 onTextChanged: root.query = text.trim()
             }
@@ -684,6 +735,13 @@ Column {
             boundsBehavior: Flickable.StopAtBounds
             model: root.items
 
+            function menuScope() {
+                return {
+                    title: "List",
+                    rows: Actions.listRows(root.actionState)
+                };
+            }
+
             delegate: ItemRow {}
 
             Text {
@@ -810,6 +868,13 @@ Column {
                 width: parent.width
                 spacing: 8
 
+                function menuScope() {
+                    return {
+                        title: root.pickedItems.length + " picked",
+                        rows: Actions.pickedRows(root.actionState, false)
+                    };
+                }
+
                 Text {
                     color: root.shell.palette.fg
                     font.family: Ui.Fonts.mono
@@ -848,7 +913,7 @@ Column {
                         icon: Format.icons.trash
                         label: "Delete " + root.deletable.length
                         danger: true
-                        onClicked: root.askDelete(root.selectedId)
+                        onClicked: root.askDelete(root.picked)
                     }
                 }
             }
@@ -1131,6 +1196,13 @@ Column {
         onActiveFocusChanged: if (activeFocus)
             ListView.view.currentIndex = index
 
+        function menuScope() {
+            return {
+                title: root.pickedItems.length ? root.pickedItems.length + " picked" : Format.name(modelData),
+                rows: Actions.rowRows(root.actionState, modelData)
+            };
+        }
+
         Keys.onReturnPressed: root.open(modelData.id)
         Keys.onSpacePressed: root.togglePick(modelData.id)
         Keys.onPressed: event => {
@@ -1140,7 +1212,7 @@ Column {
             else if (event.key === Qt.Key_K || event.key === Qt.Key_Up)
                 range ? root.extend(-1) : root.step(-1);
             else if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete)
-                root.askDelete(modelData.id);
+                root.askDelete(root.picked.length ? root.picked : [modelData.id]);
             else if (event.key === Qt.Key_Escape && root.picked.length)
                 root.picked = [];
             else
@@ -1278,6 +1350,8 @@ Column {
         property alias text: input.text
         property alias placeholder: hint.text
         property bool multiline: false
+        // Whether plain Enter submits; Ctrl+Enter submits any field.
+        property bool enterSubmits: !multiline
         property alias readOnly: input.readOnly
 
         signal submitted
@@ -1320,12 +1394,12 @@ Column {
             }
             Keys.onBacktabPressed: input.nextItemInFocusChain(false).forceActiveFocus(Qt.BacktabFocusReason)
             Keys.onEscapePressed: root.leaveField()
-            // A single-line field takes Enter as submit, never a newline.
+            // A single-line field never takes a newline.
             Keys.onReturnPressed: event => {
-                if (field.multiline)
-                    event.accepted = false;
-                else
+                if (field.enterSubmits || event.modifiers & Qt.ControlModifier)
                     field.submitted();
+                else
+                    event.accepted = !field.multiline;
             }
             clip: true
         }
@@ -1352,6 +1426,22 @@ Column {
 
         function focusNotes() {
             notesField.focusInput();
+        }
+
+        function focusTrace() {
+            traceField.focusInput();
+        }
+
+        function menuScope() {
+            return {
+                title: "Draft",
+                rows: Actions.draftRows(root.actionState, {
+                    id: itemId,
+                    tag: tag,
+                    projects: projects,
+                    choices: [...new Set(root.projects.concat(projects))]
+                })
+            };
         }
 
         function changed() {
@@ -1604,10 +1694,13 @@ Column {
             text: "Trace id (optional)"
         }
 
+        // Enter never starts a paid run; Ctrl+Enter does.
         Field {
             id: traceField
             placeholder: "4f9d2c1ab7e84d1c9f3a0b5e6c7d8e90"
+            enterSubmits: false
             onTextChanged: form.changed()
+            onSubmitted: form.start()
         }
 
         Meta {
@@ -1619,6 +1712,7 @@ Column {
             multiline: true
             placeholder: "Anything Claude should know, e.g. a Logs URL or a recent deploy"
             onTextChanged: form.changed()
+            onSubmitted: form.start()
         }
 
         Row {
@@ -1657,6 +1751,13 @@ Column {
 
         function followUp() {
             followField.focusInput();
+        }
+
+        function menuScope() {
+            return {
+                title: "Conversation",
+                rows: Actions.conversationRows(root.actionState, item, root.selection ? root.selection.selectedText : "")
+            };
         }
 
         spacing: 8
@@ -1764,7 +1865,7 @@ Column {
                 icon: Format.icons.trash
                 label: "Delete"
                 danger: true
-                onClicked: root.askDelete(detail.item.id)
+                onClicked: root.askDelete([detail.item.id])
             }
         }
 

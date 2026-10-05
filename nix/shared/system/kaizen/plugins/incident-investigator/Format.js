@@ -16,6 +16,7 @@ var icons = {
   copy: String.fromCodePoint(0xF018F),
   reply: String.fromCodePoint(0xF045A),
   chevron: String.fromCodePoint(0xF0140),
+  arrow: String.fromCodePoint(0xF0054),
   send: String.fromCodePoint(0xF048A),
   tag: String.fromCodePoint(0xF04F9),
   model: String.fromCodePoint(0xF06A9),

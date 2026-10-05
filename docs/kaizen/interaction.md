@@ -139,8 +139,10 @@ investigator: it stays up while others have focus, and niri's window binds
 - The launcher only opens an application (its plugin node) and shows its tray
   menu. The application's own actions stay in its palette; the shell's tree
   never holds them.
-- `Ctrl+K` opens the application's palette: every action, with its key when
-  it has one, the focused object's first.
+- `Ctrl+K` opens the application's palette on what has focus: the focused
+  object's actions, then those of each scope around it (its list or pane,
+  then the window), each with its key where that key runs it. The breadcrumb
+  names the scopes.
 - Single-letter keys are optional. An application may give frequent actions
   one; it acts on the focused object while no text field has focus. In a text
   field only Esc, Enter and Ctrl chords act: Esc leaves the field, and

@@ -278,6 +278,108 @@ TestCase {
         compare(got, data.want);
     }
 
+    function test_scoped_data() {
+        const open = {
+            key: "open",
+            text: "Open"
+        };
+        const unpick = {
+            key: "unpick",
+            text: "Unpick"
+        };
+        const unpickAgain = {
+            key: "unpick",
+            text: "Unpick listed"
+        };
+        const search = {
+            key: "search",
+            text: "Search list"
+        };
+        const create = {
+            key: "new",
+            text: "New"
+        };
+        const separator = {
+            isSeparator: true,
+            enabled: true
+        };
+        return [
+            {
+                tag: "nearest first",
+                scopes: [
+                    {
+                        title: "Row",
+                        rows: [open]
+                    },
+                    {
+                        title: "List",
+                        rows: [search]
+                    },
+                    {
+                        title: "",
+                        rows: [create]
+                    }
+                ],
+                want: {
+                    rows: [open, separator, search, separator, create],
+                    names: ["List", "Row"]
+                }
+            },
+            {
+                tag: "nearer key wins",
+                scopes: [
+                    {
+                        title: "Row",
+                        rows: [unpick]
+                    },
+                    {
+                        title: "List",
+                        rows: [search, unpickAgain]
+                    }
+                ],
+                want: {
+                    rows: [unpick, separator, search],
+                    names: ["List", "Row"]
+                }
+            },
+            {
+                tag: "empty scope keeps its name",
+                scopes: [
+                    {
+                        title: "Row",
+                        rows: [unpick]
+                    },
+                    {
+                        title: "List",
+                        rows: [unpickAgain]
+                    },
+                    {
+                        title: "",
+                        rows: [create]
+                    }
+                ],
+                want: {
+                    rows: [unpick, separator, create],
+                    names: ["List", "Row"]
+                }
+            },
+            {
+                tag: "none",
+                scopes: [],
+                want: {
+                    rows: [],
+                    names: []
+                }
+            }
+        ];
+    }
+
+    function test_scoped(data) {
+        const got = Model.scoped(data.scopes);
+
+        compare(got, data.want);
+    }
+
     function test_search_data() {
         const opus = {
             key: "model.opus",
