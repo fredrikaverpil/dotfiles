@@ -56,6 +56,21 @@ function byFrecency(counts) {
   };
 }
 
+// QV4's Array.prototype.sort is unstable from seven elements, so ties fall
+// back to the input order here.
+function stableSort(rows, compare) {
+  return rows
+    .map(function (row, index) {
+      return { row: row, index: index };
+    })
+    .sort(function (a, b) {
+      return compare(a.row, b.row) || a.index - b.index;
+    })
+    .map(function (entry) {
+      return entry.row;
+    });
+}
+
 // Hyphens are ignored, so "wifi" finds "Wi-Fi".
 function searchable(text) {
   return String(text || "")
@@ -87,16 +102,18 @@ function rowsFor(items, level, query, providers, counts) {
 
   if (item && item.provider !== undefined) {
     var rows = rowsFrom(providers, item.provider, "");
-    return (
-      normalizedQuery.length === 0 ? rows.slice() : rows.filter(filterMatches)
-    ).sort(byFrecency(counts));
+    return stableSort(
+      normalizedQuery.length === 0 ? rows : rows.filter(filterMatches),
+      byFrecency(counts),
+    );
   }
   if (normalizedQuery.length === 0) {
-    return childrenOf(items, level)
-      .map(function (id) {
+    return stableSort(
+      childrenOf(items, level).map(function (id) {
         return rowFor(items, id, level);
-      })
-      .sort(byFrecency(counts));
+      }),
+      byFrecency(counts),
+    );
   }
 
   var found = descendantsOf(items, level).map(function (id) {
@@ -104,15 +121,16 @@ function rowsFor(items, level, query, providers, counts) {
   });
   if (level === "root")
     found = found.concat(rowsFrom(providers, "apps", "Apps"));
-  return found
-    .filter(function (row) {
+  return stableSort(
+    found.filter(function (row) {
       return row.enabled && filterMatches(row);
-    })
-    .sort(function (a, b) {
+    }),
+    function (a, b) {
       return (
         byFrecency(counts)(a, b) || (a.detail ? 1 : 0) - (b.detail ? 1 : 0)
       );
-    });
+    },
+  );
 }
 
 function parentLevel(level) {
