@@ -104,6 +104,10 @@ flowchart LR
   Go to ›); then the window (New, Clear, Model ›, Effort ›). A key shows where
   it runs the row. `Actions.js` lists the rows per scope. `Ctrl+Enter` in a
   draft's trace id or notes runs it; Enter in the trace id does not.
+- A right-click on a row opens its context menu at the pointer, with the
+  palette's rows for that row, or for the picked set when the row is picked;
+  the shown investigation and the picks stay. Submenus cascade beside their
+  row.
 - The list is one Tab stop, its selected row. On a focused row, `j`/`k` (or
   `↑`/`↓`) move, and with Shift pick the range from the selected row. Enter
   opens it and moves focus to its draft's notes or its follow-up field. Space

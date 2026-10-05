@@ -295,6 +295,78 @@ TestCase {
         compare(got, data.want);
     }
 
+    function test_contextRows_data() {
+        const failed = item({
+            status: "failed"
+        });
+        const other = item({
+            id: "b"
+        });
+        const rows = keys => about(["a"], [row({
+                    key: "open",
+                    text: "Open",
+                    glyph: Format.icons.failed,
+                    keys: ["Enter"],
+                    action: "open"
+                }), row({
+                    key: "rerun",
+                    text: "Re-run",
+                    glyph: Format.icons.refresh,
+                    action: "rerun"
+                }), row({
+                    key: "pick",
+                    text: "Pick",
+                    glyph: Format.icons.check,
+                    keys: ["Space"],
+                    action: "pick"
+                }), row({
+                    key: "combine",
+                    text: "Combine",
+                    glyph: Format.icons.plus,
+                    enabled: false,
+                    action: "combine"
+                }), row({
+                    key: "delete",
+                    text: "Delete",
+                    glyph: Format.icons.trash,
+                    keys: keys,
+                    action: "delete"
+                })]);
+        const pickedWith = state({
+            picked: [failed, other]
+        });
+        return [
+            {
+                tag: "nothing picked",
+                state: state({}),
+                item: failed,
+                want: rows(["Backspace"])
+            },
+            {
+                tag: "unpicked row while others are picked",
+                state: state({
+                    picked: [other, item({
+                            id: "c"
+                        })]
+                }),
+                item: failed,
+                want: rows([])
+            },
+            {
+                tag: "picked row",
+                state: pickedWith,
+                item: failed,
+                want: Actions.pickedRows(pickedWith, true)
+            }
+        ];
+    }
+
+    function test_contextRows(data) {
+        const got = Actions.contextRows(data.state, data.item);
+
+        compare(got, data.want);
+    }
+
     function test_pickedRows_data() {
         return [
             {

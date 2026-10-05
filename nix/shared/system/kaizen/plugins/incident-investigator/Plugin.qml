@@ -82,6 +82,7 @@ Ui.Plugin {
             shell: plugin.shell
 
             onPaletteRequested: keys => palette.open(keys)
+            onMenuRequested: (rows, at) => palette.popup(rows, palette.mapFromItem(null, at.x, at.y))
         }
 
         // Over the whole window, at the content's scale.
