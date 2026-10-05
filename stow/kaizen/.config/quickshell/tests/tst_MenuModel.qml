@@ -108,6 +108,30 @@ TestCase {
         })[0].id, "style");
         compare(Menu.rowsFor(items, "root", "", providers, {}).map(row => row.id), ["apps", "learn", "style"]);
 
+        // A provider level: a launched app moves first, without counts the provider's order stays.
+        const twoApps = {
+            apps: () => [
+                    {
+                        label: "Alacritty",
+                        enabled: true,
+                        entry: {
+                            id: "alacritty"
+                        }
+                    },
+                    {
+                        label: "Zed",
+                        enabled: true,
+                        entry: {
+                            id: "zed"
+                        }
+                    }
+                ]
+        };
+        compare(Menu.rowsFor(items, "apps", "", twoApps, {
+            zed: 2
+        }).map(row => row.label), ["Zed", "Alacritty"]);
+        compare(Menu.rowsFor(items, "apps", "", twoApps).map(row => row.label), ["Alacritty", "Zed"]);
+
         // Search: a launched app outranks an unlaunched tree match with the same detail weight.
         compare(Menu.rowsFor(items, "root", "a", providers, {
             alacritty: 1
