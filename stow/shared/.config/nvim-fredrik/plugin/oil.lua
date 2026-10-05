@@ -19,4 +19,4 @@ require("oil").setup({
 require("oil-git").setup({ symbol_position = "signcolumn" })
 require("oil-lsp-diagnostics").setup()
 
-vim.keymap.set("n", "<C-->", "<cmd>Oil<cr>", { desc = "Oil" })
+vim.keymap.set("n", "-", "<cmd>Oil<cr>", { desc = "Oil" })
