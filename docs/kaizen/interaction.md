@@ -92,7 +92,7 @@ something to hang from.
 | Opened by | right-click on a bar button, tray item, or an application's row or chip; an application key aimed at one control | `Mod+Space`; `Ctrl+K` in an application; `menu popup` and `menu level` over IPC |
 | Position | hangs from its anchor, on the anchor's output; in an application, from the pointer or the chip | centred on the focused output, or over the application's window |
 | Submenu | cascades beside its row | replaces the list; a breadcrumb above the search row names the path |
-| Size | fits its rows | larger text; a level may ask for a wide card (Keybindings) |
+| Size | fits its rows | a level may ask for a wide card (Keybindings) |
 
 - The launcher is the shell's tree in the palette, at the root.
 - A shell menu is a layer surface with exclusive keyboard focus. An

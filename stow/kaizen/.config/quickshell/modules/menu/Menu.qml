@@ -907,8 +907,8 @@ Ui.Panel {
         rows: menu.cardRows(menu.level, null, card.query, menu.launchCounts)
         placeholder: menu.level === "root" ? "Search…" : "Filter " + menu.items[menu.level].label.toLowerCase() + "…"
         openerKeys: menu.keyOpened ? menu.toggleKeys : []
-        fontSize: 16
-        rowHeight: 36
+        fontSize: 14
+        rowHeight: 28
         // The panel fixes the width; Emoji has thousands of rows.
         maxWidth: 0
 
