@@ -26,7 +26,19 @@ function pathFrom(items, id, level) {
     .join(" › ");
 }
 
-function rowFor(items, id, level) {
+// The chord of the first bind running exactly what item declares: an ipc
+// call ("<target> <fn>") or a compositor action.
+function chordFor(item, binds) {
+  var bind = (binds || []).find(function (bind) {
+    return (
+      (item.ipc !== undefined && bind.ipc === item.ipc) ||
+      (item.compositor !== undefined && bind.action === item.compositor)
+    );
+  });
+  return bind ? bind.chord : undefined;
+}
+
+function rowFor(items, id, level, binds) {
   var child = items[id];
   return {
     id: id,
@@ -37,6 +49,7 @@ function rowFor(items, id, level) {
     entry: null,
     action: child.action || null,
     submenu: child.provider !== undefined || childrenOf(items, id).length > 0,
+    chord: chordFor(child, binds),
   };
 }
 
@@ -93,7 +106,7 @@ function rowsFrom(providers, name, detail) {
   return source ? source(detail || "") : [];
 }
 
-function rowsFor(items, level, query, providers, counts) {
+function rowsFor(items, level, query, providers, counts, binds) {
   var item = items[level];
   var normalizedQuery = String(query || "").toLowerCase();
   var filterMatches = function (row) {
@@ -110,14 +123,14 @@ function rowsFor(items, level, query, providers, counts) {
   if (normalizedQuery.length === 0) {
     return stableSort(
       childrenOf(items, level).map(function (id) {
-        return rowFor(items, id, level);
+        return rowFor(items, id, level, binds);
       }),
       byFrecency(counts),
     );
   }
 
   var found = descendantsOf(items, level).map(function (id) {
-    return rowFor(items, id, level);
+    return rowFor(items, id, level, binds);
   });
   if (level === "root")
     found = found.concat(rowsFrom(providers, "apps", "Apps"));
