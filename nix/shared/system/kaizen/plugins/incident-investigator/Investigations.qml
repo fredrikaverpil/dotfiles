@@ -57,13 +57,14 @@ Column {
     property var picked: []
     readonly property var pickedItems: items.filter(item => picked.indexOf(item.id) >= 0)
     onSelectedIdChanged: picked = []
+    // The list is one Tab stop: the focused row while it has focus, else the selected one.
+    readonly property int tabRow: list.activeFocus ? list.currentIndex : Math.max(0, items.findIndex(item => item.id === selectedId))
 
     // A plain click selects, shift extends from the selection to index, ctrl toggles.
     function click(index, modifiers) {
         const id = items[index].id;
         if (modifiers & Qt.ShiftModifier) {
-            const from = Math.max(0, items.findIndex(item => item.id === selectedId));
-            picked = items.slice(Math.min(from, index), Math.max(from, index) + 1).map(item => item.id);
+            pickRange(index);
         } else if (modifiers & Qt.ControlModifier) {
             const base = picked.length ? picked : [selectedId];
             picked = base.indexOf(id) >= 0 ? base.filter(other => other !== id) : base.concat([id]);
@@ -71,6 +72,22 @@ Column {
             picked = [];
             selectedId = id;
         }
+    }
+
+    // Picks the rows from the selection to index.
+    function pickRange(index) {
+        const from = Math.max(0, items.findIndex(item => item.id === selectedId));
+        picked = items.slice(Math.min(from, index), Math.max(from, index) + 1).map(item => item.id);
+    }
+
+    // Enter on a row: selects it and moves focus into its draft or conversation.
+    function open(id) {
+        picked = [];
+        selectedId = id;
+        if (formView.count)
+            formView.itemAt(0).focusNotes();
+        else if (detailView.count)
+            detailView.itemAt(0).followUp();
     }
 
     // Space on a row: toggles it in the picked set, which starts from the selection.
@@ -295,6 +312,15 @@ Column {
             picked = [];
         else
             focusSelected();
+    }
+
+    // Shift with a move: picks from the selection to the next row and focuses it.
+    function extend(delta) {
+        const index = list.currentIndex + delta;
+        if (index < 0 || index >= items.length)
+            return;
+        pickRange(index);
+        focusRow(index);
     }
 
     function focusRow(index) {
@@ -1100,21 +1126,19 @@ Column {
         // Focus and hover do not fill, so only the shown investigation looks selected.
         border.color: activeFocus || rowMouse.containsMouse ? root.shell.palette.dim : "transparent"
         border.width: 1
-        activeFocusOnTab: true
+        activeFocusOnTab: index === root.tabRow
 
         onActiveFocusChanged: if (activeFocus)
             ListView.view.currentIndex = index
 
-        Keys.onReturnPressed: {
-            root.picked = [];
-            root.selectedId = modelData.id;
-        }
+        Keys.onReturnPressed: root.open(modelData.id)
         Keys.onSpacePressed: root.togglePick(modelData.id)
         Keys.onPressed: event => {
+            const range = event.modifiers & Qt.ShiftModifier;
             if (event.key === Qt.Key_J || event.key === Qt.Key_Down)
-                root.step(1);
+                range ? root.extend(1) : root.step(1);
             else if (event.key === Qt.Key_K || event.key === Qt.Key_Up)
-                root.step(-1);
+                range ? root.extend(-1) : root.step(-1);
             else if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete)
                 root.askDelete(modelData.id);
             else if (event.key === Qt.Key_Escape && root.picked.length)
@@ -1288,6 +1312,13 @@ Column {
             font.family: Ui.Fonts.mono
             font.pixelSize: 13
             wrapMode: field.multiline ? TextEdit.Wrap : TextEdit.NoWrap
+            activeFocusOnTab: true
+            // Tab moves focus; a field never takes a tab character.
+            Keys.onTabPressed: event => {
+                const forward = !(event.modifiers & Qt.ShiftModifier);
+                input.nextItemInFocusChain(forward).forceActiveFocus(forward ? Qt.TabFocusReason : Qt.BacktabFocusReason);
+            }
+            Keys.onBacktabPressed: input.nextItemInFocusChain(false).forceActiveFocus(Qt.BacktabFocusReason)
             Keys.onEscapePressed: root.leaveField()
             // A single-line field takes Enter as submit, never a newline.
             Keys.onReturnPressed: event => {
@@ -1317,6 +1348,10 @@ Column {
         function save() {
             saveLater.stop();
             root.run(["edit", itemId, "-projects=" + projects.join(","), "-tag=" + tag, "-trace-id=" + traceField.text, "-notes=" + notesField.text]);
+        }
+
+        function focusNotes() {
+            notesField.focusInput();
         }
 
         function changed() {

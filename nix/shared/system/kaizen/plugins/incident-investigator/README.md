@@ -100,11 +100,13 @@ flowchart LR
 - `Ctrl+K` or `?` opens the palette over the window: the selected
   investigation's actions, or the picked set's, then the window's (New, Clear,
   Model ›, Effort ›, Filter ›), each with its key. `Actions.js` lists them.
-- On a focused row in the list, `j`/`k` move, Enter opens, Space toggles it in
-  the picked set (`j`/`k` then move only the focus), Backspace asks to delete
-  the picked rows, or else the focused one, and Esc unpicks. Esc in a text
-  field unpicks, then leaves the field for the selected row. Delete and Clear
-  ask inline, from a button, a key or the palette alike: `y` or Enter
+- The list is one Tab stop, its selected row. On a focused row, `j`/`k` (or
+  `↑`/`↓`) move, and with Shift pick the range from the selected row. Enter
+  opens it and moves focus to its draft's notes or its follow-up field. Space
+  toggles it in the picked set (`j`/`k` then move only the focus), Backspace
+  asks to delete the picked rows, or else the focused one, and Esc unpicks. Esc
+  in a text field unpicks, then leaves the field for the selected row. Delete
+  and Clear ask inline, from a button, a key or the palette alike: `y` or Enter
   confirms, and `n`, Esc or Backspace cancels.
 - Shift-click (a range) or ctrl-click (a toggle) picks investigations in the
   list, and **Combine** drafts a new one from their alerts and reports
