@@ -88,8 +88,22 @@ reading the whole file.
 
 ## Go
 
-- Use the `gopls` LSP/MCP at all times when searching for references to symbols,
-  renaming packages/variables/functions etc.
+- Use `gopls` at all times, via two plugins:
+  - `LSP` tool: definition, hover, implementations, call hierarchy.
+  - `gopls` MCP (`go_*` tools): `go_diagnostics` after edits, `go_vulncheck`,
+    `go_rename_symbol` for renames (returns edits only; apply them, then
+    `go build ./...`), `go_symbol_references` for references,
+    `go_package_api`/`go_file_context` for orientation.
+  - `go_search` only to find a symbol by name; then use `LSP` for precision.
+    Use specific names; short queries match stdlib symbols too.
+  - MCP line numbers are 0-based; `LSP` and editors are 1-based. Add 1 to MCP
+    lines before using them.
+  - Early `LSP` calls can fail with "server is starting"; retry once.
+  - In a repo with more than one `go.mod` and no `go.work`, references and
+    rename miss other modules in both tools. The MCP only loads the root
+    module (check `go_workspace`), so an empty `go_diagnostics` for other
+    modules means nothing. Cross-check with Grep and `go build ./...` in each
+    module.
 - If a package is not installed locally, search
   [pkg.go.dev](https://pkg.go.dev). Standard library functions are available
   (example: [`fmt` package](https://pkg.go.dev/fmt)).
