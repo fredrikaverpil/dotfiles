@@ -79,6 +79,11 @@ After unloading, the xe driver's TTM page pool keeps up to ~15 GiB, shown as
 used. The kernel reclaims it under pressure;
 `echo 2 | sudo tee /proc/sys/vm/drop_caches` frees it immediately.
 
+`unsloth-desktop` (Unsloth Studio) is a separate UI for running and training
+models, with its own llama.cpp; stop `llama-router` first. It shares the
+Hugging Face cache. On first run it downloads its Python runtime, PyTorch and
+llama.cpp into `~/.unsloth/studio`; `rm -rf ~/.unsloth` removes them.
+
 ## Hardware
 
 - GPU: Xe2 on the `xe` driver. Mesa has no Intel VA-API, so
