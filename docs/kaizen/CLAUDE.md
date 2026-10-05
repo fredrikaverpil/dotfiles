@@ -4,4 +4,5 @@
 @features.md
 @plugins.md
 @style.md
+@interaction.md
 @development.md
