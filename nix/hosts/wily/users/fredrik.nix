@@ -28,6 +28,7 @@ in
     google-cloud-sdk
     llama-cpp-vulkan
     llama-router
+    unsloth-desktop
   ];
 
   llmAgents = [ ];
