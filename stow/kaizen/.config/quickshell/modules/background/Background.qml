@@ -26,7 +26,7 @@ Scope {
     readonly property string statePath: Ui.Paths.state + "/wallpaper.json"
     property bool stateLoaded: false
     property list<string> wallpapers: []
-    readonly property int columns: 4
+    readonly property int columns: 6
     // Header rows ({header, label}) and image rows ({start, count}); start
     // indexes `wallpapers`, which is sorted so each folder is contiguous.
     property var rows: []
@@ -343,8 +343,8 @@ Scope {
     Ui.Panel {
         id: picker
         shell: background.shell
-        cardWidth: 840
-        cardHeight: 540
+        cardWidth: 1200
+        cardHeight: 780
 
         function open(slot) {
             background.slot = slot || "workspace";
