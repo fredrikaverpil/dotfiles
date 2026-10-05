@@ -69,16 +69,23 @@ function scoped(scopes) {
 
 // A static tree's rows matching query, by text or keys: direct rows first,
 // then deeper ones in the tree's order, with their path as the detail. trail
-// holds the keys of the submenus between the level and the row.
+// holds the keys of the submenus between the level and the row. A row with
+// adds stands for what was typed, at its own level only: a disabled hint
+// without a query, else Add "query" with the query as its arg, unless a row
+// beside it is named that.
 function search(rows, query) {
-  if (!query) return rows;
+  const typed = String(query || "").trim();
+  if (!typed)
+    return rows.map((row) =>
+      row.adds ? Object.assign({}, row, { enabled: false }) : row,
+    );
   const found = [];
   const visit = (rows, names, keys) => {
     for (const row of rows) {
-      if (row.isSeparator || row.enabled === false) continue;
+      if (row.isSeparator || row.enabled === false || row.adds) continue;
       if (
-        matches(row, query) ||
-        matches({ text: (row.keys || []).join("+") }, query)
+        matches(row, typed) ||
+        matches({ text: (row.keys || []).join("+") }, typed)
       )
         found.push(
           Object.assign({}, row, {
@@ -91,9 +98,27 @@ function search(rows, query) {
     }
   };
   visit(rows, [], []);
+  const named = rows.some(
+    (row) =>
+      !row.adds && String(row.text || "").toLowerCase() === typed.toLowerCase(),
+  );
+  const added = named
+    ? []
+    : rows
+        .filter((row) => row.adds)
+        .map((row) =>
+          Object.assign({}, row, {
+            text: 'Add "' + typed + '"',
+            arg: typed,
+            trail: [],
+          }),
+        );
   return found
     .filter((row) => !row.trail.length)
-    .concat(found.filter((row) => row.trail.length));
+    .concat(
+      found.filter((row) => row.trail.length),
+      added,
+    );
 }
 
 // Launcher rows are rebuilt on every change and match by key; tray entries by identity.
@@ -128,17 +153,21 @@ function place(anchor, width, height, screenWidth, screenHeight) {
   };
 }
 
-// Card position below-right of point, a pointer in an area: flipped above or
-// to the left where it does not fit, then kept 8 px inside. above says which
-// side it took.
-function hang(point, width, height, areaWidth, areaHeight) {
+// Card position below-right of anchor, a rect in an area (a pointer has no
+// size): flipped above or to the left of it where it does not fit, then kept
+// 8 px inside. above says which side it took.
+function hang(anchor, width, height, areaWidth, areaHeight) {
   const margin = 8;
-  const x = point.x + width <= areaWidth - margin ? point.x : point.x - width;
-  const above = point.y + height > areaHeight - margin;
+  const below = anchor.y + anchor.height;
+  const x =
+    anchor.x + width <= areaWidth - margin
+      ? anchor.x
+      : anchor.x + anchor.width - width;
+  const above = below + height > areaHeight - margin;
   return {
     x: clamp(x, margin, areaWidth - width - margin),
     y: clamp(
-      above ? point.y - height : point.y,
+      above ? anchor.y - height : below,
       margin,
       areaHeight - height - margin,
     ),

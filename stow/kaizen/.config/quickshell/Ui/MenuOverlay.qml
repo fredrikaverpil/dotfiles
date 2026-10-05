@@ -7,7 +7,8 @@ import "MenuCardModel.js" as Model
 // scopes around the focus: the item that had it and its parents, each
 // declaring `function menuScope()` that returns { title, rows }, card rows plus
 // key with a submenu's rows as its children. A context menu (`popup()`) hangs
-// from the pointer and cascades its submenus. The host runs the rows it is
+// from the pointer or a control and cascades its submenus. A row with `adds`
+// adds what was typed (MenuCardModel.search). The host runs the rows it is
 // handed.
 Item {
     id: overlay
@@ -33,7 +34,7 @@ Item {
         }) : Model.scoped(chain.filter(item => item && typeof item.menuScope === "function").map(item => item.menuScope()))
     readonly property var level: Model.level(tree.rows, path)
     // One context menu card per level: { path, anchor, selectFirst }. The
-    // root's anchor is the pointer, a submenu's its row.
+    // root's anchor is the pointer or a control, a submenu's its row.
     property var stack: []
 
     signal runRequested(var row)
@@ -56,15 +57,15 @@ Item {
         Qt.callLater(card.selectFirst);
     }
 
-    // Opens a context menu at `at`, in the overlay's coordinates. rows returns
-    // its tree, so a binding calling it stays live.
-    function popup(rows, at) {
+    // Opens a context menu hanging from `at`, a rect in the overlay's
+    // coordinates. rows returns its tree, so a binding calling it stays live.
+    function popup(rows, at, selectFirst) {
         if (!visible)
             before = overlay.Window.window?.activeFocusItem ?? null;
         reset();
         source = rows;
         visible = true;
-        push([], at, false);
+        push([], at, selectFirst);
     }
 
     function scopes(item) {

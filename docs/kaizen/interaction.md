@@ -56,6 +56,9 @@ actions.
 - Order is frecency (palette only), then the tree's order, with direct
   children before deeper matches. A context menu skips frecency so its rows
   stay where the hand expects them.
+- An application's level may add what was typed: its last row, a hint in
+  `off` while the search is empty, becomes Add "<query>" unless a row there
+  has that name.
 
 ### Keys
 
@@ -148,9 +151,9 @@ investigator: it stays up while others have focus, and niri's window binds
   one; it acts on the focused object while no text field has focus. In a text
   field only Esc, Enter and Ctrl chords act: Esc leaves the field, and
   `Ctrl+Enter` submits. An application's keys never become niri binds.
-- A property (tag, project, model) is a chip showing its value. A click, or
-  its key when it has one, opens a context menu on the chip; picking a row
-  sets it.
+- A property (tag, project, model) is a chip showing its value, or its name
+  in `off` while unset. A click, Enter or Space on it, or its key when it has
+  one, opens a context menu on the chip; picking a row sets it.
 - A right-click on an object opens its context menu: the palette's rows for
   that object.
 - Lists: `↑` `↓` (and `j` `k`) move, and with Shift pick a range; Enter opens
@@ -167,9 +170,10 @@ the row.
 
 - Active filters show as chips above the list; each clears with a click or
   from the filter menu.
-- A draft's composer carries the chips Tag, Projects, Model and Effort beside
-  its notes, and runs on `Ctrl+Enter`. Model and Effort pick what the next run
-  starts with (`settings`).
+- A draft's composer carries the chips Tag, Projects, Model and Effort under
+  its notes, and runs on `Ctrl+Enter`; Projects › adds a project typed in it.
+  The follow-up field carries Model and Effort, which pick what the next run
+  starts with (`settings`); the conversation's header carries Tag.
 - A row's context menu holds Open, Run or Re-run, Tag ›, Combine (with a picked
   set) and Delete. A message's holds Copy, Copy selection, Edit (your own) and
   Branch.

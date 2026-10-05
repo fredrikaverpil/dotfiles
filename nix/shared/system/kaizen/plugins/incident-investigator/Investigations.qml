@@ -13,8 +13,9 @@ Column {
     required property var shell
 
     signal paletteRequested(var keys)
-    // A right-click's menu: rows returns its tree, at is in window coordinates.
-    signal menuRequested(var rows, point at)
+    // A context menu: rows returns its tree, at is the rect it hangs from, in
+    // window coordinates; a keyboard-opened one selects its first row.
+    signal menuRequested(var rows, rect at, bool selectFirst)
 
     spacing: 8
 
@@ -258,8 +259,6 @@ Column {
             goTo(arg);
         else if (action === "project" && form)
             form.toggle(arg);
-        else if (action === "addProject" && form)
-            form.addProject();
         else if (action === "focusTrace" && form)
             form.focusTrace();
         else if (action === "focusNotes" && form)
@@ -454,7 +453,7 @@ Column {
         onExited: Qt.callLater(root.next)
     }
 
-    // Title, model and the new button. Above the body, which the open lists overlap.
+    // Title, Clear and New. Above the body, which the open lists overlap.
     Item {
         z: 5
         width: parent.width
@@ -473,18 +472,6 @@ Column {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
-
-            Select {
-                options: Format.models
-                value: root.model
-                onPicked: option => root.run(["settings", "-model=" + option])
-            }
-
-            Select {
-                options: Format.efforts
-                value: root.effort
-                onPicked: option => root.run(["settings", "-effort=" + option])
-            }
 
             // Asks to confirm Clear.
             Row {
@@ -584,7 +571,7 @@ Column {
                     id: filterButton
                     icon: Format.icons.filter
                     label: "Filter"
-                    onClicked: root.menuRequested(() => Actions.filterRows(root.actionState), filterButton.mapToItem(null, 0, filterButton.height))
+                    onClicked: root.menuRequested(() => Actions.filterRows(root.actionState), filterButton.mapToItem(null, 0, 0, filterButton.width, filterButton.height), filterButton.activeFocus)
                 }
 
                 Repeater {
@@ -937,122 +924,80 @@ Column {
         }
     }
 
-    // A dropdown of strings; the open list overlaps what is below.
-    component Select: Rectangle {
-        id: select
+    // A property's value, its name in off while unset. A click, Enter or Space
+    // opens its menu on it.
+    component Chip: Rectangle {
+        id: chip
 
-        property var options: []
+        property string icon: ""
+        property string name: ""
         property string value: ""
-        property bool open: false
-        signal picked(string option)
+        property color accent: root.shell.palette.dim
+        // Returns the menu's rows.
+        property var rows: () => []
 
-        function choose(option) {
-            open = false;
-            picked(option);
+        function popup() {
+            root.menuRequested(rows, mapToItem(null, 0, 0, width, height), activeFocus);
         }
 
-        width: selectText.implicitWidth + selectChevron.implicitWidth + 28
+        width: chipRow.implicitWidth + 20
         height: 26
-        radius: 4
-        color: selectMouse.containsMouse || activeFocus ? root.shell.palette.sel : "transparent"
-        border.color: open ? root.shell.palette.fg : root.shell.palette.dim
+        radius: 13
+        color: activeFocus || chipMouse.containsMouse ? root.shell.palette.sel : "transparent"
+        border.color: activeFocus ? root.shell.palette.fg : accent
         border.width: 1
         activeFocusOnTab: true
 
-        Keys.onReturnPressed: open = !open
-        Keys.onSpacePressed: open = !open
-        Keys.onEscapePressed: event => {
-            event.accepted = open;
-            open = false;
-        }
+        Keys.onReturnPressed: popup()
+        Keys.onSpacePressed: popup()
 
-        Text {
-            id: selectText
-            anchors.left: parent.left
-            anchors.leftMargin: 10
-            anchors.verticalCenter: parent.verticalCenter
-            color: root.shell.palette.fg
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 12
-            text: select.value
-        }
+        Row {
+            id: chipRow
+            anchors.centerIn: parent
+            spacing: 6
 
-        Text {
-            id: selectChevron
-            anchors.right: parent.right
-            anchors.rightMargin: 8
-            anchors.verticalCenter: parent.verticalCenter
-            color: root.shell.palette.off
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 13
-            text: Format.icons.chevron
+            Text {
+                color: chipValue.color
+                font.family: Ui.Fonts.mono
+                font.pixelSize: 13
+                text: chip.icon
+            }
+
+            Text {
+                id: chipValue
+                width: Math.min(implicitWidth, 160)
+                elide: Text.ElideLeft
+                color: chip.value ? root.shell.palette.fg : root.shell.palette.off
+                font.family: Ui.Fonts.mono
+                font.pixelSize: 12
+                text: chip.value || chip.name
+            }
         }
 
         MouseArea {
-            id: selectMouse
+            id: chipMouse
             anchors.fill: parent
             hoverEnabled: true
-            onClicked: select.open = !select.open
+            onClicked: chip.popup()
+        }
+    }
+
+    // What the next run starts with.
+    component SettingChips: Row {
+        spacing: 8
+
+        Chip {
+            icon: Format.icons.model
+            name: "Model"
+            value: root.model
+            rows: () => Actions.submenuRows(Actions.windowRows(root.actionState), "model")
         }
 
-        Rectangle {
-            visible: select.open
-            anchors.top: parent.bottom
-            anchors.topMargin: 2
-            anchors.right: parent.right
-            width: selectOptions.implicitWidth + 8
-            height: selectOptions.implicitHeight + 8
-            radius: 4
-            color: root.shell.palette.bg
-            border.color: root.shell.palette.fg
-            border.width: 1
-
-            Column {
-                id: selectOptions
-                x: 4
-                y: 4
-
-                Repeater {
-                    model: select.options
-
-                    delegate: Rectangle {
-                        id: option
-
-                        required property string modelData
-
-                        width: Math.max(optionText.implicitWidth + 12, select.width - 8)
-                        height: 24
-                        radius: 3
-                        color: optionMouse.containsMouse || activeFocus ? root.shell.palette.sel : "transparent"
-                        activeFocusOnTab: true
-
-                        Keys.onReturnPressed: select.choose(modelData)
-                        Keys.onSpacePressed: select.choose(modelData)
-                        Keys.onEscapePressed: {
-                            select.open = false;
-                            select.forceActiveFocus();
-                        }
-
-                        Text {
-                            id: optionText
-                            anchors.left: parent.left
-                            anchors.leftMargin: 6
-                            anchors.verticalCenter: parent.verticalCenter
-                            color: option.modelData === select.value ? root.shell.palette.fg : root.shell.palette.off
-                            font.family: Ui.Fonts.mono
-                            font.pixelSize: 12
-                            text: (option.modelData === select.value ? Format.icons.done + " " : "") + option.modelData
-                        }
-
-                        MouseArea {
-                            id: optionMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            onClicked: select.choose(option.modelData)
-                        }
-                    }
-                }
-            }
+        Chip {
+            icon: Format.icons.effort
+            name: "Effort"
+            value: root.effort
+            rows: () => Actions.submenuRows(Actions.windowRows(root.actionState), "effort")
         }
     }
 
@@ -1133,7 +1078,7 @@ Column {
             onClicked: mouse => {
                 const id = row.modelData.id;
                 if (mouse.button === Qt.RightButton)
-                    root.menuRequested(() => root.rowMenu(id), mapToItem(null, mouse.x, mouse.y));
+                    root.menuRequested(() => root.rowMenu(id), mapToItem(null, mouse.x, mouse.y, 0, 0), false);
                 else
                     root.click(row.index, mouse.modifiers);
             }
@@ -1325,10 +1270,6 @@ Column {
         required property var item
         property var projects: []
         property string tag: ""
-        property bool open: false
-        // Typing a project that is not in the list yet; base is what was picked before.
-        property bool adding: false
-        property var base: []
         property bool loaded: false
 
         function save() {
@@ -1365,11 +1306,6 @@ Column {
             projects = projects.includes(name) ? projects.filter(other => other !== name) : projects.concat([name]);
         }
 
-        function close() {
-            open = false;
-            projectBox.forceActiveFocus();
-        }
-
         function start() {
             save();
             root.run(["start", itemId]);
@@ -1378,14 +1314,6 @@ Column {
         function discard() {
             saveLater.stop();
             root.remove(itemId);
-        }
-
-        function addProject() {
-            open = false;
-            adding = true;
-            base = projects;
-            projectField.text = "";
-            projectField.focusInput();
         }
 
         onProjectsChanged: changed()
@@ -1409,197 +1337,16 @@ Column {
 
         spacing: 8
 
-        Row {
-            spacing: 10
-
-            Text {
-                color: root.shell.palette.fg
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 16
-                font.bold: true
-                text: form.item.alert ? "Draft from alert" : "New investigation"
-            }
-
-            Badge {
-                anchors.verticalCenter: parent.verticalCenter
-                tag: form.tag
-            }
+        Text {
+            color: root.shell.palette.fg
+            font.family: Ui.Fonts.mono
+            font.pixelSize: 16
+            font.bold: true
+            text: form.item.alert ? "Draft from alert" : "New investigation"
         }
 
         Alert {
             alert: form.item.alert
-        }
-
-        Meta {
-            visible: root.tags.length > 0
-            text: "Tag (optional)"
-        }
-
-        Row {
-            visible: root.tags.length > 0
-            spacing: 8
-
-            Repeater {
-                model: root.tags
-
-                // Picking the picked one again clears it.
-                delegate: Btn {
-                    required property var modelData
-
-                    label: modelData.name
-                    primary: form.tag === modelData.name
-                    onClicked: form.tag = form.tag === modelData.name ? "" : modelData.name
-                }
-            }
-        }
-
-        Meta {
-            text: "GCP project"
-        }
-
-        Field {
-            id: projectField
-            visible: form.adding
-            placeholder: "my-project"
-            onTextChanged: if (form.adding)
-                form.projects = form.base.concat(text.trim() && !form.base.includes(text.trim()) ? [text.trim()] : [])
-            onSubmitted: form.adding = false
-        }
-
-        Rectangle {
-            id: projectBox
-            visible: !form.adding
-            // Above the fields below, which the open list overlaps.
-            z: form.open ? 10 : 0
-            width: parent.width
-            height: 28
-            radius: 4
-            color: projectMouse.containsMouse || activeFocus ? root.shell.palette.sel : "transparent"
-            border.color: form.open ? root.shell.palette.fg : root.shell.palette.dim
-            border.width: 1
-            activeFocusOnTab: true
-
-            Keys.onReturnPressed: form.open = !form.open
-            Keys.onSpacePressed: form.open = !form.open
-            Keys.onEscapePressed: event => {
-                event.accepted = form.open;
-                form.open = false;
-            }
-
-            Text {
-                anchors.left: parent.left
-                anchors.leftMargin: 8
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.right: projectChevron.left
-                anchors.rightMargin: 4
-                elide: Text.ElideRight
-                color: form.projects.length ? root.shell.palette.fg : root.shell.palette.off
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 13
-                text: form.projects.join(", ") || "Select projects"
-            }
-
-            Text {
-                id: projectChevron
-                anchors.right: parent.right
-                anchors.rightMargin: 8
-                anchors.verticalCenter: parent.verticalCenter
-                color: root.shell.palette.off
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 13
-                text: Format.icons.chevron
-            }
-
-            MouseArea {
-                id: projectMouse
-                anchors.fill: parent
-                hoverEnabled: true
-                onClicked: form.open = !form.open
-            }
-
-            Rectangle {
-                visible: form.open
-                anchors.top: parent.bottom
-                anchors.topMargin: 2
-                width: parent.width
-                height: projectList.implicitHeight + 8
-                radius: 4
-                color: root.shell.palette.bg
-                border.color: root.shell.palette.fg
-                border.width: 1
-
-                Column {
-                    id: projectList
-                    anchors.fill: parent
-                    anchors.margins: 4
-
-                    Repeater {
-                        model: [...new Set(root.projects.concat(form.projects))]
-
-                        delegate: Rectangle {
-                            id: option
-
-                            required property string modelData
-
-                            width: parent.width
-                            height: 24
-                            radius: 3
-                            color: optionMouse.containsMouse || activeFocus ? root.shell.palette.sel : "transparent"
-                            activeFocusOnTab: true
-
-                            Keys.onReturnPressed: form.toggle(modelData)
-                            Keys.onSpacePressed: form.toggle(modelData)
-                            Keys.onEscapePressed: form.close()
-
-                            Text {
-                                anchors.left: parent.left
-                                anchors.leftMargin: 6
-                                anchors.verticalCenter: parent.verticalCenter
-                                color: root.shell.palette.fg
-                                font.family: Ui.Fonts.mono
-                                font.pixelSize: 13
-                                text: (form.projects.includes(option.modelData) ? Format.icons.done + " " : "") + option.modelData
-                            }
-
-                            MouseArea {
-                                id: optionMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                onClicked: form.toggle(option.modelData)
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        width: parent.width
-                        height: 24
-                        radius: 3
-                        color: addMouse.containsMouse || activeFocus ? root.shell.palette.sel : "transparent"
-                        activeFocusOnTab: true
-
-                        Keys.onReturnPressed: form.addProject()
-                        Keys.onSpacePressed: form.addProject()
-                        Keys.onEscapePressed: form.close()
-
-                        Text {
-                            anchors.left: parent.left
-                            anchors.leftMargin: 6
-                            anchors.verticalCenter: parent.verticalCenter
-                            color: root.shell.palette.off
-                            font.family: Ui.Fonts.mono
-                            font.pixelSize: 13
-                            text: Format.icons.plus + "  Add a project…"
-                        }
-
-                        MouseArea {
-                            id: addMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            onClicked: form.addProject()
-                        }
-                    }
-                }
-            }
         }
 
         Meta {
@@ -1627,18 +1374,47 @@ Column {
             onSubmitted: form.start()
         }
 
-        Row {
-            spacing: 8
+        // The draft's properties, then its actions.
+        Item {
+            width: parent.width
+            height: 26
 
-            Btn {
-                icon: Format.icons.play
-                label: "Run"
-                primary: true
-                onClicked: form.start()
+            Row {
+                spacing: 8
+
+                Chip {
+                    visible: root.tags.length > 0
+                    icon: Format.icons.tag
+                    name: "Tag"
+                    value: form.tag
+                    accent: form.tag ? root.tagColor(form.tag) : root.shell.palette.dim
+                    rows: () => Actions.submenuRows(form.menuScope().rows, "tag")
+                }
+
+                Chip {
+                    icon: Format.icons.filter
+                    name: "Projects"
+                    value: form.projects.join(", ")
+                    rows: () => Actions.submenuRows(form.menuScope().rows, "projects")
+                }
+
+                SettingChips {}
             }
-            Btn {
-                label: "Discard"
-                onClicked: form.discard()
+
+            Row {
+                anchors.right: parent.right
+                spacing: 8
+
+                Btn {
+                    icon: Format.icons.play
+                    label: "Run"
+                    primary: true
+                    onClicked: form.start()
+                }
+                Btn {
+                    label: "Discard"
+                    onClicked: form.discard()
+                }
             }
         }
     }
@@ -1694,9 +1470,14 @@ Column {
                 text: Format.name(detail.item)
             }
 
-            Badge {
+            Chip {
+                visible: root.tags.length > 0
                 anchors.verticalCenter: parent.verticalCenter
-                tag: detail.item.tag
+                icon: Format.icons.tag
+                name: "Tag"
+                value: detail.item.tag
+                accent: detail.item.tag ? root.tagColor(detail.item.tag) : root.shell.palette.dim
+                rows: () => Actions.submenuRows(detail.menuScope().rows, "tag")
             }
 
             // The Claude Code profile, so a run on the wrong account shows.
@@ -1718,24 +1499,6 @@ Column {
             width: parent.width
             elide: Text.ElideRight
             text: detail.item.status + "  ·  " + detail.item.projects.join(", ") + "  ·  started " + Format.ago(detail.item.startedAt) + (detail.item.finishedAt ? "  ·  took " + Format.duration(detail.item.finishedAt - detail.item.startedAt) : "") + "  ·  $" + detail.item.costUsd.toFixed(2)
-        }
-
-        Row {
-            visible: root.tags.length > 0
-            spacing: 8
-
-            Repeater {
-                model: root.tags
-
-                // Picking the picked one again clears it.
-                delegate: Btn {
-                    required property var modelData
-
-                    label: modelData.name
-                    primary: detail.item.tag === modelData.name
-                    onClicked: root.run(["tag", detail.item.id].concat(detail.item.tag === modelData.name ? [] : [modelData.name]))
-                }
-            }
         }
 
         Row {
@@ -2151,13 +1914,18 @@ Column {
 
             Field {
                 id: followField
-                width: parent.width - 80
+                width: parent.width - followSettings.width - sendButton.width - 16
                 readOnly: !detail.canFollowUp
                 placeholder: detail.running ? "Claude is working…" : "Ask a follow-up…"
                 onSubmitted: detail.send()
             }
 
+            SettingChips {
+                id: followSettings
+            }
+
             Btn {
+                id: sendButton
                 icon: Format.icons.send
                 label: "Send"
                 enabled: detail.canFollowUp

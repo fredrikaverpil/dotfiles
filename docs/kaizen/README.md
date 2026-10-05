@@ -172,8 +172,8 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   `menu popup <id>` and `menu level <id>` open it at that level.
 - An application's palette draws it over the window's content
   (`Ui/MenuOverlay`), from the actions the focused item and its parents
-  declare (`menuScope()`). A right-click there hangs a cascading context menu
-  from the pointer (`popup()`).
+  declare (`menuScope()`). A right-click there, or a click on a chip, hangs a
+  cascading context menu from the pointer or the chip (`popup()`).
 - Every surface opens over IPC; niri binds are `spawn qs ipc call ...`.
 - How each surface takes input, the bar buttons' kinds included:
   [`interaction.md`](interaction.md).
