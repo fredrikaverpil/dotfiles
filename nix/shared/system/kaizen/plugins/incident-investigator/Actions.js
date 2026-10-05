@@ -197,9 +197,9 @@ function messageText(message) {
 // session to replay.
 function messageRows(item, index, selection) {
   var message = item.messages[index]
-  var rows = [row({ key: "copyMessage", text: "Copy", glyph: Format.icons.copy, keys: selection ? [] : ["Ctrl", "C"], action: "copy", arg: messageText(message) })]
-  if (selection)
-    rows.push(row({ key: "copySelection", text: "Copy selection", glyph: Format.icons.copy, keys: ["Ctrl", "C"], action: "copy", arg: selection }))
+  var rows = [selection
+    ? row({ key: "copySelection", text: "Copy selection", glyph: Format.icons.copy, keys: ["Ctrl", "C"], action: "copy", arg: selection })
+    : row({ key: "copyMessage", text: "Copy", glyph: Format.icons.copy, keys: ["Ctrl", "C"], action: "copy", arg: messageText(message) })]
   if (message.kind === "user" && item.status !== "running" && item.sessionId) {
     rows.push(row({ key: "edit", text: "Edit", glyph: Format.icons.draft, keys: ["Enter"], action: "edit", arg: String(index) }))
     rows.push(row({ key: "branch", text: "Branch", glyph: Format.icons.play, action: "branch", arg: String(index) }))

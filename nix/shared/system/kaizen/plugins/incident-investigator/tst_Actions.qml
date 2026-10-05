@@ -741,11 +741,11 @@ TestCase {
                 }
             ]
         });
-        const copy = (arg, keyed) => row({
+        const copy = arg => row({
                 key: "copyMessage",
                 text: "Copy",
                 glyph: Format.icons.copy,
-                keys: keyed ? ["Ctrl", "C"] : [],
+                keys: ["Ctrl", "C"],
                 action: "copy",
                 arg: arg
             });
@@ -770,7 +770,7 @@ TestCase {
                 item: conversation,
                 index: 0,
                 selection: "",
-                want: about(["a"], [copy("why", true), edit, branch])
+                want: about(["a"], [copy("why"), edit, branch])
             },
             {
                 tag: "own message while running",
@@ -779,7 +779,7 @@ TestCase {
                 }),
                 index: 0,
                 selection: "",
-                want: about(["a"], [copy("why", true)])
+                want: about(["a"], [copy("why")])
             },
             {
                 tag: "own message without a session",
@@ -788,21 +788,21 @@ TestCase {
                 }),
                 index: 0,
                 selection: "",
-                want: about(["a"], [copy("why", true)])
+                want: about(["a"], [copy("why")])
             },
             {
                 tag: "commands",
                 item: conversation,
                 index: 1,
                 selection: "",
-                want: about(["a"], [copy("ls\npwd", true)])
+                want: about(["a"], [copy("ls\npwd")])
             },
             {
                 tag: "answer with a selection",
                 item: conversation,
                 index: 2,
                 selection: "caus",
-                want: about(["a"], [copy("because", false), row({
+                want: about(["a"], [row({
                         key: "copySelection",
                         text: "Copy selection",
                         glyph: Format.icons.copy,
