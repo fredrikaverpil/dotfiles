@@ -70,16 +70,52 @@ Column {
         }
     }
 
+    // Space on a row: toggles it in the picked set, which starts from the selection.
+    function togglePick(id) {
+        if (!picked.length && id === selectedId) {
+            picked = [id];
+        } else {
+            const base = picked.length ? picked : [selectedId];
+            picked = base.indexOf(id) >= 0 ? base.filter(other => other !== id) : base.concat([id]);
+        }
+    }
+
     // Running ones stay; cancel them first.
     readonly property var deletable: pickedItems.filter(item => item.status !== "running")
 
     function deletePicked() {
-        const gone = deletable.map(item => item.id);
+        deleteItems(deletable.map(item => item.id));
+    }
+
+    // Removes the investigations; the selection moves to the nearest one left.
+    function deleteItems(gone) {
+        const index = items.findIndex(item => item.id === selectedId);
         const rest = items.filter(item => gone.indexOf(item.id) < 0);
         if (gone.indexOf(selectedId) >= 0)
-            selectedId = rest.length ? rest[0].id : "";
+            selectedId = rest.length ? rest[Math.min(index, rest.length - 1)].id : "";
         picked = [];
         run(["delete"].concat(gone));
+    }
+
+    // The ids that Backspace on a row asks to delete; empty when not asking.
+    property var confirmingDelete: []
+    property bool showKeys: false
+
+    // Backspace deletes the picked rows, or else the focused one; running ones stay.
+    function askDelete(id) {
+        const ids = (picked.length ? picked : [id]).filter(other => items.some(item => item.id === other && item.status !== "running"));
+        if (!ids.length)
+            return;
+        confirmingDelete = ids;
+        listBar.forceActiveFocus();
+    }
+
+    function answerDelete(yes) {
+        const ids = confirmingDelete;
+        confirmingDelete = [];
+        if (yes)
+            deleteItems(ids);
+        Qt.callLater(focusSelected);
     }
 
     function combinePicked() {
@@ -143,12 +179,14 @@ Column {
         Quickshell.execDetached(["wl-copy", "--", text]);
     }
 
-    // Moves the selection by delta through the list and focuses its row.
+    // Moves the selection by delta through the list and focuses its row; with rows picked, only the focus
+    // moves, so the picks stay.
     function step(delta) {
-        const index = items.findIndex(item => item.id === selectedId) + delta;
+        const index = (picked.length ? list.currentIndex : items.findIndex(item => item.id === selectedId)) + delta;
         if (index < 0 || index >= items.length)
             return;
-        selectedId = items[index].id;
+        if (!picked.length)
+            selectedId = items[index].id;
         focusRow(index);
     }
 
@@ -503,7 +541,8 @@ Column {
             anchors.left: parent.left
             anchors.top: listFilters.bottom
             anchors.topMargin: 8
-            anchors.bottom: parent.bottom
+            anchors.bottom: listBar.visible ? listBar.top : parent.bottom
+            anchors.bottomMargin: listBar.visible ? 8 : 0
             width: root.listWidth
             clip: true
             spacing: 2
@@ -519,6 +558,75 @@ Column {
                 font.family: Ui.Fonts.mono
                 font.pixelSize: 13
                 text: "No investigations"
+            }
+        }
+
+        // Asks to confirm a delete, or else lists the list's keys.
+        Rectangle {
+            id: listBar
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
+            width: root.listWidth
+            height: barColumn.implicitHeight + 16
+            visible: root.confirmingDelete.length > 0 || root.showKeys
+            radius: 4
+            color: "transparent"
+            border.color: activeFocus ? root.shell.palette.rose : root.shell.palette.dim
+            border.width: 1
+
+            Keys.onPressed: event => {
+                if (!root.confirmingDelete.length)
+                    return;
+                if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Y)
+                    root.answerDelete(true);
+                else if (event.key === Qt.Key_Escape || event.key === Qt.Key_N || event.key === Qt.Key_Backspace)
+                    root.answerDelete(false);
+                else
+                    return;
+                event.accepted = true;
+            }
+
+            Column {
+                id: barColumn
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.margins: 8
+                spacing: 6
+
+                Meta {
+                    visible: root.confirmingDelete.length > 0
+                    width: parent.width
+                    wrapMode: Text.Wrap
+                    color: root.shell.palette.fg
+                    text: "Delete " + root.confirmingDelete.length + (root.confirmingDelete.length === 1 ? " investigation?" : " investigations?")
+                }
+
+                Row {
+                    visible: root.confirmingDelete.length > 0
+                    spacing: 8
+
+                    Btn {
+                        label: "Yes"
+                        danger: true
+                        onClicked: root.answerDelete(true)
+                    }
+                    Btn {
+                        label: "No"
+                        onClicked: root.answerDelete(false)
+                    }
+                    Meta {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: "y / n"
+                    }
+                }
+
+                Meta {
+                    visible: root.confirmingDelete.length === 0
+                    width: parent.width
+                    wrapMode: Text.Wrap
+                    text: "j/k move  ⏎ open  ␣ pick  ⌫ delete  esc unpick  ? hide"
+                }
             }
         }
 
@@ -923,13 +1031,25 @@ Column {
         border.width: 1
         activeFocusOnTab: true
 
-        Keys.onReturnPressed: root.selectedId = modelData.id
-        Keys.onSpacePressed: root.selectedId = modelData.id
+        onActiveFocusChanged: if (activeFocus)
+            ListView.view.currentIndex = index
+
+        Keys.onReturnPressed: {
+            root.picked = [];
+            root.selectedId = modelData.id;
+        }
+        Keys.onSpacePressed: root.togglePick(modelData.id)
         Keys.onPressed: event => {
             if (event.key === Qt.Key_J || event.key === Qt.Key_Down)
                 root.step(1);
             else if (event.key === Qt.Key_K || event.key === Qt.Key_Up)
                 root.step(-1);
+            else if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete)
+                root.askDelete(modelData.id);
+            else if (event.key === Qt.Key_Question)
+                root.showKeys = !root.showKeys;
+            else if (event.key === Qt.Key_Escape && root.picked.length)
+                root.picked = [];
             else
                 return;
             event.accepted = true;

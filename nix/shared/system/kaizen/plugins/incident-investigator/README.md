@@ -97,6 +97,9 @@ flowchart LR
   `settings.json`. **New** under a tag's filter drafts an
   investigation with that tag, so the filter lists it. The tag buttons under an
   investigation's header set or clear its tag (`tag`) in any status.
+- On a focused row in the list, `j`/`k` move, Enter opens, Space toggles it in
+  the picked set (`j`/`k` then move only the focus), Backspace asks to delete
+  the picked rows, or else the focused one, Esc unpicks and `?` shows the keys.
 - Shift-click (a range) or ctrl-click (a toggle) picks investigations in the
   list, and **Combine** drafts a new one from their alerts and reports
   (`combine`), with the union of their entities, or **Delete** removes them
