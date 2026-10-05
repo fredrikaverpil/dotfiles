@@ -50,8 +50,9 @@ actions.
   into an item, and the root adds Apps.
 - Hyphens are ignored ("wifi" finds "Wi-Fi"); rows with a key also match by
   it.
-- Order is frecency, then the tree's order, with direct children before deeper
-  matches.
+- Order is frecency (palette only), then the tree's order, with direct
+  children before deeper matches. A context menu skips frecency so its rows
+  stay where the hand expects them.
 
 ### Keys
 

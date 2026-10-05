@@ -511,8 +511,8 @@ Ui.Panel {
     }
 
     // Launch counts for frecency: apps keyed by entry.id, tree actions by their
-    // menu id. Built when entries load, not per keystroke: a first icon-theme
-    // lookup costs ~25 ms per app. Re-sorted (cheap) on launch count changes.
+    // menu id. Apps are built when entries load, not per keystroke: a first
+    // icon-theme lookup costs ~25 ms per app.
     property var launchCounts: ({})
     property bool launchCountsLoaded: false
     readonly property var baseApps: DesktopEntries.applications.values.filter(entry => !entry.noDisplay).map(entry => ({
@@ -523,7 +523,7 @@ Ui.Panel {
                 enabled: true,
                 entry: entry
             }))
-    readonly property var apps: baseApps.slice().sort((a, b) => (menu.launchCounts[b.entry.id] || 0) - (menu.launchCounts[a.entry.id] || 0) || a.label.localeCompare(b.label))
+    readonly property var apps: baseApps.slice().sort((a, b) => a.label.localeCompare(b.label))
 
     function recordLaunch(id) {
         launchCounts = Object.assign({}, launchCounts, {
@@ -743,9 +743,10 @@ Ui.Panel {
         })
 
     // Launcher rows shaped like QsMenuEntry, for a MenuCard; keep filters the
-    // target's own rows. A keybinding has no action and is there to read.
-    function cardRows(target, keep, query) {
-        const rows = Model.rowsFor(menu.items, target, query, menu.providers, menu.launchCounts).filter(keep || (() => true)).map(row => {
+    // target's own rows; counts orders them by frecency. A keybinding has no
+    // action and is there to read.
+    function cardRows(target, keep, query, counts) {
+        const rows = Model.rowsFor(menu.items, target, query, menu.providers, counts).filter(keep || (() => true)).map(row => {
             const run = row.trayItem || row.entry || row.action ? () => menu.launch(row) : null;
             return {
                 text: row.label,
@@ -756,7 +757,7 @@ Ui.Panel {
                 enabled: row.enabled && (row.submenu || !!run || row.chord !== undefined),
                 isSeparator: false,
                 hasChildren: row.submenu === true,
-                rows: row.submenu ? childQuery => menu.cardRows(row.id, null, childQuery) : undefined,
+                rows: row.submenu ? childQuery => menu.cardRows(row.id, null, childQuery, counts) : undefined,
                 triggered: run,
                 key: row.id
             };
@@ -772,8 +773,8 @@ Ui.Panel {
             enabled: true
         })
 
-    // Card rows for the context menu, whose top level opens the launcher where a
-    // node opens its panel.
+    // Card rows for the context menu, in the tree's order. Its top level opens
+    // the launcher where a node opens its panel.
     function contextRows(target, keep, query) {
         const rows = menu.cardRows(target, keep, query);
         if (target === "root" && !query)
@@ -876,7 +877,7 @@ Ui.Panel {
         width: parent.width
         height: parent.height - y
         shell: menu.shell
-        rows: menu.cardRows(menu.level, null, card.query)
+        rows: menu.cardRows(menu.level, null, card.query, menu.launchCounts)
         placeholder: menu.level === "root" ? "Search…" : "Filter " + menu.items[menu.level].label.toLowerCase() + "…"
         fontSize: 16
         rowHeight: 36

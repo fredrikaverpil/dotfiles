@@ -87,7 +87,9 @@ function rowsFor(items, level, query, providers, counts) {
 
   if (item && item.provider !== undefined) {
     var rows = rowsFrom(providers, item.provider, "");
-    return normalizedQuery.length === 0 ? rows : rows.filter(filterMatches);
+    return (
+      normalizedQuery.length === 0 ? rows.slice() : rows.filter(filterMatches)
+    ).sort(byFrecency(counts));
   }
   if (normalizedQuery.length === 0) {
     return childrenOf(items, level)
