@@ -88,6 +88,65 @@ TestCase {
         compare(Menu.rowsFor(items, "root", "", {}).map(row => row.id), ["apps", "learn", "style"]);
     }
 
+    // QV4 sorts seven or more elements unstably.
+    function test_ties_keep_declared_order_beyond_six_rows() {
+        const labels = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"].map(letter => "item " + letter);
+        const many = {
+            many: {
+                label: "Many"
+            },
+            list: {
+                label: "List",
+                provider: "list"
+            }
+        };
+        labels.forEach((label, index) => many["many." + index] = {
+                label: label
+            });
+        const providers = {
+            list: () => labels.map(label => ({
+                            label: label,
+                            enabled: true
+                        }))
+        };
+        const cases = [
+            {
+                name: "tree without counts",
+                level: "many",
+                query: "",
+                counts: undefined,
+                want: labels
+            },
+            {
+                name: "tree with one launched",
+                level: "many",
+                query: "",
+                counts: {
+                    "many.7": 1
+                },
+                want: [labels[7]].concat(labels.filter((label, index) => index !== 7))
+            },
+            {
+                name: "search",
+                level: "many",
+                query: "item",
+                counts: undefined,
+                want: labels
+            },
+            {
+                name: "provider",
+                level: "list",
+                query: "",
+                counts: {},
+                want: labels
+            }
+        ];
+        for (const c of cases) {
+            const got = Menu.rowsFor(many, c.level, c.query, providers, c.counts).map(row => row.label);
+            compare(got, c.want, c.name);
+        }
+    }
+
     function test_frecency_reorders_launched_items_ties_keep_declared_order() {
         const providers = {
             apps: detail => [
