@@ -923,6 +923,35 @@ Column {
         }
     }
 
+    // Markdown a block at a time: headings at the body's size in the accent
+    // colour, code in the body's font.
+    component Blocks: Column {
+        id: blocks
+
+        property string text: ""
+
+        spacing: 6
+
+        Repeater {
+            model: Format.blocks(blocks.text)
+
+            delegate: Selectable {
+                required property var modelData
+                readonly property bool plain: modelData.heading || modelData.code
+
+                width: blocks.width
+                wrapMode: modelData.code ? TextEdit.Wrap : TextEdit.WordWrap
+                textFormat: plain ? TextEdit.PlainText : TextEdit.MarkdownText
+                color: modelData.heading ? root.shell.palette.blossom : modelData.code ? root.shell.palette.water : root.shell.palette.fg
+                font.family: Ui.Fonts.mono
+                font.pixelSize: 14
+                font.bold: modelData.heading
+                topPadding: modelData.heading ? 6 : 0
+                text: plain ? modelData.text : Format.literals(modelData.text, root.shell.palette.water)
+            }
+        }
+    }
+
     // A property's value, its name in off while unset. A click, Enter or Space
     // opens its menu on it.
     component Chip: Rectangle {
@@ -1813,16 +1842,11 @@ Column {
                                         radius: 8
                                         color: root.shell.palette.sel
 
-                                        Selectable {
+                                        Blocks {
                                             id: bubbleText
                                             anchors.fill: parent
                                             anchors.margins: 8
-                                            wrapMode: TextEdit.WordWrap
-                                            textFormat: TextEdit.MarkdownText
-                                            color: root.shell.palette.fg
-                                            font.family: Ui.Fonts.mono
-                                            font.pixelSize: 14
-                                            text: Format.literals(message.modelData.text, root.shell.palette.water)
+                                            text: message.modelData.text
                                         }
                                     }
 
@@ -1880,23 +1904,9 @@ Column {
                                 Column {
                                     spacing: 6
 
-                                    Repeater {
-                                        model: Format.blocks(message.modelData.text)
-
-                                        delegate: Selectable {
-                                            required property var modelData
-                                            readonly property bool plain: modelData.heading || modelData.code
-
-                                            width: parent.width
-                                            wrapMode: modelData.code ? TextEdit.Wrap : TextEdit.WordWrap
-                                            textFormat: plain ? TextEdit.PlainText : TextEdit.MarkdownText
-                                            color: modelData.heading ? root.shell.palette.blossom : modelData.code ? root.shell.palette.water : root.shell.palette.fg
-                                            font.family: Ui.Fonts.mono
-                                            font.pixelSize: 14
-                                            font.bold: modelData.heading
-                                            topPadding: modelData.heading ? 6 : 0
-                                            text: plain ? modelData.text : Format.literals(modelData.text, root.shell.palette.water)
-                                        }
+                                    Blocks {
+                                        width: parent.width
+                                        text: message.modelData.text
                                     }
 
                                     IconBtn {
