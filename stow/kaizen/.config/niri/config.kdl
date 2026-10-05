@@ -253,8 +253,8 @@ binds {
 
     // Groups: columns are the nearest thing niri has to Hyprland's groups.
     Mod+G hotkey-overlay-title="Toggle window grouping" { toggle-column-tabbed-display; }
-    Mod+Alt+Left hotkey-overlay-title="Move window to group on left" { consume-or-expel-window-left; }
-    Mod+Alt+Right hotkey-overlay-title="Move window to group on right" { consume-or-expel-window-right; }
+    Mod+BracketLeft hotkey-overlay-title="Move window to group on left" { consume-or-expel-window-left; }
+    Mod+BracketRight hotkey-overlay-title="Move window to group on right" { consume-or-expel-window-right; }
     Mod+Alt+Tab hotkey-overlay-title="Next window in group" { focus-window-down; }
     Mod+Alt+Shift+Tab hotkey-overlay-title="Previous window in group" { focus-window-up; }
     Mod+Comma hotkey-overlay-title="Consume window into group" { consume-window-into-column; }
