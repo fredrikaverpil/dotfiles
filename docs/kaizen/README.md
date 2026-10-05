@@ -7,6 +7,8 @@ that an agent can drive and verify from a terminal.
 - [`features.md`](features.md): constraints behind individual features.
 - [`plugins.md`](plugins.md): optional shell extensions and how to write one.
 - [`style.md`](style.md): palette, colour roles, shapes, status marks.
+- [`interaction.md`](interaction.md): keys, menus, the bar, panels, tray and
+  applications.
 - [`development.md`](development.md): working on kaizen, validation and
   deployment.
 
@@ -167,19 +169,8 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   It shows a tray item's menu or a launcher level (`menu popup <id>`); a level
   marked `search` opens in the launcher instead.
 - Every surface opens over IPC; niri binds are `spawn qs ipc call ...`.
-- The bar mirrors the launcher; nothing is reachable only from it. Every
-  panel action is a launcher row under Settings, except sliders and per-item
-  detail (forgetting a network, recording options).
-- Bar buttons come in four kinds, told apart by what a click does:
-  - ❄ and the workspaces: left-click opens the launcher, right-click its top
-    level as a context menu; a workspace takes focus.
-  - Panel buttons: left-click opens the panel, right-click the button's
-    Settings node as a context menu. The date is one only when a plugin takes
-    it over, and opens the plugin's node; otherwise it is a plain label.
-  - Indicators, shown only off the default state: left-click acts on it
-    (stops the recording or every mirror, re-enables idle locking, resets the
-    layout). The system alert is a plain label.
-  - Tray items: the app's own activation and menu.
+- How each surface takes input, the bar buttons' kinds included:
+  [`interaction.md`](interaction.md).
 - Plugins add launcher items, panels, IPC targets and bar indicators:
   [`plugins.md`](plugins.md).
 - [`Ui/Compositor.qml`](../../stow/kaizen/.config/quickshell/Ui/Compositor.qml)

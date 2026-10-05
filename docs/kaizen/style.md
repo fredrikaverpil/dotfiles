@@ -32,6 +32,9 @@ and may deviate.
   `sel` fill alone. A field that failed (lock, polkit) turns its outline `rose`.
   The lock field and selections drawn over content take 2 px.
 - Surfaces (panel, context menu, notification, OSD) have radius 8.
+- A key is a keycap per key (`Super` `Space`), set apart from the label it
+  belongs to: `off` text a size smaller, outlined `dim` at radius 3 with a 2 px
+  bottom edge. A menu row puts it in a column on the right.
 - Text is `Ui.Fonts.mono`. Links are `water` and underlined; inline code is
   `water` in the body's font and size. Qt's Markdown rendering ignores
   `linkColor` and draws code in its own larger fixed font, so markdown text goes
