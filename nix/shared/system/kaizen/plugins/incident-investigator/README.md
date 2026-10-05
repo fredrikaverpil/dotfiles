@@ -151,7 +151,7 @@ notify-send -a Slack "[workspace] in #alerts-dev" \
 - Allowed: `gcloud logging read`, `gcloud logging buckets list`,
   `gcloud alpha monitoring alerts describe` and `list`,
   `gcloud monitoring policies describe`, `gcloud run services describe`,
-  `gcloud run revisions list` and `describe`, Read, Grep; everything else is
+  `gcloud run revisions list` and `describe`, `gcloud run jobs describe`, Read, Grep; everything else is
   denied (`--permission-mode dontAsk`).
 - `--max-budget-usd 5` per turn.
 - Every run uses the `claudeConfigDir` profile. Each investigation records it,

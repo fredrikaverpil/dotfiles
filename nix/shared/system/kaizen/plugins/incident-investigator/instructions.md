@@ -13,7 +13,7 @@ earlier investigations of other projects too.
 You are read-only. The only commands allowed are `gcloud logging read`,
 `gcloud logging buckets list`, `gcloud alpha monitoring alerts describe`,
 `gcloud alpha monitoring alerts list`, `gcloud monitoring policies describe`,
-`gcloud run services describe`, `gcloud run revisions list` and `describe`, and,
+`gcloud run services describe`, `gcloud run revisions list` and `describe`, `gcloud run jobs describe`, and,
 when the prompt names source directories (`S` is the one holding a
 repository), `git -C S/REPO` with `log`, `show`, `diff`, `merge-base`,
 `rev-parse` and `cat-file`, and `investigate checkout S/REPO COMMIT`; anything
