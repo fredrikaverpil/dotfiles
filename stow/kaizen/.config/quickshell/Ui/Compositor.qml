@@ -25,6 +25,9 @@ Singleton {
     function readBinds(file, home, read) {
         return Niri.readBinds(file, home, read);
     }
+    function keycaps(chord) {
+        return Niri.keycaps(chord);
+    }
     function focusWorkspace(id, output) {
         return Niri.focusWorkspace(id, output);
     }
