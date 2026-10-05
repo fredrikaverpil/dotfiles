@@ -16,7 +16,16 @@ var icons = {
   copy: String.fromCodePoint(0xF018F),
   reply: String.fromCodePoint(0xF045A),
   chevron: String.fromCodePoint(0xF0140),
-  send: String.fromCodePoint(0xF048A)
+  send: String.fromCodePoint(0xF048A),
+  tag: String.fromCodePoint(0xF04F9),
+  model: String.fromCodePoint(0xF06A9),
+  effort: String.fromCodePoint(0xF029A),
+  filter: String.fromCodePoint(0xF0232),
+  close: String.fromCodePoint(0xF0156),
+  radio: String.fromCodePoint(0xF043D),
+  radioOn: String.fromCodePoint(0xF043E),
+  check: String.fromCodePoint(0xF0131),
+  checkOn: String.fromCodePoint(0xF0132)
 }
 
 // What a run can use; the daemon rejects anything else.

@@ -5,6 +5,7 @@ singleton Fonts 1.0 Fonts.qml
 Panel 1.0 Panel.qml
 ContextMenu 1.0 ContextMenu.qml
 MenuCard 1.0 MenuCard.qml
+MenuOverlay 1.0 MenuOverlay.qml
 Keycaps 1.0 Keycaps.qml
 BarButton 1.0 BarButton.qml
 singleton Paths 1.0 Paths.qml

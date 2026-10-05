@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Io
 
 import qs.Ui as Ui
+import "Actions.js" as Actions
 import "Format.js" as Format
 
 // The window's content: the list of investigations and the selected one.
@@ -10,6 +11,8 @@ Column {
     id: root
 
     required property var shell
+
+    signal paletteRequested(var keys)
 
     spacing: 8
 
@@ -99,7 +102,6 @@ Column {
 
     // The ids that Backspace on a row asks to delete; empty when not asking.
     property var confirmingDelete: []
-    property bool showKeys: false
 
     // Backspace deletes the picked rows, or else the focused one; running ones stay.
     function askDelete(id) {
@@ -125,7 +127,77 @@ Column {
 
     // Running ones stay; cancel them first.
     readonly property var clearable: items.filter(item => item.status !== "running")
+    readonly property string clearLabel: projectFilter.length || query ? "Clear listed" : tagFilter ? "Clear " + tagFilter : "Clear all"
     property bool confirmingClear: false
+
+    // A draft with the filtered tag, so the filter lists it.
+    function draft() {
+        run(tagFilter ? ["draft", "-tag=" + tagFilter] : ["draft"]);
+    }
+
+    // The palette's rows.
+    readonly property var actions: Actions.actions({
+        current: current,
+        picked: pickedItems,
+        deletable: deletable.length,
+        clearable: clearable.length,
+        clearLabel: clearLabel,
+        tags: tags,
+        model: model,
+        effort: effort,
+        tagFilter: tagFilter,
+        projectFilter: projectFilter,
+        projects: listedProjects
+    })
+
+    // Runs a palette row's action on the selection, or on the picked set.
+    function runAction(action, arg) {
+        const form = formView.count ? formView.itemAt(0) : null;
+        const detail = detailView.count ? detailView.itemAt(0) : null;
+        if (action === "run" && form)
+            form.start();
+        else if (action === "discard" && form)
+            form.discard();
+        else if (action === "stop")
+            run(["cancel", current.id]);
+        else if (action === "rerun")
+            run(["start", current.id]);
+        else if (action === "followUp" && detail)
+            detail.followUp();
+        else if (action === "terminal")
+            terminal(current);
+        else if (action === "copy")
+            copy(arg);
+        else if (action === "tag" && form)
+            form.tag = arg;
+        else if (action === "tag")
+            run(["tag", current.id].concat(arg ? [arg] : []));
+        else if (action === "delete")
+            askDelete(selectedId);
+        else if (action === "combine")
+            combinePicked();
+        else if (action === "unpick")
+            picked = [];
+        else if (action === "new")
+            draft();
+        else if (action === "clear")
+            confirmingClear = true;
+        else if (action === "model")
+            run(["settings", "-model=" + arg]);
+        else if (action === "effort")
+            run(["settings", "-effort=" + arg]);
+        else if (action === "filterTag")
+            tagFilter = arg;
+        else if (action === "filterProject")
+            projectFilterBox.toggle(arg);
+    }
+
+    Keys.onPressed: event => {
+        if (event.key !== Qt.Key_Question)
+            return;
+        paletteRequested(["?"]);
+        event.accepted = true;
+    }
 
     // What the last command printed on stderr: its error, if it failed.
     property string error: ""
@@ -366,7 +438,7 @@ Column {
             Btn {
                 visible: !root.confirmingClear && root.clearable.length > 0
                 icon: Format.icons.trash
-                label: root.projectFilter.length || root.query ? "Clear listed" : root.tagFilter ? "Clear " + root.tagFilter : "Clear all"
+                label: root.clearLabel
                 danger: true
                 onClicked: root.confirmingClear = true
             }
@@ -375,8 +447,7 @@ Column {
                 icon: Format.icons.plus
                 label: "New"
                 primary: true
-                // A draft with the filtered tag, so the filter lists it.
-                onClicked: root.run(root.tagFilter ? ["draft", "-tag=" + root.tagFilter] : ["draft"])
+                onClicked: root.draft()
             }
         }
     }
@@ -561,22 +632,20 @@ Column {
             }
         }
 
-        // Asks to confirm a delete, or else lists the list's keys.
+        // Asks to confirm a delete.
         Rectangle {
             id: listBar
             anchors.left: parent.left
             anchors.bottom: parent.bottom
             width: root.listWidth
             height: barColumn.implicitHeight + 16
-            visible: root.confirmingDelete.length > 0 || root.showKeys
+            visible: root.confirmingDelete.length > 0
             radius: 4
             color: "transparent"
             border.color: activeFocus ? root.shell.palette.rose : root.shell.palette.dim
             border.width: 1
 
             Keys.onPressed: event => {
-                if (!root.confirmingDelete.length)
-                    return;
                 if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Y)
                     root.answerDelete(true);
                 else if (event.key === Qt.Key_Escape || event.key === Qt.Key_N || event.key === Qt.Key_Backspace)
@@ -595,7 +664,6 @@ Column {
                 spacing: 6
 
                 Meta {
-                    visible: root.confirmingDelete.length > 0
                     width: parent.width
                     wrapMode: Text.Wrap
                     color: root.shell.palette.fg
@@ -603,7 +671,6 @@ Column {
                 }
 
                 Row {
-                    visible: root.confirmingDelete.length > 0
                     spacing: 8
 
                     Btn {
@@ -619,13 +686,6 @@ Column {
                         anchors.verticalCenter: parent.verticalCenter
                         text: "y / n"
                     }
-                }
-
-                Meta {
-                    visible: root.confirmingDelete.length === 0
-                    width: parent.width
-                    wrapMode: Text.Wrap
-                    text: "j/k move  ⏎ open  ␣ pick  ⌫ delete  esc unpick  ? hide"
                 }
             }
         }
@@ -663,6 +723,7 @@ Column {
             // A new model array rebuilds the view, so a view never carries over the
             // scroll position or typed text of the previous selection.
             Repeater {
+                id: formView
                 model: root.formId ? [root.formId] : []
 
                 delegate: Form {
@@ -677,6 +738,7 @@ Column {
             }
 
             Repeater {
+                id: detailView
                 model: root.detailId ? [root.detailId] : []
 
                 delegate: Detail {
@@ -1046,8 +1108,6 @@ Column {
                 root.step(-1);
             else if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete)
                 root.askDelete(modelData.id);
-            else if (event.key === Qt.Key_Question)
-                root.showKeys = !root.showKeys;
             else if (event.key === Qt.Key_Escape && root.picked.length)
                 root.picked = [];
             else
@@ -1261,6 +1321,16 @@ Column {
         function close() {
             open = false;
             projectBox.forceActiveFocus();
+        }
+
+        function start() {
+            save();
+            root.run(["start", itemId]);
+        }
+
+        function discard() {
+            saveLater.stop();
+            root.remove(itemId);
         }
 
         function addProject() {
@@ -1513,17 +1583,11 @@ Column {
                 icon: Format.icons.play
                 label: "Run"
                 primary: true
-                onClicked: {
-                    form.save();
-                    root.run(["start", form.itemId]);
-                }
+                onClicked: form.start()
             }
             Btn {
                 label: "Discard"
-                onClicked: {
-                    saveLater.stop();
-                    root.remove(form.itemId);
-                }
+                onClicked: form.discard()
             }
         }
     }
@@ -1545,6 +1609,10 @@ Column {
                 return;
             root.run(["followup", item.id, followField.text]);
             followField.text = "";
+        }
+
+        function followUp() {
+            followField.focusInput();
         }
 
         spacing: 8
@@ -1633,7 +1701,7 @@ Column {
                 visible: detail.item.status === "done"
                 icon: Format.icons.reply
                 label: "Follow up"
-                onClicked: followField.focusInput()
+                onClicked: detail.followUp()
             }
             Btn {
                 visible: detail.item.sessionId !== "" && !!detail.item.claudeConfigDir

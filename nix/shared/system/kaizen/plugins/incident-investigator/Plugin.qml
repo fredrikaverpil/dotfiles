@@ -22,8 +22,10 @@ Ui.Plugin {
 
     // niri raises a window only as it maps, so one open elsewhere, or closed by
     // the compositor while still visible here, is mapped again: focused, on the
-    // focused workspace. The selected row takes the keyboard.
+    // focused workspace. A menu left open closes; the selected row takes the
+    // keyboard.
     function open() {
+        palette.close();
         investigations.focusSelected();
         if (window.visible && investigations.Window.active)
             return;
@@ -78,6 +80,32 @@ Ui.Plugin {
             scale: zoom
             transformOrigin: Item.TopLeft
             shell: plugin.shell
+
+            onPaletteRequested: keys => palette.open(keys)
+        }
+
+        // Over the whole window, at the content's scale.
+        Ui.MenuOverlay {
+            id: palette
+
+            readonly property real zoom: plugin.shell.textScale
+
+            width: window.width / zoom
+            height: window.height / zoom
+            scale: zoom
+            transformOrigin: Item.TopLeft
+            shell: plugin.shell
+            title: "Incident investigator"
+            tree: investigations.actions
+            fallback: investigations
+
+            onRunRequested: row => investigations.runAction(row.action, row.arg)
+
+            // A focused field keeps Ctrl+K from Keys handlers; a Shortcut fires from anywhere in the window.
+            Shortcut {
+                sequence: "Ctrl+K"
+                onActivated: palette.toggle(["Ctrl", "K"])
+            }
         }
     }
 }
