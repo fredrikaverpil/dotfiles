@@ -5,16 +5,11 @@
   ...
 }:
 let
-  # No model argument starts router mode, where Pi's /llama loads, unloads and
-  # downloads models. LLAMA_CACHE puts downloads next to manually added models.
-  # Later flags override these defaults.
   llama-router = pkgs.writeShellApplication {
     name = "llama-router";
     runtimeInputs = [ pkgs.llama-cpp-vulkan ];
     text = ''
-      export LLAMA_CACHE="$HOME/models"
-      mkdir -p "$LLAMA_CACHE"
-      exec llama-server --models-dir "$HOME/models" --no-models-autoload --jinja \
+      exec llama-server --no-models-autoload --jinja \
         --host 127.0.0.1 --port 8080 -ngl 999 -c 32768 "$@"
     '';
   };
@@ -37,7 +32,9 @@ in
 
   llmAgents = [ ];
 
-  home.file = { };
+  # Shortcut to the Hugging Face cache, where downloaded models live.
+  home.file."models/huggingface".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.cache/huggingface/hub";
 
   # Chromium web apps on the work profile.
   xdg.desktopEntries = {

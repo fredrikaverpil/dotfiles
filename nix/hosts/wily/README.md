@@ -60,7 +60,8 @@ Here `kaizen-sleep-lock` is still running but cannot lock, so do not suspend.
 `llama-router` runs llama.cpp's router server (Vulkan, Xe2 iGPU) on
 `127.0.0.1:8080`. Pi connects to it: `/login llama.cpp` once, then `/llama` to
 download, load and unload models, and `/model` to pick a loaded one. Models
-live in `~/models`.
+download to the Hugging Face cache, `~/.cache/huggingface/hub`, which most
+tools share; `~/models/huggingface` links to it.
 
 Start `llama-router` before `/login llama.cpp`, which probes the URL. After
 loading a model with `/llama`, select it with `/model`; otherwise Pi keeps the
