@@ -10,6 +10,8 @@ has a bug, as a pointer-only control does.
 ## Principles
 
 - Keyboard first. Every action has a key path; the pointer only shortens it.
+- Tab and Shift+Tab step through the controls. A list is one stop: Tab lands
+  on its selected row, and arrows move inside it.
 - Keys are shown. A row or control that has a key shows it as a keycap. A key
   is one that runs the same action: a niri bind for a shell row, the
   application's own key inside an application. A row without one shows none.
@@ -117,8 +119,8 @@ something to hang from.
 - A panel shows and adjusts a subsystem; its actions are also Settings rows,
   so a panel is never the only way to one.
 - It opens centred with exclusive keyboard focus. Arrows and `hjkl` step
-  focus, as a panel has no search to type into; Enter and Space activate; Esc
-  closes.
+  focus as Tab does, since a panel has no search to type into; Enter and Space
+  activate; Esc closes.
 - A control with its own key shows it.
 
 ### Tray
@@ -148,14 +150,17 @@ investigator: it stays up while others have focus, and niri's window binds
   sets it.
 - A right-click on an object opens its context menu: the palette's rows for
   that object.
-- Lists: `↑` `↓` (and `j` `k`) move, Enter opens, Space picks, Esc unpicks,
-  Backspace or Delete deletes.
+- Lists: `↑` `↓` (and `j` `k`) move, and with Shift pick a range; Enter opens
+  and takes focus into what it opened; Space picks, Esc unpicks, Backspace or
+  Delete deletes.
 - A destructive action asks inline: `y` or Enter confirms, `n` or Esc cancels.
 
 ### Incident investigator
 
 The investigator has no single-letter action keys: `Ctrl+K` (or `?` outside a
-text field) opens the palette, and the list takes the keys above.
+text field) opens the palette, and the list takes the keys above. Enter on a
+row moves focus to its draft's notes or its follow-up field; Esc goes back to
+the row.
 
 - Active filters show as chips above the list; each clears with a click or
   from the filter menu.
