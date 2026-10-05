@@ -62,6 +62,8 @@ type Investigation struct {
 	Messages   []claude.Message `json:"messages"`
 	// Entities are the user and organization ids the tool output named.
 	Entities []claude.Entity `json:"entities"`
+	// Combined are the ids of the investigations combine drafted this one from.
+	Combined []string `json:"combined,omitempty"`
 }
 
 // settings are the model and effort that the next run starts with, and the configured tags, for the window.
@@ -336,8 +338,8 @@ func (d *daemon) followup(inv *Investigation, text string) error {
 	return d.begin(inv, text, true)
 }
 
-// combine drafts an investigation from finished ones: their alerts, notes and reports become its notes, and their
-// entities its entities. It names no trace id, so the run starts from the notes.
+// combine drafts an investigation from finished ones: their alerts, notes and reports become its notes, their
+// entities its entities, and their ids its Combined. It names no trace id, so the run starts from the notes.
 func (d *daemon) combine(ids []string) (string, error) {
 	if len(ids) < 2 {
 		return "", errors.New("combine needs at least two investigations")
@@ -348,6 +350,7 @@ func (d *daemon) combine(ids []string) (string, error) {
 		CreatedAt: now(),
 		Messages:  []claude.Message{},
 		Entities:  []claude.Entity{},
+		Combined:  slices.Clone(ids),
 	}
 	notes, projects := []string{}, []string{}
 	for _, id := range ids {

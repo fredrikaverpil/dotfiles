@@ -79,6 +79,33 @@ TestCase {
         });
     }
 
+    // Combined from › for sources "b", listed and done, and "gone", deleted.
+    readonly property var source: item({
+        id: "b",
+        title: "Spanner abort",
+        projects: ["p-prod"]
+    })
+    readonly property var sourcesMenu: row({
+        key: "sources",
+        text: "Combined from",
+        glyph: Format.icons.combined,
+        hasChildren: true,
+        children: [row({
+                key: "sources.b",
+                text: "Spanner abort",
+                glyph: Format.icons.done,
+                detail: "p-prod",
+                action: "select",
+                arg: "b"
+            }), row({
+                key: "sources.gone",
+                text: "gone",
+                glyph: Format.icons.close,
+                detail: "deleted",
+                enabled: false
+            })]
+    })
+
     function item(fields) {
         return Object.assign({
             id: "a",
@@ -96,6 +123,7 @@ TestCase {
 
     function state(fields) {
         return Object.assign({
+            all: [],
             listed: [],
             picked: [],
             clearable: 0,
@@ -653,7 +681,8 @@ TestCase {
                     id: "a",
                     tag: "",
                     projects: [],
-                    choices: []
+                    choices: [],
+                    combined: []
                 },
                 want: about(["a"], [run, discard, row({
                         key: "projects",
@@ -672,7 +701,8 @@ TestCase {
                     id: "a",
                     tag: "prod",
                     projects: ["p-prod"],
-                    choices: ["p-dev", "p-prod"]
+                    choices: ["p-dev", "p-prod"],
+                    combined: []
                 },
                 want: about(["a"], [run, discard, row({
                         key: "projects",
@@ -682,6 +712,26 @@ TestCase {
                         hasChildren: true,
                         children: [check("projects.p-dev", "p-dev", false, "project", "p-dev"), check("projects.p-prod", "p-prod", true, "project", "p-prod"), add]
                     }), tagMenu("prod")].concat(fields))
+            },
+            {
+                tag: "combined",
+                state: state({
+                    all: [source]
+                }),
+                draft: {
+                    id: "a",
+                    tag: "",
+                    projects: [],
+                    choices: [],
+                    combined: ["b", "gone"]
+                },
+                want: about(["a"], [run, discard, row({
+                        key: "projects",
+                        text: "Projects",
+                        glyph: Format.icons.filter,
+                        hasChildren: true,
+                        children: [add]
+                    })].concat(fields, [sourcesMenu]))
             }
         ];
     }
@@ -695,6 +745,9 @@ TestCase {
     function test_conversationRows_data() {
         const running = item({
             status: "running"
+        });
+        const combined = Object.assign({}, done, {
+            combined: ["b", "gone"]
         });
         return [
             {
@@ -711,13 +764,24 @@ TestCase {
                 tag: "running",
                 item: running,
                 want: about(["a"], Actions.itemRows(running, tags, "fir"))
+            },
+            {
+                tag: "combined",
+                item: combined,
+                want: about(["a"], Actions.itemRows(combined, tags, "fir").concat([sourcesMenu, row({
+                        key: "delete",
+                        text: "Delete",
+                        glyph: Format.icons.trash,
+                        action: "delete"
+                    })]))
             }
         ];
     }
 
     function test_conversationRows(data) {
         const got = Actions.conversationRows(state({
-            tags: tags
+            tags: tags,
+            all: [source]
         }), data.item, "fir");
 
         compare(got, data.want);

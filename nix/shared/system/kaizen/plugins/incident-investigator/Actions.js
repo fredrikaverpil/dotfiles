@@ -4,8 +4,8 @@
 // The palette's rows, one static tree per scope for Ui.MenuOverlay. A row runs
 // its action with its arg on its ids; a key shows only where it runs the row.
 //
-// state: listed (the investigations the list shows), picked (the picked ones),
-// clearable (a count), clearLabel, tags, tagCounts (every investigation's,
+// state: all (every investigation), listed (those the list shows), picked
+// (the picked ones), clearable (a count), clearLabel, tags, tagCounts (every investigation's,
 // by tag name, "" for all), model, effort, tagFilter, projectFilter and
 // projects (those the list names).
 
@@ -51,6 +51,17 @@ function about(ids, rows) {
 function tagMenu(tags, tag) {
   return submenu({ key: "tag", text: "Tag", glyph: Format.icons.tag, detail: tag }, tags.map(function(each) {
     return radio("tag." + each.name, each.name, each.name === tag, "tag", each.name === tag ? "" : each.name)
+  }))
+}
+
+// Combined from ›: the investigations a combined one was drafted from, each
+// going to its row; a deleted one is disabled.
+function sourcesMenu(state, ids) {
+  return submenu({ key: "sources", text: "Combined from", glyph: Format.icons.combined }, ids.map(function(id) {
+    var source = state.all.filter(function(each) { return each.id === id })[0]
+    return source
+      ? row({ key: "sources." + id, text: Format.name(source), glyph: Format.icons[source.status], detail: source.projects.join(", "), action: "select", arg: id })
+      : row({ key: "sources." + id, text: id, glyph: Format.icons.close, detail: "deleted", enabled: false })
   }))
 }
 
@@ -163,7 +174,8 @@ function listRows(state) {
 }
 
 // The shown draft's form. draft: id, tag and projects as the form holds them,
-// and choices, every project it can pick. Projects › adds what is typed in it.
+// choices, every project it can pick, and combined, the ids it was drafted
+// from. Projects › adds what is typed in it.
 function draftRows(state, draft) {
   var rows = [
     row({ key: "run", text: "Run", glyph: Format.icons.play, keys: ["Ctrl", "Enter"], action: "run" }),
@@ -176,12 +188,16 @@ function draftRows(state, draft) {
     rows.push(tagMenu(state.tags, draft.tag))
   rows.push(row({ key: "trace", text: "Trace id", glyph: Format.icons.draft, action: "focusTrace" }))
   rows.push(row({ key: "notes", text: "Notes", glyph: Format.icons.draft, action: "focusNotes" }))
+  if (draft.combined.length)
+    rows.push(sourcesMenu(state, draft.combined))
   return about([draft.id], rows)
 }
 
 // The shown investigation's conversation.
 function conversationRows(state, item, selection) {
   var rows = itemRows(item, state.tags, selection)
+  if (item.combined)
+    rows.push(sourcesMenu(state, item.combined))
   if (deletable(item))
     rows.push(row({ key: "delete", text: "Delete", glyph: Format.icons.trash, action: "delete" }))
   return about([item.id], rows)

@@ -26,7 +26,8 @@ var icons = {
   radio: String.fromCodePoint(0xF043D),
   radioOn: String.fromCodePoint(0xF043E),
   check: String.fromCodePoint(0xF0131),
-  checkOn: String.fromCodePoint(0xF0132)
+  checkOn: String.fromCodePoint(0xF0132),
+  combined: String.fromCodePoint(0xF00F8)
 }
 
 // What a run can use; the daemon rejects anything else.

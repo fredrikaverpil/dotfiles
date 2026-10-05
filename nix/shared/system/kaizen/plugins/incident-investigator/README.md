@@ -127,12 +127,15 @@ flowchart LR
 - Shift-click (a range) or ctrl-click (a toggle) picks investigations in the
   list, and **Combine** drafts a new one from their alerts and reports
   (`combine`), with the union of their entities, or **Delete** removes them
-  (running ones stay). Edit (the pencil beside one of your messages, or Enter
-  on it) opens it in place, and **Branch** (`branch`) replays the conversation
-  from there with the edited text as a new investigation, keeping the original;
-  the palette's Branch replays it unchanged. The new session gets the earlier
-  messages as text, not their tool calls. Each Claude message has a copy
-  button.
+  (running ones stay). The combined one carries a merge mark in the list and
+  shows its sources under **Combined from** (Combined from › in the palette),
+  each going to its row and clearing the filters that hide it; while it is
+  selected, the list marks its sources. Edit (the pencil beside one of your
+  messages, or Enter on it) opens it in place, and **Branch** (`branch`)
+  replays the conversation from there with the edited text as a new
+  investigation, keeping the original; the palette's Branch replays it
+  unchanged. The new session gets the earlier messages as text, not their tool
+  calls. Each Claude message has a copy button.
 - The conversation is one Tab stop, the last focused message, else the newest;
   a click focuses one too. `j`/`k` (or `↑`/`↓`) move between messages, Enter or
   Space folds a group of commands, `Ctrl+C` copies the selection, else the
