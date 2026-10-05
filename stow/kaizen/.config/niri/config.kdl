@@ -191,7 +191,7 @@ binds {
 
     // Launch
     Mod+T hotkey-overlay-title="Focus or open a terminal" { spawn "kaizen-focus" r#"^com\.mitchellh\.ghostty$"# "ghostty"; }
-    Mod+Shift+T hotkey-overlay-title="New terminal" { spawn "ghostty"; }
+    Mod+Return hotkey-overlay-title="New terminal" { spawn "ghostty"; }
 
     // Window state
     Mod+Q hotkey-overlay-title="Close window" { close-window; }
