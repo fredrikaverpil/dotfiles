@@ -13,6 +13,8 @@ Column {
     required property var shell
 
     signal paletteRequested(var keys)
+    // A right-click's menu: rows returns its tree, at is in window coordinates.
+    signal menuRequested(var rows, point at)
 
     spacing: 8
 
@@ -190,6 +192,12 @@ Column {
             title: "",
             rows: Actions.windowRows(actionState)
         };
+    }
+
+    // A row's context menu, looked up by id: a reload rebuilds the delegates.
+    function rowMenu(id) {
+        const item = items.find(item => item.id === id);
+        return item ? Actions.contextRows(actionState, item) : [];
     }
 
     // Runs a palette row's action on its ids. The shown draft's form and
@@ -1224,7 +1232,14 @@ Column {
             id: rowMouse
             anchors.fill: parent
             hoverEnabled: true
-            onClicked: mouse => root.click(row.index, mouse.modifiers)
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onClicked: mouse => {
+                const id = row.modelData.id;
+                if (mouse.button === Qt.RightButton)
+                    root.menuRequested(() => root.rowMenu(id), mapToItem(null, mouse.x, mouse.y));
+                else
+                    root.click(row.index, mouse.modifiers);
+            }
         }
 
         Text {

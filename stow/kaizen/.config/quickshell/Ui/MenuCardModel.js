@@ -127,3 +127,21 @@ function place(anchor, width, height, screenWidth, screenHeight) {
     y: clamp(anchor.y - 6, 0, maxY),
   };
 }
+
+// Card position below-right of point, a pointer in an area: flipped above or
+// to the left where it does not fit, then kept 8 px inside. above says which
+// side it took.
+function hang(point, width, height, areaWidth, areaHeight) {
+  const margin = 8;
+  const x = point.x + width <= areaWidth - margin ? point.x : point.x - width;
+  const above = point.y + height > areaHeight - margin;
+  return {
+    x: clamp(x, margin, areaWidth - width - margin),
+    y: clamp(
+      above ? point.y - height : point.y,
+      margin,
+      areaHeight - height - margin,
+    ),
+    above: above,
+  };
+}

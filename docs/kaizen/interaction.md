@@ -19,7 +19,8 @@ has a bug, as a pointer-only control does.
   open the same menu with the same rows. A right-click is never the only way
   to an action.
 - Focus is the subject. An action applies to the focused object, or to the
-  picked set when there is one.
+  picked set when there is one. A right-click's subject is the clicked object,
+  or the picked set when that object is picked.
 - Esc closes the menu, panel or dialog that holds the keyboard, whole. Inside
   an application it clears one layer per press: the open menu, then the picked
   set, then the focused field.
@@ -86,7 +87,7 @@ something to hang from.
 | | Context menu | Palette |
 | --- | --- | --- |
 | Opened by | right-click on a bar button, tray item, or an application's row or chip; an application key aimed at one control | `Mod+Space`; `Ctrl+K` in an application; `menu popup` and `menu level` over IPC |
-| Position | hangs from its anchor, on the anchor's output | centred on the focused output, or over the application's window |
+| Position | hangs from its anchor, on the anchor's output; in an application, from the pointer or the chip | centred on the focused output, or over the application's window |
 | Submenu | cascades beside its row | replaces the list; a breadcrumb above the search row names the path |
 | Size | fits its rows | larger text; a level may ask for a wide card (Keybindings) |
 

@@ -572,4 +572,96 @@ TestCase {
     function test_place(data) {
         compare(Model.place(data.anchor, 200, 100, 1000, 600), data.want);
     }
+
+    function test_hang_data() {
+        return [
+            {
+                tag: "below right",
+                point: {
+                    x: 100,
+                    y: 50
+                },
+                want: {
+                    x: 100,
+                    y: 50,
+                    above: false
+                }
+            },
+            {
+                tag: "flips left at right edge",
+                point: {
+                    x: 900,
+                    y: 50
+                },
+                want: {
+                    x: 700,
+                    y: 50,
+                    above: false
+                }
+            },
+            {
+                tag: "flips above at bottom",
+                point: {
+                    x: 100,
+                    y: 550
+                },
+                want: {
+                    x: 100,
+                    y: 450,
+                    above: true
+                }
+            },
+            {
+                tag: "flips both in bottom right corner",
+                point: {
+                    x: 900,
+                    y: 550
+                },
+                want: {
+                    x: 700,
+                    y: 450,
+                    above: true
+                }
+            },
+            {
+                tag: "kept inside at top left",
+                point: {
+                    x: 2,
+                    y: 3
+                },
+                want: {
+                    x: 8,
+                    y: 8,
+                    above: false
+                }
+            },
+            {
+                tag: "kept inside when neither side fits",
+                point: {
+                    x: 150,
+                    y: 80
+                },
+                area: {
+                    width: 300,
+                    height: 150
+                },
+                want: {
+                    x: 8,
+                    y: 8,
+                    above: true
+                }
+            }
+        ];
+    }
+
+    function test_hang(data) {
+        const area = data.area || {
+            width: 1000,
+            height: 600
+        };
+
+        const got = Model.hang(data.point, 200, 100, area.width, area.height);
+
+        compare(got, data.want);
+    }
 }

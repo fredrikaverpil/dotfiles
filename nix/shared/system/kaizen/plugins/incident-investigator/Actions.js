@@ -102,6 +102,17 @@ function rowRows(state, item) {
   return about([item.id], rows)
 }
 
+// A right-clicked row: the picked set when it is picked, else its own
+// investigation. Backspace on the row would delete the picked set, so its
+// Delete shows no key while others are picked.
+function contextRows(state, item) {
+  if (state.picked.some(function(each) { return each.id === item.id }))
+    return pickedRows(state, true)
+  return rowRows(Object.assign({}, state, { picked: [] }), item).map(function(each) {
+    return each.key === "delete" && state.picked.length ? Object.assign({}, each, { keys: [] }) : each
+  })
+}
+
 // A tag shows on when every picked investigation has it; picking that one clears it from all.
 function pickedRows(state, keyed) {
   var count = state.picked.length
