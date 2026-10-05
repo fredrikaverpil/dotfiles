@@ -171,6 +171,48 @@ func TestEdit(t *testing.T) {
 	}
 }
 
+func TestRetag(t *testing.T) {
+	for _, tt := range []struct {
+		name    string
+		tag     string
+		want    *Investigation
+		wantErr string
+	}{
+		{
+			name: "a finished investigation",
+			tag:  "prod",
+			want: &Investigation{ID: "aaaaaa", Status: "done", Tag: "prod"},
+		},
+		{
+			name: "clears the tag",
+			want: &Investigation{ID: "aaaaaa", Status: "done"},
+		},
+		{
+			name:    "a tag that is not configured",
+			tag:     "staging",
+			want:    &Investigation{ID: "aaaaaa", Status: "done", Tag: "dev"},
+			wantErr: "want one of dev, prod",
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			d := &daemon{
+				tags:  []Tag{{"dev", "water"}, {"prod", "rose"}},
+				state: t.TempDir(),
+				items: map[string]*Investigation{"aaaaaa": {ID: "aaaaaa", Status: "done", Tag: "dev"}},
+			}
+
+			err := d.retag(d.items["aaaaaa"], tt.tag)
+
+			if tt.wantErr != "" {
+				assert.ErrorContains(t, err, tt.wantErr)
+			} else {
+				assert.NilError(t, err)
+			}
+			assert.DeepEqual(t, d.items["aaaaaa"], tt.want)
+		})
+	}
+}
+
 func TestLoad(t *testing.T) {
 	for _, tt := range []struct {
 		name         string

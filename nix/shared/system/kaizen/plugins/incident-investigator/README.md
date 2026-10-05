@@ -77,7 +77,7 @@ flowchart LR
 
 - `investigate` is one Go binary with two roles: `investigate serve` is the
   daemon, and the other verbs (`draft`, `edit`, `start`, `followup`, `cancel`,
-  `delete`) are short-lived clients that send one request and exit.
+  `delete`, `tag`) are short-lived clients that send one request and exit.
 - The daemon is a systemd user service listening on
   `$XDG_RUNTIME_DIR/kaizen-incident-investigator.sock`. It owns the
   investigations, their state files and the `claude` processes, so reloading the
@@ -95,7 +95,8 @@ flowchart LR
   them in its header; its follow-ups and branches keep using them.
 - The filters list investigations by tag, from the `tags` the daemon writes to
   `settings.json`. **New** under a tag's filter drafts an
-  investigation with that tag, so the filter lists it.
+  investigation with that tag, so the filter lists it. The tag buttons under an
+  investigation's header set or clear its tag (`tag`) in any status.
 - Shift-click (a range) or ctrl-click (a toggle) picks investigations in the
   list, and **Combine** drafts a new one from their alerts and reports
   (`combine`), with the union of their entities, or **Delete** removes them

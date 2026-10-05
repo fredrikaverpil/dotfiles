@@ -190,6 +190,8 @@ func (d *daemon) do(r io.Reader) (string, error) {
 	switch req.Verb {
 	case "edit":
 		return inv.ID, d.edit(inv, req)
+	case "tag":
+		return inv.ID, d.retag(inv, req.Tag)
 	case "start":
 		return inv.ID, d.start(inv)
 	case "followup":
@@ -260,6 +262,15 @@ func (d *daemon) edit(inv *Investigation, req request) error {
 		return err
 	}
 	inv.Tag, inv.Projects, inv.TraceID, inv.Notes = req.Tag, cleanProjects(req.Projects), req.TraceID, req.Notes
+	return d.save(inv)
+}
+
+// retag sets the tag of an investigation in any status.
+func (d *daemon) retag(inv *Investigation, tag string) error {
+	if err := d.checkTag(tag); err != nil {
+		return err
+	}
+	inv.Tag = tag
 	return d.save(inv)
 }
 
