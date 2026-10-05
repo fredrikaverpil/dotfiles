@@ -1476,6 +1476,24 @@ Column {
         }
 
         Row {
+            visible: root.tags.length > 0
+            spacing: 8
+
+            Repeater {
+                model: root.tags
+
+                // Picking the picked one again clears it.
+                delegate: Btn {
+                    required property var modelData
+
+                    label: modelData.name
+                    primary: detail.item.tag === modelData.name
+                    onClicked: root.run(["tag", detail.item.id].concat(detail.item.tag === modelData.name ? [] : [modelData.name]))
+                }
+            }
+        }
+
+        Row {
             spacing: 8
 
             Btn {

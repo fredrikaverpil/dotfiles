@@ -36,6 +36,7 @@ const usage = `usage: investigate <verb> [args]
   draft [-tag T]                 create a draft from NOTIFICATION_* and INVESTIGATE_TAG, show it in the window
   edit ID [-projects P,Q] [-tag T] [-trace-id T] [-notes N]
                                  set a draft's fields; omitted ones are cleared
+  tag ID [T]                     set the tag of an investigation in any status; none clears it
   start ID...                    run investigations, or re-run finished ones
   followup ID TEXT               ask a follow-up in an investigation's session
   combine ID ID...               draft an investigation from finished ones, show it in the window
@@ -152,6 +153,16 @@ func run(args []string) error {
 				Notes:    *notes,
 			},
 		)
+		return err
+	case "tag":
+		if len(args) < 1 || len(args) > 2 {
+			return errUsage
+		}
+		req := request{Verb: verb, ID: args[0]}
+		if len(args) == 2 {
+			req.Tag = args[1]
+		}
+		_, err := call(socket, req)
 		return err
 	case "combine", "branch":
 		req := request{Verb: verb}
