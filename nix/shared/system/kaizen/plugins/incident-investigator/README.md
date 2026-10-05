@@ -67,7 +67,7 @@ flowchart LR
   window -->|investigate start, followup,<br>cancel, delete, edit, draft, settings| daemon
   window -->|investigate combine, branch| daemon
   daemon -->|claude -p, instructions| claude["Claude Code"]
-  claude -->|gcloud logging read,<br>monitoring alerts| gcp[(GCP logs, alerts)]
+  claude -->|read-only gcloud, bq| gcp[(GCP logs, alerts,<br>services, incidents)]
   claude -->|stream-json| daemon
   daemon -->|investigation.json, index.json| window
   daemon -->|notify-send, Open| window
@@ -181,8 +181,18 @@ notify-send -a Slack "[workspace] in #alerts-dev" \
 - Allowed: `gcloud logging read`, `gcloud logging buckets list`,
   `gcloud alpha monitoring alerts describe` and `list`,
   `gcloud monitoring policies describe`, `gcloud run services describe`,
-  `gcloud run revisions list` and `describe`, `gcloud run jobs describe`, Read, Grep; everything else is
-  denied (`--permission-mode dontAsk`).
+  `gcloud run revisions list` and `describe`, `gcloud run jobs describe`,
+  `gcloud sql instances` and `operations` `list` and `describe`,
+  `gcloud spanner instances` and `operations` `list` and `describe`,
+  `gcloud spanner databases list`, `gcloud beta service-health events` and
+  `artifacts` `list` and `describe`, `bq ls`, `bq show`, Read, Grep;
+  everything else is denied (`--permission-mode dontAsk`). `bq` stops at
+  metadata and jobs: `bq query` and `bq head` read rows, and `--apilog`, which
+  writes a file, is denied.
+- Service Health needs `servicehealth.googleapis.com` enabled in the project;
+  without it, a run reports that and moves on.
+- Runs skip the `_Required` bucket when searching for a request, and read its
+  system events and admin activity when a managed service failed.
 - `--max-budget-usd 5` per turn.
 - Every run uses the `claudeConfigDir` profile. Each investigation records it,
   the window shows it, and Terminal resumes the session there. Pair
