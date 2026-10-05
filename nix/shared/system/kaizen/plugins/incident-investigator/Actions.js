@@ -163,14 +163,14 @@ function listRows(state) {
 }
 
 // The shown draft's form. draft: id, tag and projects as the form holds them,
-// and choices, every project it can pick.
+// and choices, every project it can pick. Projects › adds what is typed in it.
 function draftRows(state, draft) {
   var rows = [
     row({ key: "run", text: "Run", glyph: Format.icons.play, keys: ["Ctrl", "Enter"], action: "run" }),
     row({ key: "discard", text: "Discard", glyph: Format.icons.trash, action: "discard" }),
     submenu({ key: "projects", text: "Projects", glyph: Format.icons.filter, detail: draft.projects.join(", ") }, draft.choices.map(function(project) {
       return check("projects." + project, project, draft.projects.indexOf(project) >= 0, "project", project)
-    }).concat([row({ key: "projects.add", text: "Add a project…", glyph: Format.icons.plus, action: "addProject" })]))
+    }).concat([row({ key: "projects.add", text: "Add a project…", glyph: Format.icons.plus, adds: true, action: "project" })]))
   ]
   if (state.tags.length)
     rows.push(tagMenu(state.tags, draft.tag))
@@ -185,6 +185,12 @@ function conversationRows(state, item, selection) {
   if (deletable(item))
     rows.push(row({ key: "delete", text: "Delete", glyph: Format.icons.trash, action: "delete" }))
   return about([item.id], rows)
+}
+
+// The rows of the submenu at key, for a chip's menu.
+function submenuRows(rows, key) {
+  var found = rows.filter(function(each) { return each.key === key })[0]
+  return found ? found.children : []
 }
 
 function windowRows(state) {

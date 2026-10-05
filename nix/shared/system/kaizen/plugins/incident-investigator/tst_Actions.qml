@@ -631,7 +631,8 @@ TestCase {
             key: "projects.add",
             text: "Add a project…",
             glyph: Format.icons.plus,
-            action: "addProject"
+            adds: true,
+            action: "project"
         });
         const fields = [row({
                 key: "trace",
@@ -718,6 +719,44 @@ TestCase {
         const got = Actions.conversationRows(state({
             tags: tags
         }), data.item, "fir");
+
+        compare(got, data.want);
+    }
+
+    function test_submenuRows_data() {
+        const opus = radio("model.opus", "opus", true, "model", "opus");
+        const rows = [row({
+                key: "new",
+                text: "New investigation"
+            }), row({
+                key: "model",
+                text: "Model",
+                hasChildren: true,
+                children: [opus]
+            })];
+        return [
+            {
+                tag: "a submenu",
+                key: "model",
+                want: [opus]
+            },
+            {
+                tag: "a row without children",
+                key: "new",
+                want: []
+            },
+            {
+                tag: "missing",
+                key: "effort",
+                want: []
+            }
+        ].map(each => Object.assign({
+                rows: rows
+            }, each));
+    }
+
+    function test_submenuRows(data) {
+        const got = Actions.submenuRows(data.rows, data.key);
 
         compare(got, data.want);
     }

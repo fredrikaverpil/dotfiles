@@ -418,6 +418,16 @@ TestCase {
             isSeparator: true,
             enabled: true
         };
+        const add = {
+            key: "add",
+            text: "Add a model…",
+            detail: "",
+            adds: true,
+            arg: "",
+            enabled: true,
+            isSeparator: false,
+            children: []
+        };
         const rows = [rerun, off, separator, model];
         return [
             {
@@ -473,6 +483,42 @@ TestCase {
                 want: [Object.assign({}, rerun, {
                         trail: []
                     })]
+            },
+            {
+                tag: "adds: a hint without a query",
+                rows: [opus, add],
+                query: " ",
+                want: [opus, Object.assign({}, add, {
+                        enabled: false
+                    })]
+            },
+            {
+                tag: "adds: what was typed, after matches",
+                rows: [opus, add],
+                query: " op ",
+                want: [Object.assign({}, opus, {
+                        trail: []
+                    }), Object.assign({}, add, {
+                        text: 'Add "op"',
+                        arg: "op",
+                        trail: []
+                    })]
+            },
+            {
+                tag: "adds: not a row's name",
+                rows: [opus, add],
+                query: "Opus",
+                want: [Object.assign({}, opus, {
+                        trail: []
+                    })]
+            },
+            {
+                tag: "adds: not from deeper levels",
+                rows: [Object.assign({}, model, {
+                        children: [opus, add]
+                    })],
+                query: "x",
+                want: []
             }
         ];
     }
@@ -577,9 +623,11 @@ TestCase {
         return [
             {
                 tag: "below right",
-                point: {
+                anchor: {
                     x: 100,
-                    y: 50
+                    y: 50,
+                    width: 0,
+                    height: 0
                 },
                 want: {
                     x: 100,
@@ -589,9 +637,11 @@ TestCase {
             },
             {
                 tag: "flips left at right edge",
-                point: {
+                anchor: {
                     x: 900,
-                    y: 50
+                    y: 50,
+                    width: 0,
+                    height: 0
                 },
                 want: {
                     x: 700,
@@ -601,9 +651,11 @@ TestCase {
             },
             {
                 tag: "flips above at bottom",
-                point: {
+                anchor: {
                     x: 100,
-                    y: 550
+                    y: 550,
+                    width: 0,
+                    height: 0
                 },
                 want: {
                     x: 100,
@@ -613,9 +665,11 @@ TestCase {
             },
             {
                 tag: "flips both in bottom right corner",
-                point: {
+                anchor: {
                     x: 900,
-                    y: 550
+                    y: 550,
+                    width: 0,
+                    height: 0
                 },
                 want: {
                     x: 700,
@@ -625,9 +679,11 @@ TestCase {
             },
             {
                 tag: "kept inside at top left",
-                point: {
+                anchor: {
                     x: 2,
-                    y: 3
+                    y: 3,
+                    width: 0,
+                    height: 0
                 },
                 want: {
                     x: 8,
@@ -636,10 +692,54 @@ TestCase {
                 }
             },
             {
+                tag: "below a chip",
+                anchor: {
+                    x: 100,
+                    y: 50,
+                    width: 80,
+                    height: 26
+                },
+                want: {
+                    x: 100,
+                    y: 76,
+                    above: false
+                }
+            },
+            {
+                tag: "above a chip at bottom",
+                anchor: {
+                    x: 100,
+                    y: 520,
+                    width: 80,
+                    height: 26
+                },
+                want: {
+                    x: 100,
+                    y: 420,
+                    above: true
+                }
+            },
+            {
+                tag: "left-aligned to a chip's right edge",
+                anchor: {
+                    x: 900,
+                    y: 50,
+                    width: 80,
+                    height: 26
+                },
+                want: {
+                    x: 780,
+                    y: 76,
+                    above: false
+                }
+            },
+            {
                 tag: "kept inside when neither side fits",
-                point: {
+                anchor: {
                     x: 150,
-                    y: 80
+                    y: 80,
+                    width: 0,
+                    height: 0
                 },
                 area: {
                     width: 300,
@@ -660,7 +760,7 @@ TestCase {
             height: 600
         };
 
-        const got = Model.hang(data.point, 200, 100, area.width, area.height);
+        const got = Model.hang(data.anchor, 200, 100, area.width, area.height);
 
         compare(got, data.want);
     }
