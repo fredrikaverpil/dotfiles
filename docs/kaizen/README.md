@@ -164,10 +164,10 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 - Launcher, panel and context menu hold exclusive keyboard focus and close
   each other through `shell.claimPanel`. Pick by what opens the surface.
 - A context menu opens on its button's output, sized to its rows; submenus
-  cascade beside their row and `h`/`l` close and open them. Opened without a
-  button (launcher, IPC), it resolves the focused output from the compositor.
-  It shows a tray item's menu or a launcher level (`menu popup <id>`); a level
-  marked `search` opens in the launcher instead.
+  cascade beside their row. Each card draws with `Ui/MenuCard`, and a query on
+  one closes the cards right of it. Opened without a button (launcher, IPC), it
+  resolves the focused output from the compositor. It shows a tray item's menu
+  or a launcher level (`menu popup <id>`).
 - Every surface opens over IPC; niri binds are `spawn qs ipc call ...`.
 - How each surface takes input, the bar buttons' kinds included:
   [`interaction.md`](interaction.md).

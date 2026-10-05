@@ -3,10 +3,10 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 
-import "ContextMenuModel.js" as Model
+import "MenuCardModel.js" as Model
 
-// Cascading menu anchored to what opened it. Not a Panel: a panel's card is centered and
-// its h/l step focus, while these cards follow their anchor and h/l close and open submenus.
+// Cascading menu anchored to what opened it. Not a Panel: a panel's card is centered, while
+// these cards follow their anchor and open submenus beside their row.
 PanelWindow {
     id: root
 
@@ -15,10 +15,8 @@ PanelWindow {
 
     // Rows heading the root menu, shaped like QsMenuEntry.
     property var headRows: []
-    // One level per open card: { opener, source, anchor }.
+    // One level per open card: { opener, source, anchor, title, selectFirst }.
     property var stack: []
-    // Selected row per level; -1 until one is picked, -2 for the first selectable row.
-    property var cursor: []
     readonly property int depth: stack.length
     readonly property real zoom: shell.textScale
 
@@ -26,14 +24,18 @@ PanelWindow {
         shown = false;
     }
 
-    function rowsAt(level) {
-        return cards.itemAt(level)?.rows ?? []; // qmllint disable missing-property
+    function cardAt(level) {
+        return cards.itemAt(level)?.menu ?? null; // qmllint disable missing-property
     }
 
-    // Launcher rows list their children through rows(); tray entries through an opener.
-    function rowsFor(entry, level) {
-        const entries = entry.source.rows ? entry.source.rows() : entry.opener.children ? entry.opener.children.values : [];
-        return level === 0 ? headRows.concat(entries) : entries;
+    // Launcher rows come from rows(query); tray entries from an opener, filtered by text.
+    function rowsFor(entry, level, query) {
+        const entries = entry.source.rows ? entry.source.rows(query) : entry.opener.children ? entry.opener.children.values : [];
+        const head = level === 0 ? headRows : [];
+        if (!query)
+            return head.concat(entries);
+        const found = row => !row.isSeparator && Model.matches(row, query);
+        return head.filter(found).concat(entry.source.rows ? entries : entries.filter(found));
     }
 
     // Child entries belong to their parent opener, so every menu level needs its own opener.
@@ -48,16 +50,16 @@ PanelWindow {
         });
         if (!handle.rows && !opener)
             return;
-        cursor = cursor.slice(0, depth).concat([selectFirst ? -2 : -1]);
         stack = stack.concat([
             {
                 opener: opener,
                 source: handle,
-                anchor: anchor
+                anchor: anchor,
+                title: handle.text || handle.title || "",
+                selectFirst: selectFirst === true
             }
         ]);
         levels.append({});
-        settle();
     }
 
     // Close every card deeper than level.
@@ -67,10 +69,10 @@ PanelWindow {
         // Clear bindings before destroying openers, deepest first.
         const removed = stack.slice(level);
         stack = stack.slice(0, level);
-        cursor = cursor.slice(0, level);
         levels.remove(level, removed.length);
         for (let i = removed.length - 1; i >= 0; i--)
             removed[i].opener?.destroy();
+        cardAt(level - 1)?.focusSearch();
     }
 
     function pop() {
@@ -81,22 +83,15 @@ PanelWindow {
     }
 
     function reset() {
-        settling = false;
-        settleTimer.stop();
         hoverTimer.stop();
         truncate(0);
-    }
-
-    function select(level, index) {
-        const next = cursor.slice();
-        next[level] = index;
-        cursor = next;
     }
 
     // Opens handle's menu on output (a screen name), at anchorFor(output): a bar button as
     // { below: true, x, width } in window coordinates, or null to center. Without an
     // output the menu opens on the focused one. handle is a tray menu handle, or
-    // { rows } whose rows() returns rows shaped like QsMenuEntry plus a glyph and a key.
+    // { rows, title } whose rows(query) returns rows shaped like QsMenuEntry plus a
+    // glyph, image, detail, keys and a key.
     function popup(handle, output, anchorFor) {
         if (!output) {
             pending = {
@@ -108,7 +103,6 @@ PanelWindow {
         }
         shown = false;
         reset();
-        pointer = Qt.point(-1, -1);
         screen = Quickshell.screens.find(candidate => candidate.name === output) || null;
         push(handle, anchorFor ? anchorFor(output) : null);
         if (shell && shell.registerPanel)
@@ -134,13 +128,10 @@ PanelWindow {
         }
     }
 
-    function trigger(level, row, selectFirst) {
-        if (!row || !row.enabled || row.isSeparator)
+    // A row without an action (a keybinding) is there to read.
+    function run(row) {
+        if (!row.triggered)
             return;
-        if (row.hasChildren) {
-            openChild(level, row, selectFirst);
-            return;
-        }
         row.triggered();
         close();
     }
@@ -152,46 +143,7 @@ PanelWindow {
         truncate(level + 1);
         const card = cards.itemAt(level);
         if (card)
-            push(row, card.rowAnchor(card.current), selectFirst); // qmllint disable missing-property
-    }
-
-    function onKey(event) {
-        const level = depth - 1;
-        const rows = rowsAt(level);
-        const current = cards.itemAt(level)?.current ?? -1; // qmllint disable missing-property
-        const row = current >= 0 ? rows[current] : null;
-        const text = event.text;
-        if (event.key === Qt.Key_Escape)
-            close();
-        else if (event.key === Qt.Key_Down || text === "j")
-            select(level, Model.step(rows, current, true));
-        else if (event.key === Qt.Key_Up || text === "k")
-            select(level, Model.step(rows, current, false));
-        else if (event.key === Qt.Key_Right || text === "l") {
-            if (row && row.hasChildren && row.enabled)
-                openChild(level, row, true);
-        } else if (event.key === Qt.Key_Left || event.key === Qt.Key_Backspace || text === "h")
-            pop();
-        else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
-            if (!settling)
-                trigger(level, row, true);
-        } else
-            return;
-        event.accepted = true;
-    }
-
-    // Blocks a repeating Enter from triggering a submenu's first row.
-    property bool settling: false
-
-    function settle() {
-        settling = true;
-        settleTimer.restart();
-    }
-
-    Timer {
-        id: settleTimer
-        interval: 250
-        onTriggered: root.settling = false
+            push(row, card.rowAnchor(card.menu.current), selectFirst); // qmllint disable missing-property
     }
 
     // Delays hover-opening so a diagonal move toward a submenu does not switch it.
@@ -202,26 +154,14 @@ PanelWindow {
         interval: 150
         onTriggered: {
             const target = root.hoverTarget;
-            if (target && target.level < root.depth && root.cursor[target.level] === target.index) {
-                root.openChild(target.level, root.rowsAt(target.level)[target.index]);
-            }
+            const card = target && target.level < root.depth ? root.cardAt(target.level) : null;
+            if (card && card.current === target.index)
+                root.openChild(target.level, card.shownRows[target.index]);
         }
     }
 
-    // Rows rebuilt or scrolled under a resting pointer report hover too; act on real motion only.
-    property point pointer: Qt.point(-1, -1)
-
-    function moved(point) {
-        if (point.x === pointer.x && point.y === pointer.y)
-            return false;
-        const first = pointer.x < 0;
-        pointer = point;
-        return !first;
-    }
-
     function hover(level, index) {
-        select(level, index);
-        const row = rowsAt(level)[index];
+        const row = cardAt(level).shownRows[index];
         const open = stack[level + 1];
         if (open && !Model.sameRow(open.source, row))
             truncate(level + 1);
@@ -234,7 +174,7 @@ PanelWindow {
     }
 
     onShownChanged: if (shown)
-        keys.forceActiveFocus()
+        cardAt(depth - 1)?.focusSearch()
     else
         reset()
 
@@ -258,20 +198,6 @@ PanelWindow {
         onClicked: root.close()
     }
 
-    Item {
-        id: keys
-        focus: true
-        Keys.onPressed: function (event) {
-            root.onKey(event);
-        }
-    }
-
-    FontMetrics {
-        id: metrics
-        font.family: Fonts.mono
-        font.pixelSize: 14
-    }
-
     ListModel {
         id: levels
     }
@@ -281,35 +207,39 @@ PanelWindow {
         model: levels
 
         Rectangle {
-            id: card
+            id: frame
 
             required property int index
+            readonly property alias menu: menu
 
             // Read once: stack changes must not rebuild this card's rows.
             property var level: null
-            Component.onCompleted: level = root.stack[index]
+            Component.onCompleted: {
+                level = root.stack[index];
+                if (level.selectFirst)
+                    menu.selectFirst();
+                menu.settle();
+                menu.focusSearch();
+            }
 
-            readonly property var rows: level ? root.rowsFor(level, index) : []
-            readonly property int current: root.cursor[index] === -2 ? Model.step(rows, -1, true) : root.cursor[index] ?? -1
-            readonly property int rowsHeight: rows.reduce((sum, row) => sum + (row.isSeparator ? 9 : 28), 0) + Math.max(0, rows.length - 1) * list.spacing
-            readonly property int labelWidth: rows.reduce((widest, row) => row.isSeparator ? widest : Math.max(widest, metrics.advanceWidth((row.text || "") + (row.hasChildren ? " ›" : ""))), 0)
-            readonly property var position: Model.place(level ? level.anchor : null, width * root.zoom, height * root.zoom, root.width, root.height)
+            // Placed by its tallest height, so a query shrinks the card without moving its top.
+            property real tallest: 0
+            onHeightChanged: tallest = Math.max(tallest, height)
+            readonly property var position: Model.place(level ? level.anchor : null, width * root.zoom, tallest * root.zoom, root.width, root.height)
 
             // Anchor for the submenu of row, in window coordinates.
             function rowAnchor(row) {
-                const delegate = list.itemAtIndex(row);
-                const y = delegate ? delegate.mapToItem(null, 0, 0).y : card.y;
                 return {
-                    x: card.x,
-                    width: card.width * root.zoom,
-                    y: y
+                    x: frame.x,
+                    width: frame.width * root.zoom,
+                    y: menu.rowTop(row)
                 };
             }
 
             x: position.x
             y: position.y
-            width: Model.clamp(Math.ceil(labelWidth) + 54, 160, 360)
-            height: Math.max(40, Math.min(rowsHeight + 12, (root.height - 16) / root.zoom))
+            width: Model.clamp(Math.ceil(menu.implicitWidth) + 12, 160, 360)
+            height: Math.max(40, Math.min(menu.implicitHeight + 12, (root.height - 16) / root.zoom))
             scale: root.zoom
             transformOrigin: Item.TopLeft
             radius: 8
@@ -325,83 +255,22 @@ PanelWindow {
                 anchors.fill: parent
             }
 
-            ListView {
-                id: list
+            MenuCard {
+                id: menu
                 anchors.fill: parent
                 anchors.margins: 6
-                clip: true
-                spacing: 2
-                model: card.rows
-                currentIndex: card.current
-                highlightFollowsCurrentItem: false
-                boundsBehavior: Flickable.StopAtBounds
-                onCurrentIndexChanged: if (currentIndex >= 0)
-                    positionViewAtIndex(currentIndex, ListView.Contain)
+                shell: root.shell
+                rows: frame.level ? root.rowsFor(frame.level, frame.index, menu.query) : []
+                placeholder: frame.level && frame.level.title ? "Filter " + frame.level.title.toLowerCase() + "…" : "Filter…"
+                maxWidth: 360 - 12
 
-                delegate: Rectangle {
-                    id: row
-
-                    required property var modelData
-                    required property int index
-
-                    width: list.width
-                    height: modelData.isSeparator ? 9 : 28
-                    radius: 4
-                    color: "transparent"
-                    border.color: row.index === card.current ? root.shell.palette.fg : "transparent"
-                    border.width: 1
-                    opacity: modelData.enabled ? 1 : 0.45
-
-                    Rectangle {
-                        visible: row.modelData.isSeparator
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: parent.width - 16
-                        x: 8
-                        height: 1
-                        color: root.shell.palette.dim
-                    }
-
-                    Row {
-                        visible: !row.modelData.isSeparator
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: parent.left
-                        anchors.leftMargin: 8
-                        anchors.right: parent.right
-                        anchors.rightMargin: 8
-                        spacing: 8
-
-                        Text {
-                            width: 14
-                            color: root.shell.palette.fg
-                            font.family: Fonts.mono
-                            font.pixelSize: 14
-                            text: row.modelData.buttonType === QsMenuButtonType.CheckBox ? (row.modelData.checkState === Qt.Checked ? "󰄲" : "󰄱") : row.modelData.buttonType === QsMenuButtonType.RadioButton ? (row.modelData.checkState === Qt.Checked ? "󰐾" : "󰐽") : row.modelData.glyph ?? ""
-                        }
-
-                        Text {
-                            width: parent.width - 22
-                            color: root.shell.palette.fg
-                            font.family: Fonts.mono
-                            font.pixelSize: 14
-                            text: (row.modelData.text || "") + (row.modelData.hasChildren ? " ›" : "")
-                            elide: Text.ElideRight
-                        }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        enabled: !row.modelData.isSeparator
-                        hoverEnabled: true
-                        onPositionChanged: function (mouse) {
-                            if (root.moved(mapToItem(null, mouse.x, mouse.y)))
-                                root.hover(card.index, row.index);
-                        }
-                        onClicked: {
-                            root.select(card.index, row.index);
-                            root.trigger(card.index, row.modelData);
-                        }
-                    }
-                }
+                // A query changes this card's rows, so its submenus no longer belong.
+                onQueryChanged: root.truncate(frame.index + 1)
+                onOpenRequested: (row, selectFirst) => root.openChild(frame.index, row, selectFirst)
+                onRunRequested: row => root.run(row)
+                onBackRequested: root.pop()
+                onCloseRequested: root.close()
+                onHovered: index => root.hover(frame.index, index)
             }
         }
     }

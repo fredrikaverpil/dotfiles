@@ -18,19 +18,15 @@ Ui.Panel {
     required property var contextMenu
 
     readonly property var items: Object.assign({
-        // search: too many rows to scan without it, so a context menu hands the
-        // level to the launcher.
         "apps": {
             icon: "󰀻",
             label: "Apps",
-            provider: "apps",
-            search: true
+            provider: "apps"
         },
         "keybindings": {
             icon: "\u{F11C}",
             label: "Keybindings",
-            provider: "binds",
-            search: true
+            provider: "binds"
         },
         "tray": {
             icon: "󰘔",
@@ -81,8 +77,7 @@ Ui.Panel {
         "trigger.emoji": {
             icon: "",
             label: "Emoji",
-            provider: "emoji",
-            search: true
+            provider: "emoji"
         },
         "trigger.clipboard": {
             icon: "\u{F014C}",
@@ -135,8 +130,7 @@ Ui.Panel {
         "settings.weather.location": {
             icon: "󰖐",
             label: "Location",
-            provider: "places",
-            search: true
+            provider: "places"
         },
         "settings.clock": {
             icon: "󰅐",
@@ -150,8 +144,7 @@ Ui.Panel {
         "settings.clock.timezone": {
             icon: "󰅐",
             label: "Timezone",
-            provider: "zones",
-            search: true
+            provider: "zones"
         },
         "settings.media": {
             icon: menu.shell.media.icon,
@@ -752,25 +745,26 @@ Ui.Panel {
     readonly property var rows: Model.rowsFor(menu.items, level, input.text, menu.providers, menu.launchCounts)
 
     // Launcher rows shaped like QsMenuEntry, for the context menu; keep filters
-    // the target's own rows.
-    function contextRows(target, keep) {
-        const rows = Model.rowsFor(menu.items, target, "", menu.providers, menu.launchCounts).filter(keep || (() => true)).map(row => {
-            const cascades = row.submenu && !menu.items[row.id].search;
-            const handsOff = row.submenu && !cascades;
-            const run = handsOff ? () => menu.open(row.id) : row.trayItem || row.entry || row.action ? () => menu.launch(row) : null;
+    // the target's own rows. A keybinding has no action and is there to read.
+    function contextRows(target, keep, query) {
+        const rows = Model.rowsFor(menu.items, target, query, menu.providers, menu.launchCounts).filter(keep || (() => true)).map(row => {
+            const run = row.trayItem || row.entry || row.action ? () => menu.launch(row) : null;
             return {
-                text: row.label + (handsOff ? "…" : ""),
+                text: row.label,
                 glyph: row.icon,
-                enabled: row.enabled && (cascades || !!run),
+                image: row.image || "",
+                detail: row.detail || "",
+                keys: row.chord !== undefined ? Ui.Compositor.keycaps(row.chord) : [],
+                enabled: row.enabled && (row.submenu || !!run || row.chord !== undefined),
                 isSeparator: false,
-                hasChildren: cascades,
-                rows: cascades ? () => menu.contextRows(row.id) : undefined,
+                hasChildren: row.submenu === true,
+                rows: row.submenu ? childQuery => menu.contextRows(row.id, null, childQuery) : undefined,
                 triggered: run,
                 key: row.id
             };
         });
         // The top level opens the launcher where a node opens its panel.
-        if (target === "root")
+        if (target === "root" && !query)
             rows.unshift({
                 text: "Launcher",
                 glyph: "\u{F0349}",
@@ -801,8 +795,11 @@ Ui.Panel {
             return;
         }
         popped = target;
+        // Keybindings can cascade from here, so its rows must be current.
+        readBinds();
         contextMenu.popup({
-            rows: () => menu.contextRows(target, keep)
+            rows: query => menu.contextRows(target, keep, query),
+            title: menu.items[target]?.label ?? ""
         }, output, button ? () => {
             const point = button.mapToItem(null, 0, 0);
             return {

@@ -1,13 +1,32 @@
-// Next selectable row from current, wrapping; separators are skipped.
-function step(rows, current, forward) {
+// The selectable row steps rows away from current, backward when negative,
+// wrapping; separators and disabled rows are skipped. From no row (-1), one
+// step lands on the first or the last.
+function step(rows, current, steps) {
   const count = rows.length;
-  for (let i = 1; i <= count; i++) {
-    const index =
-      ((current < 0 && !forward ? 0 : current) + (forward ? i : -i) + count) %
-      count;
-    if (!rows[index].isSeparator) return index;
+  const forward = steps > 0;
+  let index = current;
+  for (let moved = 0; moved < Math.abs(steps); moved++) {
+    let next = -1;
+    for (let i = 1; i <= count && next < 0; i++) {
+      const candidate =
+        ((index < 0 && !forward ? 0 : index) + (forward ? i : -i) + count) %
+        count;
+      if (!rows[candidate].isSeparator && rows[candidate].enabled !== false)
+        next = candidate;
+    }
+    if (next < 0) return -1;
+    index = next;
   }
-  return -1;
+  return index;
+}
+
+// Hyphens and case are ignored, so "wifi" finds "Wi-Fi".
+function matches(row, query) {
+  const searchable = (text) =>
+    String(text || "")
+      .toLowerCase()
+      .replace(/-/g, "");
+  return searchable(row.text).indexOf(searchable(query)) >= 0;
 }
 
 // Launcher rows are rebuilt on every change and match by key; tray entries by identity.
