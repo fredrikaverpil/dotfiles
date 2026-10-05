@@ -29,6 +29,49 @@ function matches(row, query) {
   return searchable(row.text).indexOf(searchable(query)) >= 0;
 }
 
+// A static tree's level at path, the keys of the submenus drilled into, and
+// those submenus' names. A key no longer in the tree ends the walk.
+function level(tree, path) {
+  let rows = tree;
+  const names = [];
+  for (const key of path) {
+    const row = rows.find((row) => row.key === key);
+    if (!row) return { rows: [], names: names };
+    rows = row.children;
+    names.push(row.text);
+  }
+  return { rows: rows, names: names };
+}
+
+// A static tree's rows matching query, by text or keys: direct rows first,
+// then deeper ones in the tree's order, with their path as the detail. trail
+// holds the keys of the submenus between the level and the row.
+function search(rows, query) {
+  if (!query) return rows;
+  const found = [];
+  const visit = (rows, names, keys) => {
+    for (const row of rows) {
+      if (row.isSeparator || row.enabled === false) continue;
+      if (
+        matches(row, query) ||
+        matches({ text: (row.keys || []).join("+") }, query)
+      )
+        found.push(
+          Object.assign({}, row, {
+            detail: names.length ? names.join(" › ") : row.detail,
+            trail: keys,
+          }),
+        );
+      if (row.children)
+        visit(row.children, names.concat([row.text]), keys.concat([row.key]));
+    }
+  };
+  visit(rows, [], []);
+  return found
+    .filter((row) => !row.trail.length)
+    .concat(found.filter((row) => row.trail.length));
+}
+
 // Launcher rows are rebuilt on every change and match by key; tray entries by identity.
 function sameRow(a, b) {
   return a === b || (!!b && a.key !== undefined && a.key === b.key);

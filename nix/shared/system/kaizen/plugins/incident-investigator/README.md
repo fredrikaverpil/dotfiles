@@ -97,9 +97,12 @@ flowchart LR
   `settings.json`. **New** under a tag's filter drafts an
   investigation with that tag, so the filter lists it. The tag buttons under an
   investigation's header set or clear its tag (`tag`) in any status.
+- `Ctrl+K` or `?` opens the palette over the window: the selected
+  investigation's actions, or the picked set's, then the window's (New, Clear,
+  Model ›, Effort ›, Filter ›), each with its key. `Actions.js` lists them.
 - On a focused row in the list, `j`/`k` move, Enter opens, Space toggles it in
   the picked set (`j`/`k` then move only the focus), Backspace asks to delete
-  the picked rows, or else the focused one, Esc unpicks and `?` shows the keys.
+  the picked rows, or else the focused one, and Esc unpicks.
 - Shift-click (a range) or ctrl-click (a toggle) picks investigations in the
   list, and **Combine** drafts a new one from their alerts and reports
   (`combine`), with the union of their entities, or **Delete** removes them
@@ -189,7 +192,8 @@ directory as private as `sourceDirs`.
 | `Plugin.qml`         | window, IPC handler, launcher item       |
 | `Investigations.qml` | window content                           |
 | `Format.js`          | formatting helpers for the window        |
-| `tst_Format.qml`     | `qmltestrunner -input .`, offscreen      |
+| `Actions.js`         | the palette's rows                       |
+| `tst_*.qml`          | `qmltestrunner -input .`, offscreen      |
 | `investigate/`       | daemon, CLI and tray                     |
 | `instructions.md`    | the base instructions for every run      |
 | `claude-plugin/`     | the Claude plugin serving gopls          |

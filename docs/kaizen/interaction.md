@@ -90,9 +90,9 @@ something to hang from.
 
 - The launcher is the shell's tree in the palette, at the root.
 - A shell menu is a layer surface with exclusive keyboard focus. An
-  application's menu is a popup of the application's window, placed by the
-  compositor beside its anchor: the shell does not know where a control sits
-  on screen, and an exclusive layer would take the keyboard from the window.
+  application's menu is drawn inside the application's window, over its
+  content: it needs no second surface, the keyboard stays with the window, and
+  it never leaves the window's bounds.
 
 ## Shell surfaces
 

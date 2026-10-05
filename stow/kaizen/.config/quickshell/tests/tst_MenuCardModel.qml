@@ -227,6 +227,160 @@ TestCase {
         verify(Model.sameRow(data.a, data.b) === data.want);
     }
 
+    function test_level_data() {
+        const tree = [
+            {
+                key: "model",
+                text: "Model",
+                children: [
+                    {
+                        key: "model.opus",
+                        text: "opus",
+                        children: []
+                    }
+                ]
+            }
+        ];
+        return [
+            {
+                tag: "root",
+                tree: tree,
+                path: [],
+                want: {
+                    rows: tree,
+                    names: []
+                }
+            },
+            {
+                tag: "submenu",
+                tree: tree,
+                path: ["model"],
+                want: {
+                    rows: tree[0].children,
+                    names: ["Model"]
+                }
+            },
+            {
+                tag: "gone",
+                tree: tree,
+                path: ["effort"],
+                want: {
+                    rows: [],
+                    names: []
+                }
+            }
+        ];
+    }
+
+    function test_level(data) {
+        const got = Model.level(data.tree, data.path);
+
+        compare(got, data.want);
+    }
+
+    function test_search_data() {
+        const opus = {
+            key: "model.opus",
+            text: "opus",
+            detail: "",
+            enabled: true,
+            isSeparator: false,
+            children: []
+        };
+        const model = {
+            key: "model",
+            text: "Model",
+            detail: "opus",
+            enabled: true,
+            isSeparator: false,
+            children: [opus]
+        };
+        const rerun = {
+            key: "rerun",
+            text: "Re-run",
+            detail: "",
+            keys: ["Ctrl", "R"],
+            enabled: true,
+            isSeparator: false,
+            children: []
+        };
+        const off = {
+            key: "off",
+            text: "Re-off",
+            detail: "",
+            enabled: false,
+            isSeparator: false,
+            children: []
+        };
+        const separator = {
+            isSeparator: true,
+            enabled: true
+        };
+        const rows = [rerun, off, separator, model];
+        return [
+            {
+                tag: "no query",
+                rows: rows,
+                query: "",
+                want: rows
+            },
+            {
+                tag: "direct",
+                rows: rows,
+                query: "rerun",
+                want: [Object.assign({}, rerun, {
+                        trail: []
+                    })]
+            },
+            {
+                tag: "deeper with path",
+                rows: rows,
+                query: "opus",
+                want: [Object.assign({}, opus, {
+                        detail: "Model",
+                        trail: ["model"]
+                    })]
+            },
+            {
+                tag: "direct before deeper",
+                rows: [
+                    {
+                        key: "tag",
+                        text: "Tag",
+                        detail: "",
+                        enabled: true,
+                        isSeparator: false,
+                        children: [opus]
+                    },
+                    model],
+                query: "o",
+                want: [Object.assign({}, model, {
+                        trail: []
+                    }), Object.assign({}, opus, {
+                        detail: "Tag",
+                        trail: ["tag"]
+                    }), Object.assign({}, opus, {
+                        detail: "Model",
+                        trail: ["model"]
+                    })]
+            },
+            {
+                tag: "by key",
+                rows: rows,
+                query: "ctrl+r",
+                want: [Object.assign({}, rerun, {
+                        trail: []
+                    })]
+            }
+        ];
+    }
+
+    function test_search(data) {
+        const got = Model.search(data.rows, data.query);
+
+        compare(got, data.want);
+    }
+
     // 200x100 card in a 1000x600 area.
     function test_place_data() {
         return [
