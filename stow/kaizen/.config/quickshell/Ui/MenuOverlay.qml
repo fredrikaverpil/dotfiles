@@ -243,8 +243,8 @@ Item {
             // From level alone: it can lag a change of path.
             placeholder: overlay.level.names.length ? "Filter " + overlay.level.names[overlay.level.names.length - 1].toLowerCase() + "…" : "Search…"
             openerKeys: overlay.openerKeys
-            fontSize: 16
-            rowHeight: 36
+            fontSize: 14
+            rowHeight: 28
             // The frame fixes the width.
             maxWidth: 0
 

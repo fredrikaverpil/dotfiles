@@ -35,7 +35,8 @@ and may deviate.
 - A key is a keycap per key (`Super` `Space`), set apart from the label it
   belongs to: `off` text a size smaller, outlined `dim` at radius 3 with a 2 px
   bottom edge. A menu row puts it in a column on the right.
-- Text is `Ui.Fonts.mono`. Links are `water` and underlined; inline code is
+- Text is `Ui.Fonts.mono` at 14 px, times the text scale; secondary text is a
+  size or two smaller. Links are `water` and underlined; inline code is
   `water` in the body's font and size. Qt's Markdown rendering ignores
   `linkColor` and draws code in its own larger fixed font, so markdown text goes
   through a helper that colours both spans first.

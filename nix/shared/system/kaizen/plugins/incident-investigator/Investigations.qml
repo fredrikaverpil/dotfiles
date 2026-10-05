@@ -648,7 +648,7 @@ Column {
                 anchors.centerIn: parent
                 color: root.shell.palette.off
                 font.family: Ui.Fonts.mono
-                font.pixelSize: 13
+                font.pixelSize: 14
                 text: "No investigations"
             }
         }
@@ -822,7 +822,7 @@ Column {
                 anchors.centerIn: parent
                 color: root.shell.palette.off
                 font.family: Ui.Fonts.mono
-                font.pixelSize: 13
+                font.pixelSize: 14
                 text: "Select an investigation"
             }
         }
@@ -857,7 +857,7 @@ Column {
                 visible: btn.icon !== ""
                 color: btn.danger ? root.shell.palette.rose : root.shell.palette.fg
                 font.family: Ui.Fonts.mono
-                font.pixelSize: 13
+                font.pixelSize: 14
                 text: btn.icon
             }
 
@@ -884,7 +884,7 @@ Column {
         activeFocusOnTab: true
         color: iconMouse.containsMouse || activeFocus ? root.shell.palette.fg : root.shell.palette.off
         font.family: Ui.Fonts.mono
-        font.pixelSize: 13
+        font.pixelSize: 14
 
         Keys.onReturnPressed: clicked()
         Keys.onSpacePressed: clicked()
@@ -958,7 +958,7 @@ Column {
             Text {
                 color: chipValue.color
                 font.family: Ui.Fonts.mono
-                font.pixelSize: 13
+                font.pixelSize: 14
                 text: chip.icon
             }
 
@@ -1114,7 +1114,7 @@ Column {
             elide: Text.ElideRight
             color: root.shell.palette.fg
             font.family: Ui.Fonts.mono
-            font.pixelSize: 13
+            font.pixelSize: 14
             font.bold: true
             text: Format.name(row.modelData)
         }
@@ -1229,7 +1229,7 @@ Column {
             anchors.fill: input
             color: root.shell.palette.off
             font.family: Ui.Fonts.mono
-            font.pixelSize: 13
+            font.pixelSize: 14
         }
 
         TextEdit {
@@ -1240,7 +1240,7 @@ Column {
             selectionColor: root.shell.palette.sel
             selectedTextColor: root.shell.palette.fg
             font.family: Ui.Fonts.mono
-            font.pixelSize: 13
+            font.pixelSize: 14
             wrapMode: field.multiline ? TextEdit.Wrap : TextEdit.NoWrap
             activeFocusOnTab: true
             // Tab moves focus; a field never takes a tab character.
@@ -1799,7 +1799,7 @@ Column {
                                         id: measure
                                         visible: false
                                         font.family: Ui.Fonts.mono
-                                        font.pixelSize: 13
+                                        font.pixelSize: 14
                                         textFormat: Text.MarkdownText
                                         text: Format.literals(message.modelData.text, root.shell.palette.water)
                                     }
@@ -1821,7 +1821,7 @@ Column {
                                             textFormat: TextEdit.MarkdownText
                                             color: root.shell.palette.fg
                                             font.family: Ui.Fonts.mono
-                                            font.pixelSize: 13
+                                            font.pixelSize: 14
                                             text: Format.literals(message.modelData.text, root.shell.palette.water)
                                         }
                                     }
@@ -1892,7 +1892,7 @@ Column {
                                             textFormat: plain ? TextEdit.PlainText : TextEdit.MarkdownText
                                             color: modelData.heading ? root.shell.palette.blossom : modelData.code ? root.shell.palette.water : root.shell.palette.fg
                                             font.family: Ui.Fonts.mono
-                                            font.pixelSize: 13
+                                            font.pixelSize: 14
                                             font.bold: modelData.heading
                                             topPadding: modelData.heading ? 6 : 0
                                             text: plain ? modelData.text : Format.literals(modelData.text, root.shell.palette.water)
@@ -1960,7 +1960,7 @@ Column {
                     wrapMode: Text.WordWrap
                     color: root.shell.palette.rose
                     font.family: Ui.Fonts.mono
-                    font.pixelSize: 13
+                    font.pixelSize: 14
                     text: detail.item.error
                 }
 
