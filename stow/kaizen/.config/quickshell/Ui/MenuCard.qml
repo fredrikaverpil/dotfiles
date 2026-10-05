@@ -37,6 +37,10 @@ Item {
         input.forceActiveFocus();
     }
 
+    function clear() {
+        input.text = "";
+    }
+
     // Set while there is no row to select yet: tray menus fill after opening.
     property bool firstPending: false
 

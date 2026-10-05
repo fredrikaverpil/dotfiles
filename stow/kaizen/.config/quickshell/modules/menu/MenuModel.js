@@ -113,31 +113,6 @@ function rowsFor(items, level, query, providers, counts) {
     });
 }
 
-function selectFirstEnabled(rows) {
-  var index = (rows || []).findIndex(function (row) {
-    return row.enabled;
-  });
-  return index < 0 ? 0 : index;
-}
-
-function moveIndex(rows, currentIndex, steps) {
-  var list = rows || [];
-  var count = list.length;
-  if (count === 0) return currentIndex;
-
-  var delta = steps > 0 ? 1 : -1;
-  var index = currentIndex;
-  for (var moved = 0; moved < Math.abs(steps); moved++) {
-    var candidate = index;
-    for (var tried = 0; tried < count; tried++) {
-      candidate = (candidate + delta + count) % count;
-      if (list[candidate].enabled) break;
-    }
-    index = candidate;
-  }
-  return index;
-}
-
 function parentLevel(level) {
   if (level === "root") return "root";
   return level.indexOf(".") >= 0

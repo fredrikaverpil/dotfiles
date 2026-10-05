@@ -699,7 +699,7 @@ Ui.Panel {
             menu.open(id);
         }
         function popup(id: string): void {
-            menu.popup(id, "", null);
+            menu.open(id);
         }
     }
 
@@ -742,11 +742,9 @@ Ui.Panel {
             }
         })
 
-    readonly property var rows: Model.rowsFor(menu.items, level, input.text, menu.providers, menu.launchCounts)
-
-    // Launcher rows shaped like QsMenuEntry, for the context menu; keep filters
-    // the target's own rows. A keybinding has no action and is there to read.
-    function contextRows(target, keep, query) {
+    // Launcher rows shaped like QsMenuEntry, for a MenuCard; keep filters the
+    // target's own rows. A keybinding has no action and is there to read.
+    function cardRows(target, keep, query) {
         const rows = Model.rowsFor(menu.items, target, query, menu.providers, menu.launchCounts).filter(keep || (() => true)).map(row => {
             const run = row.trayItem || row.entry || row.action ? () => menu.launch(row) : null;
             return {
@@ -758,12 +756,26 @@ Ui.Panel {
                 enabled: row.enabled && (row.submenu || !!run || row.chord !== undefined),
                 isSeparator: false,
                 hasChildren: row.submenu === true,
-                rows: row.submenu ? childQuery => menu.contextRows(row.id, null, childQuery) : undefined,
+                rows: row.submenu ? childQuery => menu.cardRows(row.id, null, childQuery) : undefined,
                 triggered: run,
                 key: row.id
             };
         });
-        // The top level opens the launcher where a node opens its panel.
+        // Sets a node's panel row apart from its actions.
+        if (rows[0]?.key === target + ".panel")
+            rows.splice(1, 0, menu.separator);
+        return rows;
+    }
+
+    readonly property var separator: ({
+            isSeparator: true,
+            enabled: true
+        })
+
+    // Card rows for the context menu, whose top level opens the launcher where a
+    // node opens its panel.
+    function contextRows(target, keep, query) {
+        const rows = menu.cardRows(target, keep, query);
         if (target === "root" && !query)
             rows.unshift({
                 text: "Launcher",
@@ -773,13 +785,7 @@ Ui.Panel {
                 hasChildren: false,
                 triggered: () => menu.open("root"),
                 key: "root.panel"
-            });
-        // Sets a node's panel row apart from its actions.
-        if (rows[0]?.key === target + ".panel")
-            rows.splice(1, 0, {
-                isSeparator: true,
-                enabled: true
-            });
+            }, menu.separator);
         return rows;
     }
 
@@ -810,17 +816,7 @@ Ui.Panel {
         } : null);
     }
 
-    function selectFirstEnabled() {
-        list.currentIndex = Model.selectFirstEnabled(rows);
-    }
-
-    function move(steps) {
-        if (rows.length === 0)
-            return;
-        list.currentIndex = Model.moveIndex(rows, list.currentIndex, steps);
-    }
-
-    readonly property string title: level === "root" ? "Go" : menu.items[level].label
+    readonly property string breadcrumb: level === "root" ? "Launcher" : level.split(".").map((part, index, parts) => menu.items[parts.slice(0, index + 1).join(".")].label).join(" › ")
 
     readonly property bool wide: level !== "root" && menu.items[level].provider === "binds"
 
@@ -833,10 +829,10 @@ Ui.Panel {
             readBinds();
         focusedOutputQuery.running = true;
         level = target;
-        input.text = "";
+        card.clear();
         shown = true;
-        input.forceActiveFocus();
-        Qt.callLater(selectFirstEnabled);
+        card.focusSearch();
+        Qt.callLater(card.selectFirst);
     }
 
     function toggle() {
@@ -848,18 +844,6 @@ Ui.Panel {
             close();
         else
             open(Model.parentLevel(level));
-    }
-
-    function activate() {
-        const row = rows[list.currentIndex];
-        if (!row || !row.enabled)
-            return;
-        if (row.trayItem || row.entry || row.action) {
-            close();
-            launch(row);
-        } else if (row.id) {
-            open(row.id);
-        }
     }
 
     function launch(row) {
@@ -881,149 +865,36 @@ Ui.Panel {
     }
 
     Text {
-        color: menu.shell.palette.dim
+        color: menu.shell.palette.off
         font.family: Ui.Fonts.mono
         font.pixelSize: 13
-        text: menu.title
+        text: menu.breadcrumb
     }
 
-    TextInput {
-        id: input
-        width: parent.width
-        clip: true
-        color: menu.shell.palette.fg
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 18
-        focus: true
-
-        // Keyed on the query, not on rows: the rows binding returns a fresh array
-        // whenever any provider notifies, which would reset the selection mid-scroll.
-        // ListView resets currentIndex after this handler runs.
-        onTextChanged: Qt.callLater(menu.selectFirstEnabled)
-
-        Text {
-            anchors.fill: parent
-            visible: input.text.length === 0
-            color: menu.shell.palette.dim
-            font: input.font
-            text: "Search…"
-        }
-
-        Keys.onPressed: function (event) {
-            if (event.key === Qt.Key_Escape)
-                menu.back();
-            else if (event.key === Qt.Key_Left && input.text.length === 0)
-                menu.back();
-            else if (event.key === Qt.Key_Down)
-                menu.move(1);
-            else if (event.key === Qt.Key_Up)
-                menu.move(-1);
-            else if (event.key === Qt.Key_PageDown)
-                menu.move(10);
-            else if (event.key === Qt.Key_PageUp)
-                menu.move(-10);
-            else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
-                menu.activate();
-            else if (event.key === Qt.Key_Right && input.text.length === 0)
-                menu.activate();
-            else
-                return;
-            event.accepted = true;
-        }
-    }
-
-    Rectangle {
-        width: parent.width
-        height: 1
-        color: menu.shell.palette.dim
-    }
-
-    ListView {
-        id: list
+    Ui.MenuCard {
+        id: card
         width: parent.width
         height: parent.height - y
-        clip: true
-        model: menu.rows
+        shell: menu.shell
+        rows: menu.cardRows(menu.level, null, card.query)
+        placeholder: menu.level === "root" ? "Search…" : "Filter " + menu.items[menu.level].label.toLowerCase() + "…"
+        fontSize: 16
+        rowHeight: 36
+        // The panel fixes the width; Emoji has thousands of rows.
+        maxWidth: 0
 
-        delegate: Rectangle {
-            required property var modelData
-            required property int index
-
-            width: list.width
-            height: 36
-            color: index === list.currentIndex ? menu.shell.palette.sel : "transparent"
-            radius: 4
-
-            Row {
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
-                anchors.leftMargin: 8
-                spacing: 10
-
-                Item {
-                    width: 20
-                    height: 20
-                    visible: modelData.chord === undefined
-
-                    Image {
-                        id: rowImage
-                        anchors.fill: parent
-                        source: modelData.image || ""
-                        visible: status === Image.Ready
-                        fillMode: Image.PreserveAspectFit
-                        asynchronous: true
-                        sourceSize.width: width * Screen.devicePixelRatio
-                        sourceSize.height: height * Screen.devicePixelRatio
-                    }
-
-                    Text {
-                        anchors.fill: parent
-                        visible: !rowImage.visible
-                        verticalAlignment: Text.AlignVCenter
-                        color: modelData.enabled ? menu.shell.palette.fg : menu.shell.palette.off
-                        font.family: Ui.Fonts.mono
-                        font.pixelSize: 15
-                        text: modelData.icon || ""
-                    }
-                }
-
-                Text {
-                    width: 290
-                    visible: modelData.chord !== undefined
-                    color: menu.shell.palette.off
-                    font.family: Ui.Fonts.mono
-                    font.pixelSize: 15
-                    text: modelData.chord || ""
-                }
-
-                Text {
-                    color: modelData.enabled ? menu.shell.palette.fg : menu.shell.palette.off
-                    font.family: Ui.Fonts.mono
-                    font.pixelSize: 15
-                    width: modelData.detail ? Math.min(implicitWidth, 300) : implicitWidth
-                    text: modelData.label + (modelData.submenu ? " ›" : "")
-                    elide: Text.ElideRight
-                }
-
-                Text {
-                    visible: (modelData.detail || "") !== ""
-                    color: menu.shell.palette.off
-                    font.family: Ui.Fonts.mono
-                    font.pixelSize: 15
-                    text: modelData.detail || ""
-                    elide: Text.ElideRight
-                }
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    if (!modelData.enabled)
-                        return;
-                    list.currentIndex = index;
-                    menu.activate();
-                }
-            }
+        onOpenRequested: row => {
+            menu.open(row.key);
+            card.settle();
         }
+        // A row without an action (a keybinding) is there to read.
+        onRunRequested: row => {
+            if (!row.triggered)
+                return;
+            menu.close();
+            row.triggered();
+        }
+        onBackRequested: menu.back()
+        onCloseRequested: menu.close()
     }
 }

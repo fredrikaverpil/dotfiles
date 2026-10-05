@@ -149,7 +149,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 ## Surfaces
 
 ```text
-Launcher (modules/menu)            keyboard entry point; drills down levels
+Launcher (modules/menu)            palette; keyboard entry point, drills down levels
   ├─ Apps, Keybindings, Emoji     providers
   ├─ Trigger                      screenshots, recording, clipboard, window actions
   ├─ Settings                     per bar button: its panel, then its actions; Session
@@ -165,9 +165,11 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   each other through `shell.claimPanel`. Pick by what opens the surface.
 - A context menu opens on its button's output, sized to its rows; submenus
   cascade beside their row. Each card draws with `Ui/MenuCard`, and a query on
-  one closes the cards right of it. Opened without a button (launcher, IPC), it
-  resolves the focused output from the compositor. It shows a tray item's menu
-  or a launcher level (`menu popup <id>`).
+  one closes the cards right of it. Opened without an output (the launcher's
+  Tray level), it resolves the focused output from the compositor. It shows a
+  tray item's menu, or a launcher level on a bar button's right-click.
+- The launcher draws the same card centred in a `Ui/Panel`, a level at a time.
+  `menu popup <id>` and `menu level <id>` open it at that level.
 - Every surface opens over IPC; niri binds are `spawn qs ipc call ...`.
 - How each surface takes input, the bar buttons' kinds included:
   [`interaction.md`](interaction.md).

@@ -142,31 +142,4 @@ TestCase {
             compare(got, c.want, c.query);
         }
     }
-
-    function test_keyboard_movement_wraps_and_skips_disabled_rows() {
-        const rows = [
-            {
-                enabled: true
-            },
-            {
-                enabled: false
-            },
-            {
-                enabled: true
-            }
-        ];
-        compare(Menu.selectFirstEnabled([
-            {
-                enabled: false
-            },
-            {
-                enabled: true
-            }
-        ]), 1);
-        compare(Menu.selectFirstEnabled([]), 0);
-        compare(Menu.moveIndex(rows, 0, 1), 2);
-        compare(Menu.moveIndex(rows, 2, 1), 0);
-        compare(Menu.moveIndex(rows, 0, -1), 2);
-        compare(Menu.moveIndex(rows, 0, 10), 0);
-    }
 }
