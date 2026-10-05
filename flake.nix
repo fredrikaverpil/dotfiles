@@ -182,6 +182,7 @@
                     pkgs.niri
                     pkgs.jq
                     pkgs.wtype
+                    pkgs.wlrctl
                     (task "compositor-test" "tests/config_test.sh")
                     (task "shell-smoke" "tests/shell_smoke.sh \"$@\"")
                     (task "shell-perf" "tests/shell_perf.sh \"$@\"")
