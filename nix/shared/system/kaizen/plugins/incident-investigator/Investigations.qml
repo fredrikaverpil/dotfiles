@@ -1773,7 +1773,8 @@ Column {
             // the newest message, like a flick does.
             ScrollBar.vertical: ScrollBar {
                 id: chatScroll
-                policy: ScrollBar.AsNeeded
+                // AsNeeded alone hides only the style's own handle, not this one.
+                visible: size < 1.0
                 onPressedChanged: scroller.follow = !pressed && scroller.atYEnd
                 contentItem: Rectangle {
                     implicitWidth: 6
