@@ -43,6 +43,30 @@ function level(tree, path) {
   return { rows: rows, names: names };
 }
 
+// One tree from the scopes around the focus, { title, rows } nearest first:
+// their rows nearest first, a separator between scopes, and a row whose key a
+// nearer scope has dropped. names are the titles outermost first.
+function scoped(scopes) {
+  const seen = new Set();
+  let rows = [];
+  for (const scope of scopes) {
+    const own = scope.rows.filter(
+      (row) => row.isSeparator || !seen.has(row.key),
+    );
+    if (!own.length) continue;
+    own.forEach((row) => seen.add(row.key));
+    rows = rows.concat(
+      rows.length ? [{ isSeparator: true, enabled: true }] : [],
+      own,
+    );
+  }
+  const names = scopes
+    .map((scope) => scope.title)
+    .filter(Boolean)
+    .reverse();
+  return { rows: rows, names: names };
+}
+
 // A static tree's rows matching query, by text or keys: direct rows first,
 // then deeper ones in the tree's order, with their path as the detail. trail
 // holds the keys of the submenus between the level and the row.

@@ -1,17 +1,12 @@
 .pragma library
 .import "Format.js" as Format
 
-// The palette's rows, a static tree for Ui.MenuOverlay: the focused
-// investigation's actions, or the picked set's, then the window's. A row runs
-// its action with its arg.
+// The palette's rows, one static tree per scope for Ui.MenuOverlay. A row runs
+// its action with its arg on its ids; a key shows only where it runs the row.
 //
-// state: current (the selected investigation, or null), picked (the picked
-// investigations), deletable and clearable (counts), clearLabel, tags, model,
-// effort, tagFilter, projectFilter and projects (those the list names).
-function actions(state) {
-  var first = state.picked.length >= 2 ? pickedRows(state) : state.current ? itemRows(state.current, state.tags) : []
-  return first.length ? first.concat([separator], windowRows(state)) : windowRows(state)
-}
+// state: listed (the investigations the list shows), picked (the picked ones),
+// clearable (a count), clearLabel, tags, model, effort, tagFilter,
+// projectFilter and projects (those the list names).
 
 var separator = { isSeparator: true, enabled: true }
 
@@ -27,7 +22,8 @@ function row(fields) {
     hasChildren: false,
     children: [],
     action: "",
-    arg: ""
+    arg: "",
+    ids: []
   }, fields)
 }
 
@@ -39,7 +35,18 @@ function radio(key, text, on, action, arg) {
   return row({ key: key, text: text, glyph: on ? Format.icons.radioOn : Format.icons.radio, action: action, arg: arg })
 }
 
-// Picking the investigation's tag again clears it.
+function check(key, text, on, action, arg) {
+  return row({ key: key, text: text, glyph: on ? Format.icons.checkOn : Format.icons.check, action: action, arg: arg })
+}
+
+// The rows, their submenus' too, acting on ids.
+function about(ids, rows) {
+  return rows.map(function(each) {
+    return Object.assign({}, each, { ids: ids, children: about(ids, each.children) })
+  })
+}
+
+// Picking the tag already set clears it.
 function tagMenu(tags, tag) {
   return submenu({ key: "tag", text: "Tag", glyph: Format.icons.tag, detail: tag }, tags.map(function(each) {
     return radio("tag." + each.name, each.name, each.name === tag, "tag", each.name === tag ? "" : each.name)
@@ -52,7 +59,8 @@ function answer(item) {
   return answers.length ? answers[answers.length - 1].text : ""
 }
 
-function itemRows(item, tags) {
+// An investigation's actions by status; selection is the conversation's selected text.
+function itemRows(item, tags, selection) {
   var rows = []
   var running = item.status === "running"
   if (item.status === "draft") {
@@ -69,21 +77,96 @@ function itemRows(item, tags) {
     rows.push(row({ key: "terminal", text: "Terminal", glyph: Format.icons.terminal, action: "terminal" }))
   if (!running && answer(item))
     rows.push(row({ key: "copy", text: "Copy answer", glyph: Format.icons.copy, action: "copy", arg: answer(item) }))
+  if (selection)
+    rows.push(row({ key: "copySelection", text: "Copy selection", glyph: Format.icons.copy, action: "copy", arg: selection }))
   if (tags.length)
     rows.push(tagMenu(tags, item.tag))
-  if (!running && item.status !== "draft")
-    rows.push(row({ key: "delete", text: "Delete", glyph: Format.icons.trash, keys: ["Backspace"], action: "delete" }))
   return rows
 }
 
-function pickedRows(state) {
-  var rows = [
-    row({ key: "combine", text: "Combine", glyph: Format.icons.plus, detail: state.picked.length + " investigations", action: "combine" }),
-    row({ key: "unpick", text: "Unpick", glyph: Format.icons.close, keys: ["Esc"], action: "unpick" })
-  ]
-  if (state.deletable)
-    rows.push(row({ key: "delete", text: "Delete " + state.deletable, glyph: Format.icons.trash, keys: ["Backspace"], action: "delete" }))
+// A draft has Discard instead.
+function deletable(item) {
+  return item.status !== "running" && item.status !== "draft"
+}
+
+// A focused row: its investigation, or the picked set when there is one.
+function rowRows(state, item) {
+  if (state.picked.length)
+    return pickedRows(state, true)
+  var rows = [row({ key: "open", text: "Open", glyph: Format.icons[item.status], keys: ["Enter"], action: "open" })].concat(itemRows(item, state.tags, ""), [
+    row({ key: "pick", text: "Pick", glyph: Format.icons.check, keys: ["Space"], action: "pick" }),
+    row({ key: "combine", text: "Combine", glyph: Format.icons.plus, enabled: false, action: "combine" })
+  ])
+  if (deletable(item))
+    rows.push(row({ key: "delete", text: "Delete", glyph: Format.icons.trash, keys: ["Backspace"], action: "delete" }))
+  return about([item.id], rows)
+}
+
+// A tag shows on when every picked investigation has it; picking that one clears it from all.
+function pickedRows(state, keyed) {
+  var count = state.picked.length
+  var rows = [row({ key: "combine", text: "Combine", glyph: Format.icons.plus, detail: count + (count === 1 ? " investigation" : " investigations"), enabled: count >= 2, action: "combine" })]
+  if (state.tags.length) {
+    var shared = state.tags.filter(function(tag) {
+      return state.picked.every(function(item) { return item.tag === tag.name })
+    })
+    rows.push(tagMenu(state.tags, shared.length ? shared[0].name : ""))
+  }
+  rows.push(row({ key: "unpick", text: "Unpick", glyph: Format.icons.close, keys: keyed ? ["Esc"] : [], action: "unpick" }))
+  var gone = state.picked.filter(function(item) { return item.status !== "running" }).length
+  if (gone)
+    rows.push(row({ key: "delete", text: "Delete " + gone, glyph: Format.icons.trash, keys: keyed ? ["Backspace"] : [], action: "delete" }))
+  return about(state.picked.map(function(item) { return item.id }), rows)
+}
+
+// The list and its search field.
+function listRows(state) {
+  var rows = [row({ key: "search", text: "Search list", glyph: Format.icons.filter, action: "search" })]
+  var filters = []
+  if (state.tags.length)
+    filters.push(submenu({ key: "filter.tag", text: "Tag", glyph: Format.icons.tag, detail: state.tagFilter }, [radio("filter.tag.", "All", !state.tagFilter, "filterTag", "")].concat(state.tags.map(function(tag) {
+      return radio("filter.tag." + tag.name, tag.name, tag.name === state.tagFilter, "filterTag", tag.name)
+    }))))
+  if (state.projects.length)
+    filters.push(submenu({ key: "filter.project", text: "Project", glyph: Format.icons.filter, detail: state.projectFilter.join(", ") }, [radio("filter.project.", "All projects", !state.projectFilter.length, "filterProject", "")].concat(state.projects.map(function(project) {
+      return check("filter.project." + project, project, state.projectFilter.indexOf(project) >= 0, "filterProject", project)
+    }))))
+  if (filters.length)
+    rows.push(submenu({ key: "filter", text: "Filter", glyph: Format.icons.filter, detail: [state.tagFilter].concat(state.projectFilter).filter(Boolean).join(", ") }, filters))
+  if (state.listed.length > 1)
+    rows.push(row({ key: "pickAll", text: "Pick all listed", glyph: Format.icons.checkOn, action: "pickAll" }))
+  if (state.picked.length)
+    rows.push(row({ key: "unpick", text: "Unpick", glyph: Format.icons.close, keys: ["Esc"], action: "unpick" }))
+  if (state.listed.length)
+    rows.push(submenu({ key: "goto", text: "Go to", glyph: Format.icons.arrow }, state.listed.map(function(item) {
+      return row({ key: "goto." + item.id, text: Format.name(item), glyph: Format.icons[item.status], detail: item.projects.join(", "), action: "select", arg: item.id })
+    })))
   return rows
+}
+
+// The shown draft's form. draft: id, tag and projects as the form holds them,
+// and choices, every project it can pick.
+function draftRows(state, draft) {
+  var rows = [
+    row({ key: "run", text: "Run", glyph: Format.icons.play, keys: ["Ctrl", "Enter"], action: "run" }),
+    row({ key: "discard", text: "Discard", glyph: Format.icons.trash, action: "discard" }),
+    submenu({ key: "projects", text: "Projects", glyph: Format.icons.filter, detail: draft.projects.join(", ") }, draft.choices.map(function(project) {
+      return check("projects." + project, project, draft.projects.indexOf(project) >= 0, "project", project)
+    }).concat([row({ key: "projects.add", text: "Add a project…", glyph: Format.icons.plus, action: "addProject" })]))
+  ]
+  if (state.tags.length)
+    rows.push(tagMenu(state.tags, draft.tag))
+  rows.push(row({ key: "trace", text: "Trace id", glyph: Format.icons.draft, action: "focusTrace" }))
+  rows.push(row({ key: "notes", text: "Notes", glyph: Format.icons.draft, action: "focusNotes" }))
+  return about([draft.id], rows)
+}
+
+// The shown investigation's conversation.
+function conversationRows(state, item, selection) {
+  var rows = itemRows(item, state.tags, selection)
+  if (deletable(item))
+    rows.push(row({ key: "delete", text: "Delete", glyph: Format.icons.trash, action: "delete" }))
+  return about([item.id], rows)
 }
 
 function windowRows(state) {
@@ -96,17 +179,5 @@ function windowRows(state) {
   rows.push(submenu({ key: "effort", text: "Effort", glyph: Format.icons.effort, detail: state.effort }, Format.efforts.map(function(effort) {
     return radio("effort." + effort, effort, effort === state.effort, "effort", effort)
   })))
-  var filters = []
-  if (state.tags.length)
-    filters.push(submenu({ key: "filter.tag", text: "Tag", glyph: Format.icons.tag, detail: state.tagFilter }, [radio("filter.tag.", "All", !state.tagFilter, "filterTag", "")].concat(state.tags.map(function(tag) {
-      return radio("filter.tag." + tag.name, tag.name, tag.name === state.tagFilter, "filterTag", tag.name)
-    }))))
-  if (state.projects.length)
-    filters.push(submenu({ key: "filter.project", text: "Project", glyph: Format.icons.filter, detail: state.projectFilter.join(", ") }, [radio("filter.project.", "All projects", !state.projectFilter.length, "filterProject", "")].concat(state.projects.map(function(project) {
-      var on = state.projectFilter.indexOf(project) >= 0
-      return row({ key: "filter.project." + project, text: project, glyph: on ? Format.icons.checkOn : Format.icons.check, action: "filterProject", arg: project })
-    }))))
-  if (filters.length)
-    rows.push(submenu({ key: "filter", text: "Filter", glyph: Format.icons.filter, detail: [state.tagFilter].concat(state.projectFilter).filter(Boolean).join(", ") }, filters))
   return rows
 }

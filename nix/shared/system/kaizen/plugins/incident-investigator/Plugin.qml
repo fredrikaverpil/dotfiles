@@ -96,10 +96,9 @@ Ui.Plugin {
             transformOrigin: Item.TopLeft
             shell: plugin.shell
             title: "Incident investigator"
-            tree: investigations.actions
             fallback: investigations
 
-            onRunRequested: row => investigations.runAction(row.action, row.arg)
+            onRunRequested: row => investigations.runAction(row)
 
             // A focused field keeps Ctrl+K from Keys handlers; a Shortcut fires from anywhere in the window.
             Shortcut {

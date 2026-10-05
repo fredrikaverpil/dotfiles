@@ -3,14 +3,14 @@ import QtQuick
 import "MenuCardModel.js" as Model
 
 // An application's palette, drawn over its window's content: a MenuCard that
-// drills in place under a breadcrumb. The host binds tree, so the rows follow
-// its state, and runs the rows it is handed.
+// drills in place under a breadcrumb. Its rows come from the scopes around the
+// focus: the item that had it and its parents, each declaring
+// `function menuScope()` that returns { title, rows }, card rows plus key with
+// a submenu's rows as its children. The host runs the rows it is handed.
 Item {
     id: overlay
 
     required property var shell
-    // Card rows plus key; a submenu's rows are its children.
-    property var tree: []
     // The breadcrumb's first part.
     property string title: ""
     // Takes the keyboard on close when the item that had it is gone or hidden.
@@ -20,7 +20,10 @@ Item {
     property var path: []
     // Where focus was when the menu opened.
     property Item before: null
-    readonly property var level: Model.level(tree, path)
+    // The items with a scope, from there up. A reload can destroy one while open.
+    property var chain: []
+    readonly property var tree: Model.scoped(chain.filter(item => item && typeof item.menuScope === "function").map(item => item.menuScope()))
+    readonly property var level: Model.level(tree.rows, path)
 
     signal runRequested(var row)
 
@@ -28,14 +31,24 @@ Item {
 
     // A menu opening over another keeps the focus saved by the first.
     function open(keys) {
-        if (!visible)
+        if (!visible) {
             before = overlay.Window.window?.activeFocusItem ?? null;
+            chain = scopes(before ?? fallback);
+        }
         openerKeys = keys || [];
         path = [];
         card.clear();
         visible = true;
         card.focusSearch();
         Qt.callLater(card.selectFirst);
+    }
+
+    function scopes(item) {
+        const found = [];
+        for (let each = item; each; each = each.parent)
+            if (typeof each.menuScope === "function")
+                found.push(each);
+        return found;
     }
 
     function toggle(keys) {
@@ -49,6 +62,7 @@ Item {
     function close() {
         visible = false;
         path = [];
+        chain = [];
         const target = before && before.visible ? before : fallback;
         before = null;
         if (target)
@@ -92,7 +106,7 @@ Item {
             color: overlay.shell.palette.off
             font.family: Fonts.mono
             font.pixelSize: 13
-            text: [overlay.title].concat(overlay.level.names).join(" › ")
+            text: [overlay.title].concat(overlay.tree.names, overlay.level.names).join(" › ")
         }
 
         MenuCard {

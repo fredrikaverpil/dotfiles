@@ -171,7 +171,8 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 - The launcher draws the same card centred in a `Ui/Panel`, a level at a time.
   `menu popup <id>` and `menu level <id>` open it at that level.
 - An application's palette draws it over the window's content
-  (`Ui/MenuOverlay`), from a static tree of the application's actions.
+  (`Ui/MenuOverlay`), from the actions the focused item and its parents
+  declare (`menuScope()`).
 - Every surface opens over IPC; niri binds are `spawn qs ipc call ...`.
 - How each surface takes input, the bar buttons' kinds included:
   [`interaction.md`](interaction.md).
