@@ -105,12 +105,13 @@ flowchart LR
   an investigation with that tag, so the filter lists it. The Tag chip in an
   investigation's header sets or clears its tag (`tag`) in any status.
 - `Ctrl+K` or `?` opens the palette over the window on what has focus, nearest
-  first: a row's investigation, or the picked set when there is one; the
-  draft's form, the conversation (with Copy selection while text is selected)
-  or the picked set's view; the list (Search list, Filter ›, Pick all listed,
-  Go to ›); then the window (New, Clear, Model ›, Effort ›). A key shows where
-  it runs the row. `Actions.js` lists the rows per scope. `Ctrl+Enter` in a
-  draft's trace id or notes runs it; Enter in the trace id does not.
+  first: a row's investigation, or the picked set when there is one; a
+  message (Copy, Copy selection while text is selected, and Edit and Branch on
+  your own); the draft's form, the conversation or the picked set's view; the
+  list (Search list, Filter ›, Pick all listed, Go to ›); then the window (New,
+  Clear, Model ›, Effort ›). A key shows where it runs the row. `Actions.js`
+  lists the rows per scope. `Ctrl+Enter` in a draft's trace id or notes runs
+  it; Enter in the trace id does not.
 - A right-click on a row opens its context menu at the pointer, with the
   palette's rows for that row, or for the picked set when the row is picked;
   the shown investigation and the picks stay. Submenus cascade beside their
@@ -126,12 +127,18 @@ flowchart LR
 - Shift-click (a range) or ctrl-click (a toggle) picks investigations in the
   list, and **Combine** drafts a new one from their alerts and reports
   (`combine`), with the union of their entities, or **Delete** removes them
-  (running ones stay). The pencil beside one of your messages edits it and
-  **Branch** (`branch`) replays the conversation from there as a new
-  investigation, keeping the original. The new session gets the earlier messages
-  as text, not their tool calls. Each Claude message has a copy button. A
-  right-click in the conversation copies the text that a drag selected, which is
-  kept within one paragraph or code block.
+  (running ones stay). Edit (the pencil beside one of your messages, or Enter
+  on it) opens it in place, and **Branch** (`branch`) replays the conversation
+  from there with the edited text as a new investigation, keeping the original;
+  the palette's Branch replays it unchanged. The new session gets the earlier
+  messages as text, not their tool calls. Each Claude message has a copy
+  button.
+- The conversation is one Tab stop, the last focused message, else the newest;
+  a click focuses one too. `j`/`k` (or `↑`/`↓`) move between messages, Enter or
+  Space folds a group of commands, `Ctrl+C` copies the selection, else the
+  message, and Esc goes back to the row. A right-click on a message opens its
+  rows from the palette. A drag selects text within one paragraph or code
+  block.
 - The **entities** row lists the user and organization ids that the tool output
   named (`users/ID`, `organizations/ID`, and `entityPatterns`). The daemon scans
   the output itself, so the ids never pass through the model and can be resolved
