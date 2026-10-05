@@ -20,8 +20,9 @@ The desktop is built to be developed by an agent, usually run on the host
 itself, sometimes over SSH. Every part is reachable: `qs ipc` queries and
 drives shell services and panels, `niri msg` the compositor,
 `systemctl --user` the units, `grim` and the recording service capture what is
-on screen. Use them to verify your own work; what they cannot prove is listed
-under "Required local validation".
+on screen, and `wtype` and `wlrctl` take over the keyboard and the pointer to
+press keys, point and click. Use them to verify your own work; what they cannot
+prove is listed under "Required local validation".
 
 ## Versions
 
@@ -136,11 +137,24 @@ tree, so a static check passing here passes for every kaizen host.
   `niri msg layers`, then use the devshell's `wtype -k z`. Niri drops
   virtual-keyboard input before bind handling, so `wtype` cannot test
   compositor binds.
+- Test a window, such as a plugin's application, the same way: focus it
+  (`niri msg action focus-window --id ID`) and check `niri msg -j
+  focused-window` before every key, or keys land in the user's window. Run
+  each round as one command that opens a fresh window, focuses it, sends the
+  keys and closes it: the user may be answering an agent's permission prompt
+  in their terminal between commands, which takes focus. Give focus back
+  afterwards. `wtype -M shift -k Tab` arrives as Tab with Shift held, not as
+  Backtab.
+- Drive the pointer with the devshell's `wlrctl pointer move DX DY` and
+  `wlrctl pointer click [left|right]`. Moves are relative and niri does not
+  report the cursor's position, so confirm where it is with a capture before
+  clicking. Never move it into the top-left corner, which opens niri's
+  overview.
 - Use `grim` to check how the shell looks; `qs ipc` and `shell-smoke` for
-  internal state. Crop with `-g "0,0 1280x32"` and pick the output with `-o`;
-  capture cost depends only on the area. Niri does not report layer geometry,
-  so derive the bar's from `niri msg --json outputs` and `barHeight` in
-  `shell.qml`.
+  internal state. Crop with `-g "0,0 1280x32"` (layout coordinates) or capture
+  one output with `-o`; the two do not combine. Capture cost depends only on
+  the area. Niri does not report layer geometry, so derive the bar's from
+  `niri msg --json outputs` and `barHeight` in `shell.qml`.
 - To record, `qs ipc call recording capture WxH+X+Y` (`0x0+X+Y` is the whole
   monitor): no countdown, audio or camera, and the bar shows it. It returns the
   file; `qs ipc call recording stop` finalizes it. Extract frames with
