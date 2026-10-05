@@ -22,6 +22,149 @@ TestCase {
         compare(Niri.parseBinds(""), []);
     }
 
+    function test_parse_binds_keeps_what_a_bind_runs_data() {
+        return [
+            {
+                tag: "ipc",
+                line: 'Mod+Print repeat=false hotkey-overlay-title="Record" { spawn "qs" "ipc" "call" "recording" "toggle"; }',
+                want: {
+                    chord: "Mod+Print",
+                    label: "Record",
+                    enabled: true,
+                    ipc: "recording toggle"
+                }
+            },
+            {
+                tag: "ipc with an argument",
+                line: 'Mod+1 hotkey-overlay-title="Zone" { spawn "qs" "ipc" "call" "timezone" "set" "UTC"; }',
+                want: {
+                    chord: "Mod+1",
+                    label: "Zone",
+                    enabled: true,
+                    ipc: "timezone set UTC"
+                }
+            },
+            {
+                tag: "action",
+                line: 'Mod+Q hotkey-overlay-title="Close window" { close-window; }',
+                want: {
+                    chord: "Mod+Q",
+                    label: "Close window",
+                    enabled: true,
+                    action: "close-window"
+                }
+            },
+            {
+                tag: "action with an argument",
+                line: 'Mod+1 hotkey-overlay-title="Workspace 1" { focus-workspace 1; }',
+                want: {
+                    chord: "Mod+1",
+                    label: "Workspace 1",
+                    enabled: true
+                }
+            },
+            {
+                tag: "plain spawn",
+                line: 'Mod+Return hotkey-overlay-title="New terminal" { spawn "ghostty"; }',
+                want: {
+                    chord: "Mod+Return",
+                    label: "New terminal",
+                    enabled: true
+                }
+            },
+            {
+                tag: "qs without ipc call",
+                line: 'Mod+Space hotkey-overlay-title="Menu" { spawn "qs"; }',
+                want: {
+                    chord: "Mod+Space",
+                    label: "Menu",
+                    enabled: true
+                }
+            },
+            {
+                tag: "spawn-sh",
+                line: 'Mod+A hotkey-overlay-title="Apps" { spawn-sh "qs ipc call menu toggle"; }',
+                want: {
+                    chord: "Mod+A",
+                    label: "Apps",
+                    enabled: true
+                }
+            },
+            {
+                tag: "two actions",
+                line: 'Mod+W hotkey-overlay-title="Both" { close-window; quit; }',
+                want: {
+                    chord: "Mod+W",
+                    label: "Both",
+                    enabled: true
+                }
+            },
+            {
+                tag: "body on later lines",
+                line: 'Mod+B hotkey-overlay-title="Split"',
+                want: {
+                    chord: "Mod+B",
+                    label: "Split",
+                    enabled: true
+                }
+            },
+        ];
+    }
+
+    function test_parse_binds_keeps_what_a_bind_runs(data) {
+        const raw = `binds {\n    ${data.line}\n}\n`;
+
+        const binds = Niri.parseBinds(raw);
+
+        compare(binds, [data.want]);
+    }
+
+    function test_keycaps_data() {
+        return [
+            {
+                tag: "mod",
+                chord: "Mod+Shift+Space",
+                want: ["Super", "Shift", "Space"]
+            },
+            {
+                tag: "super as written",
+                chord: "Super+Alt+L",
+                want: ["Super", "Alt", "L"]
+            },
+            {
+                tag: "audio key",
+                chord: "XF86AudioMicMute",
+                want: ["MicMute"]
+            },
+            {
+                tag: "monitor key",
+                chord: "XF86MonBrightnessUp",
+                want: ["BrightnessUp"]
+            },
+            {
+                tag: "other xf86 key",
+                chord: "XF86Calculator",
+                want: ["Calculator"]
+            },
+            {
+                tag: "plain",
+                chord: "Ctrl+Alt+Delete",
+                want: ["Ctrl", "Alt", "Delete"]
+            },
+            {
+                tag: "empty",
+                chord: "",
+                want: []
+            },
+        ];
+    }
+
+    function test_keycaps(data) {
+        const keys = Niri.keycaps(data.chord);
+
+        compare(keys, data.want);
+    }
+
     function test_read_binds_expands_includes_in_place() {
         const bind = (chord, label) => `binds {\n    ${chord} hotkey-overlay-title="${label}" { spawn "x"; }\n}\n`;
         const files = {
@@ -69,8 +212,8 @@ TestCase {
 
     function test_read_binds_keeps_the_last_bind_of_a_chord() {
         const files = {
-            "/c/config.kdl": 'binds {\n' + '    Mod+Space hotkey-overlay-title="Menu" { spawn "qs"; }\n' + '    Mod+Shift+Space hotkey-overlay-title="Next layout" { spawn "qs"; }\n' + '}\n' + 'include optional=true "host.kdl"\n',
-            "/c/host.kdl": 'binds {\n    Shift+Mod+space hotkey-overlay-title="Mine" { spawn "x"; }\n}\n'
+            "/c/config.kdl": 'binds {\n' + '    Mod+Space hotkey-overlay-title="Menu" { spawn "qs"; }\n' + '    Mod+Shift+Space hotkey-overlay-title="Next layout" { spawn "qs" "ipc" "call" "keyboard" "next"; }\n' + '}\n' + 'include optional=true "host.kdl"\n',
+            "/c/host.kdl": 'binds {\n    Shift+Mod+space hotkey-overlay-title="Mine" { close-window; }\n}\n'
         };
 
         const binds = Niri.readBinds("/c/config.kdl", "/home/u", path => files[path] ?? null);
@@ -84,7 +227,8 @@ TestCase {
             {
                 chord: "Shift+Mod+space",
                 label: "Mine",
-                enabled: true
+                enabled: true,
+                action: "close-window"
             },
         ]);
     }

@@ -36,18 +36,49 @@ function configFile(home, niriConfig) {
 }
 
 // Binds are the config lines carrying hotkey-overlay-title; the chord is the
-// first word. Commented-out binds are skipped.
+// first word. Commented-out binds are skipped. A bind running
+// `qs ipc call <target> <fn>` carries ipc "<target> <fn>"; one running a niri
+// action without arguments carries action.
 function parseBinds(raw) {
   return String(raw || "")
     .split("\n")
     .map(function (line) {
-      return /^\s*([^\s\/]\S*)\s.*hotkey-overlay-title="([^"]*)"/.exec(line);
+      return /^\s*([^\s\/]\S*)\s.*hotkey-overlay-title="([^"]*)"[^{]*(?:\{(.*)\})?/.exec(
+        line,
+      );
     })
     .filter(function (match) {
       return match && match[1] !== "spawn-at-startup";
     })
     .map(function (match) {
-      return { chord: match[1], label: match[2], enabled: true };
+      var bind = { chord: match[1], label: match[2], enabled: true };
+      var body = (match[3] || "").trim();
+      var ipc = /^spawn\s+"qs"\s+"ipc"\s+"call"((?:\s+"[^"]*")+)\s*;$/.exec(
+        body,
+      );
+      if (ipc)
+        bind.ipc = ipc[1]
+          .match(/"[^"]*"/g)
+          .map(function (word) {
+            return word.slice(1, -1);
+          })
+          .join(" ");
+      var action = /^([a-z][a-z-]*)\s*;$/.exec(body);
+      if (action) bind.action = action[1];
+      return bind;
+    });
+}
+
+// A chord's keys as keycaps: Mod is Super, an XF86 key drops the prefix and
+// its Audio or Mon group (XF86AudioMute is Mute).
+function keycaps(chord) {
+  return String(chord || "")
+    .split("+")
+    .filter(Boolean)
+    .map(function (key) {
+      return /^mod$/i.test(key)
+        ? "Super"
+        : key.replace(/^XF86(Audio|Mon)?/i, "");
     });
 }
 
