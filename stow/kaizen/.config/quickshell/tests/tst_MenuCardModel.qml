@@ -1,9 +1,9 @@
 import QtQuick
 import QtTest
-import "../Ui/ContextMenuModel.js" as Model
+import "../Ui/MenuCardModel.js" as Model
 
 TestCase {
-    name: "ContextMenuModel"
+    name: "MenuCardModel"
 
     function test_step_data() {
         const rows = [
@@ -22,35 +22,35 @@ TestCase {
                 tag: "none forward",
                 rows: rows,
                 current: -1,
-                forward: true,
+                steps: 1,
                 want: 0
             },
             {
                 tag: "none backward",
                 rows: rows,
                 current: -1,
-                forward: false,
+                steps: -1,
                 want: 2
             },
             {
                 tag: "skips separator",
                 rows: rows,
                 current: 0,
-                forward: true,
+                steps: 1,
                 want: 2
             },
             {
                 tag: "wraps forward",
                 rows: rows,
                 current: 2,
-                forward: true,
+                steps: 1,
                 want: 0
             },
             {
                 tag: "wraps backward",
                 rows: rows,
                 current: 0,
-                forward: false,
+                steps: -1,
                 want: 2
             },
             {
@@ -61,21 +61,116 @@ TestCase {
                     }
                 ],
                 current: -1,
-                forward: true,
+                steps: 1,
                 want: -1
             },
             {
                 tag: "empty",
                 rows: [],
                 current: -1,
-                forward: true,
+                steps: 1,
                 want: -1
+            },
+            {
+                tag: "skips disabled",
+                rows: [
+                    {
+                        enabled: true
+                    },
+                    {
+                        enabled: false
+                    },
+                    {
+                        enabled: true
+                    }
+                ],
+                current: 0,
+                steps: 1,
+                want: 2
+            },
+            {
+                tag: "disabled only",
+                rows: [
+                    {
+                        enabled: false
+                    }
+                ],
+                current: -1,
+                steps: 1,
+                want: -1
+            },
+            {
+                tag: "page down",
+                rows: Array.from({
+                    length: 12
+                }, () => ({
+                            enabled: true
+                        })),
+                current: 0,
+                steps: 10,
+                want: 10
+            },
+            {
+                tag: "page up wraps",
+                rows: Array.from({
+                    length: 12
+                }, () => ({
+                            enabled: true
+                        })),
+                current: 2,
+                steps: -10,
+                want: 4
             }
         ];
     }
 
     function test_step(data) {
-        verify(Model.step(data.rows, data.current, data.forward) === data.want);
+        const index = Model.step(data.rows, data.current, data.steps);
+
+        verify(index === data.want, `${index} !== ${data.want}`);
+    }
+
+    function test_matches_data() {
+        return [
+            {
+                tag: "substring",
+                text: "Wallpaper (workspace)",
+                query: "work",
+                want: true
+            },
+            {
+                tag: "case",
+                text: "Bluetooth",
+                query: "BLUE",
+                want: true
+            },
+            {
+                tag: "hyphens",
+                text: "Wi-Fi",
+                query: "wifi",
+                want: true
+            },
+            {
+                tag: "no match",
+                text: "Sound",
+                query: "mic",
+                want: false
+            },
+            {
+                tag: "no text",
+                text: undefined,
+                query: "a",
+                want: false
+            }
+        ];
+    }
+
+    function test_matches(data) {
+        const found = Model.matches({
+            text: data.text
+        }, data.query);
+
+        verify(found === data.want);
     }
 
     function test_sameRow_data() {

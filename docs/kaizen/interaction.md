@@ -68,6 +68,7 @@ actions.
 
 - Letters are text, so `hjkl` and Space neither move nor run. `Ctrl+J` and
   `Ctrl+K` stay unbound: `Ctrl+K` opens an application's palette.
+- Tab and Shift+Tab do nothing: the menu keeps the keyboard until it closes.
 - Back is the same step in both placements: a cascade closes its last card, the
   palette returns to the parent level.
 - Enter still repeating from the press that opened a submenu does not run the
