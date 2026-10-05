@@ -65,6 +65,13 @@ upstream's latest, and niri marks each option with the version it arrived in
   capture each time it is turned on); `captured` returns it as JSON. It is off
   after every shell restart. Capture a real one before handling an app's
   notifications specially.
+- Whether Slack sent a notification at all is in its own logs:
+  `~/.config/Slack/logs/default/webapp-console*.log` (`Store:
+  NEW_NOTIFICATION` with a channel id, content redacted) and `browser.log`
+  ("Creating new Electron notification"). What became of each toast shows in
+  `dbus-monitor --session "interface='org.freedesktop.Notifications'"`:
+  `NotificationClosed` reason 1 is a toast that expired on screen, 2 one
+  dismissed or dropped untracked under DnD.
 - `notify-send -a <app> <summary> <body>` fakes an app's notification, to try a
   notification rule without waiting for the real one, for example
   `notify-send -a Slack "[workspace] in #alerts" "<https://example.com|View>"`.
@@ -142,14 +149,23 @@ tree, so a static check passing here passes for every kaizen host.
   focused-window` before every key, or keys land in the user's window. Run
   each round as one command that opens a fresh window, focuses it, sends the
   keys and closes it: the user may be answering an agent's permission prompt
-  in their terminal between commands, which takes focus. Give focus back
-  afterwards. `wtype -M shift -k Tab` arrives as Tab with Shift held, not as
-  Backtab.
+  in their terminal between commands, which takes focus. Never reuse a window
+  across commands: it restores its last focused item, such as a draft's field.
+  Give focus back afterwards. `wtype -M shift -k Tab` arrives as Tab with Shift
+  held, not as Backtab.
+- Enter or Space acts on whatever has focus, and a few Tabs away there is
+  usually a delete or a paid run (an investigator's Discard or Re-run). Send
+  them only to a control a capture in the same command showed focused, and
+  never after a Tab sequence whose start depends on an earlier step. A round
+  stops at its first failed step: one command per line under `set -e`, not
+  lines of `a && b`, since a failing `&&` list does not trip `set -e` and the
+  next line still runs. Clear any filter a round set before it ends.
 - Drive the pointer with the devshell's `wlrctl pointer move DX DY` and
   `wlrctl pointer click [left|right]`. Moves are relative and niri does not
   report the cursor's position, so confirm where it is with a capture before
   clicking. Never move it into the top-left corner, which opens niri's
-  overview.
+  overview. `wlrctl` cannot hold a button, so a drag is the user's to check; a
+  double-click selects a word.
 - Use `grim` to check how the shell looks; `qs ipc` and `shell-smoke` for
   internal state. Crop with `-g "0,0 1280x32"` (layout coordinates) or capture
   one output with `-o`; the two do not combine. Capture cost depends only on
