@@ -187,6 +187,26 @@ function conversationRows(state, item, selection) {
   return about([item.id], rows)
 }
 
+// What Copy takes from a message: a commands group's commands, one per line.
+function messageText(message) {
+  return message.kind === "tools" ? message.commands.join("\n") : message.text
+}
+
+// The index'th message of the shown conversation. Ctrl+C copies the selection,
+// else the message. Only your own messages branch, and only once a run has a
+// session to replay.
+function messageRows(item, index, selection) {
+  var message = item.messages[index]
+  var rows = [row({ key: "copyMessage", text: "Copy", glyph: Format.icons.copy, keys: selection ? [] : ["Ctrl", "C"], action: "copy", arg: messageText(message) })]
+  if (selection)
+    rows.push(row({ key: "copySelection", text: "Copy selection", glyph: Format.icons.copy, keys: ["Ctrl", "C"], action: "copy", arg: selection }))
+  if (message.kind === "user" && item.status !== "running" && item.sessionId) {
+    rows.push(row({ key: "edit", text: "Edit", glyph: Format.icons.draft, keys: ["Enter"], action: "edit", arg: String(index) }))
+    rows.push(row({ key: "branch", text: "Branch", glyph: Format.icons.play, action: "branch", arg: String(index) }))
+  }
+  return about([item.id], rows)
+}
+
 // The rows of the submenu at key, for a chip's menu.
 function submenuRows(rows, key) {
   var found = rows.filter(function(each) { return each.key === key })[0]

@@ -210,6 +210,12 @@ Column {
         return item ? Actions.contextRows(actionState, item) : [];
     }
 
+    // A message's context menu, looked up by id: a reload rebuilds the view.
+    function messageMenu(id, index) {
+        const item = all.find(item => item.id === id);
+        return item && item.messages[index] ? Actions.messageRows(item, index, selection ? selection.selectedText : "") : [];
+    }
+
     // Runs a palette row's action on its ids. The shown draft's form and
     // conversation act for their own investigation.
     function runAction(row) {
@@ -236,6 +242,10 @@ Column {
             terminal(item);
         else if (action === "copy")
             copy(arg);
+        else if (action === "edit" && detail)
+            detail.edit(Number(arg));
+        else if (action === "branch" && item)
+            run(["branch", id, arg, item.messages[Number(arg)].text]);
         else if (action === "tag")
             for (const each of row.ids) {
                 if (shown && each === shown.itemId)
@@ -335,9 +345,6 @@ Column {
 
     // The Selectable holding the selection; a new selection clears the previous one.
     property Item selection: null
-    // The Selectable whose copy menu is open, and where it opened in window coordinates.
-    property Item menuEdit: null
-    property point menuAt
 
     function copy(text) {
         Quickshell.execDetached(["wl-copy", "--", text]);
@@ -890,11 +897,12 @@ Column {
         }
     }
 
-    // Read-only text that a drag selects; a right-click in the conversation offers to copy the selection.
+    // Read-only text that a drag selects. Its message takes the focus.
     component Selectable: TextEdit {
         id: edit
 
         readOnly: true
+        activeFocusOnPress: false
         selectByMouse: true
         persistentSelection: true
         selectionColor: root.shell.palette.dim
@@ -904,8 +912,6 @@ Column {
             if (link.startsWith("https://"))
                 Quickshell.execDetached(["xdg-open", link]);
         }
-        onActiveFocusChanged: if (!activeFocus && root.menuEdit === edit)
-            root.menuEdit = null
         onSelectedTextChanged: {
             if (selectedText) {
                 if (root.selection && root.selection !== edit)
@@ -914,13 +920,6 @@ Column {
             } else if (root.selection === edit) {
                 root.selection = null;
             }
-            if (root.menuEdit === edit)
-                root.menuEdit = null;
-        }
-        Keys.onEscapePressed: event => {
-            event.accepted = root.menuEdit === edit;
-            if (event.accepted)
-                root.menuEdit = null;
         }
     }
 
@@ -1441,6 +1440,33 @@ Column {
             followField.focusInput();
         }
 
+        // The conversation is one Tab stop: the last focused message, else the newest.
+        property int current: -1
+        readonly property int tabMessage: current >= 0 && current < messages.count ? current : messages.count - 1
+        // Set while a press focuses a message, so the view stays under the pointer.
+        property bool pressing: false
+
+        function focusMessage(index) {
+            const message = messages.itemAt(index);
+            if (message)
+                message.forceActiveFocus();
+        }
+
+        // The message at a point in the conversation's coordinates, else -1.
+        function messageAt(point) {
+            const child = conversation.childAt(point.x, point.y);
+            for (let index = 0; index < messages.count; index++)
+                if (messages.itemAt(index) === child)
+                    return index;
+            return -1;
+        }
+
+        function edit(index) {
+            const message = messages.itemAt(index);
+            if (message)
+                message.edit();
+        }
+
         function menuScope() {
             return {
                 title: "Conversation",
@@ -1617,7 +1643,7 @@ Column {
             width: parent.width
             height: parent.height - y - followUp.height - parent.spacing
             contentWidth: width
-            contentHeight: conversation.implicitHeight
+            contentHeight: conversation.implicitHeight + 2 * conversation.y
             clip: true
             boundsBehavior: Flickable.StopAtBounds
 
@@ -1632,53 +1658,36 @@ Column {
             }
             onMovementEnded: follow = atYEnd
 
-            Rectangle {
-                id: copyMenu
-
-                readonly property point at: scroller.contentItem.mapFromItem(null, root.menuAt.x, root.menuAt.y)
-
-                visible: root.menuEdit !== null
-                z: 10
-                x: Math.min(at.x, conversation.width - width)
-                y: at.y
-                width: 64
-                height: 26
-                radius: 4
-                color: root.shell.palette.bg
-                border.color: root.shell.palette.fg
-                border.width: 1
-
-                Text {
-                    anchors.centerIn: parent
-                    color: copyMouse.containsMouse ? root.shell.palette.fg : root.shell.palette.off
-                    font.family: Ui.Fonts.mono
-                    font.pixelSize: 12
-                    text: Format.icons.copy + "  Copy"
-                }
-
-                MouseArea {
-                    id: copyMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked: {
-                        root.copy(root.menuEdit.selectedText);
-                        root.menuEdit = null;
-                    }
-                }
+            // Scrolls the least that shows item and its outline whole, else to
+            // its top. The conversation's inset is the outline's.
+            function reveal(item) {
+                const top = item.y;
+                const bottom = item.y + item.height + 2 * conversation.y;
+                if (top < contentY || bottom - top > height)
+                    contentY = Math.max(0, top);
+                else if (bottom > contentY + height)
+                    contentY = bottom - height;
+                follow = atYEnd;
             }
 
-            // A drag ends wherever the pointer is, so a right-click anywhere in the conversation copies the selection.
+            // A left press focuses the message under it and goes on, so a drag
+            // still selects; a right-click opens the message's menu.
             MouseArea {
                 z: 5
-                width: conversation.width
-                height: Math.max(conversation.height, scroller.height)
-                acceptedButtons: Qt.RightButton
+                width: scroller.width
+                height: Math.max(scroller.contentHeight, scroller.height)
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
                 onPressed: mouse => {
-                    if (!root.selection)
-                        return;
-                    root.selection.forceActiveFocus();
-                    root.menuAt = mapToItem(null, mouse.x, mouse.y);
-                    root.menuEdit = root.selection;
+                    const index = detail.messageAt(mapToItem(conversation, mouse.x, mouse.y));
+                    if (mouse.button === Qt.LeftButton) {
+                        detail.pressing = true;
+                        detail.focusMessage(index);
+                        detail.pressing = false;
+                        mouse.accepted = false;
+                    } else if (index >= 0) {
+                        const id = detail.item.id;
+                        root.menuRequested(() => root.messageMenu(id, index), mapToItem(null, mouse.x, mouse.y, 0, 0), false);
+                    }
                 }
             }
 
@@ -1690,187 +1699,254 @@ Column {
                     scroller.toEnd()
             }
 
+            // Inset by the focus outline.
             Column {
                 id: conversation
-                width: scroller.width
+                x: 4
+                y: 4
+                width: scroller.width - 2 * x
                 spacing: 10
 
                 Repeater {
                     id: messages
                     model: detail.item.messages
 
-                    delegate: Loader {
+                    // Not the Loader itself: a focus scope would hand focus back to a hidden editor.
+                    delegate: Item {
                         id: message
 
                         required property var modelData
                         required property int index
 
+                        // Your own message's inline editor.
+                        function edit() {
+                            if (modelData.kind === "user" && !detail.running && detail.item.sessionId !== "")
+                                loader.item.edit();
+                        }
+
+                        function menuScope() {
+                            return {
+                                title: "Message",
+                                rows: Actions.messageRows(detail.item, index, root.selection ? root.selection.selectedText : "")
+                            };
+                        }
+
                         width: conversation.width
-                        sourceComponent: modelData.kind === "user" ? userMessage : modelData.kind === "tools" ? toolMessage : assistantMessage
+                        height: loader.height
+                        activeFocusOnTab: index === detail.tabMessage
 
-                        // What you sent, on the right.
-                        Component {
-                            id: userMessage
+                        onActiveFocusChanged: if (activeFocus) {
+                            detail.current = index;
+                            if (!detail.pressing)
+                                scroller.reveal(message);
+                        }
 
-                            Item {
-                                id: userItem
+                        // Keys from the editor arrive here too; they act only on the focused message.
+                        Keys.onPressed: event => {
+                            if (!activeFocus)
+                                return;
+                            const fold = modelData.kind === "tools";
+                            if (event.key === Qt.Key_J || event.key === Qt.Key_Down)
+                                detail.focusMessage(index + 1);
+                            else if (event.key === Qt.Key_K || event.key === Qt.Key_Up)
+                                detail.focusMessage(index - 1);
+                            else if (fold && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space))
+                                loader.item.expanded = !loader.item.expanded;
+                            else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
+                                message.edit();
+                            else if (event.matches(StandardKey.Copy))
+                                root.copy(root.selection ? root.selection.selectedText : Actions.messageText(modelData));
+                            else if (event.key === Qt.Key_Escape)
+                                root.leaveField();
+                            else
+                                return;
+                            event.accepted = true;
+                        }
 
-                                property bool editing: false
+                        Rectangle {
+                            visible: message.activeFocus
+                            anchors.fill: parent
+                            anchors.margins: -conversation.y
+                            radius: 8
+                            color: "transparent"
+                            border.color: root.shell.palette.dim
+                            border.width: 1
+                        }
 
-                                height: editing ? editor.height : bubble.height
+                        Loader {
+                            id: loader
+                            width: parent.width
+                            sourceComponent: message.modelData.kind === "user" ? userMessage : message.modelData.kind === "tools" ? toolMessage : assistantMessage
 
-                                Text {
-                                    id: measure
-                                    visible: false
-                                    font.family: Ui.Fonts.mono
-                                    font.pixelSize: 13
-                                    textFormat: Text.MarkdownText
-                                    text: Format.literals(message.modelData.text, root.shell.palette.water)
-                                }
+                            // What you sent, on the right.
+                            Component {
+                                id: userMessage
 
-                                Rectangle {
-                                    id: bubble
-                                    visible: !userItem.editing
-                                    anchors.right: parent.right
-                                    width: Math.min(parent.width * 0.8, measure.implicitWidth + 24)
-                                    height: bubbleText.implicitHeight + 16
-                                    radius: 8
-                                    color: root.shell.palette.sel
+                                Item {
+                                    id: userItem
 
-                                    Selectable {
-                                        id: bubbleText
-                                        anchors.fill: parent
-                                        anchors.margins: 8
-                                        wrapMode: TextEdit.WordWrap
-                                        textFormat: TextEdit.MarkdownText
-                                        color: root.shell.palette.fg
-                                        font.family: Ui.Fonts.mono
-                                        font.pixelSize: 13
-                                        text: Format.literals(message.modelData.text, root.shell.palette.water)
-                                    }
-                                }
+                                    property bool editing: false
 
-                                // Branches the investigation from this message; the original is kept.
-                                IconBtn {
-                                    visible: !userItem.editing && !detail.running && detail.item.sessionId !== ""
-                                    anchors.right: bubble.left
-                                    anchors.rightMargin: 6
-                                    anchors.verticalCenter: bubble.verticalCenter
-                                    text: Format.icons.draft
-                                    onClicked: {
+                                    function edit() {
                                         editField.text = message.modelData.text;
-                                        userItem.editing = true;
+                                        editing = true;
                                         editField.focusInput();
                                     }
-                                }
 
-                                Column {
-                                    id: editor
-                                    visible: userItem.editing
-                                    width: parent.width
-                                    spacing: 6
+                                    height: editing ? editor.height : bubble.height
 
-                                    Field {
-                                        id: editField
-                                        multiline: true
-                                    }
-
-                                    Row {
-                                        spacing: 8
-
-                                        Btn {
-                                            primary: true
-                                            icon: Format.icons.play
-                                            label: "Branch"
-                                            onClicked: {
-                                                root.run(["branch", detail.item.id, String(message.index), editField.text]);
-                                                userItem.editing = false;
-                                            }
-                                        }
-                                        Btn {
-                                            label: "Cancel"
-                                            onClicked: userItem.editing = false
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // What Claude said, its headings in the accent colour.
-                        Component {
-                            id: assistantMessage
-
-                            Column {
-                                spacing: 6
-
-                                Repeater {
-                                    model: Format.blocks(message.modelData.text)
-
-                                    delegate: Selectable {
-                                        required property var modelData
-                                        readonly property bool plain: modelData.heading || modelData.code
-
-                                        width: parent.width
-                                        wrapMode: modelData.code ? TextEdit.Wrap : TextEdit.WordWrap
-                                        textFormat: plain ? TextEdit.PlainText : TextEdit.MarkdownText
-                                        color: modelData.heading ? root.shell.palette.blossom : modelData.code ? root.shell.palette.water : root.shell.palette.fg
+                                    Text {
+                                        id: measure
+                                        visible: false
                                         font.family: Ui.Fonts.mono
                                         font.pixelSize: 13
-                                        font.bold: modelData.heading
-                                        topPadding: modelData.heading ? 6 : 0
-                                        text: plain ? modelData.text : Format.literals(modelData.text, root.shell.palette.water)
+                                        textFormat: Text.MarkdownText
+                                        text: Format.literals(message.modelData.text, root.shell.palette.water)
                                     }
-                                }
 
-                                IconBtn {
-                                    text: Format.icons.copy
-                                    onClicked: root.copy(message.modelData.text)
+                                    Rectangle {
+                                        id: bubble
+                                        visible: !userItem.editing
+                                        anchors.right: parent.right
+                                        width: Math.min(parent.width * 0.8, measure.implicitWidth + 24)
+                                        height: bubbleText.implicitHeight + 16
+                                        radius: 8
+                                        color: root.shell.palette.sel
+
+                                        Selectable {
+                                            id: bubbleText
+                                            anchors.fill: parent
+                                            anchors.margins: 8
+                                            wrapMode: TextEdit.WordWrap
+                                            textFormat: TextEdit.MarkdownText
+                                            color: root.shell.palette.fg
+                                            font.family: Ui.Fonts.mono
+                                            font.pixelSize: 13
+                                            text: Format.literals(message.modelData.text, root.shell.palette.water)
+                                        }
+                                    }
+
+                                    // Branches the investigation from this message; the original is kept.
+                                    IconBtn {
+                                        visible: !userItem.editing && !detail.running && detail.item.sessionId !== ""
+                                        anchors.right: bubble.left
+                                        anchors.rightMargin: 6
+                                        anchors.verticalCenter: bubble.verticalCenter
+                                        activeFocusOnTab: false
+                                        text: Format.icons.draft
+                                        onClicked: userItem.edit()
+                                    }
+
+                                    Column {
+                                        id: editor
+                                        visible: userItem.editing
+                                        width: parent.width
+                                        spacing: 6
+
+                                        Field {
+                                            id: editField
+                                            multiline: true
+                                        }
+
+                                        Row {
+                                            spacing: 8
+
+                                            Btn {
+                                                primary: true
+                                                icon: Format.icons.play
+                                                label: "Branch"
+                                                onClicked: {
+                                                    root.run(["branch", detail.item.id, String(message.index), editField.text]);
+                                                    userItem.editing = false;
+                                                    message.forceActiveFocus();
+                                                }
+                                            }
+                                            Btn {
+                                                label: "Cancel"
+                                                onClicked: {
+                                                    userItem.editing = false;
+                                                    message.forceActiveFocus();
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
-                        }
 
-                        // The commands Claude ran, folded away once it has finished.
-                        Component {
-                            id: toolMessage
+                            // What Claude said, its headings in the accent colour.
+                            Component {
+                                id: assistantMessage
 
-                            Column {
-                                id: tools
+                                Column {
+                                    spacing: 6
 
-                                property bool expanded: detail.running
-                                readonly property var commands: message.modelData.commands
+                                    Repeater {
+                                        model: Format.blocks(message.modelData.text)
 
-                                spacing: 2
+                                        delegate: Selectable {
+                                            required property var modelData
+                                            readonly property bool plain: modelData.heading || modelData.code
 
-                                Text {
-                                    activeFocusOnTab: true
-                                    Keys.onReturnPressed: tools.expanded = !tools.expanded
-                                    Keys.onSpacePressed: tools.expanded = !tools.expanded
-                                    color: toolMouse.containsMouse || activeFocus ? root.shell.palette.fg : root.shell.palette.off
-                                    font.family: Ui.Fonts.mono
-                                    font.pixelSize: 12
-                                    text: Format.icons.terminal + "  " + tools.commands.length + (tools.commands.length === 1 ? " command" : " commands") + "  " + (tools.expanded ? "▾" : "▸")
+                                            width: parent.width
+                                            wrapMode: modelData.code ? TextEdit.Wrap : TextEdit.WordWrap
+                                            textFormat: plain ? TextEdit.PlainText : TextEdit.MarkdownText
+                                            color: modelData.heading ? root.shell.palette.blossom : modelData.code ? root.shell.palette.water : root.shell.palette.fg
+                                            font.family: Ui.Fonts.mono
+                                            font.pixelSize: 13
+                                            font.bold: modelData.heading
+                                            topPadding: modelData.heading ? 6 : 0
+                                            text: plain ? modelData.text : Format.literals(modelData.text, root.shell.palette.water)
+                                        }
+                                    }
 
-                                    MouseArea {
-                                        id: toolMouse
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        onClicked: tools.expanded = !tools.expanded
+                                    IconBtn {
+                                        activeFocusOnTab: false
+                                        text: Format.icons.copy
+                                        onClicked: root.copy(message.modelData.text)
                                     }
                                 }
+                            }
 
-                                Repeater {
-                                    model: tools.expanded ? tools.commands : []
+                            // The commands Claude ran, folded away once it has finished.
+                            Component {
+                                id: toolMessage
 
-                                    delegate: Selectable {
-                                        required property string modelData
+                                Column {
+                                    id: tools
 
-                                        width: tools.width
-                                        leftPadding: 18
-                                        wrapMode: TextEdit.WrapAnywhere
-                                        color: root.shell.palette.off
+                                    property bool expanded: detail.running
+                                    readonly property var commands: message.modelData.commands
+
+                                    spacing: 2
+
+                                    Text {
+                                        color: toolMouse.containsMouse ? root.shell.palette.fg : root.shell.palette.off
                                         font.family: Ui.Fonts.mono
-                                        font.pixelSize: 11
-                                        text: "$ " + modelData
+                                        font.pixelSize: 12
+                                        text: Format.icons.terminal + "  " + tools.commands.length + (tools.commands.length === 1 ? " command" : " commands") + "  " + (tools.expanded ? "▾" : "▸")
+
+                                        MouseArea {
+                                            id: toolMouse
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            onClicked: tools.expanded = !tools.expanded
+                                        }
+                                    }
+
+                                    Repeater {
+                                        model: tools.expanded ? tools.commands : []
+
+                                        delegate: Selectable {
+                                            required property string modelData
+
+                                            width: tools.width
+                                            leftPadding: 18
+                                            wrapMode: TextEdit.WrapAnywhere
+                                            color: root.shell.palette.off
+                                            font.family: Ui.Fonts.mono
+                                            font.pixelSize: 11
+                                            text: "$ " + modelData
+                                        }
                                     }
                                 }
                             }

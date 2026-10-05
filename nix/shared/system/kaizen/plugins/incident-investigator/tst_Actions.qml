@@ -723,6 +723,103 @@ TestCase {
         compare(got, data.want);
     }
 
+    function test_messageRows_data() {
+        const conversation = item({
+            sessionId: "s",
+            messages: [
+                {
+                    kind: "user",
+                    text: "why"
+                },
+                {
+                    kind: "tools",
+                    commands: ["ls", "pwd"]
+                },
+                {
+                    kind: "assistant",
+                    text: "because"
+                }
+            ]
+        });
+        const copy = (arg, keyed) => row({
+                key: "copyMessage",
+                text: "Copy",
+                glyph: Format.icons.copy,
+                keys: keyed ? ["Ctrl", "C"] : [],
+                action: "copy",
+                arg: arg
+            });
+        const edit = row({
+            key: "edit",
+            text: "Edit",
+            glyph: Format.icons.draft,
+            keys: ["Enter"],
+            action: "edit",
+            arg: "0"
+        });
+        const branch = row({
+            key: "branch",
+            text: "Branch",
+            glyph: Format.icons.play,
+            action: "branch",
+            arg: "0"
+        });
+        return [
+            {
+                tag: "own message",
+                item: conversation,
+                index: 0,
+                selection: "",
+                want: about(["a"], [copy("why", true), edit, branch])
+            },
+            {
+                tag: "own message while running",
+                item: Object.assign({}, conversation, {
+                    status: "running"
+                }),
+                index: 0,
+                selection: "",
+                want: about(["a"], [copy("why", true)])
+            },
+            {
+                tag: "own message without a session",
+                item: Object.assign({}, conversation, {
+                    sessionId: ""
+                }),
+                index: 0,
+                selection: "",
+                want: about(["a"], [copy("why", true)])
+            },
+            {
+                tag: "commands",
+                item: conversation,
+                index: 1,
+                selection: "",
+                want: about(["a"], [copy("ls\npwd", true)])
+            },
+            {
+                tag: "answer with a selection",
+                item: conversation,
+                index: 2,
+                selection: "caus",
+                want: about(["a"], [copy("because", false), row({
+                        key: "copySelection",
+                        text: "Copy selection",
+                        glyph: Format.icons.copy,
+                        keys: ["Ctrl", "C"],
+                        action: "copy",
+                        arg: "caus"
+                    })])
+            }
+        ];
+    }
+
+    function test_messageRows(data) {
+        const got = Actions.messageRows(data.item, data.index, data.selection);
+
+        compare(got, data.want);
+    }
+
     function test_submenuRows_data() {
         const opus = radio("model.opus", "opus", true, "model", "opus");
         const rows = [row({
