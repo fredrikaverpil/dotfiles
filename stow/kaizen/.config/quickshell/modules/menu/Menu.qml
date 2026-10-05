@@ -17,6 +17,8 @@ Ui.Panel {
 
     required property var contextMenu
 
+    // An item's ipc ("<target> <fn>") or compositor action names the bind that
+    // runs exactly its action; its row shows that bind's keys.
     readonly property var items: Object.assign({
         "apps": {
             icon: "󰀻",
@@ -55,16 +57,19 @@ Ui.Panel {
         "trigger.screenshotRegion": {
             icon: "",
             label: "Screenshot (region)",
+            ipc: "recording screenshot",
             action: () => menu.shell.recordingService.screenshot()
         },
         "trigger.record": {
             icon: "󰑊",
             label: "Record screen",
+            ipc: "recording toggle",
             action: () => menu.shell.recording.open()
         },
         "trigger.pause": {
             icon: menu.shell.recordingService.paused ? "󰐊" : "󰏤",
             label: menu.shell.recordingService.paused ? "Resume recording" : "Pause recording",
+            ipc: "recording pause",
             enabled: menu.shell.recordingService.recording,
             action: () => menu.shell.recordingService.togglePause()
         },
@@ -101,6 +106,7 @@ Ui.Panel {
         "trigger.close": {
             icon: "󰅖",
             label: "Close window",
+            compositor: "close-window",
             action: () => Quickshell.execDetached(Ui.Compositor.closeWindow())
         },
         // One node per panel button, in bar order, each opening its panel first.
@@ -158,18 +164,21 @@ Ui.Panel {
         "settings.media.playPause": {
             icon: "󰐎",
             label: "Play/Pause",
+            ipc: "media playPause",
             enabled: menu.hasPlayer,
             action: () => menu.shell.media.service.runAction("playPause")
         },
         "settings.media.next": {
             icon: "󰒭",
             label: "Next",
+            ipc: "media next",
             enabled: menu.hasPlayer,
             action: () => menu.shell.media.service.runAction("next")
         },
         "settings.media.previous": {
             icon: "󰒮",
             label: "Previous",
+            ipc: "media previous",
             enabled: menu.hasPlayer,
             action: () => menu.shell.media.service.runAction("previous")
         },
@@ -190,11 +199,13 @@ Ui.Panel {
         "settings.audio.mute": {
             icon: menu.checkbox(!menu.shell.audio.muted),
             label: "Sound",
+            ipc: "audio mute",
             action: () => menu.shell.audio.toggleMute()
         },
         "settings.audio.micMute": {
             icon: menu.checkbox(!menu.shell.audio.micMuted),
             label: "Microphone",
+            ipc: "audio micMute",
             enabled: menu.shell.audio.sources.length > 0,
             action: () => menu.shell.audio.toggleMicMute()
         },
@@ -372,6 +383,7 @@ Ui.Panel {
         "settings.session.lock": {
             icon: "",
             label: "Lock",
+            ipc: "lock lock",
             action: () => menu.shell.lock.beginLock()
         },
         "settings.session.curtain": {
@@ -458,7 +470,7 @@ Ui.Panel {
         printErrors: false
     }
 
-    // Called on each open of the level, so edits to any included file show.
+    // Called on each opening, so edits to any included file show.
     function readBinds() {
         const home = Quickshell.env("HOME");
         const file = Ui.Compositor.configFile(home, Quickshell.env("NIRI_CONFIG"));
@@ -687,7 +699,7 @@ Ui.Panel {
         target: "menu"
 
         function toggle(): void {
-            menu.toggle();
+            menu.toggle(true);
         }
         function open(): void {
             menu.open("root");
@@ -746,7 +758,7 @@ Ui.Panel {
     // target's own rows; counts orders them by frecency. A keybinding has no
     // action and is there to read.
     function cardRows(target, keep, query, counts) {
-        const rows = Model.rowsFor(menu.items, target, query, menu.providers, counts).filter(keep || (() => true)).map(row => {
+        const rows = Model.rowsFor(menu.items, target, query, menu.providers, counts, menu.binds).filter(keep || (() => true)).map(row => {
             const run = row.trayItem || row.entry || row.action ? () => menu.launch(row) : null;
             return {
                 text: row.label,
@@ -781,6 +793,7 @@ Ui.Panel {
             rows.unshift({
                 text: "Launcher",
                 glyph: "\u{F0349}",
+                keys: menu.toggleKeys,
                 enabled: true,
                 isSeparator: false,
                 hasChildren: false,
@@ -802,7 +815,6 @@ Ui.Panel {
             return;
         }
         popped = target;
-        // Keybindings can cascade from here, so its rows must be current.
         readBinds();
         contextMenu.popup({
             rows: query => menu.contextRows(target, keep, query),
@@ -817,6 +829,15 @@ Ui.Panel {
         } : null);
     }
 
+    readonly property var toggleKeys: Ui.Compositor.keycaps(Model.chordFor({
+        ipc: "menu toggle"
+    }, menu.binds))
+
+    // Set while the menu toggle bind opened the palette.
+    property bool keyOpened: false
+    onShownChanged: if (!shown)
+        keyOpened = false
+
     readonly property string breadcrumb: level === "root" ? "Launcher" : level.split(".").map((part, index, parts) => menu.items[parts.slice(0, index + 1).join(".")].label).join(" › ")
 
     readonly property bool wide: level !== "root" && menu.items[level].provider === "binds"
@@ -826,7 +847,7 @@ Ui.Panel {
             shell.registerPanel(menu);
         if (shell && shell.claimPanel)
             shell.claimPanel(menu);
-        if (menu.items[target]?.provider === "binds")
+        if (!shown)
             readBinds();
         focusedOutputQuery.running = true;
         level = target;
@@ -836,8 +857,14 @@ Ui.Panel {
         Qt.callLater(card.selectFirst);
     }
 
-    function toggle() {
-        shown ? close() : open("root");
+    // byKey: the menu toggle bind called it.
+    function toggle(byKey) {
+        if (shown) {
+            close();
+            return;
+        }
+        open("root");
+        keyOpened = byKey === true;
     }
 
     function back() {
@@ -879,6 +906,7 @@ Ui.Panel {
         shell: menu.shell
         rows: menu.cardRows(menu.level, null, card.query, menu.launchCounts)
         placeholder: menu.level === "root" ? "Search…" : "Filter " + menu.items[menu.level].label.toLowerCase() + "…"
+        openerKeys: menu.keyOpened ? menu.toggleKeys : []
         fontSize: 16
         rowHeight: 36
         // The panel fixes the width; Emoji has thousands of rows.

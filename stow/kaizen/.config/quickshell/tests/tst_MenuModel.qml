@@ -225,4 +225,129 @@ TestCase {
             compare(got, c.want, c.query);
         }
     }
+
+    function test_chord_for_names_the_first_bind_running_the_item() {
+        const binds = [
+            {
+                chord: "Mod+Space",
+                label: "Menu",
+                enabled: true,
+                ipc: "menu toggle"
+            },
+            {
+                chord: "XF86AudioPause",
+                label: "Play/pause",
+                enabled: true,
+                ipc: "media playPause"
+            },
+            {
+                chord: "XF86AudioPlay",
+                label: "Play/pause",
+                enabled: true,
+                ipc: "media playPause"
+            },
+            {
+                chord: "Mod+Q",
+                label: "Close window",
+                enabled: true,
+                action: "close-window"
+            },
+            {
+                chord: "Mod+T",
+                label: "Terminal",
+                enabled: true
+            }
+        ];
+        const cases = [
+            {
+                name: "ipc",
+                item: {
+                    ipc: "menu toggle"
+                },
+                want: "Mod+Space"
+            },
+            {
+                name: "bound twice",
+                item: {
+                    ipc: "media playPause"
+                },
+                want: "XF86AudioPause"
+            },
+            {
+                name: "compositor action",
+                item: {
+                    compositor: "close-window"
+                },
+                want: "Mod+Q"
+            },
+            {
+                name: "unbound ipc",
+                item: {
+                    ipc: "lock lock"
+                },
+                want: undefined
+            },
+            {
+                name: "nothing declared",
+                item: {
+                    label: "Terminal"
+                },
+                want: undefined
+            }
+        ];
+        for (const c of cases) {
+            compare(Menu.chordFor(c.item, binds), c.want, c.name);
+        }
+    }
+
+    function test_rows_carry_their_binds_chord_and_match_by_it() {
+        const items = {
+            session: {
+                label: "Session"
+            },
+            "session.lock": {
+                label: "Lock",
+                ipc: "lock lock"
+            },
+            "session.suspend": {
+                label: "Suspend"
+            }
+        };
+        const binds = [
+            {
+                chord: "Super+Alt+L",
+                label: "Lock the screen",
+                enabled: true,
+                ipc: "lock lock"
+            }
+        ];
+        const lock = {
+            id: "session.lock",
+            label: "Lock",
+            icon: undefined,
+            detail: "",
+            enabled: true,
+            entry: null,
+            action: null,
+            submenu: false,
+            chord: "Super+Alt+L"
+        };
+
+        compare(Menu.rowsFor(items, "session", "", {}, {}, binds), [lock,
+            {
+                id: "session.suspend",
+                label: "Suspend",
+                icon: undefined,
+                detail: "",
+                enabled: true,
+                entry: null,
+                action: null,
+                submenu: false,
+                chord: undefined
+            }
+        ]);
+        compare(Menu.rowsFor(items, "root", "alt+l", {}, {}, binds), [Object.assign({}, lock, {
+                detail: "Session"
+            })]);
+    }
 }
