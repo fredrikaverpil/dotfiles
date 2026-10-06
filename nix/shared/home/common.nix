@@ -94,10 +94,6 @@ in
       # Development & Language Toolchains
       # ========================================================================
       # Language-specific
-      # NOTE: Deno is the preferred runtime for one-off npm CLI runs
-      # (`deno run -A npm:<pkg>`). Unstable for the latest Node-compat fixes
-      # (no-op on macOS, where pkgs IS unstable).
-      unstable.deno
       # Unstable: the Pi's pinned uv is too old for the relative-date
       # `exclude-newer` in stow/shared/.config/uv/uv.toml.
       unstable.uv
