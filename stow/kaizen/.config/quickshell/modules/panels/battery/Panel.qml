@@ -14,6 +14,7 @@ Ui.Panel {
             "balanced": "󰊚 Balanced",
             "performance": "󰓅 Performance"
         })
+    readonly property color levelColor: !service.onBattery ? shell.palette.fg : service.percentage <= service.lowLevel ? shell.palette.rose : service.percentage <= service.warnLevel ? shell.palette.wood : shell.palette.fg
 
     cardWidth: 480
     cardHeight: 262
@@ -56,7 +57,7 @@ Ui.Panel {
         Text {
             id: percentLabel
             visible: root.service.present
-            color: root.shell.palette.fg
+            color: root.levelColor
             font.family: Ui.Fonts.mono
             font.pixelSize: 18
             text: root.service.percentage + "%"
@@ -92,7 +93,7 @@ Ui.Panel {
             width: parent.width * root.service.percentage / 100
             height: parent.height
             radius: parent.radius
-            color: root.shell.palette.fg
+            color: root.levelColor
         }
     }
 
