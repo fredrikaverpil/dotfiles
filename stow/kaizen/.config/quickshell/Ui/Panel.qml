@@ -89,7 +89,8 @@ PanelWindow {
             width: panel.cardWidth
             height: panel.cardHeight
             // Follows the text size, capped to stay clear of the bar and screen edges.
-            scale: Math.max(1, Math.min(panel.shell ? panel.shell.textScale : 1, (panel.width - 32) / panel.cardWidth, (panel.height - 2 * panel.barHeight - 32) / panel.cardHeight))
+            // The floor is 1, or the text size when that is smaller.
+            scale: Math.max(Math.min(1, panel.shell ? panel.shell.textScale : 1), Math.min(panel.shell ? panel.shell.textScale : 1, (panel.width - 32) / panel.cardWidth, (panel.height - 2 * panel.barHeight - 32) / panel.cardHeight))
             radius: 8
             color: panel.shell.palette.bg
             border.color: panel.shell.palette.dim
