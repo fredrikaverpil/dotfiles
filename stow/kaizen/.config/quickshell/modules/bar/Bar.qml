@@ -211,7 +211,7 @@ Scope {
                 anchors.right: networkButton.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: 4
-                foreground: bar.shell.bluetoothService.powered ? bar.shell.palette.fg : bar.shell.palette.rose
+                foreground: !bar.shell.bluetoothService.powered || bar.shell.bluetoothService.lowestBattery >= 0 && bar.shell.bluetoothService.lowestBattery <= bar.shell.batteryService.lowLevel ? bar.shell.palette.rose : bar.shell.bluetoothService.lowestBattery >= 0 && bar.shell.bluetoothService.lowestBattery <= bar.shell.batteryService.warnLevel ? bar.shell.palette.wood : bar.shell.palette.fg
                 label: bar.shell.bluetoothService.icon
                 onActivated: bar.shell.bluetooth.toggle()
                 onSecondary: bar.shell.menu.popup("settings.bluetooth", modelData.name, bluetoothButton)
