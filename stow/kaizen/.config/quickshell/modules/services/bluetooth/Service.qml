@@ -12,6 +12,11 @@ Item {
     readonly property var devices: Model.pairedDevices(adapter ? adapter.devices.values : [])
     readonly property int connectedCount: devices.filter(device => device.connected).length
     readonly property string icon: Model.barIcon(available, powered, connectedCount)
+    // Percent of the emptiest connected device, or negative when none reports one.
+    readonly property int lowestBattery: devices.reduce((low, device) => {
+        const level = device.connected ? Math.round(battery(device) * 100) : -1;
+        return level >= 0 && (low < 0 || level < low) ? level : low;
+    }, -1)
 
     function togglePower() {
         if (adapter)
