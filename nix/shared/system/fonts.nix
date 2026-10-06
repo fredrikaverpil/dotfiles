@@ -3,12 +3,19 @@
 {
   # NOTE: Berkeley Mono is installed manually, as it requires a license.
   fonts.packages = with pkgs; [
+    adwaita-fonts
     nerd-fonts.jetbrains-mono
     maple-mono.truetype
     maple-mono.variable
     nerd-fonts.symbols-only
     noto-fonts
     noto-fonts-color-emoji
+  ];
+
+  # GTK's UI font, which Chromium sizes its menus from. The schema default is
+  # 11pt; menu row height scales with it.
+  programs.dconf.profiles.user.databases = [
+    { settings."org/gnome/desktop/interface".font-name = "Adwaita Sans 9"; }
   ];
 
   # Berkeley Mono is licensed, so it is copied into ~/.local/share/fonts by
