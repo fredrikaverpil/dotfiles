@@ -37,13 +37,11 @@ with unstable;
   beamPackages.elixir
   go_latest
   nixfmt # cannot be installed via Mason on macOS, so installed here instead
-  nodejs # required by github copilot
-  npm-check-updates
+  nodejs # npm for Mason packages (macOS), grammar.js for tree-sitter generate
   python3
   ruby
   rustup # run `rustup update stable` to get latest rustc, cargo, rust-analyzer etc.
   tree-sitter
-  yarn
 ]
 ++ lib.optionals nixos [
   # Kept alphabetical by Mason name; the trailing comment is the language/tool.
