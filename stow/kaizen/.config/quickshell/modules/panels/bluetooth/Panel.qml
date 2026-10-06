@@ -173,6 +173,8 @@ Ui.Panel {
 
         required property var device
         readonly property string action: root.service.deviceAction(device)
+        // Percent, or negative when not shown.
+        readonly property int battery: device.connected ? Math.round(root.service.battery(device) * 100) : -1
 
         width: parent.width
         height: 42
@@ -197,7 +199,7 @@ Ui.Panel {
             anchors.right: toggle.left
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
-            color: root.shell.palette.fg
+            color: row.battery < 0 ? root.shell.palette.fg : row.battery <= root.shell.batteryService.lowLevel ? root.shell.palette.rose : row.battery <= root.shell.batteryService.warnLevel ? root.shell.palette.wood : root.shell.palette.fg
             font.family: Ui.Fonts.mono
             font.pixelSize: 14
             text: (row.device.name || row.device.address) + " · " + root.service.deviceStatus(row.device)
