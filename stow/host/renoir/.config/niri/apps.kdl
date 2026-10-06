@@ -8,6 +8,7 @@ window-rule {
     match app-id=r#"^zen-beta$"#
     open-on-workspace "1"
     open-focused true
+    default-column-width { proportion 0.7; }
 }
 
 window-rule {
