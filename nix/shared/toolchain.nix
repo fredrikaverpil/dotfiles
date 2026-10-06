@@ -9,12 +9,11 @@
 # Neovim-only extras (see common.nix). `mkShell` gives the devshell a stdenv C
 # compiler automatically.
 #
-# NOTE: the standalone-package managers uv and deno are intentionally NOT here.
-# They live on the base PATH (home.packages in home/common.nix) so they
-# work in a plain shell (uv venv auto-activation, deno-installed npm tools) and
-# are inherited into both Neovim and this devshell. Keeping uv out of the list
-# also keeps it out of the Neovim context (see commit "comment out uv inside
-# neovim context").
+# NOTE: the standalone-package manager uv is intentionally NOT here. It lives
+# on the base PATH (home.packages in home/common.nix) so it works in a plain
+# shell (uv venv auto-activation) and is inherited into both Neovim and this
+# devshell. Keeping uv out of the list also keeps it out of the Neovim context
+# (see commit "comment out uv inside neovim context").
 #
 # Channels: this list is authored `with unstable`, so a bare name resolves to
 # nixpkgs-unstable (the default — everything here comes from unstable, all

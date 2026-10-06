@@ -60,7 +60,7 @@ There is no mechanism for installing CLI tools with a language package manager
 (npm, uv, ...) — a tool must come from nixpkgs or the `llm-agents` flake.
 Wheels and prebuilt npm binaries are glibc-linked and fail to load on NixOS
 (`libstdc++.so.6: cannot open shared object file`). For a one-off run, use
-`deno run -A npm:<pkg>` or `uvx <pkg>` from a shell instead of installing.
+`npx <pkg>` or `uvx <pkg>` from a shell instead of installing.
 
 ### niri + Quickshell desktop (ThinkPads)
 

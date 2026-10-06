@@ -23,11 +23,10 @@
       "env": {}
     },
     "playwright": {
-      "command": "deno",
+      "command": "npx",
       "args": [
-        "run",
-        "-A",
-        "npm:@playwright/mcp@latest"
+        "-y",
+        "@playwright/mcp@latest"
       ]
     }
   },
