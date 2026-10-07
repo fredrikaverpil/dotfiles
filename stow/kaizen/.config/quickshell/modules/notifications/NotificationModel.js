@@ -90,6 +90,26 @@ function withoutRecord(rows, key) {
   });
 }
 
+// state is { doNotDisturb, holds, owned }. The first hold turns DnD on, owning
+// it only when it was off; the last release turns it off only when owned.
+function dndHold(state, reason, on) {
+  var holds = state.holds.filter(function (held) {
+    return held !== reason;
+  });
+  if (on)
+    return {
+      doNotDisturb: true,
+      holds: holds.concat([reason]),
+      owned: state.owned || !state.doNotDisturb,
+    };
+  var release = holds.length === 0 && state.owned;
+  return {
+    doNotDisturb: release ? false : state.doNotDisturb,
+    holds: holds,
+    owned: release ? false : state.owned,
+  };
+}
+
 function dndValue(value) {
   var normalized = String(value || "").toLowerCase();
   return (

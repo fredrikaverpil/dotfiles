@@ -76,10 +76,8 @@ Ui.Panel {
     readonly property int count: rows.length + actions.length
 
     property int cursor: 0
-    // On each time the panel opens; a recording that turns DnD on turns it off
-    // again once it ends.
+    // On each time the panel opens; a recording holds DnD on until it ends.
     property bool dnd: true
-    property bool restoreDnd: false
     readonly property bool active: service.selecting || service.busy
 
     cardWidth: 480
@@ -88,17 +86,13 @@ Ui.Panel {
     function record() {
         close();
         service.start();
-        if (dnd && active && !shell.notifications.doNotDisturb) {
-            shell.notifications.setDoNotDisturb(true);
-            restoreDnd = true;
-        }
+        if (dnd && active)
+            shell.notifications.holdDoNotDisturb("recording", true);
     }
 
     function restore() {
-        if (active || !restoreDnd)
-            return;
-        restoreDnd = false;
-        shell.notifications.setDoNotDisturb(false);
+        if (!active)
+            shell.notifications.holdDoNotDisturb("recording", false);
     }
 
     function adjust(delta) {

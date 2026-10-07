@@ -33,6 +33,10 @@ Item {
     // Whether the history holds a critical notification DnD held back.
     readonly property bool criticalHeld: doNotDisturb && historyRows.some(row => row.urgency === NotificationUrgency.Critical && row.timestamp >= dndSince)
     readonly property int dndRemind: 10 * 60 * 1000
+    // Reasons holding DnD on, such as a recording, and whether a hold turned it
+    // on.
+    property var dndHolds: []
+    property bool dndOwned: false
     // Debug aid, driven over IPC only: records each arriving notification's raw
     // data in memory, newest first.
     property bool capture: false
@@ -313,7 +317,24 @@ Item {
             defaultAction(record);
     }
 
+    // Set by hand: no hold turns it off.
     function setDoNotDisturb(value) {
+        dndOwned = false;
+        applyDoNotDisturb(value);
+    }
+
+    function holdDoNotDisturb(reason, on) {
+        var next = Model.dndHold({
+            doNotDisturb: doNotDisturb,
+            holds: dndHolds,
+            owned: dndOwned
+        }, reason, on);
+        dndHolds = next.holds;
+        dndOwned = next.owned;
+        applyDoNotDisturb(next.doNotDisturb);
+    }
+
+    function applyDoNotDisturb(value) {
         if (doNotDisturb === !!value)
             return;
         dndSince = value ? Date.now() : 0;
