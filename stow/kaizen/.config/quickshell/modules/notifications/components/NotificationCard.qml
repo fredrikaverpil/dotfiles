@@ -34,6 +34,7 @@ Rectangle {
     readonly property string body: String(row.body || "")
     readonly property string image: String(row.image || "")
     readonly property string ruleIcon: String(row.icon || "")
+    readonly property string ruleBadgeIcon: String(row.badgeIcon || "")
     readonly property string badgeEmoji: String(row.badgeEmoji || "")
     readonly property real perimeter: 2 * (width + height)
     readonly property int urgency: Number(row.urgency)
@@ -45,12 +46,13 @@ Rectangle {
     readonly property bool beating: animated && row.borderAnimation === "heartbeat"
     readonly property bool glowing: animated && row.borderAnimation === "glow"
     // A rule's icon takes the notification's place, which moves to the badge;
-    // a rule's badge emoji takes the badge's.
+    // a rule's badge icon takes the badge's, leaving the notification's in place;
+    // a rule's badge emoji takes the badge's over either.
     readonly property string icon: ruleIcon || ownIcon
-    readonly property string badge: ruleIcon ? ownIcon : ""
+    readonly property string badge: ruleBadgeIcon || (ruleIcon ? ownIcon : "")
     readonly property string ownIcon: {
         if (image)
-            return image;
+            return NotificationLogic.imageSource(image);
         if (!appIcon)
             return "";
         if (appIcon.indexOf("file://") === 0 || appIcon.indexOf("image://") === 0)
@@ -209,10 +211,17 @@ Rectangle {
             spacing: 10
 
             Image {
+                id: iconImage
+                // The badge's icon stands in once the notification's own cannot load.
+                property bool fellBack: false
                 Layout.preferredWidth: visible ? 40 : 0
                 Layout.preferredHeight: visible ? 40 : 0
-                visible: root.icon.length > 0 && status !== Image.Error
-                source: root.icon
+                visible: (root.icon.length > 0 || fellBack) && status !== Image.Error
+                source: fellBack ? root.badge : root.icon
+                onStatusChanged: {
+                    if (status === Image.Error && !fellBack && !root.ruleIcon && root.badge.length > 0)
+                        fellBack = true;
+                }
                 sourceSize.width: 80
                 sourceSize.height: 80
                 fillMode: Image.PreserveAspectFit
@@ -227,7 +236,7 @@ Rectangle {
                     height: 22
                     radius: 11
                     color: root.color
-                    visible: root.badgeEmoji.length > 0 || (root.badge.length > 0 && badgeImage.status !== Image.Error)
+                    visible: !iconImage.fellBack && (root.badgeEmoji.length > 0 || (root.badge.length > 0 && badgeImage.status !== Image.Error))
 
                     Image {
                         id: badgeImage
