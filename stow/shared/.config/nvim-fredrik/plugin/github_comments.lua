@@ -2,14 +2,12 @@ if not Config.use_codediff then
   return
 end
 
+local github = require("github")
+
 local ns = vim.api.nvim_create_namespace("pr_comments")
 
 local cached_comments = {}
-local cached_pending_review_ids = {}
 local cached_diff_files = {}
-local cached_pr_number = nil
-local cached_pr_node_id = nil
-local cached_pending_review_node_id = nil
 
 -- --------------------------------------------------------------------------
 -- Sign column: show comment indicators
@@ -216,58 +214,6 @@ end
 -- GitHub API helpers
 -- --------------------------------------------------------------------------
 
---- @param query string GraphQL query
---- @param variables table? GraphQL variables
---- @param callback fun(data: table)
---- @param on_error fun(msg: string)?
-local function graphql(query, variables, callback, on_error)
-  local json = vim.json.encode({ query = query, variables = variables or {} })
-  local stdout_chunks = {}
-  local stderr_chunks = {}
-
-  local job_id = vim.fn.jobstart({ "bash", "-c", "gh api graphql --input -" }, {
-    stdout_buffered = true,
-    stderr_buffered = true,
-    on_stdout = function(_, data)
-      if data then
-        table.insert(stdout_chunks, table.concat(data, "\n"))
-      end
-    end,
-    on_stderr = function(_, data)
-      if data then
-        table.insert(stderr_chunks, table.concat(data, "\n"))
-      end
-    end,
-    on_exit = function(_, exit_code)
-      vim.schedule(function()
-        local raw = table.concat(stdout_chunks, "")
-        if exit_code ~= 0 or raw == "" then
-          if on_error then
-            on_error(table.concat(stderr_chunks, ""))
-          end
-          return
-        end
-        local ok, result = pcall(vim.json.decode, raw)
-        if not ok then
-          if on_error then
-            on_error("Failed to decode GraphQL response")
-          end
-          return
-        end
-        if result.errors then
-          if on_error then
-            on_error(vim.json.encode(result.errors))
-          end
-          return
-        end
-        callback(result.data or {})
-      end)
-    end,
-  })
-  vim.fn.chansend(job_id, json)
-  vim.fn.chanclose(job_id, "stdin")
-end
-
 local function fetch_diff_files(pr_number)
   local cmd = string.format("gh api repos/{owner}/{repo}/pulls/%s/files --paginate", pr_number)
   local stdout_chunks = {}
@@ -349,16 +295,15 @@ local function fetch_review_comments(pr_number, callback)
 end
 
 local function fetch_pr_data(callback)
-  local pr_number = vim.fn.trim(vim.fn.system("gh pr view --json number --jq .number 2>/dev/null"))
-  if vim.v.shell_error ~= 0 or pr_number == "" then
+  local pr_number = github.current_pr_number()
+  if not pr_number then
     return
   end
-  cached_pr_number = pr_number
 
   local state = { comments_done = false, reviews_done = false }
   local function try_finish()
     if state.comments_done and state.reviews_done then
-      callback(cached_comments, cached_pending_review_ids)
+      callback(cached_comments, github.cache.pending_review_ids)
     end
   end
 
@@ -370,40 +315,7 @@ local function fetch_pr_data(callback)
     try_finish()
   end)
 
-  local owner = vim.fn.trim(vim.fn.system("gh repo view --json owner --jq .owner.login"))
-  local repo = vim.fn.trim(vim.fn.system("gh repo view --json name --jq .name"))
-
-  local query = [[
-    query($owner: String!, $repo: String!, $pr: Int!) {
-      repository(owner: $owner, name: $repo) {
-        pullRequest(number: $pr) {
-          id
-          reviews(first: 100) {
-            nodes { id databaseId state }
-          }
-        }
-      }
-    }
-  ]]
-
-  graphql(query, { owner = owner, repo = repo, pr = tonumber(pr_number) }, function(data)
-    local pr = data.repository and data.repository.pullRequest
-    if not pr then
-      return
-    end
-
-    cached_pr_node_id = pr.id
-
-    local pending = {}
-    cached_pending_review_node_id = nil
-    for _, r in ipairs(pr.reviews and pr.reviews.nodes or {}) do
-      if r.state == "PENDING" then
-        pending[r.databaseId] = true
-        cached_pending_review_node_id = r.id
-      end
-    end
-    cached_pending_review_ids = pending
-
+  github.fetch_reviews(pr_number, function()
     state.reviews_done = true
     try_finish()
   end, function(err)
@@ -419,7 +331,7 @@ end
 
 local function show_cached()
   if cached_comments and #cached_comments > 0 then
-    show_signs_for_session(cached_comments, cached_pending_review_ids)
+    show_signs_for_session(cached_comments, github.cache.pending_review_ids)
   end
 end
 
@@ -582,13 +494,13 @@ local function build_thread_variables(file_path, start_line, end_line, side, bod
 end
 
 local function post_comment(file_path, start_line, end_line, side, body)
-  if not cached_pr_node_id then
+  if not github.cache.pr_node_id then
     vim.notify("No PR data cached — try refreshing first", vim.log.levels.ERROR)
     return
   end
 
   local variables = build_thread_variables(file_path, start_line, end_line, side, body)
-  variables.pullRequestId = cached_pr_node_id
+  variables.pullRequestId = github.cache.pr_node_id
 
   local query = [[
     mutation($pullRequestId: ID!, $path: String!, $body: String!, $line: Int!, $side: DiffSide!, $startSide: DiffSide, $startLine: Int) {
@@ -606,7 +518,7 @@ local function post_comment(file_path, start_line, end_line, side, body)
     }
   ]]
 
-  graphql(query, variables, function()
+  github.graphql(query, variables, function()
     vim.notify(string.format("PR comment posted on %s:%d-%d", file_path, start_line, end_line), vim.log.levels.INFO)
     refresh()
   end, function(err)
@@ -636,7 +548,7 @@ local function post_review_comment(file_path, start_line, end_line, side, body)
 
   local function add_thread(review_node_id, is_new_review)
     variables.pullRequestReviewId = review_node_id
-    graphql(thread_query, variables, function()
+    github.graphql(thread_query, variables, function()
       local msg = is_new_review and string.format("Review started on %s:%d-%d", file_path, start_line, end_line)
         or string.format("Review comment added to review on %s:%d-%d", file_path, start_line, end_line)
       vim.notify(msg, vim.log.levels.INFO)
@@ -646,45 +558,19 @@ local function post_review_comment(file_path, start_line, end_line, side, body)
     end)
   end
 
-  if cached_pending_review_node_id then
-    add_thread(cached_pending_review_node_id, false)
-  else
-    if not cached_pr_node_id then
-      vim.notify("No PR data cached — try refreshing first", vim.log.levels.ERROR)
-      return
-    end
-
-    local create_query = [[
-      mutation($pullRequestId: ID!) {
-        addPullRequestReview(input: { pullRequestId: $pullRequestId }) {
-          pullRequestReview { id }
-        }
-      }
-    ]]
-
-    graphql(create_query, { pullRequestId = cached_pr_node_id }, function(data)
-      local review_id = data.addPullRequestReview
-        and data.addPullRequestReview.pullRequestReview
-        and data.addPullRequestReview.pullRequestReview.id
-      if not review_id then
-        vim.notify("Failed to create pending review: no review ID returned", vim.log.levels.ERROR)
-        return
-      end
-      cached_pending_review_node_id = review_id
-      add_thread(review_id, true)
-    end, function(err)
-      vim.notify("Failed to create pending review: " .. err, vim.log.levels.ERROR)
-    end)
-  end
+  github.ensure_pending_review(add_thread, function(msg)
+    vim.notify(msg, vim.log.levels.ERROR)
+  end)
 end
 
 local function post_reply(root_comment_id, body)
-  if not cached_pr_number then
+  if not github.cache.pr_number then
     vim.notify("No PR data cached — try refreshing first", vim.log.levels.ERROR)
     return
   end
 
-  local cmd = string.format("gh api repos/{owner}/{repo}/pulls/%s/comments --method POST --input -", cached_pr_number)
+  local cmd =
+    string.format("gh api repos/{owner}/{repo}/pulls/%s/comments --method POST --input -", github.cache.pr_number)
   local payload = vim.json.encode({ in_reply_to = root_comment_id, body = body })
   local stderr_chunks = {}
 
