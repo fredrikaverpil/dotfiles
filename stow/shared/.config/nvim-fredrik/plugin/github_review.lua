@@ -13,9 +13,9 @@ local review_tabs = {}
 --- @type string?
 local pending_revision = nil
 
---- Continue the PR's draft review, or offer to start one.
+--- Continue the PR's draft review, if any. The first comment starts one.
 --- @param pr_number string
-local function start_or_continue_review(pr_number)
+local function continue_review(pr_number)
   github.fetch_reviews(pr_number, function()
     local head = vim.fn.trim(vim.fn.system("git rev-parse HEAD"))
     local pr_head = github.cache.head_oid
@@ -28,18 +28,7 @@ local function start_or_continue_review(pr_number)
 
     if github.cache.pending_review_node_id then
       vim.notify(string.format("Continuing draft review on PR #%s", pr_number), vim.log.levels.INFO)
-      return
     end
-
-    local prompt = string.format("No draft review on PR #%s. Start one?", pr_number)
-    if vim.fn.confirm(prompt, "&Yes\n&No", 2) ~= 1 then
-      return
-    end
-    github.ensure_pending_review(function()
-      vim.notify(string.format("Draft review started on PR #%s", pr_number), vim.log.levels.INFO)
-    end, function(msg)
-      vim.notify(msg, vim.log.levels.ERROR)
-    end)
   end, function(err)
     vim.notify("Failed to fetch PR reviews: " .. err, vim.log.levels.ERROR)
   end)
@@ -109,7 +98,7 @@ local function on_open(args)
   end
   review_tabs[data.tabpage] = { pr_number = pr_number }
   load_viewed_files(data.tabpage, pr_number)
-  start_or_continue_review(pr_number)
+  continue_review(pr_number)
 end
 
 require("lazyload").on_vim_enter(function()
