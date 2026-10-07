@@ -80,6 +80,14 @@ function M.current_pr_number()
   return pr_number
 end
 
+--- JSON null decodes to vim.NIL, which is truthy.
+local function nonnull(v)
+  if v == vim.NIL then
+    return nil
+  end
+  return v
+end
+
 --- @return string owner
 --- @return string repo
 local function repo_ref()
@@ -131,6 +139,80 @@ function M.fetch_reviews(pr_number, callback, on_error)
 
     callback()
   end, on_error)
+end
+
+--- Review comments on the pull request, including the viewer's pending ones.
+---
+--- Each comment carries its thread's position: `line` is nil once the thread
+--- is outdated, and replies point at the thread's first comment.
+--- @param pr_number string
+--- @param callback fun(comments: table[])
+--- @param on_error fun(msg: string)
+function M.fetch_review_comments(pr_number, callback, on_error)
+  local owner, repo = repo_ref()
+
+  local query = [[
+    query($owner: String!, $repo: String!, $pr: Int!, $after: String) {
+      repository(owner: $owner, name: $repo) {
+        pullRequest(number: $pr) {
+          reviewThreads(first: 100, after: $after) {
+            nodes {
+              path
+              diffSide
+              line
+              originalLine
+              comments(first: 100) {
+                nodes {
+                  databaseId
+                  body
+                  author { login }
+                  pullRequestReview { databaseId }
+                }
+              }
+            }
+            pageInfo { hasNextPage endCursor }
+          }
+        }
+      }
+    }
+  ]]
+
+  local comments = {}
+  local function fetch_page(after)
+    local variables = { owner = owner, repo = repo, pr = tonumber(pr_number), after = after }
+    M.graphql(query, variables, function(data)
+      local threads = data.repository and data.repository.pullRequest and data.repository.pullRequest.reviewThreads
+      if not threads then
+        on_error("No review threads returned for PR #" .. pr_number)
+        return
+      end
+      for _, t in ipairs(threads.nodes or {}) do
+        local root_id = nil
+        for _, c in ipairs(t.comments.nodes or {}) do
+          local review = nonnull(c.pullRequestReview)
+          local author = nonnull(c.author)
+          table.insert(comments, {
+            id = c.databaseId,
+            path = t.path,
+            body = c.body,
+            line = t.line,
+            original_line = t.originalLine,
+            side = nonnull(t.diffSide) or "RIGHT",
+            pull_request_review_id = review and review.databaseId,
+            in_reply_to_id = root_id,
+            user = author and author.login,
+          })
+          root_id = root_id or c.databaseId
+        end
+      end
+      if threads.pageInfo.hasNextPage then
+        fetch_page(threads.pageInfo.endCursor)
+      else
+        callback(comments)
+      end
+    end, on_error)
+  end
+  fetch_page(nil)
 end
 
 --- Viewed state of every file in the pull request, keyed by path.
