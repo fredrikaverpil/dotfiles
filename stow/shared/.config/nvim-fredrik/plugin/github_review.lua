@@ -4,6 +4,11 @@ end
 
 local github = require("github")
 
+--- PR review tabs opened by <leader>gdr. `files` is the set of PR paths, known
+--- once their viewed states have loaded.
+--- @type table<integer, { pr_number: string, files: table<string, boolean>? }>
+local review_tabs = {}
+
 --- Base revision of the diff <leader>gdr opened, until its CodeDiffOpen.
 --- @type string?
 local pending_revision = nil
@@ -40,6 +45,51 @@ local function start_or_continue_review(pr_number)
   end)
 end
 
+--- Mark the tab's explorer rows for files already viewed on GitHub.
+--- @param tabpage integer
+--- @param pr_number string
+local function load_viewed_files(tabpage, pr_number)
+  github.fetch_viewed_files(pr_number, function(states)
+    local tab = review_tabs[tabpage]
+    if not tab then
+      return
+    end
+    local codediff = require("codediff")
+    local files = {}
+    for path, state in pairs(states) do
+      files[path] = true
+      if state == "VIEWED" then
+        codediff.set_reviewed(path, true, { tabpage = tabpage })
+      end
+    end
+    tab.files = files
+  end, function(err)
+    vim.notify("Failed to fetch viewed files: " .. err, vim.log.levels.ERROR)
+  end)
+end
+
+--- Mirror an explorer reviewed toggle into the file's viewed state on GitHub.
+local function sync_viewed(args)
+  local data = args.data
+  local tab = review_tabs[data.tabpage]
+  if not tab or data.mode ~= "explorer" then
+    return
+  end
+  if not tab.files then
+    vim.notify("Viewed files are still loading; mark not synced to GitHub", vim.log.levels.WARN)
+    return
+  end
+  if not tab.files[data.path] then
+    vim.notify(string.format("%s is not in PR #%s; mark kept local", data.path, tab.pr_number), vim.log.levels.INFO)
+    return
+  end
+
+  github.set_file_viewed(data.path, data.reviewed, function() end, function(err)
+    require("codediff").set_reviewed(data.path, not data.reviewed, { tabpage = data.tabpage })
+    vim.notify(string.format("Failed to sync viewed state of %s: %s", data.path, err), vim.log.levels.ERROR)
+  end)
+end
+
 --- Take over the PR diff <leader>gdr opened once codediff has drawn it.
 local function on_open(args)
   local data = args.data
@@ -57,6 +107,8 @@ local function on_open(args)
     vim.notify("No pull request for the current branch", vim.log.levels.WARN)
     return
   end
+  review_tabs[data.tabpage] = { pr_number = pr_number }
+  load_viewed_files(data.tabpage, pr_number)
   start_or_continue_review(pr_number)
 end
 
@@ -67,6 +119,20 @@ require("lazyload").on_vim_enter(function()
     group = group,
     pattern = "CodeDiffOpen",
     callback = on_open,
+  })
+
+  vim.api.nvim_create_autocmd("User", {
+    group = group,
+    pattern = "CodeDiffReviewedToggle",
+    callback = sync_viewed,
+  })
+
+  vim.api.nvim_create_autocmd("User", {
+    group = group,
+    pattern = "CodeDiffClose",
+    callback = function(args)
+      review_tabs[args.data.tabpage] = nil
+    end,
   })
 
   vim.keymap.set("n", "<leader>gdr", function()
