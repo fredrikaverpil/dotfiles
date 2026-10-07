@@ -246,54 +246,6 @@ local function fetch_diff_files(pr_number)
   })
 end
 
-local function fetch_review_comments(pr_number, callback)
-  local cmd = string.format("gh api repos/{owner}/{repo}/pulls/%s/comments --paginate", pr_number)
-  local stdout_chunks = {}
-
-  vim.fn.jobstart({ "bash", "-c", cmd }, {
-    stdout_buffered = true,
-    stderr_buffered = true,
-    on_stdout = function(_, data)
-      if data then
-        table.insert(stdout_chunks, table.concat(data, "\n"))
-      end
-    end,
-    on_exit = function(_, exit_code)
-      vim.schedule(function()
-        if exit_code ~= 0 then
-          callback({})
-          return
-        end
-        local raw = table.concat(stdout_chunks, "")
-        if raw == "" then
-          callback({})
-          return
-        end
-        local ok, items = pcall(vim.json.decode, raw)
-        if not ok or type(items) ~= "table" then
-          callback({})
-          return
-        end
-        local comments = {}
-        for _, c in ipairs(items) do
-          table.insert(comments, {
-            id = c.id,
-            path = c.path,
-            body = c.body,
-            line = c.line,
-            original_line = c.original_line,
-            side = c.side or "RIGHT",
-            pull_request_review_id = c.pull_request_review_id,
-            in_reply_to_id = c.in_reply_to_id,
-            user = c.user and c.user.login,
-          })
-        end
-        callback(comments)
-      end)
-    end,
-  })
-end
-
 local function fetch_pr_data(callback)
   local pr_number = github.current_pr_number()
   if not pr_number then
@@ -309,10 +261,13 @@ local function fetch_pr_data(callback)
 
   fetch_diff_files(pr_number)
 
-  fetch_review_comments(pr_number, function(comments)
+  local function on_comments(comments)
     cached_comments = comments
     state.comments_done = true
     try_finish()
+  end
+  github.fetch_review_comments(pr_number, on_comments, function()
+    on_comments({})
   end)
 
   github.fetch_reviews(pr_number, function()
