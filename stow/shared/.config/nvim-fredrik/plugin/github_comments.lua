@@ -128,7 +128,7 @@ end
 --- Repo-relative path of the file currently shown in the diff panes.
 ---
 --- codediff keeps this in two places. Explorer and history sessions leave the
---- session's own paths empty and track the selected file on the panel object;
+--- session's own paths empty and track the selected file on the panel view;
 --- standalone diffs put the paths on the session. Both are consulted, so this
 --- works whichever way the diff was opened.
 --- @return string? file_path
@@ -146,9 +146,9 @@ local function get_session_file_path()
 
   -- Explorer/history mode: the panel knows the selected file, already
   -- repo-relative. Explorer calls it current_file_path, history current_file.
-  local panel = lifecycle.get_explorer(tabpage)
-  if panel then
-    local selected = panel.current_file_path or panel.current_file
+  local view = lifecycle.get_panel_view(tabpage)
+  if view and view.data then
+    local selected = view.data.current_file_path or view.data.current_file
     if type(selected) == "string" and selected ~= "" then
       return selected, session
     end

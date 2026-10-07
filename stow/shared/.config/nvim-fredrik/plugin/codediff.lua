@@ -1,6 +1,6 @@
 if Config.use_codediff then
   require("lazyload").on_vim_enter(function()
-    local variant = "fork"
+    local variant = "local"
     if variant == "local" then
       require("dev").load_local("~/code/public/github.com/fredrikaverpil/codediff.nvim")
       vim.pack.add({
