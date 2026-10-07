@@ -168,9 +168,17 @@ local function show_signs_for_session(comments, pending_review_ids)
     return
   end
 
+  -- The panes' buffers, which codediff swaps in before updating the session.
+  local function pane_buf(win, bufnr)
+    if win and vim.api.nvim_win_is_valid(win) then
+      return vim.api.nvim_win_get_buf(win)
+    end
+    return bufnr
+  end
+
   pending_review_ids = pending_review_ids or {}
-  place_signs(session.original_bufnr, file_path, "LEFT", comments, pending_review_ids)
-  place_signs(session.modified_bufnr, file_path, "RIGHT", comments, pending_review_ids)
+  place_signs(pane_buf(session.original_win, session.original_bufnr), file_path, "LEFT", comments, pending_review_ids)
+  place_signs(pane_buf(session.modified_win, session.modified_bufnr), file_path, "RIGHT", comments, pending_review_ids)
 end
 
 local function parse_hunk_ranges(patch)
@@ -704,6 +712,14 @@ require("lazyload").on_vim_enter(function()
     pattern = "CodeDiffFileSelect",
     callback = function()
       vim.defer_fn(show_cached, 100)
+    end,
+  })
+
+  -- codediff swaps in a file's buffers after the events above have fired.
+  vim.api.nvim_create_autocmd("BufWinEnter", {
+    group = group,
+    callback = function()
+      vim.schedule(show_cached)
     end,
   })
 end)
