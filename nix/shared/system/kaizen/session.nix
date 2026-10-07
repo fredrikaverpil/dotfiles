@@ -237,7 +237,13 @@ in
               type = lib.types.nullOr lib.types.path;
               default = null;
               example = lib.literalExpression "./github.svg";
-              description = "Icon shown in place of the notification's, such as the sender an app relays for; the notification's own moves to a badge on its corner";
+              description = "Icon shown in place of the notification's, such as the sender an app relays for; the notification's own moves to a badge on its corner unless `badgeIcon` is set";
+            };
+            badgeIcon = lib.mkOption {
+              type = lib.types.nullOr lib.types.path;
+              default = null;
+              example = lib.literalExpression "./satty.svg";
+              description = "Icon on the corner badge. With `icon` set too, each shows as set; otherwise the notification's own stays the icon, and the badge icon takes its place when that cannot be loaded";
             };
             badgeEmoji = lib.mkOption {
               type = lib.types.nullOr lib.types.str;
@@ -475,6 +481,11 @@ in
           summary = " from Linear$";
         };
         icon = ./icons/linear.svg;
+      }
+      # Satty's image is a temp file it may delete before the toast loads it.
+      {
+        match.app = "^satty$";
+        badgeIcon = ./icons/satty.svg;
       }
     ];
 

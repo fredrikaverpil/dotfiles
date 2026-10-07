@@ -18,6 +18,7 @@ TestCase {
             body: "",
             image: "",
             icon: "",
+            badgeIcon: "",
             badgeEmoji: "",
             border: "",
             borderAnimation: "",
@@ -111,6 +112,7 @@ TestCase {
             body: "",
             image: "",
             icon: "",
+            badgeIcon: "",
             badgeEmoji: "",
             border: "",
             borderAnimation: "",
@@ -287,6 +289,35 @@ TestCase {
         }, rules, "collapse"), "");
     }
 
+    function test_image_given_as_a_path_loads_as_a_file() {
+        compare(Notification.imageSource("image://icon//tmp/x.png"), "file:///tmp/x.png");
+        compare(Notification.imageSource("image://icon/dialog-information"), "image://icon/dialog-information");
+        compare(Notification.imageSource("image://qsimage/1"), "image://qsimage/1");
+        compare(Notification.imageSource(""), "");
+        compare(Notification.imageSource(undefined), "");
+    }
+
+    function test_notification_badge_icon_comes_from_the_first_matching_rule_with_one() {
+        const rules = Notification.compileRules([
+            {
+                match: {
+                    app: "^satty$"
+                },
+                badgeIcon: "/nix/store/x-satty.svg"
+            },
+        ]);
+
+        compare(Notification.badgeIconOf({
+            appName: "satty"
+        }, rules), "file:///nix/store/x-satty.svg");
+        compare(Notification.badgeIconOf({
+            appName: "Slack"
+        }, rules), "");
+        compare(Notification.badgeIconOf({
+            appName: "satty"
+        }), "");
+    }
+
     function test_notification_icon_comes_from_the_first_matching_rule_with_one() {
         const rules = Notification.compileRules([
             {
@@ -339,6 +370,7 @@ TestCase {
             body: "",
             image: "",
             icon: "file:///nix/store/x-github.svg",
+            badgeIcon: "",
             badgeEmoji: "",
             border: "",
             borderAnimation: "",
@@ -400,6 +432,7 @@ TestCase {
             body: "",
             image: "",
             icon: "",
+            badgeIcon: "",
             badgeEmoji: "",
             border: "rose",
             borderAnimation: "orbit",
@@ -432,6 +465,7 @@ TestCase {
             body: "",
             image: "image://qsimage/1",
             icon: "",
+            badgeIcon: "",
             badgeEmoji: "❤️",
             border: "",
             borderAnimation: "",

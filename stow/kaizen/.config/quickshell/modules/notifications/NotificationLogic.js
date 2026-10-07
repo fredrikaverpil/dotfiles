@@ -11,6 +11,16 @@ function iconSource(icon) {
   return value;
 }
 
+// An image the app gave as a path loads as a file: the icon provider answers a
+// missing file with a placeholder, a file source with an error.
+function imageSource(image) {
+  var prefix = "image://icon/";
+  var value = asString(image);
+  return value.indexOf(prefix + "/") === 0
+    ? "file://" + value.substring(prefix.length)
+    : value;
+}
+
 // Compiles host rules (host.notificationRules) matching `field: pattern` (app,
 // summary, body); a rule with a bad pattern or no fields is dropped.
 function compileRules(rules) {
@@ -29,6 +39,7 @@ function compileRules(rules) {
           collapse: rule.collapse || null,
           focus: rule.focus || "",
           icon: iconSource(rule.icon),
+          badgeIcon: iconSource(rule.badgeIcon),
           badgeEmoji: rule.badgeEmoji || "",
           border: rule.border || "",
           borderAnimation: rule.borderAnimation || "",
@@ -87,6 +98,14 @@ function iconOf(notification, rules) {
     return rule.icon;
   });
   return rule ? rule.icon : "";
+}
+
+// The badge icon of the first matching rule with one, else "".
+function badgeIconOf(notification, rules) {
+  var rule = matchingRules(notification, rules).find(function (rule) {
+    return rule.badgeIcon;
+  });
+  return rule ? rule.badgeIcon : "";
 }
 
 // The actions of the first matching rule with any, else [].
@@ -153,6 +172,7 @@ function snapshotOf(notification, timestamp, rules) {
     body: asString(notification.body),
     image: asString(notification.image),
     icon: iconOf(notification, rules),
+    badgeIcon: badgeIconOf(notification, rules),
     badgeEmoji: ruleValue(notification, rules, "badgeEmoji"),
     border: ruleValue(notification, rules, "border"),
     borderAnimation: ruleValue(notification, rules, "borderAnimation"),
