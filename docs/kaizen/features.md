@@ -112,30 +112,22 @@ history.
 
 [notify-send]: https://man.archlinux.org/man/notify-send.1
 
-## Recording
+## Recording (`recording`)
 
-- The camera is a circle because gpu-screen-recorder cannot mask its own
-  camera overlay: the service runs mpv under the `kaizen-camera` app id and a
-  niri window rule rounds and places it, so the screen capture records it as
-  ordinary screen content. It must therefore sit inside a recorded region.
-- Its diameter is a share of the captured frame's short side, so it covers the
-  same part of the recording on a region as on an output of any resolution.
-  The window rule's corner is the output's, which a region rarely reaches, so a
-  region's circle is moved into the region's own bottom-right.
-- The circle's scale and coordinates belong to the output it opened on, which
-  is whichever one had focus, so starting a recording *with a camera* focuses
-  the output being captured. Recording without one never moves focus.
-- mpv sizes in device pixels, which is why the service asks niri for the
-  focused output's scale instead of using Qt's rounded `devicePixelRatio`. niri
-  has neither an aspect-ratio rule nor sticky windows, and mpv accepts any size
-  it is given, so while the preview is up the service follows the event
-  stream: it sets the window's height back to its width and moves it to each
-  workspace that gains focus. `move-floating-window` takes coordinates in the
-  output's working area, which the bar shortens at the top, and reads a bare
-  negative number as a relative move.
-- The recording service also owns the region screenshot (`grim`), because that
-  reuses its region selector; `selectMode` says which of the two the selection
-  feeds. Niri's own `screenshot` binds are unrelated and stay compositor-side.
+### Screenshot
+
+Niri comes with built-in screenshotting mapped to `Print`. But often you need to
+send your screenshot to a lightweight editor
+([Satty][https://github.com/gabm/Satty]). In such cases, there's a custom
+screenshotting utility available that supports desktop, window or region:
+`Shift+Print` for a region, or Trigger › Screenshot.
+
+### Record screen
+
+A screen recording utility makes it possible to record the screen (desktop,
+window or region) along with showing a circular video feed captured from a
+camera. Audio controls are available. `Mod+Print` opens the recording panel or
+stops a running recording; `Mod+Shift+Print` pauses or resumes it.
 
 ## Time and place
 
@@ -160,3 +152,6 @@ history.
   falls back to UTC, which only looks like a live pickup.
 
 [timedated]: https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.timedate1.html
+
+```
+```
