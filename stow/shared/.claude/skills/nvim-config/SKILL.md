@@ -74,7 +74,6 @@ No framework -- each directory has a single responsibility:
     lint.lua             -- linting (VimEnter)
     lsp.lua              -- LSP enable + LspAttach keymaps (VimEnter)
     lualine.lua          -- statusline (VimEnter, sync)
-    mason.lua            -- tool installation (VimEnter)
     neotest.lua          -- testing (deferred to first use)
     <name>.lua           -- other feature plugins (snacks, treesitter, oil, etc.)
   after/

@@ -25,8 +25,8 @@ alias pyclean='find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rvf'
 alias pip-purge='pip list --format freeze | xargs pip uninstall -y'
 alias activate='source .venv/bin/activate'
 
-# Nix
-alias dev-toolchain='nix develop ~/.dotfiles#dev --command zsh' # enter the shared dev toolchain shell (nix/shared/toolchain.nix)
+# mise
+alias dev-toolchain='mise exec -- zsh' # enter a shell with the mise toolchain (~/.config/mise)
 
 # Gerrit
 # alias gerrit-push='git push origin HEAD:refs/for/master'

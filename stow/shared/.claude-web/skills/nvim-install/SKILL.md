@@ -46,8 +46,8 @@ Two independent mechanisms gate traffic; they bite at different points.
      subdomains, but the plugin `src` URLs are `https://codeberg.org/...`, so a
      `*.codeberg.org`-only allowlist still 403s the clones. (`Full` network
      access also works but is broader than needed.)
-   - **GitHub release assets** (codediff's prebuilt lib, Mason LSP servers,
-     treesitter parsers) — gated by the GitHub proxy to *attached* repos
+   - **GitHub release assets** (codediff's prebuilt lib, treesitter parsers)
+     — gated by the GitHub proxy to *attached* repos
      **regardless of network level**, so they may 403. Optional for observing
      most config behavior; attach a specific repo with `add_repo` only if the
      change under test needs it.
@@ -84,7 +84,7 @@ The config lives in the cloned repo. Two env vars point Neovim at it:
 - **`NVIM_APPNAME=nvim-fredrik`** makes Neovim read `~/.config/nvim-fredrik`
   (the symlink created below).
 - **`$DOTFILES`** is the **dotfiles repo root**. The config builds paths from it
-  (Mason lockfile, lint configs, snippets); left unset it falls back to
+  (lint configs, snippets); left unset it falls back to
   `~/.dotfiles`, which doesn't exist in the sandbox, so those lookups silently
   resolve to missing files. Point it at the clone root.
 
@@ -237,11 +237,12 @@ nvim --server "$NVIM" --remote-expr 'luaeval("vim.json.encode(vim.diagnostic.get
 ## Caveats
 
 - **First launch is slow** — plugin cloning is network-bound and serial.
-- **Mason / LSP servers and treesitter parsers are best-effort.** They pull
-  extra tools from GitHub release assets and compile locally; if a change under
-  test doesn't depend on a language server, you don't need them. Failures are
-  logged in `/tmp/nvim-headless.log` and don't prevent the rest of the config
-  loading.
+- **No LSP servers; treesitter parsers are best-effort.** Servers, linters and
+  formatters come from mise (`~/.config/mise`), not the Neovim config, so they
+  are absent unless installed separately; if a change under test doesn't depend
+  on them, you don't need them. Parsers pull from GitHub release assets and
+  compile locally. Failures are logged in `/tmp/nvim-headless.log` and don't
+  prevent the rest of the config loading.
 - **Headless has no UI.** Inspect state via RPC (`vim.diagnostic.get`,
   `vim.lsp.get_clients`, buffer APIs), not by looking at a screen.
 - **Ephemeral.** The install and config live only for this environment's

@@ -27,6 +27,10 @@
   # session therefore has no ambient root-equivalent access.
   security.sudo.wheelNeedsPassword = true;
 
+  # Lets prebuilt glibc binaries (e.g. mise-installed tools) run instead of
+  # hitting stub-ld.
+  programs.nix-ld.enable = true;
+
   # Note: User configuration is handled by lib/users.nix
 
   # System-level packages

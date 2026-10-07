@@ -111,87 +111,65 @@
       formatter.aarch64-linux = stable.aarch64-linux.nixfmt;
       formatter.aarch64-darwin = unstable.aarch64-darwin.nixfmt;
 
-      # Dev shell exposing the shared Neovim toolchain (nix/shared/toolchain.nix)
-      # for use outside Neovim, e.g. `nix develop ~/.dotfiles#dev -c <cmd>`.
       devShells =
         let
-          mkDevShell =
-            system:
-            let
-              channels = {
-                stable = stable.${system};
-                unstable = unstable.${system};
+          mkDevShell = system: {
+            # Entered by direnv (.envrc) for work on this repo itself: the QML
+            # tooling for the hosts' Quickshell trees, which does not belong
+            # in the global mise toolchain. Neovim inherits the env when
+            # launched from a shell in this directory.
+            default =
+              let
+                pkgs = unstable.${system};
+                # Linux-only. Never built on Darwin: the x86_64-linux path
+                # substitutes from cache.nixos.org, and only lib/qt-6/qml
+                # (.qmltypes) is used here. Same nixpkgs as renoir, so the
+                # same store path the ThinkPad runs.
+                quickshell = unstable.x86_64-linux.quickshell;
+                # Every kaizen host runs the one tree in stow/kaizen/.
+                task =
+                  name: text:
+                  pkgs.writeShellScriptBin name ''
+                    set -e
+                    cd "$(git rev-parse --show-toplevel)/stow/kaizen/.config/quickshell"
+                    ${text}
+                  '';
+              in
+              pkgs.mkShell {
+                packages = [
+                  pkgs.qt6.qtdeclarative # qmlls, qmllint, qmlformat, qmltestrunner
+                  (task "qml-lint" "qmllint -E -W 0 $(find . -name '*.qml')")
+                  # Tool defaults; prettier's match conform's flags for JS.
+                  (task "qml-format" ''
+                    dirs=". ../../../../nix/shared/system/kaizen/plugins ../../../../nix/hosts/*/kaizen-plugins"
+                    qmlformat -i $(find $dirs -name '*.qml')
+                    # Prettier cannot parse QML's `.pragma`/`.import` JS.
+                    prettier --log-level warn --write $(grep -LE '^\.(pragma|import)' $(find $dirs -name '*.js'))
+                  '')
+                  pkgs.prettier
+                  (task "qml-test" ''
+                    export QT_QPA_PLATFORM=offscreen QT_QPA_PLATFORMTHEME=
+                    qmltestrunner -input tests
+                    qmltestrunner -input ../../../../nix/shared/system/kaizen/plugins/calendar
+                    qmltestrunner -input ../../../../nix/shared/system/kaizen/plugins/gcloud-auth
+                    qmltestrunner -input ../../../../nix/shared/system/kaizen/plugins/incident-investigator
+                  '')
+                  pkgs.lua
+                ]
+                ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+                  pkgs.niri
+                  pkgs.jq
+                  pkgs.wtype
+                  pkgs.wlrctl
+                  (task "compositor-test" "tests/config_test.sh")
+                  (task "shell-smoke" "tests/shell_smoke.sh \"$@\"")
+                  (task "shell-perf" "tests/shell_perf.sh \"$@\"")
+                ];
+                # qmlls/qmllint/qmltestrunner take import paths from argv or
+                # env only (`-E` reads this); .qmlls.ini has no key for them.
+                QML_IMPORT_PATH = "${quickshell}/lib/qt-6/qml:${pkgs.qt6.qtdeclarative}/lib/qt-6/qml";
               };
-            in
-            {
-              dev = channels.unstable.mkShell {
-                # A devshell has no OS config; every Linux host here is NixOS,
-                # so isLinux stands in for the toolchain's `nixos` flag.
-                packages = import ./nix/shared/toolchain.nix (
-                  channels // { nixos = channels.unstable.stdenv.hostPlatform.isLinux; }
-                );
-                # macOS: Mason binaries are native Mach-O — put them on PATH so
-                # the devshell reaches the same tooling Neovim uses.
-                shellHook = channels.unstable.lib.optionalString channels.unstable.stdenv.hostPlatform.isDarwin ''
-                  export PATH="$HOME/.local/share/nvim-fredrik/mason/bin:$PATH"
-                '';
-              };
-              # Entered by direnv (.envrc) for work on this repo itself: the QML
-              # tooling for the hosts' Quickshell trees, which does not belong
-              # in the toolchain every Neovim carries. Neovim inherits the env
-              # when launched from a shell in this directory.
-              default =
-                let
-                  pkgs = channels.unstable;
-                  # Linux-only. Never built on Darwin: the x86_64-linux path
-                  # substitutes from cache.nixos.org, and only lib/qt-6/qml
-                  # (.qmltypes) is used here. Same nixpkgs as renoir, so the
-                  # same store path the ThinkPad runs.
-                  quickshell = unstable.x86_64-linux.quickshell;
-                  # Every kaizen host runs the one tree in stow/kaizen/.
-                  task =
-                    name: text:
-                    pkgs.writeShellScriptBin name ''
-                      set -e
-                      cd "$(git rev-parse --show-toplevel)/stow/kaizen/.config/quickshell"
-                      ${text}
-                    '';
-                in
-                pkgs.mkShell {
-                  packages = [
-                    pkgs.qt6.qtdeclarative # qmlls, qmllint, qmlformat, qmltestrunner
-                    (task "qml-lint" "qmllint -E -W 0 $(find . -name '*.qml')")
-                    # Tool defaults; prettier's match conform's flags for JS.
-                    (task "qml-format" ''
-                      dirs=". ../../../../nix/shared/system/kaizen/plugins ../../../../nix/hosts/*/kaizen-plugins"
-                      qmlformat -i $(find $dirs -name '*.qml')
-                      # Prettier cannot parse QML's `.pragma`/`.import` JS.
-                      prettier --log-level warn --write $(grep -LE '^\.(pragma|import)' $(find $dirs -name '*.js'))
-                    '')
-                    pkgs.prettier
-                    (task "qml-test" ''
-                      export QT_QPA_PLATFORM=offscreen QT_QPA_PLATFORMTHEME=
-                      qmltestrunner -input tests
-                      qmltestrunner -input ../../../../nix/shared/system/kaizen/plugins/calendar
-                      qmltestrunner -input ../../../../nix/shared/system/kaizen/plugins/gcloud-auth
-                      qmltestrunner -input ../../../../nix/shared/system/kaizen/plugins/incident-investigator
-                    '')
-                    pkgs.lua
-                  ]
-                  ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
-                    pkgs.niri
-                    pkgs.jq
-                    pkgs.wtype
-                    pkgs.wlrctl
-                    (task "compositor-test" "tests/config_test.sh")
-                    (task "shell-smoke" "tests/shell_smoke.sh \"$@\"")
-                    (task "shell-perf" "tests/shell_perf.sh \"$@\"")
-                  ];
-                  # qmlls/qmllint/qmltestrunner take import paths from argv or
-                  # env only (`-E` reads this); .qmlls.ini has no key for them.
-                  QML_IMPORT_PATH = "${quickshell}/lib/qt-6/qml:${pkgs.qt6.qtdeclarative}/lib/qt-6/qml";
-                };
-            };
+          };
         in
         {
           x86_64-linux = mkDevShell "x86_64-linux";

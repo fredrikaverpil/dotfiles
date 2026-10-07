@@ -102,7 +102,7 @@ upstream's latest, and niri marks each option with the version it arrived in
 Run relevant checks **before and after editing**, on the correct platform.
 These are development gates, not CI jobs. They live only in the repository's
 default devshell (`flake.nix`), entered by `direnv` at the repo root or run as
-`nix develop ~/.dotfiles -c <command>` (not `#dev`) from anywhere in the
+`nix develop ~/.dotfiles -c <command>` from anywhere in the
 checkout. `compositor-test` and `shell-smoke` are Linux-only and are absent
 from the shell on macOS. All of them run against the single `stow/kaizen/`
 tree, so a static check passing here passes for every kaizen host.
@@ -202,7 +202,7 @@ tree, so a static check passing here passes for every kaizen host.
 - `qml-lint` fails on any warning. Shadowing an Item member that is public API
   (`palette`, IPC-visible `enabled`) or a lookup on an untyped `Loader.item`
   gets an inline `// qmllint disable <category>`; anything else gets fixed.
-- Use the devshell's pinned Qt tools, not Mason's standalone `qmlls`. Launch
+- Use the devshell's pinned Qt tools, not a standalone `qmlls`. Launch
   Neovim from the repo so it inherits `PATH` and `QML_IMPORT_PATH`. The flake
   supplies both Qt imports and Quickshell metadata; deployed Qt must match the
   pin after updates. `qml-test` clears the GTK platform theme for offscreen SSH.
