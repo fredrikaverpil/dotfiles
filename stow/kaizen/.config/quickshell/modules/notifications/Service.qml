@@ -7,6 +7,7 @@ import Quickshell.Services.Notifications
 import Quickshell.Wayland
 
 import "../../Ui" as Ui
+import "../../Ui/compositors" as Compositors
 import "components"
 import "NotificationLogic.js" as NotificationLogic
 import "NotificationModel.js" as Model
@@ -72,8 +73,12 @@ Item {
         var saved = Model.loadedState(raw, historyLimit);
         if (!saved.valid)
             console.warn("notifications: ignoring invalid saved state");
-        dndSince = saved.doNotDisturb ? saved.dndSince || Date.now() : 0;
-        doNotDisturb = saved.doNotDisturb;
+        // A hold placed before the state loaded keeps DnD on, unless it was saved on.
+        if (saved.doNotDisturb || !dndHolds.length) {
+            dndOwned = false;
+            dndSince = saved.doNotDisturb ? saved.dndSince || Date.now() : 0;
+            doNotDisturb = saved.doNotDisturb;
+        }
         historyRows = saved.history;
         stateLoaded = true;
         remind();
@@ -386,6 +391,11 @@ Item {
     Timer {
         id: reminder
         onTriggered: root.dndOverdue = true
+    }
+
+    Compositors.NiriCasts {
+        id: casts
+        onSharingChanged: root.holdDoNotDisturb("sharing", sharing)
     }
 
     Component.onCompleted: {
