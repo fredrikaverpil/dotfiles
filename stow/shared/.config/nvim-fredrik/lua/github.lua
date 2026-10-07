@@ -7,6 +7,9 @@ M.cache = {
   pr_number = nil,
   --- @type string?
   pr_node_id = nil,
+  --- Commit at the head of the pull request on GitHub.
+  --- @type string?
+  head_oid = nil,
   --- @type string?
   pending_review_node_id = nil,
   --- Database IDs of pending reviews.
@@ -77,7 +80,8 @@ function M.current_pr_number()
   return pr_number
 end
 
---- Fetch the pull request's node ID and pending reviews into the cache.
+--- Fetch the pull request's node ID, head commit and pending reviews into the
+--- cache.
 --- @param pr_number string
 --- @param callback fun()
 --- @param on_error fun(msg: string)
@@ -90,6 +94,7 @@ function M.fetch_reviews(pr_number, callback, on_error)
       repository(owner: $owner, name: $repo) {
         pullRequest(number: $pr) {
           id
+          headRefOid
           reviews(first: 100) {
             nodes { id databaseId state }
           }
@@ -105,6 +110,7 @@ function M.fetch_reviews(pr_number, callback, on_error)
     end
 
     M.cache.pr_node_id = pr.id
+    M.cache.head_oid = pr.headRefOid
 
     local pending = {}
     M.cache.pending_review_node_id = nil
