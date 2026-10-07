@@ -80,14 +80,21 @@ function M.current_pr_number()
   return pr_number
 end
 
+--- @return string owner
+--- @return string repo
+local function repo_ref()
+  local owner = vim.fn.trim(vim.fn.system("gh repo view --json owner --jq .owner.login"))
+  local repo = vim.fn.trim(vim.fn.system("gh repo view --json name --jq .name"))
+  return owner, repo
+end
+
 --- Fetch the pull request's node ID, head commit and pending reviews into the
 --- cache.
 --- @param pr_number string
 --- @param callback fun()
 --- @param on_error fun(msg: string)
 function M.fetch_reviews(pr_number, callback, on_error)
-  local owner = vim.fn.trim(vim.fn.system("gh repo view --json owner --jq .owner.login"))
-  local repo = vim.fn.trim(vim.fn.system("gh repo view --json name --jq .name"))
+  local owner, repo = repo_ref()
 
   local query = [[
     query($owner: String!, $repo: String!, $pr: Int!) {
@@ -122,6 +129,76 @@ function M.fetch_reviews(pr_number, callback, on_error)
     end
     M.cache.pending_review_ids = pending
 
+    callback()
+  end, on_error)
+end
+
+--- Viewed state of every file in the pull request, keyed by path.
+--- @param pr_number string
+--- @param callback fun(states: table<string, "VIEWED"|"UNVIEWED"|"DISMISSED">)
+--- @param on_error fun(msg: string)
+function M.fetch_viewed_files(pr_number, callback, on_error)
+  local owner, repo = repo_ref()
+
+  local query = [[
+    query($owner: String!, $repo: String!, $pr: Int!, $after: String) {
+      repository(owner: $owner, name: $repo) {
+        pullRequest(number: $pr) {
+          files(first: 100, after: $after) {
+            nodes { path viewerViewedState }
+            pageInfo { hasNextPage endCursor }
+          }
+        }
+      }
+    }
+  ]]
+
+  local states = {}
+  local function fetch_page(after)
+    local variables = { owner = owner, repo = repo, pr = tonumber(pr_number), after = after }
+    M.graphql(query, variables, function(data)
+      local files = data.repository and data.repository.pullRequest and data.repository.pullRequest.files
+      if not files then
+        on_error("No files returned for PR #" .. pr_number)
+        return
+      end
+      for _, f in ipairs(files.nodes or {}) do
+        states[f.path] = f.viewerViewedState
+      end
+      if files.pageInfo.hasNextPage then
+        fetch_page(files.pageInfo.endCursor)
+      else
+        callback(states)
+      end
+    end, on_error)
+  end
+  fetch_page(nil)
+end
+
+--- Mark or unmark a pull request file as viewed by the current user.
+--- @param path string
+--- @param viewed boolean
+--- @param callback fun()
+--- @param on_error fun(msg: string)
+function M.set_file_viewed(path, viewed, callback, on_error)
+  if not M.cache.pr_node_id then
+    on_error("No PR data cached — try refreshing first")
+    return
+  end
+
+  local mutation = viewed and "markFileAsViewed" or "unmarkFileAsViewed"
+  local query = string.format(
+    [[
+      mutation($pullRequestId: ID!, $path: String!) {
+        %s(input: { pullRequestId: $pullRequestId, path: $path }) {
+          pullRequest { id }
+        }
+      }
+    ]],
+    mutation
+  )
+
+  M.graphql(query, { pullRequestId = M.cache.pr_node_id, path = path }, function()
     callback()
   end, on_error)
 end
