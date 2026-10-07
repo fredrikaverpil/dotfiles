@@ -47,7 +47,7 @@
   "respondToBashCommands": false,
   "statusLine": {
     "type": "command",
-    "command": "~/code/public/github.com/fredrikaverpil/claudeline/claudeline -debug -effort -cache-expiry=countdown",
+    "command": "~/code/public/github.com/fredrikaverpil/claudeline/claudeline -debug -effort",
     "refreshInterval": 60
   },
   "enabledPlugins": {
