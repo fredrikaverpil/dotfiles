@@ -26,7 +26,8 @@ Stow commands:
   outside Neovim (e.g. Claude Code under Remote Control) and needing them, use
   the devshell: `nix develop ~/.dotfiles#dev -c <cmd>` (or enter with
   `nix develop ~/.dotfiles#dev`). Defined once in `nix/shared/toolchain.nix`,
-  shared by the devshell and Neovim's `nvim-deps-path`.
+  shared by the devshell and Neovim's `nvim-deps-path`. A project's
+  `.mise.toml` overrides individual tools inside Neovim via mise shims.
 
 ## Repository Architecture
 

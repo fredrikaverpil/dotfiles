@@ -53,6 +53,14 @@ else
   exit 1
 fi
 
+# Per-project tool overrides. Shims resolve per directory and fall through to
+# the next binary on PATH when no .mise.toml sets that tool.
+MISE_SHIMS="${MISE_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/mise}/shims"
+if [ -d "$MISE_SHIMS" ]; then
+  # Append so per-project tooling (direnv, devshells) takes precedence
+  export PATH="$PATH:$MISE_SHIMS"
+fi
+
 # Inject Neovim build dependencies (managed by Nix, not on regular PATH)
 NVIM_DEPS_PATH_FILE="$HOME/.config/nvim-deps-path"
 if [ -f "$NVIM_DEPS_PATH_FILE" ]; then

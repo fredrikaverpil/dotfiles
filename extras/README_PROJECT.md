@@ -468,6 +468,24 @@ The tools to install (LSPs, formatters, linters) are listed in
 `Config.mason_extra`. On startup, Mason automatically downloads and installs any
 missing tools.
 
+### Per-project overrides with mise
+
+The `nvim` wrapper appends mise's shims to `PATH`, ahead of the Nix toolchain
+(`nvim-deps-path`). A `.mise.toml` in a project (or a parent directory)
+overrides individual tools inside Neovim, without direnv or `mise activate`:
+
+```toml
+# .mise.toml
+[tools]
+go = "1.24"
+```
+
+Shims resolve the version per working directory, and fall through to the next
+binary on `PATH` when no config sets that tool. Missing versions are installed
+on first use. On NixOS, the downloaded binaries run through nix-ld.
+[`~/.config/mise/config.toml`](../stow/shared/.config/mise/config.toml) holds
+settings only (precompiled binaries, no source builds).
+
 ## LLM setup
 
 ### Claude Code

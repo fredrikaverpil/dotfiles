@@ -102,7 +102,8 @@ in
       bfs
       devbox
       devenv
-      mise
+      # Unstable: the Pi's pinned mise is too old for stow/shared/.config/mise.
+      unstable.mise
       dust
       fd
       gnumake
