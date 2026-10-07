@@ -129,29 +129,34 @@ window or region) along with showing a circular video feed captured from a
 camera. Audio controls are available. `Mod+Print` opens the recording panel or
 stops a running recording; `Mod+Shift+Print` pauses or resumes it.
 
-## Time and place
+## Time and timezone
 
-- The timezone lives in [timedated] (`/etc/localtime`). The timezone service
-  runs `timedatectl set-timezone` with an id from
-  [`ZonesModel.js`](../../stow/kaizen/.config/quickshell/modules/services/timezone/ZonesModel.js)
-  and reads the result back; polkit may prompt. ThinkPads leave `time.timeZone`
-  unset so the choice survives rebuilds; stationary hosts pin it.
-- Zones are IANA ids. tzdata evaluates DST per instant; the Clock panel shows
-  offset, abbreviation, UTC and the next DST change, the last from `zdump`.
-- Zone-aware formatting goes through `date(1)`. Qt's JS engine has no `Intl`
-  and ignores `toLocaleString`'s `timeZone` option.
-- The weather location is a coordinate picked from
-  [`PlacesModel.js`](../../stow/kaizen/.config/quickshell/modules/services/weather/PlacesModel.js)
-  and saved by the shell; the machines have no GNSS. Nightlight takes sunrise
-  and sunset from the same coordinate, so one saved place moves both.
-- After a zone change, restart `quickshell.service` by hand, and any other
-  long-running process that shows local time, such as the calendar plugin's
-  `dcal.service`: glibc caches the parsed tzfile, so a running process keeps
-  the zone it started with. The restart stays manual because the shell must
-  never restart while locked. Removing `/etc/localtime` is not a test; that
-  falls back to UTC, which only looks like a live pickup.
+To be written.
 
-[timedated]: https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.timedate1.html
+## Weather and location
 
-```
-```
+To be written.
+
+## Display settings
+
+To be written.
+
+## Audio controls
+
+To be written.
+
+## Media controls
+
+To be written.
+
+## Bluetooth
+
+To be written.
+
+## Wi-Fi and network
+
+To be written.
+
+## Battery
+
+To be written.
