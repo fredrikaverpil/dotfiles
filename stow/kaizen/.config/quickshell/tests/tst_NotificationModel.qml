@@ -142,6 +142,135 @@ TestCase {
             compare(Notification.dndValue(value), false);
     }
 
+    function test_dnd_hold_data() {
+        return [
+            {
+                tag: "first hold turns DnD on and owns it",
+                state: {
+                    doNotDisturb: false,
+                    holds: [],
+                    owned: false
+                },
+                reason: "recording",
+                on: true,
+                want: {
+                    doNotDisturb: true,
+                    holds: ["recording"],
+                    owned: true
+                }
+            },
+            {
+                tag: "hold leaves DnD set by hand unowned",
+                state: {
+                    doNotDisturb: true,
+                    holds: [],
+                    owned: false
+                },
+                reason: "recording",
+                on: true,
+                want: {
+                    doNotDisturb: true,
+                    holds: ["recording"],
+                    owned: false
+                }
+            },
+            {
+                tag: "second hold keeps ownership",
+                state: {
+                    doNotDisturb: true,
+                    holds: ["recording"],
+                    owned: true
+                },
+                reason: "sharing",
+                on: true,
+                want: {
+                    doNotDisturb: true,
+                    holds: ["recording", "sharing"],
+                    owned: true
+                }
+            },
+            {
+                tag: "repeated hold is held once",
+                state: {
+                    doNotDisturb: true,
+                    holds: ["sharing"],
+                    owned: true
+                },
+                reason: "sharing",
+                on: true,
+                want: {
+                    doNotDisturb: true,
+                    holds: ["sharing"],
+                    owned: true
+                }
+            },
+            {
+                tag: "release with holds left keeps DnD on",
+                state: {
+                    doNotDisturb: true,
+                    holds: ["recording", "sharing"],
+                    owned: true
+                },
+                reason: "recording",
+                on: false,
+                want: {
+                    doNotDisturb: true,
+                    holds: ["sharing"],
+                    owned: true
+                }
+            },
+            {
+                tag: "last release turns owned DnD off",
+                state: {
+                    doNotDisturb: true,
+                    holds: ["sharing"],
+                    owned: true
+                },
+                reason: "sharing",
+                on: false,
+                want: {
+                    doNotDisturb: false,
+                    holds: [],
+                    owned: false
+                }
+            },
+            {
+                tag: "last release leaves unowned DnD on",
+                state: {
+                    doNotDisturb: true,
+                    holds: ["sharing"],
+                    owned: false
+                },
+                reason: "sharing",
+                on: false,
+                want: {
+                    doNotDisturb: true,
+                    holds: [],
+                    owned: false
+                }
+            },
+            {
+                tag: "release without a hold changes nothing",
+                state: {
+                    doNotDisturb: false,
+                    holds: [],
+                    owned: false
+                },
+                reason: "recording",
+                on: false,
+                want: {
+                    doNotDisturb: false,
+                    holds: [],
+                    owned: false
+                }
+            }
+        ];
+    }
+
+    function test_dnd_hold(data) {
+        compare(Notification.dndHold(data.state, data.reason, data.on), data.want);
+    }
+
     function test_popup_selection_steps_wrap_and_follow_removal() {
         const rows = [
             {
