@@ -109,7 +109,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | system | [hwmon], `/proc` load | alert indicator | Settings › Display | `system`, `display` |
 | timezone | [timedated] via `timedatectl`, `zdump` for the DST rules | time button | Settings › Clock | `timezone` |
 | weather | [met.no locationforecast] | button | Settings › Weather | `weather` |
-| notifications | [Desktop Notifications] server | bell button | Settings › Notifications | `notifications` |
+| notifications | [Desktop Notifications] server, [niri] casts for DnD | bell button | Settings › Notifications | `notifications` |
 | lock | [ext-session-lock] + [PAM] `kaizen-lock` | – | Settings › Session | `lock` |
 | curtain | [wlr-layer-shell] + [PAM] | – | Settings › Session | `curtain` |
 | polkit agent | [polkit] | – | dialog on request | – |

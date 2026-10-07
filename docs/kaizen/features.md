@@ -97,8 +97,10 @@ every notification, critical ones included, to the notification history panel.
 The status bar's bell icon blinks when critical notifications arrive or when DnD
 has been active for a longer time.
 
-The screen recording dialog turns it on by default, and turns it off again when
-the recording ends or is cancelled, unless it was already on.
+The screen recording dialog turns it on by default, and so does an app sharing
+the screen through the portal (a PipeWire cast in `niri msg casts`). DnD turns
+off again when the last of them ends, unless it was already on. Toggling DnD by
+hand in the meantime wins: then nothing turns it off afterwards.
 
 ### History
 
