@@ -66,6 +66,7 @@ local function place_signs(bufnr, file_path, side, comments, pending_review_ids)
 
   local line_has_published = {}
   local line_has_pending = {}
+  local line_has_file = {}
   local line_in_range = {}
   for _, c in ipairs(comments) do
     if c.path == file_path and not c.in_reply_to_id then
@@ -74,7 +75,9 @@ local function place_signs(bufnr, file_path, side, comments, pending_review_ids)
         local l = resolve_line(c, comment_side)
         if l then
           local rid = c.pull_request_review_id
-          if rid and pending_review_ids[rid] then
+          if c.on_file then
+            line_has_file[l] = true
+          elseif rid and pending_review_ids[rid] then
             line_has_pending[l] = true
           else
             line_has_published[l] = true
@@ -90,7 +93,8 @@ local function place_signs(bufnr, file_path, side, comments, pending_review_ids)
 
   -- Ranged comments: a bar from the first line down to the icon on the last.
   for line, _ in pairs(line_in_range) do
-    if not line_has_published[line] and not line_has_pending[line] and line >= 1 and line <= line_count then
+    local has_icon = line_has_published[line] or line_has_pending[line] or line_has_file[line]
+    if not has_icon and line >= 1 and line <= line_count then
       vim.api.nvim_buf_set_extmark(bufnr, ns, line - 1, 0, {
         sign_text = "┃",
         sign_hl_group = "DiagnosticInfo",
@@ -104,7 +108,7 @@ local function place_signs(bufnr, file_path, side, comments, pending_review_ids)
     if comment_side == side then
       local line = tonumber(line_str)
       if line and line >= 1 and line <= line_count then
-        local icon = line_has_published[line] and "💬" or "💭"
+        local icon = line_has_published[line] and "💬" or line_has_pending[line] and "💭" or "📄"
         vim.api.nvim_buf_set_extmark(bufnr, ns, line - 1, 0, {
           sign_text = icon,
           sign_hl_group = "DiagnosticInfo",
@@ -239,6 +243,50 @@ local function lines_in_diff(file_path, start_line, end_line, side)
 end
 
 -- --------------------------------------------------------------------------
+-- File-level threads
+-- --------------------------------------------------------------------------
+
+--- Reference to the lines a file-level comment is about, e.g. `L3-L5`.
+local function line_ref(start_line, end_line, side)
+  local ref = start_line == end_line and string.format("L%d", start_line)
+    or string.format("L%d-L%d", start_line, end_line)
+  if side == "LEFT" then
+    ref = ref .. " (original)"
+  end
+  return "`" .. ref .. "`"
+end
+
+--- Lines a comment body opens with, as written by `line_ref`.
+--- @return integer? start_line
+--- @return integer? end_line
+--- @return string? side
+local function parse_line_ref(body)
+  local ref = (body or ""):match("^`(L%d+[^`]*)`: ")
+  if not ref then
+    return nil
+  end
+  local start_line = tonumber(ref:match("^L(%d+)"))
+  local end_line = tonumber(ref:match("^L%d+%-L(%d+)")) or start_line
+  local side = ref:find(" (original)", 1, true) and "LEFT" or "RIGHT"
+  return start_line, end_line, side
+end
+
+--- Give file-level threads a position: the lines their body references, or
+--- line 1 of the new file.
+local function pin_file_threads(comments)
+  for _, c in ipairs(comments) do
+    if c.on_file and not c.in_reply_to_id then
+      local start_line, end_line, side = parse_line_ref(c.body)
+      end_line, side = end_line or 1, side or "RIGHT"
+      c.line, c.original_line, c.side = end_line, end_line, side
+      if start_line ~= end_line then
+        c.start_line, c.original_start_line = start_line, start_line
+      end
+    end
+  end
+end
+
+-- --------------------------------------------------------------------------
 -- GitHub API helpers
 -- --------------------------------------------------------------------------
 
@@ -290,6 +338,7 @@ local function fetch_pr_data(callback)
   fetch_diff_files(pr_number)
 
   local function on_comments(comments)
+    pin_file_threads(comments)
     cached_comments = comments
     state.comments_done = true
     try_finish()
@@ -462,16 +511,6 @@ local function open_comment_popup(title_prefix, file_path, start_line, end_line,
   vim.keymap.set("n", "<C-CR>", submit, vim.tbl_extend("force", opts, { desc = "Submit comment" }))
 end
 
---- Reference to the lines a file-level comment is about, e.g. `L3-L5`.
-local function line_ref(start_line, end_line, side)
-  local ref = start_line == end_line and string.format("L%d", start_line)
-    or string.format("L%d-L%d", start_line, end_line)
-  if side == "LEFT" then
-    ref = ref .. " (original)"
-  end
-  return "`" .. ref .. "`"
-end
-
 --- `on_file` makes a file-level thread, its body prefixed with the lines.
 local function build_thread_variables(file_path, start_line, end_line, side, body, on_file)
   if on_file then
@@ -608,7 +647,9 @@ local function open_thread_viewer(thread_comments, root_id, file_path, side, cur
   local lines = {}
   local function add_comment(c, is_reply)
     local author = c.user or "unknown"
-    local header = is_reply and string.format("**@%s** _(reply)_", author) or string.format("**@%s**", author)
+    local header = is_reply and string.format("**@%s** _(reply)_", author)
+      or c.on_file and string.format("**@%s** _(file)_", author)
+      or string.format("**@%s**", author)
     table.insert(lines, header)
     table.insert(lines, "")
     for _, l in ipairs(vim.split(c.body or "", "\n")) do
