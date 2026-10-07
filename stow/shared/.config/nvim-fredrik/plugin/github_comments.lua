@@ -13,19 +13,22 @@ local cached_diff_files = {}
 -- Sign column: show comment indicators
 -- --------------------------------------------------------------------------
 
+--- Line a comment sits on for `side`. `current`/`original` name the fields to
+--- read, defaulting to the end line.
 --- @return integer?
-local function resolve_line(comment, side)
+local function resolve_line(comment, side, current, original)
+  current, original = current or "line", original or "original_line"
   if side == "LEFT" then
-    local l = comment.original_line
+    local l = comment[original]
     if l and l ~= vim.NIL then
       return l
     end
   end
-  local l = comment.line
+  local l = comment[current]
   if l and l ~= vim.NIL then
     return l
   end
-  local alt = side == "LEFT" and comment.line or comment.original_line
+  local alt = side == "LEFT" and comment[current] or comment[original]
   if alt and alt ~= vim.NIL then
     return alt
   end
@@ -63,6 +66,7 @@ local function place_signs(bufnr, file_path, side, comments, pending_review_ids)
 
   local line_has_published = {}
   local line_has_pending = {}
+  local line_in_range = {}
   for _, c in ipairs(comments) do
     if c.path == file_path and not c.in_reply_to_id then
       local comment_side = c.side or "RIGHT"
@@ -75,8 +79,23 @@ local function place_signs(bufnr, file_path, side, comments, pending_review_ids)
           else
             line_has_published[l] = true
           end
+          local start = resolve_line(c, comment_side, "start_line", "original_start_line")
+          for r = start or l, l - 1 do
+            line_in_range[r] = true
+          end
         end
       end
+    end
+  end
+
+  -- Ranged comments: a bar from the first line down to the icon on the last.
+  for line, _ in pairs(line_in_range) do
+    if not line_has_published[line] and not line_has_pending[line] and line >= 1 and line <= line_count then
+      vim.api.nvim_buf_set_extmark(bufnr, ns, line - 1, 0, {
+        sign_text = "┃",
+        sign_hl_group = "DiagnosticInfo",
+        priority = 1000,
+      })
     end
   end
 

@@ -144,7 +144,8 @@ end
 --- Review comments on the pull request, including the viewer's pending ones.
 ---
 --- Each comment carries its thread's position: `line` is nil once the thread
---- is outdated, and replies point at the thread's first comment.
+--- is outdated, `start_line` is set for ranges, and replies point at the
+--- thread's first comment.
 --- @param pr_number string
 --- @param callback fun(comments: table[])
 --- @param on_error fun(msg: string)
@@ -161,6 +162,8 @@ function M.fetch_review_comments(pr_number, callback, on_error)
               diffSide
               line
               originalLine
+              startLine
+              originalStartLine
               comments(first: 100) {
                 nodes {
                   databaseId
@@ -197,6 +200,8 @@ function M.fetch_review_comments(pr_number, callback, on_error)
             body = c.body,
             line = t.line,
             original_line = t.originalLine,
+            start_line = t.startLine,
+            original_start_line = t.originalStartLine,
             side = nonnull(t.diffSide) or "RIGHT",
             pull_request_review_id = review and review.databaseId,
             in_reply_to_id = root_id,
