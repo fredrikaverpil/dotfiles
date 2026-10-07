@@ -160,3 +160,11 @@ To be written.
 ## Battery
 
 To be written.
+
+## Tray
+
+To be written.
+
+## Plugins
+
+To be written.
