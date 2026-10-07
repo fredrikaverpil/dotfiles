@@ -17,7 +17,7 @@ case "$1" in
 esac
 
 cd "${1:-$HOME/.dotfiles}"
-dir_links=(.config/nvim-fredrik .config/nvim-simple .shell) # in stow/shared
+dir_links=(.config/mise .config/nvim-fredrik .config/nvim-simple .shell) # in stow/shared
 dir_links_re="^($(IFS="|"; echo "${dir_links[*]//./\\.}"))"
 stow_pkg() {
   local cmd=(stow --dir="$1" --target="$HOME" --restow --no-folding --adopt

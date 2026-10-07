@@ -1,0 +1,16 @@
+# Settings only. The Nix toolchain is the base; a project's .mise.toml
+# overrides individual tools in Neovim via the shims the nvim wrapper adds.
+
+[settings]
+# mise defaults to true on NixOS; nix-ld runs the precompiled binaries.
+all_compile = false
+
+# Precompiled only: fail rather than fall back to a slow source build.
+[settings.node]
+compile = false
+
+[settings.python]
+compile = false
+
+[settings.ruby]
+compile = false
