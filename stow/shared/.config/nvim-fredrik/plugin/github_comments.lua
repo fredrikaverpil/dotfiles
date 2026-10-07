@@ -172,7 +172,8 @@ local function get_session_file_path()
   end
 
   -- Standalone mode: the session carries the paths itself.
-  local file_path = relative_path_of(session.original, session.git_root) or relative_path_of(session.modified, session.git_root)
+  local file_path = relative_path_of(session.original, session.git_root)
+    or relative_path_of(session.modified, session.git_root)
   if not file_path then
     return nil
   end
