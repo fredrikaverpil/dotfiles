@@ -462,7 +462,25 @@ local function open_comment_popup(title_prefix, file_path, start_line, end_line,
   vim.keymap.set("n", "<C-CR>", submit, vim.tbl_extend("force", opts, { desc = "Submit comment" }))
 end
 
-local function build_thread_variables(file_path, start_line, end_line, side, body)
+--- Reference to the lines a file-level comment is about, e.g. `L3-L5`.
+local function line_ref(start_line, end_line, side)
+  local ref = start_line == end_line and string.format("L%d", start_line)
+    or string.format("L%d-L%d", start_line, end_line)
+  if side == "LEFT" then
+    ref = ref .. " (original)"
+  end
+  return "`" .. ref .. "`"
+end
+
+--- `on_file` makes a file-level thread, its body prefixed with the lines.
+local function build_thread_variables(file_path, start_line, end_line, side, body, on_file)
+  if on_file then
+    return {
+      path = file_path,
+      body = line_ref(start_line, end_line, side) .. ": " .. body,
+      subjectType = "FILE",
+    }
+  end
   local vars = {
     path = file_path,
     body = body,
@@ -476,17 +494,17 @@ local function build_thread_variables(file_path, start_line, end_line, side, bod
   return vars
 end
 
-local function post_comment(file_path, start_line, end_line, side, body)
+local function post_comment(file_path, start_line, end_line, side, body, on_file)
   if not github.cache.pr_node_id then
     vim.notify("No PR data cached — try refreshing first", vim.log.levels.ERROR)
     return
   end
 
-  local variables = build_thread_variables(file_path, start_line, end_line, side, body)
+  local variables = build_thread_variables(file_path, start_line, end_line, side, body, on_file)
   variables.pullRequestId = github.cache.pr_node_id
 
   local query = [[
-    mutation($pullRequestId: ID!, $path: String!, $body: String!, $line: Int!, $side: DiffSide!, $startSide: DiffSide, $startLine: Int) {
+    mutation($pullRequestId: ID!, $path: String!, $body: String!, $line: Int, $side: DiffSide, $startSide: DiffSide, $startLine: Int, $subjectType: PullRequestReviewThreadSubjectType) {
       addPullRequestReviewThread(input: {
         pullRequestId: $pullRequestId
         path: $path
@@ -495,6 +513,7 @@ local function post_comment(file_path, start_line, end_line, side, body)
         side: $side
         startSide: $startSide
         startLine: $startLine
+        subjectType: $subjectType
       }) {
         thread { id }
       }
@@ -510,11 +529,11 @@ local function post_comment(file_path, start_line, end_line, side, body)
 end
 
 --- Creates a pending review first if none exists, then adds the thread.
-local function post_review_comment(file_path, start_line, end_line, side, body)
-  local variables = build_thread_variables(file_path, start_line, end_line, side, body)
+local function post_review_comment(file_path, start_line, end_line, side, body, on_file)
+  local variables = build_thread_variables(file_path, start_line, end_line, side, body, on_file)
 
   local thread_query = [[
-    mutation($pullRequestReviewId: ID!, $path: String!, $body: String!, $line: Int!, $side: DiffSide!, $startSide: DiffSide, $startLine: Int) {
+    mutation($pullRequestReviewId: ID!, $path: String!, $body: String!, $line: Int, $side: DiffSide, $startSide: DiffSide, $startLine: Int, $subjectType: PullRequestReviewThreadSubjectType) {
       addPullRequestReviewThread(input: {
         pullRequestReviewId: $pullRequestReviewId
         path: $path
@@ -523,6 +542,7 @@ local function post_review_comment(file_path, start_line, end_line, side, body)
         side: $side
         startSide: $startSide
         startLine: $startLine
+        subjectType: $subjectType
       }) {
         thread { id }
       }
@@ -648,6 +668,21 @@ end
 -- Visual mode entry points (called from keymaps)
 -- --------------------------------------------------------------------------
 
+--- Whether to comment on the file instead of the lines, which GitHub only
+--- allows inside the diff's hunks. Nil when cancelled.
+--- @return boolean?
+local function comment_on_file(file_path, start_line, end_line, side)
+  if lines_in_diff(file_path, start_line, end_line, side) then
+    return false
+  end
+  local prompt =
+    string.format("%s is outside the diff. Comment on the file instead?", line_ref(start_line, end_line, side))
+  if vim.fn.confirm(prompt, "&Yes\n&No", 2) ~= 1 then
+    return nil
+  end
+  return true
+end
+
 local function pr_comment()
   local file_path, start_line, end_line, side = get_visual_diff_context()
   if not file_path then
@@ -656,15 +691,13 @@ local function pr_comment()
   ---@cast start_line integer
   ---@cast end_line integer
   ---@cast side string
-  if not lines_in_diff(file_path, start_line, end_line, side) then
-    vim.notify(
-      "Selected lines are outside the diff — GitHub only allows comments on changed lines",
-      vim.log.levels.WARN
-    )
+  local on_file = comment_on_file(file_path, start_line, end_line, side)
+  if on_file == nil then
     return
   end
-  open_comment_popup("PR comment", file_path, start_line, end_line, side, function(body)
-    post_comment(file_path, start_line, end_line, side, body)
+  local title = on_file and "PR comment on file" or "PR comment"
+  open_comment_popup(title, file_path, start_line, end_line, side, function(body)
+    post_comment(file_path, start_line, end_line, side, body, on_file)
   end)
 end
 
@@ -676,15 +709,13 @@ local function pr_review_comment()
   ---@cast start_line integer
   ---@cast end_line integer
   ---@cast side string
-  if not lines_in_diff(file_path, start_line, end_line, side) then
-    vim.notify(
-      "Selected lines are outside the diff — GitHub only allows comments on changed lines",
-      vim.log.levels.WARN
-    )
+  local on_file = comment_on_file(file_path, start_line, end_line, side)
+  if on_file == nil then
     return
   end
-  open_comment_popup("Review comment", file_path, start_line, end_line, side, function(body)
-    post_review_comment(file_path, start_line, end_line, side, body)
+  local title = on_file and "Review comment on file" or "Review comment"
+  open_comment_popup(title, file_path, start_line, end_line, side, function(body)
+    post_review_comment(file_path, start_line, end_line, side, body, on_file)
   end)
 end
 
