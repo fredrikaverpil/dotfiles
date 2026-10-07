@@ -77,3 +77,5 @@ brew update && brew upgrade   # add --greedy to also bump self-updating casks
   - [Maple Mono](https://github.com/subframe7536/maple-font)
   - [Noto Color Emoji](https://fonts.google.com/noto/specimen/Noto+Color+Emoji)
   - [Symbols Nerd Font Mono](https://github.com/ryanoasis/nerd-fonts)
+
+Agent Club demo!
