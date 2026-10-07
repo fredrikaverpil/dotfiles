@@ -526,6 +526,13 @@ local function build_thread_variables(file_path, start_line, end_line, side, bod
   return vars
 end
 
+--- Whether addPullRequestReviewThread made a thread. GitHub answers null, with
+--- no error, for lines it cannot resolve.
+local function thread_created(data)
+  local result = data.addPullRequestReviewThread
+  return type(result) == "table" and type(result.thread) == "table"
+end
+
 local function post_comment(file_path, start_line, end_line, side, body, on_file)
   if not github.cache.pr_node_id then
     vim.notify("No PR data cached — try refreshing first", vim.log.levels.ERROR)
@@ -552,7 +559,11 @@ local function post_comment(file_path, start_line, end_line, side, body, on_file
     }
   ]]
 
-  github.graphql(query, variables, function()
+  github.graphql(query, variables, function(data)
+    if not thread_created(data) then
+      vim.notify("Failed to post PR comment: GitHub created no thread", vim.log.levels.ERROR)
+      return
+    end
     vim.notify(string.format("PR comment posted on %s:%d-%d", file_path, start_line, end_line), vim.log.levels.INFO)
     refresh()
   end, function(err)
@@ -583,7 +594,11 @@ local function post_review_comment(file_path, start_line, end_line, side, body, 
 
   local function add_thread(review_node_id, is_new_review)
     variables.pullRequestReviewId = review_node_id
-    github.graphql(thread_query, variables, function()
+    github.graphql(thread_query, variables, function(data)
+      if not thread_created(data) then
+        vim.notify("Failed to add review thread: GitHub created no thread", vim.log.levels.ERROR)
+        return
+      end
       local msg = is_new_review and string.format("Review started on %s:%d-%d", file_path, start_line, end_line)
         or string.format("Review comment added to review on %s:%d-%d", file_path, start_line, end_line)
       vim.notify(msg, vim.log.levels.INFO)
