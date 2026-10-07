@@ -11,10 +11,10 @@
   ],
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-6-astra",
-  "lastChangelogVersion": "1.0.0",
+  "lastChangelogVersion": "1.0.2",
   "packages": [
     "npm:pi-system-theme"
   ],
-  "theme": "light",
+  "theme": "dark",
   "defaultThinkingLevel": "xhigh"
 }
