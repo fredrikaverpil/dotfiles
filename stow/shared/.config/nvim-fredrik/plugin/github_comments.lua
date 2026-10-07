@@ -743,6 +743,6 @@ require("lazyload").on_vim_enter(function()
   })
 end)
 
-vim.keymap.set("v", "<leader>gdc", pr_comment, { desc = "Post PR comment" })
-vim.keymap.set("v", "<leader>gdC", pr_review_comment, { desc = "Add review comment" })
+vim.keymap.set({ "n", "v" }, "<leader>gdc", pr_review_comment, { desc = "Add review comment" })
+vim.keymap.set({ "n", "v" }, "<leader>gdC", pr_comment, { desc = "Post PR comment" })
 vim.keymap.set("n", "<leader>gdv", view_thread, { desc = "View PR thread" })
