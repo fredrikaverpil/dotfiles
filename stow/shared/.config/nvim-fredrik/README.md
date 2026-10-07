@@ -31,8 +31,9 @@ keymaps and custom behaviors.
 
 Core plugin files (`plugin/*.lua`) each own **all** of their tool's
 configuration inline: `conform.lua` lists every formatter, `lint.lua` every
-linter, `lsp.lua` every server, `mason.lua` every tool, and so on. To see or
-change a tool's setup you open that one file.
+linter, `lsp.lua` every server, and so on. To see or change a tool's setup you
+open that one file. The tools themselves are installed by mise
+(`stow/shared/.config/mise/config.toml`), outside this config.
 
 Language files (`plugin/lang/*.lua`) hold only what is genuinely
 language-specific and cannot live in a shared plugin file: extra
@@ -122,35 +123,42 @@ Place a `.nvim.lua` in the the `$cwd` or above it. It runs at step 7c of
 [initialization](https://neovim.io/doc/user/starting/#_initialization) —
 **before** `plugin/` files (`:h exrc`).
 
+Tools only needed in some projects (or other versions of global ones) go in a
+`.mise.toml` in that directory or above it; mise shims pick it up per
+directory, after `mise trust`.
+
 Example:
+
+```toml
+# ~/code/private/<workplace>/.mise.toml
+#
+# mdformat with the plugins pinned by einride/sage
+# (tools/sgmdformat/requirements.txt) in the mdformat venv
+[tools."pipx:mdformat"]
+version = "latest"
+uvx_args = """\
+  --with mdformat-gfm==1.0.0 \
+  --with mdformat-admon==2.1.1 \
+  --with mdformat-front-matters==2.0.0"""
+```
 
 ```lua
 -- ~/code/private/<workplace>/.nvim.lua
---
--- install mdformat via mason, with the plugins pinned by einride/sage
--- (tools/sgmdformat/requirements.txt) in the mdformat venv
-Config.mason_extra = {
-    mason = { "mdformat" },
-    mason_pip = {
-        mdformat = {
-            "mdformat-gfm==1.0.0",
-            "mdformat-admon==2.1.1",
-            "mdformat-front-matters==2.0.0",
-        },
-    },
-}
-
 require("lazyload").on_override(function()
     -- Override markdown formatter.
-    -- Prefer the mason mdformat (it carries the pip extras pinned above);
-    -- inside sage projects .sage/bin is ahead on $PATH and shadows it with a
-    -- shim whose venv can break (e.g. Homebrew python upgrades), so resolve the
-    -- mason binary explicitly. Fall back to $PATH mdformat when mason has none.
+    -- Prefer the mise mdformat (it carries the plugins pinned above); inside
+    -- sage projects .sage/bin is ahead on $PATH and shadows it with a shim
+    -- whose venv can break (e.g. Homebrew python upgrades), so resolve the mise
+    -- shim explicitly. Fall back to $PATH mdformat when there is no shim. The
+    -- shim resolves .mise.toml from cwd, so run it from the file's directory.
     require("conform").formatters_by_ft.markdown = { "mdformat" }
     require("conform").formatters.mdformat = {
         command = function()
-            local mason_bin = vim.fn.stdpath("data") .. "/mason/bin/mdformat"
-            return vim.uv.fs_stat(mason_bin) and mason_bin or "mdformat"
+            local shim = vim.fs.normalize("~/.local/share/mise/shims/mdformat")
+            return vim.uv.fs_stat(shim) and shim or "mdformat"
+        end,
+        cwd = function(_, ctx)
+            return ctx.dirname
         end,
         prepend_args = { "--number", "--wrap", "80" },
     }
@@ -190,9 +198,8 @@ file. To add a language, edit the files for the tools it needs (all are plain
 literal tables, so you see the whole picture for a tool in one place):
 
 - **LSP**: add the server name to the `servers` list in `plugin/lsp.lua`.
-- **Mason** (macOS): add the tool(s) to `ensure_installed` in
-  `plugin/mason.lua`. On NixOS Mason is disabled; add the nixpkgs equivalent
-  to the Linux list in `nix/shared/toolchain.nix` instead.
+- **Install**: add the tool(s) to `[tools]` in
+  `stow/shared/.config/mise/config.toml`, then `mise install`.
 - **Formatting**: add `formatters_by_ft` (and any per-formatter config) in
   `plugin/conform.lua`.
 - **Linting**: add `linters_by_ft` (and any per-linter config) in
@@ -221,6 +228,5 @@ For concerns that don't belong in a shared plugin file:
 - **LSP server config**: add `after/lsp/<server>.lua` to override the
   nvim-lspconfig base config.
 
-Project-local additions (a Mason tool / pip extras only needed in one repo) go
-through `Config.mason_extra` in a `.nvim.lua` — see
-[Per-project overrides](#per-project-overrides).
+Project-local additions (a tool only needed in one repo) go in a `.mise.toml`
+— see [Per-project overrides](#per-project-overrides).

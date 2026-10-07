@@ -24,13 +24,13 @@ direnv (.envrc)   Per-directory env vars, Nix dev shells, tool activation
     ↓
 Project tools     nix / devbox / devenv / mise / pkgx — project-specific CLI versions
     ↓
-Editor (Neovim)   Mason — LSPs, linters, formatters, debug adapters
+Editor (Neovim)   mise shims — runtimes, LSPs, linters, formatters, debug adapters
 ```
 
 Later layers override earlier ones. For example, a project's `.envrc` can
 activate a Nix dev shell that shadows a home-manager-installed Go with a
-project-pinned version, and Mason's `PATH = "append"` ensures those
-project-local tools take precedence inside Neovim too.
+project-pinned version, and the `nvim` wrapper appends the mise shims to
+`PATH`, so those project-local tools take precedence inside Neovim too.
 
 ### Shell initialization
 
@@ -453,20 +453,17 @@ Then use `pkgs-python39.python39` in your packages list.
 
 ## Editor tooling (Neovim)
 
-LSPs, linters, formatters, and debug adapters used inside Neovim are managed by
-[Mason](https://github.com/mason-org/mason.nvim), configured in
-[`stow/shared/.config/nvim-fredrik/plugin/mason.lua`](../stow/shared/.config/nvim-fredrik/plugin/mason.lua).
-Mason installs tools into its own isolated location
-(`~/.local/share/nvim-fredrik/mason/bin/`), separate from the shell environment.
+Language runtimes and the LSPs, linters, formatters, and debug adapters used
+inside Neovim are managed by [mise](https://mise.jdx.dev), configured in
+[`stow/shared/.config/mise/config.toml`](../stow/shared/.config/mise/config.toml)
+and pinned in `mise.lock` next to it. Install with `mise install`, bump with
+`mise upgrade`.
 
-Mason's `PATH` is set to `"append"`, meaning project-local tools (from Nix,
-mise, etc.) take precedence over Mason-installed versions. This lets per-project
-tooling override editor defaults automatically.
-
-The tools to install (LSPs, formatters, linters) are listed in
-`ensure_installed` in that file, and a project's `.nvim.lua` can add more via
-`Config.mason_extra`. On startup, Mason automatically downloads and installs any
-missing tools.
+They are not on the shell `PATH`: the
+[`nvim`](../stow/shared/.shell/bin/nvim) wrapper appends the mise shims, so
+project-local tools (from Nix, direnv, etc.) take precedence. Shims resolve per
+directory, so a project's `.mise.toml` overrides individual tools (after
+`mise trust`). Outside Neovim, use `mise exec -- <cmd>`.
 
 ## LLM setup
 
