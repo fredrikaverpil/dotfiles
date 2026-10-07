@@ -371,18 +371,17 @@ end
 -- Thread helpers
 -- --------------------------------------------------------------------------
 
---- Returns the root comment and replies at the cursor position, plus context.
---- When multiple root comments exist on the same line, the first is used.
---- @return table? root
---- @return table[] replies
+--- Threads at the cursor position, each its root comment followed by the
+--- replies, plus context.
+--- @return table[][] threads
 --- @return string? file_path
 --- @return string? side
 --- @return integer? cursor_line
-local function get_thread_at_cursor()
+local function get_threads_at_cursor()
   local cursor_line = vim.fn.line(".")
   local file_path, session = get_session_file_path()
   if not file_path or not session then
-    return nil, {}, nil, nil, nil
+    return {}, nil, nil, nil
   end
 
   local current_buf = vim.api.nvim_get_current_buf()
@@ -392,35 +391,29 @@ local function get_thread_at_cursor()
   elseif current_buf == session.modified_bufnr then
     side = "RIGHT"
   else
-    return nil, {}, nil, nil, nil
+    return {}, nil, nil, nil
   end
 
-  local root = nil
-  for _, c in ipairs(cached_comments) do
-    if c.path == file_path and not c.in_reply_to_id then
-      local comment_side = c.side or "RIGHT"
-      if comment_side == side and resolve_line(c, comment_side) == cursor_line then
-        root = c
-        break
+  local threads = {}
+  for _, root in ipairs(cached_comments) do
+    if root.path == file_path and not root.in_reply_to_id then
+      local comment_side = root.side or "RIGHT"
+      if comment_side == side and resolve_line(root, comment_side) == cursor_line then
+        local replies = {}
+        for _, c in ipairs(cached_comments) do
+          if c.in_reply_to_id == root.id then
+            table.insert(replies, c)
+          end
+        end
+        table.sort(replies, function(a, b)
+          return a.id < b.id
+        end)
+        table.insert(threads, vim.list_extend({ root }, replies))
       end
     end
   end
 
-  if not root then
-    return nil, {}, file_path, side, cursor_line
-  end
-
-  local replies = {}
-  for _, c in ipairs(cached_comments) do
-    if c.in_reply_to_id == root.id then
-      table.insert(replies, c)
-    end
-  end
-  table.sort(replies, function(a, b)
-    return a.id < b.id
-  end)
-
-  return root, replies, file_path, side, cursor_line
+  return threads, file_path, side, cursor_line
 end
 
 -- --------------------------------------------------------------------------
@@ -639,7 +632,8 @@ local function post_reply(root_comment_id, body)
   vim.fn.chanclose(job_id, "stdin")
 end
 
-local function open_thread_viewer(thread_comments, root_id, file_path, side, cursor_line)
+--- @param threads table[][] each a root comment followed by its replies
+local function open_thread_viewer(threads, file_path, side, cursor_line)
   local buf = vim.api.nvim_create_buf(false, true)
   vim.bo[buf].filetype = "markdown"
   vim.bo[buf].bufhidden = "wipe"
@@ -657,12 +651,24 @@ local function open_thread_viewer(thread_comments, root_id, file_path, side, cur
     end
   end
 
-  add_comment(thread_comments[1], false)
-  for i = 2, #thread_comments do
-    table.insert(lines, "")
-    table.insert(lines, "---")
-    table.insert(lines, "")
-    add_comment(thread_comments[i], true)
+  -- First buffer line of each thread, for replying to the one at the cursor.
+  local thread_starts = {}
+  for t, thread_comments in ipairs(threads) do
+    if t > 1 then
+      table.insert(lines, "")
+    end
+    thread_starts[t] = #lines + 1
+    if #threads > 1 then
+      table.insert(lines, string.format("# Thread %d/%d", t, #threads))
+      table.insert(lines, "")
+    end
+    add_comment(thread_comments[1], false)
+    for i = 2, #thread_comments do
+      table.insert(lines, "")
+      table.insert(lines, "---")
+      table.insert(lines, "")
+      add_comment(thread_comments[i], true)
+    end
   end
 
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
@@ -678,7 +684,7 @@ local function open_thread_viewer(thread_comments, root_id, file_path, side, cur
     row = math.floor((vim.o.lines - height) / 2),
     style = "minimal",
     border = "rounded",
-    title = string.format(" Thread: %s:%d (%s) ", file_path, cursor_line, side),
+    title = string.format(" %s: %s:%d (%s) ", #threads > 1 and "Threads" or "Thread", file_path, cursor_line, side),
     title_pos = "center",
     footer = " r: reply  q: close ",
     footer_pos = "center",
@@ -698,6 +704,13 @@ local function open_thread_viewer(thread_comments, root_id, file_path, side, cur
   vim.keymap.set("n", "q", close, vim.tbl_extend("force", opts, { desc = "Close thread viewer" }))
   vim.keymap.set("n", "<Esc>", close, vim.tbl_extend("force", opts, { desc = "Close thread viewer" }))
   vim.keymap.set("n", "r", function()
+    local row = vim.fn.line(".")
+    local root_id = threads[1][1].id
+    for t, start in ipairs(thread_starts) do
+      if row >= start then
+        root_id = threads[t][1].id
+      end
+    end
     close()
     open_comment_popup("Reply", file_path, cursor_line, cursor_line, side, function(body)
       post_reply(root_id, body)
@@ -761,8 +774,8 @@ local function pr_review_comment()
 end
 
 local function view_thread()
-  local root, replies, file_path, side, cursor_line = get_thread_at_cursor()
-  if not root then
+  local threads, file_path, side, cursor_line = get_threads_at_cursor()
+  if #threads == 0 then
     vim.notify("No PR thread at cursor", vim.log.levels.WARN)
     return
   end
@@ -770,12 +783,7 @@ local function view_thread()
   ---@cast side string
   ---@cast cursor_line integer
 
-  local thread_comments = { root }
-  for _, r in ipairs(replies) do
-    table.insert(thread_comments, r)
-  end
-
-  open_thread_viewer(thread_comments, root.id, file_path, side, cursor_line)
+  open_thread_viewer(threads, file_path, side, cursor_line)
 end
 
 -- --------------------------------------------------------------------------
