@@ -1,0 +1,87 @@
+# Global toolchain: language runtimes and the LSPs/linters/formatters/debug
+# adapters Neovim uses. The nvim wrapper appends the shims to PATH, so a
+# project's own mise.toml (or direnv, devshell) overrides per tool. Outside
+# Neovim: `mise exec -- <cmd>`. Versions are pinned in mise.lock; bump with
+# `mise upgrade`.
+#
+# Not here (Nix, see nix/shared/home/common.nix): gcc, cmake, lua 5.1,
+# luarocks, nixfmt, nil.
+
+[settings]
+lockfile = true
+# mise defaults to true on NixOS; nix-ld runs the precompiled binaries.
+all_compile = false
+
+# Precompiled only: fail rather than fall back to a slow source build.
+[settings.node]
+compile = false
+
+[settings.python]
+compile = false
+
+[settings.ruby]
+compile = false
+
+[tools]
+# Runtimes
+go = "latest"
+node = "lts"
+python = "latest"
+ruby = "latest"
+rust = "stable" # rustup; `mise upgrade rust` for latest rustc, cargo etc.
+tree-sitter = "latest"
+
+# Kept alphabetical; the trailing comment is the language/tool that needs it.
+actionlint = "latest" # yaml (github actions)
+"github:googleapis/api-linter" = "latest" # protobuf
+"npm:basedpyright" = "latest" # python
+"npm:bash-language-server" = "latest" # bash
+biome = "latest" # json
+buf = "latest" # protobuf
+"pipx:debugpy" = "latest" # python
+"go:github.com/go-delve/delve/cmd/dlv" = "latest" # go
+"npm:dockerfile-language-server-nodejs" = "latest" # docker
+"go:github.com/daixiang0/gci" = "latest" # go
+gofumpt = "latest" # go (golines runs it as --base-formatter)
+"go:golang.org/x/tools/cmd/goimports" = "latest" # go
+golangci-lint = "latest" # go
+golines = "latest" # go
+"go:golang.org/x/tools/gopls" = "latest" # go
+gotestsum = "latest" # go (neotest)
+"npm:graphql-language-service-cli" = "latest" # graphql
+hadolint = "latest" # docker
+"go:github.com/josharian/impl" = "latest" # go (go-impl.nvim)
+"npm:vscode-langservers-extracted" = "latest" # json (json-lsp)
+lua-language-server = "latest" # lua
+"npm:markdownlint-cli" = "latest" # markdown
+"pipx:mypy" = "latest" # python
+prettier = "latest" # typescript/javascript
+protolint = "latest" # protobuf
+ruff = "latest" # python
+rumdl = "latest" # markdown
+rust-analyzer = "latest" # rust
+shellcheck = "latest" # bash (bashls runs it itself; not a nvim-lint linter)
+shfmt = "latest" # bash
+stylua = "latest" # lua
+superhtml = "latest" # html
+taplo = "latest" # toml
+"github:a-h/templ" = "latest" # templ
+terraform-ls = "latest" # terraform
+tflint = "latest" # terraform
+"github:ribru17/ts_query_ls" = "latest" # query
+"npm:@vtsls/language-server" = "latest" # typescript
+"npm:yaml-language-server" = "latest" # yaml
+yamlfmt = "latest" # yaml
+yamllint = "latest" # yaml
+zls = "latest" # zig
+
+# rust (DAP); ships only as .vsix (zip)
+[tools."github:vadimcn/codelldb"]
+version = "latest"
+format = "zip"
+bin_path = "extension/adapter"
+
+[tools."github:vadimcn/codelldb".platforms]
+linux-arm64 = { asset_pattern = "codelldb-linux-arm64.vsix" }
+linux-x64 = { asset_pattern = "codelldb-linux-x64.vsix" }
+macos-arm64 = { asset_pattern = "codelldb-darwin-arm64.vsix" }
