@@ -20,13 +20,12 @@ Stow commands:
   nix/hosts/wily/einride` first when a change could interact with it
 - **Format Nix files**: `nix fmt` (uses nixfmt-rfc-style)
 - **CI testing**: Follow `.github/workflows/test.yml` workflow
-- **Toolchain outside Neovim**: language toolchains (go, python3, node, ruby,
-  rustup, elixir, tree-sitter, ...) are NOT on the base PATH —
-  `stow/shared/.shell/bin/nvim` injects them into Neovim only. When running
-  outside Neovim (e.g. Claude Code under Remote Control) and needing them, use
-  the devshell: `nix develop ~/.dotfiles#dev -c <cmd>` (or enter with
-  `nix develop ~/.dotfiles#dev`). Defined once in `nix/shared/toolchain.nix`,
-  shared by the devshell and Neovim's `nvim-deps-path`.
+- **Toolchain outside Neovim**: language toolchains and editor tooling (go,
+  python, node, ruby, rust, tree-sitter, LSPs, linters, formatters, ...) come
+  from mise (`stow/shared/.config/mise/config.toml`, pinned in `mise.lock`)
+  and are NOT on the base PATH — `stow/shared/.shell/bin/nvim` appends the
+  mise shims for Neovim only. When running outside Neovim (e.g. Claude Code
+  under Remote Control) and needing them, use `mise exec -- <cmd>`.
 
 ## Repository Architecture
 
@@ -50,17 +49,16 @@ Stow commands:
   follow another nixpkgs — it is built/cached against its own pin
   (cache.numtide.com)
 - **No curl|bash installers in activation**: AI/agent CLIs must come from
-  llm-agents (patched, cached), not native installers. Prebuilt glibc
-  binaries cannot run on NixOS (stub-ld), and install-if-missing activation
-  scripts make rebuilds depend on third-party servers.
+  llm-agents (patched, cached), not native installers. Install-if-missing
+  activation scripts make rebuilds depend on third-party servers.
 
 ### CLI tools outside nixpkgs
 
-There is no mechanism for installing CLI tools with a language package manager
-(npm, uv, ...) — a tool must come from nixpkgs or the `llm-agents` flake.
-Wheels and prebuilt npm binaries are glibc-linked and fail to load on NixOS
-(`libstdc++.so.6: cannot open shared object file`). For a one-off run, use
-`npx <pkg>` or `uvx <pkg>` from a shell instead of installing.
+Shell CLI tools come from nixpkgs or the `llm-agents` flake. The exception is
+the language/editor toolchain, which mise installs (see Toolchain outside
+Neovim above) — add tools there, never as global npm/uv installs. Prebuilt
+glibc binaries run on NixOS through nix-ld. For a one-off run, use `npx <pkg>`
+or `uvx <pkg>` from a shell instead of installing.
 
 ### niri + Quickshell desktop (ThinkPads)
 

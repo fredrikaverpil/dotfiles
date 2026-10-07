@@ -4,11 +4,9 @@
   lib,
   pkgs,
   inputs,
-  osConfig ? { },
   ...
 }:
 let
-  stable = inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system};
   unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
 in
 {
@@ -155,22 +153,20 @@ in
       #       infocmp -x xterm-ghostty | ssh <host> 'tic -x -o "$HOME/.terminfo" -'
     ];
 
-    # Tooling available only in Neovim.
-    # Written to a file so the nvim wrapper can inject them into PATH at launch,
-    # keeping these tools off the regular shell PATH. The shared toolchain (also
-    # the `dev` devshell in flake.nix) is imported so Neovim and the devshell
-    # resolve to identical store paths; the extras below are Neovim-only.
+    # Tooling available only in Neovim, for what mise
+    # (stow/shared/.config/mise) does not provide.
+    # Written to a file so the nvim wrapper can inject them into PATH at launch
+    # (after the mise shims), keeping these tools off the regular shell PATH.
     home.file.".config/nvim-deps-path".text = lib.makeBinPath (
-      (import ../toolchain.nix {
-        inherit stable unstable;
-        nixos = osConfig ? system.nixos; # absent under nix-darwin
-      })
-      ++ (with unstable; [
-        cmake # Neovim's injected PATH has no stdenv cc (devshell gets it from stdenv)
+      with unstable;
+      [
+        cmake # Neovim's injected PATH has no stdenv cc
         gcc
         lua51Packages.lua # Neovim requires Lua 5.1
         lua51Packages.luarocks # Neovim requires Lua 5.1
-      ])
+        nil # nix; not in mise's registry
+        nixfmt # nix; not in mise's registry
+      ]
     );
 
     # Writes ~/.config/direnv/direnvrc sourcing nix-direnv by store path, so
