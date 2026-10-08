@@ -14,3 +14,6 @@ font-variation-italic = wght=400
 
 # Default toggles fullscreen; let ctrl+enter reach the app.
 keybind = ctrl+enter=unbind
+
+# window-title-font-family does not reach the libadwaita tab bar.
+gtk-custom-css = tabs.css
