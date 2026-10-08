@@ -19,11 +19,11 @@ in
     (pkgs.makeDesktopItem {
       name = "hello-tray";
       desktopName = "Hello tray";
-      exec = "systemctl --user start hello-tray.service";
+      exec = "systemctl --user start kaizen-hello-tray.service";
     })
   ];
 
-  systemd.user.services.hello-tray = {
+  systemd.user.services.kaizen-hello-tray = {
     description = "Hello tray plugin";
     partOf = [ "graphical-session.target" ];
     # The shell hosts the StatusNotifierWatcher it registers with.
