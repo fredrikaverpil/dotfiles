@@ -221,6 +221,12 @@ require("lazyload").on_vim_enter(function()
 
   -- go: golangcilint with cwd at the nearest go.mod (handles nested modules)
   do
+    -- Lint the package dir; nvim-lint picks file vs dir once from nvim's cwd.
+    local golangcilint = lint.linters.golangcilint
+    golangcilint.args[#golangcilint.args] = function()
+      return vim.fn.expand("%:p:h")
+    end
+
     local go_mod_dir_cache = {}
 
     local function go_mod_dir()
