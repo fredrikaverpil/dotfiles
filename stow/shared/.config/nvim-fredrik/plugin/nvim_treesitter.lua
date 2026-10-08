@@ -1,3 +1,6 @@
+-- Synchronous treesitter parsing, so buffers are highlighted on first redraw.
+vim.g._ts_force_sync_parsing = true
+
 if Config.use_nvim_treesitter then
   require("lazyload").on_vim_enter(function()
     vim.api.nvim_create_autocmd("PackChanged", {
