@@ -27,7 +27,7 @@ in
     description = "Hello tray plugin";
     partOf = [ "graphical-session.target" ];
     # The shell hosts the StatusNotifierWatcher it registers with.
-    after = [ "quickshell.service" ];
+    after = [ "kaizen-shell.service" ];
     wantedBy = lib.optional autostart "wayland-session@niri.target";
     serviceConfig = {
       ExecStart = lib.getExe hello-tray;

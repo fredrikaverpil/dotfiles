@@ -78,9 +78,8 @@ upstream's latest, and niri marks each option with the version it arrived in
   It carries only what you pass, so copy the summary and body from a captured
   one.
 - User units are named `kaizen-<name>`, plugin daemons included
-  (`kaizen-dcal`); `quickshell.service` is the exception. Units that must stay
-  out of a non-kaizen session are listed in `kaizen_units`
-  (`stow/shared/.shell/sourcing.sh`).
+  (`kaizen-dcal`). Units that must stay out of a non-kaizen session are listed
+  in `kaizen_units` (`stow/shared/.shell/sourcing.sh`).
 - Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Niri KDL booleans are presence-only, not `option true`.
 - Use `keyNavigation` for ordinary focus chains; use a panel-managed cursor
@@ -275,7 +274,7 @@ ssh fredrik@<host> 'cd ~/.dotfiles && git add -AN .'
 unlocked shell after deployment rather than relying on its watcher:
 
 ```sh
-systemctl --user restart quickshell.service
+systemctl --user restart kaizen-shell.service
 ```
 
 For ordinary `qs ipc` and compositor commands over SSH, provide the active

@@ -354,7 +354,7 @@ in
     # Marks a kaizen host; dotfiles-stow stows stow/kaizen/ where it exists.
     environment.etc.kaizen.text = "";
 
-    systemd.user.services.quickshell = {
+    systemd.user.services.kaizen-shell = {
       description = "Quickshell desktop shell";
       partOf = [ "graphical-session.target" ];
       # Never order after graphical-session.target: that creates a systemd cycle.
@@ -387,7 +387,7 @@ in
     # Holds XDG autostart apps (UWSM orders them after this target) until the tray's
     # StatusNotifierWatcher is up; Electron apps look for it once and never retry.
     # The shell registers it once its config loads, which waits for xdg-desktop-portal,
-    # itself ordered after graphical-session.target: waiting in quickshell.service would deadlock.
+    # itself ordered after graphical-session.target: waiting in kaizen-shell.service would deadlock.
     systemd.user.services.kaizen-tray-ready = {
       description = "Wait for the Quickshell tray";
       before = [ "wayland-session-xdg-autostart@niri.target" ];

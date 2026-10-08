@@ -10,8 +10,8 @@ case "${1-}" in
     ;;
 esac
 
-systemctl --user is-active --quiet quickshell.service
-pid=$(systemctl --user show quickshell.service --property=MainPID --value)
+systemctl --user is-active --quiet kaizen-shell.service
+pid=$(systemctl --user show kaizen-shell.service --property=MainPID --value)
 [[ "$pid" -gt 0 ]]
 
 # Select the running service, not an arbitrary test instance or display. This
@@ -68,9 +68,9 @@ if [[ "${1-}" == --panels ]]; then
   printf 'PASS: live display query and bindings\n'
 fi
 
-started=$(systemctl --user show quickshell.service --property=ActiveEnterTimestamp --value)
+started=$(systemctl --user show kaizen-shell.service --property=ActiveEnterTimestamp --value)
 # Quickshell can embed ANSI colours in journal messages, including the level.
-log=$(journalctl --user -u quickshell.service --since "$started" --no-pager -o cat |
+log=$(journalctl --user -u kaizen-shell.service --since "$started" --no-pager -o cat |
   jq -Rr 'gsub("\u001b\\[[0-9;]*m"; "")')
 if grep -E '(^|[[:space:]])(ERROR|FATAL):|ReferenceError:|TypeError:|SyntaxError:|Failed to load configuration' <<<"$log"; then
   printf 'FAIL: Quickshell runtime errors since service start\n' >&2

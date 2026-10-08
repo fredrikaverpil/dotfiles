@@ -25,7 +25,7 @@
     partOf = [ "graphical-session.target" ];
     after = [
       "dbus.socket"
-      "quickshell.service"
+      "kaizen-shell.service"
       "wayland-wm@niri.service"
       "wayland-session-waitenv.service"
     ];
