@@ -77,6 +77,10 @@ upstream's latest, and niri marks each option with the version it arrived in
   `notify-send -a Slack "[workspace] in #alerts" "<https://example.com|View>"`.
   It carries only what you pass, so copy the summary and body from a captured
   one.
+- User units are named `kaizen-<name>`, plugin daemons included
+  (`kaizen-dcal`); `quickshell.service` is the exception. Units that must stay
+  out of a non-kaizen session are listed in `kaizen_units`
+  (`stow/shared/.shell/sourcing.sh`).
 - Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Niri KDL booleans are presence-only, not `option true`.
 - Use `keyNavigation` for ordinary focus chains; use a panel-managed cursor
