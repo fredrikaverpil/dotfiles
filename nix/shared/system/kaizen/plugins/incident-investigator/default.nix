@@ -142,7 +142,7 @@ in
     environment.systemPackages = [ investigate ];
 
     # Owns the runs, so a shell reload or crash does not stop an investigation.
-    systemd.user.services.incident-investigator = {
+    systemd.user.services.kaizen-incident-investigator = {
       description = "Incident investigator runs";
       partOf = [ "graphical-session.target" ];
       wantedBy = [ "wayland-session@niri.target" ];
