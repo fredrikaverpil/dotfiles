@@ -79,7 +79,7 @@ place, live on save: the compositor config and the shell's QML.
   exists. So [`stow/kaizen/`](../../stow/kaizen/) reaches every kaizen host or
   none, and a plugin keeps its QML beside its Nix module instead. The module
   lists its directory in `host.kaizenPlugins`, read in place from the checkout.
-- Nix hands the shell values only through `quickshell.service`'s environment
+- Nix hands the shell values only through `kaizen-shell.service`'s environment
   (`KAIZEN_PLUGINS`, `KAIZEN_NOTIFICATION_RULES`, `KAIZEN_EMOJI`).
 - Apps are not kaizen's: [`nix/README.md`](../../nix/README.md) says where they
   go.
@@ -191,7 +191,7 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 ```
 TTY login ─ kaizen() ─ uwsm start niri --session
   └─ wayland-session@niri.target
-       ├─ quickshell.service        Restart=on-failure
+       ├─ kaizen-shell.service      Restart=on-failure
        └─ kaizen-sleep-lock.service logind delay inhibitor
 lid close / power key ─ logind ─ sleep-lock locks shell ─ waits for secure ─ suspend
 ```
@@ -205,7 +205,7 @@ nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
 
 - XDG autostart apps start only once the shell's StatusNotifierWatcher is on
   the bus (`kaizen-tray-ready.service`), because Electron apps look for it once
-  and never retry. Never gate `quickshell.service` or anything before
+  and never retry. Never gate `kaizen-shell.service` or anything before
   `graphical-session.target` on the tray: the shell registers the watcher once
   its config loads, which waits for `xdg-desktop-portal`, and the portal is
   ordered after `graphical-session.target`.

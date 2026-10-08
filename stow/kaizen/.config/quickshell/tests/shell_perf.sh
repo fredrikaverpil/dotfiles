@@ -42,7 +42,7 @@ fail() {
   printf 'FAIL: %s\n' "$1" >&2
   exit 1
 }
-prop() { systemctl --user show quickshell.service --property="$1" --value; }
+prop() { systemctl --user show kaizen-shell.service --property="$1" --value; }
 ipc() { timeout 10 qs ipc --pid "$pid" call "$@"; }
 mb() { awk -v b="$1" 'BEGIN { printf "%.1f", b / 1048576 }'; }
 pss() { awk '/^Pss:/ { printf "%.1f", $2 / 1024 }' "/proc/$pid/smaps_rollup"; }
@@ -66,7 +66,7 @@ power() {
   [[ "$profile" == balanced ]] || fail "power profile is $profile, not balanced"
 }
 power
-systemctl --user is-active --quiet quickshell.service || fail 'quickshell.service is not active'
+systemctl --user is-active --quiet kaizen-shell.service || fail 'kaizen-shell.service is not active'
 pid=$(prop MainPID)
 [[ "$(ipc lock isLocked)" == false ]] || fail 'session is locked'
 load=$(cut -d' ' -f1 /proc/loadavg)
@@ -84,7 +84,7 @@ ipc idle disable >/dev/null
 
 printf 'Hands off the machine until the run ends.\n'
 started=$(date +%s%N)
-systemctl --user restart quickshell.service
+systemctl --user restart kaizen-shell.service
 pid=$(prop MainPID)
 until ipc system status >/dev/null 2>&1; do
   (($(date +%s%N) - started < 30000000000)) || fail 'shell did not answer IPC within 30 s'

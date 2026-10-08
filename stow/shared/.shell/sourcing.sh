@@ -26,7 +26,7 @@ if [ -e /etc/NIXOS ]; then
     function kaizen_units() {
       local dir="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/systemd/user.control" unit
       mkdir -p "$dir" || return
-      for unit in quickshell.service kaizen-dcal.service kaizen-sleep-lock.service; do
+      for unit in kaizen-shell.service kaizen-dcal.service kaizen-sleep-lock.service; do
         if [ "$1" = mask ]; then
           ln -sf /dev/null "$dir/$unit"
         else
