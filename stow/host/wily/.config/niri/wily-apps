@@ -34,7 +34,7 @@ spawn_missing '^chrome-calendar\.google\.com__-' \
   chromium --profile-directory=Work --app=https://calendar.google.com/
 spawn_missing '^chrome-meet\.google\.com__-' \
   chromium --profile-directory=Work --app=https://meet.google.com/
-spawn_missing '(?i)^spotify$' spotify
+spawn_missing '^spotifast$' spotifast
 spawn_missing '^signal$' signal-desktop
 spawn_missing '^proton-pass$' proton-pass
 
