@@ -159,6 +159,7 @@ in
       # unticked; ticked, Slack renders on the CPU (`--use-gl=disabled`).
       (withGnomeLibsecret slack)
       spotify
+      inputs.spotifast.packages.${pkgs.stdenv.hostPlatform.system}.default
       zed-editor
     ];
   };
