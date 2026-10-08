@@ -15,6 +15,7 @@
   home.packages = with pkgs; [
     btop
     lsof # List open files - essential for debugging file/network issues
+    systemctl-tui # TUI for systemd services
   ];
 
   home.file = {
