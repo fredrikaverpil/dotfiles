@@ -40,6 +40,11 @@ window-rule {
 }
 
 window-rule {
+    match app-id=r#"^spotifast$"#
+    open-on-workspace "5"
+}
+
+window-rule {
     match app-id=r#"^com.rafaelmardojai.Blanket$"#
     open-on-workspace "5"
 }
