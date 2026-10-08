@@ -87,6 +87,26 @@
         "type": "github"
       }
     },
+    "delta": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791473752,
+        "narHash": "sha256-eLNULrR3uU1lt7UEVgd3FDrgMvw5WkeTIL2D6QQRs5o=",
+        "owner": "zed-industries",
+        "repo": "delta-nix",
+        "rev": "b6fec9fb9ff980183626bb2980676b9daa5dc8ac",
+        "type": "github"
+      },
+      "original": {
+        "owner": "zed-industries",
+        "repo": "delta-nix",
+        "type": "github"
+      }
+    },
     "disko": {
       "inputs": {
         "nixpkgs": [
@@ -344,6 +364,7 @@
     "root": {
       "inputs": {
         "dankcalendar": "dankcalendar",
+        "delta": "delta",
         "disko": "disko",
         "home-manager-rpi": "home-manager-rpi",
         "home-manager-unstable": "home-manager-unstable",
