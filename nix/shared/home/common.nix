@@ -102,7 +102,7 @@ in
       bfs
       devbox
       devenv
-      mise
+      unstable.mise
       dust
       fd
       gnumake
