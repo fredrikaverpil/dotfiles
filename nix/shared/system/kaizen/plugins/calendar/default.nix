@@ -20,7 +20,7 @@
 
   # Keep the upstream systemd option off: its unit orders after graphical-session.target.
   # Sync and reminders outlive the calendar window and run independently of our shell.
-  systemd.user.services.dcal = {
+  systemd.user.services.kaizen-dcal = {
     description = "DankCalendar sync and reminders";
     partOf = [ "graphical-session.target" ];
     after = [
