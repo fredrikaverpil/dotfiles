@@ -110,11 +110,6 @@ reading the whole file.
 - You can run `go mod tidy` recursively in the repo with the custom
   [`go-mod-tidy`](~/.shell/bin/go-mod-tidy) shell script.
 
-## Npm
-
-- For one-off npm CLI runs, use `npx <pkg>`. Deno is not installed; if needed,
-  use `nix run nixpkgs#deno`.
-
 ## Python
 
 - Always use `uv` to run Python commands.
