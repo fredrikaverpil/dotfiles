@@ -21,7 +21,7 @@ require("lazyload").on_vim_enter(function()
     workspaces = vim.tbl_values(vaults),
 
     picker = {
-      name = "snacks.pick",
+      name = "snacks.picker",
     },
 
     daily_notes = {
