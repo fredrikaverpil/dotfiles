@@ -28,11 +28,12 @@ Go down the list; the first match wins.
 | every NixOS desktop host      | [`shared/system/linux-desktop.nix`](shared/system/linux-desktop.nix) | [`shared/home/linux-desktop.nix`](shared/home/linux-desktop.nix) |
 | one host                      | `hosts/<host>/configuration.nix`  | `hosts/<host>/users/<user>.nix` |
 
-- **System**: GUI apps, and anything that needs a NixOS or nix-darwin module
-  (a service, the firewall, a setuid wrapper). On macOS, GUI apps are Homebrew
-  casks.
-- **User** (home-manager): CLI tools, so macOS and the servers share them, and
-  home-manager-only options such as the web apps' `xdg.desktopEntries`.
+- **System**: the default for a package, and anything that needs a NixOS or
+  nix-darwin module (a service, the firewall, a setuid wrapper). On macOS, GUI
+  apps are Homebrew casks.
+- **User** (home-manager): home-manager-only options such as the web apps'
+  `xdg.desktopEntries`, and CLI tools that macOS and the servers share, since
+  `environment.systemPackages` is NixOS-only.
 
 Something one host wants is declared in that host. Once every host in a scope
 wants it, move it to that scope's shared file rather than repeating it.
