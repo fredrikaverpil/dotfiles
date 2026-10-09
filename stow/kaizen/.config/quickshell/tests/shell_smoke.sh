@@ -39,7 +39,7 @@ check battery '(.present | type) == "boolean" and (.profiles | type) == "array"'
 check system '(.alerts | type) == "array" and (.cpu | type) == "number" and (.memory | type) == "number"'
 check mirror '(.mirrors | type) == "array"'
 check clipboard '(.entries | type) == "number"'
-check firmware '(.updates | type) == "array" and (.secureBoot | type) == "boolean"'
+check firmware '(.backends | type) == "array" and (.updates | type) == "array"'
 check recording '(.recording | type) == "boolean" and (.monitor as $m | $m == "region" or any(.monitors[]; . == $m))'
 case "$(ipc notifications dndState)" in
   on | off) printf 'PASS: notifications\n' ;;

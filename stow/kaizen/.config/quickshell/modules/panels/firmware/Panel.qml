@@ -22,7 +22,7 @@ Ui.Panel {
             return "No firmware backend on this host";
         if (service.checking && service.lastChecked === 0)
             return "Checking…";
-        const count = service.pending.length;
+        const count = service.updates.length;
         const checked = service.lastChecked === 0 ? "" : " · checked " + Qt.formatDateTime(new Date(service.lastChecked), "HH:mm");
         if (count === 0 && service.errors.length > 0)
             return "Check failed" + checked;
@@ -207,7 +207,6 @@ Ui.Panel {
         id: row
 
         required property var update
-        readonly property bool counted: Model.counts(update, root.service.secureBoot)
 
         width: content.width
         height: rowColumn.implicitHeight + 16
@@ -242,7 +241,7 @@ Ui.Panel {
                 Text {
                     width: parent.width - urgency.implicitWidth - parent.spacing
                     elide: Text.ElideRight
-                    color: row.counted ? root.shell.palette.fg : root.shell.palette.off
+                    color: root.shell.palette.fg
                     font.family: Ui.Fonts.mono
                     font.pixelSize: 14
                     text: row.update.name + (row.update.vendor === "" ? "" : " · " + row.update.vendor)
@@ -250,7 +249,7 @@ Ui.Panel {
 
                 Text {
                     id: urgency
-                    color: row.counted ? root.shell.palette[Model.urgencyRole(row.update.urgency)] : root.shell.palette.off
+                    color: root.shell.palette[Model.urgencyRole(row.update.urgency)]
                     font.family: Ui.Fonts.mono
                     font.pixelSize: 12
                     text: row.update.urgency
@@ -263,7 +262,7 @@ Ui.Panel {
                 color: root.shell.palette.off
                 font.family: Ui.Fonts.mono
                 font.pixelSize: 12
-                text: Model.detail(row.update, root.service.secureBoot)
+                text: Model.detail(row.update)
             }
 
             Text {

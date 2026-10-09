@@ -99,7 +99,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | bluetooth | [BlueZ] via [Quickshell] | button | Settings › Bluetooth | `bluetooth` |
 | brightness | [sysfs backlight] via [logind] SetBrightness | – | XF86 keys | `brightness` |
 | clipboard | [wl-clipboard] watcher, in memory | – | Trigger › Clipboard | `clipboard` |
-| firmware | [fwupd] via `fwupdmgr`, the SecureBoot efivar | firmware indicator | Settings › Firmware | `firmware` |
+| firmware | [fwupd] via `fwupdmgr` | firmware indicator | Settings › Firmware | `firmware` |
 | idle | [ext-idle-notify], lock service | idle indicator | Settings › Session | `idle` |
 | keyboard | [niri] XKB layouts | layout indicator | Settings › Keyboard layout | `keyboard` |
 | media | [MPRIS] | now-playing widget | Settings › Media | `media` |

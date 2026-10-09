@@ -12,11 +12,6 @@ function backends(value, known) {
     });
 }
 
-// The SecureBoot EFI variable: 4 attribute bytes, then 1 when enforcing.
-function secureBootEnabled(bytes) {
-  return !!bytes && bytes.length === 5 && bytes[4] === 1;
-}
-
 function merge(backends, results) {
   var updates = [];
   var errors = [];
@@ -29,30 +24,14 @@ function merge(backends, results) {
   return { updates: updates, errors: errors };
 }
 
-// Secure Boot databases go unread while Secure Boot is off, so they never
-// count as pending; they are still listed and can be applied.
-function counts(update, secureBoot) {
-  return !update.secureBoot || secureBoot;
-}
-
-function pending(updates, secureBoot) {
-  return updates.filter(function (update) {
-    return counts(update, secureBoot);
-  });
-}
-
 function rank(urgency) {
   return URGENCY_RANK[urgency] || 0;
 }
 
-// Pending first, then most urgent, then by name.
-function order(updates, secureBoot) {
+// Most urgent first, then by name.
+function order(updates) {
   return updates.slice().sort(function (a, b) {
-    return (
-      Number(counts(b, secureBoot)) - Number(counts(a, secureBoot)) ||
-      rank(b.urgency) - rank(a.urgency) ||
-      a.name.localeCompare(b.name)
-    );
+    return rank(b.urgency) - rank(a.urgency) || a.name.localeCompare(b.name);
   });
 }
 
@@ -62,8 +41,8 @@ function urgencyRole(urgency) {
   return value >= URGENCY_RANK.high ? "rose" : value > 0 ? "wood" : "off";
 }
 
-// "0 → 0.1.15 · 5 CVEs · needs AC · reboot · Secure Boot off"
-function detail(update, secureBoot) {
+// "0 → 0.1.15 · 5 CVEs · needs AC · reboot"
+function detail(update) {
   var parts = [update.current + " → " + update.version];
   var cves = update.issues.filter(function (issue) {
     return issue.indexOf("CVE-") === 0;
@@ -71,6 +50,5 @@ function detail(update, secureBoot) {
   if (cves > 0) parts.push(cves + (cves === 1 ? " CVE" : " CVEs"));
   if (update.needsAc) parts.push("needs AC");
   if (update.needsReboot) parts.push("reboot");
-  if (!counts(update, secureBoot)) parts.push("Secure Boot off");
   return parts.join(" · ");
 }

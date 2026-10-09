@@ -60,10 +60,6 @@ The bar shows an indicator in wood while an update is pending, whatever its
 urgency: an update can wait for a convenient reboot. Each row shows its own
 urgency. There are no notifications.
 
-Secure Boot databases (`uefi_db`, `uefi_dbx`, `uefi_kek`, `uefi_pk`) are
-listed, but do not count as pending while Secure Boot is off: the firmware
-does not read them then. Their row says "Secure Boot off".
-
 [fwupd]: https://fwupd.org
 [LVFS]: https://fwupd.org/lvfs/
 
