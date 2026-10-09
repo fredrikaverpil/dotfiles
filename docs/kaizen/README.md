@@ -99,6 +99,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | bluetooth | [BlueZ] via [Quickshell] | button | Settings › Bluetooth | `bluetooth` |
 | brightness | [sysfs backlight] via [logind] SetBrightness | – | XF86 keys | `brightness` |
 | clipboard | [wl-clipboard] watcher, in memory | – | Trigger › Clipboard | `clipboard` |
+| firmware | [fwupd] via `fwupdmgr`, the SecureBoot efivar | firmware indicator | Settings › Firmware | `firmware` |
 | idle | [ext-idle-notify], lock service | idle indicator | Settings › Session | `idle` |
 | keyboard | [niri] XKB layouts | layout indicator | Settings › Keyboard layout | `keyboard` |
 | media | [MPRIS] | now-playing widget | Settings › Media | `media` |
@@ -127,6 +128,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 [sysfs backlight]: https://www.kernel.org/doc/Documentation/ABI/stable/sysfs-class-backlight
 [logind]: https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.login1.html
 [wl-clipboard]: https://github.com/bugaevc/wl-clipboard
+[fwupd]: https://fwupd.org
 [ext-idle-notify]: https://wayland.app/protocols/ext-idle-notify-v1
 [niri]: https://github.com/YaLTeR/niri/wiki
 [MPRIS]: https://specifications.freedesktop.org/mpris-spec/latest/

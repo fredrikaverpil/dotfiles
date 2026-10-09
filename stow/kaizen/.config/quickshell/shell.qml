@@ -16,6 +16,7 @@ import "modules/panels/bluetooth" as Bluetooth
 import "modules/panels/clipboard" as Clipboard
 import "modules/panels/media" as Media
 import "modules/panels/display" as Display
+import "modules/panels/firmware" as Firmware
 import "modules/panels/network" as Network
 import "modules/panels/recording" as Recording
 import "modules/panels/timezone" as Timezone
@@ -27,6 +28,7 @@ import "modules/services/battery" as BatteryService
 import "modules/services/bluetooth" as BluetoothService
 import "modules/services/brightness" as Brightness
 import "modules/services/clipboard" as ClipboardService
+import "modules/services/firmware" as FirmwareService
 import "modules/services/idle" as Idle
 import "modules/services/keyboard" as Keyboard
 import "modules/services/media" as MediaService
@@ -69,6 +71,8 @@ ShellRoot {
     readonly property alias clipboard: clipboard
     readonly property alias timezone: timezone
     readonly property alias timezoneService: timezoneService
+    readonly property alias firmware: firmware
+    readonly property alias firmwareService: firmwareService
 
     readonly property int barHeight: Math.round(32 * textScale)
     property var panels: []
@@ -421,6 +425,16 @@ ShellRoot {
         id: timezone
         shell: root
         service: timezoneService
+    }
+
+    FirmwareService.Service {
+        id: firmwareService
+    }
+
+    Firmware.Panel {
+        id: firmware
+        shell: root
+        service: firmwareService
     }
 
     // Shows a launcher level hanging from a bar button.

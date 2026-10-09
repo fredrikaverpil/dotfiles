@@ -40,6 +40,33 @@ What the curtain does not do, since it would stop screenshotting from working:
 - ⚠️ It never locks the machine: idle locking is paused while the curtain is up.
   Always use the real lock when leaving the machine.
 
+## Firmware (`firmware`)
+
+The firmware panel lists pending firmware updates; it never installs them.
+Installing can need AC power, a reboot, or root, so the user runs the update
+command in a terminal. Each update's row copies that command (`fwupdmgr update
+<id>`) with Enter, Space or a click, as does Settings › Firmware › Copy update
+command.
+
+The host decides which backends run: kaizen reads [fwupd] when the host enables
+it, and never starts a backend's daemon. The shell checks at start, once a day
+and when the panel opens, reading only local metadata; fwupd's own timer
+downloads it.
+
+`O` on a row, or Settings › Firmware › Open release page, opens the vendor's
+details page, or the update's [LVFS] device page when the vendor sets none.
+
+The bar shows an indicator in wood while an update is pending, whatever its
+urgency: an update can wait for a convenient reboot. Each row shows its own
+urgency. There are no notifications.
+
+Secure Boot databases (`uefi_db`, `uefi_dbx`, `uefi_kek`, `uefi_pk`) are
+listed, but do not count as pending while Secure Boot is off: the firmware
+does not read them then. Their row says "Secure Boot off".
+
+[fwupd]: https://fwupd.org
+[LVFS]: https://fwupd.org/lvfs/
+
 ## Notifications (`notifications`)
 
 Apps send notifications over D-Bus. [`notify-send`][notify-send] sends one from
