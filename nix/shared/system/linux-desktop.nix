@@ -161,7 +161,6 @@ in
       spotify
       inputs.spotifast.packages.${pkgs.stdenv.hostPlatform.system}.default
       zed-editor
-      inputs.delta.packages.${pkgs.stdenv.hostPlatform.system}.delta
     ];
   };
 }
