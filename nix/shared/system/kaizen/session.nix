@@ -334,6 +334,22 @@ in
     # The shell's network service and panel drive NetworkManager through nmcli.
     networking.networkmanager.enable = true;
 
+    # BIOS and device firmware from LVFS. Updates reboot, so the user runs them:
+    #
+    #   fwupdmgr refresh --force               # stale metadata reports "no updates"
+    #   fwupdmgr get-updates                   # lists each device's "Device ID"
+    #   cat /sys/class/power_supply/AC/online  # must print 1
+    #   fwupdmgr update <device-id>
+    #
+    # A BIOS update needs AC power and reboots into a UEFI capsule flash staged on
+    # the ESP (/boot); keep room there. It can reset EFI settings. Afterwards,
+    # confirm /sys/class/dmi/id/bios_version and recheck
+    # `journalctl -b -k -p warning`. The Secure Boot databases (KEK, db, dbx) are
+    # unused while Secure Boot is disabled, but applying them is harmless: the dbx
+    # update refuses when it would revoke a binary on the ESP. Update only the
+    # device you need, by ID.
+    services.fwupd.enable = true;
+
     # GTK3 needs the portal to follow the dconf theme; Qt uses the GTK platform theme.
     environment.sessionVariables = {
       NIXOS_OZONE_WL = "1";

@@ -113,6 +113,7 @@ llama.cpp into `~/.unsloth/studio`; `rm -rf ~/.unsloth` removes them.
 
 ## Firmware
 
-The fwupd procedure is in `nix/shared/system/thinkpad.nix`. BIOS N4HET22W
-1.10 (2026-09). `fwupdmgr get-updates` also lists NVMe (SK hynix
-HFS001TFM9X179N) and "System Update" bundles.
+The fwupd procedure is in `nix/shared/system/kaizen/session.nix`. BIOS
+N4HET22W 1.10 (2026-09). `fwupdmgr get-updates` also lists NVMe (SK hynix
+HFS001TFM9X179N) and "System Update" bundles. Secure Boot is disabled: the
+NixOS installer is unsigned.

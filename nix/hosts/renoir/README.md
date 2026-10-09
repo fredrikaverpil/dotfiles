@@ -13,8 +13,9 @@ Lid close uses the logind default, plain suspend; there is no hibernate.
 
 ## Firmware
 
-The fwupd procedure is in `nix/shared/system/thinkpad.nix`.
+The fwupd procedure is in `nix/shared/system/kaizen/session.nix`.
 
+- Secure Boot is disabled: the NixOS installer is unsigned.
 - A BIOS update can reset EFI settings; recheck Config → Power → Sleep State.
   "Linux" enables S3 (`deep` in `/sys/power/mem_sleep`).
 - The BIOS has no CPPC option, so `amd_pstate` stays disabled and cpufreq
