@@ -161,6 +161,8 @@ in
       spotify
       inputs.spotifast.packages.${pkgs.stdenv.hostPlatform.system}.default
       zed-editor
+      lumen
+      hunk
     ];
   };
 }
