@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+set -e
+
+# Writes gh's stored token to the file ~/.config/nix/nix.conf includes, or
+# removes it when gh is logged out, so nix never sends a revoked token.
+# GH_TOKEN/GITHUB_TOKEN are ignored: a shell's copy goes stale on re-login.
+# The token passes through printf, a builtin, so it never reaches an argv.
+
+case "$1" in
+-h | --help)
+  echo "usage: nix-github-token    write gh's token for nix's GitHub fetches"
+  exit 0
+  ;;
+esac
+
+dir="${XDG_CONFIG_HOME:-$HOME/.config}/nix"
+file="$dir/access-tokens.conf"
+if ! token="$(env -u GH_TOKEN -u GITHUB_TOKEN gh auth token 2>/dev/null)"; then
+  rm -f "$file"
+  echo "gh is logged out: removed $file" >&2
+  exit 1
+fi
+mkdir -p "$dir"
+tmp="$(umask 077 && mktemp "$dir/.access-tokens.XXXXXX")"
+printf 'access-tokens = github.com=%s\n' "$token" >"$tmp"
+mv -f "$tmp" "$file"
+echo "wrote $file"
