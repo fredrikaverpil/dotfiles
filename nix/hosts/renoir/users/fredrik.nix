@@ -12,7 +12,13 @@ in
 
   # Host-only user packages; shared ones live in nix/shared/home/.
   home.packages = with pkgs; [
-    unstable.neovim
+    # Newer than nixpkgs; drop once NixOS/nixpkgs#572220 lands.
+    (unstable.wrapNeovim (unstable.neovim-unwrapped.overrideAttrs (old: {
+      version = "0.12.6";
+      src = old.src.override {
+        hash = "sha256-lK1gbJyESMN3C/i8cyPFzzlJDYZHzEXugGhCwPVEbNk=";
+      };
+    })) { })
   ];
 
   llmAgents = [ ];
