@@ -1,0 +1,4 @@
+# Included from the shared config; macOS-only overrides.
+
+# Workaround for https://github.com/ghostty-org/ghostty/discussions/12708
+cursor-color = cell-foreground

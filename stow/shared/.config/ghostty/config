@@ -39,9 +39,6 @@ background-blur-radius = 40
 # expand ~ in a path, so an absolute path would pin this to one machine.
 theme = dark:zenbones_dark,light:zenbones_light
 
-# NOTE: workaround for https://github.com/ghostty-org/ghostty/discussions/12708
-cursor-color = cell-foreground
-
 mouse-hide-while-typing = true
 
 # SSH integration: install ghostty's terminfo on remote hosts (ssh-terminfo),
@@ -71,5 +68,6 @@ keybind = cmd+ctrl+e=equalize_splits
 # custom-shader = /Users/fredrik/code/public/ghostty-shaders/cursor_blaze.glsl
 # custom-shader-animation = false
 
-# Linux-only overrides (ignored when missing).
+# Platform overrides (ignored when missing).
 config-file = ?config-linux
+config-file = ?config-darwin
