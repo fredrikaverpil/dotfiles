@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 {
   imports = [
     ../../shared/system/linux-desktop.nix
@@ -86,5 +86,6 @@
     (withGnomeLibsecret ente-desktop)
     (withGnomeLibsecret obsidian)
     lutris # Battle.net and other non-Steam launchers.
+    inputs.delta.packages.${pkgs.stdenv.hostPlatform.system}.delta
   ];
 }
