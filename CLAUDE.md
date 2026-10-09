@@ -32,10 +32,11 @@ Stow commands:
 
 ### Nix Architecture Patterns
 
-- **Mixed stability**: Darwin uses unstable nixpkgs; the Raspberry Pi is
-  anchored to the nixpkgs pinned by the `nixos-raspberrypi` input (its
-  nixpkgs, `home-manager-rpi` and `disko` all follow that pin — do not make
-  them follow another nixpkgs, or kernel binary cache hits are lost)
+- **Mixed stability**: servers use stable nixpkgs; desktops and laptops (NixOS
+  and Darwin) use unstable. The Raspberry Pi server is anchored to the stable
+  nixpkgs pinned by the `nixos-raspberrypi` input (its nixpkgs,
+  `home-manager-rpi` and `disko` all follow that pin — do not make them follow
+  another nixpkgs, or kernel binary cache hits are lost)
 - **Module scope**: `nix/README.md` decides where a package or setting goes
   (kaizen, a shared scope, one host or one user). Read it before adding one
 - **Configuration helpers**: Use `lib.mkDarwin`, `lib.mkNixos` and

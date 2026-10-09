@@ -18,13 +18,15 @@
 
   inputs = {
     # Mixed stability approach:
-    # - Raspberry Pi/NixOS: Anchored to nixos-raspberrypi's pinned nixpkgs
+    # - Raspberry Pi: Anchored to nixos-raspberrypi's pinned nixpkgs
     #   (home-manager-rpi + disko follow that pin)
+    # - NixOS desktops and laptops: Use unstable (nixpkgs-unstable + home-manager-unstable)
     # - Darwin/macOS: Uses unstable (nixpkgs-unstable + home-manager-unstable + nix-darwin)
     #
-    # Rationale: Darwin ecosystem moves faster, benefits from latest packages.
+    # Rationale: Servers stay on stable; desktops and laptops benefit from the
+    # latest packages.
     # The Pi has a single version anchor (the nixos-raspberrypi input), so
-    # Darwin-motivated input updates cannot break the Pi, and kernel builds
+    # updates to the unstable inputs cannot break the Pi, and kernel builds
     # hit the nixos-raspberrypi.cachix.org binary cache.
     #
     # Version alignment references:
