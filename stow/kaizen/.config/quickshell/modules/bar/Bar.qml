@@ -246,7 +246,7 @@ Scope {
                 anchors.right: audioButton.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: visible ? 6 : 0
-                visible: idleButton.visible || keyboardButton.visible || recordingButton.visible || mirrorButton.visible || systemButton.visible || mediaWidget.width > 0 || pluginIndicators.width > 0
+                visible: idleButton.visible || keyboardButton.visible || recordingButton.visible || mirrorButton.visible || systemButton.visible || firmwareButton.visible || mediaWidget.width > 0 || pluginIndicators.width > 0
                 width: visible ? 1 : 0
                 height: 16 * bar.shell.textScale
                 color: bar.shell.palette.dim
@@ -325,10 +325,25 @@ Scope {
                 label: bar.shell.systemService.alertLabel
             }
 
+            // Pending firmware updates; Secure Boot databases count only while it is on.
+            Ui.BarButton {
+                id: firmwareButton
+                shell: bar.shell
+                anchors.right: systemButton.left
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.rightMargin: visible ? 4 : 0
+                visible: bar.shell.firmwareService.pending.length > 0
+                // Wood even when urgent: updates can wait for a convenient reboot.
+                foreground: bar.shell.palette.wood
+                label: "󰚰"
+                onActivated: bar.shell.firmware.open()
+                onSecondary: bar.shell.menu.popup("settings.firmware", modelData.name, firmwareButton)
+            }
+
             // In plugin load order; right-click opens the plugin's node.
             Row {
                 id: pluginIndicators
-                anchors.right: systemButton.left
+                anchors.right: firmwareButton.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: width > 0 ? 4 : 0
                 spacing: 4

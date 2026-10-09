@@ -391,6 +391,10 @@ in
         builtins.toJSON config.host.notificationRules
       )}";
       environment.KAIZEN_PLUGINS = lib.concatStringsSep ":" config.host.kaizenPlugins;
+      # Firmware backends the host runs; kaizen never enables their daemons.
+      environment.KAIZEN_FIRMWARE_BACKENDS = lib.concatStringsSep ":" (
+        lib.optional config.services.fwupd.enable "fwupd"
+      );
       serviceConfig = {
         ExecStart = "${pkgs.quickshell}/bin/quickshell";
         Restart = "on-failure";

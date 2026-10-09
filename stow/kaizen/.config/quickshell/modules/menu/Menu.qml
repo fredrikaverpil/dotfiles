@@ -5,6 +5,7 @@ import Quickshell.Services.SystemTray
 
 import "../bar/widgets/TrayModel.js" as TrayModel
 import "../services/bluetooth/BluetoothModel.js" as BluetoothModel
+import "../services/firmware/FirmwareModel.js" as FirmwareModel
 import "../services/media/MediaModel.js" as MediaModel
 import "../services/timezone/ZonesModel.js" as ZonesModel
 import "../services/weather/PlacesModel.js" as PlacesModel
@@ -376,6 +377,31 @@ Ui.Panel {
             icon: "󰌌",
             label: "Keyboard layout"
         },
+        "settings.firmware": {
+            icon: "󰚰",
+            label: "Firmware"
+        },
+        "settings.firmware.panel": {
+            icon: "󰕮",
+            label: "Firmware panel",
+            action: () => menu.shell.firmware.open()
+        },
+        "settings.firmware.refresh": {
+            icon: "󰑐",
+            label: "Check now",
+            enabled: menu.shell.firmwareService.backends.length > 0,
+            action: () => menu.shell.firmwareService.refresh()
+        },
+        "settings.firmware.copy": {
+            icon: "󰆏",
+            label: "Copy update command",
+            provider: "firmwareUpdates"
+        },
+        "settings.firmware.page": {
+            icon: "󰖟",
+            label: "Open release page",
+            provider: "firmwarePages"
+        },
         "settings.session": {
             icon: "󰐥",
             label: "Session"
@@ -683,6 +709,28 @@ Ui.Panel {
                 }));
     }
 
+    function firmwareRows() {
+        const service = menu.shell.firmwareService;
+        return service.updates.map(update => ({
+                    label: update.name,
+                    icon: "󰆏",
+                    detail: FirmwareModel.detail(update, service.secureBoot),
+                    enabled: true,
+                    action: () => service.copyCommand(update.id)
+                }));
+    }
+
+    function firmwarePageRows() {
+        const service = menu.shell.firmwareService;
+        return service.updates.filter(update => update.url !== "").map(update => ({
+                    label: update.name,
+                    icon: "󰖟",
+                    detail: update.url,
+                    enabled: true,
+                    action: () => service.openPage(update.id)
+                }));
+    }
+
     // Known networks only: the scanner runs while the Network panel is open.
     function networkRows() {
         const service = menu.shell.networkService;
@@ -751,6 +799,12 @@ Ui.Panel {
             },
             networks: function () {
                 return menu.networkRows();
+            },
+            firmwareUpdates: function () {
+                return menu.firmwareRows();
+            },
+            firmwarePages: function () {
+                return menu.firmwarePageRows();
             }
         })
 
