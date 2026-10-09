@@ -160,6 +160,7 @@ in
       (withGnomeLibsecret slack)
       spotify
       inputs.spotifast.packages.${pkgs.stdenv.hostPlatform.system}.default
+      (callPackage ../pkgs/photocraft.nix { })
       zed-editor
       lumen
       hunk
