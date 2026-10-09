@@ -17,6 +17,7 @@ in
 
   home.packages = with pkgs; [
     unstable.jira-cli-go
+    unstable.neovim
     unstable.openfga-cli
   ];
 

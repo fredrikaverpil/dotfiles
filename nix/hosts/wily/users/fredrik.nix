@@ -2,9 +2,12 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }:
 let
+  unstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+
   llama-router = pkgs.writeShellApplication {
     name = "llama-router";
     runtimeInputs = [ pkgs.llama-cpp-vulkan ];
@@ -29,6 +32,7 @@ in
     llama-cpp-vulkan
     llama-router
     unsloth-desktop
+    unstable.neovim
   ];
 
   llmAgents = [ ];

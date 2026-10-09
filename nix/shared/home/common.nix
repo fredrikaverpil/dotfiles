@@ -72,7 +72,6 @@ in
       git-lfs
       htop
       jq
-      unstable.neovim
       stow # GNU Stow for dotfile management
       tmux
       tree
