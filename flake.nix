@@ -76,10 +76,6 @@
       url = "github:AvengeMedia/dankcalendar";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
-    spotifast = {
-      url = "github:crmne/spotifast";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
     # Zed's Delta (delta.dev); Linux only, macOS uses the zed-delta cask.
     delta = {
       url = "github:zed-industries/delta-nix";
