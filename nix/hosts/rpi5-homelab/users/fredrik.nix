@@ -17,7 +17,9 @@ in
 
   llmAgents = [ ];
 
-  home.packages = with pkgs; [ ];
+  home.packages = with pkgs; [
+    unstable.neovim
+  ];
 
   home.file = {
   };

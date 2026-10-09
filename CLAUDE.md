@@ -110,6 +110,6 @@ are wired up in `stow/shared/.config/nvim-fredrik/plugin/conform.lua`.
 
 ## Gotchas
 
-- **Neovim comes from nixpkgs-unstable on all hosts** (declared in
-  `nix/shared/home/common.nix`); a commented `overrideAttrs` there builds a
-  specific sha/tag instead
+- **Neovim comes from nixpkgs-unstable**, declared per host in
+  `nix/hosts/<host>/users/fredrik.nix`. For a release nixpkgs lacks, override
+  `neovim-unwrapped` and rewrap it with `wrapNeovim`
