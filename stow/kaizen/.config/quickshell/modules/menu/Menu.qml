@@ -714,7 +714,7 @@ Ui.Panel {
         return service.updates.map(update => ({
                     label: update.name,
                     icon: "󰆏",
-                    detail: FirmwareModel.detail(update, service.secureBoot),
+                    detail: FirmwareModel.detail(update),
                     enabled: true,
                     action: () => service.copyCommand(update.id)
                 }));

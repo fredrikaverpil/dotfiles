@@ -325,14 +325,14 @@ Scope {
                 label: bar.shell.systemService.alertLabel
             }
 
-            // Pending firmware updates; Secure Boot databases count only while it is on.
+            // Pending firmware updates.
             Ui.BarButton {
                 id: firmwareButton
                 shell: bar.shell
                 anchors.right: systemButton.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: visible ? 4 : 0
-                visible: bar.shell.firmwareService.pending.length > 0
+                visible: bar.shell.firmwareService.updates.length > 0
                 // Wood even when urgent: updates can wait for a convenient reboot.
                 foreground: bar.shell.palette.wood
                 label: "󰚰"

@@ -74,7 +74,6 @@ TestCase {
             issues: [],
             needsAc: true,
             needsReboot: true,
-            secureBoot: false,
             command: "fwupdmgr update 04e17fcf7d3de91da49a163ffe4907855c3648be"
         })
 
@@ -92,7 +91,6 @@ TestCase {
             issues: [],
             needsAc: false,
             needsReboot: true,
-            secureBoot: true,
             command: "fwupdmgr update 362301da643102b9f38477387e2193e57abaa590"
         })
 
@@ -151,30 +149,6 @@ TestCase {
 
     function test_backends(data) {
         compare(Firmware.backends(data.value, ["fwupd"]), data.want);
-    }
-
-    function test_secure_boot_enabled_data() {
-        return [
-            {
-                tag: "enforcing",
-                bytes: [6, 0, 0, 0, 1],
-                want: true
-            },
-            {
-                tag: "off",
-                bytes: [6, 0, 0, 0, 0],
-                want: false
-            },
-            {
-                tag: "missing",
-                bytes: [],
-                want: false
-            },
-        ];
-    }
-
-    function test_secure_boot_enabled(data) {
-        verify(Firmware.secureBootEnabled(data.bytes) === data.want);
     }
 
     function test_merge() {
@@ -240,46 +214,6 @@ TestCase {
         verify(Fwupd.releaseUrl(data.release) === data.want, "got " + Fwupd.releaseUrl(data.release));
     }
 
-    function test_pending_data() {
-        const low = Object.assign({}, ssd, {
-            name: "Camera",
-            urgency: "low"
-        });
-        const critical = Object.assign({}, dbx, {
-            urgency: "critical"
-        });
-        return [
-            {
-                tag: "Secure Boot off hides its databases",
-                updates: [critical, low],
-                secureBoot: false,
-                pending: [low]
-            },
-            {
-                tag: "Secure Boot on counts them",
-                updates: [critical, low],
-                secureBoot: true,
-                pending: [critical, low]
-            },
-            {
-                tag: "high urgency",
-                updates: [ssd],
-                secureBoot: false,
-                pending: [ssd]
-            },
-            {
-                tag: "nothing",
-                updates: [],
-                secureBoot: false,
-                pending: []
-            },
-        ];
-    }
-
-    function test_pending(data) {
-        compare(Firmware.pending(data.updates, data.secureBoot), data.pending);
-    }
-
     function test_order() {
         const low = Object.assign({}, ssd, {
             name: "Camera",
@@ -288,8 +222,7 @@ TestCase {
         const critical = Object.assign({}, dbx, {
             urgency: "critical"
         });
-        compare(Firmware.order([low, critical, ssd], false), [ssd, low, critical]);
-        compare(Firmware.order([low, critical, ssd], true), [critical, ssd, low]);
+        compare(Firmware.order([low, critical, ssd]), [critical, ssd, low]);
     }
 
     function test_urgency_role_data() {
@@ -331,19 +264,11 @@ TestCase {
             {
                 tag: "AC and reboot",
                 update: ssd,
-                secureBoot: false,
                 want: "61720A20 → 61730A20 · needs AC · reboot"
             },
             {
-                tag: "Secure Boot off",
+                tag: "reboot only",
                 update: dbx,
-                secureBoot: false,
-                want: "20250507 → 20260707 · reboot · Secure Boot off"
-            },
-            {
-                tag: "Secure Boot on",
-                update: dbx,
-                secureBoot: true,
                 want: "20250507 → 20260707 · reboot"
             },
             {
@@ -351,7 +276,6 @@ TestCase {
                 update: Object.assign({}, ssd, {
                     issues: ["CVE-2026-20760", "CVE-2025-35973", "LEN-12345"]
                 }),
-                secureBoot: false,
                 want: "61720A20 → 61730A20 · 2 CVEs · needs AC · reboot"
             },
             {
@@ -359,13 +283,12 @@ TestCase {
                 update: Object.assign({}, ssd, {
                     issues: ["CVE-2026-20760"]
                 }),
-                secureBoot: false,
                 want: "61720A20 → 61730A20 · 1 CVE · needs AC · reboot"
             },
         ];
     }
 
     function test_detail(data) {
-        verify(Firmware.detail(data.update, data.secureBoot) === data.want, "got " + Firmware.detail(data.update, data.secureBoot));
+        verify(Firmware.detail(data.update) === data.want, "got " + Firmware.detail(data.update));
     }
 }

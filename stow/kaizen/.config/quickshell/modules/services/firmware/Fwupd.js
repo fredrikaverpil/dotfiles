@@ -4,8 +4,6 @@
 
 var name = "fwupd";
 
-var SECURE_BOOT_PLUGINS = ["uefi_db", "uefi_dbx", "uefi_kek", "uefi_pk"];
-
 function command() {
   return ["fwupdmgr", "get-updates", "--json"];
 }
@@ -70,7 +68,6 @@ function parse(text) {
         issues: release.Issues || [],
         needsAc: has(device.Flags, "require-ac"),
         needsReboot: has(device.Flags, "needs-reboot"),
-        secureBoot: has(SECURE_BOOT_PLUGINS, device.Plugin),
         command: updateCommand(device.DeviceId || ""),
       };
     });

@@ -19,17 +19,14 @@ Item {
     // backend -> { updates, error } from its last check.
     property var results: ({})
     readonly property var merged: Model.merge(backends, results)
-    property bool secureBoot: false
-    readonly property var updates: Model.order(merged.updates, secureBoot)
+    readonly property var updates: Model.order(merged.updates)
     readonly property var errors: merged.errors
-    readonly property var pending: Model.pending(updates, secureBoot)
     // Milliseconds since the epoch; 0 before the first check finishes.
     property real lastChecked: 0
     readonly property bool checking: probes.instances.some(instance => instance.running)
 
     // The backends read local metadata, so a check costs no network.
     function refresh() {
-        secureBootFile.reload();
         probes.instances.forEach(instance => {
             if (!instance.running)
                 instance.start();
@@ -61,18 +58,9 @@ Item {
             backends: backends,
             checking: checking,
             lastChecked: lastChecked,
-            secureBoot: secureBoot,
-            pending: pending.length,
             updates: updates,
             errors: errors
         });
-    }
-
-    FileView {
-        id: secureBootFile
-        path: "/sys/firmware/efi/efivars/SecureBoot-8be4df61-93ca-11d2-aa0d-00e098032b8c"
-        printErrors: false
-        onLoaded: root.secureBoot = Model.secureBootEnabled(new Uint8Array(data()))
     }
 
     Variants {
