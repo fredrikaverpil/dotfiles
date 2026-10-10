@@ -33,24 +33,24 @@ from the host's own nixpkgs and leave its state in `~/.config/noctalia/` and
 `~/.local/state/noctalia/`, outside the dotfiles.
 
 A whole session without kaizen: `noctalia` from the TTY, the counterpart to
-`kaizen run`, in `stow/shared/.shell/sourcing.sh`. It masks `quickshell`, `dcal`
-and `kaizen-sleep-lock` for the session and lets niri start Noctalia instead.
+`kaizen run`, in `stow/shared/.shell/sourcing.sh`. It masks the units
+`kaizen units` lists for the session and lets niri start Noctalia instead.
 niri's config is kaizen's, so its `kaizen ipc` binds do nothing and Noctalia's
 own binds are absent. Its logs are `journalctl --user -u noctalia-trial -f`, the
-same unit name as the swap below. The masks are `--runtime`, so they are gone
-after a reboot, and `kaizen run` clears them before starting; either command
-always reaches the other session.
+same unit name as the swap below. The masks live in `$XDG_RUNTIME_DIR`, so they
+are gone after a reboot, and `kaizen run` clears them before starting; either
+command always reaches the other session.
 
 Swapping shells inside a running kaizen session, keeping its niri and units:
 
 ```sh
-systemctl --user stop quickshell
+systemctl --user stop kaizen-shell
 systemd-run --user --unit=noctalia-trial --collect -p Slice=app.slice \
   nix run ~/.dotfiles#nixosConfigurations.wily.pkgs.noctalia
 journalctl --user -u noctalia-trial -f   # logs
 
 # back
-systemctl --user stop noctalia-trial && systemctl --user start quickshell
+systemctl --user stop noctalia-trial && systemctl --user start kaizen-shell
 ```
 
 Here `kaizen-sleep-lock` is still running but cannot lock, so do not suspend.
