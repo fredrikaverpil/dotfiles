@@ -7,8 +7,9 @@ cause.
 
 ## Configuration
 
-Importing `default.nix` (NixOS) or `home.nix` (home-manager) enables the
-plugin. Its options live under `kaizen.incidentInvestigator`, a home-manager
+Importing `default.nix` (NixOS) or `home.nix` (home-manager) installs the
+daemon, and `~/.config/kaizen/plugins/incident-investigator.jsonc` enables the
+window. Its options live under `kaizen.incidentInvestigator`, a home-manager
 option:
 
 ```nix
@@ -44,7 +45,7 @@ kaizen.incidentInvestigator = {
 | --- | --- | --- |
 | `claudeConfigDir` | required | `CLAUDE_CONFIG_DIR` of the daemon and its runs |
 | `sourceDirs` | `[]` | directories of repositories a run may read; see Read-only runs |
-| `instructionFiles` | `[ ./instructions.md ]` | system prompt additions; list merging appends |
+| `instructionFiles` | `[ instructions.md ]` | system prompt additions; list merging appends |
 | `tags` | `[]` | `name`, and `color`, a palette role |
 | `entityPatterns` | `[]` | `kind` (`user`, `organization`) and a regex whose first group is the id |
 
@@ -238,15 +239,19 @@ unit's `StateDirectory` (`$STATE_DIRECTORY`), which the window reads through
 `<id>/src/`. Transcripts hold the log entries and code a run read, so keep the
 directory as private as `sourceDirs`.
 
-| Path                 | Holds                                    |
-| -------------------- | ---------------------------------------- |
-| `Plugin.qml`         | window, IPC handler, launcher item       |
-| `Investigations.qml` | window content                           |
-| `Format.js`          | formatting helpers for the window        |
-| `Actions.js`         | the palette's rows                       |
-| `tst_*.qml`          | `qmltestrunner -input .`, offscreen      |
-| `investigate/`       | daemon, CLI and tray                     |
-| `instructions.md`    | the base instructions for every run      |
-| `claude-plugin/`     | the Claude plugin serving gopls          |
-| `home.nix`           | options, package, user unit              |
-| `default.nix`        | adds `home.nix` to home-manager users    |
+The window, `instructions.md` and `claude-plugin/` are in
+[`plugins/incident-investigator/`](../../../../../../stow/kaizen/.config/quickshell/plugins/incident-investigator/)
+under the shell's QML; the daemon and its Nix module are here.
+
+| Path                 | Holds                                 |
+| -------------------- | ------------------------------------- |
+| `Plugin.qml`         | window, IPC handler, launcher item    |
+| `Investigations.qml` | window content                        |
+| `Format.js`          | formatting helpers for the window     |
+| `Actions.js`         | the palette's rows                    |
+| `tst_*.qml`          | `qml-test`, offscreen                 |
+| `instructions.md`    | the base instructions for every run   |
+| `claude-plugin/`     | the Claude plugin serving gopls       |
+| `investigate/`       | daemon, CLI and tray                  |
+| `home.nix`           | options, package, user unit           |
+| `default.nix`        | adds `home.nix` to home-manager users |

@@ -9,11 +9,6 @@
 {
   imports = [ inputs.dankcalendar.homeModules.default ];
 
-  # Read from the checkout, so `qs ipc call shell reload` applies edits.
-  kaizen.plugins = [
-    "${config.home.homeDirectory}/.dotfiles/nix/shared/system/kaizen/plugins/calendar"
-  ];
-
   # OAuth tokens stay in gnome-keyring (from programs.niri), unlocked by the login PAM stack.
   # Calendar credentials and feed URLs are private user state, never Nix/Stow values.
   programs.dank-calendar.enable = true;

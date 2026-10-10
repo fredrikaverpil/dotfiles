@@ -9,9 +9,9 @@
 let
   cfg = config.kaizen.incidentInvestigator;
   home = config.home.homeDirectory;
-  # Read from the checkout, so `qs ipc call shell reload` applies QML edits and
-  # the next run picks up instruction edits.
-  dir = "${home}/.dotfiles/nix/shared/system/kaizen/plugins/incident-investigator";
+  # The plugin's QML directory, from stow/kaizen/; read in place, so the next
+  # run picks up instruction edits.
+  dir = "${config.xdg.configHome}/quickshell/plugins/incident-investigator";
 
   investigate = pkgs.buildGo127Module {
     pname = "investigate";
@@ -91,8 +91,6 @@ in
 
   config = {
     kaizen.incidentInvestigator.instructionFiles = lib.mkBefore [ "${dir}/instructions.md" ];
-
-    kaizen.plugins = [ dir ];
 
     # On the session PATH, for the shell to run its client verbs.
     home.packages = [ investigate ];

@@ -90,12 +90,6 @@ in
 # stow/kaizen/.
 {
   options.kaizen = {
-    plugins = lib.mkOption {
-      type = lib.types.listOf lib.types.path;
-      default = [ ];
-      description = "Shell plugin directories, each holding a Plugin.qml, loaded in order. A path is copied to the store; an absolute path as a string is read in place, and `qs ipc call shell reload` applies its edits";
-    };
-
     firmwareBackends = lib.mkOption {
       type = lib.types.listOf (lib.types.enum [ "fwupd" ]);
       default = [ ];
@@ -124,7 +118,6 @@ in
           # qtimageformats supplies Quickshell's WebP decoder.
           "QT_PLUGIN_PATH=${pkgs.qt6.qtimageformats}/lib/qt-6/plugins"
           "KAIZEN_EMOJI=${emoji}"
-          "KAIZEN_PLUGINS=${lib.concatStringsSep ":" config.kaizen.plugins}"
           "KAIZEN_FIRMWARE_BACKENDS=${lib.concatStringsSep ":" config.kaizen.firmwareBackends}"
         ];
         ExecStart = "${pkgs.quickshell}/bin/quickshell";

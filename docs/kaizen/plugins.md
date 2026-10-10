@@ -1,7 +1,7 @@
 # kaizen plugins
 
 A plugin is an optional shell extension: the shell runs without it, however
-many hosts import it. Where its Nix module and QML live, and which hosts it
+many hosts enable it. Where its QML and Nix module live, and which hosts it
 reaches, is in [`README.md`](README.md) › Where it lives.
 
 ## Writing one
@@ -12,12 +12,16 @@ reaches, is in [`README.md`](README.md) › Where it lives.
   button (`barActions.date`) or show an indicator (`barIndicator`): left-click
   calls the plugin, right-click opens its `plugins.<name>` node. Unlike the core
   indicators, the plugin picks when it shows.
-  [`nix/hosts/renoir/kaizen-plugins/hello/`](../../nix/hosts/renoir/kaizen-plugins/hello/)
+  [`stow/host/renoir/.config/quickshell/plugins/hello/`](../../stow/host/renoir/.config/quickshell/plugins/hello/)
   is the minimal example;
-  [`nix/shared/system/kaizen/plugins/gcloud-auth/`](../../nix/shared/system/kaizen/plugins/gcloud-auth/)
+  [`plugins/gcloud-auth/`](../../stow/kaizen/.config/quickshell/plugins/gcloud-auth/)
   always shows its login state as one.
-- Its Nix module is a home-manager module, `home.nix`, holding its `kaizen.*`
-  settings, units and packages, so it runs wherever the core's `home.nix` does.
+- The shell loads `plugins/<name>/Plugin.qml` for each
+  `~/.config/kaizen/plugins/<name>.jsonc`, in name order, and picks up a file
+  added or removed. The file holds the plugin's config in JSONC, `{}` when it
+  has none. Plugin QML imports `../../Ui`, as the core's does.
+- A plugin that needs a unit or a package has a Nix module, a home-manager
+  module, `home.nix`, so it runs wherever the core's `home.nix` does.
   `default.nix` is what a host imports: it adds `home.nix` to the host's
   home-manager users, and holds any part that needs NixOS.
 - A host's notification rules may add buttons that run the plugin's commands
@@ -48,11 +52,11 @@ reaches, is in [`README.md`](README.md) › Where it lives.
 
 ## Developing one
 
-- Quickshell does not watch plugins: apply an edit with
-  `qs ipc call shell reload`. `qml-test` runs the calendar's, gcloud-auth's and
-  the incident investigator's tests; `qml-lint` skips plugins (their
-  `import qs.Ui` resolves only inside Quickshell). A tray plugin's user unit
-  starts with the session when its module sets `autostart`.
+- Quickshell watches only the files `shell.qml` imports, not plugins: apply an
+  edit with `qs ipc call shell reload`. `qml-test` runs the tests under
+  `plugins/`; `qml-lint` skips plugins for now. A host's plugin, outside
+  `stow/kaizen/`, is checked by neither. A tray plugin's user unit starts with
+  the session when its module sets `autostart`.
 
 [dcal]: https://github.com/AvengeMedia/dankcalendar
 [StatusNotifierItem]: https://www.freedesktop.org/wiki/Specifications/StatusNotifierItem/

@@ -1,7 +1,8 @@
 import Quickshell
 
-// The root of <dir>/Plugin.qml, for each directory in KAIZEN_PLUGINS. A plugin
-// creates its own Ui.Panel and IpcHandler, as the core panels do.
+// The root of plugins/<name>/Plugin.qml, for each <name>.jsonc in
+// ~/.config/kaizen/plugins/. A plugin creates its own Ui.Panel and IpcHandler,
+// as the core panels do.
 Scope {
     required property var shell
     // Its launcher node is plugins.<name>, which a right-click on a bar button

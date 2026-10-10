@@ -61,29 +61,31 @@ Each layer calls downward only.
 
 Nix holds what needs a system module, root or the store: the two lower layers,
 the units and the packages, applied on rebuild. Stow holds files edited in
-place, live on save: the compositor config, the shell's QML and the
-notification rules.
+place, live on save: the compositor config, the shell's and plugins' QML, which
+plugins run, and the notification rules.
 
 | Part | Path | Reaches |
 | --- | --- | --- |
 | Session, system half: niri under UWSM, portals, PAM, the services the shell reads | [`nix/shared/system/kaizen/session.nix`](../../nix/shared/system/kaizen/session.nix) | every kaizen host |
 | Session, user half (home-manager): units, the packages the shell and its binds use | [`nix/shared/system/kaizen/home.nix`](../../nix/shared/system/kaizen/home.nix) | every home-manager user on a kaizen host |
 | Compositor config, the shell's QML, the core's notification rules | [`stow/kaizen/`](../../stow/kaizen/) | every kaizen host |
-| Generic or reusable plugin, configured through its module's options | `nix/shared/system/kaizen/plugins/<name>/` | the hosts importing it |
-| Plugin specific to one host | `nix/hosts/<host>/kaizen-plugins/<name>/`, or a private submodule such as wily's `einride` | that host |
+| Plugin QML: generic or reusable | [`stow/kaizen/.config/quickshell/plugins/<name>/`](../../stow/kaizen/.config/quickshell/plugins/) | every kaizen host |
+| Plugin QML: specific to one host | `stow/host/<host>/.config/quickshell/plugins/<name>/` | that host |
+| Which plugins run, with their config | `stow/host/<host>/.config/kaizen/plugins/<name>.jsonc`, or in a private submodule's `stow/` such as wily's `einride` | that host |
+| A plugin's daemon, units and packages (home-manager) | `nix/shared/system/kaizen/plugins/<name>/`, `nix/hosts/<host>/kaizen-plugins/<name>/` | the hosts importing it |
 | ThinkPad hardware the shell reads (thresholds, keyd, micmute LED); not kaizen | [`nix/shared/system/thinkpad.nix`](../../nix/shared/system/thinkpad.nix) | ThinkPad hosts |
 | Hardware, sleep policy, output layout, host-only programs | `nix/hosts/<host>/`, `stow/host/<host>/` | that host |
 
 - Core is what kaizen needs to work as designed; every kaizen host runs it. A
-  plugin is optional: the shell runs without it, however many hosts import it.
+  plugin is optional: the shell runs without it, however many hosts enable it.
 - Importing `session.nix` makes a host a kaizen host: it adds `home.nix` to
   every home-manager user and writes `/etc/kaizen`, and `dotfiles-stow` stows
   [`stow/kaizen/`](../../stow/kaizen/) only where that exists. So
   [`stow/kaizen/`](../../stow/kaizen/) reaches every kaizen host or none, and a
-  plugin keeps its QML beside its Nix module instead. The module lists its
-  directory in `kaizen.plugins`, read in place from the checkout.
+  plugin's QML there loads only where a `~/.config/kaizen/plugins/<name>.jsonc`
+  enables it.
 - Nix hands the shell values only through `kaizen-shell.service`'s environment
-  (`KAIZEN_PLUGINS`, `KAIZEN_EMOJI`).
+  (`KAIZEN_EMOJI`, `KAIZEN_FIRMWARE_BACKENDS`).
 - Apps are not kaizen's: [`nix/README.md`](../../nix/README.md) says where they
   go.
 - QML paths here (`modules/…`, `Ui/…`) are under
@@ -92,12 +94,11 @@ notification rules.
 
 ## Off NixOS
 
-The user half runs under standalone home-manager on another distro with Nix.
-The `kaizen-home` check in [`flake.nix`](../../flake.nix) evaluates it that
-way, and is the minimal configuration to copy: `home.nix` and each plugin's
-`home.nix` as modules, `extraSpecialArgs = { inherit inputs; }` (the calendar
-imports dankcalendar's module from it), and the checkout at `~/.dotfiles`,
-where plugins read their QML. Set `targets.genericLinux.enable`: it adds the
+The user half runs under standalone home-manager on another distro with Nix. The
+`kaizen-home` check in [`flake.nix`](../../flake.nix) evaluates it that way, and
+is the minimal configuration to copy: `home.nix` and each plugin's `home.nix` as
+modules, `extraSpecialArgs = { inherit inputs; }` (the calendar imports
+dankcalendar's module from it). Set `targets.genericLinux.enable`: it adds the
 Nix profiles to the XDG paths and, through `targets.genericLinux.gpu`, the GPU
 drivers Nix-built niri and Quickshell need; activation prints the one-time
 `sudo` command that installs them.
@@ -154,7 +155,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | tray | [StatusNotifierItem] | tray | Tray | `tray` |
 | background | wallpaper files, theme state | – | Settings › Display | `wallpaper`, `theme` |
 | menu | launcher | menu button | `Mod+Space` | `menu` |
-| plugins | `Plugin.qml` in each `kaizen.plugins` directory | date button, when taken over; indicators | Plugins › each plugin | `shell` (reload) |
+| plugins | `plugins/<name>/Plugin.qml` for each `~/.config/kaizen/plugins/<name>.jsonc` | date button, when taken over; indicators | Plugins › each plugin | `shell` (reload) |
 
 [PipeWire]: https://pipewire.org
 [Quickshell]: https://quickshell.org/docs/types/

@@ -4,7 +4,6 @@
     ../../shared/system/linux-desktop.nix
     ../../shared/system/kaizen/session.nix
     ../../shared/system/kaizen/plugins/calendar
-    ../../shared/system/kaizen/plugins/gcloud-auth
     ../../shared/system/thinkpad.nix
   ]
   # Work-only config from the private dotfiles-einride submodule; an
