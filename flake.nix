@@ -191,6 +191,7 @@
                       qmltestrunner -input tests
                       qmltestrunner -input plugins
                     '')
+                    (task "requires-check" "tests/requires_test.sh")
                     pkgs.lua
                   ]
                   ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [

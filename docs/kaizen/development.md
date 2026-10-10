@@ -115,7 +115,7 @@ tree, so a static check passing here passes for every kaizen host.
 | Change | Checks |
 | --- | --- |
 | Nix | `nix fmt`, `nix build .#nixosConfigurations.<host>.config.system.build.toplevel`; build both kaizen hosts, a shared module breaks both |
-| JS/QML | `qml-format`, `qml-test`, `qml-lint` (any platform) |
+| JS/QML | `qml-format`, `qml-test`, `qml-lint`, `requires-check` (any platform) |
 | Compositor interface, config, or bind contract | Also `compositor-test` (Linux) |
 | Service IPC, `shell.qml` wiring, or systemd units | Also `shell-smoke` on the machine after deploy and restart, and exercise the affected path |
 | Panel views | Also `shell-smoke --panels` |
@@ -135,13 +135,13 @@ tree, so a static check passing here passes for every kaizen host.
   since the last service start; restart the service before re-running to clear
   stale errors.
 - `kaizen doctor` lists the warnings and errors from each `kaizen-*` unit's
-  current run, and checks units, the shell's binary, niri's config and the
-  plugin dirs; `--json` prints one document, and journalctl arguments
-  (`--since -1h`, `-b -1`) report that span of the journal instead, without
-  the checks. Follow the units with `journalctl --user -u 'kaizen-*' -f`.
-  Quickshell logs everything at priority 6 with the level in the text, so
-  `journalctl -p warning` misses it. The bar's doctor indicator shows whenever
-  it reports anything.
+  current run, and checks units, the shell's binary, niri's config, the plugin
+  dirs and the `requires` files; `--json` prints one document, and journalctl
+  arguments (`--since -1h`, `-b -1`) report that span of the journal instead,
+  without the checks. Follow the units with
+  `journalctl --user -u 'kaizen-*' -f`. Quickshell logs everything at priority 6
+  with the level in the text, so `journalctl -p warning` misses it. The bar's
+  doctor indicator shows whenever it reports anything.
 - Smoke checks do not prove focus, object lifetime, authentication, daemon
   recovery, or physical input. Exercise affected paths explicitly. Agree on a
   recovery path before lock/PAM, suspend, DPMS-off, or connectivity tests.

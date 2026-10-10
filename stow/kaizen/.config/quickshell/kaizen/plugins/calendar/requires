@@ -1,0 +1,3 @@
+# What the calendar plugin calls; format in ../../requires.
+cmd dcal
+bus session org.freedesktop.secrets
