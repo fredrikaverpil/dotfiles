@@ -8,11 +8,18 @@ set -euo pipefail
 # tones) have a null name. The shell reads it from `kaizen/emoji.json` in the
 # XDG data dirs.
 #
-# Usage: kaizen-emoji <emoji-test.txt> <emoji.json>
+# Usage: kaizen emoji <emoji-test.txt> <emoji.json>
 #   emoji-test.txt: https://unicode.org/Public/emoji/latest/emoji-test.txt
 #   emoji.json: https://github.com/iamcal/emoji-data
+usage="usage: kaizen emoji <emoji-test.txt> <emoji.json>    print the shell's emoji data"
+case "${1:-}" in
+-h | --help)
+  echo "$usage"
+  exit 0
+  ;;
+esac
 if [[ $# -ne 2 ]]; then
-  echo "usage: kaizen-emoji <emoji-test.txt> <emoji.json>" >&2
+  echo "$usage" >&2
   exit 2
 fi
 

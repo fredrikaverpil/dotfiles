@@ -4,7 +4,7 @@ import Quickshell.Io
 
 import "LogModel.js" as Model
 
-// What `kaizen-log` lists: warnings and errors from the kaizen-* units this
+// What `kaizen log` lists: warnings and errors from the kaizen-* units this
 // boot, earlier shell instances included.
 Item {
     id: root
@@ -36,7 +36,7 @@ Item {
         });
     }
 
-    // kaizen-log starts over from the boot's first entry.
+    // `kaizen log` starts over from the boot's first entry.
     function start() {
         entries = [];
         count = 0;
@@ -48,7 +48,7 @@ Item {
     Process {
         id: reader
         running: true
-        command: ["kaizen-log", "--json", "--follow"]
+        command: ["kaizen", "log", "--json", "--follow"]
         stdout: SplitParser {
             onRead: line => {
                 const entry = Model.parse(line);

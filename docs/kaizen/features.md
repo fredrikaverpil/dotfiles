@@ -10,7 +10,7 @@ Quickshell's IPC (inter-process communication):
 qs ipc show
 
 # show ipc calls for a given target
-kaizen-ipc <target>
+kaizen ipc <target>
 
 # call a target's ipc function
 qs ipc call <target> <function> [args...]
@@ -65,7 +65,7 @@ urgency. There are no notifications.
 
 ## Log (`log`)
 
-`kaizen-log` lists the warnings and errors that the `kaizen-*` units, plugin
+`kaizen log` lists the warnings and errors that the `kaizen-*` units, plugin
 daemons included, logged this boot. A healthy desktop logs none, so every
 entry is something to fix. It holds what nothing on screen shows: an error an
 application shows in its window or a toast stays out of it.
@@ -112,7 +112,7 @@ JSONC (JSON with comments). The shell reads the files in file-name order and
 applies an edit on save; a notification takes each setting from the first
 matching rule that has one. A relative icon path resolves against the file's
 directory. A file or rule that is invalid is dropped with a warning, which
-`kaizen-log` lists.
+`kaizen log` lists.
 
 | File | Holds |
 | --- | --- |

@@ -29,7 +29,7 @@ Ui.Panel {
             parts.push(service.errors + (service.errors === 1 ? " error" : " errors"));
         if (warnings > 0)
             parts.push(warnings + (warnings === 1 ? " warning" : " warnings"));
-        const more = count > service.entries.length ? " · latest " + service.entries.length + " shown, kaizen-log lists all" : "";
+        const more = count > service.entries.length ? " · latest " + service.entries.length + " shown, `kaizen log` lists all" : "";
         return parts.join(", ") + " this boot" + more;
     }
 

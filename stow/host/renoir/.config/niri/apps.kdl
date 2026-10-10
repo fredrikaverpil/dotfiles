@@ -86,6 +86,6 @@ binds {
 
     // Focus the app's most recently focused window, switching workspace, or
     // open it.
-    Mod+Z hotkey-overlay-title="Focus or open Zen" { spawn "kaizen-focus" r#"^zen-beta$"# "zen-beta"; }
-    Mod+S hotkey-overlay-title="Focus or open Slack" { spawn "kaizen-focus" r#"(?i)^slack$"# "slack"; }
+    Mod+Z hotkey-overlay-title="Focus or open Zen" { spawn "kaizen" "focus" r#"^zen-beta$"# "zen-beta"; }
+    Mod+S hotkey-overlay-title="Focus or open Slack" { spawn "kaizen" "focus" r#"(?i)^slack$"# "slack"; }
 }

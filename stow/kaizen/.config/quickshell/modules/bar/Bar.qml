@@ -340,7 +340,7 @@ Scope {
                 onSecondary: bar.shell.menu.popup("settings.firmware", modelData.name, firmwareButton)
             }
 
-            // kaizen-log is not silent.
+            // `kaizen log` is not silent.
             Ui.BarButton {
                 id: logButton
                 shell: bar.shell

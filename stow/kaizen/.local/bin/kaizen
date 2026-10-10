@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+set -euo pipefail
+
+# Runs a subcommand from ~/.local/libexec/kaizen/. Each prints its usage line
+# on -h.
+dir="$HOME/.local/libexec/kaizen"
+
+usage() {
+  local sub
+  echo "usage: kaizen COMMAND [ARGS...]"
+  for sub in "$dir"/*; do
+    "$sub" -h | awk -F '    ' '{ sub(/^usage: /, "", $1); printf "  %-45s %s\n", $1, $2 }'
+  done
+}
+
+case "${1:-}" in
+"" | -h | --help)
+  usage
+  exit 0
+  ;;
+esac
+
+if [[ $1 == */* || ! -x "$dir/$1" ]]; then
+  echo "kaizen: unknown command: $1" >&2
+  usage >&2
+  exit 2
+fi
+
+sub="$1"
+shift
+exec "$dir/$sub" "$@"

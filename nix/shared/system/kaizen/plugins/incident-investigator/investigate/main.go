@@ -72,7 +72,7 @@ func run(args []string) error {
 	verb, args := args[0], args[1:]
 	switch verb {
 	case "serve":
-		// The unit's journal is read by kaizen-log, which lists slog's warnings and errors.
+		// The unit's journal is read by `kaizen log`, which lists slog's warnings and errors.
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 		if err := runServe(logger, socket, args); err != nil {
 			logger.Error("serve", "error", err)

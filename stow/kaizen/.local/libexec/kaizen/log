@@ -2,6 +2,13 @@
 # shellcheck shell=bash
 set -euo pipefail
 
+case "${1:-}" in
+-h | --help)
+  echo "usage: kaizen log [--json] [JOURNALCTL_ARGS...]    list the kaizen units' warnings and errors"
+  exit 0
+  ;;
+esac
+
 # --json prints one {time, unit, level, message} object per line, time in
 # milliseconds since the epoch; other arguments go to journalctl.
 json=false

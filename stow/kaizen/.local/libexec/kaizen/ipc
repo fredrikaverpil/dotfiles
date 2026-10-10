@@ -2,6 +2,13 @@
 # shellcheck shell=bash
 set -euo pipefail
 
+case "${1:-}" in
+-h | --help)
+  echo "usage: kaizen ipc [TARGET]    list the shell's IPC functions, by target"
+  exit 0
+  ;;
+esac
+
 qs ipc show |
   awk -v t="${1:-}" '/^target /{n=$2} t=="" || n==t {print n "\t" $0}' |
   sort -s -t "$(printf '\t')" -k1,1 |
