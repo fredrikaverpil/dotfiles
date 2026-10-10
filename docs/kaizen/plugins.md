@@ -35,7 +35,7 @@ reaches, is in [`README.md`](README.md) › Where it lives.
   does this with [dcal]. The incident investigator
   ([`nix/shared/system/kaizen/plugins/incident-investigator/`](../../nix/shared/system/kaizen/plugins/incident-investigator/))
   brings a daemon written for it, and takes what differs per host from its
-  module's options.
+  plugin file.
 - A plugin, and a daemon written for it, writes only under `plugins/<name>/` in
   the shell's state and cache roots (`Ui.Paths.state` or `Ui.Paths.cache` +
   `"/plugins/<name>"`; a daemon's unit sets `StateDirectory` or

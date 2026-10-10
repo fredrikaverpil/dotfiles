@@ -135,7 +135,6 @@
                   homeDirectory = "/home/kaizen";
                   stateVersion = "26.05";
                 };
-                kaizen.incidentInvestigator.claudeConfigDir = "/home/kaizen/.claude";
               }
             ];
           };

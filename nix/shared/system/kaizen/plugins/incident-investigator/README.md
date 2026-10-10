@@ -8,51 +8,59 @@ cause.
 ## Configuration
 
 Importing `default.nix` (NixOS) or `home.nix` (home-manager) installs the
-daemon, and `~/.config/kaizen/plugins/incident-investigator.jsonc` enables the
-window. Its options live under `kaizen.incidentInvestigator`, a home-manager
-option:
+daemon. `~/.config/kaizen/plugins/incident-investigator.jsonc` enables the
+window and configures the daemon, which reads it at start
+(`systemctl --user restart kaizen-incident-investigator` applies an edit). A
+path is absolute or starts with `~/`.
 
-```nix
-kaizen.incidentInvestigator = {
-  # Required. The Claude Code profile (account and sessions) every run uses.
-  claudeConfigDir = "/home/me/.claude-oncall";
+```jsonc
+{
+  // Required. The Claude Code profile (account and sessions) every run uses.
+  "claudeConfigDir": "~/.claude-oncall",
 
-  # Directories holding clones of the services' repositories. Lets a run read
-  # the code at the commit that is deployed. Empty: runs read logs and alerts
-  # only.
-  sourceDirs = [ "/home/me/code/github.com/my-org" ];
+  // Directories holding clones of the services' repositories. Lets a run read
+  // the code at the commit that is deployed. Empty: runs read logs and alerts
+  // only.
+  "sourceDirs": ["~/code/github.com/my-org"],
 
-  # Appended to Claude's system prompt on every turn, in order, read in place.
-  # The default is the plugin's instructions.md. Adding a file appends to it,
-  # and lib.mkForce replaces it.
-  instructionFiles = [ ./my-org.md ];
+  // Appended to Claude's system prompt on every turn, in order, after the
+  // plugin's instructions.md; read in place.
+  "instructionFiles": ["~/notes/my-org.md"],
 
-  # Labels an investigation can carry, for the window's filters and badges.
-  tags = [
-    { name = "prod"; color = "rose"; }
-    { name = "dev"; color = "water"; }
-  ];
+  // Labels an investigation can carry, for the window's filters and badges.
+  "tags": [
+    { "name": "prod", "color": "rose" },
+    { "name": "dev", "color": "water" },
+  ],
 
-  # Ids in tool output listed as users and organizations, besides the
-  # `users/ID` and `organizations/ID` resource names.
-  entityPatterns = [
-    { kind = "user"; regex = "(?i)my[_-]?user[_-]?id\\W{1,8}([A-Za-z0-9_.-]+)"; }
-  ];
-};
+  // Ids in tool output listed as users and organizations, besides the
+  // `users/ID` and `organizations/ID` resource names.
+  "entityPatterns": [
+    {
+      "kind": "user",
+      "regex": "(?i)my[_-]?user[_-]?id\\W{1,8}([A-Za-z0-9_.-]+)",
+    },
+  ],
+}
 ```
 
-| Option | Default | |
+| Field | Default | |
 | --- | --- | --- |
-| `claudeConfigDir` | required | `CLAUDE_CONFIG_DIR` of the daemon and its runs |
+| `claudeConfigDir` | required | `CLAUDE_CONFIG_DIR` of the runs |
 | `sourceDirs` | `[]` | directories of repositories a run may read; see Read-only runs |
-| `instructionFiles` | `[ instructions.md ]` | system prompt additions; list merging appends |
+| `instructionFiles` | `[]` | system prompt additions after `instructions.md` |
 | `tags` | `[]` | `name`, and `color`, a palette role |
 | `entityPatterns` | `[]` | `kind` (`user`, `organization`) and a regex whose first group is the id |
+
+An unknown field, or a missing or invalid file, stops the daemon from starting:
+`kaizen-log` lists the failure, and
+`journalctl --user -u kaizen-incident-investigator` the reason.
 
 An alert toast gets the button from a notification rule
 ([`features.md`](../../../../../../docs/kaizen/features.md) › Notifications ›
 Rules) whose action runs `investigate draft`. `INVESTIGATE_TAG`, one of `tags`,
-tags the draft; the daemon refuses any other.
+tags the draft; the daemon refuses any other. A draft that fails shows a
+critical toast with the error.
 
 ```jsonc
 // ~/.config/kaizen/notification-rules.d/50-alerts.jsonc
@@ -253,5 +261,5 @@ under the shell's QML; the daemon and its Nix module are here.
 | `instructions.md`    | the base instructions for every run   |
 | `claude-plugin/`     | the Claude plugin serving gopls       |
 | `investigate/`       | daemon, CLI and tray                  |
-| `home.nix`           | options, package, user unit           |
+| `home.nix`           | package, user unit                    |
 | `default.nix`        | adds `home.nix` to home-manager users |
