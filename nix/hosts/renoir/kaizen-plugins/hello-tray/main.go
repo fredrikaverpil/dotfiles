@@ -14,8 +14,8 @@ import (
 )
 
 func main() {
-	// `kaizen log` lists the level= field of slog's text output.
-	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, nil)))
+	// `kaizen log` lists the unit's warnings and errors by journal priority.
+	slog.SetDefault(slog.New(newJournalHandler(os.Stderr, nil)))
 	// Left-click greets, right-click opens the menu. Set before Run: a tap handler
 	// turns off ItemIsMenu, which is read once at export.
 	systray.SetOnTapped(sayHello)
