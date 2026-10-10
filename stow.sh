@@ -2,11 +2,11 @@
 # shellcheck shell=bash
 set -e
 
-# Symlinks the stow/ tree into $HOME: shared, platform, kaizen (kaizen hosts),
-# then the optional host package and the stow/ trees of the host's private
-# submodules, removes broken links into the repo left by files it moved or
-# deleted, and reloads the user units on a kaizen host. Also what home-manager
-# activation runs.
+# Symlinks the stow/ tree into $HOME: shared, platform, kaizen (kaizen hosts;
+# unstowed elsewhere), then the optional host package and the stow/ trees of
+# the host's private submodules, removes broken links into the repo left by
+# files it moved or deleted, and reloads the user units on a kaizen host. Also
+# what home-manager activation runs.
 # --adopt absorbs a real file that replaced a managed symlink into the repo;
 # --no-folding links files, not dirs, so other tools can write siblings.
 # dir_links are the exception: linked as whole dirs, so new files in the repo
@@ -36,7 +36,11 @@ for dir in "${dir_links[@]}"; do
 done
 stow_pkg stow/platform "$(uname -s)"
 # kaizen's Nix module creates the marker.
-[ -e /etc/kaizen ] && stow_pkg stow kaizen
+if [ -e /etc/kaizen ]; then
+  stow_pkg stow kaizen
+else
+  stow --dir=stow --target="$HOME" --delete --no-folding kaizen
+fi
 host="$(uname -n | cut -d. -f1)"
 [ -d "stow/host/$host" ] && stow_pkg stow/host "$host"
 for tree in nix/hosts/"$host"/*/stow; do
