@@ -1,0 +1,21 @@
+diff --git a/src/launch/launch.cpp b/src/launch/launch.cpp
+index 71d9983..e0af8ad 100644
+--- a/src/launch/launch.cpp
++++ b/src/launch/launch.cpp
+@@ -277,6 +277,7 @@ int launch(const LaunchArgs& args, char** argv, QCoreApplication* coreApplicatio
+ 		QIcon::setFallbackSearchPaths(fallbackPaths);
+ 	}
+ 
++	QGuiApplication::setDesktopFileName(appId);
+ 	QGuiApplication::setDesktopSettingsAware(pragmas.desktopSettingsAware);
+ 
+ 	delete coreApplication;
+@@ -290,8 +291,6 @@ int launch(const LaunchArgs& args, char** argv, QCoreApplication* coreApplicatio
+ 		app = new QGuiApplication(qArgC, argv);
+ 	}
+ 
+-	QGuiApplication::setDesktopFileName(appId);
+-
+ 	if (args.debugPort != -1) {
+ 		QQmlDebuggingEnabler::enableDebugging(true);
+ 		auto wait = args.waitForDebug ? QQmlDebuggingEnabler::WaitForClient

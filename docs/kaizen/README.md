@@ -130,7 +130,10 @@ enabled plugin's do on NixOS:
   `GTK_USE_PORTAL=1`, and the fonts in
   [`fonts.nix`](../../nix/shared/system/fonts.nix).
 - The packages in `environment.systemPackages`, Quickshell with
-  qtimageformats for WebP, and a plugin's daemon: dcal for the calendar,
+  qtimageformats for WebP and the
+  [overlay's patch](../../nix/shared/overlays/default.nix) (without it, every
+  Quickshell start logs a host portal warning `kaizen doctor` reports), and a
+  plugin's daemon: dcal for the calendar,
   `investigate` with go and gopls on its PATH for the incident investigator.
 - The emoji data: run
   [`kaizen emoji`](../../stow/kaizen/.local/libexec/kaizen/emoji) into
