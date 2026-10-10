@@ -6,13 +6,16 @@ import (
 	"image"
 	"image/color"
 	"image/png"
-	"log"
+	"log/slog"
+	"os"
 
 	"fyne.io/systray"
 	"github.com/godbus/dbus/v5"
 )
 
 func main() {
+	// kaizen-log lists the level= field of slog's text output.
+	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, nil)))
 	// Left-click greets, right-click opens the menu. Set before Run: a tap handler
 	// turns off ItemIsMenu, which is read once at export.
 	systray.SetOnTapped(sayHello)
@@ -40,7 +43,7 @@ func onReady() {
 
 func sayHello() {
 	if err := notify("Hello from a tray plugin"); err != nil {
-		log.Printf("notify: %v", err)
+		slog.Error("notify", "error", err)
 	}
 }
 
@@ -79,7 +82,8 @@ func icon() []byte {
 	}
 	var buf bytes.Buffer
 	if err := png.Encode(&buf, img); err != nil {
-		log.Fatal(err)
+		slog.Error("encode the icon", "error", err)
+		os.Exit(1)
 	}
 	return buf.Bytes()
 }
