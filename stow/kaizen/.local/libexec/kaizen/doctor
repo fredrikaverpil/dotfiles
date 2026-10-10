@@ -181,10 +181,24 @@ filter='
     // "INFO";
   def clock: . / 1000 | strflocaltime("%T");
   def count($n; $word): "\($n) \($word)" + (if $n == 1 then "" else "s" end);
+  # Electron tray items send IconPixmap only and fail a Get of IconName or
+  # IconThemePath, which Quickshell reads again on each NewIcon. It logs the
+  # property, then the QDBusError on the next line.
+  def ignored:
+    .MESSAGE | text | test("^\\s*WARN quickshell\\.dbus\\.properties: Error updating property "
+      + "org\\.freedesktop\\.StatusNotifierItem-[0-9]+-[0-9]+/StatusNotifierItem/org\\.kde\\.StatusNotifierItem:"
+      + "(IconName|IconThemePath)$");
+  def unignored:
+    . as $all
+    | range(length) as $i
+    | $all[$i]
+    | select((ignored
+        or ($i > 0 and ._PID == $all[$i - 1]._PID and ($all[$i - 1] | ignored)
+          and (.MESSAGE | text | test("^\\s*WARN quickshell\\.dbus\\.properties: QDBusError\\(")))) | not);
 
   ($units | map(select(.ActiveState == "failed") | .Id)) as $failed
   | [
-    .[]
+    unignored
     | (.MESSAGE | text) as $m
     | (.PRIORITY // "6" | tonumber) as $p
     | ($m | level) as $t
