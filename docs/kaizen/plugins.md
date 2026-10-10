@@ -19,9 +19,10 @@ reaches, is in [`README.md`](README.md) › Where it lives.
 - The shell loads `plugins/<name>/Plugin.qml` for each
   `~/.config/kaizen/plugins/<name>.jsonc`, in name order, and picks up a file
   added or removed. The file holds the plugin's config in JSONC, `{}` when it
-  has none. A generic plugin's `plugins/<name>/` is in the shell tree, a host's
-  in `~/.config/kaizen/`; a name in both, or in neither, does not load. Plugin
-  QML imports `qs.Ui`, which resolves to the shell tree's `Ui/` from either.
+  has none; the plugin reads it as `config`, updated on save. A generic
+  plugin's `plugins/<name>/` is in the shell tree, a host's in
+  `~/.config/kaizen/`; a name in both, or in neither, does not load. Plugin QML
+  imports `qs.Ui`, which resolves to the shell tree's `Ui/` from either.
 - A plugin that needs a package has a Nix module, its directory's
   `default.nix`, which a host imports beside the core's.
 - A plugin lists the programs, D-Bus services and files it needs beyond the

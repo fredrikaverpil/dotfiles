@@ -1,3 +1,5 @@
+.import "Ui/Jsonc.js" as Jsonc
+
 function rgb(hex) {
   var value = String(hex || "");
   var match = /^#([0-9a-f]{6})$/i.exec(value);
@@ -44,4 +46,23 @@ function textScale(value, minimum, maximum) {
 function observedTextScale(value) {
   var scale = parseFloat(String(value));
   return isFinite(scale) && scale > 0 ? scale : null;
+}
+
+// The config a plugin's JSONC file at `path` holds: an object, else {}, with a
+// warning unless the text is empty.
+function pluginConfig(text, path) {
+  var value = String(text || "");
+  if (!value.trim()) return {};
+  var config;
+  try {
+    config = Jsonc.parse(value);
+  } catch (error) {
+    console.warn("plugins: " + path + ": " + error);
+    return {};
+  }
+  if (!config || typeof config !== "object" || Array.isArray(config)) {
+    console.warn("plugins: " + path + ": not an object");
+    return {};
+  }
+  return config;
 }

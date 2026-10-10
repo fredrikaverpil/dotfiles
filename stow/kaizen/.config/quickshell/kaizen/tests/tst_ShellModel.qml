@@ -37,4 +37,45 @@ TestCase {
         compare(Shell.observedTextScale("invalid"), null);
         compare(Shell.observedTextScale(0), null);
     }
+
+    function test_plugin_config_data() {
+        return [
+            {
+                tag: "jsonc object",
+                text: "{\n  // note\n  \"tags\": { \"a\": \"b\" },\n}",
+                want: {
+                    tags: {
+                        a: "b"
+                    }
+                }
+            },
+            {
+                tag: "empty object",
+                text: "{}",
+                want: {}
+            },
+            {
+                tag: "empty file",
+                text: "",
+                want: {}
+            },
+            {
+                tag: "invalid",
+                text: "{",
+                want: {}
+            },
+            {
+                tag: "list",
+                text: "[1]",
+                want: {}
+            },
+        ];
+    }
+
+    function test_plugin_config(data) {
+        const got = Shell.pluginConfig(data.text, "plugins/x.jsonc");
+
+        compare(got, data.want);
+        verify(!Array.isArray(got));
+    }
 }
