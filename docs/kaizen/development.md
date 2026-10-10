@@ -138,9 +138,10 @@ tree, so a static check passing here passes for every kaizen host.
   observed effect; the root cause is unverified. Do not attribute it to a
   change.
 - `kaizen-log` lists warnings and errors from every `kaizen-*` unit, this
-  boot by default; `-f` follows, and other arguments go to `journalctl`
-  (`--since -1h`, `-b -1`). Quickshell logs everything at priority 6 with the
-  level in the text, so `journalctl -p warning` misses it.
+  boot by default; `-f` follows, `--json` prints one object per line, and other
+  arguments go to `journalctl` (`--since -1h`, `-b -1`). Quickshell logs
+  everything at priority 6 with the level in the text, so
+  `journalctl -p warning` misses it.
 - Smoke checks do not prove focus, object lifetime, authentication, daemon
   recovery, or physical input. Exercise affected paths explicitly. Agree on a
   recovery path before lock/PAM, suspend, DPMS-off, or connectivity tests.
