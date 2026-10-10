@@ -46,7 +46,8 @@ What the curtain does not do, since it would stop screenshotting from working:
 shows: the warnings and errors each `kaizen-*` unit, plugin daemons included,
 logged in its current run, a failed or restarted unit, a shell still running
 the Quickshell a rebuild replaced, a niri config that fails `niri validate`,
-and an enabled plugin the shell cannot load. A healthy desktop reports
+an enabled plugin the shell cannot load, and a program, D-Bus service or file
+that a `requires` file lists and the system lacks. A healthy desktop reports
 nothing, so every finding is something to fix. An error an application shows
 in its window or a toast stays out of it.
 

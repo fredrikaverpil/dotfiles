@@ -1,0 +1,61 @@
+# What the core calls or reads, checked by `kaizen doctor` and requires-check.
+# One per line: cmd NAME, bus session|system NAME, file PATH, data PATH (in the
+# XDG data dirs). Missing is an error unless the line ends in `warn`.
+
+# Session
+cmd niri
+cmd uwsm
+cmd uwsm-app
+cmd quickshell
+cmd qs
+cmd systemctl
+cmd systemd-run
+cmd systemd-inhibit
+cmd journalctl
+cmd busctl
+cmd dbus-monitor
+cmd jq
+file /etc/kaizen
+file /etc/pam.d/kaizen-lock
+bus system org.freedesktop.login1
+bus session org.freedesktop.portal.Desktop
+
+# Desktop
+cmd ghostty
+cmd xdg-terminal-exec
+cmd xdg-open
+cmd notify-send
+cmd wl-copy
+cmd wl-paste
+cmd dconf
+cmd kwriteconfig6
+cmd magick
+cmd pw-play
+cmd wl-gammarelay-rs
+cmd wl-mirror
+data kaizen/emoji.json
+
+# Recording
+cmd grim
+cmd satty
+cmd gpu-screen-recorder
+cmd mpv
+
+# Network and Bluetooth
+cmd ip
+cmd ping
+cmd nmcli
+cmd nm-connection-editor
+cmd bluetui
+bus system org.freedesktop.NetworkManager
+bus system org.bluez
+
+# Power, clock, weather, firmware
+bus system org.freedesktop.UPower
+bus system org.freedesktop.UPower.PowerProfiles
+bus system org.freedesktop.timedate1
+cmd timedatectl
+cmd zdump
+cmd curl
+cmd fwupdmgr warn
+bus system org.freedesktop.fwupd warn

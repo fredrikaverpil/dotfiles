@@ -112,15 +112,17 @@ QML, which plugins run, and the notification rules.
 
 The distro supplies what
 [the core's Nix module](../../nix/shared/system/kaizen/default.nix) and each
-enabled plugin's do on NixOS:
+enabled plugin's do on NixOS. `kaizen doctor` reports each program, D-Bus
+service and file missing from
+[`requires`](../../stow/kaizen/.config/quickshell/kaizen/requires) and from
+each enabled plugin's `plugins/<name>/requires`. It cannot check:
 
-- niri, UWSM, Xwayland and xwayland-satellite.
+- Xwayland and xwayland-satellite.
 - `xdg-desktop-portal-gnome` and `-gtk`, gnome-keyring as Secret Service, and
-  `xdg-terminal-exec` with ghostty as its default.
-- PipeWire with its ALSA and PulseAudio layers, rtkit, UPower,
-  power-profiles-daemon, BlueZ, NetworkManager, and polkit with `pkexec`.
-- fwupd, when the firmware panel should read it.
-- gpu-screen-recorder, with `cap_sys_admin+ep` on `gsr-kms-server` so monitor
+  ghostty as `xdg-terminal-exec`'s default.
+- PipeWire with its ALSA and PulseAudio layers, rtkit, and polkit with
+  `pkexec`.
+- `cap_sys_admin+ep` on gpu-screen-recorder's `gsr-kms-server`, so monitor
   capture skips the portal dialog.
 - `/etc/pam.d/kaizen-lock` holding `auth include login`, for the lock and the
   curtain.
@@ -129,11 +131,9 @@ enabled plugin's do on NixOS:
 - The session variables `NIXOS_OZONE_WL=1`, `QT_QPA_PLATFORMTHEME=gtk3` and
   `GTK_USE_PORTAL=1`, and the fonts in
   [`fonts.nix`](../../nix/shared/system/fonts.nix).
-- The packages in `environment.systemPackages`, Quickshell with
-  qtimageformats for WebP and the
+- Quickshell with qtimageformats for WebP and the
   [overlay's patch](../../nix/shared/overlays/default.nix) (without it, every
-  Quickshell start logs a host portal warning `kaizen doctor` reports), and a
-  plugin's daemon: dcal for the calendar,
+  Quickshell start logs a host portal warning `kaizen doctor` reports), and
   `investigate` with go and gopls on its PATH for the incident investigator.
 - The emoji data: run
   [`kaizen emoji`](../../stow/kaizen/.local/libexec/kaizen/emoji) into
@@ -151,7 +151,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | bluetooth | [BlueZ] via [Quickshell] | button | Settings › Bluetooth | `bluetooth` |
 | brightness | [sysfs backlight] via [logind] SetBrightness | – | XF86 keys | `brightness` |
 | clipboard | [wl-clipboard] watcher, in memory | – | Trigger › Clipboard | `clipboard` |
-| doctor | the `kaizen-*` units' state and journal, niri's config and the plugin dirs, via `kaizen doctor` | doctor indicator | Settings › Doctor | `doctor` |
+| doctor | the `kaizen-*` units' state and journal, niri's config, the plugin dirs and the `requires` files, via `kaizen doctor` | doctor indicator | Settings › Doctor | `doctor` |
 | firmware | [fwupd] via `fwupdmgr` | firmware indicator | Settings › Firmware | `firmware` |
 | idle | [ext-idle-notify], lock service | idle indicator | Settings › Session | `idle` |
 | keyboard | [niri] XKB layouts | layout indicator | Settings › Keyboard layout | `keyboard` |
