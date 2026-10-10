@@ -86,157 +86,10 @@ in
 # pre-suspend lock, the data they hand the shell, and the packages the shell
 # and its binds use. A home-manager module, so it also runs on a distro other
 # than NixOS; session.nix holds the system half and adds this module to every
-# home-manager user. Compositor config and QML live in stow/kaizen/.
+# home-manager user. Compositor config, QML and notification rules live in
+# stow/kaizen/.
 {
   options.kaizen = {
-    notificationRules = lib.mkOption {
-      type = lib.types.listOf (
-        lib.types.submodule {
-          options = {
-            match = lib.mkOption {
-              type = lib.types.attrsOf lib.types.str;
-              example = {
-                app = "^Slack$";
-                summary = " in #?alerts$";
-              };
-              description = "JavaScript regexes keyed by notification field (app, summary, body); the rule applies when all match";
-            };
-            urgency = lib.mkOption {
-              type = lib.types.nullOr (
-                lib.types.enum [
-                  "low"
-                  "normal"
-                  "critical"
-                ]
-              );
-              default = null;
-              description = "Urgency in place of the one the app sent; critical sticks, low expires sooner. The first matching rule with one applies";
-            };
-            border = lib.mkOption {
-              type = lib.types.nullOr (
-                lib.types.enum [
-                  "rose"
-                  "leaf"
-                  "wood"
-                  "water"
-                  "blossom"
-                  "sky"
-                ]
-              );
-              default = null;
-              description = "Palette colour of the border, on the toast and in the history, in place of the one its urgency gives";
-            };
-            borderAnimation = lib.mkOption {
-              type = lib.types.nullOr (
-                lib.types.enum [
-                  "orbit"
-                  "heartbeat"
-                  "glow"
-                ]
-              );
-              default = null;
-              description = "Animation of the border, on the toast and in the history: `orbit` keeps a dash travelling around it, and dims the border itself so the dash stands out; `heartbeat` thickens it in two soft beats, then rests; `glow` breathes a halo around it, over the bar, the history panel and other notifications";
-            };
-            dedup = lib.mkOption {
-              type = lib.types.nullOr (
-                lib.types.submodule {
-                  options = {
-                    group = lib.mkOption {
-                      type = lib.types.str;
-                      description = "One event reported by several apps";
-                    };
-                    keep = lib.mkOption {
-                      type = lib.types.bool;
-                      default = false;
-                      description = "Show this copy and dismiss the group's others; they are held briefly in case it arrives";
-                    };
-                  };
-                }
-              );
-              default = null;
-              description = "Show one copy of an event reported by several apps";
-            };
-            collapse = lib.mkOption {
-              type = lib.types.nullOr (
-                lib.types.submodule {
-                  options = {
-                    summary = lib.mkOption {
-                      type = lib.types.nullOr lib.types.str;
-                      default = null;
-                      description = "Summary in place of the latest toast's";
-                    };
-                    body = lib.mkOption {
-                      type = lib.types.nullOr lib.types.str;
-                      default = null;
-                      description = "Body in place of the latest toast's";
-                    };
-                  };
-                }
-              );
-              default = null;
-              example = {
-                body = "Several new review requests";
-              };
-              description = "Show a burst of this rule's toasts as one: each is held briefly, then the latest replaces the others and the one on screen, showing these fields in place of its own. A lone toast keeps the app's text";
-            };
-            focus = lib.mkOption {
-              type = lib.types.nullOr lib.types.str;
-              default = null;
-              example = "^chrome-calendar\\.google\\.com";
-              description = "JavaScript regex of the app id of the window to focus when the notification is activated, in place of the notification's own app";
-            };
-            icon = lib.mkOption {
-              type = lib.types.nullOr lib.types.path;
-              default = null;
-              example = lib.literalExpression "./github.svg";
-              description = "Icon shown in place of the notification's, such as the sender an app relays for; the notification's own moves to a badge on its corner unless `badgeIcon` is set";
-            };
-            badgeIcon = lib.mkOption {
-              type = lib.types.nullOr lib.types.path;
-              default = null;
-              example = lib.literalExpression "./satty.svg";
-              description = "Icon on the corner badge. With `icon` set too, each shows as set; otherwise the notification's own stays the icon, and the badge icon takes its place when that cannot be loaded";
-            };
-            badgeEmoji = lib.mkOption {
-              type = lib.types.nullOr lib.types.str;
-              default = null;
-              example = "❤️";
-              description = "Emoji on the icon's corner badge, in Noto Color Emoji, in place of the notification's own icon when `icon` moves it there";
-            };
-            actions = lib.mkOption {
-              type = lib.types.listOf (
-                lib.types.submodule {
-                  options = {
-                    label = lib.mkOption {
-                      type = lib.types.str;
-                      description = "Text of the button";
-                    };
-                    command = lib.mkOption {
-                      type = lib.types.listOf lib.types.str;
-                      example = [
-                        "notify-send"
-                        "Pressed"
-                      ];
-                      description = "Program and arguments, run detached and not in a shell";
-                    };
-                    env = lib.mkOption {
-                      type = lib.types.attrsOf lib.types.str;
-                      default = { };
-                      description = "Variables added to the command's environment, besides NOTIFICATION_APP, NOTIFICATION_SUMMARY and NOTIFICATION_BODY";
-                    };
-                  };
-                }
-              );
-              default = [ ];
-              description = "Buttons after the toast's own; pressing one runs its command and dismisses the toast. They also show on the notification in the history, where pressing one keeps the notification and closes the panel. The first matching rule with any applies";
-            };
-          };
-        }
-      );
-      default = [ ];
-      description = "Kaizen's notification rules";
-    };
-
     plugins = lib.mkOption {
       type = lib.types.listOf lib.types.path;
       default = [ ];
@@ -271,7 +124,6 @@ in
           # qtimageformats supplies Quickshell's WebP decoder.
           "QT_PLUGIN_PATH=${pkgs.qt6.qtimageformats}/lib/qt-6/plugins"
           "KAIZEN_EMOJI=${emoji}"
-          "KAIZEN_NOTIFICATION_RULES=${pkgs.writeText "notification-rules.json" (builtins.toJSON config.kaizen.notificationRules)}"
           "KAIZEN_PLUGINS=${lib.concatStringsSep ":" config.kaizen.plugins}"
           "KAIZEN_FIRMWARE_BACKENDS=${lib.concatStringsSep ":" config.kaizen.firmwareBackends}"
         ];
@@ -325,75 +177,6 @@ in
       };
       Install.WantedBy = [ "wayland-session@niri.target" ];
     };
-
-    kaizen.notificationRules = [
-      # Google Calendar reminders arrive from both Slack and Chromium; Chromium's
-      # copy carries the buttons.
-      {
-        # Chromium prefixes the body with the origin.
-        match = {
-          app = "^Chromium$";
-          body = "^calendar\\.google\\.com\\n";
-        };
-        urgency = "critical";
-        border = "leaf";
-        dedup = {
-          group = "calendar";
-          keep = true;
-        };
-        # The reminder comes from Chromium, but the window is the Calendar app's.
-        focus = "^chrome-calendar\\.google\\.com";
-      }
-      # Slack titles messages from its apps "[workspace] from <app>", as it does a
-      # person's. Icons are simple-icons 16.32.0 (CC0) glyphs from
-      # https://cdn.jsdelivr.net/npm/simple-icons@16.32.0/icons/<slug>.svg, filled
-      # with the slug's `hex` from the package's data/simple-icons.json and scaled
-      # onto a white circle:
-      #   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-      #     <circle cx="12" cy="12" r="12" fill="#fff"/>
-      #     <path transform="translate(5 5) scale(.5833)" fill="#<hex>" d="<path>"/>
-      #   </svg>
-      {
-        match = {
-          app = "^Slack$";
-          summary = " from Google Calendar$";
-        };
-        urgency = "critical";
-        border = "leaf";
-        dedup.group = "calendar";
-        # Slack relays the reminder, but the event is in the Calendar app.
-        focus = "^chrome-calendar\\.google\\.com";
-        icon = ./icons/google-calendar.svg;
-      }
-      {
-        match = {
-          app = "^Slack$";
-          summary = " from GitHub$";
-        };
-        icon = ./icons/github.svg;
-      }
-      # A pull request opened across many repos assigns its reviews in a burst.
-      {
-        match = {
-          app = "^Slack$";
-          summary = " from GitHub$";
-          body = "^Reviews assigned to you on ";
-        };
-        collapse.body = "Several new review requests";
-      }
-      {
-        match = {
-          app = "^Slack$";
-          summary = " from Linear$";
-        };
-        icon = ./icons/linear.svg;
-      }
-      # Satty's image is a temp file it may delete before the toast loads it.
-      {
-        match.app = "^satty$";
-        badgeIcon = ./icons/satty.svg;
-      }
-    ];
 
     home.packages = with pkgs; [
       quickshell

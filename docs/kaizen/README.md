@@ -61,13 +61,14 @@ Each layer calls downward only.
 
 Nix holds what needs a system module, root or the store: the two lower layers,
 the units and the packages, applied on rebuild. Stow holds files edited in
-place, live on save: the compositor config and the shell's QML.
+place, live on save: the compositor config, the shell's QML and the
+notification rules.
 
 | Part | Path | Reaches |
 | --- | --- | --- |
 | Session, system half: niri under UWSM, portals, PAM, the services the shell reads | [`nix/shared/system/kaizen/session.nix`](../../nix/shared/system/kaizen/session.nix) | every kaizen host |
-| Session, user half (home-manager): units, the packages the shell and its binds use, notification rules | [`nix/shared/system/kaizen/home.nix`](../../nix/shared/system/kaizen/home.nix) | every home-manager user on a kaizen host |
-| Compositor config, the shell's QML | [`stow/kaizen/`](../../stow/kaizen/) | every kaizen host |
+| Session, user half (home-manager): units, the packages the shell and its binds use | [`nix/shared/system/kaizen/home.nix`](../../nix/shared/system/kaizen/home.nix) | every home-manager user on a kaizen host |
+| Compositor config, the shell's QML, the core's notification rules | [`stow/kaizen/`](../../stow/kaizen/) | every kaizen host |
 | Generic or reusable plugin, configured through its module's options | `nix/shared/system/kaizen/plugins/<name>/` | the hosts importing it |
 | Plugin specific to one host | `nix/hosts/<host>/kaizen-plugins/<name>/`, or a private submodule such as wily's `einride` | that host |
 | ThinkPad hardware the shell reads (thresholds, keyd, micmute LED); not kaizen | [`nix/shared/system/thinkpad.nix`](../../nix/shared/system/thinkpad.nix) | ThinkPad hosts |
@@ -82,7 +83,7 @@ place, live on save: the compositor config and the shell's QML.
   plugin keeps its QML beside its Nix module instead. The module lists its
   directory in `kaizen.plugins`, read in place from the checkout.
 - Nix hands the shell values only through `kaizen-shell.service`'s environment
-  (`KAIZEN_PLUGINS`, `KAIZEN_NOTIFICATION_RULES`, `KAIZEN_EMOJI`).
+  (`KAIZEN_PLUGINS`, `KAIZEN_EMOJI`).
 - Apps are not kaizen's: [`nix/README.md`](../../nix/README.md) says where they
   go.
 - QML paths here (`modules/…`, `Ui/…`) are under
@@ -273,7 +274,8 @@ nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
 | State that must survive | `~/.local/state/kaizen-shell/` | across reboots |
 | Lock and socket state | `$XDG_RUNTIME_DIR/kaizen-<name>` | until logout |
 
-- These three roots only. `~/.config/quickshell/` is Stow's tree.
+- These three roots only. `~/.config/quickshell/` and `~/.config/kaizen/` are
+  Stow's trees.
 - Files are flat in the root, one value or small JSON document each. The
   unit's `StateDirectory=` creates the state root.
 - Many or unbounded entries get a subdirectory

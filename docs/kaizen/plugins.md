@@ -20,8 +20,9 @@ reaches, is in [`README.md`](README.md) › Where it lives.
   settings, units and packages, so it runs wherever the core's `home.nix` does.
   `default.nix` is what a host imports: it adds `home.nix` to the host's
   home-manager users, and holds any part that needs NixOS.
-- Its Nix module may add notification rules, such as buttons on another app's
-  notifications: [`features.md`](features.md) › Notifications › Rules.
+- A host's notification rules may add buttons that run the plugin's commands
+  on another app's notifications: [`features.md`](features.md) ›
+  Notifications › Rules.
 - Plugin code runs in the shell as QML/JS. It needs a process of its own only
   for a tray item or for work that must outlive a shell reload, as below.
 - A plugin that needs a long-running backend brings its own daemon: its module

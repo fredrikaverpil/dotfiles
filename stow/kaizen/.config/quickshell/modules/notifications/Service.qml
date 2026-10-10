@@ -1,5 +1,6 @@
 import QtCore
 import QtQuick
+import Qt.labs.folderlistmodel
 import QtQuick.Layouts
 import QtQuick.Window
 import Quickshell
@@ -60,7 +61,11 @@ Item {
     // card whenever popupRows changes, so a card cannot hold it.
     property var countdowns: ({})
     property var shortcodes: NotificationLogic.shortcodesFrom(JSON.parse(shortcodeFile.text() || "[]"))
-    property var rules: NotificationLogic.compileRules(JSON.parse(rulesFile.text() || "[]"))
+    // The rules of every file in rulesFolder, in file-name order.
+    property var rules: []
+    // Set once rulesFolder is first listed; the server waits for it, so no
+    // notification is handled before the rules exist.
+    property bool rulesListed: false
 
     function stateText() {
         return Model.stateText(doNotDisturb, historyRows, dndSince);
@@ -84,6 +89,18 @@ Item {
         historyRows = saved.history;
         stateLoaded = true;
         remind();
+    }
+
+    function loadRules() {
+        var files = [];
+        for (var i = 0; i < ruleFiles.count; i++) {
+            var file = ruleFiles.objectAt(i) as FileView;
+            files.push({
+                path: file.path,
+                text: file.text()
+            });
+        }
+        rules = NotificationLogic.rulesFrom(files);
     }
 
     function recordFor(notification, existing) {
@@ -459,30 +476,55 @@ Item {
         printErrors: false
     }
 
-    // The notification rules (kaizen.notificationRules).
-    FileView {
-        id: rulesFile
-        path: Quickshell.env("KAIZEN_NOTIFICATION_RULES") || ""
-        // Blocks the first read, so no notification is handled before the rules exist.
-        blockLoading: true
-        printErrors: false
+    // Rules files: JSONC lists of rules (NotificationLogic.ruleCheck).
+    FolderListModel {
+        id: rulesFolder
+        folder: "file://" + Ui.Paths.config + "/notification-rules.d"
+        nameFilters: ["*.jsonc"]
+        showDirs: false
+        onStatusChanged: {
+            if (status === FolderListModel.Ready)
+                root.rulesListed = true;
+        }
     }
 
-    NotificationServer {
-        id: server
-        keepOnReload: false
-        bodySupported: true
-        bodyMarkupSupported: false
-        bodyHyperlinksSupported: false
-        bodyImagesSupported: false
-        imageSupported: true
-        actionsSupported: true
-        actionIconsSupported: false
-        inlineReplySupported: false
-        persistenceSupported: false
+    Instantiator {
+        id: ruleFiles
+        model: rulesFolder
+        onObjectAdded: root.loadRules()
+        onObjectRemoved: root.loadRules()
 
-        onNotification: function (notification) {
-            root.handleNotification(notification);
+        delegate: FileView {
+            required property string filePath
+            path: filePath
+            watchChanges: true
+            // Blocks the first read, so the rules are whole once listed.
+            blockLoading: true
+            printErrors: false
+            onFileChanged: reload()
+            onLoaded: root.loadRules()
+        }
+    }
+
+    LazyLoader {
+        active: root.rulesListed
+
+        NotificationServer {
+            id: server
+            keepOnReload: false
+            bodySupported: true
+            bodyMarkupSupported: false
+            bodyHyperlinksSupported: false
+            bodyImagesSupported: false
+            imageSupported: true
+            actionsSupported: true
+            actionIconsSupported: false
+            inlineReplySupported: false
+            persistenceSupported: false
+
+            onNotification: function (notification) {
+                root.handleNotification(notification);
+            }
         }
     }
 

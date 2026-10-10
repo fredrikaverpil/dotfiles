@@ -1,0 +1,56 @@
+// kaizen's notification rules. Each file in this directory holds a list of
+// rules; the shell reads them in file-name order. Fields are described at
+// `ruleCheck` in ~/.config/quickshell/modules/notifications/NotificationLogic.js.
+[
+  // Google Calendar reminders arrive from both Slack and Chromium; Chromium's
+  // copy carries the buttons.
+  {
+    // Chromium prefixes the body with the origin.
+    "match": { "app": "^Chromium$", "body": "^calendar\\.google\\.com\\n" },
+    "urgency": "critical",
+    "border": "leaf",
+    "dedup": { "group": "calendar", "keep": true },
+    // The reminder comes from Chromium, but the window is the Calendar app's.
+    "focus": "^chrome-calendar\\.google\\.com",
+  },
+  // Slack titles messages from its apps "[workspace] from <app>", as it does a
+  // person's. Icons are simple-icons 16.32.0 (CC0) glyphs from
+  // https://cdn.jsdelivr.net/npm/simple-icons@16.32.0/icons/<slug>.svg, filled
+  // with the slug's `hex` from the package's data/simple-icons.json and scaled
+  // onto a white circle:
+  //   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  //     <circle cx="12" cy="12" r="12" fill="#fff"/>
+  //     <path transform="translate(5 5) scale(.5833)" fill="#<hex>" d="<path>"/>
+  //   </svg>
+  {
+    "match": { "app": "^Slack$", "summary": " from Google Calendar$" },
+    "urgency": "critical",
+    "border": "leaf",
+    "dedup": { "group": "calendar" },
+    // Slack relays the reminder, but the event is in the Calendar app.
+    "focus": "^chrome-calendar\\.google\\.com",
+    "icon": "../icons/google-calendar.svg",
+  },
+  {
+    "match": { "app": "^Slack$", "summary": " from GitHub$" },
+    "icon": "../icons/github.svg",
+  },
+  // A pull request opened across many repos assigns its reviews in a burst.
+  {
+    "match": {
+      "app": "^Slack$",
+      "summary": " from GitHub$",
+      "body": "^Reviews assigned to you on ",
+    },
+    "collapse": { "body": "Several new review requests" },
+  },
+  {
+    "match": { "app": "^Slack$", "summary": " from Linear$" },
+    "icon": "../icons/linear.svg",
+  },
+  // Satty's image is a temp file it may delete before the toast loads it.
+  {
+    "match": { "app": "^satty$" },
+    "badgeIcon": "../icons/satty.svg",
+  },
+]

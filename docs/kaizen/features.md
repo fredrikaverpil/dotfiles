@@ -97,23 +97,31 @@ notify-send -i /path/to/icon.svg <summary> <body>
 
 ### Rules
 
-Notifications arriving via the D-Bus can be transformed by
-`kaizen.notificationRules`, keyed by regexes on the notification's data. This
-offers capabilities such as restyling, adding action buttons or deduplication.
-The features available are described in
-[`home.nix`](../../nix/shared/system/kaizen/home.nix).
+Notifications arriving via the D-Bus can be transformed by notification rules,
+keyed by regexes on the notification's data. This offers capabilities such as
+restyling, adding action buttons or deduplication. The fields are described at
+`ruleCheck` in
+[`NotificationLogic.js`](../../stow/kaizen/.config/quickshell/modules/notifications/NotificationLogic.js).
 
 Rules match only on what the app sends. Capture a real notification first:
 [`development.md`](development.md) › Gotchas.
 
-Rules can be specified in the core kaizen system, per-host or by an optional
-plugin.
+Each `~/.config/kaizen/notification-rules.d/*.jsonc` holds a list of rules in
+JSONC (JSON with comments and trailing commas). The shell reads the files in
+file-name order and applies an edit on save; a notification takes each setting
+from the first matching rule that has one. A relative icon path resolves
+against the file's directory. A file or rule that is invalid is dropped with a
+warning, which `kaizen-log` lists.
 
-A plugin adds rules from its Nix module, such as a button that runs its own
-command with the notification in `NOTIFICATION_APP`, `NOTIFICATION_SUMMARY` and
-`NOTIFICATION_BODY`; the
+| File | Holds |
+| --- | --- |
+| `10-kaizen.jsonc` in [`stow/kaizen/`](../../stow/kaizen/.config/kaizen/notification-rules.d/) | the core's rules |
+| `50-<what>.jsonc` in `stow/host/<host>/`, or in a private submodule's `stow/` | a host's rules |
+
+A rule's button may run a plugin's command, with the notification in
+`NOTIFICATION_APP`, `NOTIFICATION_SUMMARY` and `NOTIFICATION_BODY`; the
 [incident investigator](../../nix/shared/system/kaizen/plugins/incident-investigator/README.md)
-does.
+has one.
 
 ### Toasts
 

@@ -22,8 +22,6 @@ let
     nativeCheckInputs = [ pkgs.git ];
     meta.mainProgram = "investigate";
   };
-
-  tagNames = map (tag: tag.name) cfg.tags;
 in
 {
   options.kaizen.incidentInvestigator = {
@@ -50,7 +48,7 @@ in
               type = lib.types.str;
               description = "Label shown on the investigation's badge and filter";
             };
-            # The palette roles of kaizen.notificationRules' border.
+            # The palette roles of a notification rule's border.
             color = lib.mkOption {
               type = lib.types.enum [
                 "rose"
@@ -67,29 +65,6 @@ in
       );
       default = [ ];
       description = "Labels an investigation can carry, for the window's filters and badges";
-    };
-    alerts = lib.mkOption {
-      type = lib.types.listOf (
-        lib.types.submodule {
-          options = {
-            match = lib.mkOption {
-              type = lib.types.attrsOf lib.types.str;
-              example = {
-                app = "^Slack$";
-                summary = " in #alerts$";
-              };
-              description = "As in kaizen.notificationRules";
-            };
-            tag = lib.mkOption {
-              type = lib.types.nullOr lib.types.str;
-              default = null;
-              description = "Tag of the drafts the button creates, one of tags";
-            };
-          };
-        }
-      );
-      default = [ ];
-      description = "Notifications that get the Investigate button. Style their toasts with kaizen.notificationRules entries";
     };
     entityPatterns = lib.mkOption {
       type = lib.types.listOf (
@@ -115,28 +90,9 @@ in
   };
 
   config = {
-    assertions = map (alert: {
-      assertion = alert.tag == null || lib.elem alert.tag tagNames;
-      message = "kaizen.incidentInvestigator.alerts: tag ${toString alert.tag} is not one of tags";
-    }) cfg.alerts;
-
     kaizen.incidentInvestigator.instructionFiles = lib.mkBefore [ "${dir}/instructions.md" ];
 
     kaizen.plugins = [ dir ];
-
-    kaizen.notificationRules = map (alert: {
-      inherit (alert) match;
-      actions = [
-        {
-          label = "Investigate";
-          command = [
-            "investigate"
-            "draft"
-          ];
-          env = lib.optionalAttrs (alert.tag != null) { INVESTIGATE_TAG = alert.tag; };
-        }
-      ];
-    }) cfg.alerts;
 
     # On the session PATH, for the shell to run its client verbs.
     home.packages = [ investigate ];

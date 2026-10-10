@@ -122,6 +122,169 @@ TestCase {
         });
     }
 
+    function test_notification_rule_errors_name_the_first_invalid_field() {
+        const match = {
+            app: "^Slack$"
+        };
+        const cases = [
+            {
+                rule: {
+                    match: match,
+                    urgency: null,
+                    dedup: {
+                        group: "calendar",
+                        keep: true
+                    },
+                    actions: [
+                        {
+                            label: "Run",
+                            command: ["run"],
+                            env: {
+                                A: "1"
+                            }
+                        }
+                    ]
+                },
+                want: ""
+            },
+            {
+                rule: "rule",
+                want: "not an object"
+            },
+            {
+                rule: {
+                    match: match,
+                    borderAnimaton: "glow"
+                },
+                want: "borderAnimaton: unknown field"
+            },
+            {
+                rule: {
+                    match: match,
+                    toString: "x"
+                },
+                want: "toString: unknown field"
+            },
+            {
+                rule: {
+                    match: match,
+                    border: "red"
+                },
+                want: "border: not one of rose, leaf, wood, water, blossom, sky"
+            },
+            {
+                rule: {
+                    match: {
+                        app: 1
+                    }
+                },
+                want: "match: app: not a string"
+            },
+            {
+                rule: {
+                    match: match,
+                    dedup: {
+                        keep: true
+                    }
+                },
+                want: "dedup: group: missing"
+            },
+            {
+                rule: {
+                    match: match,
+                    dedup: {
+                        group: "g",
+                        keep: "yes"
+                    }
+                },
+                want: "dedup: keep: not a boolean"
+            },
+            {
+                rule: {
+                    match: match,
+                    actions: [
+                        {
+                            label: "Run",
+                            command: "run"
+                        }
+                    ]
+                },
+                want: "actions: [0]: command: not a list"
+            },
+            {
+                rule: {
+                    match: match,
+                    actions: [
+                        {
+                            label: "Run",
+                            command: ["run"],
+                            env: {
+                                A: 1
+                            }
+                        }
+                    ]
+                },
+                want: "actions: [0]: env: A: not a string"
+            },
+        ];
+        for (const c of cases)
+            verify(Notification.ruleError(c.rule) === c.want, JSON.stringify(c.rule) + " => " + Notification.ruleError(c.rule));
+    }
+
+    function test_notification_rule_icons_resolve_relative_paths_against_the_rules_file() {
+        const icons = ["../icons/github.svg", "/abs/github.svg", "file:///abs/github.svg", "image://icon/slack"].map(icon => Notification.compileRules([
+                {
+                    match: {
+                        app: "^Slack$"
+                    },
+                    icon: icon,
+                    badgeIcon: icon
+                }
+            ], "/home/me/.config/kaizen/notification-rules.d/10-kaizen.jsonc")[0]).map(rule => [rule.icon, rule.badgeIcon]);
+        compare(icons, [["file:///home/me/.config/kaizen/notification-rules.d/../icons/github.svg", "file:///home/me/.config/kaizen/notification-rules.d/../icons/github.svg"], ["file:///abs/github.svg", "file:///abs/github.svg"], ["file:///abs/github.svg", "file:///abs/github.svg"], ["image://icon/slack", "image://icon/slack"]]);
+    }
+
+    function test_notification_rules_files_concatenate_in_order_skipping_invalid_ones() {
+        ignoreWarning(/^notifications: \/b\.jsonc: skipping: SyntaxError/);
+        ignoreWarning("notifications: /c.jsonc: dropping rules: not a list");
+        ignoreWarning('notifications: /d.jsonc: dropping rule 0 {"match":{"app":"^D$"},"urgency":"loud"}: urgency: not one of low, normal, critical');
+        const rules = Notification.rulesFrom([
+            {
+                path: "/a.jsonc",
+                text: '// core\n[{"match": {"app": "^A$"}, "urgency": "critical",},]'
+            },
+            {
+                path: "/b.jsonc",
+                text: "[{"
+            },
+            {
+                path: "/c.jsonc",
+                text: "{}"
+            },
+            {
+                path: "/d.jsonc",
+                text: '[{"match": {"app": "^D$"}, "urgency": "loud"}, {"match": {"summary": "^E$"}, "border": "rose"}]'
+            },
+        ]);
+
+        compare(rules.map(rule => ({
+                    checks: rule.checks.map(check => check.field + "=" + check.pattern.source),
+                    urgency: rule.urgency,
+                    border: rule.border
+                })), [
+            {
+                checks: ["app=^A$"],
+                urgency: "critical",
+                border: ""
+            },
+            {
+                checks: ["summary=^E$"],
+                urgency: "",
+                border: "rose"
+            },
+        ]);
+    }
+
     function test_notification_urgency_comes_from_the_first_matching_rule_with_one() {
         const rules = Notification.compileRules([
             {

@@ -51,7 +51,7 @@ plugins. Servers import neither. The two stay independent: `linux-desktop.nix`
 sets no kaizen option, and kaizen declares everything it runs, even a tool
 another scope also installs (`jq`, `imagemagick`). kaizen's own settings, such
 as its notification rules, may name apps; a host adds to them in its own
-configuration. [`../docs/kaizen/README.md`](../docs/kaizen/README.md) maps
+Stow tree. [`../docs/kaizen/README.md`](../docs/kaizen/README.md) maps
 kaizen's own parts, Nix and Stow.
 
 An app's niri window rules and binds go in
