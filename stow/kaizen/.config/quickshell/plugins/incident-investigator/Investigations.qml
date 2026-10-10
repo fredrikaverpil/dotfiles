@@ -99,9 +99,9 @@ Column {
         picked = [];
         selectedId = id;
         if (formView.count)
-            formView.itemAt(0).focusNotes();
+            (formView.itemAt(0) as Form).focusNotes();
         else if (detailView.count)
-            detailView.itemAt(0).followUp();
+            (detailView.itemAt(0) as Detail).followUp();
     }
 
     // Space on a row: toggles it in the picked set, which starts from the selection.
@@ -227,9 +227,9 @@ Column {
         const arg = row.arg;
         const id = row.ids.length ? row.ids[0] : "";
         const item = all.find(item => item.id === id);
-        const shown = formView.count ? formView.itemAt(0) : null;
+        const shown = formView.count ? formView.itemAt(0) as Form : null;
         const form = shown && shown.itemId === id ? shown : null;
-        const detail = detailView.count && detailId === id ? detailView.itemAt(0) : null;
+        const detail = detailView.count && detailId === id ? detailView.itemAt(0) as Detail : null;
         if (action === "open")
             open(id);
         else if (action === "run")
@@ -353,7 +353,7 @@ Column {
     }
 
     // The Selectable holding the selection; a new selection clears the previous one.
-    property Item selection: null
+    property Selectable selection: null
 
     function copy(text) {
         Quickshell.execDetached(["wl-copy", "--", text]);
@@ -1585,7 +1585,7 @@ Column {
         function edit(index) {
             const message = messages.itemAt(index);
             if (message)
-                message.edit();
+                message.edit(); // qmllint disable missing-property
         }
 
         function menuScope() {
@@ -1861,7 +1861,7 @@ Column {
                         // Your own message's inline editor.
                         function edit() {
                             if (modelData.kind === "user" && !detail.running && detail.item.sessionId !== "")
-                                loader.item.edit();
+                                loader.item.edit(); // qmllint disable missing-property
                         }
 
                         function menuScope() {
@@ -1890,9 +1890,9 @@ Column {
                                 detail.focusMessage(index + 1);
                             else if (event.key === Qt.Key_K || event.key === Qt.Key_Up)
                                 detail.focusMessage(index - 1);
-                            else if (fold && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space))
-                                loader.item.expanded = !loader.item.expanded;
-                            else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
+                            else if (fold && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space)) {
+                                loader.item.expanded = !loader.item.expanded; // qmllint disable missing-property
+                            } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
                                 message.edit();
                             else if (event.matches(StandardKey.Copy))
                                 root.copy(root.selection ? root.selection.selectedText : Actions.messageText(modelData));

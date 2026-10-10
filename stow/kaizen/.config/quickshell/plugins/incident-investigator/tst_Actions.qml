@@ -121,7 +121,7 @@ TestCase {
         }, fields);
     }
 
-    function state(fields) {
+    function actionState(fields) {
         return Object.assign({
             all: [],
             listed: [],
@@ -286,7 +286,7 @@ TestCase {
             enabled: false,
             action: "combine"
         });
-        const picked = state({
+        const picked = actionState({
             picked: [failed, item({
                     id: "b"
                 })]
@@ -294,7 +294,7 @@ TestCase {
         return [
             {
                 tag: "deletable",
-                state: state({}),
+                state: actionState({}),
                 item: failed,
                 want: about(["a"], [open("failed"), row({
                         key: "rerun",
@@ -311,7 +311,7 @@ TestCase {
             },
             {
                 tag: "draft",
-                state: state({}),
+                state: actionState({}),
                 item: draft,
                 want: about(["a"], [open("draft")].concat(Actions.itemRows(draft, [], ""), [pick, combine]))
             },
@@ -367,19 +367,19 @@ TestCase {
                     keys: keys,
                     action: "delete"
                 })]);
-        const pickedWith = state({
+        const pickedWith = actionState({
             picked: [failed, other]
         });
         return [
             {
                 tag: "nothing picked",
-                state: state({}),
+                state: actionState({}),
                 item: failed,
                 want: rows(["Backspace"])
             },
             {
                 tag: "unpicked row while others are picked",
-                state: state({
+                state: actionState({
                     picked: [other, item({
                             id: "c"
                         })]
@@ -406,7 +406,7 @@ TestCase {
         return [
             {
                 tag: "keyed, a shared tag",
-                state: state({
+                state: actionState({
                     tags: tags,
                     picked: [item({
                             tag: "dev"
@@ -438,7 +438,7 @@ TestCase {
             },
             {
                 tag: "one running, tags differ",
-                state: state({
+                state: actionState({
                     tags: tags,
                     picked: [item({
                             status: "running",
@@ -462,7 +462,7 @@ TestCase {
             },
             {
                 tag: "no shared tag",
-                state: state({
+                state: actionState({
                     tags: tags,
                     picked: [item({
                             status: "running",
@@ -499,12 +499,12 @@ TestCase {
         return [
             {
                 tag: "no tags or projects",
-                state: state({}),
+                state: actionState({}),
                 want: []
             },
             {
                 tag: "tags counted, all filtered",
-                state: state({
+                state: actionState({
                     tags: tags,
                     tagCounts: {
                         "": 3,
@@ -521,7 +521,7 @@ TestCase {
             },
             {
                 tag: "projects only",
-                state: state({
+                state: actionState({
                     projectFilter: ["p-dev"],
                     projects: ["p-dev", "p-prod"]
                 }),
@@ -562,12 +562,12 @@ TestCase {
         return [
             {
                 tag: "empty",
-                state: state({}),
+                state: actionState({}),
                 want: [search]
             },
             {
                 tag: "filtered and picked",
-                state: state({
+                state: actionState({
                     listed: [first, second],
                     picked: [second],
                     tags: tags,
@@ -676,7 +676,7 @@ TestCase {
         return [
             {
                 tag: "no tags or projects",
-                state: state({}),
+                state: actionState({}),
                 draft: {
                     id: "a",
                     tag: "",
@@ -694,7 +694,7 @@ TestCase {
             },
             {
                 tag: "tagged with a project",
-                state: state({
+                state: actionState({
                     tags: tags
                 }),
                 draft: {
@@ -715,7 +715,7 @@ TestCase {
             },
             {
                 tag: "combined",
-                state: state({
+                state: actionState({
                     all: [source]
                 }),
                 draft: {
@@ -779,7 +779,7 @@ TestCase {
     }
 
     function test_conversationRows(data) {
-        const got = Actions.conversationRows(state({
+        const got = Actions.conversationRows(actionState({
             tags: tags,
             all: [source]
         }), data.item, "fir");
@@ -942,7 +942,7 @@ TestCase {
         return [
             {
                 tag: "nothing to clear",
-                state: state({}),
+                state: actionState({}),
                 want: [row({
                         key: "new",
                         text: "New investigation",
@@ -952,7 +952,7 @@ TestCase {
             },
             {
                 tag: "filtered",
-                state: state({
+                state: actionState({
                     clearable: 3,
                     clearLabel: "Clear dev",
                     tagFilter: "dev"

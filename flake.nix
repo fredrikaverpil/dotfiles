@@ -198,8 +198,7 @@
                 pkgs.mkShell {
                   packages = [
                     pkgs.qt6.qtdeclarative # qmlls, qmllint, qmlformat, qmltestrunner
-                    # Plugins skipped until the investigator's lookups are typed.
-                    (task "qml-lint" "qmllint -E -W 0 $(find . -path ./plugins -prune -o -name '*.qml' -print)")
+                    (task "qml-lint" "qmllint -E -W 0 $(find . -name '*.qml')")
                     # Tool defaults; prettier's match conform's flags for JS.
                     (task "qml-format" ''
                       dirs=". ../../../host/*/.config/quickshell"

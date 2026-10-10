@@ -53,10 +53,10 @@ reaches, is in [`README.md`](README.md) › Where it lives.
 ## Developing one
 
 - Quickshell watches only the files `shell.qml` imports, not plugins: apply an
-  edit with `qs ipc call shell reload`. `qml-test` runs the tests under
-  `plugins/`; `qml-lint` skips plugins for now. A host's plugin, outside
-  `stow/kaizen/`, is checked by neither. A tray plugin's user unit starts with
-  the session when its module sets `autostart`.
+  edit with `qs ipc call shell reload`. `qml-lint` and `qml-test` cover
+  `plugins/`; a host's plugin, outside `stow/kaizen/`, is checked by neither. A
+  tray plugin's user unit starts with the session when its module sets
+  `autostart`.
 
 [dcal]: https://github.com/AvengeMedia/dankcalendar
 [StatusNotifierItem]: https://www.freedesktop.org/wiki/Specifications/StatusNotifierItem/
