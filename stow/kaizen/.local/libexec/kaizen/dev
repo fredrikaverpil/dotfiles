@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+set -euo pipefail
+
+case "${1:-}" in
+-h | --help)
+  echo "usage: kaizen dev [PATH | NAME | off]    run the shell from a checkout or a worktree of ~/.dotfiles, or main's again"
+  exit 0
+  ;;
+esac
+
+unit=kaizen-shell.service
+# Under /run, so a reboot returns to main's shell.
+dropin="${XDG_RUNTIME_DIR:?}/systemd/user/$unit.d/dev.conf"
+tree=stow/kaizen/.config/quickshell/kaizen
+
+# running: the shell.qml the unit's process runs, if it runs.
+running() {
+  local pid
+  pid=$(systemctl --user show "$unit" -p MainPID --value)
+  qs list --all -j | jq -r --argjson pid "${pid:-0}" '.[] | select(.pid == $pid) | .config_path'
+}
+
+# unlocked: fails unless the shell holds no lock. It answers "Not ready" while
+# a reload runs, and for good once its config failed to load, when it has no
+# lock surface either.
+unlocked() {
+  local answer
+  if [[ -z $(running) ]]; then
+    return 0
+  fi
+  for _ in $(seq 25); do
+    answer=$(timeout 2 kaizen ipc call lock isLocked 2>&1) || true
+    case $answer in
+    false) return 0 ;;
+    true)
+      echo "kaizen dev: the session is locked" >&2
+      return 1
+      ;;
+    esac
+    sleep 0.2
+  done
+  if [[ $answer == "Not ready to accept queries yet." ]]; then
+    return 0
+  fi
+  echo "kaizen dev: the lock state is unknown: $answer" >&2
+  return 1
+}
+
+# restart: restarts the unit and waits until its IPC answers.
+restart() {
+  unlocked || exit 1
+  systemctl --user daemon-reload
+  systemctl --user restart "$unit"
+  for _ in $(seq 100); do
+    if timeout 2 kaizen ipc call lock isLocked >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 0.2
+  done
+  echo "kaizen dev: $unit does not answer over IPC; kaizen dev off runs main's" >&2
+  exit 1
+}
+
+case "${1:-}" in
+"")
+  config=$(running)
+  if [[ -z $config ]]; then
+    echo "kaizen-shell is not running" >&2
+    exit 1
+  fi
+  dirname "$config"
+  ;;
+off)
+  rm -f "$dropin"
+  restart
+  dirname "$(running)"
+  ;;
+*)
+  if [[ -d $1 ]]; then
+    root=$(realpath "$1")
+  else
+    root=$(git -C "$HOME/.dotfiles" worktree list --porcelain |
+      sed -n 's/^worktree //p' |
+      awk -v name="$1" -F / '$NF == name')
+    if [[ -z $root || $root == *$'\n'* ]]; then
+      echo "kaizen dev: no single worktree of ~/.dotfiles named $1" >&2
+      exit 1
+    fi
+  fi
+  dir="$root/$tree"
+  if [[ ! -f $dir/shell.qml ]]; then
+    echo "kaizen dev: $dir/shell.qml does not exist" >&2
+    exit 1
+  fi
+  mkdir -p "$(dirname "$dropin")"
+  # No fallback: a removed worktree leaves the unit failing, which kaizen
+  # doctor reports.
+  printf '[Service]\nExecStart=\nExecStart=/usr/bin/env quickshell -p "%s"\n' "$dir" >"$dropin"
+  restart
+  # Fails rather than leave an agent validating main's shell.
+  if [[ $(running) != "$dir/shell.qml" ]]; then
+    echo "kaizen dev: $unit does not run $dir" >&2
+    exit 1
+  fi
+  echo "$dir"
+  ;;
+esac

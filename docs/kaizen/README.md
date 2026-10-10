@@ -95,7 +95,8 @@ QML, which plugins run, and the notification rules.
   [`stow/kaizen/`](../../stow/kaizen/). `~/.config/kaizen/` holds only a host's
   configuration: which plugins run and their config, notification rules, and
   its plugins' QML. A plugin name in both is an error: neither shadows the
-  other.
+  other. `kaizen dev` runs a worktree's shell tree instead:
+  [`development.md`](development.md) › Working from a worktree.
 - `kaizen <sub>` is the only kaizen command on PATH; it runs
   `~/.local/libexec/kaizen/<sub>`. Units, niri binds and QML call it, never a
   script's path.

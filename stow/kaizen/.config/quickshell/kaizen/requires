@@ -15,6 +15,7 @@ cmd journalctl
 cmd busctl
 cmd dbus-monitor
 cmd jq
+cmd git
 file /etc/kaizen
 file /etc/pam.d/kaizen-lock
 bus system org.freedesktop.login1

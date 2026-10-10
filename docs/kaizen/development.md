@@ -245,6 +245,30 @@ change it measures.
   `kaizen-shell.service`, so `kaizen ipc` and the binds miss it; reach it with
   `qs ipc -c kaizen`.
 
+## Working from a worktree
+
+Static checks (`qml-*`, `requires-check`, `compositor-test`) and Nix builds run
+in the worktree. To see its QML live:
+
+```sh
+kaizen dev .      # from the worktree's root, or kaizen dev NAME (its directory)
+kaizen dev        # prints the shell tree kaizen-shell runs
+kaizen dev off    # back to main's
+```
+
+- `kaizen dev PATH` restarts `kaizen-shell.service` on the worktree's shell
+  tree through a drop-in under `$XDG_RUNTIME_DIR`, then hot-reloads its edits.
+  It fails unless the unit runs that tree, and `kaizen ipc`, the binds and
+  `shell-smoke` reach it. A reboot returns to main's.
+- An agent runs it without asking. It refuses while locked: the rule below
+  applies.
+- Only the shell's QML, generic plugins included, comes from the worktree.
+  Scripts, units, niri's config, a host's plugins and the investigator's `-dir`
+  stay main's, so changes to them still go through main.
+- One worktree is live at a time. Run `kaizen dev off` before removing the
+  worktree or ending the task. A removed worktree, or QML that fails to load,
+  leaves the unit failing; `kaizen dev off` recovers either.
+
 ## Deployment safety
 
 On the host, `~/.dotfiles` is this checkout and the live stowed tree: edits
