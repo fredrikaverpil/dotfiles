@@ -25,36 +25,6 @@ public clones and CI try to fetch the private repo.
 After pulling, `git submodule update --init` brings the submodule to the
 pinned commit. CI builds the host without the submodule checked out.
 
-## Test-driving Noctalia
-
-Noctalia v5 (nixpkgs `noctalia`, a C++ shell; `noctalia-shell` is the v4
-Quickshell config) is evaluated, never installed: both routes below run it
-from the host's own nixpkgs and leave its state in `~/.config/noctalia/` and
-`~/.local/state/noctalia/`, outside the dotfiles.
-
-A whole session without kaizen: `noctalia` from the TTY, the counterpart to
-`kaizen run`, in `stow/shared/.shell/sourcing.sh`. It masks the units
-`kaizen units` lists for the session and lets niri start Noctalia instead.
-niri's config is kaizen's, so its `kaizen ipc` binds do nothing and Noctalia's
-own binds are absent. Its logs are `journalctl --user -u noctalia-trial -f`, the
-same unit name as the swap below. The masks live in `$XDG_RUNTIME_DIR`, so they
-are gone after a reboot, and `kaizen run` clears them before starting; either
-command always reaches the other session.
-
-Swapping shells inside a running kaizen session, keeping its niri and units:
-
-```sh
-systemctl --user stop kaizen-shell
-systemd-run --user --unit=noctalia-trial --collect -p Slice=app.slice \
-  nix run ~/.dotfiles#nixosConfigurations.wily.pkgs.noctalia
-journalctl --user -u noctalia-trial -f   # logs
-
-# back
-systemctl --user stop noctalia-trial && systemctl --user start kaizen-shell
-```
-
-Here `kaizen-sleep-lock` is still running but cannot lock, so do not suspend.
-
 ## Local LLM
 
 `llama-router` runs llama.cpp's router server (Vulkan, Xe2 iGPU) on

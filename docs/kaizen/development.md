@@ -80,8 +80,7 @@ upstream's latest, and niri marks each option with the version it arrived in
   It carries only what you pass, so copy the summary and body from a captured
   one.
 - User units are named `kaizen-<name>`, plugin daemons included
-  (`kaizen-dcal`). Units that must stay out of a non-kaizen session are listed
-  in [`kaizen units`](../../stow/kaizen/.local/libexec/kaizen/units).
+  (`kaizen-dcal`).
 - Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Niri KDL booleans are presence-only, not `option true`.
 - Use `keyNavigation` for ordinary focus chains; use a panel-managed cursor

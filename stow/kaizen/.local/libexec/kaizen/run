@@ -19,8 +19,6 @@ if [[ $arg0 != -* ]]; then
 fi
 uwsm check may-start -i
 
-# Undo a mask left behind by a noctalia session that died mid-function.
-kaizen units unmask
 # --session serves niri's D-Bus interfaces (screencast portal, a11y) and
 # imports its environment, which uwsm cleans up on exit. The instance name
 # follows from the executable, so the units are wayland-wm@niri.service and
