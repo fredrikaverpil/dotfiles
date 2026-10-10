@@ -29,6 +29,8 @@ combination of NixOS, niri and Quickshell).
    sudo darwin-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"  # macOS
    ```
 
+On a machine without Nix, `~/.dotfiles/stow.sh` links the dotfiles alone.
+
 Then, after the first rebuild, some common commands:
 
 ```sh
@@ -37,7 +39,7 @@ nh os switch --ask  # NixOS
 nh darwin switch --ask  # macOS
 
 # run stowing of files
-dotfiles-stow
+~/.dotfiles/stow.sh
 
 # update all flake inputs
 nix flake update

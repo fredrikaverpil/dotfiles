@@ -24,7 +24,7 @@ sudo scutil --set HostName <hostname>
 sudo nix run nix-darwin/master#darwin-rebuild -- switch --flake ~/.dotfiles#<hostname>
 ```
 
-Open a new terminal. `darwin-rebuild` and `dotfiles-stow` are now on `PATH`,
+Open a new terminal. `darwin-rebuild` is now on `PATH`,
 and the [README](../README.md) takes over from here.
 
 nix-darwin manages the Nix installation from the first switch on; the installer

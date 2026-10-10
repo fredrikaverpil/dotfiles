@@ -2,7 +2,7 @@
 
 ```sh
 # edit files in stow/ and then run:
-dotfiles-stow
+~/.dotfiles/stow.sh
 ```
 
 Stow forbids slashes in package names, so each level is its own invocation:
