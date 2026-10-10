@@ -7,7 +7,7 @@ let
     pname = "hello-tray";
     version = "0.1.0";
     src = ./.;
-    vendorHash = "sha256-4dUCx2EuKoELZOUXzX6lSkmzWfScv83EuAtf5qFBIAc=";
+    vendorHash = "sha256-D3vwR88HkkSyRY1e4VAjI0pUC4AbIEvUmc9lQ922apM=";
     meta.mainProgram = "hello-tray";
   };
 in
