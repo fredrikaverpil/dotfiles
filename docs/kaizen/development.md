@@ -139,12 +139,14 @@ tree, so a static check passing here passes for every kaizen host.
   known baseline (since at least 2026-09-11), passes `shell-smoke`, and has no
   observed effect; the root cause is unverified. Do not attribute it to a
   change.
-- `kaizen log` lists warnings and errors from every `kaizen-*` unit, this
-  boot by default; `-f` follows, `--json` prints one object per line, and other
-  arguments go to `journalctl` (`--since -1h`, `-b -1`). Quickshell logs
-  everything at priority 6 with the level in the text, so
-  `journalctl -p warning` misses it. The bar's log indicator shows whenever it
-  lists anything.
+- `kaizen doctor` lists the warnings and errors from each `kaizen-*` unit's
+  current run, and checks units, the shell's binary, niri's config and the
+  plugin dirs; `--json` prints one document, and journalctl arguments
+  (`--since -1h`, `-b -1`) report that span of the journal instead, without
+  the checks. Follow the units with `journalctl --user -u 'kaizen-*' -f`.
+  Quickshell logs everything at priority 6 with the level in the text, so
+  `journalctl -p warning` misses it. The bar's doctor indicator shows whenever
+  it reports anything.
 - Smoke checks do not prove focus, object lifetime, authentication, daemon
   recovery, or physical input. Exercise affected paths explicitly. Agree on a
   recovery path before lock/PAM, suspend, DPMS-off, or connectivity tests.

@@ -1,0 +1,174 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+set -euo pipefail
+
+case "${1:-}" in
+-h | --help)
+  echo "usage: kaizen doctor [--json] [JOURNALCTL_ARGS...]    report the kaizen units' warnings and errors, and what is out of order"
+  exit 0
+  ;;
+esac
+
+# --json prints { findings, text }: findings sorted as text lists them, each
+# { source, level, unit, message, count, first, last }, times in milliseconds
+# since the epoch. Without JOURNALCTL_ARGS the report covers each kaizen unit's
+# current run plus the checks; with them (-b -1, --since -1h) it covers that
+# part of the journal, without checks.
+json=false
+args=()
+for arg in "$@"; do
+  if [[ "$arg" == --json ]]; then
+    json=true
+  else
+    args+=("$arg")
+  fi
+done
+
+now=$(date +%s%3N)
+config=${XDG_CONFIG_HOME:-$HOME/.config}
+units=[]
+checks=""
+
+# check LEVEL UNIT MESSAGE
+check() {
+  checks+=$(jq -nc --arg level "$1" --arg unit "$2" --arg message "$3" '{$level, $unit, $message}')$'\n'
+}
+
+if ((${#args[@]} > 0)); then
+  journal=$(journalctl --user --unit 'kaizen-*' --boot --lines all --output json --no-pager "${args[@]}")
+else
+  units=$(
+    systemctl --user show 'kaizen-*' -p Id -p InvocationID -p NRestarts -p ActiveState -p Result -p MainPID |
+      jq -Rsc 'split("\n\n") | map(split("\n") | map(select(. != "") | capture("^(?<key>[^=]+)=(?<value>.*)$")) | from_entries | select(.Id))'
+  )
+
+  # NRestarts counts systemd's restarts since the unit was last started by hand.
+  while IFS=$'\t' read -r level unit message; do
+    check "$level" "$unit" "$message"
+  done < <(jq -r '.[]
+    | (.Id | sub("\\.service$"; "")) as $unit
+    | (.NRestarts | tonumber) as $n
+    | (if .ActiveState == "failed" then ["ERROR", $unit, "failed (\(.Result))"] else empty end),
+      (if $n > 0 then ["WARN", $unit, "failed and was restarted \($n) time\(if $n == 1 then "" else "s" end)"] else empty end)
+    | @tsv' <<<"$units")
+
+  # Nix replaces the store path a rebuild installs; elsewhere the old binary
+  # shows as deleted.
+  pid=$(jq -r '.[] | select(.Id == "kaizen-shell.service") | .MainPID' <<<"$units")
+  if [[ "${pid:-0}" != 0 ]] && exe=$(readlink "/proc/$pid/exe"); then
+    stale=false
+    if command -v nix-store >/dev/null && installed=$(command -v quickshell); then
+      closure=$(nix-store -qR "$(readlink -f "$installed")")
+      grep -qxF "$(cut -d/ -f1-4 <<<"$exe")" <<<"$closure" || stale=true
+    elif [[ "$exe" == *" (deleted)" ]]; then
+      stale=true
+    fi
+    if $stale; then
+      check WARN kaizen-shell "runs a Quickshell that is no longer installed: systemctl --user restart kaizen-shell"
+    fi
+  fi
+
+  # niri's tracing lines (timestamped) precede the report.
+  if ! out=$(NO_COLOR=1 niri validate 2>&1 >/dev/null); then
+    check ERROR niri "niri validate:
+$(grep -Ev '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[^ ]+ +[A-Z]+ ' <<<"$out" || true)"
+  fi
+
+  # The shell loads a plugin only from the one dir that has it, silently.
+  shell_plugins=$config/quickshell/kaizen/plugins
+  host_plugins=$config/kaizen/plugins
+  for file in "$host_plugins"/*.jsonc; do
+    [[ -e "$file" ]] || continue
+    name=$(basename "$file" .jsonc)
+    dirs=()
+    for dir in "$shell_plugins" "$host_plugins"; do
+      if [[ -d "$dir/$name" ]]; then
+        dirs+=("$dir/$name")
+      fi
+    done
+    case ${#dirs[@]} in
+    0) check ERROR plugins "$name: no $name/ in $shell_plugins or $host_plugins" ;;
+    2) check ERROR plugins "$name: $name/ in both $shell_plugins and $host_plugins" ;;
+    *) [[ -f "${dirs[0]}/Plugin.qml" ]] || check ERROR plugins "$name: no Plugin.qml in ${dirs[0]}" ;;
+    esac
+  done
+
+  # The user manager tags its own lines about a run USER_INVOCATION_ID.
+  matches=()
+  for id in $(jq -r '.[].InvocationID | select(. != "")' <<<"$units"); do
+    if ((${#matches[@]} > 0)); then
+      matches+=(+)
+    fi
+    matches+=("_SYSTEMD_INVOCATION_ID=$id" + "USER_INVOCATION_ID=$id")
+  done
+  journal=""
+  if ((${#matches[@]} > 0)); then
+    journal=$(journalctl --user --lines all --output json --no-pager "${matches[@]}")
+  fi
+fi
+
+# The units log at priority 6 with the level in the text: Quickshell and dcal
+# lead with it (`  WARN scene:`), other tools start with it after at most a Go
+# log timestamp and a word (`error: …`, `… systray error: …`), and Go's slog
+# writes a logfmt field (`time=… level=WARN msg=…`). systemd's own lines about
+# the units, and the Go daemons' lines, carry a real priority.
+# shellcheck disable=SC2016
+filter='
+  def hex: "0123456789abcdef"[.:. + 1];
+  # journalctl sends a message with control bytes (ANSI colours) as a byte array.
+  def text:
+    if type == "array" then map("%" + ((. / 16 | floor) | hex) + ((. % 16) | hex)) | add | @urid
+    else . // "" end
+    | gsub("\u001b\\[[0-9;]*m"; "");
+  def level:
+    capture("^\\s*(?<l>DEBUG|INFO|WARN|ERROR|FATAL)\\b").l
+    // ((capture("^(\\d{4}/\\d\\d/\\d\\d \\d\\d:\\d\\d:\\d\\d )?(\\S+ )?(?<l>warn(ing)?|error|fatal|crit(ical)?|panic)\\b"; "i")
+        // capture("^(time=\\S+ )?level=(?<l>warn(ing)?|error|fatal|crit(ical)?|panic)\\b"; "i")).l
+      | ascii_upcase | if startswith("WARN") then "WARN" else "ERROR" end)
+    // "INFO";
+  def clock: . / 1000 | strflocaltime("%T");
+  def count($n; $word): "\($n) \($word)" + (if $n == 1 then "" else "s" end);
+
+  ($units | map(select(.ActiveState == "failed") | .Id)) as $failed
+  | [
+    .[]
+    | (.MESSAGE | text) as $m
+    | (.PRIORITY // "6" | tonumber) as $p
+    | ($m | level) as $t
+    | (if $t == "ERROR" or $t == "FATAL" or $p <= 3 then "ERROR" elif $t == "WARN" or $p == 4 then "WARN" else null end) as $l
+    | select($l)
+    # The failed-unit check reports what systemd says about the failure.
+    | select((.SYSLOG_IDENTIFIER == "systemd" and IN(.USER_UNIT; $failed[])) | not)
+    | {
+        time: (.__REALTIME_TIMESTAMP | tonumber / 1000 | floor),
+        unit: (.USER_UNIT // ._SYSTEMD_USER_UNIT // .SYSLOG_IDENTIFIER // "?" | sub("\\.service$"; "")),
+        level: $l,
+        # The journal has the time.
+        message: ($m | sub("^\\s+"; "") | sub("^time=\\S+ "; ""))
+      }
+  ]
+  | group_by([.unit, .level, .message])
+  | map({source: "log", level: .[0].level, unit: .[0].unit, message: .[0].message, count: length,
+      first: (map(.time) | min), last: (map(.time) | max)})
+  | ($checks | map({source: "check", level, unit, message: (.message | sub("\\s+$"; "")), count: 1,
+      first: $now, last: $now})) + .
+  | sort_by([(if .level == "ERROR" then 0 else 1 end), (if .source == "check" then 0 else 1 end), -.last])
+  | . as $findings
+  | (map(select(.level == "ERROR")) | length) as $errors
+  | ([if $errors > 0 then count($errors; "error") else empty end,
+      if length > $errors then count(length - $errors; "warning") else empty end]
+      | if . == [] then "No errors or warnings" else join(", ") end) as $summary
+  | map(
+      (if .level == "WARN" then "WARN " else .level end) + " " + .unit + "  "
+      + (if .source == "check" then "check"
+         else (if .count > 1 then "×\(.count)  " else "" end)
+           + ((.first | clock) as $first | (.last | clock) as $last
+              | if $first == $last then $first else "\($first)–\($last)" end)
+         end)
+      + "\n" + (.message | split("\n") | map(if . == "" then . else "  " + . end) | join("\n")))
+  | ([$summary] + if . == [] then [] else ["", join("\n")] end | join("\n")) as $text
+  | if $json then {findings: $findings, text: $text} else $text end
+'
+
+jq -src --argjson json "$json" --argjson units "$units" --argjson now "$now" \
+  --argjson checks "$(jq -sc . <<<"$checks")" "$filter" <<<"$journal"
