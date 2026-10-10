@@ -246,7 +246,7 @@ Scope {
                 anchors.right: audioButton.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: visible ? 6 : 0
-                visible: idleButton.visible || keyboardButton.visible || recordingButton.visible || mirrorButton.visible || systemButton.visible || firmwareButton.visible || mediaWidget.width > 0 || pluginIndicators.width > 0
+                visible: idleButton.visible || keyboardButton.visible || recordingButton.visible || mirrorButton.visible || systemButton.visible || firmwareButton.visible || logButton.visible || mediaWidget.width > 0 || pluginIndicators.width > 0
                 width: visible ? 1 : 0
                 height: 16 * bar.shell.textScale
                 color: bar.shell.palette.dim
@@ -340,10 +340,24 @@ Scope {
                 onSecondary: bar.shell.menu.popup("settings.firmware", modelData.name, firmwareButton)
             }
 
+            // kaizen-log is not silent.
+            Ui.BarButton {
+                id: logButton
+                shell: bar.shell
+                anchors.right: firmwareButton.left
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.rightMargin: visible ? 4 : 0
+                visible: bar.shell.logService.count > 0
+                foreground: bar.shell.logService.errors > 0 ? bar.shell.palette.rose : bar.shell.palette.wood
+                label: "󰃤"
+                onActivated: bar.shell.log.open()
+                onSecondary: bar.shell.menu.popup("settings.log", modelData.name, logButton)
+            }
+
             // In plugin load order; right-click opens the plugin's node.
             Row {
                 id: pluginIndicators
-                anchors.right: firmwareButton.left
+                anchors.right: logButton.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: width > 0 ? 4 : 0
                 spacing: 4

@@ -63,6 +63,18 @@ urgency. There are no notifications.
 [fwupd]: https://fwupd.org
 [LVFS]: https://fwupd.org/lvfs/
 
+## Log (`log`)
+
+`kaizen-log` lists the warnings and errors that the `kaizen-*` units, plugin
+daemons included, logged this boot. A healthy desktop logs none, so every
+entry is something to fix.
+
+The bar shows an indicator while it lists anything: rose when an error is among
+the entries, wood for warnings only. It opens the log panel, newest entry
+first; Enter, Space or a click copies an entry's line, and Copy all copies
+every entry the panel holds (the latest 200). The indicator stays until the
+next boot, since the journal keeps what earlier shell instances logged.
+
 ## Notifications (`notifications`)
 
 Apps send notifications over D-Bus. [`notify-send`][notify-send] sends one from

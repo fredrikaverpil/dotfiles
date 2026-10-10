@@ -403,6 +403,21 @@ Ui.Panel {
             label: "Open release page",
             provider: "firmwarePages"
         },
+        "settings.log": {
+            icon: "󰃤",
+            label: "Log"
+        },
+        "settings.log.panel": {
+            icon: "󰕮",
+            label: "Log panel",
+            action: () => menu.shell.log.open()
+        },
+        "settings.log.copy": {
+            icon: "󰆏",
+            label: "Copy log",
+            enabled: menu.shell.logService.entries.length > 0,
+            action: () => menu.shell.logService.copyAll()
+        },
         "settings.session": {
             icon: "󰐥",
             label: "Session"
