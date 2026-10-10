@@ -134,11 +134,6 @@ tree, so a static check passing here passes for every kaizen host.
   not change scaling or device settings. Its journal scan covers everything
   since the last service start; restart the service before re-running to clear
   stale errors.
-- Every Quickshell start logs `qt.qpa.services: Failed to register with host
-  portal ... Connection already associated with an application ID`. It is a
-  known baseline (since at least 2026-09-11), passes `shell-smoke`, and has no
-  observed effect; the root cause is unverified. Do not attribute it to a
-  change.
 - `kaizen doctor` lists the warnings and errors from each `kaizen-*` unit's
   current run, and checks units, the shell's binary, niri's config and the
   plugin dirs; `--json` prints one document, and journalctl arguments
