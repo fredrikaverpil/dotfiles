@@ -1,3 +1,4 @@
+import QtCore
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Window
@@ -19,7 +20,8 @@ Item {
     readonly property var palette: shell.palette // qmllint disable property-override
     readonly property string statePath: Ui.Paths.state + "/notifications.json"
     readonly property int historyLimit: 99
-    readonly property string soundPath: "/run/current-system/sw/share/sounds/freedesktop/stereo/message.oga"
+    // The freedesktop sound theme's message sound, first match in the XDG data dirs.
+    readonly property string soundPath: String(StandardPaths.locate(StandardPaths.GenericDataLocation, "sounds/freedesktop/stereo/message.oga")).replace(/^file:\/\//, "")
     readonly property real soundVolume: 0.4
     // How far apart the copies of one dedup group's event, or the toasts of one
     // collapse rule's burst, may arrive.
@@ -237,7 +239,8 @@ Item {
 
     function show(record) {
         popupRows = [record].concat(popupRows);
-        sound.startDetached();
+        if (soundPath)
+            sound.startDetached();
     }
 
     function dismiss(record) {
@@ -399,6 +402,8 @@ Item {
     }
 
     Component.onCompleted: {
+        if (!soundPath)
+            console.warn("notifications: no sounds/freedesktop/stereo/message.oga in the XDG data dirs; toasts are silent");
         stateLoaded = true;
         stateFile.reload();
     }
