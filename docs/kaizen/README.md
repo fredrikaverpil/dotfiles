@@ -81,13 +81,14 @@ QML, which plugins run, and the notification rules.
   plugin is optional: the shell runs without it, however many hosts enable it.
 - Importing
   [`nix/shared/system/kaizen/`](../../nix/shared/system/kaizen/default.nix)
-  makes a host a kaizen host: it writes `/etc/kaizen`, and `dotfiles-stow` stows
-  [`stow/kaizen/`](../../stow/kaizen/) only where that exists. So
+  makes a host a kaizen host: it writes `/etc/kaizen`, and
+  [`stow.sh`](../../stow.sh) stows [`stow/kaizen/`](../../stow/kaizen/) only
+  where that exists. So
   [`stow/kaizen/`](../../stow/kaizen/) reaches every kaizen host or none, and a
   plugin's QML there loads only where a `~/.config/kaizen/plugins/<name>.jsonc`
   enables it.
-- A `.wants/` link beside a unit enables it, and `dotfiles-stow` reloads the
-  user manager. A unit runs a packaged program through `/usr/bin/env`, from the
+- A `.wants/` link beside a unit enables it, and `stow.sh` reloads the user
+  manager. A unit runs a packaged program through `/usr/bin/env`, from the
   session PATH, and a script from `%h/.local/bin/`.
 - The shell reads its emoji data from `kaizen/emoji.json` in the XDG data dirs,
   which Nix builds with
@@ -114,9 +115,8 @@ enabled plugin's do on NixOS:
   capture skips the portal dialog.
 - `/etc/pam.d/kaizen-lock` holding `auth include login`, for the lock and the
   curtain.
-- An empty `/etc/kaizen`: `dotfiles-stow` stows
-  [`stow/kaizen/`](../../stow/kaizen/) and the shell defines `kaizen()` only
-  where it exists.
+- An empty `/etc/kaizen`: `stow.sh` stows [`stow/kaizen/`](../../stow/kaizen/)
+  and the shell defines `kaizen()` only where it exists.
 - The session variables `NIXOS_OZONE_WL=1`, `QT_QPA_PLATFORMTHEME=gtk3` and
   `GTK_USE_PORTAL=1`, and the fonts in
   [`fonts.nix`](../../nix/shared/system/fonts.nix).

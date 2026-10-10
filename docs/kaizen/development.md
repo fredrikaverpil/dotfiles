@@ -265,9 +265,10 @@ qs ipc call idle disable
 qs ipc call lock isLocked
 ```
 
-New/moved files need `dotfiles-stow`, which also reloads the user manager; an
-edited unit needs `systemctl --user daemon-reload`. Never create Stow links
-manually or run `git clean -fd` in the host clone.
+New/moved files need `~/.dotfiles/stow.sh`, which also removes the links a
+move left behind and reloads the user manager; an edited unit needs
+`systemctl --user daemon-reload`. Never create Stow links manually or run
+`git clean -fd` in the host clone.
 
 When working from another host, sync the checkout before live validation or a
 user-run rebuild, which evaluates the host's clone. Checksums avoid replacing

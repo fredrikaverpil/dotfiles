@@ -8,7 +8,7 @@
 NVIM_APPNAME=nvim-fredrik nvim
 ```
 
-`dotfiles-stow` links this directory to `~/.config/nvim-fredrik`.
+`~/.dotfiles/stow.sh` links this directory to `~/.config/nvim-fredrik`.
 
 ## Structure
 

@@ -27,7 +27,7 @@ References — read the one the task needs:
 ## This config's location
 
 The native config lives at **`~/.dotfiles/stow/shared/.config/nvim-fredrik/`**
-inside the dotfiles repo. `dotfiles-stow` links it into place as a whole
+inside the dotfiles repo. `stow.sh` links it into place as a whole
 directory, so new files show up without a restow:
 
 ```

@@ -110,7 +110,7 @@ in
       auth include login
     '';
 
-    # Marks a kaizen host; dotfiles-stow stows stow/kaizen/ where it exists.
+    # Marks a kaizen host; stow.sh stows stow/kaizen/ where it exists.
     environment.etc.kaizen.text = "";
 
     # The system profile links only these dirs; the shell finds its emoji data
