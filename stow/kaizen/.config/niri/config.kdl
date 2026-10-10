@@ -178,13 +178,10 @@ binds {
     XF86AudioPlay allow-when-locked=true repeat=false hotkey-overlay-title="Play/pause" { spawn "qs" "ipc" "call" "media" "playPause"; }
     XF86AudioPrev allow-when-locked=true repeat=false hotkey-overlay-title="Previous track" { spawn "qs" "ipc" "call" "media" "previous"; }
 
-    // Capture. niri saves screenshots to screenshot-path, default
-    // ~/Pictures/Screenshots, and copies them to the clipboard.
-    Print repeat=false hotkey-overlay-title="Screenshot a selection" { screenshot; }
-    Ctrl+Print repeat=false hotkey-overlay-title="Screenshot the screen" { screenshot-screen; }
-    Alt+Print repeat=false hotkey-overlay-title="Screenshot the window" { screenshot-window; }
-    // The shell's keyboard-first region selector; niri's own is pointer-driven.
-    Shift+Print repeat=false hotkey-overlay-title="Screenshot a region" { spawn "qs" "ipc" "call" "recording" "screenshot"; }
+    // Capture. The shell saves screenshots to ~/Pictures/Screenshots, copies
+    // them to the clipboard and offers to annotate them.
+    Print repeat=false hotkey-overlay-title="Screenshot a region" { spawn "qs" "ipc" "call" "recording" "screenshot"; }
+    Shift+Print repeat=false hotkey-overlay-title="Screenshot the screen" { spawn "qs" "ipc" "call" "recording" "shoot" "screen"; }
     // Opens the recording panel, or stops a running recording.
     Mod+Print repeat=false hotkey-overlay-title="Record the screen" { spawn "qs" "ipc" "call" "recording" "toggle"; }
     Mod+Shift+Print repeat=false hotkey-overlay-title="Pause or resume the recording" { spawn "qs" "ipc" "call" "recording" "pause"; }

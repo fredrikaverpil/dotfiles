@@ -48,6 +48,7 @@ Ui.Panel {
         "trigger.screenshot": {
             icon: "",
             label: "Screenshot (desktop)",
+            ipc: "recording shoot screen",
             action: () => menu.shell.recordingService.shoot("screen")
         },
         "trigger.screenshotWindow": {

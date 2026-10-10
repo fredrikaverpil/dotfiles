@@ -139,11 +139,10 @@ history.
 
 ### Screenshot
 
-Niri comes with built-in screenshotting mapped to `Print`. But often you need to
-send your screenshot to a lightweight editor
-([Satty][https://github.com/gabm/Satty]). In such cases, there's a custom
-screenshotting utility available that supports desktop, window or region:
-`Shift+Print` for a region, or Trigger › Screenshot.
+A custom screenshotting utility replaces niri's built-in one and offers to send
+the screenshot to a lightweight editor ([Satty][https://github.com/gabm/Satty]).
+It supports desktop, window or region: `Print` for a region, `Shift+Print` for
+the focused screen, or Trigger › Screenshot.
 
 ### Record screen
 

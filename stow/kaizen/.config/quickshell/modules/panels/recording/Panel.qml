@@ -146,6 +146,10 @@ Ui.Panel {
         function screenshot(): void {
             root.service.screenshot();
         }
+        // Saves a screenshot of the focused "screen" or "window".
+        function shoot(mode: string): void {
+            root.service.shoot(mode);
+        }
         function stop(): void {
             root.service.stop();
         }
