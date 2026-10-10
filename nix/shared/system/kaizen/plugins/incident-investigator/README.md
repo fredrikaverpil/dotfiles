@@ -81,9 +81,9 @@ critical toast with the error.
 ```mermaid
 flowchart LR
   toast["alert toast: Investigate"] -->|investigate draft| daemon
-  tray["tray: click / Open"] -->|qs ipc call open| window
+  tray["tray: click / Open"] -->|kaizen ipc call open| window
   tray -->|New investigation, in process| daemon
-  daemon -->|qs ipc call reveal| window
+  daemon -->|kaizen ipc call reveal| window
   window -->|investigate start, followup,<br>cancel, delete, edit, draft, settings| daemon
   window -->|investigate combine, branch| daemon
   daemon -->|claude -p, instructions| claude["Claude Code"]
@@ -176,8 +176,8 @@ flowchart LR
    writes it to the state files and answers with its id. A GCP alert or
    incident URL in the body becomes the notes, and its `project` parameter the
    project.
-3. The client runs `qs ipc call incident-investigator reveal <id>`. The window
-   opens with the draft selected.
+3. The client runs `kaizen ipc call incident-investigator reveal <id>`. The
+   window opens with the draft selected.
 4. You fill in the projects, trace id, notes and tag (`investigate edit`) and
    press Start (`investigate start`).
 5. The daemon spawns `claude -p` with the instructions as an appended system
@@ -247,7 +247,7 @@ unit's `StateDirectory` (`$STATE_DIRECTORY`), which the window reads through
 directory as private as `sourceDirs`.
 
 The window, `instructions.md` and `claude-plugin/` are in
-[`plugins/incident-investigator/`](../../../../../../stow/kaizen/.config/quickshell/plugins/incident-investigator/)
+[`plugins/incident-investigator/`](../../../../../../stow/kaizen/.config/quickshell/kaizen/plugins/incident-investigator/)
 under the shell's QML:
 
 | Path                 | Holds                               |

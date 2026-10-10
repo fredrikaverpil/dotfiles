@@ -1,4 +1,4 @@
-import "../../Ui" as Ui
+import qs.Ui as Ui
 
 // Events from dcal (dankcalendar), which kaizen-dcal.service runs.
 Ui.Plugin {

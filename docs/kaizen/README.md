@@ -21,7 +21,7 @@ that an agent can drive and verify from a terminal.
   keyboard-first face; infrequent tasks go to a purpose-built application
   (bluetui, nm-connection-editor).
 - Keyboard-first everywhere. Pointer-only controls are bugs.
-- Every action is reachable over `qs ipc`, `niri msg` or `systemctl --user`.
+- Every action is reachable over `kaizen ipc`, `niri msg` or `systemctl --user`.
 - Host-agnostic naming: "kaizen" in units, PAM, layer namespaces and state
   files. No hostname in the desktop's configuration.
 
@@ -68,8 +68,8 @@ QML, which plugins run, and the notification rules.
 | --- | --- | --- |
 | Session: niri under UWSM, portals, PAM, the services the shell reads, the packages the shell, its binds, scripts and units use | [`nix/shared/system/kaizen/`](../../nix/shared/system/kaizen/default.nix) | every kaizen host |
 | Compositor config, units and scripts, the shell's QML, the core's notification rules | [`stow/kaizen/`](../../stow/kaizen/) | every kaizen host |
-| Plugin QML: generic or reusable | [`stow/kaizen/.config/quickshell/plugins/<name>/`](../../stow/kaizen/.config/quickshell/plugins/) | every kaizen host |
-| Plugin QML: specific to one host | `stow/host/<host>/.config/quickshell/plugins/<name>/` | that host |
+| Plugin QML: generic or reusable | [`stow/kaizen/.config/quickshell/kaizen/plugins/<name>/`](../../stow/kaizen/.config/quickshell/kaizen/plugins/) | every kaizen host |
+| Plugin QML: specific to one host | `stow/host/<host>/.config/kaizen/plugins/<name>/` | that host |
 | Which plugins run, with their config | `stow/host/<host>/.config/kaizen/plugins/<name>.jsonc`, or in a private submodule's `stow/` such as wily's `einride` | that host |
 | A plugin's unit: generic or reusable | [`stow/kaizen/.config/systemd/user/`](../../stow/kaizen/.config/systemd/user/) | every kaizen host that enables the plugin |
 | A plugin's unit: specific to one host | `stow/host/<host>/.config/systemd/user/` | that host |
@@ -90,6 +90,12 @@ QML, which plugins run, and the notification rules.
 - A `.wants/` link beside a unit enables it, and `stow.sh` reloads the user
   manager. A unit runs a packaged program through `/usr/bin/env`, from the
   session PATH, and a kaizen script as `%h/.local/bin/kaizen <sub>`.
+- The shell is the Quickshell config `kaizen`, run as `quickshell -c kaizen`:
+  `~/.config/quickshell/kaizen/` holds only files from
+  [`stow/kaizen/`](../../stow/kaizen/). `~/.config/kaizen/` holds only a host's
+  configuration: which plugins run and their config, notification rules, and
+  its plugins' QML. A plugin name in both is an error: neither shadows the
+  other.
 - `kaizen <sub>` is the only kaizen command on PATH; it runs
   `~/.local/libexec/kaizen/<sub>`. Units, niri binds and QML call it, never a
   script's path.
@@ -99,7 +105,7 @@ QML, which plugins run, and the notification rules.
 - Apps are not kaizen's: [`nix/README.md`](../../nix/README.md) says where they
   go.
 - QML paths here (`modules/…`, `Ui/…`) are under
-  [`stow/kaizen/.config/quickshell/`](../../stow/kaizen/.config/quickshell/);
+  [`stow/kaizen/.config/quickshell/kaizen/`](../../stow/kaizen/.config/quickshell/kaizen/);
   `niri/…` is under [`stow/kaizen/.config/`](../../stow/kaizen/.config/).
 
 ## Off NixOS
@@ -133,7 +139,7 @@ enabled plugin's do on NixOS:
 ## Services to surfaces
 
 Every service wraps one subsystem and feeds the surfaces below. IPC target is
-`qs ipc call <target> ...`.
+`kaizen ipc call <target> ...`.
 
 | Service | Subsystem | Bar | Panel / launcher | IPC |
 | --- | --- | --- | --- | --- |
@@ -220,17 +226,17 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   (`Ui/MenuOverlay`), from the actions the focused item and its parents
   declare (`menuScope()`). A right-click there, or a click on a chip, hangs a
   cascading context menu from the pointer or the chip (`popup()`).
-- Every surface opens over IPC; niri binds are `spawn qs ipc call ...`.
+- Every surface opens over IPC; niri binds are `spawn kaizen ipc call ...`.
 - How each surface takes input, the bar buttons' kinds included:
   [`interaction.md`](interaction.md).
 - Plugins add launcher items, panels, IPC targets and bar indicators:
   [`plugins.md`](plugins.md).
-- [`Ui/Compositor.qml`](../../stow/kaizen/.config/quickshell/Ui/Compositor.qml)
+- [`Ui/Compositor.qml`](../../stow/kaizen/.config/quickshell/kaizen/Ui/Compositor.qml)
   is the only path to niri;
-  [`Ui/compositors/`](../../stow/kaizen/.config/quickshell/Ui/compositors/) owns
-  niri commands, response parsing, and the workspace source. Keep scheduling and
-  shared state above it. Nightlight is not compositor-specific and lives in its
-  service.
+  [`Ui/compositors/`](../../stow/kaizen/.config/quickshell/kaizen/Ui/compositors/)
+  owns niri commands, response parsing, and the workspace source. Keep
+  scheduling and shared state above it. Nightlight is not compositor-specific
+  and lives in its service.
 
 ## Session
 
@@ -281,8 +287,8 @@ nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
 | State that must survive | `~/.local/state/kaizen-shell/` | across reboots |
 | Lock and socket state | `$XDG_RUNTIME_DIR/kaizen-<name>` | until logout |
 
-- These three roots only. `~/.config/quickshell/` and `~/.config/kaizen/` are
-  Stow's trees.
+- These three roots only. `~/.config/quickshell/kaizen/` and `~/.config/kaizen/`
+  are Stow's trees.
 - Files are flat in the root, one value or small JSON document each. The
   unit's `StateDirectory=` creates the state root.
 - Many or unbounded entries get a subdirectory
@@ -314,19 +320,20 @@ nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
 2. Does a purpose-built app do it acceptably? Launch that instead.
 3. Can it be used with the keyboard only? If not, redesign.
 4. Then: daemon/process state →
-   [`modules/services/`](../../stow/kaizen/.config/quickshell/modules/services/),
+   [`modules/services/`](../../stow/kaizen/.config/quickshell/kaizen/modules/services/),
    view →
-   [`modules/panels/`](../../stow/kaizen/.config/quickshell/modules/panels/),
-   both wired in [`shell.qml`](../../stow/kaizen/.config/quickshell/shell.qml);
-   a protocol-driven surface with no other consumer of its state (lock,
+   [`modules/panels/`](../../stow/kaizen/.config/quickshell/kaizen/modules/panels/),
+   both wired in
+   [`shell.qml`](../../stow/kaizen/.config/quickshell/kaizen/shell.qml); a
+   protocol-driven surface with no other consumer of its state (lock,
    notifications, polkit) keeps both in `modules/<name>/`. Packages (even a
    package another scope also installs), system services and PAM →
    [`kaizen/default.nix`](../../nix/shared/system/kaizen/default.nix), units and
    scripts → [`systemd/user/`](../../stow/kaizen/.config/systemd/user/) and
    [`.local/libexec/kaizen/`](../../stow/kaizen/.local/libexec/kaizen/),
    compositor →
-   [`Ui/compositors/`](../../stow/kaizen/.config/quickshell/Ui/compositors/) and
-   [`niri/config.kdl`](../../stow/kaizen/.config/niri/config.kdl), IPC target
-   for every new action. An optional shell extension is a [plugin](plugins.md).
-   An app is not kaizen's to install: [`nix/README.md`](../../nix/README.md)
-   says where it goes.
+   [`Ui/compositors/`](../../stow/kaizen/.config/quickshell/kaizen/Ui/compositors/)
+   and [`niri/config.kdl`](../../stow/kaizen/.config/niri/config.kdl), IPC
+   target for every new action. An optional shell extension is a
+   [plugin](plugins.md). An app is not kaizen's to install:
+   [`nix/README.md`](../../nix/README.md) says where it goes.

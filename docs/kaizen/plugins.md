@@ -7,19 +7,21 @@ reaches, is in [`README.md`](README.md) › Where it lives.
 ## Writing one
 
 - A plugin
-  ([`Ui/Plugin.qml`](../../stow/kaizen/.config/quickshell/Ui/Plugin.qml)) adds
-  launcher items, its own panels and IPC targets, and may take over the date
-  button (`barActions.date`) or show an indicator (`barIndicator`): left-click
-  calls the plugin, right-click opens its `plugins.<name>` node. Unlike the core
-  indicators, the plugin picks when it shows.
-  [`stow/host/renoir/.config/quickshell/plugins/hello/`](../../stow/host/renoir/.config/quickshell/plugins/hello/)
+  ([`Ui/Plugin.qml`](../../stow/kaizen/.config/quickshell/kaizen/Ui/Plugin.qml))
+  adds launcher items, its own panels and IPC targets, and may take over the
+  date button (`barActions.date`) or show an indicator (`barIndicator`):
+  left-click calls the plugin, right-click opens its `plugins.<name>` node.
+  Unlike the core indicators, the plugin picks when it shows.
+  [`stow/host/renoir/.config/kaizen/plugins/hello/`](../../stow/host/renoir/.config/kaizen/plugins/hello/)
   is the minimal example;
-  [`plugins/gcloud-auth/`](../../stow/kaizen/.config/quickshell/plugins/gcloud-auth/)
+  [`plugins/gcloud-auth/`](../../stow/kaizen/.config/quickshell/kaizen/plugins/gcloud-auth/)
   always shows its login state as one.
 - The shell loads `plugins/<name>/Plugin.qml` for each
   `~/.config/kaizen/plugins/<name>.jsonc`, in name order, and picks up a file
   added or removed. The file holds the plugin's config in JSONC, `{}` when it
-  has none. Plugin QML imports `../../Ui`, as the core's does.
+  has none. A generic plugin's `plugins/<name>/` is in the shell tree, a host's
+  in `~/.config/kaizen/`; a name in both, or in neither, does not load. Plugin
+  QML imports `qs.Ui`, which resolves to the shell tree's `Ui/` from either.
 - A plugin that needs a package has a Nix module, its directory's
   `default.nix`, which a host imports beside the core's.
 - A plugin's unit is a file under Stow, enabled by a link in
@@ -65,8 +67,9 @@ reaches, is in [`README.md`](README.md) › Where it lives.
 ## Developing one
 
 - Quickshell watches only the files `shell.qml` imports, not plugins: apply an
-  edit with `qs ipc call shell reload`. `qml-lint` and `qml-test` cover
-  `plugins/`; a host's plugin, outside `stow/kaizen/`, is checked by neither. A
+  edit with `kaizen ipc call shell reload`. `qml-lint` and `qml-format`
+  cover every plugin, a host's in `stow/host/*/.config/kaizen/plugins/`
+  included; `qml-test` runs the `tst_*.qml` in the shell tree's `plugins/`. A
   tray plugin's user unit starts with the session when a `.wants/` link
   enables it.
 

@@ -1,6 +1,7 @@
-// kaizen's notification rules. Each file in this directory holds a list of
-// rules; the shell reads them in file-name order. Fields are described at
-// `ruleCheck` in ~/.config/quickshell/modules/notifications/NotificationLogic.js.
+// kaizen's notification rules. Each file here and in
+// ~/.config/kaizen/notification-rules.d/ holds a list of rules; the shell reads
+// them together in file-name order. Fields are described at `ruleCheck` in
+// ~/.config/quickshell/kaizen/modules/notifications/NotificationLogic.js.
 [
   // Google Calendar reminders arrive from both Slack and Chromium; Chromium's
   // copy carries the buttons.

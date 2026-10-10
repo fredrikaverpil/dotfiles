@@ -10,7 +10,7 @@ After=wayland-wm@niri.service wayland-session-waitenv.service
 # systemd looks a bare name up only in its built-in path, which NixOS leaves
 # empty; env searches the session PATH that UWSM imports. Launcher entries and
 # uwsm-app need that PATH too.
-ExecStart=/usr/bin/env quickshell
+ExecStart=/usr/bin/env quickshell -c kaizen
 Restart=on-failure
 # Creates ~/.local/state/kaizen-shell before ExecStart: for user units
 # StateDirectory resolves under $XDG_STATE_HOME.

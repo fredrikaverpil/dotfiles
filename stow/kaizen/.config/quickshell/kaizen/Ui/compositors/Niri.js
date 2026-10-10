@@ -37,8 +37,8 @@ function configFile(home, niriConfig) {
 
 // Binds are the config lines carrying hotkey-overlay-title; the chord is the
 // first word. Commented-out binds are skipped. A bind running
-// `qs ipc call <target> <fn>` carries ipc "<target> <fn>"; one running a niri
-// action without arguments carries action.
+// `kaizen ipc call <target> <fn>` carries ipc "<target> <fn>"; one running a
+// niri action without arguments carries action.
 function parseBinds(raw) {
   return String(raw || "")
     .split("\n")
@@ -53,7 +53,7 @@ function parseBinds(raw) {
     .map(function (match) {
       var bind = { chord: match[1], label: match[2], enabled: true };
       var body = (match[3] || "").trim();
-      var ipc = /^spawn\s+"qs"\s+"ipc"\s+"call"((?:\s+"[^"]*")+)\s*;$/.exec(
+      var ipc = /^spawn\s+"kaizen"\s+"ipc"\s+"call"((?:\s+"[^"]*")+)\s*;$/.exec(
         body,
       );
       if (ipc)

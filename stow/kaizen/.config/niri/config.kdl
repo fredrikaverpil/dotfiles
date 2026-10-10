@@ -9,7 +9,7 @@ input {
     keyboard {
         xkb {
             // No grp: toggle: the shell owns the current index
-            // (qs ipc call keyboard ...) and a compositor-side switch desyncs
+            // (kaizen ipc call keyboard ...) and a compositor-side switch desyncs
             // the bar indicator. The shell lists these by niri's names; the
             // first is the default.
             // us_se is US plus RightAlt+[ ; ' for å ö ä (~/.config/xkb/symbols).
@@ -156,35 +156,35 @@ spawn-at-startup "uwsm" "finalize" "NIRI_SOCKET"
 
 binds {
     // Shell
-    Mod+Space hotkey-overlay-title="Menu" { spawn "qs" "ipc" "call" "menu" "toggle"; }
-    Mod+Shift+Space hotkey-overlay-title="Next keyboard layout" { spawn "qs" "ipc" "call" "keyboard" "next"; }
-    Super+Alt+L hotkey-overlay-title="Lock the screen" { spawn "qs" "ipc" "call" "lock" "lock"; }
-    Mod+N hotkey-overlay-title="Select notification" { spawn "qs" "ipc" "call" "notifications" "select"; }
-    Mod+Shift+Comma hotkey-overlay-title="Dismiss all notifications" { spawn "qs" "ipc" "call" "notifications" "dismissAll"; }
+    Mod+Space hotkey-overlay-title="Menu" { spawn "kaizen" "ipc" "call" "menu" "toggle"; }
+    Mod+Shift+Space hotkey-overlay-title="Next keyboard layout" { spawn "kaizen" "ipc" "call" "keyboard" "next"; }
+    Super+Alt+L hotkey-overlay-title="Lock the screen" { spawn "kaizen" "ipc" "call" "lock" "lock"; }
+    Mod+N hotkey-overlay-title="Select notification" { spawn "kaizen" "ipc" "call" "notifications" "select"; }
+    Mod+Shift+Comma hotkey-overlay-title="Dismiss all notifications" { spawn "kaizen" "ipc" "call" "notifications" "dismissAll"; }
     Mod+Shift+Slash hotkey-overlay-title="Show hotkey overlay" { show-hotkey-overlay; }
     Mod+Escape allow-inhibiting=false hotkey-overlay-title="Toggle shortcuts inhibit" { toggle-keyboard-shortcuts-inhibit; }
     Mod+Shift+E hotkey-overlay-title="Exit niri" { quit; }
     Ctrl+Alt+Delete hotkey-overlay-title="Exit niri" { quit; }
 
     // Hardware keys. allow-when-locked keeps these working on the lock screen.
-    XF86AudioRaiseVolume allow-when-locked=true hotkey-overlay-title="Volume up" { spawn "qs" "ipc" "call" "audio" "up"; }
-    XF86AudioLowerVolume allow-when-locked=true hotkey-overlay-title="Volume down" { spawn "qs" "ipc" "call" "audio" "down"; }
-    XF86AudioMute allow-when-locked=true repeat=false hotkey-overlay-title="Mute" { spawn "qs" "ipc" "call" "audio" "mute"; }
-    XF86AudioMicMute allow-when-locked=true repeat=false hotkey-overlay-title="Mute microphone" { spawn "qs" "ipc" "call" "audio" "micMute"; }
-    XF86MonBrightnessUp allow-when-locked=true hotkey-overlay-title="Brightness up" { spawn "qs" "ipc" "call" "brightness" "up"; }
-    XF86MonBrightnessDown allow-when-locked=true hotkey-overlay-title="Brightness down" { spawn "qs" "ipc" "call" "brightness" "down"; }
-    XF86AudioNext allow-when-locked=true repeat=false hotkey-overlay-title="Next track" { spawn "qs" "ipc" "call" "media" "next"; }
-    XF86AudioPause allow-when-locked=true repeat=false hotkey-overlay-title="Play/pause" { spawn "qs" "ipc" "call" "media" "playPause"; }
-    XF86AudioPlay allow-when-locked=true repeat=false hotkey-overlay-title="Play/pause" { spawn "qs" "ipc" "call" "media" "playPause"; }
-    XF86AudioPrev allow-when-locked=true repeat=false hotkey-overlay-title="Previous track" { spawn "qs" "ipc" "call" "media" "previous"; }
+    XF86AudioRaiseVolume allow-when-locked=true hotkey-overlay-title="Volume up" { spawn "kaizen" "ipc" "call" "audio" "up"; }
+    XF86AudioLowerVolume allow-when-locked=true hotkey-overlay-title="Volume down" { spawn "kaizen" "ipc" "call" "audio" "down"; }
+    XF86AudioMute allow-when-locked=true repeat=false hotkey-overlay-title="Mute" { spawn "kaizen" "ipc" "call" "audio" "mute"; }
+    XF86AudioMicMute allow-when-locked=true repeat=false hotkey-overlay-title="Mute microphone" { spawn "kaizen" "ipc" "call" "audio" "micMute"; }
+    XF86MonBrightnessUp allow-when-locked=true hotkey-overlay-title="Brightness up" { spawn "kaizen" "ipc" "call" "brightness" "up"; }
+    XF86MonBrightnessDown allow-when-locked=true hotkey-overlay-title="Brightness down" { spawn "kaizen" "ipc" "call" "brightness" "down"; }
+    XF86AudioNext allow-when-locked=true repeat=false hotkey-overlay-title="Next track" { spawn "kaizen" "ipc" "call" "media" "next"; }
+    XF86AudioPause allow-when-locked=true repeat=false hotkey-overlay-title="Play/pause" { spawn "kaizen" "ipc" "call" "media" "playPause"; }
+    XF86AudioPlay allow-when-locked=true repeat=false hotkey-overlay-title="Play/pause" { spawn "kaizen" "ipc" "call" "media" "playPause"; }
+    XF86AudioPrev allow-when-locked=true repeat=false hotkey-overlay-title="Previous track" { spawn "kaizen" "ipc" "call" "media" "previous"; }
 
     // Capture. The shell saves screenshots to ~/Pictures/Screenshots, copies
     // them to the clipboard and offers to annotate them.
-    Print repeat=false hotkey-overlay-title="Screenshot a region" { spawn "qs" "ipc" "call" "recording" "screenshot"; }
-    Shift+Print repeat=false hotkey-overlay-title="Screenshot the screen" { spawn "qs" "ipc" "call" "recording" "shoot" "screen"; }
+    Print repeat=false hotkey-overlay-title="Screenshot a region" { spawn "kaizen" "ipc" "call" "recording" "screenshot"; }
+    Shift+Print repeat=false hotkey-overlay-title="Screenshot the screen" { spawn "kaizen" "ipc" "call" "recording" "shoot" "screen"; }
     // Opens the recording panel, or stops a running recording.
-    Mod+Print repeat=false hotkey-overlay-title="Record the screen" { spawn "qs" "ipc" "call" "recording" "toggle"; }
-    Mod+Shift+Print repeat=false hotkey-overlay-title="Pause or resume the recording" { spawn "qs" "ipc" "call" "recording" "pause"; }
+    Mod+Print repeat=false hotkey-overlay-title="Record the screen" { spawn "kaizen" "ipc" "call" "recording" "toggle"; }
+    Mod+Shift+Print repeat=false hotkey-overlay-title="Pause or resume the recording" { spawn "kaizen" "ipc" "call" "recording" "pause"; }
 
     // Launch
     Mod+T hotkey-overlay-title="Focus or open a terminal" { spawn "kaizen" "focus" r#"^com\.mitchellh\.ghostty$"# "ghostty"; }

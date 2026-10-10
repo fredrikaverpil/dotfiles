@@ -4,12 +4,17 @@ set -euo pipefail
 
 case "${1:-}" in
 -h | --help)
-  echo "usage: kaizen ipc [TARGET]    list the shell's IPC functions, by target"
+  echo "usage: kaizen ipc show [TARGET] | call TARGET FN [ARGS...]    list the shell's IPC functions by target, or call one"
   exit 0
   ;;
 esac
 
-qs ipc show |
-  awk -v t="${1:-}" '/^target /{n=$2} t=="" || n==t {print n "\t" $0}' |
+# Anything but show is qs ipc's own, run against the kaizen config.
+if [[ ${1:-} != show ]]; then
+  exec qs ipc -c kaizen "$@"
+fi
+
+qs ipc -c kaizen show |
+  awk -v t="${2:-}" '/^target /{n=$2} t=="" || n==t {print n "\t" $0}' |
   sort -s -t "$(printf '\t')" -k1,1 |
   cut -f2-

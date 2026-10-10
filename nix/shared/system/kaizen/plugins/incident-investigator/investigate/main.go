@@ -33,7 +33,7 @@ const usage = `usage: investigate <verb> [args]
                                  run the daemon in STATE_DIRECTORY; the config (JSONC, default
                                  ~/.config/kaizen/plugins/incident-investigator.jsonc) holds the Claude Code profile,
                                  source dirs, instruction files, tags and entity patterns, the plugin's dir (default
-                                 ~/.config/quickshell/plugins/incident-investigator) its instructions.md and the
+                                 ~/.config/quickshell/kaizen/plugins/incident-investigator) its instructions.md and the
                                  claude-plugin/ serving gopls, and the tool path (go, gopls) and module cache
                                  (default: go env GOMODCACHE) serve the LSP
   draft [-tag T]                 create a draft from NOTIFICATION_* and INVESTIGATE_TAG, show it in the window;
@@ -215,7 +215,7 @@ func runServe(logger *slog.Logger, socket string, args []string) error {
 	)
 	dir := flags.String(
 		"dir",
-		filepath.Join(configDir, "quickshell", "plugins", "incident-investigator"),
+		filepath.Join(configDir, "quickshell", "kaizen", "plugins", "incident-investigator"),
 		"the plugin's directory, with instructions.md and claude-plugin/",
 	)
 	toolPath := flags.String("tool-path", "", "directories with go and gopls, first on the runs' PATH")
@@ -369,7 +369,7 @@ func call(socket string, req request) (string, error) {
 
 // show selects an investigation in the window and opens it.
 func show(id string) error {
-	// `qs ipc call <target> show` is parsed as the CLI's own `show`.
+	// `kaizen ipc call <target> show` is parsed as the CLI's own `show`.
 	return callWindow("reveal", id)
 }
 
@@ -377,8 +377,8 @@ func show(id string) error {
 // are not filtered by display.
 func callWindow(function string, args ...string) error {
 	cmd := append([]string{"ipc", "--any-display", "call", "incident-investigator", function}, args...)
-	if out, err := exec.Command("qs", cmd...).CombinedOutput(); err != nil {
-		return fmt.Errorf("qs ipc call %s: %v: %s", function, err, out)
+	if out, err := exec.Command("kaizen", cmd...).CombinedOutput(); err != nil {
+		return fmt.Errorf("kaizen ipc call %s: %v: %s", function, err, out)
 	}
 	return nil
 }
