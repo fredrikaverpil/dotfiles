@@ -286,7 +286,6 @@ Item {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     visible: row.modelData.hasChildren === true
-                    width: visible ? implicitWidth : 0
                     color: row.usable ? card.shell.palette.fg : card.shell.palette.off
                     font.family: Fonts.mono
                     font.pixelSize: card.fontSize
@@ -295,7 +294,7 @@ Item {
 
                 Keycaps {
                     id: keys
-                    anchors.right: chevron.left
+                    anchors.right: chevron.visible ? chevron.left : parent.right
                     anchors.rightMargin: chevron.visible ? 8 : 0
                     anchors.verticalCenter: parent.verticalCenter
                     shell: card.shell
