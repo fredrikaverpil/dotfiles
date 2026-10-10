@@ -7,11 +7,12 @@ cause.
 
 ## Configuration
 
-Importing `default.nix` enables the plugin. Its options live under
-`host.incidentInvestigator`:
+Importing `default.nix` (NixOS) or `home.nix` (home-manager) enables the
+plugin. Its options live under `kaizen.incidentInvestigator`, a home-manager
+option:
 
 ```nix
-host.incidentInvestigator = {
+kaizen.incidentInvestigator = {
   # Required. The Claude Code profile (account and sessions) every run uses.
   claudeConfigDir = "/home/me/.claude-oncall";
 
@@ -237,4 +238,5 @@ directory as private as `sourceDirs`.
 | `investigate/`       | daemon, CLI and tray                     |
 | `instructions.md`    | the base instructions for every run      |
 | `claude-plugin/`     | the Claude plugin serving gopls          |
-| `default.nix`        | options, package, user unit, alert rules |
+| `home.nix`           | options, package, user unit, alert rules |
+| `default.nix`        | adds `home.nix` to home-manager users    |
