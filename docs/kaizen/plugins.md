@@ -16,6 +16,10 @@ reaches, is in [`README.md`](README.md) › Where it lives.
   is the minimal example;
   [`nix/shared/system/kaizen/plugins/gcloud-auth/`](../../nix/shared/system/kaizen/plugins/gcloud-auth/)
   always shows its login state as one.
+- Its Nix module is a home-manager module, `home.nix`, holding its `kaizen.*`
+  settings, units and packages, so it runs wherever the core's `home.nix` does.
+  `default.nix` is what a host imports: it adds `home.nix` to the host's
+  home-manager users, and holds any part that needs NixOS.
 - Its Nix module may add notification rules, such as buttons on another app's
   notifications: [`features.md`](features.md) › Notifications › Rules.
 - Plugin code runs in the shell as QML/JS. It needs a process of its own only
