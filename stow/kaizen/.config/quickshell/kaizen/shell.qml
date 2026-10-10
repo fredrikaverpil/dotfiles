@@ -147,7 +147,10 @@ ShellRoot {
         onObjectRemoved: root.loadPlugins()
 
         delegate: Loader {
+            id: pluginLoader
             required property string fileBaseName
+            required property string filePath
+            property var config: ({})
             Component.onCompleted: {
                 const source = root.pluginSource(fileBaseName);
                 if (source)
@@ -156,6 +159,22 @@ ShellRoot {
                     });
             }
             onLoaded: root.loadPlugins()
+
+            Binding {
+                target: pluginLoader.item
+                property: "config"
+                value: pluginLoader.config
+            }
+
+            FileView {
+                path: pluginLoader.filePath
+                watchChanges: true
+                // Blocks the first read, so the plugin starts with its config.
+                blockLoading: true
+                printErrors: false
+                onFileChanged: reload()
+                onLoaded: pluginLoader.config = Model.pluginConfig(text(), pluginLoader.filePath)
+            }
         }
     }
 

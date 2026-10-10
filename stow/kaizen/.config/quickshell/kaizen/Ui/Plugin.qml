@@ -8,6 +8,8 @@ Scope {
     // Its launcher node is plugins.<name>, which a right-click on a bar button
     // it takes over, or on its indicator, opens.
     required property string name
+    // Its <name>.jsonc, parsed; {} when that is not a JSONC object.
+    property var config: ({})
     // Shaped like Menu.qml's items; merged in load order.
     property var menuItems: ({})
     // Bar buttons it takes over, each mapped to the function its left-click
