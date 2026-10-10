@@ -73,8 +73,10 @@ started=$(systemctl --user show kaizen-shell.service --property=ActiveEnterTimes
 # Quickshell can embed ANSI colours in journal messages, including the level.
 log=$(journalctl --user -u kaizen-shell.service --since "$started" --no-pager -o cat |
   jq -Rr 'gsub("\u001b\\[[0-9;]*m"; "")')
-if grep -E '(^|[[:space:]])(ERROR|FATAL):|ReferenceError:|TypeError:|SyntaxError:|Failed to load configuration' <<<"$log"; then
-  printf 'FAIL: Quickshell runtime errors since service start\n' >&2
+# `WARN scene:` is a QML load or binding problem, `WARN qml:` the shell's own
+# console.warn. Other warning categories come from third-party tray apps.
+if grep -E '(^|[[:space:]])(ERROR|FATAL):|(^|[[:space:]])WARN (scene|qml):|ReferenceError:|TypeError:|SyntaxError:|Failed to load configuration' <<<"$log"; then
+  printf 'FAIL: Quickshell runtime errors or QML warnings since service start\n' >&2
   exit 1
 fi
 printf 'PASS: Quickshell smoke checks (hardware interactions not exercised)\n'

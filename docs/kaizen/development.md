@@ -126,11 +126,12 @@ tree, so a static check passing here passes for every kaizen host.
 - Mac tests are supplementary. Report unavailable session/hardware coverage as
   **pending**, never substitute another platform or claim full validation.
 - `shell-smoke` selects the running systemd service's PID and works over SSH.
-  It checks actual service IPC and runtime errors. `--panels` additionally
-  opens, queries, then closes Display, closing any competing panel. It refuses
-  that operation while locked and does not change scaling or device settings.
-  Its journal scan covers everything since the last service start; restart the
-  service before re-running to clear stale errors.
+  It checks actual service IPC, runtime errors and QML warnings (`WARN scene:`,
+  `WARN qml:`). `--panels` additionally opens, queries, then closes Display,
+  closing any competing panel. It refuses that operation while locked and does
+  not change scaling or device settings. Its journal scan covers everything
+  since the last service start; restart the service before re-running to clear
+  stale errors.
 - Every Quickshell start logs `qt.qpa.services: Failed to register with host
   portal ... Connection already associated with an application ID`. It is a
   known baseline (since at least 2026-09-11), passes `shell-smoke`, and has no
