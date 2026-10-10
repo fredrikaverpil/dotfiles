@@ -86,6 +86,10 @@
     # Marks a kaizen host; dotfiles-stow stows stow/kaizen/ where it exists.
     environment.etc.kaizen.text = "";
 
+    # The profiles home.nix's packages land in (useUserPackages) link only these
+    # dirs; the shell finds its emoji data in share/kaizen.
+    environment.pathsToLink = [ "/share/kaizen" ];
+
     environment.systemPackages = with pkgs; [
       # niri spawns it on demand and exports DISPLAY for X11 apps.
       xwayland-satellite
