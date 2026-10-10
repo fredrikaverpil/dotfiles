@@ -115,6 +115,15 @@ let
         cut -f2-
     '';
   };
+  # Lists warnings and errors from the kaizen-* user units, this boot by default.
+  kaizen-log = pkgs.writeShellApplication {
+    name = "kaizen-log";
+    runtimeInputs = [
+      pkgs.jq
+      pkgs.systemd
+    ];
+    text = builtins.readFile ./scripts/kaizen-log.sh;
+  };
 
   # bluetui registers its own pairing agent; the shell has none.
   bluetui-desktop = pkgs.makeDesktopItem {
@@ -532,6 +541,7 @@ in
       jq # The clipboard watcher's JSON encoding.
       kaizen-focus
       kaizen-ipc
+      kaizen-log
       mpv
       # nm-connection-editor edits wired, static-IP and other connection settings;
       # the network panel launches it. nm-applet runs via XDG autostart for its tray menu.
