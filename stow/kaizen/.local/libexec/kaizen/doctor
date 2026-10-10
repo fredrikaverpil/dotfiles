@@ -76,7 +76,7 @@ if ((${#args[@]} > 0)); then
   journal=$(journalctl --user --unit 'kaizen-*' --boot --lines all --output json --no-pager "${args[@]}")
 else
   units=$(
-    systemctl --user show 'kaizen-*' -p Id -p InvocationID -p NRestarts -p ActiveState -p Result -p MainPID |
+    systemctl --user show 'kaizen-*' -p Id -p InvocationID -p NRestarts -p ActiveState -p Result -p MainPID -p DropInPaths |
       jq -Rsc 'split("\n\n") | map(split("\n") | map(select(. != "") | capture("^(?<key>[^=]+)=(?<value>.*)$")) | from_entries | select(.Id))'
   )
 
@@ -112,10 +112,20 @@ else
 $(grep -Ev '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[^ ]+ +[A-Z]+ ' <<<"$out" || true)"
   fi
 
-  requires "$config/quickshell/kaizen/requires" requires
+  # kaizen dev's drop-in runs a worktree's tree, whose requires and plugins
+  # count.
+  shell_tree=$config/quickshell/kaizen
+  dev=$(jq -r '.[] | select(.Id == "kaizen-shell.service") | .DropInPaths | split(" ")[]
+    | select(endswith("/kaizen-shell.service.d/dev.conf"))' <<<"$units")
+  if [[ -n "$dev" ]]; then
+    shell_tree=$(sed -nE 's/^ExecStart=.* -p "(.*)"$/\1/p' "$dev")
+    check WARN kaizen-shell "runs $shell_tree: kaizen dev off"
+  fi
+
+  requires "$shell_tree/requires" requires
 
   # The shell loads a plugin only from the one dir that has it, silently.
-  shell_plugins=$config/quickshell/kaizen/plugins
+  shell_plugins=$shell_tree/plugins
   host_plugins=$config/kaizen/plugins
   for file in "$host_plugins"/*.jsonc; do
     [[ -e "$file" ]] || continue
