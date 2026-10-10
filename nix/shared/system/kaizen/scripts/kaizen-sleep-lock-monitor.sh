@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+set -euo pipefail
+
+lock_and_wait() {
+  qs ipc call lock lock >/dev/null || return 1
+
+  for _ in $(seq 1 30); do
+    if qs ipc call lock status 2>/dev/null | grep -q '"secure":true'; then
+      echo "kaizen: session lock is secure, releasing the suspend delay"
+      return 0
+    fi
+    sleep 0.1
+  done
+
+  return 1
+}
+
+monitor_sleep() {
+  while IFS= read -r line; do
+    if [[ $line == *"boolean true"* ]]; then
+      lock_and_wait || echo "kaizen: session lock was not secure before suspend" >&2
+      return
+    fi
+  done < <(dbus-monitor --system \
+    "type='signal',sender='org.freedesktop.login1',interface='org.freedesktop.login1.Manager',member='PrepareForSleep'")
+}
+
+if [[ ${1:-} == "--monitor" ]]; then
+  monitor_sleep
+else
+  exec systemd-inhibit \
+    --what=sleep \
+    --mode=delay \
+    --who=kaizen \
+    --why="Secure the Quickshell lock screen before suspend" \
+    "$0" --monitor
+fi

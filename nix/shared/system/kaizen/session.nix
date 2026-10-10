@@ -38,42 +38,7 @@ let
       pkgs.quickshell
       pkgs.systemd
     ];
-    text = ''
-      lock_and_wait() {
-        qs ipc call lock lock >/dev/null || return 1
-
-        for _ in $(seq 1 30); do
-          if qs ipc call lock status 2>/dev/null | grep -q '"secure":true'; then
-            echo "kaizen: session lock is secure, releasing the suspend delay"
-            return 0
-          fi
-          sleep 0.1
-        done
-
-        return 1
-      }
-
-      monitor_sleep() {
-        while IFS= read -r line; do
-          if [[ $line == *"boolean true"* ]]; then
-            lock_and_wait || echo "kaizen: session lock was not secure before suspend" >&2
-            return
-          fi
-        done < <(dbus-monitor --system \
-          "type='signal',sender='org.freedesktop.login1',interface='org.freedesktop.login1.Manager',member='PrepareForSleep'")
-      }
-
-      if [[ ''${1:-} == "--monitor" ]]; then
-        monitor_sleep
-      else
-        exec systemd-inhibit \
-          --what=sleep \
-          --mode=delay \
-          --who=kaizen \
-          --why="Secure the Quickshell lock screen before suspend" \
-          "$0" --monitor
-      fi
-    '';
+    text = builtins.readFile ./scripts/kaizen-sleep-lock-monitor.sh;
   };
   # Focuses the most recently focused niri window whose app id matches, or runs
   # the command when none does. niri's binds call it.
@@ -83,23 +48,7 @@ let
       pkgs.jq
       config.programs.niri.package
     ];
-    text = ''
-      case "''${1:-}" in
-      "" | -h | --help)
-        echo "usage: kaizen-focus APP_ID_REGEX COMMAND [ARGS...]    focus the app, or open it"
-        exit 0
-        ;;
-      esac
-
-      regex="$1"
-      shift
-      id="$(niri msg -j windows | jq --arg re "$regex" \
-        '[.[] | select(.app_id | test($re))] | max_by(.focus_timestamp | [.secs, .nanos]) | .id // empty')"
-      if [ -n "$id" ]; then
-        exec niri msg action focus-window --id "$id"
-      fi
-      exec "$@"
-    '';
+    text = builtins.readFile ./scripts/kaizen-focus.sh;
   };
   # Lists the shell's IPC functions, all targets or one, sorted by target.
   kaizen-ipc = pkgs.writeShellApplication {
@@ -108,12 +57,7 @@ let
       pkgs.gawk
       pkgs.quickshell
     ];
-    text = ''
-      qs ipc show |
-        awk -v t="''${1:-}" '/^target /{n=$2} t=="" || n==t {print n "\t" $0}' |
-        sort -s -t "$(printf '\t')" -k1,1 |
-        cut -f2-
-    '';
+    text = builtins.readFile ./scripts/kaizen-ipc.sh;
   };
   # Lists warnings and errors from the kaizen-* user units, this boot by default.
   kaizen-log = pkgs.writeShellApplication {
