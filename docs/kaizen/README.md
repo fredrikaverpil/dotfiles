@@ -102,6 +102,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | firmware | [fwupd] via `fwupdmgr` | firmware indicator | Settings › Firmware | `firmware` |
 | idle | [ext-idle-notify], lock service | idle indicator | Settings › Session | `idle` |
 | keyboard | [niri] XKB layouts | layout indicator | Settings › Keyboard layout | `keyboard` |
+| log | the `kaizen-*` units' journal via `kaizen-log` | log indicator | Settings › Log | `log` |
 | media | [MPRIS] | now-playing widget | Settings › Media | `media` |
 | mirror | [wl-mirror] in a transient `kaizen-mirror-<target>` user unit per mirror | mirror indicator | Settings › Display › Mirror | `mirror` |
 | network | [NetworkManager], `ip -j` | button | Settings › Network | `network` |
