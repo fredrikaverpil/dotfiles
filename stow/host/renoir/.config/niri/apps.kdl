@@ -30,6 +30,11 @@ window-rule {
 }
 
 window-rule {
+    match app-id=r#"^com\.belmoussaoui\.Decoder$"#
+    open-floating true
+}
+
+window-rule {
     match app-id=r#"^org\.gnome\.NautilusPreviewer$"#
     open-floating true
 }
