@@ -95,6 +95,9 @@ Item {
         var files = [];
         for (var i = 0; i < ruleFiles.count; i++) {
             var file = ruleFiles.objectAt(i) as FileView;
+            // Not created yet; its own objectAdded reloads.
+            if (!file)
+                continue;
             files.push({
                 path: file.path,
                 text: file.text()
