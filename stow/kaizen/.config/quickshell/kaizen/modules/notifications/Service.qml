@@ -61,10 +61,10 @@ Item {
     // card whenever popupRows changes, so a card cannot hold it.
     property var countdowns: ({})
     property var shortcodes: NotificationLogic.shortcodesFrom(JSON.parse(shortcodeFile.text() || "[]"))
-    // The rules of every file in rulesFolder, in file-name order.
+    // The rules of every rules file, in file-name order.
     property var rules: []
-    // Set once rulesFolder is first listed; the server waits for it, so no
-    // notification is handled before the rules exist.
+    // Set once both rules folders are first listed; the server waits for it,
+    // so no notification is handled before the rules exist.
     property bool rulesListed: false
 
     function stateText() {
@@ -91,17 +91,24 @@ Item {
         remind();
     }
 
+    function listRules() {
+        if (coreRulesFolder.status === FolderListModel.Ready && hostRulesFolder.status === FolderListModel.Ready)
+            rulesListed = true;
+    }
+
     function loadRules() {
         var files = [];
-        for (var i = 0; i < ruleFiles.count; i++) {
-            var file = ruleFiles.objectAt(i) as FileView;
-            // Not created yet; its own objectAdded reloads.
-            if (!file)
-                continue;
-            files.push({
-                path: file.path,
-                text: file.text()
-            });
+        for (var instantiator of [coreRuleFiles, hostRuleFiles]) {
+            for (var i = 0; i < instantiator.count; i++) {
+                var file = instantiator.objectAt(i) as FileView;
+                // Not created yet; its own objectAdded reloads.
+                if (!file)
+                    continue;
+                files.push({
+                    path: file.path,
+                    text: file.text()
+                });
+            }
         }
         rules = NotificationLogic.rulesFrom(files);
     }
@@ -479,25 +486,28 @@ Item {
         printErrors: false
     }
 
-    // Rules files: JSONC lists of rules (NotificationLogic.ruleCheck).
+    // Rules files: JSONC lists of rules (NotificationLogic.ruleCheck), the
+    // core's in this tree and the host's in Ui.Paths.config.
     FolderListModel {
-        id: rulesFolder
+        id: coreRulesFolder
+        folder: "file://" + Quickshell.shellPath("notification-rules.d")
+        nameFilters: ["*.jsonc"]
+        showDirs: false
+        onStatusChanged: root.listRules()
+    }
+
+    FolderListModel {
+        id: hostRulesFolder
         folder: "file://" + Ui.Paths.config + "/notification-rules.d"
         nameFilters: ["*.jsonc"]
         showDirs: false
-        onStatusChanged: {
-            if (status === FolderListModel.Ready)
-                root.rulesListed = true;
-        }
+        onStatusChanged: root.listRules()
     }
 
-    Instantiator {
-        id: ruleFiles
-        model: rulesFolder
-        onObjectAdded: root.loadRules()
-        onObjectRemoved: root.loadRules()
+    Component {
+        id: ruleFile
 
-        delegate: FileView {
+        FileView {
             required property string filePath
             path: filePath
             watchChanges: true
@@ -507,6 +517,22 @@ Item {
             onFileChanged: reload()
             onLoaded: root.loadRules()
         }
+    }
+
+    Instantiator {
+        id: coreRuleFiles
+        model: coreRulesFolder
+        delegate: ruleFile
+        onObjectAdded: root.loadRules()
+        onObjectRemoved: root.loadRules()
+    }
+
+    Instantiator {
+        id: hostRuleFiles
+        model: hostRulesFolder
+        delegate: ruleFile
+        onObjectAdded: root.loadRules()
+        onObjectRemoved: root.loadRules()
     }
 
     LazyLoader {

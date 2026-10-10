@@ -17,7 +17,7 @@ facts (firmware, BIOS, hardware quirks) belong in the host's `README.md` or
 ## Working model
 
 The desktop is built to be developed by an agent, usually run on the host
-itself, sometimes over SSH. Every part is reachable: `qs ipc` queries and
+itself, sometimes over SSH. Every part is reachable: `kaizen ipc` queries and
 drives shell services and panels, `niri msg` the compositor,
 `systemctl --user` the units, `grim` and the recording service capture what is
 on screen, and `wtype` and `wlrctl` take over the keyboard and the pointer to
@@ -62,7 +62,7 @@ upstream's latest, and niri marks each option with the version it arrived in
   on workspace 7; unlocking there within the minute lets the waiting `ssh`/`git`
   proceed.
 - Apps differ in the actions and hints their notifications carry, and the shell
-  logs none of it. `qs ipc call notifications toggleCapture` records each
+  logs none of it. `kaizen ipc call notifications toggleCapture` records each
   arriving notification's raw data, message text included, in memory (a new
   capture each time it is turned on); `captured` returns it as JSON. It is off
   after every shell restart. Capture a real one before handling an app's
@@ -151,7 +151,7 @@ tree, so a static check passing here passes for every kaizen host.
 - Hardware-dependent paths: Wi-Fi/Bluetooth, battery, backlight, lid,
   touchpad, fingerprint reader, `GAMMA_LUT` (nightlight). Validate on the
   machine.
-- Test keyboard-first panels over SSH: open the panel with `qs ipc call`,
+- Test keyboard-first panels over SSH: open the panel with `kaizen ipc call`,
   confirm it is the only `Keyboard interactivity: exclusive` layer in
   `niri msg layers`, then use the devshell's `wtype -k z`. Niri drops
   virtual-keyboard input before bind handling, so `wtype` cannot test
@@ -178,14 +178,14 @@ tree, so a static check passing here passes for every kaizen host.
   clicking. Never move it into the top-left corner, which opens niri's
   overview. `wlrctl` cannot hold a button, so a drag is the user's to check; a
   double-click selects a word.
-- Use `grim` to check how the shell looks; `qs ipc` and `shell-smoke` for
+- Use `grim` to check how the shell looks; `kaizen ipc` and `shell-smoke` for
   internal state. Crop with `-g "0,0 1280x32"` (layout coordinates) or capture
   one output with `-o`; the two do not combine. Capture cost depends only on
   the area. Niri does not report layer geometry, so derive the bar's from
   `niri msg --json outputs` and `barHeight` in `shell.qml`.
-- To record, `qs ipc call recording capture WxH+X+Y` (`0x0+X+Y` is the whole
+- To record, `kaizen ipc call recording capture WxH+X+Y` (`0x0+X+Y` is the whole
   monitor): no countdown, audio or camera, and the bar shows it. It returns the
-  file; `qs ipc call recording stop` finalizes it. Extract frames with
+  file; `kaizen ipc call recording stop` finalizes it. Extract frames with
   `nix shell nixpkgs#ffmpeg`.
 - DPMS-off can resemble a frozen machine. Use bounded commands; `grim` can hang
   while no output produces frames. Recovery is
@@ -260,9 +260,9 @@ afterward. **Never restart Quickshell while locked**: the compositor keeps the
 session lock after its client dies.
 
 ```sh
-qs ipc call idle status
-qs ipc call idle disable
-qs ipc call lock isLocked
+kaizen ipc call idle status
+kaizen ipc call idle disable
+kaizen ipc call lock isLocked
 ```
 
 New/moved files need `~/.dotfiles/stow.sh`, which also removes the links a
@@ -288,7 +288,7 @@ unlocked shell after deployment rather than relying on its watcher:
 systemctl --user restart kaizen-shell.service
 ```
 
-For ordinary `qs ipc` and compositor commands over SSH, provide the active
+For ordinary `kaizen ipc` and compositor commands over SSH, provide the active
 session's `XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY`, and `NIRI_SOCKET` from
 `systemctl --user show-environment`. Missing display context can make live
 Quickshell instances appear dead. `shell-smoke` avoids that by selecting the

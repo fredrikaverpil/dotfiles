@@ -7,13 +7,13 @@ Quickshell's IPC (inter-process communication):
 
 ```sh
 # show all ipc target functions
-qs ipc show
+kaizen ipc show
 
 # show ipc calls for a given target
-kaizen ipc <target>
+kaizen ipc show <target>
 
 # call a target's ipc function
-qs ipc call <target> <function> [args...]
+kaizen ipc call <target> <function> [args...]
 ```
 
 The below sections correspond to an IPC target (e.g. Curtain correlates to
@@ -102,22 +102,22 @@ Notifications arriving via the D-Bus can be transformed by notification rules,
 keyed by regexes on the notification's data. This offers capabilities such as
 restyling, adding action buttons or deduplication. The fields are described at
 `ruleCheck` in
-[`NotificationLogic.js`](../../stow/kaizen/.config/quickshell/modules/notifications/NotificationLogic.js).
+[`NotificationLogic.js`](../../stow/kaizen/.config/quickshell/kaizen/modules/notifications/NotificationLogic.js).
 
 Rules match only on what the app sends. Capture a real notification first:
 [`development.md`](development.md) › Gotchas.
 
-Each `~/.config/kaizen/notification-rules.d/*.jsonc` holds a list of rules in
-JSONC (JSON with comments). The shell reads the files in file-name order and
-applies an edit on save; a notification takes each setting from the first
+Each `*.jsonc` in the two `notification-rules.d/` below holds a list of rules in
+JSONC (JSON with comments). The shell reads the files of both in file-name order
+and applies an edit on save; a notification takes each setting from the first
 matching rule that has one. A relative icon path resolves against the file's
 directory. A file or rule that is invalid is dropped with a warning, which
 `kaizen log` lists.
 
-| File | Holds |
-| --- | --- |
-| `10-kaizen.jsonc` in [`stow/kaizen/`](../../stow/kaizen/.config/kaizen/notification-rules.d/) | the core's rules |
-| `50-<what>.jsonc` in `stow/host/<host>/`, or in a private submodule's `stow/` | a host's rules |
+| File | Under | Holds |
+| --- | --- | --- |
+| `10-kaizen.jsonc` | `~/.config/quickshell/kaizen/`, from [`stow/kaizen/`](../../stow/kaizen/.config/quickshell/kaizen/notification-rules.d/) | the core's rules |
+| `50-<what>.jsonc` | `~/.config/kaizen/`, from `stow/host/<host>/` or a private submodule's `stow/` | a host's rules |
 
 A rule's button may run a plugin's command, with the notification in
 `NOTIFICATION_APP`, `NOTIFICATION_SUMMARY` and `NOTIFICATION_BODY`; the

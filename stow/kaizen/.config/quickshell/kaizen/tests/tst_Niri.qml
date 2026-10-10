@@ -6,7 +6,7 @@ TestCase {
     name: "Niri"
 
     function test_parse_binds_reads_titled_binds_from_the_config() {
-        const raw = 'spawn-at-startup "sh" "-c" "hotkey-overlay-title=\\"x\\""\n' + 'binds {\n' + '    Mod+Space hotkey-overlay-title="Menu" { spawn "qs"; }\n' + '    // Mod+Q hotkey-overlay-title="Old" { quit; }\n' + '    XF86AudioMute allow-when-locked=true repeat=false hotkey-overlay-title="Mute" { spawn "qs"; }\n' + '    Mod+T { spawn "kitty"; }\n' + '}\n';
+        const raw = 'spawn-at-startup "sh" "-c" "hotkey-overlay-title=\\"x\\""\n' + 'binds {\n' + '    Mod+Space hotkey-overlay-title="Menu" { spawn "kaizen"; }\n' + '    // Mod+Q hotkey-overlay-title="Old" { quit; }\n' + '    XF86AudioMute allow-when-locked=true repeat=false hotkey-overlay-title="Mute" { spawn "kaizen"; }\n' + '    Mod+T { spawn "kitty"; }\n' + '}\n';
         compare(Niri.parseBinds(raw), [
             {
                 chord: "Mod+Space",
@@ -26,7 +26,7 @@ TestCase {
         return [
             {
                 tag: "ipc",
-                line: 'Mod+Print repeat=false hotkey-overlay-title="Record" { spawn "qs" "ipc" "call" "recording" "toggle"; }',
+                line: 'Mod+Print repeat=false hotkey-overlay-title="Record" { spawn "kaizen" "ipc" "call" "recording" "toggle"; }',
                 want: {
                     chord: "Mod+Print",
                     label: "Record",
@@ -36,7 +36,7 @@ TestCase {
             },
             {
                 tag: "ipc with an argument",
-                line: 'Mod+1 hotkey-overlay-title="Zone" { spawn "qs" "ipc" "call" "timezone" "set" "UTC"; }',
+                line: 'Mod+1 hotkey-overlay-title="Zone" { spawn "kaizen" "ipc" "call" "timezone" "set" "UTC"; }',
                 want: {
                     chord: "Mod+1",
                     label: "Zone",
@@ -73,8 +73,8 @@ TestCase {
                 }
             },
             {
-                tag: "qs without ipc call",
-                line: 'Mod+Space hotkey-overlay-title="Menu" { spawn "qs"; }',
+                tag: "kaizen without ipc call",
+                line: 'Mod+Space hotkey-overlay-title="Menu" { spawn "kaizen"; }',
                 want: {
                     chord: "Mod+Space",
                     label: "Menu",
@@ -83,7 +83,7 @@ TestCase {
             },
             {
                 tag: "spawn-sh",
-                line: 'Mod+A hotkey-overlay-title="Apps" { spawn-sh "qs ipc call menu toggle"; }',
+                line: 'Mod+A hotkey-overlay-title="Apps" { spawn-sh "kaizen ipc call menu toggle"; }',
                 want: {
                     chord: "Mod+A",
                     label: "Apps",
@@ -212,7 +212,7 @@ TestCase {
 
     function test_read_binds_keeps_the_last_bind_of_a_chord() {
         const files = {
-            "/c/config.kdl": 'binds {\n' + '    Mod+Space hotkey-overlay-title="Menu" { spawn "qs"; }\n' + '    Mod+Shift+Space hotkey-overlay-title="Next layout" { spawn "qs" "ipc" "call" "keyboard" "next"; }\n' + '}\n' + 'include optional=true "host.kdl"\n',
+            "/c/config.kdl": 'binds {\n' + '    Mod+Space hotkey-overlay-title="Menu" { spawn "kaizen"; }\n' + '    Mod+Shift+Space hotkey-overlay-title="Next layout" { spawn "kaizen" "ipc" "call" "keyboard" "next"; }\n' + '}\n' + 'include optional=true "host.kdl"\n',
             "/c/host.kdl": 'binds {\n    Shift+Mod+space hotkey-overlay-title="Mine" { close-window; }\n}\n'
         };
 

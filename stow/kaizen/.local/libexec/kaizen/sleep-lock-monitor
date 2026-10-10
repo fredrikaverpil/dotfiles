@@ -10,10 +10,10 @@ case "${1:-}" in
 esac
 
 lock_and_wait() {
-  qs ipc call lock lock >/dev/null || return 1
+  kaizen ipc call lock lock >/dev/null || return 1
 
   for _ in $(seq 1 30); do
-    if qs ipc call lock status 2>/dev/null | grep -q '"secure":true'; then
+    if kaizen ipc call lock status 2>/dev/null | grep -q '"secure":true'; then
       echo "kaizen: session lock is secure, releasing the suspend delay"
       return 0
     fi

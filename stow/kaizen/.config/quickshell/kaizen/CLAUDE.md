@@ -1,0 +1,1 @@
+../../../../../docs/kaizen/CLAUDE.md

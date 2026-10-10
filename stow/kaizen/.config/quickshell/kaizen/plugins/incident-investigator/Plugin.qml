@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import "../../Ui" as Ui
+import qs.Ui as Ui
 
 // Claude Code investigations of alerts, run by `investigate serve`.
 Ui.Plugin {
@@ -43,7 +43,7 @@ Ui.Plugin {
             investigations.selectedId = id;
         }
         // `investigate` calls it for a new draft and a finished turn's Open button.
-        // `qs ipc call <target> show` is parsed as the CLI's own `show`.
+        // `kaizen ipc call <target> show` is parsed as the CLI's own `show`.
         function reveal(id: string): void {
             investigations.selectedId = id;
             plugin.open();

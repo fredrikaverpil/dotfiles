@@ -202,10 +202,19 @@ function compileRules(rules, file) {
     .filter(Boolean);
 }
 
-// The rules of every `{ path, text }` rules file, in order: each holds a JSONC
-// list of rules. A file that does not parse is skipped with a warning.
+// The rules of every `{ path, text }` rules file, in file-name order whatever
+// its directory: each holds a JSONC list of rules. A file that does not parse
+// is skipped with a warning.
 function rulesFrom(files) {
-  return files.reduce(function (rules, file) {
+  function name(file) {
+    return file.path.slice(file.path.lastIndexOf("/") + 1);
+  }
+  return files
+    .slice()
+    .sort(function (a, b) {
+      return name(a) < name(b) ? -1 : name(a) > name(b) ? 1 : 0;
+    })
+    .reduce(function (rules, file) {
     var parsed;
     try {
       parsed = Jsonc.parse(file.text);

@@ -16,7 +16,7 @@ if [ -e /etc/kaizen ]; then
     if [ -e /etc/NIXOS ]; then
       # Noctalia is evaluated, not installed, so it runs from the host's own
       # nixpkgs, which only a NixOS host has. niri's config is kaizen's: its
-      # `qs ipc` binds do nothing here and noctalia's own binds are absent.
+      # `kaizen ipc` binds do nothing here and noctalia's own binds are absent.
       # State lives in ~/.config/noctalia and ~/.local/state/noctalia, outside
       # the dotfiles.
       function noctalia() {

@@ -1,5 +1,5 @@
 import Quickshell
-import "../../Ui" as Ui
+import qs.Ui as Ui
 
 // The minimal plugin: a launcher node and one action.
 Ui.Plugin {

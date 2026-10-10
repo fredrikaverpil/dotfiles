@@ -4,13 +4,13 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-niri validate --config ../niri/config.kdl
+niri validate --config ../../niri/config.kdl
 printf 'PASS: compositor configuration contracts\n'
 
 # docs/kaizen/README.md rules with a mechanical check: the IPC column of the services
 # table is the set of IpcHandler targets, and the shell writes only under the
 # roots Ui/Paths.qml resolves.
-doc=../../../../docs/kaizen/README.md
+doc=../../../../../docs/kaizen/README.md
 # shellcheck disable=SC2016
 documented=$(grep -E '^\| [a-z ()]+ \| ' "$doc" | awk -F'|' '{print $6}' | grep -o '`[a-z]*`' | tr -d '`' | sort -u)
 declared=$(grep -rho 'target: *"[a-z]*"' --include='*.qml' modules Ui shell.qml | grep -o '"[a-z]*"' | tr -d '"' | sort -u)

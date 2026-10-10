@@ -155,22 +155,31 @@
                   # (.qmltypes) is used here. Same nixpkgs as renoir, so the
                   # same store path the ThinkPad runs.
                   quickshell = unstable.x86_64-linux.quickshell;
-                  # Every kaizen host runs the one tree in stow/kaizen/.
+                  # Every kaizen host runs the one tree in stow/kaizen/; a host's
+                  # plugins add theirs under stow/host/<host>/.config/kaizen/.
                   task =
                     name: text:
                     pkgs.writeShellScriptBin name ''
                       set -e
-                      cd "$(git rev-parse --show-toplevel)/stow/kaizen/.config/quickshell"
+                      cd "$(git rev-parse --show-toplevel)/stow/kaizen/.config/quickshell/kaizen"
                       ${text}
                     '';
                 in
                 pkgs.mkShell {
                   packages = [
                     pkgs.qt6.qtdeclarative # qmlls, qmllint, qmlformat, qmltestrunner
-                    (task "qml-lint" "qmllint -E -W 0 $(find . -name '*.qml')")
+                    # Plugins import qs.Ui, which Quickshell maps to the tree's Ui/;
+                    # qmllint finds it through a qs/Ui link on -I.
+                    (task "qml-lint" ''
+                      imports=$(mktemp -d)
+                      trap 'rm -rf "$imports"' EXIT
+                      mkdir "$imports/qs"
+                      ln -s "$PWD/Ui" "$imports/qs/Ui"
+                      qmllint -E -I "$imports" -W 0 $(find . ../../../../host/*/.config/kaizen/plugins -name '*.qml')
+                    '')
                     # Tool defaults; prettier's match conform's flags for JS.
                     (task "qml-format" ''
-                      dirs=". ../../../host/*/.config/quickshell"
+                      dirs=". ../../../../host/*/.config/kaizen/plugins"
                       qmlformat -i $(find $dirs -name '*.qml')
                       # Prettier cannot parse QML's `.pragma`/`.import` JS.
                       prettier --log-level warn --write $(grep -LE '^\.(pragma|import)' $(find $dirs -name '*.js'))

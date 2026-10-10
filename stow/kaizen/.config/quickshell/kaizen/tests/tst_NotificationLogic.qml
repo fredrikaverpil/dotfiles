@@ -240,30 +240,30 @@ TestCase {
                     icon: icon,
                     badgeIcon: icon
                 }
-            ], "/home/me/.config/kaizen/notification-rules.d/10-kaizen.jsonc")[0]).map(rule => [rule.icon, rule.badgeIcon]);
-        compare(icons, [["file:///home/me/.config/kaizen/notification-rules.d/../icons/github.svg", "file:///home/me/.config/kaizen/notification-rules.d/../icons/github.svg"], ["file:///abs/github.svg", "file:///abs/github.svg"], ["file:///abs/github.svg", "file:///abs/github.svg"], ["image://icon/slack", "image://icon/slack"]]);
+            ], "/home/me/.config/quickshell/kaizen/notification-rules.d/10-kaizen.jsonc")[0]).map(rule => [rule.icon, rule.badgeIcon]);
+        compare(icons, [["file:///home/me/.config/quickshell/kaizen/notification-rules.d/../icons/github.svg", "file:///home/me/.config/quickshell/kaizen/notification-rules.d/../icons/github.svg"], ["file:///abs/github.svg", "file:///abs/github.svg"], ["file:///abs/github.svg", "file:///abs/github.svg"], ["image://icon/slack", "image://icon/slack"]]);
     }
 
-    function test_notification_rules_files_concatenate_in_order_skipping_invalid_ones() {
-        ignoreWarning(/^notifications: \/b\.jsonc: skipping: SyntaxError/);
-        ignoreWarning("notifications: /c.jsonc: dropping rules: not a list");
-        ignoreWarning('notifications: /d.jsonc: dropping rule 0 {"match":{"app":"^D$"},"urgency":"loud"}: urgency: not one of low, normal, critical');
+    function test_notification_rules_files_concatenate_in_file_name_order_skipping_invalid_ones() {
+        ignoreWarning(/^notifications: \/core\/b\.jsonc: skipping: SyntaxError/);
+        ignoreWarning("notifications: /host/c.jsonc: dropping rules: not a list");
+        ignoreWarning('notifications: /host/d.jsonc: dropping rule 0 {"match":{"app":"^D$"},"urgency":"loud"}: urgency: not one of low, normal, critical');
         const rules = Notification.rulesFrom([
             {
-                path: "/a.jsonc",
-                text: '// core\n[{"match": {"app": "^A$"}, "urgency": "critical",},]'
+                path: "/host/d.jsonc",
+                text: '[{"match": {"app": "^D$"}, "urgency": "loud"}, {"match": {"summary": "^E$"}, "border": "rose"}]'
             },
             {
-                path: "/b.jsonc",
-                text: "[{"
-            },
-            {
-                path: "/c.jsonc",
+                path: "/host/c.jsonc",
                 text: "{}"
             },
             {
-                path: "/d.jsonc",
-                text: '[{"match": {"app": "^D$"}, "urgency": "loud"}, {"match": {"summary": "^E$"}, "border": "rose"}]'
+                path: "/core/a.jsonc",
+                text: '// core\n[{"match": {"app": "^A$"}, "urgency": "critical",},]'
+            },
+            {
+                path: "/core/b.jsonc",
+                text: "[{"
             },
         ]);
 
