@@ -241,7 +241,9 @@ change it measures.
   open, and records growth in MB/h. Use it for suspected leaks; a few hours
   distinguishes growth from warm-up.
 - For per-binding cost, restart with `qs --debug PORT` and attach the
-  devshell's `qmlprofiler --attach localhost:PORT`.
+  devshell's `qmlprofiler --attach localhost:PORT`. That shell runs outside
+  `kaizen-shell.service`, so `kaizen ipc` and the binds miss it; reach it with
+  `qs ipc -c kaizen`.
 
 ## Deployment safety
 
@@ -284,8 +286,7 @@ unlocked shell after deployment rather than relying on its watcher:
 systemctl --user restart kaizen-shell.service
 ```
 
-For ordinary `kaizen ipc` and compositor commands over SSH, provide the active
-session's `XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY`, and `NIRI_SOCKET` from
-`systemctl --user show-environment`. Missing display context can make live
-Quickshell instances appear dead. `shell-smoke` avoids that by selecting the
-PID.
+For compositor commands over SSH, provide the active session's
+`XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY`, and `NIRI_SOCKET` from
+`systemctl --user show-environment`. `kaizen ipc` and `shell-smoke` select the
+shell by its unit's PID, so they need no display context.
