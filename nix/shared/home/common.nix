@@ -27,7 +27,9 @@ in
       "pi"
     ];
 
-    home.activation.handleDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    # After linkGeneration, which removes links that left the generation, so
+    # stow can link a file home-manager linked before.
+    home.activation.handleDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" "linkGeneration" ] ''
       # Check if dotfiles are already cloned locally
       if [ -d "$HOME/.dotfiles/.git" ]; then
         echo "Using existing dotfiles at ~/.dotfiles"

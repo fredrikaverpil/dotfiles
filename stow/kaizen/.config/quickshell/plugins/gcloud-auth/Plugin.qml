@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import qs.Ui as Ui
+import "../../Ui" as Ui
 
 import "GcloudModel.js" as Model
 

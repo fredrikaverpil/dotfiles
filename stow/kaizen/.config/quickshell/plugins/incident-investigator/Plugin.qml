@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import qs.Ui as Ui
+import "../../Ui" as Ui
 
 // Claude Code investigations of alerts, run by `investigate serve`.
 Ui.Plugin {

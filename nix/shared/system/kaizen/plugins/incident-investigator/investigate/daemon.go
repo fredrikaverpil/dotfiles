@@ -577,8 +577,8 @@ func (d *daemon) execTurn(id, sessionID, model, effort, prompt string, resume bo
 	defer func() { _ = transcript.Close() }()
 	cmd := claude.Command(dir, d.pluginDir, d.sourceDirs, d.goModCache, model, effort, sessionID, instructions, prompt,
 		resume)
-	// CLAUDE_CONFIG_DIR comes from the daemon's environment.
 	cmd.Env = append(os.Environ(),
+		"CLAUDE_CONFIG_DIR="+d.claudeConfigDir,
 		// For `investigate checkout`.
 		"INVESTIGATE_RUN_DIR="+dir, "INVESTIGATE_SOURCE_DIRS="+strings.Join(d.sourceDirs, string(os.PathListSeparator)),
 		// git never writes to the clones' .git; go and gopls never download modules or toolchains.

@@ -1,4 +1,5 @@
 import QtQuick
+import Qt.labs.folderlistmodel
 import Quickshell
 import Quickshell.Io
 
@@ -81,22 +82,43 @@ ShellRoot {
     readonly property int barHeight: Math.round(32 * textScale)
     property var panels: []
 
-    // Ui.Plugin instances, in KAIZEN_PLUGINS order; one that fails to load is left out.
-    readonly property var plugins: pluginLoaders.instances.map(loader => loader.item).filter(plugin => plugin)
+    // Ui.Plugin instances, in name order; one that fails to load is left out.
+    property var plugins: []
 
-    Variants {
+    function loadPlugins() {
+        const loaded = [];
+        for (let i = 0; i < pluginLoaders.count; i++) {
+            const plugin = (pluginLoaders.objectAt(i) as Loader)?.item;
+            if (plugin)
+                loaded.push(plugin);
+        }
+        plugins = loaded;
+    }
+
+    // Each <name>.jsonc enables plugins/<name>/Plugin.qml and holds its config.
+    FolderListModel {
+        id: pluginFiles
+        folder: "file://" + Ui.Paths.config + "/plugins"
+        nameFilters: ["*.jsonc"]
+        showDirs: false
+    }
+
+    Instantiator {
         id: pluginLoaders
-        model: (Quickshell.env("KAIZEN_PLUGINS") || "").split(":").filter(dir => dir)
+        model: pluginFiles
+        onObjectAdded: root.loadPlugins()
+        onObjectRemoved: root.loadPlugins()
 
-        Loader {
-            required property string modelData
-            Component.onCompleted: setSource("file://" + modelData + "/Plugin.qml", {
+        delegate: Loader {
+            required property string fileBaseName
+            Component.onCompleted: setSource("file://" + Quickshell.shellPath("plugins/" + fileBaseName + "/Plugin.qml"), {
                 shell: root
             })
+            onLoaded: root.loadPlugins()
         }
     }
 
-    // Plugins live outside the tree, so Quickshell does not watch their files.
+    // Quickshell watches only files shell.qml imports; plugins load by path.
     IpcHandler {
         target: "shell"
 

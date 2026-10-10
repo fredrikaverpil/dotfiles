@@ -3,6 +3,7 @@
 // exits 0 with an empty Devices array when nothing is pending.
 
 var name = "fwupd";
+var busName = "org.freedesktop.fwupd";
 
 function command() {
   return ["fwupdmgr", "get-updates", "--json"];

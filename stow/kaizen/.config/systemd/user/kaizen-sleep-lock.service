@@ -1,0 +1,17 @@
+# Lid close and the power key suspend via logind; this delay inhibitor locks the
+# shell first and releases once the lock reports secure.
+[Unit]
+Description=Lock Quickshell before suspend
+PartOf=graphical-session.target
+# Match Quickshell's ordering: waitenv is required for niri, and
+# graphical-session.target cycles.
+After=dbus.socket wayland-wm@niri.service wayland-session-waitenv.service
+Requires=dbus.socket
+
+[Service]
+ExecStart=%h/.local/bin/kaizen-sleep-lock-monitor
+Restart=always
+RestartSec=2s
+
+[Install]
+WantedBy=wayland-session@niri.target

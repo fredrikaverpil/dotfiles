@@ -1,0 +1,28 @@
+# The calendar plugin's daemon: sync and reminders outlive the calendar window
+# and run independently of the shell. Not dcal's own unit, which orders after
+# graphical-session.target. It inherits UWSM's session PATH, so dcal can launch
+# its Quickshell UI and open OAuth URLs with the session's tools.
+[Unit]
+Description=DankCalendar sync and reminders
+ConditionPathExists=%h/.config/kaizen/plugins/calendar.jsonc
+PartOf=graphical-session.target
+After=dbus.socket kaizen-shell.service wayland-wm@niri.service wayland-session-waitenv.service
+# Retry indefinitely, e.g. while the keyring is not yet unlocked.
+StartLimitIntervalSec=0
+
+[Service]
+# dcal must see Secret Service before starting: its local keyring fallback uses
+# a fixed password. OpenSession prevents that fallback; the collection probe
+# catches first-use keyring initialization that advertises `login` without
+# exporting it. Manually launched instances bypass both probes.
+ExecStartPre=/usr/bin/env busctl --user --timeout=15 --quiet call org.freedesktop.secrets /org/freedesktop/secrets org.freedesktop.Secret.Service OpenSession sv plain s ""
+ExecStartPre=/usr/bin/env busctl --user --timeout=15 --quiet get-property org.freedesktop.secrets /org/freedesktop/secrets/collection/login org.freedesktop.Secret.Collection Locked
+ExecStart=/usr/bin/env dcal run --session --hidden
+# The UI's Quit makes the daemon SIGTERM itself and exit 0.
+Restart=always
+RestartSec=2s
+Slice=app.slice
+UMask=0077
+
+[Install]
+WantedBy=wayland-session@niri.target

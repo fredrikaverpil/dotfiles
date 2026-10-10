@@ -1,0 +1,5 @@
+# Starts the unit, so it runs once however it was started.
+[Desktop Entry]
+Type=Application
+Name=Hello tray
+Exec=systemctl --user start kaizen-hello-tray.service

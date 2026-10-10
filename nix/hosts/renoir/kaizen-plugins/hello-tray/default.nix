@@ -1,10 +1,8 @@
-{ lib, pkgs, ... }:
+{ pkgs, ... }:
 # The minimal tray plugin: an app with its own StatusNotifierItem and menu,
-# which the shell's tray shows. It needs no shell code.
+# which the shell's tray shows. It needs no shell code. Its unit and desktop
+# entry live in stow/host/renoir/.
 let
-  # Start with the session; otherwise start it from the launcher's Apps.
-  autostart = true;
-
   hello-tray = pkgs.buildGo127Module {
     pname = "hello-tray";
     version = "0.1.0";
@@ -14,26 +12,5 @@ let
   };
 in
 {
-  # Starts the unit, so it runs once however it was started.
-  environment.systemPackages = [
-    (pkgs.makeDesktopItem {
-      name = "hello-tray";
-      desktopName = "Hello tray";
-      exec = "systemctl --user start kaizen-hello-tray.service";
-    })
-  ];
-
-  systemd.user.services.kaizen-hello-tray = {
-    description = "Hello tray plugin";
-    partOf = [ "graphical-session.target" ];
-    # The shell hosts the StatusNotifierWatcher it registers with.
-    after = [ "kaizen-shell.service" ];
-    wantedBy = lib.optional autostart "wayland-session@niri.target";
-    serviceConfig = {
-      ExecStart = lib.getExe hello-tray;
-      # Quit in its menu exits 0 and leaves it stopped.
-      Restart = "on-failure";
-      Slice = "app.slice";
-    };
-  };
+  environment.systemPackages = [ hello-tray ];
 }

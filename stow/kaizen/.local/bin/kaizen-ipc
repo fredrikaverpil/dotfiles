@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+set -euo pipefail
+
+qs ipc show |
+  awk -v t="${1:-}" '/^target /{n=$2} t=="" || n==t {print n "\t" $0}' |
+  sort -s -t "$(printf '\t')" -k1,1 |
+  cut -f2-

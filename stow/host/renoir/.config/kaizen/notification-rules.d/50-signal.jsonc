@@ -1,0 +1,10 @@
+[
+  // Never miss a message from family.
+  {
+    "match": { "app": "^Signal$", "summary": " Averpil$" },
+    "urgency": "critical",
+    "border": "rose",
+    "borderAnimation": "glow",
+    "badgeEmoji": "❤️"
+  }
+]

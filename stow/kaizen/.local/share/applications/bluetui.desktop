@@ -1,0 +1,8 @@
+# bluetui registers its own pairing agent; the shell has none.
+[Desktop Entry]
+Type=Application
+Name=bluetui
+Comment=Bluetooth pairing
+Exec=bluetui
+Terminal=true
+Categories=Settings;HardwareSettings;

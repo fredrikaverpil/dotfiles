@@ -1,0 +1,17 @@
+# Holds XDG autostart apps (UWSM orders them after this target) until the
+# tray's StatusNotifierWatcher is up; Electron apps look for it once and never
+# retry. The shell registers it once its config loads, which waits for
+# xdg-desktop-portal, itself ordered after graphical-session.target: waiting in
+# kaizen-shell.service would deadlock.
+[Unit]
+Description=Wait for the Quickshell tray
+Before=wayland-session-xdg-autostart@niri.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'until busctl --user status org.kde.StatusNotifierWatcher >/dev/null 2>&1; do sleep 0.2; done'
+# A tray that never comes up delays autostart apps, never blocks them.
+TimeoutStartSec=10
+
+[Install]
+WantedBy=wayland-session-xdg-autostart@niri.target

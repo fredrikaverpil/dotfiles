@@ -13,8 +13,8 @@ Item {
     readonly property var known: ({
             fwupd: Fwupd
         })
-    // Set from the host's Nix config: only the backends it enables run.
-    readonly property var backends: Model.backends(Quickshell.env("KAIZEN_FIRMWARE_BACKENDS"), Object.keys(known))
+    // Only the backends the system runs: kaizen never starts their daemons.
+    property var backends: []
 
     // backend -> { updates, error } from its last check.
     property var results: ({})
@@ -61,6 +61,14 @@ Item {
             updates: updates,
             errors: errors
         });
+    }
+
+    Process {
+        command: ["busctl", "--system", "--json=short", "call", "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus", "ListActivatableNames"]
+        running: true
+        stdout: StdioCollector {
+            onStreamFinished: root.backends = Model.backends(text, root.known)
+        }
     }
 
     Variants {

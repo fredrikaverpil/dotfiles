@@ -13,6 +13,7 @@ Stow forbids slashes in package names, so each level is its own invocation:
 | `stow/platform/{Darwin,Linux}/` | matching `uname -s` |
 | `stow/kaizen/` | kaizen hosts, where `/etc/kaizen` exists (`renoir`, `wily`) |
 | `stow/host/<hostname>/` | that machine only; optional |
+| `nix/hosts/<hostname>/*/stow/` | that machine, from a private submodule (wily's `einride`); optional |
 
 `--adopt` absorbs any real file that has replaced a managed symlink into the
 repo instead of aborting; review the result with `git diff` before committing.
