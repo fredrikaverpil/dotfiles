@@ -1,10 +1,8 @@
 { pkgs, ... }:
 let
-  # `[{ emoji, name, shortcodes }]`: Unicode's names for the menu's picker, and
-  # the shortcodes Slack sends as `:name:` in notification text, from the
-  # dataset Slack uses. Shortcode-only entries (skin tones) have a null name.
+  # The shell's emoji data, found as share/kaizen/emoji.json in the XDG data dirs.
   emoji =
-    pkgs.runCommand "emoji.json"
+    pkgs.runCommand "kaizen-emoji"
       {
         nativeBuildInputs = [ pkgs.jq ];
         names = "${pkgs.unicode-emoji}/share/unicode/emoji/emoji-test.txt";
@@ -14,14 +12,8 @@ let
         };
       }
       ''
-        jq -nc --rawfile names "$names" --slurpfile data "$shortcodes" > $out '
-          def hex: ascii_downcase | explode | reduce .[] as $c (0; . * 16 + if $c >= 97 then $c - 87 else $c - 48 end);
-          ($data[0] | map({ key: [.unified | split("-")[] | hex] | implode, value: .short_names }) | from_entries) as $codes
-          | [$names | split("\n")[] | capture("; fully-qualified +# (?<emoji>\\S+) E\\d+\\.\\d+ (?<name>.+)$") | select(.name | contains("skin tone") | not)] as $named
-          | ($named | map({ key: .emoji, value: true }) | from_entries) as $seen
-          | $named | map(.shortcodes = ($codes[.emoji] // []))
-            + [$codes | to_entries[] | select($seen[.key] | not) | { emoji: .key, name: null, shortcodes: .value }]
-        '
+        mkdir -p $out/share/kaizen
+        bash ${../../../../stow/kaizen/.local/bin/kaizen-emoji} "$names" "$shortcodes" > $out/share/kaizen/emoji.json
       '';
 
   sleep-lock-monitor = pkgs.writeShellApplication {
@@ -78,10 +70,9 @@ let
   };
 in
 # The user half of the kaizen session: the shell's user units and the
-# pre-suspend lock, the data they hand the shell, and the packages the shell
-# and its binds use. A home-manager module, so it also runs on a distro other
-# than NixOS; session.nix holds the system half and adds this module to every
-# home-manager user. Compositor config, QML and notification rules live in
+# pre-suspend lock, and the packages and data the shell and its binds use. A
+# home-manager module, so it also runs on a distro other than NixOS; session.nix
+# holds the system half and adds this module to every home-manager user. Compositor config, QML and notification rules live in
 # stow/kaizen/.
 {
   config = {
@@ -104,7 +95,6 @@ in
         Environment = [
           # qtimageformats supplies Quickshell's WebP decoder.
           "QT_PLUGIN_PATH=${pkgs.qt6.qtimageformats}/lib/qt-6/plugins"
-          "KAIZEN_EMOJI=${emoji}"
         ];
         ExecStart = "${pkgs.quickshell}/bin/quickshell";
         Restart = "on-failure";
@@ -173,6 +163,7 @@ in
       iputils
       bluetui
       bluetui-desktop
+      emoji
       grim
       imagemagick # Wallpaper thumbnails.
       jq # The clipboard watcher's JSON encoding.

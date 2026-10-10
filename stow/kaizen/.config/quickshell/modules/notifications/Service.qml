@@ -470,7 +470,7 @@ Item {
 
     FileView {
         id: shortcodeFile
-        path: Quickshell.env("KAIZEN_EMOJI") || ""
+        path: Ui.Paths.emoji
         // Blocks the first read, so no notification is handled before the map exists.
         blockLoading: true
         printErrors: false

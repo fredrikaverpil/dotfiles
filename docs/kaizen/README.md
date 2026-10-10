@@ -84,8 +84,9 @@ plugins run, and the notification rules.
   [`stow/kaizen/`](../../stow/kaizen/) reaches every kaizen host or none, and a
   plugin's QML there loads only where a `~/.config/kaizen/plugins/<name>.jsonc`
   enables it.
-- Nix hands the shell values only through `kaizen-shell.service`'s environment
-  (`KAIZEN_EMOJI`).
+- The shell reads its emoji data from `kaizen/emoji.json` in the XDG data dirs,
+  which Nix builds with
+  [`kaizen-emoji`](../../stow/kaizen/.local/bin/kaizen-emoji).
 - Apps are not kaizen's: [`nix/README.md`](../../nix/README.md) says where they
   go.
 - QML paths here (`modules/…`, `Ui/…`) are under
