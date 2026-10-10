@@ -187,7 +187,7 @@ binds {
     Mod+Shift+Print repeat=false hotkey-overlay-title="Pause or resume the recording" { spawn "qs" "ipc" "call" "recording" "pause"; }
 
     // Launch
-    Mod+T hotkey-overlay-title="Focus or open a terminal" { spawn "kaizen-focus" r#"^com\.mitchellh\.ghostty$"# "ghostty"; }
+    Mod+T hotkey-overlay-title="Focus or open a terminal" { spawn "kaizen" "focus" r#"^com\.mitchellh\.ghostty$"# "ghostty"; }
     Mod+Return hotkey-overlay-title="New terminal" { spawn "ghostty"; }
 
     // Window state

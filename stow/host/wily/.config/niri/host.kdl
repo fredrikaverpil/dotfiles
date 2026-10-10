@@ -15,7 +15,7 @@ binds {
     Mod+A hotkey-overlay-title="Open the everyday apps" { spawn-sh "~/.config/niri/wily-apps"; }
 
     // Focus the app's most recently focused window, or open it.
-    Mod+E hotkey-overlay-title="Focus or open Google Calendar" { spawn "kaizen-focus" r#"^chrome-calendar\.google\.com__-"# "chromium" "--profile-directory=Work" "--app=https://calendar.google.com/"; }
-    Mod+W hotkey-overlay-title="Focus or open Google Meet" { spawn "kaizen-focus" r#"^chrome-meet\.google\.com__-"# "chromium" "--profile-directory=Work" "--app=https://meet.google.com/"; }
-    Mod+P hotkey-overlay-title="Focus or open Linear" { spawn "kaizen-focus" r#"^chrome-linear\.app__-"# "chromium" "--profile-directory=Work" "--app=https://linear.app/"; }
+    Mod+E hotkey-overlay-title="Focus or open Google Calendar" { spawn "kaizen" "focus" r#"^chrome-calendar\.google\.com__-"# "chromium" "--profile-directory=Work" "--app=https://calendar.google.com/"; }
+    Mod+W hotkey-overlay-title="Focus or open Google Meet" { spawn "kaizen" "focus" r#"^chrome-meet\.google\.com__-"# "chromium" "--profile-directory=Work" "--app=https://meet.google.com/"; }
+    Mod+P hotkey-overlay-title="Focus or open Linear" { spawn "kaizen" "focus" r#"^chrome-linear\.app__-"# "chromium" "--profile-directory=Work" "--app=https://linear.app/"; }
 }

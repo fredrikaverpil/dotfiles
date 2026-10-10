@@ -318,6 +318,6 @@ TestCase {
     }
 
     function test_focus_app_hands_the_pattern_to_kaizen_focus() {
-        compare(Niri.focusApp("^slack$"), ["kaizen-focus", "^slack$", "true"]);
+        compare(Niri.focusApp("^slack$"), ["kaizen", "focus", "^slack$", "true"]);
     }
 }

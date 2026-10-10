@@ -4,7 +4,7 @@ set -euo pipefail
 
 case "${1:-}" in
 "" | -h | --help)
-  echo "usage: kaizen-focus APP_ID_REGEX COMMAND [ARGS...]    focus the app, or open it"
+  echo "usage: kaizen focus APP_ID_REGEX COMMAND [ARGS...]    focus the app, or open it"
   exit 0
   ;;
 esac

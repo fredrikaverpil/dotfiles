@@ -89,10 +89,13 @@ QML, which plugins run, and the notification rules.
   enables it.
 - A `.wants/` link beside a unit enables it, and `stow.sh` reloads the user
   manager. A unit runs a packaged program through `/usr/bin/env`, from the
-  session PATH, and a script from `%h/.local/bin/`.
+  session PATH, and a kaizen script as `%h/.local/bin/kaizen <sub>`.
+- `kaizen <sub>` is the only kaizen command on PATH; it runs
+  `~/.local/libexec/kaizen/<sub>`. Units, niri binds and QML call it, never a
+  script's path.
 - The shell reads its emoji data from `kaizen/emoji.json` in the XDG data dirs,
   which Nix builds with
-  [`kaizen-emoji`](../../stow/kaizen/.local/bin/kaizen-emoji).
+  [`kaizen emoji`](../../stow/kaizen/.local/libexec/kaizen/emoji).
 - Apps are not kaizen's: [`nix/README.md`](../../nix/README.md) says where they
   go.
 - QML paths here (`modules/…`, `Ui/…`) are under
@@ -116,7 +119,7 @@ enabled plugin's do on NixOS:
 - `/etc/pam.d/kaizen-lock` holding `auth include login`, for the lock and the
   curtain.
 - An empty `/etc/kaizen`: `stow.sh` stows [`stow/kaizen/`](../../stow/kaizen/)
-  and the shell defines `kaizen()` only where it exists.
+  only where it exists.
 - The session variables `NIXOS_OZONE_WL=1`, `QT_QPA_PLATFORMTHEME=gtk3` and
   `GTK_USE_PORTAL=1`, and the fonts in
   [`fonts.nix`](../../nix/shared/system/fonts.nix).
@@ -124,7 +127,7 @@ enabled plugin's do on NixOS:
   qtimageformats for WebP, and a plugin's daemon: dcal for the calendar,
   `investigate` with go and gopls on its PATH for the incident investigator.
 - The emoji data: run
-  [`kaizen-emoji`](../../stow/kaizen/.local/bin/kaizen-emoji) into
+  [`kaizen emoji`](../../stow/kaizen/.local/libexec/kaizen/emoji) into
   `~/.local/share/kaizen/emoji.json`.
 
 ## Services to surfaces
@@ -142,7 +145,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | firmware | [fwupd] via `fwupdmgr` | firmware indicator | Settings › Firmware | `firmware` |
 | idle | [ext-idle-notify], lock service | idle indicator | Settings › Session | `idle` |
 | keyboard | [niri] XKB layouts | layout indicator | Settings › Keyboard layout | `keyboard` |
-| log | the `kaizen-*` units' journal via `kaizen-log` | log indicator | Settings › Log | `log` |
+| log | the `kaizen-*` units' journal via `kaizen log` | log indicator | Settings › Log | `log` |
 | media | [MPRIS] | now-playing widget | Settings › Media | `media` |
 | mirror | [wl-mirror] in a transient `kaizen-mirror-<target>` user unit per mirror | mirror indicator | Settings › Display › Mirror | `mirror` |
 | network | [NetworkManager], `ip -j` | button | Settings › Network | `network` |
@@ -232,7 +235,7 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 ## Session
 
 ```
-TTY login ─ kaizen() ─ uwsm start niri --session
+TTY login ─ kaizen run ─ uwsm start niri --session
   └─ wayland-session@niri.target
        ├─ kaizen-shell.service      Restart=on-failure
        └─ kaizen-sleep-lock.service logind delay inhibitor
@@ -320,7 +323,8 @@ nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
    package another scope also installs), system services and PAM →
    [`kaizen/default.nix`](../../nix/shared/system/kaizen/default.nix), units and
    scripts → [`systemd/user/`](../../stow/kaizen/.config/systemd/user/) and
-   [`.local/bin/`](../../stow/kaizen/.local/bin/), compositor →
+   [`.local/libexec/kaizen/`](../../stow/kaizen/.local/libexec/kaizen/),
+   compositor →
    [`Ui/compositors/`](../../stow/kaizen/.config/quickshell/Ui/compositors/) and
    [`niri/config.kdl`](../../stow/kaizen/.config/niri/config.kdl), IPC target
    for every new action. An optional shell extension is a [plugin](plugins.md).

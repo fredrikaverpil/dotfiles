@@ -1,4 +1,4 @@
-// Entries as `kaizen-log --json` prints them: { time, unit, level, message },
+// Entries as `kaizen log --json` prints them: { time, unit, level, message },
 // time in milliseconds since the epoch, level WARN, ERROR or FATAL.
 
 var LEVELS = ["WARN", "ERROR", "FATAL"];

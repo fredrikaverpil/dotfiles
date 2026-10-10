@@ -5,44 +5,14 @@
 # functions and shell-agnostic
 # ----------------------------
 
-# Session launcher for a console login. /etc/kaizen marks a kaizen host, on
-# NixOS or another distro, so it rules out macOS and every other Linux in one
-# test; the inner check then skips hosts that do not install niri.
+# Noctalia session launcher for a console login, beside `kaizen run`.
+# /etc/kaizen marks a kaizen host, on NixOS or another distro, so it rules out
+# macOS and every other Linux in one test; the inner check then skips hosts
+# that do not install niri.
 if [ -e /etc/kaizen ]; then
-  # --session serves niri's D-Bus interfaces (screencast portal, a11y) and
-  # imports its environment, which uwsm cleans up on exit. The instance name
-  # follows from the executable, so the units are wayland-wm@niri.service and
-  # wayland-session@niri.target -- both named in stow/kaizen/.config/systemd/user/.
-  # `kaizen` starts the niri session; the Quickshell shell and other user
-  # units bind to wayland-session@niri.target. `noctalia` starts the same
-  # session with those units masked and Noctalia v5 in their place.
+  # `noctalia` starts the niri session `kaizen run` does, with kaizen's units
+  # masked and Noctalia v5 in their place.
   if command -v uwsm >/dev/null 2>&1 && command -v niri >/dev/null 2>&1; then
-    # The shell and its companions are enabled into wayland-session@niri.target,
-    # so masking is the only way to keep them out of a session. `systemctl --user
-    # mask --runtime` writes to $XDG_RUNTIME_DIR/systemd/user, which ranks below
-    # the ~/.config/systemd/user units Stow installs and is therefore
-    # ignored; user.control outranks them. Both live in /run, so a reboot clears the mask.
-    # Usage: kaizen_units mask|unmask
-    function kaizen_units() {
-      local dir="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/systemd/user.control" unit
-      mkdir -p "$dir" || return
-      for unit in kaizen-shell.service kaizen-dcal.service kaizen-sleep-lock.service; do
-        if [ "$1" = mask ]; then
-          ln -sf /dev/null "$dir/$unit"
-        else
-          rm -f "$dir/$unit"
-        fi
-      done
-      systemctl --user daemon-reload
-    }
-
-    function kaizen() {
-      uwsm check may-start || return
-      # Undo a mask left behind by a noctalia session that died mid-function.
-      kaizen_units unmask
-      uwsm start -e -D niri -- niri --session
-    }
-
     if [ -e /etc/NIXOS ]; then
       # Noctalia is evaluated, not installed, so it runs from the host's own
       # nixpkgs, which only a NixOS host has. niri's config is kaizen's: its
@@ -53,12 +23,12 @@ if [ -e /etc/kaizen ]; then
         uwsm check may-start || return
         local flake
         flake="$HOME/.dotfiles#nixosConfigurations.$(hostname -s).pkgs.noctalia"
-        kaizen_units mask
+        kaizen units mask
         # uwsm-app puts the shell in app.slice; foreground, so niri owns its
         # life. Named, so `journalctl --user -u noctalia-trial` reaches it.
         uwsm start -e -D niri -- niri --session -- \
           uwsm-app -t service -u noctalia-trial.service -- nix run "$flake"
-        kaizen_units unmask
+        kaizen units unmask
       }
     fi
   fi

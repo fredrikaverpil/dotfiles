@@ -9,7 +9,7 @@ After=dbus.socket wayland-wm@niri.service wayland-session-waitenv.service
 Requires=dbus.socket
 
 [Service]
-ExecStart=%h/.local/bin/kaizen-sleep-lock-monitor
+ExecStart=%h/.local/bin/kaizen sleep-lock-monitor
 Restart=always
 RestartSec=2s
 

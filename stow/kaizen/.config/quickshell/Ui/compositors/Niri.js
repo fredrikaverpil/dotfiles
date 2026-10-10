@@ -129,7 +129,7 @@ function focusWorkspace(id, output) {
 // Focuses the most recently focused window whose app id matches pattern; does
 // nothing when none does.
 function focusApp(pattern) {
-  return ["kaizen-focus", pattern, "true"];
+  return ["kaizen", "focus", pattern, "true"];
 }
 
 function focusMonitor(output) {

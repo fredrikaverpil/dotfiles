@@ -2,6 +2,13 @@
 # shellcheck shell=bash
 set -euo pipefail
 
+case "${1:-}" in
+-h | --help)
+  echo "usage: kaizen sleep-lock-monitor    lock the shell before each suspend (kaizen-sleep-lock.service)"
+  exit 0
+  ;;
+esac
+
 lock_and_wait() {
   qs ipc call lock lock >/dev/null || return 1
 
@@ -19,7 +26,7 @@ lock_and_wait() {
 monitor_sleep() {
   while IFS= read -r line; do
     if [[ $line == *"boolean true"* ]]; then
-      # <4>: the journal's warning priority, which kaizen-log lists.
+      # <4>: the journal's warning priority, which `kaizen log` lists.
       lock_and_wait || echo "<4>kaizen: session lock was not secure before suspend" >&2
       return
     fi

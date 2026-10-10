@@ -53,7 +53,7 @@ path is absolute or starts with `~/`.
 | `entityPatterns` | `[]` | `kind` (`user`, `organization`) and a regex whose first group is the id |
 
 An unknown field, or a missing or invalid file, stops the daemon from starting,
-and `kaizen-log` lists the reason.
+and `kaizen log` lists the reason.
 
 An alert toast gets the button from a notification rule
 ([`features.md`](../../../../../../docs/kaizen/features.md) › Notifications ›

@@ -81,7 +81,7 @@ upstream's latest, and niri marks each option with the version it arrived in
   one.
 - User units are named `kaizen-<name>`, plugin daemons included
   (`kaizen-dcal`). Units that must stay out of a non-kaizen session are listed
-  in `kaizen_units` (`stow/shared/.shell/sourcing.sh`).
+  in [`kaizen units`](../../stow/kaizen/.local/libexec/kaizen/units).
 - Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Niri KDL booleans are presence-only, not `option true`.
 - Use `keyNavigation` for ordinary focus chains; use a panel-managed cursor
@@ -139,7 +139,7 @@ tree, so a static check passing here passes for every kaizen host.
   known baseline (since at least 2026-09-11), passes `shell-smoke`, and has no
   observed effect; the root cause is unverified. Do not attribute it to a
   change.
-- `kaizen-log` lists warnings and errors from every `kaizen-*` unit, this
+- `kaizen log` lists warnings and errors from every `kaizen-*` unit, this
   boot by default; `-f` follows, `--json` prints one object per line, and other
   arguments go to `journalctl` (`--since -1h`, `-b -1`). Quickshell logs
   everything at priority 6 with the level in the text, so

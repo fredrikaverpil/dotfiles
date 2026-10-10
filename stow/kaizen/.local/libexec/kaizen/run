@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+set -euo pipefail
+
+case "${1:-}" in
+-h | --help)
+  echo "usage: kaizen run    start the session from a TTY login shell"
+  exit 0
+  ;;
+esac
+
+# uwsm's login-shell test reads its parent's command line, which is this
+# script's. `kaizen` execs this script, so its parent is the shell to test.
+arg0=""
+read -r -d '' arg0 <"/proc/$PPID/cmdline" || true
+if [[ $arg0 != -* ]]; then
+  echo "kaizen: run it from a TTY login shell" >&2
+  exit 1
+fi
+uwsm check may-start -i
+
+# Undo a mask left behind by a noctalia session that died mid-function.
+kaizen units unmask
+# --session serves niri's D-Bus interfaces (screencast portal, a11y) and
+# imports its environment, which uwsm cleans up on exit. The instance name
+# follows from the executable, so the units are wayland-wm@niri.service and
+# wayland-session@niri.target -- both named in stow/kaizen/.config/systemd/user/.
+exec uwsm start -e -D niri -- niri --session
