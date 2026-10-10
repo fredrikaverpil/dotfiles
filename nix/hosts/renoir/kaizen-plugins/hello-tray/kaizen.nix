@@ -12,5 +12,5 @@ let
   };
 in
 {
-  home.packages = [ hello-tray ];
+  environment.systemPackages = [ hello-tray ];
 }

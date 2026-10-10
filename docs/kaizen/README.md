@@ -66,26 +66,24 @@ QML, which plugins run, and the notification rules.
 
 | Part | Path | Reaches |
 | --- | --- | --- |
-| Session, system half: niri under UWSM, portals, PAM, the services the shell reads | [`nix/shared/system/kaizen/session.nix`](../../nix/shared/system/kaizen/session.nix) | every kaizen host |
-| Session, user half (home-manager): the packages the shell, its binds, scripts and units use | [`nix/shared/system/kaizen/home.nix`](../../nix/shared/system/kaizen/home.nix) | every home-manager user on a kaizen host |
+| Session: niri under UWSM, portals, PAM, the services the shell reads, the packages the shell, its binds, scripts and units use | [`nix/shared/system/kaizen/kaizen.nix`](../../nix/shared/system/kaizen/kaizen.nix) | every kaizen host |
 | Compositor config, units and scripts, the shell's QML, the core's notification rules | [`stow/kaizen/`](../../stow/kaizen/) | every kaizen host |
 | Plugin QML: generic or reusable | [`stow/kaizen/.config/quickshell/plugins/<name>/`](../../stow/kaizen/.config/quickshell/plugins/) | every kaizen host |
 | Plugin QML: specific to one host | `stow/host/<host>/.config/quickshell/plugins/<name>/` | that host |
 | Which plugins run, with their config | `stow/host/<host>/.config/kaizen/plugins/<name>.jsonc`, or in a private submodule's `stow/` such as wily's `einride` | that host |
 | A plugin's unit: generic or reusable | [`stow/kaizen/.config/systemd/user/`](../../stow/kaizen/.config/systemd/user/) | every kaizen host that enables the plugin |
 | A plugin's unit: specific to one host | `stow/host/<host>/.config/systemd/user/` | that host |
-| A plugin's daemon and packages (home-manager) | `nix/shared/system/kaizen/plugins/<name>/`, `nix/hosts/<host>/kaizen-plugins/<name>/` | the hosts importing it |
+| A plugin's daemon and packages | `nix/shared/system/kaizen/plugins/<name>/kaizen.nix`, `nix/hosts/<host>/kaizen-plugins/<name>/kaizen.nix` | the hosts importing it |
 | ThinkPad hardware the shell reads (thresholds, keyd, micmute LED); not kaizen | [`nix/shared/system/thinkpad.nix`](../../nix/shared/system/thinkpad.nix) | ThinkPad hosts |
 | Hardware, sleep policy, output layout, host-only programs | `nix/hosts/<host>/`, `stow/host/<host>/` | that host |
 
 - Core is what kaizen needs to work as designed; every kaizen host runs it. A
   plugin is optional: the shell runs without it, however many hosts enable it.
-- Importing `session.nix` makes a host a kaizen host: it adds `home.nix` to
-  every home-manager user and writes `/etc/kaizen`, and `dotfiles-stow` stows
-  [`stow/kaizen/`](../../stow/kaizen/) only where that exists. So
-  [`stow/kaizen/`](../../stow/kaizen/) reaches every kaizen host or none, and a
-  plugin's QML there loads only where a `~/.config/kaizen/plugins/<name>.jsonc`
-  enables it.
+- Importing `kaizen.nix` makes a host a kaizen host: it writes `/etc/kaizen`,
+  and `dotfiles-stow` stows [`stow/kaizen/`](../../stow/kaizen/) only where
+  that exists. So [`stow/kaizen/`](../../stow/kaizen/) reaches every kaizen
+  host or none, and a plugin's QML there loads only where a
+  `~/.config/kaizen/plugins/<name>.jsonc` enables it.
 - A `.wants/` link beside a unit enables it, and `dotfiles-stow` reloads the
   user manager. A unit runs a packaged program through `/usr/bin/env`, from the
   session PATH, and a script from `%h/.local/bin/`.
@@ -100,17 +98,9 @@ QML, which plugins run, and the notification rules.
 
 ## Off NixOS
 
-The user half runs under standalone home-manager on another distro with Nix. The
-`kaizen-home` check in [`flake.nix`](../../flake.nix) evaluates it that way, and
-is the minimal configuration to copy: `home.nix` and each plugin's `home.nix` as
-modules, `extraSpecialArgs = { inherit inputs; }` (the calendar imports
-dankcalendar's module from it). Set `targets.genericLinux.enable`: it adds the
-Nix profiles to the XDG paths and, through `targets.genericLinux.gpu`, the GPU
-drivers Nix-built niri and Quickshell need; activation prints the one-time
-`sudo` command that installs them.
-
 The distro supplies what
-[`session.nix`](../../nix/shared/system/kaizen/session.nix) does on NixOS:
+[`kaizen.nix`](../../nix/shared/system/kaizen/kaizen.nix) and each enabled
+plugin's `kaizen.nix` do on NixOS:
 
 - niri, UWSM, Xwayland and xwayland-satellite.
 - `xdg-desktop-portal-gnome` and `-gtk`, gnome-keyring as Secret Service, and
@@ -128,6 +118,12 @@ The distro supplies what
 - The session variables `NIXOS_OZONE_WL=1`, `QT_QPA_PLATFORMTHEME=gtk3` and
   `GTK_USE_PORTAL=1`, and the fonts in
   [`fonts.nix`](../../nix/shared/system/fonts.nix).
+- The packages in `environment.systemPackages`, Quickshell with
+  qtimageformats for WebP, and a plugin's daemon: dcal for the calendar,
+  `investigate` with go and gopls on its PATH for the incident investigator.
+- The emoji data: run
+  [`kaizen-emoji`](../../stow/kaizen/.local/bin/kaizen-emoji) into
+  `~/.local/share/kaizen/emoji.json`.
 
 ## Services to surfaces
 
@@ -318,14 +314,13 @@ nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
    [`modules/panels/`](../../stow/kaizen/.config/quickshell/modules/panels/),
    both wired in [`shell.qml`](../../stow/kaizen/.config/quickshell/shell.qml);
    a protocol-driven surface with no other consumer of its state (lock,
-   notifications, polkit) keeps both in `modules/<name>/`. Packages →
-   [`home.nix`](../../nix/shared/system/kaizen/home.nix) (even a package
-   another scope also installs), units and scripts →
-   [`systemd/user/`](../../stow/kaizen/.config/systemd/user/) and
-   [`.local/bin/`](../../stow/kaizen/.local/bin/), system services and PAM →
-   [`session.nix`](../../nix/shared/system/kaizen/session.nix), compositor →
+   notifications, polkit) keeps both in `modules/<name>/`. Packages (even a
+   package another scope also installs), system services and PAM →
+   [`kaizen.nix`](../../nix/shared/system/kaizen/kaizen.nix), units and scripts
+   → [`systemd/user/`](../../stow/kaizen/.config/systemd/user/) and
+   [`.local/bin/`](../../stow/kaizen/.local/bin/), compositor →
    [`Ui/compositors/`](../../stow/kaizen/.config/quickshell/Ui/compositors/) and
    [`niri/config.kdl`](../../stow/kaizen/.config/niri/config.kdl), IPC target
-   for every new action. An optional shell extension is a
-   [plugin](plugins.md). An app is not kaizen's to install:
-   [`nix/README.md`](../../nix/README.md) says where it goes.
+   for every new action. An optional shell extension is a [plugin](plugins.md).
+   An app is not kaizen's to install: [`nix/README.md`](../../nix/README.md)
+   says where it goes.

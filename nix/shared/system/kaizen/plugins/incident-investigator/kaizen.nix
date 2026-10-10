@@ -18,7 +18,7 @@ in
   # On the session PATH, for kaizen-incident-investigator (stow/kaizen/) and for
   # the shell to run its client verbs. go and gopls come first on its runs'
   # PATH: the runs' gopls, offline against the module cache Neovim's go fills.
-  home.packages = [
+  environment.systemPackages = [
     (pkgs.symlinkJoin {
       inherit (investigate) name meta;
       paths = [ investigate ];

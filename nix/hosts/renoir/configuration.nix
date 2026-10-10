@@ -2,9 +2,9 @@
 {
   imports = [
     ../../shared/system/linux-desktop.nix
-    ../../shared/system/kaizen/session.nix
-    ../../shared/system/kaizen/plugins/calendar
-    ./kaizen-plugins/hello-tray
+    ../../shared/system/kaizen/kaizen.nix
+    ../../shared/system/kaizen/plugins/calendar/kaizen.nix
+    ./kaizen-plugins/hello-tray/kaizen.nix
     ../../shared/system/thinkpad.nix
   ];
 

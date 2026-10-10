@@ -7,9 +7,9 @@ cause.
 
 ## Configuration
 
-Importing `default.nix` (NixOS) or `home.nix` (home-manager) installs the
-daemon. `~/.config/kaizen/plugins/incident-investigator.jsonc` enables the
-window and configures the daemon, which reads it at start
+Importing `kaizen.nix` installs the daemon.
+`~/.config/kaizen/plugins/incident-investigator.jsonc` enables the window and
+configures the daemon, which reads it at start
 (`systemctl --user restart kaizen-incident-investigator` applies an edit). A
 path is absolute or starts with `~/`.
 
@@ -263,5 +263,4 @@ the daemon and its Nix module are here.
 | `instructions.md`    | the base instructions for every run   |
 | `claude-plugin/`     | the Claude plugin serving gopls       |
 | `investigate/`       | daemon, CLI and tray                  |
-| `home.nix`           | package                               |
-| `default.nix`        | adds `home.nix` to home-manager users |
+| `kaizen.nix`         | package                               |

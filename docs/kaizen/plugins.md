@@ -20,10 +20,8 @@ reaches, is in [`README.md`](README.md) › Where it lives.
   `~/.config/kaizen/plugins/<name>.jsonc`, in name order, and picks up a file
   added or removed. The file holds the plugin's config in JSONC, `{}` when it
   has none. Plugin QML imports `../../Ui`, as the core's does.
-- A plugin that needs a package has a Nix module, a home-manager module,
-  `home.nix`, so it runs wherever the core's `home.nix` does. `default.nix` is
-  what a host imports: it adds `home.nix` to the host's home-manager users, and
-  holds any part that needs NixOS.
+- A plugin that needs a package has a Nix module, `kaizen.nix`, which a host
+  imports beside the core's.
 - A plugin's unit is a file under Stow, enabled by a link in
   `wayland-session@niri.target.wants/`. A generic plugin's lives in
   [`stow/kaizen/`](../../stow/kaizen/.config/systemd/user/) with

@@ -12,7 +12,7 @@ if [ -e /etc/kaizen ]; then
   # --session serves niri's D-Bus interfaces (screencast portal, a11y) and
   # imports its environment, which uwsm cleans up on exit. The instance name
   # follows from the executable, so the units are wayland-wm@niri.service and
-  # wayland-session@niri.target -- both named in nix/shared/system/kaizen/home.nix.
+  # wayland-session@niri.target -- both named in stow/kaizen/.config/systemd/user/.
   # `kaizen` starts the niri session; the Quickshell shell and other user
   # units bind to wayland-session@niri.target. `noctalia` starts the same
   # session with those units masked and Noctalia v5 in their place.

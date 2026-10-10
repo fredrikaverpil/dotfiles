@@ -50,7 +50,7 @@ upstream's latest, and niri marks each option with the version it arrived in
 
 - Nix comments carry the "why" for packages, portals, PAM and hardware
   integration, and the units' comments for the units. Read
-  `nix/shared/system/kaizen/session.nix` and `home.nix`,
+  `nix/shared/system/kaizen/kaizen.nix`,
   `stow/kaizen/.config/systemd/user/`,
   `nix/shared/system/linux-desktop.nix` and `nix/shared/system/thinkpad.nix`,
   plus the host's `configuration.nix`, before asking.

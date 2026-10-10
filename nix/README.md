@@ -8,10 +8,7 @@ place that covers every host that wants it.
 Go down the list; the first match wins.
 
 1. **kaizen core**:
-   [`shared/system/kaizen/session.nix`](shared/system/kaizen/session.nix) for
-   system services and PAM,
-   [`shared/system/kaizen/home.nix`](shared/system/kaizen/home.nix) for
-   packages. What
+   [`shared/system/kaizen/kaizen.nix`](shared/system/kaizen/kaizen.nix). What
    the shell, the session or a bind in [`stow/kaizen/`](../stow/kaizen/) needs
    to do its job, including the purpose-built apps kaizen hands tasks to
    (bluetui, nm-connection-editor).
@@ -46,7 +43,7 @@ wants it, move it to that scope's shared file rather than repeating it.
 A desktop host imports
 [`shared/system/linux-desktop.nix`](shared/system/linux-desktop.nix) for its
 apps and opts into kaizen with
-[`shared/system/kaizen/session.nix`](shared/system/kaizen/session.nix) and any
+[`shared/system/kaizen/kaizen.nix`](shared/system/kaizen/kaizen.nix) and any
 plugins. Servers import neither. The two stay independent: `linux-desktop.nix`
 sets no kaizen option, and kaizen declares everything it runs, even a tool
 another scope also installs (`jq`, `imagemagick`). kaizen's own settings, such

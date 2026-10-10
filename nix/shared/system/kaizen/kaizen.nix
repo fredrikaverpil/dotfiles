@@ -1,14 +1,41 @@
 { pkgs, ... }:
-# The kaizen session every kaizen host shares, system half: niri under UWSM,
-# portals, PAM, and the services the shell reads. home.nix holds the user half
-# (the packages and data the shell runs), added here to every home-manager user.
-# Units, scripts, compositor config and QML live in stow/kaizen/.
+let
+  # The shell's emoji data, found as share/kaizen/emoji.json in the XDG data dirs.
+  emoji =
+    pkgs.runCommand "kaizen-emoji"
+      {
+        nativeBuildInputs = [ pkgs.jq ];
+        names = "${pkgs.unicode-emoji}/share/unicode/emoji/emoji-test.txt";
+        shortcodes = pkgs.fetchurl {
+          url = "https://raw.githubusercontent.com/iamcal/emoji-data/v16.0.0/emoji.json";
+          hash = "sha256-HWAuZb6Idyv4zDaM4WuFXXGe7duv4SjUcbgCA/SU0p8=";
+        };
+      }
+      ''
+        mkdir -p $out/share/kaizen
+        bash ${../../../../stow/kaizen/.local/bin/kaizen-emoji} "$names" "$shortcodes" > $out/share/kaizen/emoji.json
+      '';
+
+  # qtimageformats supplies Quickshell's WebP decoder.
+  quickshell = pkgs.symlinkJoin {
+    inherit (pkgs.quickshell) name meta;
+    paths = [ pkgs.quickshell ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      for bin in $out/bin/*; do
+        wrapProgram "$bin" --prefix QT_PLUGIN_PATH : ${pkgs.qt6.qtimageformats}/lib/qt-6/plugins
+      done
+    '';
+  };
+in
+# The kaizen session every kaizen host shares: niri under UWSM, portals, PAM,
+# the services the shell reads, and the packages and data its shell, binds,
+# scripts and units run. Units, scripts, compositor config, QML and
+# notification rules live in stow/kaizen/.
 {
   imports = [ ../fonts.nix ];
 
   config = {
-    home-manager.sharedModules = [ ./home.nix ];
-
     # niri is the only session: `niri --session` under UWSM, started with `kaizen` from the console.
     programs.uwsm.enable = true;
 
@@ -86,13 +113,41 @@
     # Marks a kaizen host; dotfiles-stow stows stow/kaizen/ where it exists.
     environment.etc.kaizen.text = "";
 
-    # The profiles home.nix's packages land in (useUserPackages) link only these
-    # dirs; the shell finds its emoji data in share/kaizen.
+    # The system profile links only these dirs; the shell finds its emoji data
+    # in share/kaizen.
     environment.pathsToLink = [ "/share/kaizen" ];
 
     environment.systemPackages = with pkgs; [
       # niri spawns it on demand and exports DISPLAY for X11 apps.
       xwayland-satellite
+      # The wrapper above (let outranks with); the shell's unit finds it on PATH.
+      quickshell
+      # niri's terminal binds and xdg-terminal-exec open it.
+      ghostty
+      # Nightlight: drives zwlr_gamma_control_v1, so it is compositor-agnostic.
+      wl-gammarelay-rs
+      libnotify
+      sound-theme-freedesktop
+      kdePackages.kconfig
+      gnome-themes-extra
+      # Cursor theme for niri, GTK and Qt; without one niri draws a fixed 64px fallback.
+      bibata-cursors
+      iproute2
+      iputils
+      bluetui
+      emoji
+      grim
+      imagemagick # Wallpaper thumbnails.
+      jq # The clipboard watcher's JSON encoding, kaizen-focus and kaizen-log.
+      mpv
+      # nm-connection-editor edits wired, static-IP and other connection settings;
+      # the network panel launches it. nm-applet runs via XDG autostart for its tray menu.
+      networkmanagerapplet
+      # Annotates screenshots from the notification's Edit action.
+      satty
+      wl-clipboard
+      # niri cannot mirror outputs; the mirror service runs it fullscreen on the target.
+      wl-mirror
     ];
   };
 }

@@ -32,7 +32,7 @@ for dir in "${dir_links[@]}"; do
   ln -sfn "$PWD/stow/shared/$dir" "$HOME/$dir"
 done
 stow_pkg stow/platform "$(uname -s)"
-# kaizen's session.nix creates the marker.
+# kaizen's kaizen.nix creates the marker.
 [ -e /etc/kaizen ] && stow_pkg stow kaizen
 host="$(uname -n | cut -d. -f1)"
 [ -d "stow/host/$host" ] && stow_pkg stow/host "$host"
