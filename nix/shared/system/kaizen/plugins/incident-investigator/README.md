@@ -50,7 +50,7 @@ kaizen.incidentInvestigator = {
 | `entityPatterns` | `[]` | `kind` (`user`, `organization`) and a regex whose first group is the id |
 
 An alert toast gets the button from a notification rule
-([`features.md`](../../../../../docs/kaizen/features.md) › Notifications ›
+([`features.md`](../../../../../../docs/kaizen/features.md) › Notifications ›
 Rules) whose action runs `investigate draft`. `INVESTIGATE_TAG`, one of `tags`,
 tags the draft; the daemon refuses any other.
 
