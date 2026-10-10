@@ -5,10 +5,10 @@
 # functions and shell-agnostic
 # ----------------------------
 
-# Session launcher for a console login. /etc/NIXOS is the NixOS marker file,
-# so it rules out macOS and every other Linux in one test; the inner check
-# then skips hosts that do not install niri.
-if [ -e /etc/NIXOS ]; then
+# Session launcher for a console login. /etc/kaizen marks a kaizen host, on
+# NixOS or another distro, so it rules out macOS and every other Linux in one
+# test; the inner check then skips hosts that do not install niri.
+if [ -e /etc/kaizen ]; then
   # --session serves niri's D-Bus interfaces (screencast portal, a11y) and
   # imports its environment, which uwsm cleans up on exit. The instance name
   # follows from the executable, so the units are wayland-wm@niri.service and
@@ -43,21 +43,24 @@ if [ -e /etc/NIXOS ]; then
       uwsm start -e -D niri -- niri --session
     }
 
-    # Noctalia is evaluated, not installed, so it runs from the host's own
-    # nixpkgs. niri's config is kaizen's: its `qs ipc` binds do nothing here
-    # and noctalia's own binds are absent. State lives in ~/.config/noctalia
-    # and ~/.local/state/noctalia, outside the dotfiles.
-    function noctalia() {
-      uwsm check may-start || return
-      local flake
-      flake="$HOME/.dotfiles#nixosConfigurations.$(hostname -s).pkgs.noctalia"
-      kaizen_units mask
-      # uwsm-app puts the shell in app.slice; foreground, so niri owns its
-      # life. Named, so `journalctl --user -u noctalia-trial` reaches it.
-      uwsm start -e -D niri -- niri --session -- \
-        uwsm-app -t service -u noctalia-trial.service -- nix run "$flake"
-      kaizen_units unmask
-    }
+    if [ -e /etc/NIXOS ]; then
+      # Noctalia is evaluated, not installed, so it runs from the host's own
+      # nixpkgs, which only a NixOS host has. niri's config is kaizen's: its
+      # `qs ipc` binds do nothing here and noctalia's own binds are absent.
+      # State lives in ~/.config/noctalia and ~/.local/state/noctalia, outside
+      # the dotfiles.
+      function noctalia() {
+        uwsm check may-start || return
+        local flake
+        flake="$HOME/.dotfiles#nixosConfigurations.$(hostname -s).pkgs.noctalia"
+        kaizen_units mask
+        # uwsm-app puts the shell in app.slice; foreground, so niri owns its
+        # life. Named, so `journalctl --user -u noctalia-trial` reaches it.
+        uwsm start -e -D niri -- niri --session -- \
+          uwsm-app -t service -u noctalia-trial.service -- nix run "$flake"
+        kaizen_units unmask
+      }
+    fi
   fi
 
 fi
