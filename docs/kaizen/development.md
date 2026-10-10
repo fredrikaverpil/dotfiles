@@ -259,7 +259,8 @@ kaizen dev off    # back to main's
 - `kaizen dev PATH` restarts `kaizen-shell.service` on the worktree's shell
   tree through a drop-in under `$XDG_RUNTIME_DIR`, then hot-reloads its edits.
   It fails unless the unit runs that tree, and `kaizen ipc`, the binds and
-  `shell-smoke` reach it. A reboot returns to main's.
+  `shell-smoke` reach it. `kaizen doctor` warns while it does, and checks the
+  worktree's `requires` and plugins. A reboot returns to main's.
 - An agent runs it without asking. It refuses while locked: the rule below
   applies.
 - Only the shell's QML, generic plugins included, comes from the worktree.
