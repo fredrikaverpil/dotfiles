@@ -48,10 +48,10 @@ command in a terminal. Each update's row copies that command (`fwupdmgr update
 <id>`) with Enter, Space or a click, as does Settings › Firmware › Copy update
 command.
 
-The host decides which backends run: kaizen reads [fwupd] when the host enables
-it, and never starts a backend's daemon. The shell checks at start, once a day
-and when the panel opens, reading only local metadata; fwupd's own timer
-downloads it.
+The host decides which backends run: kaizen reads [fwupd] when the system bus
+can activate it, and never enables a backend's daemon. The shell checks at
+start, once a day and when the panel opens, reading only local metadata; fwupd's
+own timer downloads it.
 
 `O` on a row, or Settings › Firmware › Open release page, opens the vendor's
 details page, or the update's [LVFS] device page when the vendor sets none.

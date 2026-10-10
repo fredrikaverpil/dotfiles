@@ -1,9 +1,4 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ pkgs, ... }:
 # The kaizen session every kaizen host shares, system half: niri under UWSM,
 # portals, PAM, and the services the shell reads. home.nix holds the user half
 # (the shell's units, its data and the packages it runs), added here to every
@@ -12,10 +7,7 @@
   imports = [ ../fonts.nix ];
 
   config = {
-    home-manager.sharedModules = [
-      ./home.nix
-      { kaizen.firmwareBackends = lib.mkDefault (lib.optional config.services.fwupd.enable "fwupd"); }
-    ];
+    home-manager.sharedModules = [ ./home.nix ];
 
     # niri is the only session: `niri --session` under UWSM, started with `kaizen` from the console.
     programs.uwsm.enable = true;

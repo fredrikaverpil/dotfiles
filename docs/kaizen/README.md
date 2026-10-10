@@ -85,7 +85,7 @@ plugins run, and the notification rules.
   plugin's QML there loads only where a `~/.config/kaizen/plugins/<name>.jsonc`
   enables it.
 - Nix hands the shell values only through `kaizen-shell.service`'s environment
-  (`KAIZEN_EMOJI`, `KAIZEN_FIRMWARE_BACKENDS`).
+  (`KAIZEN_EMOJI`).
 - Apps are not kaizen's: [`nix/README.md`](../../nix/README.md) says where they
   go.
 - QML paths here (`modules/…`, `Ui/…`) are under
@@ -111,8 +111,7 @@ The distro supplies what
   `xdg-terminal-exec` with ghostty as its default.
 - PipeWire with its ALSA and PulseAudio layers, rtkit, UPower,
   power-profiles-daemon, BlueZ, NetworkManager, and polkit with `pkexec`.
-- fwupd, when the firmware panel should read it: also set
-  `kaizen.firmwareBackends = [ "fwupd" ]`.
+- fwupd, when the firmware panel should read it.
 - gpu-screen-recorder, with `cap_sys_admin+ep` on `gsr-kms-server` so monitor
   capture skips the portal dialog.
 - `/etc/pam.d/kaizen-lock` holding `auth include login`, for the lock and the

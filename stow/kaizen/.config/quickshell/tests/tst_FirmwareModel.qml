@@ -130,25 +130,27 @@ TestCase {
     function test_backends_data() {
         return [
             {
-                tag: "enabled",
-                value: "fwupd",
+                tag: "activatable",
+                output: '{"type":"as","data":[["org.freedesktop.DBus","org.freedesktop.fwupd"]]}',
                 want: ["fwupd"]
             },
             {
-                tag: "unknown dropped",
-                value: "system76:fwupd",
-                want: ["fwupd"]
+                tag: "not activatable",
+                output: '{"type":"as","data":[["org.freedesktop.DBus"]]}',
+                want: []
             },
             {
-                tag: "unset",
-                value: undefined,
+                tag: "busctl failed",
+                output: "",
                 want: []
             },
         ];
     }
 
     function test_backends(data) {
-        compare(Firmware.backends(data.value, ["fwupd"]), data.want);
+        compare(Firmware.backends(data.output, {
+            fwupd: Fwupd
+        }), data.want);
     }
 
     function test_merge() {

@@ -3,13 +3,18 @@
 
 var URGENCY_RANK = { critical: 3, high: 2, medium: 1 };
 
-// KAIZEN_FIRMWARE_BACKENDS, ":"-separated; names without a backend are dropped.
-function backends(value, known) {
-  return String(value || "")
-    .split(":")
-    .filter(function (backend) {
-      return known.indexOf(backend) >= 0;
-    });
+// The backends whose daemon the system bus can activate, from busctl's
+// ListActivatableNames in --json=short; known maps a backend to its module.
+function backends(output, known) {
+  var names;
+  try {
+    names = JSON.parse(output).data[0];
+  } catch (e) {
+    return [];
+  }
+  return Object.keys(known).filter(function (backend) {
+    return names.indexOf(known[backend].busName) >= 0;
+  });
 }
 
 function merge(backends, results) {

@@ -1,9 +1,4 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ pkgs, ... }:
 let
   # `[{ emoji, name, shortcodes }]`: Unicode's names for the menu's picker, and
   # the shortcodes Slack sends as `:name:` in notification text, from the
@@ -89,14 +84,6 @@ in
 # home-manager user. Compositor config, QML and notification rules live in
 # stow/kaizen/.
 {
-  options.kaizen = {
-    firmwareBackends = lib.mkOption {
-      type = lib.types.listOf (lib.types.enum [ "fwupd" ]);
-      default = [ ];
-      description = "Firmware backends the system runs, which the shell reads; kaizen never enables their daemons";
-    };
-  };
-
   config = {
     # A switch never restarts the shell or the lock monitor, so a rebuild cannot
     # restart Quickshell under a session lock; restart them by hand, unlocked.
@@ -118,7 +105,6 @@ in
           # qtimageformats supplies Quickshell's WebP decoder.
           "QT_PLUGIN_PATH=${pkgs.qt6.qtimageformats}/lib/qt-6/plugins"
           "KAIZEN_EMOJI=${emoji}"
-          "KAIZEN_FIRMWARE_BACKENDS=${lib.concatStringsSep ":" config.kaizen.firmwareBackends}"
         ];
         ExecStart = "${pkgs.quickshell}/bin/quickshell";
         Restart = "on-failure";
