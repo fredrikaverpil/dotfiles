@@ -72,48 +72,13 @@ func run(args []string) error {
 	verb, args := args[0], args[1:]
 	switch verb {
 	case "serve":
-		configDir, err := os.UserConfigDir()
-		if err != nil {
-			return err
-		}
-		flags := flag.NewFlagSet("serve", flag.ContinueOnError)
-		configFile := flags.String(
-			"config",
-			filepath.Join(configDir, "kaizen", "plugins", "incident-investigator.jsonc"),
-			"JSONC file with the profile, source dirs, instruction files, tags and entity patterns",
-		)
-		dir := flags.String(
-			"dir",
-			filepath.Join(configDir, "quickshell", "plugins", "incident-investigator"),
-			"the plugin's directory, with instructions.md and claude-plugin/",
-		)
-		toolPath := flags.String("tool-path", "", "directories with go and gopls, first on the runs' PATH")
-		goModCache := flags.String("go-mod-cache", "", "Go module cache the runs may read")
-		if err := flags.Parse(args); err != nil {
-			return err
-		}
-		// Set by the unit: systemd creates the state directory.
-		state := os.Getenv("STATE_DIRECTORY")
-		if state == "" {
-			return errors.New("serve: STATE_DIRECTORY must be set")
-		}
-		cfg, err := readConfig(*configFile)
-		if err != nil {
-			return err
-		}
-		cfg.pluginDir = filepath.Join(*dir, "claude-plugin")
-		cfg.instructionFiles = append([]string{filepath.Join(*dir, "instructions.md")}, cfg.instructionFiles...)
-		cfg.toolPath, cfg.goModCache = *toolPath, *goModCache
-		if cfg.goModCache == "" && len(cfg.sourceDirs) > 0 {
-			// Without it, only definitions in other modules fail.
-			if out, err := exec.Command("go", "env", "GOMODCACHE").Output(); err == nil {
-				cfg.goModCache = strings.TrimSpace(string(out))
-			}
-		}
-		ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-		defer stop()
+		// The unit's journal is read by kaizen-log, which lists slog's warnings and errors.
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
-		return serve(ctx, logger, socket, state, cfg)
+		if err := runServe(logger, socket, args); err != nil {
+			logger.Error("serve", "error", err)
+			return err
+		}
+		return nil
 	case "draft":
 		flags := flag.NewFlagSet("draft", flag.ContinueOnError)
 		tag := flags.String("tag", "", "tag; overrides INVESTIGATE_TAG")
@@ -234,6 +199,51 @@ func run(args []string) error {
 		return nil
 	}
 	return errUsage
+}
+
+// runServe reads serve's flags and config, then runs the daemon until it is stopped.
+func runServe(logger *slog.Logger, socket string, args []string) error {
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return err
+	}
+	flags := flag.NewFlagSet("serve", flag.ContinueOnError)
+	configFile := flags.String(
+		"config",
+		filepath.Join(configDir, "kaizen", "plugins", "incident-investigator.jsonc"),
+		"JSONC file with the profile, source dirs, instruction files, tags and entity patterns",
+	)
+	dir := flags.String(
+		"dir",
+		filepath.Join(configDir, "quickshell", "plugins", "incident-investigator"),
+		"the plugin's directory, with instructions.md and claude-plugin/",
+	)
+	toolPath := flags.String("tool-path", "", "directories with go and gopls, first on the runs' PATH")
+	goModCache := flags.String("go-mod-cache", "", "Go module cache the runs may read")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	// Set by the unit: systemd creates the state directory.
+	state := os.Getenv("STATE_DIRECTORY")
+	if state == "" {
+		return errors.New("serve: STATE_DIRECTORY must be set")
+	}
+	cfg, err := readConfig(*configFile)
+	if err != nil {
+		return err
+	}
+	cfg.pluginDir = filepath.Join(*dir, "claude-plugin")
+	cfg.instructionFiles = append([]string{filepath.Join(*dir, "instructions.md")}, cfg.instructionFiles...)
+	cfg.toolPath, cfg.goModCache = *toolPath, *goModCache
+	if cfg.goModCache == "" && len(cfg.sourceDirs) > 0 {
+		// Without it, only definitions in other modules fail.
+		if out, err := exec.Command("go", "env", "GOMODCACHE").Output(); err == nil {
+			cfg.goModCache = strings.TrimSpace(string(out))
+		}
+	}
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	return serve(ctx, logger, socket, state, cfg)
 }
 
 // readConfig reads the -config file: the profile, the source dirs, the instruction files after the plugin's own,
