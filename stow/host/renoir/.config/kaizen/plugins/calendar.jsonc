@@ -1,1 +1,9 @@
-{}
+{
+  // A JavaScript regex on a calendar's name, mapped to the emoji shown before
+  // its events; the first match in file order wins.
+  "emoji": {
+    "^Family$": "🏠",
+    "^Johannas kalender$": "❤️",
+    "^My calendar$": "👤"
+  }
+}

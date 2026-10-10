@@ -19,51 +19,94 @@ TestCase {
         verify(/^to=2026-09-17T00:00:00[+-]\d\d:\d\d$/.test(command[5]));
     }
 
-    function test_calendars_map_to_google_or_named_tags() {
-        const text = JSON.stringify([
-            {
-                id: "g-family",
-                name: "Family",
-                accountKind: "google"
-            },
-            {
-                id: "g-week",
-                name: "Veckonummer",
-                accountKind: "google"
-            },
-            {
-                id: "family",
-                name: "Family",
-                accountKind: "ical"
-            },
-            {
-                id: "johanna",
-                name: "Johannas kalender",
-                accountKind: "ical"
-            },
-            {
-                id: "mine",
-                name: "My calendar",
-                accountKind: "ical"
-            },
-            {
-                id: "other",
-                name: "Holidays",
-                accountKind: "ical"
-            },
-        ]);
+    readonly property string calendars: JSON.stringify([
+        {
+            id: "g-family",
+            name: "Family",
+            accountKind: "google"
+        },
+        {
+            id: "johanna",
+            name: "Johannas kalender",
+            accountKind: "ical"
+        },
+        {
+            id: "mine",
+            name: "My calendar",
+            accountKind: "ical"
+        },
+        {
+            id: "other",
+            name: "Holidays",
+            accountKind: "ical"
+        },
+    ])
 
-        const tags = Calendar.tags(text);
+    function test_calendars_map_to_emoji_data() {
+        return [
+            {
+                tag: "regex on name",
+                emojiByRegex: {
+                    "^Family$": "🏠",
+                    "kalender$": "❤️",
+                    "^My calendar$": "👤"
+                },
+                want: {
+                    "g-family": "🏠",
+                    johanna: "❤️",
+                    mine: "👤",
+                    other: ""
+                }
+            },
+            {
+                tag: "first match in order",
+                emojiByRegex: {
+                    "^Family$": "🏠",
+                    "a": "A"
+                },
+                want: {
+                    "g-family": "🏠",
+                    johanna: "A",
+                    mine: "A",
+                    other: "A"
+                }
+            },
+            {
+                tag: "invalid regex skipped",
+                emojiByRegex: {
+                    "(": "X",
+                    "^Holidays$": "🎉"
+                },
+                want: {
+                    "g-family": "",
+                    johanna: "",
+                    mine: "",
+                    other: "🎉"
+                }
+            },
+            {
+                tag: "no config",
+                emojiByRegex: undefined,
+                want: {
+                    "g-family": "",
+                    johanna: "",
+                    mine: "",
+                    other: ""
+                }
+            },
+        ];
+    }
 
-        compare(tags, {
-            "g-family": "G",
-            "g-week": "G",
-            family: "🏠",
-            johanna: "❤️",
-            mine: "👤",
-            other: ""
-        });
-        compare(Calendar.tags("Error: dcal daemon not running"), {});
+    function test_calendars_map_to_emoji(data) {
+        const got = Calendar.emojis(calendars, data.emojiByRegex);
+
+        compare(got, data.want);
+    }
+
+    function test_unreadable_calendars_map_to_no_emoji() {
+        compare(Calendar.emojis("Error: dcal daemon not running", {
+            ".": "X"
+        }), {});
     }
 
     function test_events_split_into_days_with_all_day_first() {
@@ -109,18 +152,18 @@ TestCase {
                 },
             ]
         });
-        const tags = {
+        const emojis = {
             johanna: "❤️",
             "g-week": "G"
         };
 
-        const days = Calendar.parse(text, now, tags);
+        const days = Calendar.parse(text, now, emojis);
 
         compare(days.map(day => day.date.getTime()), [new Date(2026, 8, 14).getTime(), new Date(2026, 8, 15).getTime(), new Date(2026, 8, 16).getTime(),]);
         const week = {
             uid: "week",
             start: "2026-09-14T00:00:00Z",
-            tag: "G",
+            emoji: "G",
             summary: "Week 38",
             location: "",
             meetingUrl: "",
@@ -132,7 +175,7 @@ TestCase {
         const night = time => ({
                     uid: "night",
                     start: local(15, 23),
-                    tag: "",
+                    emoji: "",
                     summary: "(no title)",
                     location: "",
                     meetingUrl: "",
@@ -145,7 +188,7 @@ TestCase {
                 {
                     uid: "late",
                     start: local(14, 17),
-                    tag: "❤️",
+                    emoji: "❤️",
                     summary: "Late",
                     location: "Room",
                     meetingUrl: "https://meet.example/abc",
@@ -185,10 +228,10 @@ TestCase {
             mine: "👤"
         });
 
-        const unreadable = (uid, summary, start, tag) => ({
+        const unreadable = (uid, summary, start, emoji) => ({
                     uid: uid,
                     start: start,
-                    tag: tag,
+                    emoji: emoji,
                     summary: summary,
                     location: "",
                     meetingUrl: "",
@@ -201,7 +244,7 @@ TestCase {
                 {
                     uid: "timed",
                     start: local(14, 9),
-                    tag: "",
+                    emoji: "",
                     summary: "Timed",
                     location: "",
                     meetingUrl: "",

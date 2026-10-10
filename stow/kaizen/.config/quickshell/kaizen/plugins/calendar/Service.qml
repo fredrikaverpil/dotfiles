@@ -7,10 +7,12 @@ import "CalendarModel.js" as Model
 Item {
     id: root
 
+    // The plugin's config.
+    property var config: ({})
     property var days: []
     property bool failed: false
     property var requestedAt: new Date()
-    property var tags: ({})
+    property var emojis: ({})
 
     readonly property bool busy: calendars.running || list.running
 
@@ -21,13 +23,13 @@ Item {
         calendars.running = true;
     }
 
-    // Events carry only a calendar id; the tag comes from its calendar.
+    // Events carry only a calendar id; the emoji comes from its calendar.
     Process {
         id: calendars
         command: ["dcal", "--json", "ipc", "calendars.list"]
         stdout: StdioCollector {
             onStreamFinished: {
-                root.tags = Model.tags(text);
+                root.emojis = Model.emojis(text, root.config.emoji);
                 list.command = Model.listCommand(root.requestedAt);
                 list.running = true;
             }
@@ -38,7 +40,7 @@ Item {
         id: list
         stdout: StdioCollector {
             onStreamFinished: {
-                const days = Model.parse(text, root.requestedAt, root.tags);
+                const days = Model.parse(text, root.requestedAt, root.emojis);
                 root.failed = days === null;
                 root.days = days || [];
             }
