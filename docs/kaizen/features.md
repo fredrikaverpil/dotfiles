@@ -67,7 +67,8 @@ urgency. There are no notifications.
 
 `kaizen-log` lists the warnings and errors that the `kaizen-*` units, plugin
 daemons included, logged this boot. A healthy desktop logs none, so every
-entry is something to fix.
+entry is something to fix. It holds what nothing on screen shows: an error an
+application shows in its window or a toast stays out of it.
 
 The bar shows an indicator while it lists anything: rose when an error is among
 the entries, wood for warnings only. It opens the log panel, newest entry
