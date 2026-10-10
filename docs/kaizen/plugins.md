@@ -53,8 +53,10 @@ reaches, is in [`README.md`](README.md) › Where it lives.
   and menu
   ([`nix/hosts/renoir/kaizen-plugins/hello-tray/`](../../nix/hosts/renoir/kaizen-plugins/hello-tray/)),
   so the tray and its launcher level show it without shell code. Its unit starts
-  it with the session or from Apps. A third-party app with a tray icon is not a
-  plugin; the tray shows it anyway.
+  it from Apps, or with the XDG autostart apps through a link in
+  `wayland-session-xdg-autostart@niri.target.wants/`, ordered after
+  `kaizen-tray-ready.service` so the tray is up when it registers. A
+  third-party app with a tray icon is not a plugin; the tray shows it anyway.
 
 ## Developing one
 
