@@ -1,0 +1,20 @@
+# Owns the runs, so a shell reload or crash does not stop an investigation. The
+# session PATH it inherits has claude, gcloud, qs and notify-send.
+[Unit]
+Description=Incident investigator runs
+ConditionPathExists=%h/.config/kaizen/plugins/incident-investigator.jsonc
+PartOf=graphical-session.target
+# Its tray item registers with the shell's StatusNotifierWatcher; started
+# before the watcher is up, it logs a failed registration.
+After=kaizen-shell.service kaizen-tray-ready.service
+
+[Service]
+ExecStart=/usr/bin/env investigate serve
+# $STATE_DIRECTORY; transcripts hold the logs and code runs read.
+StateDirectory=kaizen-shell/plugins/incident-investigator
+StateDirectoryMode=0700
+Restart=on-failure
+Slice=app.slice
+
+[Install]
+WantedBy=wayland-session-xdg-autostart@niri.target

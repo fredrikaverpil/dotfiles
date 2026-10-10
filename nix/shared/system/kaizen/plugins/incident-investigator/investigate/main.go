@@ -3,6 +3,7 @@
 package main
 
 import (
+	"bytes"
 	"cmp"
 	"context"
 	"encoding/json"
@@ -21,19 +22,22 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/tailscale/hujson"
+
 	"investigate/internal/claude"
 )
 
 const usage = `usage: investigate <verb> [args]
 
-  serve -plugin-dir DIR -config FILE [-instructions FILE]... [-source-dir DIR]... [-tool-path PATH]
-        [-go-mod-cache DIR]
-                                 run the daemon with the Claude Code profile CLAUDE_CONFIG_DIR, in STATE_DIRECTORY;
-                                 the plugin dir serves gopls, the config holds the tags and entity patterns,
-                                 the instructions are appended to the system prompt,
-                                 the source dirs hold the repositories runs may read,
-                                 the tool path (go, gopls) and module cache serve their LSP
-  draft [-tag T]                 create a draft from NOTIFICATION_* and INVESTIGATE_TAG, show it in the window
+  serve [-config FILE] [-dir DIR] [-tool-path PATH] [-go-mod-cache DIR]
+                                 run the daemon in STATE_DIRECTORY; the config (JSONC, default
+                                 ~/.config/kaizen/plugins/incident-investigator.jsonc) holds the Claude Code profile,
+                                 source dirs, instruction files, tags and entity patterns, the plugin's dir (default
+                                 ~/.config/quickshell/plugins/incident-investigator) its instructions.md and the
+                                 claude-plugin/ serving gopls, and the tool path (go, gopls) and module cache
+                                 (default: go env GOMODCACHE) serve the LSP
+  draft [-tag T]                 create a draft from NOTIFICATION_* and INVESTIGATE_TAG, show it in the window;
+                                 a failure shows a notification
   edit ID [-projects P,Q] [-tag T] [-trace-id T] [-notes N]
                                  set a draft's fields; omitted ones are cleared
   tag ID [T]                     set the tag of an investigation in any status; none clears it
@@ -68,37 +72,13 @@ func run(args []string) error {
 	verb, args := args[0], args[1:]
 	switch verb {
 	case "serve":
-		var cfg config
-		appendTo := func(list *[]string) func(string) error {
-			return func(v string) error { *list = append(*list, v); return nil }
-		}
-		flags := flag.NewFlagSet("serve", flag.ContinueOnError)
-		flags.StringVar(&cfg.pluginDir, "plugin-dir", "", "Claude plugin serving gopls")
-		configFile := flags.String("config", "", "JSON file with the tags and entity patterns")
-		flags.Func("instructions", "file appended to the system prompt; repeatable", appendTo(&cfg.instructionFiles))
-		flags.Func("source-dir", "directory of repositories the runs may read; repeatable", appendTo(&cfg.sourceDirs))
-		flags.StringVar(&cfg.toolPath, "tool-path", "", "directories with go and gopls, first on the runs' PATH")
-		flags.StringVar(&cfg.goModCache, "go-mod-cache", "", "Go module cache the runs may read")
-		if err := flags.Parse(args); err != nil {
-			return err
-		}
-		if cfg.pluginDir == "" || *configFile == "" {
-			return errUsage
-		}
-		// Set by the unit: the profile is chosen per host, and systemd creates the state directory.
-		cfg.claudeConfigDir = os.Getenv("CLAUDE_CONFIG_DIR")
-		state := os.Getenv("STATE_DIRECTORY")
-		if cfg.claudeConfigDir == "" || state == "" {
-			return errors.New("serve: CLAUDE_CONFIG_DIR and STATE_DIRECTORY must be set")
-		}
-		var err error
-		if cfg.tags, cfg.entityPatterns, err = readConfig(*configFile); err != nil {
-			return err
-		}
-		ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-		defer stop()
+		// The unit's journal is read by kaizen-log, which lists slog's warnings and errors.
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
-		return serve(ctx, logger, socket, state, cfg)
+		if err := runServe(logger, socket, args); err != nil {
+			logger.Error("serve", "error", err)
+			return err
+		}
+		return nil
 	case "draft":
 		flags := flag.NewFlagSet("draft", flag.ContinueOnError)
 		tag := flags.String("tag", "", "tag; overrides INVESTIGATE_TAG")
@@ -111,6 +91,11 @@ func run(args []string) error {
 		}
 		id, err := call(socket, req)
 		if err != nil {
+			// A notification's button runs draft detached, so nothing else shows the error.
+			_ = exec.Command(
+				"notify-send", "--app-name", "Incident investigator", "--urgency", "critical",
+				"Investigation not drafted", err.Error(),
+			).Run()
 			return err
 		}
 		fmt.Println(id)
@@ -216,32 +201,129 @@ func run(args []string) error {
 	return errUsage
 }
 
-// readConfig reads the -config file: the tags, and the entity patterns besides the built-in ones.
-func readConfig(path string) ([]Tag, []claude.EntityPattern, error) {
+// runServe reads serve's flags and config, then runs the daemon until it is stopped.
+func runServe(logger *slog.Logger, socket string, args []string) error {
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return err
+	}
+	flags := flag.NewFlagSet("serve", flag.ContinueOnError)
+	configFile := flags.String(
+		"config",
+		filepath.Join(configDir, "kaizen", "plugins", "incident-investigator.jsonc"),
+		"JSONC file with the profile, source dirs, instruction files, tags and entity patterns",
+	)
+	dir := flags.String(
+		"dir",
+		filepath.Join(configDir, "quickshell", "plugins", "incident-investigator"),
+		"the plugin's directory, with instructions.md and claude-plugin/",
+	)
+	toolPath := flags.String("tool-path", "", "directories with go and gopls, first on the runs' PATH")
+	goModCache := flags.String("go-mod-cache", "", "Go module cache the runs may read")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	// Set by the unit: systemd creates the state directory.
+	state := os.Getenv("STATE_DIRECTORY")
+	if state == "" {
+		return errors.New("serve: STATE_DIRECTORY must be set")
+	}
+	cfg, err := readConfig(*configFile)
+	if err != nil {
+		return err
+	}
+	cfg.pluginDir = filepath.Join(*dir, "claude-plugin")
+	cfg.instructionFiles = append([]string{filepath.Join(*dir, "instructions.md")}, cfg.instructionFiles...)
+	cfg.toolPath, cfg.goModCache = *toolPath, *goModCache
+	if cfg.goModCache == "" && len(cfg.sourceDirs) > 0 {
+		// Without it, only definitions in other modules fail.
+		if out, err := exec.Command("go", "env", "GOMODCACHE").Output(); err == nil {
+			cfg.goModCache = strings.TrimSpace(string(out))
+		}
+	}
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	return serve(ctx, logger, socket, state, cfg)
+}
+
+// readConfig reads the -config file: the profile, the source dirs, the instruction files after the plugin's own,
+// the tags, and the entity patterns besides the built-in ones. A path is absolute or starts with ~/.
+func readConfig(path string) (config, error) {
 	var file struct {
-		Tags           []Tag `json:"tags"`
-		EntityPatterns []struct {
+		ClaudeConfigDir  string   `json:"claudeConfigDir"`
+		SourceDirs       []string `json:"sourceDirs"`
+		InstructionFiles []string `json:"instructionFiles"`
+		Tags             []Tag    `json:"tags"`
+		EntityPatterns   []struct {
 			Kind  string `json:"kind"`
 			Regex string `json:"regex"`
 		} `json:"entityPatterns"`
 	}
 	// Never null in settings.json.
 	file.Tags = []Tag{}
-	if err := readJSON(path, &file); err != nil {
-		return nil, nil, err
+	if err := readJSONC(path, &file); err != nil {
+		return config{}, err
 	}
-	patterns := slices.Clone(claude.EntityPatterns)
+	if file.ClaudeConfigDir == "" {
+		return config{}, fmt.Errorf("%s: claudeConfigDir is required", path)
+	}
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return config{}, err
+	}
+	expand := func(p string) (string, error) {
+		if rest, ok := strings.CutPrefix(p, "~/"); ok {
+			return filepath.Join(home, rest), nil
+		}
+		if !filepath.IsAbs(p) {
+			return "", fmt.Errorf("%s: path %q: want an absolute path or ~/", path, p)
+		}
+		return p, nil
+	}
+	cfg := config{tags: file.Tags, entityPatterns: slices.Clone(claude.EntityPatterns)}
+	if cfg.claudeConfigDir, err = expand(file.ClaudeConfigDir); err != nil {
+		return config{}, err
+	}
+	for _, list := range []struct{ from, to *[]string }{
+		{&file.SourceDirs, &cfg.sourceDirs},
+		{&file.InstructionFiles, &cfg.instructionFiles},
+	} {
+		for _, p := range *list.from {
+			expanded, err := expand(p)
+			if err != nil {
+				return config{}, err
+			}
+			*list.to = append(*list.to, expanded)
+		}
+	}
 	for _, p := range file.EntityPatterns {
 		re, err := regexp.Compile(p.Regex)
 		if err != nil {
-			return nil, nil, fmt.Errorf("entity pattern: %v", err)
+			return config{}, fmt.Errorf("entity pattern: %v", err)
 		}
 		if re.NumSubexp() == 0 {
-			return nil, nil, fmt.Errorf("entity pattern %q: want a group around the id", p.Regex)
+			return config{}, fmt.Errorf("entity pattern %q: want a group around the id", p.Regex)
 		}
-		patterns = append(patterns, claude.EntityPattern{Kind: p.Kind, Regexp: re})
+		cfg.entityPatterns = append(cfg.entityPatterns, claude.EntityPattern{Kind: p.Kind, Regexp: re})
 	}
-	return file.Tags, patterns, nil
+	return cfg, nil
+}
+
+// readJSONC reads JSON that may hold comments and trailing commas. An unknown field is an error.
+func readJSONC(path string, v any) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	if data, err = hujson.Standardize(data); err != nil {
+		return fmt.Errorf("parse %s: %v", path, err)
+	}
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(v); err != nil {
+		return fmt.Errorf("parse %s: %v", path, err)
+	}
+	return nil
 }
 
 // request is one verb sent to the daemon; it answers with a response.

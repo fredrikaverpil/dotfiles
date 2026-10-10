@@ -170,7 +170,7 @@
                     (task "qml-lint" "qmllint -E -W 0 $(find . -name '*.qml')")
                     # Tool defaults; prettier's match conform's flags for JS.
                     (task "qml-format" ''
-                      dirs=". ../../../../nix/shared/system/kaizen/plugins ../../../../nix/hosts/*/kaizen-plugins"
+                      dirs=". ../../../host/*/.config/quickshell"
                       qmlformat -i $(find $dirs -name '*.qml')
                       # Prettier cannot parse QML's `.pragma`/`.import` JS.
                       prettier --log-level warn --write $(grep -LE '^\.(pragma|import)' $(find $dirs -name '*.js'))
@@ -179,9 +179,7 @@
                     (task "qml-test" ''
                       export QT_QPA_PLATFORM=offscreen QT_QPA_PLATFORMTHEME=
                       qmltestrunner -input tests
-                      qmltestrunner -input ../../../../nix/shared/system/kaizen/plugins/calendar
-                      qmltestrunner -input ../../../../nix/shared/system/kaizen/plugins/gcloud-auth
-                      qmltestrunner -input ../../../../nix/shared/system/kaizen/plugins/incident-investigator
+                      qmltestrunner -input plugins
                     '')
                     pkgs.lua
                   ]

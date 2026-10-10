@@ -2,9 +2,8 @@
 {
   imports = [
     ../../shared/system/linux-desktop.nix
-    ../../shared/system/kaizen/session.nix
+    ../../shared/system/kaizen
     ../../shared/system/kaizen/plugins/calendar
-    ../../shared/system/kaizen/plugins/gcloud-auth
     ../../shared/system/thinkpad.nix
   ]
   # Work-only config from the private dotfiles-einride submodule; an
@@ -64,20 +63,6 @@
       ];
     };
   };
-
-  # Never miss a message from family.
-  host.notificationRules = [
-    {
-      match = {
-        app = "^Signal$";
-        summary = " Averpil$";
-      };
-      urgency = "critical";
-      border = "rose";
-      borderAnimation = "glow";
-      badgeEmoji = "❤️";
-    }
-  ];
 
   networking.firewall.allowedTCPPorts = [ 22 ];
 

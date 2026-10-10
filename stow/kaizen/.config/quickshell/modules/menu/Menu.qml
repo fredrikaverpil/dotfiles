@@ -527,7 +527,7 @@ Ui.Panel {
     property var emojis: []
 
     FileView {
-        path: Quickshell.env("KAIZEN_EMOJI") || ""
+        path: Ui.Paths.emoji
         printErrors: false
         // Shortcode-only entries (skin tones) have no name.
         onLoaded: menu.emojis = JSON.parse(text()).filter(e => e.name).map(e => ({

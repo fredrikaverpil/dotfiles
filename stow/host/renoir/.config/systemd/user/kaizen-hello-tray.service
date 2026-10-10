@@ -1,0 +1,18 @@
+# The minimal tray plugin: an app with its own StatusNotifierItem and menu,
+# which the shell's tray shows. Its .wants link starts it with the XDG
+# autostart apps; without one, start it from the launcher's Apps.
+[Unit]
+Description=Hello tray plugin
+PartOf=graphical-session.target
+# The shell hosts the StatusNotifierWatcher it registers with; started before
+# the watcher is up, it logs a failed registration.
+After=kaizen-shell.service kaizen-tray-ready.service
+
+[Service]
+ExecStart=/usr/bin/env hello-tray
+# Quit in its menu exits 0 and leaves it stopped.
+Restart=on-failure
+Slice=app.slice
+
+[Install]
+WantedBy=wayland-session-xdg-autostart@niri.target

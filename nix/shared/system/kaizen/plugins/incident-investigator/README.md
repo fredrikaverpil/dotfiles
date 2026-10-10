@@ -7,56 +7,76 @@ cause.
 
 ## Configuration
 
-Importing `default.nix` enables the plugin. Its options live under
-`host.incidentInvestigator`:
+Importing this directory installs the daemon.
+`~/.config/kaizen/plugins/incident-investigator.jsonc` enables the window and
+configures the daemon, which reads it at start
+(`systemctl --user restart kaizen-incident-investigator` applies an edit). A
+path is absolute or starts with `~/`.
 
-```nix
-host.incidentInvestigator = {
-  # Required. The Claude Code profile (account and sessions) every run uses.
-  claudeConfigDir = "/home/me/.claude-oncall";
+```jsonc
+{
+  // Required. The Claude Code profile (account and sessions) every run uses.
+  "claudeConfigDir": "~/.claude-oncall",
 
-  # Directories holding clones of the services' repositories. Lets a run read
-  # the code at the commit that is deployed. Empty: runs read logs and alerts
-  # only.
-  sourceDirs = [ "/home/me/code/github.com/my-org" ];
+  // Directories holding clones of the services' repositories. Lets a run read
+  // the code at the commit that is deployed. Empty: runs read logs and alerts
+  // only.
+  "sourceDirs": ["~/code/github.com/my-org"],
 
-  # Appended to Claude's system prompt on every turn, in order, read in place.
-  # The default is the plugin's instructions.md. Adding a file appends to it,
-  # and lib.mkForce replaces it.
-  instructionFiles = [ ./my-org.md ];
+  // Appended to Claude's system prompt on every turn, in order, after the
+  // plugin's instructions.md; read in place.
+  "instructionFiles": ["~/notes/my-org.md"],
 
-  # Labels an investigation can carry, for the window's filters and badges.
-  tags = [
-    { name = "prod"; color = "rose"; }
-    { name = "dev"; color = "water"; }
-  ];
+  // Labels an investigation can carry, for the window's filters and badges.
+  "tags": [
+    { "name": "prod", "color": "rose" },
+    { "name": "dev", "color": "water" },
+  ],
 
-  # Notifications that get the Investigate button, and the tag of their drafts.
-  alerts = [
-    { match = { app = "^Slack$"; summary = " in #alerts$"; }; tag = "prod"; }
-    { match = { app = "^Slack$"; summary = " in #alerts-dev$"; }; tag = "dev"; }
-  ];
-
-  # Ids in tool output listed as users and organizations, besides the
-  # `users/ID` and `organizations/ID` resource names.
-  entityPatterns = [
-    { kind = "user"; regex = "(?i)my[_-]?user[_-]?id\\W{1,8}([A-Za-z0-9_.-]+)"; }
-  ];
-};
+  // Ids in tool output listed as users and organizations, besides the
+  // `users/ID` and `organizations/ID` resource names.
+  "entityPatterns": [
+    {
+      "kind": "user",
+      "regex": "(?i)my[_-]?user[_-]?id\\W{1,8}([A-Za-z0-9_.-]+)",
+    },
+  ],
+}
 ```
 
-| Option | Default | |
+| Field | Default | |
 | --- | --- | --- |
-| `claudeConfigDir` | required | `CLAUDE_CONFIG_DIR` of the daemon and its runs |
+| `claudeConfigDir` | required | `CLAUDE_CONFIG_DIR` of the runs |
 | `sourceDirs` | `[]` | directories of repositories a run may read; see Read-only runs |
-| `instructionFiles` | `[ ./instructions.md ]` | system prompt additions; list merging appends |
+| `instructionFiles` | `[]` | system prompt additions after `instructions.md` |
 | `tags` | `[]` | `name`, and `color`, a palette role |
-| `alerts` | `[]` | `match` as in `host.notificationRules`, and an optional `tag` |
 | `entityPatterns` | `[]` | `kind` (`user`, `organization`) and a regex whose first group is the id |
 
-An alert adds only the button. Style its toast with a `host.notificationRules`
-entry with the same `match`: toasts take each setting from the first matching
-rule that has one.
+An unknown field, or a missing or invalid file, stops the daemon from starting,
+and `kaizen-log` lists the reason.
+
+An alert toast gets the button from a notification rule
+([`features.md`](../../../../../../docs/kaizen/features.md) › Notifications ›
+Rules) whose action runs `investigate draft`. `INVESTIGATE_TAG`, one of `tags`,
+tags the draft; the daemon refuses any other. A draft that fails shows a
+critical toast with the error.
+
+```jsonc
+// ~/.config/kaizen/notification-rules.d/50-alerts.jsonc
+[
+  {
+    "match": { "app": "^Slack$", "summary": " in #alerts$" },
+    "border": "rose",
+    "actions": [
+      {
+        "label": "Investigate",
+        "command": ["investigate", "draft"],
+        "env": { "INVESTIGATE_TAG": "prod" },
+      },
+    ],
+  },
+]
+```
 
 ```mermaid
 flowchart LR
@@ -149,9 +169,9 @@ flowchart LR
 
 ## Alert flow
 
-1. Each `alerts` entry becomes a `host.notificationRules` entry whose
-   **Investigate** button runs `investigate draft` with `NOTIFICATION_APP`,
-   `NOTIFICATION_SUMMARY`, `NOTIFICATION_BODY` and `INVESTIGATE_TAG`.
+1. An alert rule's **Investigate** button runs `investigate draft` with
+   `NOTIFICATION_APP`, `NOTIFICATION_SUMMARY`, `NOTIFICATION_BODY` and
+   `INVESTIGATE_TAG`.
 2. The client sends `draft` over the socket. The daemon creates the draft,
    writes it to the state files and answers with its id. A GCP alert or
    incident URL in the body becomes the notes, and its `project` parameter the
@@ -168,8 +188,7 @@ flowchart LR
 7. When a turn finishes, the daemon sends a `notify-send` toast whose **Open**
    button runs `reveal`. Follow-ups go through `investigate followup`.
 
-To try the flow without a real alert, fake a toast that an `alerts` entry
-matches:
+To try the flow without a real alert, fake a toast that an alert rule matches:
 
 ```sh
 notify-send -a Slack "[workspace] in #alerts-dev" \
@@ -227,14 +246,25 @@ unit's `StateDirectory` (`$STATE_DIRECTORY`), which the window reads through
 `<id>/src/`. Transcripts hold the log entries and code a run read, so keep the
 directory as private as `sourceDirs`.
 
-| Path                 | Holds                                    |
-| -------------------- | ---------------------------------------- |
-| `Plugin.qml`         | window, IPC handler, launcher item       |
-| `Investigations.qml` | window content                           |
-| `Format.js`          | formatting helpers for the window        |
-| `Actions.js`         | the palette's rows                       |
-| `tst_*.qml`          | `qmltestrunner -input .`, offscreen      |
-| `investigate/`       | daemon, CLI and tray                     |
-| `instructions.md`    | the base instructions for every run      |
-| `claude-plugin/`     | the Claude plugin serving gopls          |
-| `default.nix`        | options, package, user unit, alert rules |
+The window, `instructions.md` and `claude-plugin/` are in
+[`plugins/incident-investigator/`](../../../../../../stow/kaizen/.config/quickshell/plugins/incident-investigator/)
+under the shell's QML:
+
+| Path                 | Holds                               |
+| -------------------- | ----------------------------------- |
+| `Plugin.qml`         | window, IPC handler, launcher item  |
+| `Investigations.qml` | window content                      |
+| `Format.js`          | formatting helpers for the window   |
+| `Actions.js`         | the palette's rows                  |
+| `tst_*.qml`          | `qml-test`, offscreen               |
+| `instructions.md`    | the base instructions for every run |
+| `claude-plugin/`     | the Claude plugin serving gopls     |
+
+Its unit is
+[`kaizen-incident-investigator.service`](../../../../../../stow/kaizen/.config/systemd/user/kaizen-incident-investigator.service).
+The daemon and its Nix module are here:
+
+| Path           | Holds                |
+| -------------- | -------------------- |
+| `investigate/` | daemon, CLI and tray |
+| `default.nix`  | package              |

@@ -48,10 +48,10 @@ command in a terminal. Each update's row copies that command (`fwupdmgr update
 <id>`) with Enter, Space or a click, as does Settings › Firmware › Copy update
 command.
 
-The host decides which backends run: kaizen reads [fwupd] when the host enables
-it, and never starts a backend's daemon. The shell checks at start, once a day
-and when the panel opens, reading only local metadata; fwupd's own timer
-downloads it.
+The host decides which backends run: kaizen reads [fwupd] when the system bus
+can activate it, and never enables a backend's daemon. The shell checks at
+start, once a day and when the panel opens, reading only local metadata; fwupd's
+own timer downloads it.
 
 `O` on a row, or Settings › Firmware › Open release page, opens the vendor's
 details page, or the update's [LVFS] device page when the vendor sets none.
@@ -67,7 +67,8 @@ urgency. There are no notifications.
 
 `kaizen-log` lists the warnings and errors that the `kaizen-*` units, plugin
 daemons included, logged this boot. A healthy desktop logs none, so every
-entry is something to fix.
+entry is something to fix. It holds what nothing on screen shows: an error an
+application shows in its window or a toast stays out of it.
 
 The bar shows an indicator while it lists anything: rose when an error is among
 the entries, wood for warnings only. It opens the log panel, newest entry
@@ -97,23 +98,31 @@ notify-send -i /path/to/icon.svg <summary> <body>
 
 ### Rules
 
-Notifications arriving via the D-Bus can be transformed by
-`host.notificationRules`, keyed by regexes on the notification's data. This
-offers capabilities such as restyling, adding action buttons or deduplication.
-The features available are described in
-[`session.nix`](../../nix/shared/system/kaizen/session.nix).
+Notifications arriving via the D-Bus can be transformed by notification rules,
+keyed by regexes on the notification's data. This offers capabilities such as
+restyling, adding action buttons or deduplication. The fields are described at
+`ruleCheck` in
+[`NotificationLogic.js`](../../stow/kaizen/.config/quickshell/modules/notifications/NotificationLogic.js).
 
 Rules match only on what the app sends. Capture a real notification first:
 [`development.md`](development.md) › Gotchas.
 
-Rules can be specified in the core kaizen system, per-host or by an optional
-plugin.
+Each `~/.config/kaizen/notification-rules.d/*.jsonc` holds a list of rules in
+JSONC (JSON with comments). The shell reads the files in file-name order and
+applies an edit on save; a notification takes each setting from the first
+matching rule that has one. A relative icon path resolves against the file's
+directory. A file or rule that is invalid is dropped with a warning, which
+`kaizen-log` lists.
 
-A plugin adds rules from its Nix module, such as a button that runs its own
-command with the notification in `NOTIFICATION_APP`, `NOTIFICATION_SUMMARY` and
-`NOTIFICATION_BODY`; the
+| File | Holds |
+| --- | --- |
+| `10-kaizen.jsonc` in [`stow/kaizen/`](../../stow/kaizen/.config/kaizen/notification-rules.d/) | the core's rules |
+| `50-<what>.jsonc` in `stow/host/<host>/`, or in a private submodule's `stow/` | a host's rules |
+
+A rule's button may run a plugin's command, with the notification in
+`NOTIFICATION_APP`, `NOTIFICATION_SUMMARY` and `NOTIFICATION_BODY`; the
 [incident investigator](../../nix/shared/system/kaizen/plugins/incident-investigator/README.md)
-does.
+has one.
 
 ### Toasts
 

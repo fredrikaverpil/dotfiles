@@ -1,6 +1,6 @@
-import qs.Ui as Ui
+import "../../Ui" as Ui
 
-// Events from dcal (dankcalendar), which default.nix runs.
+// Events from dcal (dankcalendar), which kaizen-dcal.service runs.
 Ui.Plugin {
     id: plugin
 

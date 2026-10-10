@@ -370,10 +370,14 @@ func TestInstructions(t *testing.T) {
 }
 
 func TestReadConfig(t *testing.T) {
+	t.Setenv("HOME", "/home/me")
 	type pattern struct{ Kind, Regex string }
 	type result struct {
-		Tags     []Tag
-		Patterns []pattern
+		ClaudeConfigDir  string
+		SourceDirs       []string
+		InstructionFiles []string
+		Tags             []Tag
+		Patterns         []pattern
 	}
 	builtIn := []pattern{
 		{"user", `\busers/([A-Za-z0-9][A-Za-z0-9_.|@~-]*)`},
@@ -386,31 +390,64 @@ func TestReadConfig(t *testing.T) {
 		wantErr string
 	}{
 		{
-			name: "tags and patterns",
-			file: `{"tags":[{"name":"prod","color":"rose"}],"entityPatterns":[{"kind":"user","regex":"member_id=(\\w+)"}]}`,
-			want: result{[]Tag{{"prod", "rose"}}, append(builtIn, pattern{"user", `member_id=(\w+)`})},
+			name: "every field, in JSONC",
+			file: `{
+				// The work profile.
+				"claudeConfigDir": "~/.claude-work",
+				"sourceDirs": ["~/code", "/srv/code"],
+				"instructionFiles": ["/etc/org.md",],
+				"tags": [{"name": "prod", "color": "rose"}],
+				"entityPatterns": [{"kind": "user", "regex": "member_id=(\\w+)"}],
+			}`,
+			want: result{
+				ClaudeConfigDir:  "/home/me/.claude-work",
+				SourceDirs:       []string{"/home/me/code", "/srv/code"},
+				InstructionFiles: []string{"/etc/org.md"},
+				Tags:             []Tag{{"prod", "rose"}},
+				Patterns:         append(builtIn, pattern{"user", `member_id=(\w+)`}),
+			},
 		},
-		{name: "empty", file: `{}`, want: result{[]Tag{}, builtIn}},
+		{
+			name: "the profile only",
+			file: `{"claudeConfigDir": "/c"}`,
+			want: result{ClaudeConfigDir: "/c", Tags: []Tag{}, Patterns: builtIn},
+		},
+		{name: "no profile", file: `{}`, wantErr: "claudeConfigDir is required"},
+		{
+			name:    "a relative path",
+			file:    `{"claudeConfigDir": "/c", "sourceDirs": ["code"]}`,
+			wantErr: "want an absolute path or ~/",
+		},
+		{name: "an unknown field", file: `{"claudeConfigDir": "/c", "tag": []}`, wantErr: `unknown field "tag"`},
 		{
 			name:    "a pattern without a group",
-			file:    `{"entityPatterns":[{"kind":"user","regex":"id"}]}`,
+			file:    `{"claudeConfigDir": "/c", "entityPatterns": [{"kind": "user", "regex": "id"}]}`,
 			wantErr: "want a group",
 		},
-		{name: "an invalid pattern", file: `{"entityPatterns":[{"kind":"user","regex":"("}]}`, wantErr: "entity pattern"},
+		{
+			name:    "an invalid pattern",
+			file:    `{"claudeConfigDir": "/c", "entityPatterns": [{"kind": "user", "regex": "("}]}`,
+			wantErr: "entity pattern",
+		},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
-			path := filepath.Join(t.TempDir(), "config.json")
+			path := filepath.Join(t.TempDir(), "config.jsonc")
 			assert.NilError(t, os.WriteFile(path, []byte(tt.file), 0o600))
 
-			tags, patterns, err := readConfig(path)
+			cfg, err := readConfig(path)
 
 			if tt.wantErr != "" {
 				assert.ErrorContains(t, err, tt.wantErr)
 				return
 			}
 			assert.NilError(t, err)
-			got := result{Tags: tags}
-			for _, p := range patterns {
+			got := result{
+				ClaudeConfigDir:  cfg.claudeConfigDir,
+				SourceDirs:       cfg.sourceDirs,
+				InstructionFiles: cfg.instructionFiles,
+				Tags:             cfg.tags,
+			}
+			for _, p := range cfg.entityPatterns {
 				got.Patterns = append(got.Patterns, pattern{p.Kind, p.Regexp.String()})
 			}
 			assert.DeepEqual(t, got, tt.want)

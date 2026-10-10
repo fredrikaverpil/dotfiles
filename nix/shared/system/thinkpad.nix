@@ -14,7 +14,7 @@
   # `nix eval --raw .#nixosConfigurations.<host>.config.security.pam.services.<name>.text`;
   # environment.etc."pam.d/<name>".text is null because it uses `source`. The
   # lock screen needs a separate, concurrent fingerprint PamContext (see the
-  # kaizen-lock comment in kaizen/session.nix). Test it with a recovery plan
+  # kaizen-lock comment in kaizen/default.nix). Test it with a recovery plan
   # before enabling it for login.
 
   # Swaps Super and left Alt and makes Caps Lock Ctrl on the built-in keyboard;

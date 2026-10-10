@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+set -euo pipefail
+
+# Prints the shell's emoji data, `[{ emoji, name, shortcodes }]`: Unicode's
+# names for the menu's picker, and the shortcodes Slack sends as `:name:` in
+# notification text, from the dataset Slack uses. Shortcode-only entries (skin
+# tones) have a null name. The shell reads it from `kaizen/emoji.json` in the
+# XDG data dirs.
+#
+# Usage: kaizen-emoji <emoji-test.txt> <emoji.json>
+#   emoji-test.txt: https://unicode.org/Public/emoji/latest/emoji-test.txt
+#   emoji.json: https://github.com/iamcal/emoji-data
+if [[ $# -ne 2 ]]; then
+  echo "usage: kaizen-emoji <emoji-test.txt> <emoji.json>" >&2
+  exit 2
+fi
+
+jq -nc --rawfile names "$1" --slurpfile data "$2" '
+  def hex: ascii_downcase | explode | reduce .[] as $c (0; . * 16 + if $c >= 97 then $c - 87 else $c - 48 end);
+  ($data[0] | map({ key: [.unified | split("-")[] | hex] | implode, value: .short_names }) | from_entries) as $codes
+  | [$names | split("\n")[] | capture("; fully-qualified +# (?<emoji>\\S+) E\\d+\\.\\d+ (?<name>.+)$") | select(.name | contains("skin tone") | not)] as $named
+  | ($named | map({ key: .emoji, value: true }) | from_entries) as $seen
+  | $named | map(.shortcodes = ($codes[.emoji] // []))
+    + [$codes | to_entries[] | select($seen[.key] | not) | { emoji: .key, name: null, shortcodes: .value }]
+'

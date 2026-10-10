@@ -16,8 +16,9 @@ done
 
 # The units log at priority 6 with the level in the text: Quickshell and dcal
 # lead with it (`  WARN scene:`), other tools start with it after at most a Go
-# log timestamp and a word (`error: …`, `… systray error: …`). systemd's own
-# lines about the units carry a real priority.
+# log timestamp and a word (`error: …`, `… systray error: …`), and Go's slog
+# writes a logfmt field (`time=… level=WARN msg=…`). systemd's own lines about
+# the units carry a real priority.
 # shellcheck disable=SC2016
 filter='
   def hex: "0123456789abcdef"[.:. + 1];
@@ -28,7 +29,8 @@ filter='
     | gsub("\u001b\\[[0-9;]*m"; "");
   def level:
     capture("^\\s*(?<l>DEBUG|INFO|WARN|ERROR|FATAL)\\b").l
-    // (capture("^(\\d{4}/\\d\\d/\\d\\d \\d\\d:\\d\\d:\\d\\d )?(\\S+ )?(?<l>warn(ing)?|error|fatal|crit(ical)?|panic)\\b"; "i").l
+    // ((capture("^(\\d{4}/\\d\\d/\\d\\d \\d\\d:\\d\\d:\\d\\d )?(\\S+ )?(?<l>warn(ing)?|error|fatal|crit(ical)?|panic)\\b"; "i")
+        // capture("^(time=\\S+ )?level=(?<l>warn(ing)?|error|fatal|crit(ical)?|panic)\\b"; "i")).l
       | ascii_upcase | if startswith("WARN") then "WARN" elif . == "ERROR" then "ERROR" else "FATAL" end)
     // "INFO";
   (.MESSAGE | text) as $m
@@ -40,7 +42,8 @@ filter='
       time: (.__REALTIME_TIMESTAMP | tonumber / 1000 | floor),
       unit: (.USER_UNIT // ._SYSTEMD_USER_UNIT // .SYSLOG_IDENTIFIER // "?" | sub("\\.service$"; "")),
       level: $l,
-      message: ($m | sub("^\\s+"; ""))
+      # The journal has the time.
+      message: ($m | sub("^\\s+"; "") | sub("^time=\\S+ "; ""))
     }
   | if $json then . else (.time / 1000 | strflocaltime("%b %d %T")) + " " + .unit + ": " + .message end
 '
