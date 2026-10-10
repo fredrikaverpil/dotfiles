@@ -113,6 +113,38 @@
         };
       };
 
+      # kaizen's home-manager modules evaluated as standalone home-manager runs
+      # them on another distro, so nothing NixOS-only creeps in. Eval-only: the
+      # check writes the activation package's drvPath and builds none of it.
+      checks.x86_64-linux.kaizen-home =
+        let
+          pkgs = import inputs.nixpkgs-unstable {
+            system = "x86_64-linux";
+            overlays = [ self.overlays.default ];
+          };
+          home = inputs.home-manager-unstable.lib.homeManagerConfiguration {
+            inherit pkgs;
+            extraSpecialArgs = { inherit inputs; };
+            modules = [
+              ./nix/shared/system/kaizen/home.nix
+              ./nix/shared/system/kaizen/plugins/calendar/home.nix
+              ./nix/shared/system/kaizen/plugins/gcloud-auth/home.nix
+              ./nix/shared/system/kaizen/plugins/incident-investigator/home.nix
+              {
+                home = {
+                  username = "kaizen";
+                  homeDirectory = "/home/kaizen";
+                  stateVersion = "26.05";
+                };
+                kaizen.incidentInvestigator.claudeConfigDir = "/home/kaizen/.claude";
+              }
+            ];
+          };
+        in
+        pkgs.runCommand "kaizen-home" { } ''
+          echo ${builtins.unsafeDiscardStringContext home.activationPackage.drvPath} > $out
+        '';
+
       # Formatters for `nix fmt` - uses nixfmt for each architecture
       formatter.x86_64-linux = stable.x86_64-linux.nixfmt;
       formatter.aarch64-linux = stable.aarch64-linux.nixfmt;

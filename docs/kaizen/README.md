@@ -89,6 +89,39 @@ place, live on save: the compositor config and the shell's QML.
   [`stow/kaizen/.config/quickshell/`](../../stow/kaizen/.config/quickshell/);
   `niri/…` is under [`stow/kaizen/.config/`](../../stow/kaizen/.config/).
 
+## Off NixOS
+
+The user half runs under standalone home-manager on another distro with Nix.
+The `kaizen-home` check in [`flake.nix`](../../flake.nix) evaluates it that
+way, and is the minimal configuration to copy: `home.nix` and each plugin's
+`home.nix` as modules, `extraSpecialArgs = { inherit inputs; }` (the calendar
+imports dankcalendar's module from it), and the checkout at `~/.dotfiles`,
+where plugins read their QML. Set `targets.genericLinux.enable`: it adds the
+Nix profiles to the XDG paths and, through `targets.genericLinux.gpu`, the GPU
+drivers Nix-built niri and Quickshell need; activation prints the one-time
+`sudo` command that installs them.
+
+The distro supplies what
+[`session.nix`](../../nix/shared/system/kaizen/session.nix) does on NixOS:
+
+- niri, UWSM, Xwayland and xwayland-satellite.
+- `xdg-desktop-portal-gnome` and `-gtk`, gnome-keyring as Secret Service, and
+  `xdg-terminal-exec` with ghostty as its default.
+- PipeWire with its ALSA and PulseAudio layers, rtkit, UPower,
+  power-profiles-daemon, BlueZ, NetworkManager, and polkit with `pkexec`.
+- fwupd, when the firmware panel should read it: also set
+  `kaizen.firmwareBackends = [ "fwupd" ]`.
+- gpu-screen-recorder, with `cap_sys_admin+ep` on `gsr-kms-server` so monitor
+  capture skips the portal dialog.
+- `/etc/pam.d/kaizen-lock` holding `auth include login`, for the lock and the
+  curtain.
+- An empty `/etc/kaizen`: `dotfiles-stow` stows
+  [`stow/kaizen/`](../../stow/kaizen/) and the shell defines `kaizen()` only
+  where it exists.
+- The session variables `NIXOS_OZONE_WL=1`, `QT_QPA_PLATFORMTHEME=gtk3` and
+  `GTK_USE_PORTAL=1`, and the fonts in
+  [`fonts.nix`](../../nix/shared/system/fonts.nix).
+
 ## Services to surfaces
 
 Every service wraps one subsystem and feeds the surfaces below. IPC target is
