@@ -120,6 +120,7 @@ in
         package = withGnomeLibsecret gitify;
       })
       gnome-calculator
+      gnome-decoder
       # Chromium picks its password store per desktop; switching stores drops cookies and logins.
       # The last --enable-features wins, so repeat the wrapper's WaylandWindowDecorations.
       (chromium.override {
