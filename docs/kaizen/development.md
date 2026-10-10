@@ -49,7 +49,7 @@ upstream's latest, and niri marks each option with the version it arrived in
 ## Gotchas
 
 - Nix comments carry the "why" for packages, portals, PAM, units and hardware
-  integration. Read `nix/shared/system/kaizen/session.nix`,
+  integration. Read `nix/shared/system/kaizen/session.nix` and `home.nix`,
   `nix/shared/system/linux-desktop.nix` and `nix/shared/system/thinkpad.nix`,
   plus the host's `configuration.nix`, before asking.
 - SSH keys come from the Proton Pass app's agent (`SSH_AUTH_SOCK` in

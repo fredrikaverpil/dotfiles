@@ -10,8 +10,12 @@
   imports = [ inputs.dankcalendar.nixosModules.default ];
 
   # Read from the checkout, so `qs ipc call shell reload` applies edits.
-  host.kaizenPlugins = [
-    "${config.users.users.fredrik.home}/.dotfiles/nix/shared/system/kaizen/plugins/calendar"
+  home-manager.sharedModules = [
+    {
+      kaizen.plugins = [
+        "${config.users.users.fredrik.home}/.dotfiles/nix/shared/system/kaizen/plugins/calendar"
+      ];
+    }
   ];
 
   # OAuth tokens stay in gnome-keyring (from programs.niri), unlocked by the login PAM stack.

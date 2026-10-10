@@ -12,7 +12,7 @@ if [ -e /etc/NIXOS ]; then
   # --session serves niri's D-Bus interfaces (screencast portal, a11y) and
   # imports its environment, which uwsm cleans up on exit. The instance name
   # follows from the executable, so the units are wayland-wm@niri.service and
-  # wayland-session@niri.target -- both named in nix/shared/system/kaizen/session.nix.
+  # wayland-session@niri.target -- both named in nix/shared/system/kaizen/home.nix.
   # `kaizen` starts the niri session; the Quickshell shell and other user
   # units bind to wayland-session@niri.target. `noctalia` starts the same
   # session with those units masked and Noctalia v5 in their place.
@@ -20,8 +20,8 @@ if [ -e /etc/NIXOS ]; then
     # The shell and its companions are enabled into wayland-session@niri.target,
     # so masking is the only way to keep them out of a session. `systemctl --user
     # mask --runtime` writes to $XDG_RUNTIME_DIR/systemd/user, which ranks below
-    # the /etc/systemd/user unit NixOS installs and is therefore ignored;
-    # user.control outranks it. Both live in /run, so a reboot clears the mask.
+    # the ~/.config/systemd/user units home-manager installs and is therefore
+    # ignored; user.control outranks them. Both live in /run, so a reboot clears the mask.
     # Usage: kaizen_units mask|unmask
     function kaizen_units() {
       local dir="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/systemd/user.control" unit

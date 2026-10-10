@@ -25,6 +25,20 @@ in
 
   home.stateVersion = "26.05";
 
+  # Never miss a message from family.
+  kaizen.notificationRules = [
+    {
+      match = {
+        app = "^Signal$";
+        summary = " Averpil$";
+      };
+      urgency = "critical";
+      border = "rose";
+      borderAnimation = "glow";
+      badgeEmoji = "❤️";
+    }
+  ];
+
   # Host-only user packages; shared ones live in nix/shared/home/.
   home.packages = with pkgs; [
     jira-cli-go

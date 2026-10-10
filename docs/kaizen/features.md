@@ -98,10 +98,10 @@ notify-send -i /path/to/icon.svg <summary> <body>
 ### Rules
 
 Notifications arriving via the D-Bus can be transformed by
-`host.notificationRules`, keyed by regexes on the notification's data. This
+`kaizen.notificationRules`, keyed by regexes on the notification's data. This
 offers capabilities such as restyling, adding action buttons or deduplication.
 The features available are described in
-[`session.nix`](../../nix/shared/system/kaizen/session.nix).
+[`home.nix`](../../nix/shared/system/kaizen/home.nix).
 
 Rules match only on what the app sends. Capture a real notification first:
 [`development.md`](development.md) › Gotchas.

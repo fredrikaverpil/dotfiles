@@ -8,7 +8,10 @@ place that covers every host that wants it.
 Go down the list; the first match wins.
 
 1. **kaizen core**:
-   [`shared/system/kaizen/session.nix`](shared/system/kaizen/session.nix). What
+   [`shared/system/kaizen/session.nix`](shared/system/kaizen/session.nix) for
+   system services and PAM,
+   [`shared/system/kaizen/home.nix`](shared/system/kaizen/home.nix) for packages
+   and units. What
    the shell, the session or a bind in [`stow/kaizen/`](../stow/kaizen/) needs
    to do its job, including the purpose-built apps kaizen hands tasks to
    (bluetui, nm-connection-editor).

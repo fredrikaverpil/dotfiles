@@ -65,7 +65,8 @@ place, live on save: the compositor config and the shell's QML.
 
 | Part | Path | Reaches |
 | --- | --- | --- |
-| Session: niri under UWSM, portals, PAM, units, the services and packages the shell and its binds use, notification rules | [`nix/shared/system/kaizen/session.nix`](../../nix/shared/system/kaizen/session.nix) | every kaizen host |
+| Session, system half: niri under UWSM, portals, PAM, the services the shell reads | [`nix/shared/system/kaizen/session.nix`](../../nix/shared/system/kaizen/session.nix) | every kaizen host |
+| Session, user half (home-manager): units, the packages the shell and its binds use, notification rules | [`nix/shared/system/kaizen/home.nix`](../../nix/shared/system/kaizen/home.nix) | every home-manager user on a kaizen host |
 | Compositor config, the shell's QML | [`stow/kaizen/`](../../stow/kaizen/) | every kaizen host |
 | Generic or reusable plugin, configured through its module's options | `nix/shared/system/kaizen/plugins/<name>/` | the hosts importing it |
 | Plugin specific to one host | `nix/hosts/<host>/kaizen-plugins/<name>/`, or a private submodule such as wily's `einride` | that host |
@@ -74,11 +75,12 @@ place, live on save: the compositor config and the shell's QML.
 
 - Core is what kaizen needs to work as designed; every kaizen host runs it. A
   plugin is optional: the shell runs without it, however many hosts import it.
-- Importing `session.nix` makes a host a kaizen host: it writes `/etc/kaizen`,
-  and `dotfiles-stow` stows [`stow/kaizen/`](../../stow/kaizen/) only where that
-  exists. So [`stow/kaizen/`](../../stow/kaizen/) reaches every kaizen host or
-  none, and a plugin keeps its QML beside its Nix module instead. The module
-  lists its directory in `host.kaizenPlugins`, read in place from the checkout.
+- Importing `session.nix` makes a host a kaizen host: it adds `home.nix` to
+  every home-manager user and writes `/etc/kaizen`, and `dotfiles-stow` stows
+  [`stow/kaizen/`](../../stow/kaizen/) only where that exists. So
+  [`stow/kaizen/`](../../stow/kaizen/) reaches every kaizen host or none, and a
+  plugin keeps its QML beside its Nix module instead. The module lists its
+  directory in `kaizen.plugins`, read in place from the checkout.
 - Nix hands the shell values only through `kaizen-shell.service`'s environment
   (`KAIZEN_PLUGINS`, `KAIZEN_NOTIFICATION_RULES`, `KAIZEN_EMOJI`).
 - Apps are not kaizen's: [`nix/README.md`](../../nix/README.md) says where they
@@ -118,7 +120,7 @@ Every service wraps one subsystem and feeds the surfaces below. IPC target is
 | tray | [StatusNotifierItem] | tray | Tray | `tray` |
 | background | wallpaper files, theme state | – | Settings › Display | `wallpaper`, `theme` |
 | menu | launcher | menu button | `Mod+Space` | `menu` |
-| plugins | `Plugin.qml` in each `host.kaizenPlugins` directory | date button, when taken over; indicators | Plugins › each plugin | `shell` (reload) |
+| plugins | `Plugin.qml` in each `kaizen.plugins` directory | date button, when taken over; indicators | Plugins › each plugin | `shell` (reload) |
 
 [PipeWire]: https://pipewire.org
 [Quickshell]: https://quickshell.org/docs/types/
@@ -275,9 +277,10 @@ nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
    [`modules/panels/`](../../stow/kaizen/.config/quickshell/modules/panels/),
    both wired in [`shell.qml`](../../stow/kaizen/.config/quickshell/shell.qml);
    a protocol-driven surface with no other consumer of its state (lock,
-   notifications, polkit) keeps both in `modules/<name>/`. Packages/units/PAM →
-   [`session.nix`](../../nix/shared/system/kaizen/session.nix) (even a package
-   another scope also installs), compositor →
+   notifications, polkit) keeps both in `modules/<name>/`. Packages and units →
+   [`home.nix`](../../nix/shared/system/kaizen/home.nix) (even a package
+   another scope also installs), system services and PAM →
+   [`session.nix`](../../nix/shared/system/kaizen/session.nix), compositor →
    [`Ui/compositors/`](../../stow/kaizen/.config/quickshell/Ui/compositors/) and
    [`niri/config.kdl`](../../stow/kaizen/.config/niri/config.kdl), IPC target
    for every new action. An optional shell extension is a

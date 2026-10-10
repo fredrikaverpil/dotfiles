@@ -1,0 +1,431 @@
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+let
+  # `[{ emoji, name, shortcodes }]`: Unicode's names for the menu's picker, and
+  # the shortcodes Slack sends as `:name:` in notification text, from the
+  # dataset Slack uses. Shortcode-only entries (skin tones) have a null name.
+  emoji =
+    pkgs.runCommand "emoji.json"
+      {
+        nativeBuildInputs = [ pkgs.jq ];
+        names = "${pkgs.unicode-emoji}/share/unicode/emoji/emoji-test.txt";
+        shortcodes = pkgs.fetchurl {
+          url = "https://raw.githubusercontent.com/iamcal/emoji-data/v16.0.0/emoji.json";
+          hash = "sha256-HWAuZb6Idyv4zDaM4WuFXXGe7duv4SjUcbgCA/SU0p8=";
+        };
+      }
+      ''
+        jq -nc --rawfile names "$names" --slurpfile data "$shortcodes" > $out '
+          def hex: ascii_downcase | explode | reduce .[] as $c (0; . * 16 + if $c >= 97 then $c - 87 else $c - 48 end);
+          ($data[0] | map({ key: [.unified | split("-")[] | hex] | implode, value: .short_names }) | from_entries) as $codes
+          | [$names | split("\n")[] | capture("; fully-qualified +# (?<emoji>\\S+) E\\d+\\.\\d+ (?<name>.+)$") | select(.name | contains("skin tone") | not)] as $named
+          | ($named | map({ key: .emoji, value: true }) | from_entries) as $seen
+          | $named | map(.shortcodes = ($codes[.emoji] // []))
+            + [$codes | to_entries[] | select($seen[.key] | not) | { emoji: .key, name: null, shortcodes: .value }]
+        '
+      '';
+
+  sleep-lock-monitor = pkgs.writeShellApplication {
+    name = "kaizen-sleep-lock-monitor";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.dbus
+      pkgs.gnugrep
+      pkgs.quickshell
+      pkgs.systemd
+    ];
+    text = builtins.readFile ./scripts/kaizen-sleep-lock-monitor.sh;
+  };
+  # Focuses the most recently focused niri window whose app id matches, or runs
+  # the command when none does. niri's binds call it.
+  kaizen-focus = pkgs.writeShellApplication {
+    name = "kaizen-focus";
+    runtimeInputs = [
+      pkgs.jq
+      pkgs.niri
+    ];
+    text = builtins.readFile ./scripts/kaizen-focus.sh;
+  };
+  # Lists the shell's IPC functions, all targets or one, sorted by target.
+  kaizen-ipc = pkgs.writeShellApplication {
+    name = "kaizen-ipc";
+    runtimeInputs = [
+      pkgs.gawk
+      pkgs.quickshell
+    ];
+    text = builtins.readFile ./scripts/kaizen-ipc.sh;
+  };
+  # Lists warnings and errors from the kaizen-* user units, this boot by default.
+  kaizen-log = pkgs.writeShellApplication {
+    name = "kaizen-log";
+    runtimeInputs = [
+      pkgs.jq
+      pkgs.systemd
+    ];
+    text = builtins.readFile ./scripts/kaizen-log.sh;
+  };
+
+  # bluetui registers its own pairing agent; the shell has none.
+  bluetui-desktop = pkgs.makeDesktopItem {
+    name = "bluetui";
+    desktopName = "bluetui";
+    comment = "Bluetooth pairing";
+    exec = "bluetui";
+    terminal = true;
+    categories = [
+      "Settings"
+      "HardwareSettings"
+    ];
+  };
+in
+# The user half of the kaizen session: the shell's user units and the
+# pre-suspend lock, the data they hand the shell, and the packages the shell
+# and its binds use. A home-manager module, so it also runs on a distro other
+# than NixOS; session.nix holds the system half and adds this module to every
+# home-manager user. Compositor config and QML live in stow/kaizen/.
+{
+  options.kaizen = {
+    notificationRules = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            match = lib.mkOption {
+              type = lib.types.attrsOf lib.types.str;
+              example = {
+                app = "^Slack$";
+                summary = " in #?alerts$";
+              };
+              description = "JavaScript regexes keyed by notification field (app, summary, body); the rule applies when all match";
+            };
+            urgency = lib.mkOption {
+              type = lib.types.nullOr (
+                lib.types.enum [
+                  "low"
+                  "normal"
+                  "critical"
+                ]
+              );
+              default = null;
+              description = "Urgency in place of the one the app sent; critical sticks, low expires sooner. The first matching rule with one applies";
+            };
+            border = lib.mkOption {
+              type = lib.types.nullOr (
+                lib.types.enum [
+                  "rose"
+                  "leaf"
+                  "wood"
+                  "water"
+                  "blossom"
+                  "sky"
+                ]
+              );
+              default = null;
+              description = "Palette colour of the border, on the toast and in the history, in place of the one its urgency gives";
+            };
+            borderAnimation = lib.mkOption {
+              type = lib.types.nullOr (
+                lib.types.enum [
+                  "orbit"
+                  "heartbeat"
+                  "glow"
+                ]
+              );
+              default = null;
+              description = "Animation of the border, on the toast and in the history: `orbit` keeps a dash travelling around it, and dims the border itself so the dash stands out; `heartbeat` thickens it in two soft beats, then rests; `glow` breathes a halo around it, over the bar, the history panel and other notifications";
+            };
+            dedup = lib.mkOption {
+              type = lib.types.nullOr (
+                lib.types.submodule {
+                  options = {
+                    group = lib.mkOption {
+                      type = lib.types.str;
+                      description = "One event reported by several apps";
+                    };
+                    keep = lib.mkOption {
+                      type = lib.types.bool;
+                      default = false;
+                      description = "Show this copy and dismiss the group's others; they are held briefly in case it arrives";
+                    };
+                  };
+                }
+              );
+              default = null;
+              description = "Show one copy of an event reported by several apps";
+            };
+            collapse = lib.mkOption {
+              type = lib.types.nullOr (
+                lib.types.submodule {
+                  options = {
+                    summary = lib.mkOption {
+                      type = lib.types.nullOr lib.types.str;
+                      default = null;
+                      description = "Summary in place of the latest toast's";
+                    };
+                    body = lib.mkOption {
+                      type = lib.types.nullOr lib.types.str;
+                      default = null;
+                      description = "Body in place of the latest toast's";
+                    };
+                  };
+                }
+              );
+              default = null;
+              example = {
+                body = "Several new review requests";
+              };
+              description = "Show a burst of this rule's toasts as one: each is held briefly, then the latest replaces the others and the one on screen, showing these fields in place of its own. A lone toast keeps the app's text";
+            };
+            focus = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              example = "^chrome-calendar\\.google\\.com";
+              description = "JavaScript regex of the app id of the window to focus when the notification is activated, in place of the notification's own app";
+            };
+            icon = lib.mkOption {
+              type = lib.types.nullOr lib.types.path;
+              default = null;
+              example = lib.literalExpression "./github.svg";
+              description = "Icon shown in place of the notification's, such as the sender an app relays for; the notification's own moves to a badge on its corner unless `badgeIcon` is set";
+            };
+            badgeIcon = lib.mkOption {
+              type = lib.types.nullOr lib.types.path;
+              default = null;
+              example = lib.literalExpression "./satty.svg";
+              description = "Icon on the corner badge. With `icon` set too, each shows as set; otherwise the notification's own stays the icon, and the badge icon takes its place when that cannot be loaded";
+            };
+            badgeEmoji = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              example = "❤️";
+              description = "Emoji on the icon's corner badge, in Noto Color Emoji, in place of the notification's own icon when `icon` moves it there";
+            };
+            actions = lib.mkOption {
+              type = lib.types.listOf (
+                lib.types.submodule {
+                  options = {
+                    label = lib.mkOption {
+                      type = lib.types.str;
+                      description = "Text of the button";
+                    };
+                    command = lib.mkOption {
+                      type = lib.types.listOf lib.types.str;
+                      example = [
+                        "notify-send"
+                        "Pressed"
+                      ];
+                      description = "Program and arguments, run detached and not in a shell";
+                    };
+                    env = lib.mkOption {
+                      type = lib.types.attrsOf lib.types.str;
+                      default = { };
+                      description = "Variables added to the command's environment, besides NOTIFICATION_APP, NOTIFICATION_SUMMARY and NOTIFICATION_BODY";
+                    };
+                  };
+                }
+              );
+              default = [ ];
+              description = "Buttons after the toast's own; pressing one runs its command and dismisses the toast. They also show on the notification in the history, where pressing one keeps the notification and closes the panel. The first matching rule with any applies";
+            };
+          };
+        }
+      );
+      default = [ ];
+      description = "Kaizen's notification rules";
+    };
+
+    plugins = lib.mkOption {
+      type = lib.types.listOf lib.types.path;
+      default = [ ];
+      description = "Shell plugin directories, each holding a Plugin.qml, loaded in order. A path is copied to the store; an absolute path as a string is read in place, and `qs ipc call shell reload` applies its edits";
+    };
+
+    firmwareBackends = lib.mkOption {
+      type = lib.types.listOf (lib.types.enum [ "fwupd" ]);
+      default = [ ];
+      description = "Firmware backends the system runs, which the shell reads; kaizen never enables their daemons";
+    };
+  };
+
+  config = {
+    # A switch never restarts the shell or the lock monitor, so a rebuild cannot
+    # restart Quickshell under a session lock; restart them by hand, unlocked.
+    systemd.user.services.kaizen-shell = {
+      Unit = {
+        Description = "Quickshell desktop shell";
+        PartOf = [ "graphical-session.target" ];
+        # Never order after graphical-session.target: that creates a systemd cycle.
+        # waitenv closes niri's readiness-before-WAYLAND_DISPLAY race.
+        After = [
+          "wayland-wm@niri.service"
+          "wayland-session-waitenv.service"
+        ];
+        X-SwitchMethod = "keep-old";
+      };
+      Service = {
+        # The unit inherits UWSM's session PATH, which launcher entries and uwsm-app need.
+        Environment = [
+          # qtimageformats supplies Quickshell's WebP decoder.
+          "QT_PLUGIN_PATH=${pkgs.qt6.qtimageformats}/lib/qt-6/plugins"
+          "KAIZEN_EMOJI=${emoji}"
+          "KAIZEN_NOTIFICATION_RULES=${pkgs.writeText "notification-rules.json" (builtins.toJSON config.kaizen.notificationRules)}"
+          "KAIZEN_PLUGINS=${lib.concatStringsSep ":" config.kaizen.plugins}"
+          "KAIZEN_FIRMWARE_BACKENDS=${lib.concatStringsSep ":" config.kaizen.firmwareBackends}"
+        ];
+        ExecStart = "${pkgs.quickshell}/bin/quickshell";
+        Restart = "on-failure";
+        # Creates ~/.local/state/kaizen-shell before ExecStart: for user units
+        # StateDirectory resolves under $XDG_STATE_HOME.
+        StateDirectory = "kaizen-shell";
+      };
+      # Bind to the niri session so another desktop cannot start a second shell.
+      Install.WantedBy = [ "wayland-session@niri.target" ];
+    };
+
+    # Holds XDG autostart apps (UWSM orders them after this target) until the tray's
+    # StatusNotifierWatcher is up; Electron apps look for it once and never retry.
+    # The shell registers it once its config loads, which waits for xdg-desktop-portal,
+    # itself ordered after graphical-session.target: waiting in kaizen-shell.service would deadlock.
+    systemd.user.services.kaizen-tray-ready = {
+      Unit = {
+        Description = "Wait for the Quickshell tray";
+        Before = [ "wayland-session-xdg-autostart@niri.target" ];
+      };
+      Service = {
+        Type = "oneshot";
+        ExecStart = "${pkgs.bash}/bin/bash -c 'until ${pkgs.systemd}/bin/busctl --user status org.kde.StatusNotifierWatcher >/dev/null 2>&1; do ${pkgs.coreutils}/bin/sleep 0.2; done'";
+        # A tray that never comes up delays autostart apps, never blocks them.
+        TimeoutStartSec = 10;
+      };
+      Install.WantedBy = [ "wayland-session-xdg-autostart@niri.target" ];
+    };
+
+    # Lid close and the power key suspend via logind; this delay inhibitor locks
+    # the shell first and releases once the lock reports secure.
+    systemd.user.services.kaizen-sleep-lock = {
+      Unit = {
+        Description = "Lock Quickshell before suspend";
+        PartOf = [ "graphical-session.target" ];
+        # Match Quickshell's ordering: waitenv is required for niri, and graphical-session.target cycles.
+        After = [
+          "dbus.socket"
+          "wayland-wm@niri.service"
+          "wayland-session-waitenv.service"
+        ];
+        Requires = [ "dbus.socket" ];
+        X-SwitchMethod = "keep-old";
+      };
+      Service = {
+        ExecStart = "${sleep-lock-monitor}/bin/kaizen-sleep-lock-monitor";
+        Restart = "always";
+        RestartSec = "2s";
+      };
+      Install.WantedBy = [ "wayland-session@niri.target" ];
+    };
+
+    kaizen.notificationRules = [
+      # Google Calendar reminders arrive from both Slack and Chromium; Chromium's
+      # copy carries the buttons.
+      {
+        # Chromium prefixes the body with the origin.
+        match = {
+          app = "^Chromium$";
+          body = "^calendar\\.google\\.com\\n";
+        };
+        urgency = "critical";
+        border = "leaf";
+        dedup = {
+          group = "calendar";
+          keep = true;
+        };
+        # The reminder comes from Chromium, but the window is the Calendar app's.
+        focus = "^chrome-calendar\\.google\\.com";
+      }
+      # Slack titles messages from its apps "[workspace] from <app>", as it does a
+      # person's. Icons are simple-icons 16.32.0 (CC0) glyphs from
+      # https://cdn.jsdelivr.net/npm/simple-icons@16.32.0/icons/<slug>.svg, filled
+      # with the slug's `hex` from the package's data/simple-icons.json and scaled
+      # onto a white circle:
+      #   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      #     <circle cx="12" cy="12" r="12" fill="#fff"/>
+      #     <path transform="translate(5 5) scale(.5833)" fill="#<hex>" d="<path>"/>
+      #   </svg>
+      {
+        match = {
+          app = "^Slack$";
+          summary = " from Google Calendar$";
+        };
+        urgency = "critical";
+        border = "leaf";
+        dedup.group = "calendar";
+        # Slack relays the reminder, but the event is in the Calendar app.
+        focus = "^chrome-calendar\\.google\\.com";
+        icon = ./icons/google-calendar.svg;
+      }
+      {
+        match = {
+          app = "^Slack$";
+          summary = " from GitHub$";
+        };
+        icon = ./icons/github.svg;
+      }
+      # A pull request opened across many repos assigns its reviews in a burst.
+      {
+        match = {
+          app = "^Slack$";
+          summary = " from GitHub$";
+          body = "^Reviews assigned to you on ";
+        };
+        collapse.body = "Several new review requests";
+      }
+      {
+        match = {
+          app = "^Slack$";
+          summary = " from Linear$";
+        };
+        icon = ./icons/linear.svg;
+      }
+      # Satty's image is a temp file it may delete before the toast loads it.
+      {
+        match.app = "^satty$";
+        badgeIcon = ./icons/satty.svg;
+      }
+    ];
+
+    home.packages = with pkgs; [
+      quickshell
+      # niri's terminal binds and xdg-terminal-exec open it.
+      ghostty
+      # Nightlight: drives zwlr_gamma_control_v1, so it is compositor-agnostic.
+      wl-gammarelay-rs
+      libnotify
+      sound-theme-freedesktop
+      kdePackages.kconfig
+      gnome-themes-extra
+      # Cursor theme for niri, GTK and Qt; without one niri draws a fixed 64px fallback.
+      bibata-cursors
+      iproute2
+      iputils
+      bluetui
+      bluetui-desktop
+      grim
+      imagemagick # Wallpaper thumbnails.
+      jq # The clipboard watcher's JSON encoding.
+      kaizen-focus
+      kaizen-ipc
+      kaizen-log
+      mpv
+      # nm-connection-editor edits wired, static-IP and other connection settings;
+      # the network panel launches it. nm-applet runs via XDG autostart for its tray menu.
+      networkmanagerapplet
+      # Annotates screenshots from the notification's Edit action.
+      satty
+      wl-clipboard
+      # niri cannot mirror outputs; the mirror service runs it fullscreen on the target.
+      wl-mirror
+    ];
+  };
+}

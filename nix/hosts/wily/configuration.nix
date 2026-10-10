@@ -65,20 +65,6 @@
     };
   };
 
-  # Never miss a message from family.
-  host.notificationRules = [
-    {
-      match = {
-        app = "^Signal$";
-        summary = " Averpil$";
-      };
-      urgency = "critical";
-      border = "rose";
-      borderAnimation = "glow";
-      badgeEmoji = "❤️";
-    }
-  ];
-
   networking.firewall.allowedTCPPorts = [ 22 ];
 
   # Daemon for testcontainers.

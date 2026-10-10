@@ -50,7 +50,7 @@ in
               type = lib.types.str;
               description = "Label shown on the investigation's badge and filter";
             };
-            # The palette roles of host.notificationRules' border.
+            # The palette roles of kaizen.notificationRules' border.
             color = lib.mkOption {
               type = lib.types.enum [
                 "rose"
@@ -78,7 +78,7 @@ in
                 app = "^Slack$";
                 summary = " in #alerts$";
               };
-              description = "As in host.notificationRules";
+              description = "As in kaizen.notificationRules";
             };
             tag = lib.mkOption {
               type = lib.types.nullOr lib.types.str;
@@ -89,7 +89,7 @@ in
         }
       );
       default = [ ];
-      description = "Notifications that get the Investigate button. Style their toasts with host.notificationRules entries";
+      description = "Notifications that get the Investigate button. Style their toasts with kaizen.notificationRules entries";
     };
     entityPatterns = lib.mkOption {
       type = lib.types.listOf (
@@ -122,21 +122,25 @@ in
 
     host.incidentInvestigator.instructionFiles = lib.mkBefore [ "${dir}/instructions.md" ];
 
-    host.kaizenPlugins = [ dir ];
+    home-manager.sharedModules = [
+      {
+        kaizen.plugins = [ dir ];
 
-    host.notificationRules = map (alert: {
-      inherit (alert) match;
-      actions = [
-        {
-          label = "Investigate";
-          command = [
-            "investigate"
-            "draft"
+        kaizen.notificationRules = map (alert: {
+          inherit (alert) match;
+          actions = [
+            {
+              label = "Investigate";
+              command = [
+                "investigate"
+                "draft"
+              ];
+              env = lib.optionalAttrs (alert.tag != null) { INVESTIGATE_TAG = alert.tag; };
+            }
           ];
-          env = lib.optionalAttrs (alert.tag != null) { INVESTIGATE_TAG = alert.tag; };
-        }
-      ];
-    }) cfg.alerts;
+        }) cfg.alerts;
+      }
+    ];
 
     # On the session PATH, for the shell to run its client verbs.
     environment.systemPackages = [ investigate ];

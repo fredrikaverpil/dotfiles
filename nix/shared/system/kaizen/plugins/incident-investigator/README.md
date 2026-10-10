@@ -51,10 +51,10 @@ host.incidentInvestigator = {
 | `sourceDirs` | `[]` | directories of repositories a run may read; see Read-only runs |
 | `instructionFiles` | `[ ./instructions.md ]` | system prompt additions; list merging appends |
 | `tags` | `[]` | `name`, and `color`, a palette role |
-| `alerts` | `[]` | `match` as in `host.notificationRules`, and an optional `tag` |
+| `alerts` | `[]` | `match` as in `kaizen.notificationRules`, and an optional `tag` |
 | `entityPatterns` | `[]` | `kind` (`user`, `organization`) and a regex whose first group is the id |
 
-An alert adds only the button. Style its toast with a `host.notificationRules`
+An alert adds only the button. Style its toast with a `kaizen.notificationRules`
 entry with the same `match`: toasts take each setting from the first matching
 rule that has one.
 
@@ -149,7 +149,7 @@ flowchart LR
 
 ## Alert flow
 
-1. Each `alerts` entry becomes a `host.notificationRules` entry whose
+1. Each `alerts` entry becomes a `kaizen.notificationRules` entry whose
    **Investigate** button runs `investigate draft` with `NOTIFICATION_APP`,
    `NOTIFICATION_SUMMARY`, `NOTIFICATION_BODY` and `INVESTIGATE_TAG`.
 2. The client sends `draft` over the socket. The daemon creates the draft,
