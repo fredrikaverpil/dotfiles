@@ -27,6 +27,7 @@ Ui.Plugin {
 
     Service {
         id: calendarService
+        config: plugin.config
     }
 
     Panel {

@@ -56,12 +56,29 @@ function clock(date) {
   return pad(date.getHours()) + ":" + pad(date.getMinutes());
 }
 
-// iCal feeds are tagged by calendar name; every Google calendar shares one tag.
-var TAGS = { Family: "🏠", "Johannas kalender": "❤️", "My calendar": "👤" };
-var GOOGLE_TAG = "G";
+// The config's `emoji`, each a JavaScript regex on the calendar name mapped to
+// its emoji, in file order; a regex that does not compile is skipped with a
+// warning.
+function emojiPatterns(emojiByRegex) {
+  if (!emojiByRegex || typeof emojiByRegex !== "object") return [];
+  return Object.keys(emojiByRegex)
+    .map(function (source) {
+      try {
+        return {
+          pattern: new RegExp(source),
+          emoji: String(emojiByRegex[source]),
+        };
+      } catch (error) {
+        console.warn("calendar: skipping emoji " + source + ": " + error);
+        return null;
+      }
+    })
+    .filter(Boolean);
+}
 
-// Maps calendar id to tag from a calendars.list reply.
-function tags(text) {
+// Maps calendar id to the emoji of the first config regex matching its name,
+// from a calendars.list reply.
+function emojis(text, emojiByRegex) {
   var calendars;
   try {
     calendars = JSON.parse(text);
@@ -70,18 +87,19 @@ function tags(text) {
   }
   var result = {};
   if (!Array.isArray(calendars)) return result;
+  var patterns = emojiPatterns(emojiByRegex);
   calendars.forEach(function (calendar) {
     if (!calendar) return;
-    result[calendar.id] =
-      calendar.accountKind === "google"
-        ? GOOGLE_TAG
-        : TAGS[calendar.name] || "";
+    var match = patterns.find(function (entry) {
+      return entry.pattern.test(String(calendar.name || ""));
+    });
+    result[calendar.id] = match ? match.emoji : "";
   });
   return result;
 }
 
 // Unreadable dates land on the first day with a "?" time rather than vanish.
-function row(event, dayStart, dayEnd, tagsById, first) {
+function row(event, dayStart, dayEnd, emojiById, first) {
   var start = event.allDay ? allDayDate(event.start) : new Date(event.start);
   var end = event.allDay ? allDayDate(event.end) : new Date(event.end);
   var readable = !isNaN(start) && !isNaN(end);
@@ -92,7 +110,7 @@ function row(event, dayStart, dayEnd, tagsById, first) {
   return {
     uid: String(event.uid || ""),
     start: String(event.start || ""),
-    tag: (tagsById || {})[event.calendarId] || "",
+    emoji: (emojiById || {})[event.calendarId] || "",
     summary: String(event.summary || "") || "(no title)",
     location: String(event.location || ""),
     // Invites come from others; only web links reach xdg-open.
@@ -111,7 +129,7 @@ function row(event, dayStart, dayEnd, tagsById, first) {
 }
 
 // Returns DAY_COUNT days from now's midnight, or null for anything but an events.list reply.
-function parse(text, now, tagsById) {
+function parse(text, now, emojiById) {
   var events;
   try {
     events = JSON.parse(text).events;
@@ -129,7 +147,7 @@ function parse(text, now, tagsById) {
         return event && event.status !== "cancelled";
       })
       .map(function (event) {
-        return row(event, dayStart, dayEnd, tagsById, index === 0);
+        return row(event, dayStart, dayEnd, emojiById, index === 0);
       })
       .filter(function (entry) {
         return entry !== null;
