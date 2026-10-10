@@ -26,7 +26,7 @@ lock_and_wait() {
 monitor_sleep() {
   while IFS= read -r line; do
     if [[ $line == *"boolean true"* ]]; then
-      # <4>: the journal's warning priority, which `kaizen log` lists.
+      # <4>: the journal's warning priority, which `kaizen doctor` lists.
       lock_and_wait || echo "<4>kaizen: session lock was not secure before suspend" >&2
       return
     fi

@@ -40,7 +40,7 @@ check system '(.alerts | type) == "array" and (.cpu | type) == "number" and (.me
 check mirror '(.mirrors | type) == "array"'
 check clipboard '(.entries | type) == "number"'
 check firmware '(.backends | type) == "array" and (.updates | type) == "array"'
-check log '(.count | type) == "number" and .errors <= .count and (.entries | length) <= .count'
+check doctor '(.findings | type) == "array" and .errors + .warnings == (.findings | length) and (.text | type) == "string"'
 check recording '(.recording | type) == "boolean" and (.monitor as $m | $m == "region" or any(.monitors[]; . == $m))'
 case "$(ipc notifications dndState)" in
   on | off) printf 'PASS: notifications\n' ;;

@@ -403,20 +403,26 @@ Ui.Panel {
             label: "Open release page",
             provider: "firmwarePages"
         },
-        "settings.log": {
+        "settings.doctor": {
             icon: "󰃤",
-            label: "Log"
+            label: "Doctor"
         },
-        "settings.log.panel": {
+        "settings.doctor.panel": {
             icon: "󰕮",
-            label: "Log panel",
-            action: () => menu.shell.log.open()
+            label: "Doctor panel",
+            action: () => menu.shell.doctor.open()
         },
-        "settings.log.copy": {
+        "settings.doctor.refresh": {
+            icon: "󰑐",
+            label: "Refresh",
+            enabled: !menu.shell.doctorService.running,
+            action: () => menu.shell.doctorService.refresh()
+        },
+        "settings.doctor.copy": {
             icon: "󰆏",
-            label: "Copy log",
-            enabled: menu.shell.logService.entries.length > 0,
-            action: () => menu.shell.logService.copyAll()
+            label: "Copy report",
+            enabled: menu.shell.doctorService.text !== "",
+            action: () => menu.shell.doctorService.copyAll()
         },
         "settings.session": {
             icon: "󰐥",

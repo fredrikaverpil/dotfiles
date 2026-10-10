@@ -43,11 +43,11 @@ reaches, is in [`README.md`](README.md) › Where it lives.
   ([`nix/shared/system/kaizen/plugins/incident-investigator/`](../../nix/shared/system/kaizen/plugins/incident-investigator/))
   brings a daemon written for it, and takes what differs per host from its
   plugin file.
-- A plugin's daemon or tray app logs what nothing on screen shows with a
-  journal priority: a syslog prefix on each line (`<4>`, as the investigator's
-  `journal.go` writes for slog) or `sd_journal`, so that `kaizen log` lists its
-  warnings and errors. A level only in the text (`level=WARN`) is a fallback
-  `kaizen log` guesses at; Go's `log` writes neither.
+- A plugin's daemon or tray app logs what nothing on screen shows with a journal
+  priority: a syslog prefix on each line (`<4>`, as the investigator's
+  `journal.go` writes for slog) or `sd_journal`, so that `kaizen doctor` lists
+  its warnings and errors. A level only in the text (`level=WARN`) is a fallback
+  `kaizen doctor` guesses at; Go's `log` writes neither.
 - A plugin, and a daemon written for it, writes only under `plugins/<name>/` in
   the shell's state and cache roots (`Ui.Paths.state` or `Ui.Paths.cache` +
   `"/plugins/<name>"`; a daemon's unit sets `StateDirectory` or

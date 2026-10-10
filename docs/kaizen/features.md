@@ -40,6 +40,26 @@ What the curtain does not do, since it would stop screenshotting from working:
 - ⚠️ It never locks the machine: idle locking is paused while the curtain is up.
   Always use the real lock when leaving the machine.
 
+## Doctor (`doctor`)
+
+`kaizen doctor` reports what is wrong with the desktop that nothing on screen
+shows: the warnings and errors each `kaizen-*` unit, plugin daemons included,
+logged in its current run, a failed or restarted unit, a shell still running
+the Quickshell a rebuild replaced, a niri config that fails `niri validate`,
+and an enabled plugin the shell cannot load. A healthy desktop reports
+nothing, so every finding is something to fix. An error an application shows
+in its window or a toast stays out of it.
+
+A unit restarted by hand starts clean. With journalctl arguments
+(`kaizen doctor -b -1`, `--since -1h`) it reports that span of the journal
+instead, without the checks.
+
+The shell runs it every minute and when the panel opens. The bar shows an
+indicator while it reports anything: rose with any error, wood for warnings
+only. It opens the doctor panel, the report as text: arrows,
+PageUp/PageDown and Home/End move in it, Shift selects and Ctrl+C copies the
+selection. Refresh runs it again; Copy all copies the report.
+
 ## Firmware (`firmware`)
 
 The firmware panel lists pending firmware updates; it never installs them.
@@ -62,19 +82,6 @@ urgency. There are no notifications.
 
 [fwupd]: https://fwupd.org
 [LVFS]: https://fwupd.org/lvfs/
-
-## Log (`log`)
-
-`kaizen log` lists the warnings and errors that the `kaizen-*` units, plugin
-daemons included, logged this boot. A healthy desktop logs none, so every
-entry is something to fix. It holds what nothing on screen shows: an error an
-application shows in its window or a toast stays out of it.
-
-The bar shows an indicator while it lists anything: rose when an error is among
-the entries, wood for warnings only. It opens the log panel, newest entry
-first; Enter, Space or a click copies an entry's line, and Copy all copies
-every entry the panel holds (the latest 200). The indicator stays until the
-next boot, since the journal keeps what earlier shell instances logged.
 
 ## Notifications (`notifications`)
 
@@ -112,7 +119,7 @@ JSONC (JSON with comments). The shell reads the files of both in file-name order
 and applies an edit on save; a notification takes each setting from the first
 matching rule that has one. A relative icon path resolves against the file's
 directory. A file or rule that is invalid is dropped with a warning, which
-`kaizen log` lists.
+`kaizen doctor` lists.
 
 | File | Under | Holds |
 | --- | --- | --- |
