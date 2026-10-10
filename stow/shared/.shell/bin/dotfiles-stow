@@ -3,7 +3,8 @@
 set -e
 
 # Symlinks the stow/ tree into $HOME: shared, platform, kaizen (kaizen hosts),
-# then the optional host package. Also what home-manager activation runs.
+# then the optional host package and the stow/ trees of the host's private
+# submodules. Also what home-manager activation runs.
 # --adopt absorbs a real file that replaced a managed symlink into the repo;
 # --no-folding links files, not dirs, so other tools can write siblings.
 # dir_links are the exception: linked as whole dirs, so new files in the repo
@@ -34,4 +35,7 @@ stow_pkg stow/platform "$(uname -s)"
 [ -e /etc/kaizen ] && stow_pkg stow kaizen
 host="$(uname -n | cut -d. -f1)"
 [ -d "stow/host/$host" ] && stow_pkg stow/host "$host"
+for tree in nix/hosts/"$host"/*/stow; do
+  [ -d "$tree" ] && stow_pkg "${tree%/stow}" stow
+done
 echo "stowed"
