@@ -138,7 +138,8 @@ in
       emoji
       grim
       imagemagick # Wallpaper thumbnails.
-      jq # The clipboard watcher's JSON encoding, `kaizen focus` and `kaizen doctor`.
+      jq # The clipboard watcher's JSON encoding, `kaizen focus`, `kaizen doctor` and `kaizen dev`.
+      git # `kaizen dev` resolves a worktree by name.
       mpv
       # nm-connection-editor edits wired, static-IP and other connection settings;
       # the network panel launches it. nm-applet runs via XDG autostart for its tray menu.
