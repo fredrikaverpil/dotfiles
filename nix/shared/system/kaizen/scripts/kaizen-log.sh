@@ -2,6 +2,18 @@
 # shellcheck shell=bash
 set -euo pipefail
 
+# --json prints one {time, unit, level, message} object per line, time in
+# milliseconds since the epoch; other arguments go to journalctl.
+json=false
+args=()
+for arg in "$@"; do
+  if [[ "$arg" == --json ]]; then
+    json=true
+  else
+    args+=("$arg")
+  fi
+done
+
 # The units log at priority 6 with the level in the text: Quickshell and dcal
 # lead with it (`  WARN scene:`), other tools start with it after at most a Go
 # log timestamp and a word (`error: …`, `… systray error: …`). systemd's own
@@ -16,14 +28,22 @@ filter='
     | gsub("\u001b\\[[0-9;]*m"; "");
   def level:
     capture("^\\s*(?<l>DEBUG|INFO|WARN|ERROR|FATAL)\\b").l
-    // (select(test("^(\\d{4}/\\d\\d/\\d\\d \\d\\d:\\d\\d:\\d\\d )?(\\S+ )?(warn(ing)?|error|fatal|crit(ical)?|panic)\\b"; "i")) | "WARN")
+    // (capture("^(\\d{4}/\\d\\d/\\d\\d \\d\\d:\\d\\d:\\d\\d )?(\\S+ )?(?<l>warn(ing)?|error|fatal|crit(ical)?|panic)\\b"; "i").l
+      | ascii_upcase | if startswith("WARN") then "WARN" elif . == "ERROR" then "ERROR" else "FATAL" end)
     // "INFO";
   (.MESSAGE | text) as $m
-  | select((.PRIORITY // "6" | tonumber) <= 4 or ($m | level | IN("WARN", "ERROR", "FATAL")))
-  | (.__REALTIME_TIMESTAMP | tonumber / 1000000 | strflocaltime("%b %d %T")) + " "
-    + (.USER_UNIT // ._SYSTEMD_USER_UNIT // .SYSLOG_IDENTIFIER | sub("\\.service$"; ""))
-    + ": " + ($m | sub("^\\s+"; ""))
+  | (.PRIORITY // "6" | tonumber) as $p
+  | ($m | level) as $t
+  | (if $t == "ERROR" or $t == "FATAL" then $t elif $p <= 3 then "ERROR" elif $t == "WARN" or $p == 4 then "WARN" else null end) as $l
+  | select($l)
+  | {
+      time: (.__REALTIME_TIMESTAMP | tonumber / 1000 | floor),
+      unit: (.USER_UNIT // ._SYSTEMD_USER_UNIT // .SYSLOG_IDENTIFIER // "?" | sub("\\.service$"; "")),
+      level: $l,
+      message: ($m | sub("^\\s+"; ""))
+    }
+  | if $json then . else (.time / 1000 | strflocaltime("%b %d %T")) + " " + .unit + ": " + .message end
 '
 
-journalctl --user --unit 'kaizen-*' --boot --lines all --output json --no-pager "$@" |
-  jq --unbuffered -r "$filter"
+journalctl --user --unit 'kaizen-*' --boot --lines all --output json --no-pager "${args[@]}" |
+  jq --unbuffered -rc --argjson json "$json" "$filter"
