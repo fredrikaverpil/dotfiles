@@ -249,7 +249,9 @@ directory as private as `sourceDirs`.
 
 The window, `instructions.md` and `claude-plugin/` are in
 [`plugins/incident-investigator/`](../../../../../../stow/kaizen/.config/quickshell/plugins/incident-investigator/)
-under the shell's QML; the daemon and its Nix module are here.
+under the shell's QML, and its unit is
+[`kaizen-incident-investigator.service`](../../../../../../stow/kaizen/.config/systemd/user/kaizen-incident-investigator.service);
+the daemon and its Nix module are here.
 
 | Path                 | Holds                                 |
 | -------------------- | ------------------------------------- |
@@ -261,5 +263,5 @@ under the shell's QML; the daemon and its Nix module are here.
 | `instructions.md`    | the base instructions for every run   |
 | `claude-plugin/`     | the Claude plugin serving gopls       |
 | `investigate/`       | daemon, CLI and tray                  |
-| `home.nix`           | package, user unit                    |
+| `home.nix`           | package                               |
 | `default.nix`        | adds `home.nix` to home-manager users |

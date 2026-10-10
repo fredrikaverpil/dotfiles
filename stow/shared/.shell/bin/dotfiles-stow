@@ -4,7 +4,8 @@ set -e
 
 # Symlinks the stow/ tree into $HOME: shared, platform, kaizen (kaizen hosts),
 # then the optional host package and the stow/ trees of the host's private
-# submodules. Also what home-manager activation runs.
+# submodules, and reloads the user units on a kaizen host. Also what
+# home-manager activation runs.
 # --adopt absorbs a real file that replaced a managed symlink into the repo;
 # --no-folding links files, not dirs, so other tools can write siblings.
 # dir_links are the exception: linked as whole dirs, so new files in the repo
@@ -38,4 +39,12 @@ host="$(uname -n | cut -d. -f1)"
 for tree in nix/hosts/"$host"/*/stow; do
   [ -d "$tree" ] && stow_pkg "${tree%/stow}" stow
 done
+# Stowed user units take effect on a reload, when a user manager runs.
+if [ -e /etc/kaizen ]; then
+  export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+  if systemctl --user show-environment >/dev/null 2>&1; then
+    echo "systemctl --user daemon-reload"
+    systemctl --user daemon-reload
+  fi
+fi
 echo "stowed"

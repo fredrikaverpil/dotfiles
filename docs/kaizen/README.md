@@ -59,20 +59,22 @@ Each layer calls downward only.
 
 ## Where it lives
 
-Nix holds what needs a system module, root or the store: the two lower layers,
-the units and the packages, applied on rebuild. Stow holds files edited in
-place, live on save: the compositor config, the shell's and plugins' QML, which
-plugins run, and the notification rules.
+Nix holds what needs a system module, root or the store: the two lower layers
+and the packages, applied on rebuild. Stow holds files edited in place, live on
+save: the compositor config, the units and scripts, the shell's and plugins'
+QML, which plugins run, and the notification rules.
 
 | Part | Path | Reaches |
 | --- | --- | --- |
 | Session, system half: niri under UWSM, portals, PAM, the services the shell reads | [`nix/shared/system/kaizen/session.nix`](../../nix/shared/system/kaizen/session.nix) | every kaizen host |
-| Session, user half (home-manager): units, the packages the shell and its binds use | [`nix/shared/system/kaizen/home.nix`](../../nix/shared/system/kaizen/home.nix) | every home-manager user on a kaizen host |
-| Compositor config, the shell's QML, the core's notification rules | [`stow/kaizen/`](../../stow/kaizen/) | every kaizen host |
+| Session, user half (home-manager): the packages the shell, its binds, scripts and units use | [`nix/shared/system/kaizen/home.nix`](../../nix/shared/system/kaizen/home.nix) | every home-manager user on a kaizen host |
+| Compositor config, units and scripts, the shell's QML, the core's notification rules | [`stow/kaizen/`](../../stow/kaizen/) | every kaizen host |
 | Plugin QML: generic or reusable | [`stow/kaizen/.config/quickshell/plugins/<name>/`](../../stow/kaizen/.config/quickshell/plugins/) | every kaizen host |
 | Plugin QML: specific to one host | `stow/host/<host>/.config/quickshell/plugins/<name>/` | that host |
 | Which plugins run, with their config | `stow/host/<host>/.config/kaizen/plugins/<name>.jsonc`, or in a private submodule's `stow/` such as wily's `einride` | that host |
-| A plugin's daemon, units and packages (home-manager) | `nix/shared/system/kaizen/plugins/<name>/`, `nix/hosts/<host>/kaizen-plugins/<name>/` | the hosts importing it |
+| A plugin's unit: generic or reusable | [`stow/kaizen/.config/systemd/user/`](../../stow/kaizen/.config/systemd/user/) | every kaizen host that enables the plugin |
+| A plugin's unit: specific to one host | `stow/host/<host>/.config/systemd/user/` | that host |
+| A plugin's daemon and packages (home-manager) | `nix/shared/system/kaizen/plugins/<name>/`, `nix/hosts/<host>/kaizen-plugins/<name>/` | the hosts importing it |
 | ThinkPad hardware the shell reads (thresholds, keyd, micmute LED); not kaizen | [`nix/shared/system/thinkpad.nix`](../../nix/shared/system/thinkpad.nix) | ThinkPad hosts |
 | Hardware, sleep policy, output layout, host-only programs | `nix/hosts/<host>/`, `stow/host/<host>/` | that host |
 
@@ -84,6 +86,9 @@ plugins run, and the notification rules.
   [`stow/kaizen/`](../../stow/kaizen/) reaches every kaizen host or none, and a
   plugin's QML there loads only where a `~/.config/kaizen/plugins/<name>.jsonc`
   enables it.
+- A `.wants/` link beside a unit enables it, and `dotfiles-stow` reloads the
+  user manager. A unit runs a packaged program through `/usr/bin/env`, from the
+  session PATH, and a script from `%h/.local/bin/`.
 - The shell reads its emoji data from `kaizen/emoji.json` in the XDG data dirs,
   which Nix builds with
   [`kaizen-emoji`](../../stow/kaizen/.local/bin/kaizen-emoji).
@@ -313,9 +318,11 @@ nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
    [`modules/panels/`](../../stow/kaizen/.config/quickshell/modules/panels/),
    both wired in [`shell.qml`](../../stow/kaizen/.config/quickshell/shell.qml);
    a protocol-driven surface with no other consumer of its state (lock,
-   notifications, polkit) keeps both in `modules/<name>/`. Packages and units →
+   notifications, polkit) keeps both in `modules/<name>/`. Packages →
    [`home.nix`](../../nix/shared/system/kaizen/home.nix) (even a package
-   another scope also installs), system services and PAM →
+   another scope also installs), units and scripts →
+   [`systemd/user/`](../../stow/kaizen/.config/systemd/user/) and
+   [`.local/bin/`](../../stow/kaizen/.local/bin/), system services and PAM →
    [`session.nix`](../../nix/shared/system/kaizen/session.nix), compositor →
    [`Ui/compositors/`](../../stow/kaizen/.config/quickshell/Ui/compositors/) and
    [`niri/config.kdl`](../../stow/kaizen/.config/niri/config.kdl), IPC target

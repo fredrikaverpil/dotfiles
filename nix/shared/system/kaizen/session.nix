@@ -1,8 +1,8 @@
 { pkgs, ... }:
 # The kaizen session every kaizen host shares, system half: niri under UWSM,
 # portals, PAM, and the services the shell reads. home.nix holds the user half
-# (the shell's units, its data and the packages it runs), added here to every
-# home-manager user. Compositor config and QML live in stow/kaizen/.
+# (the packages and data the shell runs), added here to every home-manager user.
+# Units, scripts, compositor config and QML live in stow/kaizen/.
 {
   imports = [ ../fonts.nix ];
 

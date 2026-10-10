@@ -20,7 +20,7 @@ if [ -e /etc/kaizen ]; then
     # The shell and its companions are enabled into wayland-session@niri.target,
     # so masking is the only way to keep them out of a session. `systemctl --user
     # mask --runtime` writes to $XDG_RUNTIME_DIR/systemd/user, which ranks below
-    # the ~/.config/systemd/user units home-manager installs and is therefore
+    # the ~/.config/systemd/user units Stow installs and is therefore
     # ignored; user.control outranks them. Both live in /run, so a reboot clears the mask.
     # Usage: kaizen_units mask|unmask
     function kaizen_units() {

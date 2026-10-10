@@ -1,0 +1,20 @@
+# Bound to the niri session so another desktop cannot start a second shell.
+[Unit]
+Description=Quickshell desktop shell
+PartOf=graphical-session.target
+# Never order after graphical-session.target: that creates a systemd cycle.
+# waitenv closes niri's readiness-before-WAYLAND_DISPLAY race.
+After=wayland-wm@niri.service wayland-session-waitenv.service
+
+[Service]
+# systemd looks a bare name up only in its built-in path, which NixOS leaves
+# empty; env searches the session PATH that UWSM imports. Launcher entries and
+# uwsm-app need that PATH too.
+ExecStart=/usr/bin/env quickshell
+Restart=on-failure
+# Creates ~/.local/state/kaizen-shell before ExecStart: for user units
+# StateDirectory resolves under $XDG_STATE_HOME.
+StateDirectory=kaizen-shell
+
+[Install]
+WantedBy=wayland-session@niri.target

@@ -20,17 +20,23 @@ reaches, is in [`README.md`](README.md) › Where it lives.
   `~/.config/kaizen/plugins/<name>.jsonc`, in name order, and picks up a file
   added or removed. The file holds the plugin's config in JSONC, `{}` when it
   has none. Plugin QML imports `../../Ui`, as the core's does.
-- A plugin that needs a unit or a package has a Nix module, a home-manager
-  module, `home.nix`, so it runs wherever the core's `home.nix` does.
-  `default.nix` is what a host imports: it adds `home.nix` to the host's
-  home-manager users, and holds any part that needs NixOS.
+- A plugin that needs a package has a Nix module, a home-manager module,
+  `home.nix`, so it runs wherever the core's `home.nix` does. `default.nix` is
+  what a host imports: it adds `home.nix` to the host's home-manager users, and
+  holds any part that needs NixOS.
+- A plugin's unit is a file under Stow, enabled by a link in
+  `wayland-session@niri.target.wants/`. A generic plugin's lives in
+  [`stow/kaizen/`](../../stow/kaizen/.config/systemd/user/) with
+  `ConditionPathExists=%h/.config/kaizen/plugins/<name>.jsonc`, so it runs only
+  where the plugin is enabled; a host-only one in `stow/host/<host>/`.
 - A host's notification rules may add buttons that run the plugin's commands
   on another app's notifications: [`features.md`](features.md) ›
   Notifications › Rules.
 - Plugin code runs in the shell as QML/JS. It needs a process of its own only
   for a tray item or for work that must outlive a shell reload, as below.
 - A plugin that needs a long-running backend brings its own daemon: its module
-  adds the unit, and its QML queries the daemon's IPC. The calendar
+  installs it, its unit runs it, and its QML queries the daemon's IPC. The
+  calendar
   ([`nix/shared/system/kaizen/plugins/calendar/`](../../nix/shared/system/kaizen/plugins/calendar/))
   does this with [dcal]. The incident investigator
   ([`nix/shared/system/kaizen/plugins/incident-investigator/`](../../nix/shared/system/kaizen/plugins/incident-investigator/))
@@ -55,8 +61,8 @@ reaches, is in [`README.md`](README.md) › Where it lives.
 - Quickshell watches only the files `shell.qml` imports, not plugins: apply an
   edit with `qs ipc call shell reload`. `qml-lint` and `qml-test` cover
   `plugins/`; a host's plugin, outside `stow/kaizen/`, is checked by neither. A
-  tray plugin's user unit starts with the session when its module sets
-  `autostart`.
+  tray plugin's user unit starts with the session when a `.wants/` link
+  enables it.
 
 [dcal]: https://github.com/AvengeMedia/dankcalendar
 [StatusNotifierItem]: https://www.freedesktop.org/wiki/Specifications/StatusNotifierItem/

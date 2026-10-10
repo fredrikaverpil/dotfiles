@@ -48,8 +48,10 @@ upstream's latest, and niri marks each option with the version it arrived in
 
 ## Gotchas
 
-- Nix comments carry the "why" for packages, portals, PAM, units and hardware
-  integration. Read `nix/shared/system/kaizen/session.nix` and `home.nix`,
+- Nix comments carry the "why" for packages, portals, PAM and hardware
+  integration, and the units' comments for the units. Read
+  `nix/shared/system/kaizen/session.nix` and `home.nix`,
+  `stow/kaizen/.config/systemd/user/`,
   `nix/shared/system/linux-desktop.nix` and `nix/shared/system/thinkpad.nix`,
   plus the host's `configuration.nix`, before asking.
 - SSH keys come from the Proton Pass app's agent (`SSH_AUTH_SOCK` in
@@ -263,8 +265,9 @@ qs ipc call idle disable
 qs ipc call lock isLocked
 ```
 
-New/moved files need `dotfiles-stow`; never create Stow links manually or run
-`git clean -fd` in the host clone.
+New/moved files need `dotfiles-stow`, which also reloads the user manager; an
+edited unit needs `systemctl --user daemon-reload`. Never create Stow links
+manually or run `git clean -fd` in the host clone.
 
 When working from another host, sync the checkout before live validation or a
 user-run rebuild, which evaluates the host's clone. Checksums avoid replacing
