@@ -142,7 +142,8 @@ each enabled plugin's `plugins/<name>/requires`. It cannot check:
 ## Services to surfaces
 
 Every service wraps one subsystem and feeds the surfaces below. IPC target is
-`kaizen ipc call <target> ...`.
+`kaizen ipc call <target> ...`, which reaches the process `kaizen-shell.service`
+runs.
 
 | Service | Subsystem | Bar | Panel / launcher | IPC |
 | --- | --- | --- | --- | --- |

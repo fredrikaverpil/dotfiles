@@ -9,12 +9,26 @@ case "${1:-}" in
   ;;
 esac
 
-# Anything but show is qs ipc's own, run against the kaizen config.
-if [[ ${1:-} != show ]]; then
-  exec qs ipc -c kaizen "$@"
+# Selects the unit's process, whatever tree it runs and on any display. qs
+# refuses config selection beside --pid.
+pid=$(systemctl --user show kaizen-shell.service -p MainPID --value)
+if [[ ${pid:-0} == 0 ]]; then
+  echo "kaizen-shell is not running" >&2
+  exit 1
+fi
+unset QS_CONFIG_NAME QS_CONFIG_PATH QS_MANIFEST
+
+# For an investigate built before it stopped passing --any-display.
+if [[ ${1:-} == --any-display ]]; then
+  shift
 fi
 
-qs ipc -c kaizen show |
+# Anything but show is qs ipc's own.
+if [[ ${1:-} != show ]]; then
+  exec qs ipc --pid "$pid" "$@"
+fi
+
+qs ipc --pid "$pid" show |
   awk -v t="${2:-}" '/^target /{n=$2} t=="" || n==t {print n "\t" $0}' |
   sort -s -t "$(printf '\t')" -k1,1 |
   cut -f2-

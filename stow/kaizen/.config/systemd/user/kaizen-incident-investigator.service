@@ -9,10 +9,8 @@ PartOf=graphical-session.target
 After=kaizen-shell.service kaizen-tray-ready.service
 
 [Service]
-# -dir and QS_CONFIG_NAME repeat investigate's defaults, for a build that
-# predates them.
+# -dir repeats investigate's default, for a build that predates it.
 ExecStart=/usr/bin/env investigate serve -dir %h/.config/quickshell/kaizen/plugins/incident-investigator
-Environment=QS_CONFIG_NAME=kaizen
 # $STATE_DIRECTORY; transcripts hold the logs and code runs read.
 StateDirectory=kaizen-shell/plugins/incident-investigator
 StateDirectoryMode=0700
