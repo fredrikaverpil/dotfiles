@@ -3,6 +3,7 @@ package state
 import (
 	"errors"
 	"testing"
+	"time"
 
 	"gotest.tools/v3/assert"
 )
@@ -57,11 +58,21 @@ func TestParseJournal(t *testing.T) {
 		},
 		{
 			name: "string and byte array",
-			out: `{"MESSAGE":"Stopping Quickshell desktop shell...","PRIORITY":"6","_PID":"1"}` + "\n" +
+			out: `{"MESSAGE":"Stopping Quickshell desktop shell...","PRIORITY":"6","_PID":"1",` +
+				`"__REALTIME_TIMESTAMP":"1791715805123456","SYSLOG_IDENTIFIER":"systemd",` +
+				`"USER_UNIT":"kaizen-shell.service","_SYSTEMD_USER_UNIT":"init.scope"}` + "\n" +
 				// "\x1b[33m  WARN\x1b[0m: x".
 				`{"MESSAGE":[27,91,51,51,109,32,32,87,65,82,78,27,91,48,109,58,32,120],"PRIORITY":"6"}` + "\n",
 			want: []Entry{
-				{Message: "Stopping Quickshell desktop shell...", Priority: 6},
+				{
+					Message:     "Stopping Quickshell desktop shell...",
+					Priority:    6,
+					Time:        time.UnixMicro(1791715805123456),
+					PID:         "1",
+					Identifier:  "systemd",
+					UserUnit:    "kaizen-shell.service",
+					ProcessUnit: "init.scope",
+				},
 				{Message: "  WARN: x", Priority: 6},
 			},
 		},
@@ -76,13 +87,18 @@ func TestParseJournal(t *testing.T) {
 			wantErr: `PRIORITY: strconv.Atoi: parsing "high": invalid syntax`,
 		},
 		{
+			name:    "invalid time",
+			out:     `{"MESSAGE":"x","__REALTIME_TIMESTAMP":"now"}` + "\n",
+			wantErr: `__REALTIME_TIMESTAMP: strconv.ParseInt: parsing "now": invalid syntax`,
+		},
+		{
 			name:    "invalid JSON",
 			out:     `{"MESSAGE":` + "\n",
 			wantErr: `jsontext: unexpected EOF within "/MESSAGE" after offset 12`,
 		},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := parseJournal([]byte(tt.out))
+			got, err := ParseJournal([]byte(tt.out))
 			if tt.wantErr != "" {
 				assert.Error(t, err, tt.wantErr)
 				return

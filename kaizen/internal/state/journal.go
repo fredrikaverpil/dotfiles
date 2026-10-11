@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // colour matches a terminal colour sequence, which Quickshell writes around
@@ -20,13 +21,23 @@ var colour = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 // level matches the level Quickshell writes at the start of a message.
 var level = regexp.MustCompile(`^\s*(DEBUG|INFO|WARN|ERROR|FATAL)\b`)
 
-// Entry is a journal entry about the shell's unit: Quickshell's, or systemd's
-// about the unit.
+// Entry is a journal entry about a unit: its process's, or systemd's about the
+// unit.
 type Entry struct {
 	// Message is the entry's text without terminal colours.
 	Message string
 	// Priority is the entry's syslog priority.
 	Priority int
+	// Time is when it was logged.
+	Time time.Time
+	// PID is the process that logged it.
+	PID string
+	// Identifier is its syslog identifier: the program, or systemd.
+	Identifier string
+	// UserUnit is the unit systemd's entry is about.
+	UserUnit string
+	// ProcessUnit is the user unit of the process that logged it.
+	ProcessUnit string
 }
 
 // Level returns the entry's level: DEBUG, INFO, WARN, ERROR or FATAL.
@@ -90,21 +101,26 @@ func Journal(ctx context.Context, r Runner, cursor string) ([]Entry, error) {
 	if err != nil {
 		return nil, fmt.Errorf("journalctl: %v", err)
 	}
-	entries, err := parseJournal(out)
+	entries, err := ParseJournal(out)
 	if err != nil {
 		return nil, fmt.Errorf("journalctl: %v", err)
 	}
 	return entries, nil
 }
 
-// parseJournal parses journalctl's JSON output, one object per entry.
-func parseJournal(out []byte) ([]Entry, error) {
+// ParseJournal parses journalctl's JSON output, one object per entry.
+func ParseJournal(out []byte) ([]Entry, error) {
 	var entries []Entry
 	dec := jsontext.NewDecoder(bytes.NewReader(out))
 	for {
 		var raw struct {
-			Message  jsontext.Value `json:"MESSAGE"`
-			Priority string         `json:"PRIORITY"`
+			Message     jsontext.Value `json:"MESSAGE"`
+			Priority    string         `json:"PRIORITY"`
+			Time        string         `json:"__REALTIME_TIMESTAMP"`
+			PID         string         `json:"_PID"`
+			Identifier  string         `json:"SYSLOG_IDENTIFIER"`
+			UserUnit    string         `json:"USER_UNIT"`
+			ProcessUnit string         `json:"_SYSTEMD_USER_UNIT"`
 		}
 		err := json.UnmarshalDecode(dec, &raw)
 		if errors.Is(err, io.EOF) {
@@ -117,11 +133,25 @@ func parseJournal(out []byte) ([]Entry, error) {
 		if err != nil {
 			return nil, err
 		}
-		entry := Entry{Message: colour.ReplaceAllString(message, ""), Priority: 6}
+		entry := Entry{
+			Message:     colour.ReplaceAllString(message, ""),
+			Priority:    6,
+			PID:         raw.PID,
+			Identifier:  raw.Identifier,
+			UserUnit:    raw.UserUnit,
+			ProcessUnit: raw.ProcessUnit,
+		}
 		if raw.Priority != "" {
 			if entry.Priority, err = strconv.Atoi(raw.Priority); err != nil {
 				return nil, fmt.Errorf("PRIORITY: %v", err)
 			}
+		}
+		if raw.Time != "" {
+			usec, err := strconv.ParseInt(raw.Time, 10, 64)
+			if err != nil {
+				return nil, fmt.Errorf("__REALTIME_TIMESTAMP: %v", err)
+			}
+			entry.Time = time.UnixMicro(usec)
 		}
 		entries = append(entries, entry)
 	}

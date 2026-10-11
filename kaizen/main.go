@@ -14,6 +14,7 @@ import (
 
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/cli"
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/dev"
+	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/doctor"
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/reload"
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/shot"
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/status"
@@ -44,6 +45,7 @@ func main() {
 				Main:       filepath.Join(home, ".dotfiles"),
 				RuntimeDir: os.Getenv("XDG_RUNTIME_DIR"),
 			},
+			doctor.Command{Runner: state.Exec{}, Home: home, Getenv: os.Getenv},
 			reload.Command{Runner: state.Exec{}},
 			shot.Command{Runner: state.Exec{}, CacheDir: cache},
 			status.Command{Runner: state.Exec{}},
