@@ -185,6 +185,9 @@ ShellRoot {
         function reload(): void {
             Quickshell.reload(false);
         }
+        function barHeight(): int {
+            return root.barHeight;
+        }
     }
 
     function registerPanel(panel) {

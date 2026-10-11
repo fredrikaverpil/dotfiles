@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+set -euo pipefail
+
+case "${1:-}" in
+-h | --help)
+  echo "usage: kaizen shot [--bar | WxH+X+Y] [--full] [-o FILE] [OUTPUT]    capture an output for verification, scaled to 1600 px unless --full; prints the file"
+  exit 0
+  ;;
+esac
+
+# The longest edge of a capture, so a 4K output costs no more to read than a
+# laptop panel. A region at --full is the way to inspect pixels.
+max_edge=1600
+
+bar=false
+full=false
+region=""
+file=""
+output=""
+while (($#)); do
+  case $1 in
+  --bar) bar=true ;;
+  --full) full=true ;;
+  -o)
+    file=${2:?kaizen shot: -o needs a file}
+    shift
+    ;;
+  -*)
+    echo "kaizen shot: unknown option: $1" >&2
+    exit 2
+    ;;
+  *)
+    if [[ $1 =~ ^[0-9]+x[0-9]+\+[0-9]+\+[0-9]+$ ]]; then
+      region=$1
+    else
+      output=$1
+    fi
+    ;;
+  esac
+  shift
+done
+
+if $bar && [[ -n $region ]]; then
+  echo "kaizen shot: --bar and a region exclude each other" >&2
+  exit 2
+fi
+
+outputs=$(niri msg -j outputs)
+names=$(jq -r '[.[].name] | sort | .[]' <<<"$outputs")
+focused=$(niri msg -j focused-output | jq -r '.name // empty')
+# An open panel, menu or launcher holds exclusive keyboard focus on its output.
+open=$(niri msg -j layers | jq -r '[.[] | select(.keyboard_interactivity == "Exclusive") | .output] | unique | .[]')
+
+# The focused output follows the user, not the surface under test, so it is
+# never the default: one output, or the one output holding an open surface.
+if [[ -z $output ]]; then
+  if [[ $(wc -l <<<"$names") -eq 1 ]]; then
+    output=$names
+  elif [[ -n $open && $(wc -l <<<"$open") -eq 1 ]]; then
+    output=$open
+  fi
+fi
+
+if [[ -z $output ]] || ! grep -qxF "$output" <<<"$names"; then
+  if [[ -n $output ]]; then
+    echo "kaizen shot: no output named $output; the outputs are:" >&2
+  else
+    echo "kaizen shot: pass the output to capture:" >&2
+  fi
+  while read -r name; do
+    notes=""
+    [[ $name == "$focused" ]] && notes+=" focused"
+    grep -qxF "$name" <<<"$open" && notes+=" open surface"
+    echo "  $name${notes:+ (${notes# })}" >&2
+  done <<<"$names"
+  exit 2
+fi
+
+if [[ $(kaizen ipc call lock isLocked 2>/dev/null || true) == true ]]; then
+  echo "kaizen shot: the session is locked" >&2
+  exit 1
+fi
+
+# grim cannot capture an output through the curtain. Lift it for the capture
+# and put it back, whatever the capture does.
+active=$(kaizen ipc call curtain status 2>/dev/null | jq -r '.active // false' || echo false)
+if [[ $active == true ]]; then
+  kaizen ipc call curtain close >/dev/null
+  trap 'kaizen ipc call curtain open >/dev/null 2>&1 || true' EXIT
+  # The surface leaves with the next frame, which `status` does not show.
+  for _ in $(seq 25); do
+    niri msg -j layers | jq -e 'any(.[]; .namespace == "kaizen-curtain") | not' >/dev/null && break
+    sleep 0.1
+  done
+fi
+
+# x y width height, in the output's logical pixels.
+read -r ox oy ow oh < <(jq -r --arg o "$output" \
+  '.[] | select(.name == $o) | .logical | "\(.x) \(.y) \(.width) \(.height)"' <<<"$outputs")
+suffix=""
+if $bar; then
+  # The bar is anchored to the top of each output; niri reports no layer
+  # geometry, so take its height from the shell.
+  height=$(kaizen ipc call shell barHeight)
+  if [[ ! $height =~ ^[0-9]+$ ]]; then
+    echo "kaizen shot: the shell did not report the bar's height: $height" >&2
+    exit 1
+  fi
+  w=$ow h=$height x=0 y=0
+  suffix="-bar"
+elif [[ -n $region ]]; then
+  IFS='x+' read -r w h x y <<<"$region"
+  if ((x + w > ow || y + h > oh)); then
+    echo "kaizen shot: $region is outside $output, which is ${ow}x${oh}" >&2
+    exit 2
+  fi
+  suffix="-region"
+else
+  w=$ow h=$oh x=0 y=0
+fi
+
+# grim's -s sets pixels per logical pixel.
+args=(-g "$((ox + x)),$((oy + y)) ${w}x${h}")
+size="${w}x${h}"
+if ! $full && ((w > max_edge || h > max_edge)); then
+  # Rounded up, since grim truncates the scaled size.
+  factor=$(awk -v m="$max_edge" -v w="$w" -v h="$h" 'BEGIN { e = (w > h ? w : h); printf "%.6f", m / e + 0.0000005 }')
+  args+=(-s "$factor")
+  size=$(awk -v f="$factor" -v w="$w" -v h="$h" 'BEGIN { printf "%dx%d", w * f, h * f }')
+fi
+
+if [[ -z $file ]]; then
+  # Disposable, so aged out after a day instead of README's 30.
+  dir="${XDG_CACHE_HOME:-$HOME/.cache}/kaizen-shell/shots"
+  mkdir -p "$dir"
+  find "$dir" -name 'shot-*.png' -mmin +1440 -delete
+  file="$dir/shot-$output$suffix-$(date +%Y%m%dT%H%M%S).png"
+fi
+
+# DPMS-off leaves no frames to capture, and grim then waits for ever.
+timeout 10 grim "${args[@]}" "$file"
+echo "kaizen shot: captured $output${suffix} at $size" >&2
+echo "$file"
