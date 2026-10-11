@@ -21,9 +21,19 @@ itself, sometimes over SSH. Every part is reachable: `kaizen ipc` queries and
 drives shell services and panels, `niri msg` the compositor,
 `systemctl --user` the units, `grim` and the recording service capture what is
 on screen, and `wtype` and `wlrctl` take over the keyboard and the pointer to
-press keys, point and click. `kaizen --json` lists every kaizen command with
-its usage and summary. Use them to verify your own work; what they cannot prove
-is listed under "Required local validation".
+press keys, point and click. Use them to verify your own work; what they cannot
+prove is listed under "Required local validation".
+
+Each `kaizen` command carries a rule the raw tool leaves to you:
+
+| To | Use | Not |
+| --- | --- | --- |
+| Query or drive a shell service or panel | `kaizen ipc` | `qs ipc`, which needs the unit's PID |
+| Learn whether the desktop is healthy | `kaizen doctor` | `journalctl -p warning`, which misses Quickshell's log level |
+| See a worktree's QML live | `kaizen dev` | editing main's tree |
+| Restart the shell | `kaizen restart` | `systemctl --user restart`, which restarts while locked |
+| Focus an app or open it | `kaizen focus` | `niri msg action focus-window`, which needs the window id and never opens the app |
+| List the commands | `kaizen --json` | `ls ~/.local/libexec/kaizen`, which lists none of the usage |
 
 ## Versions
 
