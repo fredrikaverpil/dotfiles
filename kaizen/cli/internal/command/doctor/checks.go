@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/fredrikaverpil/dotfiles/kaizen/internal/state"
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/state"
 )
 
 // tracing matches niri's tracing lines, which precede `niri validate`'s report.

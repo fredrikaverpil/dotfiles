@@ -17,7 +17,7 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/fredrikaverpil/dotfiles/kaizen/internal/state"
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/state"
 )
 
 // The units log at priority 6 with the level in the text: Quickshell and dcal

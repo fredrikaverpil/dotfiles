@@ -1,4 +1,4 @@
-module github.com/fredrikaverpil/dotfiles/kaizen
+module github.com/fredrikaverpil/dotfiles/kaizen/cli
 
 go 1.27.1
 

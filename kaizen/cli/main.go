@@ -12,14 +12,14 @@ import (
 	"runtime/debug"
 	"syscall"
 
-	"github.com/fredrikaverpil/dotfiles/kaizen/internal/cli"
-	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/dev"
-	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/doctor"
-	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/keys"
-	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/reload"
-	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/shot"
-	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/status"
-	"github.com/fredrikaverpil/dotfiles/kaizen/internal/state"
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/cli"
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/dev"
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/doctor"
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/keys"
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/reload"
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/shot"
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/status"
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/state"
 )
 
 func main() {

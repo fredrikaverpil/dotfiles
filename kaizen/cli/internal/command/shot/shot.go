@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fredrikaverpil/dotfiles/kaizen/internal/state"
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/state"
 )
 
 // maxEdge is the longest edge of a capture, so a 4K output costs no more to

@@ -10,7 +10,7 @@ import (
 	"io"
 	"strconv"
 
-	"github.com/fredrikaverpil/dotfiles/kaizen/internal/state"
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/state"
 )
 
 // Command prints the shell's state.
