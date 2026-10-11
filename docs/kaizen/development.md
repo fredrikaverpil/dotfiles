@@ -81,7 +81,11 @@ upstream's latest, and niri marks each option with the version it arrived in
   It carries only what you pass, so copy the summary and body from a captured
   one.
 - User units are named `kaizen-<name>`, plugin daemons included
-  (`kaizen-dcal`).- Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
+  (`kaizen-dcal`).
+- A bind, unit or script that may run while the shell restarts calls
+  `kaizen ipc -q call ...`: silent, and exit 0 when the shell is down or the
+  call fails. Without `-q` the call exits 1 with a message.
+- Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Niri KDL booleans are presence-only, not `option true`.
 - Use `keyNavigation` for ordinary focus chains; use a panel-managed cursor
   where it cannot represent a control, such as a slider.

@@ -14,6 +14,9 @@ kaizen ipc show <target>
 
 # call a target's ipc function
 kaizen ipc call <target> <function> [args...]
+
+# same, silent and exit 0 when the shell is down or the call fails
+kaizen ipc -q call <target> <function> [args...]
 ```
 
 The below sections correspond to an IPC target (e.g. Curtain correlates to

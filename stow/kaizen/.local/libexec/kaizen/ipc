@@ -4,22 +4,35 @@ set -euo pipefail
 
 case "${1:-}" in
 -h | --help)
-  echo "usage: kaizen ipc show [TARGET] | call TARGET FN [ARGS...]    list the shell's IPC functions by target, or call one"
+  echo "usage: kaizen ipc [-q] show [TARGET] | call TARGET FN [ARGS...]    list the shell's IPC functions by target, or call one; -q is silent and succeeds when it cannot"
   exit 0
   ;;
 esac
+
+# -q is for binds and units that can run while the shell restarts.
+quiet=false
+if [[ ${1:-} == -q ]]; then
+  quiet=true
+  shift
+  exec >/dev/null 2>&1
+fi
 
 # Selects the unit's process, whatever tree it runs and on any display. qs
 # refuses config selection beside --pid.
 pid=$(systemctl --user show kaizen-shell.service -p MainPID --value)
 if [[ ${pid:-0} == 0 ]]; then
   echo "kaizen-shell is not running" >&2
+  $quiet && exit 0
   exit 1
 fi
 unset QS_CONFIG_NAME QS_CONFIG_PATH QS_MANIFEST
 
 # Anything but show is qs ipc's own.
 if [[ ${1:-} != show ]]; then
+  if $quiet; then
+    qs ipc --pid "$pid" "$@" || true
+    exit 0
+  fi
   exec qs ipc --pid "$pid" "$@"
 fi
 
