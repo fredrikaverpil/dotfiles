@@ -129,7 +129,7 @@ QML, which plugins run, and the notification rules.
 The distro supplies what
 [the core's Nix module](nix/default.nix) and each
 enabled plugin's do on NixOS. `kaizen doctor` reports each program, D-Bus
-service, file and session variable missing from
+service, file, session variable and font missing from
 [`requires`](stow/.config/quickshell/kaizen/requires) and from
 each enabled plugin's `plugins/<name>/requires`. It cannot check:
 
@@ -144,7 +144,8 @@ each enabled plugin's `plugins/<name>/requires`. It cannot check:
   curtain.
 - An empty `/etc/kaizen`: `stow.sh` stows [`kaizen/stow/`](stow/)
   only where it exists.
-- The fonts in [`fonts.nix`](nix/fonts.nix).
+- The fonts in [`fonts.nix`](nix/fonts.nix) the shell does not name, and its
+  fontconfig rules.
 - Quickshell with qtimageformats for WebP and the
   [overlay's patch](nix/default.nix) (without it, every
   Quickshell start logs a host portal warning `kaizen doctor` reports), and
