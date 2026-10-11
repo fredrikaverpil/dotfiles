@@ -21,8 +21,9 @@ itself, sometimes over SSH. Every part is reachable: `kaizen ipc` queries and
 drives shell services and panels, `niri msg` the compositor,
 `systemctl --user` the units, `grim` and the recording service capture what is
 on screen, and `wtype` and `wlrctl` take over the keyboard and the pointer to
-press keys, point and click. Use them to verify your own work; what they cannot
-prove is listed under "Required local validation".
+press keys, point and click. `kaizen --json` lists every kaizen command with
+its usage and summary. Use them to verify your own work; what they cannot prove
+is listed under "Required local validation".
 
 ## Versions
 
@@ -80,8 +81,7 @@ upstream's latest, and niri marks each option with the version it arrived in
   It carries only what you pass, so copy the summary and body from a captured
   one.
 - User units are named `kaizen-<name>`, plugin daemons included
-  (`kaizen-dcal`).
-- Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
+  (`kaizen-dcal`).- Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Niri KDL booleans are presence-only, not `option true`.
 - Use `keyNavigation` for ordinary focus chains; use a panel-managed cursor
   where it cannot represent a control, such as a slider.

@@ -8,15 +8,28 @@ dir="$HOME/.local/libexec/kaizen"
 
 usage() {
   local sub
-  echo "usage: kaizen COMMAND [ARGS...]"
+  echo "usage: kaizen COMMAND [ARGS...] | kaizen --json"
   for sub in "$dir"/*; do
     "$sub" -h | awk -F '    ' '{ sub(/^usage: /, "", $1); printf "  %-45s %s\n", $1, $2 }'
   done
 }
 
+# [{ name, usage, summary }] for each command.
+catalogue() {
+  local sub
+  for sub in "$dir"/*; do
+    "$sub" -h
+  done | jq -Rn '[inputs | sub("^usage: "; "") | split("    ") |
+    { name: (.[0] | split(" ")[1]), usage: .[0], summary: .[1] }]'
+}
+
 case "${1:-}" in
 "" | -h | --help)
   usage
+  exit 0
+  ;;
+--json)
+  catalogue
   exit 0
   ;;
 esac
