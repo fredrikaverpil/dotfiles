@@ -24,6 +24,9 @@ file /etc/kaizen
 file /etc/pam.d/kaizen-lock
 bus system org.freedesktop.login1
 bus session org.freedesktop.portal.Desktop
+# The portal's GNOME (screencast, file chooser) and GTK backends.
+data xdg-desktop-portal/portals/gnome.portal
+data xdg-desktop-portal/portals/gtk.portal
 env NIXOS_OZONE_WL=1
 env QT_QPA_PLATFORMTHEME=gtk3
 env GTK_USE_PORTAL=1
@@ -31,6 +34,8 @@ env GTK_USE_PORTAL=1
 # Desktop
 cmd ghostty
 cmd xdg-terminal-exec
+# Names ghostty as xdg-terminal-exec's default.
+file /etc/xdg/xdg-terminals.list
 cmd xdg-open
 cmd notify-send
 cmd wl-copy

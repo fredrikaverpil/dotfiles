@@ -131,6 +131,7 @@ func (c Command) check(ctx context.Context, units []unit) []check {
 	}
 	k.kaizens(ctx)
 	k.niri(ctx)
+	k.portal(ctx)
 	// kaizen dev's drop-in runs a worktree's tree, whose requires and plugins
 	// count.
 	tree := filepath.Join(k.configDir(), "quickshell", "kaizen")
@@ -335,6 +336,22 @@ func (k *checker) niri(ctx context.Context) {
 		}
 	}
 	k.add(check{name: "niri-config", level: "ERROR", unit: "niri", message: "niri validate:\n" + strings.Join(lines, "\n")})
+}
+
+// portal warns when the portal does not answer the colour scheme, which GTK
+// and Qt read through it.
+func (k *checker) portal(ctx context.Context) {
+	_, err := run(ctx, k.Runner, "busctl", "--user", "--timeout=5", "call", "org.freedesktop.portal.Desktop",
+		"/org/freedesktop/portal/desktop", "org.freedesktop.portal.Settings", "ReadOne", "ss",
+		"org.freedesktop.appearance", "color-scheme")
+	if err != nil {
+		k.add(check{
+			name:    "portal",
+			level:   "WARN",
+			unit:    "xdg-desktop-portal",
+			message: fmt.Sprintf("cannot read the colour scheme: %v", err),
+		})
+	}
 }
 
 // devTree returns the tree kaizen dev's drop-in among dropInPaths runs, or ""

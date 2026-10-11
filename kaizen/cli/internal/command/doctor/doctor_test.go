@@ -46,8 +46,10 @@ func (s *seqRunner) Run(_ context.Context, name string, args ...string) ([]byte,
 }
 
 const (
-	showLine  = "systemctl --user show kaizen-* -p Id -p InvocationID -p NRestarts -p ActiveState -p Result -p MainPID -p DropInPaths"
-	niriLine  = "env NO_COLOR=1 niri validate"
+	showLine   = "systemctl --user show kaizen-* -p Id -p InvocationID -p NRestarts -p ActiveState -p Result -p MainPID -p DropInPaths"
+	niriLine   = "env NO_COLOR=1 niri validate"
+	portalLine = "busctl --user --timeout=5 call org.freedesktop.portal.Desktop /org/freedesktop/portal/desktop " +
+		"org.freedesktop.portal.Settings ReadOne ss org.freedesktop.appearance color-scheme"
 	runsLine  = "journalctl --user --lines all --output json --no-pager"
 	bootLine  = "journalctl --user --unit kaizen-* --boot --lines all --output json --no-pager"
 	userBus   = "busctl --user list --no-legend"
@@ -162,8 +164,9 @@ func TestRun(t *testing.T) {
 			files: map[string]string{coreRequires: ""},
 			execs: []string{"bin/kaizen"},
 			outputs: map[string][]recorded{
-				showLine: {{Stdout: shellRunning + "\n" + unitBlock("kaizen-dcal.service", "bbb", "active", "success", "77", "0", "")}},
-				niriLine: {{}},
+				showLine:   {{Stdout: shellRunning + "\n" + unitBlock("kaizen-dcal.service", "bbb", "active", "success", "77", "0", "")}},
+				niriLine:   {{}},
+				portalLine: {{}},
 				runsLine + " _SYSTEMD_INVOCATION_ID=aaa + USER_INVOCATION_ID=aaa + _SYSTEMD_INVOCATION_ID=bbb + USER_INVOCATION_ID=bbb": {
 					{},
 				},
@@ -172,7 +175,7 @@ func TestRun(t *testing.T) {
 				Stdout: `{"findings":[],"text":"No errors or warnings"}` + "\n",
 				Calls: []string{
 					showLine,
-					niriLine,
+					niriLine, portalLine,
 					runsLine + " _SYSTEMD_INVOCATION_ID=aaa + USER_INVOCATION_ID=aaa + _SYSTEMD_INVOCATION_ID=bbb + USER_INVOCATION_ID=bbb",
 				},
 			},
@@ -188,7 +191,8 @@ func TestRun(t *testing.T) {
 				}, "\n")}},
 				restartsLine("kaizen-dcal.service", 1):                  {{}},
 				restartsLine("kaizen-incident-investigator.service", 2): {{Err: errors.New("exit status 1")}},
-				niriLine: {{}},
+				niriLine:   {{}},
+				portalLine: {{}},
 				runsLine + " _SYSTEMD_INVOCATION_ID=aaa + USER_INVOCATION_ID=aaa + _SYSTEMD_INVOCATION_ID=ccc + USER_INVOCATION_ID=ccc": {
 					{Stdout: logLine(5, binding) + logLine(65, binding) +
 						logLine(70, map[string]string{
@@ -242,7 +246,7 @@ func TestRun(t *testing.T) {
 					showLine,
 					restartsLine("kaizen-dcal.service", 1),
 					restartsLine("kaizen-incident-investigator.service", 2),
-					niriLine,
+					niriLine, portalLine,
 					runsLine + " _SYSTEMD_INVOCATION_ID=aaa + USER_INVOCATION_ID=aaa + _SYSTEMD_INVOCATION_ID=ccc + USER_INVOCATION_ID=ccc",
 				},
 			},
@@ -270,7 +274,8 @@ func TestRun(t *testing.T) {
 						logLine(29, exited("r3", "code=dumped, status=11/SEGV")) +
 						logLine(29, failed("r3"))},
 				},
-				niriLine: {{}},
+				niriLine:   {{}},
+				portalLine: {{}},
 				runsLine + " _SYSTEMD_INVOCATION_ID=aaa + USER_INVOCATION_ID=aaa": {{}},
 			},
 			want: result{
@@ -283,7 +288,7 @@ func TestRun(t *testing.T) {
 					restartsLine("kaizen-shell.service", 4),
 					runsLine + " _SYSTEMD_INVOCATION_ID=r1 + USER_INVOCATION_ID=r1 + _SYSTEMD_INVOCATION_ID=r2 + USER_INVOCATION_ID=r2" +
 						" + _SYSTEMD_INVOCATION_ID=r3 + USER_INVOCATION_ID=r3 + _SYSTEMD_INVOCATION_ID=r4 + USER_INVOCATION_ID=r4",
-					niriLine,
+					niriLine, portalLine,
 					runsLine + " _SYSTEMD_INVOCATION_ID=aaa + USER_INVOCATION_ID=aaa",
 				},
 			},
@@ -339,13 +344,14 @@ func TestRun(t *testing.T) {
 				niriLine: {{Err: &exec.ExitError{
 					Stderr: []byte("2026-10-11T11:00:00.000Z  INFO niri: loading\nError: bad config\n\n  at line 3\n"),
 				}}},
-				userBus:   {{Stdout: "org.a 1 x\n:1.5 2 y\n"}},
-				systemBus: {{Err: errors.New("exit status 1")}},
-				envLine:   {{Stdout: "A=1\nB=1\nPATH=/bin\n"}},
-				fontLine:  {{Stdout: "Mono Sans,Mono Alias\nOther\n"}},
+				portalLine: {{Err: errors.New("exit status 1")}},
+				userBus:    {{Stdout: "org.a 1 x\n:1.5 2 y\n"}},
+				systemBus:  {{Err: errors.New("exit status 1")}},
+				envLine:    {{Stdout: "A=1\nB=1\nPATH=/bin\n"}},
+				fontLine:   {{Stdout: "Mono Sans,Mono Alias\nOther\n"}},
 			},
 			want: result{
-				Stdout: "7 errors, 4 warnings\n\n" +
+				Stdout: "7 errors, 5 warnings\n\n" +
 					"ERROR niri  check\n  niri validate:\n  Error: bad config\n\n    at line 3\n" +
 					"ERROR doctor  check\n  cannot list the system bus: busctl: exit status 1\n" +
 					"ERROR requires  check\n" +
@@ -366,32 +372,35 @@ func TestRun(t *testing.T) {
 					"  runs a Quickshell that is no longer installed\n  hint: kaizen reload --restart\n" +
 					"WARN  kaizen  check\n  2 kaizen on PATH; the first, ~/.local/bin/kaizen, is abc123\n" +
 					"  hint: delete ~/.local/bin/kaizen or rebuild\n" +
+					"WARN  xdg-desktop-portal  check\n  cannot read the colour scheme: busctl: exit status 1\n" +
 					"WARN  kaizen-shell  check\n  runs $DIR/tree\n  hint: kaizen dev off\n" +
 					"WARN  warned  check\n  missing cmd absent\n",
-				Calls: []string{showLine, "$DIR/home/.local/bin/kaizen --version", niriLine, userBus, systemBus, envLine, fontLine},
+				Calls: []string{showLine, "$DIR/home/.local/bin/kaizen --version", niriLine, portalLine, userBus, systemBus, envLine, fontLine},
 			},
 		},
 		{
 			name: "no core requires",
 			outputs: map[string][]recorded{
-				showLine: {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "0", "0", "")}},
-				niriLine: {{}},
+				showLine:   {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "0", "0", "")}},
+				niriLine:   {{}},
+				portalLine: {{}},
 			},
 			want: result{
 				Stdout: "1 error\n\nERROR requires  check\n  no requires in $DIR/home/.config/quickshell/kaizen\n",
-				Calls:  []string{showLine, niriLine},
+				Calls:  []string{showLine, niriLine, portalLine},
 			},
 		},
 		{
 			name:  "qtplugin without a shell",
 			files: map[string]string{coreRequires: "qtplugin imageformats/libqwebp.so\nqtplugin platforms/libqwayland.so\n"},
 			outputs: map[string][]recorded{
-				showLine: {{Stdout: unitBlock("kaizen-shell.service", "", "inactive", "success", "0", "0", "")}},
-				niriLine: {{}},
+				showLine:   {{Stdout: unitBlock("kaizen-shell.service", "", "inactive", "success", "0", "0", "")}},
+				niriLine:   {{}},
+				portalLine: {{}},
 			},
 			want: result{
 				Stdout: "1 error\n\nERROR doctor  check\n  cannot list the shell's Qt plugin dirs: kaizen-shell is not running\n",
-				Calls:  []string{showLine, niriLine},
+				Calls:  []string{showLine, niriLine, portalLine},
 			},
 		},
 		{
@@ -406,12 +415,13 @@ func TestRun(t *testing.T) {
 			outputs: map[string][]recorded{
 				showLine: {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "4242", "0", "")}},
 				"nix-store -qR $DIR/store/qs-new/bin/quickshell": {{Stdout: "/nix/store/glibc\n/nix/store/qs-new\n"}},
-				niriLine: {{}},
+				niriLine:   {{}},
+				portalLine: {{}},
 			},
 			want: result{
 				Stdout: "1 warning\n\nWARN  kaizen-shell  check\n" +
 					"  runs a Quickshell that is no longer installed\n  hint: kaizen reload --restart\n",
-				Calls: []string{showLine, "nix-store -qR $DIR/store/qs-new/bin/quickshell", niriLine},
+				Calls: []string{showLine, "nix-store -qR $DIR/store/qs-new/bin/quickshell", niriLine, portalLine},
 			},
 		},
 		{
@@ -426,11 +436,12 @@ func TestRun(t *testing.T) {
 			outputs: map[string][]recorded{
 				showLine: {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "4242", "0", "")}},
 				"nix-store -qR $DIR/store/qs-new/bin/quickshell": {{Stdout: "/nix/store/glibc\n/nix/store/qs-new\n"}},
-				niriLine: {{}},
+				niriLine:   {{}},
+				portalLine: {{}},
 			},
 			want: result{
 				Stdout: "No errors or warnings\n",
-				Calls:  []string{showLine, "nix-store -qR $DIR/store/qs-new/bin/quickshell", niriLine},
+				Calls:  []string{showLine, "nix-store -qR $DIR/store/qs-new/bin/quickshell", niriLine, portalLine},
 			},
 		},
 		{
@@ -440,13 +451,14 @@ func TestRun(t *testing.T) {
 			execs: []string{"bin/nix-store", "bin/quickshell"},
 			links: map[string]string{"proc/4242/exe": "/usr/bin/quickshell (deleted)"},
 			outputs: map[string][]recorded{
-				showLine: {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "4242", "0", "")}},
-				niriLine: {{}},
+				showLine:   {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "4242", "0", "")}},
+				niriLine:   {{}},
+				portalLine: {{}},
 			},
 			want: result{
 				Stdout: "1 warning\n\nWARN  kaizen-shell  check\n" +
 					"  runs a Quickshell that is no longer installed\n  hint: kaizen reload --restart\n",
-				Calls: []string{showLine, niriLine},
+				Calls: []string{showLine, niriLine, portalLine},
 			},
 		},
 		{
@@ -455,8 +467,9 @@ func TestRun(t *testing.T) {
 			files: map[string]string{coreRequires: ""},
 			links: map[string]string{"proc/4242/exe": "/usr/bin/quickshell (deleted)"},
 			outputs: map[string][]recorded{
-				showLine: {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "4242", "0", "")}},
-				niriLine: {{}},
+				showLine:   {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "4242", "0", "")}},
+				niriLine:   {{}},
+				portalLine: {{}},
 			},
 			want: result{
 				Stdout: fmt.Sprintf(
@@ -467,7 +480,7 @@ func TestRun(t *testing.T) {
 						`  runs a Quickshell that is no longer installed\n  hint: kaizen reload --restart"}`+"\n",
 					now.UnixMilli(),
 				),
-				Calls: []string{showLine, niriLine},
+				Calls: []string{showLine, niriLine, portalLine},
 			},
 		},
 		{
@@ -490,7 +503,8 @@ func TestRun(t *testing.T) {
 					"$DIR/run/kaizen-shell.service.d/dev.conf",
 				)}},
 				"nix-store -qR $DIR/store/qs-new/bin/quickshell": {{Err: errors.New("exit status 1")}},
-				niriLine: {{Err: errors.New("exit status 1")}},
+				niriLine:   {{Err: errors.New("exit status 1")}},
+				portalLine: {{}},
 			},
 			want: result{
 				Stdout: "5 errors\n\n" +
@@ -502,7 +516,7 @@ func TestRun(t *testing.T) {
 					"  cannot check a requires file: open $DIR/home/.config/quickshell/kaizen/requires: permission denied\n" +
 					"ERROR doctor  check\n" +
 					"  cannot list the enabled plugins: open $DIR/home/.config/kaizen/plugins: not a directory\n",
-				Calls: []string{showLine, "nix-store -qR $DIR/store/qs-new/bin/quickshell", niriLine},
+				Calls: []string{showLine, "nix-store -qR $DIR/store/qs-new/bin/quickshell", niriLine, portalLine},
 			},
 		},
 		{
@@ -516,12 +530,13 @@ func TestRun(t *testing.T) {
 					"kaizen-shell.service", "", "active", "success", "0", "0",
 					"$DIR/run/kaizen-shell.service.d/dev.conf",
 				)}},
-				niriLine: {{}},
+				niriLine:   {{}},
+				portalLine: {{}},
 			},
 			want: result{
 				Stdout: "1 warning\n\nWARN  kaizen-shell  check\n" +
 					"  runs a tree $DIR/run/kaizen-shell.service.d/dev.conf does not name\n  hint: kaizen dev off\n",
-				Calls: []string{showLine, niriLine},
+				Calls: []string{showLine, niriLine, portalLine},
 			},
 		},
 		{
