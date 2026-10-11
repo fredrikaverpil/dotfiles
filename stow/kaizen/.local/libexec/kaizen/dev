@@ -35,6 +35,8 @@ case "${1:-}" in
   dirname "$config"
   ;;
 off)
+  # Before the drop-in changes, so a refusal leaves the unit as it was.
+  unlocked || exit 1
   rm -f "$dropin"
   restart
   dirname "$(running)"
@@ -56,6 +58,7 @@ off)
     echo "kaizen dev: $dir/shell.qml does not exist" >&2
     exit 1
   fi
+  unlocked || exit 1
   mkdir -p "$(dirname "$dropin")"
   # No fallback: a removed worktree leaves the unit failing, which kaizen
   # doctor reports.
