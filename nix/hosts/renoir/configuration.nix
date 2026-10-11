@@ -2,8 +2,8 @@
 {
   imports = [
     ../../shared/system/linux-desktop.nix
-    ../../shared/system/kaizen
-    ../../shared/system/kaizen/plugins/calendar
+    ../../../kaizen/nix
+    ../../../kaizen/nix/plugins/calendar
     ./kaizen-plugins/hello-tray
     ../../shared/system/thinkpad.nix
   ];

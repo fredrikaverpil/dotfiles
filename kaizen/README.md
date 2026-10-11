@@ -70,22 +70,22 @@ QML, which plugins run, and the notification rules.
 
 | Part | Path | Reaches |
 | --- | --- | --- |
-| Session: niri under UWSM, portals, PAM, the services the shell reads, the packages the shell, its binds, scripts and units use | [`nix/shared/system/kaizen/`](../nix/shared/system/kaizen/default.nix) | every kaizen host |
-| The `kaizen` command, in Go, built by [`package.nix`](../nix/shared/system/kaizen/package.nix) | [`kaizen/`](./) | every kaizen host |
+| Session: niri under UWSM, portals, PAM, the services the shell reads, the packages the shell, its binds, scripts and units use | [`kaizen/nix/`](nix/default.nix) | every kaizen host |
+| The `kaizen` command, in Go, built by [`package.nix`](nix/package.nix) | [`kaizen/`](./) | every kaizen host |
 | Compositor config, units and scripts, the shell's QML, the core's notification rules | [`stow/kaizen/`](../stow/kaizen/) | every kaizen host |
 | Plugin QML: generic or reusable | [`stow/kaizen/.config/quickshell/kaizen/plugins/<name>/`](../stow/kaizen/.config/quickshell/kaizen/plugins/) | every kaizen host |
 | Plugin QML: specific to one host | `stow/host/<host>/.config/kaizen/plugins/<name>/` | that host |
 | Which plugins run, with their config | `stow/host/<host>/.config/kaizen/plugins/<name>.jsonc`, or in a private submodule's `stow/` such as wily's `einride` | that host |
 | A plugin's unit: generic or reusable | [`stow/kaizen/.config/systemd/user/`](../stow/kaizen/.config/systemd/user/) | every kaizen host that enables the plugin |
 | A plugin's unit: specific to one host | `stow/host/<host>/.config/systemd/user/` | that host |
-| A plugin's daemon and packages | `nix/shared/system/kaizen/plugins/<name>/`, `nix/hosts/<host>/kaizen-plugins/<name>/` | the hosts importing it |
+| A plugin's daemon and packages | `kaizen/nix/plugins/<name>/`, `nix/hosts/<host>/kaizen-plugins/<name>/` | the hosts importing it |
 | ThinkPad hardware the shell reads (thresholds, keyd, micmute LED); not kaizen | [`nix/shared/system/thinkpad.nix`](../nix/shared/system/thinkpad.nix) | ThinkPad hosts |
 | Hardware, sleep policy, output layout, host-only programs | `nix/hosts/<host>/`, `stow/host/<host>/` | that host |
 
 - Core is what kaizen needs to work as designed; every kaizen host runs it. A
   plugin is optional: the shell runs without it, however many hosts enable it.
 - Importing
-  [`nix/shared/system/kaizen/`](../nix/shared/system/kaizen/default.nix)
+  [`kaizen/nix/`](nix/default.nix)
   makes a host a kaizen host: it writes `/etc/kaizen`, and
   [`stow.sh`](../stow.sh) stows [`stow/kaizen/`](../stow/kaizen/) only
   where that exists. So
@@ -126,7 +126,7 @@ QML, which plugins run, and the notification rules.
 ## Off NixOS
 
 The distro supplies what
-[the core's Nix module](../nix/shared/system/kaizen/default.nix) and each
+[the core's Nix module](nix/default.nix) and each
 enabled plugin's do on NixOS. `kaizen doctor` reports each program, D-Bus
 service and file missing from
 [`requires`](../stow/kaizen/.config/quickshell/kaizen/requires) and from
@@ -351,7 +351,7 @@ nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
    protocol-driven surface with no other consumer of its state (lock,
    notifications, polkit) keeps both in `modules/<name>/`. Packages (even a
    package another scope also installs), system services and PAM →
-   [`kaizen/default.nix`](../nix/shared/system/kaizen/default.nix), units and
+   [`nix/default.nix`](nix/default.nix), units and
    scripts → [`systemd/user/`](../stow/kaizen/.config/systemd/user/) and
    [`.local/libexec/kaizen/`](../stow/kaizen/.local/libexec/kaizen/),
    compositor →
