@@ -113,6 +113,9 @@ in
     # Marks a kaizen host; stow.sh stows stow/kaizen/ where it exists.
     environment.etc.kaizen.text = "";
 
+    # A rebuild deletes an agent-built ~/.local/bin/kaizen.
+    home-manager.sharedModules = [ ./home.nix ];
+
     # The system profile links only these dirs; the shell finds its emoji data
     # in share/kaizen.
     environment.pathsToLink = [ "/share/kaizen" ];

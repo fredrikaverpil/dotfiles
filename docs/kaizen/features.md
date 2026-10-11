@@ -48,7 +48,8 @@ What the curtain does not do, since it would stop screenshotting from working:
 `kaizen doctor` reports what is wrong with the desktop that nothing on screen
 shows: the warnings and errors each `kaizen-*` unit, plugin daemons included,
 logged in its current run, a failed or restarted unit, a shell still running
-the Quickshell a rebuild replaced or a worktree's tree (`kaizen dev`), a niri
+the Quickshell a rebuild replaced or a worktree's tree (`kaizen dev`), a
+`kaizen` shadowing another on PATH, a niri
 config that fails `niri validate`, an enabled plugin the shell cannot load, and
 a program, D-Bus service or file that a `requires` file lists and the system
 lacks. A healthy desktop reports nothing, so every finding is something to fix.
