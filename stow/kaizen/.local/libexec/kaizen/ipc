@@ -27,7 +27,23 @@ if [[ ${pid:-0} == 0 ]]; then
 fi
 unset QS_CONFIG_NAME QS_CONFIG_PATH QS_MANIFEST
 
-# Anything but show is qs ipc's own.
+# qs ipc call prints its own errors on stdout and exits 0; these are their
+# first lines.
+errors='^(Target not found\.|Function not found\.|Too (many|few) arguments provided|Unable to parse argument |Not ready to accept queries yet\.|Error occurred while waiting for response\.|Received invalid IPC response|(Target|Function) required to send message\.)'
+if [[ ${1:-} == call ]]; then
+  status=0
+  out=$(qs ipc --pid "$pid" "$@") || status=$?
+  if [[ $status == 0 && $out =~ $errors ]]; then
+    printf '%s\n' "$out" >&2
+    status=1
+  elif [[ -n $out ]]; then
+    printf '%s\n' "$out"
+  fi
+  $quiet && exit 0
+  exit "$status"
+fi
+
+# Anything but show and call is qs ipc's own.
 if [[ ${1:-} != show ]]; then
   if $quiet; then
     qs ipc --pid "$pid" "$@" || true
