@@ -22,6 +22,9 @@ cmd dbus-monitor
 cmd jq
 cmd git
 cmd wtype
+# niri spawns xwayland-satellite, which runs Xwayland, for X11 apps alone.
+cmd xwayland-satellite warn
+cmd Xwayland warn
 file /etc/kaizen
 file /etc/pam.d/kaizen-lock
 bus system org.freedesktop.login1
@@ -61,6 +64,8 @@ font Berkeley Mono Variable warn
 cmd grim
 cmd satty
 cmd gpu-screen-recorder
+# Monitor capture; `kaizen doctor` also checks its cap_sys_admin+ep.
+cmd gsr-kms-server
 cmd mpv
 
 # Network and Bluetooth

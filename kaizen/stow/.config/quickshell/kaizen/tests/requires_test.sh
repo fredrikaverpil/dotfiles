@@ -4,7 +4,7 @@ set -euo pipefail
 
 # Every program an argv head names is listed as a `cmd` in a requires file: a
 # plugin's own or the core's for a plugin, the core's for the rest. Heads are
-# taken from QML/JS arrays, the core's units and niri/config.kdl. Programs in
+# taken from QML/JS arrays, the core's units and niri/*.kdl. Programs in
 # shell strings and the libexec scripts are listed by hand.
 
 cd "$(dirname "$0")/.."
@@ -71,7 +71,7 @@ mapfile -t core_units < <(grep -L '^ConditionPathExists=.*/kaizen/plugins/' "$un
 mapfile -t core < <(
   qml_heads "${core_qml[@]}"
   unit_heads "${core_units[@]}"
-  sed -nE 's/.*\bspawn +"([^"]+)".*/\1/p' ../../niri/config.kdl
+  sed -nE 's/.*\bspawn +"([^"]+)".*/\1/p' ../../niri/*.kdl
 )
 check core "" "${core[@]}"
 

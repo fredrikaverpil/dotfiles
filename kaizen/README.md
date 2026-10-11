@@ -145,20 +145,17 @@ enabled plugin's do on NixOS; the session variables come from Stow
 `kaizen doctor` reports each program, D-Bus
 service, file, session variable, font and Qt plugin missing from
 [`requires`](stow/.config/quickshell/kaizen/requires) and from
-each enabled plugin's `plugins/<name>/requires`, and a portal that does not
-answer the colour scheme. It cannot check:
+each enabled plugin's `plugins/<name>/requires`, a portal that does not
+answer the colour scheme, and a `gsr-kms-server` without `cap_sys_admin+ep`,
+which lets monitor capture skip the portal dialog. It cannot check:
 
-- Xwayland and xwayland-satellite.
 - gnome-keyring as Secret Service, and ghostty first in
   `xdg-terminals.list`.
 - PipeWire with its ALSA and PulseAudio layers, rtkit, and polkit with
   `pkexec`.
-- `cap_sys_admin+ep` on gpu-screen-recorder's `gsr-kms-server`, so monitor
-  capture skips the portal dialog.
-- `/etc/pam.d/kaizen-lock` holding `auth include login`, for the lock and the
-  curtain.
-- An empty `/etc/kaizen`: `stow.sh` stows [`kaizen/stow/`](stow/)
-  only where it exists.
+- What `/etc/pam.d/kaizen-lock` holds, only that it exists: a stack that
+  authenticates the user's password (`auth include login` on NixOS), for the
+  lock and the curtain.
 - The fonts in [`fonts.nix`](nix/fonts.nix) the shell does not name, and its
   fontconfig rules.
 - Quickshell with the [overlay's patch](nix/default.nix) (without it, every

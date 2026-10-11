@@ -3,6 +3,7 @@ package doctor
 import (
 	"cmp"
 	"context"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -13,6 +14,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"syscall"
 
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/state"
 )
@@ -132,6 +134,7 @@ func (c Command) check(ctx context.Context, units []unit) []check {
 	k.kaizens(ctx)
 	k.niri(ctx)
 	k.portal(ctx)
+	k.kmsServer()
 	// kaizen dev's drop-in runs a worktree's tree, whose requires and plugins
 	// count.
 	tree := filepath.Join(k.configDir(), "quickshell", "kaizen")
@@ -352,6 +355,65 @@ func (k *checker) portal(ctx context.Context) {
 			message: fmt.Sprintf("cannot read the colour scheme: %v", err),
 		})
 	}
+}
+
+// kmsServer warns when gsr-kms-server, the first on PATH as gpu-screen-recorder
+// finds it, lacks cap_sys_admin+ep, which lets monitor capture skip the portal
+// dialog. requires reports it missing.
+func (k *checker) kmsServer() {
+	path, ok := k.lookPath("gsr-kms-server")
+	if !ok {
+		return
+	}
+	read := k.getxattr
+	if read == nil {
+		read = getxattr
+	}
+	data, err := read(path, "security.capability")
+	if err != nil && !errors.Is(err, syscall.ENODATA) {
+		k.add(check{
+			name:    "gsr-kms-server",
+			level:   "ERROR",
+			unit:    "doctor",
+			message: fmt.Sprintf("cannot read %s's capabilities: %v", path, err),
+		})
+		return
+	}
+	if sysAdmin(data) {
+		return
+	}
+	k.add(check{
+		name:    "gsr-kms-server",
+		level:   "WARN",
+		unit:    "gpu-screen-recorder",
+		message: path + " lacks cap_sys_admin+ep",
+		hint:    "sudo setcap cap_sys_admin+ep " + path,
+	})
+}
+
+// sysAdmin reports that data, a security.capability attribute (vfs_cap_data:
+// little-endian magic_etc, then the permitted set's low word), holds
+// cap_sys_admin permitted and effective.
+func sysAdmin(data []byte) bool {
+	const (
+		// effective is VFS_CAP_FLAGS_EFFECTIVE, in magic_etc.
+		effective = 1
+		// capSysAdmin is CAP_SYS_ADMIN's bit.
+		capSysAdmin = 1 << 21
+	)
+	return len(data) >= 8 &&
+		binary.LittleEndian.Uint32(data)&effective != 0 &&
+		binary.LittleEndian.Uint32(data[4:])&capSysAdmin != 0
+}
+
+// getxattr returns path's extended attribute attr, following links.
+func getxattr(path, attr string) ([]byte, error) {
+	buf := make([]byte, 64)
+	n, err := syscall.Getxattr(path, attr, buf)
+	if err != nil {
+		return nil, err
+	}
+	return buf[:n], nil
 }
 
 // devTree returns the tree kaizen dev's drop-in among dropInPaths runs, or ""

@@ -3,6 +3,7 @@ package doctor
 import (
 	"bytes"
 	"context"
+	"encoding/binary"
 	"encoding/json/v2"
 	"errors"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"testing"
 	"time"
 
@@ -122,6 +124,31 @@ func shellLine(run, message string) map[string]string {
 	}
 }
 
+// xattr is a file's security.capability attribute, or the error reading it.
+type xattr struct {
+	value []byte
+	err   error
+}
+
+// vfsCap is a security.capability attribute of size bytes: magic_etc, then the
+// permitted set's low word.
+func vfsCap(magic, permitted uint32, size int) []byte {
+	data := make([]byte, size)
+	binary.LittleEndian.PutUint32(data, magic)
+	binary.LittleEndian.PutUint32(data[4:], permitted)
+	return data
+}
+
+// The vfs_cap_data revisions, and their effective flag.
+const (
+	capRevision2 = 0x02000000
+	capRevision3 = 0x03000000
+	capEffective = 1
+)
+
+// cap_setpcap and cap_sys_admin, as NixOS's wrapper holds them.
+const setpcapSysAdmin = 1<<8 | 1<<21
+
 // result is what Command.Run did, and the lines it ran.
 type result struct {
 	Code   int
@@ -148,7 +175,9 @@ func TestRun(t *testing.T) {
 		// unreadable are files under $DIR without permissions.
 		unreadable []string
 		// links are symbolic links under $DIR to their targets.
-		links   map[string]string
+		links map[string]string
+		// caps are files' capabilities under $DIR; a file without is ENODATA.
+		caps    map[string]xattr
 		outputs map[string][]recorded
 		want    result
 	}{
@@ -162,7 +191,8 @@ func TestRun(t *testing.T) {
 			args:  []string{"--json"},
 			env:   map[string]string{"PATH": "$DIR/bin"},
 			files: map[string]string{coreRequires: ""},
-			execs: []string{"bin/kaizen"},
+			execs: []string{"bin/kaizen", "bin/gsr-kms-server"},
+			caps:  map[string]xattr{"bin/gsr-kms-server": {value: vfsCap(capRevision2|capEffective, setpcapSysAdmin, 20)}},
 			outputs: map[string][]recorded{
 				showLine:   {{Stdout: shellRunning + "\n" + unitBlock("kaizen-dcal.service", "bbb", "active", "success", "77", "0", "")}},
 				niriLine:   {{}},
@@ -462,6 +492,23 @@ func TestRun(t *testing.T) {
 			},
 		},
 		{
+			name:  "gsr-kms-server without cap_sys_admin",
+			env:   map[string]string{"PATH": "$DIR/bin"},
+			files: map[string]string{coreRequires: ""},
+			execs: []string{"bin/gsr-kms-server"},
+			outputs: map[string][]recorded{
+				showLine:   {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "0", "0", "")}},
+				niriLine:   {{}},
+				portalLine: {{}},
+			},
+			want: result{
+				Stdout: "1 warning\n\nWARN  gpu-screen-recorder  check\n" +
+					"  $DIR/bin/gsr-kms-server lacks cap_sys_admin+ep\n" +
+					"  hint: sudo setcap cap_sys_admin+ep $DIR/bin/gsr-kms-server\n",
+				Calls: []string{showLine, niriLine, portalLine},
+			},
+		},
+		{
 			name:  "check as JSON",
 			args:  []string{"--json"},
 			files: map[string]string{coreRequires: ""},
@@ -492,7 +539,8 @@ func TestRun(t *testing.T) {
 				"home/.config/kaizen/plugins":           "",
 			},
 			unreadable: []string{coreRequires},
-			execs:      []string{"bin/nix-store", "store/qs-new/bin/quickshell"},
+			execs:      []string{"bin/nix-store", "store/qs-new/bin/quickshell", "bin/gsr-kms-server"},
+			caps:       map[string]xattr{"bin/gsr-kms-server": {err: syscall.EACCES}},
 			links: map[string]string{
 				"bin/quickshell": "$DIR/store/qs-new/bin/quickshell",
 				"proc/4242/exe":  "/nix/store/qs-old/bin/quickshell",
@@ -507,9 +555,10 @@ func TestRun(t *testing.T) {
 				portalLine: {{}},
 			},
 			want: result{
-				Stdout: "5 errors\n\n" +
+				Stdout: "6 errors\n\n" +
 					"ERROR doctor  check\n  cannot check the shell's Quickshell: nix-store: exit status 1\n" +
 					"ERROR niri  check\n  niri validate:\n  exit status 1\n" +
+					"ERROR doctor  check\n  cannot read $DIR/bin/gsr-kms-server's capabilities: permission denied\n" +
 					"ERROR doctor  check\n" +
 					"  cannot read kaizen dev's drop-in: read $DIR/run/kaizen-shell.service.d/dev.conf: is a directory\n" +
 					"ERROR doctor  check\n" +
@@ -605,6 +654,10 @@ func TestRun(t *testing.T) {
 					outputs[expand(line)] = append(outputs[expand(line)], recorded{Stdout: expand(out.Stdout), Err: out.Err})
 				}
 			}
+			caps := map[string]xattr{}
+			for path, x := range tt.caps {
+				caps[filepath.Join(dir, path)] = x
+			}
 			runner := &seqRunner{outputs: outputs}
 			c := Command{
 				Runner:   runner,
@@ -613,6 +666,13 @@ func TestRun(t *testing.T) {
 				now:      func() time.Time { return now },
 				location: time.UTC,
 				proc:     filepath.Join(dir, "proc"),
+				getxattr: func(path, attr string) ([]byte, error) {
+					x, ok := caps[path]
+					if !ok || attr != "security.capability" {
+						return nil, syscall.ENODATA
+					}
+					return x.value, x.err
+				},
 			}
 			var stdout, stderr bytes.Buffer
 
@@ -633,6 +693,25 @@ func write(t *testing.T, path, content string, mode os.FileMode) {
 	t.Helper()
 	assert.NilError(t, os.MkdirAll(filepath.Dir(path), 0o755))
 	assert.NilError(t, os.WriteFile(path, []byte(content), mode))
+}
+
+func TestSysAdmin(t *testing.T) {
+	for _, tt := range []struct {
+		name string
+		data []byte
+		want bool
+	}{
+		{name: "permitted and effective", data: vfsCap(capRevision2|capEffective, setpcapSysAdmin, 20), want: true},
+		{name: "revision 3", data: vfsCap(capRevision3|capEffective, 1<<21, 24), want: true},
+		{name: "permitted only", data: vfsCap(capRevision2, setpcapSysAdmin, 20)},
+		{name: "other capabilities", data: vfsCap(capRevision2|capEffective, 1<<8, 20)},
+		{name: "truncated", data: vfsCap(capRevision2|capEffective, setpcapSysAdmin, 20)[:6]},
+		{name: "none"},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, sysAdmin(tt.data), tt.want)
+		})
+	}
 }
 
 func TestSeverity(t *testing.T) {
