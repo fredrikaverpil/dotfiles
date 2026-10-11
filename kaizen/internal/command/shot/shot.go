@@ -31,14 +31,6 @@ const captureTimeout = 10 * time.Second
 // instead of the cache's 30.
 const maxAge = 24 * time.Hour
 
-// The curtain's surface leaves with the next frame, which its status does not
-// show: wait up to 2.5 s for niri to drop it.
-const (
-	curtainLayer    = "kaizen-curtain"
-	curtainAttempts = 25
-	curtainDelay    = 100 * time.Millisecond
-)
-
 // regionPattern is a WxH+X+Y region.
 var regionPattern = regexp.MustCompile(`^([0-9]+)x([0-9]+)\+([0-9]+)\+([0-9]+)$`)
 
@@ -199,19 +191,15 @@ func (c Command) shoot(ctx context.Context, opts options, stderr io.Writer) (fil
 	}
 	// grim cannot capture an output through the curtain. Lift it for the
 	// capture and put it back, whatever the capture does.
-	if status.CurtainUp() {
-		if err := state.CloseCurtain(ctx, c.Runner, status.PID); err != nil {
-			return "", err
-		}
-		defer func() {
-			if openErr := state.OpenCurtain(context.WithoutCancel(ctx), c.Runner, status.PID); openErr != nil {
-				err = errors.Join(err, openErr)
-			}
-		}()
-		if err := c.awaitCurtainGone(ctx); err != nil {
-			return "", err
-		}
+	restore, err := state.LiftCurtain(ctx, c.Runner, status, c.wait)
+	if err != nil {
+		return "", err
 	}
+	defer func() {
+		if openErr := restore(context.WithoutCancel(ctx)); openErr != nil {
+			err = errors.Join(err, openErr)
+		}
+	}()
 	if err := capture(ctx, c.Runner, append(args, file)); err != nil {
 		return "", err
 	}
@@ -249,30 +237,6 @@ func (c Command) cacheFile(what string) (string, error) {
 		}
 	}
 	return filepath.Join(dir, fmt.Sprintf("shot-%s-%s.png", what, now.Format("20060102T150405"))), nil
-}
-
-// awaitCurtainGone waits until niri shows no curtain surface, failing when it
-// stays.
-func (c Command) awaitCurtainGone(ctx context.Context) error {
-	wait := c.wait
-	if wait == nil {
-		wait = sleep
-	}
-	for attempt := 1; ; attempt++ {
-		layers, err := readLayers(ctx, c.Runner)
-		if err != nil {
-			return err
-		}
-		if !slices.ContainsFunc(layers, func(l layer) bool { return l.Namespace == curtainLayer }) {
-			return nil
-		}
-		if attempt == curtainAttempts {
-			return errors.New("the curtain's surface did not leave the outputs")
-		}
-		if err := wait(ctx, curtainDelay); err != nil {
-			return err
-		}
-	}
 }
 
 // capture runs grim with args.
@@ -315,16 +279,6 @@ func unknown(status state.Status) string {
 	return "shell status has no barHeight"
 }
 
-// sleep waits for d, or until ctx is done.
-func sleep(ctx context.Context, d time.Duration) error {
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case <-time.After(d):
-		return nil
-	}
-}
-
 // output is an output in `niri msg -j outputs`.
 type output struct {
 	Name string `json:"name"`
@@ -338,13 +292,6 @@ type logical struct {
 	Y      int `json:"y"`
 	Width  int `json:"width"`
 	Height int `json:"height"`
-}
-
-// layer is a layer surface in `niri msg -j layers`.
-type layer struct {
-	Namespace             string `json:"namespace"`
-	Output                string `json:"output"`
-	KeyboardInteractivity string `json:"keyboard_interactivity"`
 }
 
 // screen is what niri shows: its outputs, the focused one, and those holding
@@ -383,7 +330,7 @@ func readScreen(ctx context.Context, r state.Runner) (screen, error) {
 	if focused != nil {
 		s.focused = focused.Name
 	}
-	layers, err := readLayers(ctx, r)
+	layers, err := state.Layers(ctx, r)
 	if err != nil {
 		return screen{}, err
 	}
@@ -396,19 +343,6 @@ func readScreen(ctx context.Context, r state.Runner) (screen, error) {
 	}
 	slices.Sort(s.open)
 	return s, nil
-}
-
-// readLayers reads the layer surfaces from niri.
-func readLayers(ctx context.Context, r state.Runner) ([]layer, error) {
-	out, err := r.Run(ctx, "niri", "msg", "-j", "layers")
-	if err != nil {
-		return nil, fmt.Errorf("niri msg layers: %v", err)
-	}
-	var layers []layer
-	if err := json.Unmarshal(out, &layers); err != nil {
-		return nil, fmt.Errorf("niri msg layers: %v", err)
-	}
-	return layers, nil
 }
 
 // pick returns the output to capture: name, else the only output, else the

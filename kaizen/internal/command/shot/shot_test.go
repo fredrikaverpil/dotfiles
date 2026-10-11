@@ -355,7 +355,7 @@ func TestRun(t *testing.T) {
 				Code:   1,
 				Stderr: "kaizen shot: the curtain's surface did not leave the outputs\n",
 				Calls: append(
-					append(append(slices.Clone(reads), closeLine), slices.Repeat([]string{layersLine}, curtainAttempts)...),
+					append(append(slices.Clone(reads), closeLine), slices.Repeat([]string{layersLine}, 25)...),
 					openLine,
 				),
 			},
