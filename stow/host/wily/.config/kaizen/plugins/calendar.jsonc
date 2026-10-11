@@ -1,7 +1,1 @@
-{
-  "emoji": {
-    "^Family$": "🏠",
-    "^Johannas kalender$": "❤️",
-    "^My calendar$": "👤"
-  }
-}
+../../../../renoir/.config/kaizen/plugins/calendar.jsonc
