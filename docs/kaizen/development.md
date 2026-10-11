@@ -20,9 +20,9 @@ The desktop is built to be developed by an agent, usually run on the host
 itself, sometimes over SSH. Every part is reachable: `kaizen ipc` queries and
 drives shell services and panels, `niri msg` the compositor,
 `systemctl --user` the units, `grim` and the recording service capture what is
-on screen, and `wtype` and `wlrctl` take over the keyboard and the pointer to
-press keys, point and click. Use them to verify your own work; what they cannot
-prove is listed under "Required local validation".
+on screen, and `kaizen keys` and `wlrctl` take over the keyboard and the
+pointer to press keys, point and click. Use them to verify your own work; what
+they cannot prove is listed under "Required local validation".
 
 Each `kaizen` command carries a rule the raw tool leaves to you:
 
@@ -35,6 +35,7 @@ Each `kaizen` command carries a rule the raw tool leaves to you:
 | See a worktree's QML live | `kaizen dev` | editing main's tree |
 | Restart the shell | `kaizen reload --restart` | `systemctl --user restart`, which restarts while locked |
 | Capture an output or its bar | `kaizen shot` | `grim` by hand, which guesses the output and leaves the curtain lifted on failure |
+| Press keys in a panel, menu or window | `kaizen keys` | `wtype`, which types into whatever holds the keyboard: your terminal, or the lock's password field |
 | Focus an app or open it | `kaizen focus` | `niri msg action focus-window`, which needs the window id and never opens the app |
 | List the commands | `kaizen --json` | `ls ~/.local/libexec/kaizen`, which lists none of the usage |
 
@@ -178,19 +179,21 @@ tree, so a static check passing here passes for every kaizen host.
   touchpad, fingerprint reader, `GAMMA_LUT` (nightlight). Validate on the
   machine.
 - Test keyboard-first panels over SSH: open the panel with `kaizen ipc call`,
-  confirm it is the only `Keyboard interactivity: exclusive` layer in
-  `niri msg layers`, then use the devshell's `wtype -k z`. Niri drops
-  virtual-keyboard input before bind handling, so `wtype` cannot test
+  then `kaizen keys --layer NAMESPACE KEY...` with its namespace from
+  `niri msg layers`. It presses each key only while that layer alone holds the
+  keyboard (`exclusive`), lifts the curtain meanwhile, and refuses while
+  locked. A key is a chord of xkb names (`Return`, `ctrl+k`, `shift+Tab`,
+  which arrives as Tab with Shift held, not as Backtab); a key that moves the
+  keyboard elsewhere, such as an Esc that closes the panel, comes last. Niri
+  drops virtual-keyboard input before bind handling, so it cannot test
   compositor binds.
-- Test a window, such as a plugin's application, the same way: focus it
-  (`niri msg action focus-window --id ID`) and check `niri msg -j
-  focused-window` before every key, or keys land in the user's window. Run
-  each round as one command that opens a fresh window, focuses it, sends the
-  keys and closes it: the user may be answering an agent's permission prompt
-  in their terminal between commands, which takes focus. Never reuse a window
-  across commands: it restores its last focused item, such as a draft's field.
-  Give focus back afterwards. `wtype -M shift -k Tab` arrives as Tab with Shift
-  held, not as Backtab.
+- Test a window, such as a plugin's application, with
+  `kaizen keys --window ID KEY...`: it focuses the window, presses each key
+  only while the window has focus and no layer holds the keyboard, and gives
+  focus back to the window that had it. Run each round as one command that
+  opens a fresh window, sends the keys and closes it: never reuse a window
+  across commands, since it restores its last focused item, such as a draft's
+  field.
 - Enter or Space acts on whatever has focus, and a few Tabs away there is
   usually a delete or a paid run (an investigator's Discard or Re-run). Send
   them only to a control a capture in the same command showed focused, and
