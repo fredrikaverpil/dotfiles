@@ -87,12 +87,17 @@ QML, which plugins run, and the notification rules.
 - Importing
   [`kaizen/nix/`](nix/default.nix)
   makes a host a kaizen host: it writes `/etc/kaizen`, and
-  [`stow.sh`](../stow.sh) stows [`kaizen/stow/`](stow/) only
-  where that exists. So
+  [`stow.sh`](../stow.sh) runs `kaizen link` only where that exists, and
+  unstows [`kaizen/stow/`](stow/) elsewhere. So
   [`kaizen/stow/`](stow/) reaches every kaizen host or none, and a
   plugin's QML there loads only where a `~/.config/kaizen/plugins/<name>.jsonc`
   enables it.
-- A `.wants/` link beside a unit enables it, and `stow.sh` reloads the user
+- `kaizen link [DIR]` links `kaizen/stow/` of the checkout DIR (default
+  `~/.dotfiles`) into `$HOME` with Stow, after removing broken links into its
+  `kaizen/`, and reloads the user manager when one runs. It needs no stowed
+  file, so it works on a first install; Home Manager's activation has it on
+  PATH.
+- A `.wants/` link beside a unit enables it, and `kaizen link` reloads the user
   manager. A unit runs a packaged program, `kaizen` included, through
   `/usr/bin/env`, from the session PATH.
 - The shell is the Quickshell config `kaizen`, run as `quickshell -c kaizen`:

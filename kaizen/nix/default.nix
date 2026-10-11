@@ -128,10 +128,11 @@ in
       auth include login
     '';
 
-    # Marks a kaizen host; stow.sh stows kaizen/stow/ where it exists.
+    # Marks a kaizen host; stow.sh runs `kaizen link` where it exists.
     environment.etc.kaizen.text = "";
 
-    # A rebuild deletes an agent-built ~/.local/bin/kaizen.
+    # Activation can run `kaizen link`; a rebuild deletes an agent-built
+    # ~/.local/bin/kaizen.
     home-manager.sharedModules = [ ./home.nix ];
 
     # The system profile links only these dirs; the shell finds its emoji data

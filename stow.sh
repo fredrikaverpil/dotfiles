@@ -3,10 +3,11 @@
 set -e
 
 # Removes broken links into the repo left by files it moved or deleted, then
-# symlinks the stow/ tree into $HOME: shared, platform, kaizen/stow (kaizen
-# hosts; unstowed elsewhere), then the optional host package and the stow/
-# trees of the host's private submodules, and reloads the user units on a
-# kaizen host. Also what home-manager activation runs.
+# symlinks the stow/ tree into $HOME: shared, platform, then the optional host
+# package and the stow/ trees of the host's private submodules. Last, on a
+# kaizen host `kaizen link` links kaizen/stow and reloads the user units, the
+# host's included; elsewhere kaizen/stow is unstowed. Also what home-manager
+# activation runs.
 # --adopt absorbs a real file that replaced a managed symlink into the repo;
 # --no-folding links files, not dirs, so other tools can write siblings.
 # dir_links are the exception: linked as whole dirs, so new files in the repo
@@ -23,8 +24,6 @@ cd "${1:-$(dirname "$0")}"
 dir_links=(.config/nvim-fredrik .config/nvim-simple .shell) # in stow/shared
 dir_links_re="^($(IFS="|"; echo "${dir_links[*]//./\\.}"))"
 pkgs=(stow/shared "stow/platform/$(uname -s)")
-# kaizen's Nix module creates the marker.
-[ -e /etc/kaizen ] && pkgs+=(kaizen/stow)
 host="$(uname -n | cut -d. -f1)"
 [ -d "stow/host/$host" ] && pkgs+=("stow/host/$host")
 for tree in nix/hosts/"$host"/*/stow; do
@@ -59,14 +58,10 @@ done
 for dir in "${dir_links[@]}"; do
   ln -sfn "$PWD/stow/shared/$dir" "$HOME/$dir"
 done
-[ -e /etc/kaizen ] ||
-  stow --dir=kaizen --target="$HOME" --delete --no-folding stow
-# Stowed user units take effect on a reload, when a user manager runs.
+# kaizen's Nix module creates the marker.
 if [ -e /etc/kaizen ]; then
-  export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
-  if systemctl --user show-environment >/dev/null 2>&1; then
-    echo "systemctl --user daemon-reload"
-    systemctl --user daemon-reload
-  fi
+  kaizen link "$PWD"
+else
+  stow --dir=kaizen --target="$HOME" --delete --no-folding stow
 fi
 echo "stowed"
