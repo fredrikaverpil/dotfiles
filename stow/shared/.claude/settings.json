@@ -28,7 +28,8 @@
       "Read(~/code/private/github.com/einride*/**)",
       "Edit(~/code/private/github.com/einride*/**)",
       "Bash(*code/private/github.com/einride*)"
-    ]
+    ],
+    "defaultMode": "auto"
   },
   "model": "opus",
   "hooks": {
@@ -91,7 +92,7 @@
       "effortLevel": "high"
     },
     "claude-sonnet-5-5": {
-      "effortLevel": "high"
+      "effortLevel": "medium"
     }
   },
   "showClearContextOnPlanAccept": true,
@@ -100,6 +101,7 @@
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
   "agentPushNotifEnabled": true,
+  "useAutoModeDuringPlan": true,
   "autoMode": {
     "environment": [
       "### Org-wide",
