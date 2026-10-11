@@ -149,9 +149,7 @@ func (c Command) report(ctx context.Context, journalArgs []string) (report, erro
 		if units, err = readUnits(ctx, c.Runner); err != nil {
 			return report{}, err
 		}
-		if checks, err = c.check(ctx, units); err != nil {
-			return report{}, err
-		}
+		checks = c.check(ctx, units)
 		if out, err = readRuns(ctx, c.Runner, units); err != nil {
 			return report{}, err
 		}

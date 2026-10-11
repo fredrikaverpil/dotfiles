@@ -101,6 +101,8 @@ func TestRun(t *testing.T) {
 		// files are written under $DIR; those in execs are executable.
 		files map[string]string
 		execs []string
+		// unreadable are files under $DIR without permissions.
+		unreadable []string
 		// links are symbolic links under $DIR to their targets.
 		links   map[string]string
 		outputs map[string][]recorded
@@ -316,6 +318,76 @@ func TestRun(t *testing.T) {
 			},
 		},
 		{
+			name:  "quickshell outside the Nix store",
+			env:   map[string]string{"PATH": "$DIR/bin"},
+			files: map[string]string{coreRequires: ""},
+			execs: []string{"bin/nix-store", "bin/quickshell"},
+			links: map[string]string{"proc/4242/exe": "/usr/bin/quickshell (deleted)"},
+			outputs: map[string][]recorded{
+				showLine: {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "4242", "0", "")}},
+				niriLine: {{}},
+			},
+			want: result{
+				Stdout: "1 warning\n\nWARN  kaizen-shell  check\n" +
+					"  runs a Quickshell that is no longer installed: systemctl --user restart kaizen-shell\n",
+				Calls: []string{showLine, niriLine},
+			},
+		},
+		{
+			name: "checks that cannot run",
+			env:  map[string]string{"PATH": "$DIR/bin"},
+			files: map[string]string{
+				coreRequires:                            "cmd absent\n",
+				"run/kaizen-shell.service.d/dev.conf/x": "",
+				"home/.config/kaizen/plugins":           "",
+			},
+			unreadable: []string{coreRequires},
+			execs:      []string{"bin/nix-store", "store/qs-new/bin/quickshell"},
+			links: map[string]string{
+				"bin/quickshell": "$DIR/store/qs-new/bin/quickshell",
+				"proc/4242/exe":  "/nix/store/qs-old/bin/quickshell",
+			},
+			outputs: map[string][]recorded{
+				showLine: {{Stdout: unitBlock(
+					"kaizen-shell.service", "", "active", "success", "4242", "0",
+					"$DIR/run/kaizen-shell.service.d/dev.conf",
+				)}},
+				"nix-store -qR $DIR/store/qs-new/bin/quickshell": {{Err: errors.New("exit status 1")}},
+				niriLine: {{Err: errors.New("exit status 1")}},
+			},
+			want: result{
+				Stdout: "5 errors\n\n" +
+					"ERROR doctor  check\n  cannot check the shell's Quickshell: nix-store: exit status 1\n" +
+					"ERROR niri  check\n  niri validate:\n  exit status 1\n" +
+					"ERROR doctor  check\n" +
+					"  cannot read kaizen dev's drop-in: read $DIR/run/kaizen-shell.service.d/dev.conf: is a directory\n" +
+					"ERROR doctor  check\n" +
+					"  cannot check a requires file: open $DIR/home/.config/quickshell/kaizen/requires: permission denied\n" +
+					"ERROR doctor  check\n" +
+					"  cannot list the enabled plugins: open $DIR/home/.config/kaizen/plugins: not a directory\n",
+				Calls: []string{showLine, "nix-store -qR $DIR/store/qs-new/bin/quickshell", niriLine},
+			},
+		},
+		{
+			name: "dev drop-in without a tree",
+			files: map[string]string{
+				coreRequires:                          "",
+				"run/kaizen-shell.service.d/dev.conf": "[Service]\nExecStart=\n",
+			},
+			outputs: map[string][]recorded{
+				showLine: {{Stdout: unitBlock(
+					"kaizen-shell.service", "", "active", "success", "0", "0",
+					"$DIR/run/kaizen-shell.service.d/dev.conf",
+				)}},
+				niriLine: {{}},
+			},
+			want: result{
+				Stdout: "1 warning\n\nWARN  kaizen-shell  check\n" +
+					"  runs a tree $DIR/run/kaizen-shell.service.d/dev.conf does not name: kaizen dev off\n",
+				Calls: []string{showLine, niriLine},
+			},
+		},
+		{
 			name: "journalctl arguments",
 			args: []string{"-b", "--json", "-1"},
 			outputs: map[string][]recorded{
@@ -355,10 +427,16 @@ func TestRun(t *testing.T) {
 		},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
+			if len(tt.unreadable) > 0 && os.Geteuid() == 0 {
+				t.Skip("root reads any file")
+			}
 			dir := t.TempDir()
 			expand := func(s string) string { return strings.ReplaceAll(s, "$DIR", dir) }
 			for path, content := range tt.files {
 				write(t, filepath.Join(dir, path), expand(content), 0o644)
+			}
+			for _, path := range tt.unreadable {
+				assert.NilError(t, os.Chmod(filepath.Join(dir, path), 0))
 			}
 			for _, path := range tt.execs {
 				write(t, filepath.Join(dir, path), "#!/bin/sh\n", 0o755)
