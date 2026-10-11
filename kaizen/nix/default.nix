@@ -30,8 +30,8 @@ let
 in
 # The kaizen session every kaizen host shares: niri under UWSM, portals, PAM,
 # the services the shell reads, and the packages and data its shell, binds,
-# scripts and units run. Units, scripts, compositor config, QML and
-# notification rules live in kaizen/stow/.
+# scripts and units run. Units, scripts, compositor config, session variables,
+# QML and notification rules live in kaizen/stow/.
 {
   imports = [
     ./fonts.nix
@@ -110,13 +110,6 @@ in
     # update refuses when it would revoke a binary on the ESP. Update only the
     # device you need, by ID.
     services.fwupd.enable = true;
-
-    # GTK3 needs the portal to follow the dconf theme; Qt uses the GTK platform theme.
-    environment.sessionVariables = {
-      NIXOS_OZONE_WL = "1";
-      QT_QPA_PLATFORMTHEME = "gtk3";
-      GTK_USE_PORTAL = "1";
-    };
 
     # polkit.enable does not install the setuid pkexec wrapper.
     security.polkit.enablePkexecWrapper = true;

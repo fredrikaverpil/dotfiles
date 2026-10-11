@@ -72,7 +72,7 @@ QML, which plugins run, and the notification rules.
 | --- | --- | --- |
 | Session: niri under UWSM, portals, PAM, the services the shell reads, the packages the shell, its binds, scripts and units use | [`kaizen/nix/`](nix/default.nix) | every kaizen host |
 | The `kaizen` command, in Go, built by [`package.nix`](nix/package.nix) | [`kaizen/cli/`](cli/) | every kaizen host |
-| Compositor config, units and scripts, the shell's QML, the core's notification rules | [`kaizen/stow/`](stow/) | every kaizen host |
+| Compositor config, session variables, units and scripts, the shell's QML, the core's notification rules | [`kaizen/stow/`](stow/) | every kaizen host |
 | Plugin QML: generic or reusable | [`kaizen/stow/.config/quickshell/kaizen/plugins/<name>/`](stow/.config/quickshell/kaizen/plugins/) | every kaizen host |
 | Plugin QML: specific to one host | `stow/host/<host>/.config/kaizen/plugins/<name>/` | that host |
 | Which plugins run, with their config | `stow/host/<host>/.config/kaizen/plugins/<name>.jsonc`, or in a private submodule's `stow/` such as wily's `einride` | that host |
@@ -140,7 +140,9 @@ QML, which plugins run, and the notification rules.
 
 The distro supplies what
 [the core's Nix module](nix/default.nix) and each
-enabled plugin's do on NixOS. `kaizen doctor` reports each program, D-Bus
+enabled plugin's do on NixOS; the session variables come from Stow
+([`uwsm/env-kaizen`](stow/.config/uwsm/env-kaizen)) on either.
+`kaizen doctor` reports each program, D-Bus
 service, file, session variable, font and Qt plugin missing from
 [`requires`](stow/.config/quickshell/kaizen/requires) and from
 each enabled plugin's `plugins/<name>/requires`, and a portal that does not
@@ -293,7 +295,9 @@ The session is the entry
 runs niri. uwsm names its units after the entry ID, so another session on
 niri (`uwsm start niri`) starts none of kaizen's. Its `DesktopNames` set
 `XDG_CURRENT_DESKTOP=niri:kaizen`; niri first keeps niri's portal config and
-`OnlyShowIn=niri` autostart entries.
+`OnlyShowIn=niri` autostart entries. For the name `kaizen`, uwsm sources
+[`uwsm/env-kaizen`](stow/.config/uwsm/env-kaizen) and exports its session
+variables to the user manager; a change applies from the next login.
 
 Units bind to `wayland-session@kaizen.desktop.target`; ordering after
 `graphical-session.target` is a cycle. `wayland-session-waitenv.service`
