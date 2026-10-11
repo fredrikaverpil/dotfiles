@@ -21,7 +21,9 @@ that an agent can drive and verify from a terminal.
   keyboard-first face; infrequent tasks go to a purpose-built application
   (bluetui, nm-connection-editor).
 - Keyboard-first everywhere. Pointer-only controls are bugs.
-- Every action is reachable over `kaizen ipc`, `niri msg` or `systemctl --user`.
+- Every action is reachable from a terminal: the `kaizen` commands
+  (`kaizen --json` lists them; `kaizen ipc` drives the shell), `niri msg` and
+  `systemctl --user`.
 - Host-agnostic naming: "kaizen" in units, PAM, layer namespaces and state
   files. No hostname in the desktop's configuration.
 
