@@ -1,9 +1,1 @@
-[
-  {
-    "match": { "app": "^Signal$", "summary": " Averpil$" },
-    "urgency": "critical",
-    "border": "rose",
-    "borderAnimation": "glow",
-    "badgeEmoji": "❤️"
-  }
-]
+../../../../renoir/.config/kaizen/notification-rules.d/50-signal.jsonc
