@@ -1,5 +1,17 @@
 var name = "niri";
 
+// Demoting an exclusive layer surface to on-demand loses its keyboard focus.
+var releaseExclusiveFocus = false;
+// A dead client's session lock holds, and a new client's lock replaces it.
+var replacesDeadLock = true;
+// A new window opens on the focused output, whichever output it asks for.
+var opensOnFocusedOutput = true;
+// move-floating-window is relative to the output's working area, which the
+// bar's exclusive zone shortens at the top.
+var floatsInWorkingArea = true;
+var workspaceComponent = "NiriWorkspaces.qml";
+var castComponent = "NiriCasts.qml";
+
 function dpms(on) {
   return [
     "niri",

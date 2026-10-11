@@ -2,7 +2,6 @@ import QtQuick
 import Quickshell
 
 import "../../../Ui" as Ui
-import "../../../Ui/compositors" as Compositors
 import "WorkspaceModel.js" as Model
 
 Item {
@@ -14,7 +13,8 @@ Item {
     property real fontScale: 1
 
     function workspaceIds() {
-        return Model.workspaceIds(source.ids(root.output));
+        // Loader.item is typed QObject; the source exposes ids().
+        return Model.workspaceIds(source.item ? source.item.ids(root.output) : []); // qmllint disable missing-property
     }
 
     function focusWorkspace(id) {
@@ -26,8 +26,9 @@ Item {
     width: implicitWidth
     height: implicitHeight
 
-    Compositors.NiriWorkspaces {
+    Loader {
         id: source
+        source: Ui.Compositor.workspaceSource
     }
 
     Row {
@@ -35,13 +36,13 @@ Item {
         spacing: 2
 
         Repeater {
-            model: root.workspaceIds()
+            model: source.item ? root.workspaceIds() : []
 
             delegate: Rectangle {
                 required property int modelData
 
-                readonly property bool occupied: source.occupied(modelData, root.output)
-                readonly property bool focused: source.activeId(root.output) === modelData
+                readonly property bool occupied: source.item.occupied(modelData, root.output) // qmllint disable missing-property
+                readonly property bool focused: source.item.activeId(root.output) === modelData // qmllint disable missing-property
 
                 width: 20 * root.fontScale
                 height: Math.round(24 * root.fontScale)

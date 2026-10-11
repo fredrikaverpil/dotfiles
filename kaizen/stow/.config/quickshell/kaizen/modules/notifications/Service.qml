@@ -9,7 +9,6 @@ import Quickshell.Services.Notifications
 import Quickshell.Wayland
 
 import "../../Ui" as Ui
-import "../../Ui/compositors" as Compositors
 import "components"
 import "NotificationLogic.js" as NotificationLogic
 import "NotificationModel.js" as Model
@@ -423,10 +422,14 @@ Item {
         onTriggered: root.dndOverdue = true
     }
 
-    Compositors.NiriCasts {
+    Loader {
         id: casts
-        onSharingChanged: root.holdDoNotDisturb("sharing", sharing)
+        source: Ui.Compositor.castSource
     }
+
+    // Loader.item is typed QObject; the source exposes sharing.
+    readonly property bool sharing: casts.item ? casts.item.sharing : false // qmllint disable missing-property
+    onSharingChanged: holdDoNotDisturb("sharing", sharing)
 
     Component.onCompleted: {
         if (!soundPath)

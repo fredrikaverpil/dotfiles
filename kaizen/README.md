@@ -268,9 +268,15 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 - [`Ui/Compositor.qml`](stow/.config/quickshell/kaizen/Ui/Compositor.qml)
   is the only path to niri;
   [`Ui/compositors/`](stow/.config/quickshell/kaizen/Ui/compositors/)
-  owns niri commands, response parsing, and the workspace source. Keep
+  owns niri commands, response parsing, and the workspace and screencast
+  sources, which the bar and notifications load through its URLs. Keep
   scheduling and shared state above it. Nightlight is not compositor-specific
   and lives in its service.
+- Where the compositor's behaviour shapes a surface or service, `Compositor`
+  exposes a capability for it to read, not a compositor name to check:
+  `releaseExclusiveFocus` (panel and context menu focus), `replacesDeadLock`
+  (lock restore after a crash), `opensOnFocusedOutput` (mirror),
+  `floatsInWorkingArea` (recording's camera). `Niri.js` sets each.
 
 ## Session
 

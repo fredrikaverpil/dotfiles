@@ -28,6 +28,10 @@ Item {
         if (busy || !canMirror(source, target))
             return;
         starter.command = Model.startCommand(source, target);
+        if (!Ui.Compositor.opensOnFocusedOutput) {
+            starter.running = true;
+            return;
+        }
         focuser.command = Ui.Compositor.focusMonitor(target);
         focuser.running = true;
     }
@@ -52,8 +56,8 @@ Item {
 
     Component.onCompleted: refresh()
 
-    // niri opens the window on the focused output and ignores wl-mirror's
-    // --fullscreen-output; on the source, it would mirror itself.
+    // Where windows open on the focused output, wl-mirror's --fullscreen-output
+    // is ignored; on the source, it would mirror itself.
     Process {
         id: focuser
         onExited: starter.running = true

@@ -13,6 +13,7 @@ PanelWindow {
     readonly property int barHeight: shell ? shell.barHeight : 32
 
     property bool keyNavigation: false
+    property bool focusPrimed: false
 
     default property alias content: column.data
     readonly property alias contentSpacing: column.spacing
@@ -44,8 +45,11 @@ PanelWindow {
             next.forceActiveFocus(Qt.TabFocusReason);
     }
 
-    onShownChanged: if (shown && keyNavigation)
-        column.forceActiveFocus()
+    onShownChanged: {
+        focusPrimed = false;
+        if (shown && keyNavigation)
+            column.forceActiveFocus();
+    }
     Component.onCompleted: if (shell && shell.registerPanel)
         shell.registerPanel(panel)
 
@@ -60,10 +64,16 @@ PanelWindow {
     color: "transparent"
     mask: modalMask
     WlrLayershell.layer: WlrLayer.Overlay
-    // Demoting an exclusive panel loses its keyboard focus on niri.
-    WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    // Exclusive to take the keyboard, then on-demand between panels where the
+    // compositor keeps focus through the demotion.
+    WlrLayershell.keyboardFocus: shown ? (focusPrimed ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive) : WlrKeyboardFocus.None
 
     data: [
+        Timer {
+            interval: 75
+            running: panel.shown && !panel.focusPrimed && Compositor.releaseExclusiveFocus
+            onTriggered: panel.focusPrimed = true
+        },
         Region {
             id: modalMask
             item: modalInput

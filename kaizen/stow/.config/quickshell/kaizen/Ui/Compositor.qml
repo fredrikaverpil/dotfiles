@@ -6,6 +6,15 @@ import "compositors/Niri.js" as Niri
 
 Singleton {
     readonly property string name: Niri.name
+    // What differs between compositors; Niri.js says what each means.
+    readonly property bool releaseExclusiveFocus: Niri.releaseExclusiveFocus
+    readonly property bool replacesDeadLock: Niri.replacesDeadLock
+    readonly property bool opensOnFocusedOutput: Niri.opensOnFocusedOutput
+    readonly property bool floatsInWorkingArea: Niri.floatsInWorkingArea
+    // Components with ids(output), activeId(output) and occupied(idx, output);
+    // and with sharing, true while a screencast runs.
+    readonly property url workspaceSource: Qt.resolvedUrl("compositors/" + Niri.workspaceComponent)
+    readonly property url castSource: Qt.resolvedUrl("compositors/" + Niri.castComponent)
 
     function dpms(on) {
         return Niri.dpms(on);

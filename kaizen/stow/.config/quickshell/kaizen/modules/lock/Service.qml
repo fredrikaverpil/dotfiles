@@ -70,9 +70,9 @@ Item {
         return true;
     }
 
-    // niri keeps a dead client's lock and accepts a new one in its place.
+    // Takes over the lock a crashed shell left, where the compositor allows it.
     function restoreLock() {
-        if (!restorePending || !passwordPamConfigured)
+        if (!restorePending || !passwordPamConfigured || !Ui.Compositor.replacesDeadLock)
             return;
         restorePending = false;
         beginLock();
