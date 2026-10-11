@@ -269,10 +269,11 @@ change it measures.
 
 - Ask the user before running it; it restarts the shell and needs the machine
   untouched for about 10 minutes.
-- It refuses to run off AC, outside the `balanced` profile, while locked, or
-  at a 1-minute load of 1.5 or more. The restart applies the profile the shell
-  saved for AC, so it rechecks power after warm-up and before writing the row.
-  It warns when the system was over 10% busy; discard such rows.
+- It refuses to run off AC, outside the `balanced` profile, while locked, with
+  the curtain up, or at a 1-minute load of 1.5 or more. The restart applies
+  the profile the shell saved for AC, so it rechecks power after warm-up and
+  before writing the row. It warns when the system was over 10% busy; discard
+  such rows.
 - Measure with `eDP-1` only: lid open, no external monitor, on a plain
   USB-C charger (the monitor supplies power; unplugging it drops AC).
 - Rows are comparable only within the same `quickshell` build (Qt included)
