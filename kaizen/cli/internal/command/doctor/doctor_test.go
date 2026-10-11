@@ -52,6 +52,7 @@ const (
 	bootLine  = "journalctl --user --unit kaizen-* --boot --lines all --output json --no-pager"
 	userBus   = "busctl --user list --no-legend"
 	systemBus = "busctl --system list --no-legend"
+	envLine   = "systemctl --user show-environment"
 	// coreRequires is the core's requires under the test's $HOME.
 	coreRequires = "home/.config/quickshell/kaizen/requires"
 )
@@ -302,9 +303,10 @@ func TestRun(t *testing.T) {
 					"bus session org.a\nbus session org.b warn\nbus system org.c\nbus system org.d\nbus other x\n" +
 					"bus session\nbus session org.a warn extra\ncmd\ncmd present extra\ndata\n" +
 					"file $DIR/tree/requires\nfile $DIR/nope\n" +
-					"data kaizen/emoji.json\ndata kaizen/nope.json warn\n",
+					"data kaizen/emoji.json\ndata kaizen/nope.json warn\n" +
+					"env A=1\nenv B=2 warn\nenv C=3\nenv A\nenv =1\n",
 				"tree/plugins/ok/Plugin.qml":                  "",
-				"tree/plugins/ok/requires":                    "bus session org.a\ncmd present\n",
+				"tree/plugins/ok/requires":                    "bus session org.a\ncmd present\nenv A=1\n",
 				"tree/plugins/warned/Plugin.qml":              "",
 				"tree/plugins/warned/requires":                "cmd absent warn\n",
 				"tree/plugins/both/Plugin.qml":                "",
@@ -330,6 +332,7 @@ func TestRun(t *testing.T) {
 				}}},
 				userBus:   {{Stdout: "org.a 1 x\n:1.5 2 y\n"}},
 				systemBus: {{Err: errors.New("exit status 1")}},
+				envLine:   {{Stdout: "A=1\nB=1\nPATH=/bin\n"}},
 			},
 			want: result{
 				Stdout: "7 errors, 4 warnings\n\n" +
@@ -340,7 +343,8 @@ func TestRun(t *testing.T) {
 					"  unknown line: bus other x\n  unknown line: bus session\n" +
 					"  unknown line: bus session org.a warn extra\n  unknown line: cmd\n" +
 					"  unknown line: cmd present extra\n  unknown line: data\n  missing file $DIR/nope\n" +
-					"  missing data kaizen/nope.json\n" +
+					"  missing data kaizen/nope.json\n  missing env B=2\n  missing env C=3\n" +
+					"  unknown line: env A\n  unknown line: env =1\n" +
 					"ERROR plugins  check\n  absent: no absent/ in $DIR/tree/plugins or $DIR/home/.config/kaizen/plugins\n" +
 					"ERROR plugins  check\n  both: both/ in both $DIR/tree/plugins and $DIR/home/.config/kaizen/plugins\n" +
 					"ERROR plugins  check\n  noqml: no Plugin.qml in $DIR/home/.config/kaizen/plugins/noqml\n" +
@@ -351,7 +355,7 @@ func TestRun(t *testing.T) {
 					"  hint: delete ~/.local/bin/kaizen or rebuild\n" +
 					"WARN  kaizen-shell  check\n  runs $DIR/tree\n  hint: kaizen dev off\n" +
 					"WARN  warned  check\n  missing cmd absent\n",
-				Calls: []string{showLine, "$DIR/home/.local/bin/kaizen --version", niriLine, userBus, systemBus},
+				Calls: []string{showLine, "$DIR/home/.local/bin/kaizen --version", niriLine, userBus, systemBus, envLine},
 			},
 		},
 		{

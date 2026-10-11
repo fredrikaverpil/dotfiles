@@ -13,8 +13,9 @@ import (
 // requires checks the requires file at path for unit: one finding listing
 // what it names that is missing and each line in another form, an error
 // unless every missing line ends in `warn`. Each line is `cmd NAME`,
-// `bus session|system NAME`, `file PATH` or `data PATH`, in the XDG data
-// dirs, then `warn` or nothing.
+// `bus session|system NAME`, `file PATH`, `data PATH`, in the XDG data dirs,
+// or `env NAME=VALUE`, in the user manager's environment, then `warn` or
+// nothing.
 func (k *checker) requires(ctx context.Context, path, unit string) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -45,12 +46,18 @@ func (k *checker) requires(ctx context.Context, path, unit string) {
 		case kind == "cmd":
 			_, found = k.lookPath(name)
 		case kind == "bus" && bus != "":
-			names, listed := k.busNames(ctx, bus)
+			names, listed := k.list(ctx, "the "+bus+" bus", "busctl", busFlags[bus], "list", "--no-legend")
 			if !listed {
 				continue
 			}
 			found = slices.Contains(names, name)
 			name = bus + " " + name
+		case kind == "env" && strings.Index(name, "=") > 0:
+			names, listed := k.list(ctx, "the user manager's environment", "systemctl", "--user", "show-environment")
+			if !listed {
+				continue
+			}
+			found = slices.Contains(names, name)
 		case kind == "file":
 			found = exists(name)
 		case kind == "data":
@@ -84,31 +91,31 @@ func field(fields []string, i int) string {
 	return ""
 }
 
-// busList is a bus's names, owned and activatable alike.
-type busList struct {
+// busFlags is busctl's flag for each bus, whose list holds the names owned
+// and activatable alike.
+var busFlags = map[string]string{"session": "--user", "system": "--system"}
+
+// listing is the names a command printed.
+type listing struct {
 	names []string
-	// listed is false when busctl failed.
-	listed bool
+	// ok is false when the command failed.
+	ok bool
 }
 
-// busNames returns the names on bus, session or system, owned and activatable
-// alike; false when busctl fails, which it reports once.
-func (k *checker) busNames(ctx context.Context, bus string) ([]string, bool) {
-	if list, ok := k.buses[bus]; ok {
-		return list.names, list.listed
+// list returns the first field of each line name prints with args, running it
+// once per what; false when it fails, which it reports once.
+func (k *checker) list(ctx context.Context, what, name string, args ...string) ([]string, bool) {
+	if l, ok := k.lists[what]; ok {
+		return l.names, l.ok
 	}
-	flag := "--system"
-	if bus == "session" {
-		flag = "--user"
-	}
-	out, err := run(ctx, k.Runner, "busctl", flag, "list", "--no-legend")
+	out, err := run(ctx, k.Runner, name, args...)
 	if err != nil {
-		k.buses[bus] = busList{}
+		k.lists[what] = listing{}
 		k.add(check{
 			name:    "requires",
 			level:   "ERROR",
 			unit:    "doctor",
-			message: fmt.Sprintf("cannot list the %s bus: %v", bus, err),
+			message: fmt.Sprintf("cannot list %s: %v", what, err),
 		})
 		return nil, false
 	}
@@ -118,7 +125,7 @@ func (k *checker) busNames(ctx context.Context, bus string) ([]string, bool) {
 			names = append(names, fields[0])
 		}
 	}
-	k.buses[bus] = busList{names: names, listed: true}
+	k.lists[what] = listing{names: names, ok: true}
 	return names, true
 }
 
