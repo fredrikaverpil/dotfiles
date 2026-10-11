@@ -61,6 +61,8 @@ type Command struct {
 	location *time.Location
 	// proc is where the processes are; empty is /proc.
 	proc string
+	// getxattr returns a file's extended attribute; nil reads the file's.
+	getxattr func(path, attr string) ([]byte, error)
 }
 
 // Name returns doctor.
