@@ -52,5 +52,11 @@ Update it whenever a decision is made or a step completes, not only at the end.
    step.
 
 When every step is done, ask whether to delete `PLAN.md` and, if used, the
-worktree (`git worktree remove`, which also drops the `.git/worktrees` entry
-and the `.claude/worktrees/<tree-name>` directory).
+worktree. First check its branch is in the main branch
+(`git merge-base --is-ancestor HEAD main`). Then:
+
+- From a session inside the worktree: `ExitWorktree` with `remove`. It
+  counts commits against the session's starting point, not the main branch,
+  so once the branch is merged and I agreed, pass `discard_changes: true`.
+- Otherwise, from the main checkout: `git worktree remove <path>`, then
+  `git branch -d <branch>` (the worktree removal keeps the branch).
