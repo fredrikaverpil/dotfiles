@@ -473,7 +473,7 @@ func TestRun(t *testing.T) {
 			},
 			want: result{
 				Stdout: fmt.Sprintf(
-					`{"findings":[{"source":"check","name":"stale-shell","level":"WARN","unit":"kaizen-shell",`+
+					`{"findings":[{"source":"check","id":"stale-shell","level":"WARN","unit":"kaizen-shell",`+
 						`"message":"runs a Quickshell that is no longer installed","hint":"kaizen reload --restart",`+
 						`"count":1,"first":%[1]d,"last":%[1]d}],`+
 						`"text":"1 warning\n\nWARN  kaizen-shell  check\n`+
@@ -547,7 +547,7 @@ func TestRun(t *testing.T) {
 			},
 			want: result{
 				Stdout: fmt.Sprintf(
-					`{"findings":[{"source":"log","name":"log","level":"WARN","unit":"kaizen-shell",`+
+					`{"findings":[{"source":"log","id":"log","level":"WARN","unit":"kaizen-shell",`+
 						`"message":"WARN scene: Binding loop","count":2,"first":%d,"last":%d}],`+
 						`"text":"1 warning\n\nWARN  kaizen-shell  ×2  11:00:05–11:01:05\n  WARN scene: Binding loop"}`+"\n",
 					base.Add(5*time.Second).UnixMilli(),
