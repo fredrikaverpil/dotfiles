@@ -33,7 +33,10 @@ in
 # scripts and units run. Units, scripts, compositor config, QML and
 # notification rules live in kaizen/stow/.
 {
-  imports = [ ./fonts.nix ];
+  imports = [
+    ./fonts.nix
+    ./requires.nix
+  ];
 
   config = {
     # NOTE: Quickshell sets the app ID (Qt's desktop file name) after constructing the app,
