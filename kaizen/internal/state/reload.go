@@ -91,10 +91,9 @@ func unlocked(ctx context.Context, r Runner, wait wait) (Status, error) {
 
 // Reload applies the shell's files: a hot reload of a shell that answers, else,
 // or with restart, a restart of its unit after reloading the user manager. It
-// waits until the shell has loaded its config and answers, puts the curtain
-// back up if status had it up, and returns what the unit logged meanwhile;
-// ErrLoadFailed when the config failed to load. status is the shell's state,
-// from Unlocked.
+// waits until the shell has loaded its config and answers, and returns what the
+// unit logged meanwhile; ErrLoadFailed when the config failed to load. status
+// is the shell's state, from Unlocked.
 func Reload(ctx context.Context, r Runner, status Status, restart bool) ([]Entry, error) {
 	return reload(ctx, r, status, restart, sleep)
 }
@@ -126,11 +125,6 @@ func reload(ctx context.Context, r Runner, status Status, restart bool, wait wai
 			return entries, err
 		}
 		if loaded && now.Ready {
-			if status.CurtainUp() && !now.CurtainUp() {
-				if err := OpenCurtain(ctx, r, now.PID); err != nil {
-					return entries, err
-				}
-			}
 			// With what it logged until it answered.
 			return Journal(ctx, r, cursor)
 		}

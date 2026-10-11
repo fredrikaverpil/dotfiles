@@ -40,3 +40,21 @@ function shouldDimBacklight(state) {
 function shouldSleepOnTimeout(state, authenticating) {
   return !!(state.active && state.awake && !authenticating);
 }
+
+// The state file a previous generation wrote. savedBrightness is -1 when
+// there is no brightness to return to.
+function restored(text) {
+  var saved;
+  try {
+    saved = JSON.parse(String(text || ""));
+  } catch (error) {
+    saved = null;
+  }
+  var brightness = saved ? saved.savedBrightness : -1;
+  var valid =
+    Number.isInteger(brightness) && brightness >= 0 && brightness <= 100;
+  return {
+    active: !!saved && saved.active === true,
+    savedBrightness: valid ? brightness : -1,
+  };
+}

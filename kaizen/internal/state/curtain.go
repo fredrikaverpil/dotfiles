@@ -10,9 +10,8 @@ func (s Status) CurtainUp() bool {
 	return s.Curtain != nil && s.Curtain.Active
 }
 
-// OpenCurtain puts the curtain of the shell at pid back up: a reload, a
-// restart or a capture takes it down, and it hides the desktop while nobody is
-// at it.
+// OpenCurtain puts the curtain of the shell at pid back up after a capture: it
+// hides the desktop while nobody is at it.
 func OpenCurtain(ctx context.Context, r Runner, pid int) error {
 	_, answer, err := call(ctx, r, pid, "curtain", "open")
 	if err != nil {

@@ -31,9 +31,9 @@ sorts, but without the proper security features in place. Pressing any key
 while the curtain is active will show a password prompt.
 
 The user turns the curtain on from Settings › Session › Curtain in the launcher.
-`kaizen shot` lifts it for a screenshot and puts it back. A reload or restart
-of the shell takes it down; `kaizen reload` and `kaizen dev` put it back up.
-Over IPC, `close` lifts it and `open` puts it back.
+`kaizen shot` lifts it for a screenshot and puts it back. It stays up through a
+reload or restart of the shell, a crash included, until logout. Over IPC,
+`close` lifts it and `open` puts it back.
 
 What the curtain does not do, since it would stop screenshotting from working:
 

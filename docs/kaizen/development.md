@@ -104,9 +104,7 @@ upstream's latest, and niri marks each option with the version it arrived in
   `systemctl --user daemon-reload` when it is down, never loaded its config, or
   with `--restart`. It waits until the shell has loaded its config and answers,
   prints the warnings and errors it logged meanwhile, and exits 1 when the
-  config failed to load. A reload or a restart takes the curtain down, so it
-  puts the curtain back up when it was up. It refuses while the session is
-  locked.
+  config failed to load. It refuses while the session is locked.
 - User units are named `kaizen-<name>`, plugin daemons included
   (`kaizen-dcal`).
 - A bind, unit or script that may run while the shell restarts calls
