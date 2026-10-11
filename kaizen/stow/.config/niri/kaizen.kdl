@@ -1,6 +1,12 @@
-// What the kaizen shell needs from niri: its border colours, rules for its
-// surfaces and windows, and binds calling `kaizen`. Included by config.kdl;
-// window management and input stay there.
+// What the kaizen shell needs from niri: the session's environment, its border
+// colours, rules for its surfaces and windows, and binds calling `kaizen`. The
+// user's ~/.config/niri/config.kdl includes it with `include "kaizen.kdl"`;
+// everything else there is the user's.
+
+// Exports WAYLAND_DISPLAY to the systemd user manager, which starts the shell's
+// units. NIRI_SOCKET must be named explicitly, or `niri msg` fails inside the
+// shell.
+spawn-at-startup "uwsm" "finalize" "NIRI_SOCKET"
 
 // The shell writes the active border colour from its palette on each theme
 // change.

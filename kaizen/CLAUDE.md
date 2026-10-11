@@ -2,7 +2,7 @@
 
 # kaizen
 
-niri plus a Quickshell shell, driven and verified by an agent from a terminal.
+A Quickshell shell for niri, driven and verified by an agent from a terminal.
 The docs are not loaded with this file: read the one the task needs, by its
 path from the repository root.
 

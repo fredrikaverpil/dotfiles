@@ -9,8 +9,8 @@ Personal dotfiles, managed in three layers:
 - **Stow** ([`stow/`](stow/)): dotfiles symlinked into `$HOME` with
   [GNU Stow](https://www.gnu.org/software/stow/) (not Nix). Changes take effect
   immediately, no rebuild needed.
-- **Kaizen** ([`kaizen/`](kaizen/)): my custom Linux desktop experience which is
-  the combination of niri and Quickshell.
+- **Kaizen** ([`kaizen/`](kaizen/)): my custom Linux desktop experience, a
+  Quickshell shell for niri.
 
 ## Convenience links
 

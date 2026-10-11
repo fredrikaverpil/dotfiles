@@ -4,7 +4,18 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-niri validate --config ../../niri/config.kdl
+# kaizen.kdl alone, then each host's config.kdl beside its includes and
+# kaizen.kdl, as stowed into ~/.config/niri.
+niri validate --config ../../niri/kaizen.kdl
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+for config in ../../../../../stow/host/*/.config/niri/config.kdl; do
+  [ -e "$config" ] || continue
+  host=$(basename "$(dirname "$(dirname "$(dirname "$config")")")")
+  mkdir "$tmp/$host"
+  cp -L "$(dirname "$config")"/*.kdl ../../niri/kaizen.kdl "$tmp/$host"
+  niri validate --config "$tmp/$host/config.kdl"
+done
 printf 'PASS: compositor configuration contracts\n'
 
 # kaizen/README.md rules with a mechanical check: the IPC column of the services

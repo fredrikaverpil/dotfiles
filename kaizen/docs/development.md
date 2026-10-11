@@ -53,7 +53,7 @@ nix eval --raw .#nixosConfigurations.<host>.pkgs.qt6.qtdeclarative.version
 Look up a Quickshell type, property or signal in Context7 at the pinned version
 before using one that this tree does not already use, or when `qml-lint`
 rejects one. For niri, do the same for a config node or action missing from
-`niri/config.kdl` and `niri/kaizen.kdl`. `qml-lint` and `compositor-test`
+`niri/kaizen.kdl` and the hosts' `config.kdl`. `qml-lint` and `compositor-test`
 catch removed or misspelled API, not features you did not know about.
 
 Context7 indexes Quickshell per release
@@ -139,14 +139,16 @@ default devshell (`flake.nix`), entered by `direnv` at the repo root or run as
 `nix develop ~/.dotfiles -c <command>` (not `#dev`) from anywhere in the
 checkout. `compositor-test` and `shell-smoke` are Linux-only and are absent
 from the shell on macOS. All of them run against the single `kaizen/stow/`
-tree, so a static check passing here passes for every kaizen host.
+tree, so a static check passing here passes for every kaizen host;
+`compositor-test` also validates each host's niri `config.kdl` with its
+includes.
 
 | Change | Checks |
 | --- | --- |
 | Nix | `nix fmt`, `nix build .#nixosConfigurations.<host>.config.system.build.toplevel`; build both kaizen hosts, a shared module breaks both; the build fails on a `requires` `cmd`, `file` or `data` line the host does not install |
 | JS/QML | `qml-format`, `qml-test`, `qml-lint`, `requires-check` (any platform) |
 | The `kaizen` command (Go) | `go test ./...` and `go vet ./...` in `kaizen/cli/`; build both kaizen hosts, whose build runs the tests |
-| Compositor interface, config, or bind contract | Also `compositor-test` (Linux) |
+| Compositor interface, config (`kaizen.kdl` or a host's niri config), or bind contract | Also `compositor-test` (Linux) |
 | Service IPC, `shell.qml` wiring, or systemd units | Also `shell-smoke` on the machine after deploy and restart, and exercise the affected path |
 | Panel views | Also `shell-smoke --panels` |
 | Device-dependent behaviour | Also validate on the actual ThinkPad |
