@@ -77,8 +77,8 @@ func (Command) Summary() string {
 // finding is a check's or a log line's finding.
 type finding struct {
 	Source string `json:"source"`
-	// Name is the check's stable id; log for a log line.
-	Name    string `json:"name"`
+	// ID is the check's, stable; log for a log line.
+	ID      string `json:"id"`
 	Level   string `json:"level"`
 	Unit    string `json:"unit"`
 	Message string `json:"message"`
@@ -170,7 +170,7 @@ func (c Command) report(ctx context.Context, journalArgs []string) (report, erro
 	for _, ch := range checks {
 		findings = append(findings, finding{
 			Source:  "check",
-			Name:    ch.name,
+			ID:      ch.name,
 			Level:   ch.level,
 			Unit:    ch.unit,
 			Message: strings.TrimRightFunc(ch.message, unicode.IsSpace),
@@ -250,7 +250,7 @@ func logFindings(entries []state.Entry, units []unit) []finding {
 		ms := e.Time.UnixMilli()
 		f, ok := groups[k]
 		if !ok {
-			f = &finding{Source: "log", Name: "log", Level: k.level, Unit: k.unit, Message: k.message, First: ms, Last: ms}
+			f = &finding{Source: "log", ID: "log", Level: k.level, Unit: k.unit, Message: k.message, First: ms, Last: ms}
 			groups[k] = f
 			keys = append(keys, k)
 		}

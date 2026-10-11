@@ -1,7 +1,7 @@
 // The report as `kaizen doctor --json` prints it: { findings, text }, each
-// finding { source, name, level, unit, message, hint, count, first, last },
+// finding { source, id, level, unit, message, hint, count, first, last },
 // times in milliseconds since the epoch, level ERROR or WARN, hint only with a
-// fix. This reads neither name nor hint; the text carries the hint.
+// fix. This reads neither id nor hint; the text carries the hint.
 
 var LEVELS = ["ERROR", "WARN"];
 

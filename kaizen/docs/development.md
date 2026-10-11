@@ -167,7 +167,7 @@ tree, so a static check passing here passes for every kaizen host.
 - `kaizen doctor` lists the warnings and errors from each `kaizen-*` unit's
   current run, and checks units, the shell's binary, niri's config, the portal,
   the plugin dirs and the `requires` files; `--json` prints one document, each
-  finding with its check's stable `name` and, when there is one, its fix as
+  finding with its check's stable `id` and, when there is one, its fix as
   `hint`; journalctl arguments (`--since -1h`, `-b -1`) report that span of
   the journal instead, without the checks. Follow the units with
   `journalctl --user -u 'kaizen-*' -f`. Quickshell logs everything at priority 6
