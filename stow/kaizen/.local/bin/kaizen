@@ -3,24 +3,38 @@
 set -euo pipefail
 
 # Runs a subcommand from ~/.local/libexec/kaizen/. Each prints its usage line
-# on -h.
+# on -h. `kaizen internal` runs the ones under internal/, which the system runs
+# and a person has no use for.
 dir="$HOME/.local/libexec/kaizen"
+prefix="kaizen"
+
+if [[ ${1:-} == internal ]]; then
+  shift
+  dir="$dir/internal"
+  prefix="kaizen internal"
+fi
 
 usage() {
   local sub
-  echo "usage: kaizen COMMAND [ARGS...] | kaizen --json"
+  echo "usage: $prefix COMMAND [ARGS...] | $prefix --json"
   for sub in "$dir"/*; do
+    [[ -f $sub ]] || continue
     "$sub" -h | awk -F '    ' '{ sub(/^usage: /, "", $1); printf "  %-45s %s\n", $1, $2 }'
   done
+  if [[ $prefix == kaizen ]]; then
+    printf "  %-45s %s\n" "kaizen internal" "list the commands the system runs"
+  fi
 }
 
 # [{ name, usage, summary }] for each command.
 catalogue() {
   local sub
   for sub in "$dir"/*; do
+    [[ -f $sub ]] || continue
     "$sub" -h
   done | jq -Rn '[inputs | sub("^usage: "; "") | split("    ") |
-    { name: (.[0] | split(" ")[1]), usage: .[0], summary: .[1] }]'
+    { name: (.[0] | split(" ") | map(select(. != "kaizen" and . != "internal")) | .[0]),
+      usage: .[0], summary: .[1] }]'
 }
 
 case "${1:-}" in
@@ -34,7 +48,7 @@ case "${1:-}" in
   ;;
 esac
 
-if [[ $1 == */* || ! -x "$dir/$1" ]]; then
+if [[ $1 == */* || ! -f "$dir/$1" || ! -x "$dir/$1" ]]; then
   echo "kaizen: unknown command: $1" >&2
   usage >&2
   exit 2

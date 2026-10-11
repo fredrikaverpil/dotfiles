@@ -13,7 +13,7 @@ let
       }
       ''
         mkdir -p $out/share/kaizen
-        bash ${../../../../stow/kaizen/.local/libexec/kaizen/emoji} "$names" "$shortcodes" > $out/share/kaizen/emoji.json
+        bash ${../../../../stow/kaizen/.local/libexec/kaizen/internal/emoji} "$names" "$shortcodes" > $out/share/kaizen/emoji.json
       '';
 
   # qtimageformats supplies Quickshell's WebP decoder.

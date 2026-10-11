@@ -101,9 +101,12 @@ QML, which plugins run, and the notification rules.
   `~/.local/libexec/kaizen/<sub>`. Units, niri binds and QML call it, never a
   script's path. `kaizen --json` lists the commands as
   `{ name, usage, summary }`.
+- `kaizen internal <sub>` runs `~/.local/libexec/kaizen/internal/<sub>`: what
+  the system runs, as a unit or a build, and a person or an agent has no use
+  for. `kaizen internal` lists them, and `--json` works there too.
 - The shell reads its emoji data from `kaizen/emoji.json` in the XDG data dirs,
   which Nix builds with
-  [`kaizen emoji`](../../stow/kaizen/.local/libexec/kaizen/emoji).
+  [`kaizen internal emoji`](../../stow/kaizen/.local/libexec/kaizen/internal/emoji).
 - Apps are not kaizen's: [`nix/README.md`](../../nix/README.md) says where they
   go.
 - QML paths here (`modules/…`, `Ui/…`) are under
@@ -138,8 +141,8 @@ each enabled plugin's `plugins/<name>/requires`. It cannot check:
   Quickshell start logs a host portal warning `kaizen doctor` reports), and
   `investigate` with go and gopls on its PATH for the incident investigator.
 - The emoji data: run
-  [`kaizen emoji`](../../stow/kaizen/.local/libexec/kaizen/emoji) into
-  `~/.local/share/kaizen/emoji.json`.
+  [`kaizen internal emoji`](../../stow/kaizen/.local/libexec/kaizen/internal/emoji)
+  into `~/.local/share/kaizen/emoji.json`.
 
 ## Services to surfaces
 
