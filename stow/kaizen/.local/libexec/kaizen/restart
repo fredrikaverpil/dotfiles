@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+set -euo pipefail
+
+case "${1:-}" in
+-h | --help)
+  echo "usage: kaizen restart    restart the shell and wait for its IPC; refuses while the session is locked"
+  exit 0
+  ;;
+esac
+
+# shellcheck source=lib/shell.bash
+source "${BASH_SOURCE[0]%/*}/lib/shell.bash"
+
+# unlocked: fails unless the shell holds no lock. It answers "Not ready" while
+# a reload runs, and for good once its config failed to load, when it has no
+# lock surface either. The compositor keeps the lock after its client dies, so
+# a restart while locked leaves the session unable to unlock.
+unlocked() {
+  local answer
+  if [[ -z $(running) ]]; then
+    return 0
+  fi
+  for _ in $(seq 25); do
+    answer=$(timeout 2 kaizen ipc call lock isLocked 2>&1) || true
+    case $answer in
+    false) return 0 ;;
+    true)
+      echo "kaizen restart: the session is locked" >&2
+      return 1
+      ;;
+    esac
+    sleep 0.2
+  done
+  if [[ $answer == "Not ready to accept queries yet." ]]; then
+    return 0
+  fi
+  echo "kaizen restart: the lock state is unknown: $answer" >&2
+  return 1
+}
+
+unlocked || exit 1
+systemctl --user daemon-reload
+systemctl --user restart "$unit"
+for _ in $(seq 100); do
+  if timeout 2 kaizen ipc call lock isLocked >/dev/null 2>&1; then
+    exit 0
+  fi
+  sleep 0.2
+done
+echo "kaizen restart: $unit does not answer over IPC" >&2
+exit 1
