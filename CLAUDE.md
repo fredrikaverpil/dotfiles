@@ -65,10 +65,10 @@ Wheels and prebuilt npm binaries are glibc-linked and fail to load on NixOS
 
 ### niri + Quickshell desktop (ThinkPads)
 
-Read `docs/kaizen/README.md` (design, map) and `docs/kaizen/development.md`
+Read `kaizen/README.md` (design, map) and `kaizen/docs/development.md`
 (local checks, platform boundaries, safe deployment) before changing
-Quickshell, niri or their Nix modules. A `CLAUDE.md` symlink in each kaizen
-directory imports both when a file there is read.
+Quickshell, niri or their Nix modules. `kaizen/CLAUDE.md`, symlinked into each
+kaizen directory outside it, imports both when a file there is read.
 
 ### Neovim Configuration
 

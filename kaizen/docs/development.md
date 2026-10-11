@@ -1,7 +1,7 @@
 # Developing kaizen
 
 How to work on kaizen. Its design, layers and map, with where each part lives
-and which hosts it reaches, are in [`README.md`](README.md).
+and which hosts it reaches, are in [`README.md`](../README.md).
 
 Every kaizen host shares one copy of the core, so an edit lands on all of them
 at once: there is no promotion step and no drift to diff for.
@@ -320,7 +320,7 @@ kaizen dev off    # back to main's
 
 ## Building kaizen
 
-`kaizen` is a Go binary built from [`kaizen/`](../../kaizen/). A rebuild
+`kaizen` is a Go binary built from [`kaizen/`](../). A rebuild
 compiles it into the system profile, and a failing test fails the rebuild. Go
 comes from the default devshell. To use a change without a rebuild:
 

@@ -2,7 +2,7 @@
 
 A plugin is an optional shell extension: the shell runs without it, however
 many hosts enable it. Where its QML and Nix module live, and which hosts it
-reaches, is in [`README.md`](README.md) › Where it lives.
+reaches, is in [`README.md`](../README.md) › Where it lives.
 
 ## Writing one
 
@@ -59,7 +59,7 @@ reaches, is in [`README.md`](README.md) › Where it lives.
   the shell's state and cache roots (`Ui.Paths.state` or `Ui.Paths.cache` +
   `"/plugins/<name>"`; a daemon's unit sets `StateDirectory` or
   `CacheDirectory = "kaizen-shell/plugins/<name>"`), and names its runtime files
-  `$XDG_RUNTIME_DIR/kaizen-<name>…`. The rules of [`README.md`](README.md) ›
+  `$XDG_RUNTIME_DIR/kaizen-<name>…`. The rules of [`README.md`](../README.md) ›
   Where the shell writes apply: a cache producer prunes its own entries. A
   third-party daemon a plugin queries, such as dcal, keeps its own paths.
 - A tray plugin is an app written for kaizen, with its own [StatusNotifierItem]

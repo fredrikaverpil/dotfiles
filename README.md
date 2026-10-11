@@ -13,7 +13,7 @@ Personal dotfiles, managed in three layers:
   packages and a rebuild installs or removes to match, but versions are
   unpinned and upgraded manually.
 
-The Linux desktop experience is [kaizen](docs/kaizen/README.md) (a homegrown
+The Linux desktop experience is [kaizen](kaizen/README.md) (a homegrown
 combination of NixOS, niri and Quickshell).
 
 ## Quickstart

@@ -56,7 +56,7 @@ An unknown field, or a missing or invalid file, stops the daemon from starting,
 and `kaizen doctor` lists the reason.
 
 An alert toast gets the button from a notification rule
-([`features.md`](../../../../../../docs/kaizen/features.md) › Notifications ›
+([`features.md`](../../../../../../kaizen/docs/features.md) › Notifications ›
 Rules) whose action runs `investigate draft`. `INVESTIGATE_TAG`, one of `tags`,
 tags the draft; the daemon refuses any other. A draft that fails shows a
 critical toast with the error.

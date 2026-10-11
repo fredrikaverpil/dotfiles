@@ -1,1 +1,1 @@
-../../../../docs/kaizen/CLAUDE.md
+../../../../kaizen/CLAUDE.md
