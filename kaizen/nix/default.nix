@@ -33,7 +33,7 @@ in
 # scripts and units run. Units, scripts, compositor config, QML and
 # notification rules live in kaizen/stow/.
 {
-  imports = [ ../../nix/shared/system/fonts.nix ];
+  imports = [ ./fonts.nix ];
 
   config = {
     # niri is the only session: `niri --session` under UWSM, started with `kaizen` from the console.
