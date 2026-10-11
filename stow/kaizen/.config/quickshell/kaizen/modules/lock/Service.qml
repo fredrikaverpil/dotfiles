@@ -27,6 +27,16 @@ Item {
 
     readonly property bool locked: lockRequested || sessionLock.locked || sessionLock.secure
 
+    function status() {
+        return {
+            locked: locked,
+            requested: lockRequested,
+            secure: sessionLock.secure,
+            passwordPam: passwordPamConfigured,
+            authenticating: authenticating
+        };
+    }
+
     function authState() {
         return {
             lockRequested: lockRequested,
@@ -228,13 +238,7 @@ Item {
         }
 
         function status(): string {
-            return JSON.stringify({
-                locked: root.locked,
-                requested: root.lockRequested,
-                secure: sessionLock.secure,
-                passwordPam: root.passwordPamConfigured,
-                authenticating: root.authenticating
-            });
+            return JSON.stringify(root.status());
         }
     }
 }

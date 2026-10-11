@@ -188,6 +188,15 @@ ShellRoot {
         function barHeight(): int {
             return root.barHeight;
         }
+        function status(): string {
+            return JSON.stringify({
+                tree: Quickshell.shellDir,
+                barHeight: root.barHeight,
+                lock: lock.status(),
+                curtain: curtain.status(),
+                idle: idle.status()
+            });
+        }
     }
 
     function registerPanel(panel) {

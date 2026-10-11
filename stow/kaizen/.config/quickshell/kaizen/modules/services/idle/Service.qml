@@ -28,6 +28,14 @@ Item {
             }) + "\n");
     }
 
+    function status() {
+        return {
+            enabled: enabled,
+            idle: idleMonitor.isIdle,
+            lockAfterSeconds: lockAfterSeconds
+        };
+    }
+
     function lockNow() {
         if (!enabled || !lockService)
             return;
@@ -75,11 +83,7 @@ Item {
         target: "idle"
 
         function status(): string {
-            return JSON.stringify({
-                enabled: root.enabled,
-                idle: idleMonitor.isIdle,
-                lockAfterSeconds: root.lockAfterSeconds
-            });
+            return JSON.stringify(root.status());
         }
 
         function enable(): string {
