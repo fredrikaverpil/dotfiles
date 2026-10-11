@@ -92,6 +92,9 @@ QML, which plugins run, and the notification rules.
   [`kaizen/stow/`](stow/) reaches every kaizen host or none, and a
   plugin's QML there loads only where a `~/.config/kaizen/plugins/<name>.jsonc`
   enables it.
+- A host lists the trees it stows into `$HOME` in `kaizen.configTrees`
+  ([`requires.nix`](nix/requires.nix)), so its build checks the `requires` of
+  each plugin they enable.
 - `kaizen link [DIR]` links `kaizen/stow/` of the checkout DIR (default
   `~/.dotfiles`) into `$HOME` with Stow, after removing broken links into its
   `kaizen/`, and reloads the user manager when one runs. It needs no stowed
