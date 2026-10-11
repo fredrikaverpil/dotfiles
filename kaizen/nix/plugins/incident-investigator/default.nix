@@ -15,7 +15,7 @@ let
   };
 in
 {
-  # On the session PATH, for kaizen-incident-investigator (stow/kaizen/) and for
+  # On the session PATH, for kaizen-incident-investigator (kaizen/stow/) and for
   # the shell to run its client verbs. go and gopls come first on its runs'
   # PATH: the runs' gopls, offline against the module cache Neovim's go fills.
   environment.systemPackages = [

@@ -11,7 +11,7 @@ Stow forbids slashes in package names, so each level is its own invocation:
 | --- | --- |
 | `stow/shared/` | every machine |
 | `stow/platform/{Darwin,Linux}/` | matching `uname -s` |
-| `stow/kaizen/` | kaizen hosts, where `/etc/kaizen` exists (`renoir`, `wily`) |
+| `kaizen/stow/` | kaizen hosts, where `/etc/kaizen` exists (`renoir`, `wily`) |
 | `stow/host/<hostname>/` | that machine only; optional |
 | `nix/hosts/<hostname>/*/stow/` | that machine, from a private submodule; optional |
 

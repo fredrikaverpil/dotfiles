@@ -115,7 +115,7 @@ Notifications arriving via the D-Bus can be transformed by notification rules,
 keyed by regexes on the notification's data. This offers capabilities such as
 restyling, adding action buttons or deduplication. The fields are described at
 `ruleCheck` in
-[`NotificationLogic.js`](../../stow/kaizen/.config/quickshell/kaizen/modules/notifications/NotificationLogic.js).
+[`NotificationLogic.js`](../stow/.config/quickshell/kaizen/modules/notifications/NotificationLogic.js).
 
 Rules match only on what the app sends. Capture a real notification first:
 [`development.md`](development.md) › Gotchas.
@@ -129,7 +129,7 @@ directory. A file or rule that is invalid is dropped with a warning, which
 
 | File | Under | Holds |
 | --- | --- | --- |
-| `10-kaizen.jsonc` | `~/.config/quickshell/kaizen/`, from [`stow/kaizen/`](../../stow/kaizen/.config/quickshell/kaizen/notification-rules.d/) | the core's rules |
+| `10-kaizen.jsonc` | `~/.config/quickshell/kaizen/`, from [`kaizen/stow/`](../stow/.config/quickshell/kaizen/notification-rules.d/) | the core's rules |
 | `50-<what>.jsonc` | `~/.config/kaizen/`, from `stow/host/<host>/` or a private submodule's `stow/` | a host's rules |
 
 A rule's button may run a plugin's command, with the notification in

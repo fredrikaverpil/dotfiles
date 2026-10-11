@@ -14,7 +14,7 @@ import (
 
 func TestScriptsDir(t *testing.T) {
 	checkout := t.TempDir()
-	scripts := filepath.Join(checkout, "stow", "kaizen", ".local", "libexec", "kaizen")
+	scripts := filepath.Join(checkout, "kaizen", "stow", ".local", "libexec", "kaizen")
 	assert.NilError(t, os.MkdirAll(scripts, 0o755))
 	home := "/home/user"
 	for _, tt := range []struct {

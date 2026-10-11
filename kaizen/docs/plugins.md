@@ -7,14 +7,14 @@ reaches, is in [`README.md`](../README.md) › Where it lives.
 ## Writing one
 
 - A plugin
-  ([`Ui/Plugin.qml`](../../stow/kaizen/.config/quickshell/kaizen/Ui/Plugin.qml))
+  ([`Ui/Plugin.qml`](../stow/.config/quickshell/kaizen/Ui/Plugin.qml))
   adds launcher items, its own panels and IPC targets, and may take over the
   date button (`barActions.date`) or show an indicator (`barIndicator`):
   left-click calls the plugin, right-click opens its `plugins.<name>` node.
   Unlike the core indicators, the plugin picks when it shows.
   [`stow/host/renoir/.config/kaizen/plugins/hello/`](../../stow/host/renoir/.config/kaizen/plugins/hello/)
   is the minimal example;
-  [`plugins/gcloud-auth/`](../../stow/kaizen/.config/quickshell/kaizen/plugins/gcloud-auth/)
+  [`plugins/gcloud-auth/`](../stow/.config/quickshell/kaizen/plugins/gcloud-auth/)
   always shows its login state as one.
 - The shell loads `plugins/<name>/Plugin.qml` for each
   `~/.config/kaizen/plugins/<name>.jsonc`, in name order, and picks up a file
@@ -27,14 +27,14 @@ reaches, is in [`README.md`](../README.md) › Where it lives.
   `default.nix`, which a host imports beside the core's.
 - A plugin lists the programs, D-Bus services and files it needs beyond the
   core's in `plugins/<name>/requires`, in the format of the core's
-  [`requires`](../../stow/kaizen/.config/quickshell/kaizen/requires).
+  [`requires`](../stow/.config/quickshell/kaizen/requires).
   `kaizen doctor` reports what is missing where the plugin is enabled, and
   `requires-check` fails on a program its QML, JS or unit calls that neither
   file lists.
 - A plugin's unit is a file under Stow, enabled by a link in
   `wayland-session@niri.target.wants/`, or in the autostart target's when it
   shows a tray item (below). A generic plugin's lives in
-  [`stow/kaizen/`](../../stow/kaizen/.config/systemd/user/) with
+  [`kaizen/stow/`](../stow/.config/systemd/user/) with
   `ConditionPathExists=%h/.config/kaizen/plugins/<name>.jsonc`, so it runs only
   where the plugin is enabled; a host-only one in `stow/host/<host>/`.
 - A host's notification rules may add buttons that run the plugin's commands
