@@ -50,10 +50,10 @@ function cameraInset(frame) {
   return Math.min(cameraMargin, Math.round(cameraShort(frame) * 0.1));
 }
 
-// The circle's top-left for the bottom-right corner of region, in the
-// coordinates niri's move-floating-window takes: relative to the output's
-// working area, which the bar shortens at the top. Negative values would read
-// as relative moves, so they are clamped away.
+// The circle's top-left for the bottom-right corner of region, relative to
+// screen less barHeight at the top: the working area move-floating-window
+// takes, or the whole output with 0. Negative values would read as relative
+// moves, so they are clamped away.
 function cameraPosition(region, screen, barHeight, fraction) {
   var offset = cameraSize(region, fraction) + cameraInset(region);
   return {

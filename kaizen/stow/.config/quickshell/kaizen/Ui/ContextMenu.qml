@@ -12,6 +12,7 @@ PanelWindow {
 
     required property var shell
     property bool shown: false
+    property bool focusPrimed: false
 
     // Rows heading the root menu, shaped like QsMenuEntry.
     property var headRows: []
@@ -173,10 +174,13 @@ PanelWindow {
             hoverTimer.restart();
     }
 
-    onShownChanged: if (shown)
-        cardAt(depth - 1)?.focusSearch()
-    else
-        reset()
+    onShownChanged: {
+        focusPrimed = false;
+        if (shown)
+            cardAt(depth - 1)?.focusSearch();
+        else
+            reset();
+    }
 
     visible: shown
     anchors {
@@ -189,8 +193,15 @@ PanelWindow {
     exclusiveZone: 0
     color: "transparent"
     WlrLayershell.layer: WlrLayer.Overlay
-    // Demoting an exclusive panel loses its keyboard focus on niri.
-    WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    // Exclusive to take the keyboard, then on-demand between panels where the
+    // compositor keeps focus through the demotion.
+    WlrLayershell.keyboardFocus: shown ? (focusPrimed ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive) : WlrKeyboardFocus.None
+
+    Timer {
+        interval: 75
+        running: root.shown && !root.focusPrimed && Compositor.releaseExclusiveFocus
+        onTriggered: root.focusPrimed = true
+    }
 
     MouseArea {
         anchors.fill: parent

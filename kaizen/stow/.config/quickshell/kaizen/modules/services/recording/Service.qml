@@ -85,7 +85,7 @@ Item {
     // the circle would vanish and open a second time.
     property bool cameraScaleKnown: false
 
-    // The bar's exclusive zone: niri's floating coordinates start below it.
+    // The bar's exclusive zone, below which floatsInWorkingArea's coordinates start.
     required property int barHeight
 
     function refreshCameras() {
@@ -319,7 +319,7 @@ Item {
         if (!screen)
             return;
         placedWindow = cameraWindow.id;
-        const at = Model.cameraPosition(region, screen, barHeight, cameraFraction);
+        const at = Model.cameraPosition(region, screen, Ui.Compositor.floatsInWorkingArea ? barHeight : 0, cameraFraction);
         Quickshell.execDetached(Ui.Compositor.moveFloatingWindow(cameraWindow.id, at.x, at.y));
     }
 
