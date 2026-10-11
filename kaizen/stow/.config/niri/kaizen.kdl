@@ -1,0 +1,64 @@
+// What the kaizen shell needs from niri: its border colours, rules for its
+// surfaces and windows, and binds calling `kaizen`. Included by config.kdl;
+// window management and input stay there.
+
+// The shell writes the active border colour from its palette on each theme
+// change.
+include optional=true "~/.local/state/kaizen-shell/niri-colors.kdl"
+
+// Quickshell draws two wallpapers: one inside the workspaces, one behind them.
+layer-rule {
+    match namespace=r#"^quickshell-backdrop$"#
+    place-within-backdrop true
+}
+
+// The recording service's camera preview: gpu-screen-recorder cannot mask its
+// own camera overlay, so the screen capture records this window instead. mpv
+// sets its title after the initial configure, so opening rules need the app id
+// to match. niri clamps the radius to half the window, so any square mpv asks
+// for comes out a circle; the size is mpv's, since a rule size is in device
+// pixels and a proportion does not apply to floating windows.
+window-rule {
+    match app-id=r#"^kaizen-camera$"#
+
+    open-floating true
+    open-focused false
+    default-floating-position x=32 y=32 relative-to="bottom-right"
+    geometry-corner-radius 9999
+    clip-to-geometry true
+    border {
+        off
+    }
+}
+
+binds {
+    // Shell
+    Mod+Space hotkey-overlay-title="Menu" { spawn "kaizen" "ipc" "call" "menu" "toggle"; }
+    Mod+Shift+Space hotkey-overlay-title="Next keyboard layout" { spawn "kaizen" "ipc" "call" "keyboard" "next"; }
+    Super+Alt+L hotkey-overlay-title="Lock the screen" { spawn "kaizen" "ipc" "call" "lock" "lock"; }
+    Mod+N hotkey-overlay-title="Select notification" { spawn "kaizen" "ipc" "call" "notifications" "select"; }
+    Mod+Shift+Comma hotkey-overlay-title="Dismiss all notifications" { spawn "kaizen" "ipc" "call" "notifications" "dismissAll"; }
+
+    // Hardware keys. allow-when-locked keeps these working on the lock screen.
+    XF86AudioRaiseVolume allow-when-locked=true hotkey-overlay-title="Volume up" { spawn "kaizen" "ipc" "call" "audio" "up"; }
+    XF86AudioLowerVolume allow-when-locked=true hotkey-overlay-title="Volume down" { spawn "kaizen" "ipc" "call" "audio" "down"; }
+    XF86AudioMute allow-when-locked=true repeat=false hotkey-overlay-title="Mute" { spawn "kaizen" "ipc" "call" "audio" "mute"; }
+    XF86AudioMicMute allow-when-locked=true repeat=false hotkey-overlay-title="Mute microphone" { spawn "kaizen" "ipc" "call" "audio" "micMute"; }
+    XF86MonBrightnessUp allow-when-locked=true hotkey-overlay-title="Brightness up" { spawn "kaizen" "ipc" "call" "brightness" "up"; }
+    XF86MonBrightnessDown allow-when-locked=true hotkey-overlay-title="Brightness down" { spawn "kaizen" "ipc" "call" "brightness" "down"; }
+    XF86AudioNext allow-when-locked=true repeat=false hotkey-overlay-title="Next track" { spawn "kaizen" "ipc" "call" "media" "next"; }
+    XF86AudioPause allow-when-locked=true repeat=false hotkey-overlay-title="Play/pause" { spawn "kaizen" "ipc" "call" "media" "playPause"; }
+    XF86AudioPlay allow-when-locked=true repeat=false hotkey-overlay-title="Play/pause" { spawn "kaizen" "ipc" "call" "media" "playPause"; }
+    XF86AudioPrev allow-when-locked=true repeat=false hotkey-overlay-title="Previous track" { spawn "kaizen" "ipc" "call" "media" "previous"; }
+
+    // Capture. The shell saves screenshots to ~/Pictures/Screenshots, copies
+    // them to the clipboard and offers to annotate them.
+    Print repeat=false hotkey-overlay-title="Screenshot a region" { spawn "kaizen" "ipc" "call" "recording" "screenshot"; }
+    Shift+Print repeat=false hotkey-overlay-title="Screenshot the screen" { spawn "kaizen" "ipc" "call" "recording" "shoot" "screen"; }
+    // Opens the recording panel, or stops a running recording.
+    Mod+Print repeat=false hotkey-overlay-title="Record the screen" { spawn "kaizen" "ipc" "call" "recording" "toggle"; }
+    Mod+Shift+Print repeat=false hotkey-overlay-title="Pause or resume the recording" { spawn "kaizen" "ipc" "call" "recording" "pause"; }
+
+    // Launch
+    Mod+T hotkey-overlay-title="Focus or open a terminal" { spawn "kaizen" "focus" r#"^com\.mitchellh\.ghostty$"# "ghostty"; }
+}
