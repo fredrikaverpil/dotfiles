@@ -23,24 +23,45 @@ lock_and_wait() {
   return 1
 }
 
-monitor_sleep() {
-  while IFS= read -r line; do
-    if [[ $line == *"boolean true"* ]]; then
-      # <4>: the journal's warning priority, which `kaizen doctor` lists.
-      lock_and_wait || echo "<4>kaizen: session lock was not secure before suspend" >&2
-      return
-    fi
-  done < <(dbus-monitor --system \
-    "type='signal',sender='org.freedesktop.login1',interface='org.freedesktop.login1.Manager',member='PrepareForSleep'")
-}
+# A child holds the delay inhibitor, so releasing it before a suspend keeps
+# this process, and the unit, running.
+holder=""
 
-if [[ ${1:-} == "--monitor" ]]; then
-  monitor_sleep
-else
-  exec systemd-inhibit \
+hold_delay() {
+  [[ -z $holder ]] || return 0
+  systemd-inhibit \
     --what=sleep \
     --mode=delay \
     --who=kaizen \
     --why="Secure the Quickshell lock screen before suspend" \
-    "$0" --monitor
-fi
+    sleep infinity &
+  holder=$!
+}
+
+release_delay() {
+  # Killing systemd-inhibit also ends its child and releases the lock.
+  kill "$holder" 2>/dev/null || echo "<4>kaizen: the suspend delay was not held" >&2
+  wait "$holder" || true
+  holder=""
+}
+
+monitor_sleep() {
+  hold_delay
+  while IFS= read -r line; do
+    case $line in
+    *"boolean true"*)
+      # <4>: the journal's warning priority, which `kaizen doctor` lists.
+      lock_and_wait || echo "<4>kaizen: session lock was not secure before suspend" >&2
+      release_delay
+      ;;
+    *"boolean false"*)
+      hold_delay
+      ;;
+    esac
+  done < <(dbus-monitor --system \
+    "type='signal',sender='org.freedesktop.login1',interface='org.freedesktop.login1.Manager',member='PrepareForSleep'")
+  echo "kaizen: dbus-monitor exited" >&2
+  return 1
+}
+
+monitor_sleep
