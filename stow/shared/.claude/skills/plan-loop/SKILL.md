@@ -42,18 +42,14 @@ Update it whenever a decision is made or a step completes, not only at the end.
 1. After `/clear`, read `PLAN.md` and the files it lists before doing anything
    else. If no `PLAN.md` is at the root of the current checkout, list
    `.claude/worktrees/*/PLAN.md` and ask which one.
-2. Implement the next step only.
+2. Implement the first unticked step only.
 3. Update `PLAN.md` so a fresh context can resume from it alone: tick the step,
    record decisions and findings, name the next step.
 4. Re-read all of `PLAN.md` for contradictory or outdated passages and fix
    them. If that raises a decision or a change of course, discuss it with me
    first.
-5. Stop and ask me to run `/clear`. Do not start the next step. End with a
-   copy-paste prompt for the cleared context, using the absolute path:
-
-   ```text
-   /plan-loop Read /abs/path/to/PLAN.md and continue with step <N>: <title>.
-   ```
+5. Stop and ask me to run `/clear`, then `/plan-loop`. Do not start the next
+   step.
 
 When every step is done, ask whether to delete `PLAN.md` and, if used, the
 worktree (`git worktree remove`, which also drops the `.git/worktrees` entry
