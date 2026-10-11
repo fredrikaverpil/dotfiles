@@ -99,7 +99,8 @@ QML, which plugins run, and the notification rules.
   [`development.md`](development.md) › Working from a worktree.
 - `kaizen <sub>` is the only kaizen command on PATH; it runs
   `~/.local/libexec/kaizen/<sub>`. Units, niri binds and QML call it, never a
-  script's path.
+  script's path. `kaizen --json` lists the commands as
+  `{ name, usage, summary }`.
 - The shell reads its emoji data from `kaizen/emoji.json` in the XDG data dirs,
   which Nix builds with
   [`kaizen emoji`](../../stow/kaizen/.local/libexec/kaizen/emoji).
