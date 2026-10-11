@@ -290,11 +290,13 @@ lid close / power key ─ logind ─ sleep-lock locks shell ─ waits for secure
 The session is the entry
 [`kaizen.desktop`](stow/.local/share/wayland-sessions/kaizen.desktop), which
 runs niri. uwsm names its units after the entry ID, so another session on
-niri (`uwsm start niri`) starts none of kaizen's. Its `DesktopNames` set
-`XDG_CURRENT_DESKTOP=niri:kaizen`; niri first keeps niri's portal config and
-`OnlyShowIn=niri` autostart entries. For the name `kaizen`, uwsm sources
-[`uwsm/env-kaizen`](stow/.config/uwsm/env-kaizen) and exports its session
-variables to the user manager; a change applies from the next login.
+niri (`uwsm start niri`) starts none of kaizen's. Its `DesktopNames` give
+uwsm `XDG_CURRENT_DESKTOP=niri:kaizen` while it prepares the environment. For
+the name `kaizen`, uwsm sources [`uwsm/env-kaizen`](stow/.config/uwsm/env-kaizen)
+and exports its session variables to the user manager; a change applies from
+the next login. `niri --session` then sets and exports
+`XDG_CURRENT_DESKTOP=niri`, so portals and `OnlyShowIn=niri` autostart entries
+see plain niri.
 
 Units bind to `wayland-session@kaizen.desktop.target`; ordering after
 `graphical-session.target` is a cycle. `wayland-session-waitenv.service`
