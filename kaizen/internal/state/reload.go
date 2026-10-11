@@ -126,8 +126,8 @@ func reload(ctx context.Context, r Runner, status Status, restart bool, wait wai
 			return entries, err
 		}
 		if loaded && now.Ready {
-			if curtainUp(status) && !curtainUp(now) {
-				if err := openCurtain(ctx, r, now.PID); err != nil {
+			if status.CurtainUp() && !now.CurtainUp() {
+				if err := OpenCurtain(ctx, r, now.PID); err != nil {
 					return entries, err
 				}
 			}
@@ -174,24 +174,6 @@ func restartUnit(ctx context.Context, r Runner) error {
 		if _, err := r.Run(ctx, "systemctl", args...); err != nil {
 			return fmt.Errorf("systemctl %s: %v", strings.Join(args[1:], " "), err)
 		}
-	}
-	return nil
-}
-
-// curtainUp reports whether status shows the curtain up.
-func curtainUp(status Status) bool {
-	return status.Curtain != nil && status.Curtain.Active
-}
-
-// openCurtain puts the curtain of the shell at pid back up: a reload or a
-// restart takes it down, and it hides the desktop while nobody is at it.
-func openCurtain(ctx context.Context, r Runner, pid int) error {
-	_, answer, err := call(ctx, r, pid, "curtain", "open")
-	if err != nil {
-		return fmt.Errorf("the curtain is down: %v", err)
-	}
-	if answer != "shown" {
-		return fmt.Errorf("the curtain is down: curtain open: %s", answer)
 	}
 	return nil
 }
