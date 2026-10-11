@@ -71,7 +71,7 @@ QML, which plugins run, and the notification rules.
 | Part | Path | Reaches |
 | --- | --- | --- |
 | Session: niri under UWSM, portals, PAM, the services the shell reads, the packages the shell, its binds, scripts and units use | [`kaizen/nix/`](nix/default.nix) | every kaizen host |
-| The `kaizen` command, in Go, built by [`package.nix`](nix/package.nix) | [`kaizen/`](./) | every kaizen host |
+| The `kaizen` command, in Go, built by [`package.nix`](nix/package.nix) | [`kaizen/cli/`](cli/) | every kaizen host |
 | Compositor config, units and scripts, the shell's QML, the core's notification rules | [`kaizen/stow/`](stow/) | every kaizen host |
 | Plugin QML: generic or reusable | [`kaizen/stow/.config/quickshell/kaizen/plugins/<name>/`](stow/.config/quickshell/kaizen/plugins/) | every kaizen host |
 | Plugin QML: specific to one host | `stow/host/<host>/.config/kaizen/plugins/<name>/` | that host |
@@ -102,9 +102,10 @@ QML, which plugins run, and the notification rules.
   its plugins' QML. A plugin name in both is an error: neither shadows the
   other. `kaizen dev` runs a worktree's shell tree instead:
   [`development.md`](docs/development.md) › Working from a worktree.
-- `kaizen` is the only kaizen command on PATH, built from [`kaizen/`](./) into
-  the system profile. `kaizen <sub>` runs its Go command `<sub>`
-  ([`kaizen/internal/command/`](internal/command/)), else
+- `kaizen` is the only kaizen command on PATH, built from
+  [`kaizen/cli/`](cli/) into the system profile. `kaizen <sub>` runs its Go
+  command `<sub>`
+  ([`kaizen/cli/internal/command/`](cli/internal/command/)), else
   `~/.local/libexec/kaizen/<sub>` with the binary's own directory first on its
   PATH. Units, niri binds and QML call it, never a script's path.
   `kaizen --json` lists the commands as `{ name, usage, summary }`, and
@@ -150,7 +151,7 @@ each enabled plugin's `plugins/<name>/requires`. It cannot check:
   [overlay's patch](../nix/shared/overlays/default.nix) (without it, every
   Quickshell start logs a host portal warning `kaizen doctor` reports), and
   `investigate` with go and gopls on its PATH for the incident investigator.
-- The `kaizen` command: [`kaizen/build.sh`](build.sh) installs it
+- The `kaizen` command: [`kaizen/cli/build.sh`](cli/build.sh) installs it
   as `~/.local/bin/kaizen` with the host's Go, or
   `nix build ~/.dotfiles#kaizen` builds it.
 - The emoji data: run

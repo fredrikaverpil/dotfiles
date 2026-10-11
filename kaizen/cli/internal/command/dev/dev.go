@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/fredrikaverpil/dotfiles/kaizen/internal/state"
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/state"
 )
 
 // tree is the shell tree in a checkout.

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/fredrikaverpil/dotfiles/kaizen/internal/state"
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/state"
 )
 
 // Command reloads the shell.

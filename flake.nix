@@ -173,7 +173,7 @@
                 in
                 pkgs.mkShell {
                   packages = [
-                    pkgs.go_1_27 # kaizen/, as package.nix builds it
+                    pkgs.go_1_27 # kaizen/cli/, as package.nix builds it
                     pkgs.qt6.qtdeclarative # qmlls, qmllint, qmlformat, qmltestrunner
                     # Plugins import qs.Ui, which Quickshell maps to the tree's Ui/;
                     # qmllint finds it through a qs/Ui link on -I.

@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fredrikaverpil/dotfiles/kaizen/internal/state"
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/state"
 )
 
 // sendTimeout bounds one wtype run.
