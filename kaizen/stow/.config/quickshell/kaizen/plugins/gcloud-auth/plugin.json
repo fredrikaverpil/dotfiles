@@ -1,0 +1,7 @@
+{
+  "id": "gcloud-auth",
+  "name": "gcloud auth",
+  "version": "0.1.0",
+  "api": 1,
+  "units": []
+}

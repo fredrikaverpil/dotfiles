@@ -66,3 +66,31 @@ function pluginConfig(text, path) {
   }
   return config;
 }
+
+// The plugin.json at `path` of plugin `id` when the shell's plugin API `api`
+// loads it, else null with a warning.
+function pluginManifest(text, path, id, api) {
+  var manifest;
+  try {
+    manifest = JSON.parse(String(text || ""));
+  } catch (error) {
+    console.warn("plugins: " + path + ": " + error);
+    return null;
+  }
+  if (!manifest || manifest.id !== id) {
+    console.warn("plugins: " + path + ": id is not " + id);
+    return null;
+  }
+  if (manifest.api !== api) {
+    console.warn(
+      "plugins: " +
+        path +
+        ": plugin API " +
+        manifest.api +
+        ", the shell's is " +
+        api,
+    );
+    return null;
+  }
+  return manifest;
+}

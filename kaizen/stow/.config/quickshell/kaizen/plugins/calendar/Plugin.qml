@@ -4,7 +4,6 @@ import qs.Ui as Ui
 Ui.Plugin {
     id: plugin
 
-    name: "calendar"
     menuItems: ({
             "plugins.calendar": {
                 icon: "󰃭",

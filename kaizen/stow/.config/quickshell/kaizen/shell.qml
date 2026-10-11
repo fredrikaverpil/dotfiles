@@ -103,9 +103,21 @@ ShellRoot {
             pluginDirsListed = true;
     }
 
-    // The Plugin.qml under the one plugin dir named name; "" when neither or
-    // both have it.
-    function pluginSource(name) {
+    // The Ui.Plugin contract this tree provides, from its plugin-api; 0 until
+    // read.
+    property int pluginApi: 0
+
+    FileView {
+        path: Quickshell.shellPath("plugin-api")
+        onLoaded: {
+            root.pluginApi = parseInt(text(), 10) || 0;
+            if (!root.pluginApi)
+                console.warn("plugins: " + path + ": not a number");
+        }
+    }
+
+    // The one plugin dir named name; "" when neither or both have it.
+    function pluginDir(name) {
         const dirs = [shellPluginDirs, configPluginDirs].filter(model => {
             for (let i = 0; i < model.count; i++) {
                 if (model.get(i, "fileName") === name)
@@ -113,7 +125,7 @@ ShellRoot {
             }
             return false;
         });
-        return dirs.length === 1 ? String(dirs[0].folder) + "/" + name + "/Plugin.qml" : "";
+        return dirs.length === 1 ? dirs[0].path + "/" + name : "";
     }
 
     // Each <name>.jsonc enables plugins/<name>/Plugin.qml, in this tree or in
@@ -127,21 +139,23 @@ ShellRoot {
 
     FolderListModel {
         id: shellPluginDirs
-        folder: "file://" + Quickshell.shellPath("plugins")
+        readonly property string path: Quickshell.shellPath("plugins")
+        folder: "file://" + path
         showFiles: false
         onStatusChanged: root.listPluginDirs()
     }
 
     FolderListModel {
         id: configPluginDirs
-        folder: "file://" + Ui.Paths.config + "/plugins"
+        readonly property string path: Ui.Paths.config + "/plugins"
+        folder: "file://" + path
         showFiles: false
         onStatusChanged: root.listPluginDirs()
     }
 
     Instantiator {
         id: pluginLoaders
-        active: root.pluginDirsListed
+        active: root.pluginDirsListed && root.pluginApi > 0
         model: pluginFiles
         onObjectAdded: root.loadPlugins()
         onObjectRemoved: root.loadPlugins()
@@ -150,15 +164,25 @@ ShellRoot {
             id: pluginLoader
             required property string fileBaseName
             required property string filePath
+            property string dir: ""
             property var config: ({})
-            Component.onCompleted: {
-                const source = root.pluginSource(fileBaseName);
-                if (source)
-                    setSource(source, {
-                        shell: root
-                    });
-            }
+            Component.onCompleted: dir = root.pluginDir(fileBaseName)
             onLoaded: root.loadPlugins()
+
+            // Loads Plugin.qml once its plugin.json matches.
+            FileView {
+                path: pluginLoader.dir ? pluginLoader.dir + "/plugin.json" : ""
+                printErrors: false
+                onLoaded: {
+                    const manifest = Model.pluginManifest(text(), path, pluginLoader.fileBaseName, root.pluginApi);
+                    if (manifest)
+                        pluginLoader.setSource("file://" + pluginLoader.dir + "/Plugin.qml", {
+                            shell: root,
+                            name: manifest.id
+                        });
+                }
+                onLoadFailed: console.warn("plugins: " + path + ": cannot read")
+            }
 
             Binding {
                 target: pluginLoader.item

@@ -349,12 +349,16 @@ func TestRun(t *testing.T) {
 					"7299-72aa r--p 00000000 fe:00 1    $DIR/qtbase/lib/libQt6Core.so.6.11.2\n",
 				"qt/b/imageformats/libqwebp.so":                    "",
 				"qtbase/lib/qt-6/plugins/platforms/libqwayland.so": "",
+				"tree/plugin-api":                                  "1\n",
 				"tree/plugins/ok/Plugin.qml":                       "",
+				"tree/plugins/ok/plugin.json":                      `{"id": "ok", "api": 1}`,
 				"tree/plugins/ok/requires":                         "bus session org.a\ncmd present\nenv A=1\nqtplugin imageformats/libqwebp.so\n",
 				"tree/plugins/warned/Plugin.qml":                   "",
+				"tree/plugins/warned/plugin.json":                  `{"id": "warned", "api": 1}`,
 				"tree/plugins/warned/requires":                     "cmd absent warn\n",
 				"tree/plugins/both/Plugin.qml":                     "",
 				"home/.config/kaizen/plugins/both/Plugin.qml":      "",
+				"home/.config/kaizen/plugins/noqml/plugin.json":    `{"id": "noqml", "api": 1}`,
 				"home/.config/kaizen/plugins/noqml/requires":       "cmd absent\n",
 				"home/.config/kaizen/plugins/ok.jsonc":             "{}",
 				"home/.config/kaizen/plugins/warned.jsonc":         "{}",
@@ -406,6 +410,69 @@ func TestRun(t *testing.T) {
 					"WARN  kaizen-shell  check\n  runs $DIR/tree\n  hint: kaizen dev off\n" +
 					"WARN  warned  check\n  missing cmd absent\n",
 				Calls: []string{showLine, "$DIR/home/.local/bin/kaizen --version", niriLine, portalLine, userBus, systemBus, envLine, fontLine},
+			},
+		},
+		{
+			name: "plugin manifests",
+			files: map[string]string{
+				coreRequires: "",
+				"home/.config/quickshell/kaizen/plugin-api":      "1\n",
+				"home/.config/kaizen/plugins/broken.jsonc":       "{}",
+				"home/.config/kaizen/plugins/broken/Plugin.qml":  "",
+				"home/.config/kaizen/plugins/broken/plugin.json": "{",
+				"home/.config/kaizen/plugins/good.jsonc":         "{}",
+				"home/.config/kaizen/plugins/good/Plugin.qml":    "",
+				"home/.config/kaizen/plugins/good/plugin.json": `{"id": "good", "name": "Good", "version": "0.1.0", "api": 1, ` +
+					`"units": ["kaizen-good.service", "kaizen-idle.service", "kaizen-gone.service"]}`,
+				"home/.config/kaizen/plugins/newer.jsonc":      "{}",
+				"home/.config/kaizen/plugins/newer/Plugin.qml": "",
+				"home/.config/kaizen/plugins/newer/plugin.json": `{"id": "newer", "name": "Newer", "version": "2.0.0", "api": 2, ` +
+					`"units": ["kaizen-good.service"]}`,
+				"home/.config/kaizen/plugins/nomanifest.jsonc":      "{}",
+				"home/.config/kaizen/plugins/nomanifest/Plugin.qml": "",
+				"home/.config/kaizen/plugins/renamed.jsonc":         "{}",
+				"home/.config/kaizen/plugins/renamed/Plugin.qml":    "",
+				"home/.config/kaizen/plugins/renamed/plugin.json":   `{"id": "other", "api": 1, "units": ["kaizen-gone.service"]}`,
+			},
+			outputs: map[string][]recorded{
+				showLine: {{Stdout: strings.Join([]string{
+					unitBlock("kaizen-shell.service", "", "active", "success", "0", "0", ""),
+					unitBlock("kaizen-good.service", "", "active", "success", "0", "0", ""),
+					unitBlock("kaizen-idle.service", "", "inactive", "success", "0", "0", ""),
+				}, "\n")}},
+				niriLine:   {{}},
+				portalLine: {{}},
+			},
+			want: result{
+				Stdout: "5 errors, 1 warning\n\n" +
+					"ERROR plugins  check\n  broken: $DIR/home/.config/kaizen/plugins/broken/plugin.json: " +
+					"jsontext: unexpected EOF after offset 1\n" +
+					"ERROR plugins  check\n  good: kaizen-gone.service is not loaded\n  hint: kaizen link\n" +
+					"ERROR plugins  check\n  newer: Newer 2.0.0 needs plugin API 2, the shell's is 1\n" +
+					"ERROR plugins  check\n  nomanifest: no plugin.json in $DIR/home/.config/kaizen/plugins/nomanifest\n" +
+					"ERROR plugins  check\n  renamed: $DIR/home/.config/kaizen/plugins/renamed/plugin.json names id \"other\"\n" +
+					"WARN  kaizen-idle  check\n  not running, though plugin good is enabled\n" +
+					"  hint: systemctl --user start kaizen-idle.service\n",
+				Calls: []string{showLine, niriLine, portalLine},
+			},
+		},
+		{
+			name: "no plugin API",
+			files: map[string]string{
+				coreRequires:                                   "",
+				"home/.config/kaizen/plugins/good.jsonc":       "{}",
+				"home/.config/kaizen/plugins/good/Plugin.qml":  "",
+				"home/.config/kaizen/plugins/good/plugin.json": `{"id": "good", "api": 2}`,
+			},
+			outputs: map[string][]recorded{
+				showLine:   {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "0", "0", "")}},
+				niriLine:   {{}},
+				portalLine: {{}},
+			},
+			want: result{
+				Stdout: "1 error\n\nERROR plugins  check\n  cannot read the shell's plugin API: " +
+					"open $DIR/home/.config/quickshell/kaizen/plugin-api: no such file or directory\n",
+				Calls: []string{showLine, niriLine, portalLine},
 			},
 		},
 		{

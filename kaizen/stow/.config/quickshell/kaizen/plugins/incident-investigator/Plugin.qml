@@ -7,7 +7,6 @@ import qs.Ui as Ui
 Ui.Plugin {
     id: plugin
 
-    name: "incident-investigator"
     menuItems: ({
             "plugins.incident-investigator": {
                 icon: "󰍉",

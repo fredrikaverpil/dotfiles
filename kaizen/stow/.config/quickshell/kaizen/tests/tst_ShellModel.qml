@@ -78,4 +78,56 @@ TestCase {
         compare(got, data.want);
         verify(!Array.isArray(got));
     }
+
+    function test_plugin_manifest_data() {
+        return [
+            {
+                tag: "matching",
+                text: "{\"id\": \"x\", \"name\": \"X\", \"version\": \"0.1.0\", \"api\": 1, \"units\": []}",
+                want: {
+                    id: "x",
+                    name: "X",
+                    version: "0.1.0",
+                    api: 1,
+                    units: []
+                }
+            },
+            {
+                tag: "other api",
+                text: "{\"id\": \"x\", \"api\": 2}",
+                want: null
+            },
+            {
+                tag: "api as text",
+                text: "{\"id\": \"x\", \"api\": \"1\"}",
+                want: null
+            },
+            {
+                tag: "other id",
+                text: "{\"id\": \"y\", \"api\": 1}",
+                want: null
+            },
+            {
+                tag: "invalid",
+                text: "{",
+                want: null
+            },
+            {
+                tag: "empty file",
+                text: "",
+                want: null
+            },
+            {
+                tag: "list",
+                text: "[1]",
+                want: null
+            },
+        ];
+    }
+
+    function test_plugin_manifest(data) {
+        const got = Shell.pluginManifest(data.text, "plugins/x/plugin.json", "x", 1);
+
+        compare(got, data.want);
+    }
 }

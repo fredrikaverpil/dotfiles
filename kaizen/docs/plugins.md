@@ -17,12 +17,33 @@ reaches, is in [`README.md`](../README.md) › Where it lives.
   [`plugins/gcloud-auth/`](../stow/.config/quickshell/kaizen/plugins/gcloud-auth/)
   always shows its login state as one.
 - The shell loads `plugins/<name>/Plugin.qml` for each
-  `~/.config/kaizen/plugins/<name>.jsonc`, in name order, and picks up a file
-  added or removed. The file holds the plugin's config in JSONC, `{}` when it
-  has none; the plugin reads it as `config`, updated on save. A generic
+  `~/.config/kaizen/plugins/<name>.jsonc` whose manifest (below) matches, in
+  name order, and picks up a file added or removed. The file holds the
+  plugin's config in JSONC, `{}` when it has none; the plugin reads it as
+  `config`, updated on save. A generic
   plugin's `plugins/<name>/` is in the shell tree, a host's in
   `~/.config/kaizen/`; a name in both, or in neither, does not load. Plugin QML
   imports `qs.Ui`, which resolves to the shell tree's `Ui/` from either.
+- A plugin's manifest is `plugins/<name>/plugin.json`:
+
+  ```json
+  {
+    "id": "calendar",
+    "name": "Calendar",
+    "version": "0.1.0",
+    "api": 1,
+    "units": ["kaizen-dcal.service"]
+  }
+  ```
+
+  The shell loads the plugin only when `id` is its dir's name and `api` is the
+  shell tree's
+  [`plugin-api`](../stow/.config/quickshell/kaizen/plugin-api), the number of
+  the `Ui.Plugin` contract, bumped by a change that breaks a plugin; it passes
+  `id` as the plugin's `name`. `units` lists the plugin's units, each named
+  `kaizen-…`; `name` and `version` label `kaizen doctor`'s findings. Doctor
+  reports a missing or mismatched manifest, and a listed unit that is not
+  loaded or not running.
 - A plugin that needs a package has a Nix module, its directory's
   `default.nix`, which a host imports beside the core's.
 - A plugin lists the programs, D-Bus services and files it needs beyond the
