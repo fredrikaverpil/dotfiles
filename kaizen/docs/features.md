@@ -134,7 +134,7 @@ directory. A file or rule that is invalid is dropped with a warning, which
 
 A rule's button may run a plugin's command, with the notification in
 `NOTIFICATION_APP`, `NOTIFICATION_SUMMARY` and `NOTIFICATION_BODY`; the
-[incident investigator](../../nix/shared/system/kaizen/plugins/incident-investigator/README.md)
+[incident investigator](../nix/plugins/incident-investigator/README.md)
 has one.
 
 ### Toasts

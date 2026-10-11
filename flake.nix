@@ -115,7 +115,7 @@
 
       # `kaizen` off NixOS: `nix build ~/.dotfiles#kaizen`.
       packages = inputs.nixpkgs-unstable.lib.genAttrs [ "x86_64-linux" "aarch64-linux" ] (system: {
-        kaizen = unstable.${system}.callPackage ./nix/shared/system/kaizen/package.nix { };
+        kaizen = unstable.${system}.callPackage ./kaizen/nix/package.nix { };
       });
 
       # Formatters for `nix fmt` - uses nixfmt for each architecture

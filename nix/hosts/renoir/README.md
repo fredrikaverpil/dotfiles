@@ -2,7 +2,7 @@
 
 Personal machine. The niri + Quickshell desktop it runs is shared with `wily`
 and documented in `kaizen/README.md`; its Nix modules are
-`nix/shared/system/kaizen/default.nix`, the kaizen plugins `configuration.nix`
+`kaizen/nix/default.nix`, the kaizen plugins `configuration.nix`
 imports, and `nix/shared/system/thinkpad.nix`.
 Machine-specific settings (microcode, VAAPI driver, kernel choice) and
 host-only programs belong in `configuration.nix`.
@@ -13,7 +13,7 @@ Lid close uses the logind default, plain suspend; there is no hibernate.
 
 ## Firmware
 
-The fwupd procedure is in `nix/shared/system/kaizen/default.nix`.
+The fwupd procedure is in `kaizen/nix/default.nix`.
 
 - Secure Boot is disabled: the NixOS installer is unsigned.
 - A BIOS update can reset EFI settings; recheck Config → Power → Sleep State.

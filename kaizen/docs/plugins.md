@@ -45,9 +45,9 @@ reaches, is in [`README.md`](../README.md) › Where it lives.
 - A plugin that needs a long-running backend brings its own daemon: its module
   installs it, its unit runs it, and its QML queries the daemon's IPC. The
   calendar
-  ([`nix/shared/system/kaizen/plugins/calendar/`](../../nix/shared/system/kaizen/plugins/calendar/))
+  ([`kaizen/nix/plugins/calendar/`](../nix/plugins/calendar/))
   does this with [dcal]. The incident investigator
-  ([`nix/shared/system/kaizen/plugins/incident-investigator/`](../../nix/shared/system/kaizen/plugins/incident-investigator/))
+  ([`kaizen/nix/plugins/incident-investigator/`](../nix/plugins/incident-investigator/))
   brings a daemon written for it, and takes what differs per host from its
   plugin file.
 - A plugin's daemon or tray app logs what nothing on screen shows with a journal

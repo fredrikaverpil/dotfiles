@@ -13,7 +13,7 @@ let
       }
       ''
         mkdir -p $out/share/kaizen
-        bash ${../../../../stow/kaizen/.local/libexec/kaizen/internal/emoji} "$names" "$shortcodes" > $out/share/kaizen/emoji.json
+        bash ${../../stow/kaizen/.local/libexec/kaizen/internal/emoji} "$names" "$shortcodes" > $out/share/kaizen/emoji.json
       '';
 
   # qtimageformats supplies Quickshell's WebP decoder.
@@ -33,7 +33,7 @@ in
 # scripts and units run. Units, scripts, compositor config, QML and
 # notification rules live in stow/kaizen/.
 {
-  imports = [ ../fonts.nix ];
+  imports = [ ../../nix/shared/system/fonts.nix ];
 
   config = {
     # niri is the only session: `niri --session` under UWSM, started with `kaizen` from the console.
