@@ -32,6 +32,15 @@ Item {
     property string failureMessage: ""
     property int failedAttempts: 0
 
+    function status() {
+        return {
+            active: active,
+            awake: awake,
+            passwordPam: passwordPamConfigured,
+            authenticating: authenticating
+        };
+    }
+
     function curtainState() {
         return {
             active: active,
@@ -269,12 +278,7 @@ Item {
         }
 
         function status(): string {
-            return JSON.stringify({
-                active: root.active,
-                awake: root.awake,
-                passwordPam: root.passwordPamConfigured,
-                authenticating: root.authenticating
-            });
+            return JSON.stringify(root.status());
         }
     }
 }

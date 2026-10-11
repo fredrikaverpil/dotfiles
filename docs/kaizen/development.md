@@ -91,6 +91,9 @@ upstream's latest, and niri marks each option with the version it arrived in
   `notify-send -a Slack "[workspace] in #alerts" "<https://example.com|View>"`.
   It carries only what you pass, so copy the summary and body from a captured
   one.
+- `kaizen ipc call shell status` returns the shell's state as one JSON
+  document: the tree it runs, the bar's height, and the lock, curtain and idle
+  services' `status`. Read it rather than querying the services one by one.
 - User units are named `kaizen-<name>`, plugin daemons included
   (`kaizen-dcal`).
 - A bind, unit or script that may run while the shell restarts calls
