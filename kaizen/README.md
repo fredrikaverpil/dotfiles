@@ -146,7 +146,7 @@ each enabled plugin's `plugins/<name>/requires`. It cannot check:
   only where it exists.
 - The session variables `NIXOS_OZONE_WL=1`, `QT_QPA_PLATFORMTHEME=gtk3` and
   `GTK_USE_PORTAL=1`, and the fonts in
-  [`fonts.nix`](../nix/shared/system/fonts.nix).
+  [`fonts.nix`](nix/fonts.nix).
 - Quickshell with qtimageformats for WebP and the
   [overlay's patch](../nix/shared/overlays/default.nix) (without it, every
   Quickshell start logs a host portal warning `kaizen doctor` reports), and
