@@ -30,6 +30,7 @@ Each `kaizen` command carries a rule the raw tool leaves to you:
 | --- | --- | --- |
 | Query or drive a shell service or panel | `kaizen ipc` | `qs ipc`, which needs the unit's PID |
 | Learn whether the desktop is healthy | `kaizen doctor` | `journalctl -p warning`, which misses Quickshell's log level |
+| Learn the shell's state: unit, PID, tree, lock | `kaizen status` | `systemctl --user show` and `qs ipc`, each half of it; `qs` prints its errors as answers |
 | See a worktree's QML live | `kaizen dev` | editing main's tree |
 | Restart the shell | `kaizen restart` | `systemctl --user restart`, which restarts while locked |
 | Capture an output or its bar | `kaizen shot` | `grim` by hand, which guesses the output and leaves the curtain lifted on failure |
@@ -91,9 +92,13 @@ upstream's latest, and niri marks each option with the version it arrived in
   `notify-send -a Slack "[workspace] in #alerts" "<https://example.com|View>"`.
   It carries only what you pass, so copy the summary and body from a captured
   one.
-- `kaizen ipc call shell status` returns the shell's state as one JSON
-  document: the tree it runs, the bar's height, and the lock, curtain and idle
-  services' `status`. Read it rather than querying the services one by one.
+- `kaizen status` prints the shell's state, one `key value` line per fact or
+  one JSON document with `--json`: the unit's state and PID, whether
+  `kaizen dev` runs it, whether it answers IPC (`error` says why not), and
+  `kaizen ipc call shell status`: the tree it runs, the bar's height, and the
+  lock, curtain and idle services' `status`. A fact it could not learn is
+  `null`. It exits 0 whatever the shell's state. Read it rather than querying
+  the services one by one.
 - User units are named `kaizen-<name>`, plugin daemons included
   (`kaizen-dcal`).
 - A bind, unit or script that may run while the shell restarts calls

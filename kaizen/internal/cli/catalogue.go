@@ -5,17 +5,19 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 )
 
-// command is a script's entry in the catalogue.
+// command is a command's entry in the catalogue.
 type command struct {
 	Name    string `json:"name"`
 	Usage   string `json:"usage"`
 	Summary string `json:"summary"`
 }
 
-// catalogue runs each script in d.Dir with -h and parses each line it prints.
+// catalogue lists d.Commands and each line the scripts in d.Dir print on -h,
+// by name.
 func (d Dispatcher) catalogue() ([]command, error) {
 	entries, err := os.ReadDir(d.Dir)
 	if err != nil {
@@ -38,9 +40,16 @@ func (d Dispatcher) catalogue() ([]command, error) {
 			return nil, fmt.Errorf("%s -h: %w", entry.Name(), err)
 		}
 		for line := range strings.Lines(string(out)) {
-			commands = append(commands, parseUsage(strings.TrimSuffix(line, "\n")))
+			c := parseUsage(strings.TrimSuffix(line, "\n"))
+			if !slices.ContainsFunc(d.Commands, func(g Command) bool { return g.Name() == c.Name }) {
+				commands = append(commands, c)
+			}
 		}
 	}
+	for _, c := range d.Commands {
+		commands = append(commands, command{Name: c.Name(), Usage: c.Usage(), Summary: c.Summary()})
+	}
+	slices.SortStableFunc(commands, func(a, b command) int { return strings.Compare(a.Name, b.Name) })
 	return commands, nil
 }
 

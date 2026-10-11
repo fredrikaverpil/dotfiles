@@ -2,6 +2,9 @@ package cli
 
 import (
 	"bytes"
+	"context"
+	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"testing"
@@ -87,6 +90,20 @@ type result struct {
 	Exec   *execCall
 }
 
+// fakeCommand is a Go command that prints its name and arguments.
+type fakeCommand struct {
+	name string
+}
+
+func (c fakeCommand) Name() string    { return c.name }
+func (c fakeCommand) Usage() string   { return "kaizen " + c.name + " [--go]" }
+func (c fakeCommand) Summary() string { return "do " + c.name + " in Go" }
+
+func (c fakeCommand) Run(_ context.Context, args []string, stdout, _ io.Writer) int {
+	fmt.Fprintln(stdout, c.name, args)
+	return 3
+}
+
 func TestRun(t *testing.T) {
 	dir := t.TempDir()
 	writeScript(t, filepath.Join(dir, "alpha"), "usage: kaizen alpha [X]    do alpha")
@@ -96,7 +113,8 @@ func TestRun(t *testing.T) {
 	assert.NilError(t, os.MkdirAll(filepath.Join(dir, "lib"), 0o755))
 	usage := "usage: kaizen COMMAND [ARGS...] | kaizen --json\n" +
 		"  kaizen alpha [X]                              do alpha\n" +
-		"  kaizen beta                                   do beta\n" +
+		"  kaizen beta [--go]                            do beta in Go\n" +
+		"  kaizen delta [--go]                           do delta in Go\n" +
 		"  kaizen internal                               list the commands the system runs\n" +
 		"  kaizen --version                              print the commit kaizen was built from\n"
 	internalUsage := "usage: kaizen internal COMMAND [ARGS...] | kaizen internal --json\n" +
@@ -127,8 +145,13 @@ func TestRun(t *testing.T) {
   },
   {
     "name": "beta",
-    "usage": "kaizen beta",
-    "summary": "do beta"
+    "usage": "kaizen beta [--go]",
+    "summary": "do beta in Go"
+  },
+  {
+    "name": "delta",
+    "usage": "kaizen delta [--go]",
+    "summary": "do delta in Go"
   }
 ]
 `},
@@ -179,9 +202,24 @@ func TestRun(t *testing.T) {
 			}},
 		},
 		{
+			name: "go command",
+			args: []string{"delta", "x"},
+			want: result{Code: 3, Stdout: "delta [x]\n"},
+		},
+		{
+			name: "go command over a script",
+			args: []string{"beta"},
+			want: result{Code: 3, Stdout: "beta []\n"},
+		},
+		{
+			name: "go command under internal",
+			args: []string{"internal", "delta"},
+			want: result{Code: 2, Stderr: "kaizen: unknown command: delta\n" + internalUsage},
+		},
+		{
 			name: "unknown command",
-			args: []string{"delta"},
-			want: result{Code: 2, Stderr: "kaizen: unknown command: delta\n" + usage},
+			args: []string{"epsilon"},
+			want: result{Code: 2, Stderr: "kaizen: unknown command: epsilon\n" + usage},
 		},
 		{
 			name: "directory",
@@ -203,18 +241,19 @@ func TestRun(t *testing.T) {
 			var stdout, stderr bytes.Buffer
 			var got result
 			d := Dispatcher{
-				Dir:     dir,
-				BinDir:  "/opt/kaizen/bin",
-				Version: "4f1c2a9e0b7d",
-				Environ: []string{"HOME=/home/user", "PATH=/usr/bin"},
-				Stdout:  &stdout,
-				Stderr:  &stderr,
+				Commands: []Command{fakeCommand{name: "delta"}, fakeCommand{name: "beta"}},
+				Dir:      dir,
+				BinDir:   "/opt/kaizen/bin",
+				Version:  "4f1c2a9e0b7d",
+				Environ:  []string{"HOME=/home/user", "PATH=/usr/bin"},
+				Stdout:   &stdout,
+				Stderr:   &stderr,
 				Execve: func(path string, argv []string, env []string) error {
 					got.Exec = &execCall{Path: path, Argv: argv, Env: env}
 					return nil
 				},
 			}
-			got.Code = d.Run(tt.args)
+			got.Code = d.Run(t.Context(), tt.args)
 			got.Stdout = stdout.String()
 			got.Stderr = stderr.String()
 			assert.DeepEqual(t, got, tt.want)

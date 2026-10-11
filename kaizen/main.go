@@ -1,9 +1,11 @@
-// Command kaizen runs kaizen's commands: the scripts in libexec/kaizen/, each of
-// which prints its usage line on -h. `kaizen internal` runs the ones under
-// internal/, which the system runs and a person has no use for.
+// Command kaizen runs kaizen's commands: those in internal/command/, and the
+// scripts in libexec/kaizen/, each of which prints its usage line on -h.
+// `kaizen internal` runs the scripts under internal/, which the system runs and
+// a person has no use for.
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,6 +13,8 @@ import (
 	"syscall"
 
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/cli"
+	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/status"
+	"github.com/fredrikaverpil/dotfiles/kaizen/internal/state"
 )
 
 func main() {
@@ -26,6 +30,9 @@ func main() {
 	}
 	info, _ := debug.ReadBuildInfo()
 	d := cli.Dispatcher{
+		Commands: []cli.Command{
+			status.Command{Runner: state.Exec{}},
+		},
 		Dir:     cli.ScriptsDir(exe, home),
 		BinDir:  filepath.Dir(exe),
 		Version: cli.Version(info),
@@ -34,5 +41,5 @@ func main() {
 		Stderr:  os.Stderr,
 		Execve:  syscall.Exec,
 	}
-	os.Exit(d.Run(os.Args[1:]))
+	os.Exit(d.Run(context.Background(), os.Args[1:]))
 }
