@@ -52,9 +52,9 @@ Stow tree. [`../kaizen/README.md`](../kaizen/README.md) maps
 kaizen's own parts, Nix and Stow.
 
 An app's niri window rules and binds go in
-`stow/host/<hostname>/.config/niri/apps.kdl` (example in
-[`stow/host/renoir/.config/niri/apps.kdl`](../stow/host/renoir/.config/niri/apps.kdl)),
-which wily symlinks, or the host's `host.kdl`.
+[`stow/host/renoir/.config/niri/config.kdl`](../stow/host/renoir/.config/niri/config.kdl)
+(the app window rules, and the binds block's Apps part), which wily symlinks,
+or in a host's `host.kdl`.
 
 On a kaizen host, wrap Chromium and Electron apps with `pkgs.withGnomeLibsecret`
 ([`shared/overlays/`](shared/overlays/)); without it they cannot keep logins in

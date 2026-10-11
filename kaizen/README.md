@@ -114,9 +114,9 @@ QML, which plugins run, and the notification rules.
   niri config, `~/.config/niri/config.kdl`, is the user's: input, layout,
   window management and its binds. It includes `kaizen.kdl`. Here it is
   [`config.kdl`](../stow/host/renoir/.config/niri/config.kdl) in renoir's
-  host package, which wily links, with each host's `outputs.kdl`, `apps.kdl`
-  and `host.kdl` (`stow/host/<host>/.config/niri/`) included around
-  `kaizen.kdl`, the last two after it, so their binds win.
+  host package, which wily links, with each host's `outputs.kdl` and
+  `host.kdl` (`stow/host/<host>/.config/niri/`) included around `kaizen.kdl`,
+  the last after it, so its binds win.
 - `kaizen` is the only kaizen command on PATH, built from
   [`kaizen/cli/`](cli/) into the system profile. `kaizen <sub>` runs its Go
   command `<sub>`

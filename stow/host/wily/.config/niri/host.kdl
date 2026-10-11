@@ -1,5 +1,5 @@
 // Included last by config.kdl on wily only, so its binds override
-// config.kdl's, kaizen.kdl's and apps.kdl's.
+// config.kdl's and kaizen.kdl's.
 
 // Chromium --app windows; the suffix is the profile directory.
 
