@@ -9,56 +9,19 @@ case "${1:-}" in
   ;;
 esac
 
-unit=kaizen-shell.service
+# shellcheck source=lib/shell.bash
+source "${BASH_SOURCE[0]%/*}/lib/shell.bash"
+
 # Under /run, so a reboot returns to main's shell.
 dropin="${XDG_RUNTIME_DIR:?}/systemd/user/$unit.d/dev.conf"
 tree=stow/kaizen/.config/quickshell/kaizen
 
-# running: the shell.qml the unit's process runs, if it runs.
-running() {
-  local pid
-  pid=$(systemctl --user show "$unit" -p MainPID --value)
-  qs list --all -j | jq -r --argjson pid "${pid:-0}" '.[] | select(.pid == $pid) | .config_path'
-}
-
-# unlocked: fails unless the shell holds no lock. It answers "Not ready" while
-# a reload runs, and for good once its config failed to load, when it has no
-# lock surface either.
-unlocked() {
-  local answer
-  if [[ -z $(running) ]]; then
-    return 0
-  fi
-  for _ in $(seq 25); do
-    answer=$(timeout 2 kaizen ipc call lock isLocked 2>&1) || true
-    case $answer in
-    false) return 0 ;;
-    true)
-      echo "kaizen dev: the session is locked" >&2
-      return 1
-      ;;
-    esac
-    sleep 0.2
-  done
-  if [[ $answer == "Not ready to accept queries yet." ]]; then
-    return 0
-  fi
-  echo "kaizen dev: the lock state is unknown: $answer" >&2
-  return 1
-}
-
-# restart: restarts the unit and waits until its IPC answers.
+# restart: kaizen restart, which refuses while locked.
 restart() {
-  unlocked || exit 1
-  systemctl --user daemon-reload
-  systemctl --user restart "$unit"
-  for _ in $(seq 100); do
-    if timeout 2 kaizen ipc call lock isLocked >/dev/null 2>&1; then
-      return 0
-    fi
-    sleep 0.2
-  done
-  echo "kaizen dev: $unit does not answer over IPC; kaizen dev off runs main's" >&2
+  kaizen restart && return 0
+  if [[ -f $dropin ]]; then
+    echo "kaizen dev: kaizen dev off runs main's" >&2
+  fi
   exit 1
 }
 

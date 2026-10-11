@@ -309,11 +309,15 @@ ssh fredrik@<host> 'cd ~/.dotfiles && git add -AN .'
 ```
 
 `rsync`, Git checkouts, and `sed -i` can replace inodes, so restart the
-unlocked shell after deployment rather than relying on its watcher:
+shell after deployment rather than relying on its watcher:
 
 ```sh
-systemctl --user restart kaizen-shell.service
+kaizen restart
 ```
+
+`kaizen restart` reloads the user manager, restarts `kaizen-shell.service` and
+waits until its IPC answers. It refuses while the session is locked, so use it
+instead of `systemctl --user restart`.
 
 For compositor commands over SSH, provide the active session's
 `XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY`, and `NIRI_SOCKET` from
