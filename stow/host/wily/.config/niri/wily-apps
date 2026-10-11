@@ -2,11 +2,6 @@
 # shellcheck shell=bash
 set -e
 
-# Opens the everyday apps, one per workspace. niri's own window rules place
-# them, so this only spawns. Idempotent against niri's window list rather than
-# a state file: an app already running is skipped, so a rerun after closing one
-# brings back just that one.
-
 case "$1" in
 -h | --help)
   echo "usage: wily-apps    open the everyday apps that are not running yet"
