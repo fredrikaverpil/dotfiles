@@ -60,13 +60,15 @@ Each layer calls downward only.
 ## Where it lives
 
 Nix holds what needs a system module, root or the store: the two lower layers
-and the packages, applied on rebuild. Stow holds files edited in place, live on
+and the packages, the `kaizen` command among them, applied on rebuild. Stow
+holds files edited in place, live on
 save: the compositor config, the units and scripts, the shell's and plugins'
 QML, which plugins run, and the notification rules.
 
 | Part | Path | Reaches |
 | --- | --- | --- |
 | Session: niri under UWSM, portals, PAM, the services the shell reads, the packages the shell, its binds, scripts and units use | [`nix/shared/system/kaizen/`](../../nix/shared/system/kaizen/default.nix) | every kaizen host |
+| The `kaizen` command, in Go, built by [`package.nix`](../../nix/shared/system/kaizen/package.nix) | [`kaizen/`](../../kaizen/) | every kaizen host |
 | Compositor config, units and scripts, the shell's QML, the core's notification rules | [`stow/kaizen/`](../../stow/kaizen/) | every kaizen host |
 | Plugin QML: generic or reusable | [`stow/kaizen/.config/quickshell/kaizen/plugins/<name>/`](../../stow/kaizen/.config/quickshell/kaizen/plugins/) | every kaizen host |
 | Plugin QML: specific to one host | `stow/host/<host>/.config/kaizen/plugins/<name>/` | that host |
@@ -88,8 +90,8 @@ QML, which plugins run, and the notification rules.
   plugin's QML there loads only where a `~/.config/kaizen/plugins/<name>.jsonc`
   enables it.
 - A `.wants/` link beside a unit enables it, and `stow.sh` reloads the user
-  manager. A unit runs a packaged program through `/usr/bin/env`, from the
-  session PATH, and a kaizen script as `%h/.local/bin/kaizen <sub>`.
+  manager. A unit runs a packaged program, `kaizen` included, through
+  `/usr/bin/env`, from the session PATH.
 - The shell is the Quickshell config `kaizen`, run as `quickshell -c kaizen`:
   `~/.config/quickshell/kaizen/` holds only files from
   [`stow/kaizen/`](../../stow/kaizen/). `~/.config/kaizen/` holds only a host's
@@ -97,10 +99,13 @@ QML, which plugins run, and the notification rules.
   its plugins' QML. A plugin name in both is an error: neither shadows the
   other. `kaizen dev` runs a worktree's shell tree instead:
   [`development.md`](development.md) › Working from a worktree.
-- `kaizen <sub>` is the only kaizen command on PATH; it runs
-  `~/.local/libexec/kaizen/<sub>`. Units, niri binds and QML call it, never a
-  script's path. `kaizen --json` lists the commands as
-  `{ name, usage, summary }`.
+- `kaizen` is the only kaizen command on PATH, built from
+  [`kaizen/`](../../kaizen/) into the system profile. `kaizen <sub>` runs
+  `~/.local/libexec/kaizen/<sub>` with the binary's own directory first on its
+  PATH. Units, niri binds and QML call it, never a script's path.
+  `kaizen --json` lists the commands as `{ name, usage, summary }`. A
+  `~/.local/bin/kaizen` overrides it: [`development.md`](development.md) ›
+  Building kaizen.
 - `kaizen internal <sub>` runs `~/.local/libexec/kaizen/internal/<sub>`: what
   the system runs, as a unit or a build, and a person or an agent has no use
   for. `kaizen internal` lists them, and `--json` works there too.
@@ -140,6 +145,9 @@ each enabled plugin's `plugins/<name>/requires`. It cannot check:
   [overlay's patch](../../nix/shared/overlays/default.nix) (without it, every
   Quickshell start logs a host portal warning `kaizen doctor` reports), and
   `investigate` with go and gopls on its PATH for the incident investigator.
+- The `kaizen` command: [`kaizen/build.sh`](../../kaizen/build.sh) installs it
+  as `~/.local/bin/kaizen` with the host's Go, or
+  `nix build ~/.dotfiles#kaizen` builds it.
 - The emoji data: run
   [`kaizen internal emoji`](../../stow/kaizen/.local/libexec/kaizen/internal/emoji)
   into `~/.local/share/kaizen/emoji.json`.

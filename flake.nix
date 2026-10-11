@@ -113,6 +113,11 @@
         };
       };
 
+      # `kaizen` off NixOS: `nix build ~/.dotfiles#kaizen`.
+      packages = inputs.nixpkgs-unstable.lib.genAttrs [ "x86_64-linux" "aarch64-linux" ] (system: {
+        kaizen = unstable.${system}.callPackage ./nix/shared/system/kaizen/package.nix { };
+      });
+
       # Formatters for `nix fmt` - uses nixfmt for each architecture
       formatter.x86_64-linux = stable.x86_64-linux.nixfmt;
       formatter.aarch64-linux = stable.aarch64-linux.nixfmt;
@@ -168,6 +173,7 @@
                 in
                 pkgs.mkShell {
                   packages = [
+                    pkgs.go_1_27 # kaizen/, as package.nix builds it
                     pkgs.qt6.qtdeclarative # qmlls, qmllint, qmlformat, qmltestrunner
                     # Plugins import qs.Ui, which Quickshell maps to the tree's Ui/;
                     # qmllint finds it through a qs/Ui link on -I.
