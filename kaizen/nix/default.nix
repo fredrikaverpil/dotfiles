@@ -45,7 +45,7 @@ in
     # refuses the registration: "Connection already associated with an application ID",
     # logged at every start of the shell and of dcal's UI. The patch sets it before.
     # TODO: drop once a Quickshell release sets the app ID before constructing the app.
-    # https://github.com/quickshell-mirror/quickshell/issues/384
+    # https://github.com/quickshell-mirror/quickshell/issues/1293
     nixpkgs.overlays = [
       (_final: prev: {
         quickshell = prev.quickshell.overrideAttrs (old: {
