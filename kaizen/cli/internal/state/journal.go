@@ -2,6 +2,7 @@ package state
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"encoding/json/jsontext"
 	"encoding/json/v2"
@@ -38,6 +39,10 @@ type Entry struct {
 	UserUnit string
 	// ProcessUnit is the user unit of the process that logged it.
 	ProcessUnit string
+	// InvocationID is the run of the unit it is about, or that logged it.
+	InvocationID string
+	// MessageID is systemd's catalog id of the entry, if any.
+	MessageID string
 }
 
 // Level returns the entry's level: DEBUG, INFO, WARN, ERROR or FATAL.
@@ -121,6 +126,10 @@ func ParseJournal(out []byte) ([]Entry, error) {
 			Identifier  string         `json:"SYSLOG_IDENTIFIER"`
 			UserUnit    string         `json:"USER_UNIT"`
 			ProcessUnit string         `json:"_SYSTEMD_USER_UNIT"`
+			// systemd tags its entries about a run USER_INVOCATION_ID.
+			UserInvocationID    string `json:"USER_INVOCATION_ID"`
+			ProcessInvocationID string `json:"_SYSTEMD_INVOCATION_ID"`
+			MessageID           string `json:"MESSAGE_ID"`
 		}
 		err := json.UnmarshalDecode(dec, &raw)
 		if errors.Is(err, io.EOF) {
@@ -134,12 +143,14 @@ func ParseJournal(out []byte) ([]Entry, error) {
 			return nil, err
 		}
 		entry := Entry{
-			Message:     colour.ReplaceAllString(message, ""),
-			Priority:    6,
-			PID:         raw.PID,
-			Identifier:  raw.Identifier,
-			UserUnit:    raw.UserUnit,
-			ProcessUnit: raw.ProcessUnit,
+			Message:      colour.ReplaceAllString(message, ""),
+			Priority:     6,
+			PID:          raw.PID,
+			Identifier:   raw.Identifier,
+			UserUnit:     raw.UserUnit,
+			ProcessUnit:  raw.ProcessUnit,
+			InvocationID: cmp.Or(raw.UserInvocationID, raw.ProcessInvocationID),
+			MessageID:    raw.MessageID,
 		}
 		if raw.Priority != "" {
 			if entry.Priority, err = strconv.Atoi(raw.Priority); err != nil {

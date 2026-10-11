@@ -70,12 +70,52 @@ func logLine(sec int, fields map[string]string) string {
 	return string(out) + "\n"
 }
 
+// restartsLine reads the n latest restarts of unit id.
+func restartsLine(id string, n int) string {
+	return fmt.Sprintf(
+		"journalctl --user --boot USER_UNIT=%s MESSAGE_ID=%s --lines %d --output json --no-pager",
+		id, restartScheduled, n,
+	)
+}
+
 // unitBlock is a unit as `systemctl show` prints it.
 func unitBlock(id, invocation, state, result, pid, restarts, dropIns string) string {
 	return fmt.Sprintf(
 		"Id=%s\nActiveState=%s\nDropInPaths=%s\nInvocationID=%s\nMainPID=%s\nResult=%s\nNRestarts=%s\n",
 		id, state, dropIns, invocation, pid, result, restarts,
 	)
+}
+
+// scheduled is systemd's entry about the shell's run that it restarts.
+func scheduled(run string) map[string]string {
+	return map[string]string{
+		"MESSAGE": "kaizen-shell.service: Scheduled restart job.", "SYSLOG_IDENTIFIER": "systemd",
+		"USER_UNIT": "kaizen-shell.service", "USER_INVOCATION_ID": run, "MESSAGE_ID": restartScheduled,
+	}
+}
+
+// exited is systemd's entry about how the shell's run exited.
+func exited(run, how string) map[string]string {
+	return map[string]string{
+		"MESSAGE": "kaizen-shell.service: Main process exited, " + how, "PRIORITY": "5", "SYSLOG_IDENTIFIER": "systemd",
+		"USER_UNIT": "kaizen-shell.service", "USER_INVOCATION_ID": run, "MESSAGE_ID": processExited,
+	}
+}
+
+// failed is systemd's entry about the shell's failed run.
+func failed(run string) map[string]string {
+	return map[string]string{
+		"MESSAGE": "kaizen-shell.service: Failed with result 'exit-code'.", "PRIORITY": "4", "SYSLOG_IDENTIFIER": "systemd",
+		"USER_UNIT": "kaizen-shell.service", "USER_INVOCATION_ID": run, "MESSAGE_ID": failureResult,
+	}
+}
+
+// shellLine is a line the shell's run logged.
+func shellLine(run, message string) map[string]string {
+	return map[string]string{
+		"MESSAGE": message, "PRIORITY": "6", "_PID": "10",
+		"_SYSTEMD_USER_UNIT": "kaizen-shell.service", "_SYSTEMD_INVOCATION_ID": run,
+	}
 }
 
 // result is what Command.Run did, and the lines it ran.
@@ -144,6 +184,8 @@ func TestRun(t *testing.T) {
 					unitBlock("kaizen-dcal.service", "", "failed", "exit-code", "0", "1", ""),
 					unitBlock("kaizen-incident-investigator.service", "ccc", "active", "success", "77", "2", ""),
 				}, "\n")}},
+				restartsLine("kaizen-dcal.service", 1):                  {{}},
+				restartsLine("kaizen-incident-investigator.service", 2): {{Err: errors.New("exit status 1")}},
 				niriLine: {{}},
 				runsLine + " _SYSTEMD_INVOCATION_ID=aaa + USER_INVOCATION_ID=aaa + _SYSTEMD_INVOCATION_ID=ccc + USER_INVOCATION_ID=ccc": {
 					{Stdout: logLine(5, binding) + logLine(65, binding) +
@@ -183,8 +225,9 @@ func TestRun(t *testing.T) {
 				},
 			},
 			want: result{
-				Stdout: "3 errors, 6 warnings\n\n" +
+				Stdout: "4 errors, 6 warnings\n\n" +
 					"ERROR kaizen-dcal  check\n  failed (exit-code)\n" +
+					"ERROR doctor  check\n  cannot read why kaizen-incident-investigator was restarted: journalctl: exit status 1\n" +
 					"ERROR kaizen-incident-investigator  11:01:50\n  2026/10/11 11:00:00 systray error: boom\n" +
 					"ERROR kaizen-incident-investigator  11:01:30\n  Failed to start kaizen-incident-investigator.service.\n" +
 					"WARN  kaizen-dcal  check\n  failed and was restarted 1 time\n" +
@@ -195,8 +238,51 @@ func TestRun(t *testing.T) {
 					"WARN  kaizen-shell  ×2  11:00:05–11:01:05\n  WARN scene: Binding loop\n",
 				Calls: []string{
 					showLine,
+					restartsLine("kaizen-dcal.service", 1),
+					restartsLine("kaizen-incident-investigator.service", 2),
 					niriLine,
 					runsLine + " _SYSTEMD_INVOCATION_ID=aaa + USER_INVOCATION_ID=aaa + _SYSTEMD_INVOCATION_ID=ccc + USER_INVOCATION_ID=ccc",
+				},
+			},
+		},
+		{
+			name:  "restarts",
+			files: map[string]string{coreRequires: ""},
+			outputs: map[string][]recorded{
+				showLine: {{Stdout: unitBlock("kaizen-shell.service", "aaa", "active", "success", "0", "4", "")}},
+				restartsLine("kaizen-shell.service", 4): {{Stdout: logLine(10, scheduled("r1")) + logLine(20, scheduled("r2")) +
+					logLine(30, scheduled("r3")) + logLine(40, scheduled("r4"))}},
+				runsLine + " _SYSTEMD_INVOCATION_ID=r1 + USER_INVOCATION_ID=r1 + _SYSTEMD_INVOCATION_ID=r2 + USER_INVOCATION_ID=r2" +
+					" + _SYSTEMD_INVOCATION_ID=r3 + USER_INVOCATION_ID=r3 + _SYSTEMD_INVOCATION_ID=r4 + USER_INVOCATION_ID=r4": {
+					{Stdout: logLine(7, shellLine("r1", "  WARN scene: Binding loop")) +
+						logLine(8, shellLine("r1", "  ERROR boom")) +
+						logLine(9, exited("r1", "code=exited, status=1/FAILURE")) +
+						logLine(9, failed("r1")) +
+						logLine(18, shellLine("r2", "  ERROR boom")) +
+						logLine(19, exited("r2", "code=exited, status=1/FAILURE")) +
+						logLine(19, failed("r2")) +
+						logLine(27, shellLine("r3", "  ERROR first\nat line 3")) +
+						logLine(28, shellLine("r3", "  WARN quickshell.dbus.properties: Error updating property "+
+							"org.freedesktop.StatusNotifierItem-5-1/StatusNotifierItem/org.kde.StatusNotifierItem:IconName")) +
+						logLine(28, shellLine("r3", "  WARN quickshell.dbus.properties: QDBusError(UnknownProperty)")) +
+						logLine(29, exited("r3", "code=dumped, status=11/SEGV")) +
+						logLine(29, failed("r3"))},
+				},
+				niriLine: {{}},
+				runsLine + " _SYSTEMD_INVOCATION_ID=aaa + USER_INVOCATION_ID=aaa": {{}},
+			},
+			want: result{
+				Stdout: "1 warning\n\nWARN  kaizen-shell  check\n  failed and was restarted 4 times\n" +
+					"  ×2  11:00:09–11:00:19  code=exited, status=1/FAILURE\n    ERROR boom\n" +
+					"  11:00:29  code=dumped, status=11/SEGV\n    ERROR first\n    at line 3\n" +
+					"  11:00:40\n",
+				Calls: []string{
+					showLine,
+					restartsLine("kaizen-shell.service", 4),
+					runsLine + " _SYSTEMD_INVOCATION_ID=r1 + USER_INVOCATION_ID=r1 + _SYSTEMD_INVOCATION_ID=r2 + USER_INVOCATION_ID=r2" +
+						" + _SYSTEMD_INVOCATION_ID=r3 + USER_INVOCATION_ID=r3 + _SYSTEMD_INVOCATION_ID=r4 + USER_INVOCATION_ID=r4",
+					niriLine,
+					runsLine + " _SYSTEMD_INVOCATION_ID=aaa + USER_INVOCATION_ID=aaa",
 				},
 			},
 		},

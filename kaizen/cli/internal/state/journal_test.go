@@ -60,20 +60,24 @@ func TestParseJournal(t *testing.T) {
 			name: "string and byte array",
 			out: `{"MESSAGE":"Stopping Quickshell desktop shell...","PRIORITY":"6","_PID":"1",` +
 				`"__REALTIME_TIMESTAMP":"1791715805123456","SYSLOG_IDENTIFIER":"systemd",` +
-				`"USER_UNIT":"kaizen-shell.service","_SYSTEMD_USER_UNIT":"init.scope"}` + "\n" +
+				`"USER_UNIT":"kaizen-shell.service","_SYSTEMD_USER_UNIT":"init.scope",` +
+				`"USER_INVOCATION_ID":"aaa","_SYSTEMD_INVOCATION_ID":"zzz","MESSAGE_ID":"de5b426a63be47a7b6ac3eaac82e2f6f"}` + "\n" +
 				// "\x1b[33m  WARN\x1b[0m: x".
-				`{"MESSAGE":[27,91,51,51,109,32,32,87,65,82,78,27,91,48,109,58,32,120],"PRIORITY":"6"}` + "\n",
+				`{"MESSAGE":[27,91,51,51,109,32,32,87,65,82,78,27,91,48,109,58,32,120],"PRIORITY":"6",` +
+				`"_SYSTEMD_INVOCATION_ID":"bbb"}` + "\n",
 			want: []Entry{
 				{
-					Message:     "Stopping Quickshell desktop shell...",
-					Priority:    6,
-					Time:        time.UnixMicro(1791715805123456),
-					PID:         "1",
-					Identifier:  "systemd",
-					UserUnit:    "kaizen-shell.service",
-					ProcessUnit: "init.scope",
+					Message:      "Stopping Quickshell desktop shell...",
+					Priority:     6,
+					Time:         time.UnixMicro(1791715805123456),
+					PID:          "1",
+					Identifier:   "systemd",
+					UserUnit:     "kaizen-shell.service",
+					ProcessUnit:  "init.scope",
+					InvocationID: "aaa",
+					MessageID:    "de5b426a63be47a7b6ac3eaac82e2f6f",
 				},
-				{Message: "  WARN: x", Priority: 6},
+				{Message: "  WARN: x", Priority: 6, InvocationID: "bbb"},
 			},
 		},
 		{

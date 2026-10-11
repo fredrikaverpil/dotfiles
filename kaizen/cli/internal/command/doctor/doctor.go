@@ -150,13 +150,17 @@ func (c Command) report(ctx context.Context, journalArgs []string) (report, erro
 			return report{}, err
 		}
 		checks = c.check(ctx, units)
-		if out, err = readRuns(ctx, c.Runner, units); err != nil {
+		ids := make([]string, 0, len(units))
+		for _, u := range units {
+			ids = append(ids, u.invocationID)
+		}
+		if out, err = readRuns(ctx, c.Runner, ids); err != nil {
 			return report{}, err
 		}
 	}
-	entries, err := state.ParseJournal(out)
+	entries, err := parseJournal(out)
 	if err != nil {
-		return report{}, fmt.Errorf("journalctl: %v", err)
+		return report{}, err
 	}
 	findings := make([]finding, 0, len(checks))
 	for _, ch := range checks {
@@ -189,18 +193,18 @@ func rank(first bool) int {
 	return 1
 }
 
-// readRuns returns the journal of each unit's current run. The user manager
-// tags its own lines about a run USER_INVOCATION_ID.
-func readRuns(ctx context.Context, r state.Runner, units []unit) ([]byte, error) {
+// readRuns returns the journal of the runs ids, skipping empty ones. The user
+// manager tags its own lines about a run USER_INVOCATION_ID.
+func readRuns(ctx context.Context, r state.Runner, ids []string) ([]byte, error) {
 	var matches []string
-	for _, u := range units {
-		if u.invocationID == "" {
+	for _, id := range ids {
+		if id == "" {
 			continue
 		}
 		if len(matches) > 0 {
 			matches = append(matches, "+")
 		}
-		matches = append(matches, "_SYSTEMD_INVOCATION_ID="+u.invocationID, "+", "USER_INVOCATION_ID="+u.invocationID)
+		matches = append(matches, "_SYSTEMD_INVOCATION_ID="+id, "+", "USER_INVOCATION_ID="+id)
 	}
 	if len(matches) == 0 {
 		return nil, nil
@@ -221,7 +225,7 @@ func logFindings(entries []state.Entry, units []unit) []finding {
 	groups := map[key]*finding{}
 	var keys []key
 	for i, e := range entries {
-		if ignored(e) || i > 0 && e.PID == entries[i-1].PID && ignored(entries[i-1]) && trayError.MatchString(e.Message) {
+		if skipped(entries, i) {
 			continue
 		}
 		level := severity(e)
@@ -235,7 +239,7 @@ func logFindings(entries []state.Entry, units []unit) []finding {
 		k := key{
 			unit:    strings.TrimSuffix(cmp.Or(e.UserUnit, e.ProcessUnit, e.Identifier, "?"), ".service"),
 			level:   level,
-			message: timeField.ReplaceAllString(strings.TrimLeftFunc(e.Message, unicode.IsSpace), ""),
+			message: trimMessage(e.Message),
 		}
 		ms := e.Time.UnixMilli()
 		f, ok := groups[k]
@@ -258,9 +262,21 @@ func logFindings(entries []state.Entry, units []unit) []finding {
 	return findings
 }
 
+// skipped reports that entries[i] is an Electron tray item's failed property
+// read, or the QDBusError its process logs next.
+func skipped(entries []state.Entry, i int) bool {
+	e := entries[i]
+	return ignored(e) || i > 0 && e.PID == entries[i-1].PID && ignored(entries[i-1]) && trayError.MatchString(e.Message)
+}
+
 // ignored reports an Electron tray item's failed property read.
 func ignored(e state.Entry) bool {
 	return trayProperty.MatchString(e.Message)
+}
+
+// trimMessage returns a message without leading space and slog's time.
+func trimMessage(message string) string {
+	return timeField.ReplaceAllString(strings.TrimLeftFunc(message, unicode.IsSpace), "")
 }
 
 // severity returns ERROR or WARN for an entry to report, else "".
@@ -320,16 +336,7 @@ func (c Command) text(findings []finding) string {
 		}
 		when := "check"
 		if f.Source != "check" {
-			when = ""
-			if f.Count > 1 {
-				when = fmt.Sprintf("×%d  ", f.Count)
-			}
-			first, last := c.clock(f.First), c.clock(f.Last)
-			if first == last {
-				when += first
-			} else {
-				when += first + "–" + last
-			}
+			when = c.times(f.Count, f.First, f.Last)
 		}
 		lines := strings.Split(f.Message, "\n")
 		for i, line := range lines {
@@ -340,6 +347,20 @@ func (c Command) text(findings []finding) string {
 		blocks = append(blocks, level+" "+f.Unit+"  "+when+"\n"+strings.Join(lines, "\n"))
 	}
 	return strings.Join(counts, ", ") + "\n\n" + strings.Join(blocks, "\n")
+}
+
+// times returns ×count when more than one, then the time of day of first and,
+// when it differs, of last; first and last are milliseconds since the epoch.
+func (c Command) times(count int, first, last int64) string {
+	when := ""
+	if count > 1 {
+		when = fmt.Sprintf("×%d  ", count)
+	}
+	from, to := c.clock(first), c.clock(last)
+	if from == to {
+		return when + from
+	}
+	return when + from + "–" + to
 }
 
 // clock returns the time of day of ms milliseconds since the epoch.
