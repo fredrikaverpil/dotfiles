@@ -28,12 +28,18 @@ type Dispatcher struct {
 	Execve func(path string, argv []string, env []string) error
 }
 
-// ScriptsDir returns the scripts of the checkout exe was built in, when exe is
-// <checkout>/kaizen/kaizen, else the stowed ones under home.
+// ScriptsDir returns the scripts of the checkout exe was built in, found in the
+// nearest ancestor of exe holding stow/.local/libexec/kaizen, else the stowed
+// ones under home.
 func ScriptsDir(exe, home string) string {
-	checkout := filepath.Join(exe, "..", "stow", ".local", "libexec", "kaizen")
-	if info, err := os.Stat(checkout); err == nil && info.IsDir() {
-		return checkout
+	for dir := filepath.Dir(exe); ; dir = filepath.Dir(dir) {
+		checkout := filepath.Join(dir, "stow", ".local", "libexec", "kaizen")
+		if info, err := os.Stat(checkout); err == nil && info.IsDir() {
+			return checkout
+		}
+		if dir == filepath.Dir(dir) {
+			break
+		}
 	}
 	return filepath.Join(home, ".local", "libexec", "kaizen")
 }

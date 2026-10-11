@@ -28,6 +28,21 @@ func TestScriptsDir(t *testing.T) {
 			want: scripts,
 		},
 		{
+			name: "checkout subdirectory",
+			exe:  filepath.Join(checkout, "kaizen", "cli", "kaizen"),
+			want: scripts,
+		},
+		{
+			name: "checkout deeper",
+			exe:  filepath.Join(checkout, "kaizen", "cli", "out", "bin", "kaizen"),
+			want: scripts,
+		},
+		{
+			name: "outside checkout",
+			exe:  filepath.Join(t.TempDir(), "kaizen"),
+			want: "/home/user/.local/libexec/kaizen",
+		},
+		{
 			name: "user install",
 			exe:  "/home/user/.local/bin/kaizen",
 			want: "/home/user/.local/libexec/kaizen",
