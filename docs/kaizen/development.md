@@ -133,6 +133,7 @@ tree, so a static check passing here passes for every kaizen host.
 | --- | --- |
 | Nix | `nix fmt`, `nix build .#nixosConfigurations.<host>.config.system.build.toplevel`; build both kaizen hosts, a shared module breaks both |
 | JS/QML | `qml-format`, `qml-test`, `qml-lint`, `requires-check` (any platform) |
+| The `kaizen` command (Go) | `go test ./...` and `go vet ./...` in `kaizen/`; build both kaizen hosts, whose build runs the tests |
 | Compositor interface, config, or bind contract | Also `compositor-test` (Linux) |
 | Service IPC, `shell.qml` wiring, or systemd units | Also `shell-smoke` on the machine after deploy and restart, and exercise the affected path |
 | Panel views | Also `shell-smoke --panels` |
@@ -294,10 +295,28 @@ kaizen dev off    # back to main's
   applies.
 - Only the shell's QML, generic plugins included, comes from the worktree.
   Scripts, units, niri's config, a host's plugins and the investigator's `-dir`
-  stay main's, so changes to them still go through main.
+  stay main's, so changes to them still go through main. The worktree's own
+  `./kaizen/kaizen` runs its scripts: Building kaizen.
 - One worktree is live at a time. Run `kaizen dev off` before removing the
   worktree or ending the task. A removed worktree, or QML that fails to load,
   leaves the unit failing; `kaizen dev off` recovers either.
+
+## Building kaizen
+
+`kaizen` is a Go binary built from [`kaizen/`](../../kaizen/). A rebuild
+compiles it into the system profile, and a failing test fails the rebuild. Go
+comes from the default devshell. To use a change without a rebuild:
+
+- In a worktree, `go build .` in `kaizen/` writes `kaizen/kaizen`; run it by
+  path (`./kaizen/kaizen --json`). It runs the worktree's scripts, and a
+  script's `kaizen` is the same binary. Never install it: units, binds and QML
+  keep main's `kaizen`.
+- In `~/.dotfiles`,
+  `nix develop ~/.dotfiles -c ~/.dotfiles/kaizen/build.sh` installs
+  `~/.local/bin/kaizen`, which precedes the system profile's on PATH: shells,
+  binds and QML take it at once, units on their next start. It refuses
+  anywhere else, since parallel sessions share `~/.local/bin`. Delete it to
+  return to the system profile's.
 
 ## Deployment safety
 

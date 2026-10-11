@@ -118,6 +118,8 @@ in
     environment.pathsToLink = [ "/share/kaizen" ];
 
     environment.systemPackages = with pkgs; [
+      # Units, binds, QML and people run it; ~/.local/bin/kaizen overrides it.
+      (callPackage ./package.nix { })
       # niri spawns it on demand and exports DISPLAY for X11 apps.
       xwayland-satellite
       # The wrapper above (let outranks with); the shell's unit finds it on PATH.
