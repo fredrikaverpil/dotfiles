@@ -76,7 +76,8 @@ reaches, is in [`README.md`](README.md) › Where it lives.
 ## Developing one
 
 - Quickshell watches only the files `shell.qml` imports, not plugins: apply an
-  edit with `kaizen ipc call shell reload`. `qml-lint` and `qml-format`
+  edit with `kaizen reload`, which prints its QML errors. `qml-lint` and
+  `qml-format`
   cover every plugin, a host's in `stow/host/*/.config/kaizen/plugins/`
   included; `qml-test` runs the `tst_*.qml` in the shell tree's `plugins/`. A
   tray plugin's user unit starts with the session when a `.wants/` link

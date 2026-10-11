@@ -49,6 +49,26 @@ func (e Entry) Level() string {
 	return "INFO"
 }
 
+// Problems returns the warnings and errors among entries, one line each,
+// starting with its level.
+func Problems(entries []Entry) []string {
+	var lines []string
+	for _, entry := range entries {
+		level := entry.Level()
+		switch level {
+		case "WARN", "ERROR", "FATAL":
+		default:
+			continue
+		}
+		line := strings.TrimSpace(entry.Message)
+		if !strings.HasPrefix(line, level) {
+			line = level + " " + line
+		}
+		lines = append(lines, line)
+	}
+	return lines
+}
+
 // Cursor returns the journal's current position, to read what follows with
 // Journal.
 func Cursor(ctx context.Context, r Runner) (string, error) {
