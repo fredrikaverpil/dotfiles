@@ -1,5 +1,4 @@
 [
-  // Never miss a message from family.
   {
     "match": { "app": "^Signal$", "summary": " Averpil$" },
     "urgency": "critical",
