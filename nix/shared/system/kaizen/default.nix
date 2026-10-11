@@ -143,7 +143,7 @@ in
       emoji
       grim
       imagemagick # Wallpaper thumbnails.
-      jq # The clipboard watcher's JSON encoding, `kaizen focus`, `kaizen doctor` and `kaizen dev`.
+      jq # The clipboard watcher's JSON encoding, `kaizen focus` and `kaizen doctor`.
       git # `kaizen dev` resolves a worktree by name.
       mpv
       # nm-connection-editor edits wired, static-IP and other connection settings;

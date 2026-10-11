@@ -13,6 +13,7 @@ import (
 	"syscall"
 
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/cli"
+	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/dev"
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/reload"
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/status"
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/state"
@@ -32,6 +33,11 @@ func main() {
 	info, _ := debug.ReadBuildInfo()
 	d := cli.Dispatcher{
 		Commands: []cli.Command{
+			dev.Command{
+				Runner:     state.Exec{},
+				Main:       filepath.Join(home, ".dotfiles"),
+				RuntimeDir: os.Getenv("XDG_RUNTIME_DIR"),
+			},
 			reload.Command{Runner: state.Exec{}},
 			status.Command{Runner: state.Exec{}},
 		},

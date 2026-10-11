@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"strings"
 
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/state"
 )
@@ -50,7 +49,7 @@ func (c Command) Run(ctx context.Context, args []string, stdout, stderr io.Write
 		return 1
 	}
 	entries, err := state.Reload(ctx, c.Runner, status, restart)
-	for _, line := range problems(entries) {
+	for _, line := range state.Problems(entries) {
 		fmt.Fprintln(stdout, line)
 	}
 	if err != nil {
@@ -58,24 +57,4 @@ func (c Command) Run(ctx context.Context, args []string, stdout, stderr io.Write
 		return 1
 	}
 	return 0
-}
-
-// problems returns the warnings and errors among entries, one line each,
-// starting with its level.
-func problems(entries []state.Entry) []string {
-	var lines []string
-	for _, entry := range entries {
-		level := entry.Level()
-		switch level {
-		case "WARN", "ERROR", "FATAL":
-		default:
-			continue
-		}
-		line := strings.TrimSpace(entry.Message)
-		if !strings.HasPrefix(line, level) {
-			line = level + " " + line
-		}
-		lines = append(lines, line)
-	}
-	return lines
 }

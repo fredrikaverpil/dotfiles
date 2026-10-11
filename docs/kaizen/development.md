@@ -33,7 +33,7 @@ Each `kaizen` command carries a rule the raw tool leaves to you:
 | Learn the shell's state: unit, PID, tree, lock | `kaizen status` | `systemctl --user show` and `qs ipc`, each half of it; `qs` prints its errors as answers |
 | Apply a change to the shell's files and see its QML errors | `kaizen reload` | `kaizen ipc call shell reload`, which ignores the lock and reports no load failure |
 | See a worktree's QML live | `kaizen dev` | editing main's tree |
-| Restart the shell | `kaizen restart` | `systemctl --user restart`, which restarts while locked |
+| Restart the shell | `kaizen reload --restart` | `systemctl --user restart`, which restarts while locked |
 | Capture an output or its bar | `kaizen shot` | `grim` by hand, which guesses the output and leaves the curtain lifted on failure |
 | Focus an app or open it | `kaizen focus` | `niri msg action focus-window`, which needs the window id and never opens the app |
 | List the commands | `kaizen --json` | `ls ~/.local/libexec/kaizen`, which lists none of the usage |
@@ -300,7 +300,9 @@ kaizen dev off    # back to main's
 ```
 
 - `kaizen dev PATH` restarts `kaizen-shell.service` on the worktree's shell
-  tree through a drop-in under `$XDG_RUNTIME_DIR`, then hot-reloads its edits.
+  tree through a drop-in under `$XDG_RUNTIME_DIR`, as
+  `kaizen reload --restart` does, with the shell's warnings and errors on
+  stderr; Quickshell then hot-reloads the tree's edits.
   It fails unless the unit runs that tree, and `kaizen ipc`, the binds and
   `shell-smoke` reach it. `kaizen doctor` warns while it does, and checks the
   worktree's `requires` and plugins. A reboot returns to main's.
@@ -338,22 +340,23 @@ On the host, `~/.dotfiles` is this checkout and the live stowed tree: edits
 deploy as they are saved. From another host it is reached over SSH as
 `fredrik@<host>`.
 
-Before any live file replacement or restart, inspect target changes and
-preserve unrelated edits, check the lock, and record/temporarily disable idle
-locking; hot reload can happen during copying. Restore the idle setting
+Before any live file replacement, inspect target changes and preserve
+unrelated edits. Quickshell's watcher can hot-reload during copying, with no
+lock guard, so record and temporarily disable idle locking, and restore it
 afterward. **Never restart Quickshell while locked**: the compositor keeps the
-session lock after its client dies.
+session lock after its client dies. `kaizen reload` and `kaizen dev` refuse
+while locked.
 
 ```sh
 kaizen ipc call idle status
 kaizen ipc call idle disable
-kaizen ipc call lock isLocked
 ```
 
 New/moved files need `~/.dotfiles/stow.sh`, which also removes the links a
 move left behind and reloads the user manager; an edited unit needs
-`systemctl --user daemon-reload`. Never create Stow links manually or run
-`git clean -fd` in the host clone.
+`systemctl --user daemon-reload`, which `kaizen reload --restart` runs for the
+shell's. Never create Stow links manually or run `git clean -fd` in the host
+clone.
 
 When working from another host, sync the checkout before live validation or a
 user-run rebuild, which evaluates the host's clone. Checksums avoid replacing
@@ -370,12 +373,13 @@ ssh fredrik@<host> 'cd ~/.dotfiles && git add -AN .'
 shell after deployment rather than relying on its watcher:
 
 ```sh
-kaizen restart
+kaizen reload --restart
 ```
 
-`kaizen restart` reloads the user manager, restarts `kaizen-shell.service` and
-waits until its IPC answers. It refuses while the session is locked, so use it
-instead of `systemctl --user restart`.
+It reloads the user manager, restarts `kaizen-shell.service`, waits until the
+shell has loaded its config and answers, and prints its warnings and errors.
+It refuses while the session is locked, so use it instead of
+`systemctl --user restart`.
 
 For compositor commands over SSH, provide the active session's
 `XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY`, and `NIRI_SOCKET` from

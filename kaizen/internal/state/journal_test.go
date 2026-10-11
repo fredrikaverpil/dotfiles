@@ -115,3 +115,49 @@ func TestEntryLevel(t *testing.T) {
 		})
 	}
 }
+
+func TestProblems(t *testing.T) {
+	for _, tt := range []struct {
+		name    string
+		entries []Entry
+		want    []string
+	}{
+		{
+			name: "none",
+			entries: []Entry{
+				{Message: "  INFO: Configuration Loaded", Priority: 6},
+				{Message: " DEBUG qml: kaizen polkit agent registered", Priority: 6},
+				{Message: "Stopping Quickshell desktop shell...", Priority: 6},
+			},
+		},
+		{
+			name: "quickshell's",
+			entries: []Entry{
+				{Message: "  WARN scene: Binding loop", Priority: 6},
+				{Message: " ERROR: Failed to load configuration", Priority: 6},
+				{Message: " ERROR:   caused by @shell.qml[552:1]: Syntax error", Priority: 6},
+			},
+			want: []string{
+				"WARN scene: Binding loop",
+				"ERROR: Failed to load configuration",
+				"ERROR:   caused by @shell.qml[552:1]: Syntax error",
+			},
+		},
+		{
+			name: "systemd's",
+			entries: []Entry{
+				{Message: "kaizen-shell.service: Failed with result 'exit-code'.", Priority: 4},
+				{Message: "Failed to start Quickshell desktop shell.", Priority: 3},
+				{Message: "kaizen-shell.service: Main process exited, code=exited, status=255/EXCEPTION", Priority: 5},
+			},
+			want: []string{
+				"WARN kaizen-shell.service: Failed with result 'exit-code'.",
+				"ERROR Failed to start Quickshell desktop shell.",
+			},
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.DeepEqual(t, Problems(tt.entries), tt.want)
+		})
+	}
+}
