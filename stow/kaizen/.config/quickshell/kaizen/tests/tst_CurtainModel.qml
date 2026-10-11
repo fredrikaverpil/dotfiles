@@ -49,4 +49,85 @@ TestCase {
         compare(Curtain.shouldSleepOnTimeout(black, false), false);
         compare(Curtain.shouldSleepOnTimeout(hidden, false), false);
     }
+
+    function test_restored_reads_a_previous_generation_or_nothing_data() {
+        return [
+            {
+                tag: "up",
+                text: '{"active":true,"savedBrightness":40}\n',
+                want: {
+                    active: true,
+                    savedBrightness: 40
+                }
+            },
+            {
+                tag: "up without a backlight",
+                text: '{"active":true,"savedBrightness":-1}\n',
+                want: {
+                    active: true,
+                    savedBrightness: -1
+                }
+            },
+            {
+                tag: "down",
+                text: '{"active":false,"savedBrightness":-1}\n',
+                want: {
+                    active: false,
+                    savedBrightness: -1
+                }
+            },
+            {
+                tag: "brightness out of range",
+                text: '{"active":true,"savedBrightness":140}',
+                want: {
+                    active: true,
+                    savedBrightness: -1
+                }
+            },
+            {
+                tag: "brightness not an integer",
+                text: '{"active":true,"savedBrightness":"40"}',
+                want: {
+                    active: true,
+                    savedBrightness: -1
+                }
+            },
+            {
+                tag: "active not a boolean",
+                text: '{"active":"true","savedBrightness":40}',
+                want: {
+                    active: false,
+                    savedBrightness: 40
+                }
+            },
+            {
+                tag: "empty",
+                text: "",
+                want: {
+                    active: false,
+                    savedBrightness: -1
+                }
+            },
+            {
+                tag: "not JSON",
+                text: "{",
+                want: {
+                    active: false,
+                    savedBrightness: -1
+                }
+            },
+            {
+                tag: "null",
+                text: "null",
+                want: {
+                    active: false,
+                    savedBrightness: -1
+                }
+            }
+        ];
+    }
+
+    function test_restored_reads_a_previous_generation_or_nothing(data) {
+        compare(Curtain.restored(data.text), data.want);
+    }
 }

@@ -11,8 +11,8 @@ import "CurtainModel.js" as Model
 // A privacy curtain, not a lock. It is a layer surface rather than a
 // WlSessionLock so that toggling it off leaves a capturable desktop behind:
 // wlr-screencopy (grim) sees whatever the compositor composites, and a session
-// lock replaces that entirely. The trade is that the curtain dies with
-// Quickshell, where a session lock would survive a crash.
+// lock replaces that entirely. The trade is that the desktop shows while
+// Quickshell is down, where a session lock would hold through a crash.
 Item {
     id: root
 
@@ -20,11 +20,16 @@ Item {
     property var brightnessService: null
     readonly property string userName: Quickshell.env("USER") || Quickshell.env("LOGNAME")
     readonly property int sleepAfterMs: 20000
+    // Runtime dir: the curtain outlives a reload, a restart or a crash, not a
+    // logout or reboot.
+    readonly property string statePath: Quickshell.env("XDG_RUNTIME_DIR") + "/kaizen-curtain.json"
 
     property bool passwordPamConfigured: false
     property bool active: false
     property bool awake: false
     property int savedBrightness: -1
+    property bool restorePending: false
+    property int restoredBrightness: -1
 
     property bool authenticating: false
     property string pendingPassword: ""
@@ -108,6 +113,29 @@ Item {
         applyCurtainState(Model.dismiss(curtainState()));
         savedBrightness = -1;
     }
+
+    // Back up black, returning to the brightness from before the curtain, not
+    // the dimmed one.
+    function restore() {
+        if (!restorePending || !passwordPamConfigured)
+            return;
+        restorePending = false;
+        if (show() && restoredBrightness >= 0)
+            savedBrightness = restoredBrightness;
+    }
+
+    function save() {
+        stateFile.setText(JSON.stringify({
+            active: active,
+            savedBrightness: savedBrightness
+        }) + "\n");
+    }
+
+    // Once per change: a write started before the last finished is dropped
+    // with a warning.
+    onActiveChanged: Qt.callLater(save)
+    onSavedBrightnessChanged: Qt.callLater(save)
+    onPasswordPamConfiguredChanged: restore()
 
     // Mouse motion or any keypress reveals the prompt.
     function wake() {
@@ -242,6 +270,28 @@ Item {
         interval: root.sleepAfterMs
         repeat: false
         onTriggered: root.sleep()
+    }
+
+    // A restore can come before the backlight device is known.
+    Connections {
+        target: root.brightnessService
+
+        function onPresentChanged() {
+            root.applyBacklight();
+        }
+    }
+
+    FileView {
+        id: stateFile
+        path: root.statePath
+        atomicWrites: true
+        printErrors: false
+        onLoaded: {
+            const saved = Model.restored(text());
+            root.restorePending = saved.active;
+            root.restoredBrightness = saved.savedBrightness;
+            root.restore();
+        }
     }
 
     FileView {

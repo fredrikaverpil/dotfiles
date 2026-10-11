@@ -161,11 +161,7 @@ const (
 	daemonReload  = "systemctl --user daemon-reload"
 	resetFailed   = "systemctl --user reset-failed kaizen-shell.service"
 	restartLine   = "systemctl --user restart kaizen-shell.service"
-	curtainLine   = "qs ipc --pid 4242 call curtain open"
 )
-
-// curtainDown is answer with the curtain down.
-var curtainDown = strings.Replace(answer, `"curtain":{"active":true`, `"curtain":{"active":false`, 1)
 
 const (
 	reloading = `{"MESSAGE":"  INFO: Reloading configuration...","PRIORITY":"6"}` + "\n"
@@ -258,80 +254,6 @@ func TestReload(t *testing.T) {
 			want: result{
 				Entries: slices.Concat([]Entry{reloadingEntry}, loadErrorEntries, []Entry{reloadingEntry, loadedEntry}),
 				Calls:   []string{cursorLine, hotReloadLine, journalLine, showLine, queryLine, journalLine},
-			},
-		},
-		{
-			name:   "hot reload takes the curtain down",
-			status: readyStatus(),
-			outputs: map[string][]output{
-				cursorLine:    {{Stdout: "-- cursor: s=1\n"}},
-				hotReloadLine: {{}},
-				journalLine:   {{Stdout: reloading + loaded}},
-				showLine:      {{Stdout: running}},
-				queryLine:     {{Stdout: curtainDown}},
-				curtainLine:   {{Stdout: "shown\n"}},
-			},
-			want: result{
-				Entries: []Entry{reloadingEntry, loadedEntry},
-				Calls:   []string{cursorLine, hotReloadLine, journalLine, showLine, queryLine, curtainLine, journalLine},
-			},
-		},
-		{
-			name: "curtain was down",
-			status: func() Status {
-				s := readyStatus()
-				s.Curtain = &Curtain{PasswordPam: true}
-				return s
-			}(),
-			outputs: map[string][]output{
-				cursorLine:    {{Stdout: "-- cursor: s=1\n"}},
-				hotReloadLine: {{}},
-				journalLine:   {{Stdout: reloading + loaded}},
-				showLine:      {{Stdout: running}},
-				queryLine:     {{Stdout: curtainDown}},
-			},
-			want: result{
-				Entries: []Entry{reloadingEntry, loadedEntry},
-				Calls:   []string{cursorLine, hotReloadLine, journalLine, showLine, queryLine, journalLine},
-			},
-		},
-		{
-			name:   "curtain does not open",
-			status: readyStatus(),
-			outputs: map[string][]output{
-				cursorLine:    {{Stdout: "-- cursor: s=1\n"}},
-				hotReloadLine: {{}},
-				journalLine:   {{Stdout: reloading + loaded}},
-				showLine:      {{Stdout: running}},
-				queryLine:     {{Stdout: curtainDown}},
-				curtainLine:   {{Stdout: "missing-pam\n"}},
-			},
-			want: result{
-				Entries: []Entry{reloadingEntry, loadedEntry},
-				Err:     "the curtain is down: curtain open: missing-pam",
-				Calls:   []string{cursorLine, hotReloadLine, journalLine, showLine, queryLine, curtainLine},
-			},
-		},
-		{
-			name:    "restart takes the curtain down",
-			status:  readyStatus(),
-			restart: true,
-			outputs: map[string][]output{
-				cursorLine:   {{Stdout: "-- cursor: s=1\n"}},
-				daemonReload: {{}},
-				resetFailed:  {{}},
-				restartLine:  {{}},
-				journalLine:  {{Stdout: loaded}},
-				showLine:     {{Stdout: running}},
-				queryLine:    {{Stdout: curtainDown}},
-				curtainLine:  {{Stdout: "shown\n"}},
-			},
-			want: result{
-				Entries: []Entry{loadedEntry},
-				Calls: []string{
-					cursorLine, daemonReload, resetFailed, restartLine,
-					journalLine, showLine, queryLine, curtainLine, journalLine,
-				},
 			},
 		},
 		{
