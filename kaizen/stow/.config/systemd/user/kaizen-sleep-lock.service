@@ -5,7 +5,7 @@ Description=Lock Quickshell before suspend
 PartOf=graphical-session.target
 # Match Quickshell's ordering: waitenv is required for niri, and
 # graphical-session.target cycles.
-After=dbus.socket wayland-wm@niri.service wayland-session-waitenv.service
+After=dbus.socket wayland-wm@kaizen.desktop.service wayland-session-waitenv.service
 Requires=dbus.socket
 
 [Service]
@@ -14,4 +14,4 @@ Restart=always
 RestartSec=2s
 
 [Install]
-WantedBy=wayland-session@niri.target
+WantedBy=wayland-session@kaizen.desktop.target

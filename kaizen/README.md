@@ -263,14 +263,21 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 ## Session
 
 ```
-TTY login ─ kaizen run ─ uwsm start niri --session
-  └─ wayland-session@niri.target
+TTY login ─ kaizen run ─ uwsm start kaizen.desktop ─ niri --session
+  └─ wayland-session@kaizen.desktop.target
        ├─ kaizen-shell.service      Restart=on-failure
        └─ kaizen-sleep-lock.service logind delay inhibitor
 lid close / power key ─ logind ─ sleep-lock locks shell ─ waits for secure ─ suspend
 ```
 
-Units bind to `wayland-session@niri.target`; ordering after
+The session is the entry
+[`kaizen.desktop`](stow/.local/share/wayland-sessions/kaizen.desktop), which
+runs niri. uwsm names its units after the entry ID, so another session on
+niri (`uwsm start niri`) starts none of kaizen's. Its `DesktopNames` set
+`XDG_CURRENT_DESKTOP=niri:kaizen`; niri first keeps niri's portal config and
+`OnlyShowIn=niri` autostart entries.
+
+Units bind to `wayland-session@kaizen.desktop.target`; ordering after
 `graphical-session.target` is a cycle. `wayland-session-waitenv.service`
 closes niri's readiness-before-`WAYLAND_DISPLAY` race.
 

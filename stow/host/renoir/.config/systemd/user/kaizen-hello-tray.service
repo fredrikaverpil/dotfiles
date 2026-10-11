@@ -15,4 +15,4 @@ Restart=on-failure
 Slice=app.slice
 
 [Install]
-WantedBy=wayland-session-xdg-autostart@niri.target
+WantedBy=wayland-session-xdg-autostart@kaizen.desktop.target

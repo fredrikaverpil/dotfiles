@@ -5,7 +5,7 @@
 # kaizen-shell.service would deadlock.
 [Unit]
 Description=Wait for the Quickshell tray
-Before=wayland-session-xdg-autostart@niri.target
+Before=wayland-session-xdg-autostart@kaizen.desktop.target
 
 [Service]
 Type=oneshot
@@ -14,4 +14,4 @@ ExecStart=/bin/sh -c 'until busctl --user status org.kde.StatusNotifierWatcher >
 TimeoutStartSec=10
 
 [Install]
-WantedBy=wayland-session-xdg-autostart@niri.target
+WantedBy=wayland-session-xdg-autostart@kaizen.desktop.target

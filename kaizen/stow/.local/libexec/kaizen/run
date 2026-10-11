@@ -23,8 +23,10 @@ if [[ $arg0 != -* ]]; then
 fi
 uwsm check may-start -i
 
-# --session serves niri's D-Bus interfaces (screencast portal, a11y) and
-# imports its environment, which uwsm cleans up on exit. The instance name
-# follows from the executable, so the units are wayland-wm@niri.service and
-# wayland-session@niri.target -- both named in kaizen/stow/.config/systemd/user/.
-exec uwsm start -e -D niri -- niri --session
+# The entry runs `niri --session`, which serves niri's D-Bus interfaces
+# (screencast portal, a11y) and imports its environment, which uwsm cleans up
+# on exit. The instance name is the entry ID, so the units are
+# wayland-wm@kaizen.desktop.service and wayland-session@kaizen.desktop.target --
+# both named in kaizen/stow/.config/systemd/user/. A plain `uwsm start niri`
+# starts none of kaizen.
+exec uwsm start -- kaizen.desktop
