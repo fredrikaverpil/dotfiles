@@ -1,7 +1,7 @@
 # kaizen
 
-`kaizen` is [niri](https://niri-wm.github.io/niri/) plus a
-[Quickshell](https://quickshell.org) shell: a minimal, keyboard-first desktop
+`kaizen` is a [Quickshell](https://quickshell.org) shell for
+[niri](https://niri-wm.github.io/niri/): a minimal, keyboard-first desktop
 that an agent can drive and verify from a terminal.
 
 - [`features.md`](docs/features.md): description of individual features.
@@ -65,14 +65,14 @@ Each layer calls downward only.
 Nix holds what needs a system module, root or the store: the two lower layers
 and the packages, the `kaizen` command among them, applied on rebuild. Stow
 holds files edited in place, live on
-save: the compositor config, the units and scripts, the shell's and plugins'
+save: the shell's niri config, the units and scripts, the shell's and plugins'
 QML, which plugins run, and the notification rules.
 
 | Part | Path | Reaches |
 | --- | --- | --- |
 | Session: niri under UWSM, portals, PAM, the services the shell reads, the packages the shell, its binds, scripts and units use | [`kaizen/nix/`](nix/default.nix) | every kaizen host |
 | The `kaizen` command, in Go, built by [`package.nix`](nix/package.nix) | [`kaizen/cli/`](cli/) | every kaizen host |
-| Compositor config, session variables, units and scripts, the shell's QML, the core's notification rules | [`kaizen/stow/`](stow/) | every kaizen host |
+| The shell's niri config, session variables, units and scripts, the shell's QML, the core's notification rules | [`kaizen/stow/`](stow/) | every kaizen host |
 | Plugin QML: generic or reusable | [`kaizen/stow/.config/quickshell/kaizen/plugins/<name>/`](stow/.config/quickshell/kaizen/plugins/) | every kaizen host |
 | Plugin QML: specific to one host | `stow/host/<host>/.config/kaizen/plugins/<name>/` | that host |
 | Which plugins run, with their config | `stow/host/<host>/.config/kaizen/plugins/<name>.jsonc`, or in a private submodule's `stow/` such as wily's `einride` | that host |
@@ -80,7 +80,7 @@ QML, which plugins run, and the notification rules.
 | A plugin's unit: specific to one host | `stow/host/<host>/.config/systemd/user/` | that host |
 | A plugin's daemon and packages | `kaizen/nix/plugins/<name>/`, `nix/hosts/<host>/kaizen-plugins/<name>/` | the hosts importing it |
 | ThinkPad hardware the shell reads (thresholds, keyd, micmute LED); not kaizen | [`nix/shared/system/thinkpad.nix`](../nix/shared/system/thinkpad.nix) | ThinkPad hosts |
-| Hardware, sleep policy, output layout, host-only programs | `nix/hosts/<host>/`, `stow/host/<host>/` | that host |
+| Hardware, sleep policy, the niri config and output layout, host-only programs | `nix/hosts/<host>/`, `stow/host/<host>/` | that host |
 
 - Core is what kaizen needs to work as designed; every kaizen host runs it. A
   plugin is optional: the shell runs without it, however many hosts enable it.
@@ -107,13 +107,16 @@ QML, which plugins run, and the notification rules.
   its plugins' QML. A plugin name in both is an error: neither shadows the
   other. `kaizen dev` runs a worktree's shell tree instead:
   [`development.md`](docs/development.md) › Working from a worktree.
-- niri's config is two files. [`niri/config.kdl`](stow/.config/niri/config.kdl)
-  holds input, layout, window management and its binds;
-  [`niri/kaizen.kdl`](stow/.config/niri/kaizen.kdl), which it includes, holds
-  what the shell needs: binds calling `kaizen`, rules for the shell's surfaces
-  and windows, and the border colours the shell writes. A host's
-  `outputs.kdl`, `apps.kdl` and `host.kdl` (`stow/host/<host>/.config/niri/`)
-  are included around them, the last two after both, so their binds win.
+- kaizen ships one niri file,
+  [`niri/kaizen.kdl`](stow/.config/niri/kaizen.kdl): what the shell needs,
+  namely the session's environment, binds calling `kaizen`, rules for the
+  shell's surfaces and windows, and the border colours the shell writes. The
+  niri config, `~/.config/niri/config.kdl`, is the user's: input, layout,
+  window management and its binds. It includes `kaizen.kdl`. Here it is
+  [`config.kdl`](../stow/host/renoir/.config/niri/config.kdl) in renoir's
+  host package, which wily links, with each host's `outputs.kdl`, `apps.kdl`
+  and `host.kdl` (`stow/host/<host>/.config/niri/`) included around
+  `kaizen.kdl`, the last two after it, so their binds win.
 - `kaizen` is the only kaizen command on PATH, built from
   [`kaizen/cli/`](cli/) into the system profile. `kaizen <sub>` runs its Go
   command `<sub>`

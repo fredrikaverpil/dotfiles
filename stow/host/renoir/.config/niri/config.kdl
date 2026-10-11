@@ -1,8 +1,8 @@
 // Binds follow niri's default-config.kdl. niri reloads this file on save.
 // Defaults: https://github.com/niri-wm/niri/blob/main/resources/default-config.kdl
 
-// Output layout, from the host stow package (stow/host/<host>). niri uses the
-// first matching output block, so this stays above any other.
+// The host's output layout. niri uses the first matching output block, so this
+// stays above any other.
 include optional=true "outputs.kdl"
 
 input {
@@ -121,12 +121,9 @@ cursor {
     xcursor-size 24
 }
 
-// Exports WAYLAND_DISPLAY to the systemd user manager. NIRI_SOCKET must be
-// named explicitly, or `niri msg` fails inside the shell.
-spawn-at-startup "uwsm" "finalize" "NIRI_SOCKET"
-
-// What the shell needs. Its rules land after the ones above, and its binds
-// lead the menu's Keybindings list, which follows file order.
+// What the kaizen shell needs, from kaizen/stow. Its rules land after the ones
+// above, and its binds lead the menu's Keybindings list, which follows file
+// order.
 include "kaizen.kdl"
 
 binds {
@@ -269,7 +266,7 @@ binds {
     Mod+Shift+P hotkey-overlay-title="Power off monitors" { power-off-monitors; }
 }
 
-// App window rules and binds, then host-only settings, both from the host stow
-// package (stow/host/<host>). Last, so their binds override the ones above.
+// App window rules and binds, then host-only settings. Last, so their binds
+// override the ones above.
 include optional=true "apps.kdl"
 include optional=true "host.kdl"
