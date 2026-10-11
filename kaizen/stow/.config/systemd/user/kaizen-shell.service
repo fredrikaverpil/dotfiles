@@ -1,10 +1,11 @@
-# Bound to the niri session so another desktop cannot start a second shell.
+# Bound to the kaizen session so another desktop, plain niri included, cannot
+# start a second shell.
 [Unit]
 Description=Quickshell desktop shell
 PartOf=graphical-session.target
 # Never order after graphical-session.target: that creates a systemd cycle.
 # waitenv closes niri's readiness-before-WAYLAND_DISPLAY race.
-After=wayland-wm@niri.service wayland-session-waitenv.service
+After=wayland-wm@kaizen.desktop.service wayland-session-waitenv.service
 
 [Service]
 # systemd looks a bare name up only in its built-in path, which NixOS leaves
@@ -17,4 +18,4 @@ Restart=on-failure
 StateDirectory=kaizen-shell
 
 [Install]
-WantedBy=wayland-session@niri.target
+WantedBy=wayland-session@kaizen.desktop.target

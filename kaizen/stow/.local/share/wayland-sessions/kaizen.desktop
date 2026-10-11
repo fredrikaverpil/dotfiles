@@ -1,0 +1,10 @@
+# `kaizen run` starts this entry. uwsm names the session's units after its ID:
+# wayland-wm@kaizen.desktop.service, wayland-session@kaizen.desktop.target.
+# DesktopNames lowercased name the env files uwsm sources: uwsm/env-niri,
+# uwsm/env-kaizen.
+[Desktop Entry]
+Name=kaizen
+Comment=niri with the kaizen Quickshell shell
+Exec=niri --session
+Type=Application
+DesktopNames=niri;kaizen;

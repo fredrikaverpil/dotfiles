@@ -33,7 +33,8 @@ reaches, is in [`README.md`](../README.md) › Where it lives.
   not install, and `requires-check` fails on a program its QML, JS or unit
   calls that neither file lists.
 - A plugin's unit is a file under Stow, enabled by a link in
-  `wayland-session@niri.target.wants/`, or in the autostart target's when it
+  `wayland-session@kaizen.desktop.target.wants/`, or in the autostart target's
+  when it
   shows a tray item (below). A generic plugin's lives in
   [`kaizen/stow/`](../stow/.config/systemd/user/) with
   `ConditionPathExists=%h/.config/kaizen/plugins/<name>.jsonc`, so it runs only
@@ -68,7 +69,7 @@ reaches, is in [`README.md`](../README.md) › Where it lives.
   ([`nix/hosts/renoir/kaizen-plugins/hello-tray/`](../../nix/hosts/renoir/kaizen-plugins/hello-tray/)),
   so the tray and its launcher level show it without shell code. Its unit starts
   it from Apps, or with the XDG autostart apps through a link in
-  `wayland-session-xdg-autostart@niri.target.wants/`, ordered after
+  `wayland-session-xdg-autostart@kaizen.desktop.target.wants/`, ordered after
   `kaizen-tray-ready.service` so the tray is up when it registers. A plugin's
   daemon that shows a tray item, as the investigator's does, starts the same
   way. A third-party app with a tray icon is not a plugin; the tray shows it
