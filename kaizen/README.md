@@ -148,7 +148,7 @@ each enabled plugin's `plugins/<name>/requires`. It cannot check:
   `GTK_USE_PORTAL=1`, and the fonts in
   [`fonts.nix`](nix/fonts.nix).
 - Quickshell with qtimageformats for WebP and the
-  [overlay's patch](../nix/shared/overlays/default.nix) (without it, every
+  [overlay's patch](nix/default.nix) (without it, every
   Quickshell start logs a host portal warning `kaizen doctor` reports), and
   `investigate` with go and gopls on its PATH for the incident investigator.
 - The `kaizen` command: [`kaizen/cli/build.sh`](cli/build.sh) installs it
