@@ -1,7 +1,7 @@
 # What the core calls or reads, checked by `kaizen doctor` and requires-check.
 # One per line: cmd NAME, bus session|system NAME, file PATH, data PATH (in the
-# XDG data dirs). Missing is an error unless the line ends in `warn`; a line in
-# another form is an error.
+# XDG data dirs), env NAME=VALUE (in the user manager's environment). Missing is
+# an error unless the line ends in `warn`; a line in another form is an error.
 
 # Session
 cmd niri
@@ -22,6 +22,9 @@ file /etc/kaizen
 file /etc/pam.d/kaizen-lock
 bus system org.freedesktop.login1
 bus session org.freedesktop.portal.Desktop
+env NIXOS_OZONE_WL=1
+env QT_QPA_PLATFORMTHEME=gtk3
+env GTK_USE_PORTAL=1
 
 # Desktop
 cmd ghostty

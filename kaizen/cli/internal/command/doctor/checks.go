@@ -91,8 +91,8 @@ func readUnits(ctx context.Context, r state.Runner) ([]unit, error) {
 type checker struct {
 	Command
 	checks []check
-	// buses holds each bus's names.
-	buses map[string]busList
+	// lists holds the names each listing's command printed, by what it lists.
+	lists map[string]listing
 }
 
 // add records a finding.
@@ -102,7 +102,7 @@ func (k *checker) add(c check) {
 
 // check runs the checks. A check that cannot run is an error of unit doctor.
 func (c Command) check(ctx context.Context, units []unit) []check {
-	k := &checker{Command: c, buses: map[string]busList{}}
+	k := &checker{Command: c, lists: map[string]listing{}}
 	var shell unit
 	for _, u := range units {
 		name := strings.TrimSuffix(u.id, ".service")
