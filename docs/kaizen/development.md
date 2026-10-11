@@ -31,7 +31,7 @@ Each `kaizen` command carries a rule the raw tool leaves to you:
 | Query or drive a shell service or panel | `kaizen ipc` | `qs ipc`, which needs the unit's PID |
 | Learn whether the desktop is healthy | `kaizen doctor` | `journalctl -p warning`, which misses Quickshell's log level |
 | Learn the shell's state: unit, PID, tree, lock | `kaizen status` | `systemctl --user show` and `qs ipc`, each half of it; `qs` prints its errors as answers |
-| Apply a change to the shell's files and see its QML errors | `kaizen reload` | `kaizen ipc call shell reload`, which ignores the lock and reports no load failure |
+| Apply a change to the shell's files and see its QML errors | `kaizen reload` | `kaizen ipc call shell reload`, which reports no load failure and returns before the load |
 | See a worktree's QML live | `kaizen dev` | editing main's tree |
 | Restart the shell | `kaizen reload --restart` | `systemctl --user restart`, which restarts while locked |
 | Capture an output or its bar | `kaizen shot` | `grim` by hand, which guesses the output and leaves the curtain lifted on failure |

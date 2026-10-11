@@ -198,7 +198,7 @@ func TestReload(t *testing.T) {
 			status: readyStatus(),
 			outputs: map[string][]output{
 				cursorLine:    {{Stdout: "-- cursor: s=1\n"}},
-				hotReloadLine: {{}},
+				hotReloadLine: {{Stdout: "reloading\n"}},
 				journalLine:   {{Stdout: reloading + loaded}, {Stdout: reloading + loaded + warning}},
 				showLine:      {{Stdout: running}},
 				queryLine:     {{Stdout: answer}},
@@ -213,7 +213,7 @@ func TestReload(t *testing.T) {
 			status: readyStatus(),
 			outputs: map[string][]output{
 				cursorLine:    {{Stdout: "-- cursor: s=1\n"}},
-				hotReloadLine: {{}},
+				hotReloadLine: {{Stdout: "reloading\n"}},
 				journalLine:   {{Stdout: reloading}, {Stdout: reloading + loaded}},
 				showLine:      {{Stdout: running}},
 				queryLine:     {{Stdout: answer}},
@@ -232,7 +232,7 @@ func TestReload(t *testing.T) {
 			status: readyStatus(),
 			outputs: map[string][]output{
 				cursorLine:    {{Stdout: "-- cursor: s=1\n"}},
-				hotReloadLine: {{}},
+				hotReloadLine: {{Stdout: "reloading\n"}},
 				journalLine:   {{Stdout: reloading + loadError}},
 			},
 			want: result{
@@ -246,7 +246,7 @@ func TestReload(t *testing.T) {
 			status: readyStatus(),
 			outputs: map[string][]output{
 				cursorLine:    {{Stdout: "-- cursor: s=1\n"}},
-				hotReloadLine: {{}},
+				hotReloadLine: {{Stdout: "reloading\n"}},
 				journalLine:   {{Stdout: reloading + loadError + reloading + loaded}},
 				showLine:      {{Stdout: running}},
 				queryLine:     {{Stdout: answer}},
@@ -263,7 +263,16 @@ func TestReload(t *testing.T) {
 				cursorLine:    {{Stdout: "-- cursor: s=1\n"}},
 				hotReloadLine: {{Stdout: "Function not found.\n"}},
 			},
-			want: result{Err: "Function not found.", Calls: []string{cursorLine, hotReloadLine}},
+			want: result{Err: "shell reload: Function not found.", Calls: []string{cursorLine, hotReloadLine}},
+		},
+		{
+			name:   "hot reload refused, locked since the guard",
+			status: readyStatus(),
+			outputs: map[string][]output{
+				cursorLine:    {{Stdout: "-- cursor: s=1\n"}},
+				hotReloadLine: {{Stdout: "locked\n"}},
+			},
+			want: result{Err: "the session is locked", Calls: []string{cursorLine, hotReloadLine}},
 		},
 		{
 			name:    "restart asked",
@@ -385,7 +394,7 @@ func TestReload(t *testing.T) {
 			status: readyStatus(),
 			outputs: map[string][]output{
 				cursorLine:    {{Stdout: "-- cursor: s=1\n"}},
-				hotReloadLine: {{}},
+				hotReloadLine: {{Stdout: "reloading\n"}},
 				journalLine:   {{Stdout: reloading}},
 				showLine:      {{Stdout: running}},
 				queryLine:     {{Stdout: answer}},

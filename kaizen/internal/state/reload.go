@@ -172,14 +172,19 @@ func restartUnit(ctx context.Context, r Runner) error {
 	return nil
 }
 
-// hotReload reloads the config of the shell at pid in place.
+// hotReload reloads the config of the shell at pid in place. The shell refuses
+// while locked.
 func hotReload(ctx context.Context, r Runner, pid int) error {
 	_, answer, err := call(ctx, r, pid, "shell", "reload")
 	if err != nil {
 		return err
 	}
-	if answer != "" {
-		return errors.New(answer)
+	switch answer {
+	case "reloading":
+		return nil
+	case "locked":
+		return ErrLocked
+	default:
+		return fmt.Errorf("shell reload: %s", answer)
 	}
-	return nil
 }
