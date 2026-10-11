@@ -1,6 +1,7 @@
 # What the core calls or reads, checked by `kaizen doctor` and requires-check.
 # One per line: cmd NAME, bus session|system NAME, file PATH, data PATH (in the
-# XDG data dirs). Missing is an error unless the line ends in `warn`.
+# XDG data dirs). Missing is an error unless the line ends in `warn`; a line in
+# another form is an error.
 
 # Session
 cmd niri

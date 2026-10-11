@@ -79,8 +79,8 @@ func readUnits(ctx context.Context, r state.Runner) ([]unit, error) {
 type checker struct {
 	Command
 	checks []check
-	// buses holds each bus's names, owned and activatable alike.
-	buses map[string][]string
+	// buses holds each bus's names.
+	buses map[string]busList
 }
 
 // add records a finding.
@@ -90,7 +90,7 @@ func (k *checker) add(level, unit, message string) {
 
 // check runs the checks.
 func (c Command) check(ctx context.Context, units []unit) ([]check, error) {
-	k := &checker{Command: c, buses: map[string][]string{}}
+	k := &checker{Command: c, buses: map[string]busList{}}
 	var shell unit
 	for _, u := range units {
 		name := strings.TrimSuffix(u.id, ".service")
@@ -128,7 +128,9 @@ func (c Command) check(ctx context.Context, units []unit) ([]check, error) {
 		tree = *dev
 		k.add("WARN", "kaizen-shell", fmt.Sprintf("runs %s: kaizen dev off", tree))
 	}
-	if err := k.requires(ctx, filepath.Join(tree, "requires"), "requires"); err != nil {
+	if core := filepath.Join(tree, "requires"); !isRegular(core) {
+		k.add("ERROR", "requires", "no requires in "+tree)
+	} else if err := k.requires(ctx, core, "requires"); err != nil {
 		return nil, err
 	}
 	if err := k.plugins(ctx, filepath.Join(tree, "plugins")); err != nil {
@@ -274,8 +276,10 @@ func (k *checker) plugins(ctx context.Context, shellPlugins string) error {
 			if !isRegular(filepath.Join(dirs[0], "Plugin.qml")) {
 				k.add("ERROR", "plugins", fmt.Sprintf("%s: no Plugin.qml in %s", name, dirs[0]))
 			}
-			if err := k.requires(ctx, filepath.Join(dirs[0], "requires"), name); err != nil {
-				return err
+			if requires := filepath.Join(dirs[0], "requires"); isRegular(requires) {
+				if err := k.requires(ctx, requires, name); err != nil {
+					return err
+				}
 			}
 		}
 	}

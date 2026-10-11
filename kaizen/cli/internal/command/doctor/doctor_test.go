@@ -52,6 +52,8 @@ const (
 	bootLine  = "journalctl --user --unit kaizen-* --boot --lines all --output json --no-pager"
 	userBus   = "busctl --user list --no-legend"
 	systemBus = "busctl --system list --no-legend"
+	// coreRequires is the core's requires under the test's $HOME.
+	coreRequires = "home/.config/quickshell/kaizen/requires"
 )
 
 // base is the time the journal's entries count from.
@@ -113,6 +115,7 @@ func TestRun(t *testing.T) {
 			name:  "healthy",
 			args:  []string{"--json"},
 			env:   map[string]string{"PATH": "$DIR/bin"},
+			files: map[string]string{coreRequires: ""},
 			execs: []string{"bin/kaizen"},
 			outputs: map[string][]recorded{
 				showLine: {{Stdout: shellRunning + "\n" + unitBlock("kaizen-dcal.service", "bbb", "active", "success", "77", "0", "")}},
@@ -131,7 +134,8 @@ func TestRun(t *testing.T) {
 			},
 		},
 		{
-			name: "units and logs",
+			name:  "units and logs",
+			files: map[string]string{coreRequires: ""},
 			outputs: map[string][]recorded{
 				showLine: {{Stdout: strings.Join([]string{
 					unitBlock("kaizen-shell.service", "aaa", "active", "success", "0", "0", ""),
@@ -207,7 +211,8 @@ func TestRun(t *testing.T) {
 				"run/kaizen-shell.service.d/dev.conf": "[Service]\nExecStart=\n" +
 					"ExecStart=/usr/bin/env quickshell -p \"$DIR/tree\"\n",
 				"tree/requires": "# comment\n\ncmd present\ncmd notexec\ncmd absent warn\n" +
-					"bus session org.a\nbus session org.b warn\nbus system org.c\nbus other x\n" +
+					"bus session org.a\nbus session org.b warn\nbus system org.c\nbus system org.d\nbus other x\n" +
+					"bus session\nbus session org.a warn extra\ncmd\ncmd present extra\ndata\n" +
 					"file $DIR/tree/requires\nfile $DIR/nope\n" +
 					"data kaizen/emoji.json\ndata kaizen/nope.json warn\n",
 				"tree/plugins/ok/Plugin.qml":                  "",
@@ -239,11 +244,14 @@ func TestRun(t *testing.T) {
 				systemBus: {{Err: errors.New("exit status 1")}},
 			},
 			want: result{
-				Stdout: "6 errors, 4 warnings\n\n" +
+				Stdout: "7 errors, 4 warnings\n\n" +
 					"ERROR niri  check\n  niri validate:\n  Error: bad config\n\n    at line 3\n" +
+					"ERROR doctor  check\n  cannot list the system bus: busctl: exit status 1\n" +
 					"ERROR requires  check\n" +
 					"  missing cmd notexec\n  missing cmd absent\n  missing bus session org.b\n" +
-					"  missing bus system org.c\n  unknown line: bus other x\n  missing file $DIR/nope\n" +
+					"  unknown line: bus other x\n  unknown line: bus session\n" +
+					"  unknown line: bus session org.a warn extra\n  unknown line: cmd\n" +
+					"  unknown line: cmd present extra\n  unknown line: data\n  missing file $DIR/nope\n" +
 					"  missing data kaizen/nope.json\n" +
 					"ERROR plugins  check\n  absent: no absent/ in $DIR/tree/plugins or $DIR/home/.config/kaizen/plugins\n" +
 					"ERROR plugins  check\n  both: both/ in both $DIR/tree/plugins and $DIR/home/.config/kaizen/plugins\n" +
@@ -258,8 +266,20 @@ func TestRun(t *testing.T) {
 			},
 		},
 		{
+			name: "no core requires",
+			outputs: map[string][]recorded{
+				showLine: {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "0", "0", "")}},
+				niriLine: {{}},
+			},
+			want: result{
+				Stdout: "1 error\n\nERROR requires  check\n  no requires in $DIR/home/.config/quickshell/kaizen\n",
+				Calls:  []string{showLine, niriLine},
+			},
+		},
+		{
 			name:  "quickshell replaced in the Nix store",
 			env:   map[string]string{"PATH": "$DIR/bin"},
+			files: map[string]string{coreRequires: ""},
 			execs: []string{"bin/nix-store", "store/qs-new/bin/quickshell"},
 			links: map[string]string{
 				"bin/quickshell": "$DIR/store/qs-new/bin/quickshell",
@@ -279,6 +299,7 @@ func TestRun(t *testing.T) {
 		{
 			name:  "quickshell current in the Nix store",
 			env:   map[string]string{"PATH": "$DIR/bin"},
+			files: map[string]string{coreRequires: ""},
 			execs: []string{"bin/nix-store", "store/qs-new/bin/quickshell"},
 			links: map[string]string{
 				"bin/quickshell": "$DIR/store/qs-new/bin/quickshell",
