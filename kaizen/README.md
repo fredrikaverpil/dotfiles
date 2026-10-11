@@ -131,11 +131,12 @@ The distro supplies what
 enabled plugin's do on NixOS. `kaizen doctor` reports each program, D-Bus
 service, file, session variable, font and Qt plugin missing from
 [`requires`](stow/.config/quickshell/kaizen/requires) and from
-each enabled plugin's `plugins/<name>/requires`. It cannot check:
+each enabled plugin's `plugins/<name>/requires`, and a portal that does not
+answer the colour scheme. It cannot check:
 
 - Xwayland and xwayland-satellite.
-- `xdg-desktop-portal-gnome` and `-gtk`, gnome-keyring as Secret Service, and
-  ghostty as `xdg-terminal-exec`'s default.
+- gnome-keyring as Secret Service, and ghostty first in
+  `xdg-terminals.list`.
 - PipeWire with its ALSA and PulseAudio layers, rtkit, and polkit with
   `pkexec`.
 - `cap_sys_admin+ep` on gpu-screen-recorder's `gsr-kms-server`, so monitor
