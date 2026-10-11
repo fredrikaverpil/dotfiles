@@ -72,11 +72,11 @@ QML, which plugins run, and the notification rules.
 | --- | --- | --- |
 | Session: niri under UWSM, portals, PAM, the services the shell reads, the packages the shell, its binds, scripts and units use | [`kaizen/nix/`](nix/default.nix) | every kaizen host |
 | The `kaizen` command, in Go, built by [`package.nix`](nix/package.nix) | [`kaizen/`](./) | every kaizen host |
-| Compositor config, units and scripts, the shell's QML, the core's notification rules | [`stow/kaizen/`](../stow/kaizen/) | every kaizen host |
-| Plugin QML: generic or reusable | [`stow/kaizen/.config/quickshell/kaizen/plugins/<name>/`](../stow/kaizen/.config/quickshell/kaizen/plugins/) | every kaizen host |
+| Compositor config, units and scripts, the shell's QML, the core's notification rules | [`kaizen/stow/`](stow/) | every kaizen host |
+| Plugin QML: generic or reusable | [`kaizen/stow/.config/quickshell/kaizen/plugins/<name>/`](stow/.config/quickshell/kaizen/plugins/) | every kaizen host |
 | Plugin QML: specific to one host | `stow/host/<host>/.config/kaizen/plugins/<name>/` | that host |
 | Which plugins run, with their config | `stow/host/<host>/.config/kaizen/plugins/<name>.jsonc`, or in a private submodule's `stow/` such as wily's `einride` | that host |
-| A plugin's unit: generic or reusable | [`stow/kaizen/.config/systemd/user/`](../stow/kaizen/.config/systemd/user/) | every kaizen host that enables the plugin |
+| A plugin's unit: generic or reusable | [`kaizen/stow/.config/systemd/user/`](stow/.config/systemd/user/) | every kaizen host that enables the plugin |
 | A plugin's unit: specific to one host | `stow/host/<host>/.config/systemd/user/` | that host |
 | A plugin's daemon and packages | `kaizen/nix/plugins/<name>/`, `nix/hosts/<host>/kaizen-plugins/<name>/` | the hosts importing it |
 | ThinkPad hardware the shell reads (thresholds, keyd, micmute LED); not kaizen | [`nix/shared/system/thinkpad.nix`](../nix/shared/system/thinkpad.nix) | ThinkPad hosts |
@@ -87,9 +87,9 @@ QML, which plugins run, and the notification rules.
 - Importing
   [`kaizen/nix/`](nix/default.nix)
   makes a host a kaizen host: it writes `/etc/kaizen`, and
-  [`stow.sh`](../stow.sh) stows [`stow/kaizen/`](../stow/kaizen/) only
+  [`stow.sh`](../stow.sh) stows [`kaizen/stow/`](stow/) only
   where that exists. So
-  [`stow/kaizen/`](../stow/kaizen/) reaches every kaizen host or none, and a
+  [`kaizen/stow/`](stow/) reaches every kaizen host or none, and a
   plugin's QML there loads only where a `~/.config/kaizen/plugins/<name>.jsonc`
   enables it.
 - A `.wants/` link beside a unit enables it, and `stow.sh` reloads the user
@@ -97,7 +97,7 @@ QML, which plugins run, and the notification rules.
   `/usr/bin/env`, from the session PATH.
 - The shell is the Quickshell config `kaizen`, run as `quickshell -c kaizen`:
   `~/.config/quickshell/kaizen/` holds only files from
-  [`stow/kaizen/`](../stow/kaizen/). `~/.config/kaizen/` holds only a host's
+  [`kaizen/stow/`](stow/). `~/.config/kaizen/` holds only a host's
   configuration: which plugins run and their config, notification rules, and
   its plugins' QML. A plugin name in both is an error: neither shadows the
   other. `kaizen dev` runs a worktree's shell tree instead:
@@ -116,12 +116,12 @@ QML, which plugins run, and the notification rules.
   for. `kaizen internal` lists them, and `--json` works there too.
 - The shell reads its emoji data from `kaizen/emoji.json` in the XDG data dirs,
   which Nix builds with
-  [`kaizen internal emoji`](../stow/kaizen/.local/libexec/kaizen/internal/emoji).
+  [`kaizen internal emoji`](stow/.local/libexec/kaizen/internal/emoji).
 - Apps are not kaizen's: [`nix/README.md`](../nix/README.md) says where they
   go.
 - QML paths here (`modules/…`, `Ui/…`) are under
-  [`stow/kaizen/.config/quickshell/kaizen/`](../stow/kaizen/.config/quickshell/kaizen/);
-  `niri/…` is under [`stow/kaizen/.config/`](../stow/kaizen/.config/).
+  [`kaizen/stow/.config/quickshell/kaizen/`](stow/.config/quickshell/kaizen/);
+  `niri/…` is under [`kaizen/stow/.config/`](stow/.config/).
 
 ## Off NixOS
 
@@ -129,7 +129,7 @@ The distro supplies what
 [the core's Nix module](nix/default.nix) and each
 enabled plugin's do on NixOS. `kaizen doctor` reports each program, D-Bus
 service and file missing from
-[`requires`](../stow/kaizen/.config/quickshell/kaizen/requires) and from
+[`requires`](stow/.config/quickshell/kaizen/requires) and from
 each enabled plugin's `plugins/<name>/requires`. It cannot check:
 
 - Xwayland and xwayland-satellite.
@@ -141,7 +141,7 @@ each enabled plugin's `plugins/<name>/requires`. It cannot check:
   capture skips the portal dialog.
 - `/etc/pam.d/kaizen-lock` holding `auth include login`, for the lock and the
   curtain.
-- An empty `/etc/kaizen`: `stow.sh` stows [`stow/kaizen/`](../stow/kaizen/)
+- An empty `/etc/kaizen`: `stow.sh` stows [`kaizen/stow/`](stow/)
   only where it exists.
 - The session variables `NIXOS_OZONE_WL=1`, `QT_QPA_PLATFORMTHEME=gtk3` and
   `GTK_USE_PORTAL=1`, and the fonts in
@@ -154,7 +154,7 @@ each enabled plugin's `plugins/<name>/requires`. It cannot check:
   as `~/.local/bin/kaizen` with the host's Go, or
   `nix build ~/.dotfiles#kaizen` builds it.
 - The emoji data: run
-  [`kaizen internal emoji`](../stow/kaizen/.local/libexec/kaizen/internal/emoji)
+  [`kaizen internal emoji`](stow/.local/libexec/kaizen/internal/emoji)
   into `~/.local/share/kaizen/emoji.json`.
 
 ## Services to surfaces
@@ -253,9 +253,9 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   [`interaction.md`](docs/interaction.md).
 - Plugins add launcher items, panels, IPC targets and bar indicators:
   [`plugins.md`](docs/plugins.md).
-- [`Ui/Compositor.qml`](../stow/kaizen/.config/quickshell/kaizen/Ui/Compositor.qml)
+- [`Ui/Compositor.qml`](stow/.config/quickshell/kaizen/Ui/Compositor.qml)
   is the only path to niri;
-  [`Ui/compositors/`](../stow/kaizen/.config/quickshell/kaizen/Ui/compositors/)
+  [`Ui/compositors/`](stow/.config/quickshell/kaizen/Ui/compositors/)
   owns niri commands, response parsing, and the workspace source. Keep
   scheduling and shared state above it. Nightlight is not compositor-specific
   and lives in its service.
@@ -343,20 +343,20 @@ nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
 2. Does a purpose-built app do it acceptably? Launch that instead.
 3. Can it be used with the keyboard only? If not, redesign.
 4. Then: daemon/process state →
-   [`modules/services/`](../stow/kaizen/.config/quickshell/kaizen/modules/services/),
+   [`modules/services/`](stow/.config/quickshell/kaizen/modules/services/),
    view →
-   [`modules/panels/`](../stow/kaizen/.config/quickshell/kaizen/modules/panels/),
+   [`modules/panels/`](stow/.config/quickshell/kaizen/modules/panels/),
    both wired in
-   [`shell.qml`](../stow/kaizen/.config/quickshell/kaizen/shell.qml); a
+   [`shell.qml`](stow/.config/quickshell/kaizen/shell.qml); a
    protocol-driven surface with no other consumer of its state (lock,
    notifications, polkit) keeps both in `modules/<name>/`. Packages (even a
    package another scope also installs), system services and PAM →
    [`nix/default.nix`](nix/default.nix), units and
-   scripts → [`systemd/user/`](../stow/kaizen/.config/systemd/user/) and
-   [`.local/libexec/kaizen/`](../stow/kaizen/.local/libexec/kaizen/),
+   scripts → [`systemd/user/`](stow/.config/systemd/user/) and
+   [`.local/libexec/kaizen/`](stow/.local/libexec/kaizen/),
    compositor →
-   [`Ui/compositors/`](../stow/kaizen/.config/quickshell/kaizen/Ui/compositors/)
-   and [`niri/config.kdl`](../stow/kaizen/.config/niri/config.kdl), IPC
+   [`Ui/compositors/`](stow/.config/quickshell/kaizen/Ui/compositors/)
+   and [`niri/config.kdl`](stow/.config/niri/config.kdl), IPC
    target for every new action. An optional shell extension is a
    [plugin](docs/plugins.md). An app is not kaizen's to install:
    [`nix/README.md`](../nix/README.md) says where it goes.

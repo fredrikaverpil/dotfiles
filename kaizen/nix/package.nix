@@ -1,6 +1,6 @@
 { lib, buildGo127Module }:
 # The `kaizen` command, built from kaizen/; its tests run in checkPhase, so a
-# failing test fails the rebuild. It runs the scripts stow/kaizen/ links into
+# failing test fails the rebuild. It runs the scripts kaizen/stow/ links into
 # ~/.local/libexec/kaizen/.
 buildGo127Module {
   pname = "kaizen";

@@ -247,7 +247,7 @@ unit's `StateDirectory` (`$STATE_DIRECTORY`), which the window reads through
 directory as private as `sourceDirs`.
 
 The window, `instructions.md` and `claude-plugin/` are in
-[`plugins/incident-investigator/`](../../../../stow/kaizen/.config/quickshell/kaizen/plugins/incident-investigator/)
+[`plugins/incident-investigator/`](../../../stow/.config/quickshell/kaizen/plugins/incident-investigator/)
 under the shell's QML:
 
 | Path                 | Holds                               |
@@ -261,7 +261,7 @@ under the shell's QML:
 | `claude-plugin/`     | the Claude plugin serving gopls     |
 
 Its unit is
-[`kaizen-incident-investigator.service`](../../../../stow/kaizen/.config/systemd/user/kaizen-incident-investigator.service).
+[`kaizen-incident-investigator.service`](../../../stow/.config/systemd/user/kaizen-incident-investigator.service).
 The daemon and its Nix module are here:
 
 | Path           | Holds                |

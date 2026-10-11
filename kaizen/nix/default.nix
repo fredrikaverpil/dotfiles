@@ -13,7 +13,7 @@ let
       }
       ''
         mkdir -p $out/share/kaizen
-        bash ${../../stow/kaizen/.local/libexec/kaizen/internal/emoji} "$names" "$shortcodes" > $out/share/kaizen/emoji.json
+        bash ${../stow/.local/libexec/kaizen/internal/emoji} "$names" "$shortcodes" > $out/share/kaizen/emoji.json
       '';
 
   # qtimageformats supplies Quickshell's WebP decoder.
@@ -31,7 +31,7 @@ in
 # The kaizen session every kaizen host shares: niri under UWSM, portals, PAM,
 # the services the shell reads, and the packages and data its shell, binds,
 # scripts and units run. Units, scripts, compositor config, QML and
-# notification rules live in stow/kaizen/.
+# notification rules live in kaizen/stow/.
 {
   imports = [ ../../nix/shared/system/fonts.nix ];
 
@@ -110,7 +110,7 @@ in
       auth include login
     '';
 
-    # Marks a kaizen host; stow.sh stows stow/kaizen/ where it exists.
+    # Marks a kaizen host; stow.sh stows kaizen/stow/ where it exists.
     environment.etc.kaizen.text = "";
 
     # A rebuild deletes an agent-built ~/.local/bin/kaizen.

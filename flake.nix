@@ -161,13 +161,13 @@
                   # same types the ThinkPad runs; without the overlay's patch,
                   # which changes no type.
                   quickshell = unstable.x86_64-linux.quickshell;
-                  # Every kaizen host runs the one tree in stow/kaizen/; a host's
+                  # Every kaizen host runs the one tree in kaizen/stow/; a host's
                   # plugins add theirs under stow/host/<host>/.config/kaizen/.
                   task =
                     name: text:
                     pkgs.writeShellScriptBin name ''
                       set -e
-                      cd "$(git rev-parse --show-toplevel)/stow/kaizen/.config/quickshell/kaizen"
+                      cd "$(git rev-parse --show-toplevel)/kaizen/stow/.config/quickshell/kaizen"
                       ${text}
                     '';
                 in
@@ -182,11 +182,11 @@
                       trap 'rm -rf "$imports"' EXIT
                       mkdir "$imports/qs"
                       ln -s "$PWD/Ui" "$imports/qs/Ui"
-                      qmllint -E -I "$imports" -W 0 $(find . ../../../../host/*/.config/kaizen/plugins -name '*.qml')
+                      qmllint -E -I "$imports" -W 0 $(find . ../../../../../stow/host/*/.config/kaizen/plugins -name '*.qml')
                     '')
                     # Tool defaults; prettier's match conform's flags for JS.
                     (task "qml-format" ''
-                      dirs=". ../../../../host/*/.config/kaizen/plugins"
+                      dirs=". ../../../../../stow/host/*/.config/kaizen/plugins"
                       qmlformat -i $(find $dirs -name '*.qml')
                       # Prettier cannot parse QML's `.pragma`/`.import` JS.
                       prettier --log-level warn --write $(grep -LE '^\.(pragma|import)' $(find $dirs -name '*.js'))

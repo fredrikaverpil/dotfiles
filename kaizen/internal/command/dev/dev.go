@@ -15,7 +15,7 @@ import (
 )
 
 // tree is the shell tree in a checkout.
-const tree = "stow/kaizen/.config/quickshell/kaizen"
+const tree = "kaizen/stow/.config/quickshell/kaizen"
 
 // Command runs the shell from a checkout's tree, or main's again.
 type Command struct {

@@ -66,7 +66,7 @@ upstream's latest, and niri marks each option with the version it arrived in
 - Nix comments carry the "why" for packages, portals, PAM and hardware
   integration, and the units' comments for the units. Read
   `kaizen/nix/default.nix`,
-  `stow/kaizen/.config/systemd/user/`,
+  `kaizen/stow/.config/systemd/user/`,
   `nix/shared/system/linux-desktop.nix` and `nix/shared/system/thinkpad.nix`,
   plus the host's `configuration.nix`, before asking.
 - SSH keys come from the Proton Pass app's agent (`SSH_AUTH_SOCK` in
@@ -138,7 +138,7 @@ These are development gates, not CI jobs. They live only in the repository's
 default devshell (`flake.nix`), entered by `direnv` at the repo root or run as
 `nix develop ~/.dotfiles -c <command>` (not `#dev`) from anywhere in the
 checkout. `compositor-test` and `shell-smoke` are Linux-only and are absent
-from the shell on macOS. All of them run against the single `stow/kaizen/`
+from the shell on macOS. All of them run against the single `kaizen/stow/`
 tree, so a static check passing here passes for every kaizen host.
 
 | Change | Checks |
@@ -363,7 +363,7 @@ clone.
 When working from another host, sync the checkout before live validation or a
 user-run rebuild, which evaluates the host's clone. Checksums avoid replacing
 identical compositor files solely because timestamps differ. The host may
-carry uncommitted theme edits in `stow/kaizen/`; check `git status`
+carry uncommitted theme edits in `kaizen/stow/`; check `git status`
 there before `--delete`.
 
 ```sh

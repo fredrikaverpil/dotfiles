@@ -2,11 +2,11 @@
 # shellcheck shell=bash
 set -e
 
-# Symlinks the stow/ tree into $HOME: shared, platform, kaizen (kaizen hosts;
-# unstowed elsewhere), then the optional host package and the stow/ trees of
-# the host's private submodules, removes broken links into the repo left by
-# files it moved or deleted, and reloads the user units on a kaizen host. Also
-# what home-manager activation runs.
+# Removes broken links into the repo left by files it moved or deleted, then
+# symlinks the stow/ tree into $HOME: shared, platform, kaizen/stow (kaizen
+# hosts; unstowed elsewhere), then the optional host package and the stow/
+# trees of the host's private submodules, and reloads the user units on a
+# kaizen host. Also what home-manager activation runs.
 # --adopt absorbs a real file that replaced a managed symlink into the repo;
 # --no-folding links files, not dirs, so other tools can write siblings.
 # dir_links are the exception: linked as whole dirs, so new files in the repo
@@ -22,34 +22,20 @@ esac
 cd "${1:-$(dirname "$0")}"
 dir_links=(.config/nvim-fredrik .config/nvim-simple .shell) # in stow/shared
 dir_links_re="^($(IFS="|"; echo "${dir_links[*]//./\\.}"))"
-stowed=()
-stow_pkg() {
-  stowed+=("$1/$2")
-  local cmd=(stow --dir="$1" --target="$HOME" --restow --no-folding --adopt
-    --ignore="$dir_links_re" "$2")
-  echo "${cmd[*]}"
-  "${cmd[@]}"
-}
-stow_pkg stow shared
-for dir in "${dir_links[@]}"; do
-  ln -sfn "$PWD/stow/shared/$dir" "$HOME/$dir"
-done
-stow_pkg stow/platform "$(uname -s)"
+pkgs=(stow/shared "stow/platform/$(uname -s)")
 # kaizen's Nix module creates the marker.
-if [ -e /etc/kaizen ]; then
-  stow_pkg stow kaizen
-else
-  stow --dir=stow --target="$HOME" --delete --no-folding kaizen
-fi
+[ -e /etc/kaizen ] && pkgs+=(kaizen/stow)
 host="$(uname -n | cut -d. -f1)"
-[ -d "stow/host/$host" ] && stow_pkg stow/host "$host"
+[ -d "stow/host/$host" ] && pkgs+=("stow/host/$host")
 for tree in nix/hosts/"$host"/*/stow; do
-  [ -d "$tree" ] && stow_pkg "${tree%/stow}" stow
+  [ -d "$tree" ] && pkgs+=("$tree")
 done
-# Scans each top-level entry the packages hold, and removes the directories a
-# removal leaves empty, up to that entry.
+# Broken links go before stowing: stow refuses to replace a link it does not
+# own, such as one into a package that moved. Scans each top-level entry the
+# packages hold, and removes the directories a removal leaves empty, up to
+# that entry.
 repo="$(pwd -P)"
-for pkg in "${stowed[@]}"; do ls -A "$pkg"; done | sort -u |
+for pkg in "${pkgs[@]}"; do ls -A "$pkg"; done | sort -u |
   while IFS= read -r top; do
     [ -e "$HOME/$top" ] || [ -L "$HOME/$top" ] || continue
     find "$HOME/$top" -type l | while IFS= read -r link; do
@@ -64,6 +50,17 @@ for pkg in "${stowed[@]}"; do ls -A "$pkg"; done | sort -u |
       done
     done
   done
+for pkg in "${pkgs[@]}"; do
+  cmd=(stow --dir="${pkg%/*}" --target="$HOME" --restow --no-folding --adopt
+    --ignore="$dir_links_re" "${pkg##*/}")
+  echo "${cmd[*]}"
+  "${cmd[@]}"
+done
+for dir in "${dir_links[@]}"; do
+  ln -sfn "$PWD/stow/shared/$dir" "$HOME/$dir"
+done
+[ -e /etc/kaizen ] ||
+  stow --dir=kaizen --target="$HOME" --delete --no-folding stow
 # Stowed user units take effect on a reload, when a user manager runs.
 if [ -e /etc/kaizen ]; then
   export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"

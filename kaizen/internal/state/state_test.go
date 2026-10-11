@@ -43,7 +43,7 @@ const (
 
 func TestRead(t *testing.T) {
 	tree := "/home/user/.config/quickshell/kaizen"
-	devTree := "/home/user/.dotfiles/.claude/worktrees/x/stow/kaizen/.config/quickshell/kaizen"
+	devTree := "/home/user/.dotfiles/.claude/worktrees/x/kaizen/stow/.config/quickshell/kaizen"
 	barHeight := 40
 	curtain := &Curtain{Active: true, PasswordPam: true}
 	idle := &Idle{Enabled: true, LockAfterSeconds: 300}

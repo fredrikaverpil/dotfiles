@@ -9,7 +9,7 @@ Go down the list; the first match wins.
 
 1. **kaizen core**:
    [`../kaizen/nix/`](../kaizen/nix/default.nix). What
-   the shell, the session or a bind in [`stow/kaizen/`](../stow/kaizen/) needs
+   the shell, the session or a bind in [`kaizen/stow/`](../kaizen/stow/) needs
    to do its job, including the purpose-built apps kaizen hands tasks to
    (bluetui, nm-connection-editor).
 2. **kaizen plugin**: optional; the shell runs without it. Written for kaizen,

@@ -31,7 +31,7 @@ type Dispatcher struct {
 // ScriptsDir returns the scripts of the checkout exe was built in, when exe is
 // <checkout>/kaizen/kaizen, else the stowed ones under home.
 func ScriptsDir(exe, home string) string {
-	checkout := filepath.Join(exe, "..", "..", "stow", "kaizen", ".local", "libexec", "kaizen")
+	checkout := filepath.Join(exe, "..", "stow", ".local", "libexec", "kaizen")
 	if info, err := os.Stat(checkout); err == nil && info.IsDir() {
 		return checkout
 	}

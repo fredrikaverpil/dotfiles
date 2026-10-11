@@ -10,7 +10,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 units=../../systemd/user
-hosts=../../../../host
+hosts=../../../../../stow/host
 # Present on every system.
 base=" awk bash cat cut date find grep head kaizen ln ls mkdir mv readlink rm sed seq sh sleep sort tail touch tr "
 
