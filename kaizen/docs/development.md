@@ -143,7 +143,7 @@ tree, so a static check passing here passes for every kaizen host.
 
 | Change | Checks |
 | --- | --- |
-| Nix | `nix fmt`, `nix build .#nixosConfigurations.<host>.config.system.build.toplevel`; build both kaizen hosts, a shared module breaks both |
+| Nix | `nix fmt`, `nix build .#nixosConfigurations.<host>.config.system.build.toplevel`; build both kaizen hosts, a shared module breaks both; the build fails on a `requires` `cmd`, `file` or `data` line the host does not install |
 | JS/QML | `qml-format`, `qml-test`, `qml-lint`, `requires-check` (any platform) |
 | The `kaizen` command (Go) | `go test ./...` and `go vet ./...` in `kaizen/cli/`; build both kaizen hosts, whose build runs the tests |
 | Compositor interface, config, or bind contract | Also `compositor-test` (Linux) |

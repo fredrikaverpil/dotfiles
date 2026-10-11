@@ -28,9 +28,10 @@ reaches, is in [`README.md`](../README.md) › Where it lives.
 - A plugin lists the programs, D-Bus services and files it needs beyond the
   core's in `plugins/<name>/requires`, in the format of the core's
   [`requires`](../stow/.config/quickshell/kaizen/requires).
-  `kaizen doctor` reports what is missing where the plugin is enabled, and
-  `requires-check` fails on a program its QML, JS or unit calls that neither
-  file lists.
+  `kaizen doctor` reports what is missing where the plugin is enabled, a
+  host enabling it fails to build on a `cmd`, `file` or `data` line it does
+  not install, and `requires-check` fails on a program its QML, JS or unit
+  calls that neither file lists.
 - A plugin's unit is a file under Stow, enabled by a link in
   `wayland-session@niri.target.wants/`, or in the autostart target's when it
   shows a tray item (below). A generic plugin's lives in

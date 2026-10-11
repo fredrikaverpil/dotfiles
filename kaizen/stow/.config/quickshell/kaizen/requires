@@ -3,7 +3,9 @@
 # XDG data dirs), env NAME=VALUE (in the user manager's environment), font FAMILY
 # (the rest of the line, any case), qtplugin PATH (in the running shell's Qt
 # plugin dirs). Missing is an error unless the line ends in `warn`; a line in
-# another form is an error.
+# another form is an error. kaizen/nix/requires.nix fails a host's build on a
+# `cmd`, `file` or `data` line here or in an enabled plugin's requires that the
+# host does not install.
 
 # Session
 cmd niri
