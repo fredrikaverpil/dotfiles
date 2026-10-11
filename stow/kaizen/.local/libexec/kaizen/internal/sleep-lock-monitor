@@ -4,7 +4,7 @@ set -euo pipefail
 
 case "${1:-}" in
 -h | --help)
-  echo "usage: kaizen sleep-lock-monitor    lock the shell before each suspend (kaizen-sleep-lock.service)"
+  echo "usage: kaizen internal sleep-lock-monitor    lock the shell before each suspend (kaizen-sleep-lock.service)"
   exit 0
   ;;
 esac
