@@ -119,13 +119,18 @@ func Read(ctx context.Context, r Runner) (Status, error) {
 		status.Error = new(err.Error())
 		return status, nil
 	}
-	status.Ready = true
-	status.Tree = shell.Tree
-	status.BarHeight = shell.BarHeight
-	status.Lock = shell.Lock
-	status.Curtain = shell.Curtain
-	status.Idle = shell.Idle
+	status.answered(shell)
 	return status, nil
+}
+
+// answered records the shell's answer to `shell status`.
+func (s *Status) answered(shell shellStatus) {
+	s.Ready = true
+	s.Tree = shell.Tree
+	s.BarHeight = shell.BarHeight
+	s.Lock = shell.Lock
+	s.Curtain = shell.Curtain
+	s.Idle = shell.Idle
 }
 
 // readUnit returns the unit's facts from systemd.
@@ -157,18 +162,28 @@ func readUnit(ctx context.Context, r Runner) (Status, error) {
 	return status, nil
 }
 
-// query asks the shell at pid for its status. qs answers with an error message
-// in place of the JSON, mostly with exit 0.
-func query(ctx context.Context, r Runner, pid int) (shellStatus, error) {
+// call calls function fn of target on the shell at pid and returns the first
+// line of its answer. qs answers with an error message in place of the
+// function's answer, mostly with exit 0: the caller tells the two apart.
+func call(ctx context.Context, r Runner, pid int, target, fn string) ([]byte, string, error) {
 	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
 	defer cancel()
-	out, err := r.Run(ctx, "qs", "ipc", "--pid", strconv.Itoa(pid), "call", "shell", "status")
+	out, err := r.Run(ctx, "qs", "ipc", "--pid", strconv.Itoa(pid), "call", target, fn)
 	answer, _, _ := strings.Cut(string(bytes.TrimSpace(out)), "\n")
 	if answer == notReady {
-		return shellStatus{}, ErrNotReady
+		return nil, "", ErrNotReady
 	}
 	if err != nil && answer == "" {
-		return shellStatus{}, fmt.Errorf("qs ipc: %v", err)
+		return nil, "", fmt.Errorf("qs ipc: %v", err)
+	}
+	return out, answer, nil
+}
+
+// query asks the shell at pid for its status.
+func query(ctx context.Context, r Runner, pid int) (shellStatus, error) {
+	out, answer, err := call(ctx, r, pid, "shell", "status")
+	if err != nil {
+		return shellStatus{}, err
 	}
 	if !strings.HasPrefix(answer, "{") {
 		return shellStatus{}, errors.New(answer)

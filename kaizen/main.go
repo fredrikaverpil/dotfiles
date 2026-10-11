@@ -13,6 +13,7 @@ import (
 	"syscall"
 
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/cli"
+	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/reload"
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/status"
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/state"
 )
@@ -31,6 +32,7 @@ func main() {
 	info, _ := debug.ReadBuildInfo()
 	d := cli.Dispatcher{
 		Commands: []cli.Command{
+			reload.Command{Runner: state.Exec{}},
 			status.Command{Runner: state.Exec{}},
 		},
 		Dir:     cli.ScriptsDir(exe, home),
