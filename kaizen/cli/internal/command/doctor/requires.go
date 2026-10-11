@@ -14,7 +14,8 @@ import (
 // what it names that is missing and each line in another form, an error
 // unless every missing line ends in `warn`. Each line is `cmd NAME`,
 // `bus session|system NAME`, `file PATH`, `data PATH`, in the XDG data dirs,
-// or `env NAME=VALUE`, in the user manager's environment, then `warn` or
+// `env NAME=VALUE`, in the user manager's environment, or `font FAMILY`,
+// whose name is the rest of the line and matches any case, then `warn` or
 // nothing.
 func (k *checker) requires(ctx context.Context, path, unit string) {
 	data, err := os.ReadFile(path)
@@ -40,24 +41,36 @@ func (k *checker) requires(ctx context.Context, path, unit string) {
 			bus, args = args[0], args[1:]
 		}
 		name, flag := field(args, 0), strings.Join(args[min(len(args), 1):], " ")
+		if kind == "font" {
+			name, flag = strings.Join(args, " "), ""
+			if n := len(args); n > 1 && args[n-1] == "warn" {
+				name, flag = strings.Join(args[:n-1], " "), "warn"
+			}
+		}
 		found, known := false, name != "" && (flag == "" || flag == "warn")
 		switch {
 		case !known:
 		case kind == "cmd":
 			_, found = k.lookPath(name)
 		case kind == "bus" && bus != "":
-			names, listed := k.list(ctx, "the "+bus+" bus", "busctl", busFlags[bus], "list", "--no-legend")
+			names, listed := k.list(ctx, "the "+bus+" bus", firstField, "busctl", busFlags[bus], "list", "--no-legend")
 			if !listed {
 				continue
 			}
 			found = slices.Contains(names, name)
 			name = bus + " " + name
 		case kind == "env" && strings.Index(name, "=") > 0:
-			names, listed := k.list(ctx, "the user manager's environment", "systemctl", "--user", "show-environment")
+			names, listed := k.list(ctx, "the user manager's environment", firstField, "systemctl", "--user", "show-environment")
 			if !listed {
 				continue
 			}
 			found = slices.Contains(names, name)
+		case kind == "font":
+			names, listed := k.list(ctx, "the fonts", families, "fc-list", ":", "family")
+			if !listed {
+				continue
+			}
+			found = slices.Contains(names, strings.ToLower(name))
 		case kind == "file":
 			found = exists(name)
 		case kind == "data":
@@ -102,9 +115,15 @@ type listing struct {
 	ok bool
 }
 
-// list returns the first field of each line name prints with args, running it
-// once per what; false when it fails, which it reports once.
-func (k *checker) list(ctx context.Context, what, name string, args ...string) ([]string, bool) {
+// list returns the names split finds in each line name prints with args,
+// running it once per what; false when it fails, which it reports once.
+func (k *checker) list(
+	ctx context.Context,
+	what string,
+	split func(line string) []string,
+	name string,
+	args ...string,
+) ([]string, bool) {
 	if l, ok := k.lists[what]; ok {
 		return l.names, l.ok
 	}
@@ -121,12 +140,28 @@ func (k *checker) list(ctx context.Context, what, name string, args ...string) (
 	}
 	var names []string
 	for line := range strings.Lines(string(out)) {
-		if fields := strings.Fields(line); len(fields) > 0 {
-			names = append(names, fields[0])
-		}
+		names = append(names, split(line)...)
 	}
 	k.lists[what] = listing{names: names, ok: true}
 	return names, true
+}
+
+// firstField returns the line's first field, if any.
+func firstField(line string) []string {
+	fields := strings.Fields(line)
+	return fields[:min(len(fields), 1)]
+}
+
+// families returns the comma-separated family names of an `fc-list : family`
+// line, lowercased.
+func families(line string) []string {
+	var names []string
+	for family := range strings.SplitSeq(strings.TrimSpace(line), ",") {
+		if family != "" {
+			names = append(names, strings.ToLower(family))
+		}
+	}
+	return names
 }
 
 // dataDirs returns $XDG_DATA_HOME and $XDG_DATA_DIRS, with their defaults.
