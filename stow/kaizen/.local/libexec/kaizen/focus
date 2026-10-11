@@ -12,7 +12,7 @@ esac
 regex="$1"
 shift
 id="$(niri msg -j windows | jq --arg re "$regex" \
-  '[.[] | select(.app_id | test($re))] | max_by(.focus_timestamp | [.secs, .nanos]) | .id // empty')"
+  '[.[] | select(.app_id // "" | test($re))] | max_by(.focus_timestamp | [.secs, .nanos]) | .id // empty')"
 if [ -n "$id" ]; then
   exec niri msg action focus-window --id "$id"
 fi
