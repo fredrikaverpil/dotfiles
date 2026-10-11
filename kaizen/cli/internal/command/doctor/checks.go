@@ -23,6 +23,16 @@ var tracing = regexp.MustCompile(`^[0-9]{4}-[0-9]{2}-[0-9]{2}T[^ ]+ +[A-Z]+ `)
 // devExec matches the ExecStart of kaizen dev's drop-in, naming the tree.
 var devExec = regexp.MustCompile(`^ExecStart=.* -p "(.*)"$`)
 
+// systemd's catalog ids of its entries about a unit's run.
+const (
+	// restartScheduled is "Scheduled restart job, restart counter is at N".
+	restartScheduled = "5eb03494b6584870a536b337290809b3"
+	// processExited is "Main process exited, code=…, status=…".
+	processExited = "98e322203f7a4ed290d09fe03c09fe15"
+	// failureResult is "Failed with result '…'".
+	failureResult = "d9b373ed55a64feb8242e02dbe79a49c"
+)
+
 // check is a check's finding.
 type check struct {
 	level, unit, message string
@@ -99,7 +109,8 @@ func (c Command) check(ctx context.Context, units []unit) []check {
 			k.add("ERROR", name, fmt.Sprintf("failed (%s)", u.result))
 		}
 		if u.nRestarts > 0 {
-			k.add("WARN", name, fmt.Sprintf("failed and was restarted %s", plural(u.nRestarts, "time")))
+			lines := append([]string{"failed and was restarted " + plural(u.nRestarts, "time")}, k.restarts(ctx, u)...)
+			k.add("WARN", name, strings.Join(lines, "\n"))
 		}
 		if u.id == state.Unit && shell.id == "" {
 			shell = u
@@ -128,6 +139,90 @@ func (c Command) check(ctx context.Context, units []unit) []check {
 	}
 	k.plugins(ctx, filepath.Join(tree, "plugins"))
 	return k.checks
+}
+
+// restarts returns why each of u's runs since it was last started by hand
+// failed: when, how its process exited, then its last warning or error
+// indented. Identical causes are counted. systemd logs each automatic restart
+// about the run that failed.
+func (k *checker) restarts(ctx context.Context, u unit) []string {
+	name := strings.TrimSuffix(u.id, ".service")
+	out, err := run(ctx, k.Runner, "journalctl", "--user", "--boot", "USER_UNIT="+u.id, "MESSAGE_ID="+restartScheduled,
+		"--lines", strconv.Itoa(u.nRestarts), "--output", "json", "--no-pager")
+	var scheduled, entries []state.Entry
+	if err == nil {
+		scheduled, err = parseJournal(out)
+	}
+	if err == nil {
+		ids := make([]string, 0, len(scheduled))
+		for _, s := range scheduled {
+			ids = append(ids, s.InvocationID)
+		}
+		out, err = readRuns(ctx, k.Runner, ids)
+	}
+	if err == nil {
+		entries, err = parseJournal(out)
+	}
+	if err != nil {
+		k.add("ERROR", "doctor", fmt.Sprintf("cannot read why %s was restarted: %v", name, err))
+		return nil
+	}
+	runs := map[string][]state.Entry{}
+	for _, e := range entries {
+		runs[e.InvocationID] = append(runs[e.InvocationID], e)
+	}
+	type cause struct{ exit, last string }
+	type span struct {
+		count       int
+		first, last int64
+	}
+	spans := map[cause]*span{}
+	var causes []cause
+	for _, s := range scheduled {
+		var c cause
+		when := s.Time.UnixMilli()
+		logged := runs[s.InvocationID]
+		for i, e := range logged {
+			switch {
+			case e.MessageID == processExited:
+				c.exit = strings.TrimPrefix(strings.TrimPrefix(e.Message, u.id+": "), "Main process exited, ")
+				when = e.Time.UnixMilli()
+			case e.MessageID != failureResult && !skipped(logged, i) && severity(e) != "":
+				c.last = trimMessage(e.Message)
+			}
+		}
+		sp, ok := spans[c]
+		if !ok {
+			sp = &span{first: when, last: when}
+			spans[c] = sp
+			causes = append(causes, c)
+		}
+		sp.count++
+		sp.first = min(sp.first, when)
+		sp.last = max(sp.last, when)
+	}
+	lines := make([]string, 0, len(causes))
+	for _, c := range causes {
+		sp := spans[c]
+		line := k.times(sp.count, sp.first, sp.last)
+		if c.exit != "" {
+			line += "  " + c.exit
+		}
+		if c.last != "" {
+			line += "\n  " + strings.ReplaceAll(c.last, "\n", "\n  ")
+		}
+		lines = append(lines, line)
+	}
+	return lines
+}
+
+// parseJournal parses journalctl's JSON output.
+func parseJournal(out []byte) ([]state.Entry, error) {
+	entries, err := state.ParseJournal(out)
+	if err != nil {
+		return nil, fmt.Errorf("journalctl: %v", err)
+	}
+	return entries, nil
 }
 
 // staleShell reports that the shell at pid runs a Quickshell that is no longer
