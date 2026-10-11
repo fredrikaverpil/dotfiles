@@ -60,6 +60,8 @@ const (
 	fontLine  = "fc-list : family"
 	// coreRequires is the core's requires under the test's $HOME.
 	coreRequires = "home/.config/quickshell/kaizen/requires"
+	// niriConfig is niri's config under the test's $HOME.
+	niriConfig = "home/.config/niri/config.kdl"
 )
 
 // base is the time the journal's entries count from.
@@ -169,7 +171,8 @@ func TestRun(t *testing.T) {
 		args []string
 		// env, files, links and outputs say $DIR for the test's directory.
 		env map[string]string
-		// files are written under $DIR; those in execs are executable.
+		// files are written under $DIR, over a niri config including
+		// kaizen.kdl; those in execs are executable.
 		files map[string]string
 		execs []string
 		// unreadable are files under $DIR without permissions.
@@ -636,6 +639,58 @@ func TestRun(t *testing.T) {
 			},
 		},
 		{
+			name: "niri config reaches kaizen.kdl through includes",
+			env:  map[string]string{"NIRI_CONFIG": "$DIR/niri/main.kdl"},
+			files: map[string]string{
+				coreRequires:            "",
+				"niri/main.kdl":         "// include \"kaizen.kdl\"\ninclude optional=true \"sub/host.kdl\"\n",
+				"niri/sub/host.kdl":     "include \"~/shell/kaizen.kdl\"\n",
+				"home/shell/kaizen.kdl": "",
+			},
+			outputs: map[string][]recorded{
+				showLine:   {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "0", "0", "")}},
+				niriLine:   {{}},
+				portalLine: {{}},
+			},
+			want: result{
+				Stdout: "No errors or warnings\n",
+				Calls:  []string{showLine, niriLine, portalLine},
+			},
+		},
+		{
+			name: "niri config without kaizen.kdl",
+			files: map[string]string{
+				coreRequires: "",
+				niriConfig: "// include \"kaizen.kdl\"\ninclude optional=true \"gone/kaizen.kdl\"\n" +
+					"include \"apps.kdl\"\n",
+				"home/.config/niri/apps.kdl": "include \"apps.kdl\"\n",
+			},
+			outputs: map[string][]recorded{
+				showLine:   {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "0", "0", "")}},
+				niriLine:   {{}},
+				portalLine: {{}},
+			},
+			want: result{
+				Stdout: "1 error\n\nERROR niri  check\n" +
+					"  $DIR/home/.config/niri/config.kdl does not include kaizen.kdl\n" +
+					"  hint: add include \"kaizen.kdl\" to $DIR/home/.config/niri/config.kdl\n",
+				Calls: []string{showLine, niriLine, portalLine},
+			},
+		},
+		{
+			name:  "invalid niri config without kaizen.kdl",
+			files: map[string]string{coreRequires: "", niriConfig: "bad\n"},
+			outputs: map[string][]recorded{
+				showLine:   {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "0", "0", "")}},
+				niriLine:   {{Err: errors.New("exit status 1")}},
+				portalLine: {{}},
+			},
+			want: result{
+				Stdout: "1 error\n\nERROR niri  check\n  niri validate:\n  exit status 1\n",
+				Calls:  []string{showLine, niriLine, portalLine},
+			},
+		},
+		{
 			name: "dev drop-in without a tree",
 			files: map[string]string{
 				coreRequires:                          "",
@@ -700,7 +755,9 @@ func TestRun(t *testing.T) {
 			}
 			dir := t.TempDir()
 			expand := func(s string) string { return strings.ReplaceAll(s, "$DIR", dir) }
-			for path, content := range tt.files {
+			files := map[string]string{niriConfig: "include \"kaizen.kdl\"\n", "home/.config/niri/kaizen.kdl": ""}
+			maps.Copy(files, tt.files)
+			for path, content := range files {
 				write(t, filepath.Join(dir, path), expand(content), 0o644)
 			}
 			for _, path := range tt.unreadable {

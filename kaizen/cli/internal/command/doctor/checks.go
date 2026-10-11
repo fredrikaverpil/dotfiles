@@ -23,6 +23,9 @@ import (
 // tracing matches niri's tracing lines, which precede `niri validate`'s report.
 var tracing = regexp.MustCompile(`^[0-9]{4}-[0-9]{2}-[0-9]{2}T[^ ]+ +[A-Z]+ `)
 
+// include matches a niri config's include line, capturing its path.
+var include = regexp.MustCompile(`(?m)^[ \t]*include[ \t][^"\n]*"([^"]*)"`)
+
 // devExec matches the ExecStart of kaizen dev's drop-in, naming the tree.
 var devExec = regexp.MustCompile(`^ExecStart=.* -p "(.*)"$`)
 
@@ -322,10 +325,21 @@ func (k *checker) kaizens(ctx context.Context) {
 	})
 }
 
-// niri reports a niri config that fails `niri validate`.
+// niri reports a niri config that fails `niri validate`, or else never
+// includes kaizen.kdl.
 func (k *checker) niri(ctx context.Context) {
 	_, err := k.Runner.Run(ctx, "env", "NO_COLOR=1", "niri", "validate")
 	if err == nil {
+		config := cmp.Or(k.Getenv("NIRI_CONFIG"), filepath.Join(k.configDir(), "niri", "config.kdl"))
+		if !k.reaches(config, "kaizen.kdl", 0) {
+			k.add(check{
+				name:    "niri-include",
+				level:   "ERROR",
+				unit:    "niri",
+				message: config + " does not include kaizen.kdl",
+				hint:    `add include "kaizen.kdl" to ` + config,
+			})
+		}
 		return
 	}
 	report := err.Error()
@@ -340,6 +354,33 @@ func (k *checker) niri(ctx context.Context) {
 		}
 	}
 	k.add(check{name: "niri-config", level: "ERROR", unit: "niri", message: "niri validate:\n" + strings.Join(lines, "\n")})
+}
+
+// reaches reports whether niri config file, or a file it includes, includes a
+// regular file named name. Includes resolve as niri's do: ~ is home, other
+// relative paths are relative to the including file, and nesting stops at 10
+// levels.
+func (k *checker) reaches(file, name string, depth int) bool {
+	if depth >= 10 {
+		return false
+	}
+	data, err := os.ReadFile(file)
+	if err != nil {
+		return false
+	}
+	for _, m := range include.FindAllStringSubmatch(string(data), -1) {
+		path := m[1]
+		switch {
+		case path == "~" || strings.HasPrefix(path, "~/"):
+			path = k.Home + path[1:]
+		case !filepath.IsAbs(path):
+			path = filepath.Join(filepath.Dir(file), path)
+		}
+		if filepath.Base(path) == name && isRegular(path) || k.reaches(path, name, depth+1) {
+			return true
+		}
+	}
+	return false
 }
 
 // portal warns when the portal does not answer the colour scheme, which GTK
