@@ -15,10 +15,11 @@ import (
 // unless every missing line ends in `warn`. Each line is `cmd NAME`,
 // `bus session|system NAME`, `file PATH` or `data PATH`, in the XDG data
 // dirs, then `warn` or nothing.
-func (k *checker) requires(ctx context.Context, path, unit string) error {
+func (k *checker) requires(ctx context.Context, path, unit string) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return err
+		k.add("ERROR", "doctor", fmt.Sprintf("cannot check a requires file: %v", err))
+		return
 	}
 	level := "WARN"
 	var missing []string
@@ -68,7 +69,6 @@ func (k *checker) requires(ctx context.Context, path, unit string) error {
 	if len(missing) > 0 {
 		k.add(level, unit, strings.Join(missing, "\n"))
 	}
-	return nil
 }
 
 // field returns fields[i], or "" past the end.

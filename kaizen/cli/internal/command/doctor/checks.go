@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -88,8 +89,8 @@ func (k *checker) add(level, unit, message string) {
 	k.checks = append(k.checks, check{level: level, unit: unit, message: message})
 }
 
-// check runs the checks.
-func (c Command) check(ctx context.Context, units []unit) ([]check, error) {
+// check runs the checks. A check that cannot run is an error of unit doctor.
+func (c Command) check(ctx context.Context, units []unit) []check {
 	k := &checker{Command: c, buses: map[string]busList{}}
 	var shell unit
 	for _, u := range units {
@@ -104,11 +105,7 @@ func (c Command) check(ctx context.Context, units []unit) ([]check, error) {
 			shell = u
 		}
 	}
-	stale, err := k.staleShell(ctx, shell.mainPID)
-	if err != nil {
-		return nil, err
-	}
-	if stale {
+	if k.staleShell(ctx, shell.mainPID) {
 		k.add(
 			"WARN",
 			"kaizen-shell",
@@ -120,53 +117,49 @@ func (c Command) check(ctx context.Context, units []unit) ([]check, error) {
 	// kaizen dev's drop-in runs a worktree's tree, whose requires and plugins
 	// count.
 	tree := filepath.Join(k.configDir(), "quickshell", "kaizen")
-	dev, err := devTree(shell.dropInPaths)
-	if err != nil {
-		return nil, err
-	}
-	if dev != nil {
-		tree = *dev
+	if dev := k.devTree(shell.dropInPaths); dev != "" {
+		tree = dev
 		k.add("WARN", "kaizen-shell", fmt.Sprintf("runs %s: kaizen dev off", tree))
 	}
 	if core := filepath.Join(tree, "requires"); !isRegular(core) {
 		k.add("ERROR", "requires", "no requires in "+tree)
-	} else if err := k.requires(ctx, core, "requires"); err != nil {
-		return nil, err
+	} else {
+		k.requires(ctx, core, "requires")
 	}
-	if err := k.plugins(ctx, filepath.Join(tree, "plugins")); err != nil {
-		return nil, err
-	}
-	return k.checks, nil
+	k.plugins(ctx, filepath.Join(tree, "plugins"))
+	return k.checks
 }
 
 // staleShell reports that the shell at pid runs a Quickshell that is no longer
 // installed. Nix replaces the store path a rebuild installs; elsewhere the old
 // binary shows as deleted.
-func (k *checker) staleShell(ctx context.Context, pid string) (bool, error) {
+func (k *checker) staleShell(ctx context.Context, pid string) bool {
 	if pid == "" || pid == "0" {
-		return false, nil
+		return false
 	}
 	exe, err := os.Readlink(filepath.Join(cmp.Or(k.proc, "/proc"), pid, "exe"))
 	if err != nil {
-		return false, nil
+		return false
 	}
 	_, hasNixStore := k.lookPath("nix-store")
 	installed, hasQuickshell := k.lookPath("quickshell")
-	if !hasNixStore || !hasQuickshell {
-		return strings.HasSuffix(exe, " (deleted)"), nil
+	if !strings.HasPrefix(exe, "/nix/store/") || !hasNixStore || !hasQuickshell {
+		return strings.HasSuffix(exe, " (deleted)")
 	}
 	resolved, err := filepath.EvalSymlinks(installed)
 	if err != nil {
-		return false, err
+		k.add("ERROR", "doctor", fmt.Sprintf("cannot check the shell's Quickshell: %v", err))
+		return false
 	}
 	out, err := run(ctx, k.Runner, "nix-store", "-qR", resolved)
 	if err != nil {
-		return false, err
+		k.add("ERROR", "doctor", fmt.Sprintf("cannot check the shell's Quickshell: %v", err))
+		return false
 	}
 	// The store path: /nix/store/HASH-NAME.
 	parts := strings.SplitN(exe, "/", 5)
 	storePath := strings.Join(parts[:min(len(parts), 4)], "/")
-	return !slices.Contains(strings.Split(strings.TrimRight(string(out), "\n"), "\n"), storePath), nil
+	return !slices.Contains(strings.Split(strings.TrimRight(string(out), "\n"), "\n"), storePath)
 }
 
 // kaizens warns of more than one kaizen on PATH: an agent-built
@@ -226,16 +219,17 @@ func (k *checker) niri(ctx context.Context) {
 	k.add("ERROR", "niri", "niri validate:\n"+strings.Join(lines, "\n"))
 }
 
-// devTree returns the tree kaizen dev's drop-in among dropInPaths runs, or nil
-// without one.
-func devTree(dropInPaths string) (*string, error) {
+// devTree returns the tree kaizen dev's drop-in among dropInPaths runs, or ""
+// without one or when the drop-in does not say.
+func (k *checker) devTree(dropInPaths string) string {
 	for path := range strings.SplitSeq(dropInPaths, " ") {
 		if !strings.HasSuffix(path, "/"+state.Unit+".d/dev.conf") {
 			continue
 		}
 		data, err := os.ReadFile(path)
 		if err != nil {
-			return nil, err
+			k.add("ERROR", "doctor", fmt.Sprintf("cannot read kaizen dev's drop-in: %v", err))
+			return ""
 		}
 		var trees []string
 		for line := range strings.SplitSeq(string(data), "\n") {
@@ -243,18 +237,25 @@ func devTree(dropInPaths string) (*string, error) {
 				trees = append(trees, m[1])
 			}
 		}
-		return new(strings.Join(trees, "\n")), nil
+		if len(trees) == 0 {
+			k.add("WARN", "kaizen-shell", fmt.Sprintf("runs a tree %s does not name: kaizen dev off", path))
+		}
+		return strings.Join(trees, "\n")
 	}
-	return nil, nil
+	return ""
 }
 
 // plugins checks each enabled plugin. The shell loads a plugin only from the
 // one dir that has it, silently.
-func (k *checker) plugins(ctx context.Context, shellPlugins string) error {
+func (k *checker) plugins(ctx context.Context, shellPlugins string) {
 	hostPlugins := filepath.Join(k.configDir(), "kaizen", "plugins")
 	entries, err := os.ReadDir(hostPlugins)
+	if errors.Is(err, fs.ErrNotExist) {
+		return
+	}
 	if err != nil {
-		return nil
+		k.add("ERROR", "doctor", fmt.Sprintf("cannot list the enabled plugins: %v", err))
+		return
 	}
 	for _, entry := range entries {
 		name, ok := strings.CutSuffix(entry.Name(), ".jsonc")
@@ -277,13 +278,10 @@ func (k *checker) plugins(ctx context.Context, shellPlugins string) error {
 				k.add("ERROR", "plugins", fmt.Sprintf("%s: no Plugin.qml in %s", name, dirs[0]))
 			}
 			if requires := filepath.Join(dirs[0], "requires"); isRegular(requires) {
-				if err := k.requires(ctx, requires, name); err != nil {
-					return err
-				}
+				k.requires(ctx, requires, name)
 			}
 		}
 	}
-	return nil
 }
 
 // configDir returns $XDG_CONFIG_HOME, else ~/.config.

@@ -54,6 +54,7 @@ the Quickshell a rebuild replaced or a worktree's tree (`kaizen dev`), a
 config that fails `niri validate`, an enabled plugin the shell cannot load, and
 a program, D-Bus service or file that a `requires` file lists and the system
 lacks. A healthy desktop reports nothing, so every finding is something to fix.
+A check that cannot run is an error of `doctor`, and the others still run.
 An error an application shows in its window or a toast stays out of it.
 
 A unit restarted by hand starts clean. With journalctl arguments
