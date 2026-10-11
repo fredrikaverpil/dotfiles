@@ -4,6 +4,7 @@ import (
 	"cmp"
 	"context"
 	"encoding/binary"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -147,7 +148,7 @@ func (c Command) check(ctx context.Context, units []unit) []check {
 	} else {
 		k.requires(ctx, core, "requires")
 	}
-	k.plugins(ctx, filepath.Join(tree, "plugins"))
+	k.plugins(ctx, tree, units)
 	return k.checks
 }
 
@@ -453,9 +454,20 @@ func (k *checker) devTree(dropInPaths string) string {
 	return ""
 }
 
-// plugins checks each enabled plugin. The shell loads a plugin only from the
-// one dir that has it, silently.
-func (k *checker) plugins(ctx context.Context, shellPlugins string) {
+// manifest is a plugin's plugin.json.
+type manifest struct {
+	ID      string   `json:"id"`
+	Name    string   `json:"name"`
+	Version string   `json:"version"`
+	API     int      `json:"api"`
+	Units   []string `json:"units"`
+}
+
+// plugins checks each enabled plugin of the shell in tree. The shell loads a
+// plugin only from the one dir that has it, with a plugin.json of its plugin
+// API, silently.
+func (k *checker) plugins(ctx context.Context, tree string, units []unit) {
+	shellPlugins := filepath.Join(tree, "plugins")
 	hostPlugins := filepath.Join(k.configDir(), "kaizen", "plugins")
 	entries, err := os.ReadDir(hostPlugins)
 	if errors.Is(err, fs.ErrNotExist) {
@@ -470,6 +482,7 @@ func (k *checker) plugins(ctx context.Context, shellPlugins string) {
 		})
 		return
 	}
+	api := k.pluginAPI(tree)
 	for _, entry := range entries {
 		name, ok := strings.CutSuffix(entry.Name(), ".jsonc")
 		if !ok || strings.HasPrefix(entry.Name(), ".") || !exists(filepath.Join(hostPlugins, entry.Name())) {
@@ -505,9 +518,110 @@ func (k *checker) plugins(ctx context.Context, shellPlugins string) {
 					message: fmt.Sprintf("%s: no Plugin.qml in %s", name, dirs[0]),
 				})
 			}
+			k.manifest(name, dirs[0], api, units)
 			if requires := filepath.Join(dirs[0], "requires"); isRegular(requires) {
 				k.requires(ctx, requires, name)
 			}
+		}
+	}
+}
+
+// pluginAPI returns the plugin API of the shell in tree, its plugin-api; 0
+// when it has none.
+func (k *checker) pluginAPI(tree string) int {
+	path := filepath.Join(tree, "plugin-api")
+	data, err := os.ReadFile(path)
+	if err != nil {
+		k.add(check{
+			name:    "plugins",
+			level:   "ERROR",
+			unit:    "plugins",
+			message: fmt.Sprintf("cannot read the shell's plugin API: %v", err),
+		})
+		return 0
+	}
+	api, err := strconv.Atoi(strings.TrimSpace(string(data)))
+	if err != nil || api < 1 {
+		k.add(check{
+			name:    "plugins",
+			level:   "ERROR",
+			unit:    "plugins",
+			message: fmt.Sprintf("%s holds no plugin API", path),
+		})
+		return 0
+	}
+	return api
+}
+
+// manifest checks the plugin.json in dir of the plugin name: its id, its
+// plugin API against api unless 0, and that its units are loaded and running.
+func (k *checker) manifest(name, dir string, api int, units []unit) {
+	path := filepath.Join(dir, "plugin.json")
+	data, err := os.ReadFile(path)
+	if errors.Is(err, fs.ErrNotExist) {
+		k.add(check{
+			name:    "plugins",
+			level:   "ERROR",
+			unit:    "plugins",
+			message: fmt.Sprintf("%s: no plugin.json in %s", name, dir),
+		})
+		return
+	}
+	if err != nil {
+		k.add(check{
+			name:    "plugins",
+			level:   "ERROR",
+			unit:    "doctor",
+			message: fmt.Sprintf("cannot read a plugin manifest: %v", err),
+		})
+		return
+	}
+	var m manifest
+	if err := json.Unmarshal(data, &m); err != nil {
+		k.add(check{
+			name:    "plugins",
+			level:   "ERROR",
+			unit:    "plugins",
+			message: fmt.Sprintf("%s: %s: %v", name, path, err),
+		})
+		return
+	}
+	if m.ID != name {
+		k.add(check{
+			name:    "plugins",
+			level:   "ERROR",
+			unit:    "plugins",
+			message: fmt.Sprintf("%s: %s names id %q", name, path, m.ID),
+		})
+		return
+	}
+	if api > 0 && m.API != api {
+		k.add(check{
+			name:    "plugins",
+			level:   "ERROR",
+			unit:    "plugins",
+			message: fmt.Sprintf("%s: %s %s needs plugin API %d, the shell's is %d", name, m.Name, m.Version, m.API, api),
+		})
+	}
+	for _, id := range m.Units {
+		i := slices.IndexFunc(units, func(u unit) bool { return u.id == id })
+		switch {
+		case i < 0:
+			k.add(check{
+				name:    "plugins",
+				level:   "ERROR",
+				unit:    "plugins",
+				message: fmt.Sprintf("%s: %s is not loaded", name, id),
+				hint:    "kaizen link",
+			})
+		case units[i].activeState == "inactive":
+			k.add(check{
+				name:    "plugins",
+				level:   "WARN",
+				unit:    strings.TrimSuffix(id, ".service"),
+				message: "not running, though plugin " + name + " is enabled",
+				hint:    "systemctl --user start " + id,
+			})
 		}
 	}
 }

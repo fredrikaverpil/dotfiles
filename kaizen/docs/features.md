@@ -53,13 +53,13 @@ run exited and the last warning or error it logged, a shell still running the
 Quickshell a rebuild replaced or a worktree's tree (`kaizen dev`), a `kaizen`
 shadowing another on PATH, a niri config that fails `niri validate`, a portal
 that does not answer the colour scheme, a `gsr-kms-server` without
-`cap_sys_admin+ep`, an enabled plugin the shell cannot load,
-and a program, D-Bus service, file, session variable, font or Qt plugin that a
-`requires` file lists and the system lacks. A healthy desktop reports nothing,
-so every finding is something to fix; a `hint:` line under it names the fix when
-there is one. A check that cannot run is an error of `doctor`, and the others
-still run. An error an application shows in its window or a toast stays out of
-it.
+`cap_sys_admin+ep`, an enabled plugin the shell cannot load or whose units are
+not running, and a program, D-Bus service, file, session variable, font or Qt
+plugin that a `requires` file lists and the system lacks. A healthy desktop
+reports nothing, so every finding is something to fix; a `hint:` line under it
+names the fix when there is one. A check that cannot run is an error of
+`doctor`, and the others still run. An error an application shows in its window
+or a toast stays out of it.
 
 A unit restarted by hand starts clean. With journalctl arguments
 (`kaizen doctor -b -1`, `--since -1h`) it reports that span of the journal

@@ -2,11 +2,12 @@ import Quickshell
 
 // The root of plugins/<name>/Plugin.qml, for each <name>.jsonc in
 // ~/.config/kaizen/plugins/. A plugin creates its own Ui.Panel and IpcHandler,
-// as the core panels do.
+// as the core panels do. The tree's plugin-api numbers this contract; a change
+// that breaks a plugin bumps it.
 Scope {
     required property var shell
-    // Its launcher node is plugins.<name>, which a right-click on a bar button
-    // it takes over, or on its indicator, opens.
+    // Its plugin.json's id. Its launcher node is plugins.<name>, which a
+    // right-click on a bar button it takes over, or on its indicator, opens.
     required property string name
     // Its <name>.jsonc, parsed; {} when that is not a JSONC object.
     property var config: ({})

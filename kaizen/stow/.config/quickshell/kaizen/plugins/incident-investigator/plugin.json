@@ -1,0 +1,7 @@
+{
+  "id": "incident-investigator",
+  "name": "Incident investigator",
+  "version": "0.1.0",
+  "api": 1,
+  "units": ["kaizen-incident-investigator.service"]
+}

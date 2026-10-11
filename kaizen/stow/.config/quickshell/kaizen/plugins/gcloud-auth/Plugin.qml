@@ -12,7 +12,6 @@ import "GcloudModel.js" as Model
 Ui.Plugin {
     id: plugin
 
-    name: "gcloud-auth"
     // The last check that succeeded, null until one does: { accounts, active, ok, reason }.
     property var auth: null
     property bool failed: false

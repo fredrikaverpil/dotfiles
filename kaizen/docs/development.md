@@ -166,7 +166,8 @@ tree, so a static check passing here passes for every kaizen host.
   stale errors.
 - `kaizen doctor` lists the warnings and errors from each `kaizen-*` unit's
   current run, and checks units, the shell's binary, niri's config, the portal,
-  `gsr-kms-server`'s capability, the plugin dirs and the `requires` files;
+  `gsr-kms-server`'s capability, the plugin dirs and manifests and the
+  `requires` files;
   `--json` prints one document, each finding with its check's stable `id`
   and, when there is one, its fix as `hint`; journalctl arguments
   (`--since -1h`, `-b -1`) report that span of the journal instead, without
