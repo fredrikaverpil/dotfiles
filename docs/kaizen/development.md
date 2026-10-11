@@ -315,8 +315,9 @@ comes from the default devshell. To use a change without a rebuild:
   `nix develop ~/.dotfiles -c ~/.dotfiles/kaizen/build.sh` installs
   `~/.local/bin/kaizen`, which precedes the system profile's on PATH: shells,
   binds and QML take it at once, units on their next start. It refuses
-  anywhere else, since parallel sessions share `~/.local/bin`. Delete it to
-  return to the system profile's.
+  anywhere else, since parallel sessions share `~/.local/bin`. A rebuild
+  deletes it, returning to the system profile's; until then `kaizen doctor`
+  warns, naming its commit (`kaizen --version`).
 
 ## Deployment safety
 

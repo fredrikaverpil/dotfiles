@@ -103,8 +103,9 @@ QML, which plugins run, and the notification rules.
   [`kaizen/`](../../kaizen/) into the system profile. `kaizen <sub>` runs
   `~/.local/libexec/kaizen/<sub>` with the binary's own directory first on its
   PATH. Units, niri binds and QML call it, never a script's path.
-  `kaizen --json` lists the commands as `{ name, usage, summary }`. A
-  `~/.local/bin/kaizen` overrides it: [`development.md`](development.md) ›
+  `kaizen --json` lists the commands as `{ name, usage, summary }`, and
+  `kaizen --version` prints the commit it was built from (`unknown` from Nix).
+  A `~/.local/bin/kaizen` overrides it: [`development.md`](development.md) ›
   Building kaizen.
 - `kaizen internal <sub>` runs `~/.local/libexec/kaizen/internal/<sub>`: what
   the system runs, as a unit or a build, and a person or an agent has no use

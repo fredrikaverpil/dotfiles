@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"syscall"
 
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/cli"
@@ -23,9 +24,11 @@ func main() {
 		fmt.Fprintf(os.Stderr, "kaizen: %v\n", err)
 		os.Exit(1)
 	}
+	info, _ := debug.ReadBuildInfo()
 	d := cli.Dispatcher{
 		Dir:     cli.ScriptsDir(exe, home),
 		BinDir:  filepath.Dir(exe),
+		Version: cli.Version(info),
 		Environ: os.Environ(),
 		Stdout:  os.Stdout,
 		Stderr:  os.Stderr,

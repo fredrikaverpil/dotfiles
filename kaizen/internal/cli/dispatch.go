@@ -16,6 +16,7 @@ import (
 type Dispatcher struct {
 	Dir     string
 	BinDir  string
+	Version string
 	Environ []string
 	Stdout  io.Writer
 	Stderr  io.Writer
@@ -59,6 +60,11 @@ func (d Dispatcher) Run(args []string) int {
 		}
 		fmt.Fprintln(d.Stdout)
 		return 0
+	case "--version":
+		if !internal {
+			fmt.Fprintln(d.Stdout, d.Version)
+			return 0
+		}
 	}
 	path := filepath.Join(d.Dir, name)
 	if strings.Contains(name, "/") || !isExecutable(path) {
@@ -89,6 +95,7 @@ func (d Dispatcher) usage(w io.Writer, internal bool, code int) int {
 	}
 	if !internal {
 		fmt.Fprintf(w, "  %-45s %s\n", "kaizen internal", "list the commands the system runs")
+		fmt.Fprintf(w, "  %-45s %s\n", "kaizen --version", "print the commit kaizen was built from")
 	}
 	return code
 }

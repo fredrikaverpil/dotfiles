@@ -97,7 +97,8 @@ func TestRun(t *testing.T) {
 	usage := "usage: kaizen COMMAND [ARGS...] | kaizen --json\n" +
 		"  kaizen alpha [X]                              do alpha\n" +
 		"  kaizen beta                                   do beta\n" +
-		"  kaizen internal                               list the commands the system runs\n"
+		"  kaizen internal                               list the commands the system runs\n" +
+		"  kaizen --version                              print the commit kaizen was built from\n"
 	internalUsage := "usage: kaizen internal COMMAND [ARGS...] | kaizen internal --json\n" +
 		"  kaizen internal gamma FILE                    do gamma\n"
 	env := []string{"HOME=/home/user", "PATH=/opt/kaizen/bin:/usr/bin"}
@@ -150,6 +151,16 @@ func TestRun(t *testing.T) {
 `},
 		},
 		{
+			name: "version",
+			args: []string{"--version"},
+			want: result{Stdout: "4f1c2a9e0b7d\n"},
+		},
+		{
+			name: "internal version",
+			args: []string{"internal", "--version"},
+			want: result{Code: 2, Stderr: "kaizen: unknown command: --version\n" + internalUsage},
+		},
+		{
 			name: "command",
 			args: []string{"alpha", "x", "--y"},
 			want: result{Exec: &execCall{
@@ -194,6 +205,7 @@ func TestRun(t *testing.T) {
 			d := Dispatcher{
 				Dir:     dir,
 				BinDir:  "/opt/kaizen/bin",
+				Version: "4f1c2a9e0b7d",
 				Environ: []string{"HOME=/home/user", "PATH=/usr/bin"},
 				Stdout:  &stdout,
 				Stderr:  &stderr,
