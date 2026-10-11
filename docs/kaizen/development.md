@@ -32,6 +32,7 @@ Each `kaizen` command carries a rule the raw tool leaves to you:
 | Learn whether the desktop is healthy | `kaizen doctor` | `journalctl -p warning`, which misses Quickshell's log level |
 | See a worktree's QML live | `kaizen dev` | editing main's tree |
 | Restart the shell | `kaizen restart` | `systemctl --user restart`, which restarts while locked |
+| Capture an output or its bar | `kaizen shot` | `grim` by hand, which guesses the output and leaves the curtain lifted on failure |
 | Focus an app or open it | `kaizen focus` | `niri msg action focus-window`, which needs the window id and never opens the app |
 | List the commands | `kaizen --json` | `ls ~/.local/libexec/kaizen`, which lists none of the usage |
 
@@ -188,11 +189,22 @@ tree, so a static check passing here passes for every kaizen host.
   clicking. Never move it into the top-left corner, which opens niri's
   overview. `wlrctl` cannot hold a button, so a drag is the user's to check; a
   double-click selects a word.
-- Use `grim` to check how the shell looks; `kaizen ipc` and `shell-smoke` for
-  internal state. Crop with `-g "0,0 1280x32"` (layout coordinates) or capture
-  one output with `-o`; the two do not combine. Capture cost depends only on
-  the area. Niri does not report layer geometry, so derive the bar's from
-  `niri msg --json outputs` and `barHeight` in `shell.qml`.
+- Use `kaizen shot` to check how the shell looks; `kaizen ipc` and
+  `shell-smoke` for internal state. It names the output it captured and prints
+  the file, under `~/.cache/kaizen-shell/shots/` unless `-o` says otherwise. It
+  takes the output as an argument, and without one picks the only output, or
+  the one holding an open panel, menu or launcher; the focused output follows
+  the user, so it is never the default, and with several candidates it lists
+  them and exits 2. `--bar` captures that output's bar, and a `WxH+X+Y`
+  argument a region of it, relative to the output. The longest edge is scaled
+  to 1600 px so a 4K output reads like a laptop panel; `--full` keeps native
+  pixels, which a region is for. It lifts the curtain for the capture and puts
+  it back, and refuses while locked. `grim` itself crops with
+  `-g "0,0 1280x32"` (layout coordinates) or captures one output with `-o`;
+  the two do not combine, and capture cost depends only on the area. Niri does
+  not report layer geometry, so the bar's height comes from
+  `kaizen ipc call shell barHeight` and its width from
+  `niri msg --json outputs`.
 - To record, `kaizen ipc call recording capture WxH+X+Y` (`0x0+X+Y` is the whole
   monitor): no countdown, audio or camera, and the bar shows it. It returns the
   file; `kaizen ipc call recording stop` finalizes it. Extract frames with
