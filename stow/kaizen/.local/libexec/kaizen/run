@@ -7,6 +7,10 @@ case "${1:-}" in
   echo "usage: kaizen run    start the session from a TTY login shell"
   exit 0
   ;;
+?*)
+  printf 'kaizen run: unknown argument: %s\nusage: kaizen run\n' "$1" >&2
+  exit 2
+  ;;
 esac
 
 # uwsm's login-shell test reads its parent's command line, which is this
