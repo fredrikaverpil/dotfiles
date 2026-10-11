@@ -1,8 +1,9 @@
 # What the core calls or reads, checked by `kaizen doctor` and requires-check.
 # One per line: cmd NAME, bus session|system NAME, file PATH, data PATH (in the
 # XDG data dirs), env NAME=VALUE (in the user manager's environment), font FAMILY
-# (the rest of the line, any case). Missing is an error unless the line ends in
-# `warn`; a line in another form is an error.
+# (the rest of the line, any case), qtplugin PATH (in the running shell's Qt
+# plugin dirs). Missing is an error unless the line ends in `warn`; a line in
+# another form is an error.
 
 # Session
 cmd niri
@@ -41,6 +42,8 @@ cmd pw-play
 cmd wl-gammarelay-rs
 cmd wl-mirror
 data kaizen/emoji.json
+# Quickshell's WebP decoder.
+qtplugin imageformats/libqwebp.so
 font JetBrainsMono Nerd Font
 font Noto Color Emoji
 # Licensed, installed by hand; Ui/Fonts.qml falls back to JetBrains Mono.

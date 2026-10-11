@@ -53,8 +53,8 @@ failed run exited and the last warning or error it logged, a shell still running
 the Quickshell a rebuild replaced or a worktree's tree (`kaizen dev`), a
 `kaizen` shadowing another on PATH, a niri
 config that fails `niri validate`, an enabled plugin the shell cannot load, and
-a program, D-Bus service, file, session variable or font that a `requires` file
-lists and the system lacks. A healthy desktop reports nothing, so every finding is something to fix;
+a program, D-Bus service, file, session variable, font or Qt plugin that a
+`requires` file lists and the system lacks. A healthy desktop reports nothing, so every finding is something to fix;
 a `hint:` line under it names the fix when there is one. A check that cannot
 run is an error of `doctor`, and the others still run.
 An error an application shows in its window or a toast stays out of it.

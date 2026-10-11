@@ -91,8 +91,10 @@ func readUnits(ctx context.Context, r state.Runner) ([]unit, error) {
 type checker struct {
 	Command
 	checks []check
-	// lists holds the names each listing's command printed, by what it lists.
+	// lists holds each listing's names, by what it lists.
 	lists map[string]listing
+	// shellPID is the shell's MainPID; "" or "0" when it is not running.
+	shellPID string
 }
 
 // add records a finding.
@@ -117,7 +119,8 @@ func (c Command) check(ctx context.Context, units []unit) []check {
 			shell = u
 		}
 	}
-	if k.staleShell(ctx, shell.mainPID) {
+	k.shellPID = shell.mainPID
+	if k.staleShell(ctx, k.shellPID) {
 		k.add(check{
 			name:    "stale-shell",
 			level:   "WARN",

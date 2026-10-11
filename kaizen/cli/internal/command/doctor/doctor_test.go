@@ -306,20 +306,27 @@ func TestRun(t *testing.T) {
 					"file $DIR/tree/requires\nfile $DIR/nope\n" +
 					"data kaizen/emoji.json\ndata kaizen/nope.json warn\n" +
 					"env A=1\nenv B=2 warn\nenv C=3\nenv A\nenv =1\n" +
-					"font Mono Sans\nfont mono  ALIAS\nfont Gone Mono warn\nfont Gone Serif\nfont\n",
-				"tree/plugins/ok/Plugin.qml":                  "",
-				"tree/plugins/ok/requires":                    "bus session org.a\ncmd present\nenv A=1\n",
-				"tree/plugins/warned/Plugin.qml":              "",
-				"tree/plugins/warned/requires":                "cmd absent warn\n",
-				"tree/plugins/both/Plugin.qml":                "",
-				"home/.config/kaizen/plugins/both/Plugin.qml": "",
-				"home/.config/kaizen/plugins/noqml/requires":  "cmd absent\n",
-				"home/.config/kaizen/plugins/ok.jsonc":        "{}",
-				"home/.config/kaizen/plugins/warned.jsonc":    "{}",
-				"home/.config/kaizen/plugins/both.jsonc":      "{}",
-				"home/.config/kaizen/plugins/noqml.jsonc":     "{}",
-				"home/.config/kaizen/plugins/absent.jsonc":    "{}",
-				"home/.config/kaizen/plugins/.hidden.jsonc":   "{}",
+					"font Mono Sans\nfont mono  ALIAS\nfont Gone Mono warn\nfont Gone Serif\nfont\n" +
+					"qtplugin imageformats/libqwebp.so\nqtplugin platforms/libqwayland.so\n" +
+					"qtplugin imageformats/libqgif.so warn\nqtplugin imageformats/libqsvg.so\nqtplugin\n",
+				"proc/4242/environ": "A=1\x00QT_PLUGIN_PATH=$DIR/qt/a::$DIR/qt/b\x00",
+				"proc/4242/maps": "7299-72aa r--p 00000000 00:00 0\n" +
+					"7299-72aa r--p 00000000 fe:00 1    $DIR/qtbase/lib/libQt6Core.so.6.11.2\n",
+				"qt/b/imageformats/libqwebp.so":                    "",
+				"qtbase/lib/qt-6/plugins/platforms/libqwayland.so": "",
+				"tree/plugins/ok/Plugin.qml":                       "",
+				"tree/plugins/ok/requires":                         "bus session org.a\ncmd present\nenv A=1\nqtplugin imageformats/libqwebp.so\n",
+				"tree/plugins/warned/Plugin.qml":                   "",
+				"tree/plugins/warned/requires":                     "cmd absent warn\n",
+				"tree/plugins/both/Plugin.qml":                     "",
+				"home/.config/kaizen/plugins/both/Plugin.qml":      "",
+				"home/.config/kaizen/plugins/noqml/requires":       "cmd absent\n",
+				"home/.config/kaizen/plugins/ok.jsonc":             "{}",
+				"home/.config/kaizen/plugins/warned.jsonc":         "{}",
+				"home/.config/kaizen/plugins/both.jsonc":           "{}",
+				"home/.config/kaizen/plugins/noqml.jsonc":          "{}",
+				"home/.config/kaizen/plugins/absent.jsonc":         "{}",
+				"home/.config/kaizen/plugins/.hidden.jsonc":        "{}",
 			},
 			execs: []string{"home/.local/bin/kaizen", "bin/kaizen", "bin/present"},
 			links: map[string]string{"proc/4242/exe": "/usr/bin/quickshell (deleted)"},
@@ -349,6 +356,8 @@ func TestRun(t *testing.T) {
 					"  missing data kaizen/nope.json\n  missing env B=2\n  missing env C=3\n" +
 					"  unknown line: env A\n  unknown line: env =1\n" +
 					"  missing font Gone Mono\n  missing font Gone Serif\n  unknown line: font\n" +
+					"  missing qtplugin imageformats/libqgif.so\n  missing qtplugin imageformats/libqsvg.so\n" +
+					"  unknown line: qtplugin\n" +
 					"ERROR plugins  check\n  absent: no absent/ in $DIR/tree/plugins or $DIR/home/.config/kaizen/plugins\n" +
 					"ERROR plugins  check\n  both: both/ in both $DIR/tree/plugins and $DIR/home/.config/kaizen/plugins\n" +
 					"ERROR plugins  check\n  noqml: no Plugin.qml in $DIR/home/.config/kaizen/plugins/noqml\n" +
@@ -370,6 +379,18 @@ func TestRun(t *testing.T) {
 			},
 			want: result{
 				Stdout: "1 error\n\nERROR requires  check\n  no requires in $DIR/home/.config/quickshell/kaizen\n",
+				Calls:  []string{showLine, niriLine},
+			},
+		},
+		{
+			name:  "qtplugin without a shell",
+			files: map[string]string{coreRequires: "qtplugin imageformats/libqwebp.so\nqtplugin platforms/libqwayland.so\n"},
+			outputs: map[string][]recorded{
+				showLine: {{Stdout: unitBlock("kaizen-shell.service", "", "inactive", "success", "0", "0", "")}},
+				niriLine: {{}},
+			},
+			want: result{
+				Stdout: "1 error\n\nERROR doctor  check\n  cannot list the shell's Qt plugin dirs: kaizen-shell is not running\n",
 				Calls:  []string{showLine, niriLine},
 			},
 		},

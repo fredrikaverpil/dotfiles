@@ -3,6 +3,7 @@ package doctor
 import (
 	"cmp"
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -14,9 +15,9 @@ import (
 // what it names that is missing and each line in another form, an error
 // unless every missing line ends in `warn`. Each line is `cmd NAME`,
 // `bus session|system NAME`, `file PATH`, `data PATH`, in the XDG data dirs,
-// `env NAME=VALUE`, in the user manager's environment, or `font FAMILY`,
-// whose name is the rest of the line and matches any case, then `warn` or
-// nothing.
+// `env NAME=VALUE`, in the user manager's environment, `font FAMILY`, whose
+// name is the rest of the line and matches any case, or `qtplugin PATH`, in
+// the running shell's Qt plugin dirs, then `warn` or nothing.
 func (k *checker) requires(ctx context.Context, path, unit string) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -71,6 +72,12 @@ func (k *checker) requires(ctx context.Context, path, unit string) {
 				continue
 			}
 			found = slices.Contains(names, strings.ToLower(name))
+		case kind == "qtplugin":
+			dirs, listed := k.listed("the shell's Qt plugin dirs", k.qtPluginDirs)
+			if !listed {
+				continue
+			}
+			found = slices.ContainsFunc(dirs, func(dir string) bool { return exists(dir + "/" + name) })
 		case kind == "file":
 			found = exists(name)
 		case kind == "data":
@@ -108,10 +115,10 @@ func field(fields []string, i int) string {
 // and activatable alike.
 var busFlags = map[string]string{"session": "--user", "system": "--system"}
 
-// listing is the names a command printed.
+// listing is the names a listing found.
 type listing struct {
 	names []string
-	// ok is false when the command failed.
+	// ok is false when the listing failed.
 	ok bool
 }
 
@@ -124,10 +131,26 @@ func (k *checker) list(
 	name string,
 	args ...string,
 ) ([]string, bool) {
+	return k.listed(what, func() ([]string, error) {
+		out, err := run(ctx, k.Runner, name, args...)
+		if err != nil {
+			return nil, err
+		}
+		var names []string
+		for line := range strings.Lines(string(out)) {
+			names = append(names, split(line)...)
+		}
+		return names, nil
+	})
+}
+
+// listed returns what names returns, calling it once per what; false when it
+// fails, which it reports once.
+func (k *checker) listed(what string, names func() ([]string, error)) ([]string, bool) {
 	if l, ok := k.lists[what]; ok {
 		return l.names, l.ok
 	}
-	out, err := run(ctx, k.Runner, name, args...)
+	got, err := names()
 	if err != nil {
 		k.lists[what] = listing{}
 		k.add(check{
@@ -138,12 +161,8 @@ func (k *checker) list(
 		})
 		return nil, false
 	}
-	var names []string
-	for line := range strings.Lines(string(out)) {
-		names = append(names, split(line)...)
-	}
-	k.lists[what] = listing{names: names, ok: true}
-	return names, true
+	k.lists[what] = listing{names: got, ok: true}
+	return got, true
 }
 
 // firstField returns the line's first field, if any.
@@ -169,4 +188,40 @@ func (c Command) dataDirs() []string {
 	home := cmp.Or(c.Getenv("XDG_DATA_HOME"), filepath.Join(c.Home, ".local", "share"))
 	dirs := cmp.Or(c.Getenv("XDG_DATA_DIRS"), "/usr/local/share:/usr/share")
 	return strings.Split(home+":"+dirs, ":")
+}
+
+// qtPluginDirs returns where the running shell loads Qt plugins from: its
+// QT_PLUGIN_PATH, which Nix's wrapper sets on the process alone, then Qt's own
+// plugins dir beside the libQt6Core it mapped, which a distro's Qt uses.
+func (k *checker) qtPluginDirs() ([]string, error) {
+	if k.shellPID == "" || k.shellPID == "0" {
+		return nil, errors.New("kaizen-shell is not running")
+	}
+	proc := filepath.Join(cmp.Or(k.proc, "/proc"), k.shellPID)
+	environ, err := os.ReadFile(filepath.Join(proc, "environ"))
+	if err != nil {
+		return nil, err
+	}
+	var dirs []string
+	for variable := range strings.SplitSeq(string(environ), "\x00") {
+		if path, ok := strings.CutPrefix(variable, "QT_PLUGIN_PATH="); ok {
+			for dir := range strings.SplitSeq(path, ":") {
+				if dir != "" {
+					dirs = append(dirs, dir)
+				}
+			}
+		}
+	}
+	maps, err := os.ReadFile(filepath.Join(proc, "maps"))
+	if err != nil {
+		return nil, err
+	}
+	for line := range strings.Lines(string(maps)) {
+		fields := strings.Fields(line)
+		if len(fields) == 6 && strings.HasPrefix(filepath.Base(fields[5]), "libQt6Core.so") {
+			lib := filepath.Dir(fields[5])
+			return append(dirs, lib+"/qt6/plugins", lib+"/qt-6/plugins"), nil
+		}
+	}
+	return dirs, nil
 }
