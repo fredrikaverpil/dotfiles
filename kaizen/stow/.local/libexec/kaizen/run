@@ -23,6 +23,10 @@ if [[ $arg0 != -* ]]; then
 fi
 uwsm check may-start -i
 
+# `kaizen` put its own directory, a store path, first on PATH, and uwsm exports
+# PATH to the session. Drop it, so the session's `kaizen` follows rebuilds.
+PATH=${PATH#"$(dirname "$(command -v kaizen)")":}
+
 # The entry runs `niri --session`, which serves niri's D-Bus interfaces
 # (screencast portal, a11y) and imports its environment, which uwsm cleans up
 # on exit. The instance name is the entry ID, so the units are
