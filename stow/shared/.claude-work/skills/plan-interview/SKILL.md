@@ -1,1 +1,0 @@
-../../../.claude/skills/plan-interview/SKILL.md
