@@ -158,8 +158,7 @@ portal dialog. It cannot check:
 - What `/etc/pam.d/kaizen-lock` holds, only that it exists: a stack that
   authenticates the user's password (`auth include login` on NixOS), for the
   lock and the curtain.
-- The fonts in [`fonts.nix`](nix/fonts.nix) the shell does not name, and its
-  fontconfig rules.
+- The fonts in [`fonts.nix`](nix/fonts.nix) the shell does not name.
 - Quickshell with the [overlay's patch](nix/default.nix) (without it, every
   Quickshell start logs a host portal warning `kaizen doctor` reports), and
   `investigate` with go and gopls on its PATH for the incident investigator.
