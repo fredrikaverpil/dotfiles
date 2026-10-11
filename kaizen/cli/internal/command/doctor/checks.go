@@ -33,9 +33,10 @@ const (
 	failureResult = "d9b373ed55a64feb8242e02dbe79a49c"
 )
 
-// check is a check's finding.
+// check is a check's finding. name is the check's stable id; hint is the fix,
+// or "".
 type check struct {
-	level, unit, message string
+	name, level, unit, message, hint string
 }
 
 // unit is a kaizen unit as systemd shows it.
@@ -95,8 +96,8 @@ type checker struct {
 }
 
 // add records a finding.
-func (k *checker) add(level, unit, message string) {
-	k.checks = append(k.checks, check{level: level, unit: unit, message: message})
+func (k *checker) add(c check) {
+	k.checks = append(k.checks, c)
 }
 
 // check runs the checks. A check that cannot run is an error of unit doctor.
@@ -106,22 +107,24 @@ func (c Command) check(ctx context.Context, units []unit) []check {
 	for _, u := range units {
 		name := strings.TrimSuffix(u.id, ".service")
 		if u.activeState == "failed" {
-			k.add("ERROR", name, fmt.Sprintf("failed (%s)", u.result))
+			k.add(check{name: "failed", level: "ERROR", unit: name, message: fmt.Sprintf("failed (%s)", u.result)})
 		}
 		if u.nRestarts > 0 {
 			lines := append([]string{"failed and was restarted " + plural(u.nRestarts, "time")}, k.restarts(ctx, u)...)
-			k.add("WARN", name, strings.Join(lines, "\n"))
+			k.add(check{name: "restarted", level: "WARN", unit: name, message: strings.Join(lines, "\n")})
 		}
 		if u.id == state.Unit && shell.id == "" {
 			shell = u
 		}
 	}
 	if k.staleShell(ctx, shell.mainPID) {
-		k.add(
-			"WARN",
-			"kaizen-shell",
-			"runs a Quickshell that is no longer installed: systemctl --user restart kaizen-shell",
-		)
+		k.add(check{
+			name:    "stale-shell",
+			level:   "WARN",
+			unit:    "kaizen-shell",
+			message: "runs a Quickshell that is no longer installed",
+			hint:    "kaizen reload --restart",
+		})
 	}
 	k.kaizens(ctx)
 	k.niri(ctx)
@@ -130,10 +133,10 @@ func (c Command) check(ctx context.Context, units []unit) []check {
 	tree := filepath.Join(k.configDir(), "quickshell", "kaizen")
 	if dev := k.devTree(shell.dropInPaths); dev != "" {
 		tree = dev
-		k.add("WARN", "kaizen-shell", fmt.Sprintf("runs %s: kaizen dev off", tree))
+		k.add(check{name: "dev", level: "WARN", unit: "kaizen-shell", message: "runs " + tree, hint: "kaizen dev off"})
 	}
 	if core := filepath.Join(tree, "requires"); !isRegular(core) {
-		k.add("ERROR", "requires", "no requires in "+tree)
+		k.add(check{name: "requires", level: "ERROR", unit: "requires", message: "no requires in " + tree})
 	} else {
 		k.requires(ctx, core, "requires")
 	}
@@ -164,7 +167,12 @@ func (k *checker) restarts(ctx context.Context, u unit) []string {
 		entries, err = parseJournal(out)
 	}
 	if err != nil {
-		k.add("ERROR", "doctor", fmt.Sprintf("cannot read why %s was restarted: %v", name, err))
+		k.add(check{
+			name:    "restarted",
+			level:   "ERROR",
+			unit:    "doctor",
+			message: fmt.Sprintf("cannot read why %s was restarted: %v", name, err),
+		})
 		return nil
 	}
 	runs := map[string][]state.Entry{}
@@ -243,12 +251,22 @@ func (k *checker) staleShell(ctx context.Context, pid string) bool {
 	}
 	resolved, err := filepath.EvalSymlinks(installed)
 	if err != nil {
-		k.add("ERROR", "doctor", fmt.Sprintf("cannot check the shell's Quickshell: %v", err))
+		k.add(check{
+			name:    "stale-shell",
+			level:   "ERROR",
+			unit:    "doctor",
+			message: fmt.Sprintf("cannot check the shell's Quickshell: %v", err),
+		})
 		return false
 	}
 	out, err := run(ctx, k.Runner, "nix-store", "-qR", resolved)
 	if err != nil {
-		k.add("ERROR", "doctor", fmt.Sprintf("cannot check the shell's Quickshell: %v", err))
+		k.add(check{
+			name:    "stale-shell",
+			level:   "ERROR",
+			unit:    "doctor",
+			message: fmt.Sprintf("cannot check the shell's Quickshell: %v", err),
+		})
 		return false
 	}
 	// The store path: /nix/store/HASH-NAME.
@@ -287,11 +305,13 @@ func (k *checker) kaizens(ctx context.Context) {
 	if rest, ok := strings.CutPrefix(first, k.Home); ok && k.Home != "" {
 		shown = "~" + rest
 	}
-	k.add(
-		"WARN",
-		"kaizen",
-		fmt.Sprintf("%d kaizen on PATH; the first, %s, is %s: delete it or rebuild", len(found), shown, version),
-	)
+	k.add(check{
+		name:    "kaizen-path",
+		level:   "WARN",
+		unit:    "kaizen",
+		message: fmt.Sprintf("%d kaizen on PATH; the first, %s, is %s", len(found), shown, version),
+		hint:    fmt.Sprintf("delete %s or rebuild", shown),
+	})
 }
 
 // niri reports a niri config that fails `niri validate`.
@@ -311,7 +331,7 @@ func (k *checker) niri(ctx context.Context) {
 			lines = append(lines, line)
 		}
 	}
-	k.add("ERROR", "niri", "niri validate:\n"+strings.Join(lines, "\n"))
+	k.add(check{name: "niri-config", level: "ERROR", unit: "niri", message: "niri validate:\n" + strings.Join(lines, "\n")})
 }
 
 // devTree returns the tree kaizen dev's drop-in among dropInPaths runs, or ""
@@ -323,7 +343,12 @@ func (k *checker) devTree(dropInPaths string) string {
 		}
 		data, err := os.ReadFile(path)
 		if err != nil {
-			k.add("ERROR", "doctor", fmt.Sprintf("cannot read kaizen dev's drop-in: %v", err))
+			k.add(check{
+				name:    "dev",
+				level:   "ERROR",
+				unit:    "doctor",
+				message: fmt.Sprintf("cannot read kaizen dev's drop-in: %v", err),
+			})
 			return ""
 		}
 		var trees []string
@@ -333,7 +358,13 @@ func (k *checker) devTree(dropInPaths string) string {
 			}
 		}
 		if len(trees) == 0 {
-			k.add("WARN", "kaizen-shell", fmt.Sprintf("runs a tree %s does not name: kaizen dev off", path))
+			k.add(check{
+				name:    "dev",
+				level:   "WARN",
+				unit:    "kaizen-shell",
+				message: fmt.Sprintf("runs a tree %s does not name", path),
+				hint:    "kaizen dev off",
+			})
 		}
 		return strings.Join(trees, "\n")
 	}
@@ -349,7 +380,12 @@ func (k *checker) plugins(ctx context.Context, shellPlugins string) {
 		return
 	}
 	if err != nil {
-		k.add("ERROR", "doctor", fmt.Sprintf("cannot list the enabled plugins: %v", err))
+		k.add(check{
+			name:    "plugins",
+			level:   "ERROR",
+			unit:    "doctor",
+			message: fmt.Sprintf("cannot list the enabled plugins: %v", err),
+		})
 		return
 	}
 	for _, entry := range entries {
@@ -365,12 +401,27 @@ func (k *checker) plugins(ctx context.Context, shellPlugins string) {
 		}
 		switch len(dirs) {
 		case 0:
-			k.add("ERROR", "plugins", fmt.Sprintf("%s: no %s/ in %s or %s", name, name, shellPlugins, hostPlugins))
+			k.add(check{
+				name:    "plugins",
+				level:   "ERROR",
+				unit:    "plugins",
+				message: fmt.Sprintf("%s: no %s/ in %s or %s", name, name, shellPlugins, hostPlugins),
+			})
 		case 2:
-			k.add("ERROR", "plugins", fmt.Sprintf("%s: %s/ in both %s and %s", name, name, shellPlugins, hostPlugins))
+			k.add(check{
+				name:    "plugins",
+				level:   "ERROR",
+				unit:    "plugins",
+				message: fmt.Sprintf("%s: %s/ in both %s and %s", name, name, shellPlugins, hostPlugins),
+			})
 		default:
 			if !isRegular(filepath.Join(dirs[0], "Plugin.qml")) {
-				k.add("ERROR", "plugins", fmt.Sprintf("%s: no Plugin.qml in %s", name, dirs[0]))
+				k.add(check{
+					name:    "plugins",
+					level:   "ERROR",
+					unit:    "plugins",
+					message: fmt.Sprintf("%s: no Plugin.qml in %s", name, dirs[0]),
+				})
 			}
 			if requires := filepath.Join(dirs[0], "requires"); isRegular(requires) {
 				k.requires(ctx, requires, name)

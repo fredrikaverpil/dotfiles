@@ -76,11 +76,15 @@ func (Command) Summary() string {
 
 // finding is a check's or a log line's finding.
 type finding struct {
-	Source  string `json:"source"`
+	Source string `json:"source"`
+	// Name is the check's stable id; log for a log line.
+	Name    string `json:"name"`
 	Level   string `json:"level"`
 	Unit    string `json:"unit"`
 	Message string `json:"message"`
-	Count   int    `json:"count"`
+	// Hint is the fix, if any.
+	Hint  string `json:"hint,omitzero"`
+	Count int    `json:"count"`
 	// First and Last are milliseconds since the epoch.
 	First int64 `json:"first"`
 	Last  int64 `json:"last"`
@@ -166,9 +170,11 @@ func (c Command) report(ctx context.Context, journalArgs []string) (report, erro
 	for _, ch := range checks {
 		findings = append(findings, finding{
 			Source:  "check",
+			Name:    ch.name,
 			Level:   ch.level,
 			Unit:    ch.unit,
 			Message: strings.TrimRightFunc(ch.message, unicode.IsSpace),
+			Hint:    ch.hint,
 			Count:   1,
 			First:   now.UnixMilli(),
 			Last:    now.UnixMilli(),
@@ -244,7 +250,7 @@ func logFindings(entries []state.Entry, units []unit) []finding {
 		ms := e.Time.UnixMilli()
 		f, ok := groups[k]
 		if !ok {
-			f = &finding{Source: "log", Level: k.level, Unit: k.unit, Message: k.message, First: ms, Last: ms}
+			f = &finding{Source: "log", Name: "log", Level: k.level, Unit: k.unit, Message: k.message, First: ms, Last: ms}
 			groups[k] = f
 			keys = append(keys, k)
 		}
@@ -310,7 +316,7 @@ func textLevel(message string) string {
 }
 
 // text returns the report as text: a summary, then each finding with its
-// message indented.
+// message indented and its hint under it.
 func (c Command) text(findings []finding) string {
 	errs := 0
 	for _, f := range findings {
@@ -343,6 +349,9 @@ func (c Command) text(findings []finding) string {
 			if line != "" {
 				lines[i] = "  " + line
 			}
+		}
+		if f.Hint != "" {
+			lines = append(lines, "  hint: "+f.Hint)
 		}
 		blocks = append(blocks, level+" "+f.Unit+"  "+when+"\n"+strings.Join(lines, "\n"))
 	}

@@ -18,7 +18,12 @@ import (
 func (k *checker) requires(ctx context.Context, path, unit string) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		k.add("ERROR", "doctor", fmt.Sprintf("cannot check a requires file: %v", err))
+		k.add(check{
+			name:    "requires",
+			level:   "ERROR",
+			unit:    "doctor",
+			message: fmt.Sprintf("cannot check a requires file: %v", err),
+		})
 		return
 	}
 	level := "WARN"
@@ -67,7 +72,7 @@ func (k *checker) requires(ctx context.Context, path, unit string) {
 		missing = append(missing, "missing "+kind+" "+name)
 	}
 	if len(missing) > 0 {
-		k.add(level, unit, strings.Join(missing, "\n"))
+		k.add(check{name: "requires", level: level, unit: unit, message: strings.Join(missing, "\n")})
 	}
 }
 
@@ -99,7 +104,12 @@ func (k *checker) busNames(ctx context.Context, bus string) ([]string, bool) {
 	out, err := run(ctx, k.Runner, "busctl", flag, "list", "--no-legend")
 	if err != nil {
 		k.buses[bus] = busList{}
-		k.add("ERROR", "doctor", fmt.Sprintf("cannot list the %s bus: %v", bus, err))
+		k.add(check{
+			name:    "requires",
+			level:   "ERROR",
+			unit:    "doctor",
+			message: fmt.Sprintf("cannot list the %s bus: %v", bus, err),
+		})
 		return nil, false
 	}
 	var names []string

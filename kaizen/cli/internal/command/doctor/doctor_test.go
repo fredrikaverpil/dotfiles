@@ -346,9 +346,10 @@ func TestRun(t *testing.T) {
 					"ERROR plugins  check\n  noqml: no Plugin.qml in $DIR/home/.config/kaizen/plugins/noqml\n" +
 					"ERROR noqml  check\n  missing cmd absent\n" +
 					"WARN  kaizen-shell  check\n" +
-					"  runs a Quickshell that is no longer installed: systemctl --user restart kaizen-shell\n" +
-					"WARN  kaizen  check\n  2 kaizen on PATH; the first, ~/.local/bin/kaizen, is abc123: delete it or rebuild\n" +
-					"WARN  kaizen-shell  check\n  runs $DIR/tree: kaizen dev off\n" +
+					"  runs a Quickshell that is no longer installed\n  hint: kaizen reload --restart\n" +
+					"WARN  kaizen  check\n  2 kaizen on PATH; the first, ~/.local/bin/kaizen, is abc123\n" +
+					"  hint: delete ~/.local/bin/kaizen or rebuild\n" +
+					"WARN  kaizen-shell  check\n  runs $DIR/tree\n  hint: kaizen dev off\n" +
 					"WARN  warned  check\n  missing cmd absent\n",
 				Calls: []string{showLine, "$DIR/home/.local/bin/kaizen --version", niriLine, userBus, systemBus},
 			},
@@ -380,7 +381,7 @@ func TestRun(t *testing.T) {
 			},
 			want: result{
 				Stdout: "1 warning\n\nWARN  kaizen-shell  check\n" +
-					"  runs a Quickshell that is no longer installed: systemctl --user restart kaizen-shell\n",
+					"  runs a Quickshell that is no longer installed\n  hint: kaizen reload --restart\n",
 				Calls: []string{showLine, "nix-store -qR $DIR/store/qs-new/bin/quickshell", niriLine},
 			},
 		},
@@ -415,7 +416,28 @@ func TestRun(t *testing.T) {
 			},
 			want: result{
 				Stdout: "1 warning\n\nWARN  kaizen-shell  check\n" +
-					"  runs a Quickshell that is no longer installed: systemctl --user restart kaizen-shell\n",
+					"  runs a Quickshell that is no longer installed\n  hint: kaizen reload --restart\n",
+				Calls: []string{showLine, niriLine},
+			},
+		},
+		{
+			name:  "check as JSON",
+			args:  []string{"--json"},
+			files: map[string]string{coreRequires: ""},
+			links: map[string]string{"proc/4242/exe": "/usr/bin/quickshell (deleted)"},
+			outputs: map[string][]recorded{
+				showLine: {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "4242", "0", "")}},
+				niriLine: {{}},
+			},
+			want: result{
+				Stdout: fmt.Sprintf(
+					`{"findings":[{"source":"check","name":"stale-shell","level":"WARN","unit":"kaizen-shell",`+
+						`"message":"runs a Quickshell that is no longer installed","hint":"kaizen reload --restart",`+
+						`"count":1,"first":%[1]d,"last":%[1]d}],`+
+						`"text":"1 warning\n\nWARN  kaizen-shell  check\n`+
+						`  runs a Quickshell that is no longer installed\n  hint: kaizen reload --restart"}`+"\n",
+					now.UnixMilli(),
+				),
 				Calls: []string{showLine, niriLine},
 			},
 		},
@@ -469,7 +491,7 @@ func TestRun(t *testing.T) {
 			},
 			want: result{
 				Stdout: "1 warning\n\nWARN  kaizen-shell  check\n" +
-					"  runs a tree $DIR/run/kaizen-shell.service.d/dev.conf does not name: kaizen dev off\n",
+					"  runs a tree $DIR/run/kaizen-shell.service.d/dev.conf does not name\n  hint: kaizen dev off\n",
 				Calls: []string{showLine, niriLine},
 			},
 		},
@@ -481,7 +503,7 @@ func TestRun(t *testing.T) {
 			},
 			want: result{
 				Stdout: fmt.Sprintf(
-					`{"findings":[{"source":"log","level":"WARN","unit":"kaizen-shell",`+
+					`{"findings":[{"source":"log","name":"log","level":"WARN","unit":"kaizen-shell",`+
 						`"message":"WARN scene: Binding loop","count":2,"first":%d,"last":%d}],`+
 						`"text":"1 warning\n\nWARN  kaizen-shell  ×2  11:00:05–11:01:05\n  WARN scene: Binding loop"}`+"\n",
 					base.Add(5*time.Second).UnixMilli(),
