@@ -15,6 +15,7 @@ import (
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/cli"
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/dev"
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/reload"
+	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/shot"
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/command/status"
 	"github.com/fredrikaverpil/dotfiles/kaizen/internal/state"
 )
@@ -30,6 +31,11 @@ func main() {
 		fmt.Fprintf(os.Stderr, "kaizen: %v\n", err)
 		os.Exit(1)
 	}
+	cache, err := os.UserCacheDir()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "kaizen: %v\n", err)
+		os.Exit(1)
+	}
 	info, _ := debug.ReadBuildInfo()
 	d := cli.Dispatcher{
 		Commands: []cli.Command{
@@ -39,6 +45,7 @@ func main() {
 				RuntimeDir: os.Getenv("XDG_RUNTIME_DIR"),
 			},
 			reload.Command{Runner: state.Exec{}},
+			shot.Command{Runner: state.Exec{}, CacheDir: cache},
 			status.Command{Runner: state.Exec{}},
 		},
 		Dir:     cli.ScriptsDir(exe, home),
