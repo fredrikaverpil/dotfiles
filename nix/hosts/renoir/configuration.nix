@@ -8,6 +8,9 @@
     ../../shared/system/thinkpad.nix
   ];
 
+  # The trees stow.sh links here; their plugins are checked at build.
+  kaizen.configTrees = [ ../../../stow/host/renoir ];
+
   system.stateVersion = "26.05";
 
   networking.hostName = "renoir";

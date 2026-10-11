@@ -11,6 +11,12 @@
   # evaluate without it.
   ++ lib.optional (builtins.pathExists ./einride/default.nix) ./einride/default.nix;
 
+  # The trees stow.sh links here; their plugins are checked at build.
+  kaizen.configTrees = [
+    ../../../stow/host/wily
+  ]
+  ++ lib.optional (builtins.pathExists ./einride/stow) ./einride/stow;
+
   system.stateVersion = "26.05";
 
   networking.hostName = "wily";

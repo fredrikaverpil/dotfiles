@@ -8,17 +8,8 @@
 # `warn`, of the core's requires or of a plugin this host enables that the
 # host does not provide. `kaizen doctor` checks every line at runtime.
 let
-  host = config.networking.hostName;
-  hostDir = ../../nix/hosts + "/${host}";
   shellPlugins = ../stow/.config/quickshell/kaizen/plugins;
-
-  # The host's stowed trees, as stow.sh finds them.
-  trees = lib.filter builtins.pathExists (
-    [ (../../stow/host + "/${host}") ]
-    ++ lib.mapAttrsToList (name: _: hostDir + "/${name}/stow") (
-      lib.filterAttrs (_: type: type == "directory") (builtins.readDir hostDir)
-    )
-  );
+  trees = config.kaizen.configTrees;
 
   # The plugins a tree enables: its plugins/<name>.jsonc.
   enabled =
@@ -76,7 +67,13 @@ let
   );
 in
 {
-  system.checks = [
+  options.kaizen.configTrees = lib.mkOption {
+    type = lib.types.listOf lib.types.path;
+    default = [ ];
+    description = "Trees stowed into $HOME on this host; each .config/kaizen/plugins/<name>.jsonc in them enables a plugin.";
+  };
+
+  config.system.checks = [
     (pkgs.runCommand "kaizen-requires"
       {
         inherit profiles;
