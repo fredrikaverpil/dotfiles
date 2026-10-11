@@ -4,8 +4,8 @@
 
 ### Planning the work
 
-Work back and forth with me, starting with your open questions and outline
-before writing the plan.
+Use the `plan-loop` skill before writing a plan, when I mention a
+`PLAN.md`, or when resuming after `/clear`.
 
 ### Atomic, logical changes
 
