@@ -1,8 +1,9 @@
-// Package cli is kaizen's command-line plumbing: it runs the scripts in
-// libexec/kaizen/ and lists them from their -h lines.
+// Package cli is kaizen's command-line plumbing: it runs its Go commands and
+// the scripts in libexec/kaizen/, and lists both.
 package cli
 
 import (
+	"context"
 	"encoding/json/jsontext"
 	"encoding/json/v2"
 	"fmt"
@@ -12,14 +13,17 @@ import (
 	"strings"
 )
 
-// Dispatcher runs the scripts in Dir, with BinDir first on their PATH.
+// Dispatcher runs Commands and the scripts in Dir, with BinDir first on the
+// scripts' PATH.
 type Dispatcher struct {
-	Dir     string
-	BinDir  string
-	Version string
-	Environ []string
-	Stdout  io.Writer
-	Stderr  io.Writer
+	// Commands are the Go commands; none runs under kaizen internal.
+	Commands []Command
+	Dir      string
+	BinDir   string
+	Version  string
+	Environ  []string
+	Stdout   io.Writer
+	Stderr   io.Writer
 	// Execve replaces the process with a script; it returns only on failure.
 	Execve func(path string, argv []string, env []string) error
 }
@@ -35,11 +39,12 @@ func ScriptsDir(exe, home string) string {
 }
 
 // Run dispatches args and returns the exit code.
-func (d Dispatcher) Run(args []string) int {
+func (d Dispatcher) Run(ctx context.Context, args []string) int {
 	internal := len(args) > 0 && args[0] == "internal"
 	if internal {
 		args = args[1:]
 		d.Dir = filepath.Join(d.Dir, "internal")
+		d.Commands = nil
 	}
 	var name string
 	if len(args) > 0 {
@@ -64,6 +69,11 @@ func (d Dispatcher) Run(args []string) int {
 		if !internal {
 			fmt.Fprintln(d.Stdout, d.Version)
 			return 0
+		}
+	}
+	for _, c := range d.Commands {
+		if c.Name() == name {
+			return c.Run(ctx, args[1:], d.Stdout, d.Stderr)
 		}
 	}
 	path := filepath.Join(d.Dir, name)

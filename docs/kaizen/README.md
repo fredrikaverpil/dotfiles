@@ -100,7 +100,9 @@ QML, which plugins run, and the notification rules.
   other. `kaizen dev` runs a worktree's shell tree instead:
   [`development.md`](development.md) › Working from a worktree.
 - `kaizen` is the only kaizen command on PATH, built from
-  [`kaizen/`](../../kaizen/) into the system profile. `kaizen <sub>` runs
+  [`kaizen/`](../../kaizen/) into the system profile. `kaizen <sub>` runs its
+  Go command `<sub>`
+  ([`kaizen/internal/command/`](../../kaizen/internal/command/)), else
   `~/.local/libexec/kaizen/<sub>` with the binary's own directory first on its
   PATH. Units, niri binds and QML call it, never a script's path.
   `kaizen --json` lists the commands as `{ name, usage, summary }`, and
