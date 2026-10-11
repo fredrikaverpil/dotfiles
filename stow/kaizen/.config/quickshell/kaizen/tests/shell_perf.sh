@@ -66,13 +66,16 @@ power() {
   [[ "$profile" == balanced ]] || fail "power profile is $profile, not balanced"
 }
 power
-systemctl --user is-active --quiet kaizen-shell.service || fail 'kaizen-shell.service is not active'
-pid=$(prop MainPID)
-[[ "$(ipc lock isLocked)" == false ]] || fail 'session is locked'
+status=$(kaizen status --json)
+jq -e '.active == "active"' <<<"$status" >/dev/null || fail 'kaizen-shell.service is not active'
+pid=$(jq -r .pid <<<"$status")
+jq -e '.lock.locked == false' <<<"$status" >/dev/null || fail 'session is locked'
+# The curtain dims the backlight to 0 and covers every output.
+jq -e '.curtain.active == false' <<<"$status" >/dev/null || fail 'curtain is up'
 load=$(cut -d' ' -f1 /proc/loadavg)
 awk -v l="$load" 'BEGIN { exit !(l < 1.5) }' || fail "system load $load; wait until it is idle"
 
-idle_was=$(ipc idle status | jq -r .enabled)
+idle_was=$(jq -r .idle.enabled <<<"$status")
 open_panel=
 cleanup() {
   [[ -n "$open_panel" ]] && ipc "$open_panel" close >/dev/null 2>&1 || true
@@ -83,14 +86,13 @@ trap cleanup EXIT
 ipc idle disable >/dev/null
 
 printf 'Hands off the machine until the run ends.\n'
-started=$(date +%s%N)
-systemctl --user restart kaizen-shell.service
-pid=$(prop MainPID)
-until ipc system status >/dev/null 2>&1; do
-  (($(date +%s%N) - started < 30000000000)) || fail 'shell did not answer IPC within 30 s'
-  sleep 0.05
-done
-startup_ms=$((($(date +%s%N) - started) / 1000000))
+kaizen reload --restart || fail 'shell did not restart'
+pid=$(kaizen status --json | jq -r .pid)
+# From exec to Quickshell's config load, both CLOCK_MONOTONIC in µs.
+loaded=$(journalctl --user -b _PID="$pid" --grep 'Configuration Loaded' -o json --no-pager -q |
+  jq -rs 'first.__MONOTONIC_TIMESTAMP // empty')
+[[ -n "$loaded" ]] || fail 'no Configuration Loaded entry for the restarted shell'
+startup_ms=$(((loaded - $(prop ExecMainStartTimestampMonotonic)) / 1000))
 
 exe=$(readlink "/proc/$pid/exe")
 quickshell=$(sed -E 's|^/nix/store/([a-z0-9]{7})[a-z0-9]*-([^/]*)/.*|\1-\2|' <<<"$exe")

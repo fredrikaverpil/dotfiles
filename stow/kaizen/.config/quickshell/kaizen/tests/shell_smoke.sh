@@ -10,9 +10,9 @@ case "${1-}" in
     ;;
 esac
 
-systemctl --user is-active --quiet kaizen-shell.service
-pid=$(systemctl --user show kaizen-shell.service --property=MainPID --value)
-[[ "$pid" -gt 0 ]]
+status=$(kaizen status --json)
+jq -e '.active == "active" and .pid > 0' <<<"$status" >/dev/null
+pid=$(jq -r .pid <<<"$status")
 
 # Select the running service, not an arbitrary test instance or display. This
 # also works over SSH without copying the whole desktop environment into it.
@@ -55,7 +55,7 @@ printf 'PASS: tray\n'
 # Opt-in: opens and then closes the display panel, also closing any competing
 # panel. This exercises the real Process -> backend parser -> QML binding path.
 if [[ "${1-}" == --panels ]]; then
-  [[ "$(ipc lock isLocked)" == false ]]
+  kaizen status --json | jq -e '.lock.locked == false' >/dev/null
   trap 'ipc display close' EXIT
   ipc display open
   ready=false
