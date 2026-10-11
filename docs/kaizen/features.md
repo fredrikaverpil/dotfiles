@@ -31,8 +31,9 @@ sorts, but without the proper security features in place. Pressing any key
 while the curtain is active will show a password prompt.
 
 The user turns the curtain on from Settings › Session › Curtain in the launcher.
-When the agent needs to take a screenshot, it lifts the curtain with `close` and
-puts it back with `open`.
+`kaizen shot` lifts it for a screenshot and puts it back. A reload or restart
+of the shell takes it down; `kaizen reload` and `kaizen dev` put it back up.
+Over IPC, `close` lifts it and `open` puts it back.
 
 What the curtain does not do, since it would stop screenshotting from working:
 
