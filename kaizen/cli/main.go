@@ -5,6 +5,7 @@
 package main
 
 import (
+	"cmp"
 	"context"
 	"fmt"
 	"os"
@@ -16,6 +17,7 @@ import (
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/dev"
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/doctor"
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/keys"
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/link"
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/reload"
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/shot"
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/status"
@@ -48,6 +50,13 @@ func main() {
 			},
 			doctor.Command{Runner: state.Exec{}, Home: home, Getenv: os.Getenv},
 			keys.Command{Runner: state.Exec{}},
+			link.Command{
+				Runner: state.Exec{},
+				Home:   home,
+				Main:   filepath.Join(home, ".dotfiles"),
+				// Home Manager's activation runs without one.
+				RuntimeDir: cmp.Or(os.Getenv("XDG_RUNTIME_DIR"), fmt.Sprintf("/run/user/%d", os.Getuid())),
+			},
 			reload.Command{Runner: state.Exec{}},
 			shot.Command{Runner: state.Exec{}, CacheDir: cache},
 			status.Command{Runner: state.Exec{}},
