@@ -182,8 +182,12 @@ ShellRoot {
     IpcHandler {
         target: "shell"
 
-        function reload(): void {
+        // Refused while locked, as kaizen reload is.
+        function reload(): string {
+            if (lock.locked)
+                return "locked";
             Quickshell.reload(false);
+            return "reloading";
         }
         function barHeight(): int {
             return root.barHeight;

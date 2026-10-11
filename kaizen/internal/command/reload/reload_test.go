@@ -77,7 +77,7 @@ func TestRun(t *testing.T) {
 				showLine:   {Stdout: running},
 				queryLine:  {Stdout: unlocked},
 				cursorLine: {Stdout: "-- cursor: s=1\n"},
-				reloadLine: {},
+				reloadLine: {Stdout: "reloading\n"},
 				journalLine: {Stdout: `{"MESSAGE":"  INFO: Configuration Loaded","PRIORITY":"6"}` + "\n" +
 					`{"MESSAGE":"  WARN scene: Binding loop","PRIORITY":"6"}` + "\n"},
 			},
@@ -89,7 +89,7 @@ func TestRun(t *testing.T) {
 				showLine:   {Stdout: running},
 				queryLine:  {Stdout: unlocked},
 				cursorLine: {Stdout: "-- cursor: s=1\n"},
-				reloadLine: {},
+				reloadLine: {Stdout: "reloading\n"},
 				journalLine: {Stdout: `{"MESSAGE":" ERROR: Failed to load configuration","PRIORITY":"6"}` + "\n" +
 					`{"MESSAGE":" ERROR:   caused by @shell.qml[552:1]: Syntax error","PRIORITY":"6"}` + "\n"},
 			},
