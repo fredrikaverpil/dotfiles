@@ -2,7 +2,7 @@
 
 How the shell and its applications take input. How they look is in
 [`style.md`](style.md); what each surface is and where it lives, in
-[`README.md`](README.md).
+[`README.md`](../README.md).
 
 These rules hold for every surface, core and plugin. A surface that breaks one
 has a bug, as a pointer-only control does.

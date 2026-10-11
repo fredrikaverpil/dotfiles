@@ -4,7 +4,7 @@ import QtQuick
 import Quickshell
 
 // The root the shell reads its config from, the two it writes under (see
-// "Where the shell writes" in docs/kaizen/README.md), and its emoji data. The
+// "Where the shell writes" in kaizen/README.md), and its emoji data. The
 // unit's StateDirectory resolves under XDG_STATE_HOME, so the same variable
 // decides here.
 QtObject {

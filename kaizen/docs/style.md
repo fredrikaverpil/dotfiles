@@ -1,7 +1,7 @@
 # kaizen style
 
 How the shell looks. What kaizen is and where each part lives is in
-[`README.md`](README.md).
+[`README.md`](../README.md).
 
 ## Palette
 
