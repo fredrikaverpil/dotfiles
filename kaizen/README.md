@@ -102,6 +102,13 @@ QML, which plugins run, and the notification rules.
   its plugins' QML. A plugin name in both is an error: neither shadows the
   other. `kaizen dev` runs a worktree's shell tree instead:
   [`development.md`](docs/development.md) › Working from a worktree.
+- niri's config is two files. [`niri/config.kdl`](stow/.config/niri/config.kdl)
+  holds input, layout, window management and its binds;
+  [`niri/kaizen.kdl`](stow/.config/niri/kaizen.kdl), which it includes, holds
+  what the shell needs: binds calling `kaizen`, rules for the shell's surfaces
+  and windows, and the border colours the shell writes. A host's
+  `outputs.kdl`, `apps.kdl` and `host.kdl` (`stow/host/<host>/.config/niri/`)
+  are included around them, the last two after both, so their binds win.
 - `kaizen` is the only kaizen command on PATH, built from
   [`kaizen/cli/`](cli/) into the system profile. `kaizen <sub>` runs its Go
   command `<sub>`
@@ -363,7 +370,7 @@ nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
    [`.local/libexec/kaizen/`](stow/.local/libexec/kaizen/),
    compositor →
    [`Ui/compositors/`](stow/.config/quickshell/kaizen/Ui/compositors/)
-   and [`niri/config.kdl`](stow/.config/niri/config.kdl), IPC
+   and [`niri/kaizen.kdl`](stow/.config/niri/kaizen.kdl), IPC
    target for every new action. An optional shell extension is a
    [plugin](docs/plugins.md). An app is not kaizen's to install:
    [`nix/README.md`](../nix/README.md) says where it goes.

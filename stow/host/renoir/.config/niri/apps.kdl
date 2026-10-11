@@ -1,5 +1,6 @@
-// App window rules and binds, shared with wily through a symlink. Included by
-// kaizen/stow/.config/niri/config.kdl; host-only ones go in host.kdl.
+// App window rules and binds, shared with wily through a symlink. Included
+// last by kaizen/stow/.config/niri/config.kdl, after kaizen.kdl, so its binds
+// override both; host-only ones go in host.kdl.
 
 // Open apps on given workspace.
 // List running windows: `niri msg -j windows | jq -r '.[] | "\(.app_id)\t\(.title)"'`

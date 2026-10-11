@@ -53,8 +53,8 @@ nix eval --raw .#nixosConfigurations.<host>.pkgs.qt6.qtdeclarative.version
 Look up a Quickshell type, property or signal in Context7 at the pinned version
 before using one that this tree does not already use, or when `qml-lint`
 rejects one. For niri, do the same for a config node or action missing from
-`niri/config.kdl`. `qml-lint` and `compositor-test` catch removed or misspelled
-API, not features you did not know about.
+`niri/config.kdl` and `niri/kaizen.kdl`. `qml-lint` and `compositor-test`
+catch removed or misspelled API, not features you did not know about.
 
 Context7 indexes Quickshell per release
 (`/websites/quickshell_v<major>_<minor>_<patch>`); its niri and Qt docs track
