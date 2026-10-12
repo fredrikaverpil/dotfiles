@@ -21,7 +21,7 @@ case "$1" in
 esac
 
 cd "${1:-$(dirname "$0")}"
-dir_links=(.config/nvim-fredrik .config/nvim-simple .shell) # in stow/shared
+dir_links=(.claude/local-plugins .config/nvim-fredrik .config/nvim-simple .shell) # in stow/shared
 dir_links_re="^($(IFS="|"; echo "${dir_links[*]//./\\.}"))"
 pkgs=(stow/shared "stow/platform/$(uname -s)")
 host="$(uname -n | cut -d. -f1)"
