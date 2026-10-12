@@ -121,6 +121,23 @@ cursor {
     xcursor-size 24
 }
 
+// An explicit scope, since a bind without one reopens the switcher in whatever
+// scope was last picked in it (A/W/O/S). A binds block replaces all default
+// binds.
+recent-windows {
+    binds {
+        Alt+Tab         { next-window     scope="all"; }
+        Alt+Shift+Tab   { previous-window scope="all"; }
+        Alt+grave       { next-window     scope="all" filter="app-id"; }
+        Alt+Shift+grave { previous-window scope="all" filter="app-id"; }
+
+        Mod+Tab         { next-window     scope="all"; }
+        Mod+Shift+Tab   { previous-window scope="all"; }
+        Mod+grave       { next-window     scope="all" filter="app-id"; }
+        Mod+Shift+grave { previous-window scope="all" filter="app-id"; }
+    }
+}
+
 // What the kaizen shell needs, from kaizen/stow. Its rules land after the ones
 // above, and its binds lead the menu's Keybindings list, which follows file
 // order.
@@ -221,7 +238,7 @@ binds {
     Mod+I hotkey-overlay-title="Previous workspace" { focus-workspace-up; }
     Mod+WheelScrollDown cooldown-ms=150 hotkey-overlay-title="Scroll active workspace forward" { focus-workspace-down; }
     Mod+WheelScrollUp cooldown-ms=150 hotkey-overlay-title="Scroll active workspace backward" { focus-workspace-up; }
-    // Alt/Mod+Tab and Alt/Mod+grave are left to recent-windows' default binds.
+    // Alt/Mod+Tab and Alt/Mod+grave live in recent-windows above.
     Mod+Ctrl+Tab hotkey-overlay-title="Former workspace" { focus-workspace-previous; }
 
     Mod+Ctrl+1 hotkey-overlay-title="Move column to workspace 1" { move-column-to-workspace 1; }
