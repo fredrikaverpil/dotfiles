@@ -1,6 +1,6 @@
 {
   "name": "context-meter",
-  "description": "Warns the model, and the user with a toast, once the context passes 200k tokens or 20%",
+  "description": "Warns the model, and the user with a toast, once the context passes 200k tokens or 20%, and offers a tool to check usage",
   "version": "0.1.0",
   "author": {
     "name": "Fredrik Averpil"

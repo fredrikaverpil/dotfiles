@@ -44,3 +44,22 @@ test('warns once past 200k tokens or 20%, again after a drop or /clear', async (
   ]
   expect({ notes, toasts }).toEqual({ notes: want, toasts: want.flat() })
 })
+
+test('reports usage on demand, without a toast', async ($, on) => {
+  // Arrange
+  on('session.usage', () => ({
+    value: { startedAt: 1, context: { tokens: 120_000, window: 1_000_000, percent: 12 }, rateLimits: [] },
+  }))
+  const toasts: string[] = []
+  on('ui.toast', ($, e, next) => (toasts.push(e.text), next(e)))
+
+  // Act
+  const ran = await $.tool.call({ tool: 'mcp__context-meter__usage' })
+
+  // Assert
+  expect({ result: ran.result, context: ran.context, toasts }).toEqual({
+    result: 'Context window: 12% used (120k of 1000k tokens).',
+    context: undefined,
+    toasts: [],
+  })
+})
