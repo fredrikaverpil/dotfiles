@@ -71,8 +71,8 @@ Wheels and prebuilt npm binaries are glibc-linked and fail to load on NixOS
 Read `kaizen/README.md` (design, map) and `kaizen/docs/development.md`
 (local checks, platform boundaries, safe deployment) before changing
 Quickshell, niri or their Nix modules. `kaizen/CLAUDE.md`, symlinked into each
-kaizen directory outside it, loads when a file there is read: an index of the
-docs and the hard rules.
+kaizen directory outside it, imports the README and every doc under
+`kaizen/docs/` when a file there is read.
 
 ### Neovim Configuration
 
