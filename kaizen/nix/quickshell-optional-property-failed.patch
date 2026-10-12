@@ -1,0 +1,13 @@
+--- a/src/dbus/properties.cpp
++++ b/src/dbus/properties.cpp
+@@ -248,7 +248,9 @@
+ 		const QDBusPendingReply<QDBusVariant> reply = *call;
+ 
+ 		if (reply.isError()) {
+-			if (!property->isRequired() && reply.error().type() == QDBusError::InvalidArgs) {
++			// Chromium's StatusNotifierItem answers a Get of a property it lacks with Failed.
++			auto type = reply.error().type();
++			if (!property->isRequired() && (type == QDBusError::InvalidArgs || type == QDBusError::Failed)) {
+ 				qCDebug(logDbusProperties) << "Error updating non-required property" << propStr;
+ 				qCDebug(logDbusProperties) << reply.error();
+ 			} else {

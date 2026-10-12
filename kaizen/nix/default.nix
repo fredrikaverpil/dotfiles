@@ -46,10 +46,20 @@ in
     # logged at every start of the shell and of dcal's UI. The patch sets it before.
     # TODO: drop once a Quickshell release sets the app ID before constructing the app.
     # https://github.com/quickshell-mirror/quickshell/issues/1293
+    #
+    # NOTE: Quickshell logs a failed Get of an optional D-Bus property at debug level only
+    # for InvalidArgs. Chromium's StatusNotifierItem (Electron apps: Slack, gitify) lacks
+    # IconName and IconThemePath and answers their Get with Failed, which Quickshell logs
+    # as a warning on every icon change. The patch treats Failed as InvalidArgs.
+    # TODO: drop once a Quickshell release handles it.
+    # https://github.com/quickshell-mirror/quickshell/issues/862
     nixpkgs.overlays = [
       (_final: prev: {
         quickshell = prev.quickshell.overrideAttrs (old: {
-          patches = (old.patches or [ ]) ++ [ ./quickshell-desktop-file-name.patch ];
+          patches = (old.patches or [ ]) ++ [
+            ./quickshell-desktop-file-name.patch
+            ./quickshell-optional-property-failed.patch
+          ];
         });
       })
     ];
