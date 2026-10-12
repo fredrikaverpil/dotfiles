@@ -14,12 +14,13 @@ Stow commands:
   (`zap`, `plumbus`);
   `nix build .#nixosConfigurations.<host>.config.system.build.toplevel` on
   NixOS (`rpi5-homelab`, `renoir`, `wily`) — NixOS has no `.system` attribute
-- **wily's einride submodule**: a `.#` flake leaves submodules out, checked
-  out or not, and `configuration.nix` skips `einride/` when absent, so such a
-  build passes without the work config. When a change could interact with it,
-  build `'.?submodules=1#nixosConfigurations.wily.config.system.build.toplevel'`
-  (as `nh`'s flake does); in a git worktree, run
-  `git submodule update --init nix/hosts/wily/einride` first
+- **wily's private submodule**: a `.#` flake leaves submodules out, checked out
+  or not, and `configuration.nix` skips the private submodule when absent, so
+  such a build passes without the work config. When a change could interact with
+  it, build
+  `'.?submodules=1#nixosConfigurations.wily.config.system.build.toplevel'` (as
+  `nh`'s flake does); in a git worktree, run
+  `git submodule update --init nix/hosts/<host>/<submodule>` first
 - **Format Nix files**: `nix fmt` (uses nixfmt-rfc-style)
 - **CI testing**: Follow `.github/workflows/test.yml` workflow
 - **Toolchain outside Neovim**: language toolchains (go, python3, node, ruby,
