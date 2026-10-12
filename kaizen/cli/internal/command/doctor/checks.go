@@ -201,12 +201,12 @@ func (k *checker) restarts(ctx context.Context, u unit) []string {
 		var c cause
 		when := s.Time.UnixMilli()
 		logged := runs[s.InvocationID]
-		for i, e := range logged {
+		for _, e := range logged {
 			switch {
 			case e.MessageID == processExited:
 				c.exit = strings.TrimPrefix(strings.TrimPrefix(e.Message, u.id+": "), "Main process exited, ")
 				when = e.Time.UnixMilli()
-			case e.MessageID != failureResult && !skipped(logged, i) && severity(e) != "":
+			case e.MessageID != failureResult && severity(e) != "":
 				c.last = trimMessage(e.Message)
 			}
 		}

@@ -33,16 +33,6 @@ var (
 	fieldLevel = regexp.MustCompile(`(?i)^(time=\S+ )?level=(?P<level>warn(ing)?|error|fatal|crit(ical)?|panic)\b`)
 )
 
-// Electron tray items send IconPixmap only and fail a Get of IconName or
-// IconThemePath, which Quickshell reads again on each NewIcon. It logs the
-// property, then the QDBusError on the next line.
-var (
-	trayProperty = regexp.MustCompile(`^\s*WARN quickshell\.dbus\.properties: Error updating property ` +
-		`org\.freedesktop\.StatusNotifierItem-[0-9]+-[0-9]+/StatusNotifierItem/org\.kde\.StatusNotifierItem:` +
-		`(IconName|IconThemePath)$`)
-	trayError = regexp.MustCompile(`^\s*WARN quickshell\.dbus\.properties: QDBusError\(`)
-)
-
 // timeField is slog's time, which the journal has.
 var timeField = regexp.MustCompile(`^time=\S+ `)
 
@@ -232,10 +222,7 @@ func logFindings(entries []state.Entry, units []unit) []finding {
 	type key struct{ unit, level, message string }
 	groups := map[key]*finding{}
 	var keys []key
-	for i, e := range entries {
-		if skipped(entries, i) {
-			continue
-		}
+	for _, e := range entries {
 		level := severity(e)
 		if level == "" {
 			continue
@@ -268,18 +255,6 @@ func logFindings(entries []state.Entry, units []unit) []finding {
 		findings = append(findings, *groups[k])
 	}
 	return findings
-}
-
-// skipped reports that entries[i] is an Electron tray item's failed property
-// read, or the QDBusError its process logs next.
-func skipped(entries []state.Entry, i int) bool {
-	e := entries[i]
-	return ignored(e) || i > 0 && e.PID == entries[i-1].PID && ignored(entries[i-1]) && trayError.MatchString(e.Message)
-}
-
-// ignored reports an Electron tray item's failed property read.
-func ignored(e state.Entry) bool {
-	return trayProperty.MatchString(e.Message)
 }
 
 // trimMessage returns a message without leading space and slog's time.
