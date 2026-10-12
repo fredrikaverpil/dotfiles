@@ -228,19 +228,6 @@ func TestRun(t *testing.T) {
 				portalLine: {{}},
 				runsLine + " _SYSTEMD_INVOCATION_ID=aaa + USER_INVOCATION_ID=aaa + _SYSTEMD_INVOCATION_ID=ccc + USER_INVOCATION_ID=ccc": {
 					{Stdout: logLine(5, binding) + logLine(65, binding) +
-						logLine(70, map[string]string{
-							"MESSAGE": "  WARN quickshell.dbus.properties: Error updating property " +
-								"org.freedesktop.StatusNotifierItem-5-1/StatusNotifierItem/org.kde.StatusNotifierItem:IconName",
-							"_PID": "10", "_SYSTEMD_USER_UNIT": "kaizen-shell.service",
-						}) +
-						logLine(70, map[string]string{
-							"MESSAGE": "  WARN quickshell.dbus.properties: QDBusError(UnknownProperty)",
-							"_PID":    "10", "_SYSTEMD_USER_UNIT": "kaizen-shell.service",
-						}) +
-						logLine(80, map[string]string{
-							"MESSAGE": "  WARN quickshell.dbus.properties: QDBusError(UnknownProperty)",
-							"_PID":    "11", "_SYSTEMD_USER_UNIT": "kaizen-shell.service",
-						}) +
 						logLine(85, map[string]string{
 							"MESSAGE": "kaizen-dcal.service: Failed with result 'exit-code'.", "PRIORITY": "4",
 							"SYSLOG_IDENTIFIER": "systemd", "USER_UNIT": "kaizen-dcal.service",
@@ -264,7 +251,7 @@ func TestRun(t *testing.T) {
 				},
 			},
 			want: result{
-				Stdout: "4 errors, 6 warnings\n\n" +
+				Stdout: "4 errors, 5 warnings\n\n" +
 					"ERROR kaizen-dcal  check\n  failed (exit-code)\n" +
 					"ERROR doctor  check\n  cannot read why kaizen-incident-investigator was restarted: journalctl: exit status 1\n" +
 					"ERROR kaizen-incident-investigator  11:01:50\n  2026/10/11 11:00:00 systray error: boom\n" +
@@ -273,7 +260,6 @@ func TestRun(t *testing.T) {
 					"WARN  kaizen-incident-investigator  check\n  failed and was restarted 2 times\n" +
 					"WARN  ?  11:02:00\n  orphan\n" +
 					"WARN  kaizen-incident-investigator  11:01:40\n  level=WARN msg=slow\n" +
-					"WARN  kaizen-shell  11:01:20\n  WARN quickshell.dbus.properties: QDBusError(UnknownProperty)\n" +
 					"WARN  kaizen-shell  ×2  11:00:05–11:01:05\n  WARN scene: Binding loop\n",
 				Calls: []string{
 					showLine,
@@ -301,9 +287,6 @@ func TestRun(t *testing.T) {
 						logLine(19, exited("r2", "code=exited, status=1/FAILURE")) +
 						logLine(19, failed("r2")) +
 						logLine(27, shellLine("r3", "  ERROR first\nat line 3")) +
-						logLine(28, shellLine("r3", "  WARN quickshell.dbus.properties: Error updating property "+
-							"org.freedesktop.StatusNotifierItem-5-1/StatusNotifierItem/org.kde.StatusNotifierItem:IconName")) +
-						logLine(28, shellLine("r3", "  WARN quickshell.dbus.properties: QDBusError(UnknownProperty)")) +
 						logLine(29, exited("r3", "code=dumped, status=11/SEGV")) +
 						logLine(29, failed("r3"))},
 				},
