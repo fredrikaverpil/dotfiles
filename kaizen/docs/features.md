@@ -59,7 +59,10 @@ variable, font or Qt plugin that a `requires` file lists and the system lacks. A
 healthy desktop reports nothing, so every finding is something to fix; a `hint:`
 line under it names the fix when there is one. A check that cannot run is an
 error of `doctor`, and the others still run. An error an application shows in
-its window or a toast stays out of it.
+its window or a toast stays out of it, as does a D-Bus call Quickshell could
+not finish because the peer left the bus, such as a closed player's. Quickshell
+logs a failed D-Bus call's error on a line of its own; doctor reports it with
+the call's line.
 
 A unit restarted by hand starts clean. With journalctl arguments
 (`kaizen doctor -b -1`, `--since -1h`) it reports that span of the journal
