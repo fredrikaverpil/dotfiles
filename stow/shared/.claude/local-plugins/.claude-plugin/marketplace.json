@@ -13,6 +13,13 @@
       "description": "gopls MCP server: Go diagnostics, vulncheck, package APIs and file context",
       "version": "1.0.0",
       "category": "development"
+    },
+    {
+      "name": "context-meter",
+      "source": "./context-meter",
+      "description": "A tool the model calls to see how full its context window is",
+      "version": "0.1.0",
+      "category": "productivity"
     }
   ]
 }

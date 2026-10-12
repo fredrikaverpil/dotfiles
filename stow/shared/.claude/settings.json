@@ -60,6 +60,7 @@
     "code-review@claude-plugins-official": false,
     "ponytail@ponytail": false,
     "gopls-mcp@local": true,
+    "context-meter@local": true,
     "context7@anthropic-plugin-directory": true
   },
   "extraKnownMarketplaces": {
