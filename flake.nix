@@ -158,8 +158,8 @@
                   # Linux-only. Never built on Darwin: the x86_64-linux path
                   # substitutes from cache.nixos.org, and only lib/qt-6/qml
                   # (.qmltypes) is used here. Same nixpkgs as renoir, so the
-                  # same types the ThinkPad runs; without the overlay's patch,
-                  # which changes no type.
+                  # same types the ThinkPad runs; without the overlay's patches,
+                  # which change no type.
                   quickshell = unstable.x86_64-linux.quickshell;
                   # Every kaizen host runs the one tree in kaizen/stow/; a host's
                   # plugins add theirs under stow/host/<host>/.config/kaizen/.
