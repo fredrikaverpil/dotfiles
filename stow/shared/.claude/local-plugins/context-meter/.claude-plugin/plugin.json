@@ -1,0 +1,8 @@
+{
+  "name": "context-meter",
+  "description": "A tool the model calls to see how full its context window is",
+  "version": "0.1.0",
+  "author": {
+    "name": "Fredrik Averpil"
+  }
+}
