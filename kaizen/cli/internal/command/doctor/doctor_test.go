@@ -821,6 +821,62 @@ func TestSysAdmin(t *testing.T) {
 	}
 }
 
+func TestJoinDBusErrors(t *testing.T) {
+	const (
+		updating    = "  WARN quickshell.dbus.properties: Error updating property org.mpris.MediaPlayer2.x:Position"
+		dbusError   = `  WARN quickshell.dbus.properties: QDBusError("org.freedesktop.DBus.Error.`
+		failed      = dbusError + `Failed", "boom")`
+		unknown     = dbusError + `ServiceUnknown", "The name is not activatable")`
+		noObject    = dbusError + `UnknownMethod", "Object does not exist at path “/x”")`
+		noMethod    = dbusError + `UnknownMethod", "No such method 'Get'")`
+		bindingLoop = "  WARN scene: Binding loop"
+	)
+	for _, tt := range []struct {
+		name    string
+		entries []state.Entry
+		want    []state.Entry
+	}{
+		{
+			name:    "error joined to its call",
+			entries: []state.Entry{{Message: updating, PID: "10"}, {Message: failed, PID: "10"}},
+			want:    []state.Entry{{Message: updating + "\n" + strings.TrimSpace(failed), PID: "10"}},
+		},
+		{
+			name:    "unknown method joined to its call",
+			entries: []state.Entry{{Message: updating, PID: "10"}, {Message: noMethod, PID: "10"}},
+			want:    []state.Entry{{Message: updating + "\n" + strings.TrimSpace(noMethod), PID: "10"}},
+		},
+		{
+			name: "peer gone",
+			entries: []state.Entry{
+				{Message: bindingLoop, PID: "10"},
+				{Message: updating, PID: "10"}, {Message: noObject, PID: "10"},
+				{Message: updating, PID: "10"}, {Message: unknown, PID: "10"},
+			},
+			want: []state.Entry{{Message: bindingLoop, PID: "10"}},
+		},
+		{
+			name:    "peer gone without its call",
+			entries: []state.Entry{{Message: unknown, PID: "10"}},
+			want:    []state.Entry{},
+		},
+		{
+			name:    "error after another process's line",
+			entries: []state.Entry{{Message: updating, PID: "10"}, {Message: failed, PID: "11"}},
+			want:    []state.Entry{{Message: updating, PID: "10"}, {Message: failed, PID: "11"}},
+		},
+		{
+			name:    "error first",
+			entries: []state.Entry{{Message: failed, PID: "10"}},
+			want:    []state.Entry{{Message: failed, PID: "10"}},
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.DeepEqual(t, joinDBusErrors(tt.entries), tt.want)
+		})
+	}
+}
+
 func TestSeverity(t *testing.T) {
 	for _, tt := range []struct {
 		name  string

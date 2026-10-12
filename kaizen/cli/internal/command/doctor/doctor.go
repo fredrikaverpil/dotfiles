@@ -36,6 +36,16 @@ var (
 // timeField is slog's time, which the journal has.
 var timeField = regexp.MustCompile(`^time=\S+ `)
 
+// Quickshell follows a failed D-Bus call's line with one naming the error.
+// ServiceUnknown, and UnknownMethod for a missing object, mean the peer left
+// the bus before it answered.
+var (
+	dbusError = regexp.MustCompile(`^\s*(WARN|ERROR) \S+: QDBusError\(`)
+	peerGone  = regexp.MustCompile(
+		`QDBusError\("org\.freedesktop\.DBus\.Error\.(ServiceUnknown"|UnknownMethod", "Object does not exist )`,
+	)
+)
+
 // Command reports the kaizen units' warnings and errors, and what is out of
 // order.
 type Command struct {
@@ -222,7 +232,7 @@ func logFindings(entries []state.Entry, units []unit) []finding {
 	type key struct{ unit, level, message string }
 	groups := map[key]*finding{}
 	var keys []key
-	for _, e := range entries {
+	for _, e := range joinDBusErrors(entries) {
 		level := severity(e)
 		if level == "" {
 			continue
@@ -255,6 +265,31 @@ func logFindings(entries []state.Entry, units []unit) []finding {
 		findings = append(findings, *groups[k])
 	}
 	return findings
+}
+
+// joinDBusErrors returns entries with each Quickshell D-Bus error line joined
+// to the line before it from the same process, and without the pairs whose
+// peer left the bus.
+func joinDBusErrors(entries []state.Entry) []state.Entry {
+	joined := make([]state.Entry, 0, len(entries))
+	for _, e := range entries {
+		if !dbusError.MatchString(e.Message) {
+			joined = append(joined, e)
+			continue
+		}
+		last := len(joined) - 1
+		paired := last >= 0 && joined[last].PID == e.PID
+		switch {
+		case peerGone.MatchString(e.Message) && paired:
+			joined = joined[:last]
+		case peerGone.MatchString(e.Message):
+		case paired:
+			joined[last].Message += "\n" + trimMessage(e.Message)
+		default:
+			joined = append(joined, e)
+		}
+	}
+	return joined
 }
 
 // trimMessage returns a message without leading space and slog's time.
