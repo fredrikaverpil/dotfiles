@@ -14,9 +14,9 @@ We discuss the work, write it down in `PLAN.md`, then implement one step at a
 time with `/clear` in between. This keeps me in the loop to pivot between
 steps, and keeps the context small: cheaper, and you stay sharper.
 
-Recommended: Opus at high effort. If you are not running on Opus, say so and
-ask whether to proceed anyway. You cannot see the effort level; when starting
-a new plan, remind me to check it.
+Recommended: Opus at high effort. If you are not running on Opus, say so and ask
+whether to proceed anyway. You cannot see the effort level (no need to remind me
+about it).
 
 ## Gather information
 
