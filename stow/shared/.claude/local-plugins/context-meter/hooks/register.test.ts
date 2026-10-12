@@ -1,30 +1,46 @@
 import { expect, test } from 'claude-code/testing'
 
-const usage = (context: { tokens?: number; window: number; percent?: number }) => () => ({
-  value: { startedAt: 0, context, rateLimits: [] },
-})
-
-test('reports usage to the model and as a toast', async ($, on) => {
+test('warns once past 200k tokens or 20%, again after a drop or /clear', async ($, on) => {
   // Arrange
-  on('session.usage', usage({ tokens: 212_000, window: 1_000_000, percent: 21 }))
+  let usage = { startedAt: 1, tokens: 0, window: 1_000_000 }
+  on('session.usage', () => {
+    const { startedAt, tokens, window } = usage
+    const percent = Math.round((tokens / window) * 100)
+    return { value: { startedAt, context: { tokens, window, percent }, rateLimits: [] } }
+  })
+  on('tool.call', () => ({ result: { stdout: '', stderr: '', interrupted: false } }))
   const toasts: string[] = []
   on('ui.toast', ($, e, next) => (toasts.push(e.text), next(e)))
+  const call = async (next: Partial<typeof usage>) => {
+    usage = { ...usage, ...next }
+    const ran = await $.tool.call({ tool: 'Bash', command: 'true' })
+    return ran.context ?? []
+  }
 
   // Act
-  const ran = await $.tool.call({ tool: 'mcp__context-meter__usage' })
+  const notes = [
+    await call({ tokens: 150_000 }),
+    await call({ tokens: 210_000 }),
+    await call({ tokens: 300_000 }),
+    await call({ tokens: 30_000 }),
+    await call({ tokens: 220_000 }),
+    await call({ startedAt: 2, tokens: 20_000 }),
+    await call({ tokens: 45_000, window: 200_000 }),
+    await call({ startedAt: 3, tokens: 205_000, window: 2_000_000 }),
+  ]
 
   // Assert
-  const text = 'Context window: 21% used (212k of 1000k tokens).'
-  expect({ result: ran.result, toasts }).toEqual({ result: text, toasts: [text] })
-})
-
-test('says so before the first response', async ($, on) => {
-  // Arrange
-  on('session.usage', usage({ window: 1_000_000 }))
-
-  // Act
-  const ran = await $.tool.call({ tool: 'mcp__context-meter__usage' })
-
-  // Assert
-  expect(ran.result).toEqual('Context window: not measured yet.')
+  const warn = (p: number, t: number, w: number) =>
+    `Context window: ${p}% used (${t}k of ${w}k tokens), past 200k tokens or 20%.`
+  const want = [
+    [],
+    [warn(21, 210, 1000)],
+    [],
+    [],
+    [warn(22, 220, 1000)],
+    [],
+    [warn(23, 45, 200)],
+    [warn(10, 205, 2000)],
+  ]
+  expect({ notes, toasts }).toEqual({ notes: want, toasts: want.flat() })
 })

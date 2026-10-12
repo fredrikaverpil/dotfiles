@@ -40,10 +40,9 @@ Update it whenever a decision is made or a step completes, not only at the end.
 
 ## Step loop
 
-The context-meter plugin (`~/.claude/local-plugins/context-meter`) provides
-`mcp__context-meter__usage`, which reports how full the context window is.
-Load it with ToolSearch (`select:mcp__context-meter__usage`); if it is not
-found, warn me that the plugin is not loaded.
+The context-meter plugin (`~/.claude/local-plugins/context-meter`) adds a
+`Context window: ...` warning to a tool result once the context passes 200k
+tokens or 20%.
 
 1. After `/clear`, read `PLAN.md` and the files it lists before doing anything
    else. If no `PLAN.md` is at the root of the current checkout, list
@@ -53,12 +52,12 @@ found, warn me that the plugin is not loaded.
    next step.
 4. Re-read all of `PLAN.md` for contradictory or outdated passages and fix
    them.
-5. Call `mcp__context-meter__usage`, then continue with the next step (back
-   to 2), unless:
+5. Continue with the next step (back to 2), unless:
    - The step or the re-read raised a decision, a surprise or a change of
      course: discuss it with me first.
-   - The context is at 20% or more, or the plugin is not loaded: stop and ask
-     me to run `/clear`, then `/plan-loop`.
+   - The context-meter warning has arrived: stop and ask me to run `/clear`,
+     then `/plan-loop`. If it arrives mid-step, finish the step and steps 3–4
+     first.
 
 When every step is done, ask whether to delete `PLAN.md` and, if used, the
 worktree. First check its branch is in the main branch
