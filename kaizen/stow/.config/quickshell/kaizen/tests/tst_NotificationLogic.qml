@@ -692,6 +692,25 @@ TestCase {
             }));
     }
 
+    function test_notification_alarm_rattles_in_two_bursts() {
+        verify(Notification.alarmRattle(0) === 0);
+        fuzzyCompare(Notification.alarmRattle(100), 1, 0.001);
+        fuzzyCompare(Notification.alarmRattle(140), -1, 0.001);
+        verify(Notification.alarmRattle(600) === 0);
+        fuzzyCompare(Notification.alarmRattle(800), 1, 0.001);
+        verify(Notification.alarmRattle(1500) === 0);
+        verify(Notification.alarmRattle(3000 + 100) === Notification.alarmRattle(100));
+    }
+
+    function test_notification_alarm_rings_after_each_burst() {
+        verify(Notification.alarmRing(0, 0) === 0);
+        fuzzyCompare(Notification.alarmRing(800, 0), 0.5, 0.001);
+        verify(Notification.alarmRing(1600, 0) === -1);
+        verify(Notification.alarmRing(600, 1) === -1);
+        fuzzyCompare(Notification.alarmRing(1100, 1), 0.25, 0.001);
+        verify(Notification.alarmRing(3000 + 800, 0) === Notification.alarmRing(800, 0));
+    }
+
     function test_notification_icon_sources_preserve_schemes_and_normalize_paths() {
         compare(Notification.iconSource("/tmp/icon.png"), "file:///tmp/icon.png");
         compare(Notification.iconSource("file:///tmp/icon.png"), "file:///tmp/icon.png");

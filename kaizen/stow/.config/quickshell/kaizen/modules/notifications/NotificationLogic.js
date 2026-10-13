@@ -98,8 +98,10 @@ var ruleCheck = record(
     // stands out; `heartbeat` thickens it in two soft beats, then rests; `glow`
     // breathes a halo around it, over the bar, the history panel and other
     // notifications; `lightning` strikes a jagged bolt across the card, border
-    // and content, every few seconds.
-    borderAnimation: oneOf(["orbit", "heartbeat", "glow", "lightning"]),
+    // and content, every few seconds; `alarm` rocks the card like an old alarm
+    // clock's hammer between its bells, in two bursts, each sending a ring out
+    // from it over what is around it.
+    borderAnimation: oneOf(["orbit", "heartbeat", "glow", "lightning", "alarm"]),
     // Shows one copy of an event reported by several apps: `group` names the
     // event; the `keep` copy shows and dismisses the group's others, which are
     // held briefly in case it arrives.
@@ -423,6 +425,32 @@ function bolt(n) {
     y: root.y < 0.5 ? 0.85 : 0.15,
   };
   return { trunk: trunk, fork: jag(root, tip, 2).concat([tip]) };
+}
+
+var alarmPeriod = 3000;
+// When each burst of the bells starts in the cycle.
+var alarmBursts = [0, 700];
+var alarmBurst = 500;
+var alarmRingLife = 1600;
+
+// The alarm clock's tilt, -1 to 1, at `ms` into its cycle: the hammer swinging
+// between its bells in each burst, at rest between them.
+function alarmRattle(ms) {
+  var t = ms % alarmPeriod;
+  for (var i = 0; i < alarmBursts.length; i++) {
+    var u = t - alarmBursts[i];
+    if (u < 0 || u >= alarmBurst) continue;
+    var envelope = Math.min(1, u / 40, (alarmBurst - u) / 80);
+    return envelope * Math.sin((2 * Math.PI * u) / 80);
+  }
+  return 0;
+}
+
+// Burst `i`'s ring at `ms` into the cycle: 0 as it leaves the card, 1 as it
+// fades out, -1 while there is none.
+function alarmRing(ms, i) {
+  var u = (ms % alarmPeriod) - alarmBursts[i];
+  return u >= 0 && u < alarmRingLife ? u / alarmRingLife : -1;
 }
 
 function durationFor(notification, lowUrgency, criticalUrgency, rules) {
