@@ -323,7 +323,7 @@ Scope {
     }
 
     Variants {
-        model: Quickshell.screens
+        model: background.shell.screens
 
         Wall {
             WlrLayershell.namespace: "quickshell-backdrop"
@@ -332,7 +332,7 @@ Scope {
     }
 
     Variants {
-        model: Quickshell.screens
+        model: background.shell.screens
 
         Wall {
             WlrLayershell.namespace: "quickshell-wallpaper"

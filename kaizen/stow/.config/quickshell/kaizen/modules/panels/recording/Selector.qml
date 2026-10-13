@@ -50,7 +50,7 @@ Scope {
     }
 
     Variants {
-        model: Quickshell.screens
+        model: root.shell.screens
 
         PanelWindow {
             id: window

@@ -21,7 +21,7 @@ Scope {
     }
 
     Variants {
-        model: Quickshell.screens
+        model: bar.shell.screens
 
         PanelWindow {
             id: barWindow

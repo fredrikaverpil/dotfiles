@@ -80,6 +80,8 @@ ShellRoot {
     readonly property alias doctorService: doctorService
 
     readonly property int barHeight: Math.round(32 * textScale)
+    // The outputs, without the nameless placeholder Qt adds while there are none.
+    readonly property var screens: Quickshell.screens.filter(screen => screen.name !== "")
     property var panels: []
 
     // Ui.Plugin instances, in name order; one that fails to load is left out.
