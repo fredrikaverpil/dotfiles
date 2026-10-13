@@ -35,6 +35,17 @@ function historyWith(history, record, limit, critical) {
     .slice(0, limit);
 }
 
+// Quickshell serves an app's raw image data only to the process that
+// received it.
+var processImage = "image://qsimage/";
+
+// The row as the state file keeps it: without an image of this process.
+function storedRecord(row) {
+  return row && String(row.image || "").indexOf(processImage) === 0
+    ? Object.assign({}, row, { image: "" })
+    : row;
+}
+
 function loadedState(raw, limit) {
   var parsed = {};
   var valid = true;
@@ -49,7 +60,7 @@ function loadedState(raw, limit) {
     doNotDisturb: !!parsed.doNotDisturb,
     dndSince: Number(parsed.dndSince) || 0,
     history: Array.isArray(parsed.history)
-      ? parsed.history.slice(0, limit)
+      ? parsed.history.slice(0, limit).map(storedRecord)
       : [],
   };
 }
@@ -61,7 +72,7 @@ function stateText(doNotDisturb, history, dndSince) {
         version: 1,
         doNotDisturb: !!doNotDisturb,
         dndSince: dndSince || 0,
-        history: Array.isArray(history) ? history : [],
+        history: Array.isArray(history) ? history.map(storedRecord) : [],
       },
       null,
       2,
