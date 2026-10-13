@@ -188,6 +188,7 @@ Item {
                 color: card.shell.palette.off
                 font: input.font
                 text: card.placeholder
+                textFormat: Text.PlainText
                 elide: Text.ElideRight
             }
         }
@@ -312,6 +313,7 @@ Item {
                     font.family: Fonts.mono
                     font.pixelSize: card.fontSize
                     text: row.modelData.text || ""
+                    textFormat: Text.PlainText
                     elide: Text.ElideRight
                 }
 
@@ -326,6 +328,7 @@ Item {
                     font.family: Fonts.mono
                     font.pixelSize: card.fontSize
                     text: row.modelData.detail || ""
+                    textFormat: Text.PlainText
                     elide: Text.ElideRight
                 }
             }
