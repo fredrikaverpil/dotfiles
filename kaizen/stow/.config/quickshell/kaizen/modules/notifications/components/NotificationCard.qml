@@ -46,6 +46,7 @@ Rectangle {
     readonly property bool beating: animated && row.borderAnimation === "heartbeat"
     readonly property bool glowing: animated && row.borderAnimation === "glow"
     readonly property bool striking: animated && row.borderAnimation === "lightning"
+    readonly property bool ringing: animated && row.borderAnimation === "alarm"
     // A rule's icon takes the notification's place, which moves to the badge;
     // a rule's badge icon takes the badge's, leaving the notification's in place;
     // a rule's badge emoji takes the badge's over either.
@@ -69,9 +70,15 @@ Rectangle {
     color: activeFocus || selected ? palette.sel : palette.bg
     border.color: tint
     border.width: 1
-    // A glowing card draws its halo outside itself, over the cards beside it.
-    clip: !glowing
-    z: glowing ? 1 : 0
+    // A glowing or ringing card draws outside itself, over the cards beside it.
+    clip: !glowing && !ringing
+    z: glowing || ringing ? 1 : 0
+    // A ringing card rocks on its bottom edge.
+    transform: Rotation {
+        origin.x: root.width / 2
+        origin.y: root.height
+        angle: root.ringing ? alarm.tilt : 0
+    }
 
     activeFocusOnTab: selectable
     Keys.onPressed: function (event) {
@@ -266,6 +273,55 @@ Rectangle {
                 const now = Date.now();
                 lightning.level = NotificationLogic.lightning(now);
                 lightning.strike = Math.floor(now / NotificationLogic.lightningPeriod);
+            }
+        }
+    }
+
+    // An old alarm clock: the card rocks as the hammer swings between its bells,
+    // and each burst sends a ring out from it, below the card so only what is
+    // outside it shows, held level as the card rocks. It holds still under the
+    // pointer or the selection, so its buttons stay put. Timed by the wall
+    // clock, so every ringing card rings in step.
+    Item {
+        id: alarm
+        property real tilt: 0
+        property var rings: []
+        anchors.fill: parent
+        z: -1
+        visible: root.ringing
+        transform: Rotation {
+            origin.x: alarm.width / 2
+            origin.y: alarm.height
+            angle: -alarm.tilt
+        }
+
+        Repeater {
+            model: NotificationLogic.alarmBursts.length
+
+            delegate: Rectangle {
+                required property int index
+                readonly property real progress: alarm.rings[index] ?? -1
+                // Eases out, as a sound fading with distance.
+                readonly property real reach: 40 * (1 - Math.pow(1 - progress, 3))
+
+                anchors.fill: parent
+                anchors.margins: -reach
+                visible: progress >= 0
+                radius: root.radius + reach
+                color: "transparent"
+                border.color: root.tint
+                border.width: 3 - 2 * progress
+                opacity: 0.9 * (1 - progress) * (1 - progress)
+            }
+        }
+
+        FrameAnimation {
+            running: alarm.visible
+            onTriggered: {
+                const now = Date.now();
+                const still = root.hovered || root.selected || root.activeFocus;
+                alarm.tilt = still ? 0 : 1.5 * NotificationLogic.alarmRattle(now);
+                alarm.rings = NotificationLogic.alarmBursts.map((at, i) => NotificationLogic.alarmRing(now, i));
             }
         }
     }
