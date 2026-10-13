@@ -3,7 +3,7 @@
     "match": { "app": "^Signal$", "summary": " Averpil$" },
     "urgency": "critical",
     "border": "rose",
-    "borderAnimation": "glow",
+    "animation": "glow",
     "badgeEmoji": "❤️"
   }
 ]

@@ -14,7 +14,7 @@ Rectangle {
     property var row: ({})
     property var notification: null
     property bool toast: false
-    // Border animations run only while the card is on screen.
+    // Animations run only while the card is on screen.
     property bool animated: toast
     property bool selectable: false
     property bool selected: false
@@ -42,11 +42,11 @@ Rectangle {
     readonly property color accent: urgency === 2 ? palette.rose : (urgency === 0 ? palette.off : palette.fg)
     // A rule's border colour takes the place of the urgency's.
     readonly property color tint: palette[String(row.border || "")] ?? accent
-    readonly property bool orbiting: animated && row.borderAnimation === "orbit"
-    readonly property bool beating: animated && row.borderAnimation === "heartbeat"
-    readonly property bool glowing: animated && row.borderAnimation === "glow"
-    readonly property bool striking: animated && row.borderAnimation === "lightning"
-    readonly property bool ringing: animated && row.borderAnimation === "alarm"
+    readonly property bool orbiting: animated && row.animation === "orbit"
+    readonly property bool beating: animated && row.animation === "heartbeat"
+    readonly property bool glowing: animated && row.animation === "glow"
+    readonly property bool striking: animated && row.animation === "lightning"
+    readonly property bool ringing: animated && row.animation === "alarm"
     // A rule's icon takes the notification's place, which moves to the badge;
     // a rule's badge icon takes the badge's, leaving the notification's in place;
     // a rule's badge emoji takes the badge's over either.

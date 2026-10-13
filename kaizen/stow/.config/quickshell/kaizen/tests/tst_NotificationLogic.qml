@@ -21,7 +21,7 @@ TestCase {
             badgeIcon: "",
             badgeEmoji: "",
             border: "",
-            borderAnimation: "",
+            animation: "",
             actions: [],
             urgency: 2,
             timestamp: 123
@@ -115,7 +115,7 @@ TestCase {
             badgeIcon: "",
             badgeEmoji: "",
             border: "",
-            borderAnimation: "",
+            animation: "",
             actions: [],
             urgency: 2,
             timestamp: 123
@@ -154,9 +154,9 @@ TestCase {
             {
                 rule: {
                     match: match,
-                    borderAnimaton: "glow"
+                    animaton: "glow"
                 },
-                want: "borderAnimaton: unknown field"
+                want: "animaton: unknown field"
             },
             {
                 rule: {
@@ -536,7 +536,7 @@ TestCase {
             badgeIcon: "",
             badgeEmoji: "",
             border: "",
-            borderAnimation: "",
+            animation: "",
             actions: [],
             urgency: 1,
             timestamp: 123
@@ -552,7 +552,7 @@ TestCase {
                 },
                 urgency: "critical",
                 border: "rose",
-                borderAnimation: "orbit"
+                animation: "orbit"
             },
             {
                 match: {
@@ -575,7 +575,7 @@ TestCase {
         compare(Notification.ruleValue({
             appName: "Slack",
             summary: "[x] in #alerts-dev"
-        }, rules, "borderAnimation"), "");
+        }, rules, "animation"), "");
         compare(Notification.ruleValue({
             appName: "Slack",
             summary: "[x] in #general"
@@ -598,7 +598,7 @@ TestCase {
             badgeIcon: "",
             badgeEmoji: "",
             border: "rose",
-            borderAnimation: "orbit",
+            animation: "orbit",
             actions: [],
             urgency: 2,
             timestamp: 123
@@ -631,7 +631,7 @@ TestCase {
             badgeIcon: "",
             badgeEmoji: "❤️",
             border: "",
-            borderAnimation: "",
+            animation: "",
             actions: [],
             urgency: 1,
             timestamp: 123

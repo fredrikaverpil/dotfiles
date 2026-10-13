@@ -93,7 +93,7 @@ var ruleCheck = record(
     // Palette colour of the border, on the toast and in the history, in place
     // of the one its urgency gives.
     border: oneOf(paletteRoles),
-    // Animation of the border, on the toast and in the history: `orbit` keeps
+    // Animation of the card, on the toast and in the history: `orbit` keeps
     // a dash travelling around it, and dims the border itself so the dash
     // stands out; `heartbeat` thickens it in two soft beats, then rests; `glow`
     // breathes a halo around it, over the bar, the history panel and other
@@ -101,7 +101,7 @@ var ruleCheck = record(
     // and content, every few seconds; `alarm` rocks the card like an old alarm
     // clock's hammer between its bells, in two bursts, each sending a ring out
     // from it over what is around it.
-    borderAnimation: oneOf(["orbit", "heartbeat", "glow", "lightning", "alarm"]),
+    animation: oneOf(["orbit", "heartbeat", "glow", "lightning", "alarm"]),
     // Shows one copy of an event reported by several apps: `group` names the
     // event; the `keep` copy shows and dismisses the group's others, which are
     // held briefly in case it arrives.
@@ -184,7 +184,7 @@ function compileRules(rules, file) {
           badgeIcon: iconSource(rulePath(rule.badgeIcon, dir)),
           badgeEmoji: rule.badgeEmoji || "",
           border: rule.border || "",
-          borderAnimation: rule.borderAnimation || "",
+          animation: rule.animation || "",
           // Shaped as buttons, like the app's actions.
           actions: (rule.actions || []).map(function (action) {
             return {
@@ -342,7 +342,7 @@ function snapshotOf(notification, timestamp, rules) {
     badgeIcon: badgeIconOf(notification, rules),
     badgeEmoji: ruleValue(notification, rules, "badgeEmoji"),
     border: ruleValue(notification, rules, "border"),
-    borderAnimation: ruleValue(notification, rules, "borderAnimation"),
+    animation: ruleValue(notification, rules, "animation"),
     // A rule's; the app's are on the live notification.
     actions: actionsOf(notification, rules),
     urgency: urgencyOf(notification, rules),
