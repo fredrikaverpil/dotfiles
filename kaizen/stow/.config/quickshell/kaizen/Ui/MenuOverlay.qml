@@ -230,6 +230,7 @@ Item {
             font.family: Fonts.mono
             font.pixelSize: 13
             text: [overlay.title].concat(overlay.tree.names, overlay.level.names).join(" › ")
+            textFormat: Text.PlainText
         }
 
         MenuCard {
