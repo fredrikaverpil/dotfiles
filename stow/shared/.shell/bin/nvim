@@ -53,6 +53,10 @@ else
   exit 1
 fi
 
+# mise pins shadow the Nix toolchain below; an unpinned tool's shim falls
+# through to it
+export PATH="$PATH:$HOME/.local/share/mise/shims"
+
 # Inject Neovim build dependencies (managed by Nix, not on regular PATH)
 NVIM_DEPS_PATH_FILE="$HOME/.config/nvim-deps-path"
 if [ -f "$NVIM_DEPS_PATH_FILE" ]; then
