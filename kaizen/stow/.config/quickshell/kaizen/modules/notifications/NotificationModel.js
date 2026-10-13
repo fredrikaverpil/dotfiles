@@ -10,7 +10,7 @@ function savedRecord(record) {
     badgeIcon: record.badgeIcon,
     badgeEmoji: record.badgeEmoji,
     border: record.border,
-    borderAnimation: record.borderAnimation,
+    animation: record.animation,
     actions: record.actions,
     urgency: record.urgency,
     timestamp: record.timestamp,

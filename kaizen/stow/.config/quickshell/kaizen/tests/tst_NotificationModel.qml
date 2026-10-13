@@ -17,7 +17,7 @@ TestCase {
                     app: "^Slack$"
                 },
                 border: "rose",
-                borderAnimation: "glow",
+                animation: "glow",
                 actions: [
                     {
                         label: "Investigate",
@@ -44,7 +44,7 @@ TestCase {
             badgeIcon: "",
             badgeEmoji: "",
             border: "rose",
-            borderAnimation: "glow",
+            animation: "glow",
             actions: [
                 {
                     text: "Investigate",
@@ -125,7 +125,7 @@ TestCase {
                 badgeIcon: "",
                 badgeEmoji: "",
                 border: "rose",
-                borderAnimation: "glow",
+                animation: "glow",
                 actions: [
                     {
                         text: "Investigate",
