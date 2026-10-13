@@ -77,6 +77,32 @@ TestCase {
         }, null, 2) + "\n");
     }
 
+    function test_notification_state_drops_images_of_the_process() {
+        const held = Object.assign({}, record, {
+            image: "image://qsimage/22/1"
+        });
+        const file = Object.assign({}, record, {
+            image: "/tmp/cover.png"
+        });
+        const stored = Object.assign({}, record, {
+            image: ""
+        });
+        compare(Notification.stateText(false, [held, file], 0), JSON.stringify({
+            version: 1,
+            doNotDisturb: false,
+            dndSince: 0,
+            history: [stored, file]
+        }, null, 2) + "\n");
+        compare(Notification.loadedState(JSON.stringify({
+            history: [held, file]
+        }), 5), {
+            valid: true,
+            doNotDisturb: false,
+            dndSince: 0,
+            history: [stored, file]
+        });
+    }
+
     function test_notification_history_skips_transient_records_and_keeps_newest_entries() {
         compare(Notification.historyWith([record], {
             transient: true
