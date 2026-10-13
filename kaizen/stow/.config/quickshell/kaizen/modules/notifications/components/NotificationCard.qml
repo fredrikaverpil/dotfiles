@@ -45,6 +45,7 @@ Rectangle {
     readonly property bool orbiting: animated && row.borderAnimation === "orbit"
     readonly property bool beating: animated && row.borderAnimation === "heartbeat"
     readonly property bool glowing: animated && row.borderAnimation === "glow"
+    readonly property bool striking: animated && row.borderAnimation === "lightning"
     // A rule's icon takes the notification's place, which moves to the badge;
     // a rule's badge icon takes the badge's, leaving the notification's in place;
     // a rule's badge emoji takes the badge's over either.
@@ -197,6 +198,75 @@ Rectangle {
         FrameAnimation {
             running: heartbeat.visible
             onTriggered: heartbeat.opacity = NotificationLogic.heartbeat(Date.now())
+        }
+    }
+
+    // A jagged bolt striking across the card, over its border and content, and
+    // lighting the card. Timed by the wall clock, so every striking card
+    // strikes in step, with the same bolt.
+    Item {
+        id: lightning
+        property real level: 0
+        property int strike: 0
+        readonly property var bolt: NotificationLogic.bolt(strike)
+        readonly property var trunk: onCard(bolt.trunk)
+        readonly property var fork: onCard(bolt.fork)
+        readonly property color core: Qt.lighter(root.tint, 1.8)
+        readonly property color halo: Qt.alpha(root.tint, 0.5)
+
+        function onCard(points) {
+            return points.map(point => Qt.point(point.x * width, point.y * height));
+        }
+        anchors.fill: parent
+        z: 1
+        visible: root.striking
+        opacity: level
+
+        Rectangle {
+            anchors.fill: parent
+            radius: root.radius
+            color: root.tint
+            opacity: 0.15
+        }
+
+        // Halos around white-hot cores, the fork thinner than the trunk.
+        Shape {
+            anchors.fill: parent
+            layer.enabled: lightning.visible
+            layer.samples: 4
+
+            BoltPath {
+                strokeColor: lightning.halo
+                strokeWidth: 7
+                points: lightning.trunk
+            }
+
+            BoltPath {
+                strokeColor: lightning.halo
+                strokeWidth: 5
+                points: lightning.fork
+            }
+
+            BoltPath {
+                strokeColor: lightning.core
+                strokeWidth: 2
+                points: lightning.trunk
+            }
+
+            BoltPath {
+                strokeColor: lightning.core
+                strokeWidth: 1.5
+                points: lightning.fork
+            }
+        }
+
+        FrameAnimation {
+            running: lightning.visible
+            onTriggered: {
+                const now = Date.now();
+                lightning.level = NotificationLogic.lightning(now);
+                lightning.strike = Math.floor(now / NotificationLogic.lightningPeriod);
+            }
         }
     }
 
@@ -391,6 +461,18 @@ Rectangle {
                 root.remaining = 0;
                 root.expired();
             }
+        }
+    }
+
+    component BoltPath: ShapePath {
+        property alias points: polyline.path
+
+        fillColor: "transparent"
+        capStyle: ShapePath.RoundCap
+        joinStyle: ShapePath.MiterJoin
+
+        PathPolyline {
+            id: polyline
         }
     }
 }

@@ -97,8 +97,9 @@ var ruleCheck = record(
     // a dash travelling around it, and dims the border itself so the dash
     // stands out; `heartbeat` thickens it in two soft beats, then rests; `glow`
     // breathes a halo around it, over the bar, the history panel and other
-    // notifications.
-    borderAnimation: oneOf(["orbit", "heartbeat", "glow"]),
+    // notifications; `lightning` strikes a jagged bolt across the card, border
+    // and content, every few seconds.
+    borderAnimation: oneOf(["orbit", "heartbeat", "glow", "lightning"]),
     // Shows one copy of an event reported by several apps: `group` names the
     // event; the `keep` copy shows and dismisses the group's others, which are
     // held briefly in case it arrives.
@@ -368,6 +369,60 @@ function glowFlare(age) {
   if (!(age >= 0) || age >= 1500) return 0;
   var x = 1 - age / 1500;
   return x * x * x;
+}
+
+var lightningPeriod = 3000;
+
+// The lightning's brightness, 0 to 1, at `ms` into its cycle: a strike, a
+// flicker, a second strike fading out, then dark.
+function lightning(ms) {
+  var t = ms % lightningPeriod;
+  if (t < 60) return 1;
+  if (t < 110) return 0.2;
+  if (t >= 500) return 0;
+  var x = 1 - (t - 110) / 390;
+  return x * x;
+}
+
+// Strike `n`'s bolt, as points on a unit card, the same for every card on that
+// strike: a jagged `trunk` from the left edge to the right, by midpoint
+// displacement, and a shorter `fork` off its middle toward the far edge.
+function bolt(n) {
+  // mulberry32, seeded by the strike.
+  var state = n >>> 0;
+  function random() {
+    state = (state + 0x6d2b79f5) >>> 0;
+    var t = Math.imul(state ^ (state >>> 15), state | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  }
+  // Folded back between 0.15 and 0.85, clear of the corners, so that no run
+  // flattens along an edge.
+  function clamp(y) {
+    if (y > 0.85) return Math.max(0.15, 1.7 - y);
+    if (y < 0.15) return Math.min(0.85, 0.3 - y);
+    return y;
+  }
+  // The points from `from` up to `to`, `to` left out, each level displacing
+  // the midpoint, more for a wider segment but enough for a narrow one to
+  // kink sharply.
+  function jag(from, to, depth) {
+    if (!depth) return [from];
+    var span = to.x - from.x;
+    var mid = {
+      x: (from.x + to.x) / 2 + 0.2 * (random() - 0.5) * span,
+      y: clamp((from.y + to.y) / 2 + (0.35 + 0.6 * span) * (random() - 0.5)),
+    };
+    return jag(from, mid, depth - 1).concat(jag(mid, to, depth - 1));
+  }
+  var end = { x: 1, y: clamp(random()) };
+  var trunk = jag({ x: 0, y: clamp(random()) }, end, 4).concat([end]);
+  var root = trunk[4 + Math.floor(8 * random())];
+  var tip = {
+    x: Math.min(1, root.x + 0.15 + 0.15 * random()),
+    y: root.y < 0.5 ? 0.85 : 0.15,
+  };
+  return { trunk: trunk, fork: jag(root, tip, 2).concat([tip]) };
 }
 
 function durationFor(notification, lowUrgency, criticalUrgency, rules) {

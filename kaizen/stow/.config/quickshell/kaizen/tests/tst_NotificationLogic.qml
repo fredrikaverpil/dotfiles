@@ -664,6 +664,34 @@ TestCase {
         verify(Notification.glowFlare(NaN) === 0);
     }
 
+    function test_notification_lightning_strikes_flickers_then_fades() {
+        verify(Notification.lightning(0) === 1);
+        fuzzyCompare(Notification.lightning(80), 0.2, 0.001);
+        verify(Notification.lightning(110) === 1);
+        fuzzyCompare(Notification.lightning(305), 0.25, 0.001);
+        verify(Notification.lightning(500) === 0);
+        verify(Notification.lightning(2999) === 0);
+        verify(Notification.lightning(3000 + 80) === Notification.lightning(80));
+    }
+
+    function test_notification_bolt_crosses_the_card_with_a_fork() {
+        const bolt = Notification.bolt(196000000);
+        const trunk = bolt.trunk;
+        const fork = bolt.fork;
+
+        compare(Notification.bolt(196000000), bolt);
+        verify(trunk.length === 17);
+        verify(trunk[0].x === 0);
+        verify(trunk[16].x === 1);
+        verify(fork.length === 5);
+        verify(trunk.indexOf(fork[0]) >= 4 && trunk.indexOf(fork[0]) < 12);
+        verify(fork[4].y === (fork[0].y < 0.5 ? 0.85 : 0.15));
+        [trunk, fork].forEach(points => points.forEach((point, i) => {
+                verify(point.y >= 0.15 && point.y <= 0.85);
+                verify(i === 0 || point.x > points[i - 1].x);
+            }));
+    }
+
     function test_notification_icon_sources_preserve_schemes_and_normalize_paths() {
         compare(Notification.iconSource("/tmp/icon.png"), "file:///tmp/icon.png");
         compare(Notification.iconSource("file:///tmp/icon.png"), "file:///tmp/icon.png");
