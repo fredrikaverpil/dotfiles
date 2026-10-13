@@ -1,0 +1,10 @@
+# Pins over the Nix toolchain (nix/shared/toolchain.nix). Neovim and the `dev`
+# devshell put mise's shims ahead of it: a tool pinned here or in a project's
+# mise.toml shadows Nix's, and an unpinned tool's shim falls through to it.
+# Pin or update one tool with `mise use -g <tool>@<version>`; mise.lock locks
+# it for every platform.
+
+[settings]
+lockfile = true
+
+[tools]
