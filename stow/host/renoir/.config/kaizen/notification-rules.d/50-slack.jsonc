@@ -6,7 +6,7 @@
     "match": { "app": "^Chromium$", "body": "^calendar\\.google\\.com\\n" },
     "urgency": "critical",
     "border": "leaf",
-    "borderAnimation": "lightning",
+    "borderAnimation": "alarm",
     "dedup": { "group": "calendar", "keep": true },
     // The reminder comes from Chromium, but the window is the Calendar app's.
     "focus": "^chrome-calendar\\.google\\.com"
@@ -24,7 +24,7 @@
     "match": { "app": "^Slack$", "summary": " from Google Calendar$" },
     "urgency": "critical",
     "border": "leaf",
-    "borderAnimation": "lightning",
+    "borderAnimation": "alarm",
     "dedup": { "group": "calendar" },
     // Slack relays the reminder, but the event is in the Calendar app.
     "focus": "^chrome-calendar\\.google\\.com",
