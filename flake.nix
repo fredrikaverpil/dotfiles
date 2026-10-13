@@ -144,9 +144,14 @@
                 );
                 # macOS: Mason binaries are native Mach-O — put them on PATH so
                 # the devshell reaches the same tooling Neovim uses.
-                shellHook = channels.unstable.lib.optionalString channels.unstable.stdenv.hostPlatform.isDarwin ''
-                  export PATH="$HOME/.local/share/nvim-fredrik/mason/bin:$PATH"
-                '';
+                shellHook =
+                  channels.unstable.lib.optionalString channels.unstable.stdenv.hostPlatform.isDarwin ''
+                    export PATH="$HOME/.local/share/nvim-fredrik/mason/bin:$PATH"
+                  ''
+                  # mise pins shadow the toolchain and Mason, as in Neovim.
+                  + ''
+                    export PATH="$HOME/.local/share/mise/shims:$PATH"
+                  '';
               };
               # Entered by direnv (.envrc) for work on this repo itself: the QML
               # tooling for the hosts' Quickshell trees, which does not belong
