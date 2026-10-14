@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+# mise's toolchain comes ahead of Nix's, as in the nvim wrapper
+export PATH="$PATH:$HOME/.local/share/mise/shims"
+
 DEPS_PATH_FILE="$HOME/.config/nvim-deps-path"
 if [ -f "$DEPS_PATH_FILE" ]; then
   export PATH="$PATH:$(cat "$DEPS_PATH_FILE")"
