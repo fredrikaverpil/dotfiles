@@ -93,11 +93,6 @@ in
       # ========================================================================
       # Development & Language Toolchains
       # ========================================================================
-      # Language-specific
-      # Unstable: the Pi's pinned uv is too old for the relative-date
-      # `exclude-newer` in stow/shared/.config/uv/uv.toml.
-      unstable.uv
-
       # Generic development
       bfs
       devbox
