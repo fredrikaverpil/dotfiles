@@ -131,6 +131,10 @@
       "src": "https://github.com/nvim-mini/mini.icons",
       "version": ">=0.0.0"
     },
+    "mini.pick": {
+      "rev": "7cb8fd34bde460986e5e39e9539a9f992ec9772e",
+      "src": "https://github.com/echasnovski/mini.pick"
+    },
     "neotest": {
       "rev": "1c529a1ef9c82e8131e872368415cecc2bb86ea2",
       "src": "https://github.com/nvim-neotest/neotest",
@@ -187,8 +191,7 @@
     },
     "nvim-lspconfig": {
       "rev": "4d363f93c3581b9212a24f7a830d7590b3f050af",
-      "src": "https://github.com/neovim/nvim-lspconfig",
-      "version": ">=0.0.0"
+      "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "nvim-nio": {
       "rev": "21f5324bfac14e22ba26553caf69ec76ae8a7662",
