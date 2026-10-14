@@ -4,7 +4,6 @@
   lib,
   pkgs,
   inputs,
-  osConfig ? { },
   ...
 }:
 let
@@ -94,11 +93,6 @@ in
       # ========================================================================
       # Development & Language Toolchains
       # ========================================================================
-      # Language-specific
-      # Unstable: the Pi's pinned uv is too old for the relative-date
-      # `exclude-newer` in stow/shared/.config/uv/uv.toml.
-      unstable.uv
-
       # Generic development
       bfs
       devbox
@@ -161,10 +155,7 @@ in
     # the `dev` devshell in flake.nix) is imported so Neovim and the devshell
     # resolve to identical store paths; the extras below are Neovim-only.
     home.file.".config/nvim-deps-path".text = lib.makeBinPath (
-      (import ../toolchain.nix {
-        inherit stable unstable;
-        nixos = osConfig ? system.nixos; # absent under nix-darwin
-      })
+      (import ../toolchain.nix { inherit stable unstable; })
       ++ (with unstable; [
         cmake # Neovim's injected PATH has no stdenv cc (devshell gets it from stdenv)
         gcc

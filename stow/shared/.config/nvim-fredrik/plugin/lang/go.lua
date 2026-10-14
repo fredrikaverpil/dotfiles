@@ -27,7 +27,7 @@ require("lazyload").on_vim_enter(function()
     end
   end
 
-  -- go-impl (uses "impl" from mason and "symbolScope", "symbolMatcher" setting in gopls)
+  -- go-impl (uses "impl" from mise and "symbolScope", "symbolMatcher" setting in gopls)
   do
     vim.pack.add({
       { src = "https://github.com/fang2hou/go-impl.nvim", version = vim.version.range("*") },

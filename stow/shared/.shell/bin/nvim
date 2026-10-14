@@ -53,11 +53,28 @@ else
   exit 1
 fi
 
+# Appends each entry of a colon-separated list to PATH, skipping entries already
+# on it (e.g. nvim launching claude, both wrappers)
+path_append() {
+  local IFS=: dir
+  for dir in $1; do
+    case ":$PATH:" in
+    *":$dir:"*) ;;
+    *) PATH="$PATH:$dir" ;;
+    esac
+  done
+  export PATH
+}
+
+# mise's toolchain comes ahead of Nix's below; a shim for a tool mise does not
+# provide falls through to it
+path_append "$HOME/.local/share/mise/shims"
+
 # Inject Neovim build dependencies (managed by Nix, not on regular PATH)
 NVIM_DEPS_PATH_FILE="$HOME/.config/nvim-deps-path"
 if [ -f "$NVIM_DEPS_PATH_FILE" ]; then
   # Append so per-project tooling (e.g. mise) takes precedence over these fallbacks
-  export PATH="$PATH:$(cat "$NVIM_DEPS_PATH_FILE")"
+  path_append "$(cat "$NVIM_DEPS_PATH_FILE")"
 fi
 
 # Check if NVIM_APPNAME is already set

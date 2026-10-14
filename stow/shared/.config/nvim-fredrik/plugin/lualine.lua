@@ -39,7 +39,7 @@ require("lazyload").on_vim_enter(
         lualine_y = { "progress" },
         lualine_z = { "location" },
       },
-      extensions = { "man", "mason", "quickfix" },
+      extensions = { "man", "quickfix" },
     })
 
     vim.opt.showmode = false

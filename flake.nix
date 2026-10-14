@@ -137,15 +137,10 @@
             in
             {
               dev = channels.unstable.mkShell {
-                # A devshell has no OS config; every Linux host here is NixOS,
-                # so isLinux stands in for the toolchain's `nixos` flag.
-                packages = import ./nix/shared/toolchain.nix (
-                  channels // { nixos = channels.unstable.stdenv.hostPlatform.isLinux; }
-                );
-                # macOS: Mason binaries are native Mach-O — put them on PATH so
-                # the devshell reaches the same tooling Neovim uses.
-                shellHook = channels.unstable.lib.optionalString channels.unstable.stdenv.hostPlatform.isDarwin ''
-                  export PATH="$HOME/.local/share/nvim-fredrik/mason/bin:$PATH"
+                packages = import ./nix/shared/toolchain.nix channels;
+                # mise's toolchain comes ahead of Nix's, as in Neovim.
+                shellHook = ''
+                  export PATH="$HOME/.local/share/mise/shims:$PATH"
                 '';
               };
               # Entered by direnv (.envrc) for work on this repo itself: the QML

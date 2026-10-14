@@ -2,13 +2,17 @@
 
 ![screenshot](https://github.com/user-attachments/assets/d8b0b742-a77c-4e55-94b6-3640723739e2)
 
-Personal dotfiles, managed in three layers:
+Personal dotfiles, managed in four layers:
 
 - **Nix** ([`nix/`](nix/)): system configuration and packages,
   pinned by `flake.lock` and applied with a rebuild. Fully reproducible.
 - **Stow** ([`stow/`](stow/)): dotfiles symlinked into `$HOME` with
   [GNU Stow](https://www.gnu.org/software/stow/) (not Nix). Changes take effect
   immediately, no rebuild needed.
+- **mise** ([`stow/shared/.config/mise/`](stow/shared/.config/mise/)): the
+  development toolchain (runtimes, LSPs, formatters, linters), pinned by
+  `mise.lock` and installed with `mise install`. A project's `mise.toml`
+  overrides it.
 - **Kaizen** ([`kaizen/`](kaizen/)): my custom Linux desktop experience, a
   Quickshell shell for niri.
 
@@ -53,6 +57,12 @@ Personal dotfiles, managed in three layers:
 
    # macOS
    sudo darwin-rebuild switch --flake ~/.dotfiles#"$(hostname -s)"
+   ```
+
+6. Install the development toolchain:
+
+   ```sh
+   mise install
    ```
 
 The rebuild stows the dotfiles, so `stow.sh` needs no separate run. On a

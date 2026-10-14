@@ -24,13 +24,13 @@ direnv (.envrc)   Per-directory env vars, Nix dev shells, tool activation
     ↓
 Project tools     nix / devbox / devenv / mise / pkgx — project-specific CLI versions
     ↓
-Editor (Neovim)   Mason — LSPs, linters, formatters, debug adapters
+Editor (Neovim)   mise — runtimes, LSPs, linters, formatters
 ```
 
 Later layers override earlier ones. For example, a project's `.envrc` can
 activate a Nix dev shell that shadows a home-manager-installed Go with a
-project-pinned version, and Mason's `PATH = "append"` ensures those
-project-local tools take precedence inside Neovim too.
+project-pinned version, and the `nvim` wrapper appends mise's shims to `PATH`,
+so those project-local tools take precedence inside Neovim too.
 
 ### Shell initialization
 
@@ -42,15 +42,25 @@ The shell startup chain is:
    `~/.shell/.env`
 3. **[`aliases.sh`](../stow/shared/.shell/aliases.sh)** — shell aliases
 4. **[`sourcing.sh`](../stow/shared/.shell/sourcing.sh)** — Nix daemon, tool
-   initialization (atuin, direnv, mise, zoxide, starship, fzf), zsh
+   initialization (atuin, direnv, zoxide, starship, fzf), zsh
    completions/plugins, and `cd` overrides
 
-The `cd` override (and `z`/`zi`) automatically activates Python virtual
-environments when entering directories with a `.python-version` or `.venv/`.
-This works alongside direnv — direnv handles Nix shells and env vars, while the
-`cd` override handles behaviors that would be too cumbersome to maintain in
-scattered `.envrc` files across every project. Some things are simply easier to
-handle centrally in one place.
+The `cd` override (and `z`/`zi`) can run behaviors centrally on every
+directory change. Its Python virtual environment activation is disabled: a uv
+project's `.envrc` syncs and activates the `.venv` instead:
+
+```sh
+watch_file mise.toml pyproject.toml
+mise exec -- uv sync --all-groups --frozen
+eval "$(mise env -s bash)"
+```
+
+- `--all-groups`: a plain `uv sync` removes the dependency groups it does not
+  install.
+- `--frozen`: installs from `uv.lock` without re-resolving, so the global
+  `exclude-newer` (`~/.config/uv/uv.toml`) does not rewrite it.
+- `mise env` activates the `.venv` via the global config's
+  `python.uv_venv_auto`.
 
 ## Direnv
 
@@ -85,8 +95,11 @@ eval "$(devbox generate direnv --print-envrc)"
 eval "$(devenv direnvrc)"
 use devenv
 
-# mise (alternative: `use mise` if nix-direnv stdlib extension is available)
-eval "$(mise activate bash)"
+# mise: exports the tools once, and activates a uv project's .venv (the global
+# config's python.uv_venv_auto). `mise activate` relies on a shell hook that
+# direnv drops, and `use mise` is deprecated.
+watch_file mise.toml
+eval "$(mise env -s bash)"
 
 # pkgx (activates dependencies from .pkgx.yml or auto-detected project files)
 source <(pkgx --internal.activate $(realpath .))
@@ -121,7 +134,7 @@ tasks or bleeding edge tool versions:
 ```sh
 source_up_if_exists
 eval "$(devbox generate direnv --print-envrc)"
-eval "$(mise activate bash)"
+eval "$(mise env -s bash)"
 ```
 
 ### Environment variables
@@ -453,20 +466,25 @@ Then use `pkgs-python39.python39` in your packages list.
 
 ## Editor tooling (Neovim)
 
-LSPs, linters, formatters, and debug adapters used inside Neovim are managed by
-[Mason](https://github.com/mason-org/mason.nvim), configured in
-[`stow/shared/.config/nvim-fredrik/plugin/mason.lua`](../stow/shared/.config/nvim-fredrik/plugin/mason.lua).
-Mason installs tools into its own isolated location
-(`~/.local/share/nvim-fredrik/mason/bin/`), separate from the shell environment.
+Language runtimes, LSPs, linters and formatters used inside Neovim come from
+the global mise config,
+[`stow/shared/.config/mise/config.toml`](../stow/shared/.config/mise/config.toml),
+pinned by `mise.lock`. What mise cannot provide comes from
+[`nix/shared/toolchain.nix`](../nix/shared/toolchain.nix). Neither is on the
+shell's `PATH`: the [`nvim` wrapper](../stow/shared/.shell/bin/nvim) appends
+mise's shims, then the Nix toolchain.
 
-Mason's `PATH` is set to `"append"`, meaning project-local tools (from Nix,
-mise, etc.) take precedence over Mason-installed versions. This lets per-project
-tooling override editor defaults automatically.
+Being appended, they yield to project-local tools already on `PATH` (e.g. a Nix
+dev shell from direnv). A shim resolves its tool per working directory, so a
+project's `mise.toml` overrides a version with no shell hook:
 
-The tools to install (LSPs, formatters, linters) are listed in
-`ensure_installed` in that file, and a project's `.nvim.lua` can add more via
-`Config.mason_extra`. On startup, Mason automatically downloads and installs any
-missing tools.
+```toml
+# mise.toml in a project
+[tools]
+go = "1.24"
+```
+
+Run `mise install` after changing the global config.
 
 ## LLM setup
 

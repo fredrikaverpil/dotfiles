@@ -117,19 +117,6 @@
       "rev": "7edcd52ac6f2acc2f83f0cc27ac989a142408fbf",
       "src": "https://github.com/Bilal2453/luvit-meta"
     },
-    "mason-lock.nvim": {
-      "rev": "b75e2de585637a61b2fb818dc33dad7863b7b0c4",
-      "src": "https://github.com/zapling/mason-lock.nvim"
-    },
-    "mason-lspconfig.nvim": {
-      "rev": "e17625cdc8c2650787467398e02c5d63a2cde966",
-      "src": "https://github.com/mason-org/mason-lspconfig.nvim"
-    },
-    "mason.nvim": {
-      "rev": "2a6940af80375532e5e9e7c1f2fc6319a1b7a69d",
-      "src": "https://github.com/mason-org/mason.nvim",
-      "version": ">=0.0.0"
-    },
     "melange-nvim": {
       "rev": "ce42f6b629beeaa00591ba73a77d3eeac4cf28ce",
       "src": "https://github.com/savq/melange-nvim"
@@ -143,6 +130,10 @@
       "rev": "e56797f90192d81f1fda02e662fc3e8e3d775027",
       "src": "https://github.com/nvim-mini/mini.icons",
       "version": ">=0.0.0"
+    },
+    "mini.pick": {
+      "rev": "7cb8fd34bde460986e5e39e9539a9f992ec9772e",
+      "src": "https://github.com/echasnovski/mini.pick"
     },
     "neotest": {
       "rev": "1c529a1ef9c82e8131e872368415cecc2bb86ea2",

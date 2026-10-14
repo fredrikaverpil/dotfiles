@@ -1,0 +1,67 @@
+# The shared development toolchain, on PATH in Neovim and Claude Code via their
+# wrappers. What mise cannot provide comes from nix/shared/toolchain.nix.
+
+[settings]
+lockfile = true
+all_compile = false
+
+# Precompiled only: fail rather than fall back to a slow source build.
+[settings.node]
+compile = false
+
+[settings.python]
+compile = false
+uv_venv_auto = "source" # activate a uv project's .venv
+
+[settings.ruby]
+compile = false
+
+[tools]
+go = "latest"
+node = "lts"
+python = "latest"
+ruby = "latest"
+tree-sitter = "latest"
+uv = "latest"
+
+# LSPs, formatters, linters
+actionlint = "latest"                                              # yaml (github actions)
+"go:github.com/googleapis/api-linter/v2/cmd/api-linter" = "latest" # protobuf
+"npm:basedpyright" = "latest"                                      # python
+"npm:bash-language-server" = "latest"                              # bash
+biome = "latest"                                                   # json
+buf = "latest"                                                     # protobuf
+"go:github.com/go-delve/delve/cmd/dlv" = "latest"                  # go
+"npm:dockerfile-language-server-nodejs" = "latest"                 # docker
+"go:github.com/daixiang0/gci" = "latest"                           # go
+gofumpt = "latest"                                                 # go (golines runs it as --base-formatter)
+"go:golang.org/x/tools/cmd/goimports" = "latest"                   # go
+golangci-lint = "latest"                                           # go
+golines = "latest"                                                 # go
+"go:golang.org/x/tools/gopls" = "latest"                           # go
+gotestsum = "latest"                                               # go (neotest)
+"npm:graphql-language-service-cli" = "latest"                      # graphql
+hadolint = "latest"                                                # docker
+"go:github.com/josharian/impl" = "latest"                          # go (go-impl.nvim)
+"npm:vscode-langservers-extracted" = "latest"                      # json (json-lsp)
+lua-language-server = "latest"                                     # lua
+"npm:markdownlint-cli" = "latest"                                  # markdown
+"pipx:mypy" = "latest"                                             # python
+prettier = "latest"                                                # typescript/javascript
+protolint = "latest"                                               # protobuf
+ruff = "latest"                                                    # python
+rumdl = "latest"                                                   # markdown
+shellcheck = "latest"                                              # bash (bashls runs it itself; not a nvim-lint linter)
+shfmt = "latest"                                                   # bash
+stylua = "latest"                                                  # lua
+superhtml = "latest"                                               # html
+taplo = "latest"                                                   # toml
+"github:a-h/templ" = "latest"                                      # templ
+terraform-ls = "latest"                                            # terraform
+tflint = "latest"                                                  # terraform
+"github:ribru17/ts_query_ls" = "latest"                            # query
+"npm:@vtsls/language-server" = "latest"                            # typescript
+"npm:yaml-language-server" = "latest"                              # yaml
+yamlfmt = "latest"                                                 # yaml
+# yamllint = "latest"                                              # yaml (Nix: not yet available in mise for python 3.15)
+zls = "latest" # zig

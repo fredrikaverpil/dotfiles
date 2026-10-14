@@ -28,8 +28,11 @@ Stow commands:
   `stow/shared/.shell/bin/nvim` injects them into Neovim only. When running
   outside Neovim (e.g. Claude Code under Remote Control) and needing them, use
   the devshell: `nix develop ~/.dotfiles#dev -c <cmd>` (or enter with
-  `nix develop ~/.dotfiles#dev`). Defined once in `nix/shared/toolchain.nix`,
-  shared by the devshell and Neovim's `nvim-deps-path`.
+  `nix develop ~/.dotfiles#dev`). Mostly defined in the global mise config
+  (`stow/shared/.config/mise/config.toml`), whose shims come ahead of what
+  stays in `nix/shared/toolchain.nix` (Elixir, Nix tooling, rustup), in both
+  the devshell and Neovim. To pin or update one tool,
+  `mise use -g <tool>@<version>`, then `mise install`.
 
 ## Repository Architecture
 
@@ -110,8 +113,8 @@ For each language, consult the corresponding file in
 `yaml.lua`) to get exact formatter/linter tools and configurations. Formatters
 are wired up in `stow/shared/.config/nvim-fredrik/plugin/conform.lua`.
 
-**Note**: If LSP/formatter not found, check Mason install path:
-`~/.local/share/nvim-fredrik/mason/bin/` or `~/.local/share/nvim/mason/bin/`
+**Note**: If an LSP/formatter is not found, check `mise which <tool>`; what
+mise cannot provide comes from `nix/shared/toolchain.nix`.
 
 ## Gotchas
 
