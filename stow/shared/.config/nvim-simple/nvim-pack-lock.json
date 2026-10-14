@@ -1,9 +1,5 @@
 {
   "plugins": {
-    "mason.nvim": {
-      "rev": "7dc4facca9702f95353d5a1f87daf23d78e31c2a",
-      "src": "https://github.com/mason-org/mason.nvim"
-    },
     "mini.pick": {
       "rev": "51680e9d67bdf657209aaef4117a4dcc61e8428c",
       "src": "https://github.com/echasnovski/mini.pick"
