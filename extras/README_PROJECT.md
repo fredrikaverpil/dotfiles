@@ -42,15 +42,25 @@ The shell startup chain is:
    `~/.shell/.env`
 3. **[`aliases.sh`](../stow/shared/.shell/aliases.sh)** — shell aliases
 4. **[`sourcing.sh`](../stow/shared/.shell/sourcing.sh)** — Nix daemon, tool
-   initialization (atuin, direnv, mise, zoxide, starship, fzf), zsh
+   initialization (atuin, direnv, zoxide, starship, fzf), zsh
    completions/plugins, and `cd` overrides
 
-The `cd` override (and `z`/`zi`) automatically activates Python virtual
-environments when entering directories with a `.python-version` or `.venv/`.
-This works alongside direnv — direnv handles Nix shells and env vars, while the
-`cd` override handles behaviors that would be too cumbersome to maintain in
-scattered `.envrc` files across every project. Some things are simply easier to
-handle centrally in one place.
+The `cd` override (and `z`/`zi`) can run behaviors centrally on every
+directory change. Its Python virtual environment activation is disabled: a uv
+project's `.envrc` syncs and activates the `.venv` instead:
+
+```sh
+watch_file mise.toml pyproject.toml
+mise exec -- uv sync --all-groups --frozen
+eval "$(mise env -s bash)"
+```
+
+- `--all-groups`: a plain `uv sync` removes the dependency groups it does not
+  install.
+- `--frozen`: installs from `uv.lock` without re-resolving, so the global
+  `exclude-newer` (`~/.config/uv/uv.toml`) does not rewrite it.
+- `mise env` activates the `.venv` via the global config's
+  `python.uv_venv_auto`.
 
 ## Direnv
 
