@@ -113,8 +113,8 @@ For each language, consult the corresponding file in
 `yaml.lua`) to get exact formatter/linter tools and configurations. Formatters
 are wired up in `stow/shared/.config/nvim-fredrik/plugin/conform.lua`.
 
-**Note**: If LSP/formatter not found, check Mason install path:
-`~/.local/share/nvim-fredrik/mason/bin/` or `~/.local/share/nvim/mason/bin/`
+**Note**: If an LSP/formatter is not found, check `mise which <tool>`; what
+mise cannot provide comes from `nix/shared/toolchain.nix`.
 
 ## Gotchas
 
