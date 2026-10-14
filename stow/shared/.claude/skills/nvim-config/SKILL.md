@@ -74,7 +74,6 @@ No framework -- each directory has a single responsibility:
     lint.lua             -- linting (VimEnter)
     lsp.lua              -- LSP enable + LspAttach keymaps (VimEnter)
     lualine.lua          -- statusline (VimEnter, sync)
-    mason.lua            -- tool installation (VimEnter)
     neotest.lua          -- testing (deferred to first use)
     <name>.lua           -- other feature plugins (snacks, treesitter, oil, etc.)
   after/
@@ -157,7 +156,7 @@ disable one: `vim.lsp.enable("gopls", false)`.
 ## Adding a new language
 
 1. Add LSP server to the `servers` list in `plugin/lsp.lua`
-2. Add mason tools to the `ensure_installed` list in `plugin/mason.lua`
+2. Make the tools it needs available on `PATH` (e.g. via mise)
 3. Add formatters to `formatters_by_ft` in `plugin/conform.lua`
 4. Add linters to `linters_by_ft` in `plugin/lint.lua`
 5. Testing/debugging/coverage/running: `plugin/neotest.lua`, `plugin/dap.lua`,

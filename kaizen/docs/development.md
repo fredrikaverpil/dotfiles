@@ -259,7 +259,7 @@ includes.
 - `qml-lint` fails on any warning. Shadowing an Item member that is public API
   (`palette`, IPC-visible `enabled`) or a lookup on an untyped `Loader.item`
   gets an inline `// qmllint disable <category>`; anything else gets fixed.
-- Use the devshell's pinned Qt tools, not Mason's standalone `qmlls`. Launch
+- Use the devshell's pinned Qt tools, not a standalone `qmlls`. Launch
   Neovim from the repo so it inherits `PATH` and `QML_IMPORT_PATH`. The flake
   supplies both Qt imports and Quickshell metadata; deployed Qt must match the
   pin after updates. `qml-test` clears the GTK platform theme for offscreen SSH.
