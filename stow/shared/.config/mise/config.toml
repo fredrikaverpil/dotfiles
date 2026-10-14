@@ -35,7 +35,7 @@ tree-sitter = "latest"
 # language/tool. Not mirrored: codelldb/debugpy (no DAP adapter uses them),
 # rust-analyzer (rustup component), elixir-ls and nil (Nix).
 actionlint = { version = "latest", os = ["linux"] } # yaml (github actions)
-"github:googleapis/api-linter" = { version = "latest", os = ["linux"] } # protobuf
+"go:github.com/googleapis/api-linter/v2/cmd/api-linter" = { version = "latest", os = ["linux"] } # protobuf
 "npm:basedpyright" = { version = "latest", os = ["linux"] } # python
 "npm:bash-language-server" = { version = "latest", os = ["linux"] } # bash
 biome = { version = "latest", os = ["linux"] } # json
