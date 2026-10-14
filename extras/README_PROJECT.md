@@ -85,8 +85,11 @@ eval "$(devbox generate direnv --print-envrc)"
 eval "$(devenv direnvrc)"
 use devenv
 
-# mise (alternative: `use mise` if nix-direnv stdlib extension is available)
-eval "$(mise activate bash)"
+# mise: exports the tools once, and activates a uv project's .venv (the global
+# config's python.uv_venv_auto). `mise activate` relies on a shell hook that
+# direnv drops, and `use mise` is deprecated.
+watch_file mise.toml
+eval "$(mise env -s bash)"
 
 # pkgx (activates dependencies from .pkgx.yml or auto-detected project files)
 source <(pkgx --internal.activate $(realpath .))
@@ -121,7 +124,7 @@ tasks or bleeding edge tool versions:
 ```sh
 source_up_if_exists
 eval "$(devbox generate direnv --print-envrc)"
-eval "$(mise activate bash)"
+eval "$(mise env -s bash)"
 ```
 
 ### Environment variables
