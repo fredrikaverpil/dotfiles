@@ -1,12 +1,25 @@
 #!/usr/bin/env bash
 set -e
 
+# Appends each entry of a colon-separated list to PATH, skipping entries already
+# on it (e.g. nvim launching claude, both wrappers)
+path_append() {
+  local IFS=: dir
+  for dir in $1; do
+    case ":$PATH:" in
+    *":$dir:"*) ;;
+    *) PATH="$PATH:$dir" ;;
+    esac
+  done
+  export PATH
+}
+
 # mise's toolchain comes ahead of Nix's, as in the nvim wrapper
-export PATH="$PATH:$HOME/.local/share/mise/shims"
+path_append "$HOME/.local/share/mise/shims"
 
 DEPS_PATH_FILE="$HOME/.config/nvim-deps-path"
 if [ -f "$DEPS_PATH_FILE" ]; then
-  export PATH="$PATH:$(cat "$DEPS_PATH_FILE")"
+  path_append "$(cat "$DEPS_PATH_FILE")"
 fi
 
 exec "$HOME/.nix-profile/bin/claude" "$@"
