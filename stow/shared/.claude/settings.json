@@ -25,6 +25,9 @@
       "Bash(docker-compose *)"
     ],
     "deny": [
+      "Read(//**/.env)",
+      "Read(//**/.env.*)",
+      "Read(//**/.envrc)",
       "Read(~/code/private/github.com/einride*/**)",
       "Edit(~/code/private/github.com/einride*/**)",
       "Bash(*code/private/github.com/einride*)"
