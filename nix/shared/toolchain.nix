@@ -89,6 +89,6 @@ with unstable;
   # vtsls # typescript
   # yaml-language-server # yaml
   # yamlfmt # yaml
-  # yamllint # yaml
+  yamllint # yaml
   # zls # zig
 ]
