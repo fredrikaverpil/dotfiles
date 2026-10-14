@@ -1,5 +1,5 @@
-# The shared development toolchain, always available in e.g. Neovim and Claude Code.
-# Complementing toolchain.nix where some tooling installed when not available via mise.
+# The shared development toolchain, on PATH in Neovim and Claude Code via their
+# wrappers. What mise cannot provide comes from nix/shared/toolchain.nix.
 
 [settings]
 lockfile = true
