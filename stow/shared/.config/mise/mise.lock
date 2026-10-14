@@ -619,12 +619,6 @@ aube = { path = "locks/npm-yaml-language-server/1.25.0", digest = "sha256:ef7576
 backend = "npm:yaml-language-server"
 specifiers = ["latest"]
 
-[[tools."pipx:mypy"]]
-version = "2.4.0"
-backend = "pipx:mypy"
-specifiers = ["latest"]
-uv = { path = "locks/pipx-mypy/2.4.0", digest = "sha256:b74a07a03f5a3d22f0dae46ff49b20cb4640e4a2a3db22a3bfc4247bbc58441c" }
-
 [[tools.prettier]]
 version = "3.9.10"
 aube = { path = "locks/prettier/3.9.10", digest = "sha256:0a52cf3e98ebe971f9f0c338c08e668756d290a8d14fe3fd308251084fba1522" }
@@ -670,6 +664,12 @@ url_api = "https://api.github.com/repos/yoheimuta/protolint/releases/assets/6070
 checksum = "sha256:66efe70020a9f1c124aceb931509093e4cb2f13066b553b40c693f8e0f4bd593"
 url = "https://github.com/yoheimuta/protolint/releases/download/v0.58.0/protolint_0.58.0_windows_amd64.tar.gz"
 url_api = "https://api.github.com/repos/yoheimuta/protolint/releases/assets/607036307"
+
+[[tools."pypi:mypy"]]
+version = "2.4.0"
+backend = "pypi:mypy"
+specifiers = ["latest"]
+uv = { path = "locks/pypi-mypy/2.4.0", digest = "sha256:81d6cfc4e34b496a10d8dc2f2f9ef3c3facaa03772b7ba41ac9529cb13ea0551" }
 
 [[tools.python]]
 version = "3.15.0"
