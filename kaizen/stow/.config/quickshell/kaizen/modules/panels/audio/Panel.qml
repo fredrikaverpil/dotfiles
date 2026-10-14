@@ -60,8 +60,9 @@ Ui.Panel {
     onMicMutedChanged: syncMicLed()
     Component.onCompleted: syncMicLed()
 
+    // Selecting the current default would store it as the user's choice, ahead of an absent headset.
     function setDefault(node) {
-        if (node)
+        if (node && node !== sink)
             Pipewire.preferredDefaultAudioSink = node;
     }
 
