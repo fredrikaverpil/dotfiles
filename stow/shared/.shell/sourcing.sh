@@ -163,9 +163,11 @@ fi
 
 function cd() {
   builtin cd "$@" || return
-  virtual_env_activate
+
+  # Activate and sync uv virtual envs
+  # virtual_env_activate
 }
-cd . # trigger cd overrides when shell starts
+# cd . # trigger cd overrides when shell starts (disabled in favour for direnv + mise)
 
 function z() {
   __zoxide_z "$@" && cd . || return
