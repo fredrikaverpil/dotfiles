@@ -27,50 +27,50 @@ python = "latest"
 ruby = "latest"
 tree-sitter = "latest"
 
-# LSPs/linters/formatters: on macOS Mason installs them
-# (stow/shared/.config/nvim-fredrik/plugin/mason.lua). On NixOS Mason is
-# disabled — its prebuilt glibc binaries fail under stub-ld — so this
-# Linux-only list mirrors Mason's `ensure_installed`. Keep the two lists in
-# sync. Kept alphabetical by Mason name; the trailing comment is the
+# LSPs/linters/formatters, mirroring Mason's `ensure_installed`
+# (stow/shared/.config/nvim-fredrik/plugin/mason.lua). Mason is disabled on
+# NixOS and appends to PATH on macOS, so these come first. Keep the two lists
+# in sync. Kept alphabetical by Mason name; the trailing comment is the
 # language/tool. Not mirrored: codelldb/debugpy (no DAP adapter uses them),
-# rust-analyzer (rustup component), elixir-ls and nil (Nix).
-actionlint = { version = "latest", os = ["linux"] } # yaml (github actions)
-"go:github.com/googleapis/api-linter/v2/cmd/api-linter" = { version = "latest", os = ["linux"] } # protobuf
-"npm:basedpyright" = { version = "latest", os = ["linux"] } # python
-"npm:bash-language-server" = { version = "latest", os = ["linux"] } # bash
-biome = { version = "latest", os = ["linux"] } # json
-buf = { version = "latest", os = ["linux"] } # protobuf
-"go:github.com/go-delve/delve/cmd/dlv" = { version = "latest", os = ["linux"] } # go
-"npm:dockerfile-language-server-nodejs" = { version = "latest", os = ["linux"] } # docker
-"go:github.com/daixiang0/gci" = { version = "latest", os = ["linux"] } # go
-gofumpt = { version = "latest", os = ["linux"] } # go (golines runs it as --base-formatter)
-"go:golang.org/x/tools/cmd/goimports" = { version = "latest", os = ["linux"] } # go
-golangci-lint = { version = "latest", os = ["linux"] } # go
-golines = { version = "latest", os = ["linux"] } # go
-"go:golang.org/x/tools/gopls" = { version = "latest", os = ["linux"] } # go
-gotestsum = { version = "latest", os = ["linux"] } # go (neotest)
-"npm:graphql-language-service-cli" = { version = "latest", os = ["linux"] } # graphql
-hadolint = { version = "latest", os = ["linux"] } # docker
-"go:github.com/josharian/impl" = { version = "latest", os = ["linux"] } # go (go-impl.nvim)
-"npm:vscode-langservers-extracted" = { version = "latest", os = ["linux"] } # json (json-lsp)
-lua-language-server = { version = "latest", os = ["linux"] } # lua
-"npm:markdownlint-cli" = { version = "latest", os = ["linux"] } # markdown
-"pipx:mypy" = { version = "latest", os = ["linux"] } # python
-prettier = { version = "latest", os = ["linux"] } # typescript/javascript
-protolint = { version = "latest", os = ["linux"] } # protobuf
-ruff = { version = "latest", os = ["linux"] } # python
-rumdl = { version = "latest", os = ["linux"] } # markdown
-shellcheck = { version = "latest", os = ["linux"] } # bash (bashls runs it itself; not a nvim-lint linter)
-shfmt = { version = "latest", os = ["linux"] } # bash
-stylua = { version = "latest", os = ["linux"] } # lua
-superhtml = { version = "latest", os = ["linux"] } # html
-taplo = { version = "latest", os = ["linux"] } # toml
-"github:a-h/templ" = { version = "latest", os = ["linux"] } # templ
-terraform-ls = { version = "latest", os = ["linux"] } # terraform
-tflint = { version = "latest", os = ["linux"] } # terraform
-"github:ribru17/ts_query_ls" = { version = "latest", os = ["linux"] } # query
-"npm:@vtsls/language-server" = { version = "latest", os = ["linux"] } # typescript
-"npm:yaml-language-server" = { version = "latest", os = ["linux"] } # yaml
-yamlfmt = { version = "latest", os = ["linux"] } # yaml
-yamllint = { version = "latest", os = ["linux"] } # yaml
-zls = { version = "latest", os = ["linux"] } # zig
+# rust-analyzer (rustup component), elixir-ls and nil (Nix on NixOS, Mason on
+# macOS).
+actionlint = "latest" # yaml (github actions)
+"go:github.com/googleapis/api-linter/v2/cmd/api-linter" = "latest" # protobuf
+"npm:basedpyright" = "latest" # python
+"npm:bash-language-server" = "latest" # bash
+biome = "latest" # json
+buf = "latest" # protobuf
+"go:github.com/go-delve/delve/cmd/dlv" = "latest" # go
+"npm:dockerfile-language-server-nodejs" = "latest" # docker
+"go:github.com/daixiang0/gci" = "latest" # go
+gofumpt = "latest" # go (golines runs it as --base-formatter)
+"go:golang.org/x/tools/cmd/goimports" = "latest" # go
+golangci-lint = "latest" # go
+golines = "latest" # go
+"go:golang.org/x/tools/gopls" = "latest" # go
+gotestsum = "latest" # go (neotest)
+"npm:graphql-language-service-cli" = "latest" # graphql
+hadolint = "latest" # docker
+"go:github.com/josharian/impl" = "latest" # go (go-impl.nvim)
+"npm:vscode-langservers-extracted" = "latest" # json (json-lsp)
+lua-language-server = "latest" # lua
+"npm:markdownlint-cli" = "latest" # markdown
+"pipx:mypy" = "latest" # python
+prettier = "latest" # typescript/javascript
+protolint = "latest" # protobuf
+ruff = "latest" # python
+rumdl = "latest" # markdown
+shellcheck = "latest" # bash (bashls runs it itself; not a nvim-lint linter)
+shfmt = "latest" # bash
+stylua = "latest" # lua
+superhtml = "latest" # html
+taplo = "latest" # toml
+"github:a-h/templ" = "latest" # templ
+terraform-ls = "latest" # terraform
+tflint = "latest" # terraform
+"github:ribru17/ts_query_ls" = "latest" # query
+"npm:@vtsls/language-server" = "latest" # typescript
+"npm:yaml-language-server" = "latest" # yaml
+yamlfmt = "latest" # yaml
+yamllint = "latest" # yaml
+zls = "latest" # zig

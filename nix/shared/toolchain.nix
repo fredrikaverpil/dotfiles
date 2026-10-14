@@ -24,12 +24,11 @@
 # the commented-out entries; its shims come ahead of this list in Neovim and
 # this devshell. Only what mise cannot provide stays here.
 #
-# LSPs/linters/formatters: on macOS Mason installs them
+# LSPs/linters/formatters: mise provides most of Mason's `ensure_installed`
 # (stow/shared/.config/nvim-fredrik/plugin/mason.lua). On NixOS Mason is
 # disabled — its prebuilt glibc binaries fail under stub-ld — so the NixOS-only
-# list below, with mise's Linux-only list, mirrors Mason's `ensure_installed`.
-# Keep the lists in sync. `nixos` is passed by the caller: nothing in nixpkgs
-# distinguishes NixOS from other Linux.
+# list below holds the rest. Keep the lists in sync. `nixos` is passed by the
+# caller: nothing in nixpkgs distinguishes NixOS from other Linux.
 {
   stable,
   unstable,
