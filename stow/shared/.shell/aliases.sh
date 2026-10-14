@@ -26,7 +26,7 @@ alias pip-purge='pip list --format freeze | xargs pip uninstall -y'
 alias activate='source .venv/bin/activate'
 
 # Nix
-alias dev-toolchain='nix develop ~/.dotfiles#dev --command zsh' # enter the shared dev toolchain shell (nix/shared/toolchain.nix)
+alias dev-toolchain='nix develop ~/.dotfiles#dev --command zsh' # enter the shared dev toolchain shell (mise + nix/shared/toolchain.nix)
 
 # Gerrit
 # alias gerrit-push='git push origin HEAD:refs/for/master'
