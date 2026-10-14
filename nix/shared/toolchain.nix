@@ -32,7 +32,7 @@ with unstable;
   # buf # protobuf
   # delve # go
   # dockerfile-language-server # docker
-  elixir-ls # elixir
+  elixir-ls # elixir; needs the Elixir above
   # gci # go
   # gofumpt # go (golines runs it as --base-formatter)
   # gotools # go (goimports)
