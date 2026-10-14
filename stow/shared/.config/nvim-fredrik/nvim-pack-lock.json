@@ -191,7 +191,8 @@
     },
     "nvim-lspconfig": {
       "rev": "4d363f93c3581b9212a24f7a830d7590b3f050af",
-      "src": "https://github.com/neovim/nvim-lspconfig"
+      "src": "https://github.com/neovim/nvim-lspconfig",
+      "version": ">=0.0.0"
     },
     "nvim-nio": {
       "rev": "21f5324bfac14e22ba26553caf69ec76ae8a7662",
