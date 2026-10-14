@@ -1,13 +1,8 @@
-# The shared development toolchain, over what stays in Nix
-# (nix/shared/toolchain.nix). Neovim, the `claude` wrapper and the `dev`
-# devshell put mise's shims ahead of Nix's: a project's mise.toml shadows a tool
-# here, and a tool nothing here declares falls through to Nix.
-# Pin or update one tool with `mise use -g <tool>@<version>`; mise.lock locks
-# it for every platform. Run `mise install` after a change.
+# The shared development toolchain, always available in e.g. Neovim and Claude Code.
+# Complementing toolchain.nix where some tooling installed when not available via mise.
 
 [settings]
 lockfile = true
-# mise defaults to true on NixOS; nix-ld runs the precompiled binaries.
 all_compile = false
 
 # Precompiled only: fail rather than fall back to a slow source build.
@@ -22,18 +17,12 @@ compile = false
 
 [tools]
 go = "latest"
-node = "lts"           # npm for Mason packages (macOS), grammar.js for tree-sitter generate
+node = "lts"
 python = "latest"
 ruby = "latest"
 tree-sitter = "latest"
 
-# LSPs/linters/formatters, mirroring Mason's `ensure_installed`
-# (stow/shared/.config/nvim-fredrik/plugin/mason.lua). Mason is disabled on
-# NixOS and appends to PATH on macOS, so these come first. Keep the two lists
-# in sync. Kept alphabetical by Mason name; the trailing comment is the
-# language/tool. Not mirrored: codelldb/debugpy (no DAP adapter uses them),
-# rust-analyzer (rustup component), elixir-ls and nil (Nix on NixOS, Mason on
-# macOS).
+# LSPs, formatters, linters
 actionlint = "latest"                                              # yaml (github actions)
 "go:github.com/googleapis/api-linter/v2/cmd/api-linter" = "latest" # protobuf
 "npm:basedpyright" = "latest"                                      # python
