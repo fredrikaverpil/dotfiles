@@ -25,8 +25,8 @@ _G.Config = {
   use_workspace_diagnostics_plugin = false,
 }
 
--- Plugin files build paths from this at sourcing time (mason lockfile,
--- lint configs); without a fallback an unset env var crashes startup.
+-- Plugin files build paths from this at sourcing time (lint configs); without
+-- a fallback an unset env var crashes startup.
 vim.env.DOTFILES = vim.env.DOTFILES or vim.fs.normalize("~/.dotfiles")
 
 vim.g.mapleader = " "
