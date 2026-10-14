@@ -615,6 +615,7 @@ specifiers = ["latest"]
 
 [[tools."npm:yaml-language-server"]]
 version = "1.25.0"
+aube = { path = "locks/npm-yaml-language-server/1.25.0", digest = "sha256:ef75760496e2bf86d47dedca0f87fc232adcfce2ca92bdf3ff796635e708ddbd" }
 backend = "npm:yaml-language-server"
 specifiers = ["latest"]
 
@@ -626,6 +627,7 @@ uv = { path = "locks/pipx-mypy/2.4.0", digest = "sha256:b74a07a03f5a3d22f0dae46f
 
 [[tools.prettier]]
 version = "3.9.10"
+aube = { path = "locks/prettier/3.9.10", digest = "sha256:0a52cf3e98ebe971f9f0c338c08e668756d290a8d14fe3fd308251084fba1522" }
 backend = "npm:prettier"
 specifiers = ["latest"]
 
@@ -685,7 +687,7 @@ url = "https://github.com/astral-sh/python-build-standalone/releases/download/20
 provenance = "github-attestations"
 
 [tools.python."platforms.linux-x64"]
-checksum = "blake3:c2864b47f038fa84c83a94d908b3dfe3135976403a7a0c3cc25823b778ff240f"
+checksum = "sha256:46edc8f6fccade47dc38001ef2d4094d9cedd21a1863d9b44b2a02c1ee76b94d"
 url = "https://github.com/astral-sh/python-build-standalone/releases/download/20261009/cpython-3.15.0+20261009-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
