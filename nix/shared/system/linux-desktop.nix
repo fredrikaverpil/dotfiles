@@ -141,6 +141,7 @@ in
     '';
 
     environment.systemPackages = with pkgs; [
+      alsa-utils # For Claude Code's /voice.
       kdePackages.dolphin
       # Dolphin thumbnails for images and videos.
       kdePackages.kio-extras
