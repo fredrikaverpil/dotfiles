@@ -28,11 +28,11 @@ Stow commands:
   `stow/shared/.shell/bin/nvim` injects them into Neovim only. When running
   outside Neovim (e.g. Claude Code under Remote Control) and needing them, use
   the devshell: `nix develop ~/.dotfiles#dev -c <cmd>` (or enter with
-  `nix develop ~/.dotfiles#dev`). Defined once in `nix/shared/toolchain.nix`,
-  shared by the devshell and Neovim's `nvim-deps-path`. To pin or update one
-  tool, `mise use -g <tool>@<version>`
-  (`stow/shared/.config/mise/config.toml`): mise's shims shadow the Nix
-  toolchain in both, and fall through to it for unpinned tools.
+  `nix develop ~/.dotfiles#dev`). Mostly defined in the global mise config
+  (`stow/shared/.config/mise/config.toml`), whose shims come ahead of what
+  stays in `nix/shared/toolchain.nix` (Elixir, Nix tooling, rustup), in both
+  the devshell and Neovim. To pin or update one tool,
+  `mise use -g <tool>@<version>`, then `mise install`.
 
 ## Repository Architecture
 

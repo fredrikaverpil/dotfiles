@@ -148,7 +148,7 @@
                   channels.unstable.lib.optionalString channels.unstable.stdenv.hostPlatform.isDarwin ''
                     export PATH="$HOME/.local/share/nvim-fredrik/mason/bin:$PATH"
                   ''
-                  # mise pins shadow the toolchain and Mason, as in Neovim.
+                  # mise's toolchain comes ahead of Nix's and Mason, as in Neovim.
                   + ''
                     export PATH="$HOME/.local/share/mise/shims:$PATH"
                   '';

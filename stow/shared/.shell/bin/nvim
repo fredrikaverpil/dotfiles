@@ -53,8 +53,8 @@ else
   exit 1
 fi
 
-# mise pins shadow the Nix toolchain below; an unpinned tool's shim falls
-# through to it
+# mise's toolchain comes ahead of Nix's below; a shim for a tool mise does not
+# provide falls through to it
 export PATH="$PATH:$HOME/.local/share/mise/shims"
 
 # Inject Neovim build dependencies (managed by Nix, not on regular PATH)
