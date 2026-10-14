@@ -1,5 +1,5 @@
--- NixOS: tooling comes from nix/shared/toolchain.nix (Mason's prebuilt glibc
--- binaries fail under stub-ld).
+-- NixOS: tooling comes from mise and nix/shared/toolchain.nix (Mason's
+-- prebuilt glibc binaries fail under stub-ld).
 if vim.uv.fs_stat("/etc/NIXOS") then
   return
 end
