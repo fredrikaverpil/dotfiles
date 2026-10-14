@@ -183,46 +183,6 @@ checksum = "sha256:6b3da83a851ae87ed0edfad21421f78ab921e5f818a07ac95f30d941a30cc
 url = "https://github.com/a-h/templ/releases/download/v0.3.1070/templ_Windows_x86_64.tar.gz"
 url_api = "https://api.github.com/repos/a-h/templ/releases/assets/610064968"
 
-[[tools."github:googleapis/api-linter"]]
-version = "2.4.0"
-backend = "github:googleapis/api-linter"
-specifiers = ["latest"]
-
-[tools."github:googleapis/api-linter"."platforms.linux-arm64"]
-checksum = "sha256:67045ba5971f232e6c1e533c227722a4a9bb7854cc953db1fa6d2f9412a1a08d"
-url = "https://github.com/googleapis/api-linter/releases/download/v2.4.0/api-linter.tar.gz"
-url_api = "https://api.github.com/repos/googleapis/api-linter/releases/assets/555459899"
-
-[tools."github:googleapis/api-linter"."platforms.linux-arm64-musl"]
-checksum = "sha256:67045ba5971f232e6c1e533c227722a4a9bb7854cc953db1fa6d2f9412a1a08d"
-url = "https://github.com/googleapis/api-linter/releases/download/v2.4.0/api-linter.tar.gz"
-url_api = "https://api.github.com/repos/googleapis/api-linter/releases/assets/555459899"
-
-[tools."github:googleapis/api-linter"."platforms.linux-x64"]
-checksum = "sha256:67045ba5971f232e6c1e533c227722a4a9bb7854cc953db1fa6d2f9412a1a08d"
-url = "https://github.com/googleapis/api-linter/releases/download/v2.4.0/api-linter.tar.gz"
-url_api = "https://api.github.com/repos/googleapis/api-linter/releases/assets/555459899"
-
-[tools."github:googleapis/api-linter"."platforms.linux-x64-musl"]
-checksum = "sha256:67045ba5971f232e6c1e533c227722a4a9bb7854cc953db1fa6d2f9412a1a08d"
-url = "https://github.com/googleapis/api-linter/releases/download/v2.4.0/api-linter.tar.gz"
-url_api = "https://api.github.com/repos/googleapis/api-linter/releases/assets/555459899"
-
-[tools."github:googleapis/api-linter"."platforms.macos-arm64"]
-checksum = "sha256:67045ba5971f232e6c1e533c227722a4a9bb7854cc953db1fa6d2f9412a1a08d"
-url = "https://github.com/googleapis/api-linter/releases/download/v2.4.0/api-linter.tar.gz"
-url_api = "https://api.github.com/repos/googleapis/api-linter/releases/assets/555459899"
-
-[tools."github:googleapis/api-linter"."platforms.macos-x64"]
-checksum = "sha256:67045ba5971f232e6c1e533c227722a4a9bb7854cc953db1fa6d2f9412a1a08d"
-url = "https://github.com/googleapis/api-linter/releases/download/v2.4.0/api-linter.tar.gz"
-url_api = "https://api.github.com/repos/googleapis/api-linter/releases/assets/555459899"
-
-[tools."github:googleapis/api-linter"."platforms.windows-x64"]
-checksum = "sha256:67045ba5971f232e6c1e533c227722a4a9bb7854cc953db1fa6d2f9412a1a08d"
-url = "https://github.com/googleapis/api-linter/releases/download/v2.4.0/api-linter.tar.gz"
-url_api = "https://api.github.com/repos/googleapis/api-linter/releases/assets/555459899"
-
 [[tools."github:ribru17/ts_query_ls"]]
 version = "3.16.0"
 backend = "github:ribru17/ts_query_ls"
@@ -304,6 +264,11 @@ specifiers = ["latest"]
 [[tools."go:github.com/go-delve/delve/cmd/dlv"]]
 version = "1.27.2"
 backend = "go:github.com/go-delve/delve/cmd/dlv"
+specifiers = ["latest"]
+
+[[tools."go:github.com/googleapis/api-linter/v2/cmd/api-linter"]]
+version = "2.4.0"
+backend = "go:github.com/googleapis/api-linter/v2/cmd/api-linter"
 specifiers = ["latest"]
 
 [[tools."go:github.com/josharian/impl"]]
