@@ -133,7 +133,7 @@ fi
 if [ -n "$brew_prefix" ] || [ -d "/nix/store" ]; then
   eval "$(atuin init "$shell" --disable-up-arrow)"
   eval "$(direnv hook "$shell")"
-  # eval "$(mise activate "$shell")"  # use direnv to activate mise in projects instead
+  eval "$(mise activate "$shell")"
   eval "$(zoxide init "$shell")"
   eval "$(starship init "$shell")"
 
@@ -167,7 +167,7 @@ function cd() {
   # Activate and sync uv virtual envs
   # virtual_env_activate
 }
-# cd . # trigger cd overrides when shell starts (disabled in favour for direnv + mise)
+# cd . # trigger cd overrides when shell starts (disabled; mise activate handles venvs)
 
 function z() {
   __zoxide_z "$@" && cd . || return
