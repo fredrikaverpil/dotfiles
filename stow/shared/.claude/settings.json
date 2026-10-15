@@ -99,6 +99,7 @@
       "effortLevel": "medium"
     }
   },
+  "idleCompaction": false,
   "showClearContextOnPlanAccept": true,
   "tui": "fullscreen",
   "showThinkingSummaries": true,
