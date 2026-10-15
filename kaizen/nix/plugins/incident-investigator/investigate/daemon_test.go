@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -82,6 +83,7 @@ func TestCombine(t *testing.T) {
 
 func TestDraft(t *testing.T) {
 	const link = "https://console.cloud.google.com/monitoring/alerting/alerts/0.abc?project=p-dev"
+	const body = "Fired {project_id=my-project-dev}\nView alert"
 	for _, tt := range []struct {
 		name    string
 		req     request
@@ -94,6 +96,15 @@ func TestDraft(t *testing.T) {
 			want: &Investigation{
 				Status: "draft", Tag: "dev", Projects: []string{"p-dev"}, Notes: link,
 				Alert:    &Alert{App: "Slack", Body: "<" + link + "|View alert>"},
+				Messages: []claude.Message{}, Entities: []claude.Entity{},
+			},
+		},
+		{
+			name: "an alert without a link becomes the notes and its projects the projects",
+			req:  request{Verb: "draft", Tag: "dev", Alert: &Alert{App: "Slack", Body: body}},
+			want: &Investigation{
+				Status: "draft", Tag: "dev", Projects: []string{"my-project-dev"}, Notes: body,
+				Alert:    &Alert{App: "Slack", Body: body},
 				Messages: []claude.Message{}, Entities: []claude.Entity{},
 			},
 		},
@@ -111,7 +122,14 @@ func TestDraft(t *testing.T) {
 		},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
-			d := &daemon{tags: []Tag{{"dev", "water"}}, state: t.TempDir(), items: map[string]*Investigation{}}
+			d := &daemon{
+				config: config{
+					tags:            []Tag{{"dev", "water"}},
+					projectPatterns: []*regexp.Regexp{regexp.MustCompile(`project_id=([\w-]+)`)},
+				},
+				state: t.TempDir(),
+				items: map[string]*Investigation{},
+			}
 
 			id, err := d.draft(tt.req)
 
@@ -378,6 +396,7 @@ func TestReadConfig(t *testing.T) {
 		InstructionFiles []string
 		Tags             []Tag
 		Patterns         []pattern
+		ProjectPatterns  []string
 	}
 	builtIn := []pattern{
 		{"user", `\busers/([A-Za-z0-9][A-Za-z0-9_.|@~-]*)`},
@@ -398,6 +417,7 @@ func TestReadConfig(t *testing.T) {
 				"instructionFiles": ["/etc/org.md",],
 				"tags": [{"name": "prod", "color": "rose"}],
 				"entityPatterns": [{"kind": "user", "regex": "member_id=(\\w+)"}],
+				"projectPatterns": ["project_id=([\\w-]+)"],
 			}`,
 			want: result{
 				ClaudeConfigDir:  "/home/me/.claude-work",
@@ -405,6 +425,7 @@ func TestReadConfig(t *testing.T) {
 				InstructionFiles: []string{"/etc/org.md"},
 				Tags:             []Tag{{"prod", "rose"}},
 				Patterns:         append(builtIn, pattern{"user", `member_id=(\w+)`}),
+				ProjectPatterns:  []string{`project_id=([\w-]+)`},
 			},
 		},
 		{
@@ -429,6 +450,16 @@ func TestReadConfig(t *testing.T) {
 			file:    `{"claudeConfigDir": "/c", "entityPatterns": [{"kind": "user", "regex": "("}]}`,
 			wantErr: "entity pattern",
 		},
+		{
+			name:    "a project pattern without a group",
+			file:    `{"claudeConfigDir": "/c", "projectPatterns": ["project_id"]}`,
+			wantErr: "want a group",
+		},
+		{
+			name:    "an invalid project pattern",
+			file:    `{"claudeConfigDir": "/c", "projectPatterns": ["("]}`,
+			wantErr: "project pattern",
+		},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			path := filepath.Join(t.TempDir(), "config.jsonc")
@@ -449,6 +480,9 @@ func TestReadConfig(t *testing.T) {
 			}
 			for _, p := range cfg.entityPatterns {
 				got.Patterns = append(got.Patterns, pattern{p.Kind, p.Regexp.String()})
+			}
+			for _, re := range cfg.projectPatterns {
+				got.ProjectPatterns = append(got.ProjectPatterns, re.String())
 			}
 			assert.DeepEqual(t, got, tt.want)
 		})
@@ -482,6 +516,29 @@ func TestGCPAlertLink(t *testing.T) {
 			gotLink, gotProject := gcpAlertLink(tt.text)
 
 			assert.DeepEqual(t, result{gotLink, gotProject}, tt.want)
+		})
+	}
+}
+
+func TestAlertProjects(t *testing.T) {
+	patterns := []*regexp.Regexp{regexp.MustCompile(`project=(\w+)`), regexp.MustCompile(`in (\w+)\.`)}
+	for _, tt := range []struct {
+		name string
+		text string
+		want []string
+	}{
+		{name: "one", text: "{project=a}", want: []string{"a"}},
+		{
+			name: "distinct, by pattern, then in order",
+			text: "in c. {project=b} {project=a} {project=b}",
+			want: []string{"b", "a", "c"},
+		},
+		{name: "none", text: "CPU high", want: []string{}},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			got := alertProjects(tt.text, patterns)
+
+			assert.DeepEqual(t, got, tt.want)
 		})
 	}
 }

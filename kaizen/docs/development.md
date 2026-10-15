@@ -91,9 +91,9 @@ upstream's latest, and niri marks each option with the version it arrived in
   dismissed or dropped untracked under DnD.
 - `notify-send -a <app> <summary> <body>` fakes an app's notification, to try a
   notification rule without waiting for the real one, for example
-  `notify-send -a Slack "[workspace] in #alerts" "<https://example.com|View>"`.
+  `notify-send -a Slack "[workspace] in #alerts" $'Error rate high\nView alert'`.
   It carries only what you pass, so copy the summary and body from a captured
-  one.
+  one: Slack's body is plain text, a link only its label.
 - `kaizen status` prints the shell's state, one `key value` line per fact or
   one JSON document with `--json`: the unit's state and PID, whether
   `kaizen dev` runs it, whether it answers IPC (`error` says why not), and

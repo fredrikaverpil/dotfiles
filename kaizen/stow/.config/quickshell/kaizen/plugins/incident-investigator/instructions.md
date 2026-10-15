@@ -37,6 +37,16 @@ gcloud monitoring policies describe POLICY --format 'json(displayName,conditions
 `POLICY` is the alert's `policy.name`. The alert's `openTime` and `resource`,
 and the policy's condition filter, bound the log search.
 
+Given an alert's text without its URL, as Slack relays it, list the alerts
+opened from shortly before the time it names (`START`, RFC 3339; a day ago when
+it names none), match it by resource and policy, then read it as above. Say in
+the report when none matches.
+
+```sh
+gcloud alpha monitoring alerts list --project P --filter 'open_time>="START"' \
+  --format 'json(name,state,openTime,policy.displayName,resource.labels)'
+```
+
 1. List the project's log buckets:
 
    ```sh
