@@ -5,5 +5,6 @@
   },
   "permissions": {
     "deny": ["Read(//**/.env)", "Read(//**/.env.*)", "Read(//**/.envrc)"]
-  }
+  },
+  "idleCompaction": false
 }
