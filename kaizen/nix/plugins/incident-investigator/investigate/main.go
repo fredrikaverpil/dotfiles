@@ -32,10 +32,10 @@ const usage = `usage: investigate <verb> [args]
   serve [-config FILE] [-dir DIR] [-tool-path PATH] [-go-mod-cache DIR]
                                  run the daemon in STATE_DIRECTORY; the config (JSONC, default
                                  ~/.config/kaizen/plugins/incident-investigator.jsonc) holds the Claude Code profile,
-                                 source dirs, instruction files, tags and entity patterns, the plugin's dir (default
-                                 ~/.config/quickshell/kaizen/plugins/incident-investigator) its instructions.md and the
-                                 claude-plugin/ serving gopls, and the tool path (go, gopls) and module cache
-                                 (default: go env GOMODCACHE) serve the LSP
+                                 source dirs, instruction files, tags, entity and project patterns, the plugin's
+                                 dir (default ~/.config/quickshell/kaizen/plugins/incident-investigator) its
+                                 instructions.md and the claude-plugin/ serving gopls, and the tool path (go, gopls)
+                                 and module cache (default: go env GOMODCACHE) serve the LSP
   draft [-tag T]                 create a draft from NOTIFICATION_* and INVESTIGATE_TAG, show it in the window;
                                  a failure shows a notification
   edit ID [-projects P,Q] [-tag T] [-trace-id T] [-notes N]
@@ -211,7 +211,7 @@ func runServe(logger *slog.Logger, socket string, args []string) error {
 	configFile := flags.String(
 		"config",
 		filepath.Join(configDir, "kaizen", "plugins", "incident-investigator.jsonc"),
-		"JSONC file with the profile, source dirs, instruction files, tags and entity patterns",
+		"JSONC file with the profile, source dirs, instruction files, tags, entity and project patterns",
 	)
 	dir := flags.String(
 		"dir",
@@ -247,7 +247,8 @@ func runServe(logger *slog.Logger, socket string, args []string) error {
 }
 
 // readConfig reads the -config file: the profile, the source dirs, the instruction files after the plugin's own,
-// the tags, and the entity patterns besides the built-in ones. A path is absolute or starts with ~/.
+// the tags, the entity patterns besides the built-in ones, and the project patterns. A path is absolute or starts
+// with ~/.
 func readConfig(path string) (config, error) {
 	var file struct {
 		ClaudeConfigDir  string   `json:"claudeConfigDir"`
@@ -258,6 +259,7 @@ func readConfig(path string) (config, error) {
 			Kind  string `json:"kind"`
 			Regex string `json:"regex"`
 		} `json:"entityPatterns"`
+		ProjectPatterns []string `json:"projectPatterns"`
 	}
 	// Never null in settings.json.
 	file.Tags = []Tag{}
@@ -305,6 +307,16 @@ func readConfig(path string) (config, error) {
 			return config{}, fmt.Errorf("entity pattern %q: want a group around the id", p.Regex)
 		}
 		cfg.entityPatterns = append(cfg.entityPatterns, claude.EntityPattern{Kind: p.Kind, Regexp: re})
+	}
+	for _, p := range file.ProjectPatterns {
+		re, err := regexp.Compile(p)
+		if err != nil {
+			return config{}, fmt.Errorf("project pattern: %v", err)
+		}
+		if re.NumSubexp() == 0 {
+			return config{}, fmt.Errorf("project pattern %q: want a group around the project", p)
+		}
+		cfg.projectPatterns = append(cfg.projectPatterns, re)
 	}
 	return cfg, nil
 }

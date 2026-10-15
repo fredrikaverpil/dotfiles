@@ -41,6 +41,10 @@ path is absolute or starts with `~/`.
       "regex": "(?i)my[_-]?user[_-]?id\\W{1,8}([A-Za-z0-9_.-]+)",
     },
   ],
+
+  // Projects in an alert's text that has no GCP alert link; the first group is
+  // the project.
+  "projectPatterns": ["\\bproject_id=([a-z][a-z0-9-]{4,28}[a-z0-9])\\b"],
 }
 ```
 
@@ -51,6 +55,7 @@ path is absolute or starts with `~/`.
 | `instructionFiles` | `[]` | system prompt additions after `instructions.md` |
 | `tags` | `[]` | `name`, and `color`, a palette role |
 | `entityPatterns` | `[]` | `kind` (`user`, `organization`) and a regex whose first group is the id |
+| `projectPatterns` | `[]` | regexes whose first group is a project, read from an alert without a link |
 
 An unknown field, or a missing or invalid file, stops the daemon from starting,
 and `kaizen doctor` lists the reason.
@@ -175,7 +180,9 @@ flowchart LR
 2. The client sends `draft` over the socket. The daemon creates the draft,
    writes it to the state files and answers with its id. A GCP alert or
    incident URL in the body becomes the notes, and its `project` parameter the
-   project.
+   project. Slack sends a link's text without its URL; then the body becomes
+   the notes, what `projectPatterns` find in it the projects, and the run finds
+   the alert by the time, resource and policy the text names.
 3. The client runs `kaizen ipc call incident-investigator reveal <id>`. The
    window opens with the draft selected.
 4. You fill in the projects, trace id, notes and tag (`investigate edit`) and
@@ -192,7 +199,7 @@ To try the flow without a real alert, fake a toast that an alert rule matches:
 
 ```sh
 notify-send -a Slack "[workspace] in #alerts-dev" \
-  "<https://console.cloud.google.com/monitoring/alerting/alerts/ID?project=my-project-dev|View alert>"
+  $'Fired for Cloud Run Revision with {project_id=my-project-dev}.\nView alert'
 ```
 
 ## Read-only runs

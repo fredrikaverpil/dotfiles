@@ -105,6 +105,8 @@ type config struct {
 	tags                 []Tag
 	// entityPatterns find the ids listed as entities.
 	entityPatterns []claude.EntityPattern
+	// projectPatterns find the projects in an alert without a link; the first group is the project.
+	projectPatterns []*regexp.Regexp
 }
 
 type daemon struct {
@@ -223,11 +225,17 @@ func (d *daemon) draft(req request) (string, error) {
 		Entities:  []claude.Entity{},
 	}
 	if req.Alert != nil {
-		if link, project := gcpAlertLink(req.Alert.Body); link != "" {
+		link, project := gcpAlertLink(req.Alert.Body)
+		switch {
+		case link != "":
 			inv.Notes = link
 			if project != "" {
 				inv.Projects = []string{project}
 			}
+		default:
+			// Slack sends a link's text without its URL; the run finds the alert from the text.
+			inv.Notes = req.Alert.Body
+			inv.Projects = alertProjects(req.Alert.Body, d.projectPatterns)
 		}
 	}
 	d.items[inv.ID] = inv
@@ -244,6 +252,19 @@ func gcpAlertLink(text string) (link, project string) {
 		project = u.Query().Get("project")
 	}
 	return link, project
+}
+
+// alertProjects are the distinct projects that patterns find in text, by pattern, then in order.
+func alertProjects(text string, patterns []*regexp.Regexp) []string {
+	projects := []string{}
+	for _, re := range patterns {
+		for _, m := range re.FindAllStringSubmatch(text, -1) {
+			if !slices.Contains(projects, m[1]) {
+				projects = append(projects, m[1])
+			}
+		}
+	}
+	return projects
 }
 
 func (d *daemon) newID() string {
