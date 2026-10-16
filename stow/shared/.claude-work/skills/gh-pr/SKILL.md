@@ -1,1 +1,0 @@
-../../../.claude/skills/gh-pr/SKILL.md

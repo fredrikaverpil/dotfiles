@@ -504,11 +504,8 @@ Use a separate Claude config dir for work contexts (different settings, skills,
 commands). Add to `~/code/private/<workplace>/.envrc`:
 
 ```sh
-export CLAUDE_CONFIG_DIR="/Users/fredrik/.claude-work"
+export CLAUDE_CONFIG_DIR="$HOME/.claude-work"
 ```
-
-This switches Claude Code to use `~/.claude-work/` (synced from
-`stow/shared/.claude-work/` via Stow) when working in that directory.
 
 ```sh
 # you can import mcp servers from claude desktop, into ~/.claude.json
