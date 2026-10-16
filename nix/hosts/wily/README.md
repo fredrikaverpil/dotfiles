@@ -2,16 +2,15 @@
 
 Work machine (Lenovo 21QG006CMX). The niri + Quickshell desktop it runs is
 shared with `renoir` and documented in `kaizen/README.md`.
-Work-only configuration lives in the private
-`fredrikaverpil/dotfiles-einride` repo, mounted as the git submodule `einride/`
-and imported by `configuration.nix` only when checked out.
+Work-only configuration lives in a private repo, mounted as a git submodule and
+imported by `configuration.nix` only when checked out.
 
 ## Rebuilding
 
 Flakes copy the tree from `git ls-files`, which lists the submodule pointer
-but not its contents, so a plain flake reference sees `private/` as an empty
-directory and silently builds the host without the work config. The flake
-reference has to ask for submodules:
+but not its contents, so a plain flake reference sees the private submodule as
+an empty directory and silently builds the host without the work config. The
+flake reference has to ask for submodules:
 
 ```sh
 nh os switch                                                        # normal

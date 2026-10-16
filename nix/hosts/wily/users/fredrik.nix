@@ -72,7 +72,7 @@ in
   };
 
   programs = {
-    # `?submodules=1` pulls in the private submodule at nix/hosts/wily/einride;
+    # `?submodules=1` pulls in the private submodule;
     # `inputs.self.submodules` cannot be used, it makes public clones and CI
     # try to fetch the private repo.
     nh.flake = lib.mkForce "${config.home.homeDirectory}/.dotfiles?submodules=1";

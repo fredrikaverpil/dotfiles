@@ -75,7 +75,7 @@ QML, which plugins run, and the notification rules.
 | The shell's niri config, session variables, units and scripts, the shell's QML, the core's notification rules | [`kaizen/stow/`](stow/) | every kaizen host |
 | Plugin QML: generic or reusable | [`kaizen/stow/.config/quickshell/kaizen/plugins/<name>/`](stow/.config/quickshell/kaizen/plugins/) | every kaizen host |
 | Plugin QML: specific to one host | `stow/host/<host>/.config/kaizen/plugins/<name>/` | that host |
-| Which plugins run, with their config | `stow/host/<host>/.config/kaizen/plugins/<name>.jsonc`, or in a private submodule's `stow/` such as wily's `einride` | that host |
+| Which plugins run, with their config | `stow/host/<host>/.config/kaizen/plugins/<name>.jsonc`, or in the `stow/` of a host's private submodule | that host |
 | A plugin's unit: generic or reusable | [`kaizen/stow/.config/systemd/user/`](stow/.config/systemd/user/) | every kaizen host that enables the plugin |
 | A plugin's unit: specific to one host | `stow/host/<host>/.config/systemd/user/` | that host |
 | A plugin's daemon and packages | `kaizen/nix/plugins/<name>/`, `nix/hosts/<host>/kaizen-plugins/<name>/` | the hosts importing it |
