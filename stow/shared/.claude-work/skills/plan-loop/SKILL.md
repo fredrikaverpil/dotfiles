@@ -1,1 +1,0 @@
-../../../.claude/skills/plan-loop/SKILL.md
