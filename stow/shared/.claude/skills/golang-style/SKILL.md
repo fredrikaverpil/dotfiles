@@ -72,8 +72,7 @@ Never shadow a predeclared identifier with a variable or parameter name — not
 or any other builtin function, constant, or type. Pick a descriptive name
 instead: `length` over `len`, `dataCopy` over `copy`.
 
-## Einride
+## Sage
 
-If the project is under the Einride organization, run tasks through the
-project's Sage-generated Makefiles (the `.sage` folder) rather than invoking
-`go` directly.
+If the project has a `.sage` folder (Sage is used), run tasks through the
+Sage-generated Makefiles rather than invoking `go` directly.
