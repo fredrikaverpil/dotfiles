@@ -7,6 +7,12 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "cli_default_open_behavior": "existing_window",
+  "icon_theme": {
+    "mode": "system",
+    "light": "Zed (Default)",
+    "dark": "Zed (Default)"
+  },
   "diff_view_style": "split",
   "agent_servers": {
     "pi-acp": {
@@ -43,7 +49,7 @@
   "buffer_font_size": 16.0,
   "theme": {
     "mode": "system",
-    "light": "Atelier Forest Light",
-    "dark": "Tokyo Night Storm"
+    "light": "Gruvbox Light",
+    "dark": "Gruvbox Dark"
   }
 }
