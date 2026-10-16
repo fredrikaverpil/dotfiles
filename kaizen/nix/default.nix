@@ -61,6 +61,14 @@ in
             # TODO: drop once a Quickshell release handles it.
             # https://github.com/quickshell-mirror/quickshell/issues/862
             ./quickshell-optional-property-failed.patch
+
+            # NOTE: WlSessionLock checks isLocked() after releasing the lock, so it emits no
+            # lockStateChanged on unlock and `locked` stays true in QML: a lock the compositor
+            # ends leaves the lock service stuck as locked. The patch checks it before.
+            # TODO: drop once a Quickshell release emits it.
+            # https://github.com/quickshell-mirror/quickshell/issues/1230
+            # https://github.com/quickshell-mirror/quickshell/pull/1289
+            ./quickshell-session-lock-unlock.patch
           ];
         });
       })

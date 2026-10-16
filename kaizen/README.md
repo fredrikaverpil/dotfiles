@@ -164,7 +164,8 @@ portal dialog. It cannot check:
 - The fonts in [`fonts.nix`](nix/fonts.nix) the shell does not name.
 - Quickshell with the [overlay's patches](nix/default.nix) (without them,
   every Quickshell start logs a host portal warning, and an Electron app's tray
-  icon a property warning, that `kaizen doctor` reports), and
+  icon a property warning, that `kaizen doctor` reports, and a lock the
+  compositor ends leaves the lock service stuck as locked), and
   `investigate` with go and gopls on its PATH for the incident investigator.
 - The `kaizen` command: [`kaizen/cli/build.sh`](cli/build.sh) installs it
   as `~/.local/bin/kaizen` with the host's Go, or
