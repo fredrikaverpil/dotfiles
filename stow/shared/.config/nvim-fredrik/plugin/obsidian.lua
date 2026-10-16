@@ -67,11 +67,11 @@ require("lazyload").on_vim_enter(function()
     legacy_commands = false,
   })
 
-  -- The vault follows the cwd: work notes when in einride* repos, personal elsewhere.
+  -- The vault follows the cwd: work notes when in work repos, personal elsewhere.
   -- Re-evaluated on every keymap so changing directory changes the vault.
   local function vault_for_cwd()
     local cwd = vim.fn.getcwd()
-    -- Match any einride-prefixed org (einride, einride-labs, etc.) in public or private
+    -- Match any work org (they share a prefix) in public or private
     if cwd:match("/github%.com/einride[^/]*/") then
       return "work"
     else
