@@ -1,0 +1,13 @@
+--- a/src/wayland/session_lock.cpp
++++ b/src/wayland/session_lock.cpp
+@@ -179,8 +179,9 @@ void WlSessionLock::unlock() {
+
+ 	this->surfaces.clear();
+
++	auto wasLocked = this->isLocked();
+ 	if (this->manager) this->manager->unlock();
+-	if (this->isLocked()) emit this->lockStateChanged();
++	if (wasLocked) emit this->lockStateChanged();
+ }
+
+ void WlSessionLock::onScreensChanged() {
