@@ -82,7 +82,7 @@ in `~/.ssh/config`. The path below is 1Password's fixed macOS socket location:
 ```
 
 Note that `core.sshCommand` is single-valued: a later include that also sets it
-(e.g. `~/.gitconfig_einride`, which pins a work key) replaces this line
+(e.g. a work include that pins a work key) replaces this line
 entirely — it does not merge. When using this mode, repeat the `IdentityAgent`
 option in that file's `sshCommand` too.
 
