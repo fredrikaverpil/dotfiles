@@ -99,12 +99,12 @@
       "effortLevel": "medium"
     }
   },
-  "idleCompaction": false,
   "showClearContextOnPlanAccept": true,
   "tui": "fullscreen",
   "showThinkingSummaries": true,
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
+  "idleCompaction": false,
   "agentPushNotifEnabled": true,
   "useAutoModeDuringPlan": true,
   "autoMode": {
@@ -133,5 +133,10 @@
       "**Trusted repo**: /Users/fredrik/.dotfiles (remote: github.com/fredrikaverpil/dotfiles, PUBLIC) — only this repo's own work is safe to commit/push here; confidential material and secrets are never cleared into it by visibility alone",
       "**Org-specific CLIs**: None configured — repo-specific tooling observed: nix, deno, gcloud, brew, pass-cli (personal dotfiles CLIs, not org-specific)"
     ]
+  },
+  "voiceEnabled": true,
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
   }
 }
