@@ -163,7 +163,7 @@ override applies to every project below it:
 ```toml
 # ~/code/private/<workplace>/mise.toml
 #
-# mdformat, with the plugins pinned by einride/sage
+# mdformat, with the plugins pinned by Sage
 # (tools/sgmdformat/requirements.txt)
 [tools]
 "pypi:mdformat" = { version = "latest", with = [
