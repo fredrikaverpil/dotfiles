@@ -6,9 +6,8 @@
     ../../../kaizen/nix/plugins/calendar
     ../../shared/system/thinkpad.nix
   ]
-  # Work-only config from the private dotfiles-einride submodule; an
-  # uninitialised submodule is an empty directory, so public clones and CI
-  # evaluate without it.
+  # Work-only config from the private submodule; an uninitialised submodule
+  # is an empty directory, so public clones and CI evaluate without it.
   ++ lib.optional (builtins.pathExists ./einride/default.nix) ./einride/default.nix;
 
   # The trees stow.sh links here; their plugins are checked at build.
