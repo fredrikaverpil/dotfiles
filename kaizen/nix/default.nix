@@ -39,25 +39,27 @@ in
   ];
 
   config = {
-    # NOTE: Quickshell sets the app ID (Qt's desktop file name) after constructing the app,
-    # so Qt queues its host portal registration. The gtk3 platform theme reads the portal's
-    # settings first, which ties the connection to no app ID, and xdg-desktop-portal then
-    # refuses the registration: "Connection already associated with an application ID",
-    # logged at every start of the shell and of dcal's UI. The patch sets it before.
-    # TODO: drop once a Quickshell release sets the app ID before constructing the app.
-    # https://github.com/quickshell-mirror/quickshell/issues/1293
-    #
-    # NOTE: Quickshell logs a failed Get of an optional D-Bus property at debug level only
-    # for InvalidArgs. Chromium's StatusNotifierItem (Electron apps: Slack, gitify) lacks
-    # IconName and IconThemePath and answers their Get with Failed, which Quickshell logs
-    # as a warning on every icon change. The patch treats Failed as InvalidArgs.
-    # TODO: drop once a Quickshell release handles it.
-    # https://github.com/quickshell-mirror/quickshell/issues/862
     nixpkgs.overlays = [
       (_final: prev: {
         quickshell = prev.quickshell.overrideAttrs (old: {
           patches = (old.patches or [ ]) ++ [
+            # NOTE: Quickshell sets the app ID (Qt's desktop file name) after constructing the
+            # app, so Qt queues its host portal registration. The gtk3 platform theme reads the
+            # portal's settings first, which ties the connection to no app ID, and
+            # xdg-desktop-portal then refuses the registration: "Connection already associated
+            # with an application ID", logged at every start of the shell and of dcal's UI. The
+            # patch sets it before.
+            # TODO: drop once a Quickshell release sets the app ID before constructing the app.
+            # https://github.com/quickshell-mirror/quickshell/issues/1293
             ./quickshell-desktop-file-name.patch
+
+            # NOTE: Quickshell logs a failed Get of an optional D-Bus property at debug level
+            # only for InvalidArgs. Chromium's StatusNotifierItem (Electron apps: Slack, gitify)
+            # lacks IconName and IconThemePath and answers their Get with Failed, which
+            # Quickshell logs as a warning on every icon change. The patch treats Failed as
+            # InvalidArgs.
+            # TODO: drop once a Quickshell release handles it.
+            # https://github.com/quickshell-mirror/quickshell/issues/862
             ./quickshell-optional-property-failed.patch
           ];
         });
