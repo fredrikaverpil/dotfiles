@@ -59,11 +59,6 @@
 [include]
 	path = ~/.gitconfig_signing
 
-# Always keep gitconfig for work at bottom of this file
-[includeIf "hasconfig:remote.*.url:git@github.com:einride*/**"]
-	path = ~/.gitconfig_einride
-[includeIf "hasconfig:remote.*.url:https://github.com/einride*/**"]
-	path = ~/.gitconfig_einride
-[includeIf "hasconfig:remote.*.url:ssh://git@github.com/einride*/**"]
-	path = ~/.gitconfig_einride
-
+# Optional work config; keep last so it overrides the above
+[include]
+	path = ~/.gitconfig_work
