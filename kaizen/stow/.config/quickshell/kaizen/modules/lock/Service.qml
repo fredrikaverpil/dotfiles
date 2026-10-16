@@ -83,12 +83,15 @@ Item {
     }) + "\n")
     onPasswordPamConfiguredChanged: restoreLock()
 
+    // Releases sessionLock before lockRequested, so `locked` re-reads it
+    // released: Quickshell 0.3.2 emits no lockStateChanged on unlock
+    // (quickshell#1230).
     function finishUnlock() {
         if (passwordPam.active)
             passwordPam.abort();
-        applyAuthState(Model.unlocked(authState()));
         blankTimer.stop();
         sessionLock.locked = false;
+        applyAuthState(Model.unlocked(authState()));
         wake();
     }
 
