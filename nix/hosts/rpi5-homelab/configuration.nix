@@ -57,6 +57,10 @@ in {
   # interactive login session.
   users.users.fredrik.linger = true;
 
+  # Compressed swap in RAM, so large local builds (e.g. Rust packages missing
+  # from the binary cache) slow down instead of hanging the Pi
+  zramSwap.enable = true;
+
   # Wireless network configuration
   # Use NetworkManager with wpa_supplicant backend for better Pi stability under load
   networking.wireless.iwd.enable = false; # Disable iwd (less stable on Pi under load)
