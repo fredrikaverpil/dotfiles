@@ -1,11 +1,15 @@
 # shellcheck shell=sh
-# uwsm sources this at the start of a session named kaizen in its DesktopNames
-# (kaizen.desktop) and exports it to the user manager, which units, niri and
-# what they launch inherit. Sourced, so every variable needs `export`.
+# uwsm reads this file when a kaizen session starts and gives these variables
+# to every program in the session.
 
-# GTK3 needs the portal to follow the dconf theme; Qt uses the GTK platform theme.
+# GTK 3 apps get dark mode and the theme from the portal, even when they cannot
+# read GNOME's settings themselves, and open its file picke
 export GTK_USE_PORTAL=1
+
+# Qt apps copy their look from GTK: dark or light, colours, fonts and icons.
+# Without it they stay light and show no themed icon
 export QT_QPA_PLATFORMTHEME=gtk3
-# nixpkgs' Chromium and Electron wrappers add their Wayland flags; elsewhere,
-# Electron picks Wayland from XDG_SESSION_TYPE.
+
+# This tells older Electron apps from nixpkgs to run as real Wayland
+# apps instead of through Xwayland, which looks blurry on scaled screens.
 export NIXOS_OZONE_WL=1
