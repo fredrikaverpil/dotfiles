@@ -97,7 +97,7 @@ in
       bfs
       devbox
       devenv
-      mise
+      unstable.mise # rpi5-homelab: its stable mise lacks the pypi: backend the mise config uses
       dust
       fd
       gnumake
