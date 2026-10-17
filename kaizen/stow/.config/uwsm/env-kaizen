@@ -3,7 +3,7 @@
 # to every program in the session.
 
 # GTK 3 apps get dark mode and the theme from the portal, even when they cannot
-# read GNOME's settings themselves, and open its file picke
+# read GNOME's settings themselves, and open its file picker.
 export GTK_USE_PORTAL=1
 
 # Qt apps copy their look from GTK: dark or light, colours, fonts and icons.
