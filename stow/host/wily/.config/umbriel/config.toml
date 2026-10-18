@@ -3,10 +3,11 @@
 # `umbriel config validate` checks it.
 # Reference: https://docs.noctalia.dev/umbriel/
 
-# What the kaizen shell needs, from kaizen/stow. umbriel applies it before this
-# file, so a key set here wins; its binds lead the menu's Keybindings list.
+# What the kaizen shell needs, from kaizen/stow, and this host's output layout.
+# umbriel applies them before this file, so a key set here wins; kaizen.toml's
+# binds lead the menu's Keybindings list.
 [include]
-files = ["kaizen.toml"]
+files = ["kaizen.toml", "outputs.toml"]
 
 [general]
 show_cheatsheet = false
