@@ -33,6 +33,9 @@ Singleton {
     // occupied(idx, output); with sharing, true while a screencast runs; and
     // with windowId, the window of appId, kept round and on the focused
     // workspace. Empty when the backend has none.
+    // Workspaces come from each backend, not Quickshell.WindowManager: its only
+    // protocol, ext-workspace-v1, reports no windows, so no occupancy. It fits
+    // once a protocol reports each window's workspace.
     readonly property url workspaceSource: backend.workspaceComponent ? Qt.resolvedUrl("compositors/" + backend.workspaceComponent) : ""
     readonly property url castSource: backend.castComponent ? Qt.resolvedUrl("compositors/" + backend.castComponent) : ""
     readonly property url pinSource: backend.pinComponent ? Qt.resolvedUrl("compositors/" + backend.pinComponent) : ""
