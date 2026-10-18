@@ -45,10 +45,10 @@ flowchart BT
     upower[UPower / power-profiles-daemon]
     keyring[gnome-keyring: Secret Service]
     polkitd[polkit]
-    portal[xdg-desktop-portal-gnome / gtk]
+    portal[xdg-desktop-portal-gnome / umbriel / gtk]
   end
   subgraph WM[Compositor]
-    niri["niri --session under UWSM: layer-shell, session-lock, screencopy, idle-notify, niri msg"]
+    niri["niri --session or umbriel under UWSM: layer-shell, session-lock, screencopy, idle-notify, niri msg / umbriel msg"]
   end
   subgraph SHELL[kaizen: Quickshell]
     svc[modules/services: daemon and process state]
@@ -70,7 +70,7 @@ notification rules.
 
 | Part | Path | Reaches |
 | --- | --- | --- |
-| Session: niri under UWSM, portals, PAM, the services the shell reads, the packages the shell, its binds, scripts and units use | [`kaizen/nix/`](nix/default.nix) | every kaizen host |
+| Session: niri or umbriel (a flake input) under UWSM, portals, PAM, the services the shell reads, the packages the shell, its binds, scripts and units use | [`kaizen/nix/`](nix/default.nix) | every kaizen host |
 | The `kaizen` command, in Go, built by [`package.nix`](nix/package.nix) | [`kaizen/cli/`](cli/) | every kaizen host |
 | The shell's niri and umbriel config, session variables, units and scripts, the shell's QML, the core's notification rules | [`kaizen/stow/`](stow/) | every kaizen host |
 | Plugin QML: generic or reusable | [`kaizen/stow/.config/quickshell/kaizen/plugins/<name>/`](stow/.config/quickshell/kaizen/plugins/) | every kaizen host |
@@ -309,7 +309,7 @@ The session is the entry
 [`kaizen_niri.desktop`](stow/.local/share/wayland-sessions/kaizen_niri.desktop),
 which runs niri; `kaizen run -c umbriel` starts
 [`kaizen_umbriel.desktop`](stow/.local/share/wayland-sessions/kaizen_umbriel.desktop)
-instead, where umbriel is installed. uwsm names its units after the entry ID,
+instead. uwsm names its units after the entry ID,
 so another session on niri (`uwsm start niri`) starts none of kaizen's. Its
 `DesktopNames` give uwsm `XDG_CURRENT_DESKTOP=niri:kaizen` (`umbriel:kaizen`)
 while it prepares the environment, which picks the portals. For
@@ -339,7 +339,8 @@ nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
   which needs the Mutter D-Bus services that niri serves only as
   `niri --session`. Session mode also serves `org.freedesktop.ScreenSaver`
   idle inhibitors and the a11y bus, and takes the power key from logind unless
-  `disable-power-key-handling` is set.
+  `disable-power-key-handling` is set. On umbriel it goes through
+  `xdg-desktop-portal-umbriel`, then GTK's (`umbriel-portals.conf`).
 - On first use, gnome-keyring can advertise `login` without exporting the
   collection when keyring creation follows D-Bus startup. Recover by
   restarting the keyring daemon and unlocking it, then retry account setup.

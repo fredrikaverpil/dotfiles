@@ -47,6 +47,7 @@ Your memory of Quickshell, Qt and niri may predate the pins, which move with
 ```sh
 qs --version
 niri --version
+umbriel --version  # the flake input's commit
 nix eval --raw .#nixosConfigurations.<host>.pkgs.qt6.qtdeclarative.version
 ```
 
