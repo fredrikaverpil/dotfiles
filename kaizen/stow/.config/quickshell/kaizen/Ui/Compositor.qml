@@ -36,6 +36,16 @@ Singleton {
     readonly property url workspaceSource: backend.workspaceComponent ? Qt.resolvedUrl("compositors/" + backend.workspaceComponent) : ""
     readonly property url castSource: backend.castComponent ? Qt.resolvedUrl("compositors/" + backend.castComponent) : ""
     readonly property url pinSource: backend.pinComponent ? Qt.resolvedUrl("compositors/" + backend.pinComponent) : ""
+    // One of each source for the whole shell; null when the backend has none.
+    readonly property var workspaces: workspaceLoader.item
+    readonly property var casts: castLoader.item
+
+    property Loader workspaceLoader: Loader {
+        source: root.workspaceSource
+    }
+    property Loader castLoader: Loader {
+        source: root.castSource
+    }
     // The file borderColors(palette) fills, under the shell's state dir.
     readonly property string borderFile: backend.borderFile || ""
     // The action closeWindow() runs, as a bind names it.

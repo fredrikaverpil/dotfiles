@@ -422,13 +422,7 @@ Item {
         onTriggered: root.dndOverdue = true
     }
 
-    Loader {
-        id: casts
-        source: Ui.Compositor.castSource
-    }
-
-    // Loader.item is typed QObject; the source exposes sharing.
-    readonly property bool sharing: casts.item ? casts.item.sharing : false // qmllint disable missing-property
+    readonly property bool sharing: Ui.Compositor.casts ? Ui.Compositor.casts.sharing : false
     onSharingChanged: holdDoNotDisturb("sharing", sharing)
 
     Component.onCompleted: {
