@@ -80,7 +80,7 @@ notification rules.
 | A plugin's unit: specific to one host | `stow/host/<host>/.config/systemd/user/` | that host |
 | A plugin's daemon and packages | `kaizen/nix/plugins/<name>/`, `nix/hosts/<host>/kaizen-plugins/<name>/` | the hosts importing it |
 | ThinkPad hardware the shell reads (thresholds, keyd, micmute LED); not kaizen | [`nix/shared/system/thinkpad.nix`](../nix/shared/system/thinkpad.nix) | ThinkPad hosts |
-| Hardware, sleep policy, the niri config and output layout, host-only programs | `nix/hosts/<host>/`, `stow/host/<host>/` | that host |
+| Hardware, sleep policy, the niri and umbriel configs and output layout, host-only programs | `nix/hosts/<host>/`, `stow/host/<host>/` | that host |
 
 - Core is what kaizen needs to work as designed; every kaizen host runs it. A
   plugin is optional: the shell runs without it, however many hosts enable it.
@@ -123,7 +123,12 @@ notification rules.
   [`config.kdl`](../stow/host/renoir/.config/niri/config.kdl) in renoir's host
   package, which wily links, with each host's `outputs.kdl` and `host.kdl`
   (`stow/host/<host>/.config/niri/`) included around `kaizen.kdl`, the last
-  after it, so its binds win.
+  after it, so its binds win. The umbriel config,
+  `~/.config/umbriel/config.toml`, is the twin of niri's, also kept by hand,
+  and includes `kaizen.toml`. umbriel applies a file's includes before its own
+  keys, so an included host file could not override its binds: each host has
+  its own (`stow/host/<host>/.config/umbriel/config.toml`), wily's being
+  renoir's with `host.kdl`'s lines.
 - `kaizen` is the only kaizen command on PATH, built from
   [`kaizen/cli/`](cli/) into the system profile. `kaizen <sub>` runs its Go
   command `<sub>`
