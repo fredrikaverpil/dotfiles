@@ -290,13 +290,13 @@ ShellRoot {
     }
 
     // Not palette: onDarkChanged runs before palette re-evaluates.
-    function writeNiriColors() {
-        niriColors.setText(Model.niriColors(dark ? darkPalette : lightPalette));
+    function writeBorderColors() {
+        borderColors.setText(Ui.Compositor.borderColors(dark ? darkPalette : lightPalette));
     }
 
     onDarkChanged: {
         writeKdeglobals();
-        writeNiriColors();
+        writeBorderColors();
     }
 
     Process {
@@ -306,10 +306,10 @@ ShellRoot {
         id: kdeglobals
     }
 
-    // Included by niri/kaizen.kdl.
+    // Included by the compositor's kaizen config.
     FileView {
-        id: niriColors
-        path: Ui.Paths.state + "/niri-colors.kdl"
+        id: borderColors
+        path: Ui.Paths.state + "/" + Ui.Compositor.borderFile
         atomicWrites: true
         printErrors: false
     }
@@ -368,7 +368,7 @@ ShellRoot {
             onStreamFinished: {
                 root.dark = text.indexOf("prefer-light") < 0;
                 root.writeKdeglobals();
-                root.writeNiriColors();
+                root.writeBorderColors();
             }
         }
     }

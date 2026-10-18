@@ -317,6 +317,12 @@ TestCase {
         compare(Niri.focusedOutputOn(""), Niri.outputs());
     }
 
+    function test_border_colours_set_the_border_from_water() {
+        compare(Niri.borderColors({
+            water: "#6099C0"
+        }), "layout {\n    border {\n        active-color \"#6099C0\"\n    }\n}\n");
+    }
+
     function test_focus_app_hands_the_pattern_to_kaizen_focus() {
         compare(Niri.focusApp("^slack$"), ["kaizen", "focus", "^slack$", "true"]);
     }

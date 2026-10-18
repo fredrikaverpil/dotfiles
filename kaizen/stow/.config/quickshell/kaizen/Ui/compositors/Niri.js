@@ -11,6 +11,16 @@ var opensOnFocusedOutput = true;
 var floatsInWorkingArea = true;
 var workspaceComponent = "NiriWorkspaces.qml";
 var castComponent = "NiriCasts.qml";
+// Under the shell's state dir, included by niri/kaizen.kdl.
+var borderFile = "niri-colors.kdl";
+
+function borderColors(palette) {
+  return (
+    'layout {\n    border {\n        active-color "' +
+    palette.water +
+    '"\n    }\n}\n'
+  );
+}
 
 function dpms(on) {
   return [
