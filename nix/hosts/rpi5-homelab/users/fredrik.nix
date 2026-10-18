@@ -21,8 +21,13 @@ in
     unstable.neovim
   ];
 
-  # Stowed from stow/host/rpi5-homelab, in place of the shared mise config.
-  home.sessionVariables.MISE_GLOBAL_CONFIG_FILE = "${config.home.homeDirectory}/.config/mise/config.rpi5-homelab.toml";
+  home.sessionVariables = {
+    # Stowed from stow/host/rpi5-homelab, in place of the shared mise config.
+    MISE_GLOBAL_CONFIG_FILE = "${config.home.homeDirectory}/.config/mise/config.rpi5-homelab.toml";
+    # Stops mise loading the shared ~/.config/mise/config.toml as a project
+    # config from any directory under $HOME.
+    MISE_CEILING_PATHS = config.home.homeDirectory;
+  };
 
   home.file = {
   };
