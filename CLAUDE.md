@@ -69,13 +69,13 @@ Wheels and prebuilt npm binaries are glibc-linked and fail to load on NixOS
 (`libstdc++.so.6: cannot open shared object file`). For a one-off run, use
 `npx <pkg>` or `uvx <pkg>` from a shell instead of installing.
 
-### niri + Quickshell desktop (ThinkPads)
+### niri or umbriel + Quickshell desktop (ThinkPads)
 
-Read `kaizen/README.md` (design, map) and `kaizen/docs/development.md`
-(local checks, platform boundaries, safe deployment) before changing
-Quickshell, niri or their Nix modules. `kaizen/CLAUDE.md`, symlinked into each
-kaizen directory outside it, imports the README and every doc under
-`kaizen/docs/` when a file there is read.
+Read `kaizen/README.md` (design, map) and `kaizen/docs/development.md` (local
+checks, platform boundaries, safe deployment) before changing Quickshell, niri,
+umbriel or their Nix modules. `kaizen/CLAUDE.md`, symlinked into each kaizen
+directory outside it, imports the README and every doc under `kaizen/docs/` when
+a file there is read.
 
 ### Neovim Configuration
 
