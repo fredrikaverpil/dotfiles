@@ -82,10 +82,10 @@ window-rule {
     scroll-factor 0.2
 }
 
-// Gecko menus draw their shadow inside the popup's geometry, so blur would
-// spill over it as a blurred halo.
+// Gecko and Chromium menus draw their shadow inside the popup's geometry, so
+// blur would spill over it as a blurred halo.
 window-rule {
-    exclude app-id=r#"^(firefox|zen-beta)$"#
+    exclude app-id=r#"^(firefox|zen-beta|chromium-browser|slack)$|^chrome-"#
 
     popups {
         geometry-corner-radius 15
