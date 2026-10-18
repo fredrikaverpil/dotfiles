@@ -16,6 +16,22 @@ for config in ../../../../../stow/host/*/.config/niri/config.kdl; do
   cp -L "$(dirname "$config")"/*.kdl ../../niri/kaizen.kdl "$tmp/$host"
   niri validate --config "$tmp/$host/config.kdl"
 done
+
+# kaizen.toml alone, then each host's config.toml beside kaizen.toml and the
+# host's xkb symbols, as stowed into ~/.config. An empty HOME leaves out the
+# shell's colour file.
+mkdir "$tmp/home"
+HOME="$tmp/home" umbriel config validate -c ../../umbriel/kaizen.toml
+for config in ../../../../../stow/host/*/.config/umbriel/config.toml; do
+  [ -e "$config" ] || continue
+  host=$(basename "$(dirname "$(dirname "$(dirname "$config")")")")
+  mkdir -p "$tmp/umbriel-$host/umbriel"
+  cp -L "$config" ../../umbriel/kaizen.toml "$tmp/umbriel-$host/umbriel"
+  if [ -d "$(dirname "$(dirname "$config")")/xkb" ]; then
+    cp -rL "$(dirname "$(dirname "$config")")/xkb" "$tmp/umbriel-$host"
+  fi
+  HOME="$tmp/home" XDG_CONFIG_HOME="$tmp/umbriel-$host" umbriel config validate
+done
 printf 'PASS: compositor configuration contracts\n'
 
 # kaizen/README.md rules with a mechanical check: the IPC column of the services

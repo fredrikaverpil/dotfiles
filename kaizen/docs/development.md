@@ -143,8 +143,8 @@ default devshell (`flake.nix`), entered by `direnv` at the repo root or run as
 checkout. `compositor-test` and `shell-smoke` are Linux-only and are absent
 from the shell on macOS. All of them run against the single `kaizen/stow/`
 tree, so a static check passing here passes for every kaizen host;
-`compositor-test` also validates each host's niri `config.kdl` with its
-includes.
+`compositor-test` also validates each host's niri `config.kdl` and umbriel
+`config.toml` with their includes.
 
 | Change | Checks |
 | --- | --- |
@@ -255,7 +255,8 @@ includes.
 - `compare()` handles objects/arrays but tolerates small numeric differences.
   Use `verify(actual === expected)` for exact values/identity and `fuzzyCompare`
   for explicit tolerances. Do not compare objects via JSON serialization.
-- `compositor-test` validates niri's KDL. It does not test dispatch.
+- `compositor-test` validates niri's KDL and umbriel's TOML. It does not test
+  dispatch.
 
 ### Tooling
 
