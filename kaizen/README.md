@@ -317,7 +317,8 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 - `Ui/compositors/Contract.js` lists every property and function a backend
   defines for `Compositor` to forward, and `tst_Compositors.qml` checks each
   backend, `Unset.js` included, against it. A function added to `Compositor`
-  goes in each.
+  goes in each. A backend's `readBinds` returns chords as `Chords.js` reads
+  them (`Mod+Shift+Key`, xkb key names), translating its compositor's syntax.
 
 ## Session
 

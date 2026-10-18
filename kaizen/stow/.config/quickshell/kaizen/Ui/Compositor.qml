@@ -2,6 +2,7 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import "compositors/Chords.js" as Chords
 import "compositors/Niri.js" as Niri
 import "compositors/Umbriel.js" as Umbriel
 import "compositors/Unset.js" as Unset
@@ -55,15 +56,15 @@ Singleton {
     function pickColor() {
         return root.backend.pickColor();
     }
-    function configFile(home, niriConfig) {
-        return root.backend.configFile(home, niriConfig);
+    // getenv(name) returns an environment variable.
+    function configFile(home, getenv) {
+        return root.backend.configFile(home, getenv);
     }
     function readBinds(file, home, read) {
         return root.backend.readBinds(file, home, read);
     }
-    // umbriel chords share niri's syntax.
     function keycaps(chord) {
-        return Niri.keycaps(chord);
+        return Chords.keycaps(chord);
     }
     function focusWorkspace(id, output) {
         return root.backend.focusWorkspace(id, output);

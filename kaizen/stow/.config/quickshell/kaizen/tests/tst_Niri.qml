@@ -119,52 +119,6 @@ TestCase {
         compare(binds, [data.want]);
     }
 
-    function test_keycaps_data() {
-        return [
-            {
-                tag: "mod",
-                chord: "Mod+Shift+Space",
-                want: ["Super", "Shift", "Space"]
-            },
-            {
-                tag: "super as written",
-                chord: "Super+Alt+L",
-                want: ["Super", "Alt", "L"]
-            },
-            {
-                tag: "audio key",
-                chord: "XF86AudioMicMute",
-                want: ["MicMute"]
-            },
-            {
-                tag: "monitor key",
-                chord: "XF86MonBrightnessUp",
-                want: ["BrightnessUp"]
-            },
-            {
-                tag: "other xf86 key",
-                chord: "XF86Calculator",
-                want: ["Calculator"]
-            },
-            {
-                tag: "plain",
-                chord: "Ctrl+Alt+Delete",
-                want: ["Ctrl", "Alt", "Delete"]
-            },
-            {
-                tag: "empty",
-                chord: "",
-                want: []
-            },
-        ];
-    }
-
-    function test_keycaps(data) {
-        const keys = Niri.keycaps(data.chord);
-
-        compare(keys, data.want);
-    }
-
     function test_read_binds_expands_includes_in_place() {
         const bind = (chord, label) => `binds {\n    ${chord} hotkey-overlay-title="${label}" { spawn "x"; }\n}\n`;
         const files = {
@@ -234,9 +188,18 @@ TestCase {
     }
 
     function test_config_file() {
-        compare(Niri.configFile("/home/u", null), "/home/u/.config/niri/config.kdl");
-        compare(Niri.configFile("/home/u", ""), "/home/u/.config/niri/config.kdl");
-        compare(Niri.configFile("/home/u", "/etc/niri/trial.kdl"), "/etc/niri/trial.kdl");
+        const env = vars => name => vars[name];
+        compare(Niri.configFile("/home/u", env({})), "/home/u/.config/niri/config.kdl");
+        compare(Niri.configFile("/home/u", env({
+            NIRI_CONFIG: ""
+        })), "/home/u/.config/niri/config.kdl");
+        compare(Niri.configFile("/home/u", env({
+            XDG_CONFIG_HOME: "/cfg"
+        })), "/cfg/niri/config.kdl");
+        compare(Niri.configFile("/home/u", env({
+            NIRI_CONFIG: "/etc/niri/trial.kdl",
+            XDG_CONFIG_HOME: "/cfg"
+        })), "/etc/niri/trial.kdl");
     }
 
     function test_pin_window() {
