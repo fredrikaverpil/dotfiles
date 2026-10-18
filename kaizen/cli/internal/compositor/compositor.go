@@ -33,6 +33,8 @@ type Compositor interface {
 	// Validate checks the compositor's config, returning its report when
 	// it fails.
 	Validate(ctx context.Context) error
+	// Config returns the compositor's config file, resolved in env.
+	Config(env Env) Config
 }
 
 // Layer is a layer surface.
@@ -111,3 +113,6 @@ func (u Unset) FocusWindow(context.Context, string) error { return u.Err }
 
 // Validate returns u.Err.
 func (u Unset) Validate(context.Context) error { return u.Err }
+
+// Config returns no config file.
+func (Unset) Config(Env) Config { return Config{} }

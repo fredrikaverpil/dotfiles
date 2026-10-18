@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"slices"
 	"strconv"
@@ -15,6 +16,9 @@ import (
 
 // tracing matches niri's tracing lines, which precede `niri validate`'s report.
 var tracing = regexp.MustCompile(`^[0-9]{4}-[0-9]{2}-[0-9]{2}T[^ ]+ +[A-Z]+ `)
+
+// niriInclude matches a niri config's include line, capturing its path.
+var niriInclude = regexp.MustCompile(`(?m)^[ \t]*include[ \t][^"\n]*"([^"]*)"`)
 
 // Niri is niri, driven with `niri msg`.
 type Niri struct {
@@ -160,6 +164,27 @@ func (n Niri) Validate(ctx context.Context) error {
 		}
 	}
 	return errors.New("niri validate:\n" + strings.Join(lines, "\n"))
+}
+
+// Config returns $NIRI_CONFIG, else niri/config.kdl in the config dir.
+func (Niri) Config(env Env) Config {
+	path := cmp.Or(env.Getenv("NIRI_CONFIG"), filepath.Join(env.configDir(), "niri", "config.kdl"))
+	return Config{
+		Path:     path,
+		Kaizen:   "kaizen.kdl",
+		Hint:     `add include "kaizen.kdl" to ` + path,
+		includes: niriIncludes,
+		home:     env.Home,
+	}
+}
+
+// niriIncludes returns the paths a niri config's include lines name.
+func niriIncludes(data string) []string {
+	var paths []string
+	for _, m := range niriInclude.FindAllStringSubmatch(data, -1) {
+		paths = append(paths, m[1])
+	}
+	return paths
 }
 
 // query decodes `niri msg -j <what>` into v.
