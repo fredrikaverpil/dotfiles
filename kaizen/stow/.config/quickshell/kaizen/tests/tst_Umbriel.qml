@@ -45,6 +45,136 @@ TestCase {
         }), '[colors.border]\nfocused = "#6099C0"\n');
     }
 
+    function test_parse_binds_reads_labelled_binds_from_keybinds() {
+        const raw = '"Mod+A" = "window-close" # Outside\n' + '[keybinds]\n' + '# "Mod+B" = "window-close" # Commented\n' + '"Mod+Space" = "spawn:kaizen ipc call menu toggle" # Menu\n' + '"XF86AudioMute" = { action = "spawn:kaizen ipc call audio mute", allow_when_locked = true, repeat = false } # Mute\n' + '"Mod+T" = "spawn:kitty"\n' + '"submap[resize],H" = "window-resize-left" # In a submap\n' + '[[window_rule]]\n' + '"Mod+C" = "window-close" # Not a bind\n';
+
+        const binds = Umbriel.parseBinds(raw);
+
+        compare(binds, [
+            {
+                chord: "Mod+Space",
+                label: "Menu",
+                enabled: true,
+                ipc: "menu toggle"
+            },
+            {
+                chord: "XF86AudioMute",
+                label: "Mute",
+                enabled: true,
+                ipc: "audio mute"
+            },
+        ]);
+        compare(Umbriel.parseBinds(""), []);
+    }
+
+    function test_parse_binds_keeps_what_a_bind_runs_data() {
+        return [
+            {
+                tag: "action",
+                line: '"Mod+Q" = "window-close" # Close window',
+                want: {
+                    chord: "Mod+Q",
+                    label: "Close window",
+                    enabled: true,
+                    action: "window-close"
+                }
+            },
+            {
+                tag: "action with an argument",
+                line: '"Mod+1" = "workspace-switch:1" # Workspace 1',
+                want: {
+                    chord: "Mod+1",
+                    label: "Workspace 1",
+                    enabled: true
+                }
+            },
+            {
+                tag: "ipc in a table, after other keys",
+                line: "\"Print\" = { repeat = false, action = 'spawn:kaizen ipc call recording shoot screen' } # Shoot",
+                want: {
+                    chord: "Print",
+                    label: "Shoot",
+                    enabled: true,
+                    ipc: "recording shoot screen"
+                }
+            },
+            {
+                tag: "spawn with an escaped regex",
+                line: '"Mod+T" = "spawn:kaizen focus \'^com\\\\.mitchellh\\\\.ghostty$\' ghostty" # Terminal',
+                want: {
+                    chord: "Mod+T",
+                    label: "Terminal",
+                    enabled: true
+                }
+            },
+            {
+                tag: "a hash inside the value",
+                line: '"Mod+H" = "spawn:notify-send \'#1\'" # Hash',
+                want: {
+                    chord: "Mod+H",
+                    label: "Hash",
+                    enabled: true
+                }
+            },
+            {
+                tag: "bare key",
+                line: 'XF86AudioPlay = "spawn:kaizen ipc call media playPause" # Play',
+                want: {
+                    chord: "XF86AudioPlay",
+                    label: "Play",
+                    enabled: true,
+                    ipc: "media playPause"
+                }
+            },
+        ];
+    }
+
+    function test_parse_binds_keeps_what_a_bind_runs(data) {
+        compare(Umbriel.parseBinds("[keybinds]\n" + data.line + "\n"), [data.want]);
+    }
+
+    function test_read_binds_follows_umbriels_merge_order() {
+        const bind = (chord, label) => '[keybinds]\n"' + chord + '" = "window-close" # ' + label + '\n';
+        const files = {
+            "/home/u/.config/umbriel/config.toml": '[include]\nfiles = [\n  "a.toml", # first\n  "/etc/b.toml",\n]\n\n' + '[include.optional]\nfiles = ["~/extra.toml", "missing.toml"]\n\n' + bind("Mod+A", "Main"),
+            "/home/u/.config/umbriel/a.toml": '[include]\nfiles = ["config.toml"]\n' + bind("Mod+B", "A"),
+            "/etc/b.toml": bind("Mod+C", "B"),
+            "/home/u/extra.toml": bind("Mod+D", "Extra")
+        };
+        const read = path => path in files ? files[path] : null;
+
+        const binds = Umbriel.readBinds("/home/u/.config/umbriel/config.toml", "/home/u", read);
+
+        // Includes come before the including file's own binds; a.toml's
+        // include of config.toml is a cycle umbriel skips.
+        compare(binds.map(bind => bind.label), ["A", "B", "Extra", "Main"]);
+        compare(Umbriel.readBinds("/missing.toml", "/home/u", read), []);
+    }
+
+    function test_read_binds_keeps_the_last_bind_of_a_chord() {
+        const files = {
+            "/c/config.toml": '[include]\nfiles = ["kaizen.toml"]\n[keybinds]\n"Shift+Mod+space" = "window-close" # Mine\n',
+            "/c/kaizen.toml": '[keybinds]\n"Mod+Space" = "spawn:kaizen ipc call menu toggle" # Menu\n"Mod+Shift+Space" = "spawn:kaizen ipc call keyboard next" # Next layout\n'
+        };
+
+        const binds = Umbriel.readBinds("/c/config.toml", "/home/u", path => files[path] ?? null);
+
+        compare(binds, [
+            {
+                chord: "Mod+Space",
+                label: "Menu",
+                enabled: true,
+                ipc: "menu toggle"
+            },
+            {
+                chord: "Shift+Mod+space",
+                label: "Mine",
+                enabled: true,
+                action: "window-close"
+            },
+        ]);
+    }
+
     function test_focused_output_on() {
         compare(Umbriel.focusedOutputOn("DP-1"), ["sh", "-c", Umbriel.focusOutput + " && umbriel outputs --json", "sh", "DP-1"]);
         // Without an output there is nothing to focus, so the plain query is used.
