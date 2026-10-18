@@ -12,6 +12,7 @@ var opensOnFocusedOutput = true;
 var floatsInWorkingArea = true;
 var workspaceComponent = "UmbrielWorkspaces.qml";
 var castComponent = "UmbrielCasts.qml";
+var pinComponent = "UmbrielPin.qml";
 // Under the shell's state dir, included by umbriel/kaizen.toml.
 var borderFile = "umbriel-colors.toml";
 // The action closeWindow runs, as a bind names it.
@@ -237,33 +238,9 @@ function focusedMonitor(raw) {
   };
 }
 
-function events() {
-  return ["umbriel", "subscribe", "windows"];
-}
-
 // Absolute x and y from the usable area's top-left corner.
 function moveFloatingWindow(id, x, y) {
   return msg("window-move-to:top_left/" + x + "/" + y + "/" + id);
-}
-
-// The window rule for appId pins it and fixes its size, so only its id is
-// followed, from each windows snapshot. state is {id, requested, spaces}, as
-// Niri.pinWindow keeps it.
-function pinWindow(raw, appId, state) {
-  var event;
-  try {
-    event = JSON.parse(String(raw || ""));
-  } catch (error) {
-    event = null;
-  }
-  var held = { id: state.id, requested: state.requested, spaces: state.spaces };
-  if (!event || event.event !== "windows" || !Array.isArray(event.data))
-    return held;
-  var match = event.data.filter(function (window) {
-    return window && window.app_id === appId;
-  })[0];
-  held.id = match ? match.id : 0;
-  return held;
 }
 
 function layoutQuery() {

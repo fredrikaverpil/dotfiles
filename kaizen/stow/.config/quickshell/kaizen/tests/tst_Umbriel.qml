@@ -233,55 +233,6 @@ TestCase {
         compare(Umbriel.focusedMonitor(data.raw), data.want);
     }
 
-    function test_pin_window_follows_the_id_data() {
-        const known = {
-            id: "c4",
-            requested: 0,
-            spaces: {}
-        };
-        return [
-            {
-                tag: "window appears",
-                raw: '{"event":"windows","data":[{"id":"a1","app_id":"other"},{"id":"c4","app_id":"cam"}]}',
-                state: {
-                    id: 0,
-                    requested: 0,
-                    spaces: {}
-                },
-                want: known
-            },
-            {
-                tag: "window gone",
-                raw: '{"event":"windows","data":[{"id":"a1","app_id":"other"}]}',
-                state: known,
-                want: {
-                    id: 0,
-                    requested: 0,
-                    spaces: {}
-                }
-            },
-            {
-                tag: "other event",
-                raw: '{"event":"workspaces","data":[]}',
-                state: known,
-                want: known
-            },
-            {
-                tag: "invalid",
-                raw: "invalid",
-                state: known,
-                want: known
-            }
-        ];
-    }
-
-    function test_pin_window_follows_the_id(data) {
-        const got = Umbriel.pinWindow(data.raw, "cam", data.state);
-        compare(got, data.want);
-        // The rule pins and sizes the window, so nothing is ever run.
-        verify(got.command === undefined);
-    }
-
     function test_set_layout_steps_from_current_data() {
         return [
             {

@@ -304,8 +304,9 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   is the only path to the compositor. It picks the backend once, by the name
   in `KAIZEN_COMPOSITOR`, else `Unset.js`.
   [`Ui/compositors/`](stow/.config/quickshell/kaizen/Ui/compositors/)
-  owns each compositor's commands, response parsing, and the workspace and
-  screencast sources, which the bar and notifications load through its URLs.
+  owns each compositor's commands, response parsing, and the workspace,
+  screencast and camera-pinning sources, which the bar, notifications and
+  recording load through its URLs.
   Keep scheduling and shared state above it. Nightlight is not
   compositor-specific and lives in its service.
 - Where the compositor's behaviour shapes a surface or service, `Compositor`
