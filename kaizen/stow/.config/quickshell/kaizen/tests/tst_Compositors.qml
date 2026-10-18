@@ -3,6 +3,7 @@ import QtTest
 import "../Ui/compositors/Contract.js" as Contract
 import "../Ui/compositors/Niri.js" as Niri
 import "../Ui/compositors/Umbriel.js" as Umbriel
+import "../Ui/compositors/Unset.js" as Unset
 
 TestCase {
     name: "Compositors"
@@ -23,18 +24,25 @@ TestCase {
         return [
             {
                 tag: "niri",
+                name: "niri",
                 backend: Niri
             },
             {
                 tag: "umbriel",
+                name: "umbriel",
                 backend: Umbriel
+            },
+            {
+                tag: "unset",
+                name: "",
+                backend: Unset
             },
         ];
     }
 
     function test_backend_defines_the_contract(data) {
         compare(Contract.missing(data.backend), []);
-        verify(data.backend.name === data.tag);
+        verify(data.backend.name === data.name);
     }
 
     function test_missing_names_what_a_backend_lacks() {

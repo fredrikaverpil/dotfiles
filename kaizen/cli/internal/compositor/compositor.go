@@ -3,7 +3,12 @@ package compositor
 
 import (
 	"context"
+	"errors"
+	"fmt"
 )
+
+// ErrNoCompositor is the error of each call on an Unset compositor.
+var ErrNoCompositor = errors.New("KAIZEN_COMPOSITOR names no compositor")
 
 // Runner runs a program and returns its stdout.
 type Runner interface {
@@ -58,11 +63,46 @@ type Window struct {
 	AppID string
 }
 
-// FromEnv returns the session's compositor: umbriel when UMBRIEL_SOCKET is
-// set, else niri.
-func FromEnv(getenv func(string) string, r Runner) Compositor {
-	if getenv("UMBRIEL_SOCKET") != "" {
-		return Umbriel{Runner: r}
-	}
-	return Niri{Runner: r}
+// compositors maps each KAIZEN_COMPOSITOR value to its compositor.
+var compositors = map[string]func(Runner) Compositor{
+	"niri":    func(r Runner) Compositor { return Niri{Runner: r} },
+	"umbriel": func(r Runner) Compositor { return Umbriel{Runner: r} },
 }
+
+// FromEnv returns the compositor KAIZEN_COMPOSITOR names, or an Unset one when
+// it names none.
+func FromEnv(getenv func(string) string, r Runner) Compositor {
+	name := getenv("KAIZEN_COMPOSITOR")
+	if name == "" {
+		return Unset{Err: fmt.Errorf("%w: it is unset", ErrNoCompositor)}
+	}
+	newCompositor, ok := compositors[name]
+	if !ok {
+		return Unset{Err: fmt.Errorf("%w: %q", ErrNoCompositor, name)}
+	}
+	return newCompositor(r)
+}
+
+// Unset stands in for a compositor KAIZEN_COMPOSITOR does not name: each call
+// returns Err.
+type Unset struct {
+	Err error
+}
+
+// Name returns the empty string.
+func (Unset) Name() string { return "" }
+
+// Layers returns u.Err.
+func (u Unset) Layers(context.Context) ([]Layer, error) { return nil, u.Err }
+
+// Outputs returns u.Err.
+func (u Unset) Outputs(context.Context) ([]Output, error) { return nil, u.Err }
+
+// FocusedWindow returns u.Err.
+func (u Unset) FocusedWindow(context.Context) (*Window, error) { return nil, u.Err }
+
+// FocusWindow returns u.Err.
+func (u Unset) FocusWindow(context.Context, string) error { return u.Err }
+
+// Validate returns u.Err.
+func (u Unset) Validate(context.Context) error { return u.Err }

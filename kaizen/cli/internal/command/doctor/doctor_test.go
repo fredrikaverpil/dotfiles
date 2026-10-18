@@ -678,8 +678,23 @@ func TestRun(t *testing.T) {
 			},
 		},
 		{
+			name:  "no compositor named",
+			env:   map[string]string{"KAIZEN_COMPOSITOR": ""},
+			files: map[string]string{coreRequires: ""},
+			outputs: map[string][]recorded{
+				showLine:   {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "0", "0", "")}},
+				portalLine: {{}},
+			},
+			want: result{
+				Stdout: "1 error\n\nERROR compositor  check\n" +
+					"  KAIZEN_COMPOSITOR names no compositor: it is unset\n" +
+					"  hint: start the session with kaizen run; over SSH, copy it from systemctl --user show-environment\n",
+				Calls: []string{showLine, portalLine},
+			},
+		},
+		{
 			name: "umbriel config, niri config without kaizen.kdl",
-			env:  map[string]string{"UMBRIEL_SOCKET": "$DIR/run/umbriel-wayland-1.sock"},
+			env:  map[string]string{"KAIZEN_COMPOSITOR": "umbriel"},
 			files: map[string]string{
 				coreRequires:                       "",
 				niriConfig:                         "include \"apps.kdl\"\n",
@@ -699,9 +714,9 @@ func TestRun(t *testing.T) {
 		{
 			name: "umbriel config reaches kaizen.toml through includes",
 			env: map[string]string{
-				"UMBRIEL_SOCKET":  "$DIR/run/umbriel-wayland-1.sock",
-				"XDG_CONFIG_HOME": "$DIR/cfg",
-				"SHELL_DIR":       "$DIR/home/shell",
+				"KAIZEN_COMPOSITOR": "umbriel",
+				"XDG_CONFIG_HOME":   "$DIR/cfg",
+				"SHELL_DIR":         "$DIR/home/shell",
 			},
 			files: map[string]string{
 				"cfg/quickshell/kaizen/requires": "",
@@ -723,7 +738,7 @@ func TestRun(t *testing.T) {
 		},
 		{
 			name: "umbriel config without kaizen.toml",
-			env:  map[string]string{"UMBRIEL_SOCKET": "$DIR/run/umbriel-wayland-1.sock"},
+			env:  map[string]string{"KAIZEN_COMPOSITOR": "umbriel"},
 			files: map[string]string{
 				coreRequires: "",
 				umbrielConfig: "# [include]\n# files = [\"kaizen.toml\"]\n[general]\nfiles = [\"kaizen.toml\"]\n" +
@@ -745,7 +760,7 @@ func TestRun(t *testing.T) {
 		},
 		{
 			name:  "invalid umbriel config",
-			env:   map[string]string{"UMBRIEL_SOCKET": "$DIR/run/umbriel-wayland-1.sock"},
+			env:   map[string]string{"KAIZEN_COMPOSITOR": "umbriel"},
 			files: map[string]string{coreRequires: ""},
 			outputs: map[string][]recorded{
 				showLine: {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "0", "0", "")}},
@@ -840,7 +855,7 @@ func TestRun(t *testing.T) {
 				assert.NilError(t, os.MkdirAll(filepath.Dir(filepath.Join(dir, path)), 0o755))
 				assert.NilError(t, os.Symlink(expand(target), filepath.Join(dir, path)))
 			}
-			env := map[string]string{"HOME": "$DIR/home", "PATH": "$DIR/empty"}
+			env := map[string]string{"HOME": "$DIR/home", "PATH": "$DIR/empty", "KAIZEN_COMPOSITOR": "niri"}
 			maps.Copy(env, tt.env)
 			outputs := map[string][]recorded{}
 			for line, outs := range tt.outputs {

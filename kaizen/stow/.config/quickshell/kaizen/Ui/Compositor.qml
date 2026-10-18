@@ -4,12 +4,19 @@ import QtQuick
 import Quickshell
 import "compositors/Niri.js" as Niri
 import "compositors/Umbriel.js" as Umbriel
+import "compositors/Unset.js" as Unset
 
 Singleton {
     id: root
 
-    // The session's compositor, read once: umbriel exports UMBRIEL_SOCKET.
-    readonly property var backend: Quickshell.env("UMBRIEL_SOCKET") ? Umbriel : Niri
+    // The session's compositor, read once from KAIZEN_COMPOSITOR, which
+    // `kaizen run` exports; Unset when it names none.
+    readonly property var backends: ({
+            niri: Niri,
+            umbriel: Umbriel
+        })
+    readonly property string configured: Quickshell.env("KAIZEN_COMPOSITOR") || ""
+    readonly property var backend: backends.hasOwnProperty(configured) ? backends[configured] : Unset
 
     readonly property string name: backend.name
     // What differs between compositors; each backend says what each means.
@@ -19,12 +26,18 @@ Singleton {
     readonly property bool floatsInWorkingArea: backend.floatsInWorkingArea
     // Components with ids(output), activeId(output) and occupied(idx, output);
     // and with sharing, true while a screencast runs.
-    readonly property url workspaceSource: Qt.resolvedUrl("compositors/" + backend.workspaceComponent)
-    readonly property url castSource: Qt.resolvedUrl("compositors/" + backend.castComponent)
+    // Empty when the backend has none.
+    readonly property url workspaceSource: backend.workspaceComponent ? Qt.resolvedUrl("compositors/" + backend.workspaceComponent) : ""
+    readonly property url castSource: backend.castComponent ? Qt.resolvedUrl("compositors/" + backend.castComponent) : ""
     // The file borderColors(palette) fills, under the shell's state dir.
     readonly property string borderFile: backend.borderFile
     // The action closeWindow() runs, as a bind names it.
     readonly property string closeWindowAction: backend.closeWindowAction
+
+    Component.onCompleted: {
+        if (backend === Unset)
+            console.error("KAIZEN_COMPOSITOR names no compositor:", configured || "it is unset");
+    }
 
     function borderColors(palette) {
         return root.backend.borderColors(palette);

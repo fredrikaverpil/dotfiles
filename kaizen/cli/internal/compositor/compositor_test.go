@@ -51,19 +51,39 @@ func record(r *fakeRunner, value any, err error) result {
 }
 
 func TestFromEnv(t *testing.T) {
+	// named is a compositor's name and, for an Unset one, its error.
+	type named struct {
+		Name         string
+		Err          string
+		NoCompositor bool
+	}
 	for _, tt := range []struct {
 		name string
 		env  map[string]string
-		want string
+		want named
 	}{
-		{name: "niri", env: map[string]string{"NIRI_SOCKET": "/run/user/1000/niri.sock"}, want: "niri"},
-		{name: "umbriel", env: map[string]string{"UMBRIEL_SOCKET": "/run/user/1000/umbriel-wayland-1.sock"}, want: "umbriel"},
-		{name: "neither", want: "niri"},
+		{name: "niri", env: map[string]string{"KAIZEN_COMPOSITOR": "niri"}, want: named{Name: "niri"}},
+		{name: "umbriel", env: map[string]string{"KAIZEN_COMPOSITOR": "umbriel"}, want: named{Name: "umbriel"}},
+		{
+			name: "unset",
+			env:  map[string]string{"NIRI_SOCKET": "/run/user/1000/niri.sock"},
+			want: named{Err: "KAIZEN_COMPOSITOR names no compositor: it is unset", NoCompositor: true},
+		},
+		{
+			name: "unknown",
+			env:  map[string]string{"KAIZEN_COMPOSITOR": "sway"},
+			want: named{Err: `KAIZEN_COMPOSITOR names no compositor: "sway"`, NoCompositor: true},
+		},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			c := FromEnv(func(key string) string { return tt.env[key] }, &fakeRunner{})
 
-			assert.Equal(t, c.Name(), tt.want)
+			got := named{Name: c.Name()}
+			if u, ok := c.(Unset); ok {
+				got.Err = u.Err.Error()
+				got.NoCompositor = errors.Is(u.Err, ErrNoCompositor)
+			}
+			assert.DeepEqual(t, got, tt.want)
 		})
 	}
 }

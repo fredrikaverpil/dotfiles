@@ -51,7 +51,8 @@ shows: the warnings and errors each `kaizen-*` unit, plugin daemons included,
 logged in its current run, a failed unit, a restarted unit with how each failed
 run exited and the last warning or error it logged, a shell still running the
 Quickshell a rebuild replaced or a worktree's tree (`kaizen dev`), a `kaizen`
-shadowing another on PATH, a niri config that fails `niri validate` or never
+shadowing another on PATH, a session whose `KAIZEN_COMPOSITOR` names no
+compositor, a niri config that fails `niri validate` or never
 includes `kaizen.kdl`, an umbriel config that fails `umbriel config validate` or
 never includes `kaizen.toml`, a portal that does not answer the colour scheme, a
 `gsr-kms-server` without `cap_sys_admin+ep`, an enabled plugin the shell cannot
