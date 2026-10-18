@@ -43,6 +43,10 @@ enabled = false
 [colors.border]
 unfocused = "#00000000"
 
+[overview]
+# background_blur = false # with blur enabled, stuttering happens on renoir
+# workspace_wallpaper = false
+
 [layout]
 gap = 8
 
