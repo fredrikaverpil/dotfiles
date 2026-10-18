@@ -1,0 +1,290 @@
+# The twin of ../niri/config.kdl and ../niri/host.kdl, kept by hand: renoir's
+# umbriel config.toml with wily's lines. umbriel reloads this file on save;
+# `umbriel config validate` checks it.
+# Reference: https://docs.noctalia.dev/umbriel/
+
+# What the kaizen shell needs, from kaizen/stow. umbriel applies it before this
+# file, so a key set here wins; its binds lead the menu's Keybindings list.
+[include]
+files = ["kaizen.toml"]
+
+[general]
+show_cheatsheet = false
+
+[environment]
+GDK_SCALE = "1"
+
+[input.keyboard]
+# No grp: option: the shell owns the current index
+# (kaizen ipc call keyboard ...) and a compositor-side switch desyncs the bar
+# indicator. The first layout is the default.
+# us_se is US plus RightAlt+[ ; ' for å ö ä (~/.config/xkb/symbols).
+layout = "us_se,se"
+repeat_delay = 200
+repeat_rate = 60
+
+[input.touchpad]
+tap = true
+disable_while_typing = true
+
+[input.cursor]
+theme = "Bibata-Modern-Classic"
+size = 24
+
+# niri's look: square corners, no shadow, and only the focused window
+# outlined; a transparent unfocused border keeps the layout identical. The
+# shell writes the focused colour (kaizen.toml).
+[appearance]
+corner_radius = 0
+
+[appearance.shadow]
+enabled = false
+
+[colors.border]
+unfocused = "#00000000"
+
+[layout]
+gap = 8
+
+# Named, so they persist and app rules can place windows on them.
+[[workspace]]
+name = "1"
+
+[[workspace]]
+name = "2"
+
+[[workspace]]
+name = "3"
+
+[[workspace]]
+name = "4"
+
+[[workspace]]
+name = "5"
+
+[[workspace]]
+name = "6"
+
+[[workspace]]
+name = "7"
+
+[[window_rule]]
+match.app_id = "^com\\.mitchellh\\.ghostty$"
+corner_radius = 8
+blur = true
+
+# Floating windows blur what is directly behind them, at a higher cost.
+[[window_rule]]
+match.app_id = "^com\\.mitchellh\\.ghostty$"
+match.is_floating = true
+blur_optimized = false
+
+# Defining this table replaces umbriel's built-in binds. A trailing comment
+# labels a bind for the menu's Keybindings list.
+[keybinds]
+# Session
+"Mod+Shift+Slash" = { action = "cheatsheet-toggle", repeat = false } # Show hotkey overlay
+"Mod+Escape" = { action = "shortcuts-inhibit-toggle", allow_when_inhibited = true, repeat = false } # Toggle shortcuts inhibit
+"Mod+Shift+E" = { action = "session-quit", repeat = false } # Exit umbriel
+"Ctrl+Alt+Delete" = { action = "session-quit", repeat = false } # Exit umbriel
+
+# umbriel has no recent-windows switcher; these flip to the last window.
+"Alt+Tab" = "window-focus-last" # Focus the previous window
+"Mod+Tab" = "window-focus-last" # Focus the previous window
+
+# Launch
+"Mod+Return" = { action = "spawn:ghostty", repeat = false } # New terminal
+
+# Window state
+"Mod+Q" = { action = "window-close", repeat = false } # Close window
+"Mod+Shift+F" = { action = "window-toggle-fullscreen", repeat = false } # Full screen
+"Mod+M" = { action = "window-toggle-maximize-to-edges", repeat = false } # Maximize window to edges
+"Mod+V" = { action = "window-toggle-floating", repeat = false } # Toggle window floating/tiling
+"Mod+Shift+V" = { action = "window-focus-switch-floating", repeat = false } # Switch focus between floating and tiling
+
+# Focus
+"Mod+Left" = "window-focus-left" # Focus on left window
+"Mod+Right" = "window-focus-right" # Focus on right window
+"Mod+Up" = "window-focus-or-workspace-up" # Focus on above window or previous workspace
+"Mod+Down" = "window-focus-or-workspace-down" # Focus on below window or next workspace
+"Mod+H" = "window-focus-left" # Focus on left window
+"Mod+L" = "window-focus-right" # Focus on right window
+"Mod+K" = "window-focus-or-workspace-up" # Focus on above window or previous workspace
+"Mod+J" = "window-focus-or-workspace-down" # Focus on below window or next workspace
+"Mod+Home" = "column-focus-first" # Focus on first column
+"Mod+End" = "column-focus-last" # Focus on last column
+"Mod+WheelRight" = "window-focus-right" # Focus on right window
+"Mod+WheelLeft" = "window-focus-left" # Focus on left window
+"Mod+Shift+WheelDown" = "window-focus-right" # Focus on right window
+"Mod+Shift+WheelUp" = "window-focus-left" # Focus on left window
+
+# Move
+"Mod+Ctrl+Left" = "column-move-left" # Swap window to the left
+"Mod+Ctrl+Right" = "column-move-right" # Swap window to the right
+"Mod+Ctrl+Up" = "window-move-or-workspace-up" # Swap window up or to previous workspace
+"Mod+Ctrl+Down" = "window-move-or-workspace-down" # Swap window down or to next workspace
+"Mod+Ctrl+H" = "column-move-left" # Swap window to the left
+"Mod+Ctrl+L" = "column-move-right" # Swap window to the right
+"Mod+Ctrl+K" = "window-move-or-workspace-up" # Swap window up or to previous workspace
+"Mod+Ctrl+J" = "window-move-or-workspace-down" # Swap window down or to next workspace
+"Mod+Ctrl+Home" = "column-move-to-first" # Move column to first
+"Mod+Ctrl+End" = "column-move-to-last" # Move column to last
+"Mod+Ctrl+WheelRight" = "column-move-right" # Swap window to the right
+"Mod+Ctrl+WheelLeft" = "column-move-left" # Swap window to the left
+"Mod+Ctrl+Shift+WheelDown" = "column-move-right" # Swap window to the right
+"Mod+Ctrl+Shift+WheelUp" = "column-move-left" # Swap window to the left
+
+# Size. The primary extent is column width, the secondary the window's height
+# within it.
+"Mod+F" = { action = "window-toggle-maximize", repeat = false } # Full width
+"Mod+R" = "window-cycle-primary-extent" # Next preset column width
+"Mod+Shift+R" = "window-cycle-primary-extent-back" # Previous preset column width
+"Mod+Ctrl+Shift+R" = "window-cycle-secondary-extent" # Next preset window height
+"Mod+Minus" = "window-modify-primary-extent:-0.1" # Narrow column
+"Mod+Equal" = "window-modify-primary-extent:0.1" # Widen column
+"Mod+Shift+Minus" = "window-modify-secondary-extent:-0.1" # Shorten window
+"Mod+Shift+Equal" = "window-modify-secondary-extent:0.1" # Heighten window
+"Mod+Alt+Minus" = "window-modify-primary-extent:-0.02" # Narrow column a little
+"Mod+Alt+Equal" = "window-modify-primary-extent:0.02" # Widen column a little
+"Mod+Ctrl+Minus" = "window-modify-primary-extent:-0.25" # Narrow column a lot
+"Mod+Ctrl+Equal" = "window-modify-primary-extent:0.25" # Widen column a lot
+"Mod+C" = "column-center" # Center column
+
+# Groups: tab groups within a column.
+"Mod+G" = { action = "column-toggle-tabbed", repeat = false } # Toggle window grouping
+"Mod+BracketLeft" = "window-consume-or-expel-left" # Move window to group on left
+"Mod+BracketRight" = "window-consume-or-expel-right" # Move window to group on right
+"Mod+Alt+Tab" = "column-focus-tab-next" # Next window in group
+"Mod+Alt+Shift+Tab" = "column-focus-tab-previous" # Previous window in group
+"Mod+Comma" = "window-consume-from-right" # Consume window into group
+
+# Workspaces
+"Mod+O" = { action = "overview-toggle", repeat = false } # Overview
+
+"Mod+1" = "workspace-switch:1" # Switch to workspace 1
+"Mod+2" = "workspace-switch:2" # Switch to workspace 2
+"Mod+3" = "workspace-switch:3" # Switch to workspace 3
+"Mod+4" = "workspace-switch:4" # Switch to workspace 4
+"Mod+5" = "workspace-switch:5" # Switch to workspace 5
+"Mod+6" = "workspace-switch:6" # Switch to workspace 6
+"Mod+7" = "workspace-switch:7" # Switch to workspace 7
+"Mod+8" = "workspace-switch:8" # Switch to workspace 8
+"Mod+9" = "workspace-switch:9" # Switch to workspace 9
+"Mod+Page_Down" = "workspace-next" # Next workspace
+"Mod+Page_Up" = "workspace-previous" # Previous workspace
+"Mod+U" = "workspace-next" # Next workspace
+"Mod+I" = "workspace-previous" # Previous workspace
+"Mod+WheelDown" = { action = "workspace-next", cooldown_ms = 150 } # Scroll active workspace forward
+"Mod+WheelUp" = { action = "workspace-previous", cooldown_ms = 150 } # Scroll active workspace backward
+"Mod+Ctrl+Tab" = "workspace-focus-last" # Former workspace
+
+"Mod+Ctrl+1" = "column-move-to-workspace:1" # Move column to workspace 1
+"Mod+Ctrl+2" = "column-move-to-workspace:2" # Move column to workspace 2
+"Mod+Ctrl+3" = "column-move-to-workspace:3" # Move column to workspace 3
+"Mod+Ctrl+4" = "column-move-to-workspace:4" # Move column to workspace 4
+"Mod+Ctrl+5" = "column-move-to-workspace:5" # Move column to workspace 5
+"Mod+Ctrl+6" = "column-move-to-workspace:6" # Move column to workspace 6
+"Mod+Ctrl+7" = "column-move-to-workspace:7" # Move column to workspace 7
+"Mod+Ctrl+8" = "column-move-to-workspace:8" # Move column to workspace 8
+"Mod+Ctrl+9" = "column-move-to-workspace:9" # Move column to workspace 9
+"Mod+Ctrl+Page_Down" = "column-move-to-workspace-next" # Move column to next workspace
+"Mod+Ctrl+Page_Up" = "column-move-to-workspace-previous" # Move column to previous workspace
+"Mod+Ctrl+U" = "column-move-to-workspace-next" # Move column to next workspace
+"Mod+Ctrl+I" = "column-move-to-workspace-previous" # Move column to previous workspace
+"Mod+Ctrl+WheelDown" = { action = "column-move-to-workspace-next", cooldown_ms = 150 } # Move column to next workspace
+"Mod+Ctrl+WheelUp" = { action = "column-move-to-workspace-previous", cooldown_ms = 150 } # Move column to previous workspace
+
+"Mod+Shift+Page_Up" = "workspace-move-up" # Move workspace up
+"Mod+Shift+Page_Down" = "workspace-move-down" # Move workspace down
+"Mod+Shift+I" = "workspace-move-up" # Move workspace up
+"Mod+Shift+U" = "workspace-move-down" # Move workspace down
+
+# Monitors
+"Mod+Shift+Left" = "output-focus-left" # Focus on left monitor
+"Mod+Shift+Right" = "output-focus-right" # Focus on right monitor
+"Mod+Shift+Up" = "output-focus-up" # Focus on above monitor
+"Mod+Shift+Down" = "output-focus-down" # Focus on below monitor
+"Mod+Shift+H" = "output-focus-left" # Focus on left monitor
+"Mod+Shift+L" = "output-focus-right" # Focus on right monitor
+"Mod+Shift+K" = "output-focus-up" # Focus on above monitor
+"Mod+Shift+J" = "output-focus-down" # Focus on below monitor
+
+"Mod+Shift+Ctrl+Left" = "column-move-to-output-left" # Move window to left monitor
+"Mod+Shift+Ctrl+Right" = "column-move-to-output-right" # Move window to right monitor
+"Mod+Shift+Ctrl+Up" = "column-move-to-output-up" # Move window to above monitor
+"Mod+Shift+Ctrl+Down" = "column-move-to-output-down" # Move window to below monitor
+"Mod+Shift+Ctrl+H" = "column-move-to-output-left" # Move window to left monitor
+"Mod+Shift+Ctrl+L" = "column-move-to-output-right" # Move window to right monitor
+"Mod+Shift+Ctrl+K" = "column-move-to-output-up" # Move window to above monitor
+"Mod+Shift+Ctrl+J" = "column-move-to-output-down" # Move window to below monitor
+# Input wakes them.
+"Mod+Shift+P" = { action = "dpms-off", repeat = false } # Power off monitors
+
+# Apps. spawn runs its command through /bin/sh.
+"Mod+Y" = { action = "spawn:xdg-terminal-exec yazi", repeat = false } # Files
+"Mod+B" = { action = "spawn:chromium --profile-directory=Work", repeat = false } # Browser
+# Focus the app's most recently focused window, switching workspace, or open
+# it.
+"Mod+Z" = { action = "spawn:kaizen focus '^zen-beta$' zen-beta", repeat = false } # Focus or open Zen
+"Mod+S" = { action = "spawn:kaizen focus '(?i)^slack$' slack", repeat = false } # Focus or open Slack
+"Mod+E" = { action = "spawn:kaizen focus '^chrome-calendar\\.google\\.com__-' chromium --profile-directory=Work --app=https://calendar.google.com/", repeat = false } # Focus or open Google Calendar
+"Mod+W" = { action = "spawn:kaizen focus '^chrome-meet\\.google\\.com__-' chromium --profile-directory=Work --app=https://meet.google.com/", repeat = false } # Focus or open Google Meet
+"Mod+P" = { action = "spawn:kaizen focus '^chrome-linear\\.app__-' chromium --profile-directory=Work --app=https://linear.app/", repeat = false } # Focus or open Linear
+# No Mod+A: ../niri/wily-apps reads niri's windows and workspaces.
+
+# App window rules. umbriel's regexes are ECMAScript: no inline (?i) flag.
+# List running windows: `umbriel windows`
+
+[[window_rule]]
+match.app_id = "^zen-beta$"
+default_workspace = "1"
+default_focused = true
+default_scrolling_extent = 0.7
+
+[[window_rule]]
+match.app_id = "^slack$"
+default_workspace = "3"
+default_scrolling_extent = 0.33333
+
+# kaizen-dcal.service runs the sync daemon headless; this is the window
+# `dcal show` opens.
+[[window_rule]]
+match.app_id = "^com\\.danklinux\\.dankcalendar$"
+default_workspace = "4"
+
+# Chromium --app windows; the suffix is the profile directory.
+[[window_rule]]
+match.app_id = [
+  "^chrome-linear\\.app__-",
+  "^chrome-calendar\\.google\\.com__-",
+  "^chrome-meet\\.google\\.com__-",
+]
+default_workspace = "4"
+
+[[window_rule]]
+match.app_id = [
+  "^org\\.gnome\\.Calculator$",
+  "^com\\.belmoussaoui\\.Decoder$",
+  "^org\\.gnome\\.NautilusPreviewer$",
+  "^system-config-printer$",
+  "^(org\\.kde\\.dolphin|org\\.gnome\\.Nautilus)$",
+]
+default_floating = true
+
+[[window_rule]]
+match.app_id = [
+  "^[Ss]potify$",
+  "^spotifast$",
+  "^com\\.rafaelmardojai\\.Blanket$",
+  # Brain.fm
+  "^chrome-my\\.brain\\.fm__-",
+]
+default_workspace = "5"
+
+[[window_rule]]
+match.app_id = "^signal$"
+default_workspace = "6"
+
+[[window_rule]]
+match.app_id = "^proton-pass$"
+default_workspace = "7"
