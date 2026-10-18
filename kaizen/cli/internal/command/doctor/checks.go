@@ -16,6 +16,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/compositor"
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/state"
 )
 
@@ -331,11 +332,23 @@ func (k *checker) kaizens(ctx context.Context) {
 	})
 }
 
-// compositorConfig reports a compositor config that fails validation, or else
-// one that never includes kaizen's file for it.
+// compositorConfig reports a session that names no compositor, a compositor
+// config that fails validation, or else one that never includes kaizen's file
+// for it.
 func (k *checker) compositorConfig(ctx context.Context) {
 	name := k.Compositor.Name()
-	if err := k.Compositor.Validate(ctx); err != nil {
+	err := k.Compositor.Validate(ctx)
+	if errors.Is(err, compositor.ErrNoCompositor) {
+		k.add(check{
+			name:    "compositor",
+			level:   "ERROR",
+			unit:    "compositor",
+			message: err.Error(),
+			hint:    "start the session with kaizen run; over SSH, copy it from systemctl --user show-environment",
+		})
+		return
+	}
+	if err != nil {
 		k.add(check{name: name + "-config", level: "ERROR", unit: name, message: err.Error()})
 		return
 	}

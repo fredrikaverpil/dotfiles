@@ -35,10 +35,13 @@ niri is the stable compositor and umbriel is on trial. Every kaizen host
 installs both, and the session picks one at login: `kaizen run` starts niri,
 `kaizen run -c umbriel` umbriel (Session).
 
-- The shell and the `kaizen` command take umbriel when `UMBRIEL_SOCKET` is set,
-  else niri, and reach it only through one backend per compositor:
+- `kaizen run` exports `KAIZEN_COMPOSITOR` (`niri`, `umbriel`) to the session,
+  and the shell, the `kaizen` command and its scripts read only that. They
+  reach the compositor only through one backend per compositor:
   [`Ui/compositors/`](stow/.config/quickshell/kaizen/Ui/compositors/) (Surfaces)
-  and [`cli/internal/compositor/`](cli/internal/compositor/).
+  and [`cli/internal/compositor/`](cli/internal/compositor/). When the
+  variable names none, an `Unset` backend fails every call, so the shell still
+  runs and locks, and `kaizen doctor` reports it; nothing falls back to niri.
 - Each compositor has its own kaizen config (Where it lives), kept in step by
   hand but for the titled binds, which `qml-test` checks are the same
   (`tst_Compositors.qml`), and its own portal (Session).
@@ -157,7 +160,7 @@ notification rules.
   `kaizen --version` prints the commit it was built from (`unknown` from Nix). A
   `~/.local/bin/kaizen` overrides it: [`development.md`](docs/development.md) ›
   Building kaizen. Its commands and scripts pick the compositor as the shell
-  does: umbriel when `UMBRIEL_SOCKET` is set, else niri.
+  does, from `KAIZEN_COMPOSITOR`.
 - `kaizen internal <sub>` runs `~/.local/libexec/kaizen/internal/<sub>`: what
   the system runs, as a unit or a build, and a person or an agent has no use
   for. `kaizen internal` lists them, and `--json` works there too.
@@ -298,8 +301,8 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 - Plugins add launcher items, panels, IPC targets and bar indicators:
   [`plugins.md`](docs/plugins.md).
 - [`Ui/Compositor.qml`](stow/.config/quickshell/kaizen/Ui/Compositor.qml)
-  is the only path to the compositor. It picks the backend once, from the
-  session: umbriel's when `UMBRIEL_SOCKET` is set, else niri's.
+  is the only path to the compositor. It picks the backend once, by the name
+  in `KAIZEN_COMPOSITOR`, else `Unset.js`.
   [`Ui/compositors/`](stow/.config/quickshell/kaizen/Ui/compositors/)
   owns each compositor's commands, response parsing, and the workspace and
   screencast sources, which the bar and notifications load through its URLs.
@@ -313,11 +316,12 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   set each.
 - `Ui/compositors/Contract.js` lists every property and function a backend
   defines for `Compositor` to forward, and `tst_Compositors.qml` checks each
-  backend against it. A function added to `Compositor` goes in both.
+  backend, `Unset.js` included, against it. A function added to `Compositor`
+  goes in each.
 
 ## Session
 
-```
+```text
 TTY login ─ kaizen run ─ uwsm start kaizen_niri.desktop ─ niri --session
           (kaizen run -c umbriel ─ uwsm start kaizen_umbriel.desktop ─ umbriel)
   └─ wayland-session@kaizen_<compositor>.desktop.target
@@ -334,9 +338,11 @@ which runs niri; `kaizen run -c umbriel` starts
 instead. uwsm names its units after the entry ID, so another session on niri
 (`uwsm start niri`) starts none of kaizen's. Its `DesktopNames` give uwsm
 `XDG_CURRENT_DESKTOP=niri:kaizen` (`umbriel:kaizen`) while it prepares the
-environment, which picks the portals. For the name `kaizen`, uwsm sources
-[`uwsm/env-kaizen`](stow/.config/uwsm/env-kaizen) and exports its session
-variables to the user manager; a change applies from the next login.
+environment, which picks the portals. uwsm also exports its own environment, so
+`KAIZEN_COMPOSITOR`, which `kaizen run` sets, reaches the user manager; a
+session started with `uwsm start` alone lacks it. For the name `kaizen`, uwsm
+sources [`uwsm/env-kaizen`](stow/.config/uwsm/env-kaizen) and exports its
+session variables to the user manager; a change applies from the next login.
 `niri --session` then sets and exports `XDG_CURRENT_DESKTOP=niri`, so portals
 and `OnlyShowIn=niri` autostart entries see plain niri; umbriel does the same
 with `umbriel`.

@@ -46,6 +46,10 @@ uwsm check may-start -i
 # PATH to the session. Drop it, so the session's `kaizen` follows rebuilds.
 PATH=${PATH#"$(dirname "$(command -v kaizen)")":}
 
+# uwsm exports its own environment to the session, so the shell, its units and
+# `kaizen` read the compositor from KAIZEN_COMPOSITOR.
+export KAIZEN_COMPOSITOR="$compositor"
+
 # One entry per compositor, since its DesktopNames set XDG_CURRENT_DESKTOP,
 # which picks the portals. kaizen_niri.desktop runs `niri --session`, which
 # serves niri's D-Bus interfaces (screencast portal, a11y) and imports its
