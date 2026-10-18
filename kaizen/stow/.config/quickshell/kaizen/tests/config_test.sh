@@ -26,7 +26,7 @@ for config in ../../../../../stow/host/*/.config/umbriel/config.toml; do
   [ -e "$config" ] || continue
   host=$(basename "$(dirname "$(dirname "$(dirname "$config")")")")
   mkdir -p "$tmp/umbriel-$host/umbriel"
-  cp -L "$config" ../../umbriel/kaizen.toml "$tmp/umbriel-$host/umbriel"
+  cp -L "$(dirname "$config")"/*.toml ../../umbriel/kaizen.toml "$tmp/umbriel-$host/umbriel"
   if [ -d "$(dirname "$(dirname "$config")")/xkb" ]; then
     cp -rL "$(dirname "$(dirname "$config")")/xkb" "$tmp/umbriel-$host"
   fi

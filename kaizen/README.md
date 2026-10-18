@@ -125,10 +125,11 @@ notification rules.
   (`stow/host/<host>/.config/niri/`) included around `kaizen.kdl`, the last
   after it, so its binds win. The umbriel config,
   `~/.config/umbriel/config.toml`, is the twin of niri's, also kept by hand,
-  and includes `kaizen.toml`. umbriel applies a file's includes before its own
-  keys, so an included host file could not override its binds: each host has
-  its own (`stow/host/<host>/.config/umbriel/config.toml`), wily's being
-  renoir's with `host.kdl`'s lines.
+  and includes `kaizen.toml` and the host's `outputs.toml`. umbriel applies a
+  file's includes before its own keys, so an included host file could not
+  override its binds: each host has its own
+  (`stow/host/<host>/.config/umbriel/config.toml`), wily's being renoir's with
+  `host.kdl`'s lines.
 - `kaizen` is the only kaizen command on PATH, built from
   [`kaizen/cli/`](cli/) into the system profile. `kaizen <sub>` runs its Go
   command `<sub>`
@@ -380,8 +381,8 @@ nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
 ## Out of scope
 
 - Bluetooth pairing, connection editing: bluetui, nm-connection-editor.
-- Output layout: hand-kept in `stow/host/<host>/.config/niri/outputs.kdl`,
-  keyed by monitor, not port.
+- Output layout: hand-kept in `stow/host/<host>/.config/niri/outputs.kdl` and
+  its twin `umbriel/outputs.toml`, keyed by monitor, not port.
 - Compositor-side XKB toggling: the shell owns layout state, and a
   compositor-side toggle would desynchronize it.
 - Clipboard persistence: memory only. Offers carrying
