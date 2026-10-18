@@ -310,6 +310,9 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   (lock restore after a crash), `opensOnFocusedOutput` (mirror),
   `floatsInWorkingArea` (recording's camera). `Niri.js` and `Umbriel.js`
   set each.
+- `Ui/compositors/Contract.js` lists every property and function a backend
+  defines for `Compositor` to forward, and `tst_Compositors.qml` checks each
+  backend against it. A function added to `Compositor` goes in both.
 
 ## Session
 
