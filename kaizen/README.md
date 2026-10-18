@@ -327,8 +327,8 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   exposes a capability for it to read, not a compositor name to check:
   `releaseExclusiveFocus` (panel and context menu focus), `replacesDeadLock`
   (lock restore after a crash), `opensOnFocusedOutput` (mirror),
-  `floatsInWorkingArea` (recording's camera). `Niri.js` and `Umbriel.js`
-  set each.
+  `floatsInWorkingArea` (recording's camera), `placesBackdrop` (the
+  backdrop wallpaper). `Niri.js` and `Umbriel.js` set each.
 - `Ui/compositors/Contract.js` lists every property and function a backend
   defines for `Compositor` to forward, and each optional feature's names,
   which a backend defines all of or none; `tst_Compositors.qml` checks each

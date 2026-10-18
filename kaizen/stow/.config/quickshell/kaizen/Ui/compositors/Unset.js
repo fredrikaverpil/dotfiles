@@ -7,6 +7,7 @@ var releaseExclusiveFocus = false;
 var replacesDeadLock = true;
 var opensOnFocusedOutput = true;
 var floatsInWorkingArea = true;
+var placesBackdrop = false;
 // No source loads.
 var eventsComponent = "";
 var workspaceComponent = "";
