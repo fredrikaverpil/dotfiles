@@ -23,6 +23,8 @@ Singleton {
     readonly property url castSource: Qt.resolvedUrl("compositors/" + backend.castComponent)
     // The file borderColors(palette) fills, under the shell's state dir.
     readonly property string borderFile: backend.borderFile
+    // The action closeWindow() runs, as a bind names it.
+    readonly property string closeWindowAction: backend.closeWindowAction
 
     function borderColors(palette) {
         return root.backend.borderColors(palette);
