@@ -60,6 +60,8 @@ const (
 	systemBus = "busctl --system list --no-legend"
 	envLine   = "systemctl --user show-environment"
 	fontLine  = "fc-list : family"
+	// waylandInfo lists the compositor's globals.
+	waylandInfo = "wayland-info"
 	// coreRequires is the core's requires under the test's $HOME.
 	coreRequires = "home/.config/quickshell/kaizen/requires"
 	// niriConfig is niri's config under the test's $HOME.
@@ -333,7 +335,9 @@ func TestRun(t *testing.T) {
 					"env A=1\nenv B=2 warn\nenv C=3\nenv A\nenv =1\n" +
 					"font Mono Sans\nfont mono  ALIAS\nfont Gone Mono warn\nfont Gone Serif\nfont\n" +
 					"qtplugin imageformats/libqwebp.so\nqtplugin platforms/libqwayland.so\n" +
-					"qtplugin imageformats/libqgif.so warn\nqtplugin imageformats/libqsvg.so\nqtplugin\n",
+					"qtplugin imageformats/libqgif.so warn\nqtplugin imageformats/libqsvg.so\nqtplugin\n" +
+					"protocol zwlr_layer_shell_v1\nprotocol zwlr_b_v1|ext_b_v1\nprotocol gone_v1\nprotocol gone_too_v1 warn\n" +
+					"protocol\n",
 				"proc/4242/environ": "A=1\x00QT_PLUGIN_PATH=$DIR/qt/a::$DIR/qt/b\x00",
 				"proc/4242/maps": "7299-72aa r--p 00000000 00:00 0\n" +
 					"7299-72aa r--p 00000000 fe:00 1    $DIR/qtbase/lib/libQt6Core.so.6.11.2\n",
@@ -373,6 +377,8 @@ func TestRun(t *testing.T) {
 				systemBus:  {{Err: errors.New("exit status 1")}},
 				envLine:    {{Stdout: "A=1\nB=1\nPATH=/bin\n"}},
 				fontLine:   {{Stdout: "Mono Sans,Mono Alias\nOther\n"}},
+				waylandInfo: {{Stdout: "interface: 'zwlr_layer_shell_v1',      version:  4, name:  1\n" +
+					"\tname: zwlr_layer_shell_v1\ninterface: 'ext_b_v1', version: 1, name: 2\n"}},
 			},
 			want: result{
 				Stdout: "7 errors, 5 warnings\n\n" +
@@ -387,7 +393,8 @@ func TestRun(t *testing.T) {
 					"  unknown line: env A\n  unknown line: env =1\n" +
 					"  missing font Gone Mono\n  missing font Gone Serif\n  unknown line: font\n" +
 					"  missing qtplugin imageformats/libqgif.so\n  missing qtplugin imageformats/libqsvg.so\n" +
-					"  unknown line: qtplugin\n" +
+					"  unknown line: qtplugin\n  missing protocol gone_v1\n  missing protocol gone_too_v1\n" +
+					"  unknown line: protocol\n" +
 					"ERROR plugins  check\n  absent: no absent/ in $DIR/tree/plugins or $DIR/home/.config/kaizen/plugins\n" +
 					"ERROR plugins  check\n  both: both/ in both $DIR/tree/plugins and $DIR/home/.config/kaizen/plugins\n" +
 					"ERROR plugins  check\n  noqml: no Plugin.qml in $DIR/home/.config/kaizen/plugins/noqml\n" +
@@ -399,7 +406,9 @@ func TestRun(t *testing.T) {
 					"WARN  xdg-desktop-portal  check\n  cannot read the colour scheme: busctl: exit status 1\n" +
 					"WARN  kaizen-shell  check\n  runs $DIR/tree\n  hint: kaizen dev off\n" +
 					"WARN  warned  check\n  missing cmd absent\n",
-				Calls: []string{showLine, "$DIR/home/.local/bin/kaizen --version", niriLine, portalLine, userBus, systemBus, envLine, fontLine},
+				Calls: []string{showLine, "$DIR/home/.local/bin/kaizen --version", niriLine, portalLine, userBus, systemBus, envLine, fontLine,
+					waylandInfo,
+				},
 			},
 		},
 		{

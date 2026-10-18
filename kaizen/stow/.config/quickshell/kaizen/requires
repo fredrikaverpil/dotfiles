@@ -2,10 +2,11 @@
 # One per line: cmd NAME, bus session|system NAME, file PATH, data PATH (in the
 # XDG data dirs), env NAME=VALUE (in the user manager's environment), font FAMILY
 # (the rest of the line, any case), qtplugin PATH (in the running shell's Qt
-# plugin dirs). Missing is an error unless the line ends in `warn`; a line in
-# another form is an error. kaizen/nix/requires.nix fails a host's build on a
-# `cmd`, `file` or `data` line here or in an enabled plugin's requires that the
-# host does not install.
+# plugin dirs), protocol NAME[|NAME...] (a Wayland global the compositor
+# advertises, any one of them). Missing is an error unless the line ends in
+# `warn`; a line in another form is an error. kaizen/nix/requires.nix fails a
+# host's build on a `cmd`, `file` or `data` line here or in an enabled plugin's
+# requires that the host does not install.
 
 # Session
 cmd niri
@@ -41,6 +42,24 @@ data xdg-desktop-portal/portals/umbriel.portal
 env NIXOS_OZONE_WL=1
 env QT_QPA_PLATFORMTHEME=gtk3
 env GTK_USE_PORTAL=1
+
+# Compositor
+# Lists the protocols below.
+cmd wayland-info
+# The bar, panels, menus, notifications, background and curtain.
+protocol zwlr_layer_shell_v1
+protocol ext_session_lock_manager_v1
+# grim and wl-mirror take either.
+protocol zwlr_screencopy_manager_v1|ext_image_copy_capture_manager_v1
+protocol ext_idle_notifier_v1
+# kaizen keys (wtype).
+protocol zwp_virtual_keyboard_manager_v1
+# The clipboard watcher (wl-paste) takes either.
+protocol zwlr_data_control_manager_v1|ext_data_control_manager_v1
+# Nightlight (wl-gammarelay-rs).
+protocol zwlr_gamma_control_manager_v1 warn
+# wlrctl, the devshell's pointer for agents.
+protocol zwlr_virtual_pointer_manager_v1 warn
 
 # Desktop
 cmd ghostty

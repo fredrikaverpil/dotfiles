@@ -16,8 +16,10 @@ import (
 // unless every missing line ends in `warn`. Each line is `cmd NAME`,
 // `bus session|system NAME`, `file PATH`, `data PATH`, in the XDG data dirs,
 // `env NAME=VALUE`, in the user manager's environment, `font FAMILY`, whose
-// name is the rest of the line and matches any case, or `qtplugin PATH`, in
-// the running shell's Qt plugin dirs, then `warn` or nothing.
+// name is the rest of the line and matches any case, `qtplugin PATH`, in
+// the running shell's Qt plugin dirs, or `protocol NAME[|NAME...]`, a Wayland
+// global the compositor advertises, any one of the names, then `warn` or
+// nothing.
 func (k *checker) requires(ctx context.Context, path, unit string) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -78,6 +80,12 @@ func (k *checker) requires(ctx context.Context, path, unit string) {
 				continue
 			}
 			found = slices.ContainsFunc(dirs, func(dir string) bool { return exists(dir + "/" + name) })
+		case kind == "protocol":
+			globals, listed := k.list(ctx, "the compositor's protocols", interfaceName, "wayland-info")
+			if !listed {
+				continue
+			}
+			found = slices.ContainsFunc(strings.Split(name, "|"), func(n string) bool { return slices.Contains(globals, n) })
 		case kind == "file":
 			found = exists(name)
 		case kind == "data":
@@ -169,6 +177,20 @@ func (k *checker) listed(what string, names func() ([]string, error)) ([]string,
 func firstField(line string) []string {
 	fields := strings.Fields(line)
 	return fields[:min(len(fields), 1)]
+}
+
+// interfaceName returns the global a wayland-info line names
+// (`interface: 'wl_shm', version: 2, name: 1`), if it names one.
+func interfaceName(line string) []string {
+	rest, ok := strings.CutPrefix(line, "interface: '")
+	if !ok {
+		return nil
+	}
+	name, _, ok := strings.Cut(rest, "'")
+	if !ok {
+		return nil
+	}
+	return []string{name}
 }
 
 // families returns the comma-separated family names of an `fc-list : family`
