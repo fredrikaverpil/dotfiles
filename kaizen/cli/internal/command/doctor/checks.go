@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -19,9 +18,6 @@ import (
 
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/state"
 )
-
-// tracing matches niri's tracing lines, which precede `niri validate`'s report.
-var tracing = regexp.MustCompile(`^[0-9]{4}-[0-9]{2}-[0-9]{2}T[^ ]+ +[A-Z]+ `)
 
 // include matches a niri config's include line, capturing its path.
 var include = regexp.MustCompile(`(?m)^[ \t]*include[ \t][^"\n]*"([^"]*)"`)
@@ -136,7 +132,7 @@ func (c Command) check(ctx context.Context, units []unit) []check {
 		})
 	}
 	k.kaizens(ctx)
-	k.niri(ctx)
+	k.compositorConfig(ctx)
 	k.portal(ctx)
 	k.kmsServer()
 	// kaizen dev's drop-in runs a worktree's tree, whose requires and plugins
@@ -325,35 +321,24 @@ func (k *checker) kaizens(ctx context.Context) {
 	})
 }
 
-// niri reports a niri config that fails `niri validate`, or else never
-// includes kaizen.kdl.
-func (k *checker) niri(ctx context.Context) {
-	_, err := k.Runner.Run(ctx, "env", "NO_COLOR=1", "niri", "validate")
-	if err == nil {
-		config := cmp.Or(k.Getenv("NIRI_CONFIG"), filepath.Join(k.configDir(), "niri", "config.kdl"))
-		if !k.reaches(config, "kaizen.kdl", 0) {
-			k.add(check{
-				name:    "niri-include",
-				level:   "ERROR",
-				unit:    "niri",
-				message: config + " does not include kaizen.kdl",
-				hint:    `add include "kaizen.kdl" to ` + config,
-			})
-		}
+// compositorConfig reports a compositor config that fails validation, or else
+// a niri config that never includes kaizen.kdl.
+func (k *checker) compositorConfig(ctx context.Context) {
+	name := k.Compositor.Name()
+	if err := k.Compositor.Validate(ctx); err != nil {
+		k.add(check{name: name + "-config", level: "ERROR", unit: name, message: err.Error()})
 		return
 	}
-	report := err.Error()
-	var exitErr *exec.ExitError
-	if errors.As(err, &exitErr) {
-		report = string(exitErr.Stderr)
+	config := cmp.Or(k.Getenv("NIRI_CONFIG"), filepath.Join(k.configDir(), "niri", "config.kdl"))
+	if !k.reaches(config, "kaizen.kdl", 0) {
+		k.add(check{
+			name:    "niri-include",
+			level:   "ERROR",
+			unit:    "niri",
+			message: config + " does not include kaizen.kdl",
+			hint:    `add include "kaizen.kdl" to ` + config,
+		})
 	}
-	var lines []string
-	for line := range strings.SplitSeq(strings.TrimRight(report, "\n"), "\n") {
-		if !tracing.MatchString(line) {
-			lines = append(lines, line)
-		}
-	}
-	k.add(check{name: "niri-config", level: "ERROR", unit: "niri", message: "niri validate:\n" + strings.Join(lines, "\n")})
 }
 
 // reaches reports whether niri config file, or a file it includes, includes a

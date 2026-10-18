@@ -18,6 +18,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/compositor"
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/state"
 )
 
@@ -767,12 +768,13 @@ func TestRun(t *testing.T) {
 			}
 			runner := &seqRunner{outputs: outputs}
 			c := Command{
-				Runner:   runner,
-				Home:     expand(env["HOME"]),
-				Getenv:   func(key string) string { return expand(env[key]) },
-				now:      func() time.Time { return now },
-				location: time.UTC,
-				proc:     filepath.Join(dir, "proc"),
+				Runner:     runner,
+				Compositor: compositor.Niri{Runner: runner},
+				Home:       expand(env["HOME"]),
+				Getenv:     func(key string) string { return expand(env[key]) },
+				now:        func() time.Time { return now },
+				location:   time.UTC,
+				proc:       filepath.Join(dir, "proc"),
 				getxattr: func(path, attr string) ([]byte, error) {
 					x, ok := caps[path]
 					if !ok || attr != "security.capability" {

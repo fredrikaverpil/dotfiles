@@ -4,16 +4,15 @@ package keys
 
 import (
 	"context"
-	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"io"
 	"os/exec"
 	"slices"
-	"strconv"
 	"strings"
 	"time"
 
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/compositor"
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/state"
 )
 
@@ -29,7 +28,8 @@ var passwordLayers = []string{state.CurtainLayer, "kaizen-polkit"}
 // Command presses keys in a layer or a window, refusing unless it holds the
 // keyboard before each key.
 type Command struct {
-	Runner state.Runner
+	Runner     state.Runner
+	Compositor compositor.Compositor
 	// wait waits for d; nil sleeps.
 	wait func(ctx context.Context, d time.Duration) error
 }
@@ -49,14 +49,14 @@ func (Command) Summary() string {
 // target is where the keys go: a layer namespace, else a window id.
 type target struct {
 	layer  string
-	window int
+	window string
 }
 
 func (t target) String() string {
 	if t.layer != "" {
 		return "layer " + t.layer
 	}
-	return fmt.Sprintf("window %d", t.window)
+	return "window " + t.window
 }
 
 // chord is a key and the modifiers held while it is pressed.
@@ -113,11 +113,10 @@ func (c Command) parse(args []string) (target, []chord, error) {
 			t.layer = args[i]
 		case arg == "--window":
 			i++
-			id, err := strconv.Atoi(args[i])
-			if err != nil || id <= 0 {
-				return target{}, nil, usageError(args[i] + " is not a window id")
+			if args[i] == "" {
+				return target{}, nil, usageError(`"" is not a window id`)
 			}
-			t.window = id
+			t.window = args[i]
 		case strings.HasPrefix(arg, "-"):
 			return target{}, nil, usageError("unknown argument: " + arg)
 		default:
@@ -164,7 +163,7 @@ func (c Command) press(ctx context.Context, t target, chords []chord) (err error
 	if err != nil {
 		return err
 	}
-	restore, err := state.LiftCurtain(ctx, c.Runner, status, c.wait)
+	restore, err := state.LiftCurtain(ctx, c.Runner, c.Compositor, status, c.wait)
 	if err != nil {
 		return err
 	}
@@ -173,9 +172,9 @@ func (c Command) press(ctx context.Context, t target, chords []chord) (err error
 			err = errors.Join(err, restoreErr)
 		}
 	}()
-	if t.window != 0 {
+	if t.window != "" {
 		// Not err: the deferred give-back joins its error into press's.
-		giveBack, focusErr := focusWindow(ctx, c.Runner, t.window)
+		giveBack, focusErr := focusWindow(ctx, c.Compositor, t.window)
 		if focusErr != nil {
 			return focusErr
 		}
@@ -229,15 +228,15 @@ func (c Command) holds(ctx context.Context, t target) error {
 	if _, err := unlocked(ctx, c.Runner); err != nil {
 		return err
 	}
-	layers, err := state.Layers(ctx, c.Runner)
+	layers, err := c.Compositor.Layers(ctx)
 	if err != nil {
 		return err
 	}
-	// The shell's surfaces that take the keyboard are Exclusive, and niri
-	// gives them the keyboard over any window.
+	// The shell's surfaces that take the keyboard are exclusive, and the
+	// compositor gives them the keyboard over any window.
 	var holders []string
 	for _, l := range layers {
-		if l.KeyboardInteractivity == "Exclusive" && !slices.Contains(holders, l.Namespace) {
+		if l.Exclusive && !slices.Contains(holders, l.Namespace) {
 			holders = append(holders, l.Namespace)
 		}
 	}
@@ -251,14 +250,14 @@ func (c Command) holds(ctx context.Context, t target) error {
 	if len(holders) > 0 {
 		return fmt.Errorf("%v does not hold the keyboard: %s", t, describe(holders))
 	}
-	w, err := focusedWindow(ctx, c.Runner)
+	w, err := c.Compositor.FocusedWindow(ctx)
 	switch {
 	case err != nil:
 		return err
 	case w == nil:
 		return fmt.Errorf("%v does not hold the keyboard: no window has focus", t)
 	case w.ID != t.window:
-		return fmt.Errorf("%v does not hold the keyboard: window %d (%s) has focus", t, w.ID, w.AppID)
+		return fmt.Errorf("%v does not hold the keyboard: window %s (%s) has focus", t, w.ID, w.AppID)
 	}
 	return nil
 }
@@ -274,47 +273,24 @@ func describe(holders []string) string {
 	return "layers " + strings.Join(holders, ", ") + " hold it"
 }
 
-// window is a window in `niri msg -j focused-window`.
-type window struct {
-	ID    int    `json:"id"`
-	AppID string `json:"app_id"`
-}
-
-// focusedWindow returns the focused window, nil when none is.
-func focusedWindow(ctx context.Context, r state.Runner) (*window, error) {
-	out, err := r.Run(ctx, "niri", "msg", "-j", "focused-window")
-	if err != nil {
-		return nil, fmt.Errorf("niri msg focused-window: %v", err)
-	}
-	var w *window
-	if err := json.Unmarshal(out, &w); err != nil {
-		return nil, fmt.Errorf("niri msg focused-window: %v", err)
-	}
-	return w, nil
-}
-
 // focusWindow focuses window id and returns the function that gives focus back
 // to the window that had it, which does nothing when none or id had it.
-func focusWindow(ctx context.Context, r state.Runner, id int) (giveBack func(ctx context.Context) error, err error) {
-	previous, err := focusedWindow(ctx, r)
+func focusWindow(
+	ctx context.Context,
+	c compositor.Compositor,
+	id string,
+) (giveBack func(ctx context.Context) error, err error) {
+	previous, err := c.FocusedWindow(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if err := focus(ctx, r, id); err != nil {
+	if err := c.FocusWindow(ctx, id); err != nil {
 		return nil, err
 	}
 	if previous == nil || previous.ID == id {
 		return func(context.Context) error { return nil }, nil
 	}
-	return func(ctx context.Context) error { return focus(ctx, r, previous.ID) }, nil
-}
-
-// focus focuses window id.
-func focus(ctx context.Context, r state.Runner, id int) error {
-	if _, err := r.Run(ctx, "niri", "msg", "action", "focus-window", "--id", strconv.Itoa(id)); err != nil {
-		return fmt.Errorf("niri msg action focus-window: %v", err)
-	}
-	return nil
+	return func(ctx context.Context) error { return c.FocusWindow(ctx, previous.ID) }, nil
 }
 
 // send presses k with wtype.

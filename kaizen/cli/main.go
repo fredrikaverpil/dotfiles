@@ -21,6 +21,7 @@ import (
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/reload"
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/shot"
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/status"
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/compositor"
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/state"
 )
 
@@ -41,6 +42,7 @@ func main() {
 		os.Exit(1)
 	}
 	info, _ := debug.ReadBuildInfo()
+	comp := compositor.Niri{Runner: state.Exec{}}
 	d := cli.Dispatcher{
 		Commands: []cli.Command{
 			dev.Command{
@@ -48,8 +50,8 @@ func main() {
 				Main:       filepath.Join(home, ".dotfiles"),
 				RuntimeDir: os.Getenv("XDG_RUNTIME_DIR"),
 			},
-			doctor.Command{Runner: state.Exec{}, Home: home, Getenv: os.Getenv},
-			keys.Command{Runner: state.Exec{}},
+			doctor.Command{Runner: state.Exec{}, Compositor: comp, Home: home, Getenv: os.Getenv},
+			keys.Command{Runner: state.Exec{}, Compositor: comp},
 			link.Command{
 				Runner: state.Exec{},
 				Home:   home,
@@ -58,7 +60,7 @@ func main() {
 				RuntimeDir: cmp.Or(os.Getenv("XDG_RUNTIME_DIR"), fmt.Sprintf("/run/user/%d", os.Getuid())),
 			},
 			reload.Command{Runner: state.Exec{}},
-			shot.Command{Runner: state.Exec{}, CacheDir: cache},
+			shot.Command{Runner: state.Exec{}, Compositor: comp, CacheDir: cache},
 			status.Command{Runner: state.Exec{}},
 		},
 		Dir:     cli.ScriptsDir(exe, home),

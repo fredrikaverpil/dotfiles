@@ -6,13 +6,15 @@ import (
 	"fmt"
 	"slices"
 	"time"
+
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/compositor"
 )
 
 // CurtainLayer is the curtain's layer namespace.
 const CurtainLayer = "kaizen-curtain"
 
 // The curtain's surface leaves with the next frame, which its status does not
-// show: wait up to 2.5 s for niri to drop it.
+// show: wait up to 2.5 s for the compositor to drop it.
 const (
 	curtainAttempts = 25
 	curtainDelay    = 100 * time.Millisecond
@@ -49,7 +51,7 @@ func CloseCurtain(ctx context.Context, r Runner, pid int) error {
 	return nil
 }
 
-// LiftCurtain lifts the curtain when status shows it up, and waits until niri
+// LiftCurtain lifts the curtain when status shows it up, and waits until c
 // shows no curtain surface: it hides the outputs from a capture and takes
 // every key. It returns the function that puts the curtain back, which does
 // nothing when it was down. When the surface stays, it puts the curtain back
@@ -57,6 +59,7 @@ func CloseCurtain(ctx context.Context, r Runner, pid int) error {
 func LiftCurtain(
 	ctx context.Context,
 	r Runner,
+	c compositor.Compositor,
 	status Status,
 	wait func(ctx context.Context, d time.Duration) error,
 ) (restore func(ctx context.Context) error, err error) {
@@ -70,21 +73,21 @@ func LiftCurtain(
 		return nil, err
 	}
 	restore = func(ctx context.Context) error { return OpenCurtain(ctx, r, status.PID) }
-	if err := awaitCurtainGone(ctx, r, wait); err != nil {
+	if err := awaitCurtainGone(ctx, c, wait); err != nil {
 		return nil, errors.Join(err, restore(context.WithoutCancel(ctx)))
 	}
 	return restore, nil
 }
 
-// awaitCurtainGone waits until niri shows no curtain surface, failing when it
+// awaitCurtainGone waits until c shows no curtain surface, failing when it
 // stays.
-func awaitCurtainGone(ctx context.Context, r Runner, wait wait) error {
+func awaitCurtainGone(ctx context.Context, c compositor.Compositor, wait wait) error {
 	for attempt := 1; ; attempt++ {
-		layers, err := Layers(ctx, r)
+		layers, err := c.Layers(ctx)
 		if err != nil {
 			return err
 		}
-		if !slices.ContainsFunc(layers, func(l Layer) bool { return l.Namespace == CurtainLayer }) {
+		if !slices.ContainsFunc(layers, func(l compositor.Layer) bool { return l.Namespace == CurtainLayer }) {
 			return nil
 		}
 		if attempt == curtainAttempts {

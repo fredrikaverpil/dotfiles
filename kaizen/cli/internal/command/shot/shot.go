@@ -3,7 +3,6 @@ package shot
 
 import (
 	"context"
-	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"io"
@@ -16,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/compositor"
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/state"
 )
 
@@ -36,7 +36,8 @@ var regionPattern = regexp.MustCompile(`^([0-9]+)x([0-9]+)\+([0-9]+)\+([0-9]+)$`
 
 // Command captures an output, or its bar or a region of it.
 type Command struct {
-	Runner state.Runner
+	Runner     state.Runner
+	Compositor compositor.Compositor
 	// CacheDir is $XDG_CACHE_HOME, else ~/.cache.
 	CacheDir string
 	// now returns the time; nil is the clock.
@@ -124,7 +125,7 @@ func (c Command) Run(ctx context.Context, args []string, stdout, stderr io.Write
 // shoot captures the output opts names and returns the file. It returns the
 // file with an error when the capture succeeded but the curtain stayed down.
 func (c Command) shoot(ctx context.Context, opts options, stderr io.Writer) (file string, err error) {
-	screen, err := readScreen(ctx, c.Runner)
+	screen, err := readScreen(ctx, c.Compositor)
 	if err != nil {
 		return "", err
 	}
@@ -191,7 +192,7 @@ func (c Command) shoot(ctx context.Context, opts options, stderr io.Writer) (fil
 	}
 	// grim cannot capture an output through the curtain. Lift it for the
 	// capture and put it back, whatever the capture does.
-	restore, err := state.LiftCurtain(ctx, c.Runner, status, c.wait)
+	restore, err := state.LiftCurtain(ctx, c.Runner, c.Compositor, status, c.wait)
 	if err != nil {
 		return "", err
 	}
@@ -279,65 +280,38 @@ func unknown(status state.Status) string {
 	return "shell status has no barHeight"
 }
 
-// output is an output in `niri msg -j outputs`.
-type output struct {
-	Name string `json:"name"`
-	// Logical is nil while the output is off.
-	Logical *logical `json:"logical"`
-}
-
-// logical is an output's place and size in the layout, in logical pixels.
-type logical struct {
-	X      int `json:"x"`
-	Y      int `json:"y"`
-	Width  int `json:"width"`
-	Height int `json:"height"`
-}
-
-// screen is what niri shows: its outputs, the focused one, and those holding
-// an open panel, menu or launcher.
+// screen is what the compositor shows: its outputs, the focused one, and those
+// holding an open panel, menu or launcher.
 type screen struct {
-	outputs map[string]output
+	outputs map[string]compositor.Output
 	names   []string
 	focused string
 	open    []string
 }
 
-// readScreen reads the outputs and their surfaces from niri.
-func readScreen(ctx context.Context, r state.Runner) (screen, error) {
-	out, err := r.Run(ctx, "niri", "msg", "-j", "outputs")
+// readScreen reads the outputs and their surfaces from c.
+func readScreen(ctx context.Context, c compositor.Compositor) (screen, error) {
+	outputs, err := c.Outputs(ctx)
 	if err != nil {
-		return screen{}, fmt.Errorf("niri msg outputs: %v", err)
+		return screen{}, err
 	}
-	var outputs map[string]output
-	if err := json.Unmarshal(out, &outputs); err != nil {
-		return screen{}, fmt.Errorf("niri msg outputs: %v", err)
-	}
-	s := screen{outputs: make(map[string]output, len(outputs))}
+	s := screen{outputs: make(map[string]compositor.Output, len(outputs))}
 	for _, o := range outputs {
 		s.outputs[o.Name] = o
 		s.names = append(s.names, o.Name)
+		if o.Focused {
+			s.focused = o.Name
+		}
 	}
 	slices.Sort(s.names)
-	out, err = r.Run(ctx, "niri", "msg", "-j", "focused-output")
-	if err != nil {
-		return screen{}, fmt.Errorf("niri msg focused-output: %v", err)
-	}
-	var focused *output
-	if err := json.Unmarshal(out, &focused); err != nil {
-		return screen{}, fmt.Errorf("niri msg focused-output: %v", err)
-	}
-	if focused != nil {
-		s.focused = focused.Name
-	}
-	layers, err := state.Layers(ctx, r)
+	layers, err := c.Layers(ctx)
 	if err != nil {
 		return screen{}, err
 	}
 	// An open panel, menu or launcher holds exclusive keyboard focus on its
 	// output.
 	for _, l := range layers {
-		if l.KeyboardInteractivity == "Exclusive" && !slices.Contains(s.open, l.Output) {
+		if l.Exclusive && !slices.Contains(s.open, l.Output) {
 			s.open = append(s.open, l.Output)
 		}
 	}
