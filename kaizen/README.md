@@ -48,12 +48,15 @@ installs both, and the session picks one at login: `kaizen run` starts niri,
 - A backend fills what its compositor lacks with another tool: umbriel's
   screenshots come from grim, its screen sharing from PipeWire's node list.
 - A compositor must provide layer-shell, ext-session-lock, screencopy,
-  ext-idle-notify and virtual-keyboard, and its backend the outputs and the
-  focused output, focusing an output, a workspace and an app, closing a
-  window, DPMS, binds and keyboard layouts. Beyond that, a backend may lack an
-  optional feature: auto DnD on screencasts, window screenshots, the colour
-  picker, the recording's camera, border colours. The shell then hides its
-  launcher rows and panel controls.
+  ext-idle-notify, virtual-keyboard and data control, and its backend the
+  outputs and the focused output, focusing an output, a workspace and an app,
+  closing a window, DPMS, binds and keyboard layouts. `kaizen doctor` checks
+  the protocols, and warns without gamma control (nightlight) or virtual
+  pointer (`wlrctl`): the `protocol` lines in
+  [`requires`](stow/.config/quickshell/kaizen/requires). Beyond that, a
+  backend may lack an optional feature: auto DnD on screencasts, window
+  screenshots, the colour picker, the recording's camera, border colours. The
+  shell then hides its launcher rows and panel controls.
 
 ## Layers
 
@@ -185,9 +188,10 @@ notification rules.
 The distro supplies what [the core's Nix module](nix/default.nix) and each
 enabled plugin's do on NixOS; the session variables come from Stow
 ([`uwsm/env-kaizen`](stow/.config/uwsm/env-kaizen)) on either. `kaizen doctor`
-reports each program, D-Bus service, file, session variable, font and Qt plugin
-missing from [`requires`](stow/.config/quickshell/kaizen/requires) and from each
-enabled plugin's `plugins/<name>/requires`, a niri config that never includes
+reports each program, D-Bus service, file, session variable, font, Qt plugin and
+Wayland protocol missing from
+[`requires`](stow/.config/quickshell/kaizen/requires) and from each enabled
+plugin's `plugins/<name>/requires`, a niri config that never includes
 `kaizen.kdl` (an umbriel config `kaizen.toml`), a portal that does not answer
 the colour scheme, and a `gsr-kms-server` without `cap_sys_admin+ep`, which lets
 monitor capture skip the portal dialog. It cannot check:

@@ -57,7 +57,8 @@ includes `kaizen.kdl`, an umbriel config that fails `umbriel config validate` or
 never includes `kaizen.toml`, a portal that does not answer the colour scheme, a
 `gsr-kms-server` without `cap_sys_admin+ep`, an enabled plugin the shell cannot
 load or whose units are not running, and a program, D-Bus service, file, session
-variable, font or Qt plugin that a `requires` file lists and the system lacks. A
+variable, font, Qt plugin or Wayland protocol that a `requires` file lists and
+the system or compositor lacks. A
 healthy desktop reports nothing, so every finding is something to fix; a `hint:`
 line under it names the fix when there is one. A check that cannot run is an
 error of `doctor`, and the others still run. An error an application shows in

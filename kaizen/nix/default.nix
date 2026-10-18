@@ -196,6 +196,7 @@ in
       # Neither compositor mirrors outputs; the mirror service runs it fullscreen on the target.
       wl-mirror
       wtype # `kaizen keys` presses keys with it.
+      wayland-utils # `kaizen doctor` lists the compositor's protocols with wayland-info.
     ];
   };
 }
