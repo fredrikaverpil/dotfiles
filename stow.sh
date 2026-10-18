@@ -56,7 +56,23 @@ for pkg in "${pkgs[@]}"; do
   "${cmd[@]}"
 done
 for dir in "${dir_links[@]}"; do
-  ln -sfn "$PWD/stow/shared/$dir" "$HOME/$dir"
+  target="$HOME/$dir"
+  # A real dir here, such as one stowed file by file, would get the link
+  # inside it. One holding only links into the repo is replaced.
+  if [ -d "$target" ] && [ ! -L "$target" ]; then
+    foreign="$(find "$target" ! -type d | while IFS= read -r entry; do
+      [ -L "$entry" ] && case "$(readlink -m "$entry")" in "$repo"/*) continue ;; esac
+      echo "$entry"
+    done)"
+    if [ -n "$foreign" ]; then
+      echo "skip $target: a dir holding entries outside the repo:" >&2
+      echo "$foreign" >&2
+      continue
+    fi
+    echo "rm -r $target"
+    rm -r "$target"
+  fi
+  ln -sfn "$PWD/stow/shared/$dir" "$target"
 done
 # kaizen's Nix module creates the marker.
 if [ -e /etc/kaizen ]; then
