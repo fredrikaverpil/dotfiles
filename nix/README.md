@@ -54,8 +54,9 @@ kaizen's own parts, Nix and Stow.
 An app's niri window rules and binds go in
 [`stow/host/renoir/.config/niri/config.kdl`](../stow/host/renoir/.config/niri/config.kdl)
 (the app window rules, and the binds block's Apps part), which wily symlinks,
-or in a host's `host.kdl`. Their umbriel twins go in each host's
-`stow/host/<host>/.config/umbriel/config.toml`.
+or in a host's `host.kdl`. Their umbriel twins go in
+[`stow/host/renoir/.config/umbriel/common.toml`](../stow/host/renoir/.config/umbriel/common.toml),
+which wily also symlinks, or in a host's `host.toml`.
 
 On a kaizen host, wrap Chromium and Electron apps with `pkgs.withGnomeLibsecret`
 ([`shared/overlays/`](shared/overlays/)); without it they cannot keep logins in
