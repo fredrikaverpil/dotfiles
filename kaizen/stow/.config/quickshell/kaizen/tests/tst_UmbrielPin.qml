@@ -8,33 +8,38 @@ TestCase {
     function test_window_id_data() {
         return [
             {
-                tag: "window appears",
-                raw: '{"event":"windows","data":[{"id":"a1","app_id":"other"},{"id":"c4","app_id":"cam"}]}',
-                id: 0,
+                tag: "window present",
+                windows: [
+                    {
+                        id: "a1",
+                        app_id: "other"
+                    },
+                    {
+                        id: "c4",
+                        app_id: "cam"
+                    }
+                ],
                 want: "c4"
             },
             {
-                tag: "window gone",
-                raw: '{"event":"windows","data":[{"id":"a1","app_id":"other"}]}',
-                id: "c4",
+                tag: "window absent",
+                windows: [
+                    {
+                        id: "a1",
+                        app_id: "other"
+                    }
+                ],
                 want: 0
             },
             {
-                tag: "other event",
-                raw: '{"event":"workspaces","data":[]}',
-                id: "c4",
-                want: "c4"
-            },
-            {
-                tag: "invalid",
-                raw: "invalid",
-                id: "c4",
-                want: "c4"
+                tag: "no snapshot",
+                windows: null,
+                want: 0
             }
         ];
     }
 
     function test_window_id(data) {
-        verify(Pin.windowId(data.raw, "cam", data.id) === data.want);
+        verify(Pin.windowId(data.windows, "cam") === data.want);
     }
 }

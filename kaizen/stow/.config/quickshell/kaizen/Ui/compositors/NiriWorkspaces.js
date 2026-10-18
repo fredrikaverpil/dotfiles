@@ -1,25 +1,9 @@
-function workspaceState(list) {
-  var source = Array.isArray(list) ? list : [];
-  var workspaces = {};
-  var activeByOutput = {};
+// workspaces and windows are NiriEvents' maps of niri's ids to its objects.
 
-  for (var index = 0; index < source.length; index++) {
-    var workspace = source[index];
-    if (!workspace || workspace.id === undefined || workspace.idx === undefined)
-      continue;
-    workspaces[workspace.id] = { idx: workspace.idx, output: workspace.output };
-    if (workspace.is_active) activeByOutput[workspace.output] = workspace.idx;
-  }
-
-  return { workspaces: workspaces, activeByOutput: activeByOutput };
-}
-
-function windowCounts(list) {
-  var source = Array.isArray(list) ? list : [];
+function windowCounts(windows) {
   var counts = {};
-
-  for (var index = 0; index < source.length; index++) {
-    var window = source[index];
+  for (var id in windows) {
+    var window = windows[id];
     if (
       window &&
       window.workspace_id !== undefined &&
@@ -41,6 +25,15 @@ function ids(workspaces, output) {
   return result;
 }
 
+function activeId(workspaces, output) {
+  for (var id in workspaces) {
+    var workspace = workspaces[id];
+    if (workspace.output === output && workspace.is_active)
+      return workspace.idx;
+  }
+  return -1;
+}
+
 function occupied(workspaces, counts, output, idx) {
   for (var id in workspaces) {
     var workspace = workspaces[id];
@@ -52,38 +45,4 @@ function occupied(workspaces, counts, output, idx) {
       return true;
   }
   return false;
-}
-
-function eventResult(state, event) {
-  var previous = state || {};
-  var next = {
-    workspaces: previous.workspaces || {},
-    activeByOutput: previous.activeByOutput || {},
-    windowCounts: previous.windowCounts || {},
-    queryWindows: false,
-  };
-  var value = event || {};
-
-  if (value.WorkspacesChanged) {
-    var workspaces = workspaceState(value.WorkspacesChanged.workspaces);
-    next.workspaces = workspaces.workspaces;
-    next.activeByOutput = workspaces.activeByOutput;
-    next.queryWindows = true;
-  } else if (value.WorkspaceActivated) {
-    var activated = next.workspaces[value.WorkspaceActivated.id];
-    if (activated) {
-      next.activeByOutput = Object.assign({}, next.activeByOutput);
-      next.activeByOutput[activated.output] = activated.idx;
-    }
-  } else if (value.WindowsChanged) {
-    next.windowCounts = windowCounts(value.WindowsChanged.windows);
-  } else if (
-    value.WindowOpenedOrChanged ||
-    value.WindowClosed ||
-    value.WindowLayoutsChanged
-  ) {
-    next.queryWindows = true;
-  }
-
-  return next;
 }

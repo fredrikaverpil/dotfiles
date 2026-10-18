@@ -1,21 +1,10 @@
 import QtQuick
-import Quickshell.Io
 
 import "UmbrielPin.js" as Model
 
 QtObject {
-    id: root
-
+    // UmbrielEvents.
+    property var events: null
     property string appId
-    property var windowId: 0
-
-    property Process stream: Process {
-        running: root.appId !== ""
-        command: ["umbriel", "subscribe", "windows"]
-        stdout: SplitParser {
-            onRead: function (line) {
-                root.windowId = Model.windowId(line, root.appId, root.windowId);
-            }
-        }
-    }
+    readonly property var windowId: events ? Model.windowId(events.windows, appId) : 0
 }

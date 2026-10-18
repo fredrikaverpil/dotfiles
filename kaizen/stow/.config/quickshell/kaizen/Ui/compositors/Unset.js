@@ -8,6 +8,7 @@ var replacesDeadLock = true;
 var opensOnFocusedOutput = true;
 var floatsInWorkingArea = true;
 // No source loads.
+var eventsComponent = "";
 var workspaceComponent = "";
 var closeWindowAction = "";
 

@@ -9,6 +9,7 @@ var opensOnFocusedOutput = true;
 // move-floating-window is relative to the output's working area, which the
 // bar's exclusive zone shortens at the top.
 var floatsInWorkingArea = true;
+var eventsComponent = "NiriEvents.qml";
 var workspaceComponent = "NiriWorkspaces.qml";
 var castComponent = "NiriCasts.qml";
 var pinComponent = "NiriPin.qml";
