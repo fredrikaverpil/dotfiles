@@ -1,0 +1,11 @@
+# `kaizen run -c umbriel` starts this entry. uwsm names the session's units
+# after its ID: wayland-wm@kaizen_umbriel.desktop.service,
+# wayland-session@kaizen_umbriel.desktop.target, which wants
+# kaizen-session.target. DesktopNames lowercased name the env files uwsm
+# sources: uwsm/env-umbriel, uwsm/env-kaizen.
+[Desktop Entry]
+Name=kaizen (umbriel)
+Comment=umbriel with the kaizen Quickshell shell
+Exec=umbriel
+Type=Application
+DesktopNames=umbriel;kaizen;

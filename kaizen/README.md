@@ -296,9 +296,12 @@ lid close / power key ─ logind ─ sleep-lock locks shell ─ waits for secure
 
 The session is the entry
 [`kaizen_niri.desktop`](stow/.local/share/wayland-sessions/kaizen_niri.desktop),
-which runs niri. uwsm names its units after the entry ID, so another session on
-niri (`uwsm start niri`) starts none of kaizen's. Its `DesktopNames` give
-uwsm `XDG_CURRENT_DESKTOP=niri:kaizen` while it prepares the environment. For
+which runs niri; `kaizen run -c umbriel` starts
+[`kaizen_umbriel.desktop`](stow/.local/share/wayland-sessions/kaizen_umbriel.desktop)
+instead, where umbriel is installed. uwsm names its units after the entry ID,
+so another session on niri (`uwsm start niri`) starts none of kaizen's. Its
+`DesktopNames` give uwsm `XDG_CURRENT_DESKTOP=niri:kaizen` (`umbriel:kaizen`)
+while it prepares the environment, which picks the portals. For
 the name `kaizen`, uwsm sources [`uwsm/env-kaizen`](stow/.config/uwsm/env-kaizen)
 and exports its session variables to the user manager; a change applies from
 the next login. `niri --session` then sets and exports
