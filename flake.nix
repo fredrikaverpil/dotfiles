@@ -81,6 +81,14 @@
       url = "github:zed-industries/delta-nix";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    # kaizen's second compositor; nixpkgs' umbriel lags upstream's IPC.
+    # NOTE: Follows nixpkgs-unstable, so built locally: umbriel.cachix.org
+    # serves builds against umbriel's own pin, whose mesa/libgbm may not load
+    # the system's drivers.
+    umbriel = {
+      url = "github:noctalia-dev/umbriel";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
   };
 
   outputs =
