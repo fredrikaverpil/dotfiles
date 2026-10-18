@@ -49,9 +49,10 @@ func (s *seqRunner) Run(_ context.Context, name string, args ...string) ([]byte,
 }
 
 const (
-	showLine   = "systemctl --user show kaizen-* -p Id -p InvocationID -p NRestarts -p ActiveState -p Result -p MainPID -p DropInPaths"
-	niriLine   = "env NO_COLOR=1 niri validate"
-	portalLine = "busctl --user --timeout=5 call org.freedesktop.portal.Desktop /org/freedesktop/portal/desktop " +
+	showLine    = "systemctl --user show kaizen-* -p Id -p InvocationID -p NRestarts -p ActiveState -p Result -p MainPID -p DropInPaths"
+	niriLine    = "env NO_COLOR=1 niri validate"
+	umbrielLine = "umbriel config validate"
+	portalLine  = "busctl --user --timeout=5 call org.freedesktop.portal.Desktop /org/freedesktop/portal/desktop " +
 		"org.freedesktop.portal.Settings ReadOne ss org.freedesktop.appearance color-scheme"
 	runsLine  = "journalctl --user --lines all --output json --no-pager"
 	bootLine  = "journalctl --user --unit kaizen-* --boot --lines all --output json --no-pager"
@@ -675,6 +676,40 @@ func TestRun(t *testing.T) {
 			},
 		},
 		{
+			name: "umbriel config, niri config without kaizen.kdl",
+			env:  map[string]string{"UMBRIEL_SOCKET": "$DIR/run/umbriel-wayland-1.sock"},
+			files: map[string]string{
+				coreRequires: "",
+				niriConfig:   "include \"apps.kdl\"\n",
+			},
+			outputs: map[string][]recorded{
+				showLine:    {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "0", "0", "")}},
+				umbrielLine: {{}},
+				portalLine:  {{}},
+			},
+			want: result{
+				Stdout: "No errors or warnings\n",
+				Calls:  []string{showLine, umbrielLine, portalLine},
+			},
+		},
+		{
+			name:  "invalid umbriel config",
+			env:   map[string]string{"UMBRIEL_SOCKET": "$DIR/run/umbriel-wayland-1.sock"},
+			files: map[string]string{coreRequires: ""},
+			outputs: map[string][]recorded{
+				showLine: {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "0", "0", "")}},
+				umbrielLine: {{Err: &exec.ExitError{
+					Stderr: []byte("error: config.toml:3: unknown key 'gaps'\nconfiguration invalid\n"),
+				}}},
+				portalLine: {{}},
+			},
+			want: result{
+				Stdout: "1 error\n\nERROR umbriel  check\n  umbriel config validate:\n" +
+					"  error: config.toml:3: unknown key 'gaps'\n  configuration invalid\n",
+				Calls: []string{showLine, umbrielLine, portalLine},
+			},
+		},
+		{
 			name: "dev drop-in without a tree",
 			files: map[string]string{
 				coreRequires:                          "",
@@ -769,7 +804,7 @@ func TestRun(t *testing.T) {
 			runner := &seqRunner{outputs: outputs}
 			c := Command{
 				Runner:     runner,
-				Compositor: compositor.Niri{Runner: runner},
+				Compositor: compositor.FromEnv(func(key string) string { return expand(env[key]) }, runner),
 				Home:       expand(env["HOME"]),
 				Getenv:     func(key string) string { return expand(env[key]) },
 				now:        func() time.Time { return now },

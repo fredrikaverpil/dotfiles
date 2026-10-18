@@ -129,7 +129,8 @@ QML, which plugins run, and the notification rules.
   `kaizen --json` lists the commands as `{ name, usage, summary }`, and
   `kaizen --version` prints the commit it was built from (`unknown` from Nix). A
   `~/.local/bin/kaizen` overrides it: [`development.md`](docs/development.md) ›
-  Building kaizen.
+  Building kaizen. Its commands and scripts pick the compositor as the shell
+  does: umbriel when `UMBRIEL_SOCKET` is set, else niri.
 - `kaizen internal <sub>` runs `~/.local/libexec/kaizen/internal/<sub>`: what
   the system runs, as a unit or a build, and a person or an agent has no use
   for. `kaizen internal` lists them, and `--json` works there too.
@@ -187,7 +188,7 @@ runs.
 | bluetooth | [BlueZ] via [Quickshell] | button | Settings › Bluetooth | `bluetooth` |
 | brightness | [sysfs backlight] via [logind] SetBrightness | – | XF86 keys | `brightness` |
 | clipboard | [wl-clipboard] watcher, in memory | – | Trigger › Clipboard | `clipboard` |
-| doctor | the `kaizen-*` units' state and journal, niri's config, the plugin dirs and the `requires` files, via `kaizen doctor` | doctor indicator | Settings › Doctor | `doctor` |
+| doctor | the `kaizen-*` units' state and journal, the compositor's config, the plugin dirs and the `requires` files, via `kaizen doctor` | doctor indicator | Settings › Doctor | `doctor` |
 | firmware | [fwupd] via `fwupdmgr` | firmware indicator | Settings › Firmware | `firmware` |
 | idle | [ext-idle-notify], lock service | idle indicator | Settings › Session | `idle` |
 | keyboard | the compositor's XKB layouts | layout indicator | Settings › Keyboard layout | `keyboard` |

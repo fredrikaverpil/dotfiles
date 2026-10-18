@@ -11,6 +11,15 @@ esac
 
 regex="$1"
 shift
+if [ -n "${UMBRIEL_SOCKET:-}" ]; then
+  # umbriel has no focus timestamp: the active window, else the first match.
+  id="$(umbriel windows --json | jq -r --arg re "$regex" \
+    '[.[] | select(.app_id // "" | test($re))] | (map(select(.active)) + .)[0].id // empty')"
+  if [ -n "$id" ]; then
+    exec umbriel msg "window-focus:$id"
+  fi
+  exec "$@"
+fi
 id="$(niri msg -j windows | jq --arg re "$regex" \
   '[.[] | select(.app_id // "" | test($re))] | max_by(.focus_timestamp | [.secs, .nanos]) | .id // empty')"
 if [ -n "$id" ]; then
