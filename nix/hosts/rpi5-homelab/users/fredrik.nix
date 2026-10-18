@@ -21,6 +21,9 @@ in
     unstable.neovim
   ];
 
+  # Stowed from stow/host/rpi5-homelab, in place of the shared mise config.
+  home.sessionVariables.MISE_GLOBAL_CONFIG_FILE = "${config.home.homeDirectory}/.config/mise/config.rpi5-homelab.toml";
+
   home.file = {
   };
 
