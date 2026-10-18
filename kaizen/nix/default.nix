@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ inputs, pkgs, ... }:
 let
   # The shell's emoji data, found as share/kaizen/emoji.json in the XDG data dirs.
   emoji =
@@ -28,7 +28,7 @@ let
     '';
   };
 in
-# The kaizen session every kaizen host shares: niri under UWSM, portals, PAM,
+# The kaizen session every kaizen host shares: niri or umbriel under UWSM, portals, PAM,
 # the services the shell reads, and the packages and data its shell, binds,
 # scripts and units run. Units, scripts, compositor config, session variables,
 # QML and notification rules live in kaizen/stow/.
@@ -36,6 +36,7 @@ in
   imports = [
     ./fonts.nix
     ./requires.nix
+    inputs.umbriel.nixosModules.default
   ];
 
   config = {
@@ -74,7 +75,7 @@ in
       })
     ];
 
-    # niri is the only session: `niri --session` under UWSM, started with `kaizen` from the console.
+    # `niri --session` or umbriel under UWSM, started with `kaizen run` from the console.
     programs.uwsm.enable = true;
 
     # Session defaults, GNOME (screencast) and GTK portals, gnome-keyring as Secret Service,
@@ -84,6 +85,12 @@ in
     programs.niri.enable = true;
     # niri's module leaves Xwayland off; xwayland-satellite runs the Xwayland binary.
     programs.xwayland.enable = true;
+
+    # umbriel's session units, and its portal (Screencast, Screenshot) ahead of GTK's
+    # under umbriel. Its start-umbriel and session file go unused under UWSM.
+    programs.umbriel.enable = true;
+    # gnome-keyring's Secret portal, as niri's portal config names it.
+    xdg.portal.config.umbriel."org.freedesktop.impl.portal.Secret" = [ "gnome-keyring" ];
 
     # uwsm-app launches Terminal=true entries through xdg-terminal-exec.
     xdg.terminal-exec.enable = true;
@@ -183,6 +190,8 @@ in
       networkmanagerapplet
       # Annotates screenshots from the notification's Edit action.
       satty
+      # The colour picker's point selection on umbriel.
+      slurp
       wl-clipboard
       # niri cannot mirror outputs; the mirror service runs it fullscreen on the target.
       wl-mirror

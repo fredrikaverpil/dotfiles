@@ -10,8 +10,8 @@
 # Session
 cmd niri
 # The umbriel backend, and its colour picker.
-cmd umbriel warn
-cmd slurp warn
+cmd umbriel
+cmd slurp
 cmd uwsm
 cmd uwsm-app
 cmd quickshell
@@ -35,6 +35,8 @@ bus session org.freedesktop.portal.Desktop
 # The portal's GNOME (screencast, file chooser) and GTK backends.
 data xdg-desktop-portal/portals/gnome.portal
 data xdg-desktop-portal/portals/gtk.portal
+# umbriel's (Screencast, Screenshot).
+data xdg-desktop-portal/portals/umbriel.portal
 # uwsm/env-kaizen sets them.
 env NIXOS_OZONE_WL=1
 env QT_QPA_PLATFORMTHEME=gtk3
