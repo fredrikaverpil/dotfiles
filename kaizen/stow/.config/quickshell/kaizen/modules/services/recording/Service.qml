@@ -308,7 +308,7 @@ Item {
         })
 
     // The window already placed, so each new circle is moved once.
-    property int placedWindow: 0
+    property var placedWindow: 0
 
     // The niri rule puts the circle in the output's bottom-right, which a region
     // rarely reaches, so a region's circle is moved into its own corner instead.
