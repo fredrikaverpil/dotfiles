@@ -8,3 +8,4 @@ StopWhenUnneeded=yes
 
 [Install]
 WantedBy=wayland-session-xdg-autostart@kaizen_niri.desktop.target
+WantedBy=wayland-session-xdg-autostart@kaizen_umbriel.desktop.target

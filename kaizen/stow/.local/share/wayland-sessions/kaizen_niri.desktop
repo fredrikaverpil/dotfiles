@@ -4,7 +4,7 @@
 # DesktopNames lowercased name the env files uwsm sources: uwsm/env-niri,
 # uwsm/env-kaizen.
 [Desktop Entry]
-Name=kaizen
+Name=kaizen (niri)
 Comment=niri with the kaizen Quickshell shell
 Exec=niri --session
 Type=Application
