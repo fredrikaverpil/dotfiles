@@ -1,29 +1,27 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
 
 import "NiriPin.js" as Model
 
 QtObject {
     id: root
 
+    // NiriEvents.
+    property var events: null
     property string appId
-    property var state: ({
-            id: 0,
-            requested: 0,
-            spaces: ({})
-        })
-    readonly property var windowId: state.id
+    readonly property var windowId: events ? Model.windowId(events.windows, appId) : 0
+    // The height last asked for; see Model.follow.
+    property int requested: 0
 
-    property Process stream: Process {
-        running: root.appId !== ""
-        command: ["niri", "msg", "-j", "event-stream"]
-        stdout: SplitParser {
-            onRead: function (line) {
-                root.state = Model.follow(line, root.appId, root.state);
-                if (root.state.command)
-                    Quickshell.execDetached(root.state.command);
-            }
+    onWindowIdChanged: requested = 0
+
+    property Connections listener: Connections {
+        target: root.events
+        function onReceived(event) {
+            var result = Model.follow(event, root.windowId, root.events.workspaces, root.requested);
+            root.requested = result.requested;
+            if (result.command)
+                Quickshell.execDetached(result.command);
         }
     }
 }

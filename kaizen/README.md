@@ -312,9 +312,11 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   in `KAIZEN_COMPOSITOR`, else `Unset.js`.
   [`Ui/compositors/`](stow/.config/quickshell/kaizen/Ui/compositors/)
   owns each compositor's commands, response parsing, and the workspace,
-  screencast and camera-pinning sources. `Compositor` loads one workspace and
-  one screencast source for the shell (`workspaces`, `casts`), which the bar
-  and notifications read; recording loads the pinner from `pinSource`.
+  screencast and camera-pinning sources. `Compositor` loads the backend's one
+  event stream (`events`), which feeds the sources, and one workspace and one
+  screencast source for the shell (`workspaces`, `casts`), which the bar and
+  notifications read; recording loads the pinner from `pinSource`. A source
+  joining late reads the stream's state, so niri's keeps its full state.
   Keep scheduling and shared state above it. Nightlight is not
   compositor-specific and lives in its service.
 - Where the compositor's behaviour shapes a surface or service, `Compositor`

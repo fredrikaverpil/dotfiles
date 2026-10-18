@@ -1,13 +1,6 @@
 // list is a workspaces snapshot: each workspace's output, 1-based index,
 // active state and window_count.
 
-// The list a `subscribe workspaces` event carries, or null for another event.
-function snapshot(event) {
-  return event && event.event === "workspaces" && Array.isArray(event.data)
-    ? event.data
-    : null;
-}
-
 function onOutput(list, output) {
   return (Array.isArray(list) ? list : []).filter(function (workspace) {
     return workspace && workspace.output === output;

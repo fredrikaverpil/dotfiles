@@ -29,22 +29,29 @@ Singleton {
     // Each optional feature of Contract.js, true when the backend has it; what
     // it lacks, the shell hides.
     readonly property var supports: Contract.supports(backend)
-    // Components with ids(output), activeId(output) and occupied(idx, output);
-    // with sharing, true while a screencast runs; and with windowId, the window
-    // of appId, kept round and on the focused workspace.
-    // Empty when the backend has none.
+    // Components fed by events: with ids(output), activeId(output) and
+    // occupied(idx, output); with sharing, true while a screencast runs; and
+    // with windowId, the window of appId, kept round and on the focused
+    // workspace. Empty when the backend has none.
     readonly property url workspaceSource: backend.workspaceComponent ? Qt.resolvedUrl("compositors/" + backend.workspaceComponent) : ""
     readonly property url castSource: backend.castComponent ? Qt.resolvedUrl("compositors/" + backend.castComponent) : ""
     readonly property url pinSource: backend.pinComponent ? Qt.resolvedUrl("compositors/" + backend.pinComponent) : ""
-    // One of each source for the whole shell; null when the backend has none.
+    // The backend's one event stream, which only its own sources read, and one
+    // of each source for the whole shell; null when the backend has none.
+    readonly property var events: eventsLoader.item
     readonly property var workspaces: workspaceLoader.item
     readonly property var casts: castLoader.item
 
+    property Loader eventsLoader: Loader {
+        source: root.backend.eventsComponent ? Qt.resolvedUrl("compositors/" + root.backend.eventsComponent) : ""
+    }
     property Loader workspaceLoader: Loader {
         source: root.workspaceSource
+        onLoaded: item.events = Qt.binding(() => root.events) // qmllint disable missing-property
     }
     property Loader castLoader: Loader {
         source: root.castSource
+        onLoaded: item.events = Qt.binding(() => root.events) // qmllint disable missing-property
     }
     // The file borderColors(palette) fills, under the shell's state dir.
     readonly property string borderFile: backend.borderFile || ""

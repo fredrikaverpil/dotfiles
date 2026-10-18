@@ -307,7 +307,10 @@ Item {
         id: cameraPin
         active: cameraPreview.running
         source: Ui.Compositor.pinSource
-        onLoaded: item.appId = Model.cameraAppId // qmllint disable missing-property
+        onLoaded: {
+            item.events = Ui.Compositor.events; // qmllint disable missing-property
+            item.appId = Model.cameraAppId; // qmllint disable missing-property
+        }
     }
     // Loader.item is typed QObject; the source exposes windowId.
     readonly property var cameraWindow: cameraPin.item ? cameraPin.item.windowId : 0 // qmllint disable missing-property

@@ -10,6 +10,7 @@ var opensOnFocusedOutput = true;
 // window-move-to is relative to the output's usable area, which the bar's
 // exclusive zone shortens at the top.
 var floatsInWorkingArea = true;
+var eventsComponent = "UmbrielEvents.qml";
 var workspaceComponent = "UmbrielWorkspaces.qml";
 var castComponent = "UmbrielCasts.qml";
 var pinComponent = "UmbrielPin.qml";
