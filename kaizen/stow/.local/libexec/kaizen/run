@@ -2,16 +2,35 @@
 # shellcheck shell=bash
 set -euo pipefail
 
-case "${1:-}" in
--h | --help)
-  echo "usage: kaizen run    start the session from a TTY login shell"
-  exit 0
-  ;;
-?*)
-  printf 'kaizen run: unknown argument: %s\nusage: kaizen run\n' "$1" >&2
+usage="kaizen run [-c|--compositor niri|umbriel]"
+compositor=niri
+while (($#)); do
+  case "$1" in
+  -h | --help)
+    echo "usage: $usage    start the session from a TTY login shell"
+    exit 0
+    ;;
+  -c | --compositor)
+    compositor="${2:-}"
+    shift 2 || shift
+    ;;
+  *)
+    printf 'kaizen run: unknown argument: %s\nusage: %s\n' "$1" "$usage" >&2
+    exit 2
+    ;;
+  esac
+done
+case "$compositor" in
+niri | umbriel) ;;
+*)
+  printf 'kaizen run: unknown compositor: %s\nusage: %s\n' "$compositor" "$usage" >&2
   exit 2
   ;;
 esac
+if ! command -v "$compositor" >/dev/null; then
+  echo "kaizen run: $compositor is not installed" >&2
+  exit 1
+fi
 
 # uwsm's login-shell test reads its parent's command line, which is this
 # script's. `kaizen` execs this script, so its parent is the shell to test.
@@ -27,12 +46,13 @@ uwsm check may-start -i
 # PATH to the session. Drop it, so the session's `kaizen` follows rebuilds.
 PATH=${PATH#"$(dirname "$(command -v kaizen)")":}
 
-# The entry runs `niri --session`, which serves niri's D-Bus interfaces
-# (screencast portal, a11y) and imports its environment, which uwsm cleans up
-# on exit. The instance name is the entry ID, so the units are
-# wayland-wm@kaizen_niri.desktop.service and
-# wayland-session@kaizen_niri.desktop.target, whose .wants/ in
+# One entry per compositor, since its DesktopNames set XDG_CURRENT_DESKTOP,
+# which picks the portals. kaizen_niri.desktop runs `niri --session`, which
+# serves niri's D-Bus interfaces (screencast portal, a11y) and imports its
+# environment, which uwsm cleans up on exit. The instance name is the entry ID,
+# so the units are wayland-wm@kaizen_<compositor>.desktop.service and
+# wayland-session@kaizen_<compositor>.desktop.target, whose .wants/ in
 # kaizen/stow/.config/systemd/user/ starts kaizen-session.target. A plain
 # `uwsm start niri` starts none of kaizen. An underscore, not a dash: systemd
 # escapes a dash in an instance name (\x2d), which .wants/ would have to spell.
-exec uwsm start -- kaizen_niri.desktop
+exec uwsm start -- "kaizen_$compositor.desktop"

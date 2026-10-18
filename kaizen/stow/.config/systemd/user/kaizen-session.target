@@ -9,3 +9,4 @@ StopWhenUnneeded=yes
 
 [Install]
 WantedBy=wayland-session@kaizen_niri.desktop.target
+WantedBy=wayland-session@kaizen_umbriel.desktop.target
