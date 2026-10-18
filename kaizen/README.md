@@ -190,7 +190,7 @@ runs.
 | doctor | the `kaizen-*` units' state and journal, niri's config, the plugin dirs and the `requires` files, via `kaizen doctor` | doctor indicator | Settings › Doctor | `doctor` |
 | firmware | [fwupd] via `fwupdmgr` | firmware indicator | Settings › Firmware | `firmware` |
 | idle | [ext-idle-notify], lock service | idle indicator | Settings › Session | `idle` |
-| keyboard | [niri] XKB layouts | layout indicator | Settings › Keyboard layout | `keyboard` |
+| keyboard | the compositor's XKB layouts | layout indicator | Settings › Keyboard layout | `keyboard` |
 | media | [MPRIS] | now-playing widget | Settings › Media | `media` |
 | mirror | [wl-mirror] in a transient `kaizen-mirror-<target>` user unit per mirror | mirror indicator | Settings › Display › Mirror | `mirror` |
 | network | [NetworkManager], `ip -j` | button | Settings › Network | `network` |
@@ -199,7 +199,7 @@ runs.
 | system | [hwmon], `/proc` load | alert indicator | Settings › Display | `system`, `display` |
 | timezone | [timedated] via `timedatectl`, `zdump` for the DST rules | time button | Settings › Clock | `timezone` |
 | weather | [met.no locationforecast] | button | Settings › Weather | `weather` |
-| notifications | [Desktop Notifications] server, [niri] casts for DnD | bell button | Settings › Notifications | `notifications` |
+| notifications | [Desktop Notifications] server, the compositor's screencasts for DnD | bell button | Settings › Notifications | `notifications` |
 | lock | [ext-session-lock] + [PAM] `kaizen-lock` | – | Settings › Session | `lock` |
 | curtain | [wlr-layer-shell] + [PAM] | – | Settings › Session | `curtain` |
 | polkit agent | [polkit] | – | dialog on request | – |
@@ -219,7 +219,6 @@ runs.
 [wl-clipboard]: https://github.com/bugaevc/wl-clipboard
 [fwupd]: https://fwupd.org
 [ext-idle-notify]: https://wayland.app/protocols/ext-idle-notify-v1
-[niri]: https://github.com/YaLTeR/niri/wiki
 [MPRIS]: https://specifications.freedesktop.org/mpris-spec/latest/
 [NetworkManager]: https://networkmanager.dev
 [wl-mirror]: https://github.com/Ferdi265/wl-mirror
@@ -271,17 +270,19 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 - Plugins add launcher items, panels, IPC targets and bar indicators:
   [`plugins.md`](docs/plugins.md).
 - [`Ui/Compositor.qml`](stow/.config/quickshell/kaizen/Ui/Compositor.qml)
-  is the only path to niri;
+  is the only path to the compositor. It picks the backend once, from the
+  session: umbriel's when `UMBRIEL_SOCKET` is set, else niri's.
   [`Ui/compositors/`](stow/.config/quickshell/kaizen/Ui/compositors/)
-  owns niri commands, response parsing, and the workspace and screencast
-  sources, which the bar and notifications load through its URLs. Keep
-  scheduling and shared state above it. Nightlight is not compositor-specific
-  and lives in its service.
+  owns each compositor's commands, response parsing, and the workspace and
+  screencast sources, which the bar and notifications load through its URLs.
+  Keep scheduling and shared state above it. Nightlight is not
+  compositor-specific and lives in its service.
 - Where the compositor's behaviour shapes a surface or service, `Compositor`
   exposes a capability for it to read, not a compositor name to check:
   `releaseExclusiveFocus` (panel and context menu focus), `replacesDeadLock`
   (lock restore after a crash), `opensOnFocusedOutput` (mirror),
-  `floatsInWorkingArea` (recording's camera). `Niri.js` sets each.
+  `floatsInWorkingArea` (recording's camera). `Niri.js` and `Umbriel.js`
+  set each.
 
 ## Session
 
