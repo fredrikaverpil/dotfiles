@@ -101,6 +101,10 @@
   },
   "showClearContextOnPlanAccept": true,
   "tui": "fullscreen",
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
   "showThinkingSummaries": true,
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
@@ -134,9 +138,5 @@
       "**Org-specific CLIs**: None configured — repo-specific tooling observed: nix, deno, gcloud, brew, pass-cli (personal dotfiles CLIs, not org-specific)"
     ]
   },
-  "voiceEnabled": true,
-  "voice": {
-    "enabled": true,
-    "mode": "hold"
-  }
+  "voiceEnabled": true
 }
