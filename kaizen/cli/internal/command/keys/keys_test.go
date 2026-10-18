@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"gotest.tools/v3/assert"
+
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/compositor"
 )
 
 // recorded is a program's recorded stdout and error.
@@ -140,8 +142,8 @@ func TestRun(t *testing.T) {
 		},
 		{
 			name: "not a window id",
-			args: []string{"--window", "x", "Return"},
-			want: result{Code: 2, Stderr: "kaizen keys: x is not a window id\n" + usage + "\n"},
+			args: []string{"--window", "", "Return"},
+			want: result{Code: 2, Stderr: "kaizen keys: \"\" is not a window id\n" + usage + "\n"},
 		},
 		{
 			name: "unknown option",
@@ -402,7 +404,7 @@ func TestRun(t *testing.T) {
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &seqRunner{outputs: tt.outputs}
-			c := Command{Runner: r, wait: noWait}
+			c := Command{Runner: r, Compositor: compositor.Niri{Runner: r}, wait: noWait}
 			var stdout, stderr bytes.Buffer
 
 			code := c.Run(t.Context(), tt.args, &stdout, &stderr)
