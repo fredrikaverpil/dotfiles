@@ -1,10 +1,12 @@
 // gpu-screen-recorder cannot mask its own camera overlay, so the camera is a
-// niri-rounded mpv window the screen capture picks up (see cameraCommand).
+// mpv window, rounded by the compositor, that the screen capture picks up (see
+// cameraCommand).
 function captureSource(monitor, region) {
   return region ? "region" : monitor;
 }
 
-// A square centre crop, under the app id of the niri window rule that rounds it.
+// A square centre crop, under the app id of the compositor's window rule that
+// rounds it.
 // mpv asks for device pixels, so size is the logical size times the screen scale.
 function cameraCommand(camera, scale, frame, fraction) {
   var size = Math.round(cameraSize(frame, fraction) * (scale || 1));
@@ -65,7 +67,7 @@ function cameraPosition(region, screen, barHeight, fraction) {
   };
 }
 
-// The app id the niri window rule rounds and places.
+// The app id the compositor's window rule rounds and places.
 var cameraAppId = "kaizen-camera";
 
 // One merged track: most players only play the first of several.

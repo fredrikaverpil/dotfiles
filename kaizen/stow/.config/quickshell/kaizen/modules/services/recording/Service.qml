@@ -77,8 +77,9 @@ Item {
     // window opened on, so it is focused before its scale is read.
     readonly property string captureOutput: regionMode ? (region && Model.screenAt(screens, region) ? Model.screenAt(screens, region).name : "") : activeMonitor
 
-    // niri's scale converts the circle's logical size to the device pixels mpv
-    // asks for. Qt's devicePixelRatio cannot: it rounds a fractional scale up.
+    // The compositor's scale converts the circle's logical size to the device
+    // pixels mpv asks for. Qt's devicePixelRatio cannot: it rounds a fractional
+    // scale up.
     property real cameraScale: 1
     // The preview waits for that query: a scale arriving mid-countdown changes
     // mpv's command, and Quickshell restarts a process whose command changes, so
@@ -319,8 +320,9 @@ Item {
     // The window already placed, so each new circle is moved once.
     property var placedWindow: 0
 
-    // The niri rule puts the circle in the output's bottom-right, which a region
-    // rarely reaches, so a region's circle is moved into its own corner instead.
+    // The compositor's window rule puts the circle in the output's
+    // bottom-right, which a region rarely reaches, so a region's circle is
+    // moved into its own corner instead.
     function placeCamera() {
         if (!regionMode || !region || !cameraWindow || cameraWindow === placedWindow)
             return;
