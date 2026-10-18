@@ -300,12 +300,16 @@ Item {
     }
 
     // The circle stays round through a resize and follows the focused workspace;
-    // see Compositor.pinWindow.
-    property var cameraWindow: ({
-            id: 0,
-            requested: 0,
-            spaces: ({})
-        })
+    // see Compositor.pinSource.
+    Loader {
+        id: cameraPin
+        active: cameraPreview.running
+        source: Ui.Compositor.pinSource
+        onLoaded: item.appId = Model.cameraAppId // qmllint disable missing-property
+    }
+    // Loader.item is typed QObject; the source exposes windowId.
+    readonly property var cameraWindow: cameraPin.item ? cameraPin.item.windowId : 0 // qmllint disable missing-property
+    onCameraWindowChanged: placeCamera()
 
     // The window already placed, so each new circle is moved once.
     property var placedWindow: 0
@@ -313,28 +317,14 @@ Item {
     // The niri rule puts the circle in the output's bottom-right, which a region
     // rarely reaches, so a region's circle is moved into its own corner instead.
     function placeCamera() {
-        if (!regionMode || !region || !cameraWindow.id || cameraWindow.id === placedWindow)
+        if (!regionMode || !region || !cameraWindow || cameraWindow === placedWindow)
             return;
         const screen = Model.screenAt(screens, region);
         if (!screen)
             return;
-        placedWindow = cameraWindow.id;
+        placedWindow = cameraWindow;
         const at = Model.cameraPosition(region, screen, Ui.Compositor.floatsInWorkingArea ? barHeight : 0, cameraFraction);
-        Quickshell.execDetached(Ui.Compositor.moveFloatingWindow(cameraWindow.id, at.x, at.y));
-    }
-
-    Process {
-        id: cameraShape
-        running: cameraPreview.running
-        command: Ui.Compositor.events()
-        stdout: SplitParser {
-            onRead: function (line) {
-                root.cameraWindow = Ui.Compositor.pinWindow(line, Model.cameraAppId, root.cameraWindow);
-                if (root.cameraWindow.command)
-                    Quickshell.execDetached(root.cameraWindow.command);
-                root.placeCamera();
-            }
-        }
+        Quickshell.execDetached(Ui.Compositor.moveFloatingWindow(cameraWindow, at.x, at.y));
     }
 
     // Visible from the countdown on, so it is warm and framed before recording.

@@ -26,10 +26,12 @@ Singleton {
     readonly property bool opensOnFocusedOutput: backend.opensOnFocusedOutput
     readonly property bool floatsInWorkingArea: backend.floatsInWorkingArea
     // Components with ids(output), activeId(output) and occupied(idx, output);
-    // and with sharing, true while a screencast runs.
+    // with sharing, true while a screencast runs; and with windowId, the window
+    // of appId, kept round and on the focused workspace.
     // Empty when the backend has none.
     readonly property url workspaceSource: backend.workspaceComponent ? Qt.resolvedUrl("compositors/" + backend.workspaceComponent) : ""
     readonly property url castSource: backend.castComponent ? Qt.resolvedUrl("compositors/" + backend.castComponent) : ""
+    readonly property url pinSource: backend.pinComponent ? Qt.resolvedUrl("compositors/" + backend.pinComponent) : ""
     // The file borderColors(palette) fills, under the shell's state dir.
     readonly property string borderFile: backend.borderFile
     // The action closeWindow() runs, as a bind names it.
@@ -84,14 +86,8 @@ Singleton {
     function focusedMonitor(raw) {
         return root.backend.focusedMonitor(raw);
     }
-    function events() {
-        return root.backend.events();
-    }
     function moveFloatingWindow(id, x, y) {
         return root.backend.moveFloatingWindow(id, x, y);
-    }
-    function pinWindow(raw, appId, state) {
-        return root.backend.pinWindow(raw, appId, state);
     }
     function layoutQuery() {
         return root.backend.layoutQuery();

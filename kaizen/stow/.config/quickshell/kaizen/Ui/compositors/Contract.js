@@ -8,6 +8,7 @@ var properties = {
   floatsInWorkingArea: "boolean",
   workspaceComponent: "string",
   castComponent: "string",
+  pinComponent: "string",
   borderFile: "string",
   closeWindowAction: "string",
 };
@@ -27,9 +28,7 @@ var functions = [
   "outputs",
   "focusedOutputOn",
   "focusedMonitor",
-  "events",
   "moveFloatingWindow",
-  "pinWindow",
   "layoutQuery",
   "currentLayout",
   "layoutNames",

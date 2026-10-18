@@ -9,6 +9,7 @@ var floatsInWorkingArea = true;
 // No source loads.
 var workspaceComponent = "";
 var castComponent = "";
+var pinComponent = "";
 var borderFile = "";
 var closeWindowAction = "";
 
@@ -66,16 +67,8 @@ function focusedMonitor(raw) {
   return null;
 }
 
-function events() {
-  return fail;
-}
-
 function moveFloatingWindow(id, x, y) {
   return fail;
-}
-
-function pinWindow(raw, appId, state) {
-  return { id: state.id, requested: state.requested, spaces: state.spaces };
 }
 
 function layoutQuery() {
