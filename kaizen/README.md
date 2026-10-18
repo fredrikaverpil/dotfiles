@@ -160,17 +160,16 @@ notification rules.
   override its binds: each host has its own
   (`stow/host/<host>/.config/umbriel/config.toml`), wily's being renoir's with
   `host.kdl`'s lines.
-- `kaizen` is the only kaizen command on PATH, built from
-  [`kaizen/cli/`](cli/) into the system profile. `kaizen <sub>` runs its Go
-  command `<sub>`
+- `kaizen` is the only kaizen command on PATH, built from [`kaizen/cli/`](cli/)
+  into the system profile. `kaizen <sub>` runs its Go command `<sub>`
   ([`kaizen/cli/internal/command/`](cli/internal/command/)), else
   `~/.local/libexec/kaizen/<sub>` with the binary's own directory first on its
   PATH. Units, niri binds and QML call it, never a script's path.
   `kaizen --json` lists the commands as `{ name, usage, summary }`, and
   `kaizen --version` prints the commit it was built from (`unknown` from Nix). A
   `~/.local/bin/kaizen` overrides it in a terminal:
-  [`development.md`](docs/development.md) › Building kaizen. Its commands and scripts pick the compositor as the shell
-  does, from `KAIZEN_COMPOSITOR`.
+  [`development.md`](docs/development.md) › Building kaizen. Its commands and
+  scripts pick the compositor as the shell does, from `KAIZEN_COMPOSITOR`.
 - `kaizen internal <sub>` runs `~/.local/libexec/kaizen/internal/<sub>`: what
   the system runs, as a unit or a build, and a person or an agent has no use
   for. `kaizen internal` lists them, and `--json` works there too.
