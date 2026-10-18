@@ -4,7 +4,7 @@ import Quickshell.Io
 import "../../../Ui" as Ui
 import "MirrorModel.js" as Model
 
-// niri cannot mirror outputs; wl-mirror shows one fullscreen on another, in
+// Neither compositor mirrors outputs; wl-mirror shows one fullscreen on another, in
 // transient user units so they outlive shell reloads.
 Item {
     id: root

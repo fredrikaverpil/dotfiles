@@ -193,7 +193,7 @@ in
       # The colour picker's point selection on umbriel.
       slurp
       wl-clipboard
-      # niri cannot mirror outputs; the mirror service runs it fullscreen on the target.
+      # Neither compositor mirrors outputs; the mirror service runs it fullscreen on the target.
       wl-mirror
       wtype # `kaizen keys` presses keys with it.
     ];
