@@ -15,6 +15,12 @@ Singleton {
     // and with sharing, true while a screencast runs.
     readonly property url workspaceSource: Qt.resolvedUrl("compositors/" + Niri.workspaceComponent)
     readonly property url castSource: Qt.resolvedUrl("compositors/" + Niri.castComponent)
+    // The file borderColors(palette) fills, under the shell's state dir.
+    readonly property string borderFile: Niri.borderFile
+
+    function borderColors(palette) {
+        return Niri.borderColors(palette);
+    }
 
     function dpms(on) {
         return Niri.dpms(on);
