@@ -32,6 +32,12 @@ macos-option-as-alt = true
 background-opacity = 0.9
 background-blur-radius = 40
 
+# Padding takes the nearest cell's background, so a translucent strip does not
+# show around apps with their own background (Neovim); balance spreads the
+# leftover that fits no cell over all edges.
+window-padding-color = extend
+window-padding-balance = true
+
 # ghostty +list-themes
 # theme = dark:/Users/fredrik/.local/share/nvim-fredrik/lazy/tokyonight.nvim/extras/ghostty/tokyonight_moon,light:/Users/fredrik/.local/share/nvim-fredrik/lazy/nightfox.nvim/extra/dayfox/dayfox.ghostty
 # Vendored under themes/ rather than referenced inside the zenbones.nvim
