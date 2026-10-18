@@ -205,6 +205,7 @@
                   ]
                   ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
                     pkgs.niri
+                    inputs.umbriel.packages.${system}.default
                     pkgs.jq
                     pkgs.wtype
                     pkgs.wlrctl
