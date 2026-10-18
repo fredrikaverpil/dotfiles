@@ -6,6 +6,7 @@ var properties = {
   replacesDeadLock: "boolean",
   opensOnFocusedOutput: "boolean",
   floatsInWorkingArea: "boolean",
+  placesBackdrop: "boolean",
   eventsComponent: "string",
   workspaceComponent: "string",
   closeWindowAction: "string",

@@ -278,6 +278,7 @@ Ui.Panel {
         "settings.display.backdrop": {
             icon: "",
             label: "Wallpaper (backdrop)",
+            hidden: !Ui.Compositor.placesBackdrop,
             action: () => menu.shell.background.open("backdrop")
         },
         "settings.bluetooth": {

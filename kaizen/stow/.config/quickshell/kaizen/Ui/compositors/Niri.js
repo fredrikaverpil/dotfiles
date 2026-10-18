@@ -9,6 +9,9 @@ var opensOnFocusedOutput = true;
 // move-floating-window is relative to the output's working area, which the
 // bar's exclusive zone shortens at the top.
 var floatsInWorkingArea = true;
+// niri/kaizen.kdl's layer rule places the backdrop surface behind the
+// workspaces, where the overview shows it.
+var placesBackdrop = true;
 var eventsComponent = "NiriEvents.qml";
 var workspaceComponent = "NiriWorkspaces.qml";
 var castComponent = "NiriCasts.qml";

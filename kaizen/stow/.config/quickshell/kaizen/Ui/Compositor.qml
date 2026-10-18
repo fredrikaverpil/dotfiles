@@ -26,6 +26,7 @@ Singleton {
     readonly property bool replacesDeadLock: backend.replacesDeadLock
     readonly property bool opensOnFocusedOutput: backend.opensOnFocusedOutput
     readonly property bool floatsInWorkingArea: backend.floatsInWorkingArea
+    readonly property bool placesBackdrop: backend.placesBackdrop
     // Each optional feature of Contract.js, true when the backend has it; what
     // it lacks, the shell hides.
     readonly property var supports: Contract.supports(backend)

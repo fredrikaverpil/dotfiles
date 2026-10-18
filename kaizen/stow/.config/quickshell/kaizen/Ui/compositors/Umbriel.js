@@ -10,6 +10,8 @@ var opensOnFocusedOutput = true;
 // window-move-to is relative to the output's usable area, which the bar's
 // exclusive zone shortens at the top.
 var floatsInWorkingArea = true;
+// No backdrop: a second background surface would sit under the wallpaper.
+var placesBackdrop = false;
 var eventsComponent = "UmbrielEvents.qml";
 var workspaceComponent = "UmbrielWorkspaces.qml";
 var castComponent = "UmbrielCasts.qml";

@@ -234,8 +234,9 @@ Scope {
         }
     }
 
-    // Wallpaper surface. The backdrop one is pulled behind the workspaces by a
-    // niri layer rule matching its namespace.
+    // Wallpaper surface. The backdrop one, where the compositor places one
+    // (Compositor.placesBackdrop), is pulled behind the workspaces by a layer
+    // rule matching its namespace.
     component Wall: PanelWindow {
         required property var modelData
         property string src: ""
@@ -323,7 +324,7 @@ Scope {
     }
 
     Variants {
-        model: background.shell.screens
+        model: Ui.Compositor.placesBackdrop ? background.shell.screens : []
 
         Wall {
             WlrLayershell.namespace: "quickshell-backdrop"
@@ -347,6 +348,8 @@ Scope {
         cardHeight: 780
 
         function open(slot) {
+            if (slot === "backdrop" && !Ui.Compositor.placesBackdrop)
+                return;
             background.slot = slot || "workspace";
             grid.pointer = Qt.point(-1, -1);
             scan.running = true;
