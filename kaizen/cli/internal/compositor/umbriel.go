@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"os/exec"
+	"slices"
 	"strings"
 )
 
@@ -106,6 +107,29 @@ func (u Umbriel) FocusedWindow(ctx context.Context) (*Window, error) {
 		}
 	}
 	return nil, nil
+}
+
+// Windows reads the windows from `umbriel windows --json`. umbriel keeps no
+// focus timestamp: the active window comes first, the rest in its order.
+func (u Umbriel) Windows(ctx context.Context) ([]Window, error) {
+	var windows []umbrielWindow
+	if err := u.query(ctx, &windows, "windows"); err != nil {
+		return nil, err
+	}
+	slices.SortStableFunc(windows, func(a, b umbrielWindow) int {
+		switch {
+		case a.Active == b.Active:
+			return 0
+		case a.Active:
+			return -1
+		}
+		return 1
+	})
+	result := make([]Window, 0, len(windows))
+	for _, w := range windows {
+		result = append(result, Window{ID: w.ID, AppID: w.AppID})
+	}
+	return result, nil
 }
 
 // FocusWindow focuses window id.

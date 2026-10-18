@@ -26,6 +26,8 @@ type Compositor interface {
 	// FocusedWindow returns the window with keyboard focus, nil when none has
 	// it.
 	FocusedWindow(ctx context.Context) (*Window, error)
+	// Windows returns the windows, the most recently focused first.
+	Windows(ctx context.Context) ([]Window, error)
 	// FocusWindow focuses window id.
 	FocusWindow(ctx context.Context, id string) error
 	// Validate checks the compositor's config, returning its report when
@@ -100,6 +102,9 @@ func (u Unset) Outputs(context.Context) ([]Output, error) { return nil, u.Err }
 
 // FocusedWindow returns u.Err.
 func (u Unset) FocusedWindow(context.Context) (*Window, error) { return nil, u.Err }
+
+// Windows returns u.Err.
+func (u Unset) Windows(context.Context) ([]Window, error) { return nil, u.Err }
 
 // FocusWindow returns u.Err.
 func (u Unset) FocusWindow(context.Context, string) error { return u.Err }
