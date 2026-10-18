@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	"gotest.tools/v3/assert"
+
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/compositor"
 )
 
 func TestCurtain(t *testing.T) {
@@ -151,7 +153,7 @@ func TestLiftCurtain(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &seqRunner{outputs: tt.outputs}
 
-			restore, err := LiftCurtain(t.Context(), r, tt.status, noWait)
+			restore, err := LiftCurtain(t.Context(), r, compositor.Niri{Runner: r}, tt.status, noWait)
 
 			var got result
 			if err != nil {

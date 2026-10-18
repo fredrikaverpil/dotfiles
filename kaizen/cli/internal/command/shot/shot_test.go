@@ -13,6 +13,8 @@ import (
 	"time"
 
 	"gotest.tools/v3/assert"
+
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/compositor"
 )
 
 // recorded is a program's recorded stdout and error.
@@ -377,7 +379,13 @@ func TestRun(t *testing.T) {
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &seqRunner{outputs: tt.outputs}
-			c := Command{Runner: r, CacheDir: cache, now: func() time.Time { return now }, wait: noWait}
+			c := Command{
+				Runner:     r,
+				Compositor: compositor.Niri{Runner: r},
+				CacheDir:   cache,
+				now:        func() time.Time { return now },
+				wait:       noWait,
+			}
 			var stdout, stderr bytes.Buffer
 			code := c.Run(t.Context(), tt.args, &stdout, &stderr)
 			got := result{Code: code, Stdout: stdout.String(), Stderr: stderr.String(), Calls: r.calls}

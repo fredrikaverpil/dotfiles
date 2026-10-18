@@ -17,6 +17,7 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/compositor"
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/state"
 )
 
@@ -49,7 +50,8 @@ var (
 // Command reports the kaizen units' warnings and errors, and what is out of
 // order.
 type Command struct {
-	Runner state.Runner
+	Runner     state.Runner
+	Compositor compositor.Compositor
 	// Home is the user's home directory.
 	Home string
 	// Getenv returns an environment variable: PATH and the XDG base
