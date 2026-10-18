@@ -22,8 +22,9 @@ type umbrielLayer struct {
 	Namespace string `json:"namespace"`
 	Output    string `json:"output"`
 	Mapped    bool   `json:"mapped"`
-	// KeyboardInteractivity is none, exclusive or on_demand.
-	KeyboardInteractivity string `json:"keyboard_interactivity"`
+	// Focused reports keyboard focus. A primed panel keeps it on demand
+	// (releaseExclusiveFocus), so interactivity alone does not tell.
+	Focused bool `json:"focused"`
 }
 
 // Layers reads the mapped layer surfaces from `umbriel layers --json`, which
@@ -41,7 +42,7 @@ func (u Umbriel) Layers(ctx context.Context) ([]Layer, error) {
 		result = append(result, Layer{
 			Namespace: l.Namespace,
 			Output:    l.Output,
-			Exclusive: l.KeyboardInteractivity == "exclusive",
+			Keyboard:  l.Focused,
 		})
 	}
 	return result, nil

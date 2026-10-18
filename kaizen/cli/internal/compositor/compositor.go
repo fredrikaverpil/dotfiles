@@ -32,9 +32,8 @@ type Compositor interface {
 type Layer struct {
 	Namespace string
 	Output    string
-	// Exclusive reports exclusive keyboard interactivity. The shell's
-	// surfaces that take the keyboard are exclusive.
-	Exclusive bool
+	// Keyboard reports that the layer holds the keyboard.
+	Keyboard bool
 }
 
 // Output is an output.

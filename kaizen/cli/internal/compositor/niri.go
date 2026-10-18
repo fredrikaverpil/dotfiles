@@ -31,7 +31,9 @@ type niriLayer struct {
 	KeyboardInteractivity string `json:"keyboard_interactivity"`
 }
 
-// Layers reads the layer surfaces from `niri msg -j layers`.
+// Layers reads the layer surfaces from `niri msg -j layers`. niri reports no
+// layer focus; it gives an exclusive layer the keyboard over any window, and
+// the shell's surfaces that take the keyboard stay exclusive on niri.
 func (n Niri) Layers(ctx context.Context) ([]Layer, error) {
 	var layers []niriLayer
 	if err := n.query(ctx, &layers, "layers"); err != nil {
@@ -42,7 +44,7 @@ func (n Niri) Layers(ctx context.Context) ([]Layer, error) {
 		result = append(result, Layer{
 			Namespace: l.Namespace,
 			Output:    l.Output,
-			Exclusive: l.KeyboardInteractivity == "Exclusive",
+			Keyboard:  l.KeyboardInteractivity == "Exclusive",
 		})
 	}
 	return result, nil

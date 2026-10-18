@@ -308,10 +308,9 @@ func readScreen(ctx context.Context, c compositor.Compositor) (screen, error) {
 	if err != nil {
 		return screen{}, err
 	}
-	// An open panel, menu or launcher holds exclusive keyboard focus on its
-	// output.
+	// An open panel, menu or launcher holds the keyboard on its output.
 	for _, l := range layers {
-		if l.Exclusive && !slices.Contains(s.open, l.Output) {
+		if l.Keyboard && !slices.Contains(s.open, l.Output) {
 			s.open = append(s.open, l.Output)
 		}
 	}
