@@ -48,10 +48,6 @@
       "rev": "ae11f6cb469ee5547cd0e076ecb41d74a7322cb8",
       "src": "https://github.com/CRAG666/code_runner.nvim"
     },
-    "codediff.nvim": {
-      "rev": "a493fb2a992458dc6282e82015308bc99f3b4696",
-      "src": "https://github.com/fredrikaverpil/codediff.nvim"
-    },
     "conform.nvim": {
       "rev": "016802de402556da54c36bd7359b441266b01cdd",
       "src": "https://github.com/stevearc/conform.nvim"
@@ -100,10 +96,6 @@
       "rev": "4e4bef34498e821bcbd5203f44db8b67e4f10e04",
       "src": "https://github.com/meznaric/key-analyzer.nvim"
     },
-    "lazydev.nvim": {
-      "rev": "ff2cbcba459b637ec3fd165a2be59b7bbaeedf0d",
-      "src": "https://github.com/folke/lazydev.nvim"
-    },
     "log-highlight.nvim": {
       "rev": "2538129ddbd0c4a35b8c6bb8486725bbc6d184b6",
       "src": "https://github.com/fei6409/log-highlight.nvim",
@@ -130,10 +122,6 @@
       "rev": "e56797f90192d81f1fda02e662fc3e8e3d775027",
       "src": "https://github.com/nvim-mini/mini.icons",
       "version": ">=0.0.0"
-    },
-    "mini.pick": {
-      "rev": "7cb8fd34bde460986e5e39e9539a9f992ec9772e",
-      "src": "https://github.com/echasnovski/mini.pick"
     },
     "neotest": {
       "rev": "1c529a1ef9c82e8131e872368415cecc2bb86ea2",
