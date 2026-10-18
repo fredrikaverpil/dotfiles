@@ -42,7 +42,8 @@ actions.
   a detail (a match's path, a value such as a zone's offset), its key and `›`
   when it has children. Check and radio rows show their state in the icon.
 - Separators group rows; a query hides them. Disabled rows keep their place in
-  `off`, and the cursor skips them.
+  `off`, and the cursor skips them. A row for a feature the compositor lacks
+  is not shown.
 - Rows are virtualized: a level can hold thousands (emoji).
 
 ### Search

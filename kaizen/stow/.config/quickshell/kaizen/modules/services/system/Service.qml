@@ -83,6 +83,8 @@ Item {
 
     // Copies the picked color and confirms with a notification.
     function pickColor() {
+        if (!Ui.Compositor.supports.colorPicker)
+            return;
         Quickshell.execDetached(["sh", "-c", 'hex=$("$@") && [ -n "$hex" ] && wl-copy "$hex" && notify-send -a "Color picker" "$hex" "Copied to clipboard"', "sh", ...Ui.Compositor.pickColor()]);
     }
 

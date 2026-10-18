@@ -54,6 +54,7 @@ Ui.Panel {
         "trigger.screenshotWindow": {
             icon: "",
             label: "Screenshot (window)",
+            hidden: !Ui.Compositor.supports.windowScreenshot,
             action: () => menu.shell.recordingService.shoot("window")
         },
         "trigger.screenshotRegion": {
@@ -103,6 +104,7 @@ Ui.Panel {
         "trigger.color": {
             icon: "󰃉",
             label: "Color picker",
+            hidden: !Ui.Compositor.supports.colorPicker,
             action: () => menu.shell.systemService.pickColor()
         },
         "trigger.close": {

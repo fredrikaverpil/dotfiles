@@ -47,6 +47,13 @@ installs both, and the session picks one at login: `kaizen run` starts niri,
   (`tst_Compositors.qml`), and its own portal (Session).
 - A backend fills what its compositor lacks with another tool: umbriel's
   screenshots come from grim, its screen sharing from PipeWire's node list.
+- A compositor must provide layer-shell, ext-session-lock, screencopy,
+  ext-idle-notify and virtual-keyboard, and its backend the outputs and the
+  focused output, focusing an output, a workspace and an app, closing a
+  window, DPMS, binds and keyboard layouts. Beyond that, a backend may lack an
+  optional feature: auto DnD on screencasts, window screenshots, the colour
+  picker, the recording's camera, border colours. The shell then hides its
+  launcher rows and panel controls.
 
 ## Layers
 
@@ -316,10 +323,13 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   `floatsInWorkingArea` (recording's camera). `Niri.js` and `Umbriel.js`
   set each.
 - `Ui/compositors/Contract.js` lists every property and function a backend
-  defines for `Compositor` to forward, and `tst_Compositors.qml` checks each
-  backend, `Unset.js` included, against it. A function added to `Compositor`
-  goes in each. A backend's `readBinds` returns chords as `Chords.js` reads
-  them (`Mod+Shift+Key`, xkb key names), translating its compositor's syntax.
+  defines for `Compositor` to forward, and each optional feature's names,
+  which a backend defines all of or none; `tst_Compositors.qml` checks each
+  backend, `Unset.js` included, against it. A required function added to
+  `Compositor` goes in each. `Compositor.supports.<feature>` says whether the
+  backend has one, and a launcher row it hides sets `hidden`. A backend's
+  `readBinds` returns chords as `Chords.js` reads them (`Mod+Shift+Key`, xkb
+  key names), translating its compositor's syntax.
 
 ## Session
 

@@ -29,6 +29,23 @@ TestCase {
             }
         })
 
+    function test_hidden_items_are_not_listed() {
+        const items = {
+            style: {
+                label: "Style"
+            },
+            "style.dark": {
+                label: "Dark"
+            },
+            "style.pick": {
+                label: "Pick",
+                hidden: true
+            }
+        };
+        compare(Menu.childrenOf(items, "style"), ["style.dark"]);
+        compare(Menu.descendantsOf(items, "root"), ["style", "style.dark"]);
+    }
+
     function test_hierarchy_paths_and_rows_describe_menu_descendants() {
         compare(Menu.childrenOf(items, "root"), ["apps", "learn", "style"]);
         compare(Menu.childrenOf(items, "learn"), ["learn.keys"]);

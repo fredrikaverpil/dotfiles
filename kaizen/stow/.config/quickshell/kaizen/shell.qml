@@ -291,7 +291,8 @@ ShellRoot {
 
     // Not palette: onDarkChanged runs before palette re-evaluates.
     function writeBorderColors() {
-        borderColors.setText(Ui.Compositor.borderColors(dark ? darkPalette : lightPalette));
+        if (Ui.Compositor.supports.borders)
+            borderColors.setText(Ui.Compositor.borderColors(dark ? darkPalette : lightPalette));
     }
 
     onDarkChanged: {
@@ -309,7 +310,7 @@ ShellRoot {
     // Included by the compositor's kaizen config.
     FileView {
         id: borderColors
-        path: Ui.Paths.state + "/" + Ui.Compositor.borderFile
+        path: Ui.Compositor.supports.borders ? Ui.Paths.state + "/" + Ui.Compositor.borderFile : ""
         atomicWrites: true
         printErrors: false
     }

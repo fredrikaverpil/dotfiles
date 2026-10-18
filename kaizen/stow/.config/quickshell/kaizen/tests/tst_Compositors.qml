@@ -35,7 +35,8 @@ TestCase {
             {
                 tag: "unset",
                 name: "",
-                backend: Unset
+                backend: Unset,
+                supported: false
             },
         ];
     }
@@ -43,6 +44,17 @@ TestCase {
     function test_backend_defines_the_contract(data) {
         compare(Contract.missing(data.backend), []);
         verify(data.backend.name === data.name);
+        const want = {};
+        Object.keys(Contract.optional).forEach(feature => want[feature] = data.supported !== false);
+        compare(Contract.supports(data.backend), want);
+    }
+
+    function test_missing_names_what_a_feature_lacks() {
+        const backend = Object.assign({}, Niri, {
+            pinComponent: ""
+        });
+        compare(Contract.missing(backend), ["pinComponent"]);
+        verify(Contract.supports(backend).camera === false);
     }
 
     function test_missing_names_what_a_backend_lacks() {

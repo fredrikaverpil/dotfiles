@@ -1,9 +1,14 @@
+// Neither lists an item that is hidden.
 function childrenOf(items, parent) {
   var entries = items || {};
   var prefix = parent === "root" ? "" : parent + ".";
   var depth = parent === "root" ? 1 : parent.split(".").length + 1;
   return Object.keys(entries).filter(function (id) {
-    return id.indexOf(prefix) === 0 && id.split(".").length === depth;
+    return (
+      id.indexOf(prefix) === 0 &&
+      id.split(".").length === depth &&
+      !entries[id].hidden
+    );
   });
 }
 
@@ -11,7 +16,7 @@ function descendantsOf(items, parent) {
   var entries = items || {};
   var prefix = parent === "root" ? "" : parent + ".";
   return Object.keys(entries).filter(function (id) {
-    return id !== parent && id.indexOf(prefix) === 0;
+    return id !== parent && id.indexOf(prefix) === 0 && !entries[id].hidden;
   });
 }
 
