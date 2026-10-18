@@ -71,8 +71,11 @@ function pickColor() {
   ];
 }
 
-function configFile(home) {
-  return home + "/.config/umbriel/config.toml";
+// umbriel/config.toml in the config dir.
+function configFile(home, getenv) {
+  return (
+    (getenv("XDG_CONFIG_HOME") || home + "/.config") + "/umbriel/config.toml"
+  );
 }
 
 // A TOML string's text: a literal '...' as is, a basic "..." unescaped.

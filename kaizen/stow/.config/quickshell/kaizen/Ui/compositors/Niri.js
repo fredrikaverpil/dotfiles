@@ -54,9 +54,12 @@ function pickColor() {
   return ["sh", "-c", "niri msg pick-color | sed -n 's/^Hex: //p'"];
 }
 
-// niriConfig is NIRI_CONFIG, which niri prefers to the default path.
-function configFile(home, niriConfig) {
-  return niriConfig || home + "/.config/niri/config.kdl";
+// $NIRI_CONFIG, else niri/config.kdl in the config dir.
+function configFile(home, getenv) {
+  return (
+    getenv("NIRI_CONFIG") ||
+    (getenv("XDG_CONFIG_HOME") || home + "/.config") + "/niri/config.kdl"
+  );
 }
 
 // Binds are the config lines carrying hotkey-overlay-title; the chord is the
@@ -90,19 +93,6 @@ function parseBinds(raw) {
       var action = /^([a-z][a-z-]*)\s*;$/.exec(body);
       if (action) bind.action = action[1];
       return bind;
-    });
-}
-
-// A chord's keys as keycaps: Mod is Super, an XF86 key drops the prefix and
-// its Audio or Mon group (XF86AudioMute is Mute).
-function keycaps(chord) {
-  return String(chord || "")
-    .split("+")
-    .filter(Boolean)
-    .map(function (key) {
-      return /^mod$/i.test(key)
-        ? "Super"
-        : key.replace(/^XF86(Audio|Mon)?/i, "");
     });
 }
 

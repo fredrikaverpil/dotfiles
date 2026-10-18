@@ -521,7 +521,7 @@ Ui.Panel {
     // Called on each opening, so edits to any included file show.
     function readBinds() {
         const home = Quickshell.env("HOME");
-        const file = Ui.Compositor.configFile(home, Quickshell.env("NIRI_CONFIG"));
+        const file = Ui.Compositor.configFile(home, name => Quickshell.env(name));
         binds = Ui.Compositor.readBinds(file, home, path => {
             bindsFile.path = path;
             bindsFile.reload();

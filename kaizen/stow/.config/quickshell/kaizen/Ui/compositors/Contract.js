@@ -19,6 +19,7 @@ var functions = [
   "screenshot",
   "pickColor",
   "configFile",
+  // Returns chords as Chords.js reads them.
   "readBinds",
   "focusWorkspace",
   "focusApp",

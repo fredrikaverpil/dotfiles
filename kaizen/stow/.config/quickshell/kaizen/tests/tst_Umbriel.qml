@@ -175,6 +175,14 @@ TestCase {
         ]);
     }
 
+    function test_config_file() {
+        const env = vars => name => vars[name];
+        compare(Umbriel.configFile("/home/u", env({})), "/home/u/.config/umbriel/config.toml");
+        compare(Umbriel.configFile("/home/u", env({
+            XDG_CONFIG_HOME: "/cfg"
+        })), "/cfg/umbriel/config.toml");
+    }
+
     function test_focused_output_on() {
         compare(Umbriel.focusedOutputOn("DP-1"), ["sh", "-c", Umbriel.focusOutput + " && umbriel outputs --json", "sh", "DP-1"]);
         // Without an output there is nothing to focus, so the plain query is used.

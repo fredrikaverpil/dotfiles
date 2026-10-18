@@ -34,7 +34,7 @@ function pickColor() {
   return fail;
 }
 
-function configFile(home) {
+function configFile(home, getenv) {
   return "";
 }
 
