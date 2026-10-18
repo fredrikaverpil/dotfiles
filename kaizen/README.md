@@ -63,7 +63,7 @@ flowchart TB
   go -->|"layers, outputs, windows, focus, validate"| msg
   go -->|"doctor: wayland-info"| proto
   users --> facade
-  facade -->|"picks by KAIZEN_COMPOSITOR"| backend
+  facade -->|"picks by NIRI_SOCKET or UMBRIEL_SOCKET"| backend
   users -->|"Compositor.workspaces, casts, pinSource"| sources
   sources --> events
   users -->|"run the backend's commands"| msg
@@ -72,15 +72,17 @@ flowchart TB
 ```
 
 Arrows point from what calls or reads to what it calls or reads. The shell and
-the Go commands read `KAIZEN_COMPOSITOR` from the session, which `kaizen run`
-exports. umbriel's cast source reads PipeWire's nodes, not the event stream.
+the Go commands pick the compositor by the socket variable it exports to the
+session. umbriel's cast source reads PipeWire's nodes, not the event stream.
 
-- `kaizen run` exports `KAIZEN_COMPOSITOR` (`niri`, `umbriel`) to the session,
-  and the shell, the `kaizen` command and its scripts read only that. They
-  reach the compositor only through one backend per compositor:
+- Each compositor exports its IPC socket to the session, `NIRI_SOCKET` or
+  `UMBRIEL_SOCKET`, and the shell and the `kaizen` command pick the one whose
+  variable is set. They reach the compositor only through one backend per
+  compositor:
   [`Ui/compositors/`](stow/.config/quickshell/kaizen/Ui/compositors/) (Surfaces)
-  and [`cli/internal/compositor/`](cli/internal/compositor/). When the
-  variable names none, an `Unset` backend fails every call, so the shell still
+  and [`cli/internal/compositor/`](cli/internal/compositor/). When none of the
+  variables is set, or more than one is (a nested session, or one a previous
+  session left behind), an `Unset` backend fails every call, so the shell still
   runs and locks, and `kaizen doctor` reports it; nothing falls back to niri.
 - Each compositor has its own kaizen config (Where it lives), kept in step by
   hand but for the titled binds, which `qml-test` checks are the same
@@ -238,7 +240,7 @@ notification rules.
   `kaizen --version` prints the commit it was built from (`unknown` from Nix). A
   `~/.local/bin/kaizen` overrides it in a terminal:
   [`development.md`](docs/development.md) › Building kaizen. Its commands and
-  scripts pick the compositor as the shell does, from `KAIZEN_COMPOSITOR`.
+  scripts pick the compositor as the shell does, by its socket variable.
 - `kaizen internal <sub>` runs `~/.local/libexec/kaizen/internal/<sub>`: what
   the system runs, as a unit or a build, and a person or an agent has no use
   for. `kaizen internal` lists them, and `--json` works there too.
@@ -380,8 +382,8 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 - Plugins add launcher items, panels, IPC targets and bar indicators:
   [`plugins.md`](docs/plugins.md).
 - [`Ui/Compositor.qml`](stow/.config/quickshell/kaizen/Ui/Compositor.qml)
-  is the only path to the compositor. It picks the backend once, by the name
-  in `KAIZEN_COMPOSITOR`, else `Unset.js`.
+  is the only path to the compositor. It picks the backend once, by the one
+  socket variable set, else `Unset.js`.
   [`Ui/compositors/`](stow/.config/quickshell/kaizen/Ui/compositors/)
   owns each compositor's commands, response parsing, and the workspace,
   screencast and camera-pinning sources. `Compositor` loads the backend's one
@@ -425,9 +427,7 @@ which runs niri; `kaizen run -c umbriel` starts
 instead. uwsm names its units after the entry ID, so another session on niri
 (`uwsm start niri`) starts none of kaizen's. Its `DesktopNames` give uwsm
 `XDG_CURRENT_DESKTOP=niri:kaizen` (`umbriel:kaizen`) while it prepares the
-environment, which picks the portals. uwsm also exports its own environment, so
-`KAIZEN_COMPOSITOR`, which `kaizen run` sets, reaches the user manager; a
-session started with `uwsm start` alone lacks it. For the name `kaizen`, uwsm
+environment, which picks the portals. For the name `kaizen`, uwsm
 sources [`uwsm/env-kaizen`](stow/.config/uwsm/env-kaizen) and exports its
 session variables to the user manager; a change applies from the next login.
 `niri --session` then sets and exports `XDG_CURRENT_DESKTOP=niri`, so portals

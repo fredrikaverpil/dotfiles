@@ -11,14 +11,14 @@ import "compositors/Unset.js" as Unset
 Singleton {
     id: root
 
-    // The session's compositor, read once from KAIZEN_COMPOSITOR, which
-    // `kaizen run` exports; Unset when it names none.
+    // The session's compositor: the one whose socket variable, which it
+    // exports to its session, is set. Unset when none is or more than one is.
     readonly property var backends: ({
-            niri: Niri,
-            umbriel: Umbriel
+            NIRI_SOCKET: Niri,
+            UMBRIEL_SOCKET: Umbriel
         })
-    readonly property string configured: Quickshell.env("KAIZEN_COMPOSITOR") || ""
-    readonly property var backend: backends.hasOwnProperty(configured) ? backends[configured] : Unset
+    readonly property var configured: Object.keys(backends).sort().filter(key => Quickshell.env(key))
+    readonly property var backend: configured.length === 1 ? backends[configured[0]] : Unset
 
     readonly property string name: backend.name
     // What differs between compositors; each backend says what each means.
@@ -64,7 +64,7 @@ Singleton {
 
     Component.onCompleted: {
         if (backend === Unset)
-            console.error("KAIZEN_COMPOSITOR names no compositor:", configured || "it is unset");
+            console.error("no compositor:", configured.length ? "more than one is set: " + configured.join(", ") : "none of " + Object.keys(backends).sort().join(", ") + " is set");
     }
 
     function borderColors(palette) {

@@ -157,6 +157,12 @@ const (
 // cap_setpcap and cap_sys_admin, as NixOS's wrapper holds them.
 const setpcapSysAdmin = 1<<8 | 1<<21
 
+// The sockets each compositor exports to its session.
+const (
+	niriSocket    = "/run/user/1000/niri.wayland-1.sock"
+	umbrielSocket = "/run/user/1000/umbriel-wayland-1.sock"
+)
+
 // result is what Command.Run did, and the lines it ran.
 type result struct {
 	Code   int
@@ -687,8 +693,8 @@ func TestRun(t *testing.T) {
 			},
 		},
 		{
-			name:  "no compositor named",
-			env:   map[string]string{"KAIZEN_COMPOSITOR": ""},
+			name:  "no compositor",
+			env:   map[string]string{"NIRI_SOCKET": ""},
 			files: map[string]string{coreRequires: ""},
 			outputs: map[string][]recorded{
 				showLine:   {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "0", "0", "")}},
@@ -696,14 +702,15 @@ func TestRun(t *testing.T) {
 			},
 			want: result{
 				Stdout: "1 error\n\nERROR compositor  check\n" +
-					"  KAIZEN_COMPOSITOR names no compositor: it is unset\n" +
-					"  hint: start the session with kaizen run; over SSH, copy it from systemctl --user show-environment\n",
+					"  no compositor: none of NIRI_SOCKET, UMBRIEL_SOCKET is set\n" +
+					"  hint: set only the running compositor's: it exports its own under kaizen run; " +
+					"over SSH, copy it from systemctl --user show-environment\n",
 				Calls: []string{showLine, portalLine},
 			},
 		},
 		{
 			name: "umbriel config, niri config without kaizen.kdl",
-			env:  map[string]string{"KAIZEN_COMPOSITOR": "umbriel"},
+			env:  map[string]string{"NIRI_SOCKET": "", "UMBRIEL_SOCKET": umbrielSocket},
 			files: map[string]string{
 				coreRequires:                       "",
 				niriConfig:                         "include \"apps.kdl\"\n",
@@ -723,9 +730,10 @@ func TestRun(t *testing.T) {
 		{
 			name: "umbriel config reaches kaizen.toml through includes",
 			env: map[string]string{
-				"KAIZEN_COMPOSITOR": "umbriel",
-				"XDG_CONFIG_HOME":   "$DIR/cfg",
-				"SHELL_DIR":         "$DIR/home/shell",
+				"NIRI_SOCKET":     "",
+				"UMBRIEL_SOCKET":  umbrielSocket,
+				"XDG_CONFIG_HOME": "$DIR/cfg",
+				"SHELL_DIR":       "$DIR/home/shell",
 			},
 			files: map[string]string{
 				"cfg/quickshell/kaizen/requires": "",
@@ -747,7 +755,7 @@ func TestRun(t *testing.T) {
 		},
 		{
 			name: "umbriel config without kaizen.toml",
-			env:  map[string]string{"KAIZEN_COMPOSITOR": "umbriel"},
+			env:  map[string]string{"NIRI_SOCKET": "", "UMBRIEL_SOCKET": umbrielSocket},
 			files: map[string]string{
 				coreRequires: "",
 				umbrielConfig: "# [include]\n# files = [\"kaizen.toml\"]\n[general]\nfiles = [\"kaizen.toml\"]\n" +
@@ -769,7 +777,7 @@ func TestRun(t *testing.T) {
 		},
 		{
 			name:  "invalid umbriel config",
-			env:   map[string]string{"KAIZEN_COMPOSITOR": "umbriel"},
+			env:   map[string]string{"NIRI_SOCKET": "", "UMBRIEL_SOCKET": umbrielSocket},
 			files: map[string]string{coreRequires: ""},
 			outputs: map[string][]recorded{
 				showLine: {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "0", "0", "")}},
@@ -864,7 +872,7 @@ func TestRun(t *testing.T) {
 				assert.NilError(t, os.MkdirAll(filepath.Dir(filepath.Join(dir, path)), 0o755))
 				assert.NilError(t, os.Symlink(expand(target), filepath.Join(dir, path)))
 			}
-			env := map[string]string{"HOME": "$DIR/home", "PATH": "$DIR/empty", "KAIZEN_COMPOSITOR": "niri"}
+			env := map[string]string{"HOME": "$DIR/home", "PATH": "$DIR/empty", "NIRI_SOCKET": niriSocket}
 			maps.Copy(env, tt.env)
 			outputs := map[string][]recorded{}
 			for line, outs := range tt.outputs {

@@ -51,6 +51,10 @@ func record(r *fakeRunner, value any, err error) result {
 }
 
 func TestFromEnv(t *testing.T) {
+	const (
+		niriSocket    = "/run/user/1000/niri.wayland-1.sock"
+		umbrielSocket = "/run/user/1000/umbriel-wayland-1.sock"
+	)
 	// named is a compositor's name and, for an Unset one, its error.
 	type named struct {
 		Name         string
@@ -62,17 +66,17 @@ func TestFromEnv(t *testing.T) {
 		env  map[string]string
 		want named
 	}{
-		{name: "niri", env: map[string]string{"KAIZEN_COMPOSITOR": "niri"}, want: named{Name: "niri"}},
-		{name: "umbriel", env: map[string]string{"KAIZEN_COMPOSITOR": "umbriel"}, want: named{Name: "umbriel"}},
+		{name: "niri", env: map[string]string{"NIRI_SOCKET": niriSocket}, want: named{Name: "niri"}},
+		{name: "umbriel", env: map[string]string{"UMBRIEL_SOCKET": umbrielSocket}, want: named{Name: "umbriel"}},
 		{
-			name: "unset",
-			env:  map[string]string{"NIRI_SOCKET": "/run/user/1000/niri.sock"},
-			want: named{Err: "KAIZEN_COMPOSITOR names no compositor: it is unset", NoCompositor: true},
+			name: "none",
+			env:  map[string]string{"NIRI_SOCKET": "", "WAYLAND_DISPLAY": "wayland-1"},
+			want: named{Err: "no compositor: none of NIRI_SOCKET, UMBRIEL_SOCKET is set", NoCompositor: true},
 		},
 		{
-			name: "unknown",
-			env:  map[string]string{"KAIZEN_COMPOSITOR": "sway"},
-			want: named{Err: `KAIZEN_COMPOSITOR names no compositor: "sway"`, NoCompositor: true},
+			name: "both",
+			env:  map[string]string{"NIRI_SOCKET": niriSocket, "UMBRIEL_SOCKET": umbrielSocket},
+			want: named{Err: "no compositor: more than one is set: NIRI_SOCKET, UMBRIEL_SOCKET", NoCompositor: true},
 		},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
