@@ -1,0 +1,54 @@
+# Include this file from ~/.config/umbriel/config.toml. umbriel exports its
+# session environment to the user manager itself, UMBRIEL_SOCKET included.
+
+# The shell writes the focused border colour from its palette on each theme
+# change.
+[include.optional]
+files = ["~/.local/state/kaizen-shell/umbriel-colors.toml"]
+
+# The recording service's camera preview: gpu-screen-recorder cannot mask its
+# own camera overlay, so the screen capture records this window instead. mpv
+# sets its title after the initial configure, so opening rules need the app id
+# to match. The size is mpv's and the shell moves it into place; the radius
+# caps at 100, so a camera wider than 200 px has rounded corners, not a circle.
+[[window_rule]]
+match.app_id = "^kaizen-camera$"
+default_floating = true
+default_focused = false
+default_pinned = true
+corner_radius = 100
+border_width = 0
+outer_border_width = 0
+shadow = false
+
+# A trailing comment labels a bind for the menu's Keybindings list.
+[keybinds]
+# Shell
+"Mod+Space" = "spawn:kaizen ipc call menu toggle" # Menu
+"Mod+Shift+Space" = "spawn:kaizen ipc call keyboard next" # Next keyboard layout
+"Super+Alt+L" = "spawn:kaizen ipc call lock lock" # Lock the screen
+"Mod+N" = "spawn:kaizen ipc call notifications select" # Select notification
+"Mod+Shift+Comma" = "spawn:kaizen ipc call notifications dismissAll" # Dismiss all notifications
+
+# Hardware keys. allow_when_locked keeps these working on the lock screen.
+"XF86AudioRaiseVolume" = { action = "spawn:kaizen ipc call audio up", allow_when_locked = true } # Volume up
+"XF86AudioLowerVolume" = { action = "spawn:kaizen ipc call audio down", allow_when_locked = true } # Volume down
+"XF86AudioMute" = { action = "spawn:kaizen ipc call audio mute", allow_when_locked = true, repeat = false } # Mute
+"XF86AudioMicMute" = { action = "spawn:kaizen ipc call audio micMute", allow_when_locked = true, repeat = false } # Mute microphone
+"XF86MonBrightnessUp" = { action = "spawn:kaizen ipc call brightness up", allow_when_locked = true } # Brightness up
+"XF86MonBrightnessDown" = { action = "spawn:kaizen ipc call brightness down", allow_when_locked = true } # Brightness down
+"XF86AudioNext" = { action = "spawn:kaizen ipc call media next", allow_when_locked = true, repeat = false } # Next track
+"XF86AudioPause" = { action = "spawn:kaizen ipc call media playPause", allow_when_locked = true, repeat = false } # Play/pause
+"XF86AudioPlay" = { action = "spawn:kaizen ipc call media playPause", allow_when_locked = true, repeat = false } # Play/pause
+"XF86AudioPrev" = { action = "spawn:kaizen ipc call media previous", allow_when_locked = true, repeat = false } # Previous track
+
+# Capture. The shell saves screenshots to ~/Pictures/Screenshots, copies them
+# to the clipboard and offers to annotate them.
+"Print" = { action = "spawn:kaizen ipc call recording screenshot", repeat = false } # Screenshot a region
+"Shift+Print" = { action = "spawn:kaizen ipc call recording shoot screen", repeat = false } # Screenshot the screen
+# Opens the recording panel, or stops a running recording.
+"Mod+Print" = { action = "spawn:kaizen ipc call recording toggle", repeat = false } # Record the screen
+"Mod+Shift+Print" = { action = "spawn:kaizen ipc call recording pause", repeat = false } # Pause or resume the recording
+
+# Launch. spawn runs its command through /bin/sh.
+"Mod+T" = "spawn:kaizen focus '^com\\.mitchellh\\.ghostty$' ghostty" # Focus or open a terminal
