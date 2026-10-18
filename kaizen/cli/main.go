@@ -16,6 +16,7 @@ import (
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/cli"
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/dev"
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/doctor"
+	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/focus"
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/keys"
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/link"
 	"github.com/fredrikaverpil/dotfiles/kaizen/cli/internal/command/reload"
@@ -51,6 +52,7 @@ func main() {
 				RuntimeDir: os.Getenv("XDG_RUNTIME_DIR"),
 			},
 			doctor.Command{Runner: state.Exec{}, Compositor: comp, Home: home, Getenv: os.Getenv},
+			focus.Command{Compositor: comp, Environ: os.Environ(), Execve: syscall.Exec},
 			keys.Command{Runner: state.Exec{}, Compositor: comp},
 			link.Command{
 				Runner: state.Exec{},

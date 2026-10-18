@@ -1,6 +1,7 @@
 package compositor
 
 import (
+	"cmp"
 	"context"
 	"encoding/json/v2"
 	"errors"
@@ -85,10 +86,16 @@ func (n Niri) Outputs(ctx context.Context) ([]Output, error) {
 	return result, nil
 }
 
-// niriWindow is a window in `niri msg -j focused-window`.
+// niriWindow is a window in `niri msg -j focused-window` and `niri msg -j
+// windows`.
 type niriWindow struct {
 	ID    int    `json:"id"`
 	AppID string `json:"app_id"`
+	// FocusTimestamp is nil for a window never focused.
+	FocusTimestamp *struct {
+		Secs  int64 `json:"secs"`
+		Nanos int64 `json:"nanos"`
+	} `json:"focus_timestamp"`
 }
 
 // FocusedWindow reads the focused window from `niri msg -j focused-window`.
@@ -101,6 +108,29 @@ func (n Niri) FocusedWindow(ctx context.Context) (*Window, error) {
 		return nil, nil
 	}
 	return &Window{ID: strconv.Itoa(w.ID), AppID: w.AppID}, nil
+}
+
+// focusedAt returns w's focus timestamp in nanoseconds, -1 when never focused.
+func (w niriWindow) focusedAt() int64 {
+	if w.FocusTimestamp == nil {
+		return -1
+	}
+	return w.FocusTimestamp.Secs*1e9 + w.FocusTimestamp.Nanos
+}
+
+// Windows reads the windows from `niri msg -j windows`, ordered by focus
+// timestamp; those never focused come last.
+func (n Niri) Windows(ctx context.Context) ([]Window, error) {
+	var windows []niriWindow
+	if err := n.query(ctx, &windows, "windows"); err != nil {
+		return nil, err
+	}
+	slices.SortStableFunc(windows, func(a, b niriWindow) int { return cmp.Compare(b.focusedAt(), a.focusedAt()) })
+	result := make([]Window, 0, len(windows))
+	for _, w := range windows {
+		result = append(result, Window{ID: strconv.Itoa(w.ID), AppID: w.AppID})
+	}
+	return result, nil
 }
 
 // FocusWindow focuses window id.

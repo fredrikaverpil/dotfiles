@@ -296,6 +296,70 @@ func TestFocusedWindow(t *testing.T) {
 	}
 }
 
+func TestWindows(t *testing.T) {
+	for _, tt := range []struct {
+		name       string
+		compositor func(r Runner) Compositor
+		outputs    map[string]recorded
+		want       result
+	}{
+		{
+			name:       "niri, by focus timestamp, never focused last",
+			compositor: func(r Runner) Compositor { return Niri{Runner: r} },
+			outputs: map[string]recorded{"niri msg -j windows": {Stdout: `[
+				{"id":1,"app_id":"slack","focus_timestamp":null},
+				{"id":3,"app_id":"com.mitchellh.ghostty","focus_timestamp":{"secs":100,"nanos":5}},
+				{"id":7,"app_id":"com.mitchellh.ghostty","focus_timestamp":{"secs":100,"nanos":9}},
+				{"id":9,"app_id":"zen-beta","focus_timestamp":{"secs":200,"nanos":0}}
+			]`}},
+			want: result{
+				Value: []Window{
+					{ID: "9", AppID: "zen-beta"},
+					{ID: "7", AppID: "com.mitchellh.ghostty"},
+					{ID: "3", AppID: "com.mitchellh.ghostty"},
+					{ID: "1", AppID: "slack"},
+				},
+				Calls: []string{"niri msg -j windows"},
+			},
+		},
+		{
+			name:       "niri fails",
+			compositor: func(r Runner) Compositor { return Niri{Runner: r} },
+			outputs:    map[string]recorded{"niri msg -j windows": {Err: errors.New("exit status 1")}},
+			want: result{
+				Value: []Window(nil),
+				Err:   "niri msg windows: exit status 1",
+				Calls: []string{"niri msg -j windows"},
+			},
+		},
+		{
+			name:       "umbriel, active first, the rest in its order",
+			compositor: func(r Runner) Compositor { return Umbriel{Runner: r} },
+			outputs: map[string]recorded{"umbriel windows --json": {Stdout: `[
+				{"id":"a1","app_id":"firefox","active":false},
+				{"id":"b2","app_id":"slack","active":false},
+				{"id":"c3","app_id":"com.mitchellh.ghostty","active":true}
+			]`}},
+			want: result{
+				Value: []Window{
+					{ID: "c3", AppID: "com.mitchellh.ghostty"},
+					{ID: "a1", AppID: "firefox"},
+					{ID: "b2", AppID: "slack"},
+				},
+				Calls: []string{"umbriel windows --json"},
+			},
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &fakeRunner{outputs: tt.outputs}
+
+			w, err := tt.compositor(r).Windows(t.Context())
+
+			assert.DeepEqual(t, record(r, w, err), tt.want)
+		})
+	}
+}
+
 func TestFocusWindow(t *testing.T) {
 	for _, tt := range []struct {
 		name       string
