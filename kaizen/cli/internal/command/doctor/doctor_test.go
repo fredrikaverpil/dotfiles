@@ -64,6 +64,8 @@ const (
 	coreRequires = "home/.config/quickshell/kaizen/requires"
 	// niriConfig is niri's config under the test's $HOME.
 	niriConfig = "home/.config/niri/config.kdl"
+	// umbrielConfig is umbriel's config under the test's $HOME.
+	umbrielConfig = "home/.config/umbriel/config.toml"
 )
 
 // base is the time the journal's entries count from.
@@ -679,8 +681,10 @@ func TestRun(t *testing.T) {
 			name: "umbriel config, niri config without kaizen.kdl",
 			env:  map[string]string{"UMBRIEL_SOCKET": "$DIR/run/umbriel-wayland-1.sock"},
 			files: map[string]string{
-				coreRequires: "",
-				niriConfig:   "include \"apps.kdl\"\n",
+				coreRequires:                       "",
+				niriConfig:                         "include \"apps.kdl\"\n",
+				umbrielConfig:                      "[include]\nfiles = [\"kaizen.toml\"]\n",
+				"home/.config/umbriel/kaizen.toml": "",
 			},
 			outputs: map[string][]recorded{
 				showLine:    {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "0", "0", "")}},
@@ -690,6 +694,53 @@ func TestRun(t *testing.T) {
 			want: result{
 				Stdout: "No errors or warnings\n",
 				Calls:  []string{showLine, umbrielLine, portalLine},
+			},
+		},
+		{
+			name: "umbriel config reaches kaizen.toml through includes",
+			env: map[string]string{
+				"UMBRIEL_SOCKET":  "$DIR/run/umbriel-wayland-1.sock",
+				"XDG_CONFIG_HOME": "$DIR/cfg",
+				"SHELL_DIR":       "$DIR/home/shell",
+			},
+			files: map[string]string{
+				"cfg/quickshell/kaizen/requires": "",
+				"cfg/umbriel/config.toml": "[include]\nfiles = [\n  \"apps.toml\", # \"kaizen.toml\"\n]\n\n" +
+					"[include . optional]\nfiles = [\"sub/host.toml\"]\n",
+				"cfg/umbriel/apps.toml":     "",
+				"cfg/umbriel/sub/host.toml": "[include]\nfiles = ['${SHELL_DIR}/kaizen.toml']\n",
+				"home/shell/kaizen.toml":    "",
+			},
+			outputs: map[string][]recorded{
+				showLine:    {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "0", "0", "")}},
+				umbrielLine: {{}},
+				portalLine:  {{}},
+			},
+			want: result{
+				Stdout: "No errors or warnings\n",
+				Calls:  []string{showLine, umbrielLine, portalLine},
+			},
+		},
+		{
+			name: "umbriel config without kaizen.toml",
+			env:  map[string]string{"UMBRIEL_SOCKET": "$DIR/run/umbriel-wayland-1.sock"},
+			files: map[string]string{
+				coreRequires: "",
+				umbrielConfig: "# [include]\n# files = [\"kaizen.toml\"]\n[general]\nfiles = [\"kaizen.toml\"]\n" +
+					"[include]\nfiles = [\"apps.toml\", \"gone/kaizen.toml\"]\n",
+				"home/.config/umbriel/apps.toml":   "[include]\nfiles = [\"apps.toml\"]\n",
+				"home/.config/umbriel/kaizen.toml": "",
+			},
+			outputs: map[string][]recorded{
+				showLine:    {{Stdout: unitBlock("kaizen-shell.service", "", "active", "success", "0", "0", "")}},
+				umbrielLine: {{}},
+				portalLine:  {{}},
+			},
+			want: result{
+				Stdout: "1 error\n\nERROR umbriel  check\n" +
+					"  $DIR/home/.config/umbriel/config.toml does not include kaizen.toml\n" +
+					"  hint: add \"kaizen.toml\" to [include] files in $DIR/home/.config/umbriel/config.toml\n",
+				Calls: []string{showLine, umbrielLine, portalLine},
 			},
 		},
 		{

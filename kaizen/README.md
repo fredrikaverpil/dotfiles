@@ -155,9 +155,9 @@ enabled plugin's do on NixOS; the session variables come from Stow
 reports each program, D-Bus service, file, session variable, font and Qt plugin
 missing from [`requires`](stow/.config/quickshell/kaizen/requires) and from each
 enabled plugin's `plugins/<name>/requires`, a niri config that never includes
-`kaizen.kdl`, a portal that does not answer the colour scheme, and a
-`gsr-kms-server` without `cap_sys_admin+ep`, which lets monitor capture skip the
-portal dialog. It cannot check:
+`kaizen.kdl` (an umbriel config `kaizen.toml`), a portal that does not answer
+the colour scheme, and a `gsr-kms-server` without `cap_sys_admin+ep`, which lets
+monitor capture skip the portal dialog. It cannot check:
 
 - gnome-keyring as Secret Service, and ghostty first in
   `xdg-terminals.list`.
