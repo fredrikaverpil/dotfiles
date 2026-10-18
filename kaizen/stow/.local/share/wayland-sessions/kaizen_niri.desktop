@@ -1,5 +1,6 @@
 # `kaizen run` starts this entry. uwsm names the session's units after its ID:
-# wayland-wm@kaizen.desktop.service, wayland-session@kaizen.desktop.target.
+# wayland-wm@kaizen_niri.desktop.service,
+# wayland-session@kaizen_niri.desktop.target, which wants kaizen-session.target.
 # DesktopNames lowercased name the env files uwsm sources: uwsm/env-niri,
 # uwsm/env-kaizen.
 [Desktop Entry]

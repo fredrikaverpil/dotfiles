@@ -1,0 +1,11 @@
+# The kaizen session, whichever compositor runs it: each kaizen entry's
+# wayland-session@<entry>.target wants it, so kaizen's units name no entry and
+# another session on the same compositor starts none of them.
+[Unit]
+Description=kaizen session
+# Not PartOf=graphical-session.target: a target orders after the units it is
+# part of, and graphical-session.target after the entry's target, a cycle.
+StopWhenUnneeded=yes
+
+[Install]
+WantedBy=wayland-session@kaizen_niri.desktop.target
