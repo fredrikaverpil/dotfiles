@@ -58,6 +58,35 @@ installs both, and the session picks one at login: `kaizen run` starts niri,
   screenshots, the colour picker, the recording's camera, border colours. The
   shell then hides its launcher rows and panel controls.
 
+A new compositor `<name>` needs its own of each, as niri and umbriel have:
+
+1. Session: an entry `kaizen_<name>.desktop` in
+   [`wayland-sessions/`](stow/.local/share/wayland-sessions/) with
+   `DesktopNames=<name>;kaizen;`; its `wayland-session@` and
+   `wayland-session-xdg-autostart@` targets in the `WantedBy=` of
+   [`kaizen-session.target`](stow/.config/systemd/user/kaizen-session.target)
+   and `kaizen-session-xdg-autostart.target`, with the `.wants/` links beside
+   them; its name in [`run`](stow/.local/libexec/kaizen/run)'s `-c`.
+2. Nix: the package (a flake input when nixpkgs lags) and its portal, whose
+   config names gnome-keyring's Secret portal, in
+   [`nix/default.nix`](nix/default.nix); the binary in the default devshell
+   (`flake.nix`) for `compositor-test`.
+3. [`requires`](stow/.config/quickshell/kaizen/requires): its `cmd`, its
+   portal's `data` line, and each tool its backend fills a gap with.
+4. QML backend: `Ui/compositors/<Name>.js` meeting `Contract.js`, with its
+   events, workspace and optional components, mapped by name in
+   `Ui/Compositor.qml`; its rows in `tst_Compositors.qml` (contract, bind
+   parity) and its own `tst_*.qml`.
+5. Go backend: a `Compositor` in
+   [`cli/internal/compositor/`](cli/internal/compositor/), mapped by name in
+   `compositors`, with its tests.
+6. Config: `<name>/kaizen.*`, with niri's titled binds; each host's `config.*`
+   and `outputs.*` in `stow/host/<host>/.config/<name>/`; their validation in
+   [`config_test.sh`](stow/.config/quickshell/kaizen/tests/config_test.sh)
+   (`compositor-test`).
+7. Docs: its commands where [`development.md`](docs/development.md) names
+   umbriel's beside niri's (Versions, `kaizen keys`, the SSH socket).
+
 ## Layers
 
 ```mermaid
