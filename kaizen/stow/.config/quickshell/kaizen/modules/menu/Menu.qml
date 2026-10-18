@@ -108,7 +108,7 @@ Ui.Panel {
         "trigger.close": {
             icon: "󰅖",
             label: "Close window",
-            compositor: "close-window",
+            compositor: Ui.Compositor.closeWindowAction,
             action: () => Quickshell.execDetached(Ui.Compositor.closeWindow())
         },
         // One node per panel button, in bar order, each opening its panel first.

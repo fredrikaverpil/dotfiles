@@ -13,6 +13,8 @@ var workspaceComponent = "NiriWorkspaces.qml";
 var castComponent = "NiriCasts.qml";
 // Under the shell's state dir, included by niri/kaizen.kdl.
 var borderFile = "niri-colors.kdl";
+// The action closeWindow runs, as a bind names it.
+var closeWindowAction = "close-window";
 
 function borderColors(palette) {
   return (
@@ -32,7 +34,7 @@ function dpms(on) {
 }
 
 function closeWindow() {
-  return ["niri", "msg", "action", "close-window"];
+  return ["niri", "msg", "action", closeWindowAction];
 }
 
 // niri writes path asynchronously, after the action returns.
