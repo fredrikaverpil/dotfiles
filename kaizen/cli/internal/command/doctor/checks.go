@@ -22,6 +22,16 @@ import (
 // include matches a niri config's include line, capturing its path.
 var include = regexp.MustCompile(`(?m)^[ \t]*include[ \t][^"\n]*"([^"]*)"`)
 
+// TOML, as far as umbriel's includes need it: a table header, naming the
+// table; a string; a line's text before its comment; an array of files.
+var (
+	tomlHeader  = regexp.MustCompile(`^\s*\[\[?\s*([^\[\]]+?)\s*\]\]?\s*(#.*)?$`)
+	tomlDot     = regexp.MustCompile(`\s*\.\s*`)
+	tomlString  = regexp.MustCompile(`"(?:[^"\\]|\\.)*"|'[^']*'`)
+	tomlComment = regexp.MustCompile(`^((?:[^#"']|"(?:[^"\\]|\\.)*"|'[^']*')*)#.*$`)
+	tomlFiles   = regexp.MustCompile(`(?m)^\s*files\s*=\s*\[([^\]]*)\]`)
+)
+
 // devExec matches the ExecStart of kaizen dev's drop-in, naming the tree.
 var devExec = regexp.MustCompile(`^ExecStart=.* -p "(.*)"$`)
 
@@ -322,33 +332,85 @@ func (k *checker) kaizens(ctx context.Context) {
 }
 
 // compositorConfig reports a compositor config that fails validation, or else
-// a niri config that never includes kaizen.kdl.
+// one that never includes kaizen's file for it.
 func (k *checker) compositorConfig(ctx context.Context) {
 	name := k.Compositor.Name()
 	if err := k.Compositor.Validate(ctx); err != nil {
 		k.add(check{name: name + "-config", level: "ERROR", unit: name, message: err.Error()})
 		return
 	}
-	if name != "niri" {
-		return
-	}
-	config := cmp.Or(k.Getenv("NIRI_CONFIG"), filepath.Join(k.configDir(), "niri", "config.kdl"))
-	if !k.reaches(config, "kaizen.kdl", 0) {
-		k.add(check{
-			name:    "niri-include",
-			level:   "ERROR",
-			unit:    "niri",
-			message: config + " does not include kaizen.kdl",
-			hint:    `add include "kaizen.kdl" to ` + config,
-		})
+	switch name {
+	case "niri":
+		config := cmp.Or(k.Getenv("NIRI_CONFIG"), filepath.Join(k.configDir(), "niri", "config.kdl"))
+		if !k.reaches(config, "kaizen.kdl", niriIncludes, 0) {
+			k.add(check{
+				name:    "niri-include",
+				level:   "ERROR",
+				unit:    "niri",
+				message: config + " does not include kaizen.kdl",
+				hint:    `add include "kaizen.kdl" to ` + config,
+			})
+		}
+	case "umbriel":
+		config := filepath.Join(k.configDir(), "umbriel", "config.toml")
+		if !k.reaches(config, "kaizen.toml", k.umbrielIncludes, 0) {
+			k.add(check{
+				name:    "umbriel-include",
+				level:   "ERROR",
+				unit:    "umbriel",
+				message: config + " does not include kaizen.toml",
+				hint:    `add "kaizen.toml" to [include] files in ` + config,
+			})
+		}
 	}
 }
 
-// reaches reports whether niri config file, or a file it includes, includes a
-// regular file named name. Includes resolve as niri's do: ~ is home, other
-// relative paths are relative to the including file, and nesting stops at 10
-// levels.
-func (k *checker) reaches(file, name string, depth int) bool {
+// niriIncludes returns the paths a niri config's include lines name.
+func niriIncludes(data string) []string {
+	var paths []string
+	for _, m := range include.FindAllStringSubmatch(data, -1) {
+		paths = append(paths, m[1])
+	}
+	return paths
+}
+
+// umbrielIncludes returns the paths an umbriel config's [include] and then
+// [include.optional] tables list in files, with $VAR and ${VAR} expanded, as
+// umbriel does.
+func (k *checker) umbrielIncludes(data string) []string {
+	tables := map[string][]string{}
+	header := ""
+	for line := range strings.SplitSeq(data, "\n") {
+		if m := tomlHeader.FindStringSubmatch(line); m != nil {
+			header = tomlDot.ReplaceAllString(m[1], ".")
+			continue
+		}
+		tables[header] = append(tables[header], tomlComment.ReplaceAllString(line, "$1"))
+	}
+	var paths []string
+	for _, name := range []string{"include", "include.optional"} {
+		m := tomlFiles.FindStringSubmatch(strings.Join(tables[name], "\n"))
+		if m == nil {
+			continue
+		}
+		for _, quoted := range tomlString.FindAllString(m[1], -1) {
+			path := quoted[1 : len(quoted)-1]
+			if quoted[0] == '"' {
+				if unquoted, err := strconv.Unquote(quoted); err == nil {
+					path = unquoted
+				}
+			}
+			paths = append(paths, os.Expand(path, k.Getenv))
+		}
+	}
+	return paths
+}
+
+// reaches reports whether config file, or a file it includes, includes a
+// regular file named name; includes lists the paths in a file's text. ~ is
+// home, other relative paths are relative to the including file, and nesting
+// stops at 10 levels, which also ends a cycle.
+func (k *checker) reaches(file, name string, includes func(string) []string, depth int) bool {
 	if depth >= 10 {
 		return false
 	}
@@ -356,15 +418,14 @@ func (k *checker) reaches(file, name string, depth int) bool {
 	if err != nil {
 		return false
 	}
-	for _, m := range include.FindAllStringSubmatch(string(data), -1) {
-		path := m[1]
+	for _, path := range includes(string(data)) {
 		switch {
 		case path == "~" || strings.HasPrefix(path, "~/"):
 			path = k.Home + path[1:]
 		case !filepath.IsAbs(path):
 			path = filepath.Join(filepath.Dir(file), path)
 		}
-		if filepath.Base(path) == name && isRegular(path) || k.reaches(path, name, depth+1) {
+		if filepath.Base(path) == name && isRegular(path) || k.reaches(path, name, includes, depth+1) {
 			return true
 		}
 	}
