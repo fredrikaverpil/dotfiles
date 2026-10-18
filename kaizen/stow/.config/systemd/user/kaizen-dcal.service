@@ -6,7 +6,7 @@
 Description=DankCalendar sync and reminders
 ConditionPathExists=%h/.config/kaizen/plugins/calendar.jsonc
 PartOf=graphical-session.target
-After=dbus.socket kaizen-shell.service wayland-wm@kaizen.desktop.service wayland-session-waitenv.service
+After=dbus.socket kaizen-shell.service wayland-session-waitenv.service
 # Retry indefinitely, e.g. while the keyring is not yet unlocked.
 StartLimitIntervalSec=0
 
@@ -25,4 +25,4 @@ Slice=app.slice
 UMask=0077
 
 [Install]
-WantedBy=wayland-session@kaizen.desktop.target
+WantedBy=kaizen-session.target
