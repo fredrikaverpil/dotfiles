@@ -68,7 +68,7 @@ func TestRun(t *testing.T) {
 	niri := func(r compositor.Runner) compositor.Compositor { return compositor.Niri{Runner: r} }
 	umbriel := func(r compositor.Runner) compositor.Compositor { return compositor.Umbriel{Runner: r} }
 	unset := func(compositor.Runner) compositor.Compositor {
-		return compositor.Unset{Err: fmt.Errorf("%w: it is unset", compositor.ErrNoCompositor)}
+		return compositor.Unset{Err: fmt.Errorf("%w: none of NIRI_SOCKET, UMBRIEL_SOCKET is set", compositor.ErrNoCompositor)}
 	}
 	for _, tt := range []struct {
 		name       string
@@ -127,7 +127,7 @@ func TestRun(t *testing.T) {
 				Exec: &execCall{
 					Path: "/bin/slack",
 					Argv: []string{"slack", "--enable-features=X"},
-					Env:  []string{"KAIZEN_COMPOSITOR=niri"},
+					Env:  []string{"NIRI_SOCKET=/run/user/1000/niri.wayland-1.sock"},
 				},
 			},
 		},
@@ -147,7 +147,7 @@ func TestRun(t *testing.T) {
 			args:       []string{"^zen-beta$", "zen-beta"},
 			want: result{
 				Code:   1,
-				Stderr: "kaizen focus: KAIZEN_COMPOSITOR names no compositor: it is unset\n",
+				Stderr: "kaizen focus: no compositor: none of NIRI_SOCKET, UMBRIEL_SOCKET is set\n",
 			},
 		},
 		{
@@ -199,7 +199,7 @@ func TestRun(t *testing.T) {
 				Code:   1,
 				Stderr: "kaizen focus: slack: permission denied\n",
 				Calls:  []string{"niri msg -j windows"},
-				Exec:   &execCall{Path: "/bin/slack", Argv: []string{"slack"}, Env: []string{"KAIZEN_COMPOSITOR=niri"}},
+				Exec:   &execCall{Path: "/bin/slack", Argv: []string{"slack"}, Env: []string{"NIRI_SOCKET=/run/user/1000/niri.wayland-1.sock"}},
 			},
 		},
 	} {
@@ -208,7 +208,7 @@ func TestRun(t *testing.T) {
 			var got result
 			c := Command{
 				Compositor: tt.compositor(r),
-				Environ:    []string{"KAIZEN_COMPOSITOR=niri"},
+				Environ:    []string{"NIRI_SOCKET=/run/user/1000/niri.wayland-1.sock"},
 				Execve: func(path string, argv []string, env []string) error {
 					got.Exec = &execCall{Path: path, Argv: argv, Env: env}
 					return tt.execErr

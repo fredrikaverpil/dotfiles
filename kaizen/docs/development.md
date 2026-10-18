@@ -397,8 +397,8 @@ It refuses while the session is locked, so use it instead of
 `systemctl --user restart`.
 
 For compositor commands over SSH, provide the active session's
-`XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY`, `KAIZEN_COMPOSITOR`, and `NIRI_SOCKET`
-(`UMBRIEL_SOCKET` on umbriel) from `systemctl --user show-environment`; without
-`KAIZEN_COMPOSITOR` the `kaizen` commands drive no compositor. `kaizen ipc` and
-`shell-smoke` select the shell by its unit's PID, so they need no display
+`XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY`, and `NIRI_SOCKET` (`UMBRIEL_SOCKET` on
+umbriel) from `systemctl --user show-environment`; the `kaizen` commands find
+the compositor by its socket variable, and drive none without it. `kaizen ipc`
+and `shell-smoke` select the shell by its unit's PID, so they need no display
 context.

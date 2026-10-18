@@ -5,10 +5,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
+	"slices"
+	"strings"
 )
 
 // ErrNoCompositor is the error of each call on an Unset compositor.
-var ErrNoCompositor = errors.New("KAIZEN_COMPOSITOR names no compositor")
+var ErrNoCompositor = errors.New("no compositor")
 
 // Runner runs a program and returns its stdout.
 type Runner interface {
@@ -67,27 +70,28 @@ type Window struct {
 	AppID string
 }
 
-// compositors maps each KAIZEN_COMPOSITOR value to its compositor.
+// compositors maps the variable each compositor exports to its session, its
+// IPC socket, to the compositor.
 var compositors = map[string]func(Runner) Compositor{
-	"niri":    func(r Runner) Compositor { return Niri{Runner: r} },
-	"umbriel": func(r Runner) Compositor { return Umbriel{Runner: r} },
+	"NIRI_SOCKET":    func(r Runner) Compositor { return Niri{Runner: r} },
+	"UMBRIEL_SOCKET": func(r Runner) Compositor { return Umbriel{Runner: r} },
 }
 
-// FromEnv returns the compositor KAIZEN_COMPOSITOR names, or an Unset one when
-// it names none.
+// FromEnv returns the compositor whose socket variable is set, or an Unset one
+// when none is or more than one is.
 func FromEnv(getenv func(string) string, r Runner) Compositor {
-	name := getenv("KAIZEN_COMPOSITOR")
-	if name == "" {
-		return Unset{Err: fmt.Errorf("%w: it is unset", ErrNoCompositor)}
+	vars := slices.Sorted(maps.Keys(compositors))
+	set := slices.DeleteFunc(slices.Clone(vars), func(v string) bool { return getenv(v) == "" })
+	switch len(set) {
+	case 0:
+		return Unset{Err: fmt.Errorf("%w: none of %s is set", ErrNoCompositor, strings.Join(vars, ", "))}
+	case 1:
+		return compositors[set[0]](r)
 	}
-	newCompositor, ok := compositors[name]
-	if !ok {
-		return Unset{Err: fmt.Errorf("%w: %q", ErrNoCompositor, name)}
-	}
-	return newCompositor(r)
+	return Unset{Err: fmt.Errorf("%w: more than one is set: %s", ErrNoCompositor, strings.Join(set, ", "))}
 }
 
-// Unset stands in for a compositor KAIZEN_COMPOSITOR does not name: each call
+// Unset stands in when no single compositor's socket variable is set: each call
 // returns Err.
 type Unset struct {
 	Err error

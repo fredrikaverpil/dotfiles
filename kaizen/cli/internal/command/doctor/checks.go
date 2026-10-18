@@ -319,7 +319,7 @@ func (k *checker) kaizens(ctx context.Context) {
 	})
 }
 
-// compositorConfig reports a session that names no compositor, a compositor
+// compositorConfig reports a session without a single compositor, a compositor
 // config that fails validation, or else one that never includes kaizen's file
 // for it.
 func (k *checker) compositorConfig(ctx context.Context) {
@@ -331,7 +331,8 @@ func (k *checker) compositorConfig(ctx context.Context) {
 			level:   "ERROR",
 			unit:    "compositor",
 			message: err.Error(),
-			hint:    "start the session with kaizen run; over SSH, copy it from systemctl --user show-environment",
+			hint: "set only the running compositor's: it exports its own under kaizen run; " +
+				"over SSH, copy it from systemctl --user show-environment",
 		})
 		return
 	}

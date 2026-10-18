@@ -1,5 +1,5 @@
-// Stands in when KAIZEN_COMPOSITOR names no compositor, so the shell still runs
-// and locks. Every command fails, every query answers with nothing, and no
+// Stands in when no single compositor's socket variable is set, so the shell
+// still runs and locks. Every command fails, every query answers with nothing, and no
 // optional feature is defined.
 var name = "";
 
