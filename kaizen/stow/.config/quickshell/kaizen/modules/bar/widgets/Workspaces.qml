@@ -13,8 +13,7 @@ Item {
     property real fontScale: 1
 
     function workspaceIds() {
-        // Loader.item is typed QObject; the source exposes ids().
-        return Model.workspaceIds(source.item ? source.item.ids(root.output) : []); // qmllint disable missing-property
+        return Model.workspaceIds(Ui.Compositor.workspaces ? Ui.Compositor.workspaces.ids(root.output) : []);
     }
 
     function focusWorkspace(id) {
@@ -26,23 +25,18 @@ Item {
     width: implicitWidth
     height: implicitHeight
 
-    Loader {
-        id: source
-        source: Ui.Compositor.workspaceSource
-    }
-
     Row {
         id: workspaces
         spacing: 2
 
         Repeater {
-            model: source.item ? root.workspaceIds() : []
+            model: Ui.Compositor.workspaces ? root.workspaceIds() : []
 
             delegate: Rectangle {
                 required property int modelData
 
-                readonly property bool occupied: source.item.occupied(modelData, root.output) // qmllint disable missing-property
-                readonly property bool focused: source.item.activeId(root.output) === modelData // qmllint disable missing-property
+                readonly property bool occupied: Ui.Compositor.workspaces.occupied(modelData, root.output)
+                readonly property bool focused: Ui.Compositor.workspaces.activeId(root.output) === modelData
 
                 width: 20 * root.fontScale
                 height: Math.round(24 * root.fontScale)
