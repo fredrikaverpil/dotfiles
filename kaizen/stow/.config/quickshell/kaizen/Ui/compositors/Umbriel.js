@@ -189,8 +189,8 @@ function focusWorkspace(id, output) {
   return msg("workspace-switch:" + id + "/" + output);
 }
 
-// Focuses the most recently focused window whose app id matches pattern; does
-// nothing when none does.
+// Focuses the active window whose app id matches pattern, else the first;
+// does nothing when none does.
 function focusApp(pattern) {
   return ["kaizen", "focus", pattern, "true"];
 }
