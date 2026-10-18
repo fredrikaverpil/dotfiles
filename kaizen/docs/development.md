@@ -51,9 +51,11 @@ nix eval --raw .#nixosConfigurations.<host>.pkgs.qt6.qtdeclarative.version
 ```
 
 Look up a Quickshell type, property or signal in Context7 at the pinned version
-before using one that this tree does not already use, or when `qml-lint`
-rejects one. For niri, do the same for a config node or action missing from
-`niri/kaizen.kdl` and the hosts' `config.kdl`. `qml-lint` and `compositor-test`
+before using one that this tree does not already use, or when `qml-lint` rejects
+one. For niri, do the same for a config node or action missing from
+`niri/kaizen.kdl` and the hosts' `config.kdl`. For umbriel, read its
+`docs/user/` at the pinned commit, or `umbriel config schema --json`, for a key
+or action missing from `umbriel/kaizen.toml`. `qml-lint` and `compositor-test`
 catch removed or misspelled API, not features you did not know about.
 
 Context7 indexes Quickshell per release
@@ -148,7 +150,7 @@ includes.
 | Nix | `nix fmt`, `nix build .#nixosConfigurations.<host>.config.system.build.toplevel`; build both kaizen hosts, a shared module breaks both; the build fails on a `requires` `cmd`, `file` or `data` line the host does not install |
 | JS/QML | `qml-format`, `qml-test`, `qml-lint`, `requires-check` (any platform) |
 | The `kaizen` command (Go) | `go test ./...` and `go vet ./...` in `kaizen/cli/`; build both kaizen hosts, whose build runs the tests |
-| Compositor interface, config (`kaizen.kdl` or a host's niri config), or bind contract | Also `compositor-test` (Linux) |
+| Compositor interface, config (`kaizen.kdl`, `kaizen.toml` or a host's compositor config), or bind contract | Also `compositor-test` (Linux) |
 | Service IPC, `shell.qml` wiring, or systemd units | Also `shell-smoke` on the machine after deploy and restart, and exercise the affected path |
 | Panel views | Also `shell-smoke --panels` |
 | Device-dependent behaviour | Also validate on the actual ThinkPad |

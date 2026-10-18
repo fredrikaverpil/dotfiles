@@ -64,15 +64,15 @@ Each layer calls downward only.
 
 Nix holds what needs a system module, root or the store: the two lower layers
 and the packages, the `kaizen` command among them, applied on rebuild. Stow
-holds files edited in place, live on
-save: the shell's niri config, the units and scripts, the shell's and plugins'
-QML, which plugins run, and the notification rules.
+holds files edited in place, live on save: the shell's compositor config, the
+units and scripts, the shell's and plugins' QML, which plugins run, and the
+notification rules.
 
 | Part | Path | Reaches |
 | --- | --- | --- |
 | Session: niri under UWSM, portals, PAM, the services the shell reads, the packages the shell, its binds, scripts and units use | [`kaizen/nix/`](nix/default.nix) | every kaizen host |
 | The `kaizen` command, in Go, built by [`package.nix`](nix/package.nix) | [`kaizen/cli/`](cli/) | every kaizen host |
-| The shell's niri config, session variables, units and scripts, the shell's QML, the core's notification rules | [`kaizen/stow/`](stow/) | every kaizen host |
+| The shell's niri and umbriel config, session variables, units and scripts, the shell's QML, the core's notification rules | [`kaizen/stow/`](stow/) | every kaizen host |
 | Plugin QML: generic or reusable | [`kaizen/stow/.config/quickshell/kaizen/plugins/<name>/`](stow/.config/quickshell/kaizen/plugins/) | every kaizen host |
 | Plugin QML: specific to one host | `stow/host/<host>/.config/kaizen/plugins/<name>/` | that host |
 | Which plugins run, with their config | `stow/host/<host>/.config/kaizen/plugins/<name>.jsonc`, or in the `stow/` of a host's private submodule | that host |
@@ -110,16 +110,20 @@ QML, which plugins run, and the notification rules.
   its plugins' QML. A plugin name in both is an error: neither shadows the
   other. `kaizen dev` runs a worktree's shell tree instead:
   [`development.md`](docs/development.md) › Working from a worktree.
-- kaizen ships one niri file,
-  [`niri/kaizen.kdl`](stow/.config/niri/kaizen.kdl): what the shell needs,
-  namely the session's environment, binds calling `kaizen`, rules for the
-  shell's surfaces and windows, and the border colours the shell writes. The
-  niri config, `~/.config/niri/config.kdl`, is the user's: input, layout,
-  window management and its binds. It includes `kaizen.kdl`. Here it is
-  [`config.kdl`](../stow/host/renoir/.config/niri/config.kdl) in renoir's
-  host package, which wily links, with each host's `outputs.kdl` and
-  `host.kdl` (`stow/host/<host>/.config/niri/`) included around `kaizen.kdl`,
-  the last after it, so its binds win.
+- kaizen ships one file per compositor,
+  [`niri/kaizen.kdl`](stow/.config/niri/kaizen.kdl) and
+  [`umbriel/kaizen.toml`](stow/.config/umbriel/kaizen.toml): what the shell
+  needs, namely the session's environment (niri only; umbriel exports its own),
+  binds calling `kaizen`, rules for the shell's surfaces and windows, and the
+  border colours the shell writes. Both are kept by hand: a bind or rule added
+  to one goes in the other too. A bind's label is its `hotkey-overlay-title` in
+  niri and its trailing comment in umbriel, which has no label key. The niri
+  config, `~/.config/niri/config.kdl`, is the user's: input, layout, window
+  management and its binds. It includes `kaizen.kdl`. Here it is
+  [`config.kdl`](../stow/host/renoir/.config/niri/config.kdl) in renoir's host
+  package, which wily links, with each host's `outputs.kdl` and `host.kdl`
+  (`stow/host/<host>/.config/niri/`) included around `kaizen.kdl`, the last
+  after it, so its binds win.
 - `kaizen` is the only kaizen command on PATH, built from
   [`kaizen/cli/`](cli/) into the system profile. `kaizen <sub>` runs its Go
   command `<sub>`
@@ -265,7 +269,7 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
   (`Ui/MenuOverlay`), from the actions the focused item and its parents
   declare (`menuScope()`). A right-click there, or a click on a chip, hangs a
   cascading context menu from the pointer or the chip (`popup()`).
-- Every surface opens over IPC; niri binds are `spawn kaizen ipc call ...`.
+- Every surface opens over IPC; compositor binds run `kaizen ipc call ...`.
 - How each surface takes input, the bar buttons' kinds included:
   [`interaction.md`](docs/interaction.md).
 - Plugins add launcher items, panels, IPC targets and bar indicators:
@@ -399,7 +403,8 @@ nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
    [`.local/libexec/kaizen/`](stow/.local/libexec/kaizen/),
    compositor →
    [`Ui/compositors/`](stow/.config/quickshell/kaizen/Ui/compositors/)
-   and [`niri/kaizen.kdl`](stow/.config/niri/kaizen.kdl), IPC
+   and [`niri/kaizen.kdl`](stow/.config/niri/kaizen.kdl) with its twin
+   [`umbriel/kaizen.toml`](stow/.config/umbriel/kaizen.toml), IPC
    target for every new action. An optional shell extension is a
    [plugin](docs/plugins.md). An app is not kaizen's to install:
    [`nix/README.md`](../nix/README.md) says where it goes.
