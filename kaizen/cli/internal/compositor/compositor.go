@@ -58,3 +58,12 @@ type Window struct {
 	ID    string
 	AppID string
 }
+
+// FromEnv returns the session's compositor: umbriel when UMBRIEL_SOCKET is
+// set, else niri.
+func FromEnv(getenv func(string) string, r Runner) Compositor {
+	if getenv("UMBRIEL_SOCKET") != "" {
+		return Umbriel{Runner: r}
+	}
+	return Niri{Runner: r}
+}

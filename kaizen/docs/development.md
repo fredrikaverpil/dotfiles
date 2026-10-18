@@ -167,9 +167,9 @@ includes.
   since the last service start; restart the service before re-running to clear
   stale errors.
 - `kaizen doctor` lists the warnings and errors from each `kaizen-*` unit's
-  current run, and checks units, the shell's binary, niri's config, the portal,
-  `gsr-kms-server`'s capability, the plugin dirs and manifests and the
-  `requires` files;
+  current run, and checks units, the shell's binary, the compositor's config,
+  the portal, `gsr-kms-server`'s capability, the plugin dirs and manifests and
+  the `requires` files;
   `--json` prints one document, each finding with its check's stable `id`
   and, when there is one, its fix as `hint`; journalctl arguments
   (`--since -1h`, `-b -1`) report that span of the journal instead, without
@@ -185,13 +185,13 @@ includes.
   machine.
 - Test keyboard-first panels over SSH: open the panel with `kaizen ipc call`,
   then `kaizen keys --layer NAMESPACE KEY...` with its namespace from
-  `niri msg layers`. It presses each key only while that layer alone holds the
-  keyboard (`exclusive`), lifts the curtain meanwhile, and refuses while
-  locked. A key is a chord of xkb names (`Return`, `ctrl+k`, `shift+Tab`,
-  which arrives as Tab with Shift held, not as Backtab); a key that moves the
-  keyboard elsewhere, such as an Esc that closes the panel, comes last. Niri
-  drops virtual-keyboard input before bind handling, so it cannot test
-  compositor binds.
+  `niri msg layers` (`umbriel layers` on umbriel). It presses each key only
+  while that layer alone holds the keyboard (`exclusive`), lifts the curtain
+  meanwhile, and refuses while locked. A key is a chord of xkb names
+  (`Return`, `ctrl+k`, `shift+Tab`, which arrives as Tab with Shift held, not
+  as Backtab); a key that moves the keyboard elsewhere, such as an Esc that
+  closes the panel, comes last. Niri drops virtual-keyboard input before bind
+  handling, so it cannot test compositor binds.
 - Test a window, such as a plugin's application, with
   `kaizen keys --window ID KEY...`: it focuses the window, presses each key
   only while the window has focus and no layer holds the keyboard, and gives
@@ -389,6 +389,7 @@ It refuses while the session is locked, so use it instead of
 `systemctl --user restart`.
 
 For compositor commands over SSH, provide the active session's
-`XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY`, and `NIRI_SOCKET` from
+`XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY`, and `NIRI_SOCKET` (`UMBRIEL_SOCKET` on
+umbriel, without which the `kaizen` commands drive niri) from
 `systemctl --user show-environment`. `kaizen ipc` and `shell-smoke` select the
 shell by its unit's PID, so they need no display context.
