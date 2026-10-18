@@ -1,8 +1,9 @@
 # kaizen
 
 `kaizen` is a [Quickshell](https://quickshell.org) shell for
-[niri](https://niri-wm.github.io/niri/): a minimal, keyboard-first desktop
-that an agent can drive and verify from a terminal.
+[niri](https://niri-wm.github.io/niri/) or
+[umbriel](https://github.com/noctalia-dev/umbriel): a minimal, keyboard-first
+desktop that an agent can drive and verify from a terminal.
 
 - [`features.md`](docs/features.md): description of individual features.
 - [`plugins.md`](docs/plugins.md): optional shell extensions and how to write
@@ -23,10 +24,25 @@ that an agent can drive and verify from a terminal.
   (bluetui, nm-connection-editor).
 - Keyboard-first everywhere. Pointer-only controls are bugs.
 - Every action is reachable from a terminal: the `kaizen` commands
-  (`kaizen --json` lists them; `kaizen ipc` drives the shell), `niri msg` and
-  `systemctl --user`.
+  (`kaizen --json` lists them; `kaizen ipc` drives the shell), `niri msg` or
+  `umbriel msg`, and `systemctl --user`.
 - Host-agnostic naming: "kaizen" in units, PAM, layer namespaces and state
   files. No hostname in the desktop's configuration.
+
+## Compositors
+
+niri is the stable compositor and umbriel is on trial. Every kaizen host
+installs both, and the session picks one at login: `kaizen run` starts niri,
+`kaizen run -c umbriel` umbriel (Session).
+
+- The shell and the `kaizen` command take umbriel when `UMBRIEL_SOCKET` is set,
+  else niri, and reach it only through one backend per compositor:
+  [`Ui/compositors/`](stow/.config/quickshell/kaizen/Ui/compositors/) (Surfaces)
+  and [`cli/internal/compositor/`](cli/internal/compositor/).
+- Each compositor has its own kaizen config, kept in step by hand (Where it
+  lives), and its own portal (Session).
+- A backend fills what its compositor lacks with another tool: umbriel's
+  screenshots come from grim, its screen sharing from PipeWire's node list.
 
 ## Layers
 
@@ -299,7 +315,8 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 
 ```
 TTY login ─ kaizen run ─ uwsm start kaizen_niri.desktop ─ niri --session
-  └─ wayland-session@kaizen_niri.desktop.target
+          (kaizen run -c umbriel ─ uwsm start kaizen_umbriel.desktop ─ umbriel)
+  └─ wayland-session@kaizen_<compositor>.desktop.target
        └─ kaizen-session.target
             ├─ kaizen-shell.service      Restart=on-failure
             └─ kaizen-sleep-lock.service logind delay inhibitor
@@ -310,15 +327,15 @@ The session is the entry
 [`kaizen_niri.desktop`](stow/.local/share/wayland-sessions/kaizen_niri.desktop),
 which runs niri; `kaizen run -c umbriel` starts
 [`kaizen_umbriel.desktop`](stow/.local/share/wayland-sessions/kaizen_umbriel.desktop)
-instead. uwsm names its units after the entry ID,
-so another session on niri (`uwsm start niri`) starts none of kaizen's. Its
-`DesktopNames` give uwsm `XDG_CURRENT_DESKTOP=niri:kaizen` (`umbriel:kaizen`)
-while it prepares the environment, which picks the portals. For
-the name `kaizen`, uwsm sources [`uwsm/env-kaizen`](stow/.config/uwsm/env-kaizen)
-and exports its session variables to the user manager; a change applies from
-the next login. `niri --session` then sets and exports
-`XDG_CURRENT_DESKTOP=niri`, so portals and `OnlyShowIn=niri` autostart entries
-see plain niri.
+instead. uwsm names its units after the entry ID, so another session on niri
+(`uwsm start niri`) starts none of kaizen's. Its `DesktopNames` give uwsm
+`XDG_CURRENT_DESKTOP=niri:kaizen` (`umbriel:kaizen`) while it prepares the
+environment, which picks the portals. For the name `kaizen`, uwsm sources
+[`uwsm/env-kaizen`](stow/.config/uwsm/env-kaizen) and exports its session
+variables to the user manager; a change applies from the next login.
+`niri --session` then sets and exports `XDG_CURRENT_DESKTOP=niri`, so portals
+and `OnlyShowIn=niri` autostart entries see plain niri; umbriel does the same
+with `umbriel`.
 
 The entry's `wayland-session@<entry>.target` and
 `wayland-session-xdg-autostart@<entry>.target` want `kaizen-session.target`
@@ -328,7 +345,8 @@ order after `wayland-session-waitenv.service`, which ends once the compositor
 exported `WAYLAND_DISPLAY`.
 
 Lid close uses logind defaults: suspend (the sleep-lock unit locks first), or
-nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
+nothing when docked. Niri turns off `eDP-1` while docked with the lid closed;
+umbriel leaves it on, since no config sets its `[events]` lid commands.
 
 - XDG autostart apps start only once the shell's StatusNotifierWatcher is on
   the bus (`kaizen-tray-ready.service`), because Electron apps look for it once
@@ -347,11 +365,11 @@ nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.
   restarting the keyring daemon and unlocking it, then retry account setup.
   Do not delete keyring files.
 - Chromium and Electron pick their secret store from `XDG_CURRENT_DESKTOP`. They
-  do not recognise `niri` and fall back to `basic_text`, so logins and secrets
-  do not persist or are stored under a hardcoded key. Wrap each such app with
-  `pkgs.withGnomeLibsecret` (`nix/shared/overlays/`), which adds
-  `--password-store=gnome-libsecret`; `chromium` passes the flag directly. Do
-  not add `GNOME` to `XDG_CURRENT_DESKTOP`: autostart entries such as
+  recognise neither `niri` nor `umbriel` and fall back to `basic_text`, so
+  logins and secrets do not persist or are stored under a hardcoded key. Wrap
+  each such app with `pkgs.withGnomeLibsecret` (`nix/shared/overlays/`), which
+  adds `--password-store=gnome-libsecret`; `chromium` passes the flag directly.
+  Do not add `GNOME` to `XDG_CURRENT_DESKTOP`: autostart entries such as
   `nm-applet` and `print-applet` use `NotShowIn=GNOME`. Once an app has
   encrypted secrets with the keyring, removing the flag locks it out of them.
 
