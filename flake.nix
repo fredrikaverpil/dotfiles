@@ -196,7 +196,9 @@
                     '')
                     pkgs.prettier
                     (task "qml-test" ''
-                      export QT_QPA_PLATFORM=offscreen QT_QPA_PLATFORMTHEME=
+                      # QML_XHR_ALLOW_FILE_READ: tst_Compositors.qml reads the
+                      # compositor configs.
+                      export QT_QPA_PLATFORM=offscreen QT_QPA_PLATFORMTHEME= QML_XHR_ALLOW_FILE_READ=1
                       qmltestrunner -input tests
                       qmltestrunner -input plugins
                     '')

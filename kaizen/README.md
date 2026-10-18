@@ -39,8 +39,9 @@ installs both, and the session picks one at login: `kaizen run` starts niri,
   else niri, and reach it only through one backend per compositor:
   [`Ui/compositors/`](stow/.config/quickshell/kaizen/Ui/compositors/) (Surfaces)
   and [`cli/internal/compositor/`](cli/internal/compositor/).
-- Each compositor has its own kaizen config, kept in step by hand (Where it
-  lives), and its own portal (Session).
+- Each compositor has its own kaizen config (Where it lives), kept in step by
+  hand but for the titled binds, which `qml-test` checks are the same
+  (`tst_Compositors.qml`), and its own portal (Session).
 - A backend fills what its compositor lacks with another tool: umbriel's
   screenshots come from grim, its screen sharing from PipeWire's node list.
 
