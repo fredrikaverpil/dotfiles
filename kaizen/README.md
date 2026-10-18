@@ -122,8 +122,9 @@ A new compositor `<name>` needs its own of each, as niri and umbriel have:
 5. Go backend: a `Compositor` in
    [`cli/internal/compositor/`](cli/internal/compositor/), mapped by name in
    `compositors`, with its tests.
-6. Config: `<name>/kaizen.*`, with niri's titled binds; each host's `config.*`
-   and `outputs.*` in `stow/host/<host>/.config/<name>/`; their validation in
+6. Config: `<name>/kaizen.*`, with niri's titled binds; the hosts' `config.*`,
+   `outputs.*` and `host.*` in `stow/host/<host>/.config/<name>/` (Where it
+   lives); their validation in
    [`config_test.sh`](stow/.config/quickshell/kaizen/tests/config_test.sh)
    (`compositor-test`).
 7. Docs: its commands where [`development.md`](docs/development.md) names
@@ -218,19 +219,20 @@ notification rules.
   binds calling `kaizen`, rules for the shell's surfaces and windows, and the
   border colours the shell writes. Both are kept by hand: a bind or rule added
   to one goes in the other too. A bind's label is its `hotkey-overlay-title` in
-  niri and its trailing comment in umbriel, which has no label key. The niri
-  config, `~/.config/niri/config.kdl`, is the user's: input, layout, window
-  management and its binds. It includes `kaizen.kdl`. Here it is
-  [`config.kdl`](../stow/host/renoir/.config/niri/config.kdl) in renoir's host
-  package, which wily links, with each host's `outputs.kdl` and `host.kdl`
-  (`stow/host/<host>/.config/niri/`) included around `kaizen.kdl`, the last
-  after it, so its binds win. The umbriel config,
-  `~/.config/umbriel/config.toml`, is the twin of niri's, also kept by hand,
-  and includes `kaizen.toml` and the host's `outputs.toml`. umbriel applies a
-  file's includes before its own keys, so an included host file could not
-  override its binds: each host has its own
-  (`stow/host/<host>/.config/umbriel/config.toml`), wily's being renoir's with
-  `host.kdl`'s lines.
+  niri and its trailing comment in umbriel, which has no label key.
+- The compositor's config, `~/.config/niri/config.kdl` or
+  `~/.config/umbriel/config.toml`, is the user's: input, layout, window
+  management and its binds. Each compositor has the same files in
+  `stow/host/<host>/.config/<compositor>/`, each the twin of the other's, kept
+  by hand: `config.*`, renoir's, which wily links, includes the host's
+  `outputs.*`, kaizen's file and last, when it exists, the host's `host.*`, so
+  its binds win. niri applies an include where it stands, so
+  [`config.kdl`](../stow/host/renoir/.config/niri/config.kdl) holds the
+  shared settings around its includes. umbriel applies a file's includes
+  before its own keys, so
+  [`config.toml`](../stow/host/renoir/.config/umbriel/config.toml) holds only
+  includes, and the shared settings are in `common.toml`, which wily also
+  links.
 - `kaizen` is the only kaizen command on PATH, built from [`kaizen/cli/`](cli/)
   into the system profile. `kaizen <sub>` runs its Go command `<sub>`
   ([`kaizen/cli/internal/command/`](cli/internal/command/)), else
