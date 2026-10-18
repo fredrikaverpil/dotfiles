@@ -2,6 +2,7 @@ import QtQuick
 import QtTest
 import "../modules/bar/widgets/WorkspaceModel.js" as Workspaces
 import "../Ui/compositors/NiriWorkspaces.js" as Niri
+import "../Ui/compositors/UmbrielWorkspaces.js" as Umbriel
 
 TestCase {
     name: "WorkspaceModel"
@@ -150,5 +151,50 @@ TestCase {
                 id: 42
             }
         }).queryWindows, false);
+    }
+
+    function test_umbriel_snapshots_are_per_output() {
+        const list = Umbriel.snapshot({
+            event: "workspaces",
+            data: [
+                {
+                    output: "DP-1",
+                    index: 2,
+                    active: true,
+                    window_count: 0
+                },
+                {
+                    output: "DP-1",
+                    index: 1,
+                    active: false,
+                    window_count: 3
+                },
+                {
+                    output: "eDP-1",
+                    index: 1,
+                    active: true,
+                    window_count: 0
+                }
+            ]
+        });
+        compare(Umbriel.ids(list, "DP-1"), [1, 2]);
+        compare(Umbriel.ids(list, "HDMI-A-1"), []);
+        compare(Umbriel.activeId(list, "DP-1"), 2);
+        compare(Umbriel.activeId(list, "HDMI-A-1"), -1);
+        compare(Umbriel.occupied(list, "DP-1", 1), true);
+        compare(Umbriel.occupied(list, "DP-1", 2), false);
+        compare(Umbriel.occupied(list, "eDP-1", 1), false);
+    }
+
+    function test_umbriel_snapshot_ignores_other_events() {
+        compare(Umbriel.snapshot({
+            event: "windows",
+            data: []
+        }), null);
+        compare(Umbriel.snapshot({
+            event: "workspaces",
+            data: null
+        }), null);
+        compare(Umbriel.snapshot(null), null);
     }
 }

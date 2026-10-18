@@ -9,6 +9,9 @@
 
 # Session
 cmd niri
+# The umbriel backend, and its colour picker.
+cmd umbriel warn
+cmd slurp warn
 cmd uwsm
 cmd uwsm-app
 cmd quickshell

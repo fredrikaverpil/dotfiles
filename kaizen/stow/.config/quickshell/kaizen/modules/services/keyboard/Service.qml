@@ -17,8 +17,9 @@ Item {
     function set(next) {
         if (!(next >= 0 && next < root.names.length) || next === root.index)
             return;
+        const current = root.index;
         root.index = next;
-        Quickshell.execDetached(Ui.Compositor.setLayout(next));
+        Quickshell.execDetached(Ui.Compositor.setLayout(next, current, root.names.length));
     }
 
     function next() {
