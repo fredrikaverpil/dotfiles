@@ -10,7 +10,7 @@ Personal dotfiles, managed in three layers:
   [GNU Stow](https://www.gnu.org/software/stow/) (not Nix). Changes take effect
   immediately, no rebuild needed.
 - **Kaizen** ([`kaizen/`](kaizen/)): my custom Linux desktop experience, a
-  Quickshell shell for niri.
+  Quickshell shell for niri or umbriel.
 
 ## Convenience links
 
