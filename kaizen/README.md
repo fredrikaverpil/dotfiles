@@ -35,6 +35,46 @@ niri is the stable compositor and umbriel is on trial. Every kaizen host
 installs both, and the session picks one at login: `kaizen run` starts niri,
 `kaizen run -c umbriel` umbriel (Session).
 
+```mermaid
+flowchart TB
+  binds["the compositor's binds: niri/kaizen.kdl, umbriel/kaizen.toml"]
+  subgraph CLI[kaizen command]
+    run["run (script)"]
+    kipc["ipc (script): qs ipc --pid on kaizen-shell.service"]
+    go["doctor, keys, shot, focus (Go): cli/internal/compositor"]
+  end
+  subgraph SHELL[kaizen: Quickshell]
+    users["services and surfaces: bar, notifications, recording, menu, lock, ..."]
+    facade["Ui/Compositor.qml: capabilities, supports, forwarded calls"]
+    backend["Niri.js / Umbriel.js / Unset.js: build commands, parse replies"]
+    sources["one workspace and one cast source, a pinner per camera"]
+    events["one event stream"]
+  end
+  subgraph WM[Compositor]
+    comp["niri --session or umbriel, under uwsm"]
+    msg["niri msg / umbriel msg"]
+    proto["protocols: layer-shell, session-lock, idle, screencopy, data control"]
+  end
+  binds -->|"kaizen ipc call"| kipc
+  binds -->|"kaizen focus"| go
+  run -->|"uwsm start kaizen_&lt;name&gt;.desktop"| comp
+  kipc -->|"IpcHandler targets"| users
+  users -->|"kaizen doctor, kaizen focus"| go
+  go -->|"layers, outputs, windows, focus, validate"| msg
+  go -->|"doctor: wayland-info"| proto
+  users --> facade
+  facade -->|"picks by KAIZEN_COMPOSITOR"| backend
+  users -->|"Compositor.workspaces, casts, pinSource"| sources
+  sources --> events
+  users -->|"run the backend's commands"| msg
+  events -->|"event-stream / subscribe"| msg
+  users -->|"layer surfaces, lock, idle; grim, wl-paste"| proto
+```
+
+Arrows point from what calls or reads to what it calls or reads. The shell and
+the Go commands read `KAIZEN_COMPOSITOR` from the session, which `kaizen run`
+exports. umbriel's cast source reads PipeWire's nodes, not the event stream.
+
 - `kaizen run` exports `KAIZEN_COMPOSITOR` (`niri`, `umbriel`) to the session,
   and the shell, the `kaizen` command and its scripts read only that. They
   reach the compositor only through one backend per compositor:
