@@ -286,16 +286,17 @@ Notifications, Lock, Polkit, Background, Curtain   own layer surfaces
 ## Session
 
 ```
-TTY login ─ kaizen run ─ uwsm start kaizen.desktop ─ niri --session
-  └─ wayland-session@kaizen.desktop.target
-       ├─ kaizen-shell.service      Restart=on-failure
-       └─ kaizen-sleep-lock.service logind delay inhibitor
+TTY login ─ kaizen run ─ uwsm start kaizen_niri.desktop ─ niri --session
+  └─ wayland-session@kaizen_niri.desktop.target
+       └─ kaizen-session.target
+            ├─ kaizen-shell.service      Restart=on-failure
+            └─ kaizen-sleep-lock.service logind delay inhibitor
 lid close / power key ─ logind ─ sleep-lock locks shell ─ waits for secure ─ suspend
 ```
 
 The session is the entry
-[`kaizen.desktop`](stow/.local/share/wayland-sessions/kaizen.desktop), which
-runs niri. uwsm names its units after the entry ID, so another session on
+[`kaizen_niri.desktop`](stow/.local/share/wayland-sessions/kaizen_niri.desktop),
+which runs niri. uwsm names its units after the entry ID, so another session on
 niri (`uwsm start niri`) starts none of kaizen's. Its `DesktopNames` give
 uwsm `XDG_CURRENT_DESKTOP=niri:kaizen` while it prepares the environment. For
 the name `kaizen`, uwsm sources [`uwsm/env-kaizen`](stow/.config/uwsm/env-kaizen)
@@ -304,9 +305,12 @@ the next login. `niri --session` then sets and exports
 `XDG_CURRENT_DESKTOP=niri`, so portals and `OnlyShowIn=niri` autostart entries
 see plain niri.
 
-Units bind to `wayland-session@kaizen.desktop.target`; ordering after
-`graphical-session.target` is a cycle. `wayland-session-waitenv.service`
-closes niri's readiness-before-`WAYLAND_DISPLAY` race.
+The entry's `wayland-session@<entry>.target` and
+`wayland-session-xdg-autostart@<entry>.target` want `kaizen-session.target`
+and `kaizen-session-xdg-autostart.target`, which kaizen's units bind to, so
+they name no entry. Ordering after `graphical-session.target` is a cycle; they
+order after `wayland-session-waitenv.service`, which ends once the compositor
+exported `WAYLAND_DISPLAY`.
 
 Lid close uses logind defaults: suspend (the sleep-lock unit locks first), or
 nothing when docked. Niri turns off `eDP-1` while docked with the lid closed.

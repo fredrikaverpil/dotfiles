@@ -30,7 +30,9 @@ PATH=${PATH#"$(dirname "$(command -v kaizen)")":}
 # The entry runs `niri --session`, which serves niri's D-Bus interfaces
 # (screencast portal, a11y) and imports its environment, which uwsm cleans up
 # on exit. The instance name is the entry ID, so the units are
-# wayland-wm@kaizen.desktop.service and wayland-session@kaizen.desktop.target --
-# both named in kaizen/stow/.config/systemd/user/. A plain `uwsm start niri`
-# starts none of kaizen.
-exec uwsm start -- kaizen.desktop
+# wayland-wm@kaizen_niri.desktop.service and
+# wayland-session@kaizen_niri.desktop.target, whose .wants/ in
+# kaizen/stow/.config/systemd/user/ starts kaizen-session.target. A plain
+# `uwsm start niri` starts none of kaizen. An underscore, not a dash: systemd
+# escapes a dash in an instance name (\x2d), which .wants/ would have to spell.
+exec uwsm start -- kaizen_niri.desktop
