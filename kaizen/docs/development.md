@@ -341,8 +341,10 @@ comes from the default devshell. To use a change without a rebuild:
   keep main's `kaizen`.
 - In `~/.dotfiles`,
   `nix develop ~/.dotfiles -c ~/.dotfiles/kaizen/cli/build.sh` installs
-  `~/.local/bin/kaizen`, which precedes the system profile's on PATH: shells,
-  binds and QML take it at once, units on their next start. It refuses
+  `~/.local/bin/kaizen`, which precedes the system profile's only on an
+  interactive shell's PATH (`exports.sh`). Units, binds and QML take PATH from
+  the user manager, which lacks `~/.local/bin`, and keep the system profile's
+  `kaizen` until a rebuild; try a change from a terminal. It refuses
   anywhere else, since parallel sessions share `~/.local/bin`. A rebuild
   deletes it, returning to the system profile's; until then `kaizen doctor`
   warns, naming its commit (`kaizen --version`).
