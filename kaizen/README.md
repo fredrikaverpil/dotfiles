@@ -158,8 +158,8 @@ notification rules.
   PATH. Units, niri binds and QML call it, never a script's path.
   `kaizen --json` lists the commands as `{ name, usage, summary }`, and
   `kaizen --version` prints the commit it was built from (`unknown` from Nix). A
-  `~/.local/bin/kaizen` overrides it: [`development.md`](docs/development.md) ›
-  Building kaizen. Its commands and scripts pick the compositor as the shell
+  `~/.local/bin/kaizen` overrides it in a terminal:
+  [`development.md`](docs/development.md) › Building kaizen. Its commands and scripts pick the compositor as the shell
   does, from `KAIZEN_COMPOSITOR`.
 - `kaizen internal <sub>` runs `~/.local/libexec/kaizen/internal/<sub>`: what
   the system runs, as a unit or a build, and a person or an agent has no use
