@@ -232,11 +232,10 @@ func (c Command) holds(ctx context.Context, t target) error {
 	if err != nil {
 		return err
 	}
-	// The shell's surfaces that take the keyboard are exclusive, and the
-	// compositor gives them the keyboard over any window.
+	// A layer holding the keyboard holds it over any window.
 	var holders []string
 	for _, l := range layers {
-		if l.Exclusive && !slices.Contains(holders, l.Namespace) {
+		if l.Keyboard && !slices.Contains(holders, l.Namespace) {
 			holders = append(holders, l.Namespace)
 		}
 	}

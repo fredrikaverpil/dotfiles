@@ -189,7 +189,8 @@ tree, so a static check passing here passes for every kaizen host;
 - Test keyboard-first panels over SSH: open the panel with `kaizen ipc call`,
   then `kaizen keys --layer NAMESPACE KEY...` with its namespace from
   `niri msg layers` (`umbriel layers` on umbriel). It presses each key only
-  while that layer alone holds the keyboard (`exclusive`), lifts the curtain
+  while that layer alone holds the keyboard (`exclusive` on niri, `focused` on
+  umbriel, where a primed panel drops to on-demand), lifts the curtain
   meanwhile, and refuses while locked. A key is a chord of xkb names
   (`Return`, `ctrl+k`, `shift+Tab`, which arrives as Tab with Shift held, not
   as Backtab); a key that moves the keyboard elsewhere, such as an Esc that

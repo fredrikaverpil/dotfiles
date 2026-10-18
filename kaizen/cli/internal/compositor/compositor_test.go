@@ -85,7 +85,7 @@ func TestLayers(t *testing.T) {
 			want: result{
 				Value: []Layer{
 					{Namespace: "kaizen-bar", Output: "eDP-1"},
-					{Namespace: "kaizen-panel", Output: "DP-1", Exclusive: true},
+					{Namespace: "kaizen-panel", Output: "DP-1", Keyboard: true},
 				},
 				Calls: []string{"niri msg -j layers"},
 			},
@@ -101,17 +101,19 @@ func TestLayers(t *testing.T) {
 			},
 		},
 		{
-			name:       "umbriel, unmapped left out",
+			name:       "umbriel, unmapped left out, focus over interactivity",
 			compositor: func(r Runner) Compositor { return Umbriel{Runner: r} },
 			outputs: map[string]recorded{"umbriel layers --json": {Stdout: `[
-				{"namespace":"kaizen-bar","output":"eDP-1","mapped":true,"keyboard_interactivity":"none"},
-				{"namespace":"kaizen-curtain","output":"eDP-1","mapped":false,"keyboard_interactivity":"exclusive"},
-				{"namespace":"kaizen-panel","output":"DP-1","mapped":true,"keyboard_interactivity":"exclusive"}
+				{"namespace":"kaizen-bar","output":"eDP-1","mapped":true,"keyboard_interactivity":"none","focused":false},
+				{"namespace":"kaizen-curtain","output":"eDP-1","mapped":false,"keyboard_interactivity":"exclusive","focused":false},
+				{"namespace":"kaizen-osd","output":"eDP-1","mapped":true,"keyboard_interactivity":"exclusive","focused":false},
+				{"namespace":"kaizen-panel","output":"DP-1","mapped":true,"keyboard_interactivity":"on_demand","focused":true}
 			]`}},
 			want: result{
 				Value: []Layer{
 					{Namespace: "kaizen-bar", Output: "eDP-1"},
-					{Namespace: "kaizen-panel", Output: "DP-1", Exclusive: true},
+					{Namespace: "kaizen-osd", Output: "eDP-1"},
+					{Namespace: "kaizen-panel", Output: "DP-1", Keyboard: true},
 				},
 				Calls: []string{"umbriel layers --json"},
 			},
