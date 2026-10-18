@@ -329,6 +329,9 @@ func (k *checker) compositorConfig(ctx context.Context) {
 		k.add(check{name: name + "-config", level: "ERROR", unit: name, message: err.Error()})
 		return
 	}
+	if name != "niri" {
+		return
+	}
 	config := cmp.Or(k.Getenv("NIRI_CONFIG"), filepath.Join(k.configDir(), "niri", "config.kdl"))
 	if !k.reaches(config, "kaizen.kdl", 0) {
 		k.add(check{

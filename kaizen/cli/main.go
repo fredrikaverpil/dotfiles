@@ -42,7 +42,7 @@ func main() {
 		os.Exit(1)
 	}
 	info, _ := debug.ReadBuildInfo()
-	comp := compositor.Niri{Runner: state.Exec{}}
+	comp := compositor.FromEnv(os.Getenv, state.Exec{})
 	d := cli.Dispatcher{
 		Commands: []cli.Command{
 			dev.Command{
