@@ -18,13 +18,15 @@ Ui.Panel {
             value: service.activeMonitor,
             set: value => root.service.monitor = value
         },
-        {
-            label: "Camera",
-            values: service.cameraOptions,
-            labels: ["Off"].concat(service.cameras.map(entry => entry.name)),
-            value: service.activeCamera,
-            set: value => root.service.camera = value
-        },
+        ...(Ui.Compositor.supports.camera ? [
+                {
+                    label: "Camera",
+                    values: service.cameraOptions,
+                    labels: ["Off"].concat(service.cameras.map(entry => entry.name)),
+                    value: service.activeCamera,
+                    set: value => root.service.camera = value
+                }
+            ] : []),
         // Only the Camera row above can turn this one off, so the cursor never
         // sits on a row the change moves.
         ...(service.activeCamera ? [

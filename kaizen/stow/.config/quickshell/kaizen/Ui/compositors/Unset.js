@@ -1,5 +1,6 @@
 // Stands in when KAIZEN_COMPOSITOR names no compositor, so the shell still runs
-// and locks. Every command fails, and every query answers with nothing.
+// and locks. Every command fails, every query answers with nothing, and no
+// optional feature is defined.
 var name = "";
 
 var releaseExclusiveFocus = false;
@@ -8,16 +9,9 @@ var opensOnFocusedOutput = true;
 var floatsInWorkingArea = true;
 // No source loads.
 var workspaceComponent = "";
-var castComponent = "";
-var pinComponent = "";
-var borderFile = "";
 var closeWindowAction = "";
 
 var fail = ["false"];
-
-function borderColors(palette) {
-  return "";
-}
 
 function dpms(on) {
   return fail;
@@ -27,11 +21,7 @@ function closeWindow() {
   return fail;
 }
 
-function screenshot(mode, path) {
-  return fail;
-}
-
-function pickColor() {
+function screenshot(path) {
   return fail;
 }
 
@@ -65,10 +55,6 @@ function focusedOutputOn(output) {
 
 function focusedMonitor(raw) {
   return null;
-}
-
-function moveFloatingWindow(id, x, y) {
-  return fail;
 }
 
 function layoutQuery() {

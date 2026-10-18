@@ -39,15 +39,12 @@ function closeWindow() {
 }
 
 // niri writes path asynchronously, after the action returns.
-function screenshot(mode, path) {
-  return [
-    "niri",
-    "msg",
-    "action",
-    mode === "window" ? "screenshot-window" : "screenshot-screen",
-    "--path",
-    path,
-  ];
+function screenshot(path) {
+  return ["niri", "msg", "action", "screenshot-screen", "--path", path];
+}
+
+function screenshotWindow(path) {
+  return ["niri", "msg", "action", "screenshot-window", "--path", path];
 }
 
 // Prints the picked color as #rrggbb, or nothing when cancelled.

@@ -48,15 +48,23 @@ function closeWindow() {
 }
 
 // grim has written path once the command exits.
-function screenshot(mode, path) {
+function screenshot(path) {
   return [
     "sh",
     "-c",
-    mode === "window"
-      ? "window=$(" + focusedWindow + ') && grim -T "$window" "$1"'
-      : "output=$(umbriel outputs --json | jq -er " +
-        "'first(.[] | select(.focused).name)') && " +
-        'grim -o "$output" "$1"',
+    "output=$(umbriel outputs --json | jq -er " +
+      "'first(.[] | select(.focused).name)') && " +
+      'grim -o "$output" "$1"',
+    "sh",
+    path,
+  ];
+}
+
+function screenshotWindow(path) {
+  return [
+    "sh",
+    "-c",
+    "window=$(" + focusedWindow + ') && grim -T "$window" "$1"',
     "sh",
     path,
   ];

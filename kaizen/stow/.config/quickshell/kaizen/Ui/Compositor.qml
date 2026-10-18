@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import "compositors/Chords.js" as Chords
+import "compositors/Contract.js" as Contract
 import "compositors/Niri.js" as Niri
 import "compositors/Umbriel.js" as Umbriel
 import "compositors/Unset.js" as Unset
@@ -25,6 +26,9 @@ Singleton {
     readonly property bool replacesDeadLock: backend.replacesDeadLock
     readonly property bool opensOnFocusedOutput: backend.opensOnFocusedOutput
     readonly property bool floatsInWorkingArea: backend.floatsInWorkingArea
+    // Each optional feature of Contract.js, true when the backend has it; what
+    // it lacks, the shell hides.
+    readonly property var supports: Contract.supports(backend)
     // Components with ids(output), activeId(output) and occupied(idx, output);
     // with sharing, true while a screencast runs; and with windowId, the window
     // of appId, kept round and on the focused workspace.
@@ -33,7 +37,7 @@ Singleton {
     readonly property url castSource: backend.castComponent ? Qt.resolvedUrl("compositors/" + backend.castComponent) : ""
     readonly property url pinSource: backend.pinComponent ? Qt.resolvedUrl("compositors/" + backend.pinComponent) : ""
     // The file borderColors(palette) fills, under the shell's state dir.
-    readonly property string borderFile: backend.borderFile
+    readonly property string borderFile: backend.borderFile || ""
     // The action closeWindow() runs, as a bind names it.
     readonly property string closeWindowAction: backend.closeWindowAction
 
@@ -52,8 +56,11 @@ Singleton {
     function closeWindow() {
         return root.backend.closeWindow();
     }
-    function screenshot(mode, path) {
-        return root.backend.screenshot(mode, path);
+    function screenshot(path) {
+        return root.backend.screenshot(path);
+    }
+    function screenshotWindow(path) {
+        return root.backend.screenshotWindow(path);
     }
     function pickColor() {
         return root.backend.pickColor();

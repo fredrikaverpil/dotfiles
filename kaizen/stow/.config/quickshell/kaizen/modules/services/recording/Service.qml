@@ -36,7 +36,7 @@ Item {
 
     // The choices each saved value falls back over, and the ones the panel offers.
     readonly property var monitorOptions: monitors.concat(["region"])
-    readonly property var cameraOptions: [""].concat(cameras.map(entry => entry.path))
+    readonly property var cameraOptions: [""].concat(Ui.Compositor.supports.camera ? cameras.map(entry => entry.path) : [])
     readonly property var micOptions: ["", "default_input"].concat(mics.map(node => node.name))
 
     readonly property string activeMonitor: Model.pick(monitorOptions, monitor, monitors[0] || "")
@@ -128,7 +128,9 @@ Item {
 
     // Screenshots the focused "screen" or "window".
     function shoot(mode) {
-        snap(file => Ui.Compositor.screenshot(mode, file));
+        if (mode === "window" && !Ui.Compositor.supports.windowScreenshot)
+            return;
+        snap(file => mode === "window" ? Ui.Compositor.screenshotWindow(file) : Ui.Compositor.screenshot(file));
     }
 
     // Runs command(file), copies the file and offers to annotate it in satty.
