@@ -52,7 +52,16 @@ in
 
       # Environment
       Environment = [
-        "PATH=%h/.nix-profile/bin:${lib.makeBinPath [ pkgs.git pkgs.coreutils pkgs.findutils pkgs.gnugrep pkgs.gnused pkgs.gawk ]}"
+        "PATH=%h/.nix-profile/bin:${
+          lib.makeBinPath [
+            pkgs.git
+            pkgs.coreutils
+            pkgs.findutils
+            pkgs.gnugrep
+            pkgs.gnused
+            pkgs.gawk
+          ]
+        }"
       ];
     };
 
@@ -119,7 +128,16 @@ in
 
       # Environment
       Environment = [
-        "PATH=%h/.nix-profile/bin:${lib.makeBinPath [ pkgs.git pkgs.coreutils pkgs.findutils pkgs.gnugrep pkgs.gnused pkgs.gawk ]}"
+        "PATH=%h/.nix-profile/bin:${
+          lib.makeBinPath [
+            pkgs.git
+            pkgs.coreutils
+            pkgs.findutils
+            pkgs.gnugrep
+            pkgs.gnused
+            pkgs.gawk
+          ]
+        }"
       ];
     };
 
