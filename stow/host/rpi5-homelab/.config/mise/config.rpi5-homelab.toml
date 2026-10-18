@@ -3,7 +3,7 @@
 # pypi: backend (mise >= 2026.9.7), so mypy comes from pipx: instead.
 #
 # Workaround: once the Pi's stable nixpkgs ships mise >= 2026.9.7, delete this
-# file and its lockfile, and MISE_GLOBAL_CONFIG_FILE in
+# file and its lockfile, and MISE_GLOBAL_CONFIG_FILE and MISE_CEILING_PATHS in
 # nix/hosts/rpi5-homelab/users/fredrik.nix. Check the version with:
 #   nix eval --raw .#nixosConfigurations.rpi5-homelab.pkgs.mise.version
 
