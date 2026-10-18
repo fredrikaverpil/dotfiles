@@ -5,9 +5,23 @@ import (
 	"encoding/json/v2"
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
+	"regexp"
 	"slices"
+	"strconv"
 	"strings"
+)
+
+// TOML, as far as umbriel's includes need it: a table header, naming the
+// table; a string; a line's text before its comment; an array of files.
+var (
+	tomlHeader  = regexp.MustCompile(`^\s*\[\[?\s*([^\[\]]+?)\s*\]\]?\s*(#.*)?$`)
+	tomlDot     = regexp.MustCompile(`\s*\.\s*`)
+	tomlString  = regexp.MustCompile(`"(?:[^"\\]|\\.)*"|'[^']*'`)
+	tomlComment = regexp.MustCompile(`^((?:[^#"']|"(?:[^"\\]|\\.)*"|'[^']*')*)#.*$`)
+	tomlFiles   = regexp.MustCompile(`(?m)^\s*files\s*=\s*\[([^\]]*)\]`)
 )
 
 // Umbriel is umbriel, driven with its CLI over $UMBRIEL_SOCKET.
@@ -152,6 +166,50 @@ func (u Umbriel) Validate(ctx context.Context) error {
 		report = string(exitErr.Stderr)
 	}
 	return errors.New("umbriel config validate:\n" + strings.TrimRight(report, "\n"))
+}
+
+// Config returns umbriel/config.toml in the config dir.
+func (Umbriel) Config(env Env) Config {
+	path := filepath.Join(env.configDir(), "umbriel", "config.toml")
+	return Config{
+		Path:     path,
+		Kaizen:   "kaizen.toml",
+		Hint:     `add "kaizen.toml" to [include] files in ` + path,
+		includes: func(data string) []string { return umbrielIncludes(data, env.Getenv) },
+		home:     env.Home,
+	}
+}
+
+// umbrielIncludes returns the paths an umbriel config's [include] and then
+// [include.optional] tables list in files, with $VAR and ${VAR} expanded, as
+// umbriel does.
+func umbrielIncludes(data string, getenv func(string) string) []string {
+	tables := map[string][]string{}
+	header := ""
+	for line := range strings.SplitSeq(data, "\n") {
+		if m := tomlHeader.FindStringSubmatch(line); m != nil {
+			header = tomlDot.ReplaceAllString(m[1], ".")
+			continue
+		}
+		tables[header] = append(tables[header], tomlComment.ReplaceAllString(line, "$1"))
+	}
+	var paths []string
+	for _, name := range []string{"include", "include.optional"} {
+		m := tomlFiles.FindStringSubmatch(strings.Join(tables[name], "\n"))
+		if m == nil {
+			continue
+		}
+		for _, quoted := range tomlString.FindAllString(m[1], -1) {
+			path := quoted[1 : len(quoted)-1]
+			if quoted[0] == '"' {
+				if unquoted, err := strconv.Unquote(quoted); err == nil {
+					path = unquoted
+				}
+			}
+			paths = append(paths, os.Expand(path, getenv))
+		}
+	}
+	return paths
 }
 
 // query decodes `umbriel <what> --json` into v.
