@@ -193,8 +193,9 @@ Item {
 
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.namespace: "kaizen-curtain"
-            // Every output is exclusive: niri focuses only the active output's
-            // exclusive layer, and a click makes the output under it active.
+            // Every output is exclusive: the compositor focuses only the active
+            // output's exclusive layer, and a click makes the output under it
+            // active.
             WlrLayershell.keyboardFocus: root.active ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
             LockUi.LockView {

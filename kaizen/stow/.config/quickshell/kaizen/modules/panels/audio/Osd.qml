@@ -4,7 +4,7 @@ import Quickshell.Wayland
 
 import "../../../Ui" as Ui
 
-// Shown by the volume and mic-mute keys. No screen is set, so niri maps it on the focused output.
+// Shown by the volume and mic-mute keys. No screen is set, so the compositor maps it on the focused output.
 PanelWindow {
     id: root
 
