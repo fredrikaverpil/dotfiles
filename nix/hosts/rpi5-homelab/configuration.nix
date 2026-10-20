@@ -4,12 +4,14 @@
   lib,
   inputs,
   ...
-}: let
+}:
+let
   stateVersions = {
     nixos = "25.05";
   };
-in {
-  imports = [./restic.nix];
+in
+{
+  imports = [ ./restic.nix ];
 
   # NixOS state version "25.05" - defines system configuration schema/compatibility
   # See flake.nix for actual package channel selection (stable vs unstable)
@@ -41,13 +43,16 @@ in {
       isPrimary = true; # Not used on Linux, but kept for consistency
       shell = "zsh";
       homeConfig = ./users/fredrik.nix;
-      groups = ["networkmanager" "docker"];
+      groups = [
+        "networkmanager"
+        "docker"
+      ];
       # SSH keys for secure access (RECOMMENDED: add your public key here)
       # This enables immediate key-based access on fresh installs
       # Generate key: ssh-keygen -t ed25519 -C "your-email@example.com"
       # Then add your ~/.ssh/id_ed25519.pub content below:
       sshKeys = [
-				"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKte3qmH2qXRfdbVIfl6HgFvhRE6MCCiL9ho7xW3KSZB"
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKte3qmH2qXRfdbVIfl6HgFvhRE6MCCiL9ho7xW3KSZB"
       ];
     };
   };
@@ -70,7 +75,7 @@ in {
     # Disable VPN plugins to avoid webkitgtk build on headless server
     # Default plugins (iodine-gnome, openconnect, etc.) pull in webkitgtk GUI dependencies
     # which are unnecessary for a headless homelab and cause expensive builds from source
-    plugins = lib.mkForce [];
+    plugins = lib.mkForce [ ];
   };
 
   # Disable WiFi power management to prevent connection drops under high CPU load
@@ -103,7 +108,7 @@ in {
     ];
 
     # Allow Tailscale traffic (+ matches any interface starting with "tailscale")
-    trustedInterfaces = ["tailscale+"];
+    trustedInterfaces = [ "tailscale+" ];
   };
 
   # mosh for roaming SSH sessions (e.g. from a phone). UDP 60000-61000 stays
@@ -118,7 +123,7 @@ in {
     # Accessible via local network and Tailscale VPN only (not internet-exposed)
     openssh = {
       enable = true;
-      ports = [22]; # Standard SSH port (safe since not internet-exposed)
+      ports = [ 22 ]; # Standard SSH port (safe since not internet-exposed)
       settings = {
         PermitRootLogin = "no"; # Security: disable root login via SSH
         PasswordAuthentication = true; # Safe for local network + Tailscale access
@@ -203,7 +208,7 @@ in {
     group = "cloudflared";
     description = "Cloudflare Tunnel user";
   };
-  users.groups.cloudflared = {};
+  users.groups.cloudflared = { };
 
   # ========================================================================
   # HOMELAB DOCKER SERVICES
@@ -222,8 +227,8 @@ in {
   systemd.services = {
     homelab-portainer = {
       description = "Homelab Portainer Container Management Stack";
-      after = ["docker.service"];
-      requires = ["docker.service"];
+      after = [ "docker.service" ];
+      requires = [ "docker.service" ];
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
@@ -233,13 +238,13 @@ in {
         ExecReload = "${pkgs.docker-compose}/bin/docker-compose up -d --force-recreate";
         TimeoutStartSec = "300";
       };
-      wantedBy = ["multi-user.target"];
+      wantedBy = [ "multi-user.target" ];
     };
 
     homelab-uptime-kuma = {
       description = "Homelab Uptime Kuma Service Monitoring Stack";
-      after = ["docker.service"];
-      requires = ["docker.service"];
+      after = [ "docker.service" ];
+      requires = [ "docker.service" ];
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
@@ -249,14 +254,14 @@ in {
         ExecReload = "${pkgs.docker-compose}/bin/docker-compose up -d --force-recreate";
         TimeoutStartSec = "300";
       };
-      wantedBy = ["multi-user.target"];
+      wantedBy = [ "multi-user.target" ];
     };
 
     # Cloudflare Tunnel service
     cloudflared = {
       description = "Cloudflare Tunnel";
-      after = ["network-online.target"];
-      wants = ["network-online.target"];
+      after = [ "network-online.target" ];
+      wants = [ "network-online.target" ];
       # Only start if tunnel token exists - prevents boot failures
       unitConfig.ConditionPathExists = "/etc/cloudflared/tunnel.json";
       serviceConfig = {
@@ -275,16 +280,16 @@ in {
         PrivateTmp = true;
         ProtectSystem = "strict";
         ProtectHome = true;
-        ReadOnlyPaths = ["/etc/cloudflared"];
+        ReadOnlyPaths = [ "/etc/cloudflared" ];
       };
       # Start automatically - but only if ConditionPathExists is satisfied
-      wantedBy = ["multi-user.target"];
+      wantedBy = [ "multi-user.target" ];
     };
 
     homelab-immich = {
       description = "Homelab Immich Photo Management Stack";
-      after = ["docker.service"];
-      requires = ["docker.service"];
+      after = [ "docker.service" ];
+      requires = [ "docker.service" ];
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
@@ -299,13 +304,13 @@ in {
         ExecReload = "${pkgs.docker-compose}/bin/docker-compose up -d --force-recreate";
         TimeoutStartSec = "600"; # Immich takes longer to start (ML models, etc.)
       };
-      wantedBy = ["multi-user.target"];
+      wantedBy = [ "multi-user.target" ];
     };
 
     homelab-jellyfin = {
       description = "Homelab Jellyfin Media Server Stack";
-      after = ["docker.service"];
-      requires = ["docker.service"];
+      after = [ "docker.service" ];
+      requires = [ "docker.service" ];
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
@@ -321,7 +326,7 @@ in {
         ExecReload = "${pkgs.docker-compose}/bin/docker-compose up -d --force-recreate";
         TimeoutStartSec = "300";
       };
-      wantedBy = ["multi-user.target"];
+      wantedBy = [ "multi-user.target" ];
     };
   };
 
@@ -329,7 +334,8 @@ in {
   # HOST-SPECIFIC EXTENSIONS
   # ========================================================================
   # Host-specific system packages for rpi5-homelab
-  environment.systemPackages = with pkgs;
+  environment.systemPackages =
+    with pkgs;
     [
       # Essential system administration tools
       # These are kept minimal as most tools are managed via home-manager
@@ -350,7 +356,7 @@ in {
       # Hardware-specific utilities for Raspberry Pi
       # These may be provided by nixos-raspberrypi modules
     ]
-    ++ (with pkgs.rpi or {}; [
+    ++ (with pkgs.rpi or { }; [
       # Raspberry Pi optimized packages when available
       # The nixos-raspberrypi flake may provide Pi-specific optimizations
       # These packages are conditionally included if available
@@ -367,13 +373,15 @@ in {
   # System identification tags for the Raspberry Pi
   # These tags help identify the system variant and configuration
   # Following the nixos-raspberrypi project conventions
-  system.nixos.tags = let
-    cfg = config.boot.loader.raspberry-pi;
-  in [
-    "raspberry-pi-${cfg.variant}" # e.g., "raspberry-pi-5"
-    cfg.bootloader # Bootloader type
-    config.boot.kernelPackages.kernel.version # Kernel version
-  ];
+  system.nixos.tags =
+    let
+      cfg = config.boot.loader.raspberry-pi;
+    in
+    [
+      "raspberry-pi-${cfg.variant}" # e.g., "raspberry-pi-5"
+      cfg.bootloader # Bootloader type
+      config.boot.kernelPackages.kernel.version # Kernel version
+    ];
 
   # Allow unfree packages (needed for various packages)
   nixpkgs.config.allowUnfree = true;
