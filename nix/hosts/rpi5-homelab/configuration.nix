@@ -11,7 +11,10 @@ let
   };
 in
 {
-  imports = [ ./restic.nix ];
+  imports = [
+    ./restic.nix
+    ./wifi-watchdog.nix
+  ];
 
   # NixOS state version "25.05" - defines system configuration schema/compatibility
   # See flake.nix for actual package channel selection (stable vs unstable)
