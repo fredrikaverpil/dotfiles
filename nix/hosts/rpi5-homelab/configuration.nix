@@ -106,6 +106,13 @@ in {
     trustedInterfaces = ["tailscale+"];
   };
 
+  # mosh for roaming SSH sessions (e.g. from a phone). UDP 60000-61000 stays
+  # closed on the LAN; the trusted tailscale+ interface lets it through.
+  programs.mosh = {
+    enable = true;
+    openFirewall = false;
+  };
+
   services = {
     # SSH service for remote access
     # Accessible via local network and Tailscale VPN only (not internet-exposed)
