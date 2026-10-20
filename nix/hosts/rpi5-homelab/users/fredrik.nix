@@ -90,19 +90,19 @@ in
   # do NOT add port 4096 to allowedTCPPorts, or Basic auth would be exposed
   # over cleartext HTTP on the local network.
   #
-  # Auth: OpenCode's HTTP Basic auth is enabled *by the presence of*
-  # OPENCODE_SERVER_PASSWORD, supplied out-of-band via EnvironmentFile
-  # (mirrors the restic.nix secret convention) and never tracked in git. The
+  # Auth: HTTP Basic auth (user "opencode") with the password from
+  # OPENCODE_PASSWORD, supplied out-of-band via EnvironmentFile (mirrors the
+  # restic.nix secret convention) and never tracked in git. Without one,
+  # OpenCode generates a random password and prints it to the journal. The
   # unit fails closed on both a missing and an empty secret: EnvironmentFile
   # without a leading "-" fails the unit if the file is absent, and the
-  # ${OPENCODE_SERVER_PASSWORD:?...} guard in ExecStart refuses to start if
-  # the variable is unset or empty. Without that guard an empty file would
-  # start an unauthenticated server, which for an agent that can run host
-  # commands is effectively tailnet-wide RCE. Create the secret atomically
-  # (single write, never an empty intermediate state) once on the host:
-  #   ( umask 077; printf 'OPENCODE_SERVER_PASSWORD=%s\n' \
+  # ${OPENCODE_PASSWORD:?...} guard in ExecStart refuses to start if the
+  # variable is unset or empty. Create the secret atomically (single write,
+  # never an empty intermediate state) once on the host:
+  #   ( umask 077; printf 'OPENCODE_PASSWORD=%s\n' \
   #       "$(openssl rand -base64 24)" > ~/.config/opencode/server.env )
-  # and log in to a provider once with: opencode auth login
+  # and log in to a provider once with: opencode2 auth login
+  # Clients connect with: OPENCODE_PASSWORD=... opencode2 --server <url>
   #
   # Working directory: ~/code/public
   systemd.user.services.opencode-server = {
@@ -117,14 +117,14 @@ in
       Type = "simple";
       WorkingDirectory = "%h/code/public";
       ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p %h/code/public";
-      # The ${OPENCODE_SERVER_PASSWORD:?...} guard fails the unit closed when
-      # the secret is unset or empty, so the server never comes up without
-      # Basic auth (see the auth note above).
-      ExecStart = "${pkgs.bash}/bin/bash -c ': \"\${OPENCODE_SERVER_PASSWORD:?set OPENCODE_SERVER_PASSWORD in server.env}\"; exec $HOME/.nix-profile/bin/opencode serve --hostname 0.0.0.0 --port 4096 --print-logs'";
+      # The ${OPENCODE_PASSWORD:?...} guard fails the unit closed when the
+      # secret is unset or empty, so the server never comes up without the
+      # known password (see the auth note above).
+      ExecStart = "${pkgs.bash}/bin/bash -c ': \"\${OPENCODE_PASSWORD:?set OPENCODE_PASSWORD in server.env}\"; exec $HOME/.nix-profile/bin/opencode2 serve --hostname 0.0.0.0 --port 4096 --print-logs'";
       Restart = "always";
       RestartSec = "10";
 
-      # HTTP Basic auth secret (OPENCODE_SERVER_PASSWORD), supplied out-of-band
+      # HTTP Basic auth secret (OPENCODE_PASSWORD), supplied out-of-band
       # and not tracked in git. No leading "-": the file is required, so an
       # absent secret fails the unit; the ExecStart guard additionally covers
       # a present-but-empty secret.
