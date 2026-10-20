@@ -22,7 +22,7 @@ in
     llmAgents = [
       "claude-code"
       "gemini-cli"
-      "opencode"
+      "opencode2"
       "pi"
     ];
 
