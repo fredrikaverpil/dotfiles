@@ -79,8 +79,11 @@ in
   };
 
   # OpenCode headless server service
-  # Runs automatically on boot, mirroring the Claude Code remote-control server
-  # above but for a provider-agnostic agent (OpenRouter etc.).
+  # A provider-agnostic agent (OpenRouter etc.) alongside the Claude Code
+  # remote-control server above, but started on demand rather than on boot
+  # since the Install.WantedBy is commented out further down below:
+  #   systemctl --user start opencode-server
+  #   systemctl --user stop opencode-server
   #
   # Reachability: binds 0.0.0.0 but is *not* added to networking.firewall
   # allowedTCPPorts, so the local network is blocked while the trusted
@@ -149,8 +152,9 @@ in
       ];
     };
 
-    Install = {
-      WantedBy = [ "default.target" ];
-    };
+    # Uncomment to enable on boot
+    # Install = {
+    #   WantedBy = [ "default.target" ];
+    # };
   };
 }
