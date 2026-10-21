@@ -121,3 +121,36 @@ mise cannot provide comes from `nix/shared/toolchain.nix`.
 - **Neovim comes from nixpkgs-unstable**, declared per host in
   `nix/hosts/<host>/users/fredrik.nix`. For a release nixpkgs lacks, override
   `neovim-unwrapped` and rewrap it with `wrapNeovim`
+
+## Pending reverts
+
+### eMudhra CA blocklist
+
+`nix/shared/system/common.nix` sets `security.pki.caCertificateBlacklist` to
+distrust the eMudhra ECC G3 and Comodo AAA roots (CVE-2026-111943), plus two
+emSign roots Mozilla removed at the same time. It mirrors the list nixpkgs
+appends internally in `nixos/modules/security/ca.nix` (NixOS/nixpkgs#576390
+and #576401), so the option value itself stays `[]` upstream. Remove the
+override only once **every** host gets that list from its own locked sources:
+
+- renoir, wily: `nixpkgs-unstable` locked at or after `02c087f3`.
+- zap, plumbus: same, plus nix-darwin#1876/#1877 in the locked nix-darwin.
+- rpi5-homelab: the nixpkgs pinned by `nixos-raspberrypi` at or after
+  `7816d39d` (the 26.05 backport). Bumping it restarts `claude-code-server`.
+
+Closing NixOS/nixpkgs#576485 does not mean the revert is safe. To check, look
+for the list in each host's locked module sources (`0` = not yet):
+
+```bash
+for h in rpi5-homelab renoir wily; do
+  p=$(nix eval --raw --impure --accept-flake-config \
+    .#nixosConfigurations.$h.pkgs.path)
+  echo "$h: $(grep -c 'emSign ECC Root CA - G3' \
+    "$p/nixos/modules/security/ca.nix")"
+done
+d=$(nix flake archive --json | jq -r '.inputs["nix-darwin"].path')
+echo "nix-darwin: $(grep -rl 'emSign ECC Root CA - G3' "$d/modules" | wc -l)"
+```
+
+Programs that embed their own CA bundles are tracked separately in
+NixOS/nixpkgs#576475.
