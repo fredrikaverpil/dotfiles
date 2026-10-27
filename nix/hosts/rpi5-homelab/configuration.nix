@@ -9,6 +9,9 @@ let
   stateVersions = {
     nixos = "25.05";
   };
+  # Toggle the Cloudflare Tunnel (remote Immich access) on/off.
+  # Set to true to re-enable it; see README.md for the tunnel token setup.
+  cloudflareTunnel = false;
 in
 {
   imports = [
@@ -206,12 +209,12 @@ in
   };
 
   # Host-specific system users
-  users.users.cloudflared = {
+  users.users.cloudflared = lib.mkIf cloudflareTunnel {
     isSystemUser = true;
     group = "cloudflared";
     description = "Cloudflare Tunnel user";
   };
-  users.groups.cloudflared = { };
+  users.groups.cloudflared = lib.mkIf cloudflareTunnel { };
 
   # ========================================================================
   # HOMELAB DOCKER SERVICES
@@ -261,7 +264,7 @@ in
     };
 
     # Cloudflare Tunnel service
-    cloudflared = {
+    cloudflared = lib.mkIf cloudflareTunnel {
       description = "Cloudflare Tunnel";
       after = [ "network-online.target" ];
       wants = [ "network-online.target" ];
@@ -353,12 +356,11 @@ in
       # Backup tools
       restic # Backup tool for Immich and other services
 
-      # Cloudflare tools
-      cloudflared # Cloudflare Tunnel client
-
       # Hardware-specific utilities for Raspberry Pi
       # These may be provided by nixos-raspberrypi modules
     ]
+    # Cloudflare tools
+    ++ lib.optional cloudflareTunnel cloudflared # Cloudflare Tunnel client
     ++ (with pkgs.rpi or { }; [
       # Raspberry Pi optimized packages when available
       # The nixos-raspberrypi flake may provide Pi-specific optimizations
