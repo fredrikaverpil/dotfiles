@@ -107,6 +107,7 @@ in
     fonts.packages = with pkgs; [
       # GTK's default UI font (`font-name`); without it fontconfig falls back to Noto Sans.
       adwaita-fonts
+      commit-mono
       nerd-fonts.jetbrains-mono
       maple-mono.truetype
       maple-mono.variable
