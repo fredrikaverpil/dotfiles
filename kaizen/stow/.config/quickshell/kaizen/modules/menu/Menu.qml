@@ -270,6 +270,11 @@ Ui.Panel {
             label: "Mirror",
             provider: "mirrors"
         },
+        "settings.display.arrange": {
+            icon: "󰨇",
+            label: "Arrange outputs…",
+            action: () => Quickshell.execDetached(["wdisplays"])
+        },
         "settings.display.wallpaper": {
             icon: "",
             label: "Wallpaper (workspace)",

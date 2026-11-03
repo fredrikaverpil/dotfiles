@@ -21,7 +21,7 @@ desktop that an agent can drive and verify from a terminal.
   and drives their state, never owns a copy of it.
 - Build only what is used. A panel exists only where a subsystem has no
   keyboard-first face; infrequent tasks go to a purpose-built application
-  (bluetui, nm-connection-editor).
+  (bluetui, nm-connection-editor, wdisplays).
 - Keyboard-first everywhere. Pointer-only controls are bugs.
 - Every action is reachable from a terminal: the `kaizen` commands
   (`kaizen --json` lists them; `kaizen ipc` drives the shell), `niri msg` or
@@ -499,7 +499,9 @@ umbriel leaves it on, since no config sets its `[events]` lid commands.
 
 - Bluetooth pairing, connection editing: bluetui, nm-connection-editor.
 - Output layout: hand-kept in `stow/host/<host>/.config/niri/outputs.kdl` and
-  its twin `umbriel/outputs.toml`, keyed by monitor, not port.
+  its twin `umbriel/outputs.toml`, keyed by monitor, not port. wdisplays
+  (Settings › Display › Arrange outputs) arranges the outputs live and shows
+  each one's name, scale and position to copy there; it saves nothing.
 - Compositor-side XKB toggling: the shell owns layout state, and a
   compositor-side toggle would desynchronize it.
 - Clipboard persistence: memory only. Offers carrying
