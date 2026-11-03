@@ -11,7 +11,7 @@ Ui.Panel {
 
     readonly property var textScales: [0.9, 1, 1.1, 1.25, 1.5, 2]
 
-    cardHeight: 440 + (mirrorSection.visible ? mirrorSection.height + contentSpacing : 0)
+    cardHeight: 440 + layoutSection.height + contentSpacing + (mirrorSection.visible ? mirrorSection.height + contentSpacing : 0)
     keyNavigation: true
 
     function refresh() {
@@ -253,6 +253,22 @@ Ui.Panel {
                     selected: root.shell.mirror.sourceOf(mirrorRow.target)
                     onChosen: value => value ? root.shell.mirror.start(value, mirrorRow.target) : root.shell.mirror.stop(mirrorRow.target)
                 }
+            }
+        }
+    }
+
+    Ui.Section {
+        id: layoutSection
+
+        shell: root.shell
+        title: "Layout"
+
+        ChoiceButton {
+            width: parent.width
+            label: "Arrange outputs…"
+            onActivated: {
+                root.close();
+                Quickshell.execDetached(["wdisplays"]);
             }
         }
     }

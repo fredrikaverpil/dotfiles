@@ -195,6 +195,8 @@ in
       wl-clipboard
       # Neither compositor mirrors outputs; the mirror service runs it fullscreen on the target.
       wl-mirror
+      # Arranges outputs over wlr-output-management; the display panel launches it.
+      wdisplays
       wtype # `kaizen keys` presses keys with it.
       wayland-utils # `kaizen doctor` lists the compositor's protocols with wayland-info.
     ];
