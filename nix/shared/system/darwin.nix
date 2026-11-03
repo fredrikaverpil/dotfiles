@@ -107,7 +107,6 @@ in
         "wacom-tablet"
         "wezterm"
         "zed"
-        "zed-delta"
         "zen"
       ]
       ++ config.host.extraCasks;
