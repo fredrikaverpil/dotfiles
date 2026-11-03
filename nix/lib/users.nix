@@ -6,49 +6,52 @@
   lib,
   inputs,
   ...
-}: {
+}:
+{
   options = {
     host.users = lib.mkOption {
-      type = lib.types.attrsOf (lib.types.submodule {
-        options = {
-          isAdmin = lib.mkOption {
-            type = lib.types.bool;
-            default = false;
-            description = "Whether this user has administrative privileges";
-          };
+      type = lib.types.attrsOf (
+        lib.types.submodule {
+          options = {
+            isAdmin = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+              description = "Whether this user has administrative privileges";
+            };
 
-          isPrimary = lib.mkOption {
-            type = lib.types.bool;
-            default = false;
-            description = "Whether this is the primary user (for Darwin system defaults)";
-          };
+            isPrimary = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+              description = "Whether this is the primary user (for Darwin system defaults)";
+            };
 
-          shell = lib.mkOption {
-            type = lib.types.str;
-            default = "zsh";
-            description = "Default shell for this user";
-          };
+            shell = lib.mkOption {
+              type = lib.types.str;
+              default = "zsh";
+              description = "Default shell for this user";
+            };
 
-          homeConfig = lib.mkOption {
-            type = lib.types.nullOr lib.types.path;
-            default = null;
-            description = "Path to user-specific home-manager configuration";
-          };
+            homeConfig = lib.mkOption {
+              type = lib.types.nullOr lib.types.path;
+              default = null;
+              description = "Path to user-specific home-manager configuration";
+            };
 
-          groups = lib.mkOption {
-            type = lib.types.listOf lib.types.str;
-            default = [];
-            description = "Additional groups for this user";
-          };
+            groups = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [ ];
+              description = "Additional groups for this user";
+            };
 
-          sshKeys = lib.mkOption {
-            type = lib.types.listOf lib.types.str;
-            default = [];
-            description = "SSH public keys for this user";
+            sshKeys = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [ ];
+              description = "SSH public keys for this user";
+            };
           };
-        };
-      });
-      default = {};
+        }
+      );
+      default = { };
       description = "User configurations for this system";
     };
   };
@@ -58,7 +61,8 @@
     programs.zsh.enable = true;
 
     # Create system users for each defined user
-    users.users = lib.mapAttrs (username: userConfig:
+    users.users = lib.mapAttrs (
+      username: userConfig:
       lib.mkMerge [
         # Common user settings across all platforms
         {
@@ -81,18 +85,13 @@
           # SSH public key authentication
           openssh.authorizedKeys.keys = userConfig.sshKeys;
         })
-      ])
-    config.host.users;
+      ]
+    ) config.host.users;
 
     # Home-manager configuration for each user with a homeConfig
-    home-manager.users =
-      lib.mapAttrs (
-        username: userConfig:
-          if userConfig.homeConfig != null
-          then import userConfig.homeConfig
-          else {}
-      )
-      config.host.users;
+    home-manager.users = lib.mapAttrs (
+      username: userConfig: if userConfig.homeConfig != null then import userConfig.homeConfig else { }
+    ) config.host.users;
 
     # Pass flake inputs to home-manager modules.
     home-manager.extraSpecialArgs = { inherit inputs; };

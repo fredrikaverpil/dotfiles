@@ -1,4 +1,4 @@
-{nixos-raspberrypi, ...}: {
+{ nixos-raspberrypi, ... }: {
   # Hardware-specific configuration for Raspberry Pi 5
   # This file defines the hardware capabilities and storage layout
 
@@ -49,7 +49,9 @@
   fileSystems."/mnt/homelab-data" = {
     device = "/dev/disk/by-label/homelab-data";
     fsType = "ext4";
-    options = ["defaults" "nofail"];
+    options = [
+      "defaults"
+      "nofail"
+    ];
   };
 }
-
