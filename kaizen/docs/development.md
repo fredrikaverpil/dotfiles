@@ -125,7 +125,7 @@ upstream's latest, and niri marks each option with the version it arrived in
 - Read the reference shell's source before changing a feature ported from it
   (`git clone` if missing and `git pull` its source before reading):
   - `~/code/public/github.com/caelestia-dots/shell`
-  - `~/code/public/github.com/AvengeMedia/DankMaterialShell`
+  - `~/code/public/github.com/duxlabs-dev/dux-shell`
   - `~/code/public/github.com/snowarch/iNiR`
   - `~/code/public/github.com/Gakuseei/Ricelin`
   - `~/code/public/github.com/0xbbuddha/dotfiles_nothing_os`
