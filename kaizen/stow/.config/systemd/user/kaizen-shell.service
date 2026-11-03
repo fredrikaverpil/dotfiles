@@ -13,6 +13,9 @@ After=wayland-session-waitenv.service
 # empty; env searches the session PATH that UWSM imports. Launcher entries and
 # uwsm-app need that PATH too.
 ExecStart=/usr/bin/env quickshell -c kaizen
+# Qt's Wayland input context disables text input on a surface it never enabled
+# whenever focus lands on one without a text field, and warns on each focus move.
+Environment=QT_LOGGING_RULES=qt.qpa.wayland.textinput.warning=false
 Restart=on-failure
 # Creates ~/.local/state/kaizen-shell before ExecStart: for user units
 # StateDirectory resolves under $XDG_STATE_HOME.
