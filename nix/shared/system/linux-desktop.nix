@@ -199,8 +199,8 @@ in
       (withGnomeLibsecret slack)
       spotify
       spotifast
-      (callPackage ../pkgs/photocraft.nix { })
-      (callPackage ../pkgs/pdfcraft.nix { })
+      photocraft
+      pdfcraft
       zed-editor
       lumen
       hunk
