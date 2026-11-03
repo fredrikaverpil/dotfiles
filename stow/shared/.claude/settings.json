@@ -64,7 +64,8 @@
     "ponytail@ponytail": false,
     "gopls-mcp@local": true,
     "context-meter@local": true,
-    "context7@anthropic-plugin-directory": true
+    "context7@anthropic-plugin-directory": true,
+    "egm@egm": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
@@ -83,6 +84,12 @@
       "source": {
         "source": "directory",
         "path": "~/.claude/local-plugins"
+      }
+    },
+    "egm": {
+      "source": {
+        "source": "github",
+        "repo": "google/elephant-goldfish-model"
       }
     }
   },
