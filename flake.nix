@@ -121,10 +121,10 @@
         kaizen = unstable.${system}.callPackage ./kaizen/nix/package.nix { };
       });
 
-      # Formatters for `nix fmt` - uses nixfmt for each architecture
-      formatter.x86_64-linux = stable.x86_64-linux.nixfmt;
-      formatter.aarch64-linux = stable.aarch64-linux.nixfmt;
-      formatter.aarch64-darwin = unstable.aarch64-darwin.nixfmt;
+      # Formatters for `nix fmt`: nixfmt over the tree, via treefmt
+      formatter.x86_64-linux = stable.x86_64-linux.nixfmt-tree;
+      formatter.aarch64-linux = stable.aarch64-linux.nixfmt-tree;
+      formatter.aarch64-darwin = unstable.aarch64-darwin.nixfmt-tree;
 
       # Dev shell exposing the shared Neovim toolchain (nix/shared/toolchain.nix)
       # for use outside Neovim, e.g. `nix develop ~/.dotfiles#dev -c <cmd>`.
