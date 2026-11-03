@@ -105,5 +105,5 @@ reaches, is in [`README.md`](../README.md) › Where it lives.
   tray plugin's user unit starts with the session when a `.wants/` link
   enables it.
 
-[dcal]: https://github.com/AvengeMedia/dankcalendar
+[dcal]: https://github.com/duxlabs-dev/dux-calendar
 [StatusNotifierItem]: https://www.freedesktop.org/wiki/Specifications/StatusNotifierItem/

@@ -3,7 +3,7 @@
 # graphical-session.target. It inherits UWSM's session PATH, so dcal can launch
 # its Quickshell UI and open OAuth URLs with the session's tools.
 [Unit]
-Description=DankCalendar sync and reminders
+Description=Dux Calendar sync and reminders
 ConditionPathExists=%h/.config/kaizen/plugins/calendar.jsonc
 PartOf=graphical-session.target
 After=dbus.socket kaizen-shell.service wayland-session-waitenv.service

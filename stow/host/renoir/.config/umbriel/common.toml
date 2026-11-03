@@ -244,7 +244,7 @@ default_scrolling_extent = 0.33333
 # kaizen-dcal.service runs the sync daemon headless; this is the window
 # `dcal show` opens.
 [[window_rule]]
-match.app_id = "^com\\.danklinux\\.dankcalendar$"
+match.app_id = "^dev\\.duxlabs\\.calendar$"
 default_workspace = "4"
 
 [[window_rule]]

@@ -1,6 +1,6 @@
 import qs.Ui as Ui
 
-// Events from dcal (dankcalendar), which kaizen-dcal.service runs.
+// Events from dcal (dux-calendar), which kaizen-dcal.service runs.
 Ui.Plugin {
     id: plugin
 

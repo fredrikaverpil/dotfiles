@@ -72,8 +72,8 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
       inputs.home-manager.follows = "home-manager-unstable";
     };
-    dankcalendar = {
-      url = "github:AvengeMedia/dankcalendar";
+    dux-calendar = {
+      url = "github:duxlabs-dev/dux-calendar";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     # kaizen's second compositor; nixpkgs' umbriel lags upstream's IPC.
