@@ -47,6 +47,14 @@ var (
 	)
 )
 
+// A mistyped password at the lock or curtain makes pam_unix log a failure and
+// gkr-pam an error, from the same PAM process. gkr-pam's error alone means the
+// login keyring's password differs from the user's.
+var (
+	pamFailure     = regexp.MustCompile(`^pam_unix\([^)]*:auth\): authentication failure;`)
+	keyringInvalid = regexp.MustCompile(`^gkr-pam: the password for the login keyring was invalid\.`)
+)
+
 // Command reports the kaizen units' warnings and errors, and what is out of
 // order.
 type Command struct {
@@ -234,7 +242,7 @@ func logFindings(entries []state.Entry, units []unit) []finding {
 	type key struct{ unit, level, message string }
 	groups := map[key]*finding{}
 	var keys []key
-	for _, e := range joinDBusErrors(entries) {
+	for _, e := range joinDBusErrors(dropMistypedPasswords(entries)) {
 		level := severity(e)
 		if level == "" {
 			continue
@@ -292,6 +300,20 @@ func joinDBusErrors(entries []state.Entry) []state.Entry {
 		}
 	}
 	return joined
+}
+
+// dropMistypedPasswords returns entries without gkr-pam's errors from the PAM
+// processes whose pam_unix authentication failed.
+func dropMistypedPasswords(entries []state.Entry) []state.Entry {
+	failed := map[string]bool{}
+	for _, e := range entries {
+		if pamFailure.MatchString(e.Message) {
+			failed[e.PID] = true
+		}
+	}
+	return slices.DeleteFunc(slices.Clone(entries), func(e state.Entry) bool {
+		return failed[e.PID] && keyringInvalid.MatchString(e.Message)
+	})
 }
 
 // trimMessage returns a message without leading space and slog's time.

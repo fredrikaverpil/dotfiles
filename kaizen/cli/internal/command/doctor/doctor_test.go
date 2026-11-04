@@ -997,6 +997,47 @@ func TestJoinDBusErrors(t *testing.T) {
 	}
 }
 
+func TestDropMistypedPasswords(t *testing.T) {
+	const (
+		pamFailure = "pam_unix(kaizen-lock:auth): authentication failure; logname=fredrik uid=1000 user=fredrik"
+		invalid    = "gkr-pam: the password for the login keyring was invalid."
+		unlocked   = "gkr-pam: unlocked login keyring"
+	)
+	for _, tt := range []struct {
+		name    string
+		entries []state.Entry
+		want    []state.Entry
+	}{
+		{
+			name:    "mistyped password",
+			entries: []state.Entry{{Message: pamFailure, PID: "10"}, {Message: invalid, PID: "10"}},
+			want:    []state.Entry{{Message: pamFailure, PID: "10"}},
+		},
+		{
+			name:    "keyring password differs",
+			entries: []state.Entry{{Message: invalid, PID: "10"}},
+			want:    []state.Entry{{Message: invalid, PID: "10"}},
+		},
+		{
+			name: "failure in another process",
+			entries: []state.Entry{
+				{Message: pamFailure, PID: "10"},
+				{Message: invalid, PID: "11"},
+				{Message: unlocked, PID: "12"},
+			},
+			want: []state.Entry{
+				{Message: pamFailure, PID: "10"},
+				{Message: invalid, PID: "11"},
+				{Message: unlocked, PID: "12"},
+			},
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.DeepEqual(t, dropMistypedPasswords(tt.entries), tt.want)
+		})
+	}
+}
+
 func TestSeverity(t *testing.T) {
 	for _, tt := range []struct {
 		name  string

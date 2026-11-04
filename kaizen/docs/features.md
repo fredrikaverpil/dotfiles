@@ -63,7 +63,8 @@ healthy desktop reports nothing, so every finding is something to fix; a `hint:`
 line under it names the fix when there is one. A check that cannot run is an
 error of `doctor`, and the others still run. An error an application shows in
 its window or a toast stays out of it, as does a D-Bus call Quickshell could not
-finish because the peer left the bus, such as a closed player's. Quickshell logs
+finish because the peer left the bus, such as a closed player's, and the
+keyring error a mistyped lock or curtain password logs. Quickshell logs
 a failed D-Bus call's error on a line of its own; doctor reports it with the
 call's line.
 
