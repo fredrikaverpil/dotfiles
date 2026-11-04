@@ -97,9 +97,9 @@ Item {
 
     function loadRules() {
         var files = [];
-        for (var instantiator of [coreRuleFiles, hostRuleFiles]) {
-            for (var i = 0; i < instantiator.count; i++) {
-                var file = instantiator.objectAt(i) as FileView;
+        for (const instantiator of [coreRuleFiles, hostRuleFiles]) {
+            for (let i = 0; i < instantiator.count; i++) {
+                const file = instantiator.objectAt(i) as FileView;
                 // Not created yet; its own objectAdded reloads.
                 if (!file)
                     continue;
@@ -183,7 +183,7 @@ Item {
     function handleNotification(notification) {
         var record;
 
-        for (var key in live) {
+        for (const key in live) {
             if (live[key].notification === notification) {
                 refresh(live[key]);
                 return;
@@ -208,7 +208,7 @@ Item {
         // A dedup group's `keep` copy replaces its others.
         var dedup = NotificationLogic.dedupOf(notification, rules);
         if (dedup && dedup.keep) {
-            var copies = held[dedup.group] || [];
+            const copies = held[dedup.group] || [];
             delete held[dedup.group];
             keptAt[dedup.group] = Date.now();
             copies.forEach(function (key) {
@@ -226,7 +226,7 @@ Item {
 
         // A collapse rule's toasts are held, then shown as one.
         if (record.collapse) {
-            var burst = bursts.find(function (burst) {
+            const burst = bursts.find(function (burst) {
                 return burst.collapse === record.collapse;
             });
             if (burst)
@@ -295,7 +295,7 @@ Item {
         focusApp(record);
 
         var actions = record.notification.actions || [];
-        for (var index = 0; index < actions.length; index++) {
+        for (let index = 0; index < actions.length; index++) {
             if (actions[index].identifier === "default") {
                 actions[index].invoke();
                 break;
@@ -392,7 +392,7 @@ Item {
 
     function dismissAll() {
         var rows = popupRows.slice();
-        for (var index = 0; index < rows.length; index++)
+        for (let index = 0; index < rows.length; index++)
             dismiss(rows[index]);
     }
 
@@ -450,7 +450,7 @@ Item {
         id: dedupHold
         interval: root.dedupWindow
         onTriggered: {
-            for (var group in root.held) {
+            for (const group in root.held) {
                 root.held[group].forEach(function (key) {
                     if (root.live[key])
                         root.show(root.live[key]);

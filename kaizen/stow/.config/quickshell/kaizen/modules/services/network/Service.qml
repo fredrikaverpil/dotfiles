@@ -338,8 +338,8 @@ Item {
     function status() {
         var devices = [];
         var source = networkDevices || [];
-        for (var i = 0; i < source.length; i++) {
-            var device = source[i];
+        for (let i = 0; i < source.length; i++) {
+            const device = source[i];
             if (!device)
                 continue;
             devices.push({

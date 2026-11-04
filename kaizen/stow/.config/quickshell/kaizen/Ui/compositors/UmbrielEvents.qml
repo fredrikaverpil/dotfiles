@@ -20,11 +20,11 @@ QtObject {
         stdout: SplitParser {
             onRead: function (line) {
                 try {
-                    var event = JSON.parse(line);
-                    var workspaces = Model.snapshot(event, "workspaces");
+                    const event = JSON.parse(line);
+                    const workspaces = Model.snapshot(event, "workspaces");
                     if (workspaces)
                         root.workspaces = workspaces;
-                    var windows = Model.snapshot(event, "windows");
+                    const windows = Model.snapshot(event, "windows");
                     if (windows)
                         root.windows = windows;
                 } catch (error) {}

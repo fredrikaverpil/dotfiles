@@ -33,7 +33,7 @@ Ui.Panel {
         const item = focusedItem;
         if (!item || !shown)
             return;
-        const top = item.mapToItem(content, 0, 0).y;
+        const top = item.mapToItem(body, 0, 0).y;
         if (!isFinite(top))
             return;
         if (top < scroller.contentY)
@@ -92,12 +92,12 @@ Ui.Panel {
         width: parent.width
         height: parent.height - y
         contentWidth: width
-        contentHeight: content.implicitHeight
+        contentHeight: body.implicitHeight
         clip: true
         boundsBehavior: Flickable.StopAtBounds
 
         Column {
-            id: content
+            id: body
             width: scroller.width
             spacing: 10
 

@@ -611,7 +611,7 @@ Ui.Panel {
         printErrors: false
         onLoaded: {
             try {
-                var parsed = JSON.parse(String(text() || ""));
+                const parsed = JSON.parse(String(text() || ""));
                 menu.launchCounts = parsed.counts || {};
             } catch (error) {
                 menu.launchCounts = {};

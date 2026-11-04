@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import Quickshell.Io
 
 import "../../../Ui" as Ui
@@ -56,7 +55,7 @@ Item {
         printErrors: false
         onLoaded: {
             try {
-                var parsed = JSON.parse(String(text() || ""));
+                const parsed = JSON.parse(String(text() || ""));
                 root.enabled = parsed.enabled !== false;
             } catch (error) {
                 root.enabled = true;
