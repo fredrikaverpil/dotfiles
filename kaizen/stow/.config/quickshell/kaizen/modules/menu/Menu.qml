@@ -488,7 +488,7 @@ Ui.Panel {
         return {
             icon: menu.radio(service.profile === name),
             label: label,
-            enabled: service.profiles.indexOf(name) >= 0,
+            enabled: service.profiles().indexOf(name) >= 0,
             action: () => service.setProfile(name)
         };
     }

@@ -50,7 +50,6 @@ Item {
     readonly property string threshold: Model.formatThreshold(startThreshold, endThreshold)
 
     readonly property var profileValues: [PowerProfile.PowerSaver, PowerProfile.Balanced, PowerProfile.Performance]
-    readonly property var profiles: PowerProfiles.hasPerformanceProfile ? Model.profiles : Model.profiles.slice(0, 2)
     readonly property string profile: Model.profiles[profileValues.indexOf(PowerProfiles.profile)] || ""
 
     property bool stateLoaded: false
@@ -64,13 +63,17 @@ Item {
             sysfs.running = true;
     }
 
-    // A function: a binding reads stale in onOnBatteryChanged.
+    // Functions: a binding can read stale in a change handler.
     function source() {
         return onBattery ? "battery" : "ac";
     }
 
+    function profiles() {
+        return PowerProfiles.hasPerformanceProfile ? Model.profiles : Model.profiles.slice(0, 2);
+    }
+
     function applyProfile(name) {
-        if (profiles.indexOf(name) < 0)
+        if (profiles().indexOf(name) < 0)
             return false;
         PowerProfiles.profile = profileValues[Model.profiles.indexOf(name)];
         return true;
@@ -88,7 +91,7 @@ Item {
 
     function restoreProfile() {
         if (stateLoaded && present)
-            applyProfile(Model.profileFor(savedProfiles, source(), profiles));
+            applyProfile(Model.profileFor(savedProfiles, source(), profiles()));
     }
 
     function checkLevel() {
@@ -108,7 +111,7 @@ Item {
             state: stateLabel,
             onBattery: onBattery,
             profile: profile,
-            profiles: profiles,
+            profiles: profiles(),
             threshold: {
                 start: startThreshold,
                 end: endThreshold
