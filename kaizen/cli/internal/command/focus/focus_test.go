@@ -137,9 +137,9 @@ func TestRun(t *testing.T) {
 			args:       []string{`^com\.mitchellh\.ghostty$`, "ghostty"},
 			outputs: map[string]recorded{
 				"umbriel windows --json":      {Stdout: umbrielWindows},
-				"umbriel msg window-focus:b2": {},
+				"umbriel msg window-focus b2": {},
 			},
-			want: result{Calls: []string{"umbriel windows --json", "umbriel msg window-focus:b2"}},
+			want: result{Calls: []string{"umbriel windows --json", "umbriel msg window-focus b2"}},
 		},
 		{
 			name:       "no compositor",

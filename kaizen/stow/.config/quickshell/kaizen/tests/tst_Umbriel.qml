@@ -25,12 +25,12 @@ TestCase {
             {
                 tag: "focus workspace",
                 got: Umbriel.focusWorkspace(3, "DP-1"),
-                want: ["umbriel", "msg", "workspace-switch:3/DP-1"]
+                want: ["umbriel", "msg", "workspace-switch", "3", "--output", "DP-1"]
             },
             {
                 tag: "move floating window",
                 got: Umbriel.moveFloatingWindow("a1b2", -4, 20),
-                want: ["umbriel", "msg", "window-move-to:top_left/-4/20/a1b2"]
+                want: ["umbriel", "msg", "window-move-to", "top_left", "-4", "20", "--window", "a1b2"]
             }
         ];
     }
@@ -46,7 +46,7 @@ TestCase {
     }
 
     function test_parse_binds_reads_labelled_binds_from_keybinds() {
-        const raw = '"Mod+A" = "window-close" # Outside\n' + '[keybinds]\n' + '# "Mod+B" = "window-close" # Commented\n' + '"Mod+Space" = "spawn:kaizen ipc call menu toggle" # Menu\n' + '"XF86AudioMute" = { action = "spawn:kaizen ipc call audio mute", allow_when_locked = true, repeat = false } # Mute\n' + '"Mod+T" = "spawn:kitty"\n' + '"submap[resize],H" = "window-resize-left" # In a submap\n' + '[[window_rule]]\n' + '"Mod+C" = "window-close" # Not a bind\n';
+        const raw = '"Mod+A" = "window-close" # Outside\n' + '[keybinds]\n' + '# "Mod+B" = "window-close" # Commented\n' + '"Mod+Space" = "spawn kaizen ipc call menu toggle" # Menu\n' + '"XF86AudioMute" = { action = "spawn kaizen ipc call audio mute", allow_when_locked = true, repeat = false } # Mute\n' + '"Mod+T" = "spawn kitty"\n' + '"submap[resize],H" = "window-resize-left" # In a submap\n' + '[[window_rule]]\n' + '"Mod+C" = "window-close" # Not a bind\n';
 
         const binds = Umbriel.parseBinds(raw);
 
@@ -81,7 +81,7 @@ TestCase {
             },
             {
                 tag: "action with an argument",
-                line: '"Mod+1" = "workspace-switch:1" # Workspace 1',
+                line: '"Mod+1" = "workspace-switch 1" # Workspace 1',
                 want: {
                     chord: "Mod+1",
                     label: "Workspace 1",
@@ -90,7 +90,7 @@ TestCase {
             },
             {
                 tag: "ipc in a table, after other keys",
-                line: "\"Print\" = { repeat = false, action = 'spawn:kaizen ipc call recording shoot screen' } # Shoot",
+                line: "\"Print\" = { repeat = false, action = 'spawn kaizen ipc call recording shoot screen' } # Shoot",
                 want: {
                     chord: "Print",
                     label: "Shoot",
@@ -100,7 +100,7 @@ TestCase {
             },
             {
                 tag: "spawn with an escaped regex",
-                line: '"Mod+T" = "spawn:kaizen focus \'^com\\\\.mitchellh\\\\.ghostty$\' ghostty" # Terminal',
+                line: '"Mod+T" = "spawn kaizen focus \'^com\\\\.mitchellh\\\\.ghostty$\' ghostty" # Terminal',
                 want: {
                     chord: "Mod+T",
                     label: "Terminal",
@@ -109,7 +109,7 @@ TestCase {
             },
             {
                 tag: "a hash inside the value",
-                line: '"Mod+H" = "spawn:notify-send \'#1\'" # Hash',
+                line: '"Mod+H" = "spawn notify-send \'#1\'" # Hash',
                 want: {
                     chord: "Mod+H",
                     label: "Hash",
@@ -118,7 +118,7 @@ TestCase {
             },
             {
                 tag: "bare key",
-                line: 'XF86AudioPlay = "spawn:kaizen ipc call media playPause" # Play',
+                line: 'XF86AudioPlay = "spawn kaizen ipc call media playPause" # Play',
                 want: {
                     chord: "XF86AudioPlay",
                     label: "Play",
@@ -154,7 +154,7 @@ TestCase {
     function test_read_binds_keeps_the_last_bind_of_a_chord() {
         const files = {
             "/c/config.toml": '[include]\nfiles = ["kaizen.toml"]\n[keybinds]\n"Shift+Mod+space" = "window-close" # Mine\n',
-            "/c/kaizen.toml": '[keybinds]\n"Mod+Space" = "spawn:kaizen ipc call menu toggle" # Menu\n"Mod+Shift+Space" = "spawn:kaizen ipc call keyboard next" # Next layout\n'
+            "/c/kaizen.toml": '[keybinds]\n"Mod+Space" = "spawn kaizen ipc call menu toggle" # Menu\n"Mod+Shift+Space" = "spawn kaizen ipc call keyboard next" # Next layout\n'
         };
 
         const binds = Umbriel.readBinds("/c/config.toml", "/home/u", path => files[path] ?? null);

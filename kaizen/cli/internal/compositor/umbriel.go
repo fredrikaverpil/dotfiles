@@ -148,7 +148,7 @@ func (u Umbriel) Windows(ctx context.Context) ([]Window, error) {
 
 // FocusWindow focuses window id.
 func (u Umbriel) FocusWindow(ctx context.Context, id string) error {
-	if _, err := u.Runner.Run(ctx, "umbriel", "msg", "window-focus:"+id); err != nil {
+	if _, err := u.Runner.Run(ctx, "umbriel", "msg", "window-focus", id); err != nil {
 		return fmt.Errorf("umbriel msg window-focus: %v", err)
 	}
 	return nil

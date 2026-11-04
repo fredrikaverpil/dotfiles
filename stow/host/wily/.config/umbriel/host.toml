@@ -11,10 +11,10 @@ match.app_id = [
 default_workspace = "4"
 
 [keybinds]
-"Mod+B" = { action = "spawn:chromium --profile-directory=Work", repeat = false } # Browser
+"Mod+B" = { action = "spawn chromium --profile-directory=Work", repeat = false } # Browser
 # No Mod+A: ../niri/wily-apps reads niri's windows and workspaces.
 
 # Focus the app's most recently focused window, or open it.
-"Mod+E" = { action = "spawn:kaizen focus '^chrome-calendar\\.google\\.com__-' chromium --profile-directory=Work --app=https://calendar.google.com/", repeat = false } # Focus or open Google Calendar
-"Mod+W" = { action = "spawn:kaizen focus '^chrome-meet\\.google\\.com__-' chromium --profile-directory=Work --app=https://meet.google.com/", repeat = false } # Focus or open Google Meet
-"Mod+P" = { action = "spawn:kaizen focus '^chrome-linear\\.app__-' chromium --profile-directory=Work --app=https://linear.app/", repeat = false } # Focus or open Linear
+"Mod+E" = { action = "spawn kaizen focus '^chrome-calendar\\.google\\.com__-' chromium --profile-directory=Work --app=https://calendar.google.com/", repeat = false } # Focus or open Google Calendar
+"Mod+W" = { action = "spawn kaizen focus '^chrome-meet\\.google\\.com__-' chromium --profile-directory=Work --app=https://meet.google.com/", repeat = false } # Focus or open Google Meet
+"Mod+P" = { action = "spawn kaizen focus '^chrome-linear\\.app__-' chromium --profile-directory=Work --app=https://linear.app/", repeat = false } # Focus or open Linear

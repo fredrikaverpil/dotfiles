@@ -383,17 +383,17 @@ func TestFocusWindow(t *testing.T) {
 			name:       "umbriel",
 			compositor: func(r Runner) Compositor { return Umbriel{Runner: r} },
 			id:         "b2",
-			outputs:    map[string]recorded{"umbriel msg window-focus:b2": {}},
-			want:       result{Calls: []string{"umbriel msg window-focus:b2"}},
+			outputs:    map[string]recorded{"umbriel msg window-focus b2": {}},
+			want:       result{Calls: []string{"umbriel msg window-focus b2"}},
 		},
 		{
 			name:       "umbriel fails",
 			compositor: func(r Runner) Compositor { return Umbriel{Runner: r} },
 			id:         "b2",
-			outputs:    map[string]recorded{"umbriel msg window-focus:b2": {Err: errors.New("exit status 1")}},
+			outputs:    map[string]recorded{"umbriel msg window-focus b2": {Err: errors.New("exit status 1")}},
 			want: result{
 				Err:   "umbriel msg window-focus: exit status 1",
-				Calls: []string{"umbriel msg window-focus:b2"},
+				Calls: []string{"umbriel msg window-focus b2"},
 			},
 		},
 	} {
