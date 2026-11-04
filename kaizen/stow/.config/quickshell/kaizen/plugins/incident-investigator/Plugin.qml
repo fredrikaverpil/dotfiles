@@ -24,7 +24,7 @@ Ui.Plugin {
     // focused workspace. A menu left open closes; the selected row takes the
     // keyboard.
     function open() {
-        palette.close();
+        menuOverlay.close();
         investigations.focusSelected();
         if (window.visible && investigations.Window.active)
             return;
@@ -80,13 +80,13 @@ Ui.Plugin {
             transformOrigin: Item.TopLeft
             shell: plugin.shell
 
-            onPaletteRequested: keys => palette.open(keys)
-            onMenuRequested: (rows, at, selectFirst) => palette.popup(rows, palette.mapFromItem(null, at.x, at.y, at.width, at.height), selectFirst)
+            onPaletteRequested: keys => menuOverlay.open(keys)
+            onMenuRequested: (rows, at, selectFirst) => menuOverlay.popup(rows, menuOverlay.mapFromItem(null, at.x, at.y, at.width, at.height), selectFirst)
         }
 
         // Over the whole window, at the content's scale.
         Ui.MenuOverlay {
-            id: palette
+            id: menuOverlay
 
             readonly property real zoom: plugin.shell.textScale
 
@@ -103,7 +103,7 @@ Ui.Plugin {
             // A focused field keeps Ctrl+K from Keys handlers; a Shortcut fires from anywhere in the window.
             Shortcut {
                 sequence: "Ctrl+K"
-                onActivated: palette.toggle(["Ctrl", "K"])
+                onActivated: menuOverlay.toggle(["Ctrl", "K"])
             }
         }
     }

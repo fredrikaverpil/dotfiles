@@ -221,16 +221,16 @@ PanelWindow {
             id: frame
 
             required property int index
-            readonly property alias menu: menu
+            readonly property alias menu: menuCard
 
             // Read once: stack changes must not rebuild this card's rows.
             property var level: null
             Component.onCompleted: {
                 level = root.stack[index];
                 if (level.selectFirst)
-                    menu.selectFirst();
-                menu.settle();
-                menu.focusSearch();
+                    menuCard.selectFirst();
+                menuCard.settle();
+                menuCard.focusSearch();
             }
 
             // Placed by its tallest height, so a query shrinks the card without moving its top.
@@ -243,14 +243,14 @@ PanelWindow {
                 return {
                     x: frame.x,
                     width: frame.width * root.zoom,
-                    y: menu.rowTop(row)
+                    y: menuCard.rowTop(row)
                 };
             }
 
             x: position.x
             y: position.y
-            width: Model.clamp(Math.ceil(menu.implicitWidth) + 12, 160, 360)
-            height: Math.max(40, Math.min(menu.implicitHeight + 12, (root.height - 16) / root.zoom))
+            width: Model.clamp(Math.ceil(menuCard.implicitWidth) + 12, 160, 360)
+            height: Math.max(40, Math.min(menuCard.implicitHeight + 12, (root.height - 16) / root.zoom))
             scale: root.zoom
             transformOrigin: Item.TopLeft
             radius: 8
@@ -267,11 +267,11 @@ PanelWindow {
             }
 
             MenuCard {
-                id: menu
+                id: menuCard
                 anchors.fill: parent
                 anchors.margins: 6
                 shell: root.shell
-                rows: frame.level ? root.rowsFor(frame.level, frame.index, menu.query) : []
+                rows: frame.level ? root.rowsFor(frame.level, frame.index, menuCard.query) : []
                 placeholder: frame.level && frame.level.title ? "Filter " + frame.level.title.toLowerCase() + "…" : "Filter…"
                 maxWidth: 360 - 12
 

@@ -77,7 +77,7 @@ Ui.Panel {
     }
 
     Column {
-        id: top
+        id: header
         width: parent.width
         spacing: 10
 
@@ -120,7 +120,7 @@ Ui.Panel {
     // Tab and hjkl step focus as elsewhere in panels.
     Rectangle {
         width: parent.width
-        height: parent.height - top.height - bottom.height - 2 * root.contentSpacing
+        height: parent.height - header.height - footer.height - 2 * root.contentSpacing
         radius: 4
         color: "transparent"
         border.color: view.activeFocus ? root.shell.palette.fg : root.shell.palette.dim
@@ -179,7 +179,7 @@ Ui.Panel {
     }
 
     Column {
-        id: bottom
+        id: footer
         width: parent.width
         spacing: 10
 

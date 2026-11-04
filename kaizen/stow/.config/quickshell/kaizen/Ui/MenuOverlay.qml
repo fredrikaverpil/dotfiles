@@ -276,16 +276,16 @@ Item {
             id: cascade
 
             required property int index
-            readonly property alias menu: menu
+            readonly property alias menu: menuCard
 
             // Read once: a push must not rebuild this card's rows.
             property var entry: null
             Component.onCompleted: {
                 entry = overlay.stack[index];
                 if (entry.selectFirst)
-                    menu.selectFirst();
-                menu.settle();
-                menu.focusSearch();
+                    menuCard.selectFirst();
+                menuCard.settle();
+                menuCard.focusSearch();
             }
             readonly property var level: entry ? Model.level(overlay.tree.rows, entry.path) : {
                 rows: [],
@@ -303,14 +303,14 @@ Item {
                 return {
                     x: cascade.x,
                     width: cascade.width,
-                    y: overlay.mapFromItem(null, 0, menu.rowTop(row)).y
+                    y: overlay.mapFromItem(null, 0, menuCard.rowTop(row)).y
                 };
             }
 
             x: position.x
             y: position.above ? position.y + tallest - height : position.y
-            width: Model.clamp(Math.ceil(menu.implicitWidth) + 12, 160, 360)
-            height: Math.max(40, Math.min(menu.implicitHeight + 12, overlay.height - 16))
+            width: Model.clamp(Math.ceil(menuCard.implicitWidth) + 12, 160, 360)
+            height: Math.max(40, Math.min(menuCard.implicitHeight + 12, overlay.height - 16))
             radius: 8
             color: overlay.shell.palette.bg
             border.color: overlay.shell.palette.dim
@@ -322,11 +322,11 @@ Item {
             }
 
             MenuCard {
-                id: menu
+                id: menuCard
                 anchors.fill: parent
                 anchors.margins: 6
                 shell: overlay.shell
-                rows: cascade.entry ? Model.search(cascade.level.rows, menu.query) : []
+                rows: cascade.entry ? Model.search(cascade.level.rows, menuCard.query) : []
                 placeholder: cascade.level.names.length ? "Filter " + cascade.level.names[cascade.level.names.length - 1].toLowerCase() + "…" : "Filter…"
                 maxWidth: 360 - 12
 
