@@ -32,7 +32,7 @@ in
     llama-cpp-vulkan
     llama-router
     unsloth-desktop
-    # Newer than nixpkgs; drop once NixOS/nixpkgs#572220 lands.
+    # Overridden so a release nixpkgs lacks is a version and hash bump.
     (unstable.wrapNeovim (unstable.neovim-unwrapped.overrideAttrs (old: {
       version = "0.12.6";
       src = old.src.override {

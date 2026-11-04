@@ -184,6 +184,8 @@ in
       (withGnomeLibsecret proton-pass)
       proton-pass-cli
       # uwsm-app rejects the upstream entry ID, which contains a space.
+      # TODO: drop once a release names its entry without a space.
+      # https://github.com/ProtonMail/WebClients/issues/552
       (symlinkJoin {
         inherit (proton-authenticator) name;
         paths = [ proton-authenticator ];

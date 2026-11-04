@@ -80,6 +80,7 @@
     # NOTE: Follows nixpkgs-unstable, so built locally: umbriel.cachix.org
     # serves builds against umbriel's own pin, whose mesa/libgbm may not load
     # the system's drivers.
+    # TODO: drop once nixpkgs' umbriel has the IPC kaizen's backends use.
     umbriel = {
       url = "github:noctalia-dev/umbriel";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
