@@ -16,6 +16,10 @@ uv_venv_auto = "source" # activate a uv project's .venv
 [settings.ruby]
 compile = false
 
+# go finds its root from its binary; a GOROOT breaks the devshell's go.
+[settings.go]
+set_goroot = false
+
 [tools]
 go = "latest"
 node = "lts"
