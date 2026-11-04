@@ -82,19 +82,6 @@ not planned, unreported.
 - Drop: this entry, once the pinned Quickshell includes it and `qml-lint` is
   clean.
 
-## umbriel
-
-### nixpkgs' umbriel lags its IPC
-
-- Workaround: the `umbriel` flake input in [`flake.nix`](../../flake.nix),
-  whose NixOS module, imported in [`nix/default.nix`](../nix/default.nix),
-  replaces nixpkgs' `programs.umbriel`.
-- Upstream: nixpkgs has `umbriel` 0-unstable-2026-10-16 with its module and
-  portal; the input is at `e0da106` (2026-11-03).
-- Status: open.
-- Drop: the input and the import, once nixpkgs' umbriel has the IPC kaizen's
-  backends use; `compositor-test` and both hosts' builds check it.
-
 ## Qt
 
 ### qmllint misses a singleton with a relative path
@@ -137,16 +124,6 @@ Workarounds in the repository's `nix/` that kaizen hosts carry.
   wrapped apps ship it, is unverified.
 - Drop: per app, never by removing the flag alone: an app that encrypted its
   secrets with the keyring is locked out of them without it.
-
-### lutris pulls in gtk2, which nixpkgs marks broken
-
-- Workaround: `nixpkgs.config.problems.handlers."gtk+".broken = "warn"` in
-  [`nix/hosts/renoir/configuration.nix`](../../nix/hosts/renoir/configuration.nix).
-- Upstream: NixOS/nixpkgs@7f22afb3 "lutris: drop gtk2", on master since
-  2026-11-02.
-- Status: merged (unreleased): on the `nixpkgs-unstable` branch, not yet in the
-  flake's pin.
-- Drop: the handler, once `nix flake update nixpkgs-unstable` brings the commit.
 
 ### Proton Authenticator's desktop entry ID has a space
 

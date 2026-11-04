@@ -76,15 +76,6 @@
       url = "github:duxlabs-dev/dux-calendar";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
-    # kaizen's second compositor; nixpkgs' umbriel lags upstream's IPC.
-    # NOTE: Follows nixpkgs-unstable, so built locally: umbriel.cachix.org
-    # serves builds against umbriel's own pin, whose mesa/libgbm may not load
-    # the system's drivers.
-    # TODO: drop once nixpkgs' umbriel has the IPC kaizen's backends use.
-    umbriel = {
-      url = "github:noctalia-dev/umbriel";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
   };
 
   outputs =
@@ -205,7 +196,7 @@
                   ]
                   ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
                     pkgs.niri
-                    inputs.umbriel.packages.${system}.default
+                    pkgs.umbriel
                     pkgs.jq
                     pkgs.wtype
                     pkgs.wlrctl

@@ -1,4 +1,4 @@
-{ inputs, pkgs, ... }:
+{ pkgs, ... }:
 let
   # The shell's emoji data, found as share/kaizen/emoji.json in the XDG data dirs.
   emoji =
@@ -36,7 +36,6 @@ in
   imports = [
     ./fonts.nix
     ./requires.nix
-    inputs.umbriel.nixosModules.default
   ];
 
   config = {
@@ -89,8 +88,15 @@ in
     # umbriel's session units, and its portal (Screencast, Screenshot) ahead of GTK's
     # under umbriel. Its start-umbriel and session file go unused under UWSM.
     programs.umbriel.enable = true;
-    # gnome-keyring's Secret portal, as niri's portal config names it.
-    xdg.portal.config.umbriel."org.freedesktop.impl.portal.Secret" = [ "gnome-keyring" ];
+    # gnome-keyring's Secret portal, as niri's portal config names it. This file
+    # shadows the portal package's umbriel-portals.conf, so it repeats its default.
+    xdg.portal.config.umbriel = {
+      default = [
+        "umbriel"
+        "gtk"
+      ];
+      "org.freedesktop.impl.portal.Secret" = [ "gnome-keyring" ];
+    };
 
     # uwsm-app launches Terminal=true entries through xdg-terminal-exec.
     xdg.terminal-exec.enable = true;
