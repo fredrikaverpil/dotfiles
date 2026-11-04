@@ -174,7 +174,7 @@ notification rules.
 
 | Part | Path | Reaches |
 | --- | --- | --- |
-| Session: niri or umbriel (a flake input) under UWSM, portals, PAM, the services the shell reads, the packages the shell, its binds, scripts and units use | [`kaizen/nix/`](nix/default.nix) | every kaizen host |
+| Session: niri or umbriel under UWSM, portals, PAM, the services the shell reads, the packages the shell, its binds, scripts and units use | [`kaizen/nix/`](nix/default.nix) | every kaizen host |
 | The `kaizen` command, in Go, built by [`package.nix`](nix/package.nix) | [`kaizen/cli/`](cli/) | every kaizen host |
 | The shell's niri and umbriel config, session variables, units and scripts, the shell's QML, the core's notification rules | [`kaizen/stow/`](stow/) | every kaizen host |
 | Plugin QML: generic or reusable | [`kaizen/stow/.config/quickshell/kaizen/plugins/<name>/`](stow/.config/quickshell/kaizen/plugins/) | every kaizen host |

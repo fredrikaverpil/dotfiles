@@ -16,9 +16,6 @@
   networking.hostName = "renoir";
   nixpkgs.hostPlatform = "x86_64-linux";
   nixpkgs.config.allowUnfree = true;
-  # lutris' FHS env pulls in gtk2, which nixpkgs marks broken ahead of removal.
-  # TODO: drop once the nixpkgs-unstable pin has NixOS/nixpkgs@7f22afb3 (lutris: drop gtk2).
-  nixpkgs.config.problems.handlers."gtk+".broken = "warn";
 
   # Unset so timedated owns /etc/localtime and `timedatectl set-timezone`
   # persists across rebuilds; this laptop travels. UTC until first set.
