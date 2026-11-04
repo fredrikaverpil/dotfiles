@@ -274,6 +274,7 @@ in
     # Font management
     # NOTE: Berkeley Mono is installed manually, as it requires a license.
     fonts.packages = with pkgs; [
+      commit-mono
       maple-mono.truetype
       maple-mono.variable
       nerd-fonts.jetbrains-mono
