@@ -262,7 +262,8 @@ tree, so a static check passing here passes for every kaizen host;
 
 ### Tooling
 
-- `qml-lint` fails on any warning. Shadowing an Item member that is public API
+- `qml-lint` fails on any warning; [`issues.md`](issues.md) lists those an
+  upstream bug causes. Shadowing an Item member that is public API
   (`palette`, IPC-visible `enabled`) or a lookup on an untyped `Loader.item`
   gets an inline `// qmllint disable <category>`; anything else gets fixed.
 - Use the devshell's pinned Qt tools, not a standalone `qmlls`. Launch

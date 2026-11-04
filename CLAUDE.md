@@ -121,3 +121,6 @@ mise cannot provide comes from `nix/shared/toolchain.nix`.
 - **Neovim comes from nixpkgs-unstable**, declared per host in
   `nix/hosts/<host>/users/fredrik.nix`. For a release nixpkgs lacks, override
   `neovim-unwrapped` and rewrap it with `wrapNeovim`
+- **Upstream workarounds are tracked** in `kaizen/docs/issues.md`: a patch,
+  override or `TODO: drop once …` for kaizen or a kaizen host gets an entry
+  there, with its upstream status, and loses it in the commit that drops it

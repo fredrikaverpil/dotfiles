@@ -86,6 +86,7 @@ Item {
     // Releases sessionLock before lockRequested, so `locked` re-reads it
     // released: Quickshell 0.3.2 emits no lockStateChanged on unlock
     // (quickshell#1230).
+    // TODO: once a Quickshell release emits it, check whether the order is still needed.
     function finishUnlock() {
         if (passwordPam.active)
             passwordPam.abort();
