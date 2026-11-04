@@ -52,7 +52,6 @@ Item {
     readonly property var profileValues: [PowerProfile.PowerSaver, PowerProfile.Balanced, PowerProfile.Performance]
     readonly property var profiles: PowerProfiles.hasPerformanceProfile ? Model.profiles : Model.profiles.slice(0, 2)
     readonly property string profile: Model.profiles[profileValues.indexOf(PowerProfiles.profile)] || ""
-    readonly property string source: onBattery ? "battery" : "ac"
 
     property bool stateLoaded: false
     property var savedProfiles: ({
@@ -63,6 +62,11 @@ Item {
     function refresh() {
         if (cell && !sysfs.running)
             sysfs.running = true;
+    }
+
+    // A function: a binding reads stale in onOnBatteryChanged.
+    function source() {
+        return onBattery ? "battery" : "ac";
     }
 
     function applyProfile(name) {
@@ -76,7 +80,7 @@ Item {
     function setProfile(name) {
         if (!applyProfile(name))
             return false;
-        savedProfiles = Model.withProfile(savedProfiles, source, name);
+        savedProfiles = Model.withProfile(savedProfiles, source(), name);
         if (stateLoaded)
             stateFile.setText(Model.profilesText(savedProfiles));
         return true;
@@ -84,7 +88,7 @@ Item {
 
     function restoreProfile() {
         if (stateLoaded && present)
-            applyProfile(Model.profileFor(savedProfiles, source, profiles));
+            applyProfile(Model.profileFor(savedProfiles, source(), profiles));
     }
 
     function checkLevel() {
