@@ -174,13 +174,15 @@
                     pkgs.go_1_27 # kaizen/cli/, as package.nix builds it
                     pkgs.qt6.qtdeclarative # qmlls, qmllint, qmlformat, qmltestrunner
                     # Plugins import qs.Ui, which Quickshell maps to the tree's Ui/;
-                    # qmllint finds it through a qs/Ui link on -I.
+                    # qmllint finds it through a qs/Ui link on -I. Absolute paths:
+                    # given a relative one, qmllint 6.12 misses a singleton its
+                    # own qmldir declares.
                     (task "qml-lint" ''
                       imports=$(mktemp -d)
                       trap 'rm -rf "$imports"' EXIT
                       mkdir "$imports/qs"
                       ln -s "$PWD/Ui" "$imports/qs/Ui"
-                      qmllint -E -I "$imports" -W 0 $(find . ../../../../../stow/host/*/.config/kaizen/plugins -name '*.qml')
+                      qmllint -E -I "$imports" -W 0 $(find "$PWD" "$(realpath ../../../../../stow/host)"/*/.config/kaizen/plugins -name '*.qml')
                     '')
                     # Tool defaults; prettier's match conform's flags for JS.
                     (task "qml-format" ''
