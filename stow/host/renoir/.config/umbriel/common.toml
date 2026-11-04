@@ -92,7 +92,7 @@ blur_optimized = false
 "Mod+Tab" = "window-focus-last" # Focus the previous window
 
 # Launch
-"Mod+Return" = { action = "spawn:ghostty", repeat = false } # New terminal
+"Mod+Return" = { action = "spawn ghostty", repeat = false } # New terminal
 
 # Window state
 "Mod+Q" = { action = "window-close", repeat = false } # Close window
@@ -139,14 +139,14 @@ blur_optimized = false
 "Mod+R" = "window-cycle-primary-extent" # Next preset column width
 "Mod+Shift+R" = "window-cycle-primary-extent-back" # Previous preset column width
 "Mod+Ctrl+Shift+R" = "window-cycle-secondary-extent" # Next preset window height
-"Mod+Minus" = "window-modify-primary-extent:-0.1" # Narrow column
-"Mod+Equal" = "window-modify-primary-extent:0.1" # Widen column
-"Mod+Shift+Minus" = "window-modify-secondary-extent:-0.1" # Shorten window
-"Mod+Shift+Equal" = "window-modify-secondary-extent:0.1" # Heighten window
-"Mod+Alt+Minus" = "window-modify-primary-extent:-0.02" # Narrow column a little
-"Mod+Alt+Equal" = "window-modify-primary-extent:0.02" # Widen column a little
-"Mod+Ctrl+Minus" = "window-modify-primary-extent:-0.25" # Narrow column a lot
-"Mod+Ctrl+Equal" = "window-modify-primary-extent:0.25" # Widen column a lot
+"Mod+Minus" = "window-modify-primary-extent -0.1" # Narrow column
+"Mod+Equal" = "window-modify-primary-extent 0.1" # Widen column
+"Mod+Shift+Minus" = "window-modify-secondary-extent -0.1" # Shorten window
+"Mod+Shift+Equal" = "window-modify-secondary-extent 0.1" # Heighten window
+"Mod+Alt+Minus" = "window-modify-primary-extent -0.02" # Narrow column a little
+"Mod+Alt+Equal" = "window-modify-primary-extent 0.02" # Widen column a little
+"Mod+Ctrl+Minus" = "window-modify-primary-extent -0.25" # Narrow column a lot
+"Mod+Ctrl+Equal" = "window-modify-primary-extent 0.25" # Widen column a lot
 "Mod+C" = "column-center" # Center column
 
 # Groups: tab groups within a column.
@@ -160,15 +160,15 @@ blur_optimized = false
 # Workspaces
 "Mod+O" = { action = "overview-toggle", repeat = false } # Overview
 
-"Mod+1" = "workspace-switch:1" # Switch to workspace 1
-"Mod+2" = "workspace-switch:2" # Switch to workspace 2
-"Mod+3" = "workspace-switch:3" # Switch to workspace 3
-"Mod+4" = "workspace-switch:4" # Switch to workspace 4
-"Mod+5" = "workspace-switch:5" # Switch to workspace 5
-"Mod+6" = "workspace-switch:6" # Switch to workspace 6
-"Mod+7" = "workspace-switch:7" # Switch to workspace 7
-"Mod+8" = "workspace-switch:8" # Switch to workspace 8
-"Mod+9" = "workspace-switch:9" # Switch to workspace 9
+"Mod+1" = "workspace-switch 1" # Switch to workspace 1
+"Mod+2" = "workspace-switch 2" # Switch to workspace 2
+"Mod+3" = "workspace-switch 3" # Switch to workspace 3
+"Mod+4" = "workspace-switch 4" # Switch to workspace 4
+"Mod+5" = "workspace-switch 5" # Switch to workspace 5
+"Mod+6" = "workspace-switch 6" # Switch to workspace 6
+"Mod+7" = "workspace-switch 7" # Switch to workspace 7
+"Mod+8" = "workspace-switch 8" # Switch to workspace 8
+"Mod+9" = "workspace-switch 9" # Switch to workspace 9
 "Mod+Page_Down" = "workspace-next" # Next workspace
 "Mod+Page_Up" = "workspace-previous" # Previous workspace
 "Mod+U" = "workspace-next" # Next workspace
@@ -177,15 +177,15 @@ blur_optimized = false
 "Mod+WheelUp" = { action = "workspace-previous", cooldown_ms = 150 } # Scroll active workspace backward
 "Mod+Ctrl+Tab" = "workspace-focus-last" # Former workspace
 
-"Mod+Ctrl+1" = "column-move-to-workspace:1" # Move column to workspace 1
-"Mod+Ctrl+2" = "column-move-to-workspace:2" # Move column to workspace 2
-"Mod+Ctrl+3" = "column-move-to-workspace:3" # Move column to workspace 3
-"Mod+Ctrl+4" = "column-move-to-workspace:4" # Move column to workspace 4
-"Mod+Ctrl+5" = "column-move-to-workspace:5" # Move column to workspace 5
-"Mod+Ctrl+6" = "column-move-to-workspace:6" # Move column to workspace 6
-"Mod+Ctrl+7" = "column-move-to-workspace:7" # Move column to workspace 7
-"Mod+Ctrl+8" = "column-move-to-workspace:8" # Move column to workspace 8
-"Mod+Ctrl+9" = "column-move-to-workspace:9" # Move column to workspace 9
+"Mod+Ctrl+1" = "column-move-to-workspace 1" # Move column to workspace 1
+"Mod+Ctrl+2" = "column-move-to-workspace 2" # Move column to workspace 2
+"Mod+Ctrl+3" = "column-move-to-workspace 3" # Move column to workspace 3
+"Mod+Ctrl+4" = "column-move-to-workspace 4" # Move column to workspace 4
+"Mod+Ctrl+5" = "column-move-to-workspace 5" # Move column to workspace 5
+"Mod+Ctrl+6" = "column-move-to-workspace 6" # Move column to workspace 6
+"Mod+Ctrl+7" = "column-move-to-workspace 7" # Move column to workspace 7
+"Mod+Ctrl+8" = "column-move-to-workspace 8" # Move column to workspace 8
+"Mod+Ctrl+9" = "column-move-to-workspace 9" # Move column to workspace 9
 "Mod+Ctrl+Page_Down" = "column-move-to-workspace-next" # Move column to next workspace
 "Mod+Ctrl+Page_Up" = "column-move-to-workspace-previous" # Move column to previous workspace
 "Mod+Ctrl+U" = "column-move-to-workspace-next" # Move column to next workspace
@@ -220,12 +220,12 @@ blur_optimized = false
 "Mod+Shift+P" = { action = "dpms-off", repeat = false } # Power off monitors
 
 # Apps. spawn runs its command through /bin/sh.
-"Mod+Y" = { action = "spawn:xdg-terminal-exec yazi", repeat = false } # Files
-"Mod+B" = { action = "spawn:chromium --profile-directory=Default", repeat = false } # Browser
+"Mod+Y" = { action = "spawn xdg-terminal-exec yazi", repeat = false } # Files
+"Mod+B" = { action = "spawn chromium --profile-directory=Default", repeat = false } # Browser
 # Focus the app's most recently focused window, switching workspace, or open
 # it.
-"Mod+Z" = { action = "spawn:kaizen focus '^zen-beta$' zen-beta", repeat = false } # Focus or open Zen
-"Mod+S" = { action = "spawn:kaizen focus '(?i)^slack$' slack", repeat = false } # Focus or open Slack
+"Mod+Z" = { action = "spawn kaizen focus '^zen-beta$' zen-beta", repeat = false } # Focus or open Zen
+"Mod+S" = { action = "spawn kaizen focus '(?i)^slack$' slack", repeat = false } # Focus or open Slack
 
 # App window rules. umbriel's regexes are ECMAScript: no inline (?i) flag.
 # List running windows: `umbriel windows`

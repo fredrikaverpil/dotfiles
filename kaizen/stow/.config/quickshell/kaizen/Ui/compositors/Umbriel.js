@@ -26,7 +26,7 @@ var closeWindowAction = "window-close";
 var focusOutput =
   'index=$(umbriel workspaces --json | jq -er --arg output "$1" ' +
   "'first(.[] | select(.output == $output and .active).index)') && " +
-  'umbriel msg "workspace-switch:$index/$1" >/dev/null';
+  'umbriel msg workspace-switch "$index" --output "$1" >/dev/null';
 
 // The focused workspace's window, which keeps its place while a layer surface
 // holds the keyboard.
@@ -38,8 +38,9 @@ function borderColors(palette) {
   return '[colors.border]\nfocused = "' + palette.water + '"\n';
 }
 
-function msg(action) {
-  return ["umbriel", "msg", action];
+// An action and its arguments, one word each.
+function msg(words) {
+  return ["umbriel", "msg"].concat(words);
 }
 
 function dpms(on) {
@@ -156,8 +157,9 @@ function parseBinds(raw) {
         value = action ? action[1] : "";
       }
       var run = value ? unquote(value) : "";
-      var ipc =
-        /^spawn:\s*kaizen\s+ipc\s+call((?:\s+[A-Za-z0-9_-]+)+)\s*$/.exec(run);
+      var ipc = /^spawn\s+kaizen\s+ipc\s+call((?:\s+[A-Za-z0-9_-]+)+)\s*$/.exec(
+        run,
+      );
       if (ipc) bind.ipc = ipc[1].trim().split(/\s+/).join(" ");
       if (/^[a-z][a-z-]*$/.test(run)) bind.action = run;
       return bind;
@@ -201,7 +203,7 @@ function readBinds(file, home, read, seen) {
 }
 
 function focusWorkspace(id, output) {
-  return msg("workspace-switch:" + id + "/" + output);
+  return msg(["workspace-switch", String(id), "--output", output]);
 }
 
 // Focuses the active window whose app id matches pattern, else the first;
@@ -251,7 +253,14 @@ function focusedMonitor(raw) {
 
 // Absolute x and y from the usable area's top-left corner.
 function moveFloatingWindow(id, x, y) {
-  return msg("window-move-to:top_left/" + x + "/" + y + "/" + id);
+  return msg([
+    "window-move-to",
+    "top_left",
+    String(x),
+    String(y),
+    "--window",
+    id,
+  ]);
 }
 
 function layoutQuery() {
