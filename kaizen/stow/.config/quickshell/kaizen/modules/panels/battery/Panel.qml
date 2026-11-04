@@ -170,7 +170,7 @@ Ui.Panel {
         spacing: 6
 
         Repeater {
-            model: root.service.profiles
+            model: root.service.profiles()
 
             delegate: ActionButton {
                 required property string modelData
