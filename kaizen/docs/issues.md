@@ -96,8 +96,8 @@ not planned, unreported.
   module; X11 apps' bell is silent. PipeWire is shared, so this applies under
   niri too.
 - Upstream: `c2fec6c0` "module-x11-bell: make the X11 I/O error handler
-  idempotent" on master, no issue.
-- Status: merged (unreleased); latest release 1.6.11, nixpkgs has 1.6.9.
+  idempotent" on master, backported to 1.6 as `dc117ab7`, no issue.
+- Status: released in 1.6.10; nixpkgs has 1.6.9.
 - Drop: the setting, once nixpkgs' PipeWire has a release containing it.
 
 ## Qt
