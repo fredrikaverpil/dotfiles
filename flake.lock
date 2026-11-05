@@ -53,11 +53,11 @@
     "dank-qml-common": {
       "flake": false,
       "locked": {
-        "lastModified": 1793720721,
-        "narHash": "sha256-A266EMSFs169/cqH+9elzMX/6N+ycuEBXFw4qXdTD7k=",
+        "lastModified": 1793886583,
+        "narHash": "sha256-siUIqXQUg4hTtlKnYI2w68E6idxNqF3RsFa/4j//pNc=",
         "owner": "duxlabs-dev",
         "repo": "dux-qml-common",
-        "rev": "be3e16ca62866a749b34cfefe1aaed81cfe21e94",
+        "rev": "8fb555a440693b71ac458d9dc1e9dc979750b48e",
         "type": "github"
       },
       "original": {
@@ -95,11 +95,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793760571,
-        "narHash": "sha256-mEfqshtbdK6z5I/Sf8SzaTHJE8k1ixbls/wRQqWFN8U=",
+        "lastModified": 1793888662,
+        "narHash": "sha256-2obTXgvICUlhQvQehuPVwfgnSob9rbcwpod8cglaL9A=",
         "owner": "duxlabs-dev",
         "repo": "dux-calendar",
-        "rev": "2b38c488ead7ce72b20959b97c942d286fe6e66f",
+        "rev": "17b98ca001fbaeb6a03d5b5f46d20f43548d6c77",
         "type": "github"
       },
       "original": {

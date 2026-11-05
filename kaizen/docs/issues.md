@@ -113,17 +113,6 @@ not planned, unreported.
 - Upstream: unreported.
 - Drop: the absolute paths are harmless; keep them unless they get in the way.
 
-## Plugins
-
-### dcal's stale vendorHash
-
-- Workaround: the `vendorHash` override in
-  [`nix/plugins/calendar/default.nix`](../nix/plugins/calendar/default.nix).
-- Upstream: PR
-  [dux-calendar#151](https://github.com/duxlabs-dev/dux-calendar/pull/151).
-- Status: open.
-- Drop: the override, once the PR lands and the flake input moves past it.
-
 ## Outside kaizen
 
 Workarounds in the repository's `nix/` that kaizen hosts carry.
