@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+set -e
+
+fd -H -E .git 'go\.mod$' -t f | xargs -I {} sh -c 'cd $(dirname {}) && go fix ./...'
