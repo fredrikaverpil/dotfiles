@@ -161,6 +161,9 @@ tree, so a static check passing here passes for every kaizen host;
 - Establish the target checkout, flake pin, and session first. Record baseline
   failures; after editing, check an isolated Linux copy before deploying into
   the live stowed tree. Repeat checks against the deployed shell.
+- On the host, where `~/.dotfiles` is the live tree, edit it in place and run
+  the checks after saving; there is no copy to check first. A disruptive
+  change goes to a worktree instead: Working from a worktree.
 - Mac tests are supplementary. Report unavailable session/hardware coverage as
   **pending**, never substitute another platform or claim full validation.
 - `shell-smoke` selects the running systemd service's PID and works over SSH.
@@ -354,8 +357,10 @@ comes from the default devshell. To use a change without a rebuild:
 ## Deployment safety
 
 On the host, `~/.dotfiles` is this checkout and the live stowed tree: edits
-deploy as they are saved. From another host it is reached over SSH as
-`fredrik@<host>`.
+deploy as they are saved. Quickshell's watcher can miss an edit that replaces
+the file's inode (`sed -i`, a Git checkout), so apply a QML edit with
+`kaizen reload`, which also prints its QML errors. From another host it is
+reached over SSH as `fredrik@<host>`.
 
 Before any live file replacement, inspect target changes and preserve
 unrelated edits. Quickshell's watcher can hot-reload during copying, with no
