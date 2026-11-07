@@ -73,7 +73,8 @@ Read `kaizen/README.md` (design, map) and `kaizen/docs/development.md` (local
 checks, platform boundaries, safe deployment) before changing Quickshell, niri,
 umbriel or their Nix modules. `kaizen/CLAUDE.md`, symlinked into each kaizen
 directory outside it, imports the README and every doc under `kaizen/docs/` when
-a file there is read.
+the Read tool opens a file there; `cat`, `grep` or `sed` in a shell loads
+nothing, so open one with Read before editing.
 
 ### Neovim Configuration
 
