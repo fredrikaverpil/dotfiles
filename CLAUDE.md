@@ -23,15 +23,14 @@ Stow commands:
   `git submodule update --init nix/hosts/<host>/<submodule>` first
 - **Format Nix files**: `nix fmt` (uses nixfmt-rfc-style)
 - **CI testing**: Follow `.github/workflows/test.yml` workflow
-- **Toolchain outside Neovim**: language toolchains (go, python3, node, ruby,
-  rustup, elixir, tree-sitter, ...) are NOT on the base PATH —
-  `stow/shared/.shell/bin/nvim` injects them into Neovim only. When running
-  outside Neovim (e.g. Claude Code under Remote Control) and needing them, use
-  the devshell: `nix develop ~/.dotfiles#dev -c <cmd>` (or enter with
-  `nix develop ~/.dotfiles#dev`). Mostly defined in the global mise config
-  (`stow/shared/.config/mise/config.toml`), whose shims come ahead of what
-  stays in `nix/shared/toolchain.nix` (Elixir, Nix tooling, rustup), in both
-  the devshell and Neovim. To pin or update one tool,
+- **Toolchain**: language toolchains and LSPs, formatters and linters come from
+  the global mise config (`stow/shared/.config/mise/config.toml`), on the
+  shell PATH via `mise activate` (`stow/shared/.shell/sourcing.sh`). What mise
+  cannot provide (Elixir, rustup, Nix tooling, yamllint) is in
+  `nix/shared/toolchain.nix`, which is NOT on the shell PATH: the `nvim` and
+  `claude` wrappers (`stow/shared/.shell/bin/`) inject it behind the mise
+  shims, as does the devshell: `nix develop ~/.dotfiles#dev -c <cmd>` (or
+  enter with `nix develop ~/.dotfiles#dev`). To pin or update one tool,
   `mise use -g <tool>@<version>`, then `mise install`.
 
 ## Repository Architecture
@@ -57,16 +56,15 @@ Stow commands:
   follow another nixpkgs — it is built/cached against its own pin
   (cache.numtide.com)
 - **No curl|bash installers in activation**: AI/agent CLIs must come from
-  llm-agents (patched, cached), not native installers. Prebuilt glibc
-  binaries cannot run on NixOS (stub-ld), and install-if-missing activation
-  scripts make rebuilds depend on third-party servers.
+  llm-agents (patched, cached), not native installers. Install-if-missing
+  activation scripts make rebuilds depend on third-party servers.
 
 ### CLI tools outside nixpkgs
 
-There is no mechanism for installing CLI tools with a language package manager
-(npm, uv, ...) — a tool must come from nixpkgs or the `llm-agents` flake.
-Wheels and prebuilt npm binaries are glibc-linked and fail to load on NixOS
-(`libstdc++.so.6: cannot open shared object file`). For a one-off run, use
+Development tools go in the global mise config, whose `npm:`, `pypi:`, `go:`
+and `github:` backends cover tools outside its registry; on NixOS, nix-ld
+(`nix/shared/system/linux.nix`) lets their prebuilt glibc binaries run. Other
+CLI tools come from nixpkgs or the `llm-agents` flake. For a one-off run, use
 `npx <pkg>` or `uvx <pkg>` from a shell instead of installing.
 
 ### niri or umbriel + Quickshell desktop (ThinkPads)
