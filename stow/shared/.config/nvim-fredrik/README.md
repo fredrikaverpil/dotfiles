@@ -190,9 +190,8 @@ file. To add a language, edit the files for the tools it needs (all are plain
 literal tables, so you see the whole picture for a tool in one place):
 
 - **LSP**: add the server name to the `servers` list in `plugin/lsp.lua`.
-- **Tools**: add the LSP, formatter or linter to the global mise config
-  (`stow/shared/.config/mise/config.toml`), then run `mise install`. A tool
-  mise cannot provide goes in `nix/shared/toolchain.nix` instead.
+- **Tools**: add the LSP, formatter or linter to `nix/shared/toolchain.nix`,
+  then rebuild.
 - **Formatting**: add `formatters_by_ft` (and any per-formatter config) in
   `plugin/conform.lua`.
 - **Linting**: add `linters_by_ft` (and any per-linter config) in

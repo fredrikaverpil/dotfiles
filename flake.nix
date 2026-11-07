@@ -133,7 +133,7 @@
             {
               dev = channels.unstable.mkShell {
                 packages = import ./nix/shared/toolchain.nix channels;
-                # mise's toolchain comes ahead of Nix's, as in Neovim.
+                # A project's mise.toml overrides come ahead, as in Neovim.
                 shellHook = ''
                   export PATH="$HOME/.local/share/mise/shims:$PATH"
                 '';

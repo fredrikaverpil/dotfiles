@@ -1,7 +1,8 @@
 # kaizen issues
 
-This is an overview of all upstream bugs kaizen either tracks or works around
-via e.g. overrides or patches.
+This is an overview of all upstream bugs kaizen or the shared toolchain
+([`nix/shared/toolchain.nix`](../../nix/shared/toolchain.nix)) either tracks
+or works around via e.g. overrides or patches.
 
 > [!NOTE]
 > 

@@ -238,7 +238,8 @@ nvim --server "$NVIM" --remote-expr 'luaeval("vim.json.encode(vim.diagnostic.get
 
 - **First launch is slow** — plugin cloning is network-bound and serial.
 - **No LSP servers; treesitter parsers are best-effort.** LSPs, formatters and
-  linters come from mise, which this skill does not install. Parsers pull from
+  linters come from the Nix toolchain (`nix/shared/toolchain.nix`), which this
+  skill does not install. Parsers pull from
   GitHub release assets and compile locally; if a change under test doesn't
   depend on them, you don't need them. Failures are logged in
   `/tmp/nvim-headless.log` and don't prevent the rest of the config loading.
