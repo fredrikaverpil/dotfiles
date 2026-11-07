@@ -68,11 +68,10 @@ When I provide github.com links (PRs, issues, comments, actions, etc.), use the
 `gh` CLI to fetch the content instead of WebFetch. WebFetch often fails on
 GitHub pages.
 
-## Jira
+## Linear
 
-If you come by a Jira ticket number or Jira URL, use `jira`
-([jira-cli](https://github.com/ankitpokhrel/jira-cli)) to acquire more details
-for increased understanding of the problem at hand.
+If you come by a Linear issue, use the Linear MCP to acquire more details for
+increased understanding of the problem at hand.
 
 ## LSP
 
