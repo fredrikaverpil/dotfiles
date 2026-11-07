@@ -68,6 +68,9 @@ When I provide github.com links (PRs, issues, comments, actions, etc.), use the
 `gh` CLI to fetch the content instead of WebFetch. WebFetch often fails on
 GitHub pages.
 
+Clone down all public repos into `~/code/public/github.com/<user|org>/<repo>`
+and all private repos into `~/code/private/github.com/<user|org>/<repo>`.
+
 ## Linear
 
 If you come by a Linear issue, use the Linear MCP to acquire more details for
