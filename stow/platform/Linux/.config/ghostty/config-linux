@@ -12,6 +12,10 @@ font-variation-italic =
 font-variation-italic = wght=400
 
 
+# `main` pins the quick terminal to the primary output; `mouse` leaves the
+# output to the compositor, which picks the focused one.
+quick-terminal-screen = mouse
+
 # Default toggles fullscreen; let ctrl+enter reach the app.
 keybind = ctrl+enter=unbind
 
