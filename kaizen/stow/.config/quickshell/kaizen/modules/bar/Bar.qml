@@ -336,7 +336,7 @@ Scope {
                 // Wood even when urgent: updates can wait for a convenient reboot.
                 foreground: bar.shell.palette.wood
                 label: "󰚰"
-                onActivated: bar.shell.firmware.open()
+                onActivated: bar.shell.firmware.toggle()
                 onSecondary: bar.shell.menu.popup("settings.firmware", modelData.name, firmwareButton)
             }
 
@@ -350,7 +350,7 @@ Scope {
                 visible: bar.shell.doctorService.findings.length > 0 || bar.shell.doctorService.failure !== ""
                 foreground: bar.shell.doctorService.counts.errors > 0 || bar.shell.doctorService.failure !== "" ? bar.shell.palette.rose : bar.shell.palette.wood
                 label: "󰃤"
-                onActivated: bar.shell.doctor.open()
+                onActivated: bar.shell.doctor.toggle()
                 onSecondary: bar.shell.menu.popup("settings.doctor", modelData.name, doctorButton)
             }
 
