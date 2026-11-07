@@ -74,5 +74,6 @@
     (withGnomeLibsecret ente-desktop)
     (withGnomeLibsecret obsidian)
     lutris # Battle.net and other non-Steam launchers.
+    lightcraft # Lags upstream; see kaizen/docs/issues.md.
   ];
 }

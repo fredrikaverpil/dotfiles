@@ -148,6 +148,54 @@ Workarounds in the repository's `nix/` that kaizen hosts carry.
 - Status: open.
 - Drop: the rename, once a release names its entry without a space.
 
+### LightCraft lags upstream in nixpkgs
+
+- Symptom: renoir's `lightcraft`, in
+  [`nix/hosts/renoir/configuration.nix`](../../nix/hosts/renoir/configuration.nix),
+  is nixpkgs' 0.14.0 (2026-10-25); upstream is at v0.19.0. It is there to try
+  out the Fujifilm X100VI's RAFs (X-Trans CMOS 5 HR, 40 MP, the X-T5's
+  sensor), so Fujifilm fixes reach renoir only through nixpkgs.
+- Workaround: none. Upstream's flake fails every offline build since 0.15.0: its
+  `Cargo.toml` has four unused `[patch.crates-io]` entries, which are not
+  vendored
+  ([storytold/lightcraft#3404](https://github.com/storytold/lightcraft/issues/3404)).
+  Building it would take a `postPatch`, dropping `--locked` and a local compile
+  on every bump.
+- Upstream (nixpkgs):
+  [NixOS/nixpkgs#580713](https://github.com/NixOS/nixpkgs/pull/580713) bumps
+  it to 0.16.0, deleting those entries in a `postPatch`.
+- Wanted for the X100VI:
+  - Released in v0.17.0, not in nixpkgs:
+    [#3402](https://github.com/storytold/lightcraft/pull/3402), the camera look
+    fitted on the vignetting-corrected sensor (RAFs render up to 0.3 EV too
+    bright in midtones, 0.6 EV in shadows), and
+    [#3321](https://github.com/storytold/lightcraft/pull/3321), compressed RAFs
+    decode 13–17 % faster.
+  - Open: [#2926](https://github.com/storytold/lightcraft/pull/2926), a new
+    X-Trans demosaic with less false colour; the current one shifts colour in
+    fine texture and fringes clipped highlights magenta
+    ([#3451](https://github.com/storytold/lightcraft/issues/3451)).
+  - Open: film simulations as looks.
+    [#3339](https://github.com/storytold/lightcraft/pull/3339) fits the X-T5's
+    eleven (the same sensor), on
+    [#2445](https://github.com/storytold/lightcraft/pull/2445)'s X-T4 looks;
+    [#3330](https://github.com/storytold/lightcraft/pull/3330) reads the film
+    simulation from the maker note. Requested in
+    [#380](https://github.com/storytold/lightcraft/issues/380).
+  - Open: AI denoise for X-Trans, which it refuses
+    ([#1760](https://github.com/storytold/lightcraft/issues/1760)):
+    [#1828](https://github.com/storytold/lightcraft/pull/1828) or
+    [#2355](https://github.com/storytold/lightcraft/pull/2355).
+  - Open: Kelvin white balance; the X100VI's is a relative slider, having no
+    colour matrices. [#2527](https://github.com/storytold/lightcraft/pull/2527)
+    reads it from the neutral multipliers a RAF stores
+    ([#730](https://github.com/storytold/lightcraft/issues/730)).
+- Status: open; nixpkgs' release lacks every item above.
+- Drop: each item once nixpkgs carries a release containing it (check with
+  `nix eval --raw .#nixosConfigurations.renoir.pkgs.lightcraft.version` and
+  `gh api repos/storytold/lightcraft/compare/SHA...vX.Y.Z --jq .status`); the
+  entry once none is left, or when renoir drops `lightcraft`.
+
 ### Neovim override
 
 - Override: `neovim-unwrapped` at 0.12.6 in
