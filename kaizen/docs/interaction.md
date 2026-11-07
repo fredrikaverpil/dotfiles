@@ -111,12 +111,14 @@ something to hang from.
 - Bar buttons come in four kinds, told apart by what a click does:
   - ❄ and the workspaces: left-click opens the launcher, right-click its top
     level as a context menu; a workspace takes focus.
-  - Panel buttons: left-click opens the panel, right-click the button's
-    Settings node as a context menu. The date is one only when a plugin takes
-    it over, and opens the plugin's node; otherwise it is a plain label.
+  - Panel buttons: left-click opens the panel, or closes it when open;
+    right-click opens the button's Settings node as a context menu. The date
+    is one only when a plugin takes it over, and opens the plugin's node;
+    otherwise it is a plain label.
   - Indicators, shown only off the default state: left-click acts on it
     (stops the recording or every mirror, re-enables idle locking, resets the
-    layout). The system alert is a plain label.
+    layout), or opens and closes its panel (doctor, firmware). The system
+    alert is a plain label.
   - Tray items: the app's own activation and menu.
 
 ### Panels
