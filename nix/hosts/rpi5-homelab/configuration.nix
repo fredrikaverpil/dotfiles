@@ -12,9 +12,6 @@ let
   # Toggle the Cloudflare Tunnel (remote Immich access) on/off.
   # Set to true to re-enable it; see README.md for the tunnel token setup.
   cloudflareTunnel = false;
-  # Toggle the Immich stack on/off. Its data under
-  # /mnt/homelab-data/services/immich is kept either way.
-  immich = false;
 in
 {
   imports = [
@@ -109,9 +106,9 @@ in
       9000 # Portainer - HTTP port (legacy/optional)
       9443 # Portainer - HTTPS port (primary)
       3001 # Uptime Kuma - Service monitoring dashboard
+      2283 # Immich - Photo management web interface
       8096 # Jellyfin - Media server web interface
-    ]
-    ++ lib.optional immich 2283; # Immich - Photo management web interface
+    ];
 
     allowedUDPPorts = [
     ];
@@ -226,8 +223,8 @@ in
   environment.etc = {
     "homelab/portainer/docker-compose.yml".source = ./docker-compose/portainer.yml;
     "homelab/uptime-kuma/docker-compose.yml".source = ./docker-compose/uptime-kuma.yml;
-    "homelab/immich/docker-compose.yml" = lib.mkIf immich { source = ./docker-compose/immich.yml; };
-    "homelab/immich/.env" = lib.mkIf immich { source = ./docker-compose/immich.env; };
+    "homelab/immich/docker-compose.yml".source = ./docker-compose/immich.yml;
+    "homelab/immich/.env".source = ./docker-compose/immich.env;
     "homelab/jellyfin/docker-compose.yml".source = ./docker-compose/jellyfin.yml;
     "homelab/jellyfin/.env".source = ./docker-compose/jellyfin.env;
   };
@@ -295,7 +292,7 @@ in
       wantedBy = [ "multi-user.target" ];
     };
 
-    homelab-immich = lib.mkIf immich {
+    homelab-immich = {
       description = "Homelab Immich Photo Management Stack";
       after = [ "docker.service" ];
       requires = [ "docker.service" ];
