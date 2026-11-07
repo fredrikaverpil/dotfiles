@@ -1,7 +1,0 @@
-{
-  "name": "mise-npm-install",
-  "private": true,
-  "dependencies": {
-    "dockerfile-language-server-nodejs": "0.15.0"
-  }
-}

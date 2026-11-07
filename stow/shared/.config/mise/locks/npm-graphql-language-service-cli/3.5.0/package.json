@@ -1,7 +1,0 @@
-{
-  "name": "mise-npm-install",
-  "private": true,
-  "dependencies": {
-    "graphql-language-service-cli": "3.5.0"
-  }
-}

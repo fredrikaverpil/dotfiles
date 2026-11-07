@@ -14,7 +14,8 @@ path_append() {
   export PATH
 }
 
-# mise's toolchain comes ahead of Nix's, as in the nvim wrapper
+# A project's mise.toml overrides come ahead of the toolchain, as in the nvim
+# wrapper
 path_append "$HOME/.local/share/mise/shims"
 
 DEPS_PATH_FILE="$HOME/.config/nvim-deps-path"

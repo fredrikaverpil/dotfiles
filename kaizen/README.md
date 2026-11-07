@@ -13,8 +13,8 @@ desktop that an agent can drive and verify from a terminal.
   and applications.
 - [`development.md`](docs/development.md): working on kaizen, validation and
   deployment.
-- [`issues.md`](docs/issues.md): upstream bugs kaizen works around, its
-  patches, and their status.
+- [`issues.md`](docs/issues.md): upstream bugs kaizen and the shared toolchain
+  work around, their patches, and their status.
 
 ## Intent
 

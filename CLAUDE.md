@@ -23,15 +23,15 @@ Stow commands:
   `git submodule update --init nix/hosts/<host>/<submodule>` first
 - **Format Nix files**: `nix fmt` (uses nixfmt-rfc-style)
 - **CI testing**: Follow `.github/workflows/test.yml` workflow
-- **Toolchain**: language toolchains and LSPs, formatters and linters come from
-  the global mise config (`stow/shared/.config/mise/config.toml`), on the
-  shell PATH via `mise activate` (`stow/shared/.shell/sourcing.sh`). What mise
-  cannot provide (Elixir, rustup, Nix tooling, yamllint) is in
-  `nix/shared/toolchain.nix`, which is NOT on the shell PATH: the `nvim` and
-  `claude` wrappers (`stow/shared/.shell/bin/`) inject it behind the mise
-  shims, as does the devshell: `nix develop ~/.dotfiles#dev -c <cmd>` (or
-  enter with `nix develop ~/.dotfiles#dev`). To pin or update one tool,
-  `mise use -g <tool>@<version>`, then `mise install`.
+- **Toolchain**: language toolchains and LSPs, formatters and linters come
+  from `nix/shared/toolchain.nix`, which is NOT on the shell PATH: the `nvim`
+  and `claude` wrappers (`stow/shared/.shell/bin/`) inject it, as does the
+  devshell: `nix develop ~/.dotfiles#dev -c <cmd>` (or enter with
+  `nix develop ~/.dotfiles#dev`). A project overrides a tool in its own
+  `mise.toml`, whose shims come ahead of the toolchain (and which
+  `mise activate` puts on the shell PATH); the global mise config
+  (`stow/shared/.config/mise/config.toml`) holds settings only. A tool broken
+  for every project is fixed in `toolchain.nix` (e.g. `overrideAttrs`).
 
 ## Repository Architecture
 
@@ -61,11 +61,11 @@ Stow commands:
 
 ### CLI tools outside nixpkgs
 
-Development tools go in the global mise config, whose `npm:`, `pypi:`, `go:`
-and `github:` backends cover tools outside its registry; on NixOS, nix-ld
-(`nix/shared/system/linux.nix`) lets their prebuilt glibc binaries run. Other
-CLI tools come from nixpkgs or the `llm-agents` flake. For a one-off run, use
-`npx <pkg>` or `uvx <pkg>` from a shell instead of installing.
+CLI tools come from nixpkgs or the `llm-agents` flake. A project needing a tool
+outside nixpkgs pins it in its `mise.toml`, whose `npm:`, `pypi:`, `go:` and
+`github:` backends cover tools outside mise's registry; on NixOS, nix-ld
+(`nix/shared/system/linux.nix`) lets their prebuilt glibc binaries run. For a
+one-off run, use `npx <pkg>` or `uvx <pkg>` from a shell instead of installing.
 
 ### niri or umbriel + Quickshell desktop (ThinkPads)
 
@@ -111,8 +111,8 @@ For each language, consult the corresponding file in
 `yaml.lua`) to get exact formatter/linter tools and configurations. Formatters
 are wired up in `stow/shared/.config/nvim-fredrik/plugin/conform.lua`.
 
-**Note**: If an LSP/formatter is not found, check `mise which <tool>`; what
-mise cannot provide comes from `nix/shared/toolchain.nix`.
+**Note**: If an LSP/formatter is not found, check that it is in
+`nix/shared/toolchain.nix`, and `mise which <tool>` for a project override.
 
 ## Gotchas
 
@@ -120,5 +120,6 @@ mise cannot provide comes from `nix/shared/toolchain.nix`.
   `nix/hosts/<host>/users/fredrik.nix`. For a release nixpkgs lacks, override
   `neovim-unwrapped` and rewrap it with `wrapNeovim`
 - **Upstream workarounds are tracked** in `kaizen/docs/issues.md`: a patch,
-  override or `TODO: drop once …` for kaizen or a kaizen host gets an entry
+  override or `TODO: drop once …` for kaizen, a kaizen host or the shared
+  toolchain (`nix/shared/toolchain.nix`) gets an entry
   there, with its upstream status, and loses it in the commit that drops it

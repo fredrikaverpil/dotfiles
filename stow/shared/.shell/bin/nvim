@@ -66,14 +66,13 @@ path_append() {
   export PATH
 }
 
-# mise's toolchain comes ahead of Nix's below; a shim for a tool mise does not
-# provide falls through to it
+# A project's mise.toml overrides come ahead of the toolchain below; a shim for
+# a tool the project does not pin falls through to it
 path_append "$HOME/.local/share/mise/shims"
 
-# Inject Neovim build dependencies (managed by Nix, not on regular PATH)
+# Inject the toolchain (nix/shared/toolchain.nix, not on regular PATH)
 NVIM_DEPS_PATH_FILE="$HOME/.config/nvim-deps-path"
 if [ -f "$NVIM_DEPS_PATH_FILE" ]; then
-  # Append so per-project tooling (e.g. mise) takes precedence over these fallbacks
   path_append "$(cat "$NVIM_DEPS_PATH_FILE")"
 fi
 
