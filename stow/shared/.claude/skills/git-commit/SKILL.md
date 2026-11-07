@@ -44,6 +44,11 @@ Write commit messages following the Conventional Commits specification.
 4. Separate subject from body with a blank line
 5. Use the body to explain intent, nuances, gotchas, or background behind the
    change — not a paraphrase of the diff
+6. If the repo is private, ask me for the Linear issue number before committing.
+   If there is a Linear issue, include it as the last line in the commit body,
+   with a Linear-compatible
+   ["magic word"](https://linear.app/docs/github#magic-words) verb before it
+   (e.g., `fixes XY-123` or `r). If there isn't one, ask whether to create one.
 
 ## Breaking Changes
 
@@ -81,4 +86,3 @@ it:
    `-c user.name=...`/`-c user.email=...`.
 3. Let git resolve signing from config — commit without `-S`, `--gpg-sign` or
    `--no-gpg-sign`, and leave signing-related config as it is.
-
