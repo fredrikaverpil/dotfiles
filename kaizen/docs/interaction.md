@@ -134,6 +134,9 @@ something to hang from.
 
 - A tray item's left-click is the app's activation; its right-click opens the
   app's menu as a context menu. The launcher's Tray level lists the items.
+- When the items do not all fit beside the clock, one tray button replaces
+  them; either click opens the launcher's Tray level as a context menu from
+  it, where each item's menu cascades.
 - A tray menu's rows come from the app, so they carry no keys, and root search
   does not read them.
 

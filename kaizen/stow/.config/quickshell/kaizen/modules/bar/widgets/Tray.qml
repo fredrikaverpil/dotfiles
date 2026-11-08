@@ -14,13 +14,12 @@ Row {
     property real maxWidth: Infinity
 
     readonly property var items: TrayModel.sortItems(SystemTray.items.values)
-    readonly property int shown: TrayModel.visibleCount(items.length, maxWidth, 28 * tray.shell.textScale, tray.spacing)
-    readonly property var hidden: items.slice(shown)
+    // One tray button replaces the items when they do not all fit.
+    readonly property bool collapsed: !TrayModel.fits(items.length, maxWidth, 28 * tray.shell.textScale, tray.spacing)
 
-    // A hidden item's menu hangs from the overflow button.
+    // Collapsed, every item's menu hangs from the tray button.
     function buttonFor(item) {
-        const index = items.indexOf(item);
-        return index < shown ? buttons.itemAt(index) : overflow;
+        return collapsed ? trayButton : buttons.itemAt(items.indexOf(item));
     }
 
     Component.onCompleted: panel.registerTray(tray)
@@ -30,7 +29,7 @@ Row {
 
     Repeater {
         id: buttons
-        model: tray.items.slice(0, tray.shown)
+        model: tray.collapsed ? [] : tray.items
 
         Ui.BarButton {
             id: item
@@ -52,12 +51,12 @@ Row {
     }
 
     Ui.BarButton {
-        id: overflow
+        id: trayButton
         shell: tray.shell
-        visible: tray.hidden.length > 0
-        label: "+" + tray.hidden.length
-        foreground: tray.hidden.some(item => item.status === Status.NeedsAttention) ? tray.shell.palette.sel : tray.shell.palette.fg
-        onActivated: tray.shell.menu.popup("tray", tray.output, overflow, row => tray.hidden.includes(row.trayItem))
-        onSecondary: tray.shell.menu.popup("tray", tray.output, overflow, row => tray.hidden.includes(row.trayItem))
+        visible: tray.collapsed
+        label: "󰘔"
+        foreground: tray.items.some(item => item.status === Status.NeedsAttention) ? tray.shell.palette.sel : tray.shell.palette.fg
+        onActivated: tray.shell.menu.popup("tray", tray.output, trayButton)
+        onSecondary: tray.shell.menu.popup("tray", tray.output, trayButton)
     }
 }

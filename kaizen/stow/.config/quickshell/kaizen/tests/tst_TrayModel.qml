@@ -67,49 +67,43 @@ TestCase {
         compare(items.map(i => i.id), ["signal", "dropbox", "nm-applet"]);
     }
 
-    function test_visible_count_data() {
+    function test_fits_data() {
         return [
             {
                 tag: "all fit exactly",
                 count: 4,
                 maxWidth: 236,
-                want: 4
+                want: true
             },
             {
-                tag: "one short keeps an overflow slot",
+                tag: "one short",
                 count: 4,
                 maxWidth: 235,
-                want: 2
+                want: false
             },
             {
                 tag: "unbounded",
                 count: 4,
                 maxWidth: Infinity,
-                want: 4
-            },
-            {
-                tag: "room for overflow only",
-                count: 4,
-                maxWidth: 56,
-                want: 0
+                want: true
             },
             {
                 tag: "negative",
                 count: 4,
                 maxWidth: -50,
-                want: 0
+                want: false
             },
             {
                 tag: "empty",
                 count: 0,
-                maxWidth: 0,
-                want: 0
+                maxWidth: -50,
+                want: true
             }
         ];
     }
 
-    function test_visible_count(data) {
-        verify(Tray.visibleCount(data.count, data.maxWidth, 56, 4) === data.want);
+    function test_fits(data) {
+        verify(Tray.fits(data.count, data.maxWidth, 56, 4) === data.want);
     }
 
     function test_theme_icon_data() {

@@ -7,11 +7,9 @@ function sortItems(items) {
   return [...items].sort((a, b) => String(a.id).localeCompare(String(b.id)));
 }
 
-// Buttons that fit in maxWidth, keeping one slot for the overflow button when
-// not all do.
-function visibleCount(count, maxWidth, slot, spacing) {
-  if (count * (slot + spacing) - spacing <= maxWidth) return count;
-  return Math.max(0, Math.floor((maxWidth + spacing) / (slot + spacing)) - 1);
+// Whether count buttons fit in maxWidth.
+function fits(count, maxWidth, slot, spacing) {
+  return count === 0 || count * (slot + spacing) - spacing <= maxWidth;
 }
 
 function themeIconName(url) {
