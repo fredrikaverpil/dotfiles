@@ -1,8 +1,7 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with
-code in this repository. The README covers the layers, rebuild, update and
-Stow commands:
+This file provides guidance to coding agents when working with code in this
+repository. The README covers the layers, rebuild, update and Stow commands:
 
 @README.md
 
@@ -71,7 +70,7 @@ one-off run, use `npx <pkg>` or `uvx <pkg>` from a shell instead of installing.
 
 Read `kaizen/README.md` (design, map) and `kaizen/docs/development.md` (local
 checks, platform boundaries, safe deployment) before changing Quickshell, niri,
-umbriel or their Nix modules. `kaizen/CLAUDE.md`, symlinked into each kaizen
+umbriel or their Nix modules. `kaizen/AGENTS.md`, symlinked into each kaizen
 directory outside it, imports the README and every doc under `kaizen/docs/` when
 the Read tool opens a file there; `cat`, `grep` or `sed` in a shell loads
 nothing, so open one with Read before editing.
