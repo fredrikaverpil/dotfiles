@@ -69,6 +69,15 @@ in
         "video/x-matroska"
         "video/quicktime"
         "video/x-msvideo"
+        "video/mpeg"
+        "video/ogg"
+        "video/3gpp"
+        "video/3gpp2"
+        "video/x-flv"
+        "video/x-ms-wmv"
+        "video/x-ms-asf"
+        "video/x-ogm+ogg"
+        "video/x-theora+ogg"
       ] (_: "mpv.desktop")
       # Same types zen-browser's home-manager setAsDefaultBrowser claims. Firefox
       # and Chromium also claim html/xhtml/http/https; without a default either may win.
