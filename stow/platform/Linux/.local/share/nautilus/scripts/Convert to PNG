@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+set -e
+
+# Nautilus script: writes a PNG next to each selected image, never overwriting.
+for f in "$@"; do
+  out="${f%.*}.png"
+  if [[ -e $out ]]; then
+    notify-send "Convert to PNG" "Skipped $f: $out exists"
+    continue
+  fi
+  magick "$f" -auto-orient "$out" || notify-send "Convert to PNG" "Failed: $f"
+done

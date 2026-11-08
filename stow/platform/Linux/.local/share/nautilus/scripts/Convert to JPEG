@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+set -e
+
+# Nautilus script: writes a JPEG next to each selected image, never overwriting.
+for f in "$@"; do
+  out="${f%.*}.jpg"
+  if [[ -e $out ]]; then
+    notify-send "Convert to JPEG" "Skipped $f: $out exists"
+    continue
+  fi
+  magick "$f" -auto-orient "$out" || notify-send "Convert to JPEG" "Failed: $f"
+done
