@@ -253,7 +253,7 @@ match.app_id = [
   "^com\\.belmoussaoui\\.Decoder$",
   "^org\\.gnome\\.NautilusPreviewer$",
   "^system-config-printer$",
-  "^(org\\.kde\\.dolphin|org\\.gnome\\.Nautilus)$",
+  "^org\\.gnome\\.Nautilus$",
 ]
 default_floating = true
 

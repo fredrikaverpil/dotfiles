@@ -272,7 +272,7 @@ ShellRoot {
         })
     readonly property var palette: dark ? darkPalette : lightPalette
 
-    // KConfig needs --notify before the dconf palette change or running Dolphin keeps cached view colours.
+    // KConfig needs --notify before the dconf palette change or running KDE apps keep cached view colours.
     function kdeglobalsWrite(on) {
         return Model.kdeglobalsWrite(on, darkPalette, lightPalette);
     }

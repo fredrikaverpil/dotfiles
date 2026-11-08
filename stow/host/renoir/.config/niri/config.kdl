@@ -366,7 +366,7 @@ window-rule {
 }
 
 window-rule {
-    match app-id=r#"^(org\.kde\.dolphin|org\.gnome\.Nautilus)$"#
+    match app-id=r#"^org\.gnome\.Nautilus$"#
     open-floating true
 }
 

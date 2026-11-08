@@ -47,19 +47,6 @@ in
     };
     programs.system-config-printer.enable = true;
 
-    # KService builds Dolphin's application list from an applications menu, which only Plasma ships.
-    # Plasma's own menu would pull in plasma-workspace; KService only needs every app listed.
-    environment.etc."xdg/menus/applications.menu".text = ''
-      <!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
-        "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
-      <Menu>
-        <Name>Applications</Name>
-        <DefaultAppDirs/>
-        <DefaultDirectoryDirs/>
-        <Include><All/></Include>
-      </Menu>
-    '';
-
     xdg.mime.defaultApplications =
       lib.genAttrs [
         "image/png"
@@ -73,6 +60,9 @@ in
         "image/avif"
         "image/jxl"
       ] (_: "org.gnome.Loupe.desktop")
+      // {
+        "inode/directory" = "org.gnome.Nautilus.desktop";
+      }
       // lib.genAttrs [
         "video/mp4"
         "video/webm"
@@ -146,13 +136,8 @@ in
 
     environment.systemPackages = with pkgs; [
       alsa-utils # For Claude Code's /voice.
-      kdePackages.dolphin
-      # Dolphin thumbnails for images and videos.
-      kdePackages.kio-extras
-      kdePackages.ffmpegthumbs
-      # Trialled side by side with Dolphin; yazi stays the inode/directory handler.
       # programs.niri only registers Nautilus's D-Bus services, not its launcher entry.
-      # Both provide org.freedesktop.FileManager1, so "Show in folder" may open either.
+      # Opens folders (inode/directory) and "Show in folder" (org.freedesktop.FileManager1).
       nautilus
       sushi # Quick preview (Space); decodes with gdk-pixbuf, so no HEIC.
       ffmpegthumbnailer # Video thumbnails.
