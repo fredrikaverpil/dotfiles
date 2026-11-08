@@ -68,7 +68,11 @@ in
         "image/webp"
         "image/bmp"
         "image/tiff"
-      ] (_: "imv.desktop")
+        "image/heif"
+        "image/heic"
+        "image/avif"
+        "image/jxl"
+      ] (_: "org.gnome.Loupe.desktop")
       // lib.genAttrs [
         "video/mp4"
         "video/webm"
@@ -150,8 +154,10 @@ in
       # programs.niri only registers Nautilus's D-Bus services, not its launcher entry.
       # Both provide org.freedesktop.FileManager1, so "Show in folder" may open either.
       nautilus
-      ffmpegthumbnailer # Nautilus video thumbnails.
-      sushi # Nautilus quick preview (Space).
+      sushi # Quick preview (Space); decodes with gdk-pixbuf, so no HEIC.
+      ffmpegthumbnailer # Video thumbnails.
+      glycin-thumbnailer # Image thumbnails, HEIC included; same decoders as Loupe.
+      loupe # Opens images on double-click; see xdg.mime.defaultApplications.
       (withGnomeLibsecret gitify)
       (makeAutostartItem {
         name = "gitify";
