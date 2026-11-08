@@ -79,6 +79,9 @@ in
         "video/x-ogm+ogg"
         "video/x-theora+ogg"
       ] (_: "mpv.desktop")
+      // {
+        "application/pdf" = "org.gnome.Evince.desktop";
+      }
       # Same types zen-browser's home-manager setAsDefaultBrowser claims. Firefox
       # and Chromium also claim html/xhtml/http/https; without a default either may win.
       // lib.genAttrs [
@@ -152,6 +155,7 @@ in
       ffmpegthumbnailer # Video thumbnails.
       glycin-thumbnailer # Image thumbnails, HEIC included; same decoders as Loupe.
       loupe # Opens images on double-click; see xdg.mime.defaultApplications.
+      evince # Opens PDFs, and thumbnails them.
       (withGnomeLibsecret gitify)
       (makeAutostartItem {
         name = "gitify";
