@@ -151,8 +151,8 @@ blur_optimized = false
 
 # Groups: tab groups within a column.
 "Mod+G" = { action = "column-toggle-tabbed", repeat = false } # Toggle window grouping
-"Mod+BracketLeft" = "window-consume-or-expel-left" # Move window to group on left
-"Mod+BracketRight" = "window-consume-or-expel-right" # Move window to group on right
+"Mod+Alt+Left" = "window-consume-or-expel-left" # Move window to group on left
+"Mod+Alt+Right" = "window-consume-or-expel-right" # Move window to group on right
 "Mod+Alt+Tab" = "column-focus-tab-next" # Next window in group
 "Mod+Alt+Shift+Tab" = "column-focus-tab-previous" # Previous window in group
 "Mod+Comma" = "window-consume-from-right" # Consume window into group
