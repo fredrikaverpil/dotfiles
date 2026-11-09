@@ -12,3 +12,7 @@ singleton Paths 1.0 Paths.qml
 Plugin 1.0 Plugin.qml
 Section 1.0 Section.qml
 PanelCard 1.0 PanelCard.qml
+PanelHeader 1.0 PanelHeader.qml
+PanelFooter 1.0 PanelFooter.qml
+PanelSlider 1.0 PanelSlider.qml
+RadioRow 1.0 RadioRow.qml

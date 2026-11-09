@@ -20,6 +20,7 @@ Ui.Panel {
 
     cardWidth: view.cardWidth
     cardHeight: view.cardHeight
+    cardPadding: view.cardPadding
 
     function label(node) {
         return node ? (node.nickname || node.description || node.name || "Unknown") : "";

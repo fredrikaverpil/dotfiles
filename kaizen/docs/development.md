@@ -348,7 +348,7 @@ qs -p "$PWD/kaizen/stow/.config/quickshell/kaizen/gallery.qml"
 - A panel shows there once its content is a `View.qml` beside its
   `Panel.qml`, reading a model the panel passes in, with a stand-in in
   `gallery/` and an entry in `gallery.qml`'s `panels`. A view declares its
-  card's size and `keyNavigation`; a view that declares `variants` and
+  card's size, padding and `keyNavigation`; a view that declares `variants` and
   `variant` gets a row of buttons to switch between design alternatives.
 - Above the card, a piece of the bar holds the panel's bar button, fed by the
   same stand-in. The button is a component in `modules/bar/widgets/` that

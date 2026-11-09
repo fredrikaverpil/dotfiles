@@ -7,6 +7,7 @@ Rectangle {
 
     required property var shell
     property bool keyNavigation: false
+    property int padding: 12
 
     default property alias content: column.data
     readonly property alias body: column
@@ -55,7 +56,7 @@ Rectangle {
     Column {
         id: column
         anchors.fill: parent
-        anchors.margins: 12
+        anchors.margins: card.padding
         spacing: 8
 
         focus: card.keyNavigation

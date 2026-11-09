@@ -24,7 +24,7 @@ starts from them and may deviate.
 | `leaf` | Success, done, connected, logged in |
 | `sky` | Running, in progress |
 | `water` | Accent and information: links, inline code, the active window border, a neutral tag |
-| `blossom` | Headings |
+| `blossom` | Headings in rendered Markdown |
 
 ## Shapes and text
 
@@ -54,12 +54,17 @@ reason, written next to the code.
 
 Every panel has the same shape, top to bottom:
 
-- A header: the title in `blossom` at 16 px on the left, and the panel's one
-  key value (a volume, a charge, a network) at 16 px on the right, coloured by
-  its status.
-- A subtitle in `off` at 12 px: what the value belongs to, or why there is
-  none.
-- Groups, each a section label and its content.
+- A header: the title in `fg` at 16 px on the left. A panel without a
+  slider or meter puts its one key value (a network) at 16 px on the right,
+  coloured by its status.
+- A subtitle in `off` at 14 px: what the value belongs to, or why there is
+  none. Left out when it would repeat what the panel shows below.
+- Optionally, a slider or meter for the key value, 16 under the header. It is
+  part of the header: no section label.
+- A slider's or meter's value sits right of its track at 14 px, in a column
+  as wide as `100%`, so stacked tracks end together. It takes the fill's
+  colour: `off` while muted, the status colour on a meter.
+- Groups, each a section label, ruled underneath, and its content.
 - A footer with the panel's own keys: a keycap, then what it does in `off`. It
   lists only the keys the panel adds to those every panel shares
   ([`interaction.md`](interaction.md) › Panels).
@@ -67,9 +72,12 @@ Every panel has the same shape, top to bottom:
 ### Space
 
 - Spacing comes from one scale: 4, 8, 16 and 24 px. Rows in a list are 4
-  apart, a label is 8 above its content, the card's padding is 16, and groups
-  are 24 apart. The subtitle sits 4 under the title.
-- Space separates groups. A panel draws no divider lines.
+  apart, a section label's rule is 4 under it and 8 above its content, the
+  card's padding is 16, and groups are 24 apart. The subtitle sits 4 under the title.
+- A group's content aligns with its section label. A row's or slider's `sel`
+  fill reaches 8 into the card's padding, past the text it holds.
+- Space separates groups. The only lines a panel draws are the rules under
+  its section labels: 1 px `dim`, as wide as the group. The header has none.
 
 ### Focus and state
 
@@ -82,10 +90,12 @@ Every panel has the same shape, top to bottom:
 
 ### Type
 
-- Three sizes: 16 px for the title and the key value, 14 px for body text,
-  12 px for secondary text and section labels. All scale with the text scale.
-- A section label is in sentence case, 12 px, in `off`. Every group has one,
-  even a panel's only group.
+- Three sizes: 16 px for the title and the key value; 14 px for the subtitle,
+  section labels and body text; 12 px for the footer. All scale with the text
+  scale.
+- A section label is in sentence case, 14 px, in `fg`, over its rule: no
+  smaller than the body it heads, and set apart from it by the rule, not by
+  colour. Every group has one, even a panel's only group.
 - Colour carries a role or a status, never decoration.
 
 ## Status

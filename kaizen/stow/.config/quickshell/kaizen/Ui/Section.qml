@@ -1,6 +1,6 @@
 import QtQuick
 
-// A panel section: a heading above its content.
+// A panel section: a heading, ruled underneath, above its content.
 Column {
     id: section
 
@@ -8,14 +8,23 @@ Column {
     required property string title
 
     width: parent ? parent.width : 0
-    spacing: 6
+    spacing: 8
 
-    Text {
-        color: section.shell.palette.off
-        font.family: Fonts.mono
-        font.pixelSize: 11
-        font.capitalization: Font.AllUppercase
-        font.letterSpacing: 1.5
-        text: section.title
+    Column {
+        width: parent.width
+        spacing: 4
+
+        Text {
+            color: section.shell.palette.fg
+            font.family: Fonts.mono
+            font.pixelSize: 14
+            text: section.title
+        }
+
+        Rectangle {
+            width: parent.width
+            height: 1
+            color: section.shell.palette.dim
+        }
     }
 }
