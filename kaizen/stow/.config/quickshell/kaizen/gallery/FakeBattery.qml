@@ -95,11 +95,16 @@ QtObject {
     readonly property int percentage: Model.percent(snapshot.fraction)
     readonly property string stateLabel: Model.status(snapshot, deviceStates, endThreshold)
     readonly property string icon: Model.icon(snapshot, deviceStates, endThreshold)
+    readonly property string chargeRole: onBattery ? levelRole(percentage) : "fg"
     readonly property string timeRemaining: Model.timeRemaining(snapshot, deviceStates, endThreshold)
     readonly property string rate: present ? Model.formatRate(snapshot.rate) : "--"
     readonly property string energy: present ? Model.formatEnergy(snapshot.fraction * 50.4, 50.4) : "--"
     readonly property string health: present ? Model.formatHealth(true, 94) : "--"
     readonly property string threshold: Model.formatThreshold(startThreshold, endThreshold)
+
+    function levelRole(level) {
+        return Model.levelRole(level, warnLevel, lowLevel);
+    }
 
     function refresh() {
     }

@@ -199,7 +199,7 @@ Ui.Panel {
             anchors.right: toggle.left
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
-            color: row.battery < 0 ? root.shell.palette.fg : row.battery <= root.shell.batteryService.lowLevel ? root.shell.palette.rose : row.battery <= root.shell.batteryService.warnLevel ? root.shell.palette.wood : root.shell.palette.fg
+            color: root.shell.palette[root.shell.batteryService.levelRole(row.battery)]
             font.family: Ui.Fonts.mono
             font.pixelSize: 14
             text: (row.device.name || row.device.address) + " · " + root.service.deviceStatus(row.device)

@@ -10,6 +10,6 @@ Ui.BarButton {
 
     visible: button.service.present
     implicitWidth: visible ? 64 * button.shell.textScale : 0
-    foreground: !button.service.onBattery ? button.shell.palette.fg : button.service.percentage <= button.service.lowLevel ? button.shell.palette.rose : button.service.percentage <= button.service.warnLevel ? button.shell.palette.wood : button.shell.palette.fg
+    foreground: button.shell.palette[button.service.chargeRole]
     label: button.service.icon + " " + button.service.percentage + "%"
 }

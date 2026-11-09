@@ -14,7 +14,7 @@ Column {
             "balanced": "󰊚 Balanced",
             "performance": "󰓅 Performance"
         })
-    readonly property color levelColor: !service.onBattery ? shell.palette.fg : service.percentage <= service.lowLevel ? shell.palette.rose : service.percentage <= service.warnLevel ? shell.palette.wood : shell.palette.fg
+    readonly property color levelColor: shell.palette[service.chargeRole]
 
     readonly property int cardWidth: 480
     readonly property int cardHeight: 262

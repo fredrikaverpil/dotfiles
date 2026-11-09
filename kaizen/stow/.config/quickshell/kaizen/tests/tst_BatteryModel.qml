@@ -219,6 +219,45 @@ TestCase {
         });
     }
 
+    function test_level_role_data() {
+        return [
+            {
+                tag: "unknown",
+                level: -1,
+                want: "fg"
+            },
+            {
+                tag: "empty",
+                level: 0,
+                want: "rose"
+            },
+            {
+                tag: "low",
+                level: 10,
+                want: "rose"
+            },
+            {
+                tag: "above low",
+                level: 11,
+                want: "wood"
+            },
+            {
+                tag: "warn",
+                level: 20,
+                want: "wood"
+            },
+            {
+                tag: "above warn",
+                level: 21,
+                want: "fg"
+            }
+        ];
+    }
+
+    function test_level_role(data) {
+        compare(Battery.levelRole(data.level, 20, 10), data.want);
+    }
+
     function test_low_battery_notifies_once_per_crossing() {
         var notified = "";
         var got = [];
