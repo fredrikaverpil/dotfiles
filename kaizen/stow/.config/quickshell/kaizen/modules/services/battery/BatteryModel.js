@@ -64,7 +64,7 @@ function timeRemaining(battery, states, end) {
 
 function formatRate(watts) {
   var value = Math.abs(Number(watts));
-  return value >= 0.05 ? value.toFixed(1) + " W" : "--";
+  return isFinite(value) ? value.toFixed(1) + " W" : "--";
 }
 
 function formatEnergy(now, full) {

@@ -183,7 +183,7 @@ TestCase {
             hours: "1h",
             zero: "",
             rate: "8.4 W",
-            idle: "--",
+            idle: "0.0 W",
             energy: "39.2 / 46.7 Wh",
             noEnergy: "--",
             health: "93%",
