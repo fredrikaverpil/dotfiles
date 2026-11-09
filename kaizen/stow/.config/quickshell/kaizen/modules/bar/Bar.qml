@@ -177,16 +177,13 @@ Scope {
                 color: bar.shell.palette.dim
             }
 
-            Ui.BarButton {
+            BarWidgets.BatteryButton {
                 id: batteryButton
                 shell: bar.shell
+                service: bar.shell.batteryService
                 anchors.right: notificationDivider.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: visible ? 6 : 0
-                visible: bar.shell.batteryService.present
-                implicitWidth: visible ? 64 * bar.shell.textScale : 0
-                foreground: !bar.shell.batteryService.onBattery ? bar.shell.palette.fg : bar.shell.batteryService.percentage <= bar.shell.batteryService.lowLevel ? bar.shell.palette.rose : bar.shell.batteryService.percentage <= bar.shell.batteryService.warnLevel ? bar.shell.palette.wood : bar.shell.palette.fg
-                label: bar.shell.batteryService.icon + " " + bar.shell.batteryService.percentage + "%"
                 onActivated: bar.shell.battery.toggle()
                 onSecondary: bar.shell.menu.popup("settings.power", modelData.name, batteryButton)
             }
@@ -228,14 +225,13 @@ Scope {
                 onSecondary: bar.shell.menu.popup("settings.display", modelData.name, displayButton)
             }
 
-            Ui.BarButton {
+            BarWidgets.AudioButton {
                 id: audioButton
                 shell: bar.shell
+                audio: bar.shell.audio
                 anchors.right: displayButton.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: 4
-                foreground: bar.shell.audio.muted ? bar.shell.palette.rose : bar.shell.palette.fg
-                label: bar.shell.audio.icon
                 onActivated: bar.shell.audio.toggle()
                 onSecondary: bar.shell.menu.popup("settings.audio", modelData.name, audioButton)
             }

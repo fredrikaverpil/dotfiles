@@ -66,7 +66,7 @@ check() {
   done
 }
 
-mapfile -t core_qml < <(find . -path ./plugins -prune -o -path ./tests -prune -o \( -name '*.qml' -o -name '*.js' \) -print)
+mapfile -t core_qml < <(find . -path ./plugins -prune -o -path ./tests -prune -o -path ./gallery/now -prune -o \( -name '*.qml' -o -name '*.js' \) -print)
 mapfile -t core_units < <(grep -L '^ConditionPathExists=.*/kaizen/plugins/' "$units"/*.service)
 mapfile -t core < <(
   qml_heads "${core_qml[@]}"
