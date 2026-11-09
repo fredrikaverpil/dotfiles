@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Layouts
 
 import "../../../Ui" as Ui
 
@@ -16,198 +15,113 @@ Column {
         })
     readonly property color levelColor: shell.palette[service.chargeRole]
 
-    readonly property int cardWidth: 480
-    readonly property int cardHeight: 262
+    readonly property int cardWidth: 400
+    readonly property int cardPadding: 16
+    readonly property int cardHeight: implicitHeight + 2 * cardPadding
     readonly property bool keyNavigation: true
 
     width: parent ? parent.width : 0
-    spacing: 8
+    spacing: 24
 
-    Row {
+    Column {
         width: parent.width
+        spacing: 16
 
-        Text {
-            width: parent.width - percentLabel.width
-            color: root.shell.palette.fg
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 18
-            text: root.service.present ? root.service.icon + " Battery" : "Battery"
+        Ui.PanelHeader {
+            shell: root.shell
+            title: "Battery"
+            subtitle: {
+                if (!root.service.present)
+                    return "No battery reported by UPower";
+                if (root.service.stateLabel === "Holding")
+                    return "Holding at " + root.service.threshold;
+                const time = root.service.timeRemaining;
+                if (time === "")
+                    return root.service.stateLabel;
+                return root.service.stateLabel + " · " + time + (root.service.onBattery ? " left" : " to full");
+            }
         }
 
-        Text {
-            id: percentLabel
+        Ui.PanelSlider {
             visible: root.service.present
-            color: root.levelColor
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 18
-            text: root.service.percentage + "%"
+            shell: root.shell
+            interactive: false
+            value: root.service.percentage / 100
+            valueText: root.service.percentage + "%"
+            icon: root.service.icon
+            iconColor: root.levelColor
+            fillColor: root.levelColor
         }
     }
 
-    Text {
-        width: parent.width
-        elide: Text.ElideRight
-        color: root.shell.palette.off
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 13
-        text: {
-            if (!root.service.present)
-                return "No battery reported by UPower";
-            if (root.service.stateLabel === "Holding")
-                return "Holding at " + root.service.threshold;
-            const time = root.service.timeRemaining;
-            if (time === "")
-                return root.service.stateLabel;
-            return root.service.stateLabel + " · " + time + (root.service.onBattery ? " left" : " to full");
-        }
-    }
-
-    Rectangle {
+    Ui.Section {
         visible: root.service.present
-        width: parent.width
-        height: 6
-        radius: 3
-        color: root.shell.palette.dim
+        shell: root.shell
+        title: "Details"
 
-        Rectangle {
-            width: parent.width * root.service.percentage / 100
-            height: parent.height
-            radius: parent.radius
-            color: root.levelColor
-        }
-    }
+        Column {
+            width: parent.width
+            spacing: 4
 
-    Rectangle {
-        width: parent.width
-        height: 1
-        color: root.shell.palette.dim
-    }
-
-    GridLayout {
-        visible: root.service.present
-        width: parent.width
-        columns: 4
-        columnSpacing: 14
-        rowSpacing: 5
-
-        MetricLabel {
-            text: root.service.onBattery ? "Draining" : "Charging"
-        }
-        MetricValue {
-            text: root.service.rate
-        }
-        MetricLabel {
-            text: "Energy"
-        }
-        MetricValue {
-            text: root.service.energy
-        }
-
-        MetricLabel {
-            text: "Health"
-        }
-        MetricValue {
-            text: root.service.health
-        }
-        MetricLabel {
-            text: "Cycles"
-        }
-        MetricValue {
-            text: root.service.cycles > 0 ? String(root.service.cycles) : "--"
-        }
-
-        MetricLabel {
-            text: "Charge limit"
-        }
-        MetricValue {
-            text: root.service.threshold
-        }
-        MetricLabel {
-            text: "Power"
-        }
-        MetricValue {
-            text: root.service.onBattery ? "Battery" : "AC"
-        }
-    }
-
-    Rectangle {
-        visible: root.service.present
-        width: parent.width
-        height: 1
-        color: root.shell.palette.dim
-    }
-
-    Text {
-        color: root.shell.palette.off
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 13
-        text: "Power profile · " + (root.service.onBattery ? "on battery" : "on AC")
-    }
-
-    Row {
-        id: profileRow
-        width: parent.width
-        spacing: 6
-
-        Repeater {
-            model: root.service.profiles()
-
-            delegate: ActionButton {
-                required property string modelData
-                width: (profileRow.width - profileRow.spacing * 2) / 3
-                label: root.profileLabels[modelData] || modelData
-                active: root.service.profile === modelData
-                onActivated: root.service.setProfile(modelData)
+            Detail {
+                label: root.service.onBattery ? "Draining" : "Charging"
+                value: root.service.rate
+            }
+            Detail {
+                label: "Energy"
+                value: root.service.energy
+            }
+            Detail {
+                label: "Health"
+                value: root.service.health
+            }
+            Detail {
+                label: "Cycles"
+                value: root.service.cycles > 0 ? String(root.service.cycles) : "--"
+            }
+            Detail {
+                label: "Charge limit"
+                value: root.service.threshold
             }
         }
     }
 
-    component MetricLabel: Text {
-        Layout.fillWidth: true
-        color: root.shell.palette.off
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 12
+    Ui.Section {
+        shell: root.shell
+        title: "Power profile " + (root.service.onBattery ? "on battery" : "on AC")
+
+        Ui.SegmentedControl {
+            shell: root.shell
+            options: root.service.profiles().map(name => ({
+                        value: name,
+                        label: root.profileLabels[name] || name
+                    }))
+            current: root.service.profile
+            onPicked: value => root.service.setProfile(value)
+        }
     }
 
-    component MetricValue: Text {
-        Layout.fillWidth: true
-        color: root.shell.palette.fg
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 12
-        horizontalAlignment: Text.AlignRight
-        elide: Text.ElideLeft
-    }
-
-    component ActionButton: Rectangle {
-        id: button
-
+    component Detail: Item {
         property string label: ""
-        property bool active: false
-        signal activated
+        property string value: ""
 
-        height: 28
-        radius: 4
-        color: active ? root.shell.palette.sel : "transparent"
-        border.color: button.activeFocus ? root.shell.palette.fg : root.shell.palette.dim
-        border.width: 1
-
-        activeFocusOnTab: button.visible
-        Keys.onReturnPressed: button.activated()
-        Keys.onEnterPressed: button.activated()
-        Keys.onSpacePressed: button.activated()
+        width: root.width
+        implicitHeight: labelText.implicitHeight
 
         Text {
-            anchors.centerIn: parent
-            color: root.shell.palette.fg
+            id: labelText
+            color: root.shell.palette.off
             font.family: Ui.Fonts.mono
-            font.pixelSize: 12
-            text: button.label
+            font.pixelSize: 14
+            text: parent.label
         }
 
-        MouseArea {
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: button.activated()
+        Text {
+            anchors.right: parent.right
+            color: root.shell.palette.fg
+            font.family: Ui.Fonts.mono
+            font.pixelSize: 14
+            text: parent.value
         }
     }
 }

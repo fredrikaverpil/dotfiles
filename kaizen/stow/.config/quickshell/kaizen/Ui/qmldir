@@ -16,3 +16,4 @@ PanelHeader 1.0 PanelHeader.qml
 PanelFooter 1.0 PanelFooter.qml
 PanelSlider 1.0 PanelSlider.qml
 RadioRow 1.0 RadioRow.qml
+SegmentedControl 1.0 SegmentedControl.qml

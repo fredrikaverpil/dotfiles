@@ -29,9 +29,10 @@ starts from them and may deviate.
 ## Shapes and text
 
 - Buttons and inputs are outlined, 1 px at radius 4: `fg` focused and `dim`
-  otherwise, filled with `sel` on focus or hover. List rows show focus with the
-  `sel` fill alone. A field that failed (lock, polkit) turns its outline `rose`.
-  The lock field and selections drawn over content take 2 px.
+  otherwise, filled with `sel` on focus or hover; in a panel the outline stays
+  `dim` (Panels). List rows show focus with the `sel` fill alone. A field that
+  failed (lock, polkit) turns its outline `rose`. The lock field and selections
+  drawn over content take 2 px.
 - Surfaces (panel, context menu, notification, OSD) have radius 8.
 - A key is a keycap per key (`Super` `Space`), set apart from the label it
   belongs to: `off` text a size smaller, outlined `dim` at radius 3 with a 2 px
@@ -81,12 +82,17 @@ Every panel has the same shape, top to bottom:
 
 ### Focus and state
 
-- The `sel` fill marks focus or hover, and nothing else. Rows and sliders
-  draw no outline; buttons keep theirs (Shapes and text).
+- The `sel` fill marks focus or hover, and nothing else. Rows, sliders and
+  buttons show focus with it alone: rows and sliders draw no outline, and a
+  button's stays `dim`.
 - What is current or chosen shows as a mark at the start of its row: `●` for
-  the chosen one of a set, `○` in `dim` for the others.
+  the chosen one of a set, `○` in `dim` for the others. A segmented control,
+  a few choices side by side in one outline, has no row start: its chosen
+  label is `fg`, the others `off`.
 - A slider is a 2 px track in `dim`, filled `fg` up to its value, with a
-  10 px knob; the fill and knob turn `off` while muted or off.
+  10 px knob; the fill and knob turn `off` while muted or off. A meter, which
+  only shows a value, is the same track without the knob, its icon and fill
+  in the value's status colour.
 
 ### Type
 

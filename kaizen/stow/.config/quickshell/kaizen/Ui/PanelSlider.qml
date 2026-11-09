@@ -9,10 +9,12 @@ Item {
     // Muted or off: the fill and knob turn `off`.
     property bool off: false
     property bool focused: false
+    // False for a meter: no knob, no pointer.
+    property bool interactive: true
     property string icon: ""
     property color iconColor: shell.palette.fg
 
-    readonly property color fillColor: off ? shell.palette.off : shell.palette.fg
+    property color fillColor: off ? shell.palette.off : shell.palette.fg
     // Drawn right of the track; empty draws no column.
     property string valueText: ""
     property color valueColor: fillColor
@@ -36,6 +38,7 @@ Item {
         anchors.fill: parent
         anchors.leftMargin: -8
         anchors.rightMargin: -8
+        enabled: slider.interactive
         acceptedButtons: Qt.NoButton
         hoverEnabled: true
         onEntered: slider.hovered()
@@ -57,7 +60,7 @@ Item {
         anchors.leftMargin: 8
         anchors.right: valueLabel.visible ? valueLabel.left : parent.right
         // Room for the knob's half at full, and the gap before the value.
-        anchors.rightMargin: 5 + (valueLabel.visible ? 8 : 0)
+        anchors.rightMargin: (slider.interactive ? 5 : 0) + (valueLabel.visible ? 8 : 0)
         anchors.verticalCenter: parent.verticalCenter
         height: 10
 
@@ -78,6 +81,7 @@ Item {
         }
 
         Rectangle {
+            visible: slider.interactive
             x: parent.width * Math.max(0, Math.min(1, slider.value)) - width / 2
             anchors.verticalCenter: parent.verticalCenter
             width: 10
@@ -90,6 +94,7 @@ Item {
             anchors.fill: parent
             anchors.topMargin: -11
             anchors.bottomMargin: -11
+            enabled: slider.interactive
             hoverEnabled: true
             onEntered: slider.hovered()
             onPressed: function (mouse) {
