@@ -1,80 +1,77 @@
 import QtQuick
-import QtQuick.Window
 
 import "../../../Ui" as Ui
 
-Flickable {
+Column {
     id: root
 
     required property var shell
     // The bluetooth service, or the gallery's stand-in.
     required property var service
 
-    // Pairing happens in bluetui; the panel closes for it.
-    signal pairRequested
+    // Pairing, forgetting and the rest happen in bluetui; the panel closes for it.
+    signal settingsRequested
 
-    readonly property int cardWidth: 600
-    readonly property int cardHeight: 420
+    readonly property int cardWidth: 400
+    readonly property int cardPadding: 16
+    readonly property int cardHeight: implicitHeight + 2 * cardPadding
+    // One width for a row's button, whatever its label, so the statuses line up.
+    readonly property int actionWidth: actionMetrics.advanceWidth + 24
     readonly property bool keyNavigation: true
 
-    readonly property var focusedItem: root.Window.activeFocusItem
-    // Map to content coordinates: Flickable coordinates are relative to its viewport.
-    onFocusedItemChanged: {
-        const item = focusedItem;
-        if (!item || !visible)
-            return;
-        const top = item.mapToItem(body, 0, 0).y;
-        if (!isFinite(top))
-            return;
-        if (top < contentY)
-            contentY = Math.max(0, top);
-        else if (top + item.height > contentY + height)
-            contentY = top + item.height - height;
+    width: parent ? parent.width : 0
+    spacing: 24
+
+    // The power button sits where a key value would: it is the panel's key state.
+    Item {
+        width: parent.width
+        implicitHeight: Math.max(header.implicitHeight, power.height)
+
+        Ui.PanelHeader {
+            id: header
+            width: parent.width - (power.visible ? power.width + 8 : 0)
+            shell: root.shell
+            title: "Bluetooth"
+            subtitle: {
+                const service = root.service;
+                if (!service.available)
+                    return "No Bluetooth adapter";
+                if (!service.powered)
+                    return "Off";
+                if (service.devices.length === 0)
+                    return "No paired devices";
+                return service.connectedCount > 0 ? service.connectedCount + " connected" : "None connected";
+            }
+        }
+
+        Ui.PanelButton {
+            id: power
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            // As wide for either label, so the button keeps its place.
+            width: powerMetrics.advanceWidth + 24
+            visible: root.service.available
+            shell: root.shell
+            label: root.service.powered ? "Turn off" : "Turn on"
+            onActivated: root.service.togglePower()
+        }
+
+        TextMetrics {
+            id: powerMetrics
+            font.family: Ui.Fonts.mono
+            font.pixelSize: 14
+            text: "Turn off"
+        }
     }
 
-    width: parent ? parent.width : 0
-    height: parent ? parent.height : 0
-    contentWidth: width
-    contentHeight: body.implicitHeight
-    clip: true
-    boundsBehavior: Flickable.StopAtBounds
+    Ui.Section {
+        visible: root.service.powered && root.service.devices.length > 0
+        shell: root.shell
+        title: "Paired devices"
 
-    Column {
-        id: body
-        width: root.width
-        spacing: 10
-
-        Row {
+        Column {
             width: parent.width
-            spacing: 8
-
-            Text {
-                width: parent.width - (powerToggle.visible ? powerToggle.width + parent.spacing : 0)
-                color: root.shell.palette.fg
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 18
-                text: "Bluetooth"
-            }
-
-            ActionButton {
-                id: powerToggle
-                visible: root.service.available
-                width: 92
-                label: "Enabled"
-                active: root.service.powered
-                onActivated: root.service.togglePower()
-            }
-        }
-
-        Rectangle {
-            width: parent.width
-            height: 1
-            color: root.shell.palette.dim
-        }
-
-        Ui.Section {
-            shell: root.shell
-            title: "Paired devices"
+            spacing: 4
 
             Repeater {
                 model: root.service.powered ? root.service.devices : []
@@ -84,119 +81,91 @@ Flickable {
                     device: modelData
                 }
             }
-
-            Text {
-                width: parent.width
-                visible: !root.service.powered || root.service.devices.length === 0
-                color: root.shell.palette.off
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 13
-                text: !root.service.available ? "No Bluetooth adapter" : !root.service.powered ? "Bluetooth is off" : "No paired devices"
-            }
-        }
-
-        Rectangle {
-            width: parent.width
-            height: 1
-            color: root.shell.palette.dim
-        }
-
-        ActionButton {
-            visible: root.service.available
-            width: 160
-            label: "Pair new device…"
-            onActivated: root.pairRequested()
         }
     }
 
-    component ActionButton: Rectangle {
-        id: button
-
-        property string label: ""
-        property bool active: false
-        property bool available: true
-        signal activated
-
-        height: 28
-        radius: 4
-        color: active ? root.shell.palette.sel : "transparent"
-        border.color: button.activeFocus ? root.shell.palette.fg : root.shell.palette.dim
-        border.width: 1
-        opacity: available ? 1 : 0.45
-
-        // Availability changes during connection changes; visibility alone controls focus membership.
-        activeFocusOnTab: button.visible
-        Keys.onReturnPressed: if (button.available)
-            button.activated()
-        Keys.onEnterPressed: if (button.available)
-            button.activated()
-        Keys.onSpacePressed: if (button.available)
-            button.activated()
-
-        Text {
-            anchors.centerIn: parent
-            color: root.shell.palette.fg
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 12
-            text: button.label
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            enabled: button.available
-            hoverEnabled: true
-            onClicked: button.activated()
-        }
+    Ui.PanelFooter {
+        shell: root.shell
+        buttonLabel: root.service.available ? "Bluetooth settings…" : ""
+        onButtonActivated: root.settingsRequested()
     }
 
-    component DeviceRow: Rectangle {
+    // A paired device: its button connects or disconnects it; the row takes no focus.
+    component DeviceRow: Item {
         id: row
 
         required property var device
-        readonly property string action: root.service.deviceAction(device)
+        // Empty while connecting or disconnecting.
+        readonly property bool busy: root.service.deviceAction(device) === ""
         // Percent, or negative when not shown.
         readonly property int battery: device.connected ? Math.round(root.service.battery(device) * 100) : -1
 
+        function toggle() {
+            if (!busy)
+                root.service.toggleConnection(device);
+        }
+
         width: root.width
-        height: 42
-        radius: 4
-        color: device.connected ? root.shell.palette.sel : "transparent"
-        border.color: root.shell.palette.dim
-        border.width: 1
+        implicitHeight: 28
 
         Text {
+            id: icon
             anchors.left: parent.left
-            anchors.leftMargin: 8
             anchors.verticalCenter: parent.verticalCenter
-            color: root.shell.palette.fg
+            // Glyphs differ in width; a column keeps the names aligned.
+            width: 16
+            horizontalAlignment: Text.AlignHCenter
+            color: row.device.connected ? root.shell.palette.leaf : root.shell.palette.off
             font.family: Ui.Fonts.mono
-            font.pixelSize: 16
+            font.pixelSize: 14
             text: root.service.deviceIcon(row.device)
         }
 
         Text {
-            anchors.left: parent.left
-            anchors.leftMargin: 34
-            anchors.right: toggle.left
+            anchors.left: icon.right
+            anchors.leftMargin: 8
+            anchors.right: statusText.left
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
-            color: root.shell.palette[root.shell.batteryService.levelRole(row.battery)]
+            elide: Text.ElideRight
+            color: root.shell.palette.fg
             font.family: Ui.Fonts.mono
             font.pixelSize: 14
-            text: (row.device.name || row.device.address) + " · " + root.service.deviceStatus(row.device)
-            elide: Text.ElideRight
+            text: row.device.name || row.device.address
         }
 
-        // Keeps its width and focus while connecting; the label empties instead.
-        ActionButton {
-            id: toggle
-            anchors.right: parent.right
-            anchors.rightMargin: 6
+        Text {
+            id: statusText
+            anchors.right: actionSlot.left
+            anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
-            width: 96
-            label: row.action || "…"
-            available: row.action !== ""
-            onActivated: root.service.toggleConnection(row.device)
+            color: row.busy ? root.shell.palette.sky : root.shell.palette[root.shell.batteryService.levelRole(row.battery)]
+            font.family: Ui.Fonts.mono
+            font.pixelSize: 14
+            text: row.busy ? root.service.deviceStatus(row.device) : row.battery >= 0 ? row.battery + "%" : ""
         }
+
+        // Kept while connecting, so the status does not shift.
+        Item {
+            id: actionSlot
+            anchors.right: parent.right
+            width: root.actionWidth
+            height: parent.height
+
+            Ui.PanelButton {
+                anchors.fill: parent
+                visible: !row.busy
+                shell: root.shell
+                label: root.service.deviceAction(row.device)
+                onActivated: row.toggle()
+            }
+        }
+    }
+
+    TextMetrics {
+        id: actionMetrics
+        font.family: Ui.Fonts.mono
+        font.pixelSize: 14
+        text: "Disconnect"
     }
 }

@@ -11,6 +11,7 @@ Ui.Panel {
 
     cardWidth: view.cardWidth
     cardHeight: view.cardHeight
+    cardPadding: view.cardPadding
     keyNavigation: view.keyNavigation
 
     IpcHandler {
@@ -34,7 +35,7 @@ Ui.Panel {
         id: view
         shell: root.shell
         service: root.service
-        onPairRequested: {
+        onSettingsRequested: {
             root.close();
             Quickshell.execDetached(["xdg-terminal-exec", "bluetui"]);
         }

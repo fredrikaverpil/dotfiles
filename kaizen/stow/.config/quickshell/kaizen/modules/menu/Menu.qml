@@ -306,9 +306,9 @@ Ui.Panel {
             label: "Devices",
             provider: "devices"
         },
-        "settings.bluetooth.pair": {
-            icon: "󰐕",
-            label: "Pair new device…",
+        "settings.bluetooth.settings": {
+            icon: "󰒓",
+            label: "Bluetooth settings…",
             enabled: menu.shell.bluetoothService.available,
             action: () => Quickshell.execDetached(["xdg-terminal-exec", "bluetui"])
         },

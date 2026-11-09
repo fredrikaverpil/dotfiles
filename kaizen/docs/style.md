@@ -57,7 +57,9 @@ Every panel has the same shape, top to bottom:
 
 - A header: the title in `fg` at 16 px on the left. A panel without a
   slider or meter puts its one key value (a network) at 16 px on the right,
-  coloured by its status.
+  coloured by its status. A panel whose subsystem turns off (bluetooth) puts
+  the button that turns it on or off there instead, and its subtitle says the
+  state.
 - A subtitle in `off` at 14 px: what the value belongs to, or why there is
   none. Left out when it would repeat what the panel shows below.
 - Optionally, a slider or meter for the key value, 16 under the header. It is
@@ -68,7 +70,9 @@ Every panel has the same shape, top to bottom:
 - Groups, each a section label, ruled underneath, and its content.
 - A footer with the panel's own keys: a keycap, then what it does in `off`. It
   lists only the keys the panel adds to those every panel shares
-  ([`interaction.md`](interaction.md) › Panels).
+  ([`interaction.md`](interaction.md) › Panels). A button acting on the
+  whole panel ("Pair new device…") sits at its right, where no scrolling
+  hides it; a group's own button stays in its group.
 
 ### Space
 
@@ -89,6 +93,13 @@ Every panel has the same shape, top to bottom:
   the chosen one of a set, `○` in `dim` for the others. A segmented control,
   a few choices side by side in one outline, has no row start: its chosen
   label is `fg`, the others `off`.
+- A device's state shows in its icon at the start of its row: `leaf` while
+  connected, `off` otherwise. What it reports, such as its battery, sits at
+  the row's right in its status colour; a change under way ("Connecting…")
+  sits there in `sky`.
+- A row whose actions are buttons (a device's Connect, a network's Join) takes
+  no focus, `sel` fill or click: its buttons, at its right and as wide as
+  their longest label, are the stops.
 - A slider is a 2 px track in `dim`, filled `fg` up to its value, with a
   10 px knob; the fill and knob turn `off` while muted or off. A meter, which
   only shows a value, is the same track without the knob, its icon and fill
