@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Window
 import Quickshell
 import Quickshell.Wayland
 
@@ -15,8 +14,8 @@ PanelWindow {
     property bool keyNavigation: false
     property bool focusPrimed: false
 
-    default property alias content: column.data
-    readonly property alias contentSpacing: column.spacing
+    default property alias content: card.content
+    readonly property alias contentSpacing: card.contentSpacing
 
     function open() {
         if (shell && shell.registerPanel)
@@ -34,21 +33,10 @@ PanelWindow {
         shown ? close() : open();
     }
 
-    function focusStep(forward) {
-        const current = column.Window.activeFocusItem;
-        if (!current) {
-            column.forceActiveFocus();
-            return;
-        }
-        const next = current.nextItemInFocusChain(forward);
-        if (next)
-            next.forceActiveFocus(Qt.TabFocusReason);
-    }
-
     onShownChanged: {
         focusPrimed = false;
         if (shown && keyNavigation)
-            column.forceActiveFocus();
+            card.focusContent();
     }
     Component.onCompleted: if (shell && shell.registerPanel)
         shell.registerPanel(panel)
@@ -93,45 +81,17 @@ PanelWindow {
             enabled: panel.shown
             onClicked: panel.close()
         },
-        Rectangle {
+        PanelCard {
             id: card
+            shell: panel.shell
+            keyNavigation: panel.keyNavigation
             anchors.centerIn: parent
             width: panel.cardWidth
             height: panel.cardHeight
             // Follows the text size, capped to stay clear of the bar and screen edges.
             // The floor is 1, or the text size when that is smaller.
             scale: Math.max(Math.min(1, panel.shell ? panel.shell.textScale : 1), Math.min(panel.shell ? panel.shell.textScale : 1, (panel.width - 32) / panel.cardWidth, (panel.height - 2 * panel.barHeight - 32) / panel.cardHeight))
-            radius: 8
-            color: panel.shell.palette.bg
-            border.color: panel.shell.palette.dim
-            border.width: 1
-
-            Keys.onPressed: function (event) {
-                if (!panel.keyNavigation)
-                    return;
-                if (event.key === Qt.Key_Escape)
-                    panel.close();
-                else if (event.key === Qt.Key_Down || event.key === Qt.Key_Right || event.text === "j" || event.text === "l")
-                    panel.focusStep(true);
-                else if (event.key === Qt.Key_Up || event.key === Qt.Key_Left || event.text === "k" || event.text === "h")
-                    panel.focusStep(false);
-                else
-                    return;
-                event.accepted = true;
-            }
-
-            MouseArea {
-                anchors.fill: parent
-            }
-
-            Column {
-                id: column
-                anchors.fill: parent
-                anchors.margins: 12
-                spacing: 8
-
-                focus: panel.keyNavigation
-            }
+            onCloseRequested: panel.close()
         }
     ]
 }
