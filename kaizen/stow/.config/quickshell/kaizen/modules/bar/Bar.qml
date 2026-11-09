@@ -202,14 +202,13 @@ Scope {
                 onSecondary: bar.shell.menu.popup("settings.network", modelData.name, networkButton)
             }
 
-            Ui.BarButton {
+            BarWidgets.BluetoothButton {
                 id: bluetoothButton
                 shell: bar.shell
+                service: bar.shell.bluetoothService
                 anchors.right: networkButton.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: 4
-                foreground: !bar.shell.bluetoothService.powered ? bar.shell.palette.rose : bar.shell.palette[bar.shell.batteryService.levelRole(bar.shell.bluetoothService.lowestBattery)]
-                label: bar.shell.bluetoothService.icon
                 onActivated: bar.shell.bluetooth.toggle()
                 onSecondary: bar.shell.menu.popup("settings.bluetooth", modelData.name, bluetoothButton)
             }

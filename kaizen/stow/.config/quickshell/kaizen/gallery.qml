@@ -8,6 +8,7 @@ import "modules/bar/widgets" as BarWidgets
 // Unused but for Quickshell, which watches only the files of imported directories.
 import "modules/panels/audio" as AudioPanel
 import "modules/panels/battery" as BatteryPanel
+import "modules/panels/bluetooth" as BluetoothPanel
 import "Ui/Palette.js" as Palette
 
 // Draws a panel's view in a window, under its bar button, fed by a stand-in in a chosen state.
@@ -35,6 +36,14 @@ ShellRoot {
                 button: batteryButton,
                 props: {
                     service: fakeBattery
+                }
+            },
+            "bluetooth": {
+                title: "Bluetooth",
+                fake: fakeBluetooth,
+                button: bluetoothButton,
+                props: {
+                    service: fakeBluetooth
                 }
             }
         })
@@ -153,6 +162,7 @@ ShellRoot {
 
         property alias dark: saved.dark
         property real textScale: 1
+        readonly property var batteryService: fakeBattery
         readonly property var palette: dark ? Palette.dark : Palette.light
     }
 
@@ -166,6 +176,12 @@ ShellRoot {
         id: fakeBattery
 
         property string scenario: "78% on battery"
+    }
+
+    Gallery.FakeBluetooth {
+        id: fakeBluetooth
+
+        property string scenario: "Connected"
     }
 
     // The bar's own buttons, bound to the stand-ins.
@@ -184,6 +200,15 @@ ShellRoot {
         BarWidgets.BatteryButton {
             shell: fakeShell
             service: fakeBattery
+        }
+    }
+
+    Component {
+        id: bluetoothButton
+
+        BarWidgets.BluetoothButton {
+            shell: fakeShell
+            service: fakeBluetooth
         }
     }
 
