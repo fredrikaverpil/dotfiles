@@ -7,8 +7,9 @@ How the shell looks. What kaizen is and where each part lives is in
 
 The palette is [zenbones](https://github.com/zenbones-theme/zenbones.nvim)' dark
 and light variants, defined once in
-[`shell.qml`](../stow/.config/quickshell/kaizen/shell.qml) and
-followed by the theme toggle. QML reads colours from `shell.palette`, never as
+[`Ui/Palette.js`](../stow/.config/quickshell/kaizen/Ui/Palette.js) and
+followed by the theme toggle in
+[`shell.qml`](../stow/.config/quickshell/kaizen/shell.qml). QML reads colours from `shell.palette`, never as
 hex literals. The roles below are the default: core follows them, a plugin
 starts from them and may deviate.
 
