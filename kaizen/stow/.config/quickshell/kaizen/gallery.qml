@@ -9,6 +9,7 @@ import "modules/bar/widgets" as BarWidgets
 import "modules/panels/audio" as AudioPanel
 import "modules/panels/battery" as BatteryPanel
 import "modules/panels/bluetooth" as BluetoothPanel
+import "modules/panels/display" as DisplayPanel
 import "Ui/Palette.js" as Palette
 
 // Draws a panel's view in a window, under its bar button, fed by a stand-in in a chosen state.
@@ -44,6 +45,17 @@ ShellRoot {
                 button: bluetoothButton,
                 props: {
                     service: fakeBluetooth
+                }
+            },
+            "display": {
+                title: "Display",
+                fake: fakeDisplay,
+                button: displayButton,
+                props: {
+                    brightness: fakeDisplay,
+                    nightlight: fakeDisplay,
+                    mirror: fakeDisplay,
+                    outputs: fakeDisplay
                 }
             }
         })
@@ -164,6 +176,14 @@ ShellRoot {
         property real textScale: 1
         readonly property var batteryService: fakeBattery
         readonly property var palette: dark ? Palette.dark : Palette.light
+
+        function setDark(on) {
+            dark = on;
+        }
+
+        function setTextScale(value) {
+            textScale = value;
+        }
     }
 
     Gallery.FakeAudio {
@@ -182,6 +202,12 @@ ShellRoot {
         id: fakeBluetooth
 
         property string scenario: "Connected"
+    }
+
+    Gallery.FakeDisplay {
+        id: fakeDisplay
+
+        property string scenario: "Laptop"
     }
 
     // The bar's own buttons, bound to the stand-ins.
@@ -209,6 +235,14 @@ ShellRoot {
         BarWidgets.BluetoothButton {
             shell: fakeShell
             service: fakeBluetooth
+        }
+    }
+
+    Component {
+        id: displayButton
+
+        BarWidgets.DisplayButton {
+            shell: fakeShell
         }
     }
 

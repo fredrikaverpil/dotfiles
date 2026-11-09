@@ -213,13 +213,12 @@ Scope {
                 onSecondary: bar.shell.menu.popup("settings.bluetooth", modelData.name, bluetoothButton)
             }
 
-            Ui.BarButton {
+            BarWidgets.DisplayButton {
                 id: displayButton
                 shell: bar.shell
                 anchors.right: bluetoothButton.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: 4
-                label: "󰍹"
                 onActivated: bar.shell.display.toggle()
                 onSecondary: bar.shell.menu.popup("settings.display", modelData.name, displayButton)
             }
