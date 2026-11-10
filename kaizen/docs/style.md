@@ -67,7 +67,9 @@ Every panel has the same shape, top to bottom:
 - A slider's or meter's value sits right of its track at 14 px, in a column
   as wide as `100%`, so stacked tracks end together. It takes the fill's
   colour: `off` while muted, the status colour on a meter.
-- Groups, each a section label, ruled underneath, and its content.
+- Groups, each a section label, ruled underneath, and its content. A group
+  with one value of its own that no control shows (nightlight's temperature)
+  puts it at the label's right in `off`.
 - A footer with the panel's own keys: a keycap, then what it does in `off`. It
   lists only the keys the panel adds to those every panel shares
   ([`interaction.md`](interaction.md) › Panels). A button acting on the
@@ -92,7 +94,9 @@ Every panel has the same shape, top to bottom:
 - What is current or chosen shows as a mark at the start of its row: `●` for
   the chosen one of a set, `○` in `dim` for the others. A segmented control,
   a few choices side by side in one outline, has no row start: its chosen
-  label is `fg`, the others `off`.
+  label is `fg`, the others `off`. An option that cannot be picked (a mirror
+  that would loop) is `dim`, since `off` already means unchosen there, and
+  focus skips it.
 - A device's state shows in its icon at the start of its row: `leaf` while
   connected, `off` otherwise. What it reports, such as its battery, sits at
   the row's right in its status colour; a change under way ("Connecting…")

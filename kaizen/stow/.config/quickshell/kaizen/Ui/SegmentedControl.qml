@@ -1,18 +1,19 @@
 import QtQuick
 
-// One choice of a few, side by side in one outline; the chosen label is `fg`, the others `off` (style.md › Panels).
+// One choice of a few, side by side in one outline; the chosen label is `fg`, the others `off`, unavailable ones `dim` (style.md › Panels).
 Rectangle {
     id: control
 
     required property var shell
-    // [{ value: "balanced", label: "󰊚 Balanced" }, ...]
+    // [{ value: "balanced", label: "󰊚 Balanced" }, ...]; `available: false` draws an option `dim`, skipped by focus.
     property var options: []
-    property string current: ""
+    property var current
+    property var matches: (value, current) => value === current
 
     // Segments share the spare width equally, so each label has the same space around it.
     readonly property real spare: (width - options.reduce((sum, option) => sum + metrics.advanceWidth(option.label), 0)) / Math.max(1, options.length)
 
-    signal picked(string value)
+    signal picked(var value)
 
     width: parent ? parent.width : 0
     implicitHeight: 28
@@ -37,26 +38,32 @@ Rectangle {
                 id: segment
 
                 required property var modelData
-                readonly property bool chosen: modelData.value === control.current
+                readonly property bool chosen: control.matches(modelData.value, control.current)
+                readonly property bool available: modelData.available !== false
+
+                function pick() {
+                    if (available)
+                        control.picked(modelData.value);
+                }
 
                 width: metrics.advanceWidth(modelData.label) + control.spare
                 height: control.height
 
-                activeFocusOnTab: control.visible
-                Keys.onReturnPressed: control.picked(modelData.value)
-                Keys.onEnterPressed: control.picked(modelData.value)
-                Keys.onSpacePressed: control.picked(modelData.value)
+                activeFocusOnTab: control.visible && segment.available
+                Keys.onReturnPressed: segment.pick()
+                Keys.onEnterPressed: segment.pick()
+                Keys.onSpacePressed: segment.pick()
 
                 Rectangle {
                     anchors.fill: parent
                     anchors.margins: 1
                     radius: 3
-                    color: segment.activeFocus || mouse.containsMouse ? control.shell.palette.sel : "transparent"
+                    color: segment.activeFocus || (segment.available && mouse.containsMouse) ? control.shell.palette.sel : "transparent"
                 }
 
                 Text {
                     anchors.centerIn: parent
-                    color: segment.chosen ? control.shell.palette.fg : control.shell.palette.off
+                    color: !segment.available ? control.shell.palette.dim : segment.chosen ? control.shell.palette.fg : control.shell.palette.off
                     font.family: Fonts.mono
                     font.pixelSize: 14
                     text: segment.modelData.label
@@ -66,7 +73,7 @@ Rectangle {
                     id: mouse
                     anchors.fill: parent
                     hoverEnabled: true
-                    onClicked: control.picked(segment.modelData.value)
+                    onClicked: segment.pick()
                 }
             }
         }

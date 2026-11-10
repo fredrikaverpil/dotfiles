@@ -18,41 +18,64 @@ Column {
     signal wallpaperRequested
 
     readonly property var textScales: [0.9, 1, 1.1, 1.25, 1.5, 2]
+    // A mirror row's control: a segment per output ("Own" and the others), each as wide as the widest
+    // label plus 16 a side, so every row's control is as wide and they align.
+    readonly property real mirrorWidth: outputs.names.length * (outputs.names.reduce((widest, name) => Math.max(widest, nameMetrics.advanceWidth(name)), nameMetrics.advanceWidth("Own")) + 32)
 
-    readonly property int cardWidth: 600
-    readonly property int cardHeight: 440 + layoutSection.height + spacing + (mirrorSection.visible ? mirrorSection.height + spacing : 0)
+    readonly property int cardWidth: 400
+    readonly property int cardPadding: 16
+    readonly property int cardHeight: implicitHeight + 2 * cardPadding
     readonly property bool keyNavigation: true
 
     width: parent ? parent.width : 0
-    spacing: 8
+    spacing: 24
 
-    Text {
-        width: parent.width
-        color: root.shell.palette.fg
+    FontMetrics {
+        id: nameMetrics
         font.family: Ui.Fonts.mono
-        font.pixelSize: 18
-        text: "Display"
+        font.pixelSize: 14
     }
 
-    Text {
-        width: parent.width
-        color: root.shell.palette.off
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 13
-        text: root.outputs.focused ? root.outputs.focused.name + " · " + root.outputs.focused.width + "×" + root.outputs.focused.height : "No active display"
+    Ui.PanelHeader {
+        shell: root.shell
+        title: "Display"
+        subtitle: root.outputs.focused ? root.outputs.focused.name + " · " + root.outputs.focused.width + "×" + root.outputs.focused.height : "No active display"
     }
 
-    Rectangle {
-        width: parent.width
-        height: 1
-        color: root.shell.palette.dim
+    Ui.Section {
+        visible: root.brightness.present
+        shell: root.shell
+        title: "Brightness"
+
+        Ui.PanelSlider {
+            id: brightnessSlider
+            shell: root.shell
+            value: root.brightness.percent / 100
+            valueText: root.brightness.percent + "%"
+            focused: activeFocus
+            icon: "󰃠"
+            onMoved: value => root.brightness.set(100 * value)
+
+            activeFocusOnTab: visible
+            // Left/right adjust here; up/down fall through to the panel's focus chain.
+            Keys.onPressed: function (event) {
+                if (event.key === Qt.Key_Right || event.text === "l")
+                    root.brightness.adjust(root.brightness.step);
+                else if (event.key === Qt.Key_Left || event.text === "h")
+                    root.brightness.adjust(-root.brightness.step);
+                else
+                    return;
+                event.accepted = true;
+            }
+        }
     }
 
     Ui.Section {
         shell: root.shell
         title: "Theme"
 
-        ChoiceRow {
+        Ui.SegmentedControl {
+            shell: root.shell
             options: [
                 {
                     label: "Light",
@@ -63,16 +86,24 @@ Column {
                     value: true
                 },
             ]
-            selected: root.shell.dark
-            onChosen: value => root.shell.setDark(value)
+            current: root.shell.dark
+            onPicked: value => root.shell.setDark(value)
+        }
+
+        Ui.PanelButton {
+            shell: root.shell
+            label: "Choose wallpaper…"
+            onActivated: root.wallpaperRequested()
         }
     }
 
     Ui.Section {
         shell: root.shell
-        title: root.nightlight.temperature === null ? "Nightlight" : "Nightlight · " + root.nightlight.temperature + "K"
+        title: "Nightlight"
+        value: root.nightlight.temperature === null ? "" : root.nightlight.temperature + "K"
 
-        ChoiceRow {
+        Ui.SegmentedControl {
+            shell: root.shell
             options: [
                 {
                     label: "Off",
@@ -87,236 +118,84 @@ Column {
                     value: "on"
                 },
             ]
-            selected: root.nightlight.mode
-            onChosen: value => root.nightlight.setMode(value)
+            current: root.nightlight.mode
+            onPicked: value => root.nightlight.setMode(value)
         }
     }
 
     Ui.Section {
         shell: root.shell
-        title: "Text size · " + Math.round(root.shell.textScale * 100) + "%"
+        title: "Text size"
 
-        ChoiceRow {
+        Ui.SegmentedControl {
+            shell: root.shell
             options: root.textScales.map(value => ({
                         label: Math.round(value * 100) + "%",
                         value: value
                     }))
-            selected: root.shell.textScale
-            matches: (value, selected) => Math.abs(Number(value) - Number(selected)) < 0.01
-            onChosen: value => root.shell.setTextScale(value)
+            current: root.shell.textScale
+            matches: (value, current) => Math.abs(value - current) < 0.01
+            onPicked: value => root.shell.setTextScale(value)
         }
     }
 
     Ui.Section {
         shell: root.shell
-        title: root.brightness.present ? "Brightness · " + root.brightness.percent + "%" : "Brightness · not applicable, no backlight device"
+        title: "Outputs"
 
-        Rectangle {
-            id: brightnessSlider
-
-            visible: root.brightness.present
+        // One row per output, picking what it shows; only with another output to mirror.
+        Column {
+            visible: root.outputs.names.length > 1
             width: parent.width
-            height: 30
-            radius: 4
-            color: "transparent"
-            border.color: activeFocus ? root.shell.palette.fg : root.shell.palette.dim
-            border.width: 1
+            spacing: 4
 
-            activeFocusOnTab: visible
-            // Left/right adjust here; up/down fall through to the panel's focus chain.
-            Keys.onPressed: function (event) {
-                if (event.key === Qt.Key_Right || event.text === "l")
-                    root.brightness.adjust(root.brightness.step);
-                else if (event.key === Qt.Key_Left || event.text === "h")
-                    root.brightness.adjust(-root.brightness.step);
-                else
-                    return;
-                event.accepted = true;
-            }
+            Repeater {
+                model: root.outputs.names.length > 1 ? root.outputs.names : []
 
-            Text {
-                id: brightnessIcon
-                anchors.left: parent.left
-                anchors.leftMargin: 10
-                anchors.verticalCenter: parent.verticalCenter
-                color: root.shell.palette.fg
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 16
-                text: "󰃠"
-            }
+                delegate: Item {
+                    id: mirrorRow
 
-            Rectangle {
-                anchors.left: brightnessIcon.right
-                anchors.leftMargin: 10
-                anchors.right: parent.right
-                anchors.rightMargin: 10
-                anchors.verticalCenter: parent.verticalCenter
-                height: 6
-                radius: 3
-                color: root.shell.palette.dim
+                    required property string modelData
+                    readonly property string target: modelData
 
-                Rectangle {
-                    width: parent.width * root.brightness.percent / 100
-                    height: parent.height
-                    radius: parent.radius
-                    color: root.shell.palette.fg
-                }
+                    width: root.width
+                    implicitHeight: mirrorChoice.implicitHeight
 
-                MouseArea {
-                    anchors.fill: parent
-                    anchors.margins: -12
-                    onPositionChanged: function (mouse) {
-                        if (pressed)
-                            root.brightness.set(100 * mouse.x / width);
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: root.shell.palette.fg
+                        font.family: Ui.Fonts.mono
+                        font.pixelSize: 14
+                        text: mirrorRow.target
                     }
-                    onPressed: function (mouse) {
-                        root.brightness.set(100 * mouse.x / width);
+
+                    Ui.SegmentedControl {
+                        id: mirrorChoice
+                        anchors.right: parent.right
+                        width: root.mirrorWidth
+                        shell: root.shell
+                        options: [
+                            {
+                                label: "Own",
+                                value: "",
+                                available: !root.mirror.busy
+                            }
+                        ].concat(root.outputs.names.filter(name => name !== mirrorRow.target).map(name => ({
+                                    label: name,
+                                    value: name,
+                                    available: !root.mirror.busy && (root.mirror.sourceOf(mirrorRow.target) === name || root.mirror.canMirror(name, mirrorRow.target))
+                                })))
+                        current: root.mirror.sourceOf(mirrorRow.target)
+                        onPicked: value => value ? root.mirror.start(value, mirrorRow.target) : root.mirror.stop(mirrorRow.target)
                     }
                 }
             }
         }
-    }
 
-    Ui.Section {
-        id: mirrorSection
-
-        visible: root.outputs.names.length > 1
-        shell: root.shell
-        title: "Mirror"
-
-        // One row per output, picking what it shows.
-        Repeater {
-            model: root.outputs.names
-
-            delegate: Row {
-                id: mirrorRow
-
-                required property string modelData
-                readonly property string target: modelData
-
-                width: root.width
-                spacing: 6
-
-                Text {
-                    width: 90
-                    anchors.verticalCenter: parent.verticalCenter
-                    color: root.shell.palette.fg
-                    font.family: Ui.Fonts.mono
-                    font.pixelSize: 13
-                    elide: Text.ElideRight
-                    text: mirrorRow.target
-                }
-
-                ChoiceRow {
-                    width: parent.width - 96
-                    available: !root.mirror.busy
-                    options: [
-                        {
-                            label: "Own",
-                            value: ""
-                        }
-                    ].concat(root.outputs.names.filter(name => name !== mirrorRow.target).map(name => ({
-                                label: name,
-                                value: name,
-                                available: root.mirror.sourceOf(mirrorRow.target) === name || root.mirror.canMirror(name, mirrorRow.target)
-                            })))
-                    selected: root.mirror.sourceOf(mirrorRow.target)
-                    onChosen: value => value ? root.mirror.start(value, mirrorRow.target) : root.mirror.stop(mirrorRow.target)
-                }
-            }
-        }
-    }
-
-    Ui.Section {
-        id: layoutSection
-
-        shell: root.shell
-        title: "Layout"
-
-        ChoiceButton {
-            width: parent.width
+        Ui.PanelButton {
+            shell: root.shell
             label: "Arrange outputs…"
             onActivated: root.arrangeRequested()
-        }
-    }
-
-    Ui.Section {
-        shell: root.shell
-        title: "Wallpaper · " + (root.shell.dark ? "dark" : "light")
-
-        ChoiceButton {
-            width: parent.width
-            label: "Choose wallpaper…"
-            onActivated: root.wallpaperRequested()
-        }
-    }
-
-    component ChoiceRow: Row {
-        id: choices
-
-        property var options: []
-        property var selected
-        property bool available: true
-        property var matches: (value, selected) => value === selected
-        signal chosen(var value)
-
-        width: parent.width
-        spacing: 6
-
-        Repeater {
-            id: optionRepeater
-            model: choices.options
-
-            delegate: ChoiceButton {
-                required property var modelData
-                required property int index
-
-                width: (choices.width - choices.spacing * (optionRepeater.count - 1)) / optionRepeater.count
-                label: modelData.label
-                active: choices.matches(modelData.value, choices.selected)
-                available: choices.available && modelData.available !== false
-                onActivated: choices.chosen(modelData.value)
-            }
-        }
-    }
-
-    component ChoiceButton: Rectangle {
-        id: button
-
-        property string label: ""
-        property bool active: false
-        property bool available: true
-        signal activated
-
-        height: 30
-        radius: 4
-        color: active ? root.shell.palette.sel : "transparent"
-        border.color: button.activeFocus ? root.shell.palette.fg : root.shell.palette.dim
-        border.width: 1
-        opacity: available ? 1 : 0.45
-
-        // Keep an unavailable visible button in the chain; removing focused controls strands focus.
-        activeFocusOnTab: true
-        Keys.onReturnPressed: if (button.available)
-            button.activated()
-        Keys.onEnterPressed: if (button.available)
-            button.activated()
-        Keys.onSpacePressed: if (button.available)
-            button.activated()
-
-        Text {
-            anchors.centerIn: parent
-            color: root.shell.palette.fg
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 14
-            text: button.label
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            enabled: button.available
-            hoverEnabled: true
-            onClicked: button.activated()
         }
     }
 }

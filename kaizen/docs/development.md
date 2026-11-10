@@ -120,7 +120,8 @@ upstream's latest, and niri marks each option with the version it arrived in
 - Use `keyNavigation` for ordinary focus chains; use a panel-managed cursor
   where it cannot represent a control, such as a slider.
 - `Ui/Panel.qml` has a top-bar cutout so bar buttons can switch panels. Preserve
-  focus-chain membership for visible but unavailable controls.
+  focus-chain membership for visible but unavailable controls, except a
+  segmented control's options, which focus skips (`style.md` › Panels).
 - Tray submenus require one live opener per level. `QsMenuEntry.display()` needs
   a platform menu this shell does not have.
 - Read the reference shell's source before changing a feature ported from it
