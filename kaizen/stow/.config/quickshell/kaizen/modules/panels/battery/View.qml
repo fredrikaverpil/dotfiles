@@ -59,30 +59,30 @@ Column {
         shell: root.shell
         title: "Details"
 
-        Column {
-            width: parent.width
-            spacing: 4
-
-            Detail {
-                label: root.service.onBattery ? "Draining" : "Charging"
-                value: root.service.rate
-            }
-            Detail {
-                label: "Energy"
-                value: root.service.energy
-            }
-            Detail {
-                label: "Health"
-                value: root.service.health
-            }
-            Detail {
-                label: "Cycles"
-                value: root.service.cycles > 0 ? String(root.service.cycles) : "--"
-            }
-            Detail {
-                label: "Charge limit"
-                value: root.service.threshold
-            }
+        Ui.InfoTable {
+            shell: root.shell
+            entries: [
+                {
+                    label: root.service.onBattery ? "Draining" : "Charging",
+                    value: root.service.rate
+                },
+                {
+                    label: "Energy",
+                    value: root.service.energy
+                },
+                {
+                    label: "Health",
+                    value: root.service.health
+                },
+                {
+                    label: "Cycles",
+                    value: root.service.cycles > 0 ? String(root.service.cycles) : "--"
+                },
+                {
+                    label: "Charge limit",
+                    value: root.service.threshold
+                }
+            ]
         }
     }
 
@@ -98,30 +98,6 @@ Column {
                     }))
             current: root.service.profile
             onPicked: value => root.service.setProfile(value)
-        }
-    }
-
-    component Detail: Item {
-        property string label: ""
-        property string value: ""
-
-        width: root.width
-        implicitHeight: labelText.implicitHeight
-
-        Text {
-            id: labelText
-            color: root.shell.palette.off
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 14
-            text: parent.label
-        }
-
-        Text {
-            anchors.right: parent.right
-            color: root.shell.palette.fg
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 14
-            text: parent.value
         }
     }
 }
