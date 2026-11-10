@@ -20,6 +20,7 @@ Flickable {
     readonly property int cardWidth: 600
     readonly property int cardHeight: 560
     readonly property bool keyNavigation: true
+    readonly property var routeMetrics: Model.detailMetrics(service.detailsFor(service.connection.iface))
 
     readonly property var focusedItem: root.Window.activeFocusItem
     // Map to content coordinates: Flickable coordinates are relative to its viewport.
@@ -122,52 +123,52 @@ Flickable {
                     text: "Ping (Cloudflare)"
                 }
                 MetricValue {
-                    text: Model.formatPing(root.service.ping.latency, root.service.hasPing)
+                    text: root.routeMetrics.ping
                 }
                 MetricLabel {
                     text: "Packet loss"
                 }
                 MetricValue {
-                    text: Model.formatPacketLoss(root.service.ping.packetLoss, root.service.hasPing)
+                    text: root.routeMetrics.loss
                 }
 
                 MetricLabel {
                     text: "Ping (gateway)"
                 }
                 MetricValue {
-                    text: Model.formatPing(root.service.gatewayPing.latency, root.service.hasGatewayPing)
+                    text: root.routeMetrics.gatewayPing
                 }
                 MetricLabel {
                     text: "Packet loss"
                 }
                 MetricValue {
-                    text: Model.formatPacketLoss(root.service.gatewayPing.packetLoss, root.service.hasGatewayPing)
+                    text: root.routeMetrics.gatewayLoss
                 }
 
                 MetricLabel {
                     text: "Receiving"
                 }
                 MetricValue {
-                    text: root.service.hasTransfer ? Model.formatRate(root.service.transfer.receivingRate) : "--"
+                    text: root.routeMetrics.receiving
                 }
                 MetricLabel {
                     text: "Sending"
                 }
                 MetricValue {
-                    text: root.service.hasTransfer ? Model.formatRate(root.service.transfer.sendingRate) : "--"
+                    text: root.routeMetrics.sending
                 }
 
                 MetricLabel {
                     text: "Downloaded"
                 }
                 MetricValue {
-                    text: Model.formatBytes(root.service.connection.rxBytes)
+                    text: root.routeMetrics.downloaded
                 }
                 MetricLabel {
                     text: "Uploaded"
                 }
                 MetricValue {
-                    text: Model.formatBytes(root.service.connection.txBytes)
+                    text: root.routeMetrics.uploaded
                 }
 
                 MetricLabel {

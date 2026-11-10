@@ -118,10 +118,18 @@ TestCase {
             ip: "",
             gateway: ""
         });
-        compare(Network.parseLinkStats("invalid"), {
-            iface: "",
-            rxBytes: null,
-            txBytes: null
+        compare(Network.parseLinkStats("invalid"), {});
+        compare(Network.parseLinkStats('[{"ifname":"eth0","stats64":{"rx":{"bytes":10},"tx":{"bytes":20}}},{"ifname":"wg0"}]'), {
+            eth0: {
+                rxBytes: 10,
+                txBytes: 20
+            }
+        });
+        compare(Network.parseDefaultRoutes("invalid"), {});
+        compare(Network.parseDefaultRoutes('[{"dst":"default","gateway":"10.0.0.1","dev":"eth0","metric":100},' + '{"dst":"default","gateway":"10.0.0.9","dev":"eth0","metric":700},' + '{"dst":"default","gateway":"192.168.1.1","dev":"wlan0","metric":600},{"dst":"default","dev":"wg0"}]'), {
+            eth0: "10.0.0.1",
+            wlan0: "192.168.1.1",
+            wg0: ""
         });
         compare(Network.parsePing("64 bytes: time=1.5 ms"), 1.5);
         compare(Network.appendPingSample([1, 2], 3, 2), [2, 3]);
@@ -157,6 +165,168 @@ TestCase {
             latency: 10,
             packetLoss: 0
         });
+    }
+
+    function test_device_details_track_each_iface_and_its_pings() {
+        // Arrange
+        const addresses = {
+            eth0: "10.0.0.5",
+            wlan0: "192.168.1.4"
+        };
+        const gateways = {
+            eth0: "10.0.0.1",
+            wlan0: "192.168.1.1"
+        };
+        const first = Network.deviceDetails({}, ["eth0", "wlan0"], addresses, gateways, {
+            eth0: {
+                rxBytes: 100,
+                txBytes: 200
+            }
+        }, 10);
+
+        // Act
+        const pinged = Network.recordDevicePing(Network.recordDevicePing(first, "eth0", "ping", "eth0", "time=9 ms"), "eth0", "gatewayPing", "eth0 10.0.0.1", "time=2 ms");
+        const stale = Network.recordDevicePing(pinged, "eth0", "gatewayPing", "eth0 10.0.0.254", "time=2 ms");
+        const moved = Network.deviceDetails(pinged, ["eth0"], addresses, {
+            eth0: "10.0.0.254"
+        }, {
+            eth0: {
+                rxBytes: 300,
+                txBytes: 260
+            }
+        }, 12);
+
+        // Assert
+        compare(first, {
+            eth0: {
+                ip: "10.0.0.5",
+                gateway: "10.0.0.1",
+                transfer: {
+                    iface: "eth0",
+                    rxBytes: 100,
+                    txBytes: 200,
+                    sampleTime: 10,
+                    receivingRate: 0,
+                    sendingRate: 0
+                },
+                ping: {
+                    iface: "eth0",
+                    samples: [],
+                    latency: -1,
+                    packetLoss: 0
+                },
+                gatewayPing: {
+                    iface: "eth0 10.0.0.1",
+                    samples: [],
+                    latency: -1,
+                    packetLoss: 0
+                }
+            },
+            wlan0: {
+                ip: "192.168.1.4",
+                gateway: "192.168.1.1",
+                transfer: null,
+                ping: {
+                    iface: "wlan0",
+                    samples: [],
+                    latency: -1,
+                    packetLoss: 0
+                },
+                gatewayPing: {
+                    iface: "wlan0 192.168.1.1",
+                    samples: [],
+                    latency: -1,
+                    packetLoss: 0
+                }
+            }
+        });
+        verify(stale === pinged);
+        compare(moved, {
+            eth0: {
+                ip: "10.0.0.5",
+                gateway: "10.0.0.254",
+                transfer: {
+                    iface: "eth0",
+                    rxBytes: 300,
+                    txBytes: 260,
+                    sampleTime: 12,
+                    receivingRate: 100,
+                    sendingRate: 30
+                },
+                ping: {
+                    iface: "eth0",
+                    samples: [9],
+                    latency: 9,
+                    packetLoss: 0
+                },
+                gatewayPing: {
+                    iface: "eth0 10.0.0.254",
+                    samples: [],
+                    latency: -1,
+                    packetLoss: 0
+                }
+            }
+        });
+    }
+
+    function test_detail_metrics_format_a_device_for_the_panel_data() {
+        return [
+            {
+                tag: "unmeasured",
+                detail: null,
+                want: {
+                    ip: "--",
+                    gateway: "--",
+                    ping: "--",
+                    loss: "--",
+                    gatewayPing: "--",
+                    gatewayLoss: "--",
+                    receiving: "--",
+                    sending: "--",
+                    downloaded: "--",
+                    uploaded: "--"
+                }
+            },
+            {
+                tag: "measured",
+                detail: {
+                    ip: "10.0.0.5",
+                    gateway: "10.0.0.1",
+                    transfer: {
+                        rxBytes: 2048,
+                        txBytes: 512,
+                        receivingRate: 1024,
+                        sendingRate: 0
+                    },
+                    ping: {
+                        samples: [12],
+                        latency: 12,
+                        packetLoss: 0
+                    },
+                    gatewayPing: {
+                        samples: [null],
+                        latency: -1,
+                        packetLoss: 100
+                    }
+                },
+                want: {
+                    ip: "10.0.0.5",
+                    gateway: "10.0.0.1",
+                    ping: "12 ms",
+                    loss: "0%",
+                    gatewayPing: "Timeout",
+                    gatewayLoss: "100%",
+                    receiving: "1.0 KB/s",
+                    sending: "0 B/s",
+                    downloaded: "2.0 KB",
+                    uploaded: "512 B"
+                }
+            }
+        ];
+    }
+
+    function test_detail_metrics_format_a_device_for_the_panel(data) {
+        compare(Network.detailMetrics(data.detail), data.want);
     }
 
     function test_network_action_state_has_explicit_begin_completion_and_failure_transitions() {

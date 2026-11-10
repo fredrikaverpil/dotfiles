@@ -43,13 +43,13 @@ QtObject {
             connection: {
                 iface: "wlp0s20f3",
                 ip: "192.168.1.23",
-                gateway: "192.168.1.1",
-                rxBytes: 494471049,
-                txBytes: 12908299
+                gateway: "192.168.1.1"
             },
             transfer: {
                 receivingRate: 182400,
-                sendingRate: 9100
+                sendingRate: 9100,
+                rxBytes: 494471049,
+                txBytes: 12908299
             },
             ping: {
                 samples: [12, 14, 13],
@@ -248,16 +248,21 @@ QtObject {
         }) : metrics.connection) : {
         iface: "",
         ip: "",
-        gateway: "",
-        rxBytes: null,
-        txBytes: null
+        gateway: ""
     }
-    readonly property var transfer: metrics.transfer
-    readonly property var ping: metrics.ping
-    readonly property var gatewayPing: metrics.gatewayPing
-    readonly property bool hasTransfer: hasConnection
-    readonly property bool hasPing: hasConnection
-    readonly property bool hasGatewayPing: hasConnection
+    // The route's iface only.
+    readonly property var details: {
+        const result = {};
+        if (hasConnection)
+            result[connection.iface] = {
+                ip: connection.ip,
+                gateway: connection.gateway,
+                transfer: metrics.transfer,
+                ping: metrics.ping,
+                gatewayPing: metrics.gatewayPing
+            };
+        return result;
+    }
 
     onConnectedNameChanged: syncNetworks()
     onKnownNamesChanged: syncNetworks()
@@ -268,6 +273,10 @@ QtObject {
             network.connected = network.name === connectedName;
             network.known = knownNames.indexOf(network.name) >= 0;
         }
+    }
+
+    function detailsFor(iface) {
+        return details[iface] || null;
     }
 
     function deviceTypeName(device) {

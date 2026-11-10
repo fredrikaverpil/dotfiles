@@ -147,24 +147,114 @@ function parseRoute(raw) {
   };
 }
 
+// Parses `ip -j route show default` into { iface: gateway }, the first (lowest metric) per iface.
+function parseDefaultRoutes(raw) {
+  var routes;
+  try {
+    routes = JSON.parse(String(raw || "[]"));
+  } catch (error) {
+    return {};
+  }
+  if (!Array.isArray(routes)) return {};
+
+  var gateways = {};
+  for (var i = 0; i < routes.length; i++) {
+    var route = routes[i];
+    if (!route || !route.dev || gateways.hasOwnProperty(route.dev)) continue;
+    gateways[route.dev] = String(route.gateway || "");
+  }
+  return gateways;
+}
+
+// Parses `ip -j -s link show` into { iface: { rxBytes, txBytes } }.
 function parseLinkStats(raw) {
   var links;
   try {
     links = JSON.parse(String(raw || "[]"));
   } catch (error) {
-    return { iface: "", rxBytes: null, txBytes: null };
+    return {};
   }
-  if (!Array.isArray(links) || !links[0])
-    return { iface: "", rxBytes: null, txBytes: null };
+  if (!Array.isArray(links)) return {};
 
-  var link = links[0];
-  var stats = link.stats64 || link.stats || {};
-  var rx = stats.rx || {};
-  var tx = stats.tx || {};
+  var result = {};
+  for (var i = 0; i < links.length; i++) {
+    var link = links[i];
+    if (!link || !link.ifname) continue;
+    var stats = link.stats64 || link.stats || {};
+    var rx = Number((stats.rx || {}).bytes);
+    var tx = Number((stats.tx || {}).bytes);
+    if (!isFinite(rx) || !isFinite(tx)) continue;
+    result[link.ifname] = { rxBytes: rx, txBytes: tx };
+  }
+  return result;
+}
+
+function emptyPing(key) {
+  return { iface: key, samples: [], latency: -1, packetLoss: 0 };
+}
+
+// Details per iface: { iface: { ip, gateway, transfer, ping, gatewayPing } }, for `ifaces` only.
+// Pings carry over; a gateway's resets when the iface's gateway changes.
+function deviceDetails(previous, ifaces, addresses, gateways, stats, now) {
+  var prev = previous || {};
+  var result = {};
+  for (var i = 0; i < (ifaces || []).length; i++) {
+    var iface = ifaces[i];
+    var old = prev[iface] || {};
+    var gateway = (gateways || {})[iface] || "";
+    var sample = (stats || {})[iface];
+    var gatewayKey = iface + " " + gateway;
+    result[iface] = {
+      ip: (addresses || {})[iface] || "",
+      gateway: gateway,
+      transfer: sample
+        ? transferState(
+            old.transfer,
+            { iface: iface, rxBytes: sample.rxBytes, txBytes: sample.txBytes },
+            now,
+          )
+        : old.transfer || null,
+      ping: old.ping || emptyPing(iface),
+      gatewayPing:
+        old.gatewayPing && old.gatewayPing.iface === gatewayKey
+          ? old.gatewayPing
+          : emptyPing(gatewayKey),
+    };
+  }
+  return result;
+}
+
+// Records one ping reply (`raw`) of `which` ("ping" or "gatewayPing") for `iface`; `key` is what the
+// ping was started for, and a reply for a gateway that has since changed is dropped.
+function recordDevicePing(details, iface, which, key, raw) {
+  var detail = (details || {})[iface];
+  if (!detail || !detail[which] || detail[which].iface !== key) return details;
+  var result = Object.assign({}, details);
+  var next = Object.assign({}, detail);
+  next[which] = pingState(detail[which], key, parsePing(raw), 24, 5);
+  result[iface] = next;
+  return result;
+}
+
+// A device's details as the panel shows them; "--" until measured.
+function detailMetrics(detail) {
+  var d = detail || {};
+  var transfer = d.transfer;
+  var ping = d.ping || {};
+  var gatewayPing = d.gatewayPing || {};
+  var hasPing = (ping.samples || []).length > 0;
+  var hasGatewayPing = (gatewayPing.samples || []).length > 0;
   return {
-    iface: String(link.ifname || ""),
-    rxBytes: isFinite(Number(rx.bytes)) ? Number(rx.bytes) : null,
-    txBytes: isFinite(Number(tx.bytes)) ? Number(tx.bytes) : null,
+    ip: d.ip || "--",
+    gateway: d.gateway || "--",
+    ping: formatPing(ping.latency, hasPing),
+    loss: formatPacketLoss(ping.packetLoss, hasPing),
+    gatewayPing: formatPing(gatewayPing.latency, hasGatewayPing),
+    gatewayLoss: formatPacketLoss(gatewayPing.packetLoss, hasGatewayPing),
+    receiving: transfer ? formatRate(transfer.receivingRate) : "--",
+    sending: transfer ? formatRate(transfer.sendingRate) : "--",
+    downloaded: transfer ? formatBytes(transfer.rxBytes) : "--",
+    uploaded: transfer ? formatBytes(transfer.txBytes) : "--",
   };
 }
 
