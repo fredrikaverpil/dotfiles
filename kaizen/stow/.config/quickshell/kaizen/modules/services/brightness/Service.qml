@@ -8,6 +8,8 @@ Item {
 
     readonly property int step: 5
     property string device: ""
+    // The connector the backlight lights, "" when sysfs names none.
+    property string output: ""
     property int max: 0
     property int raw: 0
     property bool pending: false
@@ -52,7 +54,20 @@ Item {
         running: true
         command: ["ls", "/sys/class/backlight"]
         stdout: StdioCollector {
-            onStreamFinished: root.device = text.trim().split("\n")[0] || ""
+            onStreamFinished: {
+                root.device = text.trim().split("\n")[0] || "";
+                if (!root.device)
+                    return;
+                outputLink.command = ["readlink", "/sys/class/backlight/" + root.device];
+                outputLink.running = true;
+            }
+        }
+    }
+
+    Process {
+        id: outputLink
+        stdout: StdioCollector {
+            onStreamFinished: root.output = Model.outputOf(text)
         }
     }
 
@@ -85,6 +100,7 @@ Item {
         function status(): string {
             return JSON.stringify({
                 device: root.device,
+                output: root.output,
                 percent: root.present ? root.percent : null
             });
         }

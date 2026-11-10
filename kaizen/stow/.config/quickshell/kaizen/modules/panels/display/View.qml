@@ -42,8 +42,9 @@ Column {
         subtitle: root.outputs.focused ? root.outputs.focused.name + " · " + root.outputs.focused.width + "×" + root.outputs.focused.height : "No active display"
     }
 
+    // Only on the output the backlight lights; on every output when sysfs names none.
     Ui.Section {
-        visible: root.brightness.present
+        visible: root.brightness.present && (root.brightness.output === "" || !!root.outputs.focused && root.outputs.focused.name === root.brightness.output)
         shell: root.shell
         title: "Brightness"
 
