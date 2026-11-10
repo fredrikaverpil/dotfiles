@@ -10,6 +10,7 @@ import "modules/panels/audio" as AudioPanel
 import "modules/panels/battery" as BatteryPanel
 import "modules/panels/bluetooth" as BluetoothPanel
 import "modules/panels/display" as DisplayPanel
+import "modules/panels/media" as MediaPanel
 import "modules/panels/network" as NetworkPanel
 import "Ui/Palette.js" as Palette
 
@@ -57,6 +58,14 @@ ShellRoot {
                     nightlight: fakeDisplay,
                     mirror: fakeDisplay,
                     outputs: fakeDisplay
+                }
+            },
+            "media": {
+                title: "Media",
+                fake: fakeMedia,
+                button: mediaButton,
+                props: {
+                    service: fakeMedia
                 }
             },
             "network": {
@@ -219,6 +228,12 @@ ShellRoot {
         property string scenario: "Laptop"
     }
 
+    Gallery.FakeMedia {
+        id: fakeMedia
+
+        property string scenario: "Playing"
+    }
+
     Gallery.FakeNetwork {
         id: fakeNetwork
 
@@ -258,6 +273,15 @@ ShellRoot {
 
         BarWidgets.DisplayButton {
             shell: fakeShell
+        }
+    }
+
+    Component {
+        id: mediaButton
+
+        BarWidgets.MediaButton {
+            shell: fakeShell
+            service: fakeMedia
         }
     }
 

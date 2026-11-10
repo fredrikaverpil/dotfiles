@@ -3,7 +3,6 @@ import Quickshell
 import Quickshell.Wayland
 
 import "widgets" as BarWidgets
-import "../services/media" as Media
 import "../services/recording/RecordingModel.js" as RecordingModel
 import "../../Ui" as Ui
 
@@ -237,27 +236,29 @@ Scope {
                 anchors.right: audioButton.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: visible ? 6 : 0
-                visible: idleButton.visible || keyboardButton.visible || recordingButton.visible || mirrorButton.visible || systemButton.visible || firmwareButton.visible || doctorButton.visible || mediaWidget.width > 0 || pluginIndicators.width > 0
+                visible: idleButton.visible || keyboardButton.visible || recordingButton.visible || mirrorButton.visible || systemButton.visible || firmwareButton.visible || doctorButton.visible || mediaButton.visible || pluginIndicators.width > 0
                 width: visible ? 1 : 0
                 height: 16 * bar.shell.textScale
                 color: bar.shell.palette.dim
             }
 
-            Media.BarWidget {
-                id: mediaWidget
+            BarWidgets.MediaButton {
+                id: mediaButton
+                shell: bar.shell
+                service: bar.shell.media.service
                 anchors.right: indicatorDivider.left
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.rightMargin: width > 0 ? 6 : 0
-                shell: bar.shell
-                output: modelData.name
+                anchors.rightMargin: visible ? 6 : 0
+                onActivated: bar.shell.media.toggle()
+                onSecondary: bar.shell.menu.popup("settings.media", modelData.name, mediaButton)
             }
 
             Ui.BarButton {
                 id: idleButton
                 shell: bar.shell
-                anchors.right: mediaWidget.left
+                anchors.right: mediaButton.left
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.rightMargin: visible ? (mediaWidget.width > 0 ? 4 : 6) : 0
+                anchors.rightMargin: visible ? (mediaButton.visible ? 4 : 6) : 0
                 visible: !bar.shell.idle.enabled
                 foreground: bar.shell.palette.rose
                 label: "󱙱"
