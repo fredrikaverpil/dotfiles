@@ -56,12 +56,13 @@ reason, written next to the code.
 Every panel has the same shape, top to bottom:
 
 - A header: the title in `fg` at 16 px on the left. A panel without a
-  slider or meter puts its one key value (a network) at 16 px on the right,
-  coloured by its status. A panel whose subsystem turns off (bluetooth) puts
+  slider or meter may put its one key value at 16 px on the right, coloured
+  by its status. A panel whose subsystem turns off (bluetooth) puts
   the button that turns it on or off there instead, and its subtitle says the
   state.
-- A subtitle in `off` at 14 px: what the value belongs to, or why there is
-  none. Left out when it would repeat what the panel shows below.
+- A subtitle in `off` at 14 px: what the value belongs to, the panel's
+  state ("Default route via Ethernet"), or why there is none. Left out when
+  it would repeat what the panel shows below.
 - Optionally, a slider or meter for the key value, 16 under the header. It is
   part of the header: no section label.
 - A slider's or meter's value sits right of its track at 14 px, in a column
@@ -69,7 +70,14 @@ Every panel has the same shape, top to bottom:
   colour: `off` while muted, the status colour on a meter.
 - Groups, each a section label, ruled underneath, and its content. A group
   with one value of its own that no control shows (nightlight's temperature)
-  puts it at the label's right in `off`.
+  puts it at the label's right in `off`; a group with a control of its own
+  (Wi-Fi's power button) puts that there instead.
+- A panel over several devices, each with details of its own (network), gives
+  each device a group titled by its type ("Ethernet", "Wi-Fi"). A group
+  holding a long list goes last.
+- Many values about one thing form a details table: labels in `off`, values
+  in `fg` right-aligned, both 14 px, two pairs to a line in a wide card. A
+  panel's tables share their column widths, so they line up.
 - A footer with the panel's own keys: a keycap, then what it does in `off`. It
   lists only the keys the panel adds to those every panel shares
   ([`interaction.md`](interaction.md) › Panels). A button acting on the
@@ -81,6 +89,9 @@ Every panel has the same shape, top to bottom:
 - Spacing comes from one scale: 4, 8, 16 and 24 px. Rows in a list are 4
   apart, a section label's rule is 4 under it and 8 above its content, the
   card's padding is 16, and groups are 24 apart. The subtitle sits 4 under the title.
+- Groups too tall for the screen scroll between a fixed header and footer.
+  While they overflow, a 4 px `dim` bar at radius 2 sits in the card's
+  right padding, clear of the rows' fill; it shows nothing when all fits.
 - A group's content aligns with its section label. A row's or slider's `sel`
   fill reaches 8 into the card's padding, past the text it holds.
 - Space separates groups. The only lines a panel draws are the rules under

@@ -327,16 +327,6 @@ Ui.Panel {
             enabled: menu.shell.networkService.wifiDevice !== null,
             action: () => menu.shell.networkService.toggleWifi()
         },
-        // The scanner runs only while the panel is open.
-        "settings.network.scan": {
-            icon: "󰐷",
-            label: "Scan",
-            enabled: menu.shell.networkService.wifiEnabled,
-            action: () => {
-                menu.shell.network.open();
-                menu.shell.networkService.scan();
-            }
-        },
         "settings.network.networks": {
             icon: "󰖩",
             label: "Wi-Fi networks",

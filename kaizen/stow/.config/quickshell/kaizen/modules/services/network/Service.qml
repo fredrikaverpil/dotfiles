@@ -34,6 +34,8 @@ Item {
     property string failureSsid: ""
     property string failureReason: ""
     property bool scanning: false
+    // Sorted by strength until the user touches the list, then held (freezeOrder).
+    property bool orderFrozen: false
     // The internet's route: `ip route get 1.1.1.1`.
     property var connection: ({
             iface: "",
@@ -56,7 +58,6 @@ Item {
     }
 
     readonly property bool busy: actionKind !== ""
-    readonly property bool hasConnection: connection.iface !== ""
 
     function actionState() {
         return {
@@ -91,10 +92,15 @@ Item {
     }
 
     function syncWifiNetworks() {
-        var ordered = Model.orderWifiNetworks(wifiNetworks, wifiNetworkObjects);
+        var ordered = Model.orderWifiNetworks(orderFrozen ? wifiNetworks : [], wifiNetworkObjects);
         if (!Model.sameWifiNetworks(ordered, wifiNetworks))
             wifiNetworks = ordered;
         checkActionCompletion();
+    }
+
+    // Rows then keep their positions, so a scan never moves one under a click or the cursor.
+    function freezeOrder() {
+        orderFrozen = true;
     }
 
     function setScannerEnabled(enabled) {
@@ -156,8 +162,8 @@ Item {
         return Model.deviceType(device.type, DeviceType);
     }
 
-    function deviceDetail(device) {
-        return Model.deviceDetail(device, ipAddresses, DeviceType, ConnectionState);
+    function deviceState(device) {
+        return Model.deviceState(device.type, DeviceType, !!device.hasLink, device.state, ConnectionState);
     }
 
     function wifiStatus(network) {
@@ -314,10 +320,12 @@ Item {
 
     onActiveChanged: {
         if (active) {
-            // Drop the frozen order so the list is sorted by strength again on open.
+            // Sorted by strength again on open.
+            orderFrozen = false;
             wifiNetworks = [];
             refresh();
             loadSavedWifi();
+            scan();
         } else {
             passwordSsid = "";
             setScannerEnabled(false);

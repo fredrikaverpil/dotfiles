@@ -56,6 +56,98 @@ TestCase {
         }, "", "open", "owe"), "Join");
     }
 
+    function test_device_state_says_no_cable_for_a_wired_device_without_a_link_data() {
+        return [
+            {
+                tag: "wired without link",
+                type: types.Wired,
+                hasLink: false,
+                state: "unknown",
+                want: "No cable"
+            },
+            {
+                tag: "wired with link",
+                type: types.Wired,
+                hasLink: true,
+                state: connectionStates.Disconnected,
+                want: "Disconnected"
+            },
+            {
+                tag: "wifi",
+                type: types.Wifi,
+                hasLink: false,
+                state: connectionStates.Connected,
+                want: "Connected"
+            }
+        ];
+    }
+
+    function test_device_state_says_no_cable_for_a_wired_device_without_a_link(data) {
+        compare(Network.deviceState(data.type, types, data.hasLink, data.state, connectionStates), data.want);
+    }
+
+    function test_order_devices_puts_ethernet_first_and_wifi_last_data() {
+        return [
+            {
+                tag: "quickshell order",
+                devices: [
+                    {
+                        name: "builtin",
+                        type: "Ethernet",
+                        connected: false
+                    },
+                    {
+                        name: "wifi",
+                        type: "Wi-Fi",
+                        connected: true
+                    },
+                    {
+                        name: "dock",
+                        type: "Ethernet",
+                        connected: true
+                    }
+                ],
+                want: ["dock", "builtin", "wifi"]
+            },
+            {
+                tag: "other type between, ties keep their order",
+                devices: [
+                    {
+                        name: "wifi",
+                        type: "Wi-Fi",
+                        connected: false
+                    },
+                    {
+                        name: "other",
+                        type: "Network",
+                        connected: true
+                    },
+                    {
+                        name: "a",
+                        type: "Ethernet",
+                        connected: false
+                    },
+                    {
+                        name: "b",
+                        type: "Ethernet",
+                        connected: false
+                    },
+                    null],
+                want: ["a", "b", "other", "wifi"]
+            },
+            {
+                tag: "empty",
+                devices: [],
+                want: []
+            }
+        ];
+    }
+
+    function test_order_devices_puts_ethernet_first_and_wifi_last(data) {
+        const got = Network.orderDevices(data.devices, device => device.type).map(device => device.name);
+        compare(got, data.want);
+    }
+
     function test_saved_wifi_parses_nmcli_and_filters_networks_in_range() {
         const raw = "connection.uuid:a\n802-11-wireless.ssid:Attic\n\n" + "connection.uuid:b\n802-11-wireless.ssid:Cafe\\:5G\n\nconnection.uuid:c\n802-11-wireless.ssid:\n";
         const saved = Network.parseSavedWifi(raw);
@@ -396,8 +488,5 @@ TestCase {
         compare(Network.ipFor(wired, {
             eth0: "192.0.2.3"
         }), "192.0.2.3");
-        compare(Network.deviceDetail(wired, {
-            eth0: "192.0.2.3"
-        }, types, connectionStates), "Connected · 192.0.2.3");
     }
 }

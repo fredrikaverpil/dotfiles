@@ -18,6 +18,32 @@ function deviceType(type, types) {
   return "Network";
 }
 
+// Devices in panel order: Ethernet first, connected before not, then other
+// types, Wi-Fi last, so its long network list ends the panel. typeName(device)
+// is deviceType's name. Ties keep their order.
+function orderDevices(devices, typeName) {
+  function rank(device) {
+    const name = typeName(device);
+    const group = name === "Ethernet" ? 0 : name === "Wi-Fi" ? 2 : 1;
+    return group * 2 + (device.connected ? 0 : 1);
+  }
+  return devices
+    .filter((device) => !!device)
+    .map((device, index) => ({
+      device: device,
+      index: index,
+      rank: rank(device),
+    }))
+    .sort((a, b) => a.rank - b.rank || a.index - b.index)
+    .map((entry) => entry.device);
+}
+
+// A device's state; a wired one without a link has no cable plugged in.
+function deviceState(type, types, hasLink, state, states) {
+  if (type === types.Wired && !hasLink) return "No cable";
+  return connectionState(state, states);
+}
+
 function connectionState(state, states) {
   if (state === states.Connected) return "Connected";
   if (state === states.Connecting) return "Connecting";
@@ -423,12 +449,6 @@ function networkForSsid(networks, ssid) {
 function ipFor(device, addresses) {
   if (!device || !device.name) return "";
   return (addresses || {})[device.name] || "";
-}
-
-function deviceDetail(device, addresses, types, states) {
-  var state = connectionState(device.state, states);
-  var ip = ipFor(device, addresses);
-  return ip ? state + " · " + ip : state;
 }
 
 function wifiStatus(network, actionSsid, actionKind) {

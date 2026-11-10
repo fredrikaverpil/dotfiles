@@ -37,36 +37,65 @@ QtObject {
             name: "Grannens nätverk med ett mycket långt namn"
             signalStrength: 0.12
             security: fake.securities.Wpa
+        },
+        Network {
+            name: "Bredband2-4C1E"
+            signalStrength: 0.58
+            security: fake.securities.Wpa
+        },
+        Network {
+            name: "Comhem_9A2F"
+            signalStrength: 0.44
+            security: fake.securities.Wpa
+        },
+        Network {
+            name: "TP-Link_7781"
+            signalStrength: 0.4
+            security: fake.securities.Wpa
+        },
+        Network {
+            name: "Tele2 Hemnät"
+            signalStrength: 0.31
+            security: fake.securities.Wpa
+        },
+        Network {
+            name: "ASUS_RT-AX58U"
+            signalStrength: 0.27
+            security: fake.securities.Wpa
+        },
+        Network {
+            name: "DIRECT-HP-LaserJet"
+            signalStrength: 0.22
+            security: fake.securities.Open
+        },
+        Network {
+            name: "Lägenhet 4B"
+            signalStrength: 0.18
+            security: fake.securities.Wpa
+        },
+        Network {
+            name: "Ohana"
+            signalStrength: 0.15
+            security: fake.securities.Wpa
+        },
+        Network {
+            name: "Gäst"
+            signalStrength: 0.09
+            security: fake.securities.Open
+        },
+        Network {
+            name: "Netgear42"
+            signalStrength: 0.05
+            security: fake.securities.Wpa
         }
     ]
-    readonly property var metrics: ({
-            connection: {
-                iface: "wlp0s20f3",
-                ip: "192.168.1.23",
-                gateway: "192.168.1.1"
-            },
-            transfer: {
-                receivingRate: 182400,
-                sendingRate: 9100,
-                rxBytes: 494471049,
-                txBytes: 12908299
-            },
-            ping: {
-                samples: [12, 14, 13],
-                latency: 13,
-                packetLoss: 0
-            },
-            gatewayPing: {
-                samples: [2, 3, 2],
-                latency: 2,
-                packetLoss: 0
-            }
-        })
     readonly property var scenarios: ({
             "Wi-Fi": {
                 manager: true,
                 adapter: true,
                 wired: false,
+                dock: false,
+                frozenOrder: null,
                 wifiEnabled: true,
                 scanner: true,
                 connectedName: "Hemma",
@@ -87,6 +116,8 @@ QtObject {
                 manager: true,
                 adapter: true,
                 wired: true,
+                dock: true,
+                frozenOrder: null,
                 wifiEnabled: true,
                 scanner: false,
                 connectedName: "Hemma",
@@ -102,6 +133,8 @@ QtObject {
                 manager: true,
                 adapter: true,
                 wired: false,
+                dock: false,
+                frozenOrder: null,
                 wifiEnabled: true,
                 scanner: true,
                 connectedName: "",
@@ -117,6 +150,8 @@ QtObject {
                 manager: true,
                 adapter: true,
                 wired: false,
+                dock: false,
+                frozenOrder: null,
                 wifiEnabled: true,
                 scanner: true,
                 connectedName: "",
@@ -132,6 +167,8 @@ QtObject {
                 manager: true,
                 adapter: true,
                 wired: false,
+                dock: false,
+                frozenOrder: null,
                 wifiEnabled: true,
                 scanner: true,
                 connectedName: "",
@@ -147,6 +184,8 @@ QtObject {
                 manager: true,
                 adapter: true,
                 wired: false,
+                dock: false,
+                frozenOrder: null,
                 wifiEnabled: false,
                 scanner: false,
                 connectedName: "",
@@ -162,6 +201,8 @@ QtObject {
                 manager: true,
                 adapter: false,
                 wired: true,
+                dock: true,
+                frozenOrder: null,
                 wifiEnabled: true,
                 scanner: false,
                 connectedName: "",
@@ -177,6 +218,8 @@ QtObject {
                 manager: false,
                 adapter: false,
                 wired: false,
+                dock: false,
+                frozenOrder: null,
                 wifiEnabled: false,
                 scanner: false,
                 connectedName: "",
@@ -193,7 +236,11 @@ QtObject {
     property bool active: false
     property bool manager: true
     property bool adapter: true
+    // The dock's Ethernet: present, and connected (wired).
+    property bool dock: false
     property bool wired: false
+    // Names in the order the list holds once touched; null while it sorts.
+    property var frozenOrder: null
     property bool wifiEnabled: true
     // Off, Quickshell lists only known and connected networks.
     property bool scanner: true
@@ -216,7 +263,14 @@ QtObject {
     readonly property var wifiDevice: manager && adapter ? {
         scannerEnabled: scanner
     } : null
-    readonly property var wifiNetworks: wifiDevice && wifiEnabled ? all.filter(network => scanner || network.known || network.connected) : []
+    readonly property var deviceTypes: ({
+            Wifi: "wifi",
+            Wired: "wired"
+        })
+    readonly property var wifiNetworks: {
+        const visible = wifiDevice && wifiEnabled ? all.filter(network => scanner || network.known || network.connected) : [];
+        return frozenOrder ? Model.orderWifiNetworks(frozenOrder, visible) : Model.sortWifiNetworks(visible);
+    }
     readonly property var outOfRangeWifi: wifiDevice && wifiEnabled ? Model.outOfRangeWifi(saved, wifiNetworks) : []
     readonly property var connectedWifiNetwork: Model.findConnectedWifiNetwork(wifiNetworks)
     readonly property string kind: wired ? "ethernet" : connectedWifiNetwork ? "wifi" : "disconnected"
@@ -225,43 +279,85 @@ QtObject {
         const devices = [];
         if (!manager)
             return devices;
-        if (wired)
-            devices.push({
-                name: "enp0s20f0u2u3",
-                type: "Ethernet",
-                detail: "Connected · 10.2.0.65"
-            });
+        // Quickshell's order: the built-in port (no cable), Wi-Fi, the dock.
+        devices.push({
+            name: "enp0s31f6",
+            type: "Ethernet",
+            kind: deviceTypes.Wired,
+            connected: false,
+            hasLink: false,
+            ip: ""
+        });
         if (adapter)
             devices.push({
                 name: "wlp0s20f3",
                 type: "Wi-Fi",
-                detail: connectedWifiNetwork ? "Connected · 192.168.1.23" : "Disconnected"
+                kind: deviceTypes.Wifi,
+                connected: connectedWifiNetwork !== null,
+                hasLink: false,
+                ip: connectedWifiNetwork ? "192.168.1.23" : ""
+            });
+        if (dock)
+            devices.push({
+                name: "enp0s20f0u2u3",
+                type: "Ethernet",
+                kind: deviceTypes.Wired,
+                connected: wired,
+                hasLink: true,
+                ip: wired ? "10.2.0.65" : ""
             });
         return devices;
     }
     readonly property bool busy: actionKind !== ""
     readonly property bool hasConnection: kind !== "disconnected"
-    readonly property var connection: hasConnection ? (wired ? Object.assign({}, metrics.connection, {
-            iface: "enp0s20f0u2u3",
-            ip: "10.2.0.65",
-            gateway: "10.2.0.1"
-        }) : metrics.connection) : {
+    readonly property var connection: !hasConnection ? {
         iface: "",
         ip: "",
         gateway: ""
+    } : wired ? {
+        iface: "enp0s20f0u2u3",
+        ip: "10.2.0.65",
+        gateway: "10.2.0.1"
+    } : {
+        iface: "wlp0s20f3",
+        ip: "192.168.1.23",
+        gateway: "192.168.1.1"
     }
-    // The route's iface only.
+    // Docked, the Ethernet carries the traffic and Wi-Fi idles, still answering pings.
     readonly property var details: {
         const result = {};
-        if (hasConnection)
-            result[connection.iface] = {
-                ip: connection.ip,
-                gateway: connection.gateway,
-                transfer: metrics.transfer,
-                ping: metrics.ping,
-                gatewayPing: metrics.gatewayPing
-            };
+        if (wired)
+            result["enp0s20f0u2u3"] = detail("10.2.0.65", "10.2.0.1", 241300, 15200, 1820433011, 90211873, 9, 1);
+        if (connectedWifiNetwork)
+            result["wlp0s20f3"] = wired ? detail("192.168.1.23", "192.168.1.1", 120, 0, 3381202, 401330, 15, 3) : detail("192.168.1.23", "192.168.1.1", 182400, 9100, 494471049, 12908299, 13, 2);
         return result;
+    }
+
+    function detail(ip, gateway, receiving, sending, rx, tx, ping, gatewayPing) {
+        return {
+            ip: ip,
+            gateway: gateway,
+            transfer: {
+                rxBytes: rx,
+                txBytes: tx,
+                receivingRate: receiving,
+                sendingRate: sending
+            },
+            ping: {
+                samples: [ping],
+                latency: ping,
+                packetLoss: 0
+            },
+            gatewayPing: {
+                samples: [gatewayPing],
+                latency: gatewayPing,
+                packetLoss: 0
+            }
+        };
+    }
+
+    function detailsFor(iface) {
+        return details[iface] || null;
     }
 
     onConnectedNameChanged: syncNetworks()
@@ -275,16 +371,19 @@ QtObject {
         }
     }
 
-    function detailsFor(iface) {
-        return details[iface] || null;
-    }
-
     function deviceTypeName(device) {
         return device.type;
     }
 
-    function deviceDetail(device) {
-        return device.detail;
+    function deviceState(device) {
+        if (device.kind === deviceTypes.Wired && !device.hasLink)
+            return "No cable";
+        return device.connected ? "Connected" : device.kind === deviceTypes.Wifi && !wifiEnabled ? "Unavailable" : "Disconnected";
+    }
+
+    function freezeOrder() {
+        if (!frozenOrder)
+            frozenOrder = wifiNetworks.slice();
     }
 
     function wifiStatus(network) {
@@ -334,17 +433,6 @@ QtObject {
     function toggleWifi() {
         if (wifiDevice)
             wifiEnabled = !wifiEnabled;
-    }
-
-    function scan() {
-        scanning = true;
-        scanner = true;
-        scanDone.restart();
-    }
-
-    property Timer scanDone: Timer {
-        interval: 1500
-        onTriggered: fake.scanning = false
     }
 
     component Network: QtObject {
