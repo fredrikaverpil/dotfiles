@@ -10,6 +10,7 @@ import "modules/panels/audio" as AudioPanel
 import "modules/panels/battery" as BatteryPanel
 import "modules/panels/bluetooth" as BluetoothPanel
 import "modules/panels/display" as DisplayPanel
+import "modules/panels/network" as NetworkPanel
 import "Ui/Palette.js" as Palette
 
 // Draws a panel's view in a window, under its bar button, fed by a stand-in in a chosen state.
@@ -56,6 +57,14 @@ ShellRoot {
                     nightlight: fakeDisplay,
                     mirror: fakeDisplay,
                     outputs: fakeDisplay
+                }
+            },
+            "network": {
+                title: "Network",
+                fake: fakeNetwork,
+                button: networkButton,
+                props: {
+                    service: fakeNetwork
                 }
             }
         })
@@ -210,6 +219,12 @@ ShellRoot {
         property string scenario: "Laptop"
     }
 
+    Gallery.FakeNetwork {
+        id: fakeNetwork
+
+        property string scenario: "Wi-Fi"
+    }
+
     // The bar's own buttons, bound to the stand-ins.
     Component {
         id: audioButton
@@ -243,6 +258,15 @@ ShellRoot {
 
         BarWidgets.DisplayButton {
             shell: fakeShell
+        }
+    }
+
+    Component {
+        id: networkButton
+
+        BarWidgets.NetworkButton {
+            shell: fakeShell
+            service: fakeNetwork
         }
     }
 
