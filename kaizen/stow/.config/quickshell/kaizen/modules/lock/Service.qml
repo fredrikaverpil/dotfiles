@@ -24,6 +24,8 @@ Item {
     property int failedAttempts: 0
     property bool blanked: false
     property bool restorePending: false
+    property bool capsLock: false
+    property bool capsLockStale: false
 
     readonly property bool locked: lockRequested || sessionLock.locked || sessionLock.secure
 
@@ -67,7 +69,18 @@ Item {
         applyAuthState(transition.state);
         sessionLock.locked = true;
         blankTimer.restart();
+        readCapsLock();
+        // For the layout bind's keycap.
+        Qt.callLater(shell.menu.readBinds);
         return true;
+    }
+
+    // Caps Lock only changes on a key press, which the lock surface receives.
+    function readCapsLock() {
+        if (capsLockQuery.running)
+            capsLockStale = true;
+        else
+            capsLockQuery.running = true;
     }
 
     // Takes over the lock a crashed shell left, where the compositor allows it.
@@ -161,6 +174,7 @@ Item {
                 failureMessage: root.failureMessage
                 password: root.enteredPassword
                 inputEnabled: root.lockRequested
+                capsLock: root.capsLock
                 onPasswordEdited: function (value) {
                     root.enteredPassword = value;
                 }
@@ -169,6 +183,7 @@ Item {
                 }
                 onClearFailureRequested: root.failureMessage = ""
                 onWakeRequested: root.wake()
+                onKeyPressed: root.readCapsLock()
             }
         }
     }
@@ -202,6 +217,19 @@ Item {
 
     Process {
         id: dpmsProcess
+    }
+
+    // niri and umbriel set every keyboard's LEDs from the seat's state.
+    Process {
+        id: capsLockQuery
+        command: ["sh", "-c", "grep -qs '[1-9]' /sys/class/leds/*::capslock/brightness"]
+        onExited: function (exitCode) {
+            root.capsLock = exitCode === 0;
+            if (root.capsLockStale) {
+                root.capsLockStale = false;
+                Qt.callLater(root.readCapsLock);
+            }
+        }
     }
 
     FileView {

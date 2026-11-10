@@ -27,7 +27,7 @@ shadow = false
 [keybinds]
 # Shell
 "Mod+Space" = "spawn kaizen ipc call menu toggle" # Menu
-"Mod+Shift+Space" = "spawn kaizen ipc call keyboard next" # Next keyboard layout
+"Mod+Shift+Space" = { action = "spawn kaizen ipc call keyboard next", allow_when_locked = true } # Next keyboard layout
 "Super+Alt+L" = "spawn kaizen ipc call lock lock" # Lock the screen
 "Mod+N" = "spawn kaizen ipc call notifications select" # Select notification
 "Mod+Shift+Comma" = "spawn kaizen ipc call notifications dismissAll" # Dismiss all notifications

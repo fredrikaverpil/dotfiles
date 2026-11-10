@@ -1,6 +1,7 @@
 import QtQuick
 
 import "../../Ui" as Ui
+import "../menu/MenuModel.js" as MenuModel
 
 Item {
     id: root
@@ -10,13 +11,19 @@ Item {
     property string failureMessage: ""
     property string password: ""
     property bool inputEnabled: true
+    property bool capsLock: false
 
     signal passwordEdited(string value)
     signal submitPassword(string value)
     signal clearFailureRequested
     signal wakeRequested
+    signal keyPressed
 
     readonly property var palette: shell.palette // qmllint disable property-override
+    readonly property var keyboard: shell.keyboard
+    readonly property var layoutKeys: Ui.Compositor.keycaps(MenuModel.chordFor({
+        ipc: "keyboard next"
+    }, shell.menu.binds))
 
     function focusPassword() {
         if (inputEnabled && !authenticating)
@@ -110,6 +117,7 @@ Item {
 
                 Keys.onPressed: function (event) {
                     root.wakeRequested();
+                    root.keyPressed();
                     if (event.key === Qt.Key_Escape || (event.modifiers & Qt.ControlModifier && event.key === Qt.Key_U)) {
                         passwordInput.text = "";
                         event.accepted = true;
@@ -127,6 +135,46 @@ Item {
                 font.italic: root.failureMessage.length > 0
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
+            }
+        }
+
+        // What the typed password depends on besides the keys.
+        Column {
+            anchors.top: field.bottom
+            // The field scales about its centre, the hints about their top.
+            anchors.topMargin: field.height * (field.scale - 1) / 2 + 16 * field.scale
+            anchors.horizontalCenter: field.horizontalCenter
+            scale: root.shell.textScale
+            transformOrigin: Item.Top
+            spacing: 8
+
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: root.keyboard.names.length > 1
+                spacing: 10
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: root.keyboard.name
+                    color: root.keyboard.isDefault ? root.palette.off : root.palette.wood
+                    font.family: Ui.Fonts.mono
+                    font.pixelSize: 14
+                }
+
+                Ui.Keycaps {
+                    anchors.verticalCenter: parent.verticalCenter
+                    shell: root.shell
+                    keys: root.layoutKeys
+                }
+            }
+
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: root.capsLock
+                text: "Caps Lock is on"
+                color: root.palette.wood
+                font.family: Ui.Fonts.mono
+                font.pixelSize: 14
             }
         }
     }

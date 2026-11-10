@@ -37,7 +37,7 @@ window-rule {
 binds {
     // Shell
     Mod+Space hotkey-overlay-title="Menu" { spawn "kaizen" "ipc" "call" "menu" "toggle"; }
-    Mod+Shift+Space hotkey-overlay-title="Next keyboard layout" { spawn "kaizen" "ipc" "call" "keyboard" "next"; }
+    Mod+Shift+Space allow-when-locked=true hotkey-overlay-title="Next keyboard layout" { spawn "kaizen" "ipc" "call" "keyboard" "next"; }
     Super+Alt+L hotkey-overlay-title="Lock the screen" { spawn "kaizen" "ipc" "call" "lock" "lock"; }
     Mod+N hotkey-overlay-title="Select notification" { spawn "kaizen" "ipc" "call" "notifications" "select"; }
     Mod+Shift+Comma hotkey-overlay-title="Dismiss all notifications" { spawn "kaizen" "ipc" "call" "notifications" "dismissAll"; }
