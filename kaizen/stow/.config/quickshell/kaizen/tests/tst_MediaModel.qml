@@ -177,4 +177,53 @@ TestCase {
             identity: "Spotify"
         }), "Spotify");
     }
+
+    function test_seeking() {
+        compare([Media.hasLength(null), Media.hasLength({
+                lengthSupported: true,
+                length: 330
+            }), Media.hasLength({
+                lengthSupported: false,
+                length: 12
+            }), Media.hasLength({
+                lengthSupported: true,
+                length: 0
+            })], [false, true, false, false]);
+        compare([Media.canSeek(null), Media.canSeek({
+                canSeek: true,
+                positionSupported: true
+            }), Media.canSeek({
+                canSeek: true,
+                positionSupported: false
+            })], [false, true, false]);
+    }
+
+    function test_format_position_data() {
+        return [
+            {
+                tag: "zero",
+                seconds: 0,
+                text: "0:00"
+            },
+            {
+                tag: "minutes",
+                seconds: 83.7,
+                text: "1:23"
+            },
+            {
+                tag: "hours",
+                seconds: 3725,
+                text: "1:02:05"
+            },
+            {
+                tag: "negative",
+                seconds: -4,
+                text: "0:00"
+            }
+        ];
+    }
+
+    function test_format_position(data) {
+        compare(Media.formatPosition(data.seconds), data.text);
+    }
 }

@@ -14,6 +14,12 @@ Ui.Panel {
     cardHeight: view.cardHeight
     keyNavigation: view.keyNavigation
 
+    Binding {
+        target: root.service
+        property: "active"
+        value: root.shown
+    }
+
     IpcHandler {
         target: "media"
 

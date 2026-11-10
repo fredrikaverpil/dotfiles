@@ -23,7 +23,10 @@ QtObject {
             trackArtist: "Massive Attack",
             trackAlbum: "Mezzanine",
             canGoNext: true,
-            canGoPrevious: true
+            canGoPrevious: true,
+            canSeek: true,
+            position: 83,
+            length: 330
         })
     readonly property var scenarios: ({
             "Playing": {
@@ -57,7 +60,32 @@ QtObject {
                         trackArtist: "Johann Sebastian Bach, Academy of St Martin in the Fields, Neville Marriner",
                         trackAlbum: "Bach: Violin Concertos (Remastered Anniversary Edition)",
                         canGoNext: true,
-                        canGoPrevious: true
+                        canGoPrevious: true,
+                        canSeek: true,
+                        position: 3725,
+                        length: 4810
+                    }
+                }
+            },
+            "No seeking": {
+                sources: {
+                    "Mozilla Firefox": {
+                        isPlaying: true,
+                        trackTitle: "How the Internet Works",
+                        trackArtist: "Example Channel",
+                        position: 412,
+                        length: 1083
+                    }
+                }
+            },
+            "Live stream": {
+                sources: {
+                    "Mozilla Firefox": {
+                        isPlaying: true,
+                        trackTitle: "Lofi hip hop radio",
+                        trackArtist: "Lofi Girl",
+                        canSeek: true,
+                        position: 5400
                     }
                 }
             },
@@ -95,6 +123,10 @@ QtObject {
     readonly property string artUrl: ""
     readonly property string identity: activePlayer ? activePlayer.identity : ""
     readonly property string icon: playing ? "󰏤" : "󰐊"
+    readonly property bool hasLength: Model.hasLength(activePlayer)
+    readonly property bool canSeek: Model.canSeek(activePlayer)
+    readonly property real position: activePlayer ? activePlayer.position : 0
+    readonly property real length: hasLength ? activePlayer.length : 0
 
     onSourcesChanged: applySources()
     Component.onCompleted: applySources()
@@ -108,6 +140,9 @@ QtObject {
             player.trackAlbum = source.trackAlbum || "";
             player.canGoNext = !!source.canGoNext;
             player.canGoPrevious = !!source.canGoPrevious;
+            player.canSeek = !!source.canSeek;
+            player.position = source.position || 0;
+            player.length = source.length || 0;
         }
     }
 
@@ -120,6 +155,13 @@ QtObject {
         if (!player)
             return false;
         preferredPlayerKey = Model.playerKey(player);
+        return true;
+    }
+
+    function seek(seconds) {
+        if (!canSeek)
+            return false;
+        activePlayer.position = Math.max(0, Math.min(length, seconds));
         return true;
     }
 
@@ -143,6 +185,12 @@ QtObject {
         property string trackAlbum: ""
         property bool canGoNext: false
         property bool canGoPrevious: false
+        property bool canSeek: false
+        property real position: 0
+        // 0: none reported, as a live stream.
+        property real length: 0
+        readonly property bool positionSupported: true
+        readonly property bool lengthSupported: length > 0
         readonly property bool canTogglePlaying: trackTitle !== ""
         readonly property bool canPlay: canTogglePlaying
         readonly property bool canPause: canTogglePlaying

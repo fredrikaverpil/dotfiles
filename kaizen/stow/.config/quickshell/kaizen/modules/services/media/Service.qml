@@ -7,6 +7,8 @@ Item {
     id: root
 
     property string preferredPlayerKey: ""
+    // While the panel is shown: position only updates when asked.
+    property bool active: false
 
     readonly property var players: Mpris.players ? Mpris.players.values : []
     readonly property var sourcePlayers: Model.sourcePlayers(players)
@@ -19,6 +21,25 @@ Item {
     readonly property string artUrl: activePlayer ? String(activePlayer.trackArtUrl || "") : ""
     readonly property string identity: activePlayer ? String(activePlayer.identity || activePlayer.desktopEntry || "") : ""
     readonly property string icon: playing ? "󰏤" : "󰐊"
+    readonly property bool hasLength: Model.hasLength(activePlayer)
+    readonly property bool canSeek: Model.canSeek(activePlayer)
+    readonly property real position: activePlayer ? activePlayer.position : 0
+    readonly property real length: hasLength ? activePlayer.length : 0
+
+    onActiveChanged: refreshPosition()
+    onActivePlayerChanged: refreshPosition()
+
+    Timer {
+        running: root.active && root.playing && root.hasLength
+        interval: 1000
+        repeat: true
+        onTriggered: root.refreshPosition()
+    }
+
+    function refreshPosition() {
+        if (active && activePlayer)
+            activePlayer.positionChanged();
+    }
 
     function playerKey(player) {
         return Model.playerKey(player);
@@ -38,6 +59,13 @@ Item {
 
     function playerForAction(action, targetKey) {
         return Model.playerForAction(players, sourcePlayers, activePlayer, action, targetKey);
+    }
+
+    function seek(seconds) {
+        if (!canSeek)
+            return false;
+        activePlayer.position = Math.max(0, Math.min(length, seconds));
+        return true;
     }
 
     function runAction(action, targetKey) {
@@ -89,7 +117,10 @@ Item {
             artUrl: artUrl,
             canGoNext: player ? !!player.canGoNext : false,
             canGoPrevious: player ? !!player.canGoPrevious : false,
-            canTogglePlaying: player ? !!player.canTogglePlaying : false
+            canTogglePlaying: player ? !!player.canTogglePlaying : false,
+            canSeek: canSeek,
+            position: position,
+            length: length
         });
     }
 }
