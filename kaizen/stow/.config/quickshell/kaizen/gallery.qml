@@ -121,10 +121,10 @@ ShellRoot {
     function focusView() {
         if (!view)
             return;
-        if (view.reset)
-            view.reset();
         if (card.keyNavigation)
             card.focusContent();
+        if (view.reset)
+            view.reset();
     }
 
     function applyScenario(name) {

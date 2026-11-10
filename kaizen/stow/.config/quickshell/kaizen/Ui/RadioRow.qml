@@ -8,6 +8,9 @@ Item {
     property string label: ""
     property bool chosen: false
     property bool focused: false
+    // At the row's right, such as a player's state.
+    property string value: ""
+    property color valueColor: shell.palette.off
 
     signal hovered
     signal activated
@@ -37,13 +40,24 @@ Item {
     Text {
         anchors.left: mark.right
         anchors.leftMargin: 8
-        anchors.right: parent.right
+        anchors.right: valueText.left
+        anchors.rightMargin: valueText.text ? 8 : 0
         anchors.verticalCenter: parent.verticalCenter
         elide: Text.ElideRight
         color: row.shell.palette.fg
         font.family: Fonts.mono
         font.pixelSize: 14
         text: row.label
+    }
+
+    Text {
+        id: valueText
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        color: row.valueColor
+        font.family: Fonts.mono
+        font.pixelSize: 14
+        text: row.value
     }
 
     MouseArea {

@@ -107,7 +107,8 @@ Every panel has the same shape, top to bottom:
   a few choices side by side in one outline, has no row start: its chosen
   label is `fg`, the others `off`. An option that cannot be picked (a mirror
   that would loop) is `dim`, since `off` already means unchosen there, and
-  focus skips it.
+  focus skips it; so is a button that cannot act (a player's Next with no
+  next track).
 - A device's state shows in its icon at the start of its row: `leaf` while
   connected, `off` otherwise. What it reports, such as its battery, sits at
   the row's right in its status colour; a change under way ("Connecting…")

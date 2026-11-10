@@ -17,6 +17,8 @@ Item {
     property color fillColor: off ? shell.palette.off : shell.palette.fg
     // Drawn right of the track; empty draws no column.
     property string valueText: ""
+    // The value column is as wide as this, so stacked tracks end at the same x.
+    property string valueWidest: "100%"
     property color valueColor: fillColor
 
     signal moved(real value)
@@ -57,7 +59,7 @@ Item {
     Item {
         id: track
         anchors.left: iconText.right
-        anchors.leftMargin: 8
+        anchors.leftMargin: slider.icon ? 8 : 0
         anchors.right: valueLabel.visible ? valueLabel.left : parent.right
         // Room for the knob's half at full, and the gap before the value.
         anchors.rightMargin: (slider.interactive ? 5 : 0) + (valueLabel.visible ? 8 : 0)
@@ -107,11 +109,10 @@ Item {
         }
     }
 
-    // As wide as "100%", so stacked tracks end at the same x.
     TextMetrics {
         id: widest
         font: valueLabel.font
-        text: "100%"
+        text: slider.valueWidest
     }
 
     Text {
