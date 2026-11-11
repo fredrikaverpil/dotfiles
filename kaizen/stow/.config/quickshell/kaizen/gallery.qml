@@ -13,6 +13,7 @@ import "modules/panels/display" as DisplayPanel
 import "modules/panels/media" as MediaPanel
 import "modules/panels/network" as NetworkPanel
 import "modules/panels/recording" as RecordingPanel
+import "modules/panels/timezone" as TimezonePanel
 import "Ui/Palette.js" as Palette
 
 // Draws a panel's view in a window, under its bar button, fed by a stand-in in a chosen state.
@@ -83,6 +84,14 @@ ShellRoot {
                 button: recordingButton,
                 props: {
                     service: fakeRecording
+                }
+            },
+            "timezone": {
+                title: "Clock",
+                fake: fakeTimezone,
+                button: timeButton,
+                props: {
+                    service: fakeTimezone
                 }
             }
         })
@@ -255,6 +264,12 @@ ShellRoot {
         property string scenario: "Idle"
     }
 
+    Gallery.FakeTimezone {
+        id: fakeTimezone
+
+        property string scenario: "Stockholm"
+    }
+
     // The bar's own buttons, bound to the stand-ins.
     Component {
         id: audioButton
@@ -315,6 +330,15 @@ ShellRoot {
         BarWidgets.RecordingButton {
             shell: fakeShell
             service: fakeRecording
+        }
+    }
+
+    Component {
+        id: timeButton
+
+        BarWidgets.TimeButton {
+            shell: fakeShell
+            date: new Date()
         }
     }
 

@@ -104,34 +104,13 @@ Scope {
                     color: bar.shell.palette.dim
                 }
 
-                Ui.BarButton {
+                BarWidgets.TimeButton {
                     id: timeLabel
                     shell: bar.shell
+                    date: clock.date
                     anchors.verticalCenter: parent.verticalCenter
-                    label: Qt.formatDateTime(clock.date, "HH:mm")
                     onActivated: bar.shell.timezone.toggle()
                     onSecondary: bar.shell.menu.popup("settings.clock", modelData.name, timeLabel)
-                    onLabelChanged: if (label.endsWith(":00"))
-                        hourPulse.restart()
-
-                    SequentialAnimation {
-                        id: hourPulse
-                        loops: 3
-                        NumberAnimation {
-                            target: timeLabel
-                            property: "scale"
-                            to: 1.25
-                            duration: 200
-                            easing.type: Easing.OutQuad
-                        }
-                        NumberAnimation {
-                            target: timeLabel
-                            property: "scale"
-                            to: 1.0
-                            duration: 200
-                            easing.type: Easing.InQuad
-                        }
-                    }
                 }
             }
 
