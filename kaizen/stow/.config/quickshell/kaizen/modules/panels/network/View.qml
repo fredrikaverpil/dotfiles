@@ -193,8 +193,13 @@ Column {
 
     Ui.PanelFooter {
         shell: root.shell
-        buttonLabel: root.service.networkManagerAvailable ? "Connection settings…" : ""
-        onButtonActivated: root.settingsRequested()
+
+        Ui.PanelButton {
+            visible: root.service.networkManagerAvailable
+            shell: root.shell
+            label: "Connection settings…"
+            onActivated: root.settingsRequested()
+        }
     }
 
     FontMetrics {

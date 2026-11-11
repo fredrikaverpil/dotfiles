@@ -12,6 +12,8 @@ Ui.Panel {
 
     cardWidth: view.cardWidth
     cardHeight: view.cardHeight
+    cardPadding: view.cardPadding
+    keyNavigation: view.keyNavigation
 
     function record() {
         close();
@@ -92,7 +94,6 @@ Ui.Panel {
         id: view
         shell: root.shell
         service: root.service
-        onCloseRequested: root.close()
         onRecordRequested: root.record()
     }
 }

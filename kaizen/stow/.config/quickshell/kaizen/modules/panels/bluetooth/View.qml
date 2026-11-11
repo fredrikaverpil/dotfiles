@@ -84,10 +84,16 @@ Column {
         }
     }
 
+    // A hidden footer's button never shows again, so the footer hides, not the button.
     Ui.PanelFooter {
+        visible: root.service.available
         shell: root.shell
-        buttonLabel: root.service.available ? "Bluetooth settings…" : ""
-        onButtonActivated: root.settingsRequested()
+
+        Ui.PanelButton {
+            shell: root.shell
+            label: "Bluetooth settings…"
+            onActivated: root.settingsRequested()
+        }
     }
 
     // A paired device: its button connects or disconnects it; the row takes no focus.

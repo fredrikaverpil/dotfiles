@@ -75,14 +75,21 @@ Every panel has the same shape, top to bottom:
 - A panel over several devices, each with details of its own (network), gives
   each device a group titled by its type ("Ethernet", "Wi-Fi"). A group
   holding a long list goes last.
+- A panel about picking a device (audio) lists every device as a row, since
+  the choice is what it shows. A panel that sets up an action (recording)
+  shows each setting as one row instead, label left and control right, so
+  the whole setup reads at a glance: `‹ value ›` for a setting with many
+  values, which h/l or a click step, and a segmented control sized to its
+  labels for a few (On/Off, which output a display mirrors).
 - Many values about one thing form a details table: labels in `off`, values
   in `fg` right-aligned, both 14 px, two pairs to a line in a wide card. A
   panel's tables share their column widths, so they line up.
 - A footer with the panel's own keys: a keycap, then what it does in `off`. It
   lists only the keys the panel adds to those every panel shares
-  ([`interaction.md`](interaction.md) › Panels). A button acting on the
-  whole panel ("Pair new device…") sits at its right, where no scrolling
-  hides it; a group's own button stays in its group.
+  ([`interaction.md`](interaction.md) › Panels). The buttons acting on the
+  whole panel ("Pair new device…", a recording's Pause and Stop) sit at its
+  right, where no scrolling hides them; a group's own button stays in its
+  group.
 
 ### Space
 

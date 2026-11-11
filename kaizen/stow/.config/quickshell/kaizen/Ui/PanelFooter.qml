@@ -1,21 +1,21 @@
 import QtQuick
 
-// A panel's own keys, each a keycap and what it does, and at the right a button acting on the
-// whole panel (style.md › Panels).
+// A panel's own keys, each a keycap and what it does, and at the right its children: the buttons
+// acting on the whole panel (style.md › Panels).
 Item {
     id: footer
 
     required property var shell
     // [{ keys: ["m"], label: "mute" }, ...]
     property var entries: []
-    // The panel-wide button's label; "" for none.
-    property string buttonLabel: ""
-
-    signal buttonActivated
+    default property alias buttons: buttonRow.data
 
     width: parent ? parent.width : 0
-    implicitHeight: Math.max(keys.implicitHeight, button.visible ? button.implicitHeight : 0)
-    visible: entries.length > 0 || buttonLabel !== ""
+    implicitHeight: Math.max(keys.implicitHeight, buttonRow.implicitHeight)
+    // The row's width, not visibleChildren, which stays empty while the footer is hidden. A hidden
+    // footer's buttons count as hidden too, so one that starts hidden never shows: to hide the only
+    // button, hide the footer.
+    visible: entries.length > 0 || buttonRow.implicitWidth > 0
 
     Row {
         id: keys
@@ -48,14 +48,11 @@ Item {
         }
     }
 
-    PanelButton {
-        id: button
+    Row {
+        id: buttonRow
 
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
-        visible: footer.buttonLabel !== ""
-        shell: footer.shell
-        label: footer.buttonLabel
-        onActivated: footer.buttonActivated()
+        spacing: 8
     }
 }
