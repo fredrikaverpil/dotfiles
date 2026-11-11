@@ -68,9 +68,11 @@ Every panel has the same shape, top to bottom:
 - A slider's or meter's value sits right of its track at 14 px, in a column
   as wide as `100%`, so stacked tracks end together. It takes the fill's
   colour: `off` while muted, the status colour on a meter.
-- Groups, each a section label, ruled underneath, and its content. A group
+- Groups, each a rule with its section label at the rule's left, and its
+  content. A group whose content names itself (battery's details table,
+  recording's options) leaves the label out: the rule alone heads it. A group
   with one value of its own that no control shows (nightlight's temperature)
-  puts it at the label's right in `off`; a group with a control of its own
+  puts it at the rule's right in `off`; a group with a control of its own
   (Wi-Fi's power button) puts that there instead.
 - A panel over several devices, each with details of its own (network), gives
   each device a group titled by its type ("Ethernet", "Wi-Fi"). A group
@@ -94,15 +96,17 @@ Every panel has the same shape, top to bottom:
 ### Space
 
 - Spacing comes from one scale: 4, 8, 16 and 24 px. Rows in a list are 4
-  apart, a section label's rule is 4 under it and 8 above its content, the
+  apart, a rule runs 8 clear of the label at its left and of what sits at its
+  right, a group's content is 8 under its label or 16 under a bare rule, the
   card's padding is 16, and groups are 24 apart. The subtitle sits 4 under the title.
 - Groups too tall for the screen scroll between a fixed header and footer.
   While they overflow, a 4 px `dim` bar at radius 2 sits in the card's
   right padding, clear of the rows' fill; it shows nothing when all fits.
-- A group's content aligns with its section label. A row's or slider's `sel`
+- A group's content aligns with its rule's start. A row's or slider's `sel`
   fill reaches 8 into the card's padding, past the text it holds.
-- Space separates groups. The only lines a panel draws are the rules under
-  its section labels: 1 px `dim`, as wide as the group. The header has none.
+- Space separates groups. The only lines a panel draws are the rules heading
+  its groups: 1 px `dim`, on the label's line, to the group's right edge or
+  what sits there. The header has none.
 
 ### Focus and state
 
@@ -133,9 +137,9 @@ Every panel has the same shape, top to bottom:
 - Three sizes: 16 px for the title and the key value; 14 px for the subtitle,
   section labels and body text; 12 px for the footer. All scale with the text
   scale.
-- A section label is in sentence case, 14 px, in `fg`, over its rule: no
+- A section label is in sentence case, 14 px, in `fg`, at its rule's left: no
   smaller than the body it heads, and set apart from it by the rule, not by
-  colour. Every group has one, even a panel's only group.
+  colour.
 - Colour carries a role or a status, never decoration.
 
 ## Status

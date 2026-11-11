@@ -57,7 +57,6 @@ Column {
     Ui.Section {
         visible: root.service.present
         shell: root.shell
-        title: "Details"
 
         Ui.InfoTable {
             shell: root.shell

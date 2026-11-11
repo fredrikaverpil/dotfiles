@@ -222,7 +222,7 @@ Column {
         text: "Forget"
     }
 
-    // A device's group: its details while connected; for Wi-Fi, its power button at the label's right
+    // A device's group: its details while connected; for Wi-Fi, its power button at the rule's right
     // and the networks under the details.
     component DeviceGroup: Ui.Section {
         id: group

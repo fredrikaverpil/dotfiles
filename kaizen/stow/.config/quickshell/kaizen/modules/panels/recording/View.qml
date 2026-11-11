@@ -41,7 +41,6 @@ Column {
     Ui.Section {
         visible: !root.service.busy
         shell: root.shell
-        title: "Options"
 
         Cycler {
             label: "Source"
@@ -150,7 +149,7 @@ Column {
             event.accepted = true;
         }
 
-        // The fill reaches into the card's padding, so the label aligns with the section label.
+        // The fill reaches into the card's padding, so the label aligns with the group's rule.
         Rectangle {
             anchors.fill: parent
             anchors.leftMargin: -8
