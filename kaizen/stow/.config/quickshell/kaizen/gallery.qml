@@ -12,6 +12,7 @@ import "modules/panels/bluetooth" as BluetoothPanel
 import "modules/panels/display" as DisplayPanel
 import "modules/panels/media" as MediaPanel
 import "modules/panels/network" as NetworkPanel
+import "modules/panels/recording" as RecordingPanel
 import "Ui/Palette.js" as Palette
 
 // Draws a panel's view in a window, under its bar button, fed by a stand-in in a chosen state.
@@ -74,6 +75,14 @@ ShellRoot {
                 button: networkButton,
                 props: {
                     service: fakeNetwork
+                }
+            },
+            "recording": {
+                title: "Recording",
+                fake: fakeRecording,
+                button: recordingButton,
+                props: {
+                    service: fakeRecording
                 }
             }
         })
@@ -240,6 +249,12 @@ ShellRoot {
         property string scenario: "Wi-Fi"
     }
 
+    Gallery.FakeRecording {
+        id: fakeRecording
+
+        property string scenario: "Idle"
+    }
+
     // The bar's own buttons, bound to the stand-ins.
     Component {
         id: audioButton
@@ -291,6 +306,15 @@ ShellRoot {
         BarWidgets.NetworkButton {
             shell: fakeShell
             service: fakeNetwork
+        }
+    }
+
+    Component {
+        id: recordingButton
+
+        BarWidgets.RecordingButton {
+            shell: fakeShell
+            service: fakeRecording
         }
     }
 

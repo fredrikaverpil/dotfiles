@@ -3,7 +3,6 @@ import Quickshell
 import Quickshell.Wayland
 
 import "widgets" as BarWidgets
-import "../services/recording/RecordingModel.js" as RecordingModel
 import "../../Ui" as Ui
 
 Scope {
@@ -277,16 +276,13 @@ Scope {
                 onActivated: bar.shell.keyboard.set(0)
             }
 
-            Ui.BarButton {
+            BarWidgets.RecordingButton {
                 id: recordingButton
                 shell: bar.shell
+                service: bar.shell.recordingService
                 anchors.right: keyboardButton.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: visible ? 4 : 0
-                visible: bar.shell.recordingService.busy
-                implicitWidth: visible ? 76 * bar.shell.textScale : 0
-                foreground: bar.shell.recordingService.paused ? bar.shell.palette.off : bar.shell.palette.rose
-                label: "󰑊 " + (bar.shell.recordingService.countdown > 0 ? bar.shell.recordingService.countdown : RecordingModel.elapsed(bar.shell.recordingService.seconds))
                 onActivated: bar.shell.recordingService.stop()
                 onSecondary: bar.shell.recordingService.togglePause()
             }

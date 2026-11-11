@@ -36,7 +36,8 @@ Item {
 
     // The choices each saved value falls back over, and the ones the panel offers.
     readonly property var monitorOptions: monitors.concat(["region"])
-    readonly property var cameraOptions: [""].concat(Ui.Compositor.supports.camera ? cameras.map(entry => entry.path) : [])
+    readonly property bool cameraSupported: Ui.Compositor.supports.camera
+    readonly property var cameraOptions: [""].concat(cameraSupported ? cameras.map(entry => entry.path) : [])
     readonly property var micOptions: ["", "default_input"].concat(mics.map(node => node.name))
 
     readonly property string activeMonitor: Model.pick(monitorOptions, monitor, monitors[0] || "")
