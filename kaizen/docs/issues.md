@@ -60,7 +60,7 @@ not planned, unreported.
 - Upstream: issue
   [#1230](https://github.com/quickshell-mirror/quickshell/issues/1230), fixed
   by PR [#1289](https://github.com/quickshell-mirror/quickshell/pull/1289) as
-  `18c95fa`.
+  `18c95fa`, which closed it.
 - Status: merged (unreleased).
 - Drop: the patch, once nixpkgs has a release after v0.3.2; then check whether
   `finishUnlock()` still needs its order, and update its comment.
@@ -98,9 +98,10 @@ not planned, unreported.
   niri too.
 - Upstream: `c2fec6c0` "module-x11-bell: make the X11 I/O error handler
   idempotent" on master, backported to 1.6 as `dc117ab7`, no issue.
-- Status: released in 1.6.10; nixpkgs has 1.6.9, and
+- Status: released in 1.6.10;
   [NixOS/nixpkgs#577480](https://github.com/NixOS/nixpkgs/pull/577480) merged
-  1.6.10 into staging.
+  it, and `nixos-unstable` has 1.6.11, but `nixpkgs-unstable`, which the flake
+  follows, still has 1.6.9.
 - Drop: the setting, once nixpkgs' PipeWire has a release containing it.
 
 ## Qt
@@ -152,7 +153,7 @@ Workarounds in the repository's `nix/` that kaizen hosts carry.
 
 - Symptom: renoir's `lightcraft`, in
   [`nix/hosts/renoir/configuration.nix`](../../nix/hosts/renoir/configuration.nix),
-  is nixpkgs' 0.14.0 (2026-10-25); upstream is at v0.19.0. It is there to try
+  is nixpkgs' 0.14.0 (2026-10-25); upstream is at v0.20.0. It is there to try
   out the Fujifilm X100VI's RAFs (X-Trans CMOS 5 HR, 40 MP, the X-T5's
   sensor), so Fujifilm fixes reach renoir only through nixpkgs.
 - Workaround: none. Upstream's flake fails every offline build since 0.15.0: its
@@ -162,8 +163,8 @@ Workarounds in the repository's `nix/` that kaizen hosts carry.
   Building it would take a `postPatch`, dropping `--locked` and a local compile
   on every bump.
 - Upstream (nixpkgs):
-  [NixOS/nixpkgs#580713](https://github.com/NixOS/nixpkgs/pull/580713) bumps
-  it to 0.16.0, deleting those entries in a `postPatch`.
+  [NixOS/nixpkgs#580713](https://github.com/NixOS/nixpkgs/pull/580713), a
+  draft, bumps it to 0.19.0, deleting those entries in a `postPatch`.
 - Wanted for the X100VI:
   - Released in v0.17.0, not in nixpkgs:
     [#3402](https://github.com/storytold/lightcraft/pull/3402), the camera look
