@@ -34,7 +34,7 @@ Column {
         title: "Recording"
         value: !root.service.busy ? "" : root.service.countdown > 0 ? String(root.service.countdown) : Model.elapsed(root.service.seconds)
         valueColor: root.service.paused ? root.shell.palette.off : root.shell.palette.rose
-        subtitle: root.service.paused ? "Paused" : "Saved to ~/Videos"
+        subtitle: root.service.paused ? "Paused" : "Saved to " + root.service.shownDirectory
     }
 
     // The options are fixed once recording starts, so they hide while busy.

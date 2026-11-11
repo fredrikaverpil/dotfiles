@@ -67,6 +67,7 @@ QtObject {
             })
         })
 
+    readonly property string shownDirectory: "~/Videos/Recordings"
     property var monitors: []
     property bool cameraSupported: true
     property var cameras: []

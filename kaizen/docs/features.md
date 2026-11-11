@@ -196,7 +196,8 @@ the focused screen, or Trigger › Screenshot.
 A screen recording utility makes it possible to record the screen (desktop,
 window or region) along with showing a circular video feed captured from a
 camera. Audio controls are available. `Mod+Print` opens the recording panel or
-stops a running recording; `Mod+Shift+Print` pauses or resumes it.
+stops a running recording; `Mod+Shift+Print` pauses or resumes it. Recordings
+are saved to `~/Videos/Recordings`.
 
 ## Time and timezone
 
