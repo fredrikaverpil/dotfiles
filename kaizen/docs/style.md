@@ -89,8 +89,10 @@ Every panel has the same shape, top to bottom:
   share their column widths, so they line up.
 - A footer with the panel's own keys: a keycap, then what it does in `off`. It
   lists only the keys the panel adds to those every panel shares
-  ([`interaction.md`](interaction.md) › Panels). The buttons acting on the
-  whole panel ("Pair new device…", a recording's Pause and Stop) sit at its
+  ([`interaction.md`](interaction.md) › Panels). A panel with no keys of its
+  own may put a fixed note there instead, such as its data's credit
+  (weather's MET Norway licence). The buttons acting on the whole panel
+  ("Pair new device…", a recording's Pause and Stop) sit at its
   right, where no scrolling hides them; a group's own button stays in its
   group.
 

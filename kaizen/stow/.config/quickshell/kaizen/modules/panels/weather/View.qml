@@ -9,210 +9,148 @@ Column {
     required property var shell
     required property var service
 
-    readonly property int cardWidth: 420
-    readonly property int cardHeight: 350
+    readonly property string updated: service.updatedAt ? Qt.formatDateTime(service.updatedAt, "HH:mm") : ""
+
+    readonly property int cardWidth: 400
+    readonly property int cardPadding: 16
+    readonly property int cardHeight: implicitHeight + 2 * cardPadding
     readonly property bool keyNavigation: true
 
     signal forecastRequested
+    signal locationRequested
 
     width: parent ? parent.width : 0
-    spacing: 8
+    spacing: 24
 
-    Text {
-        width: parent.width
-        color: root.shell.palette.fg
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 18
-        text: "Weather"
+    Ui.PanelHeader {
+        shell: root.shell
+        title: "Weather"
+        value: root.service.ready ? root.service.icon + " " + root.service.temperature : ""
+        subtitle: {
+            const place = root.service.place === "" ? "Unknown location" : root.service.place;
+            if (root.service.ready)
+                return place + " · " + root.service.condition;
+            return place + " · " + (root.service.failed ? "Forecast unavailable" : "Loading…");
+        }
     }
 
-    Text {
-        width: parent.width
-        elide: Text.ElideRight
-        color: root.shell.palette.off
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 13
-        text: (root.service.place === "" ? "Unknown location" : root.service.place) + (root.service.updatedAt ? "  ·  updated " + Qt.formatDateTime(root.service.updatedAt, "HH:mm:ss") : "")
-    }
-
-    Rectangle {
-        width: parent.width
-        height: 1
-        color: root.shell.palette.dim
-    }
-
-    Row {
-        width: parent.width
-        height: 76
-        spacing: 14
+    // Above the details: the values below are older than they look.
+    Ui.Section {
+        visible: root.service.failed && root.service.ready
+        shell: root.shell
 
         Text {
-            anchors.verticalCenter: parent.verticalCenter
-            color: root.shell.palette.fg
+            width: parent.width
+            wrapMode: Text.WordWrap
+            color: root.shell.palette.rose
             font.family: Ui.Fonts.mono
-            font.pixelSize: 46
-            text: root.service.icon
+            font.pixelSize: 14
+            text: "Could not update; showing the forecast from " + root.updated
+        }
+    }
+
+    Ui.Section {
+        visible: root.service.ready
+        shell: root.shell
+
+        Ui.InfoTable {
+            shell: root.shell
+            perLine: 2
+            entries: [
+                {
+                    label: "Wind",
+                    value: root.service.wind
+                },
+                {
+                    label: "Humidity",
+                    value: root.service.humidity
+                },
+                {
+                    label: "Updated",
+                    value: root.updated
+                }
+            ]
         }
 
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            color: root.shell.palette.fg
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 34
-            text: root.service.ready ? root.service.temperature : "--"
+        Ui.PanelButton {
+            shell: root.shell
+            label: "Today on yr.no"
+            onActivated: root.forecastRequested()
         }
+    }
+
+    Ui.Section {
+        visible: root.service.days.length > 0
+        shell: root.shell
+        title: "Forecast"
 
         Column {
-            anchors.verticalCenter: parent.verticalCenter
+            width: parent.width
             spacing: 4
 
-            Text {
-                color: root.shell.palette.fg
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 14
-                text: root.service.failed ? "Unavailable" : root.service.condition
-            }
+            Repeater {
+                model: root.service.days
 
-            Text {
-                visible: text.length > 0
-                color: root.shell.palette.off
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 13
-                text: root.service.wind === "" ? "" : "󰖝 " + root.service.wind + "   󰖎 " + root.service.humidity
-            }
-        }
-    }
+                delegate: Item {
+                    id: day
 
-    Rectangle {
-        width: parent.width
-        height: 1
-        color: root.shell.palette.dim
-    }
+                    required property var modelData
 
-    Repeater {
-        model: root.service.days
+                    width: root.width
+                    height: name.implicitHeight
 
-        delegate: Row {
-            id: dayRow
+                    Text {
+                        id: glyph
+                        width: 24
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: root.shell.palette.fg
+                        font.family: Ui.Fonts.mono
+                        font.pixelSize: 14
+                        text: Model.icon(day.modelData.symbol)
+                    }
 
-            required property var modelData
+                    Text {
+                        id: name
+                        x: glyph.width + 8
+                        width: 40
+                        color: root.shell.palette.fg
+                        font.family: Ui.Fonts.mono
+                        font.pixelSize: 14
+                        text: day.modelData.name
+                    }
 
-            width: root.width
-            height: 26
-            spacing: 10
+                    Text {
+                        x: name.x + name.width + 8
+                        width: temperatures.x - x - 8
+                        elide: Text.ElideRight
+                        color: root.shell.palette.fg
+                        font.family: Ui.Fonts.mono
+                        font.pixelSize: 14
+                        text: Model.condition(day.modelData.symbol)
+                    }
 
-            Text {
-                width: 44
-                anchors.verticalCenter: parent.verticalCenter
-                color: root.shell.palette.fg
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 14
-                text: dayRow.modelData.name
-            }
-
-            Text {
-                width: 24
-                anchors.verticalCenter: parent.verticalCenter
-                color: root.shell.palette.fg
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 16
-                text: Model.icon(dayRow.modelData.symbol)
-            }
-
-            Text {
-                width: 96
-                anchors.verticalCenter: parent.verticalCenter
-                color: root.shell.palette.fg
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 13
-                text: Model.temperature(dayRow.modelData.maximum) + " / " + Model.temperature(dayRow.modelData.minimum)
-            }
-
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                elide: Text.ElideRight
-                color: root.shell.palette.off
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 13
-                text: Model.condition(dayRow.modelData.symbol)
-            }
-        }
-    }
-
-    Item {
-        width: parent.width
-        height: 4
-    }
-
-    Row {
-        width: parent.width
-        spacing: 8
-
-        Rectangle {
-            id: refreshButton
-            width: (parent.width - parent.spacing) / 2
-            height: 28
-            radius: 4
-            color: activeFocus ? root.shell.palette.sel : "transparent"
-            border.color: activeFocus ? root.shell.palette.fg : root.shell.palette.dim
-            border.width: 1
-            activeFocusOnTab: true
-
-            Keys.onReturnPressed: root.service.refresh()
-            Keys.onEnterPressed: root.service.refresh()
-            Keys.onSpacePressed: root.service.refresh()
-
-            Text {
-                anchors.centerIn: parent
-                color: root.shell.palette.fg
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 13
-                text: root.service.busy ? "󰑐 Refreshing…" : "󰑐 Refresh"
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                enabled: !root.service.busy
-                onClicked: root.service.refresh()
-            }
-        }
-
-        Rectangle {
-            id: yrButton
-
-            width: (parent.width - parent.spacing) / 2
-            height: 28
-            radius: 4
-            color: activeFocus ? root.shell.palette.sel : "transparent"
-            border.color: activeFocus ? root.shell.palette.fg : root.shell.palette.dim
-            border.width: 1
-            activeFocusOnTab: true
-
-            Keys.onReturnPressed: root.forecastRequested()
-            Keys.onEnterPressed: root.forecastRequested()
-            Keys.onSpacePressed: root.forecastRequested()
-
-            Text {
-                anchors.centerIn: parent
-                color: root.shell.palette.fg
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 13
-                text: "󰖐 Today on yr.no"
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: root.forecastRequested()
+                    Text {
+                        id: temperatures
+                        anchors.right: parent.right
+                        color: root.shell.palette.fg
+                        font.family: Ui.Fonts.mono
+                        font.pixelSize: 14
+                        text: Model.temperature(day.modelData.maximum) + " / " + Model.temperature(day.modelData.minimum)
+                    }
+                }
             }
         }
     }
 
     // CC BY 4.0 requires crediting MET Norway wherever their data is shown.
-    Text {
-        width: parent.width
-        color: root.shell.palette.off
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 11
-        text: "Data from MET Norway (yr.no), CC BY 4.0"
+    Ui.PanelFooter {
+        shell: root.shell
+        note: "MET Norway, CC BY 4.0"
+
+        Ui.PanelButton {
+            shell: root.shell
+            label: "Change location…"
+            onActivated: root.locationRequested()
+        }
     }
 }

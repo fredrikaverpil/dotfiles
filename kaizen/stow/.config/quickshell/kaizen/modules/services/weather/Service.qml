@@ -27,7 +27,6 @@ Item {
     // the first fetch.
     property var expiresAt: null
 
-    readonly property bool busy: fetch.running
     readonly property bool ready: current !== null
     readonly property string icon: current ? Model.icon(current.symbol) : "󰖐"
     readonly property string condition: current ? Model.condition(current.symbol) : ""

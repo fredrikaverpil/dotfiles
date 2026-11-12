@@ -12,6 +12,7 @@ Ui.Panel {
 
     cardWidth: view.cardWidth
     cardHeight: view.cardHeight
+    cardPadding: view.cardPadding
     keyNavigation: view.keyNavigation
 
     onShownChanged: if (shown)
@@ -63,5 +64,7 @@ Ui.Panel {
         shell: root.shell
         service: root.service
         onForecastRequested: root.openForecast()
+        // The launcher claims focus and closes this panel.
+        onLocationRequested: root.shell.menu.open("settings.weather.location")
     }
 }

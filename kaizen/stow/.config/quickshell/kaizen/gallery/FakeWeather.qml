@@ -110,7 +110,6 @@ QtObject {
     property var days: forecast
     property bool failed: false
     property var updatedAt: updated
-    property bool busy: false
 
     readonly property bool ready: current !== null
     readonly property string icon: current ? Model.icon(current.symbol) : "󰖐"
@@ -118,7 +117,4 @@ QtObject {
     readonly property string temperature: current ? Model.temperature(current.temperature) : ""
     readonly property string wind: current ? Math.round(current.wind) + " m/s" : ""
     readonly property string humidity: current ? Math.round(current.humidity) + "%" : ""
-
-    function refresh() {
-    }
 }
