@@ -10,12 +10,15 @@ Rectangle {
     property string fontFamily: Fonts.mono
     property real fontSize: 14
     property color foreground: btn.shell.palette.fg
+    // Glyphs before the label, each in a colour of its own, such as a status: [{ icon, color }].
+    property var prefix: []
+    readonly property real prefixWidth: btnPrefix.visible ? btnPrefix.implicitWidth + 4 * btn.shell.textScale : 0
 
     signal activated
     signal secondary
     signal middle
 
-    implicitWidth: visible ? Math.max(28 * btn.shell.textScale, btnLabel.implicitWidth + 12 * btn.shell.textScale) : 0
+    implicitWidth: visible ? Math.max(28 * btn.shell.textScale, btn.prefixWidth + btnLabel.implicitWidth + 12 * btn.shell.textScale) : 0
     width: implicitWidth
     height: Math.round(24 * btn.shell.textScale)
     radius: 4
@@ -49,10 +52,32 @@ Rectangle {
         id: btnLabel
         anchors.centerIn: parent
         visible: !btnImage.visible
-        anchors.horizontalCenterOffset: btnLabel.implicitWidth / 2 - (btnMetrics.tightBoundingRect.x + btnMetrics.tightBoundingRect.width / 2)
+        anchors.horizontalCenterOffset: btnLabel.implicitWidth / 2 - (btnMetrics.tightBoundingRect.x + btnMetrics.tightBoundingRect.width / 2) + btn.prefixWidth / 2
         color: btn.foreground
         font.family: btn.fontFamily
         font.pixelSize: btn.fontSize * btn.shell.textScale
+    }
+
+    Row {
+        id: btnPrefix
+        anchors.right: btnLabel.left
+        anchors.rightMargin: 4 * btn.shell.textScale
+        anchors.verticalCenter: btnLabel.verticalCenter
+        visible: btnLabel.visible && btn.prefix.length > 0
+        spacing: 4 * btn.shell.textScale
+
+        Repeater {
+            model: btn.prefix
+
+            delegate: Text {
+                required property var modelData
+
+                color: modelData.color
+                font.family: btn.fontFamily
+                font.pixelSize: btn.fontSize * btn.shell.textScale
+                text: modelData.icon
+            }
+        }
     }
 
     HoverHandler {
