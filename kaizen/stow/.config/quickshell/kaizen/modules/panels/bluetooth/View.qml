@@ -13,8 +13,7 @@ Column {
     signal settingsRequested
 
     readonly property int cardWidth: 400
-    readonly property int cardPadding: 16
-    readonly property int cardHeight: implicitHeight + 2 * cardPadding
+    readonly property int cardHeight: implicitHeight + 2 * Ui.Space.cardPadding
     // One width for a row's button, whatever its label, so the statuses line up.
     readonly property int actionWidth: actionMetrics.advanceWidth + 24
     readonly property bool keyNavigation: true

@@ -9,6 +9,7 @@ MenuOverlay 1.0 MenuOverlay.qml
 Keycaps 1.0 Keycaps.qml
 BarButton 1.0 BarButton.qml
 singleton Paths 1.0 Paths.qml
+singleton Space 1.0 Space.qml
 Plugin 1.0 Plugin.qml
 Section 1.0 Section.qml
 PanelCard 1.0 PanelCard.qml

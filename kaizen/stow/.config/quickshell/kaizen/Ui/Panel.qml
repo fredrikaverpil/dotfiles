@@ -9,7 +9,6 @@ PanelWindow {
     property bool shown: false
     property int cardWidth: 600
     property int cardHeight: 420
-    property int cardPadding: 12
     readonly property int barHeight: shell ? shell.barHeight : 32
 
     property bool keyNavigation: false
@@ -86,7 +85,6 @@ PanelWindow {
             id: card
             shell: panel.shell
             keyNavigation: panel.keyNavigation
-            padding: panel.cardPadding
             anchors.centerIn: parent
             width: panel.cardWidth
             height: panel.cardHeight

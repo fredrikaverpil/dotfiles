@@ -13,8 +13,7 @@ Column {
     property bool dnd: true
 
     readonly property int cardWidth: 400
-    readonly property int cardPadding: 16
-    readonly property int cardHeight: implicitHeight + 2 * cardPadding
+    readonly property int cardHeight: implicitHeight + 2 * Ui.Space.cardPadding
     readonly property bool keyNavigation: true
 
     signal recordRequested

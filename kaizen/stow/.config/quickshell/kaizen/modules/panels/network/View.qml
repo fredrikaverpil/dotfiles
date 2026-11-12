@@ -17,8 +17,7 @@ Column {
     signal settingsRequested
 
     readonly property int cardWidth: 600
-    readonly property int cardPadding: 16
-    readonly property int cardHeight: implicitHeight + 2 * cardPadding
+    readonly property int cardHeight: implicitHeight + 2 * Ui.Space.cardPadding
     readonly property bool keyNavigation: true
 
     // One width for a row's main button, whatever its label, so names and buttons line up.

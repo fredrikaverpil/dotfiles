@@ -15,8 +15,7 @@ Column {
     property string copied: ""
 
     readonly property int cardWidth: 400
-    readonly property int cardPadding: 16
-    readonly property int cardHeight: implicitHeight + 2 * cardPadding
+    readonly property int cardHeight: implicitHeight + 2 * Ui.Space.cardPadding
     readonly property bool keyNavigation: true
 
     // One width for every group's table, so they line up.

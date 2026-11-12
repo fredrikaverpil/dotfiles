@@ -7,7 +7,6 @@ Rectangle {
 
     required property var shell
     property bool keyNavigation: false
-    property int padding: 12
 
     default property alias content: column.data
     readonly property alias body: column
@@ -56,7 +55,7 @@ Rectangle {
     // Takes focus back when the focused item goes (a row whose entry left), so the card's keys keep working.
     FocusScope {
         anchors.fill: parent
-        anchors.margins: card.padding
+        anchors.margins: Space.cardPadding
         focus: card.keyNavigation
 
         Column {

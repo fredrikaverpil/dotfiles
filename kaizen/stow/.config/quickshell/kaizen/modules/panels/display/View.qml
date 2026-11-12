@@ -23,8 +23,7 @@ Column {
     readonly property real mirrorWidth: outputs.names.length * (outputs.names.reduce((widest, name) => Math.max(widest, nameMetrics.advanceWidth(name)), nameMetrics.advanceWidth("Own")) + 32)
 
     readonly property int cardWidth: 400
-    readonly property int cardPadding: 16
-    readonly property int cardHeight: implicitHeight + 2 * cardPadding
+    readonly property int cardHeight: implicitHeight + 2 * Ui.Space.cardPadding
     readonly property bool keyNavigation: true
 
     width: parent ? parent.width : 0

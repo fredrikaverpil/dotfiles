@@ -13,7 +13,6 @@ Ui.Panel {
 
     cardWidth: view.cardWidth
     cardHeight: view.cardHeight
-    cardPadding: view.cardPadding
     keyNavigation: view.keyNavigation
     // Held unmapped until a probe replaces the time left from the last open.
     visible: shown && service.fresh

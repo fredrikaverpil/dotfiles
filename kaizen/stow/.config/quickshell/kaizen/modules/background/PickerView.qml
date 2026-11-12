@@ -12,7 +12,6 @@ Column {
 
     readonly property int cardWidth: 1200
     readonly property int cardHeight: 780
-    readonly property int cardPadding: 16
     readonly property bool keyNavigation: false
     // The focused wallpaper, which the background previews.
     readonly property string selected: grid.sel >= 0 ? (root.service.wallpapers[grid.sel] || "") : ""

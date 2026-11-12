@@ -192,8 +192,6 @@ ShellRoot {
         newCard.width = Qt.binding(() => newView.cardWidth);
         newCard.height = Qt.binding(() => newView.cardHeight);
         newCard.keyNavigation = Qt.binding(() => !!newView.keyNavigation);
-        if (newView.cardPadding !== undefined)
-            newCard.padding = Qt.binding(() => newView.cardPadding);
         card = newCard;
         view = newView;
         const variant = JSON.parse(saved.variants)[panel];

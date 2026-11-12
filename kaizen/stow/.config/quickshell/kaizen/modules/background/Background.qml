@@ -312,7 +312,6 @@ Scope {
         shell: background.shell
         cardWidth: pickerView.cardWidth
         cardHeight: pickerView.cardHeight
-        cardPadding: pickerView.cardPadding
         keyNavigation: pickerView.keyNavigation
 
         function open(slot) {
