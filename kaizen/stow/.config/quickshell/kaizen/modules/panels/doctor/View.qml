@@ -10,218 +10,213 @@ Column {
     // The doctor service, or the gallery's stand-in.
     required property var service
 
-    // What was last copied, shown until the panel closes.
+    // What was copied last, until the panel closes: "all", or a finding's `Model.key`.
     property string copied: ""
+    // The focused finding's `Model.key`, so focus survives a run, which rebuilds the rows; "" off the rows.
+    property string focusedKey: ""
 
-    readonly property int cardWidth: 720
-    readonly property int cardHeight: 520
+    readonly property int cardWidth: 600
+    readonly property int cardPadding: 16
+    readonly property int cardHeight: implicitHeight + 2 * cardPadding
     readonly property bool keyNavigation: true
 
-    // The report's first line counts the findings.
-    readonly property string statusText: {
-        if (service.checked === 0)
-            return service.running ? "Checking…" : "";
-        return "Checked " + Model.clock(service.checked) + (service.running ? " · checking…" : "");
-    }
-
     function reset() {
-        Qt.callLater(() => document.forceActiveFocus());
+        Qt.callLater(() => {
+            const first = rows.itemAt(0);
+            if (first)
+                first.forceActiveFocus();
+        });
     }
 
     function copyAll() {
         if (root.service.copyAll())
-            root.copied = "the report";
+            root.copied = "all";
     }
 
-    // Moves the cursor to pos, extending the selection with Shift.
-    function moveCursor(pos, event) {
-        if (event.modifiers & Qt.ShiftModifier)
-            document.moveCursorSelection(pos, TextEdit.SelectCharacters);
-        else
-            document.cursorPosition = pos;
-    }
-
-    function follow() {
-        const rect = document.cursorRectangle;
-        if (rect.y < scroller.contentY)
-            scroller.contentY = Math.max(0, rect.y);
-        else if (rect.y + rect.height > scroller.contentY + scroller.height)
-            scroller.contentY = rect.y + rect.height - scroller.height;
+    function copy(finding) {
+        root.service.copyFinding(finding);
+        root.copied = Model.key(finding);
     }
 
     width: parent ? parent.width : 0
-    height: parent ? parent.height : 0
-    spacing: 8
+    spacing: 24
 
-    Column {
-        id: header
-        width: parent.width
-        spacing: 10
-
-        Text {
-            width: parent.width
-            color: root.shell.palette.fg
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 18
-            text: "Doctor"
-        }
-
-        Rectangle {
-            width: parent.width
-            height: 1
-            color: root.shell.palette.dim
-        }
-
-        Text {
-            width: parent.width
-            visible: text !== ""
-            wrapMode: Text.WordWrap
-            color: root.shell.palette.off
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 13
-            text: root.statusText
-        }
-
-        Text {
-            width: parent.width
-            visible: text !== ""
-            wrapMode: Text.WrapAnywhere
-            color: root.shell.palette.rose
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 12
-            text: root.service.failure
+    Ui.PanelHeader {
+        shell: root.shell
+        title: "Doctor"
+        subtitle: {
+            const service = root.service;
+            if (service.checked === 0)
+                return service.running ? "Checking…" : "Check failed";
+            const counts = service.findings.length === 0 ? "No errors or warnings" : Model.summary(service.counts);
+            return counts + " · checked " + Model.clock(service.checked);
         }
     }
 
-    // A read-only document: arrows, PageUp/PageDown and Home/End stay in it;
-    // Tab and hjkl step focus as elsewhere in panels.
-    Rectangle {
-        width: parent.width
-        height: parent.height - header.height - footer.height - 2 * parent.spacing
-        radius: 4
-        color: "transparent"
-        border.color: document.activeFocus ? root.shell.palette.fg : root.shell.palette.dim
-        border.width: 1
+    // The findings scroll under the fixed header.
+    Ui.PanelScroller {
+        visible: root.service.failure !== "" || root.service.findings.length > 0
+        shell: root.shell
 
-        Flickable {
-            id: scroller
-            anchors.fill: parent
-            anchors.margins: 8
-            contentWidth: width
-            contentHeight: document.height
-            clip: true
-            boundsBehavior: Flickable.StopAtBounds
+        // Above the findings: they are from the last run that gave a report.
+        Ui.Section {
+            visible: root.service.failure !== ""
+            shell: root.shell
 
-            // What the document leaves at its edges.
-            Keys.onPressed: function (event) {
-                if (event.key === Qt.Key_Up || event.key === Qt.Key_Down || event.key === Qt.Key_Left || event.key === Qt.Key_Right)
-                    event.accepted = true;
-            }
-
-            TextEdit {
-                id: document
-                width: scroller.width
-                readOnly: true
-                selectByKeyboard: true
-                selectByMouse: true
-                activeFocusOnTab: true
-                cursorVisible: activeFocus
-                textFormat: TextEdit.RichText
-                wrapMode: TextEdit.Wrap
-                color: root.shell.palette.fg
-                selectionColor: root.shell.palette.sel
-                selectedTextColor: root.shell.palette.fg
+            Text {
+                width: root.width
+                wrapMode: Text.Wrap
+                color: root.shell.palette.rose
                 font.family: Ui.Fonts.mono
-                font.pixelSize: 12
-                text: Model.html(root.service.text, root.shell.palette)
+                font.pixelSize: 14
+                textFormat: Text.PlainText
+                text: root.service.failure
+            }
+        }
 
-                onCursorRectangleChanged: root.follow()
+        Ui.Section {
+            visible: root.service.findings.length > 0
+            shell: root.shell
 
-                Keys.onPressed: function (event) {
-                    const rect = cursorRectangle;
-                    if (event.key === Qt.Key_PageUp || event.key === Qt.Key_PageDown) {
-                        const y = rect.y + (event.key === Qt.Key_PageUp ? -1 : 1) * scroller.height;
-                        root.moveCursor(positionAt(rect.x, Math.max(0, Math.min(height - 1, y))), event);
-                    } else if (event.key === Qt.Key_Home) {
-                        root.moveCursor(0, event);
-                    } else if (event.key === Qt.Key_End) {
-                        root.moveCursor(length, event);
-                    } else {
-                        return;
+            Column {
+                width: root.width
+                spacing: 4
+
+                Repeater {
+                    id: rows
+                    model: root.service.findings
+
+                    delegate: FindingRow {
+                        required property var modelData
+                        finding: modelData
                     }
-                    event.accepted = true;
                 }
             }
         }
     }
 
-    Column {
-        id: footer
-        width: parent.width
-        spacing: 10
+    // A healthy report says only that.
+    Ui.PanelFooter {
+        visible: root.service.findings.length > 0
+        shell: root.shell
 
-        Text {
-            width: parent.width
-            visible: root.copied !== ""
-            color: root.shell.palette.leaf
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 12
-            text: "Copied " + root.copied
-        }
-
-        Row {
-            spacing: 8
-
-            Action {
-                label: "󰑐 Refresh"
-                available: !root.service.running
-                onActivated: root.service.refresh()
-            }
-
-            Action {
-                label: "󰆏 Copy all"
-                available: root.service.text !== ""
-                onActivated: root.copyAll()
-            }
+        Ui.PanelButton {
+            // As wide for either label, so the button keeps its place.
+            width: metrics.advanceWidth("Copy report") + 24
+            shell: root.shell
+            label: root.copied === "all" ? "Copied" : "Copy report"
+            onActiveFocusChanged: if (activeFocus)
+                root.focusedKey = ""
+            onActivated: root.copyAll()
         }
     }
 
-    component Action: Rectangle {
-        id: action
+    FontMetrics {
+        id: metrics
+        font.family: Ui.Fonts.mono
+        font.pixelSize: 14
+    }
 
-        property string label
-        property bool available: true
+    // A finding: its level and unit, when it happened, its message and its fix. Enter, Space or a click copies it.
+    component FindingRow: Item {
+        id: row
 
-        signal activated
+        required property var finding
+        readonly property string key: Model.key(finding)
+        readonly property bool copied: root.copied === key
 
-        width: 140
-        height: 28
-        radius: 4
-        color: activeFocus ? root.shell.palette.sel : "transparent"
-        border.color: activeFocus ? root.shell.palette.fg : root.shell.palette.dim
-        border.width: 1
-        opacity: available ? 1 : 0.45
+        width: root.width
+        implicitHeight: lines.implicitHeight + 10
         activeFocusOnTab: true
+        onActiveFocusChanged: if (activeFocus)
+            root.focusedKey = key
+        Component.onCompleted: if (key === root.focusedKey)
+            Qt.callLater(() => row.forceActiveFocus())
 
-        Keys.onReturnPressed: if (available)
-            activated()
-        Keys.onEnterPressed: if (available)
-            activated()
-        Keys.onSpacePressed: if (available)
-            activated()
+        Keys.onReturnPressed: root.copy(row.finding)
+        Keys.onEnterPressed: root.copy(row.finding)
+        Keys.onSpacePressed: root.copy(row.finding)
 
-        Text {
-            anchors.centerIn: parent
-            color: root.shell.palette.fg
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 12
-            text: action.label
+        // The fill reaches into the card's padding, so the text aligns with the rule.
+        Rectangle {
+            anchors.fill: parent
+            anchors.leftMargin: -8
+            anchors.rightMargin: -8
+            radius: 4
+            color: row.activeFocus || mouse.containsMouse ? root.shell.palette.sel : "transparent"
+        }
+
+        Column {
+            id: lines
+
+            y: 5
+            width: parent.width
+            spacing: 4
+
+            Item {
+                width: parent.width
+                height: level.implicitHeight
+
+                Text {
+                    id: level
+                    color: root.shell.palette[Model.role(row.finding.level)]
+                    font.family: Ui.Fonts.mono
+                    font.pixelSize: 14
+                    text: row.finding.level === "WARN" ? "Warning" : "Error"
+                }
+
+                Text {
+                    anchors.left: level.right
+                    anchors.leftMargin: 8
+                    anchors.right: when.left
+                    anchors.rightMargin: when.text ? 8 : 0
+                    elide: Text.ElideRight
+                    color: root.shell.palette.fg
+                    font.family: Ui.Fonts.mono
+                    font.pixelSize: 14
+                    textFormat: Text.PlainText
+                    text: row.finding.unit
+                }
+
+                Text {
+                    id: when
+                    anchors.right: parent.right
+                    color: row.copied ? root.shell.palette.leaf : root.shell.palette.off
+                    font.family: Ui.Fonts.mono
+                    font.pixelSize: 14
+                    text: row.copied ? "Copied" : Model.when(row.finding)
+                }
+            }
+
+            Text {
+                width: parent.width
+                wrapMode: Text.Wrap
+                color: root.shell.palette.fg
+                font.family: Ui.Fonts.mono
+                font.pixelSize: 14
+                textFormat: Text.PlainText
+                text: row.finding.message
+            }
+
+            Text {
+                visible: !!row.finding.hint
+                width: parent.width
+                wrapMode: Text.Wrap
+                color: root.shell.palette.off
+                font.family: Ui.Fonts.mono
+                font.pixelSize: 14
+                textFormat: Text.PlainText
+                text: row.finding.hint || ""
+            }
         }
 
         MouseArea {
+            id: mouse
             anchors.fill: parent
-            enabled: action.available
-            onClicked: action.activated()
+            anchors.leftMargin: -8
+            anchors.rightMargin: -8
+            hoverEnabled: true
+            onClicked: root.copy(row.finding)
         }
     }
 }

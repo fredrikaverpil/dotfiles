@@ -31,6 +31,10 @@ Item {
         return true;
     }
 
+    function copyFinding(finding) {
+        Quickshell.execDetached(["wl-copy", "--", Model.copyText(finding)]);
+    }
+
     function status() {
         return JSON.stringify({
             errors: counts.errors,

@@ -39,26 +39,64 @@ QtObject {
             first: now,
             last: now
         })
+    readonly property var niriError: ({
+            source: "check",
+            id: "niri-config",
+            level: "ERROR",
+            unit: "niri",
+            message: "niri validate:\nError: unexpected node `focus-ring-colour`\n  at ~/.config/niri/config.kdl:42:5",
+            count: 1,
+            first: now,
+            last: now
+        })
+    // Log findings over a span, one per unit.
+    function logWarning(unit, message, count) {
+        return {
+            source: "log",
+            id: "log",
+            level: "WARN",
+            unit: unit,
+            message: message,
+            count: count,
+            first: now - 3600000,
+            last: now - 60000
+        };
+    }
+    readonly property var many: [unitError, niriError, shellWarning, devWarning, logWarning("kaizen-dcal", "sync: calendar \"Work\" timed out after 30 s", 12), logWarning("kaizen-investigator", "slog: run 41 exited with status 2", 3), logWarning("kaizen-sleep-lock", "inhibitor taken late: 812 ms", 2), logWarning("kaizen-tray-ready", "StatusNotifierWatcher not on the bus after 5 s", 1), logWarning("kaizen-mirror-DP-1", "wl-mirror: output DP-1 went away", 2), logWarning("kaizen-gcloud-auth", "token refresh failed: invalid_grant", 6)]
     readonly property var scenarios: ({
             "Healthy": {
                 findings: [],
-                text: "",
+                text: "No errors or warnings",
                 checked: now,
                 failure: "",
                 running: false
             },
             "Warnings": {
                 findings: [shellWarning, devWarning],
-                text: "2 warnings\n\nWARN  kaizen-shell  ×4  14:01:55\n  WARN: attempted to insert into a list that no longer exists\nWARN  kaizen-shell  14:02:07\n  runs /home/fredrik/.dotfiles/.claude/worktrees/kaizen-panel-design/kaizen/stow/.config/quickshell/kaizen\n  hint: kaizen dev off",
+                text: "2 warnings\n\nWARN  kaizen-shell  ×4  14:01:55\n  WARN: attempted to insert into a list that no longer exists\nWARN  kaizen-shell  check\n  runs /home/fredrik/.dotfiles/.claude/worktrees/kaizen-panel-design/kaizen/stow/.config/quickshell/kaizen\n  hint: kaizen dev off",
                 checked: now,
                 failure: "",
                 running: false
             },
             "Errors": {
                 findings: [unitError, shellWarning],
-                text: "1 error, 1 warning\n\nERROR kaizen-dcal  14:02:07\n  failed: exited with status 1\n  hint: systemctl --user restart kaizen-dcal\nWARN  kaizen-shell  ×4  14:01:55\n  WARN: attempted to insert into a list that no longer exists",
+                text: "1 error, 1 warning\n\nERROR kaizen-dcal  check\n  failed: exited with status 1\n  hint: systemctl --user restart kaizen-dcal\nWARN  kaizen-shell  ×4  14:01:55\n  WARN: attempted to insert into a list that no longer exists",
                 checked: now,
                 failure: "",
+                running: false
+            },
+            "Many": {
+                findings: many,
+                text: "2 errors, 8 warnings\n\n…",
+                checked: now,
+                failure: "",
+                running: false
+            },
+            "Failed with findings": {
+                findings: [unitError, shellWarning],
+                text: "1 error, 1 warning\n\n…",
+                checked: now - 120000,
+                failure: "kaizen doctor: journalctl: Failed to get journal access",
                 running: false
             },
             "Checking": {
@@ -89,5 +127,8 @@ QtObject {
 
     function copyAll() {
         return text !== "";
+    }
+
+    function copyFinding(finding) {
     }
 }

@@ -137,30 +137,116 @@ TestCase {
         compare(got, data.want);
     }
 
-    function test_html_data() {
-        const palette = {
-            rose: "#ff0000",
-            wood: "#00ff00"
-        };
+    function test_summary_data() {
         return [
             {
-                tag: "report",
-                text: "1 error, 1 warning\n\nERROR niri  check\n  niri validate:\n  <foo> & bar\nWARN  kaizen-shell  08:41:23\n  WARN qml: x",
-                palette: palette,
-                want: '<div style="white-space: pre-wrap">1 error, 1 warning<br><br>' + '<span style="color: #ff0000">ERROR</span> niri  check<br>' + "  niri validate:<br>  &lt;foo&gt; &amp; bar<br>" + '<span style="color: #00ff00">WARN</span>  kaizen-shell  08:41:23<br>' + "  WARN qml: x</div>"
+                tag: "none",
+                counts: {
+                    errors: 0,
+                    warnings: 0
+                },
+                want: ""
             },
             {
-                tag: "no findings",
-                text: "No errors or warnings",
-                palette: palette,
-                want: '<div style="white-space: pre-wrap">No errors or warnings</div>'
+                tag: "one error",
+                counts: {
+                    errors: 1,
+                    warnings: 0
+                },
+                want: "1 error"
+            },
+            {
+                tag: "warnings",
+                counts: {
+                    errors: 0,
+                    warnings: 2
+                },
+                want: "2 warnings"
+            },
+            {
+                tag: "both",
+                counts: {
+                    errors: 2,
+                    warnings: 1
+                },
+                want: "2 errors, 1 warning"
             }
         ];
     }
 
-    function test_html(data) {
+    function test_summary(data) {
         // Act
-        const got = Doctor.html(data.text, data.palette);
+        const got = Doctor.summary(data.counts);
+
+        // Assert
+        verify(got === data.want, got);
+    }
+
+    function test_when_data() {
+        return [
+            {
+                tag: "once",
+                finding: Object.assign({}, warning, {
+                    count: 1,
+                    first: morning,
+                    last: morning
+                }),
+                want: "08:41:23"
+            },
+            {
+                tag: "repeated over a span",
+                finding: Object.assign({}, warning, {
+                    count: 3,
+                    first: morning,
+                    last: morning + 65000
+                }),
+                want: "×3 · 08:41:23–08:42:28"
+            },
+            {
+                tag: "repeated in one second",
+                finding: Object.assign({}, warning, {
+                    count: 4,
+                    first: morning,
+                    last: morning + 200
+                }),
+                want: "×4 · 08:41:23"
+            },
+            {
+                tag: "check",
+                finding: error,
+                want: ""
+            }
+        ];
+    }
+
+    function test_when(data) {
+        // Act
+        const got = Doctor.when(data.finding);
+
+        // Assert
+        verify(got === data.want, got);
+    }
+
+    function test_copyText_data() {
+        return [
+            {
+                tag: "no hint",
+                finding: warning,
+                want: "WARN scene: binding loop"
+            },
+            {
+                tag: "hint",
+                finding: Object.assign({}, error, {
+                    hint: "niri validate"
+                }),
+                want: "niri validate:\nError: unexpected node\nniri validate"
+            }
+        ];
+    }
+
+    function test_copyText(data) {
+        // Act
+        const got = Doctor.copyText(data.finding);
 
         // Assert
         verify(got === data.want, got);

@@ -74,9 +74,8 @@ instead, without the checks.
 
 The shell runs it every minute and when the panel opens. The bar shows an
 indicator while it reports anything: rose with any error, wood for warnings
-only. It opens the doctor panel, the report as text: arrows,
-PageUp/PageDown and Home/End move in it, Shift selects and Ctrl+C copies the
-selection. Refresh runs it again; Copy all copies the report.
+only. It opens the doctor panel, a row per finding: Enter, Space or a click
+copies its message and hint. Copy report copies the whole report.
 
 ## Firmware (`firmware`)
 
