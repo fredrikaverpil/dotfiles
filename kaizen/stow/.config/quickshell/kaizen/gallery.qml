@@ -9,6 +9,7 @@ import "modules/bar/widgets" as BarWidgets
 import "modules/panels/audio" as AudioPanel
 import "modules/panels/battery" as BatteryPanel
 import "modules/panels/bluetooth" as BluetoothPanel
+import "modules/panels/clipboard" as ClipboardPanel
 import "modules/panels/display" as DisplayPanel
 import "modules/panels/doctor" as DoctorPanel
 import "modules/panels/firmware" as FirmwarePanel
@@ -52,6 +53,14 @@ ShellRoot {
                 button: bluetoothButton,
                 props: {
                     service: fakeBluetooth
+                }
+            },
+            "clipboard": {
+                title: "Clipboard",
+                fake: fakeClipboard,
+                button: null,
+                props: {
+                    service: fakeClipboard
                 }
             },
             "display": {
@@ -265,6 +274,12 @@ ShellRoot {
         id: fakeBluetooth
 
         property string scenario: "Connected"
+    }
+
+    Gallery.FakeClipboard {
+        id: fakeClipboard
+
+        property string scenario: "Several"
     }
 
     Gallery.FakeDisplay {
