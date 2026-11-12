@@ -105,14 +105,14 @@ Column {
                 return !first;
             }
 
-            // Keeps a section's header in view when its first row is selected.
+            // Keeps the selected row in view, and its folder's label too when it is the folder's first row.
             function reveal() {
-                let r = root.service.rowOfIndex[sel];
+                const r = root.service.rowOfIndex[sel];
                 if (r === undefined)
                     return;
-                if (root.service.rows[r - 1] && root.service.rows[r - 1].header)
-                    r--;
                 positionViewAtIndex(r, ListView.Contain);
+                if (root.service.rows[r - 1] && root.service.rows[r - 1].header)
+                    positionViewAtIndex(r - 1, ListView.Contain);
             }
 
             // Moves one image row up or down, skipping headers.
