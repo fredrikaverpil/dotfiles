@@ -10,6 +10,7 @@ import "modules/panels/audio" as AudioPanel
 import "modules/panels/battery" as BatteryPanel
 import "modules/panels/bluetooth" as BluetoothPanel
 import "modules/panels/display" as DisplayPanel
+import "modules/panels/doctor" as DoctorPanel
 import "modules/panels/firmware" as FirmwarePanel
 import "modules/panels/media" as MediaPanel
 import "modules/panels/network" as NetworkPanel
@@ -62,6 +63,14 @@ ShellRoot {
                     nightlight: fakeDisplay,
                     mirror: fakeDisplay,
                     outputs: fakeDisplay
+                }
+            },
+            "doctor": {
+                title: "Doctor",
+                fake: fakeDoctor,
+                button: doctorButton,
+                props: {
+                    service: fakeDoctor
                 }
             },
             "firmware": {
@@ -264,6 +273,12 @@ ShellRoot {
         property string scenario: "Laptop"
     }
 
+    Gallery.FakeDoctor {
+        id: fakeDoctor
+
+        property string scenario: "Warnings"
+    }
+
     Gallery.FakeFirmware {
         id: fakeFirmware
 
@@ -333,6 +348,15 @@ ShellRoot {
 
         BarWidgets.DisplayButton {
             shell: fakeShell
+        }
+    }
+
+    Component {
+        id: doctorButton
+
+        BarWidgets.DoctorButton {
+            shell: fakeShell
+            service: fakeDoctor
         }
     }
 

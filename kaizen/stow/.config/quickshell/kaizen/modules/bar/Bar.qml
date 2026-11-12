@@ -304,15 +304,13 @@ Scope {
             }
 
             // `kaizen doctor` reports anything.
-            Ui.BarButton {
+            BarWidgets.DoctorButton {
                 id: doctorButton
                 shell: bar.shell
+                service: bar.shell.doctorService
                 anchors.right: firmwareButton.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: visible ? 4 : 0
-                visible: bar.shell.doctorService.findings.length > 0 || bar.shell.doctorService.failure !== ""
-                foreground: bar.shell.doctorService.counts.errors > 0 || bar.shell.doctorService.failure !== "" ? bar.shell.palette.rose : bar.shell.palette.wood
-                label: "󰃤"
                 onActivated: bar.shell.doctor.toggle()
                 onSecondary: bar.shell.menu.popup("settings.doctor", modelData.name, doctorButton)
             }
