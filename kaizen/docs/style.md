@@ -112,7 +112,9 @@ Every panel has the same shape, top to bottom:
   fill reaches 8 into the card's padding, past the text it holds.
 - Space separates groups. The only lines a panel draws are the rules heading
   its groups: 1 px `dim`, on the label's line, to the group's right edge or
-  what sits there. The header has none.
+  what sits there. The header has none. A held notification (the
+  notification history) keeps its toast's card, tint, badge and animation
+  included: it reads as the notification it was.
 
 ### Focus and state
 

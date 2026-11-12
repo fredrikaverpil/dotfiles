@@ -718,7 +718,11 @@ Item {
         shell: root.shell
         cardWidth: historyView.cardWidth
         cardHeight: historyView.cardHeight
+        cardPadding: historyView.cardPadding
         keyNavigation: historyView.keyNavigation
+
+        onShownChanged: if (shown)
+            historyView.reset()
 
         HistoryView {
             id: historyView

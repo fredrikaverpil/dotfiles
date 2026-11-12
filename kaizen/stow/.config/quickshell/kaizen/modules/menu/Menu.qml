@@ -364,12 +364,12 @@ Ui.Panel {
         },
         "settings.notifications.clear": {
             icon: "󰃢",
-            label: "Clear",
+            label: "Clear history",
             action: () => menu.shell.notifications.clearHistory()
         },
         "settings.notifications.dnd": {
             icon: menu.checkbox(menu.shell.notifications.doNotDisturb),
-            label: "DnD (Do not disturb)",
+            label: "Pause notifications",
             action: () => menu.shell.notifications.setDoNotDisturb(!menu.shell.notifications.doNotDisturb)
         },
         "settings.keyboard": {
