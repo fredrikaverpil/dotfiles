@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pipewire
 
@@ -52,6 +53,12 @@ Ui.Panel {
 
     onMicMutedChanged: syncMicLed()
     Component.onCompleted: syncMicLed()
+
+    // Inputs, per-app volumes and profiles are set in pwvucontrol.
+    function openSettings() {
+        close();
+        Quickshell.execDetached(["pwvucontrol"]);
+    }
 
     // Selecting the current default would store it as the user's choice, ahead of an absent headset.
     function setDefault(node) {

@@ -76,6 +76,7 @@ cmd dconf
 cmd kwriteconfig6
 cmd magick
 cmd pw-play
+cmd pwvucontrol
 cmd wl-gammarelay-rs
 cmd wl-mirror
 cmd wdisplays

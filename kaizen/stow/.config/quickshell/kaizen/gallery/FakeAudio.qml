@@ -72,6 +72,9 @@ QtObject {
         }
     }
 
+    function openSettings() {
+    }
+
     function close() {
     }
 }

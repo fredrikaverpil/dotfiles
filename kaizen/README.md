@@ -24,7 +24,7 @@ desktop that an agent can drive and verify from a terminal.
   and drives their state, never owns a copy of it.
 - Build only what is used. A panel exists only where a subsystem has no
   keyboard-first face; infrequent tasks go to a purpose-built application
-  (bluetui, nm-connection-editor, wdisplays).
+  (bluetui, nm-connection-editor, pwvucontrol, wdisplays).
 - Keyboard-first everywhere. Pointer-only controls are bugs.
 - Every action is reachable from a terminal: the `kaizen` commands
   (`kaizen --json` lists them; `kaizen ipc` drives the shell), `niri msg` or

@@ -9,7 +9,7 @@ Column {
     // The panel, or the gallery's stand-in.
     required property var audio
 
-    // -1 is the slider, else a row in Output.
+    // -1 is the slider, then the rows in Output, then the settings button.
     property int cursor: -1
 
     readonly property int cardWidth: 400
@@ -29,14 +29,23 @@ Column {
             audio.setVolume(audio.volume + delta);
     }
 
+    // The button takes the real focus for its Enter and Space; other keys reach the view.
+    function setCursor(index) {
+        cursor = index;
+        if (cursor === audio.sinks.length)
+            settingsButton.forceActiveFocus();
+        else
+            root.forceActiveFocus();
+    }
+
     function moveCursor(delta) {
-        cursor = Math.max(audio.sink ? -1 : 0, Math.min(audio.sinks.length - 1, cursor + delta));
+        setCursor(Math.max(audio.sink ? -1 : 0, Math.min(audio.sinks.length, cursor + delta)));
     }
 
     function activate() {
         if (cursor < 0)
             audio.toggleMute();
-        else
+        else if (cursor < audio.sinks.length)
             audio.setDefault(audio.sinks[cursor]);
     }
 
@@ -79,7 +88,7 @@ Column {
             icon: root.audio.icon
             iconColor: root.audio.muted ? root.shell.palette.rose : root.shell.palette.fg
             onMoved: value => root.audio.setVolume(value)
-            onHovered: root.cursor = -1
+            onHovered: root.setCursor(-1)
         }
     }
 
@@ -111,10 +120,21 @@ Column {
                     label: root.audio.label(modelData)
                     chosen: modelData === root.audio.sink
                     focused: root.cursor === index
-                    onHovered: root.cursor = index
+                    onHovered: root.setCursor(index)
                     onActivated: root.audio.setDefault(modelData)
                 }
             }
+        }
+    }
+
+    Ui.PanelFooter {
+        shell: root.shell
+
+        Ui.PanelButton {
+            id: settingsButton
+            shell: root.shell
+            label: "Audio settings…"
+            onActivated: root.audio.openSettings()
         }
     }
 }

@@ -218,6 +218,11 @@ Ui.Panel {
             label: "Output",
             provider: "sinks"
         },
+        "settings.audio.settings": {
+            icon: "󰒓",
+            label: "Audio settings…",
+            action: () => menu.shell.audio.openSettings()
+        },
         "settings.display": {
             icon: "󰍹",
             label: "Display"
