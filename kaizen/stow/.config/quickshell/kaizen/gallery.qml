@@ -18,6 +18,7 @@ import "modules/panels/network" as NetworkPanel
 import "modules/panels/recording" as RecordingPanel
 import "modules/panels/timezone" as TimezonePanel
 import "modules/panels/weather" as WeatherPanel
+import "plugins/calendar" as CalendarPlugin
 import "Ui/Palette.js" as Palette
 
 // Draws a panel's view in a window, under its bar button, fed by a stand-in in a chosen state.
@@ -53,6 +54,15 @@ ShellRoot {
                 button: bluetoothButton,
                 props: {
                     service: fakeBluetooth
+                }
+            },
+            "calendar": {
+                title: "Calendar",
+                fake: fakeCalendar,
+                button: null,
+                view: "plugins/calendar/View.qml",
+                props: {
+                    service: fakeCalendar
                 }
             },
             "clipboard": {
@@ -148,7 +158,7 @@ ShellRoot {
         view = null;
         const tree = treeUrl();
         const cardComponent = Qt.createComponent(tree + "Ui/PanelCard.qml");
-        const viewComponent = Qt.createComponent(tree + "modules/panels/" + panel + "/View.qml");
+        const viewComponent = Qt.createComponent(tree + (panels[panel].view || "modules/panels/" + panel + "/View.qml"));
         if (cardComponent.status !== Component.Ready || viewComponent.status !== Component.Ready) {
             console.warn(cardComponent.errorString() + viewComponent.errorString());
             return;
@@ -274,6 +284,12 @@ ShellRoot {
         id: fakeBluetooth
 
         property string scenario: "Connected"
+    }
+
+    Gallery.FakeCalendar {
+        id: fakeCalendar
+
+        property string scenario: "Busy"
     }
 
     Gallery.FakeClipboard {
