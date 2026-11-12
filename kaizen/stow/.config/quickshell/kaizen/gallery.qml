@@ -6,6 +6,7 @@ import "Ui" as Ui
 import "gallery" as Gallery
 import "modules/bar/widgets" as BarWidgets
 // Unused but for Quickshell, which watches only the files of imported directories.
+import "modules/background" as Background
 import "modules/panels/audio" as AudioPanel
 import "modules/panels/battery" as BatteryPanel
 import "modules/panels/bluetooth" as BluetoothPanel
@@ -140,6 +141,15 @@ ShellRoot {
                 button: timeButton,
                 props: {
                     service: fakeTimezone
+                }
+            },
+            "wallpaper": {
+                title: "Wallpaper",
+                fake: fakeWallpaper,
+                button: null,
+                view: "modules/background/PickerView.qml",
+                props: {
+                    service: fakeWallpaper
                 }
             },
             "weather": {
@@ -354,6 +364,12 @@ ShellRoot {
         id: fakeTimezone
 
         property string scenario: "Stockholm"
+    }
+
+    Gallery.FakeWallpaper {
+        id: fakeWallpaper
+
+        property string scenario: "Library"
     }
 
     Gallery.FakeWeather {
