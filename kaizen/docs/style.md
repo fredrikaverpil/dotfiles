@@ -85,16 +85,16 @@ Every panel has the same shape, top to bottom:
   labels for a few (On/Off, which output a display mirrors).
 - Many values about one thing form a details table: labels in `off`, values
   in `fg` right-aligned, or in their status colour ("Not synchronised" in
-  `wood`), both 14 px, two pairs to a line in a wide card. A panel's tables
-  share their column widths, so they line up.
+  `wood`), both 14 px, two pairs to a line in a wide card or where every
+  value is short (weather's). A panel's tables share their column widths, so
+  they line up.
 - A footer with the panel's own keys: a keycap, then what it does in `off`. It
   lists only the keys the panel adds to those every panel shares
-  ([`interaction.md`](interaction.md) › Panels). A panel with no keys of its
-  own may put a fixed note there instead, such as its data's credit
-  (weather's MET Norway licence). The buttons acting on the whole panel
-  ("Pair new device…", a recording's Pause and Stop) sit at its
-  right, where no scrolling hides them; a group's own button stays in its
-  group.
+  ([`interaction.md`](interaction.md) › Panels). A note, such as the data's
+  credit (weather's MET Norway and SMHI licence), takes a line of its own
+  under it. The buttons acting on the whole panel ("Bluetooth settings…", a
+  recording's Pause and Stop) sit at its right, where no scrolling hides them;
+  a group's own button stays in its group.
 
 ### Space
 

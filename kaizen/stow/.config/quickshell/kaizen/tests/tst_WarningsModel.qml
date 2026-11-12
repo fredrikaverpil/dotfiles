@@ -316,4 +316,52 @@ TestCase {
     function test_country_at(data) {
         verify(Places.countryAt(data.latitude, data.longitude) === data.want);
     }
+
+    // Local times, so the day names hold in any timezone.
+    function test_describe_data() {
+        const now = new Date(2026, 10, 12, 12, 0);
+        return [
+            {
+                tag: "under way, ends today",
+                start: new Date(2026, 10, 12, 10, 0).getTime(),
+                end: new Date(2026, 10, 12, 23, 0).getTime(),
+                now: now,
+                want: "Yellow warning: snow, until 23:00"
+            },
+            {
+                tag: "under way, ends another day",
+                start: new Date(2026, 10, 12, 10, 0).getTime(),
+                end: new Date(2026, 10, 13, 22, 0).getTime(),
+                now: now,
+                want: "Yellow warning: snow, until Fri 22:00"
+            },
+            {
+                tag: "yet to start",
+                start: new Date(2026, 10, 12, 18, 30).getTime(),
+                end: null,
+                now: now,
+                want: "Yellow warning: snow, from 18:30"
+            },
+            {
+                tag: "open-ended",
+                start: null,
+                end: null,
+                now: now,
+                want: "Yellow warning: snow"
+            },
+        ];
+    }
+
+    function test_describe(data) {
+        const warning = {
+            level: "wood",
+            severity: "Yellow",
+            event: "Snow",
+            area: "Västerbotten",
+            start: data.start,
+            end: data.end
+        };
+
+        compare(Warnings.describe(warning, data.now), data.want);
+    }
 }

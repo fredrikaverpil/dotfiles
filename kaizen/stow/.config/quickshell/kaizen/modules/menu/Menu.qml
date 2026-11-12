@@ -134,7 +134,7 @@ Ui.Panel {
         },
         "settings.weather.forecast": {
             icon: "󰖐",
-            label: "Today on yr.no",
+            label: "Hourly on yr.no",
             action: () => menu.shell.weather.openForecast()
         },
         "settings.weather.location": {

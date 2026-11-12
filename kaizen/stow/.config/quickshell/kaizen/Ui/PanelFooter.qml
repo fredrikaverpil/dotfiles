@@ -1,19 +1,20 @@
 import QtQuick
 
-// A panel's own keys, each a keycap and what it does, or a fixed note in their place, and at the
-// right its children: the buttons acting on the whole panel (style.md › Panels).
+// A panel's own keys, each a keycap and what it does, and at the right its children: the buttons
+// acting on the whole panel (style.md › Panels). A note, such as the data's credit, takes a line
+// of its own under them.
 Item {
     id: footer
 
     required property var shell
     // [{ keys: ["m"], label: "mute" }, ...]
     property var entries: []
-    // Shown when there are no entries, such as the data's credit; wraps beside the buttons.
     property string note: ""
     default property alias buttons: buttonRow.data
 
     width: parent ? parent.width : 0
-    implicitHeight: Math.max(keys.implicitHeight, noteText.visible ? noteText.implicitHeight : 0, buttonRow.implicitHeight)
+    readonly property real rowHeight: Math.max(keys.implicitHeight, buttonRow.implicitHeight)
+    implicitHeight: rowHeight + (noteText.visible ? (rowHeight > 0 ? 8 : 0) + noteText.implicitHeight : 0)
     // The row's width, not visibleChildren, which stays empty while the footer is hidden. A hidden
     // footer's buttons count as hidden too, so one that starts hidden never shows: to hide the only
     // button, hide the footer.
@@ -22,9 +23,9 @@ Item {
     Text {
         id: noteText
 
-        visible: footer.entries.length === 0 && footer.note !== ""
-        width: Math.max(0, footer.width - buttonRow.implicitWidth - 16)
-        anchors.verticalCenter: parent.verticalCenter
+        visible: footer.note !== ""
+        width: footer.width
+        anchors.bottom: parent.bottom
         wrapMode: Text.WordWrap
         color: footer.shell.palette.off
         font.family: Fonts.mono
@@ -35,7 +36,7 @@ Item {
     Row {
         id: keys
 
-        anchors.verticalCenter: parent.verticalCenter
+        height: footer.rowHeight
         spacing: 16
 
         Repeater {
@@ -44,6 +45,7 @@ Item {
             delegate: Row {
                 required property var modelData
 
+                anchors.verticalCenter: parent.verticalCenter
                 spacing: 8
 
                 Keycaps {
@@ -67,7 +69,7 @@ Item {
         id: buttonRow
 
         anchors.right: parent.right
-        anchors.verticalCenter: parent.verticalCenter
+        height: footer.rowHeight
         spacing: 8
     }
 }

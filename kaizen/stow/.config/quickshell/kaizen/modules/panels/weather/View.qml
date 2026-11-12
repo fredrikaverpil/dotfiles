@@ -1,6 +1,7 @@
 import QtQuick
 
 import "../../../Ui" as Ui
+import "../../services/weather/WarningsModel.js" as Warnings
 import "../../services/weather/WeatherModel.js" as Model
 
 Column {
@@ -10,8 +11,15 @@ Column {
     required property var service
 
     readonly property string updated: service.updatedAt ? Qt.formatDateTime(service.updatedAt, "HH:mm") : ""
+    readonly property var outlook: service.outlook
+    // SMHI's warnings, then the outlook's risks: [{ level, icon, text }], worst first in each.
+    readonly property var alerts: service.warnings.map(warning => ({
+                level: warning.level,
+                icon: warning.icon,
+                text: Warnings.describe(warning, new Date())
+            })).concat(outlook ? outlook.risks : [])
 
-    readonly property int cardWidth: 400
+    readonly property int cardWidth: 460
     readonly property int cardPadding: 16
     readonly property int cardHeight: implicitHeight + 2 * cardPadding
     readonly property bool keyNavigation: true
@@ -49,6 +57,8 @@ Column {
         }
     }
 
+    // The current values and the next 12 hours' extremes, then what in those hours needs
+    // attention. The labels name the hours, so the rule heads it bare.
     Ui.Section {
         visible: root.service.ready
         shell: root.shell
@@ -65,16 +75,70 @@ Column {
                     label: "Humidity",
                     value: root.service.humidity
                 },
+                // MET forecasts gusts only inside its Nordic model; elsewhere the strongest mean
+                // wind stands in.
+                root.outlook && root.outlook.gust !== null ? {
+                    label: "Max gusts, 12 h",
+                    value: Math.round(root.outlook.gust) + " m/s"
+                } : {
+                    label: "Max wind, 12 h",
+                    value: root.outlook && root.outlook.wind !== null ? Math.round(root.outlook.wind) + " m/s" : "--"
+                },
                 {
-                    label: "Updated",
-                    value: root.updated
+                    label: "Total rain, 12 h",
+                    value: root.outlook && root.outlook.precipitation !== null ? root.outlook.precipitation + " mm" : "--"
                 }
             ]
         }
 
+        Column {
+            visible: root.alerts.length > 0
+            width: parent.width
+            topPadding: 8
+            spacing: 4
+
+            Repeater {
+                model: root.alerts
+
+                delegate: Item {
+                    id: alert
+
+                    required property var modelData
+
+                    width: root.width
+                    height: alertText.implicitHeight
+
+                    Text {
+                        id: alertIcon
+                        width: 24
+                        color: root.shell.palette[alert.modelData.level]
+                        font.family: Ui.Fonts.mono
+                        font.pixelSize: 14
+                        text: alert.modelData.icon
+                    }
+
+                    Text {
+                        id: alertText
+                        x: alertIcon.width + 8
+                        width: parent.width - x
+                        wrapMode: Text.WordWrap
+                        color: root.shell.palette[alert.modelData.level]
+                        font.family: Ui.Fonts.mono
+                        font.pixelSize: 14
+                        text: alert.modelData.text
+                    }
+                }
+            }
+        }
+
+        Item {
+            width: parent.width
+            height: 8
+        }
+
         Ui.PanelButton {
             shell: root.shell
-            label: "Today on yr.no"
+            label: "Hourly on yr.no"
             onActivated: root.forecastRequested()
         }
     }
@@ -142,10 +206,11 @@ Column {
         }
     }
 
-    // CC BY 4.0 requires crediting MET Norway wherever their data is shown.
+    // CC BY 4.0 requires crediting MET Norway, and SMHI for its warnings,
+    // wherever their data is shown.
     Ui.PanelFooter {
         shell: root.shell
-        note: "MET Norway, CC BY 4.0"
+        note: (root.updated !== "" ? "Updated " + root.updated + " · " : "") + (root.service.swedish ? "MET Norway and SMHI, CC BY 4.0" : "MET Norway, CC BY 4.0")
 
         Ui.PanelButton {
             shell: root.shell
