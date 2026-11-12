@@ -292,16 +292,13 @@ Scope {
             }
 
             // Pending firmware updates.
-            Ui.BarButton {
+            BarWidgets.FirmwareButton {
                 id: firmwareButton
                 shell: bar.shell
+                service: bar.shell.firmwareService
                 anchors.right: systemButton.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: visible ? 4 : 0
-                visible: bar.shell.firmwareService.updates.length > 0
-                // Wood even when urgent: updates can wait for a convenient reboot.
-                foreground: bar.shell.palette.wood
-                label: "󰚰"
                 onActivated: bar.shell.firmware.toggle()
                 onSecondary: bar.shell.menu.popup("settings.firmware", modelData.name, firmwareButton)
             }

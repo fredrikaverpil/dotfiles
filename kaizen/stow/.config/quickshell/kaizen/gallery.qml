@@ -10,6 +10,7 @@ import "modules/panels/audio" as AudioPanel
 import "modules/panels/battery" as BatteryPanel
 import "modules/panels/bluetooth" as BluetoothPanel
 import "modules/panels/display" as DisplayPanel
+import "modules/panels/firmware" as FirmwarePanel
 import "modules/panels/media" as MediaPanel
 import "modules/panels/network" as NetworkPanel
 import "modules/panels/recording" as RecordingPanel
@@ -61,6 +62,14 @@ ShellRoot {
                     nightlight: fakeDisplay,
                     mirror: fakeDisplay,
                     outputs: fakeDisplay
+                }
+            },
+            "firmware": {
+                title: "Firmware",
+                fake: fakeFirmware,
+                button: firmwareButton,
+                props: {
+                    service: fakeFirmware
                 }
             },
             "media": {
@@ -255,6 +264,12 @@ ShellRoot {
         property string scenario: "Laptop"
     }
 
+    Gallery.FakeFirmware {
+        id: fakeFirmware
+
+        property string scenario: "Several"
+    }
+
     Gallery.FakeMedia {
         id: fakeMedia
 
@@ -318,6 +333,15 @@ ShellRoot {
 
         BarWidgets.DisplayButton {
             shell: fakeShell
+        }
+    }
+
+    Component {
+        id: firmwareButton
+
+        BarWidgets.FirmwareButton {
+            shell: fakeShell
+            service: fakeFirmware
         }
     }
 
