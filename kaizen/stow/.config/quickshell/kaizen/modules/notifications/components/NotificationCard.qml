@@ -42,6 +42,8 @@ Rectangle {
     readonly property color accent: urgency === 2 ? palette.rose : (urgency === 0 ? palette.off : palette.fg)
     // A rule's border colour takes the place of the urgency's.
     readonly property color tint: palette[String(row.border || "")] ?? accent
+    // The still border: a rule's colour, rose when critical, else `dim` as every card's (style.md › Palette).
+    readonly property color outline: palette[String(row.border || "")] ?? (urgency === 2 ? palette.rose : palette.dim)
     readonly property bool orbiting: animated && row.animation === "orbit"
     readonly property bool beating: animated && row.animation === "heartbeat"
     readonly property bool glowing: animated && row.animation === "glow"
@@ -68,7 +70,7 @@ Rectangle {
     implicitHeight: content.implicitHeight + 24
     radius: 8
     color: activeFocus || selected ? palette.sel : palette.bg
-    border.color: tint
+    border.color: outline
     border.width: 1
     // A glowing or ringing card draws outside itself, over the cards beside it.
     clip: !glowing && !ringing
