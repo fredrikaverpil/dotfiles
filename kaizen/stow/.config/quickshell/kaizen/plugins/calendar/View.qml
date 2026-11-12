@@ -1,7 +1,7 @@
 import QtQuick
-import QtQuick.Window
 
 import qs.Ui as Ui
+import "CalendarModel.js" as Model
 
 Column {
     id: root
@@ -10,128 +10,140 @@ Column {
     // The calendar service, or the gallery's stand-in.
     required property var service
 
-    readonly property int cardWidth: 520
-    readonly property int cardHeight: 460
+    // What past and under way are read against: the fetch, as the events.
+    readonly property date now: service.requestedAt
+    readonly property bool loading: !service.failed && service.days.length === 0
+
+    readonly property int cardWidth: 600
+    readonly property int cardPadding: 16
+    readonly property int cardHeight: implicitHeight + 2 * cardPadding
     readonly property bool keyNavigation: true
 
     signal openRequested(var event)
     signal joinRequested(var event)
-
-    readonly property var focusedItem: scroller.Window.activeFocusItem
-    // Map to content coordinates: Flickable coordinates are relative to its viewport.
-    onFocusedItemChanged: {
-        const item = focusedItem;
-        if (!item)
-            return;
-        const top = item.mapToItem(body, 0, 0).y;
-        if (!isFinite(top))
-            return;
-        if (top < scroller.contentY)
-            scroller.contentY = Math.max(0, top);
-        else if (top + item.height > scroller.contentY + scroller.height)
-            scroller.contentY = top + item.height - scroller.height;
-    }
+    signal appRequested
 
     width: parent ? parent.width : 0
-    height: parent ? parent.height : 0
-    spacing: 8
+    spacing: 24
 
-    Text {
-        color: root.shell.palette.fg
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 18
-        text: "Calendar"
-    }
-
-    Rectangle {
-        width: parent.width
-        height: 1
-        color: root.shell.palette.dim
-    }
-
-    Text {
-        visible: root.service.failed
-        color: root.shell.palette.off
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 13
-        text: "dcal is not running"
-    }
-
-    Flickable {
-        id: scroller
-        width: parent.width
-        height: parent.height - y
-        contentWidth: width
-        contentHeight: body.implicitHeight
-        clip: true
-        boundsBehavior: Flickable.StopAtBounds
-
-        Column {
-            id: body
-            width: scroller.width
-            spacing: 10
-
-            Repeater {
-                model: root.service.days
-
-                delegate: DaySection {}
-            }
+    Ui.PanelHeader {
+        shell: root.shell
+        title: "Calendar"
+        subtitle: {
+            if (root.service.failed)
+                return "";
+            if (root.loading)
+                return "Loading…";
+            return Model.nextLabel(root.service.days, root.now);
         }
     }
 
-    component DaySection: Column {
+    Ui.Section {
+        visible: root.service.failed
+        shell: root.shell
+
+        Text {
+            width: root.width
+            wrapMode: Text.WordWrap
+            color: root.shell.palette.rose
+            font.family: Ui.Fonts.mono
+            font.pixelSize: 14
+            text: "dcal is not running"
+        }
+    }
+
+    Ui.PanelScroller {
+        visible: root.service.days.length > 0
+        shell: root.shell
+        spacing: 24
+
+        Repeater {
+            model: root.service.days
+
+            delegate: DaySection {}
+        }
+    }
+
+    Ui.PanelFooter {
+        shell: root.shell
+
+        Ui.PanelButton {
+            shell: root.shell
+            label: "Open calendar…"
+            onActivated: root.appRequested()
+        }
+    }
+
+    // A day: "Today" and "Tomorrow" name it, their date at the rule's right; later days by their date.
+    component DaySection: Ui.Section {
         id: day
 
         required property var modelData
         required property int index
+        readonly property string date: Qt.formatDateTime(modelData.date, "dddd d MMMM")
 
-        width: parent.width
-        spacing: 2
+        shell: root.shell
+        title: index < 2 ? ["Today", "Tomorrow"][index] : date
+        value: index < 2 ? date : ""
 
-        Text {
-            color: root.shell.palette.fg
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 14
-            font.bold: true
-            text: (day.index < 2 ? ["Today", "Tomorrow"][day.index] + " · " : "") + Qt.formatDateTime(day.modelData.date, "dddd d MMMM")
-        }
+        Column {
+            width: root.width
+            spacing: 4
 
-        Repeater {
-            model: day.modelData.events
+            Repeater {
+                model: day.modelData.events
 
-            delegate: EventRow {}
-        }
+                delegate: EventRow {}
+            }
 
-        Text {
-            visible: day.modelData.events.length === 0
-            leftPadding: 8
-            color: root.shell.palette.off
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 13
-            text: "No events"
+            Text {
+                visible: day.modelData.events.length === 0
+                color: root.shell.palette.off
+                font.family: Ui.Fonts.mono
+                font.pixelSize: 14
+                text: "No events"
+            }
         }
     }
 
-    component EventRow: Rectangle {
+    // The widest time a row shows, so the summaries start together.
+    TextMetrics {
+        id: timeMetrics
+        font.family: Ui.Fonts.mono
+        font.pixelSize: 14
+        text: "00:00–00:00"
+    }
+
+    // An event: Enter, Space or a click opens it in dcal; Join, its own stop, opens the meeting.
+    component EventRow: Item {
         id: row
 
         required property var modelData
-        // Ended before the fetch; dimmed like the time column.
-        readonly property bool past: modelData.until > 0 && modelData.until <= root.service.requestedAt.getTime()
+        readonly property bool past: modelData.until > 0 && modelData.until <= root.now.getTime()
+        readonly property color textColor: past ? root.shell.palette.off : root.shell.palette.fg
 
-        width: parent.width
-        height: 30
-        radius: 4
-        color: activeFocus || mouse.containsMouse ? root.shell.palette.sel : "transparent"
+        width: root.width
+        implicitHeight: 28
         activeFocusOnTab: true
 
         Keys.onReturnPressed: root.openRequested(row.modelData)
         Keys.onEnterPressed: root.openRequested(row.modelData)
         Keys.onSpacePressed: root.openRequested(row.modelData)
 
+        // The fill reaches into the card's padding, so the text aligns with the rule.
+        Rectangle {
+            anchors.fill: parent
+            anchors.leftMargin: -8
+            anchors.rightMargin: -8
+            radius: 4
+            color: row.activeFocus || mouse.containsMouse ? root.shell.palette.sel : "transparent"
+        }
+
         MouseArea {
             id: mouse
             anchors.fill: parent
+            anchors.leftMargin: -8
+            anchors.rightMargin: -8
             hoverEnabled: true
             onClicked: root.openRequested(row.modelData)
         }
@@ -139,72 +151,63 @@ Column {
         Text {
             id: emoji
             anchors.left: parent.left
-            anchors.leftMargin: 4
             anchors.verticalCenter: parent.verticalCenter
             width: 24
-            horizontalAlignment: Text.AlignHCenter
-            color: row.past ? root.shell.palette.off : root.shell.palette.fg
             font.family: Ui.Fonts.mono
-            font.pixelSize: 13
+            font.pixelSize: 14
+            opacity: row.past ? 0.5 : 1
             text: row.modelData.emoji
         }
 
         Text {
             id: time
             anchors.left: emoji.right
-            anchors.leftMargin: 6
+            anchors.leftMargin: 8
             anchors.verticalCenter: parent.verticalCenter
-            width: 104
-            color: root.shell.palette.off
+            width: timeMetrics.advanceWidth
+            color: Model.underway(row.modelData, root.now) ? root.shell.palette.fg : root.shell.palette.off
             font.family: Ui.Fonts.mono
-            font.pixelSize: 13
+            font.pixelSize: 14
             text: row.modelData.time
         }
 
+        // The summary keeps its room; the location takes what is left.
         Text {
+            id: summary
             anchors.left: time.right
-            anchors.right: joinButton.visible ? joinButton.left : parent.right
-            anchors.rightMargin: 8
+            anchors.leftMargin: 16
             anchors.verticalCenter: parent.verticalCenter
+            width: Math.min(implicitWidth, (join.visible ? join.x - 16 : row.width) - x)
             elide: Text.ElideRight
-            color: row.past ? root.shell.palette.off : root.shell.palette.fg
+            color: row.textColor
             font.family: Ui.Fonts.mono
             font.pixelSize: 14
-            text: row.modelData.summary + (row.modelData.location ? "  · " + row.modelData.location : "")
+            textFormat: Text.PlainText
+            text: row.modelData.summary
         }
 
-        Rectangle {
-            id: joinButton
-            visible: row.modelData.meetingUrl !== ""
-            anchors.right: parent.right
-            anchors.rightMargin: 4
+        Text {
+            anchors.left: summary.right
+            anchors.leftMargin: 16
+            anchors.right: join.visible ? join.left : parent.right
+            anchors.rightMargin: join.visible ? 16 : 0
             anchors.verticalCenter: parent.verticalCenter
-            width: 72
-            height: 22
-            radius: 4
-            color: activeFocus || joinMouse.containsMouse ? root.shell.palette.sel : "transparent"
-            border.color: activeFocus ? root.shell.palette.fg : root.shell.palette.dim
-            border.width: 1
-            activeFocusOnTab: visible
+            elide: Text.ElideRight
+            color: root.shell.palette.off
+            font.family: Ui.Fonts.mono
+            font.pixelSize: 14
+            textFormat: Text.PlainText
+            text: row.modelData.location
+        }
 
-            Keys.onReturnPressed: root.joinRequested(row.modelData)
-            Keys.onEnterPressed: root.joinRequested(row.modelData)
-            Keys.onSpacePressed: root.joinRequested(row.modelData)
-
-            Text {
-                anchors.centerIn: parent
-                color: root.shell.palette.fg
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 12
-                text: "󰍫 Join"
-            }
-
-            MouseArea {
-                id: joinMouse
-                anchors.fill: parent
-                hoverEnabled: true
-                onClicked: root.joinRequested(row.modelData)
-            }
+        Ui.PanelButton {
+            id: join
+            visible: row.modelData.meetingUrl !== "" && !row.past
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            shell: root.shell
+            label: "Join"
+            onActivated: root.joinRequested(row.modelData)
         }
     }
 }

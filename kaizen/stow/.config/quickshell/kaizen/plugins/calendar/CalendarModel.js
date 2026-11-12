@@ -163,3 +163,22 @@ function parse(text, now, emojiById) {
   }
   return days;
 }
+
+// Started and not yet ended; an all-day event spans the day, so only timed ones count.
+function underway(event, now) {
+  var time = now.getTime();
+  return (
+    !event.allDay && event.at > 0 && event.at <= time && time < event.until
+  );
+}
+
+// The panel's subtitle: today's next timed event to start.
+function nextLabel(days, now) {
+  var time = now.getTime();
+  var next = (days[0] ? days[0].events : []).find(function (event) {
+    return !event.allDay && event.at > time;
+  });
+  return next
+    ? "Next: " + next.summary + " at " + clock(new Date(next.at))
+    : "Nothing more today";
+}

@@ -132,7 +132,9 @@ Every panel has the same shape, top to bottom:
   sits there in `sky`.
 - A row whose actions are buttons (a device's Connect, a network's Join) takes
   no focus, `sel` fill or click: its buttons, at its right and as wide as
-  their longest label, are the stops.
+  their longest label, are the stops. A row with an action of its own (a
+  calendar event, which opens in its app) keeps its stop, and its buttons (a
+  meeting's Join) follow it.
 - A slider is a 2 px track in `dim`, filled `fg` up to its value, with a
   10 px knob; the fill and knob turn `off` while muted or off. A meter, which
   only shows a value, is the same track without the knob, its icon and fill

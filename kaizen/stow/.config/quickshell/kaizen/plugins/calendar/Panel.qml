@@ -11,6 +11,7 @@ Ui.Panel {
 
     cardWidth: view.cardWidth
     cardHeight: view.cardHeight
+    cardPadding: view.cardPadding
     keyNavigation: view.keyNavigation
 
     onShownChanged: if (shown)
@@ -18,6 +19,11 @@ Ui.Panel {
 
     function openEvent(event) {
         Quickshell.execDetached(["dcal", "ipc", "ui.openEvent", "uid=" + event.uid, "start=" + event.start]);
+        root.close();
+    }
+
+    function openApp() {
+        Quickshell.execDetached(["dcal", "show"]);
         root.close();
     }
 
@@ -56,5 +62,6 @@ Ui.Panel {
         service: root.service
         onOpenRequested: event => root.openEvent(event)
         onJoinRequested: event => root.join(event)
+        onAppRequested: root.openApp()
     }
 }

@@ -262,4 +262,96 @@ TestCase {
         verify(Calendar.parse("Error: dcal daemon not running", now) === null);
         compare(Calendar.parse('{"events":[]}', now).map(day => day.events), [[], [], []]);
     }
+
+    function row(summary, from, until, allDay) {
+        return {
+            summary: summary,
+            allDay: allDay === true,
+            at: from === null ? 0 : new Date(2026, 8, 14, from).getTime(),
+            until: until === null ? 0 : new Date(2026, 8, 14, until).getTime()
+        };
+    }
+
+    function test_underway_data() {
+        return [
+            {
+                tag: "ended",
+                event: row("Ended", 9, 10),
+                want: false
+            },
+            {
+                tag: "started",
+                event: row("Started", 11, 13),
+                want: true
+            },
+            {
+                tag: "starts now",
+                event: row("Now", 12, 13),
+                want: true
+            },
+            {
+                tag: "ends now",
+                event: row("Ends", 11, 12),
+                want: false
+            },
+            {
+                tag: "later",
+                event: row("Later", 17, 18),
+                want: false
+            },
+            {
+                tag: "all day",
+                event: row("All day", 0, 24, true),
+                want: false
+            },
+            {
+                tag: "unreadable",
+                event: row("Unreadable", null, null),
+                want: false
+            },
+        ];
+    }
+
+    function test_underway(data) {
+        compare(Calendar.underway(data.event, now), data.want);
+    }
+
+    function test_next_label_data() {
+        const today = [row("All day", 0, 24, true), row("Ended", 9, 10), row("Started", 11, 13), row("Review", 14, 15), row("Late", 17, 18)];
+        return [
+            {
+                tag: "next today",
+                days: [
+                    {
+                        events: today
+                    },
+                    {
+                        events: [row("Tomorrow", 9, 10)]
+                    }
+                ],
+                want: "Next: Review at 14:00"
+            },
+            {
+                tag: "nothing more today",
+                days: [
+                    {
+                        events: today.slice(0, 3)
+                    },
+                    {
+                        events: [row("Tomorrow", 9, 10)]
+                    }
+                ],
+                want: "Nothing more today"
+            },
+            {
+                tag: "no days",
+                days: [],
+                want: "Nothing more today"
+            },
+        ];
+    }
+
+    function test_next_label(data) {
+        compare(Calendar.nextLabel(data.days, now), data.want);
+    }
 }

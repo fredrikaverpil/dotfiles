@@ -66,6 +66,10 @@ QtObject {
                 failed: false,
                 days: parsed([])
             },
+            "Loading": {
+                failed: false,
+                days: []
+            },
             "dcal not running": {
                 failed: true,
                 days: []
