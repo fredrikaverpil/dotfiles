@@ -53,12 +53,18 @@ Rectangle {
         anchors.fill: parent
     }
 
-    Column {
-        id: column
+    // Takes focus back when the focused item goes (a row whose entry left), so the card's keys keep working.
+    FocusScope {
         anchors.fill: parent
         anchors.margins: card.padding
-        spacing: 8
-
         focus: card.keyNavigation
+
+        Column {
+            id: column
+            anchors.fill: parent
+            spacing: 8
+
+            focus: card.keyNavigation
+        }
     }
 }
