@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Window
 import Quickshell
 
 import "../../../Ui" as Ui
@@ -21,8 +20,6 @@ Column {
     readonly property int cardPadding: 16
     readonly property int cardHeight: implicitHeight + 2 * cardPadding
     readonly property bool keyNavigation: true
-    // Past this, the groups scroll under a fixed header and footer.
-    readonly property int maxBodyHeight: 520
 
     // One width for a row's main button, whatever its label, so names and buttons line up.
     readonly property int actionWidth: actionMetrics.advanceWidth + 24
@@ -110,84 +107,35 @@ Column {
         }
     }
 
-    // The groups scroll under a fixed header and footer, the bar in the card's right padding.
-    Item {
-        width: root.width
-        implicitHeight: scroller.height
+    // The groups scroll under a fixed header and footer.
+    Ui.PanelScroller {
+        shell: root.shell
 
-        // 16 wider than the content, so a row's `sel` fill reaching into the card's padding is not clipped.
-        Flickable {
-            id: scroller
+        // Focus in the Wi-Fi list holds its order, as a pointer over it does.
+        onFocusEntered: item => {
+            for (let candidate = item; candidate; candidate = candidate.parent)
+                if (candidate.objectName === "wifiList")
+                    root.service.freezeOrder();
+        }
 
-            readonly property var focusedItem: scroller.Window.activeFocusItem
-
-            function holds(item) {
-                for (let candidate = item; candidate; candidate = candidate.parent)
-                    if (candidate === body)
-                        return true;
-                return false;
+        Repeater {
+            // ScriptModel diffs by identity: a reorder moves groups, keeping a passphrase being typed.
+            model: ScriptModel {
+                values: root.devices
             }
 
-            // Only items in the body: focus outside it (the card, a view being replaced) scrolls nothing.
-            // Map to content coordinates: Flickable coordinates are relative to its viewport.
-            onFocusedItemChanged: {
-                const item = focusedItem;
-                if (!item || !visible || !holds(item))
-                    return;
-                // Focus in the Wi-Fi list holds its order, as a pointer over it does.
-                for (let candidate = item; candidate; candidate = candidate.parent)
-                    if (candidate.objectName === "wifiList")
-                        root.service.freezeOrder();
-                const top = item.mapToItem(body, 0, 0).y;
-                if (top < contentY)
-                    contentY = Math.max(0, top);
-                else if (top + item.height > contentY + height)
-                    contentY = top + item.height - height;
-            }
-
-            x: -8
-            width: root.width + 16
-            height: Math.min(body.implicitHeight, root.maxBodyHeight)
-            contentWidth: width
-            contentHeight: body.implicitHeight
-            clip: true
-            boundsBehavior: Flickable.StopAtBounds
-            ScrollBar.vertical: scrollBar
-
-            Column {
-                id: body
-
-                x: 8
-                width: root.width
-                spacing: 24
-
-                Repeater {
-                    // ScriptModel diffs by identity: a reorder moves groups, keeping a passphrase being typed.
-                    model: ScriptModel {
-                        values: root.devices
-                    }
-
-                    delegate: DeviceGroup {
-                        required property var modelData
-                        device: modelData
-                    }
-                }
-
-                Text {
-                    visible: root.service.networkManagerAvailable && root.service.networkDevices.length === 0
-                    color: root.shell.palette.off
-                    font.family: Ui.Fonts.mono
-                    font.pixelSize: 14
-                    text: "No network devices"
-                }
+            delegate: DeviceGroup {
+                required property var modelData
+                device: modelData
             }
         }
 
-        Ui.PanelScrollBar {
-            id: scrollBar
-            x: root.width + 10
-            height: scroller.height
-            shell: root.shell
+        Text {
+            visible: root.service.networkManagerAvailable && root.service.networkDevices.length === 0
+            color: root.shell.palette.off
+            font.family: Ui.Fonts.mono
+            font.pixelSize: 14
+            text: "No network devices"
         }
     }
 
