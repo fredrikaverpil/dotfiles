@@ -14,6 +14,7 @@ import "modules/panels/media" as MediaPanel
 import "modules/panels/network" as NetworkPanel
 import "modules/panels/recording" as RecordingPanel
 import "modules/panels/timezone" as TimezonePanel
+import "modules/panels/weather" as WeatherPanel
 import "Ui/Palette.js" as Palette
 
 // Draws a panel's view in a window, under its bar button, fed by a stand-in in a chosen state.
@@ -92,6 +93,14 @@ ShellRoot {
                 button: timeButton,
                 props: {
                     service: fakeTimezone
+                }
+            },
+            "weather": {
+                title: "Weather",
+                fake: fakeWeather,
+                button: weatherButton,
+                props: {
+                    service: fakeWeather
                 }
             }
         })
@@ -270,6 +279,12 @@ ShellRoot {
         property string scenario: "Stockholm"
     }
 
+    Gallery.FakeWeather {
+        id: fakeWeather
+
+        property string scenario: "Partly cloudy"
+    }
+
     // The bar's own buttons, bound to the stand-ins.
     Component {
         id: audioButton
@@ -339,6 +354,15 @@ ShellRoot {
         BarWidgets.TimeButton {
             shell: fakeShell
             date: new Date()
+        }
+    }
+
+    Component {
+        id: weatherButton
+
+        BarWidgets.WeatherButton {
+            shell: fakeShell
+            service: fakeWeather
         }
     }
 

@@ -69,12 +69,11 @@ Scope {
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 6
 
-                Ui.BarButton {
+                BarWidgets.WeatherButton {
                     id: weatherButton
                     shell: bar.shell
+                    service: bar.shell.weatherService
                     anchors.verticalCenter: parent.verticalCenter
-                    implicitWidth: 58 * bar.shell.textScale
-                    label: bar.shell.weatherService.ready ? bar.shell.weatherService.icon + " " + bar.shell.weatherService.temperature : bar.shell.weatherService.icon
                     onActivated: bar.shell.weather.toggle()
                     onSecondary: bar.shell.menu.popup("settings.weather", modelData.name, weatherButton)
                 }
