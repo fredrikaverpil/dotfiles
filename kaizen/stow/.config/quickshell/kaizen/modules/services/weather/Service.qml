@@ -21,6 +21,7 @@ Item {
     property bool stateLoaded: false
     property var current: null
     property var days: []
+    property var outlook: null
     property bool failed: false
     property var updatedAt: null
     // When the forecast's Expires runs out, as the poll reads it; null until
@@ -71,6 +72,7 @@ Item {
         place = String(name || "").length > 0 ? String(name) : lat + ", " + lon;
         current = null;
         days = [];
+        outlook = null;
         saveState();
         refresh();
         return true;
@@ -104,6 +106,7 @@ Item {
         }
         current = report.current;
         days = report.days;
+        outlook = report.outlook;
         failed = false;
         updatedAt = new Date();
         poll.interval = Model.expiresInterval(separator < 0 ? "" : text.slice(0, separator));

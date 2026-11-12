@@ -6,11 +6,12 @@
 # Cache plus If-Modified-Since is required by MET's terms; -w prints Expires
 # ahead of the body so the poll can honour it. The cache is per-location: one
 # shared file would answer 304 after a location change and serve the previous
-# city's forecast under the new name. A 304 touches the file it reused, so the
-# 30-day sweep drops only locations left behind.
+# city's forecast under the new name; the endpoint is in the name for the same
+# reason. A 304 touches the file it reused, so the 30-day sweep drops only
+# locations left behind.
 set -e
 directory="$1"
-cache="$directory/weather-$2_$3.json"
+cache="$directory/weather-complete-$2_$3.json"
 url="$4"
 agent="$5"
 

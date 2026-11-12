@@ -489,8 +489,8 @@ umbriel leaves it on, since no config sets its `[events]` lid commands.
   unit's `StateDirectory=` creates the state root.
 - Many or unbounded entries get a subdirectory
   (`kaizen-shell/wallpaper-thumbs/`); a single file is written directly
-  (`kaizen-shell/weather-<lat>_<lon>.json`). Moving from one file to one per
-  input needs a sweep first.
+  (`kaizen-shell/weather-complete-<lat>_<lon>.json`). Moving from one file to
+  one per input needs a sweep first.
 - Every cache producer prunes its own entries, since nothing prunes `~/.cache`
   on these hosts: touch an entry on use (a hit or a 304 counts) and delete
   entries older than 30 days in the same pass. A producer that cannot age

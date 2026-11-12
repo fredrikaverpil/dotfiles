@@ -52,6 +52,7 @@ Ui.Panel {
                 temperature: root.service.temperature,
                 condition: root.service.condition,
                 days: root.service.days.length,
+                outlook: root.service.outlook,
                 pollMinutes: root.service.pollMinutes,
                 updatedAt: root.service.updatedAt ? root.service.updatedAt.toISOString() : null,
                 expiresAt: root.service.expiresAt ? root.service.expiresAt.toISOString() : null
