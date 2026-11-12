@@ -610,6 +610,8 @@ ShellRoot {
 
                 anchors.centerIn: parent
                 spacing: 16
+                // A card larger than the stage (the wallpaper picker) is drawn smaller.
+                scale: width > 0 && height > 0 ? Math.min(1, (stage.width - 24) / width, (stage.height - 24) / height) : 1
 
                 Rectangle {
                     width: gallery.card ? gallery.card.width : 0

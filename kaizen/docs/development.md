@@ -357,6 +357,8 @@ qs -p "$PWD/kaizen/stow/.config/quickshell/kaizen/gallery.qml"
   same stand-in. The button is a component in `modules/bar/widgets/` that
   `Bar.qml` places, so its label and colour are the bar's own; "Now" draws the
   current button too.
+- A card larger than the window is drawn scaled down to fit, so judge its
+  text sizes live (`kaizen dev`).
 - Quickshell loads no file outside the gallery's directory. To compare with
   another commit as "Now", copy its tree into the ignored `gallery/now/`:
   `git archive REV kaizen/stow/.config/quickshell/kaizen | tar -x --strip-components=5 -C kaizen/stow/.config/quickshell/kaizen/gallery/now`
