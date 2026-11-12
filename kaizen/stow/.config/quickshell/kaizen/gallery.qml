@@ -18,6 +18,7 @@ import "modules/panels/network" as NetworkPanel
 import "modules/panels/recording" as RecordingPanel
 import "modules/panels/timezone" as TimezonePanel
 import "modules/panels/weather" as WeatherPanel
+import "modules/notifications" as Notifications
 import "plugins/calendar" as CalendarPlugin
 import "Ui/Palette.js" as Palette
 
@@ -114,6 +115,15 @@ ShellRoot {
                 button: networkButton,
                 props: {
                     service: fakeNetwork
+                }
+            },
+            "notifications": {
+                title: "Notifications",
+                fake: fakeNotifications,
+                button: notificationButton,
+                view: "modules/notifications/HistoryView.qml",
+                props: {
+                    service: fakeNotifications
                 }
             },
             "recording": {
@@ -328,6 +338,12 @@ ShellRoot {
         property string scenario: "Wi-Fi"
     }
 
+    Gallery.FakeNotifications {
+        id: fakeNotifications
+
+        property string scenario: "DnD on"
+    }
+
     Gallery.FakeRecording {
         id: fakeRecording
 
@@ -362,6 +378,15 @@ ShellRoot {
         BarWidgets.BatteryButton {
             shell: fakeShell
             service: fakeBattery
+        }
+    }
+
+    Component {
+        id: notificationButton
+
+        BarWidgets.NotificationButton {
+            shell: fakeShell
+            service: fakeNotifications
         }
     }
 

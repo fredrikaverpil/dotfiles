@@ -1,8 +1,6 @@
 import QtCore
 import QtQuick
 import Qt.labs.folderlistmodel
-import QtQuick.Layouts
-import QtQuick.Window
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Notifications
@@ -385,6 +383,11 @@ Item {
         reminder.start();
     }
 
+    function removeHistory(index) {
+        historyRows = Model.withoutIndex(historyRows, index);
+        saveState();
+    }
+
     function clearHistory() {
         historyRows = [];
         saveState();
@@ -713,179 +716,20 @@ Item {
         id: historyPanel
 
         shell: root.shell
-        cardWidth: 620
-        cardHeight: 560
-        keyNavigation: true
+        cardWidth: historyView.cardWidth
+        cardHeight: historyView.cardHeight
+        keyNavigation: historyView.keyNavigation
 
-        readonly property var focusedItem: historyList.Window.activeFocusItem
-        // Map to content coordinates: Flickable coordinates are relative to its viewport.
-        onFocusedItemChanged: {
-            const item = focusedItem;
-            if (!item || !shown || item.parent !== historyContent)
-                return;
-            const top = item.mapToItem(historyContent, 0, 0).y;
-            if (!isFinite(top))
-                return;
-            if (top < historyList.contentY)
-                historyList.contentY = Math.max(0, top);
-            else if (top + item.height > historyList.contentY + historyList.height)
-                historyList.contentY = top + item.height - historyList.height;
-        }
-
-        // Removing rebuilds every delegate, so the focus has to be placed again by
-        // position: the card that took the removed one's place, or the header.
-        function drop(index) {
-            root.historyRows = Model.withoutIndex(root.historyRows, index);
-            root.saveState();
-            Qt.callLater(function () {
-                if (historyCards.count === 0) {
-                    clearButton.forceActiveFocus(Qt.TabFocusReason);
-                    return;
-                }
-                const card = historyCards.itemAt(Math.min(index, historyCards.count - 1));
-                if (card)
-                    card.forceActiveFocus(Qt.TabFocusReason);
-            });
-        }
-
-        RowLayout {
-            id: historyHeader
-            width: parent.width
-            spacing: 8
-
-            Text {
-                Layout.fillWidth: true
-                text: "Notifications"
-                color: root.palette.fg
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 18
+        HistoryView {
+            id: historyView
+            shell: root.shell
+            service: root
+            shown: historyPanel.shown
+            // Closes so what the command opens is not behind the panel.
+            onActionRequested: (row, action) => {
+                Quickshell.execDetached(NotificationLogic.commandOf(row, action));
+                historyPanel.close();
             }
-
-            HeaderButton {
-                id: clearButton
-                label: "Clear"
-                onActivated: root.clearHistory()
-            }
-
-            HeaderButton {
-                label: "Enabled"
-                active: !root.doNotDisturb
-                onActivated: root.setDoNotDisturb(!root.doNotDisturb)
-            }
-        }
-
-        Rectangle {
-            id: historySeparator
-            width: parent.width
-            height: 1
-            color: root.palette.dim
-        }
-
-        Item {
-            id: historyArea
-            width: parent.width
-            height: parent.height - historyHeader.height - historySeparator.height - 2 * historyPanel.contentSpacing
-
-            // Clips scrolled-out cards but not a glowing card's halo: the clip
-            // reaches past the sides, and past an end with nothing scrolled beyond it.
-            Item {
-                id: historyClip
-                readonly property int reach: 64
-                readonly property real above: historyList.atYBeginning ? reach : 0
-                x: -reach
-                y: -above
-                width: historyArea.width + 2 * reach
-                height: historyArea.height + above + (historyList.atYEnd ? reach : 0)
-                clip: true
-
-                // A Flickable over a Column, not a ListView: every card must exist for the
-                // panel's focus chain to reach it, and a virtualized delegate does not.
-                Flickable {
-                    id: historyList
-                    x: historyClip.reach
-                    y: historyClip.above
-                    width: historyArea.width
-                    height: historyArea.height
-                    contentWidth: width
-                    contentHeight: historyContent.implicitHeight
-                    boundsBehavior: Flickable.StopAtBounds
-
-                    Column {
-                        id: historyContent
-                        width: historyList.width
-                        spacing: 8
-
-                        Repeater {
-                            id: historyCards
-                            model: root.historyRows
-
-                            delegate: NotificationCard {
-                                required property var modelData
-                                required property int index
-
-                                width: historyContent.width
-                                palette: root.palette
-                                row: modelData
-                                toast: false
-                                animated: historyPanel.shown
-                                selectable: true
-                                onCloseRequested: historyPanel.drop(index)
-                                onInvokeRequested: {}
-                                // Closes so what the command opens is not behind the panel.
-                                onActionRequested: action => {
-                                    Quickshell.execDetached(NotificationLogic.commandOf(modelData, action));
-                                    historyPanel.close();
-                                }
-                            }
-                        }
-
-                        Text {
-                            visible: historyCards.count === 0
-                            text: "No notifcations here yet"
-                            color: root.palette.off
-                            font.family: Ui.Fonts.mono
-                            font.pixelSize: 14
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    component HeaderButton: Rectangle {
-        id: button
-
-        property string label: ""
-        property bool active: false
-        signal activated
-
-        implicitWidth: buttonLabel.implicitWidth + 14
-        implicitHeight: 26
-        radius: 4
-        color: active || buttonMouse.containsMouse ? root.palette.sel : "transparent"
-        border.color: button.activeFocus ? root.palette.fg : root.palette.dim
-        border.width: 1
-
-        activeFocusOnTab: true
-        Keys.onReturnPressed: button.activated()
-        Keys.onEnterPressed: button.activated()
-        Keys.onSpacePressed: button.activated()
-
-        Text {
-            id: buttonLabel
-            anchors.centerIn: parent
-            text: button.label
-            color: root.palette.fg
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 12
-        }
-
-        MouseArea {
-            id: buttonMouse
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: button.activated()
         }
     }
 }
