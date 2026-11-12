@@ -74,8 +74,9 @@ Every panel has the same shape, top to bottom:
   with one value of its own that no control shows (nightlight's temperature)
   puts it at the rule's right in `off`; a group with a control of its own
   (Wi-Fi's power button) puts that there instead.
-- A panel over several devices, each with details of its own (network), gives
-  each device a group titled by its type ("Ethernet", "Wi-Fi"). A group
+- A panel over several devices, each with details of its own (network,
+  firmware), gives each device a group titled by its type ("Ethernet",
+  "Wi-Fi") or, where the type does not tell them apart, its name. A group
   holding a long list goes last.
 - A panel about picking a device (audio) lists every device as a row, since
   the choice is what it shows. A panel that sets up an action (recording)

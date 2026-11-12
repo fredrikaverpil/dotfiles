@@ -82,8 +82,8 @@ selection. Refresh runs it again; Copy all copies the report.
 
 The firmware panel lists pending firmware updates; it never installs them.
 Installing can need AC power, a reboot, or root, so the user runs the update
-command in a terminal. Each update's row copies that command (`fwupdmgr update
-<id>`) with Enter, Space or a click, as does Settings › Firmware › Copy update
+command in a terminal. Each update's Copy update command button copies that
+command (`fwupdmgr update <id>`), as does Settings › Firmware › Copy update
 command.
 
 The host decides which backends run: kaizen reads [fwupd] when the system bus
@@ -91,11 +91,12 @@ can activate it, and never enables a backend's daemon. The shell checks at
 start, once a day and when the panel opens, reading only local metadata; fwupd's
 own timer downloads it.
 
-`O` on a row, or Settings › Firmware › Open release page, opens the vendor's
-details page, or the update's [LVFS] device page when the vendor sets none.
+An update's Open release page button (Settings › Firmware › Open release page)
+opens the vendor's details page, or the update's [LVFS] device page when the
+vendor sets none.
 
 The bar shows an indicator in wood while an update is pending, whatever its
-urgency: an update can wait for a convenient reboot. Each row shows its own
+urgency: an update can wait for a convenient reboot. Each update shows its own
 urgency. There are no notifications.
 
 [fwupd]: https://fwupd.org
