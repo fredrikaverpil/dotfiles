@@ -315,7 +315,7 @@ runs.
 | recording | [gpu-screen-recorder], [grim], [satty], [PipeWire] | recording indicator | Trigger › Record, Pause, Stop, Screenshot (region, desktop, window) | `recording` |
 | system | [hwmon], `/proc` load | alert indicator | Settings › Display | `system`, `display` |
 | timezone | [timedated] via `timedatectl`, `zdump` for the DST rules | time button | Settings › Time | `timezone` |
-| weather | [met.no locationforecast] | button | Settings › Weather | `weather` |
+| weather | [met.no locationforecast], [SMHI warnings] for Swedish places | button | Settings › Weather | `weather` |
 | notifications | [Desktop Notifications] server, the compositor's screencasts for DnD | bell button | Settings › Notifications | `notifications` |
 | lock | [ext-session-lock] + [PAM] `kaizen-lock` | – | Settings › Session | `lock` |
 | curtain | [wlr-layer-shell] + [PAM] | – | Settings › Session | `curtain` |
@@ -345,6 +345,7 @@ runs.
 [satty]: https://github.com/gabm/Satty
 [hwmon]: https://docs.kernel.org/hwmon/sysfs-interface.html
 [met.no locationforecast]: https://api.met.no/weatherapi/locationforecast/2.0/documentation
+[SMHI warnings]: https://opendata.smhi.se/warnings
 [Desktop Notifications]: https://specifications.freedesktop.org/notification-spec/latest/
 [ext-session-lock]: https://wayland.app/protocols/ext-session-lock-v1
 [PAM]: https://github.com/linux-pam/linux-pam

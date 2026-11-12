@@ -157,3 +157,19 @@ var places = [
     longitude: 174.76,
   },
 ];
+
+// The country of the listed place at these coordinates, "" for any other
+// spot (IPC can set one). Both sides carry two decimals.
+function countryAt(latitude, longitude) {
+  var lat = Math.round(latitude * 100);
+  var lon = Math.round(longitude * 100);
+  for (var i = 0; i < places.length; i++) {
+    var place = places[i];
+    if (
+      Math.round(place.latitude * 100) === lat &&
+      Math.round(place.longitude * 100) === lon
+    )
+      return place.country;
+  }
+  return "";
+}

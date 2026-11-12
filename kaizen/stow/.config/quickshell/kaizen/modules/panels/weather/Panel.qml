@@ -53,6 +53,9 @@ Ui.Panel {
                 condition: root.service.condition,
                 days: root.service.days.length,
                 outlook: root.service.outlook,
+                country: root.service.country,
+                warnings: root.service.warnings,
+                warningLevel: root.service.warningLevel,
                 pollMinutes: root.service.pollMinutes,
                 updatedAt: root.service.updatedAt ? root.service.updatedAt.toISOString() : null,
                 expiresAt: root.service.expiresAt ? root.service.expiresAt.toISOString() : null

@@ -4,6 +4,7 @@ import Quickshell.Io
 
 import "../../../Ui" as Ui
 import "PlacesModel.js" as Places
+import "WarningsModel.js" as Warnings
 import "WeatherModel.js" as Model
 
 Item {
@@ -22,6 +23,9 @@ Item {
     property var current: null
     property var days: []
     property var outlook: null
+    // SMHI's warnings at the place, worst first; fetched for Swedish places
+    // only (SMHI covers Sweden alone).
+    property var warnings: []
     property bool failed: false
     property var updatedAt: null
     // When the forecast's Expires runs out, as the poll reads it; null until
@@ -29,6 +33,13 @@ Item {
     property var expiresAt: null
 
     readonly property bool ready: current !== null
+    readonly property string country: Places.countryAt(latitude, longitude)
+    readonly property bool swedish: country === "Sweden"
+    // An icon per event among the outlook's risks and SMHI's warnings, each in
+    // its worst level: [{ icon, level }].
+    readonly property var alertGlyphs: Warnings.glyphs(warnings.concat(outlook ? outlook.risks : []))
+    // The worst of them: "", wood or rose.
+    readonly property string warningLevel: Warnings.worst(outlook ? outlook.level : "", warnings.length > 0 ? warnings[0].level : "")
     readonly property string icon: current ? Model.icon(current.symbol) : "󰖐"
     readonly property string condition: current ? Model.condition(current.symbol) : ""
     readonly property string temperature: current ? Model.temperature(current.temperature) : ""
@@ -47,6 +58,18 @@ Item {
         }
         fetch.command = fetchCommand();
         fetch.running = true;
+        refreshWarnings();
+    }
+
+    function refreshWarnings() {
+        if (!swedish) {
+            warnings = [];
+            return;
+        }
+        if (warningsFetch.running)
+            return;
+        warningsFetch.command = ["sh", Quickshell.shellPath("modules/services/weather/warnings.sh"), Ui.Paths.cache, Warnings.URL, userAgent];
+        warningsFetch.running = true;
     }
 
     // MET's terms forbid fetching before Expires. The poll can run late after
@@ -73,6 +96,7 @@ Item {
         current = null;
         days = [];
         outlook = null;
+        warnings = [];
         saveState();
         refresh();
         return true;
@@ -124,6 +148,20 @@ Item {
                 return;
             root.queued = false;
             Qt.callLater(root.refresh);
+        }
+    }
+
+    // A failed fetch prints nothing and keeps the warnings already shown. The
+    // place is read when the response lands, so a switch in flight cannot
+    // pin the previous city's warnings on the new one.
+    Process {
+        id: warningsFetch
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const found = root.swedish ? Warnings.warningsAt(text, root.latitude, root.longitude, new Date()) : [];
+                if (found !== null)
+                    root.warnings = found;
+            }
         }
     }
 
