@@ -36,7 +36,7 @@ actions.
 ### Anatomy
 
 - A search row comes first, always. Its placeholder names the level
-  ("Filter clock…"); on its right is the key that opened the menu, when one
+  ("Filter time…"); on its right is the key that opened the menu, when one
   did.
 - A row shows an icon (the image when it has one, else the glyph), its label,
   a detail (a match's path, a value such as a zone's offset), its key and `›`

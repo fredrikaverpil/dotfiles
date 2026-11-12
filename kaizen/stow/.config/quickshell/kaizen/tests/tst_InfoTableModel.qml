@@ -22,39 +22,46 @@ TestCase {
             },
             {
                 label: "Rate",
-                value: "1 kB/s"
+                value: "1 kB/s",
+                role: "wood"
             }
         ];
         compare(Table.cells(entries, 2), [
             {
                 text: "IP",
                 label: true,
-                column: 0
+                column: 0,
+                role: "off"
             },
             {
                 text: "10.0.0.2",
                 label: false,
-                column: 1
+                column: 1,
+                role: "fg"
             },
             {
                 text: "Ping",
                 label: true,
-                column: 2
+                column: 2,
+                role: "off"
             },
             {
                 text: "9 ms",
                 label: false,
-                column: 3
+                column: 3,
+                role: "fg"
             },
             {
                 text: "Rate",
                 label: true,
-                column: 0
+                column: 0,
+                role: "off"
             },
             {
                 text: "1 kB/s",
                 label: false,
-                column: 1
+                column: 1,
+                role: "wood"
             }
         ]);
     }

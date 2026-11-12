@@ -23,7 +23,7 @@ QtObject {
                 observed: true,
                 inEffect: false,
                 next: {
-                    local: "Sun 28 Mar 2027, 03:00",
+                    local: "2027-03-28 03:00",
                     abbreviation: "CEST",
                     dst: true,
                     offset: 7200

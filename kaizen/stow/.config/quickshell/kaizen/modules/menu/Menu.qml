@@ -142,16 +142,16 @@ Ui.Panel {
             label: "Location",
             provider: "places"
         },
-        "settings.clock": {
+        "settings.time": {
             icon: "󰅐",
-            label: "Clock"
+            label: "Time"
         },
-        "settings.clock.panel": {
+        "settings.time.panel": {
             icon: "󰕮",
-            label: "Clock panel",
+            label: "Time panel",
             action: () => menu.shell.timezone.open()
         },
-        "settings.clock.timezone": {
+        "settings.time.timezone": {
             icon: "󰅐",
             label: "Timezone",
             provider: "zones"

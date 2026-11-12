@@ -13,6 +13,7 @@ Ui.Panel {
 
     cardWidth: view.cardWidth
     cardHeight: view.cardHeight
+    cardPadding: view.cardPadding
     keyNavigation: view.keyNavigation
     // Held unmapped until a probe replaces the time left from the last open.
     visible: shown && service.fresh
@@ -66,6 +67,6 @@ Ui.Panel {
         shell: root.shell
         service: root.service
         // The launcher claims focus and closes this panel.
-        onZoneRequested: root.shell.menu.open("settings.clock.timezone")
+        onZoneRequested: root.shell.menu.open("settings.time.timezone")
     }
 }

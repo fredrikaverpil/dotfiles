@@ -2,7 +2,7 @@ import QtQuick
 
 import "../../../Ui" as Ui
 
-// The clock panel's bar button: the time, pulsing on the hour.
+// The time panel's bar button: the time, pulsing on the hour.
 Ui.BarButton {
     id: button
 

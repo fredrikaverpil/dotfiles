@@ -84,8 +84,9 @@ Every panel has the same shape, top to bottom:
   values, which h/l or a click step, and a segmented control sized to its
   labels for a few (On/Off, which output a display mirrors).
 - Many values about one thing form a details table: labels in `off`, values
-  in `fg` right-aligned, both 14 px, two pairs to a line in a wide card. A
-  panel's tables share their column widths, so they line up.
+  in `fg` right-aligned, or in their status colour ("Not synchronised" in
+  `wood`), both 14 px, two pairs to a line in a wide card. A panel's tables
+  share their column widths, so they line up.
 - A footer with the panel's own keys: a keycap, then what it does in `off`. It
   lists only the keys the panel adds to those every panel shares
   ([`interaction.md`](interaction.md) › Panels). The buttons acting on the

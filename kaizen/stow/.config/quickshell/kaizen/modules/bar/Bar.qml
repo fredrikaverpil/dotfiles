@@ -110,7 +110,7 @@ Scope {
                     date: clock.date
                     anchors.verticalCenter: parent.verticalCenter
                     onActivated: bar.shell.timezone.toggle()
-                    onSecondary: bar.shell.menu.popup("settings.clock", modelData.name, timeLabel)
+                    onSecondary: bar.shell.menu.popup("settings.time", modelData.name, timeLabel)
                 }
             }
 

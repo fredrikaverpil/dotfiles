@@ -87,7 +87,7 @@ ShellRoot {
                 }
             },
             "timezone": {
-                title: "Clock",
+                title: "Time",
                 fake: fakeTimezone,
                 button: timeButton,
                 props: {

@@ -1,11 +1,22 @@
-// The grid's cells for entries ([{ label, value }]), perLine side by side:
-// each a label, then its value.
+// The grid's cells for entries ([{ label, value, role }]), perLine side by
+// side: each a label, then its value. role is the value's palette role, `fg`
+// when unset; labels are `off`.
 function cells(entries, perLine) {
   const result = [];
   entries.forEach((entry, index) => {
     const column = (index % perLine) * 2;
-    result.push({ text: entry.label, label: true, column: column });
-    result.push({ text: entry.value, label: false, column: column + 1 });
+    result.push({
+      text: entry.label,
+      label: true,
+      column: column,
+      role: "off",
+    });
+    result.push({
+      text: entry.value,
+      label: false,
+      column: column + 1,
+      role: entry.role || "fg",
+    });
   });
   return result;
 }

@@ -3,12 +3,13 @@ import QtQuick.Layouts
 
 import "InfoTableModel.js" as Model
 
-// Labelled values, all 14 px: labels `off`, values `fg` right-aligned in their columns (style.md › Panels).
+// Labelled values, all 14 px: labels `off`, values `fg` (or their status role) right-aligned in their
+// columns (style.md › Panels).
 GridLayout {
     id: table
 
     required property var shell
-    // [{ label, value }]
+    // [{ label, value, role }]
     property var entries: []
     // Entries side by side.
     property int perLine: 1
@@ -36,7 +37,7 @@ GridLayout {
             Layout.preferredWidth: table.widths[modelData.column] || 0
             horizontalAlignment: modelData.label ? Text.AlignLeft : Text.AlignRight
             elide: modelData.label ? Text.ElideRight : Text.ElideNone
-            color: modelData.label ? table.shell.palette.off : table.shell.palette.fg
+            color: table.shell.palette[modelData.role]
             font: metrics.font
             text: modelData.text
         }

@@ -15,158 +15,114 @@ Column {
     readonly property string mismatch: Model.zoneMismatch(info.zone, info.link)
     // "tt" is what the bar's own clock resolves to, in date(1)'s %z form.
     readonly property bool stale: Model.staleClock(info.offset, Qt.formatDateTime(new Date(), "tt"))
-    readonly property var warnings: [mismatch === "" ? "" : "󰀦 Not applied: timedated reports " + info.zone + " but /etc/localtime is " + mismatch + ".", !stale ? "" : "󰀦 The bar clock is still on the zone this shell started with. " + "Apply with: systemctl --user restart quickshell", root.service.lastError,].filter(text => text !== "")
-
-    readonly property int cardWidth: 460
-    // Each warning wraps to about two lines; the card grows rather than clipping
-    // the rows or swallowing the reason a change did not land.
-    readonly property int cardHeight: 356 + warnings.length * 40
-    readonly property bool keyNavigation: true
-
-    readonly property var rows: [
+    readonly property var warnings: [
         {
-            label: "Zone",
-            value: info.zone === "" ? "unknown" : info.zone
+            text: mismatch === "" ? "" : "Not applied: timedated reports " + info.zone + " but /etc/localtime is " + mismatch + ".",
+            role: "rose"
         },
         {
-            label: "Date",
-            value: info.weekday + " " + info.date
+            text: !stale ? "" : "The bar clock is still on the zone this shell started with. Apply with: kaizen reload --restart",
+            role: "wood"
         },
         {
-            label: "Offset",
-            value: root.offsetText
+            text: root.service.lastError,
+            role: "rose"
         },
-        {
-            label: "UTC",
-            value: info.utcTime + "   " + info.utcDate
-        },
-        {
-            label: "DST",
-            value: Model.dstLabel(info.dst)
-        },
-        {
-            label: "Next",
-            value: Model.nextLabel(info.dst)
-        },
-        {
-            label: "NTP",
-            value: info.synchronized ? "Synchronised" : "Not synchronised"
-        },
-    ]
+    ].filter(warning => warning.text !== "")
 
     readonly property string offsetText: {
         const seconds = Model.offsetSeconds(info.offset);
         if (seconds === null)
-            return "unknown";
+            return "";
         const abbreviation = Model.abbreviationLabel(info.abbreviation, info.offset);
-        return (abbreviation === "" ? "" : abbreviation + "   ") + Model.offsetLabel(seconds);
+        return (abbreviation === "" ? "" : abbreviation + " ") + Model.offsetLabel(seconds);
     }
+
+    readonly property int cardWidth: 400
+    readonly property int cardPadding: 16
+    readonly property int cardHeight: implicitHeight + 2 * cardPadding
+    readonly property bool keyNavigation: true
 
     signal zoneRequested
 
     width: parent ? parent.width : 0
-    spacing: 8
+    spacing: 24
 
-    Text {
-        width: parent.width
-        color: root.shell.palette.fg
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 18
-        text: "Clock"
-    }
-
-    Rectangle {
-        width: parent.width
-        height: 1
-        color: root.shell.palette.dim
-    }
-
-    Text {
-        width: parent.width
-        color: root.shell.palette.fg
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 40
-        text: root.info.time === "" ? "--:--:--" : root.info.time
-    }
-
-    // Above the rows: a change that did not land is the reason to have opened this.
-    Repeater {
-        model: root.warnings
-
-        delegate: Text {
-            required property string modelData
-
-            width: root.cardWidth - 24
-            wrapMode: Text.WordWrap
-            color: root.shell.palette.fg
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 12
-            text: modelData
+    Ui.PanelHeader {
+        shell: root.shell
+        title: "Time"
+        value: root.info.time === "" ? "--:--:--" : root.info.time
+        subtitle: {
+            if (root.info.zone === "")
+                return "Zone unknown";
+            return root.offsetText === "" ? root.info.zone : root.info.zone + " · " + root.offsetText;
         }
     }
 
-    Repeater {
-        model: root.rows
+    // Above the details: a change that did not land is the reason to have opened this.
+    Ui.Section {
+        visible: root.warnings.length > 0
+        shell: root.shell
 
-        delegate: Row {
-            id: fieldRow
+        Column {
+            width: parent.width
+            spacing: 4
 
-            required property var modelData
+            Repeater {
+                model: root.warnings
 
-            width: root.width
-            height: 20
-            spacing: 10
+                delegate: Text {
+                    required property var modelData
 
-            Text {
-                width: 64
-                anchors.verticalCenter: parent.verticalCenter
-                color: root.shell.palette.off
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 13
-                text: fieldRow.modelData.label
-            }
-
-            Text {
-                width: parent.width - 74
-                elide: Text.ElideRight
-                anchors.verticalCenter: parent.verticalCenter
-                color: root.shell.palette.fg
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 13
-                text: fieldRow.modelData.value
+                    width: root.width
+                    wrapMode: Text.WordWrap
+                    color: root.shell.palette[modelData.role]
+                    font.family: Ui.Fonts.mono
+                    font.pixelSize: 14
+                    text: modelData.text
+                }
             }
         }
     }
 
-    Item {
-        width: parent.width
-        height: 4
+    Ui.Section {
+        shell: root.shell
+
+        Ui.InfoTable {
+            shell: root.shell
+            entries: [
+                {
+                    label: "Date",
+                    value: root.info.weekday + " " + root.info.date
+                },
+                {
+                    label: "UTC",
+                    value: root.info.utcTime + " " + root.info.utcDate
+                },
+                {
+                    label: "DST",
+                    value: Model.dstLabel(root.info.dst)
+                },
+                {
+                    label: "Next",
+                    value: Model.nextLabel(root.info.dst)
+                },
+                {
+                    label: "NTP",
+                    value: root.info.synchronized ? "Synchronised" : "Not synchronised",
+                    role: root.info.synchronized ? "fg" : "wood"
+                }
+            ]
+        }
     }
 
-    Rectangle {
-        width: parent.width
-        height: 28
-        radius: 4
-        color: activeFocus ? root.shell.palette.sel : "transparent"
-        border.color: activeFocus ? root.shell.palette.fg : root.shell.palette.dim
-        border.width: 1
-        activeFocusOnTab: true
+    Ui.PanelFooter {
+        shell: root.shell
 
-        Keys.onReturnPressed: root.zoneRequested()
-        Keys.onEnterPressed: root.zoneRequested()
-        Keys.onSpacePressed: root.zoneRequested()
-
-        Text {
-            anchors.centerIn: parent
-            color: root.shell.palette.fg
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 13
-            text: "󰅐 Change timezone"
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: root.zoneRequested()
+        Ui.PanelButton {
+            shell: root.shell
+            label: "Change timezone…"
+            onActivated: root.zoneRequested()
         }
     }
 }
