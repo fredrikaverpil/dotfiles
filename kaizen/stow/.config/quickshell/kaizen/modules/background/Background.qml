@@ -5,6 +5,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 
 import "../../Ui" as Ui
+import "WallpaperModel.js" as Model
 
 Scope {
     id: background
@@ -75,40 +76,10 @@ Scope {
         return background.thumbDir + "/" + Qt.md5(path) + ".jpg";
     }
 
-    // Folder of a wallpaper relative to wallpaperDir; "" for the root.
-    function dirOf(path) {
-        const rel = path.slice(wallpaperDir.length + 1);
-        const i = rel.lastIndexOf("/");
-        return i < 0 ? "" : rel.slice(0, i);
-    }
-
     function buildRows() {
-        const out = [];
-        const rowOf = [];
-        let dir = null;
-        wallpapers.forEach((path, i) => {
-            const d = dirOf(path);
-            if (d !== dir) {
-                dir = d;
-                out.push({
-                    header: true,
-                    label: d || "Wallpapers"
-                });
-            }
-            let row = out[out.length - 1];
-            if (row.header || row.count === columns) {
-                row = {
-                    header: false,
-                    start: i,
-                    count: 0
-                };
-                out.push(row);
-            }
-            row.count++;
-            rowOf[i] = out.length - 1;
-        });
-        rows = out;
-        rowOfIndex = rowOf;
+        const layout = Model.layout(wallpapers, wallpaperDir, columns);
+        rows = layout.rows;
+        rowOfIndex = layout.rowOfIndex;
         Qt.callLater(grid.reveal);
     }
 
@@ -151,12 +122,7 @@ Scope {
         command: ["find", background.wallpaperDir, "-type", "f", "-iregex", ".*\\.\\(png\\|jpg\\|jpeg\\|webp\\)", "!", "-name", "._*", "!", "-size", "0"]
         stdout: StdioCollector {
             onStreamFinished: {
-                background.wallpapers = text.trim().split("\n").filter(l => l.length > 0).sort((a, b) => {
-                    const da = background.dirOf(a), db = background.dirOf(b);
-                    if (da !== db)
-                        return da < db ? -1 : 1;
-                    return a < b ? -1 : a > b ? 1 : 0;
-                });
+                background.wallpapers = Model.sorted(text.trim().split("\n").filter(l => l.length > 0), background.wallpaperDir);
                 background.buildRows();
                 if (!thumbs.running)
                     thumbs.running = true;
