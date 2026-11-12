@@ -14,6 +14,9 @@ Ui.Panel {
     cardHeight: view.cardHeight
     keyNavigation: view.keyNavigation
 
+    onShownChanged: if (shown)
+        root.service.refreshIfExpired()
+
     function openForecast() {
         Quickshell.execDetached(["xdg-open", Model.yrUrl(root.service.latitude, root.service.longitude)]);
         root.close();
@@ -49,7 +52,8 @@ Ui.Panel {
                 condition: root.service.condition,
                 days: root.service.days.length,
                 pollMinutes: root.service.pollMinutes,
-                updatedAt: root.service.updatedAt ? root.service.updatedAt.toISOString() : null
+                updatedAt: root.service.updatedAt ? root.service.updatedAt.toISOString() : null,
+                expiresAt: root.service.expiresAt ? root.service.expiresAt.toISOString() : null
             });
         }
     }

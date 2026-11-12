@@ -23,6 +23,9 @@ Item {
     property var days: []
     property bool failed: false
     property var updatedAt: null
+    // When the forecast's Expires runs out, as the poll reads it; null until
+    // the first fetch.
+    property var expiresAt: null
 
     readonly property bool busy: fetch.running
     readonly property bool ready: current !== null
@@ -44,6 +47,15 @@ Item {
         }
         fetch.command = fetchCommand();
         fetch.running = true;
+    }
+
+    // MET's terms forbid fetching before Expires. The poll can run late after
+    // a suspend, so opening the panel catches up once the forecast expired.
+    function refreshIfExpired() {
+        if (!stateLoaded || fetch.running)
+            return;
+        if (expiresAt === null || Date.now() >= expiresAt.getTime())
+            refresh();
     }
 
     // Travel is rare enough not to justify an IP-geolocation service, and the
@@ -96,6 +108,7 @@ Item {
         failed = false;
         updatedAt = new Date();
         poll.interval = Model.expiresInterval(separator < 0 ? "" : text.slice(0, separator));
+        expiresAt = new Date(Date.now() + poll.interval);
     }
 
     Process {
