@@ -197,6 +197,25 @@ Workarounds in the repository's `nix/` that kaizen hosts carry.
   `gh api repos/storytold/lightcraft/compare/SHA...vX.Y.Z --jq .status`); the
   entry once none is left, or when renoir drops `lightcraft`.
 
+### Git's three-way merge overflows the heap
+
+- Symptom:
+  [CVE-2026-105437](https://nvd.nist.gov/vuln/detail/CVE-2026-105437) (CVSS
+  7.5): a committed `.gitattributes` with a huge `conflict-marker-size`
+  overflows a 32-bit size in xdiff's merge, so `git merge`, `rebase`,
+  `cherry-pick` or `merge-tree` on an untrusted repository's branches can crash
+  Git or corrupt its heap with attacker-controlled data.
+- Workaround: none. Upstream's, `* conflict-marker-size=7` in a repository's
+  `info/attributes`, is per repository; a global `core.attributesFile` ranks
+  below the in-tree `.gitattributes`.
+- Upstream: fixed in
+  [v2.56.1](https://github.com/git/git/blob/v2.56.1/Documentation/RelNotes/2.56.1.adoc),
+  with five other CVEs; no nixpkgs PR bumps it yet.
+- Status: released in 2.56.1; nixpkgs and the flake's pin have 2.56.0.
+- Drop: this entry, once
+  `nix eval --raw .#nixosConfigurations.<host>.pkgs.git.version` prints 2.56.1
+  or later.
+
 ### Neovim override
 
 - Override: `neovim-unwrapped` at 0.12.6 in
