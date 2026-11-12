@@ -175,9 +175,19 @@ TestCase {
                 want: "hello"
             },
             {
-                tag: "multiline",
+                tag: "first line",
                 text: "  one\n\ttwo  \n",
+                want: "one"
+            },
+            {
+                tag: "blank lines before",
+                text: "\n  \n\tone  two\nthree",
                 want: "one two"
+            },
+            {
+                tag: "blank",
+                text: " \n ",
+                want: ""
             },
             {
                 tag: "bounded",
@@ -189,5 +199,62 @@ TestCase {
 
     function test_preview(data) {
         verify(Model.preview(data.text) === data.want);
+    }
+
+    function test_more_lines_data() {
+        return [
+            {
+                tag: "one line",
+                text: "one",
+                want: 0
+            },
+            {
+                tag: "trailing newline",
+                text: "one\n",
+                want: 0
+            },
+            {
+                tag: "three lines",
+                text: "one\ntwo\nthree",
+                want: 2
+            },
+            {
+                tag: "blank lines at the ends",
+                text: "\n\none\n\nthree\n\n",
+                want: 2
+            },
+        ];
+    }
+
+    function test_more_lines(data) {
+        compare(Model.moreLines(data.text), data.want);
+    }
+
+    function test_stamp_data() {
+        const now = new Date(2026, 10, 12, 14, 2);
+        return [
+            {
+                tag: "today",
+                at: new Date(2026, 10, 12, 9, 5),
+                now: now,
+                want: "09:05"
+            },
+            {
+                tag: "yesterday",
+                at: new Date(2026, 10, 11, 23, 59),
+                now: now,
+                want: "Wed 23:59"
+            },
+            {
+                tag: "a week ago",
+                at: new Date(2026, 10, 5, 14, 2),
+                now: now,
+                want: "Thu 14:02"
+            },
+        ];
+    }
+
+    function test_stamp(data) {
+        compare(Model.stamp(data.at, data.now), data.want);
     }
 }

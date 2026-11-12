@@ -10,7 +10,11 @@ Ui.Panel {
 
     cardWidth: view.cardWidth
     cardHeight: view.cardHeight
+    cardPadding: view.cardPadding
     keyNavigation: view.keyNavigation
+
+    onShownChanged: if (shown)
+        view.reset()
 
     IpcHandler {
         target: "clipboard"

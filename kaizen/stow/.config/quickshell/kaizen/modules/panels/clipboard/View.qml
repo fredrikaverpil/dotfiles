@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Window
 
 import "../../../Ui" as Ui
 import "../../services/clipboard/ClipboardModel.js" as Model
@@ -11,133 +10,104 @@ Column {
     // The clipboard service, or the gallery's stand-in.
     required property var service
 
+    // What the rows' times are read against; set on open.
+    property date now: new Date()
+
     readonly property int cardWidth: 600
-    readonly property int cardHeight: 420
+    readonly property int cardPadding: 16
+    readonly property int cardHeight: implicitHeight + 2 * cardPadding
     readonly property bool keyNavigation: true
 
     signal closeRequested
+
+    // The newest entry is already on the clipboard, so focus starts on the one before it.
+    function reset() {
+        root.now = new Date();
+        Qt.callLater(() => {
+            const row = rows.itemAt(1) || rows.itemAt(0);
+            if (row)
+                row.forceActiveFocus();
+        });
+    }
 
     function pick(text) {
         root.service.copy(text);
         root.closeRequested();
     }
 
-    // Removing rebuilds every delegate, so the focus has to be placed again by
-    // position: the row that took the removed one's place, or the button below.
+    // Removing rebuilds every row, so focus goes by position: the row that took the removed one's place.
     function drop(index) {
         root.service.remove(index);
-        Qt.callLater(function () {
-            if (entries.count === 0) {
-                clearButton.forceActiveFocus(Qt.TabFocusReason);
-                return;
-            }
-            const row = entries.itemAt(Math.min(index, entries.count - 1));
+        Qt.callLater(() => {
+            const row = rows.itemAt(Math.min(index, rows.count - 1));
             if (row)
                 row.forceActiveFocus(Qt.TabFocusReason);
         });
     }
 
-    readonly property var focusedItem: scroller.Window.activeFocusItem
-    // Map to content coordinates: Flickable coordinates are relative to its viewport.
-    onFocusedItemChanged: {
-        const item = focusedItem;
-        if (!item || item.parent !== content)
-            return;
-        const top = item.mapToItem(content, 0, 0).y;
-        if (!isFinite(top))
-            return;
-        if (top < scroller.contentY)
-            scroller.contentY = Math.max(0, top);
-        else if (top + item.height > scroller.contentY + scroller.height)
-            scroller.contentY = top + item.height - scroller.height;
-    }
-
     width: parent ? parent.width : 0
-    height: parent ? parent.height : 0
-    spacing: 8
+    spacing: 24
 
-    Text {
-        color: root.shell.palette.fg
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 18
-        text: "Clipboard"
+    Ui.PanelHeader {
+        shell: root.shell
+        title: "Clipboard"
+        subtitle: {
+            const count = root.service.history.length;
+            if (count === 0)
+                return "Nothing copied yet";
+            return count + (count === 1 ? " entry" : " entries");
+        }
     }
 
-    Rectangle {
-        width: parent.width
-        height: 1
-        color: root.shell.palette.dim
-    }
+    Ui.PanelScroller {
+        visible: root.service.history.length > 0
+        shell: root.shell
 
-    Flickable {
-        id: scroller
-        width: parent.width
-        height: parent.height - y - clearButton.height - root.spacing
-        contentWidth: width
-        contentHeight: content.implicitHeight
-        clip: true
-        boundsBehavior: Flickable.StopAtBounds
+        Ui.Section {
+            shell: root.shell
 
-        Column {
-            id: content
-            width: scroller.width
-            spacing: 2
+            Column {
+                width: root.width
+                spacing: 4
 
-            Repeater {
-                id: entries
-                model: root.service.history
+                Repeater {
+                    id: rows
+                    model: root.service.history
 
-                delegate: EntryRow {}
-            }
-
-            Text {
-                visible: root.service.history.length === 0
-                color: root.shell.palette.off
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 13
-                text: "Nothing copied yet"
+                    delegate: EntryRow {}
+                }
             }
         }
     }
 
-    Rectangle {
-        id: clearButton
-        width: 160
-        height: 28
-        radius: 4
-        color: "transparent"
-        border.color: activeFocus ? root.shell.palette.fg : root.shell.palette.dim
-        border.width: 1
-        activeFocusOnTab: true
+    // A hidden footer's button never shows again, so the footer hides, not the button.
+    Ui.PanelFooter {
+        visible: root.service.history.length > 0
+        shell: root.shell
+        entries: [
+            {
+                keys: ["Backspace"],
+                label: "remove"
+            }
+        ]
 
-        Keys.onReturnPressed: root.service.clear()
-        Keys.onEnterPressed: root.service.clear()
-        Keys.onSpacePressed: root.service.clear()
-
-        Text {
-            anchors.centerIn: parent
-            color: root.shell.palette.fg
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 12
-            text: "Clear history"
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: root.service.clear()
+        Ui.PanelButton {
+            shell: root.shell
+            label: "Clear history"
+            onActivated: root.service.clear()
         }
     }
 
-    component EntryRow: Rectangle {
+    // An entry: its first line, how many follow, when it was copied. Enter, Space or a click copies it.
+    component EntryRow: Item {
         id: row
 
         required property var modelData
         required property int index
+        readonly property int more: Model.moreLines(modelData.text)
 
-        width: parent.width
-        height: 32
-        radius: 4
-        color: activeFocus || mouse.containsMouse ? root.shell.palette.sel : "transparent"
+        width: root.width
+        implicitHeight: 28
         activeFocusOnTab: true
 
         Keys.onReturnPressed: root.pick(row.modelData.text)
@@ -150,33 +120,54 @@ Column {
             event.accepted = true;
         }
 
+        // The fill reaches into the card's padding, so the text aligns with the rule.
+        Rectangle {
+            anchors.fill: parent
+            anchors.leftMargin: -8
+            anchors.rightMargin: -8
+            radius: 4
+            color: row.activeFocus || mouse.containsMouse ? root.shell.palette.sel : "transparent"
+        }
+
         Text {
             anchors.left: parent.left
-            anchors.leftMargin: 8
-            anchors.right: time.left
-            anchors.rightMargin: 12
+            anchors.right: more.left
+            anchors.rightMargin: 16
             anchors.verticalCenter: parent.verticalCenter
+            elide: Text.ElideRight
             color: root.shell.palette.fg
             font.family: Ui.Fonts.mono
             font.pixelSize: 14
+            textFormat: Text.PlainText
             text: Model.preview(row.modelData.text)
-            elide: Text.ElideRight
+        }
+
+        Text {
+            id: more
+            anchors.right: time.left
+            anchors.rightMargin: row.more > 0 ? 16 : 0
+            anchors.verticalCenter: parent.verticalCenter
+            color: root.shell.palette.off
+            font.family: Ui.Fonts.mono
+            font.pixelSize: 14
+            text: row.more > 0 ? "+" + row.more + (row.more === 1 ? " line" : " lines") : ""
         }
 
         Text {
             id: time
             anchors.right: parent.right
-            anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             color: root.shell.palette.off
             font.family: Ui.Fonts.mono
-            font.pixelSize: 13
-            text: Qt.formatDateTime(row.modelData.at, "ddd HH:mm")
+            font.pixelSize: 14
+            text: Model.stamp(row.modelData.at, root.now)
         }
 
         MouseArea {
             id: mouse
             anchors.fill: parent
+            anchors.leftMargin: -8
+            anchors.rightMargin: -8
             hoverEnabled: true
             onClicked: root.pick(row.modelData.text)
         }

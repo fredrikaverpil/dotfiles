@@ -105,7 +105,9 @@ Every panel has the same shape, top to bottom:
   card's padding is 16, and groups are 24 apart. The subtitle sits 4 under the title.
 - Groups too tall for the screen scroll between a fixed header and footer.
   While they overflow, a 4 px `dim` bar at radius 2 sits in the card's
-  right padding, clear of the rows' fill; it shows nothing when all fits.
+  right padding, clear of the rows' fill; it shows nothing when all fits. A
+  scrolling list ends at its last row, with no marker; the bar shows where
+  it is.
 - A group's content aligns with its rule's start. A row's or slider's `sel`
   fill reaches 8 into the card's padding, past the text it holds.
 - Space separates groups. The only lines a panel draws are the rules heading
