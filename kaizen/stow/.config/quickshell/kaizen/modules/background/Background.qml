@@ -21,7 +21,8 @@ Scope {
         picker.shown ? picker.close() : picker.open(slot || "workspace");
     }
 
-    readonly property string wallpaperDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
+    readonly property string shownWallpaperDir: "~/Pictures/Wallpapers"
+    readonly property string wallpaperDir: Quickshell.env("HOME") + shownWallpaperDir.substring(1)
     readonly property string thumbDir: Ui.Paths.cache + "/wallpaper-thumbs"
     readonly property string statePath: Ui.Paths.state + "/wallpaper.json"
     property bool stateLoaded: false
@@ -311,6 +312,7 @@ Scope {
         shell: background.shell
         cardWidth: pickerView.cardWidth
         cardHeight: pickerView.cardHeight
+        cardPadding: pickerView.cardPadding
         keyNavigation: pickerView.keyNavigation
 
         function open(slot) {

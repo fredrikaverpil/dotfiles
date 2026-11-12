@@ -8,6 +8,7 @@ QtObject {
     id: fake
 
     readonly property string root: "/home/you/Pictures/Wallpapers"
+    readonly property string shownWallpaperDir: "~/Pictures/Wallpapers"
     readonly property int columns: 6
 
     function library(folders) {

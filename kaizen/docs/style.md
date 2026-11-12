@@ -100,9 +100,10 @@ Every panel has the same shape, top to bottom:
 ### Space
 
 - Spacing comes from one scale: 4, 8, 16 and 24 px. Rows in a list are 4
-  apart, a rule runs 8 clear of the label at its left and of what sits at its
-  right, a group's content is 8 under its label or 16 under a bare rule, the
-  card's padding is 16, and groups are 24 apart. The subtitle sits 4 under the title.
+  apart, tiles in a grid (wallpapers) 8, a rule runs 8 clear of the label at
+  its left and of what sits at its right, a group's content is 8 under its
+  label or 16 under a bare rule, the card's padding is 16, and groups are 24
+  apart. The subtitle sits 4 under the title.
 - Groups too tall for the screen scroll between a fixed header and footer.
   While they overflow, a 4 px `dim` bar at radius 2 sits in the card's
   right padding, clear of the rows' fill; it shows nothing when all fits. A
