@@ -83,6 +83,7 @@ Column {
     Ui.PanelScroller {
         visible: root.count > 0
         shell: root.shell
+        bleed: 64
 
         Ui.Section {
             shell: root.shell

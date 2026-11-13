@@ -10,6 +10,8 @@ Item {
 
     required property var shell
     property int maxHeight: 520
+    // How far past the sides, and past an end with nothing scrolled beyond it, the body draws: a glowing card's halo.
+    property int bleed: 0
     property alias spacing: body.spacing
     default property alias content: body.data
 
@@ -20,47 +22,59 @@ Item {
     implicitHeight: flickable.height
 
     // 16 wider than the content, so a row's `sel` fill reaching into the card's padding is not clipped.
-    Flickable {
-        id: flickable
+    Item {
+        id: clipper
 
-        readonly property var focusedItem: flickable.Window.activeFocusItem
+        readonly property real above: flickable.atYBeginning ? scroller.bleed : 0
 
-        function holds(item) {
-            for (let candidate = item; candidate; candidate = candidate.parent)
-                if (candidate === body)
-                    return true;
-            return false;
-        }
-
-        // Only items in the body: focus outside it (the card, a view being replaced) scrolls nothing.
-        // Map to content coordinates: Flickable coordinates are relative to its viewport.
-        onFocusedItemChanged: {
-            const item = focusedItem;
-            if (!item || !visible || !holds(item))
-                return;
-            scroller.focusEntered(item);
-            const top = item.mapToItem(body, 0, 0).y;
-            if (top < contentY)
-                contentY = Math.max(0, top);
-            else if (top + item.height > contentY + height)
-                contentY = top + item.height - height;
-        }
-
-        x: -8
-        width: scroller.width + 16
-        height: Math.min(body.implicitHeight, scroller.maxHeight)
-        contentWidth: width
-        contentHeight: body.implicitHeight
+        x: -8 - scroller.bleed
+        y: -above
+        width: scroller.width + 16 + 2 * scroller.bleed
+        height: flickable.height + above + (flickable.atYEnd ? scroller.bleed : 0)
         clip: true
-        boundsBehavior: Flickable.StopAtBounds
-        ScrollBar.vertical: scrollBar
 
-        Column {
-            id: body
+        Flickable {
+            id: flickable
 
-            x: 8
-            width: scroller.width
-            spacing: 24
+            readonly property var focusedItem: flickable.Window.activeFocusItem
+
+            function holds(item) {
+                for (let candidate = item; candidate; candidate = candidate.parent)
+                    if (candidate === body)
+                        return true;
+                return false;
+            }
+
+            // Only items in the body: focus outside it (the card, a view being replaced) scrolls nothing.
+            // Map to content coordinates: Flickable coordinates are relative to its viewport.
+            onFocusedItemChanged: {
+                const item = focusedItem;
+                if (!item || !visible || !holds(item))
+                    return;
+                scroller.focusEntered(item);
+                const top = item.mapToItem(body, 0, 0).y;
+                if (top < contentY)
+                    contentY = Math.max(0, top);
+                else if (top + item.height > contentY + height)
+                    contentY = top + item.height - height;
+            }
+
+            x: scroller.bleed
+            y: clipper.above
+            width: scroller.width + 16
+            height: Math.min(body.implicitHeight, scroller.maxHeight)
+            contentWidth: width
+            contentHeight: body.implicitHeight
+            boundsBehavior: Flickable.StopAtBounds
+            ScrollBar.vertical: scrollBar
+
+            Column {
+                id: body
+
+                x: 8
+                width: scroller.width
+                spacing: 24
+            }
         }
     }
 
