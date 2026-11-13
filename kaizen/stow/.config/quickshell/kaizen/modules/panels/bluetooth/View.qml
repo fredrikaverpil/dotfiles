@@ -14,8 +14,6 @@ Column {
 
     readonly property int cardWidth: 400
     readonly property int cardHeight: implicitHeight + 2 * Ui.Space.cardPadding
-    // One width for a row's button, whatever its label, so the statuses line up.
-    readonly property int actionWidth: actionMetrics.advanceWidth + 24
     readonly property bool keyNavigation: true
 
     width: parent ? parent.width : 0
@@ -47,19 +45,11 @@ Column {
             id: power
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            // As wide for either label, so the button keeps its place.
-            width: powerMetrics.advanceWidth + 24
+            widest: "Turn off"
             visible: root.service.available
             shell: root.shell
             label: root.service.powered ? "Turn off" : "Turn on"
             onActivated: root.service.togglePower()
-        }
-
-        TextMetrics {
-            id: powerMetrics
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 14
-            text: "Turn off"
         }
     }
 
@@ -163,19 +153,12 @@ Column {
         Ui.PanelButton {
             id: actionButton
             anchors.right: parent.right
-            width: root.actionWidth
+            widest: "Disconnect"
             height: parent.height
             available: !row.busy
             shell: root.shell
             label: row.shownAction
             onActivated: row.toggle()
         }
-    }
-
-    TextMetrics {
-        id: actionMetrics
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 14
-        text: "Disconnect"
     }
 }

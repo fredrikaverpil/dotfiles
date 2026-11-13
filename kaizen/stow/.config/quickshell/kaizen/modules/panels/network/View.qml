@@ -20,10 +20,6 @@ Column {
     readonly property int cardHeight: implicitHeight + 2 * Ui.Space.cardPadding
     readonly property bool keyNavigation: true
 
-    // One width for a row's main button, whatever its label, so names and buttons line up.
-    readonly property int actionWidth: actionMetrics.advanceWidth + 24
-    readonly property int forgetWidth: forgetMetrics.advanceWidth + 24
-
     // A device's details table, a target's ping and loss on one line; Wi-Fi's starts with its network.
     function detailRows(device) {
         const m = Model.detailMetrics(root.service.detailsFor(device.name));
@@ -166,20 +162,6 @@ Column {
         font.pixelSize: 14
     }
 
-    TextMetrics {
-        id: actionMetrics
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 14
-        text: "Disconnect"
-    }
-
-    TextMetrics {
-        id: forgetMetrics
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 14
-        text: "Forget"
-    }
-
     // A device's group: its iface at the rule's right, its details while connected; for Wi-Fi, its power
     // button beside the iface and its networks in groups under the details.
     component DeviceGroup: Ui.Section {
@@ -198,8 +180,9 @@ Column {
         Component {
             id: powerButton
 
+            // As wide as the rows' action column below it.
             Ui.PanelButton {
-                width: root.actionWidth
+                widest: "Disconnect"
                 shell: root.shell
                 label: root.service.wifiEnabled ? "Turn off" : "Turn on"
                 onActivated: root.service.toggleWifi()
@@ -384,10 +367,11 @@ Column {
                 id: forgetSlot
                 anchors.right: actionSlot.left
                 anchors.rightMargin: 8
-                width: root.forgetWidth
+                width: forgetButton.implicitWidth
                 height: parent.height
 
                 Ui.PanelButton {
+                    id: forgetButton
                     anchors.fill: parent
                     visible: wifiRow.forgettable
                     available: !root.service.busy
@@ -400,11 +384,13 @@ Column {
             Item {
                 id: actionSlot
                 anchors.right: parent.right
-                width: root.actionWidth
+                width: actionButton.implicitWidth
                 height: parent.height
 
                 Ui.PanelButton {
+                    id: actionButton
                     anchors.fill: parent
+                    widest: "Disconnect"
                     visible: wifiRow.action !== ""
                     available: !root.service.busy
                     shell: root.shell
@@ -448,7 +434,7 @@ Column {
             Ui.PanelButton {
                 id: join
                 anchors.right: parent.right
-                width: root.actionWidth
+                widest: "Disconnect"
                 available: passphrase.text.length > 0 && !root.service.busy
                 shell: root.shell
                 label: "Join"
@@ -508,13 +494,21 @@ Column {
 
         Ui.PanelButton {
             id: savedForget
-            anchors.right: parent.right
-            anchors.rightMargin: root.actionWidth + 8
-            width: root.forgetWidth
+            anchors.right: savedAction.left
+            anchors.rightMargin: 8
             available: !root.service.busy
             shell: root.shell
             label: "Forget"
             onActivated: savedRow.forget()
+        }
+
+        // Holds the action column's place, so Forget lines up with the networks' above.
+        Ui.PanelButton {
+            id: savedAction
+            anchors.right: parent.right
+            visible: false
+            widest: "Disconnect"
+            shell: root.shell
         }
     }
 }

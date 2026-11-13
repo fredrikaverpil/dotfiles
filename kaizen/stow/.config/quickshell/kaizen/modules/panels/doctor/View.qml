@@ -101,20 +101,13 @@ Column {
         shell: root.shell
 
         Ui.PanelButton {
-            // As wide for either label, so the button keeps its place.
-            width: metrics.advanceWidth("Copy report") + 24
+            widest: "Copy report"
             shell: root.shell
             label: root.copied === "all" ? "Copied" : "Copy report"
             onActiveFocusChanged: if (activeFocus)
                 root.focusedKey = ""
             onActivated: root.copyAll()
         }
-    }
-
-    FontMetrics {
-        id: metrics
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 14
     }
 
     // A finding: its level and unit, when it happened, its message and its fix. Enter, Space or a click copies it.

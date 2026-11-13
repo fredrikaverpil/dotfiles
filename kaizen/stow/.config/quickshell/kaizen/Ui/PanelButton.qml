@@ -8,10 +8,12 @@ Rectangle {
     required property var shell
     property string label: ""
     property bool available: true
+    // The button is at least as wide as this label, so it keeps its place when its label changes.
+    property string widest: ""
 
     signal activated
 
-    implicitWidth: text.implicitWidth + 24
+    implicitWidth: Math.max(caption.implicitWidth, widestMetrics.advanceWidth) + 24
     implicitHeight: 28
     radius: 4
     color: button.available && (button.activeFocus || mouse.containsMouse) ? shell.palette.sel : "transparent"
@@ -28,12 +30,18 @@ Rectangle {
         button.activated()
 
     Text {
-        id: text
+        id: caption
         anchors.centerIn: parent
         color: button.available ? button.shell.palette.fg : button.shell.palette.dim
         font.family: Fonts.mono
         font.pixelSize: 14
         text: button.label
+    }
+
+    TextMetrics {
+        id: widestMetrics
+        font: caption.font
+        text: button.widest
     }
 
     MouseArea {

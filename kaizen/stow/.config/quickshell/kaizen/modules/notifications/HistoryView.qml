@@ -68,18 +68,10 @@ Column {
             id: dnd
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            // As wide for either label, so the button keeps its place.
-            width: dndMetrics.advanceWidth + 24
+            widest: "Resume"
             shell: root.shell
             label: root.service.doNotDisturb ? "Resume" : "Pause"
             onActivated: root.service.setDoNotDisturb(!root.service.doNotDisturb)
-        }
-
-        TextMetrics {
-            id: dndMetrics
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 14
-            text: "Resume"
         }
     }
 

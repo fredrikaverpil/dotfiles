@@ -21,8 +21,6 @@ Column {
 
     // One width for every group's table, so they line up.
     readonly property var tableWidths: Table.columnWidths(service.updates.map(update => Model.details(update)), 1, text => metrics.advanceWidth(text))
-    // The copy button keeps its width when its label turns "Copied".
-    readonly property int copyWidth: metrics.advanceWidth("Copy update command") + 24
 
     // Opening a release page hands over to the browser.
     signal closeRequested
@@ -130,7 +128,7 @@ Column {
             spacing: 8
 
             Ui.PanelButton {
-                width: root.copyWidth
+                widest: "Copy update command"
                 shell: root.shell
                 label: root.copied === group.update.id ? "Copied" : "Copy update command"
                 onActivated: root.copy(group.update)
