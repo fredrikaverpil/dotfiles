@@ -56,20 +56,14 @@ Ui.Panel {
         }
     }
 
-    QtObject {
-        id: outputState
-
-        readonly property var focused: root.focusedMonitor
-        readonly property var names: Quickshell.screens.map(screen => screen.name)
-    }
-
     View {
         id: view
         shell: root.shell
         brightness: root.shell.brightness
         nightlight: root.shell.nightlight
         mirror: root.shell.mirror
-        outputs: outputState
+        focusedOutput: root.focusedMonitor
+        outputNames: Quickshell.screens.map(screen => screen.name)
         onArrangeRequested: {
             root.close();
             Quickshell.execDetached(["wdisplays"]);

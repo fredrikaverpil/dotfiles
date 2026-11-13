@@ -10,8 +10,10 @@ Column {
     required property var brightness
     required property var nightlight
     required property var mirror
-    // focused: the focused monitor or null; names: every output's name.
-    required property var outputs
+    // The focused monitor, or null.
+    required property var focusedOutput
+    // Every output's name.
+    required property var outputNames
 
     // wdisplays arranges the outputs; the panel closes for it.
     signal arrangeRequested
@@ -28,13 +30,13 @@ Column {
     Ui.PanelHeader {
         shell: root.shell
         title: "Display"
-        subtitle: root.outputs.focused ? root.outputs.focused.name + " · " + root.outputs.focused.width + "×" + root.outputs.focused.height : "No active display"
+        subtitle: root.focusedOutput ? root.focusedOutput.name + " · " + root.focusedOutput.width + "×" + root.focusedOutput.height : "No active display"
     }
 
     // A group, not the header's slider (style.md › Panels › Form): the panel has no key value, and only the backlit
     // output has brightness. Shown on that output; on every output when sysfs names none.
     Ui.Section {
-        visible: root.brightness.present && (root.brightness.output === "" || !!root.outputs.focused && root.outputs.focused.name === root.brightness.output)
+        visible: root.brightness.present && (root.brightness.output === "" || !!root.focusedOutput && root.focusedOutput.name === root.brightness.output)
         shell: root.shell
         title: "Brightness"
 
@@ -124,12 +126,12 @@ Column {
 
         // One row per output, picking what it shows; only with another output to mirror.
         Column {
-            visible: root.outputs.names.length > 1
+            visible: root.outputNames.length > 1
             width: parent.width
             spacing: 4
 
             Repeater {
-                model: root.outputs.names.length > 1 ? root.outputs.names : []
+                model: root.outputNames.length > 1 ? root.outputNames : []
 
                 delegate: Item {
                     id: mirrorRow
@@ -153,14 +155,14 @@ Column {
                         anchors.right: parent.right
                         // Every row's segments as wide as the longest name (the font is monospace), so the rows align.
                         width: implicitWidth
-                        widest: root.outputs.names.reduce((widest, name) => name.length > widest.length ? name : widest, "Own")
+                        widest: root.outputNames.reduce((widest, name) => name.length > widest.length ? name : widest, "Own")
                         shell: root.shell
                         options: [
                             {
                                 label: "Own",
                                 value: ""
                             }
-                        ].concat(root.outputs.names.filter(name => name !== mirrorRow.target).map(name => ({
+                        ].concat(root.outputNames.filter(name => name !== mirrorRow.target).map(name => ({
                                     label: name,
                                     value: name
                                 })))
