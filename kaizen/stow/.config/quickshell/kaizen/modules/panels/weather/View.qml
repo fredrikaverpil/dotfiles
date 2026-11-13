@@ -14,13 +14,12 @@ Column {
     // What the times are read against; set on open.
     property date now: new Date()
     readonly property string updated: service.updatedAt ? Time.stamp(service.updatedAt, now) : ""
-    readonly property var outlook: service.outlook
     // SMHI's warnings, then the outlook's risks: [{ level, icon, text }], worst first in each.
     readonly property var alerts: service.warnings.map(warning => ({
                 level: warning.level,
                 icon: warning.icon,
                 text: Warnings.describe(warning, root.now)
-            })).concat(outlook ? outlook.risks : [])
+            })).concat(service.outlook ? service.outlook.risks : [])
 
     readonly property int cardWidth: 460
     readonly property bool keyNavigation: true
@@ -70,29 +69,7 @@ Column {
             Ui.InfoTable {
                 shell: root.shell
                 perLine: 2
-                entries: [
-                    {
-                        label: "Wind",
-                        value: root.service.wind
-                    },
-                    {
-                        label: "Humidity",
-                        value: root.service.humidity
-                    },
-                    // MET forecasts gusts only inside its Nordic model; elsewhere the strongest mean
-                    // wind stands in.
-                    root.outlook && root.outlook.gust !== null ? {
-                        label: "Max gusts, 12 h",
-                        value: Math.round(root.outlook.gust) + " m/s"
-                    } : {
-                        label: "Max wind, 12 h",
-                        value: root.outlook && root.outlook.wind !== null ? Math.round(root.outlook.wind) + " m/s" : "--"
-                    },
-                    {
-                        label: "Total rain, 12 h",
-                        value: root.outlook && root.outlook.precipitation !== null ? root.outlook.precipitation + " mm" : "--"
-                    }
-                ]
+                entries: root.service.details
             }
 
             Column {

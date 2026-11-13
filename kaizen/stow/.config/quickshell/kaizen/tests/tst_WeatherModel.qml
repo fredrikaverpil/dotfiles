@@ -374,4 +374,100 @@ TestCase {
             level: data.risks.length > 0 ? data.risks[0].level : ""
         });
     }
+
+    function test_details_data() {
+        return [
+            {
+                tag: "gusts forecast",
+                current: {
+                    wind: 4.6,
+                    humidity: 81.2
+                },
+                outlook: {
+                    wind: 9.4,
+                    gust: 17.5,
+                    precipitation: 2.3
+                },
+                want: [
+                    {
+                        label: "Wind",
+                        value: "5 m/s"
+                    },
+                    {
+                        label: "Humidity",
+                        value: "81%"
+                    },
+                    {
+                        label: "Max gusts, 12 h",
+                        value: "18 m/s"
+                    },
+                    {
+                        label: "Total rain, 12 h",
+                        value: "2.3 mm"
+                    }
+                ]
+            },
+            {
+                tag: "no gusts outside the Nordic model",
+                current: {
+                    wind: 4.6,
+                    humidity: 81.2
+                },
+                outlook: {
+                    wind: 9.4,
+                    gust: null,
+                    precipitation: 0
+                },
+                want: [
+                    {
+                        label: "Wind",
+                        value: "5 m/s"
+                    },
+                    {
+                        label: "Humidity",
+                        value: "81%"
+                    },
+                    {
+                        label: "Max wind, 12 h",
+                        value: "9 m/s"
+                    },
+                    {
+                        label: "Total rain, 12 h",
+                        value: "0 mm"
+                    }
+                ]
+            },
+            {
+                tag: "missing values",
+                current: {
+                    wind: null
+                },
+                outlook: null,
+                want: [
+                    {
+                        label: "Wind",
+                        value: "--"
+                    },
+                    {
+                        label: "Humidity",
+                        value: "--"
+                    },
+                    {
+                        label: "Max wind, 12 h",
+                        value: "--"
+                    },
+                    {
+                        label: "Total rain, 12 h",
+                        value: "--"
+                    }
+                ]
+            }
+        ];
+    }
+
+    function test_details(data) {
+        const got = Weather.details(data.current, data.outlook);
+
+        compare(got, data.want);
+    }
 }

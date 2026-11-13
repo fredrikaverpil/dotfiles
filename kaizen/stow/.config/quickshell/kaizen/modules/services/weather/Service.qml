@@ -43,8 +43,7 @@ Item {
     readonly property string icon: current ? Model.icon(current.symbol) : "󰖐"
     readonly property string condition: current ? Model.condition(current.symbol) : ""
     readonly property string temperature: current ? Model.temperature(current.temperature) : ""
-    readonly property string wind: current && isFinite(current.wind) ? Math.round(current.wind) + " m/s" : ""
-    readonly property string humidity: current && isFinite(current.humidity) ? Math.round(current.humidity) + "%" : ""
+    readonly property var details: Model.details(current, outlook)
     readonly property int pollMinutes: Math.round(poll.interval / 60000)
 
     // A switch made while the previous city is still in flight must not be

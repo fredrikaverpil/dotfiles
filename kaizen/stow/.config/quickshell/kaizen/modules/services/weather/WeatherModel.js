@@ -167,6 +167,44 @@ function temperature(value) {
   return isFinite(number) ? Math.round(number) + "°" : "";
 }
 
+function metresPerSecond(value) {
+  return typeof value === "number" && isFinite(value)
+    ? Math.round(value) + " m/s"
+    : "--";
+}
+
+// The panel's details table: the wind and humidity now, then the outlook's
+// strongest wind and total rain; "--" for a missing value. MET forecasts
+// gusts only inside its Nordic model; elsewhere the strongest mean wind
+// stands in.
+function details(current, outlook) {
+  var now = current || {};
+  var next = outlook || {};
+  var humidity = now.humidity;
+  var hasGust = typeof next.gust === "number";
+  return [
+    { label: "Wind", value: metresPerSecond(now.wind) },
+    {
+      label: "Humidity",
+      value:
+        typeof humidity === "number" && isFinite(humidity)
+          ? Math.round(humidity) + "%"
+          : "--",
+    },
+    {
+      label: hasGust ? "Max gusts, 12 h" : "Max wind, 12 h",
+      value: metresPerSecond(hasGust ? next.gust : next.wind),
+    },
+    {
+      label: "Total rain, 12 h",
+      value:
+        typeof next.precipitation === "number"
+          ? next.precipitation + " mm"
+          : "--",
+    },
+  ];
+}
+
 function dayKey(date) {
   var month = date.getMonth() + 1;
   var day = date.getDate();
