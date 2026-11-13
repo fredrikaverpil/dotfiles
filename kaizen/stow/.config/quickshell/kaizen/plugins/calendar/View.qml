@@ -29,24 +29,10 @@ Column {
         title: "Calendar"
         subtitle: {
             if (root.service.failed)
-                return "";
+                return "dcal is not running";
             if (root.loading)
                 return "Loading…";
             return Model.nextLabel(root.service.days, root.now);
-        }
-    }
-
-    Ui.Section {
-        visible: root.service.failed
-        shell: root.shell
-
-        Text {
-            width: root.width
-            wrapMode: Text.WordWrap
-            color: root.shell.palette.rose
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 14
-            text: "dcal is not running"
         }
     }
 
@@ -129,8 +115,10 @@ Column {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             width: 24
+            horizontalAlignment: Text.AlignHCenter
             font.family: Ui.Fonts.mono
             font.pixelSize: 14
+            // A colour emoji ignores its text colour, so a past one fades rather than turning off.
             opacity: row.past ? 0.5 : 1
             text: row.modelData.emoji
         }
@@ -153,7 +141,7 @@ Column {
             anchors.left: time.right
             anchors.leftMargin: 16
             anchors.verticalCenter: parent.verticalCenter
-            width: Math.min(implicitWidth, (join.visible ? join.x - 16 : row.width) - x)
+            width: Math.min(implicitWidth, row.width - x - (join.visible ? join.width + 16 : 0))
             elide: Text.ElideRight
             color: row.textColor
             font.family: Ui.Fonts.mono
