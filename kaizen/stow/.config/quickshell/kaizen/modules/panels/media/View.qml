@@ -50,7 +50,7 @@ Column {
                 width: 94
                 height: 94
                 radius: 4
-                color: root.shell.palette.sel
+                color: "transparent"
                 border.color: root.shell.palette.dim
                 border.width: 1
 
@@ -63,6 +63,7 @@ Column {
                     source: root.service.artUrl
                 }
 
+                // Off the type scale (style.md › Panels › Type): it stands in for the art, not text.
                 Text {
                     anchors.centerIn: parent
                     visible: art.status !== Image.Ready
