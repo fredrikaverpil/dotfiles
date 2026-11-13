@@ -242,7 +242,7 @@ Column {
         readonly property string action: root.service.wifiAction(network)
         readonly property string status: root.service.wifiStatus(network)
         // "Connecting…", "Disconnecting…", "Forgetting…".
-        readonly property bool changing: status.endsWith("…")
+        readonly property bool changing: root.service.busy && root.service.actionSsid === network.name
         readonly property bool forgettable: Model.canForgetNetwork(network)
 
         function activate() {
