@@ -133,15 +133,15 @@ Column {
             }
         }
 
-        Item {
-            width: parent.width
-            height: 8
-        }
+        // 16 under the content (style.md › Panels › Space).
+        Row {
+            topPadding: 8
 
-        Ui.PanelButton {
-            shell: root.shell
-            label: "Hourly on yr.no"
-            onActivated: root.forecastRequested()
+            Ui.PanelButton {
+                shell: root.shell
+                label: "Hourly on yr.no"
+                onActivated: root.forecastRequested()
+            }
         }
     }
 

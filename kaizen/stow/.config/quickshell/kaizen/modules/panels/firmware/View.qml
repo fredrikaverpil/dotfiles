@@ -124,12 +124,9 @@ Column {
             text: group.update.notes
         }
 
-        Item {
-            width: root.width
-            height: 8
-        }
-
+        // 16 under the content (style.md › Panels › Space).
         Row {
+            topPadding: 8
             spacing: 8
 
             Ui.PanelButton {

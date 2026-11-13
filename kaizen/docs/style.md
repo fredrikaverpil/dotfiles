@@ -113,8 +113,8 @@ Every panel has the same shape, top to bottom:
   apart, tiles in a grid (wallpapers) 8, a rule runs 8 clear of the label at
   its left and of what sits at its right, a group's content is 8 under its
   label or 16 under a bare rule, sub-groups are 8 apart and 16 under the
-  group's content above them, the card's padding is 16, and groups are 24
-  apart. The subtitle sits 4 under the title.
+  group's content above them, as is a group's own button, the card's padding
+  is 16, and groups are 24 apart. The subtitle sits 4 under the title.
 - Groups too tall for the screen scroll between a fixed header and footer.
   While they overflow, a 4 px `dim` bar at radius 2 sits in the card's
   right padding, clear of the rows' fill; it shows nothing when all fits. A
