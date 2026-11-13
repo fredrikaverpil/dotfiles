@@ -332,6 +332,8 @@ Item {
             // Sorted by strength again on open.
             orderFrozen = false;
             wifiNetworks = [];
+            // Rates and pings measured from now, not across the time closed.
+            details = ({});
             refresh();
             loadSavedWifi();
             scan();
