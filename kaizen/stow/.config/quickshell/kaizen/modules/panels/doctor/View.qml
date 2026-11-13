@@ -48,7 +48,7 @@ Column {
             if (service.checked === 0)
                 return service.running ? "Checking…" : "Check failed";
             const counts = service.findings.length === 0 ? "No errors or warnings" : Model.summary(service.counts);
-            return counts + " · checked " + Time.stamp(new Date(service.checked), new Date());
+            return counts + " · checked " + Time.stamp(new Date(service.checked), new Date()) + (service.running ? " · checking…" : "");
         }
     }
 
@@ -118,7 +118,7 @@ Column {
         readonly property bool copied: root.copied === key
 
         width: root.width
-        implicitHeight: lines.implicitHeight + 10
+        implicitHeight: lines.implicitHeight + 8
         shell: root.shell
         onActivated: root.copy(row.finding)
         onActiveFocusChanged: if (activeFocus)
@@ -129,7 +129,7 @@ Column {
         Column {
             id: lines
 
-            y: 5
+            y: 4
             width: parent.width
             spacing: 4
 
