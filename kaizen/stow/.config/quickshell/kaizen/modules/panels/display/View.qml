@@ -42,21 +42,9 @@ Column {
             shell: root.shell
             value: root.brightness.percent / 100
             valueText: root.brightness.percent + "%"
-            focused: activeFocus
             icon: "󰃠"
             onMoved: value => root.brightness.set(100 * value)
-
-            activeFocusOnTab: visible
-            // Left/right adjust here; up/down fall through to the panel's focus chain.
-            Keys.onPressed: function (event) {
-                if (event.key === Qt.Key_Right || event.text === "l")
-                    root.brightness.adjust(root.brightness.step);
-                else if (event.key === Qt.Key_Left || event.text === "h")
-                    root.brightness.adjust(-root.brightness.step);
-                else
-                    return;
-                event.accepted = true;
-            }
+            onStepped: direction => root.brightness.adjust(direction * root.brightness.step)
         }
     }
 

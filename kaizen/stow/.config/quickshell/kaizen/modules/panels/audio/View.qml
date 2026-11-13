@@ -107,6 +107,7 @@ Column {
             icon: root.audio.icon
             iconColor: root.audio.muted ? root.shell.palette.rose : root.shell.palette.fg
             onMoved: value => root.audio.setVolume(value)
+            onStepped: direction => root.adjust(0.05 * direction)
             onHovered: root.setCursor(-1)
         }
     }

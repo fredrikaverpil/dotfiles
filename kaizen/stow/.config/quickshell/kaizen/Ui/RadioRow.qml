@@ -1,31 +1,14 @@
 import QtQuick
 
 // One choice of a set: `●` when chosen, `○` in `dim` otherwise (style.md › Panels).
-Item {
+PanelRow {
     id: row
 
-    required property var shell
     property string label: ""
     property bool chosen: false
-    property bool focused: false
     // At the row's right, such as a player's state.
     property string value: ""
     property color valueColor: shell.palette.off
-
-    signal hovered
-    signal activated
-
-    width: parent ? parent.width : 0
-    implicitHeight: 28
-
-    // The fill reaches into the card's padding, so the mark aligns with the section label.
-    Rectangle {
-        anchors.fill: parent
-        anchors.leftMargin: -8
-        anchors.rightMargin: -8
-        radius: 4
-        color: row.focused ? row.shell.palette.sel : "transparent"
-    }
 
     Text {
         id: mark
@@ -58,14 +41,5 @@ Item {
         font.family: Fonts.mono
         font.pixelSize: 14
         text: row.value
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        anchors.leftMargin: -8
-        anchors.rightMargin: -8
-        hoverEnabled: true
-        onEntered: row.hovered()
-        onClicked: row.activated()
     }
 }

@@ -117,22 +117,8 @@ Column {
             value: root.service.length > 0 ? root.service.position / root.service.length : 0
             valueText: Model.formatPosition(root.service.position)
             valueWidest: Model.formatPosition(root.service.length)
-            focused: activeFocus && interactive
             onMoved: value => root.service.seek(value * root.service.length)
-
-            activeFocusOnTab: (visible && interactive) || activeFocus
-            // Left/right seek here; up/down fall through to the panel's focus chain.
-            Keys.onPressed: function (event) {
-                if (event.key === Qt.Key_Right || event.text === "l")
-                    root.service.seek(root.service.position + root.seekStep);
-                else if (event.key === Qt.Key_Left || event.text === "h")
-                    root.service.seek(root.service.position - root.seekStep);
-                else
-                    return;
-                event.accepted = true;
-            }
-            onHovered: if (interactive)
-                forceActiveFocus()
+            onStepped: direction => root.service.seek(root.service.position + direction * root.seekStep)
         }
 
         Row {
@@ -185,12 +171,6 @@ Column {
                 chosen: root.service.playerKey(modelData) === root.service.playerKey(root.player)
                 value: modelData.isPlaying ? "󰏤" : "󰐊"
                 valueColor: modelData.isPlaying ? root.shell.palette.fg : root.shell.palette.off
-                focused: activeFocus
-                activeFocusOnTab: visible || activeFocus
-                Keys.onReturnPressed: activated()
-                Keys.onEnterPressed: activated()
-                Keys.onSpacePressed: activated()
-                onHovered: forceActiveFocus()
                 onActivated: root.service.selectPlayer(root.service.playerKey(modelData))
             }
         }

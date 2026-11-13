@@ -8,9 +8,10 @@ Item {
     property real value: 0
     // Muted or off: the fill and knob turn `off`.
     property bool off: false
-    property bool focused: false
-    // False for a meter: no knob, no pointer.
+    // False for a meter: no knob, no pointer, no focus.
     property bool interactive: true
+    // Draws the fill; a view keeping its own cursor (audio's) binds it.
+    property bool focused: activeFocus && interactive
     property string icon: ""
     property color iconColor: shell.palette.fg
 
@@ -22,10 +23,30 @@ Item {
     property color valueColor: fillColor
 
     signal moved(real value)
+    // h/l and the arrows step the value: 1 up, -1 down.
+    signal stepped(int direction)
     signal hovered
+
+    function hover() {
+        slider.hovered();
+        slider.forceActiveFocus();
+    }
 
     width: parent ? parent.width : 0
     implicitHeight: 32
+
+    // Kept while focused: Qt refuses to drop the active focus item from the chain.
+    activeFocusOnTab: (slider.visible && slider.interactive) || slider.activeFocus
+    // Up/down fall through to the panel's focus chain.
+    Keys.onPressed: function (event) {
+        if (event.key === Qt.Key_Right || event.text === "l")
+            slider.stepped(1);
+        else if (event.key === Qt.Key_Left || event.text === "h")
+            slider.stepped(-1);
+        else
+            return;
+        event.accepted = true;
+    }
 
     // The fill reaches into the card's padding, so the icon aligns with the section label.
     Rectangle {
@@ -43,7 +64,7 @@ Item {
         enabled: slider.interactive
         acceptedButtons: Qt.NoButton
         hoverEnabled: true
-        onEntered: slider.hovered()
+        onEntered: slider.hover()
     }
 
     Text {
@@ -98,7 +119,7 @@ Item {
             anchors.bottomMargin: -11
             enabled: slider.interactive
             hoverEnabled: true
-            onEntered: slider.hovered()
+            onEntered: slider.hover()
             onPressed: function (mouse) {
                 slider.moved(Math.max(0, Math.min(1, mouse.x / width)));
             }
