@@ -178,24 +178,76 @@ TestCase {
         }), "Spotify");
     }
 
-    function test_seeking() {
-        compare([Media.hasLength(null), Media.hasLength({
-                lengthSupported: true,
-                length: 330
-            }), Media.hasLength({
-                lengthSupported: false,
-                length: 12
-            }), Media.hasLength({
-                lengthSupported: true,
-                length: 0
-            })], [false, true, false, false]);
-        compare([Media.canSeek(null), Media.canSeek({
-                canSeek: true,
-                positionSupported: true
-            }), Media.canSeek({
-                canSeek: true,
-                positionSupported: false
-            })], [false, true, false]);
+    function test_has_length_data() {
+        return [
+            {
+                tag: "no player",
+                player: null,
+                want: false
+            },
+            {
+                tag: "length",
+                player: {
+                    lengthSupported: true,
+                    length: 330
+                },
+                want: true
+            },
+            {
+                tag: "length unsupported",
+                player: {
+                    lengthSupported: false,
+                    length: 12
+                },
+                want: false
+            },
+            {
+                tag: "zero length",
+                player: {
+                    lengthSupported: true,
+                    length: 0
+                },
+                want: false
+            }
+        ];
+    }
+
+    function test_has_length(data) {
+        const got = Media.hasLength(data.player);
+
+        compare(got, data.want);
+    }
+
+    function test_can_seek_data() {
+        return [
+            {
+                tag: "no player",
+                player: null,
+                want: false
+            },
+            {
+                tag: "seekable",
+                player: {
+                    canSeek: true,
+                    positionSupported: true
+                },
+                want: true
+            },
+            {
+                tag: "position unsupported",
+                player: {
+                    canSeek: true,
+                    positionSupported: false
+                },
+                want: false
+            }
+        ];
+    }
+
+    function test_can_seek(data) {
+        const got = Media.canSeek(data.player);
+
+        compare(got, data.want);
     }
 
     function test_format_position_data() {
