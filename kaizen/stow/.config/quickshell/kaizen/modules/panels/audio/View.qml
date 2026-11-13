@@ -9,7 +9,7 @@ Column {
     // The audio service.
     required property var service
 
-    // Inputs, per-app volumes and profiles are set in pwvucontrol; the panel closes for it.
+    // Per-app volumes and device profiles are set in pwvucontrol; the panel closes for it.
     signal settingsRequested
 
     width: parent ? parent.width : 0

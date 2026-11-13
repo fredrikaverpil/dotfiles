@@ -12,7 +12,7 @@ Ui.Panel {
     cardWidth: 400
     keyNavigation: true
 
-    // Inputs, per-app volumes and profiles are set in pwvucontrol.
+    // Per-app volumes and device profiles are set in pwvucontrol.
     function openSettings() {
         close();
         Quickshell.execDetached(["pwvucontrol"]);
