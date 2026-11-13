@@ -251,4 +251,59 @@ TestCase {
         // Assert
         verify(got === data.want, got);
     }
+
+    function test_key_data() {
+        const finding = {
+            source: "unit",
+            id: "journal",
+            level: "WARN",
+            unit: "kaizen-shell.service",
+            message: "binding loop",
+            count: 1,
+            first: 1,
+            last: 1
+        };
+        return [
+            {
+                tag: "a later run's copy",
+                a: finding,
+                b: Object.assign({}, finding, {
+                    level: "ERROR",
+                    count: 3,
+                    last: 9
+                }),
+                want: true
+            },
+            {
+                tag: "another message",
+                a: finding,
+                b: Object.assign({}, finding, {
+                    message: "other"
+                }),
+                want: false
+            },
+            {
+                tag: "another unit",
+                a: finding,
+                b: Object.assign({}, finding, {
+                    unit: "kaizen-dcal.service"
+                }),
+                want: false
+            },
+            {
+                tag: "another check",
+                a: finding,
+                b: Object.assign({}, finding, {
+                    id: "failed"
+                }),
+                want: false
+            }
+        ];
+    }
+
+    function test_key(data) {
+        const got = Doctor.key(data.a) === Doctor.key(data.b);
+
+        compare(got, data.want);
+    }
 }
