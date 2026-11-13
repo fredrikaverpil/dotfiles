@@ -71,12 +71,13 @@ Every panel has the same shape, top to bottom:
 - Groups, each a rule with its section label at the rule's left, and its
   content. A group whose content names itself (battery's details table,
   recording's options) leaves the label out: the rule alone heads it. A group
-  with one value of its own that no control shows (nightlight's temperature)
-  puts it at the rule's right in `off`; a group with a control of its own
-  (Wi-Fi's power button) puts that there instead.
+  with one value of its own that no control shows (nightlight's temperature,
+  a network device's iface) puts it at the rule's right in `off`; a control
+  of its own (Wi-Fi's power button) sits right of that.
 - A panel over several devices, each with details of its own (network,
   firmware), gives each device a group titled by its type ("Ethernet",
-  "Wi-Fi") or, where the type does not tell them apart, its name. A group
+  "Wi-Fi"), with its iface at the rule's right to tell two of a type apart,
+  or, where it has no iface (firmware), by its name. A group
   holding a long list goes last.
 - A panel about picking a device (audio) lists every device as a row, since
   the choice is what it shows. A panel that sets up an action (recording)

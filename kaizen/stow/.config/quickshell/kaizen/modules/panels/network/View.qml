@@ -24,17 +24,17 @@ Column {
     readonly property int actionWidth: actionMetrics.advanceWidth + 24
     readonly property int forgetWidth: forgetMetrics.advanceWidth + 24
 
-    // A device's details table.
+    // A device's details table, a target's ping and loss on one line.
     function detailRows(iface) {
         const m = Model.detailMetrics(root.service.detailsFor(iface));
         return [
             {
-                label: "Interface",
-                value: iface
-            },
-            {
                 label: "IP address",
                 value: m.ip
+            },
+            {
+                label: "Gateway",
+                value: m.gateway
             },
             {
                 label: "Ping (Cloudflare)",
@@ -67,10 +67,6 @@ Column {
             {
                 label: "Uploaded",
                 value: m.uploaded
-            },
-            {
-                label: "Gateway",
-                value: m.gateway
             }
         ];
     }
@@ -169,8 +165,8 @@ Column {
         text: "Forget"
     }
 
-    // A device's group: its details while connected; for Wi-Fi, its power button at the rule's right
-    // and the networks under the details.
+    // A device's group: its iface at the rule's right, its details while connected; for Wi-Fi, its power
+    // button beside the iface and the networks under the details.
     component DeviceGroup: Ui.Section {
         id: group
 
@@ -179,6 +175,7 @@ Column {
 
         shell: root.shell
         title: root.service.deviceTypeName(device)
+        value: device.name
         control: wifi ? powerButton : null
 
         Component {
@@ -201,26 +198,12 @@ Column {
         }
 
         // Wi-Fi's state shows in its network rows instead.
-        Item {
-            width: root.width
-            implicitHeight: stateText.implicitHeight
+        Text {
             visible: !group.device.connected && !group.wifi
-
-            Text {
-                id: stateText
-                color: root.shell.palette.off
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 14
-                text: root.service.deviceState(group.device)
-            }
-
-            Text {
-                anchors.right: parent.right
-                color: root.shell.palette.off
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 14
-                text: group.device.name
-            }
+            color: root.shell.palette.off
+            font.family: Ui.Fonts.mono
+            font.pixelSize: 14
+            text: root.service.deviceState(group.device)
         }
 
         Column {
