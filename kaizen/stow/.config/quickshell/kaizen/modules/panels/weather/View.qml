@@ -43,164 +43,168 @@ Column {
         }
     }
 
-    // Above the details: the values below are older than they look.
-    Ui.Section {
-        visible: root.service.failed && root.service.ready
+    Ui.PanelScroller {
         shell: root.shell
 
-        Text {
-            width: parent.width
-            wrapMode: Text.WordWrap
-            color: root.shell.palette.rose
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 14
-            text: "Could not update; showing the forecast from " + root.updated
-        }
-    }
-
-    // The current values and the next 12 hours' extremes, then what in those hours needs
-    // attention. The labels name the hours, so the rule heads it bare.
-    Ui.Section {
-        visible: root.service.ready
-        shell: root.shell
-
-        Ui.InfoTable {
+        // Above the details: the values below are older than they look.
+        Ui.Section {
+            visible: root.service.failed && root.service.ready
             shell: root.shell
-            perLine: 2
-            entries: [
-                {
-                    label: "Wind",
-                    value: root.service.wind
-                },
-                {
-                    label: "Humidity",
-                    value: root.service.humidity
-                },
-                // MET forecasts gusts only inside its Nordic model; elsewhere the strongest mean
-                // wind stands in.
-                root.outlook && root.outlook.gust !== null ? {
-                    label: "Max gusts, 12 h",
-                    value: Math.round(root.outlook.gust) + " m/s"
-                } : {
-                    label: "Max wind, 12 h",
-                    value: root.outlook && root.outlook.wind !== null ? Math.round(root.outlook.wind) + " m/s" : "--"
-                },
-                {
-                    label: "Total rain, 12 h",
-                    value: root.outlook && root.outlook.precipitation !== null ? root.outlook.precipitation + " mm" : "--"
-                }
-            ]
-        }
 
-        Column {
-            visible: root.alerts.length > 0
-            width: parent.width
-            topPadding: 8
-            spacing: 4
-
-            Repeater {
-                model: root.alerts
-
-                delegate: Item {
-                    id: alert
-
-                    required property var modelData
-
-                    width: root.width
-                    height: alertText.implicitHeight
-
-                    Text {
-                        id: alertIcon
-                        width: 24
-                        color: root.shell.palette[alert.modelData.level]
-                        font.family: Ui.Fonts.mono
-                        font.pixelSize: 14
-                        text: alert.modelData.icon
-                    }
-
-                    Text {
-                        id: alertText
-                        x: alertIcon.width + 8
-                        width: parent.width - x
-                        wrapMode: Text.WordWrap
-                        color: root.shell.palette[alert.modelData.level]
-                        font.family: Ui.Fonts.mono
-                        font.pixelSize: 14
-                        text: alert.modelData.text
-                    }
-                }
+            Text {
+                width: parent.width
+                wrapMode: Text.WordWrap
+                color: root.shell.palette.rose
+                font.family: Ui.Fonts.mono
+                font.pixelSize: 14
+                text: "Could not update; showing the forecast from " + root.updated
             }
         }
 
-        // 16 under the content (style.md › Panels › Space).
-        Row {
-            topPadding: 8
+        // The current values and the next 12 hours' extremes, then what in those hours needs
+        // attention. The labels name the hours, so the rule heads it bare.
+        Ui.Section {
+            visible: root.service.ready
+            shell: root.shell
 
-            Ui.PanelButton {
+            Ui.InfoTable {
                 shell: root.shell
-                label: "Hourly on yr.no"
-                onActivated: root.forecastRequested()
+                perLine: 2
+                entries: [
+                    {
+                        label: "Wind",
+                        value: root.service.wind
+                    },
+                    {
+                        label: "Humidity",
+                        value: root.service.humidity
+                    },
+                    // MET forecasts gusts only inside its Nordic model; elsewhere the strongest mean
+                    // wind stands in.
+                    root.outlook && root.outlook.gust !== null ? {
+                        label: "Max gusts, 12 h",
+                        value: Math.round(root.outlook.gust) + " m/s"
+                    } : {
+                        label: "Max wind, 12 h",
+                        value: root.outlook && root.outlook.wind !== null ? Math.round(root.outlook.wind) + " m/s" : "--"
+                    },
+                    {
+                        label: "Total rain, 12 h",
+                        value: root.outlook && root.outlook.precipitation !== null ? root.outlook.precipitation + " mm" : "--"
+                    }
+                ]
+            }
+
+            Column {
+                visible: root.alerts.length > 0
+                width: parent.width
+                topPadding: 8
+                spacing: 4
+
+                Repeater {
+                    model: root.alerts
+
+                    delegate: Item {
+                        id: alert
+
+                        required property var modelData
+
+                        width: root.width
+                        height: alertText.implicitHeight
+
+                        Text {
+                            id: alertIcon
+                            width: 24
+                            color: root.shell.palette[alert.modelData.level]
+                            font.family: Ui.Fonts.mono
+                            font.pixelSize: 14
+                            text: alert.modelData.icon
+                        }
+
+                        Text {
+                            id: alertText
+                            x: alertIcon.width + 8
+                            width: parent.width - x
+                            wrapMode: Text.WordWrap
+                            color: root.shell.palette[alert.modelData.level]
+                            font.family: Ui.Fonts.mono
+                            font.pixelSize: 14
+                            text: alert.modelData.text
+                        }
+                    }
+                }
+            }
+
+            // 16 under the content (style.md › Panels › Space).
+            Row {
+                topPadding: 8
+
+                Ui.PanelButton {
+                    shell: root.shell
+                    label: "Hourly on yr.no"
+                    onActivated: root.forecastRequested()
+                }
             }
         }
-    }
 
-    Ui.Section {
-        visible: root.service.days.length > 0
-        shell: root.shell
-        title: "Forecast"
+        Ui.Section {
+            visible: root.service.days.length > 0
+            shell: root.shell
+            title: "Forecast"
 
-        Column {
-            width: parent.width
-            spacing: 4
+            Column {
+                width: parent.width
+                spacing: 4
 
-            Repeater {
-                model: root.service.days
+                Repeater {
+                    model: root.service.days
 
-                delegate: Item {
-                    id: day
+                    delegate: Item {
+                        id: day
 
-                    required property var modelData
+                        required property var modelData
 
-                    width: root.width
-                    height: name.implicitHeight
+                        width: root.width
+                        height: name.implicitHeight
 
-                    Text {
-                        id: glyph
-                        width: 24
-                        anchors.verticalCenter: parent.verticalCenter
-                        color: root.shell.palette.fg
-                        font.family: Ui.Fonts.mono
-                        font.pixelSize: 14
-                        text: Model.icon(day.modelData.symbol)
-                    }
+                        Text {
+                            id: glyph
+                            width: 24
+                            anchors.verticalCenter: parent.verticalCenter
+                            color: root.shell.palette.fg
+                            font.family: Ui.Fonts.mono
+                            font.pixelSize: 14
+                            text: Model.icon(day.modelData.symbol)
+                        }
 
-                    Text {
-                        id: name
-                        x: glyph.width + 8
-                        width: 40
-                        color: root.shell.palette.fg
-                        font.family: Ui.Fonts.mono
-                        font.pixelSize: 14
-                        text: day.modelData.name
-                    }
+                        Text {
+                            id: name
+                            x: glyph.width + 8
+                            width: 40
+                            color: root.shell.palette.fg
+                            font.family: Ui.Fonts.mono
+                            font.pixelSize: 14
+                            text: day.modelData.name
+                        }
 
-                    Text {
-                        x: name.x + name.width + 8
-                        width: temperatures.x - x - 8
-                        elide: Text.ElideRight
-                        color: root.shell.palette.fg
-                        font.family: Ui.Fonts.mono
-                        font.pixelSize: 14
-                        text: Model.condition(day.modelData.symbol)
-                    }
+                        Text {
+                            x: name.x + name.width + 8
+                            width: temperatures.x - x - 8
+                            elide: Text.ElideRight
+                            color: root.shell.palette.fg
+                            font.family: Ui.Fonts.mono
+                            font.pixelSize: 14
+                            text: Model.condition(day.modelData.symbol)
+                        }
 
-                    Text {
-                        id: temperatures
-                        anchors.right: parent.right
-                        color: root.shell.palette.fg
-                        font.family: Ui.Fonts.mono
-                        font.pixelSize: 14
-                        text: Model.temperature(day.modelData.maximum) + " / " + Model.temperature(day.modelData.minimum)
+                        Text {
+                            id: temperatures
+                            anchors.right: parent.right
+                            color: root.shell.palette.fg
+                            font.family: Ui.Fonts.mono
+                            font.pixelSize: 14
+                            text: Model.temperature(day.modelData.maximum) + " / " + Model.temperature(day.modelData.minimum)
+                        }
                     }
                 }
             }
