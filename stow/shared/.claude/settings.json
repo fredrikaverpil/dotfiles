@@ -78,19 +78,22 @@
       "source": {
         "source": "github",
         "repo": "DietrichGebert/ponytail"
-      }
+      },
+      "autoUpdate": true
     },
     "local": {
       "source": {
         "source": "directory",
         "path": "~/.claude/local-plugins"
-      }
+      },
+      "autoUpdate": true
     },
     "egm": {
       "source": {
         "source": "github",
         "repo": "google/elephant-goldfish-model"
-      }
+      },
+      "autoUpdate": true
     }
   },
   "outputStyle": "Terse",
