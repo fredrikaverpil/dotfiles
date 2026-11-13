@@ -15,6 +15,8 @@ Column {
     readonly property bool keyNavigation: false
     // The focused wallpaper, which the background previews.
     readonly property string selected: grid.sel >= 0 ? (root.service.wallpapers[grid.sel] || "") : ""
+    // Clear holds focus only because the grid was empty.
+    property bool clearByDefault: false
 
     signal closeRequested
 
@@ -22,10 +24,11 @@ Column {
     function reset() {
         grid.pointer = Qt.point(-1, -1);
         grid.sel = Math.max(0, root.service.wallpapers.indexOf(root.service.currentPick()));
-        if (root.service.wallpapers.length > 0)
-            grid.forceActiveFocus();
-        else
+        root.clearByDefault = root.service.wallpapers.length === 0;
+        if (root.clearByDefault)
             clearButton.forceActiveFocus();
+        else
+            grid.forceActiveFocus();
     }
 
     function choose() {
@@ -47,6 +50,9 @@ Column {
     Connections {
         target: root.service
         function onRowsChanged() {
+            // A scan that empties the grid leaves no stop with focus; one that fills it takes over from Clear.
+            if (root.service.wallpapers.length === 0 ? !clearButton.activeFocus : root.clearByDefault && clearButton.activeFocus)
+                root.reset();
             Qt.callLater(grid.reveal);
         }
     }
