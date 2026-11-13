@@ -40,7 +40,8 @@ GridLayout {
             Layout.preferredWidth: table.fitted[modelData.column] || 0
             horizontalAlignment: modelData.label ? Text.AlignLeft : Text.AlignRight
             elide: Text.ElideRight
-            color: table.shell.palette[modelData.role]
+            // An unknown role reads as the default rather than no colour.
+            color: table.shell.palette[modelData.role] || table.shell.palette.fg
             font: metrics.font
             text: modelData.text
         }
