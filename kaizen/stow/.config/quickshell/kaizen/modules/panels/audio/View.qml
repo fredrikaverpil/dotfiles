@@ -42,6 +42,14 @@ Column {
         setCursor(Math.max(audio.sink ? -1 : 0, Math.min(audio.sinks.length, cursor + delta)));
     }
 
+    // Keeps the cursor on a stop as devices come and go; the button stays the button.
+    function clampCursor() {
+        if (settingsButton.activeFocus)
+            setCursor(audio.sinks.length);
+        else if (cursor >= audio.sinks.length || (cursor < 0 && !audio.sink))
+            moveCursor(0);
+    }
+
     function activate() {
         if (cursor < 0)
             audio.toggleMute();
@@ -54,7 +62,9 @@ Column {
     Keys.onPressed: function (event) {
         if (event.key === Qt.Key_Escape)
             root.audio.close();
-        else if (event.key === Qt.Key_Down || event.text === "j")
+        else if (event.key === Qt.Key_Backtab || (event.key === Qt.Key_Tab && event.modifiers & Qt.ShiftModifier))
+            root.moveCursor(-1);
+        else if (event.key === Qt.Key_Down || event.key === Qt.Key_Tab || event.text === "j")
             root.moveCursor(1);
         else if (event.key === Qt.Key_Up || event.text === "k")
             root.moveCursor(-1);
@@ -67,6 +77,17 @@ Column {
         else
             return;
         event.accepted = true;
+    }
+
+    Connections {
+        target: root.audio
+
+        function onSinksChanged() {
+            root.clampCursor();
+        }
+        function onSinkChanged() {
+            root.clampCursor();
+        }
     }
 
     Column {
