@@ -299,7 +299,7 @@ runs.
 
 | Service | Subsystem | Bar | Panel / launcher | IPC |
 | --- | --- | --- | --- | --- |
-| audio (panel only) | [PipeWire] via [Quickshell] | volume button | Settings › Audio | `audio` |
+| audio | [PipeWire] via [Quickshell] | volume button | Settings › Audio | `audio` |
 | battery | [UPower], [sysfs power_supply] thresholds, [power-profiles-daemon] | battery button | Settings › Power | `battery` |
 | bluetooth | [BlueZ] via [Quickshell] | button | Settings › Bluetooth | `bluetooth` |
 | brightness | [sysfs backlight] via [logind] SetBrightness | – | XF86 keys | `brightness` |

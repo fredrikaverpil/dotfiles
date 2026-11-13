@@ -181,7 +181,7 @@ Scope {
             BarWidgets.AudioButton {
                 id: audioButton
                 shell: bar.shell
-                audio: bar.shell.audio
+                service: bar.shell.audioService
                 anchors.right: displayButton.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: 4

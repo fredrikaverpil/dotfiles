@@ -9,7 +9,10 @@ PanelWindow {
     id: root
 
     required property var shell
-    required property var audio
+    // The audio service.
+    required property var service
+    // The audio panel, which shows the change itself while open.
+    required property var panel
 
     property bool mic: false
 
@@ -37,10 +40,10 @@ PanelWindow {
     }
 
     Connections {
-        target: root.audio
+        target: root.service
 
         function onAdjusted(mic) {
-            if (!root.audio.shown)
+            if (!root.panel.shown)
                 root.show(mic);
         }
     }
@@ -63,7 +66,7 @@ PanelWindow {
             color: root.shell.palette.fg
             font.family: Ui.Fonts.mono
             font.pixelSize: 18
-            text: root.mic ? (root.audio.micMuted ? "󰍭" : "󰍬") : root.audio.icon
+            text: root.mic ? (root.service.micMuted ? "󰍭" : "󰍬") : root.service.icon
         }
 
         Text {
@@ -75,7 +78,7 @@ PanelWindow {
             color: root.shell.palette.fg
             font.family: Ui.Fonts.mono
             font.pixelSize: 13
-            text: Math.round(root.audio.volume * 100) + "%"
+            text: Math.round(root.service.volume * 100) + "%"
         }
 
         Rectangle {
@@ -90,10 +93,10 @@ PanelWindow {
             color: root.shell.palette.dim
 
             Rectangle {
-                width: parent.width * root.audio.volume
+                width: parent.width * root.service.volume
                 height: parent.height
                 radius: parent.radius
-                color: root.audio.muted ? root.shell.palette.off : root.shell.palette.fg
+                color: root.service.muted ? root.shell.palette.off : root.shell.palette.fg
             }
         }
 
@@ -105,7 +108,7 @@ PanelWindow {
             color: root.shell.palette.fg
             font.family: Ui.Fonts.mono
             font.pixelSize: 13
-            text: root.audio.micMuted ? "Microphone muted" : "Microphone on"
+            text: root.service.micMuted ? "Microphone muted" : "Microphone on"
         }
     }
 }

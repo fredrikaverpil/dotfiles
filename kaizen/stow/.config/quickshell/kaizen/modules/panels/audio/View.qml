@@ -6,11 +6,14 @@ Column {
     id: root
 
     required property var shell
-    // The panel.
-    required property var audio
+    // The audio service.
+    required property var service
 
     readonly property int cardWidth: 400
     readonly property bool keyNavigation: true
+
+    // Inputs, per-app volumes and profiles are set in pwvucontrol; the panel closes for it.
+    signal settingsRequested
 
     width: parent ? parent.width : 0
     spacing: 24
@@ -25,18 +28,18 @@ Column {
         }
 
         Ui.PanelSlider {
-            visible: !!root.audio.sink
+            visible: !!root.service.sink
             shell: root.shell
-            value: root.audio.volume
-            valueText: Math.round(root.audio.volume * 100) + "%"
-            off: root.audio.muted
-            icon: root.audio.icon
-            iconColor: root.audio.muted ? root.shell.palette.rose : root.shell.palette.fg
-            onMoved: value => root.audio.setVolume(value)
-            onStepped: direction => root.audio.setVolume(root.audio.volume + 0.05 * direction)
-            Keys.onReturnPressed: root.audio.toggleMute()
-            Keys.onEnterPressed: root.audio.toggleMute()
-            Keys.onSpacePressed: root.audio.toggleMute()
+            value: root.service.volume
+            valueText: Math.round(root.service.volume * 100) + "%"
+            off: root.service.muted
+            icon: root.service.icon
+            iconColor: root.service.muted ? root.shell.palette.rose : root.shell.palette.fg
+            onMoved: value => root.service.setVolume(value)
+            onStepped: direction => root.service.setVolume(root.service.volume + 0.05 * direction)
+            Keys.onReturnPressed: root.service.toggleMute()
+            Keys.onEnterPressed: root.service.toggleMute()
+            Keys.onSpacePressed: root.service.toggleMute()
         }
     }
 
@@ -49,7 +52,7 @@ Column {
             spacing: 4
 
             Text {
-                visible: root.audio.sinks.length === 0
+                visible: root.service.sinks.length === 0
                 color: root.shell.palette.off
                 font.family: Ui.Fonts.mono
                 font.pixelSize: 14
@@ -57,16 +60,16 @@ Column {
             }
 
             Repeater {
-                model: root.audio.sinks
+                model: root.service.sinks
 
                 delegate: Ui.RadioRow {
                     required property var modelData
 
                     width: root.width
                     shell: root.shell
-                    label: root.audio.label(modelData)
-                    chosen: modelData === root.audio.sink
-                    onActivated: root.audio.setDefault(modelData)
+                    label: root.service.label(modelData)
+                    chosen: modelData === root.service.sink
+                    onActivated: root.service.setDefault(modelData)
                 }
             }
         }
@@ -78,7 +81,7 @@ Column {
         Ui.PanelButton {
             shell: root.shell
             label: "Audio settings…"
-            onActivated: root.audio.openSettings()
+            onActivated: root.settingsRequested()
         }
     }
 }

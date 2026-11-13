@@ -192,7 +192,7 @@ Ui.Panel {
             provider: "players"
         },
         "settings.audio": {
-            icon: menu.shell.audio.icon,
+            icon: menu.shell.audioService.icon,
             label: "Audio"
         },
         "settings.audio.panel": {
@@ -201,17 +201,17 @@ Ui.Panel {
             action: () => menu.shell.audio.open()
         },
         "settings.audio.mute": {
-            icon: menu.checkbox(!menu.shell.audio.muted),
+            icon: menu.checkbox(!menu.shell.audioService.muted),
             label: "Sound",
             ipc: "audio mute",
-            action: () => menu.shell.audio.toggleMute()
+            action: () => menu.shell.audioService.toggleMute()
         },
         "settings.audio.micMute": {
-            icon: menu.checkbox(!menu.shell.audio.micMuted),
+            icon: menu.checkbox(!menu.shell.audioService.micMuted),
             label: "Microphone",
             ipc: "audio micMute",
-            enabled: menu.shell.audio.sources.length > 0,
-            action: () => menu.shell.audio.toggleMicMute()
+            enabled: menu.shell.audioService.sources.length > 0,
+            action: () => menu.shell.audioService.toggleMicMute()
         },
         "settings.audio.output": {
             icon: "󰓃",
@@ -664,7 +664,7 @@ Ui.Panel {
     }
 
     function sinkRows() {
-        const audio = menu.shell.audio;
+        const audio = menu.shell.audioService;
         return audio.sinks.map(node => ({
                     label: audio.label(node),
                     icon: menu.radio(node === audio.sink),

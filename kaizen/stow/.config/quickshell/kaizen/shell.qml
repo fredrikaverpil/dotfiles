@@ -27,6 +27,7 @@ import "modules/panels/tray" as Tray
 import "modules/panels/weather" as Weather
 import "modules/polkit" as Polkit
 import "modules/curtain" as Curtain
+import "modules/services/audio" as AudioService
 import "modules/services/battery" as BatteryService
 import "modules/services/bluetooth" as BluetoothService
 import "modules/services/brightness" as Brightness
@@ -64,6 +65,7 @@ ShellRoot {
     readonly property alias bluetooth: bluetooth
     readonly property alias bluetoothService: bluetoothService
     readonly property alias audio: audio
+    readonly property alias audioService: audioService
     readonly property alias battery: battery
     readonly property alias batteryService: batteryService
     readonly property alias tray: tray
@@ -462,14 +464,20 @@ ShellRoot {
         service: bluetoothService
     }
 
+    AudioService.Service {
+        id: audioService
+    }
+
     Audio.Panel {
         id: audio
         shell: root
+        service: audioService
     }
 
     Audio.Osd {
         shell: root
-        audio: audio
+        service: audioService
+        panel: audio
     }
 
     Tray.Panel {

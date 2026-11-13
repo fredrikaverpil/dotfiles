@@ -6,8 +6,8 @@ import "../../../Ui" as Ui
 Ui.BarButton {
     id: button
 
-    required property var audio
+    required property var service
 
-    foreground: button.audio.muted ? button.shell.palette.rose : button.shell.palette.fg
-    label: button.audio.icon
+    foreground: button.service.muted ? button.shell.palette.rose : button.shell.palette.fg
+    label: button.service.icon
 }
