@@ -108,7 +108,7 @@ Column {
 
         Text {
             anchors.left: parent.left
-            anchors.right: more.left
+            anchors.right: moreText.left
             anchors.rightMargin: 16
             anchors.verticalCenter: parent.verticalCenter
             elide: Text.ElideRight
@@ -120,7 +120,7 @@ Column {
         }
 
         Text {
-            id: more
+            id: moreText
             anchors.right: time.left
             anchors.rightMargin: row.more > 0 ? 16 : 0
             anchors.verticalCenter: parent.verticalCenter
