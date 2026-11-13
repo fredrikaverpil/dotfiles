@@ -27,7 +27,7 @@ Column {
     // A device's details table, a target's ping and loss on one line; Wi-Fi's starts with its network.
     function detailRows(device) {
         const m = Model.detailMetrics(root.service.detailsFor(device.name));
-        const network = root.service.deviceTypeName(device) === "Wi-Fi" ? root.service.connectedWifiNetwork : null;
+        const network = device === root.service.wifiDevice ? root.service.connectedWifiNetwork : null;
         const wifi = network ? [
             {
                 label: "SSID",
@@ -187,6 +187,8 @@ Column {
 
         required property var device
         readonly property bool wifi: root.service.deviceTypeName(device) === "Wi-Fi"
+        // The service scans and joins through one Wi-Fi device; only its group lists networks.
+        readonly property bool listed: device === root.service.wifiDevice
 
         shell: root.shell
         title: root.service.deviceTypeName(device)
@@ -212,9 +214,9 @@ Column {
             entries: group.device.connected ? root.detailRows(group.device) : []
         }
 
-        // Wi-Fi's state shows in its network rows instead.
+        // The listed Wi-Fi's state shows in its network rows instead.
         Text {
-            visible: !group.device.connected && !group.wifi
+            visible: !group.device.connected && !group.listed
             color: root.shell.palette.off
             font.family: Ui.Fonts.mono
             font.pixelSize: 14
@@ -223,7 +225,7 @@ Column {
 
         Column {
             objectName: "wifiList"
-            visible: group.wifi
+            visible: group.listed
             width: root.width
             // 16 under the details; the network groups 8 apart.
             topPadding: group.device.connected ? 16 - group.spacing : 0
@@ -247,7 +249,7 @@ Column {
                 id: securedGroup
                 key: "secured"
                 title: "Secured"
-                networks: group.wifi ? root.securedWifi : []
+                networks: group.listed ? root.securedWifi : []
 
                 WifiRows {
                     networks: securedGroup.networks
@@ -258,7 +260,7 @@ Column {
                 id: openGroup
                 key: "open"
                 title: "Open"
-                networks: group.wifi ? root.openWifi : []
+                networks: group.listed ? root.openWifi : []
 
                 WifiRows {
                     networks: openGroup.networks
@@ -269,7 +271,7 @@ Column {
                 id: outOfRangeGroup
                 key: "outOfRange"
                 title: "Out of range"
-                networks: group.wifi ? root.service.outOfRangeWifi : []
+                networks: group.listed ? root.service.outOfRangeWifi : []
 
                 Repeater {
                     model: ScriptModel {
