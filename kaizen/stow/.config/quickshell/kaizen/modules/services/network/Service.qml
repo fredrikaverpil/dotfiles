@@ -286,13 +286,13 @@ Item {
         const detail = details[iface];
         if (!detail)
             return null;
-        const transfer = detail.transfer || {};
+        const transfer = detail.transfer;
         return {
             gateway: detail.gateway,
-            receivingRate: detail.transfer ? transfer.receivingRate : null,
-            sendingRate: detail.transfer ? transfer.sendingRate : null,
-            rxBytes: detail.transfer ? transfer.rxBytes : null,
-            txBytes: detail.transfer ? transfer.txBytes : null,
+            receivingRate: transfer ? transfer.receivingRate : null,
+            sendingRate: transfer ? transfer.sendingRate : null,
+            rxBytes: transfer ? transfer.rxBytes : null,
+            txBytes: transfer ? transfer.txBytes : null,
             ping: detail.ping.latency,
             packetLoss: detail.ping.packetLoss,
             gatewayPing: detail.gatewayPing.latency,
