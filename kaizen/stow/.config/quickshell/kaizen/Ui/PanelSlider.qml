@@ -10,8 +10,6 @@ Item {
     property bool off: false
     // False for a meter: no knob, no pointer, no focus.
     property bool interactive: true
-    // Draws the fill; a view keeping its own cursor (audio's) binds it.
-    property bool focused: activeFocus && interactive
     property string icon: ""
     property color iconColor: shell.palette.fg
 
@@ -25,12 +23,6 @@ Item {
     signal moved(real value)
     // h/l and the arrows step the value: 1 up, -1 down.
     signal stepped(int direction)
-    signal hovered
-
-    function hover() {
-        slider.hovered();
-        slider.forceActiveFocus();
-    }
 
     width: parent ? parent.width : 0
     implicitHeight: 32
@@ -54,7 +46,7 @@ Item {
         anchors.leftMargin: -8
         anchors.rightMargin: -8
         radius: 4
-        color: slider.focused ? slider.shell.palette.sel : "transparent"
+        color: slider.activeFocus && slider.interactive ? slider.shell.palette.sel : "transparent"
     }
 
     MouseArea {
@@ -64,7 +56,7 @@ Item {
         enabled: slider.interactive
         acceptedButtons: Qt.NoButton
         hoverEnabled: true
-        onEntered: slider.hover()
+        onEntered: slider.forceActiveFocus()
     }
 
     Text {
@@ -119,7 +111,7 @@ Item {
             anchors.bottomMargin: -11
             enabled: slider.interactive
             hoverEnabled: true
-            onEntered: slider.hover()
+            onEntered: slider.forceActiveFocus()
             onPressed: function (mouse) {
                 slider.moved(Math.max(0, Math.min(1, mouse.x / width)));
             }

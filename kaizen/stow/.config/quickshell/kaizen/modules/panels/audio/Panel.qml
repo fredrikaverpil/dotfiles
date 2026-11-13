@@ -20,6 +20,7 @@ Ui.Panel {
     signal adjusted(bool mic)
 
     cardWidth: view.cardWidth
+    keyNavigation: view.keyNavigation
 
     function label(node) {
         return node ? (node.nickname || node.description || node.name || "Unknown") : "";

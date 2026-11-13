@@ -117,8 +117,10 @@ upstream's latest, and niri marks each option with the version it arrived in
   call fails. Without `-q` the call exits 1 with a message.
 - Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
 - Niri KDL booleans are presence-only, not `option true`.
-- Use `keyNavigation` for ordinary focus chains; use a panel-managed cursor
-  where it cannot represent a control, such as a slider.
+- A panel moves focus through its focus chain (`keyNavigation`), with no
+  cursor of its own. A control that steps a value takes `h` `l` and the
+  arrows itself and lets up and down fall through, as `Ui/PanelSlider.qml`
+  does.
 - `Ui/Panel.qml` has a top-bar cutout so bar buttons can switch panels. Preserve
   focus-chain membership for visible but unavailable controls, except a
   segmented control's options and a button that cannot act, which focus skips

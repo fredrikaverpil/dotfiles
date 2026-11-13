@@ -6,10 +6,7 @@ Item {
     id: row
 
     required property var shell
-    // Draws the fill; a view keeping its own cursor (audio's) binds it.
-    property bool focused: activeFocus
 
-    signal hovered
     signal activated
 
     width: parent ? parent.width : 0
@@ -27,7 +24,7 @@ Item {
         anchors.leftMargin: -8
         anchors.rightMargin: -8
         radius: 4
-        color: row.focused ? row.shell.palette.sel : "transparent"
+        color: row.activeFocus ? row.shell.palette.sel : "transparent"
     }
 
     MouseArea {
@@ -35,10 +32,7 @@ Item {
         anchors.leftMargin: -8
         anchors.rightMargin: -8
         hoverEnabled: true
-        onEntered: {
-            row.hovered();
-            row.forceActiveFocus();
-        }
+        onEntered: row.forceActiveFocus()
         onClicked: row.activated()
     }
 }
