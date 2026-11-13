@@ -716,8 +716,8 @@ Item {
         id: historyPanel
 
         shell: root.shell
-        cardWidth: historyView.cardWidth
-        keyNavigation: historyView.keyNavigation
+        cardWidth: 600
+        keyNavigation: true
 
         onShownChanged: if (shown)
             historyView.reset()

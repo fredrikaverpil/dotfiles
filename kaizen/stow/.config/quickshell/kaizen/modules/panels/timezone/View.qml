@@ -38,9 +38,6 @@ Column {
         return (abbreviation === "" ? "" : abbreviation + " ") + Model.offsetLabel(seconds);
     }
 
-    readonly property int cardWidth: 400
-    readonly property bool keyNavigation: true
-
     signal zoneRequested
 
     width: parent ? parent.width : 0

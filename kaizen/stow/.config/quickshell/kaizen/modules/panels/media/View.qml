@@ -17,9 +17,6 @@ Column {
     // Seconds h/l seek by.
     readonly property int seekStep: 5
 
-    readonly property int cardWidth: 400
-    readonly property bool keyNavigation: true
-
     width: parent ? parent.width : 0
     spacing: 24
 

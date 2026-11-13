@@ -10,8 +10,8 @@ Ui.Panel {
 
     readonly property string icon: service.icon
 
-    cardWidth: view.cardWidth
-    keyNavigation: view.keyNavigation
+    cardWidth: 400
+    keyNavigation: true
 
     Binding {
         target: root.service

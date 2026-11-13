@@ -9,9 +9,6 @@ Column {
     // The audio service.
     required property var service
 
-    readonly property int cardWidth: 400
-    readonly property bool keyNavigation: true
-
     // Inputs, per-app volumes and profiles are set in pwvucontrol; the panel closes for it.
     signal settingsRequested
 

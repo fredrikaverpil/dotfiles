@@ -20,9 +20,6 @@ Column {
                 text: Warnings.alertText(alert, root.now)
             }))
 
-    readonly property int cardWidth: 460
-    readonly property bool keyNavigation: true
-
     signal forecastRequested
     signal locationRequested
 

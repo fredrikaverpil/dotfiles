@@ -310,9 +310,8 @@ Scope {
     Ui.Panel {
         id: picker
         shell: background.shell
-        cardWidth: pickerView.cardWidth
-        cardHeight: pickerView.cardHeight
-        keyNavigation: pickerView.keyNavigation
+        cardWidth: 1200
+        cardHeight: 780
 
         function open(slot) {
             if (slot === "backdrop" && !Ui.Compositor.placesBackdrop)

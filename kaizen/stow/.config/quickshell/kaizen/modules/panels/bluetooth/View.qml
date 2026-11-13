@@ -12,9 +12,6 @@ Column {
     // Pairing, forgetting and the rest happen in bluetui; the panel closes for it.
     signal settingsRequested
 
-    readonly property int cardWidth: 400
-    readonly property bool keyNavigation: true
-
     width: parent ? parent.width : 0
     spacing: 24
 

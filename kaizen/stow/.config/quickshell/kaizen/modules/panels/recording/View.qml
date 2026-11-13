@@ -12,9 +12,6 @@ Column {
     // On each time the panel opens; a recording holds DnD on until it ends.
     property bool dnd: true
 
-    readonly property int cardWidth: 400
-    readonly property bool keyNavigation: true
-
     signal recordRequested(bool dnd)
 
     width: parent ? parent.width : 0

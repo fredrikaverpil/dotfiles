@@ -15,9 +15,6 @@ Column {
     // The id of the update whose command was copied last, until the panel closes.
     property string copied: ""
 
-    readonly property int cardWidth: 400
-    readonly property bool keyNavigation: true
-
     // One width for every group's table, so they line up.
     readonly property var tableWidths: Table.columnWidths(service.updates.map(update => Model.details(update)), 1, text => metrics.advanceWidth(text))
 

@@ -14,9 +14,6 @@ Column {
     readonly property date now: service.requestedAt
     readonly property bool loading: !service.failed && service.days.length === 0
 
-    readonly property int cardWidth: 600
-    readonly property bool keyNavigation: true
-
     signal openRequested(var event)
     signal joinRequested(var event)
     signal appRequested

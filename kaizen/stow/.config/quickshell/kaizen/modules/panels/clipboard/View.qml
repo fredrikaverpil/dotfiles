@@ -14,9 +14,6 @@ Column {
     // What the rows' times are read against; set on open.
     property date now: new Date()
 
-    readonly property int cardWidth: 600
-    readonly property bool keyNavigation: true
-
     signal closeRequested
 
     function reset() {

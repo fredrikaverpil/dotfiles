@@ -9,8 +9,8 @@ Ui.Panel {
 
     required property var service
 
-    cardWidth: view.cardWidth
-    keyNavigation: view.keyNavigation
+    cardWidth: 600
+    keyNavigation: true
 
     Binding {
         target: root.service

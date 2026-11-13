@@ -17,9 +17,6 @@ Column {
     // the panel closes.
     property string focusedKey: ""
 
-    readonly property int cardWidth: 600
-    readonly property bool keyNavigation: true
-
     function copyAll() {
         if (root.service.copyAll())
             root.copied = "all";

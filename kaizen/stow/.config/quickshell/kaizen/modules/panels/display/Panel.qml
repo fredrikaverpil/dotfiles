@@ -11,8 +11,8 @@ Ui.Panel {
 
     readonly property var textScales: view.textScales
 
-    cardWidth: view.cardWidth
-    keyNavigation: view.keyNavigation
+    cardWidth: 400
+    keyNavigation: true
 
     function refresh() {
         if (!monitorState.running)

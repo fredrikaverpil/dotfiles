@@ -21,9 +21,6 @@ Column {
 
     readonly property var textScales: [0.9, 1, 1.1, 1.25, 1.5, 2]
 
-    readonly property int cardWidth: 400
-    readonly property bool keyNavigation: true
-
     width: parent ? parent.width : 0
     spacing: 24
 

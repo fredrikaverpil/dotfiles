@@ -16,9 +16,6 @@ Column {
     // Connection editing happens in nm-connection-editor; the panel closes for it.
     signal settingsRequested
 
-    readonly property int cardWidth: 600
-    readonly property bool keyNavigation: true
-
     function detailRows(device) {
         return Model.detailRows(root.service.detailsFor(device.name), device === root.service.wifiDevice ? root.service.connectedWifiNetwork : null);
     }

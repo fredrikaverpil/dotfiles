@@ -10,8 +10,8 @@ Ui.Panel {
 
     readonly property bool active: service.selecting || service.busy
 
-    cardWidth: view.cardWidth
-    keyNavigation: view.keyNavigation
+    cardWidth: 400
+    keyNavigation: true
 
     function record(dnd) {
         close();
