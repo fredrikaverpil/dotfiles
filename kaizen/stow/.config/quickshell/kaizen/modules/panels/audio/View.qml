@@ -131,6 +131,7 @@ Column {
                 width: rows.width
                 shell: rows.shell
                 label: rows.service.label(modelData)
+                value: rows.service.isUnplugged(modelData) ? "󰚦" : ""
                 chosen: modelData === rows.current
                 onActivated: rows.picked(modelData)
             }

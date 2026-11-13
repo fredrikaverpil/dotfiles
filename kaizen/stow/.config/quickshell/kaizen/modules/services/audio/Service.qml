@@ -2,9 +2,16 @@ import QtQuick
 import Quickshell.Io
 import Quickshell.Services.Pipewire
 
+import "AudioModel.js" as AudioModel
+
 // The default sink's and source's volume and mute, and the devices to pick each from.
 Item {
     id: root
+
+    // Polls the cards' jacks while a surface shows the devices.
+    property bool active: false
+    // AudioModel.unplugged() keys of the devices whose jack or port is empty.
+    property var unpluggedKeys: []
 
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var sinks: Pipewire.nodes ? Pipewire.nodes.values.filter(node => node && node.isSink && !node.isStream) : []
@@ -24,6 +31,26 @@ Item {
     function label(node) {
         return node ? (node.nickname || node.description || node.name || "Unknown") : "";
     }
+
+    // A device on an empty jack or port; it stays pickable.
+    function isUnplugged(node) {
+        return AudioModel.isUnplugged(unpluggedKeys, node);
+    }
+
+    function refreshJacks() {
+        if (jacks.running)
+            return;
+        const cards = AudioModel.cards(sinks.concat(sources));
+        if (cards.length === 0) {
+            unpluggedKeys = [];
+            return;
+        }
+        jacks.command = ["pw-dump"].concat(cards);
+        jacks.running = true;
+    }
+
+    onActiveChanged: if (active)
+        refreshJacks()
 
     function setVolume(value) {
         if (!sink || !sink.audio)
@@ -83,5 +110,26 @@ Item {
         command: ["busctl", "call", "org.freedesktop.login1", "/org/freedesktop/login1/session/auto", "org.freedesktop.login1.Session", "SetBrightness", "ssu", "leds", "platform::micmute", value]
         onExited: if (value !== (root.micMuted ? "1" : "0"))
             root.syncMicLed()
+    }
+
+    // Quickshell exposes nodes, not cards: their routes' jack state comes from the cards' dump.
+    Process {
+        id: jacks
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    root.unpluggedKeys = AudioModel.unplugged(JSON.parse(text));
+                } catch (error) {
+                    root.unpluggedKeys = [];
+                }
+            }
+        }
+    }
+
+    Timer {
+        interval: 2000
+        repeat: true
+        running: root.active
+        onTriggered: root.refreshJacks()
     }
 }

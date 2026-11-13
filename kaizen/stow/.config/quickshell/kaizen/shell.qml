@@ -464,8 +464,10 @@ ShellRoot {
         service: bluetoothService
     }
 
+    // The launcher's Output and Input rows show the jacks too.
     AudioService.Service {
         id: audioService
+        active: audio.shown || menu.shown || launcherMenu.shown
     }
 
     Audio.Panel {

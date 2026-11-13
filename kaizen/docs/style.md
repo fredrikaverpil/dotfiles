@@ -147,7 +147,9 @@ Every panel has the same shape, top to bottom:
 - A device's state shows in its icon at the start of its row: `leaf` while
   connected, `off` otherwise. What it reports, such as its battery, sits at
   the row's right in its status colour; a change under way ("Connecting…")
-  sits there in `sky`.
+  sits there in `sky`. An audio device on an empty jack or port (no
+  headset, an HDMI port with no monitor) shows `󰚦` there in `off`, and stays
+  pickable.
 - A row whose actions are buttons (a device's Connect, a network's Join) takes
   no focus, `sel` fill or click: its buttons, at its right and as wide as
   their longest label, are the stops. A row with an action of its own (a

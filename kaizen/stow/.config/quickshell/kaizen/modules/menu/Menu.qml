@@ -673,7 +673,7 @@ Ui.Panel {
         return audio.sinks.map(node => ({
                     label: audio.label(node),
                     icon: menu.radio(node === audio.sink),
-                    detail: "",
+                    detail: audio.isUnplugged(node) ? "󰚦" : "",
                     enabled: true,
                     action: () => audio.setDefault(node)
                 }));
@@ -684,7 +684,7 @@ Ui.Panel {
         return audio.sources.map(node => ({
                     label: audio.label(node),
                     icon: menu.radio(node === audio.source),
-                    detail: "",
+                    detail: audio.isUnplugged(node) ? "󰚦" : "",
                     enabled: true,
                     action: () => audio.setDefaultSource(node)
                 }));

@@ -75,6 +75,7 @@ cmd wl-paste
 cmd dconf
 cmd kwriteconfig6
 cmd magick
+cmd pw-dump
 cmd pw-play
 cmd pwvucontrol
 cmd wl-gammarelay-rs
