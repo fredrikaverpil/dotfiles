@@ -284,6 +284,42 @@ function detailMetrics(detail) {
   };
 }
 
+// A device's details table, a target's ping and loss on one line; a Wi-Fi
+// device's starts with its connected network, when it has one.
+function detailRows(detail, network) {
+  var m = detailMetrics(detail);
+  var wifi = network
+    ? [
+        { label: "SSID", value: network.name },
+        { label: "Signal strength", value: wifiSignal(network) + "%" },
+      ]
+    : [];
+  return wifi.concat([
+    { label: "IP address", value: m.ip },
+    { label: "Gateway", value: m.gateway },
+    { label: "Ping (Cloudflare)", value: m.ping },
+    { label: "Packet loss", value: m.loss },
+    { label: "Ping (gateway)", value: m.gatewayPing },
+    { label: "Packet loss", value: m.gatewayLoss },
+    { label: "Receiving", value: m.receiving },
+    { label: "Sending", value: m.sending },
+    { label: "Downloaded", value: m.downloaded },
+    { label: "Uploaded", value: m.uploaded },
+  ]);
+}
+
+// The panel's subtitle: the default route's device, by its Wi-Fi network,
+// its type, or its iface when Quickshell does not list it (a VPN's). type is
+// "" for an unlisted iface; wifiName is "" without a connected network.
+function routeSubtitle(available, iface, anyConnected, type, wifiName) {
+  if (!available) return "NetworkManager is unavailable";
+  if (!iface) return anyConnected ? "No default route" : "Disconnected";
+  if (!type) return "Default route via " + iface;
+  return (
+    "Default route via " + (type === "Wi-Fi" && wifiName ? wifiName : type)
+  );
+}
+
 function transferState(previous, sample, now) {
   var prev = previous || {};
   var next = sample || {};

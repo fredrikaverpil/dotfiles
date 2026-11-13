@@ -19,62 +19,8 @@ Column {
     readonly property int cardWidth: 600
     readonly property bool keyNavigation: true
 
-    // A device's details table, a target's ping and loss on one line; Wi-Fi's starts with its network.
     function detailRows(device) {
-        const m = Model.detailMetrics(root.service.detailsFor(device.name));
-        const network = device === root.service.wifiDevice ? root.service.connectedWifiNetwork : null;
-        const wifi = network ? [
-            {
-                label: "SSID",
-                value: network.name
-            },
-            {
-                label: "Signal strength",
-                value: Model.wifiSignal(network) + "%"
-            }
-        ] : [];
-        return wifi.concat([
-            {
-                label: "IP address",
-                value: m.ip
-            },
-            {
-                label: "Gateway",
-                value: m.gateway
-            },
-            {
-                label: "Ping (Cloudflare)",
-                value: m.ping
-            },
-            {
-                label: "Packet loss",
-                value: m.loss
-            },
-            {
-                label: "Ping (gateway)",
-                value: m.gatewayPing
-            },
-            {
-                label: "Packet loss",
-                value: m.gatewayLoss
-            },
-            {
-                label: "Receiving",
-                value: m.receiving
-            },
-            {
-                label: "Sending",
-                value: m.sending
-            },
-            {
-                label: "Downloaded",
-                value: m.downloaded
-            },
-            {
-                label: "Uploaded",
-                value: m.uploaded
-            }
-        ]);
+        return Model.detailRows(root.service.detailsFor(device.name), device === root.service.wifiDevice ? root.service.connectedWifiNetwork : null);
     }
 
     // Wired first, Wi-Fi last (Model.orderDevices).
@@ -95,20 +41,12 @@ Column {
     Ui.PanelHeader {
         shell: root.shell
         title: "Network"
-        // The default route's device: its network, its type, or its iface when Quickshell does not
-        // list it (a VPN's). Each card's own subnet still goes over that card.
+        // The default route's device; each card's own subnet still goes over that card.
         subtitle: {
             const service = root.service;
-            if (!service.networkManagerAvailable)
-                return "NetworkManager is unavailable";
             const iface = service.connection.iface;
-            if (!iface)
-                return root.devices.some(device => device.connected) ? "No default route" : "Disconnected";
-            const device = service.networkDevices.find(candidate => candidate && candidate.name === iface);
-            if (!device)
-                return "Default route via " + iface;
-            const type = service.deviceTypeName(device);
-            return "Default route via " + (type === "Wi-Fi" && service.connectedWifiNetwork ? service.connectedWifiNetwork.name : type);
+            const device = iface ? service.networkDevices.find(candidate => candidate && candidate.name === iface) : null;
+            return Model.routeSubtitle(service.networkManagerAvailable, iface, root.devices.some(device => device.connected), device ? service.deviceTypeName(device) : "", service.connectedWifiNetwork ? service.connectedWifiNetwork.name : "");
         }
     }
 

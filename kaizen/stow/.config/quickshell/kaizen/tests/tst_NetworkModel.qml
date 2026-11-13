@@ -421,6 +421,155 @@ TestCase {
         compare(Network.detailMetrics(data.detail), data.want);
     }
 
+    function test_detail_rows_data() {
+        const unmeasured = [
+            {
+                label: "IP address",
+                value: "--"
+            },
+            {
+                label: "Gateway",
+                value: "--"
+            },
+            {
+                label: "Ping (Cloudflare)",
+                value: "--"
+            },
+            {
+                label: "Packet loss",
+                value: "--"
+            },
+            {
+                label: "Ping (gateway)",
+                value: "--"
+            },
+            {
+                label: "Packet loss",
+                value: "--"
+            },
+            {
+                label: "Receiving",
+                value: "--"
+            },
+            {
+                label: "Sending",
+                value: "--"
+            },
+            {
+                label: "Downloaded",
+                value: "--"
+            },
+            {
+                label: "Uploaded",
+                value: "--"
+            }
+        ];
+        return [
+            {
+                tag: "wired",
+                network: null,
+                want: unmeasured
+            },
+            {
+                tag: "wi-fi starts with its network",
+                network: {
+                    name: "Home",
+                    signalStrength: 0.62
+                },
+                want: [
+                    {
+                        label: "SSID",
+                        value: "Home"
+                    },
+                    {
+                        label: "Signal strength",
+                        value: "62%"
+                    }
+                ].concat(unmeasured)
+            }
+        ];
+    }
+
+    function test_detail_rows(data) {
+        const got = Network.detailRows(null, data.network);
+
+        compare(got, data.want);
+    }
+
+    function test_route_subtitle_data() {
+        return [
+            {
+                tag: "no NetworkManager",
+                available: false,
+                iface: "wlan0",
+                anyConnected: true,
+                type: "Wi-Fi",
+                wifiName: "Home",
+                want: "NetworkManager is unavailable"
+            },
+            {
+                tag: "connected without a default route",
+                available: true,
+                iface: "",
+                anyConnected: true,
+                type: "",
+                wifiName: "",
+                want: "No default route"
+            },
+            {
+                tag: "disconnected",
+                available: true,
+                iface: "",
+                anyConnected: false,
+                type: "",
+                wifiName: "",
+                want: "Disconnected"
+            },
+            {
+                tag: "unlisted iface",
+                available: true,
+                iface: "wg0",
+                anyConnected: true,
+                type: "",
+                wifiName: "",
+                want: "Default route via wg0"
+            },
+            {
+                tag: "ethernet",
+                available: true,
+                iface: "eth0",
+                anyConnected: true,
+                type: "Ethernet",
+                wifiName: "Home",
+                want: "Default route via Ethernet"
+            },
+            {
+                tag: "wi-fi by its network",
+                available: true,
+                iface: "wlan0",
+                anyConnected: true,
+                type: "Wi-Fi",
+                wifiName: "Home",
+                want: "Default route via Home"
+            },
+            {
+                tag: "wi-fi without a network",
+                available: true,
+                iface: "wlan0",
+                anyConnected: true,
+                type: "Wi-Fi",
+                wifiName: "",
+                want: "Default route via Wi-Fi"
+            }
+        ];
+    }
+
+    function test_route_subtitle(data) {
+        const got = Network.routeSubtitle(data.available, data.iface, data.anyConnected, data.type, data.wifiName);
+
+        compare(got, data.want);
+    }
+
     function test_network_action_state_has_explicit_begin_completion_and_failure_transitions() {
         const network = {
             name: "Home",
