@@ -1,3 +1,5 @@
+.pragma library
+
 // The grid's cells for entries ([{ label, value, role }]), perLine side by
 // side: each a label, then its value. role is the value's palette role, `fg`
 // when unset; labels are `off`.
