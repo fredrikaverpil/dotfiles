@@ -79,6 +79,14 @@ Every panel has the same shape, top to bottom:
   "Wi-Fi"), with its iface at the rule's right to tell two of a type apart,
   or, where it has no iface (firmware), by its name. A group
   holding a long list goes last.
+- A long list of a few kinds (Wi-Fi's networks: secured, open, out of range)
+  splits into sub-groups inside its group, leaving out empty ones. A
+  sub-group's heading is a row: a chevron, `󰅀` open and `󰅂` collapsed, its
+  label in `fg`, and a rule to its count in `off`. Sub-groups start
+  collapsed, so the panel reads at a glance: what is current (the connected
+  network's SSID and signal) shows in the group's details table. The heading
+  is a focus stop that expands or collapses its sub-group, which stays so
+  until the shell restarts.
 - A panel about picking a device (audio) lists every device as a row, since
   the choice is what it shows. A panel that sets up an action (recording)
   shows each setting as one row instead, label left and control right, so
@@ -89,7 +97,8 @@ Every panel has the same shape, top to bottom:
   in `fg` right-aligned, or in their status colour ("Not synchronised" in
   `wood`), both 14 px, two pairs to a line in a wide card or where every
   value is short (weather's). A panel's tables share their column widths, so
-  they line up.
+  they line up. A value too long for the card (an SSID) is cut with `…`;
+  labels never are.
 - A footer with the panel's own keys: a keycap, then what it does in `off`. It
   lists only the keys the panel adds to those every panel shares
   ([`interaction.md`](interaction.md) › Panels). A note, such as the data's
@@ -103,20 +112,22 @@ Every panel has the same shape, top to bottom:
 - Spacing comes from one scale: 4, 8, 16 and 24 px. Rows in a list are 4
   apart, tiles in a grid (wallpapers) 8, a rule runs 8 clear of the label at
   its left and of what sits at its right, a group's content is 8 under its
-  label or 16 under a bare rule, the card's padding is 16, and groups are 24
+  label or 16 under a bare rule, sub-groups are 8 apart and 16 under the
+  group's content above them, the card's padding is 16, and groups are 24
   apart. The subtitle sits 4 under the title.
 - Groups too tall for the screen scroll between a fixed header and footer.
   While they overflow, a 4 px `dim` bar at radius 2 sits in the card's
   right padding, clear of the rows' fill; it shows nothing when all fits. A
   scrolling list ends at its last row, with no marker; the bar shows where
   it is.
-- A group's content aligns with its rule's start. A row's or slider's `sel`
+- A group's content aligns with its rule's start. A sub-group's heading and
+  rows indent 16, its chevron over the rows' icons. A row's or slider's `sel`
   fill reaches 8 into the card's padding, past the text it holds.
 - Space separates groups. The only lines a panel draws are the rules heading
-  its groups: 1 px `dim`, on the label's line, to the group's right edge or
-  what sits there. The header has none. A held notification (the
-  notification history) keeps its toast's card, tint, badge and animation
-  included: it reads as the notification it was.
+  its groups and sub-groups: 1 px `dim`, on the label's line, to the group's
+  right edge or what sits there. The header has none. A held notification
+  (the notification history) keeps its toast's card, tint, badge and
+  animation included: it reads as the notification it was.
 
 ### Focus and state
 

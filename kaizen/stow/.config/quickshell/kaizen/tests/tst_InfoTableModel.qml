@@ -119,4 +119,37 @@ TestCase {
     function test_column_widths(data) {
         compare(Table.columnWidths(data.entrySets, data.perLine, measure), data.want);
     }
+
+    function test_fit_widths_data() {
+        return [
+            {
+                tag: "fits",
+                widths: [10, 20, 10, 5],
+                total: 60,
+                want: [10, 20, 10, 5]
+            },
+            {
+                tag: "widest value gives way",
+                widths: [10, 40, 10, 5],
+                total: 60,
+                want: [10, 20, 10, 5]
+            },
+            {
+                tag: "second value widest",
+                widths: [10, 5, 10, 40],
+                total: 60,
+                want: [10, 5, 10, 20]
+            },
+            {
+                tag: "never below zero",
+                widths: [30, 10],
+                total: 20,
+                want: [30, 0]
+            }
+        ];
+    }
+
+    function test_fit_widths(data) {
+        compare(Table.fitWidths(data.widths, data.total, 5), data.want);
+    }
 }

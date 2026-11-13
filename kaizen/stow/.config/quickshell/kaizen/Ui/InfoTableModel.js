@@ -33,3 +33,19 @@ function columnWidths(entrySets, perLine, measure) {
       );
   return widths;
 }
+
+// widths shrunk to fit total, with spacing between columns: the widest value
+// column (an SSID) gives up the overflow, so labels and the other values keep
+// theirs and that value elides.
+function fitWidths(widths, total, spacing) {
+  const result = widths.slice();
+  const used =
+    result.reduce((sum, width) => sum + width, 0) +
+    spacing * Math.max(0, result.length - 1);
+  if (used <= total) return result;
+  let widest = 1;
+  for (let column = 3; column < result.length; column += 2)
+    if (result[column] > result[widest]) widest = column;
+  result[widest] = Math.max(0, result[widest] - (used - total));
+  return result;
+}

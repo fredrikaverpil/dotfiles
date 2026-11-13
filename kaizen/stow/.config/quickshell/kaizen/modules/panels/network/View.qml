@@ -24,10 +24,21 @@ Column {
     readonly property int actionWidth: actionMetrics.advanceWidth + 24
     readonly property int forgetWidth: forgetMetrics.advanceWidth + 24
 
-    // A device's details table, a target's ping and loss on one line.
-    function detailRows(iface) {
-        const m = Model.detailMetrics(root.service.detailsFor(iface));
-        return [
+    // A device's details table, a target's ping and loss on one line; Wi-Fi's starts with its network.
+    function detailRows(device) {
+        const m = Model.detailMetrics(root.service.detailsFor(device.name));
+        const network = root.service.deviceTypeName(device) === "Wi-Fi" ? root.service.connectedWifiNetwork : null;
+        const wifi = network ? [
+            {
+                label: "SSID",
+                value: network.name
+            },
+            {
+                label: "Signal strength",
+                value: Model.wifiSignal(network) + "%"
+            }
+        ] : [];
+        return wifi.concat([
             {
                 label: "IP address",
                 value: m.ip
@@ -68,16 +79,20 @@ Column {
                 label: "Uploaded",
                 value: m.uploaded
             }
-        ];
+        ]);
     }
 
     // Wired first, Wi-Fi last (Model.orderDevices).
     readonly property var devices: service.networkManagerAvailable ? Model.orderDevices(service.networkDevices, device => service.deviceTypeName(device)) : []
     readonly property int tablePerLine: 2
     // One set of column widths for every device's table, so they line up.
-    readonly property var tableWidths: Table.columnWidths(devices.filter(device => device.connected).map(device => detailRows(device.name)), tablePerLine, text => tableMetrics.advanceWidth(text))
+    readonly property var tableWidths: Table.columnWidths(devices.filter(device => device.connected).map(device => detailRows(device)), tablePerLine, text => tableMetrics.advanceWidth(text))
 
     readonly property bool hasWifiRows: service.wifiNetworks.length + service.outOfRangeWifi.length > 0
+    readonly property var securedWifi: service.wifiNetworks.filter(network => service.wifiSecured(network))
+    readonly property var openWifi: service.wifiNetworks.filter(network => !service.wifiSecured(network))
+    // A row inside a Wi-Fi network group.
+    readonly property int rowWidth: width - Ui.Space.indent
 
     width: parent ? parent.width : 0
     spacing: 24
@@ -166,7 +181,7 @@ Column {
     }
 
     // A device's group: its iface at the rule's right, its details while connected; for Wi-Fi, its power
-    // button beside the iface and the networks under the details.
+    // button beside the iface and its networks in groups under the details.
     component DeviceGroup: Ui.Section {
         id: group
 
@@ -194,7 +209,7 @@ Column {
             shell: root.shell
             perLine: root.tablePerLine
             widths: root.tableWidths
-            entries: group.device.connected ? root.detailRows(group.device.name) : []
+            entries: group.device.connected ? root.detailRows(group.device) : []
         }
 
         // Wi-Fi's state shows in its network rows instead.
@@ -210,7 +225,9 @@ Column {
             objectName: "wifiList"
             visible: group.wifi
             width: root.width
-            spacing: 4
+            // 16 under the details; the network groups 8 apart.
+            topPadding: group.device.connected ? 16 - group.spacing : 0
+            spacing: 8
 
             // A pointer over the list holds its order, so a scan never moves a row under it.
             HoverHandler {
@@ -226,29 +243,72 @@ Column {
                 text: !root.service.wifiEnabled ? "Wi-Fi is off" : root.service.scanning ? "Scanning…" : "No networks found"
             }
 
-            Repeater {
-                // ScriptModel diffs by identity, keeping delegates (and a passphrase being typed) alive.
-                model: ScriptModel {
-                    values: group.wifi ? root.service.wifiNetworks : []
-                }
+            WifiGroup {
+                id: securedGroup
+                key: "secured"
+                title: "Secured"
+                networks: group.wifi ? root.securedWifi : []
 
-                delegate: WifiRow {
-                    required property var modelData
-                    network: modelData
+                WifiRows {
+                    networks: securedGroup.networks
                 }
             }
 
-            Repeater {
-                model: ScriptModel {
-                    values: group.wifi ? root.service.outOfRangeWifi : []
-                    objectProp: "uuid"
-                }
+            WifiGroup {
+                id: openGroup
+                key: "open"
+                title: "Open"
+                networks: group.wifi ? root.openWifi : []
 
-                delegate: SavedRow {
-                    required property var modelData
-                    saved: modelData
+                WifiRows {
+                    networks: openGroup.networks
                 }
             }
+
+            WifiGroup {
+                id: outOfRangeGroup
+                key: "outOfRange"
+                title: "Out of range"
+                networks: group.wifi ? root.service.outOfRangeWifi : []
+
+                Repeater {
+                    model: ScriptModel {
+                        values: outOfRangeGroup.networks
+                        objectProp: "uuid"
+                    }
+
+                    delegate: SavedRow {
+                        required property var modelData
+                        saved: modelData
+                    }
+                }
+            }
+        }
+    }
+
+    // A collapsible group of Wi-Fi networks, hidden while empty.
+    component WifiGroup: Ui.Subsection {
+        required property string key
+        required property var networks
+
+        visible: networks.length > 0
+        shell: root.shell
+        value: String(networks.length)
+        expanded: !!root.service.expandedWifiGroups[key]
+        onToggled: root.service.toggleWifiGroup(key)
+    }
+
+    component WifiRows: Repeater {
+        required property var networks
+
+        // ScriptModel diffs by identity, keeping delegates (and a passphrase being typed) alive.
+        model: ScriptModel {
+            values: networks
+        }
+
+        delegate: WifiRow {
+            required property var modelData
+            network: modelData
         }
     }
 
@@ -274,7 +334,7 @@ Column {
                 root.service.forget(network.name);
         }
 
-        width: root.width
+        width: root.rowWidth
         spacing: 4
 
         Item {
@@ -309,26 +369,13 @@ Column {
 
             Text {
                 id: statusText
-                anchors.right: lockText.left
+                anchors.right: forgetSlot.left
                 anchors.rightMargin: 8
                 anchors.verticalCenter: parent.verticalCenter
                 color: root.shell.palette.sky
                 font.family: Ui.Fonts.mono
                 font.pixelSize: 14
                 text: wifiRow.changing ? wifiRow.status : ""
-            }
-
-            Text {
-                id: lockText
-                anchors.right: forgetSlot.left
-                anchors.rightMargin: 8
-                anchors.verticalCenter: parent.verticalCenter
-                width: 16
-                horizontalAlignment: Text.AlignHCenter
-                color: root.shell.palette.off
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 14
-                text: root.service.wifiSecured(wifiRow.network) ? "󰌾" : ""
             }
 
             Item {
@@ -426,7 +473,7 @@ Column {
                 root.service.forgetSaved(saved.uuid);
         }
 
-        width: root.width
+        width: root.rowWidth
         implicitHeight: 28
 
         Text {
@@ -444,7 +491,7 @@ Column {
         Text {
             anchors.left: savedIcon.right
             anchors.leftMargin: 8
-            anchors.right: rangeText.left
+            anchors.right: savedForget.left
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             elide: Text.ElideRight
@@ -452,17 +499,6 @@ Column {
             font.family: Ui.Fonts.mono
             font.pixelSize: 14
             text: savedRow.saved.ssid
-        }
-
-        Text {
-            id: rangeText
-            anchors.right: savedForget.left
-            anchors.rightMargin: 8 + 16 + 8
-            anchors.verticalCenter: parent.verticalCenter
-            color: root.shell.palette.off
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 14
-            text: "Out of range"
         }
 
         Ui.PanelButton {

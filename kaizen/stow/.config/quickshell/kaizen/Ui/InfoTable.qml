@@ -16,6 +16,9 @@ GridLayout {
     // Each column's width; tables given the same (Model.columnWidths over all of them) line up.
     property var widths: Model.columnWidths([entries], perLine, text => metrics.advanceWidth(text))
 
+    // widths within the table's own, so a value too long for the card (an SSID) elides.
+    readonly property var fitted: Model.fitWidths(widths, width, columnSpacing)
+
     width: parent ? parent.width : 0
     columns: perLine * 2
     columnSpacing: 16
@@ -34,9 +37,9 @@ GridLayout {
             required property var modelData
 
             Layout.fillWidth: modelData.label
-            Layout.preferredWidth: table.widths[modelData.column] || 0
+            Layout.preferredWidth: table.fitted[modelData.column] || 0
             horizontalAlignment: modelData.label ? Text.AlignLeft : Text.AlignRight
-            elide: modelData.label ? Text.ElideRight : Text.ElideNone
+            elide: Text.ElideRight
             color: table.shell.palette[modelData.role]
             font: metrics.font
             text: modelData.text

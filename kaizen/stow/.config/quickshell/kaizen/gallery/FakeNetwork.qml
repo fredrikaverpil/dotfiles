@@ -258,6 +258,9 @@ QtObject {
     property string failureReason: ""
     property string actionSsid: ""
     property string actionKind: ""
+    // The panel's expanded Wi-Fi network groups, by key; the others start collapsed. Kept until the shell
+    // restarts.
+    property var expandedWifiGroups: ({})
 
     readonly property bool networkManagerAvailable: manager
     readonly property var wifiDevice: manager && adapter ? {
@@ -384,6 +387,12 @@ QtObject {
     function freezeOrder() {
         if (!frozenOrder)
             frozenOrder = wifiNetworks.slice();
+    }
+
+    function toggleWifiGroup(key) {
+        const next = Object.assign({}, expandedWifiGroups);
+        next[key] = !next[key];
+        expandedWifiGroups = next;
     }
 
     function wifiStatus(network) {

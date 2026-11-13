@@ -36,6 +36,9 @@ Item {
     property bool scanning: false
     // Sorted by strength until the user touches the list, then held (freezeOrder).
     property bool orderFrozen: false
+    // The panel's expanded Wi-Fi network groups, by key; the others start collapsed. Kept until the shell
+    // restarts.
+    property var expandedWifiGroups: ({})
     // The internet's route: `ip route get 1.1.1.1`.
     property var connection: ({
             iface: "",
@@ -101,6 +104,12 @@ Item {
     // Rows then keep their positions, so a scan never moves one under a click or the cursor.
     function freezeOrder() {
         orderFrozen = true;
+    }
+
+    function toggleWifiGroup(key) {
+        const next = Object.assign({}, expandedWifiGroups);
+        next[key] = !next[key];
+        expandedWifiGroups = next;
     }
 
     function setScannerEnabled(enabled) {
