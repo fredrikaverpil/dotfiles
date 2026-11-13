@@ -18,21 +18,12 @@ Column {
     signal wallpaperRequested
 
     readonly property var textScales: [0.9, 1, 1.1, 1.25, 1.5, 2]
-    // A mirror row's control: a segment per output ("Own" and the others), each as wide as the widest
-    // label plus 16 a side, so every row's control is as wide and they align.
-    readonly property real mirrorWidth: outputs.names.length * (outputs.names.reduce((widest, name) => Math.max(widest, nameMetrics.advanceWidth(name)), nameMetrics.advanceWidth("Own")) + 32)
 
     readonly property int cardWidth: 400
     readonly property bool keyNavigation: true
 
     width: parent ? parent.width : 0
     spacing: 24
-
-    FontMetrics {
-        id: nameMetrics
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 14
-    }
 
     Ui.PanelHeader {
         shell: root.shell
@@ -171,7 +162,9 @@ Column {
                     Ui.SegmentedControl {
                         id: mirrorChoice
                         anchors.right: parent.right
-                        width: root.mirrorWidth
+                        // Every row's segments as wide as the longest name (the font is monospace), so the rows align.
+                        width: implicitWidth
+                        widest: root.outputs.names.reduce((widest, name) => name.length > widest.length ? name : widest, "Own")
                         shell: root.shell
                         options: [
                             {

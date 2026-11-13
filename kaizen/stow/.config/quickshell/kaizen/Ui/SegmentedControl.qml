@@ -11,6 +11,8 @@ Rectangle {
     property var matches: (value, current) => value === current
     // False draws an option `dim`, skipped by focus. A function, so the options and their focus outlive a change of it.
     property var available: value => true
+    // Each segment is at least as wide as this label, so controls with different labels can match widths.
+    property string widest: ""
 
     // Segments share the spare width equally, so each label has the same space around it.
     readonly property real spare: (width - options.reduce((sum, option) => sum + metrics.advanceWidth(option.label), 0)) / Math.max(1, options.length)
@@ -18,6 +20,8 @@ Rectangle {
     signal picked(var value)
 
     width: parent ? parent.width : 0
+    // Each label with 16 a side.
+    implicitWidth: options.reduce((sum, option) => sum + Math.max(metrics.advanceWidth(option.label), metrics.advanceWidth(widest)) + 32, 0)
     implicitHeight: 28
     radius: 4
     color: "transparent"

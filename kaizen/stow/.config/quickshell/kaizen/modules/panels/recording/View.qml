@@ -204,7 +204,7 @@ Column {
             id: segments
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            width: 112
+            width: implicitWidth
             shell: root.shell
             options: [
                 {
