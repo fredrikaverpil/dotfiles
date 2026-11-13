@@ -68,10 +68,15 @@ Column {
             onPicked: value => root.shell.setDark(value)
         }
 
-        Ui.PanelButton {
-            shell: root.shell
-            label: "Choose wallpaper…"
-            onActivated: root.wallpaperRequested()
+        // 16 under the content (style.md › Panels › Space).
+        Row {
+            topPadding: 8
+
+            Ui.PanelButton {
+                shell: root.shell
+                label: "Choose wallpaper…"
+                onActivated: root.wallpaperRequested()
+            }
         }
     }
 
@@ -123,6 +128,7 @@ Column {
 
         // One row per output, picking what it shows; only with another output to mirror.
         Column {
+            id: mirrorRows
             visible: root.outputNames.length > 1
             width: parent.width
             spacing: 4
@@ -171,10 +177,15 @@ Column {
             }
         }
 
-        Ui.PanelButton {
-            shell: root.shell
-            label: "Arrange outputs…"
-            onActivated: root.arrangeRequested()
+        // 16 under the mirror rows; with one output, the group's only content.
+        Row {
+            topPadding: mirrorRows.visible ? 8 : 0
+
+            Ui.PanelButton {
+                shell: root.shell
+                label: "Arrange outputs…"
+                onActivated: root.arrangeRequested()
+            }
         }
     }
 }
