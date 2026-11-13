@@ -179,7 +179,7 @@ TestCase {
         const got = Doctor.summary(data.counts);
 
         // Assert
-        verify(got === data.want, got);
+        compare(got, data.want);
     }
 
     function test_when_data() {
@@ -224,7 +224,7 @@ TestCase {
         const got = Doctor.when(data.finding, new Date(morning));
 
         // Assert
-        verify(got === data.want, got);
+        compare(got, data.want);
     }
 
     function test_copyText_data() {
@@ -249,7 +249,7 @@ TestCase {
         const got = Doctor.copyText(data.finding);
 
         // Assert
-        verify(got === data.want, got);
+        compare(got, data.want);
     }
 
     function test_key_data() {

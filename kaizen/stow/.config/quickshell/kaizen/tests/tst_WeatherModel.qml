@@ -39,8 +39,8 @@ TestCase {
         verify(Weather.coordinate(-0.005) === -0);
         verify(Weather.coordinate("nowhere") === null);
         verify(Weather.coordinate(undefined) === null);
-        verify(Weather.forecastUrl(57.7089, 11.9746) === "https://api.met.no/weatherapi/locationforecast/2.0/complete?lat=57.71&lon=11.97");
-        verify(Weather.forecastUrl("nowhere", 11.97) === "");
+        compare(Weather.forecastUrl(57.7089, 11.9746), "https://api.met.no/weatherapi/locationforecast/2.0/complete?lat=57.71&lon=11.97");
+        compare(Weather.forecastUrl("nowhere", 11.97), "");
         verify(Weather.yrUrl(57.7089, 11.9746) === "https://www.yr.no/en/forecast/hourly-table/57.71,11.97?i=0");
         verify(Weather.yrUrl("nowhere", 11.97) === "");
     }
