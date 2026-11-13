@@ -83,27 +83,6 @@ not planned, unreported.
 - Drop: this entry, once the pinned Quickshell includes it and `qml-lint` is
   clean.
 
-## umbriel
-
-### umbriel's idle Xwayland crashes PipeWire
-
-- Symptom: on umbriel, PipeWire dumps core in its X11 bell module's
-  `x11_io_error_exit_handler` whenever Xwayland exits, 10 s after its last X
-  client (`-terminate 10`), so it restarts mid-session and the shell logs a
-  PipeWire connection error. niri's xwayland-satellite keeps its display until
-  the session ends, where the same crash is harmless.
-- Workaround: `module.x11.bell = false` in
-  [`nix/default.nix`](../nix/default.nix), which stops PipeWire loading the
-  module; X11 apps' bell is silent. PipeWire is shared, so this applies under
-  niri too.
-- Upstream: `c2fec6c0` "module-x11-bell: make the X11 I/O error handler
-  idempotent" on master, backported to 1.6 as `dc117ab7`, no issue.
-- Status: released in 1.6.10;
-  [NixOS/nixpkgs#577480](https://github.com/NixOS/nixpkgs/pull/577480) merged
-  it, and `nixos-unstable` has 1.6.11, but `nixpkgs-unstable`, which the flake
-  follows, still has 1.6.9.
-- Drop: the setting, once nixpkgs' PipeWire has a release containing it.
-
 ## Qt
 
 ### qmllint misses a singleton with a relative path

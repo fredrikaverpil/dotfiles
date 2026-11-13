@@ -109,10 +109,6 @@ in
       enable = true;
       alsa.enable = true;
       pulse.enable = true;
-      # The X11 bell module crashes PipeWire when the X server exits, which
-      # umbriel's Xwayland does when idle; niri's only at session end.
-      # TODO: drop once nixpkgs' PipeWire has pipewire/pipewire@c2fec6c0.
-      extraConfig.pipewire."10-no-x11-bell"."context.properties"."module.x11.bell" = false;
     };
 
     security.rtkit.enable = true;
