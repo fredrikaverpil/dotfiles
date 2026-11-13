@@ -13,10 +13,10 @@ Ui.Panel {
     cardWidth: view.cardWidth
     keyNavigation: view.keyNavigation
 
-    function record() {
+    function record(dnd) {
         close();
         service.start();
-        if (view.dnd && active)
+        if (dnd && active)
             shell.notifications.holdDoNotDisturb("recording", true);
     }
 
@@ -92,6 +92,6 @@ Ui.Panel {
         id: view
         shell: root.shell
         service: root.service
-        onRecordRequested: root.record()
+        onRecordRequested: dnd => root.record(dnd)
     }
 }

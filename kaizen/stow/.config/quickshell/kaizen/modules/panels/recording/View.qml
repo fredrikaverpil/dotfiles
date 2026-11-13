@@ -15,7 +15,7 @@ Column {
     readonly property int cardWidth: 400
     readonly property bool keyNavigation: true
 
-    signal recordRequested
+    signal recordRequested(bool dnd)
 
     width: parent ? parent.width : 0
     spacing: 24
@@ -92,7 +92,7 @@ Column {
             visible: !root.service.busy
             shell: root.shell
             label: "Record"
-            onActivated: root.recordRequested()
+            onActivated: root.recordRequested(root.dnd)
         }
 
         Ui.PanelButton {
