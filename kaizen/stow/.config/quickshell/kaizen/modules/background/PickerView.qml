@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 
 import "../../Ui" as Ui
+import "WallpaperModel.js" as Model
 
 Column {
     id: root
@@ -112,26 +113,16 @@ Column {
 
             // Keeps the selected row in view, and its folder's label too when it is the folder's first row.
             function reveal() {
-                const r = root.service.rowOfIndex[sel];
-                if (r === undefined)
-                    return;
-                positionViewAtIndex(r, ListView.Contain);
-                if (root.service.rows[r - 1] && root.service.rows[r - 1].header)
-                    positionViewAtIndex(r - 1, ListView.Contain);
+                for (const r of Model.reveal(root.service.rows, root.service.rowOfIndex, sel))
+                    positionViewAtIndex(r, ListView.Contain);
             }
 
             // Moves one image row up or down, skipping headers.
             function step(dir) {
-                const r = root.service.rowOfIndex[sel];
-                if (r === undefined)
+                const next = Model.step(root.service.rows, root.service.rowOfIndex, sel, dir);
+                if (next < 0)
                     return false;
-                let t = r + dir;
-                while (root.service.rows[t] && root.service.rows[t].header)
-                    t += dir;
-                const row = root.service.rows[t];
-                if (!row)
-                    return false;
-                sel = row.start + Math.min(sel - root.service.rows[r].start, row.count - 1);
+                sel = next;
                 return true;
             }
 

@@ -37,3 +37,23 @@ function layout(paths, root, columns) {
   });
   return { rows: rows, rowOfIndex: rowOfIndex };
 }
+
+// The index one image row up (dir -1) or down (1) from index, skipping
+// headers, in its column or the row's last; -1 past the first or last row.
+function step(rows, rowOfIndex, index, dir) {
+  var r = rowOfIndex[index];
+  if (r === undefined) return -1;
+  var t = r + dir;
+  while (rows[t] && rows[t].header) t += dir;
+  var row = rows[t];
+  if (!row) return -1;
+  return row.start + Math.min(index - rows[r].start, row.count - 1);
+}
+
+// The rows that keep index in view, in order: its own, then its folder's
+// label when it is the folder's first row.
+function reveal(rows, rowOfIndex, index) {
+  var r = rowOfIndex[index];
+  if (r === undefined) return [];
+  return rows[r - 1] && rows[r - 1].header ? [r, r - 1] : [r];
+}
