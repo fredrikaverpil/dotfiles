@@ -14,7 +14,7 @@ ScrollBar {
 
     contentItem: Rectangle {
         radius: 2
-        color: bar.pressed ? bar.shell.palette.off : bar.shell.palette.dim
+        color: bar.shell.palette.dim
     }
 
     background: Item {}
