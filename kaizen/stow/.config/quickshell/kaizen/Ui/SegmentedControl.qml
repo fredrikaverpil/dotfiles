@@ -5,10 +5,12 @@ Rectangle {
     id: control
 
     required property var shell
-    // [{ value: "balanced", label: "󰊚 Balanced" }, ...]; `available: false` draws an option `dim`, skipped by focus.
+    // [{ value: "balanced", label: "󰊚 Balanced" }, ...]
     property var options: []
     property var current
     property var matches: (value, current) => value === current
+    // False draws an option `dim`, skipped by focus. A function, so the options and their focus outlive a change of it.
+    property var available: value => true
 
     // Segments share the spare width equally, so each label has the same space around it.
     readonly property real spare: (width - options.reduce((sum, option) => sum + metrics.advanceWidth(option.label), 0)) / Math.max(1, options.length)
@@ -39,7 +41,7 @@ Rectangle {
 
                 required property var modelData
                 readonly property bool chosen: control.matches(modelData.value, control.current)
-                readonly property bool available: modelData.available !== false
+                readonly property bool available: control.available(modelData.value)
 
                 function pick() {
                     if (available)
@@ -49,7 +51,7 @@ Rectangle {
                 width: metrics.advanceWidth(modelData.label) + control.spare
                 height: control.height
 
-                activeFocusOnTab: control.visible && segment.available
+                activeFocusOnTab: (control.visible && segment.available) || segment.activeFocus
                 Keys.onReturnPressed: segment.pick()
                 Keys.onEnterPressed: segment.pick()
                 Keys.onSpacePressed: segment.pick()

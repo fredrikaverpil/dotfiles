@@ -177,14 +177,13 @@ Column {
                         options: [
                             {
                                 label: "Own",
-                                value: "",
-                                available: !root.mirror.busy
+                                value: ""
                             }
                         ].concat(root.outputs.names.filter(name => name !== mirrorRow.target).map(name => ({
                                     label: name,
-                                    value: name,
-                                    available: !root.mirror.busy && (root.mirror.sourceOf(mirrorRow.target) === name || root.mirror.canMirror(name, mirrorRow.target))
+                                    value: name
                                 })))
+                        available: value => !root.mirror.busy && (value === "" || root.mirror.sourceOf(mirrorRow.target) === value || root.mirror.canMirror(value, mirrorRow.target))
                         current: root.mirror.sourceOf(mirrorRow.target)
                         onPicked: value => value ? root.mirror.start(value, mirrorRow.target) : root.mirror.stop(mirrorRow.target)
                     }
