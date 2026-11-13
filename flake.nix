@@ -174,14 +174,14 @@
                       trap 'rm -rf "$imports"' EXIT
                       mkdir "$imports/qs"
                       ln -s "$PWD/Ui" "$imports/qs/Ui"
-                      qmllint -E -I "$imports" -W 0 $(find "$PWD" "$(realpath ../../../../../stow/host)"/*/.config/kaizen/plugins -path "$PWD/gallery/now" -prune -o -name '*.qml' -print)
+                      qmllint -E -I "$imports" -W 0 $(find "$PWD" "$(realpath ../../../../../stow/host)"/*/.config/kaizen/plugins -name '*.qml')
                     '')
                     # Tool defaults; prettier's match conform's flags for JS.
                     (task "qml-format" ''
                       dirs=". ../../../../../stow/host/*/.config/kaizen/plugins"
-                      qmlformat -i $(find $dirs -path ./gallery/now -prune -o -name '*.qml' -print)
+                      qmlformat -i $(find $dirs -name '*.qml')
                       # Prettier cannot parse QML's `.pragma`/`.import` JS.
-                      prettier --log-level warn --write $(grep -LE '^\.(pragma|import)' $(find $dirs -path ./gallery/now -prune -o -name '*.js' -print))
+                      prettier --log-level warn --write $(grep -LE '^\.(pragma|import)' $(find $dirs -name '*.js'))
                     '')
                     pkgs.prettier
                     (task "qml-test" ''

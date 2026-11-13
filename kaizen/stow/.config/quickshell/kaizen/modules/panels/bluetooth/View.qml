@@ -6,7 +6,7 @@ Column {
     id: root
 
     required property var shell
-    // The bluetooth service, or the gallery's stand-in.
+    // The bluetooth service.
     required property var service
 
     // Pairing, forgetting and the rest happen in bluetui; the panel closes for it.

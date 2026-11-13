@@ -9,7 +9,7 @@ Column {
     id: root
 
     required property var shell
-    // The firmware service, or the gallery's stand-in.
+    // The firmware service.
     required property var service
 
     // The id of the update whose command was copied last, until the panel closes.

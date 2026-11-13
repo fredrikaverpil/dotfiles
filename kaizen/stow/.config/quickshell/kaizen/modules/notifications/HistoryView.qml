@@ -7,7 +7,7 @@ Column {
     id: root
 
     required property var shell
-    // The notification service, or the gallery's stand-in.
+    // The notification service.
     required property var service
 
     // The cards animate only while the panel is open.

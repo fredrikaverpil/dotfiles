@@ -335,42 +335,6 @@ kaizen dev off    # back to main's
   worktree or ending the task. A removed worktree, or QML that fails to load,
   leaves the unit failing; `kaizen dev off` recovers either.
 
-## Panel gallery
-
-The gallery draws a panel's view in a window of its own, beside the shell,
-fed by a stand-in in a chosen state (muted, 12 % battery): for designing a
-panel in states the machine is not in. It runs from any tree, a worktree's
-included, and reloads on save:
-
-```sh
-qs -p "$PWD/kaizen/stow/.config/quickshell/kaizen/gallery.qml"
-```
-
-- A panel shows there once its content is a `View.qml` beside its
-  `Panel.qml`, reading a model the panel passes in, with a stand-in in
-  `gallery/` and an entry in `gallery.qml`'s `panels` (whose `view` names a
-  view outside `modules/panels/<name>/`, such as a plugin's). A view declares
-  its card's size and `keyNavigation`; a view that declares
-  `variants` and `variant` gets a row of buttons to switch between design
-  alternatives.
-- Above the card, a piece of the bar holds the panel's bar button, fed by the
-  same stand-in. The button is a component in `modules/bar/widgets/` that
-  `Bar.qml` places, so its label and colour are the bar's own; "Now" draws the
-  current button too.
-- A card larger than the window is drawn scaled down to fit, so judge its
-  text sizes live (`kaizen dev`).
-- Quickshell loads no file outside the gallery's directory. To compare with
-  another commit as "Now", copy its tree into the ignored `gallery/now/`:
-  `git archive REV kaizen/stow/.config/quickshell/kaizen | tar -x --strip-components=5 -C kaizen/stow/.config/quickshell/kaizen/gallery/now`
-  (create the directory first), then restart the gallery.
-- The panel, state, variant and theme it shows survive the reload a save
-  causes. Quickshell watches only files it reached through an import, so
-  `gallery.qml` imports each panel's directory.
-- `qs ipc -p PATH call gallery ...` drives it: `panel NAME`, `scenario NAME`,
-  `variant NAME`, `theme true|false`, `now true|false`, `reload` (after a
-  write that replaced a file's inode), and `shot FILE`, which saves the stage
-  as a PNG with no screen capture.
-
 ## Building kaizen
 
 `kaizen` is a Go binary built from [`kaizen/cli/`](../cli/). A rebuild

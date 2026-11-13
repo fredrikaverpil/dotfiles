@@ -7,7 +7,7 @@ Column {
     id: root
 
     required property var shell
-    // The calendar service, or the gallery's stand-in.
+    // The calendar service.
     required property var service
 
     // What past and under way are read against: the fetch, as the events.

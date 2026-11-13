@@ -7,7 +7,7 @@ Column {
     id: root
 
     required property var shell
-    // The background, or the gallery's stand-in.
+    // The background.
     required property var service
 
     readonly property int cardWidth: 1200

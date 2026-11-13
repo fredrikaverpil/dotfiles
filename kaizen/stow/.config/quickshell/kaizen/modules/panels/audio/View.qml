@@ -6,7 +6,7 @@ Column {
     id: root
 
     required property var shell
-    // The panel, or the gallery's stand-in.
+    // The panel.
     required property var audio
 
     // -1 is the slider, then the rows in Output, then the settings button.

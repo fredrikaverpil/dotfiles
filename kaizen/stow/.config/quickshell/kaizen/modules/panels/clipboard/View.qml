@@ -8,7 +8,7 @@ Column {
     id: root
 
     required property var shell
-    // The clipboard service, or the gallery's stand-in.
+    // The clipboard service.
     required property var service
 
     // What the rows' times are read against; set on open.

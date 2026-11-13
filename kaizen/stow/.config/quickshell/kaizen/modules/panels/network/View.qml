@@ -10,7 +10,7 @@ Column {
     id: root
 
     required property var shell
-    // The network service, or the gallery's stand-in.
+    // The network service.
     required property var service
 
     // Connection editing happens in nm-connection-editor; the panel closes for it.

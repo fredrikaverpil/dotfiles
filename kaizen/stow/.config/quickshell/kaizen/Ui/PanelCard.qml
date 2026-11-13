@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Window
 
-// A panel's card, apart from its layer surface so the gallery can draw it in a window.
+// A panel's card, apart from its layer surface.
 Rectangle {
     id: card
 

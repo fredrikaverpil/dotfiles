@@ -8,7 +8,7 @@ Column {
     id: root
 
     required property var shell
-    // The doctor service, or the gallery's stand-in.
+    // The doctor service.
     required property var service
 
     // What was copied last, until the panel closes: "all", or a finding's `Model.key`.

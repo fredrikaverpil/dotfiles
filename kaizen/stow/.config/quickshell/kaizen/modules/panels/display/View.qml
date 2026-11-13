@@ -6,7 +6,7 @@ Column {
     id: root
 
     required property var shell
-    // The services, or the gallery's stand-in.
+    // The services.
     required property var brightness
     required property var nightlight
     required property var mirror
