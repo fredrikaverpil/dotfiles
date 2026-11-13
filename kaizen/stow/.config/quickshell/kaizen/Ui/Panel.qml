@@ -9,7 +9,8 @@ PanelWindow {
     required property var shell
     property bool shown: false
     property int cardWidth: 600
-    property int cardHeight: 420
+    // Fits the content; a card of fixed height (the launcher, the picker) sets it.
+    property int cardHeight: body.childrenRect.height + 2 * Space.cardPadding
     readonly property int barHeight: shell ? shell.barHeight : 32
 
     property bool keyNavigation: false

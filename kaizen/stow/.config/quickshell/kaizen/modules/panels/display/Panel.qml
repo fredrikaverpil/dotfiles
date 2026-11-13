@@ -12,7 +12,6 @@ Ui.Panel {
     readonly property var textScales: view.textScales
 
     cardWidth: view.cardWidth
-    cardHeight: view.cardHeight
     keyNavigation: view.keyNavigation
 
     function refresh() {

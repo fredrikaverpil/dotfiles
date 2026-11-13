@@ -12,7 +12,6 @@ Ui.Panel {
     readonly property var info: service.info
 
     cardWidth: view.cardWidth
-    cardHeight: view.cardHeight
     keyNavigation: view.keyNavigation
     // Held unmapped until a probe replaces the time left from the last open.
     visible: shown && service.fresh

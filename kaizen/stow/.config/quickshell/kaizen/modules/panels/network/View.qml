@@ -17,7 +17,6 @@ Column {
     signal settingsRequested
 
     readonly property int cardWidth: 600
-    readonly property int cardHeight: implicitHeight + 2 * Ui.Space.cardPadding
     readonly property bool keyNavigation: true
 
     // A device's details table, a target's ping and loss on one line; Wi-Fi's starts with its network.

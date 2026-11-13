@@ -11,7 +11,6 @@ Ui.Panel {
     readonly property string icon: service.icon
 
     cardWidth: view.cardWidth
-    cardHeight: view.cardHeight
     keyNavigation: view.keyNavigation
 
     onShownChanged: if (shown)

@@ -16,7 +16,6 @@ Column {
     readonly property color levelColor: shell.palette[service.chargeRole]
 
     readonly property int cardWidth: 400
-    readonly property int cardHeight: implicitHeight + 2 * Ui.Space.cardPadding
     readonly property bool keyNavigation: true
 
     width: parent ? parent.width : 0

@@ -717,7 +717,6 @@ Item {
 
         shell: root.shell
         cardWidth: historyView.cardWidth
-        cardHeight: historyView.cardHeight
         keyNavigation: historyView.keyNavigation
 
         onShownChanged: if (shown)

@@ -13,7 +13,6 @@ Column {
     property int cursor: -1
 
     readonly property int cardWidth: 400
-    readonly property int cardHeight: implicitHeight + 2 * Ui.Space.cardPadding
 
     width: parent ? parent.width : 0
     spacing: 24

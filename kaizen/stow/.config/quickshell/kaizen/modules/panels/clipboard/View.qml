@@ -15,7 +15,6 @@ Column {
     property date now: new Date()
 
     readonly property int cardWidth: 600
-    readonly property int cardHeight: implicitHeight + 2 * Ui.Space.cardPadding
     readonly property bool keyNavigation: true
 
     signal closeRequested

@@ -9,7 +9,6 @@ Ui.Panel {
     required property var service
 
     cardWidth: view.cardWidth
-    cardHeight: view.cardHeight
     keyNavigation: view.keyNavigation
 
     onShownChanged: {

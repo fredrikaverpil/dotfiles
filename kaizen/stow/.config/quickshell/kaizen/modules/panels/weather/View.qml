@@ -23,7 +23,6 @@ Column {
             })).concat(outlook ? outlook.risks : [])
 
     readonly property int cardWidth: 460
-    readonly property int cardHeight: implicitHeight + 2 * Ui.Space.cardPadding
     readonly property bool keyNavigation: true
 
     signal forecastRequested

@@ -17,7 +17,6 @@ Column {
     property string focusedKey: ""
 
     readonly property int cardWidth: 600
-    readonly property int cardHeight: implicitHeight + 2 * Ui.Space.cardPadding
     readonly property bool keyNavigation: true
 
     function reset() {

@@ -11,7 +11,6 @@ Ui.Panel {
     readonly property bool active: service.selecting || service.busy
 
     cardWidth: view.cardWidth
-    cardHeight: view.cardHeight
     keyNavigation: view.keyNavigation
 
     function record() {
