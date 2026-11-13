@@ -388,6 +388,7 @@ Column {
                 Ui.PanelButton {
                     anchors.fill: parent
                     visible: wifiRow.forgettable
+                    available: !root.service.busy
                     shell: root.shell
                     label: "Forget"
                     onActivated: wifiRow.forget()
@@ -403,6 +404,7 @@ Column {
                 Ui.PanelButton {
                     anchors.fill: parent
                     visible: wifiRow.action !== ""
+                    available: !root.service.busy
                     shell: root.shell
                     label: wifiRow.action
                     onActivated: wifiRow.activate()
@@ -445,6 +447,7 @@ Column {
                 id: join
                 anchors.right: parent.right
                 width: root.actionWidth
+                available: passphrase.text.length > 0 && !root.service.busy
                 shell: root.shell
                 label: "Join"
                 onActivated: if (passphrase.text.length > 0)
@@ -506,6 +509,7 @@ Column {
             anchors.right: parent.right
             anchors.rightMargin: root.actionWidth + 8
             width: root.forgetWidth
+            available: !root.service.busy
             shell: root.shell
             label: "Forget"
             onActivated: savedRow.forget()
