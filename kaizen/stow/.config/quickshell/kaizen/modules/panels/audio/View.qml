@@ -15,14 +15,6 @@ Column {
     width: parent ? parent.width : 0
     spacing: 24
 
-    function reset() {
-        Qt.callLater(() => {
-            const first = slider.visible ? slider : rows.itemAt(0);
-            if (first)
-                first.forceActiveFocus();
-        });
-    }
-
     Column {
         width: parent.width
         spacing: 16
@@ -33,7 +25,6 @@ Column {
         }
 
         Ui.PanelSlider {
-            id: slider
             visible: !!root.audio.sink
             shell: root.shell
             value: root.audio.volume
@@ -66,7 +57,6 @@ Column {
             }
 
             Repeater {
-                id: rows
                 model: root.audio.sinks
 
                 delegate: Ui.RadioRow {

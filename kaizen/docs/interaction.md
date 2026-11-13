@@ -125,9 +125,10 @@ something to hang from.
 
 - A panel shows and adjusts a subsystem; its actions are also Settings rows,
   so a panel is never the only way to one.
-- It opens centred with exclusive keyboard focus. Arrows and `hjkl` step
-  focus as Tab does, since a panel has no search to type into; Enter and Space
-  activate; Esc closes. A control that steps a value (a slider, a
+- It opens centred with exclusive keyboard focus, nothing focused: the first
+  step lands on its first stop. Arrows and `hjkl` step focus as Tab does,
+  since a panel has no search to type into; Enter and Space activate; Esc
+  closes. A control that steps a value (a slider, a
   `‹ value ›` setting) takes `←` `→` and `h` `l` to step it instead.
 - Moving the pointer over a row or slider moves focus to it, so one row at a
   time shows the fill. A row that appears or scrolls under a still pointer

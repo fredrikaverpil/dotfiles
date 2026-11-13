@@ -66,9 +66,6 @@ Ui.Panel {
             Pipewire.preferredDefaultAudioSink = node;
     }
 
-    onShownChanged: if (shown)
-        view.reset()
-
     // PipeWire node properties do not bind until their objects are tracked.
     PwObjectTracker {
         objects: root.sinks.concat(root.sources)

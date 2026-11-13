@@ -23,11 +23,6 @@ Column {
 
     function reset() {
         root.now = new Date();
-        Qt.callLater(() => {
-            const row = rows.itemAt(0);
-            if (row)
-                row.forceActiveFocus();
-        });
     }
 
     // Removing rebuilds every card, so focus goes by position: the card that took the removed one's

@@ -14,9 +14,9 @@ Ui.Panel {
     onShownChanged: {
         if (shown) {
             service.refresh();
-            view.reset();
         } else {
             view.copied = "";
+            view.focusedKey = "";
         }
     }
 

@@ -19,14 +19,8 @@ Column {
 
     signal closeRequested
 
-    // The newest entry is already on the clipboard, so focus starts on the one before it.
     function reset() {
         root.now = new Date();
-        Qt.callLater(() => {
-            const row = rows.itemAt(1) || rows.itemAt(0);
-            if (row)
-                row.forceActiveFocus();
-        });
     }
 
     function pick(text) {

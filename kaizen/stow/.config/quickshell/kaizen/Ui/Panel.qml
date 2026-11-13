@@ -34,13 +34,14 @@ PanelWindow {
         shown ? close() : open();
     }
 
+    // Nothing is focused on open: the first step, either way, lands on the first stop.
     function focusStep(forward) {
         const current = body.Window.activeFocusItem;
         if (!current) {
             body.forceActiveFocus();
             return;
         }
-        const next = current.nextItemInFocusChain(forward);
+        const next = current === body ? body.nextItemInFocusChain(true) : current.nextItemInFocusChain(forward);
         if (next)
             next.forceActiveFocus(Qt.TabFocusReason);
     }

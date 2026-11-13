@@ -20,11 +20,8 @@ Column {
     width: parent ? parent.width : 0
     spacing: 24
 
-    // Record is preselected, so Enter starts with the saved choices; while recording, Pause; in the
-    // countdown, Stop.
     function reset() {
         dnd = true;
-        (!service.busy ? recordButton : service.recording ? pauseButton : stopButton).forceActiveFocus();
     }
 
     Ui.PanelHeader {
@@ -92,7 +89,6 @@ Column {
         shell: root.shell
 
         Ui.PanelButton {
-            id: recordButton
             visible: !root.service.busy
             shell: root.shell
             label: "Record"
@@ -100,7 +96,6 @@ Column {
         }
 
         Ui.PanelButton {
-            id: pauseButton
             visible: root.service.busy
             // The countdown has nothing to pause.
             available: root.service.recording
@@ -110,7 +105,6 @@ Column {
         }
 
         Ui.PanelButton {
-            id: stopButton
             visible: root.service.busy
             shell: root.shell
             label: "Stop"

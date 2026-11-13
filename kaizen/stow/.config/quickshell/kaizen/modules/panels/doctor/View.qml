@@ -13,19 +13,12 @@ Column {
 
     // What was copied last, until the panel closes: "all", or a finding's `Model.key`.
     property string copied: ""
-    // The focused finding's `Model.key`, so focus survives a run, which rebuilds the rows; "" off the rows.
+    // The focused finding's `Model.key`, so focus survives a run, which rebuilds the rows; "" off the rows and once
+    // the panel closes.
     property string focusedKey: ""
 
     readonly property int cardWidth: 600
     readonly property bool keyNavigation: true
-
-    function reset() {
-        Qt.callLater(() => {
-            const first = rows.itemAt(0);
-            if (first)
-                first.forceActiveFocus();
-        });
-    }
 
     function copyAll() {
         if (root.service.copyAll())

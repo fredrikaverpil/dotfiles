@@ -23,12 +23,6 @@ Column {
     width: parent ? parent.width : 0
     spacing: 24
 
-    // Opens on play/pause.
-    function reset() {
-        if (playButton.available)
-            playButton.forceActiveFocus();
-    }
-
     Column {
         width: parent.width
         spacing: 16
@@ -136,7 +130,6 @@ Column {
             }
 
             Ui.PanelButton {
-                id: playButton
                 width: (parent.width - parent.spacing * 2) / 3
                 shell: root.shell
                 label: root.service.playing ? "󰏤" : "󰐊"

@@ -13,9 +13,6 @@ Ui.Panel {
     cardWidth: view.cardWidth
     keyNavigation: view.keyNavigation
 
-    onShownChanged: if (shown)
-        view.reset()
-
     Binding {
         target: root.service
         property: "active"
