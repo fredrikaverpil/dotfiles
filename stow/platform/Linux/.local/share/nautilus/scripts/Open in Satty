@@ -8,6 +8,9 @@ for f in "$@"; do
   # satty expands strftime specifiers in the output name.
   out="${f%.*}"
   out="${out//%/%%}-edited-%Y%m%d-%H%M%S.png"
-  magick "$f" -auto-orient png:- | satty --filename - --output-filename "$out" --early-exit save ||
+  # The first image only, which satty shows; 8-bit at zlib level 1, since the
+  # PNG only crosses a pipe.
+  magick "${f}[0]" -auto-orient -depth 8 -define png:compression-level=1 png:- |
+    satty --filename - --output-filename "$out" --early-exit save ||
     notify-send "Open in Satty" "Failed: $f"
 done
