@@ -31,7 +31,8 @@ Column {
         subtitle: root.outputs.focused ? root.outputs.focused.name + " · " + root.outputs.focused.width + "×" + root.outputs.focused.height : "No active display"
     }
 
-    // Only on the output the backlight lights; on every output when sysfs names none.
+    // A group, not the header's slider (style.md › Panels › Form): the panel has no key value, and only the backlit
+    // output has brightness. Shown on that output; on every output when sysfs names none.
     Ui.Section {
         visible: root.brightness.present && (root.brightness.output === "" || !!root.outputs.focused && root.outputs.focused.name === root.brightness.output)
         shell: root.shell
