@@ -101,7 +101,16 @@ Column {
 
         required property var device
         // Empty while connecting or disconnecting.
-        readonly property bool busy: root.service.deviceAction(device) === ""
+        readonly property string action: root.service.deviceAction(device)
+        readonly property bool busy: action === ""
+        // The action the button showed before the change began, kept while it runs.
+        property string shownAction
+
+        Binding on shownAction {
+            when: !row.busy
+            value: row.action
+            restoreMode: Binding.RestoreNone
+        }
         // Percent, or negative when not shown.
         readonly property int battery: device.connected ? Math.round(root.service.battery(device) * 100) : -1
 
@@ -141,7 +150,7 @@ Column {
 
         Text {
             id: statusText
-            anchors.right: actionSlot.left
+            anchors.right: actionButton.left
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             color: row.busy ? root.shell.palette.sky : root.shell.palette[root.shell.batteryService.levelRole(row.battery)]
@@ -150,20 +159,16 @@ Column {
             text: row.busy ? root.service.deviceStatus(row.device) : row.battery >= 0 ? row.battery + "%" : ""
         }
 
-        // Kept while connecting, so the status does not shift.
-        Item {
-            id: actionSlot
+        // Inactive while connecting, so it keeps its focus and the status does not shift.
+        Ui.PanelButton {
+            id: actionButton
             anchors.right: parent.right
             width: root.actionWidth
             height: parent.height
-
-            Ui.PanelButton {
-                anchors.fill: parent
-                visible: !row.busy
-                shell: root.shell
-                label: root.service.deviceAction(row.device)
-                onActivated: row.toggle()
-            }
+            available: !row.busy
+            shell: root.shell
+            label: row.shownAction
+            onActivated: row.toggle()
         }
     }
 
