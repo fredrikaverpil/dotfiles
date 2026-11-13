@@ -47,27 +47,18 @@ Column {
     width: parent ? parent.width : 0
     spacing: 24
 
-    // DnD's button sits where a key value would: it is the panel's key state.
-    Item {
-        width: parent.width
-        implicitHeight: Math.max(header.implicitHeight, dnd.height)
-
-        Ui.PanelHeader {
-            id: header
-            width: parent.width - dnd.width - 8
-            shell: root.shell
-            title: "Notifications"
-            subtitle: {
-                if (!root.service.doNotDisturb)
-                    return root.count === 0 ? "Showing notifications" : "Showing notifications · " + root.count + " held back";
-                return "Paused · " + (root.count === 0 ? "nothing" : root.count) + " held back";
-            }
+    Ui.PanelHeader {
+        shell: root.shell
+        title: "Notifications"
+        subtitle: {
+            if (!root.service.doNotDisturb)
+                return root.count === 0 ? "Showing notifications" : "Showing notifications · " + root.count + " held back";
+            return "Paused · " + (root.count === 0 ? "nothing" : root.count) + " held back";
         }
 
+        // DnD's button sits where a key value would: it is the panel's key state.
         Ui.PanelButton {
             id: dnd
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
             widest: "Resume"
             shell: root.shell
             label: root.service.doNotDisturb ? "Resume" : "Pause"

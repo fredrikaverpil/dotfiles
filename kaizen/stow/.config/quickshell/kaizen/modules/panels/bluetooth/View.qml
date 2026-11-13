@@ -19,32 +19,22 @@ Column {
     width: parent ? parent.width : 0
     spacing: 24
 
-    // The power button sits where a key value would: it is the panel's key state.
-    Item {
-        width: parent.width
-        implicitHeight: Math.max(header.implicitHeight, power.height)
-
-        Ui.PanelHeader {
-            id: header
-            width: parent.width - (power.visible ? power.width + 8 : 0)
-            shell: root.shell
-            title: "Bluetooth"
-            subtitle: {
-                const service = root.service;
-                if (!service.available)
-                    return "No Bluetooth adapter";
-                if (!service.powered)
-                    return "Off";
-                if (service.devices.length === 0)
-                    return "No paired devices";
-                return service.connectedCount > 0 ? service.connectedCount + " connected" : "None connected";
-            }
+    Ui.PanelHeader {
+        shell: root.shell
+        title: "Bluetooth"
+        subtitle: {
+            const service = root.service;
+            if (!service.available)
+                return "No Bluetooth adapter";
+            if (!service.powered)
+                return "Off";
+            if (service.devices.length === 0)
+                return "No paired devices";
+            return service.connectedCount > 0 ? service.connectedCount + " connected" : "None connected";
         }
 
+        // The power button sits where a key value would: it is the panel's key state.
         Ui.PanelButton {
-            id: power
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
             widest: "Turn off"
             visible: root.service.available
             shell: root.shell
