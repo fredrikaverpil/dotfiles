@@ -16,7 +16,7 @@ Ui.Panel {
     onShownChanged: {
         if (!shown)
             return;
-        view.now = new Date();
+        view.reset();
         root.service.refreshIfExpired();
     }
 

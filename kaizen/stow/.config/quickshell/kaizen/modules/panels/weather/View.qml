@@ -23,6 +23,10 @@ Column {
     signal forecastRequested
     signal locationRequested
 
+    function reset() {
+        root.now = new Date();
+    }
+
     width: parent ? parent.width : 0
     spacing: 24
 
