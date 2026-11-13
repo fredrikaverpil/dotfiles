@@ -971,38 +971,43 @@ Ui.Panel {
         }
     }
 
-    Text {
-        color: menu.shell.palette.off
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 13
-        text: menu.breadcrumb
-    }
+    Column {
+        anchors.fill: parent
+        spacing: 8
 
-    Ui.MenuCard {
-        id: card
-        width: parent.width
-        height: parent.height - y
-        shell: menu.shell
-        rows: menu.cardRows(menu.level, null, card.query, menu.launchCounts)
-        placeholder: menu.level === "root" ? "Search…" : "Filter " + menu.items[menu.level].label.toLowerCase() + "…"
-        openerKeys: menu.keyOpened ? menu.toggleKeys : []
-        fontSize: 14
-        rowHeight: 28
-        // The panel fixes the width; Emoji has thousands of rows.
-        maxWidth: 0
+        Text {
+            color: menu.shell.palette.off
+            font.family: Ui.Fonts.mono
+            font.pixelSize: 13
+            text: menu.breadcrumb
+        }
 
-        onOpenRequested: row => {
-            menu.open(row.key);
-            card.settle();
+        Ui.MenuCard {
+            id: card
+            width: parent.width
+            height: parent.height - y
+            shell: menu.shell
+            rows: menu.cardRows(menu.level, null, card.query, menu.launchCounts)
+            placeholder: menu.level === "root" ? "Search…" : "Filter " + menu.items[menu.level].label.toLowerCase() + "…"
+            openerKeys: menu.keyOpened ? menu.toggleKeys : []
+            fontSize: 14
+            rowHeight: 28
+            // The panel fixes the width; Emoji has thousands of rows.
+            maxWidth: 0
+
+            onOpenRequested: row => {
+                menu.open(row.key);
+                card.settle();
+            }
+            // A row without an action (a keybinding) is there to read.
+            onRunRequested: row => {
+                if (!row.triggered)
+                    return;
+                menu.close();
+                row.triggered();
+            }
+            onBackRequested: menu.back()
+            onCloseRequested: menu.close()
         }
-        // A row without an action (a keybinding) is there to read.
-        onRunRequested: row => {
-            if (!row.triggered)
-                return;
-            menu.close();
-            row.triggered();
-        }
-        onBackRequested: menu.back()
-        onCloseRequested: menu.close()
     }
 }
