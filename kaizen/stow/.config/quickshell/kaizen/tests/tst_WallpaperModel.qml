@@ -28,7 +28,7 @@ TestCase {
     }
 
     function test_dirOf(data) {
-        verify(Model.dirOf(data.path, root) === data.want);
+        compare(Model.dirOf(data.path, root), data.want);
     }
 
     function test_sorted_data() {

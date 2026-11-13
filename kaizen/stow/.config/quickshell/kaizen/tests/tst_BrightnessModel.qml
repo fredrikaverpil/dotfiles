@@ -103,6 +103,6 @@ TestCase {
     }
 
     function test_output_of(data) {
-        verify(Brightness.outputOf(data.link) === data.want);
+        compare(Brightness.outputOf(data.link), data.want);
     }
 }

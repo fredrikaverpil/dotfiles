@@ -261,9 +261,11 @@ tree, so a static check passing here passes for every kaizen host;
   loadable through its installed metadata. Even `Ui/BarButton.qml` shares the
   Quickshell-dependent `Compositor` singleton's module. Do not mock Quickshell
   to cross this boundary.
-- `compare()` handles objects/arrays but tolerates small numeric differences.
-  Use `verify(actual === expected)` for exact values/identity and `fuzzyCompare`
-  for explicit tolerances. Do not compare objects via JSON serialization.
+- `compare()` is exact for strings, booleans and null, deep for objects and
+  arrays, and tolerates small numeric differences. Use it for everything but
+  numbers, for its failure message; `verify(actual === expected)` for an exact
+  number or an object's identity, and `fuzzyCompare` for explicit tolerances.
+  Do not compare objects via JSON serialization.
 - `compositor-test` validates niri's KDL and umbriel's TOML. It does not test
   dispatch. `qml-test` checks that `niri/kaizen.kdl` and `umbriel/kaizen.toml`
   declare the same titled binds, as each backend's `readBinds` reads them.

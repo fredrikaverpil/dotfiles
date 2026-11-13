@@ -198,7 +198,7 @@ TestCase {
     }
 
     function test_preview(data) {
-        verify(Model.preview(data.text) === data.want);
+        compare(Model.preview(data.text), data.want);
     }
 
     function test_more_lines_data() {

@@ -96,7 +96,7 @@ TestCase {
     }
 
     function test_contains(data) {
-        verify(Warnings.contains(data.geometry, 57.71, 11.97) === data.want);
+        compare(Warnings.contains(data.geometry, 57.71, 11.97), data.want);
     }
 
     function test_warnings_at_data() {
@@ -183,8 +183,8 @@ TestCase {
     }
 
     function test_warnings_at_rejects_what_does_not_read() {
-        verify(Warnings.warningsAt("<html>", 57.71, 11.97, new Date(now)) === null);
-        verify(Warnings.warningsAt("{}", 57.71, 11.97, new Date(now)) === null);
+        compare(Warnings.warningsAt("<html>", 57.71, 11.97, new Date(now)), null);
+        compare(Warnings.warningsAt("{}", 57.71, 11.97, new Date(now)), null);
     }
 
     function test_worst_data() {
@@ -211,7 +211,7 @@ TestCase {
     }
 
     function test_worst(data) {
-        verify(Warnings.worst(data.a, data.b) === data.want);
+        compare(Warnings.worst(data.a, data.b), data.want);
     }
 
     function test_event_glyph_data() {
@@ -245,7 +245,7 @@ TestCase {
     }
 
     function test_event_glyph(data) {
-        verify(Warnings.eventGlyph(data.code) === data.want);
+        compare(Warnings.eventGlyph(data.code), data.want);
     }
 
     function test_glyphs_keep_one_per_icon_at_its_worst_level_worst_first() {
@@ -314,7 +314,7 @@ TestCase {
     }
 
     function test_country_at(data) {
-        verify(Places.countryAt(data.latitude, data.longitude) === data.want);
+        compare(Places.countryAt(data.latitude, data.longitude), data.want);
     }
 
     // Local times, so the day names hold in any timezone.
