@@ -51,43 +51,50 @@ TestCase {
                 state: deviceStates.Connected,
                 battery: 0.8,
                 status: "Connected · 80%",
-                action: "Disconnect"
+                action: "Disconnect",
+                busy: false
             },
             {
                 state: deviceStates.Connected,
                 battery: -1,
                 status: "Connected",
-                action: "Disconnect"
+                action: "Disconnect",
+                busy: false
             },
             {
                 state: deviceStates.Connecting,
                 battery: -1,
                 status: "Connecting…",
-                action: ""
+                action: "Connect",
+                busy: true
             },
             {
                 state: deviceStates.Disconnecting,
                 battery: 0.5,
                 status: "Disconnecting…",
-                action: ""
+                action: "Disconnect",
+                busy: true
             },
             {
                 state: deviceStates.Disconnected,
                 battery: 0.5,
                 status: "Paired",
-                action: "Connect"
+                action: "Connect",
+                busy: false
             },
         ];
 
         for (const c of cases) {
             const got = {
                 status: Bluetooth.deviceStatus(c.state, deviceStates, c.battery),
-                action: Bluetooth.deviceAction(c.state, deviceStates)
+                action: Bluetooth.deviceAction(c.state, deviceStates),
+                busy: Bluetooth.deviceBusy(c.state, deviceStates)
             };
 
             compare(got, {
                 status: c.status,
-                action: c.action
+                action: c.action,
+                busy: c.busy
             });
         }
     }

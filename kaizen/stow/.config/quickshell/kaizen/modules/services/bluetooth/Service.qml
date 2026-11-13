@@ -35,6 +35,10 @@ Item {
         return Model.deviceAction(device.state, BluetoothDeviceState);
     }
 
+    function deviceBusy(device) {
+        return Model.deviceBusy(device.state, BluetoothDeviceState);
+    }
+
     function deviceIcon(device) {
         return Model.deviceIcon(device.icon);
     }

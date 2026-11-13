@@ -80,17 +80,8 @@ Column {
         id: row
 
         required property var device
-        // Empty while connecting or disconnecting.
-        readonly property string action: root.service.deviceAction(device)
-        readonly property bool busy: action === ""
-        // The action the button showed before the change began, kept while it runs.
-        property string shownAction
-
-        Binding on shownAction {
-            when: !row.busy
-            value: row.action
-            restoreMode: Binding.RestoreNone
-        }
+        // Connecting or disconnecting.
+        readonly property bool busy: root.service.deviceBusy(device)
         // Percent, or negative when not shown.
         readonly property int battery: device.connected ? Math.round(root.service.battery(device) * 100) : -1
 
@@ -147,7 +138,7 @@ Column {
             height: parent.height
             available: !row.busy
             shell: root.shell
-            label: row.shownAction
+            label: root.service.deviceAction(row.device)
             onActivated: row.toggle()
         }
     }

@@ -22,10 +22,15 @@ function deviceStatus(state, states, battery) {
     : "Connected";
 }
 
+// The button's action; while one is under way, that one.
 function deviceAction(state, states) {
-  if (state === states.Connected) return "Disconnect";
-  if (state === states.Disconnected) return "Connect";
-  return "";
+  return state === states.Connected || state === states.Disconnecting
+    ? "Disconnect"
+    : "Connect";
+}
+
+function deviceBusy(state, states) {
+  return state === states.Connecting || state === states.Disconnecting;
 }
 
 // icon is BlueZ's freedesktop icon name.
