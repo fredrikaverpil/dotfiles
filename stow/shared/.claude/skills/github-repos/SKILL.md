@@ -56,5 +56,4 @@ lists `@<user>`:
   also hits `@<org>/<team>-leads`. Check doubtful hits in the CODEOWNERS file.
 - Code search covers default branches only and may lag; the team and repo APIs
   are exact.
-- Code search returns no archived flag; check a CODEOWNERS-only hit with
-  `gh repo view <repo> --json isArchived`.
+- Code search skips archived repos, so CODEOWNERS hits are already non-archived.
