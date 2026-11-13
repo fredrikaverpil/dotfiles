@@ -38,7 +38,6 @@ Column {
         title: "Brightness"
 
         Ui.PanelSlider {
-            id: brightnessSlider
             shell: root.shell
             value: root.brightness.percent / 100
             valueText: root.brightness.percent + "%"

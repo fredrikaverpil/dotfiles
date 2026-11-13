@@ -36,7 +36,6 @@ Column {
     Ui.PanelScroller {
         visible: root.service.days.length > 0
         shell: root.shell
-        spacing: 24
 
         Repeater {
             model: root.service.days
