@@ -1,3 +1,5 @@
+.import "../../../Ui/Time.js" as Time
+
 // SMHI's impact-based warnings: one file for all of Sweden, open data under
 // CC BY 4.0. Each warning holds areas, each with its level, window and a
 // GeoJSON outline, so a place's warnings are those whose outline holds it.
@@ -159,29 +161,14 @@ function warningsAt(raw, latitude, longitude, now) {
   return found;
 }
 
-var DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-function pad(number) {
-  return (number < 10 ? "0" : "") + number;
-}
-
-// "23:00" today, "Fri 23:00" on another day.
-function when(time, now) {
-  var date = new Date(time);
-  var clock = pad(date.getHours()) + ":" + pad(date.getMinutes());
-  return date.toDateString() === now.toDateString()
-    ? clock
-    : DAY_NAMES[date.getDay()] + " " + clock;
-}
-
 // "Yellow warning: snow, until Fri 23:00"; one yet to start says when it
 // does, one without an end says neither.
 function describe(warning, now) {
   var reference = now instanceof Date ? now : new Date();
   var text = warning.severity + " warning: " + warning.event.toLowerCase();
   if (warning.start !== null && warning.start > reference.getTime())
-    return text + ", from " + when(warning.start, reference);
+    return text + ", from " + Time.stamp(new Date(warning.start), reference);
   if (warning.end !== null)
-    return text + ", until " + when(warning.end, reference);
+    return text + ", until " + Time.stamp(new Date(warning.end), reference);
   return text;
 }
