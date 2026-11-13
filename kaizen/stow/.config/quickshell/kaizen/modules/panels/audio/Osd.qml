@@ -66,7 +66,7 @@ PanelWindow {
             color: root.shell.palette.fg
             font.family: Ui.Fonts.mono
             font.pixelSize: 18
-            text: root.mic ? (root.service.micMuted ? "󰍭" : "󰍬") : root.service.icon
+            text: root.mic ? root.service.micIcon : root.service.icon
         }
 
         Text {

@@ -65,7 +65,9 @@ Every panel has the same shape, top to bottom:
   state ("Default route via Ethernet"), or why there is none. Left out when
   it would repeat what the panel shows below.
 - Optionally, a slider or meter for the key value, 16 under the header. It is
-  part of the header: no section label.
+  part of the header: no section label. A panel with a value per group
+  (audio's output and input volume) puts each group's slider first in its
+  group instead, over its rows and 4 above them.
 - A slider's or meter's value sits right of its track at 14 px, in a column
   as wide as `100%`, so stacked tracks end together. It takes the fill's
   colour: `off` while muted, the status colour on a meter.
@@ -87,12 +89,13 @@ Every panel has the same shape, top to bottom:
   panel reads at a glance: what is current (the connected network's SSID and
   signal) shows in the group's details table. The heading is a focus stop
   that expands or collapses its sub-group.
-- A panel about picking a device (audio) lists every device as a row, since
-  the choice is what it shows. A panel that sets up an action (recording)
-  shows each setting as one row instead, label left and control right, so
-  the whole setup reads at a glance: `‹ value ›` for a setting with many
-  values, which h/l or a click step, and a segmented control sized to its
-  labels for a few (On/Off, which output a display mirrors).
+- A panel about picking a device (audio) lists every device as a row, a
+  group per kind (Output, Input), since the choice is what it shows. A panel
+  that sets up an action (recording) shows each setting as one row instead,
+  label left and control right, so the whole setup reads at a glance:
+  `‹ value ›` for a setting with many values, which h/l or a click step, and
+  a segmented control sized to its labels for a few (On/Off, which output a
+  display mirrors).
 - Many values about one thing form a details table: labels in `off`, values
   in `fg` right-aligned, or in their status colour ("Not synchronised" in
   `wood`), both 14 px, two pairs to a line in a wide card or where every

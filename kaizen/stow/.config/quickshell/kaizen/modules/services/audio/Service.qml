@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell.Io
 import Quickshell.Services.Pipewire
 
-// The default sink's volume and mute, the sinks to pick from, and every source's mute.
+// The default sink's and source's volume and mute, and the devices to pick each from.
 Item {
     id: root
 
@@ -11,7 +11,11 @@ Item {
     readonly property real volume: sink && sink.audio ? sink.audio.volume : 0
     readonly property bool muted: sink && sink.audio ? sink.audio.muted : false
     readonly property var sources: Pipewire.nodes ? Pipewire.nodes.values.filter(node => node && node.audio && !node.isSink && !node.isStream) : []
+    readonly property var source: Pipewire.defaultAudioSource
+    readonly property real micVolume: source && source.audio ? source.audio.volume : 0
+    // Every source muted: the mic-mute key and LED treat the mic as one.
     readonly property bool micMuted: sources.length > 0 && sources.every(node => node.audio.muted)
+    readonly property string micIcon: micMuted ? "󰍭" : "󰍬"
     readonly property string icon: muted || volume <= 0 ? "󰖁" : volume < 0.34 ? "󰕿" : volume < 0.67 ? "󰖀" : "󰕾"
 
     // Emitted by the volume and mic-mute keys, for the OSD.
@@ -25,6 +29,12 @@ Item {
         if (!sink || !sink.audio)
             return;
         sink.audio.volume = Math.max(0, Math.min(1, value));
+    }
+
+    function setMicVolume(value) {
+        if (!source || !source.audio)
+            return;
+        source.audio.volume = Math.max(0, Math.min(1, value));
     }
 
     function toggleMute() {
@@ -53,6 +63,12 @@ Item {
     function setDefault(node) {
         if (node && node !== sink)
             Pipewire.preferredDefaultAudioSink = node;
+    }
+
+    // As setDefault, for the input.
+    function setDefaultSource(node) {
+        if (node && node !== source)
+            Pipewire.preferredDefaultAudioSource = node;
     }
 
     // PipeWire node properties do not bind until their objects are tracked.

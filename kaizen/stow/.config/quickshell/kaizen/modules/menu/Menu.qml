@@ -218,6 +218,11 @@ Ui.Panel {
             label: "Output",
             provider: "sinks"
         },
+        "settings.audio.input": {
+            icon: "󰍬",
+            label: "Input",
+            provider: "sources"
+        },
         "settings.audio.settings": {
             icon: "󰒓",
             label: "Audio settings…",
@@ -674,6 +679,17 @@ Ui.Panel {
                 }));
     }
 
+    function sourceRows() {
+        const audio = menu.shell.audioService;
+        return audio.sources.map(node => ({
+                    label: audio.label(node),
+                    icon: menu.radio(node === audio.source),
+                    detail: "",
+                    enabled: true,
+                    action: () => audio.setDefaultSource(node)
+                }));
+    }
+
     function textScaleRows() {
         return menu.shell.display.textScales.map(value => ({
                     label: Math.round(value * 100) + "%",
@@ -812,6 +828,9 @@ Ui.Panel {
             },
             sinks: function () {
                 return menu.sinkRows();
+            },
+            sources: function () {
+                return menu.sourceRows();
             },
             textScales: function () {
                 return menu.textScaleRows();
