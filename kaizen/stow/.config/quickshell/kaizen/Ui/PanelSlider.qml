@@ -49,14 +49,13 @@ Item {
         color: slider.activeFocus && slider.interactive ? slider.shell.palette.sel : "transparent"
     }
 
-    MouseArea {
+    HoverArea {
         anchors.fill: parent
         anchors.leftMargin: -8
         anchors.rightMargin: -8
         enabled: slider.interactive
         acceptedButtons: Qt.NoButton
-        hoverEnabled: true
-        onEntered: slider.forceActiveFocus()
+        onPointed: slider.forceActiveFocus()
     }
 
     Text {
@@ -105,13 +104,12 @@ Item {
             color: slider.fillColor
         }
 
-        MouseArea {
+        HoverArea {
             anchors.fill: parent
             anchors.topMargin: -11
             anchors.bottomMargin: -11
             enabled: slider.interactive
-            hoverEnabled: true
-            onEntered: slider.forceActiveFocus()
+            onPointed: slider.forceActiveFocus()
             onPressed: function (mouse) {
                 slider.moved(Math.max(0, Math.min(1, mouse.x / width)));
             }

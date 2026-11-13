@@ -27,12 +27,11 @@ Item {
         color: row.activeFocus ? row.shell.palette.sel : "transparent"
     }
 
-    MouseArea {
+    HoverArea {
         anchors.fill: parent
         anchors.leftMargin: -8
         anchors.rightMargin: -8
-        hoverEnabled: true
-        onEntered: row.forceActiveFocus()
+        onPointed: row.forceActiveFocus()
         onClicked: row.activated()
     }
 }
