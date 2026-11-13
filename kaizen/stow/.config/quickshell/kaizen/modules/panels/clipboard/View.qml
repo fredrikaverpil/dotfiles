@@ -2,6 +2,7 @@ import QtQuick
 
 import "../../../Ui" as Ui
 import "../../services/clipboard/ClipboardModel.js" as Model
+import "../../../Ui/Time.js" as Time
 
 Column {
     id: root
@@ -159,7 +160,7 @@ Column {
             color: root.shell.palette.off
             font.family: Ui.Fonts.mono
             font.pixelSize: 14
-            text: Model.stamp(row.modelData.at, root.now)
+            text: Time.stamp(row.modelData.at, root.now)
         }
 
         MouseArea {

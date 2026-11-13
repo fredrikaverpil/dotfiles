@@ -3,6 +3,7 @@ import QtQuick
 import "../../../Ui" as Ui
 import "../../services/weather/WarningsModel.js" as Warnings
 import "../../services/weather/WeatherModel.js" as Model
+import "../../../Ui/Time.js" as Time
 
 Column {
     id: root
@@ -10,7 +11,7 @@ Column {
     required property var shell
     required property var service
 
-    readonly property string updated: service.updatedAt ? Qt.formatDateTime(service.updatedAt, "HH:mm") : ""
+    readonly property string updated: service.updatedAt ? Time.stamp(service.updatedAt, new Date()) : ""
     readonly property var outlook: service.outlook
     // SMHI's warnings, then the outlook's risks: [{ level, icon, text }], worst first in each.
     readonly property var alerts: service.warnings.map(warning => ({

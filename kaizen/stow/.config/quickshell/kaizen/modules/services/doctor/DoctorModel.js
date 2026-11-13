@@ -1,3 +1,5 @@
+.import "../../../Ui/Time.js" as Time
+
 // The report as `kaizen doctor --json` prints it: { findings, text }, each
 // finding { source, id, level, unit, message, hint, count, first, last },
 // times in milliseconds since the epoch, level ERROR or WARN, hint only with a
@@ -59,28 +61,13 @@ function role(level) {
   return level === "WARN" ? "wood" : "rose";
 }
 
-function pad(value) {
-  return (value < 10 ? "0" : "") + value;
-}
-
-function clock(time) {
-  var date = new Date(time);
-  return (
-    pad(date.getHours()) +
-    ":" +
-    pad(date.getMinutes()) +
-    ":" +
-    pad(date.getSeconds())
-  );
-}
-
 // When a logged finding happened: ×count when more than one, then the first
 // time and, when it differs, the last. A check's finding is as old as the run:
 // "".
-function when(finding) {
+function when(finding, now) {
   if (finding.source === "check") return "";
-  var from = clock(finding.first);
-  var to = clock(finding.last);
+  var from = Time.stamp(new Date(finding.first), now);
+  var to = Time.stamp(new Date(finding.last), now);
   return (
     (finding.count > 1 ? "×" + finding.count + " · " : "") +
     (from === to ? from : from + "–" + to)

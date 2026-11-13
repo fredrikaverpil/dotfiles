@@ -6,6 +6,7 @@ import Quickshell
 
 import "../../../Ui" as Ui
 import "../NotificationLogic.js" as NotificationLogic
+import "../../../Ui/Time.js" as Time
 
 Rectangle {
     id: root
@@ -422,7 +423,7 @@ Rectangle {
                 Text {
                     Layout.fillWidth: true
                     visible: !root.toast && Number(root.row.timestamp) > 0
-                    text: Qt.formatDateTime(new Date(Number(root.row.timestamp)), "ddd HH:mm")
+                    text: Time.stamp(new Date(Number(root.row.timestamp)), new Date())
                     color: root.palette.off
                     font.family: Ui.Fonts.mono
                     font.pixelSize: 11

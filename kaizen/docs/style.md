@@ -152,6 +152,9 @@ Every panel has the same shape, top to bottom:
 - A section label is in sentence case, 14 px, in `fg`, at its rule's left: no
   smaller than the body it heads, and set apart from it by the rule, not by
   colour.
+- A time when something happened reads "14:01" on the same day and "Wed
+  13:02" before it, without seconds
+  ([`Ui/Time.js`](../stow/.config/quickshell/kaizen/Ui/Time.js)).
 - Colour carries a role or a status, never decoration.
 
 ## Status

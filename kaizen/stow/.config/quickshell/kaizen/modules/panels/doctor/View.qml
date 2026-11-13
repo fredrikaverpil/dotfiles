@@ -2,6 +2,7 @@ import QtQuick
 
 import "../../../Ui" as Ui
 import "../../services/doctor/DoctorModel.js" as Model
+import "../../../Ui/Time.js" as Time
 
 Column {
     id: root
@@ -48,7 +49,7 @@ Column {
             if (service.checked === 0)
                 return service.running ? "Checking…" : "Check failed";
             const counts = service.findings.length === 0 ? "No errors or warnings" : Model.summary(service.counts);
-            return counts + " · checked " + Model.clock(service.checked);
+            return counts + " · checked " + Time.stamp(new Date(service.checked), new Date());
         }
     }
 
@@ -183,7 +184,7 @@ Column {
                     color: row.copied ? root.shell.palette.leaf : root.shell.palette.off
                     font.family: Ui.Fonts.mono
                     font.pixelSize: 14
-                    text: row.copied ? "Copied" : Model.when(row.finding)
+                    text: row.copied ? "Copied" : Model.when(row.finding, new Date())
                 }
             }
 

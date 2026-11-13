@@ -3,6 +3,7 @@ import QtQuick
 import "../../../Ui" as Ui
 import "../../services/firmware/FirmwareModel.js" as Model
 import "../../../Ui/InfoTableModel.js" as Table
+import "../../../Ui/Time.js" as Time
 
 Column {
     id: root
@@ -49,7 +50,7 @@ Column {
             if (service.checking && service.lastChecked === 0)
                 return "Checking…";
             const count = service.updates.length;
-            const checked = service.lastChecked === 0 ? "" : " · checked " + Qt.formatDateTime(new Date(service.lastChecked), "HH:mm");
+            const checked = service.lastChecked === 0 ? "" : " · checked " + Time.stamp(new Date(service.lastChecked), new Date());
             if (count === 0 && service.errors.length > 0)
                 return "Check failed" + checked;
             return (count === 0 ? "Up to date" : count + " pending") + checked;

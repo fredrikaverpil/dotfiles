@@ -191,7 +191,7 @@ TestCase {
                     first: morning,
                     last: morning
                 }),
-                want: "08:41:23"
+                want: "08:41"
             },
             {
                 tag: "repeated over a span",
@@ -200,16 +200,16 @@ TestCase {
                     first: morning,
                     last: morning + 65000
                 }),
-                want: "×3 · 08:41:23–08:42:28"
+                want: "×3 · 08:41–08:42"
             },
             {
-                tag: "repeated in one second",
+                tag: "repeated in one minute",
                 finding: Object.assign({}, warning, {
                     count: 4,
                     first: morning,
-                    last: morning + 200
+                    last: morning + 20000
                 }),
-                want: "×4 · 08:41:23"
+                want: "×4 · 08:41"
             },
             {
                 tag: "check",
@@ -221,7 +221,7 @@ TestCase {
 
     function test_when(data) {
         // Act
-        const got = Doctor.when(data.finding);
+        const got = Doctor.when(data.finding, new Date(morning));
 
         // Assert
         verify(got === data.want, got);
@@ -250,13 +250,5 @@ TestCase {
 
         // Assert
         verify(got === data.want, got);
-    }
-
-    function test_clock() {
-        // Act
-        const got = Doctor.clock(morning);
-
-        // Assert
-        verify(got === "08:41:23", got);
     }
 }
