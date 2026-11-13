@@ -42,21 +42,25 @@ Column {
         }
     }
 
-    Ui.Section {
-        visible: root.service.powered && root.service.devices.length > 0
+    Ui.PanelScroller {
         shell: root.shell
-        title: "Paired devices"
 
-        Column {
-            width: parent.width
-            spacing: 4
+        Ui.Section {
+            visible: root.service.powered && root.service.devices.length > 0
+            shell: root.shell
+            title: "Paired devices"
 
-            Repeater {
-                model: root.service.powered ? root.service.devices : []
+            Column {
+                width: parent.width
+                spacing: 4
 
-                delegate: DeviceRow {
-                    required property var modelData
-                    device: modelData
+                Repeater {
+                    model: root.service.powered ? root.service.devices : []
+
+                    delegate: DeviceRow {
+                        required property var modelData
+                        device: modelData
+                    }
                 }
             }
         }
