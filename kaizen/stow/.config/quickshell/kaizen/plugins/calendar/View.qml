@@ -103,7 +103,7 @@ Column {
         id: row
 
         required property var modelData
-        readonly property bool past: modelData.until > 0 && modelData.until <= root.now.getTime()
+        readonly property bool past: Model.ended(modelData, root.now)
         readonly property color textColor: past ? root.shell.palette.off : root.shell.palette.fg
 
         width: root.width

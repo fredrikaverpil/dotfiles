@@ -172,6 +172,11 @@ function underway(event, now) {
   );
 }
 
+// Over by now; one without a readable end never is.
+function ended(event, now) {
+  return event.until > 0 && event.until <= now.getTime();
+}
+
 // The panel's subtitle: today's next timed event to start.
 function nextLabel(days, now) {
   var time = now.getTime();

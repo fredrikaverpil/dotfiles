@@ -316,6 +316,47 @@ TestCase {
         compare(Calendar.underway(data.event, now), data.want);
     }
 
+    function test_ended_data() {
+        return [
+            {
+                tag: "ended",
+                event: row("Ended", 9, 10),
+                want: true
+            },
+            {
+                tag: "ends now",
+                event: row("Ends", 11, 12),
+                want: true
+            },
+            {
+                tag: "under way",
+                event: row("Started", 11, 13),
+                want: false
+            },
+            {
+                tag: "later",
+                event: row("Later", 17, 18),
+                want: false
+            },
+            {
+                tag: "all day",
+                event: row("All day", 0, 24, true),
+                want: false
+            },
+            {
+                tag: "unreadable",
+                event: row("Unreadable", null, null),
+                want: false
+            }
+        ];
+    }
+
+    function test_ended(data) {
+        const got = Calendar.ended(data.event, now);
+
+        compare(got, data.want);
+    }
+
     function test_next_label_data() {
         const today = [row("All day", 0, 24, true), row("Ended", 9, 10), row("Started", 11, 13), row("Review", 14, 15), row("Late", 17, 18)];
         return [
