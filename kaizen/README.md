@@ -8,7 +8,8 @@ desktop that an agent can drive and verify from a terminal.
 - [`features.md`](docs/features.md): description of individual features.
 - [`plugins.md`](docs/plugins.md): optional shell extensions and how to write
   one.
-- [`style.md`](docs/style.md): palette, colour roles, shapes, status marks.
+- [`style.md`](docs/style.md): palette, colour roles, shapes, panels, status
+  marks.
 - [`interaction.md`](docs/interaction.md): keys, menus, the bar, panels, tray
   and applications.
 - [`development.md`](docs/development.md): working on kaizen, validation and
@@ -23,7 +24,7 @@ desktop that an agent can drive and verify from a terminal.
   and drives their state, never owns a copy of it.
 - Build only what is used. A panel exists only where a subsystem has no
   keyboard-first face; infrequent tasks go to a purpose-built application
-  (bluetui, nm-connection-editor, wdisplays).
+  (bluetui, nm-connection-editor, pwvucontrol, wdisplays).
 - Keyboard-first everywhere. Pointer-only controls are bugs.
 - Every action is reachable from a terminal: the `kaizen` commands
   (`kaizen --json` lists them; `kaizen ipc` drives the shell), `niri msg` or
@@ -298,7 +299,7 @@ runs.
 
 | Service | Subsystem | Bar | Panel / launcher | IPC |
 | --- | --- | --- | --- | --- |
-| audio (panel only) | [PipeWire] via [Quickshell] | volume button | Settings › Audio | `audio` |
+| audio | [PipeWire] via [Quickshell] | volume button | Settings › Audio | `audio` |
 | battery | [UPower], [sysfs power_supply] thresholds, [power-profiles-daemon] | battery button | Settings › Power | `battery` |
 | bluetooth | [BlueZ] via [Quickshell] | button | Settings › Bluetooth | `bluetooth` |
 | brightness | [sysfs backlight] via [logind] SetBrightness | – | XF86 keys | `brightness` |
@@ -313,8 +314,8 @@ runs.
 | nightlight | [wl-gammarelay-rs] over D-Bus, the weather location for the solar position | – | Settings › Display › Nightlight | `nightlight` |
 | recording | [gpu-screen-recorder], [grim], [satty], [PipeWire] | recording indicator | Trigger › Record, Pause, Stop, Screenshot (region, desktop, window) | `recording` |
 | system | [hwmon], `/proc` load | alert indicator | Settings › Display | `system`, `display` |
-| timezone | [timedated] via `timedatectl`, `zdump` for the DST rules | time button | Settings › Clock | `timezone` |
-| weather | [met.no locationforecast] | button | Settings › Weather | `weather` |
+| timezone | [timedated] via `timedatectl`, `zdump` for the DST rules | time button | Settings › Time | `timezone` |
+| weather | [met.no locationforecast], [SMHI warnings] for Swedish places | button | Settings › Weather | `weather` |
 | notifications | [Desktop Notifications] server, the compositor's screencasts for DnD | bell button | Settings › Notifications | `notifications` |
 | lock | [ext-session-lock] + [PAM] `kaizen-lock` | – | Settings › Session | `lock` |
 | curtain | [wlr-layer-shell] + [PAM] | – | Settings › Session | `curtain` |
@@ -344,6 +345,7 @@ runs.
 [satty]: https://github.com/gabm/Satty
 [hwmon]: https://docs.kernel.org/hwmon/sysfs-interface.html
 [met.no locationforecast]: https://api.met.no/weatherapi/locationforecast/2.0/documentation
+[SMHI warnings]: https://opendata.smhi.se/warnings
 [Desktop Notifications]: https://specifications.freedesktop.org/notification-spec/latest/
 [ext-session-lock]: https://wayland.app/protocols/ext-session-lock-v1
 [PAM]: https://github.com/linux-pam/linux-pam
@@ -488,8 +490,8 @@ umbriel leaves it on, since no config sets its `[events]` lid commands.
   unit's `StateDirectory=` creates the state root.
 - Many or unbounded entries get a subdirectory
   (`kaizen-shell/wallpaper-thumbs/`); a single file is written directly
-  (`kaizen-shell/weather-<lat>_<lon>.json`). Moving from one file to one per
-  input needs a sweep first.
+  (`kaizen-shell/weather-complete-<lat>_<lon>.json`). Moving from one file to
+  one per input needs a sweep first.
 - Every cache producer prunes its own entries, since nothing prunes `~/.cache`
   on these hosts: touch an entry on use (a hit or a 304 counts) and delete
   entries older than 30 days in the same pass. A producer that cannot age

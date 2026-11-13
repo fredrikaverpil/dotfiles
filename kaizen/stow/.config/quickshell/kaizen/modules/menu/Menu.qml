@@ -134,7 +134,7 @@ Ui.Panel {
         },
         "settings.weather.forecast": {
             icon: "󰖐",
-            label: "Today on yr.no",
+            label: "Hourly on yr.no",
             action: () => menu.shell.weather.openForecast()
         },
         "settings.weather.location": {
@@ -142,16 +142,16 @@ Ui.Panel {
             label: "Location",
             provider: "places"
         },
-        "settings.clock": {
+        "settings.time": {
             icon: "󰅐",
-            label: "Clock"
+            label: "Time"
         },
-        "settings.clock.panel": {
+        "settings.time.panel": {
             icon: "󰕮",
-            label: "Clock panel",
+            label: "Time panel",
             action: () => menu.shell.timezone.open()
         },
-        "settings.clock.timezone": {
+        "settings.time.timezone": {
             icon: "󰅐",
             label: "Timezone",
             provider: "zones"
@@ -192,7 +192,7 @@ Ui.Panel {
             provider: "players"
         },
         "settings.audio": {
-            icon: menu.shell.audio.icon,
+            icon: menu.shell.audioService.icon,
             label: "Audio"
         },
         "settings.audio.panel": {
@@ -201,22 +201,32 @@ Ui.Panel {
             action: () => menu.shell.audio.open()
         },
         "settings.audio.mute": {
-            icon: menu.checkbox(!menu.shell.audio.muted),
+            icon: menu.checkbox(!menu.shell.audioService.muted),
             label: "Sound",
             ipc: "audio mute",
-            action: () => menu.shell.audio.toggleMute()
+            action: () => menu.shell.audioService.toggleMute()
         },
         "settings.audio.micMute": {
-            icon: menu.checkbox(!menu.shell.audio.micMuted),
+            icon: menu.checkbox(!menu.shell.audioService.micMuted),
             label: "Microphone",
             ipc: "audio micMute",
-            enabled: menu.shell.audio.sources.length > 0,
-            action: () => menu.shell.audio.toggleMicMute()
+            enabled: menu.shell.audioService.sources.length > 0,
+            action: () => menu.shell.audioService.toggleMicMute()
         },
         "settings.audio.output": {
             icon: "󰓃",
             label: "Output",
             provider: "sinks"
+        },
+        "settings.audio.input": {
+            icon: "󰍬",
+            label: "Input",
+            provider: "sources"
+        },
+        "settings.audio.settings": {
+            icon: "󰒓",
+            label: "Audio settings…",
+            action: () => menu.shell.audio.openSettings()
         },
         "settings.display": {
             icon: "󰍹",
@@ -306,9 +316,9 @@ Ui.Panel {
             label: "Devices",
             provider: "devices"
         },
-        "settings.bluetooth.pair": {
-            icon: "󰐕",
-            label: "Pair new device…",
+        "settings.bluetooth.settings": {
+            icon: "󰒓",
+            label: "Bluetooth settings…",
             enabled: menu.shell.bluetoothService.available,
             action: () => Quickshell.execDetached(["xdg-terminal-exec", "bluetui"])
         },
@@ -326,16 +336,6 @@ Ui.Panel {
             label: "Wi-Fi",
             enabled: menu.shell.networkService.wifiDevice !== null,
             action: () => menu.shell.networkService.toggleWifi()
-        },
-        // The scanner runs only while the panel is open.
-        "settings.network.scan": {
-            icon: "󰐷",
-            label: "Scan",
-            enabled: menu.shell.networkService.wifiEnabled,
-            action: () => {
-                menu.shell.network.open();
-                menu.shell.networkService.scan();
-            }
         },
         "settings.network.networks": {
             icon: "󰖩",
@@ -374,12 +374,12 @@ Ui.Panel {
         },
         "settings.notifications.clear": {
             icon: "󰃢",
-            label: "Clear",
+            label: "Clear history",
             action: () => menu.shell.notifications.clearHistory()
         },
         "settings.notifications.dnd": {
             icon: menu.checkbox(menu.shell.notifications.doNotDisturb),
-            label: "DnD (Do not disturb)",
+            label: "Pause notifications",
             action: () => menu.shell.notifications.setDoNotDisturb(!menu.shell.notifications.doNotDisturb)
         },
         "settings.keyboard": {
@@ -669,13 +669,24 @@ Ui.Panel {
     }
 
     function sinkRows() {
-        const audio = menu.shell.audio;
+        const audio = menu.shell.audioService;
         return audio.sinks.map(node => ({
                     label: audio.label(node),
                     icon: menu.radio(node === audio.sink),
-                    detail: "",
+                    detail: audio.isUnplugged(node) ? "󰚦" : "",
                     enabled: true,
                     action: () => audio.setDefault(node)
+                }));
+    }
+
+    function sourceRows() {
+        const audio = menu.shell.audioService;
+        return audio.sources.map(node => ({
+                    label: audio.label(node),
+                    icon: menu.radio(node === audio.source),
+                    detail: audio.isUnplugged(node) ? "󰚦" : "",
+                    enabled: true,
+                    action: () => audio.setDefaultSource(node)
                 }));
     }
 
@@ -817,6 +828,9 @@ Ui.Panel {
             },
             sinks: function () {
                 return menu.sinkRows();
+            },
+            sources: function () {
+                return menu.sourceRows();
             },
             textScales: function () {
                 return menu.textScaleRows();
@@ -976,38 +990,43 @@ Ui.Panel {
         }
     }
 
-    Text {
-        color: menu.shell.palette.off
-        font.family: Ui.Fonts.mono
-        font.pixelSize: 13
-        text: menu.breadcrumb
-    }
+    Column {
+        anchors.fill: parent
+        spacing: 8
 
-    Ui.MenuCard {
-        id: card
-        width: parent.width
-        height: parent.height - y
-        shell: menu.shell
-        rows: menu.cardRows(menu.level, null, card.query, menu.launchCounts)
-        placeholder: menu.level === "root" ? "Search…" : "Filter " + menu.items[menu.level].label.toLowerCase() + "…"
-        openerKeys: menu.keyOpened ? menu.toggleKeys : []
-        fontSize: 14
-        rowHeight: 28
-        // The panel fixes the width; Emoji has thousands of rows.
-        maxWidth: 0
+        Text {
+            color: menu.shell.palette.off
+            font.family: Ui.Fonts.mono
+            font.pixelSize: 13
+            text: menu.breadcrumb
+        }
 
-        onOpenRequested: row => {
-            menu.open(row.key);
-            card.settle();
+        Ui.MenuCard {
+            id: card
+            width: parent.width
+            height: parent.height - y
+            shell: menu.shell
+            rows: menu.cardRows(menu.level, null, card.query, menu.launchCounts)
+            placeholder: menu.level === "root" ? "Search…" : "Filter " + menu.items[menu.level].label.toLowerCase() + "…"
+            openerKeys: menu.keyOpened ? menu.toggleKeys : []
+            fontSize: 14
+            rowHeight: 28
+            // The panel fixes the width; Emoji has thousands of rows.
+            maxWidth: 0
+
+            onOpenRequested: row => {
+                menu.open(row.key);
+                card.settle();
+            }
+            // A row without an action (a keybinding) is there to read.
+            onRunRequested: row => {
+                if (!row.triggered)
+                    return;
+                menu.close();
+                row.triggered();
+            }
+            onBackRequested: menu.back()
+            onCloseRequested: menu.close()
         }
-        // A row without an action (a keybinding) is there to read.
-        onRunRequested: row => {
-            if (!row.triggered)
-                return;
-            menu.close();
-            row.triggered();
-        }
-        onBackRequested: menu.back()
-        onCloseRequested: menu.close()
     }
 }

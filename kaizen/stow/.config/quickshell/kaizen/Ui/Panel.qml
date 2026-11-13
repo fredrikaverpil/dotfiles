@@ -9,14 +9,14 @@ PanelWindow {
     required property var shell
     property bool shown: false
     property int cardWidth: 600
-    property int cardHeight: 420
+    // Fits the content; a card of fixed height (the launcher, the picker) sets it.
+    property int cardHeight: body.childrenRect.height + 2 * Space.cardPadding
     readonly property int barHeight: shell ? shell.barHeight : 32
 
     property bool keyNavigation: false
     property bool focusPrimed: false
 
-    default property alias content: column.data
-    readonly property alias contentSpacing: column.spacing
+    default property alias content: body.data
 
     function open() {
         if (shell && shell.registerPanel)
@@ -34,13 +34,14 @@ PanelWindow {
         shown ? close() : open();
     }
 
+    // Nothing is focused on open: the first step, either way, lands on the first stop.
     function focusStep(forward) {
-        const current = column.Window.activeFocusItem;
+        const current = body.Window.activeFocusItem;
         if (!current) {
-            column.forceActiveFocus();
+            body.forceActiveFocus();
             return;
         }
-        const next = current.nextItemInFocusChain(forward);
+        const next = current === body ? body.nextItemInFocusChain(true) : current.nextItemInFocusChain(forward);
         if (next)
             next.forceActiveFocus(Qt.TabFocusReason);
     }
@@ -48,7 +49,7 @@ PanelWindow {
     onShownChanged: {
         focusPrimed = false;
         if (shown && keyNavigation)
-            column.forceActiveFocus();
+            body.forceActiveFocus();
     }
     Component.onCompleted: if (shell && shell.registerPanel)
         shell.registerPanel(panel)
@@ -100,7 +101,7 @@ PanelWindow {
             height: panel.cardHeight
             // Follows the text size, capped to stay clear of the bar and screen edges.
             // The floor is 1, or the text size when that is smaller.
-            scale: Math.max(Math.min(1, panel.shell ? panel.shell.textScale : 1), Math.min(panel.shell ? panel.shell.textScale : 1, (panel.width - 32) / panel.cardWidth, (panel.height - 2 * panel.barHeight - 32) / panel.cardHeight))
+            scale: Math.max(Math.min(1, panel.shell ? panel.shell.textScale : 1), Math.min(panel.shell ? panel.shell.textScale : 1, (panel.width - 32) / panel.cardWidth, Space.cardRoom(panel.height, panel.barHeight) / panel.cardHeight))
             radius: 8
             color: panel.shell.palette.bg
             border.color: panel.shell.palette.dim
@@ -124,13 +125,17 @@ PanelWindow {
                 anchors.fill: parent
             }
 
-            Column {
-                id: column
+            // Takes focus back when the focused item goes (a row whose entry left), so the card's keys keep working.
+            FocusScope {
                 anchors.fill: parent
-                anchors.margins: 12
-                spacing: 8
-
+                anchors.margins: Space.cardPadding
                 focus: panel.keyNavigation
+
+                Item {
+                    id: body
+                    anchors.fill: parent
+                    focus: panel.keyNavigation
+                }
             }
         }
     ]

@@ -4,6 +4,7 @@ import Quickshell.Io
 
 import "../../../Ui" as Ui
 import "PlacesModel.js" as Places
+import "WarningsModel.js" as Warnings
 import "WeatherModel.js" as Model
 
 Item {
@@ -21,16 +22,30 @@ Item {
     property bool stateLoaded: false
     property var current: null
     property var days: []
+    property var outlook: null
+    // SMHI's warnings at the place, worst first; fetched for Swedish places
+    // only (SMHI covers Sweden alone).
+    property var warnings: []
     property bool failed: false
     property var updatedAt: null
+    // When the forecast's Expires runs out, as the poll reads it; null until
+    // the first fetch.
+    property var expiresAt: null
 
-    readonly property bool busy: fetch.running
     readonly property bool ready: current !== null
+    readonly property string country: Places.countryAt(latitude, longitude)
+    readonly property bool swedish: country === "Sweden"
+    // SMHI's warnings, then the outlook's risks, worst first in each: each
+    // { level, icon }, a risk with its `text` (Warnings.alertText).
+    readonly property var alerts: warnings.concat(outlook ? outlook.risks : [])
+    // An icon per event among them, each in its worst level: [{ icon, level }].
+    readonly property var alertGlyphs: Warnings.glyphs(alerts)
+    // The worst of them: "", wood or rose.
+    readonly property string warningLevel: Warnings.worst(outlook ? outlook.level : "", warnings.length > 0 ? warnings[0].level : "")
     readonly property string icon: current ? Model.icon(current.symbol) : "󰖐"
     readonly property string condition: current ? Model.condition(current.symbol) : ""
     readonly property string temperature: current ? Model.temperature(current.temperature) : ""
-    readonly property string wind: current && isFinite(current.wind) ? Math.round(current.wind) + " m/s" : ""
-    readonly property string humidity: current && isFinite(current.humidity) ? Math.round(current.humidity) + "%" : ""
+    readonly property var details: Model.details(current, outlook)
     readonly property int pollMinutes: Math.round(poll.interval / 60000)
 
     // A switch made while the previous city is still in flight must not be
@@ -44,6 +59,27 @@ Item {
         }
         fetch.command = fetchCommand();
         fetch.running = true;
+        refreshWarnings();
+    }
+
+    function refreshWarnings() {
+        if (!swedish) {
+            warnings = [];
+            return;
+        }
+        if (warningsFetch.running)
+            return;
+        warningsFetch.command = ["sh", Quickshell.shellPath("modules/services/weather/warnings.sh"), Ui.Paths.cache, Warnings.URL, userAgent];
+        warningsFetch.running = true;
+    }
+
+    // MET's terms forbid fetching before Expires. The poll can run late after
+    // a suspend, so opening the panel catches up once the forecast expired.
+    function refreshIfExpired() {
+        if (!stateLoaded || fetch.running)
+            return;
+        if (expiresAt === null || Date.now() >= expiresAt.getTime())
+            refresh();
     }
 
     // Travel is rare enough not to justify an IP-geolocation service, and the
@@ -60,6 +96,8 @@ Item {
         place = String(name || "").length > 0 ? String(name) : lat + ", " + lon;
         current = null;
         days = [];
+        outlook = null;
+        warnings = [];
         saveState();
         refresh();
         return true;
@@ -93,9 +131,11 @@ Item {
         }
         current = report.current;
         days = report.days;
+        outlook = report.outlook;
         failed = false;
         updatedAt = new Date();
         poll.interval = Model.expiresInterval(separator < 0 ? "" : text.slice(0, separator));
+        expiresAt = new Date(Date.now() + poll.interval);
     }
 
     Process {
@@ -109,6 +149,20 @@ Item {
                 return;
             root.queued = false;
             Qt.callLater(root.refresh);
+        }
+    }
+
+    // A failed fetch prints nothing and keeps the warnings already shown. The
+    // place is read when the response lands, so a switch in flight cannot
+    // pin the previous city's warnings on the new one.
+    Process {
+        id: warningsFetch
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const found = root.swedish ? Warnings.warningsAt(text, root.latitude, root.longitude, new Date()) : [];
+                if (found !== null)
+                    root.warnings = found;
+            }
         }
     }
 

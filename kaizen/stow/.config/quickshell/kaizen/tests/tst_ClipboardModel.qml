@@ -175,9 +175,19 @@ TestCase {
                 want: "hello"
             },
             {
-                tag: "multiline",
+                tag: "first line",
                 text: "  one\n\ttwo  \n",
+                want: "one"
+            },
+            {
+                tag: "blank lines before",
+                text: "\n  \n\tone  two\nthree",
                 want: "one two"
+            },
+            {
+                tag: "blank",
+                text: " \n ",
+                want: ""
             },
             {
                 tag: "bounded",
@@ -188,6 +198,35 @@ TestCase {
     }
 
     function test_preview(data) {
-        verify(Model.preview(data.text) === data.want);
+        compare(Model.preview(data.text), data.want);
+    }
+
+    function test_more_lines_data() {
+        return [
+            {
+                tag: "one line",
+                text: "one",
+                want: 0
+            },
+            {
+                tag: "trailing newline",
+                text: "one\n",
+                want: 0
+            },
+            {
+                tag: "three lines",
+                text: "one\ntwo\nthree",
+                want: 2
+            },
+            {
+                tag: "blank lines at the ends",
+                text: "\n\none\n\nthree\n\n",
+                want: 2
+            },
+        ];
+    }
+
+    function test_more_lines(data) {
+        compare(Model.moreLines(data.text), data.want);
     }
 }

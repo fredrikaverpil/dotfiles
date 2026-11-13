@@ -6,6 +6,7 @@ import Quickshell
 
 import "../../../Ui" as Ui
 import "../NotificationLogic.js" as NotificationLogic
+import "../../../Ui/Time.js" as Time
 
 Rectangle {
     id: root
@@ -14,6 +15,8 @@ Rectangle {
     property var row: ({})
     property var notification: null
     property bool toast: false
+    // What a held card's time is read against.
+    property date now: new Date()
     // Animations run only while the card is on screen.
     property bool animated: toast
     property bool selectable: false
@@ -42,6 +45,8 @@ Rectangle {
     readonly property color accent: urgency === 2 ? palette.rose : (urgency === 0 ? palette.off : palette.fg)
     // A rule's border colour takes the place of the urgency's.
     readonly property color tint: palette[String(row.border || "")] ?? accent
+    // The still border: a rule's colour, rose when critical, else `dim` as every card's (style.md › Palette).
+    readonly property color outline: palette[String(row.border || "")] ?? (urgency === 2 ? palette.rose : palette.dim)
     readonly property bool orbiting: animated && row.animation === "orbit"
     readonly property bool beating: animated && row.animation === "heartbeat"
     readonly property bool glowing: animated && row.animation === "glow"
@@ -68,7 +73,7 @@ Rectangle {
     implicitHeight: content.implicitHeight + 24
     radius: 8
     color: activeFocus || selected ? palette.sel : palette.bg
-    border.color: tint
+    border.color: outline
     border.width: 1
     // A glowing or ringing card draws outside itself, over the cards beside it.
     clip: !glowing && !ringing
@@ -420,7 +425,7 @@ Rectangle {
                 Text {
                     Layout.fillWidth: true
                     visible: !root.toast && Number(root.row.timestamp) > 0
-                    text: Qt.formatDateTime(new Date(Number(root.row.timestamp)), "ddd HH:mm")
+                    text: Time.stamp(new Date(Number(root.row.timestamp)), root.now)
                     color: root.palette.off
                     font.family: Ui.Fonts.mono
                     font.pixelSize: 11

@@ -1,0 +1,173 @@
+import QtQuick
+
+import qs.Ui as Ui
+import "CalendarModel.js" as Model
+
+Column {
+    id: root
+
+    required property var shell
+    // The calendar service.
+    required property var service
+
+    // What past and under way are read against: the fetch, as the events.
+    readonly property date now: service.requestedAt
+    readonly property bool loading: !service.failed && service.days.length === 0
+
+    signal openRequested(var event)
+    signal joinRequested(var event)
+    signal appRequested
+
+    width: parent ? parent.width : 0
+    spacing: 24
+
+    Ui.PanelHeader {
+        shell: root.shell
+        title: "Calendar"
+        subtitle: {
+            if (root.service.failed)
+                return "dcal is not running";
+            if (root.loading)
+                return "Loading…";
+            return Model.nextLabel(root.service.days, root.now);
+        }
+    }
+
+    Ui.PanelScroller {
+        visible: root.service.days.length > 0
+        shell: root.shell
+
+        Repeater {
+            model: root.service.days
+
+            delegate: DaySection {}
+        }
+    }
+
+    Ui.PanelFooter {
+        shell: root.shell
+
+        Ui.PanelButton {
+            shell: root.shell
+            label: "Open calendar…"
+            onActivated: root.appRequested()
+        }
+    }
+
+    // A day: "Today" and "Tomorrow" name it, their date at the rule's right; later days by their date.
+    component DaySection: Ui.Section {
+        id: day
+
+        required property var modelData
+        required property int index
+        readonly property string date: Qt.formatDateTime(modelData.date, "dddd d MMMM")
+
+        shell: root.shell
+        title: index < 2 ? ["Today", "Tomorrow"][index] : date
+        value: index < 2 ? date : ""
+
+        Column {
+            width: root.width
+            spacing: 4
+
+            Repeater {
+                model: day.modelData.events
+
+                delegate: EventRow {}
+            }
+
+            Text {
+                visible: day.modelData.events.length === 0
+                color: root.shell.palette.off
+                font.family: Ui.Fonts.mono
+                font.pixelSize: 14
+                text: "No events"
+            }
+        }
+    }
+
+    // The widest time a row shows, so the summaries start together.
+    TextMetrics {
+        id: timeMetrics
+        font.family: Ui.Fonts.mono
+        font.pixelSize: 14
+        text: "00:00–00:00"
+    }
+
+    // An event: Enter, Space or a click opens it in dcal; Join, its own stop, opens the meeting.
+    component EventRow: Ui.PanelRow {
+        id: row
+
+        required property var modelData
+        readonly property bool past: Model.ended(modelData, root.now)
+        readonly property color textColor: past ? root.shell.palette.off : root.shell.palette.fg
+
+        width: root.width
+        shell: root.shell
+        onActivated: root.openRequested(row.modelData)
+
+        Text {
+            id: emoji
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            width: 24
+            horizontalAlignment: Text.AlignHCenter
+            font.family: Ui.Fonts.mono
+            font.pixelSize: 14
+            // A colour emoji ignores its text colour, so a past one fades rather than turning off.
+            opacity: row.past ? 0.5 : 1
+            text: row.modelData.emoji
+        }
+
+        Text {
+            id: time
+            anchors.left: emoji.right
+            anchors.leftMargin: 8
+            anchors.verticalCenter: parent.verticalCenter
+            width: timeMetrics.advanceWidth
+            color: Model.underway(row.modelData, root.now) ? root.shell.palette.fg : root.shell.palette.off
+            font.family: Ui.Fonts.mono
+            font.pixelSize: 14
+            text: row.modelData.time
+        }
+
+        // The summary keeps its room; the location takes what is left.
+        Text {
+            id: summary
+            anchors.left: time.right
+            anchors.leftMargin: 16
+            anchors.verticalCenter: parent.verticalCenter
+            width: Math.min(implicitWidth, row.width - x - (join.visible ? join.width + 16 : 0))
+            elide: Text.ElideRight
+            color: row.textColor
+            font.family: Ui.Fonts.mono
+            font.pixelSize: 14
+            textFormat: Text.PlainText
+            text: row.modelData.summary
+        }
+
+        Text {
+            anchors.left: summary.right
+            anchors.leftMargin: 16
+            anchors.right: join.visible ? join.left : parent.right
+            anchors.rightMargin: join.visible ? 16 : 0
+            anchors.verticalCenter: parent.verticalCenter
+            elide: Text.ElideRight
+            color: root.shell.palette.off
+            font.family: Ui.Fonts.mono
+            font.pixelSize: 14
+            textFormat: Text.PlainText
+            text: row.modelData.location
+        }
+
+        Ui.PanelButton {
+            id: join
+            visible: row.modelData.meetingUrl !== "" && !row.past
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            shell: root.shell
+            label: "Join"
+            onActivated: root.joinRequested(row.modelData)
+        }
+    }
+}

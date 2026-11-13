@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
 import Quickshell.Networking
 
@@ -33,40 +34,33 @@ Item {
     property string failureSsid: ""
     property string failureReason: ""
     property bool scanning: false
+    // Sorted by strength until the user touches the list, then held (freezeOrder).
+    property bool orderFrozen: false
+    // The panel's expanded Wi-Fi network groups, by key; the others start collapsed. Kept until the shell
+    // restarts.
+    property var expandedWifiGroups: ({})
+    // The internet's route: `ip route get 1.1.1.1`.
     property var connection: ({
             iface: "",
             ip: "",
-            gateway: "",
-            rxBytes: null,
-            txBytes: null
+            gateway: ""
         })
-    property var transfer: ({
-            iface: "",
-            rxBytes: 0,
-            txBytes: 0,
-            sampleTime: 0,
-            receivingRate: 0,
-            sendingRate: 0
-        })
-    property var ping: ({
-            iface: "",
-            samples: [],
-            latency: -1,
-            packetLoss: 0
-        })
-    // Keyed by "<iface> <gateway>" so switching networks on one iface resets samples.
-    property var gatewayPing: ({
-            iface: "",
-            samples: [],
-            latency: -1,
-            packetLoss: 0
-        })
+    // Default gateway per iface.
+    property var gateways: ({})
+    // Per iface: ip, gateway, transfer, ping (Cloudflare) and gatewayPing (Model.deviceDetails).
+    property var details: ({})
+    // Connected devices, and the route's iface when it is none of them (a VPN's).
+    readonly property var detailIfaces: {
+        const ifaces = [];
+        for (const device of networkDevices)
+            if (device && device.connected && device.name)
+                ifaces.push(device.name);
+        if (connection.iface && ifaces.indexOf(connection.iface) < 0)
+            ifaces.push(connection.iface);
+        return ifaces;
+    }
 
     readonly property bool busy: actionKind !== ""
-    readonly property bool hasConnection: connection.iface !== ""
-    readonly property bool hasTransfer: connection.rxBytes !== null && connection.txBytes !== null
-    readonly property bool hasPing: ping.samples && ping.samples.length > 0
-    readonly property bool hasGatewayPing: gatewayPing.samples && gatewayPing.samples.length > 0
 
     function actionState() {
         return {
@@ -101,10 +95,21 @@ Item {
     }
 
     function syncWifiNetworks() {
-        var ordered = Model.orderWifiNetworks(wifiNetworks, wifiNetworkObjects);
+        var ordered = Model.orderWifiNetworks(orderFrozen ? wifiNetworks : [], wifiNetworkObjects);
         if (!Model.sameWifiNetworks(ordered, wifiNetworks))
             wifiNetworks = ordered;
         checkActionCompletion();
+    }
+
+    // Rows then keep their positions, so a scan never moves one under a click or the cursor.
+    function freezeOrder() {
+        orderFrozen = true;
+    }
+
+    function toggleWifiGroup(key) {
+        const next = Object.assign({}, expandedWifiGroups);
+        next[key] = !next[key];
+        expandedWifiGroups = next;
     }
 
     function setScannerEnabled(enabled) {
@@ -132,85 +137,26 @@ Item {
             ipAddressProcess.running = true;
         if (!routeProcess.running)
             routeProcess.running = true;
+        if (!defaultRoutesProcess.running)
+            defaultRoutesProcess.running = true;
+        if (!linkStatsProcess.running)
+            linkStatsProcess.running = true;
     }
 
     function updateRoute(raw) {
-        var route = Model.parseRoute(raw);
-        var changed = route.iface !== connection.iface;
-        if (changed) {
-            transfer = ({
-                    iface: "",
-                    rxBytes: 0,
-                    txBytes: 0,
-                    sampleTime: 0,
-                    receivingRate: 0,
-                    sendingRate: 0
-                });
-            ping = ({
-                    iface: "",
-                    samples: [],
-                    latency: -1,
-                    packetLoss: 0
-                });
-        }
-
-        connection = {
-            iface: route.iface,
-            ip: route.ip,
-            gateway: route.gateway,
-            rxBytes: changed ? null : connection.rxBytes,
-            txBytes: changed ? null : connection.txBytes
-        };
-        if (!route.iface)
-            return;
-        if (!linkStatsProcess.running) {
-            linkStatsProcess.command = ["ip", "-j", "-s", "link", "show", "dev", route.iface];
-            linkStatsProcess.running = true;
-        }
-        startInternetPing(route.iface);
-        startGatewayPing(route.iface, route.gateway);
+        connection = Model.parseRoute(raw);
     }
 
-    function updateLinkStats(raw) {
-        var stats = Model.parseLinkStats(raw);
-        if (!stats.iface || stats.iface !== connection.iface)
-            return;
-        transfer = Model.transferState(transfer, stats, Date.now() / 1000);
-        connection = {
-            iface: connection.iface,
-            ip: connection.ip,
-            gateway: connection.gateway,
-            rxBytes: stats.rxBytes,
-            txBytes: stats.txBytes
-        };
+    function updateDetails(rawStats) {
+        details = Model.deviceDetails(details, detailIfaces, ipAddresses, gateways, Model.parseLinkStats(rawStats), Date.now() / 1000);
     }
 
-    function startInternetPing(iface) {
-        if (!active || !iface || internetPing.running)
-            return;
-        internetPing.iface = iface;
-        internetPing.command = ["ping", "-n", "-I", iface, "-c", "1", "-W", "1", "1.1.1.1"];
-        internetPing.running = true;
+    function recordPing(iface, which, key, raw) {
+        details = Model.recordDevicePing(details, iface, which, key, raw);
     }
 
-    function recordInternetPing(iface, raw) {
-        if (iface !== connection.iface)
-            return;
-        ping = Model.pingState(ping, iface, Model.parsePing(raw), 24, 5);
-    }
-
-    function startGatewayPing(iface, gateway) {
-        if (!active || !iface || !gateway || gatewayPingProcess.running)
-            return;
-        gatewayPingProcess.key = iface + " " + gateway;
-        gatewayPingProcess.command = ["ping", "-n", "-I", iface, "-c", "1", "-W", "1", gateway];
-        gatewayPingProcess.running = true;
-    }
-
-    function recordGatewayPing(key, raw) {
-        if (key !== connection.iface + " " + connection.gateway)
-            return;
-        gatewayPing = Model.pingState(gatewayPing, key, Model.parsePing(raw), 24, 5);
+    function detailsFor(iface) {
+        return details[iface] || null;
     }
 
     function setIpAddresses(raw) {
@@ -225,8 +171,8 @@ Item {
         return Model.deviceType(device.type, DeviceType);
     }
 
-    function deviceDetail(device) {
-        return Model.deviceDetail(device, ipAddresses, DeviceType, ConnectionState);
+    function deviceState(device) {
+        return Model.deviceState(device.type, DeviceType, !!device.hasLink, device.state, ConnectionState);
     }
 
     function wifiStatus(network) {
@@ -335,6 +281,25 @@ Item {
         Networking.wifiEnabled = !Networking.wifiEnabled;
     }
 
+    // Null for an iface without details (not connected).
+    function detailStatus(iface) {
+        const detail = details[iface];
+        if (!detail)
+            return null;
+        const transfer = detail.transfer;
+        return {
+            gateway: detail.gateway,
+            receivingRate: transfer ? transfer.receivingRate : null,
+            sendingRate: transfer ? transfer.sendingRate : null,
+            rxBytes: transfer ? transfer.rxBytes : null,
+            txBytes: transfer ? transfer.txBytes : null,
+            ping: detail.ping.latency,
+            packetLoss: detail.ping.packetLoss,
+            gatewayPing: detail.gatewayPing.latency,
+            gatewayPacketLoss: detail.gatewayPing.packetLoss
+        };
+    }
+
     function status() {
         var devices = [];
         var source = networkDevices || [];
@@ -346,35 +311,32 @@ Item {
                 name: device.name,
                 type: deviceTypeName(device),
                 state: Model.connectionState(device.state, ConnectionState),
-                ip: ipFor(device)
+                ip: ipFor(device),
+                details: detailStatus(device.name)
             });
         }
         return JSON.stringify({
             kind: kind,
             wifiEnabled: Networking.wifiEnabled,
             devices: devices,
-            connection: {
+            connection: Object.assign({
                 iface: connection.iface,
                 ip: connection.ip,
-                gateway: connection.gateway,
-                receivingRate: transfer.receivingRate,
-                sendingRate: transfer.sendingRate,
-                rxBytes: connection.rxBytes,
-                txBytes: connection.txBytes,
-                ping: ping.latency,
-                packetLoss: ping.packetLoss,
-                gatewayPing: gatewayPing.latency,
-                gatewayPacketLoss: gatewayPing.packetLoss
-            }
+                gateway: connection.gateway
+            }, detailStatus(connection.iface) || {})
         });
     }
 
     onActiveChanged: {
         if (active) {
-            // Drop the frozen order so the list is sorted by strength again on open.
+            // Sorted by strength again on open.
+            orderFrozen = false;
             wifiNetworks = [];
+            // Rates and pings measured from now, not across the time closed.
+            details = ({});
             refresh();
             loadSavedWifi();
+            scan();
         } else {
             passwordSsid = "";
             setScannerEnabled(false);
@@ -443,28 +405,70 @@ Item {
     }
 
     Process {
+        id: defaultRoutesProcess
+        command: ["ip", "-j", "route", "show", "default"]
+        stdout: StdioCollector {
+            waitForEnd: true
+            onStreamFinished: root.gateways = Model.parseDefaultRoutes(text)
+        }
+    }
+
+    Process {
         id: linkStatsProcess
+        command: ["ip", "-j", "-s", "link", "show"]
         stdout: StdioCollector {
             waitForEnd: true
-            onStreamFinished: root.updateLinkStats(text)
+            onStreamFinished: root.updateDetails(text)
         }
     }
 
-    Process {
-        id: internetPing
-        property string iface: ""
-        stdout: StdioCollector {
-            waitForEnd: true
-            onStreamFinished: root.recordInternetPing(internetPing.iface, text)
-        }
-    }
+    // Each iface pings Cloudflare and its gateway through itself, so a standby card shows its own.
+    Variants {
+        model: root.active ? root.detailIfaces : []
 
-    Process {
-        id: gatewayPingProcess
-        property string key: ""
-        stdout: StdioCollector {
-            waitForEnd: true
-            onStreamFinished: root.recordGatewayPing(gatewayPingProcess.key, text)
+        Scope {
+            id: pinger
+
+            required property string modelData
+            readonly property string gateway: {
+                const detail = root.details[modelData];
+                return detail ? detail.gateway : "";
+            }
+
+            Process {
+                id: internetPing
+                command: ["ping", "-n", "-I", pinger.modelData, "-c", "1", "-W", "1", "1.1.1.1"]
+                stdout: StdioCollector {
+                    waitForEnd: true
+                    onStreamFinished: root.recordPing(pinger.modelData, "ping", pinger.modelData, text)
+                }
+            }
+
+            Process {
+                id: gatewayPing
+                // The gateway it was started for: a reply after the gateway changed is dropped.
+                property string key: ""
+                stdout: StdioCollector {
+                    waitForEnd: true
+                    onStreamFinished: root.recordPing(pinger.modelData, "gatewayPing", gatewayPing.key, text)
+                }
+            }
+
+            Timer {
+                interval: 1500
+                repeat: true
+                running: true
+                triggeredOnStart: true
+                onTriggered: {
+                    if (!internetPing.running)
+                        internetPing.running = true;
+                    if (pinger.gateway && !gatewayPing.running) {
+                        gatewayPing.key = pinger.modelData + " " + pinger.gateway;
+                        gatewayPing.command = ["ping", "-n", "-I", pinger.modelData, "-c", "1", "-W", "1", pinger.gateway];
+                        gatewayPing.running = true;
+                    }
+                }
+            }
         }
     }
 

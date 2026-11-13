@@ -36,7 +36,7 @@ actions.
 ### Anatomy
 
 - A search row comes first, always. Its placeholder names the level
-  ("Filter clock…"); on its right is the key that opened the menu, when one
+  ("Filter time…"); on its right is the key that opened the menu, when one
   did.
 - A row shows an icon (the image when it has one, else the glyph), its label,
   a detail (a match's path, a value such as a zone's offset), its key and `›`
@@ -125,10 +125,18 @@ something to hang from.
 
 - A panel shows and adjusts a subsystem; its actions are also Settings rows,
   so a panel is never the only way to one.
-- It opens centred with exclusive keyboard focus. Arrows and `hjkl` step
-  focus as Tab does, since a panel has no search to type into; Enter and Space
-  activate; Esc closes.
-- A control with its own key shows it.
+- It opens centred with exclusive keyboard focus, nothing focused: the first
+  step lands on its first stop. Arrows and `hjkl` step focus as Tab does,
+  since a panel has no search to type into; Enter and Space activate; Esc
+  closes. A control that steps a value (a slider, a
+  `‹ value ›` setting) takes `←` `→` and `h` `l` to step it instead.
+- Moving the pointer over a row or slider moves focus to it, so one row at a
+  time shows the fill. A row that appears or scrolls under a still pointer
+  takes no focus.
+- A sub-group's heading expands or collapses it on Enter, Space or a click; it
+  stays so until the shell restarts.
+- A control with its own key shows it, and the panel's footer lists every key
+  it adds beyond these ([`style.md`](style.md) › Panels).
 
 ### Tray
 

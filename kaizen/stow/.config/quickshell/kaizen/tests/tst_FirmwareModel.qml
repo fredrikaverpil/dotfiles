@@ -298,4 +298,85 @@ TestCase {
     function test_detail(data) {
         verify(Firmware.detail(data.update) === data.want, "got " + Firmware.detail(data.update));
     }
+
+    function test_details_data() {
+        return [
+            {
+                tag: "AC and reboot",
+                update: ssd,
+                want: [
+                    {
+                        label: "Vendor",
+                        value: "SK hynix"
+                    },
+                    {
+                        label: "Version",
+                        value: "61720A20 → 61730A20"
+                    },
+                    {
+                        label: "Urgency",
+                        value: "High",
+                        role: "rose"
+                    },
+                    {
+                        label: "Requires",
+                        value: "AC power, reboot"
+                    }
+                ]
+            },
+            {
+                tag: "urgent, CVEs, reboot only",
+                update: Object.assign({}, dbx, {
+                    urgency: "critical",
+                    issues: ["CVE-2023-24932", "CVE-2024-7344", "LEN-12345"]
+                }),
+                want: [
+                    {
+                        label: "Vendor",
+                        value: dbx.vendor
+                    },
+                    {
+                        label: "Version",
+                        value: "20250507 → 20260707"
+                    },
+                    {
+                        label: "Urgency",
+                        value: "Critical",
+                        role: "rose"
+                    },
+                    {
+                        label: "Security",
+                        value: "2 CVEs"
+                    },
+                    {
+                        label: "Requires",
+                        value: "Reboot"
+                    }
+                ]
+            },
+            {
+                tag: "no vendor, unknown urgency, nothing required",
+                update: Object.assign({}, ssd, {
+                    vendor: "",
+                    urgency: "unknown",
+                    needsAc: false,
+                    needsReboot: false
+                }),
+                want: [
+                    {
+                        label: "Vendor",
+                        value: "--"
+                    },
+                    {
+                        label: "Version",
+                        value: "61720A20 → 61730A20"
+                    }
+                ]
+            },
+        ];
+    }
+
+    function test_details(data) {
+        compare(Firmware.details(data.update), data.want);
+    }
 }

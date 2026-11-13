@@ -74,16 +74,15 @@ instead, without the checks.
 
 The shell runs it every minute and when the panel opens. The bar shows an
 indicator while it reports anything: rose with any error, wood for warnings
-only. It opens the doctor panel, the report as text: arrows,
-PageUp/PageDown and Home/End move in it, Shift selects and Ctrl+C copies the
-selection. Refresh runs it again; Copy all copies the report.
+only. It opens the doctor panel, a row per finding: Enter, Space or a click
+copies its message and hint. Copy report copies the whole report.
 
 ## Firmware (`firmware`)
 
 The firmware panel lists pending firmware updates; it never installs them.
 Installing can need AC power, a reboot, or root, so the user runs the update
-command in a terminal. Each update's row copies that command (`fwupdmgr update
-<id>`) with Enter, Space or a click, as does Settings › Firmware › Copy update
+command in a terminal. Each update's Copy update command button copies that
+command (`fwupdmgr update <id>`), as does Settings › Firmware › Copy update
 command.
 
 The host decides which backends run: kaizen reads [fwupd] when the system bus
@@ -91,11 +90,12 @@ can activate it, and never enables a backend's daemon. The shell checks at
 start, once a day and when the panel opens, reading only local metadata; fwupd's
 own timer downloads it.
 
-`O` on a row, or Settings › Firmware › Open release page, opens the vendor's
-details page, or the update's [LVFS] device page when the vendor sets none.
+An update's Open release page button (Settings › Firmware › Open release page)
+opens the vendor's details page, or the update's [LVFS] device page when the
+vendor sets none.
 
 The bar shows an indicator in wood while an update is pending, whatever its
-urgency: an update can wait for a convenient reboot. Each row shows its own
+urgency: an update can wait for a convenient reboot. Each update shows its own
 urgency. There are no notifications.
 
 [fwupd]: https://fwupd.org
@@ -196,7 +196,8 @@ the focused screen, or Trigger › Screenshot.
 A screen recording utility makes it possible to record the screen (desktop,
 window or region) along with showing a circular video feed captured from a
 camera. Audio controls are available. `Mod+Print` opens the recording panel or
-stops a running recording; `Mod+Shift+Print` pauses or resumes it.
+stops a running recording; `Mod+Shift+Print` pauses or resumes it. Recordings
+are saved to `~/Videos/Recordings`.
 
 ## Time and timezone
 

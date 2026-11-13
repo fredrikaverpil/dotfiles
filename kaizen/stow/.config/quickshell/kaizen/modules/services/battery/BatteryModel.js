@@ -39,6 +39,13 @@ function icon(battery, states, end) {
   return (battery.onBattery ? dischargingIcons : chargingIcons)[index];
 }
 
+// The palette role of a charge in percent; a negative level is unknown.
+function levelRole(level, warn, low) {
+  if (level < 0) return "fg";
+  if (level <= low) return "rose";
+  return level <= warn ? "wood" : "fg";
+}
+
 function formatDuration(seconds) {
   var minutes = Math.round(Number(seconds) / 60);
   if (!(minutes > 0)) return "";
@@ -57,7 +64,7 @@ function timeRemaining(battery, states, end) {
 
 function formatRate(watts) {
   var value = Math.abs(Number(watts));
-  return value >= 0.05 ? value.toFixed(1) + " W" : "--";
+  return isFinite(value) ? value.toFixed(1) + " W" : "--";
 }
 
 function formatEnergy(now, full) {

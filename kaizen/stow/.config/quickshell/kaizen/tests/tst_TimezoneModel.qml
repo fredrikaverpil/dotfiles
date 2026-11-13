@@ -27,7 +27,7 @@ TestCase {
         verify(parsed.dst.inEffect === true);
         verify(Timezone.dstLabel(parsed.dst) === "In effect");
         // The change ahead is described by the offset it brings, not the one it ends.
-        verify(Timezone.nextLabel(parsed.dst) === "Sun 25 Oct 2026, 02:00 → CET (UTC+01:00)");
+        compare(Timezone.nextLabel(parsed.dst), "2026-10-25 02:00 → CET UTC+01:00");
     }
 
     function test_a_zone_without_dst_says_so_rather_than_guessing() {
@@ -38,7 +38,7 @@ TestCase {
         verify(parsed.dst.inEffect === false);
         verify(parsed.dst.next === null);
         verify(Timezone.dstLabel(parsed.dst) === "Not observed");
-        verify(Timezone.nextLabel(parsed.dst) === "No further changes");
+        compare(Timezone.nextLabel(parsed.dst), "No further changes");
     }
 
     function test_each_change_is_read_from_its_second_line_not_its_last_second() {
@@ -58,7 +58,7 @@ TestCase {
         const parsed = Timezone.parse(stockholm, Date.UTC(2026, 0, 15, 12, 0, 0));
         verify(parsed.dst.inEffect === false);
         verify(Timezone.dstLabel(parsed.dst) === "Standard time");
-        verify(Timezone.nextLabel(parsed.dst) === "Sun 29 Mar 2026, 03:00 → CEST (UTC+02:00)");
+        compare(Timezone.nextLabel(parsed.dst), "2026-03-29 03:00 → CEST UTC+02:00");
     }
 
     // What a pick rejected by a read-only /etc/localtime leaves behind: timedated

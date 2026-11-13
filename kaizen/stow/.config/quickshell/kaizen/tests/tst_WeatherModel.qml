@@ -39,8 +39,8 @@ TestCase {
         verify(Weather.coordinate(-0.005) === -0);
         verify(Weather.coordinate("nowhere") === null);
         verify(Weather.coordinate(undefined) === null);
-        verify(Weather.forecastUrl(57.7089, 11.9746) === "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=57.71&lon=11.97");
-        verify(Weather.forecastUrl("nowhere", 11.97) === "");
+        compare(Weather.forecastUrl(57.7089, 11.9746), "https://api.met.no/weatherapi/locationforecast/2.0/complete?lat=57.71&lon=11.97");
+        compare(Weather.forecastUrl("nowhere", 11.97), "");
         verify(Weather.yrUrl(57.7089, 11.9746) === "https://www.yr.no/en/forecast/hourly-table/57.71,11.97?i=0");
         verify(Weather.yrUrl("nowhere", 11.97) === "");
     }
@@ -173,5 +173,301 @@ TestCase {
         verify(parsed.days[0].symbol === "lightrain");
         verify(parsed.days[1].maximum === 18.7);
         verify(parsed.days[1].minimum === 18.7);
+    }
+
+    function hourEntry(time, symbol, precipitation, wind, gust, thunder) {
+        const instant = {
+            wind_speed: wind
+        };
+        if (gust !== null)
+            instant.wind_speed_of_gust = gust;
+        const data = {
+            instant: {
+                details: instant
+            }
+        };
+        if (symbol) {
+            const details = {
+                precipitation_amount: precipitation
+            };
+            if (thunder !== null)
+                details.probability_of_thunder = thunder;
+            data.next_1_hours = {
+                summary: {
+                    symbol_code: symbol
+                },
+                details: details
+            };
+        }
+        return {
+            time: time,
+            data: data
+        };
+    }
+
+    function test_outlook_starts_at_the_hour_under_way_and_skips_six_hourly_entries() {
+        const series = [hourEntry("2026-09-07T10:00:00Z", "heavyrain", 9, 20, 30, 90), hourEntry("2026-09-07T11:00:00Z", "lightrain", 0.5, 4.6, 9.0, 12), hourEntry("2026-09-07T12:00:00Z", "rain", 1, 5.0, 8.2, 3), hourEntry("2026-09-07T18:00:00Z", null, null, 25, 40, null),];
+
+        const got = Weather.parse(report(series), new Date("2026-09-07T11:30:00Z")).outlook;
+
+        compare(got, {
+            hours: 2,
+            precipitation: 1.5,
+            wind: 5.0,
+            gust: 9.0,
+            thunder: 12,
+            thunderSymbol: false,
+            risks: [],
+            level: ""
+        });
+    }
+
+    function test_outlook_stops_after_twelve_hours() {
+        const series = [];
+        for (let hour = 0; hour < 14; hour++)
+            series.push(hourEntry(new Date(Date.UTC(2026, 8, 7, hour)).toISOString(), "rain", 1, 3, 6, 0));
+
+        const got = Weather.parse(report(series), new Date("2026-09-07T00:10:00Z")).outlook;
+
+        compare(got, {
+            hours: 12,
+            precipitation: 12,
+            wind: 3,
+            gust: 6,
+            thunder: 0,
+            thunderSymbol: false,
+            risks: [],
+            level: ""
+        });
+    }
+
+    // gust and thunder null: outside MET's Nordic model.
+    function test_outlook_risks_data() {
+        return [
+            {
+                tag: "calm",
+                wind: 5,
+                gust: 9,
+                thunder: 5,
+                symbol: "cloudy",
+                risks: []
+            },
+            {
+                tag: "near gale abroad",
+                wind: 14,
+                gust: null,
+                thunder: null,
+                symbol: "cloudy",
+                risks: [
+                    {
+                        level: "wood",
+                        icon: Weather.RISK_GLYPHS.wind,
+                        text: "Near gale, up to 14 m/s"
+                    }
+                ]
+            },
+            {
+                tag: "gale with gusts",
+                wind: 18,
+                gust: 27,
+                thunder: 0,
+                symbol: "cloudy",
+                risks: [
+                    {
+                        level: "rose",
+                        icon: Weather.RISK_GLYPHS.wind,
+                        text: "Gale, gusts up to 27 m/s"
+                    }
+                ]
+            },
+            {
+                tag: "strong gusts",
+                wind: 10,
+                gust: 22,
+                thunder: 0,
+                symbol: "cloudy",
+                risks: [
+                    {
+                        level: "wood",
+                        icon: Weather.RISK_GLYPHS.wind,
+                        text: "Strong gusts up to 22 m/s"
+                    }
+                ]
+            },
+            {
+                tag: "gusts alone at alert",
+                wind: 10,
+                gust: 26,
+                thunder: 0,
+                symbol: "cloudy",
+                risks: [
+                    {
+                        level: "rose",
+                        icon: Weather.RISK_GLYPHS.wind,
+                        text: "Strong gusts up to 26 m/s"
+                    }
+                ]
+            },
+            {
+                tag: "thunder probability",
+                wind: 3,
+                gust: 6,
+                thunder: 30,
+                symbol: "cloudy",
+                risks: [
+                    {
+                        level: "wood",
+                        icon: Weather.RISK_GLYPHS.thunder,
+                        text: "Risk of thunder"
+                    }
+                ]
+            },
+            {
+                tag: "thunder symbol abroad",
+                wind: 3,
+                gust: null,
+                thunder: null,
+                symbol: "rainandthunder",
+                risks: [
+                    {
+                        level: "wood",
+                        icon: Weather.RISK_GLYPHS.thunder,
+                        text: "Risk of thunder"
+                    }
+                ]
+            },
+            {
+                tag: "gale and thunder, worst first",
+                wind: 18,
+                gust: null,
+                thunder: 40,
+                symbol: "cloudy",
+                risks: [
+                    {
+                        level: "rose",
+                        icon: Weather.RISK_GLYPHS.wind,
+                        text: "Gale, up to 18 m/s"
+                    },
+                    {
+                        level: "wood",
+                        icon: Weather.RISK_GLYPHS.thunder,
+                        text: "Risk of thunder"
+                    }
+                ]
+            },
+        ];
+    }
+
+    function test_outlook_risks(data) {
+        const series = [hourEntry("2026-09-07T12:00:00Z", data.symbol, 0, data.wind, data.gust, data.thunder)];
+
+        const got = Weather.parse(report(series), new Date("2026-09-07T12:10:00Z")).outlook;
+
+        compare(got, {
+            hours: 1,
+            precipitation: 0,
+            wind: data.wind,
+            gust: data.gust,
+            thunder: data.thunder,
+            thunderSymbol: data.symbol === "rainandthunder",
+            risks: data.risks,
+            level: data.risks.length > 0 ? data.risks[0].level : ""
+        });
+    }
+
+    function test_details_data() {
+        return [
+            {
+                tag: "gusts forecast",
+                current: {
+                    wind: 4.6,
+                    humidity: 81.2
+                },
+                outlook: {
+                    wind: 9.4,
+                    gust: 17.5,
+                    precipitation: 2.3
+                },
+                want: [
+                    {
+                        label: "Wind",
+                        value: "5 m/s"
+                    },
+                    {
+                        label: "Humidity",
+                        value: "81%"
+                    },
+                    {
+                        label: "Max gusts, 12 h",
+                        value: "18 m/s"
+                    },
+                    {
+                        label: "Total rain, 12 h",
+                        value: "2.3 mm"
+                    }
+                ]
+            },
+            {
+                tag: "no gusts outside the Nordic model",
+                current: {
+                    wind: 4.6,
+                    humidity: 81.2
+                },
+                outlook: {
+                    wind: 9.4,
+                    gust: null,
+                    precipitation: 0
+                },
+                want: [
+                    {
+                        label: "Wind",
+                        value: "5 m/s"
+                    },
+                    {
+                        label: "Humidity",
+                        value: "81%"
+                    },
+                    {
+                        label: "Max wind, 12 h",
+                        value: "9 m/s"
+                    },
+                    {
+                        label: "Total rain, 12 h",
+                        value: "0 mm"
+                    }
+                ]
+            },
+            {
+                tag: "missing values",
+                current: {
+                    wind: null
+                },
+                outlook: null,
+                want: [
+                    {
+                        label: "Wind",
+                        value: "--"
+                    },
+                    {
+                        label: "Humidity",
+                        value: "--"
+                    },
+                    {
+                        label: "Max wind, 12 h",
+                        value: "--"
+                    },
+                    {
+                        label: "Total rain, 12 h",
+                        value: "--"
+                    }
+                ]
+            }
+        ];
+    }
+
+    function test_details(data) {
+        const got = Weather.details(data.current, data.outlook);
+
+        compare(got, data.want);
     }
 }

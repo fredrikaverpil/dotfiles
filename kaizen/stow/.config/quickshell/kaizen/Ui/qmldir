@@ -9,5 +9,18 @@ MenuOverlay 1.0 MenuOverlay.qml
 Keycaps 1.0 Keycaps.qml
 BarButton 1.0 BarButton.qml
 singleton Paths 1.0 Paths.qml
+singleton Space 1.0 Space.qml
 Plugin 1.0 Plugin.qml
 Section 1.0 Section.qml
+PanelHeader 1.0 PanelHeader.qml
+PanelRow 1.0 PanelRow.qml
+HoverArea 1.0 HoverArea.qml
+PanelFooter 1.0 PanelFooter.qml
+PanelSlider 1.0 PanelSlider.qml
+RadioRow 1.0 RadioRow.qml
+SegmentedControl 1.0 SegmentedControl.qml
+PanelButton 1.0 PanelButton.qml
+InfoTable 1.0 InfoTable.qml
+PanelScrollBar 1.0 PanelScrollBar.qml
+PanelScroller 1.0 PanelScroller.qml
+Subsection 1.0 Subsection.qml

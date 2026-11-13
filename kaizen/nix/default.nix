@@ -194,6 +194,9 @@ in
       # nm-connection-editor edits wired, static-IP and other connection settings;
       # the network panel launches it. nm-applet runs via XDG autostart for its tray menu.
       networkmanagerapplet
+      # pwvucontrol sets per-app volumes and device profiles; the audio
+      # panel launches it.
+      pwvucontrol
       # Annotates screenshots from the notification's Edit action.
       satty
       # The colour picker's point selection on umbriel.

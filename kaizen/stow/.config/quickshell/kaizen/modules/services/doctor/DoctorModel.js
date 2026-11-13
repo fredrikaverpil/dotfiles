@@ -1,7 +1,9 @@
+.import "../../../Ui/Time.js" as Time
+
 // The report as `kaizen doctor --json` prints it: { findings, text }, each
 // finding { source, id, level, unit, message, hint, count, first, last },
 // times in milliseconds since the epoch, level ERROR or WARN, hint only with a
-// fix. This reads neither id nor hint; the text carries the hint.
+// fix.
 
 var LEVELS = ["ERROR", "WARN"];
 
@@ -43,45 +45,41 @@ function counts(findings) {
   return { errors: errors, warnings: findings.length - errors };
 }
 
+// "1 error, 2 warnings"; "" for none.
+function summary(counts) {
+  var parts = [];
+  if (counts.errors > 0)
+    parts.push(counts.errors + (counts.errors === 1 ? " error" : " errors"));
+  if (counts.warnings > 0)
+    parts.push(
+      counts.warnings + (counts.warnings === 1 ? " warning" : " warnings"),
+    );
+  return parts.join(", ");
+}
+
 function role(level) {
   return level === "WARN" ? "wood" : "rose";
 }
 
-function escape(text) {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
-// The text as rich text, each finding's level in its role's colour.
-function html(text, palette) {
-  var lines = text.split("\n").map(function (line) {
-    var header = /^(ERROR|WARN)( .*)$/.exec(line);
-    if (!header) return escape(line);
-    return (
-      '<span style="color: ' +
-      palette[role(header[1])] +
-      '">' +
-      header[1] +
-      "</span>" +
-      escape(header[2])
-    );
-  });
-  return '<div style="white-space: pre-wrap">' + lines.join("<br>") + "</div>";
-}
-
-function pad(value) {
-  return (value < 10 ? "0" : "") + value;
-}
-
-function clock(time) {
-  var date = new Date(time);
+// When a logged finding happened: ×count when more than one, then the first
+// time and, when it differs, the last. A check's finding is as old as the run:
+// "".
+function when(finding, now) {
+  if (finding.source === "check") return "";
+  var from = Time.stamp(new Date(finding.first), now);
+  var to = Time.stamp(new Date(finding.last), now);
   return (
-    pad(date.getHours()) +
-    ":" +
-    pad(date.getMinutes()) +
-    ":" +
-    pad(date.getSeconds())
+    (finding.count > 1 ? "×" + finding.count + " · " : "") +
+    (from === to ? from : from + "–" + to)
   );
+}
+
+// What copying one finding puts on the clipboard: its message, then its hint.
+function copyText(finding) {
+  return finding.hint ? finding.message + "\n" + finding.hint : finding.message;
+}
+
+// Tells findings apart across runs, which replace the objects.
+function key(finding) {
+  return [finding.source, finding.id, finding.unit, finding.message].join("\n");
 }

@@ -76,4 +76,33 @@ TestCase {
     function test_raw_for(data) {
         verify(Brightness.rawFor(data.value, data.max) === data.want);
     }
+
+    function test_output_of_data() {
+        return [
+            {
+                tag: "intel",
+                link: "../../devices/pci0000:00/0000:00:02.0/drm/card0/card0-eDP-1/intel_backlight\n",
+                want: "eDP-1"
+            },
+            {
+                tag: "amdgpu",
+                link: "../../devices/pci0000:00/0000:00:08.1/0000:c1:00.0/drm/card1/card1-eDP-2/amdgpu_bl1",
+                want: "eDP-2"
+            },
+            {
+                tag: "acpi",
+                link: "../../devices/pci0000:00/0000:00:02.0/backlight/acpi_video0",
+                want: ""
+            },
+            {
+                tag: "empty",
+                link: "",
+                want: ""
+            },
+        ];
+    }
+
+    function test_output_of(data) {
+        compare(Brightness.outputOf(data.link), data.want);
+    }
 }

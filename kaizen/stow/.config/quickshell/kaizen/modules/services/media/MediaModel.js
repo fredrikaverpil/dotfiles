@@ -135,3 +135,23 @@ function playerForAction(players, source, active, action, targetKey) {
   }
   return null;
 }
+
+// A track has a length to seek in; a live stream reports none.
+function hasLength(player) {
+  return !!(player && player.lengthSupported && player.length > 0);
+}
+
+function canSeek(player) {
+  return !!(player && player.canSeek && player.positionSupported);
+}
+
+// Seconds as m:ss, or h:mm:ss from an hour.
+function formatPosition(seconds) {
+  var total = Math.max(0, Math.floor(seconds || 0));
+  var hours = Math.floor(total / 3600);
+  var minutes = Math.floor((total % 3600) / 60);
+  var rest = String(total % 60).padStart(2, "0");
+  if (hours > 0)
+    return hours + ":" + String(minutes).padStart(2, "0") + ":" + rest;
+  return minutes + ":" + rest;
+}

@@ -7,6 +7,9 @@ var EXPIRY_MARGIN = 60 * 1000;
 
 var DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+// The outlook's risks, as WarningsModel's event icons.
+var RISK_GLYPHS = { wind: "󰖝", thunder: "󰖓" };
+
 var GLYPHS = {
   sun: "󰖙",
   moon: "󰖔",
@@ -50,7 +53,7 @@ function forecastUrl(latitude, longitude) {
   var lon = coordinate(longitude);
   if (lat === null || lon === null) return "";
   return (
-    "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=" +
+    "https://api.met.no/weatherapi/locationforecast/2.0/complete?lat=" +
     lat +
     "&lon=" +
     lon
@@ -164,6 +167,44 @@ function temperature(value) {
   return isFinite(number) ? Math.round(number) + "°" : "";
 }
 
+function metresPerSecond(value) {
+  return typeof value === "number" && isFinite(value)
+    ? Math.round(value) + " m/s"
+    : "--";
+}
+
+// The panel's details table: the wind and humidity now, then the outlook's
+// strongest wind and total rain; "--" for a missing value. MET forecasts
+// gusts only inside its Nordic model; elsewhere the strongest mean wind
+// stands in.
+function details(current, outlook) {
+  var now = current || {};
+  var next = outlook || {};
+  var humidity = now.humidity;
+  var hasGust = typeof next.gust === "number";
+  return [
+    { label: "Wind", value: metresPerSecond(now.wind) },
+    {
+      label: "Humidity",
+      value:
+        typeof humidity === "number" && isFinite(humidity)
+          ? Math.round(humidity) + "%"
+          : "--",
+    },
+    {
+      label: hasGust ? "Max gusts, 12 h" : "Max wind, 12 h",
+      value: metresPerSecond(hasGust ? next.gust : next.wind),
+    },
+    {
+      label: "Total rain, 12 h",
+      value:
+        typeof next.precipitation === "number"
+          ? next.precipitation + " mm"
+          : "--",
+    },
+  ];
+}
+
 function dayKey(date) {
   var month = date.getMonth() + 1;
   var day = date.getDate();
@@ -271,6 +312,101 @@ function dailyFrom(series, now) {
   });
 }
 
+// The rolling window the outlook sums up, from the hour under way.
+var OUTLOOK_HOURS = 12;
+// Beaufort 7 (near gale) and 8 (gale), in mean wind; gusts at roughly the
+// speeds national services warn at.
+var WIND_WARNING = 14;
+var WIND_ALERT = 17;
+var GUST_WARNING = 21;
+var GUST_ALERT = 25;
+var THUNDER_WARNING = 30;
+
+function numberOr(value, fallback) {
+  var number = parseFloat(value);
+  return isFinite(number) ? number : fallback;
+}
+
+function higher(a, b) {
+  return a === null || b > a ? b : a;
+}
+
+// The next OUTLOOK_HOURS hourly entries. Gusts and thunder probability come
+// only inside MET's Nordic model; elsewhere they stay null and a thunder
+// symbol stands in for the probability.
+function outlookFrom(series, now) {
+  var reference = (now instanceof Date ? now : new Date()).getTime();
+  var outlook = {
+    hours: 0,
+    precipitation: null,
+    wind: null,
+    gust: null,
+    thunder: null,
+    thunderSymbol: false,
+  };
+  for (var i = 0; i < series.length && outlook.hours < OUTLOOK_HOURS; i++) {
+    var entry = series[i];
+    var next = entry.data ? entry.data.next_1_hours : null;
+    var when = Date.parse(String(entry.time || ""));
+    if (!next || isNaN(when)) continue;
+    if (when + 60 * 60 * 1000 <= reference) continue;
+
+    outlook.hours++;
+    var hourly = next.details || {};
+    var instant = entry.data.instant ? entry.data.instant.details : {};
+    var rain = numberOr(hourly.precipitation_amount, null);
+    if (rain !== null)
+      outlook.precipitation = (outlook.precipitation || 0) + rain;
+    var wind = numberOr(instant.wind_speed, null);
+    if (wind !== null) outlook.wind = higher(outlook.wind, wind);
+    var gust = numberOr(instant.wind_speed_of_gust, null);
+    if (gust !== null) outlook.gust = higher(outlook.gust, gust);
+    var thunder = numberOr(hourly.probability_of_thunder, null);
+    if (thunder !== null) outlook.thunder = higher(outlook.thunder, thunder);
+    if (kind(symbolOf(entry)) === "storm") outlook.thunderSymbol = true;
+  }
+  if (outlook.precipitation !== null)
+    outlook.precipitation = Math.round(outlook.precipitation * 10) / 10;
+  outlook.risks = risksOf(outlook);
+  outlook.level = outlook.risks.length > 0 ? outlook.risks[0].level : "";
+  return outlook;
+}
+
+// What in the outlook crosses a threshold, worst first.
+function risksOf(outlook) {
+  var risks = [];
+  var wind = numberOr(outlook.wind, 0);
+  var gust = numberOr(outlook.gust, 0);
+  var windLevel =
+    wind >= WIND_ALERT || gust >= GUST_ALERT
+      ? "rose"
+      : wind >= WIND_WARNING || gust >= GUST_WARNING
+        ? "wood"
+        : "";
+  if (windLevel !== "") {
+    var gusts = outlook.gust !== null ? "gusts up to " + Math.round(gust) : "";
+    var text =
+      wind >= WIND_ALERT
+        ? "Gale, "
+        : wind >= WIND_WARNING
+          ? "Near gale, "
+          : "Strong ";
+    text += gusts !== "" ? gusts : "up to " + Math.round(wind);
+    risks.push({
+      level: windLevel,
+      icon: RISK_GLYPHS.wind,
+      text: text + " m/s",
+    });
+  }
+  if (numberOr(outlook.thunder, 0) >= THUNDER_WARNING || outlook.thunderSymbol)
+    risks.push({
+      level: "wood",
+      icon: RISK_GLYPHS.thunder,
+      text: "Risk of thunder",
+    });
+  return risks;
+}
+
 function parse(raw, now) {
   var data = null;
   try {
@@ -284,5 +420,9 @@ function parse(raw, now) {
 
   var current = currentFrom(series, now);
   if (!current) return null;
-  return { current: current, days: dailyFrom(series, now) };
+  return {
+    current: current,
+    days: dailyFrom(series, now),
+    outlook: outlookFrom(series, now),
+  };
 }

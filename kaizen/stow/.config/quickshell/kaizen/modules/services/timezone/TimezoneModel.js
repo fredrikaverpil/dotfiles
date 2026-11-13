@@ -57,15 +57,14 @@ function transitions(text) {
           Number(match[4]),
           Number(match[5]),
         ),
+        // The new offset's wall time, as "2027-03-28 03:00".
         local:
-          match[7] +
-          " " +
-          Number(match[9]) +
-          " " +
-          match[8] +
-          " " +
           match[13] +
-          ", " +
+          "-" +
+          pad(MONTHS.indexOf(match[8]) + 1) +
+          "-" +
+          pad(Number(match[9])) +
+          " " +
           match[10] +
           ":" +
           match[11],
@@ -196,8 +195,7 @@ function nextLabel(dst) {
     dst.next.local +
     " → " +
     dst.next.abbreviation +
-    " (" +
-    offsetLabel(dst.next.offset) +
-    ")"
+    " " +
+    offsetLabel(dst.next.offset)
   );
 }

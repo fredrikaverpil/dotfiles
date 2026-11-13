@@ -14,6 +14,11 @@ Ui.Plugin {
                 label: "Calendar panel",
                 action: () => calendarPanel.open()
             },
+            "plugins.calendar.open": {
+                icon: "󰃭",
+                label: "Open calendar…",
+                action: () => calendarPanel.openApp()
+            },
             "plugins.calendar.refresh": {
                 icon: "󰑐",
                 label: "Refresh",

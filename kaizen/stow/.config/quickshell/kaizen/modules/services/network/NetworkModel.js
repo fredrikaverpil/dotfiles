@@ -18,6 +18,32 @@ function deviceType(type, types) {
   return "Network";
 }
 
+// Devices in panel order: Ethernet first, connected before not, then other
+// types, Wi-Fi last, so its long network list ends the panel. typeName(device)
+// is deviceType's name. Ties keep their order.
+function orderDevices(devices, typeName) {
+  function rank(device) {
+    const name = typeName(device);
+    const group = name === "Ethernet" ? 0 : name === "Wi-Fi" ? 2 : 1;
+    return group * 2 + (device.connected ? 0 : 1);
+  }
+  return devices
+    .filter((device) => !!device)
+    .map((device, index) => ({
+      device: device,
+      index: index,
+      rank: rank(device),
+    }))
+    .sort((a, b) => a.rank - b.rank || a.index - b.index)
+    .map((entry) => entry.device);
+}
+
+// A device's state; a wired one without a link has no cable plugged in.
+function deviceState(type, types, hasLink, state, states) {
+  if (type === types.Wired && !hasLink) return "No cable";
+  return connectionState(state, states);
+}
+
 function connectionState(state, states) {
   if (state === states.Connected) return "Connected";
   if (state === states.Connecting) return "Connecting";
@@ -147,25 +173,151 @@ function parseRoute(raw) {
   };
 }
 
+// Parses `ip -j route show default` into { iface: gateway }, the first (lowest metric) per iface.
+function parseDefaultRoutes(raw) {
+  var routes;
+  try {
+    routes = JSON.parse(String(raw || "[]"));
+  } catch (error) {
+    return {};
+  }
+  if (!Array.isArray(routes)) return {};
+
+  var gateways = {};
+  for (var i = 0; i < routes.length; i++) {
+    var route = routes[i];
+    if (!route || !route.dev || gateways.hasOwnProperty(route.dev)) continue;
+    gateways[route.dev] = String(route.gateway || "");
+  }
+  return gateways;
+}
+
+// Parses `ip -j -s link show` into { iface: { rxBytes, txBytes } }.
 function parseLinkStats(raw) {
   var links;
   try {
     links = JSON.parse(String(raw || "[]"));
   } catch (error) {
-    return { iface: "", rxBytes: null, txBytes: null };
+    return {};
   }
-  if (!Array.isArray(links) || !links[0])
-    return { iface: "", rxBytes: null, txBytes: null };
+  if (!Array.isArray(links)) return {};
 
-  var link = links[0];
-  var stats = link.stats64 || link.stats || {};
-  var rx = stats.rx || {};
-  var tx = stats.tx || {};
+  var result = {};
+  for (var i = 0; i < links.length; i++) {
+    var link = links[i];
+    if (!link || !link.ifname) continue;
+    var stats = link.stats64 || link.stats || {};
+    var rx = Number((stats.rx || {}).bytes);
+    var tx = Number((stats.tx || {}).bytes);
+    if (!isFinite(rx) || !isFinite(tx)) continue;
+    result[link.ifname] = { rxBytes: rx, txBytes: tx };
+  }
+  return result;
+}
+
+function emptyPing(key) {
+  return { iface: key, samples: [], latency: -1, packetLoss: 0 };
+}
+
+// Details per iface: { iface: { ip, gateway, transfer, ping, gatewayPing } }, for `ifaces` only.
+// Pings carry over; a gateway's resets when the iface's gateway changes.
+function deviceDetails(previous, ifaces, addresses, gateways, stats, now) {
+  var prev = previous || {};
+  var result = {};
+  for (var i = 0; i < (ifaces || []).length; i++) {
+    var iface = ifaces[i];
+    var old = prev[iface] || {};
+    var gateway = (gateways || {})[iface] || "";
+    var sample = (stats || {})[iface];
+    var gatewayKey = iface + " " + gateway;
+    result[iface] = {
+      ip: (addresses || {})[iface] || "",
+      gateway: gateway,
+      transfer: sample
+        ? transferState(
+            old.transfer,
+            { iface: iface, rxBytes: sample.rxBytes, txBytes: sample.txBytes },
+            now,
+          )
+        : old.transfer || null,
+      ping: old.ping || emptyPing(iface),
+      gatewayPing:
+        old.gatewayPing && old.gatewayPing.iface === gatewayKey
+          ? old.gatewayPing
+          : emptyPing(gatewayKey),
+    };
+  }
+  return result;
+}
+
+// Records one ping reply (`raw`) of `which` ("ping" or "gatewayPing") for `iface`; `key` is what the
+// ping was started for, and a reply for a gateway that has since changed is dropped.
+function recordDevicePing(details, iface, which, key, raw) {
+  var detail = (details || {})[iface];
+  if (!detail || !detail[which] || detail[which].iface !== key) return details;
+  var result = Object.assign({}, details);
+  var next = Object.assign({}, detail);
+  next[which] = pingState(detail[which], key, parsePing(raw), 24, 5);
+  result[iface] = next;
+  return result;
+}
+
+// A device's details as the panel shows them; "--" until measured.
+function detailMetrics(detail) {
+  var d = detail || {};
+  var transfer = d.transfer;
+  var ping = d.ping || {};
+  var gatewayPing = d.gatewayPing || {};
+  var hasPing = (ping.samples || []).length > 0;
+  var hasGatewayPing = (gatewayPing.samples || []).length > 0;
   return {
-    iface: String(link.ifname || ""),
-    rxBytes: isFinite(Number(rx.bytes)) ? Number(rx.bytes) : null,
-    txBytes: isFinite(Number(tx.bytes)) ? Number(tx.bytes) : null,
+    ip: d.ip || "--",
+    gateway: d.gateway || "--",
+    ping: formatPing(ping.latency, hasPing),
+    loss: formatPacketLoss(ping.packetLoss, hasPing),
+    gatewayPing: formatPing(gatewayPing.latency, hasGatewayPing),
+    gatewayLoss: formatPacketLoss(gatewayPing.packetLoss, hasGatewayPing),
+    receiving: transfer ? formatRate(transfer.receivingRate) : "--",
+    sending: transfer ? formatRate(transfer.sendingRate) : "--",
+    downloaded: transfer ? formatBytes(transfer.rxBytes) : "--",
+    uploaded: transfer ? formatBytes(transfer.txBytes) : "--",
   };
+}
+
+// A device's details table, a target's ping and loss on one line; a Wi-Fi
+// device's starts with its connected network, when it has one.
+function detailRows(detail, network) {
+  var m = detailMetrics(detail);
+  var wifi = network
+    ? [
+        { label: "SSID", value: network.name },
+        { label: "Signal strength", value: wifiSignal(network) + "%" },
+      ]
+    : [];
+  return wifi.concat([
+    { label: "IP address", value: m.ip },
+    { label: "Gateway", value: m.gateway },
+    { label: "Ping (Cloudflare)", value: m.ping },
+    { label: "Packet loss", value: m.loss },
+    { label: "Ping (gateway)", value: m.gatewayPing },
+    { label: "Packet loss", value: m.gatewayLoss },
+    { label: "Receiving", value: m.receiving },
+    { label: "Sending", value: m.sending },
+    { label: "Downloaded", value: m.downloaded },
+    { label: "Uploaded", value: m.uploaded },
+  ]);
+}
+
+// The panel's subtitle: the default route's device, by its Wi-Fi network,
+// its type, or its iface when Quickshell does not list it (a VPN's). type is
+// "" for an unlisted iface; wifiName is "" without a connected network.
+function routeSubtitle(available, iface, anyConnected, type, wifiName) {
+  if (!available) return "NetworkManager is unavailable";
+  if (!iface) return anyConnected ? "No default route" : "Disconnected";
+  if (!type) return "Default route via " + iface;
+  return (
+    "Default route via " + (type === "Wi-Fi" && wifiName ? wifiName : type)
+  );
 }
 
 function transferState(previous, sample, now) {
@@ -333,12 +485,6 @@ function networkForSsid(networks, ssid) {
 function ipFor(device, addresses) {
   if (!device || !device.name) return "";
   return (addresses || {})[device.name] || "";
-}
-
-function deviceDetail(device, addresses, types, states) {
-  var state = connectionState(device.state, states);
-  var ip = ipFor(device, addresses);
-  return ip ? state + " · " + ip : state;
 }
 
 function wifiStatus(network, actionSsid, actionKind) {

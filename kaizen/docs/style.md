@@ -7,10 +7,11 @@ How the shell looks. What kaizen is and where each part lives is in
 
 The palette is [zenbones](https://github.com/zenbones-theme/zenbones.nvim)' dark
 and light variants, defined once in
-[`shell.qml`](../stow/.config/quickshell/kaizen/shell.qml) and
-followed by the theme toggle. QML reads colours from `shell.palette`, never as
-hex literals. The roles below are the default: core follows them, a plugin
-starts from them and may deviate.
+[`Ui/Palette.js`](../stow/.config/quickshell/kaizen/Ui/Palette.js) and
+followed by the theme toggle in
+[`shell.qml`](../stow/.config/quickshell/kaizen/shell.qml). QML reads colours
+from `shell.palette`, never as hex literals. The roles below are the default:
+core follows them, a plugin starts from them and may deviate.
 
 | Role | Meaning |
 | --- | --- |
@@ -23,23 +24,154 @@ starts from them and may deviate.
 | `leaf` | Success, done, connected, logged in |
 | `sky` | Running, in progress |
 | `water` | Accent and information: links, inline code, the active window border, a neutral tag |
-| `blossom` | Headings |
+| `blossom` | Headings in rendered Markdown |
 
 ## Shapes and text
 
 - Buttons and inputs are outlined, 1 px at radius 4: `fg` focused and `dim`
-  otherwise, filled with `sel` on focus or hover. List rows show focus with the
-  `sel` fill alone. A field that failed (lock, polkit) turns its outline `rose`.
-  The lock field and selections drawn over content take 2 px.
+  otherwise, filled with `sel` on focus or hover; a panel's buttons differ
+  (Panels › Focus and state). List rows show focus with the `sel` fill alone.
+  A field that failed (lock, polkit) turns its outline `rose`. The lock field
+  and selections drawn over content take 2 px.
 - Surfaces (panel, context menu, notification, OSD) have radius 8.
 - A key is a keycap per key (`Super` `Space`), set apart from the label it
-  belongs to: `off` text a size smaller, outlined `dim` at radius 3 with a 2 px
+  belongs to: `off` text at 12 px, outlined `dim` at radius 3 with a 2 px
   bottom edge. A menu row puts it in a column on the right.
-- Text is `Ui.Fonts.mono` at 14 px, times the text scale; secondary text is a
-  size or two smaller. Links are `water` and underlined; inline code is
+- Text is `Ui.Fonts.mono` at 14 px, times the text scale; a keycap and a
+  panel's footer are 12 px, and a panel's sizes are in Panels › Type. Links
+  are `water` and underlined; inline code is
   `water` in the body's font and size. Qt's Markdown rendering ignores
   `linkColor` and draws code in its own larger fixed font, so markdown text goes
   through a helper that colours both spans first.
+
+## Panels
+
+Panels borrow four ideas from Japanese design, each turned into rules below:
+ma (間), the space between things, as structure; kanso (簡素), keeping only
+what earns its place; kata (型), one form that every panel follows; and shibui
+(渋い), quiet until something matters. A panel that breaks a rule needs a
+reason, written next to the code.
+
+### Form
+
+Every panel has the same shape, top to bottom:
+
+- A header: the title in `fg` at 16 px on the left. A panel without a
+  slider or meter may put its one key value at 16 px on the right, coloured
+  by its status. A panel whose subsystem turns off (bluetooth) puts
+  the button that turns it on or off there instead, and its subtitle says the
+  state.
+- A subtitle in `off` at 14 px: what the value belongs to, the panel's
+  state ("Default route via Ethernet"), or why there is none. Left out when
+  it would repeat what the panel shows below.
+- Optionally, a slider or meter for the key value, 16 under the header. It is
+  part of the header: no section label. A panel with a value per group
+  (audio's output and input volume) puts each group's slider first in its
+  group instead, over its rows and 4 above them.
+- A slider's or meter's value sits right of its track at 14 px, in a column
+  as wide as `100%`, so stacked tracks end together. It takes the fill's
+  colour: `off` while muted, the status colour on a meter.
+- Groups, each a rule with its section label at the rule's left, and its
+  content. A group whose content names itself (battery's details table,
+  recording's options) leaves the label out: the rule alone heads it. A group
+  with one value of its own that no control shows (nightlight's temperature,
+  a network device's iface) puts it at the rule's right in `off`; a control
+  of its own (Wi-Fi's power button) sits right of that.
+- A panel over several devices, each with details of its own (network,
+  firmware), gives each device a group titled by its type ("Ethernet",
+  "Wi-Fi"), with its iface at the rule's right to tell two of a type apart. A
+  device without an iface (firmware's) is titled by its name instead.
+- A group holding a long list goes last.
+- A group's content of a few kinds splits into sub-groups, leaving out empty
+  ones, such as Wi-Fi's networks: secured, open, out of range. A sub-group's
+  heading is a row: a chevron, `󰅀` open and `󰅂` collapsed, its label in
+  `fg`, and a rule to its count in `off`. Sub-groups start collapsed, so the
+  panel reads at a glance: what is current (the connected network's SSID and
+  signal) shows in the group's details table. The heading is a focus stop
+  that expands or collapses its sub-group.
+- A panel about picking a device (audio) lists every device as a row, a
+  group per kind (Output, Input), since the choice is what it shows. A panel
+  that sets up an action (recording) shows each setting as one row instead,
+  label left and control right, so the whole setup reads at a glance:
+  `‹ value ›` for a setting with many values, which h/l or a click step, and
+  a segmented control sized to its labels for a few (On/Off, which output a
+  display mirrors).
+- Many values about one thing form a details table: labels in `off`, values
+  in `fg` right-aligned, or in their status colour ("Not synchronised" in
+  `wood`), both 14 px, two pairs to a line in a wide card or where every
+  value is short (weather's). A panel's tables share their column widths, so
+  they line up. A value too long for the card (an SSID) is cut with `…`;
+  labels never are.
+- A held notification (the notification history) keeps its toast's card,
+  tint, badge and animation included: it reads as the notification it was.
+- A footer with the panel's own keys: a keycap, then what it does in `off`. It
+  lists only the keys the panel adds to those every panel shares
+  ([`interaction.md`](interaction.md) › Panels). A note, such as the data's
+  credit (weather's MET Norway and SMHI licence), takes a line of its own
+  under it. The buttons acting on the whole panel ("Bluetooth settings…", a
+  recording's Pause and Stop) sit at its right, where no scrolling hides them;
+  a group's own button stays in its group.
+
+### Space
+
+- Spacing comes from one scale: 4, 8, 16 and 24 px. Rows in a list are 4
+  apart, tiles in a grid (wallpapers) 8, a rule runs 8 clear of the label at
+  its left and of what sits at its right, a group's content is 8 under its
+  label or 16 under a bare rule, sub-groups are 8 apart and 16 under the
+  group's content above them, as is a group's own button, the card's padding
+  is 16, and groups are 24 apart. The subtitle sits 4 under the title.
+- Groups too tall for the screen scroll between a fixed header and footer.
+  While they overflow, a 4 px `dim` bar at radius 2 sits in the card's
+  right padding, clear of the rows' fill; it shows nothing when all fits. A
+  scrolling list ends at its last row, with no marker; the bar shows where
+  it is.
+- A group's content aligns with its rule's start. A sub-group's heading and
+  rows indent 16, its chevron over the rows' icons. A row's or slider's `sel`
+  fill reaches 8 into the card's padding, past the text it holds.
+- Space separates groups. The only lines a panel draws are the rules heading
+  its groups and sub-groups: 1 px `dim`, on the label's line, to the group's
+  right edge or what sits there. The header has none.
+
+### Focus and state
+
+- The `sel` fill marks focus or hover, and nothing else. Rows, sliders and
+  buttons show focus with it alone: rows and sliders draw no outline, and a
+  button's stays `dim`.
+- What is current or chosen shows as a mark at the start of its row: `●` for
+  the chosen one of a set, `○` in `dim` for the others. A segmented control,
+  a few choices side by side in one outline, has no row start: its chosen
+  label is `fg`, the others `off`. An option that cannot be picked (a mirror
+  that would loop) is `dim`, since `off` already means unchosen there, and
+  focus skips it; so is a button that cannot act (a player's Next with no
+  next track).
+- A device's state shows in its icon at the start of its row: `leaf` while
+  connected, `off` otherwise. What it reports, such as its battery, sits at
+  the row's right in its status colour; a change under way ("Connecting…")
+  sits there in `sky`. An audio device on an empty jack or port (no
+  headset, an HDMI port with no monitor) shows `󰚦` there in `off`, and stays
+  pickable.
+- A row whose actions are buttons (a device's Connect, a network's Join) takes
+  no focus, `sel` fill or click: its buttons, at its right and as wide as
+  their longest label, are the stops. A row with an action of its own (a
+  calendar event, which opens in its app) keeps its stop, and its buttons (a
+  meeting's Join) follow it.
+- A slider is a 2 px track in `dim`, filled `fg` up to its value, with a
+  10 px knob; the fill and knob turn `off` while muted or off. A meter, which
+  only shows a value, is the same track without the knob, its icon and fill
+  in the value's status colour.
+
+### Type
+
+- Three sizes: 16 px for the title and the header's key value; 14 px for the
+  subtitle, section labels, body text and a slider's or meter's value; 12 px
+  for the footer. All scale with the text scale.
+- A section label is in sentence case, 14 px, in `fg`, at its rule's left: no
+  smaller than the body it heads, and set apart from it by the rule, not by
+  colour.
+- A time when something happened reads "14:01" on the same day and "Wed
+  13:02" before it, without seconds
+  ([`Ui/Time.js`](../stow/.config/quickshell/kaizen/Ui/Time.js)).
+- Colour carries a role or a status, never decoration.
 
 ## Status
 

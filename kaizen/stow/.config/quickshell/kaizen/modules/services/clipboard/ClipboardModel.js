@@ -17,7 +17,22 @@ function removeAt(history, index) {
   return next;
 }
 
-// One line, bounded so a huge copy does not lay out a huge Text.
+// The text's lines, without the blank ones at either end.
+function lines(text) {
+  var all = text.split("\n");
+  while (all.length > 0 && all[0].trim() === "") all.shift();
+  while (all.length > 0 && all[all.length - 1].trim() === "") all.pop();
+  return all;
+}
+
+// The first non-blank line, bounded so a huge copy does not lay out a huge
+// Text.
 function preview(text) {
-  return text.slice(0, 500).replace(/\s+/g, " ").trim();
+  var first = lines(text.slice(0, 2000))[0] || "";
+  return first.slice(0, 500).replace(/\s+/g, " ").trim();
+}
+
+// How many lines follow the preview's.
+function moreLines(text) {
+  return Math.max(0, lines(text).length - 1);
 }

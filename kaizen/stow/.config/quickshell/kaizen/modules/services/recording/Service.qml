@@ -11,7 +11,9 @@ Item {
     id: root
 
     readonly property string statePath: Ui.Paths.state + "/recording.json"
-    readonly property string directory: Quickshell.env("HOME") + "/Videos"
+    // As shown to the user; `directory` expands it.
+    readonly property string shownDirectory: "~/Videos/Recordings"
+    readonly property string directory: Quickshell.env("HOME") + shownDirectory.substring(1)
 
     // Saved choices. An empty camera or mic means off; unavailable ones fall back.
     // monitor is an output name or "region"; region is logical, global {x, y, width, height}.
@@ -36,7 +38,8 @@ Item {
 
     // The choices each saved value falls back over, and the ones the panel offers.
     readonly property var monitorOptions: monitors.concat(["region"])
-    readonly property var cameraOptions: [""].concat(Ui.Compositor.supports.camera ? cameras.map(entry => entry.path) : [])
+    readonly property bool cameraSupported: Ui.Compositor.supports.camera
+    readonly property var cameraOptions: [""].concat(cameraSupported ? cameras.map(entry => entry.path) : [])
     readonly property var micOptions: ["", "default_input"].concat(mics.map(node => node.name))
 
     readonly property string activeMonitor: Model.pick(monitorOptions, monitor, monitors[0] || "")

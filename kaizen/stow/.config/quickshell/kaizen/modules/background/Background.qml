@@ -1,10 +1,10 @@
 import QtQuick
-import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 
 import "../../Ui" as Ui
+import "WallpaperModel.js" as Model
 
 Scope {
     id: background
@@ -21,7 +21,8 @@ Scope {
         picker.shown ? picker.close() : picker.open(slot || "workspace");
     }
 
-    readonly property string wallpaperDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
+    readonly property string shownWallpaperDir: "~/Pictures/Wallpapers"
+    readonly property string wallpaperDir: Quickshell.env("HOME") + shownWallpaperDir.substring(1)
     readonly property string thumbDir: Ui.Paths.cache + "/wallpaper-thumbs"
     readonly property string statePath: Ui.Paths.state + "/wallpaper.json"
     property bool stateLoaded: false
@@ -33,6 +34,7 @@ Scope {
     property var rowOfIndex: []
     // Wallpapers the current thumbnail pass has reached, generated or not.
     property int thumbsDone: 0
+    readonly property bool thumbsRunning: thumbs.running
     property string darkPick: ""
     property string lightPick: ""
     property string backdropDarkPick: ""
@@ -50,7 +52,7 @@ Scope {
     Timer {
         id: previewDelay
         interval: 250
-        onTriggered: background.preview = picker.shown && grid.sel >= 0 ? (background.wallpapers[grid.sel] || "") : ""
+        onTriggered: background.preview = picker.shown ? pickerView.selected : ""
     }
 
     Connections {
@@ -69,47 +71,16 @@ Scope {
         return slot === "backdrop" ? backdrop : wallpaper;
     }
 
-    // Qt.md5 of the path matches `printf %s <path> | md5sum`, so the generator
-    // below and the grid derive the same name without sharing a list.
+    // A URL. Qt.md5 of the path matches `printf %s <path> | md5sum`, so the
+    // generator below and the grid derive the same name without sharing a list.
     function thumbFor(path) {
-        return background.thumbDir + "/" + Qt.md5(path) + ".jpg";
-    }
-
-    // Folder of a wallpaper relative to wallpaperDir; "" for the root.
-    function dirOf(path) {
-        const rel = path.slice(wallpaperDir.length + 1);
-        const i = rel.lastIndexOf("/");
-        return i < 0 ? "" : rel.slice(0, i);
+        return "file://" + background.thumbDir + "/" + Qt.md5(path) + ".jpg";
     }
 
     function buildRows() {
-        const out = [];
-        const rowOf = [];
-        let dir = null;
-        wallpapers.forEach((path, i) => {
-            const d = dirOf(path);
-            if (d !== dir) {
-                dir = d;
-                out.push({
-                    header: true,
-                    label: d || "Wallpapers"
-                });
-            }
-            let row = out[out.length - 1];
-            if (row.header || row.count === columns) {
-                row = {
-                    header: false,
-                    start: i,
-                    count: 0
-                };
-                out.push(row);
-            }
-            row.count++;
-            rowOf[i] = out.length - 1;
-        });
-        rows = out;
-        rowOfIndex = rowOf;
-        Qt.callLater(grid.reveal);
+        const layout = Model.layout(wallpapers, wallpaperDir, columns);
+        rows = layout.rows;
+        rowOfIndex = layout.rowOfIndex;
     }
 
     function saveState() {
@@ -151,12 +122,7 @@ Scope {
         command: ["find", background.wallpaperDir, "-type", "f", "-iregex", ".*\\.\\(png\\|jpg\\|jpeg\\|webp\\)", "!", "-name", "._*", "!", "-size", "0"]
         stdout: StdioCollector {
             onStreamFinished: {
-                background.wallpapers = text.trim().split("\n").filter(l => l.length > 0).sort((a, b) => {
-                    const da = background.dirOf(a), db = background.dirOf(b);
-                    if (da !== db)
-                        return da < db ? -1 : 1;
-                    return a < b ? -1 : a > b ? 1 : 0;
-                });
+                background.wallpapers = Model.sorted(text.trim().split("\n").filter(l => l.length > 0), background.wallpaperDir);
                 background.buildRows();
                 if (!thumbs.running)
                     thumbs.running = true;
@@ -351,239 +317,21 @@ Scope {
             if (slot === "backdrop" && !Ui.Compositor.placesBackdrop)
                 return;
             background.slot = slot || "workspace";
-            grid.pointer = Qt.point(-1, -1);
             scan.running = true;
             if (background.shell && background.shell.registerPanel)
                 background.shell.registerPanel(picker);
             if (background.shell && background.shell.claimPanel)
                 background.shell.claimPanel(picker);
             shown = true;
-            grid.sel = Math.max(0, background.wallpapers.indexOf(background.currentPick()));
-            grid.forceActiveFocus();
+            pickerView.reset();
         }
 
-        function choose() {
-            const path = background.wallpapers[grid.sel];
-            if (path)
-                background.setWallpaper(path);
-            close();
-        }
-
-        function clear() {
-            background.setWallpaper("");
-            close();
-        }
-
-        Item {
-            width: parent.width
-            height: Math.max(title.height, clearButton.height)
-
-            Text {
-                id: title
-                anchors.verticalCenter: parent.verticalCenter
-                color: background.shell.palette.fg
-                font.family: Ui.Fonts.mono
-                font.pixelSize: 15
-                text: "Wallpaper (" + background.slot + ") · " + (background.shell.dark ? "dark" : "light") + (thumbs.running ? " · thumbnails " + background.thumbsDone + "/" + background.wallpapers.length : "")
-            }
-
-            Rectangle {
-                id: clearButton
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                width: clearLabel.width + 20
-                height: clearLabel.height + 10
-                radius: 4
-                activeFocusOnTab: true
-                color: activeFocus ? background.shell.palette.dim : "transparent"
-                border.color: activeFocus ? background.shell.palette.fg : background.shell.palette.dim
-                border.width: 1
-
-                Text {
-                    id: clearLabel
-                    anchors.centerIn: parent
-                    color: background.shell.palette.fg
-                    font.family: Ui.Fonts.mono
-                    font.pixelSize: 13
-                    text: "󰅖 Clear"
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: picker.clear()
-                }
-
-                Keys.onPressed: function (event) {
-                    if (event.key === Qt.Key_Escape)
-                        picker.close();
-                    else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space)
-                        picker.clear();
-                    else if (event.key === Qt.Key_Down || event.key === Qt.Key_Up)
-                        grid.forceActiveFocus();
-                    else
-                        return;
-                    event.accepted = true;
-                }
-            }
-        }
-
-        ListView {
-            id: grid
-            width: parent.width
-            height: parent.height - y
-            clip: true
-            focus: true
-            activeFocusOnTab: true
-            keyNavigationEnabled: false
-            // Index into background.wallpapers; the view's own currentIndex
-            // counts rows, headers included.
-            property int sel: 0
-            // Cells scrolled under a resting pointer report hover too; act on real motion only.
-            property point pointer: Qt.point(-1, -1)
-            readonly property real cellWidth: (width - 16) / background.columns
-            readonly property real cellHeight: cellWidth * 9 / 16
-            model: background.rows
-            onSelChanged: {
-                previewDelay.restart();
-                reveal();
-            }
-
-            function moved(point) {
-                if (point.x === pointer.x && point.y === pointer.y)
-                    return false;
-                const first = pointer.x < 0;
-                pointer = point;
-                return !first;
-            }
-
-            // Keeps a section's header in view when its first row is selected.
-            function reveal() {
-                let r = background.rowOfIndex[sel];
-                if (r === undefined)
-                    return;
-                if (background.rows[r - 1] && background.rows[r - 1].header)
-                    r--;
-                positionViewAtIndex(r, ListView.Contain);
-            }
-
-            // Moves one image row up or down, skipping headers.
-            function step(dir) {
-                const r = background.rowOfIndex[sel];
-                if (r === undefined)
-                    return false;
-                let t = r + dir;
-                while (background.rows[t] && background.rows[t].header)
-                    t += dir;
-                const row = background.rows[t];
-                if (!row)
-                    return false;
-                sel = row.start + Math.min(sel - background.rows[r].start, row.count - 1);
-                return true;
-            }
-
-            // AlwaysOn because the point is to show how much library is left,
-            // not only to react to a flick. Dragging it comes with the type.
-            ScrollBar.vertical: ScrollBar {
-                id: gridScroll
-                policy: ScrollBar.AlwaysOn
-                contentItem: Rectangle {
-                    implicitWidth: 6
-                    radius: width / 2
-                    color: background.shell.palette.fg
-                    opacity: gridScroll.pressed ? 0.9 : 0.4
-                }
-            }
-
-            delegate: Item {
-                id: rowItem
-                required property var modelData
-
-                width: grid.width
-                height: modelData.header ? headerLabel.implicitHeight + 16 : grid.cellHeight
-
-                Text {
-                    id: headerLabel
-                    visible: rowItem.modelData.header
-                    anchors.left: parent.left
-                    anchors.leftMargin: 4
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 4
-                    color: background.shell.palette.fg
-                    font.family: Ui.Fonts.mono
-                    font.pixelSize: 13
-                    font.bold: true
-                    text: rowItem.modelData.label || ""
-                }
-
-                Repeater {
-                    model: rowItem.modelData.header ? 0 : rowItem.modelData.count
-
-                    Item {
-                        id: cell
-                        required property int index
-                        readonly property int flat: rowItem.modelData.start + index
-                        readonly property string path: background.wallpapers[flat]
-
-                        x: index * grid.cellWidth
-                        width: grid.cellWidth
-                        height: grid.cellHeight
-
-                        Rectangle {
-                            anchors.fill: parent
-                            anchors.margins: 4
-                            radius: 4
-                            clip: true
-                            color: background.shell.palette.dim
-                            border.color: cell.flat === grid.sel ? background.shell.palette.fg : "transparent"
-                            border.width: 2
-
-                            Image {
-                                anchors.fill: parent
-                                anchors.margins: 2
-                                fillMode: Image.PreserveAspectCrop
-                                asynchronous: true
-                                sourceSize.width: 480
-                                source: "file://" + background.thumbFor(cell.path)
-                                // Not yet generated, or magick could not read it.
-                                onStatusChanged: if (status === Image.Error)
-                                    source = "file://" + cell.path
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                onPositionChanged: function (mouse) {
-                                    if (grid.moved(mapToItem(null, mouse.x, mouse.y)))
-                                        grid.sel = cell.flat;
-                                }
-                                onClicked: {
-                                    grid.sel = cell.flat;
-                                    picker.choose();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            Keys.onPressed: function (event) {
-                if (event.key === Qt.Key_Escape)
-                    picker.close();
-                else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
-                    picker.choose();
-                else if (event.key === Qt.Key_Left)
-                    sel = Math.max(0, sel - 1);
-                else if (event.key === Qt.Key_Right)
-                    sel = Math.min(background.wallpapers.length - 1, sel + 1);
-                else if (event.key === Qt.Key_Down)
-                    step(1);
-                else if (event.key === Qt.Key_Up) {
-                    if (!step(-1))
-                        clearButton.forceActiveFocus();
-                } else
-                    return;
-                event.accepted = true;
-            }
+        PickerView {
+            id: pickerView
+            shell: background.shell
+            service: background
+            onSelectedChanged: previewDelay.restart()
+            onCloseRequested: picker.close()
         }
     }
 }
