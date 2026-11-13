@@ -11,7 +11,7 @@ Column {
     required property var service
 
     // The cards animate only while the panel is open.
-    property bool shown: true
+    required property bool shown
     readonly property int count: service.historyRows.length
     // What the cards' times are read against; set on open.
     property date now: new Date()

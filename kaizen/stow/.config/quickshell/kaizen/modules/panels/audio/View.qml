@@ -14,7 +14,6 @@ Column {
 
     readonly property int cardWidth: 400
     readonly property int cardHeight: implicitHeight + 2 * Ui.Space.cardPadding
-    readonly property bool keyNavigation: false
 
     width: parent ? parent.width : 0
     spacing: 24
