@@ -25,7 +25,7 @@ Item {
     signal stepped(int direction)
 
     width: parent ? parent.width : 0
-    implicitHeight: 32
+    implicitHeight: 28
 
     // Kept while focused: Qt refuses to drop the active focus item from the chain.
     activeFocusOnTab: (slider.visible && slider.interactive) || slider.activeFocus
