@@ -128,7 +128,8 @@ something to hang from.
 - It opens centred with exclusive keyboard focus. Arrows and `hjkl` step
   focus as Tab does, since a panel has no search to type into; Enter and Space
   activate; Esc closes.
-- A control with its own key shows it.
+- A control with its own key shows it, and the panel's footer lists every key
+  it adds beyond these ([`style.md`](style.md) › Panels).
 
 ### Tray
 

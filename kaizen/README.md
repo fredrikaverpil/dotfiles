@@ -8,7 +8,8 @@ desktop that an agent can drive and verify from a terminal.
 - [`features.md`](docs/features.md): description of individual features.
 - [`plugins.md`](docs/plugins.md): optional shell extensions and how to write
   one.
-- [`style.md`](docs/style.md): palette, colour roles, shapes, status marks.
+- [`style.md`](docs/style.md): palette, colour roles, shapes, panels, status
+  marks.
 - [`interaction.md`](docs/interaction.md): keys, menus, the bar, panels, tray
   and applications.
 - [`development.md`](docs/development.md): working on kaizen, validation and

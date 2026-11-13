@@ -35,11 +35,57 @@ starts from them and may deviate.
 - A key is a keycap per key (`Super` `Space`), set apart from the label it
   belongs to: `off` text a size smaller, outlined `dim` at radius 3 with a 2 px
   bottom edge. A menu row puts it in a column on the right.
-- Text is `Ui.Fonts.mono` at 14 px, times the text scale; secondary text is a
-  size or two smaller. Links are `water` and underlined; inline code is
+- Text is `Ui.Fonts.mono` at 14 px, times the text scale; secondary text is
+  12 px. Links are `water` and underlined; inline code is
   `water` in the body's font and size. Qt's Markdown rendering ignores
   `linkColor` and draws code in its own larger fixed font, so markdown text goes
   through a helper that colours both spans first.
+
+## Panels
+
+Panels borrow four ideas from Japanese design, each turned into rules below:
+ma (間), the space between things, as structure; kanso (簡素), keeping only
+what earns its place; kata (型), one form that every panel follows; and shibui
+(渋い), quiet until something matters. A panel that breaks a rule needs a
+reason, written next to the code.
+
+### Form
+
+Every panel has the same shape, top to bottom:
+
+- A header: the title in `blossom` at 16 px on the left, and the panel's one
+  key value (a volume, a charge, a network) at 16 px on the right, coloured by
+  its status.
+- A subtitle in `off` at 12 px: what the value belongs to, or why there is
+  none.
+- Groups, each a section label and its content.
+- A footer with the panel's own keys: a keycap, then what it does in `off`. It
+  lists only the keys the panel adds to those every panel shares
+  ([`interaction.md`](interaction.md) › Panels).
+
+### Space
+
+- Spacing comes from one scale: 4, 8, 16 and 24 px. Rows in a list are 4
+  apart, a label is 8 above its content, the card's padding is 16, and groups
+  are 24 apart. The subtitle sits 4 under the title.
+- Space separates groups. A panel draws no divider lines.
+
+### Focus and state
+
+- The `sel` fill marks focus or hover, and nothing else. Rows and sliders
+  draw no outline; buttons keep theirs (Shapes and text).
+- What is current or chosen shows as a mark at the start of its row: `●` for
+  the chosen one of a set, `○` in `dim` for the others.
+- A slider is a 2 px track in `dim`, filled `fg` up to its value, with a
+  10 px knob; the fill and knob turn `off` while muted or off.
+
+### Type
+
+- Three sizes: 16 px for the title and the key value, 14 px for body text,
+  12 px for secondary text and section labels. All scale with the text scale.
+- A section label is in sentence case, 12 px, in `off`. Every group has one,
+  even a panel's only group.
+- Colour carries a role or a status, never decoration.
 
 ## Status
 
