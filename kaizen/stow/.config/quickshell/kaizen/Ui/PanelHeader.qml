@@ -24,8 +24,11 @@ Item {
             width: parent.width
             height: titleText.implicitHeight
 
+            // Elided before the value, which stays whole.
             Text {
                 id: titleText
+                width: parent.width - (valueText.text !== "" ? valueText.implicitWidth + 8 : 0)
+                elide: Text.ElideRight
                 color: header.shell.palette.fg
                 font.family: Fonts.mono
                 font.pixelSize: 16
@@ -33,6 +36,7 @@ Item {
             }
 
             Text {
+                id: valueText
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 color: header.valueColor
