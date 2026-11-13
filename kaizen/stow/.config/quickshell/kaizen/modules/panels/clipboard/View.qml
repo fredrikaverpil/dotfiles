@@ -99,7 +99,7 @@ Column {
     }
 
     // An entry: its first line, how many follow, when it was copied. Enter, Space or a click copies it.
-    component EntryRow: Item {
+    component EntryRow: Ui.PanelRow {
         id: row
 
         required property var modelData
@@ -107,26 +107,13 @@ Column {
         readonly property int more: Model.moreLines(modelData.text)
 
         width: root.width
-        implicitHeight: 28
-        activeFocusOnTab: true
-
-        Keys.onReturnPressed: root.pick(row.modelData.text)
-        Keys.onEnterPressed: root.pick(row.modelData.text)
-        Keys.onSpacePressed: root.pick(row.modelData.text)
+        shell: root.shell
+        onActivated: root.pick(row.modelData.text)
         Keys.onPressed: function (event) {
             if (event.key !== Qt.Key_Backspace)
                 return;
             root.drop(row.index);
             event.accepted = true;
-        }
-
-        // The fill reaches into the card's padding, so the text aligns with the rule.
-        Rectangle {
-            anchors.fill: parent
-            anchors.leftMargin: -8
-            anchors.rightMargin: -8
-            radius: 4
-            color: row.activeFocus || mouse.containsMouse ? root.shell.palette.sel : "transparent"
         }
 
         Text {
@@ -161,15 +148,6 @@ Column {
             font.family: Ui.Fonts.mono
             font.pixelSize: 14
             text: Time.stamp(row.modelData.at, root.now)
-        }
-
-        MouseArea {
-            id: mouse
-            anchors.fill: parent
-            anchors.leftMargin: -8
-            anchors.rightMargin: -8
-            hoverEnabled: true
-            onClicked: root.pick(row.modelData.text)
         }
     }
 }

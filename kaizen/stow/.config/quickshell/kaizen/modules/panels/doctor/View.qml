@@ -111,7 +111,7 @@ Column {
     }
 
     // A finding: its level and unit, when it happened, its message and its fix. Enter, Space or a click copies it.
-    component FindingRow: Item {
+    component FindingRow: Ui.PanelRow {
         id: row
 
         required property var finding
@@ -120,24 +120,12 @@ Column {
 
         width: root.width
         implicitHeight: lines.implicitHeight + 10
-        activeFocusOnTab: true
+        shell: root.shell
+        onActivated: root.copy(row.finding)
         onActiveFocusChanged: if (activeFocus)
             root.focusedKey = key
         Component.onCompleted: if (key === root.focusedKey)
             Qt.callLater(() => row.forceActiveFocus())
-
-        Keys.onReturnPressed: root.copy(row.finding)
-        Keys.onEnterPressed: root.copy(row.finding)
-        Keys.onSpacePressed: root.copy(row.finding)
-
-        // The fill reaches into the card's padding, so the text aligns with the rule.
-        Rectangle {
-            anchors.fill: parent
-            anchors.leftMargin: -8
-            anchors.rightMargin: -8
-            radius: 4
-            color: row.activeFocus || mouse.containsMouse ? root.shell.palette.sel : "transparent"
-        }
 
         Column {
             id: lines
@@ -201,15 +189,6 @@ Column {
                 textFormat: Text.PlainText
                 text: row.finding.hint || ""
             }
-        }
-
-        MouseArea {
-            id: mouse
-            anchors.fill: parent
-            anchors.leftMargin: -8
-            anchors.rightMargin: -8
-            hoverEnabled: true
-            onClicked: root.copy(row.finding)
         }
     }
 }

@@ -121,7 +121,7 @@ Column {
 
     // A setting with many values: its label, then `‹ value ›`; h/l, Enter, Space or a click step it, a
     // right-click back.
-    component Cycler: Item {
+    component Cycler: Ui.PanelRow {
         id: cycler
 
         property string label: ""
@@ -136,26 +136,17 @@ Column {
         }
 
         width: root.width
-        implicitHeight: 28
-        activeFocusOnTab: visible || activeFocus
+        shell: root.shell
+        onActivated: cycler.step(1)
         // Up/down fall through to the panel's focus chain.
         Keys.onPressed: function (event) {
-            if (event.key === Qt.Key_Right || event.text === "l" || event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space)
+            if (event.key === Qt.Key_Right || event.text === "l")
                 cycler.step(1);
             else if (event.key === Qt.Key_Left || event.text === "h")
                 cycler.step(-1);
             else
                 return;
             event.accepted = true;
-        }
-
-        // The fill reaches into the card's padding, so the label aligns with the group's rule.
-        Rectangle {
-            anchors.fill: parent
-            anchors.leftMargin: -8
-            anchors.rightMargin: -8
-            radius: 4
-            color: cycler.activeFocus ? root.shell.palette.sel : "transparent"
         }
 
         Text {
@@ -179,16 +170,13 @@ Column {
             text: "‹ " + (cycler.labels[cycler.values.indexOf(cycler.value)] || "—") + " ›"
         }
 
+        // A left click passes through to the row's own area.
         MouseArea {
             anchors.fill: parent
             anchors.leftMargin: -8
             anchors.rightMargin: -8
-            hoverEnabled: true
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            onEntered: cycler.forceActiveFocus()
-            onClicked: function (mouse) {
-                cycler.step(mouse.button === Qt.RightButton ? -1 : 1);
-            }
+            acceptedButtons: Qt.RightButton
+            onClicked: cycler.step(-1)
         }
     }
 

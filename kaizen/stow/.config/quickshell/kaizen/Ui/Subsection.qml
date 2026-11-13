@@ -18,26 +18,13 @@ Column {
     leftPadding: Space.indent
     spacing: 4
 
-    Item {
+    // The fill reaches 8 past the chevron, as a row's past its mark.
+    PanelRow {
         id: heading
 
         width: subsection.width - subsection.leftPadding
-        implicitHeight: 28
-
-        // Kept while focused: Qt refuses to drop the active focus item from the chain.
-        activeFocusOnTab: subsection.visible || heading.activeFocus
-        Keys.onReturnPressed: subsection.toggled()
-        Keys.onEnterPressed: subsection.toggled()
-        Keys.onSpacePressed: subsection.toggled()
-
-        // The fill reaches 8 past the chevron, as a row's past its mark.
-        Rectangle {
-            anchors.fill: parent
-            anchors.leftMargin: -8
-            anchors.rightMargin: -8
-            radius: 4
-            color: heading.activeFocus || mouse.containsMouse ? subsection.shell.palette.sel : "transparent"
-        }
+        shell: subsection.shell
+        onActivated: subsection.toggled()
 
         Text {
             id: chevron
@@ -78,15 +65,6 @@ Column {
             font.family: Fonts.mono
             font.pixelSize: 14
             text: subsection.value
-        }
-
-        MouseArea {
-            id: mouse
-            anchors.fill: parent
-            anchors.leftMargin: -8
-            anchors.rightMargin: -8
-            hoverEnabled: true
-            onClicked: subsection.toggled()
         }
     }
 

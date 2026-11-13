@@ -13,6 +13,7 @@ singleton Space 1.0 Space.qml
 Plugin 1.0 Plugin.qml
 Section 1.0 Section.qml
 PanelHeader 1.0 PanelHeader.qml
+PanelRow 1.0 PanelRow.qml
 PanelFooter 1.0 PanelFooter.qml
 PanelSlider 1.0 PanelSlider.qml
 RadioRow 1.0 RadioRow.qml

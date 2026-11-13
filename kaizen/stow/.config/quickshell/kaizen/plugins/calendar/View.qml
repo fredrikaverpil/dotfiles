@@ -114,7 +114,7 @@ Column {
     }
 
     // An event: Enter, Space or a click opens it in dcal; Join, its own stop, opens the meeting.
-    component EventRow: Item {
+    component EventRow: Ui.PanelRow {
         id: row
 
         required property var modelData
@@ -122,30 +122,8 @@ Column {
         readonly property color textColor: past ? root.shell.palette.off : root.shell.palette.fg
 
         width: root.width
-        implicitHeight: 28
-        activeFocusOnTab: true
-
-        Keys.onReturnPressed: root.openRequested(row.modelData)
-        Keys.onEnterPressed: root.openRequested(row.modelData)
-        Keys.onSpacePressed: root.openRequested(row.modelData)
-
-        // The fill reaches into the card's padding, so the text aligns with the rule.
-        Rectangle {
-            anchors.fill: parent
-            anchors.leftMargin: -8
-            anchors.rightMargin: -8
-            radius: 4
-            color: row.activeFocus || mouse.containsMouse ? root.shell.palette.sel : "transparent"
-        }
-
-        MouseArea {
-            id: mouse
-            anchors.fill: parent
-            anchors.leftMargin: -8
-            anchors.rightMargin: -8
-            hoverEnabled: true
-            onClicked: root.openRequested(row.modelData)
-        }
+        shell: root.shell
+        onActivated: root.openRequested(row.modelData)
 
         Text {
             id: emoji
