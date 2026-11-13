@@ -90,6 +90,16 @@ Column {
         }
     }
 
+    Ui.PanelFooter {
+        shell: root.shell
+
+        Ui.PanelButton {
+            shell: root.shell
+            label: "Audio settings…"
+            onActivated: root.settingsRequested()
+        }
+    }
+
     // A row per device, the current one chosen; "No devices" without any.
     component DeviceRows: Column {
         id: rows
@@ -124,16 +134,6 @@ Column {
                 chosen: modelData === rows.current
                 onActivated: rows.picked(modelData)
             }
-        }
-    }
-
-    Ui.PanelFooter {
-        shell: rows.shell
-
-        Ui.PanelButton {
-            shell: rows.shell
-            label: "Audio settings…"
-            onActivated: root.settingsRequested()
         }
     }
 }
