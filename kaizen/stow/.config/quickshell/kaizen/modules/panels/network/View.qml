@@ -145,10 +145,10 @@ Column {
     }
 
     Ui.PanelFooter {
+        visible: root.service.networkManagerAvailable
         shell: root.shell
 
         Ui.PanelButton {
-            visible: root.service.networkManagerAvailable
             shell: root.shell
             label: "Connection settings…"
             onActivated: root.settingsRequested()

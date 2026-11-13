@@ -2,7 +2,7 @@ import QtQuick
 
 // A panel's own keys, each a keycap and what it does, and at the right its children: the buttons
 // acting on the whole panel (style.md › Panels). A note, such as the data's credit, takes a line
-// of its own under them.
+// of its own under them. A panel hides the footer, not its only button, which would leave it empty.
 Item {
     id: footer
 
@@ -15,10 +15,6 @@ Item {
     width: parent ? parent.width : 0
     readonly property real rowHeight: Math.max(keys.implicitHeight, buttonRow.implicitHeight)
     implicitHeight: rowHeight + (noteText.visible ? (rowHeight > 0 ? 8 : 0) + noteText.implicitHeight : 0)
-    // The row's width, not visibleChildren, which stays empty while the footer is hidden. A hidden
-    // footer's buttons count as hidden too, so one that starts hidden never shows: to hide the only
-    // button, hide the footer.
-    visible: entries.length > 0 || note !== "" || buttonRow.implicitWidth > 0
 
     Text {
         id: noteText
