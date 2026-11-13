@@ -20,7 +20,6 @@ Column {
 
     // Focuses the current wallpaper, or Clear without any.
     function reset() {
-        grid.pointer = Qt.point(-1, -1);
         grid.sel = Math.max(0, root.service.wallpapers.indexOf(root.service.currentPick()));
         root.clearByDefault = root.service.wallpapers.length === 0;
         if (root.clearByDefault)
@@ -91,22 +90,12 @@ Column {
             // Index into service.wallpapers; the view's own currentIndex
             // counts rows, headers included.
             property int sel: 0
-            // Cells scrolled under a resting pointer report hover too; act on real motion only.
-            property point pointer: Qt.point(-1, -1)
             readonly property int gap: 8
             readonly property real cellWidth: (width - (root.service.columns - 1) * gap) / root.service.columns
             readonly property real cellHeight: cellWidth * 9 / 16
             model: root.service.rows
             onSelChanged: reveal()
             ScrollBar.vertical: scrollBar
-
-            function moved(point) {
-                if (point.x === pointer.x && point.y === pointer.y)
-                    return false;
-                const first = pointer.x < 0;
-                pointer = point;
-                return !first;
-            }
 
             // Keeps the selected row in view, and its folder's label too when it is the folder's first row.
             function reveal() {
@@ -173,12 +162,9 @@ Column {
                                 source = "file://" + cell.path
                         }
 
-                        MouseArea {
+                        Ui.HoverArea {
                             anchors.fill: parent
-                            hoverEnabled: true
-                            onPositionChanged: function (mouse) {
-                                if (!grid.moved(mapToItem(null, mouse.x, mouse.y)))
-                                    return;
+                            onPointed: {
                                 grid.sel = cell.flat;
                                 grid.forceActiveFocus();
                             }
