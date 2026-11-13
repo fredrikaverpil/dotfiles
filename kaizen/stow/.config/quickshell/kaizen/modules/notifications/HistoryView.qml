@@ -13,6 +13,8 @@ Column {
     // The cards animate only while the panel is open.
     property bool shown: true
     readonly property int count: service.historyRows.length
+    // What the cards' times are read against; set on open.
+    property date now: new Date()
 
     readonly property int cardWidth: 600
     readonly property int cardHeight: implicitHeight + 2 * Ui.Space.cardPadding
@@ -21,6 +23,7 @@ Column {
     signal actionRequested(var row, var action)
 
     function reset() {
+        root.now = new Date();
         Qt.callLater(() => {
             const row = rows.itemAt(0);
             if (row)
@@ -105,6 +108,7 @@ Column {
                         palette: root.shell.palette
                         row: modelData
                         toast: false
+                        now: root.now
                         animated: root.shown
                         selectable: true
                         onCloseRequested: root.drop(index)

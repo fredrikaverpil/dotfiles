@@ -14,8 +14,12 @@ Ui.Panel {
     cardHeight: view.cardHeight
     keyNavigation: view.keyNavigation
 
-    onShownChanged: if (shown)
-        root.service.refreshIfExpired()
+    onShownChanged: {
+        if (!shown)
+            return;
+        view.now = new Date();
+        root.service.refreshIfExpired();
+    }
 
     function openForecast() {
         Quickshell.execDetached(["xdg-open", Model.yrUrl(root.service.latitude, root.service.longitude)]);

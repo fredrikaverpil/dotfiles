@@ -15,6 +15,8 @@ Rectangle {
     property var row: ({})
     property var notification: null
     property bool toast: false
+    // What a held card's time is read against.
+    property date now: new Date()
     // Animations run only while the card is on screen.
     property bool animated: toast
     property bool selectable: false
@@ -423,7 +425,7 @@ Rectangle {
                 Text {
                     Layout.fillWidth: true
                     visible: !root.toast && Number(root.row.timestamp) > 0
-                    text: Time.stamp(new Date(Number(root.row.timestamp)), new Date())
+                    text: Time.stamp(new Date(Number(root.row.timestamp)), root.now)
                     color: root.palette.off
                     font.family: Ui.Fonts.mono
                     font.pixelSize: 11
