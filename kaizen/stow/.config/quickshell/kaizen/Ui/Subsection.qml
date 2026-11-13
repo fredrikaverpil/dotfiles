@@ -8,7 +8,7 @@ Column {
     required property var shell
     property string title: ""
     property string value: ""
-    property bool expanded: true
+    property bool expanded: false
 
     signal toggled
 
