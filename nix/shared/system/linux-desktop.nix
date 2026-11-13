@@ -148,6 +148,7 @@ in
 
     environment.systemPackages = with pkgs; [
       alsa-utils # For Claude Code's /voice.
+      pwvucontrol # PipeWire volume control.
       # programs.niri only registers Nautilus's D-Bus services, not its launcher entry.
       # Opens folders (inode/directory) and "Show in folder" (org.freedesktop.FileManager1).
       nautilus
