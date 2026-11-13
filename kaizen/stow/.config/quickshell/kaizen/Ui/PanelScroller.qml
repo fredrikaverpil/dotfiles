@@ -4,12 +4,23 @@ import QtQuick.Window
 
 // A panel's scrolling body, between its fixed header and footer: a column of its children, as tall as they are up
 // to `maxHeight`, then scrolling to keep the focused item in view, the bar in the card's right padding
-// (style.md › Panels).
+// (style.md › Panels). It sits in its view's Column.
 Item {
     id: scroller
 
     required property var shell
-    property int maxHeight: 520
+    // What the screen leaves at the text scale, less the view's other items, their spacing and the card's padding.
+    // Sums the siblings, not the view's height, which holds this one's.
+    property real maxHeight: {
+        const view = scroller.parent;
+        if (!view)
+            return 0;
+        let rest = 2 * Space.cardPadding;
+        for (const item of view.children)
+            if (item !== scroller && item.visible && item.height > 0)
+                rest += item.height + view.spacing;
+        return Math.max(0, Space.cardRoom(scroller.Window.height, shell.barHeight) / shell.textScale - rest);
+    }
     // How far past the sides, and past an end with nothing scrolled beyond it, the body draws: a glowing card's halo.
     property int bleed: 0
     property alias spacing: body.spacing
