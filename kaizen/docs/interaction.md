@@ -127,7 +127,10 @@ something to hang from.
   so a panel is never the only way to one.
 - It opens centred with exclusive keyboard focus. Arrows and `hjkl` step
   focus as Tab does, since a panel has no search to type into; Enter and Space
-  activate; Esc closes.
+  activate; Esc closes. A control that steps a value (a slider, a
+  `‹ value ›` setting) takes `←` `→` and `h` `l` to step it instead.
+- A sub-group's heading expands or collapses it on Enter, Space or a click; it
+  stays so until the shell restarts.
 - A control with its own key shows it, and the panel's footer lists every key
   it adds beyond these ([`style.md`](style.md) › Panels).
 

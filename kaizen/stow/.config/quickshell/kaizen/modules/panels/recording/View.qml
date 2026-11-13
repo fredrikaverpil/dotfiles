@@ -119,7 +119,8 @@ Column {
         }
     }
 
-    // A setting with many values: its label, then `‹ value ›`; h/l, Enter, Space or a click step it.
+    // A setting with many values: its label, then `‹ value ›`; h/l, Enter, Space or a click step it, a
+    // right-click back.
     component Cycler: Item {
         id: cycler
 

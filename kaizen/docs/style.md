@@ -9,9 +9,9 @@ The palette is [zenbones](https://github.com/zenbones-theme/zenbones.nvim)' dark
 and light variants, defined once in
 [`Ui/Palette.js`](../stow/.config/quickshell/kaizen/Ui/Palette.js) and
 followed by the theme toggle in
-[`shell.qml`](../stow/.config/quickshell/kaizen/shell.qml). QML reads colours from `shell.palette`, never as
-hex literals. The roles below are the default: core follows them, a plugin
-starts from them and may deviate.
+[`shell.qml`](../stow/.config/quickshell/kaizen/shell.qml). QML reads colours
+from `shell.palette`, never as hex literals. The roles below are the default:
+core follows them, a plugin starts from them and may deviate.
 
 | Role | Meaning |
 | --- | --- |
@@ -29,16 +29,17 @@ starts from them and may deviate.
 ## Shapes and text
 
 - Buttons and inputs are outlined, 1 px at radius 4: `fg` focused and `dim`
-  otherwise, filled with `sel` on focus or hover; in a panel the outline stays
-  `dim` (Panels). List rows show focus with the `sel` fill alone. A field that
-  failed (lock, polkit) turns its outline `rose`. The lock field and selections
-  drawn over content take 2 px.
+  otherwise, filled with `sel` on focus or hover; a panel's buttons differ
+  (Panels › Focus and state). List rows show focus with the `sel` fill alone.
+  A field that failed (lock, polkit) turns its outline `rose`. The lock field
+  and selections drawn over content take 2 px.
 - Surfaces (panel, context menu, notification, OSD) have radius 8.
 - A key is a keycap per key (`Super` `Space`), set apart from the label it
-  belongs to: `off` text a size smaller, outlined `dim` at radius 3 with a 2 px
+  belongs to: `off` text at 12 px, outlined `dim` at radius 3 with a 2 px
   bottom edge. A menu row puts it in a column on the right.
-- Text is `Ui.Fonts.mono` at 14 px, times the text scale; secondary text is
-  12 px. Links are `water` and underlined; inline code is
+- Text is `Ui.Fonts.mono` at 14 px, times the text scale; a keycap and a
+  panel's footer are 12 px, and a panel's sizes are in Panels › Type. Links
+  are `water` and underlined; inline code is
   `water` in the body's font and size. Qt's Markdown rendering ignores
   `linkColor` and draws code in its own larger fixed font, so markdown text goes
   through a helper that colours both spans first.
@@ -76,17 +77,16 @@ Every panel has the same shape, top to bottom:
   of its own (Wi-Fi's power button) sits right of that.
 - A panel over several devices, each with details of its own (network,
   firmware), gives each device a group titled by its type ("Ethernet",
-  "Wi-Fi"), with its iface at the rule's right to tell two of a type apart,
-  or, where it has no iface (firmware), by its name. A group
-  holding a long list goes last.
-- A long list of a few kinds (Wi-Fi's networks: secured, open, out of range)
-  splits into sub-groups inside its group, leaving out empty ones. A
-  sub-group's heading is a row: a chevron, `󰅀` open and `󰅂` collapsed, its
-  label in `fg`, and a rule to its count in `off`. Sub-groups start
-  collapsed, so the panel reads at a glance: what is current (the connected
-  network's SSID and signal) shows in the group's details table. The heading
-  is a focus stop that expands or collapses its sub-group, which stays so
-  until the shell restarts.
+  "Wi-Fi"), with its iface at the rule's right to tell two of a type apart. A
+  device without an iface (firmware's) is titled by its name instead.
+- A group holding a long list goes last.
+- A group's content of a few kinds splits into sub-groups, leaving out empty
+  ones, such as Wi-Fi's networks: secured, open, out of range. A sub-group's
+  heading is a row: a chevron, `󰅀` open and `󰅂` collapsed, its label in
+  `fg`, and a rule to its count in `off`. Sub-groups start collapsed, so the
+  panel reads at a glance: what is current (the connected network's SSID and
+  signal) shows in the group's details table. The heading is a focus stop
+  that expands or collapses its sub-group.
 - A panel about picking a device (audio) lists every device as a row, since
   the choice is what it shows. A panel that sets up an action (recording)
   shows each setting as one row instead, label left and control right, so
@@ -99,6 +99,8 @@ Every panel has the same shape, top to bottom:
   value is short (weather's). A panel's tables share their column widths, so
   they line up. A value too long for the card (an SSID) is cut with `…`;
   labels never are.
+- A held notification (the notification history) keeps its toast's card,
+  tint, badge and animation included: it reads as the notification it was.
 - A footer with the panel's own keys: a keycap, then what it does in `off`. It
   lists only the keys the panel adds to those every panel shares
   ([`interaction.md`](interaction.md) › Panels). A note, such as the data's
@@ -125,9 +127,7 @@ Every panel has the same shape, top to bottom:
   fill reaches 8 into the card's padding, past the text it holds.
 - Space separates groups. The only lines a panel draws are the rules heading
   its groups and sub-groups: 1 px `dim`, on the label's line, to the group's
-  right edge or what sits there. The header has none. A held notification
-  (the notification history) keeps its toast's card, tint, badge and
-  animation included: it reads as the notification it was.
+  right edge or what sits there. The header has none.
 
 ### Focus and state
 
@@ -157,9 +157,9 @@ Every panel has the same shape, top to bottom:
 
 ### Type
 
-- Three sizes: 16 px for the title and the key value; 14 px for the subtitle,
-  section labels and body text; 12 px for the footer. All scale with the text
-  scale.
+- Three sizes: 16 px for the title and the header's key value; 14 px for the
+  subtitle, section labels, body text and a slider's or meter's value; 12 px
+  for the footer. All scale with the text scale.
 - A section label is in sentence case, 14 px, in `fg`, at its rule's left: no
   smaller than the body it heads, and set apart from it by the rule, not by
   colour.
