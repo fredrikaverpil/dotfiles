@@ -364,4 +364,36 @@ TestCase {
 
         compare(Warnings.describe(warning, data.now), data.want);
     }
+
+    function test_alert_text_data() {
+        return [
+            {
+                tag: "warning, described",
+                alert: {
+                    level: "wood",
+                    icon: "x",
+                    severity: "Yellow",
+                    event: "Snow",
+                    start: null,
+                    end: null
+                },
+                want: "Yellow warning: snow"
+            },
+            {
+                tag: "risk, its own text",
+                alert: {
+                    level: "wood",
+                    icon: "x",
+                    text: "Risk of thunder"
+                },
+                want: "Risk of thunder"
+            }
+        ];
+    }
+
+    function test_alert_text(data) {
+        const got = Warnings.alertText(data.alert, new Date(2026, 10, 12, 12, 0));
+
+        compare(got, data.want);
+    }
 }

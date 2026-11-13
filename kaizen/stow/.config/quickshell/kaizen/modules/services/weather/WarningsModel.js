@@ -172,3 +172,9 @@ function describe(warning, now) {
     return text + ", until " + Time.stamp(new Date(warning.end), reference);
   return text;
 }
+
+// An alert's line in the panel: a warning described against now, an outlook
+// risk by its own text.
+function alertText(alert, now) {
+  return typeof alert.text === "string" ? alert.text : describe(alert, now);
+}

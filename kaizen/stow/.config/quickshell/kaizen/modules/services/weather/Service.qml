@@ -35,9 +35,11 @@ Item {
     readonly property bool ready: current !== null
     readonly property string country: Places.countryAt(latitude, longitude)
     readonly property bool swedish: country === "Sweden"
-    // An icon per event among the outlook's risks and SMHI's warnings, each in
-    // its worst level: [{ icon, level }].
-    readonly property var alertGlyphs: Warnings.glyphs(warnings.concat(outlook ? outlook.risks : []))
+    // SMHI's warnings, then the outlook's risks, worst first in each: each
+    // { level, icon }, a risk with its `text` (Warnings.alertText).
+    readonly property var alerts: warnings.concat(outlook ? outlook.risks : [])
+    // An icon per event among them, each in its worst level: [{ icon, level }].
+    readonly property var alertGlyphs: Warnings.glyphs(alerts)
     // The worst of them: "", wood or rose.
     readonly property string warningLevel: Warnings.worst(outlook ? outlook.level : "", warnings.length > 0 ? warnings[0].level : "")
     readonly property string icon: current ? Model.icon(current.symbol) : "󰖐"

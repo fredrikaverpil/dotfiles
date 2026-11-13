@@ -14,12 +14,11 @@ Column {
     // What the times are read against; set on open.
     property date now: new Date()
     readonly property string updated: service.updatedAt ? Time.stamp(service.updatedAt, now) : ""
-    // SMHI's warnings, then the outlook's risks: [{ level, icon, text }], worst first in each.
-    readonly property var alerts: service.warnings.map(warning => ({
-                level: warning.level,
-                icon: warning.icon,
-                text: Warnings.describe(warning, root.now)
-            })).concat(service.outlook ? service.outlook.risks : [])
+    readonly property var alerts: service.alerts.map(alert => ({
+                level: alert.level,
+                icon: alert.icon,
+                text: Warnings.alertText(alert, root.now)
+            }))
 
     readonly property int cardWidth: 460
     readonly property bool keyNavigation: true
