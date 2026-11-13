@@ -9,5 +9,8 @@ for f in "$@"; do
     notify-send "Convert to PNG" "Skipped $f: $out exists"
     continue
   fi
-  magick "$f" -auto-orient "$out" || notify-send "Convert to PNG" "Failed: $f"
+  # 8-bit at zlib level 3: magick's defaults write 16-bit from 10-bit HEIC and
+  # compress on one core, about 15x slower for a few percent smaller files.
+  magick "$f" -auto-orient -depth 8 -define png:compression-level=3 "$out" ||
+    notify-send "Convert to PNG" "Failed: $f"
 done
