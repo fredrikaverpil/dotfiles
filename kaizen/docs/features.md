@@ -213,8 +213,7 @@ The bell turns rose while it holds.
 DnD turns the hold on, and off again when DnD ends, unless it was already on.
 Toggling the hold by hand in the meantime wins: then DnD ending leaves it on.
 
-The status bar's bell icon blinks when critical notifications arrive or when the
-hold has been on for a longer time.
+The bell blinks while the hold has held back a critical notification.
 
 ### History
 

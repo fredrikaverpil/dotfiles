@@ -31,11 +31,8 @@ Item {
     property bool holding: false
     // When holding started, in ms since the epoch; 0 while off.
     property real holdingSince: 0
-    // Set once holding has been on for holdRemind.
-    property bool holdOverdue: false
     // Whether the history holds a critical notification held back.
     readonly property bool criticalHeld: holding && historyRows.some(row => row.urgency === NotificationUrgency.Critical && row.timestamp >= holdingSince)
-    readonly property int holdRemind: 10 * 60 * 1000
     // Reasons holding notifications, DnD's, and whether a hold turned it on.
     property var holds: []
     property bool holdOwned: false
@@ -45,7 +42,6 @@ Item {
     property bool capture: false
     readonly property int captureLimit: 50
     property var captureRows: []
-    readonly property alias historyShown: historyPanel.shown
     property var popupRows: []
     property var historyRows: []
     property var live: ({})
@@ -87,7 +83,6 @@ Item {
         stateLoaded = true;
         // DnD may have changed while the shell was down.
         hold("dnd", dnd);
-        remind();
     }
 
     function listRules() {
@@ -375,16 +370,6 @@ Item {
         }
         holdingSince = value ? Date.now() : 0;
         holding = !!value;
-        remind();
-    }
-
-    function remind() {
-        holdOverdue = false;
-        reminder.stop();
-        if (!holding)
-            return;
-        reminder.interval = Math.max(0, holdingSince + holdRemind - Date.now());
-        reminder.start();
     }
 
     function removeHistory(index) {
@@ -417,18 +402,6 @@ Item {
 
     onHoldingChanged: saveState()
     onDndChanged: hold("dnd", dnd)
-
-    // Seeing the history snoozes the reminder for another holdRemind.
-    onHistoryShownChanged: if (historyShown && holdOverdue) {
-        holdOverdue = false;
-        reminder.interval = holdRemind;
-        reminder.restart();
-    }
-
-    Timer {
-        id: reminder
-        onTriggered: root.holdOverdue = true
-    }
 
     Component.onCompleted: {
         if (!soundPath)
