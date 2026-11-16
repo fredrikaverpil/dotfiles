@@ -112,7 +112,9 @@ Ui.Plugin {
             detail: Model.detail(r, n)
         } : null;
         plugin.left = r.seconds;
-        countdown.restart();
+        // Only with a count: restart() runs the timer whatever its binding says.
+        if (plugin.counting)
+            countdown.restart();
         plugin.display(r, Model.detail(r, n));
     }
 
