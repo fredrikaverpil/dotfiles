@@ -26,7 +26,7 @@ var DEFAULT_REMINDERS = [
   },
 ];
 
-// One entry of hitoiki.jsonc's reminders, or null when invalid.
+// One entry of breaks.jsonc's reminders, or null when invalid.
 function reminder(r) {
   if (!r || typeof r !== "object") return null;
   if (typeof r.id !== "string" || r.id === "") return null;
@@ -50,7 +50,7 @@ function reminder(r) {
   };
 }
 
-// hitoiki.jsonc's settings. reminders, when set, replaces the defaults; an
+// breaks.jsonc's settings. reminders, when set, replaces the defaults; an
 // invalid entry, or one repeating an earlier id, is dropped.
 function settings(config) {
   var c = config || {};

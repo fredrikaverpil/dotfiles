@@ -3,7 +3,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import qs.Ui as Ui
 
-import "HitoikiModel.js" as Model
+import "BreaksModel.js" as Model
 
 // How long you have been at the computer without a break, with a card for each
 // reminder as it comes due. A session ends after idleMinutes without input, or
@@ -41,26 +41,26 @@ Ui.Plugin {
             action: () => plugin.remind()
         })
     menuItems: ({
-            "plugins.hitoiki": {
+            "plugins.breaks": {
                 icon: plugin.indicator.icon,
-                label: "hitoiki"
+                label: "Breaks"
             },
-            "plugins.hitoiki.status": {
+            "plugins.breaks.status": {
                 icon: plugin.indicator.icon,
                 label: Model.status(plugin.phase, plugin.elapsed),
                 enabled: false
             },
-            "plugins.hitoiki.new": {
+            "plugins.breaks.new": {
                 icon: "󰑐",
                 label: "New session",
                 action: () => plugin.newSession()
             },
-            "plugins.hitoiki.pause": {
+            "plugins.breaks.pause": {
                 icon: plugin.shell.menu.checkbox(plugin.paused),
                 label: "Pause tracking",
                 action: () => plugin.paused ? plugin.resume() : plugin.pause()
             },
-            "plugins.hitoiki.show": {
+            "plugins.breaks.show": {
                 icon: "\u{F0176}",
                 label: "Show reminder",
                 action: () => plugin.remind()
@@ -99,7 +99,7 @@ Ui.Plugin {
     function remind() {
         plugin.counting = null;
         osd.headline = Model.duration(plugin.elapsed);
-        osd.detail = "一息 · time for a breather";
+        osd.detail = "Time for a break";
         osd.show();
     }
 
@@ -123,7 +123,7 @@ Ui.Plugin {
     function display(r, detail) {
         const count = r.seconds > 0 ? (plugin.left > 0 ? plugin.left + " s" : "done") : "";
         osd.headline = r.icon;
-        osd.detail = ["一息", r.title, detail, count].filter(s => s).join(" · ");
+        osd.detail = [r.title, detail, count].filter(s => s).join(" · ");
         osd.show();
     }
 
@@ -178,11 +178,11 @@ Ui.Plugin {
     Ui.LargeOsd {
         id: osd
         shell: plugin.shell
-        namespace: "kaizen-hitoiki"
+        namespace: "kaizen-breaks"
     }
 
     IpcHandler {
-        target: "hitoiki"
+        target: "breaks"
 
         function status(): string {
             return Model.status(plugin.phase, plugin.elapsed);

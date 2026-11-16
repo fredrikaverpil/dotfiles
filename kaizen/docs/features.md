@@ -22,6 +22,30 @@ kaizen ipc -q call <target> <function> [args...]
 The below sections correspond to an IPC target (e.g. Curtain correlates to
 target `curtain`).
 
+## Breaks (`breaks`)
+
+A plugin, after [Pandan](https://sindresorhus.com/pandan): breaks shows in the
+bar how long you have been at the computer without a break, and reminds you to
+take one. A session ends after `idleMinutes` (5) without input, an idle
+inhibitor such as a video call's keeping it going, or when the screen locks or
+the curtain goes up; the next input starts a new one.
+
+Each reminder in `reminders` comes due every `everyMinutes` of a session, its
+`icon` (a glyph, a coffee cup by default) large in the middle of every output,
+as the hour is, over its `title` and its `detail`, or the next of its `details`
+each time. With `seconds`, the card stays up counting them down. Without
+`reminders`, two follow the eye and movement guidance: look into the distance
+for 20 s every 20 minutes (the 20-20-20 rule), and stand up and move every 30.
+Both settings are in `~/.config/kaizen/plugins/breaks.jsonc`.
+
+When several come due together, only the one with the longest interval shows.
+DnD holds reminders back while the time keeps counting; when it ends, the
+longest-interval one held back shows. The bar shows the time in `wood` once the
+longest-interval reminder came due. Under DnD it shows the time beside a bell
+off (󰂛) instead, in `off`, and in `wood` once a reminder is held back. Its
+left-click shows the session time large; New session and Pause tracking are in
+its menu. Nothing survives a shell restart.
+
 ## Curtain (`curtain`)
 
 When the agent verifies its work by invoking UI elements on the screen and
@@ -52,7 +76,7 @@ itself back. DnD knows nothing of them, so it does the same for whatever joins
 later. Today:
 
 - Notifications are held back to the history (Notifications › Hold).
-- Hitoiki holds its reminders, while still counting.
+- Breaks holds its reminders, while still counting.
 - The hour's time does not show (Time and timezone).
 
 Settings › Do not disturb (DnD) toggles it, as does
@@ -121,30 +145,6 @@ urgency. There are no notifications.
 
 [fwupd]: https://fwupd.org
 [LVFS]: https://fwupd.org/lvfs/
-
-## Hitoiki (`hitoiki`)
-
-A plugin, after [Pandan](https://sindresorhus.com/pandan): hitoiki (一息, a
-breather) shows in the bar how long you have been at the computer without a
-break, and reminds you to take one. A session ends after `idleMinutes` (5)
-without input, an idle inhibitor such as a video call's keeping it going, or
-when the screen locks or the curtain goes up; the next input starts a new one.
-
-Each reminder in `reminders` comes due every `everyMinutes` of a session, its
-`icon` (a glyph, a coffee cup by default) large in the middle of every output,
-as the hour is, over its `title` and its `detail`, or the next of its `details`
-each time. With `seconds`, the card stays up counting them down. Without
-`reminders`, two follow the eye and movement guidance: look into the distance
-for 20 s every 20 minutes (the 20-20-20 rule), and stand up and move every 30.
-Both settings are in `~/.config/kaizen/plugins/hitoiki.jsonc`.
-
-When several come due together, only the one with the longest interval shows.
-DnD holds reminders back while the time keeps counting; when it ends, the
-longest-interval one held back shows. The bar shows the time in `wood` once the
-longest-interval reminder came due. Under DnD it shows the time beside a bell
-off (󰂛) instead, in `off`, and in `wood` once a reminder is held back. Its
-left-click shows the session time large; New session and Pause tracking are in
-its menu. Nothing survives a shell restart.
 
 ## Notifications (`notifications`)
 

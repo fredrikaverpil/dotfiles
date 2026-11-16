@@ -1,9 +1,9 @@
 import QtQuick
 import QtTest
-import "HitoikiModel.js" as Model
+import "BreaksModel.js" as Model
 
 TestCase {
-    name: "HitoikiModel"
+    name: "BreaksModel"
 
     readonly property int minute: 60 * 1000
 
