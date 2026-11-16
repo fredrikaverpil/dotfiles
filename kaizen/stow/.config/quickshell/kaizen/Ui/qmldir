@@ -24,3 +24,4 @@ InfoTable 1.0 InfoTable.qml
 PanelScrollBar 1.0 PanelScrollBar.qml
 PanelScroller 1.0 PanelScroller.qml
 Subsection 1.0 Subsection.qml
+Osd 1.0 Osd.qml

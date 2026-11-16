@@ -16,6 +16,9 @@ Item {
     readonly property bool present: device !== "" && max > 0
     readonly property int percent: Model.percent(raw, max)
 
+    // Emitted by the brightness keys, for the OSD.
+    signal adjusted
+
     function refresh() {
         if (present)
             current.reload();
@@ -90,9 +93,13 @@ Item {
 
         function up(): void {
             root.adjust(root.step);
+            if (root.present)
+                root.adjusted();
         }
         function down(): void {
             root.adjust(-root.step);
+            if (root.present)
+                root.adjusted();
         }
         function set(percent: int): void {
             root.set(percent);

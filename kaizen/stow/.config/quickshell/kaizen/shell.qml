@@ -434,6 +434,12 @@ ShellRoot {
         shell: root
     }
 
+    Display.Osd {
+        shell: root
+        service: brightness
+        panel: display
+    }
+
     BatteryService.Service {
         id: batteryService
     }

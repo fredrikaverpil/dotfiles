@@ -1,14 +1,11 @@
 import QtQuick
-import Quickshell
-import Quickshell.Wayland
 
 import "../../../Ui" as Ui
 
-// Shown by the volume and mic-mute keys. No screen is set, so the compositor maps it on the focused output.
-PanelWindow {
+// Shown by the volume and mic-mute keys.
+Ui.Osd {
     id: root
 
-    required property var shell
     // The audio service.
     required property var service
     // The audio panel, which shows the change itself while open.
@@ -16,99 +13,19 @@ PanelWindow {
 
     property bool mic: false
 
-    function show(mic) {
-        root.mic = mic;
-        visible = true;
-        hide.restart();
-    }
-
-    visible: false
-    anchors.bottom: true
-    margins.bottom: 64
-    implicitWidth: 320 * shell.textScale
-    implicitHeight: 48 * shell.textScale
-    exclusiveZone: 0
-    color: "transparent"
-    mask: Region {}
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-
-    Timer {
-        id: hide
-        interval: 1500
-        onTriggered: root.visible = false
-    }
+    icon: mic ? service.micIcon : service.icon
+    value: service.volume
+    off: service.muted
+    text: mic ? (service.micMuted ? "Microphone muted" : "Microphone on") : ""
 
     Connections {
         target: root.service
 
         function onAdjusted(mic) {
-            if (!root.panel.shown)
-                root.show(mic);
-        }
-    }
-
-    Rectangle {
-        anchors.centerIn: parent
-        width: 320
-        height: 48
-        scale: root.shell.textScale
-        radius: 8
-        color: root.shell.palette.bg
-        border.color: root.shell.palette.dim
-        border.width: 1
-
-        Text {
-            id: icon
-            anchors.left: parent.left
-            anchors.leftMargin: 14
-            anchors.verticalCenter: parent.verticalCenter
-            color: root.shell.palette.fg
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 18
-            text: root.mic ? root.service.micIcon : root.service.icon
-        }
-
-        Text {
-            id: value
-            anchors.right: parent.right
-            anchors.rightMargin: 14
-            anchors.verticalCenter: parent.verticalCenter
-            visible: !root.mic
-            color: root.shell.palette.fg
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 13
-            text: Math.round(root.service.volume * 100) + "%"
-        }
-
-        Rectangle {
-            anchors.left: icon.right
-            anchors.leftMargin: 12
-            anchors.right: value.left
-            anchors.rightMargin: 12
-            anchors.verticalCenter: parent.verticalCenter
-            visible: !root.mic
-            height: 6
-            radius: 3
-            color: root.shell.palette.dim
-
-            Rectangle {
-                width: parent.width * root.service.volume
-                height: parent.height
-                radius: parent.radius
-                color: root.service.muted ? root.shell.palette.off : root.shell.palette.fg
-            }
-        }
-
-        Text {
-            anchors.left: icon.right
-            anchors.leftMargin: 12
-            anchors.verticalCenter: parent.verticalCenter
-            visible: root.mic
-            color: root.shell.palette.fg
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 13
-            text: root.service.micMuted ? "Microphone muted" : "Microphone on"
+            if (root.panel.shown)
+                return;
+            root.mic = mic;
+            root.show();
         }
     }
 }
