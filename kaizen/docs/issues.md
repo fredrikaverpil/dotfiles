@@ -128,29 +128,21 @@ Workarounds in the repository's `nix/` that kaizen hosts carry.
 - Status: open.
 - Drop: the rename, once a release names its entry without a space.
 
-### LightCraft lags upstream in nixpkgs
+### LightCraft lacks fixes for the X100VI
 
 - Symptom: renoir's `lightcraft`, in
   [`nix/hosts/renoir/configuration.nix`](../../nix/hosts/renoir/configuration.nix),
-  is nixpkgs' 0.14.0 (2026-10-25); upstream is at v0.20.0. It is there to try
-  out the Fujifilm X100VI's RAFs (X-Trans CMOS 5 HR, 40 MP, the X-T5's
-  sensor), so Fujifilm fixes reach renoir only through nixpkgs.
+  is nixpkgs' 0.21.1, upstream's latest. It is there to try out the Fujifilm
+  X100VI's RAFs (X-Trans CMOS 5 HR, 40 MP, the X-T5's sensor), so Fujifilm
+  fixes reach renoir only through nixpkgs.
 - Workaround: none. Upstream's flake fails every offline build since 0.15.0: its
-  `Cargo.toml` has four unused `[patch.crates-io]` entries, which are not
-  vendored
-  ([storytold/lightcraft#3404](https://github.com/storytold/lightcraft/issues/3404)).
-  Building it would take a `postPatch`, dropping `--locked` and a local compile
-  on every bump.
-- Upstream (nixpkgs):
-  [NixOS/nixpkgs#580713](https://github.com/NixOS/nixpkgs/pull/580713), a
-  draft, bumps it to 0.19.0, deleting those entries in a `postPatch`.
+  `Cargo.toml` has unused `[patch.crates-io]` entries, which are not vendored
+  ([storytold/lightcraft#3404](https://github.com/storytold/lightcraft/issues/3404),
+  open). nixpkgs deletes them in a `postPatch`
+  ([NixOS/nixpkgs#580713](https://github.com/NixOS/nixpkgs/pull/580713)), so
+  building ahead of nixpkgs would take the same and a local compile on every
+  bump.
 - Wanted for the X100VI:
-  - Released in v0.17.0, not in nixpkgs:
-    [#3402](https://github.com/storytold/lightcraft/pull/3402), the camera look
-    fitted on the vignetting-corrected sensor (RAFs render up to 0.3 EV too
-    bright in midtones, 0.6 EV in shadows), and
-    [#3321](https://github.com/storytold/lightcraft/pull/3321), compressed RAFs
-    decode 13–17 % faster.
   - Open: [#2926](https://github.com/storytold/lightcraft/pull/2926), a new
     X-Trans demosaic with less false colour; the current one shifts colour in
     fine texture and fringes clipped highlights magenta
@@ -170,7 +162,7 @@ Workarounds in the repository's `nix/` that kaizen hosts carry.
     colour matrices. [#2527](https://github.com/storytold/lightcraft/pull/2527)
     reads it from the neutral multipliers a RAF stores
     ([#730](https://github.com/storytold/lightcraft/issues/730)).
-- Status: open; nixpkgs' release lacks every item above.
+- Status: open; every item above is unmerged upstream.
 - Drop: each item once nixpkgs carries a release containing it (check with
   `nix eval --raw .#nixosConfigurations.renoir.pkgs.lightcraft.version` and
   `gh api repos/storytold/lightcraft/compare/SHA...vX.Y.Z --jq .status`); the
@@ -189,8 +181,10 @@ Workarounds in the repository's `nix/` that kaizen hosts carry.
   below the in-tree `.gitattributes`.
 - Upstream: fixed in
   [v2.56.1](https://github.com/git/git/blob/v2.56.1/Documentation/RelNotes/2.56.1.adoc),
-  with five other CVEs; no nixpkgs PR bumps it yet.
-- Status: released in 2.56.1; nixpkgs and the flake's pin have 2.56.0.
+  with five other CVEs; in nixpkgs by
+  [NixOS/nixpkgs#586339](https://github.com/NixOS/nixpkgs/pull/586339), merged
+  into `staging` (2026-11-10).
+- Status: released in 2.56.1; nixpkgs-unstable and the flake's pin have 2.56.0.
 - Drop: this entry, once
   `nix eval --raw .#nixosConfigurations.<host>.pkgs.git.version` prints 2.56.1
   or later.
