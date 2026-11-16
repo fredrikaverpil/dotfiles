@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 
-// A brief card for a value a key changed. No screen is set, so the compositor maps it on the focused output.
+// A brief card for a value a key changed, centred. No screen is set, so the compositor maps it on the focused output.
 PanelWindow {
     id: root
 
@@ -21,8 +21,6 @@ PanelWindow {
     }
 
     visible: false
-    anchors.bottom: true
-    margins.bottom: 64
     implicitWidth: 320 * shell.textScale
     implicitHeight: 48 * shell.textScale
     exclusiveZone: 0

@@ -68,12 +68,12 @@ not planned, unreported.
 ### Placeholder types in the qmltypes on Qt 6.12
 
 - Symptom: `qml-lint` and qmlls report `Member "values" not found on type
-  "UntypedObjectModel"` and `Could not find property` on `margins.*`, 8
+  "UntypedObjectModel"` and `Could not find property` on `margins.*`, 7
   warnings in all. Each Quickshell module's `.qmltypes` declares the core
   types it uses as empty, opaque types, which qmllint takes for the real ones.
   They also hide later warnings in a function, so a release may surface new
   ones in kaizen's code.
-- Workaround: none; `qml-lint` fails on these 8 until the release. A v0.3.2
+- Workaround: none; `qml-lint` fails on these 7 until the release. A v0.3.2
   build with `2b4501a` applied lints the tree clean. Not patched: the devshell
   takes Quickshell's types from the binary cache, and a patched build is not
   cached, which the Mac devshell cannot build.
