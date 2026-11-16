@@ -92,7 +92,7 @@ upstream's latest, and niri marks each option with the version it arrived in
   ("Creating new Electron notification"). What became of each toast shows in
   `dbus-monitor --session "interface='org.freedesktop.Notifications'"`:
   `NotificationClosed` reason 1 is a toast that expired on screen, 2 one
-  dismissed or dropped untracked under DnD.
+  dismissed or dropped untracked while held.
 - `notify-send -a <app> <summary> <body>` fakes an app's notification, to try a
   notification rule without waiting for the real one, for example
   `notify-send -a Slack "[workspace] in #alerts" $'Error rate high\nView alert'`.

@@ -10,6 +10,7 @@ import "../../Ui" as Ui
 import "components"
 import "NotificationLogic.js" as NotificationLogic
 import "NotificationModel.js" as Model
+import "../../Ui/Hold.js" as Hold
 
 Item {
     id: root
@@ -26,18 +27,19 @@ Item {
     readonly property int dedupWindow: 5000
 
     property bool stateLoaded: false
-    property bool doNotDisturb: false
-    // When DnD turned on, in ms since the epoch; 0 while off.
-    property real dndSince: 0
-    // Set once DnD has been on for dndRemind.
-    property bool dndOverdue: false
-    // Whether the history holds a critical notification DnD held back.
-    readonly property bool criticalHeld: doNotDisturb && historyRows.some(row => row.urgency === NotificationUrgency.Critical && row.timestamp >= dndSince)
-    readonly property int dndRemind: 10 * 60 * 1000
-    // Reasons holding DnD on, such as a recording, and whether a hold turned it
-    // on.
-    property var dndHolds: []
-    property bool dndOwned: false
+    // Holds every notification back to the history; DnD turns it on.
+    property bool holding: false
+    // When holding started, in ms since the epoch; 0 while off.
+    property real holdingSince: 0
+    // Set once holding has been on for holdRemind.
+    property bool holdOverdue: false
+    // Whether the history holds a critical notification held back.
+    readonly property bool criticalHeld: holding && historyRows.some(row => row.urgency === NotificationUrgency.Critical && row.timestamp >= holdingSince)
+    readonly property int holdRemind: 10 * 60 * 1000
+    // Reasons holding notifications, DnD's, and whether a hold turned it on.
+    property var holds: []
+    property bool holdOwned: false
+    readonly property bool dnd: shell.dnd.active
     // Debug aid, driven over IPC only: records each arriving notification's raw
     // data in memory, newest first.
     property bool capture: false
@@ -65,7 +67,7 @@ Item {
     property bool rulesListed: false
 
     function stateText() {
-        return Model.stateText(doNotDisturb, historyRows, dndSince);
+        return Model.stateText(holding, historyRows, holdingSince, holdOwned);
     }
 
     function saveState() {
@@ -77,14 +79,14 @@ Item {
         var saved = Model.loadedState(raw, historyLimit);
         if (!saved.valid)
             console.warn("notifications: ignoring invalid saved state");
-        // A hold placed before the state loaded keeps DnD on, unless it was saved on.
-        if (saved.doNotDisturb || !dndHolds.length) {
-            dndOwned = false;
-            dndSince = saved.doNotDisturb ? saved.dndSince || Date.now() : 0;
-            doNotDisturb = saved.doNotDisturb;
-        }
+        holds = [];
+        holdOwned = saved.owned;
+        holdingSince = saved.holding ? saved.holdingSince || Date.now() : 0;
+        holding = saved.holding;
         historyRows = saved.history;
         stateLoaded = true;
+        // DnD may have changed while the shell was down.
+        hold("dnd", dnd);
         remind();
     }
 
@@ -193,8 +195,8 @@ Item {
         if (capture)
             captureRows = [NotificationLogic.captureOf(notification, record.timestamp)].concat(captureRows).slice(0, captureLimit);
 
-        // Critical too: DnD is for screen sharing and recording.
-        if (doNotDisturb) {
+        // Critical too: DnD, which turns it on, is for screen sharing and recording.
+        if (holding) {
             addHistory(record);
             return;
         }
@@ -350,36 +352,38 @@ Item {
     }
 
     // Set by hand: no hold turns it off.
-    function setDoNotDisturb(value) {
-        dndOwned = false;
-        applyDoNotDisturb(value);
+    function setHolding(value) {
+        holdOwned = false;
+        applyHolding(value);
     }
 
-    function holdDoNotDisturb(reason, on) {
-        var next = Model.dndHold({
-            doNotDisturb: doNotDisturb,
-            holds: dndHolds,
-            owned: dndOwned
+    function hold(reason, on) {
+        var next = Hold.hold({
+            on: holding,
+            holds: holds,
+            owned: holdOwned
         }, reason, on);
-        dndHolds = next.holds;
-        dndOwned = next.owned;
-        applyDoNotDisturb(next.doNotDisturb);
+        holds = next.holds;
+        holdOwned = next.owned;
+        applyHolding(next.on);
     }
 
-    function applyDoNotDisturb(value) {
-        if (doNotDisturb === !!value)
+    function applyHolding(value) {
+        if (holding === !!value) {
+            saveState();
             return;
-        dndSince = value ? Date.now() : 0;
-        doNotDisturb = !!value;
+        }
+        holdingSince = value ? Date.now() : 0;
+        holding = !!value;
         remind();
     }
 
     function remind() {
-        dndOverdue = false;
+        holdOverdue = false;
         reminder.stop();
-        if (!doNotDisturb)
+        if (!holding)
             return;
-        reminder.interval = Math.max(0, dndSince + dndRemind - Date.now());
+        reminder.interval = Math.max(0, holdingSince + holdRemind - Date.now());
         reminder.start();
     }
 
@@ -411,22 +415,20 @@ Item {
         historyPanel.toggle();
     }
 
-    onDoNotDisturbChanged: saveState()
+    onHoldingChanged: saveState()
+    onDndChanged: hold("dnd", dnd)
 
-    // Seeing the history snoozes the reminder for another dndRemind.
-    onHistoryShownChanged: if (historyShown && dndOverdue) {
-        dndOverdue = false;
-        reminder.interval = dndRemind;
+    // Seeing the history snoozes the reminder for another holdRemind.
+    onHistoryShownChanged: if (historyShown && holdOverdue) {
+        holdOverdue = false;
+        reminder.interval = holdRemind;
         reminder.restart();
     }
 
     Timer {
         id: reminder
-        onTriggered: root.dndOverdue = true
+        onTriggered: root.holdOverdue = true
     }
-
-    readonly property bool sharing: Ui.Compositor.casts ? Ui.Compositor.casts.sharing : false
-    onSharingChanged: holdDoNotDisturb("sharing", sharing)
 
     Component.onCompleted: {
         if (!soundPath)
@@ -560,21 +562,18 @@ Item {
     IpcHandler {
         target: "notifications"
 
-        function dndState(): string {
-            return root.doNotDisturb ? "on" : "off";
-        }
-        function isDnd(): string {
-            return dndState();
+        function holdState(): string {
+            return root.holding ? "on" : "off";
         }
 
-        function toggleDnd(): string {
-            root.setDoNotDisturb(!root.doNotDisturb);
-            return dndState();
+        function toggleHold(): string {
+            root.setHolding(!root.holding);
+            return holdState();
         }
 
-        function setDnd(value: string): string {
-            root.setDoNotDisturb(Model.dndValue(value));
-            return dndState();
+        function setHold(value: string): string {
+            root.setHolding(Hold.flag(value));
+            return holdState();
         }
 
         function captureState(): string {

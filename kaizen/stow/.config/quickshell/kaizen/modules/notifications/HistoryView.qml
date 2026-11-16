@@ -23,7 +23,7 @@ Column {
     }
 
     // Removing rebuilds every card, so focus goes by position: the card that took the removed one's
-    // place, or the DnD button once none is left.
+    // place, or the hold button once none is left.
     function drop(index) {
         root.service.removeHistory(index);
         Qt.callLater(() => {
@@ -31,7 +31,7 @@ Column {
             if (row)
                 row.forceActiveFocus(Qt.TabFocusReason);
             else
-                dnd.forceActiveFocus(Qt.TabFocusReason);
+                hold.forceActiveFocus(Qt.TabFocusReason);
         });
     }
 
@@ -42,18 +42,18 @@ Column {
         shell: root.shell
         title: "Notifications"
         subtitle: {
-            if (!root.service.doNotDisturb)
+            if (!root.service.holding)
                 return root.count === 0 ? "Showing notifications" : "Showing notifications · " + root.count + " held back";
-            return "Paused · " + (root.count === 0 ? "nothing" : root.count) + " held back";
+            return "Holding · " + (root.count === 0 ? "nothing" : root.count) + " held back";
         }
 
-        // DnD's button sits where a key value would: it is the panel's key state.
+        // The hold's button sits where a key value would: it is the panel's key state.
         Ui.PanelButton {
-            id: dnd
-            widest: "Resume"
+            id: hold
+            widest: "Release"
             shell: root.shell
-            label: root.service.doNotDisturb ? "Resume" : "Pause"
-            onActivated: root.service.setDoNotDisturb(!root.service.doNotDisturb)
+            label: root.service.holding ? "Release" : "Hold"
+            onActivated: root.service.setHolding(!root.service.holding)
         }
     }
 

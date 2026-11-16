@@ -59,20 +59,23 @@ TestCase {
     function test_notification_state_loading_rejects_invalid_data_and_caps_history() {
         compare(Notification.loadedState("invalid", 2), {
             valid: false,
-            doNotDisturb: false,
-            dndSince: 0,
+            holding: false,
+            holdingSince: 0,
+            owned: false,
             history: []
         });
-        compare(Notification.loadedState('{"doNotDisturb":true,"dndSince":5,"history":[1,2,3]}', 2), {
+        compare(Notification.loadedState('{"holding":true,"holdingSince":5,"owned":true,"history":[1,2,3]}', 2), {
             valid: true,
-            doNotDisturb: true,
-            dndSince: 5,
+            holding: true,
+            holdingSince: 5,
+            owned: true,
             history: [1, 2]
         });
-        compare(Notification.stateText(true, [record], 5), JSON.stringify({
+        compare(Notification.stateText(true, [record], 5, true), JSON.stringify({
             version: 1,
-            doNotDisturb: true,
-            dndSince: 5,
+            holding: true,
+            holdingSince: 5,
+            owned: true,
             history: [record]
         }, null, 2) + "\n");
     }
@@ -87,18 +90,20 @@ TestCase {
         const stored = Object.assign({}, record, {
             image: ""
         });
-        compare(Notification.stateText(false, [held, file], 0), JSON.stringify({
+        compare(Notification.stateText(false, [held, file], 0, false), JSON.stringify({
             version: 1,
-            doNotDisturb: false,
-            dndSince: 0,
+            holding: false,
+            holdingSince: 0,
+            owned: false,
             history: [stored, file]
         }, null, 2) + "\n");
         compare(Notification.loadedState(JSON.stringify({
             history: [held, file]
         }), 5), {
             valid: true,
-            doNotDisturb: false,
-            dndSince: 0,
+            holding: false,
+            holdingSince: 0,
+            owned: false,
             history: [stored, file]
         });
     }
@@ -154,7 +159,7 @@ TestCase {
         }), 3, 2), [critical, saved]);
     }
 
-    function test_popup_replacement_removal_and_ipc_dnd_values_are_deterministic() {
+    function test_popup_replacement_and_removal_are_deterministic() {
         const replacement = Object.assign({}, record, {
             summary: "Updated"
         });
@@ -164,139 +169,6 @@ TestCase {
         compare(Notification.withoutIndex([record, replacement], 0), [replacement]);
         compare(Notification.withoutIndex([record], 1), [record]);
         compare(Notification.withoutIndex([record], -1), [record]);
-        for (const value of ["true", "1", "on", "yes", "YES"])
-            compare(Notification.dndValue(value), true);
-        for (const value of ["", "false", "0", "off", "no"])
-            compare(Notification.dndValue(value), false);
-    }
-
-    function test_dnd_hold_data() {
-        return [
-            {
-                tag: "first hold turns DnD on and owns it",
-                state: {
-                    doNotDisturb: false,
-                    holds: [],
-                    owned: false
-                },
-                reason: "recording",
-                on: true,
-                want: {
-                    doNotDisturb: true,
-                    holds: ["recording"],
-                    owned: true
-                }
-            },
-            {
-                tag: "hold leaves DnD set by hand unowned",
-                state: {
-                    doNotDisturb: true,
-                    holds: [],
-                    owned: false
-                },
-                reason: "recording",
-                on: true,
-                want: {
-                    doNotDisturb: true,
-                    holds: ["recording"],
-                    owned: false
-                }
-            },
-            {
-                tag: "second hold keeps ownership",
-                state: {
-                    doNotDisturb: true,
-                    holds: ["recording"],
-                    owned: true
-                },
-                reason: "sharing",
-                on: true,
-                want: {
-                    doNotDisturb: true,
-                    holds: ["recording", "sharing"],
-                    owned: true
-                }
-            },
-            {
-                tag: "repeated hold is held once",
-                state: {
-                    doNotDisturb: true,
-                    holds: ["sharing"],
-                    owned: true
-                },
-                reason: "sharing",
-                on: true,
-                want: {
-                    doNotDisturb: true,
-                    holds: ["sharing"],
-                    owned: true
-                }
-            },
-            {
-                tag: "release with holds left keeps DnD on",
-                state: {
-                    doNotDisturb: true,
-                    holds: ["recording", "sharing"],
-                    owned: true
-                },
-                reason: "recording",
-                on: false,
-                want: {
-                    doNotDisturb: true,
-                    holds: ["sharing"],
-                    owned: true
-                }
-            },
-            {
-                tag: "last release turns owned DnD off",
-                state: {
-                    doNotDisturb: true,
-                    holds: ["sharing"],
-                    owned: true
-                },
-                reason: "sharing",
-                on: false,
-                want: {
-                    doNotDisturb: false,
-                    holds: [],
-                    owned: false
-                }
-            },
-            {
-                tag: "last release leaves unowned DnD on",
-                state: {
-                    doNotDisturb: true,
-                    holds: ["sharing"],
-                    owned: false
-                },
-                reason: "sharing",
-                on: false,
-                want: {
-                    doNotDisturb: true,
-                    holds: [],
-                    owned: false
-                }
-            },
-            {
-                tag: "release without a hold changes nothing",
-                state: {
-                    doNotDisturb: false,
-                    holds: [],
-                    owned: false
-                },
-                reason: "recording",
-                on: false,
-                want: {
-                    doNotDisturb: false,
-                    holds: [],
-                    owned: false
-                }
-            }
-        ];
-    }
-
-    function test_dnd_hold(data) {
-        compare(Notification.dndHold(data.state, data.reason, data.on), data.want);
     }
 
     function test_popup_selection_steps_wrap_and_follow_removal() {

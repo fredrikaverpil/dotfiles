@@ -57,21 +57,23 @@ function loadedState(raw, limit) {
 
   return {
     valid: valid,
-    doNotDisturb: !!parsed.doNotDisturb,
-    dndSince: Number(parsed.dndSince) || 0,
+    holding: !!parsed.holding,
+    holdingSince: Number(parsed.holdingSince) || 0,
+    owned: !!parsed.owned,
     history: Array.isArray(parsed.history)
       ? parsed.history.slice(0, limit).map(storedRecord)
       : [],
   };
 }
 
-function stateText(doNotDisturb, history, dndSince) {
+function stateText(holding, history, holdingSince, owned) {
   return (
     JSON.stringify(
       {
         version: 1,
-        doNotDisturb: !!doNotDisturb,
-        dndSince: dndSince || 0,
+        holding: !!holding,
+        holdingSince: holdingSince || 0,
+        owned: !!owned,
         history: Array.isArray(history) ? history.map(storedRecord) : [],
       },
       null,
@@ -100,36 +102,6 @@ function withoutRecord(rows, key) {
   return (Array.isArray(rows) ? rows : []).filter(function (row) {
     return row.key !== key;
   });
-}
-
-// state is { doNotDisturb, holds, owned }. The first hold turns DnD on, owning
-// it only when it was off; the last release turns it off only when owned.
-function dndHold(state, reason, on) {
-  var holds = state.holds.filter(function (held) {
-    return held !== reason;
-  });
-  if (on)
-    return {
-      doNotDisturb: true,
-      holds: holds.concat([reason]),
-      owned: state.owned || !state.doNotDisturb,
-    };
-  var release = holds.length === 0 && state.owned;
-  return {
-    doNotDisturb: release ? false : state.doNotDisturb,
-    holds: holds,
-    owned: release ? false : state.owned,
-  };
-}
-
-function dndValue(value) {
-  var normalized = String(value || "").toLowerCase();
-  return (
-    normalized === "true" ||
-    normalized === "1" ||
-    normalized === "on" ||
-    normalized === "yes"
-  );
 }
 
 function step(index, delta, count) {

@@ -29,8 +29,7 @@ Ui.Plugin {
     property real now: Date.now()
 
     readonly property bool away: plugin.shell.lock.locked || plugin.shell.curtain.active
-    // DnD covers recording and screen sharing, which turn it on.
-    readonly property bool held: plugin.shell.notifications.doNotDisturb || away
+    readonly property bool held: plugin.shell.dnd.active || away
     readonly property bool tracking: !paused && !away && !idleMonitor.isIdle
     readonly property real elapsed: sessionStart > 0 ? now - sessionStart : 0
     readonly property string phase: Model.state(paused, sessionStart > 0, elapsed, reminders)

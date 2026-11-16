@@ -316,7 +316,8 @@ runs.
 | system | [hwmon], `/proc` load | alert indicator | Settings › Display | `system`, `display` |
 | timezone | [timedated] via `timedatectl`, `zdump` for the DST rules | time button | Settings › Time | `timezone` |
 | weather | [met.no locationforecast], [SMHI warnings] for Swedish places | button | Settings › Weather | `weather` |
-| notifications | [Desktop Notifications] server, the compositor's screencasts for DnD | bell button | Settings › Notifications | `notifications` |
+| dnd | a mode features read to hold back what would interrupt the screen; recording and the compositor's screencasts turn it on | – | Settings › Do not disturb (DnD) | `dnd` |
+| notifications | [Desktop Notifications] server, held back under DnD | bell button | Settings › Notifications | `notifications` |
 | lock | [ext-session-lock] + [PAM] `kaizen-lock` | – | Settings › Session | `lock` |
 | curtain | [wlr-layer-shell] + [PAM] | – | Settings › Session | `curtain` |
 | polkit agent | [polkit] | – | dialog on request | – |

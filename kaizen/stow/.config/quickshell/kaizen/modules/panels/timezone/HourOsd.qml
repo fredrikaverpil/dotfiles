@@ -3,8 +3,8 @@ import Quickshell
 
 import "../../../Ui" as Ui
 
-// The time, large and centred on every output, when the hour strikes. Held back under DnD, which is for sharing and
-// recording the screen, and while locked or curtained. A strike missed asleep is not shown on resume.
+// The time, large and centred on every output, when the hour strikes. Held back under DnD and while locked or
+// curtained. A strike missed asleep is not shown on resume.
 Scope {
     id: root
 
@@ -13,7 +13,7 @@ Scope {
     required property var panel
 
     function strike() {
-        if (shell.notifications.doNotDisturb || shell.lock.locked || shell.curtain.active)
+        if (shell.dnd.active || shell.lock.locked || shell.curtain.active)
             return;
         osd.show();
     }

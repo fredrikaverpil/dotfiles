@@ -34,6 +34,7 @@ import "modules/services/brightness" as Brightness
 import "modules/services/clipboard" as ClipboardService
 import "modules/services/firmware" as FirmwareService
 import "modules/services/doctor" as DoctorService
+import "modules/services/dnd" as Dnd
 import "modules/services/idle" as Idle
 import "modules/services/keyboard" as Keyboard
 import "modules/services/media" as MediaService
@@ -50,6 +51,7 @@ ShellRoot {
 
     readonly property alias menu: menu
     readonly property alias background: background
+    readonly property alias dnd: dnd
     readonly property alias notifications: notifications
     readonly property alias nightlight: nightlight
     readonly property alias idle: idle
@@ -366,6 +368,10 @@ ShellRoot {
         stdout: StdioCollector {
             onStreamFinished: root.updateTextScale(text)
         }
+    }
+
+    Dnd.Service {
+        id: dnd
     }
 
     Notifications.Service {

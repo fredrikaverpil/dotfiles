@@ -113,10 +113,16 @@ Ui.Panel {
             compositor: Ui.Compositor.closeWindowAction,
             action: () => Quickshell.execDetached(Ui.Compositor.closeWindow())
         },
-        // One node per panel button, in bar order, each opening its panel first.
+        // Do not disturb, then one node per panel button, in bar order, each
+        // opening its panel first.
         "settings": {
             icon: "",
             label: "Settings"
+        },
+        "settings.dnd": {
+            icon: menu.checkbox(menu.shell.dnd.active),
+            label: "Do not disturb (DnD)",
+            action: () => menu.shell.dnd.set(!menu.shell.dnd.active)
         },
         "settings.weather": {
             icon: menu.shell.weatherService.icon,
@@ -377,10 +383,10 @@ Ui.Panel {
             label: "Clear history",
             action: () => menu.shell.notifications.clearHistory()
         },
-        "settings.notifications.dnd": {
-            icon: menu.checkbox(menu.shell.notifications.doNotDisturb),
-            label: "Pause notifications",
-            action: () => menu.shell.notifications.setDoNotDisturb(!menu.shell.notifications.doNotDisturb)
+        "settings.notifications.hold": {
+            icon: menu.checkbox(menu.shell.notifications.holding),
+            label: "Hold notifications",
+            action: () => menu.shell.notifications.setHolding(!menu.shell.notifications.holding)
         },
         "settings.keyboard": {
             icon: "󰌌",

@@ -42,10 +42,10 @@ check clipboard '(.entries | type) == "number"'
 check firmware '(.backends | type) == "array" and (.updates | type) == "array"'
 check doctor '(.findings | type) == "array" and .errors + .warnings == (.findings | length) and (.text | type) == "string"'
 check recording '(.recording | type) == "boolean" and (.monitor as $m | $m == "region" or any(.monitors[]; . == $m))'
-case "$(ipc notifications dndState)" in
+case "$(ipc notifications holdState)" in
   on | off) printf 'PASS: notifications\n' ;;
   *)
-    printf 'FAIL: notifications DND state\n' >&2
+    printf 'FAIL: notifications hold state\n' >&2
     exit 1
     ;;
 esac

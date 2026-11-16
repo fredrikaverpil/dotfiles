@@ -17,12 +17,12 @@ Ui.Panel {
         close();
         service.start();
         if (dnd && active)
-            shell.notifications.holdDoNotDisturb("recording", true);
+            shell.dnd.hold("recording", true);
     }
 
     function restore() {
         if (!active)
-            shell.notifications.holdDoNotDisturb("recording", false);
+            shell.dnd.hold("recording", false);
     }
 
     onShownChanged: if (shown) {

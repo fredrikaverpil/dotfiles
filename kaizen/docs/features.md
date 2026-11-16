@@ -44,6 +44,27 @@ What the curtain does not do, since it would stop screenshotting from working:
 - ⚠️ It never locks the machine: idle locking is paused while the curtain is up.
   Always use the real lock when leaving the machine.
 
+## Do not disturb (`dnd`)
+
+DnD is a mode the shell broadcasts: turning it on says "do not interrupt the
+screen", and each feature that would interrupt it reads the mode and holds
+itself back. DnD knows nothing of them, so it does the same for whatever joins
+later. Today:
+
+- Notifications are held back to the history (Notifications › Hold).
+- Hitoiki holds its reminders, while still counting.
+- The hour's time does not show (Time and timezone).
+
+Settings › Do not disturb (DnD) toggles it, as does
+`kaizen ipc call dnd toggle`; `set on|off` sets it and `state` prints it. It
+survives a shell restart.
+
+The screen recording dialog turns it on by default, and so does an app sharing
+the screen through the portal (a PipeWire cast in `niri msg casts`, or on
+umbriel the portal's `umbriel-screen-capture` PipeWire node). DnD turns off
+again when the last of them ends, unless it was already on. Toggling DnD by
+hand in the meantime wins: then nothing turns it off afterwards.
+
 ## Doctor (`doctor`)
 
 `kaizen doctor` reports what is wrong with the desktop that nothing on screen
@@ -118,11 +139,11 @@ for 20 s every 20 minutes (the 20-20-20 rule), and stand up and move every 30.
 Both settings are in `~/.config/kaizen/plugins/hitoiki.jsonc`.
 
 When several come due together, only the one with the longest interval shows.
-DnD, which recording and screen sharing turn on, holds reminders back while the
-time keeps counting; when it ends, the longest-interval one held back shows. The
-bar shows the time in `wood` once the longest-interval reminder came due. Its
-left-click shows the session time large; New session and Pause tracking are in
-its menu. Nothing survives a shell restart.
+DnD holds reminders back while the time keeps counting; when it ends, the
+longest-interval one held back shows. The bar shows the time in `wood` once the
+longest-interval reminder came due. Its left-click shows the session time
+large; New session and Pause tracking are in its menu. Nothing survives a shell
+restart.
 
 ## Notifications (`notifications`)
 
@@ -181,23 +202,23 @@ such as a reminder Slack relays for Google Calendar.
 
 Critical toasts stay until dismissed. Others will timeout and disappear.
 
-### Do not disturb (DnD)
+### Hold
 
-DnD is for sharing the screen or recording it, so it holds back
-every notification, critical ones included, to the notification history panel.
+Holding notifications sends every one, critical ones included, to the
+notification history panel instead of a toast: Settings › Notifications › Hold
+notifications, the panel's Hold button, or
+`kaizen ipc call notifications toggleHold` (`setHold on|off`, `holdState`).
+The bell turns rose while it holds.
 
-The status bar's bell icon blinks when critical notifications arrive or when DnD
-has been active for a longer time.
+DnD turns the hold on, and off again when DnD ends, unless it was already on.
+Toggling the hold by hand in the meantime wins: then DnD ending leaves it on.
 
-The screen recording dialog turns it on by default, and so does an app sharing
-the screen through the portal (a PipeWire cast in `niri msg casts`, or on
-umbriel the portal's `umbriel-screen-capture` PipeWire node). DnD turns
-off again when the last of them ends, unless it was already on. Toggling DnD by
-hand in the meantime wins: then nothing turns it off afterwards.
+The status bar's bell icon blinks when critical notifications arrive or when the
+hold has been on for a longer time.
 
 ### History
 
-The history holds only what DnD held back, newest first with critical ones
+The history holds only what the hold held back, newest first with critical ones
 always at the top. Some action buttons will not appear on the notifications in
 the history, due to how an app's own buttons only work while the app still holds
 the notification. Only buttons added via notification rules are retained in the
