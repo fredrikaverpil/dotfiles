@@ -548,6 +548,11 @@ ShellRoot {
         service: timezoneService
     }
 
+    Timezone.HourOsd {
+        shell: root
+        panel: timezone
+    }
+
     FirmwareService.Service {
         id: firmwareService
     }

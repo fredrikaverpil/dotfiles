@@ -199,9 +199,15 @@ camera. Audio controls are available. `Mod+Print` opens the recording panel or
 stops a running recording; `Mod+Shift+Print` pauses or resumes it. Recordings
 are saved to `~/Videos/Recordings`.
 
-## Time and timezone
+## Time and timezone (`timezone`)
 
-To be written.
+On the hour, the time shows large in the middle of every output for a few
+seconds, impossible to miss without taking the keyboard or the pointer. It is
+held back under DnD, so it never lands in a screen share or a recording, and
+while the screen is locked or curtained; an hour struck asleep is not shown on
+resume. `kaizen ipc call timezone hour` shows it now, whatever holds it back.
+
+The rest is to be written.
 
 ## Weather and location
 
