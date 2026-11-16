@@ -39,16 +39,24 @@ for 20 s every 20 minutes (the 20-20-20 rule), and stand up and move every 30.
 Both settings are in `~/.config/kaizen/plugins/breaks.jsonc`.
 
 When several come due together, only the one with the longest interval shows.
-DnD holds reminders back while the time keeps counting; when it ends, the
-longest-interval one held back shows. The bar shows the time in `wood` once the
-longest-interval reminder came due. Under DnD it shows the time beside a bell
-off (󰂛) instead, in `off`, and in `wood` once a reminder is held back. Its
-left-click shows the session time large; New session and Pause tracking are in
-its menu.
+The bar shows the time in `wood` once the longest-interval reminder came due.
+Its left-click shows the session time large; New session and Hold reminders are
+in its menu.
 
 Its state survives a shell restart, in
-`~/.local/state/kaizen-shell/plugins/breaks/state.json`: whether it is paused,
-and the session, unless the shell was down `idleMinutes` or longer.
+`~/.local/state/kaizen-shell/plugins/breaks/state.json`: the hold, and the
+session, unless the shell was down `idleMinutes` or longer.
+
+### Hold
+
+Holding reminders keeps them back while the time keeps counting; when the hold
+ends, the longest-interval one held back shows. Plugins › Breaks › Hold
+reminders toggles it, as does `kaizen ipc call breaks toggleHold`
+(`setHold on|off`, `holdState`). While it holds, the bar shows the time beside
+a bell off (󰂛) in `off`, and in `wood` once a reminder is held back.
+
+DnD turns the hold on, and off again when DnD ends, unless it was already on.
+Toggling the hold by hand in the meantime wins: then DnD ending leaves it on.
 
 ## Curtain (`curtain`)
 
@@ -80,7 +88,7 @@ itself back. DnD knows nothing of them, so it does the same for whatever joins
 later. Today:
 
 - Notifications are held back to the history (Notifications › Hold).
-- Breaks holds its reminders, while still counting.
+- Breaks holds its reminders, while still counting (Breaks › Hold).
 - The hour's time does not show (Time and timezone).
 
 Settings › Do not disturb (DnD) toggles it, as does

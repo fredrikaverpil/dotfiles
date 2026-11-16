@@ -118,13 +118,13 @@ function detail(r, n) {
   return r.details.length > 0 ? r.details[n % r.details.length] : "";
 }
 
-// "paused", "idle" (no session), "held" (DnD holds a reminder back), "dnd"
-// (DnD, nothing held), "due" (the longest-interval reminder came due) or
+// "idle" (no session), "held" (the hold holds a reminder back), "holding"
+// (nothing held yet), "due" (the longest-interval reminder came due) or
 // "active". shown is pick's.
-function state(paused, active, elapsedMs, reminders, dnd, shown) {
-  if (paused) return "paused";
+function state(active, elapsedMs, reminders, holding, shown) {
   if (!active) return "idle";
-  if (dnd) return pick(reminders, elapsedMs, shown).reminder ? "held" : "dnd";
+  if (holding)
+    return pick(reminders, elapsedMs, shown).reminder ? "held" : "holding";
   var r = longest(reminders);
   return r && remindersDue(elapsedMs, r.everyMinutes * MINUTE) > 0
     ? "due"
@@ -134,14 +134,12 @@ function state(paused, active, elapsedMs, reminders, dnd, shown) {
 // The bar indicator for a state: { icon, text, role }, role a palette key.
 function indicator(st, elapsedMs) {
   switch (st) {
-    case "paused":
-      return { icon: "\u{F051E}", text: "", role: "off" };
     case "idle":
       return { icon: "\u{F051B}", text: "0m", role: "off" };
     case "due":
       return { icon: "\u{F0176}", text: duration(elapsedMs), role: "wood" };
-    // MDI bell-off, as the notifications' bell under DnD.
-    case "dnd":
+    // MDI bell-off, as the notifications' bell while holding.
+    case "holding":
       return { icon: "\u{F009B}", text: duration(elapsedMs), role: "off" };
     case "held":
       return { icon: "\u{F009B}", text: duration(elapsedMs), role: "wood" };
@@ -152,9 +150,9 @@ function indicator(st, elapsedMs) {
 
 // The launcher's status row.
 function status(st, elapsedMs) {
-  if (st === "paused") return "Paused";
   if (st === "idle") return "No active session";
-  return "Active for " + duration(elapsedMs);
+  var active = "Active for " + duration(elapsedMs);
+  return st === "holding" || st === "held" ? active + " · holding" : active;
 }
 
 // A saved map of counts by id, keeping only whole counts of 0 or more.
@@ -167,12 +165,14 @@ function counts(c) {
   return out;
 }
 
-// The state file's text. seen is when the session was last tracked.
-function stateText(paused, rotation, sessionStart, shown, seen) {
+// The state file's text. owned is whether a hold turned holding on; seen is
+// when the session was last tracked.
+function stateText(holding, owned, rotation, sessionStart, shown, seen) {
   return (
     JSON.stringify({
       version: 1,
-      paused: paused,
+      holding: holding,
+      owned: owned,
       rotation: rotation,
       sessionStart: sessionStart,
       shown: shown,
@@ -181,10 +181,10 @@ function stateText(paused, rotation, sessionStart, shown, seen) {
   );
 }
 
-// The saved state to restore: { valid, paused, rotation, sessionStart, shown },
-// valid false for text that is not JSON. The session, sessionStart 0 for none,
-// resumes only when it was seen less than idleMs before now, as an idle that
-// long would have ended it.
+// The saved state to restore: { valid, holding, owned, rotation, sessionStart,
+// shown }, valid false for text that is not JSON. The session, sessionStart 0
+// for none, resumes only when it was seen less than idleMs before now, as an
+// idle that long would have ended it.
 function restored(raw, now, idleMs) {
   var s = {};
   var valid = true;
@@ -198,7 +198,8 @@ function restored(raw, now, idleMs) {
   var resume = start > 0 && start <= seen && seen <= now && now - seen < idleMs;
   return {
     valid: valid,
-    paused: s.paused === true,
+    holding: s.holding === true,
+    owned: s.holding === true && s.owned === true,
     rotation: counts(s.rotation),
     sessionStart: resume ? start : 0,
     shown: resume ? counts(s.shown) : {},

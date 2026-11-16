@@ -223,65 +223,44 @@ TestCase {
     function test_state_data() {
         return [
             {
-                tag: "paused wins",
-                paused: true,
-                active: true,
-                elapsed: 90 * minute,
-                want: "paused"
-            },
-            {
                 tag: "idle",
-                paused: false,
                 active: false,
                 elapsed: 0,
                 want: "idle"
             },
             {
                 tag: "a shorter one due is still active",
-                paused: false,
                 active: true,
                 elapsed: 25 * minute,
                 want: "active"
             },
             {
                 tag: "due",
-                paused: false,
                 active: true,
                 elapsed: 30 * minute,
                 want: "due"
             },
             {
-                tag: "paused wins over dnd",
-                paused: true,
-                active: true,
-                dnd: true,
-                elapsed: 90 * minute,
-                want: "paused"
-            },
-            {
-                tag: "idle under dnd",
-                paused: false,
+                tag: "idle while holding",
                 active: false,
-                dnd: true,
+                holding: true,
                 elapsed: 0,
                 want: "idle"
             },
             {
-                tag: "dnd, nothing held",
-                paused: false,
+                tag: "holding, nothing held",
                 active: true,
-                dnd: true,
+                holding: true,
                 elapsed: 25 * minute,
                 shown: {
                     eyes: 1
                 },
-                want: "dnd"
+                want: "holding"
             },
             {
-                tag: "dnd holds one back",
-                paused: false,
+                tag: "holding one back",
                 active: true,
-                dnd: true,
+                holding: true,
                 elapsed: 40 * minute,
                 shown: {
                     eyes: 1,
@@ -293,25 +272,15 @@ TestCase {
     }
 
     function test_state_no_reminders() {
-        compare(Model.state(false, true, 90 * minute, [], false, {}), "active");
+        compare(Model.state(true, 90 * minute, [], false, {}), "active");
     }
 
     function test_state(data) {
-        compare(Model.state(data.paused, data.active, data.elapsed, reminders, data.dnd || false, data.shown || {}), data.want);
+        compare(Model.state(data.active, data.elapsed, reminders, data.holding || false, data.shown || {}), data.want);
     }
 
     function test_indicator_data() {
         return [
-            {
-                tag: "paused",
-                state: "paused",
-                elapsed: 0,
-                want: {
-                    icon: "\u{F051E}",
-                    text: "",
-                    role: "off"
-                }
-            },
             {
                 tag: "idle",
                 state: "idle",
@@ -343,8 +312,8 @@ TestCase {
                 }
             },
             {
-                tag: "dnd",
-                state: "dnd",
+                tag: "holding",
+                state: "holding",
                 elapsed: 32 * minute,
                 want: {
                     icon: "\u{F009B}",
@@ -372,12 +341,6 @@ TestCase {
     function test_status_data() {
         return [
             {
-                tag: "paused",
-                state: "paused",
-                elapsed: 0,
-                want: "Paused"
-            },
-            {
                 tag: "idle",
                 state: "idle",
                 elapsed: 0,
@@ -388,6 +351,18 @@ TestCase {
                 state: "active",
                 elapsed: 32 * minute,
                 want: "Active for 32m"
+            },
+            {
+                tag: "holding",
+                state: "holding",
+                elapsed: 32 * minute,
+                want: "Active for 32m · holding"
+            },
+            {
+                tag: "held",
+                state: "held",
+                elapsed: 32 * minute,
+                want: "Active for 32m · holding"
             },
         ];
     }
@@ -555,7 +530,8 @@ TestCase {
         const idle = 5 * minute;
         const saved = o => JSON.stringify(Object.assign({
                 version: 1,
-                paused: false,
+                holding: false,
+                owned: false,
                 rotation: {
                     move: 3
                 },
@@ -572,7 +548,8 @@ TestCase {
                 raw: saved({}),
                 want: {
                     valid: true,
-                    paused: false,
+                    holding: false,
+                    owned: false,
                     rotation: {
                         move: 3
                     },
@@ -590,7 +567,8 @@ TestCase {
                 }),
                 want: {
                     valid: true,
-                    paused: false,
+                    holding: false,
+                    owned: false,
                     rotation: {
                         move: 3
                     },
@@ -605,7 +583,8 @@ TestCase {
                 }),
                 want: {
                     valid: true,
-                    paused: false,
+                    holding: false,
+                    owned: false,
                     rotation: {
                         move: 3
                     },
@@ -621,7 +600,8 @@ TestCase {
                 }),
                 want: {
                     valid: true,
-                    paused: false,
+                    holding: false,
+                    owned: false,
                     rotation: {
                         move: 3
                     },
@@ -630,15 +610,36 @@ TestCase {
                 }
             },
             {
-                tag: "paused",
+                tag: "owned only while holding",
                 raw: saved({
-                    paused: true,
+                    owned: true
+                }),
+                want: {
+                    valid: true,
+                    holding: false,
+                    owned: false,
+                    rotation: {
+                        move: 3
+                    },
+                    sessionStart: now - 40 * minute,
+                    shown: {
+                        eyes: 1,
+                        move: 1
+                    }
+                }
+            },
+            {
+                tag: "holding",
+                raw: saved({
+                    holding: true,
+                    owned: true,
                     sessionStart: 0,
                     seen: 0
                 }),
                 want: {
                     valid: true,
-                    paused: true,
+                    holding: true,
+                    owned: true,
                     rotation: {
                         move: 3
                     },
@@ -659,7 +660,8 @@ TestCase {
                 }),
                 want: {
                     valid: true,
-                    paused: false,
+                    holding: false,
+                    owned: false,
                     rotation: {
                         d: 2
                     },
@@ -672,7 +674,8 @@ TestCase {
                 raw: "",
                 want: {
                     valid: true,
-                    paused: false,
+                    holding: false,
+                    owned: false,
                     rotation: {},
                     sessionStart: 0,
                     shown: {}
@@ -683,7 +686,8 @@ TestCase {
                 raw: "{",
                 want: {
                     valid: false,
-                    paused: false,
+                    holding: false,
+                    owned: false,
                     rotation: {},
                     sessionStart: 0,
                     shown: {}
@@ -698,14 +702,15 @@ TestCase {
 
     function test_state_text_round_trip() {
         const now = 1000 * minute;
-        const text = Model.stateText(true, {
+        const text = Model.stateText(true, true, {
             move: 2
         }, now - 10 * minute, {
             eyes: 0
         }, now);
         compare(Model.restored(text, now, 5 * minute), {
             valid: true,
-            paused: true,
+            holding: true,
+            owned: true,
             rotation: {
                 move: 2
             },

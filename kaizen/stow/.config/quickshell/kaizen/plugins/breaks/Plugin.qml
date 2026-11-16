@@ -4,6 +4,7 @@ import Quickshell.Wayland
 import qs.Ui as Ui
 
 import "BreaksModel.js" as Model
+import "../../Ui/Hold.js" as Hold
 
 // How long you have been at the computer without a break, with a card for each
 // reminder as it comes due. A session ends after idleMinutes without input, or
@@ -17,7 +18,11 @@ Ui.Plugin {
     readonly property string statePath: Ui.Paths.state + "/plugins/breaks/state.json"
     property bool stateLoaded: false
 
-    property bool paused: false
+    // Holds reminders back while the session keeps counting; DnD turns it on.
+    property bool holding: false
+    // Reasons holding, DnD's, and whether a hold turned it on.
+    property var holds: []
+    property bool holdOwned: false
     // When the session started; 0 while there is none.
     property real sessionStart: 0
     // Each reminder's shows this session, by id; one due beyond them is
@@ -30,11 +35,12 @@ Ui.Plugin {
     property int left: 0
     property real now: Date.now()
 
-    readonly property bool away: plugin.shell.lock.locked || plugin.shell.curtain.active
-    readonly property bool held: plugin.shell.dnd.active || away
-    readonly property bool tracking: !paused && !away && !idleMonitor.isIdle
+    readonly property bool covered: plugin.shell.lock.locked || plugin.shell.curtain.active
+    readonly property bool dnd: plugin.shell.dnd.active
+    readonly property bool held: holding || covered
+    readonly property bool tracking: !covered && !idleMonitor.isIdle
     readonly property real elapsed: sessionStart > 0 ? now - sessionStart : 0
-    readonly property string phase: Model.state(paused, sessionStart > 0, elapsed, reminders, plugin.shell.dnd.active, shown)
+    readonly property string phase: Model.state(sessionStart > 0, elapsed, reminders, holding, shown)
     readonly property var indicator: Model.indicator(phase, elapsed)
 
     barIndicator: ({
@@ -57,10 +63,10 @@ Ui.Plugin {
                 label: "New session",
                 action: () => plugin.newSession()
             },
-            "plugins.breaks.pause": {
-                icon: plugin.shell.menu.checkbox(plugin.paused),
-                label: "Pause tracking",
-                action: () => plugin.paused ? plugin.resume() : plugin.pause()
+            "plugins.breaks.hold": {
+                icon: plugin.shell.menu.checkbox(plugin.holding),
+                label: "Hold reminders",
+                action: () => plugin.setHolding(!plugin.holding)
             },
             "plugins.breaks.show": {
                 icon: "\u{F0176}",
@@ -82,19 +88,10 @@ Ui.Plugin {
     }
 
     function newSession() {
-        plugin.paused = false;
         if (plugin.tracking)
             plugin.start();
         else
             plugin.end();
-    }
-
-    function pause() {
-        plugin.paused = true;
-    }
-
-    function resume() {
-        plugin.paused = false;
     }
 
     // The session time, large.
@@ -141,9 +138,28 @@ Ui.Plugin {
         }
     }
 
+    // Set by hand: no hold turns it off.
+    function setHolding(value) {
+        plugin.holdOwned = false;
+        plugin.holding = !!value;
+        plugin.save();
+    }
+
+    function hold(reason, on) {
+        const next = Hold.hold({
+            on: plugin.holding,
+            holds: plugin.holds,
+            owned: plugin.holdOwned
+        }, reason, on);
+        plugin.holds = next.holds;
+        plugin.holdOwned = next.owned;
+        plugin.holding = next.on;
+        plugin.save();
+    }
+
     function save() {
         if (plugin.stateLoaded)
-            stateFile.setText(Model.stateText(plugin.paused, plugin.rotation, plugin.sessionStart, plugin.shown, Date.now()));
+            stateFile.setText(Model.stateText(plugin.holding, plugin.holdOwned, plugin.rotation, plugin.sessionStart, plugin.shown, Date.now()));
     }
 
     // Before the first start: a session the restart broke resumes.
@@ -151,7 +167,9 @@ Ui.Plugin {
         const r = Model.restored(stateFile.text(), Date.now(), plugin.settings.idleMinutes * 60 * 1000);
         if (!r.valid)
             console.warn("breaks: ignoring invalid saved state");
-        plugin.paused = r.paused;
+        plugin.holds = [];
+        plugin.holdOwned = r.owned;
+        plugin.holding = r.holding;
         plugin.rotation = r.rotation;
         if (plugin.tracking && r.sessionStart > 0) {
             plugin.now = Date.now();
@@ -161,11 +179,12 @@ Ui.Plugin {
             plugin.start();
         }
         plugin.stateLoaded = true;
-        plugin.save();
+        // DnD may have changed while the shell was down.
+        plugin.hold("dnd", plugin.dnd);
     }
 
     onTrackingChanged: tracking ? start() : end()
-    onPausedChanged: save()
+    onDndChanged: hold("dnd", dnd)
     onSessionStartChanged: save()
     onShownChanged: save()
     onHeldChanged: {
@@ -177,7 +196,6 @@ Ui.Plugin {
 
     IdleMonitor {
         id: idleMonitor
-        enabled: !plugin.paused
         timeout: plugin.settings.idleMinutes * 60
         // An inhibitor, such as a video call's, keeps the session going.
         respectInhibitors: true
@@ -235,11 +253,16 @@ Ui.Plugin {
         function newSession(): void {
             plugin.newSession();
         }
-        function pause(): void {
-            plugin.pause();
+        function holdState(): string {
+            return plugin.holding ? "on" : "off";
         }
-        function resume(): void {
-            plugin.resume();
+        function toggleHold(): string {
+            plugin.setHolding(!plugin.holding);
+            return holdState();
+        }
+        function setHold(value: string): string {
+            plugin.setHolding(Hold.flag(value));
+            return holdState();
         }
         function remind(): void {
             plugin.remind();
