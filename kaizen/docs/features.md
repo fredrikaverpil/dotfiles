@@ -44,7 +44,11 @@ longest-interval one held back shows. The bar shows the time in `wood` once the
 longest-interval reminder came due. Under DnD it shows the time beside a bell
 off (󰂛) instead, in `off`, and in `wood` once a reminder is held back. Its
 left-click shows the session time large; New session and Pause tracking are in
-its menu. Nothing survives a shell restart.
+its menu.
+
+Its state survives a shell restart, in
+`~/.local/state/kaizen-shell/plugins/breaks/state.json`: whether it is paused,
+and the session, unless the shell was down `idleMinutes` or longer.
 
 ## Curtain (`curtain`)
 

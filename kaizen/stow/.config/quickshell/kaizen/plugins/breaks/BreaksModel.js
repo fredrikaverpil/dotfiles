@@ -156,3 +156,51 @@ function status(st, elapsedMs) {
   if (st === "idle") return "No active session";
   return "Active for " + duration(elapsedMs);
 }
+
+// A saved map of counts by id, keeping only whole counts of 0 or more.
+function counts(c) {
+  var out = {};
+  if (!c || typeof c !== "object" || Array.isArray(c)) return out;
+  for (var id in c)
+    if (typeof c[id] === "number" && c[id] >= 0 && Math.floor(c[id]) === c[id])
+      out[id] = c[id];
+  return out;
+}
+
+// The state file's text. seen is when the session was last tracked.
+function stateText(paused, rotation, sessionStart, shown, seen) {
+  return (
+    JSON.stringify({
+      version: 1,
+      paused: paused,
+      rotation: rotation,
+      sessionStart: sessionStart,
+      shown: shown,
+      seen: seen,
+    }) + "\n"
+  );
+}
+
+// The saved state to restore: { valid, paused, rotation, sessionStart, shown },
+// valid false for text that is not JSON. The session, sessionStart 0 for none,
+// resumes only when it was seen less than idleMs before now, as an idle that
+// long would have ended it.
+function restored(raw, now, idleMs) {
+  var s = {};
+  var valid = true;
+  try {
+    s = JSON.parse(String(raw || "{}")) || {};
+  } catch (error) {
+    valid = false;
+  }
+  var start = typeof s.sessionStart === "number" ? s.sessionStart : 0;
+  var seen = typeof s.seen === "number" ? s.seen : 0;
+  var resume = start > 0 && start <= seen && seen <= now && now - seen < idleMs;
+  return {
+    valid: valid,
+    paused: s.paused === true,
+    rotation: counts(s.rotation),
+    sessionStart: resume ? start : 0,
+    shown: resume ? counts(s.shown) : {},
+  };
+}

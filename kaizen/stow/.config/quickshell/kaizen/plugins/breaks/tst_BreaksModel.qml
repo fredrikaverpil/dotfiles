@@ -549,4 +549,170 @@ TestCase {
     function test_detail(data) {
         compare(Model.detail(data.reminder, data.n), data.want);
     }
+
+    function test_restored_data() {
+        const now = 1000 * minute;
+        const idle = 5 * minute;
+        const saved = o => JSON.stringify(Object.assign({
+                version: 1,
+                paused: false,
+                rotation: {
+                    move: 3
+                },
+                sessionStart: now - 40 * minute,
+                shown: {
+                    eyes: 1,
+                    move: 1
+                },
+                seen: now - minute
+            }, o));
+        return [
+            {
+                tag: "resumes within idle",
+                raw: saved({}),
+                want: {
+                    valid: true,
+                    paused: false,
+                    rotation: {
+                        move: 3
+                    },
+                    sessionStart: now - 40 * minute,
+                    shown: {
+                        eyes: 1,
+                        move: 1
+                    }
+                }
+            },
+            {
+                tag: "seen idle ago: new session",
+                raw: saved({
+                    seen: now - idle
+                }),
+                want: {
+                    valid: true,
+                    paused: false,
+                    rotation: {
+                        move: 3
+                    },
+                    sessionStart: 0,
+                    shown: {}
+                }
+            },
+            {
+                tag: "seen in the future: new session",
+                raw: saved({
+                    seen: now + minute
+                }),
+                want: {
+                    valid: true,
+                    paused: false,
+                    rotation: {
+                        move: 3
+                    },
+                    sessionStart: 0,
+                    shown: {}
+                }
+            },
+            {
+                tag: "no session",
+                raw: saved({
+                    sessionStart: 0,
+                    shown: {}
+                }),
+                want: {
+                    valid: true,
+                    paused: false,
+                    rotation: {
+                        move: 3
+                    },
+                    sessionStart: 0,
+                    shown: {}
+                }
+            },
+            {
+                tag: "paused",
+                raw: saved({
+                    paused: true,
+                    sessionStart: 0,
+                    seen: 0
+                }),
+                want: {
+                    valid: true,
+                    paused: true,
+                    rotation: {
+                        move: 3
+                    },
+                    sessionStart: 0,
+                    shown: {}
+                }
+            },
+            {
+                tag: "bad counts dropped",
+                raw: saved({
+                    rotation: {
+                        a: -1,
+                        b: 1.5,
+                        c: "2",
+                        d: 2
+                    },
+                    shown: [1]
+                }),
+                want: {
+                    valid: true,
+                    paused: false,
+                    rotation: {
+                        d: 2
+                    },
+                    sessionStart: now - 40 * minute,
+                    shown: {}
+                }
+            },
+            {
+                tag: "no file",
+                raw: "",
+                want: {
+                    valid: true,
+                    paused: false,
+                    rotation: {},
+                    sessionStart: 0,
+                    shown: {}
+                }
+            },
+            {
+                tag: "not JSON",
+                raw: "{",
+                want: {
+                    valid: false,
+                    paused: false,
+                    rotation: {},
+                    sessionStart: 0,
+                    shown: {}
+                }
+            },
+        ];
+    }
+
+    function test_restored(data) {
+        compare(Model.restored(data.raw, 1000 * minute, 5 * minute), data.want);
+    }
+
+    function test_state_text_round_trip() {
+        const now = 1000 * minute;
+        const text = Model.stateText(true, {
+            move: 2
+        }, now - 10 * minute, {
+            eyes: 0
+        }, now);
+        compare(Model.restored(text, now, 5 * minute), {
+            valid: true,
+            paused: true,
+            rotation: {
+                move: 2
+            },
+            sessionStart: now - 10 * minute,
+            shown: {
+                eyes: 0
+            }
+        });
+    }
 }

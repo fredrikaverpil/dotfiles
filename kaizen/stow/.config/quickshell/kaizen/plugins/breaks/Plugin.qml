@@ -7,13 +7,15 @@ import "BreaksModel.js" as Model
 
 // How long you have been at the computer without a break, with a card for each
 // reminder as it comes due. A session ends after idleMinutes without input, or
-// when the screen locks or the curtain goes up. Nothing survives a shell
-// restart.
+// when the screen locks or the curtain goes up. A session survives a shell
+// restart shorter than idleMinutes.
 Ui.Plugin {
     id: plugin
 
     readonly property var settings: Model.settings(plugin.config)
     readonly property var reminders: settings.reminders
+    readonly property string statePath: Ui.Paths.state + "/plugins/breaks/state.json"
+    property bool stateLoaded: false
 
     property bool paused: false
     // When the session started; 0 while there is none.
@@ -107,6 +109,7 @@ Ui.Plugin {
     function show(r) {
         const n = plugin.rotation[r.id] || 0;
         plugin.rotation[r.id] = n + 1;
+        plugin.save();
         plugin.counting = r.seconds > 0 ? {
             reminder: r,
             detail: Model.detail(r, n)
@@ -138,14 +141,39 @@ Ui.Plugin {
         }
     }
 
+    function save() {
+        if (plugin.stateLoaded)
+            stateFile.setText(Model.stateText(plugin.paused, plugin.rotation, plugin.sessionStart, plugin.shown, Date.now()));
+    }
+
+    // Before the first start: a session the restart broke resumes.
+    function load() {
+        const r = Model.restored(stateFile.text(), Date.now(), plugin.settings.idleMinutes * 60 * 1000);
+        if (!r.valid)
+            console.warn("breaks: ignoring invalid saved state");
+        plugin.paused = r.paused;
+        plugin.rotation = r.rotation;
+        if (plugin.tracking && r.sessionStart > 0) {
+            plugin.now = Date.now();
+            plugin.sessionStart = r.sessionStart;
+            plugin.shown = r.shown;
+        } else if (plugin.tracking) {
+            plugin.start();
+        }
+        plugin.stateLoaded = true;
+        plugin.save();
+    }
+
     onTrackingChanged: tracking ? start() : end()
+    onPausedChanged: save()
+    onSessionStartChanged: save()
+    onShownChanged: save()
     onHeldChanged: {
         if (held)
             counting = null;
         tick();
     }
-    Component.onCompleted: if (tracking)
-        start()
+    Component.onCompleted: load()
 
     IdleMonitor {
         id: idleMonitor
@@ -162,6 +190,14 @@ Ui.Plugin {
         onTriggered: plugin.tick()
     }
 
+    // Keeps the saved session's seen time current.
+    Timer {
+        interval: 60 * 1000
+        running: plugin.sessionStart > 0
+        repeat: true
+        onTriggered: plugin.save()
+    }
+
     Timer {
         id: countdown
         interval: 1000
@@ -173,6 +209,15 @@ Ui.Plugin {
             if (plugin.left <= 0)
                 plugin.counting = null;
         }
+    }
+
+    FileView {
+        id: stateFile
+        path: plugin.statePath
+        atomicWrites: true
+        // Blocks the first read, so load() has it.
+        blockLoading: true
+        printErrors: false
     }
 
     Ui.LargeOsd {
