@@ -1,0 +1,19 @@
+{
+  // Minutes without input that end a session. The idle lock, at 5, ends one
+  // too, so a larger value acts as 5.
+  "idleMinutes": 5
+  // "reminders" replaces the two defaults, eyes every 20 and moving every 30:
+  // "reminders": [
+  //   {
+  //     "id": "move",
+  //     "everyMinutes": 30,
+  //     // Optional: a glyph, written as itself; JSON has no \u{…} escape.
+  //     "icon": "󰜎",
+  //     "title": "Stand up and move",
+  //     // Or "detail": one string. The next one shows each time.
+  //     "details": ["10 squats", "Shoulder rolls"],
+  //     // Optional: the card stays up, counting down.
+  //     "seconds": 20
+  //   }
+  // ]
+}
