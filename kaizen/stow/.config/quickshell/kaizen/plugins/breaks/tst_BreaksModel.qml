@@ -302,7 +302,7 @@ TestCase {
                 state: "holding",
                 elapsed: 32 * minute,
                 want: {
-                    icon: "\u{F009B}",
+                    icon: "\u{F051E}",
                     text: "32m",
                     role: "rose"
                 }

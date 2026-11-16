@@ -136,9 +136,9 @@ function indicator(st, elapsedMs) {
       return { icon: "\u{F051B}", text: "0m", role: "off" };
     case "due":
       return { icon: "\u{F0176}", text: duration(elapsedMs), role: "wood" };
-    // MDI bell-off, as the notifications' bell while holding.
+    // MDI timer-off-outline: the timer struck through.
     case "holding":
-      return { icon: "\u{F009B}", text: duration(elapsedMs), role: "rose" };
+      return { icon: "\u{F051E}", text: duration(elapsedMs), role: "rose" };
     default:
       return { icon: "\u{F051B}", text: duration(elapsedMs), role: "fg" };
   }
