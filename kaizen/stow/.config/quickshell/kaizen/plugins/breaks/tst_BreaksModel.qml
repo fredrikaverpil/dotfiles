@@ -248,35 +248,21 @@ TestCase {
                 want: "idle"
             },
             {
-                tag: "holding, nothing held",
-                active: true,
-                holding: true,
-                elapsed: 25 * minute,
-                shown: {
-                    eyes: 1
-                },
-                want: "holding"
-            },
-            {
-                tag: "holding one back",
+                tag: "holding",
                 active: true,
                 holding: true,
                 elapsed: 40 * minute,
-                shown: {
-                    eyes: 1,
-                    move: 0
-                },
-                want: "held"
+                want: "holding"
             },
         ];
     }
 
     function test_state_no_reminders() {
-        compare(Model.state(true, 90 * minute, [], false, {}), "active");
+        compare(Model.state(true, 90 * minute, [], false), "active");
     }
 
     function test_state(data) {
-        compare(Model.state(data.active, data.elapsed, reminders, data.holding || false, data.shown || {}), data.want);
+        compare(Model.state(data.active, data.elapsed, reminders, data.holding || false), data.want);
     }
 
     function test_indicator_data() {
@@ -318,17 +304,7 @@ TestCase {
                 want: {
                     icon: "\u{F009B}",
                     text: "32m",
-                    role: "off"
-                }
-            },
-            {
-                tag: "held",
-                state: "held",
-                elapsed: 65 * minute,
-                want: {
-                    icon: "\u{F009B}",
-                    text: "1h 5m",
-                    role: "wood"
+                    role: "rose"
                 }
             },
         ];
@@ -355,12 +331,6 @@ TestCase {
             {
                 tag: "holding",
                 state: "holding",
-                elapsed: 32 * minute,
-                want: "Active for 32m · holding"
-            },
-            {
-                tag: "held",
-                state: "held",
                 elapsed: 32 * minute,
                 want: "Active for 32m · holding"
             },

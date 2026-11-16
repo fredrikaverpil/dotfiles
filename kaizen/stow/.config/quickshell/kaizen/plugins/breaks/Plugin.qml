@@ -40,7 +40,7 @@ Ui.Plugin {
     readonly property bool held: holding || covered
     readonly property bool tracking: !covered && !idleMonitor.isIdle
     readonly property real elapsed: sessionStart > 0 ? now - sessionStart : 0
-    readonly property string phase: Model.state(sessionStart > 0, elapsed, reminders, holding, shown)
+    readonly property string phase: Model.state(sessionStart > 0, elapsed, reminders, holding)
     readonly property var indicator: Model.indicator(phase, elapsed)
 
     barIndicator: ({

@@ -118,13 +118,11 @@ function detail(r, n) {
   return r.details.length > 0 ? r.details[n % r.details.length] : "";
 }
 
-// "idle" (no session), "held" (the hold holds a reminder back), "holding"
-// (nothing held yet), "due" (the longest-interval reminder came due) or
-// "active". shown is pick's.
-function state(active, elapsedMs, reminders, holding, shown) {
+// "idle" (no session), "holding", "due" (the longest-interval reminder came
+// due) or "active".
+function state(active, elapsedMs, reminders, holding) {
   if (!active) return "idle";
-  if (holding)
-    return pick(reminders, elapsedMs, shown).reminder ? "held" : "holding";
+  if (holding) return "holding";
   var r = longest(reminders);
   return r && remindersDue(elapsedMs, r.everyMinutes * MINUTE) > 0
     ? "due"
@@ -140,9 +138,7 @@ function indicator(st, elapsedMs) {
       return { icon: "\u{F0176}", text: duration(elapsedMs), role: "wood" };
     // MDI bell-off, as the notifications' bell while holding.
     case "holding":
-      return { icon: "\u{F009B}", text: duration(elapsedMs), role: "off" };
-    case "held":
-      return { icon: "\u{F009B}", text: duration(elapsedMs), role: "wood" };
+      return { icon: "\u{F009B}", text: duration(elapsedMs), role: "rose" };
     default:
       return { icon: "\u{F051B}", text: duration(elapsedMs), role: "fg" };
   }
@@ -152,7 +148,7 @@ function indicator(st, elapsedMs) {
 function status(st, elapsedMs) {
   if (st === "idle") return "No active session";
   var active = "Active for " + duration(elapsedMs);
-  return st === "holding" || st === "held" ? active + " · holding" : active;
+  return st === "holding" ? active + " · holding" : active;
 }
 
 // A saved map of counts by id, keeping only whole counts of 0 or more.

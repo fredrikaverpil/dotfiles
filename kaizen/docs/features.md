@@ -53,7 +53,7 @@ Holding reminders keeps them back while the time keeps counting; when the hold
 ends, the longest-interval one held back shows. Plugins › Breaks › Hold
 reminders toggles it, as does `kaizen ipc call breaks toggleHold`
 (`setHold on|off`, `holdState`). While it holds, the bar shows the time beside
-a bell off (󰂛) in `off`, and in `wood` once a reminder is held back.
+a bell off (󰂛) in rose, as the notifications' bell turns.
 
 DnD turns the hold on, and off again when DnD ends, unless it was already on.
 Toggling the hold by hand in the meantime wins: then DnD ending leaves it on.
