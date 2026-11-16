@@ -48,53 +48,58 @@ PanelWindow {
         Text {
             id: icon
             anchors.left: parent.left
-            anchors.leftMargin: 14
+            anchors.leftMargin: 16
             anchors.verticalCenter: parent.verticalCenter
             color: root.shell.palette.fg
             font.family: Fonts.mono
-            font.pixelSize: 18
+            font.pixelSize: 16
             text: root.icon
         }
 
         Text {
             id: value
             anchors.right: parent.right
-            anchors.rightMargin: 14
+            anchors.rightMargin: 16
             anchors.verticalCenter: parent.verticalCenter
             visible: root.text === ""
-            color: root.shell.palette.fg
+            color: track.fillColor
             font.family: Fonts.mono
-            font.pixelSize: 13
+            font.pixelSize: 14
             text: Math.round(root.value * 100) + "%"
         }
 
+        // A meter (style.md › Panels › Focus and state): the slider's track, without the knob.
         Rectangle {
+            id: track
+
+            readonly property color fillColor: root.off ? root.shell.palette.off : root.shell.palette.fg
+
             anchors.left: icon.right
-            anchors.leftMargin: 12
+            anchors.leftMargin: 8
             anchors.right: value.left
-            anchors.rightMargin: 12
+            anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             visible: root.text === ""
-            height: 6
-            radius: 3
+            height: 2
+            radius: 1
             color: root.shell.palette.dim
 
             Rectangle {
                 width: parent.width * Math.max(0, Math.min(1, root.value))
                 height: parent.height
                 radius: parent.radius
-                color: root.off ? root.shell.palette.off : root.shell.palette.fg
+                color: track.fillColor
             }
         }
 
         Text {
             anchors.left: icon.right
-            anchors.leftMargin: 12
+            anchors.leftMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             visible: root.text !== ""
             color: root.shell.palette.fg
             font.family: Fonts.mono
-            font.pixelSize: 13
+            font.pixelSize: 14
             text: root.text
         }
     }
