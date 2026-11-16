@@ -118,11 +118,13 @@ function detail(r, n) {
   return r.details.length > 0 ? r.details[n % r.details.length] : "";
 }
 
-// "paused", "idle" (no session), "due" (the longest-interval reminder came
-// due) or "active".
-function state(paused, active, elapsedMs, reminders) {
+// "paused", "idle" (no session), "held" (DnD holds a reminder back), "dnd"
+// (DnD, nothing held), "due" (the longest-interval reminder came due) or
+// "active". shown is pick's.
+function state(paused, active, elapsedMs, reminders, dnd, shown) {
   if (paused) return "paused";
   if (!active) return "idle";
+  if (dnd) return pick(reminders, elapsedMs, shown).reminder ? "held" : "dnd";
   var r = longest(reminders);
   return r && remindersDue(elapsedMs, r.everyMinutes * MINUTE) > 0
     ? "due"
@@ -138,6 +140,11 @@ function indicator(st, elapsedMs) {
       return { icon: "\u{F051B}", text: "0m", role: "off" };
     case "due":
       return { icon: "\u{F0176}", text: duration(elapsedMs), role: "wood" };
+    // MDI bell-off, as the notifications' bell under DnD.
+    case "dnd":
+      return { icon: "\u{F009B}", text: duration(elapsedMs), role: "off" };
+    case "held":
+      return { icon: "\u{F009B}", text: duration(elapsedMs), role: "wood" };
     default:
       return { icon: "\u{F051B}", text: duration(elapsedMs), role: "fg" };
   }

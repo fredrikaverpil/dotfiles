@@ -141,9 +141,10 @@ Both settings are in `~/.config/kaizen/plugins/hitoiki.jsonc`.
 When several come due together, only the one with the longest interval shows.
 DnD holds reminders back while the time keeps counting; when it ends, the
 longest-interval one held back shows. The bar shows the time in `wood` once the
-longest-interval reminder came due. Its left-click shows the session time
-large; New session and Pause tracking are in its menu. Nothing survives a shell
-restart.
+longest-interval reminder came due. Under DnD it shows the time beside a bell
+off (󰂛) instead, in `off`, and in `wood` once a reminder is held back. Its
+left-click shows the session time large; New session and Pause tracking are in
+its menu. Nothing survives a shell restart.
 
 ## Notifications (`notifications`)
 

@@ -250,15 +250,54 @@ TestCase {
                 elapsed: 30 * minute,
                 want: "due"
             },
+            {
+                tag: "paused wins over dnd",
+                paused: true,
+                active: true,
+                dnd: true,
+                elapsed: 90 * minute,
+                want: "paused"
+            },
+            {
+                tag: "idle under dnd",
+                paused: false,
+                active: false,
+                dnd: true,
+                elapsed: 0,
+                want: "idle"
+            },
+            {
+                tag: "dnd, nothing held",
+                paused: false,
+                active: true,
+                dnd: true,
+                elapsed: 25 * minute,
+                shown: {
+                    eyes: 1
+                },
+                want: "dnd"
+            },
+            {
+                tag: "dnd holds one back",
+                paused: false,
+                active: true,
+                dnd: true,
+                elapsed: 40 * minute,
+                shown: {
+                    eyes: 1,
+                    move: 0
+                },
+                want: "held"
+            },
         ];
     }
 
     function test_state_no_reminders() {
-        compare(Model.state(false, true, 90 * minute, []), "active");
+        compare(Model.state(false, true, 90 * minute, [], false, {}), "active");
     }
 
     function test_state(data) {
-        compare(Model.state(data.paused, data.active, data.elapsed, reminders), data.want);
+        compare(Model.state(data.paused, data.active, data.elapsed, reminders, data.dnd || false, data.shown || {}), data.want);
     }
 
     function test_indicator_data() {
@@ -299,6 +338,26 @@ TestCase {
                 elapsed: 65 * minute,
                 want: {
                     icon: "\u{F0176}",
+                    text: "1h 5m",
+                    role: "wood"
+                }
+            },
+            {
+                tag: "dnd",
+                state: "dnd",
+                elapsed: 32 * minute,
+                want: {
+                    icon: "\u{F009B}",
+                    text: "32m",
+                    role: "off"
+                }
+            },
+            {
+                tag: "held",
+                state: "held",
+                elapsed: 65 * minute,
+                want: {
+                    icon: "\u{F009B}",
                     text: "1h 5m",
                     role: "wood"
                 }

@@ -32,7 +32,7 @@ Ui.Plugin {
     readonly property bool held: plugin.shell.dnd.active || away
     readonly property bool tracking: !paused && !away && !idleMonitor.isIdle
     readonly property real elapsed: sessionStart > 0 ? now - sessionStart : 0
-    readonly property string phase: Model.state(paused, sessionStart > 0, elapsed, reminders)
+    readonly property string phase: Model.state(paused, sessionStart > 0, elapsed, reminders, plugin.shell.dnd.active, shown)
     readonly property var indicator: Model.indicator(phase, elapsed)
 
     barIndicator: ({
