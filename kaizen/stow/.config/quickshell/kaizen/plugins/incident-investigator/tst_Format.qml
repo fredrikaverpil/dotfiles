@@ -176,4 +176,46 @@ TestCase {
 
         compare(html, 'See <span style="color:#6099C0">https&#58;&#47;&#47;x&#46;dev&#47;a&#95;b&#63;c&#61;1&#38;d&#61;2</span>.' + ' And <span style="color:#6099C0">https&#58;&#47;&#47;y&#46;dev</span>');
     }
+
+    function test_literals_lead_items_with_zero_width_space_data() {
+        const span = '<span style="color:#6099C0">x</span>';
+        return [
+            {
+                tag: "bullet",
+                markdown: "- `x` a\n- b",
+                want: "- ​" + span + " a\n- b"
+            },
+            {
+                tag: "ordered",
+                markdown: "Intro\n2. `x` a",
+                want: "Intro\n2. ​" + span + " a"
+            },
+            {
+                tag: "nested in quote",
+                markdown: "> - `x`",
+                want: "> - ​" + span
+            },
+            {
+                tag: "link",
+                markdown: "* [x](https://x.dev) a",
+                want: '* ​<a href="https://x.dev">' + span + "</a> a"
+            },
+            {
+                tag: "paragraph start",
+                markdown: "`x` a",
+                want: span + " a"
+            },
+            {
+                tag: "mid item",
+                markdown: "- a `x`",
+                want: "- a " + span
+            },
+        ];
+    }
+
+    function test_literals_lead_items_with_zero_width_space(data) {
+        const got = Format.literals(data.markdown, "#6099C0");
+
+        compare(got, data.want);
+    }
 }

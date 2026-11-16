@@ -113,11 +113,15 @@ function blocks(markdown) {
 // render wrong.
 function literals(markdown, color) {
   var pattern = /(`+)([\s\S]+?)\1(?!`)|\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|https?:\/\/[^\s<>]*[^\s<>.,;:!?)'"]/g
-  return markdown.replace(pattern, function(match, ticks, code, label, url) {
+  return markdown.replace(pattern, function(match, ticks, code, label, url, offset, text) {
     // ASCII punctuation as entities, so markdown and HTML inside the span stay
     // literal, and a bare URL is not linked.
     var literal = (ticks ? code : label || match).replace(/[!-\/:-@\[-`{-~]/g, function(c) { return "&#" + c.charCodeAt(0) + ";" })
     var span = '<span style="color:' + color + '">' + literal + "</span>"
-    return url ? '<a href="' + url.replace(/&/g, "&amp;").replace(/"/g, "&quot;") + '">' + span + "</a>" : span
+    var html = url ? '<a href="' + url.replace(/&/g, "&amp;").replace(/"/g, "&quot;") + '">' + span + "</a>" : span
+    // Qt drops a list item or quote whose first inline is HTML: lead with a
+    // zero-width space (docs/issues.md).
+    var line = text.slice(text.lastIndexOf("\n", offset - 1) + 1, offset)
+    return /^[ \t]*(>[ \t]*|([-*+]|\d{1,9}[.)])[ \t]+)+$/.test(line) ? "​" + html : html
   })
 }

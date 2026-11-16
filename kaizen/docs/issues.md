@@ -96,6 +96,22 @@ not planned, unreported.
 - Upstream: unreported.
 - Drop: the absolute paths are harmless; keep them unless they get in the way.
 
+### Markdown drops a list item that starts with HTML
+
+- Symptom: in Qt 6.12's `QTextMarkdownImporter`, inline HTML or an entity as
+  the first inline of a list item or block quote takes that block out of its
+  list or quote. As a list's first item, the whole list loses its bullets, and
+  the next item logs `attempted to insert into a list that no longer exists`.
+  The investigator's `Format.literals` turns inline code and URLs into HTML
+  spans, so `- \`foo\` does…` hit it on every render.
+- Workaround: `Format.literals` in
+  [`plugins/incident-investigator/Format.js`](../stow/.config/quickshell/kaizen/plugins/incident-investigator/Format.js)
+  puts a literal U+200B before a span that follows a line's list or quote
+  markers; `&#8203;` would take the same HTML path. Copying such a line
+  includes it.
+- Upstream: unreported; unchanged on qtbase's dev branch (2026-11-16).
+- Drop: the zero-width space, once a pinned Qt keeps the list.
+
 ## Outside kaizen
 
 Workarounds in the repository's `nix/` that kaizen hosts carry.
