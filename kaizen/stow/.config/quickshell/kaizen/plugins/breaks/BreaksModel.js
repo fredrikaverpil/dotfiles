@@ -16,12 +16,7 @@ var DEFAULT_REMINDERS = [
     // MDI run.
     icon: "\u{F070E}",
     title: "Stand up and move",
-    details: [
-      "10 squats",
-      "Shoulder rolls",
-      "Hip-flexor stretch",
-      "Walk for 2 min",
-    ],
+    details: [],
     seconds: 0,
   },
 ];

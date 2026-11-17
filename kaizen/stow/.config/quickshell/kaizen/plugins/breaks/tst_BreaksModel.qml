@@ -20,10 +20,13 @@ TestCase {
             everyMinutes: 30,
             icon: "\u{F070E}",
             title: "Stand up and move",
-            details: ["10 squats", "Shoulder rolls", "Hip-flexor stretch", "Walk for 2 min"],
+            details: [],
             seconds: 0
         })
     readonly property var reminders: [eyes, move]
+    readonly property var rotating: ({
+            details: ["a", "b", "c"]
+        })
 
     function test_settings_data() {
         return [
@@ -456,21 +459,21 @@ TestCase {
         return [
             {
                 tag: "first",
-                reminder: move,
+                reminder: rotating,
                 n: 0,
-                want: "10 squats"
+                want: "a"
             },
             {
                 tag: "next",
-                reminder: move,
+                reminder: rotating,
                 n: 1,
-                want: "Shoulder rolls"
+                want: "b"
             },
             {
                 tag: "wraps",
-                reminder: move,
-                n: 5,
-                want: "Shoulder rolls"
+                reminder: rotating,
+                n: 4,
+                want: "b"
             },
             {
                 tag: "single",
