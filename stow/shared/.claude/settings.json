@@ -10,19 +10,23 @@
   },
   "permissions": {
     "allow": [
+      "Bash(docker *)",
+      "Bash(docker-compose *)",
+      "Bash(find *)",
+      "Bash(gh *)",
+      "Bash(git *)",
+      "Bash(go build *)",
       "Bash(go doc *)",
       "Bash(go test *)",
-      "Bash(go build *)",
-      "Edit",
-      "Write",
-      "Read(~/.claude/*)",
-      "Bash(make *)",
       "Bash(ls *)",
-      "Bash(find *)",
-      "Bash(git *)",
-      "Bash(gh *)",
-      "Bash(docker *)",
-      "Bash(docker-compose *)"
+      "Bash(make *)",
+      "Edit",
+      "Read(~/.claude/*)",
+      "WebFetch(domain:docs.cloud.google.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebSearch",
+      "Write"
     ],
     "deny": [
       "Read(//**/.env)",
@@ -103,7 +107,7 @@
       "effortLevel": "xhigh"
     },
     "claude-opus-5-5": {
-      "effortLevel": "high"
+      "effortLevel": "medium"
     },
     "claude-sonnet-5-5": {
       "effortLevel": "medium"
