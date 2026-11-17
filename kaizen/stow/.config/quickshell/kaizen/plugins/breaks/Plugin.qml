@@ -242,6 +242,8 @@ Ui.Plugin {
         id: osd
         shell: plugin.shell
         namespace: "kaizen-breaks"
+        // Ends the countdown, whose next second would show it again.
+        onDismissed: plugin.counting = null
     }
 
     IpcHandler {
@@ -266,6 +268,9 @@ Ui.Plugin {
         }
         function remind(): void {
             plugin.remind();
+        }
+        function dismiss(): void {
+            osd.dismiss();
         }
     }
 }

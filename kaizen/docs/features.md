@@ -33,7 +33,9 @@ the curtain goes up; the next input starts a new one.
 Each reminder in `reminders` comes due every `everyMinutes` of a session, its
 `icon` (a glyph, a coffee cup by default) large in the middle of every output,
 as the hour is, over its `title` and its `detail`, or the next of its `details`
-each time. With `seconds`, the card stays up counting them down. Without
+each time. With `seconds`, the card stays up counting them down. A click on
+the card, or `kaizen ipc call breaks dismiss`, dismisses it and ends its count.
+Without
 `reminders`, two follow the eye and movement guidance: look into the distance
 for 20 s every 20 minutes (the 20-20-20 rule), and stand up and move every 30.
 Both settings are in `~/.config/kaizen/plugins/breaks.jsonc`.
@@ -261,7 +263,8 @@ On the hour, the time shows large in the middle of every output for a few
 seconds, impossible to miss without taking the keyboard or the pointer. It is
 held back under DnD, so it never lands in a screen share or a recording, and
 while the screen is locked or curtained; an hour struck asleep is not shown on
-resume. `kaizen ipc call timezone hour` shows it now, whatever holds it back.
+resume. A click on it dismisses it. `kaizen ipc call timezone hour` shows it
+now, whatever holds it back.
 
 The rest is to be written.
 

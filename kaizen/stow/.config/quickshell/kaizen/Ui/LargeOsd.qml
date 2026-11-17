@@ -3,7 +3,7 @@ import Quickshell
 import Quickshell.Wayland
 
 // A headline, large and centred on every output, fading out after a few seconds: for what a glance from across the
-// desk has to catch. The caller decides what holds it back.
+// desk has to catch. A click dismisses it. The caller decides what holds it back.
 Scope {
     id: root
 
@@ -14,8 +14,19 @@ Scope {
 
     property real level: 0
 
+    signal dismissed
+
     function show() {
+        out.stop();
         fade.restart();
+    }
+
+    function dismiss() {
+        if (root.level === 0)
+            return;
+        fade.stop();
+        out.restart();
+        root.dismissed();
     }
 
     SequentialAnimation {
@@ -39,6 +50,15 @@ Scope {
         }
     }
 
+    NumberAnimation {
+        id: out
+        target: root
+        property: "level"
+        to: 0
+        duration: 150
+        easing.type: Easing.InQuad
+    }
+
     Variants {
         model: Quickshell.screens
 
@@ -51,7 +71,6 @@ Scope {
             implicitHeight: card.height * root.shell.textScale
             exclusiveZone: 0
             color: "transparent"
-            mask: Region {}
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
             WlrLayershell.namespace: root.namespace
@@ -67,6 +86,11 @@ Scope {
                 color: root.shell.palette.bg
                 border.color: root.shell.palette.dim
                 border.width: 1
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: root.dismiss()
+                }
 
                 Column {
                     id: content
