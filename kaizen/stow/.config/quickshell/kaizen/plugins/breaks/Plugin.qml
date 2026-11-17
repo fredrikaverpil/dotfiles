@@ -127,13 +127,13 @@ Ui.Plugin {
         osd.show();
     }
 
-    // Shows a reminder that came due, once nothing holds it back.
+    // Shows a reminder that came due; one due while held back is skipped.
     function tick() {
         plugin.now = Date.now();
-        if (plugin.sessionStart > 0 && !plugin.held) {
+        if (plugin.sessionStart > 0) {
             const picked = Model.pick(plugin.reminders, plugin.elapsed, plugin.shown);
             plugin.shown = picked.shown;
-            if (picked.reminder)
+            if (picked.reminder && !plugin.held)
                 plugin.show(picked.reminder);
         }
     }

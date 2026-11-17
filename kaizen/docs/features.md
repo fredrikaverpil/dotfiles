@@ -49,9 +49,9 @@ session, unless the shell was down `idleMinutes` or longer.
 
 ### Hold
 
-Holding reminders keeps them back while the time keeps counting; when the hold
-ends, the longest-interval one held back shows. Plugins › Breaks › Hold
-reminders toggles it, as does `kaizen ipc call breaks toggleHold`
+Holding reminders skips them while the time keeps counting; when the hold ends,
+the next one comes due on its interval, with no catch-up. Plugins › Breaks ›
+Hold reminders toggles it, as does `kaizen ipc call breaks toggleHold`
 (`setHold on|off`, `holdState`). While it holds, the bar shows the time beside
 a timer struck through (󰔞) in rose, as the notifications' bell turns.
 
