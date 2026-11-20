@@ -1,4 +1,4 @@
-# The shared development toolchain, injected into Neovim and Claude Code by
+# The shared development toolchain, injected into Neovim, Claude Code and agy by
 # their wrappers (stow/shared/.shell/bin/) and exposed as the `dev` devshell
 # (flake.nix). Kept off the shell PATH; updated by `nix flake update`.
 #

@@ -23,8 +23,8 @@ repository. The README covers the layers, rebuild, update and Stow commands:
 - **Format Nix files**: `nix fmt` (uses nixfmt-rfc-style)
 - **CI testing**: Follow `.github/workflows/test.yml` workflow
 - **Toolchain**: language toolchains and LSPs, formatters and linters come
-  from `nix/shared/toolchain.nix`, which is NOT on the shell PATH: the `nvim`
-  and `claude` wrappers (`stow/shared/.shell/bin/`) inject it, as does the
+  from `nix/shared/toolchain.nix`, which is NOT on the shell PATH: the `nvim`,
+  `claude` and `agy` wrappers (`stow/shared/.shell/bin/`) inject it, as does the
   devshell: `nix develop ~/.dotfiles#dev -c <cmd>` (or enter with
   `nix develop ~/.dotfiles#dev`). A project overrides a tool in its own
   `mise.toml`, whose shims come ahead of the toolchain (and which
