@@ -1,183 +1,188 @@
 # kaizen style
 
-How the shell looks. What kaizen is and where each part lives is in
+Visual design rules for the shell. For architecture and file locations, see
 [`README.md`](../README.md).
 
 ## Palette
 
-The palette is [zenbones](https://github.com/zenbones-theme/zenbones.nvim)' dark
-and light variants, defined once in
-[`Ui/Palette.js`](../stow/.config/quickshell/kaizen/Ui/Palette.js) and
-followed by the theme toggle in
-[`shell.qml`](../stow/.config/quickshell/kaizen/shell.qml). QML reads colours
-from `shell.palette`, never as hex literals. The roles below are the default:
-core follows them, a plugin starts from them and may deviate.
+kaizen uses the dark and light variants of
+[zenbones](https://github.com/zenbones-theme/zenbones.nvim), defined once in
+[`Ui/Palette.js`](../stow/.config/quickshell/kaizen/Ui/Palette.js) and switched
+by the theme toggle in
+[`shell.qml`](../stow/.config/quickshell/kaizen/shell.qml). QML must always read
+colors from `shell.palette`, never hex literals. Core follows these color roles
+strictly; plugins start from them and may deviate when needed.
 
 | Role | Meaning |
 | --- | --- |
 | `bg`, `fg` | Surface, text, focused outline |
 | `dim` | Unfocused outline, card border |
-| `sel` | Hover, focus and selection fill |
+| `sel` | Hover, focus, and selection fill |
 | `off` | Secondary text, hints, unavailable, cancelled, logged out |
-| `rose` | Needs attention: error, failure, a core feature off, something live (recording, idle inhibited), production |
+| `rose` | Needs attention: error, failure, disabled core feature, live activity (recording, idle inhibited), production |
 | `wood` | Warning, draft |
 | `leaf` | Success, done, connected, logged in |
 | `sky` | Running, in progress |
-| `water` | Accent and information: links, inline code, the active window border, a neutral tag |
+| `water` | Accent and information: links, inline code, active window border, neutral tags |
 | `blossom` | Headings in rendered Markdown |
 
 ## Shapes and text
 
-- Buttons and inputs are outlined, 1 px at radius 4: `fg` focused and `dim`
-  otherwise, filled with `sel` on focus or hover; a panel's buttons differ
-  (Panels › Focus and state). List rows show focus with the `sel` fill alone.
-  A field that failed (lock, polkit) turns its outline `rose`. The lock field
-  and selections drawn over content take 2 px.
-- Surfaces (panel, context menu, notification, OSD) have radius 8.
-- A key is a keycap per key (`Super` `Space`), set apart from the label it
-  belongs to: `off` text at 12 px, outlined `dim` at radius 3 with a 2 px
-  bottom edge. A menu row puts it in a column on the right.
-- Text is `Ui.Fonts.mono` at 14 px, times the text scale; a keycap and a
-  panel's footer are 12 px, and a panel's sizes are in Panels › Type. Links
-  are `water` and underlined; inline code is
-  `water` in the body's font and size. Qt's Markdown rendering ignores
-  `linkColor` and draws code in its own larger fixed font, so markdown text goes
-  through a helper that colours both spans first.
+- **Buttons and inputs:** 1 px outline with 4 px radius—`fg` when focused,
+  `dim` otherwise—and `sel` fill on focus or hover. Panel buttons are an
+  exception (see [Panels › Focus and state](#focus-and-state)). List rows show
+  focus with `sel` fill alone. Failed inputs (lock screen, polkit) turn their
+  outline `rose`. The lock password field and selections drawn over content use
+  a 2 px outline.
+- **Surfaces:** Panels, context menus, notifications, and OSDs use an 8 px
+  corner radius.
+- **Keycaps:** Keyboard shortcuts render as individual keycaps (`Super`
+  `Space`), separated from their label: 12 px `off` text inside a `dim`
+  outline with 3 px radius and a 2 px bottom edge. In menu rows, keycaps sit in
+  a right-hand column.
+- **Typography and Markdown:** Body text uses `Ui.Fonts.mono` at 14 px, scaled
+  by the text scale. Keycaps and panel footers are 12 px (see
+  [Panels › Type](#type) for panel sizes). Links are `water` and underlined;
+  inline code is `water` in the body font and size. Because Qt's Markdown
+  renderer ignores `linkColor` and draws inline code in a larger fixed font,
+  Markdown text passes through a helper that styles both spans beforehand.
 
 ## Panels
 
-Panels borrow four ideas from Japanese design, each turned into rules below:
-ma (間), the space between things, as structure; kanso (簡素), keeping only
-what earns its place; kata (型), one form that every panel follows; and shibui
-(渋い), quiet until something matters. A panel that breaks a rule needs a
-reason, written next to the code.
+Panels follow four Japanese design principles, translated into concrete rules
+below: *ma* (間), using negative space for structure; *kanso* (簡素), keeping
+only what earns its place; *kata* (型), giving every panel the same layout; and
+*shibui* (渋い), staying quiet until something needs attention. Any panel that
+breaks a rule must explain why in a comment next to the code.
 
 ### Form
 
-Every panel has the same shape, top to bottom:
+Every panel shares the same top-to-bottom structure:
 
-- A header: the title in `fg` at 16 px on the left. A panel without a
-  slider or meter may put its one key value at 16 px on the right, coloured
-  by its status. A panel whose subsystem turns off (bluetooth) puts
-  the button that turns it on or off there instead, and its subtitle says the
-  state.
-- A subtitle in `off` at 14 px: what the value belongs to, the panel's
-  state ("Default route via Ethernet"), or why there is none. Left out when
-  it would repeat what the panel shows below.
-- Optionally, a slider or meter for the key value, 16 under the header. It is
-  part of the header: no section label. A panel with a value per group
-  (audio's output and input volume) puts each group's slider first in its
-  group instead, over its rows and 4 above them.
-- A slider's or meter's value sits right of its track at 14 px, in a column
-  as wide as `100%`, so stacked tracks end together. It takes the fill's
-  colour: `off` while muted, the status colour on a meter.
-- Groups, each a rule with its section label at the rule's left, and its
-  content. A group whose content names itself (battery's details table,
-  recording's options) leaves the label out: the rule alone heads it. A group
-  with one value of its own that no control shows (nightlight's temperature,
-  a network device's iface) puts it at the rule's right in `off`; a control
-  of its own (Wi-Fi's power button) sits right of that.
-- A panel over several devices, each with details of its own (network,
-  firmware), gives each device a group titled by its type ("Ethernet",
-  "Wi-Fi"), with its iface at the rule's right to tell two of a type apart. A
-  device without an iface (firmware's) is titled by its name instead.
-- A group holding a long list goes last.
-- A group's content of a few kinds splits into sub-groups, leaving out empty
-  ones, such as Wi-Fi's networks: secured, open, out of range. A sub-group's
-  heading is a row: a chevron, `󰅀` open and `󰅂` collapsed, its label in
-  `fg`, and a rule to its count in `off`. Sub-groups start collapsed, so the
-  panel reads at a glance: what is current (the connected network's SSID and
-  signal) shows in the group's details table. The heading is a focus stop
-  that expands or collapses its sub-group.
-- A panel about picking a device (audio) lists every device as a row, a
-  group per kind (Output, Input), since the choice is what it shows. A panel
-  that sets up an action (recording) shows each setting as one row instead,
-  label left and control right, so the whole setup reads at a glance:
-  `‹ value ›` for a setting with many values, which h/l or a click step, and
-  a segmented control sized to its labels for a few (On/Off, which output a
-  display mirrors).
-- Many values about one thing form a details table: labels in `off`, values
-  in `fg` right-aligned, or in their status colour ("Not synchronised" in
-  `wood`), both 14 px, two pairs to a line in a wide card or where every
-  value is short (weather's). A panel's tables share their column widths, so
-  they line up. A value too long for the card (an SSID) is cut with `…`;
-  labels never are.
-- A held notification (the notification history) keeps its toast's card,
-  tint, badge and animation included: it reads as the notification it was.
-- A footer with the panel's own keys: a keycap, then what it does in `off`. It
-  lists only the keys the panel adds to those every panel shares
-  ([`interaction.md`](interaction.md) › Panels). A note, such as the data's
-  credit (weather's MET Norway and SMHI licence), takes a line of its own
-  under it. The buttons acting on the whole panel ("Bluetooth settings…", a
-  recording's Pause and Stop) sit at its right, where no scrolling hides them;
-  a group's own button stays in its group.
+- **Header:** The title sits on the left in 16 px `fg`. If the panel has no
+  header slider or meter, it may display a single 16 px key value on the right
+  in its status color. If the subsystem can be toggled off (such as Bluetooth),
+  the on/off toggle button goes on the right instead and the subtitle reports
+  the state.
+- **Subtitle:** Optional 14 px `off` text describing what the key value belongs
+  to, the current state ("Default route via Ethernet"), or why nothing is
+  shown. Omit it when it would merely repeat content below.
+- **Header slider or meter:** Optional control for the panel's primary value,
+  placed 16 px below the header with no section label. Panels with one value
+  per group (such as audio output and input volume) instead put each slider at
+  the top of its group, 4 px above its rows.
+- **Slider and meter values:** Placed to the right of the track at 14 px in a
+  fixed column wide enough for `100%`, so stacked tracks end evenly. Values
+  match the fill color (`off` while muted, or the meter's status color).
+- **Groups:** Each group starts with a horizontal rule, with its section label
+  on the left. If the group's content is self-describing (such as the battery
+  details table or recording options), omit the label and use a bare rule. A
+  group with a single display-only value (nightlight temperature, network
+  interface) puts it on the right of the rule in `off`; a group-level control
+  (such as Wi-Fi's power toggle) sits to the right of that. Place groups
+  containing long lists last.
+- **Multi-device panels:** Panels showing multiple devices with individual
+  details (network, firmware) give each device its own group titled by device
+  type ("Ethernet", "Wi-Fi"), with its interface name on the rule's right to
+  distinguish duplicates. Devices without an interface (firmware) use their
+  device name as the title.
+- **Sub-groups:** When a group's items fall into a few categories (such as
+  Wi-Fi networks: secured, open, out of range), split them into sub-groups and
+  omit empty ones. Each sub-group heading is a focusable row containing a
+  chevron (`󰅀` open, `󰅂` collapsed), a `fg` label, a rule, and an `off` item
+  count. Sub-groups start collapsed so the panel reads at a glance; active
+  state (such as the connected SSID and signal) lives in the group's details
+  table.
+- **Device pickers vs. action setup:** Panels for choosing a device (audio)
+  list every device as a row, grouped by kind (Output, Input). Panels for
+  configuring an action (recording) display one row per setting (label left,
+  control right) so the entire configuration is visible at once: use
+  `‹ value ›` (stepped with `h`/`l` or clicks) for many values, and a
+  label-sized segmented control for a few options (On/Off, mirror target).
+- **Details tables:** Multiple attributes of one item form a table with `off`
+  labels and right-aligned `fg` values (or status-colored values such as `wood`
+  for "Not synchronised"), all at 14 px. Use two key/value pairs per line in
+  wide cards or when all values are short (weather). Share column widths across
+  tables in the same panel so columns align. Truncate overly long values (such
+  as SSIDs) with `…`; never truncate labels.
+- **Held notifications:** Entries in the notification history keep their
+  original toast card styling—tint, badge, and animation included—so they read
+  just like the live notification.
+- **Footer:** Lists only shortcuts unique to this panel (keycap + `off`
+  description), omitting global panel keys (see
+  [`interaction.md`](interaction.md) › Panels). Attribution or notes (such as
+  weather's MET Norway and SMHI license) appear on their own line below.
+  Panel-wide action buttons ("Bluetooth settings…", recording Pause/Stop) stay
+  pinned on the footer's right so scrolling cannot hide them; group-specific
+  buttons stay inside their group.
 
 ### Space
 
-- Spacing comes from one scale: 4, 8, 16 and 24 px. Rows in a list are 4
-  apart, tiles in a grid (wallpapers) 8, a rule runs 8 clear of the label at
-  its left and of what sits at its right, a group's content is 8 under its
-  label or 16 under a bare rule, sub-groups are 8 apart and 16 under the
-  group's content above them, as is a group's own button, the card's padding
-  is 16, and groups are 24 apart. The subtitle sits 4 under the title.
-- Groups too tall for the screen scroll between a fixed header and footer.
-  While they overflow, a 4 px `dim` bar at radius 2 sits in the card's
-  right padding, clear of the rows' fill; it shows nothing when all fits. A
-  scrolling list ends at its last row, with no marker; the bar shows where
-  it is.
-- A group's content aligns with its rule's start. A sub-group's heading and
-  rows indent 16, its chevron over the rows' icons. A row's or slider's `sel`
-  fill reaches 8 into the card's padding, past the text it holds.
-- Space separates groups. The only lines a panel draws are the rules heading
-  its groups and sub-groups: 1 px `dim`, on the label's line, to the group's
-  right edge or what sits there. The header has none.
+- **Spacing scale:** All gaps use 4, 8, 16, or 24 px:
+  - `4 px`: subtitle below title; gap between list rows.
+  - `8 px`: grid tiles (wallpapers); rule clearance from left label and right
+    items; group content below a labeled rule; gap between sub-groups.
+  - `16 px`: card padding; group content below a bare rule; sub-groups or a
+    group's own button below preceding group content.
+  - `24 px`: gap between groups.
+- **Scrolling:** When groups exceed the screen height, they scroll between the
+  fixed header and footer. While overflowing, a 4 px `dim` scrollbar (radius 2)
+  appears inside the card's right padding, clear of row fills; it hides when
+  everything fits. Scrolling lists end at their last row with no extra marker.
+- **Alignment:** Group content aligns with the start of its rule. Sub-group
+  headings and rows indent 16 px, lining the chevron up over the rows' icons.
+  Row and slider `sel` fills extend 8 px into the card padding past the text.
+- **Rules:** Space—not borders—separates groups. The only lines drawn in a
+  panel are the 1 px `dim` rules heading groups and sub-groups, sitting inline
+  with the label and extending to the right edge (or the right-side item). The
+  header has no rule.
 
 ### Focus and state
 
-- The `sel` fill marks focus or hover, and nothing else. Rows, sliders and
-  buttons show focus with it alone: rows and sliders draw no outline, and a
-  button's stays `dim`.
-- What is current or chosen shows as a mark at the start of its row: `●` for
-  the chosen one of a set, `○` in `dim` for the others. A segmented control,
-  a few choices side by side in one outline, has no row start: its chosen
-  label is `fg`, the others `off`. An option that cannot be picked (a mirror
-  that would loop) is `dim`, since `off` already means unchosen there, and
-  focus skips it; so is a button that cannot act (a player's Next with no
-  next track).
-- A device's state shows in its icon at the start of its row: `leaf` while
-  connected, `off` otherwise. What it reports, such as its battery, sits at
-  the row's right in its status colour; a change under way ("Connecting…")
-  sits there in `sky`. An audio device on an empty jack or port (no
-  headset, an HDMI port with no monitor) shows `󰚦` there in `off`, and stays
-  pickable.
-- A row whose actions are buttons (a device's Connect, a network's Join) takes
-  no focus, `sel` fill or click: its buttons, at its right and as wide as
-  their longest label, are the stops. A row with an action of its own (a
-  calendar event, which opens in its app) keeps its stop, and its buttons (a
-  meeting's Join) follow it.
-- A slider is a 2 px track in `dim`, filled `fg` up to its value, with a
-  10 px knob; the fill and knob turn `off` while muted or off. A meter, which
-  only shows a value, is the same track without the knob, its icon and fill
-  in the value's status colour.
+- **Focus fill:** `sel` marks focus or hover and nothing else. Rows, sliders,
+  and buttons indicate focus with `sel` alone: rows and sliders have no
+  outline, and button outlines stay `dim`.
+- **Selection marks:** The active choice in a list shows `●` at the start of
+  its row; inactive choices show `○` in `dim`. Segmented controls (choices side
+  by side in one outline) have no row prefix: the active label is `fg` and
+  inactive labels are `off`. Unselectable options (such as a display mirror that
+  would create a loop) and inactive buttons (such as Next with no next track)
+  use `dim`—since `off` already means unselected—and are skipped by keyboard
+  focus.
+- **Device rows:** A device's leading icon shows `leaf` when connected and
+  `off` otherwise. Secondary info (such as battery level) sits on the right in
+  its status color; in-progress transitions ("Connecting…") appear there in
+  `sky`. An audio device on an unplugged jack or empty HDMI port shows `󰚦` in
+  `off` on the right and remains selectable.
+- **Row actions:** A row whose only actions are buttons (such as Connect or
+  Join) cannot itself be focused, highlighted with `sel`, or clicked; its
+  right-aligned buttons (sized to the widest label) are the focus stops. A row
+  that also has its own primary action (such as a calendar event that opens its
+  app) keeps its own focus stop, followed by its buttons (such as Join).
+- **Sliders and meters:** A slider is a 2 px `dim` track filled with `fg` up to
+  its value, plus a 10 px knob; both fill and knob turn `off` when muted or
+  disabled. A display-only meter uses the same track without a knob, coloring
+  both its icon and fill with the value's status color.
 
 ### Type
 
-- Three sizes: 16 px for the title and the header's key value; 14 px for the
-  subtitle, section labels, body text and a slider's or meter's value; 12 px
-  for the footer. All scale with the text scale.
-- A section label is in sentence case, 14 px, in `fg`, at its rule's left: no
-  smaller than the body it heads, and set apart from it by the rule, not by
-  colour.
-- A time when something happened reads "14:01" on the same day and "Wed
-  13:02" before it, without seconds
+- **Three sizes:** 16 px for panel titles and header key values; 14 px for
+  subtitles, section labels, body text, and slider/meter values; 12 px for
+  footers. All scale with the text scale.
+- **Section labels:** Sentence case, 14 px, `fg`, placed at the left of their
+  rule—the same size as body text, distinguished by the rule rather than color.
+- **Timestamps:** Events from today format as `14:01`; earlier days format as
+  `Wed 13:02`, without seconds
   ([`Ui/Time.js`](../stow/.config/quickshell/kaizen/Ui/Time.js)).
-- Colour carries a role or a status, never decoration.
+- **Meaningful color:** Color always conveys a role or status, never
+  decoration.
 
 ## Status
 
-- A status colours its label or icon with its role.
-- A diagonal strikethrough on an icon marks an off state such as disconnected,
-  disabled, muted or logged out. A core feature that is temporarily off shows
-  it in rose, as an alert (Wi-Fi, Bluetooth, notifications). A plugin picks its
-  own colours but marks such states the same way, and may show the connected,
-  active or logged-in state in green (`leaf`).
+- Status labels and icons take the color of their semantic role.
+- A diagonal strikethrough on an icon marks an off state (disconnected,
+  disabled, muted, or logged out). Temporarily disabled core features (Wi-Fi,
+  Bluetooth, notifications) show this struck-through icon in `rose` as an
+  alert. Plugins choose their own colors, follow the same strikethrough
+  convention for off states, and may use `leaf` for connected, active, or
+  logged-in states.

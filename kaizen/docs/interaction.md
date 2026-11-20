@@ -1,196 +1,212 @@
 # kaizen interaction
 
-How the shell and its applications take input. How they look is in
-[`style.md`](style.md); what each surface is and where it lives, in
-[`README.md`](../README.md).
+Input and navigation rules for the shell and its applications. For visual
+design, see [`style.md`](style.md); for surface architecture and file paths,
+see [`README.md`](../README.md).
 
-These rules hold for every surface, core and plugin. A surface that breaks one
-has a bug, as a pointer-only control does.
+These rules apply to every surface, both core and plugin. Breaking one is a
+bug, just like a pointer-only control.
 
 ## Principles
 
-- Keyboard first. Every action has a key path; the pointer only shortens it.
-- Tab and Shift+Tab step through the controls. A list is one stop: Tab lands
-  on its selected row, and arrows move inside it.
-- Keys are shown. A row or control that has a key shows it as a keycap. A key
-  is one that runs the same action: a niri bind for a shell row, the
-  application's own key inside an application. A row without one shows none.
-- One menu, many ways in. An action key, a right-click and a click on a chip
-  open the same menu with the same rows. A right-click is never the only way
-  to an action.
-- Focus is the subject. An action applies to the focused object, or to the
-  picked set when there is one. A right-click's subject is the clicked object,
-  or the picked set when that object is picked.
-- Esc closes the menu, panel or dialog that holds the keyboard, whole. Inside
-  an application it clears one layer per press: the open menu, then the picked
-  set, then the focused field.
-- `?` lists the keys of the focused scope.
+- **Keyboard first:** Every action has a keyboard path; the pointer is only a
+  shortcut.
+- **Tab navigation:** `Tab` and `Shift+Tab` step between controls. A list is a
+  single Tab stop: `Tab` lands on the selected row, and arrow keys move within
+  the list.
+- **Visible shortcuts:** Any row or control with a shortcut displays it as a
+  keycap—a compositor bind for shell rows, or an app shortcut inside an
+  application. Rows without shortcuts show none.
+- **One menu, many entry points:** An action shortcut, a right-click, and a
+  chip click all open the same menu with the same rows. Right-click is never
+  the only way to reach an action.
+- **Focus defines the target:** Actions apply to the focused item, or to the
+  selected set if items are selected. Right-clicking targets the clicked item—or
+  the selected set if the clicked item belongs to it.
+- **Predictable `Esc`:** In shell surfaces, `Esc` immediately closes the active
+  menu, panel, or dialog. Inside applications, `Esc` unwinds one layer per
+  press: open menu → selected set → focused input field.
+- **Shortcut help:** `?` lists available shortcuts for the focused scope.
 
 ## Menus
 
-One component draws every menu: the launcher, the bar's and tray's context
-menus, and the menus inside applications. Its rows come from one tree: the
-launcher's items for the shell, a tray item's own menu, or an application's
-actions.
+One component renders every menu: the launcher, bar and tray context menus, and
+in-app menus. Each menu reads from a single item tree—the shell launcher tree,
+a tray item's D-Bus menu, or an application's actions.
 
 ### Anatomy
 
-- A search row comes first, always. Its placeholder names the level
-  ("Filter time…"); on its right is the key that opened the menu, when one
-  did.
-- A row shows an icon (the image when it has one, else the glyph), its label,
-  a detail (a match's path, a value such as a zone's offset), its key and `›`
-  when it has children. Check and radio rows show their state in the icon.
-- Separators group rows; a query hides them. Disabled rows keep their place in
-  `off`, and the cursor skips them. A row for a feature the compositor lacks
-  is not shown.
-- Rows are virtualized: a level can hold thousands (emoji).
+- **Search bar:** Always appears first. Its placeholder names the current level
+  ("Filter time…"), and the right side displays the shortcut that opened the
+  menu (when applicable).
+- **Rows:** Each row shows an icon (image if available, otherwise a glyph),
+  label, optional detail (such as a deeper match's path or a timezone offset),
+  shortcut keycap, and `›` if it opens a submenu. Check and radio rows show
+  their state in the icon.
+- **Separators and visibility:** Separators group rows and disappear while
+  filtering. Disabled rows remain visible in `off` and are skipped by keyboard
+  navigation. Rows for features unsupported by the active compositor are
+  hidden.
+- **Virtualization:** Lists are virtualized so a single level can hold
+  thousands of rows (such as emoji).
 
 ### Search
 
-- Typing always filters. A query matches the level's rows and every static
-  row below it; deeper matches show their path as the detail. It reads no
-  provider's rows but the level's own, so tray menus are reached by drilling
-  into an item, and the root adds Apps.
-- Hyphens are ignored ("wifi" finds "Wi-Fi"); rows with a key also match by
-  it.
-- Order is frecency (palette only), then the tree's order, with direct
-  children before deeper matches. A context menu skips frecency so its rows
-  stay where the hand expects them.
-- An application's level may add what was typed: its last row, a hint in
-  `off` while the search is empty, becomes Add "<query>" unless a row there
-  has that name.
+- Typing always filters. A query searches the current level and all static
+  descendants below it, showing each deeper match's path in its detail column.
+  Search does not query dynamic providers inside child levels (so tray menus
+  are searched only after opening a tray item), except at the root level, which
+  also includes Apps.
+- Hyphens are ignored ("wifi" matches "Wi-Fi"), and rows with shortcuts also
+  match on their shortcut text.
+- Results are ordered by frecency (in palettes only), then tree order, with
+  direct children ranked ahead of deeper matches. Context menus disable
+  frecency so row positions stay predictable for muscle memory.
+- Application menu levels can allow creating new entries from the search box:
+  the final row displays an `off` hint when empty and switches to
+  `Add "<query>"` while typing, unless an existing row already has that name.
 
 ### Keys
 
 | Key | Action |
 | --- | --- |
 | type | filter |
-| `↑` `↓`, `Ctrl+N` `Ctrl+P` | move |
+| `↑` `↓`, `Ctrl+N` `Ctrl+P` | move selection |
 | `PageUp` `PageDown` | move ten rows |
-| `→` | open the submenu |
-| `←` | back one step while the search is empty, else move the text cursor |
-| `Backspace` | delete a character, or back one step on an empty search |
-| `Enter` | run the row, or open its submenu |
-| `Esc` | close the menu |
+| `→` | open submenu |
+| `←` | go back one level (when search is empty), or move text cursor |
+| `Backspace` | delete character, or go back one level when search is empty |
+| `Enter` | activate row or open submenu |
+| `Esc` | close menu |
 
-- Letters are text, so `hjkl` and Space neither move nor run. `Ctrl+J` and
-  `Ctrl+K` stay unbound: `Ctrl+K` opens an application's palette.
-- Tab and Shift+Tab do nothing: the menu keeps the keyboard until it closes.
-- Back is the same step in both placements: a cascade closes its last card, the
-  palette returns to the parent level.
-- Enter still repeating from the press that opened a submenu does not run the
-  submenu's first row.
-- The pointer: hover selects, and opens a submenu after a pause; a click runs.
+- Letters always type into the filter, so `hjkl` and `Space` do not navigate or
+  activate rows. `Ctrl+J` and `Ctrl+K` stay unbound (`Ctrl+K` opens an
+  application's command palette).
+- `Tab` and `Shift+Tab` do nothing; the menu holds keyboard focus until closed.
+- Going back works identically in both placements: it closes the rightmost card
+  in a cascading context menu, or returns to the parent level in a palette.
+- Key repeat on `Enter` after opening a submenu will not activate the submenu's
+  first row.
+- With the pointer, hovering selects a row and opens submenus after a brief
+  delay; clicking activates.
 
 ### Placements
 
-The same menu opens in one of two placements, decided by whether it has
-something to hang from.
+The same menu opens in one of two placements depending on whether it has an
+anchor:
 
 | | Context menu | Palette |
 | --- | --- | --- |
-| Opened by | right-click on a bar button, tray item, or an application's row or chip; an application key aimed at one control | `Mod+Space`; `Ctrl+K` in an application; `menu popup` and `menu level` over IPC |
-| Position | hangs from its anchor, on the anchor's output; in an application, from the pointer or the chip | centred on the focused output, or over the application's window |
-| Submenu | cascades beside its row | replaces the list; a breadcrumb above the search row names the path |
-| Size | fits its rows | a level may ask for a wide card (Keybindings) |
+| Opened by | right-click on a bar button, tray item, or app row/chip; an app shortcut targeting one control | `Mod+Space`; `Ctrl+K` in an app; `menu popup` and `menu level` over IPC |
+| Position | anchored to its trigger on that output (or to the pointer/chip inside an app) | centered on the focused output, or over the app window |
+| Submenu | cascades beside its parent row | replaces the list, with a breadcrumb above the search bar |
+| Size | fits its rows | standard width, unless a level requests a wide card (Keybindings) |
 
-- The launcher is the shell's tree in the palette, at the root.
-- A shell menu is a layer surface with exclusive keyboard focus. An
-  application's menu is drawn inside the application's window, over its
-  content: it needs no second surface, the keyboard stays with the window, and
-  it never leaves the window's bounds.
+- The launcher is the shell's menu tree opened as a palette at its root.
+- Shell menus are layer surfaces with exclusive keyboard focus. Application
+  menus render inside the application window over its content—requiring no
+  extra surface, keeping keyboard focus in the window, and staying within
+  window bounds.
 
 ## Shell surfaces
 
 ### Bar
 
-- The bar mirrors the launcher; nothing is reachable only from it. Every panel
-  action is a launcher row under Settings, except sliders and per-item detail
-  (forgetting a network, recording options).
-- Bar buttons come in four kinds, told apart by what a click does:
-  - ❄ and the workspaces: left-click opens the launcher, right-click its top
-    level as a context menu; a workspace takes focus.
-  - Panel buttons: left-click opens the panel, or closes it when open;
-    right-click opens the button's Settings node as a context menu. The date
-    is one only when a plugin takes it over, and opens the plugin's node;
+- The bar mirrors the launcher; nothing is accessible only from the bar. Every
+  panel action also lives under **Settings** in the launcher, except sliders
+  and item-specific details (such as forgetting a network or tweaking recording
+  options).
+- Bar items fall into four kinds based on click behavior:
+  - **Menu (`❄`) and workspaces:** Left-clicking `❄` opens the launcher;
+    right-clicking opens the top level as a context menu. Clicking a workspace
+    focuses it.
+  - **Panel buttons:** Left-click toggles the panel open or closed; right-click
+    opens its **Settings** subtree as a context menu. The date behaves as a
+    panel button only when claimed by a plugin (opening the plugin's node);
     otherwise it is a plain label.
-  - Indicators, shown only off the default state: left-click acts on it
-    (stops the recording or every mirror, re-enables idle locking, resets the
-    layout), or opens and closes its panel (doctor, firmware). The system
-    alert is a plain label.
-  - Tray items: the app's own activation and menu.
+  - **Indicators:** Shown only when off the default state. Left-click either
+    acts directly (stopping recording or mirrors, re-enabling idle lock,
+    resetting keyboard layout) or toggles its panel (doctor, firmware). The
+    system alert indicator is a plain label.
+  - **Tray items:** Forward left-click activation and right-click menus to the
+    app.
 
 ### Panels
 
-- A panel shows and adjusts a subsystem; its actions are also Settings rows,
-  so a panel is never the only way to one.
-- It opens centred with exclusive keyboard focus, nothing focused: the first
-  step lands on its first stop. Arrows and `hjkl` step focus as Tab does,
-  since a panel has no search to type into; Enter and Space activate; Esc
-  closes. A control that steps a value (a slider, a
-  `‹ value ›` setting) takes `←` `→` and `h` `l` to step it instead.
-- Moving the pointer over a row or slider moves focus to it, so one row at a
-  time shows the fill. A row that appears or scrolls under a still pointer
-  takes no focus.
-- A sub-group's heading expands or collapses it on Enter, Space or a click; it
-  stays so until the shell restarts.
-- A control with its own key shows it, and the panel's footer lists every key
-  it adds beyond these ([`style.md`](style.md) › Panels).
+- Panels view and adjust a subsystem. Their actions also exist as **Settings**
+  rows in the launcher, so a panel is never the only path to an action.
+- Panels open centered with exclusive keyboard focus and nothing focused
+  initially, so the first navigation step lands on the first control. Because
+  panels have no search input, both arrow keys and `hjkl` step focus just like
+  `Tab`. `Enter` and `Space` activate; `Esc` closes. Value controls (sliders
+  and `‹ value ›` steppers) consume `←`/`→` and `h`/`l` to adjust their value.
+- Hovering a row or slider moves focus to it so only one item shows the `sel`
+  fill at a time. A row that appears or scrolls beneath a stationary pointer
+  does not steal focus.
+- Activating a sub-group heading (`Enter`, `Space`, or click) toggles it open
+  or closed; that state persists until the shell restarts.
+- Controls with dedicated shortcuts display them as keycaps, and the panel
+  footer lists every panel-specific key beyond the defaults above (see
+  [`style.md`](style.md) › Panels).
 
 ### Tray
 
-- A tray item's left-click is the app's activation; its right-click opens the
-  app's menu as a context menu. The launcher's Tray level lists the items.
-- When the items do not all fit beside the clock, one tray button replaces
-  them; either click opens the launcher's Tray level as a context menu from
-  it, where each item's menu cascades.
-- A tray menu's rows come from the app, so they carry no keys, and root search
-  does not read them.
+- Left-clicking a tray item triggers the app's activation; right-clicking opens
+  the app's menu as a context menu. The launcher's **Tray** level lists all
+  tray items.
+- If tray items overflow the space beside the clock, they collapse into a
+  single tray button. Either click opens the launcher's **Tray** level as a
+  context menu from that button, with each item's menu cascading out.
+- Tray menu rows come from the app itself, so they carry no shortcuts and are
+  excluded from root search.
 
 ## Applications
 
-An application is a complex UI in a normal window, such as the incident
-investigator: it stays up while others have focus, and niri's window binds
-(`Mod+Q`) treat it as any other window.
+An application is a complex UI in a regular window (such as the incident
+investigator). It stays open while other windows are focused, and compositor
+window binds (like `Mod+Q`) treat it like any other window.
 
-- The launcher only opens an application (its plugin node) and shows its tray
-  menu. The application's own actions stay in its palette; the shell's tree
-  never holds them.
-- `Ctrl+K` opens the application's palette on what has focus: the focused
-  object's actions, then those of each scope around it (its list or pane,
-  then the window), each with its key where that key runs it. The breadcrumb
-  names the scopes.
-- Single-letter keys are optional. An application may give frequent actions
-  one; it acts on the focused object while no text field has focus. In a text
-  field only Esc, Enter and Ctrl chords act: Esc leaves the field, and
-  `Ctrl+Enter` submits. An application's keys never become niri binds.
-- A property (tag, project, model) is a chip showing its value, or its name
-  in `off` while unset. A click, Enter or Space on it, or its key when it has
-  one, opens a context menu on the chip; picking a row sets it.
-- A right-click on an object opens its context menu: the palette's rows for
-  that object.
-- Lists: `↑` `↓` (and `j` `k`) move, and with Shift pick a range; Enter opens
-  and takes focus into what it opened; Space picks, Esc unpicks, Backspace or
-  Delete deletes.
-- A destructive action asks inline: `y` or Enter confirms, `n` or Esc cancels.
+- The launcher only launches the application (via its plugin node) and exposes
+  its tray menu. All internal actions live in the application's own palette,
+  never in the shell tree.
+- `Ctrl+K` opens the application palette scoped to the current focus: actions
+  for the focused item first, followed by each enclosing scope (its list or
+  pane, then the window), with shortcuts shown where active. The breadcrumb
+  reflects the scope chain.
+- Single-letter shortcuts are optional. When defined, they act on the focused
+  item whenever no text field is focused. Inside a text field, only `Esc`,
+  `Enter`, and `Ctrl` chords act (`Esc` leaves the field; `Ctrl+Enter`
+  submits). Application shortcuts never become compositor binds.
+- Properties (tag, project, model) appear as chips showing their value, or
+  their name in `off` when unset. Clicking a chip, pressing `Enter`/`Space` on
+  it, or hitting its shortcut opens an anchored context menu to set the value.
+- Right-clicking an item opens its context menu with the same rows shown in the
+  palette for that item.
+- **Lists:** `↑`/`↓` (and `j`/`k`) move focus; adding `Shift` selects a range.
+  `Enter` opens the item and moves focus into it; `Space` toggles selection;
+  `Esc` clears selection; `Backspace` or `Delete` deletes.
+- Destructive actions confirm inline: `y` or `Enter` confirms; `n` or `Esc`
+  cancels.
 
 ### Incident investigator
 
-The investigator has no single-letter action keys: `Ctrl+K` (or `?` outside a
-text field) opens the palette, and the list takes the keys above. Enter on a
-row moves focus to its draft's notes or its follow-up field; Esc goes back to
-the row.
+The incident investigator defines no single-letter action keys: `Ctrl+K` (or
+`?` outside a text field) opens the palette, and the investigation list uses
+the standard list keys above. Pressing `Enter` on a row moves focus to its
+draft notes or follow-up input; `Esc` returns focus to the row.
 
-- Active filters show as chips above the list; each clears with a click or
-  from the filter menu.
-- A draft's composer carries the chips Tag, Projects, Model and Effort under
-  its notes, and runs on `Ctrl+Enter`; Projects › adds a project typed in it.
-  The follow-up field carries Model and Effort, which pick what the next run
-  starts with (`settings`); the conversation's header carries Tag.
-- A combined investigation's sources are buttons under Combined from, and
-  Combined from › in its palette; each goes to the source's row. While it is
-  selected, the list marks its sources.
-- A row's context menu holds Open, Run or Re-run, Tag ›, Combine (with a picked
-  set) and Delete. A message's holds Copy (Copy selection while text is
-  selected), Edit (your own) and Branch.
+- Active filters appear as chips above the list; clear them by clicking a chip
+  or via the filter menu.
+- A draft's composer shows **Tag**, **Projects**, **Model**, and **Effort**
+  chips below the notes field and submits on `Ctrl+Enter`; typing in
+  **Projects ›** lets you add a new project. The follow-up bar shows **Model**
+  and **Effort** (selecting the defaults for the next run via `settings`), and
+  the conversation header shows **Tag**.
+- Combined investigations list their source investigations as buttons under
+  **Combined from** (and under **Combined from ›** in the palette), each
+  jumping to its source row. Selecting a combined investigation highlights its
+  sources in the list.
+- A row's context menu contains **Open**, **Run** / **Re-run**, **Tag ›**,
+  **Combine** (when multiple rows are selected), and **Delete**. A message's
+  context menu contains **Copy** (or **Copy selection** when text is selected),
+  **Edit** (on your own messages), and **Branch**.

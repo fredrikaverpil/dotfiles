@@ -1,40 +1,39 @@
 # Incident investigator
 
-An alert toast gets an **Investigate** button. It drafts an investigation, and a
-read-only Claude Code run searches GCP logs for the alert's trace id, or from
-the notes (an alert or Logs Explorer URL, a time), and reports the likely root
-cause.
+Adds an **Investigate** button to alert toasts. Clicking it drafts an
+investigation, and a read-only Claude Code run searches GCP logs—using the
+alert's trace ID or details from the notes (such as an alert URL, Logs Explorer
+URL, or timestamp)—to report the likely root cause.
 
 ## Configuration
 
-Importing this directory installs the daemon.
+Importing this Nix module installs the daemon.
 `~/.config/kaizen/plugins/incident-investigator.jsonc` enables the window and
-configures the daemon, which reads it at start
-(`systemctl --user restart kaizen-incident-investigator` applies an edit). A
-path is absolute or starts with `~/`.
+configures the daemon, which reads it at startup (run
+`systemctl --user restart kaizen-incident-investigator` to apply edits). Paths
+may be absolute or start with `~/`.
 
 ```jsonc
 {
-  // Required. The Claude Code profile (account and sessions) every run uses.
+  // Required. Claude Code profile (account and sessions) used for every run.
   "claudeConfigDir": "~/.claude-oncall",
 
-  // Directories holding clones of the services' repositories. Lets a run read
-  // the code at the commit that is deployed. Empty: runs read logs and alerts
-  // only.
+  // Directories containing clones of service repositories so runs can read
+  // code at the deployed commit. Leave empty to inspect logs and alerts only.
   "sourceDirs": ["~/code/github.com/my-org"],
 
   // Appended to Claude's system prompt on every turn, in order, after the
-  // plugin's instructions.md; read in place.
+  // plugin's instructions.md (read in place).
   "instructionFiles": ["~/notes/my-org.md"],
 
-  // Labels an investigation can carry, for the window's filters and badges.
+  // Labels an investigation can carry, used for window filters and badges.
   "tags": [
     { "name": "prod", "color": "rose" },
     { "name": "dev", "color": "water" },
   ],
 
-  // Ids in tool output listed as users and organizations, besides the
-  // `users/ID` and `organizations/ID` resource names.
+  // Extra regexes for extracting user and organization IDs from tool output,
+  // in addition to `users/ID` and `organizations/ID` resource names.
   "entityPatterns": [
     {
       "kind": "user",
@@ -42,29 +41,29 @@ path is absolute or starts with `~/`.
     },
   ],
 
-  // Projects in an alert's text that has no GCP alert link; the first group is
-  // the project.
+  // Regexes whose first capture group extracts GCP project IDs from alert text
+  // that has no GCP alert URL.
   "projectPatterns": ["\\bproject_id=([a-z][a-z0-9-]{4,28}[a-z0-9])\\b"],
 }
 ```
 
-| Field | Default | |
+| Field | Default | Description |
 | --- | --- | --- |
-| `claudeConfigDir` | required | `CLAUDE_CONFIG_DIR` of the runs |
-| `sourceDirs` | `[]` | directories of repositories a run may read; see Read-only runs |
-| `instructionFiles` | `[]` | system prompt additions after `instructions.md` |
-| `tags` | `[]` | `name`, and `color`, a palette role |
-| `entityPatterns` | `[]` | `kind` (`user`, `organization`) and a regex whose first group is the id |
-| `projectPatterns` | `[]` | regexes whose first group is a project, read from an alert without a link |
+| `claudeConfigDir` | required | `CLAUDE_CONFIG_DIR` for every run |
+| `sourceDirs` | `[]` | repository parent directories a run may read (see [Read-only runs](#read-only-runs)) |
+| `instructionFiles` | `[]` | extra system prompt files appended after `instructions.md` |
+| `tags` | `[]` | list of `{ name, color }` where `color` is a palette role |
+| `entityPatterns` | `[]` | `{ kind, regex }` (`user` or `organization`), first capture group is the ID |
+| `projectPatterns` | `[]` | regexes whose first capture group extracts a project from alerts without URLs |
 
-An unknown field, or a missing or invalid file, stops the daemon from starting,
-and `kaizen doctor` lists the reason.
+An unknown field or a missing/invalid config file prevents the daemon from
+starting; `kaizen doctor` reports the exact reason.
 
-An alert toast gets the button from a notification rule
-([`features.md`](../../../docs/features.md) › Notifications ›
-Rules) whose action runs `investigate draft`. `INVESTIGATE_TAG`, one of `tags`,
-tags the draft; the daemon refuses any other. A draft that fails shows a
-critical toast with the error.
+To attach the **Investigate** button to alert toasts, add a notification rule
+(see [`features.md`](../../../docs/features.md) › Notifications › Rules) whose
+action runs `investigate draft`. Pass `INVESTIGATE_TAG` (must match an entry in
+`tags`; the daemon rejects anything else). If drafting fails, a critical toast
+displays the error.
 
 ```jsonc
 // ~/.config/kaizen/notification-rules.d/50-alerts.jsonc
@@ -100,102 +99,112 @@ flowchart LR
 
 ## Components
 
-- `investigate` is one Go binary with two roles: `investigate serve` is the
-  daemon, and the other verbs (`draft`, `edit`, `start`, `followup`, `cancel`,
-  `delete`, `tag`) are short-lived clients that send one request and exit.
-- The daemon is a systemd user service listening on
-  `$XDG_RUNTIME_DIR/kaizen-incident-investigator.sock`. It owns the
-  investigations, their state files and the `claude` processes, so reloading the
-  shell does not stop a run.
-- The tray icon runs inside the daemon process. It has no Quit item, as quitting
-  would stop the daemon and its runs. New investigation creates the draft
-  directly, with no client in between. An amber dot on the icon marks a running
-  turn.
-- The window is a Quickshell `FloatingWindow`. It watches the state files
-  (`FileView`) and runs the client verbs when you click.
-- Claude Code runs as a `claude -p` subprocess of the daemon, one per turn.
-- The Model and Effort chips on a draft and beside the follow-up field (or
-  Model › and Effort › in the palette) pick the model and effort that the next
-  run starts with (`settings`, kept in `settings.json`). **Run**, **Re-run**
-  and the other starts store them on the investigation, which shows them in its
-  header; its follow-ups and branches keep using them.
-- A chip shows a property's value, or its name while unset. A click, or Enter
-  or Space while it has focus, opens its menu on it: the palette's submenu of
-  the same name. A draft carries Tag, Projects, Model and Effort under its
-  notes; Projects › adds a project typed into its search.
-- **Filter** under the search field, or Filter › in the palette, lists
-  investigations by tag (from the `tags` the daemon writes to `settings.json`,
-  each with its count) or by project. Each active filter shows as a chip beside
-  the button, and a click on it clears it. **New** under a tag's filter drafts
-  an investigation with that tag, so the filter lists it. The Tag chip in an
-  investigation's header sets or clears its tag (`tag`) in any status.
-- `Ctrl+K` or `?` opens the palette over the window on what has focus, nearest
-  first: a row's investigation, or the picked set when there is one; a
-  message (Copy, or Copy selection while text is selected, and Edit and Branch
-  on your own); the draft's form, the conversation or the picked set's view; the
-  list (Search list, Filter ›, Pick all listed, Go to ›); then the window (New,
-  Clear, Model ›, Effort ›). A key shows where it runs the row. `Actions.js`
-  lists the rows per scope. `Ctrl+Enter` in a draft's trace id or notes runs
-  it; Enter in the trace id does not.
-- A right-click on a row opens its context menu at the pointer, with the
-  palette's rows for that row, or for the picked set when the row is picked;
-  the shown investigation and the picks stay. Submenus cascade beside their
-  row.
-- The list is one Tab stop, its selected row. On a focused row, `j`/`k` (or
-  `↑`/`↓`) move, and with Shift pick the range from the selected row. Enter
-  opens it and moves focus to its draft's notes or its follow-up field. Space
-  toggles it in the picked set (`j`/`k` then move only the focus), Backspace
-  asks to delete the picked rows, or else the focused one, and Esc unpicks. Esc
-  in a text field unpicks, then leaves the field for the selected row. Delete
-  and Clear ask inline, from a button, a key or the palette alike: `y` or Enter
-  confirms, and `n`, Esc or Backspace cancels.
-- Shift-click (a range) or ctrl-click (a toggle) picks investigations in the
-  list, and **Combine** drafts a new one from their alerts and reports
-  (`combine`), with the union of their entities, or **Delete** removes them
-  (running ones stay). The combined one carries a merge mark in the list and
-  shows its sources under **Combined from** (Combined from › in the palette),
-  each going to its row and clearing the filters that hide it; while it is
-  selected, the list marks its sources. Edit (the pencil beside one of your
-  messages, or Enter on it) opens it in place, and **Branch** (`branch`)
-  replays the conversation from there with the edited text as a new
-  investigation, keeping the original; the palette's Branch replays it
-  unchanged. The new session gets the earlier messages as text, not their tool
-  calls. Each Claude message has a copy button.
-- The conversation is one Tab stop, the last focused message, else the newest;
-  a click focuses one too. `j`/`k` (or `↑`/`↓`) move between messages, Enter or
-  Space folds a group of commands, `Ctrl+C` copies the selection, else the
-  message, and Esc goes back to the row. A right-click on a message opens its
-  rows from the palette. A drag selects text within one paragraph or code
+- **CLI and daemon (`investigate`):** One Go binary serves both roles.
+  `investigate serve` runs the daemon, while client verbs (`draft`, `edit`,
+  `start`, `followup`, `cancel`, `delete`, `tag`) send a single request over
+  the socket and exit.
+- **Daemon service:** A systemd user service listening on
+  `$XDG_RUNTIME_DIR/kaizen-incident-investigator.sock`. It owns all
+  investigations, state files, and `claude` subprocesses, so shell reloads
+  never interrupt active runs.
+- **Tray icon:** Runs inside the daemon process and omits a Quit item (quitting
+  would kill the daemon and its active runs). **New investigation** creates a
+  draft directly in-process without spawning a client. An amber dot on the icon
+  indicates an active turn.
+- **Window:** A Quickshell `FloatingWindow` that watches the state files via
+  `FileView` and invokes client verbs in response to user actions.
+- **Claude Code turns:** Each turn runs as a `claude -p` subprocess of the
+  daemon.
+- **Model and effort:** The **Model** and **Effort** chips on drafts and beside
+  the follow-up field (or **Model ›** and **Effort ›** in the palette) set the
+  defaults for the next run (`settings`, stored in `settings.json`). Starting a
+  run (**Run**, **Re-run**, etc.) saves those values onto the investigation
+  (displayed in its header), and follow-ups and branches inherit them.
+- **Property chips:** Each chip shows its current value, or its label in `off`
+  when unset. Clicking a chip or pressing `Enter`/`Space` while focused opens
+  its anchored submenu (matching the palette submenu of the same name). Drafts
+  show **Tag**, **Projects**, **Model**, and **Effort** under the notes field;
+  typing in **Projects ›** lets you add a new project.
+- **Filtering and tagging:** **Filter** below the search box (or **Filter ›**
+  in the palette) filters by tag (with counts from `settings.json`) or by
+  project. Active filters appear as dismissible chips beside the button.
+  Clicking **New** while a tag filter is active applies that tag to the new
+  draft so it stays visible. The **Tag** chip in an investigation's header sets
+  or clears its tag (`tag`) in any status.
+- **Command palette (`Ctrl+K` / `?`):** Opens over the window scoped from
+  nearest focus outward: the focused row's investigation (or selected set); the
+  focused message (**Copy**, or **Copy selection** when text is highlighted,
+  plus **Edit** and **Branch** on your own messages); the draft form,
+  conversation, or multi-select view; the list (**Search list**, **Filter ›**,
+  **Pick all listed**, **Go to ›**); and finally the window (**New**,
+  **Clear**, **Model ›**, **Effort ›**). Shortcuts appear where active. See
+  `Actions.js` for the per-scope row definitions. Pressing `Ctrl+Enter` inside
+  a draft's trace ID or notes starts the run; plain `Enter` in the trace ID
+  does not.
+- **Row context menu:** Right-clicking a row opens a cascading context menu at
+  the pointer containing the palette actions for that row (or for the selected
+  set if the clicked row is selected), without altering the open investigation
+  or current selection.
+- **List keyboard navigation:** The list is a single Tab stop on its selected
+  row. On a focused row: `j`/`k` (or `↑`/`↓`) move focus, and adding `Shift`
+  selects a range; `Enter` opens the row and moves focus into its draft notes
+  or follow-up field; `Space` toggles selection (while items are selected,
+  `j`/`k` move focus only); `Backspace` prompts to delete selected rows (or the
+  focused row); and `Esc` clears selection. Inside a text field, `Esc` clears
+  selection first and then returns focus to the selected row. **Delete** and
+  **Clear** always confirm inline (`y` or `Enter` confirms; `n`, `Esc`, or
+  `Backspace` cancels).
+- **Combining and branching:** Use `Shift`-click (range) or `Ctrl`-click
+  (toggle) to select multiple investigations, then click **Combine**
+  (`combine`) to draft a new investigation merging their alerts, reports, and
+  entities, or **Delete** to remove them (running investigations are kept).
+  Combined investigations show a merge icon in the list, highlight their source
+  rows when selected, and list jump-to-source links under **Combined from**
+  (clearing any filters hiding a source). Click the pencil icon (or press
+  `Enter`) on one of your own messages to edit it in place, then **Branch**
+  (`branch`) to replay from that point as a new investigation without modifying
+  the original (or use **Branch** from the palette to replay unchanged).
+  Branched sessions receive prior messages as plain text without tool calls.
+  Every Claude message has a copy button.
+- **Conversation navigation:** The conversation pane is a single Tab stop
+  landing on the last focused message (or the newest); clicking also focuses a
+  message. `j`/`k` (or `↑`/`↓`) move between messages, `Enter`/`Space` toggles
+  folded command groups, `Ctrl+C` copies the text selection (or the entire
+  message), and `Esc` returns to the list row. Right-clicking a message opens
+  its context menu. Dragging selects text within a single paragraph or code
   block.
-- The **entities** row lists the user and organization ids that the tool output
-  named (`users/ID`, `organizations/ID`, and `entityPatterns`). The daemon scans
-  the output itself, so the ids never pass through the model and can be resolved
-  to names outside it.
+- **Entities:** The **entities** row displays user and organization IDs
+  extracted directly from tool output (`users/ID`, `organizations/ID`, and
+  `entityPatterns`). Because the daemon scans tool output itself, IDs never
+  depend on the model and can be resolved to names outside it.
 
 ## Alert flow
 
-1. An alert rule's **Investigate** button runs `investigate draft` with
-   `NOTIFICATION_APP`, `NOTIFICATION_SUMMARY`, `NOTIFICATION_BODY` and
+1. Clicking **Investigate** on an alert toast runs `investigate draft` with
+   `NOTIFICATION_APP`, `NOTIFICATION_SUMMARY`, `NOTIFICATION_BODY`, and
    `INVESTIGATE_TAG`.
 2. The client sends `draft` over the socket. The daemon creates the draft,
-   writes it to the state files and answers with its id. A GCP alert or
-   incident URL in the body becomes the notes, and its `project` parameter the
-   project. Slack sends a link's text without its URL; then the body becomes
-   the notes, what `projectPatterns` find in it the projects, and the run finds
-   the alert by the time, resource and policy the text names.
-3. The client runs `kaizen ipc call incident-investigator reveal <id>`. The
-   window opens with the draft selected.
-4. You fill in the projects, trace id, notes and tag (`investigate edit`) and
-   press Start (`investigate start`).
-5. The daemon spawns `claude -p` with the instructions as an appended system
-   prompt.
-6. The daemon parses Claude's stream-json output into
-   `<id>/investigation.json` and `index.json`. The window follows along. The
-   report's `#` heading names the investigation.
+   persists it, and returns its ID:
+   - If the body contains a GCP alert or incident URL, that URL becomes the
+     notes and its `project` query parameter sets the project.
+   - If the alert came from Slack (which sends link labels without URLs), the
+     full body becomes the notes, `projectPatterns` extract the projects, and
+     the run locates the alert using the timestamp, resource, and policy named
+     in the text.
+3. The client runs `kaizen ipc call incident-investigator reveal <id>`, opening
+   the window with the draft selected.
+4. Fill in projects, trace ID, notes, and tag (`investigate edit`) and click
+   **Start** (`investigate start`).
+5. The daemon spawns `claude -p` with `instructions.md` (plus any
+   `instructionFiles`) appended to the system prompt.
+6. As Claude streams `stream-json` output, the daemon updates
+   `<id>/investigation.json` and `index.json` while the window updates live.
+   The report's `#` heading becomes the investigation's title.
 7. When a turn finishes, the daemon sends a `notify-send` toast whose **Open**
-   button runs `reveal`. Follow-ups go through `investigate followup`.
+   button calls `reveal`. Follow-ups run via `investigate followup`.
 
-To try the flow without a real alert, fake a toast that an alert rule matches:
+To test this flow without a real alert, send a fake toast matching your alert
+rule:
 
 ```sh
 notify-send -a Slack "[workspace] in #alerts-dev" \
@@ -204,72 +213,76 @@ notify-send -a Slack "[workspace] in #alerts-dev" \
 
 ## Read-only runs
 
-- `claude -p --restricted --tools "Bash,Read,Grep"`, plus `LSP` with
-  `sourceDirs`. `--restricted` ignores settings files and confines Read and Grep
-  to the run's directory and its own saved tool output.
-- Allowed: `gcloud logging read`, `gcloud logging buckets list`,
-  `gcloud alpha monitoring alerts describe` and `list`,
-  `gcloud monitoring policies describe`, `gcloud run services describe`,
-  `gcloud run revisions list` and `describe`, `gcloud run jobs describe`,
-  `gcloud sql instances` and `operations` `list` and `describe`,
-  `gcloud spanner instances` and `operations` `list` and `describe`,
-  `gcloud spanner databases list`, `gcloud beta service-health events` and
-  `artifacts` `list` and `describe`, `bq ls`, `bq show`, Read, Grep;
-  everything else is denied (`--permission-mode dontAsk`). `bq` stops at
-  metadata and jobs: `bq query` and `bq head` read rows, and `--apilog`, which
-  writes a file, is denied.
-- Service Health needs `servicehealth.googleapis.com` enabled in the project;
-  without it, a run reports that and moves on.
-- Runs skip the `_Required` bucket when searching for a request, and read its
-  system events and admin activity when a managed service failed.
-- `--max-budget-usd 5` per turn.
-- Every run uses the `claudeConfigDir` profile. Each investigation records it,
-  the window shows it, and Terminal resumes the session there. Pair
-  `sourceDirs` with a profile allowed to read that code.
-- With `sourceDirs`, a run also reads those directories and may run read-only
-  `git -C` (`log`, `show`, `diff`, `merge-base`, `rev-parse`, `cat-file`) there,
-  to compare the deployed commit (the Cloud Run image tag) with the clone. Each
-  turn allows `git -C` per repository by its exact path: a wildcard before the
-  subcommand would also approve options such as `-c core.fsmonitor=CMD`, which
-  run commands.
-- With `sourceDirs`, a run may also run `investigate checkout DIR/REPO COMMIT`,
-  for a clone directly under one of them, which unpacks its commit with
-  `git archive` into `<id>/src/REPO@SHA`, deleted with the investigation. Only
-  stored objects are read, so a clone's branch, working tree and index stay as
-  you left them. `GIT_OPTIONAL_LOCKS=0` keeps the other git commands from taking
-  `.git/index.lock` too.
-- The LSP tool runs the plugin's `gopls`, with `go` and `gopls` first on the
-  run's PATH, and `GOPROXY=off` and `GOTOOLCHAIN=local` keep them offline.
-  Definitions in other modules open in `~/go/pkg/mod`, which the run may read,
-  at the version the checkout's `go.mod` pins. A module missing from the cache
-  is not downloaded, and only its definitions fail.
+- **Sandbox flags:** Runs use `claude -p --restricted --tools "Bash,Read,Grep"`
+  (adding `LSP` when `sourceDirs` is configured) with
+  `--permission-mode dontAsk` and `--max-budget-usd 5` per turn. `--restricted`
+  ignores user settings files and limits `Read` and `Grep` to the run directory
+  and its own saved tool output.
+- **Allowed commands:** Everything not explicitly listed below is denied:
+  - Logging & Monitoring: `gcloud logging read`, `gcloud logging buckets list`,
+    `gcloud alpha monitoring alerts describe|list`,
+    `gcloud monitoring policies describe`
+  - Cloud Run: `gcloud run services describe`,
+    `gcloud run revisions list|describe`, `gcloud run jobs describe`
+  - Databases: `gcloud sql instances|operations list|describe`,
+    `gcloud spanner instances|operations list|describe`,
+    `gcloud spanner databases list`
+  - Service Health: `gcloud beta service-health events|artifacts list|describe`
+    (requires `servicehealth.googleapis.com`; if disabled, the run notes it and
+    continues)
+  - BigQuery: `bq ls`, `bq show` (metadata and jobs only—`bq query`,
+    `bq head`, and `--apilog` are denied)
+  - Tools: `Read`, `Grep`
+- **Log buckets:** Request searches skip `_Required`; runs query `_Required`
+  only for system events and admin activity when a managed service fails.
+- **Profiles:** Every run uses `claudeConfigDir`. Each investigation records
+  its profile (shown in the window and used by **Terminal** to resume the
+  session). Make sure `claudeConfigDir` is authorized to read any repositories
+  in `sourceDirs`.
+- **Source repositories (`sourceDirs`):**
+  - Runs may read those directories and invoke read-only `git -C` subcommands
+    (`log`, `show`, `diff`, `merge-base`, `rev-parse`, `cat-file`) to compare
+    the deployed commit (from the Cloud Run image tag) against local clones.
+    Each repository is allowlisted by exact path—wildcards before the
+    subcommand would allow flags like `-c core.fsmonitor=CMD` that execute
+    arbitrary commands.
+  - Runs may also invoke `investigate checkout DIR/REPO COMMIT` for any clone
+    directly under `sourceDirs`. This exports the commit with `git archive`
+    into `<id>/src/REPO@SHA` (deleted alongside the investigation) without
+    touching the clone's branch, working tree, or index. `GIT_OPTIONAL_LOCKS=0`
+    prevents other git commands from taking `.git/index.lock`.
+- **Go LSP (`gopls`):** The `LSP` tool runs the plugin's `gopls` with `go` and
+  `gopls` prepended to `PATH`, kept offline via `GOPROXY=off` and
+  `GOTOOLCHAIN=local`. Definitions in external modules open from `~/go/pkg/mod`
+  at the version pinned by the checkout's `go.mod`; uncached modules are not
+  downloaded, and only lookups into them fail.
 
 ## Where things live
 
-State is in `~/.local/state/kaizen-shell/plugins/incident-investigator/`, the
-unit's `StateDirectory` (`$STATE_DIRECTORY`), which the window reads through
-`Ui.Paths.state`: `projects.json`, `settings.json`, `index.json`,
-`<id>/investigation.json`, `<id>/transcript.jsonl` and the checkouts in
-`<id>/src/`. Transcripts hold the log entries and code a run read, so keep the
-directory as private as `sourceDirs`.
+State lives in `~/.local/state/kaizen-shell/plugins/incident-investigator/`
+(the unit's `StateDirectory` / `$STATE_DIRECTORY`, accessed by the window via
+`Ui.Paths.state`): `projects.json`, `settings.json`, `index.json`,
+`<id>/investigation.json`, `<id>/transcript.jsonl`, and temporary checkouts in
+`<id>/src/`. Because transcripts store log entries and code read during runs,
+treat this directory with the same privacy as `sourceDirs`.
 
-The window, `instructions.md` and `claude-plugin/` are in
+The window, `instructions.md`, and `claude-plugin/` live in
 [`plugins/incident-investigator/`](../../../stow/.config/quickshell/kaizen/plugins/incident-investigator/)
-under the shell's QML:
+under the shell's QML tree:
 
 | Path                 | Holds                               |
 | -------------------- | ----------------------------------- |
 | `Plugin.qml`         | window, IPC handler, launcher item  |
 | `Investigations.qml` | window content                      |
 | `Format.js`          | formatting helpers for the window   |
-| `Actions.js`         | the palette's rows                  |
+| `Actions.js`         | palette rows                        |
 | `tst_*.qml`          | `qml-test`, offscreen               |
-| `instructions.md`    | the base instructions for every run |
-| `claude-plugin/`     | the Claude plugin serving gopls     |
+| `instructions.md`    | base instructions for every run     |
+| `claude-plugin/`     | Claude plugin serving `gopls`       |
 
-Its unit is
+Its systemd unit is
 [`kaizen-incident-investigator.service`](../../../stow/.config/systemd/user/kaizen-incident-investigator.service).
-The daemon and its Nix module are here:
+The daemon and Nix module live in this directory:
 
 | Path           | Holds                |
 | -------------- | -------------------- |

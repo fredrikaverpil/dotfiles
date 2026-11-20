@@ -1,170 +1,191 @@
 # kaizen features
 
-Description of kaizen features and the rationale behind them.
+Overview of kaizen's features and the rationale behind them.
 
-Most features can be driven from the launcher or the terminal through
-Quickshell's IPC (inter-process communication):
+Most features can be driven from the launcher or a terminal through
+Quickshell's IPC:
 
 ```sh
-# show all ipc target functions
+# list all IPC targets and their functions
 kaizen ipc show
 
-# show ipc calls for a given target
+# list IPC functions for a specific target
 kaizen ipc show <target>
 
-# call a target's ipc function
+# call a target's IPC function
 kaizen ipc call <target> <function> [args...]
 
-# same, silent and exit 0 when the shell is down or the call fails
+# same, silent and exit 0 if the shell is down or the call fails
 kaizen ipc -q call <target> <function> [args...]
 ```
 
-The below sections correspond to an IPC target (e.g. Curtain correlates to
-target `curtain`).
+Each section below names its IPC target in parentheses (for example, Curtain
+uses `curtain`).
 
 ## Breaks (`breaks`)
 
-A plugin, after [Pandan](https://sindresorhus.com/pandan): breaks shows in the
-bar how long you have been at the computer without a break, and reminds you to
-take one. A session ends after `idleMinutes` (5) without input, an idle
-inhibitor such as a video call's keeping it going, or when the screen locks or
-the curtain goes up; the next input starts a new one.
+A plugin inspired by [Pandan](https://sindresorhus.com/pandan). It displays how
+long you have been at the computer without a break and reminds you to take one.
 
-Each reminder in `reminders` comes due every `everyMinutes` of a session, its
-`icon` (a glyph, a coffee cup by default) large in the middle of every output,
-as the hour is, over its `title` and its `detail`, or the next of its `details`
-each time. With `seconds`, the card stays up counting them down. A click on
-the card, or `kaizen ipc call breaks dismiss`, dismisses it and ends its count.
-Without
-`reminders`, two follow the eye and movement guidance: look into the distance
-for 20 s every 20 minutes (the 20-20-20 rule), and stand up and move every 30.
-Both settings are in `~/.config/kaizen/plugins/breaks.jsonc`.
+A session ends after `idleMinutes` (default: 5) without input, or when the
+screen locks or the curtain goes up. Active idle inhibitors (such as a video
+call) keep the session running. The next input starts a new session.
 
-When several come due together, only the one with the longest interval shows.
-The bar shows the time in `wood` once the longest-interval reminder came due.
-Its left-click shows the session time large; New session and Hold reminders are
-in its menu.
+Configure `idleMinutes` and `reminders` in
+`~/.config/kaizen/plugins/breaks.jsonc`:
 
-Its state survives a shell restart, in
-`~/.local/state/kaizen-shell/plugins/breaks/state.json`: the hold, and the
-session, unless the shell was down `idleMinutes` or longer.
+- Each entry in `reminders` fires every `everyMinutes` of a session, displaying
+  a large card centered on every output (like the hourly clock). The card shows
+  its `icon` (a glyph, defaulting to a coffee cup) above its `title` and either
+  its `detail` or the next entry rotating through `details`.
+- If `seconds` is set, the card stays up and counts down. Clicking the card or
+  running `kaizen ipc call breaks dismiss` dismisses it and stops the
+  countdown.
+- If `reminders` is omitted, two defaults apply: look into the distance for
+  20 seconds every 20 minutes (the 20-20-20 rule), and stand up and move every
+  30 minutes.
+
+When multiple reminders come due at the same time, only the one with the
+longest interval is shown. Once the longest-interval reminder has fired, the
+bar timer switches to `wood`. Left-clicking the bar item shows the session time
+large; its menu offers **New session** and **Hold reminders**.
+
+State persists across shell restarts in
+`~/.local/state/kaizen-shell/plugins/breaks/state.json` (both the hold flag and
+the current session, unless the shell was down for `idleMinutes` or longer).
 
 ### Hold
 
-Holding reminders skips them while the time keeps counting; when the hold ends,
-the next one comes due on its interval, with no catch-up. Plugins › Breaks ›
-Hold reminders toggles it, as does `kaizen ipc call breaks toggleHold`
-(`setHold on|off`, `holdState`). While it holds, the bar shows the time beside
-a timer struck through (󰔞) in rose, as the notifications' bell turns.
+Holding reminders skips them while the session timer keeps counting. When the
+hold ends, reminders resume on their normal intervals without catching up on
+missed ones.
 
-DnD turns the hold on, and off again when DnD ends, unless it was already on.
-Toggling the hold by hand in the meantime wins: then DnD ending leaves it on.
+Toggle the hold via **Plugins › Breaks › Hold reminders** or
+`kaizen ipc call breaks toggleHold` (also `setHold on|off` and `holdState`).
+While held, the bar shows a struck-through timer icon (`󰔞`) in `rose`, matching
+the held notifications bell.
+
+DnD enables the hold automatically and clears it when DnD ends, unless you had
+already enabled the hold beforehand. If you toggle the hold manually while DnD
+is active, your manual choice wins and DnD will not clear it afterward.
 
 ## Curtain (`curtain`)
 
-When the agent verifies its work by invoking UI elements on the screen and
-interacting with them, the activity can be hidden by enabling a "curtain". Think
-of it as an overlay surface drawn on top of the desktop, like a screensaver of
-sorts, but without the proper security features in place. Pressing any key
-while the curtain is active will show a password prompt.
+When an agent verifies its work by opening and interacting with UI elements,
+you can hide that activity behind a "curtain"—an overlay drawn over the desktop
+like a screensaver, without real lock security. Pressing any key while the
+curtain is active brings up a password prompt.
 
-The user turns the curtain on from Settings › Session › Curtain in the launcher.
-`kaizen shot` lifts it for a screenshot and puts it back. It stays up through a
-reload or restart of the shell, a crash included, until logout. Over IPC,
-`close` lifts it and `open` puts it back.
+Enable the curtain from **Settings › Session › Curtain**. `kaizen shot`
+temporarily lifts the curtain for screenshots and restores it afterward. The
+curtain survives shell reloads, restarts, and crashes until logout. Over IPC,
+`close` lifts it and `open` restores it.
 
-What the curtain does not do, since it would stop screenshotting from working:
+Because a real lock would prevent screenshotting, the curtain intentionally
+does *not*:
 
-- It is not a real screen lock (no `WlSessionLock`).
-- It never turns the screens off (no DPMS), but it dims the laptop screen's
-  backlight.
-- It never causes the machine to go to sleep.
-- ⚠️ It never locks the machine: idle locking is paused while the curtain is up.
-  Always use the real lock when leaving the machine.
+- Act as a real screen lock (no `WlSessionLock`).
+- Turn off displays (no DPMS), though it dims the laptop backlight.
+- Suspend the machine.
+- ⚠️ Lock the machine: idle locking is paused while the curtain is up. Always
+  use the real lock when stepping away.
 
 ## Do not disturb (`dnd`)
 
-DnD is a mode the shell broadcasts: turning it on says "do not interrupt the
-screen", and each feature that would interrupt it reads the mode and holds
-itself back. DnD knows nothing of them, so it does the same for whatever joins
-later. Today:
+DnD is a shell-wide mode signaling "do not interrupt the screen." Features that
+would interrupt read this flag and suppress themselves, so DnD needs no
+knowledge of them and automatically covers future features. Currently, DnD:
 
-- Notifications are held back to the history (Notifications › Hold).
-- Breaks holds its reminders, while still counting (Breaks › Hold).
-- The hour's time does not show (Time and timezone).
+- Holds notifications in history (see [Notifications › Hold](#hold-1)).
+- Holds break reminders while keeping the timer running (see
+  [Breaks › Hold](#hold)).
+- Suppresses the hourly time overlay (see
+  [Time and timezone](#time-and-timezone-timezone)).
 
-Settings › Do not disturb (DnD) toggles it, as does
-`kaizen ipc call dnd toggle`; `set on|off` sets it and `state` prints it. It
-survives a shell restart.
+Toggle DnD via **Settings › Do not disturb (DnD)** or
+`kaizen ipc call dnd toggle` (also `set on|off` and `state`). Its state
+survives shell restarts.
 
-The screen recording dialog turns it on by default, and so does an app sharing
-the screen through the portal (a PipeWire cast in `niri msg casts`, or on
-umbriel the portal's `umbriel-screen-capture` PipeWire node). DnD turns off
-again when the last of them ends, unless it was already on. Toggling DnD by
-hand in the meantime wins: then nothing turns it off afterwards.
+Screen recording enables DnD by default, as does any app sharing the screen
+through the portal (a PipeWire cast in `niri msg casts`, or the
+`umbriel-screen-capture` PipeWire node on umbriel). DnD turns back off when the
+last recording or cast ends, unless it was already on beforehand. Toggling DnD
+manually in the meantime overrides automatic cleanup, leaving it in the state
+you chose.
 
 ## Doctor (`doctor`)
 
-`kaizen doctor` reports what is wrong with the desktop that nothing on screen
-shows: the warnings and errors each `kaizen-*` unit, plugin daemons included,
-logged in its current run, a failed unit, a restarted unit with how each failed
-run exited and the last warning or error it logged, a shell still running the
-Quickshell a rebuild replaced or a worktree's tree (`kaizen dev`), a `kaizen`
-shadowing another on PATH, a session with no compositor's socket variable or
-more than one, a niri config that fails `niri validate` or never
-includes `kaizen.kdl`, an umbriel config that fails `umbriel config validate` or
-never includes `kaizen.toml`, a portal that does not answer the colour scheme, a
-`gsr-kms-server` without `cap_sys_admin+ep`, an enabled plugin the shell cannot
-load or whose units are not running, and a program, D-Bus service, file, session
-variable, font, Qt plugin or Wayland protocol that a `requires` file lists and
-the system or compositor lacks. A
-healthy desktop reports nothing, so every finding is something to fix; a `hint:`
-line under it names the fix when there is one. A check that cannot run is an
-error of `doctor`, and the others still run. An error an application shows in
-its window or a toast stays out of it, as does a D-Bus call Quickshell could not
-finish because the peer left the bus, such as a closed player's, and the
-keyring error a mistyped lock or curtain password logs. Quickshell logs
-a failed D-Bus call's error on a line of its own; doctor reports it with the
-call's line.
+`kaizen doctor` reports desktop problems that are otherwise invisible on
+screen. A healthy desktop produces no output, so every finding is actionable; a
+`hint:` line beneath a finding names the fix when one exists. If a check itself
+fails to run, `doctor` reports it as an error and continues running the rest.
 
-A unit restarted by hand starts clean. With journalctl arguments
-(`kaizen doctor -b -1`, `--since -1h`) it reports that span of the journal
-instead, without the checks.
+`kaizen doctor` checks for:
 
-The shell runs it every minute and when the panel opens. The bar shows an
-indicator while it reports anything: rose with any error, wood for warnings
-only. It opens the doctor panel, a row per finding: Enter, Space or a click
-copies its message and hint. Copy report copies the whole report.
+- Warnings and errors logged by any `kaizen-*` unit (including plugin daemons)
+  during its current run.
+- Failed units, and restarted units (showing how each failed run exited and its
+  last warning or error).
+- A running shell still using an old Quickshell binary after a rebuild, or
+  running a worktree via `kaizen dev`.
+- A `kaizen` binary shadowing another on `PATH`.
+- A session with no compositor socket variable set, or more than one.
+- A niri config failing `niri validate` or not including `kaizen.kdl`; an
+  umbriel config failing `umbriel config validate` or not including
+  `kaizen.toml`.
+- An XDG portal that does not answer color-scheme queries.
+- A `gsr-kms-server` binary missing `cap_sys_admin+ep`.
+- An enabled plugin that fails to load or whose units are not running.
+- Any program, D-Bus service, file, session variable, font, Qt plugin, or
+  Wayland protocol listed in a `requires` file that is missing from the system
+  or compositor.
+
+`doctor` ignores errors an application already shows in its own window or
+toast, D-Bus calls that fail because the peer left the bus (such as a closed
+media player), and keyring errors from mistyped lock or curtain passwords.
+Because Quickshell logs a failed D-Bus call's error on a separate line,
+`doctor` pairs it with the preceding call line.
+
+Manually restarting a unit clears its current-run log findings. Passing
+`journalctl` arguments (such as `kaizen doctor -b -1` or `--since -1h`) scans
+that journal range instead of running live checks.
+
+The shell runs `kaizen doctor` once per minute and whenever the Doctor panel
+opens. While any finding exists, the bar displays an indicator (`rose` for
+errors, `wood` for warnings only). Clicking it opens the Doctor panel, with one
+row per finding: pressing `Enter`, `Space`, or clicking copies that finding's
+message and hint, and **Copy report** copies the full report.
 
 ## Firmware (`firmware`)
 
-The firmware panel lists pending firmware updates; it never installs them.
-Installing can need AC power, a reboot, or root, so the user runs the update
-command in a terminal. Each update's Copy update command button copies that
-command (`fwupdmgr update <id>`), as does Settings › Firmware › Copy update
-command.
+The Firmware panel lists pending firmware updates without installing them.
+Because installing firmware can require AC power, root privileges, or a reboot,
+you run the update command in a terminal. Each update's **Copy update command**
+button (and **Settings › Firmware › Copy update command**) copies
+`fwupdmgr update <id>`.
 
-The host decides which backends run: kaizen reads [fwupd] when the system bus
-can activate it, and never enables a backend's daemon. The shell checks at
-start, once a day and when the panel opens, reading only local metadata; fwupd's
-own timer downloads it.
+Each host decides which firmware backends to run: kaizen queries [fwupd]
+whenever it is activatable on the system bus and never enables the daemon
+itself. The shell checks local metadata at startup, once per day, and when the
+panel opens; `fwupd`'s own timer handles downloading metadata.
 
-An update's Open release page button (Settings › Firmware › Open release page)
-opens the vendor's details page, or the update's [LVFS] device page when the
-vendor sets none.
+Each update's **Open release page** button (and **Settings › Firmware › Open
+release page**) opens the vendor's release notes, falling back to the [LVFS]
+device page if none is provided.
 
-The bar shows an indicator in wood while an update is pending, whatever its
-urgency: an update can wait for a convenient reboot. Each update shows its own
-urgency. There are no notifications.
+While updates are pending, the bar shows a `wood` indicator regardless of
+urgency, since firmware updates can wait for a convenient reboot. Individual
+updates display their own urgency in the panel. Firmware updates never trigger
+notifications.
 
 [fwupd]: https://fwupd.org
 [LVFS]: https://fwupd.org/lvfs/
 
 ## Notifications (`notifications`)
 
-Apps send notifications over D-Bus. [`notify-send`][notify-send] sends one from
-a shell or script, as the shell does for its own (battery, screenshots,
-recordings):
+Apps send notifications over D-Bus. You can send one from a shell or script
+with [`notify-send`][notify-send], which the shell itself uses for battery,
+screenshot, and recording notifications:
 
 ```sh
 # show a notification
@@ -182,61 +203,60 @@ notify-send -i /path/to/icon.svg <summary> <body>
 
 ### Rules
 
-Notifications arriving via the D-Bus can be transformed by notification rules,
-keyed by regexes on the notification's data. This offers capabilities such as
-restyling, adding action buttons or deduplication. The fields are described at
-`ruleCheck` in
-[`NotificationLogic.js`](../stow/.config/quickshell/kaizen/modules/notifications/NotificationLogic.js).
+Incoming D-Bus notifications can be transformed by rules matched via regexes on
+notification fields—allowing restyling, extra action buttons, or deduplication.
+See `ruleCheck` in
+[`NotificationLogic.js`](../stow/.config/quickshell/kaizen/modules/notifications/NotificationLogic.js)
+for the supported fields.
 
-Rules match only on what the app sends. Capture a real notification first:
-[`development.md`](development.md) › Gotchas.
+Rules match only against the raw data the app actually sends, so capture a real
+notification first (see [`development.md`](development.md) › Gotchas).
 
-Each `*.jsonc` in the two `notification-rules.d/` below holds a list of rules in
-JSONC (JSON with comments). The shell reads the files of both in file-name order
-and applies an edit on save; a notification takes each setting from the first
-matching rule that has one. A relative icon path resolves against the file's
-directory. A file or rule that is invalid is dropped with a warning, which
-`kaizen doctor` lists.
+Place `*.jsonc` rule lists in either `notification-rules.d/` directory below.
+The shell reads files from both directories in filename order and reloads edits
+on save. For each setting, a notification takes the value from the first
+matching rule that defines it. Relative icon paths resolve against the rule
+file's directory. Invalid files or rules are skipped with a warning reported by
+`kaizen doctor`.
 
 | File | Under | Holds |
 | --- | --- | --- |
-| `10-kaizen.jsonc` | `~/.config/quickshell/kaizen/`, from [`kaizen/stow/`](../stow/.config/quickshell/kaizen/notification-rules.d/) | the core's rules |
-| `50-<what>.jsonc` | `~/.config/kaizen/`, from `stow/host/<host>/` or a private submodule's `stow/` | a host's rules |
+| `10-kaizen.jsonc` | `~/.config/quickshell/kaizen/`, from [`kaizen/stow/`](../stow/.config/quickshell/kaizen/notification-rules.d/) | core rules |
+| `50-<what>.jsonc` | `~/.config/kaizen/`, from `stow/host/<host>/` or a private submodule's `stow/` | host rules |
 
-A rule's button may run a plugin's command, with the notification in
-`NOTIFICATION_APP`, `NOTIFICATION_SUMMARY` and `NOTIFICATION_BODY`; the
-[incident investigator](../nix/plugins/incident-investigator/README.md)
-has one.
+A rule's action button can run a plugin command with the notification passed in
+`NOTIFICATION_APP`, `NOTIFICATION_SUMMARY`, and `NOTIFICATION_BODY` (used by
+the [incident investigator](../nix/plugins/incident-investigator/README.md)).
 
 ### Toasts
 
-Activating a toast focuses its app's window. Apps cannot raise their own window
-without an activation token, which the server has no way to pass on, so the
-shell does it. A rule's `focus` picks the window when it is not the sender's,
-such as a reminder Slack relays for Google Calendar.
+Activating a toast focuses its app's window. Because apps cannot raise their
+own windows without an activation token—and the notification server cannot pass
+one along—the shell handles focusing directly. A rule's `focus` field can
+redirect focus to a different window than the sender (for example, a Google
+Calendar reminder relayed through Slack).
 
-Critical toasts stay until dismissed. Others will timeout and disappear.
+Critical toasts stay on screen until dismissed; all others time out.
 
 ### Hold
 
-Holding notifications sends every one, critical ones included, to the
-notification history panel instead of a toast: Settings › Notifications › Hold
-notifications, the panel's Hold button, or
-`kaizen ipc call notifications toggleHold` (`setHold on|off`, `holdState`).
-The bell turns rose while it holds.
+Holding notifications sends every incoming notification—including critical
+ones—straight to the notification history panel instead of showing a toast.
+Toggle it via **Settings › Notifications › Hold notifications**, the panel's
+**Hold** button, or `kaizen ipc call notifications toggleHold` (also
+`setHold on|off` and `holdState`). The bell icon turns `rose` while active, and
+blinks if a critical notification has been held back.
 
-DnD turns the hold on, and off again when DnD ends, unless it was already on.
-Toggling the hold by hand in the meantime wins: then DnD ending leaves it on.
-
-The bell blinks while the hold has held back a critical notification.
+DnD enables the hold automatically and clears it when DnD ends, unless you had
+already enabled the hold beforehand. If you toggle the hold manually while DnD
+is active, your manual choice wins and DnD will not clear it afterward.
 
 ### History
 
-The history holds only what the hold held back, newest first with critical ones
-always at the top. Some action buttons will not appear on the notifications in
-the history, due to how an app's own buttons only work while the app still holds
-the notification. Only buttons added via notification rules are retained in the
-history.
+The notification history stores only notifications captured while held, ordered
+newest first with critical notifications pinned to the top. An app's own action
+buttons only work while the app still tracks the live notification, so they are
+omitted in history; only buttons added by notification rules remain.
 
 [notify-send]: https://man.archlinux.org/man/notify-send.1
 
@@ -244,27 +264,27 @@ history.
 
 ### Screenshot
 
-A custom screenshotting utility replaces niri's built-in one and offers to send
-the screenshot to a lightweight editor ([Satty][https://github.com/gabm/Satty]).
-It supports desktop, window or region: `Print` for a region, `Shift+Print` for
-the focused screen, or Trigger › Screenshot.
+A custom screenshot tool replaces niri's built-in one and can send captures to
+[Satty](https://github.com/gabm/Satty) for quick annotation. It supports
+region (`Print`), focused screen (`Shift+Print`), and desktop or window
+captures (**Trigger › Screenshot**).
 
 ### Record screen
 
-A screen recording utility makes it possible to record the screen (desktop,
-window or region) along with showing a circular video feed captured from a
-camera. Audio controls are available. `Mod+Print` opens the recording panel or
-stops a running recording; `Mod+Shift+Print` pauses or resumes it. Recordings
-are saved to `~/Videos/Recordings`.
+The screen recorder captures a desktop, window, or region, with optional audio
+controls and a circular camera overlay. Press `Mod+Print` to open the recording
+panel (or stop an active recording), and `Mod+Shift+Print` to pause or resume.
+Recordings are saved to `~/Videos/Recordings`.
 
 ## Time and timezone (`timezone`)
 
-On the hour, the time shows large in the middle of every output for a few
-seconds, impossible to miss without taking the keyboard or the pointer. It is
-held back under DnD, so it never lands in a screen share or a recording, and
-while the screen is locked or curtained; an hour struck asleep is not shown on
-resume. A click on it dismisses it. `kaizen ipc call timezone hour` shows it
-now, whatever holds it back.
+On the hour, the time appears in large text at the center of every output for a
+few seconds without stealing keyboard or pointer focus. It is suppressed during
+DnD (so it never appears in screen shares or recordings) and while the screen
+is locked or curtained. Hours that pass while the machine is asleep are not
+shown on resume. Click the overlay to dismiss it, or run
+`kaizen ipc call timezone hour` to display it immediately regardless of
+suppression.
 
 The rest is to be written.
 

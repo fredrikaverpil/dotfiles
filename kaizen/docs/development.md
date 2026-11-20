@@ -1,48 +1,54 @@
 # Developing kaizen
 
-How to work on kaizen. Its design, layers and map, with where each part lives
-and which hosts it reaches, are in [`README.md`](../README.md).
+Workflow, validation, and deployment guide. For architecture, layers, and file
+locations, see [`README.md`](../README.md).
 
-Every kaizen host shares one copy of the core, so an edit lands on all of them
-at once: there is no promotion step and no drift to diff for.
+All kaizen hosts share a single copy of the core, so edits land on every host
+at once—there is no promotion step and no host drift to reconcile. To test an
+alternative shell, compositor, or panel on one machine, use a git branch or
+worktree instead of copying files per host.
 
-To try another shell, compositor or panel on one machine, use a git branch or
-worktree, not a per-host copy of the tree.
-
-Document constraints, rationale and gotchas, not implementation inventories or
-previous states. Explain a declaration next to it, not in these docs. Machine
-facts (firmware, BIOS, hardware quirks) belong in the host's `README.md` or
+**Documentation guidelines:** Document constraints, rationale, and gotchas—not
+implementation inventories or historical states. Explain specific declarations
+in comments next to the code rather than here. Machine-specific facts
+(firmware, BIOS, hardware quirks) belong in the host's `README.md` or
 `nix/shared/system/thinkpad.nix`.
 
 ## Working model
 
-The desktop is built to be developed by an agent, usually run on the host
-itself, sometimes over SSH. Every part is reachable: `kaizen ipc` queries and
-drives shell services and panels, `niri msg` the compositor,
-`systemctl --user` the units, `grim` and the recording service capture what is
-on screen, and `kaizen keys` and `wlrctl` take over the keyboard and the
-pointer to press keys, point and click. Use them to verify your own work; what
-they cannot prove is listed under "Required local validation".
+kaizen is built to be developed and verified by an agent, either locally on the
+host or over SSH. Every layer is scriptable:
 
-Each `kaizen` command carries a rule the raw tool leaves to you:
+- `kaizen ipc` queries and drives shell services and panels.
+- `niri msg` or `umbriel msg` drives the compositor.
+- `systemctl --user` manages user units.
+- `grim` and the recording service capture the screen.
+- `kaizen keys` and `wlrctl` simulate keyboard and pointer input.
 
-| To | Use | Not |
+Use these tools to verify your changes; see
+[Required local validation](#required-local-validation) for what cannot be
+proven automatically.
+
+Prefer `kaizen` commands over raw tools—each encodes safety guards that the raw
+tool omits:
+
+| Goal | Use | Avoid |
 | --- | --- | --- |
-| Query or drive a shell service or panel | `kaizen ipc` | `qs ipc`, which needs the unit's PID |
-| Learn whether the desktop is healthy | `kaizen doctor` | `journalctl -p warning`, which misses Quickshell's log level |
-| Learn the shell's state: unit, PID, tree, lock | `kaizen status` | `systemctl --user show` and `qs ipc`, each half of it; `qs` prints its errors as answers |
-| Apply a change to the shell's files and see its QML errors | `kaizen reload` | `kaizen ipc call shell reload`, which reports no load failure and returns before the load |
-| See a worktree's QML live | `kaizen dev` | editing main's tree |
-| Restart the shell | `kaizen reload --restart` | `systemctl --user restart`, which restarts while locked |
-| Capture an output or its bar | `kaizen shot` | `grim` by hand, which guesses the output and leaves the curtain lifted on failure |
-| Press keys in a panel, menu or window | `kaizen keys` | `wtype`, which types into whatever holds the keyboard: your terminal, or the lock's password field |
-| Focus an app or open it | `kaizen focus` | `niri msg action focus-window`, which needs the window id and never opens the app |
-| List the commands | `kaizen --json` | `ls ~/.local/libexec/kaizen`, which lists none of the usage |
+| Query or drive a shell service or panel | `kaizen ipc` | `qs ipc` (requires the unit's PID) |
+| Check desktop health | `kaizen doctor` | `journalctl -p warning` (misses Quickshell's log levels) |
+| Check shell state (unit, PID, tree, lock) | `kaizen status` | combining `systemctl --user show` and `qs ipc` (`qs` prints errors as output) |
+| Apply shell edits and see QML errors | `kaizen reload` | `kaizen ipc call shell reload` (returns before loading and hides errors) |
+| Test a worktree's QML live | `kaizen dev` | editing main's tree directly |
+| Restart the shell | `kaizen reload --restart` | `systemctl --user restart` (will restart while locked) |
+| Capture an output or its bar | `kaizen shot` | raw `grim` (guesses the output and can leave the curtain lifted on failure) |
+| Send keys to a panel, menu, or window | `kaizen keys` | `wtype` (types into whatever has focus, including your terminal or lock prompt) |
+| Focus or launch an app | `kaizen focus` | `niri msg action focus-window` (needs a window ID and cannot launch the app) |
+| List available commands | `kaizen --json` | `ls ~/.local/libexec/kaizen` (omits Go subcommands and usage) |
 
 ## Versions
 
-Your memory of Quickshell, Qt and niri may predate the pins, which move with
-`nix flake update`. Check them first:
+Pinned versions of Quickshell, Qt, niri, and umbriel advance with
+`nix flake update`, so check them before relying on memory:
 
 ```sh
 qs --version
@@ -52,366 +58,384 @@ nix eval --raw .#nixosConfigurations.<host>.pkgs.umbriel.src.rev
 nix eval --raw .#nixosConfigurations.<host>.pkgs.qt6.qtdeclarative.version
 ```
 
-Look up a Quickshell type, property or signal in Context7 at the pinned version
-before using one that this tree does not already use, or when `qml-lint` rejects
-one. For niri, do the same for a config node or action missing from
-`niri/kaizen.kdl` and the hosts' `config.kdl`. For umbriel, read its
-`docs/user/` at the pinned commit, or `umbriel config schema --json`, for a key
-or action missing from `umbriel/kaizen.toml`. `qml-lint` and `compositor-test`
-catch removed or misspelled API, not features you did not know about.
+- **Quickshell:** Look up unfamiliar types, properties, or signals in Context7
+  at the pinned release (`/websites/quickshell_v<major>_<minor>_<patch>`)
+  before using them, or whenever `qml-lint` rejects one.
+- **niri and Qt:** Context7 tracks upstream latest; niri docs mark when each
+  option was introduced (for example, "Since: 26.04"). Check any config node or
+  action not already used in `niri/kaizen.kdl` or host `config.kdl` files.
+- **umbriel:** Check `docs/user/` at the pinned commit, or run
+  `umbriel config schema --json`, for any key or action not already in
+  `umbriel/kaizen.toml`.
 
-Context7 indexes Quickshell per release
-(`/websites/quickshell_v<major>_<minor>_<patch>`); its niri and Qt docs track
-upstream's latest, and niri marks each option with the version it arrived in
-("Since: 26.04").
+Remember that `qml-lint` and `compositor-test` catch removed or misspelled
+APIs, not newer features you did not know existed.
 
 ## Gotchas
 
-- Nix comments carry the "why" for packages, portals, PAM and hardware
-  integration, and the units' comments for the units. Read
-  `kaizen/nix/default.nix`,
-  `kaizen/stow/.config/systemd/user/`,
-  `nix/shared/system/linux-desktop.nix` and `nix/shared/system/thinkpad.nix`,
-  plus the host's `configuration.nix`, before asking.
-- SSH keys come from the Proton Pass app's agent (`SSH_AUTH_SOCK` in
-  `nix/shared/system/linux-desktop.nix`), so the app must be running. While it
-  is locked, a key request waits 60 s for an unlock, then fails as
-  `Permission denied (publickey)`. The app asks by showing its window, which
-  niri ignores for a mapped window (no focus, no urgency), so the prompt stays
-  on workspace 7; unlocking there within the minute lets the waiting `ssh`/`git`
-  proceed.
-- Apps differ in the actions and hints their notifications carry, and the shell
-  logs none of it. `kaizen ipc call notifications toggleCapture` records each
-  arriving notification's raw data, message text included, in memory (a new
-  capture each time it is turned on); `captured` returns it as JSON. It is off
-  after every shell restart. Capture a real one before handling an app's
-  notifications specially.
-- Whether Slack sent a notification at all is in its own logs:
-  `~/.config/Slack/logs/default/webapp-console*.log` (`Store:
-  NEW_NOTIFICATION` with a channel id, content redacted) and `browser.log`
-  ("Creating new Electron notification"). What became of each toast shows in
+- **Read inline comments first:** Nix files explain the "why" for packages,
+  portals, PAM, and hardware setup; unit files explain unit ordering and
+  dependencies. Check `kaizen/nix/default.nix`,
+  `kaizen/stow/.config/systemd/user/`, `nix/shared/system/linux-desktop.nix`,
+  `nix/shared/system/thinkpad.nix`, and the host's `configuration.nix` before
+  asking.
+- **Proton Pass SSH agent:** SSH keys come from the Proton Pass app
+  (`SSH_AUTH_SOCK` in `nix/shared/system/linux-desktop.nix`), so the app must
+  be running. When locked, key requests wait 60 seconds for an unlock before
+  failing with `Permission denied (publickey)`. Because niri ignores focus and
+  urgency requests from an already-mapped window, the unlock prompt stays
+  quietly on workspace 7; unlocking there within the minute lets the waiting
+  `ssh` or `git` command proceed.
+- **Capturing raw notifications:** Apps vary in the actions and hints they send,
+  and the shell does not log them. Run
+  `kaizen ipc call notifications toggleCapture` to record incoming
+  notifications (including message text) in memory, then call `captured` to
+  read them as JSON. Enabling capture starts a fresh buffer, and restarting the
+  shell turns capture off. Always capture a real notification before writing
+  app-specific rules.
+- **Debugging Slack notifications:** Check Slack's logs to see whether it sent
+  a notification at all: `~/.config/Slack/logs/default/webapp-console*.log`
+  (`Store: NEW_NOTIFICATION` with a channel ID, content redacted) and
+  `browser.log` ("Creating new Electron notification"). To trace what happened
+  to each toast, run
   `dbus-monitor --session "interface='org.freedesktop.Notifications'"`:
-  `NotificationClosed` reason 1 is a toast that expired on screen, 2 one
-  dismissed or dropped untracked while held.
-- `notify-send -a <app> <summary> <body>` fakes an app's notification, to try a
-  notification rule without waiting for the real one, for example
+  `NotificationClosed` reason `1` means the toast timed out; reason `2` means
+  it was dismissed or dropped untracked while held.
+- **Faking notifications for rules:** Use
+  `notify-send -a <app> <summary> <body>` to test a rule without waiting for a
+  real alert—for example:
   `notify-send -a Slack "[workspace] in #alerts" $'Error rate high\nView alert'`.
-  It carries only what you pass, so copy the summary and body from a captured
-  one: Slack's body is plain text, a link only its label.
-- `kaizen status` prints the shell's state, one `key value` line per fact or
-  one JSON document with `--json`: the unit's state and PID, whether
-  `kaizen dev` runs it, whether it answers IPC (`error` says why not), and
-  `kaizen ipc call shell status`: the tree it runs, the bar's height, and the
-  lock, curtain and idle services' `status`. A fact it could not learn is
-  `null`. It exits 0 whatever the shell's state. Read it rather than querying
-  the services one by one.
-- `kaizen reload` hot-reloads the shell, or restarts its unit after
-  `systemctl --user daemon-reload` when it is down, never loaded its config, or
-  with `--restart`. It waits until the shell has loaded its config and answers,
-  prints the warnings and errors it logged meanwhile, and exits 1 when the
-  config failed to load. It refuses while the session is locked.
-- User units are named `kaizen-<name>`, plugin daemons included
-  (`kaizen-dcal`).
-- A bind, unit or script that may run while the shell restarts calls
-  `kaizen ipc -q call ...`: silent, and exit 0 when the shell is down or the
-  call fails. Without `-q` the call exits 1 with a message.
-- Niri event IDs are global; UI labels/actions use output-local workspace `idx`.
-- Niri KDL booleans are presence-only, not `option true`.
-- A panel moves focus through its focus chain (`keyNavigation`), with no
-  cursor of its own. A control that steps a value takes `h` `l` and the
-  arrows itself and lets up and down fall through, as `Ui/PanelSlider.qml`
-  does.
-- `Ui/Panel.qml` has a top-bar cutout so bar buttons can switch panels. Preserve
-  focus-chain membership for visible but unavailable controls, except a
-  segmented control's options and a button that cannot act, which focus skips
-  (`style.md` › Panels › Focus and state).
-- Tray submenus require one live opener per level. `QsMenuEntry.display()` needs
-  a platform menu this shell does not have.
-- Read the reference shell's source before changing a feature ported from it
-  (`git clone` if missing and `git pull` its source before reading):
+  Copy the exact summary and body from a captured notification (Slack sends
+  plain text with link labels only, not URLs).
+- **`kaizen status`:** Prints shell state as `key value` lines (or JSON with
+  `--json`): unit state and PID, whether `kaizen dev` is active, IPC
+  reachability (`error` explains failures), and `kaizen ipc call shell status`
+  (active tree, bar height, and lock/curtain/idle status). Unknown fields are
+  `null`, and the command always exits 0. Prefer it over querying services
+  individually.
+- **`kaizen reload`:** Hot-reloads the running shell, or runs
+  `systemctl --user daemon-reload` and restarts the unit when the shell is
+  down, failed to load its config, or `--restart` is passed. It waits until the
+  shell loads and answers IPC, prints any warnings/errors logged during load,
+  exits 1 if loading fails, and refuses to run while locked.
+- **Unit naming:** All user units use the `kaizen-<name>` prefix, including
+  plugin daemons (such as `kaizen-dcal`).
+- **Quiet IPC in scripts and binds:** Any bind, unit, or script that may fire
+  during a shell restart must call `kaizen ipc -q call ...`, which stays silent
+  and exits 0 if the shell is down or the call fails. Without `-q`, failures
+  print an error and exit 1.
+- **niri workspace IDs vs. indices:** niri event IDs are global; UI labels and
+  actions use output-local workspace `idx`.
+- **niri KDL booleans:** Booleans are presence-only flags, not `option true`.
+- **Panel focus chain:** Panels navigate via their focus chain
+  (`keyNavigation`) with no separate cursor. Value controls (like
+  `Ui/PanelSlider.qml`) consume `h`/`l` and `←`/`→` while letting `↑`/`↓` pass
+  through.
+- **Panel layout and disabled controls:** `Ui/Panel.qml` leaves a top-bar
+  cutout so bar buttons remain clickable to switch panels. Keep visible but
+  unavailable controls in the focus chain, except disabled segmented-control
+  options and inactive buttons, which focus skips (see `style.md` › Panels ›
+  Focus and state).
+- **Tray submenus:** Each submenu level requires one live opener.
+  `QsMenuEntry.display()` requires a platform menu that kaizen does not
+  provide.
+- **Reference shells:** Before modifying a feature ported from another shell,
+  read its upstream source (`git clone` if missing, `git pull` to update):
   - `~/code/public/github.com/caelestia-dots/shell`
   - `~/code/public/github.com/duxlabs-dev/dux-shell`
   - `~/code/public/github.com/snowarch/iNiR`
   - `~/code/public/github.com/Gakuseei/Ricelin`
   - `~/code/public/github.com/0xbbuddha/dotfiles_nothing_os`
   - `~/code/public/github.com/omacom/omarchy`
-  - and `https://noctalia.dev/plugins` which contains a registry of plugins
-- Any open source/public projects we might want to adopt/inspect can be cloned
-  into `~/code/public/`.
+  - `https://noctalia.dev/plugins` (plugin registry)
+- Clone any other open-source projects you need to inspect into
+  `~/code/public/`.
 
 ## Required local validation
 
-Run relevant checks **before and after editing**, on the correct platform.
-These are development gates, not CI jobs. They live only in the repository's
-default devshell (`flake.nix`), entered by `direnv` at the repo root or run as
-`nix develop ~/.dotfiles -c <command>` (not `#dev`) from anywhere in the
-checkout. `compositor-test` and `shell-smoke` are Linux-only and are absent
-from the shell on macOS. All of them run against the single `kaizen/stow/`
-tree, so a static check passing here passes for every kaizen host;
-`compositor-test` also validates each host's niri `config.kdl` and umbriel
-`config.toml` with their includes.
+Run the relevant checks **before and after editing**, on the appropriate
+platform. These are local development gates (not CI jobs) provided only by the
+repository's default devshell (`flake.nix`)—entered via `direnv` at the repo
+root, or run as `nix develop ~/.dotfiles -c <command>` (not `#dev`) from
+anywhere in the checkout.
+
+`compositor-test` and `shell-smoke` are Linux-only and omitted on macOS. All
+static checks run against the shared `kaizen/stow/` tree and therefore cover
+every kaizen host; `compositor-test` also validates each host's niri
+`config.kdl` and umbriel `config.toml` together with their includes.
 
 | Change | Checks |
 | --- | --- |
-| Nix | `nix fmt`, `nix build .#nixosConfigurations.<host>.config.system.build.toplevel`; build both kaizen hosts, a shared module breaks both; the build fails on a `requires` `cmd`, `file` or `data` line the host does not install |
+| Nix | `nix fmt`, `nix build .#nixosConfigurations.<host>.config.system.build.toplevel` for **both** kaizen hosts (shared modules affect both; the build fails if any `requires` `cmd`, `file`, or `data` item is not installed) |
 | JS/QML | `qml-format`, `qml-test`, `qml-lint`, `requires-check` (any platform) |
-| The `kaizen` command (Go) | `go test ./...` and `go vet ./...` in `kaizen/cli/`; build both kaizen hosts, whose build runs the tests |
-| Compositor interface, config (`kaizen.kdl`, `kaizen.toml` or a host's compositor config), or bind contract | Also `compositor-test` (Linux) and `qml-test` |
-| Service IPC, `shell.qml` wiring, or systemd units | Also `shell-smoke` on the machine after deploy and restart, and exercise the affected path |
+| `kaizen` CLI (Go) | `go test ./...` and `go vet ./...` in `kaizen/cli/`, plus build both kaizen hosts (Nix builds run the tests) |
+| Compositor interface, configs (`kaizen.kdl`, `kaizen.toml`, or host configs), or bind contract | Also `compositor-test` (Linux) and `qml-test` |
+| Service IPC, `shell.qml` wiring, or systemd units | Also `shell-smoke` on the host after deploy and restart, and exercise the affected path |
 | Panel views | Also `shell-smoke --panels` |
-| Device-dependent behaviour | Also validate on the actual ThinkPad |
-| Timers, `Process`/`FileView`, services, panels, or `shell.qml` wiring | Ask the user whether to run `shell-perf` after deploy (see Performance) |
+| Device-dependent behavior | Also validate on the physical ThinkPad |
+| Timers, `Process`/`FileView`, services, panels, or `shell.qml` wiring | Ask the user whether to run `shell-perf` after deploy (see [Performance](#performance)) |
 
-- Establish the target checkout, flake pin, and session first. Record baseline
-  failures; after editing, check an isolated Linux copy before deploying into
-  the live stowed tree. Repeat checks against the deployed shell.
-- On the host, where `~/.dotfiles` is the live tree, edit it in place and run
-  the checks after saving; there is no copy to check first. A disruptive
-  change goes to a worktree instead: Working from a worktree.
-- Mac tests are supplementary. Report unavailable session/hardware coverage as
-  **pending**, never substitute another platform or claim full validation.
-- `shell-smoke` selects the running systemd service's PID and works over SSH.
-  It checks actual service IPC, runtime errors and QML warnings (`WARN scene:`,
-  `WARN qml:`). `--panels` additionally opens, queries, then closes Display,
-  closing any competing panel. It refuses that operation while locked and does
-  not change scaling or device settings. Its journal scan covers everything
-  since the last service start; restart the service before re-running to clear
+- **Workflow and baselines:** Confirm the target checkout, flake pin, and
+  active session first, and record baseline failures. When working from another
+  host, validate an isolated Linux copy before deploying to the live tree, then
+  re-check the deployed shell. On the host itself, `~/.dotfiles` *is* the live
+  stowed tree, so edit in place and re-run checks after saving—or use a
+  worktree for disruptive changes (see
+  [Working from a worktree](#working-from-a-worktree)).
+- **Platform honesty:** macOS checks are supplementary. Always report
+  unavailable session or hardware coverage as **pending**—never claim full
+  validation from another platform.
+- **`shell-smoke`:** Targets the running systemd service by PID and works over
+  SSH. It checks live service IPC, runtime errors, and QML warnings
+  (`WARN scene:`, `WARN qml:`). `--panels` also opens, queries, and closes the
+  Display panel (dismissing any competing panel, refusing while locked, and
+  leaving scaling/device settings untouched). Because it scans journal logs
+  since the last service start, restart the service before re-running to clear
   stale errors.
-- `kaizen doctor` lists the warnings and errors from each `kaizen-*` unit's
-  current run, and checks units, the shell's binary, the compositor's config,
-  the portal, `gsr-kms-server`'s capability, the plugin dirs and manifests and
-  the `requires` files;
-  `--json` prints one document, each finding with its check's stable `id`
-  and, when there is one, its fix as `hint`; journalctl arguments
-  (`--since -1h`, `-b -1`) report that span of the journal instead, without
-  the checks. Follow the units with `journalctl --user -u 'kaizen-*' -f`.
-  Quickshell logs everything at priority 6 with the level in the text, so
-  `journalctl -p warning` misses it. The bar's doctor indicator shows whenever
-  it reports anything.
-- Smoke checks do not prove focus, object lifetime, authentication, daemon
-  recovery, or physical input. Exercise affected paths explicitly. Agree on a
-  recovery path before lock/PAM, suspend, DPMS-off, or connectivity tests.
-- Hardware-dependent paths: Wi-Fi/Bluetooth, battery, backlight, lid,
-  touchpad, fingerprint reader, `GAMMA_LUT` (nightlight). Validate on the
-  machine.
-- Test keyboard-first panels over SSH: open the panel with `kaizen ipc call`,
-  then `kaizen keys --layer NAMESPACE KEY...` with its namespace from
-  `niri msg layers` (`umbriel layers` on umbriel). It presses each key only
-  while that layer alone holds the keyboard (`exclusive` on niri, `focused` on
-  umbriel, where a primed panel drops to on-demand), lifts the curtain
-  meanwhile, and refuses while locked. A key is a chord of xkb names
-  (`Return`, `ctrl+k`, `shift+Tab`, which arrives as Tab with Shift held, not
-  as Backtab); a key that moves the keyboard elsewhere, such as an Esc that
-  closes the panel, comes last. Niri drops virtual-keyboard input before bind
-  handling, so it cannot test compositor binds.
-- Test a window, such as a plugin's application, with
-  `kaizen keys --window ID KEY...`: it focuses the window, presses each key
-  only while the window has focus and no layer holds the keyboard, and gives
-  focus back to the window that had it. Run each round as one command that
-  opens a fresh window, sends the keys and closes it: never reuse a window
-  across commands, since it restores its last focused item, such as a draft's
-  field.
-- Enter or Space acts on whatever has focus, and a few Tabs away there is
-  usually a delete or a paid run (an investigator's Discard or Re-run). Send
-  them only to a control a capture in the same command showed focused, and
-  never after a Tab sequence whose start depends on an earlier step. A round
-  stops at its first failed step: one command per line under `set -e`, not
-  lines of `a && b`, since a failing `&&` list does not trip `set -e` and the
-  next line still runs. Clear any filter a round set before it ends.
-- Drive the pointer with the devshell's `wlrctl pointer move DX DY` and
-  `wlrctl pointer click [left|right]`. Moves are relative and niri does not
-  report the cursor's position, so confirm where it is with a capture before
-  clicking. Never move it into the top-left corner, which opens niri's
-  overview. `wlrctl` cannot hold a button, so a drag is the user's to check; a
-  double-click selects a word.
-- Use `kaizen shot` to check how the shell looks; `kaizen ipc` and
-  `shell-smoke` for internal state. It names the output it captured and prints
-  the file, under `~/.cache/kaizen-shell/shots/` unless `-o` says otherwise. It
-  takes the output as an argument, and without one picks the only output, or
-  the one holding an open panel, menu or launcher; the focused output follows
-  the user, so it is never the default, and with several candidates it lists
-  them and exits 2. `--bar` captures that output's bar, and a `WxH+X+Y`
-  argument a region of it, relative to the output. The longest edge is scaled
-  to 1600 px so a 4K output reads like a laptop panel; `--full` keeps native
-  pixels, which a region is for. It lifts the curtain for the capture and puts
-  it back, and refuses while locked. `grim` itself crops with
-  `-g "0,0 1280x32"` (layout coordinates) or captures one output with `-o`;
-  the two do not combine, and capture cost depends only on the area. Niri does
-  not report layer geometry, so the bar's height comes from
-  `kaizen ipc call shell barHeight` and its width from
-  `niri msg --json outputs`.
-- To record, `kaizen ipc call recording capture WxH+X+Y` (`0x0+X+Y` is the whole
-  monitor): no countdown, audio or camera, and the bar shows it. It returns the
-  file; `kaizen ipc call recording stop` finalizes it. Extract frames with
+- **`kaizen doctor`:** Reports current-run warnings/errors from all `kaizen-*`
+  units and validates units, the running shell binary, compositor configs, the
+  portal, `gsr-kms-server` capabilities, plugin directories/manifests, and
+  `requires` files. `--json` outputs structured findings with stable check
+  `id`s and `hint` fixes. Passing `journalctl` arguments (`--since -1h`,
+  `-b -1`) scans that journal window instead of running live checks. Stream
+  live logs with `journalctl --user -u 'kaizen-*' -f`. (Quickshell logs every
+  line at syslog priority 6 with the severity in the message text, which is why
+  `journalctl -p warning` misses it.) The bar shows a doctor indicator whenever
+  any finding exists.
+- **Beyond smoke tests:** Smoke checks do not verify focus handling, object
+  lifetimes, authentication, daemon recovery, or physical input—exercise
+  affected paths directly. Agree on a recovery plan with the user before
+  testing lock/PAM, suspend, DPMS-off, or network changes.
+- **Hardware-dependent paths:** Validate Wi-Fi/Bluetooth, battery, backlight,
+  lid events, touchpad, fingerprint reader, and `GAMMA_LUT` (nightlight) on the
+  physical machine.
+- **Keyboard testing for layer surfaces (`kaizen keys --layer`):** Open the
+  panel with `kaizen ipc call`, find its namespace with `niri msg layers` (or
+  `umbriel layers`), and send keys with
+  `kaizen keys --layer NAMESPACE KEY...`. It sends keys only while that layer
+  alone holds keyboard focus (`exclusive` on niri; `focused` on umbriel, where
+  a primed panel drops to on-demand), temporarily lifts the curtain, and
+  refuses while locked. Keys use XKB names (`Return`, `ctrl+k`, `shift+Tab`—note
+  `shift+Tab` arrives as `Tab` with `Shift`, not `Backtab`). Put any key that
+  dismisses or shifts focus (like `Esc`) last. niri drops virtual-keyboard
+  input before compositor binds, so `kaizen keys` cannot test compositor binds.
+- **Keyboard testing for windows (`kaizen keys --window`):** Run
+  `kaizen keys --window ID KEY...` to focus a window (such as a plugin app),
+  send keys only while that window is focused and no layer holds the keyboard,
+  and restore focus to the previous window afterward. Run each test round as a
+  single command that opens a fresh window, sends keys, and closes it—never
+  reuse an existing window across commands, since it remembers its last focused
+  item (such as a draft input field).
+- **Safe key automation:** `Enter` and `Space` activate whatever has focus, and
+  destructive or paid actions (like Discard or Re-run in the incident
+  investigator) are often just a few `Tab`s away. Only send `Enter`/`Space` to
+  a control confirmed focused by a screenshot in the same command, and never
+  after a `Tab` sequence whose starting point depends on an earlier step.
+  Structure rounds as one command per line under `set -e`—avoid `a && b` chains
+  because a failing `&&` list does not trigger `set -e` and subsequent lines
+  still execute. Clear any filters set during the test before finishing.
+- **Pointer testing (`wlrctl`):** Use the devshell's
+  `wlrctl pointer move DX DY` and `wlrctl pointer click [left|right]`. Moves
+  are relative and niri does not report cursor coordinates, so verify cursor
+  position with a screenshot before clicking. Never move the pointer into the
+  top-left corner (that opens niri's overview). `wlrctl` cannot hold a button,
+  so drag interactions must be tested by the user; double-clicking selects a
+  word.
+- **Screenshots (`kaizen shot`):** Use `kaizen shot` to inspect visuals (and
+  `kaizen ipc` / `shell-smoke` for internal state). It prints the captured
+  output name and file path (under `~/.cache/kaizen-shell/shots/` unless `-o`
+  is given). Pass an output name explicitly, or omit it to auto-select the sole
+  output or the output holding an open panel, menu, or launcher (it never
+  defaults to the focused output because that follows the user, and exits 2 if
+  multiple candidates exist). `--bar` captures the bar; `WxH+X+Y` captures a
+  region relative to the output. By default the longest edge scales to 1600 px
+  so 4K outputs read like laptop panels; pass `--full` for native pixels (for
+  example, when inspecting a region). `kaizen shot` lifts and restores the
+  curtain and refuses while locked. (Under the hood, `grim` crops in layout
+  coordinates with `-g "0,0 1280x32"` or captures an output with `-o`—never
+  both—and capture cost scales only with area. Because niri does not report
+  layer geometry, bar height comes from `kaizen ipc call shell barHeight` and
+  width from `niri msg --json outputs`.)
+- **Recording for verification:** Run
+  `kaizen ipc call recording capture WxH+X+Y` (`0x0+X+Y` for the full monitor)
+  to record with no countdown, audio, or camera (the bar still shows the
+  recording indicator). It returns the output path; call
+  `kaizen ipc call recording stop` to finalize it, and extract frames with
   `nix shell nixpkgs#ffmpeg`.
-- DPMS-off can resemble a frozen machine. Use bounded commands; `grim` can hang
-  while no output produces frames. Recovery is
-  `niri msg action power-on-monitors`.
-- Report host/session, before/after results, existing diagnostics, and
-  omissions. Ask the user to run Nix rebuilds; never run them without asking.
+- **DPMS-off hazard:** Turned-off monitors can look like a frozen machine, and
+  `grim` can hang when no output is producing frames. Always use bounded
+  commands; recover with `niri msg action power-on-monitors`.
+- **Reporting:** Summarize the host/session, before/after results, pre-existing
+  diagnostics, and any omitted checks. Always ask the user to run Nix
+  rebuilds—never run them yourself.
 
 ### Tests
 
-- `tst_*.qml` imports production JS directly into QtTest. Keep meaningful pure
-  parsing, transforms, and transitions; inline trivial single-use bindings.
-  There is no independent JS consumer here, so no Deno/Node/Bun test suite or
-  CommonJS export guards.
-- QtTest can test Qt-only components, but all transitive imports must be
-  Qt-only. Quickshell's native types are linked into its executable, not
-  loadable through its installed metadata. Even `Ui/BarButton.qml` shares the
-  Quickshell-dependent `Compositor` singleton's module. Do not mock Quickshell
-  to cross this boundary.
-- `compare()` is exact for strings, booleans and null, deep for objects and
-  arrays, and tolerates small numeric differences. Use it for everything but
-  numbers, for its failure message; `verify(actual === expected)` for an exact
-  number or an object's identity, and `fuzzyCompare` for explicit tolerances.
-  Do not compare objects via JSON serialization.
-- `compositor-test` validates niri's KDL and umbriel's TOML. It does not test
-  dispatch. `qml-test` checks that `niri/kaizen.kdl` and `umbriel/kaizen.toml`
-  declare the same titled binds, as each backend's `readBinds` reads them.
+- `tst_*.qml` files import production JS directly into QtTest. Keep meaningful
+  pure parsing, transforms, and state transitions in JS modules, and inline
+  trivial single-use bindings. Because there is no separate JS runtime here, do
+  not add a Deno/Node/Bun test suite or CommonJS export guards.
+- QtTest can test Qt-only QML components only if all transitive imports are
+  Qt-only. Quickshell's native C++ types are compiled into the `quickshell`
+  binary and cannot be loaded from installed metadata (for example,
+  `Ui/BarButton.qml` pulls in the Quickshell-dependent `Compositor` singleton
+  from its module). Do not mock Quickshell to cross this boundary.
+- `compare()` checks strings, booleans, and `null` strictly, compares
+  objects/arrays deeply, and allows small floating-point tolerances. Use
+  `compare()` for everything except numbers (for better failure messages),
+  `verify(actual === expected)` for exact numbers or object identity, and
+  `fuzzyCompare()` for explicit tolerances. Never compare objects via JSON
+  serialization.
+- `compositor-test` validates niri KDL and umbriel TOML syntax (not action
+  dispatch). `qml-test` verifies that `niri/kaizen.kdl` and
+  `umbriel/kaizen.toml` expose identical titled keybinds via each backend's
+  `readBinds`.
 
 ### Tooling
 
-- `qml-lint` fails on any warning; [`issues.md`](issues.md) lists those an
-  upstream bug causes. Shadowing an Item member that is public API
-  (`palette`, IPC-visible `enabled`) or a lookup on an untyped `Loader.item`
-  gets an inline `// qmllint disable <category>`; anything else gets fixed.
-- Use the devshell's pinned Qt tools, not a standalone `qmlls`. Launch
-  Neovim from the repo so it inherits `PATH` and `QML_IMPORT_PATH`. The flake
-  supplies both Qt imports and Quickshell metadata; deployed Qt must match the
-  pin after updates. `qml-test` clears the GTK platform theme for offscreen SSH.
-- `Ui/qmldir` must list new QML types in `Ui/` for tooling. `.qmllint.ini` is
-  shared by the editor and CLI.
+- `qml-lint` fails on any warning (see [`issues.md`](issues.md) for warnings
+  caused by upstream bugs). Add an inline `// qmllint disable <category>` only
+  when shadowing a public-API `Item` member (`palette`, IPC-visible `enabled`)
+  or accessing properties on an untyped `Loader.item`; fix all other warnings.
+- Always use the devshell's pinned Qt tools rather than a standalone `qmlls`.
+  Launch Neovim from the repo root so it inherits `PATH` and `QML_IMPORT_PATH`.
+  The flake provides both Qt imports and Quickshell metadata, so the deployed
+  Qt version must match the flake pin after updates. `qml-test` clears the GTK
+  platform theme so offscreen SSH runs succeed.
+- Register every new QML type under `Ui/` in `Ui/qmldir` so tooling finds it.
+  Editor and CLI share `.qmllint.ini`.
 
 ### Performance
 
-`shell-perf` (devshell, on the host) restarts the unlocked shell, measures it,
-appends a row to `nix/hosts/<host>/shell-perf.tsv` and compares it with the
-last row on the same Quickshell build and outputs. Commit the row with the
-change it measures.
+`shell-perf` (run from the devshell on the host) restarts the unlocked shell,
+benchmarks it, appends a row to `nix/hosts/<host>/shell-perf.tsv`, and compares
+it against the previous row for the same Quickshell build and monitor setup.
+Commit the new row alongside the change it measures.
 
-- Ask the user before running it; it restarts the shell and needs the machine
-  untouched for about 10 minutes.
-- It refuses to run off AC, outside the `balanced` profile, while locked, with
-  the curtain up, or at a 1-minute load of 1.5 or more. The restart applies
-  the profile the shell saved for AC, so it rechecks power after warm-up and
-  before writing the row. It warns when the system was over 10% busy; discard
-  such rows.
-- Measure with `eDP-1` only: lid open, no external monitor, on a plain
-  USB-C charger (the monitor supplies power; unplugging it drops AC).
-- Rows are comparable only within the same `quickshell` build (Qt included)
-  and `outputs`. After a flake update or a monitor change, run it on the old
-  commit first to get a new baseline.
-- Run-to-run noise is uncalibrated. Short test runs varied by about 5 MB PSS
-  and 15 MB peak; repeat a run before trusting a delta of that size.
-- `shell-perf --soak HOURS [PANEL]` samples PSS each minute, with PANEL held
-  open, and records growth in MB/h. Use it for suspected leaks; a few hours
-  distinguishes growth from warm-up.
-- For per-binding cost, restart with `qs --debug PORT` and attach the
-  devshell's `qmlprofiler --attach localhost:PORT`. That shell runs outside
-  `kaizen-shell.service`, so `kaizen ipc` and the binds miss it; reach it with
-  `qs ipc -c kaizen`.
+- Ask the user before running `shell-perf`: it restarts the shell and requires
+  leaving the machine untouched for roughly 10 minutes.
+- Preconditions: the script refuses to run on battery, outside the `balanced`
+  power profile, while locked, with the curtain up, or with a 1-minute load of
+  1.5 or higher. Because restarting the shell reapplies the saved AC power
+  profile, it rechecks power state after warm-up and before recording the row.
+  Discard any row where it warns the system was over 10% busy.
+- Measure on `eDP-1` only: lid open, no external monitors, plugged into a plain
+  USB-C charger (unplugging a power-delivery monitor drops AC).
+- Rows are only comparable within the same `quickshell` build (including Qt)
+  and `outputs`. After a flake update or monitor change, run `shell-perf` on
+  the previous commit first to establish a new baseline.
+- Run-to-run variance is uncalibrated; short runs have varied by ~5 MB PSS and
+  ~15 MB peak, so repeat a run before trusting a delta in that range.
+- For suspected memory leaks, run `shell-perf --soak HOURS [PANEL]` to sample
+  PSS every minute (optionally holding `PANEL` open) and report growth in MB/h.
+  A few hours separates real leaks from warm-up.
+- To profile QML binding costs, restart manually with `qs --debug PORT` and
+  attach the devshell's `qmlprofiler --attach localhost:PORT`. Because that
+  instance runs outside `kaizen-shell.service`, `kaizen ipc` and binds will not
+  reach it—use `qs ipc -c kaizen` instead.
 
 ## Working from a worktree
 
 Static checks (`qml-*`, `requires-check`, `compositor-test`) and Nix builds run
-in the worktree. To see its QML live:
+directly inside a worktree. To run that worktree's QML live:
 
 ```sh
-kaizen dev .      # from the worktree's root, or kaizen dev NAME (its directory)
-kaizen dev        # prints the shell tree kaizen-shell runs
-kaizen dev off    # back to main's
+kaizen dev .      # from the worktree root (or: kaizen dev NAME)
+kaizen dev        # print the shell tree kaizen-shell currently runs
+kaizen dev off    # return to main's tree
 ```
 
-- `kaizen dev PATH` restarts `kaizen-shell.service` on the worktree's shell
-  tree through a drop-in under `$XDG_RUNTIME_DIR`, as
-  `kaizen reload --restart` does, with the shell's warnings and errors on
-  stderr; Quickshell then hot-reloads the tree's edits.
-  It fails unless the unit runs that tree, and `kaizen ipc`, the binds and
-  `shell-smoke` reach it. `kaizen doctor` warns while it does, and checks the
-  worktree's `requires` and plugins. A reboot returns to main's.
-- An agent runs it without asking. It refuses while locked: the rule below
-  applies.
-- Only the shell's QML, generic plugins included, comes from the worktree.
-  Scripts, units, niri's config, a host's plugins and the investigator's `-dir`
-  stay main's, so changes to them still go through main. The worktree's own
-  `./kaizen/cli/kaizen` runs its scripts: Building kaizen.
-- One worktree is live at a time. Run `kaizen dev off` before removing the
-  worktree or ending the task. A removed worktree, or QML that fails to load,
-  leaves the unit failing; `kaizen dev off` recovers either.
+- `kaizen dev PATH` writes a systemd drop-in under `$XDG_RUNTIME_DIR` and
+  restarts `kaizen-shell.service` against the worktree's shell tree (printing
+  startup warnings and errors to stderr, like `kaizen reload --restart`).
+  Quickshell then hot-reloads edits from that tree, and `kaizen ipc`,
+  compositor binds, and `shell-smoke` all talk to it. `kaizen dev` fails if the
+  unit does not end up running that tree. While active, `kaizen doctor` warns
+  and validates the worktree's `requires` and plugins. Rebooting resets to
+  main's tree.
+- Agents may run `kaizen dev` without asking; it refuses while locked.
+- Only shell QML (including generic plugins) comes from the worktree. Scripts,
+  systemd units, compositor configs, host plugins, and the investigator's
+  `-dir` remain on main, so changes to those still go through main. To run a
+  worktree's scripts, invoke its own `./kaizen/cli/kaizen` binary (see
+  [Building kaizen](#building-kaizen)).
+- Only one worktree can be live at a time. Run `kaizen dev off` before removing
+  a worktree or ending a task. If a live worktree is deleted or contains broken
+  QML, the unit fails—`kaizen dev off` recovers both cases.
 
 ## Building kaizen
 
-`kaizen` is a Go binary built from [`kaizen/cli/`](../cli/). A rebuild
-compiles it into the system profile, and a failing test fails the rebuild. Go
-comes from the default devshell. To use a change without a rebuild:
+`kaizen` is a Go binary built from [`kaizen/cli/`](../cli/). A Nix rebuild
+installs it into the system profile and runs its Go tests (failing tests block
+the rebuild). Go is provided by the default devshell. To test CLI changes
+without rebuilding:
 
-- In a worktree, `go build -o kaizen .` in `kaizen/cli/` writes
-  `kaizen/cli/kaizen`; run it by path (`./kaizen/cli/kaizen --json`). It runs
-  the worktree's scripts, and a script's `kaizen` is the same binary. Never install it: units, binds and QML
-  keep main's `kaizen`.
-- In `~/.dotfiles`,
-  `nix develop ~/.dotfiles -c ~/.dotfiles/kaizen/cli/build.sh` installs
-  `~/.local/bin/kaizen`, which precedes the system profile's only on an
-  interactive shell's PATH (`exports.sh`). Units, binds and QML take PATH from
-  the user manager, which lacks `~/.local/bin`, and keep the system profile's
-  `kaizen` until a rebuild; try a change from a terminal. It refuses
-  anywhere else, since parallel sessions share `~/.local/bin`. A rebuild
-  deletes it, returning to the system profile's; until then `kaizen doctor`
-  warns, naming its commit (`kaizen --version`).
+- **In a worktree:** Run `go build -o kaizen .` inside `kaizen/cli/` and invoke
+  it by path (`./kaizen/cli/kaizen --json`). It dispatches to the worktree's
+  own scripts, and scripts calling `kaizen` reuse that same binary. Never
+  install a worktree build globally—units, binds, and QML should keep using
+  main's `kaizen`.
+- **In `~/.dotfiles`:** Run
+  `nix develop ~/.dotfiles -c ~/.dotfiles/kaizen/cli/build.sh` to install
+  `~/.local/bin/kaizen`. That path takes precedence over the system profile
+  only in interactive shells (`exports.sh`); systemd units, binds, and QML
+  inherit the user manager's `PATH` (which omits `~/.local/bin`) and keep using
+  the system binary until a rebuild. `build.sh` refuses to run outside
+  `~/.dotfiles` so parallel sessions do not clobber `~/.local/bin`. The next
+  rebuild deletes `~/.local/bin/kaizen`; until then, `kaizen doctor` warns and
+  prints its commit (`kaizen --version`).
 
 ## Deployment safety
 
-On the host, `~/.dotfiles` is this checkout and the live stowed tree: edits
-deploy as they are saved. Quickshell's watcher can miss an edit that replaces
-the file's inode (`sed -i`, a Git checkout), so apply a QML edit with
-`kaizen reload`, which also prints its QML errors. From another host it is
-reached over SSH as `fredrik@<host>`.
+On the host, `~/.dotfiles` is both the Git checkout and the live stowed tree,
+so edits take effect on save. Because Quickshell's file watcher can miss
+inode-replacing edits (such as `sed -i` or a Git checkout), apply QML edits
+with `kaizen reload`, which also prints any QML errors. From another machine,
+connect over SSH as `fredrik@<host>`.
 
-Before any live file replacement, inspect target changes and preserve
-unrelated edits. Quickshell's watcher can hot-reload during copying, with no
-lock guard, so record and temporarily disable idle locking, and restore it
-afterward. **Never restart Quickshell while locked**: the compositor keeps the
-session lock after its client dies. `kaizen reload` and `kaizen dev` refuse
-while locked.
+Before overwriting live files, inspect local changes and preserve unrelated
+edits. Quickshell's watcher can hot-reload mid-copy without checking the lock
+state, so record and temporarily disable idle locking beforehand and restore it
+afterward. **Never restart Quickshell while locked**: the compositor holds the
+session lock even if the lock client dies. `kaizen reload` and `kaizen dev`
+both refuse to run while locked.
 
 ```sh
 kaizen ipc call idle status
 kaizen ipc call idle disable
 ```
 
-New/moved files need `~/.dotfiles/stow.sh`, which also removes the links a
-move left behind and reloads the user manager; an edited unit needs
-`systemctl --user daemon-reload`, which `kaizen reload --restart` runs for the
-shell's. Never create Stow links manually or run `git clean -fd` in the host
-clone.
+After adding or moving stowed files, run `~/.dotfiles/stow.sh` (which also
+removes stale symlinks and reloads the systemd user manager). After editing a
+unit file, run `systemctl --user daemon-reload` (`kaizen reload --restart` does
+this automatically for the shell unit). Never create Stow symlinks manually or
+run `git clean -fd` in the host checkout.
 
-When working from another host, sync the checkout before live validation or a
-user-run rebuild, which evaluates the host's clone. Checksums avoid replacing
-identical compositor files solely because timestamps differ. The host may
-carry uncommitted theme edits in `kaizen/stow/`; check `git status`
-there before `--delete`.
+When developing from another machine, sync the checkout before running live
+validation or asking the user to rebuild (which evaluates the host's clone).
+Use checksums (`-c`) so identical compositor configs are not touched just for
+differing timestamps. Check `git status` on the host before syncing with
+`--delete`, as the host may have uncommitted theme edits in `kaizen/stow/`:
 
 ```sh
 rsync -ac --delete --exclude .git --exclude result --exclude .direnv ~/.dotfiles/ fredrik@<host>:~/.dotfiles/
 ssh fredrik@<host> 'cd ~/.dotfiles && git add -AN .'
 ```
 
-`rsync`, Git checkouts, and `sed -i` can replace inodes, so restart the
-shell after deployment rather than relying on its watcher:
+Because `rsync`, Git checkouts, and `sed -i` can replace inodes, restart the
+shell explicitly after syncing instead of relying on hot-reload:
 
 ```sh
 kaizen reload --restart
 ```
 
-It reloads the user manager, restarts `kaizen-shell.service`, waits until the
-shell has loaded its config and answers, and prints its warnings and errors.
-It refuses while the session is locked, so use it instead of
-`systemctl --user restart`.
+This reloads the user manager, restarts `kaizen-shell.service`, waits for the
+shell to load and answer IPC, and prints any warnings or errors—while refusing
+to run if locked.
 
-For compositor commands over SSH, provide the active session's
-`XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY`, and `NIRI_SOCKET` (`UMBRIEL_SOCKET` on
-umbriel) from `systemctl --user show-environment`; the `kaizen` commands find
-the compositor by its socket variable, and drive none without it. `kaizen ipc`
-and `shell-smoke` select the shell by its unit's PID, so they need no display
-context.
+When running compositor commands over SSH, export the active session's
+`XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY`, and `NIRI_SOCKET` (or `UMBRIEL_SOCKET` on
+umbriel) from `systemctl --user show-environment`; `kaizen` subcommands detect
+the compositor from its socket variable and refuse to run without it.
+`kaizen ipc` and `shell-smoke` target the shell by unit PID and require no
+display environment.
