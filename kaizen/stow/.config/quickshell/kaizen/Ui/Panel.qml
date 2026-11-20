@@ -11,6 +11,9 @@ PanelWindow {
     property int cardWidth: 600
     // Fits the content; a card of fixed height (the launcher, the picker) sets it.
     property int cardHeight: body.childrenRect.height + 2 * Space.cardPadding
+    // Follows the text size, capped to stay clear of the bar and screen edges.
+    // The floor is 1, or the text size when that is smaller.
+    readonly property real zoom: Math.max(Math.min(1, shell ? shell.textScale : 1), Math.min(shell ? shell.textScale : 1, (width - 32) / cardWidth, Space.cardRoom(height, barHeight) / cardHeight))
     readonly property int barHeight: shell ? shell.barHeight : 32
 
     property bool keyNavigation: false
@@ -99,9 +102,7 @@ PanelWindow {
             anchors.centerIn: parent
             width: panel.cardWidth
             height: panel.cardHeight
-            // Follows the text size, capped to stay clear of the bar and screen edges.
-            // The floor is 1, or the text size when that is smaller.
-            scale: Math.max(Math.min(1, panel.shell ? panel.shell.textScale : 1), Math.min(panel.shell ? panel.shell.textScale : 1, (panel.width - 32) / panel.cardWidth, Space.cardRoom(panel.height, panel.barHeight) / panel.cardHeight))
+            scale: panel.zoom
             radius: 8
             color: panel.shell.palette.bg
             border.color: panel.shell.palette.dim

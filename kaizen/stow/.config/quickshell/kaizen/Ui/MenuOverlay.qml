@@ -19,6 +19,8 @@ Item {
     // Takes the keyboard on close when the item that had it is gone or hidden.
     property Item fallback: null
     property var openerKeys: []
+    // The scale the host draws the overlay at, for its cards.
+    property real zoom: 1
     // The keys of the submenus drilled into.
     property var path: []
     // Where focus was when the menu opened.
@@ -240,6 +242,7 @@ Item {
             width: parent.width - 8
             height: parent.height - y - 4
             shell: overlay.shell
+            zoom: overlay.zoom
             rows: overlay.visible && !overlay.context ? Model.search(overlay.level.rows, card.query) : []
             // From level alone: it can lag a change of path.
             placeholder: overlay.level.names.length ? "Filter " + overlay.level.names[overlay.level.names.length - 1].toLowerCase() + "…" : "Search…"
@@ -326,6 +329,7 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 6
                 shell: overlay.shell
+                zoom: overlay.zoom
                 rows: cascade.entry ? Model.search(cascade.level.rows, menuCard.query) : []
                 placeholder: cascade.level.names.length ? "Filter " + cascade.level.names[cascade.level.names.length - 1].toLowerCase() + "…" : "Filter…"
                 maxWidth: 360 - 12

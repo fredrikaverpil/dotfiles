@@ -17,6 +17,9 @@ Item {
     property var openerKeys: []
     property real fontSize: 14
     property int rowHeight: 28
+    // The scale the host draws the card at; glyphs and icons render at it so
+    // bitmaps (emoji, app icons) stay sharp.
+    property real zoom: 1
     // Measuring stops at this width; a level can hold thousands of rows.
     property real maxWidth: Infinity
     property int current: -1
@@ -273,8 +276,8 @@ Item {
                         visible: status === Image.Ready
                         fillMode: Image.PreserveAspectFit
                         asynchronous: true
-                        sourceSize.width: width * Screen.devicePixelRatio
-                        sourceSize.height: height * Screen.devicePixelRatio
+                        sourceSize.width: width * card.zoom * Screen.devicePixelRatio
+                        sourceSize.height: height * card.zoom * Screen.devicePixelRatio
                     }
 
                     Text {
@@ -282,7 +285,8 @@ Item {
                         visible: !image.visible
                         color: row.usable ? card.shell.palette.fg : card.shell.palette.off
                         font.family: Fonts.mono
-                        font.pixelSize: row.modelData.glyphSize || card.fontSize
+                        font.pixelSize: (row.modelData.glyphSize || card.fontSize) * card.zoom
+                        scale: 1 / card.zoom
                         text: row.modelData.buttonType === QsMenuButtonType.CheckBox ? (row.modelData.checkState === Qt.Checked ? "󰄲" : "󰄱") : row.modelData.buttonType === QsMenuButtonType.RadioButton ? (row.modelData.checkState === Qt.Checked ? "󰐾" : "󰐽") : row.modelData.glyph ?? ""
                     }
                 }

@@ -88,8 +88,7 @@ Ui.Plugin {
         Ui.MenuOverlay {
             id: menuOverlay
 
-            readonly property real zoom: plugin.shell.textScale
-
+            zoom: plugin.shell.textScale
             width: window.width / zoom
             height: window.height / zoom
             scale: zoom

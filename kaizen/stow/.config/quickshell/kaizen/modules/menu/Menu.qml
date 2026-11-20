@@ -1019,6 +1019,7 @@ Ui.Panel {
             openerKeys: menu.keyOpened ? menu.toggleKeys : []
             fontSize: 14
             rowHeight: 28
+            zoom: menu.zoom
             // The panel fixes the width; Emoji has thousands of rows.
             maxWidth: 0
 

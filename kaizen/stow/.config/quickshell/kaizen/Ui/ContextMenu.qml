@@ -271,6 +271,7 @@ PanelWindow {
                 anchors.fill: parent
                 anchors.margins: 6
                 shell: root.shell
+                zoom: root.zoom
                 rows: frame.level ? root.rowsFor(frame.level, frame.index, menuCard.query) : []
                 placeholder: frame.level && frame.level.title ? "Filter " + frame.level.title.toLowerCase() + "…" : "Filter…"
                 maxWidth: 360 - 12
