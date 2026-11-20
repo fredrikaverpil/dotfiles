@@ -37,5 +37,37 @@ in
     apply = lib.unique;
   };
 
-  config.home.packages = map (name: llmAgentPackages.${name}) config.llmAgents;
+  config = {
+    home.packages = map (name: llmAgentPackages.${name}) config.llmAgents;
+
+    # Antigravity's terminal sandbox (sbox) mounts FHS paths, not /nix/store,
+    # so `exec /proc/self/exe` fails on NixOS unless these are in read_file
+    # allow rules. Merged into the live file rather than stowed because agy
+    # also persists host-local state (trustedWorkspaces, model) in it.
+    home.activation.antigravitySettings =
+      lib.mkIf (pkgs.stdenv.hostPlatform.isLinux && builtins.elem "antigravity-cli" config.llmAgents)
+        (
+          lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+            settings="$HOME/.gemini/antigravity-cli/settings.json"
+            if [ -n "''${DRY_RUN_CMD:-}" ]; then
+              echo "Would merge NixOS sandbox read_file rules into $settings"
+            else
+              mkdir -p "$(dirname "$settings")"
+              [ -f "$settings" ] || printf '{}\n' > "$settings"
+              tmp="$(mktemp "$(dirname "$settings")/.settings.json.XXXXXX")"
+              if ${pkgs.jq}/bin/jq '
+                .permissions.allow = ((.permissions.allow // []) + [
+                  "read_file(/nix/store)",
+                  "read_file(/run/current-system)"
+                ] | unique)
+              ' "$settings" > "$tmp"; then
+                mv "$tmp" "$settings"
+              else
+                rm -f "$tmp"
+                exit 1
+              fi
+            fi
+          ''
+        );
+  };
 }

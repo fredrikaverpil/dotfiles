@@ -21,7 +21,7 @@ in
     })) { })
   ];
 
-  llmAgents = [ ];
+  llmAgents = [ "antigravity-cli" ];
 
   home.file = { };
 
