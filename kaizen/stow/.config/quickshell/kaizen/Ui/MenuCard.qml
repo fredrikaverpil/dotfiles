@@ -9,7 +9,8 @@ Item {
     id: card
 
     required property var shell
-    // Shaped like QsMenuEntry, plus glyph, image, detail and keys.
+    // Shaped like QsMenuEntry, plus glyph, image, detail, keys and glyphSize,
+    // which grows the row to fit a larger glyph (emoji).
     property var rows: []
     property string placeholder: "Filter…"
     // The keys that opened the menu, when a bind did.
@@ -22,7 +23,7 @@ Item {
 
     readonly property alias query: input.text
     readonly property var shownRows: query.length > 0 ? rows.filter(row => !row.isSeparator) : rows
-    readonly property int rowsHeight: shownRows.reduce((sum, row) => sum + (row.isSeparator ? 9 : rowHeight), 0) + Math.max(0, shownRows.length - 1) * list.spacing
+    readonly property int rowsHeight: shownRows.reduce((sum, row) => sum + heightOf(row), 0) + Math.max(0, shownRows.length - 1) * list.spacing
 
     signal openRequested(var row, bool selectFirst)
     signal runRequested(var row)
@@ -32,6 +33,10 @@ Item {
 
     implicitWidth: widest
     implicitHeight: list.y + rowsHeight
+
+    function heightOf(row) {
+        return row.isSeparator ? 9 : Math.max(rowHeight, (row.glyphSize || 0) + 8);
+    }
 
     function focusSearch() {
         input.forceActiveFocus();
@@ -235,7 +240,7 @@ Item {
             readonly property bool usable: !modelData.isSeparator && modelData.enabled
 
             width: list.width
-            height: modelData.isSeparator ? 9 : card.rowHeight
+            height: card.heightOf(modelData)
             radius: 4
             color: index === card.current ? card.shell.palette.sel : "transparent"
 
@@ -256,7 +261,7 @@ Item {
 
                 Item {
                     id: icon
-                    width: card.fontSize + 2
+                    width: (row.modelData.glyphSize || card.fontSize) + 2
                     height: parent.height
 
                     Image {
@@ -277,7 +282,7 @@ Item {
                         visible: !image.visible
                         color: row.usable ? card.shell.palette.fg : card.shell.palette.off
                         font.family: Fonts.mono
-                        font.pixelSize: card.fontSize
+                        font.pixelSize: row.modelData.glyphSize || card.fontSize
                         text: row.modelData.buttonType === QsMenuButtonType.CheckBox ? (row.modelData.checkState === Qt.Checked ? "󰄲" : "󰄱") : row.modelData.buttonType === QsMenuButtonType.RadioButton ? (row.modelData.checkState === Qt.Checked ? "󰐾" : "󰐽") : row.modelData.glyph ?? ""
                     }
                 }

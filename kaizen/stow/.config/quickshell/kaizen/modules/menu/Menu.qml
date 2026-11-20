@@ -553,6 +553,7 @@ Ui.Panel {
         onLoaded: menu.emojis = JSON.parse(text()).filter(e => e.name).map(e => ({
                     label: e.name,
                     icon: e.emoji,
+                    glyphSize: 28,
                     image: "",
                     detail: "",
                     enabled: true,
@@ -867,6 +868,7 @@ Ui.Panel {
             return {
                 text: row.label,
                 glyph: row.icon,
+                glyphSize: row.glyphSize,
                 image: row.image || "",
                 detail: row.detail || "",
                 keys: row.chord !== undefined ? Ui.Compositor.keycaps(row.chord) : [],
