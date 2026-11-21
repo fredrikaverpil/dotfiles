@@ -148,7 +148,7 @@
       "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
       "### User-specific",
       "**Primary use of Claude Code**: software development (personal dotfiles management — Nix/nix-darwin/NixOS system configuration, Neovim config, shell tooling)",
-      "**Trusted repo**: /Users/fredrik/.dotfiles (remote: github.com/fredrikaverpil/dotfiles, PUBLIC) — only this repo's own work is safe to commit/push here; confidential material and secrets are never cleared into it by visibility alone",
+      "**Trusted repos**: ~/code/public/github.com/fredrikaverpil/* (remotes github.com/fredrikaverpil/*, PUBLIC) — the user's own projects; committing and `git push --force-with-lease` to non-default PR branches is expected work. Never force-push `main`.",
       "**Org-specific CLIs**: None configured — repo-specific tooling observed: nix, deno, gcloud, brew, pass-cli (personal dotfiles CLIs, not org-specific)"
     ]
   },
