@@ -85,8 +85,8 @@ displays the error.
 ```mermaid
 flowchart LR
   toast["alert toast: Investigate"] -->|investigate draft| daemon
-  tray["tray: click / Open"] -->|kaizen ipc call open| window
-  tray -->|New investigation, in process| daemon
+  bar["bar indicator: click / Open"] --> window
+  bar -->|New investigation: investigate draft| daemon
   daemon -->|kaizen ipc call reveal| window
   window -->|investigate start, followup,<br>cancel, delete, edit, draft, settings| daemon
   window -->|investigate combine, branch| daemon
@@ -107,10 +107,9 @@ flowchart LR
   `$XDG_RUNTIME_DIR/kaizen-incident-investigator.sock`. It owns all
   investigations, state files, and `claude` subprocesses, so shell reloads
   never interrupt active runs.
-- **Tray icon:** Runs inside the daemon process and omits a Quit item (quitting
-  would kill the daemon and its active runs). **New investigation** creates a
-  draft directly in-process without spawning a client. An amber dot on the icon
-  indicates an active turn.
+- **Bar indicator:** Shown by the shell plugin, in `sky` while a turn runs.
+  Left-click opens the window; right-click opens the plugin's launcher node,
+  whose **New investigation** runs `investigate draft`.
 - **Window:** A Quickshell `FloatingWindow` that watches the state files via
   `FileView` and invokes client verbs in response to user actions.
 - **Claude Code turns:** Each turn runs as a `claude -p` subprocess of the
@@ -284,7 +283,7 @@ Its systemd unit is
 [`kaizen-incident-investigator.service`](../../../stow/.config/systemd/user/kaizen-incident-investigator.service).
 The daemon and Nix module live in this directory:
 
-| Path           | Holds                |
-| -------------- | -------------------- |
-| `investigate/` | daemon, CLI and tray |
-| `default.nix`  | package              |
+| Path           | Holds          |
+| -------------- | -------------- |
+| `investigate/` | daemon and CLI |
+| `default.nix`  | package        |
