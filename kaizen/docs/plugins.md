@@ -4,6 +4,24 @@ A plugin is an optional shell extension: the shell always runs without it,
 regardless of how many hosts enable it. See [`README.md`](../README.md) › Where
 it lives for where plugin QML and Nix modules live and which hosts they reach.
 
+## Kinds of plugins
+
+| | Shell plugin | Shell plugin with a daemon | Tray app |
+| --- | --- | --- | --- |
+| Runs | in the shell process | in the shell, plus a systemd user unit that outlives shell reloads | its own process |
+| Enabled by | `plugins/<name>.jsonc` | the same, which the unit's `ConditionPathExists=` also checks | its Nix module, plus an optional autostart symlink |
+| Quit | no: remove its `.jsonc`, or hold it if it offers a hold | no: the unit keeps the daemon running | yes, from its own tray menu |
+| Shows | launcher nodes, panels and windows, an optional bar indicator | the same; a third-party daemon may add its own window, as `dcal show` does | a tray item, also listed in the launcher's Tray level |
+| `kaizen doctor` | manifest and `requires` | also the units listed in its manifest | its unit's state and journal, if named `kaizen-…` |
+| Examples | `breaks`, `gcloud-auth`, `hello` (launcher only) | `calendar`, `incident-investigator` | `hello-tray` |
+
+Make it a shell plugin when kaizen owns the feature: it is always on and shows
+through the shell. Add a daemon only for work that must survive a shell reload,
+such as a sync or a running job. Make it a tray app when it is an app in its
+own right that you start and quit; it can still drive the shell through
+`kaizen ipc`. A tray item is for something you can quit, so a plugin's daemon
+should not add one: give its shell plugin a bar indicator instead.
+
 ## Writing one
 
 - **Capabilities:** A plugin
