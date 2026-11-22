@@ -8,7 +8,7 @@ let
     pname = "investigate";
     version = "0.1.0";
     src = ./investigate;
-    vendorHash = "sha256-mN0CEwQazxP6E6xnKfUYikIVJxLvvnHqrF9qQtesVRI=";
+    vendorHash = "sha256-2/WBln7Un8YkVATEQJ4LkQkb+MVsb8LUtOXs63Rz6Dk=";
     # TestCheckout builds a repository.
     nativeCheckInputs = [ pkgs.git ];
     meta.mainProgram = "investigate";

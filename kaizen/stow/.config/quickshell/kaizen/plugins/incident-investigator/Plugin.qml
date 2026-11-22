@@ -7,6 +7,13 @@ import qs.Ui as Ui
 Ui.Plugin {
     id: plugin
 
+    readonly property bool running: investigations.all.some(item => item.status === "running")
+
+    barIndicator: ({
+            label: "󰍉",
+            foreground: plugin.running ? plugin.shell.palette.sky : plugin.shell.palette.fg,
+            action: () => plugin.open()
+        })
     menuItems: ({
             "plugins.incident-investigator": {
                 icon: "󰍉",
@@ -16,6 +23,12 @@ Ui.Plugin {
                 icon: "󰕮",
                 label: "Open incident investigator",
                 action: () => plugin.open()
+            },
+            "plugins.incident-investigator.new": {
+                icon: "󰐕",
+                label: "New investigation",
+                // `investigate draft` opens the window on it.
+                action: () => investigations.draft()
             }
         })
 

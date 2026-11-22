@@ -4,9 +4,7 @@
 Description=Incident investigator runs
 ConditionPathExists=%h/.config/kaizen/plugins/incident-investigator.jsonc
 PartOf=graphical-session.target
-# Its tray item registers with the shell's StatusNotifierWatcher; started
-# before the watcher is up, it logs a failed registration.
-After=kaizen-shell.service kaizen-tray-ready.service
+After=kaizen-shell.service
 
 [Service]
 # -dir repeats investigate's default, for a build that predates it.
@@ -18,4 +16,4 @@ Restart=on-failure
 Slice=app.slice
 
 [Install]
-WantedBy=kaizen-session-xdg-autostart.target
+WantedBy=kaizen-session.target

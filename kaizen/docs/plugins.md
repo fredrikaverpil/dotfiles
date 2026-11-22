@@ -94,9 +94,8 @@ it lives for where plugin QML and Nix modules live and which hosts they reach.
   Launch it from Apps, or autostart it with a symlink in
   `kaizen-session-xdg-autostart.target.wants/` ordered after
   `kaizen-tray-ready.service` so the tray watcher is ready before registration.
-  Plugin daemons that expose a tray icon (such as the incident investigator)
-  start the same way. Third-party apps with tray icons are not plugins—the tray
-  displays them automatically.
+  Third-party apps with tray icons are not plugins—the tray displays them
+  automatically.
 
 ## Developing one
 
