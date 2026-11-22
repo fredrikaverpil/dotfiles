@@ -35,9 +35,9 @@ Configure `idleMinutes` and `reminders` in
 `~/.config/kaizen/plugins/breaks.jsonc`:
 
 - Each entry in `reminders` fires every `everyMinutes` of a session, displaying
-  a large card centered on every output (like the hourly clock). The card shows
-  its `icon` (a glyph, defaulting to a coffee cup) above its `title` and either
-  its `detail` or the next entry rotating through `details`.
+  a large card centered on every output, like the hourly time below. The card
+  shows its `icon` (a glyph, defaulting to a coffee cup) above its `title` and
+  either its `detail` or the next entry rotating through `details`.
 - If `seconds` is set, the card stays up and counts down. Clicking the card or
   running `kaizen ipc call breaks dismiss` dismisses it and stops the
   countdown.
@@ -49,6 +49,13 @@ When multiple reminders come due at the same time, only the one with the
 longest interval is shown. Once the longest-interval reminder has fired, the
 bar timer switches to `wood`. Left-clicking the bar item shows the session time
 large; its menu offers **New session** and **Hold reminders**.
+
+On the hour, the time appears on the same card, without stealing keyboard or
+pointer focus. It is skipped while reminders are held (so DnD keeps it out of
+screen shares and recordings), while the screen is locked or curtained, and
+while a reminder is counting down. Hours that pass while the machine is asleep
+are not shown on resume. Click the card to dismiss it, or run
+`kaizen ipc call breaks hour` to display it immediately regardless of holds.
 
 State persists across shell restarts in
 `~/.local/state/kaizen-shell/plugins/breaks/state.json` (both the hold flag and
@@ -99,8 +106,6 @@ knowledge of them and automatically covers future features. Currently, DnD:
 - Holds notifications in history (see [Notifications › Hold](#hold-1)).
 - Holds break reminders while keeping the timer running (see
   [Breaks › Hold](#hold)).
-- Suppresses the hourly time overlay (see
-  [Time and timezone](#time-and-timezone-timezone)).
 
 Toggle DnD via **Settings › Do not disturb (DnD)** or
 `kaizen ipc call dnd toggle` (also `set on|off` and `state`). Its state
@@ -277,14 +282,6 @@ panel (or stop an active recording), and `Mod+Shift+Print` to pause or resume.
 Recordings are saved to `~/Videos/Recordings`.
 
 ## Time and timezone (`timezone`)
-
-On the hour, the time appears in large text at the center of every output for a
-few seconds without stealing keyboard or pointer focus. It is suppressed during
-DnD (so it never appears in screen shares or recordings) and while the screen
-is locked or curtained. Hours that pass while the machine is asleep are not
-shown on resume. Click the overlay to dismiss it, or run
-`kaizen ipc call timezone hour` to display it immediately regardless of
-suppression.
 
 The rest is to be written.
 

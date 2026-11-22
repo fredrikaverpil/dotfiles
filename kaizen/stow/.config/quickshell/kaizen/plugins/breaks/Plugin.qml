@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import qs.Ui as Ui
@@ -9,7 +10,8 @@ import "../../Ui/Hold.js" as Hold
 // How long you have been at the computer without a break, with a card for each
 // reminder as it comes due. A session ends after idleMinutes without input, or
 // when the screen locks or the curtain goes up. A session survives a shell
-// restart shorter than idleMinutes.
+// restart shorter than idleMinutes. On the hour, the time shows large unless
+// held or a reminder is counting down; a strike missed asleep is not shown.
 Ui.Plugin {
     id: plugin
 
@@ -99,6 +101,14 @@ Ui.Plugin {
         plugin.counting = null;
         osd.headline = Model.duration(plugin.elapsed);
         osd.detail = "Time for a break";
+        osd.show();
+    }
+
+    // The time, large.
+    function hour() {
+        plugin.counting = null;
+        osd.headline = Qt.formatDateTime(clock.date, "HH:mm");
+        osd.detail = Qt.formatDateTime(clock.date, "dddd d MMMM");
         osd.show();
     }
 
@@ -194,6 +204,13 @@ Ui.Plugin {
     }
     Component.onCompleted: load()
 
+    SystemClock {
+        id: clock
+        precision: SystemClock.Minutes
+        onDateChanged: if (date.getMinutes() === 0 && !plugin.held && !plugin.counting)
+            plugin.hour()
+    }
+
     IdleMonitor {
         id: idleMonitor
         timeout: plugin.settings.idleMinutes * 60
@@ -268,6 +285,9 @@ Ui.Plugin {
         }
         function remind(): void {
             plugin.remind();
+        }
+        function hour(): void {
+            plugin.hour();
         }
         function dismiss(): void {
             osd.dismiss();

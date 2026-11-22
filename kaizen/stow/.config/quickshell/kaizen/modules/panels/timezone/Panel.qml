@@ -11,9 +11,6 @@ Ui.Panel {
 
     readonly property var info: service.info
 
-    // Shows the hour OSD now, whatever holds it back on the hour.
-    signal hourRequested
-
     cardWidth: 400
     keyNavigation: true
     // Held unmapped until a probe replaces the time left from the last open.
@@ -46,9 +43,6 @@ Ui.Panel {
         }
         function home(): void {
             root.service.resetZone();
-        }
-        function hour(): void {
-            root.hourRequested();
         }
         function status(): string {
             return JSON.stringify({
