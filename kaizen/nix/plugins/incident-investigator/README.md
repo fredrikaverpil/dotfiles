@@ -139,7 +139,8 @@ flowchart LR
   **Clear**, **Model ›**, **Effort ›**). Shortcuts appear where active. See
   `Actions.js` for the per-scope row definitions. Pressing `Ctrl+Enter` inside
   a draft's trace ID or notes starts the run; plain `Enter` in the trace ID
-  does not.
+  does not. In the follow-up field, `Enter` sends and `Shift+Enter` inserts a
+  newline.
 - **Row context menu:** Right-clicking a row opens a cascading context menu at
   the pointer containing the palette actions for that row (or for the selected
   set if the clicked row is selected), without altering the open investigation

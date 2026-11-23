@@ -177,6 +177,10 @@ window binds (like `Mod+Q`) treat it like any other window.
   item whenever no text field is focused. Inside a text field, only `Esc`,
   `Enter`, and `Ctrl` chords act (`Esc` leaves the field; `Ctrl+Enter`
   submits). Application shortcuts never become compositor binds.
+- Multiline text fields grow with their text, then scroll to keep the cursor
+  in view. Drag the grip in the lower-right corner to resize; double-click it
+  to grow with the text again. Where plain `Enter` submits (a chat input),
+  `Shift+Enter` inserts a newline.
 - Properties (tag, project, model) appear as chips showing their value, or
   their name in `off` when unset. Clicking a chip, pressing `Enter`/`Space` on
   it, or hitting its shortcut opens an anchored context menu to set the value.

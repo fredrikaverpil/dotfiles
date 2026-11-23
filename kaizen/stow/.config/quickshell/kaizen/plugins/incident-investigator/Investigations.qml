@@ -1322,9 +1322,13 @@ Column {
         property alias text: input.text
         property alias placeholder: hint.text
         property bool multiline: false
-        // Whether plain Enter submits; Ctrl+Enter submits any field.
+        // Whether plain Enter submits; Ctrl+Enter submits any field, Shift+Enter breaks a multiline one.
         property bool enterSubmits: !multiline
         property alias readOnly: input.readOnly
+        // A multiline field grows with its text between these heights; dragging its grip sets the height.
+        property real minHeight: multiline ? 84 : 28
+        property real maxHeight: 200
+        property real draggedHeight: 0
 
         signal submitted
 
@@ -1333,7 +1337,7 @@ Column {
         }
 
         width: parent ? parent.width : 0
-        height: multiline ? 84 : 28
+        height: !multiline ? 28 : draggedHeight > 0 ? draggedHeight : Math.min(Math.max(input.contentHeight + 12, minHeight), maxHeight)
         radius: 4
         color: "transparent"
         border.color: input.activeFocus ? root.shell.palette.fg : root.shell.palette.dim
@@ -1342,38 +1346,111 @@ Column {
         Text {
             id: hint
             visible: input.text === ""
-            anchors.fill: input
+            anchors.fill: flick
             color: root.shell.palette.off
             font.family: Ui.Fonts.mono
             font.pixelSize: 14
         }
 
-        TextEdit {
-            id: input
+        // Scrolls the text to keep the cursor in view.
+        Flickable {
+            id: flick
             anchors.fill: parent
             anchors.margins: 6
-            color: root.shell.palette.fg
-            selectionColor: root.shell.palette.sel
-            selectedTextColor: root.shell.palette.fg
-            font.family: Ui.Fonts.mono
-            font.pixelSize: 14
-            wrapMode: field.multiline ? TextEdit.Wrap : TextEdit.NoWrap
-            activeFocusOnTab: true
-            // Tab moves focus; a field never takes a tab character.
-            Keys.onTabPressed: event => {
-                const forward = !(event.modifiers & Qt.ShiftModifier);
-                input.nextItemInFocusChain(forward).forceActiveFocus(forward ? Qt.TabFocusReason : Qt.BacktabFocusReason);
-            }
-            Keys.onBacktabPressed: input.nextItemInFocusChain(false).forceActiveFocus(Qt.BacktabFocusReason)
-            Keys.onEscapePressed: root.leaveField()
-            // A single-line field never takes a newline.
-            Keys.onReturnPressed: event => {
-                if (field.enterSubmits || event.modifiers & Qt.ControlModifier)
-                    field.submitted();
-                else
-                    event.accepted = !field.multiline;
-            }
+            contentWidth: input.width
+            contentHeight: input.height
             clip: true
+            boundsBehavior: Flickable.StopAtBounds
+
+            function follow(r) {
+                if (contentX >= r.x)
+                    contentX = r.x;
+                else if (contentX + width <= r.x + r.width)
+                    contentX = r.x + r.width - width;
+                if (contentY >= r.y)
+                    contentY = r.y;
+                else if (contentY + height <= r.y + r.height)
+                    contentY = r.y + r.height - height;
+            }
+
+            ScrollBar.vertical: Ui.PanelScrollBar {
+                shell: root.shell
+            }
+
+            TextEdit {
+                id: input
+                width: field.multiline ? flick.width : Math.max(flick.width, implicitWidth)
+                height: Math.max(flick.height, contentHeight)
+                color: root.shell.palette.fg
+                selectionColor: root.shell.palette.sel
+                selectedTextColor: root.shell.palette.fg
+                font.family: Ui.Fonts.mono
+                font.pixelSize: 14
+                wrapMode: field.multiline ? TextEdit.Wrap : TextEdit.NoWrap
+                activeFocusOnTab: true
+                onCursorRectangleChanged: flick.follow(cursorRectangle)
+                // Tab moves focus; a field never takes a tab character.
+                Keys.onTabPressed: event => {
+                    const forward = !(event.modifiers & Qt.ShiftModifier);
+                    input.nextItemInFocusChain(forward).forceActiveFocus(forward ? Qt.TabFocusReason : Qt.BacktabFocusReason);
+                }
+                Keys.onBacktabPressed: input.nextItemInFocusChain(false).forceActiveFocus(Qt.BacktabFocusReason)
+                Keys.onEscapePressed: root.leaveField()
+                // A single-line field never takes a newline.
+                Keys.onReturnPressed: event => {
+                    if (event.modifiers & Qt.ControlModifier)
+                        field.submitted();
+                    else if (field.multiline && event.modifiers & Qt.ShiftModifier) {
+                        if (!input.readOnly) {
+                            input.remove(input.selectionStart, input.selectionEnd);
+                            input.insert(input.cursorPosition, "\n");
+                        }
+                    } else if (field.enterSubmits)
+                        field.submitted();
+                    else
+                        event.accepted = !field.multiline;
+                }
+            }
+        }
+
+        // Drag to resize; double-click to grow with the text again.
+        MouseArea {
+            id: grip
+
+            property real startY: 0
+            property real startHeight: 0
+
+            visible: field.multiline
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            width: 14
+            height: 14
+            cursorShape: Qt.SizeVerCursor
+            onPressed: mouse => {
+                startY = mapToItem(null, 0, mouse.y).y;
+                startHeight = field.height;
+            }
+            onPositionChanged: mouse => {
+                if (pressed)
+                    field.draggedHeight = Math.min(Math.max(startHeight + mapToItem(null, 0, mouse.y).y - startY, 28), 600);
+            }
+            onDoubleClicked: field.draggedHeight = 0
+
+            // Two diagonal strokes in the corner.
+            Repeater {
+                model: [6, 10]
+
+                Rectangle {
+                    required property int modelData
+
+                    width: modelData * Math.SQRT2
+                    height: 1
+                    x: grip.width - 3 - modelData / 2 - width / 2
+                    y: grip.height - 3 - modelData / 2
+                    rotation: -45
+                    color: root.shell.palette.off
+                }
+            }
         }
     }
 
@@ -2112,6 +2189,9 @@ Column {
             Field {
                 id: followField
                 width: parent.width - followSettings.width - sendButton.width - 16
+                multiline: true
+                enterSubmits: true
+                minHeight: 28
                 readOnly: !detail.canFollowUp
                 placeholder: detail.running ? "Claude is working…" : "Ask a follow-up…"
                 onSubmitted: detail.send()
