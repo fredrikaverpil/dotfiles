@@ -20,6 +20,7 @@
       "Bash(go test *)",
       "Bash(ls *)",
       "Bash(make *)",
+      "Bash(npx --package renovate -- renovate-config-validator *)",
       "Edit",
       "Read(~/.claude/*)",
       "WebFetch(domain:docs.cloud.google.com)",
