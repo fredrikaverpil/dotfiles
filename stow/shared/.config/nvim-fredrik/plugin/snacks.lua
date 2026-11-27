@@ -174,7 +174,7 @@ end, { desc = "Command History" })
 
 -- Explorer
 vim.keymap.set("n", "<leader>e", function()
-  Snacks.explorer.open({ hidden = true, ignored = true, exclude = { ".DS_Store" } })
+  Snacks.explorer.open({ hidden = true, ignored = true, exclude = { ".DS_Store", ".rumdl_cache" } })
 end, { desc = "Explorer" })
 vim.keymap.set("n", "<leader>E", function()
   Snacks.explorer.reveal({ hidden = true, ignored = true })
