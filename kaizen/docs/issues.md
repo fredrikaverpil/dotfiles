@@ -166,10 +166,11 @@ Workarounds in the repository's `nix/` tree carried by kaizen hosts.
 - **Workaround:** None. Upstream's flake has failed offline builds since 0.15.0
   because `Cargo.toml` leaves unused `[patch.crates-io]` entries unvendored
   ([storytold/lightcraft#3404](https://github.com/storytold/lightcraft/issues/3404),
-  open). nixpkgs strips them in `postPatch`
-  ([NixOS/nixpkgs#580713](https://github.com/NixOS/nixpkgs/pull/580713)), so
-  tracking upstream directly would require repeating that patch and compiling
-  locally on every bump.
+  fixed by [#3414](https://github.com/storytold/lightcraft/pull/3414), expected
+  in v0.22.0). nixpkgs strips them in `postPatch`
+  ([NixOS/nixpkgs#580713](https://github.com/NixOS/nixpkgs/pull/580713)); until
+  v0.22.0, tracking upstream directly would require repeating that patch and
+  compiling locally on every bump.
 - **Wanted for the X100VI (all currently open upstream):**
   - Improved X-Trans demosaicing with less false color
     ([#2926](https://github.com/storytold/lightcraft/pull/2926)); the current
